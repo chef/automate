@@ -71,7 +71,9 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "could not initialize v1 server")
 	}
 
-	v2PolServer, err := v2.NewPostgresPolicyServer(ctx, l, e, migrationsConfig,
+	// TODO (tc) Refactor how singletons are shared between GRPC servers. Should we also
+	// be sharing a single v2 store / pg instance?
+	v2PolServer, policyRefresher, err := v2.NewPostgresPolicyServer(ctx, l, e, migrationsConfig,
 		dataMigrationsConfig, v1Server.Storage(), vChan)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 policy server")
@@ -88,7 +90,7 @@ func NewGRPCServer(ctx context.Context,
 	}
 
 	v2ProjectsServer, err := v2.NewPostgresProjectsServer(ctx, l, migrationsConfig,
-		dataMigrationsConfig, e, eventServiceClient, configManager)
+		dataMigrationsConfig, e, eventServiceClient, configManager, policyRefresher)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 projects server")
 	}

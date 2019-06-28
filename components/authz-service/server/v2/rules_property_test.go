@@ -22,8 +22,12 @@ const (
 )
 
 func TestCreateRuleProperties(t *testing.T) {
-	ctx := context.Background()
-	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	testFW := testhelpers.NewTestFramework(t, ctx)
+	cl := testFW.Projects
+	testDB := testFW.TestDB
+	seed := testFW.Seed
 
 	graphicRange := rangetable.Merge(unicode.GraphicRanges...)
 
@@ -161,4 +165,5 @@ func TestCreateRuleProperties(t *testing.T) {
 		}),
 	))
 	properties.TestingRun(t)
+	testFW.Shutdown(t, ctx)
 }

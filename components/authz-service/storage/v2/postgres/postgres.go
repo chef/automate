@@ -974,11 +974,6 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 		}
 	}
 
-	err = p.notifyPolicyChange(ctx, tx)
-	if err != nil {
-		return nil, p.processError(err)
-	}
-
 	err = tx.Commit()
 	if err != nil {
 		return nil, storage_errors.NewErrTxCommit(err)
@@ -1224,6 +1219,108 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 		return nil, errors.Wrap(err, "error retrieving result rows")
 	}
 	return rules, nil
+}
+
+// ApplyStagedRules begins a db transaction, locks the rule tables, moves all staged rule updates
+// and deletes into the applied rule table, and returns the database transaction. The transaction is returned
+// so that other non-database concerns can be completed before freeing the lock to avoid race conditions.
+func (p *pg) ApplyStagedRules(ctx context.Context) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return p.processError(err)
+	}
+
+	_, err = tx.ExecContext(ctx,
+		`LOCK TABLE iam_project_rules;
+			LOCK TABLE iam_rule_conditions;
+			LOCK TABLE iam_staged_project_rules;
+			LOCK TABLE iam_staged_rule_conditions; `,
+	)
+	if err != nil {
+		return p.processError(err)
+	}
+
+	// Upsert all staged rules into applied rules marked for update, returning the id and db_id
+	// of all rules affected so we can update their conditions below.
+	rows, err := tx.QueryContext(ctx,
+		`INSERT INTO iam_project_rules (id, project_id, name, type)
+				SELECT s.id, s.project_id, s.name, s.type
+					FROM iam_staged_project_rules AS s
+					WHERE deleted=false
+				ON CONFLICT (id) DO UPDATE
+				SET name=excluded.name, type=excluded.type
+				RETURNING id, db_id;`)
+	if err != nil {
+		return p.processError(err)
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			p.logger.Warnf("failed to close db rows: %s", err.Error())
+		}
+	}()
+
+	// For every staged rule updated, we need to update conditions.
+	ids := make(map[string]string)
+	for rows.Next() {
+		var id string
+		var dbID string
+		err = rows.Scan(&id, &dbID)
+		if err != nil {
+			return p.processError(err)
+		}
+		ids[id] = dbID
+	}
+	if err := rows.Err(); err != nil {
+		return errors.Wrap(err, "error retrieving result rows")
+	}
+
+	for id, dbID := range ids {
+		_, err = tx.ExecContext(ctx,
+			`DELETE FROM iam_rule_conditions WHERE rule_db_id=$1;`, dbID)
+		if err != nil {
+			return p.processError(err)
+		}
+
+		_, err = tx.ExecContext(ctx,
+			`INSERT INTO iam_rule_conditions (rule_db_id, value, attribute, operator)
+					SELECT $2, cond.value, cond.attribute, cond.operator
+						FROM iam_staged_project_rules AS r
+					LEFT OUTER JOIN iam_staged_rule_conditions AS cond
+						ON rule_db_id=r.db_id
+						WHERE r.id=$1;`,
+			id, dbID,
+		)
+		if err != nil {
+			return p.processError(err)
+		}
+	}
+
+	_, err = tx.ExecContext(ctx,
+		`DELETE FROM iam_project_rules
+				WHERE id IN (SELECT id FROM iam_staged_project_rules WHERE deleted)`)
+	if err != nil {
+		return p.processError(err)
+	}
+
+	_, err = tx.ExecContext(ctx, `DELETE FROM iam_staged_project_rules;`)
+	if err != nil {
+		return p.processError(err)
+	}
+
+	err = p.notifyPolicyChange(ctx, tx)
+	if err != nil {
+		return p.processError(err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return storage_errors.NewErrTxCommit(err)
+	}
+
+	return nil
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

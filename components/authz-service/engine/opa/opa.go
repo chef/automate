@@ -225,6 +225,11 @@ func (s *State) DumpDataV2p1(ctx context.Context) error {
 	return dumpData(ctx, s.v2p1Store, s.log)
 }
 
+func (s *State) DumpDataRules(ctx context.Context) error {
+	s.log.Infof("data: %#v", s.ruleStore.Items())
+	return nil
+}
+
 func dumpData(ctx context.Context, store storage.Store, l logger.Logger) error {
 	txn, err := store.NewTransaction(ctx)
 	if err != nil {
@@ -234,6 +239,7 @@ func dumpData(ctx context.Context, store storage.Store, l logger.Logger) error {
 	if err != nil {
 		return err
 	}
+
 	l.Infof("data: %#v", data)
 	return store.Commit(ctx, txn)
 }

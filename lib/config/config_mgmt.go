@@ -3,9 +3,10 @@ package config
 import (
 	"bytes"
 
-	"github.com/chef/automate/lib/io/fileutils"
 	toml "github.com/pelletier/go-toml"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/lib/io/fileutils"
 )
 
 // Manager - configuration manager for the service

@@ -3,38 +3,60 @@ package testhelpers
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"net/url"
 	"os"
 	"path"
 	"runtime"
 	"testing"
+	"time"
 
+	"github.com/golang/mock/gomock"
+	"github.com/golang/protobuf/ptypes"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
+
+	_struct "github.com/golang/protobuf/ptypes/struct"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/authz-service/config"
+	"github.com/chef/automate/components/authz-service/engine"
+	"github.com/chef/automate/components/authz-service/engine/opa"
 	"github.com/chef/automate/components/authz-service/prng"
 	grpc_server "github.com/chef/automate/components/authz-service/server"
 	server "github.com/chef/automate/components/authz-service/server/v2"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
+	postgres_v1 "github.com/chef/automate/components/authz-service/storage/v1/postgres"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
+	automate_event_type "github.com/chef/automate/components/event-service/server"
+	project_update_tags "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/tls/test/helpers"
 )
 
-type TestDB struct {
-	*sql.DB
+type TestFramework struct {
+	Policy                api.PoliciesClient
+	Authz                 api.AuthorizationClient
+	Projects              api.ProjectsClient
+	TestDB                *TestDB
+	Engine                engine.Engine
+	Seed                  int64
+	PolicyRefresher       server.PolicyRefresher
+	ConfigManager         *config.Manager
+	ConfigManagerFilename string
+	GRPC                  *grpctest.Server
+	LatestEvent           *automate_event.EventMsg
+	ProjectUpdateManager  *server.ProjectUpdateManager
 }
 
-type MockEventServiceClient struct {
-	PublishedEvents       int
-	LastestPublishedEvent *automate_event.EventMsg
+type TestDB struct {
+	*sql.DB
 }
 
 const resetDatabaseStatement = `DROP SCHEMA public CASCADE;
@@ -42,21 +64,40 @@ CREATE SCHEMA public;
 GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO public;`
 
-func SetupProjectsAndRulesWithDB(t *testing.T) (api.ProjectsClient, *TestDB, storage.Storage,
-	*MockEventServiceClient, int64) {
+// NewTestFramework spins up authz-service with nothing mocked besides the event service.
+// Due to lots of state (OPA cache that we aren't cleaning up properly, goroutines, etc)
+// it should be used for a single test and Shutdown should be called on it at the end of
+// that test. You should also be passing a cancel-able context.
+func NewTestFramework(t *testing.T, ctx context.Context) *TestFramework {
 	t.Helper()
-	ctx := context.Background()
 	seed := prng.GenSeed(t)
 
-	pg, testDB, _ := SetupTestDB(t)
-	eventServiceClient := &MockEventServiceClient{}
-	configMgr, err := config.NewManager("/tmp/.authz-delete-me")
+	eventServiceClient := automate_event.NewMockEventServiceClient(gomock.NewController(t))
+	pg, testDB, _, migrationConfig := SetupTestDB(t)
+	configMgrFilename := fmt.Sprintf("/tmp/.authz-delete-me-%d", time.Now().UTC().Unix())
+	configMgr, err := config.NewManager(configMgrFilename)
 	require.NoError(t, err)
 
 	l, err := logger.NewLogger("text", "error")
 	require.NoError(t, err, "init logger for storage")
-	projectsSrv, err := server.NewProjectsServer(ctx, l, pg, &TestProjectRulesRetriever{},
-		eventServiceClient, configMgr)
+
+	pgV1, err := postgres_v1.New(ctx, l, *migrationConfig)
+	require.NoError(t, err)
+
+	opaInstance, err := opa.New(ctx, l)
+	require.NoError(t, err, "init OPA")
+
+	vChan := make(chan api.Version, 1)
+	vSwitch := server.NewSwitch(vChan)
+
+	polSrv, polRefresher, err := server.NewPoliciesServer(ctx, l, pg, opaInstance, pgV1, vChan)
+	require.NoError(t, err)
+
+	projectsSrv, err := server.NewProjectsServer(ctx, l, pg, opaInstance,
+		eventServiceClient, configMgr, polRefresher)
+	require.NoError(t, err)
+
+	authzSrv, err := server.NewAuthzServer(l, opaInstance, vSwitch, projectsSrv)
 	require.NoError(t, err)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
@@ -68,6 +109,8 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (api.ProjectsClient, *TestDB, sto
 		grpc_server.InputValidationInterceptor(),
 	))
 	api.RegisterProjectsServer(serv, projectsSrv)
+	api.RegisterAuthorizationServer(serv, authzSrv)
+	api.RegisterPoliciesServer(serv, polSrv)
 
 	grpcServ := grpctest.NewServer(serv)
 
@@ -76,10 +119,45 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (api.ProjectsClient, *TestDB, sto
 		t.Fatalf("connecting to grpc endpoint: %s", err)
 	}
 
-	return api.NewProjectsClient(conn), testDB, pg, eventServiceClient, seed
+	tf := &TestFramework{
+		Policy:                api.NewPoliciesClient(conn),
+		Authz:                 api.NewAuthorizationClient(conn),
+		Projects:              api.NewProjectsClient(conn),
+		TestDB:                testDB,
+		Engine:                opaInstance,
+		Seed:                  seed,
+		PolicyRefresher:       polRefresher,
+		ConfigManager:         configMgr,
+		ConfigManagerFilename: configMgrFilename,
+		ProjectUpdateManager:  projectsSrv.(*server.ProjectState).ProjectUpdateManager,
+		GRPC:                  grpcServ,
+	}
+
+	eventServiceClient.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
+		func(cxt interface{}, in *automate_event.PublishRequest) (*automate_event.PublishResponse, error) {
+			tf.LatestEvent = in.Msg
+			return &automate_event.PublishResponse{}, nil
+		})
+
+	return tf
 }
 
-func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *prng.Prng) {
+// Shutdown must be called at the end of every test that uses TestFramework
+// otherwise strange things might happen with the authz-service/config.Manager
+// because other tests might accidentally get state to its config file
+// if we don't kill the goroutine that writes to it.
+func (tf *TestFramework) Shutdown(t *testing.T, ctx context.Context) {
+	t.Helper()
+	tf.TestDB.Flush(t)
+	tf.ConfigManager.Close()
+	err := os.Remove(tf.ConfigManagerFilename)
+	require.NoError(t, err)
+	tf.GRPC.Close()
+	// TODO (tc): Track down and kill literally every goroutine we start, otherwise
+	// this TestFramework's authz instance could write some bad state while the next test is running.
+}
+
+func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *prng.Prng, *migration.Config) {
 	t.Helper()
 
 	ctx := context.Background()
@@ -112,13 +190,12 @@ func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *prng.Prng) {
 
 	backend, err := postgres.New(ctx, l, *migrationConfig, datamigration.Config(*dataMigrationConfig))
 	require.NoError(t, err)
-	return backend, &TestDB{DB: db}, prng.Seed(t)
+	return backend, &TestDB{DB: db}, prng.Seed(t), migrationConfig
 }
 
 func (d *TestDB) Flush(t *testing.T) {
 	_, err := d.Exec(`DELETE FROM iam_policies CASCADE; DELETE FROM iam_members CASCADE;
-		DELETE FROM iam_roles CASCADE; DELETE FROM iam_projects CASCADE; DELETE FROM iam_role_projects CASCADE;
-		DELETE FROM migration_status; INSERT INTO migration_status(state) VALUES ('init')`)
+		DELETE FROM iam_roles CASCADE; DELETE FROM iam_projects CASCADE; DELETE FROM iam_role_projects CASCADE;`)
 	require.NoError(t, err)
 }
 
@@ -178,6 +255,11 @@ func openDB(t *testing.T) *sql.DB {
 	return db
 }
 
+type MockEventServiceClient struct {
+	PublishedEvents       int
+	LastestPublishedEvent *automate_event.EventMsg
+}
+
 func (t *MockEventServiceClient) Publish(ctx context.Context,
 	in *automate_event.PublishRequest,
 	opts ...grpc.CallOption) (*automate_event.PublishResponse, error) {
@@ -210,4 +292,69 @@ type TestProjectRulesRetriever struct{}
 func (t *TestProjectRulesRetriever) ListProjectMappings(
 	context.Context) (map[string][]storage.Rule, error) {
 	return make(map[string][]storage.Rule, 0), nil
+}
+
+type mockPolicyRefresher struct{}
+
+func NewMockPolicyRefresher() server.PolicyRefresher {
+	return &mockPolicyRefresher{}
+}
+
+func (*mockPolicyRefresher) Refresh(context.Context) error {
+	return nil
+}
+
+func (refresher *mockPolicyRefresher) RefreshAsync() error {
+	return nil
+}
+
+func CreateStatusEventMsg(projectUpdateIDTag string, estimatedTimeCompleteInSec float64,
+	percentageComplete float64, completed bool, producer string) *automate_event.EventMsg {
+	return &automate_event.EventMsg{
+		EventID:   "event-id-2",
+		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdateStatus},
+		Published: ptypes.TimestampNow(),
+		Producer: &automate_event.Producer{
+			ID: producer,
+		},
+		Data: &_struct.Struct{
+			Fields: map[string]*_struct.Value{
+				"Completed": {
+					Kind: &_struct.Value_BoolValue{
+						BoolValue: completed,
+					},
+				},
+				"PercentageComplete": {
+					Kind: &_struct.Value_NumberValue{
+						NumberValue: percentageComplete,
+					},
+				},
+				"EstimatedTimeCompleteInSec": {
+					Kind: &_struct.Value_NumberValue{
+						NumberValue: estimatedTimeCompleteInSec,
+					},
+				},
+				project_update_tags.ProjectUpdateIDTag: {
+					Kind: &_struct.Value_StringValue{
+						StringValue: projectUpdateIDTag,
+					},
+				},
+			},
+		},
+	}
+}
+
+func WaitForWithTimeout(t *testing.T, f func() bool, timeout time.Duration, message string) {
+	expired := time.Now().Add(timeout)
+	for {
+		if f() {
+			break
+		}
+
+		if expired.Before(time.Now()) {
+			assert.Fail(t, message)
+			break
+		}
+		time.Sleep(time.Millisecond * 10)
+	}
 }

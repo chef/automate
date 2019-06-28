@@ -2925,14 +2925,15 @@ func assertRolesMatch(t *testing.T, storageRole storage.Role, apiRole api_v2.Rol
 }
 
 type testSetup struct {
-	policy       api_v2.PoliciesClient
-	authz        api_v2.AuthorizationClient
-	projects     api_v2.ProjectsClient
-	policyCache  *cache.Cache
-	roleCache    *cache.Cache
-	projectCache *cache.Cache
-	status       storage.MigrationStatusProvider
-	switcher     *v2.VersionSwitch
+	policy         api_v2.PoliciesClient
+	authz          api_v2.AuthorizationClient
+	projects       api_v2.ProjectsClient
+	policyCache    *cache.Cache
+	roleCache      *cache.Cache
+	projectCache   *cache.Cache
+	status         storage.MigrationStatusProvider
+	switcher       *v2.VersionSwitch
+	rulesRetriever engine.ProjectRulesRetriever
 }
 
 func setupV2WithWriter(t *testing.T,
@@ -2977,14 +2978,14 @@ func setupV2WithMigrationState(t *testing.T,
 		require.NoError(t, migration(mem_v2)) // this is IAM v2
 	}
 
-	polV2, err := v2.NewPoliciesServer(ctx, l, mem_v2, writer, pl, vChan)
+	polV2, _, err := v2.NewPoliciesServer(ctx, l, mem_v2, writer, pl, vChan)
 	require.NoError(t, err)
 
 	eventServiceClient := &testhelpers.MockEventServiceClient{}
 	configMgr, err := config.NewManager("/tmp/.authz-delete-me")
 	require.NoError(t, err)
 	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2,
-		rulesRetriever, eventServiceClient, configMgr)
+		rulesRetriever, eventServiceClient, configMgr, testhelpers.NewMockPolicyRefresher())
 	require.NoError(t, err)
 
 	vSwitch := v2.NewSwitch(vChan)
@@ -3017,14 +3018,15 @@ func setupV2WithMigrationState(t *testing.T,
 	}
 
 	return testSetup{
-		policy:       api_v2.NewPoliciesClient(conn),
-		authz:        api_v2.NewAuthorizationClient(conn),
-		projects:     api_v2.NewProjectsClient(conn),
-		policyCache:  mem_v2.PoliciesCache(),
-		roleCache:    mem_v2.RolesCache(),
-		projectCache: mem_v2.ProjectsCache(),
-		status:       mem_v2,
-		switcher:     vSwitch,
+		policy:         api_v2.NewPoliciesClient(conn),
+		authz:          api_v2.NewAuthorizationClient(conn),
+		projects:       api_v2.NewProjectsClient(conn),
+		policyCache:    mem_v2.PoliciesCache(),
+		roleCache:      mem_v2.RolesCache(),
+		projectCache:   mem_v2.ProjectsCache(),
+		status:         mem_v2,
+		switcher:       vSwitch,
+		rulesRetriever: rulesRetriever,
 	}
 }
 

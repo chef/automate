@@ -15,6 +15,7 @@ import (
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/authz-service/config"
 	v2 "github.com/chef/automate/components/authz-service/server/v2"
+	"github.com/chef/automate/components/authz-service/testhelpers"
 	automate_event_type "github.com/chef/automate/components/event-service/server"
 	project_update_tags "github.com/chef/automate/lib/authz"
 	event_ids "github.com/chef/automate/lib/event"
@@ -79,7 +80,7 @@ func TestProjectUpdateManagerFinishesAfterCompletStatusMessages(t *testing.T) {
 	err = manager.Start()
 	assert.NoError(t, err)
 
-	waitForWithTimeout(t, func() bool {
+	testhelpers.WaitForWithTimeout(t, func() bool {
 		return config.RunningState == manager.State()
 	}, time.Second*3, "State did not switch to Running")
 
@@ -91,7 +92,7 @@ func TestProjectUpdateManagerFinishesAfterCompletStatusMessages(t *testing.T) {
 
 	projectUpdateIDTag := eventData.Fields[project_update_tags.ProjectUpdateIDTag].GetStringValue()
 
-	infraStatusEvent := createStatusEventMsg(projectUpdateIDTag,
+	infraStatusEvent := testhelpers.CreateStatusEventMsg(projectUpdateIDTag,
 		0.0,  // EstimatedTimeCompleteInSec
 		1.0,  // percentageComplete
 		true, // completed
@@ -99,7 +100,7 @@ func TestProjectUpdateManagerFinishesAfterCompletStatusMessages(t *testing.T) {
 
 	manager.ProcessStatusEvent(infraStatusEvent)
 
-	complianceStatusEvent := createStatusEventMsg(
+	complianceStatusEvent := testhelpers.CreateStatusEventMsg(
 		projectUpdateIDTag, // projectUpdateID not matching current
 		0.0,                // EstimatedTimeCompleteInSec
 		1.0,                // percentageComplete
@@ -108,7 +109,7 @@ func TestProjectUpdateManagerFinishesAfterCompletStatusMessages(t *testing.T) {
 
 	manager.ProcessStatusEvent(complianceStatusEvent)
 
-	waitForWithTimeout(t, func() bool {
+	testhelpers.WaitForWithTimeout(t, func() bool {
 		return config.NotRunningState == manager.State()
 	}, time.Second*3, "State did not switch to NotRunning")
 }
@@ -131,7 +132,7 @@ func TestProjectUpdateManagerSendCancelEvent(t *testing.T) {
 
 	err = manager.Start()
 	assert.NoError(t, err)
-	waitForWithTimeout(t, func() bool {
+	testhelpers.WaitForWithTimeout(t, func() bool {
 		return config.RunningState == manager.State()
 	}, time.Second*3, "State did not switch to Running")
 
@@ -143,7 +144,7 @@ func TestProjectUpdateManagerSendCancelEvent(t *testing.T) {
 
 	projectUpdateIDTag := eventData.Fields[project_update_tags.ProjectUpdateIDTag].GetStringValue()
 
-	infraStatusEvent := createStatusEventMsg(projectUpdateIDTag,
+	infraStatusEvent := testhelpers.CreateStatusEventMsg(projectUpdateIDTag,
 		0.0,  // EstimatedTimeCompleteInSec
 		1.0,  // percentageComplete
 		true, // completed
@@ -152,7 +153,7 @@ func TestProjectUpdateManagerSendCancelEvent(t *testing.T) {
 	manager.ProcessStatusEvent(infraStatusEvent)
 
 	manager.Cancel()
-	waitForWithTimeout(t, func() bool {
+	testhelpers.WaitForWithTimeout(t, func() bool {
 		for _, event := range eventsSent {
 			if event.Type.Name == automate_event_type.ProjectRulesCancelUpdate {
 				return true
@@ -165,7 +166,7 @@ func TestProjectUpdateManagerSendCancelEvent(t *testing.T) {
 	// State does not change from running cancel
 	assert.Equal(t, config.RunningState, manager.State())
 
-	complianceStatusEvent := createStatusEventMsg(
+	complianceStatusEvent := testhelpers.CreateStatusEventMsg(
 		projectUpdateIDTag, // projectUpdateID not matching current
 		0.0,                // EstimatedTimeCompleteInSec
 		1.0,                // percentageComplete
@@ -174,7 +175,7 @@ func TestProjectUpdateManagerSendCancelEvent(t *testing.T) {
 
 	manager.ProcessStatusEvent(complianceStatusEvent)
 
-	waitForWithTimeout(t, func() bool {
+	testhelpers.WaitForWithTimeout(t, func() bool {
 		return config.NotRunningState == manager.State()
 	}, time.Second*3, "State did not switch to NotRunning")
 }
@@ -197,7 +198,7 @@ func TestProjectUpdateManagerNoCancelEventSent(t *testing.T) {
 
 	err = manager.Start()
 	assert.NoError(t, err)
-	waitForWithTimeout(t, func() bool {
+	testhelpers.WaitForWithTimeout(t, func() bool {
 		return config.RunningState == manager.State()
 	}, time.Second*3, "State did not switch to Running")
 
@@ -208,7 +209,7 @@ func TestProjectUpdateManagerNoCancelEventSent(t *testing.T) {
 	eventData := eventsSent[0].Data
 	projectUpdateIDTag := eventData.Fields[project_update_tags.ProjectUpdateIDTag].GetStringValue()
 
-	infraStatusEvent := createStatusEventMsg(projectUpdateIDTag,
+	infraStatusEvent := testhelpers.CreateStatusEventMsg(projectUpdateIDTag,
 		0.0,  // EstimatedTimeCompleteInSec
 		1.0,  // percentageComplete
 		true, // completed
@@ -216,7 +217,7 @@ func TestProjectUpdateManagerNoCancelEventSent(t *testing.T) {
 
 	manager.ProcessStatusEvent(infraStatusEvent)
 
-	complianceStatusEvent := createStatusEventMsg(
+	complianceStatusEvent := testhelpers.CreateStatusEventMsg(
 		projectUpdateIDTag, // projectUpdateID not matching current
 		0.0,                // EstimatedTimeCompleteInSec
 		1.0,                // percentageComplete
@@ -225,7 +226,7 @@ func TestProjectUpdateManagerNoCancelEventSent(t *testing.T) {
 
 	manager.ProcessStatusEvent(complianceStatusEvent)
 
-	waitForWithTimeout(t, func() bool {
+	testhelpers.WaitForWithTimeout(t, func() bool {
 		return config.NotRunningState == manager.State()
 	}, time.Second*3, "State did not switch to NotRunning")
 
@@ -260,7 +261,7 @@ func TestProjectUpdateManagerNotFinishAfterOldCompletStatusMessages(t *testing.T
 	eventData := lastestPublishedEvent.Data
 	projectUpdateIDTag := eventData.Fields[project_update_tags.ProjectUpdateIDTag].GetStringValue()
 
-	infraStatusEvent := createStatusEventMsg(projectUpdateIDTag,
+	infraStatusEvent := testhelpers.CreateStatusEventMsg(projectUpdateIDTag,
 		0.0,  // EstimatedTimeCompleteInSec
 		1.0,  // percentageComplete
 		true, // completed
@@ -269,11 +270,11 @@ func TestProjectUpdateManagerNotFinishAfterOldCompletStatusMessages(t *testing.T
 	err = manager.ProcessStatusEvent(infraStatusEvent)
 	assert.NoError(t, err)
 
-	complianceStatusEvent := createStatusEventMsg(
+	complianceStatusEvent := testhelpers.CreateStatusEventMsg(
 		"Not-active-project-update-id", // projectUpdateID not matching current
-		0.0,                            // EstimatedTimeCompleteInSec
-		1.0,                            // percentageComplete
-		true,                           // completed
+		0.0,  // EstimatedTimeCompleteInSec
+		1.0,  // percentageComplete
+		true, // completed
 		event_ids.ComplianceInspecReportProducerID)
 
 	err = manager.ProcessStatusEvent(complianceStatusEvent)
@@ -307,7 +308,7 @@ func TestProjectUpdateManagerPercentageComplete(t *testing.T) {
 
 	projectUpdateIDTag := eventData.Fields[project_update_tags.ProjectUpdateIDTag].GetStringValue()
 
-	infraStatusEvent := createStatusEventMsg(projectUpdateIDTag,
+	infraStatusEvent := testhelpers.CreateStatusEventMsg(projectUpdateIDTag,
 		1554844823.0, // This update is estimated to be longer than infra
 		0.8,          // percentageComplete
 		false,        // completed
@@ -315,7 +316,7 @@ func TestProjectUpdateManagerPercentageComplete(t *testing.T) {
 
 	manager.ProcessStatusEvent(infraStatusEvent)
 
-	complianceStatusEvent := createStatusEventMsg(projectUpdateIDTag,
+	complianceStatusEvent := testhelpers.CreateStatusEventMsg(projectUpdateIDTag,
 		1554845823.0, // This update is estimated to be longer than infra
 		0.4,          // percentageComplete
 		false,        // completed
@@ -351,7 +352,7 @@ func TestProjectUpdateManagerPercentageCompleteAllComplete(t *testing.T) {
 
 	projectUpdateIDTag := eventData.Fields[project_update_tags.ProjectUpdateIDTag].GetStringValue()
 
-	infraStatusEvent := createStatusEventMsg(projectUpdateIDTag,
+	infraStatusEvent := testhelpers.CreateStatusEventMsg(projectUpdateIDTag,
 		1554844823.0, // This update is estimated to be longer than infra
 		0.8,          // percentageComplete
 		true,         // completed
@@ -359,7 +360,7 @@ func TestProjectUpdateManagerPercentageCompleteAllComplete(t *testing.T) {
 
 	manager.ProcessStatusEvent(infraStatusEvent)
 
-	complianceStatusEvent := createStatusEventMsg(projectUpdateIDTag,
+	complianceStatusEvent := testhelpers.CreateStatusEventMsg(projectUpdateIDTag,
 		1554845823.0, // This update is estimated to be longer than infra
 		0.4,          // percentageComplete
 		true,         // completed
@@ -394,7 +395,7 @@ func TestProjectUpdateManagerFailureMessagesOldUpdate(t *testing.T) {
 	eventData := lastestPublishedEvent.Data
 	projectUpdateIDTag := eventData.Fields[project_update_tags.ProjectUpdateIDTag].GetStringValue()
 
-	infraStatusEvent := createStatusEventMsg(projectUpdateIDTag,
+	infraStatusEvent := testhelpers.CreateStatusEventMsg(projectUpdateIDTag,
 		0.0,  // EstimatedTimeCompleteInSec
 		1.0,  // percentageComplete
 		true, // completed
@@ -432,42 +433,6 @@ func createFailureEventMsg(projectUpdateIDTag string, producer string) *automate
 	}
 }
 
-func createStatusEventMsg(projectUpdateIDTag string, estimatedTimeCompleteInSec float64,
-	percentageComplete float64, completed bool, producer string) *automate_event.EventMsg {
-	return &automate_event.EventMsg{
-		EventID:   "event-id-2",
-		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdateStatus},
-		Published: ptypes.TimestampNow(),
-		Producer: &automate_event.Producer{
-			ID: producer,
-		},
-		Data: &_struct.Struct{
-			Fields: map[string]*_struct.Value{
-				"Completed": {
-					Kind: &_struct.Value_BoolValue{
-						BoolValue: completed,
-					},
-				},
-				"PercentageComplete": {
-					Kind: &_struct.Value_NumberValue{
-						NumberValue: percentageComplete,
-					},
-				},
-				"EstimatedTimeCompleteInSec": {
-					Kind: &_struct.Value_NumberValue{
-						NumberValue: estimatedTimeCompleteInSec,
-					},
-				},
-				project_update_tags.ProjectUpdateIDTag: {
-					Kind: &_struct.Value_StringValue{
-						StringValue: projectUpdateIDTag,
-					},
-				},
-			},
-		},
-	}
-}
-
 func waitFor(f func() bool) {
 	period := time.Millisecond * 10
 
@@ -477,20 +442,5 @@ func waitFor(f func() bool) {
 		}
 
 		time.Sleep(period)
-	}
-}
-
-func waitForWithTimeout(t *testing.T, f func() bool, timeout time.Duration, message string) {
-	expired := time.Now().Add(timeout)
-	for {
-		if f() {
-			break
-		}
-
-		if expired.Before(time.Now()) {
-			assert.Fail(t, message)
-			break
-		}
-		time.Sleep(time.Millisecond * 10)
 	}
 }
