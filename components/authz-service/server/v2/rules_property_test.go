@@ -169,9 +169,10 @@ func TestCreateRuleProperties(t *testing.T) {
 		createProjectAndRuleGen,
 	))
 
-	properties.Property("creates a staged rule, updates it, and applies it", prop.ForAll(
+	properties.Property("updates a staged rule and applies update", prop.ForAll(
 		func(reqs projectAndRuleReq) bool {
 			defer testDB.Flush(t)
+
 			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
 			if err != nil {
 				t.Error(err.Error())
@@ -209,9 +210,10 @@ func TestCreateRuleProperties(t *testing.T) {
 		createProjectAndRuleGen,
 	))
 
-	properties.Property("creates a staged rule, applies it, deletes it, applies deletion", prop.ForAll(
+	properties.Property("updates an applied rule and applies update", prop.ForAll(
 		func(reqs projectAndRuleReq) bool {
 			defer testDB.Flush(t)
+
 			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
 			if err != nil {
 				t.Error(err.Error())
@@ -226,9 +228,92 @@ func TestCreateRuleProperties(t *testing.T) {
 
 			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-			_, err = cl.DeleteRule(ctx, &api.DeleteRuleReq{
-				Id: reqs.rules[0].Id,
-			})
+			rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+			statusBeforeSecondUpdate := rApplied.Rule.Status
+
+			updateReq := api.UpdateRuleReq{
+				Id:         reqs.rules[0].Id,
+				ProjectId:  reqs.rules[0].ProjectId,
+				Name:       reqs.rules[0].Name + " updated",
+				Type:       reqs.rules[0].Type,
+				Conditions: reqs.rules[0].Conditions,
+			}
+			rUpdated, err := cl.UpdateRule(ctx, &updateReq)
+
+			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+			rApplied, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			return statusBeforeSecondUpdate == "applied" &&
+				rUpdated.Rule.Status == "" && // TODO: this is wrong; should be "staged"
+				rApplied.Rule.Status == "applied" &&
+				RuleMatches(updateReq, *rApplied.Rule) &&
+				RuleMatches(updateReq, *rUpdated.Rule)
+		},
+		createProjectAndRuleGen,
+	))
+
+	properties.Property("deletes a staged rule and applies deletion", prop.ForAll(
+		func(reqs projectAndRuleReq) bool {
+			defer testDB.Flush(t)
+
+			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			_, err = cl.CreateRule(ctx, &reqs.rules[0])
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			_, err = cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: reqs.rules[0].Id})
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+			found := err == nil
+
+			return !found
+		},
+		createProjectAndRuleGen,
+	))
+
+	properties.Property("deletes an applied rule and applies deletion", prop.ForAll(
+		func(reqs projectAndRuleReq) bool {
+			defer testDB.Flush(t)
+
+			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			_, err = cl.CreateRule(ctx, &reqs.rules[0])
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
+
+			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+			_, err = cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: reqs.rules[0].Id})
+			if err != nil {
+				t.Error(err.Error())
+				return false
+			}
 
 			rDeleted, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
 			if err != nil {
@@ -252,6 +337,7 @@ func TestCreateRuleProperties(t *testing.T) {
 	properties.Property("ensures rule IDs are unique", prop.ForAll(
 		func(reqs projectAndRuleReq) bool {
 			defer testDB.Flush(t)
+
 			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
 			if err != nil {
 				t.Error(err.Error())
