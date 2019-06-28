@@ -388,6 +388,63 @@ func (suite *NodesIntegrationSuite) TestProjectsAreRoundtrippedThroughNodeLifecy
 	suite.Equal([]string{"Best Soups", "Mexican Restaurant Menu"}, controlNode.Projects)
 }
 
+func (suite *NodesIntegrationSuite) TestBulkAddNodesAndTagsUpdate() {
+	ctx := context.Background()
+
+	node1 := &nodes.Node{Name: "Bulky One",
+		Tags: []*common.Kv{{Key: "bleep", Value: "bloop"}}}
+
+	testNodeIDs, err := suite.Database.BulkAddNodes([]*nodes.Node{node1})
+	suite.Equal(0, len(testNodeIDs))
+	suite.EqualError(err, "BulkAddNodes requests require hosts in TargetConfig")
+
+	// Setting up node1 with Host
+	node1.TargetConfig = &nodes.TargetConfig{Host: "127.0.0.1"}
+	testNodeIDs, err = suite.Database.BulkAddNodes([]*nodes.Node{node1})
+	suite.Equal(0, len(testNodeIDs))
+	suite.EqualError(err, "BulkAddNodes does not support TargetConfig.Host, use Hosts instead")
+
+	// Setting up node1 with Hosts
+	node1.TargetConfig = &nodes.TargetConfig{Hosts: []string{"127.0.0.1"}}
+
+	// Setting up node2 with Hosts
+	node2 := &nodes.Node{Name: "Bulky Two",
+		TargetConfig: &nodes.TargetConfig{Hosts: []string{"127.0.0.2"}},
+		Tags:         []*common.Kv{{Key: "bada", Value: "bing"}, {Key: "bleep", Value: "bloop"}}}
+
+	// Add the nodes we're going to test with
+	testNodeIDs, err = suite.Database.BulkAddNodes([]*nodes.Node{node1, node2})
+	suite.Require().NoError(err)
+	suite.Require().Equal(2, len(testNodeIDs))
+	suite.Require().NotEmpty(testNodeIDs[0])
+	suite.Require().NoError(err)
+
+	testNode, err := suite.Database.GetNode(ctx, testNodeIDs[0])
+	suite.Require().NoError(err)
+	suite.Equal([]*common.Kv{{Key: "bleep", Value: "bloop"}}, testNode.Tags)
+
+	testNode, err = suite.Database.GetNode(ctx, testNodeIDs[1])
+	suite.Require().NoError(err)
+	suite.Equal([]*common.Kv{{Key: "bada", Value: "bing"}, {Key: "bleep", Value: "bloop"}}, testNode.Tags)
+
+	// Update the tags on node one
+	err = suite.Database.UpdateNode(&nodes.Node{Id: testNodeIDs[0], Name: "Bulky One - Updated",
+		Tags: []*common.Kv{{Key: "bleep", Value: "new"}}})
+	suite.Require().NoError(err)
+
+	// Name and Tags on one should be updated.
+	testNode, err = suite.Database.GetNode(ctx, testNodeIDs[0])
+	suite.Require().NoError(err)
+	suite.Equal("Bulky One - Updated", testNode.Name)
+	suite.Equal([]*common.Kv{{Key: "bleep", Value: "new"}}, testNode.Tags)
+
+	// Name and Tags on second node should be the same.
+	testNode, err = suite.Database.GetNode(ctx, testNodeIDs[1])
+	suite.Require().NoError(err)
+	suite.Equal("Bulky Two", testNode.Name)
+	suite.Equal([]*common.Kv{{Key: "bada", Value: "bing"}, {Key: "bleep", Value: "bloop"}}, testNode.Tags)
+}
+
 var nowTime = ptypes.TimestampNow()
 var baseNodeData = manager.NodeMetadata{
 	Uuid:            "1223-4254-2424-1322",

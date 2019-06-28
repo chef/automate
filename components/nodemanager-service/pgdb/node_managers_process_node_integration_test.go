@@ -511,8 +511,8 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeUUIDWithTags() 
 	}
 	suite.Equal("my really cool node", readNode.Name)
 	suite.Equal([]*common.Kv{
-		{Key: "my test", Value: "my val"},
 		{Key: "environment", Value: "dev"},
+		{Key: "my test", Value: "my val"},
 	}, readNode.Tags)
 
 	// send node in again with more tags
@@ -536,10 +536,10 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeUUIDWithTags() 
 	}
 
 	suite.Equal([]*common.Kv{
-		{Key: "my test", Value: "my val"},
-		{Key: "environment", Value: "dev"},
-		{Key: "birds", Value: "are fun"},
 		{Key: "archer", Value: "detective"},
+		{Key: "birds", Value: "are fun"},
+		{Key: "environment", Value: "dev"},
+		{Key: "my test", Value: "my val"},
 	}, readNode.Tags)
 	_, err = suite.Database.DeleteNode(listNodes[0].Id)
 }
@@ -584,8 +584,8 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeSourceInfoWithT
 	}
 	suite.Equal("my really cool node", readNode.Name)
 	suite.Equal([]*common.Kv{
-		{Key: "my test", Value: "my val"},
 		{Key: "environment", Value: "dev"},
+		{Key: "my test", Value: "my val"},
 	}, readNode.Tags)
 
 	// send node in again with more tags
@@ -609,10 +609,10 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeSourceInfoWithT
 	}
 
 	suite.Equal([]*common.Kv{
-		{Key: "my test", Value: "my val"},
-		{Key: "environment", Value: "dev"},
-		{Key: "birds", Value: "are fun"},
 		{Key: "archer", Value: "detective"},
+		{Key: "birds", Value: "are fun"},
+		{Key: "environment", Value: "dev"},
+		{Key: "my test", Value: "my val"},
 	}, readNode.Tags)
 	_, err = suite.Database.DeleteNode(listNodes[0].Id)
 }

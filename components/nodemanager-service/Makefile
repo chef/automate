@@ -186,6 +186,11 @@ run-db-tests:
 	@POSTGRES_URI="$(POSTGRES_URI)" \
 		go test -v $(shell go list ./pgdb/...) -cover -database
 
+run-one-db-test:
+	@POSTGRES_URI="$(POSTGRES_URI)" \
+		go test -v $(shell go list ./pgdb/...) -run TestRunNodesIntegrationSuite/TestBulkAddNodesAndTagsUpdate -cover -database
+
+
 test-compliance-ingestion-to-manager-conn: run-background
 	cd ../compliance-service && make run
 	go run ../compliance-service/examples/ingest/ingest_client.go --file ../compliance-service/ingest/examples/compliance-success-tiny-report.json
