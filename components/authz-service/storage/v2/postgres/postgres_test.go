@@ -3407,7 +3407,7 @@ func TestCreateRule(t *testing.T) {
 		"create event rule with multiple conditions": func(t *testing.T) {
 			projID := "project-1"
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
-			ruleType := storage.Node
+			ruleType := storage.Event
 			condition1, err := storage.NewCondition(ruleType,
 				[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
 			require.NoError(t, err)
@@ -3466,9 +3466,8 @@ func TestListRules(t *testing.T) {
 			projID := "project-1"
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 
-			ruleType := storage.Node
-			rule1 := insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID, ruleType)
-			rule2 := insertAppliedRuleWithMultipleConditions(t, db, "rule-2", projID, ruleType)
+			rule1 := insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID, storage.Event)
+			rule2 := insertAppliedRuleWithMultipleConditions(t, db, "rule-2", projID, storage.Node)
 
 			resp, err := store.ListRules(ctx)
 			assert.NoError(t, err)
@@ -3480,9 +3479,8 @@ func TestListRules(t *testing.T) {
 			projID := "project-1"
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 
-			ruleType := storage.Node
-			rule1 := insertAppliedRuleWithMultipleConditions(t, db, "rule1", projID, ruleType)
-			insertStagedRuleWithMultipleConditions(t, db, "rule2", projID, ruleType, false)
+			rule1 := insertAppliedRuleWithMultipleConditions(t, db, "rule1", projID, storage.Node)
+			insertStagedRuleWithMultipleConditions(t, db, "rule2", projID, storage.Event, false)
 
 			resp, err := store.ListRules(ctx)
 			assert.NoError(t, err)
@@ -3534,12 +3532,11 @@ func TestListStagedAndAppliedRules(t *testing.T) {
 			projID := "project-1"
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 
-			ruleType := storage.Node
-			rule1 := insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID, ruleType)
-			rule2 := insertAppliedRuleWithMultipleConditions(t, db, "rule-2", projID, ruleType)
+			rule1 := insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID, storage.Node)
+			rule2 := insertAppliedRuleWithMultipleConditions(t, db, "rule-2", projID, storage.Event)
 
-			rule3 := insertStagedRuleWithMultipleConditions(t, db, "rule-3", projID, ruleType, false)
-			rule4 := insertStagedRuleWithMultipleConditions(t, db, "rule-4", projID, ruleType, false)
+			rule3 := insertStagedRuleWithMultipleConditions(t, db, "rule-3", projID, storage.Node, false)
+			rule4 := insertStagedRuleWithMultipleConditions(t, db, "rule-4", projID, storage.Node, false)
 
 			resp, err := store.ListStagedAndAppliedRules(ctx)
 			require.NoError(t, err)
@@ -3554,12 +3551,11 @@ func TestListStagedAndAppliedRules(t *testing.T) {
 			insertTestProject(t, db, projID2, "pika p", storage.Custom)
 			ctx = insertProjectsIntoContext(ctx, []string{"project-3", projID2})
 
-			ruleType := storage.Node
-			insertAppliedRuleWithMultipleConditions(t, db, "applied-rule", projID, ruleType)
-			rule2 := insertAppliedRuleWithMultipleConditions(t, db, "applied-rule2", projID2, ruleType)
+			insertAppliedRuleWithMultipleConditions(t, db, "applied-rule", projID, storage.Node)
+			rule2 := insertAppliedRuleWithMultipleConditions(t, db, "applied-rule2", projID2, storage.Event)
 
-			insertStagedRuleWithMultipleConditions(t, db, "staged-rule", projID, ruleType, false)
-			rule4 := insertStagedRuleWithMultipleConditions(t, db, "staged-rule4", projID2, ruleType, false)
+			insertStagedRuleWithMultipleConditions(t, db, "staged-rule", projID, storage.Event, false)
+			rule4 := insertStagedRuleWithMultipleConditions(t, db, "staged-rule4", projID2, storage.Node, false)
 
 			resp, err := store.ListStagedAndAppliedRules(ctx)
 			assert.NoError(t, err)
@@ -3624,10 +3620,9 @@ func TestListRulesForProject(t *testing.T) {
 			projID2 := "project-2"
 			insertTestProject(t, db, projID2, "pika p", storage.Custom)
 
-			ruleType := storage.Node
-			insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID, ruleType)
-			rule2 := insertAppliedRuleWithMultipleConditions(t, db, "rule-2", projID2, ruleType)
-			rule3 := insertAppliedRuleWithMultipleConditions(t, db, "rule-3", projID2, ruleType)
+			insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID, storage.Event)
+			rule2 := insertAppliedRuleWithMultipleConditions(t, db, "rule-2", projID2, storage.Node)
+			rule3 := insertAppliedRuleWithMultipleConditions(t, db, "rule-3", projID2, storage.Event)
 
 			resp, err := store.ListRulesForProject(ctx, projID2)
 			assert.NoError(t, err)
@@ -3643,10 +3638,9 @@ func TestListRulesForProject(t *testing.T) {
 			insertTestProject(t, db, projID2, "pika p", storage.Custom)
 			ctx = insertProjectsIntoContext(ctx, []string{"project-3", projID2})
 
-			ruleType := storage.Node
-			insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID, ruleType)
-			rule2 := insertAppliedRuleWithMultipleConditions(t, db, "rule-2", projID2, ruleType)
-			rule3 := insertAppliedRuleWithMultipleConditions(t, db, "rule-3", projID2, ruleType)
+			insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID, storage.Node)
+			rule2 := insertAppliedRuleWithMultipleConditions(t, db, "rule-2", projID2, storage.Event)
+			rule3 := insertAppliedRuleWithMultipleConditions(t, db, "rule-3", projID2, storage.Event)
 
 			resp, err := store.ListRulesForProject(ctx, projID2)
 			assert.NoError(t, err)
@@ -3662,7 +3656,7 @@ func TestListRulesForProject(t *testing.T) {
 			insertTestProject(t, db, projID2, "pika p", storage.Custom)
 			ctx = insertProjectsIntoContext(ctx, []string{"project-3", "project-4"})
 
-			ruleType := storage.Node
+			ruleType := storage.Event
 			insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID, ruleType)
 
 			insertAppliedRuleWithMultipleConditions(t, db, "rule-2", projID2, ruleType)
@@ -3677,7 +3671,7 @@ func TestListRulesForProject(t *testing.T) {
 			projID := "project-1"
 			insertTestProject(t, db, projID, "first project", storage.Custom)
 
-			condition, err := storage.NewCondition(storage.Node,
+			condition, err := storage.NewCondition(storage.Event,
 				[]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
 			require.NoError(t, err)
 			rule, err := storage.NewRule("first-rule", projID, "the very first rule", condition.Type,
@@ -3686,9 +3680,9 @@ func TestListRulesForProject(t *testing.T) {
 			insertAppliedRule(t, db, &rule)
 
 			updatedCondition, err := storage.NewCondition(storage.Node,
-				[]string{"new-chef-server"}, storage.ChefServer, storage.Equals)
+				[]string{"new-chef-role"}, storage.ChefRole, storage.Equals)
 			require.NoError(t, err)
-			updatedRule, err := storage.NewRule(rule.ID, projID, "updated rule name", condition.Type,
+			updatedRule, err := storage.NewRule(rule.ID, projID, "updated rule name", updatedCondition.Type,
 				[]storage.Condition{updatedCondition})
 			insertStagedRule(t, db, &updatedRule, false)
 
@@ -3740,7 +3734,7 @@ func TestListRulesForProject(t *testing.T) {
 			ctx := context.Background()
 			projID1 := "foo-project"
 			insertTestProject(t, db, projID1, "first project", storage.Custom)
-			rule1 := insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID1, storage.Node)
+			rule1 := insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID1, storage.Event)
 
 			projID2 := "bar-project"
 			insertTestProject(t, db, projID2, "second project", storage.Custom)
@@ -4108,7 +4102,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 
 			condition1, err := storage.NewCondition(storage.Node, []string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
 			require.NoError(t, err)
-			rule, err := storage.NewRule("new-id-1", projID, "name", storage.Node, []storage.Condition{condition1})
+			rule, err := storage.NewRule("new-id-1", projID, "name", condition1.Type, []storage.Condition{condition1})
 			insertStagedRule(t, db, &rule, false)
 
 			resp, err := store.GetStagedOrAppliedRule(ctx, rule.ID)
@@ -4129,9 +4123,9 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 			projID := "project-1"
 			insertTestProject(t, db, projID, "my new project", storage.Custom)
 
-			condition1, err := storage.NewCondition(storage.Node, []string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+			condition1, err := storage.NewCondition(storage.Event, []string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
 			require.NoError(t, err)
-			rule, err := storage.NewRule("new-id-1", projID, "name", storage.Node, []storage.Condition{condition1})
+			rule, err := storage.NewRule("new-id-1", projID, "name", condition1.Type, []storage.Condition{condition1})
 			insertAppliedRule(t, db, &rule)
 
 			resp, err := store.GetStagedOrAppliedRule(ctx, rule.ID)
@@ -4314,9 +4308,8 @@ func TestDeleteRule(t *testing.T) {
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 			ctx = insertProjectsIntoContext(ctx, []string{projID, "project-2"})
 
-			ruleType := storage.Node
-			ruleToDelete := insertAppliedRuleWithMultipleConditions(t, db, "delete-me", projID, ruleType)
-			ruleToSave := insertStagedRuleWithMultipleConditions(t, db, "save-me", projID, ruleType, false)
+			ruleToDelete := insertAppliedRuleWithMultipleConditions(t, db, "delete-me", projID, storage.Node)
+			ruleToSave := insertStagedRuleWithMultipleConditions(t, db, "save-me", projID, storage.Event, false)
 
 			err := store.DeleteRule(ctx, ruleToDelete.ID)
 			assert.NoError(t, err)
@@ -4348,9 +4341,8 @@ func TestDeleteRule(t *testing.T) {
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 			ctx = insertProjectsIntoContext(ctx, []string{"wrong-project", "project-2"})
 
-			ruleType := storage.Node
-			ruleToDelete := insertAppliedRuleWithMultipleConditions(t, db, "delete-me", projID, ruleType)
-			ruleToSave := insertAppliedRuleWithMultipleConditions(t, db, "save-me", projID, ruleType)
+			ruleToDelete := insertAppliedRuleWithMultipleConditions(t, db, "delete-me", projID, storage.Event)
+			ruleToSave := insertAppliedRuleWithMultipleConditions(t, db, "save-me", projID, storage.Node)
 
 			err := store.DeleteRule(ctx, ruleToDelete.ID)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
