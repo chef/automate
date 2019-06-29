@@ -282,6 +282,19 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
+  - label: "[integration] event-feed-service"
+    command:
+      - . scripts/verify_setup
+      - hab studio run "source scripts/verify_studio_init && start_deployment_service && chef-automate dev deploy-some chef/event-feed-service --with-deps && event_feed_integration"
+    timeout_in_minutes: 10
+    expeditor:
+      executor:
+        docker:
+          privileged: true
+          environment:
+            - HAB_STUDIO_SUP=false
+            - HAB_NONINTERACTIVE=true
+
   - label: "[integration] es-sidecar-service"
     command:
       - . scripts/verify_setup

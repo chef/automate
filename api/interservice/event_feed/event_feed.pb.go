@@ -6,6 +6,8 @@ package event_feed // import "github.com/chef/automate/api/interservice/event_fe
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
+import event "github.com/chef/automate/api/interservice/event"
+import timestamp "github.com/golang/protobuf/ptypes/timestamp"
 
 import (
 	context "golang.org/x/net/context"
@@ -23,6 +25,907 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
+type FeedRequest struct {
+	UserID               string   `protobuf:"bytes,1,opt,name=UserID,proto3" json:"UserID,omitempty" toml:"UserID,omitempty" mapstructure:"UserID,omitempty"`
+	Size                 int32    `protobuf:"varint,2,opt,name=Size,proto3" json:"Size,omitempty" toml:"Size,omitempty" mapstructure:"Size,omitempty"`
+	Start                int64    `protobuf:"varint,4,opt,name=Start,proto3" json:"Start,omitempty" toml:"Start,omitempty" mapstructure:"Start,omitempty"`
+	End                  int64    `protobuf:"varint,5,opt,name=End,proto3" json:"End,omitempty" toml:"End,omitempty" mapstructure:"End,omitempty"`
+	Before               int64    `protobuf:"varint,6,opt,name=Before,proto3" json:"Before,omitempty" toml:"Before,omitempty" mapstructure:"Before,omitempty"`
+	After                int64    `protobuf:"varint,7,opt,name=After,proto3" json:"After,omitempty" toml:"After,omitempty" mapstructure:"After,omitempty"`
+	Sort                 []string `protobuf:"bytes,8,rep,name=Sort,proto3" json:"Sort,omitempty" toml:"Sort,omitempty" mapstructure:"Sort,omitempty"`
+	Filters              []string `protobuf:"bytes,9,rep,name=Filters,proto3" json:"Filters,omitempty" toml:"Filters,omitempty" mapstructure:"Filters,omitempty"`
+	Cursor               string   `protobuf:"bytes,10,opt,name=Cursor,proto3" json:"Cursor,omitempty" toml:"Cursor,omitempty" mapstructure:"Cursor,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *FeedRequest) Reset()         { *m = FeedRequest{} }
+func (m *FeedRequest) String() string { return proto.CompactTextString(m) }
+func (*FeedRequest) ProtoMessage()    {}
+func (*FeedRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_event_feed_2dd7f60481e9a941, []int{0}
+}
+func (m *FeedRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_FeedRequest.Unmarshal(m, b)
+}
+func (m *FeedRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_FeedRequest.Marshal(b, m, deterministic)
+}
+func (dst *FeedRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FeedRequest.Merge(dst, src)
+}
+func (m *FeedRequest) XXX_Size() int {
+	return xxx_messageInfo_FeedRequest.Size(m)
+}
+func (m *FeedRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_FeedRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FeedRequest proto.InternalMessageInfo
+
+func (m *FeedRequest) GetUserID() string {
+	if m != nil {
+		return m.UserID
+	}
+	return ""
+}
+
+func (m *FeedRequest) GetSize() int32 {
+	if m != nil {
+		return m.Size
+	}
+	return 0
+}
+
+func (m *FeedRequest) GetStart() int64 {
+	if m != nil {
+		return m.Start
+	}
+	return 0
+}
+
+func (m *FeedRequest) GetEnd() int64 {
+	if m != nil {
+		return m.End
+	}
+	return 0
+}
+
+func (m *FeedRequest) GetBefore() int64 {
+	if m != nil {
+		return m.Before
+	}
+	return 0
+}
+
+func (m *FeedRequest) GetAfter() int64 {
+	if m != nil {
+		return m.After
+	}
+	return 0
+}
+
+func (m *FeedRequest) GetSort() []string {
+	if m != nil {
+		return m.Sort
+	}
+	return nil
+}
+
+func (m *FeedRequest) GetFilters() []string {
+	if m != nil {
+		return m.Filters
+	}
+	return nil
+}
+
+func (m *FeedRequest) GetCursor() string {
+	if m != nil {
+		return m.Cursor
+	}
+	return ""
+}
+
+type FeedResponse struct {
+	FeedEntries          []*FeedEntry `protobuf:"bytes,1,rep,name=FeedEntries,proto3" json:"FeedEntries,omitempty" toml:"FeedEntries,omitempty" mapstructure:"FeedEntries,omitempty"`
+	TotalEntries         int64        `protobuf:"varint,2,opt,name=TotalEntries,proto3" json:"TotalEntries,omitempty" toml:"TotalEntries,omitempty" mapstructure:"TotalEntries,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}     `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte       `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32        `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *FeedResponse) Reset()         { *m = FeedResponse{} }
+func (m *FeedResponse) String() string { return proto.CompactTextString(m) }
+func (*FeedResponse) ProtoMessage()    {}
+func (*FeedResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_event_feed_2dd7f60481e9a941, []int{1}
+}
+func (m *FeedResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_FeedResponse.Unmarshal(m, b)
+}
+func (m *FeedResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_FeedResponse.Marshal(b, m, deterministic)
+}
+func (dst *FeedResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FeedResponse.Merge(dst, src)
+}
+func (m *FeedResponse) XXX_Size() int {
+	return xxx_messageInfo_FeedResponse.Size(m)
+}
+func (m *FeedResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_FeedResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FeedResponse proto.InternalMessageInfo
+
+func (m *FeedResponse) GetFeedEntries() []*FeedEntry {
+	if m != nil {
+		return m.FeedEntries
+	}
+	return nil
+}
+
+func (m *FeedResponse) GetTotalEntries() int64 {
+	if m != nil {
+		return m.TotalEntries
+	}
+	return 0
+}
+
+type FeedEntry struct {
+	ID                   string               `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty" toml:"ID,omitempty" mapstructure:"ID,omitempty"`
+	EventType            string               `protobuf:"bytes,2,opt,name=EventType,proto3" json:"EventType,omitempty" toml:"EventType,omitempty" mapstructure:"EventType,omitempty"`
+	FeedType             string               `protobuf:"bytes,3,opt,name=FeedType,proto3" json:"FeedType,omitempty" toml:"FeedType,omitempty" mapstructure:"FeedType,omitempty"`
+	Tags                 []string             `protobuf:"bytes,4,rep,name=Tags,proto3" json:"Tags,omitempty" toml:"Tags,omitempty" mapstructure:"Tags,omitempty"`
+	SourceEventPublished *timestamp.Timestamp `protobuf:"bytes,5,opt,name=SourceEventPublished,proto3" json:"SourceEventPublished,omitempty" toml:"SourceEventPublished,omitempty" mapstructure:"SourceEventPublished,omitempty"`
+	Created              *timestamp.Timestamp `protobuf:"bytes,6,opt,name=Created,proto3" json:"Created,omitempty" toml:"Created,omitempty" mapstructure:"Created,omitempty"`
+	Producer             *Producer            `protobuf:"bytes,7,opt,name=Producer,proto3" json:"Producer,omitempty" toml:"Producer,omitempty" mapstructure:"Producer,omitempty"`
+	Actor                *Actor               `protobuf:"bytes,8,opt,name=Actor,proto3" json:"Actor,omitempty" toml:"Actor,omitempty" mapstructure:"Actor,omitempty"`
+	Verb                 string               `protobuf:"bytes,9,opt,name=Verb,proto3" json:"Verb,omitempty" toml:"Verb,omitempty" mapstructure:"Verb,omitempty"`
+	Object               *Object              `protobuf:"bytes,10,opt,name=Object,proto3" json:"Object,omitempty" toml:"Object,omitempty" mapstructure:"Object,omitempty"`
+	Target               *Target              `protobuf:"bytes,11,opt,name=Target,proto3" json:"Target,omitempty" toml:"Target,omitempty" mapstructure:"Target,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte               `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32                `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *FeedEntry) Reset()         { *m = FeedEntry{} }
+func (m *FeedEntry) String() string { return proto.CompactTextString(m) }
+func (*FeedEntry) ProtoMessage()    {}
+func (*FeedEntry) Descriptor() ([]byte, []int) {
+	return fileDescriptor_event_feed_2dd7f60481e9a941, []int{2}
+}
+func (m *FeedEntry) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_FeedEntry.Unmarshal(m, b)
+}
+func (m *FeedEntry) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_FeedEntry.Marshal(b, m, deterministic)
+}
+func (dst *FeedEntry) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FeedEntry.Merge(dst, src)
+}
+func (m *FeedEntry) XXX_Size() int {
+	return xxx_messageInfo_FeedEntry.Size(m)
+}
+func (m *FeedEntry) XXX_DiscardUnknown() {
+	xxx_messageInfo_FeedEntry.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FeedEntry proto.InternalMessageInfo
+
+func (m *FeedEntry) GetID() string {
+	if m != nil {
+		return m.ID
+	}
+	return ""
+}
+
+func (m *FeedEntry) GetEventType() string {
+	if m != nil {
+		return m.EventType
+	}
+	return ""
+}
+
+func (m *FeedEntry) GetFeedType() string {
+	if m != nil {
+		return m.FeedType
+	}
+	return ""
+}
+
+func (m *FeedEntry) GetTags() []string {
+	if m != nil {
+		return m.Tags
+	}
+	return nil
+}
+
+func (m *FeedEntry) GetSourceEventPublished() *timestamp.Timestamp {
+	if m != nil {
+		return m.SourceEventPublished
+	}
+	return nil
+}
+
+func (m *FeedEntry) GetCreated() *timestamp.Timestamp {
+	if m != nil {
+		return m.Created
+	}
+	return nil
+}
+
+func (m *FeedEntry) GetProducer() *Producer {
+	if m != nil {
+		return m.Producer
+	}
+	return nil
+}
+
+func (m *FeedEntry) GetActor() *Actor {
+	if m != nil {
+		return m.Actor
+	}
+	return nil
+}
+
+func (m *FeedEntry) GetVerb() string {
+	if m != nil {
+		return m.Verb
+	}
+	return ""
+}
+
+func (m *FeedEntry) GetObject() *Object {
+	if m != nil {
+		return m.Object
+	}
+	return nil
+}
+
+func (m *FeedEntry) GetTarget() *Target {
+	if m != nil {
+		return m.Target
+	}
+	return nil
+}
+
+type Producer struct {
+	ID                   string   `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty" toml:"ID,omitempty" mapstructure:"ID,omitempty"`
+	Name                 string   `protobuf:"bytes,2,opt,name=Name,proto3" json:"Name,omitempty" toml:"Name,omitempty" mapstructure:"Name,omitempty"`
+	ObjectType           string   `protobuf:"bytes,3,opt,name=ObjectType,proto3" json:"ObjectType,omitempty" toml:"ObjectType,omitempty" mapstructure:"ObjectType,omitempty"`
+	PTags                []string `protobuf:"bytes,4,rep,name=PTags,proto3" json:"PTags,omitempty" toml:"PTags,omitempty" mapstructure:"PTags,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *Producer) Reset()         { *m = Producer{} }
+func (m *Producer) String() string { return proto.CompactTextString(m) }
+func (*Producer) ProtoMessage()    {}
+func (*Producer) Descriptor() ([]byte, []int) {
+	return fileDescriptor_event_feed_2dd7f60481e9a941, []int{3}
+}
+func (m *Producer) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Producer.Unmarshal(m, b)
+}
+func (m *Producer) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Producer.Marshal(b, m, deterministic)
+}
+func (dst *Producer) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Producer.Merge(dst, src)
+}
+func (m *Producer) XXX_Size() int {
+	return xxx_messageInfo_Producer.Size(m)
+}
+func (m *Producer) XXX_DiscardUnknown() {
+	xxx_messageInfo_Producer.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Producer proto.InternalMessageInfo
+
+func (m *Producer) GetID() string {
+	if m != nil {
+		return m.ID
+	}
+	return ""
+}
+
+func (m *Producer) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *Producer) GetObjectType() string {
+	if m != nil {
+		return m.ObjectType
+	}
+	return ""
+}
+
+func (m *Producer) GetPTags() []string {
+	if m != nil {
+		return m.PTags
+	}
+	return nil
+}
+
+type Actor struct {
+	ID                   string   `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty" toml:"ID,omitempty" mapstructure:"ID,omitempty"`
+	Name                 string   `protobuf:"bytes,2,opt,name=Name,proto3" json:"Name,omitempty" toml:"Name,omitempty" mapstructure:"Name,omitempty"`
+	ObjectType           string   `protobuf:"bytes,3,opt,name=ObjectType,proto3" json:"ObjectType,omitempty" toml:"ObjectType,omitempty" mapstructure:"ObjectType,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *Actor) Reset()         { *m = Actor{} }
+func (m *Actor) String() string { return proto.CompactTextString(m) }
+func (*Actor) ProtoMessage()    {}
+func (*Actor) Descriptor() ([]byte, []int) {
+	return fileDescriptor_event_feed_2dd7f60481e9a941, []int{4}
+}
+func (m *Actor) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Actor.Unmarshal(m, b)
+}
+func (m *Actor) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Actor.Marshal(b, m, deterministic)
+}
+func (dst *Actor) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Actor.Merge(dst, src)
+}
+func (m *Actor) XXX_Size() int {
+	return xxx_messageInfo_Actor.Size(m)
+}
+func (m *Actor) XXX_DiscardUnknown() {
+	xxx_messageInfo_Actor.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Actor proto.InternalMessageInfo
+
+func (m *Actor) GetID() string {
+	if m != nil {
+		return m.ID
+	}
+	return ""
+}
+
+func (m *Actor) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *Actor) GetObjectType() string {
+	if m != nil {
+		return m.ObjectType
+	}
+	return ""
+}
+
+type Object struct {
+	ID                   string   `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty" toml:"ID,omitempty" mapstructure:"ID,omitempty"`
+	Name                 string   `protobuf:"bytes,2,opt,name=Name,proto3" json:"Name,omitempty" toml:"Name,omitempty" mapstructure:"Name,omitempty"`
+	ObjectType           string   `protobuf:"bytes,3,opt,name=ObjectType,proto3" json:"ObjectType,omitempty" toml:"ObjectType,omitempty" mapstructure:"ObjectType,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *Object) Reset()         { *m = Object{} }
+func (m *Object) String() string { return proto.CompactTextString(m) }
+func (*Object) ProtoMessage()    {}
+func (*Object) Descriptor() ([]byte, []int) {
+	return fileDescriptor_event_feed_2dd7f60481e9a941, []int{5}
+}
+func (m *Object) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Object.Unmarshal(m, b)
+}
+func (m *Object) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Object.Marshal(b, m, deterministic)
+}
+func (dst *Object) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Object.Merge(dst, src)
+}
+func (m *Object) XXX_Size() int {
+	return xxx_messageInfo_Object.Size(m)
+}
+func (m *Object) XXX_DiscardUnknown() {
+	xxx_messageInfo_Object.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Object proto.InternalMessageInfo
+
+func (m *Object) GetID() string {
+	if m != nil {
+		return m.ID
+	}
+	return ""
+}
+
+func (m *Object) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *Object) GetObjectType() string {
+	if m != nil {
+		return m.ObjectType
+	}
+	return ""
+}
+
+type Target struct {
+	ID                   string   `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty" toml:"ID,omitempty" mapstructure:"ID,omitempty"`
+	Name                 string   `protobuf:"bytes,2,opt,name=Name,proto3" json:"Name,omitempty" toml:"Name,omitempty" mapstructure:"Name,omitempty"`
+	ObjectType           string   `protobuf:"bytes,3,opt,name=ObjectType,proto3" json:"ObjectType,omitempty" toml:"ObjectType,omitempty" mapstructure:"ObjectType,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *Target) Reset()         { *m = Target{} }
+func (m *Target) String() string { return proto.CompactTextString(m) }
+func (*Target) ProtoMessage()    {}
+func (*Target) Descriptor() ([]byte, []int) {
+	return fileDescriptor_event_feed_2dd7f60481e9a941, []int{6}
+}
+func (m *Target) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Target.Unmarshal(m, b)
+}
+func (m *Target) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Target.Marshal(b, m, deterministic)
+}
+func (dst *Target) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Target.Merge(dst, src)
+}
+func (m *Target) XXX_Size() int {
+	return xxx_messageInfo_Target.Size(m)
+}
+func (m *Target) XXX_DiscardUnknown() {
+	xxx_messageInfo_Target.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Target proto.InternalMessageInfo
+
+func (m *Target) GetID() string {
+	if m != nil {
+		return m.ID
+	}
+	return ""
+}
+
+func (m *Target) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *Target) GetObjectType() string {
+	if m != nil {
+		return m.ObjectType
+	}
+	return ""
+}
+
+type FeedSummaryRequest struct {
+	Start                int64    `protobuf:"varint,1,opt,name=Start,proto3" json:"Start,omitempty" toml:"Start,omitempty" mapstructure:"Start,omitempty"`
+	End                  int64    `protobuf:"varint,2,opt,name=End,proto3" json:"End,omitempty" toml:"End,omitempty" mapstructure:"End,omitempty"`
+	Size                 int32    `protobuf:"varint,4,opt,name=Size,proto3" json:"Size,omitempty" toml:"Size,omitempty" mapstructure:"Size,omitempty"`
+	From                 int32    `protobuf:"varint,5,opt,name=From,proto3" json:"From,omitempty" toml:"From,omitempty" mapstructure:"From,omitempty"`
+	StartAfter           string   `protobuf:"bytes,6,opt,name=StartAfter,proto3" json:"StartAfter,omitempty" toml:"StartAfter,omitempty" mapstructure:"StartAfter,omitempty"`
+	Filters              []string `protobuf:"bytes,7,rep,name=Filters,proto3" json:"Filters,omitempty" toml:"Filters,omitempty" mapstructure:"Filters,omitempty"`
+	CountCategory        string   `protobuf:"bytes,9,opt,name=CountCategory,proto3" json:"CountCategory,omitempty" toml:"CountCategory,omitempty" mapstructure:"CountCategory,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *FeedSummaryRequest) Reset()         { *m = FeedSummaryRequest{} }
+func (m *FeedSummaryRequest) String() string { return proto.CompactTextString(m) }
+func (*FeedSummaryRequest) ProtoMessage()    {}
+func (*FeedSummaryRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_event_feed_2dd7f60481e9a941, []int{7}
+}
+func (m *FeedSummaryRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_FeedSummaryRequest.Unmarshal(m, b)
+}
+func (m *FeedSummaryRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_FeedSummaryRequest.Marshal(b, m, deterministic)
+}
+func (dst *FeedSummaryRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FeedSummaryRequest.Merge(dst, src)
+}
+func (m *FeedSummaryRequest) XXX_Size() int {
+	return xxx_messageInfo_FeedSummaryRequest.Size(m)
+}
+func (m *FeedSummaryRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_FeedSummaryRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FeedSummaryRequest proto.InternalMessageInfo
+
+func (m *FeedSummaryRequest) GetStart() int64 {
+	if m != nil {
+		return m.Start
+	}
+	return 0
+}
+
+func (m *FeedSummaryRequest) GetEnd() int64 {
+	if m != nil {
+		return m.End
+	}
+	return 0
+}
+
+func (m *FeedSummaryRequest) GetSize() int32 {
+	if m != nil {
+		return m.Size
+	}
+	return 0
+}
+
+func (m *FeedSummaryRequest) GetFrom() int32 {
+	if m != nil {
+		return m.From
+	}
+	return 0
+}
+
+func (m *FeedSummaryRequest) GetStartAfter() string {
+	if m != nil {
+		return m.StartAfter
+	}
+	return ""
+}
+
+func (m *FeedSummaryRequest) GetFilters() []string {
+	if m != nil {
+		return m.Filters
+	}
+	return nil
+}
+
+func (m *FeedSummaryRequest) GetCountCategory() string {
+	if m != nil {
+		return m.CountCategory
+	}
+	return ""
+}
+
+type FeedSummaryResponse struct {
+	TotalEntries         int64         `protobuf:"varint,1,opt,name=TotalEntries,proto3" json:"TotalEntries,omitempty" toml:"TotalEntries,omitempty" mapstructure:"TotalEntries,omitempty"`
+	EntryCounts          []*EntryCount `protobuf:"bytes,2,rep,name=EntryCounts,proto3" json:"EntryCounts,omitempty" toml:"EntryCounts,omitempty" mapstructure:"EntryCounts,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte        `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32         `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *FeedSummaryResponse) Reset()         { *m = FeedSummaryResponse{} }
+func (m *FeedSummaryResponse) String() string { return proto.CompactTextString(m) }
+func (*FeedSummaryResponse) ProtoMessage()    {}
+func (*FeedSummaryResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_event_feed_2dd7f60481e9a941, []int{8}
+}
+func (m *FeedSummaryResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_FeedSummaryResponse.Unmarshal(m, b)
+}
+func (m *FeedSummaryResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_FeedSummaryResponse.Marshal(b, m, deterministic)
+}
+func (dst *FeedSummaryResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FeedSummaryResponse.Merge(dst, src)
+}
+func (m *FeedSummaryResponse) XXX_Size() int {
+	return xxx_messageInfo_FeedSummaryResponse.Size(m)
+}
+func (m *FeedSummaryResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_FeedSummaryResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FeedSummaryResponse proto.InternalMessageInfo
+
+func (m *FeedSummaryResponse) GetTotalEntries() int64 {
+	if m != nil {
+		return m.TotalEntries
+	}
+	return 0
+}
+
+func (m *FeedSummaryResponse) GetEntryCounts() []*EntryCount {
+	if m != nil {
+		return m.EntryCounts
+	}
+	return nil
+}
+
+type EntryCount struct {
+	Category             string   `protobuf:"bytes,1,opt,name=Category,proto3" json:"Category,omitempty" toml:"Category,omitempty" mapstructure:"Category,omitempty"`
+	Count                int64    `protobuf:"varint,2,opt,name=Count,proto3" json:"Count,omitempty" toml:"Count,omitempty" mapstructure:"Count,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *EntryCount) Reset()         { *m = EntryCount{} }
+func (m *EntryCount) String() string { return proto.CompactTextString(m) }
+func (*EntryCount) ProtoMessage()    {}
+func (*EntryCount) Descriptor() ([]byte, []int) {
+	return fileDescriptor_event_feed_2dd7f60481e9a941, []int{9}
+}
+func (m *EntryCount) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_EntryCount.Unmarshal(m, b)
+}
+func (m *EntryCount) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_EntryCount.Marshal(b, m, deterministic)
+}
+func (dst *EntryCount) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EntryCount.Merge(dst, src)
+}
+func (m *EntryCount) XXX_Size() int {
+	return xxx_messageInfo_EntryCount.Size(m)
+}
+func (m *EntryCount) XXX_DiscardUnknown() {
+	xxx_messageInfo_EntryCount.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_EntryCount proto.InternalMessageInfo
+
+func (m *EntryCount) GetCategory() string {
+	if m != nil {
+		return m.Category
+	}
+	return ""
+}
+
+func (m *EntryCount) GetCount() int64 {
+	if m != nil {
+		return m.Count
+	}
+	return 0
+}
+
+type FeedTimelineRequest struct {
+	Start                string   `protobuf:"bytes,1,opt,name=Start,proto3" json:"Start,omitempty" toml:"Start,omitempty" mapstructure:"Start,omitempty"`
+	End                  string   `protobuf:"bytes,2,opt,name=End,proto3" json:"End,omitempty" toml:"End,omitempty" mapstructure:"End,omitempty"`
+	Timezone             string   `protobuf:"bytes,3,opt,name=Timezone,proto3" json:"Timezone,omitempty" toml:"Timezone,omitempty" mapstructure:"Timezone,omitempty"`
+	Interval             int32    `protobuf:"varint,4,opt,name=Interval,proto3" json:"Interval,omitempty" toml:"Interval,omitempty" mapstructure:"Interval,omitempty"`
+	Filters              []string `protobuf:"bytes,5,rep,name=Filters,proto3" json:"Filters,omitempty" toml:"Filters,omitempty" mapstructure:"Filters,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *FeedTimelineRequest) Reset()         { *m = FeedTimelineRequest{} }
+func (m *FeedTimelineRequest) String() string { return proto.CompactTextString(m) }
+func (*FeedTimelineRequest) ProtoMessage()    {}
+func (*FeedTimelineRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_event_feed_2dd7f60481e9a941, []int{10}
+}
+func (m *FeedTimelineRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_FeedTimelineRequest.Unmarshal(m, b)
+}
+func (m *FeedTimelineRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_FeedTimelineRequest.Marshal(b, m, deterministic)
+}
+func (dst *FeedTimelineRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FeedTimelineRequest.Merge(dst, src)
+}
+func (m *FeedTimelineRequest) XXX_Size() int {
+	return xxx_messageInfo_FeedTimelineRequest.Size(m)
+}
+func (m *FeedTimelineRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_FeedTimelineRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FeedTimelineRequest proto.InternalMessageInfo
+
+func (m *FeedTimelineRequest) GetStart() string {
+	if m != nil {
+		return m.Start
+	}
+	return ""
+}
+
+func (m *FeedTimelineRequest) GetEnd() string {
+	if m != nil {
+		return m.End
+	}
+	return ""
+}
+
+func (m *FeedTimelineRequest) GetTimezone() string {
+	if m != nil {
+		return m.Timezone
+	}
+	return ""
+}
+
+func (m *FeedTimelineRequest) GetInterval() int32 {
+	if m != nil {
+		return m.Interval
+	}
+	return 0
+}
+
+func (m *FeedTimelineRequest) GetFilters() []string {
+	if m != nil {
+		return m.Filters
+	}
+	return nil
+}
+
+type FeedTimelineResponse struct {
+	Start                string        `protobuf:"bytes,1,opt,name=Start,proto3" json:"Start,omitempty" toml:"Start,omitempty" mapstructure:"Start,omitempty"`
+	End                  string        `protobuf:"bytes,2,opt,name=End,proto3" json:"End,omitempty" toml:"End,omitempty" mapstructure:"End,omitempty"`
+	Interval             int32         `protobuf:"varint,3,opt,name=Interval,proto3" json:"Interval,omitempty" toml:"Interval,omitempty" mapstructure:"Interval,omitempty"`
+	ActionLines          []*ActionLine `protobuf:"bytes,4,rep,name=ActionLines,proto3" json:"ActionLines,omitempty" toml:"ActionLines,omitempty" mapstructure:"ActionLines,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte        `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32         `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *FeedTimelineResponse) Reset()         { *m = FeedTimelineResponse{} }
+func (m *FeedTimelineResponse) String() string { return proto.CompactTextString(m) }
+func (*FeedTimelineResponse) ProtoMessage()    {}
+func (*FeedTimelineResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_event_feed_2dd7f60481e9a941, []int{11}
+}
+func (m *FeedTimelineResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_FeedTimelineResponse.Unmarshal(m, b)
+}
+func (m *FeedTimelineResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_FeedTimelineResponse.Marshal(b, m, deterministic)
+}
+func (dst *FeedTimelineResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FeedTimelineResponse.Merge(dst, src)
+}
+func (m *FeedTimelineResponse) XXX_Size() int {
+	return xxx_messageInfo_FeedTimelineResponse.Size(m)
+}
+func (m *FeedTimelineResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_FeedTimelineResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FeedTimelineResponse proto.InternalMessageInfo
+
+func (m *FeedTimelineResponse) GetStart() string {
+	if m != nil {
+		return m.Start
+	}
+	return ""
+}
+
+func (m *FeedTimelineResponse) GetEnd() string {
+	if m != nil {
+		return m.End
+	}
+	return ""
+}
+
+func (m *FeedTimelineResponse) GetInterval() int32 {
+	if m != nil {
+		return m.Interval
+	}
+	return 0
+}
+
+func (m *FeedTimelineResponse) GetActionLines() []*ActionLine {
+	if m != nil {
+		return m.ActionLines
+	}
+	return nil
+}
+
+type ActionLine struct {
+	Action               string      `protobuf:"bytes,1,opt,name=Action,proto3" json:"Action,omitempty" toml:"Action,omitempty" mapstructure:"Action,omitempty"`
+	Slots                []*Timeslot `protobuf:"bytes,2,rep,name=Slots,proto3" json:"Slots,omitempty" toml:"Slots,omitempty" mapstructure:"Slots,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte      `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32       `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *ActionLine) Reset()         { *m = ActionLine{} }
+func (m *ActionLine) String() string { return proto.CompactTextString(m) }
+func (*ActionLine) ProtoMessage()    {}
+func (*ActionLine) Descriptor() ([]byte, []int) {
+	return fileDescriptor_event_feed_2dd7f60481e9a941, []int{12}
+}
+func (m *ActionLine) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ActionLine.Unmarshal(m, b)
+}
+func (m *ActionLine) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ActionLine.Marshal(b, m, deterministic)
+}
+func (dst *ActionLine) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ActionLine.Merge(dst, src)
+}
+func (m *ActionLine) XXX_Size() int {
+	return xxx_messageInfo_ActionLine.Size(m)
+}
+func (m *ActionLine) XXX_DiscardUnknown() {
+	xxx_messageInfo_ActionLine.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ActionLine proto.InternalMessageInfo
+
+func (m *ActionLine) GetAction() string {
+	if m != nil {
+		return m.Action
+	}
+	return ""
+}
+
+func (m *ActionLine) GetSlots() []*Timeslot {
+	if m != nil {
+		return m.Slots
+	}
+	return nil
+}
+
+type Timeslot struct {
+	Counts               []*EntryCount `protobuf:"bytes,1,rep,name=Counts,proto3" json:"Counts,omitempty" toml:"Counts,omitempty" mapstructure:"Counts,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}      `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte        `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32         `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *Timeslot) Reset()         { *m = Timeslot{} }
+func (m *Timeslot) String() string { return proto.CompactTextString(m) }
+func (*Timeslot) ProtoMessage()    {}
+func (*Timeslot) Descriptor() ([]byte, []int) {
+	return fileDescriptor_event_feed_2dd7f60481e9a941, []int{13}
+}
+func (m *Timeslot) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Timeslot.Unmarshal(m, b)
+}
+func (m *Timeslot) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Timeslot.Marshal(b, m, deterministic)
+}
+func (dst *Timeslot) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Timeslot.Merge(dst, src)
+}
+func (m *Timeslot) XXX_Size() int {
+	return xxx_messageInfo_Timeslot.Size(m)
+}
+func (m *Timeslot) XXX_DiscardUnknown() {
+	xxx_messageInfo_Timeslot.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Timeslot proto.InternalMessageInfo
+
+func (m *Timeslot) GetCounts() []*EntryCount {
+	if m != nil {
+		return m.Counts
+	}
+	return nil
+}
+
+func init() {
+	proto.RegisterType((*FeedRequest)(nil), "chef.automate.domain.event_feed.api.FeedRequest")
+	proto.RegisterType((*FeedResponse)(nil), "chef.automate.domain.event_feed.api.FeedResponse")
+	proto.RegisterType((*FeedEntry)(nil), "chef.automate.domain.event_feed.api.FeedEntry")
+	proto.RegisterType((*Producer)(nil), "chef.automate.domain.event_feed.api.Producer")
+	proto.RegisterType((*Actor)(nil), "chef.automate.domain.event_feed.api.Actor")
+	proto.RegisterType((*Object)(nil), "chef.automate.domain.event_feed.api.Object")
+	proto.RegisterType((*Target)(nil), "chef.automate.domain.event_feed.api.Target")
+	proto.RegisterType((*FeedSummaryRequest)(nil), "chef.automate.domain.event_feed.api.FeedSummaryRequest")
+	proto.RegisterType((*FeedSummaryResponse)(nil), "chef.automate.domain.event_feed.api.FeedSummaryResponse")
+	proto.RegisterType((*EntryCount)(nil), "chef.automate.domain.event_feed.api.EntryCount")
+	proto.RegisterType((*FeedTimelineRequest)(nil), "chef.automate.domain.event_feed.api.FeedTimelineRequest")
+	proto.RegisterType((*FeedTimelineResponse)(nil), "chef.automate.domain.event_feed.api.FeedTimelineResponse")
+	proto.RegisterType((*ActionLine)(nil), "chef.automate.domain.event_feed.api.ActionLine")
+	proto.RegisterType((*Timeslot)(nil), "chef.automate.domain.event_feed.api.Timeslot")
+}
+
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
 var _ grpc.ClientConn
@@ -35,6 +938,10 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type EventFeedServiceClient interface {
+	GetFeed(ctx context.Context, in *FeedRequest, opts ...grpc.CallOption) (*FeedResponse, error)
+	GetFeedSummary(ctx context.Context, in *FeedSummaryRequest, opts ...grpc.CallOption) (*FeedSummaryResponse, error)
+	GetFeedTimeline(ctx context.Context, in *FeedTimelineRequest, opts ...grpc.CallOption) (*FeedTimelineResponse, error)
+	HandleEvent(ctx context.Context, in *event.EventMsg, opts ...grpc.CallOption) (*event.EventResponse, error)
 }
 
 type eventFeedServiceClient struct {
@@ -45,35 +952,214 @@ func NewEventFeedServiceClient(cc *grpc.ClientConn) EventFeedServiceClient {
 	return &eventFeedServiceClient{cc}
 }
 
+func (c *eventFeedServiceClient) GetFeed(ctx context.Context, in *FeedRequest, opts ...grpc.CallOption) (*FeedResponse, error) {
+	out := new(FeedResponse)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.event_feed.api.EventFeedService/GetFeed", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *eventFeedServiceClient) GetFeedSummary(ctx context.Context, in *FeedSummaryRequest, opts ...grpc.CallOption) (*FeedSummaryResponse, error) {
+	out := new(FeedSummaryResponse)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.event_feed.api.EventFeedService/GetFeedSummary", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *eventFeedServiceClient) GetFeedTimeline(ctx context.Context, in *FeedTimelineRequest, opts ...grpc.CallOption) (*FeedTimelineResponse, error) {
+	out := new(FeedTimelineResponse)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.event_feed.api.EventFeedService/GetFeedTimeline", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *eventFeedServiceClient) HandleEvent(ctx context.Context, in *event.EventMsg, opts ...grpc.CallOption) (*event.EventResponse, error) {
+	out := new(event.EventResponse)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.event_feed.api.EventFeedService/HandleEvent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // EventFeedServiceServer is the server API for EventFeedService service.
 type EventFeedServiceServer interface {
+	GetFeed(context.Context, *FeedRequest) (*FeedResponse, error)
+	GetFeedSummary(context.Context, *FeedSummaryRequest) (*FeedSummaryResponse, error)
+	GetFeedTimeline(context.Context, *FeedTimelineRequest) (*FeedTimelineResponse, error)
+	HandleEvent(context.Context, *event.EventMsg) (*event.EventResponse, error)
 }
 
 func RegisterEventFeedServiceServer(s *grpc.Server, srv EventFeedServiceServer) {
 	s.RegisterService(&_EventFeedService_serviceDesc, srv)
 }
 
+func _EventFeedService_GetFeed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FeedRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventFeedServiceServer).GetFeed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.domain.event_feed.api.EventFeedService/GetFeed",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventFeedServiceServer).GetFeed(ctx, req.(*FeedRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _EventFeedService_GetFeedSummary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FeedSummaryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventFeedServiceServer).GetFeedSummary(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.domain.event_feed.api.EventFeedService/GetFeedSummary",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventFeedServiceServer).GetFeedSummary(ctx, req.(*FeedSummaryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _EventFeedService_GetFeedTimeline_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FeedTimelineRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventFeedServiceServer).GetFeedTimeline(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.domain.event_feed.api.EventFeedService/GetFeedTimeline",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventFeedServiceServer).GetFeedTimeline(ctx, req.(*FeedTimelineRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _EventFeedService_HandleEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(event.EventMsg)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventFeedServiceServer).HandleEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.domain.event_feed.api.EventFeedService/HandleEvent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventFeedServiceServer).HandleEvent(ctx, req.(*event.EventMsg))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _EventFeedService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "chef.automate.domain.event_feed.api.EventFeedService",
 	HandlerType: (*EventFeedServiceServer)(nil),
-	Methods:     []grpc.MethodDesc{},
-	Streams:     []grpc.StreamDesc{},
-	Metadata:    "api/interservice/event_feed/event_feed.proto",
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetFeed",
+			Handler:    _EventFeedService_GetFeed_Handler,
+		},
+		{
+			MethodName: "GetFeedSummary",
+			Handler:    _EventFeedService_GetFeedSummary_Handler,
+		},
+		{
+			MethodName: "GetFeedTimeline",
+			Handler:    _EventFeedService_GetFeedTimeline_Handler,
+		},
+		{
+			MethodName: "HandleEvent",
+			Handler:    _EventFeedService_HandleEvent_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "api/interservice/event_feed/event_feed.proto",
 }
 
 func init() {
-	proto.RegisterFile("api/interservice/event_feed/event_feed.proto", fileDescriptor_event_feed_b1bddf94924b1ebf)
+	proto.RegisterFile("api/interservice/event_feed/event_feed.proto", fileDescriptor_event_feed_2dd7f60481e9a941)
 }
 
-var fileDescriptor_event_feed_b1bddf94924b1ebf = []byte{
-	// 132 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xd2, 0x49, 0x2c, 0xc8, 0xd4,
-	0xcf, 0xcc, 0x2b, 0x49, 0x2d, 0x2a, 0x4e, 0x2d, 0x2a, 0xcb, 0x4c, 0x4e, 0xd5, 0x4f, 0x2d, 0x4b,
-	0xcd, 0x2b, 0x89, 0x4f, 0x4b, 0x4d, 0x4d, 0x41, 0x62, 0xea, 0x15, 0x14, 0xe5, 0x97, 0xe4, 0x0b,
-	0x29, 0x27, 0x67, 0xa4, 0xa6, 0xe9, 0x25, 0x96, 0x96, 0xe4, 0xe7, 0x26, 0x96, 0xa4, 0xea, 0xa5,
-	0xe4, 0xe7, 0x26, 0x66, 0xe6, 0xe9, 0x21, 0x29, 0x4b, 0x2c, 0xc8, 0x34, 0x12, 0xe2, 0x12, 0x70,
-	0x05, 0x89, 0xb8, 0xa5, 0xa6, 0xa6, 0x04, 0x43, 0x0c, 0x75, 0x32, 0x8b, 0x32, 0x49, 0xcf, 0x2c,
-	0xc9, 0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x07, 0x99, 0xa2, 0x0f, 0x33, 0x45, 0x1f, 0x8f,
-	0x0b, 0x92, 0xd8, 0xc0, 0xf6, 0x1a, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff, 0xff, 0x0d, 0x9a, 0x52,
-	0xa7, 0x00, 0x00, 0x00,
+var fileDescriptor_event_feed_2dd7f60481e9a941 = []byte{
+	// 936 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x56, 0xcd, 0x8e, 0xe3, 0x44,
+	0x10, 0x96, 0xf3, 0xef, 0xf2, 0xb2, 0xac, 0x9a, 0x11, 0xb2, 0x2c, 0x04, 0x91, 0xe1, 0x10, 0x01,
+	0xeb, 0x40, 0x58, 0xf1, 0x73, 0x41, 0xcc, 0x66, 0x67, 0x96, 0x11, 0xcb, 0x32, 0xeb, 0x04, 0x0e,
+	0x5c, 0x90, 0x93, 0x54, 0x32, 0x46, 0xb6, 0x3b, 0xb4, 0xdb, 0x23, 0xcd, 0x5e, 0x41, 0x9c, 0x90,
+	0xb8, 0xf3, 0x0e, 0xbc, 0x05, 0xaf, 0xc0, 0xc3, 0x70, 0x43, 0xfd, 0x67, 0x3b, 0xb3, 0xd1, 0xc8,
+	0x19, 0xcd, 0x25, 0xaa, 0xaa, 0xf4, 0xf7, 0x75, 0x75, 0x55, 0xf5, 0xd7, 0x86, 0x0f, 0xa3, 0x6d,
+	0x3c, 0x8e, 0x33, 0x8e, 0x2c, 0x47, 0x76, 0x19, 0x2f, 0x71, 0x8c, 0x97, 0x98, 0xf1, 0x9f, 0xd6,
+	0x88, 0xab, 0x9a, 0x19, 0x6c, 0x19, 0xe5, 0x94, 0xbc, 0xbb, 0xbc, 0xc0, 0x75, 0x10, 0x15, 0x9c,
+	0xa6, 0x11, 0xc7, 0x60, 0x45, 0xd3, 0x28, 0xce, 0x82, 0xda, 0xb2, 0x68, 0x1b, 0x7b, 0xfe, 0x7e,
+	0x4a, 0xf5, 0xab, 0x88, 0xbc, 0x77, 0x36, 0x94, 0x6e, 0x12, 0x1c, 0x4b, 0x6f, 0x51, 0xac, 0xc7,
+	0x3c, 0x4e, 0x31, 0xe7, 0x51, 0xba, 0x55, 0x0b, 0xfc, 0x7f, 0x2d, 0x70, 0x4e, 0x11, 0x57, 0x21,
+	0xfe, 0x52, 0x60, 0xce, 0xc9, 0x9b, 0xd0, 0xfb, 0x3e, 0x47, 0x76, 0xf6, 0xc4, 0xb5, 0x86, 0xd6,
+	0xc8, 0x0e, 0xb5, 0x47, 0x08, 0x74, 0x66, 0xf1, 0x4b, 0x74, 0x5b, 0x43, 0x6b, 0xd4, 0x0d, 0xa5,
+	0x4d, 0x8e, 0xa0, 0x3b, 0xe3, 0x11, 0xe3, 0x6e, 0x67, 0x68, 0x8d, 0xda, 0xa1, 0x72, 0xc8, 0x03,
+	0x68, 0x9f, 0x64, 0x2b, 0xb7, 0x2b, 0x63, 0xc2, 0x14, 0x9c, 0x8f, 0x71, 0x4d, 0x19, 0xba, 0x3d,
+	0x19, 0xd4, 0x9e, 0xc0, 0x1f, 0xaf, 0x39, 0x32, 0xb7, 0xaf, 0xf0, 0xd2, 0x91, 0x3b, 0x51, 0xc6,
+	0xdd, 0xc1, 0xb0, 0x3d, 0xb2, 0x43, 0x69, 0x13, 0x17, 0xfa, 0xa7, 0x71, 0x22, 0x4e, 0xea, 0xda,
+	0x32, 0x6c, 0x5c, 0xc1, 0x3d, 0x2d, 0x58, 0x4e, 0x99, 0x0b, 0x2a, 0x5f, 0xe5, 0xf9, 0xbf, 0x59,
+	0x70, 0x4f, 0x9d, 0x2b, 0xdf, 0xd2, 0x2c, 0x47, 0x72, 0xae, 0xce, 0x79, 0x92, 0x71, 0x16, 0x63,
+	0xee, 0x5a, 0xc3, 0xf6, 0xc8, 0x99, 0x04, 0x41, 0x83, 0x42, 0x07, 0x06, 0x77, 0x15, 0xd6, 0x29,
+	0x88, 0x0f, 0xf7, 0xe6, 0x94, 0x47, 0x89, 0xa1, 0x6c, 0xc9, 0x53, 0xec, 0xc4, 0xfc, 0xbf, 0x3a,
+	0x60, 0x97, 0x70, 0x72, 0x1f, 0x5a, 0x65, 0x61, 0x5b, 0x67, 0x4f, 0xc8, 0x5b, 0x60, 0x9f, 0x88,
+	0xad, 0xe6, 0x57, 0x5b, 0x55, 0x59, 0x3b, 0xac, 0x02, 0xc4, 0x83, 0x81, 0x80, 0xca, 0x3f, 0xdb,
+	0xf2, 0xcf, 0xd2, 0x17, 0x45, 0x9a, 0x47, 0x9b, 0xdc, 0xed, 0xa8, 0x22, 0x09, 0x9b, 0x3c, 0x87,
+	0xa3, 0x19, 0x2d, 0xd8, 0x12, 0x25, 0xc5, 0x79, 0xb1, 0x48, 0xe2, 0xfc, 0x02, 0x55, 0x27, 0x9c,
+	0x89, 0x17, 0xa8, 0x51, 0x08, 0xcc, 0x28, 0x04, 0x73, 0x33, 0x0a, 0xe1, 0x5e, 0x1c, 0x79, 0x04,
+	0xfd, 0x29, 0xc3, 0x88, 0xe3, 0x4a, 0xf6, 0xed, 0x66, 0x0a, 0xb3, 0x94, 0x9c, 0xc1, 0xe0, 0x9c,
+	0xd1, 0x55, 0xb1, 0xd4, 0x7d, 0x75, 0x26, 0x0f, 0x1b, 0x15, 0xd9, 0x80, 0xc2, 0x12, 0x4e, 0xbe,
+	0x82, 0xee, 0xf1, 0x92, 0x53, 0xe6, 0x0e, 0x24, 0xcf, 0xfb, 0x8d, 0x78, 0x24, 0x22, 0x54, 0x40,
+	0x51, 0xa6, 0x1f, 0x90, 0x2d, 0x5c, 0x5b, 0x96, 0x4f, 0xda, 0x64, 0x0a, 0xbd, 0xef, 0x16, 0x3f,
+	0xe3, 0x92, 0xcb, 0x89, 0x71, 0x26, 0x1f, 0x34, 0xa2, 0x55, 0x90, 0x50, 0x43, 0x05, 0xc9, 0x3c,
+	0x62, 0x1b, 0xe4, 0xae, 0x73, 0x00, 0x89, 0x82, 0x84, 0x1a, 0xea, 0xaf, 0xaa, 0x52, 0xbd, 0x32,
+	0x1a, 0x04, 0x3a, 0xcf, 0xa3, 0xd4, 0x4c, 0x85, 0xb4, 0xc9, 0xdb, 0x00, 0x6a, 0xfb, 0xda, 0x48,
+	0xd4, 0x22, 0xe2, 0x3e, 0x9d, 0xd7, 0xa6, 0x42, 0x39, 0xfe, 0x37, 0xba, 0x8a, 0x77, 0xb1, 0x85,
+	0xff, 0xcc, 0x14, 0xef, 0xae, 0xd8, 0x54, 0x29, 0xee, 0x84, 0xed, 0x1f, 0x0b, 0x88, 0xb8, 0x20,
+	0xb3, 0x22, 0x4d, 0x23, 0x76, 0x65, 0x14, 0xad, 0x54, 0x29, 0x6b, 0x8f, 0x4a, 0xb5, 0x2a, 0x95,
+	0x32, 0x0a, 0xd7, 0xa9, 0x29, 0x1c, 0x81, 0xce, 0x29, 0xa3, 0xa9, 0xbc, 0x42, 0xdd, 0x50, 0xda,
+	0x22, 0x0d, 0x49, 0xa1, 0xa4, 0xab, 0xa7, 0xd2, 0xa8, 0x22, 0x75, 0xad, 0xea, 0xef, 0x6a, 0xd5,
+	0x7b, 0xf0, 0xda, 0x94, 0x16, 0x19, 0x9f, 0x46, 0x1c, 0x37, 0x94, 0x5d, 0xe9, 0xb1, 0xdc, 0x0d,
+	0xfa, 0x7f, 0x58, 0xf0, 0xc6, 0xce, 0x31, 0xb4, 0x80, 0x5d, 0x97, 0x1b, 0xeb, 0x55, 0xb9, 0x21,
+	0x2f, 0xc0, 0x91, 0x4a, 0x23, 0x19, 0x85, 0x22, 0x09, 0x91, 0x1b, 0x37, 0x9a, 0xcd, 0x0a, 0x17,
+	0xd6, 0x39, 0xfc, 0x2f, 0x01, 0x2a, 0x57, 0x68, 0x52, 0x99, 0xbd, 0xea, 0x56, 0xe9, 0x8b, 0x42,
+	0xcb, 0x45, 0xba, 0xa8, 0xca, 0xf1, 0xff, 0xd4, 0xc7, 0x11, 0x52, 0x91, 0xc4, 0x19, 0xee, 0x6d,
+	0x8b, 0xbd, 0xa7, 0x2d, 0xb6, 0x6a, 0x8b, 0x07, 0x03, 0x01, 0x7d, 0x49, 0xb3, 0x52, 0x05, 0x8d,
+	0x2f, 0xfe, 0x3b, 0x13, 0xef, 0xdf, 0x65, 0x94, 0xe8, 0xb6, 0x95, 0x7e, 0xbd, 0x0d, 0xdd, 0x9d,
+	0x36, 0xf8, 0x7f, 0x5b, 0x70, 0xb4, 0x9b, 0x91, 0xae, 0xf0, 0x01, 0x29, 0x95, 0xdb, 0xb6, 0xaf,
+	0x6d, 0xfb, 0x02, 0x9c, 0xe3, 0x25, 0x8f, 0x69, 0xf6, 0x2c, 0xce, 0x50, 0xdd, 0xc4, 0xa6, 0x1d,
+	0xa8, 0x70, 0x61, 0x9d, 0xc3, 0x8f, 0x01, 0x2a, 0x57, 0x3c, 0x78, 0xca, 0x33, 0x0f, 0xb4, 0xf2,
+	0xc8, 0x14, 0xba, 0xb3, 0x84, 0x96, 0x4d, 0x6f, 0x26, 0xba, 0x52, 0xbf, 0x13, 0xca, 0x43, 0x85,
+	0xf5, 0x67, 0xaa, 0xd8, 0x22, 0x44, 0x9e, 0x42, 0x4f, 0x8f, 0x91, 0x75, 0xbb, 0x31, 0xd2, 0xf0,
+	0xc9, 0x7f, 0x6d, 0x78, 0x20, 0x9f, 0x16, 0x39, 0xd5, 0xea, 0x53, 0x85, 0x64, 0xd0, 0x7f, 0x8a,
+	0x32, 0x42, 0x3e, 0x6a, 0xfc, 0x08, 0xeb, 0xd9, 0xf1, 0x3e, 0x3e, 0x00, 0xa1, 0x7b, 0xfb, 0xab,
+	0x05, 0xf7, 0xf5, 0x86, 0xfa, 0x62, 0x91, 0xcf, 0x1a, 0xb3, 0xec, 0x2a, 0x8a, 0xf7, 0xf9, 0xe1,
+	0x40, 0x9d, 0xc5, 0xef, 0x16, 0xbc, 0xae, 0xb3, 0x30, 0xd3, 0x47, 0x9a, 0xb3, 0x5d, 0xbb, 0x42,
+	0xde, 0x17, 0xb7, 0x40, 0xea, 0x44, 0xd6, 0xe0, 0x7c, 0x1d, 0x65, 0xab, 0x44, 0xbd, 0xf9, 0x64,
+	0x74, 0x03, 0x93, 0x6a, 0xab, 0xb0, 0xbe, 0xcd, 0x37, 0xde, 0xc3, 0x46, 0x2b, 0xcd, 0x3e, 0x8f,
+	0x3f, 0xfd, 0xf1, 0xd1, 0x26, 0xe6, 0x17, 0xc5, 0x22, 0x58, 0xd2, 0x74, 0x2c, 0xa0, 0x63, 0x03,
+	0x1d, 0xdf, 0xf0, 0x45, 0xbc, 0xe8, 0xc9, 0x4f, 0x8c, 0x4f, 0xfe, 0x0f, 0x00, 0x00, 0xff, 0xff,
+	0xbb, 0x03, 0x82, 0x09, 0x37, 0x0b, 0x00, 0x00,
 }

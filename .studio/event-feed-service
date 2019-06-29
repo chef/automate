@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+# Helper methods specific for the event-feed-service
+
+# Run Integration tests for the feeds service
+document "event_feed_integration" <<DOC
+  Runs the integration tests for the event feeds service
+DOC
+function event_feed_integration() {
+  go_test "github.com/chef/automate/components/event-feed-service/pkg/integration_test"
+}
+
+document "event_feed_list" <<DOC
+  List events in the feed
+DOC
+function event_feed_list() {
+  chef-automate dev grpcurl event-feed-service -- chef.automate.domain.event_feed.api.EventFeedService.GetFeed -d '{"Size": 100}'
+}
+
+document "event_feed_add_event" <<DOC
+  Add an example event
+DOC
+function event_feed_add_event() {
+  chef-automate dev grpcurl event-feed-service -- chef.automate.domain.event_feed.api.EventFeedService.HandleEvent -d \
+    '{"EventID": "f7b3ffa0-3f17-4bf3-8a01-8a15e17f6eeb", "Published": "2019-06-28T15:17:21Z", "Producer": { "ID": "", "ProducerName": "ProducerName", "ProducerType": "ProducerType", "Tags": []}, "Type": { "Name": "event type"}, "Actor": {"ID":"actor ID", "ObjectType": "actor ObjectType", "DisplayName": "actor DisplayName"}, "Object": {"ID":"object ID", "DisplayName": "object display name", "ObjectType": "object ObjectType"}, "Target": {"ID": "target ID", "ObjectType": "target ObjectType", "DisplayName": "target DisplayName"}}'
+}
+
+document "event_feed_summary" <<DOC
+  Event feed summary
+DOC
+function event_feed_summary() {
+  chef-automate dev grpcurl event-feed-service -- chef.automate.domain.event_feed.api.EventFeedService.GetFeedSummary -d \
+    '{"CountCategory": "entity_type"}'
+}
+
+document "event_feed_timeline" <<DOC
+  Event feed timeline
+DOC
+function event_feed_timeline() {
+  chef-automate dev grpcurl event-feed-service -- chef.automate.domain.event_feed.api.EventFeedService.GetFeedTimeline -d \
+    '{"Timezone": "UTC", "Interval": 24, "Start": "2019-06-25", "End": "2019-06-28"}'
+}
