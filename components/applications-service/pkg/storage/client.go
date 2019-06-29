@@ -31,6 +31,7 @@ const (
 	Warning  = "WARNING"
 	Unknown  = "UNKNOWN"
 	Ok       = "OK"
+	None     = "NONE"
 )
 
 type Service struct {
@@ -48,6 +49,7 @@ type Service struct {
 	Environment         string
 	Channel             string
 	Site                string
+	PreviousHealth      string    `db:"previous_health"`
 	LastEventOccurredAt time.Time `db:"last_event_occurred_at"`
 }
 

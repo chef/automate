@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Performance Result Comparison</title>
+<style>
+.benchstat { border-collapse: collapse; }
+.benchstat th:nth-child(1) { text-align: left; }
+.benchstat tbody td:nth-child(1n+2):not(.note) { text-align: right; padding: 0em 1em; }
+.benchstat tr:not(.configs) th { border-top: 1px solid #666; border-bottom: 1px solid #ccc; }
+.benchstat .nodelta { text-align: center !important; }
+.benchstat .better td.delta { font-weight: bold; }
+.benchstat .worse td.delta { font-weight: bold; color: #c00; }
+</style>
+</head>
+<body>
+
+<table class='benchstat '>
+
+
+<tbody>
+
+<tr><th><th>time/op
+<tr><td>IngestionNewServices-4<td>8.17ms ± 7%
+<tr><td>IngestionUpdateServices-4<td>2.91ms ± 6%
+<tr><td>GetServiceGroups/max_1000_with_0_groups-4<td>1.99ms ± 2%
+<tr><td>GetServiceGroups/max_1000_with_100_groups-4<td>8.08ms ± 7%
+<tr><td>GetServiceGroups/max_1000_with_200_groups-4<td>16.9ms ± 1%
+<tr><td>GetServiceGroups/max_1000_with_300_groups-4<td>30.5ms ± 1%
+<tr><td>GetServiceGroups/max_1000_with_400_groups-4<td>47.9ms ± 1%
+<tr><td>GetServiceGroups/max_1000_with_500_groups-4<td>70.2ms ± 2%
+<tr><td>GetServiceGroups/max_1000_with_600_groups-4<td>96.1ms ± 1%
+<tr><td>GetServiceGroups/max_1000_with_700_groups-4<td>122ms ± 1%
+<tr><td>GetServiceGroups/max_1000_with_800_groups-4<td>158ms ± 2%
+<tr><td>GetServiceGroups/max_1000_with_900_groups-4<td>196ms ± 0%
+<tr><td>GetServiceGroups/max_1000_with_1000_groups-4<td>238ms ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_0_groups-4<td>1.92ms ± 3%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_1000_groups-4<td>229ms ± 1%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_2000_groups-4<td>878ms ± 1%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_3000_groups-4<td>1.95s ± 3%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_4000_groups-4<td>3.51s ± 2%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_5000_groups-4<td>5.57s ±14%
+<tr><td>GetServices/max_1000_with_0_services-4<td>2.15ms ± 1%
+<tr><td>GetServices/max_1000_with_100_services-4<td>2.64ms ± 2%
+<tr><td>GetServices/max_1000_with_200_services-4<td>2.92ms ± 1%
+<tr><td>GetServices/max_1000_with_300_services-4<td>3.21ms ± 0%
+<tr><td>GetServices/max_1000_with_400_services-4<td>3.26ms ± 1%
+<tr><td>GetServices/max_1000_with_500_services-4<td>3.53ms ± 1%
+<tr><td>GetServices/max_1000_with_600_services-4<td>3.82ms ± 1%
+<tr><td>GetServices/max_1000_with_700_services-4<td>4.14ms ± 3%
+<tr><td>GetServices/max_1000_with_800_services-4<td>4.38ms ± 2%
+<tr><td>GetServices/max_1000_with_900_services-4<td>4.75ms ± 2%
+<tr><td>GetServices/max_1000_with_1000_services-4<td>4.87ms ± 1%
+<tr><td>GetServicesHeavyLoad/max_5000_with_0_services-4<td>1.77ms ± 6%
+<tr><td>GetServicesHeavyLoad/max_5000_with_1000_services-4<td>4.90ms ± 2%
+<tr><td>GetServicesHeavyLoad/max_5000_with_2000_services-4<td>7.86ms ± 8%
+<tr><td>GetServicesHeavyLoad/max_5000_with_3000_services-4<td>10.8ms ± 6%
+<tr><td>GetServicesHeavyLoad/max_5000_with_4000_services-4<td>13.5ms ± 1%
+<tr><td>GetServicesHeavyLoad/max_5000_with_5000_services-4<td>15.9ms ± 2%
+<tr><td>&nbsp;
+</tbody>
+
+<tbody>
+
+<tr><th><th>alloc/op
+<tr><td>IngestionNewServices-4<td>20.1kB ± 0%
+<tr><td>IngestionUpdateServices-4<td>13.8kB ± 0%
+<tr><td>GetServiceGroups/max_1000_with_0_groups-4<td>8.87kB ± 0%
+<tr><td>GetServiceGroups/max_1000_with_100_groups-4<td>40.6kB ± 0%
+<tr><td>GetServiceGroups/max_1000_with_200_groups-4<td>40.6kB ± 0%
+<tr><td>GetServiceGroups/max_1000_with_300_groups-4<td>40.6kB ± 0%
+<tr><td>GetServiceGroups/max_1000_with_400_groups-4<td>40.6kB ± 0%
+<tr><td>GetServiceGroups/max_1000_with_500_groups-4<td>40.6kB ± 0%
+<tr><td>GetServiceGroups/max_1000_with_600_groups-4<td>40.6kB ± 0%
+<tr><td>GetServiceGroups/max_1000_with_700_groups-4<td>41.0kB ± 0%
+<tr><td>GetServiceGroups/max_1000_with_800_groups-4<td>41.1kB ± 0%
+<tr><td>GetServiceGroups/max_1000_with_900_groups-4<td>41.0kB ± 0%
+<tr><td>GetServiceGroups/max_1000_with_1000_groups-4<td>41.2kB ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_0_groups-4<td>8.87kB ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_1000_groups-4<td>41.1kB ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_2000_groups-4<td>41.4kB ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_3000_groups-4<td>41.9kB ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_4000_groups-4<td>41.9kB ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_5000_groups-4<td>41.9kB ± 0%
+<tr><td>GetServices/max_1000_with_0_services-4<td>14.7kB ± 0%
+<tr><td>GetServices/max_1000_with_100_services-4<td>44.7kB ± 0%
+<tr><td>GetServices/max_1000_with_200_services-4<td>44.7kB ± 0%
+<tr><td>GetServices/max_1000_with_300_services-4<td>44.7kB ± 0%
+<tr><td>GetServices/max_1000_with_400_services-4<td>44.7kB ± 0%
+<tr><td>GetServices/max_1000_with_500_services-4<td>44.7kB ± 0%
+<tr><td>GetServices/max_1000_with_600_services-4<td>44.7kB ± 0%
+<tr><td>GetServices/max_1000_with_700_services-4<td>44.7kB ± 0%
+<tr><td>GetServices/max_1000_with_800_services-4<td>44.7kB ± 0%
+<tr><td>GetServices/max_1000_with_900_services-4<td>44.7kB ± 0%
+<tr><td>GetServices/max_1000_with_1000_services-4<td>44.7kB ± 0%
+<tr><td>GetServicesHeavyLoad/max_5000_with_0_services-4<td>14.7kB ± 0%
+<tr><td>GetServicesHeavyLoad/max_5000_with_1000_services-4<td>44.7kB ± 0%
+<tr><td>GetServicesHeavyLoad/max_5000_with_2000_services-4<td>44.7kB ± 0%
+<tr><td>GetServicesHeavyLoad/max_5000_with_3000_services-4<td>44.7kB ± 0%
+<tr><td>GetServicesHeavyLoad/max_5000_with_4000_services-4<td>44.7kB ± 0%
+<tr><td>GetServicesHeavyLoad/max_5000_with_5000_services-4<td>44.7kB ± 0%
+<tr><td>&nbsp;
+</tbody>
+
+<tbody>
+
+<tr><th><th>allocs/op
+<tr><td>IngestionNewServices-4<td>780 ± 0%
+<tr><td>IngestionUpdateServices-4<td>640 ± 0%
+<tr><td>GetServiceGroups/max_1000_with_0_groups-4<td>504 ± 0%
+<tr><td>GetServiceGroups/max_1000_with_100_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroups/max_1000_with_200_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroups/max_1000_with_300_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroups/max_1000_with_400_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroups/max_1000_with_500_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroups/max_1000_with_600_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroups/max_1000_with_700_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroups/max_1000_with_800_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroups/max_1000_with_900_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroups/max_1000_with_1000_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_0_groups-4<td>504 ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_1000_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_2000_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_3000_groups-4<td>1.42k ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_4000_groups-4<td>1.42k ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_5000_groups-4<td>1.42k ± 0%
+<tr><td>GetServices/max_1000_with_0_services-4<td>804 ± 0%
+<tr><td>GetServices/max_1000_with_100_services-4<td>1.74k ± 0%
+<tr><td>GetServices/max_1000_with_200_services-4<td>1.74k ± 0%
+<tr><td>GetServices/max_1000_with_300_services-4<td>1.74k ± 0%
+<tr><td>GetServices/max_1000_with_400_services-4<td>1.74k ± 0%
+<tr><td>GetServices/max_1000_with_500_services-4<td>1.74k ± 0%
+<tr><td>GetServices/max_1000_with_600_services-4<td>1.74k ± 0%
+<tr><td>GetServices/max_1000_with_700_services-4<td>1.74k ± 0%
+<tr><td>GetServices/max_1000_with_800_services-4<td>1.74k ± 0%
+<tr><td>GetServices/max_1000_with_900_services-4<td>1.74k ± 0%
+<tr><td>GetServices/max_1000_with_1000_services-4<td>1.74k ± 0%
+<tr><td>GetServicesHeavyLoad/max_5000_with_0_services-4<td>804 ± 0%
+<tr><td>GetServicesHeavyLoad/max_5000_with_1000_services-4<td>1.74k ± 0%
+<tr><td>GetServicesHeavyLoad/max_5000_with_2000_services-4<td>1.74k ± 0%
+<tr><td>GetServicesHeavyLoad/max_5000_with_3000_services-4<td>1.74k ± 0%
+<tr><td>GetServicesHeavyLoad/max_5000_with_4000_services-4<td>1.74k ± 0%
+<tr><td>GetServicesHeavyLoad/max_5000_with_5000_services-4<td>1.74k ± 0%
+<tr><td>&nbsp;
+</tbody>
+
+</table>
+</body>
+</html>
