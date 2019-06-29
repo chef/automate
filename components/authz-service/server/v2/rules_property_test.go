@@ -159,7 +159,7 @@ func TestUpdateRuleProperties(t *testing.T) {
 					Type:       reqs.rules[0].Type,
 					Conditions: reqs.rules[0].Conditions,
 				}
-				rUpdated, err := cl.UpdateRule(ctx, &updateReq)
+				rStaged, err := cl.UpdateRule(ctx, &updateReq)
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
@@ -173,8 +173,8 @@ func TestUpdateRuleProperties(t *testing.T) {
 
 				return rApplied.Rule.Status == "applied" &&
 					ruleMatches(updateReq, *rApplied.Rule) &&
-					rUpdated.Rule.Status == "" && // TODO: this is wrong; should be "staged"
-					ruleMatches(updateReq, *rUpdated.Rule)
+					rStaged.Rule.Status == "" && // TODO: this is wrong; should be "staged"
+					ruleMatches(updateReq, *rStaged.Rule)
 			},
 			createProjectAndRuleGen,
 		))
@@ -196,11 +196,10 @@ func TestUpdateRuleProperties(t *testing.T) {
 
 				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-				rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				rInitialApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
-				statusBeforeUpdate := rApplied.Rule.Status
 
 				updateReq := api.UpdateRuleReq{
 					Id:         reqs.rules[0].Id,
@@ -209,23 +208,81 @@ func TestUpdateRuleProperties(t *testing.T) {
 					Type:       reqs.rules[0].Type,
 					Conditions: reqs.rules[0].Conditions,
 				}
-				rUpdated, err := cl.UpdateRule(ctx, &updateReq)
+				rStaged, err := cl.UpdateRule(ctx, &updateReq)
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
 				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-				rApplied, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				rFinalApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				return statusBeforeUpdate == "applied" &&
-					rUpdated.Rule.Status == "" && // TODO: this is wrong; should be "staged"
+				return rInitialApplied.Rule.Status == "applied" &&
+					rStaged.Rule.Status == "" && // TODO: this is wrong; should be "staged"
+					rFinalApplied.Rule.Status == "applied" &&
+					ruleMatches(updateReq, *rStaged.Rule) &&
+					ruleMatches(updateReq, *rFinalApplied.Rule)
+			},
+			createProjectAndRuleGen,
+		))
+
+	properties.Property("updates an applied and staged rule and applies update confirming transition from staged to applied",
+		prop.ForAll(
+			func(reqs projectAndRuleReq) bool {
+				defer testDB.Flush(t)
+
+				_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				_, err = cl.CreateRule(ctx, &reqs.rules[0])
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+				updateReq := api.UpdateRuleReq{
+					Id:         reqs.rules[0].Id,
+					ProjectId:  reqs.rules[0].ProjectId,
+					Name:       reqs.rules[0].Name + " updated",
+					Type:       reqs.rules[0].Type,
+					Conditions: reqs.rules[0].Conditions,
+				}
+				rInitialStaged, err := cl.UpdateRule(ctx, &updateReq)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				updateReq2 := api.UpdateRuleReq{
+					Id:         reqs.rules[0].Id,
+					ProjectId:  reqs.rules[0].ProjectId,
+					Name:       reqs.rules[0].Name + " updated again",
+					Type:       reqs.rules[0].Type,
+					Conditions: reqs.rules[0].Conditions,
+				}
+				rFinalStaged, err := cl.UpdateRule(ctx, &updateReq2)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+				rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				return rInitialStaged.Rule.Status == "" && // TODO: this is wrong; should be "staged"
+					rFinalStaged.Rule.Status == "" && // TODO: this is wrong; should be "staged"
 					rApplied.Rule.Status == "applied" &&
-					ruleMatches(updateReq, *rApplied.Rule) &&
-					ruleMatches(updateReq, *rUpdated.Rule)
+					ruleMatches(updateReq, *rInitialStaged.Rule) &&
+					ruleMatches(updateReq2, *rFinalStaged.Rule) &&
+					ruleMatches(updateReq2, *rApplied.Rule)
 			},
 			createProjectAndRuleGen,
 		))
@@ -365,7 +422,8 @@ func TestDeleteRuleProperties(t *testing.T) {
 
 func getGopterParams(seed int64) *gopter.Properties {
 	params := gopter.DefaultTestParametersWithSeed(seed)
-	params.MinSize = 1 // otherwise, we'd get zero-length "conditions" slices
+	params.MinSize = 1             // otherwise, we'd get zero-length "conditions" slices
+	params.MinSuccessfulTests = 25 // reduced from default 100 to be more speedy
 	return gopter.NewProperties(params)
 }
 
