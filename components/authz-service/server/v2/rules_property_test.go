@@ -2,6 +2,7 @@ package v2_test
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
@@ -27,7 +28,7 @@ type projectAndRuleReq struct {
 	rules []api.CreateRuleReq
 }
 
-func TestGetRuleProperties(t *testing.T) {
+func TestCreateRuleProperties(t *testing.T) {
 	ctx := context.Background()
 	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	properties := getGopterParams(seed)
@@ -37,6 +38,8 @@ func TestGetRuleProperties(t *testing.T) {
 		prop.ForAll(
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
+
+				reportRules(t, reqs.rules)
 
 				_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
 				if err != nil {
@@ -481,14 +484,16 @@ func getGenerators() (gopter.Gen, gopter.Gen, gopter.Gen) {
 	})
 
 	createProjectAndRuleGen := gopter.CombineGens(
-		createProjectReqGen, createRuleReqGen,
+		createProjectReqGen, gen.SliceOf(createRuleReqGen),
 	).Map(func(vals []interface{}) projectAndRuleReq {
 		p := vals[0].(api.CreateProjectReq)
-		r := vals[1].(api.CreateRuleReq)
-		r.ProjectId = p.Id
+		rules := vals[1].([]api.CreateRuleReq)
+		for i, _ := range rules {
+			rules[i].ProjectId = p.Id
+		}
 		return projectAndRuleReq{
 			CreateProjectReq: p,
-			rules:            []api.CreateRuleReq{r},
+			rules:            rules,
 		}
 	})
 
@@ -515,4 +520,12 @@ func ruleMatches(req interface{}, actual api.ProjectRule) bool {
 			actual.Name == ruleReq.Name &&
 			actual.ProjectId == ruleReq.ProjectId
 	}
+}
+
+func reportRules(t *testing.T, rules []api.CreateRuleReq) {
+	outputs := make([]string, len(rules))
+	for i, rule := range rules {
+		outputs[i] = fmt.Sprintf("%d", len(rule.Conditions))
+	}
+	t.Logf(fmt.Sprintf("%d rules with condition counts: %s", len(rules), strings.Join(outputs, ", ")))
 }
