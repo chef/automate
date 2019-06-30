@@ -210,7 +210,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     // delete the credential
     cy.contains(credName).parent().parent().find('chef-control-menu').as('row-menu')
     cy.get('@row-menu').click().then(() => {
-      cy.get('@row-menu').find('[data-cy=delete]').click()
+      cy.get('@row-menu').find('[data-cy=delete]').click({force: true})
     })
   })
   it('can delete the created node', () => {
