@@ -560,6 +560,16 @@ steps:
         linux:
           privileged: true
 
+  - label: "[integration] ha chef server"
+    command:
+      - integration/run_test integration/tests/ha_chef_server.sh
+    timeout_in_minutes: 35
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+
   - label: "[integration] workflow"
     command:
       - integration/run_test integration/tests/workflow.sh
