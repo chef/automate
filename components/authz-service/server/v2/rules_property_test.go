@@ -417,7 +417,6 @@ func TestDeleteRuleProperties(t *testing.T) {
 		))
 
 	properties.TestingRun(t)
-	testFW.Shutdown(t, ctx)
 }
 
 func getGopterParams(seed int64) *gopter.Properties {

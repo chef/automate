@@ -93,8 +93,9 @@ func NewTestFramework(t *testing.T, ctx context.Context) *TestFramework {
 	polSrv, polRefresher, err := server.NewPoliciesServer(ctx, l, pg, opaInstance, pgV1, vChan)
 	require.NoError(t, err)
 
-	projectsSrv, err := server.NewProjectsServer(ctx, l, pg, opaInstance,
-		eventServiceClient, configMgr, polRefresher)
+	projectUpdateManager := server.NewProjectUpdateManager(eventServiceClient, configMgr)
+	projectsSrv, err := server.NewProjectsServer(
+		ctx, l, pg, opaInstance, projectUpdateManager, polRefresher)
 	require.NoError(t, err)
 
 	authzSrv, err := server.NewAuthzServer(l, opaInstance, vSwitch, projectsSrv)
@@ -129,7 +130,7 @@ func NewTestFramework(t *testing.T, ctx context.Context) *TestFramework {
 		PolicyRefresher:       polRefresher,
 		ConfigManager:         configMgr,
 		ConfigManagerFilename: configMgrFilename,
-		ProjectUpdateManager:  projectsSrv.(*server.ProjectState).ProjectUpdateManager,
+		ProjectUpdateManager:  projectUpdateManager,
 		GRPC:                  grpcServ,
 	}
 
@@ -155,6 +156,44 @@ func (tf *TestFramework) Shutdown(t *testing.T, ctx context.Context) {
 	tf.GRPC.Close()
 	// TODO (tc): Track down and kill literally every goroutine we start, otherwise
 	// this TestFramework's authz instance could write some bad state while the next test is running.
+}
+
+// SetupProjectsAndRulesWithDB is a simplified test framework
+// useful for integration tests with just the DB.
+func SetupProjectsAndRulesWithDB(t *testing.T) (
+	api.ProjectsClient, *TestDB, storage.Storage, *MockEventServiceClient, int64) {
+	t.Helper()
+	ctx := context.Background()
+	seed := prng.GenSeed(t)
+
+	pg, testDB, _, _ := SetupTestDB(t)
+
+	l, err := logger.NewLogger("text", "error")
+	require.NoError(t, err, "init logger for storage")
+	projectUpdateManager := NewMockProjectUpdateManager()
+	projectsSrv, err := server.NewProjectsServer(
+		ctx, l, pg, &TestProjectRulesRetriever{}, projectUpdateManager, NewMockPolicyRefresher())
+	require.NoError(t, err)
+
+	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
+	connFactory := secureconn.NewFactory(*serviceCerts)
+
+	// TODO(sr): refactor our constructors. Having to maintain the middleware in
+	// three places is tedious and error-prone.
+	serv := connFactory.NewServer(grpc.UnaryInterceptor(
+		grpc_server.InputValidationInterceptor(),
+	))
+	api.RegisterProjectsServer(serv, projectsSrv)
+
+	grpcServ := grpctest.NewServer(serv)
+
+	conn, err := connFactory.Dial("authz-service", grpcServ.URL)
+	if err != nil {
+		t.Fatalf("connecting to grpc endpoint: %s", err)
+	}
+
+	eventServiceClient := &MockEventServiceClient{}
+	return api.NewProjectsClient(conn), testDB, pg, eventServiceClient, seed
 }
 
 func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *prng.Prng, *migration.Config) {
@@ -357,4 +396,46 @@ func WaitForWithTimeout(t *testing.T, f func() bool, timeout time.Duration, mess
 		}
 		time.Sleep(time.Millisecond * 10)
 	}
+}
+
+type mockProjectUpdateManager struct{}
+
+func NewMockProjectUpdateManager() *mockProjectUpdateManager {
+	return &mockProjectUpdateManager{}
+}
+
+func (*mockProjectUpdateManager) Cancel() error {
+	return nil
+}
+
+func (*mockProjectUpdateManager) Start() error {
+	return nil
+}
+
+func (*mockProjectUpdateManager) ProcessFailEvent(eventMessage *automate_event.EventMsg) error {
+	return nil
+}
+
+func (*mockProjectUpdateManager) ProcessStatusEvent(eventMessage *automate_event.EventMsg) error {
+	return nil
+}
+
+func (*mockProjectUpdateManager) Failed() bool {
+	return false // manager.stage.Failed
+}
+
+func (*mockProjectUpdateManager) FailureMessage() string {
+	return "" // manager.stage.FailureMessage
+}
+
+func (*mockProjectUpdateManager) PercentageComplete() float64 {
+	return 0
+}
+
+func (*mockProjectUpdateManager) EstimatedTimeComplete() time.Time {
+	return time.Time{}
+}
+
+func (*mockProjectUpdateManager) State() string {
+	return "not_running" // manager.stage.State
 }

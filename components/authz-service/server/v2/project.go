@@ -30,12 +30,12 @@ import (
 	event "github.com/chef/automate/components/event-service/server"
 )
 
-// state holds the server state for projects
-type state struct {
+// ProjectState holds the server state for projects
+type ProjectState struct {
 	log                  logger.Logger
 	store                storage.Storage
 	engine               engine.ProjectRulesRetriever
-	projectUpdateManager ProjectUpdateMgr
+	ProjectUpdateManager ProjectUpdateMgr
 	policyRefresher      PolicyRefresher
 	applyRuleMux         sync.Mutex
 }
@@ -87,7 +87,7 @@ func NewProjectsServer(
 		log:                  l,
 		store:                s,
 		engine:               e,
-		projectUpdateManager: projectUpdateManager,
+		ProjectUpdateManager: projectUpdateManager,
 		policyRefresher:      pr,
 	}, nil
 }
