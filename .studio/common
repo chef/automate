@@ -251,8 +251,10 @@ function verify_component() {
 }
 
 function display_available_components() {
-  log_line "Available components:"
-  ls -1 /src/components | awk '{print "* "$1}'
+  log_line "Available targets:"
+  echo "  * api"
+  echo "  * config"
+  ls -1 /src/components/*/scripts/grpc.sh | sed -r 's/\/src\/components\/(.*)\/scripts\/grpc.sh/  * \1/g'
 }
 
 document "generate_dev_root_ca" <<DOC
