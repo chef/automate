@@ -491,7 +491,7 @@ describe File.basename(__FILE__) do
     resp = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'environment', values: ['missing-in-action'])
     ])
-    assert_equal resp, Reporting::Reports.new()
+    assert_equal(Reporting::Reports.new(), resp)
 
 
     # Get all reports for these two nodes, one missing
@@ -652,7 +652,7 @@ describe File.basename(__FILE__) do
       assert_equal(4, res['profiles'][0]['controls'].length)
 
       control_ids = res['profiles'][0]['controls'].map {|c| c.id}
-      assert_equal(control_ids, ["nginx-01", "nginx-02", "nginx-03", "nginx-04"])
+      assert_equal(["nginx-01", "nginx-02", "nginx-03", "nginx-04"], control_ids)
 
       assert_equal(Reporting::Report, res.class)
 
