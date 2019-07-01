@@ -780,23 +780,22 @@ func (db *DB) UpdateNode(inNode *nodes.Node) error {
 	return err
 }
 
-func (trans *DBTrans) processNodesSecretsUpdate(inNode *nodes.Node) (err error) {
+func (trans *DBTrans) processNodesSecretsUpdate(inNode *nodes.Node) error {
 	var secretIdsByNodeId []string
 
-	_, err = trans.Select(&secretIdsByNodeId, selectSecretIdsFromNodes, inNode.Id)
+	_, err := trans.Select(&secretIdsByNodeId, selectSecretIdsFromNodes, inNode.Id)
 	if err != nil {
-		err = errors.Wrap(err, "processNodesSecretsUpdate unable to update node secrets")
-		return
+		return errors.Wrap(err, "processNodesSecretsUpdate unable to update node secrets")
 	}
 
 	secretsToAdd := utils.DiffArray(inNode.TargetConfig.Secrets, secretIdsByNodeId)
-	nodeSecretsToAdd := make([]interface{}, 0)
+	nodeSecretsToAdd := make([]interface{}, 0, len(secretsToAdd))
 	for _, secret := range secretsToAdd {
 		nodeSecretsToAdd = append(nodeSecretsToAdd, &NodeSecret{NodeID: inNode.Id, SecretID: secret})
 	}
 
 	secretsToDelete := utils.DiffArray(secretIdsByNodeId, inNode.TargetConfig.Secrets)
-	nodeSecretsToDelete := make([]*NodeSecret, 0)
+	nodeSecretsToDelete := make([]*NodeSecret, 0, len(secretsToDelete))
 	for _, secret := range secretsToDelete {
 		nodeSecretsToDelete = append(nodeSecretsToDelete, &NodeSecret{NodeID: inNode.Id, SecretID: secret})
 	}
@@ -805,8 +804,7 @@ func (trans *DBTrans) processNodesSecretsUpdate(inNode *nodes.Node) (err error) 
 		for _, nodeSecretToDelete := range nodeSecretsToDelete {
 			_, err = trans.Exec(deleteNodesSecretsByNodeId, inNode.Id, nodeSecretToDelete.SecretID)
 			if err != nil {
-				err = errors.Wrap(err, "processNodesSecretsUpdate unable to delete secret")
-				return
+				return errors.Wrap(err, "processNodesSecretsUpdate unable to delete secret")
 			}
 		}
 	}
@@ -814,11 +812,10 @@ func (trans *DBTrans) processNodesSecretsUpdate(inNode *nodes.Node) (err error) 
 	if len(secretsToAdd) > 0 {
 		err = trans.Insert(nodeSecretsToAdd...)
 		if err != nil {
-			err = errors.Wrap(err, "processNodesSecretsUpdate unable to insert secrets")
-			return
+			return errors.Wrap(err, "processNodesSecretsUpdate unable to insert secrets")
 		}
 	}
-	return
+	return nil
 }
 
 func (trans *DBTrans) processNodesTagsUpdate(inNode *nodes.Node) error {

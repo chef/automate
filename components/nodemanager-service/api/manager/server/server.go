@@ -104,7 +104,7 @@ func (srv *Server) Create(ctx context.Context, in *manager.NodeManager) (*manage
 	// in the background, for example: "aws-api" and "aws-ec2". handleManagersToBeAdded takes care of this
 	// logic, sending us back an array of managers to be added to the db
 	managers := handleManagersToBeAdded(in)
-	var mgrIds []*manager.Id
+	mgrIds := make([]*manager.Id, 0, len(managers))
 	for _, mgr := range managers {
 		mgrID, err := srv.addManagerAndNodes(ctx, mgr, acctID)
 		if err != nil {
@@ -557,17 +557,16 @@ func (srv *Server) searchAwsRegions(ctx context.Context, in *manager.NodeQuery) 
 }
 
 func (srv *Server) searchAzureSubscriptions(ctx context.Context, in *manager.NodeQuery) (*manager.Nodes, error) {
-	var nodes []string
 	myazure, err := managers.GetAzureManagerFromID(ctx, in.NodeManagerId, srv.DB, srv.secretsClient)
 	if err != nil {
-		err = utils.FormatErrorMsg(err, in.NodeManagerId)
-		return nil, err
+		return nil, utils.FormatErrorMsg(err, in.NodeManagerId)
 	}
 	subs, err := myazure.GetSubscriptions(ctx, in.GetQuery().GetFilterMap())
 	if err != nil {
-		err = utils.FormatErrorMsg(err, "")
-		return nil, err
+		return nil, utils.FormatErrorMsg(err, "")
 	}
+
+	nodes := make([]string, 0, len(subs))
 	for _, sub := range subs {
 		nodes = append(nodes, sub.Name)
 	}

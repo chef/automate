@@ -3,13 +3,14 @@ package pgdb
 import (
 	"encoding/json"
 
-	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/components/compliance-service/api/common"
 )
 
 const sqlFindTagID = `
-SELECT id  
+SELECT id
 FROM tags
 WHERE key = $1 AND value = $2;
 `
@@ -141,11 +142,12 @@ func KeyValueToRawMap(arr []*common.Kv) (json.RawMessage, error) {
 // RawMapToKeyValue helps convert an array of KeyValues in a Map and convert it to json
 func RawMapToKeyValue(rawJSON json.RawMessage) ([]*common.Kv, error) {
 	var zaMap map[string]string
-	var zaArray []*common.Kv
 	err := json.Unmarshal(rawJSON, &zaMap)
 	if err != nil {
-		return zaArray, errors.Wrap(err, "rawMapToKeyValue unable to unmarshal map")
+		return nil, errors.Wrap(err, "rawMapToKeyValue unable to unmarshal map")
 	}
+
+	zaArray := make([]*common.Kv, 0, len(zaMap))
 	for k, v := range zaMap {
 		zaArray = append(zaArray, &common.Kv{Key: k, Value: v})
 	}
