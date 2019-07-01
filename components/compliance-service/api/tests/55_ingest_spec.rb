@@ -140,7 +140,7 @@ describe File.basename(__FILE__) do
     ])
     act_rep_nodes['nodes'][0]['latest_report']['end_time']['seconds'] = 1
     assert_equal(1, act_rep_nodes.nodes.size)
-    assert_equal(exp_rep_nodes, act_rep_nodes.to_json)
+    assert_equal_json_sorted(exp_rep_nodes, act_rep_nodes.to_json)
 
 
     # Get profiles used by the node with node_id. This will hit the profiles index
