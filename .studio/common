@@ -254,7 +254,7 @@ function display_available_components() {
   log_line "Available targets:"
   echo "  * api"
   echo "  * config"
-  ls -1 /src/components/*/scripts/grpc.sh | sed -r 's/\/src\/components\/(.*)\/scripts\/grpc.sh/  * \1/g'
+  ls -1 /src/components/*/scripts/grpc.sh | awk -F/ '{ print "  * "$4 }'
 }
 
 document "generate_dev_root_ca" <<DOC
