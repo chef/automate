@@ -7,17 +7,15 @@ package util
 
 import (
 	"encoding/json"
-
+	"errors"
 	"net/url"
 	"strings"
-
-	"errors"
-
 	"time"
 
-	feedErrors "github.com/chef/automate/components/compliance-service/feed/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
+
+	eventErrors "github.com/chef/automate/components/event-feed-service/pkg/errors"
 )
 
 type FeedSummary struct {
@@ -232,7 +230,7 @@ func ValidateMillisecondDateRange(start int64, end int64) (time.Time, time.Time,
 	// end time is after the start time
 	if end != 0 && start != 0 {
 		if endTime.Before(startTime) {
-			return startTime, endTime, feedErrors.GrpcError(codes.InvalidArgument, "Invalid start/end time. End before Start")
+			return startTime, endTime, eventErrors.GrpcError(codes.InvalidArgument, "Invalid start/end time. End before Start")
 		}
 	}
 
@@ -284,17 +282,17 @@ func ValidatePagingCursorTime(before int64, after int64, cursor string, end int6
 	)
 
 	if before > 0 && after > 0 {
-		return cursorTime, ascending, feedErrors.GrpcError(codes.InvalidArgument,
+		return cursorTime, ascending, eventErrors.GrpcError(codes.InvalidArgument,
 			"Invalid 'before'/'after' param. Both parameters should not be set")
 	}
 
 	if before > 0 && cursor == "" {
-		return cursorTime, ascending, feedErrors.GrpcError(codes.InvalidArgument,
+		return cursorTime, ascending, eventErrors.GrpcError(codes.InvalidArgument,
 			"Invalid 'before' param. If the 'before' parameter is set the 'cursor' must be set also")
 	}
 
 	if after > 0 && cursor == "" && after != end {
-		return cursorTime, ascending, feedErrors.GrpcError(codes.InvalidArgument,
+		return cursorTime, ascending, eventErrors.GrpcError(codes.InvalidArgument,
 			"Invalid 'after' param. If the 'after' parameter is set and not the 'cursor', then the 'after' must be equal to the 'end'")
 	}
 
