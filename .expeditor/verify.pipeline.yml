@@ -328,7 +328,7 @@ steps:
 
   - label: "[unit] event-feed-service"
     command:
-      - hab studio run "source .studiorc && go_component_unit event-feed-service && go_component_static_tests event-feed-service"
+      - hab studio run "source .studiorc && go_component_unit event-feed-service && go_component_static_tests event-feed-service && go_component_lint event-feed-service"
     timeout_in_minutes: 10
     retry:
       automatic:

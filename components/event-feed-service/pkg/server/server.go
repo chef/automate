@@ -2,18 +2,18 @@ package server
 
 import (
 	"context"
+	"time"
+
+	"github.com/golang/protobuf/ptypes"
+	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc/codes"
+
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/errors"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
 	"github.com/chef/automate/components/event-feed-service/pkg/util"
 	"github.com/chef/automate/lib/grpc/health"
-	"time"
-
-	"github.com/golang/protobuf/ptypes"
-	"google.golang.org/grpc/codes"
-
-	log "github.com/sirupsen/logrus"
 )
 
 // EventFeedServer is the interface to this component.
@@ -244,7 +244,7 @@ func fromInternalFormat(entry *util.FeedEntry) (*event_feed.FeedEntry, error) {
 
 func fromInternalFormatSummary(s *util.FeedSummary) *event_feed.FeedSummaryResponse {
 	totalEntries := int64(0)
-	var counts []*event_feed.EntryCount
+	counts := make([]*event_feed.EntryCount, 0, len(s.Counts))
 	for k, v := range s.Counts {
 		ec := event_feed.EntryCount{Category: k, Count: v}
 		counts = append(counts, &ec)

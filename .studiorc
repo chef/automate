@@ -11,6 +11,9 @@ scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_na
 export HAB_ORIGIN=${HAB_ORIGIN:-chef}
 # Bring ci-studio-common to life
 RECOMMENDED_HAB_VERSION="0.77.0"
+
+GOLANGCILINTVERSION=1.16.0
+
 # shellcheck disable=1090
 if [ -d "${CI_STUDIO_COMMON:-}" ]; then
   echo "CI_STUDIO_COMMON override in effect; using $CI_STUDIO_COMMON, not chef/ci-studio-common habitat package"
