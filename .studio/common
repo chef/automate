@@ -11,7 +11,23 @@ document "compile_go_protobuf_component" <<DOC
 DOC
 function compile_go_protobuf_component() {
   [ "x$1" == "x" ] && error "Missing component name argument; try 'describe ${FUNCNAME[0]}'" && return 1
-  verify_component "$1" || return $?
+
+  # Note: while we remove all pb-derived files before regenerating, we're
+  # actually cheating a bit: the protoc-gen-* executables built above do partly
+  # depend on them.
+  local path
+  if [ "$1" == "api" ]; then
+    path=api
+  elif [ "$1" == "config" ]; then
+    path=api/config
+  else
+    path="components/$1"
+    if [ ! -f "/src/$path/scripts/grpc.sh" ]; then
+      error "Compile go protobuf target is invalid."
+      display_valid_protobuf_targets
+      return 1
+    fi
+  fi
 
   # prep policy generation (only automate-gateway needs that right now)
   # Note: the actual generation is triggered by a call to protoc with the
@@ -27,18 +43,6 @@ function compile_go_protobuf_component() {
     install_go_tool "${proto_go_tools[@]}"
     GO_TOOL_VENDOR=true install_go_tool github.com/lyft/protoc-gen-validate
   )
-
-  # Note: while we remove all pb-derived files before regenerating, we're
-  # actually cheating a bit: the protoc-gen-* executables built above do partly
-  # depend on them.
-  local path
-  if [ "$1" == "api" ]; then
-    path=api
-  elif [ "$1" == "config" ]; then
-    path=api/config
-  else
-    path="components/$1"
-  fi
 
   # "api" doesn't compile the config directory so let's not delete the config directory in that case
   if [ "$path" == "api" ]; then
@@ -251,7 +255,12 @@ function verify_component() {
 }
 
 function display_available_components() {
-  log_line "Available targets:"
+  log_line "Available components:"
+  ls -1 /src/components | awk '{print "* "$1}'
+}
+
+function display_valid_protobuf_targets() {
+  log_line "Valid targets:"
   echo "  * api"
   echo "  * config"
   ls -1 /src/components/*/scripts/grpc.sh | awk -F/ '{ print "  * "$4 }'
