@@ -143,13 +143,13 @@ func TestTimeDiffPrettyMatrix(t *testing.T) {
 			message:  "all values must have a diff of 1",
 			timeA:    time.Date(2017, 5, 1, 0, 0, 0, 0, time.UTC),
 			timeB:    time.Date(2018, 6, 2, 1, 1, 1, 1, time.UTC),
-			expected: "1 year 1 month 1 day 1 hour 1 minute 1 second",
+			expected: "1 year, 1 month, 1 day, 1 hour, 1 minute, 1 second",
 		},
 		{
 			message:  "singular and plurals",
 			timeA:    time.Date(2017, 5, 1, 0, 0, 0, 0, time.UTC),
 			timeB:    time.Date(2028, 6, 21, 1, 30, 22, 1, time.UTC),
-			expected: "11 years 1 month 20 days 1 hour 30 minutes 22 seconds",
+			expected: "11 years, 1 month, 20 days, 1 hour, 30 minutes, 22 seconds",
 		},
 		{
 			message:  "the limit of one month is 30 days",
@@ -167,7 +167,7 @@ func TestTimeDiffPrettyMatrix(t *testing.T) {
 			message:  "a month and one day",
 			timeA:    time.Date(2018, 2, 11, 0, 0, 0, 0, time.UTC),
 			timeB:    time.Date(2019, 1, 12, 0, 0, 0, 0, time.UTC),
-			expected: "11 months 1 day",
+			expected: "11 months, 1 day",
 		},
 	}
 

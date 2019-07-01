@@ -260,7 +260,7 @@ func calculateTimeDuration(t time.Time) string {
 func timeDiffPretty(a, b time.Time) string {
 	var (
 		pretty       = ""
-		separator    = " "
+		separator    = ", "
 		addSeparator = func(str string) string {
 			if str != "" {
 				return str + separator
