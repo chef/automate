@@ -582,6 +582,7 @@ paths = [
   "lib/proc/*",
   "lib/proxy/*",
   "lib/stringutils/*",
+  "lib/timef/*",
   "lib/tls/*",
   "lib/tracing/*",
   "lib/uuid4/*",
