@@ -1,8 +1,4 @@
-# lll: ignore long lines
-# unparam: unused parameters
-# nakedret: naked returns in long functions
-# prealloc: slices that could be preallocated
-LINTERARGS=-v -D lll -D unparam -D nakedret -D prealloc --deadline 1m ./...
+LINTERARGS=-v --deadline 1m ./...
 include ../../Makefile.common_go
 
 # Replaces 'unknown' terminal with 'xterm' for 'tput' colors to work in buildkite

@@ -5,11 +5,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/chef/automate/components/compliance-service/api/common"
-	"github.com/chef/automate/components/compliance-service/utils"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/components/compliance-service/api/common"
+	"github.com/chef/automate/components/compliance-service/utils"
 )
 
 func mergeFilters(mergeableFilters []*common.Filter) ([]common.Filter, error) {
@@ -66,7 +67,7 @@ func buildWhereHavingFilter(mergeableFilters []*common.Filter, tableAbbrev strin
 		return "", "", errors.Wrap(err, "buildWhereHavingFilter error")
 	}
 
-	var conditions []string
+	var conditions []string // nolint: prealloc
 	var tagFilters []common.Filter
 	for _, filter := range filters {
 		var newCondition string
