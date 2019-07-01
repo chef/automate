@@ -264,6 +264,32 @@ describe File.basename(__FILE__) do
     expected_data = {
         "profiles" => [
             {
+                "name" => "apache-baseline",
+                "title" => "DevSec Apache Baseline",
+                "maintainer" => "DevSec Hardening Framework Team",
+                "copyright" => "DevSec Hardening Framework Team",
+                "copyrightEmail" => "hello@dev-sec.io",
+                "license" => "Apache 2 license",
+                "summary" => "Test-suite for best-practice apache hardening",
+                "version" => "2.0.2",
+                "owner" => "chris",
+                "supports" => [{}],
+                "sha256" => "3e1310b071dc4d706263e9d07083e10a92b4b69e4a36cffa1eda7eaecc09969a"
+            },
+            {
+                "name" => "apache-baseline",
+                "title" => "DevSec Apache Baseline",
+                "maintainer" => "Hardening Framework Team",
+                "copyright" => "Hardening Framework Team",
+                "copyrightEmail" => "hello@dev-sec.io",
+                "license" => "Apache 2 license",
+                "summary" => "Test-suite for best-practice apache hardening",
+                "version" => "2.0.1",
+                "owner" => "chris",
+                "supports" => [{}],
+                "sha256" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9"
+            },
+            {
                 "name" => "linux-patch-baseline",
                 "title" => "DevSec Linux Patch Benchmark",
                 "maintainer" => "Christoph Hartmann",
