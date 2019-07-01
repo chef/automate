@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"math"
-	"math/rand"
 	"reflect"
 	"strings"
 	"testing"
@@ -49,27 +48,18 @@ func TestCreateRuleProperties(t *testing.T) {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				// In this first test only, I have added more realism by examining
-				// a single rule amidst a bunch of other random rules in the DB.
-				// Is the benefit real enough that it warrants the extra runtime here ??
-				reqs.rules, err = createRules(ctx, cl, reqs.rules)
-				if err != nil {
-					return reportErrorAndYieldFalse(t, err)
-				}
-				targetRule := rand.Intn(len(reqs.rules))
-				t.Logf("target rule is # %d", targetRule)
-
-				rStaged, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[targetRule].Id})
+				_, err = cl.CreateRule(ctx, &reqs.rules[0])
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				// Note: we're ignoring type conversion, as asserting that would require us
-				// to replicate the mapping logic in tests.
-				// Instead, as we add GetRule, ListRules, etc., we can use this
-				// testing approach to write meaningful assertions.
+				rStaged, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
 				return rStaged.Rule.Status == "staged" &&
-					ruleMatches(reqs.rules[targetRule], *rStaged.Rule)
+					ruleMatches(reqs.rules[0], *rStaged.Rule)
 			},
 			createProjectAndRuleGen,
 		))
@@ -135,7 +125,6 @@ func TestCreateRuleProperties(t *testing.T) {
 					rules:            []api.CreateRuleReq{r0, r1},
 				}
 			}),
-			createProjectAndRuleGen,
 		))
 
 	properties.TestingRun(t)
@@ -147,7 +136,7 @@ func TestListRuleProperties(t *testing.T) {
 	properties := getGopterParams(seed)
 	_, _, createProjectAndRuleGen := getGenerators()
 
-	properties.Property("reports rules when all are staged",
+	properties.Property("reports rules when all are staged and staged included in request",
 		prop.ForAll(
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
@@ -175,6 +164,34 @@ func TestListRuleProperties(t *testing.T) {
 			createProjectAndRuleGen,
 		))
 
+	properties.Property("reports no rules when all are staged and staged not included in request",
+		prop.ForAll(
+			func(reqs projectAndRuleReq) bool {
+				defer testDB.Flush(t)
+
+				reportRules(t, reqs.rules)
+
+				_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				reqs.rules, err = createRules(ctx, cl, reqs.rules)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				resp, err := cl.ListRules(ctx, &api.ListRulesReq{IncludeStaged: false})
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				return len(resp.Rules) == 0
+
+			},
+			createProjectAndRuleGen,
+		))
+
 	properties.Property("reports rules when all are applied",
 		prop.ForAll(
 			func(reqs projectAndRuleReq) bool {
@@ -194,7 +211,7 @@ func TestListRuleProperties(t *testing.T) {
 
 				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-				resp, err := cl.ListRules(ctx, &api.ListRulesReq{IncludeStaged: true})
+				resp, err := cl.ListRules(ctx, &api.ListRulesReq{})
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
@@ -503,7 +520,8 @@ but rule no longer found once deletion is applied`,
 func getGopterParams(seed int64) *gopter.Properties {
 	params := gopter.DefaultTestParametersWithSeed(seed)
 	params.MinSize = 1             // otherwise, we'd get zero-length "conditions" slices
-	params.MinSuccessfulTests = 25 // reduced from default 100 to be more speedy
+	params.MaxSize = 25            // otherwise, we may exceed GRPC capacity in ListRules
+	params.MinSuccessfulTests = 25 // reduced from default 100 to avoid timeouts in CI!
 	return gopter.NewProperties(params)
 }
 
@@ -624,12 +642,16 @@ func rulesMatch(rules []api.CreateRuleReq, resp *api.ListRulesResp) bool {
 
 func createRules(ctx context.Context, cl api.ProjectsClient, rules []api.CreateRuleReq) ([]api.CreateRuleReq, error) {
 	for i, rule := range rules {
-		rules[i].Id = fmt.Sprintf("%s-index-%d", rules[i].Id, i) // make the id unique!
+		// make the id unique!
+		rules[i].Id = fmt.Sprintf("%s-index-%d", rules[i].Id, i)
+
+		// constrain condition count even further than the gopter global param
 		var conditions []*api.Condition
 		for j := 0; j < int(math.Min(conditionLimit, float64(len(rule.Conditions)))); j++ {
 			conditions = append(conditions, rule.Conditions[j])
 		}
 		rules[i].Conditions = conditions
+
 		_, err := cl.CreateRule(ctx, &rules[i])
 		// Note: this could be very noisy, but it's hard to figure out what went
 		// wrong without the error
@@ -641,6 +663,7 @@ func createRules(ctx context.Context, cl api.ProjectsClient, rules []api.CreateR
 }
 
 func reportRules(t *testing.T, rules []api.CreateRuleReq) {
+	t.Helper()
 	outputs := make([]string, len(rules))
 	for i, rule := range rules {
 		outputs[i] = fmt.Sprintf("%d", len(rule.Conditions))
