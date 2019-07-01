@@ -49,7 +49,7 @@ describe File.basename(__FILE__) do
 
     ##### GRPC Success tests #####
     actual = MANAGER_GRPC nodes, :list, Nodes::Query.new(page: 1)
-    assert_equal actual, Nodes::Nodes.new(nodes: [], total: 0)
+    assert_equal Nodes::Nodes.new(nodes: [], total: 0), actual
 
     secret = SS_GRPC secrets, :create, Secrets::Secret.new(
       name:"My WinRM Cred",

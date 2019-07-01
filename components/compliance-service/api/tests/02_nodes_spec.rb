@@ -1296,7 +1296,7 @@ describe File.basename(__FILE__) do
             }
         ]
     }
-    assert_equal_json_sorted(actual_node.to_json, expected_node.to_json)
+    assert_equal_json_sorted( expected_node.to_json, actual_node.to_json)
 
     # sort by node name ASC when a profile filter is used
     resp = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [

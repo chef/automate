@@ -577,7 +577,7 @@ describe File.basename(__FILE__) do
         Common::Filter.new(key: "job_type", values: ["exec"])
       ]
     )
-    assert_equal actual, Jobs::Jobs.new(jobs: [], total: 0)
+    assert_equal Jobs::Jobs.new(jobs: [], total: 0), actual
 
     # Testing jobs list filtered by job_type = 'bogus_job_type' expect 400 bad request
     assert_grpc_error("Invalid job_type filter: bogus_job_type. job_type must be one of the following: \'detect\' or \'exec\'", 3) do
