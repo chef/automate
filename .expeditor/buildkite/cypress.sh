@@ -15,6 +15,10 @@ instances_to_test=( \
 
 for instance in ${instances_to_test[*]}
 do
+  # these machines have no SAML setup
+  if grep -Eq 'fresh-install|iamv2p1' <<< "$instance"; then
+    export CYPRESS_SKIP_SSO=true
+  fi
   echo "--- Executing Cypress tests against $instance"
   export CYPRESS_BASE_URL="https://$instance"
   export CYPRESS_RECORD_KEY="$CYPRESS_RECORD_KEY"
