@@ -246,7 +246,7 @@ describe File.basename(__FILE__) do
         name: 'windows-baseline',
         version: '1.1.0'
     )
-    assert_equal actual, Google::Protobuf::Empty.new()
+    assert_equal Google::Protobuf::Empty.new(), actual
   end
 
   it "returns an error getting the metadata for a deleted profile" do
@@ -377,7 +377,7 @@ describe File.basename(__FILE__) do
         name: 'windows-baseline',
         version: '1.1.0'
     )
-    assert_equal actual, Google::Protobuf::Empty.new()
+    assert_equal Google::Protobuf::Empty.new(), actual
   end
 
   it "returns the data for an uninstalled market profile" do

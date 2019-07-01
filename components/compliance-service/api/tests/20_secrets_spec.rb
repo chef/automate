@@ -126,7 +126,7 @@ describe File.basename(__FILE__) do
 
     ##### GRPC Success tests #####
     actual = SS_GRPC secrets, :list, Secrets::Query.new()
-    assert_equal actual, Secrets::Secrets.new(secrets: [], total: 0)
+    assert_equal Secrets::Secrets.new(secrets: [], total: 0), actual
 
     # Add a secret without tags or type
     secret1 = SS_GRPC secrets, :create, Secrets::Secret.new(
