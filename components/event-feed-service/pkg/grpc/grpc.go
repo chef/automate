@@ -3,10 +3,12 @@ package grpc
 import (
 	"context"
 	"fmt"
+	"net"
+
+	"github.com/olivere/elastic"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"net"
 
 	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/config"
@@ -14,8 +16,6 @@ import (
 	"github.com/chef/automate/components/event-feed-service/pkg/server"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
-
-	"github.com/olivere/elastic"
 )
 
 // Spawn starts a grpc server using the provided host and port.

@@ -19,7 +19,7 @@ document "go_component_unit" <<DOC
   Example: Run the unit tests for the authz-service with verbosity enabled
   ----------------------------------------------------
   $ go_component_unit -v config-mgmt-service
-  
+
   The command provides tab-completion, so if you type this...
 
   $ go_component_unit<space><tab><tab>
@@ -45,7 +45,7 @@ function go_component_unit() {
   log_line "Running '${YELLOW}$1${NC}' unit tests"
   pushd "$scaffolding_go_pkg_path" >/dev/null
     if [[ "$1" == "api" ]]; then
-      SPEC=./api/... 
+      SPEC=./api/...
     else
       SPEC=./components/$1/...
     fi
@@ -259,6 +259,53 @@ function go_component_static_tests() {
 }
 # Adding auto tab complete
 complete -F _component_auto_complete go_component_static_tests
+
+document "go_component_lint" <<DOC
+  Runs the golangci linter for a component
+DOC
+function go_component_lint() {
+  [ "x$1" == "x" ] && error "Missing component name argument; try 'describe ${FUNCNAME[0]}'" && return 1
+  verify_component $1 || return $?
+  local component=$1
+  install_golangci && run_golangci components/$component/...
+}
+
+complete -F _component_auto_complete go_component_lint
+
+function install_golangci() {
+    if [[ -z $GOLANGCILINTVERSION ]]; then
+        error "GOLANGCILINTVERSION must be set"
+        return 1
+    fi
+    (
+        enter_go_workspace
+        local lint_bin="./cache/golangci-lint-${GOLANGCILINTVERSION}-linux-amd64/golangci-lint"
+        local lint_tarball="./cache/golangci-lint-${GOLANGCILINTVERSION}-linux-amd64.tar.gz"
+        if [[ ! -f  "$lint_bin" ]]; then
+            log_line "Unpacking golang-ci ${GOLANGCILINTVERSION}"
+            if [[ ! -f "$lint_tarball" ]]; then
+                error "Could not find $lint_tarball, did you vendor this version of golangci-lint?"
+                return 1
+            fi
+            tar zxf "$lint_tarball" -C cache/
+            touch "$lint_bin"
+        fi
+    )
+}
+
+function run_golangci() {
+    if [[ -z $GOLANGCILINTVERSION ]]; then
+        error "GOLANGCILINTVERSION must be set"
+        return 1
+    fi
+
+    local pkg=$1
+    (
+        enter_go_workspace
+        log_line "Running golang-ci ${GOLANGCILINTVERSION} on $pkg"
+        "./cache/golangci-lint-${GOLANGCILINTVERSION}-linux-amd64/golangci-lint" run "$pkg"
+    )
+}
 
 document "go_component_make" <<DOC
   Runs the given make target(s) for the given component inside the scaffolding_go_pkg_path
