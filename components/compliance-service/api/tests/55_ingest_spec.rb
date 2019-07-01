@@ -119,7 +119,15 @@ describe File.basename(__FILE__) do
               },
               "failed": {}
             }
-          }
+          },
+          "profiles": [
+            {
+              "id": "3e1310b071dc4d706263e9d07083e10a92b4b69e4a36cffa1eda7eaecc09969a",
+              "name": "apache-baseline",
+              "status": "skipped",
+              "version": "2.0.2"
+            }
+          ]
         }
       ],
       "total": 1
