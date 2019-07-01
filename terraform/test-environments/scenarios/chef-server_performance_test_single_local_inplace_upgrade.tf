@@ -90,6 +90,9 @@ module "chef_server_performance_test_single_local_inplace_upgrade_deploy" {
   deployment_type = "local"
   upgrade         = "true"
 
+  # SAML
+  saml = "true"
+
   # Enable A2 Chef Server feature
   enable_chef_server = "true"
 

@@ -54,4 +54,5 @@ module "single_local_iamv2_inplace_upgrade_deploy" {
   deployment_type = "local"
   upgrade         = "true"
   iam_version     = "v2"
+  saml            = "true"
 }

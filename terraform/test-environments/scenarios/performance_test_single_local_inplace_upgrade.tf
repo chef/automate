@@ -91,6 +91,9 @@ module "performance_test_single_local_inplace_upgrade_deploy" {
   enable_eas_dashboard = "true"
   upgrade              = "true"
 
+  # SAML
+  saml = "true"
+
   # Create admin-token
   create_admin_token = "true"
 

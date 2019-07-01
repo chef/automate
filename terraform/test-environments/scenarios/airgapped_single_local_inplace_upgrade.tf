@@ -87,4 +87,7 @@ module "airgapped_single_local_inplace_upgrade_deploy" {
   channel         = "${var.channel}"
   deployment_type = "local"
   upgrade         = "true"
+
+  # SAML
+  saml = "true"
 }
