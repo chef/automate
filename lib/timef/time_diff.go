@@ -47,6 +47,7 @@ func DiffPretty(a, b time.Time) string {
 }
 
 // Diff returns the specific interval between two times
+// Reference: https://stackoverflow.com/a/36531443
 func Diff(a, b time.Time) (year, month, day, hour, min, sec int) {
 	if a.Location() != b.Location() {
 		b = b.In(a.Location())
@@ -83,9 +84,9 @@ func Diff(a, b time.Time) (year, month, day, hour, min, sec int) {
 		day--
 	}
 	if day < 0 {
-		// days in month
-		t := time.Date(y1, M1, 32, 0, 0, 0, 0, time.UTC)
-		day += 32 - t.Day()
+		// Reference: https://stackoverflow.com/a/49170822
+		t := time.Date(y2, M2, 0, 0, 0, 0, 0, time.UTC)
+		day += t.Day()
 		month--
 	}
 	if month < 0 {

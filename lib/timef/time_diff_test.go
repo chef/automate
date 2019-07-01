@@ -214,6 +214,12 @@ func TestDiffMatrix(t *testing.T) {
 			timeB:    time.Date(2019, 1, 12, 0, 0, 0, 0, time.UTC),
 			expected: "0 11 1 0 0 0",
 		},
+		{
+			message:  "calculate days from the correct month",
+			timeA:    time.Date(2015, 1, 11, 0, 0, 0, 0, time.UTC),
+			timeB:    time.Date(2015, 3, 10, 0, 0, 0, 0, time.UTC),
+			expected: "0 1 27 0 0 0",
+		},
 	}
 
 	for _, test := range cases {
