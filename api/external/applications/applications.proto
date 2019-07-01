@@ -99,9 +99,7 @@ message Service {
   string channel = 9;
   string site = 17;
   HealthStatus previous_health_check = 18;
-  string last_health_change = 19;
-  // or
-  //string current_health_since = 19;
+  string current_health_since = 19;
 
 }
 
