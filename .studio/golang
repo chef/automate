@@ -299,9 +299,9 @@ function run_golangci() {
         return 1
     fi
 
-    local pkg=$1
     (
         enter_go_workspace
+        local pkg=$1
         log_line "Running golang-ci ${GOLANGCILINTVERSION} on $pkg"
         "./cache/golangci-lint-${GOLANGCILINTVERSION}-linux-amd64/golangci-lint" run "$pkg"
     )
