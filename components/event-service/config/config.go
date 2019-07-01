@@ -16,6 +16,7 @@ const (
 	COMPLIANCE_INGEST_KEY = "compliance_ingest"
 	CFG_KEY               = "cfgingest"
 	AUTHZ                 = "authz"
+	EVENT_FEED            = "event_feed"
 )
 
 // Configuration for the Event Service
@@ -63,6 +64,7 @@ type HandlerConfig struct {
 	Feed      string `mapstructure:"feed"`
 	CfgIngest string `mapstructure:"cfgingest"`
 	Authz     string `mapstructure:"authz"`
+	EventFeed string `mapstructure:"event_feed"`
 }
 
 // ListenAddress is the address where gRPC server will bind and listen
@@ -112,6 +114,7 @@ func Configure() (*EventConfig, error) {
 	log.Debugf("feed handler endpoint: %s", config.HandlerEndpoints.Feed)
 	log.Debugf("Config ingest handler endpoint: %s", config.HandlerEndpoints.CfgIngest)
 	log.Debugf("Authz handler endpoint: %s", config.HandlerEndpoints.Authz)
+	log.Debugf("Event Feed handler endpoint: %s", config.HandlerEndpoints.EventFeed)
 
 	// Validates that the configuration has a valid host/port
 	_, err := url.ParseRequestURI(path.Join("http://", config.ListenAddress()))
@@ -139,6 +142,7 @@ func Configure() (*EventConfig, error) {
 	log.Debugf("feed endpoint: %s", config.HandlerEndpoints.Feed)
 	log.Debugf("cfg ingest endpoint: %s", config.HandlerEndpoints.CfgIngest)
 	log.Debugf("authz endpoint: %s", config.HandlerEndpoints.Authz)
+	log.Debugf("event feed endpoint: %s", config.HandlerEndpoints.EventFeed)
 	log.Debug("end config.go Configure() ->")
 	return config, nil
 }

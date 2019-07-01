@@ -11,6 +11,7 @@ import (
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	api "github.com/chef/automate/api/interservice/event"
+	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/api/interservice/ingest"
 	automate_feed "github.com/chef/automate/components/compliance-service/api/automate-feed"
 	compliance_ingest "github.com/chef/automate/components/compliance-service/ingest/ingest"
@@ -177,6 +178,18 @@ func (svc Events) getClient(handlerType string) (EventHandlerClient, error) {
 			return nil, errors.New("CallHandler could not obtain NewProjectsClient")
 		}
 		return authzProjectsClient, nil
+	} else if handlerType == config.EVENT_FEED {
+		conn, err := svc.connFactory.DialContext(timeoutCtx, "event-feed-service", svc.cfg.HandlerEndpoints.EventFeed, grpc.WithBlock())
+		if err != nil {
+			logrus.Errorf("Event service could not get event handler client; error grpc dialing authz handler %s", err.Error())
+			return nil, err
+		}
+		eventFeedClient := event_feed.NewEventFeedServiceClient(conn)
+		if eventFeedClient == nil {
+			logrus.Errorf("CallHandler could not obtain NewFeedServiceClient")
+			return nil, errors.New("CallHandler could not obtain NewFeedServiceClient")
+		}
+		return eventFeedClient, nil
 	} else { // TODO: return appropriate error type
 		return nil, errors.New("can't find client event handler for unrecognized event handler type")
 	}
