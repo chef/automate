@@ -74,10 +74,10 @@ func TestTimeDiffPrettyMatrix(t *testing.T) {
 			expected: "11 seconds",
 		},
 		{
-			message:  "12 minute",
+			message:  "2 minutes",
 			timeA:    time.Date(2018, 1, 1, 1, 0, 0, 0, time.UTC),
-			timeB:    time.Date(2018, 1, 1, 1, 12, 0, 0, time.UTC),
-			expected: "12 minutes",
+			timeB:    time.Date(2018, 1, 1, 1, 2, 0, 0, time.UTC),
+			expected: "2 minutes",
 		},
 		{
 			message:  "23 hours",
@@ -92,10 +92,10 @@ func TestTimeDiffPrettyMatrix(t *testing.T) {
 			expected: "10 days",
 		},
 		{
-			message:  "11 months",
+			message:  "6 months",
 			timeA:    time.Date(2017, 1, 1, 0, 0, 0, 0, time.UTC),
-			timeB:    time.Date(2017, 12, 1, 0, 0, 0, 0, time.UTC),
-			expected: "11 months",
+			timeB:    time.Date(2017, 7, 1, 0, 0, 0, 0, time.UTC),
+			expected: "6 months",
 		},
 		{
 			message:  "40 years",
@@ -148,8 +148,8 @@ func TestTimeDiffPrettyMatrix(t *testing.T) {
 		{
 			message:  "singular and plurals",
 			timeA:    time.Date(2017, 5, 1, 0, 0, 0, 0, time.UTC),
-			timeB:    time.Date(2028, 6, 21, 1, 30, 22, 1, time.UTC),
-			expected: "11 years, 1 month, 20 days, 1 hour, 30 minutes, 22 seconds",
+			timeB:    time.Date(2028, 6, 21, 1, 30, 2, 1, time.UTC),
+			expected: "11 years, 1 month, 20 days, 1 hour, 30 minutes, 2 seconds",
 		},
 		{
 			message:  "the limit of one month is 30 days",
@@ -164,7 +164,7 @@ func TestTimeDiffPrettyMatrix(t *testing.T) {
 			expected: "28 days",
 		},
 		{
-			message:  "a month and one day",
+			message:  "11 months and one day",
 			timeA:    time.Date(2018, 2, 11, 0, 0, 0, 0, time.UTC),
 			timeB:    time.Date(2019, 1, 12, 0, 0, 0, 0, time.UTC),
 			expected: "11 months, 1 day",

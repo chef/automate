@@ -270,13 +270,11 @@ func timeDiffPretty(a, b time.Time) string {
 		addTimeParam = func(str, param string, value int) string {
 			if value > 0 {
 				str = addSeparator(str)
-				if (value > 0) && (value <= 9) {
-					// singulars
+				if value == 1 { // singular
 					return fmt.Sprintf("%s%d %s", str, value, param)
-				} else {
-					// plurals
-					return fmt.Sprintf("%s%d %ss", str, value, param)
 				}
+				// plural
+				return fmt.Sprintf("%s%d %ss", str, value, param)
 			}
 			return str
 		}
@@ -299,11 +297,13 @@ func timeDiff(a, b time.Time) (year, month, day, hour, min, sec int) {
 	if a.After(b) {
 		a, b = b, a
 	}
-	y1, M1, d1 := a.Date()
-	y2, M2, d2 := b.Date()
+	var (
+		y1, M1, d1 = a.Date()
+		y2, M2, d2 = b.Date()
 
-	h1, m1, s1 := a.Clock()
-	h2, m2, s2 := b.Clock()
+		h1, m1, s1 = a.Clock()
+		h2, m2, s2 = b.Clock()
+	)
 
 	year = y2 - y1
 	month = int(M2 - M1)
