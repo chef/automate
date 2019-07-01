@@ -230,6 +230,32 @@ func (app *ApplicationsServer) GetServices(
 	}, nil
 }
 
+func (app *ApplicationsServer) GetServicesStats(c context.Context,
+	request *applications.ServicesStatsReq) (*applications.ServicesStatsRes, error) {
+
+	servicesCount, err := app.storageClient.GetServicesCount()
+	if err != nil {
+		log.WithError(err).Error("Error retrieving services count")
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	serviceGroupsCount, err := app.storageClient.GetServiceGroupsCount()
+	if err != nil {
+		log.WithError(err).Error("Error retrieving service groups count")
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	supervisorsCount, err := app.storageClient.GetSupervisorsCount()
+	if err != nil {
+		log.WithError(err).Error("Error retrieving supervisors count")
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &applications.ServicesStatsRes{
+		TotalServices:      servicesCount,
+		TotalServiceGroups: serviceGroupsCount,
+		TotalSupervisors:   supervisorsCount,
+	}, nil
+}
+
 // Convert storage.Service array to applications.Service array
 func convertStorageServicesToApplicationsServices(svcs []*storage.Service) []*applications.Service {
 	services := make([]*applications.Service, len(svcs))

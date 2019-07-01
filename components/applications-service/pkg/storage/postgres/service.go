@@ -98,6 +98,11 @@ SELECT COUNT(*) AS total
 FROM service AS s
  %s
 `
+
+	selectServicesTotalCount = `
+SELECT count(*)
+  FROM service;
+`
 )
 
 // GetServicesHealthCounts retrieves the health counts from all services in the database.
@@ -159,7 +164,12 @@ func (db *Postgres) GetServices(
 	return services, err
 }
 
-// GetServiceFromUniqueFields retrieves a service from the db without the need
+func (db *Postgres) GetServicesCount() (int32, error) {
+	count, err := db.DbMap.SelectInt(selectServicesTotalCount)
+	return int32(count), err
+}
+
+// getServiceFromUniqueFields retrieves a service from the db without the need
 // of an id, it is based on the unique fields, name and member id
 func (db *Postgres) GetServiceFromUniqueFields(name, member string) (*storage.Service, bool) {
 	if name == "" || member == "" {

@@ -39,6 +39,9 @@ func TestIngestSigleService(t *testing.T) {
 		svcList := suite.GetServices()
 		assert.Equal(t, 1, len(svcList))
 
+		// make sure the stats endpoint stuff is also correct
+		assert.Equal(t, int32(1), suite.GetServicesCountForStatsEndpoint())
+
 		assert.Equal(t, "4f1un3", svcList[0].SupMemberID,
 			"the service supervisor_id is not the expected one")
 		assert.Equal(t, "test", svcList[0].Origin,
@@ -112,9 +115,15 @@ func TestIngestMultiServicesDifferentServiceGroups(t *testing.T) {
 	svcList := suite.GetServices()
 	assert.Equal(t, len(events), len(svcList), "wrong number of services")
 
+	// make sure the stats endpoint stuff is also correct
+	assert.Equal(t, int32(len(events)), suite.GetServicesCountForStatsEndpoint(), "wrong number of services")
+
 	// Verify there are only three service_groups
 	sgList := suite.GetServiceGroups()
 	assert.Equal(t, 3, len(sgList), "wrong number of service groups")
+
+	// make sure the stats endpoint stuff is also correct
+	assert.Equal(t, int32(3), suite.GetServiceGroupsCountForStatsEndpoint(), "wrong number of service groups")
 }
 
 func TestIngestMultiServicesSameServiceGroup(t *testing.T) {
@@ -163,6 +172,8 @@ func TestIngestMultiServicesSameServiceGroup(t *testing.T) {
 	svcList := suite.GetServices()
 	assert.Equal(t, len(events), len(svcList), "wrong number of services")
 
+	// also check stats endpoint function
+	assert.Equal(t, int32(len(events)), suite.GetServicesCountForStatsEndpoint(), "wrong number of services")
 	// We have a race condition where if we have different services sending messages
 	// to Automate at the same time that belongs to the same service-group we will
 	// insert different service-groups and deployments entries instead of a single one.
@@ -174,6 +185,8 @@ func TestIngestMultiServicesSameServiceGroup(t *testing.T) {
 	// Verify there is only one service_group
 	//sgList := suite.GetServiceGroups()
 	//assert.Equal(t, 1, len(sgList), "there should be only one single service group")
+	// also check stats endpoint function
+	//assert.Equal(t, int32(1), suite.GetServiceGroupsCountForStatsEndpoint(), "there should be only one single service group")
 }
 
 func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
