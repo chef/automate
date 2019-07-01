@@ -27,6 +27,6 @@ You can use this environment to test changes to the Terraform code and the chef-
 1. Download and configure the [okta_aws utility](https://github.com/chef/okta_aws) - you'll use this to get credentials to the appropriate AWS account.
 2. Run `okta_aws chef-cd` to authenticate against the chef-cd AWS account.
 3. Allocate a `TF_ENVIRONMENT_INDEX` for yourself - reach out in the #releng-support channel to determine which number you should use.
-3. Run `make plan` in the `terraform/` directory to ensure that the plan will execute accordingly.
+3. Run `make plan` in the `terraform/test-environments` directory to ensure that the plan will execute accordingly.
 4. Run `make apply` to stand up your environment.
 5. When complete, run `make destroy` to tear down your environment. **There is no automatic reaping of these environments.**
