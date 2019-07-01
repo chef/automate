@@ -11,7 +11,7 @@ module "airgapped_single_local_fresh_install" {
 
   # Metadata
   meta_title       = "Airgapped Single Local (Fresh Install)"
-  meta_description = "A2 stack (using SAML) deployed locally from an airgap bundle on a single host using the chef-automate CLI."
+  meta_description = "A2 stack deployed locally from an airgap bundle on a single host using the chef-automate CLI."
   meta_type        = "habitat"
 
   # AWS Instance Configuration

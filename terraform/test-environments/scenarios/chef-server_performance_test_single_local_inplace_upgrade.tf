@@ -11,7 +11,7 @@ module "chef_server_performance_test_single_local_inplace_upgrade" {
 
   # Metadata
   meta_title       = "Performance Test A2 Chef Server Single Local (Inplace Upgrade)"
-  meta_description = "Performance test A2 Chef Server (inplace upgrade)."
+  meta_description = "Performance test A2 Chef Server (inplace upgrade, using SAML)."
   meta_type        = "habitat"
 
   # AWS Instance Configuration
