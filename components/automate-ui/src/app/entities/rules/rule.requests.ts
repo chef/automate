@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+// import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 // import { environment as env } from 'environments/environment';
 import { find, filter } from 'lodash';
@@ -35,7 +35,9 @@ export class RuleRequests {
     // }
   ];
 
-  constructor(private http: HttpClient) { }
+  // TODO use http constructor when we hook up the backend
+  // constructor(private http: HttpClient) { }
+  constructor() { }
 
   public getRules(project_id: string): Observable<GetRulesSuccessPayload> {
     // return this.http.get<GetRulesSuccessPayload>(

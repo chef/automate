@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { Subject, Observable, combineLatest } from 'rxjs';
 import { identity } from 'lodash/fp';
 import { find as _find } from 'lodash';
-import { filter, map, pluck, takeUntil, find } from 'rxjs/operators';
+import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
