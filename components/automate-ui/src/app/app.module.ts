@@ -72,6 +72,7 @@ import { ProfileRequests } from './entities/profiles/profile.requests';
 import { ProjectRequests } from './entities/projects/project.requests';
 import { ServiceGroupsRequests } from './entities/service-groups/service-groups.requests';
 import { RoleRequests } from './entities/roles/role.requests';
+import { RuleRequests } from './entities/rules/rule.requests';
 import { TeamRequests } from './entities/teams/team.requests';
 import { UserPermsRequests } from './entities/userperms/userperms.requests';
 import { UserRequests } from './entities/users/user.requests';
@@ -325,6 +326,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ProjectsFilterRequests,
     ProjectsFilterService,
     RoleRequests,
+    RuleRequests,
     { provide: RouterStateSerializer, useClass: RouterSerializer },
     RulesService,
     RunHistoryStore,

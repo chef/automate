@@ -13,13 +13,15 @@ import {
 import {
   ConfirmApplyStopModalComponent
 } from './confirm-apply-stop-modal/confirm-apply-stop-modal.component';
+import { ProjectRulesComponent } from './rules/project-rules.component';
 
 @NgModule({
   declarations: [
     ProjectDetailsComponent,
     ProjectListComponent,
     ConfirmApplyStartModalComponent,
-    ConfirmApplyStopModalComponent
+    ConfirmApplyStopModalComponent,
+    ProjectRulesComponent
   ],
   imports: [
     AppRoutingModule,

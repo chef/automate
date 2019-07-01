@@ -22,11 +22,12 @@
           </tr>
         </tbody>
       </table>
-      <chef-tab-selector>
+      <chef-tab-selector [value]="selectedTab" (change)="onTabChange($event)">
+        <chef-option value='rules'>Ingest Rules</chef-option>
         <chef-option value='details'>Details</chef-option>
       </chef-tab-selector>
     </chef-page-header>
-    <section class="page-body">
+    <section class="page-body" *ngIf="selectedTab === 'details'">
       <form [formGroup]="projectForm">
         <chef-form-field>
           <label>
@@ -52,5 +53,73 @@
         </div>
       </form>
     </section>
+    <section class="page-body" *ngIf="selectedTab === 'rules'">
+      <ng-container *ngIf="(rules$ | async)?.length > 0">
+        <chef-toolbar>
+          <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">
+            <chef-button [routerLink]="['/settings', 'projects', project?.id, 'rules']" id="create-button" primary>Create Rule</chef-button>
+          </app-authorized>
+          <small *ngIf="hasEditsPending(rules$ | async)">Edits pending, update <a [routerLink]="['/settings/projects']">projects</a> to apply edits.</small>
+        </chef-toolbar>
+        <app-authorized [allOf]="['/iam/v2beta/projects', 'get']">
+          <chef-table>
+            <chef-thead>
+              <chef-tr>
+                <chef-th>Name</chef-th>
+                <chef-th>Resource Type</chef-th>
+                <chef-th>Conditions</chef-th>
+                <chef-th>Edits</chef-th>
+                <chef-th class="controls"></chef-th>
+              </chef-tr>
+            </chef-thead>
+            <chef-tbody>
+              <chef-tr *ngFor="let rule of rules$ | async">
+                <chef-td>
+                  <a [routerLink]="['/settings', 'projects', project?.id, 'rules', rule.id]">{{ rule.name }}</a>
+                </chef-td>
+                <chef-td>{{ rule.type | titlecase }}</chef-td>
+                <chef-td>{{ rule.conditions.length }} conditions</chef-td>
+                <chef-td>{{ getEditStatus(rule.edits) }}</chef-td>
+                <chef-td class="controls">
+                  <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project?.id]">
+                    <chef-control-menu>
+                      <chef-option (click)="startRuleDelete(rule)">Delete Rule</chef-option>
+                    </chef-control-menu>
+                  </app-authorized>
+                </chef-td>
+              </chef-tr>
+            </chef-tbody>
+          </chef-table>
+        </app-authorized>
+      </ng-container>
+      <ng-container class="" *ngIf="(rules$ | async)?.length === 0">
+        <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">
+          <div class="empty-case-container">
+            <p>Create the first ingest rule to get started!</p>
+          </div>
+          <div class="empty-case-container">
+              <chef-button primary [routerLink]="['/settings', 'projects', project?.id, 'rules']">Create Rule</chef-button>
+          </div>
+        </app-authorized>
+        <app-authorized not [allOf]="['/iam/v2beta/projects', 'post']">
+          <div class="empty-case-container">
+            <p>It looks like no one has created any projects yet and you<br/>
+              don't have permission to create them.<br/><br/>
+              If this is a mistake, then reach out to your administrator.
+            </p>
+          </div>
+        </app-authorized>
+      </ng-container>
+    </section>
+
+    <app-delete-object-modal
+      [visible]="deleteModalVisible"
+      objectNoun="rule"
+      [objectName]="ruleToDelete?.name"
+      [moreDetails]="inUseMessage()"
+      (close)="closeDeleteModal()"
+      (deleteClicked)="deleteRule()">
+    </app-delete-object-modal>
+
   </main>
 </div>

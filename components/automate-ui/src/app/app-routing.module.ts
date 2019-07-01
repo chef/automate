@@ -35,6 +35,7 @@ import { PolicyDetailsComponent } from './pages/policy/details/policy-details.co
 import { PolicyAddMembersComponent } from './pages/policy/add-members/policy-add-members.component';
 import { ProjectDetailsComponent } from './pages/project/details/project-details.component';
 import { ProjectListComponent } from './pages/project/list/project-list.component';
+import { ProjectRulesComponent } from './pages/project/rules/project-rules.component';
 import { RolesListComponent } from './pages/roles/list/roles-list.component';
 import { RoleDetailsComponent } from './pages/roles/details/role-details.component';
 import { UIComponent } from 'app/ui.component';
@@ -119,6 +120,14 @@ const routes: Routes = [
         {
           path: 'projects/:id',
           component: ProjectDetailsComponent
+        },
+        {
+          path: 'projects/:id/rules',
+          component: ProjectRulesComponent
+        },
+        {
+          path: 'projects/:id/rules/:ruleid',
+          component: ProjectRulesComponent
         },
         {
           path: 'roles',
