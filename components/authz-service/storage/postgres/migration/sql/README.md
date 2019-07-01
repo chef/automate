@@ -51,3 +51,4 @@
 - [`49_update_rule_triggers.up.sql`](49_update_rule_triggers.up.sql)
 - [`50_add_status_field_to_rules.up.sql`](50_add_status_field_to_rules.up.sql)
 - [`51_change_project_rules_query.up.sql`](51_change_project_rules_query.up.sql)
+- [`52_add_db_id_members.up.sql`](52_add_db_id_members.up.sql)
