@@ -3,6 +3,8 @@ package v2_test
 import (
 	"context"
 	"fmt"
+	"math"
+	"math/rand"
 	"reflect"
 	"strings"
 	"testing"
@@ -20,7 +22,8 @@ import (
 )
 
 const (
-	idRegex = "^[a-z0-9-]{1,64}$"
+	idRegex        = "^[a-z0-9-]{1,64}$"
+	conditionLimit = 10 // avoid the grpc limit of 4194304
 )
 
 type projectAndRuleReq struct {
@@ -46,14 +49,17 @@ func TestCreateRuleProperties(t *testing.T) {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				_, err = cl.CreateRule(ctx, &reqs.rules[0])
-				// Note: this could be very noisy, but it's hard to figure out what went
-				// wrong without the error
+				// In this first test only, I have added more realism by examining
+				// a single rule amidst a bunch of other random rules in the DB.
+				// Is the benefit real enough that it warrants the extra runtime here ??
+				reqs.rules, err = createRules(ctx, cl, reqs.rules)
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
+				targetRule := rand.Intn(len(reqs.rules))
+				t.Logf("target rule is # %d", targetRule)
 
-				rStaged, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				rStaged, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[targetRule].Id})
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
@@ -63,7 +69,7 @@ func TestCreateRuleProperties(t *testing.T) {
 				// Instead, as we add GetRule, ListRules, etc., we can use this
 				// testing approach to write meaningful assertions.
 				return rStaged.Rule.Status == "staged" &&
-					ruleMatches(reqs.rules[0], *rStaged.Rule)
+					ruleMatches(reqs.rules[targetRule], *rStaged.Rule)
 			},
 			createProjectAndRuleGen,
 		))
@@ -129,6 +135,74 @@ func TestCreateRuleProperties(t *testing.T) {
 					rules:            []api.CreateRuleReq{r0, r1},
 				}
 			}),
+			createProjectAndRuleGen,
+		))
+
+	properties.TestingRun(t)
+}
+
+func TestListRuleProperties(t *testing.T) {
+	ctx := context.Background()
+	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	properties := getGopterParams(seed)
+	_, _, createProjectAndRuleGen := getGenerators()
+
+	properties.Property("reports rules when all are staged",
+		prop.ForAll(
+			func(reqs projectAndRuleReq) bool {
+				defer testDB.Flush(t)
+
+				reportRules(t, reqs.rules)
+
+				_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				reqs.rules, err = createRules(ctx, cl, reqs.rules)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				resp, err := cl.ListRules(ctx, &api.ListRulesReq{IncludeStaged: true})
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				return rulesMatch(reqs.rules, resp)
+
+			},
+			createProjectAndRuleGen,
+		))
+
+	properties.Property("reports rules when all are applied",
+		prop.ForAll(
+			func(reqs projectAndRuleReq) bool {
+				defer testDB.Flush(t)
+
+				reportRules(t, reqs.rules)
+
+				_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				reqs.rules, err = createRules(ctx, cl, reqs.rules)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+				resp, err := cl.ListRules(ctx, &api.ListRulesReq{IncludeStaged: true})
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				return rulesMatch(reqs.rules, resp)
+
+			},
+			createProjectAndRuleGen,
 		))
 
 	properties.TestingRun(t)
@@ -331,7 +405,9 @@ func TestDeleteRuleProperties(t *testing.T) {
 			createProjectAndRuleGen,
 		))
 
-	properties.Property("deletes an applied rule and applies deletion confirming rule still found while deletion is staged but no longer found once deletion is applied",
+	properties.Property(`deletes an applied rule and applies deletion
+confirming rule still found while deletion is staged
+but no longer found once deletion is applied`,
 		prop.ForAll(
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
@@ -372,7 +448,9 @@ func TestDeleteRuleProperties(t *testing.T) {
 			createProjectAndRuleGen,
 		))
 
-	properties.Property("deletes an applied and staged rule and applies deletion confirming rule found but marked for deletion while deletion staged but rule no longer found once deletion is applied",
+	properties.Property(`deletes an applied and staged rule and applies deletion
+confirming rule found but marked for deletion while deletion staged
+but rule no longer found once deletion is applied`,
 		prop.ForAll(
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
@@ -520,6 +598,46 @@ func ruleMatches(req interface{}, actual api.ProjectRule) bool {
 			actual.Name == ruleReq.Name &&
 			actual.ProjectId == ruleReq.ProjectId
 	}
+}
+
+func rulesMatch(rules []api.CreateRuleReq, resp *api.ListRulesResp) bool {
+	if len(rules) != len(resp.Rules) {
+		return false
+	}
+	// Cannot assume DB returns rules in a particular order, so make a lookup table
+	lookup := make(map[string]api.CreateRuleReq, len(rules))
+	for _, rule := range rules {
+		lookup[rule.Id] = rule
+	}
+	// Now check each returned rule for existence and matching fields
+	for _, rule := range resp.Rules {
+		if expectedRule, ok := lookup[rule.Id]; ok {
+			if !ruleMatches(expectedRule, *rule) {
+				return false
+			}
+		} else {
+			return false
+		}
+	}
+	return true
+}
+
+func createRules(ctx context.Context, cl api.ProjectsClient, rules []api.CreateRuleReq) ([]api.CreateRuleReq, error) {
+	for i, rule := range rules {
+		rules[i].Id = fmt.Sprintf("%s-index-%d", rules[i].Id, i) // make the id unique!
+		var conditions []*api.Condition
+		for j := 0; j < int(math.Min(conditionLimit, float64(len(rule.Conditions)))); j++ {
+			conditions = append(conditions, rule.Conditions[j])
+		}
+		rules[i].Conditions = conditions
+		_, err := cl.CreateRule(ctx, &rules[i])
+		// Note: this could be very noisy, but it's hard to figure out what went
+		// wrong without the error
+		if err != nil {
+			return nil, err
+		}
+	}
+	return rules, nil
 }
 
 func reportRules(t *testing.T, rules []api.CreateRuleReq) {
