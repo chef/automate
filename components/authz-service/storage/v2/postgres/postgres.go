@@ -979,7 +979,7 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 		return nil, storage_errors.NewErrTxCommit(err)
 	}
 
-	// Currently, we don't change anything from what is passed in.
+	rule.Status = pgStaged
 	return rule, nil
 }
 
@@ -1029,7 +1029,7 @@ func (p *pg) UpdateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 		return nil, storage_errors.NewErrTxCommit(err)
 	}
 
-	// Currently, we don't change anything from what is passed in.
+	rule.Status = pgStaged
 	return rule, nil
 }
 

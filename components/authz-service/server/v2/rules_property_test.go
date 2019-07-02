@@ -49,7 +49,7 @@ func TestCreateRuleProperties(t *testing.T) {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				return respRule.Status == "" && // TODO: this is wrong; should be "staged"
+				return respRule.Status == "staged" &&
 					ruleMatches(reqs.rules[0], *respRule)
 			},
 			createProjectAndRuleGen,
@@ -268,7 +268,7 @@ func TestUpdateRuleProperties(t *testing.T) {
 
 				return rApplied.Rule.Status == "applied" &&
 					ruleMatches(updateReq, *rApplied.Rule) &&
-					rStaged.Rule.Status == "" && // TODO: this is wrong; should be "staged"
+					rStaged.Rule.Status == "staged" &&
 					ruleMatches(updateReq, *rStaged.Rule)
 			},
 			createProjectAndRuleGen,
@@ -308,7 +308,7 @@ func TestUpdateRuleProperties(t *testing.T) {
 				}
 
 				return rInitialApplied.Rule.Status == "applied" &&
-					rStaged.Rule.Status == "" && // TODO: this is wrong; should be "staged"
+					rStaged.Rule.Status == "staged" &&
 					rFinalApplied.Rule.Status == "applied" &&
 					ruleMatches(updateReq, *rStaged.Rule) &&
 					ruleMatches(updateReq, *rFinalApplied.Rule)
@@ -356,8 +356,8 @@ func TestUpdateRuleProperties(t *testing.T) {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				return rInitialStaged.Rule.Status == "" && // TODO: this is wrong; should be "staged"
-					rFinalStaged.Rule.Status == "" && // TODO: this is wrong; should be "staged"
+				return rInitialStaged.Rule.Status == "staged" &&
+					rFinalStaged.Rule.Status == "staged" &&
 					rApplied.Rule.Status == "applied" &&
 					ruleMatches(updateReq, *rInitialStaged.Rule) &&
 					ruleMatches(updateReq2, *rFinalStaged.Rule) &&
