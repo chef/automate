@@ -91,7 +91,9 @@ class AutomateApiRequest < Inspec.resource(1)
       req = nil
       if loc = resp.headers.location
         # one connector only (local) => we're being redirected
-        req = loc.match(%r'\?req=([^"]+)')[1]
+        puts "loc [#{loc}]"
+        req = loc.match(%r'\?req=(.+)$')[1]
+        puts "req [#{req}]"
       else
         # pick form URL with request ID from connector selection
         m = resp.body.match(%r'"(/dex/auth/local)\?req=([^"]+)"')
