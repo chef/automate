@@ -12,6 +12,7 @@ import (
 	"github.com/chef/automate/api/external/habitat"
 	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -457,4 +458,67 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 				"the time of the last health update should not be updated")
 		}
 	})
+}
+
+func TestIngestLastEventOccurredAtFieldMatchHabitatOccurredAt(t *testing.T) {
+	defer suite.DeleteDataFromStorage()
+
+	var (
+		eventsProcessed             = suite.Ingester.EventsProcessed()
+		event                       = NewHabitatEventRandomized()
+		expectedTimestamp           = time.Date(1988, 4, 17, 3, 0, 0, 0, time.UTC)
+		expectedTimestampProto, err = ptypes.TimestampProto(expectedTimestamp)
+	)
+
+	if assert.Nil(t, err) {
+		event.EventMetadata.OccurredAt = expectedTimestampProto
+	}
+
+	bytes, err := proto.Marshal(event)
+	if assert.Nil(t, err) {
+		suite.Ingester.IngestMessage(bytes)
+		eventsProcessed++
+		suite.WaitForEventsToProcess(eventsProcessed)
+
+		svcList := suite.GetServices()
+		if assert.Equal(t, 1, len(svcList)) {
+			assert.Truef(t, svcList[0].LastEventOccurredAt.Equal(expectedTimestamp),
+				"the time of the last event received is not the expected one")
+		}
+	}
+}
+
+func TestIngestHealthUpdatedAtUpdatesOnlyOnHealthUpdate(t *testing.T) {
+	defer suite.DeleteDataFromStorage()
+
+	var (
+		eventsProcessed = suite.Ingester.EventsProcessed()
+		event           = NewHabitatEventRandomized()
+		bytes, err      = proto.Marshal(event)
+		healthUpdatedAt time.Time
+	)
+
+	if assert.Nil(t, err) {
+		suite.Ingester.IngestMessage(bytes)
+		eventsProcessed++
+		suite.WaitForEventsToProcess(eventsProcessed)
+
+		svcList := suite.GetServices()
+		if assert.Equal(t, 1, len(svcList)) {
+			healthUpdatedAt = svcList[0].HealthUpdatedAt
+			assert.Truef(t, healthUpdatedAt.Before(time.Now()),
+				"the time of the last health update should be before the current time")
+		}
+
+		// resend the same event message
+		suite.Ingester.IngestMessage(bytes)
+		eventsProcessed++
+		suite.WaitForEventsToProcess(eventsProcessed)
+
+		svcList = suite.GetServices()
+		if assert.Equal(t, 1, len(svcList)) {
+			assert.Truef(t, svcList[0].HealthUpdatedAt.Equal(healthUpdatedAt),
+				"the time of the last health update should not be updated")
+		}
+	}
 }
