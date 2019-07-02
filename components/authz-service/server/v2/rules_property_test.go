@@ -398,7 +398,7 @@ func TestDeleteRuleProperties(t *testing.T) {
 			createProjectAndRuleGen,
 		))
 
-	properties.Property("applied rules that are deleted remain available until rule changes applied",
+	properties.Property("deleting applied rules marks them for deletion and finalizes deletion upon applying rules",
 		prop.ForAll(
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
@@ -412,26 +412,20 @@ func TestDeleteRuleProperties(t *testing.T) {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				// Can still find a staged-deleted rule if the rule was previously applied!
-				rDeleted, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
-				if err != nil {
-					return reportErrorAndYieldFalse(t, err)
-				}
+				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				markedforDeletion := grpctest.AssertCode(t, codes.NotFound, err) && strings.Contains(err.Error(), "marked for deletion")
 
 				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
 				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
-				deletedWhenApplied := grpctest.AssertCode(t, codes.NotFound, err)
+				fullyDeleted := grpctest.AssertCode(t, codes.NotFound, err) && !strings.Contains(err.Error(), "marked for deletion")
 
-				return deletedWhenApplied &&
-					ruleMatches(reqs.rules[0], *rDeleted.Rule) &&
-					rDeleted.Rule.Status == "applied" && // TODO: wrong!
-					!rDeleted.Rule.Deleted // TODO: wrong!
+				return markedforDeletion && fullyDeleted
 			},
 			createProjectAndRuleGen,
 		))
 
-	properties.Property("deleting applied rules with staged updates are deleted immediately",
+	properties.Property("deleting applied rules with staged updates marks them for deletion and finalizes deletion upon applying rules",
 		prop.ForAll(
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
@@ -462,7 +456,7 @@ func TestDeleteRuleProperties(t *testing.T) {
 				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
 				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
-				fullyDeleted := grpctest.AssertCode(t, codes.NotFound, err)
+				fullyDeleted := grpctest.AssertCode(t, codes.NotFound, err) && !strings.Contains(err.Error(), "marked for deletion")
 
 				return markedforDeletion && fullyDeleted
 			},

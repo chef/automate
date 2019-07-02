@@ -1097,6 +1097,17 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 		if err != nil {
 			return p.processError(err)
 		}
+		// Code is built around expectation that rules always have at least one condition,
+		// that means even in the case of impending deletion!
+		// Value will never be seen, so a dummy value is OK here.
+		_, err = tx.ExecContext(ctx,
+			`INSERT INTO iam_staged_rule_conditions (rule_db_id, value, attribute, operator)
+			 VALUES ((SELECT db_id FROM iam_project_rules WHERE id=$1), '{dummy}', 'chef-server', 'equals');`,
+			id,
+		)
+		if err != nil {
+			return p.processError(err)
+		}
 	} else if ruleStaged {
 		res, err := tx.ExecContext(ctx,
 			`DELETE FROM iam_staged_project_rules
