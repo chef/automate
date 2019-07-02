@@ -429,8 +429,6 @@ func TestListPolicyMembers(t *testing.T) {
 			insertPolicyProject(t, db, polID, projID1)
 			member1 := insertTestPolicyMember(t, db, polID, "user:local:fred")
 			member2 := insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
 
 			ctx = insertProjectsIntoContext(ctx, []string{projID1})
 			resp, err := store.ListPolicyMembers(ctx, polID)
@@ -446,8 +444,6 @@ func TestListPolicyMembers(t *testing.T) {
 			insertPolicyProject(t, db, polID, projID1)
 			member1 := insertTestPolicyMember(t, db, polID, "user:local:fred")
 			member2 := insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
 
 			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 			resp, err := store.ListPolicyMembers(ctx, polID)
@@ -460,11 +456,8 @@ func TestListPolicyMembers(t *testing.T) {
 			polID := insertTestPolicy(t, db, "testpolicy")
 			member1 := insertTestPolicyMember(t, db, polID, "user:local:fred")
 			member2 := insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
 			projID1 := "team-rocket"
 			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
-
 			ctx = insertProjectsIntoContext(ctx, []string{projID1, v2.UnassignedProjectID})
 			resp, err := store.ListPolicyMembers(ctx, polID)
 
@@ -479,11 +472,8 @@ func TestListPolicyMembers(t *testing.T) {
 			insertPolicyProject(t, db, polID, projID1)
 			insertTestPolicyMember(t, db, polID, "user:local:fred")
 			insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=$1`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
 			projID2 := "team-montag"
 			insertTestProject(t, db, projID2, "we like dags", storage.Custom)
-
 			ctx = insertProjectsIntoContext(ctx, []string{projID2, v2.UnassignedProjectID})
 			resp, err := store.ListPolicyMembers(ctx, polID)
 
