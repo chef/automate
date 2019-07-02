@@ -9,7 +9,7 @@ instances_to_test=$(jq -nr --argjson data "$data" '$data[] | select(.tags[] | co
 
 for instance in ${instances_to_test[*]}
 do
-  if !jq -enr --arg fqdn "$instance" --argjson data "$data" '$data[] | select(.fqdn == $fqdn) as $i | "saml" | IN($i.tags[])'; then
+  if !jq -enr --arg fqdn "$instance" --argjson data "$data" '$data[] | select(.fqdn == $fqdn) | .tags | any(. == "saml")'; then
     export CYPRESS_SKIP_SSO=true
   fi
 
