@@ -139,10 +139,7 @@ func Configure() (*EventConfig, error) {
 	}
 	config.ServiceCerts = serviceCerts
 	log.Debugf("EVENT SERVICE CONFIG: %+v", config)
-	log.Debugf("feed endpoint: %s", config.HandlerEndpoints.Feed)
-	log.Debugf("cfg ingest endpoint: %s", config.HandlerEndpoints.CfgIngest)
-	log.Debugf("authz endpoint: %s", config.HandlerEndpoints.Authz)
-	log.Debugf("event feed endpoint: %s", config.HandlerEndpoints.EventFeed)
+
 	log.Debug("end config.go Configure() ->")
 	return config, nil
 }
