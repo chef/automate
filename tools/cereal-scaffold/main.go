@@ -25,6 +25,7 @@ var simpleWorkflowOpts struct {
 	DequeueWorkerCount int
 	TaskCount          int
 	SlowTasks          bool
+	NoEnqueue          bool
 }
 
 func main() {
@@ -63,6 +64,12 @@ func main() {
 		"dequeue-worker-count",
 		10,
 		"Number of workers to dequeue tasks")
+
+	simpleWorkflowCmd.PersistentFlags().BoolVar(
+		&simpleWorkflowOpts.NoEnqueue,
+		"no-enqueue",
+		false,
+		"Whether to skip the enqueue")
 
 	simpleWorkflowCmd.PersistentFlags().BoolVar(
 		&simpleWorkflowOpts.SlowTasks,
@@ -254,7 +261,7 @@ func runSimpleWorkflow(_ *cobra.Command, args []string) error {
 	}
 
 	manager.RegisterWorkflowExecutor("simple-workflow", &SimpleWorkflow{})
-	manager.RegisterTaskExecutor("test task", &SimpleTask{}, cereal.TaskExecutorOpts{
+	manager.RegisterTaskExecutor("simple task", &SimpleTask{}, cereal.TaskExecutorOpts{
 		Workers: simpleWorkflowOpts.DequeueWorkerCount})
 
 	params := SimpleWorkflowParams{
@@ -262,14 +269,17 @@ func runSimpleWorkflow(_ *cobra.Command, args []string) error {
 	}
 
 	manager.Start(context.Background())
-	instanceName := fmt.Sprintf("simple-workflow-%s", time.Now())
-	err = manager.EnqueueWorkflow(context.TODO(),
-		"simple-workflow", instanceName,
-		&params,
-	)
-	if err != nil {
-		logrus.WithError(err).Error("Unexpected error enqueueing workflow")
-		return err
+
+	if !simpleWorkflowOpts.NoEnqueue {
+		instanceName := fmt.Sprintf("simple-workflow-%s", time.Now())
+		err = manager.EnqueueWorkflow(context.TODO(),
+			"simple-workflow", instanceName,
+			&params,
+		)
+		if err != nil {
+			logrus.WithError(err).Error("Unexpected error enqueueing workflow")
+			return err
+		}
 	}
 
 	for !done {

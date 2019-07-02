@@ -102,17 +102,26 @@ CREATE TABLE cereal_workflow_results (
 -- New and Completed tasks also notify a channel that can be
 -- subscribed to by the workflows for more timely notification of new
 -- task events related to their workflow.
-CREATE TYPE cereal_task_status AS ENUM('success', 'failed');
+CREATE TYPE cereal_task_status AS ENUM('success', 'failed', 'worker_lost');
+
+CREATE TYPE cereal_task_state  AS ENUM('queued', 'running');
 
 CREATE TABLE cereal_tasks (
     id BIGSERIAL PRIMARY KEY,
     workflow_instance_id BIGINT NOT NULL,
-    try_remaining INT NOT NULL DEFAULT 1,
     enqueued_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     start_after   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     task_name     TEXT NOT NULL,
-    parameters    BYTEA
+    parameters    BYTEA,
+    task_state    cereal_task_state NOT NULL DEFAULT 'queued',
+    worker_id     TEXT
+);
+
+CREATE TABLE cereal_busy_task_workers (
+    id           TEXT PRIMARY KEY,
+    task_id      BIGINT,
+    last_checkin TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE cereal_task_results (
@@ -123,7 +132,7 @@ CREATE TABLE cereal_task_results (
     enqueued_at  TIMESTAMPTZ NOT NULL,
     completed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     status       cereal_task_status,
-    error        TEXT,
+    error        TEXT DEFAULT '',
     result       BYTEA
 );
 
@@ -255,39 +264,84 @@ $$;
 -- Task Functions
 CREATE OR REPLACE FUNCTION cereal_enqueue_task(
     _workflow_instance_id BIGINT,
-    _try_remaining INT,
     _start_after TIMESTAMPTZ,
     _task_name TEXT,
     _parameters BYTEA)
 RETURNS VOID
 AS $$
-    INSERT INTO cereal_tasks(workflow_instance_id, try_remaining, start_after, task_name, parameters)
-        VALUES(_workflow_instance_id, _try_remaining, _start_after, _task_name, _parameters);
+    INSERT INTO cereal_tasks(workflow_instance_id, start_after, task_name, parameters)
+        VALUES(_workflow_instance_id, _start_after, _task_name, _parameters);
 $$ LANGUAGE SQL;
 
-CREATE OR REPLACE FUNCTION cereal_dequeue_task(_task_name TEXT)
+CREATE OR REPLACE FUNCTION cereal_dequeue_task(_worker_id TEXT, _task_name TEXT)
 RETURNS TABLE(id BIGINT, workflow_instance_id BIGINT, parameters BYTEA)
 AS $$
-    UPDATE cereal_tasks t1 SET try_remaining = try_remaining - 1, updated_at = NOW()
-    WHERE t1.id = (
-        SELECT t2.id FROM cereal_tasks t2
-        WHERE t2.task_name = _task_name AND t2.try_remaining > 0 AND start_after < NOW()
-        ORDER BY t2.enqueued_at FOR UPDATE SKIP LOCKED LIMIT 1
-    ) RETURNING t1.id, t1.workflow_instance_id, t1.parameters
-$$ LANGUAGE SQL;
+DECLARE
+    r cereal_tasks%rowtype;
+BEGIN
+    FOR r IN
+        SELECT * FROM cereal_tasks
+        WHERE task_name = _task_name AND task_state = 'queued' AND start_after < NOW()
+        ORDER BY enqueued_at FOR UPDATE SKIP LOCKED LIMIT 1
+    LOOP
+        INSERT INTO cereal_busy_task_workers(id, task_id) VALUES(_worker_id, r.id);
+        UPDATE cereal_tasks SET task_state = 'running', worker_id = _worker_id, updated_at = NOW() WHERE cereal_tasks.id = r.id;
 
-CREATE OR REPLACE FUNCTION cereal_complete_task(_tid BIGINT, _status cereal_task_status, _error text, _result BYTEA)
-RETURNS VOID
-LANGUAGE SQL
+        id := r.id;
+        workflow_instance_id := r.workflow_instance_id;
+        parameters := r.parameters;
+        RETURN NEXT;
+    END LOOP;
+END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cereal_expire_dead_workers()
+RETURNS SETOF TEXT
 AS $$
-    WITH tres AS (
+DECLARE
+    t cereal_tasks%rowtype;
+BEGIN
+    FOR t IN
+        SELECT cereal_tasks.*
+        FROM cereal_tasks LEFT JOIN cereal_busy_task_workers ON cereal_tasks.worker_id = cereal_busy_task_workers.id
+        WHERE cereal_busy_task_workers.last_checkin < NOW() - interval '300 seconds' FOR UPDATE
+    LOOP
+        DELETE FROM cereal_busy_task_workers WHERE id = t.worker_id;
+        DELETE FROM cereal_tasks WHERE id = t.id;
+
+        INSERT INTO cereal_task_results(workflow_instance_id, parameters, task_name, enqueued_at, status)
+            VALUES(t.workflow_instance_id, t.parameters, t.task_name, t.enqueued_at, 'worker_lost');
+
+        INSERT INTO cereal_workflow_events(event_type, task_result_id, workflow_instance_id)
+            VALUES('task_complete', t.id, t.workflow_instance_id);
+
+        RETURN NEXT t.worker_id;
+    END LOOP;
+END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cereal_complete_task(_worker_id TEXT, _tid BIGINT, _status cereal_task_status, _error text, _result BYTEA)
+RETURNS SETOF BIGINT
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    t cereal_tasks%rowtype;
+BEGIN
+    FOR t IN
+         SELECT * FROM cereal_tasks WHERE id = _tid AND worker_id = _worker_id FOR UPDATE
+    LOOP
         INSERT INTO cereal_task_results(workflow_instance_id, parameters, task_name, enqueued_at, status, error, result)
-            (SELECT workflow_instance_id, parameters, task_name, enqueued_at, _status, _error, _result
-            FROM cereal_tasks WHERE id = _tid) RETURNING id, workflow_instance_id
-    )
-    INSERT INTO cereal_workflow_events(event_type, task_result_id, workflow_instance_id)
-        (SELECT 'task_complete', id, workflow_instance_id FROM tres);
-    DELETE FROM cereal_tasks WHERE id = _tid
+        VALUES(t.workflow_instance_id, t.parameters, t.task_name, t.enqueued_at, _status, _error, _result);
+
+        INSERT INTO cereal_workflow_events(event_type, task_result_id, workflow_instance_id)
+        VALUES('task_complete', t.id, t.workflow_instance_id);
+
+        DELETE FROM cereal_busy_task_workers WHERE id = t.worker_id;
+        DELETE FROM cereal_tasks WHERE id = t.id;
+
+        RETURN NEXT t.id;
+    END LOOP;
+END
 $$;
 
 COMMIT;

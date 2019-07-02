@@ -14,6 +14,7 @@ import (
 	rrule "github.com/teambition/rrule-go"
 
 	"github.com/chef/automate/lib/cereal/backend"
+	"github.com/chef/automate/lib/uuid4"
 )
 
 var (
@@ -26,6 +27,7 @@ var (
 	ErrInvalidSchedule          = errors.New("workflow schedule is not valid")
 	ErrWorkflowInstanceNotFound = errors.New("workflow instance not found")
 	ErrWorkflowNotComplete      = errors.New("workflow instance is still running")
+	ErrTaskWorkerLost           = errors.New("task worker lost before reporting its status")
 )
 
 // Schedule represents a recurring workflow.
@@ -104,16 +106,13 @@ func (r *taskResult) GetParameters(obj interface{}) error {
 }
 
 func (r *taskResult) Err() error {
-	if r.backendResult.Status == backend.TaskStatusFailed {
+	switch r.backendResult.Status {
+	case backend.TaskStatusFailed:
 		return errors.New(r.backendResult.ErrorText)
-	}
-	return nil
-}
-
-// WithRetries sets the number of automatic retries allowed for a task
-func WithRetries(numRetries int) EnqueueOpts {
-	return func(o *backend.TaskEnqueueOpts) {
-		o.TryRemaining = numRetries + 1
+	case backend.TaskStatusWorkerLost:
+		return ErrTaskWorkerLost
+	default:
+		return nil
 	}
 }
 
@@ -444,7 +443,11 @@ func (m *Manager) RegisterTaskExecutor(taskName string, executor TaskExecutor, o
 func (m *Manager) Start(ctx context.Context) error {
 	ctx, cancel := context.WithCancel(ctx)
 	m.cancel = cancel
-	m.startTaskExecutors(ctx)
+	err := m.startTaskExecutors(ctx)
+	if err != nil {
+		return err
+	}
+
 	go m.workflowScheduler.run(ctx)
 	go m.runWorkflowExecutor(ctx)
 	return nil
@@ -579,7 +582,7 @@ func (m *Manager) EnqueueWorkflow(ctx context.Context, workflowName string,
 	return err
 }
 
-func (m *Manager) startTaskExecutors(ctx context.Context) {
+func (m *Manager) startTaskExecutors(ctx context.Context) error {
 	for taskName, exec := range m.taskExecutors {
 		workerCount := exec.opts.Workers
 		if workerCount == 0 {
@@ -587,17 +590,21 @@ func (m *Manager) startTaskExecutors(ctx context.Context) {
 		}
 
 		for i := 0; i < workerCount; i++ {
-			go m.RunTaskExecutor(ctx, taskName, i, exec.opts.Timeout, exec.executor)
+			workerID, err := uuid4.New()
+			if err != nil {
+				return errors.Wrap(err, "could not generate worker id")
+			}
+			go m.RunTaskExecutor(ctx, taskName, i, workerID, exec.opts.Timeout, exec.executor)
 		}
 	}
+	return nil
 }
 
 // TODO(ssd) 2019-05-10: Why does Task need the WorkflowInstanceID?
 // TODO(jaym): should this be private?
-func (m *Manager) RunTaskExecutor(ctx context.Context, taskName string, workerID int, timeout time.Duration, exec TaskExecutor) {
-	workerName := fmt.Sprintf("%s/%d", taskName, workerID)
+func (m *Manager) RunTaskExecutor(ctx context.Context, taskName string, workerIdx int, workerID uuid4.UUID, timeout time.Duration, exec TaskExecutor) {
+	workerName := fmt.Sprintf("%s/%d/%s", taskName, workerIdx, workerID)
 	logrus.Infof("starting task executor %s", workerName)
-
 	m.wg.Add(1)
 
 LOOP:
@@ -609,7 +616,7 @@ LOOP:
 		default:
 		}
 
-		t, taskCompleter, err := m.backend.DequeueTask(ctx, taskName)
+		t, taskCompleter, err := m.backend.DequeueTask(ctx, workerID, taskName)
 		if err != nil {
 			if err == ErrNoTasks {
 				// TODO(ssd) 2019-05-10: Once we have notifications we can probably sleep longer
