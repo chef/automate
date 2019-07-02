@@ -2,7 +2,8 @@
 
 set -xeuo pipefail
 
-export COVERAGE_DATE=$(date +"%Y-%m-%dT%H:%M:%S")
+export COVERAGE_DATE
+COVERAGE_DATE="$(date +"%Y-%m-%dT%H:%M:%S")"
 
 pushd ./components/automate-ui
   npm install

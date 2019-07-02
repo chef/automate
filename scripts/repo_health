@@ -2,11 +2,11 @@
 
 set -e
 
-echo "Install latest dep"
+echo "Install latest dep and other tools"
 if [[ ! -z "$HABITAT" ]]; then
   curl -s https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 else
-  hab pkg install -b core/dep/0.5.0 core/ruby core/jq-static
+  hab pkg install -b core/dep/0.5.0 core/ruby core/jq-static core/shellcheck
 fi
 
 echo "Checking Go Dependencies"
@@ -43,6 +43,9 @@ if ! git diff --exit-code --ignore-submodules=all; then
     echo "Inspect and commit the resulting changes if they look reasonable"
     exit 1
 fi
+
+echo "Shellchecking!"
+shellcheck ./.expeditor/*.sh ./.expeditor/**/*.sh
 
 echo "Checking for possible credentials in the source code"
 go run ./tools/credscan
