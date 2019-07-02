@@ -262,13 +262,14 @@ func convertStorageServicesToApplicationsServices(svcs []*storage.Service) []*ap
 	services := make([]*applications.Service, len(svcs))
 	for i, svc := range svcs {
 		services[i] = &applications.Service{
-			SupervisorId: svc.SupMemberID,
-			Release:      svc.FullReleaseString(),
-			Group:        svc.Group,
-			HealthCheck:  convertHealthStatusToProto(svc.Health),
-			Status:       applications.ServiceStatus(applications.ServiceStatus_value[svc.Status]),
-			Application:  svc.Application,
-			Environment:  svc.Environment, Fqdn: svc.Fqdn,
+			SupervisorId:        svc.SupMemberID,
+			Release:             svc.FullReleaseString(),
+			Group:               svc.Group,
+			HealthCheck:         convertHealthStatusToProto(svc.Health),
+			Status:              applications.ServiceStatus(applications.ServiceStatus_value[svc.Status]),
+			Application:         svc.Application,
+			Environment:         svc.Environment,
+			Fqdn:                svc.Fqdn,
 			Channel:             svc.Channel,
 			Site:                svc.Site,
 			PreviousHealthCheck: convertHealthStatusToProto(svc.PreviousHealth),
