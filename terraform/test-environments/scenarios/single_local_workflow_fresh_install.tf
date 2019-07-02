@@ -11,7 +11,7 @@ module "single_local_workflow_fresh_install" {
 
   # Metadata
   meta_title       = "Single Local (Fresh Install) with Workflow"
-  meta_description = "A2 stack with Workflow (using SAML) deployed locally as Habitat packages on a single host using the chef-automate CLI."
+  meta_description = "A2 stack with Workflow deployed locally as Habitat packages on a single host using the chef-automate CLI."
   meta_type        = "habitat"
 
   # AWS Instance Configuration

@@ -33,6 +33,7 @@ module "airgapped_single_local_inplace_upgrade" {
     X-Topology         = "single"
     X-Deployment-Type  = "local"
     X-Channel          = "${var.channel}"
+    X-SAML             = "saml"
   }
 }
 
@@ -87,4 +88,7 @@ module "airgapped_single_local_inplace_upgrade_deploy" {
   channel         = "${var.channel}"
   deployment_type = "local"
   upgrade         = "true"
+
+  # SAML
+  saml = "true"
 }

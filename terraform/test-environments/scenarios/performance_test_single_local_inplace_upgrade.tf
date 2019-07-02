@@ -11,7 +11,7 @@ module "performance_test_single_local_inplace_upgrade" {
 
   # Metadata
   meta_title       = "Performance Test Single Local (Inplace Upgrade)"
-  meta_description = "Performance test A2 (inplace upgrade). A2_Performance_Test_${var.dns_suffix} CloudWatch dashboard is available in the chef-cd AWS account. Contact #helpdesk for okta access."
+  meta_description = "Performance test A2 (inplace upgrade, using SAML). A2_Performance_Test_${var.dns_suffix} CloudWatch dashboard is available in the chef-cd AWS account. Contact #helpdesk for okta access."
   meta_type        = "habitat"
 
   # AWS Instance Configuration
@@ -33,6 +33,8 @@ module "performance_test_single_local_inplace_upgrade" {
     X-Topology         = "single"
     X-Deployment-Type  = "local"
     X-Channel          = "${var.channel}"
+    X-SAML             = "saml"
+    X-CI-Test          = "e2e"
   }
 }
 
@@ -90,6 +92,9 @@ module "performance_test_single_local_inplace_upgrade_deploy" {
   deployment_type      = "local"
   enable_eas_dashboard = "true"
   upgrade              = "true"
+
+  # SAML
+  saml = "true"
 
   # Create admin-token
   create_admin_token = "true"

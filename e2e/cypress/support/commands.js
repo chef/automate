@@ -39,29 +39,38 @@ Cypress.Commands.add("adminLogin", (url) => {
 Cypress.Commands.add("login", (url, username) => {
   // CYPRESS_BASE_URL environment variable must be set
   cy.visit(url)
-  cy.get('button').contains('Log in with Username').click().then(() => {
-    cy.url().should('include', '/dex/auth/')
-    cy.server()
-    cy.route('POST', '/api/v0/auth/introspect_some').as('getAuth')
 
-    // login
-    cy.get('#login')
-      .type(username)
-
-    cy.get('#password')
-      .type('chefautomate')
-
-    cy.get('[type=submit]').click().then(() => {
-      expect(localStorage.getItem('chef-automate-user')).to.contain(username)
-
-      // close welcome modal if present
-      cy.get('app-welcome-modal').invoke('hide')
-      cy.saveStorage()
-
-      cy.wait('@getAuth')
+  // only environments using SAML or LDAP present this login method selection
+  cy.location('pathname')
+    .then(path => path.startsWith('/dex/auth/local'))
+    .then(local => {
+      if (local) {
+        login(username)
+      } else {
+        cy.get('button').contains('Log in with Username').click().then(() => login(username))
+      }
     })
-  })
 })
+
+function login(username) {
+  cy.url().should('include', '/dex/auth/local')
+  cy.server()
+  cy.route('POST', '/api/v0/auth/introspect_some').as('getAuth')
+
+  // login
+  cy.get('#login').type(username)
+  cy.get('#password').type('chefautomate')
+
+  cy.get('[type=submit]').click().then(() => {
+    expect(localStorage.getItem('chef-automate-user')).to.contain(username)
+
+    // close welcome modal if present
+    cy.get('app-welcome-modal').invoke('hide')
+    cy.saveStorage()
+
+    cy.wait('@getAuth')
+  })
+}
 
 Cypress.Commands.add("logout", () => {
   cy.get('[data-cy=user-profile-button]').click()

@@ -54,6 +54,39 @@ module "chef_baseline" {
   chef_environment  = "${var.chef_environment}"
 }
 
+locals {
+  saml_config = <<SAML
+[dex.v1]
+  [dex.v1.sys]
+    [dex.v1.sys.connectors.saml]
+      ca_contents = """-----BEGIN CERTIFICATE-----
+MIIDnjCCAoagAwIBAgIGAUtB26KcMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG
+A1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU
+MBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB2dldGNoZWYxHDAaBgkqhkiG9w0BCQEWDWlu
+Zm9Ab2t0YS5jb20wHhcNMTUwMTMxMjExNzA4WhcNNDUwMTMxMjExODA4WjCBjzELMAkGA1UEBhMC
+VVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM
+BE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdnZXRjaGVmMRwwGgYJKoZIhvcN
+AQkBFg1pbmZvQG9rdGEuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvaLXQkwf
+XxRu8NBruKXftYwVo9+WuH2iw/6cZB1u1sxbXHDlDxGPA5e9kecQNRB/LE/My7byr/gNakAsNIg3
+nTINxBe8pwKCGrNghzrCEbBxA0iphk/mYcM7+pkSqNZpRGPBUn8AIgxtihfUz/f56v2YhA15huO8
+k8fJoUyjwXu9/BGCkCP16ksJ50r9IHI+qabTq4c1lMOGxZGbZ7tQjbpKdiAPclgaTzSdQ/9lomnR
+uCvrnVwciDp60tGuAATdt68Re5X/5uOizlNh6k9snUWH9TQmIdyYn5bNtDa+3STXj0mIMVaAfiqQ
+5pyrWRRXXb4Uqx4/9lQM1/Lh/O8yeQIDAQABMA0GCSqGSIb3DQEBBQUAA4IBAQCgSlK+ZlmQsYtz
+A30/rbU5ZlW8/FtgcH7FjrSfYmfxi79Wtff3mHYDZjpPQQsncGnf+9BxwOEoBXVOoqwd+OSeWIJa
+pSRbDj8Iog7ldXRLo3/+PzRrnjhrP6xj8VwPDFpzdj6Hn/QBhk0qjXd6gV7mrrAJzss3XwHKWPoC
+8m2vkhGDLhmQBKCz18cVn+Z4Xhs0s9l9iWG+Ic9NBZu1KwxXI1e7yR2+xZRDPnBggDa410uDkXSb
+bDZqKKny7qHKs4bioZ/HtS9NfgFV+pz1GpI50nw6ojItCPhqhgaFwtvf2brq9BHSK/DUmA3vF7/d
+XoB1V6vwQXRubclyH8Ei2+1j
+-----END CERTIFICATE-----
+"""
+     sso_url = "https://chef.okta.com/app/chefsoftware_a2localfreshinstallunstable_1/exk1d6ztz4rioEOYA1d8/sso/saml"
+     entity_issuer = "https://automate.chef.co/dex/callback"
+     email_attr = "email"
+     username_attr = "email"
+     groups_attr = "groups"
+SAML
+}
+
 resource "null_resource" "chef_automate_cli_deploy" {
   count = "${var.instance_count}"
 
@@ -243,34 +276,7 @@ EOF
   [license_control.v1.sys.telemetry]
     url = "https://telemetry-acceptance.chef.io"
 
-[dex.v1]
-  [dex.v1.sys]
-    [dex.v1.sys.connectors.saml]
-      ca_contents = """-----BEGIN CERTIFICATE-----
-MIIDnjCCAoagAwIBAgIGAUtB26KcMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG
-A1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU
-MBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB2dldGNoZWYxHDAaBgkqhkiG9w0BCQEWDWlu
-Zm9Ab2t0YS5jb20wHhcNMTUwMTMxMjExNzA4WhcNNDUwMTMxMjExODA4WjCBjzELMAkGA1UEBhMC
-VVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM
-BE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdnZXRjaGVmMRwwGgYJKoZIhvcN
-AQkBFg1pbmZvQG9rdGEuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvaLXQkwf
-XxRu8NBruKXftYwVo9+WuH2iw/6cZB1u1sxbXHDlDxGPA5e9kecQNRB/LE/My7byr/gNakAsNIg3
-nTINxBe8pwKCGrNghzrCEbBxA0iphk/mYcM7+pkSqNZpRGPBUn8AIgxtihfUz/f56v2YhA15huO8
-k8fJoUyjwXu9/BGCkCP16ksJ50r9IHI+qabTq4c1lMOGxZGbZ7tQjbpKdiAPclgaTzSdQ/9lomnR
-uCvrnVwciDp60tGuAATdt68Re5X/5uOizlNh6k9snUWH9TQmIdyYn5bNtDa+3STXj0mIMVaAfiqQ
-5pyrWRRXXb4Uqx4/9lQM1/Lh/O8yeQIDAQABMA0GCSqGSIb3DQEBBQUAA4IBAQCgSlK+ZlmQsYtz
-A30/rbU5ZlW8/FtgcH7FjrSfYmfxi79Wtff3mHYDZjpPQQsncGnf+9BxwOEoBXVOoqwd+OSeWIJa
-pSRbDj8Iog7ldXRLo3/+PzRrnjhrP6xj8VwPDFpzdj6Hn/QBhk0qjXd6gV7mrrAJzss3XwHKWPoC
-8m2vkhGDLhmQBKCz18cVn+Z4Xhs0s9l9iWG+Ic9NBZu1KwxXI1e7yR2+xZRDPnBggDa410uDkXSb
-bDZqKKny7qHKs4bioZ/HtS9NfgFV+pz1GpI50nw6ojItCPhqhgaFwtvf2brq9BHSK/DUmA3vF7/d
-XoB1V6vwQXRubclyH8Ei2+1j
------END CERTIFICATE-----
-"""
-     sso_url = "https://chef.okta.com/app/chefsoftware_a2localfreshinstallunstable_1/exk1d6ztz4rioEOYA1d8/sso/saml"
-     entity_issuer = "https://automate.chef.co/dex/callback"
-     email_attr = "email"
-     username_attr = "email"
-     groups_attr = "groups"
+${var.saml == "true" ? local.saml_config : ""}
 
 [ingest]
   [ingest.v1]

@@ -11,7 +11,7 @@ module "chef_server_performance_test_single_local_inplace_upgrade" {
 
   # Metadata
   meta_title       = "Performance Test A2 Chef Server Single Local (Inplace Upgrade)"
-  meta_description = "Performance test A2 Chef Server (inplace upgrade)."
+  meta_description = "Performance test A2 Chef Server (inplace upgrade, using SAML)."
   meta_type        = "habitat"
 
   # AWS Instance Configuration
@@ -33,6 +33,7 @@ module "chef_server_performance_test_single_local_inplace_upgrade" {
     X-Topology         = "single"
     X-Deployment-Type  = "local"
     X-Channel          = "${var.channel}"
+    X-SAML             = "saml"
   }
 }
 
@@ -89,6 +90,9 @@ module "chef_server_performance_test_single_local_inplace_upgrade_deploy" {
   channel         = "${var.channel}"
   deployment_type = "local"
   upgrade         = "true"
+
+  # SAML
+  saml = "true"
 
   # Enable A2 Chef Server feature
   enable_chef_server = "true"

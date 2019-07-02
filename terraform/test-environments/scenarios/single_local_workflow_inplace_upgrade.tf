@@ -33,6 +33,7 @@ module "single_local_workflow_inplace_upgrade" {
     X-Topology         = "single"
     X-Deployment-Type  = "local"
     X-Channel          = "${var.channel}"
+    X-SAML             = "saml"
   }
 }
 
@@ -56,4 +57,7 @@ module "single_local_workflow_inplace_upgrade_deploy" {
   enable_chef_server  = "true"
   enable_workflow     = "true"
   workflow_enterprise = "demo"
+
+  # SAML
+  saml = "true"
 }
