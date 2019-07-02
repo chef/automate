@@ -4,21 +4,15 @@ set -euo pipefail
 
 cd /workdir/e2e
 
-instances_to_test=( \
-    "a2-iamv2-local-fresh-install-${CHANNEL}.cd.chef.co" \
-    "a2-iamv2-local-inplace-upgrade-${CHANNEL}.cd.chef.co" \
-    "a2-iamv2p1-local-fresh-install-${CHANNEL}.cd.chef.co" \
-    "a2-iamv2p1-local-inplace-upgrade-${CHANNEL}.cd.chef.co" \
-    "a2-local-fresh-install-${CHANNEL}.cd.chef.co" \
-    "a2-perf-test-single-local-inplace-upgrade-${CHANNEL}.cd.chef.co" \
-)
+data=$(curl --silent https://a2-${CHANNEL}.cd.chef.co/assets/data.json)
+instances_to_test=$(jq -nr --argjson data "$data" '$data[] | select(.tags[] | contains ("e2e")) | .fqdn')
 
 for instance in ${instances_to_test[*]}
 do
-  # these machines have no SAML setup
-  if grep -Eq 'fresh-install|iamv2p1' <<< "$instance"; then
+  if !jq -enr --arg fqdn "$instance" --argjson data "$data" '$data[] | select(.fqdn == $fqdn) as $i | "saml" | IN($i.tags[])'; then
     export CYPRESS_SKIP_SSO=true
   fi
+
   echo "--- Executing Cypress tests against $instance"
   export CYPRESS_BASE_URL="https://$instance"
   export CYPRESS_RECORD_KEY="$CYPRESS_RECORD_KEY"
