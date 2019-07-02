@@ -34,6 +34,7 @@ module "performance_test_single_local_inplace_upgrade" {
     X-Deployment-Type  = "local"
     X-Channel          = "${var.channel}"
     X-SAML             = "saml"
+    X-CI-Test          = "e2e"
   }
 }
 
