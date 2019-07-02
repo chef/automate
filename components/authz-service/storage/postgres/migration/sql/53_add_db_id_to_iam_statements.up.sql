@@ -31,10 +31,24 @@ ALTER TABLE iam_policy_members
 ALTER TABLE iam_policy_members
     ADD UNIQUE (member_id, policy_id);
 
-ALTER TABLE iam_policies 
-    ADD UNIQUE (id);
+ALTER TABLE iam_policy_projects RENAME COLUMN policy_id TO policy_temp_id;
 ALTER TABLE iam_policy_projects
-    ADD CONSTRAINT iam_policy_projects_policy_id_fkey FOREIGN KEY (policy_id) REFERENCES iam_policies (id) ON DELETE CASCADE;
+    ADD COLUMN policy_id INTEGER REFERENCES iam_policies (db_id) ON DELETE CASCADE;
+UPDATE
+    iam_policy_projects ipp
+SET
+    policy_id = (
+        SELECT
+            db_id
+        FROM
+            iam_policies
+        WHERE
+            id = ipp.policy_temp_id);
+ALTER TABLE iam_policy_projects
+    DROP COLUMN policy_temp_id;
+ALTER TABLE iam_policy_projects
+    ADD UNIQUE (project_id, policy_id);
+
 ALTER TABLE iam_policy_statements
     ADD CONSTRAINT iam_policy_statements_policy_id_fkey FOREIGN KEY (policy_id) REFERENCES iam_policies (id) ON DELETE CASCADE DEFERRABLE;
 
@@ -107,7 +121,7 @@ CREATE OR REPLACE FUNCTION query_policy (_policy_id TEXT, _projects_filter TEXT[
             SELECT
                 array_agg(proj.id) FILTER (WHERE proj.id IS NOT NULL)
             FROM iam_policy_projects AS pol_projs
-            LEFT OUTER JOIN iam_projects AS proj ON pol_projs.project_id = proj.id WHERE pol_projs.policy_id = pol.id) AS projects FROM iam_policies AS pol WHERE pol.id = _policy_id
+            LEFT OUTER JOIN iam_projects AS proj ON pol_projs.project_id = proj.id WHERE pol_projs.policy_id = pol.db_id) AS projects FROM iam_policies AS pol WHERE pol.id = _policy_id
         GROUP BY
             pol.db_id, pol.id, pol.name, pol.type
 )
@@ -157,7 +171,7 @@ CREATE OR REPLACE FUNCTION query_policies (_projects_filter TEXT[])
     SELECT
         array_agg(proj.id) FILTER (WHERE proj.id IS NOT NULL)
         FROM iam_policy_projects AS pol_projs
-        LEFT OUTER JOIN iam_projects AS proj ON pol_projs.project_id = proj.id WHERE pol_projs.policy_id = pol.id) AS projects FROM iam_policies AS pol
+        LEFT OUTER JOIN iam_projects AS proj ON pol_projs.project_id = proj.id WHERE pol_projs.policy_id = pol.db_id) AS projects FROM iam_policies AS pol
 GROUP BY
     pol.db_id, pol.id, pol.name, pol.type
 )
