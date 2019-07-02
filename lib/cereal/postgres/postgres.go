@@ -213,7 +213,13 @@ func (pg *PostgresBackend) expireDeadWorkers() error {
 	if err != nil {
 		return err
 	}
-	defer rows.Close()
+
+	defer func() {
+		if err := rows.Close(); err != nil {
+			logrus.WithError(err).Error("failed to close db rows")
+		}
+	}()
+
 	for rows.Next() {
 		var workerID string
 		err := rows.Scan(&workerID)
@@ -661,6 +667,7 @@ func (pg *PostgresBackend) DequeueTask(ctx context.Context, workerID uuid4.UUID,
 
 	tid, task, err := pg.dequeueTask(ctx, workerID, taskName)
 	if err != nil {
+		cancel()
 		return nil, nil, err
 	}
 	taskc := &PostgresTaskCompleter{
