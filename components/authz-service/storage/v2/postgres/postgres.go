@@ -1091,8 +1091,8 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 		}
 
 		_, err = tx.ExecContext(ctx,
-			`INSERT INTO iam_staged_project_rules
-				SELECT a.db_id, a.id, a.project_id, a.name, a.type, 'true'
+			`INSERT INTO iam_staged_project_rules (id, project_id, name, type, deleted)
+				SELECT a.id, a.project_id, a.name, a.type, 'true'
 				FROM iam_project_rules AS a
 				WHERE a.id=$1 AND projects_match_for_rule(a.project_id, $2);`,
 			id, pq.Array(projectsFilter),
@@ -1212,7 +1212,7 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 	// verify project exists, otherwise we just return an empty list
 	// that could be misleading
 	var project v2.Project
-	row := p.db.QueryRowContext(ctx, `SELECT query_project($1, $2)`, projectID, pq.Array(projectsFilter))
+	row := p.db.QueryRowContext(ctx, "SELECT query_project($1, $2)", projectID, pq.Array(projectsFilter))
 	if err := row.Scan(&project); err != nil {
 		return nil, p.processError(err)
 	}
