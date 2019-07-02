@@ -104,6 +104,10 @@ func UpdateHabitatEvent(event *habitat.HealthCheckEvent, overrides ...MessageOve
 			fmt.Printf("Error trying to create habitat event message: %s\n", err)
 		}
 	}
+
+	// since we are updating the event with new values, we are actually mocking
+	// a new habitat event and therefore we must update the timestamp
+	event.EventMetadata.OccurredAt = ptypes.TimestampNow()
 }
 
 // Creates a new HealthCheckEvent message with all its fields randomized
