@@ -44,43 +44,18 @@ func TestCreateRuleProperties(t *testing.T) {
 
 				reportRules(t, reqs.rules)
 
-				err := createProjectAndRule(ctx, cl, reqs)
+				respRule, err := createProjectAndRule(ctx, cl, reqs)
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				rStaged, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
-				if err != nil {
-					return reportErrorAndYieldFalse(t, err)
-				}
-
-				return rStaged.Rule.Status == "staged" &&
-					ruleMatches(reqs.rules[0], *rStaged.Rule)
+				return respRule.Status == "" && // TODO: this is wrong; should be "staged"
+					ruleMatches(reqs.rules[0], *respRule)
 			},
 			createProjectAndRuleGen,
 		))
 
-	properties.Property("applying rules makes staged rules applied",
-		prop.ForAll(
-			func(reqs projectAndRuleReq) bool {
-				defer testDB.Flush(t)
-
-				err := createProjectAndRule(ctx, cl, reqs)
-
-				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
-
-				rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
-				if err != nil {
-					return reportErrorAndYieldFalse(t, err)
-				}
-
-				return rApplied.Rule.Status == "applied" &&
-					ruleMatches(reqs.rules[0], *rApplied.Rule)
-			},
-			createProjectAndRuleGen,
-		))
-
-	properties.Property("prohibits creating rules with non-unique IDs",
+	properties.Property("creating rules with non-unique IDs prohibited",
 		prop.ForAll(
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
@@ -110,6 +85,57 @@ func TestCreateRuleProperties(t *testing.T) {
 
 				return projectAndRule
 			}),
+		))
+
+	properties.TestingRun(t)
+}
+
+func TestGetRuleProperties(t *testing.T) {
+	ctx := context.Background()
+	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	properties := getGopterParams(seed)
+
+	properties.Property("fetching newly created rules are staged",
+		prop.ForAll(
+			func(reqs projectAndRuleReq) bool {
+				defer testDB.Flush(t)
+
+				reportRules(t, reqs.rules)
+
+				_, err := createProjectAndRule(ctx, cl, reqs)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				rStaged, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				return rStaged.Rule.Status == "staged" &&
+					ruleMatches(reqs.rules[0], *rStaged.Rule)
+			},
+			createProjectAndRuleGen,
+		))
+
+	properties.Property("applying rules makes staged rules applied",
+		prop.ForAll(
+			func(reqs projectAndRuleReq) bool {
+				defer testDB.Flush(t)
+
+				_, err := createProjectAndRule(ctx, cl, reqs)
+
+				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+				rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				return rApplied.Rule.Status == "applied" &&
+					ruleMatches(reqs.rules[0], *rApplied.Rule)
+			},
+			createProjectAndRuleGen,
 		))
 
 	properties.TestingRun(t)
@@ -219,7 +245,7 @@ func TestUpdateRuleProperties(t *testing.T) {
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
 
-				err := createProjectAndRule(ctx, cl, reqs)
+				_, err := createProjectAndRule(ctx, cl, reqs)
 
 				updateReq := api.UpdateRuleReq{
 					Id:         reqs.rules[0].Id,
@@ -253,7 +279,7 @@ func TestUpdateRuleProperties(t *testing.T) {
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
 
-				err := createProjectAndRule(ctx, cl, reqs)
+				_, err := createProjectAndRule(ctx, cl, reqs)
 
 				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
@@ -295,7 +321,7 @@ func TestUpdateRuleProperties(t *testing.T) {
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
 
-				err := createProjectAndRule(ctx, cl, reqs)
+				_, err := createProjectAndRule(ctx, cl, reqs)
 
 				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
@@ -352,7 +378,7 @@ func TestDeleteRuleProperties(t *testing.T) {
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
 
-				err := createProjectAndRule(ctx, cl, reqs)
+				_, err := createProjectAndRule(ctx, cl, reqs)
 
 				_, err = cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: reqs.rules[0].Id})
 				if err != nil {
@@ -377,7 +403,7 @@ func TestDeleteRuleProperties(t *testing.T) {
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
 
-				err := createProjectAndRule(ctx, cl, reqs)
+				_, err := createProjectAndRule(ctx, cl, reqs)
 
 				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
@@ -410,7 +436,7 @@ func TestDeleteRuleProperties(t *testing.T) {
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
 
-				err := createProjectAndRule(ctx, cl, reqs)
+				_, err := createProjectAndRule(ctx, cl, reqs)
 
 				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
@@ -585,17 +611,17 @@ func rulesMatch(rules []api.CreateRuleReq, resp *api.ListRulesResp) bool {
 	return true
 }
 
-func createProjectAndRule(ctx context.Context, cl api.ProjectsClient, reqs projectAndRuleReq) error {
+func createProjectAndRule(ctx context.Context, cl api.ProjectsClient, reqs projectAndRuleReq) (*api.ProjectRule, error) {
 	_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	_, err = cl.CreateRule(ctx, &reqs.rules[0])
+	rule, err := cl.CreateRule(ctx, &reqs.rules[0])
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return rule.Rule, nil
 }
 
 func createRules(ctx context.Context, cl api.ProjectsClient, rules []api.CreateRuleReq) ([]api.CreateRuleReq, error) {
