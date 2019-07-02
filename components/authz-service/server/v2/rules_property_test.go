@@ -55,7 +55,7 @@ func TestCreateRuleProperties(t *testing.T) {
 			createProjectAndRuleGen,
 		))
 
-	properties.Property("creating rules with non-unique IDs prohibited",
+	properties.Property("creating rules with non-unique IDs is prohibited",
 		prop.ForAll(
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
@@ -95,7 +95,7 @@ func TestGetRuleProperties(t *testing.T) {
 	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	properties := getGopterParams(seed)
 
-	properties.Property("fetching newly created rules are staged",
+	properties.Property("newly created rules are reported as staged",
 		prop.ForAll(
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
@@ -118,7 +118,7 @@ func TestGetRuleProperties(t *testing.T) {
 			createProjectAndRuleGen,
 		))
 
-	properties.Property("applying rules makes staged rules applied",
+	properties.Property("applied rules are reported as applied",
 		prop.ForAll(
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
@@ -146,7 +146,7 @@ func TestListRuleProperties(t *testing.T) {
 	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	properties := getGopterParams(seed)
 
-	properties.Property("reports staged rules as staged",
+	properties.Property("staged rules are reported as staged",
 		prop.ForAll(
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
@@ -174,7 +174,7 @@ func TestListRuleProperties(t *testing.T) {
 			createProjectAndRuleGen,
 		))
 
-	properties.Property("does not report staged rules as applied",
+	properties.Property("staged rules are not reported as applied",
 		prop.ForAll(
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
@@ -202,7 +202,7 @@ func TestListRuleProperties(t *testing.T) {
 			createProjectAndRuleGen,
 		))
 
-	properties.Property("reports applied rules as applied",
+	properties.Property("applied rules are reported as applied",
 		prop.ForAll(
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
@@ -240,7 +240,7 @@ func TestUpdateRuleProperties(t *testing.T) {
 	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	properties := getGopterParams(seed)
 
-	properties.Property("updating newly created staged rules remain staged",
+	properties.Property("updating newly created rules remain staged",
 		prop.ForAll(
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
@@ -373,7 +373,7 @@ func TestDeleteRuleProperties(t *testing.T) {
 	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	properties := getGopterParams(seed)
 
-	properties.Property("deleting newly created staged rules deletes them immediately",
+	properties.Property("deleting newly created rules deletes them immediately",
 		prop.ForAll(
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
