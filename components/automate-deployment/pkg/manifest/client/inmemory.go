@@ -3,8 +3,6 @@ package client
 import (
 	"context"
 
-	"github.com/pkg/errors"
-
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest/parser"
@@ -26,7 +24,7 @@ func NewInMemoryClient(data []byte) *InMemory {
 func (d *InMemory) GetCurrentManifest(_ context.Context, _ string) (*manifest.A2, error) {
 	m, err := parser.ManifestFromBytes(d.data)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to parse manifest")
+		return nil, err
 	}
 
 	if m.HartOverrides == nil {
@@ -40,11 +38,11 @@ func (d *InMemory) GetCurrentManifest(_ context.Context, _ string) (*manifest.A2
 func (d *InMemory) GetManifest(_ context.Context, release string) (*manifest.A2, error) {
 	m, err := parser.ManifestFromBytes(d.data)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to parse manifest")
+		return nil, err
 	}
 
 	if m.Build != release {
-		return nil, errors.Wrapf(err, "release %s requested but in memory manifest is for %s", release, m.Build)
+		return nil, err
 	}
 
 	if m.HartOverrides == nil {

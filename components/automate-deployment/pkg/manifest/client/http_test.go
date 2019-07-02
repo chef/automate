@@ -74,5 +74,7 @@ func TestGetManifestReturnNoSuchManifestOn404(t *testing.T) {
 	testFmt := fmt.Sprintf("%s/%%s", ts.URL)
 	client := client.NewHTTPClient(client.URLFormat(testFmt))
 	_, err := client.GetManifest(context.Background(), "20180207073355")
-	require.Equal(t, err, manifest.NoSuchManifest)
+	require.Error(t, err)
+	_, ok := err.(*manifest.ErrNoSuchManifest)
+	require.True(t, ok, "error should be a ErrNoSuchManifest")
 }

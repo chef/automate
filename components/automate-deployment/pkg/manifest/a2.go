@@ -1,14 +1,8 @@
 package manifest
 
 import (
-	"errors"
-
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
 )
-
-// ErrNotFoundInManifest indicates a package was not found in the manifest for
-// the given name
-var ErrNotFoundInManifest = errors.New("Could not find package in manifest")
 
 // A ReleaseManifest specifies the expected contents of the build.
 type ReleaseManifest interface {

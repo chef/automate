@@ -49,7 +49,7 @@ func ShowBackupChecksum(bucket Bucket) (string, error) {
 // the integrity of the metadata.json file for each component backup. The
 // metadata.json files then contain checksums of the individual files in the
 // per-service backup.
-func LoadMetadataVerifier(bucket Bucket, sha256 string) (ObjectVerifier, error) {
+func LoadMetadataVerifier(ctx context.Context, bucket Bucket, sha256 string) (ObjectVerifier, error) {
 	cksums := &MetadataChecksums{}
 
 	var ckSumsFileVerifier ObjectVerifier
@@ -70,7 +70,7 @@ func LoadMetadataVerifier(bucket Bucket, sha256 string) (ObjectVerifier, error) 
 
 	objectName := metadataChecksumsObjectName
 
-	reader, err := bucket.NewReader(context.TODO(), objectName, ckSumsFileVerifier)
+	reader, err := bucket.NewReader(ctx, objectName, ckSumsFileVerifier)
 	// Backups created before the checksum code was added won't have this file.
 	// To keep them working, we no-op the verification in this case. But if the
 	// user gave us a SHA, then we require the file to exist
@@ -101,12 +101,12 @@ func LoadMetadataVerifier(bucket Bucket, sha256 string) (ObjectVerifier, error) 
 // a new Metadata instance from the backed up metadata in the given bucket.
 // Errors caused by the metadata not existing will return true when passed to
 // `backup.IsNotExist(err)`
-func LoadServiceMetadata(bucket Bucket, svcName string, objectVerifier ObjectVerifier) (*Metadata, error) {
+func LoadServiceMetadata(ctx context.Context, bucket Bucket, svcName string, objectVerifier ObjectVerifier) (*Metadata, error) {
 	metadata := &Metadata{}
 
 	mdStorageKey := path.Join(svcName, metadataFileBaseName)
 
-	reader, err := bucket.NewReader(context.TODO(), mdStorageKey, objectVerifier)
+	reader, err := bucket.NewReader(ctx, mdStorageKey, objectVerifier)
 	if err != nil {
 		// Return an IsNotExist error unwrapped so caller can also check for IsNotExist
 		if IsNotExist(err) {
@@ -140,7 +140,7 @@ func LoadAllSpecsFromBackup(ctx context.Context, bucket Bucket, verifier ObjectV
 	specs := make([]Spec, 0, len(services))
 	specless := []string{}
 	for _, service := range services {
-		metadata, err := LoadServiceMetadata(bucket, string(service), verifier)
+		metadata, err := LoadServiceMetadata(ctx, bucket, string(service), verifier)
 		if err != nil {
 			if IsNotExist(errors.Cause(err)) {
 				logrus.Warnf("Missing metadata for %s", service)

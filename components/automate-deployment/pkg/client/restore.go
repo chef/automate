@@ -132,8 +132,8 @@ func WithDeploymentRestoreAirgapInstallBundle(airgapInstallBundlePath string) De
 	}
 }
 
-func (r *DeploymentRestore) loadDeploymentConfig(bucket backup.Bucket) error {
-	c, err := backup.LoadDeploymentConfig(bucket, r.metadata.Verifier())
+func (r *DeploymentRestore) loadDeploymentConfig(ctx context.Context, bucket backup.Bucket) error {
+	c, err := backup.LoadDeploymentConfig(ctx, bucket, r.metadata.Verifier())
 	if err != nil {
 		return wrapBackupOrChecksumErr(err, "Loading deployment configuration from the backup directory failed")
 	}
@@ -142,13 +142,14 @@ func (r *DeploymentRestore) loadDeploymentConfig(bucket backup.Bucket) error {
 	return nil
 }
 
-func (r *DeploymentRestore) loadMetadata(bucket backup.Bucket) error {
-	verifier, err := backup.LoadMetadataVerifier(bucket, r.restoreTask.Sha256)
+func (r *DeploymentRestore) loadMetadata(ctx context.Context, bucket backup.Bucket) error {
+	verifier, err := backup.LoadMetadataVerifier(ctx, bucket, r.restoreTask.Sha256)
 	if err != nil {
 		return wrapBackupOrChecksumErr(err, "Loading backup metadata checksums from the backup directory failed")
 	}
 
 	metadata, err := backup.LoadServiceMetadata(
+		ctx,
 		bucket,
 		deploymentServiceName,
 		verifier,
@@ -162,14 +163,33 @@ func (r *DeploymentRestore) loadMetadata(bucket backup.Bucket) error {
 	return nil
 }
 
-func (r *DeploymentRestore) loadManifest(bucket backup.Bucket) error {
-	man, err := backup.LoadBackupManifest(bucket, r.restoreTask)
+func (r *DeploymentRestore) loadManifest(ctx context.Context, bucket backup.Bucket) error {
+	var (
+		manifestLocation backup.ReleaseManifestLocation
+		manifest         manifest.ReleaseManifest
+		err              error
+	)
 
-	if err != nil {
-		return wrapBackupOrChecksumErr(err, "Loading backup manifest from the backup directory failed")
+	if r.restoreTask.GetAirgap() {
+		manifestLocation = backup.NewOnDiskManifestLocation(api.AirgapManifestPath)
+	} else if r.restoreTask.GetUpgrade() {
+		manifestLocation = backup.NewLatestManifestLocation(
+			r.restoreTask.GetHartifactsPath(),
+			r.restoreTask.GetOverrideOrigin(),
+		)
+	} else {
+		manifestLocation, err = backup.NewBucketManifestLocation(ctx, bucket)
+		if err != nil {
+			return wrapBackupOrChecksumErr(err, "Loading manifest from the backup bucket failed")
+		}
 	}
 
-	r.a2Manifest = man
+	manifest, err = manifestLocation.Provider().GetCurrentManifest(ctx, r.restoreTask.GetChannel())
+	if err != nil {
+		return wrapBackupOrChecksumErr(err, "Loading the current manifest failed")
+	}
+
+	r.a2Manifest = manifest
 	return nil
 }
 
@@ -256,18 +276,19 @@ func (r *DeploymentRestore) stopDeploymentService(ctx context.Context) error {
 	}
 }
 
-func (r *DeploymentRestore) serviceRelease() (string, error) {
-	release := ""
-	con, err := Connection(1 * time.Second)
-	if err != nil {
-		return release, status.Wrap(
-			err,
-			status.DeploymentServiceUnreachableError,
-			"Connecting to the deployment-service failed",
-		)
+func (r *DeploymentRestore) serviceRelease(ctx context.Context) (string, error) {
+	deadline, ok := ctx.Deadline()
+	if !ok {
+		deadline = time.Now().Add(1 * time.Second)
 	}
 
-	svcVers, err := con.ServiceVersions(context.Background(), &api.ServiceVersionsRequest{})
+	release := ""
+	con, err := Connection(time.Until(deadline))
+	if err != nil {
+		return release, status.Annotate(err, status.DeploymentServiceUnreachableError)
+	}
+
+	svcVers, err := con.ServiceVersions(ctx, &api.ServiceVersionsRequest{})
 	if err != nil {
 		return release, status.Wrap(
 			err,
@@ -295,10 +316,10 @@ func (r *DeploymentRestore) startDeploymentService(ctx context.Context) error {
 	}
 
 	var (
-		startTime  = time.Now()
-		timeout    = 20 * time.Second
 		sleepTime  = 500 * time.Millisecond
+		currentRel string
 		desiredRel = deployment.ServiceFromManifest(r.a2Manifest, deploymentServiceName).Release()
+		err        error
 	)
 
 	for {
@@ -308,21 +329,24 @@ func (r *DeploymentRestore) startDeploymentService(ctx context.Context) error {
 		// depend on the Habitat health status here because
 		// that status can be delayed for up to 30 seconds if
 		// the first health check happens to fail.
-		currentRel, err := r.serviceRelease()
-		if err != nil {
-			currentRel = "unknown" // make the error message pretty
-		}
-
-		if currentRel == desiredRel {
+		currentRel, err = r.serviceRelease(ctx)
+		if err == nil && (currentRel == desiredRel) {
 			return nil
 		}
 
-		if time.Since(startTime) > timeout {
+		// Make there error message pretty
+		if currentRel == "" {
+			currentRel = "unknown"
+		}
+
+		select {
+		case <-ctx.Done():
 			msg := `
-Timed out waiting for deployment-service to start.
-    Expected deployment-service release: %s
-       Found deployment-service release: %s`
-			return status.Errorf(status.TimedOutError, msg, desiredRel, currentRel)
+	Timed out waiting for deployment-service to start.
+		Expected deployment-service release: %s
+		   Found deployment-service release: %s`
+			return status.Wrapf(err, status.TimedOutError, msg, desiredRel, currentRel)
+		default:
 		}
 
 		Disconnect()
@@ -419,15 +443,15 @@ func (r *DeploymentRestore) Restore(ctx context.Context) error {
 		}
 	}
 
-	if err := r.loadMetadata(bucket); err != nil {
+	if err := r.loadMetadata(ctx, bucket); err != nil {
 		return err
 	}
 
-	if err := r.loadManifest(bucket); err != nil {
+	if err := r.loadManifest(ctx, bucket); err != nil {
 		return err
 	}
 
-	if err := r.loadDeploymentConfig(bucket); err != nil {
+	if err := r.loadDeploymentConfig(ctx, bucket); err != nil {
 		return err
 	}
 
@@ -471,8 +495,6 @@ func (r *DeploymentRestore) Restore(ctx context.Context) error {
 	eventChan := make(chan api.DeployEvent_Backup_Operation, 30)
 	errChan := make(chan error, 1)
 	defer close(errChan)
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
-	defer cancel()
 
 	restoreCtx := backup.NewContext(
 		backup.WithContextCtx(ctx),
@@ -484,6 +506,7 @@ func (r *DeploymentRestore) Restore(ctx context.Context) error {
 	// Make the spec actually execute commands
 	spec := *r.metadata.Spec
 	backup.SetCommandExecutor(spec, command.NewExecExecutor())
+	ctx, cancel := context.WithCancel(ctx)
 
 	executor := backup.NewExecutor(
 		backup.WithEventChan(eventChan),
@@ -522,6 +545,17 @@ func (r *DeploymentRestore) Restore(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func (r *DeploymentRestore) ResolvedManifest() (manifest.ReleaseManifest, error) {
+	if r.a2Manifest == nil {
+		return nil, status.New(
+			status.BackupRestoreError,
+			"manifest has not been loaded",
+		)
+	}
+
+	return r.a2Manifest, nil
 }
 
 func wrapBackupOrChecksumErr(err error, message string) error {
