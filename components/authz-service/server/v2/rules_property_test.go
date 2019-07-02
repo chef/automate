@@ -30,11 +30,12 @@ type projectAndRuleReq struct {
 	rules []api.CreateRuleReq
 }
 
+var createRuleReqGen, createProjectReqGen, createProjectAndRuleGen = getGenerators()
+
 func TestCreateRuleProperties(t *testing.T) {
 	ctx := context.Background()
 	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	properties := getGopterParams(seed)
-	createRuleReqGen, createProjectReqGen, createProjectAndRuleGen := getGenerators()
 
 	properties.Property("newly created rules are staged",
 		prop.ForAll(
@@ -96,21 +97,18 @@ func TestCreateRuleProperties(t *testing.T) {
 				_, err = cl.CreateRule(ctx, &reqs.rules[1])
 				return grpctest.AssertCode(t, codes.AlreadyExists, err)
 			},
-			// TODO(sr): deduplicate with the combinegen above?
 			gopter.CombineGens(
 				createProjectReqGen, createRuleReqGen, createRuleReqGen,
 			).Map(func(vals []interface{}) projectAndRuleReq {
-				p := vals[0].(api.CreateProjectReq)
-				// we "fix" the second req to use the same ID as the first one
-				r0 := vals[1].(api.CreateRuleReq)
-				r1 := vals[2].(api.CreateRuleReq)
-				r1.Id = r0.Id
-				r0.ProjectId = p.Id
-				r1.ProjectId = p.Id
-				return projectAndRuleReq{
-					CreateProjectReq: p,
-					rules:            []api.CreateRuleReq{r0, r1},
-				}
+				projectAndRule := genStandardProjectAndRules(
+					vals[0].(api.CreateProjectReq),
+					[]api.CreateRuleReq{vals[1].(api.CreateRuleReq), vals[2].(api.CreateRuleReq)},
+				)
+
+				// "fix" the second req to use the same ID as the first one
+				projectAndRule.rules[1].Id = projectAndRule.rules[0].Id
+
+				return projectAndRule
 			}),
 		))
 
@@ -121,7 +119,6 @@ func TestListRuleProperties(t *testing.T) {
 	ctx := context.Background()
 	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	properties := getGopterParams(seed)
-	_, _, createProjectAndRuleGen := getGenerators()
 
 	properties.Property("reports staged rules as staged",
 		prop.ForAll(
@@ -216,7 +213,6 @@ func TestUpdateRuleProperties(t *testing.T) {
 	ctx := context.Background()
 	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	properties := getGopterParams(seed)
-	_, _, createProjectAndRuleGen := getGenerators()
 
 	properties.Property("updating newly created staged rules remain staged",
 		prop.ForAll(
@@ -350,7 +346,6 @@ func TestDeleteRuleProperties(t *testing.T) {
 	ctx := context.Background()
 	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	properties := getGopterParams(seed)
-	_, _, createProjectAndRuleGen := getGenerators()
 
 	properties.Property("deleting newly created staged rules deletes them immediately",
 		prop.ForAll(
@@ -518,28 +513,32 @@ func getGenerators() (gopter.Gen, gopter.Gen, gopter.Gen) {
 	).Map(func(vals []interface{}) projectAndRuleReq {
 		p := vals[0].(api.CreateProjectReq)
 		rules := vals[1].([]api.CreateRuleReq)
-		for i, rule := range rules {
-
-			// make the id unique!
-			rules[i].Id = fmt.Sprintf("%s-index-%d", rule.Id, i)
-
-			// tie the rule to a real project
-			rules[i].ProjectId = p.Id
-
-			// constrain condition count even further than the gopter global param
-			var conditions []*api.Condition
-			for j := 0; j < int(math.Min(conditionLimit, float64(len(rule.Conditions)))); j++ {
-				conditions = append(conditions, rule.Conditions[j])
-			}
-			rules[i].Conditions = conditions
-		}
-		return projectAndRuleReq{
-			CreateProjectReq: p,
-			rules:            rules,
-		}
+		return genStandardProjectAndRules(p, rules)
 	})
 
 	return createRuleReqGen, createProjectReqGen, createProjectAndRuleGen
+}
+
+func genStandardProjectAndRules(p api.CreateProjectReq, rules []api.CreateRuleReq) projectAndRuleReq {
+	for i, rule := range rules {
+
+		// make the id unique!
+		rules[i].Id = fmt.Sprintf("%s-index-%d", rule.Id, i)
+
+		// tie the rule to a real project
+		rules[i].ProjectId = p.Id
+
+		// constrain condition count even further than the gopter global param
+		var conditions []*api.Condition
+		for j := 0; j < int(math.Min(conditionLimit, float64(len(rule.Conditions)))); j++ {
+			conditions = append(conditions, rule.Conditions[j])
+		}
+		rules[i].Conditions = conditions
+	}
+	return projectAndRuleReq{
+		CreateProjectReq: p,
+		rules:            rules,
+	}
 }
 
 func reportErrorAndYieldFalse(t *testing.T, err error) bool {
