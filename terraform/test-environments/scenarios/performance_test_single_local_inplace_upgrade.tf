@@ -33,6 +33,7 @@ module "performance_test_single_local_inplace_upgrade" {
     X-Topology         = "single"
     X-Deployment-Type  = "local"
     X-Channel          = "${var.channel}"
+    X-SAML             = "saml"
   }
 }
 

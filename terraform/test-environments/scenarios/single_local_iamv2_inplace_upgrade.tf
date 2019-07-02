@@ -33,6 +33,7 @@ module "single_local_iamv2_inplace_upgrade" {
     X-Topology         = "single"
     X-Deployment-Type  = "local"
     X-Channel          = "${var.channel}"
+    X-SAML             = "saml"
   }
 }
 
