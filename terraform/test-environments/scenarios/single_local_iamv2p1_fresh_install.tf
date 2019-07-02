@@ -11,7 +11,7 @@ module "single_local_iamv2p1_fresh_install" {
 
   # Metadata
   meta_title       = "Single Local (Fresh Install) with IAMv2p1"
-  meta_description = "A2 stack with IAMv2p1 (using SAML) deployed locally as Habitat packages on a single host using the chef-automate CLI."
+  meta_description = "A2 stack with IAMv2p1 deployed locally as Habitat packages on a single host using the chef-automate CLI."
   meta_type        = "habitat"
 
   # AWS Instance Configuration
@@ -34,6 +34,7 @@ module "single_local_iamv2p1_fresh_install" {
     X-Topology         = "single"
     X-Deployment-Type  = "local"
     X-Channel          = "${var.channel}"
+    X-CI-Test          = "e2e"
   }
 }
 

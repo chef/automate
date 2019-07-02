@@ -111,6 +111,11 @@ variable "iam_version" {
   description = "Enable major/minor versions of A2 IAM."
 }
 
+variable "saml" {
+  default     = "false"
+  description = "Enable SAML login"
+}
+
 variable "enable_workflow" {
   default     = "false"
   description = "Enable A2 Workflow feature."
