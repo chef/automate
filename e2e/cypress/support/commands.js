@@ -76,7 +76,6 @@ Cypress.Commands.add("logout", () => {
   cy.get('[data-cy=user-profile-button]').click()
   cy.get('[data-cy=sign-out-button]').click()
   cy.url().should('include', '/dex/auth')
-  cy.contains('Choose a method to log in')
 })
 
 // IAM helpers
