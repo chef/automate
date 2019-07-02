@@ -117,11 +117,14 @@ func (p *pg) PurgeSubjectFromPolicies(ctx context.Context, sub string) ([]string
 	// prescribe this, but it feels like the better choice.)
 
 	row := tx.QueryRowContext(ctx, `
-WITH pol_ids AS (DELETE FROM iam_policy_members
-                 WHERE member_id=(SELECT db_id FROM iam_members WHERE name=$1)
-                 RETURNING policy_id)
-SELECT array_agg(policy_id) FROM pol_ids`,
-		sub)
+		WITH pol_db_ids AS (
+			DELETE FROM iam_policy_members
+			WHERE member_id=(SELECT db_id FROM iam_members WHERE name=$1)
+			RETURNING policy_id
+		)
+		SELECT array_agg(id)
+		FROM iam_policies
+		WHERE db_id IN (SELECT * FROM pol_db_ids);`, sub)
 	err = row.Scan(pq.Array(&polIDs))
 	if err != nil {
 		return nil, p.processError(err)
@@ -555,7 +558,7 @@ func (p *pg) RemovePolicyMembers(ctx context.Context,
 
 	for _, member := range members {
 		_, err := tx.ExecContext(ctx,
-			`DELETE FROM iam_policy_members WHERE policy_id=$1 AND
+			`DELETE FROM iam_policy_members WHERE policy_id=policy_db_id($1) AND
 				member_id=(SELECT db_id from iam_members WHERE name=$2);`, policyID, member.Name)
 		if err != nil {
 			err = p.processError(err)
@@ -592,7 +595,7 @@ func (p *pg) replacePolicyMembersWithQuerier(ctx context.Context, policyID strin
 	q Querier) error {
 	// Cascading drop any existing members.
 	_, err := q.ExecContext(ctx,
-		`DELETE FROM iam_policy_members WHERE policy_id=$1;`, policyID)
+		`DELETE FROM iam_policy_members WHERE policy_id=policy_db_id($1);`, policyID)
 	if err != nil {
 		return err
 	}
@@ -627,7 +630,7 @@ func (p *pg) insertOrReusePolicyMemberWithQuerier(ctx context.Context, policyID 
 	// For now, let's just ignore conflicts if someone is trying to add a user that is already a member.
 	_, err = q.ExecContext(ctx,
 		`INSERT INTO iam_policy_members (policy_id, member_id)
-			values($1, (SELECT db_id FROM iam_members WHERE name=$2)) ON CONFLICT DO NOTHING;`, policyID, member.Name)
+			values(policy_db_id($1), (SELECT db_id FROM iam_members WHERE name=$2)) ON CONFLICT DO NOTHING;`, policyID, member.Name)
 	return err
 }
 
@@ -635,7 +638,7 @@ func (p *pg) getPolicyMembersWithQuerier(ctx context.Context, id string, q Queri
 	rows, err := q.QueryContext(ctx,
 		`SELECT m.id, m.name FROM iam_policy_members AS pm
 			INNER JOIN iam_members AS m ON pm.member_id=m.db_id
-			WHERE pm.policy_id=$1 ORDER BY m.name ASC`, id)
+			WHERE pm.policy_id=policy_db_id($1) ORDER BY m.name ASC`, id)
 
 	if err != nil {
 		return nil, err
