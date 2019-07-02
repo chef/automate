@@ -3579,14 +3579,13 @@ func TestListRulesForProject(t *testing.T) {
 		desc string
 		f    func(*testing.T)
 	}{
-		{"when no rules or projects exist, returns an empty list", func(t *testing.T) {
+		{"when project does not exist, returns ErrNotFound", func(t *testing.T) {
 			ctx := context.Background()
 			resp, err := store.ListRulesForProject(ctx, "not-found")
-			assert.NoError(t, err)
+			assert.Equal(t, storage_errors.ErrNotFound, err)
 			assert.Nil(t, resp)
-			assert.Zero(t, len(resp))
 		}},
-		{"when no rules exist, returns an empty list", func(t *testing.T) {
+		{"when project exists but no rules exist, returns an empty list", func(t *testing.T) {
 			ctx := context.Background()
 			projID := "project-1"
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
@@ -3647,7 +3646,7 @@ func TestListRulesForProject(t *testing.T) {
 			assert.Equal(t, 2, len(resp))
 			assert.ElementsMatch(t, []*storage.Rule{rule2, rule3}, resp)
 		}},
-		{"when the requested project is not in the filter, returns an empty list", func(t *testing.T) {
+		{"when the requested project is not in the filter, returns ErrNotFound", func(t *testing.T) {
 			ctx := context.Background()
 
 			projID := "project-1"
@@ -3663,8 +3662,8 @@ func TestListRulesForProject(t *testing.T) {
 			insertAppliedRuleWithMultipleConditions(t, db, "rule-3", projID2, ruleType)
 
 			resp, err := store.ListRulesForProject(ctx, projID2)
-			assert.NoError(t, err)
-			assert.Zero(t, len(resp))
+			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Nil(t, resp)
 		}},
 		{"when there are only staged changes for the project's rules, returns the staged versions of the rules", func(t *testing.T) {
 			ctx := context.Background()

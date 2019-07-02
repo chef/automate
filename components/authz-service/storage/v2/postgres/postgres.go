@@ -1209,6 +1209,14 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 		return nil, err
 	}
 
+	// verify project exists, otherwise we just return an empty list
+	// that could be misleading
+	var project v2.Project
+	row := p.db.QueryRowContext(ctx, `SELECT query_project($1, $2)`, projectID, pq.Array(projectsFilter))
+	if err := row.Scan(&project); err != nil {
+		return nil, p.processError(err)
+	}
+
 	var rules []*v2.Rule
 	rows, err := p.db.QueryContext(ctx, "SELECT query_rules_for_project($1, $2)",
 		projectID, pq.Array(projectsFilter))
