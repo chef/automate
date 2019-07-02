@@ -55,12 +55,12 @@ func New(cfg *config.EventConfig) *Server {
 func (s *Server) initRegistry() map[string][]string {
 
 	registry := make(map[string][]string)
-	registry[ScanJobCreated] = []string{config.FEED_KEY}
-	registry[ScanJobUpdated] = []string{config.FEED_KEY}
-	registry[ScanJobDeleted] = []string{config.FEED_KEY}
-	registry[ProfileCreated] = []string{config.FEED_KEY}
-	registry[ProfileUpdated] = []string{config.FEED_KEY}
-	registry[ProfileDeleted] = []string{config.FEED_KEY}
+	registry[ScanJobCreated] = []string{config.FEED_KEY, config.EVENT_FEED}
+	registry[ScanJobUpdated] = []string{config.FEED_KEY, config.EVENT_FEED}
+	registry[ScanJobDeleted] = []string{config.FEED_KEY, config.EVENT_FEED}
+	registry[ProfileCreated] = []string{config.FEED_KEY, config.EVENT_FEED}
+	registry[ProfileUpdated] = []string{config.FEED_KEY, config.EVENT_FEED}
+	registry[ProfileDeleted] = []string{config.FEED_KEY, config.EVENT_FEED}
 	registry[NodeTerminated] = []string{config.CFG_KEY}
 	registry[ProjectRulesUpdate] = []string{config.CFG_KEY, config.COMPLIANCE_INGEST_KEY}
 	registry[ProjectRulesUpdateStatus] = []string{config.AUTHZ}
