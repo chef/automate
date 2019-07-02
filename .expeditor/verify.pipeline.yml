@@ -2,7 +2,7 @@ expeditor:
   defaults:
     executor:
       docker:
-        image_sha256: 60245e6090ff677e5f3263c73855ef4dc29082ecff6ab6981cef109391fc253b
+        image_sha256: abae6931d6eca75095f651daae2fa49c5243665614247d4a66929ee659f9ea93
         workdir: /go/src/github.com/chef/automate
 
 steps:
@@ -328,7 +328,7 @@ steps:
 
   - label: "[unit] event-feed-service"
     command:
-      - hab studio run "source .studiorc && go_component_unit event-feed-service && go_component_static_tests event-feed-service"
+      - hab studio run "source .studiorc && go_component_unit event-feed-service && go_component_static_tests event-feed-service && go_component_lint event-feed-service"
     timeout_in_minutes: 10
     retry:
       automatic:

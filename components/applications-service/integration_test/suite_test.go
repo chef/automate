@@ -141,6 +141,22 @@ func (s *Suite) GetServices() []*storage.Service {
 	return svcList
 }
 
+func (s *Suite) GetServicesCountForStatsEndpoint() int32 {
+	count, err := s.StorageClient.GetServicesCount()
+	if err != nil {
+		fmt.Printf("Error trying to retrieve services count from db: %s\n", err)
+	}
+	return count
+}
+
+func (s *Suite) GetServiceGroupsCountForStatsEndpoint() int32 {
+	count, err := s.StorageClient.GetServiceGroupsCount()
+	if err != nil {
+		fmt.Printf("Error trying to retrieve service groups count from db: %s\n", err)
+	}
+	return count
+}
+
 // IngestServices ingests multiple HealthCheckEvent messages into the database
 func (s *Suite) IngestServices(events []*habitat.HealthCheckEvent) {
 	for _, e := range events {

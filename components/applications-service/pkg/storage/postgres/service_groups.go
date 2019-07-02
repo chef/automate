@@ -91,6 +91,11 @@ SELECT * FROM service_group_health AS service_group_health
  LIMIT $1
 OFFSET $2
 `
+
+	selectServiceGroupsTotalCount = `
+SELECT count(*)
+  FROM service_group;
+`
 )
 
 // serviceGroupHealth matches the results from the SELECT GroupHealth Query
@@ -186,6 +191,11 @@ func (db *Postgres) GetServiceGroups(
 	}
 
 	return sgDisplay, nil
+}
+
+func (db *Postgres) GetServiceGroupsCount() (int32, error) {
+	count, err := db.DbMap.SelectInt(selectServiceGroupsTotalCount)
+	return int32(count), err
 }
 
 // ReleaseString returns the release string of the service group.

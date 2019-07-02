@@ -214,6 +214,22 @@ func init() {
         ]
       }
     },
+    "/beta/applications/stats": {
+      "get": {
+        "operationId": "GetServicesStats",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/applicationsServicesStatsRes"
+            }
+          }
+        },
+        "tags": [
+          "ApplicationsService"
+        ]
+      }
+    },
     "/beta/applications/version": {
       "get": {
         "operationId": "GetVersion",
@@ -395,6 +411,23 @@ func init() {
           "items": {
             "$ref": "#/definitions/applicationsService"
           }
+        }
+      }
+    },
+    "applicationsServicesStatsRes": {
+      "type": "object",
+      "properties": {
+        "total_service_groups": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "total_services": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "total_supervisors": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },

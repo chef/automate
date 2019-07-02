@@ -51,7 +51,7 @@ while node_status != "reachable" do
   sleep 5
   node_status = (MANAGER_GRPC nodes, :read, Nodes::Id.new(id: node.id)).status
 end
-assert_equal(node_status, "reachable")
+assert_equal("reachable", node_status)
 
 puts "\n##################"
 puts "status of node is reachable"
@@ -63,7 +63,7 @@ while node_status != "unreachable" do
   sleep 5
   node_status = (MANAGER_GRPC nodes, :read, Nodes::Id.new(id: node.id)).status
 end
-assert_equal(node_status, "unreachable")
+assert_equal("unreachable", node_status)
 
 puts "\n##################"
 puts "status of node is unreachable"
@@ -75,7 +75,7 @@ while node_status != "reachable" do
   sleep 5
   node_status = (MANAGER_GRPC nodes, :read, Nodes::Id.new(id: node.id)).status
 end
-assert_equal(node_status, "reachable")
+assert_equal("reachable", node_status)
 
 puts "\n##################"
 puts "status of node is reachable"
@@ -90,7 +90,7 @@ while node_status != "unreachable" do
   sleep 5
   node_status = (MANAGER_GRPC nodes, :read, Nodes::Id.new(id: node.id)).status
 end
-assert_equal(node_status, "unreachable")
+assert_equal("unreachable", node_status)
 
 puts "\n##################"
 puts "status of node is unreachable"

@@ -213,7 +213,7 @@ func convertA2v2SummaryDocToLatest(src *ESInSpecSummaryA2v2) *ESInSpecSummary {
 		}
 		profileStatus := srcProfileSum.Status
 		if profileStatus == "" || profileStatus == "loaded" {
-			// needed because A1 data didn't have profile level status
+			// Needed because A1 data didn't have profile level status
 			// also overwriting the inspec report "loaded" state with actual profile run status
 			profileStatus = ReportComplianceStatus(&dstControlSums)
 		}

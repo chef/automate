@@ -360,17 +360,28 @@ func (s *Suite) indexExists(i string) bool {
 //  }
 // ```
 func (s *Suite) DeleteAllDocuments() {
+	var err error
 	// ES Query to match all documents
 	q := elastic.RawStringQuery("{\"match_all\":{}}")
 
-	_, err := s.elasticClient.DeleteByQuery("_all").
-		Query(q).
-		IgnoreUnavailable(true).
-		Refresh("true").
-		WaitForCompletion(true).
-		Do(context.Background())
+	maxNumberOfTries := 3
+	tries := 0
+	for ; tries < maxNumberOfTries; tries++ {
+		_, err = s.elasticClient.DeleteByQuery("_all").
+			Query(q).
+			IgnoreUnavailable(true).
+			Refresh("true").
+			WaitForCompletion(true).
+			Do(context.Background())
 
-	if err != nil {
+		if err != nil {
+			continue
+		}
+
+		break
+	}
+
+	if tries == maxNumberOfTries {
 		fmt.Printf("Could not 'clean' ES documents.\nError: %s", err)
 		os.Exit(3)
 	}

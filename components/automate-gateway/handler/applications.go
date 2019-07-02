@@ -89,6 +89,22 @@ func (a *Applications) GetServicesBySG(
 	return out, nil
 }
 
+func (a *Applications) GetServicesStats(
+	ctx context.Context,
+	in *applications.ServicesStatsReq) (*applications.ServicesStatsRes, error) {
+
+	inDomain := &applications.ServicesStatsReq{}
+	out := &applications.ServicesStatsRes{}
+	f := func() (proto.Message, error) {
+		return a.client.GetServicesStats(ctx, inDomain)
+	}
+	err := protobuf.CallDomainService(in, inDomain, f, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GetVersion fetches the version of team service
 func (a *Applications) GetVersion(ctx context.Context,
 	e *version.VersionInfoRequest) (*version.VersionInfo, error) {

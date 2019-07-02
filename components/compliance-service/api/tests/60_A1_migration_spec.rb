@@ -46,7 +46,15 @@ describe File.basename(__FILE__) do
               "skipped": {},
               "failed": {}
             }
-          }
+          },
+          "profiles": [
+            {
+              "name": "mylinux-success",
+              "version": "1.0.0",
+              "id": "d94022291cae7c87bb13d42bbd0dbc86b027c1e32fdc6790d2555d62deb8b6a9",
+              "status": "passed"
+            }
+          ]
         }
       ],
       "total": 1

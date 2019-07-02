@@ -28,6 +28,9 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServicesStats", "service_groups", "list", "GET", "/beta/applications/stats", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetVersion", "service_info:version", "read", "GET", "/beta/applications/version", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
