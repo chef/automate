@@ -90,7 +90,7 @@ func dataA1_elasticsearch_mappingsComplianceTemplateJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/a1_elasticsearch_mappings/compliance-template.json", size: 5111, mode: os.FileMode(420), modTime: time.Unix(1554914860, 0)}
+	info := bindataFileInfo{name: "data/a1_elasticsearch_mappings/compliance-template.json", size: 5111, mode: os.FileMode(420), modTime: time.Unix(1554910181, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -110,7 +110,7 @@ func dataA1_elasticsearch_mappingsInsightsTemplateJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/a1_elasticsearch_mappings/insights-template.json", size: 2705, mode: os.FileMode(420), modTime: time.Unix(1554914860, 0)}
+	info := bindataFileInfo{name: "data/a1_elasticsearch_mappings/insights-template.json", size: 2705, mode: os.FileMode(420), modTime: time.Unix(1554910181, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -130,7 +130,7 @@ func dataA1stub_certsChefautomateupgradefromv1selftestCrl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.crl", size: 958, mode: os.FileMode(420), modTime: time.Unix(1554914860, 0)}
+	info := bindataFileInfo{name: "data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.crl", size: 958, mode: os.FileMode(420), modTime: time.Unix(1554910181, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -150,7 +150,7 @@ func dataA1stub_certsChefautomateupgradefromv1selftestCrt() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.crt", size: 1826, mode: os.FileMode(420), modTime: time.Unix(1554914860, 0)}
+	info := bindataFileInfo{name: "data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.crt", size: 1826, mode: os.FileMode(420), modTime: time.Unix(1554910181, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -170,7 +170,7 @@ func dataA1stub_certsChefautomateupgradefromv1selftestKey() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.key", size: 3243, mode: os.FileMode(420), modTime: time.Unix(1554914860, 0)}
+	info := bindataFileInfo{name: "data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.key", size: 3243, mode: os.FileMode(420), modTime: time.Unix(1554910181, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -190,7 +190,7 @@ func dataBindsTxt() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/binds.txt", size: 4302, mode: os.FileMode(420), modTime: time.Unix(1561481643, 0)}
+	info := bindataFileInfo{name: "data/binds.txt", size: 4302, mode: os.FileMode(420), modTime: time.Unix(1562008921, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -210,7 +210,7 @@ func dataInitConfigToml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/init-config.toml", size: 1823, mode: os.FileMode(420), modTime: time.Unix(1554914860, 0)}
+	info := bindataFileInfo{name: "data/init-config.toml", size: 1823, mode: os.FileMode(420), modTime: time.Unix(1554910181, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
