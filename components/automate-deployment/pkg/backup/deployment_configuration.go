@@ -14,7 +14,7 @@ import (
 
 // LoadDeploymentConfig loads the automate configuration directly from
 // the bolt database contained in the given backup.
-func LoadDeploymentConfig(bucket Bucket, verifier ObjectVerifier) (*deployment.AutomateConfig, error) {
+func LoadDeploymentConfig(ctx context.Context, bucket Bucket, verifier ObjectVerifier) (*deployment.AutomateConfig, error) {
 	// This is a roundabout way for creating a random temporary file. ioutil.WriteFile lets
 	// us rewrite the file at that path with the right permissions
 	tmpfile, err := ioutil.TempFile("", "chef-automate-restore-bolt")
@@ -28,7 +28,7 @@ func LoadDeploymentConfig(bucket Bucket, verifier ObjectVerifier) (*deployment.A
 	// TODO(ssd) 2018-05-15: Gross, this hard-codes knowledge that
 	// was previously only in the spec.
 	dbStorageKey := path.Join("deployment-service", "bolt", "bolt.db")
-	reader, err := bucket.NewReader(context.TODO(), dbStorageKey, verifier)
+	reader, err := bucket.NewReader(ctx, dbStorageKey, verifier)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open deployment-service database from backup")
 	}

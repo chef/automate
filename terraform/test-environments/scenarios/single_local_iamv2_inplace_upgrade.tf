@@ -33,6 +33,8 @@ module "single_local_iamv2_inplace_upgrade" {
     X-Topology         = "single"
     X-Deployment-Type  = "local"
     X-Channel          = "${var.channel}"
+    X-SAML             = "saml"
+    X-CI-Test          = "e2e"
   }
 }
 
@@ -54,4 +56,5 @@ module "single_local_iamv2_inplace_upgrade_deploy" {
   deployment_type = "local"
   upgrade         = "true"
   iam_version     = "v2"
+  saml            = "true"
 }

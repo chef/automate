@@ -17,12 +17,12 @@ ha_backend_setup() {
     local peer_ring_file=$(service_config_path "ha_backend_peers")
     touch "$peer_ring_file"
 
-    docker_run $ha_backend_container1
+    docker_run $ha_backend_container1 "chefes/centos-systemd:latest"
     local ha_backend_container1_ip=$(container_ip $ha_backend_container1)
     log_info "Launched $ha_backend_container1 with ip ${ha_backend_container1_ip}"
     echo "$ha_backend_container1_ip" >> "$peer_ring_file"
 
-    docker_run $ha_backend_container2
+    docker_run "$ha_backend_container2" "chefes/centos-systemd:latest"
     local ha_backend_container2_ip=$(container_ip $ha_backend_container2)
     log_info "Launched $ha_backend_container2 with ip ${ha_backend_container2_ip}"
 

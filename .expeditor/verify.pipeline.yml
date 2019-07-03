@@ -2,7 +2,7 @@ expeditor:
   defaults:
     executor:
       docker:
-        image_sha256: abae6931d6eca75095f651daae2fa49c5243665614247d4a66929ee659f9ea93
+        image_sha256: bb7e88123c5ccea4c3e1c8818c0a74465ebd02fc872f43b2d346f04abfd482d5
         workdir: /go/src/github.com/chef/automate
 
 steps:
@@ -98,7 +98,11 @@ steps:
 
   - label: "[unit] OPA"
     command:
-      - hab studio run "source .studiorc && opa_static && opa_test"
+      - |
+        hab studio run "source .studiorc &&
+          install_if_missing core/opa opa &&
+          cd /src/components/authz-service/engine/opa/policy &&
+          make static unit"
     timeout_in_minutes: 10
     retry:
       automatic:

@@ -8,7 +8,11 @@ import * as moment from 'moment';
 import { ReportingOverviewComponent } from './reporting-overview.component';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { StatsService, ReportQueryService, ReportDataService } from '../../shared/reporting';
+import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
 
+class MockTelemetryService {
+  track() { }
+}
 describe('ReportingOverviewComponent', () => {
   let fixture: ComponentFixture<ReportingOverviewComponent>;
   let component: ReportingOverviewComponent;
@@ -26,6 +30,7 @@ describe('ReportingOverviewComponent', () => {
         ReportingOverviewComponent
       ],
       providers: [
+        { provide: TelemetryService, useClass: MockTelemetryService },
         ChefSessionService,
         StatsService,
         ReportQueryService,

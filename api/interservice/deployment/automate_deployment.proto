@@ -537,6 +537,8 @@ message BackupRestoreTask {
 	S3BackupLocation s3_backup_location = 9;
 
 	string sha256 = 10;
+
+	ReleaseManifest manifest = 11;
 }
 
 message BackupDeleteTask {

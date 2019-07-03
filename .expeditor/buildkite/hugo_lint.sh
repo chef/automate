@@ -13,6 +13,6 @@ else
   if [ "$LINT_STATUS" == 0 ]; then
     exit 1
   else
-    exit $LINT_STATUS
+    exit "$LINT_STATUS"
   fi
 fi

@@ -61,13 +61,21 @@ The following settings are supported:
   # If base_path is not set, backups will be stored at the root of the bucket.
   base_path = "<base path>"
 
-  [global.v1.backups.s3.credentials]
+[global.v1.backups.s3.credentials]
   # Optionally, AWS credentials may be provided. If these are not provided, IAM instance
   # credentials will be used. It's also possible for these to be read through the standard
   # AWS environment variables or through the shared AWS config files.
   access_key = "<access_key>"
   secret_key = "<secret_key>"
   session_key = "<session_key>"
+
+[global.v1.backups.s3.ssl]
+  # root_cert (optional): The root certificate used for SSL validation.
+  # For S3 compatible APIs, you can set the SSL root cert if needed
+  root_cert = """
+  -----BEGIN CERTIFICATE-----
+  ...
+  -----END CERTIFICATE-----
 ```
 
 #### S3 Permissions

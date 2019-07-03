@@ -9,6 +9,7 @@ import (
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
 	api "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
+	"github.com/chef/automate/components/config-mgmt-service/backend"
 	"github.com/chef/automate/components/config-mgmt-service/backend/elastic"
 	"github.com/chef/automate/components/config-mgmt-service/config"
 	"github.com/chef/automate/components/config-mgmt-service/grpcserver"
@@ -491,6 +492,125 @@ func TestNodeExportProjectFilters(t *testing.T) {
 			})
 
 			assert.ElementsMatch(t, test.expectedNodeNames, actualNodeNames)
+		})
+	}
+}
+
+func TestNodeExportLoopBug(t *testing.T) {
+	esClient := elastic.New(elasticsearchUrl)
+	c := config.New(esClient)
+	server := grpcserver.NewCfgMgmtServer(c)
+
+	lis := bufconn.Listen(1024 * 1024)
+	s := grpc.NewServer()
+	api.RegisterCfgMgmtServer(s, server)
+
+	go func() {
+		if err := s.Serve(lis); err != nil {
+			t.Fatalf("Server exited with error: %v", err)
+		}
+	}()
+
+	dialer := func(string, time.Duration) (net.Conn, error) { return lis.Dial() }
+
+	conn, err := grpc.DialContext(context.Background(), "bufnet", grpc.WithDialer(dialer), grpc.WithInsecure())
+	defer conn.Close()
+	require.NoError(t, err)
+
+	client := api.NewCfgMgmtClient(conn)
+
+	cases := []struct {
+		description string
+		node        iBackend.Node
+		sorting     *request.Sorting
+	}{
+		{
+			description: "node names with upper case character",
+			node: iBackend.Node{
+				NodeInfo: iBackend.NodeInfo{
+					NodeName: "Insights.A",
+				},
+			},
+			sorting: &request.Sorting{
+				Field: backend.Name,
+			},
+		},
+		{
+			description: "organization names with upper case character",
+			node: iBackend.Node{
+				NodeInfo: iBackend.NodeInfo{
+					OrganizationName: "Rangers",
+				},
+			},
+			sorting: &request.Sorting{
+				Field: backend.Organization,
+			},
+		},
+		{
+			description: "platform names with upper case character",
+			node: iBackend.Node{
+				NodeInfo: iBackend.NodeInfo{
+					Platform: "Ubuntu",
+				},
+			},
+			sorting: &request.Sorting{
+				Field: backend.Platform,
+			},
+		},
+		{
+			description: "environment names with upper case character",
+			node: iBackend.Node{
+				NodeInfo: iBackend.NodeInfo{
+					Environment: "Dev_Backend",
+				},
+			},
+			sorting: &request.Sorting{
+				Field: backend.Environment,
+			},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("multiple nodes with the same: %s", test.description), func(t *testing.T) {
+			numberOfNodes := 5
+			nodes := make([]iBackend.Node, numberOfNodes)
+			// Adding required node data
+			for index := range nodes {
+				nodes[index].Exists = true
+				nodes[index].NodeInfo = test.node.NodeInfo
+				nodes[index].NodeInfo.EntityUuid = newUUID()
+			}
+
+			// Add nodes with projects
+			suite.IngestNodes(nodes)
+			defer suite.DeleteAllDocuments()
+
+			response, err := client.NodeExport(context.Background(), &request.NodeExport{
+				OutputType: "json",
+				Sorting:    test.sorting,
+			})
+			assert.NoError(t, err)
+			require.NotNil(t, response)
+
+			data := make([]byte, 0)
+			for {
+				tdata, err := response.Recv()
+				if err != nil && err == io.EOF {
+					data = append(data, tdata.GetContent()...)
+					break
+				}
+
+				require.NoError(t, err)
+				data = append(data, tdata.GetContent()...)
+			}
+
+			actualNumberOfNodes := 0
+			jsonparser.ArrayEach(data, func(node []byte, _ jsonparser.ValueType, _ int, err error) {
+				require.NoError(t, err)
+				actualNumberOfNodes++
+			})
+
+			assert.Equal(t, numberOfNodes, actualNumberOfNodes)
 		})
 	}
 }

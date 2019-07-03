@@ -11,6 +11,7 @@ import (
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	api "github.com/chef/automate/api/interservice/event"
+	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/api/interservice/ingest"
 	automate_feed "github.com/chef/automate/components/compliance-service/api/automate-feed"
 	compliance_ingest "github.com/chef/automate/components/compliance-service/ingest/ingest"
@@ -129,7 +130,8 @@ func (svc Events) getClient(handlerType string) (EventHandlerClient, error) {
 	timeoutCtx, cancel := context.WithTimeout(ctx, clientTimeout)
 	defer cancel()
 
-	if handlerType == config.FEED_KEY {
+	switch handlerType {
+	case config.FEED_KEY:
 		conn, err := svc.connFactory.DialContext(timeoutCtx, "compliance-service", svc.cfg.HandlerEndpoints.Feed, grpc.WithBlock())
 		if err != nil {
 			logrus.Errorf("Event service could not get event handler client; error grpc dialing automate-feed's event handler %s", err.Error())
@@ -141,7 +143,7 @@ func (svc Events) getClient(handlerType string) (EventHandlerClient, error) {
 			return nil, errors.New("CallHandler could not obtain NewFeedServiceClient")
 		}
 		return feedClient, nil
-	} else if handlerType == config.CFG_KEY {
+	case config.CFG_KEY:
 		conn, err := svc.connFactory.DialContext(timeoutCtx, "ingest-service", svc.cfg.HandlerEndpoints.CfgIngest, grpc.WithBlock())
 		if err != nil {
 			logrus.Errorf("Event service could not get event handler client; error grpc dialing ingest-service's event handler %s", err.Error())
@@ -153,7 +155,7 @@ func (svc Events) getClient(handlerType string) (EventHandlerClient, error) {
 			return nil, errors.New("CallHandler could not obtain NewEventHandlerClient")
 		}
 		return ingestClient, nil
-	} else if handlerType == config.COMPLIANCE_INGEST_KEY {
+	case config.COMPLIANCE_INGEST_KEY:
 		conn, err := svc.connFactory.DialContext(timeoutCtx, "compliance-service", svc.cfg.HandlerEndpoints.Feed, grpc.WithBlock())
 		if err != nil {
 			logrus.Errorf("Event service could not get event handler client; error grpc dialing compliance ingest's event handler %s", err.Error())
@@ -165,7 +167,7 @@ func (svc Events) getClient(handlerType string) (EventHandlerClient, error) {
 			return nil, errors.New("CallHandler could not obtain NewComplianceIngesterClient")
 		}
 		return complianceIngesterClient, nil
-	} else if handlerType == config.AUTHZ {
+	case config.AUTHZ:
 		conn, err := svc.connFactory.DialContext(timeoutCtx, "authz-service", svc.cfg.HandlerEndpoints.Authz, grpc.WithBlock())
 		if err != nil {
 			logrus.Errorf("Event service could not get event handler client; error grpc dialing authz handler %s", err.Error())
@@ -177,7 +179,19 @@ func (svc Events) getClient(handlerType string) (EventHandlerClient, error) {
 			return nil, errors.New("CallHandler could not obtain NewProjectsClient")
 		}
 		return authzProjectsClient, nil
-	} else { // TODO: return appropriate error type
+	case config.EVENT_FEED:
+		conn, err := svc.connFactory.DialContext(timeoutCtx, "event-feed-service", svc.cfg.HandlerEndpoints.EventFeed, grpc.WithBlock())
+		if err != nil {
+			logrus.Errorf("Event service could not get event handler client; error grpc dialing authz handler %s", err.Error())
+			return nil, err
+		}
+		eventFeedClient := event_feed.NewEventFeedServiceClient(conn)
+		if eventFeedClient == nil {
+			logrus.Errorf("CallHandler could not obtain NewFeedServiceClient")
+			return nil, errors.New("CallHandler could not obtain NewFeedServiceClient")
+		}
+		return eventFeedClient, nil
+	default:
 		return nil, errors.New("can't find client event handler for unrecognized event handler type")
 	}
 }

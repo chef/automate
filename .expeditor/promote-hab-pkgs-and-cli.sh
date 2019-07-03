@@ -34,7 +34,7 @@ aws s3 cp "s3://chef-automate-artifacts/${EXPEDITOR_TARGET_CHANNEL}/latest/autom
 version=$(jq -r -c ".build" manifest.json)
 
 # Promote the artifacts in Habitat Depot
-jq -r -c ".packages[]" manifest.json | while read service_ident; do
+jq -r -c ".packages[]" manifest.json | while read -r service_ident; do
   pkg_origin=${service_ident%/*/*/*}
 
   if [ "$pkg_origin" = "core" ];

@@ -12,9 +12,7 @@ desired_inspec_version() {
 }
 
 install_inspec() {
-    hab pkg install core/ruby -b -f
-    hab pkg install core/gcc -b -f
-    gem install inspec --no-document --version $(desired_inspec_version)
+    hab pkg install chef/inspec/$(desired_inspec_version) -b -f
 }
 
 install_inspec

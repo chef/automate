@@ -8,7 +8,7 @@ import (
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 )
 
-// Rule defines a ingest rule for a project.
+// Rule defines an ingest rule for a project.
 type Rule struct {
 	ID         string      `json:"id"`
 	ProjectID  string      `json:"project_id"`

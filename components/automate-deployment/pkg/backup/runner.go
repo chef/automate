@@ -517,12 +517,7 @@ func (r *Runner) startRestoreOperations(ctx context.Context) {
 	)
 
 	// Build a slice of services that we wish to restore
-	backupManifest, err := LoadBackupManifest(restoreCtx.restoreBucket, r.restoreTask)
-	if err != nil {
-		r.failf(err, "Failed to load package manifest from backup")
-		return
-	}
-
+	backupManifest := r.lockedDeployment.CurrentReleaseManifest
 	bgwSvc, err := r.loadSvcFromManifest(backupManifest, "backup-gateway")
 	if err != nil {
 		r.failf(err, "Failed to locate backup-gateway in backup manifest")
@@ -556,29 +551,8 @@ func (r *Runner) startRestoreOperations(ctx context.Context) {
 		return
 	}
 
-	if err = r.restoreServices(desiredServices, restoreCtx, cancel); err != nil {
+	if err = r.restoreServices(ctx, desiredServices, restoreCtx, cancel); err != nil {
 		r.failf(err, "Failed to restore services")
-		return
-	}
-
-	m, ok := backupManifest.(*manifest.A2)
-	if !ok {
-		r.failf(errors.New("Unknown backup manifest type"), "Failed to persist manifest")
-		return
-	}
-
-	r.lockedDeployment.CurrentReleaseManifest = m
-	_, err = r.deploymentStore.UpdateDeployment(func(d *deployment.Deployment) error {
-		// TODO(jaym) This is not the right way to interact with deployment store. We should
-		//            modify the deployment it gives us with the updates we want and not
-		//            keep around a copy of it in memory. It turns out that doing that is
-		//            still too hard because there are objects that need to be initialized
-		//            one the deployment after deserialization.
-		*d = *r.lockedDeployment // nolint: govet
-		return nil
-	})
-	if err != nil {
-		r.failf(err, "Failed to persist deployment")
 		return
 	}
 
@@ -610,13 +584,13 @@ func (r *Runner) restoreAutomateCLI(ctx context.Context, manifest manifest.Relea
 	return nil
 }
 
-func (r *Runner) restoreServices(desiredServices []*deployment.Service, restoreCtx Context, cancel func()) error {
+func (r *Runner) restoreServices(ctx context.Context, desiredServices []*deployment.Service, restoreCtx Context, cancel func()) error {
 	channel := r.lockedDeployment.Config.GetDeployment().GetV1().GetSvc().GetChannel().GetValue()
 	var bucket Bucket
 
 	// Load the verifier from the remote bucket since the backup gateway won't be
 	// available yet by this point.
-	verifier, err := LoadMetadataVerifier(restoreCtx.restoreBucket, r.restoreTask.Sha256)
+	verifier, err := LoadMetadataVerifier(ctx, restoreCtx.restoreBucket, r.restoreTask.Sha256)
 	if err != nil {
 		r.failf(err, "Failed to load service metadata checksum information")
 		return err
@@ -668,6 +642,7 @@ func (r *Runner) restoreServices(desiredServices []*deployment.Service, restoreC
 
 		var spec Spec
 		metadata, err := LoadServiceMetadata(
+			ctx,
 			bucket,
 			svc.Name(),
 			verifier,

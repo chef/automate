@@ -3,9 +3,10 @@ package server
 import (
 	"context"
 
+	log "github.com/sirupsen/logrus"
+
 	dls "github.com/chef/automate/api/interservice/data_lifecycle"
 	es "github.com/chef/automate/api/interservice/es_sidecar"
-	log "github.com/sirupsen/logrus"
 )
 
 type DataLifecycleManageableServer struct {
@@ -57,7 +58,7 @@ func (server *DataLifecycleManageableServer) Purge(ctx context.Context, request 
 				"index_name": indexName,
 			}).WithError(err).Error("PurgeTimeSeries rpc call failed")
 
-			// Errors are transformed into a purge status code and a message. We dont return
+			// Errors are transformed into a purge status code and a message. We don't return
 			// a grpc error so that we can allow multiple components to have their own status
 			purgeResponse.ComponentStatus[indexName] = &dls.PurgeStatus{
 				Status: dls.PurgeStatus_FAILED,

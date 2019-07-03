@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 pushd ./components/chef-ui-library
   npm install

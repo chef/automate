@@ -3,6 +3,11 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of as observableOf } from 'rxjs';
 import { StatsService } from './stats.service';
 import { ReportDataService } from './report-data.service';
+import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('ReportDataService', () => {
   let service: ReportDataService;
@@ -12,7 +17,8 @@ describe('ReportDataService', () => {
     TestBed.configureTestingModule({
       providers: [
         StatsService,
-        ReportDataService
+        ReportDataService,
+        { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       imports: [
         HttpClientTestingModule

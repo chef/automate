@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/user"
@@ -685,7 +686,6 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 	// to STDOUT is the restore task ID after we've started the server side
 	// restore. In that case we need to silence all non-error output in the
 	// deployment restore.
-	// TODO: respect a context deadline in the deployment-service restore
 	dsRestore := client.NewDeploymentRestore(
 		client.WithDeploymentRestoreTask(rt),
 		client.WithDeploymentRestoreSkipPreflight(backupCmdFlags.skipPreflight),
@@ -696,6 +696,20 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 
 	if err := dsRestore.Restore(ctx); err != nil {
 		return status.Annotate(err, status.BackupError)
+	}
+
+	manifest, err := dsRestore.ResolvedManifest()
+	if err != nil {
+		return status.Annotate(err, status.BackupError)
+	}
+
+	jsManifest, err := json.Marshal(manifest)
+	if err != nil {
+		return status.Wrap(err, status.BackupError, "Failed to marshal package manifest to JSON")
+	}
+
+	rt.Manifest = &api.ReleaseManifest{
+		Json: jsManifest,
 	}
 
 	// Return the task ID if we don't want to follow restore updates

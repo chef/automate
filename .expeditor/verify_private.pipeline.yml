@@ -6,7 +6,7 @@ expeditor:
   defaults:
     executor:
       docker:
-        image_sha256: abae6931d6eca75095f651daae2fa49c5243665614247d4a66929ee659f9ea93
+        image_sha256: bb7e88123c5ccea4c3e1c8818c0a74465ebd02fc872f43b2d346f04abfd482d5
         workdir: /go/src/github.com/chef/automate
 
 steps:
@@ -558,6 +558,16 @@ steps:
     expeditor:
       executor:
         linux:
+          privileged: true
+
+  - label: "[integration] ha chef server"
+    command:
+      - integration/run_test integration/tests/ha_chef_server.sh
+    timeout_in_minutes: 35
+    expeditor:
+      executor:
+        linux:
+          single-use: true
           privileged: true
 
   - label: "[integration] workflow"

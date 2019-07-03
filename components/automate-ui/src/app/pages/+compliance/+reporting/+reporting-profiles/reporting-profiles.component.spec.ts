@@ -7,6 +7,11 @@ import { ReportingProfilesComponent } from './reporting-profiles.component';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { StatsService, ReportQueryService, ReportDataService } from '../../shared/reporting';
+import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
+
+class MockTelemetryService {
+  track() { }
+}
 
 describe('ReportingProfilesComponent', () => {
   let fixture: ComponentFixture<ReportingProfilesComponent>;
@@ -24,6 +29,7 @@ describe('ReportingProfilesComponent', () => {
         ReportingProfilesComponent
       ],
       providers: [
+        { provide: TelemetryService, useClass: MockTelemetryService },
         { provide: ChefSessionService, useClass: MockChefSessionService },
         StatsService,
         ReportQueryService,

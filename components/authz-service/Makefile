@@ -59,7 +59,7 @@ kill_docker_pg:
 HAVE_GO_BINDATA := $(shell command -v go-bindata 2> /dev/null)
 generate:
 ifndef HAVE_GO_BINDATA
-	@echo "requires 'go-bindata' (go get -u github.com/twitter/go-bindata/...)"
+	@echo "requires 'go-bindata' (go get -u github.com/kevinburke/go-bindata/go-bindata)"
 	@exit 1 # fail
 else
 	go generate ./...
