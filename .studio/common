@@ -365,7 +365,7 @@ function build_all_changed_components() {
 
   build_commands=""
   pushd /src >/dev/null;
-    for component in $(./scripts/changed_components)
+    for component in $(./scripts/changed_components.rb)
     do
       if [[ -n "$AUTOMATE_OSS_BUILD" ]] && [[ "$component" = "components/automate-chef-io" ]]; then
         log_line "$component has changed but AUTOMATE_OSS_BUILD is set."

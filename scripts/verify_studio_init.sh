@@ -12,7 +12,7 @@ SUP_LOG_FILE=/hab/sup/default/sup.log
 
 . .studiorc
 
-scripts/copy_hartifacts results
+scripts/copy_hartifacts.sh results
 
 copy_logs() {
     log_info "Copying supervisor log into results directory"

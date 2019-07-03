@@ -241,7 +241,7 @@ run `sl`.
 
 Some tests require access to build infrastructure and other secret
 data. Chef employees have access to this data via an internal instance
-of Vault. To get started, the `scripts/get_secrets` script will
+of Vault. To get started, the `scripts/get_secrets.sh` script will
 download the mostly commonly needed secrets:
 
 1. Connect to the Chef VPN.
@@ -249,11 +249,11 @@ download the mostly commonly needed secrets:
 2. Run the `get_secrets` script as below:
 
 ``` console
-CHEF_USERNAME=your-chef-ad-username scripts/get_secrets
+CHEF_USERNAME=your-chef-ad-username scripts/get_secrets.sh
 source dev/secrets-env.sh
 ```
 
-You should only need to run `scripts/get_secrets` when a new secret
+You should only need to run `scripts/get_secrets.sh` when a new secret
 has been added or an existing secret has been updated.  If you update
 a secret, let other developers know via Slack.
 
@@ -265,7 +265,7 @@ You can interact with vault directly using the `vault` command:
    this is to run the get_secrets script again:
 
 ``` console
-CHEF_USERNAME=your-chef-ad-username scripts/get_secrets
+CHEF_USERNAME=your-chef-ad-username scripts/get_secrets.sh
 ```
 
 3. Setup your environment to run `vault`:
