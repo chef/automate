@@ -12,7 +12,6 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
-	"github.com/chef/automate/components/authz-service/testhelpers"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
 
@@ -20,7 +19,7 @@ const applied = "applied"
 
 func TestCreateRule(t *testing.T) {
 	ctx := context.Background()
-	cl, store, _, _ := setupRules(t)
+	cl, _, store, _, _ := setupProjectsAndRules(t)
 
 	// it's cumbersome to set this up, so we re-use it in a few of the following
 	// cases
@@ -162,8 +161,7 @@ func TestCreateRule(t *testing.T) {
 
 func TestUpdateRule(t *testing.T) {
 	ctx := context.Background()
-	cl, store, _, _ := setupRules(t)
-
+	cl, _, store, _, _ := setupProjectsAndRules(t)
 	apiConditions := []*api.Condition{
 		{
 			Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGS,
@@ -422,8 +420,7 @@ func TestUpdateRule(t *testing.T) {
 
 func TestGetRule(t *testing.T) {
 	ctx := context.Background()
-	cl, store, _, _ := setupRules(t)
-
+	cl, _, store, _, _ := setupProjectsAndRules(t)
 	apiConditions := []*api.Condition{
 		{
 			Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGS,
@@ -491,8 +488,7 @@ func TestGetRule(t *testing.T) {
 
 func TestListRules(t *testing.T) {
 	ctx := context.Background()
-	cl, store, _, _ := setupRules(t)
-
+	cl, _, store, _, _ := setupProjectsAndRules(t)
 	apiConditions1 := []*api.Condition{
 		{
 			Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGS,
@@ -573,8 +569,7 @@ func TestListRules(t *testing.T) {
 
 func TestListRulesForProject(t *testing.T) {
 	ctx := context.Background()
-	cl, store, _, _ := setupRules(t)
-
+	cl, projects, rules, _, _ := setupProjectsAndRules(t)
 	storageConditions1 := []storage.Condition{
 		{
 			Attribute: storage.Organization,
@@ -615,26 +610,29 @@ func TestListRulesForProject(t *testing.T) {
 		desc string
 		f    func(*testing.T)
 	}{
-		{"if project does not exist, returns empty list", func(t *testing.T) {
+		{"if project does not exist, returns Not Found", func(t *testing.T) {
 			resp, err := cl.ListRulesForProject(ctx, &api.ListRulesForProjectReq{Id: "wrong"})
-			require.NoError(t, err)
-			assert.Equal(t, &api.ListRulesForProjectResp{}, resp)
+			grpctest.AssertCode(t, codes.NotFound, err)
+			assert.Nil(t, resp)
 		}},
 		{"if project does not have rules, returns empty list", func(t *testing.T) {
 			projectID := "test-project"
-			addProjectToStore(t, store, projectID, "my bar", storage.Custom)
+			addProjectToStore(t, projects, projectID, "my bar", storage.Custom)
 			resp, err := cl.ListRulesForProject(ctx, &api.ListRulesForProjectReq{Id: projectID})
 			require.NoError(t, err)
 			assert.Equal(t, &api.ListRulesForProjectResp{}, resp)
 		}},
 		{"if multiple rules exist, returns rules for specific project", func(t *testing.T) {
-			id1, id2, id3 := "rule-number-1", "rule-number-2", "rule-number-3"
 			projectID1 := "foo-project"
 			projectID2 := "foo-project-2"
+			addProjectToStore(t, projects, projectID1, "proj 1", storage.Custom)
+			addProjectToStore(t, projects, projectID2, "proj 2", storage.Custom)
+
+			id1, id2, id3 := "rule-number-1", "rule-number-2", "rule-number-3"
 			name := "you don't talk about fight club"
-			addRuleToStore(t, store, id1, name, storage.Node, projectID1, storageConditions1)
-			addRuleToStore(t, store, id2, name, storage.Event, projectID2, storageConditions2)
-			addRuleToStore(t, store, id3, name, storage.Event, projectID2, storageConditions3)
+			addRuleToStore(t, rules, id1, name, storage.Node, projectID1, storageConditions1)
+			addRuleToStore(t, rules, id2, name, storage.Event, projectID2, storageConditions2)
+			addRuleToStore(t, rules, id3, name, storage.Event, projectID2, storageConditions3)
 			expected2 := api.ProjectRule{
 				Id:         id2,
 				Name:       name,
@@ -665,14 +663,14 @@ func TestListRulesForProject(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.desc, test.f)
-		store.Flush()
+		projects.Flush()
+		rules.Flush()
 	}
 }
 
 func TestDeleteRule(t *testing.T) {
 	ctx := context.Background()
-	cl, store, _, _ := setupRules(t)
-
+	cl, _, store, _, _ := setupProjectsAndRules(t)
 	storageConditions1 := []storage.Condition{
 		{
 			Attribute: storage.Organization,
@@ -747,9 +745,4 @@ func addRuleToStore(t *testing.T, store *cache.Cache, id, name string, ruleType 
 		Status:     applied,
 	}
 	store.Add(id, rule, 0)
-}
-
-func setupRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *testhelpers.MockEventServiceClient, int64) {
-	cl, _, ca, mc, s := setupProjectsAndRules(t)
-	return cl, ca, mc, s
 }
