@@ -101,10 +101,14 @@ type service struct {
 	SupID               int32     `db:"sup_id"`
 	Channel             string    `db:"channel"`
 	FullPkgIdent        string    `db:"package_ident"`
-	LastEventOccurredAt time.Time `db:"last_event_occurred_at"`
 	PreviousHealth      string    `db:"previous_health"`
+	LastEventOccurredAt time.Time `db:"last_event_occurred_at"`
+	HealthUpdatedAt     time.Time `db:"health_updated_at"`
 	CreatedAt           time.Time `db:"-"`
 	UpdatedAt           time.Time `db:"-"`
+
+	// (internal) use it to know if the service needs an update or not
+	needUpdate bool `db:"-"`
 }
 
 // supervisor struct is the representation of the supervisor table inside the db

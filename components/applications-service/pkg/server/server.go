@@ -13,6 +13,7 @@ import (
 	"github.com/chef/automate/components/applications-service/pkg/params"
 	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/chef/automate/lib/grpc/health"
+	"github.com/chef/automate/lib/timef"
 	"github.com/chef/automate/lib/version"
 
 	"google.golang.org/grpc/codes"
@@ -272,6 +273,7 @@ func convertStorageServicesToApplicationsServices(svcs []*storage.Service) []*ap
 			Channel:             svc.Channel,
 			Site:                svc.Site,
 			PreviousHealthCheck: convertHealthStatusToProto(svc.PreviousHealth),
+			CurrentHealthSince:  timef.IntervalUntilNow(svc.HealthUpdatedAt),
 		}
 	}
 	return services
