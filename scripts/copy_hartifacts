@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 #
 # copy_hartifacts: move Habitat harts and keys into /hab/cache
 #
