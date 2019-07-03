@@ -1,3 +1,11 @@
+#!/usr/bin/env bash
+#
+# copy_hartifacts: move Habitat harts and keys into /hab/cache
+#
+# Usage:
+#
+#  copy_hartifacts "results/"
+#
 src="$1"
 pkg_dst="/hab/cache/artifacts"
 key_dst="/hab/cache/keys"
