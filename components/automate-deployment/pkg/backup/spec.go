@@ -171,6 +171,16 @@ func DefaultSpecs(serviceNames []string) []Spec {
 			},
 		},
 		{
+			Name:          "event-feed-service",
+			WriteMetadata: true,
+			SyncEsIndices: []ElasticsearchOperation{
+				{
+					ServiceName:    "event-feed-service",
+					MultiIndexSpec: "eventfeed-*",
+				},
+			},
+		},
+		{
 			Name:          "compliance-service",
 			WriteMetadata: true,
 			// The compliance service no longer writes
