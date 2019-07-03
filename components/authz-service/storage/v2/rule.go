@@ -72,12 +72,21 @@ func validateRuleInputs(id string,
 	}
 
 	for _, condition := range conditions {
-		if ruleType == Event {
-			if condition.Attribute != Organization && condition.Attribute != ChefServer {
-				return errors.New("rules of type Event only accept Conditions with attributes Organization or ChefServer")
-			}
+		if err := attributeAllowed(ruleType, condition.Attribute); err != nil {
+			return err
 		}
 	}
 
+	return nil
+}
+
+func attributeAllowed(ruleType RuleType, attr ConditionAttribute) error {
+	if ruleType == Event {
+		if attr != Organization && attr != ChefServer {
+			return errors.New("rules of type Event only accept Conditions with attributes Organization or ChefServer")
+		}
+	}
+
+	// all attributes allowed for Node type
 	return nil
 }
