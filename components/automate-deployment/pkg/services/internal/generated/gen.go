@@ -281,6 +281,7 @@ var ProductMetadataJSON = `
         "chef/authz-service",
         "chef/authn-service",
         "chef/automate-dex",
+        "chef/teams-service",
         "chef/local-user-service",
         "chef/session-service"
       ],
@@ -301,8 +302,6 @@ var ProductMetadataJSON = `
         "chef/automate-ui",
         "chef/event-service",
         "chef/event-feed-service",
-        "chef/teams-service",
-        "chef/authn-service",
         "chef/secrets-service",
         "chef/applications-service",
         "chef/notifications-service",
