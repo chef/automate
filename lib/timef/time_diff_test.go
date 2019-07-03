@@ -20,7 +20,129 @@ func TestIntervalUntilNow(t *testing.T) {
 	assert.Equal(t, "1 second", diff)
 }
 
-func TestDiffPrettyMatrix(t *testing.T) {
+func TestDiffPrettyNUnitsFewFieldsMatrix(t *testing.T) {
+	timeA := time.Date(2017, 6, 21, 0, 0, 0, 0, time.UTC)
+	timeB := time.Date(2028, 6, 21, 1, 30, 2, 1, time.UTC)
+	//expected: "11 years, 1 month, 20 days, 1 hour, 30 minutes, 2 seconds",
+	cases := []struct {
+		message  string
+		units    int
+		expected string
+	}{
+		{
+			message:  "all time units",
+			units:    6,
+			expected: "11 years, 1 hour, 30 minutes, 2 seconds",
+		},
+		{
+			message:  "all time units",
+			units:    5,
+			expected: "11 years, 1 hour, 30 minutes, 2 seconds",
+		},
+		{
+			message:  "all time units",
+			units:    4,
+			expected: "11 years, 1 hour, 30 minutes, 2 seconds",
+		},
+		{
+			message:  "all time units",
+			units:    3,
+			expected: "11 years, 1 hour, 30 minutes",
+		},
+		{
+			message:  "all time units",
+			units:    2,
+			expected: "11 years, 1 hour",
+		},
+		{
+			message:  "all time units",
+			units:    1,
+			expected: "11 years",
+		},
+		{
+			message:  "negative value should return at least one field",
+			units:    -1,
+			expected: "11 years",
+		},
+		{
+			message:  "zero should return at least one field",
+			units:    0,
+			expected: "11 years",
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(test.message, func(t *testing.T) {
+			actual := timef.DiffPrettyNUnits(timeA, timeB, test.units)
+			assert.Equal(t, test.expected, actual)
+		})
+	}
+}
+
+func TestDiffPrettyNUnitsAllFieldsMatrix(t *testing.T) {
+	timeA := time.Date(2017, 5, 1, 0, 0, 0, 0, time.UTC)
+	timeB := time.Date(2018, 6, 2, 1, 1, 1, 1, time.UTC)
+	cases := []struct {
+		message  string
+		units    int
+		expected string
+	}{
+		{
+			message:  "all time units",
+			units:    6,
+			expected: "1 year, 1 month, 1 day, 1 hour, 1 minute, 1 second",
+		},
+		{
+			message:  "all time units",
+			units:    5,
+			expected: "1 year, 1 month, 1 day, 1 hour, 1 minute",
+		},
+		{
+			message:  "all time units",
+			units:    4,
+			expected: "1 year, 1 month, 1 day, 1 hour",
+		},
+		{
+			message:  "all time units",
+			units:    3,
+			expected: "1 year, 1 month, 1 day",
+		},
+		{
+			message:  "all time units",
+			units:    2,
+			expected: "1 year, 1 month",
+		},
+		{
+			message:  "all time units",
+			units:    1,
+			expected: "1 year",
+		},
+		{
+			message:  "negative value should return at least one field",
+			units:    -1,
+			expected: "1 year",
+		},
+		{
+			message:  "zero should return at least one field",
+			units:    0,
+			expected: "1 year",
+		},
+		{
+			message:  "more than the max number of time units should return them all six",
+			units:    7,
+			expected: "1 year, 1 month, 1 day, 1 hour, 1 minute, 1 second",
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(test.message, func(t *testing.T) {
+			actual := timef.DiffPrettyNUnits(timeA, timeB, test.units)
+			assert.Equal(t, test.expected, actual)
+		})
+	}
+}
+
+func TestDiffPrettyAllUnitsMatrix(t *testing.T) {
 	cases := []struct {
 		message  string
 		timeA    time.Time
@@ -139,7 +261,7 @@ func TestDiffPrettyMatrix(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.message, func(t *testing.T) {
-			actual := timef.DiffPretty(test.timeA, test.timeB)
+			actual := timef.DiffPrettyAllUnits(test.timeA, test.timeB)
 			assert.Equal(t, test.expected, actual)
 		})
 	}
