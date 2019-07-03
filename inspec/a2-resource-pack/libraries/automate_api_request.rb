@@ -88,31 +88,20 @@ class AutomateApiRequest < Inspec.resource(1)
     @@id_token ||= begin
       # init auth process
       resp = request("/dex/auth?client_id=automate-api&scope=openid+profile+email+offline_access+groups+federated:id&response_type=code+id_token&state=inspec&nonce=yeahnotreally&redirect_uri=urn:ietf:wg:oauth:2.0:oob")
-      req = nil
-      if loc = resp.headers.location
-        # one connector only (local) => we're being redirected
-        req = loc.match(%r'\?req=([^"]+)')[1]
-      else
-        # pick form URL with request ID from connector selection
-        m = resp.body.match(%r'"(/dex/auth/local)\?req=([^"]+)"')
-        loc = m[1]
-        req = m[2]
-        # Note: This happens to be the same URL: GET gives you the input boxes,
-        #       POST sends the form. So, we don't bother GETing the boxes first.
-      end
-      # fill form
-      #
-      # TODO 2019-03-13: I don't really understand how this works in
-      # the redirect case.  I suspect it doesn't but that in the
-      # places we are seeing the redirect, we have some version of
-      # inspec where the URL parsing is different.  But I am currently
-      # completely over this test suite.
-      params = { login: user,
-                 password: pass }
-      params[:req] = req if req
+      req = if loc = resp.headers.location
+              # one connector only (local) => we're being redirected
+              loc.match(%r'\?req=(.+)$')[1]
+            else
+              # pick form URL with request ID from connector selection
+              resp.body.match(%r'"/dex/auth/local\?req=([^"]+)"')[1]
+            end
+      # fill form, send req along
+      params = { login: user, password: pass, req: req }
 
-      resp = request(loc, method: 'POST', params: params)
-      # approval redirect
+      # Note: This happens to be the same URL: GET gives you the input boxes,
+      #       POST sends the form. So, we don't bother GETing the boxes first.
+      resp = request('/dex/auth/local', method: 'POST', params: params)
+      # approval redirect, follow
       if resp.status != 303
         raise "AUTHN FAILED: {login: #{user}, pass: #{pass}}"
       end
