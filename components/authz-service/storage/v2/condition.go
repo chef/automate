@@ -13,7 +13,6 @@ type Condition struct {
 	Value     []string           `json:"value"`
 	Attribute ConditionAttribute `json:"attribute"`
 	Operator  ConditionOperator  `json:"operator"`
-	Type      RuleType           `json:"type"`
 }
 
 // Scan implements pq Scan interface for a Condition reference
@@ -31,10 +30,10 @@ func (p *Condition) Scan(src interface{}) error {
 
 // NewCondition is a factory for creating a Condition storage object that also does
 // validation around what a valid condition is in terms of our storage layer.
-func NewCondition(ruleType RuleType, value []string,
+func NewCondition(value []string,
 	attribute ConditionAttribute, operator ConditionOperator) (Condition, error) {
 
-	err := validateConditionInputs(value, attribute, ruleType, operator)
+	err := validateConditionInputs(value, attribute, operator)
 	if err != nil {
 		return Condition{}, err
 	}
@@ -43,12 +42,11 @@ func NewCondition(ruleType RuleType, value []string,
 		Value:     value,
 		Attribute: attribute,
 		Operator:  operator,
-		Type:      ruleType,
 	}, nil
 }
 
 func validateConditionInputs(value []string,
-	attribute ConditionAttribute, ruleType RuleType, operator ConditionOperator) error {
+	attribute ConditionAttribute, operator ConditionOperator) error {
 
 	if len(value) == 0 {
 		return errors.New("a condition must specify one or more values")
@@ -57,12 +55,6 @@ func validateConditionInputs(value []string,
 	if operator == Equals {
 		if len(value) != 1 {
 			return errors.New("a condition must specify exactly one value for 'equals' operator")
-		}
-	}
-
-	if ruleType == Event {
-		if attribute != Organization && attribute != ChefServer {
-			return errors.New("rules of type Event only accept Conditions with attributes Organization or ChefServer")
 		}
 	}
 

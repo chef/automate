@@ -877,10 +877,10 @@ EOF
   describe "v2beta project rules API" do
     context "when the project does not exist" do
       describe "GET /iam/v2beta/projects/:id/rules" do
-        it "returns an empty list" do
+        it "returns Not Found" do
           resp = automate_api_request("/apis/iam/v2beta/projects/project-not-found/rules")
-          expect(resp.http_status).to eq 200
-          expect(resp.parsed_response_body[:rules]).to eq([])
+          expect(resp.http_status).to eq 404
+          expect(resp.parsed_response_body[:rules]).to eq(nil)
         end
       end
 
