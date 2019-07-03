@@ -140,7 +140,7 @@ execute 'create migration test users' do
   not_if 'delivery-ctl list-users test | grep bob'
 end
 
-execute 'chef-server-ctl reconfigure' do
+execute 'chef-server-ctl reconfigure --chef-license=accept-no-persist' do
   live_stream true
 end
 
