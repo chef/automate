@@ -23,7 +23,7 @@ require 'fileutils'
     channel: product['channel'].to_sym,
     product_name: product['product_name'],
     platform: 'ubuntu',
-    platform_version: '14.04',
+    platform_version: '16.04',
     architecture: 'x86_64',
   }
   options['product_version'] = product['version'] if product['version']
