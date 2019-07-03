@@ -235,5 +235,8 @@ function cleanup() {
     umount /
 }
 
+# this is for testing -- see if anything explodes with the latest shellcheck package
+hab pkg install core/shellcheck -b -f
+
 # When exiting the studio save the bash history to a file
 trap cleanup EXIT
