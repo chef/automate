@@ -161,7 +161,7 @@ tools:
 HAVE_GO_BINDATA := $(shell command -v go-bindata 2> /dev/null)
 gobindata:
 ifndef HAVE_GO_BINDATA
-	go get -u github.com/twitter/go-bindata/...
+	go get -u github.com/kevinburke/go-bindata/go-bindata
 endif
 
 generate: do_generate fmt
