@@ -36,21 +36,7 @@ CREATE FUNCTION member_db_id (_id UUID)
         id = _id;
 $$
 LANGUAGE SQL;
-CREATE OR REPLACE FUNCTION projects_match (_projects TEXT[], _projects_filter TEXT[])
-    RETURNS BOOLEAN
-    AS $$
-BEGIN
-    RETURN (
-        -- no projects filter requested (length 0) will be the case for v2.0 or v2.1 ["*"]
-        array_length(_projects_filter, 1) IS NULL
-        -- projects filter intersects with projects for row
-        OR _projects && _projects_filter
-        -- projects for row is an empty array, check if (unassigned) in project filter
-        OR (array_length(_projects, 1) IS NULL
-            AND '{(unassigned)}' && _projects_filter));
-END
-$$
-LANGUAGE PLPGSQL;
+
 CREATE OR REPLACE FUNCTION query_policy (_policy_id TEXT, _projects_filter TEXT[])
     RETURNS json
     AS $$
