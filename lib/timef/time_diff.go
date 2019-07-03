@@ -37,8 +37,8 @@ func DiffPrettyNUnits(a, b time.Time, numberOfUnits int) string {
 	var (
 		pretty       = ""
 		separator    = ", "
-		applied      = false
 		unitCounter  = 0
+		applied      bool
 		addSeparator = func(str string) string {
 			if str != "" {
 				return str + separator
