@@ -33,7 +33,7 @@ automate-ctl reconfigure --chef-license=accept-no-persist
 # reconfigure doesn't start statistics service tho?
 automate-ctl start
 
-chef-server-ctl reconfigure
+chef-server-ctl reconfigure --chef-license=accept-no-persist
 chef-server-ctl start
 
 function wait_for_healthy_status() {
