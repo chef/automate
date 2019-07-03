@@ -22,7 +22,7 @@ pkg_deps=(
   core/postgresql
   core/sqitch_pg
   core/tzdata
-  core/jq-static
+  core/jq-static/1.6 # TODO(sr): drop version when erroneous jq-static/1.10 is gone
   chef/mlsa
 
   # NOTE(ssd) 2019-04-03: Any in-repo dependencies added here MUST be

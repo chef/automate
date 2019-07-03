@@ -8,7 +8,7 @@ pkg_upstream_url="http://github.com/chef/automate/components/compliance-service"
 pkg_build_deps=(
   core/curl
   core/gcc
-  core/jq-static
+  core/jq-static/1.6 # TODO(sr): drop version when erroneous jq-static/1.10 is gone
   core/tar
 )
 pkg_bin_dirs=(bin)
@@ -35,8 +35,9 @@ inspec_release="chef/inspec/3.9.0/20190401200826"
 pkg_deps=(
   core/bash
   core/glibc
-  core/grpcurl              # Used in habitat/hooks/health_check
-  core/jq-static            # Used in habitat/hooks/health_check
+  core/grpcurl       # Used in habitat/hooks/health_check
+  # TODO(sr): drop version when erroneous jq-static/1.10 is gone
+  core/jq-static/1.6 # Used in habitat/hooks/health_check
   ${local_platform_tools_origin:-chef}/automate-platform-tools
   # WARNING: Update with care. The chef/inspec is managed with Expeditor.
 

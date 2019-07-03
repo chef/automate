@@ -10,7 +10,7 @@ pkg_version="0.0.1"
 pkg_deps=(
     core/bash
     core/netcat-openbsd
-    core/jq-static
+    core/jq-static/1.6 # TODO(sr): drop version when erroneous jq-static/1.10 is gone
     core/haproxy
 )
 

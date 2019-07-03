@@ -9,7 +9,7 @@ pkg_deps=(
   core/cacerts # communicate with license service over HTTPS
   core/curl
   core/glibc
-  core/jq-static
+  core/jq-static/1.6 # TODO(sr): drop version when erroneous jq-static/1.10 is gone
   chef/mlsa
 )
 pkg_build_deps=(

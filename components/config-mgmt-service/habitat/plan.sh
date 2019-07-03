@@ -8,7 +8,7 @@ pkg_version="0.1.0"
 pkg_deps=(
   core/glibc
   core/grpcurl
-  core/jq-static
+  core/jq-static/1.6 # TODO(sr): drop version when erroneous jq-static/1.10 is gone
   chef/mlsa
 )
 pkg_build_deps=(

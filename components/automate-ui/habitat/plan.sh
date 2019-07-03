@@ -9,7 +9,7 @@ pkg_deps=(
   core/coreutils
   chef/mlsa
   core/nginx
-  core/jq-static
+  core/jq-static/1.6 # TODO(sr): drop version when erroneous jq-static/1.10 is gone
 )
 pkg_build_deps=(
   core/git

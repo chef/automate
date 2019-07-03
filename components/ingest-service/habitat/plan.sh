@@ -21,7 +21,7 @@ pkg_exposes=(port)
 pkg_deps=(
   core/glibc
   core/grpcurl
-  core/jq-static
+  core/jq-static/1.6 # TODO(sr): drop version when erroneous jq-static/1.10 is gone
   chef/mlsa
 )
 pkg_build_deps=(
