@@ -41,11 +41,6 @@ $(SWAGGER_RESULT_FILE): $(SWAGGER_FILES)
 generate_swagger: $(SWAGGER_RESULT_FILE)
 	swagger mixin -c=$(EXPECTED_CONFLICTS) $(SWAGGER_FILES) > $(SWAGGER_RESULT_FILE) 2> /dev/null
 
-$(SWAGGER_RESULT_FILE).ruby: $(SWAGGER_FILES)
-
-generate_swagger_ruby: $(SWAGGER_RESULT_FILE).ruby
-	DEBUG=true ruby scripts/generate_all_swagger.rb $(SWAGGER_FILES) > $(SWAGGER_RESULT_FILE).ruby
-
 serve: sync generate_swagger
 	hugo server --buildDrafts --noHTTPCache
 
