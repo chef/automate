@@ -484,7 +484,7 @@ test: generate-ruby-grpc wait-for-compliance-service
 test-prep: $(MARKET_PATH) $(PROFILES_PATH) start-es-pg start-ssh-node download-sample-market-profiles install-inspec
 
 install-inspec:
-	@gem list -i inspec --version $(shell cat ../../INSPEC_VERSION) || gem install inspec --no-document --version $(shell cat ../../INSPEC_VERSION)
+	@inspec --version | grep -q $(shell cat ../../INSPEC_VERSION) || gem install inspec --no-document --version $(shell cat ../../INSPEC_VERSION)
 
 test-examples:
 	@printf "===> REQUIRES RUNNING SERVICE\n"
