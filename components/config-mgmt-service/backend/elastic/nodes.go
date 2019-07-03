@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/olivere/elastic"
@@ -124,11 +125,16 @@ func (es Backend) GetNodesPageByCurser(ctx context.Context, start time.Time,
 		Sort(NodeFieldID, ascending)
 
 	if cursorField != nil && cursorID != "" {
-		cursorDate, ok := cursorField.(time.Time)
-		if ok {
-			milliseconds := cursorDate.UnixNano() / int64(time.Millisecond)
-			searchService = searchService.SearchAfter(milliseconds, cursorID) // the date has to be in milliseconds
-		} else {
+		switch v := cursorField.(type) {
+		case time.Time:
+			// the date has to be in milliseconds
+			milliseconds := v.UnixNano() / int64(time.Millisecond)
+			searchService = searchService.SearchAfter(milliseconds, cursorID)
+		case string:
+			// strings have to be lowercase
+			lower := strings.ToLower(v)
+			searchService = searchService.SearchAfter(lower, cursorID)
+		default:
 			searchService = searchService.SearchAfter(cursorField, cursorID)
 		}
 	}

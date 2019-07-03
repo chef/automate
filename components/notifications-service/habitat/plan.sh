@@ -16,7 +16,12 @@ pkg_deps=(
 pkg_build_deps=(
   core/git
   core/erlang
-  core/elixir
+  # NOTE(ssd) 2019-07-03: PIN PIN PIN
+  #
+  # elixir 1.9.0 shipped with a number of changes to how releases
+  # work. This appears to have broken the build. Pinning until we can
+  # sort out the required changes.
+  core/elixir/1.8.0
   core/glibc
 )
 pkg_binds=(
@@ -78,7 +83,7 @@ do_build() {
 
   # Distillery seems to be chmoding stuff and not respecting our umask
   # Here's the bit of code in distillery that's causing problems:
-  # https://github.com/bitwalker/distillery/blob/b695cfb3899ef1181d4af43fe9db54a851516277/lib/mix/lib/releases/assembler.ex#L249-L260 
+  # https://github.com/bitwalker/distillery/blob/b695cfb3899ef1181d4af43fe9db54a851516277/lib/mix/lib/releases/assembler.ex#L249-L260
   find "${TARGET}" -xdev -perm -0002 -type f -print 2>/dev/null | xargs -I '{}' chmod go-w '{}'
 
   fix_interpreter "${TARGET}/releases/*/*.sh" core/coreutils bin/env

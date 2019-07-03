@@ -30,6 +30,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/a1upgrade"
 	"github.com/chef/automate/components/automate-deployment/pkg/bootstrap"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"
+	"github.com/chef/automate/components/automate-deployment/pkg/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/preflight"
 	"github.com/chef/automate/components/automate-deployment/pkg/target"
@@ -1541,6 +1542,12 @@ type initialCreds struct {
 
 func (d *deployer) saveDeploymentCreds() {
 	if d.err != nil {
+		return
+	}
+
+	// We don't need to write out any credentials if automate is not deployed.
+	// As an example, if we've deployed only chef-server
+	if !deployment.ContainsAutomateCollection(d.mergedCfg.GetDeployment()) {
 		return
 	}
 

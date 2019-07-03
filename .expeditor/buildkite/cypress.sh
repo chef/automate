@@ -4,8 +4,8 @@ set -euo pipefail
 
 cd /workdir/e2e
 
-data=$(curl --silent https://a2-${CHANNEL}.cd.chef.co/assets/data.json)
-instances_to_test=$(jq -nr --argjson data "$data" '$data[] | select(.tags[] | contains ("e2e")) | .fqdn')
+data=$(curl --silent "https://a2-${CHANNEL}.cd.chef.co/assets/data.json")
+instances_to_test=$(jq -nr --argjson data "$data" '$data[] | select(.tags | any(. == "e2e")) | .fqdn')
 
 for instance in ${instances_to_test[*]}
 do

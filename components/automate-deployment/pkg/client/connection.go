@@ -96,6 +96,8 @@ func NewDSClient(c *grpc.ClientConn) *DSClient {
 
 // Connection creates (if necessary) a gRPC connection to the
 // deployment service, saves it, and returns it.
+// TODO: Make this function accept and respect a context with a deadline instead
+// of taking a time.Duration.
 func Connection(connectTimeout time.Duration, opts ...ConnOpt) (*DSClient, error) {
 	var connection *grpc.ClientConn
 

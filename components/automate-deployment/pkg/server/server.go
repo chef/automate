@@ -1794,8 +1794,9 @@ func (s *server) Upgrade(ctx context.Context, req *api.UpgradeRequest) (*api.Upg
 		m, err = s.releaseManifestProvider.RefreshManifest(ctx, channel)
 	}
 
-	if err == manifest.NoSuchManifest {
-		return nil, status.Errorf(codes.NotFound, "No manifest for the specified version or channel could be found")
+	_, ok := err.(*manifest.ErrNoSuchManifest)
+	if ok {
+		return nil, status.Errorf(codes.NotFound, errors.Wrap(err, "No manifest for the specified version or channel could be found").Error())
 	}
 	if err != nil {
 		return nil, err

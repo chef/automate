@@ -18,8 +18,8 @@ HAB_VERSION=$HAB_SUP_VERSION
 HAB_RELEASE=$(curl "https://bldr.habitat.sh/v1/depot/channels/core/stable/pkgs/hab/$HAB_VERSION/latest" | jq -r .ident.release)
 
 HAB_LAUNCH_IDENT_JSON=$(curl "https://bldr.habitat.sh/v1/depot/channels/core/stable/pkgs/hab-launcher/latest" | jq -r .ident)
-HAB_LAUNCH_VERSION=$(echo $HAB_LAUNCH_IDENT_JSON | jq -r .version)
-HAB_LAUNCH_RELEASE=$(echo $HAB_LAUNCH_IDENT_JSON | jq -r .release)
+HAB_LAUNCH_VERSION=$(echo "$HAB_LAUNCH_IDENT_JSON" | jq -r .version)
+HAB_LAUNCH_RELEASE=$(echo "$HAB_LAUNCH_IDENT_JSON" | jq -r .release)
 
 sed -i -r "s|\"hab\".*\"version\" =>.*|\"hab\"          => { \"origin\" => \"core\", \"name\" => \"hab\",          \"version\" => \"$HAB_VERSION\", \"release\" => \"$HAB_RELEASE\"},|" .expeditor/create-manifest.rb
 sed -i -r "s|\"hab-sup\".*\"version\" =>.*|\"hab-sup\"      => { \"origin\" => \"core\", \"name\" => \"hab-sup\",      \"version\" => \"$HAB_SUP_VERSION\", \"release\" => \"$HAB_SUP_RELEASE\"},|" .expeditor/create-manifest.rb

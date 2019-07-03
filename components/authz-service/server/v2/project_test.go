@@ -457,8 +457,10 @@ func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cac
 	err = os.Remove(configFile)
 	configMgr, err := config.NewManager(configFile)
 	require.NoError(t, err)
-	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2, &testhelpers.TestProjectRulesRetriever{},
-		eventServiceClient, configMgr, testhelpers.NewMockPolicyRefresher())
+	projectUpdateManager := v2.NewProjectUpdateManager(eventServiceClient, configMgr)
+	projectsSrv, err := v2.NewProjectsServer(
+		ctx, l, mem_v2, &testhelpers.TestProjectRulesRetriever{},
+		projectUpdateManager, testhelpers.NewMockPolicyRefresher())
 	require.NoError(t, err)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")

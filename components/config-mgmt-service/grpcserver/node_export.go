@@ -71,8 +71,14 @@ func (s *CfgMgmtServer) NodeExport(request *pRequest.NodeExport, stream service.
 	if err != nil {
 		return err
 	}
-
-	return s.exportNodes(stream.Context(), request, exporter)
+	streamCtx := stream.Context()
+	deadline, ok := streamCtx.Deadline()
+	if !ok {
+		deadline = time.Now().Add(time.Minute)
+	}
+	ctx, cancel := context.WithDeadline(streamCtx, deadline)
+	defer cancel()
+	return s.exportNodes(ctx, request, exporter)
 }
 
 func getExportHandler(outputType string, stream service.CfgMgmt_NodeExportServer) (exportHandler, error) {

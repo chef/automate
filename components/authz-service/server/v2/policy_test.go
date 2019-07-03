@@ -21,7 +21,6 @@ import (
 	uuid "github.com/chef/automate/lib/uuid4"
 
 	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
-	"github.com/chef/automate/components/authz-service/config"
 	constants_v1 "github.com/chef/automate/components/authz-service/constants/v1"
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
@@ -2981,11 +2980,9 @@ func setupV2WithMigrationState(t *testing.T,
 	polV2, _, err := v2.NewPoliciesServer(ctx, l, mem_v2, writer, pl, vChan)
 	require.NoError(t, err)
 
-	eventServiceClient := &testhelpers.MockEventServiceClient{}
-	configMgr, err := config.NewManager("/tmp/.authz-delete-me")
 	require.NoError(t, err)
 	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2,
-		rulesRetriever, eventServiceClient, configMgr, testhelpers.NewMockPolicyRefresher())
+		rulesRetriever, testhelpers.NewMockProjectUpdateManager(), testhelpers.NewMockPolicyRefresher())
 	require.NoError(t, err)
 
 	vSwitch := v2.NewSwitch(vChan)
