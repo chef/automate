@@ -296,6 +296,7 @@ func (db *Postgres) insertNewService(
 			SupID:               sid,
 			FullPkgIdent:        pkgIdent.FullPackageIdent(),
 			PreviousHealth:      applications.HealthStatus_NONE.String(),
+			HealthUpdatedAt:     time.Now(),
 			LastEventOccurredAt: convertOrCreateTimestamp(eventMetadata.GetOccurredAt()),
 		}
 

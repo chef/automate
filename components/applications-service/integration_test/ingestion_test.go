@@ -21,6 +21,7 @@ func TestIngestSigleService(t *testing.T) {
 
 	var (
 		eventsProcessed = suite.Ingester.EventsProcessed()
+		timeBeforeTest  = time.Now()
 		event           = NewHabitatEvent(
 			withSupervisorId("4f1un3"),
 			withPackageIdent("test/db/0.1.0/20200101121212"),
@@ -76,6 +77,12 @@ func TestIngestSigleService(t *testing.T) {
 			"the time of the last event should be before the current time")
 		assert.Truef(t, svcList[0].HealthUpdatedAt.Before(time.Now()),
 			"the time of the last health update should be before the current time")
+
+		assert.Truef(t, svcList[0].LastEventOccurredAt.After(timeBeforeTest),
+			"the time of the last event should be after the beginning of the test")
+		assert.Truef(t, svcList[0].HealthUpdatedAt.After(timeBeforeTest),
+			"the time of the last health update should be after the beginning of the test")
+
 	}
 }
 
@@ -202,6 +209,7 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 
 	var (
 		eventsProcessed = suite.Ingester.EventsProcessed()
+		timeBeforeTest  = time.Now()
 		event           = NewHabitatEvent(
 			withSupervisorId("4f1un3"),
 			withPackageIdent("test/db/0.1.0/20200101121212"),
@@ -258,6 +266,10 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 				"the time of the last event should be before the current time")
 			assert.Truef(t, svcList[0].HealthUpdatedAt.Before(time.Now()),
 				"the time of the last health update should be before the current time")
+			assert.Truef(t, svcList[0].LastEventOccurredAt.After(timeBeforeTest),
+				"the time of the last event should be after the beginning of the test")
+			assert.Truef(t, svcList[0].HealthUpdatedAt.After(timeBeforeTest),
+				"the time of the last health update should be after the beginning of the test")
 
 			// store previous timestamps for next tests
 			previousLastEventOccurredAt = svcList[0].LastEventOccurredAt
@@ -495,6 +507,7 @@ func TestIngestHealthUpdatedAtUpdatesOnlyOnHealthUpdate(t *testing.T) {
 		eventsProcessed = suite.Ingester.EventsProcessed()
 		event           = NewHabitatEventRandomized()
 		bytes, err      = proto.Marshal(event)
+		timeBeforeTest  = time.Now()
 		healthUpdatedAt time.Time
 	)
 
@@ -506,6 +519,8 @@ func TestIngestHealthUpdatedAtUpdatesOnlyOnHealthUpdate(t *testing.T) {
 		svcList := suite.GetServices()
 		if assert.Equal(t, 1, len(svcList)) {
 			healthUpdatedAt = svcList[0].HealthUpdatedAt
+			assert.Truef(t, healthUpdatedAt.After(timeBeforeTest),
+				"the time of the last health update should be after the beginning of the test")
 			assert.Truef(t, healthUpdatedAt.Before(time.Now()),
 				"the time of the last health update should be before the current time")
 		}
