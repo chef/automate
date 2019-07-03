@@ -187,7 +187,8 @@ complete -F _component_auto_complete go_update_component
 document "kill_running_service" <<DOC
   kill a running component. This can be used to restart a component
 
-  example kill_running_service ingest-service
+  Example:
+      kill_running_service ingest-service
 DOC
 function kill_running_service() {
   [[ "$1" == "" ]] && error "Missing component name argument" && return 1;
