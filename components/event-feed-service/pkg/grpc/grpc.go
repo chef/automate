@@ -59,11 +59,15 @@ func Spawn(c *config.EventFeed, connFactory *secureconn.Factory) error {
 	esSidecarConn, err := connFactory.DialContext(timeoutCtx, "es-sidecar-service",
 		c.ESSidecarAddress, grpc.WithBlock())
 	if err != nil {
-		// This should never happend
 		log.WithError(err).Error("Failed to create ES Sidecar connection")
 		return err
 	}
-	defer esSidecarConn.Close()
+	defer func() {
+		err := esSidecarConn.Close()
+		if err != nil {
+			log.WithError(err).Error("Failed closing ES sidecar connection")
+		}
+	}()
 
 	grpcServer := newGRPCServer(connFactory, c, feedStore, esSidecarConn)
 
