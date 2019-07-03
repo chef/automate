@@ -5,6 +5,7 @@ type Client interface {
 	Connect() error
 	IngestMessage([]byte)
 
+	ResetStats()
 	GetEventStats() (int64, int64, int64)
 	EventsSuccessful() int64
 	EventsFailed() int64

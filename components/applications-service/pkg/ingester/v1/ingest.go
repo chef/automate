@@ -148,6 +148,13 @@ func (i *Ingester) GetEventStats() (int64, int64, int64) {
 	return i.totalEventsProcessed, i.totalEventsFailed, i.totalEventsSuccessful
 }
 
+// ResetStats will set all event stats back to its initial state, zero.
+func (i *Ingester) ResetStats() {
+	i.totalEventsProcessed = 0
+	i.totalEventsFailed = 0
+	i.totalEventsSuccessful = 0
+}
+
 // Returns the total number of event messages in the ingestor client queue
 func (i *Ingester) QueueLen() int {
 	return len(i.eventsCh)

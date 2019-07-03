@@ -21,8 +21,15 @@ func TestStatsWhenEmpty(t *testing.T) {
 			TotalServices:      0,
 			TotalServiceGroups: 0,
 			TotalSupervisors:   0,
+			IngestStats: &applications.IngestStats{
+				TotalEventsProcessed:  0,
+				TotalEventsFailed:     0,
+				TotalEventsSuccessful: 0,
+			},
 		}
 	)
+
+	suite.Ingester.ResetStats()
 	response, err := suite.ApplicationsServer.GetServicesStats(ctx, request)
 	assert.Nil(t, err)
 	assert.Equal(t, expected, response)
@@ -36,6 +43,11 @@ func TestStatsWithOne(t *testing.T) {
 			TotalServices:      1,
 			TotalServiceGroups: 1,
 			TotalSupervisors:   1,
+			IngestStats: &applications.IngestStats{
+				TotalEventsProcessed:  1,
+				TotalEventsFailed:     0,
+				TotalEventsSuccessful: 1,
+			},
 		}
 		mockHabService = NewHabitatEvent(
 			withSupervisorId("sup2"),
@@ -43,6 +55,8 @@ func TestStatsWithOne(t *testing.T) {
 			withPackageIdent("core/postgres/0.1.0/20190101121212"),
 		)
 	)
+
+	suite.Ingester.ResetStats()
 	suite.IngestService(mockHabService)
 	defer suite.DeleteDataFromStorage()
 
@@ -60,10 +74,16 @@ func TestStatsWithSeveral(t *testing.T) {
 			TotalServices:      10,
 			TotalServiceGroups: 4,
 			TotalSupervisors:   4,
+			IngestStats: &applications.IngestStats{
+				TotalEventsProcessed:  10,
+				TotalEventsFailed:     0,
+				TotalEventsSuccessful: 10,
+			},
 		}
 		mockHabServicesMatrix = habServicesMatrix()
 	)
 
+	suite.Ingester.ResetStats()
 	suite.IngestServices(mockHabServicesMatrix)
 	defer suite.DeleteDataFromStorage()
 

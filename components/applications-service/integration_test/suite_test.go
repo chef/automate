@@ -118,6 +118,16 @@ func (s *Suite) DeleteDataFromStorage() {
 
 // IngestService ingests a single HealthCheckEvent message into the database
 func (s *Suite) IngestService(event *habitat.HealthCheckEvent) {
+	eventsProcessed := s.Ingester.EventsProcessed()
+	bytes, err := proto.Marshal(event)
+	if err != nil {
+		fmt.Printf("Error trying to ingest hab service event: %s\n", err)
+	}
+	s.Ingester.IngestMessage(bytes)
+	s.WaitForEventsToProcess(eventsProcessed + 1)
+}
+
+func (s *Suite) IngestServiceViaStorageClient(event *habitat.HealthCheckEvent) {
 	err := s.StorageClient.IngestHealthCheckEvent(event)
 	if err != nil {
 		fmt.Printf("Error trying to ingest hab service event: %s\n", err)
