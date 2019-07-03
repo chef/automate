@@ -28,7 +28,7 @@ cp /a1-migration/delivery.license /var/opt/delivery/license/delivery.license
 
 # loading the data can leave us with incorrect rabbit password among other
 # things, reconfigure fixes it
-automate-ctl reconfigure
+automate-ctl reconfigure --chef-license=accept-no-persist
 
 # reconfigure doesn't start statistics service tho?
 automate-ctl start
