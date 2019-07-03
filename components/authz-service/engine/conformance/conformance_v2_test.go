@@ -707,7 +707,6 @@ func TestListProjectMappings(t *testing.T) {
 					type1 := v2.Node
 					conditions1 := []v2.Condition{
 						{
-							Type:      type1,
 							Attribute: v2.Organization,
 							Operator:  v2.MemberOf,
 							Value:     []string{"opscode", "chef"},
@@ -720,7 +719,6 @@ func TestListProjectMappings(t *testing.T) {
 					type2 := v2.Event
 					conditions2 := []v2.Condition{
 						{
-							Type:      type2,
 							Attribute: v2.Organization,
 							Operator:  v2.MemberOf,
 							Value:     []string{"opscode", "chef"},

@@ -3,7 +3,6 @@ package keys
 // Generate key bindata
 //go:generate curl --fail --silent --output data/keys.json http://license-acceptance.chef.co/keys
 //go:generate go-bindata -pkg $GOPACKAGE -o keys.bindata.go data/...
-//go:generate ../../../../scripts/fix_bindata_header keys.bindata.go
 
 import (
 	"crypto/sha256"

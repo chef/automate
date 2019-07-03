@@ -25,6 +25,7 @@ SELECT id
   , package_ident
   , last_event_occurred_at
   , previous_health
+  , health_updated_at
 FROM service
 WHERE name = $1
   AND sup_id IN (
@@ -49,6 +50,7 @@ SELECT s.id
   , sup.site as site
   , s.last_event_occurred_at as last_event_occurred_at
   , s.previous_health as previous_health
+  , s.health_updated_at as health_updated_at
 FROM service AS s
 LEFT JOIN service_group AS sg
   ON s.group_id = sg.id
@@ -76,6 +78,7 @@ SELECT s.id
   , sup.site as site
   , s.last_event_occurred_at as last_event_occurred_at
   , s.previous_health as previous_health
+  , s.health_updated_at as health_updated_at
 FROM service AS s
 LEFT JOIN service_group AS sg
   ON s.group_id = sg.id

@@ -31,6 +31,13 @@ do_deploy() {
     docker_run "${_frontend2_container_name}"
 
     docker exec -t $_frontend1_container_name \
+        "$(a2_root_dir)/scripts/copy_hartifacts" "$test_hartifacts_path"
+
+    docker exec -t $_frontend2_container_name \
+        "$(a2_root_dir)/scripts/copy_hartifacts" "$test_hartifacts_path"
+
+
+    docker exec -t $_frontend1_container_name \
         "$cli_bin" deploy config.toml \
             --product chef-server \
             --hartifacts "$test_hartifacts_path" \

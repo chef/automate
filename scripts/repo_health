@@ -25,7 +25,8 @@ yml2json() {
 }
 
 echo "Checking if Golang license fallbacks/exceptions are needed"
-for d in $(yml2json .license_scout.yml | jq -r '(.fallbacks, .exceptions).golang[].name'); do
+license_scout=$(yml2json .license_scout.yml)
+for d in $(jq -ner --argjson data "$license_scout" '$data | (.fallbacks, .exceptions) | (.golang // [])[].name'); do
     if [[ ! -d "vendor/$d" ]]; then
         echo "dependency \"$d\" not required anymore"
         exit 1

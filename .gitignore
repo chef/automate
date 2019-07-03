@@ -37,7 +37,6 @@ dist
 vendor.orig/
 
 # GO debugging
-debug
 debug.test
 
 # Ingest uses nodeJS for integration tests

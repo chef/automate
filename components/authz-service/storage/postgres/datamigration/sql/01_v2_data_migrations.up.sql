@@ -26,7 +26,6 @@ UPDATE iam_roles
         id = 'operator';
 
 UPDATE iam_policies SET id='editor-access', name='Editors' WHERE id='operator-access';
-UPDATE iam_policy_members SET policy_id = 'editor-access' WHERE policy_id='operator-access';
 UPDATE iam_policy_statements SET policy_id = 'editor-access' WHERE policy_id='operator-access';
 
 UPDATE iam_roles

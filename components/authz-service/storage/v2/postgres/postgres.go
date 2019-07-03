@@ -117,11 +117,14 @@ func (p *pg) PurgeSubjectFromPolicies(ctx context.Context, sub string) ([]string
 	// prescribe this, but it feels like the better choice.)
 
 	row := tx.QueryRowContext(ctx, `
-WITH pol_ids AS (DELETE FROM iam_policy_members
-                 WHERE member_id=(SELECT id FROM iam_members WHERE name=$1)
-                 RETURNING policy_id)
-SELECT array_agg(policy_id) FROM pol_ids`,
-		sub)
+		WITH pol_db_ids AS (
+			DELETE FROM iam_policy_members
+			WHERE member_id=(SELECT db_id FROM iam_members WHERE name=$1)
+			RETURNING policy_id
+		)
+		SELECT array_agg(id)
+		FROM iam_policies
+		WHERE db_id IN (SELECT * FROM pol_db_ids);`, sub)
 	err = row.Scan(pq.Array(&polIDs))
 	if err != nil {
 		return nil, p.processError(err)
@@ -356,13 +359,13 @@ func (p *pg) associatePolicyWithProjects(ctx context.Context,
 	// TODO this might be simplified as we modify how projects are assigned
 	// Drop any existing associations.
 	_, err := q.ExecContext(ctx,
-		`DELETE FROM iam_policy_projects WHERE policy_id=$1;`, policyID)
+		`DELETE FROM iam_policy_projects WHERE policy_id=policy_db_id($1);`, policyID)
 	if err != nil {
 		return err
 	}
 	for _, project := range inProjects {
 		_, err := q.ExecContext(ctx,
-			`INSERT INTO iam_policy_projects (policy_id, project_id) VALUES ($1, $2)`,
+			`INSERT INTO iam_policy_projects (policy_id, project_id) VALUES (policy_db_id($1), $2)`,
 			&policyID, &project)
 		if err != nil {
 			err = p.processError(err)
@@ -555,8 +558,8 @@ func (p *pg) RemovePolicyMembers(ctx context.Context,
 
 	for _, member := range members {
 		_, err := tx.ExecContext(ctx,
-			`DELETE FROM iam_policy_members WHERE policy_id=$1 AND
-				member_id=(SELECT id from iam_members WHERE name=$2);`, policyID, member.Name)
+			`DELETE FROM iam_policy_members WHERE policy_id=policy_db_id($1) AND
+				member_id=(SELECT db_id from iam_members WHERE name=$2);`, policyID, member.Name)
 		if err != nil {
 			err = p.processError(err)
 			switch err {
@@ -592,7 +595,7 @@ func (p *pg) replacePolicyMembersWithQuerier(ctx context.Context, policyID strin
 	q Querier) error {
 	// Cascading drop any existing members.
 	_, err := q.ExecContext(ctx,
-		`DELETE FROM iam_policy_members WHERE policy_id=$1;`, policyID)
+		`DELETE FROM iam_policy_members WHERE policy_id=policy_db_id($1);`, policyID)
 	if err != nil {
 		return err
 	}
@@ -627,15 +630,15 @@ func (p *pg) insertOrReusePolicyMemberWithQuerier(ctx context.Context, policyID 
 	// For now, let's just ignore conflicts if someone is trying to add a user that is already a member.
 	_, err = q.ExecContext(ctx,
 		`INSERT INTO iam_policy_members (policy_id, member_id)
-			values($1, (SELECT id FROM iam_members WHERE name=$2)) ON CONFLICT DO NOTHING;`, policyID, member.Name)
+			values(policy_db_id($1), (SELECT db_id FROM iam_members WHERE name=$2)) ON CONFLICT DO NOTHING;`, policyID, member.Name)
 	return err
 }
 
 func (p *pg) getPolicyMembersWithQuerier(ctx context.Context, id string, q Querier) ([]v2.Member, error) {
 	rows, err := q.QueryContext(ctx,
 		`SELECT m.id, m.name FROM iam_policy_members AS pm
-			INNER JOIN iam_members AS m ON pm.member_id=m.id
-			WHERE pm.policy_id=$1 ORDER BY m.name ASC`, id)
+			INNER JOIN iam_members AS m ON pm.member_id=m.db_id
+			WHERE pm.policy_id=policy_db_id($1) ORDER BY m.name ASC`, id)
 
 	if err != nil {
 		return nil, err
@@ -1088,8 +1091,8 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 		}
 
 		_, err = tx.ExecContext(ctx,
-			`INSERT INTO iam_staged_project_rules
-				SELECT a.db_id, a.id, a.project_id, a.name, a.type, 'true'
+			`INSERT INTO iam_staged_project_rules (id, project_id, name, type, deleted)
+				SELECT a.id, a.project_id, a.name, a.type, 'true'
 				FROM iam_project_rules AS a
 				WHERE a.id=$1 AND projects_match_for_rule(a.project_id, $2);`,
 			id, pq.Array(projectsFilter),
@@ -1102,7 +1105,7 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 		// Value will never be seen, so a dummy value is OK here.
 		_, err = tx.ExecContext(ctx,
 			`INSERT INTO iam_staged_rule_conditions (rule_db_id, value, attribute, operator)
-			 VALUES ((SELECT db_id FROM iam_project_rules WHERE id=$1), '{dummy}', 'chef-server', 'equals');`,
+			 VALUES ((SELECT db_id FROM iam_staged_project_rules WHERE id=$1), '{dummy}', 'chef-server', 'equals');`,
 			id,
 		)
 		if err != nil {
@@ -1206,8 +1209,21 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 		return nil, err
 	}
 
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, p.processError(err)
+	}
+
+	// verify project exists, otherwise we would return an empty list
+	// that could be misleading
+	var project v2.Project
+	row := tx.QueryRowContext(ctx, "SELECT query_project($1, $2)", projectID, pq.Array(projectsFilter))
+	if err := row.Scan(&project); err != nil {
+		return nil, p.processError(err)
+	}
+
 	var rules []*v2.Rule
-	rows, err := p.db.QueryContext(ctx, "SELECT query_rules_for_project($1, $2)",
+	rows, err := tx.QueryContext(ctx, "SELECT query_rules_for_project($1, $2)",
 		projectID, pq.Array(projectsFilter))
 	if err != nil {
 		return nil, p.processError(err)
@@ -1229,6 +1245,12 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 	if err := rows.Err(); err != nil {
 		return nil, errors.Wrap(err, "error retrieving result rows")
 	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, storage_errors.NewErrTxCommit(err)
+	}
+
 	return rules, nil
 }
 
