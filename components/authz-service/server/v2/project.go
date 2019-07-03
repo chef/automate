@@ -460,6 +460,9 @@ func (s *ProjectState) listRulesWithFunction(ctx context.Context, req *api.ListR
 func (s *ProjectState) ListRulesForProject(ctx context.Context, req *api.ListRulesForProjectReq) (*api.ListRulesForProjectResp, error) {
 	resp, err := s.store.ListRulesForProject(ctx, req.Id)
 	if err != nil {
+		if err == storage_errors.ErrNotFound {
+			return nil, status.Errorf(codes.NotFound, "could not find project with ID %q", req.Id)
+		}
 		return nil, status.Errorf(codes.Internal, "error retrieving rules: %s", err.Error())
 	}
 
