@@ -97,6 +97,13 @@ message ServicesStatsRes {
   int32 total_service_groups = 1;
   int32 total_services = 2;
   int32 total_supervisors = 3;
+  IngestStats ingest_stats = 4;
+}
+
+message IngestStats {
+  int64 total_events_processed = 1;
+  int64 total_events_successful = 2;
+  int64 total_events_failed = 3;
 }
 
 message Service {

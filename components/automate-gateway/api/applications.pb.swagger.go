@@ -286,6 +286,23 @@ func init() {
       "description": "- NONE: The representation of NO health check status\nTODO @afiune how much effort would be to change\nthe OK enum to be NONE",
       "title": "The HealthStatus enum matches the habitat implementation for health-check status:\n=\u003e https://www.habitat.sh/docs/reference/#health-check"
     },
+    "applicationsIngestStats": {
+      "type": "object",
+      "properties": {
+        "total_events_processed": {
+          "type": "string",
+          "format": "int64"
+        },
+        "total_events_successful": {
+          "type": "string",
+          "format": "int64"
+        },
+        "total_events_failed": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "applicationsService": {
       "type": "object",
       "properties": {
@@ -425,6 +442,9 @@ func init() {
         "total_supervisors": {
           "type": "integer",
           "format": "int32"
+        },
+        "ingest_stats": {
+          "$ref": "#/definitions/applicationsIngestStats"
         }
       }
     },

@@ -12,7 +12,7 @@ import (
 
 	"github.com/chef/automate/components/applications-service/pkg/config"
 	"github.com/chef/automate/components/applications-service/pkg/grpc"
-	"github.com/chef/automate/components/applications-service/pkg/ingest"
+	ingest "github.com/chef/automate/components/applications-service/pkg/ingester/v1"
 	"github.com/chef/automate/components/applications-service/pkg/storage/postgres"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/platform"
@@ -55,6 +55,7 @@ var serveCmd = &cobra.Command{
 			if err != nil {
 				return err
 			}
+			conf.SetIngester(ingester)
 
 			go ingester.Run()
 		}

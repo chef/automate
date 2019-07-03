@@ -10,6 +10,7 @@ import (
 	"github.com/chef/automate/api/external/applications"
 	ver_api "github.com/chef/automate/api/external/common/version"
 	"github.com/chef/automate/components/applications-service/pkg/config"
+	"github.com/chef/automate/components/applications-service/pkg/ingester"
 	"github.com/chef/automate/components/applications-service/pkg/params"
 	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/chef/automate/lib/grpc/health"
@@ -21,15 +22,17 @@ import (
 
 // ApplicationsServer is the interface to this component.
 type ApplicationsServer struct {
-	health        *health.Service
-	storageClient storage.Client
+	health         *health.Service
+	storageClient  storage.Client
+	ingesterClient ingester.Client
 }
 
 // New creates a new ApplicationsServer instance.
-func New(sc storage.Client) *ApplicationsServer {
+func New(sc storage.Client, ic ingester.Client) *ApplicationsServer {
 	return &ApplicationsServer{
-		health:        health.NewService(),
-		storageClient: sc,
+		health:         health.NewService(),
+		storageClient:  sc,
+		ingesterClient: ic,
 	}
 }
 
@@ -249,10 +252,18 @@ func (app *ApplicationsServer) GetServicesStats(c context.Context,
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	// Gather stats from ingested events
+	eProcessed, eFailed, eSuccessful := app.ingesterClient.GetEventStats()
+
 	return &applications.ServicesStatsRes{
 		TotalServices:      servicesCount,
 		TotalServiceGroups: serviceGroupsCount,
 		TotalSupervisors:   supervisorsCount,
+		IngestStats: &applications.IngestStats{
+			TotalEventsProcessed:  eProcessed,
+			TotalEventsFailed:     eFailed,
+			TotalEventsSuccessful: eSuccessful,
+		},
 	}, nil
 }
 

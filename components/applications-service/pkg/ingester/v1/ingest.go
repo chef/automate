@@ -133,6 +133,21 @@ func (i *Ingester) EventsProcessed() int64 {
 	return i.totalEventsProcessed
 }
 
+// Returns the total number of failed events by the ingestor client
+func (i *Ingester) EventsFailed() int64 {
+	return i.totalEventsFailed
+}
+
+// Returns the total number of successful events by the ingestor client
+func (i *Ingester) EventsSuccessful() int64 {
+	return i.totalEventsSuccessful
+}
+
+// GetEventStats returns the statistics of the ingested events
+func (i *Ingester) GetEventStats() (int64, int64, int64) {
+	return i.totalEventsProcessed, i.totalEventsFailed, i.totalEventsSuccessful
+}
+
 // Returns the total number of event messages in the ingestor client queue
 func (i *Ingester) QueueLen() int {
 	return len(i.eventsCh)

@@ -12,7 +12,8 @@ import (
 
 	"github.com/chef/automate/api/external/habitat"
 	"github.com/chef/automate/components/applications-service/pkg/config"
-	"github.com/chef/automate/components/applications-service/pkg/ingest"
+	"github.com/chef/automate/components/applications-service/pkg/ingester"
+	ingest "github.com/chef/automate/components/applications-service/pkg/ingester/v1"
 	"github.com/chef/automate/components/applications-service/pkg/server"
 	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/chef/automate/components/applications-service/pkg/storage/postgres"
@@ -31,7 +32,7 @@ import (
 // * Ingester: The mechanism to ingest messages to our system
 type Suite struct {
 	ApplicationsServer *server.ApplicationsServer
-	Ingester           *ingest.Ingester
+	Ingester           ingester.Client
 	StorageClient      storage.Client
 }
 
@@ -91,7 +92,7 @@ func NewSuite(database string) *Suite {
 	// ```
 	// res, err := suite.ApplicationsServer.GetServicesHealthCounts(ctx, &req)
 	// ```
-	s.ApplicationsServer = server.New(s.StorageClient)
+	s.ApplicationsServer = server.New(s.StorageClient, s.Ingester)
 
 	return s
 }
