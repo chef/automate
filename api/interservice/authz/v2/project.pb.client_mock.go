@@ -5,9 +5,9 @@
 package v2
 
 import (
+	context "context"
 	event "github.com/chef/automate/api/interservice/event"
 	gomock "github.com/golang/mock/gomock"
-	context "golang.org/x/net/context"
 	grpc "google.golang.org/grpc"
 	reflect "reflect"
 )
