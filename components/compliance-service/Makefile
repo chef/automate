@@ -358,7 +358,7 @@ run-test: clean-all test-prep run ingest-reports-into-es test
 test-db: run-with-es-pg run-db-tests
 
 run-db-tests:
-	@POSTGRES_URI="$(POSTGRES_URI)" \
+	@POSTGRES_URI="$(POSTGRES_URI)" CGO_ENABLED=0 \
 		go test -v $(shell go list ./dao/... ./profiles/db ./scanner/ ./inspec-agent/scheduler) -cover -database -parallel=1 -p 1 -failfast
 
 test-integration: start-es start-pg
@@ -448,7 +448,7 @@ test-reporting: ingest-reports-into-es
 	# the service sometimes isn't ready in travis if we don't sleep 15
 	sleep 15
 	TEST='[0-1]*_spec.rb' $(MAKE) test
-	cd api/tests && go test export_test.go -failfast
+	cd api/tests && CGO_ENABLED=0 go test export_test.go -failfast
 	$(MAKE) test-ingest-to-manager-conn
 
 test-scanner:
