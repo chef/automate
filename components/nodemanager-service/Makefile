@@ -179,7 +179,7 @@ test-integration:
 	RUN_MODE='local' go test github.com/chef/automate/components/nodemanager-service/tests/scanjobtests
 
 run-db-tests:
-	@POSTGRES_URI="$(POSTGRES_URI)" \
+	@POSTGRES_URI="$(POSTGRES_URI)" CGO_ENABLED=0 \
 		go test -v $(shell go list ./pgdb/...) -cover -database
 
 run-one-db-test:

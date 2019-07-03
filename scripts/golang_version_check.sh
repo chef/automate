@@ -8,5 +8,3 @@ if ! [ "${required_golang_major_minor}" == "${have_golang_major_minor}" ]; then
 	echo "Unsupported version of go. You have ${have_golang_major_minor}; should have ${required_golang_major_minor}"
   exit 1
 fi
-
-exit 0

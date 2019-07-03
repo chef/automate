@@ -20,7 +20,7 @@ clean:
 HAVE_GO_BINDATA := $(shell command -v go-bindata 2> /dev/null)
 generate:
 ifndef HAVE_GO_BINDATA
-	go get -u github.com/twitter/go-bindata/...
+	go get -u github.com/kevinburke/go-bindata/go-bindata
 endif
 	go generate ./...
 

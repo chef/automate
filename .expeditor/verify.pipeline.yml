@@ -98,7 +98,11 @@ steps:
 
   - label: "[unit] OPA"
     command:
-      - hab studio run "source .studiorc && opa_static && opa_test"
+      - |
+        hab studio run "source .studiorc &&
+          install_if_missing core/opa opa &&
+          cd /src/components/authz-service/engine/opa/policy &&
+          make static unit"
     timeout_in_minutes: 10
     retry:
       automatic:
