@@ -18,16 +18,20 @@ of:
 This document was written with the latter two groups in mind.
 
 ## Deploy a new standalone chef server via Automate
-1. Install the chef-automate CLI tool. You will need one that contains commits: look for
-   hashes.
+1. Install the chef-automate CLI tool.
 2. Run `chef-automate init-config` to generate an editable config.toml.
-3. Add the following to the config.toml from 2:
+3. Under the `[deployment.v1.svc]` section in the config.toml, add `products = ["chef-server"]`:
 ```
-[erchef.v1.sys.data_collector]
-enabled = false
+   [deployment.v1.svc]
+   products = ["chef-server"]
+```
+4. Add to the config.toml:
+```
+   [erchef.v1.sys.data_collector]
+   enabled = false
 ```
 Make any other config changes necessary.
-4. Run `chef-automate deploy --product chef-server config.toml` to install the chef
+5. Run `chef-automate deploy config.toml` to install the chef
    server. When the chef server comes up, the running services are:
 ```
    $ sudo ./chef-automate status
@@ -57,12 +61,9 @@ Make any other config changes necessary.
 ```
    [global.v1.external.automate]
    enable = true
-   endpoint = "https://automate.example.com/data-collector/v0/" # is this right?
+   node = "<https://automate.example.com>"
    [global.v1.external.automate.auth]
-   token = "yourdatacollectortoken"
-
-   [deployment.v1.svc]           # is this section necessary?
-   products = ["chef-server"]
+   token = "<yourdatacollectortoken>"
 
    [erchef.v1.sys.data_collector]
    enabled = true
@@ -75,15 +76,19 @@ elasticsearch and postgres. As such, it is a services option and not intended as
 option for customers.
 
 ### Deploy a chef server with external data services via the Automate deployment service
-1. Install the chef-automate CLI tool. You will need one that contains commits: look for
-   hashes.
+1. Install the chef-automate CLI tool.
 2. Run `chef-automate init-config` to generate an editable config.toml.
-3. Add the following to the config.toml from 2:
+3. Under the `[deployment.v1.svc]` section in the config.toml, add `products = ["chef-server"]`:
+```
+   [deployment.v1.svc]
+   products = ["chef-server"]
+```
+4. Add the following to the config.toml from 2:
 ```
    [erchef.v1.sys.data_collector]
    enabled = false
 ```
-4. Configure external elasticsearch by adding the following to the config.toml:
+5. Configure external elasticsearch by adding the following to the config.toml:
 ```
    [global.v1.external.elasticsearch]
    enable = true
@@ -99,7 +104,7 @@ option for customers.
    # root_cert_file = "</path/to/cert/file>"
    # server_name = "<elasticsearch server name>"
 ```
-5. Configure external postgres by adding the following to the config.toml:
+6. Configure external postgres by adding the following to the config.toml:
 ```
   [global.v1.external.postgresql]
   enable = true
@@ -124,28 +129,33 @@ option for customers.
   # enable = true
   # root_cert = "</path/to/rootCA.pem>"
 ```
-6. Make any other config changes necessary.
-7. Run `chef-automate deploy --product chef-server config.toml` to install the chef
+7. Make any other config changes necessary.
+8. Run `chef-automate deploy config.toml` to install the chef
    server.
 
 ### Create a bootstrap bundle (.abb)
 The bootstrap bundle contains chef server keys needed to start the second chef server.
 
 On your original chef server node, run
-   `chef-automate bootstrap bundle create </path/to/bundle.abb>`i
+   `chef-automate bootstrap bundle create </path/to/bundle.abb>`
 to create a bundle containing the necessary keys, etc., to deploy a second chef server.
 
 ### Deploy a second chef server on another node
 1. Copy the bootstrap bundle to the node where you wish to deploy the second chef server.
-2. Run `chef-server init-config` to generate a config.toml.
-   a. Edit the config.toml to add the data collector configuration:
+2. Run `chef-automate init-config` to generate a config.toml.
+   a. Under the `[deployment.v1.svc]` section, add `products = ["chef-server"]`:
+```
+      [deployment.v1.svc]
+      products = ["chef-server"]
+```
+   b. Edit the config.toml to add the data collector configuration:
 ```
    [erchef.v1.sys.data_collector]
    enabled = false
 ```
-   b. Edit the config.toml to use the same external elasticsearch and postgres
+   c. Edit the config.toml to use the same external elasticsearch and postgres
    configuration as the first chef server.
-3. Run `chef-server deploy --product chef-server --bootstrap-bundle /path/to/bundle.abb
+3. Run `chef-automate deploy --bootstrap-bundle /path/to/bundle.abb
    config.toml` to deploy the second chef server.
 4. On both chef servers, patch the config as described previously to forward data from the chef servers to
    Automate.
