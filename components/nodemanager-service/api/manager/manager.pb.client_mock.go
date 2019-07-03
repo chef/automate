@@ -5,10 +5,10 @@
 package manager
 
 import (
+	context "context"
 	nodes "github.com/chef/automate/components/nodemanager-service/api/nodes"
 	gomock "github.com/golang/mock/gomock"
 	empty "github.com/golang/protobuf/ptypes/empty"
-	context "golang.org/x/net/context"
 	grpc "google.golang.org/grpc"
 	reflect "reflect"
 )
