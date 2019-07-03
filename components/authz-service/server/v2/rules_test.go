@@ -33,7 +33,6 @@ func TestCreateRule(t *testing.T) {
 	}
 	storageConditions := []storage.Condition{
 		{
-			Type:      storage.Node,
 			Attribute: storage.Organization,
 			Operator:  storage.MemberOf,
 			Value:     []string{"opscode"},
@@ -174,7 +173,6 @@ func TestUpdateRule(t *testing.T) {
 	}
 	storageConditions := []storage.Condition{
 		{
-			Type:      storage.Node,
 			Attribute: storage.Organization,
 			Operator:  storage.MemberOf,
 			Value:     []string{"opscode"},
@@ -435,7 +433,6 @@ func TestGetRule(t *testing.T) {
 	}
 	storageConditions := []storage.Condition{
 		{
-			Type:      storage.Node,
 			Attribute: storage.Organization,
 			Operator:  storage.Equals,
 			Value:     []string{"opscode"},
@@ -505,7 +502,6 @@ func TestListRules(t *testing.T) {
 	}
 	storageConditions1 := []storage.Condition{
 		{
-			Type:      storage.Node,
 			Attribute: storage.Organization,
 			Operator:  storage.MemberOf,
 			Value:     []string{"opscode", "chef"},
@@ -520,7 +516,6 @@ func TestListRules(t *testing.T) {
 	}
 	storageConditions2 := []storage.Condition{
 		{
-			Type:      storage.Event,
 			Attribute: storage.Organization,
 			Operator:  storage.Equals,
 			Value:     []string{"chef"},
@@ -582,7 +577,6 @@ func TestListRulesForProject(t *testing.T) {
 
 	storageConditions1 := []storage.Condition{
 		{
-			Type:      storage.Node,
 			Attribute: storage.Organization,
 			Operator:  storage.MemberOf,
 			Value:     []string{"opscode", "chef"},
@@ -597,7 +591,6 @@ func TestListRulesForProject(t *testing.T) {
 	}
 	storageConditions2 := []storage.Condition{
 		{
-			Type:      storage.Event,
 			Attribute: storage.Organization,
 			Operator:  storage.Equals,
 			Value:     []string{"chef"},
@@ -612,7 +605,6 @@ func TestListRulesForProject(t *testing.T) {
 	}
 	storageConditions3 := []storage.Condition{
 		{
-			Type:      storage.Event,
 			Attribute: storage.Organization,
 			Operator:  storage.MemberOf,
 			Value:     []string{"other", "org"},
@@ -683,7 +675,6 @@ func TestDeleteRule(t *testing.T) {
 
 	storageConditions1 := []storage.Condition{
 		{
-			Type:      storage.Node,
 			Attribute: storage.Organization,
 			Operator:  storage.MemberOf,
 			Value:     []string{"opscode", "chef"},
@@ -691,7 +682,6 @@ func TestDeleteRule(t *testing.T) {
 	}
 	storageConditions2 := []storage.Condition{
 		{
-			Type:      storage.Event,
 			Attribute: storage.Organization,
 			Operator:  storage.Equals,
 			Value:     []string{"chef"},

@@ -72,8 +72,10 @@ func validateRuleInputs(id string,
 	}
 
 	for _, condition := range conditions {
-		if condition.Type != ruleType {
-			return errors.New("all condition types must match the parent rule type")
+		if ruleType == Event {
+			if condition.Attribute != Organization && condition.Attribute != ChefServer {
+				return errors.New("rules of type Event only accept Conditions with attributes Organization or ChefServer")
+			}
 		}
 	}
 
