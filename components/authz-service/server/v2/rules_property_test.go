@@ -2,7 +2,10 @@ package v2_test
 
 import (
 	"context"
+	"fmt"
+	"math"
 	"reflect"
+	"strings"
 	"testing"
 	"unicode"
 
@@ -18,17 +21,460 @@ import (
 )
 
 const (
-	idRegex = "^[a-z0-9-]{1,64}$"
+	idRegex        = "^[a-z0-9-]{1,64}$"
+	conditionLimit = 10 // avoid the grpc limit of 4194304
 )
 
-func TestCreateRuleProperties(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	testFW := testhelpers.NewTestFramework(t, ctx)
-	cl := testFW.Projects
-	testDB := testFW.TestDB
-	seed := testFW.Seed
+type projectAndRuleReq struct {
+	api.CreateProjectReq
+	rules []api.CreateRuleReq
+}
 
+var createRuleReqGen, createProjectReqGen, createProjectAndRuleGen = getGenerators()
+
+func TestCreateRuleProperties(t *testing.T) {
+	ctx := context.Background()
+	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	properties := getGopterParams(seed)
+
+	properties.Property("newly created rules are staged",
+		prop.ForAll(
+			func(reqs projectAndRuleReq) bool {
+				defer testDB.Flush(t)
+
+				reportRules(t, reqs.rules)
+
+				respRule, err := createProjectAndRule(ctx, cl, reqs)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				return respRule.Status == "staged" &&
+					ruleMatches(reqs.rules[0], *respRule)
+			},
+			createProjectAndRuleGen,
+		))
+
+	properties.Property("creating rules with non-unique IDs is prohibited",
+		prop.ForAll(
+			func(reqs projectAndRuleReq) bool {
+				defer testDB.Flush(t)
+
+				_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				if _, err := cl.CreateRule(ctx, &reqs.rules[0]); err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				_, err = cl.CreateRule(ctx, &reqs.rules[1])
+				return grpctest.AssertCode(t, codes.AlreadyExists, err)
+			},
+			gopter.CombineGens(
+				createProjectReqGen, createRuleReqGen, createRuleReqGen,
+			).Map(func(vals []interface{}) projectAndRuleReq {
+				projectAndRule := genStandardProjectAndRules(
+					vals[0].(api.CreateProjectReq),
+					[]api.CreateRuleReq{vals[1].(api.CreateRuleReq), vals[2].(api.CreateRuleReq)},
+				)
+
+				// "fix" the second req to use the same ID as the first one
+				projectAndRule.rules[1].Id = projectAndRule.rules[0].Id
+
+				return projectAndRule
+			}),
+		))
+
+	properties.TestingRun(t)
+}
+
+func TestGetRuleProperties(t *testing.T) {
+	ctx := context.Background()
+	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	properties := getGopterParams(seed)
+
+	properties.Property("newly created rules are reported as staged",
+		prop.ForAll(
+			func(reqs projectAndRuleReq) bool {
+				defer testDB.Flush(t)
+
+				reportRules(t, reqs.rules)
+
+				_, err := createProjectAndRule(ctx, cl, reqs)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				rStaged, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				return rStaged.Rule.Status == "staged" &&
+					ruleMatches(reqs.rules[0], *rStaged.Rule)
+			},
+			createProjectAndRuleGen,
+		))
+
+	properties.Property("applied rules are reported as applied",
+		prop.ForAll(
+			func(reqs projectAndRuleReq) bool {
+				defer testDB.Flush(t)
+
+				_, err := createProjectAndRule(ctx, cl, reqs)
+
+				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+				rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				return rApplied.Rule.Status == "applied" &&
+					ruleMatches(reqs.rules[0], *rApplied.Rule)
+			},
+			createProjectAndRuleGen,
+		))
+
+	properties.TestingRun(t)
+}
+
+func TestListRuleProperties(t *testing.T) {
+	ctx := context.Background()
+	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	properties := getGopterParams(seed)
+
+	properties.Property("staged rules are reported as staged",
+		prop.ForAll(
+			func(reqs projectAndRuleReq) bool {
+				defer testDB.Flush(t)
+
+				reportRules(t, reqs.rules)
+
+				_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				reqs.rules, err = createRules(ctx, cl, reqs.rules)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				resp, err := cl.ListRules(ctx, &api.ListRulesReq{IncludeStaged: true})
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				return rulesMatch(reqs.rules, resp)
+
+			},
+			createProjectAndRuleGen,
+		))
+
+	properties.Property("staged rules are not reported as applied",
+		prop.ForAll(
+			func(reqs projectAndRuleReq) bool {
+				defer testDB.Flush(t)
+
+				reportRules(t, reqs.rules)
+
+				_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				reqs.rules, err = createRules(ctx, cl, reqs.rules)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				resp, err := cl.ListRules(ctx, &api.ListRulesReq{IncludeStaged: false})
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				return len(resp.Rules) == 0
+
+			},
+			createProjectAndRuleGen,
+		))
+
+	properties.Property("applied rules are reported as applied",
+		prop.ForAll(
+			func(reqs projectAndRuleReq) bool {
+				defer testDB.Flush(t)
+
+				reportRules(t, reqs.rules)
+
+				_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				reqs.rules, err = createRules(ctx, cl, reqs.rules)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+				resp, err := cl.ListRules(ctx, &api.ListRulesReq{})
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				return rulesMatch(reqs.rules, resp)
+
+			},
+			createProjectAndRuleGen,
+		))
+
+	properties.TestingRun(t)
+}
+
+func TestUpdateRuleProperties(t *testing.T) {
+	ctx := context.Background()
+	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	properties := getGopterParams(seed)
+
+	properties.Property("updating newly created rules remain staged",
+		prop.ForAll(
+			func(reqs projectAndRuleReq) bool {
+				defer testDB.Flush(t)
+
+				_, err := createProjectAndRule(ctx, cl, reqs)
+
+				updateReq := api.UpdateRuleReq{
+					Id:         reqs.rules[0].Id,
+					ProjectId:  reqs.rules[0].ProjectId,
+					Name:       reqs.rules[0].Name + " updated",
+					Type:       reqs.rules[0].Type,
+					Conditions: reqs.rules[0].Conditions,
+				}
+				rStaged, err := cl.UpdateRule(ctx, &updateReq)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+				rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				return rApplied.Rule.Status == "applied" &&
+					ruleMatches(updateReq, *rApplied.Rule) &&
+					rStaged.Rule.Status == "staged" &&
+					ruleMatches(updateReq, *rStaged.Rule)
+			},
+			createProjectAndRuleGen,
+		))
+
+	properties.Property("updating applied rules become staged",
+		prop.ForAll(
+			func(reqs projectAndRuleReq) bool {
+				defer testDB.Flush(t)
+
+				_, err := createProjectAndRule(ctx, cl, reqs)
+
+				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+				rInitialApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				updateReq := api.UpdateRuleReq{
+					Id:         reqs.rules[0].Id,
+					ProjectId:  reqs.rules[0].ProjectId,
+					Name:       reqs.rules[0].Name + " updated",
+					Type:       reqs.rules[0].Type,
+					Conditions: reqs.rules[0].Conditions,
+				}
+				rStaged, err := cl.UpdateRule(ctx, &updateReq)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+				rFinalApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				return rInitialApplied.Rule.Status == "applied" &&
+					rStaged.Rule.Status == "staged" &&
+					rFinalApplied.Rule.Status == "applied" &&
+					ruleMatches(updateReq, *rStaged.Rule) &&
+					ruleMatches(updateReq, *rFinalApplied.Rule)
+			},
+			createProjectAndRuleGen,
+		))
+
+	properties.Property("updating applied and staged rules remain staged",
+		prop.ForAll(
+			func(reqs projectAndRuleReq) bool {
+				defer testDB.Flush(t)
+
+				_, err := createProjectAndRule(ctx, cl, reqs)
+
+				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+				updateReq := api.UpdateRuleReq{
+					Id:         reqs.rules[0].Id,
+					ProjectId:  reqs.rules[0].ProjectId,
+					Name:       reqs.rules[0].Name + " updated",
+					Type:       reqs.rules[0].Type,
+					Conditions: reqs.rules[0].Conditions,
+				}
+				rInitialStaged, err := cl.UpdateRule(ctx, &updateReq)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				updateReq2 := api.UpdateRuleReq{
+					Id:         reqs.rules[0].Id,
+					ProjectId:  reqs.rules[0].ProjectId,
+					Name:       reqs.rules[0].Name + " updated again",
+					Type:       reqs.rules[0].Type,
+					Conditions: reqs.rules[0].Conditions,
+				}
+				rFinalStaged, err := cl.UpdateRule(ctx, &updateReq2)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+				rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				return rInitialStaged.Rule.Status == "staged" &&
+					rFinalStaged.Rule.Status == "staged" &&
+					rApplied.Rule.Status == "applied" &&
+					ruleMatches(updateReq, *rInitialStaged.Rule) &&
+					ruleMatches(updateReq2, *rFinalStaged.Rule) &&
+					ruleMatches(updateReq2, *rApplied.Rule)
+			},
+			createProjectAndRuleGen,
+		))
+	properties.TestingRun(t)
+}
+
+func TestDeleteRuleProperties(t *testing.T) {
+	ctx := context.Background()
+	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	properties := getGopterParams(seed)
+
+	properties.Property("deleting newly created rules deletes them immediately",
+		prop.ForAll(
+			func(reqs projectAndRuleReq) bool {
+				defer testDB.Flush(t)
+
+				_, err := createProjectAndRule(ctx, cl, reqs)
+
+				_, err = cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: reqs.rules[0].Id})
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				deletedWhenStaged := grpctest.AssertCode(t, codes.NotFound, err)
+
+				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				deletedWhenApplied := grpctest.AssertCode(t, codes.NotFound, err)
+
+				return deletedWhenStaged && deletedWhenApplied
+			},
+			createProjectAndRuleGen,
+		))
+
+	properties.Property("deleting applied rules marks them for deletion and finalizes deletion upon applying rules",
+		prop.ForAll(
+			func(reqs projectAndRuleReq) bool {
+				defer testDB.Flush(t)
+
+				_, err := createProjectAndRule(ctx, cl, reqs)
+
+				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+				_, err = cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: reqs.rules[0].Id})
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				markedforDeletion := grpctest.AssertCode(t, codes.NotFound, err) && strings.Contains(err.Error(), "marked for deletion")
+
+				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				fullyDeleted := grpctest.AssertCode(t, codes.NotFound, err) && !strings.Contains(err.Error(), "marked for deletion")
+
+				return markedforDeletion && fullyDeleted
+			},
+			createProjectAndRuleGen,
+		))
+
+	properties.Property("deleting applied rules with staged updates marks them for deletion and finalizes deletion upon applying rules",
+		prop.ForAll(
+			func(reqs projectAndRuleReq) bool {
+				defer testDB.Flush(t)
+
+				_, err := createProjectAndRule(ctx, cl, reqs)
+
+				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+				updateReq := api.UpdateRuleReq{
+					Id:         reqs.rules[0].Id,
+					ProjectId:  reqs.rules[0].ProjectId,
+					Name:       reqs.rules[0].Name + " updated",
+					Type:       reqs.rules[0].Type,
+					Conditions: reqs.rules[0].Conditions,
+				}
+				_, err = cl.UpdateRule(ctx, &updateReq)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				_, err = cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: reqs.rules[0].Id})
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				markedforDeletion := grpctest.AssertCode(t, codes.NotFound, err) && strings.Contains(err.Error(), "marked for deletion")
+				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+
+				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				fullyDeleted := grpctest.AssertCode(t, codes.NotFound, err) && !strings.Contains(err.Error(), "marked for deletion")
+
+				return markedforDeletion && fullyDeleted
+			},
+			createProjectAndRuleGen,
+		))
+
+	properties.TestingRun(t)
+}
+
+func getGopterParams(seed int64) *gopter.Properties {
+	params := gopter.DefaultTestParametersWithSeed(seed)
+	params.MinSize = 1             // otherwise, we'd get zero-length "conditions" slices
+	params.MaxSize = 25            // otherwise, we may exceed GRPC capacity in ListRules
+	params.MinSuccessfulTests = 25 // reduced from default 100 to avoid timeouts in CI!
+	return gopter.NewProperties(params)
+}
+
+func getGenerators() (gopter.Gen, gopter.Gen, gopter.Gen) {
 	graphicRange := rangetable.Merge(unicode.GraphicRanges...)
 
 	conditionsGenNode := gen.StructPtr(reflect.TypeOf(&api.Condition{}), map[string]gopter.Gen{
@@ -82,88 +528,114 @@ func TestCreateRuleProperties(t *testing.T) {
 		"Name": gen.UnicodeString(graphicRange),
 	})
 
-	type projectAndRuleReq struct {
-		api.CreateProjectReq
-		rules []api.CreateRuleReq
+	createProjectAndRuleGen := gopter.CombineGens(
+		createProjectReqGen, gen.SliceOf(createRuleReqGen),
+	).Map(func(vals []interface{}) projectAndRuleReq {
+		p := vals[0].(api.CreateProjectReq)
+		rules := vals[1].([]api.CreateRuleReq)
+		return genStandardProjectAndRules(p, rules)
+	})
+
+	return createRuleReqGen, createProjectReqGen, createProjectAndRuleGen
+}
+
+func genStandardProjectAndRules(p api.CreateProjectReq, rules []api.CreateRuleReq) projectAndRuleReq {
+	for i, rule := range rules {
+
+		// make the id unique!
+		rules[i].Id = fmt.Sprintf("%s-index-%d", rule.Id, i)
+
+		// tie the rule to a real project
+		rules[i].ProjectId = p.Id
+
+		// constrain condition count even further than the gopter global param
+		var conditions []*api.Condition
+		for j := 0; j < int(math.Min(conditionLimit, float64(len(rule.Conditions)))); j++ {
+			conditions = append(conditions, rule.Conditions[j])
+		}
+		rules[i].Conditions = conditions
+	}
+	return projectAndRuleReq{
+		CreateProjectReq: p,
+		rules:            rules,
+	}
+}
+
+func reportErrorAndYieldFalse(t *testing.T, err error) bool {
+	t.Helper()
+	t.Error(err.Error())
+	return false
+}
+
+func ruleMatches(req interface{}, actual api.ProjectRule) bool {
+	if ruleReq, ok := req.(api.CreateRuleReq); ok {
+		return len(actual.Conditions) == len(ruleReq.Conditions) &&
+			actual.Id == ruleReq.Id &&
+			actual.Name == ruleReq.Name &&
+			actual.ProjectId == ruleReq.ProjectId
+	} else if ruleReq, ok := req.(api.UpdateRuleReq); ok {
+		return len(actual.Conditions) == len(ruleReq.Conditions) &&
+			actual.Id == ruleReq.Id &&
+			actual.Name == ruleReq.Name &&
+			actual.ProjectId == ruleReq.ProjectId
+	} else {
+		return false // should never happen
+	}
+}
+
+func rulesMatch(rules []api.CreateRuleReq, resp *api.ListRulesResp) bool {
+	if len(rules) != len(resp.Rules) {
+		return false
+	}
+	// Cannot assume DB returns rules in a particular order, so make a lookup table
+	lookup := make(map[string]api.CreateRuleReq, len(rules))
+	for _, rule := range rules {
+		lookup[rule.Id] = rule
+	}
+	// Now check each returned rule for existence and matching fields
+	for _, rule := range resp.Rules {
+		if expectedRule, ok := lookup[rule.Id]; ok {
+			if !ruleMatches(expectedRule, *rule) {
+				return false
+			}
+		} else {
+			return false
+		}
+	}
+	return true
+}
+
+func createProjectAndRule(ctx context.Context, cl api.ProjectsClient, reqs projectAndRuleReq) (*api.ProjectRule, error) {
+	_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+	if err != nil {
+		return nil, err
 	}
 
-	params := gopter.DefaultTestParametersWithSeed(seed)
-	params.MinSize = 1 // otherwise, we'd get zero-length "conditions" slices
-	properties := gopter.NewProperties(params)
-	properties.Property("creates a rule in storage", prop.ForAll(
-		func(reqs projectAndRuleReq) bool {
-			defer testDB.Flush(t)
-			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
-			if err != nil {
-				t.Error(err.Error())
-				return false // bad run
-			}
+	rule, err := cl.CreateRule(ctx, &reqs.rules[0])
+	if err != nil {
+		return nil, err
+	}
+	return rule.Rule, nil
+}
 
-			_, err = cl.CreateRule(ctx, &reqs.rules[0])
-			// Note: this could be very noisy, but it's hard to figure out what went
-			// wrong without the error
-			if err != nil {
-				t.Error(err.Error())
-				return false // bad run
-			}
+func createRules(ctx context.Context, cl api.ProjectsClient, rules []api.CreateRuleReq) ([]api.CreateRuleReq, error) {
+	for _, rule := range rules {
 
-			r, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
-			if err != nil {
-				t.Error(err.Error())
-				return false
-			}
+		_, err := cl.CreateRule(ctx, &rule)
+		// Note: this could be very noisy, but it's hard to figure out what went
+		// wrong without the error
+		if err != nil {
+			return nil, err
+		}
+	}
+	return rules, nil
+}
 
-			// Note: we're ignoring type conversion, as asserting that would require us
-			// to replicate the mapping logic in tests.
-			// Instead, as we add ReadRule, and ListRules etc, methods, we can use this
-			// testing approach to write meaningful assertions.
-			return len(r.Rule.Conditions) == len(reqs.rules[0].Conditions) &&
-				r.Rule.Id == reqs.rules[0].Id &&
-				r.Rule.Name == reqs.rules[0].Name &&
-				r.Rule.ProjectId == reqs.rules[0].ProjectId
-		},
-		gopter.CombineGens(createProjectReqGen, createRuleReqGen).Map(func(vals []interface{}) projectAndRuleReq {
-			p := vals[0].(api.CreateProjectReq)
-			r := vals[1].(api.CreateRuleReq)
-			r.ProjectId = p.Id
-			return projectAndRuleReq{
-				CreateProjectReq: p,
-				rules:            []api.CreateRuleReq{r},
-			}
-		}),
-	))
-	properties.Property("ensures IDs are unique", prop.ForAll(
-		func(reqs projectAndRuleReq) bool {
-			defer testDB.Flush(t)
-			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
-			if err != nil {
-				t.Error(err.Error())
-				return false // bad run
-			}
-
-			if _, err := cl.CreateRule(ctx, &reqs.rules[0]); err != nil {
-				t.Error(err.Error())
-				return false
-			}
-
-			_, err = cl.CreateRule(ctx, &reqs.rules[1])
-			return grpctest.AssertCode(t, codes.AlreadyExists, err)
-		},
-		// TODO(sr): deduplicate with the combinegen above?
-		gopter.CombineGens(createProjectReqGen, createRuleReqGen, createRuleReqGen).Map(func(vals []interface{}) projectAndRuleReq {
-			p := vals[0].(api.CreateProjectReq)
-			// we "fix" the second req to use the same ID as the first one
-			r0 := vals[1].(api.CreateRuleReq)
-			r1 := vals[2].(api.CreateRuleReq)
-			r1.Id = r0.Id
-			r0.ProjectId = p.Id
-			r1.ProjectId = p.Id
-			return projectAndRuleReq{
-				CreateProjectReq: p,
-				rules:            []api.CreateRuleReq{r0, r1},
-			}
-		}),
-	))
-	properties.TestingRun(t)
-	testFW.Shutdown(t, ctx)
+func reportRules(t *testing.T, rules []api.CreateRuleReq) {
+	t.Helper()
+	outputs := make([]string, len(rules))
+	for i, rule := range rules {
+		outputs[i] = fmt.Sprintf("%d", len(rule.Conditions))
+	}
+	t.Logf(fmt.Sprintf("%d rules with condition counts: %s", len(rules), strings.Join(outputs, ", ")))
 }

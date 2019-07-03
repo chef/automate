@@ -4332,7 +4332,7 @@ func TestDeleteRule(t *testing.T) {
 			assert.NoError(t, err)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=true`, ruleToDelete.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=false`, ruleToSave.ID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_staged_project_rules r WHERE r.id=$1)`, ruleToDelete.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_staged_project_rules r WHERE r.id=$1)`, ruleToDelete.ID))
 		},
 		"when multiple applied rules exist with a matching project filter, mark for delete": func(t *testing.T) {
 			ctx := context.Background()
@@ -4349,7 +4349,7 @@ func TestDeleteRule(t *testing.T) {
 			assert.NoError(t, err)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=true`, ruleToDelete.ID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=false`, ruleToSave.ID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
 		},
 		"when multiple applied rules exist with a non-matching project filter, do nothing and return NotFoundErr": func(t *testing.T) {
 			ctx := context.Background()
@@ -6665,10 +6665,12 @@ func assertRolesMatch(t *testing.T, db *testhelpers.TestDB, role storage.Role) {
 }
 
 func assertEmpty(t *testing.T, row *sql.Row) {
+	t.Helper()
 	assertCount(t, 0, row)
 }
 
 func assertOne(t *testing.T, row *sql.Row) {
+	t.Helper()
 	assertCount(t, 1, row)
 }
 
