@@ -1,8 +1,10 @@
 # we use pushd/popd here, and /bin/sh of our chefes/buildkite image is not bash
 # so we have to override the default shell here
 SHELL=bash
-SWAGGER_SOURCE_DIRS=../automate-gateway/api ../../api/external
 SWAGGER_RESULT_FILE=static/api-docs/all-apis.swagger.json
+SWAGGER_DIR=data/docs/api_chef_automate
+SWAGGER_FILES = $(shell find $(SWAGGER_DIR) -name '*.swagger.json')
+EXPECTED_CONFLICTS=47
 
 themes/chef:
 	git clone https://${GITHUB_TOKEN}@github.com/chef/chef-hugo-theme.git themes/chef
@@ -15,8 +17,6 @@ clean:
 
 sync: themes/chef
 	pushd themes/chef && git fetch && git reset --hard origin/master && popd
-
-SWAGGER_DIR=data/docs/api_chef_automate
 
 clean_swagger_files:
 	rm -rf ./$(SWAGGER_DIR)/*
@@ -36,11 +36,7 @@ sync_swagger_files: clean_swagger_files
 		; done && \
 	popd
 
-SWAGGER_FILES = $(shell find $(SWAGGER_SOURCE_DIRS) -name '*.swagger.json')
-
 $(SWAGGER_RESULT_FILE): $(SWAGGER_FILES)
-
-EXPECTED_CONFLICTS=47
 
 generate_swagger: $(SWAGGER_RESULT_FILE)
 	swagger mixin -c=$(EXPECTED_CONFLICTS) $(SWAGGER_FILES) > $(SWAGGER_RESULT_FILE) 2> /dev/null
