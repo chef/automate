@@ -52,4 +52,4 @@
 - [`50_add_status_field_to_rules.up.sql`](50_add_status_field_to_rules.up.sql)
 - [`51_change_project_rules_query.up.sql`](51_change_project_rules_query.up.sql)
 - [`52_add_db_id_members.up.sql`](52_add_db_id_members.up.sql)
-- [`53_add_db_id_to_iam_statements.up.sql`(53_add_db_id_to_iam_statements.up.sql)
+- [`53_add_db_id_to_iam_policies.up.sql`](53_add_db_id_to_iam_policies.up.sql)
