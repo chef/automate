@@ -6,7 +6,7 @@
 # verify_setup: Initialize a buildkite host for running a `hab studio
 # run` style integration test.
 #
-scripts/download_verify_harts
+scripts/download_verify_harts.sh
 
 upload_logs() {
     echo "Attempting to upload logs to buildkite"

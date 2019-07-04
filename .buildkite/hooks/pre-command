@@ -33,4 +33,4 @@ fi
 
 # Count retries as BK annotations; don't make all jobs explode if the script
 # is removed.
-[[ -x "scripts/count_retries" ]] && scripts/count_retries
+[[ -x "scripts/count_retries.sh" ]] && scripts/count_retries.sh
