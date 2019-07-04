@@ -28,13 +28,13 @@ func TestIntervalUntilNowDefaultTimeUnitsEqual2(t *testing.T) {
 	diff := timef.IntervalUntilNow(timeNow.AddDate(1, 1, 1))
 
 	// but since we cap the time units to a maximum of 2
-	assert.Equal(t, "1 year, 1 month", diff)
+	assert.Equal(t, "1 year 1 month", diff)
 }
 
 func TestDiffPrettyNUnitsFewFieldsMatrix(t *testing.T) {
 	timeA := time.Date(2017, 6, 21, 0, 0, 0, 0, time.UTC)
 	timeB := time.Date(2028, 6, 21, 1, 30, 2, 1, time.UTC)
-	//expected: "11 years, 1 month, 20 days, 1 hour, 30 minutes, 2 seconds",
+	//expected: "11 years 1 month 20 days 1 hour 30 minutes 2 seconds",
 	cases := []struct {
 		message  string
 		units    int
@@ -43,27 +43,27 @@ func TestDiffPrettyNUnitsFewFieldsMatrix(t *testing.T) {
 		{
 			message:  "all time units",
 			units:    6,
-			expected: "11 years, 1 hour, 30 minutes, 2 seconds",
+			expected: "11 years 1 hour 30 minutes 2 seconds",
 		},
 		{
 			message:  "all time units",
 			units:    5,
-			expected: "11 years, 1 hour, 30 minutes, 2 seconds",
+			expected: "11 years 1 hour 30 minutes 2 seconds",
 		},
 		{
 			message:  "all time units",
 			units:    4,
-			expected: "11 years, 1 hour, 30 minutes, 2 seconds",
+			expected: "11 years 1 hour 30 minutes 2 seconds",
 		},
 		{
 			message:  "all time units",
 			units:    3,
-			expected: "11 years, 1 hour, 30 minutes",
+			expected: "11 years 1 hour 30 minutes",
 		},
 		{
 			message:  "all time units",
 			units:    2,
-			expected: "11 years, 1 hour",
+			expected: "11 years 1 hour",
 		},
 		{
 			message:  "all time units",
@@ -101,27 +101,27 @@ func TestDiffPrettyNUnitsAllFieldsMatrix(t *testing.T) {
 		{
 			message:  "all time units",
 			units:    6,
-			expected: "1 year, 1 month, 1 day, 1 hour, 1 minute, 1 second",
+			expected: "1 year 1 month 1 day 1 hour 1 minute 1 second",
 		},
 		{
 			message:  "all time units",
 			units:    5,
-			expected: "1 year, 1 month, 1 day, 1 hour, 1 minute",
+			expected: "1 year 1 month 1 day 1 hour 1 minute",
 		},
 		{
 			message:  "all time units",
 			units:    4,
-			expected: "1 year, 1 month, 1 day, 1 hour",
+			expected: "1 year 1 month 1 day 1 hour",
 		},
 		{
 			message:  "all time units",
 			units:    3,
-			expected: "1 year, 1 month, 1 day",
+			expected: "1 year 1 month 1 day",
 		},
 		{
 			message:  "all time units",
 			units:    2,
-			expected: "1 year, 1 month",
+			expected: "1 year 1 month",
 		},
 		{
 			message:  "all time units",
@@ -141,7 +141,7 @@ func TestDiffPrettyNUnitsAllFieldsMatrix(t *testing.T) {
 		{
 			message:  "more than the max number of time units should return them all six",
 			units:    7,
-			expected: "1 year, 1 month, 1 day, 1 hour, 1 minute, 1 second",
+			expected: "1 year 1 month 1 day 1 hour 1 minute 1 second",
 		},
 	}
 
@@ -236,13 +236,13 @@ func TestDiffPrettyAllUnitsMatrix(t *testing.T) {
 			message:  "all values must have a diff of 1",
 			timeA:    time.Date(2017, 5, 1, 0, 0, 0, 0, time.UTC),
 			timeB:    time.Date(2018, 6, 2, 1, 1, 1, 1, time.UTC),
-			expected: "1 year, 1 month, 1 day, 1 hour, 1 minute, 1 second",
+			expected: "1 year 1 month 1 day 1 hour 1 minute 1 second",
 		},
 		{
 			message:  "singular and plurals",
 			timeA:    time.Date(2017, 5, 1, 0, 0, 0, 0, time.UTC),
 			timeB:    time.Date(2028, 6, 21, 1, 30, 2, 1, time.UTC),
-			expected: "11 years, 1 month, 20 days, 1 hour, 30 minutes, 2 seconds",
+			expected: "11 years 1 month 20 days 1 hour 30 minutes 2 seconds",
 		},
 		{
 			message:  "the limit of one month is 30 days",
@@ -260,13 +260,13 @@ func TestDiffPrettyAllUnitsMatrix(t *testing.T) {
 			message:  "11 months and one day",
 			timeA:    time.Date(2018, 2, 11, 0, 0, 0, 0, time.UTC),
 			timeB:    time.Date(2019, 1, 12, 0, 0, 0, 0, time.UTC),
-			expected: "11 months, 1 day",
+			expected: "11 months 1 day",
 		},
 		{
 			message:  "same 11 months and one day in a different timezone UTC-8",
 			timeA:    time.Date(2018, 2, 11, 0, 0, 0, 0, time.UTC),
 			timeB:    time.Date(2019, 1, 12, 0, 0, 0, 0, time.FixedZone("UTC-8", -8*60*60)),
-			expected: "11 months, 1 day, 8 hours",
+			expected: "11 months 1 day 8 hours",
 		},
 	}
 
@@ -284,7 +284,7 @@ func TestDiffMatrix(t *testing.T) {
 		timeA   time.Time
 		timeB   time.Time
 		// one single string that contains the returned values from the
-		// timeDiff() func format: "y, mo, d, h, mi, s"
+		// timeDiff() func format: "y mo d h mi s"
 		expected string
 	}{
 		{
