@@ -12,7 +12,12 @@ func (db *Postgres) GetSupervisor(id int32) (*storage.Supervisor, error) {
 		return nil, err
 	}
 
-	return &storage.Supervisor{sup.ID, sup.MemberID, sup.Fqdn, sup.Site}, nil
+	return &storage.Supervisor{
+		ID:       sup.ID,
+		MemberID: sup.MemberID,
+		Fqdn:     sup.Fqdn,
+		Site:     sup.Site,
+	}, nil
 }
 
 func (db *Postgres) getSupervisor(id int32) (*supervisor, error) {

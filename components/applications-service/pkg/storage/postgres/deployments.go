@@ -12,7 +12,11 @@ func (db *Postgres) GetDeployment(id int32) (*storage.Deployment, error) {
 		return nil, err
 	}
 
-	return &storage.Deployment{d.ID, d.AppName, d.Environment}, nil
+	return &storage.Deployment{
+		ID:          d.ID,
+		Application: d.AppName,
+		Environment: d.Environment,
+	}, nil
 }
 
 func (db *Postgres) getDeployment(id int32) (*deployment, error) {
