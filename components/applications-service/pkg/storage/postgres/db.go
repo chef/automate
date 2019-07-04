@@ -119,6 +119,9 @@ type supervisor struct {
 	Site      string    `db:"site"`
 	CreatedAt time.Time `db:"-"`
 	UpdatedAt time.Time `db:"-"`
+
+	// (internal) use it to know if the supervisor needs an update or not
+	needUpdate bool `db:"-"`
 }
 
 // serviceGroup struct is the representation of the service_group table inside the db
@@ -128,6 +131,9 @@ type serviceGroup struct {
 	DeploymentID int32     `db:"deployment_id"`
 	CreatedAt    time.Time `db:"-"`
 	UpdatedAt    time.Time `db:"-"`
+
+	// (internal) use it to know if the service-group needs an update or not
+	needUpdate bool `db:"-"`
 }
 
 // deployment struct is the representation of the deployment table inside the db
@@ -137,4 +143,7 @@ type deployment struct {
 	Environment string    `db:"environment"`
 	CreatedAt   time.Time `db:"-"`
 	UpdatedAt   time.Time `db:"-"`
+
+	// (internal) use it to know if the deployment needs an update or not
+	needUpdate bool `db:"-"`
 }
