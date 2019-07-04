@@ -20,6 +20,17 @@ func TestIntervalUntilNow(t *testing.T) {
 	assert.Equal(t, "1 second", diff)
 }
 
+func TestIntervalUntilNowDefaultTimeUnitsEqual2(t *testing.T) {
+	// Lets get the time now
+	timeNow := time.Now()
+
+	// This should return "1 year, 1 month, 1 day"
+	diff := timef.IntervalUntilNow(timeNow.AddDate(1, 1, 1))
+
+	// but since we cap the time units to a maximum of 2
+	assert.Equal(t, "1 year, 1 month", diff)
+}
+
 func TestDiffPrettyNUnitsFewFieldsMatrix(t *testing.T) {
 	timeA := time.Date(2017, 6, 21, 0, 0, 0, 0, time.UTC)
 	timeB := time.Date(2028, 6, 21, 1, 30, 2, 1, time.UTC)

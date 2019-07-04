@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	DefaultNumberOfTimeUnits = 3
+	DefaultNumberOfTimeUnits = 2
 	MaxNumberOfTimeUnits     = 6
 )
 
