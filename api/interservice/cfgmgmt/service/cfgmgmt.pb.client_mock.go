@@ -5,11 +5,11 @@
 package service
 
 import (
+	context "context"
 	request "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	response "github.com/chef/automate/api/interservice/cfgmgmt/response"
 	gomock "github.com/golang/mock/gomock"
 	struct0 "github.com/golang/protobuf/ptypes/struct"
-	context "golang.org/x/net/context"
 	grpc "google.golang.org/grpc"
 	metadata "google.golang.org/grpc/metadata"
 	reflect "reflect"

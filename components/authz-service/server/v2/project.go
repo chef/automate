@@ -460,6 +460,9 @@ func (s *ProjectState) listRulesWithFunction(ctx context.Context, req *api.ListR
 func (s *ProjectState) ListRulesForProject(ctx context.Context, req *api.ListRulesForProjectReq) (*api.ListRulesForProjectResp, error) {
 	resp, err := s.store.ListRulesForProject(ctx, req.Id)
 	if err != nil {
+		if err == storage_errors.ErrNotFound {
+			return nil, status.Errorf(codes.NotFound, "could not find project with ID %q", req.Id)
+		}
 		return nil, status.Errorf(codes.Internal, "error retrieving rules: %s", err.Error())
 	}
 
@@ -489,11 +492,11 @@ func (s *ProjectState) DeleteRule(ctx context.Context, req *api.DeleteRuleReq) (
 	}
 }
 
-func storageConditions(ruleType storage.RuleType, apiConditions []*api.Condition) ([]storage.Condition, error) {
+func storageConditions(apiConditions []*api.Condition) ([]storage.Condition, error) {
 	cs := make([]storage.Condition, len(apiConditions))
 	for i, c := range apiConditions {
 		var err error
-		cs[i], err = storageCondition(ruleType, c)
+		cs[i], err = storageCondition(c)
 		if err != nil {
 			return nil, err
 		}
@@ -501,7 +504,7 @@ func storageConditions(ruleType storage.RuleType, apiConditions []*api.Condition
 	return cs, nil
 }
 
-func storageCondition(ruleType storage.RuleType, apiCondition *api.Condition) (storage.Condition, error) {
+func storageCondition(apiCondition *api.Condition) (storage.Condition, error) {
 	condAttr, err := fromAPIProjectRuleConditionAttributes(apiCondition.Attribute)
 	if err != nil {
 		return storage.Condition{}, err
@@ -512,7 +515,7 @@ func storageCondition(ruleType storage.RuleType, apiCondition *api.Condition) (s
 		return storage.Condition{}, err
 	}
 
-	return storage.NewCondition(ruleType, apiCondition.Values, condAttr, condOp)
+	return storage.NewCondition(apiCondition.Values, condAttr, condOp)
 }
 
 // we want to reserve the option to return an error in this conversion
@@ -668,7 +671,7 @@ func (s *ProjectState) prepareStorageRule(inID, projectID, name string,
 		return nil, status.Errorf(codes.InvalidArgument,
 			"creating rule with ID %q: %s", inID, err.Error())
 	}
-	conditions, err := storageConditions(ruleType, inConditions)
+	conditions, err := storageConditions(inConditions)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument,
 			"creating rule with ID %q: %s", inID, err.Error())

@@ -189,19 +189,86 @@ func TestIngestMultiServicesSameServiceGroup(t *testing.T) {
 
 	// also check stats endpoint function
 	assert.Equal(t, int32(len(events)), suite.GetServicesCountForStatsEndpoint(), "wrong number of services")
-	// We have a race condition where if we have different services sending messages
-	// to Automate at the same time that belongs to the same service-group we will
-	// insert different service-groups and deployments entries instead of a single one.
+	// If we have different services sending messages
+	// to Automate at the same time that belongs to the same deployment and same
+	// service-group we will hit a uniqueness constraint, and then we should retry.
+	// On the retry we should get the existing deployment ID and use it.
 	//
-	// The main reason of this problem is because we process 50 things at a time (worker pool)
-	//
-	// TODO @afiune fix and uncomment this test!
+	// The main reason we encounter the uniqueness contstraint is because we process
+	// 50 things at a time (worker pool)
 	//
 	// Verify there is only one service_group
-	//sgList := suite.GetServiceGroups()
-	//assert.Equal(t, 1, len(sgList), "there should be only one single service group")
+	sgList := suite.GetServiceGroups()
+	assert.Equal(t, 1, len(sgList), "there should be only one single service group")
 	// also check stats endpoint function
-	//assert.Equal(t, int32(1), suite.GetServiceGroupsCountForStatsEndpoint(), "there should be only one single service group")
+	assert.Equal(t, int32(1), suite.GetServiceGroupsCountForStatsEndpoint(), "there should be only one single service group")
+}
+
+// This tests our ability to retry inserting service groups when there is an existing
+// deployment but two new service groups in the same batch of messages.
+func TestIngestMultiServicesSameServiceGroupExistingDeployment(t *testing.T) {
+	defer suite.DeleteDataFromStorage()
+
+	// First batch of events creates deployment and a unique service-group
+	events := []*habitat.HealthCheckEvent{
+		NewHabitatEvent(
+			withSupervisorId("s4l1m"),
+			withPackageIdent("test/db/0.1.0/20200101121211"),
+			withServiceGroup("seed.default"),
+			withStrategyAtOnce("stable"),
+			withApplication("test-app"),
+			withEnvironment("development"),
+			withFqdn("db.example.eu.com"),
+			withHealth(HealthCheckIntToString(1)), // -> WARNING
+			withSite("eu"),
+		),
+	}
+
+	// Ingest messages through the Ingester client
+	suite.IngestMessagesViaIngester(events...)
+
+	// Second batch of events reuses deployment but has two identical service-groups
+	// for insertion.
+	events2 := []*habitat.HealthCheckEvent{
+		NewHabitatEvent(
+			withSupervisorId("4f1un3"),
+			withPackageIdent("dev/db/0.1.0/20200101121212"),
+			withServiceGroup("db.default"),
+			withStrategyAtOnce("stable"),
+			withApplication("test-app"),
+			withEnvironment("development"),
+			withFqdn("db.example.us.com"),
+			withHealth(HealthCheckIntToString(2)), // -> CRITICAL
+			withSite("us"),
+		),
+		NewHabitatEvent(
+			withSupervisorId("m4y4"),
+			withPackageIdent("personal/db/0.1.0/20200101121213"),
+			withServiceGroup("db.default"),
+			withStrategyAtOnce("stable"),
+			withApplication("test-app"),
+			withEnvironment("development"),
+			withFqdn("db.example.mx.com"),
+			withHealth(HealthCheckIntToString(3)), // -> UNKNOWN
+			withSite("mx"),
+		),
+	}
+
+	// Ingest messages through the Ingester client
+	suite.IngestMessagesViaIngester(events2...)
+
+	// Verify there are only three services
+	serviceCount := len(events) + len(events2)
+	svcList := suite.GetServices()
+	assert.Equal(t, serviceCount, len(svcList), "wrong number of services")
+
+	// also check stats endpoint function
+	assert.Equal(t, int32(serviceCount), suite.GetServicesCountForStatsEndpoint(), "wrong number of services")
+
+	sgList := suite.GetServiceGroups()
+	assert.Equal(t, 2, len(sgList), "there should be two service groups")
+	// also check stats endpoint function
+	assert.Equal(t, int32(2), suite.GetServiceGroupsCountForStatsEndpoint(), "there should be two service groups")
 }
 
 func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {

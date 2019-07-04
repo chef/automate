@@ -1,10 +1,13 @@
+#!/usr/bin/env sh
+#
+# NOTE: This script is likely sourced in /bin/sh and not bash. Please
+# keep code in this script sh-compatible.
 #
 # verify_studio_init: Setup a `hab studio run` environment to run
 # tests in CI.
 #
 # This script is intended for sourcing directly rather than executing.
 #
-# NOTE: This script is likely sourced in /bin/sh and not bash.
 SUP_LOG_FILE=/hab/sup/default/sup.log
 
 . .studiorc

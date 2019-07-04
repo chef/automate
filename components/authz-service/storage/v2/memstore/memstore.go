@@ -313,6 +313,11 @@ func (s *State) ListRules(_ context.Context) ([]*storage.Rule, error) {
 }
 
 func (s *State) ListRulesForProject(_ context.Context, projectID string) ([]*storage.Rule, error) {
+	_, exists := s.projects.Get(projectID)
+	if !exists {
+		return nil, storage_errors.ErrNotFound
+	}
+
 	items := s.rules.Items()
 	rules := []*storage.Rule{}
 
