@@ -243,12 +243,6 @@ func (db *Postgres) triggerDataUpdates(
 func (db *Postgres) updateSupervisor(
 	sup *supervisor, eventMetadata *habitat.EventMetadata) {
 
-	// @afiune should we allow supervisors to change their member-id?
-	if sup.MemberID != eventMetadata.GetSupervisorId() {
-		sup.MemberID = eventMetadata.GetSupervisorId()
-		sup.needUpdate = true
-	}
-
 	if sup.Fqdn != eventMetadata.GetFqdn() {
 		sup.Fqdn = eventMetadata.GetFqdn()
 		sup.needUpdate = true

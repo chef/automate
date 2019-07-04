@@ -598,3 +598,48 @@ func TestIngestHealthUpdatedAtUpdatesOnlyOnHealthUpdate(t *testing.T) {
 		}
 	}
 }
+
+func TestIngestDenySupervisorMemberIDUpdates(t *testing.T) {
+	defer suite.DeleteDataFromStorage()
+
+	var (
+		eventsProcessed = suite.Ingester.EventsProcessed()
+		event           = NewHabitatEvent(
+			withSupervisorId("4f1un3"),
+			withPackageIdent("core/db/0.1.0/20200101121212"),
+			withServiceGroup("db.default"),
+		)
+		bytes, err = proto.Marshal(event)
+	)
+
+	if assert.Nil(t, err) {
+		suite.Ingester.IngestMessage(bytes)
+		eventsProcessed++
+		suite.WaitForEventsToProcess(eventsProcessed)
+
+		svcList := suite.GetServices()
+		if assert.Equal(t, 1, len(svcList)) {
+			assert.Equal(t, "4f1un3", svcList[0].SupMemberID,
+				"the service supervisor_id is not the expected one")
+		}
+
+		// By updating the member-id we recognize this as a brand new service
+		UpdateHabitatEvent(event, withSupervisorId("foo"))
+		bytes, err = proto.Marshal(event)
+		if assert.Nil(t, err) {
+			suite.Ingester.IngestMessage(bytes)
+			eventsProcessed++
+			suite.WaitForEventsToProcess(eventsProcessed)
+
+			svcList = suite.GetServices()
+
+			// we expect to have two services
+			if assert.Equal(t, 2, len(svcList)) {
+				assert.Equal(t, "4f1un3", svcList[0].SupMemberID,
+					"the service supervisor_id is not the expected one")
+				assert.Equal(t, "foo", svcList[1].SupMemberID,
+					"the service supervisor_id is not the expected one")
+			}
+		}
+	}
+}
