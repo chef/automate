@@ -367,20 +367,14 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 	})
 
 	t.Run("update same service with all possible things to update", func(t *testing.T) {
-		// TODO @afiune define what are the fields that we can updated?
-		// - Health, PreviousHealth and HealthUpdatedAt
-		// - Package ident (without name. the name of a service can't be changed!)
-		// - Update strategy
-		// - LastEventOccurredAt (habitat timestamp)
-
 		UpdateHabitatEvent(event,
 			withHealth(HealthCheckIntToString(2)), // -> CRITICAL
 			withStrategyAtOnce("unstable"),
 			withPackageIdent("changed/db/3.2.1/20201212000000"),
-			// TODO @afiune we should also update these fields
-			//withApplication("test-app"),
-			//withEnvironment("development"),
-			//withFqdn("db.example.com"),
+			withServiceGroup("db.test"),
+			withApplication("db-unstable-test"),
+			withEnvironment("testing"),
+			withFqdn("db.unstable.example.com"),
 		)
 
 		bytes, err := proto.Marshal(event)
@@ -404,13 +398,13 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 				"the service release is not the expected one")
 			assert.Equal(t, "CRITICAL", svcList[0].Health,
 				"the service health is not the expected one")
-			assert.Equal(t, "db.default", svcList[0].Group,
+			assert.Equal(t, "db.test", svcList[0].Group,
 				"the service service group name is not the expected one")
-			assert.Equal(t, "db.example.com", svcList[0].Fqdn,
+			assert.Equal(t, "db.unstable.example.com", svcList[0].Fqdn,
 				"the service fqdn is not the expected one")
-			assert.Equal(t, "test-app", svcList[0].Application,
+			assert.Equal(t, "db-unstable-test", svcList[0].Application,
 				"the service application name is not the expected one")
-			assert.Equal(t, "development", svcList[0].Environment,
+			assert.Equal(t, "testing", svcList[0].Environment,
 				"the service environment name is not the expected one")
 			assert.Equal(t, "unstable", svcList[0].Channel,
 				"the service channel name is not the expected one")
@@ -432,7 +426,7 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 			sgList := suite.GetServiceGroups()
 			assert.Equal(t, 1, len(sgList), "wrong number of service groups")
 
-			assert.Equal(t, "db.default", sgList[0].Name,
+			assert.Equal(t, "db.test", sgList[0].Name,
 				"the service_group name is not the expected one")
 			assert.Equal(t, "changed/db", sgList[0].Package,
 				"the service_group package is not the expected one")
@@ -442,9 +436,9 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 				"the service_group health status is not the expected one")
 			assert.Equal(t, int32(0), sgList[0].HealthPercentage,
 				"the service_group health percentage is not the expected one")
-			assert.Equal(t, "test-app", sgList[0].Application,
+			assert.Equal(t, "db-unstable-test", sgList[0].Application,
 				"the service_group application name is not the expected one")
-			assert.Equal(t, "development", sgList[0].Environment,
+			assert.Equal(t, "testing", sgList[0].Environment,
 				"the service_group environment name is not the expected one")
 			assert.Equal(t, int32(1), sgList[0].ServicesHealthCounts.Total,
 				"the total number of services in this service_group is not the expected one")
