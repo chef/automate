@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 	"unicode"
+	"unsafe"
 
 	"github.com/leanovate/gopter"
 	"github.com/leanovate/gopter/gen"
@@ -22,7 +23,7 @@ import (
 
 const (
 	idRegex        = "^[a-z0-9-]{1,64}$"
-	conditionLimit = 10 // avoid the grpc limit of 4194304
+	conditionLimit = 25 // avoid the grpc limit of 4194304
 )
 
 type projectAndRuleReq struct {
@@ -174,63 +175,63 @@ func TestListRuleProperties(t *testing.T) {
 			createProjectAndRuleGen,
 		))
 
-	properties.Property("staged rules are not reported as applied",
-		prop.ForAll(
-			func(reqs projectAndRuleReq) bool {
-				defer testDB.Flush(t)
+	// properties.Property("staged rules are not reported as applied",
+	// 	prop.ForAll(
+	// 		func(reqs projectAndRuleReq) bool {
+	// 			defer testDB.Flush(t)
 
-				reportRules(t, reqs.rules)
+	// 			reportRules(t, reqs.rules)
 
-				_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
-				if err != nil {
-					return reportErrorAndYieldFalse(t, err)
-				}
+	// 			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+	// 			if err != nil {
+	// 				return reportErrorAndYieldFalse(t, err)
+	// 			}
 
-				reqs.rules, err = createRules(ctx, cl, reqs.rules)
-				if err != nil {
-					return reportErrorAndYieldFalse(t, err)
-				}
+	// 			reqs.rules, err = createRules(ctx, cl, reqs.rules)
+	// 			if err != nil {
+	// 				return reportErrorAndYieldFalse(t, err)
+	// 			}
 
-				resp, err := cl.ListRules(ctx, &api.ListRulesReq{IncludeStaged: false})
-				if err != nil {
-					return reportErrorAndYieldFalse(t, err)
-				}
+	// 			resp, err := cl.ListRules(ctx, &api.ListRulesReq{IncludeStaged: false})
+	// 			if err != nil {
+	// 				return reportErrorAndYieldFalse(t, err)
+	// 			}
 
-				return len(resp.Rules) == 0
+	// 			return len(resp.Rules) == 0
 
-			},
-			createProjectAndRuleGen,
-		))
+	// 		},
+	// 		createProjectAndRuleGen,
+	// 	))
 
-	properties.Property("applied rules are reported as applied",
-		prop.ForAll(
-			func(reqs projectAndRuleReq) bool {
-				defer testDB.Flush(t)
+	// properties.Property("applied rules are reported as applied",
+	// 	prop.ForAll(
+	// 		func(reqs projectAndRuleReq) bool {
+	// 			defer testDB.Flush(t)
 
-				reportRules(t, reqs.rules)
+	// 			reportRules(t, reqs.rules)
 
-				_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
-				if err != nil {
-					return reportErrorAndYieldFalse(t, err)
-				}
+	// 			_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+	// 			if err != nil {
+	// 				return reportErrorAndYieldFalse(t, err)
+	// 			}
 
-				reqs.rules, err = createRules(ctx, cl, reqs.rules)
-				if err != nil {
-					return reportErrorAndYieldFalse(t, err)
-				}
+	// 			reqs.rules, err = createRules(ctx, cl, reqs.rules)
+	// 			if err != nil {
+	// 				return reportErrorAndYieldFalse(t, err)
+	// 			}
 
-				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+	// 			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-				resp, err := cl.ListRules(ctx, &api.ListRulesReq{})
-				if err != nil {
-					return reportErrorAndYieldFalse(t, err)
-				}
+	// 			resp, err := cl.ListRules(ctx, &api.ListRulesReq{})
+	// 			if err != nil {
+	// 				return reportErrorAndYieldFalse(t, err)
+	// 			}
 
-				return rulesMatch(reqs.rules, resp)
+	// 			return rulesMatch(reqs.rules, resp)
 
-			},
-			createProjectAndRuleGen,
-		))
+	// 		},
+	// 		createProjectAndRuleGen,
+	// 	))
 
 	properties.TestingRun(t)
 }
@@ -468,8 +469,8 @@ func TestDeleteRuleProperties(t *testing.T) {
 
 func getGopterParams(seed int64) *gopter.Properties {
 	params := gopter.DefaultTestParametersWithSeed(seed)
-	params.MinSize = 1             // otherwise, we'd get zero-length "conditions" slices
-	params.MaxSize = 25            // otherwise, we may exceed GRPC capacity in ListRules
+	params.MinSize = 1 // otherwise, we'd get zero-length "conditions" slices
+	// params.MaxSize = 25            // otherwise, we may exceed GRPC capacity in ListRules
 	params.MinSuccessfulTests = 25 // reduced from default 100 to avoid timeouts in CI!
 	return gopter.NewProperties(params)
 }
@@ -637,5 +638,39 @@ func reportRules(t *testing.T, rules []api.CreateRuleReq) {
 	for i, rule := range rules {
 		outputs[i] = fmt.Sprintf("%d", len(rule.Conditions))
 	}
-	t.Logf(fmt.Sprintf("%d rules with condition counts: %s", len(rules), strings.Join(outputs, ", ")))
+	t.Logf("%d rules with condition counts: %s", len(rules), strings.Join(outputs, ", "))
+	dumpRules(t, rules)
+}
+
+func dumpRules(t *testing.T, rules []api.CreateRuleReq) {
+	// we have the request object but we want to measure the response object,
+	// so adding in deleted (bool) and status ("applied|staged")
+	// The ListRulesResp object also contains 3 more fields:
+	// XXX_NoUnkeyedLiteral, XXX_unrecognized, XXX_sizecache. The last one is 4 bytes but not sure on the first two.
+	// Those unknown bits are greatly exacerbated in that each rule in the payload also has those 3 fields,
+	// and each condition of each rule does also!
+	for _, r := range rules {
+		cSize, cSizeStr := conditionSize(r.Conditions)
+		t.Logf("Rule size |%d|: %d+%d+%d+%d+%s+%d+%d",
+			size(r.Id)+size(r.ProjectId)+size(r.Name)+int(unsafe.Sizeof(r.Type))+cSize+int(unsafe.Sizeof(true))+size("applied"),
+			size(r.Id), size(r.ProjectId), size(r.Name), unsafe.Sizeof(r.Type), cSizeStr, unsafe.Sizeof(true), size("applied"))
+	}
+}
+
+func conditionSize(conditions []*api.Condition) (int, string) {
+	var cList []string
+	cSize := 0
+	for _, c := range conditions {
+		vSize := 0
+		for _, v := range c.Values {
+			vSize += size(v)
+		}
+		cList = append(cList, fmt.Sprintf("{%d+%d+%d}", unsafe.Sizeof(c.Attribute), unsafe.Sizeof(c.Operator), vSize))
+		cSize += int(unsafe.Sizeof(c.Attribute)) + int(unsafe.Sizeof(c.Operator)) + vSize
+	}
+	return cSize, "[ " + strings.Join(cList, ", ") + " ]"
+}
+
+func size(s string) int {
+	return len([]byte(s))
 }
