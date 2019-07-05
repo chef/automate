@@ -11,21 +11,24 @@ import (
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
 )
 
-func BuildBulkRunPublisher(client backend.Client) message.ChefRunPipe {
+func BuildBulkRunPublisher(client backend.Client, maxNumberOfBundledRunMsgs int) message.ChefRunPipe {
 	return func(in <-chan message.ChefRun) <-chan message.ChefRun {
-		return bulkRunPublisherBundler(in, client)
+		return bulkRunPublisherBundler(in, client, maxNumberOfBundledRunMsgs)
 	}
 }
 
-func BuildBulkActionPublisher(client backend.Client) message.ChefActionPipe {
+func BuildBulkActionPublisher(client backend.Client, maxNumberOfBundledActionMsgs int) message.ChefActionPipe {
 	return func(in <-chan message.ChefAction) <-chan message.ChefAction {
-		return bulkActionPublisherBundler(in, client)
+		return bulkActionPublisherBundler(in, client, maxNumberOfBundledActionMsgs)
 	}
 }
 
-func bulkRunPublisherBundler(in <-chan message.ChefRun, client backend.Client) <-chan message.ChefRun {
-	maxNumberOfBundledMsgs := 10000
-	out := make(chan message.ChefRun, maxNumberOfBundledMsgs)
+func bulkRunPublisherBundler(in <-chan message.ChefRun, client backend.Client,
+	maxNumberOfBundledRunMsgs int) <-chan message.ChefRun {
+	log.WithFields(log.Fields{
+		"maxNumberOfBundledRunMsgs": maxNumberOfBundledRunMsgs,
+	}).Debug("starting bulkRunPublisherBundler")
+	out := make(chan message.ChefRun, maxNumberOfBundledRunMsgs)
 	go func() {
 		bundledMsgs := []message.ChefRun{}
 		for msg := range in {
@@ -35,7 +38,7 @@ func bulkRunPublisherBundler(in <-chan message.ChefRun, client backend.Client) <
 			// Only publish the collection of bundled messages if
 			// the inbox is empty or there are over 10,000 messages bundled
 			// else collect the next message
-			if len(in) == 0 || len(bundledMsgs) > maxNumberOfBundledMsgs {
+			if len(in) == 0 || len(bundledMsgs) > maxNumberOfBundledRunMsgs {
 				start := time.Now()
 				bulkableRequests := collectBulkRunRequests(bundledMsgs)
 				err := client.SendBulkRequest(context.Background(), bulkableRequests)
@@ -76,9 +79,12 @@ func bulkRunPublisherBundler(in <-chan message.ChefRun, client backend.Client) <
 	return out
 }
 
-func bulkActionPublisherBundler(in <-chan message.ChefAction, client backend.Client) <-chan message.ChefAction {
-	maxNumberOfBundledMsgs := 10000
-	out := make(chan message.ChefAction, maxNumberOfBundledMsgs)
+func bulkActionPublisherBundler(in <-chan message.ChefAction, client backend.Client,
+	maxNumberOfBundledActionMsgs int) <-chan message.ChefAction {
+	log.WithFields(log.Fields{
+		"maxNumberOfBundledActionMsgs": maxNumberOfBundledActionMsgs,
+	}).Debug("starting bulkActionPublisherBundler")
+	out := make(chan message.ChefAction, maxNumberOfBundledActionMsgs)
 	go func() {
 		bundledMsgs := []message.ChefAction{}
 		for msg := range in {
@@ -88,7 +94,7 @@ func bulkActionPublisherBundler(in <-chan message.ChefAction, client backend.Cli
 			// Only publish the collection of bundled messages if
 			// the inbox is empty or there are over 10,000 messages bundled
 			// else collect the next message
-			if len(in) == 0 || len(bundledMsgs) > maxNumberOfBundledMsgs {
+			if len(in) == 0 || len(bundledMsgs) > maxNumberOfBundledActionMsgs {
 				start := time.Now()
 				bulkableRequests := collectBulkActionRequests(bundledMsgs)
 				err := client.SendBulkRequest(context.Background(), bulkableRequests)

@@ -123,7 +123,8 @@ func Spawn(opts *serveropts.Opts) error {
 	nodeMgrServiceClient := manager.NewNodeManagerServiceClient(nodeMgrConn)
 
 	// ChefRuns
-	chefIngest := server.NewChefIngestServer(client, authzProjectsClient, nodeMgrServiceClient)
+	chefIngest := server.NewChefIngestServer(client, authzProjectsClient, nodeMgrServiceClient,
+		opts.MaxNumberOfBundledRunMsgs, opts.MaxNumberOfBundledActionMsgs)
 	ingest.RegisterChefIngesterServer(grpcServer, chefIngest)
 
 	// Pass the chef ingest server to give status about the pipelines
