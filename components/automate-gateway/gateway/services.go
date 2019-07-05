@@ -102,6 +102,17 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	pb_cfgmgmt.RegisterConfigMgmtServer(grpcServer,
 		handler.NewCfgMgmtServer(cfgMgmtClient))
 
+	eventFeedClient, err := clients.FeedClient()
+	if err != nil {
+		log.WithFields(log.Fields{
+			"service": "EventFeed",
+			"error":   err,
+		}).Fatal("Could not create client")
+	}
+
+	pb_eventfeed.RegisterEventFeedServer(grpcServer,
+		handler.NewEventFeedServer(cfgMgmtClient, eventFeedClient))
+
 	notifier, err := clients.Notifier()
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -240,14 +251,6 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	}
 	pb_cc_reporting.RegisterReportingServiceServer(grpcServer,
 		handler_compliance.NewReportingHandler(complianceReportingClient, versionClient, jobsClient))
-
-	feedClient, err := clients.FeedClient()
-	if err != nil {
-		return errors.Wrap(err, "create client for feed service")
-	}
-
-	pb_eventfeed.RegisterEventFeedServer(grpcServer,
-		handler.NewEventFeedServer(cfgMgmtClient, feedClient))
 
 	statsClient, err := clients.ComplianceStatsServiceClient()
 	if err != nil {

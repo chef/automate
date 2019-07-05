@@ -12,7 +12,6 @@ import (
 )
 
 const (
-	FEED_KEY              = "feed"
 	COMPLIANCE_INGEST_KEY = "compliance_ingest"
 	CFG_KEY               = "cfgingest"
 	AUTHZ                 = "authz"
@@ -61,10 +60,10 @@ type ServiceConfig struct {
 }
 
 type HandlerConfig struct {
-	Feed      string `mapstructure:"feed"`
-	CfgIngest string `mapstructure:"cfgingest"`
-	Authz     string `mapstructure:"authz"`
-	EventFeed string `mapstructure:"event_feed"`
+	Compliance string `mapstructure:"feed"`
+	CfgIngest  string `mapstructure:"cfgingest"`
+	Authz      string `mapstructure:"authz"`
+	EventFeed  string `mapstructure:"event_feed"`
 }
 
 // ListenAddress is the address where gRPC server will bind and listen
@@ -111,7 +110,7 @@ func Configure() (*EventConfig, error) {
 		return config, err
 	}
 
-	log.Debugf("feed handler endpoint: %s", config.HandlerEndpoints.Feed)
+	log.Debugf("Compliance handler endpoint: %s", config.HandlerEndpoints.Compliance)
 	log.Debugf("Config ingest handler endpoint: %s", config.HandlerEndpoints.CfgIngest)
 	log.Debugf("Authz handler endpoint: %s", config.HandlerEndpoints.Authz)
 	log.Debugf("Event Feed handler endpoint: %s", config.HandlerEndpoints.EventFeed)

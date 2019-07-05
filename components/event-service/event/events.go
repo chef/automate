@@ -13,7 +13,6 @@ import (
 	api "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/api/interservice/ingest"
-	automate_feed "github.com/chef/automate/components/compliance-service/api/automate-feed"
 	compliance_ingest "github.com/chef/automate/components/compliance-service/ingest/ingest"
 	"github.com/chef/automate/components/event-service/config"
 	"github.com/chef/automate/lib/grpc/secureconn"
@@ -131,18 +130,6 @@ func (svc Events) getClient(handlerType string) (EventHandlerClient, error) {
 	defer cancel()
 
 	switch handlerType {
-	case config.FEED_KEY:
-		conn, err := svc.connFactory.DialContext(timeoutCtx, "compliance-service", svc.cfg.HandlerEndpoints.Feed, grpc.WithBlock())
-		if err != nil {
-			logrus.Errorf("Event service could not get event handler client; error grpc dialing automate-feed's event handler %s", err.Error())
-			return nil, err
-		}
-		feedClient := automate_feed.NewFeedServiceClient(conn)
-		if feedClient == nil {
-			logrus.Errorf("CallHandler could not obtain NewFeedServiceClient")
-			return nil, errors.New("CallHandler could not obtain NewFeedServiceClient")
-		}
-		return feedClient, nil
 	case config.CFG_KEY:
 		conn, err := svc.connFactory.DialContext(timeoutCtx, "ingest-service", svc.cfg.HandlerEndpoints.CfgIngest, grpc.WithBlock())
 		if err != nil {
@@ -156,7 +143,7 @@ func (svc Events) getClient(handlerType string) (EventHandlerClient, error) {
 		}
 		return ingestClient, nil
 	case config.COMPLIANCE_INGEST_KEY:
-		conn, err := svc.connFactory.DialContext(timeoutCtx, "compliance-service", svc.cfg.HandlerEndpoints.Feed, grpc.WithBlock())
+		conn, err := svc.connFactory.DialContext(timeoutCtx, "compliance-service", svc.cfg.HandlerEndpoints.Compliance, grpc.WithBlock())
 		if err != nil {
 			logrus.Errorf("Event service could not get event handler client; error grpc dialing compliance ingest's event handler %s", err.Error())
 			return nil, err
