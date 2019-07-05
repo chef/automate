@@ -13,21 +13,23 @@ then
   exit 1
 fi
 
-ROOT_DIR="$(dirname "$BASH_SOURCE[0]")/.."
+ROOT_DIR="$(dirname "${BASH_SOURCE[0]}")/.."
 
 bindings() {
-  for component_path in $(find $ROOT_DIR/components/* -maxdepth 0 -type d | sort)
+  for component_path in $(find "$ROOT_DIR/components/"* -maxdepth 0 -type d | sort)
   do
-    local component=$(basename "${component_path}")
+    local component
+    component=$(basename "${component_path}")
     # We'll check anything with a runhook
-    if [[ -e ${component_path}/habitat/hooks/run ]]
+    if [[ -e "${component_path}/habitat/hooks/run" ]]
     then
       (
         declare -A pkg_binds
         declare -A pkg_binds_optional
-        source "${component_path}/habitat/plan.sh";
+        #shellcheck disable=SC1090
+        source "${component_path}/habitat/plan.sh"
         safe_comp=${component//-/_}
-        if [[ ! -z  ${!pkg_binds[@]} ]]
+        if [[ -n "${!pkg_binds[*]}" ]]
         then
             readarray -t sorted < <(printf '%s\n' "${!pkg_binds[@]}" | sort)
             for b in "${sorted[@]}"
@@ -36,7 +38,7 @@ bindings() {
             done
         fi
 
-        if [[ ! -z ${!pkg_binds_optional[@]} ]]; then
+        if [[ -n "${!pkg_binds_optional[*]}" ]]; then
             readarray -t sorted < <(printf '%s\n' "${!pkg_binds_optional[@]}" | sort)
             for b in "${sorted[@]}"; do
                 echo "${safe_comp} -> ${b//-/_}[color=grey]"

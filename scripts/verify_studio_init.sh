@@ -10,6 +10,7 @@
 #
 SUP_LOG_FILE=/hab/sup/default/sup.log
 
+#shellcheck disable=SC1091
 . .studiorc
 
 scripts/copy_hartifacts.sh results
