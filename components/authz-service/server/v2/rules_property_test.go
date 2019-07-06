@@ -650,6 +650,7 @@ func dumpRules(t *testing.T, rules []api.CreateRuleReq) {
 	// Those unknown bits are greatly exacerbated in that each rule in the payload also has those 3 fields,
 	// and each condition of each rule does also!
 	for _, r := range rules {
+		t.Logf("rule size in one swoop = %d", r.XXX_Size())
 		cSize, cSizeStr := conditionSize(r.Conditions)
 		t.Logf("Rule size |%d|: %d+%d+%d+%d+%s+%d+%d",
 			size(r.Id)+size(r.ProjectId)+size(r.Name)+int(unsafe.Sizeof(r.Type))+cSize+int(unsafe.Sizeof(true))+size("applied"),
