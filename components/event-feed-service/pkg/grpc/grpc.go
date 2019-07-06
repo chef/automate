@@ -12,6 +12,7 @@ import (
 
 	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/config"
+	"github.com/chef/automate/components/event-feed-service/pkg/migration"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
 	"github.com/chef/automate/components/event-feed-service/pkg/server"
 	"github.com/chef/automate/lib/grpc/health"
@@ -43,7 +44,9 @@ func Spawn(c *config.EventFeed, connFactory *secureconn.Factory) error {
 
 	feedStore := persistence.NewFeedStore(esClient)
 
-	err = feedStore.InitializeStore(context.Background())
+	migrator := migration.New(context.Background(), feedStore)
+
+	err = migrator.InitializeStore()
 	if err != nil {
 		log.WithError(err).Error("Failed initializing elasticsearch")
 		return err
