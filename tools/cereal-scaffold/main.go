@@ -201,6 +201,10 @@ func (p *SimpleWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 	ev cereal.TaskCompleteEvent) cereal.Decision {
 	var mycount int
 
+	if err := ev.Result.Err(); err != nil {
+		logrus.WithError(err).Error("task failed")
+	}
+
 	if err := w.GetPayload(&mycount); err != nil {
 		logrus.WithError(err).Fatal("Could not decode payload")
 	}
@@ -217,7 +221,7 @@ func (p *SimpleWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 
 	taskResult := ""
 	if err := ev.Result.Get(&taskResult); err != nil {
-		logrus.WithError(err).Fatal("Could not decode task params in result")
+		logrus.WithError(err).Error("Could not decode task params in result")
 	}
 
 	logrus.WithFields(logrus.Fields{

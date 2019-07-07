@@ -100,6 +100,8 @@ type PostgresTaskCompleter struct {
 
 	ctx    context.Context
 	cancel context.CancelFunc
+
+	pinger *workerPinger
 }
 
 type PostgresWorkflowCompleter struct {
@@ -670,39 +672,28 @@ func (pg *PostgresBackend) DequeueTask(ctx context.Context, workerID uuid4.UUID,
 		cancel()
 		return nil, nil, err
 	}
+
+	pinger := newWorkerPinger(pg.db, workerID)
+
 	taskc := &PostgresTaskCompleter{
 		db:       pg.db,
 		workerID: workerID,
 		tid:      tid,
 		ctx:      ctx,
 		cancel:   cancel,
+		pinger:   pinger,
 	}
 
-	go taskc.workerPing()
+	pinger.Start(ctx)
 
 	return task, taskc, nil
 }
 
-// NOTE(ssd) 2019-07-02: This can keep running even if our actual task
-// executor thread is stuck. This mostly just accounts for completely
-// lost servers.
-func (taskc *PostgresTaskCompleter) workerPing() {
-	for {
-		select {
-		case <-taskc.ctx.Done():
-			return
-		case <-time.After(30 * time.Second):
-			logrus.Debugf("checkin for worker %s", taskc.workerID.String())
-			_, err := taskc.db.ExecContext(taskc.ctx, "UPDATE cereal_busy_task_workers SET last_checkin = NOW() WHERE id = $1", taskc.workerID.String())
-			if err != nil {
-				logrus.WithError(err).Error("failed to update worker check-in time")
-			}
-		}
-	}
-}
-
 func (taskc *PostgresTaskCompleter) Fail(errMsg string) error {
 	defer taskc.cancel()
+
+	taskc.pinger.Stop()
+
 	row := taskc.db.QueryRowContext(taskc.ctx, completeTaskQuery, taskc.workerID, taskc.tid, backend.TaskStatusFailed, errMsg, "")
 
 	var count int
@@ -721,6 +712,8 @@ func (taskc *PostgresTaskCompleter) Fail(errMsg string) error {
 // TODO(ssd) 2019-05-10: Should this and Fail also take a context from the caller? If so, we'll need to
 func (taskc *PostgresTaskCompleter) Succeed(results []byte) error {
 	defer taskc.cancel()
+
+	taskc.pinger.Stop()
 
 	row := taskc.db.QueryRowContext(taskc.ctx, completeTaskQuery, taskc.workerID, taskc.tid, backend.TaskStatusSuccess, "", results)
 
