@@ -243,8 +243,8 @@ function _maybe_rebuild_node_sass {
   fi
 }
 
-# (Internal) Install nodejs from the .nvmrc file
-# If it can't find that file this function will error our
+# (Internal) Install nodejs from the .nvmrc file.
+# If it can't find that file this function will fail.
 function _install_nodejs_from_nvmrc() {
   if [ ! -z "$(node -v 2>/dev/null)" ]; then
     log_line "Using NodeJS $(node -v)"
