@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"math"
 	"time"
 
 	"github.com/golang-migrate/migrate"
@@ -88,6 +89,8 @@ WHERE
 type PostgresBackend struct {
 	connURI string
 	db      *sql.DB
+
+	workerTimeout time.Duration
 }
 
 type PostgresTaskCompleter struct {
@@ -135,7 +138,8 @@ var _ backend.ScheduledWorkflowCompleter = &PostgresScheduledWorkflowCompleter{}
 
 func NewPostgresBackend(connURI string) *PostgresBackend {
 	return &PostgresBackend{
-		connURI: connURI,
+		connURI:       connURI,
+		workerTimeout: 300 * time.Second,
 	}
 }
 
@@ -211,7 +215,7 @@ func (pg *PostgresBackend) expiredWorkerCleaner() {
 }
 
 func (pg *PostgresBackend) expireDeadWorkers() error {
-	rows, err := pg.db.Query("SELECT cereal_expire_dead_workers()")
+	rows, err := pg.db.Query("SELECT cereal_expire_dead_workers($1)", int64(math.Ceil(pg.workerTimeout.Seconds())))
 	if err != nil {
 		return err
 	}

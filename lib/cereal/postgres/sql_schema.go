@@ -205,6 +205,7 @@ AS $$
         VALUES('cancel', _workflow_instance_id);
 $$ LANGUAGE SQL;
 
+-- TODO(jaym): This function looks wrong now
 CREATE OR REPLACE FUNCTION cereal_abandon_workflow(_workflow_instance_id BIGINT, _eid BIGINT, _completed_tasks INTEGER)
 RETURNS VOID
 AS $$
@@ -295,7 +296,7 @@ BEGIN
 END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION cereal_expire_dead_workers()
+CREATE OR REPLACE FUNCTION cereal_expire_dead_workers(_worker_timeout_seconds BIGINT)
 RETURNS SETOF TEXT
 AS $$
 DECLARE
@@ -304,7 +305,7 @@ BEGIN
     FOR t IN
         SELECT cereal_tasks.*
         FROM cereal_tasks LEFT JOIN cereal_busy_task_workers ON cereal_tasks.worker_id = cereal_busy_task_workers.id
-        WHERE cereal_busy_task_workers.last_checkin < NOW() - interval '300 seconds' FOR UPDATE
+        WHERE cereal_busy_task_workers.last_checkin < NOW() - (_worker_timeout_seconds || ' seconds')::interval FOR UPDATE
     LOOP
         DELETE FROM cereal_busy_task_workers WHERE id = t.worker_id;
         DELETE FROM cereal_tasks WHERE id = t.id;
