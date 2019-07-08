@@ -102,7 +102,7 @@ func init() {
 	serveCmd.Flags().String("nodemanager-address", "localhost:10120", "address of nodemanager (domain:<port>)")
 	serveCmd.Flags().Int32("converge-history-days", -1, "Number of days to keep converge history for. A number less than or equal to 0 means data should never be deleted")
 	serveCmd.Flags().Int32("actions-days", -1, "Number of days to keep actions for. A number less than or equal to 0 means data should never be deleted")
-	serveCmd.Flags().Int("max-number-of-bundled-run-msgs", 10000, "The maximum number of run messages to bundle togeter during ingestion")
+	serveCmd.Flags().Int("max-number-of-bundled-run-msgs", 2500, "The maximum number of run messages to bundle togeter during ingestion")
 	serveCmd.Flags().Int("max-number-of-bundled-action-msgs", 10000, "The maximum number of action messages to bundle togeter during ingestion")
 	serveCmd.Flags().String("key", "key.pem", "SSL Private key for gRPC server")
 	serveCmd.Flags().String("cert", "cert.pem", "SSL Certificate for gRPC server")
