@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"math"
 	"time"
 
 	"github.com/golang-migrate/migrate"
@@ -90,7 +89,7 @@ type PostgresBackend struct {
 	connURI string
 	db      *sql.DB
 
-	workerTimeout time.Duration
+	cleaner *workerCleaner
 }
 
 type PostgresTaskCompleter struct {
@@ -138,8 +137,7 @@ var _ backend.ScheduledWorkflowCompleter = &PostgresScheduledWorkflowCompleter{}
 
 func NewPostgresBackend(connURI string) *PostgresBackend {
 	return &PostgresBackend{
-		connURI:       connURI,
-		workerTimeout: 300 * time.Second,
+		connURI: connURI,
 	}
 }
 
@@ -197,47 +195,14 @@ func (pg *PostgresBackend) Init() error {
 		return errors.Wrap(err, "migration failed")
 	}
 
-	go pg.expiredWorkerCleaner()
+	pg.cleaner = newWorkerCleaner(pg.db)
+	pg.cleaner.Start(context.Background())
 
 	return nil
 }
 
-// TODO(ssd) 2019-07-02: Thread a context through?
-func (pg *PostgresBackend) expiredWorkerCleaner() {
-	for {
-		logrus.Debug("checking for dead task workers")
-		err := pg.expireDeadWorkers()
-		if err != nil {
-			logrus.WithError(err).Error("failed to run periodic cereal_expire_dead_workers")
-		}
-		time.Sleep(60 * time.Second)
-	}
-}
-
-func (pg *PostgresBackend) expireDeadWorkers() error {
-	rows, err := pg.db.Query("SELECT cereal_expire_dead_workers($1)", int64(math.Ceil(pg.workerTimeout.Seconds())))
-	if err != nil {
-		return err
-	}
-
-	defer func() {
-		if err := rows.Close(); err != nil {
-			logrus.WithError(err).Error("failed to close db rows")
-		}
-	}()
-
-	for rows.Next() {
-		var workerID string
-		err := rows.Scan(&workerID)
-		if err != nil {
-			return nil
-		}
-		logrus.Warnf("Task worker %s lost!", workerID)
-	}
-	return rows.Err()
-}
-
 func (pg *PostgresBackend) Close() error {
+	pg.cleaner.Stop()
 	if pg.db != nil {
 		return pg.db.Close()
 	}
