@@ -111,7 +111,8 @@ const routes: Routes = [
         },
         {
           path: 'policies/:id/add-members',
-          component: PolicyAddMembersComponent
+          component: PolicyAddMembersComponent,
+          data: { hideNavBar: true }
         },
         {
           path: 'projects',
@@ -123,11 +124,13 @@ const routes: Routes = [
         },
         {
           path: 'projects/:id/rules',
-          component: ProjectRulesComponent
+          component: ProjectRulesComponent,
+          data: { hideNavBar: true }
         },
         {
           path: 'projects/:id/rules/:ruleid',
-          component: ProjectRulesComponent
+          component: ProjectRulesComponent,
+          data: { hideNavBar: true }
         },
         {
           path: 'roles',

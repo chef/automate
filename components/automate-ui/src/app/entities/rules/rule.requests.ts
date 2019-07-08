@@ -17,29 +17,13 @@ export interface RulesResponse {
 export class RuleRequests {
 
   // Mocked Rule data until API's are finished.
-
-  rules: Rule[] = [
-    // {
-    //   id: 'rule-1',
-    //   project_id: 'project-1',
-    //   name: 'Rule 1',
-    //   type: 'NODE',
-    //   edits: 'staging',
-    //   conditions: [
-    //       {
-    //       attribute: 'CHEF_SERVER',
-    //       values: ['adad','asdasd'],
-    //       operator: 'MEMBER_OF'
-    //     }
-    //   ]
-    // }
-  ];
+  rules: Rule[] = [];
 
   // TODO use http constructor when we hook up the backend
   // constructor(private http: HttpClient) { }
   constructor() { }
 
-  public getRules(project_id: string): Observable<GetRulesSuccessPayload> {
+  public getRulesForProject(project_id: string): Observable<GetRulesSuccessPayload> {
     // return this.http.get<GetRulesSuccessPayload>(
       // `${env.auth_v2_url}/project/${project_id}/rules`);
     const rules: any = filter(this.rules, ['project_id', project_id]);

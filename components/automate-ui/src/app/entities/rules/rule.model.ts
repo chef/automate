@@ -12,10 +12,3 @@ export interface Condition {
   values: any;
   operator: string;
 }
-
-export class RuleConstants {
-  static readonly UNASSIGNED_PROJECT_ID = '(unassigned)';
-  static readonly UNASSIGNED_PROJECT_LABEL = '(unassigned)';
-  static readonly ALL_PROJECTS_LABEL = 'All projects';
-  static readonly MULTIPLE_PROJECTS_LABEL = 'Multiple projects';
-}

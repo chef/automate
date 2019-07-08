@@ -9,7 +9,7 @@ import { CreateNotification } from 'app/entities/notifications/notification.acti
 import { Type } from 'app/entities/notifications/notification.model';
 
 import {
-  GetRules,
+  GetRulesForProject,
   GetRulesSuccess,
   GetRulesSuccessPayload,
   GetRulesFailure,
@@ -41,10 +41,10 @@ export class RuleEffects {
   ) { }
 
   @Effect()
-  getRules$ = this.actions$.pipe(
+  getRulesForProject$ = this.actions$.pipe(
       ofType(RuleActionTypes.GET_ALL),
-      mergeMap(({ payload: { project_id } }: GetRules) =>
-        this.requests.getRules(project_id).pipe(
+      mergeMap(({ payload: { project_id } }: GetRulesForProject) =>
+        this.requests.getRulesForProject(project_id).pipe(
           map((resp: GetRulesSuccessPayload) => new GetRulesSuccess(resp)),
           catchError((error: HttpErrorResponse) => observableOf(new GetRulesFailure(error))))));
 

@@ -25,7 +25,7 @@ export interface RuleSuccessPayload {
   rule: Rule;
 }
 
-export class GetRules implements Action {
+export class GetRulesForProject implements Action {
   readonly type = RuleActionTypes.GET_ALL;
 
   constructor(public payload: { project_id: string }) { }
@@ -117,7 +117,7 @@ export class UpdateRuleFailure implements Action {
 }
 
 export type RuleActions =
-  | GetRules
+  | GetRulesForProject
   | GetRulesSuccess
   | GetRulesFailure
   | GetRule

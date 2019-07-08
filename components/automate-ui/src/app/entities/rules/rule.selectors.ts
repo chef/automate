@@ -11,6 +11,11 @@ export const {
   selectEntities: ruleEntities
 } = ruleEntityAdapter.getSelectors(ruleState);
 
+export const getRuleAttributes = createSelector(
+  ruleState,
+  (state) => state.getAttributes
+);
+
 export const getAllStatus = createSelector(
   ruleState,
   (state) => state.getAllStatus

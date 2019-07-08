@@ -9,8 +9,18 @@ import { Subject, combineLatest } from 'rxjs';
 import { map, takeUntil, pluck, filter } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 import { Rule } from 'app/entities/rules/rule.model';
-import { GetRule, GetRules, CreateRule, UpdateRule } from 'app/entities/rules/rule.actions';
-import { getStatus, updateStatus, ruleFromRoute } from 'app/entities/rules/rule.selectors';
+import {
+  GetRule,
+  GetRulesForProject,
+  CreateRule,
+  UpdateRule
+} from 'app/entities/rules/rule.actions';
+import {
+  getRuleAttributes,
+  getStatus,
+  updateStatus,
+  ruleFromRoute
+} from 'app/entities/rules/rule.selectors';
 import { projectFromRoute } from 'app/entities/projects/project.selectors';
 import { Project } from 'app/entities/projects/project.model';
 import { GetProject } from 'app/entities/projects/project.actions';
@@ -21,13 +31,14 @@ import { GetProject } from 'app/entities/projects/project.actions';
   styleUrls: ['./project-rules.component.scss']
 })
 export class ProjectRulesComponent implements OnInit, OnDestroy {
-  public project: Project;
+  public project: Project = <Project>{};
   public ruleId: string;
   public ruleForm: FormGroup;
   public rule: Rule = <Rule>{};
   public conditions: any[];
   public isLoading = true;
   public saving = false;
+  public attributes: object;
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
   constructor(
@@ -81,6 +92,10 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
           this.project = <Project>Object.assign({}, state);
         })
         ).subscribe();
+
+      this.store.select(getRuleAttributes).subscribe((attributes) => {
+        this.attributes = attributes;
+      });
   }
 
   ngOnInit(): void {
@@ -97,9 +112,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   }
 
   getHeading() {
-    return (this.ruleForm.value.name || !this.project)
-      ? `${this.ruleForm.value.name}`
-      : `${this.project.name}: Rule`;
+    return `${this.project.name}: ` + (this.ruleForm.value.name || 'Rule');
   }
 
   backRoute(): string[] {
@@ -169,7 +182,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     updatedRule.id = this.rule.id;
     updatedRule.project_id = this.rule.project_id;
     this.store.dispatch(new UpdateRule({ rule: updatedRule }));
-    this.store.dispatch(new GetRules({ project_id: this.rule.project_id }));
+    this.store.dispatch(new GetRulesForProject({ project_id: this.rule.project_id }));
   }
 
   saveRule() {

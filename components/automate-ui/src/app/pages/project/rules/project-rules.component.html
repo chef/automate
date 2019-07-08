@@ -51,8 +51,10 @@
               <label>
                 <span class="label">{{ ruleForm.get('type').value | uppercase }} Attribute</span>
                 <select ngDefaultControl formControlName="attribute">
-                  <option value='CHEF_SERVER'>Chef Server</option>
-                  <option value='CHEF_ORGS'>Chef Organization</option>
+                  <option 
+                    *ngFor="let option of attributes[ruleForm.get('type').value.toLowerCase()]; let i = index"
+                    [value]="option.key"
+                  >{{ option.value }}</option>
                 </select>
               </label>
             </chef-form-field>

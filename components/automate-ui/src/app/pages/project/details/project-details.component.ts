@@ -14,7 +14,7 @@ import {
 } from 'app/entities/projects/project.selectors';
 import { Project } from 'app/entities/projects/project.model';
 import { GetProject, UpdateProject } from 'app/entities/projects/project.actions';
-import { GetRules, DeleteRule } from 'app/entities/rules/rule.actions';
+import { GetRulesForProject, DeleteRule } from 'app/entities/rules/rule.actions';
 import { Rule } from 'app/entities/rules/rule.model';
 import {
   allRules
@@ -32,21 +32,6 @@ export class ProjectDetailsComponent implements OnDestroy {
   public saveSuccessful = false;
   public isChefManaged = false;
   public rules$: Observable<Rule[]>;
-  // public sortedRules$ = [];
-  // public sortedRules$ = [
-  //   {
-  //     name: 'Rule 1',
-  //     type: 'Node',
-  //     conditions: '3 conditions',
-  //     edits: 'Edits Pending'
-  //   },
-  //   {
-  //     name: 'Rule 2',
-  //     type: 'Event',
-  //     conditions: '1 condition',
-  //     edits: 'Applied'
-  //   }
-  // ];
   public selectedTab: 'rules' | 'details' = 'rules';
   public ruleToDelete: any;
   public deleteModalVisible = false;
@@ -83,7 +68,7 @@ export class ProjectDetailsComponent implements OnDestroy {
       takeUntil(this.isDestroyed),
       map((state) => {
         this.project = <Project>Object.assign({}, state);
-        this.store.dispatch(new GetRules({ project_id: this.project.id }));
+        this.store.dispatch(new GetRulesForProject({ project_id: this.project.id }));
         this.rules$ = store.select(allRules);
         this.isChefManaged = this.project.type === 'CHEF_MANAGED';
         this.projectForm = fb.group({
@@ -134,13 +119,14 @@ export class ProjectDetailsComponent implements OnDestroy {
       : 'Applied';
   }
 
-  hasEditsPending(rules: Rule[]): boolean {
-    return _find(rules, ['edits', 'staging']) ? true : false;
+  getConditionsText(conditions: number): string {
+    return conditions > 1
+      ? conditions + ' conditions'
+      : conditions + ' condition';
   }
 
-  // Note: This will be dealt with later, right now, we don't check if it's used
-  inUseMessage(): string {
-    return '';
+  hasEditsPending(rules: Rule[]): boolean {
+    return _find(rules, ['edits', 'staging']) ? true : false;
   }
 
   saveProject() {

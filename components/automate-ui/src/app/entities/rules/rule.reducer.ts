@@ -7,6 +7,7 @@ import { RuleActionTypes, RuleActions } from './rule.actions';
 import { Rule } from './rule.model';
 
 export interface RuleEntityState extends EntityState<Rule> {
+  getAttributes: any;
   getAllStatus: EntityStatus;
   getStatus: EntityStatus;
   createStatus: EntityStatus;
@@ -22,6 +23,49 @@ const CREATE_ERROR = 'createError';
 const DELETE_STATUS = 'deleteStatus';
 const UPDATE_STATUS = 'updateStatus';
 
+export const Attributes = {
+  node: [
+    {
+      key: 'CHEF_ORGS',
+      value: 'Chef Organization'
+    },
+    {
+      key: 'CHEF_SERVER',
+      value: 'Chef Server'
+    },
+    {
+      key: 'CHEF_ENV',
+      value: 'Environment'
+    },
+    {
+      key: 'CHEF_ROLE',
+      value: 'Chef Role'
+    },
+    {
+      key: 'CHEF_TAG',
+      value: 'Chef Tag'
+    },
+    {
+      key: 'CHEF_POLICY_NAME',
+      value: 'Chef Policy Name'
+    },
+    {
+      key: 'CHEF_POLICY_GROUP',
+      value: 'Chef Policy Group'
+    }
+  ],
+  event: [
+    {
+      key: 'CHEF_ORGS',
+      value: 'Chef Organization'
+    },
+    {
+      key: 'CHEF_SERVER',
+      value: 'Chef Server'
+    }
+  ]
+};
+
 export const ruleEntityAdapter: EntityAdapter<Rule> = createEntityAdapter<Rule>();
 
 export const RuleEntityInitialState: RuleEntityState = ruleEntityAdapter.getInitialState({
@@ -30,7 +74,49 @@ export const RuleEntityInitialState: RuleEntityState = ruleEntityAdapter.getInit
   createStatus: EntityStatus.notLoaded,
   createError: null,
   deleteStatus: EntityStatus.notLoaded,
-  updateStatus: EntityStatus.notLoaded
+  updateStatus: EntityStatus.notLoaded,
+  getAttributes: {
+    node: [
+      {
+        key: 'CHEF_ORGS',
+        value: 'Chef Organization'
+      },
+      {
+        key: 'CHEF_SERVER',
+        value: 'Chef Server'
+      },
+      {
+        key: 'CHEF_ENV',
+        value: 'Environment'
+      },
+      {
+        key: 'CHEF_ROLE',
+        value: 'Chef Role'
+      },
+      {
+        key: 'CHEF_TAG',
+        value: 'Chef Tag'
+      },
+      {
+        key: 'CHEF_POLICY_NAME',
+        value: 'Chef Policy Name'
+      },
+      {
+        key: 'CHEF_POLICY_GROUP',
+        value: 'Chef Policy Group'
+      }
+    ],
+    event: [
+      {
+        key: 'CHEF_ORGS',
+        value: 'Chef Organization'
+      },
+      {
+        key: 'CHEF_SERVER',
+        value: 'Chef Server'
+      }
+    ]
+  }
 });
 
 export function ruleEntityReducer(
