@@ -107,6 +107,10 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     this.updateServicesFilters();
   }
 
+  public formatTimestamp(time: Date): string {
+    return new Date(time).toUTCString();
+  }
+
   // healthCheckStatus returns the formated health_check status from the provided service
   // TODO: @afiune here is where we can inject an error message from the health check
   public healthCheckStatus(service: Service): string {
@@ -136,12 +140,11 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
 
   public formatTimewizardMessage(svc: Service): string {
     if (svc.previous_health_check === 'NONE') {
-      return 'Since the service was loaded, ' + svc.current_health_since + ' ago';
+      return 'Since the service was loaded,';
     }
 
     return 'Changed from ' + this.formatHealthStatusForTimewizard(svc.previous_health_check) +
-      ' to ' + this.formatHealthStatusForTimewizard(svc.health_check) + ' ' +
-      svc.current_health_since + ' ago';
+      ' to ' + this.formatHealthStatusForTimewizard(svc.health_check);
   }
 
   private formatHealthStatusForTimewizard(health: string): string {

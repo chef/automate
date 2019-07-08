@@ -17,6 +17,13 @@ ul {
   margin-top: 5px;
 }
 
+chef-tooltip {
+  display: inline-table;
+  background: $chef-primary-dark;
+  color: $chef-white;
+  font-size: 14px;
+}
+
 app-page-picker {
   padding-left: 35px;
   padding-bottom: 35px;
@@ -110,6 +117,14 @@ chef-alert {
     color: $chef-dark-grey;
     letter-spacing: 0.1px;
     line-height: 18px;
+
+    a {
+      color: inherit;
+    }
+
+    a:hover {
+      color: $chef-primary-dark;
+    }
   }
 
   chef-icon {
