@@ -173,7 +173,7 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 
 // convert a proto timestamp to native go time,
 // on any error return the current time (now)
-func convertOrCreateTimestamp(t *timestamp.Timestamp) time.Time {
+func convertOrCreateGoTime(t *timestamp.Timestamp) time.Time {
 	goTime, err := ptypes.Timestamp(t)
 	if err != nil {
 		log.WithError(err).Error("malformed protobuf timestamp, using time now")
@@ -220,7 +220,7 @@ func (db *Postgres) updateService(
 	// update only if there is something to update
 	if svc.needUpdate {
 		// Update the timestamp of the last event received
-		svc.LastEventOccurredAt = convertOrCreateTimestamp(eventMetadata.GetOccurredAt())
+		svc.LastEventOccurredAt = convertOrCreateGoTime(eventMetadata.GetOccurredAt())
 
 		if _, err := db.DbMap.Update(svc); err != nil {
 			return errors.Wrap(err, "unable to update service")
@@ -313,7 +313,7 @@ func (db *Postgres) insertNewService(
 			FullPkgIdent:        pkgIdent.FullPackageIdent(),
 			PreviousHealth:      applications.HealthStatus_NONE.String(),
 			HealthUpdatedAt:     time.Now(),
-			LastEventOccurredAt: convertOrCreateTimestamp(eventMetadata.GetOccurredAt()),
+			LastEventOccurredAt: convertOrCreateGoTime(eventMetadata.GetOccurredAt()),
 		}
 
 		if svcMetadata.GetUpdateConfig() != nil {
