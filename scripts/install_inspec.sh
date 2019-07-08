@@ -12,7 +12,7 @@ desired_inspec_version() {
 }
 
 install_inspec() {
-    hab pkg install chef/inspec/$(desired_inspec_version) -b -f
+    hab pkg install "chef/inspec/$(desired_inspec_version)" -b -f
 }
 
 install_inspec

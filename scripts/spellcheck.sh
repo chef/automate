@@ -1,5 +1,5 @@
 #!/bin/bash
-set -o pipefail
+set -eo pipefail
 
 # This runs spell checking on all projects in A2.
 # For the front-end projects it checks these file types: .ts, .tsx, .html, .md.
@@ -29,13 +29,18 @@ set -o pipefail
 # rather than just pruning the path in the bud, so cspell would take a verrrryyyy long time if it sees them.
 # The workaround is not to include them at all in the path spec given to cspell.
 
+fatal() {
+    echo "fatal error: $1" >&2
+    exit 2
+}
 
-command -v cspell >/dev/null 2>&1 || { echo >&2 "Cspell required; install with 'npm install -g cspell'.  Aborting."; exit 2; }
-test -d components && test -d scripts || { echo >&2 "Must start in a2 root directory.  Aborting."; exit 2; }
-test -f cspell.json || { echo >&2 "Oh dear, oh dear: config file (cspell.json) is missing.  Aborting."; exit 2; }
+command -v cspell >/dev/null 2>&1 || fatal "Cspell required; install with 'npm install -g cspell'"
+# shellcheck disable=SC2015
+test -d components && test -d scripts || fatal "Must start in a2 root directory."
+test -f cspell.json || fatal "Oh dear, oh dear: config file (cspell.json) is missing."
 
 # OPTS are options that will be passed to cspell
-OPTS=""
+OPTS=()
 # CHECK_GLOBAL_DOCS controls whether we check the dev-docs and
 # automate-chef-io content folders. We set this to true unless the
 # user specifies directories.
@@ -46,7 +51,7 @@ DIRS=()
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --wordsOnly)
-            OPTS="${CSPELL_OPTS} --wordsOnly"
+            OPTS+=("--wordsOnly")
             shift
             ;;
         *)
@@ -61,44 +66,48 @@ if [[ ${#DIRS[@]} -eq 0 ]]; then
     CHECK_GLOBAL_DOCS="true"
 fi
 
-function checkFiles {
+run_cspell() {
+    cspell "${OPTS[@]}" "$@"
+}
+
+checkFiles() {
     RETVAL=0
     for dir in "${DIRS[@]}"
     do
         if [[ -d $dir/node_modules ]]; then
             >&2 echo -n "$dir [ts and tsx]... "
-            cspell $OPTS "$dir/src/**/*.ts*" "$dir/e2e/**/*.ts*" || RETVAL=1
+            run_cspell "$dir/src/**/*.ts*" "$dir/e2e/**/*.ts*" || RETVAL=1
             >&2 echo -n "$dir [sh]... "
-            cspell $OPTS "$dir/src/**/*.sh" || RETVAL=1
+            run_cspell "$dir/src/**/*.sh" || RETVAL=1
             >&2 echo -n "$dir [md]... "
-            cspell $OPTS "$dir/src/**/*.md" "$dir/docs/**/*.md" README.md || RETVAL=1
+            run_cspell "$dir/src/**/*.md" "$dir/docs/**/*.md" README.md || RETVAL=1
 
             # automate-ui is not ignoring src/assets/dist.html like it should
             # when specifying src/**/*.html so do this instead:
             if [[ "$dir" == "components/automate-ui" ]]; then
                 >&2 echo -n "$dir [html]... "
-                cspell $OPTS "$dir/src/app/**/*.html" || RETVAL=1
+                run_cspell "$dir/src/app/**/*.html" || RETVAL=1
             else
                 >&2 echo -n "$dir [html]... "
-                cspell $OPTS "$dir/src/**/*.html" || RETVAL=1
+                run_cspell "$dir/src/**/*.html" || RETVAL=1
             fi
         else
             >&2 echo -n "$dir [go]... "
-            cspell $OPTS "$dir/**/*.go" || RETVAL=1
+            run_cspell "$dir/**/*.go" || RETVAL=1
             >&2 echo -n "$dir [rb]... "
-            cspell $OPTS "$dir/**/*.rb" || RETVAL=1
+            run_cspell "$dir/**/*.rb" || RETVAL=1
             >&2 echo -n "$dir [md]... "
-            cspell $OPTS "$dir/**/*.md" || RETVAL=1
+            run_cspell "$dir/**/*.md" || RETVAL=1
             >&2 echo -n "$dir [proto]... "
-            cspell $OPTS "$dir/**/*.proto" || RETVAL=1
+            run_cspell "$dir/**/*.proto" || RETVAL=1
             >&2 echo -n "$dir [sh]... "
-            cspell $OPTS "$dir/**/*.sh" || RETVAL=1
+            run_cspell "$dir/**/*.sh" || RETVAL=1
         fi
     done
 
     if [[ "$CHECK_GLOBAL_DOCS" = "true" ]]; then
         >&2 echo -n "global docs [md]... "
-        cspell $OPTS "dev-docs/**/*.md" "components/automate-chef-io/content/docs/**/*.md" || RETVAL=1
+        run_cspell "dev-docs/**/*.md" "components/automate-chef-io/content/docs/**/*.md" || RETVAL=1
     fi
     [[ $RETVAL -eq 0 ]] || exit $RETVAL
 }

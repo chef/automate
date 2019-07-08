@@ -8,7 +8,7 @@ document "graph_deps" <<DOC
 DOC
 function graph_deps {
   local output=${1:-"binds.dot"} # default output file
-  /src/scripts/graph-binds > "$output"
+  /src/scripts/graph-binds.sh > "$output"
 }
 
 document "render_dot" <<DOC

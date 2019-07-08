@@ -21,7 +21,7 @@ end
 
 config = TOML.load_file(".bldr.toml")
 
-changed_files = `git diff --name-only $(scripts/git_difference_expression)`.split("\n")
+changed_files = `git diff --name-only $(scripts/git_difference_expression.rb)`.split("\n")
 
 build_all = (ENV["BUILDKITE_BRANCH"] || "").include?("verify-rebuild-all")
 

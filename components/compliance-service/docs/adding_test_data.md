@@ -1,14 +1,14 @@
 # Adding nodes to populate the compliance reporting page
 
-from hab studio: 
+from hab studio:
 
-`chef_load_compliance_scans -N20` 
+`chef_load_compliance_scans -N20`
 
 # Adding nodes to populate the nodes and scan jobs pages
 
 ensure you have `jq` installed
 the token is retrieved by running `get_admin_token` from within the studio
-if you've never run the get_secrets script, or haven't in a while, run `CHEF_USERNAME=username scripts/get_secrets` from the studio
+if you've never run the get_secrets script, or haven't in a while, run `CHEF_USERNAME=username scripts/get_secrets.sh` from the studio
 
 _note: this should be run on your local system, not from within the studio_
 `source dev/secrets-env.sh`
