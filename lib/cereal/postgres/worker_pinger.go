@@ -16,7 +16,6 @@ type workerPinger struct {
 	wgStart         sync.WaitGroup
 	wgStop          sync.WaitGroup
 	stop            context.CancelFunc
-	once            sync.Once
 	checkinInterval time.Duration
 }
 
