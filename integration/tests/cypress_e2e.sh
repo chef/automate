@@ -19,7 +19,7 @@ do_test_deploy() {
     export CYPRESS_SKIP_SSO=true
     export CYPRESS_BASE_URL="https://$CONTAINER_HOSTNAME"
     if ! cypress run; then
-        buildkite-agent artifact upload "cypress/videos/*"
+        buildkite-agent artifact upload "cypress/videos/*;cypress/videos/**/*;cypress/screenshots/*;cypress/screenshots/**/*"
         return 1
     fi
 }
