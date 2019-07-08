@@ -3,7 +3,7 @@
 set -e
 
 echo "Install latest dep and other tools"
-if [[ ! -z "$HABITAT" ]]; then
+if [[ -n "$HABITAT" ]]; then
   curl -s https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 else
   hab pkg install -b core/dep/0.5.0 core/ruby core/jq-static core/shellcheck
@@ -21,7 +21,7 @@ echo "Checking automate-deployment binds.txt"
 )
 
 yml2json() {
-    ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))' $1
+    ruby -ryaml -rjson -e 'puts JSON.pretty_generate(YAML.load(ARGF))' "$1"
 }
 
 echo "Checking if Golang license fallbacks/exceptions are needed"
@@ -46,7 +46,7 @@ if ! git diff --exit-code --ignore-submodules=all; then
 fi
 
 echo "Shellchecking!"
-shellcheck ./.expeditor/*.sh ./.expeditor/**/*.sh
+shellcheck ./.expeditor/*.sh ./.expeditor/**/*.sh ./scripts/*.sh ./.buildkite/hooks/*
 
 echo "Checking for possible credentials in the source code"
 go run ./tools/credscan

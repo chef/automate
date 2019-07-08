@@ -23,14 +23,14 @@ safe_copy_to_dir() {
     local name
     local tmp_dst
     name=$(basename "$src")
-    tmp_dst=$(mktemp $dst/.safe_copy-XXXXXXX)
+    tmp_dst=$(mktemp "$dst/.safe_copy-XXXXXXX")
     final_dst=$dst/$name
 
-    echo "Moving ${name} from $src to $final_dst"
-    echo " - sha256 before move: $(sha256sum $src)"
-    cp $src $tmp_dst
-    mv $tmp_dst $final_dst
-    echo "- sha256 after: $(sha256sum $final_dst)"
+    echo "Moving $name from $src to $final_dst"
+    echo " - sha256 before move: $(sha256sum "$src")"
+    cp "$src" "$tmp_dst"
+    mv "$tmp_dst" "$final_dst"
+    echo "- sha256 after: $(sha256sum "$final_dst")"
 }
 
 if [[ ! -d "$src" ]]; then

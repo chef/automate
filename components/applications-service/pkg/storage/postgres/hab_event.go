@@ -19,8 +19,10 @@ import (
 )
 
 const (
-	labelSuccess = "succeeded"
-	labelFailure = "failed"
+	labelSuccess            = "succeeded"
+	labelFailure            = "failed"
+	uniqueDeploymentError   = "Unable to insert deployment: pq: duplicate key value violates unique constraint \"deployment_unique\""
+	uniqueServiceGroupError = "Unable to insert service_group: pq: duplicate key value violates unique constraint \"service_group_name_deployment_id_key\""
 )
 
 type packageIdent struct {
@@ -147,12 +149,26 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 	}
 
 	// But if the service doesn't exist, we will handle it as a new service insertion
-	return db.insertNewService(
+	err1 := db.insertNewService(
 		eventMetadata,
 		svcMetadata,
 		pkgIdent,
-		newHealth,
+		strings.ToUpper(event.GetResult().String()),
 	)
+
+	if err1 != nil {
+		// We will retry once if a unique constraint is hit,
+		// in case a new deployment or service group is in the same batch of events.
+		if err1.Error() == uniqueDeploymentError || err1.Error() == uniqueServiceGroupError {
+			return db.insertNewService(
+				eventMetadata,
+				svcMetadata,
+				pkgIdent,
+				strings.ToUpper(event.GetResult().String()),
+			)
+		}
+	}
+	return err1
 }
 
 // convert a proto timestamp to native go time,

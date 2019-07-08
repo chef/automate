@@ -6,7 +6,7 @@ build_changed() {
     sudo $(hab pkg path core/ruby)/bin/gem install toml
 
     build_commands=""
-    for component in $("$(a2_root_dir)/scripts/changed_components")
+    for component in $("$(a2_root_dir)/scripts/changed_components.rb")
     do
         build_commands="$build_commands build $component;"
     done
@@ -18,7 +18,7 @@ build_changed() {
 }
 
 download_hartifacts() {
-    "$(a2_root_dir)/scripts/download_verify_harts"
+    "$(a2_root_dir)/scripts/download_verify_harts.sh"
 }
 
 build_tools() {
@@ -40,7 +40,7 @@ create_manifest() {
 }
 
 copy_hartifacts() {
-    "$(a2_root_dir)/scripts/copy_hartifacts" "$1"
+    "$(a2_root_dir)/scripts/copy_hartifacts.sh" "$1"
 }
 
 a2_root_dir() {
