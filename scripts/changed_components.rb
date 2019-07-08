@@ -14,7 +14,7 @@ class Hash
 end
 
 def get_hab_deps(source_dir)
-  depString = `bash -c 'cd ${source_dir}; PLAN_CONTEXT=habitat . habitat/plan.sh; echo ${pkg_deps[*]}'`
+  depString = `bash -c 'cd #{source_dir}; PLAN_CONTEXT=habitat . habitat/plan.sh; echo ${pkg_deps[*]}'`
   depString.lines.last.split
 end
 
