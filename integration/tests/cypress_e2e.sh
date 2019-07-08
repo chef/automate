@@ -3,6 +3,12 @@ test_name=":cypress: e2e tests"
 test_deploy_inspec_profiles=()
 test_skip_diagnostics=true
 
+do_deploy() {
+    do_deploy_default
+    log_info "applying dev license"
+    chef-automate license apply "$A2_LICENSE"
+}
+
 do_test_deploy() {
     log_info "run chef-automate iam upgrade-to-v2"
     if ! output=$(chef-automate iam upgrade-to-v2); then
