@@ -9,7 +9,9 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
+	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/chef/automate/api/external/applications"
@@ -486,6 +488,27 @@ func assertServicesEqual(t *testing.T, expected, actual []*applications.Service)
 				svc.Site,
 				actual[i].Site,
 				"The site of a service is not the expected one")
+
+			// By default the previous health check should be set to NONE
+			assert.Equal(t,
+				applications.HealthStatus_NONE,
+				actual[i].PreviousHealthCheck,
+				"The previous health check of a service is not the expected one")
+
+			// The health check should have been updated less than two seconds ago
+			healthUpdatedAt, err := ptypes.Timestamp(actual[i].HealthUpdatedAt)
+			assert.Nil(t, err)
+			//@afiune upgrate testify go package to be able to use 'assert.Lessf()'
+			assert.Truef(t,
+				float64(2) > time.Now().Sub(healthUpdatedAt).Seconds(),
+				"The health check should have been updated less than two seconds ago")
+
+			// The current health since field should be empty since we are testing that
+			// the health was updated less than two seconds ago and our timef library doesn't
+			// display milliseconds therefore this field should always be empty
+			assert.Truef(t,
+				"" == actual[i].CurrentHealthSince || "1 second" == actual[i].CurrentHealthSince,
+				"The current health check time since last the change should be less than two seconds ago")
 		}
 	}
 }
