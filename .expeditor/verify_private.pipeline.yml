@@ -440,6 +440,19 @@ steps:
         A2_LICENSE:
           path: secret/a2/license
           field: license
+        CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_HOST:
+          path: secret/a2/testing/target_host
+          field: data
+        CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_USERNAME:
+          path: secret/a2/testing/target_username
+          field: data
+        CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_PASSWORD:
+          path: secret/a2/testing/target_password
+          field: data
+        # Note: this isn't currently used for pre-merge tests
+        # CYPRESS_RECORD_KEY:
+        #   path: secret/a2/cypress
+        #   field: record_key
       executor:
         linux:
           privileged: true
