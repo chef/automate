@@ -498,9 +498,8 @@ func assertServicesEqual(t *testing.T, expected, actual []*applications.Service)
 			// The health check should have been updated less than two seconds ago
 			healthUpdatedAt, err := ptypes.Timestamp(actual[i].HealthUpdatedAt)
 			assert.Nil(t, err)
-			//@afiune upgrate testify go package to be able to use 'assert.Lessf()'
-			assert.Truef(t,
-				float64(2) > time.Now().Sub(healthUpdatedAt).Seconds(),
+			assert.InDeltaf(t,
+				1, time.Now().Sub(healthUpdatedAt).Seconds(), 1,
 				"The health check should have been updated less than two seconds ago")
 
 			// The current health since field should be empty since we are testing that

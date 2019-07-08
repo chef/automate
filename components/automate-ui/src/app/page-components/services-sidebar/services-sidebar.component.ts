@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
+import * as moment from 'moment';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
@@ -134,9 +135,9 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     }
   }
 
-  // format a timestamp to standardized RFC1123 format like: Wed, 03 Jul 2019 17:08:53 UTC
+  // format a timestamp to standardized RFC 2822 format like: Wed, 03 Jul 2019 17:08:53 UTC
   public formatTimestamp(time: Date): string {
-    return new Date(time).toUTCString();
+    return moment.utc(time).toDate().toUTCString();
   }
 
   // returns a timewizard message for the provided current and previous health checks
