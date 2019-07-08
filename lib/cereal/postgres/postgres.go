@@ -581,6 +581,11 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 		return nil, nil, errors.Wrap(err, "failed to dequeue workflow")
 	}
 
+	logrus.WithFields(logrus.Fields{
+		"wid": workc.wid,
+		"eid": workc.eid,
+	}).Debug("dequeued workflow")
+
 	event.InstanceID = workc.wid
 
 	if event.Type == backend.TaskComplete {
@@ -610,7 +615,7 @@ func (workc *PostgresWorkflowCompleter) EnqueueTask(task *backend.Task, opts bac
 	}
 
 	_, err := workc.enqueueTaskStmt.ExecContext(workc.ctx,
-		task.WorkflowInstanceID, opts.StartAfter, task.Name, task.Parameters)
+		workc.wid, opts.StartAfter, task.Name, task.Parameters)
 	if err != nil {
 		return errors.Wrap(err, "failed to enqueue task")
 	}
@@ -689,7 +694,8 @@ func (taskc *PostgresTaskCompleter) Fail(errMsg string) error {
 	}
 
 	if count <= 0 {
-		return errors.Errorf("no task updated for task %d", taskc.tid)
+		logrus.WithField("task_id", taskc.tid).Warn("task not updated")
+		return cereal.ErrTaskWorkerLost
 	}
 
 	return nil
@@ -710,7 +716,8 @@ func (taskc *PostgresTaskCompleter) Succeed(results []byte) error {
 	}
 
 	if count <= 0 {
-		return errors.Errorf("no task updated for task %d", taskc.tid)
+		logrus.WithField("task_id", taskc.tid).Warn("task not updated")
+		return cereal.ErrTaskWorkerLost
 	}
 	return nil
 }

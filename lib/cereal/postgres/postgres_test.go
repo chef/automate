@@ -1,5 +1,3 @@
-// +build integration
-
 package postgres
 
 import (
@@ -157,7 +155,7 @@ func TestMultipleTasksCanDequeueConcurrently(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestTaskCompleteWhileWorkflowIsRunning(t *testing.T) {
+func TestTaskComplete(t *testing.T) {
 	taskName := "task_name"
 	workflowName := "workflow_name"
 	err := runResetDB()
@@ -195,6 +193,173 @@ func TestTaskCompleteWhileWorkflowIsRunning(t *testing.T) {
 	_, taskCompleter, err := b1.DequeueTask(ctx, workerID, taskName)
 	require.NoError(t, err)
 	taskCompleter.Succeed(nil)
+}
+
+func TestLostWorkOnTaskSuccess(t *testing.T) {
+	// This test creates a workflow that launches a task that will succeed.
+	// Before it can succeed, the task is expired. We expect that the result
+	// from the task is not written back.
+
+	taskName := "task_name"
+	workflowName := "workflow_name"
+	err := runResetDB()
+	require.NoError(t, err)
+	b1 := NewPostgresBackend(testDBURL())
+	err = b1.Init()
+	require.NoError(t, err)
+	defer b1.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: "workflow-instance",
+		WorkflowName: workflowName,
+		Status:       "running",
+	})
+
+	require.NoError(t, err, "failed to enqueue workflow")
+
+	_, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{})
+	completer.Continue(nil)
+
+	workerID := uuid4.Must(uuid4.New())
+
+	// start work on task
+	_, taskCompleter, err := b1.DequeueTask(ctx, workerID, taskName)
+	require.NoError(t, err)
+
+	// it's taken too long an has been marked expired
+	b1.cleaner.expireDeadWorkers(ctx, 0)
+
+	// task finishes, but cant write back because the task was expired
+	err = taskCompleter.Succeed([]byte("foo"))
+	require.Equal(t, cereal.ErrTaskWorkerLost, err)
+
+	// Make sure we get a message indicating failure because of lost work
+	wevt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+	require.Equal(t, backend.TaskComplete, wevt.Type)
+	require.Equal(t, backend.TaskStatusWorkerLost, wevt.TaskResult.Status)
+	require.Nil(t, wevt.TaskResult.Result)
+	require.Equal(t, "", wevt.TaskResult.ErrorText)
+}
+
+func TestLostWorkOnTaskFail(t *testing.T) {
+	// This test creates a workflow that launches a task that will fail.
+	// Before it can fail, the task is expired. We expect that the error
+	// from the task is not written back.
+
+	taskName := "task_name"
+	workflowName := "workflow_name"
+	err := runResetDB()
+	require.NoError(t, err)
+	b1 := NewPostgresBackend(testDBURL())
+	err = b1.Init()
+	require.NoError(t, err)
+	defer b1.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: "workflow-instance",
+		WorkflowName: workflowName,
+		Status:       "running",
+	})
+
+	require.NoError(t, err, "failed to enqueue workflow")
+
+	_, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{})
+	completer.Continue(nil)
+
+	workerID := uuid4.Must(uuid4.New())
+
+	// start work on task
+	_, taskCompleter, err := b1.DequeueTask(ctx, workerID, taskName)
+	require.NoError(t, err)
+
+	// it's taken too long an has been marked expired
+	b1.cleaner.expireDeadWorkers(ctx, 0)
+
+	// task finishes, but cant write back because the task was expired
+	err = taskCompleter.Fail("fail")
+	require.Equal(t, cereal.ErrTaskWorkerLost, err)
+
+	// Make sure we get a message indicating failure because of lost work
+	wevt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+	require.Equal(t, backend.TaskComplete, wevt.Type)
+	require.Equal(t, backend.TaskStatusWorkerLost, wevt.TaskResult.Status)
+	require.Equal(t, "", wevt.TaskResult.ErrorText)
+}
+
+func TestNoLostWorkOnTaskSuccess(t *testing.T) {
+	// This test creates a successful workflow and then tries to
+	// expire work. Because the workflow and all its tasks will
+	// have finished when we check for expired work, there should
+	// be no new workflows due after.
+
+	taskName := "task_name"
+	workflowName := "workflow_name"
+	err := runResetDB()
+	require.NoError(t, err)
+	b1 := NewPostgresBackend(testDBURL())
+	err = b1.Init()
+	require.NoError(t, err)
+	defer b1.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: "workflow-instance",
+		WorkflowName: workflowName,
+		Status:       "running",
+	})
+
+	require.NoError(t, err, "failed to enqueue workflow")
+
+	_, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{})
+	completer.Continue(nil)
+
+	workerID := uuid4.Must(uuid4.New())
+
+	// start work on task
+	_, taskCompleter, err := b1.DequeueTask(ctx, workerID, taskName)
+	require.NoError(t, err)
+
+	// task finishes, expect write back
+	err = taskCompleter.Succeed(nil)
+	require.NoError(t, err)
+
+	// Make sure we get a message indicating failure because of lost work
+	wevt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+	require.Equal(t, backend.TaskComplete, wevt.Type)
+	require.Equal(t, backend.TaskStatusSuccess, wevt.TaskResult.Status)
+
+	err = b1.cleaner.expireDeadWorkers(ctx, 0)
+	require.NoError(t, err)
+
+	_, _, err = b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.Error(t, cereal.ErrNoWorkflowInstances)
+
 }
 
 func init() {

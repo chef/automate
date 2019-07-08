@@ -50,7 +50,7 @@ func (w *workerCleaner) Start(ctx context.Context) {
 				break OUTER
 			case <-time.After(w.checkInterval):
 				logrus.Debug("checking for dead task workers")
-				if err := w.expireDeadWorkers(ctx); err != nil {
+				if err := w.expireDeadWorkers(ctx, int64(math.Ceil(w.workerTimeout.Seconds()))); err != nil {
 					logrus.WithError(err).Error("failed to run periodic cereal_expire_dead_workers")
 				}
 			}
@@ -65,9 +65,9 @@ func (w *workerCleaner) Stop() {
 	w.wgStop.Wait()
 }
 
-func (w *workerCleaner) expireDeadWorkers(ctx context.Context) error {
+func (w *workerCleaner) expireDeadWorkers(ctx context.Context, expireOlderThanSeconds int64) error {
 	rows, err := w.db.QueryContext(ctx,
-		"SELECT cereal_expire_dead_workers($1)", int64(math.Ceil(w.workerTimeout.Seconds())))
+		"SELECT cereal_expire_dead_workers($1)", expireOlderThanSeconds)
 	if err != nil {
 		return err
 	}

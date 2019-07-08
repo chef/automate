@@ -709,6 +709,7 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 		instance:   wevt.Instance,
 		wevt:       wevt,
 	}
+
 	if wevt.Instance.Status == backend.WorkflowInstanceStatusAbandoned {
 		logrus.Info("Got abandoned workflow")
 		if wevt.CompletedTaskCount > wevt.EnqueuedTaskCount {

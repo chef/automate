@@ -44,39 +44,47 @@ func (w *workerPinger) Start(ctx context.Context) {
 	w.stop = cancel
 	go func() {
 		defer w.stop()
-		logctx := logrus.WithFields(logrus.Fields{
-			"workerID": w.workerID,
-		})
+
 	OUTER:
 		for {
-		INNER:
 			select {
 			case <-ctx.Done():
 				break OUTER
 			case <-time.After(w.checkinInterval):
-				logctx.Debug("checkin for worker")
-				res, err := w.db.ExecContext(ctx, "UPDATE cereal_busy_task_workers SET last_checkin = NOW() WHERE id = $1", w.workerID.String())
-				if err != nil {
-					logctx.WithError(err).Error("failed to update worker check-in time")
-					break INNER
-				}
-
-				rowsAffected, err := res.RowsAffected()
-				if err != nil {
-					logctx.WithError(err).Error("unable to determine if checkin successful")
-					break INNER
-				}
-
-				if rowsAffected == 0 {
-					logctx.Errorf("worker has been expired")
-					return
-				} else if rowsAffected > 1 {
-					logctx.WithField("rowsAffected", rowsAffected).Errorf("checkin should have updated one row")
+				shouldExit, err := w.ping(ctx)
+				if err == nil && shouldExit {
+					break OUTER
 				}
 			}
 		}
 		w.wgStop.Done()
 	}()
+}
+
+func (w *workerPinger) ping(ctx context.Context) (shouldExit bool, err error) {
+	logctx := logrus.WithFields(logrus.Fields{
+		"workerID": w.workerID,
+	})
+	logctx.Debug("checkin for worker")
+	res, err := w.db.ExecContext(ctx, "UPDATE cereal_busy_task_workers SET last_checkin = NOW() WHERE id = $1", w.workerID.String())
+	if err != nil {
+		logctx.WithError(err).Error("failed to update worker check-in time")
+		return false, err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		logctx.WithError(err).Error("unable to determine if checkin successful")
+		return false, err
+	}
+
+	if rowsAffected == 0 {
+		logctx.Errorf("worker has been expired")
+		return true, nil
+	} else if rowsAffected > 1 {
+		logctx.WithField("rowsAffected", rowsAffected).Errorf("checkin should have updated one row")
+	}
+	return false, nil
 }
 
 func (w *workerPinger) Stop() {
