@@ -23,6 +23,8 @@ type Opts struct {
 	ConnFactory                   *secureconn.Factory
 	projectUpdateStateFilePath    string
 	NodeManagerAddress            string
+	MaxNumberOfBundledRunMsgs     int
+	MaxNumberOfBundledActionMsgs  int
 }
 
 // SetLogLevel sets the log level for the service
