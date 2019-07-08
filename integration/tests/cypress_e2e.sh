@@ -11,10 +11,13 @@ do_test_deploy() {
         return 1
     fi
 
+    log_info "fixing dns resolution for '${CONTAINER_HOSTNAME}'"
+    echo "127.0.0.1 ${CONTAINER_HOSTNAME}" >> /etc/hosts
+
     log_info "running cypress in e2e"
     cd "${A2_ROOT_DIR}/e2e"
     export CYPRESS_SKIP_SSO=true
-    export CYPRESS_BASE_URL="https://localhost"
+    export CYPRESS_BASE_URL="https://$CONTAINER_HOSTNAME"
     if ! cypress run; then
         buildkite-agent artifact upload "cypress/videos/*"
         return 1
