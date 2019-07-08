@@ -8,6 +8,10 @@ import (
 	"os"
 	"testing"
 
+	"github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/lib/uuid4"
+
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -62,6 +66,8 @@ func runResetDB() error {
 }
 
 func TestNoAvailableTasks(t *testing.T) {
+	workerID := uuid4.Must(uuid4.New())
+
 	taskName := "task_name"
 	err := runResetDB()
 	require.NoError(t, err)
@@ -73,7 +79,7 @@ func TestNoAvailableTasks(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	_, _, err = b1.DequeueTask(ctx, taskName)
+	_, _, err = b1.DequeueTask(ctx, workerID, taskName)
 	require.Equal(t, cereal.ErrNoTasks, err)
 }
 
@@ -113,10 +119,10 @@ func TestMultipleTasksCanDequeueConcurrently(t *testing.T) {
 
 	completer.EnqueueTask(&backend.Task{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{TryRemaining: 1})
+	}, backend.TaskEnqueueOpts{})
 	completer.EnqueueTask(&backend.Task{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{TryRemaining: 1})
+	}, backend.TaskEnqueueOpts{})
 	completer.Continue(nil)
 
 	tx1, err := b1.db.BeginTx(ctx, nil)
@@ -128,13 +134,16 @@ func TestMultipleTasksCanDequeueConcurrently(t *testing.T) {
 	tx3, err := b3.db.BeginTx(ctx, nil)
 	require.NoError(t, err)
 
-	b1TID, _, err := b1.dequeueTask(tx1, taskName)
+	workerID1 := uuid4.Must(uuid4.New())
+	b1TID, _, err := b1.dequeueTask(tx1, workerID1, taskName)
 	require.NoError(t, err)
 
-	b2TID, _, err := b2.dequeueTask(tx2, taskName)
+	workerID2 := uuid4.Must(uuid4.New())
+	b2TID, _, err := b2.dequeueTask(tx2, workerID2, taskName)
 	require.NoError(t, err)
 
-	_, _, err = b3.dequeueTask(tx3, taskName)
+	workerID3 := uuid4.Must(uuid4.New())
+	_, _, err = b3.dequeueTask(tx3, workerID3, taskName)
 	require.Equal(t, cereal.ErrNoTasks, err)
 
 	assert.NotZero(t, b1TID)
@@ -179,10 +188,15 @@ func TestTaskCompleteWhileWorkflowIsRunning(t *testing.T) {
 
 	completer.EnqueueTask(&backend.Task{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{TryRemaining: 1})
+	}, backend.TaskEnqueueOpts{})
 	completer.Continue(nil)
 
-	_, taskCompleter, err := b1.DequeueTask(ctx, taskName)
+	workerID := uuid4.Must(uuid4.New())
+	_, taskCompleter, err := b1.DequeueTask(ctx, workerID, taskName)
 	require.NoError(t, err)
 	taskCompleter.Succeed(nil)
+}
+
+func init() {
+	logrus.SetLevel(logrus.DebugLevel)
 }

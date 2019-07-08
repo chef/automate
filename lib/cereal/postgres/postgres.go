@@ -170,7 +170,7 @@ func (pg *PostgresBackend) Init() error {
 	if err != nil {
 		return err
 	}
-	// defer m.Close() I don't think we want to call close here because it'll close our db instance
+	defer m.Close()
 
 	version, dirty, err := m.Version()
 	if err != nil && err != migrate.ErrNilVersion {
@@ -202,9 +202,12 @@ func (pg *PostgresBackend) Init() error {
 }
 
 func (pg *PostgresBackend) Close() error {
-	pg.cleaner.Stop()
 	if pg.db != nil {
-		return pg.db.Close()
+		pg.cleaner.Stop()
+		logrus.Debug("closing cereal database")
+		err := pg.db.Close()
+		logrus.WithError(err).Debug("closed cereal database")
+		return err
 	}
 	return nil
 }
@@ -616,8 +619,8 @@ func (workc *PostgresWorkflowCompleter) EnqueueTask(task *backend.Task, opts bac
 	return nil
 }
 
-func (pg *PostgresBackend) dequeueTask(ctx context.Context, workerID uuid4.UUID, taskName string) (int64, *backend.Task, error) {
-	row := pg.db.QueryRowContext(ctx, dequeueTaskQuery, workerID.String(), taskName)
+func (pg *PostgresBackend) dequeueTask(tx *sql.Tx, workerID uuid4.UUID, taskName string) (int64, *backend.Task, error) {
+	row := tx.QueryRow(dequeueTaskQuery, workerID.String(), taskName)
 	task := &backend.Task{
 		Name: taskName,
 	}
@@ -636,8 +639,19 @@ func (pg *PostgresBackend) dequeueTask(ctx context.Context, workerID uuid4.UUID,
 func (pg *PostgresBackend) DequeueTask(ctx context.Context, workerID uuid4.UUID, taskName string) (*backend.Task, backend.TaskCompleter, error) {
 	ctx, cancel := context.WithCancel(ctx)
 
-	tid, task, err := pg.dequeueTask(ctx, workerID, taskName)
+	tx, err := pg.db.BeginTx(ctx, nil)
 	if err != nil {
+		cancel()
+		return nil, nil, err
+	}
+
+	tid, task, err := pg.dequeueTask(tx, workerID, taskName)
+	if err != nil {
+		cancel()
+		return nil, nil, err
+	}
+
+	if err := tx.Commit(); err != nil {
 		cancel()
 		return nil, nil, err
 	}

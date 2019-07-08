@@ -42,6 +42,7 @@ func (w *workerCleaner) Start(ctx context.Context) {
 	w.stop = cancel
 
 	go func() {
+		logrus.Debug("starting worker cleaner")
 	OUTER:
 		for {
 			select {
@@ -55,6 +56,7 @@ func (w *workerCleaner) Start(ctx context.Context) {
 			}
 		}
 		w.wgStop.Done()
+		logrus.Debug("exiting worker cleaner")
 	}()
 }
 
