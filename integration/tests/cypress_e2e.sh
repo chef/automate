@@ -15,5 +15,8 @@ do_test_deploy() {
     cd "${A2_ROOT_DIR}/e2e"
     export CYPRESS_SKIP_SSO=true
     export CYPRESS_BASE_URL="https://localhost"
-    cypress run
+    if ! cypress run; then
+        buildkite-agent artifact upload "cypress/videos/*"
+        return 1
+    fi
 }
