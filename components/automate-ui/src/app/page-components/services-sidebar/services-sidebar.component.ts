@@ -107,14 +107,10 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     this.updateServicesFilters();
   }
 
-  public formatTimestamp(time: Date): string {
-    return new Date(time).toUTCString();
-  }
-
-  // healthCheckStatus returns the formated health_check status from the provided service
+  // healthCheckStatus formats the provided health check to display
   // TODO: @afiune here is where we can inject an error message from the health check
-  public healthCheckStatus(service: Service): string {
-    switch (service.health_check) {
+  public healthCheckStatus(health: string): string {
+    switch (health) {
       case 'OK':
         return 'Ok';
       case 'CRITICAL':
@@ -124,7 +120,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
       case 'UNKNOWN':
         return 'Unknown';
       default:
-        return service.health_check;
+        return health;
     }
   }
 
@@ -138,15 +134,22 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     }
   }
 
-  public formatTimewizardMessage(svc: Service): string {
-    if (svc.previous_health_check === 'NONE') {
+  // format a timestamp to standardized RFC1123 format like: Wed, 03 Jul 2019 17:08:53 UTC
+  public formatTimestamp(time: Date): string {
+    return new Date(time).toUTCString();
+  }
+
+  // returns a timewizard message for the provided current and previous health checks
+  public timewizardMessage(currentHealth: string, previousHealth: string): string {
+    if (previousHealth === 'NONE') {
       return 'Since the service was loaded,';
     }
 
-    return 'Changed from ' + this.formatHealthStatusForTimewizard(svc.previous_health_check) +
-      ' to ' + this.formatHealthStatusForTimewizard(svc.health_check);
+    return 'Changed from ' + this.formatHealthStatusForTimewizard(previousHealth) +
+      ' to ' + this.formatHealthStatusForTimewizard(currentHealth);
   }
 
+  // display all health check status in lower case, except for 'OK' (upper case)
   private formatHealthStatusForTimewizard(health: string): string {
     if (health !== 'OK') {
       return health.toLowerCase();
