@@ -11,7 +11,8 @@ do_test_deploy() {
         return 1
     fi
 
-    log_info "running cypress"
+    log_info "running cypress in e2e"
+    cd "${A2_ROOT_DIR}/e2e"
     export CYPRESS_SKIP_SSO=true
     export CYPRESS_BASE_URL="https://localhost"
     cypress run
