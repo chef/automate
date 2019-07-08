@@ -431,6 +431,19 @@ steps:
   # end-to-end testing. These tests all test full deployments of
   # Automate in different configurations.
   #
+  - label: "[integration] :cypress:"
+    command:
+      - integration/run_test integration/tests/cypress_e2e.sh
+    timeout_in_minutes: 20
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
+
   - label: "[integration] iam v2 (migrated)"
     command:
       - integration/run_test integration/tests/iam_v2.sh
