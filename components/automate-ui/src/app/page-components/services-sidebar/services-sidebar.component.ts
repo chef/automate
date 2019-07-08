@@ -134,6 +134,23 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     }
   }
 
+  public formatTimewizardMessage(svc: Service): string {
+    if (svc.previous_health_check === 'NONE') {
+      return 'Since the service was loaded, ' + svc.current_health_since + ' ago';
+    }
+
+    return 'Changed from ' + this.formatHealthStatusForTimewizard(svc.previous_health_check) +
+      ' to ' + this.formatHealthStatusForTimewizard(svc.health_check) + ' ' +
+      svc.current_health_since + ' ago';
+  }
+
+  private formatHealthStatusForTimewizard(health: string): string {
+    if (health !== 'OK') {
+      return health.toLowerCase();
+    }
+    return health;
+  }
+
   private updateServicesFilters(): void {
     const queryParams = {
       'sgStatus': this.selectedHealth,

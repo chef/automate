@@ -64,9 +64,7 @@
             <chef-icon class="{{ service.health_check }}">{{ service.health_check | serviceStatusIcon }}</chef-icon>
             {{ healthCheckStatus(service) }}
           </div>
-          <div class ="timewizard-line">
-            Since {{ service.current_health_since }} ago
-          </div>
+          <div class ="timewizard-line">{{ formatTimewizardMessage(service) }}</div>
         </div>
       </li>
     </ul>
