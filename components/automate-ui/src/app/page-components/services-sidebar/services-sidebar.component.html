@@ -45,7 +45,7 @@
       </chef-status-filter-group>
     </div>
     <ul>
-      <li class="service-item" *ngFor="let service of services$ | async">
+      <li class="service-item" *ngFor="let service of services$ | async; let i = index">
         <div class="header">
           <div class ="fqdn-line"><chef-icon>storage</chef-icon> {{ service.fqdn || "--"}}</div>
           <div class ="supervisor-line"><b>Supervisor:</b> {{ service.supervisor_id || "--"}}</div>
@@ -56,7 +56,7 @@
           <div class ="channel-line">
             <chef-badge *ngIf="service.channel !== ''">{{ service.channel | uppercase }}</chef-badge>
             <chef-badge no-data
-              id="general-channel-tooltip"
+              [id]="'channel-tooltip-' + i"
               [tooltip]="tooltipMessageFor('channel')"
               *ngIf="service.channel === ''">NO CHANNEL</chef-badge>
           </div>
