@@ -14,12 +14,24 @@ do_deploy() {
 }
 
 do_test_deploy() {
-    log_info "run chef-automate iam upgrade-to-v2"
-    if ! output=$(chef-automate iam upgrade-to-v2); then
-        log_error "Non-zero exit code, output:"
-        log_error "$output"
-        return 1
-    fi
+    case $IAM in
+        v2)
+            log_info "run chef-automate iam upgrade-to-v2 --skip-policy-migration"
+            if ! output=$(chef-automate iam upgrade-to-v2 --skip-policy-migration); then
+                log_error "Non-zero exit code, output:"
+                log_error "$output"
+                return 1
+            fi
+            ;;
+        v2.1)
+            log_info "run chef-automate iam upgrade-to-v2 --skip-policy-migration --beta2.1"
+            if ! output=$(chef-automate iam upgrade-to-v2 --skip-policy-migration --beta2.1); then
+                log_error "Non-zero exit code, output:"
+                log_error "$output"
+                return 1
+            fi
+            ;;
+    esac
 
     log_info "fixing dns resolution for '${CONTAINER_HOSTNAME}'"
     echo "127.0.0.1 ${CONTAINER_HOSTNAME}" >> /etc/hosts
