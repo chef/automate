@@ -30,7 +30,7 @@ options:
     How long to wait for a operation to complete before raising an error
 - name: "yes"
   default_value: "false"
-  usage: Skip bootstrapping the machine with Habitat
+  usage: Agree to all prompts
 inherited_options:
 - name: debug
   shorthand: d
