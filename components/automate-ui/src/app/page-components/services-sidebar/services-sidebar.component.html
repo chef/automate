@@ -64,7 +64,7 @@
             <chef-icon class="{{ service.health_check }}">{{ service.health_check | serviceStatusIcon }}</chef-icon>
             {{ healthCheckStatus(service.health_check) }}
           </div>
-          <chef-tooltip style='--tooltip-color: #222435;' [attr.for]="'health-timestamp-' + i">{{ formatTimestamp(service.health_updated_at) }}</chef-tooltip>
+          <chef-tooltip [attr.for]="'health-timestamp-' + i">{{ formatTimestamp(service.health_updated_at) }}</chef-tooltip>
           <div class="timewizard-line">
             {{ timewizardMessage(service.health_check, service.previous_health_check) }}
             <a [id]="'health-timestamp-' + i"> {{ service.current_health_since }} ago</a>

@@ -18,6 +18,7 @@ ul {
 }
 
 chef-tooltip {
+  #{--tooltip-color}: $chef-primary-dark;
   display: inline-table;
   color: $chef-white;
   font-size: 14px;
