@@ -459,27 +459,23 @@ steps:
 
   - label: "[integration] :cypress: IAMv2"
     command:
-      - integration/run_test integration/tests/cypress_e2e.sh
+      - IAM=v2 integration/run_test integration/tests/cypress_e2e.sh
     timeout_in_minutes: 20
     expeditor:
       secrets: *cypress_secrets
       executor:
         linux:
           privileged: true
-          environment:
-            - IAM=v2
 
   - label: "[integration] :cypress: IAMv2.1"
     command:
-      - integration/run_test integration/tests/cypress_e2e.sh
+      - IAM=v2.1 integration/run_test integration/tests/cypress_e2e.sh
     timeout_in_minutes: 20
     expeditor:
       secrets: *cypress_secrets
       executor:
         linux:
           privileged: true
-          environment:
-            - IAM=v2.1
 
   - label: "[integration] iam v2 (migrated)"
     command:
