@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivationStart } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Feature } from 'app/services/feature-flags/types';
@@ -39,7 +40,7 @@ export class UIComponent implements OnInit {
 
   licenseApplyReason: LicenseApplyReason;
 
-  renderNavbar: true;
+  renderNavbar = true;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -49,12 +50,12 @@ export class UIComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.router.events.subscribe((event: any) => {
-      console.log('routerval', event);
-      this.renderNavbar = event.snapshot
-        && event.snapshot.data
-        ? event.snapshot.data.hideNavBar
-        : this.renderNavbar;
+    this.router.events.pipe(
+        filter(event => event instanceof ActivationStart)
+    ).subscribe((event: any) => {
+      this.renderNavbar = event.snapshot.data.hideNavBar
+        ? false
+        : true;
     });
 
     this.store.dispatch(new GetIamVersion());
