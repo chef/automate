@@ -3,6 +3,10 @@ test_name=":cypress: e2e tests"
 test_deploy_inspec_profiles=()
 test_skip_diagnostics=true
 
+# Note: these tests use the UI, so a valid license needs to be set up.
+# Alternatively, the UI tests could also _apply the license_ and thus
+# give us some test coverage for the license apply modal etc; but we
+# are not there, yet.
 do_deploy() {
     do_deploy_default
     log_info "applying dev license"
