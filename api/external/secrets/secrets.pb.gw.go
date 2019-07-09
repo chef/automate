@@ -293,15 +293,15 @@ func RegisterSecretsServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 }
 
 var (
-	pattern_SecretsService_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"secrets"}, ""))
+	pattern_SecretsService_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"secrets"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_SecretsService_Read_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1}, []string{"secrets", "id"}, ""))
+	pattern_SecretsService_Read_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1}, []string{"secrets", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_SecretsService_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1}, []string{"secrets", "id"}, ""))
+	pattern_SecretsService_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1}, []string{"secrets", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_SecretsService_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1}, []string{"secrets", "id"}, ""))
+	pattern_SecretsService_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1}, []string{"secrets", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_SecretsService_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"secrets", "search"}, ""))
+	pattern_SecretsService_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"secrets", "search"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

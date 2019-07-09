@@ -286,15 +286,15 @@ func RegisterTokensMgmtHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 }
 
 var (
-	pattern_TokensMgmt_GetTokens_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"auth", "tokens"}, ""))
+	pattern_TokensMgmt_GetTokens_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"auth", "tokens"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_TokensMgmt_CreateToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"auth", "tokens"}, ""))
+	pattern_TokensMgmt_CreateToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"auth", "tokens"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_TokensMgmt_UpdateToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"auth", "tokens", "id"}, ""))
+	pattern_TokensMgmt_UpdateToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"auth", "tokens", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_TokensMgmt_GetToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"auth", "tokens", "id"}, ""))
+	pattern_TokensMgmt_GetToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"auth", "tokens", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_TokensMgmt_DeleteToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"auth", "tokens", "id"}, ""))
+	pattern_TokensMgmt_DeleteToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"auth", "tokens", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

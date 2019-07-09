@@ -451,23 +451,23 @@ func RegisterNodesServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_NodesService_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"nodes"}, ""))
+	pattern_NodesService_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"nodes"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_NodesService_Read_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1}, []string{"nodes", "id"}, ""))
+	pattern_NodesService_Read_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1}, []string{"nodes", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_NodesService_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1}, []string{"nodes", "id"}, ""))
+	pattern_NodesService_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1}, []string{"nodes", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_NodesService_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1}, []string{"nodes", "id"}, ""))
+	pattern_NodesService_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1}, []string{"nodes", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_NodesService_BulkDeleteById_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"nodes", "delete", "ids"}, ""))
+	pattern_NodesService_BulkDeleteById_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"nodes", "delete", "ids"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_NodesService_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"nodes", "search"}, ""))
+	pattern_NodesService_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"nodes", "search"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_NodesService_Rerun_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 2}, []string{"nodes", "rerun", "id"}, ""))
+	pattern_NodesService_Rerun_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 2}, []string{"nodes", "rerun", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_NodesService_BulkDelete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"nodes", "delete"}, ""))
+	pattern_NodesService_BulkDelete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"nodes", "delete"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_NodesService_BulkCreate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"nodes", "bulk-create"}, ""))
+	pattern_NodesService_BulkCreate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"nodes", "bulk-create"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

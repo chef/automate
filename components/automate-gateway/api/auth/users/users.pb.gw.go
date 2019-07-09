@@ -341,17 +341,17 @@ func RegisterUsersMgmtHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 }
 
 var (
-	pattern_UsersMgmt_GetUsers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"auth", "users"}, ""))
+	pattern_UsersMgmt_GetUsers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"auth", "users"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_UsersMgmt_GetUserByUsername_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"auth", "users", "username"}, ""))
+	pattern_UsersMgmt_GetUserByUsername_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"auth", "users", "username"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_UsersMgmt_CreateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"auth", "users"}, ""))
+	pattern_UsersMgmt_CreateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"auth", "users"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_UsersMgmt_DeleteUserByUsername_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"auth", "users", "username"}, ""))
+	pattern_UsersMgmt_DeleteUserByUsername_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"auth", "users", "username"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_UsersMgmt_UpdateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"auth", "users", "username"}, ""))
+	pattern_UsersMgmt_UpdateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"auth", "users", "username"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_UsersMgmt_UpdateSelf_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "username"}, ""))
+	pattern_UsersMgmt_UpdateSelf_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"users", "username"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
