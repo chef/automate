@@ -151,10 +151,14 @@ do_create_config_default() {
         --file "$test_config_path" \
         --upgrade-strategy "$test_upgrade_strategy" \
         --es-mem "1g"
-    # shellcheck disable=SC2129
-    echo -e "[deployment.v1.sys.log]\nlevel = \"debug\"" >> "$test_config_path"
-    echo -e "[dex.v1.sys.expiry]\nid_tokens = \"5m\"" >> "$test_config_path"
-    echo -e "[postgresql.v1.sys.pg]\nshared_buffers = \"1GB\"" >> "$test_config_path"
+    cat >> "$test_config_path" <<EOF
+[deployment.v1.sys.log]
+  level = "debug"
+[dex.v1.sys.expiry]
+  id_tokens = "5m"
+[postgresql.v1.sys.pg]
+  shared_buffers = "1GB"
+EOF
 }
 
 do_prepare_deploy() {

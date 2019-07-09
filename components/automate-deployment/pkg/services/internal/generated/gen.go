@@ -52,15 +52,15 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
+      "name": "chef/es-sidecar-service",
+      "metadata": null
+    },
+    {
       "name": "chef/event-feed-service",
       "metadata": null
     },
     {
       "name": "chef/authz-service",
-      "metadata": null
-    },
-    {
-      "name": "chef/es-sidecar-service",
       "metadata": null
     },
     {

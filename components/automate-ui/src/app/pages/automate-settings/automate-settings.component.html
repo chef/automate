@@ -33,9 +33,9 @@
             </chef-td>
             <chef-td class="input">
               <chef-select ngDefaultControl formControlName="unit" (change)="patchUnitValue(missingNodesForm, $event)">
-                <chef-option value='m'>Minutes</chef-option>
-                <chef-option value='h'>Hours</chef-option>
-                <chef-option value='d' selected>Days</chef-option>
+                <chef-option value='m' [selected]="isUnitValue(missingNodesForm,'m')">Minutes</chef-option>
+                <chef-option value='h' [selected]="isUnitValue(missingNodesForm,'h')">Hours</chef-option>
+                <chef-option value='d' [selected]="isUnitValue(missingNodesForm,'d')">Days</chef-option>
               </chef-select>
             </chef-td>
           </chef-tr>
@@ -54,9 +54,9 @@
             </chef-td>
             <chef-td class="input">
               <chef-select ngDefaultControl formControlName="unit" (change)="patchUnitValue(deleteMissingNodesForm, $event)">
-                <chef-option value='m'>Minutes</chef-option>
-                <chef-option value='h'>Hours</chef-option>
-                <chef-option value='d' selected>Days</chef-option>
+                <chef-option value='m' [selected]="isUnitValue(deleteMissingNodesForm,'m')">Minutes</chef-option>
+                <chef-option value='h' [selected]="isUnitValue(deleteMissingNodesForm,'h')">Hours</chef-option>
+                <chef-option value='d' [selected]="isUnitValue(deleteMissingNodesForm,'d')">Days</chef-option>
               </chef-select>
             </chef-td>
           </chef-tr>

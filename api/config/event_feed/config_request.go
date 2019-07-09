@@ -25,6 +25,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Service.Host = w.String("0.0.0.0")
 	c.V1.Sys.Service.Port = w.Int32(10134)
 	c.V1.Sys.Log.Level = w.String("info")
+	c.V1.Sys.Service.PurgeEventFeedAfterDays = w.Int32(7)
 	return c
 }
 

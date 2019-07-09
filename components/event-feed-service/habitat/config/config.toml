@@ -20,3 +20,13 @@ url = "http://{{member.sys.ip}}:{{member.cfg.http-port}}"
 url = "http://127.0.0.1:{{member.cfg.http-port}}"
 {{~/if}}
 {{~/eachAlive}}
+
+[elasticsearch_sidecar]
+{{~#eachAlive bind.es-sidecar-service.members as |member|}}
+address = "{{member.sys.ip}}:{{member.cfg.port}}"
+{{~/eachAlive}}
+
+[data_lifecycle]
+{{~#if cfg.service.purge_event_feed_after_days }}
+purge_event_feed_after_days = {{cfg.service.purge_event_feed_after_days}}
+{{~/if}}
