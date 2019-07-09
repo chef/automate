@@ -36,7 +36,7 @@ steps:
   #
   - label: repo health
     command:
-      - hab studio run "source .studiorc && enter_go_workspace && scripts/repo_health"
+      - hab studio run "source .studiorc && enter_go_workspace && scripts/repo_health.sh"
     timeout_in_minutes: 10
     retry:
       automatic:
@@ -84,8 +84,8 @@ steps:
 
   - label: "[unit] authn-service"
     command:
-      - scripts/install_golang
-      - scripts/setup_buildkite_pg authn_test
+      - scripts/install_golang.sh
+      - scripts/setup_buildkite_pg.sh authn_test
       - cd components/authn-service
       - make static unit
     timeout_in_minutes: 10
@@ -117,8 +117,8 @@ steps:
 
   - label: "[unit] authz-service"
     command:
-      - scripts/install_golang
-      - scripts/setup_buildkite_pg authz_test
+      - scripts/install_golang.sh
+      - scripts/setup_buildkite_pg.sh authz_test
       - cd components/authz-service
       - make static unit
     timeout_in_minutes: 10
@@ -131,8 +131,8 @@ steps:
 
   - label: "[unit] teams-service"
     command:
-      - scripts/install_golang
-      - scripts/setup_buildkite_pg teams_test
+      - scripts/install_golang.sh
+      - scripts/setup_buildkite_pg.sh teams_test
       - cd components/teams-service
       - make static unit
     timeout_in_minutes: 10
@@ -145,8 +145,8 @@ steps:
 
   - label: "[unit] automate lib"
     command:
-      - scripts/install_golang
-      - scripts/setup_buildkite_pg cereal_test
+      - scripts/install_golang.sh
+      - scripts/setup_buildkite_pg.sh cereal_test
       - cd lib
       - PG_USER="postgres" PATH=/usr/lib/postgresql/9.6/bin/:\$PATH make lint unit cereal_integration
     timeout_in_minutes: 10
@@ -159,7 +159,7 @@ steps:
 
   - label: "[unit] automate-platform-tools"
     command:
-      - scripts/install_golang
+      - scripts/install_golang.sh
       - cd components/automate-platform-tools
       - make lint unit
     timeout_in_minutes: 10
@@ -172,7 +172,7 @@ steps:
 
   - label: "[unit] automate-cli"
     command:
-      - scripts/install_golang
+      - scripts/install_golang.sh
       - cd components/automate-cli
       - make lint unit
     timeout_in_minutes: 10
@@ -185,7 +185,7 @@ steps:
 
   - label: "[unit] event-gateway"
     command:
-      - scripts/install_golang
+      - scripts/install_golang.sh
       - cd components/event-gateway
       - make ci
     timeout_in_minutes: 10
@@ -198,7 +198,7 @@ steps:
 
   - label: "[cross-compile] automate-cli"
     command:
-      - scripts/install_golang
+      - scripts/install_golang.sh
       - cd components/automate-cli
       - make cross
     timeout_in_minutes: 10
@@ -211,7 +211,7 @@ steps:
 
   - label: "[unit] deployment-service"
     command:
-      - scripts/install_golang
+      - scripts/install_golang.sh
       - cd components/automate-deployment
       - REAL_USERADD_TESTS=true make ci
     timeout_in_minutes: 10
@@ -242,7 +242,7 @@ steps:
 
   - label: "[unit] automate-grpc"
     command:
-      - scripts/install_golang
+      - scripts/install_golang.sh
       - cd components/automate-grpc
       - make static unit
     timeout_in_minutes: 10
@@ -291,7 +291,7 @@ steps:
 
   - label: "[unit] compliance-service"
     command:
-      - scripts/install_golang
+      - scripts/install_golang.sh
       - cd components/compliance-service
       - make lint test-unit
     timeout_in_minutes: 10
@@ -304,7 +304,7 @@ steps:
 
   - label: "[unit] nodemanager-service"
     command:
-      - scripts/install_golang
+      - scripts/install_golang.sh
       - cd components/nodemanager-service
       - make lint test-unit
     timeout_in_minutes: 10
@@ -362,7 +362,7 @@ steps:
 
   - label: "[static] local-user-service"
     command:
-      - scripts/install_golang
+      - scripts/install_golang.sh
       - cd components/local-user-service
       - make static
     timeout_in_minutes: 10
@@ -390,7 +390,7 @@ steps:
 
   - label: "[unit] notifications-client"
     command:
-      - scripts/install_golang
+      - scripts/install_golang.sh
       - cd components/notifications-client
       - make test
     timeout_in_minutes: 10
@@ -424,8 +424,8 @@ steps:
   # shouldn't this be integration tests? (FWIW we can move it to the studio)
   - label: "[unit] session-service"
     command:
-      - scripts/install_golang
-      - scripts/setup_buildkite_pg sessions_test
+      - scripts/install_golang.sh
+      - scripts/setup_buildkite_pg.sh sessions_test
       - cd components/session-service
       - make static migrations-append-only-check unit
     timeout_in_minutes: 10
@@ -438,7 +438,7 @@ steps:
 
   - label: "[unit] data-lifecycle-service"
     command:
-      - scripts/install_golang
+      - scripts/install_golang.sh
       - cd components/data-lifecycle-service
       - make lint unit
     timeout_in_minutes: 10
@@ -451,7 +451,7 @@ steps:
 
   - label: "[static] es-sidecar-service"
     command:
-      - scripts/install_golang
+      - scripts/install_golang.sh
       - cd components/es-sidecar-service
       - make lint
     timeout_in_minutes: 10
@@ -494,7 +494,7 @@ steps:
 
   - label: "[unit] pg-sidecar-service"
     command:
-      - scripts/install_golang
+      - scripts/install_golang.sh
       - cd components/pg-sidecar-service
       - go test -v ./pkg/...
     timeout_in_minutes: 10
@@ -559,9 +559,9 @@ steps:
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
-      - sudo scripts/install_inspec
-      - sudo scripts/install_golang
-      - sudo scripts/install_grpcurl
+      - sudo scripts/install_inspec.sh
+      - sudo scripts/install_golang.sh
+      - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
       - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-db
     artifact_paths:
@@ -585,9 +585,9 @@ steps:
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
-      - sudo scripts/install_inspec
-      - sudo scripts/install_golang
-      - sudo scripts/install_grpcurl
+      - sudo scripts/install_inspec.sh
+      - sudo scripts/install_golang.sh
+      - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
       - sudo -E  PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-integration-scanner
     artifact_paths:
@@ -611,9 +611,9 @@ steps:
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
-      - sudo scripts/install_inspec
-      - sudo scripts/install_golang
-      - sudo scripts/install_grpcurl
+      - sudo scripts/install_inspec.sh
+      - sudo scripts/install_golang.sh
+      - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
       - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-integration-reporting
     artifact_paths:
@@ -635,9 +635,9 @@ steps:
   - label: "[integration] nodemanager-service run-db-tests"
     command:
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
-      - sudo scripts/install_inspec
-      - sudo scripts/install_golang
-      - sudo scripts/install_grpcurl
+      - sudo scripts/install_inspec.sh
+      - sudo scripts/install_golang.sh
+      - sudo scripts/install_grpcurl.sh
       - cd components/nodemanager-service
       - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-integration-db
     artifact_paths:
@@ -662,9 +662,9 @@ steps:
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
-      - sudo scripts/install_inspec
-      - sudo scripts/install_golang
-      - sudo scripts/install_grpcurl
+      - sudo scripts/install_inspec.sh
+      - sudo scripts/install_golang.sh
+      - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
       - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-automate-upgrade
     artifact_paths:
@@ -688,9 +688,9 @@ steps:
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
-      - sudo scripts/install_inspec
-      - sudo scripts/install_golang
-      - sudo scripts/install_grpcurl
+      - sudo scripts/install_inspec.sh
+      - sudo scripts/install_golang.sh
+      - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
       - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-automate-upgrade
     artifact_paths:
@@ -714,9 +714,9 @@ steps:
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
-      - sudo scripts/install_inspec
-      - sudo scripts/install_golang
-      - sudo scripts/install_grpcurl
+      - sudo scripts/install_inspec.sh
+      - sudo scripts/install_golang.sh
+      - sudo scripts/install_grpcurl.sh
       - cd components/compliance-service
       - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-automate-upgrade
     artifact_paths:

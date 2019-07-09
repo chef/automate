@@ -7,5 +7,6 @@ echo "Attempting to clean up docker containers for buildkitejob=$BUILDKITE_JOB_I
 matching_containers=$(docker ps --filter "label=buildkitejob=$BUILDKITE_JOB_ID" --format "{{.ID}}")
 if [ -n "$matching_containers" ]; then
     echo "Killing docker containers $matching_containers"
+    # shellcheck disable=SC2086
     docker kill $matching_containers
 fi

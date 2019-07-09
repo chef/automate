@@ -15,6 +15,14 @@ CONFIG="$CONFIG --converge-history-days {{cfg.service.purge_converge_history_aft
 CONFIG="$CONFIG --actions-days {{cfg.service.purge_actions_after_days}}"
 {{~/if}}
 
+{{~#if cfg.service.max_number_of_bundled_run_msgs }}
+CONFIG="$CONFIG --max-number-of-bundled-run-msgs {{cfg.service.max_number_of_bundled_run_msgs}}"
+{{~/if}}
+
+{{~#if cfg.service.max_number_of_bundled_action_msgs }}
+CONFIG="$CONFIG --max-number-of-bundled-action-msgs {{cfg.service.max_number_of_bundled_action_msgs}}"
+{{~/if}}
+
 # If we have a config pointing to an specific host,
 # lets use it, otherwise use the ipaddress of the server
 #

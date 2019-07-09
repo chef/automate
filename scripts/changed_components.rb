@@ -14,14 +14,13 @@ class Hash
 end
 
 def get_hab_deps(source_dir)
-  plan_path = "#{source_dir}/habitat/plan.sh"
-  depString = `bash -c '. #{plan_path}; echo ${pkg_deps[*]}'`
+  depString = `bash -c 'cd #{source_dir}; PLAN_CONTEXT=habitat . habitat/plan.sh; echo ${pkg_deps[*]}'`
   depString.lines.last.split
 end
 
 config = TOML.load_file(".bldr.toml")
 
-changed_files = `git diff --name-only $(scripts/git_difference_expression)`.split("\n")
+changed_files = `git diff --name-only $(scripts/git_difference_expression.rb)`.split("\n")
 
 build_all = (ENV["BUILDKITE_BRANCH"] || "").include?("verify-rebuild-all")
 

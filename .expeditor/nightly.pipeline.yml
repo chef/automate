@@ -2,13 +2,13 @@ expeditor:
   defaults:
     executor:
       docker:
-        image_sha256: 861987bfafe78bcedbc508b05fd2c092822326095a371969f6cf3a9530173632
+        image_sha256: 9efe535caea25c7a2646cec77cadaa8de422b4bdf4e123e1c83241de2f98e47a
         workdir: /go/src/github.com/chef/automate
 
 steps:
   - label: build
     command:
-      - scripts/verify_build
+      - scripts/verify_build.sh
     timeout_in_minutes: 45
     env:
       ALLOW_LOCAL_PACKAGES: true
