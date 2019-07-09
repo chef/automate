@@ -119,12 +119,6 @@ export class ProjectDetailsComponent implements OnDestroy {
       : 'Applied';
   }
 
-  getConditionsText(conditions: number): string {
-    return conditions > 1
-      ? conditions + ' conditions'
-      : conditions + ' condition';
-  }
-
   hasEditsPending(rules: Rule[]): boolean {
     return _find(rules, ['edits', 'staging']) ? true : false;
   }

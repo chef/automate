@@ -23,7 +23,7 @@ const CREATE_ERROR = 'createError';
 const DELETE_STATUS = 'deleteStatus';
 const UPDATE_STATUS = 'updateStatus';
 
-export const Attributes = {
+export const ruleAttributes = {
   node: [
     {
       key: 'CHEF_ORGS',
@@ -69,54 +69,13 @@ export const Attributes = {
 export const ruleEntityAdapter: EntityAdapter<Rule> = createEntityAdapter<Rule>();
 
 export const RuleEntityInitialState: RuleEntityState = ruleEntityAdapter.getInitialState({
+  getAttributes: ruleAttributes,
   getAllStatus: EntityStatus.notLoaded,
   getStatus: EntityStatus.notLoaded,
   createStatus: EntityStatus.notLoaded,
   createError: null,
   deleteStatus: EntityStatus.notLoaded,
-  updateStatus: EntityStatus.notLoaded,
-  getAttributes: {
-    node: [
-      {
-        key: 'CHEF_ORGS',
-        value: 'Chef Organization'
-      },
-      {
-        key: 'CHEF_SERVER',
-        value: 'Chef Server'
-      },
-      {
-        key: 'CHEF_ENV',
-        value: 'Environment'
-      },
-      {
-        key: 'CHEF_ROLE',
-        value: 'Chef Role'
-      },
-      {
-        key: 'CHEF_TAG',
-        value: 'Chef Tag'
-      },
-      {
-        key: 'CHEF_POLICY_NAME',
-        value: 'Chef Policy Name'
-      },
-      {
-        key: 'CHEF_POLICY_GROUP',
-        value: 'Chef Policy Group'
-      }
-    ],
-    event: [
-      {
-        key: 'CHEF_ORGS',
-        value: 'Chef Organization'
-      },
-      {
-        key: 'CHEF_SERVER',
-        value: 'Chef Server'
-      }
-    ]
-  }
+  updateStatus: EntityStatus.notLoaded
 });
 
 export function ruleEntityReducer(

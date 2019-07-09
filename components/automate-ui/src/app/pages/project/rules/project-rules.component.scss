@@ -2,46 +2,9 @@
 
 chef-page {
 
-  chef-modal {
-    #{--modal-width}: 777px;
-
-    h2 {
-      text-align: center;
-    }
-
-    #left-align {
-      margin-left: 150px;
-
-      chef-form-field {
-        margin-top: 20px;
-        padding-right: 150px;
-      }
-
-      p {
-        size: 11px;
-        margin-top: 11px;
-        margin-bottom: 11px;
-      }
-
-      .expression {
-        background-color: $chef-light-grey;
-        padding-left: 0.3em;
-        padding-right: 0.3em;
-      }
-    }
-
-    #align-buttons {
-      text-align: center;
-    }
-  }
-
   small {
     color: $chef-dark-grey;
     font-size: 14px;
-  }
-
-  chef-input {
-    height: 45px;
   }
 
   form {
@@ -49,44 +12,55 @@ chef-page {
     overflow-y: scroll;
   }
 
-  chef-form-field.attribute-field {
-    display: inline-block;
-    position: relative;
-    vertical-align: top;
-    width: 27%;
-
-    &:last-child {
-      margin: 2.5rem 0px;
-      width: 18%;
-
-      label {
-        display: inline-block;
-      }
-
-      chef-icon {
-        cursor: pointer;
-        font-size: 1.2rem;
-        position: absolute;
-        right: 0;
-      }
-    }
-
-    .label {
-      color: $chef-dark-grey;
-      font-weight: 100;
-      text-transform: uppercase;
-    }
-
-    chef-select,
-    chef-input {
-      min-width: 0;
-      width: 95%;
-    }
+  chef-input {
+    height: 45px;
   }
 
   #ruleName,
   #resourceType {
     width: 340px;
+  }
+
+  chef-form-field {
+    .label {
+      font-size: 12px;
+    }
+
+    &.attribute-field {
+      display: inline-block;
+      position: relative;
+      vertical-align: top;
+      width: 27%;
+
+      &:last-child {
+        margin: 2.5rem 0px;
+        width: 18%;
+
+        label {
+          display: inline-block;
+        }
+
+        chef-icon {
+          cursor: pointer;
+          font-size: 1.2rem;
+          position: absolute;
+          right: 0;
+        }
+      }
+
+      .label {
+        color: $chef-dark-grey;
+        text-transform: uppercase;
+        font-weight: 100;
+      }
+
+      chef-select,
+      chef-input {
+        min-width: 0;
+        width: 95%;
+      }
+    }
+
   }
 
   #add-condition {
@@ -98,34 +72,6 @@ chef-page {
 
     chef-button {
       margin-left: 0;
-    }
-  }
-
-  #no-members-container {
-    position: relative;
-    top: 70px;
-    text-align: center;
-  }
-
-  #table-container {
-
-    #members-selected {
-      font-size: 12px;
-      color: $chef-dark-grey;
-      margin-bottom: 5px;
-    }
-
-    #inner-container {
-      chef-table {
-        chef-tbody {
-          height: calc(100vh - 350px);
-          overflow-y: scroll;
-        }
-
-        .checkbox-row {
-          max-width: 50px;
-        }
-      }
     }
   }
 }
