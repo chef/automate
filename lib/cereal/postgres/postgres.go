@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/chef/automate/lib/uuid4"
+
 	"github.com/golang-migrate/migrate"
 	"github.com/golang-migrate/migrate/database/postgres"
 	"github.com/golang-migrate/migrate/source"
@@ -14,13 +16,12 @@ import (
 
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/backend"
-	"github.com/chef/automate/lib/uuid4"
 )
 
 const (
-	enqueueTaskQuery   = `SELECT cereal_enqueue_task($1, $2, $3, $4)`
-	dequeueTaskQuery   = `SELECT * FROM cereal_dequeue_task($1, $2)`
-	completeTaskQuery  = `SELECT COUNT(*) FROM cereal_complete_task($1, $2, $3, $4, $5)`
+	enqueueTaskQuery   = `SELECT cereal_enqueue_task($1, $2, $3, $4, $5)`
+	dequeueTaskQuery   = `SELECT * FROM cereal_dequeue_task($1)`
+	completeTaskQuery  = `SELECT cereal_complete_task($1, $2, $3, $4, $5)`
 	getTaskResultQuery = `SELECT task_name, parameters, status, error, result FROM cereal_task_results WHERE id = $1`
 
 	enqueueWorkflowQuery  = `SELECT cereal_enqueue_workflow($1, $2, $3)`
@@ -95,10 +96,10 @@ type PostgresBackend struct {
 type PostgresTaskCompleter struct {
 	// tid is the Task's id in our postgresql database.  We need
 	// this to complete the correct task.
-	tid int64
+	tid            int64
+	writebackToken string
 
-	workerID uuid4.UUID
-	db       *sql.DB
+	db *sql.DB
 
 	ctx    context.Context
 	cancel context.CancelFunc
@@ -614,8 +615,12 @@ func (workc *PostgresWorkflowCompleter) EnqueueTask(task *backend.Task, opts bac
 		opts.StartAfter = time.Now()
 	}
 
-	_, err := workc.enqueueTaskStmt.ExecContext(workc.ctx,
-		workc.wid, opts.StartAfter, task.Name, task.Parameters)
+	writebackToken, err := uuid4.NewV4()
+	if err != nil {
+		return err
+	}
+	_, err = workc.enqueueTaskStmt.ExecContext(workc.ctx,
+		workc.wid, writebackToken.String(), opts.StartAfter, task.Name, task.Parameters)
 	if err != nil {
 		return errors.Wrap(err, "failed to enqueue task")
 	}
@@ -624,24 +629,25 @@ func (workc *PostgresWorkflowCompleter) EnqueueTask(task *backend.Task, opts bac
 	return nil
 }
 
-func (pg *PostgresBackend) dequeueTask(tx *sql.Tx, workerID uuid4.UUID, taskName string) (int64, *backend.Task, error) {
-	row := tx.QueryRow(dequeueTaskQuery, workerID.String(), taskName)
+func (pg *PostgresBackend) dequeueTask(tx *sql.Tx, taskName string) (int64, string, *backend.Task, error) {
+	row := tx.QueryRow(dequeueTaskQuery, taskName)
 	task := &backend.Task{
 		Name: taskName,
 	}
 
 	var tid int64
-	err := row.Scan(&tid, &task.WorkflowInstanceID, &task.Parameters)
+	var writebackToken string
+	err := row.Scan(&tid, &task.WorkflowInstanceID, &writebackToken, &task.Parameters)
 	if err == sql.ErrNoRows {
-		return 0, nil, cereal.ErrNoTasks
+		return 0, "", nil, cereal.ErrNoTasks
 	} else if err != nil {
-		return 0, nil, errors.Wrap(err, "failed to dequeue task")
+		return 0, "", nil, errors.Wrap(err, "failed to dequeue task")
 	}
 
-	return tid, task, nil
+	return tid, writebackToken, task, nil
 }
 
-func (pg *PostgresBackend) DequeueTask(ctx context.Context, workerID uuid4.UUID, taskName string) (*backend.Task, backend.TaskCompleter, error) {
+func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*backend.Task, backend.TaskCompleter, error) {
 	ctx, cancel := context.WithCancel(ctx)
 
 	tx, err := pg.db.BeginTx(ctx, nil)
@@ -650,7 +656,7 @@ func (pg *PostgresBackend) DequeueTask(ctx context.Context, workerID uuid4.UUID,
 		return nil, nil, err
 	}
 
-	tid, task, err := pg.dequeueTask(tx, workerID, taskName)
+	tid, writebackToken, task, err := pg.dequeueTask(tx, taskName)
 	if err != nil {
 		if errR := tx.Rollback(); errR != nil {
 			logrus.WithError(err).Warn("failed to rollback dequeue transaction")
@@ -664,15 +670,15 @@ func (pg *PostgresBackend) DequeueTask(ctx context.Context, workerID uuid4.UUID,
 		return nil, nil, err
 	}
 
-	pinger := newWorkerPinger(pg.db, workerID)
+	pinger := newWorkerPinger(pg.db, tid, writebackToken)
 
 	taskc := &PostgresTaskCompleter{
-		db:       pg.db,
-		workerID: workerID,
-		tid:      tid,
-		ctx:      ctx,
-		cancel:   cancel,
-		pinger:   pinger,
+		db:             pg.db,
+		writebackToken: writebackToken,
+		tid:            tid,
+		ctx:            ctx,
+		cancel:         cancel,
+		pinger:         pinger,
 	}
 
 	pinger.Start(ctx)
@@ -685,17 +691,14 @@ func (taskc *PostgresTaskCompleter) Fail(errMsg string) error {
 
 	taskc.pinger.Stop()
 
-	row := taskc.db.QueryRowContext(taskc.ctx, completeTaskQuery, taskc.workerID, taskc.tid, backend.TaskStatusFailed, errMsg, "")
+	_, err := taskc.db.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, taskc.writebackToken, backend.TaskStatusFailed, errMsg, "")
 
-	var count int
-	err := row.Scan(&count)
 	if err != nil {
+		if isErrTaskWorkerLost(err) {
+			logrus.WithField("task_id", taskc.tid).Warn("task not updated")
+			return cereal.ErrTaskWorkerLost
+		}
 		return errors.Wrapf(err, "failed to mark task %d as failed", taskc.tid)
-	}
-
-	if count <= 0 {
-		logrus.WithField("task_id", taskc.tid).Warn("task not updated")
-		return cereal.ErrTaskWorkerLost
 	}
 
 	return nil
@@ -707,17 +710,14 @@ func (taskc *PostgresTaskCompleter) Succeed(results []byte) error {
 
 	taskc.pinger.Stop()
 
-	row := taskc.db.QueryRowContext(taskc.ctx, completeTaskQuery, taskc.workerID, taskc.tid, backend.TaskStatusSuccess, "", results)
+	_, err := taskc.db.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, taskc.writebackToken, backend.TaskStatusSuccess, "", results)
 
-	var count int
-	err := row.Scan(&count)
 	if err != nil {
+		if isErrTaskWorkerLost(err) {
+			logrus.WithField("task_id", taskc.tid).Warn("task not updated")
+			return cereal.ErrTaskWorkerLost
+		}
 		return errors.Wrapf(err, "failed to mark task %d as successful", taskc.tid)
-	}
-
-	if count <= 0 {
-		logrus.WithField("task_id", taskc.tid).Warn("task not updated")
-		return cereal.ErrTaskWorkerLost
 	}
 	return nil
 }
@@ -837,4 +837,13 @@ func (c *PostgresScheduledWorkflowCompleter) EnqueueScheduledWorkflow(s *backend
 
 func (c *PostgresScheduledWorkflowCompleter) Close() {
 	c.cancel()
+}
+
+func isErrTaskWorkerLost(err error) bool {
+	if err, ok := err.(*pq.Error); ok {
+		if err.Code == "23514" {
+			return true
+		}
+	}
+	return false
 }

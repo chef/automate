@@ -616,7 +616,7 @@ LOOP:
 		default:
 		}
 
-		t, taskCompleter, err := m.backend.DequeueTask(ctx, workerID, taskName)
+		t, taskCompleter, err := m.backend.DequeueTask(ctx, taskName)
 		if err != nil {
 			if err == ErrNoTasks {
 				// TODO(ssd) 2019-05-10: Once we have notifications we can probably sleep longer

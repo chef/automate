@@ -3,15 +3,13 @@ package backend
 import (
 	"context"
 	"time"
-
-	"github.com/chef/automate/lib/uuid4"
 )
 
 type Driver interface {
 	EnqueueWorkflow(ctx context.Context, workflow *WorkflowInstance) error
 	DequeueWorkflow(ctx context.Context, workflowNames []string) (*WorkflowEvent, WorkflowCompleter, error)
 
-	DequeueTask(ctx context.Context, workerID uuid4.UUID, taskName string) (*Task, TaskCompleter, error)
+	DequeueTask(ctx context.Context, taskName string) (*Task, TaskCompleter, error)
 
 	CreateWorkflowSchedule(ctx context.Context, instanceName string, workflowName string, parameters []byte, enabled bool, recurrence string, nextRunAt time.Time) error
 	GetDueScheduledWorkflow(ctx context.Context) (*Schedule, ScheduledWorkflowCompleter, error)

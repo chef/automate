@@ -115,13 +115,7 @@ CREATE TABLE cereal_tasks (
     task_name     TEXT NOT NULL,
     parameters    BYTEA,
     task_state    cereal_task_state NOT NULL DEFAULT 'queued',
-    worker_id     TEXT
-);
-
-CREATE TABLE cereal_busy_task_workers (
-    id           TEXT PRIMARY KEY,
-    task_id      BIGINT,
-    last_checkin TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    writeback_token TEXT NOT NULL
 );
 
 CREATE TABLE cereal_task_results (
@@ -265,17 +259,18 @@ $$;
 -- Task Functions
 CREATE OR REPLACE FUNCTION cereal_enqueue_task(
     _workflow_instance_id BIGINT,
+    _writeback_token TEXT,
     _start_after TIMESTAMPTZ,
     _task_name TEXT,
     _parameters BYTEA)
 RETURNS VOID
 AS $$
-    INSERT INTO cereal_tasks(workflow_instance_id, start_after, task_name, parameters)
-        VALUES(_workflow_instance_id, _start_after, _task_name, _parameters);
+    INSERT INTO cereal_tasks(workflow_instance_id, writeback_token, start_after, task_name, parameters)
+        VALUES(_workflow_instance_id, _writeback_token, _start_after, _task_name, _parameters);
 $$ LANGUAGE SQL;
 
-CREATE OR REPLACE FUNCTION cereal_dequeue_task(_worker_id TEXT, _task_name TEXT)
-RETURNS TABLE(id BIGINT, workflow_instance_id BIGINT, parameters BYTEA)
+CREATE OR REPLACE FUNCTION cereal_dequeue_task(_task_name TEXT)
+RETURNS TABLE(id BIGINT, workflow_instance_id BIGINT, writeback_token TEXT, parameters BYTEA)
 AS $$
 DECLARE
     r cereal_tasks%rowtype;
@@ -285,29 +280,42 @@ BEGIN
         WHERE task_name = _task_name AND task_state = 'queued' AND start_after < NOW()
         ORDER BY enqueued_at FOR UPDATE SKIP LOCKED LIMIT 1
     LOOP
-        INSERT INTO cereal_busy_task_workers(id, task_id) VALUES(_worker_id, r.id);
-        UPDATE cereal_tasks SET task_state = 'running', worker_id = _worker_id, updated_at = NOW() WHERE cereal_tasks.id = r.id;
+        UPDATE cereal_tasks SET task_state = 'running', updated_at = NOW() WHERE cereal_tasks.id = r.id;
 
         id := r.id;
         workflow_instance_id := r.workflow_instance_id;
+        writeback_token := r.writeback_token;
         parameters := r.parameters;
         RETURN NEXT;
     END LOOP;
 END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION cereal_expire_dead_workers(_worker_timeout_seconds BIGINT)
-RETURNS SETOF TEXT
+CREATE OR REPLACE FUNCTION cereal_ping_task(_task_id BIGINT, _writeback_token TEXT)
+RETURNS VOID
+AS $$
+BEGIN
+    UPDATE cereal_taks SET updated_at = NOW() WHERE id = _task_id AND writeback_token = _writeback_token;
+    IF NOT FOUND THEN
+        RAISE check_violation USING MESSAGE = 'Failed to update task: writeback_token changed';
+    END IF;
+END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cereal_expire_tasks(_worker_timeout_seconds BIGINT)
+RETURNS TABLE(tid BIGINT, workflow_instance_id BIGINT, writeback_token TEXT)
 AS $$
 DECLARE
     t cereal_tasks%rowtype;
 BEGIN
     FOR t IN
-        SELECT cereal_tasks.*
-        FROM cereal_tasks LEFT JOIN cereal_busy_task_workers ON cereal_tasks.worker_id = cereal_busy_task_workers.id
-        WHERE cereal_busy_task_workers.last_checkin < NOW() - (_worker_timeout_seconds || ' seconds')::interval FOR UPDATE
+        SELECT * 
+        FROM cereal_tasks
+        WHERE
+            task_state = 'running' AND
+            updated_at < NOW() - (_worker_timeout_seconds || ' seconds')::interval
+        FOR UPDATE SKIP LOCKED
     LOOP
-        DELETE FROM cereal_busy_task_workers WHERE id = t.worker_id;
         DELETE FROM cereal_tasks WHERE id = t.id;
 
         INSERT INTO cereal_task_results(workflow_instance_id, parameters, task_name, enqueued_at, status)
@@ -316,12 +324,16 @@ BEGIN
         INSERT INTO cereal_workflow_events(event_type, task_result_id, workflow_instance_id)
             VALUES('task_complete', t.id, t.workflow_instance_id);
 
-        RETURN NEXT t.worker_id;
+        tid := t.id;
+        workflow_instance_id := t.workflow_instance_id;
+        writeback_token := t.writeback_token;
+
+        RETURN NEXT;
     END LOOP;
 END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION cereal_complete_task(_worker_id TEXT, _tid BIGINT, _status cereal_task_status, _error text, _result BYTEA)
+CREATE OR REPLACE FUNCTION cereal_complete_task(_tid BIGINT, _writeback_token TEXT, _status cereal_task_status, _error text, _result BYTEA)
 RETURNS SETOF BIGINT
 LANGUAGE plpgsql
 AS $$
@@ -329,7 +341,7 @@ DECLARE
     t cereal_tasks%rowtype;
 BEGIN
     FOR t IN
-         SELECT * FROM cereal_tasks WHERE id = _tid AND worker_id = _worker_id FOR UPDATE
+         SELECT * FROM cereal_tasks WHERE id = _tid AND writeback_token = _writeback_token FOR UPDATE
     LOOP
         INSERT INTO cereal_task_results(workflow_instance_id, parameters, task_name, enqueued_at, status, error, result)
         VALUES(t.workflow_instance_id, t.parameters, t.task_name, t.enqueued_at, _status, _error, _result);
@@ -337,11 +349,13 @@ BEGIN
         INSERT INTO cereal_workflow_events(event_type, task_result_id, workflow_instance_id)
         VALUES('task_complete', t.id, t.workflow_instance_id);
 
-        DELETE FROM cereal_busy_task_workers WHERE id = t.worker_id;
         DELETE FROM cereal_tasks WHERE id = t.id;
 
         RETURN NEXT t.id;
     END LOOP;
+    IF NOT FOUND THEN
+        RAISE check_violation USING MESSAGE = 'Failed to update task: writeback_token changed';
+    END IF;
 END
 $$;
 

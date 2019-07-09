@@ -1,4 +1,3 @@
-// build +integration
 package postgres
 
 import (
@@ -8,8 +7,6 @@ import (
 	"testing"
 
 	"github.com/sirupsen/logrus"
-
-	"github.com/chef/automate/lib/uuid4"
 
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
@@ -65,8 +62,6 @@ func runResetDB() error {
 }
 
 func TestNoAvailableTasks(t *testing.T) {
-	workerID := uuid4.Must(uuid4.New())
-
 	taskName := "task_name"
 	err := runResetDB()
 	require.NoError(t, err)
@@ -78,7 +73,7 @@ func TestNoAvailableTasks(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	_, _, err = b1.DequeueTask(ctx, workerID, taskName)
+	_, _, err = b1.DequeueTask(ctx, taskName)
 	require.Equal(t, cereal.ErrNoTasks, err)
 }
 
@@ -133,16 +128,13 @@ func TestMultipleTasksCanDequeueConcurrently(t *testing.T) {
 	tx3, err := b3.db.BeginTx(ctx, nil)
 	require.NoError(t, err)
 
-	workerID1 := uuid4.Must(uuid4.New())
-	b1TID, _, err := b1.dequeueTask(tx1, workerID1, taskName)
+	b1TID, _, _, err := b1.dequeueTask(tx1, taskName)
 	require.NoError(t, err)
 
-	workerID2 := uuid4.Must(uuid4.New())
-	b2TID, _, err := b2.dequeueTask(tx2, workerID2, taskName)
+	b2TID, _, _, err := b2.dequeueTask(tx2, taskName)
 	require.NoError(t, err)
 
-	workerID3 := uuid4.Must(uuid4.New())
-	_, _, err = b3.dequeueTask(tx3, workerID3, taskName)
+	_, _, _, err = b3.dequeueTask(tx3, taskName)
 	require.Equal(t, cereal.ErrNoTasks, err)
 
 	assert.NotZero(t, b1TID)
@@ -190,8 +182,7 @@ func TestTaskComplete(t *testing.T) {
 	}, backend.TaskEnqueueOpts{})
 	completer.Continue(nil)
 
-	workerID := uuid4.Must(uuid4.New())
-	_, taskCompleter, err := b1.DequeueTask(ctx, workerID, taskName)
+	_, taskCompleter, err := b1.DequeueTask(ctx, taskName)
 	require.NoError(t, err)
 	taskCompleter.Succeed(nil)
 }
@@ -229,14 +220,13 @@ func TestLostWorkOnTaskSuccess(t *testing.T) {
 	}, backend.TaskEnqueueOpts{})
 	completer.Continue(nil)
 
-	workerID := uuid4.Must(uuid4.New())
-
 	// start work on task
-	_, taskCompleter, err := b1.DequeueTask(ctx, workerID, taskName)
+	_, taskCompleter, err := b1.DequeueTask(ctx, taskName)
 	require.NoError(t, err)
 
 	// it's taken too long an has been marked expired
-	b1.cleaner.expireDeadWorkers(ctx, 0)
+	err = b1.cleaner.expireDeadWorkers(ctx, 0)
+	require.NoError(t, err)
 
 	// task finishes, but cant write back because the task was expired
 	err = taskCompleter.Succeed([]byte("foo"))
@@ -284,14 +274,13 @@ func TestLostWorkOnTaskFail(t *testing.T) {
 	}, backend.TaskEnqueueOpts{})
 	completer.Continue(nil)
 
-	workerID := uuid4.Must(uuid4.New())
-
 	// start work on task
-	_, taskCompleter, err := b1.DequeueTask(ctx, workerID, taskName)
+	_, taskCompleter, err := b1.DequeueTask(ctx, taskName)
 	require.NoError(t, err)
 
 	// it's taken too long an has been marked expired
-	b1.cleaner.expireDeadWorkers(ctx, 0)
+	err = b1.cleaner.expireDeadWorkers(ctx, 0)
+	require.NoError(t, err)
 
 	// task finishes, but cant write back because the task was expired
 	err = taskCompleter.Fail("fail")
@@ -339,10 +328,8 @@ func TestNoLostWorkOnTaskSuccess(t *testing.T) {
 	}, backend.TaskEnqueueOpts{})
 	completer.Continue(nil)
 
-	workerID := uuid4.Must(uuid4.New())
-
 	// start work on task
-	_, taskCompleter, err := b1.DequeueTask(ctx, workerID, taskName)
+	_, taskCompleter, err := b1.DequeueTask(ctx, taskName)
 	require.NoError(t, err)
 
 	// task finishes, expect write back

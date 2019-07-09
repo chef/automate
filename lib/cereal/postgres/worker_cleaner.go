@@ -67,7 +67,7 @@ func (w *workerCleaner) Stop() {
 
 func (w *workerCleaner) expireDeadWorkers(ctx context.Context, expireOlderThanSeconds int64) error {
 	rows, err := w.db.QueryContext(ctx,
-		"SELECT cereal_expire_dead_workers($1)", expireOlderThanSeconds)
+		"SELECT * FROM cereal_expire_tasks($1)", expireOlderThanSeconds)
 	if err != nil {
 		return err
 	}
@@ -79,12 +79,19 @@ func (w *workerCleaner) expireDeadWorkers(ctx context.Context, expireOlderThanSe
 	}()
 
 	for rows.Next() {
-		var workerID string
-		err := rows.Scan(&workerID)
+		var tid int64
+		var workflowInstanceID int64
+		var writebackToken string
+		err := rows.Scan(&tid, &workflowInstanceID, &writebackToken)
 		if err != nil {
-			return nil
+			return err
 		}
-		logrus.Warnf("Task worker %s lost!", workerID)
+		logrus.WithFields(
+			logrus.Fields{
+				"tid":                tid,
+				"workflowInstanceID": workflowInstanceID,
+				"writebackToken":     writebackToken,
+			}).Warnf("Expired task")
 	}
 	return rows.Err()
 }

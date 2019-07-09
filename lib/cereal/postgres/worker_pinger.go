@@ -6,12 +6,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/chef/automate/lib/uuid4"
 	"github.com/sirupsen/logrus"
 )
 
 type workerPinger struct {
-	workerID        uuid4.UUID
+	taskID          int64
+	writebackToken  string
 	db              *sql.DB
 	wgStart         sync.WaitGroup
 	wgStop          sync.WaitGroup
@@ -19,9 +19,10 @@ type workerPinger struct {
 	checkinInterval time.Duration
 }
 
-func newWorkerPinger(db *sql.DB, workerID uuid4.UUID) *workerPinger {
+func newWorkerPinger(db *sql.DB, taskID int64, writebackToken string) *workerPinger {
 	pinger := &workerPinger{
-		workerID:        workerID,
+		taskID:          taskID,
+		writebackToken:  writebackToken,
 		db:              db,
 		checkinInterval: 30 * time.Second,
 	}
@@ -63,27 +64,20 @@ func (w *workerPinger) Start(ctx context.Context) {
 
 func (w *workerPinger) ping(ctx context.Context) (shouldExit bool, err error) {
 	logctx := logrus.WithFields(logrus.Fields{
-		"workerID": w.workerID,
+		"taskID":         w.taskID,
+		"writebackToken": w.writebackToken,
 	})
 	logctx.Debug("checkin for worker")
-	res, err := w.db.ExecContext(ctx, "UPDATE cereal_busy_task_workers SET last_checkin = NOW() WHERE id = $1", w.workerID.String())
+	_, err = w.db.ExecContext(ctx, "SELECT cereal_ping_task($1,$2)", w.taskID, w.writebackToken)
 	if err != nil {
 		logctx.WithError(err).Error("failed to update worker check-in time")
+		// TODO (jaym) check for check violation. In this case, we need to break out of the loop
+		if isErrTaskWorkerLost(err) {
+			return true, nil
+		}
 		return false, err
 	}
 
-	rowsAffected, err := res.RowsAffected()
-	if err != nil {
-		logctx.WithError(err).Error("unable to determine if checkin successful")
-		return false, err
-	}
-
-	if rowsAffected == 0 {
-		logctx.Errorf("worker has been expired")
-		return true, nil
-	} else if rowsAffected > 1 {
-		logctx.WithField("rowsAffected", rowsAffected).Errorf("checkin should have updated one row")
-	}
 	return false, nil
 }
 
