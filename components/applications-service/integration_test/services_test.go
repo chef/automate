@@ -505,8 +505,9 @@ func assertServicesEqual(t *testing.T, expected, actual []*applications.Service)
 			// The current health since field should be empty since we are testing that
 			// the health was updated less than two seconds ago and our timef library doesn't
 			// display milliseconds therefore this field should always be empty
-			assert.Truef(t,
-				"" == actual[i].CurrentHealthSince || "1 second" == actual[i].CurrentHealthSince,
+			assert.Containsf(t,
+				[]string{"", "1 second"},
+				actual[i].CurrentHealthSince,
 				"The current health check time since last the change should be less than two seconds ago")
 		}
 	}
