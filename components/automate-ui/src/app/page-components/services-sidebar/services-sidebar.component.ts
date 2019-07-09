@@ -29,6 +29,12 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   @Input() serviceGroupId: string;
   @Input() visible: boolean;
 
+  // RFC2822 format like: Wed, 03 Jul 2019 17:08:53 UTC
+  //
+  // TODO @afiune we should move this to a common place where other
+  // components can usee this time format
+  readonly RFC2822 = 'ddd, DD MMM YYYY, hh:mm:ss [UTC]';
+
   public services$: Observable<Service[]>;
   public servicesStatus$: Observable<EntityStatus>;
   public servicesError$: Observable<HttpErrorResponse>;
@@ -135,9 +141,17 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     }
   }
 
-  // format a timestamp to standardized RFC 2822 format like: Wed, 03 Jul 2019 17:08:53 UTC
+  // format a timestamp to standardized RFC2822
   public formatTimestamp(time: Date): string {
-    return moment.utc(time).toDate().toUTCString();
+    // Forcing UTC with custom RFC format
+    return moment.utc(time).format(this.RFC2822);
+
+    // @afiune Other formats/conversion methods
+    // ISO format
+    // return moment.utc(time).toISOString();
+
+    // UTC format (displaying GMT)
+    // return moment.utc(time).toDate().toUTCString();
   }
 
   // returns a timewizard message for the provided current and previous health checks
