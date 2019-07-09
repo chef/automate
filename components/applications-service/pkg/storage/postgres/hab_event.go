@@ -178,7 +178,6 @@ func (db *Postgres) updateTables(
 	pkgIdent *packageIdent,
 	health string) error {
 
-	//updates := map[string]interface{}{}
 	db.updateService(svc, eventMetadata, svcMetadata, pkgIdent, health)
 
 	deploy, err := db.getDeployment(svc.DeploymentID)
@@ -199,7 +198,16 @@ func (db *Postgres) updateTables(
 	}
 	db.updateServiceGroup(sg, svcMetadata)
 
-	return db.triggerDataUpdates(svc, deploy, sup, sg)
+	// @afiune in the future if we have more tables that might need
+	// to be updated, we will just add them to this map of tables
+	tables := map[string]dbTable{
+		"service":       svc,
+		"deployment":    deploy,
+		"supervisor":    sup,
+		"service_group": sg,
+	}
+
+	return db.triggerDataUpdates(tables)
 }
 
 // triggerDataUpdates receives all the data that might need to be updated
@@ -207,35 +215,15 @@ func (db *Postgres) updateTables(
 // the modifications made to ensure we weren't able to apply the changes
 // from the message, all data structs has a field 'needUpdate' that should
 // be modified when an update is required.
-func (db *Postgres) triggerDataUpdates(
-	svc *service,
-	deploy *deployment,
-	sup *supervisor,
-	sg *serviceGroup) error {
+func (db *Postgres) triggerDataUpdates(tables map[string]dbTable) error {
 
 	return dblib.Transaction(db.DbMap, func(tx *gorp.Transaction) error {
 
-		if svc.needUpdate {
-			if _, err := tx.Update(svc); err != nil {
-				return errors.Wrap(err, "unable to update service")
-			}
-		}
-
-		if deploy.needUpdate {
-			if _, err := tx.Update(deploy); err != nil {
-				return errors.Wrap(err, "unable to update deployment")
-			}
-		}
-
-		if sup.needUpdate {
-			if _, err := tx.Update(sup); err != nil {
-				return errors.Wrap(err, "unable to update supervisor")
-			}
-		}
-
-		if sg.needUpdate {
-			if _, err := tx.Update(sg); err != nil {
-				return errors.Wrap(err, "unable to update service group")
+		for tname, data := range tables {
+			if data.NeedUpdate() {
+				if _, err := tx.Update(data); err != nil {
+					return errors.Wrap(err, "unable to update "+tname)
+				}
 			}
 		}
 
