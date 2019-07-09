@@ -37,7 +37,7 @@ do_test_deploy() {
     echo "127.0.0.1 ${CONTAINER_HOSTNAME}" >> /etc/hosts
 
     log_info "running cypress in e2e"
-    cd "${A2_ROOT_DIR}/e2e"
+    cd "${A2_ROOT_DIR}/e2e" || return 1
     export CYPRESS_SKIP_SSO=true
     export CYPRESS_BASE_URL="https://$CONTAINER_HOSTNAME"
     if ! cypress run; then
