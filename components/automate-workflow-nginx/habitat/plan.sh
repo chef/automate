@@ -10,12 +10,7 @@ pkg_deps=(
   chef/openresty-noroot
   chef/mlsa
   core/bash
-  # TODO(ssd) 2019-07-03: PIN PIN PIN
-  #
-  # This is pinned until chef/openresty-noroot is rebuilt, at which
-  # point this pin will break our build again and we'll need to remove
-  # it.
-  core/curl/7.63.0/20190201004909
+  core/curl
   core/coreutils
   "${vendor_origin}/automate-workflow-web"
 )

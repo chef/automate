@@ -9,7 +9,7 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
 # FIXME: pin the chef server version and use it in the pkg_deps when we can
 # follow a stable channel
-pkg_version="12.19.31"
+pkg_version="13.0.19"
 pkg_deps=(
   chef/mlsa
   core/curl
@@ -17,8 +17,8 @@ pkg_deps=(
   core/ruby/2.5.3/20190305212319
   # FIXME: We're pinned to specific versions of unstable packages
   # until they have a stable pipeline we can pin to.
-  "${vendor_origin}/chef-server-nginx/12.19.31/20190307133720"
-  "${vendor_origin}/chef-server-ctl/12.19.31/20190307134716"
+  "${vendor_origin}/chef-server-nginx/13.0.19/20190709121113"
+  "${vendor_origin}/chef-server-ctl/13.0.19/20190709121113"
 )
 
 pkg_bin_dirs=(bin)
