@@ -1,17 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
-
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { Observable } from 'rxjs';
+
+import { Regex } from 'app/helpers/auth/regex';
 import {
   CreateTeam,
   CreateTeamPayload
 } from 'app/entities/teams/team.actions';
-import { Observable } from 'rxjs';
 import { iamMajorVersion } from 'app/entities/policies/policy.selectors';
 
-// NB: neither \S nor ^\s work inside the brackets in this regex language.
-const NON_BLANK = '.*[^ ].*';
 
 // TODO: We should only allow users to nav to this page if they have
 // permissions on user create.
@@ -31,8 +30,8 @@ export class TeamCreateComponent implements OnInit {
     fb: FormBuilder
   ) {
     this.teamCreateForm = fb.group({
-      teamId: ['', [Validators.required, Validators.pattern(NON_BLANK)]],
-      teamName: ['', [Validators.required, Validators.pattern(NON_BLANK)]]
+      teamId: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      teamName: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
     this.iamMajorVersion$ = store.select(iamMajorVersion);
   }
