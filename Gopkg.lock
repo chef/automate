@@ -918,12 +918,12 @@
   revision = "e881fd58d78e04cf6d0de1217f8707c8cc2249bc"
 
 [[projects]]
-  branch = "master"
   digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
   pruneopts = "NUT"
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
@@ -1083,16 +1083,16 @@
   revision = "1a0c4a370c3e8286b835467d2dfcdaf636c3538b"
 
 [[projects]]
-  branch = "master"
-  digest = "1:1ce967a1d67f6019f2d8e68a594093de90f17c2c478fe97ab1891b9812cee02f"
+  digest = "1:60a46e2410edbf02b419f833372dd1d24d7aa1b916a990a7370e792fada1eadd"
   name = "github.com/stretchr/objx"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "1a9d0bb9f541897e62256577b352fdbc1fb4fd94"
+  revision = "477a77ecc69700c7cdeb1fa9e129548e1c1c393c"
+  version = "v0.1.1"
 
 [[projects]]
   branch = "master"
-  digest = "1:b74ece79306aa515ecc1902a86d77ece2b4ffa2fa1cf0220d682fd4eab3c596c"
+  digest = "1:5377b69c3c582320b3a31a6b8caf18e2bc61242ba8473bfff44f33458d9d7568"
   name = "github.com/stretchr/testify"
   packages = [
     "assert",
@@ -1101,7 +1101,7 @@
     "suite",
   ]
   pruneopts = "NUT"
-  revision = "87b1dfb5b2fa649f52695dd9eae19abe404a4308"
+  revision = "ae5876d09ad6d0d68dff8d969e518db26e0e7969"
 
 [[projects]]
   branch = "master"
