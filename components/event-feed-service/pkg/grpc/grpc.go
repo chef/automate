@@ -4,12 +4,15 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"time"
 
 	"github.com/olivere/elastic"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/chef/automate/api/interservice/data_lifecycle"
+	"github.com/chef/automate/api/interservice/es_sidecar"
 	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/config"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
@@ -49,15 +52,34 @@ func Spawn(c *config.EventFeed, connFactory *secureconn.Factory) error {
 		return err
 	}
 
-	grpcServer := NewGRPCServer(connFactory, c, feedStore)
+	timeoutCtx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+
+	// Data Lifecycle Interface
+	esSidecarConn, err := connFactory.DialContext(timeoutCtx, "es-sidecar-service",
+		c.ESSidecarAddress, grpc.WithBlock())
+	if err != nil {
+		log.WithError(err).Error("Failed to create ES Sidecar connection")
+		return err
+	}
+	defer func() {
+		err := esSidecarConn.Close()
+		if err != nil {
+			log.WithError(err).Error("Failed closing ES sidecar connection")
+		}
+	}()
+
+	grpcServer := newGRPCServer(connFactory, c, feedStore, esSidecarConn)
+
 	return grpcServer.Serve(conn)
 }
 
 // NewGRPCServer returns a server that provides our services:
 // * event feed
 // * health
-func NewGRPCServer(connFactory *secureconn.Factory, c *config.EventFeed,
-	feedStore persistence.FeedStore) *grpc.Server {
+// * Data Lifecycle
+func newGRPCServer(connFactory *secureconn.Factory, c *config.EventFeed,
+	feedStore persistence.FeedStore, esSidecarConn *grpc.ClientConn) *grpc.Server {
 	grpcServer := connFactory.NewServer()
 
 	eventFeedServer := server.New(feedStore)
@@ -65,6 +87,11 @@ func NewGRPCServer(connFactory *secureconn.Factory, c *config.EventFeed,
 	event_feed.RegisterEventFeedServiceServer(grpcServer, eventFeedServer)
 
 	health.RegisterHealthServer(grpcServer, eventFeedServer.Health())
+
+	dataLifecycleServer := server.NewDataLifecycleManageableServer(
+		es_sidecar.NewEsSidecarClient(esSidecarConn), c.PurgeEventFeedAfterDays)
+
+	data_lifecycle.RegisterDataLifecycleManageableServer(grpcServer, dataLifecycleServer)
 
 	reflection.Register(grpcServer)
 

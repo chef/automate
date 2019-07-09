@@ -29,3 +29,10 @@ daily_run_at = "{{cfg.service.daily_run_at}}"
   Secure = true
   {{~/if}}
 {{~/eachAlive}}
+{{~#eachAlive bind.event-feed-service.members as |event-feed|}}
+  {{~#if @last}}
+  [managed.event-feed-service]
+  Address = "{{event-feed.sys.ip}}:{{event-feed.cfg.port}}"
+  Secure = true
+  {{~/if}}
+{{~/eachAlive}}
