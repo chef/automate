@@ -68,10 +68,6 @@ func (migratable A1ElasticSearchIndices) migrateTimeSeries(dateToMigrate time.Ti
 	return nil
 }
 
-func (migratable A1ElasticSearchIndices) migrateFeeds() error {
-	return nil
-}
-
 func (migratable A1ElasticSearchIndices) postTimeSeriesMigration(dateToMigrate time.Time) error {
 	myName := "A1ElasticSearchIndices::postTimeSeriesMigration"
 	defer util.TimeTrack(time.Now(), fmt.Sprintf("%s date: %s", myName, dateToMigrate))

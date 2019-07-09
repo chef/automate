@@ -9,22 +9,31 @@ import (
 )
 
 var (
-	eventFeedZeroIndexName  = "eventfeed-0-feeds"
-	complianceFeedIndexName = "comp-2-feeds"
+	eventFeedZeroIndexName    = "eventfeed-0-feeds"
+	compliance1FeedsIndexName = "comp-1-feeds"
+	compliance2FeedsIndexName = "comp-2-feeds"
 )
 
 // Migrator migration state struct
 type Migrator struct {
-	feedStore persistence.FeedStore
-	ctx       context.Context
+	feedStore  persistence.FeedStore
+	ctx        context.Context
+	migrations []migrationVersion
+}
+
+type migrationVersion struct {
+	migratedIfNeeded func() (bool, error)
 }
 
 // New create a new MigrationState
 func New(ctx context.Context, feedStore persistence.FeedStore) *Migrator {
-	return &Migrator{
+	migrator := &Migrator{
 		feedStore: feedStore,
 		ctx:       ctx,
 	}
+	migrator.migrations = migrator.getMigrations()
+
+	return migrator
 }
 
 // InitializeStore migrate or newly initialize the data store
@@ -34,15 +43,32 @@ func (migrator *Migrator) InitializeStore() error {
 		return err
 	}
 
-	migrated, err := migrator.complianceMigrationIfNeeded()
-	if err != nil {
-		return err
-	}
-	if migrated {
-		return nil
+	for _, mv := range migrator.migrations {
+		migrated, err := mv.migratedIfNeeded()
+		if err != nil {
+			return err
+		}
+		if migrated {
+			return nil
+		}
 	}
 
 	return migrator.feedStore.InitializeStore(migrator.ctx)
+}
+
+func (migrator *Migrator) getMigrations() []migrationVersion {
+	return []migrationVersion{
+		{
+			migratedIfNeeded: func() (bool, error) {
+				return migrator.complianceMigrationIfNeeded(compliance1FeedsIndexName)
+			},
+		},
+		{
+			migratedIfNeeded: func() (bool, error) {
+				return migrator.complianceMigrationIfNeeded(compliance2FeedsIndexName)
+			},
+		},
+	}
 }
 
 func (migrator *Migrator) removeZeroIndexIfNeeded() error {
@@ -62,24 +88,20 @@ func (migrator *Migrator) removeZeroIndexIfNeeded() error {
 	return nil
 }
 
-func (migrator *Migrator) complianceMigrationIfNeeded() (bool, error) {
-	hasComplianceFeedData, err := migrator.hasComplianceFeedData()
+func (migrator *Migrator) complianceMigrationIfNeeded(complianceFeedIndexName string) (bool, error) {
+	hasComplianceFeedData, err := migrator.feedStore.DoesIndexExists(migrator.ctx, complianceFeedIndexName)
 	if err != nil {
 		return false, err
 	}
 	if hasComplianceFeedData {
-		err = migrator.migrateComplianceFeedToCurrent()
+		err = migrator.migrateComplianceFeedToCurrent(complianceFeedIndexName)
 		return true, err
 	}
 
 	return false, nil
 }
 
-func (migrator *Migrator) hasComplianceFeedData() (bool, error) {
-	return migrator.feedStore.DoesIndexExists(migrator.ctx, complianceFeedIndexName)
-}
-
-func (migrator *Migrator) migrateComplianceFeedToCurrent() error {
+func (migrator *Migrator) migrateComplianceFeedToCurrent(complianceFeedIndexName string) error {
 	err := migrator.feedStore.InitializeStore(migrator.ctx)
 	if err != nil {
 		return err
