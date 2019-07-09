@@ -102,7 +102,7 @@ CREATE TABLE cereal_workflow_results (
 -- New and Completed tasks also notify a channel that can be
 -- subscribed to by the workflows for more timely notification of new
 -- task events related to their workflow.
-CREATE TYPE cereal_task_status AS ENUM('success', 'failed', 'worker_lost');
+CREATE TYPE cereal_task_status AS ENUM('success', 'failed', 'lost');
 
 CREATE TYPE cereal_task_state  AS ENUM('queued', 'running');
 
@@ -302,7 +302,7 @@ BEGIN
 END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION cereal_expire_tasks(_worker_timeout_seconds BIGINT)
+CREATE OR REPLACE FUNCTION cereal_expire_tasks(_task_timeout_seconds BIGINT)
 RETURNS TABLE(tid BIGINT, workflow_instance_id BIGINT, writeback_token TEXT)
 AS $$
 DECLARE
@@ -313,13 +313,13 @@ BEGIN
         FROM cereal_tasks
         WHERE
             task_state = 'running' AND
-            updated_at < NOW() - (_worker_timeout_seconds || ' seconds')::interval
+            updated_at < NOW() - (_task_timeout_seconds || ' seconds')::interval
         FOR UPDATE SKIP LOCKED
     LOOP
         DELETE FROM cereal_tasks WHERE id = t.id;
 
         INSERT INTO cereal_task_results(workflow_instance_id, parameters, task_name, enqueued_at, status)
-            VALUES(t.workflow_instance_id, t.parameters, t.task_name, t.enqueued_at, 'worker_lost');
+            VALUES(t.workflow_instance_id, t.parameters, t.task_name, t.enqueued_at, 'lost');
 
         INSERT INTO cereal_workflow_events(event_type, task_result_id, workflow_instance_id)
             VALUES('task_complete', t.id, t.workflow_instance_id);

@@ -1,3 +1,4 @@
+// build +integration
 package postgres
 
 import (
@@ -225,18 +226,18 @@ func TestLostWorkOnTaskSuccess(t *testing.T) {
 	require.NoError(t, err)
 
 	// it's taken too long an has been marked expired
-	err = b1.cleaner.expireDeadWorkers(ctx, 0)
+	err = b1.cleaner.expireDeadTasks(ctx, 0)
 	require.NoError(t, err)
 
 	// task finishes, but cant write back because the task was expired
 	err = taskCompleter.Succeed([]byte("foo"))
-	require.Equal(t, cereal.ErrTaskWorkerLost, err)
+	require.Equal(t, cereal.ErrTaskLost, err)
 
 	// Make sure we get a message indicating failure because of lost work
 	wevt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
 	require.Equal(t, backend.TaskComplete, wevt.Type)
-	require.Equal(t, backend.TaskStatusWorkerLost, wevt.TaskResult.Status)
+	require.Equal(t, backend.TaskStatusLost, wevt.TaskResult.Status)
 	require.Nil(t, wevt.TaskResult.Result)
 	require.Equal(t, "", wevt.TaskResult.ErrorText)
 }
@@ -279,18 +280,18 @@ func TestLostWorkOnTaskFail(t *testing.T) {
 	require.NoError(t, err)
 
 	// it's taken too long an has been marked expired
-	err = b1.cleaner.expireDeadWorkers(ctx, 0)
+	err = b1.cleaner.expireDeadTasks(ctx, 0)
 	require.NoError(t, err)
 
 	// task finishes, but cant write back because the task was expired
 	err = taskCompleter.Fail("fail")
-	require.Equal(t, cereal.ErrTaskWorkerLost, err)
+	require.Equal(t, cereal.ErrTaskLost, err)
 
 	// Make sure we get a message indicating failure because of lost work
 	wevt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
 	require.Equal(t, backend.TaskComplete, wevt.Type)
-	require.Equal(t, backend.TaskStatusWorkerLost, wevt.TaskResult.Status)
+	require.Equal(t, backend.TaskStatusLost, wevt.TaskResult.Status)
 	require.Equal(t, "", wevt.TaskResult.ErrorText)
 }
 
@@ -342,7 +343,7 @@ func TestNoLostWorkOnTaskSuccess(t *testing.T) {
 	require.Equal(t, backend.TaskComplete, wevt.Type)
 	require.Equal(t, backend.TaskStatusSuccess, wevt.TaskResult.Status)
 
-	err = b1.cleaner.expireDeadWorkers(ctx, 0)
+	err = b1.cleaner.expireDeadTasks(ctx, 0)
 	require.NoError(t, err)
 
 	_, _, err = b1.DequeueWorkflow(ctx, []string{workflowName})

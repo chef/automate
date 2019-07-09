@@ -58,9 +58,9 @@ const (
 type TaskStatusType string
 
 const (
-	TaskStatusSuccess    TaskStatusType = "success"
-	TaskStatusFailed     TaskStatusType = "failed"
-	TaskStatusWorkerLost TaskStatusType = "worker_lost"
+	TaskStatusSuccess TaskStatusType = "success"
+	TaskStatusFailed  TaskStatusType = "failed"
+	TaskStatusLost    TaskStatusType = "lost"
 )
 
 type WorkflowEvent struct {

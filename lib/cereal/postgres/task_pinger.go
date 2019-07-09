@@ -9,7 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type workerPinger struct {
+type taskPinger struct {
 	taskID          int64
 	writebackToken  string
 	db              *sql.DB
@@ -19,8 +19,8 @@ type workerPinger struct {
 	checkinInterval time.Duration
 }
 
-func newWorkerPinger(db *sql.DB, taskID int64, writebackToken string) *workerPinger {
-	pinger := &workerPinger{
+func newTaskPinger(db *sql.DB, taskID int64, writebackToken string) *taskPinger {
+	pinger := &taskPinger{
 		taskID:          taskID,
 		writebackToken:  writebackToken,
 		db:              db,
@@ -30,9 +30,9 @@ func newWorkerPinger(db *sql.DB, taskID int64, writebackToken string) *workerPin
 	return pinger
 }
 
-// Start starts a goroutine that checks the worker in on some interval.
+// Start starts a goroutine that checks the task in on some interval.
 // This function is only allowed to be called once.
-func (w *workerPinger) Start(ctx context.Context) {
+func (w *taskPinger) Start(ctx context.Context) {
 	// Make sure this function is only called once. A second call will
 	// cause this to panic
 	w.wgStart.Done()
@@ -62,7 +62,7 @@ func (w *workerPinger) Start(ctx context.Context) {
 	}()
 }
 
-func (w *workerPinger) ping(ctx context.Context) (shouldExit bool, err error) {
+func (w *taskPinger) ping(ctx context.Context) (shouldExit bool, err error) {
 	logctx := logrus.WithFields(logrus.Fields{
 		"taskID":         w.taskID,
 		"writebackToken": w.writebackToken,
@@ -71,8 +71,7 @@ func (w *workerPinger) ping(ctx context.Context) (shouldExit bool, err error) {
 	_, err = w.db.ExecContext(ctx, "SELECT cereal_ping_task($1,$2)", w.taskID, w.writebackToken)
 	if err != nil {
 		logctx.WithError(err).Error("failed to update worker check-in time")
-		// TODO (jaym) check for check violation. In this case, we need to break out of the loop
-		if isErrTaskWorkerLost(err) {
+		if isErrTaskLost(err) {
 			return true, nil
 		}
 		return false, err
@@ -81,7 +80,7 @@ func (w *workerPinger) ping(ctx context.Context) (shouldExit bool, err error) {
 	return false, nil
 }
 
-func (w *workerPinger) Stop() {
+func (w *taskPinger) Stop() {
 	w.stop()
 	w.wgStop.Wait()
 }

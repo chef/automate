@@ -90,7 +90,7 @@ type PostgresBackend struct {
 	connURI string
 	db      *sql.DB
 
-	cleaner *workerCleaner
+	cleaner *taskCleaner
 }
 
 type PostgresTaskCompleter struct {
@@ -104,7 +104,7 @@ type PostgresTaskCompleter struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 
-	pinger *workerPinger
+	pinger *taskPinger
 }
 
 type PostgresWorkflowCompleter struct {
@@ -196,7 +196,7 @@ func (pg *PostgresBackend) Init() error {
 		return errors.Wrap(err, "migration failed")
 	}
 
-	pg.cleaner = newWorkerCleaner(pg.db)
+	pg.cleaner = newTaskCleaner(pg.db)
 	pg.cleaner.Start(context.Background())
 
 	return nil
@@ -670,7 +670,7 @@ func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*b
 		return nil, nil, err
 	}
 
-	pinger := newWorkerPinger(pg.db, tid, writebackToken)
+	pinger := newTaskPinger(pg.db, tid, writebackToken)
 
 	taskc := &PostgresTaskCompleter{
 		db:             pg.db,
@@ -694,9 +694,9 @@ func (taskc *PostgresTaskCompleter) Fail(errMsg string) error {
 	_, err := taskc.db.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, taskc.writebackToken, backend.TaskStatusFailed, errMsg, "")
 
 	if err != nil {
-		if isErrTaskWorkerLost(err) {
+		if isErrTaskLost(err) {
 			logrus.WithField("task_id", taskc.tid).Warn("task not updated")
-			return cereal.ErrTaskWorkerLost
+			return cereal.ErrTaskLost
 		}
 		return errors.Wrapf(err, "failed to mark task %d as failed", taskc.tid)
 	}
@@ -713,9 +713,9 @@ func (taskc *PostgresTaskCompleter) Succeed(results []byte) error {
 	_, err := taskc.db.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, taskc.writebackToken, backend.TaskStatusSuccess, "", results)
 
 	if err != nil {
-		if isErrTaskWorkerLost(err) {
+		if isErrTaskLost(err) {
 			logrus.WithField("task_id", taskc.tid).Warn("task not updated")
-			return cereal.ErrTaskWorkerLost
+			return cereal.ErrTaskLost
 		}
 		return errors.Wrapf(err, "failed to mark task %d as successful", taskc.tid)
 	}
@@ -839,7 +839,7 @@ func (c *PostgresScheduledWorkflowCompleter) Close() {
 	c.cancel()
 }
 
-func isErrTaskWorkerLost(err error) bool {
+func isErrTaskLost(err error) bool {
 	if err, ok := err.(*pq.Error); ok {
 		if err.Code == "23514" {
 			return true

@@ -27,7 +27,7 @@ var (
 	ErrInvalidSchedule          = errors.New("workflow schedule is not valid")
 	ErrWorkflowInstanceNotFound = errors.New("workflow instance not found")
 	ErrWorkflowNotComplete      = errors.New("workflow instance is still running")
-	ErrTaskWorkerLost           = errors.New("task worker lost before reporting its status")
+	ErrTaskLost                 = errors.New("task lost before reporting its status")
 )
 
 // Schedule represents a recurring workflow.
@@ -109,8 +109,8 @@ func (r *taskResult) Err() error {
 	switch r.backendResult.Status {
 	case backend.TaskStatusFailed:
 		return errors.New(r.backendResult.ErrorText)
-	case backend.TaskStatusWorkerLost:
-		return ErrTaskWorkerLost
+	case backend.TaskStatusLost:
+		return ErrTaskLost
 	default:
 		return nil
 	}
