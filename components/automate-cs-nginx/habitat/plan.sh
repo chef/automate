@@ -12,7 +12,7 @@ pkg_license=('Chef-MLSA')
 pkg_version="12.19.31"
 pkg_deps=(
   chef/mlsa
-  core/curl
+  core/curl/7.63.0/20190305215321
   core/bundler/1.17.3/20190305221319
   core/ruby/2.5.3/20190305212319
   # FIXME: We're pinned to specific versions of unstable packages
