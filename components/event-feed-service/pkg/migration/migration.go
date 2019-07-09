@@ -2,9 +2,10 @@ package migration
 
 import (
 	"context"
+	"time"
+
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
 	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 var (
