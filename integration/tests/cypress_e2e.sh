@@ -11,9 +11,7 @@ do_deploy() {
     do_deploy_default
     log_info "applying dev license"
     chef-automate license apply "$A2_LICENSE"
-}
 
-do_test_deploy() {
     case $IAM in
         v2)
             log_info "run chef-automate iam upgrade-to-v2 --skip-policy-migration"
@@ -35,7 +33,9 @@ do_test_deploy() {
 
     log_info "fixing dns resolution for '${CONTAINER_HOSTNAME}'"
     echo "127.0.0.1 ${CONTAINER_HOSTNAME}" >> /etc/hosts
+}
 
+do_test_deploy() {
     log_info "running cypress in e2e"
     cd "${A2_ROOT_DIR}/e2e" || return 1
     export CYPRESS_SKIP_SSO=true
