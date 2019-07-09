@@ -32,6 +32,8 @@ hab_curl() {
     hab pkg exec core/curl curl "$@"
 }
 
+# Note: the inspec tests assert that a viewer or operator user is able
+# to retrieve the license status -- so we just add one.
 do_deploy() {
     do_deploy_default
     log_info "applying dev license"
