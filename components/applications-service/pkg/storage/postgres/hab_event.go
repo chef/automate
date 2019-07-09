@@ -202,13 +202,17 @@ func (db *Postgres) updateTables(
 	return db.triggerDataUpdates(svc, deploy, sup, sg)
 }
 
+// triggerDataUpdates receives all the data that might need to be updated
+// and wraps it into a single transaction, on any error we will roll back
+// the modifications made to ensure we weren't able to apply the changes
+// from the message, all data structs has a field 'needUpdate' that should
+// be modified when an update is required.
 func (db *Postgres) triggerDataUpdates(
 	svc *service,
 	deploy *deployment,
 	sup *supervisor,
 	sg *serviceGroup) error {
 
-	// update only if there is something to update
 	return dblib.Transaction(db.DbMap, func(tx *gorp.Transaction) error {
 
 		if svc.needUpdate {
