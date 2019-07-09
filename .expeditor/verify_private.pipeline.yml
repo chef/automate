@@ -287,7 +287,8 @@ steps:
       - . scripts/verify_setup.sh
       - hab studio run "source scripts/verify_studio_init.sh &&
           start_deployment_service &&
-          chef-automate dev deploy-some chef/data-lifecycle-service --with-deps && event_feed_integration"
+          chef-automate dev deploy-some chef/data-lifecycle-service --with-deps &&
+          event_feed_integration"
     timeout_in_minutes: 10
     expeditor:
       executor:
