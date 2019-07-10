@@ -13,6 +13,7 @@ pkg_bin_dirs=(bin)
 pkg_binds_optional=(
   [ingest-service]="port"
   [compliance-service]="port"
+  [event-feed-service]="port"
 )
 pkg_scaffolding=chef/scaffolding-go
 scaffolding_go_base_path=github.com/chef

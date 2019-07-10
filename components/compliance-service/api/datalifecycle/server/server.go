@@ -20,13 +20,6 @@ type PurgePolicy struct {
 	PurgeOlderThanDays int32
 	// IndexName is the base name of the time series index that should be purged
 	IndexName string
-	// Don't delete the entire index for non-time series databases; just delete documents over a given age from the index
-	IsNonTimeSeries bool
-	// IMPLEMENTED FOR NON-TIME SERIES INDICES ONLY!
-	// Optional field. Purge documents based on the time value in this field rather than
-	// the default field, end_time. Values for this field come from client purge policies.
-	// If this field is empty, purge defaults to end_time.
-	CustomPurgeField string
 }
 
 func NewDataLifecycleManageableServer(purgeClient es.EsSidecarClient, purgePolicies []PurgePolicy) *DataLifecycleManageableServer {
@@ -56,28 +49,14 @@ func (server *DataLifecycleManageableServer) Purge(ctx context.Context, request 
 			resp *es.PurgeResponse
 			err  error
 		)
-		if policy.IsNonTimeSeries {
-			logctx.Debug("Calling purge documents from index by age on data lifecycle component...")
-			resp, err = server.purgeClient.PurgeDocumentsFromIndexByAge(ctx, &es.PurgeRequest{
-				Id:               request.GetId(),
-				Index:            indexName,
-				OlderThanDays:    policy.PurgeOlderThanDays,
-				CustomPurgeField: policy.CustomPurgeField,
-			})
-		} else {
-			resp, err = server.purgeClient.PurgeTimeSeriesIndicesByAge(ctx, &es.PurgeRequest{
-				Id:            request.GetId(),
-				Index:         indexName,
-				OlderThanDays: policy.PurgeOlderThanDays,
-			})
-		}
+		resp, err = server.purgeClient.PurgeTimeSeriesIndicesByAge(ctx, &es.PurgeRequest{
+			Id:            request.GetId(),
+			Index:         indexName,
+			OlderThanDays: policy.PurgeOlderThanDays,
+		})
 
 		if err != nil {
-			if policy.IsNonTimeSeries {
-				logctx.WithError(err).Error("PurgeDocumentsFromIndexByAge rpc call failed")
-			} else {
-				logctx.WithError(err).Error("PurgeTimeSeries rpc call failed")
-			}
+			logctx.WithError(err).Error("PurgeTimeSeries rpc call failed")
 
 			// Errors are transformed into a purge status code and a message. We don't return
 			// a grpc error so that we can allow multiple components to have their own status

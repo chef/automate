@@ -422,20 +422,6 @@ test-automate-upgrade: clean-all
 	  exit 1; \
 	fi;
 
-test-integration-feed: start-es start-pg
-	@printf "\n===> ${blue}Running integration tests with PG6 and ES_VER=$(ES_VER)${reset}\n"
-	# we run the service locally so we can inspec detect and exec containers and ssh into containers
-	export ELASTICSEARCH_URL
-	sleep 10
-	@if $(MAKE) test-feed ; then \
-	  printf "===> ${green}feed integration tests passed!!!${reset}\n"; \
-	  $(MAKE) clean; \
-	else \
-	  printf "===> ${red}feed integration tests failed!!!${reset}\n"; \
-	  $(MAKE) clean; \
-	  exit 1; \
-	fi;
-
 test-ingest-to-manager-conn:
 	go run examples/ingest/ingest_client.go --file ingest/examples/compliance-success-tiny-report.json
 	go run examples/ingest/ingest_client.go --file ingest/examples/compliance-failure-big-report.json
@@ -454,9 +440,6 @@ test-reporting: ingest-reports-into-es
 test-scanner:
 	@printf "\n===> ${blue}Running the scanner integration tests${reset}\n"
 	TEST='[2-5]*_spec.rb' $(MAKE) test
-
-test-feed:
-	@go test -v $(shell go list ./feed/integration_test/) -failfast
 
 # Run individual tests with: TEST="02_nodes_spec.rb" make test
 # or multiple ones with: TEST="02_*" make test

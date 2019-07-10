@@ -35,19 +35,6 @@ func (migratable A2V1ElasticSearchIndices) migrateProfiles() error {
 	return nil
 }
 
-func (migratable A2V1ElasticSearchIndices) migrateFeeds() error {
-	myName := "A2V1ElasticSearchIndices::migrateFeeds"
-	defer util.TimeTrack(time.Now(), myName)
-
-	src := a2V1IndexPrefix + "feeds"
-	_, _, err := migratable.backend.reindex(src, CompFeedsIndex, noScript, "feedEntry")
-	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("%s unable to reindex %s", src, myName))
-	}
-
-	return nil
-}
-
 // Migrates the summary and report indices for a specific date
 func (migratable A2V1ElasticSearchIndices) migrateTimeSeries(dateToMigrate time.Time) error {
 	ctx := context.Background()

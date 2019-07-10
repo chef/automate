@@ -7,7 +7,7 @@ var AllMappings = []Mapping{
 }
 
 const (
-	feedsIndicesVersion = "0"
+	feedsIndicesVersion = "1"
 	DocType             = "_doc"
 	IndexNameFeeds      = "eventfeed-" + feedsIndicesVersion + "-feeds"
 )

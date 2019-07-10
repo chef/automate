@@ -14,9 +14,9 @@ import (
 	cmsReq "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	cmsRes "github.com/chef/automate/api/interservice/cfgmgmt/response"
 	cmsService "github.com/chef/automate/api/interservice/cfgmgmt/service"
+	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
 	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
 	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
-	ccFeed "github.com/chef/automate/components/compliance-service/api/automate-feed"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -362,7 +362,7 @@ func configMgmtToGatewayEventCollection(collection []*cmsRes.EventCollection, to
 // complianceToGatewayEventCollection converts a compliance-service (feed) timeline "Slots" message
 // to a Gateway EventCollection message. A FeedTimeline consists of ActionLines. Each Actionline has
 // Timeslots which contain EventCounts, each of which has a count category and count.
-func complianceToGatewayEventCollection(slots []*ccFeed.Timeslot, totalNumberOfBucketsAllowed int) []*agRes.EventCollection {
+func complianceToGatewayEventCollection(slots []*event_feed_api.Timeslot, totalNumberOfBucketsAllowed int) []*agRes.EventCollection {
 	newCollection := make([]*agRes.EventCollection, len(slots))
 	for e, slot := range slots {
 		newCollection[e] = new(agRes.EventCollection)
@@ -384,10 +384,10 @@ func complianceToGatewayEventCollection(slots []*ccFeed.Timeslot, totalNumberOfB
 }
 
 func collectComplianceEventGuitarStrings(ctx context.Context,
-	feedServiceClient ccFeed.FeedServiceClient,
+	feedServiceClient event_feed_api.EventFeedServiceClient,
 	request *agReq.EventStrings, totalNumberOfBucketsAllowed int) (*agRes.EventStrings, error) {
 
-	req := &ccFeed.FeedTimelineRequest{
+	req := &event_feed_api.FeedTimelineRequest{
 		Start:    request.GetStart(),
 		End:      request.GetEnd(),
 		Timezone: request.GetTimezone(),
