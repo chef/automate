@@ -17,24 +17,29 @@ export class ConfirmApplyStopModalComponent implements OnChanges {
 
   @Output() cancel: EventEmitter<void> = new EventEmitter();
 
-  progressValue: number;
+  public progressValue: number;
 
-  progressPrefixText: string;
+  public progressPrefixText: string;
 
-  progressSuffixText: string;
+  public progressSuffixText: string;
 
   ngOnChanges() {
-    const { percentageComplete, estimatedTimeComplete } = this.applyRulesStatus;
+    this.updateProgress(this.applyRulesStatus);
+  }
+
+  public updateProgress(applyRulesStatus: ApplyRulesStatus): void {
+    const { percentageComplete, estimatedTimeComplete } = applyRulesStatus;
     const now = moment();
     const etc = moment(estimatedTimeComplete);
     const dur = moment.duration(etc.diff(now));
-    const durHours = Math.floor(dur.get('hours')).toString().padStart(2, '0');
-    const durMins = dur.get('minutes').toString().padStart(2, '0');
-    const durSecs = dur.get('seconds').toString().padStart(2, '0');
+    const pad = num => num.toString().padStart(2, '0');
+    const durHours = pad(Math.floor(dur.asHours()));
+    const durMins = pad(dur.minutes());
+    const durSecs = pad(dur.seconds());
     const durCountdown = etc.diff(now) < 0 ? '00:00:00' : `${durHours}:${durMins}:${durSecs}`;
 
     this.progressValue = percentageComplete;
-    this.progressPrefixText = `${Math.round(percentageComplete * 100)}% complete`;
+    this.progressPrefixText = `${Math.floor(percentageComplete * 100)}% complete`;
     this.progressSuffixText = `${durCountdown} until finished`;
   }
 }
