@@ -454,8 +454,15 @@ func (m *Manager) Stop() error {
 	if m.cancel != nil {
 		m.cancel()
 	}
+
 	m.wg.Wait()
-	return nil
+
+	var err error
+	if m.backend != nil {
+		err = m.backend.Close()
+	}
+
+	return err
 }
 
 // CreateWorkflowSchedule creates a recurring workflow based on the recurrence
