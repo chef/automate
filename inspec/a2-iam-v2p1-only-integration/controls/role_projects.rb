@@ -27,22 +27,19 @@ control 'iam-v2-projects-1' do
           id: CUSTOM_ROLE_ID_1,
           name: "Test Role 1",
           actions: ["test:some:action", "test:other:action"],
-          projects: [CUSTOM_PROJECT_ID_1, CUSTOM_PROJECT_ID_2],
-          type: "CUSTOM"
+          projects: [CUSTOM_PROJECT_ID_1, CUSTOM_PROJECT_ID_2]
   }
   CUSTOM_ROLE_2 = {
           id: CUSTOM_ROLE_ID_2,
           name: "Test Role 2",
           actions: ["test:other:action"],
-          projects: [CUSTOM_PROJECT_ID_2],
-          type: "CUSTOM"
+          projects: [CUSTOM_PROJECT_ID_2]
   }
   CUSTOM_ROLE_3 = {
           id: CUSTOM_ROLE_ID_3,
           name: "Test Role 2",
           actions: ["test:other:action"],
-          projects: [],
-          type: "CUSTOM"
+          projects: []
   }
 
   CUSTOM_ROLES = [ CUSTOM_ROLE_1, CUSTOM_ROLE_2, CUSTOM_ROLE_3 ]
