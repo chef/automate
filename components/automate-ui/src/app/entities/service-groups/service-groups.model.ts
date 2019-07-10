@@ -19,6 +19,7 @@ export interface Service {
   fqdn: string;
   site: string;
   channel: string;
+  update_strategy: string;
   previous_health_check: string;
   current_health_since: string;
 }

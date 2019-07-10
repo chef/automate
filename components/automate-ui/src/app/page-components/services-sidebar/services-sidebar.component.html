@@ -54,11 +54,13 @@
         <div class="body">
           <div class ="release-line"><chef-icon>grain</chef-icon>{{ service.release || "--"}}</div>
           <div class ="channel-line">
-            <chef-badge *ngIf="service.channel !== ''">{{ service.channel | uppercase }}</chef-badge>
+            <chef-badge *ngIf="service.update_strategy !== 'NONE'">
+              {{ service.channel | uppercase }}: {{ service.update_strategy }}
+            </chef-badge>
             <chef-badge no-data
               id="general-channel-tooltip"
               [tooltip]="tooltipMessageFor('channel')"
-              *ngIf="service.channel === ''">NO CHANNEL</chef-badge>
+              *ngIf="service.update_strategy === 'NONE'">NO CHANNEL: NONE</chef-badge>
           </div>
           <div class ="health-line">
             <chef-icon class="{{ service.health_check }}">{{ service.health_check | serviceStatusIcon }}</chef-icon>
