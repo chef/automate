@@ -271,6 +271,7 @@ func convertStorageServicesToApplicationsServices(svcs []*storage.Service) []*ap
 			Environment:         svc.Environment,
 			Fqdn:                svc.Fqdn,
 			Channel:             svc.Channel,
+			UpdateStrategy:      svc.UpdateStrategy,
 			Site:                svc.Site,
 			PreviousHealthCheck: convertHealthStatusToProto(svc.PreviousHealth),
 			CurrentHealthSince:  timef.IntervalUntilNow(svc.HealthUpdatedAt),

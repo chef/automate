@@ -109,6 +109,7 @@ message Service {
   string environment = 7;
   string fqdn = 8;
   string channel = 9;
+  string update_strategy = 10;
   string site = 17;
   HealthStatus previous_health_check = 18;
   string current_health_since = 19;
