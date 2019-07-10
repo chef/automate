@@ -36,21 +36,39 @@ curl "https://packages.chef.io/manifests/dev/automate/latest.json" > results/dev
 curl "https://packages.chef.io/manifests/current/automate/latest.json" > results/current.json
 curl "https://packages.chef.io/manifests/acceptance/automate/latest.json" > results/acceptance.json
 
-mapfile -t changed_components < <(./scripts/changed_components.rb)
-if [[ ${#changed_components[@]} -ne 0 ]]; then
-    cat << EOF | buildkite-agent annotate --style "info"
+declare -a changed_components
 
+if [[ "$BUILD_ALL" = "true" ]]; then
+    for d in components/*/; do
+        # Skip the devproxy as you can't build it next to the real automate-ui safely.
+        if [[ "$d" == "components/automate-ui-devproxy/" ]]; then
+            continue
+        fi
+        if [[ -f "$d/habitat/plan.sh" ]]; then
+            changed_components+=("$d")
+        fi
+    done
+
+    buildkite-agent annotate --style "info" << EOF
+This change rebuilds ALL components because BUILD_ALL=$BUILD_ALL:
+$(printf '* %s\n' "${changed_components[@]}")
+EOF
+
+else
+    mapfile -t changed_components < <(./scripts/changed_components.rb)
+    if [[ ${#changed_components[@]} -ne 0 ]]; then
+        buildkite-agent annotate --style "info" << EOF
 This change rebuilds the following components:
 $(printf '* %s\n' "${changed_components[@]}")
 EOF
-else
-    buildkite-agent annotate --style "info" "This change rebuilds no components."
+    else
+        buildkite-agent annotate --style "info" "This change rebuilds no components."
+    fi
 fi
 
 mapfile -t modified_sql_files < <(git diff --name-status "$(./scripts/git_difference_expression.rb)" | awk '/^[RMD][0-9]*.*\.sql/{ print $2 }')
 if [[ ${#modified_sql_files[@]} -ne 0 ]]; then
-    cat << EOF | buildkite-agent annotate --append --style "warning"
-
+    buildkite-agent annotate --append --style "warning" << EOF
 This change modifies the following SQL files:
 $(printf '* %s\n' "${modified_sql_files[@]}")
 EOF
