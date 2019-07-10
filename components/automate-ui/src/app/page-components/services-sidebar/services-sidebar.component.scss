@@ -17,6 +17,13 @@ ul {
   margin-top: 5px;
 }
 
+chef-tooltip {
+  #{--tooltip-color}: $chef-primary-dark;
+  display: inline-table;
+  color: $chef-white;
+  font-size: 14px;
+}
+
 app-page-picker {
   padding-left: 35px;
   padding-bottom: 35px;
@@ -106,8 +113,18 @@ chef-alert {
 
   .timewizard-line {
     padding-left: 24px;
-    font-size: 14px;
+    font-size: 12px;
     color: $chef-dark-grey;
+    letter-spacing: 0.1px;
+    line-height: 18px;
+
+    a {
+      color: inherit;
+    }
+
+    a:hover {
+      color: $chef-primary-dark;
+    }
   }
 
   chef-icon {

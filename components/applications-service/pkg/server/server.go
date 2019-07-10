@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 
@@ -16,6 +17,8 @@ import (
 	"github.com/chef/automate/lib/timef"
 	"github.com/chef/automate/lib/version"
 
+	"github.com/golang/protobuf/ptypes"
+	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -274,7 +277,19 @@ func convertStorageServicesToApplicationsServices(svcs []*storage.Service) []*ap
 			Site:                svc.Site,
 			PreviousHealthCheck: convertHealthStatusToProto(svc.PreviousHealth),
 			CurrentHealthSince:  timef.IntervalUntilNow(svc.HealthUpdatedAt),
+			HealthUpdatedAt:     convertOrCreateProtoTimestamp(svc.HealthUpdatedAt),
 		}
 	}
 	return services
+}
+
+// convert a go native time to proto timestamp
+// on any error return the current time (now)
+func convertOrCreateProtoTimestamp(t time.Time) *timestamp.Timestamp {
+	protoTime, err := ptypes.TimestampProto(t)
+	if err != nil {
+		log.WithError(err).Error("malformed time, using protobuf timestamp for the current time")
+		return ptypes.TimestampNow()
+	}
+	return protoTime
 }

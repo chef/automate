@@ -291,7 +291,7 @@ func (db *Postgres) updateServiceGroup(
 
 // convert a proto timestamp to native go time,
 // on any error return the current time (now)
-func convertOrCreateTimestamp(t *timestamp.Timestamp) time.Time {
+func convertOrCreateGoTime(t *timestamp.Timestamp) time.Time {
 	goTime, err := ptypes.Timestamp(t)
 	if err != nil {
 		log.WithError(err).Error("malformed protobuf timestamp, using time now")
@@ -337,7 +337,7 @@ func (db *Postgres) updateService(
 
 	// update always the timestamp of the last event received so that the database
 	// has a record of when the last message was received for a service
-	svc.LastEventOccurredAt = convertOrCreateTimestamp(eventMetadata.GetOccurredAt())
+	svc.LastEventOccurredAt = convertOrCreateGoTime(eventMetadata.GetOccurredAt())
 	svc.needUpdate = true
 }
 
@@ -424,7 +424,7 @@ func (db *Postgres) insertNewService(
 			FullPkgIdent:        pkgIdent.FullPackageIdent(),
 			PreviousHealth:      applications.HealthStatus_NONE.String(),
 			HealthUpdatedAt:     time.Now(),
-			LastEventOccurredAt: convertOrCreateTimestamp(eventMetadata.GetOccurredAt()),
+			LastEventOccurredAt: convertOrCreateGoTime(eventMetadata.GetOccurredAt()),
 		}
 
 		if svcMetadata.GetUpdateConfig() != nil {
