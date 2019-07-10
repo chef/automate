@@ -13,6 +13,7 @@ import (
 
 	feedErrors "github.com/chef/automate/components/event-feed-service/pkg/errors"
 	"github.com/chef/automate/components/event-feed-service/pkg/util"
+	project_update_lib "github.com/chef/automate/lib/authz"
 )
 
 const (
@@ -44,6 +45,57 @@ func (efs ElasticFeedStore) InitializeStore(ctx context.Context) error {
 	efs.initialized = true
 
 	return nil
+}
+
+// DoesIndexExists - does the index 'indexName' exists in elasticsearch
+func (efs ElasticFeedStore) DoesIndexExists(ctx context.Context, indexName string) (bool, error) {
+	return efs.client.IndexExists(indexName).Do(ctx)
+}
+
+// ReindexFeedsToLatest reindex the feed index to the latest index
+func (efs ElasticFeedStore) ReindexFeedsToLatest(ctx context.Context, previousIndex string) (string, error) {
+	src := olivere.NewReindexSource().Index(previousIndex)
+	dst := olivere.NewReindexDestination().Index(IndexNameFeeds)
+	startTaskResult, err := efs.client.Reindex().Source(src).Destination(dst).DoAsync(ctx)
+	return startTaskResult.TaskId, err
+}
+
+// DeleteIndex - delete index with name 'index'
+func (efs ElasticFeedStore) DeleteIndex(ctx context.Context, index string) error {
+	_, err := efs.client.DeleteIndex(index).Do(ctx)
+	return err
+}
+
+func (efs ElasticFeedStore) JobStatus(ctx context.Context, jobID string) (project_update_lib.JobStatus, error) {
+	tasksGetTaskResponse, err := olivere.NewTasksGetTaskService(efs.client).
+		TaskId(jobID).
+		WaitForCompletion(false).
+		Do(ctx)
+	if err != nil {
+		return project_update_lib.JobStatus{}, err
+	}
+
+	if tasksGetTaskResponse.Task == nil {
+		return project_update_lib.JobStatus{
+			Completed: tasksGetTaskResponse.Completed,
+		}, nil
+	}
+
+	var estimatedEndTimeInSec int64
+
+	percentageComplete := getPercentageComplete(tasksGetTaskResponse.Task.Status)
+
+	if percentageComplete != 0 {
+		runningTimeNanos := float64(tasksGetTaskResponse.Task.RunningTimeInNanos)
+		timeLeftSec := int64(runningTimeNanos / percentageComplete / 1000000000.0)
+		estimatedEndTimeInSec = tasksGetTaskResponse.Task.StartTimeInMillis/1000 + timeLeftSec
+	}
+
+	return project_update_lib.JobStatus{
+		Completed:             tasksGetTaskResponse.Completed,
+		PercentageComplete:    float32(percentageComplete),
+		EstimatedEndTimeInSec: estimatedEndTimeInSec,
+	}, nil
 }
 
 func (efs ElasticFeedStore) CreateFeedEntry(entry *util.FeedEntry) (bool, error) {
@@ -608,4 +660,26 @@ func (efs ElasticFeedStore) storeExists(ctx context.Context, indexName string) b
 	}
 
 	return exists
+}
+
+func getPercentageComplete(status interface{}) float64 {
+	statusMap, ok := status.(map[string]interface{})
+	if !ok {
+		return 0
+	}
+
+	updated, ok := statusMap["updated"].(float64)
+	if !ok {
+		return 0
+	}
+	total, ok := statusMap["total"].(float64)
+	if !ok {
+		return 0
+	}
+
+	if total == 0 {
+		return 0
+	}
+
+	return updated / total
 }

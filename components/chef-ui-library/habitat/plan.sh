@@ -9,7 +9,7 @@ pkg_deps=(
 )
 
 pkg_build_deps=(
-  core/node
+  core/node10/"$(cat "$PLAN_CONTEXT/../.nvmrc")"
 )
 
 do_build() {

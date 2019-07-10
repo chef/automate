@@ -20,14 +20,15 @@ components/automate-dex/**                 @chef/auth-team
 components/automate-gateway/**             @chef/a2-maintainers
 components/automate-grpc/**                @chef/automate-deployment-team
 components/automate-load-balancer/**       @chef/automate-deployment-team
-components/automate-ui/**                  @chef/automate-ui-team
-components/automate-ui-devproxy/**         @chef/automate-ui-team
-components/chef-ui-library/**              @chef/automate-ui-team
-components/compliance-service/**           @chef/compliance-team
-components/config-mgmt-service/**          @chef/a2-infra-automation-team
+components/automate-ui/**                  @chef/automate-ui-team @chef/ux-team
+components/automate-ui-devproxy/**         @chef/automate-ui-team @chef/ux-team
+components/chef-ui-library/**              @chef/automate-ui-team @chef/ux-team
+components/compliance-service/**           @chef/superteam
+components/nodemanager-service/**          @chef/superteam
+components/config-mgmt-service/**          @chef/superteam
 components/data-lifecycle-service/**       @chef/automate-deployment-team
 components/es-sidecar-service/**           @chef/automate-deployment-team
-components/ingest-service/**               @chef/a2-infra-automation-team @chef/compliance-team
+components/ingest-service/**               @chef/superteam
 components/license-control-service/**      @chef/operability-team
 components/local-user-service/**           @chef/auth-team
 components/notifications-client/**         @chef/operability-team

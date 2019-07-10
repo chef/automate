@@ -7,9 +7,9 @@ import (
 
 	cmsReq "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	cmsService "github.com/chef/automate/api/interservice/cfgmgmt/service"
+	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
 	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
 	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
-	ccFeed "github.com/chef/automate/components/compliance-service/api/automate-feed"
 )
 
 // CollectEventTypeCounts - collect the event type counts from all the components
@@ -97,9 +97,9 @@ func collectConfigMgmtEventTypeCounts(ctx context.Context, cfgMgmtClient cmsServ
 }
 
 func collectFeedEventTypeCounts(ctx context.Context,
-	feedServiceClient ccFeed.FeedServiceClient,
+	feedServiceClient event_feed_api.EventFeedServiceClient,
 	request *agReq.EventCountsFilter) (*agRes.EventCounts, error) {
-	eventFilter := &ccFeed.FeedSummaryRequest{
+	eventFilter := &event_feed_api.FeedSummaryRequest{
 		Filters:       request.GetFilter(),
 		Start:         request.GetStart(),
 		End:           request.GetEnd(),

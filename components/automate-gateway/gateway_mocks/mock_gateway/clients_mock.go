@@ -12,12 +12,12 @@ import (
 	v2 "github.com/chef/automate/api/interservice/authz/v2"
 	service "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	deployment "github.com/chef/automate/api/interservice/deployment"
+	event_feed "github.com/chef/automate/api/interservice/event_feed"
 	ingest "github.com/chef/automate/api/interservice/ingest"
 	license_control "github.com/chef/automate/api/interservice/license_control"
 	local_user "github.com/chef/automate/api/interservice/local_user"
 	v1 "github.com/chef/automate/api/interservice/teams/v1"
 	v20 "github.com/chef/automate/api/interservice/teams/v2"
-	automate_feed "github.com/chef/automate/components/compliance-service/api/automate-feed"
 	jobs "github.com/chef/automate/components/compliance-service/api/jobs"
 	profiles "github.com/chef/automate/components/compliance-service/api/profiles"
 	reporting "github.com/chef/automate/components/compliance-service/api/reporting"
@@ -341,10 +341,10 @@ func (mr *MockClientsFactoryMockRecorder) NodesClient() *gomock.Call {
 }
 
 // FeedClient mocks base method
-func (m *MockClientsFactory) FeedClient() (automate_feed.FeedServiceClient, error) {
+func (m *MockClientsFactory) FeedClient() (event_feed.EventFeedServiceClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FeedClient")
-	ret0, _ := ret[0].(automate_feed.FeedServiceClient)
+	ret0, _ := ret[0].(event_feed.EventFeedServiceClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

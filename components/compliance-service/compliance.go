@@ -24,8 +24,6 @@ import (
 	"github.com/chef/automate/api/interservice/es_sidecar"
 	"github.com/chef/automate/api/interservice/event"
 	aEvent "github.com/chef/automate/api/interservice/event"
-	feed "github.com/chef/automate/components/compliance-service/api/automate-feed"
-	feedserver "github.com/chef/automate/components/compliance-service/api/automate-feed/server"
 	dlsserver "github.com/chef/automate/components/compliance-service/api/datalifecycle/server"
 	"github.com/chef/automate/components/compliance-service/api/jobs"
 	jobsserver "github.com/chef/automate/components/compliance-service/api/jobs/server"
@@ -185,7 +183,6 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 
 	stats.RegisterStatsServiceServer(s, statsserver.New(&esr))
 	version.RegisterVersionServiceServer(s, versionserver.New())
-	feed.RegisterFeedServiceServer(s, feedserver.New(&conf.FeedConfig, &esr))
 	status.RegisterComplianceStatusServer(s, statusSrv)
 
 	dlsManageable, err := setupDataLifecycleManageableInterface(ctx, connFactory, conf)
@@ -353,16 +350,6 @@ func setupDataLifecycleManageableInterface(ctx context.Context, connFactory *sec
 			IndexName:          fmt.Sprintf("comp-%s-r", mappings.ComplianceCurrentTimeSeriesIndicesVersion),
 			PurgeOlderThanDays: conf.ComplianceReportDays,
 		})
-	}
-
-	if conf.ComplianceEventDays > 0 {
-		purgePolicies = append(purgePolicies, dlsserver.PurgePolicy{
-			IndexName:          fmt.Sprintf("comp-%s-feeds", mappings.ComplianceCurrentFeedsIndicesVersion),
-			PurgeOlderThanDays: conf.ComplianceEventDays,
-			IsNonTimeSeries:    true,
-			CustomPurgeField:   "pub_timestamp",
-		})
-		logrus.Debugf("feed purge config: older than %d days", conf.ComplianceEventDays)
 	}
 
 	var err error

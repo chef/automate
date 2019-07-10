@@ -53,8 +53,6 @@ func (migratable A2V2ElasticSearchIndices) migrateProfiles() error {
 	return nil
 }
 
-func (migratable A2V2ElasticSearchIndices) migrateFeeds() error { return nil }
-
 // Migrates the summary and report indices for a specific date
 func (migratable A2V2ElasticSearchIndices) migrateTimeSeries(dateToMigrate time.Time) error {
 	ctx := context.Background()

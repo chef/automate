@@ -8,9 +8,9 @@ import (
 
 	cmsReq "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	cmsService "github.com/chef/automate/api/interservice/cfgmgmt/service"
+	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
 	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
 	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
-	ccFeed "github.com/chef/automate/components/compliance-service/api/automate-feed"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -151,9 +151,9 @@ func collectConfigMgmtEventTaskCounts(ctx context.Context, cfgMgmtClient cmsServ
 	}, nil
 }
 
-func collectFeedTaskCounts(ctx context.Context, feedServiceClient ccFeed.FeedServiceClient,
+func collectFeedTaskCounts(ctx context.Context, feedServiceClient event_feed_api.EventFeedServiceClient,
 	request *agReq.EventCountsFilter) (*agRes.EventCounts, error) {
-	eventFilter := &ccFeed.FeedSummaryRequest{
+	eventFilter := &event_feed_api.FeedSummaryRequest{
 		Filters:       request.GetFilter(),
 		Start:         request.GetStart(),
 		End:           request.GetEnd(),

@@ -28,6 +28,7 @@ message ConfigRequest {
 			message Service {
 				google.protobuf.StringValue host = 1;
 				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "event-feed-service", default: 10134, protocol: "grpc" } ];
+				google.protobuf.Int32Value purge_event_feed_after_days = 3;
 			}
 
 			message Log {

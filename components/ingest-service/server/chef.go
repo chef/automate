@@ -29,13 +29,17 @@ type ChefIngestServer struct {
 // newServer creates a new server instance and it automatically
 // initializes the ChefRun Pipeline by consuming the provided
 // backend client
-func NewChefIngestServer(client backend.Client, authzClient iam_v2.ProjectsClient, nodeMgrClient manager.NodeManagerServiceClient) *ChefIngestServer {
+func NewChefIngestServer(client backend.Client, authzClient iam_v2.ProjectsClient,
+	nodeMgrClient manager.NodeManagerServiceClient, maxNumberOfBundledRunMsgs int,
+	maxNumberOfBundledActionMsgs int) *ChefIngestServer {
 	return &ChefIngestServer{
-		chefRunPipeline:    pipeline.NewChefRunPipeline(client, authzClient, nodeMgrClient),
-		chefActionPipeline: pipeline.NewChefActionPipeline(client, authzClient),
-		client:             client,
-		authzClient:        authzClient,
-		nodeMgrClient:      nodeMgrClient,
+		chefRunPipeline: pipeline.NewChefRunPipeline(client, authzClient,
+			nodeMgrClient, maxNumberOfBundledRunMsgs),
+		chefActionPipeline: pipeline.NewChefActionPipeline(client, authzClient,
+			maxNumberOfBundledActionMsgs),
+		client:        client,
+		authzClient:   authzClient,
+		nodeMgrClient: nodeMgrClient,
 	}
 }
 

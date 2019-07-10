@@ -10,9 +10,9 @@ import (
 
 	cmsReq "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	cmsService "github.com/chef/automate/api/interservice/cfgmgmt/service"
+	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
 	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
 	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
-	ccFeed "github.com/chef/automate/components/compliance-service/api/automate-feed"
 	"github.com/golang/protobuf/ptypes"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
@@ -24,11 +24,11 @@ type eventsFunc func() (*agRes.Events, error)
 
 type EventFeedAggregate struct {
 	cfgMgmtClient     cmsService.CfgMgmtClient
-	feedServiceClient ccFeed.FeedServiceClient
+	feedServiceClient event_feed_api.EventFeedServiceClient
 }
 
 func NewEventFeedAggregate(cfgMgmtClient cmsService.CfgMgmtClient,
-	feedClient ccFeed.FeedServiceClient) *EventFeedAggregate {
+	feedClient event_feed_api.EventFeedServiceClient) *EventFeedAggregate {
 	return &EventFeedAggregate{
 		cfgMgmtClient:     cfgMgmtClient,
 		feedServiceClient: feedClient,
@@ -365,9 +365,9 @@ func collectConfigMgmtEventFeed(ctx context.Context,
 }
 
 func collectComplianceEventFeed(ctx context.Context,
-	feedClient ccFeed.FeedServiceClient,
+	feedClient event_feed_api.EventFeedServiceClient,
 	request *agReq.EventFilter) (*agRes.Events, error) {
-	eventFilter := &ccFeed.FeedRequest{
+	eventFilter := &event_feed_api.FeedRequest{
 		Filters: request.GetFilter(),
 		Start:   request.GetStart(),
 		End:     request.GetEnd(),

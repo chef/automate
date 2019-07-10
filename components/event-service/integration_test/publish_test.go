@@ -15,13 +15,13 @@ import (
 	"google.golang.org/grpc"
 
 	api "github.com/chef/automate/api/interservice/event"
-	feed "github.com/chef/automate/components/compliance-service/api/automate-feed"
-	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
+	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
+	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
 	"github.com/chef/automate/components/event-service/server"
 )
 
 var (
-	feedClient  feed.FeedServiceClient
+	feedClient  event_feed_api.EventFeedServiceClient
 	eventClient api.EventServiceClient
 )
 
@@ -66,38 +66,38 @@ func TestPublish(t *testing.T) {
 		},
 	}
 
-	fe := feed.FeedEntry{
+	fe := event_feed_api.FeedEntry{
 		ID:                   "unknown; assigned at feed entry creation time",
 		EventType:            event.Type.Name,
 		FeedType:             "event",
 		Tags:                 event.Tags,
 		SourceEventPublished: pubTs,
-		Producer: &feed.Producer{
+		Producer: &event_feed_api.Producer{
 			ID:         event.Producer.ID,
 			Name:       event.Producer.ProducerName,
 			ObjectType: event.Producer.ProducerType,
 			PTags:      event.Producer.Tags,
 		},
-		Actor: &feed.Actor{
+		Actor: &event_feed_api.Actor{
 			ID:         event.Actor.ID,
 			Name:       event.Actor.DisplayName,
 			ObjectType: event.Actor.ObjectType,
 		},
 		Verb: event.Verb,
-		Object: &feed.Object{
+		Object: &event_feed_api.Object{
 			ID:         event.Object.ID,
 			Name:       event.Object.DisplayName,
 			ObjectType: event.Object.ObjectType,
 		},
-		Target: &feed.Target{
+		Target: &event_feed_api.Target{
 			ID:         event.Target.ID,
 			ObjectType: event.Object.ObjectType,
 			Name:       event.Target.DisplayName,
 		},
 	}
 
-	entries := []*feed.FeedEntry{&fe}
-	fr := feed.FeedResponse{TotalEntries: 1, FeedEntries: entries}
+	entries := []*event_feed_api.FeedEntry{&fe}
+	fr := event_feed_api.FeedResponse{TotalEntries: 1, FeedEntries: entries}
 
 	req := api.PublishRequest{Msg: &event}
 
@@ -105,8 +105,8 @@ func TestPublish(t *testing.T) {
 		name string
 		in   *api.PublishRequest
 		out  bool
-		res  *feed.FeedResponse
-		e    *feed.FeedEntry
+		res  *event_feed_api.FeedResponse
+		e    *event_feed_api.FeedEntry
 		num  int
 	}{
 		{
@@ -127,9 +127,9 @@ func TestPublish(t *testing.T) {
 			require.NoErrorf(t, err, "publishing %v", test.in)
 
 			time.Sleep(6 * time.Second)
-			suite.refreshIndices(mappings.IndexNameFeeds)
+			suite.refreshIndices(persistence.IndexNameFeeds)
 
-			feedResp, err := getFeedClient().GetFeed(ctx, &feed.FeedRequest{Size: 10})
+			feedResp, err := getFeedClient().GetFeed(ctx, &event_feed_api.FeedRequest{Size: 10})
 			require.NoError(t, err)
 
 			assert.True(t, resp.Success, "Expected publish to return with success == true")
@@ -149,7 +149,7 @@ func TestPublish(t *testing.T) {
 			}
 		})
 		suite.deleteAllDocuments()
-		suite.refreshIndices(mappings.IndexNameFeeds)
+		suite.refreshIndices(persistence.IndexNameFeeds)
 	}
 }
 
@@ -235,31 +235,34 @@ func TestPublishLoad(t *testing.T) {
 			}
 		}
 		time.Sleep(10 * time.Second)
-		suite.refreshIndices(mappings.IndexNameFeeds)
+		suite.refreshIndices(persistence.IndexNameFeeds)
 
-		fsr := &feed.FeedSummaryRequest{CountCategory: "entity_type"}
+		fsr := &event_feed_api.FeedSummaryRequest{CountCategory: "entity_type"}
 		res, err := getFeedClient().GetFeedSummary(ctx, fsr)
 		if assert.Nil(t, err) {
 			assert.Equal(t, test.expectedEntryCount, res.TotalEntries)
 		}
 		suite.deleteAllDocuments()
-		suite.refreshIndices(mappings.IndexNameFeeds)
+		suite.refreshIndices(persistence.IndexNameFeeds)
 	}
 }
 
-func getFeedClient() feed.FeedServiceClient {
+func getFeedClient() event_feed_api.EventFeedServiceClient {
 	if feedClient != nil {
 		return feedClient
 	}
+	timeoutCtx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
 
-	conn, err := connFactory.DialContext(context.Background(), "compliance-service", cfg.HandlerEndpoints.Feed, grpc.WithBlock())
+	conn, err := connFactory.DialContext(timeoutCtx, "event-feed-service",
+		cfg.HandlerEndpoints.EventFeed, grpc.WithBlock())
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err,
 		}).Fatal(fmt.Sprintf("grpc dial error... could not get FeedServiceClient"))
 	}
 
-	feedClient = feed.NewFeedServiceClient(conn)
+	feedClient = event_feed_api.NewEventFeedServiceClient(conn)
 	return feedClient
 }
 

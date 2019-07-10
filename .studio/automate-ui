@@ -243,8 +243,8 @@ function _maybe_rebuild_node_sass {
   fi
 }
 
-# (Internal) Install nodejs from the .nvmrc file
-# If it can't find that file this function will error our
+# (Internal) Install nodejs from the .nvmrc file.
+# If it can't find that file this function will fail.
 function _install_nodejs_from_nvmrc() {
   if [ ! -z "$(node -v 2>/dev/null)" ]; then
     log_line "Using NodeJS $(node -v)"
@@ -259,7 +259,7 @@ function _install_nodejs_from_nvmrc() {
   fi
 
   log_line "Installing NodeJS (v.$NODE_VERSION)"
-  OPTS="-b" install "core/node/$NODE_VERSION" >/dev/null
+  OPTS="-b" install "core/node10/$NODE_VERSION" >/dev/null
 
   install_if_missing core/git git;
   install_if_missing core/coreutils env;
