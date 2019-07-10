@@ -24,10 +24,11 @@ var (
 	suite    = NewSuite(database)
 	// TODO @afiune add more apps & envs
 	// For now we will use only one application called 'app'
-	a = "app"
-	e = "test-env"
-	s = "us"
-	c = "stable"
+	a    = "app"
+	e    = "test-env"
+	s    = "us"
+	c    = ""
+	none = "NONE"
 )
 
 const (
@@ -71,13 +72,8 @@ func DefaultHabitatEvent() *habitat.HealthCheckEvent {
 			Site:        s,
 			OccurredAt:  ptypes.TimestampNow(),
 		},
-		ServiceMetadata: &habitat.ServiceMetadata{
-			UpdateConfig: &habitat.UpdateConfig{
-				Strategy: habitat.UpdateStrategy_AtOnce,
-				Channel:  c,
-			},
-		},
-		Result: habitat.HealthCheckResult_Ok,
+		ServiceMetadata: &habitat.ServiceMetadata{},
+		Result:          habitat.HealthCheckResult_Ok,
 	}
 }
 
@@ -311,16 +307,19 @@ func habServicesMatrix() []*habitat.HealthCheckEvent {
 			withSupervisorId("sup1"),
 			withServiceGroup("redis.default"),
 			withPackageIdent("core/redis/0.1.0/20190101121212"),
+			withStrategyRolling("stable"),
 		),
 		NewHabitatEvent(
 			withSupervisorId("sup2"),
 			withServiceGroup("redis.default"),
 			withPackageIdent("core/redis/0.1.0/20190101121212"),
+			withStrategyRolling("stable"),
 		),
 		NewHabitatEvent(
 			withSupervisorId("sup3"),
 			withServiceGroup("redis.default"),
 			withPackageIdent("core/redis/0.1.0/20190101121212"),
+			withStrategyRolling("stable"),
 		),
 
 		// service_group 2 <-> With a Health Status = 'WARNING'
@@ -366,7 +365,7 @@ func habServicesMatrix() []*habitat.HealthCheckEvent {
 			withServiceGroup("test.default"),
 			withPackageIdent("core/test/0.1.0/20190101121212"),
 			withHealth("UNKNOWN"),
-			withoutUpdateStrategy(),
+			withStrategyAtOnce("unstable"),
 			withSite(""),
 		),
 	}
@@ -468,7 +467,11 @@ func assertServicesEqual(t *testing.T, expected, actual []*applications.Service)
 			assert.Equal(t,
 				svc.Channel,
 				actual[i].Channel,
-				"The channel of a service is not the expected one")
+				"The update channel of a service is not the expected one")
+			assert.Equal(t,
+				svc.UpdateStrategy,
+				actual[i].UpdateStrategy,
+				"The update strategy of a service is not the expected one")
 			assert.Equal(t,
 				svc.Site,
 				actual[i].Site,

@@ -66,16 +66,17 @@ func TestGetServicesSingleService(t *testing.T) {
 			expected = &applications.ServicesRes{
 				Services: []*applications.Service{
 					{
-						SupervisorId: "sup1234",
-						Group:        "postgres.default",
-						Release:      "core/postgres/0.1.0/20190101121212",
-						Status:       applications.ServiceStatus_RUNNING,
-						HealthCheck:  applications.HealthStatus_OK,
-						Application:  a,
-						Environment:  e,
-						Fqdn:         "mytest.example.com",
-						Channel:      "testchannel",
-						Site:         "testsite",
+						SupervisorId:   "sup1234",
+						Group:          "postgres.default",
+						Release:        "core/postgres/0.1.0/20190101121212",
+						Status:         applications.ServiceStatus_RUNNING,
+						HealthCheck:    applications.HealthStatus_OK,
+						Application:    a,
+						Environment:    e,
+						Fqdn:           "mytest.example.com",
+						Channel:        "testchannel",
+						UpdateStrategy: "AT-ONCE",
+						Site:           "testsite",
 					},
 				},
 			}
@@ -105,7 +106,7 @@ func TestGetServicesMultiService(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_CRITICAL,
 					Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
-					Channel: c, Site: s,
+					Channel: c, UpdateStrategy: none, Site: s,
 				},
 				{
 					SupervisorId: "sup2",
@@ -114,7 +115,7 @@ func TestGetServicesMultiService(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
 					Application:  a, Environment: e, Fqdn: "test-1.example.com",
-					Channel: c, Site: s,
+					Channel: c, UpdateStrategy: none, Site: s,
 				},
 				{
 					SupervisorId: "sup3",
@@ -123,7 +124,7 @@ func TestGetServicesMultiService(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
 					Application:  a, Environment: e, Fqdn: "temp.example.com",
-					Channel: c, Site: s,
+					Channel: c, UpdateStrategy: none, Site: s,
 				},
 				{
 					SupervisorId: "sup1",
@@ -132,7 +133,7 @@ func TestGetServicesMultiService(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_WARNING,
 					Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
-					Channel: c, Site: s,
+					Channel: c, UpdateStrategy: none, Site: s,
 				},
 				{
 					SupervisorId: "sup1",
@@ -141,7 +142,7 @@ func TestGetServicesMultiService(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
-					Channel: c, Site: s,
+					Channel: c, UpdateStrategy: none, Site: s,
 				},
 				{
 					SupervisorId: "sup4",
@@ -150,7 +151,7 @@ func TestGetServicesMultiService(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "test-2.example.com",
-					Channel: c, Site: s,
+					Channel: c, UpdateStrategy: none, Site: s,
 				},
 			},
 		}
@@ -184,7 +185,7 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
-					Channel: c, Site: s,
+					Channel: c, UpdateStrategy: none, Site: s,
 				},
 				{
 					SupervisorId: "sup4",
@@ -193,7 +194,7 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "test-2.example.com",
-					Channel: c, Site: s,
+					Channel: c, UpdateStrategy: none, Site: s,
 				},
 				{
 					SupervisorId: "sup1",
@@ -202,7 +203,7 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_WARNING,
 					Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
-					Channel: c, Site: s,
+					Channel: c, UpdateStrategy: none, Site: s,
 				},
 				{
 					SupervisorId: "sup2",
@@ -211,7 +212,7 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
 					Application:  a, Environment: e, Fqdn: "test-1.example.com",
-					Channel: c, Site: s,
+					Channel: c, UpdateStrategy: none, Site: s,
 				},
 				{
 					SupervisorId: "sup3",
@@ -220,7 +221,7 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
 					Application:  a, Environment: e, Fqdn: "temp.example.com",
-					Channel: c, Site: s,
+					Channel: c, UpdateStrategy: none, Site: s,
 				},
 				{
 					SupervisorId: "sup1",
@@ -229,7 +230,7 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_CRITICAL,
 					Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
-					Channel: c, Site: s,
+					Channel: c, UpdateStrategy: none, Site: s,
 				},
 			},
 		}
@@ -261,7 +262,7 @@ func TestGetServicesMultiServicaPagination(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
 					Application:  a, Environment: e, Fqdn: "test-1.example.com",
-					Channel: c, Site: s,
+					Channel: c, UpdateStrategy: none, Site: s,
 				},
 			},
 		}
@@ -321,7 +322,7 @@ func TestGetServicesMultiServicePaginationAndSorting(t *testing.T) {
 					Status:       applications.ServiceStatus_RUNNING,
 					HealthCheck:  applications.HealthStatus_WARNING,
 					Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
-					Channel: c, Site: s,
+					Channel: c, UpdateStrategy: none, Site: s,
 				},
 			},
 		}
@@ -355,7 +356,7 @@ func TestGetServicesMultiServiceWithServiceGroupIDFilter(t *testing.T) {
 						Status:       applications.ServiceStatus_RUNNING,
 						HealthCheck:  applications.HealthStatus_WARNING,
 						Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
-						Channel: c, Site: s,
+						Channel: c, UpdateStrategy: none, Site: s,
 					},
 				},
 			}
@@ -388,7 +389,7 @@ func TestGetServicesMultiServiceWithHealthFilter(t *testing.T) {
 						Status:       applications.ServiceStatus_RUNNING,
 						HealthCheck:  applications.HealthStatus_WARNING,
 						Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
-						Channel: c, Site: s,
+						Channel: c, UpdateStrategy: none, Site: s,
 					},
 				},
 			}
@@ -425,7 +426,7 @@ func TestGetServicesMultiServiceWithHealthAndServiceGroupIdFilter(t *testing.T) 
 						Status:       applications.ServiceStatus_RUNNING,
 						HealthCheck:  applications.HealthStatus_UNKNOWN,
 						Application:  a, Environment: e, Fqdn: "temp.example.com",
-						Channel: c, Site: s,
+						Channel: c, UpdateStrategy: none, Site: s,
 					},
 				},
 			}
