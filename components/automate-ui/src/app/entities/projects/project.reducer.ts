@@ -39,7 +39,7 @@ export const projectEntityAdapter: EntityAdapter<Project> = createEntityAdapter<
 const initialApplyRulesStatus: ApplyRulesStatus = {
   state: 'not_running',
   estimatedTimeComplete: '0001-01-01T00:00:00Z',
-  percentageComplete: 61,
+  percentageComplete: 0,
   failed: false,
   failureMessage: ''
 };
