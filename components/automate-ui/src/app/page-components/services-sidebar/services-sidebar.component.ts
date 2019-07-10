@@ -145,13 +145,6 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   public formatTimestamp(time: Date): string {
     // Forcing UTC with custom RFC format
     return moment.utc(time).format(this.RFC2822);
-
-    // @afiune Other formats/conversion methods
-    // ISO format
-    // return moment.utc(time).toISOString();
-
-    // UTC format (displaying GMT)
-    // return moment.utc(time).toDate().toUTCString();
   }
 
   // returns a timewizard message for the provided current and previous health checks
