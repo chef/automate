@@ -37,7 +37,10 @@ func request_EventFeed_GetEventFeed_0(ctx context.Context, marshaler runtime.Mar
 	var protoReq request.EventFilter
 	var metadata runtime.ServerMetadata
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_EventFeed_GetEventFeed_0); err != nil {
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_EventFeed_GetEventFeed_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -54,7 +57,10 @@ func request_EventFeed_GetEventTypeCounts_0(ctx context.Context, marshaler runti
 	var protoReq request.EventCountsFilter
 	var metadata runtime.ServerMetadata
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_EventFeed_GetEventTypeCounts_0); err != nil {
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_EventFeed_GetEventTypeCounts_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -71,7 +77,10 @@ func request_EventFeed_GetEventTaskCounts_0(ctx context.Context, marshaler runti
 	var protoReq request.EventCountsFilter
 	var metadata runtime.ServerMetadata
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_EventFeed_GetEventTaskCounts_0); err != nil {
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_EventFeed_GetEventTaskCounts_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -88,7 +97,10 @@ func request_EventFeed_GetEventStringBuckets_0(ctx context.Context, marshaler ru
 	var protoReq request.EventStrings
 	var metadata runtime.ServerMetadata
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_EventFeed_GetEventStringBuckets_0); err != nil {
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_EventFeed_GetEventStringBuckets_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -219,13 +231,13 @@ func RegisterEventFeedHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 }
 
 var (
-	pattern_EventFeed_GetEventFeed_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"eventfeed"}, ""))
+	pattern_EventFeed_GetEventFeed_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"eventfeed"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_EventFeed_GetEventTypeCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"event_type_counts"}, ""))
+	pattern_EventFeed_GetEventTypeCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"event_type_counts"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_EventFeed_GetEventTaskCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"event_task_counts"}, ""))
+	pattern_EventFeed_GetEventTaskCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"event_task_counts"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_EventFeed_GetEventStringBuckets_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"eventstrings"}, ""))
+	pattern_EventFeed_GetEventStringBuckets_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"eventstrings"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

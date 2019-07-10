@@ -218,13 +218,13 @@ func RegisterStatsServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_StatsService_ReadSummary_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"compliance", "reporting", "stats", "summary"}, ""))
+	pattern_StatsService_ReadSummary_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"compliance", "reporting", "stats", "summary"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_StatsService_ReadTrend_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"compliance", "reporting", "stats", "trend"}, ""))
+	pattern_StatsService_ReadTrend_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"compliance", "reporting", "stats", "trend"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_StatsService_ReadProfiles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"compliance", "reporting", "stats", "profiles"}, ""))
+	pattern_StatsService_ReadProfiles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"compliance", "reporting", "stats", "profiles"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_StatsService_ReadFailures_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"compliance", "reporting", "stats", "failures"}, ""))
+	pattern_StatsService_ReadFailures_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"compliance", "reporting", "stats", "failures"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

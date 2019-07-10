@@ -986,47 +986,47 @@ func RegisterPoliciesHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 }
 
 var (
-	pattern_Policies_CreatePolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "policies"}, ""))
+	pattern_Policies_CreatePolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "policies"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Policies_GetPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "policies", "id"}, ""))
+	pattern_Policies_GetPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "policies", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Policies_ListPolicies_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "policies"}, ""))
+	pattern_Policies_ListPolicies_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "policies"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Policies_DeletePolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "policies", "id"}, ""))
+	pattern_Policies_DeletePolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "policies", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Policies_UpdatePolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "policies", "id"}, ""))
+	pattern_Policies_UpdatePolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "policies", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Policies_GetPolicyVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "policy_version"}, ""))
+	pattern_Policies_GetPolicyVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "policy_version"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Policies_ListPolicyMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2beta", "policies", "id", "members"}, ""))
+	pattern_Policies_ListPolicyMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2beta", "policies", "id", "members"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Policies_ReplacePolicyMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2beta", "policies", "id", "members"}, ""))
+	pattern_Policies_ReplacePolicyMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2beta", "policies", "id", "members"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Policies_RemovePolicyMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2beta", "policies", "id", "members"}, "remove"))
+	pattern_Policies_RemovePolicyMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2beta", "policies", "id", "members"}, "remove", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Policies_AddPolicyMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2beta", "policies", "id", "members"}, "add"))
+	pattern_Policies_AddPolicyMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2beta", "policies", "id", "members"}, "add", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Policies_CreateRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "roles"}, ""))
+	pattern_Policies_CreateRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "roles"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Policies_ListRoles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "roles"}, ""))
+	pattern_Policies_ListRoles_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "roles"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Policies_GetRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "roles", "id"}, ""))
+	pattern_Policies_GetRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "roles", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Policies_DeleteRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "roles", "id"}, ""))
+	pattern_Policies_DeleteRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "roles", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Policies_UpdateRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "roles", "id"}, ""))
+	pattern_Policies_UpdateRole_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "roles", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Policies_CreateProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "projects"}, ""))
+	pattern_Policies_CreateProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "projects"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Policies_UpdateProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "projects", "id"}, ""))
+	pattern_Policies_UpdateProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "projects", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Policies_GetProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "projects", "id"}, ""))
+	pattern_Policies_GetProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "projects", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Policies_ListProjects_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "projects"}, ""))
+	pattern_Policies_ListProjects_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "projects"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Policies_DeleteProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "projects", "id"}, ""))
+	pattern_Policies_DeleteProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "projects", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Policies_IntrospectAllProjects_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "introspect_projects"}, ""))
+	pattern_Policies_IntrospectAllProjects_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "introspect_projects"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

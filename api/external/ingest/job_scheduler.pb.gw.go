@@ -211,13 +211,13 @@ func RegisterJobSchedulerHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_JobScheduler_GetStatusJobScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"retention", "nodes", "status"}, ""))
+	pattern_JobScheduler_GetStatusJobScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"retention", "nodes", "status"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_JobScheduler_ConfigureNodesMissingScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"retention", "nodes", "missing-nodes", "config"}, ""))
+	pattern_JobScheduler_ConfigureNodesMissingScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"retention", "nodes", "missing-nodes", "config"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_JobScheduler_ConfigureDeleteNodesScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"retention", "nodes", "delete-nodes", "config"}, ""))
+	pattern_JobScheduler_ConfigureDeleteNodesScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"retention", "nodes", "delete-nodes", "config"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_JobScheduler_ConfigureMissingNodesForDeletionScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"retention", "nodes", "missing-nodes-deletion", "config"}, ""))
+	pattern_JobScheduler_ConfigureMissingNodesForDeletionScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"retention", "nodes", "missing-nodes-deletion", "config"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
