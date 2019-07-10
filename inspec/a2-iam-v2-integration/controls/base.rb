@@ -87,45 +87,45 @@ EOF
   ]
 
   NON_ADMIN_USERNAME_V2 = 'inspec_test_non_admin_with_iam_v2'
+  TEST_TOKEN_ID_V2 = 'inspec_test_token_with_iam_v2'
 
   DEFAULT_PROJECT_ID = "default"
 
   describe 'AuthZ access control' do
     before(:all) do
       create_non_admin_request = automate_api_request(
-        '/api/v0/auth/users',
+        '/apis/iam/v2beta/users',
         http_method: 'POST',
         request_body: {
-          'name': NON_ADMIN_USERNAME_V2,
-          'username': NON_ADMIN_USERNAME_V2,
-          'password': ENV['AUTOMATE_API_DEFAULT_PASSWORD'] || 'chefautomate',
+          id: NON_ADMIN_USERNAME_V2,
+          name: NON_ADMIN_USERNAME_V2,
+          password: ENV['AUTOMATE_API_DEFAULT_PASSWORD'] || 'chefautomate',
         }.to_json
       )
       expect(create_non_admin_request.http_status.to_s).to match(/200|409/)
 
       test_token_request = automate_api_request(
-        '/api/v0/auth/tokens',
+        '/apis/iam/v2beta/tokens',
         http_method: 'POST',
         request_body: {
-          'description': 'inspec_test_token',
-          'active': true
+          id: TEST_TOKEN_ID_V2,
+          description: 'inspec_test_token',
         }.to_json
       )
       TEST_TOKEN_V2 = test_token_request.parsed_response_body[:value]
-      TEST_TOKEN_ID_V2= test_token_request.parsed_response_body[:id]
 
       expect(test_token_request.http_status).to eq(200)
     end
 
     after(:all) do
       delete_non_admin_request = automate_api_request(
-        "/api/v0/auth/users/#{NON_ADMIN_USERNAME_V2}",
+        "/apis/iam/v2beta/users/#{NON_ADMIN_USERNAME_V2}",
         http_method: 'DELETE',
       )
       expect(delete_non_admin_request.http_status.to_s).to match(/200|404/)
 
       delete_token_request = automate_api_request(
-        "/api/v0/auth/tokens/#{TEST_TOKEN_ID_V2}",
+        "/apis/iam/v2beta/tokens/#{TEST_TOKEN_ID_V2}",
         http_method: 'DELETE',
       )
       expect(delete_token_request.http_status.to_s).to match(/200|404/)
