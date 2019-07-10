@@ -335,10 +335,10 @@ func (db *Postgres) updateService(
 	// Update Channel
 	updateServiceChannel(svc, svcMetadata.GetUpdateConfig())
 
-	// when a service needs update, update the timestamp of the last event received
-	if svc.needUpdate {
-		svc.LastEventOccurredAt = convertOrCreateTimestamp(eventMetadata.GetOccurredAt())
-	}
+	// update always the timestamp of the last event received so that the database
+	// has a record of when the last message was received for a service
+	svc.LastEventOccurredAt = convertOrCreateTimestamp(eventMetadata.GetOccurredAt())
+	svc.needUpdate = true
 }
 
 // update the service channel from the provided habitat update config

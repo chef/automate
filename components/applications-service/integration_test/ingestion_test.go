@@ -513,8 +513,9 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 		previousLastEventOccurredAt = svcList[0].LastEventOccurredAt
 	})
 
-	t.Run("last update to verify the last_event_occurred_at timestamp is not updated when there are no updates", func(t *testing.T) {
-		// sending same message through
+	t.Run("last update to verify the last_event_occurred_at timestamp is always updated even when there are no updates", func(t *testing.T) {
+		// sending same message through but updating the timestamp of the message
+		UpdateHabitatEvent(event)
 		bytes, err := proto.Marshal(event)
 		require.NoError(t, err)
 
@@ -525,9 +526,8 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 		svcList = suite.GetServices()
 		assert.Equal(t, 1, len(svcList))
 
-		// Both times should not be updated
-		assert.Truef(t, svcList[0].LastEventOccurredAt.Equal(previousLastEventOccurredAt),
-			"the time of the last event should not be updated")
+		assert.Truef(t, svcList[0].LastEventOccurredAt.After(previousLastEventOccurredAt),
+			"the time of the last event should always be updated")
 		assert.Truef(t, svcList[0].HealthUpdatedAt.Equal(previousHealthUpdateAt),
 			"the time of the last health update should not be updated")
 	})
