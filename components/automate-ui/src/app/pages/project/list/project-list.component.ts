@@ -15,6 +15,7 @@ import {
 } from 'app/entities/projects/project.selectors';
 import { GetProjects, CreateProject, DeleteProject  } from 'app/entities/projects/project.actions';
 import { Project } from 'app/entities/projects/project.model';
+import { ApplyRulesStatus, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
 
 const ID_PATTERN = '[0-9a-z-]+';
 
@@ -39,6 +40,7 @@ export class ProjectListComponent implements OnInit {
   public confirmApplyStopModalVisible = false;
 
   public applyRulesButtonText$: Observable<string>;
+  public ApplyRulesStatusState = ApplyRulesStatusState;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -60,11 +62,11 @@ export class ProjectListComponent implements OnInit {
     this.iamMinorVersion$ = store.select(iamMinorVersion);
 
     this.applyRulesButtonText$ = this.projects.applyRulesStatus$.pipe(
-      map(({ state, percentageComplete }) => {
+      map(({ state, percentageComplete }: ApplyRulesStatus) => {
         switch (state) {
-          case 'not_running':
+          case ApplyRulesStatusState.NotRunning:
             return 'Update Projects';
-          case 'running':
+          case ApplyRulesStatusState.Running:
             return `Updating Projects ${Math.round(percentageComplete * 100)}%...`;
         }
       })

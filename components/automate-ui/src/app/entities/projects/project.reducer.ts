@@ -6,7 +6,10 @@ import { EntityStatus } from 'app/entities/entities';
 import { ProjectActionTypes, ProjectActions } from './project.actions';
 import { Project } from './project.model';
 
-export type ApplyRulesStatusState = 'not_running' | 'running';
+export enum ApplyRulesStatusState {
+  Running = 'running',
+  NotRunning = 'not_running'
+}
 
 export interface ApplyRulesStatus {
   state: ApplyRulesStatusState;
@@ -37,7 +40,7 @@ const APPLY_RULES_STATUS = 'applyRulesStatus';
 export const projectEntityAdapter: EntityAdapter<Project> = createEntityAdapter<Project>();
 
 const initialApplyRulesStatus: ApplyRulesStatus = {
-  state: 'not_running',
+  state: ApplyRulesStatusState.NotRunning,
   estimatedTimeComplete: '0001-01-01T00:00:00Z',
   percentageComplete: 0,
   failed: false,

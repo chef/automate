@@ -1,6 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ConfirmApplyStopModalComponent } from './confirm-apply-stop-modal.component';
+import { ApplyRulesStatus } from 'app/entities/projects/project.reducer';
 
 describe('ConfirmApplyStopModalComponent', () => {
   let component: ConfirmApplyStopModalComponent;
@@ -25,7 +26,7 @@ describe('ConfirmApplyStopModalComponent', () => {
       percentageComplete: 0.5,
       failed: false,
       failureMessage: ''
-    };
+    } as ApplyRulesStatus;
     fixture.detectChanges();
   });
 
