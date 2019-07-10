@@ -19,7 +19,7 @@ export interface Service {
   fqdn: string;
   site: string;
   channel: string;
-  update_strategy: string;
+  update_strategy: 'NONE' | 'AT-ONCE' | 'ROLLING';
   previous_health_check: string;
   current_health_since: string;
 }
