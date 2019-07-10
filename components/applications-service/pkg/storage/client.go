@@ -21,6 +21,10 @@ type Client interface {
 	// @param (filters)
 	GetServicesHealthCounts(map[string][]string) (*HealthCounts, error)
 	GetServiceGroupsHealthCounts() (*HealthCounts, error)
+	// @param (id)
+	GetDeployment(int32) (*Deployment, error)
+	// @param (id)
+	GetSupervisor(int32) (*Supervisor, error)
 
 	GetServicesCount() (int32, error)
 	GetServiceGroupsCount() (int32, error)
@@ -74,6 +78,19 @@ type ServiceGroupDisplay struct {
 	ServicesHealthCounts HealthCounts
 	Application          string
 	Environment          string
+}
+
+type Supervisor struct {
+	ID       int32
+	MemberID string
+	Fqdn     string
+	Site     string
+}
+
+type Deployment struct {
+	ID          int32
+	Application string
+	Environment string
 }
 
 type HealthCounts struct {
