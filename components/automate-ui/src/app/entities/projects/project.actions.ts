@@ -34,6 +34,14 @@ export interface ProjectSuccessPayload {
   project: Project;
 }
 
+export interface GetApplyRulesStatusSuccessPayload {
+  state: string;
+  estimated_time_complete: string;
+  percentage_complete: number;
+  failed: boolean;
+  failure_message: string;
+}
+
 export class GetProjects implements Action {
   readonly type = ProjectActionTypes.GET_ALL;
 }
@@ -157,7 +165,7 @@ export class GetApplyRulesStatus implements Action {
 
 export class GetApplyRulesStatusSuccess implements Action {
   readonly type = ProjectActionTypes.GET_APPLY_RULES_STATUS_SUCCESS;
-  constructor(public payload: any) { }
+  constructor(public payload: GetApplyRulesStatusSuccessPayload) { }
 }
 
 export class GetApplyRulesStatusFailure implements Action {
