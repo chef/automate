@@ -190,6 +190,16 @@ func withStrategyAtOnce(channel string) MessageOverrides {
 	}
 }
 
+func withStrategyRolling(channel string) MessageOverrides {
+	return func(msg *habitat.HealthCheckEvent) error {
+		msg.ServiceMetadata.UpdateConfig = &habitat.UpdateConfig{
+			Strategy: habitat.UpdateStrategy_Rolling,
+			Channel:  channel,
+		}
+		return nil
+	}
+}
+
 func withApplication(application string) MessageOverrides {
 	return func(msg *habitat.HealthCheckEvent) error {
 		msg.EventMetadata.Application = application
