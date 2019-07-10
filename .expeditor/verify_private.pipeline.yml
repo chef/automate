@@ -729,6 +729,15 @@ steps:
         linux:
           privileged: true
 
+  - label: "[integration] upgrade / reset IAM v2.1"
+    command:
+      - integration/run_test integration/tests/upgrade_reset_iam_v2p1.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
   - label: "[integration] security"
     command:
       - integration/run_test integration/tests/security.sh
