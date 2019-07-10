@@ -1,5 +1,3 @@
-/// <reference types="cypress"/>
-
 describe('team management', () => {
   before(() => {
     cy.adminLogin('/settings/teams').then(() => {
@@ -12,7 +10,7 @@ describe('team management', () => {
     cy.restoreStorage()
   })
   afterEach(() => {
-    cy.saveStorage() 
+    cy.saveStorage()
   }) 
 
   it('lists system teams', () => {
@@ -21,8 +19,8 @@ describe('team management', () => {
       .invoke('attr', 'major-version')
       .then((obj: Cypress.ObjectLike) => {
         // Cypress.ObjectLike can't be casted to a string directly, 
-        // so must convert to <any> first
-        switch (<string><any>obj) {
+        // so must convert to Object type (common to all JS objects) first
+        switch (<string><Object>obj) {
           case 'v2': {
             cy.get('#table-container chef-th').contains('ID')
             cy.get('#table-container chef-th').contains('Name')

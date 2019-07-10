@@ -1,5 +1,3 @@
-/// <reference types="cypress"/>
-
 // Cypress Commands: any action that could be taken in any test
 
 Cypress.Commands.add("login", (url: string, username: string) => {

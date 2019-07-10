@@ -1,5 +1,3 @@
-/// <reference types="cypress"/>
-
 describe('user management', () => {
   before(() => {
     cy.adminLogin('/settings/users').then(() => {

@@ -1,5 +1,3 @@
-/// <reference types="cypress"/>
-
 describe('create a manual node ssh scan job and cleanup after', () => {
   before(() => {
     cy.adminLogin('/')

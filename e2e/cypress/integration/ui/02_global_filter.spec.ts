@@ -1,5 +1,3 @@
-/// <reference types="cypress"/>
-
 interface CreateProject {
   id: string
   name: string
@@ -34,8 +32,8 @@ describe('global projects filter', () => {
     cy.get('chef-sidebar').invoke('attr', 'minor-version')
       .then((obj: Cypress.ObjectLike) => {
         // Cypress.ObjectLike can't be casted to a string directly, 
-        // so must convert to <any> first
-        if (<string><any>obj === 'v1') {
+        // so must convert to Object type (common to all JS objects) first
+        if (<string><Object>obj === 'v1') {
           cy.get('[data-cy=projects-filter-button]').click()
           
           const allowedProjects = [proj1.name, proj2.name, proj3.name, '(unassigned)'];

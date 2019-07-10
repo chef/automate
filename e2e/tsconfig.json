@@ -9,10 +9,13 @@
     ],
     "types": [
       "cypress"
+    ],
+    "typeRoots": [
+      "./support"
     ]
   },
   "include": [
     "node_modules/cypress",
-    "cypress/*/*.ts"
+    "**/*.ts"
   ]
 }
