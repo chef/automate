@@ -14,6 +14,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestIngestSigleService(t *testing.T) {
@@ -36,54 +37,54 @@ func TestIngestSigleService(t *testing.T) {
 	)
 
 	bytes, err := proto.Marshal(event)
-	if assert.Nil(t, err) {
-		suite.Ingester.IngestMessage(bytes)
-		suite.WaitForEventsToProcess(eventsProcessed + 1)
+	require.NoError(t, err)
 
-		svcList := suite.GetServices()
-		assert.Equal(t, 1, len(svcList))
+	suite.Ingester.IngestMessage(bytes)
+	suite.WaitForEventsToProcess(eventsProcessed + 1)
 
-		// make sure the stats endpoint stuff is also correct
-		assert.Equal(t, int32(1), suite.GetServicesCountForStatsEndpoint())
+	svcList := suite.GetServices()
+	assert.Equal(t, 1, len(svcList))
 
-		assert.Equal(t, "4f1un3", svcList[0].SupMemberID,
-			"the service supervisor_id is not the expected one")
-		assert.Equal(t, "test", svcList[0].Origin,
-			"the service origin name is not the expected one")
-		assert.Equal(t, "db", svcList[0].Name,
-			"the service name is not the expected one")
-		assert.Equal(t, "0.1.0", svcList[0].Version,
-			"the service version is not the expected one")
-		assert.Equal(t, "20200101121212", svcList[0].Release,
-			"the service release is not the expected one")
-		assert.Equal(t, "OK", svcList[0].Health,
-			"the service health is not the expected one")
-		assert.Equal(t, "db.default", svcList[0].Group,
-			"the service service group name is not the expected one")
-		assert.Equal(t, "db.example.com", svcList[0].Fqdn,
-			"the service fqdn is not the expected one")
-		assert.Equal(t, "test-app", svcList[0].Application,
-			"the service application name is not the expected one")
-		assert.Equal(t, "development", svcList[0].Environment,
-			"the service environment name is not the expected one")
-		assert.Equal(t, "stable", svcList[0].Channel,
-			"the service channel name is not the expected one")
-		assert.Equal(t, "us", svcList[0].Site,
-			"the service site name is not the expected one")
-		assert.Equal(t, "NONE", svcList[0].PreviousHealth,
-			"the previous service health is not the expected one")
+	// make sure the stats endpoint stuff is also correct
+	assert.Equal(t, int32(1), suite.GetServicesCountForStatsEndpoint())
 
-		assert.Truef(t, svcList[0].LastEventOccurredAt.Before(time.Now()),
-			"the time of the last event should be before the current time")
-		assert.Truef(t, svcList[0].HealthUpdatedAt.Before(time.Now()),
-			"the time of the last health update should be before the current time")
+	assert.Equal(t, "4f1un3", svcList[0].SupMemberID,
+		"the service supervisor_id is not the expected one")
+	assert.Equal(t, "test", svcList[0].Origin,
+		"the service origin name is not the expected one")
+	assert.Equal(t, "db", svcList[0].Name,
+		"the service name is not the expected one")
+	assert.Equal(t, "0.1.0", svcList[0].Version,
+		"the service version is not the expected one")
+	assert.Equal(t, "20200101121212", svcList[0].Release,
+		"the service release is not the expected one")
+	assert.Equal(t, "OK", svcList[0].Health,
+		"the service health is not the expected one")
+	assert.Equal(t, "db.default", svcList[0].Group,
+		"the service service group name is not the expected one")
+	assert.Equal(t, "db.example.com", svcList[0].Fqdn,
+		"the service fqdn is not the expected one")
+	assert.Equal(t, "test-app", svcList[0].Application,
+		"the service application name is not the expected one")
+	assert.Equal(t, "development", svcList[0].Environment,
+		"the service environment name is not the expected one")
+	assert.Equal(t, "stable", svcList[0].Channel,
+		"the service channel name is not the expected one")
+	assert.Equal(t, "us", svcList[0].Site,
+		"the service site name is not the expected one")
+	assert.Equal(t, "NONE", svcList[0].PreviousHealth,
+		"the previous service health is not the expected one")
 
-		assert.Truef(t, svcList[0].LastEventOccurredAt.After(timeBeforeTest),
-			"the time of the last event should be after the beginning of the test")
-		assert.Truef(t, svcList[0].HealthUpdatedAt.After(timeBeforeTest),
-			"the time of the last health update should be after the beginning of the test")
+	assert.Truef(t, svcList[0].LastEventOccurredAt.Before(time.Now()),
+		"the time of the last event should be before the current time")
+	assert.Truef(t, svcList[0].HealthUpdatedAt.Before(time.Now()),
+		"the time of the last health update should be before the current time")
 
-	}
+	assert.Truef(t, svcList[0].LastEventOccurredAt.After(timeBeforeTest),
+		"the time of the last event should be after the beginning of the test")
+	assert.Truef(t, svcList[0].HealthUpdatedAt.After(timeBeforeTest),
+		"the time of the last health update should be after the beginning of the test")
+
 }
 
 func TestIngestMultiServicesDifferentServiceGroups(t *testing.T) {
@@ -295,162 +296,156 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 
 	t.Run("insert a new service", func(t *testing.T) {
 		bytes, err := proto.Marshal(event)
-		if assert.Nil(t, err) {
-			suite.Ingester.IngestMessage(bytes)
-			eventsProcessed++
-			suite.WaitForEventsToProcess(eventsProcessed)
+		require.NoError(t, err)
 
-			svcList = suite.GetServices()
-			assert.Equal(t, 1, len(svcList))
+		suite.Ingester.IngestMessage(bytes)
+		eventsProcessed++
+		suite.WaitForEventsToProcess(eventsProcessed)
 
-			assert.Equal(t, "4f1un3", svcList[0].SupMemberID,
-				"the service supervisor_id is not the expected one")
-			assert.Equal(t, "test", svcList[0].Origin,
-				"the service origin name is not the expected one")
-			assert.Equal(t, "db", svcList[0].Name,
-				"the service name is not the expected one")
-			assert.Equal(t, "0.1.0", svcList[0].Version,
-				"the service version is not the expected one")
-			assert.Equal(t, "20200101121212", svcList[0].Release,
-				"the service release is not the expected one")
-			assert.Equal(t, "OK", svcList[0].Health,
-				"the service health is not the expected one")
-			assert.Equal(t, "db.default", svcList[0].Group,
-				"the service service group name is not the expected one")
-			assert.Equal(t, "db.example.com", svcList[0].Fqdn,
-				"the service fqdn is not the expected one")
-			assert.Equal(t, "test-app", svcList[0].Application,
-				"the service application name is not the expected one")
-			assert.Equal(t, "development", svcList[0].Environment,
-				"the service environment name is not the expected one")
-			assert.Equal(t, "stable", svcList[0].Channel,
-				"the service channel name is not the expected one")
-			assert.Equal(t, "us", svcList[0].Site,
-				"the service site name is not the expected one")
-			assert.Equal(t, "NONE", svcList[0].PreviousHealth,
-				"the previous service health is not the expected one")
-			assert.Truef(t, svcList[0].LastEventOccurredAt.Before(time.Now()),
-				"the time of the last event should be before the current time")
-			assert.Truef(t, svcList[0].HealthUpdatedAt.Before(time.Now()),
-				"the time of the last health update should be before the current time")
-			assert.Truef(t, svcList[0].LastEventOccurredAt.After(timeBeforeTest),
-				"the time of the last event should be after the beginning of the test")
-			assert.Truef(t, svcList[0].HealthUpdatedAt.After(timeBeforeTest),
-				"the time of the last health update should be after the beginning of the test")
+		svcList = suite.GetServices()
+		assert.Equal(t, 1, len(svcList))
 
-			// store previous timestamps for next tests
-			previousLastEventOccurredAt = svcList[0].LastEventOccurredAt
-			previousHealthUpdateAt = svcList[0].HealthUpdatedAt
+		assert.Equal(t, "4f1un3", svcList[0].SupMemberID,
+			"the service supervisor_id is not the expected one")
+		assert.Equal(t, "test", svcList[0].Origin,
+			"the service origin name is not the expected one")
+		assert.Equal(t, "db", svcList[0].Name,
+			"the service name is not the expected one")
+		assert.Equal(t, "0.1.0", svcList[0].Version,
+			"the service version is not the expected one")
+		assert.Equal(t, "20200101121212", svcList[0].Release,
+			"the service release is not the expected one")
+		assert.Equal(t, "OK", svcList[0].Health,
+			"the service health is not the expected one")
+		assert.Equal(t, "db.default", svcList[0].Group,
+			"the service service group name is not the expected one")
+		assert.Equal(t, "db.example.com", svcList[0].Fqdn,
+			"the service fqdn is not the expected one")
+		assert.Equal(t, "test-app", svcList[0].Application,
+			"the service application name is not the expected one")
+		assert.Equal(t, "development", svcList[0].Environment,
+			"the service environment name is not the expected one")
+		assert.Equal(t, "stable", svcList[0].Channel,
+			"the service channel name is not the expected one")
+		assert.Equal(t, "us", svcList[0].Site,
+			"the service site name is not the expected one")
+		assert.Equal(t, "NONE", svcList[0].PreviousHealth,
+			"the previous service health is not the expected one")
+		assert.Truef(t, svcList[0].LastEventOccurredAt.Before(time.Now()),
+			"the time of the last event should be before the current time")
+		assert.Truef(t, svcList[0].HealthUpdatedAt.Before(time.Now()),
+			"the time of the last health update should be before the current time")
+		assert.Truef(t, svcList[0].LastEventOccurredAt.After(timeBeforeTest),
+			"the time of the last event should be after the beginning of the test")
+		assert.Truef(t, svcList[0].HealthUpdatedAt.After(timeBeforeTest),
+			"the time of the last health update should be after the beginning of the test")
 
-			sgList := suite.GetServiceGroups()
-			assert.Equal(t, 1, len(sgList), "wrong number of service groups")
+		// store previous timestamps for next tests
+		previousLastEventOccurredAt = svcList[0].LastEventOccurredAt
+		previousHealthUpdateAt = svcList[0].HealthUpdatedAt
 
-			assert.Equal(t, "db.default", sgList[0].Name,
-				"the service_group name is not the expected one")
-			assert.Equal(t, "test/db", sgList[0].Package,
-				"the service_group package is not the expected one")
-			assert.Equal(t, "0.1.0/20200101121212", sgList[0].Release,
-				"the service_group release is not the expected one")
-			assert.Equal(t, "OK", sgList[0].HealthStatus,
-				"the service_group health status is not the expected one")
-			assert.Equal(t, int32(100), sgList[0].HealthPercentage,
-				"the service_group health percentage is not the expected one")
-			assert.Equal(t, "test-app", sgList[0].Application,
-				"the service_group application name is not the expected one")
-			assert.Equal(t, "development", sgList[0].Environment,
-				"the service_group environment name is not the expected one")
-			assert.Equal(t, int32(1), sgList[0].ServicesHealthCounts.Total,
-				"the total number of services in this service_group is not the expected one")
-			assert.Equal(t, int32(1), sgList[0].ServicesHealthCounts.Ok,
-				"the OK number of services in this service_group is not the expected one")
-		}
+		sgList := suite.GetServiceGroups()
+		assert.Equal(t, 1, len(sgList), "wrong number of service groups")
+
+		assert.Equal(t, "db.default", sgList[0].Name,
+			"the service_group name is not the expected one")
+		assert.Equal(t, "test/db", sgList[0].Package,
+			"the service_group package is not the expected one")
+		assert.Equal(t, "0.1.0/20200101121212", sgList[0].Release,
+			"the service_group release is not the expected one")
+		assert.Equal(t, "OK", sgList[0].HealthStatus,
+			"the service_group health status is not the expected one")
+		assert.Equal(t, int32(100), sgList[0].HealthPercentage,
+			"the service_group health percentage is not the expected one")
+		assert.Equal(t, "test-app", sgList[0].Application,
+			"the service_group application name is not the expected one")
+		assert.Equal(t, "development", sgList[0].Environment,
+			"the service_group environment name is not the expected one")
+		assert.Equal(t, int32(1), sgList[0].ServicesHealthCounts.Total,
+			"the total number of services in this service_group is not the expected one")
+		assert.Equal(t, int32(1), sgList[0].ServicesHealthCounts.Ok,
+			"the OK number of services in this service_group is not the expected one")
 	})
 
 	t.Run("update same service with all possible things to update", func(t *testing.T) {
-		// TODO @afiune define what are the fields that we can updated?
-		// - Health, PreviousHealth and HealthUpdatedAt
-		// - Package ident (without name. the name of a service can't be changed!)
-		// - Update strategy
-		// - LastEventOccurredAt (habitat timestamp)
-
 		UpdateHabitatEvent(event,
 			withHealth(HealthCheckIntToString(2)), // -> CRITICAL
 			withStrategyAtOnce("unstable"),
 			withPackageIdent("changed/db/3.2.1/20201212000000"),
-			// TODO @afiune we should also update these fields
-			//withApplication("test-app"),
-			//withEnvironment("development"),
-			//withFqdn("db.example.com"),
+			withServiceGroup("db.test"),
+			withApplication("db-unstable-test"),
+			withEnvironment("testing"),
+			withFqdn("db.unstable.example.com"),
 		)
 
 		bytes, err := proto.Marshal(event)
-		if assert.Nil(t, err) {
-			suite.Ingester.IngestMessage(bytes)
-			eventsProcessed++
-			suite.WaitForEventsToProcess(eventsProcessed)
+		require.NoError(t, err)
 
-			svcList = suite.GetServices()
-			assert.Equal(t, 1, len(svcList))
+		suite.Ingester.IngestMessage(bytes)
+		eventsProcessed++
+		suite.WaitForEventsToProcess(eventsProcessed)
 
-			assert.Equal(t, "4f1un3", svcList[0].SupMemberID,
-				"the service supervisor_id is not the expected one")
-			assert.Equal(t, "changed", svcList[0].Origin,
-				"the service origin name is not the expected one")
-			assert.Equal(t, "db", svcList[0].Name,
-				"the service name is not the expected one")
-			assert.Equal(t, "3.2.1", svcList[0].Version,
-				"the service version is not the expected one")
-			assert.Equal(t, "20201212000000", svcList[0].Release,
-				"the service release is not the expected one")
-			assert.Equal(t, "CRITICAL", svcList[0].Health,
-				"the service health is not the expected one")
-			assert.Equal(t, "db.default", svcList[0].Group,
-				"the service service group name is not the expected one")
-			assert.Equal(t, "db.example.com", svcList[0].Fqdn,
-				"the service fqdn is not the expected one")
-			assert.Equal(t, "test-app", svcList[0].Application,
-				"the service application name is not the expected one")
-			assert.Equal(t, "development", svcList[0].Environment,
-				"the service environment name is not the expected one")
-			assert.Equal(t, "unstable", svcList[0].Channel,
-				"the service channel name is not the expected one")
-			assert.Equal(t, "us", svcList[0].Site,
-				"the service site name is not the expected one")
-			assert.Equal(t, "OK", svcList[0].PreviousHealth,
-				"the previous service health is not the expected one")
+		svcList = suite.GetServices()
+		assert.Equal(t, 1, len(svcList))
 
-			// Both times should be updated
-			assert.Truef(t, svcList[0].LastEventOccurredAt.After(previousLastEventOccurredAt),
-				"the time of the last event should have been updated")
-			assert.Truef(t, svcList[0].HealthUpdatedAt.After(previousHealthUpdateAt),
-				"the time of the last health update should have been updated")
+		assert.Equal(t, "4f1un3", svcList[0].SupMemberID,
+			"the service supervisor_id is not the expected one")
+		assert.Equal(t, "changed", svcList[0].Origin,
+			"the service origin name is not the expected one")
+		assert.Equal(t, "db", svcList[0].Name,
+			"the service name is not the expected one")
+		assert.Equal(t, "3.2.1", svcList[0].Version,
+			"the service version is not the expected one")
+		assert.Equal(t, "20201212000000", svcList[0].Release,
+			"the service release is not the expected one")
+		assert.Equal(t, "CRITICAL", svcList[0].Health,
+			"the service health is not the expected one")
+		assert.Equal(t, "db.test", svcList[0].Group,
+			"the service service group name is not the expected one")
+		assert.Equal(t, "db.unstable.example.com", svcList[0].Fqdn,
+			"the service fqdn is not the expected one")
+		assert.Equal(t, "db-unstable-test", svcList[0].Application,
+			"the service application name is not the expected one")
+		assert.Equal(t, "testing", svcList[0].Environment,
+			"the service environment name is not the expected one")
+		assert.Equal(t, "unstable", svcList[0].Channel,
+			"the service channel name is not the expected one")
+		assert.Equal(t, "us", svcList[0].Site,
+			"the service site name is not the expected one")
+		assert.Equal(t, "OK", svcList[0].PreviousHealth,
+			"the previous service health is not the expected one")
 
-			// save timestamps in same variable for next tests
-			previousLastEventOccurredAt = svcList[0].LastEventOccurredAt
-			previousHealthUpdateAt = svcList[0].HealthUpdatedAt
+		// Both times should be updated
+		assert.Truef(t, svcList[0].LastEventOccurredAt.After(previousLastEventOccurredAt),
+			"the time of the last event should have been updated")
+		assert.Truef(t, svcList[0].HealthUpdatedAt.After(previousHealthUpdateAt),
+			"the time of the last health update should have been updated")
 
-			sgList := suite.GetServiceGroups()
-			assert.Equal(t, 1, len(sgList), "wrong number of service groups")
+		// save timestamps in same variable for next tests
+		previousLastEventOccurredAt = svcList[0].LastEventOccurredAt
+		previousHealthUpdateAt = svcList[0].HealthUpdatedAt
 
-			assert.Equal(t, "db.default", sgList[0].Name,
-				"the service_group name is not the expected one")
-			assert.Equal(t, "changed/db", sgList[0].Package,
-				"the service_group package is not the expected one")
-			assert.Equal(t, "3.2.1/20201212000000", sgList[0].Release,
-				"the service_group release is not the expected one")
-			assert.Equal(t, "CRITICAL", sgList[0].HealthStatus,
-				"the service_group health status is not the expected one")
-			assert.Equal(t, int32(0), sgList[0].HealthPercentage,
-				"the service_group health percentage is not the expected one")
-			assert.Equal(t, "test-app", sgList[0].Application,
-				"the service_group application name is not the expected one")
-			assert.Equal(t, "development", sgList[0].Environment,
-				"the service_group environment name is not the expected one")
-			assert.Equal(t, int32(1), sgList[0].ServicesHealthCounts.Total,
-				"the total number of services in this service_group is not the expected one")
-			assert.Equal(t, int32(1), sgList[0].ServicesHealthCounts.Critical,
-				"the OK number of services in this service_group is not the expected one")
-		}
+		sgList := suite.GetServiceGroups()
+		assert.Equal(t, 1, len(sgList), "wrong number of service groups")
+
+		assert.Equal(t, "db.test", sgList[0].Name,
+			"the service_group name is not the expected one")
+		assert.Equal(t, "changed/db", sgList[0].Package,
+			"the service_group package is not the expected one")
+		assert.Equal(t, "3.2.1/20201212000000", sgList[0].Release,
+			"the service_group release is not the expected one")
+		assert.Equal(t, "CRITICAL", sgList[0].HealthStatus,
+			"the service_group health status is not the expected one")
+		assert.Equal(t, int32(0), sgList[0].HealthPercentage,
+			"the service_group health percentage is not the expected one")
+		assert.Equal(t, "db-unstable-test", sgList[0].Application,
+			"the service_group application name is not the expected one")
+		assert.Equal(t, "testing", sgList[0].Environment,
+			"the service_group environment name is not the expected one")
+		assert.Equal(t, int32(1), sgList[0].ServicesHealthCounts.Total,
+			"the total number of services in this service_group is not the expected one")
+		assert.Equal(t, int32(1), sgList[0].ServicesHealthCounts.Critical,
+			"the OK number of services in this service_group is not the expected one")
 	})
 
 	t.Run("update to verify update strategy and previous_health", func(t *testing.T) {
@@ -460,30 +455,30 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 		)
 
 		bytes, err := proto.Marshal(event)
-		if assert.Nil(t, err) {
-			suite.Ingester.IngestMessage(bytes)
-			eventsProcessed++
-			suite.WaitForEventsToProcess(eventsProcessed)
+		require.NoError(t, err)
 
-			svcList = suite.GetServices()
-			assert.Equal(t, 1, len(svcList))
-			assert.Equal(t, "", svcList[0].Channel,
-				"the service channel name is not the expected one")
-			assert.Equal(t, "UNKNOWN", svcList[0].Health,
-				"the service health is not the expected one")
-			assert.Equal(t, "CRITICAL", svcList[0].PreviousHealth,
-				"the previous service health is not the expected one")
+		suite.Ingester.IngestMessage(bytes)
+		eventsProcessed++
+		suite.WaitForEventsToProcess(eventsProcessed)
 
-			// Both times should be updated
-			assert.Truef(t, svcList[0].LastEventOccurredAt.After(previousLastEventOccurredAt),
-				"the time of the last event should have been updated")
-			assert.Truef(t, svcList[0].HealthUpdatedAt.After(previousHealthUpdateAt),
-				"the time of the last health update should have been updated")
+		svcList = suite.GetServices()
+		assert.Equal(t, 1, len(svcList))
+		assert.Equal(t, "", svcList[0].Channel,
+			"the service channel name is not the expected one")
+		assert.Equal(t, "UNKNOWN", svcList[0].Health,
+			"the service health is not the expected one")
+		assert.Equal(t, "CRITICAL", svcList[0].PreviousHealth,
+			"the previous service health is not the expected one")
 
-			// save timestamps in same variable for next tests
-			previousLastEventOccurredAt = svcList[0].LastEventOccurredAt
-			previousHealthUpdateAt = svcList[0].HealthUpdatedAt
-		}
+		// Both times should be updated
+		assert.Truef(t, svcList[0].LastEventOccurredAt.After(previousLastEventOccurredAt),
+			"the time of the last event should have been updated")
+		assert.Truef(t, svcList[0].HealthUpdatedAt.After(previousHealthUpdateAt),
+			"the time of the last health update should have been updated")
+
+		// save timestamps in same variable for next tests
+		previousLastEventOccurredAt = svcList[0].LastEventOccurredAt
+		previousHealthUpdateAt = svcList[0].HealthUpdatedAt
 	})
 
 	t.Run("update to verify health_updated_at timestamp is not updated on no health update", func(t *testing.T) {
@@ -492,50 +487,49 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 		)
 
 		bytes, err := proto.Marshal(event)
-		if assert.Nil(t, err) {
-			suite.Ingester.IngestMessage(bytes)
-			eventsProcessed++
-			suite.WaitForEventsToProcess(eventsProcessed)
+		require.NoError(t, err)
 
-			svcList = suite.GetServices()
-			assert.Equal(t, 1, len(svcList))
+		suite.Ingester.IngestMessage(bytes)
+		eventsProcessed++
+		suite.WaitForEventsToProcess(eventsProcessed)
 
-			assert.Equal(t, "20201212000001", svcList[0].Release,
-				"the service release is not the expected one")
-			// Same health
-			assert.Equal(t, "UNKNOWN", svcList[0].Health,
-				"the service health is not the expected one")
-			assert.Equal(t, "CRITICAL", svcList[0].PreviousHealth,
-				"the previous service health is not the expected one")
-			// No timestamp updated
-			assert.Truef(t, svcList[0].LastEventOccurredAt.After(previousLastEventOccurredAt),
-				"the time of the last event should have been updated")
-			assert.Truef(t, svcList[0].HealthUpdatedAt.Equal(previousHealthUpdateAt),
-				"the time of the last health update should not be updated")
+		svcList = suite.GetServices()
+		assert.Equal(t, 1, len(svcList))
 
-			// save the new time on same variable for next test
-			previousLastEventOccurredAt = svcList[0].LastEventOccurredAt
-		}
+		assert.Equal(t, "20201212000001", svcList[0].Release,
+			"the service release is not the expected one")
+		// Same health
+		assert.Equal(t, "UNKNOWN", svcList[0].Health,
+			"the service health is not the expected one")
+		assert.Equal(t, "CRITICAL", svcList[0].PreviousHealth,
+			"the previous service health is not the expected one")
+		// No timestamp updated
+		assert.Truef(t, svcList[0].LastEventOccurredAt.After(previousLastEventOccurredAt),
+			"the time of the last event should have been updated")
+		assert.Truef(t, svcList[0].HealthUpdatedAt.Equal(previousHealthUpdateAt),
+			"the time of the last health update should not be updated")
 
+		// save the new time on same variable for next test
+		previousLastEventOccurredAt = svcList[0].LastEventOccurredAt
 	})
 
-	t.Run("last update to verify the last_event_occurred_at timestamp is not updated when there are no updates", func(t *testing.T) {
-		// sending same message through
+	t.Run("last update to verify the last_event_occurred_at timestamp is always updated even when there are no updates", func(t *testing.T) {
+		// sending same message through but updating the timestamp of the message
+		UpdateHabitatEvent(event)
 		bytes, err := proto.Marshal(event)
-		if assert.Nil(t, err) {
-			suite.Ingester.IngestMessage(bytes)
-			eventsProcessed++
-			suite.WaitForEventsToProcess(eventsProcessed)
+		require.NoError(t, err)
 
-			svcList = suite.GetServices()
-			assert.Equal(t, 1, len(svcList))
+		suite.Ingester.IngestMessage(bytes)
+		eventsProcessed++
+		suite.WaitForEventsToProcess(eventsProcessed)
 
-			// Both times should not be updated
-			assert.Truef(t, svcList[0].LastEventOccurredAt.Equal(previousLastEventOccurredAt),
-				"the time of the last event should not be updated")
-			assert.Truef(t, svcList[0].HealthUpdatedAt.Equal(previousHealthUpdateAt),
-				"the time of the last health update should not be updated")
-		}
+		svcList = suite.GetServices()
+		assert.Equal(t, 1, len(svcList))
+
+		assert.Truef(t, svcList[0].LastEventOccurredAt.After(previousLastEventOccurredAt),
+			"the time of the last event should always be updated")
+		assert.Truef(t, svcList[0].HealthUpdatedAt.Equal(previousHealthUpdateAt),
+			"the time of the last health update should not be updated")
 	})
 }
 
@@ -549,21 +543,20 @@ func TestIngestLastEventOccurredAtFieldMatchHabitatOccurredAt(t *testing.T) {
 		expectedTimestampProto, err = ptypes.TimestampProto(expectedTimestamp)
 	)
 
-	if assert.Nil(t, err) {
-		event.EventMetadata.OccurredAt = expectedTimestampProto
-	}
+	require.NoError(t, err)
+	event.EventMetadata.OccurredAt = expectedTimestampProto
 
 	bytes, err := proto.Marshal(event)
-	if assert.Nil(t, err) {
-		suite.Ingester.IngestMessage(bytes)
-		eventsProcessed++
-		suite.WaitForEventsToProcess(eventsProcessed)
+	require.NoError(t, err)
 
-		svcList := suite.GetServices()
-		if assert.Equal(t, 1, len(svcList)) {
-			assert.Truef(t, svcList[0].LastEventOccurredAt.Equal(expectedTimestamp),
-				"the time of the last event received is not the expected one")
-		}
+	suite.Ingester.IngestMessage(bytes)
+	eventsProcessed++
+	suite.WaitForEventsToProcess(eventsProcessed)
+
+	svcList := suite.GetServices()
+	if assert.Equal(t, 1, len(svcList)) {
+		assert.Truef(t, svcList[0].LastEventOccurredAt.Equal(expectedTimestamp),
+			"the time of the last event received is not the expected one")
 	}
 }
 
@@ -577,30 +570,73 @@ func TestIngestHealthUpdatedAtUpdatesOnlyOnHealthUpdate(t *testing.T) {
 		timeBeforeTest  = time.Now()
 		healthUpdatedAt time.Time
 	)
+	require.NoError(t, err)
 
-	if assert.Nil(t, err) {
-		suite.Ingester.IngestMessage(bytes)
-		eventsProcessed++
-		suite.WaitForEventsToProcess(eventsProcessed)
+	suite.Ingester.IngestMessage(bytes)
+	eventsProcessed++
+	suite.WaitForEventsToProcess(eventsProcessed)
 
-		svcList := suite.GetServices()
-		if assert.Equal(t, 1, len(svcList)) {
-			healthUpdatedAt = svcList[0].HealthUpdatedAt
-			assert.Truef(t, healthUpdatedAt.After(timeBeforeTest),
-				"the time of the last health update should be after the beginning of the test")
-			assert.Truef(t, healthUpdatedAt.Before(time.Now()),
-				"the time of the last health update should be before the current time")
-		}
+	svcList := suite.GetServices()
+	if assert.Equal(t, 1, len(svcList)) {
+		healthUpdatedAt = svcList[0].HealthUpdatedAt
+		assert.Truef(t, healthUpdatedAt.After(timeBeforeTest),
+			"the time of the last health update should be after the beginning of the test")
+		assert.Truef(t, healthUpdatedAt.Before(time.Now()),
+			"the time of the last health update should be before the current time")
+	}
 
-		// resend the same event message
-		suite.Ingester.IngestMessage(bytes)
-		eventsProcessed++
-		suite.WaitForEventsToProcess(eventsProcessed)
+	// resend the same event message
+	suite.Ingester.IngestMessage(bytes)
+	eventsProcessed++
+	suite.WaitForEventsToProcess(eventsProcessed)
 
-		svcList = suite.GetServices()
-		if assert.Equal(t, 1, len(svcList)) {
-			assert.Truef(t, svcList[0].HealthUpdatedAt.Equal(healthUpdatedAt),
-				"the time of the last health update should not be updated")
-		}
+	svcList = suite.GetServices()
+	if assert.Equal(t, 1, len(svcList)) {
+		assert.Truef(t, svcList[0].HealthUpdatedAt.Equal(healthUpdatedAt),
+			"the time of the last health update should not be updated")
+	}
+}
+
+func TestIngestDenySupervisorMemberIDUpdates(t *testing.T) {
+	defer suite.DeleteDataFromStorage()
+
+	var (
+		eventsProcessed = suite.Ingester.EventsProcessed()
+		event           = NewHabitatEvent(
+			withSupervisorId("4f1un3"),
+			withPackageIdent("core/db/0.1.0/20200101121212"),
+			withServiceGroup("db.default"),
+		)
+		bytes, err = proto.Marshal(event)
+	)
+	require.NoError(t, err)
+
+	suite.Ingester.IngestMessage(bytes)
+	eventsProcessed++
+	suite.WaitForEventsToProcess(eventsProcessed)
+
+	svcList := suite.GetServices()
+	if assert.Equal(t, 1, len(svcList)) {
+		assert.Equal(t, "4f1un3", svcList[0].SupMemberID,
+			"the service supervisor_id is not the expected one")
+	}
+
+	// By updating the member-id we recognize this as a brand new service
+	UpdateHabitatEvent(event, withSupervisorId("foo"))
+	bytes, err = proto.Marshal(event)
+	require.NoError(t, err)
+
+	suite.Ingester.IngestMessage(bytes)
+	eventsProcessed++
+	suite.WaitForEventsToProcess(eventsProcessed)
+
+	svcList = suite.GetServices()
+
+	// we expect to have two services
+	if assert.Equal(t, 2, len(svcList)) {
+		assert.Equal(t, "4f1un3", svcList[0].SupMemberID,
+			"the service supervisor_id is not the expected one")
+		assert.Equal(t, "foo", svcList[1].SupMemberID,
+			"the service supervisor_id is not the expected one")
 	}
 }

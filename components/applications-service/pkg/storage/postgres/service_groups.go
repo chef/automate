@@ -363,3 +363,26 @@ func inArray(value string, array []string) bool {
 	}
 	return false
 }
+
+func (db *Postgres) getServiceGroup(id int32) (*serviceGroup, error) {
+	var sg serviceGroup
+	err := db.SelectOne(&sg,
+		"SELECT id, deployment_id, name FROM service_group WHERE id = $1", id)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to retrieve service group from the database")
+	}
+
+	return &sg, nil
+}
+func (db *Postgres) getServiceGroupID(name string) (int32, bool) {
+	var gid int32
+	err := db.SelectOne(&gid,
+		"SELECT id FROM service_group WHERE name = $1",
+		name,
+	)
+	if err != nil {
+		return gid, false
+	}
+
+	return gid, true
+}
