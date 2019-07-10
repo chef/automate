@@ -14,7 +14,6 @@ import (
 
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/common/query"
-	"github.com/chef/automate/api/external/habitat"
 )
 
 func TestGetServicesBasic(t *testing.T) {
@@ -434,111 +433,5 @@ func TestGetServicesMultiServiceWithHealthAndServiceGroupIdFilter(t *testing.T) 
 		response, err := suite.ApplicationsServer.GetServices(ctx, request)
 		assert.Nil(t, err)
 		assertServicesEqual(t, expected.GetServices(), response.GetServices())
-	}
-}
-
-// @afiune there are cases where the order of the services that are returned are not
-// exactly the same, we do care about order but in some degree, for example health check
-// status and fqdn, but we don't care about things like order of supervisor_id so we can
-// skip that check by not specifying it into the expected response
-func assertServicesEqual(t *testing.T, expected, actual []*applications.Service) {
-	if assert.Equal(t, len(expected), len(actual), "The number of services are not the same") {
-		for i, svc := range expected {
-			if len(svc.SupervisorId) != 0 {
-				assert.Equal(t,
-					svc.SupervisorId,
-					actual[i].SupervisorId,
-					"The supervisor_id of a service is not the expected one")
-			}
-			assert.Equal(t,
-				svc.Release,
-				actual[i].Release,
-				"The release of a service is not the expected one")
-			assert.Equal(t,
-				svc.Group,
-				actual[i].Group,
-				"The group of a service is not the expected one")
-			assert.Equal(t,
-				svc.HealthCheck,
-				actual[i].HealthCheck,
-				"The health_check of a service is not the expected one")
-			assert.Equal(t,
-				svc.Status,
-				actual[i].Status,
-				"The status of a service is not the expected one")
-			assert.Equal(t,
-				svc.Application,
-				actual[i].Application,
-				"The application of a service is not the expected one")
-			assert.Equal(t,
-				svc.Environment,
-				actual[i].Environment,
-				"The environment of a service is not the expected one")
-			assert.Equal(t,
-				svc.Fqdn,
-				actual[i].Fqdn,
-				"The fqdn of a service is not the expected one")
-			assert.Equal(t,
-				svc.Channel,
-				actual[i].Channel,
-				"The channel of a service is not the expected one")
-			assert.Equal(t,
-				svc.Site,
-				actual[i].Site,
-				"The site of a service is not the expected one")
-		}
-	}
-}
-
-func habServicesMatrixAllHealthStatusDifferent() []*habitat.HealthCheckEvent {
-	return []*habitat.HealthCheckEvent{
-		// service_group 1 <-> With a Health Status = 'OK'
-		NewHabitatEvent(
-			withSupervisorId("sup1"),
-			withServiceGroup("redis.default"),
-			withPackageIdent("core/redis/0.1.0/20190101121212"),
-			withHealth("OK"),
-			withFqdn("myapp-us.example.com"),
-		),
-
-		// service_group 2 <-> With a Health Status = 'WARNING'
-		NewHabitatEvent(
-			withSupervisorId("sup1"),
-			withServiceGroup("myapp.default"),
-			withPackageIdent("core/myapp/0.1.0/20190101121212"),
-			withHealth("WARNING"),
-			withFqdn("myapp-us.example.com"),
-		),
-
-		// service_group 3 <-> With a Health Status = 'CRITICAL'
-		NewHabitatEvent(
-			withSupervisorId("sup1"),
-			withServiceGroup("postgres.default"),
-			withPackageIdent("core/postgres/0.1.0/20190101121212"),
-			withHealth("CRITICAL"),
-			withFqdn("myapp-us.example.com"),
-		),
-
-		// service_group 4 <-> With a Health Status = 'UNKNOWN'
-		NewHabitatEvent(
-			withSupervisorId("sup2"),
-			withServiceGroup("test.default"),
-			withPackageIdent("core/test/0.1.0/20190101121212"),
-			withHealth("UNKNOWN"),
-			withFqdn("test-1.example.com"),
-		),
-		NewHabitatEvent(
-			withSupervisorId("sup3"),
-			withServiceGroup("temp.default"),
-			withPackageIdent("core/temp/0.1.0/20190101121212"),
-			withHealth("UNKNOWN"),
-			withFqdn("temp.example.com"),
-		),
-		NewHabitatEvent(
-			withSupervisorId("sup4"),
-			withServiceGroup("test.default"),
-			withPackageIdent("core/test/0.1.0/20190101121212"),
-			withFqdn("test-2.example.com"),
-		),
 	}
 }
