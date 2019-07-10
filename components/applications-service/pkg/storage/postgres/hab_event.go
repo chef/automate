@@ -7,6 +7,7 @@ import (
 
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/habitat"
+	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/go-gorp/gorp"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/pkg/errors"
@@ -333,7 +334,7 @@ func (db *Postgres) updateService(
 	}
 
 	// Update Channel
-	updateServiceChannel(svc, svcMetadata.GetUpdateConfig())
+	updateServiceStrategyAndChannel(svc, svcMetadata.GetUpdateConfig())
 
 	// update always the timestamp of the last event received so that the database
 	// has a record of when the last message was received for a service
@@ -341,18 +342,28 @@ func (db *Postgres) updateService(
 	svc.needUpdate = true
 }
 
-// update the service channel from the provided habitat update config
-// TODO @afiune do we want to store the strategy?
-func updateServiceChannel(svc *service, updateConfig *habitat.UpdateConfig) {
-	if updateConfig == nil && svc.Channel != "" {
-		svc.Channel = ""
-		svc.needUpdate = true
-	}
+// update the service channel & update strategy from the provided habitat update config
+func updateServiceStrategyAndChannel(svc *service, updateConfig *habitat.UpdateConfig) {
+	if updateConfig == nil {
+		if svc.Channel != "" {
+			svc.Channel = ""
+			svc.needUpdate = true
+		}
 
-	if updateConfig != nil {
+		if svc.UpdateStrategy != storage.NoneStrategy.String() {
+			svc.UpdateStrategy = storage.NoneStrategy.String()
+			svc.needUpdate = true
+		}
+	} else {
 		channel := updateConfig.GetChannel()
 		if svc.Channel != channel {
 			svc.Channel = channel
+			svc.needUpdate = true
+		}
+
+		strategy := storage.HabitatUpdateStrategyToStorageFormat(updateConfig.GetStrategy())
+		if svc.UpdateStrategy != strategy.String() {
+			svc.UpdateStrategy = strategy.String()
 			svc.needUpdate = true
 		}
 	}
@@ -429,6 +440,10 @@ func (db *Postgres) insertNewService(
 
 		if svcMetadata.GetUpdateConfig() != nil {
 			svc.Channel = svcMetadata.UpdateConfig.GetChannel()
+			strategy := storage.HabitatUpdateStrategyToStorageFormat(svcMetadata.UpdateConfig.GetStrategy())
+			svc.UpdateStrategy = strategy.String()
+		} else {
+			svc.UpdateStrategy = storage.NoneStrategy.String()
 		}
 
 		if err := tx.Insert(svc); err != nil {
