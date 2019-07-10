@@ -259,7 +259,6 @@ EOF
               user: user,
               request_body: {
                 name: "inspec-test-policy-#{Time.now.utc.to_i}",
-                description: 'trying to update this chef-managed policy',
                 members: []
               }.to_json
             )
@@ -310,7 +309,6 @@ EOF
               user: user,
               request_body: {
                 name: "inspec-test-policy-#{Time.now.utc.to_i}",
-                description: 'trying to update this chef-managed role',
                 members: []
               }.to_json
             )
