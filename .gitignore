@@ -98,7 +98,6 @@ ec2/mkmf.log
 # cypress screenshots/videos and other folders cypress creates
 e2e/cypress/screenshots
 e2e/cypress/videos
-e2e/cypress/fixtures
 components/automate-grpc/protoc-gen-a2-config/protoc-gen-a2-config
 components/event-gateway/cmd/event-gateway/event-gateway
 tools/bldr-config-gen/bldr-config-gen
