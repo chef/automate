@@ -14,12 +14,10 @@ import (
 	cmsReq "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	cmsRes "github.com/chef/automate/api/interservice/cfgmgmt/response"
 	cmsService "github.com/chef/automate/api/interservice/cfgmgmt/service"
+	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
 	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
 	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
-	mock_automate_feed "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_feed"
 	subject "github.com/chef/automate/components/automate-gateway/handler"
-	automate_feed "github.com/chef/automate/components/compliance-service/api/automate-feed"
-	complFeed "github.com/chef/automate/components/compliance-service/api/automate-feed"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
@@ -37,12 +35,12 @@ func TestEventFeedFuncGetEventFeedEmptyRequest(t *testing.T) {
 		return &cmsRes.Events{}, nil
 	})
 
-	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(ctrl)
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(ctrl)
 	mockFeedServiceClient.EXPECT().GetFeed(
 		c,
 		gomock.Any(),
-	).DoAndReturn(func(c ctx.Context, action *automate_feed.FeedRequest) (*automate_feed.FeedResponse, error) {
-		return &automate_feed.FeedResponse{}, nil
+	).DoAndReturn(func(c ctx.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
+		return &event_feed_api.FeedResponse{}, nil
 	})
 
 	eventFeedServer := subject.NewEventFeedServer(mockCfgMgmtClient, mockFeedServiceClient)
@@ -63,7 +61,7 @@ func TestEventFeedFuncGetEventFeedSingleErrorShouldNotFail(t *testing.T) {
 		ctrl                  = gomock.NewController(t)
 		c                     = ctx.Background()
 		mockCfgMgmtClient     = cmsService.NewMockCfgMgmtClient(ctrl)
-		mockFeedServiceClient = mock_automate_feed.NewMockFeedServiceClient(ctrl)
+		mockFeedServiceClient = event_feed_api.NewMockEventFeedServiceClient(ctrl)
 		request               = &agReq.EventFilter{
 			PageSize: 1000,
 		}
@@ -80,8 +78,8 @@ func TestEventFeedFuncGetEventFeedSingleErrorShouldNotFail(t *testing.T) {
 	mockFeedServiceClient.EXPECT().GetFeed(
 		ctx.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c ctx.Context, request *automate_feed.FeedRequest) (*automate_feed.FeedResponse, error) {
-		return &automate_feed.FeedResponse{}, nil
+	).DoAndReturn(func(c ctx.Context, request *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
+		return &event_feed_api.FeedResponse{}, nil
 	})
 
 	eventFeedServer := subject.NewEventFeedServer(mockCfgMgmtClient, mockFeedServiceClient)
@@ -97,7 +95,7 @@ func TestEventFeedFuncGetEventFeedAllSubscribersFailedThenExpectFailure(t *testi
 		ctrl                  = gomock.NewController(t)
 		c                     = ctx.Background()
 		mockCfgMgmtClient     = cmsService.NewMockCfgMgmtClient(ctrl)
-		mockFeedServiceClient = mock_automate_feed.NewMockFeedServiceClient(ctrl)
+		mockFeedServiceClient = event_feed_api.NewMockEventFeedServiceClient(ctrl)
 		request               = &agReq.EventFilter{
 			PageSize: 1000,
 		}
@@ -123,8 +121,8 @@ func TestEventFeedFuncGetEventFeedAllSubscribersFailedThenExpectFailure(t *testi
 	mockFeedServiceClient.EXPECT().GetFeed(
 		ctx.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c ctx.Context, action *automate_feed.FeedRequest) (*automate_feed.FeedResponse, error) {
-		return &automate_feed.FeedResponse{}, errors.New("Oh no! Something also went wrong here.")
+	).DoAndReturn(func(c ctx.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
+		return &event_feed_api.FeedResponse{}, errors.New("Oh no! Something also went wrong here.")
 	})
 
 	eventFeedServer := subject.NewEventFeedServer(mockCfgMgmtClient, mockFeedServiceClient)
@@ -160,12 +158,12 @@ func TestEventStringsFuncGetEventStringBucketsEmptyRequest(t *testing.T) {
 		}, nil
 	})
 
-	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(ctrl)
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(ctrl)
 	mockFeedServiceClient.EXPECT().GetFeedTimeline(
 		c,
 		gomock.Any(),
-	).DoAndReturn(func(c ctx.Context, action *complFeed.FeedTimelineRequest) (*complFeed.FeedTimelineResponse, error) {
-		return &complFeed.FeedTimelineResponse{
+	).DoAndReturn(func(c ctx.Context, action *event_feed_api.FeedTimelineRequest) (*event_feed_api.FeedTimelineResponse, error) {
+		return &event_feed_api.FeedTimelineResponse{
 			Interval: hoursBetween,
 			Start:    startDate.AddDate(0, 0, -6).Format("2006-01-02"),
 			End:      startDate.Format("2006-01-02"),
@@ -196,20 +194,20 @@ func TestEventStringsFuncGetEventStringBucketsCorrectRequest(t *testing.T) {
 	functionCalled := false
 
 	collection := []*cmsRes.EventCollection{
-		&cmsRes.EventCollection{
+		{
 			EventsCount: []*cmsRes.EventCount{
-				&cmsRes.EventCount{Name: "a"},
+				{Name: "a"},
 			},
 		},
-		&cmsRes.EventCollection{
+		{
 			EventsCount: []*cmsRes.EventCount{
-				&cmsRes.EventCount{Name: "b"},
+				{Name: "b"},
 			},
 		},
 	}
 
 	var cmsStringSlice = []*cmsRes.EventString{
-		&cmsRes.EventString{
+		{
 			Collection:  collection,
 			EventAction: "create",
 		},
@@ -228,19 +226,19 @@ func TestEventStringsFuncGetEventStringBucketsCorrectRequest(t *testing.T) {
 		}, nil
 	})
 
-	var feedActionLine = []*complFeed.ActionLine{
-		&complFeed.ActionLine{
-			Slots:  make([]*complFeed.Timeslot, 2),
+	var feedActionLine = []*event_feed_api.ActionLine{
+		{
+			Slots:  make([]*event_feed_api.Timeslot, 2),
 			Action: "create",
 		},
 	}
 
-	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(ctrl)
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(ctrl)
 	mockFeedServiceClient.EXPECT().GetFeedTimeline(
 		c,
 		gomock.Any(),
-	).DoAndReturn(func(c ctx.Context, action *complFeed.FeedTimelineRequest) (*complFeed.FeedTimelineResponse, error) {
-		return &complFeed.FeedTimelineResponse{
+	).DoAndReturn(func(c ctx.Context, action *event_feed_api.FeedTimelineRequest) (*event_feed_api.FeedTimelineResponse, error) {
+		return &event_feed_api.FeedTimelineResponse{
 			ActionLines: feedActionLine,
 			Start:       "2018-02-01",
 			End:         "2018-02-02",
@@ -260,14 +258,14 @@ func TestEventStringsFuncGetEventStringBucketsCorrectRequest(t *testing.T) {
 	expectedEventString := []*agRes.EventString{}
 	agInsides := &agRes.EventString{
 		Collection: []*agRes.EventCollection{
-			&agRes.EventCollection{
+			{
 				EventsCount: []*agRes.EventCount{
-					&agRes.EventCount{Name: "a"},
+					{Name: "a"},
 				},
 			},
-			&agRes.EventCollection{
+			{
 				EventsCount: []*agRes.EventCount{
-					&agRes.EventCount{Name: "b"},
+					{Name: "b"},
 				},
 			},
 		},

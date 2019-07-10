@@ -9,8 +9,7 @@ import (
 	olivere "github.com/olivere/elastic"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
-	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
+	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
 	"github.com/chef/automate/components/event-service/config"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/certs"
@@ -22,17 +21,20 @@ var (
 
 	// for integration testing with feed service
 	esClient *olivere.Client
-	indices  = []string{mappings.IndexNameFeeds}
-	types    = []string{mappings.DocType}
+	indices  = []string{persistence.IndexNameFeeds}
+	types    = []string{persistence.DocType}
 
 	suite = NewSuite()
 )
 
 func doInit() {
-	esBackend := relaxting.ES2Backend{ESUrl: os.Getenv("ELASTICSEARCH_URL")}
-	client, err := esBackend.ES2Client()
+	esURL := os.Getenv("ELASTICSEARCH_URL")
+	client, err := olivere.NewClient(
+		olivere.SetURL(esURL),
+		olivere.SetSniff(false),
+	)
 	if err != nil {
-		fmt.Printf("Could not create Elasticsearch client from '%s': %s\n", esBackend.ESUrl, err)
+		fmt.Printf("Could not create Elasticsearch client from '%s': %s\n", esURL, err)
 		os.Exit(1)
 	}
 
@@ -54,7 +56,12 @@ func doInit() {
 			KeyPath:        "/hab/svc/event-service/config/service.key",
 			RootCACertPath: "/hab/svc/event-service/config/root_ca.crt",
 		},
-		HandlerEndpoints: config.HandlerConfig{Feed: "0.0.0.0:10121", CfgIngest: "0.0.0.0:10122"},
+		HandlerEndpoints: config.HandlerConfig{
+			Compliance: "0.0.0.0:10121",
+			CfgIngest:  "0.0.0.0:10122",
+			Authz:      "0.0.0.0:10130",
+			EventFeed:  "0.0.0.0:10134",
+		},
 	}
 
 	serviceCerts, err := cfg.TLSConfig.ReadCerts()

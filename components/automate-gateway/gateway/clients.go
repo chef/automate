@@ -15,12 +15,12 @@ import (
 	iam_v2beta "github.com/chef/automate/api/interservice/authz/v2"
 	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	deployment "github.com/chef/automate/api/interservice/deployment"
+	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
 	chef_ingest "github.com/chef/automate/api/interservice/ingest"
 	license_control "github.com/chef/automate/api/interservice/license_control"
 	"github.com/chef/automate/api/interservice/local_user"
 	teams_v1 "github.com/chef/automate/api/interservice/teams/v1"
 	teams_v2 "github.com/chef/automate/api/interservice/teams/v2"
-	automate_feed "github.com/chef/automate/components/compliance-service/api/automate-feed"
 	jobs "github.com/chef/automate/components/compliance-service/api/jobs"
 	profiles "github.com/chef/automate/components/compliance-service/api/profiles"
 	cc_reporting "github.com/chef/automate/components/compliance-service/api/reporting"
@@ -50,6 +50,7 @@ var defaultEndpoints = map[string]string{
 	"secrets-service":         "0.0.0.0:10131",
 	"applications-service":    "0.0.0.0:10133",
 	"nodemanager-service":     "0.0.0.0:10120",
+	"event-feed-service":      "0.0.0.0:10134",
 }
 
 // clientMetrics holds the clients (identified by service) for which we'll
@@ -98,7 +99,7 @@ type ClientsFactory interface {
 	ApplicationsClient() (applications.ApplicationsServiceClient, error)
 	SecretClient() (secrets.SecretsServiceClient, error)
 	NodesClient() (nodes.NodesServiceClient, error)
-	FeedClient() (automate_feed.FeedServiceClient, error)
+	FeedClient() (event_feed_api.EventFeedServiceClient, error)
 	ComplianceReportingServiceClient() (cc_reporting.ReportingServiceClient, error)
 	ComplianceProfilesServiceClient() (profiles.ProfilesServiceClient, error)
 	ComplianceJobsServiceClient() (jobs.JobsServiceClient, error)
@@ -377,12 +378,12 @@ func (c *clientsFactory) NodesClient() (nodes.NodesServiceClient, error) {
 	return nodes.NewNodesServiceClient(conn), nil
 }
 
-func (c *clientsFactory) FeedClient() (automate_feed.FeedServiceClient, error) {
-	conn, err := c.connectionByName("compliance-service")
+func (c *clientsFactory) FeedClient() (event_feed_api.EventFeedServiceClient, error) {
+	conn, err := c.connectionByName("event-feed-service")
 	if err != nil {
 		return nil, err
 	}
-	return automate_feed.NewFeedServiceClient(conn), nil
+	return event_feed_api.NewEventFeedServiceClient(conn), nil
 }
 
 func (c *clientsFactory) ComplianceReportingServiceClient() (cc_reporting.ReportingServiceClient, error) {

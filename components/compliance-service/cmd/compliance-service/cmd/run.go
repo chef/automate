@@ -52,10 +52,8 @@ var conf = config.Compliance{
 		AzureVMPollIntervalMinutes: 180,
 	},
 	EventConfig: config.EventConfig{},
-	FeedConfig:  config.FeedConfig{},
 	DataRetention: config.DataRetention{
 		ComplianceReportDays: -1,
-		ComplianceEventDays:  7,
 	},
 }
 
