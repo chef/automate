@@ -227,22 +227,6 @@ function rebuild() {
   return $err
 }
 
-document "build_all" <<DOC
-  Build every hab package in components/
-DOC
-function build_all() {
-  log_line "Building all components..."
-  for d in /src/components/*/; do
-    [[ -f "$d/habitat/plan.sh" ]] || continue # skip what can't be built
-    if [[ "$d" = "/src/components/automate-chef-io" ]] && [[ -n "$AUTOMATE_OSS_BUILD" ]]; then
-        log_line "Skipping build of $d since AUTOMATE_OSS_BUILD is set."
-        continue
-    fi
-    log_line "Building $d"
-    build "$d" || return 1
-  done;
-}
-
 function verify_component() {
   if [[ "$1" == "deployment-service" || "$1" == "api" || "$1" == "config" ]]; then
     return 0
