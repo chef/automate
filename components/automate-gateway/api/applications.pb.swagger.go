@@ -214,6 +214,31 @@ func init() {
         ]
       }
     },
+    "/beta/applications/services/disconnected": {
+      "get": {
+        "operationId": "GetDisconnectedServices",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/applicationsServicesRes"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "threshold_minutes",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "ApplicationsService"
+        ]
+      }
+    },
     "/beta/applications/stats": {
       "get": {
         "operationId": "GetServicesStats",

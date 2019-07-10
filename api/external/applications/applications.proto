@@ -57,7 +57,15 @@ service ApplicationsService {
     option (chef.automate.api.policy).action = "list";
     option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
-  }
+  };
+
+  rpc GetDisconnectedServices(DisconnectedServicesReq) returns (ServicesRes ) {
+    option (google.api.http).get = "/beta/applications/services/disconnected";
+    option (chef.automate.api.policy).resource = "service_groups";
+    option (chef.automate.api.policy).action = "list";
+    option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
+  };
 
   rpc GetVersion (common.version.VersionInfoRequest) returns (common.version.VersionInfo) {
     option (google.api.http).get = "/beta/applications/version";
@@ -89,6 +97,10 @@ message ServicesBySGRes {
 
 message ServicesRes {
   repeated Service services = 1;
+}
+
+message DisconnectedServicesReq {
+  int32 threshold_minutes = 1;
 }
 
 message ServicesStatsReq {

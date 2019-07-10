@@ -14,6 +14,8 @@ type Client interface {
 	GetServiceFromUniqueFields(string, string) (*Service, bool)
 	// @param (sortField, sortAsc, page, pageSize, filters)
 	GetServices(string, bool, int32, int32, map[string][]string) ([]*Service, error)
+	// @param (thresholdMinutes)
+	GetDisconnectedServices(int32) ([]*Service, error)
 	// @param (sortField, sortAsc, page, pageSize, filters)
 	GetServiceGroups(string, bool, int32, int32, map[string][]string) ([]*ServiceGroupDisplay, error)
 	// @param (id)

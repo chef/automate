@@ -1,6 +1,9 @@
 package main
 
 import (
+	"context"
+	"fmt"
+
 	"github.com/spf13/cobra"
 
 	apps "github.com/chef/automate/api/config/applications"
@@ -9,13 +12,22 @@ import (
 	eventgw "github.com/chef/automate/api/config/event_gateway"
 	"github.com/chef/automate/api/config/gateway"
 	w "github.com/chef/automate/api/config/shared/wrappers"
+	"github.com/chef/automate/api/external/applications"
+	"github.com/chef/automate/components/automate-cli/pkg/client/apiclient"
+	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 )
+
+var thresholdMinutes int64
 
 func init() {
 	appsSubcmd := newApplicationsRootSubcmd()
 	appsSubcmd.AddCommand(newApplicationsEnableCmd())
 	appsSubcmd.AddCommand(newApplicationsDisableCmd())
+
+	listDisconnectedServicesCmd := newApplicationsListDisconnectedServicesCmd()
+	listDisconnectedServicesCmd.PersistentFlags().Int64VarP(&thresholdMinutes, "threshold-minutes", "m", 10, "Number of minutes since last event received")
+	appsSubcmd.AddCommand(listDisconnectedServicesCmd)
 
 	RootCmd.AddCommand(appsSubcmd)
 }
@@ -25,6 +37,15 @@ func newApplicationsRootSubcmd() *cobra.Command {
 		Use:    "applications COMMAND",
 		Short:  "Manage applications visibility features",
 		Hidden: true,
+	}
+}
+
+func newApplicationsListDisconnectedServicesCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "list-disconnected-services",
+		Short: "List services that haven't received events from a period of time",
+		RunE:  runApplicationsListDisconnectedServicesCmd,
+		Args:  cobra.NoArgs,
 	}
 }
 
@@ -44,6 +65,37 @@ func newApplicationsDisableCmd() *cobra.Command {
 		RunE:  runApplicationsDisableCmd,
 		Args:  cobra.NoArgs,
 	}
+}
+
+func runApplicationsListDisconnectedServicesCmd(*cobra.Command, []string) error {
+	if thresholdMinutes <= 0 {
+		return status.Errorf(status.InvalidCommandArgsError,
+			"%d is not a valid threshold time in minutes. The expected time must be greater than zero.",
+			thresholdMinutes,
+		)
+	}
+
+	ctx := context.Background()
+	apiClient, err := apiclient.OpenConnection(ctx)
+	if err != nil {
+		return status.Wrap(err, status.APIUnreachableError,
+			"Failed to create a connection to the API")
+	}
+
+	servicesRes, err := apiClient.ApplicationsClient().GetDisconnectedServices(ctx,
+		&applications.DisconnectedServicesReq{
+			ThresholdMinutes: int32(thresholdMinutes),
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	// TODO @afiune use a pretty text marshaler https://godoc.org/github.com/golang/protobuf/proto#TextMarshaler
+	fmt.Println(servicesRes.Services)
+
+	return nil
+
 }
 
 func runApplicationsEnableCmd(*cobra.Command, []string) error {

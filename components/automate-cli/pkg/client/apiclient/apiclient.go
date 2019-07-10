@@ -5,6 +5,7 @@ import (
 
 	"google.golang.org/grpc"
 
+	"github.com/chef/automate/api/external/applications"
 	client_type "github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/constants"
@@ -21,14 +22,15 @@ import (
 type client struct {
 	apiClientConn *grpc.ClientConn
 	// TODO (tc): Add other service clients here as needed.
-	authzClient     authz.AuthorizationClient
-	teamsClient     teams.TeamsClient
-	teamsV2Client   v2beta.TeamsClient
-	tokensClient    tokens.TokensMgmtClient
-	tokensV2Client  v2beta.TokensClient
-	usersClient     users.UsersMgmtClient
-	policiesClient  v2beta.PoliciesClient
-	reportingClient reporting.ReportingServiceClient
+	authzClient        authz.AuthorizationClient
+	teamsClient        teams.TeamsClient
+	teamsV2Client      v2beta.TeamsClient
+	tokensClient       tokens.TokensMgmtClient
+	tokensV2Client     v2beta.TokensClient
+	usersClient        users.UsersMgmtClient
+	policiesClient     v2beta.PoliciesClient
+	reportingClient    reporting.ReportingServiceClient
+	applicationsClient applications.ApplicationsServiceClient
 }
 
 // OpenConnection returns a new API client ready to make requests against our public API,
@@ -54,14 +56,15 @@ func OpenConnection(ctx context.Context) (client_type.APIClient, error) {
 	return client{
 		apiClientConn: apiClientConn,
 		// TODO (tc): Add other service clients here as needed.
-		authzClient:     authz.NewAuthorizationClient(apiClientConn),
-		teamsClient:     teams.NewTeamsClient(apiClientConn),
-		teamsV2Client:   v2beta.NewTeamsClient(apiClientConn),
-		tokensClient:    tokens.NewTokensMgmtClient(apiClientConn),
-		tokensV2Client:  v2beta.NewTokensClient(apiClientConn),
-		usersClient:     users.NewUsersMgmtClient(apiClientConn),
-		policiesClient:  v2beta.NewPoliciesClient(apiClientConn),
-		reportingClient: reporting.NewReportingServiceClient(apiClientConn),
+		authzClient:        authz.NewAuthorizationClient(apiClientConn),
+		teamsClient:        teams.NewTeamsClient(apiClientConn),
+		teamsV2Client:      v2beta.NewTeamsClient(apiClientConn),
+		tokensClient:       tokens.NewTokensMgmtClient(apiClientConn),
+		tokensV2Client:     v2beta.NewTokensClient(apiClientConn),
+		usersClient:        users.NewUsersMgmtClient(apiClientConn),
+		policiesClient:     v2beta.NewPoliciesClient(apiClientConn),
+		reportingClient:    reporting.NewReportingServiceClient(apiClientConn),
+		applicationsClient: applications.NewApplicationsServiceClient(apiClientConn),
 	}, nil
 }
 
@@ -95,6 +98,10 @@ func (c client) PoliciesClient() v2beta.PoliciesClient {
 
 func (c client) ReportingClient() reporting.ReportingServiceClient {
 	return c.reportingClient
+}
+
+func (c client) ApplicationsClient() applications.ApplicationsServiceClient {
+	return c.applicationsClient
 }
 
 // CloseConnection cleans up the temporary admin API token and closes all connections opened by client.
