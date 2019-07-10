@@ -1,3 +1,5 @@
+/// <reference types="cypress"/>
+
 describe('team management', () => {
   before(() => {
     cy.adminLogin('/settings/teams').then(() => {
@@ -10,15 +12,17 @@ describe('team management', () => {
     cy.restoreStorage()
   })
   afterEach(() => {
-    cy.saveStorage()
+    cy.saveStorage() 
   }) 
 
   it('lists system teams', () => {
     cy.contains('Create Team')
     cy.get('chef-sidebar')
-      .should('have.attr', 'major-version')
-      .then((version) => {
-        switch (version) {
+      .invoke('attr', 'major-version')
+      .then((obj: Cypress.ObjectLike) => {
+        // Cypress.ObjectLike can't be casted to a string directly, 
+        // so must convert to <any> first
+        switch (<string><any>obj) {
           case 'v2': {
             cy.get('#table-container chef-th').contains('ID')
             cy.get('#table-container chef-th').contains('Name')
