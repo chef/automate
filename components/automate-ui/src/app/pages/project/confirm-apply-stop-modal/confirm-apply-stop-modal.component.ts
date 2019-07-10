@@ -9,6 +9,8 @@ import * as moment from 'moment';
 })
 export class ConfirmApplyStopModalComponent implements OnChanges {
 
+  @Input() visible = false;
+
   @Input() applyRulesStatus: ApplyRulesStatus;
 
   @Output() confirm: EventEmitter<void> = new EventEmitter();

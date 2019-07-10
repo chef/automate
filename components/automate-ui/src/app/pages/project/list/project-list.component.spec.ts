@@ -48,11 +48,12 @@ describe('ProjectListComponent', () => {
         }),
         MockComponent({
           selector: 'app-confirm-apply-start-modal',
+          inputs: ['visible'],
           outputs: ['confirm', 'cancel']
         }),
         MockComponent({
           selector: 'app-confirm-apply-stop-modal',
-          inputs: ['applyRulesStatus'],
+          inputs: ['visible', 'applyRulesStatus'],
           outputs: ['confirm', 'cancel']
         }),
         MockComponent({ selector: 'chef-control-menu' }),
@@ -269,8 +270,6 @@ describe('ProjectListComponent', () => {
       component.cancelApplyStart();
       fixture.detectChanges();
 
-      const modal = fixture.nativeElement.querySelector('app-confirm-apply-start-modal');
-      expect(modal).toBeNull();
       expect(component.confirmApplyStartModalVisible).toEqual(false);
     });
   });
@@ -286,8 +285,6 @@ describe('ProjectListComponent', () => {
       component.confirmApplyStart();
       fixture.detectChanges();
 
-      const modal = fixture.nativeElement.querySelector('app-confirm-apply-start-modal');
-      expect(modal).toBeNull();
       expect(component.confirmApplyStartModalVisible).toEqual(false);
     });
 
@@ -307,8 +304,6 @@ describe('ProjectListComponent', () => {
       component.cancelApplyStop();
       fixture.detectChanges();
 
-      const modal = fixture.nativeElement.querySelector('app-confirm-apply-stop-modal');
-      expect(modal).toBeNull();
       expect(component.confirmApplyStopModalVisible).toEqual(false);
     });
   });
@@ -324,8 +319,6 @@ describe('ProjectListComponent', () => {
       component.confirmApplyStop();
       fixture.detectChanges();
 
-      const modal = fixture.nativeElement.querySelector('app-confirm-apply-stop-modal');
-      expect(modal).toBeNull();
       expect(component.confirmApplyStopModalVisible).toEqual(false);
     });
 

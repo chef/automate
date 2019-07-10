@@ -99,13 +99,13 @@
     </app-delete-object-modal>
 
     <app-confirm-apply-start-modal
-      *ngIf="confirmApplyStartModalVisible"
+      [visible]="confirmApplyStartModalVisible"
       (confirm)="confirmApplyStart()"
       (cancel)="cancelApplyStart()">
     </app-confirm-apply-start-modal>
 
     <app-confirm-apply-stop-modal
-      *ngIf="confirmApplyStopModalVisible"
+      [visible]="confirmApplyStopModalVisible"
       [applyRulesStatus]="projects.applyRulesStatus$ | async"
       (confirm)="confirmApplyStop()"
       (cancel)="cancelApplyStop()">
