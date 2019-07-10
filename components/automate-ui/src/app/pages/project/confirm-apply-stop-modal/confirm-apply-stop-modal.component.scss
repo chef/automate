@@ -1,0 +1,19 @@
+:host {
+  display: block;
+  text-align: center;
+
+  [slot=title] {
+    font-weight: bold;
+    margin-top: 1em;
+    padding-bottom: 12px;
+  }
+
+  .modal-content {
+    margin: auto;
+    width: 70%;
+
+    .options {
+      margin-top: 30px;
+    }
+  }
+}

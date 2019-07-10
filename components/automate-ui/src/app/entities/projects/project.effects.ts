@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { of as observableOf } from 'rxjs';
-import { catchError, mergeMap, map, filter } from 'rxjs/operators';
+import { interval as observableInterval, of as observableOf } from 'rxjs';
+import { catchError, mergeMap, map, filter, switchMap } from 'rxjs/operators';
 
 import { HttpStatus } from 'app/types/types';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
@@ -24,6 +24,15 @@ import {
   UpdateProject,
   UpdateProjectFailure,
   UpdateProjectSuccess,
+  ApplyRulesStart,
+  ApplyRulesStartSuccess,
+  ApplyRulesStartFailure,
+  ApplyRulesStop,
+  ApplyRulesStopSuccess,
+  ApplyRulesStopFailure,
+  GetApplyRulesStatus,
+  GetApplyRulesStatusSuccess,
+  GetApplyRulesStatusFailure,
   ProjectSuccessPayload,
   ProjectActionTypes
 } from './project.actions';
@@ -31,6 +40,8 @@ import {
 import {
   ProjectRequests
 } from './project.requests';
+
+const POLLING_INTERVAL_IN_SECONDS = 5;
 
 @Injectable()
 export class ProjectEffects {
@@ -151,5 +162,41 @@ export class ProjectEffects {
           message: `Could not update project: ${msg || payload.error}`
         });
       }));
+
+  @Effect()
+  applyRulesStart$ = this.actions$.pipe(
+    ofType<ApplyRulesStart>(ProjectActionTypes.APPLY_RULES_START),
+    mergeMap(() =>
+      this.requests.applyRulesStart().pipe(
+        switchMap(() => [
+          new ApplyRulesStartSuccess(),
+          new GetApplyRulesStatus()
+        ]),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new ApplyRulesStartFailure(error))))));
+
+  @Effect()
+  applyRulesStop$ = this.actions$.pipe(
+    ofType<ApplyRulesStop>(ProjectActionTypes.APPLY_RULES_STOP),
+    mergeMap(() =>
+      this.requests.applyRulesStop().pipe(
+        switchMap(() => [
+          new ApplyRulesStopSuccess(),
+          new GetApplyRulesStatus()
+        ]),
+        catchError((error: HttpErrorResponse) => observableOf(new ApplyRulesStopFailure(error))))));
+
+  @Effect()
+  getApplyRulesStatus$ = this.actions$.pipe(
+    ofType<GetApplyRulesStatus>(ProjectActionTypes.GET_APPLY_RULES_STATUS),
+    mergeMap(() =>
+      this.requests.getApplyRulesStatus().pipe(
+        map((resp) => new GetApplyRulesStatusSuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new GetApplyRulesStatusFailure(error))))));
+
+  @Effect()
+  getLatestApplyRulesStatus$ = observableInterval(1000 * POLLING_INTERVAL_IN_SECONDS)
+    .pipe(map(() => new GetApplyRulesStatus()));
 }
 

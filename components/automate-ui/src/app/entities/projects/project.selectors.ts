@@ -31,7 +31,6 @@ export const createError = createSelector(
   (state) => state.createError
 );
 
-
 export const updateStatus = createSelector(
   projectState,
   (state) => state.updateStatus
@@ -41,4 +40,8 @@ export const projectFromRoute = createSelector(
   projectEntities,
   routeParams,
   (state, { id }) => state[id]
+);
+
+export const applyRulesStatus = createSelector(
+  projectState, state => state.applyRulesStatus
 );

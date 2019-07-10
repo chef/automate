@@ -1,10 +1,23 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { HttpErrorResponse } from '@angular/common/http';
-import { set, pipe, unset } from 'lodash/fp';
+import { set, pipe, unset, mapKeys, camelCase } from 'lodash/fp';
 
 import { EntityStatus } from 'app/entities/entities';
 import { ProjectActionTypes, ProjectActions } from './project.actions';
 import { Project } from './project.model';
+
+export enum ApplyRulesStatusState {
+  Running = 'running',
+  NotRunning = 'not_running'
+}
+
+export interface ApplyRulesStatus {
+  state: ApplyRulesStatusState;
+  estimatedTimeComplete: string;
+  percentageComplete: number;
+  failed: boolean;
+  failureMessage: string;
+}
 
 export interface ProjectEntityState extends EntityState<Project> {
   getAllStatus: EntityStatus;
@@ -13,6 +26,7 @@ export interface ProjectEntityState extends EntityState<Project> {
   createError: HttpErrorResponse;
   updateStatus: EntityStatus;
   deleteStatus: EntityStatus;
+  applyRulesStatus: ApplyRulesStatus;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
@@ -21,8 +35,17 @@ const CREATE_STATUS = 'createStatus';
 const CREATE_ERROR = 'createError';
 const DELETE_STATUS = 'deleteStatus';
 const UPDATE_STATUS = 'updateStatus';
+const APPLY_RULES_STATUS = 'applyRulesStatus';
 
 export const projectEntityAdapter: EntityAdapter<Project> = createEntityAdapter<Project>();
+
+const initialApplyRulesStatus: ApplyRulesStatus = {
+  state: ApplyRulesStatusState.NotRunning,
+  estimatedTimeComplete: '0001-01-01T00:00:00Z',
+  percentageComplete: 0,
+  failed: false,
+  failureMessage: ''
+};
 
 export const ProjectEntityInitialState: ProjectEntityState = projectEntityAdapter.getInitialState({
   getAllStatus: EntityStatus.notLoaded,
@@ -30,7 +53,8 @@ export const ProjectEntityInitialState: ProjectEntityState = projectEntityAdapte
   createStatus: EntityStatus.notLoaded,
   createError: null,
   deleteStatus: EntityStatus.notLoaded,
-  updateStatus: EntityStatus.notLoaded
+  updateStatus: EntityStatus.notLoaded,
+  applyRulesStatus: initialApplyRulesStatus
 });
 
 export function projectEntityReducer(
@@ -95,6 +119,9 @@ export function projectEntityReducer(
 
     case ProjectActionTypes.UPDATE_FAILURE:
       return set(UPDATE_STATUS, EntityStatus.loadingFailure, state);
+
+    case ProjectActionTypes.GET_APPLY_RULES_STATUS_SUCCESS:
+      return set(APPLY_RULES_STATUS, mapKeys(key => camelCase(key), action.payload), state);
 
     default:
       return state;

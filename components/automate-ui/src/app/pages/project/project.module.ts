@@ -7,11 +7,19 @@ import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { ChefComponentsModule } from 'app/components/chef-components.module';
 import { ProjectDetailsComponent } from './details/project-details.component';
 import { ProjectListComponent } from './list/project-list.component';
+import {
+  ConfirmApplyStartModalComponent
+} from './confirm-apply-start-modal/confirm-apply-start-modal.component';
+import {
+  ConfirmApplyStopModalComponent
+} from './confirm-apply-stop-modal/confirm-apply-stop-modal.component';
 
 @NgModule({
   declarations: [
     ProjectDetailsComponent,
-    ProjectListComponent
+    ProjectListComponent,
+    ConfirmApplyStartModalComponent,
+    ConfirmApplyStopModalComponent
   ],
   imports: [
     AppRoutingModule,
