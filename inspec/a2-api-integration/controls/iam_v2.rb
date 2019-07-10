@@ -102,6 +102,28 @@ EOF
       expect(resp.http_status).to eq 200
     end
 
+    # Note: all endpoints provided by grpc-gateway satisfy this. We're using
+    # this specific test case as a canary.
+    it "returns an error if there's superfluous data in the request body" do
+      id = "inspec-test-policy-0-#{Time.now.utc.to_i}"
+      resp = automate_api_request("/apis/iam/v2beta/policies",
+        http_method: 'POST',
+        request_body: {
+          id: id,
+          foo: 'bar', # <--- that's the unknown field
+          name: 'Name',
+          members: ["user:local:member"],
+          statements: [
+            {
+              effect: "DENY",
+              role: "test"
+            },
+          ]
+        }.to_json()
+      )
+      expect(resp.http_status).to eq 400
+    end
+
     it "CREATE and DELETE policy properly respond to happy path inputs" do
       resp = automate_api_request("/apis/iam/v2beta/policies")
       expect(resp.http_status).to eq 200

@@ -331,6 +331,10 @@ func muxFromRegisterMap(grpcURI string, dopts []grpc.DialOption, localEndpoints 
 	gwmux := runtime.NewServeMux(opts...)
 	ctx := context.Background()
 
+	// Don't just ignore request JSON fields we cannot map to protobuf message
+	// fields.
+	runtime.DisallowUnknownFields()
+
 	// register each endpoint with runtime.ServeMux
 	for ep, register := range localEndpoints {
 		log.Infof("Register %s to REST Gateway %s", ep, grpcURI)
