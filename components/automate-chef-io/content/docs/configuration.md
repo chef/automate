@@ -604,6 +604,18 @@ Note that no data will be migrated from the built-in Elasticsearch service; ther
 [global.v1.external.elasticsearch]
   enable = true
   nodes = ["http://elastic1.example:9200", "http://elastic2.example:9200", "..." ]
+
+# Uncomment and fill out if using external elasticsearch with SSL and/or basic auth
+# [global.v1.external.elasticsearch.auth]
+#   scheme = "basic_auth"
+# [global.v1.external.elasticsearch.basic_auth]
+#   username = "<admin username>"
+#   password = "<admin password>"
+# [global.v1.external.elasticsearch.ssl]
+#  Specify either a root_cert or a root_cert_file
+#  root_cert = """$(cat </path/to/cert_file.crt>)"""
+#  root_cert_file = "</path/to/cert/file>"
+#  server_name = "<elasticsearch server name>"
 ```
 
 When using external Elasticsearch, Elasticsearch nodes will not have access to Automate's built-in backup storage services, so you must configure Elasticsearch backup settings separately from Automate's primary backup settings.
@@ -696,6 +708,37 @@ Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your c
 # level = "ERROR"
 [postgresql.v1.sys.superuser]
 # name = "automate"
+```
+
+#### Configuring An External PostgreSQL Database
+To use Chef Automate with an external PostgreSQL cluster, create a `.toml` file containing the following partial configuration.
+Uncomment and change settings as needed, then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
+
+Note that no data will be migrated from the built-in PostgreSQL service; therefore, this operation should only be performed on new Chef Automate deployments. If you would like to migrate an existing Chef Automate deployment to an external cluster, please contact support.
+
+```toml
+[global.v1.external.postgresql]
+enable = true
+nodes = ["<pghostname1>:<port1>", "<pghostname2>:<port2>", "..."]
+
+# To use postgres with SSL, uncomment and fill out the following:
+# [global.v1.external.postgresql.ssl]
+# enable = true
+# root_cert = """$(cat </path/to/root/cert.pem>)"""
+
+[global.v1.external.postgresql.auth]
+scheme = "password"
+
+[global.v1.external.postgresql.auth.password.superuser]
+username = "<admin username>"
+password = "<admin password>"
+[global.v1.external.postgresql.auth.password.dbuser]
+username = "<dbuser username>"
+password = "<dbuser password>"
+
+[global.v1.external.postgresql.backup]
+enable = true
+
 ```
 
 #### Load Balancer
