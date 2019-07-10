@@ -5,18 +5,19 @@ import (
 	"strings"
 	"time"
 
-	"github.com/chef/automate/api/external/applications"
-	"github.com/chef/automate/api/external/habitat"
-	"github.com/chef/automate/components/applications-service/pkg/storage"
+	dblib "github.com/chef/automate/lib/db"
+
 	"github.com/go-gorp/gorp"
 	"github.com/golang/protobuf/ptypes"
+	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
-
-	dblib "github.com/chef/automate/lib/db"
-	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/api/external/applications"
+	"github.com/chef/automate/api/external/habitat"
+	"github.com/chef/automate/components/applications-service/pkg/storage"
 )
 
 const (
