@@ -39,7 +39,7 @@ sync_swagger_files: clean_swagger_files
 $(SWAGGER_RESULT_FILE): $(SWAGGER_FILES)
 
 generate_swagger: $(SWAGGER_RESULT_FILE)
-	swagger mixin -c=$(EXPECTED_CONFLICTS) $(SWAGGER_FILES) > $(SWAGGER_RESULT_FILE) 2> /dev/null
+	swagger mixin --quiet -c=$(EXPECTED_CONFLICTS) $(SWAGGER_FILES) > $(SWAGGER_RESULT_FILE)
 
 serve: sync generate_swagger
 	hugo server --buildDrafts --noHTTPCache
