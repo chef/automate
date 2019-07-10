@@ -114,8 +114,7 @@ CREATE TABLE cereal_tasks (
     start_after   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     task_name     TEXT NOT NULL,
     parameters    BYTEA,
-    task_state    cereal_task_state NOT NULL DEFAULT 'queued',
-    writeback_token TEXT NOT NULL
+    task_state    cereal_task_state NOT NULL DEFAULT 'queued'
 );
 
 CREATE TABLE cereal_task_results (
@@ -259,18 +258,17 @@ $$;
 -- Task Functions
 CREATE OR REPLACE FUNCTION cereal_enqueue_task(
     _workflow_instance_id BIGINT,
-    _writeback_token TEXT,
     _start_after TIMESTAMPTZ,
     _task_name TEXT,
     _parameters BYTEA)
 RETURNS VOID
 AS $$
-    INSERT INTO cereal_tasks(workflow_instance_id, writeback_token, start_after, task_name, parameters)
-        VALUES(_workflow_instance_id, _writeback_token, _start_after, _task_name, _parameters);
+    INSERT INTO cereal_tasks(workflow_instance_id, start_after, task_name, parameters)
+        VALUES(_workflow_instance_id, _start_after, _task_name, _parameters);
 $$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION cereal_dequeue_task(_task_name TEXT)
-RETURNS TABLE(id BIGINT, workflow_instance_id BIGINT, writeback_token TEXT, parameters BYTEA)
+RETURNS TABLE(id BIGINT, workflow_instance_id BIGINT, parameters BYTEA)
 AS $$
 DECLARE
     r cereal_tasks%rowtype;
@@ -284,32 +282,31 @@ BEGIN
 
         id := r.id;
         workflow_instance_id := r.workflow_instance_id;
-        writeback_token := r.writeback_token;
         parameters := r.parameters;
         RETURN NEXT;
     END LOOP;
 END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION cereal_ping_task(_task_id BIGINT, _writeback_token TEXT)
+CREATE OR REPLACE FUNCTION cereal_ping_task(_task_id BIGINT)
 RETURNS VOID
 AS $$
 BEGIN
-    UPDATE cereal_taks SET updated_at = NOW() WHERE id = _task_id AND writeback_token = _writeback_token;
+    UPDATE cereal_task SET updated_at = NOW() WHERE id = _task_id;
     IF NOT FOUND THEN
-        RAISE check_violation USING MESSAGE = 'Failed to update task: writeback_token changed';
+        RAISE check_violation USING MESSAGE = 'Failed to update task: no such task_id';
     END IF;
 END
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION cereal_expire_tasks(_task_timeout_seconds BIGINT)
-RETURNS TABLE(tid BIGINT, workflow_instance_id BIGINT, writeback_token TEXT)
+RETURNS TABLE(tid BIGINT, workflow_instance_id BIGINT)
 AS $$
 DECLARE
     t cereal_tasks%rowtype;
 BEGIN
     FOR t IN
-        SELECT * 
+        SELECT *
         FROM cereal_tasks
         WHERE
             task_state = 'running' AND
@@ -326,14 +323,13 @@ BEGIN
 
         tid := t.id;
         workflow_instance_id := t.workflow_instance_id;
-        writeback_token := t.writeback_token;
 
         RETURN NEXT;
     END LOOP;
 END
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION cereal_complete_task(_tid BIGINT, _writeback_token TEXT, _status cereal_task_status, _error text, _result BYTEA)
+CREATE OR REPLACE FUNCTION cereal_complete_task(_tid BIGINT, _status cereal_task_status, _error text, _result BYTEA)
 RETURNS SETOF BIGINT
 LANGUAGE plpgsql
 AS $$
@@ -341,7 +337,7 @@ DECLARE
     t cereal_tasks%rowtype;
 BEGIN
     FOR t IN
-         SELECT * FROM cereal_tasks WHERE id = _tid AND writeback_token = _writeback_token FOR UPDATE
+         SELECT * FROM cereal_tasks WHERE id = _tid FOR UPDATE
     LOOP
         INSERT INTO cereal_task_results(workflow_instance_id, parameters, task_name, enqueued_at, status, error, result)
         VALUES(t.workflow_instance_id, t.parameters, t.task_name, t.enqueued_at, _status, _error, _result);
@@ -354,7 +350,7 @@ BEGIN
         RETURN NEXT t.id;
     END LOOP;
     IF NOT FOUND THEN
-        RAISE check_violation USING MESSAGE = 'Failed to update task: writeback_token changed';
+        RAISE check_violation USING MESSAGE = 'Failed to update task: no such task_id';
     END IF;
 END
 $$;

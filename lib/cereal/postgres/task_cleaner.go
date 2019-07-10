@@ -81,8 +81,7 @@ func (w *taskCleaner) expireDeadTasks(ctx context.Context, expireOlderThanSecond
 	for rows.Next() {
 		var tid int64
 		var workflowInstanceID int64
-		var writebackToken string
-		err := rows.Scan(&tid, &workflowInstanceID, &writebackToken)
+		err := rows.Scan(&tid, &workflowInstanceID)
 		if err != nil {
 			return err
 		}
@@ -90,7 +89,6 @@ func (w *taskCleaner) expireDeadTasks(ctx context.Context, expireOlderThanSecond
 			logrus.Fields{
 				"tid":                tid,
 				"workflowInstanceID": workflowInstanceID,
-				"writebackToken":     writebackToken,
 			}).Warnf("Expired task")
 	}
 	return rows.Err()

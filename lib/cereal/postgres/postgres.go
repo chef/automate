@@ -5,8 +5,6 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/chef/automate/lib/uuid4"
-
 	"github.com/golang-migrate/migrate"
 	"github.com/golang-migrate/migrate/database/postgres"
 	"github.com/golang-migrate/migrate/source"
@@ -19,9 +17,9 @@ import (
 )
 
 const (
-	enqueueTaskQuery   = `SELECT cereal_enqueue_task($1, $2, $3, $4, $5)`
+	enqueueTaskQuery   = `SELECT cereal_enqueue_task($1, $2, $3, $4)`
 	dequeueTaskQuery   = `SELECT * FROM cereal_dequeue_task($1)`
-	completeTaskQuery  = `SELECT cereal_complete_task($1, $2, $3, $4, $5)`
+	completeTaskQuery  = `SELECT cereal_complete_task($1, $2, $3, $4)`
 	getTaskResultQuery = `SELECT task_name, parameters, status, error, result FROM cereal_task_results WHERE id = $1`
 
 	enqueueWorkflowQuery  = `SELECT cereal_enqueue_workflow($1, $2, $3)`
@@ -96,8 +94,7 @@ type PostgresBackend struct {
 type PostgresTaskCompleter struct {
 	// tid is the Task's id in our postgresql database.  We need
 	// this to complete the correct task.
-	tid            int64
-	writebackToken string
+	tid int64
 
 	db *sql.DB
 
@@ -615,12 +612,8 @@ func (workc *PostgresWorkflowCompleter) EnqueueTask(task *backend.Task, opts bac
 		opts.StartAfter = time.Now()
 	}
 
-	writebackToken, err := uuid4.NewV4()
-	if err != nil {
-		return err
-	}
-	_, err = workc.enqueueTaskStmt.ExecContext(workc.ctx,
-		workc.wid, writebackToken.String(), opts.StartAfter, task.Name, task.Parameters)
+	_, err := workc.enqueueTaskStmt.ExecContext(workc.ctx,
+		workc.wid, opts.StartAfter, task.Name, task.Parameters)
 	if err != nil {
 		return errors.Wrap(err, "failed to enqueue task")
 	}
@@ -629,22 +622,21 @@ func (workc *PostgresWorkflowCompleter) EnqueueTask(task *backend.Task, opts bac
 	return nil
 }
 
-func (pg *PostgresBackend) dequeueTask(tx *sql.Tx, taskName string) (int64, string, *backend.Task, error) {
+func (pg *PostgresBackend) dequeueTask(tx *sql.Tx, taskName string) (int64, *backend.Task, error) {
 	row := tx.QueryRow(dequeueTaskQuery, taskName)
 	task := &backend.Task{
 		Name: taskName,
 	}
 
 	var tid int64
-	var writebackToken string
-	err := row.Scan(&tid, &task.WorkflowInstanceID, &writebackToken, &task.Parameters)
+	err := row.Scan(&tid, &task.WorkflowInstanceID, &task.Parameters)
 	if err == sql.ErrNoRows {
-		return 0, "", nil, cereal.ErrNoTasks
+		return 0, nil, cereal.ErrNoTasks
 	} else if err != nil {
-		return 0, "", nil, errors.Wrap(err, "failed to dequeue task")
+		return 0, nil, errors.Wrap(err, "failed to dequeue task")
 	}
 
-	return tid, writebackToken, task, nil
+	return tid, task, nil
 }
 
 func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*backend.Task, backend.TaskCompleter, error) {
@@ -656,7 +648,7 @@ func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*b
 		return nil, nil, err
 	}
 
-	tid, writebackToken, task, err := pg.dequeueTask(tx, taskName)
+	tid, task, err := pg.dequeueTask(tx, taskName)
 	if err != nil {
 		if errR := tx.Rollback(); errR != nil {
 			logrus.WithError(err).Warn("failed to rollback dequeue transaction")
@@ -670,15 +662,14 @@ func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*b
 		return nil, nil, err
 	}
 
-	pinger := newTaskPinger(pg.db, tid, writebackToken)
+	pinger := newTaskPinger(pg.db, tid)
 
 	taskc := &PostgresTaskCompleter{
-		db:             pg.db,
-		writebackToken: writebackToken,
-		tid:            tid,
-		ctx:            ctx,
-		cancel:         cancel,
-		pinger:         pinger,
+		db:     pg.db,
+		tid:    tid,
+		ctx:    ctx,
+		cancel: cancel,
+		pinger: pinger,
 	}
 
 	pinger.Start(ctx)
@@ -691,7 +682,7 @@ func (taskc *PostgresTaskCompleter) Fail(errMsg string) error {
 
 	taskc.pinger.Stop()
 
-	_, err := taskc.db.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, taskc.writebackToken, backend.TaskStatusFailed, errMsg, "")
+	_, err := taskc.db.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, backend.TaskStatusFailed, errMsg, "")
 
 	if err != nil {
 		if isErrTaskLost(err) {
@@ -710,7 +701,7 @@ func (taskc *PostgresTaskCompleter) Succeed(results []byte) error {
 
 	taskc.pinger.Stop()
 
-	_, err := taskc.db.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, taskc.writebackToken, backend.TaskStatusSuccess, "", results)
+	_, err := taskc.db.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, backend.TaskStatusSuccess, "", results)
 
 	if err != nil {
 		if isErrTaskLost(err) {

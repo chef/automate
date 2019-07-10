@@ -129,13 +129,13 @@ func TestMultipleTasksCanDequeueConcurrently(t *testing.T) {
 	tx3, err := b3.db.BeginTx(ctx, nil)
 	require.NoError(t, err)
 
-	b1TID, _, _, err := b1.dequeueTask(tx1, taskName)
+	b1TID, _, err := b1.dequeueTask(tx1, taskName)
 	require.NoError(t, err)
 
-	b2TID, _, _, err := b2.dequeueTask(tx2, taskName)
+	b2TID, _, err := b2.dequeueTask(tx2, taskName)
 	require.NoError(t, err)
 
-	_, _, _, err = b3.dequeueTask(tx3, taskName)
+	_, _, err = b3.dequeueTask(tx3, taskName)
 	require.Equal(t, cereal.ErrNoTasks, err)
 
 	assert.NotZero(t, b1TID)
