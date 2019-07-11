@@ -27,7 +27,6 @@ const (
 	completeWorkflowQuery = `SELECT cereal_complete_workflow($1, $2)`
 	failWorkflowQuery     = `SELECT cereal_fail_workflow($1, $2)`
 	continueWorkflowQuery = `SELECT cereal_continue_workflow($1, $2, $3, $4, $5)`
-	abandonWorkflowQuery  = `SELECT cereal_abandon_workflow($1, $2, $3)`
 
 	listScheduledWorkflowsQuery = `
 		WITH res AS
@@ -748,18 +747,6 @@ func (workc *PostgresWorkflowCompleter) Continue(payload []byte) error {
 	}
 
 	return errors.Wrapf(workc.tx.Commit(), "failed to mark workflow event %d as processed", workc.eid)
-}
-
-func (workc *PostgresWorkflowCompleter) Abandon() error {
-	ctx := workc.ctx
-	defer workc.cancel()
-
-	_, err := workc.tx.ExecContext(ctx, abandonWorkflowQuery, workc.wid, workc.eid, workc.completedTaskCount)
-	if err != nil {
-		return errors.Wrapf(err, "failed to mark workflow %d as complete", workc.wid)
-	}
-
-	return errors.Wrapf(workc.tx.Commit(), "failed to mark workflow %d as complete", workc.wid)
 }
 
 func (workc *PostgresWorkflowCompleter) Close() error {

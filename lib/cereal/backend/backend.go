@@ -30,7 +30,6 @@ type WorkflowInstanceStatus string
 
 const (
 	WorkflowInstanceStatusRunning   WorkflowInstanceStatus = "running"
-	WorkflowInstanceStatusAbandoned WorkflowInstanceStatus = "abandoned"
 	WorkflowInstanceStatusCompleted WorkflowInstanceStatus = "completed"
 )
 
@@ -101,7 +100,6 @@ type WorkflowCompleter interface {
 	EnqueueTask(task *Task, opts TaskEnqueueOpts) error
 
 	Continue(payload []byte) error
-	Abandon() error
 	Fail(err error) error
 	Done(result []byte) error
 	Close() error

@@ -4,6 +4,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -566,6 +567,191 @@ func TestTaskPinger(t *testing.T) {
 	require.NoError(t, err, "failed to dequeue workflow")
 	require.Equal(t, backend.TaskComplete, wevt.Type)
 	require.Equal(t, backend.TaskStatusSuccess, wevt.TaskResult.Status)
+}
+
+func TestTaskCompleteWithPendingTasks(t *testing.T) {
+	taskName := "task_name"
+	workflowName := "workflow_name"
+	err := runResetDB()
+	require.NoError(t, err)
+	b1 := NewPostgresBackend(testDBURL())
+	err = b1.Init()
+	require.NoError(t, err)
+	defer b1.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: "workflow-instance",
+		WorkflowName: workflowName,
+	})
+
+	require.NoError(t, err, "failed to enqueue workflow")
+
+	_, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{})
+	completer.Continue(nil)
+
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{})
+	completer.Continue(nil)
+
+	_, taskCompleter, err := b1.DequeueTask(ctx, taskName)
+	require.NoError(t, err)
+	taskCompleter.Succeed(nil)
+
+	wevt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+	require.Equal(t, backend.TaskComplete, wevt.Type)
+	require.Equal(t, backend.TaskStatusSuccess, wevt.TaskResult.Status)
+
+	err = completer.Done(nil)
+	require.NoError(t, err)
+
+	_, _, err = b1.DequeueTask(ctx, taskName)
+	require.Error(t, cereal.ErrNoTasks)
+
+	_, _, err = b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.Equal(t, cereal.ErrNoWorkflowInstances, err)
+
+	assertNoPendingWork(t, b1)
+}
+
+func TestWorkflowCompleteWithCompletingTask(t *testing.T) {
+	taskName := "task_name"
+	workflowName := "workflow_name"
+	err := runResetDB()
+	require.NoError(t, err)
+	b1 := NewPostgresBackend(testDBURL())
+	err = b1.Init()
+	require.NoError(t, err)
+	defer b1.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: "workflow-instance",
+		WorkflowName: workflowName,
+	})
+
+	require.NoError(t, err, "failed to enqueue workflow")
+
+	_, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{})
+
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{})
+	completer.Continue(nil)
+
+	_, taskCompleter, err := b1.DequeueTask(ctx, taskName)
+	require.NoError(t, err)
+	taskCompleter.Succeed(nil)
+
+	_, taskCompleter, err = b1.DequeueTask(ctx, taskName)
+	require.NoError(t, err)
+
+	wevt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+	require.Equal(t, backend.TaskComplete, wevt.Type)
+	require.Equal(t, backend.TaskStatusSuccess, wevt.TaskResult.Status)
+
+	err = taskCompleter.Succeed(nil)
+	require.NoError(t, err)
+
+	err = completer.Done(nil)
+	require.NoError(t, err)
+
+	_, _, err = b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.Equal(t, cereal.ErrNoWorkflowInstances, err)
+
+	assertNoPendingWork(t, b1)
+}
+
+func TestWorkflowCompleteWithUnprocessedTask(t *testing.T) {
+	taskName := "task_name"
+	workflowName := "workflow_name"
+	err := runResetDB()
+	require.NoError(t, err)
+	b1 := NewPostgresBackend(testDBURL())
+	err = b1.Init()
+	require.NoError(t, err)
+	defer b1.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: "workflow-instance",
+		WorkflowName: workflowName,
+	})
+
+	require.NoError(t, err, "failed to enqueue workflow")
+
+	_, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{})
+
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{})
+	completer.Continue(nil)
+
+	_, taskCompleter, err := b1.DequeueTask(ctx, taskName)
+	require.NoError(t, err)
+	err = taskCompleter.Succeed(nil)
+	require.NoError(t, err)
+
+	_, taskCompleter, err = b1.DequeueTask(ctx, taskName)
+	require.NoError(t, err)
+	err = taskCompleter.Succeed(nil)
+	require.NoError(t, err)
+
+	wevt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+	require.Equal(t, backend.TaskComplete, wevt.Type)
+	require.Equal(t, backend.TaskStatusSuccess, wevt.TaskResult.Status)
+
+	err = completer.Done(nil)
+	require.NoError(t, err)
+
+	_, _, err = b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.Equal(t, cereal.ErrNoWorkflowInstances, err)
+
+	assertNoPendingWork(t, b1)
+}
+
+func assertNoPendingWork(t *testing.T, b *PostgresBackend) {
+	t.Helper()
+
+	tables := []string{
+		"cereal_tasks",
+		"cereal_workflow_events",
+		"cereal_workflow_instances",
+		"cereal_task_results",
+	}
+	for _, table := range tables {
+		rows := b.db.QueryRow(fmt.Sprintf("SELECT count(*) from %s;", table))
+		var count int64
+		err := rows.Scan(&count)
+		require.NoError(t, err, "failed to get count for %s", table)
+		require.Zero(t, count, "table %s has unexpected entries", table)
+	}
+
 }
 
 func init() {

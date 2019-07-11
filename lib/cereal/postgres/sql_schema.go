@@ -64,7 +64,7 @@ AS $$
     UPDATE cereal_workflow_schedules SET enabled = _enabled WHERE id = _id;
 $$ LANGUAGE SQL;
 
-CREATE TYPE cereal_workflow_instance_status AS ENUM('running', 'abandoned');
+CREATE TYPE cereal_workflow_instance_status AS ENUM('running');
 
 CREATE TABLE cereal_workflow_instances (
     id BIGSERIAL PRIMARY KEY,
@@ -196,26 +196,6 @@ RETURNS VOID
 AS $$
     INSERT INTO cereal_workflow_events(event_type, workflow_instance_id)
         VALUES('cancel', _workflow_instance_id);
-$$ LANGUAGE SQL;
-
--- TODO(jaym): This function looks wrong now
-CREATE OR REPLACE FUNCTION cereal_abandon_workflow(_workflow_instance_id BIGINT, _eid BIGINT, _completed_tasks INTEGER)
-RETURNS VOID
-AS $$
-    WITH unclaimed_tasks AS (
-        SELECT id FROM cereal_tasks
-        WHERE workflow_instance_id = _workflow_instance_id
-        FOR UPDATE SKIP LOCKED
-    ), deleted_tasks AS (
-        DELETE FROM cereal_tasks WHERE id IN (SELECT id from unclaimed_tasks)
-    )
-    UPDATE cereal_workflow_instances w1 SET updated_at = NOW(), status = 'abandoned',
-        completed_tasks = _completed_tasks + (select count(*) from unclaimed_tasks);
-
-    DELETE FROM cereal_workflow_events WHERE id = _eid;
-
-    INSERT INTO cereal_workflow_events(event_type, workflow_instance_id)
-        VALUES('tasks_abandoned', _workflow_instance_id);
 $$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION cereal_complete_workflow(_wid BIGINT, _result BYTEA)
