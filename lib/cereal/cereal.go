@@ -14,7 +14,6 @@ import (
 	rrule "github.com/teambition/rrule-go"
 
 	"github.com/chef/automate/lib/cereal/backend"
-	"github.com/chef/automate/lib/uuid4"
 )
 
 var (
@@ -590,11 +589,7 @@ func (m *Manager) startTaskExecutors(ctx context.Context) error {
 		}
 
 		for i := 0; i < workerCount; i++ {
-			workerID, err := uuid4.New()
-			if err != nil {
-				return errors.Wrap(err, "could not generate worker id")
-			}
-			go m.RunTaskExecutor(ctx, taskName, i, workerID, exec.opts.Timeout, exec.executor)
+			go m.RunTaskExecutor(ctx, taskName, i, exec.opts.Timeout, exec.executor)
 		}
 	}
 	return nil
@@ -602,16 +597,18 @@ func (m *Manager) startTaskExecutors(ctx context.Context) error {
 
 // TODO(ssd) 2019-05-10: Why does Task need the WorkflowInstanceID?
 // TODO(jaym): should this be private?
-func (m *Manager) RunTaskExecutor(ctx context.Context, taskName string, workerIdx int, workerID uuid4.UUID, timeout time.Duration, exec TaskExecutor) {
-	workerName := fmt.Sprintf("%s/%d/%s", taskName, workerIdx, workerID)
-	logrus.Infof("starting task executor %s", workerName)
+func (m *Manager) RunTaskExecutor(ctx context.Context, taskName string, workerIdx int, timeout time.Duration, exec TaskExecutor) {
+	logctx := logrus.WithFields(logrus.Fields{
+		"worker_name": fmt.Sprintf("%s/%d", taskName, workerIdx),
+	})
+	logctx.Info("Starting task executor")
 	m.wg.Add(1)
 
 LOOP:
 	for {
 		select {
 		case <-ctx.Done():
-			logrus.Infof("exiting task executor %s", workerName)
+			logctx.Info("exiting task executor")
 			break LOOP
 		default:
 		}
@@ -622,11 +619,11 @@ LOOP:
 				// TODO(ssd) 2019-05-10: Once we have notifications we can probably sleep longer
 				time.Sleep(1 * time.Second)
 			} else {
-				logrus.WithError(err).Error("failed to dequeue task")
+				logctx.WithError(err).Error("failed to dequeue task")
 			}
 			continue
 		}
-		logrus.Debugf("Dequeued task %s", t.Name)
+		logctx.Debugf("Dequeued task %s", t.Name)
 
 		var runCtx context.Context
 		var cancel context.CancelFunc
@@ -640,12 +637,12 @@ LOOP:
 		if err != nil {
 			err := taskCompleter.Fail(err.Error())
 			if err != nil {
-				logrus.WithError(err).Error("failed to mark task as failed")
+				logctx.WithError(err).Error("failed to mark task as failed")
 			}
 		} else {
 			jsonResults, err := jsonify(result)
 			if err != nil {
-				logrus.WithError(err).Error("could not convert returned results to JSON")
+				logctx.WithError(err).Error("could not convert returned results to JSON")
 				if err := taskCompleter.Fail(err.Error()); err != nil {
 					logrus.WithError(err).Error("Failed to fail task completer")
 				}
