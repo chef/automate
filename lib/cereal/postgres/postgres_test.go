@@ -79,6 +79,53 @@ func TestNoAvailableTasks(t *testing.T) {
 	require.Equal(t, cereal.ErrNoTasks, err)
 }
 
+func TestEnqueueWorkflowInstanceNameUnique(t *testing.T) {
+	workflowName := "workflow_name"
+	err := runResetDB()
+	require.NoError(t, err)
+	b1 := NewPostgresBackend(testDBURL())
+	err = b1.Init()
+	require.NoError(t, err)
+	defer b1.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: "workflow-instance",
+		WorkflowName: workflowName,
+	})
+
+	require.NoError(t, err, "failed to enqueue workflow")
+
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: "workflow-instance",
+		WorkflowName: workflowName,
+	})
+
+	require.Error(t, cereal.ErrWorkflowInstanceExists, err)
+
+	_, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+
+	err = completer.Done(nil)
+	require.NoError(t, err)
+
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: "workflow-instance",
+		WorkflowName: workflowName,
+	})
+
+	require.NoError(t, err, "failed to enqueue workflow")
+
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: "workflow-instance1",
+		WorkflowName: workflowName,
+	})
+
+	require.NoError(t, err, "failed to enqueue workflow")
+}
+
 func TestMultipleTasksCanDequeueConcurrently(t *testing.T) {
 	taskName := "task_name"
 	workflowName := "workflow_name"
@@ -159,10 +206,51 @@ func TestTaskComplete(t *testing.T) {
 	require.NoError(t, err)
 	defer b1.Close()
 
-	b2 := NewPostgresBackend(testDBURL())
-	err = b2.Init()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: "workflow-instance",
+		WorkflowName: workflowName,
+	})
+
+	require.NoError(t, err, "failed to enqueue workflow")
+
+	_, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{})
+	completer.Continue(nil)
+
+	_, taskCompleter, err := b1.DequeueTask(ctx, taskName)
 	require.NoError(t, err)
-	defer b2.Close()
+	taskCompleter.Succeed([]byte("foo"))
+
+	wevt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+	require.Equal(t, backend.TaskComplete, wevt.Type)
+	require.Equal(t, backend.TaskStatusSuccess, wevt.TaskResult.Status)
+	require.Equal(t, []byte("foo"), wevt.TaskResult.Result)
+	require.Equal(t, "", wevt.TaskResult.ErrorText)
+
+	err = completer.Done(nil)
+	require.NoError(t, err)
+
+	_, _, err = b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.Equal(t, cereal.ErrNoWorkflowInstances, err)
+}
+
+func TestTaskFail(t *testing.T) {
+	taskName := "task_name"
+	workflowName := "workflow_name"
+	err := runResetDB()
+	require.NoError(t, err)
+	b1 := NewPostgresBackend(testDBURL())
+	err = b1.Init()
+	require.NoError(t, err)
+	defer b1.Close()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -184,7 +272,87 @@ func TestTaskComplete(t *testing.T) {
 
 	_, taskCompleter, err := b1.DequeueTask(ctx, taskName)
 	require.NoError(t, err)
-	taskCompleter.Succeed(nil)
+	taskCompleter.Fail("foo")
+
+	wevt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+	require.Equal(t, backend.TaskComplete, wevt.Type)
+	require.Equal(t, backend.TaskStatusFailed, wevt.TaskResult.Status)
+	require.Empty(t, wevt.TaskResult.Result)
+	require.Equal(t, "foo", wevt.TaskResult.ErrorText)
+
+	err = completer.Done(nil)
+	require.NoError(t, err)
+
+	_, _, err = b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.Equal(t, cereal.ErrNoWorkflowInstances, err)
+}
+
+func TestWorkflowsRerun(t *testing.T) {
+	taskName := "task_name"
+	workflowName := "workflow_name"
+	err := runResetDB()
+	require.NoError(t, err)
+	b1 := NewPostgresBackend(testDBURL())
+	err = b1.Init()
+	require.NoError(t, err)
+	defer b1.Close()
+
+	b2 := NewPostgresBackend(testDBURL())
+	err = b2.Init()
+	require.NoError(t, err)
+	defer b2.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: "workflow-instance",
+		WorkflowName: workflowName,
+	})
+	require.NoError(t, err, "failed to enqueue workflow")
+
+	_, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{})
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{})
+	completer.Continue(nil)
+
+	_, taskCompleter, err := b1.DequeueTask(ctx, taskName)
+	require.NoError(t, err)
+	taskCompleter.Succeed([]byte("foo"))
+
+	wevt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+	require.Equal(t, backend.TaskComplete, wevt.Type)
+	require.Equal(t, backend.TaskStatusSuccess, wevt.TaskResult.Status)
+	require.Equal(t, 1, wevt.CompletedTaskCount)
+	require.Equal(t, 2, wevt.EnqueuedTaskCount)
+	require.Equal(t, []byte("foo"), wevt.TaskResult.Result)
+	require.Equal(t, "", wevt.TaskResult.ErrorText)
+
+	err = completer.Close()
+	require.NoError(t, err)
+
+	wevt, completer, err = b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+	require.Equal(t, backend.TaskComplete, wevt.Type)
+	require.Equal(t, backend.TaskStatusSuccess, wevt.TaskResult.Status)
+	require.Equal(t, 1, wevt.CompletedTaskCount)
+	require.Equal(t, 2, wevt.EnqueuedTaskCount)
+	require.Equal(t, []byte("foo"), wevt.TaskResult.Result)
+	require.Equal(t, "", wevt.TaskResult.ErrorText)
+
+	err = completer.Done(nil)
+	require.NoError(t, err)
+
+	_, _, err = b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.Equal(t, cereal.ErrNoWorkflowInstances, err)
 }
 
 func TestLostWorkOnTaskSuccess(t *testing.T) {
