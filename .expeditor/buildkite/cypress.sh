@@ -18,5 +18,5 @@ do
   export CYPRESS_RECORD_KEY="$CYPRESS_RECORD_KEY"
 
   npm install # get dependencies defined in e2e/package.json
-  cypress run --record
+  npm run cypress:run --record
 done

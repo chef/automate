@@ -42,7 +42,7 @@ do_test_deploy() {
     export CYPRESS_BASE_URL="https://$CONTAINER_HOSTNAME"
 
     npm install # get dependencies defined in e2e/package.json
-    if ! cypress run; then
+    if ! npm run cypress:run; then
         buildkite-agent artifact upload "cypress/videos/*;cypress/videos/**/*;cypress/screenshots/*;cypress/screenshots/**/*"
         return 1
     fi
