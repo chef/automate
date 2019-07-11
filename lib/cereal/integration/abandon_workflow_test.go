@@ -48,7 +48,7 @@ func (suite *CerealTestSuite) TestCompleteWorkflowWithPendingWorkflowEvents() {
 	err := m.EnqueueWorkflow(context.Background(), workflowName, instanceName, nil)
 	suite.Require().NoError(err, "Failed to enqueue workflow")
 	wgTask.Wait()
-	time.Sleep(5 * time.Second) // Sleep a little to make sure task complete doesn't get called multiple times
+	time.Sleep(2 * time.Second) // Sleep a little to make sure task complete doesn't get called multiple times
 	err = m.Stop()
 	suite.NoError(err)
 }
