@@ -541,7 +541,7 @@ steps:
 
   - wait
 
-  - label: "[integration] automate-ui"
+  - label: "automate-ui"
     command:
       - cd components/automate-ui
       - ./scripts/build_chef_ui_lib
@@ -555,7 +555,7 @@ steps:
       executor:
         docker:
 
-  - label: "[integration] compliance-service db-migrations"
+  - label: "compliance-service db-migrations"
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
@@ -581,7 +581,7 @@ steps:
       - gopath-checkout#v1.0.1:
           import: github.com/chef/automate
 
-  - label: "[integration] compliance-service scanner"
+  - label: "compliance-service scanner"
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
@@ -607,7 +607,7 @@ steps:
       - gopath-checkout#v1.0.1:
           import: github.com/chef/automate
 
-  - label: "[integration] compliance-service reporting"
+  - label: "compliance-service reporting"
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
@@ -632,7 +632,7 @@ steps:
       - gopath-checkout#v1.0.1:
           import: github.com/chef/automate
 
-  - label: "[integration] nodemanager-service run-db-tests"
+  - label: "nodemanager-service run-db-tests"
     command:
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
       - sudo scripts/install_inspec.sh
@@ -658,7 +658,7 @@ steps:
       - gopath-checkout#v1.0.1:
           import: github.com/chef/automate
 
-  - label: "[integration] compliance-service upgrade from Automate v1"
+  - label: "compliance-service upgrade from Automate v1"
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
@@ -684,7 +684,7 @@ steps:
       - gopath-checkout#v1.0.1:
           import: github.com/chef/automate
 
-  - label: "[integration] compliance-service upgrade from Automate v2v1"
+  - label: "compliance-service upgrade from Automate v2v1"
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
@@ -710,7 +710,7 @@ steps:
       - gopath-checkout#v1.0.1:
           import: github.com/chef/automate
 
-  - label: "[integration] compliance-service upgrade from Automate v2v2"
+  - label: "compliance-service upgrade from Automate v2v2"
     command:
       - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
       - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
