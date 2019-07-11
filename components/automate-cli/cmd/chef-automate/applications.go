@@ -103,29 +103,30 @@ func runApplicationsListDisconnectedServicesCmd(*cobra.Command, []string) error 
 		},
 	)
 	if err != nil {
-		return err
-	}
-
-	if len(servicesRes.Services) == 0 {
-		writer.Printf(
-			"There are no disconnected services with a threshold of %d minute(s)\n",
-			appsCmdFlags.thresholdMinutes,
-		)
-		return nil
+		return status.Wrap(err, status.APIError, "failed to convert proto into json format")
 	}
 
 	switch appsCmdFlags.format {
 	case "json":
-		json, err := (&jsonpb.Marshaler{OrigName: true}).MarshalToString(servicesRes)
+		json, err := (&jsonpb.Marshaler{
+			EmitDefaults: true,
+			OrigName:     true,
+		}).MarshalToString(servicesRes)
 		if err != nil {
-			return err
+			return status.Wrap(err, status.MarshalError, "failed to convert proto into json format")
 		}
 		writer.Println(json)
 	case "pretty":
-		txt := proto.TextMarshaler{}
-		err := txt.Marshal(os.Stdout, servicesRes)
+		if len(servicesRes.Services) == 0 {
+			writer.Printf(
+				"There are no disconnected services with a threshold of %d minute(s)\n",
+				appsCmdFlags.thresholdMinutes,
+			)
+			return nil
+		}
+		err := (&proto.TextMarshaler{}).Marshal(os.Stdout, servicesRes)
 		if err != nil {
-			return err
+			return status.Wrap(err, status.MarshalError, "failed to convert proto into pretty format")
 		}
 	}
 
