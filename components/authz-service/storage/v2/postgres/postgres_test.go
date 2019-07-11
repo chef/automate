@@ -4119,6 +4119,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 			stagedRule, err := storage.NewRule(rule.ID, rule.ProjectID, "update: staged name", rule.Type, rule.Conditions)
 			insertStagedRule(t, db, &stagedRule, false)
 			resp, err := store.GetStagedOrAppliedRule(ctx, rule.ID)
+			require.NoError(t, err)
 			assert.NotNil(t, resp)
 			expectedRule := storage.Rule{
 				ID:         stagedRule.ID,
