@@ -595,7 +595,6 @@ func TestWorkflowCompleteWithPendingTasks(t *testing.T) {
 	completer.EnqueueTask(&backend.Task{
 		Name: taskName,
 	}, backend.TaskEnqueueOpts{})
-	completer.Continue(nil)
 
 	completer.EnqueueTask(&backend.Task{
 		Name: taskName,
@@ -619,6 +618,36 @@ func TestWorkflowCompleteWithPendingTasks(t *testing.T) {
 
 	_, _, err = b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.Equal(t, cereal.ErrNoWorkflowInstances, err)
+
+	assertNoPendingWork(t, b1)
+
+	// make sure we can run it again. There was a bug where we couldn't
+	// run any more workflows correctly after one completed early
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: "workflow-instance",
+		WorkflowName: workflowName,
+	})
+
+	require.NoError(t, err, "failed to enqueue workflow")
+
+	_, completer, err = b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{})
+	completer.Continue(nil)
+
+	_, taskCompleter, err = b1.DequeueTask(ctx, taskName)
+	require.NoError(t, err)
+	taskCompleter.Succeed(nil)
+
+	wevt, completer, err = b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+	require.Equal(t, backend.TaskComplete, wevt.Type)
+	require.Equal(t, backend.TaskStatusSuccess, wevt.TaskResult.Status)
+	err = completer.Done(nil)
+	require.NoError(t, err)
 
 	assertNoPendingWork(t, b1)
 }

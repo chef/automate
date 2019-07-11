@@ -319,8 +319,8 @@ BEGIN
     FOR t IN
          SELECT * FROM cereal_tasks WHERE id = _tid FOR UPDATE
     LOOP
-        INSERT INTO cereal_task_results(workflow_instance_id, parameters, task_name, enqueued_at, status, error, result)
-        VALUES(t.workflow_instance_id, t.parameters, t.task_name, t.enqueued_at, _status, _error, _result);
+        INSERT INTO cereal_task_results(id, workflow_instance_id, parameters, task_name, enqueued_at, status, error, result)
+        VALUES(t.id, t.workflow_instance_id, t.parameters, t.task_name, t.enqueued_at, _status, _error, _result);
 
         INSERT INTO cereal_workflow_events(event_type, task_result_id, workflow_instance_id)
         VALUES('task_complete', t.id, t.workflow_instance_id);
