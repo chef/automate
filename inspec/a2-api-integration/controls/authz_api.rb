@@ -61,7 +61,6 @@ control 'authz-api-crud-1' do
       hash[:action]   = policy_action   unless policy_action.nil?
       hash[:subjects] = policy_subjects unless policy_subjects.nil?
       hash[:resource] = policy_resource unless policy_resource.nil?
-      hash[:effect]   = policy_effect   unless policy_effect.nil?
       hash
     end
 
@@ -73,18 +72,13 @@ control 'authz-api-crud-1' do
       "#{TEST_POLICY_ACTION_PREFIX}#{SecureRandom.hex.tr('0-9', '')}"
     end
 
-    let(:policy_subjects) {
-        ["team:local:team1", "team:local:team2"]
-    }
+    let(:policy_subjects) do
+      ["team:local:team1", "team:local:team2"]
+    end
 
-    let(:policy_resource) {
-        "test:resource"
-    }
-
-    # all policies are `allow`
-    let(:policy_effect) {
-        "allow"
-    }
+    let(:policy_resource) do
+      "test:resource"
+    end
 
     let(:filtered_list) do
       filtered_policies = []
@@ -102,32 +96,32 @@ control 'authz-api-crud-1' do
       "#{TEST_POLICY_ACTION_PREFIX}#{SecureRandom.hex.tr('0-9', '')}"
     end
 
-    let(:policy_subjects2) {
-        ["team:local:team3", "team:local:team4"]
-    }
+    let(:policy_subjects2) do
+      ["team:local:team3", "team:local:team4"]
+    end
 
-    let(:policy_resource2) {
-        "test:resource2"
-    }
+    let(:policy_resource2) do
+      "test:resource2"
+    end
 
     let(:create_request2) do
       automate_api_request(
         '/api/v0/auth/policies',
         http_method: 'POST',
         request_body: {
-          "action": policy_action2,
-          "subjects": policy_subjects2,
-          "resource": policy_resource2,
+          action: policy_action2,
+          subjects: policy_subjects2,
+          resource: policy_resource2,
         }.to_json
       )
     end
 
     describe "when creating a policy" do
       shared_examples "when a field is missing" do
-          it "fails with a 400" do
-            expect(create_request.http_status).to eq(400)
-            expect(create_request.parsed_response_body[:error] || "").not_to eq("")
-          end
+        it "fails with a 400" do
+          expect(create_request.http_status).to eq 400
+          expect(create_request.parsed_response_body[:error] || "").not_to eq("")
+        end
       end
 
       context "when the action field is not specified" do
@@ -136,9 +130,9 @@ control 'authz-api-crud-1' do
       end
 
       context "when the action field is empty" do
-          let(:policy_action) { '' }
-          include_examples "when a field is missing"
-        end
+        let(:policy_action) { '' }
+        include_examples "when a field is missing"
+      end
 
       context "when the subjects field is not specified" do
         let(:policy_subjects) { nil }
@@ -166,9 +160,10 @@ control 'authz-api-crud-1' do
           expect(create_request.parsed_response_body[:action]).to eq(policy_action)
           expect(create_request.parsed_response_body[:subjects]).to eq(policy_subjects)
           expect(create_request.parsed_response_body[:resource]).to eq(policy_resource)
-          expect(create_request.parsed_response_body[:effect]).to eq(policy_effect)
+          expect(create_request.parsed_response_body[:effect]).to eq("allow")
           expect(create_request.parsed_response_body[:id]).to_not be_nil
           expect(create_request.parsed_response_body[:created_at]).to_not be_nil
+          expect(create_request.parsed_response_body[:updated_at]).to be_nil
         end
       end
     end
@@ -192,7 +187,7 @@ control 'authz-api-crud-1' do
           expect(filtered_list[0][:action]).to eq(policy_action)
           expect(filtered_list[0][:subjects]).to eq(policy_subjects)
           expect(filtered_list[0][:resource]).to eq(policy_resource)
-          expect(filtered_list[0][:effect]).to eq(policy_effect)
+          expect(filtered_list[0][:effect]).to eq("allow")
           expect(filtered_list[0][:id]).to_not be_nil
           expect(filtered_list[0][:created_at]).to_not be_nil
         end
@@ -208,23 +203,25 @@ control 'authz-api-crud-1' do
           expect(list_request.http_status).to eq(200)
           expect(filtered_list.length).to eq(2)
 
-          expect(filtered_list.find { |policy|
+          expect(filtered_list.any? { |policy|
             policy[:action] == policy_action &&
             policy[:subjects] == policy_subjects &&
             policy[:resource] == policy_resource &&
-            policy[:effect] == policy_effect &&
+            policy[:effect] == "allow" &&
             !policy[:id].nil? &&
-            !policy[:created_at].nil?
-          }).to_not be_nil
+            !policy[:created_at].nil? &&
+            policy[:updated_at].nil?
+          }).to be(true)
 
-          expect(filtered_list.find { |policy|
+          expect(filtered_list.any? { |policy|
             policy[:action] == policy_action2 &&
             policy[:subjects] == policy_subjects2 &&
             policy[:resource] == policy_resource2 &&
-            policy[:effect] == policy_effect &&
+            policy[:effect] == "allow" &&
             !policy[:id].nil? &&
-            !policy[:created_at].nil?
-          }).to_not be_nil
+            !policy[:created_at].nil? &&
+            policy[:updated_at].nil?
+          }).to be(true)
         end
       end
     end
@@ -283,7 +280,7 @@ control 'authz-api-crud-1' do
             expect(delete_request.parsed_response_body[:action]).to eq(policy_action)
             expect(delete_request.parsed_response_body[:subjects]).to eq(policy_subjects)
             expect(delete_request.parsed_response_body[:resource]).to eq(policy_resource)
-            expect(delete_request.parsed_response_body[:effect]).to eq(policy_effect)
+            expect(delete_request.parsed_response_body[:effect]).to eq("allow")
             expect(delete_request.parsed_response_body[:id]).to_not be_nil
             expect(delete_request.parsed_response_body[:created_at]).to_not be_nil
             expect(filtered_list.length).to eq(1)
