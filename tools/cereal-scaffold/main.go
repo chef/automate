@@ -25,6 +25,7 @@ var simpleWorkflowOpts struct {
 	DequeueWorkerCount int
 	TaskCount          int
 	SlowTasks          bool
+	NoEnqueue          bool
 }
 
 func main() {
@@ -63,6 +64,12 @@ func main() {
 		"dequeue-worker-count",
 		10,
 		"Number of workers to dequeue tasks")
+
+	simpleWorkflowCmd.PersistentFlags().BoolVar(
+		&simpleWorkflowOpts.NoEnqueue,
+		"no-enqueue",
+		false,
+		"Whether to skip the enqueue")
 
 	simpleWorkflowCmd.PersistentFlags().BoolVar(
 		&simpleWorkflowOpts.SlowTasks,
@@ -194,6 +201,10 @@ func (p *SimpleWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 	ev cereal.TaskCompleteEvent) cereal.Decision {
 	var mycount int
 
+	if err := ev.Result.Err(); err != nil {
+		logrus.WithError(err).Error("task failed")
+	}
+
 	if err := w.GetPayload(&mycount); err != nil {
 		logrus.WithError(err).Fatal("Could not decode payload")
 	}
@@ -210,7 +221,7 @@ func (p *SimpleWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 
 	taskResult := ""
 	if err := ev.Result.Get(&taskResult); err != nil {
-		logrus.WithError(err).Fatal("Could not decode task params in result")
+		logrus.WithError(err).Error("Could not decode task params in result")
 	}
 
 	logrus.WithFields(logrus.Fields{
@@ -254,7 +265,7 @@ func runSimpleWorkflow(_ *cobra.Command, args []string) error {
 	}
 
 	manager.RegisterWorkflowExecutor("simple-workflow", &SimpleWorkflow{})
-	manager.RegisterTaskExecutor("test task", &SimpleTask{}, cereal.TaskExecutorOpts{
+	manager.RegisterTaskExecutor("simple task", &SimpleTask{}, cereal.TaskExecutorOpts{
 		Workers: simpleWorkflowOpts.DequeueWorkerCount})
 
 	params := SimpleWorkflowParams{
@@ -262,14 +273,17 @@ func runSimpleWorkflow(_ *cobra.Command, args []string) error {
 	}
 
 	manager.Start(context.Background())
-	instanceName := fmt.Sprintf("simple-workflow-%s", time.Now())
-	err = manager.EnqueueWorkflow(context.TODO(),
-		"simple-workflow", instanceName,
-		&params,
-	)
-	if err != nil {
-		logrus.WithError(err).Error("Unexpected error enqueueing workflow")
-		return err
+
+	if !simpleWorkflowOpts.NoEnqueue {
+		instanceName := fmt.Sprintf("simple-workflow-%s", time.Now())
+		err = manager.EnqueueWorkflow(context.TODO(),
+			"simple-workflow", instanceName,
+			&params,
+		)
+		if err != nil {
+			logrus.WithError(err).Error("Unexpected error enqueueing workflow")
+			return err
+		}
 	}
 
 	for !done {

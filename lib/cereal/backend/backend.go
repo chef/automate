@@ -30,7 +30,6 @@ type WorkflowInstanceStatus string
 
 const (
 	WorkflowInstanceStatusRunning   WorkflowInstanceStatus = "running"
-	WorkflowInstanceStatusAbandoned WorkflowInstanceStatus = "abandoned"
 	WorkflowInstanceStatusCompleted WorkflowInstanceStatus = "completed"
 )
 
@@ -60,6 +59,7 @@ type TaskStatusType string
 const (
 	TaskStatusSuccess TaskStatusType = "success"
 	TaskStatusFailed  TaskStatusType = "failed"
+	TaskStatusLost    TaskStatusType = "lost"
 )
 
 type WorkflowEvent struct {
@@ -93,15 +93,13 @@ type TaskCompleter interface {
 }
 
 type TaskEnqueueOpts struct {
-	TryRemaining int
-	StartAfter   time.Time
+	StartAfter time.Time
 }
 
 type WorkflowCompleter interface {
 	EnqueueTask(task *Task, opts TaskEnqueueOpts) error
 
 	Continue(payload []byte) error
-	Abandon() error
 	Fail(err error) error
 	Done(result []byte) error
 	Close() error
