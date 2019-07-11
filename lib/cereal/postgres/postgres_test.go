@@ -569,7 +569,7 @@ func TestTaskPinger(t *testing.T) {
 	require.Equal(t, backend.TaskStatusSuccess, wevt.TaskResult.Status)
 }
 
-func TestTaskCompleteWithPendingTasks(t *testing.T) {
+func TestWorkflowCompleteWithPendingTasks(t *testing.T) {
 	taskName := "task_name"
 	workflowName := "workflow_name"
 	err := runResetDB()
