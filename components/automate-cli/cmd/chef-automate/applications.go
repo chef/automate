@@ -20,10 +20,10 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 )
 
-var (
+var appsCmdFlags = struct {
 	thresholdMinutes int64
 	format           string
-)
+}{}
 
 func init() {
 	appsSubcmd := newApplicationsRootSubcmd()
@@ -31,8 +31,8 @@ func init() {
 	appsSubcmd.AddCommand(newApplicationsDisableCmd())
 
 	listDisconnectedServicesCmd := newApplicationsListDisconnectedServicesCmd()
-	listDisconnectedServicesCmd.PersistentFlags().Int64VarP(&thresholdMinutes, "threshold-minutes", "m", 10, "Number of minutes since last event received")
-	listDisconnectedServicesCmd.PersistentFlags().StringVarP(&format, "format", "f", "json", "Format to display data. [ json | pretty ]")
+	listDisconnectedServicesCmd.PersistentFlags().Int64VarP(&appsCmdFlags.thresholdMinutes, "threshold-minutes", "m", 10, "Number of minutes since last event received")
+	listDisconnectedServicesCmd.PersistentFlags().StringVarP(&appsCmdFlags.format, "format", "f", "json", "Format to display data. [ json | pretty ]")
 	appsSubcmd.AddCommand(listDisconnectedServicesCmd)
 
 	RootCmd.AddCommand(appsSubcmd)
@@ -74,17 +74,17 @@ func newApplicationsDisableCmd() *cobra.Command {
 }
 
 func runApplicationsListDisconnectedServicesCmd(*cobra.Command, []string) error {
-	if thresholdMinutes <= 0 {
+	if appsCmdFlags.thresholdMinutes <= 0 {
 		return status.Errorf(status.InvalidCommandArgsError,
 			"%d is not a valid threshold time in minutes. The expected time must be greater than zero.",
-			thresholdMinutes,
+			appsCmdFlags.thresholdMinutes,
 		)
 	}
 
-	if format != "json" && format != "pretty" {
+	if appsCmdFlags.format != "json" && appsCmdFlags.format != "pretty" {
 		return status.Errorf(status.InvalidCommandArgsError,
 			"%s is not a valid format type. Available formats are 'json' and 'pretty'.",
-			format,
+			appsCmdFlags.format,
 		)
 	}
 
@@ -99,7 +99,7 @@ func runApplicationsListDisconnectedServicesCmd(*cobra.Command, []string) error 
 
 	servicesRes, err := apiClient.ApplicationsClient().GetDisconnectedServices(ctx,
 		&applications.DisconnectedServicesReq{
-			ThresholdMinutes: int32(thresholdMinutes),
+			ThresholdMinutes: int32(appsCmdFlags.thresholdMinutes),
 		},
 	)
 	if err != nil {
@@ -109,12 +109,12 @@ func runApplicationsListDisconnectedServicesCmd(*cobra.Command, []string) error 
 	if len(servicesRes.Services) == 0 {
 		writer.Printf(
 			"There are no disconnected services with a threshold of %d minute(s)\n",
-			thresholdMinutes,
+			appsCmdFlags.thresholdMinutes,
 		)
 		return nil
 	}
 
-	switch format {
+	switch appsCmdFlags.format {
 	case "json":
 		json, err := (&jsonpb.Marshaler{OrigName: true}).MarshalToString(servicesRes)
 		if err != nil {
