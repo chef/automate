@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/spf13/cobra"
 
@@ -19,7 +20,10 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 )
 
-var thresholdMinutes int64
+var (
+	thresholdMinutes int64
+	format           string
+)
 
 func init() {
 	appsSubcmd := newApplicationsRootSubcmd()
@@ -28,6 +32,7 @@ func init() {
 
 	listDisconnectedServicesCmd := newApplicationsListDisconnectedServicesCmd()
 	listDisconnectedServicesCmd.PersistentFlags().Int64VarP(&thresholdMinutes, "threshold-minutes", "m", 10, "Number of minutes since last event received")
+	listDisconnectedServicesCmd.PersistentFlags().StringVarP(&format, "format", "f", "json", "Format to display data. [ json | pretty ]")
 	appsSubcmd.AddCommand(listDisconnectedServicesCmd)
 
 	RootCmd.AddCommand(appsSubcmd)
@@ -76,6 +81,13 @@ func runApplicationsListDisconnectedServicesCmd(*cobra.Command, []string) error 
 		)
 	}
 
+	if format != "json" && format != "pretty" {
+		return status.Errorf(status.InvalidCommandArgsError,
+			"%s is not a valid format type. Available formats are 'json' and 'pretty'.",
+			thresholdMinutes,
+		)
+	}
+
 	var (
 		ctx            = context.Background()
 		apiClient, err = apiclient.OpenConnection(ctx)
@@ -94,11 +106,27 @@ func runApplicationsListDisconnectedServicesCmd(*cobra.Command, []string) error 
 		return err
 	}
 
-	txt := proto.TextMarshaler{}
-	txt.Marshal(os.Stdout, servicesRes)
+	if len(servicesRes.Services) == 0 {
+		writer.Printf(
+			"There are no disconnected services with a threshold of %d minute(s)\n",
+			thresholdMinutes,
+		)
+		return nil
+	}
+
+	switch format {
+	case "json":
+		json, err := (&jsonpb.Marshaler{OrigName: true}).MarshalToString(servicesRes)
+		if err != nil {
+			return err
+		}
+		writer.Println(json)
+	case "pretty":
+		txt := proto.TextMarshaler{}
+		txt.Marshal(os.Stdout, servicesRes)
+	}
 
 	return nil
-
 }
 
 func runApplicationsEnableCmd(*cobra.Command, []string) error {
