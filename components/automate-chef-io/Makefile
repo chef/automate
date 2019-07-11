@@ -17,8 +17,19 @@ clean_swagger_files:
 	rm -rf ./$(SWAGGER_DIR)/*
 
 sync_swagger_files: clean_swagger_files
-	pushd ../../api/external && find . -name '*.swagger.json' | cpio -p -dumv ../../components/automate-chef-io/$(SWAGGER_DIR) && popd
-	pushd ../automate-gateway/api/ && find . -name '*.swagger.json' | cpio -p -dumv ../../automate-chef-io/$(SWAGGER_DIR) && popd
+	pushd ../../api/external && \
+		find . -name '*.swagger.json' | sed 's/^\.\///' | while read i ; do \
+			mkdir -p ../../components/automate-chef-io/$(SWAGGER_DIR)/`dirname $$i` && \
+			cp $$i ../../components/automate-chef-io/$(SWAGGER_DIR)/`dirname $$i` \
+		; done && \
+	popd
+
+	pushd ../automate-gateway/api/ && \
+		find . -name '*.swagger.json' | sed 's/^\.\///' | while read i ; do \
+			mkdir -p ../../automate-chef-io/$(SWAGGER_DIR)/`dirname $$i` && \
+			cp $$i ../../automate-chef-io/$(SWAGGER_DIR)/`dirname $$i` \
+		; done && \
+	popd
 
 serve: sync
 	hugo server --buildDrafts --noHTTPCache
