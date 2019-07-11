@@ -310,7 +310,7 @@ func TestGetPolicy(t *testing.T) {
 			ctx = insertProjectsIntoContext(ctx, []string{projID1})
 			resp, err := store.GetPolicy(ctx, polID)
 
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, polID, resp.ID)
 		},
 		"when the * project filter is passed, return policy": func(t *testing.T) {
@@ -323,7 +323,7 @@ func TestGetPolicy(t *testing.T) {
 			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 			resp, err := store.GetPolicy(ctx, polID)
 
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, polID, resp.ID)
 		},
 		"when the policy has no projects and (unassigned) is in the projects filter, return policy": func(t *testing.T) {
@@ -335,7 +335,7 @@ func TestGetPolicy(t *testing.T) {
 			ctx = insertProjectsIntoContext(ctx, []string{projID1, v2.UnassignedProjectID})
 			resp, err := store.GetPolicy(ctx, polID)
 
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, polID, resp.ID)
 		},
 		"when the policy's projects and projects filter do not intersect, return NotFound": func(t *testing.T) {
@@ -498,7 +498,7 @@ func TestListPolicies(t *testing.T) {
 		"empty database": func(t *testing.T) {
 			ctx := context.Background()
 			resp, err := store.ListPolicies(ctx)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Nil(t, resp)
 			assert.Zero(t, len(resp))
 		},
@@ -733,7 +733,7 @@ func TestListPolicies(t *testing.T) {
 			}
 
 			resp, err := store.ListPolicies(ctx)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assertPolicies(t, expectedPolicies, resp)
 		},
 		"two policies with projects": func(t *testing.T) {
@@ -771,7 +771,7 @@ func TestListPolicies(t *testing.T) {
 			}
 
 			resp, err := store.ListPolicies(ctx)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assertPolicies(t, expectedPolicies, resp)
 		},
 		"when the list is filtered by a policy list, return intersection": func(t *testing.T) {
@@ -802,7 +802,7 @@ func TestListPolicies(t *testing.T) {
 
 			ctx = insertProjectsIntoContext(ctx, []string{projID2})
 			resp, err := store.ListPolicies(ctx)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assertPolicies(t, expectedPolicies, resp)
 		},
 		"when the list is filtered by a policy list of *, return everything": func(t *testing.T) {
@@ -838,7 +838,7 @@ func TestListPolicies(t *testing.T) {
 
 			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 			resp, err := store.ListPolicies(ctx)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assertPolicies(t, expectedPolicies, resp)
 		},
 		"when the list is filtered by a policy list of (unassigned), return policies with no projects": func(t *testing.T) {
@@ -866,7 +866,7 @@ func TestListPolicies(t *testing.T) {
 
 			ctx = insertProjectsIntoContext(ctx, []string{v2.UnassignedProjectID})
 			resp, err := store.ListPolicies(ctx)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assertPolicies(t, expectedPolicies, resp)
 		},
 		"when the list is filtered by a project list of (unassigned) and another project, return matched policies": func(t *testing.T) {
@@ -906,7 +906,7 @@ func TestListPolicies(t *testing.T) {
 
 			ctx = insertProjectsIntoContext(ctx, []string{v2.UnassignedProjectID, projID})
 			resp, err := store.ListPolicies(ctx)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assertPolicies(t, expectedPolicies, resp)
 		},
 		"when there is no intersection between projects filter and projects, return empty list": func(t *testing.T) {
@@ -932,7 +932,7 @@ func TestListPolicies(t *testing.T) {
 
 			ctx = insertProjectsIntoContext(ctx, []string{projID3})
 			resp, err := store.ListPolicies(ctx)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assertPolicies(t, expectedPolicies, resp)
 		},
 	}
@@ -1112,7 +1112,7 @@ func TestDeletePolicy(t *testing.T) {
 			ctx = insertProjectsIntoContext(ctx, []string{projID1})
 			assertPolicyChange(t, store, func() {
 				err := store.DeletePolicy(ctx, polID)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			})
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
 		},
@@ -1127,7 +1127,7 @@ func TestDeletePolicy(t *testing.T) {
 			ctx = insertProjectsIntoContext(ctx, []string{v2.UnassignedProjectID})
 			assertPolicyChange(t, store, func() {
 				err := store.DeletePolicy(ctx, polID)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			})
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
 		},
@@ -1142,7 +1142,7 @@ func TestDeletePolicy(t *testing.T) {
 
 			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 			err := store.DeletePolicy(ctx, polID)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
 		},
 		"when the policy does not overlap with the project filter, return not found": func(t *testing.T) {
@@ -1191,7 +1191,7 @@ func TestCreatePolicy(t *testing.T) {
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.CreatePolicy(ctx, &pol)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
 
@@ -1216,7 +1216,7 @@ func TestCreatePolicy(t *testing.T) {
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.CreatePolicy(ctx, &pol)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
 
@@ -1250,7 +1250,7 @@ func TestCreatePolicy(t *testing.T) {
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.CreatePolicy(ctx, &pol)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
 
@@ -1287,7 +1287,7 @@ func TestCreatePolicy(t *testing.T) {
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.CreatePolicy(ctx, &pol)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
 
@@ -1328,7 +1328,7 @@ func TestCreatePolicy(t *testing.T) {
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.CreatePolicy(ctx, &pol)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
 
@@ -1366,7 +1366,7 @@ func TestCreatePolicy(t *testing.T) {
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.CreatePolicy(ctx, &pol)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
 
@@ -1437,7 +1437,7 @@ func TestCreatePolicy(t *testing.T) {
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.CreatePolicy(ctx, &pol)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
 
@@ -1537,7 +1537,7 @@ func TestCreatePolicy(t *testing.T) {
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.CreatePolicy(ctx, &pol)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
 
@@ -1607,7 +1607,7 @@ func TestCreatePolicy(t *testing.T) {
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.CreatePolicy(ctx, &pol)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
 
@@ -1637,7 +1637,7 @@ func TestCreatePolicy(t *testing.T) {
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.CreatePolicy(ctx, &pol)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
 
@@ -1669,7 +1669,7 @@ func TestCreatePolicy(t *testing.T) {
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.CreatePolicy(ctx, &pol)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
 
@@ -3001,7 +3001,7 @@ func TestUpdatePolicy(t *testing.T) {
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.UpdatePolicy(ctx, &pol)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.ElementsMatch(t, []string{projID}, resp.Projects)
 			})
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
@@ -3032,7 +3032,7 @@ func TestUpdatePolicy(t *testing.T) {
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.UpdatePolicy(ctx, &pol)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.ElementsMatch(t, expProjs, resp.Projects)
 			})
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
@@ -3069,7 +3069,7 @@ func TestUpdatePolicy(t *testing.T) {
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.UpdatePolicy(ctx, &pol)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, expProjs, resp.Projects)
 			})
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
@@ -3104,7 +3104,7 @@ func TestUpdatePolicy(t *testing.T) {
 			expProjs := []string{projID2}
 			assertPolicyChange(t, store, func() {
 				resp, err := store.UpdatePolicy(ctx, &pol)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.ElementsMatch(t, expProjs, resp.Projects)
 			})
 
@@ -3140,7 +3140,7 @@ func TestUpdatePolicy(t *testing.T) {
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.UpdatePolicy(ctx, &pol)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, expProjs, resp.Projects)
 			})
 
@@ -3358,12 +3358,12 @@ func TestCreateRule(t *testing.T) {
 		"creating a condition with multiple entries for 'member-of' operator is allowed": func(t *testing.T) {
 			condition1, err := storage.NewCondition([]string{"1", "2", "3"}, storage.ChefServer, storage.MemberOf)
 			assert.NotNil(t, condition1)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 		},
 		"creating a condition with a single entry for 'member-of' operator is allowed": func(t *testing.T) {
 			condition1, err := storage.NewCondition([]string{"1"}, storage.ChefServer, storage.MemberOf)
 			assert.NotNil(t, condition1)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 		},
 		"create node rule with multiple conditions": func(t *testing.T) {
 			projID := "project-1"
@@ -3426,7 +3426,7 @@ func TestListRules(t *testing.T) {
 		"when no rules exist, returns an empty list": func(t *testing.T) {
 			ctx := context.Background()
 			resp, err := store.ListRules(ctx)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Nil(t, resp)
 		},
 		"when only staged rules exist, returns an empty list": func(t *testing.T) {
@@ -3436,7 +3436,7 @@ func TestListRules(t *testing.T) {
 
 			insertStagedRuleWithMultipleConditions(t, db, "staged-rule", projID, storage.Node, false)
 			resp, err := store.ListRules(ctx)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Nil(t, resp)
 		},
 		"when multiple rules exist with no project filter, returns the full list": func(t *testing.T) {
@@ -3449,7 +3449,7 @@ func TestListRules(t *testing.T) {
 			rule2 := insertAppliedRuleWithMultipleConditions(t, db, "rule-2", projID, storage.Node)
 
 			resp, err := store.ListRules(ctx)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.ElementsMatch(t, []*storage.Rule{rule1, rule2}, resp)
 		},
 		"when staged and applied rules exist with no project filter, returns applied rules": func(t *testing.T) {
@@ -3462,7 +3462,7 @@ func TestListRules(t *testing.T) {
 			insertStagedRuleWithMultipleConditions(t, db, "rule2", projID, storage.Event, false)
 
 			resp, err := store.ListRules(ctx)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			require.NotZero(t, len(resp))
 			assert.ElementsMatch(t, []*storage.Rule{rule1}, resp)
 		},
@@ -3481,7 +3481,7 @@ func TestListRules(t *testing.T) {
 			rule2 := insertAppliedRuleWithMultipleConditions(t, db, "rule-2", projID2, ruleType)
 
 			resp, err := store.ListRules(ctx)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			require.NotZero(t, len(resp))
 			assert.ElementsMatch(t, []*storage.Rule{rule2}, resp)
 		},
@@ -3501,7 +3501,7 @@ func TestListStagedAndAppliedRules(t *testing.T) {
 		"when no rules exist, returns an empty list": func(t *testing.T) {
 			ctx := context.Background()
 			resp, err := store.ListRules(ctx)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Nil(t, resp)
 			assert.Zero(t, len(resp))
 		},
@@ -3537,7 +3537,7 @@ func TestListStagedAndAppliedRules(t *testing.T) {
 			rule4 := insertStagedRuleWithMultipleConditions(t, db, "staged-rule4", projID2, storage.Node, false)
 
 			resp, err := store.ListStagedAndAppliedRules(ctx)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			require.NotZero(t, len(resp))
 			assert.ElementsMatch(t, []*storage.Rule{rule2, rule4}, resp)
 		},
@@ -3570,7 +3570,7 @@ func TestListRulesForProject(t *testing.T) {
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 
 			resp, err := store.ListRulesForProject(ctx, projID)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Nil(t, resp)
 			assert.Zero(t, len(resp))
 		}},
@@ -3585,7 +3585,7 @@ func TestListRulesForProject(t *testing.T) {
 			insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID2, storage.Node)
 
 			resp, err := store.ListRulesForProject(ctx, projID)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Nil(t, resp)
 			assert.Zero(t, len(resp))
 		}},
@@ -3603,7 +3603,7 @@ func TestListRulesForProject(t *testing.T) {
 			rule3 := insertAppliedRuleWithMultipleConditions(t, db, "rule-3", projID2, storage.Event)
 
 			resp, err := store.ListRulesForProject(ctx, projID2)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, 2, len(resp))
 			assert.ElementsMatch(t, []*storage.Rule{rule2, rule3}, resp)
 		}},
@@ -3621,7 +3621,7 @@ func TestListRulesForProject(t *testing.T) {
 			rule3 := insertAppliedRuleWithMultipleConditions(t, db, "rule-3", projID2, storage.Event)
 
 			resp, err := store.ListRulesForProject(ctx, projID2)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, 2, len(resp))
 			assert.ElementsMatch(t, []*storage.Rule{rule2, rule3}, resp)
 		}},
@@ -3663,7 +3663,7 @@ func TestListRulesForProject(t *testing.T) {
 			insertStagedRule(t, db, &updatedRule, false)
 
 			resp, err := store.ListRulesForProject(ctx, projID)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.ElementsMatch(t, []*storage.Rule{&updatedRule}, resp)
 		}},
 		{"when there are staged changes for some of the project's rules, returns those staged versions and rules that have no staged changes", func(t *testing.T) {
@@ -3688,7 +3688,7 @@ func TestListRulesForProject(t *testing.T) {
 			appliedRule := insertAppliedRuleWithMultipleConditions(t, db, "applied", projID, storage.Node)
 
 			resp, err := store.ListRulesForProject(ctx, projID)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.ElementsMatch(t, []*storage.Rule{&updatedRule, appliedRule}, resp)
 		}},
 		{"when a project has two applied rules and one is staged for deletion, returns only the non-deleted one", func(t *testing.T) {
@@ -3701,7 +3701,7 @@ func TestListRulesForProject(t *testing.T) {
 			insertDeletedStagedRule(t, db, rule2)
 
 			resp, err := store.ListRulesForProject(ctx, projID)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.ElementsMatch(t, []*storage.Rule{rule1}, resp)
 		}},
 		{"when multiple projects exist, returns only the requested project's rules", func(t *testing.T) {
@@ -3715,7 +3715,7 @@ func TestListRulesForProject(t *testing.T) {
 			rule2 := insertAppliedRuleWithMultipleConditions(t, db, "rule-2", projID2, storage.Node)
 
 			resp, err := store.ListRulesForProject(ctx, projID1)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.ElementsMatch(t, []*storage.Rule{rule1}, resp)
 			assert.NotContains(t, resp, rule2)
 		}},
@@ -3819,7 +3819,7 @@ func TestUpdateRule(t *testing.T) {
 			require.NoError(t, err)
 			ruleUpdated.Status = Applied
 			resp, err := store.UpdateRule(ctx, &ruleUpdated)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, &ruleUpdated, resp)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, rule.ID))
 			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_staged_project_rules r WHERE r.id=$1)`, rule.ID))
@@ -3852,7 +3852,7 @@ func TestUpdateRule(t *testing.T) {
 			require.NoError(t, err)
 
 			resp, err := store.UpdateRule(ctx, &ruleUpdated)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, &ruleUpdated, resp)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND name=$2 AND type=$3`,
 				ruleUpdated.ID, ruleUpdated.Name, ruleUpdated.Type.String()))
@@ -3898,7 +3898,7 @@ func TestUpdateRule(t *testing.T) {
 			require.NoError(t, err)
 
 			resp, err := store.UpdateRule(ctx, &updatedRule)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, &updatedRule, resp)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
 				ruleOriginal.ID, ruleOriginal.Name, ruleOriginal.Type.String(), ruleOriginal.ProjectID))
@@ -4024,7 +4024,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 			insertAppliedRuleWithMultipleConditions(t, db, "other-rule", projID, storage.Event)
 
 			resp, err := store.GetStagedOrAppliedRule(ctx, ruleToGet.ID)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, ruleToGet, resp)
 		},
 		"when multiple rules exists with a matching project filter, return correct rule": func(t *testing.T) {
@@ -4040,7 +4040,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 			insertAppliedRuleWithMultipleConditions(t, db, "other-project-rule", projID2, storage.Event)
 
 			resp, err := store.GetStagedOrAppliedRule(ctx, ruleToGet.ID)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, ruleToGet, resp)
 		},
 		"when multiple rules exists with a non-matching project filter, return NotFoundErr": func(t *testing.T) {
@@ -4199,7 +4199,7 @@ func TestDeleteRule(t *testing.T) {
 			ruleToSave := insertStagedRuleWithMultipleConditions(t, db, "save-me", projID, ruleType, false)
 
 			err := store.DeleteRule(ctx, ruleToDelete.ID)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToDelete.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToSave.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules`))
@@ -4217,7 +4217,7 @@ func TestDeleteRule(t *testing.T) {
 			insertStagedRuleWithMultipleConditions(t, db, "save-me", projID, ruleType, false)
 
 			err := store.DeleteRule(ctx, ruleToDelete.ID)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToDelete.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules`))
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
@@ -4276,7 +4276,7 @@ func TestDeleteRule(t *testing.T) {
 			ruleToSave := insertStagedRuleWithMultipleConditions(t, db, "save-me", projID, storage.Event, false)
 
 			err := store.DeleteRule(ctx, ruleToDelete.ID)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=true`, ruleToDelete.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=false`, ruleToSave.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_staged_project_rules r WHERE r.id=$1)`, ruleToDelete.ID))
@@ -4293,7 +4293,7 @@ func TestDeleteRule(t *testing.T) {
 			ruleToSave := insertAppliedRuleWithMultipleConditions(t, db, "save-me", projID, ruleType)
 
 			err := store.DeleteRule(ctx, ruleToDelete.ID)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=true`, ruleToDelete.ID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=false`, ruleToSave.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
@@ -4339,7 +4339,7 @@ func TestApplyStagedRules(t *testing.T) {
 			rule := insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID, storage.Node)
 
 			err := store.ApplyStagedRules(ctx)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules
 				WHERE id=$1 AND project_id=$2 AND name=$3 AND type=$4`, rule.ID, rule.ProjectID, rule.Name, rule.Type.String()))
 		}},
@@ -4357,7 +4357,7 @@ func TestApplyStagedRules(t *testing.T) {
 			insertStagedRule(t, db, &rule2, false)
 
 			err = store.ApplyStagedRules(ctx)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules`))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule1.ID))
@@ -4376,7 +4376,7 @@ func TestApplyStagedRules(t *testing.T) {
 			insertStagedRuleWithMultipleConditions(t, db, ruleToDelete2.ID, projID, ruleType, true)
 
 			err := store.ApplyStagedRules(ctx)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules`))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_project_rules`))
@@ -4424,7 +4424,7 @@ func TestApplyStagedRules(t *testing.T) {
 			insertAppliedRule(t, db, &rule3)
 
 			err = store.ApplyStagedRules(ctx)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules`))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
