@@ -39,7 +39,10 @@ func request_ConfigMgmt_GetNodes_0(ctx context.Context, marshaler runtime.Marsha
 	var protoReq request.Nodes
 	var metadata runtime.ServerMetadata
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ConfigMgmt_GetNodes_0); err != nil {
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ConfigMgmt_GetNodes_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -74,7 +77,10 @@ func request_ConfigMgmt_GetRuns_0(ctx context.Context, marshaler runtime.Marshal
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "node_id", err)
 	}
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ConfigMgmt_GetRuns_0); err != nil {
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ConfigMgmt_GetRuns_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -91,7 +97,10 @@ func request_ConfigMgmt_GetNodesCounts_0(ctx context.Context, marshaler runtime.
 	var protoReq request.NodesCounts
 	var metadata runtime.ServerMetadata
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ConfigMgmt_GetNodesCounts_0); err != nil {
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ConfigMgmt_GetNodesCounts_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -108,7 +117,10 @@ func request_ConfigMgmt_GetRunsCounts_0(ctx context.Context, marshaler runtime.M
 	var protoReq request.RunsCounts
 	var metadata runtime.ServerMetadata
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ConfigMgmt_GetRunsCounts_0); err != nil {
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ConfigMgmt_GetRunsCounts_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -154,7 +166,10 @@ func request_ConfigMgmt_GetNodeRun_0(ctx context.Context, marshaler runtime.Mars
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "run_id", err)
 	}
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ConfigMgmt_GetNodeRun_0); err != nil {
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ConfigMgmt_GetNodeRun_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -171,7 +186,10 @@ func request_ConfigMgmt_GetSuggestions_0(ctx context.Context, marshaler runtime.
 	var protoReq query.Suggestion
 	var metadata runtime.ServerMetadata
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ConfigMgmt_GetSuggestions_0); err != nil {
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ConfigMgmt_GetSuggestions_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -523,27 +541,27 @@ func RegisterConfigMgmtHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 }
 
 var (
-	pattern_ConfigMgmt_GetNodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"cfgmgmt", "nodes"}, ""))
+	pattern_ConfigMgmt_GetNodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"cfgmgmt", "nodes"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ConfigMgmt_GetRuns_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"cfgmgmt", "nodes", "node_id", "runs"}, ""))
+	pattern_ConfigMgmt_GetRuns_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"cfgmgmt", "nodes", "node_id", "runs"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ConfigMgmt_GetNodesCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"cfgmgmt", "stats", "node_counts"}, ""))
+	pattern_ConfigMgmt_GetNodesCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"cfgmgmt", "stats", "node_counts"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ConfigMgmt_GetRunsCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"cfgmgmt", "stats", "run_counts"}, ""))
+	pattern_ConfigMgmt_GetRunsCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"cfgmgmt", "stats", "run_counts"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ConfigMgmt_GetNodeRun_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"cfgmgmt", "nodes", "node_id", "runs", "run_id"}, ""))
+	pattern_ConfigMgmt_GetNodeRun_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"cfgmgmt", "nodes", "node_id", "runs", "run_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ConfigMgmt_GetSuggestions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"cfgmgmt", "suggestions"}, ""))
+	pattern_ConfigMgmt_GetSuggestions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"cfgmgmt", "suggestions"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ConfigMgmt_GetOrganizations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"cfgmgmt", "organizations"}, ""))
+	pattern_ConfigMgmt_GetOrganizations_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"cfgmgmt", "organizations"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ConfigMgmt_GetSourceFqdns_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"cfgmgmt", "source_fqdns"}, ""))
+	pattern_ConfigMgmt_GetSourceFqdns_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"cfgmgmt", "source_fqdns"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ConfigMgmt_GetAttributes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"cfgmgmt", "nodes", "node_id", "attribute"}, ""))
+	pattern_ConfigMgmt_GetAttributes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"cfgmgmt", "nodes", "node_id", "attribute"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ConfigMgmt_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"cfgmgmt", "version"}, ""))
+	pattern_ConfigMgmt_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"cfgmgmt", "version"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ConfigMgmt_GetPolicyCookbooks_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"cfgmgmt", "policy_revision", "revision_id"}, ""))
+	pattern_ConfigMgmt_GetPolicyCookbooks_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"cfgmgmt", "policy_revision", "revision_id"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

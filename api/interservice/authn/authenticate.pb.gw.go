@@ -99,7 +99,7 @@ func RegisterAuthenticationHandlerClient(ctx context.Context, mux *runtime.Serve
 }
 
 var (
-	pattern_Authentication_Authenticate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api", "authenticate"}, ""))
+	pattern_Authentication_Authenticate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api", "authenticate"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

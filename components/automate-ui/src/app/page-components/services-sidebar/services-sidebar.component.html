@@ -45,7 +45,7 @@
       </chef-status-filter-group>
     </div>
     <ul>
-      <li class="service-item" *ngFor="let service of services$ | async">
+      <li class="service-item" *ngFor="let service of services$ | async; let i = index">
         <div class="header">
           <div class ="fqdn-line"><chef-icon>storage</chef-icon> {{ service.fqdn || "--"}}</div>
           <div class ="supervisor-line"><b>Supervisor:</b> {{ service.supervisor_id || "--"}}</div>
@@ -58,16 +58,18 @@
               {{ service.channel | uppercase }}: {{ service.update_strategy }}
             </chef-badge>
             <chef-badge no-data
-              id="general-channel-tooltip"
+              [id]="'channel-tooltip-' + i"
               [tooltip]="tooltipMessageFor('channel')"
               *ngIf="service.update_strategy === 'NONE'">NO CHANNEL: NONE</chef-badge>
           </div>
           <div class ="health-line">
             <chef-icon class="{{ service.health_check }}">{{ service.health_check | serviceStatusIcon }}</chef-icon>
-            {{ healthCheckStatus(service) }}
+            {{ healthCheckStatus(service.health_check) }}
           </div>
-          <div class ="timewizard-line">
-            Since {{ service.current_health_since }} ago
+          <chef-tooltip [attr.for]="'health-timestamp-' + i">{{ formatTimestamp(service.health_updated_at) }}</chef-tooltip>
+          <div class="timewizard-line">
+            {{ timewizardMessage(service.health_check, service.previous_health_check) }}
+            <a [id]="'health-timestamp-' + i"> {{ service.current_health_since }} ago</a>
           </div>
         </div>
       </li>

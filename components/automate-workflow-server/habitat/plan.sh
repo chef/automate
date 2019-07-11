@@ -10,7 +10,7 @@ pkg_upstream_url="https://www.chef.io/automate"
 pkg_deps=(
   core/bash
   core/coreutils
-  core/curl
+  core/curl/7.63.0/20190305215321 # same as core/git/2.20.1/20190305233956
   core/erlang18
   core/gawk
   core/gcc

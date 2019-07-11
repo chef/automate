@@ -4,25 +4,42 @@ import { Action } from '@ngrx/store';
 import { Project } from './project.model';
 
 export enum ProjectActionTypes {
-  GET_ALL         = 'PROJECT::GET_ALL',
-  GET_ALL_SUCCESS = 'PROJECT::GET_ALL::SUCCESS',
-  GET_ALL_FAILURE = 'PROJECT::GET_ALL::FAILURE',
-  GET             = 'PROJECT::GET',
-  GET_SUCCESS     = 'PROJECT::GET::SUCCESS',
-  GET_FAILURE     = 'PROJECT::GET::FAILURE',
-  CREATE          = 'PROJECT::CREATE',
-  CREATE_SUCCESS  = 'PROJECT::CREATE::SUCCESS',
-  CREATE_FAILURE  = 'PROJECT::CREATE::FAILURE',
-  DELETE          = 'PROJECT::DELETE',
-  DELETE_SUCCESS  = 'PROJECT::DELETE::SUCCESS',
-  DELETE_FAILURE  = 'PROJECT::DELETE::FAILURE',
-  UPDATE          = 'PROJECT::UPDATE',
-  UPDATE_SUCCESS  = 'PROJECT::UPDATE::SUCCESS',
-  UPDATE_FAILURE  = 'PROJECT::UPDATE::FAILURE'
+  GET_ALL                        = 'PROJECT::GET_ALL',
+  GET_ALL_SUCCESS                = 'PROJECT::GET_ALL::SUCCESS',
+  GET_ALL_FAILURE                = 'PROJECT::GET_ALL::FAILURE',
+  GET                            = 'PROJECT::GET',
+  GET_SUCCESS                    = 'PROJECT::GET::SUCCESS',
+  GET_FAILURE                    = 'PROJECT::GET::FAILURE',
+  CREATE                         = 'PROJECT::CREATE',
+  CREATE_SUCCESS                 = 'PROJECT::CREATE::SUCCESS',
+  CREATE_FAILURE                 = 'PROJECT::CREATE::FAILURE',
+  DELETE                         = 'PROJECT::DELETE',
+  DELETE_SUCCESS                 = 'PROJECT::DELETE::SUCCESS',
+  DELETE_FAILURE                 = 'PROJECT::DELETE::FAILURE',
+  UPDATE                         = 'PROJECT::UPDATE',
+  UPDATE_SUCCESS                 = 'PROJECT::UPDATE::SUCCESS',
+  UPDATE_FAILURE                 = 'PROJECT::UPDATE::FAILURE',
+  APPLY_RULES_START              = 'PROJECT::APPLY_RULES_START',
+  APPLY_RULES_START_SUCCESS      = 'PROJECT::APPLY_RULES_START::SUCCESS',
+  APPLY_RULES_START_FAILURE      = 'PROJECT::APPLY_RULES_START::FAILURE',
+  APPLY_RULES_STOP               = 'PROJECT::APPLY_RULES_STOP',
+  APPLY_RULES_STOP_SUCCESS       = 'PROJECT::APPLY_RULES_STOP::SUCCESS',
+  APPLY_RULES_STOP_FAILURE       = 'PROJECT::APPLY_RULES_STOP::FAILURE',
+  GET_APPLY_RULES_STATUS         = 'PROJECT::GET_APPLY_RULES_STATUS',
+  GET_APPLY_RULES_STATUS_SUCCESS = 'PROJECT::GET_APPLY_RULES_STATUS::SUCCESS',
+  GET_APPLY_RULES_STATUS_FAILURE = 'PROJECT::GET_APPLY_RULES_STATUS::FAILURE'
 }
 
 export interface ProjectSuccessPayload {
   project: Project;
+}
+
+export interface GetApplyRulesStatusSuccessPayload {
+  state: string;
+  estimated_time_complete: string;
+  percentage_complete: number;
+  failed: boolean;
+  failure_message: string;
 }
 
 export class GetProjects implements Action {
@@ -114,6 +131,48 @@ export class UpdateProjectFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export class ApplyRulesStart implements Action {
+  readonly type = ProjectActionTypes.APPLY_RULES_START;
+}
+
+export class ApplyRulesStartSuccess implements Action {
+  readonly type = ProjectActionTypes.APPLY_RULES_START_SUCCESS;
+  constructor() { }
+}
+
+export class ApplyRulesStartFailure implements Action {
+  readonly type = ProjectActionTypes.APPLY_RULES_START_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
+export class ApplyRulesStop implements Action {
+  readonly type = ProjectActionTypes.APPLY_RULES_STOP;
+}
+
+export class ApplyRulesStopSuccess implements Action {
+  readonly type = ProjectActionTypes.APPLY_RULES_STOP_SUCCESS;
+  constructor() { }
+}
+
+export class ApplyRulesStopFailure implements Action {
+  readonly type = ProjectActionTypes.APPLY_RULES_STOP_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
+export class GetApplyRulesStatus implements Action {
+  readonly type = ProjectActionTypes.GET_APPLY_RULES_STATUS;
+}
+
+export class GetApplyRulesStatusSuccess implements Action {
+  readonly type = ProjectActionTypes.GET_APPLY_RULES_STATUS_SUCCESS;
+  constructor(public payload: GetApplyRulesStatusSuccessPayload) { }
+}
+
+export class GetApplyRulesStatusFailure implements Action {
+  readonly type = ProjectActionTypes.GET_APPLY_RULES_STATUS_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type ProjectActions =
   | GetProjects
   | GetProjectsSuccess
@@ -129,4 +188,13 @@ export type ProjectActions =
   | DeleteProjectFailure
   | UpdateProject
   | UpdateProjectSuccess
-  | UpdateProjectFailure;
+  | UpdateProjectFailure
+  | ApplyRulesStart
+  | ApplyRulesStartSuccess
+  | ApplyRulesStartFailure
+  | ApplyRulesStop
+  | ApplyRulesStopSuccess
+  | ApplyRulesStopFailure
+  | GetApplyRulesStatus
+  | GetApplyRulesStatusSuccess
+  | GetApplyRulesStatusFailure;

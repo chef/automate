@@ -22,6 +22,7 @@ export interface Service {
   update_strategy: 'NONE' | 'AT-ONCE' | 'ROLLING';
   previous_health_check: string;
   current_health_since: string;
+  health_updated_at: Date;
 }
 
 export interface ServiceGroup {

@@ -1,0 +1,21 @@
+<chef-modal id="confirm-apply-stop-modal" [visible]="visible" (close)="cancel.emit()">
+  <h2 id="title" slot="title">Stop Updating Projects?</h2>
+  <div class="modal-content">
+    <chef-progress-bar
+      [value]="progressValue"
+      [valueMax]="1"
+      [prefixText]="progressPrefixText"
+      [suffixText]="progressSuffixText">
+    </chef-progress-bar>
+    <p>Stopping the project update early <strong>cannot be undone</strong> and will leave some ingested resources in the wrong projects.</p>
+    <div class="options">
+      <chef-button id="confirm-button" primary caution (click)="confirm.emit()"
+        [disabled]="applyRulesStatus.state !== 'running'">
+        Stop Updating Projects
+      </chef-button>
+      <chef-button id="cancel-button" tertiary (click)="cancel.emit()">
+        Cancel
+      </chef-button>
+    </div>
+  </div>
+</chef-modal>

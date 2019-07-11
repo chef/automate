@@ -286,15 +286,15 @@ func RegisterTokensHandlerClient(ctx context.Context, mux *runtime.ServeMux, cli
 }
 
 var (
-	pattern_Tokens_CreateToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "tokens"}, ""))
+	pattern_Tokens_CreateToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "tokens"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Tokens_GetToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "tokens", "id"}, ""))
+	pattern_Tokens_GetToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "tokens", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Tokens_UpdateToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "tokens", "id"}, ""))
+	pattern_Tokens_UpdateToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "tokens", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Tokens_DeleteToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "tokens", "id"}, ""))
+	pattern_Tokens_DeleteToken_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "tokens", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Tokens_ListTokens_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "tokens"}, ""))
+	pattern_Tokens_ListTokens_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "tokens"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

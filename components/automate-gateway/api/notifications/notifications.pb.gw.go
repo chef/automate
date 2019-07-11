@@ -351,19 +351,19 @@ func RegisterNotificationsHandlerClient(ctx context.Context, mux *runtime.ServeM
 }
 
 var (
-	pattern_Notifications_AddRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"notifications", "rules"}, ""))
+	pattern_Notifications_AddRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"notifications", "rules"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Notifications_DeleteRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"notifications", "rules", "id"}, ""))
+	pattern_Notifications_DeleteRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"notifications", "rules", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Notifications_UpdateRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"notifications", "rules", "id"}, ""))
+	pattern_Notifications_UpdateRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"notifications", "rules", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Notifications_GetRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"notifications", "rules", "id"}, ""))
+	pattern_Notifications_GetRule_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"notifications", "rules", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Notifications_ListRules_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"notifications", "rules"}, ""))
+	pattern_Notifications_ListRules_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"notifications", "rules"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Notifications_ValidateWebhook_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"notifications", "webhook"}, ""))
+	pattern_Notifications_ValidateWebhook_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"notifications", "webhook"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Notifications_Version_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"notifications", "version"}, ""))
+	pattern_Notifications_Version_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"notifications", "version"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

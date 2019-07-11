@@ -327,6 +327,10 @@ func init() {
         },
         "current_health_since": {
           "type": "string"
+        },
+        "health_updated_at": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },

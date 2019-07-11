@@ -37,7 +37,10 @@ func request_ApplicationsService_GetServiceGroups_0(ctx context.Context, marshal
 	var protoReq ServiceGroupsReq
 	var metadata runtime.ServerMetadata
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ApplicationsService_GetServiceGroups_0); err != nil {
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ApplicationsService_GetServiceGroups_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -63,7 +66,10 @@ func request_ApplicationsService_GetServices_0(ctx context.Context, marshaler ru
 	var protoReq ServicesReq
 	var metadata runtime.ServerMetadata
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ApplicationsService_GetServices_0); err != nil {
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ApplicationsService_GetServices_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -98,7 +104,10 @@ func request_ApplicationsService_GetServicesBySG_0(ctx context.Context, marshale
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "service_group_id", err)
 	}
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ApplicationsService_GetServicesBySG_0); err != nil {
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ApplicationsService_GetServicesBySG_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -287,17 +296,17 @@ func RegisterApplicationsServiceHandlerClient(ctx context.Context, mux *runtime.
 }
 
 var (
-	pattern_ApplicationsService_GetServiceGroups_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"beta", "applications", "service-groups"}, ""))
+	pattern_ApplicationsService_GetServiceGroups_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"beta", "applications", "service-groups"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationsService_GetServiceGroupsHealthCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"beta", "applications", "service_groups_health_counts"}, ""))
+	pattern_ApplicationsService_GetServiceGroupsHealthCounts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"beta", "applications", "service_groups_health_counts"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationsService_GetServices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"beta", "applications", "services"}, ""))
+	pattern_ApplicationsService_GetServices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"beta", "applications", "services"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationsService_GetServicesBySG_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"beta", "applications", "service-groups", "service_group_id"}, ""))
+	pattern_ApplicationsService_GetServicesBySG_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"beta", "applications", "service-groups", "service_group_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationsService_GetServicesStats_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"beta", "applications", "stats"}, ""))
+	pattern_ApplicationsService_GetServicesStats_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"beta", "applications", "stats"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationsService_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"beta", "applications", "version"}, ""))
+	pattern_ApplicationsService_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"beta", "applications", "version"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

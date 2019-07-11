@@ -1250,63 +1250,63 @@ describe('Admin pages', () => {
     });
 
     describe('displays the first project (cannot be deleted and is chef-managed)', () => {
-      it('shows name and type', () => {
+      it('shows name and id', () => {
         const name = $(
           'app-project-list chef-table chef-tbody chef-tr:nth-child(1) chef-td:nth-child(1) a');
         browser.wait(EC.visibilityOf(name), 200, 'first project should render');
         expect(name.getText()).toBe('Default Project');
         expect(name.getAttribute('href')).toMatch(/\/settings\/projects\/default$/);
 
-        const projectType = $(
+        const projectID = $(
           'app-project-list chef-table chef-tbody chef-tr:nth-child(1) chef-td:nth-child(2)');
-        expect(projectType.getText()).toBe('Chef-managed');
+        expect(projectID.getText()).toBe('default');
       });
 
       it('does not show the control button', () => {
         const controlButton = $(
           'app-project-list chef-table chef-tbody chef-tr:nth-child(1) ' +
-          'chef-td:nth-child(3) chef-control-menu');
+          'chef-td:nth-child(5) chef-control-menu');
         expect(controlButton.isPresent()).toEqual(false);
       });
     });
 
     describe('displays the second project (cannot be deleted, custom)', () => {
-      it('shows name and type', () => {
+      it('shows name and id', () => {
         const name = $(
           'app-project-list chef-table chef-tbody chef-tr:nth-child(2) chef-td:nth-child(1) a');
         browser.wait(EC.visibilityOf(name), 200, 'second project should render');
         expect(name.getText()).toBe('Some project whose name does not start with A');
         expect(name.getAttribute('href')).toMatch(/\/settings\/projects\/project-9$/);
 
-        const projectType = $(
+        const projectID = $(
           'app-project-list chef-table chef-tbody chef-tr:nth-child(2) chef-td:nth-child(2)');
-        expect(projectType.getText()).toBe('Custom');
+        expect(projectID.getText()).toBe('project-9');
       });
 
       it('does not show the control button', () => {
         const controlButton = $(
           'app-project-list chef-table chef-tbody chef-tr:nth-child(2) ' +
-          'chef-td:nth-child(3) chef-control-menu');
+          'chef-td:nth-child(5) chef-control-menu');
         expect(controlButton.isPresent()).toEqual(false);
       });
     });
 
     describe('displays the third project (can be deleted, custom)', () => {
-      it('shows name and type', () => {
+      it('shows name and id', () => {
         const name = $(
           'app-project-list chef-table chef-tbody chef-tr:nth-child(3) chef-td:nth-child(1) a');
         browser.wait(EC.visibilityOf(name), 200, 'third project should render');
         expect(name.getText()).toBe('This is custom, and authz allows deletion');
 
-        const projectType = $(
+        const projectID = $(
           'app-project-list chef-table chef-tbody chef-tr:nth-child(3) chef-td:nth-child(2)');
-        expect(projectType.getText()).toBe('Custom');
+        expect(projectID.getText()).toBe('project-19');
       });
 
       it('shows the control button', () => {
         const controlButton = $(
           'app-project-list chef-table chef-tbody chef-tr:nth-child(3) ' +
-          'chef-td:nth-child(3) chef-control-menu');
+          'chef-td:nth-child(5) chef-control-menu');
         expect(controlButton.isPresent()).toBeTruthy();
 
         [ 'Delete Project' ].forEach((item, index) => {

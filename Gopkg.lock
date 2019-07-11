@@ -498,7 +498,7 @@
   version = "v1.2.0"
 
 [[projects]]
-  digest = "1:a03c2550a5b136df65f0179ba0be2ff30926dcd01315b046f64447619f0884ae"
+  digest = "1:622ee79f2c74e6f03e4dfdbcb3fd7b82869f0a3e2ffe52f96f285dd3cb256bdf"
   name = "github.com/grpc-ecosystem/grpc-gateway"
   packages = [
     "codegenerator",
@@ -515,8 +515,8 @@
     "utilities",
   ]
   pruneopts = "T"
-  revision = "8fd5fd9d19ce68183a6b0934519dfe7fe6269612"
-  version = "v1.9.0"
+  revision = "bebc7374a79e1105d786ef3468b474e47d652511"
+  version = "v1.9.4"
 
 [[projects]]
   branch = "master"

@@ -72,7 +72,10 @@ func request_JobScheduler_ConfigureNodesMissingScheduler_0(ctx context.Context, 
 	var protoReq JobSettings
 	var metadata runtime.ServerMetadata
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_JobScheduler_ConfigureNodesMissingScheduler_0); err != nil {
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_JobScheduler_ConfigureNodesMissingScheduler_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -134,7 +137,10 @@ func request_JobScheduler_ConfigureDeleteNodesScheduler_0(ctx context.Context, m
 	var protoReq JobSettings
 	var metadata runtime.ServerMetadata
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_JobScheduler_ConfigureDeleteNodesScheduler_0); err != nil {
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_JobScheduler_ConfigureDeleteNodesScheduler_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -405,27 +411,27 @@ func RegisterJobSchedulerHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_JobScheduler_StartJobScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "job-scheduler", "start"}, ""))
+	pattern_JobScheduler_StartJobScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "job-scheduler", "start"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_JobScheduler_StopJobScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "job-scheduler", "stop"}, ""))
+	pattern_JobScheduler_StopJobScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "job-scheduler", "stop"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_JobScheduler_GetStatusJobScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "job-scheduler", "status"}, ""))
+	pattern_JobScheduler_GetStatusJobScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "job-scheduler", "status"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_JobScheduler_MarkNodesMissing_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "missing-nodes", "mark-nodes-missing"}, ""))
+	pattern_JobScheduler_MarkNodesMissing_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "missing-nodes", "mark-nodes-missing"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_JobScheduler_ConfigureNodesMissingScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "missing-nodes", "config"}, ""))
+	pattern_JobScheduler_ConfigureNodesMissingScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "missing-nodes", "config"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_JobScheduler_StartNodesMissingScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "missing-nodes", "start"}, ""))
+	pattern_JobScheduler_StartNodesMissingScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "missing-nodes", "start"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_JobScheduler_StopNodesMissingScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "missing-nodes", "stop"}, ""))
+	pattern_JobScheduler_StopNodesMissingScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "missing-nodes", "stop"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_JobScheduler_DeleteMarkedNodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "delete-nodes", "delete-marked-nodes"}, ""))
+	pattern_JobScheduler_DeleteMarkedNodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "delete-nodes", "delete-marked-nodes"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_JobScheduler_StartDeleteNodesScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "delete-nodes", "start"}, ""))
+	pattern_JobScheduler_StartDeleteNodesScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "delete-nodes", "start"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_JobScheduler_StopDeleteNodesScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "delete-nodes", "stop"}, ""))
+	pattern_JobScheduler_StopDeleteNodesScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "delete-nodes", "stop"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_JobScheduler_ConfigureDeleteNodesScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "delete-nodes", "config"}, ""))
+	pattern_JobScheduler_ConfigureDeleteNodesScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "delete-nodes", "config"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

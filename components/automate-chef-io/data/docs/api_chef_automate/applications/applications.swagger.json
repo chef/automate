@@ -211,6 +211,22 @@
         ]
       }
     },
+    "/beta/applications/stats": {
+      "get": {
+        "operationId": "GetServicesStats",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/applicationsServicesStatsRes"
+            }
+          }
+        },
+        "tags": [
+          "ApplicationsService"
+        ]
+      }
+    },
     "/beta/applications/version": {
       "get": {
         "operationId": "GetVersion",
@@ -260,9 +276,11 @@
         "OK",
         "WARNING",
         "CRITICAL",
-        "UNKNOWN"
+        "UNKNOWN",
+        "NONE"
       ],
       "default": "OK",
+      "description": "- NONE: The representation of NO health check status\nTODO @afiune how much effort would be to change\nthe OK enum to be NONE",
       "title": "The HealthStatus enum matches the habitat implementation for health-check status:\n=\u003e https://www.habitat.sh/docs/reference/#health-check"
     },
     "applicationsService": {
@@ -296,6 +314,12 @@
           "type": "string"
         },
         "site": {
+          "type": "string"
+        },
+        "previous_health_check": {
+          "$ref": "#/definitions/applicationsHealthStatus"
+        },
+        "current_health_since": {
           "type": "string"
         }
       }
@@ -384,6 +408,23 @@
           "items": {
             "$ref": "#/definitions/applicationsService"
           }
+        }
+      }
+    },
+    "applicationsServicesStatsRes": {
+      "type": "object",
+      "properties": {
+        "total_service_groups": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "total_services": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "total_supervisors": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
