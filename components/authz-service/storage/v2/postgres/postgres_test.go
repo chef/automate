@@ -4057,6 +4057,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 			insertAppliedRuleWithMultipleConditions(t, db, "other-rule", projID2, storage.Node)
 
 			resp, err := store.GetStagedOrAppliedRule(ctx, ruleToGet.ID)
+			assert.Error(t, err)
 			assert.Nil(t, resp)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 		},
@@ -4068,9 +4069,11 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 			condition1, err := storage.NewCondition([]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
 			require.NoError(t, err)
 			rule, err := storage.NewRule("new-id-1", projID, "name", storage.Node, []storage.Condition{condition1})
+			require.NoError(t, err)
 			insertStagedRule(t, db, &rule, false)
 
 			resp, err := store.GetStagedOrAppliedRule(ctx, rule.ID)
+			require.NoError(t, err)
 			assert.NotNil(t, resp)
 			expectedRule := storage.Rule{
 				ID:         rule.ID,
@@ -4094,6 +4097,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 			insertAppliedRule(t, db, &rule)
 
 			resp, err := store.GetStagedOrAppliedRule(ctx, rule.ID)
+			require.NoError(t, err)
 			assert.NotNil(t, resp)
 			expectedRule := storage.Rule{
 				ID:         rule.ID,
@@ -4114,9 +4118,11 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 			condition1, err := storage.NewCondition([]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
 			require.NoError(t, err)
 			rule, err := storage.NewRule("new-id-1", projID, "applied name", storage.Node, []storage.Condition{condition1})
+			require.NoError(t, err)
 			insertAppliedRule(t, db, &rule)
 
 			stagedRule, err := storage.NewRule(rule.ID, rule.ProjectID, "update: staged name", rule.Type, rule.Conditions)
+			require.NoError(t, err)
 			insertStagedRule(t, db, &stagedRule, false)
 			resp, err := store.GetStagedOrAppliedRule(ctx, rule.ID)
 			require.NoError(t, err)

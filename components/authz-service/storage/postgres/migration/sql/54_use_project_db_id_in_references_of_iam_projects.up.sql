@@ -185,6 +185,62 @@ CREATE OR REPLACE FUNCTION
 
 $$ LANGUAGE sql;
 
+CREATE OR REPLACE FUNCTION
+  query_staged_or_applied_rule(_rule_id TEXT, _project_filter TEXT[])
+  RETURNS json AS $$
+
+  -- check for applied rule
+  SELECT json_build_object(
+    'id', r.id,
+    'project_id', p.id,
+    'name', r.name,
+    'type', r.type,
+    'deleted', r.deleted,
+    'status', 'staged',
+    'conditions', json_agg(
+      json_build_object(
+        'value', rc.value,
+        'operator', rc.operator,
+        'attribute', rc.attribute
+      )
+    )
+  ) AS rule
+  FROM iam_staged_project_rules AS r
+  INNER JOIN iam_staged_rule_conditions AS rc
+  ON rc.rule_db_id=r.db_id
+  INNER JOIN iam_projects AS p
+  ON r.project_id=p.db_id
+  WHERE r.id=_rule_id AND projects_match_for_rule(p.id, _project_filter)
+  GROUP BY r.id, p.id, r.name, r.type, r.deleted
+
+  UNION ALL
+
+  -- check for applied rule
+  SELECT json_build_object(
+    'id', r.id,
+    'project_id', p.id,
+    'name', r.name,
+    'type', r.type,
+    'deleted', false,
+    'status', 'applied',
+    'conditions', json_agg(
+      json_build_object(
+        'value', rc.value,
+        'operator', rc.operator,
+        'attribute', rc.attribute
+      )
+    )
+  ) AS rule
+  FROM iam_project_rules AS r
+  INNER JOIN iam_rule_conditions AS rc
+   ON rc.rule_db_id=r.db_id
+  INNER JOIN iam_projects AS p
+  ON r.project_id=p.db_id
+  WHERE r.id=_rule_id AND projects_match_for_rule(p.id, _project_filter)
+  GROUP BY r.id, p.id, r.name, r.type;
+
+$$ LANGUAGE sql;
+
 -- helper functions
 CREATE FUNCTION project_db_id (_id TEXT)
     RETURNS INTEGER
