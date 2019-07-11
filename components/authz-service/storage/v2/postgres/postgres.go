@@ -1068,7 +1068,7 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 		res, err := tx.ExecContext(ctx,
 			`UPDATE iam_staged_project_rules
 				SET deleted=true
-				WHERE id=$1 AND projects_match_for_rule(project_id, $2);`,
+				WHERE id=$1 AND projects_match_for_rule(project_id, $2)`,
 			id, pq.Array(projectsFilter),
 		)
 		if err != nil {
@@ -1081,7 +1081,7 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 	} else if ruleApplied {
 		res, err := tx.ExecContext(ctx,
 			`SELECT db_id FROM iam_project_rules
-				WHERE id=$1 AND projects_match_for_rule(project_id, $2);`,
+				WHERE id=$1 AND projects_match_for_rule(project_id, $2)`,
 			id, pq.Array(projectsFilter),
 		)
 		if err != nil {
@@ -1096,7 +1096,7 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 			`INSERT INTO iam_staged_project_rules (id, project_id, name, type, deleted)
 				SELECT a.id, a.project_id, a.name, a.type, 'true'
 				FROM iam_project_rules AS a
-				WHERE a.id=$1 AND projects_match_for_rule(a.project_id, $2);`,
+				WHERE a.id=$1 AND projects_match_for_rule(a.project_id, $2)`,
 			id, pq.Array(projectsFilter),
 		)
 		if err != nil {
@@ -1116,7 +1116,7 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 	} else if ruleStaged {
 		res, err := tx.ExecContext(ctx,
 			`DELETE FROM iam_staged_project_rules
-				WHERE id=$1 AND projects_match_for_rule(project_id, $2);`,
+				WHERE id=$1 AND projects_match_for_rule(project_id, $2)`,
 			id, pq.Array(projectsFilter),
 		)
 		if err != nil {

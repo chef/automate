@@ -197,5 +197,17 @@ CREATE FUNCTION project_db_id (_id TEXT)
         id = _id;
 $$
 LANGUAGE SQL;
+
+CREATE FUNCTION project_id (_db_id INTEGER)
+    RETURNS TEXT
+    AS $$
+    SELECT
+        id
+    FROM
+        iam_projects
+    WHERE
+        db_id = _db_id;
+$$
+LANGUAGE SQL;
  
 COMMIT;
