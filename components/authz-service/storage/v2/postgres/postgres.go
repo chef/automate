@@ -1107,7 +1107,7 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 		// Value will never be seen, so a dummy value is OK here.
 		_, err = tx.ExecContext(ctx,
 			`INSERT INTO iam_staged_rule_conditions (rule_db_id, value, attribute, operator)
-			 VALUES ((SELECT db_id FROM iam_staged_project_rules WHERE id=$1), '{dummy}', 'chef-server', 'equals');`,
+			 (SELECT db_id, '{dummy}', 'chef-server', 'equals'  FROM iam_staged_project_rules WHERE id=$1)`,
 			id,
 		)
 		if err != nil {
