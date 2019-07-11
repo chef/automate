@@ -275,10 +275,14 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     return member.name in this.membersToAdd;
   }
 
-  public validateAndAddExpression(): void {
+  public resetErrors(): void {
     this.unparsableMember = false;
     this.duplicateMember = false;
     this.alreadyPolicyMember = false;
+  }
+
+  public validateAndAddExpression(): void {
+    this.resetErrors();
 
     const member = stringToMember(this.expressionForm.value.expression);
 
