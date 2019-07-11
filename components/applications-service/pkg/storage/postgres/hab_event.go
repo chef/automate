@@ -5,8 +5,6 @@ import (
 	"strings"
 	"time"
 
-	dblib "github.com/chef/automate/lib/db"
-
 	"github.com/go-gorp/gorp"
 	"github.com/golang/protobuf/ptypes"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
@@ -18,6 +16,7 @@ import (
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/habitat"
 	"github.com/chef/automate/components/applications-service/pkg/storage"
+	dblib "github.com/chef/automate/lib/db"
 )
 
 const (
