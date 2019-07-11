@@ -348,8 +348,7 @@ func TestNoLostWorkOnTaskSuccess(t *testing.T) {
 
 func TestTaskPinger(t *testing.T) {
 	// This test creates a workflow that launches a task that will succeed.
-	// Before it can succeed, the task is expired. We expect that the result
-	// from the task is not written back.
+	// The task is slow, and we make sure pinging it keeps it alive
 
 	taskName := "task_name"
 	workflowName := "workflow_name"
@@ -386,13 +385,11 @@ func TestTaskPinger(t *testing.T) {
 
 	for i := 0; i < 5; i++ {
 		pgCompleter.pinger.ping(ctx)
-		// it's taken too long an has been marked expired
 		err = b1.cleaner.expireDeadTasks(ctx, 2)
 		require.NoError(t, err)
 		time.Sleep(1 * time.Second)
 	}
 
-	// task finishes, but cant write back because the task was expired
 	err = taskCompleter.Succeed([]byte("foo"))
 	require.NoError(t, err)
 
