@@ -272,7 +272,7 @@ func (app *ApplicationsServer) GetDisconnectedServices(c context.Context,
 	services, err := app.storageClient.GetDisconnectedServices(thresholdMinutes)
 	if err != nil {
 		log.WithError(err).Error("Error retrieving disconnected services")
-		return nil, status.Error(codes.Internal, err.Error())
+		return new(applications.ServicesRes), status.Error(codes.Internal, err.Error())
 	}
 
 	return &applications.ServicesRes{
