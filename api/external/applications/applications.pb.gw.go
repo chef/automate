@@ -346,7 +346,7 @@ var (
 
 	pattern_ApplicationsService_GetServicesStats_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"beta", "applications", "stats"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationsService_GetDisconnectedServices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"beta", "applications", "services", "disconnected"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationsService_GetDisconnectedServices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"beta", "applications", "disconnected_services"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_ApplicationsService_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"beta", "applications", "version"}, "", runtime.AssumeColonVerbOpt(true)))
 )

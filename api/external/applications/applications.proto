@@ -60,7 +60,7 @@ service ApplicationsService {
   };
 
   rpc GetDisconnectedServices(DisconnectedServicesReq) returns (ServicesRes ) {
-    option (google.api.http).get = "/beta/applications/services/disconnected";
+    option (google.api.http).get = "/beta/applications/disconnected_services";
     option (chef.automate.api.policy).resource = "service_groups";
     option (chef.automate.api.policy).action = "list";
     option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
