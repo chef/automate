@@ -19,8 +19,8 @@ clean_swagger_files:
 sync_swagger_files: clean_swagger_files
 	pushd ../../api/external && \
 		find . -name '*.swagger.json' | sed 's/^\.\///' | while read i ; do \
-			mkdir -p ../../components/automate-chef-io/$(SWAGGER_DIR)/`dirname $$i` && \
-			cp $$i ../../components/automate-chef-io/$(SWAGGER_DIR)/`dirname $$i` \
+			mkdir -p "../../components/automate-chef-io/$(SWAGGER_DIR)/`dirname $$i`" && \
+			cp $$i "../../components/automate-chef-io/$(SWAGGER_DIR)/$$i" \
 		; done && \
 	popd
 
