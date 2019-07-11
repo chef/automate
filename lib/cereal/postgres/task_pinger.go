@@ -64,10 +64,10 @@ func (w *taskPinger) ping(ctx context.Context) (shouldExit bool, err error) {
 	logctx := logrus.WithFields(logrus.Fields{
 		"taskID": w.taskID,
 	})
-	logctx.Debug("checkin for worker")
+	logctx.Debug("checkin for task")
 	_, err = w.db.ExecContext(ctx, "SELECT cereal_ping_task($1)", w.taskID)
 	if err != nil {
-		logctx.WithError(err).Error("failed to update worker check-in time")
+		logctx.WithError(err).Error("failed to update task check-in time")
 		if isErrTaskLost(err) {
 			return true, nil
 		}
