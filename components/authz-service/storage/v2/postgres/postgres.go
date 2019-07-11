@@ -960,8 +960,10 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 	}
 
 	row := tx.QueryRowContext(ctx,
-		`INSERT INTO iam_staged_project_rules (id, project_id, name, type, deleted) VALUES ($1, $2, $3, $4, $5) RETURNING db_id;`,
-		rule.ID, rule.ProjectID, rule.Name, rule.Type.String(), false)
+		`INSERT INTO iam_staged_project_rules (id, project_id, name, type, deleted)
+		(SELECT $1, db_id, $3, $4, false FROM iam_projects WHERE id=$2)
+		RETURNING db_id`,
+		rule.ID, rule.ProjectID, rule.Name, rule.Type.String())
 	var ruleDbID string
 	if err := row.Scan(&ruleDbID); err != nil {
 		return nil, p.processError(err)
