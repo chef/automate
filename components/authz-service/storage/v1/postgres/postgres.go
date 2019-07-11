@@ -15,6 +15,7 @@ import (
 	"github.com/chef/automate/components/authz-service/storage/postgres"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	storage "github.com/chef/automate/components/authz-service/storage/v1"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
@@ -112,12 +113,7 @@ func (p *pg) ListPolicies(ctx context.Context) ([]*storage.Policy, error) {
 	if err != nil {
 		return nil, p.processError(err)
 	}
-	defer func() {
-		err := rows.Close()
-		if err != nil {
-			p.logger.Errorf("could not close rows. Error: %v", err)
-		}
-	}()
+	defer fileutils.LogClose(rows, p.logger, "could not close rows")
 
 	storagePolicies := []*storage.Policy{}
 	for rows.Next() {
@@ -140,12 +136,7 @@ func (p *pg) ListPoliciesWithSubjects(ctx context.Context) ([]*storage.Policy, e
 	if err != nil {
 		return nil, p.processError(err)
 	}
-	defer func() {
-		err := rows.Close()
-		if err != nil {
-			p.logger.Errorf("could not close rows. Error: %v", err)
-		}
-	}()
+	defer fileutils.LogClose(rows, p.logger, "could not close rows")
 
 	storagePolicies := []*storage.Policy{}
 	for rows.Next() {
@@ -192,11 +183,7 @@ func (p *pg) PurgeSubjectFromPolicies(ctx context.Context, sub string) ([]uuid.U
 	if err != nil {
 		return nil, p.processError(err)
 	}
-	defer func() {
-		if err := rows.Close(); err != nil {
-			p.logger.Errorf("could not close rows. Error: %v", err)
-		}
-	}()
+	defer fileutils.LogClose(rows, p.logger, "could not close rows")
 
 	var polIDs []uuid.UUID
 	for rows.Next() {
