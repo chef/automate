@@ -232,7 +232,11 @@ describe File.basename(__FILE__) do
     # Get job by id with all details
     job1 = GRPC jobs, :read, Jobs::Id.new(id: job_id1)
     assert_equal(true, TimeStuff.checkTimestampAndAdjustIfNeeded(test_start_time, job1, 'start_time'))
-    job1['status'] = 'GOOOOD' if job1['status'] == 'running' || job1['status'] == 'scheduled'
+    job1['status'] = 'GOOOOD'
+    job1_hash = job1.to_hash
+    job1_hash[:results] = ["GOOOOOOOOD"]
+    job1_hash[:end_time] = 'GOOOOD'
+    job1_hash[:scheduled_time] = 'GOOOOD'
     expected_job1 = {
       "id": job_id1,
       "name": "my Detect Job For two nodes",
@@ -248,38 +252,59 @@ describe File.basename(__FILE__) do
           "value": "Spain"
         }
       ],
-      "endTime": "0001-01-01T00:00:00Z",
+      "end_time": "GOOOOD",
       "status": "GOOOOD",
       "retries": 1,
-      "retriesLeft": 1,
+      "retries_left": 1,
       "nodes": [@docker_node_id1, @docker_node_id2],
-      "nodeCount": 2,
-      "scheduledTime": "0001-01-01T00:00:00Z",
-      "parentId": "123"
+      "node_count": 2,
+      "scheduled_time": "GOOOOD",
+      "parent_id": "123",
+      "node_selectors"=>[],
+      "profile_count"=>0,
+      "profiles"=>[],
+      "recurrence"=>"",
+      "start_time"=>nil,
+      "job_count"=>0,
+      "deleted"=>false,
+      "results": ["GOOOOOOOOD"],
     }
-    assert_equal_json_sorted(expected_job1.to_json, job1.to_json)
+    assert_equal_json_sorted(expected_job1.to_json, job1_hash.to_json)
 
     # Get job by id with all details
     job2 = GRPC jobs, :read, Jobs::Id.new(id: job_id2)
     assert_equal(true, TimeStuff.checkTimestampAndAdjustIfNeeded(test_start_time, job2, 'start_time'))
-    job2['status'] = 'good' if job2['status'] == 'running' || job2['status'] == 'scheduled'
+    job2['status'] = 'GOOOOD'
+    job2_hash = job2.to_hash
+    job2_hash[:results] = ["GOOOOOOOOD"]
+    job2_hash[:end_time] = 'GOOOOD'
+    job2_hash[:scheduled_time] = 'GOOOOD'
     expected_job2 = {
       "id": job_id2,
       "name": "My Exec Job For Existing node",
       "type": "exec",
       "timeout": 7200,
-      "endTime": "0001-01-01T00:00:00Z",
-      "status": "good",
+      "end_time": "GOOOOD",
+      "status": "GOOOOD",
       "retries": 1,
-      "retriesLeft": 1,
+      "retries_left": 1,
       "nodes": [@docker_node_id1],
       "profiles": [
         "https://github.com/dev-sec/apache-baseline/archive/master.tar.gz"
       ],
-      "nodeCount": 1,
-      "scheduledTime": "0001-01-01T00:00:00Z"
+      "node_count": 1,
+      "node_selectors"=>[],
+      "profile_count"=>0,
+      "recurrence"=>"",
+      "scheduled_time": "GOOOOD",
+      "start_time"=>nil,
+      "job_count"=>0,
+      "deleted"=>false,
+      "parent_id": "",
+      "tags"=>[],
+      "results": ["GOOOOOOOOD"],
     }
-    assert_equal(expected_job2.to_json, job2.to_json)
+    assert_equal_json_sorted(expected_job2.to_json, job2_hash.to_json)
 
     # give the jobs some time to reach a conclusion
     job1 = GRPC jobs, :read, Jobs::Id.new(id: job_id1)
