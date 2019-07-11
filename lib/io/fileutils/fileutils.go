@@ -1,8 +1,18 @@
 package fileutils
 
 import (
+	"io"
 	"os"
+
+	"github.com/sirupsen/logrus"
 )
+
+// LogCLose closes the given io.Closer, logging any error.
+func LogClose(c io.Closer, log logrus.FieldLogger, msg string) {
+	if err := c.Close(); err != nil {
+		log.WithError(err).Error(msg)
+	}
+}
 
 // PathExists returns true if the path exists and false if it doesn't
 // exist. An error is returned if an unexpected error occurs.  Callers
