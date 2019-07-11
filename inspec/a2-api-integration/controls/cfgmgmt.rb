@@ -64,6 +64,7 @@ control 'config-mgmt-ccr-1' do
         end
 
         it 'should ingest the data successfully' do
+          expect(api_request.parsed_response_body).to eq({})
           expect(api_request.http_status).to eq 200
         end
       end

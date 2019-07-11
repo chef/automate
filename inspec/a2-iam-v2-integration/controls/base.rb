@@ -134,13 +134,13 @@ EOF
     # compliance:profiles for client calls should be permitted by default
     describe '/api/v0/compliance/profiles/search as client' do
       it "api/v0/compliance/profiles/search returns the correct response code for client" do
-        expect(
-          automate_client_api_request(
+        resp = automate_client_api_request(
             "/api/v0/compliance/profiles/search",
             TEST_TOKEN_V2,
             http_method: 'POST'
-          ).http_status
-        ).to eq(200)
+        )
+        expect(resp.parsed_response_body).to eq({}) # XXX just want to see the error
+        expect(resp.http_status).to eq(200)
       end
     end
 
@@ -151,13 +151,13 @@ EOF
       ).each do |url|
         { 'GET': 200, 'POST': 400 }.each do |method, status|
           it "#{method} #{url} returns the correct response code for client" do
-            expect(
-              automate_client_api_request(
+            resp = automate_client_api_request(
                 url,
                 TEST_TOKEN_V2,
                 http_method: method,
-              ).http_status
-            ).to eq(status)
+            )
+            expect(resp.parsed_response_body).to eq({}) # XXX just want to see the error
+            expect(resp.http_status).to eq(status)
           end
         end
       end
