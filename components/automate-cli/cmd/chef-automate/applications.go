@@ -2,8 +2,9 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"os"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/spf13/cobra"
 
 	apps "github.com/chef/automate/api/config/applications"
@@ -75,8 +76,10 @@ func runApplicationsListDisconnectedServicesCmd(*cobra.Command, []string) error 
 		)
 	}
 
-	ctx := context.Background()
-	apiClient, err := apiclient.OpenConnection(ctx)
+	var (
+		ctx            = context.Background()
+		apiClient, err = apiclient.OpenConnection(ctx)
+	)
 	if err != nil {
 		return status.Wrap(err, status.APIUnreachableError,
 			"Failed to create a connection to the API")
@@ -91,8 +94,8 @@ func runApplicationsListDisconnectedServicesCmd(*cobra.Command, []string) error 
 		return err
 	}
 
-	// TODO @afiune use a pretty text marshaler https://godoc.org/github.com/golang/protobuf/proto#TextMarshaler
-	fmt.Println(servicesRes.Services)
+	txt := proto.TextMarshaler{}
+	txt.Marshal(os.Stdout, servicesRes)
 
 	return nil
 
