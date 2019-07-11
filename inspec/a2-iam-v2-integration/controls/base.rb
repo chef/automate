@@ -102,6 +102,7 @@ EOF
           password: ENV['AUTOMATE_API_DEFAULT_PASSWORD'] || 'chefautomate',
         }.to_json
       )
+      expect(create_non_admin_request.parsed_response_body).to eq({})
       expect(create_non_admin_request.http_status.to_s).to match(/200|409/)
 
       test_token_request = automate_api_request(
@@ -114,6 +115,7 @@ EOF
       )
       TEST_TOKEN_V2 = test_token_request.parsed_response_body[:value]
 
+      expect(test_token_request.parsed_response_body).to eq({})
       expect(test_token_request.http_status).to eq(200)
     end
 
