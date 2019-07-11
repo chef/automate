@@ -109,7 +109,7 @@ EOF
         http_method: 'POST',
         request_body: {
           id: TEST_TOKEN_ID_V2,
-          description: 'inspec_test_token',
+          name: 'inspec_test_token',
         }.to_json
       )
       TEST_TOKEN_V2 = test_token_request.parsed_response_body[:value]
