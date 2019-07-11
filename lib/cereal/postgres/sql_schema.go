@@ -292,7 +292,7 @@ CREATE OR REPLACE FUNCTION cereal_ping_task(_task_id BIGINT)
 RETURNS VOID
 AS $$
 BEGIN
-    UPDATE cereal_task SET updated_at = NOW() WHERE id = _task_id;
+    UPDATE cereal_tasks SET updated_at = NOW() WHERE id = _task_id;
     IF NOT FOUND THEN
         RAISE check_violation USING MESSAGE = 'Failed to update task: no such task_id';
     END IF;
