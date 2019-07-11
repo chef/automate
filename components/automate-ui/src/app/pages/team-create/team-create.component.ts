@@ -30,8 +30,11 @@ export class TeamCreateComponent implements OnInit {
     fb: FormBuilder
   ) {
     this.teamCreateForm = fb.group({
-      teamId: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      teamName: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+      // Must stay in sync with error checks in team-create.component.html
+      teamId: ['',
+        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]],
+      teamName: ['',
+        [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
     this.iamMajorVersion$ = store.select(iamMajorVersion);
   }
