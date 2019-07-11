@@ -167,7 +167,7 @@ func (pg *PostgresBackend) Init() error {
 	if err != nil {
 		return err
 	}
-	defer m.Close()
+	defer m.Close() // nolint: errcheck
 
 	version, dirty, err := m.Version()
 	if err != nil && err != migrate.ErrNilVersion {
