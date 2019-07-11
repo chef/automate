@@ -42,6 +42,36 @@ const (
 	None     = "NONE"
 )
 
+type UpdateStrategy int
+
+const (
+	NoneStrategy UpdateStrategy = iota
+	AtOnceStrategy
+	RollingStrategy
+)
+
+func (x UpdateStrategy) String() string {
+	switch x {
+	case AtOnceStrategy:
+		return "AT-ONCE"
+	case RollingStrategy:
+		return "ROLLING"
+	default:
+		return "NONE"
+	}
+}
+
+func HabitatUpdateStrategyToStorageFormat(strategy habitat.UpdateStrategy) UpdateStrategy {
+	switch strategy {
+	case habitat.UpdateStrategy_AtOnce:
+		return AtOnceStrategy
+	case habitat.UpdateStrategy_Rolling:
+		return RollingStrategy
+	default:
+		return NoneStrategy
+	}
+}
+
 type Service struct {
 	ID                  int32  `db:"id"`
 	SupMemberID         string `db:"sup_member_id"`
@@ -58,6 +88,7 @@ type Service struct {
 	Channel             string
 	Site                string
 	PreviousHealth      string    `db:"previous_health"`
+	UpdateStrategy      string    `db:"update_strategy"`
 	LastEventOccurredAt time.Time `db:"last_event_occurred_at"`
 	HealthUpdatedAt     time.Time `db:"health_updated_at"`
 }

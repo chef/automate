@@ -69,7 +69,9 @@ func TestIngestSigleService(t *testing.T) {
 	assert.Equal(t, "development", svcList[0].Environment,
 		"the service environment name is not the expected one")
 	assert.Equal(t, "stable", svcList[0].Channel,
-		"the service channel name is not the expected one")
+		"the service update channel is not the expected one")
+	assert.Equal(t, "AT-ONCE", svcList[0].UpdateStrategy,
+		"the service update strategy is not the expected one")
 	assert.Equal(t, "us", svcList[0].Site,
 		"the service site name is not the expected one")
 	assert.Equal(t, "NONE", svcList[0].PreviousHealth,
@@ -282,7 +284,7 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 			withSupervisorId("4f1un3"),
 			withPackageIdent("test/db/0.1.0/20200101121212"),
 			withServiceGroup("db.default"),
-			withStrategyAtOnce("stable"),
+			withStrategyRolling("stable"),
 			withApplication("test-app"),
 			withEnvironment("development"),
 			withFqdn("db.example.com"),
@@ -326,7 +328,9 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 		assert.Equal(t, "development", svcList[0].Environment,
 			"the service environment name is not the expected one")
 		assert.Equal(t, "stable", svcList[0].Channel,
-			"the service channel name is not the expected one")
+			"the service update channel is not the expected one")
+		assert.Equal(t, "ROLLING", svcList[0].UpdateStrategy,
+			"the service update strategy is not the expected one")
 		assert.Equal(t, "us", svcList[0].Site,
 			"the service site name is not the expected one")
 		assert.Equal(t, "NONE", svcList[0].PreviousHealth,
@@ -409,7 +413,9 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 		assert.Equal(t, "testing", svcList[0].Environment,
 			"the service environment name is not the expected one")
 		assert.Equal(t, "unstable", svcList[0].Channel,
-			"the service channel name is not the expected one")
+			"the service update channel is not the expected one")
+		assert.Equal(t, "AT-ONCE", svcList[0].UpdateStrategy,
+			"the service update strategy is not the expected one")
 		assert.Equal(t, "us", svcList[0].Site,
 			"the service site name is not the expected one")
 		assert.Equal(t, "OK", svcList[0].PreviousHealth,
@@ -464,7 +470,9 @@ func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
 		svcList = suite.GetServices()
 		assert.Equal(t, 1, len(svcList))
 		assert.Equal(t, "", svcList[0].Channel,
-			"the service channel name is not the expected one")
+			"the service update channel is not the expected one")
+		assert.Equal(t, "NONE", svcList[0].UpdateStrategy,
+			"the service update strategy is not the expected one")
 		assert.Equal(t, "UNKNOWN", svcList[0].Health,
 			"the service health is not the expected one")
 		assert.Equal(t, "CRITICAL", svcList[0].PreviousHealth,
