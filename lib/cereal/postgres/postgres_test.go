@@ -104,7 +104,6 @@ func TestMultipleTasksCanDequeueConcurrently(t *testing.T) {
 	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
 		InstanceName: "workflow-instance",
 		WorkflowName: workflowName,
-		Status:       "running",
 	})
 
 	require.NoError(t, err, "failed to enqueue workflow")
@@ -170,7 +169,6 @@ func TestTaskComplete(t *testing.T) {
 	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
 		InstanceName: "workflow-instance",
 		WorkflowName: workflowName,
-		Status:       "running",
 	})
 
 	require.NoError(t, err, "failed to enqueue workflow")
@@ -208,7 +206,6 @@ func TestLostWorkOnTaskSuccess(t *testing.T) {
 	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
 		InstanceName: "workflow-instance",
 		WorkflowName: workflowName,
-		Status:       "running",
 	})
 
 	require.NoError(t, err, "failed to enqueue workflow")
@@ -262,7 +259,6 @@ func TestLostWorkOnTaskFail(t *testing.T) {
 	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
 		InstanceName: "workflow-instance",
 		WorkflowName: workflowName,
-		Status:       "running",
 	})
 
 	require.NoError(t, err, "failed to enqueue workflow")
@@ -316,7 +312,6 @@ func TestNoLostWorkOnTaskSuccess(t *testing.T) {
 	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
 		InstanceName: "workflow-instance",
 		WorkflowName: workflowName,
-		Status:       "running",
 	})
 
 	require.NoError(t, err, "failed to enqueue workflow")
@@ -348,7 +343,6 @@ func TestNoLostWorkOnTaskSuccess(t *testing.T) {
 
 	_, _, err = b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.Error(t, cereal.ErrNoWorkflowInstances)
-
 }
 
 func init() {
