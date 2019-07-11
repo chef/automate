@@ -744,7 +744,6 @@ EOF
             request_body: {
               name: updatedName,
               password: "newpassword",
-              previous_password: "wrongagain"
             }.to_json
           )
           expect(resp.http_status).to eq 404
