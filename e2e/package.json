@@ -18,6 +18,8 @@
   },
   "devDependencies": {
     "typescript": "^2.9.2",
-    "webpack": "^4.35.3"
+    "webpack": "^4.35.3",
+    "@cypress/webpack-preprocessor": "^4.1.0",
+    "ts-loader": "^6.0.4"
   }
 }
