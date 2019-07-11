@@ -84,7 +84,7 @@ func runApplicationsListDisconnectedServicesCmd(*cobra.Command, []string) error 
 	if format != "json" && format != "pretty" {
 		return status.Errorf(status.InvalidCommandArgsError,
 			"%s is not a valid format type. Available formats are 'json' and 'pretty'.",
-			thresholdMinutes,
+			format,
 		)
 	}
 
@@ -123,7 +123,10 @@ func runApplicationsListDisconnectedServicesCmd(*cobra.Command, []string) error 
 		writer.Println(json)
 	case "pretty":
 		txt := proto.TextMarshaler{}
-		txt.Marshal(os.Stdout, servicesRes)
+		err := txt.Marshal(os.Stdout, servicesRes)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
