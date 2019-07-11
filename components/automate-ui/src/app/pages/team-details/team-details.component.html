@@ -37,7 +37,7 @@
                   <chef-input ngDefaultControl formControlName="teamName" type="text"></chef-input>
                 </label>
                 <chef-error *ngIf="(editForm.get('teamName').hasError('required') || editForm.get('teamName').hasError('pattern')) && editForm.get('teamName').dirty">
-                  A non-blank team {{ versionedDescOrName }} is required
+                  Team {{ versionedDescOrName }} is required
                 </chef-error>
               </chef-form-field>
             </form>

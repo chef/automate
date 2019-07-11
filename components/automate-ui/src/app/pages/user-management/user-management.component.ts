@@ -74,7 +74,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       )));
 
     this.createUserForm = fb.group({
-      // Make sure these stay in sync with error checks in user-form.component.html
+      // Must stay in sync with error checks in user-form.component.html
       fullname: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       username: ['', [Validators.required, Validators.pattern(USERNAME_PATTERN)]],
       // length validator must be consistent with

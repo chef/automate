@@ -149,6 +149,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
   private createForms(fb: FormBuilder): void {
     this.editForm = fb.group({
+      // Must stay in sync with error checks in team-details.component.html
       teamName: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
   }

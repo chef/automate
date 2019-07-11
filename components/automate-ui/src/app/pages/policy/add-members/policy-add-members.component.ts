@@ -73,6 +73,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     fb: FormBuilder) {
 
     this.expressionForm = fb.group({
+      // Must stay in sync with error checks in policy-add-members.component.html
       expression: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
   }

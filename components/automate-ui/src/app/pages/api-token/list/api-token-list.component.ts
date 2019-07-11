@@ -58,10 +58,10 @@ export class ApiTokenListComponent implements OnInit {
     this.apiTokenCount$ = store.pipe(select(totalApiTokens));
 
     this.createTokenForm = fb.group({
-      // Make sure these stay in sync with error checks in create-object-modal.component.html
+      // Must stay in sync with error checks in create-object-modal.component.html
       name: ['', Validators.required],
-      id: ['', [
-        Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]]
+      id: ['',
+        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]]
     });
   }
 
