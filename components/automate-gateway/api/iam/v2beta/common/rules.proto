@@ -26,12 +26,19 @@ enum ConditionOperator {
     EQUALS = 2;
 }
 
+enum RuleStatus {
+    RULE_STATUS_UNSET = 0;
+    STAGED = 1;
+    APPLIED = 2;
+}
+
 message Rule {
     string id = 1;
     string project_id = 2;
     string name = 3;
     RuleType type = 4;
     repeated Condition conditions = 5;
+    RuleStatus status = 6;
 }
 
 message Condition {

@@ -88,6 +88,7 @@ func init() {
     },
     "/iam/v2beta/rules": {
       "get": {
+        "summary": "TODO (tc): Right now we don't have plans to use this in the UI\nand it doesn't return the staged rules like all the other query APIs.\nShould probably delete it or update it to return staged rules.",
         "operationId": "ListRules",
         "responses": {
           "200": {
@@ -357,8 +358,20 @@ func init() {
           "items": {
             "$ref": "#/definitions/v2betaCondition"
           }
+        },
+        "status": {
+          "$ref": "#/definitions/v2betaRuleStatus"
         }
       }
+    },
+    "v2betaRuleStatus": {
+      "type": "string",
+      "enum": [
+        "RULE_STATUS_UNSET",
+        "STAGED",
+        "APPLIED"
+      ],
+      "default": "RULE_STATUS_UNSET"
     },
     "v2betaRuleType": {
       "type": "string",
