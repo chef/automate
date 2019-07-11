@@ -287,8 +287,8 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.duplicateMember = member.name in this.membersAvailableMap;
-    if (this.duplicateMember) {
+    if (member.name in this.membersAvailableMap) {
+      this.duplicateMember = true;
       return;
     }
 
@@ -298,9 +298,6 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
         return;
       }
     });
-    if (this.alreadyPolicyMember) {
-      return;
-    }
 
     this.addAvailableMember(member, true);
     this.addOrRemoveQueuedMember(true, member);
