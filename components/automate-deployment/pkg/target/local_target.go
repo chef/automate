@@ -851,8 +851,10 @@ func (t *LocalTarget) SystemdRunning() (bool, error) {
 // required.
 func (t *LocalTarget) SystemdReloadRequired() (bool, error) {
 	stderrBuff := new(strings.Builder)
-	err := t.Executor.Run("systemctl", command.Args("status", "chef-automate.service"), command.Stderr(stderrBuff))
+	out, err := t.Executor.Output("systemctl", command.Args("status", "chef-automate.service"),
+		command.Stderr(stderrBuff))
 	if err != nil {
+		logrus.Debugf("systemctl status failed with standard output: %s", out)
 		return false, errors.Wrapf(err, "systemctl status chef-automate.service failed: %s", stderrBuff.String())
 	}
 
