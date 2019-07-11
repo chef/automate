@@ -3303,7 +3303,7 @@ func TestCreateRule(t *testing.T) {
 
 			resp, err := store.CreateRule(ctx, &rule)
 			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrForeignKey, err)
+			assert.Equal(t, storage_errors.ErrNotFound, err)
 		},
 		"when rule exists in the applied rules table, return error": func(t *testing.T) {
 			projID := "project-1"
@@ -3404,7 +3404,8 @@ func TestCreateRule(t *testing.T) {
 			resp, err := store.CreateRule(ctx, &rule)
 			require.NoError(t, err)
 			require.Equal(t, &rule, resp)
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND type=$2 AND project_id=$3 AND name=$4 AND deleted=$5`,
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND type=$2
+				AND project_id=project_db_id($3) AND name=$4 AND deleted=$5`,
 				rule.ID, rule.Type.String(), rule.ProjectID, rule.Name, false))
 			assertCount(t, 3, db.QueryRow(
 				`SELECT count(*) FROM iam_staged_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_staged_project_rules r WHERE r.id=$1)`, ruleID))
@@ -6785,8 +6786,8 @@ func insertStatementProject(t *testing.T, db *testhelpers.TestDB, statementID uu
 
 func insertAppliedRule(t *testing.T, db *testhelpers.TestDB, rule *storage.Rule) {
 	t.Helper()
-	row := db.QueryRow(`
-		INSERT INTO iam_project_rules (id, project_id, name, type) VALUES ($1, $2, $3, $4) RETURNING db_id;`,
+	row := db.QueryRow(`INSERT INTO iam_project_rules (id, project_id, name, type)
+		VALUES ($1, project_db_id($2), $3, $4) RETURNING db_id`,
 		rule.ID, rule.ProjectID, rule.Name, rule.Type.String())
 	var dbID string
 	require.NoError(t, row.Scan(&dbID))
@@ -6797,7 +6798,8 @@ func insertAppliedRule(t *testing.T, db *testhelpers.TestDB, rule *storage.Rule)
 		require.NoError(t, err)
 	}
 
-	assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
+	assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1 AND name=$2 AND type=$3
+		AND project_id=project_db_id($4)`,
 		rule.ID, rule.Name, rule.Type.String(), rule.ProjectID))
 	assertCount(t, len(rule.Conditions), db.QueryRow(`SELECT count(*) FROM iam_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_project_rules r WHERE r.id=$1)`, rule.ID))
 	rule.Status = Applied
@@ -6806,8 +6808,9 @@ func insertAppliedRule(t *testing.T, db *testhelpers.TestDB, rule *storage.Rule)
 func insertStagedRule(t *testing.T, db *testhelpers.TestDB, rule *storage.Rule, deleted bool) {
 	rule.Status = "staged"
 	t.Helper()
-	row := db.QueryRow(`
-		INSERT INTO iam_staged_project_rules (id, project_id, name, type, deleted) VALUES ($1, $2, $3, $4, $5) RETURNING db_id;`,
+	row := db.QueryRow(`INSERT INTO iam_staged_project_rules (id, project_id, name, type, deleted)
+		(SELECT $1, db_id, $3, $4, $5 FROM iam_projects WHERE id=$2)
+		RETURNING db_id`,
 		rule.ID, rule.ProjectID, rule.Name, rule.Type.String(), deleted)
 	var dbID string
 	require.NoError(t, row.Scan(&dbID))
@@ -6818,7 +6821,7 @@ func insertStagedRule(t *testing.T, db *testhelpers.TestDB, rule *storage.Rule, 
 		require.NoError(t, err)
 	}
 
-	assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=$4`,
+	assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND name=$2 AND type=$3 AND project_id=project_db_id($4)`,
 		rule.ID, rule.Name, rule.Type.String(), rule.ProjectID))
 	assertCount(t, len(rule.Conditions), db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions WHERE rule_db_id=(SELECT r.db_id FROM iam_staged_project_rules r WHERE r.id=$1)`, rule.ID))
 }
