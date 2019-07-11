@@ -106,6 +106,7 @@ type service struct {
 	Channel             string    `db:"channel"`
 	FullPkgIdent        string    `db:"package_ident"`
 	PreviousHealth      string    `db:"previous_health"`
+	UpdateStrategy      string    `db:"update_strategy"`
 	LastEventOccurredAt time.Time `db:"last_event_occurred_at"`
 	HealthUpdatedAt     time.Time `db:"health_updated_at"`
 	CreatedAt           time.Time `db:"-"`

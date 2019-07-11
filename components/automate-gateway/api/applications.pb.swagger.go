@@ -341,6 +341,9 @@ func init() {
         "channel": {
           "type": "string"
         },
+        "update_strategy": {
+          "type": "string"
+        },
         "site": {
           "type": "string"
         },
