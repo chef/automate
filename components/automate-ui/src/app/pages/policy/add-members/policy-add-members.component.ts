@@ -29,6 +29,7 @@ import {
   GetUsers
 } from 'app/entities/users/user.actions';
 import { User } from 'app/entities/users/user.model';
+import { Regex } from 'app/helpers/auth/regex';
 
 @Component({
   selector: 'app-policy-add-members',
@@ -72,7 +73,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     fb: FormBuilder) {
 
     this.expressionForm = fb.group({
-      expression: ['', Validators.required]
+      expression: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
   }
 

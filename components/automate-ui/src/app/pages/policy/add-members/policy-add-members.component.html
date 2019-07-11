@@ -22,6 +22,10 @@
               <chef-error *ngIf="unparsableMember">Invalid member expression.</chef-error>
               <chef-error *ngIf="duplicateMember">Member expression already in table.</chef-error>
               <chef-error *ngIf="alreadyPolicyMember">Member already in policy.</chef-error>
+                <chef-error *ngIf="(expressionForm.get('expression').hasError('required') || expressionForm.get('expression').hasError('pattern')) && expressionForm.get('expression').dirty">
+                  A non-blank expression is required
+                </chef-error>
+
             </chef-form-field>
           </form>
           <p><span class="expression">user | team : local | ldap | saml : &lt;name&gt;</span> or <span class="expression">token : &lt;id&gt;</span>, wildcards (*) are allowed.</p>
