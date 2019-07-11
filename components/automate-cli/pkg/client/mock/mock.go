@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/chef/automate/components/automate-gateway/api/auth/teams"
 	"github.com/chef/automate/components/automate-gateway/api/auth/tokens"
@@ -19,15 +20,16 @@ import (
 
 // Mock is a mocked out APIClient.
 type Mock struct {
-	authzClient     authz.AuthorizationClient
-	teamsClient     teams.TeamsClient
-	teamsV2Client   v2beta.TeamsClient
-	tokensClient    tokens.TokensMgmtClient
-	tokensV2Client  v2beta.TokensClient
-	usersClient     users.UsersMgmtClient
-	policiesClient  v2beta.PoliciesClient
-	reportingClient reporting.ReportingServiceClient
-	close           func()
+	authzClient        authz.AuthorizationClient
+	teamsClient        teams.TeamsClient
+	teamsV2Client      v2beta.TeamsClient
+	tokensClient       tokens.TokensMgmtClient
+	tokensV2Client     v2beta.TokensClient
+	usersClient        users.UsersMgmtClient
+	policiesClient     v2beta.PoliciesClient
+	reportingClient    reporting.ReportingServiceClient
+	applicationsClient applications.ApplicationsServiceClient
+	close              func()
 }
 
 // ServerMocks are mocked out API servers
@@ -75,15 +77,16 @@ func CreateMockConn(t *testing.T) (client.APIClient, ServerMocks, error) {
 	require.NoError(t, err)
 
 	return Mock{
-			authzClient:     authz.NewAuthorizationClient(gatewayConn),
-			teamsClient:     teams.NewTeamsClient(gatewayConn),
-			teamsV2Client:   v2beta.NewTeamsClient(gatewayConn),
-			tokensClient:    tokens.NewTokensMgmtClient(gatewayConn),
-			tokensV2Client:  v2beta.NewTokensClient(gatewayConn),
-			usersClient:     users.NewUsersMgmtClient(gatewayConn),
-			policiesClient:  v2beta.NewPoliciesClient(gatewayConn),
-			reportingClient: reporting.NewReportingServiceClient(gatewayConn),
-			close:           grpcServer.Close,
+			authzClient:        authz.NewAuthorizationClient(gatewayConn),
+			teamsClient:        teams.NewTeamsClient(gatewayConn),
+			teamsV2Client:      v2beta.NewTeamsClient(gatewayConn),
+			tokensClient:       tokens.NewTokensMgmtClient(gatewayConn),
+			tokensV2Client:     v2beta.NewTokensClient(gatewayConn),
+			usersClient:        users.NewUsersMgmtClient(gatewayConn),
+			policiesClient:     v2beta.NewPoliciesClient(gatewayConn),
+			reportingClient:    reporting.NewReportingServiceClient(gatewayConn),
+			applicationsClient: applications.NewApplicationsServiceClient(gatewayConn),
+			close:              grpcServer.Close,
 		},
 		ServerMocks{
 			AuthzMock:    mockAuthz,
@@ -134,6 +137,11 @@ func (c Mock) PoliciesClient() v2beta.PoliciesClient {
 // ReportingClient returns mock ReportingClient
 func (c Mock) ReportingClient() reporting.ReportingServiceClient {
 	return c.reportingClient
+}
+
+// ApplicationsClient returns mock ApplicationsClient
+func (c Mock) ApplicationsClient() applications.ApplicationsServiceClient {
+	return c.applicationsClient
 }
 
 // CloseConnection closes all connections opened by client
