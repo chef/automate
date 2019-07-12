@@ -1,3 +1,6 @@
+// This file was generated when running the js-to-ts conversion.
+// See https://github.com/bahmutov/add-typescript-to-cypress
+
 const wp = require('@cypress/webpack-preprocessor')
 
 const webpackOptions = {
