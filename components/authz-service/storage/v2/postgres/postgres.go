@@ -899,22 +899,20 @@ func (p *pg) insertRoleWithQuerier(ctx context.Context, role *v2.Role, q Querier
 		return p.processError(err)
 	}
 
-	row := q.QueryRowContext(ctx, `INSERT INTO iam_roles (id, name, type, actions)  VALUES ($1, $2, $3, $4)
-		RETURNING db_id;`,
+	row := q.QueryRowContext(ctx, `INSERT INTO iam_roles (id, name, type, actions) VALUES ($1, $2, $3, $4)
+		RETURNING db_id`,
 		role.ID, role.Name, role.Type.String(), pq.Array(role.Actions))
 	var dbID string
 	if err := row.Scan(&dbID); err != nil {
 		return p.processError(err)
 	}
 
-	for _, project := range role.Projects {
-		_, err := q.ExecContext(ctx,
-			`INSERT INTO iam_role_projects (role_id, project_id)
-			SELECT $1, db_id FROM iam_projects WHERE id=$2`,
-			dbID, project)
-		if err != nil {
-			return p.processError(err)
-		}
+	_, err = q.ExecContext(ctx,
+		`INSERT INTO iam_role_projects (role_id, project_id)
+		SELECT $1, db_id FROM iam_projects WHERE id=ANY($2)`,
+		dbID, pq.Array(role.Projects))
+	if err != nil {
+		return p.processError(err)
 	}
 
 	err = tx.Commit()
