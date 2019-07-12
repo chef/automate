@@ -58,5 +58,5 @@ do_restore() {
 do_test_restore() {
     do_test_restore_default || return 1
     delete_backup_and_assert_idempotent
-    chef-automate dev verify-packages
+    verify_packages
 }
