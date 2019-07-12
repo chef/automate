@@ -256,18 +256,10 @@ func (app *ApplicationsServer) GetServicesStats(c context.Context,
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	// Gather stats from ingested events
-	eProcessed, eFailed, eSuccessful := app.ingesterClient.GetEventStats()
-
 	return &applications.ServicesStatsRes{
 		TotalServices:      servicesCount,
 		TotalServiceGroups: serviceGroupsCount,
 		TotalSupervisors:   supervisorsCount,
-		IngestStats: &applications.IngestStats{
-			TotalEventsProcessed:  eProcessed,
-			TotalEventsFailed:     eFailed,
-			TotalEventsSuccessful: eSuccessful,
-		},
 	}, nil
 }
 
