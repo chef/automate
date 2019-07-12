@@ -102,7 +102,7 @@ describe('projects API', () => {
           })
         })
 
-        cy.wait(5000)
+        cy.wait(5000)  // TODO replace with polling apply status request
 
         // confirm nodes are unassigned
         cy.request({
@@ -200,8 +200,7 @@ describe('projects API', () => {
         method: 'POST',
         url: '/apis/iam/v2beta/apply-rules'
       })
-      cy.wait(5000)
-      // TODO check status until ready
+      cy.wait(5000) // TODO replace with polling apply status request
 
       // confirm rules are applied
       for (let project of [avengers_project, xmen_project]) {
@@ -261,9 +260,9 @@ describe('projects API', () => {
         method: 'POST',
         url: '/apis/iam/v2beta/apply-rules'
       })
-      cy.wait(5000)
-      // TODO check status until ready
+      cy.wait(5000) // TODO replace with polling apply status request
 
+      // TODO investigate failure by repro locally
       cy.request({
         headers: {
           'api-token': admin_token,
@@ -277,10 +276,41 @@ describe('projects API', () => {
     })
 
     it('deleted rules get applied to nodes', () => {
+      cy.request({
+        headers: { 'api-token': admin_token },
+        method: 'DELETE',
+        url: `/apis/iam/v2beta/rules/${avengersRule.id}`,
+        body: avengersRule
+      })
+      
+      cy.request({
+        headers: { 'api-token': admin_token },
+        method: 'POST',
+        url: '/apis/iam/v2beta/apply-rules'
+      })
+      cy.wait(5000)  // TODO replace with polling apply status request
+      
+      cy.request({
+        headers: {
+          'api-token': admin_token,
+          'projects': avengers_project.id
+        },
+        method: 'GET',
+        url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
+      }).then((response) => {
+        expect(response.body).to.have.length(0)
+      })
 
-      // delete other rule
-      // apply rules
-      // confirm its nodes go back to unassigned
+      cy.request({
+        headers: {
+          'api-token': admin_token,
+          'projects': '(unassigned)'
+        },
+        method: 'GET',
+        url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
+      }).then((response) => {
+        expect(response.body).to.have.length(2)
+      })
     })
   })
 })
