@@ -93,6 +93,9 @@ type RulesClient interface {
 	CreateRule(ctx context.Context, in *request.CreateRuleReq, opts ...grpc.CallOption) (*response.CreateRuleResp, error)
 	UpdateRule(ctx context.Context, in *request.UpdateRuleReq, opts ...grpc.CallOption) (*response.UpdateRuleResp, error)
 	GetRule(ctx context.Context, in *request.GetRuleReq, opts ...grpc.CallOption) (*response.GetRuleResp, error)
+	// TODO (tc): Right now we don't have plans to use this in the UI
+	// and it doesn't return the staged rules like all the other query APIs.
+	// Should probably delete it or update it to return staged rules.
 	ListRules(ctx context.Context, in *request.ListRulesReq, opts ...grpc.CallOption) (*response.ListRulesResp, error)
 	ListRulesForProject(ctx context.Context, in *request.ListRulesForProjectReq, opts ...grpc.CallOption) (*response.ListRulesForProjectResp, error)
 	DeleteRule(ctx context.Context, in *request.DeleteRuleReq, opts ...grpc.CallOption) (*response.DeleteRuleResp, error)
@@ -195,6 +198,9 @@ type RulesServer interface {
 	CreateRule(context.Context, *request.CreateRuleReq) (*response.CreateRuleResp, error)
 	UpdateRule(context.Context, *request.UpdateRuleReq) (*response.UpdateRuleResp, error)
 	GetRule(context.Context, *request.GetRuleReq) (*response.GetRuleResp, error)
+	// TODO (tc): Right now we don't have plans to use this in the UI
+	// and it doesn't return the staged rules like all the other query APIs.
+	// Should probably delete it or update it to return staged rules.
 	ListRules(context.Context, *request.ListRulesReq) (*response.ListRulesResp, error)
 	ListRulesForProject(context.Context, *request.ListRulesForProjectReq) (*response.ListRulesForProjectResp, error)
 	DeleteRule(context.Context, *request.DeleteRuleReq) (*response.DeleteRuleResp, error)
