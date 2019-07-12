@@ -381,7 +381,7 @@ describe('orgs page', () => {
             response: {
               body: {
                 webhook: {
-                  url: "https://hooks.slack.com/services/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",
+                  url: "https://hooks.slack.com/services/FAKE/FAKE/THISISFAKE",
                   name: "#delivery-slack-tests",
                   enabled: true
                 }

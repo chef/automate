@@ -2,8 +2,18 @@ defmodule H do
   @moduledoc "Various helper functions for use with Notifications in iex"
   @test_data_path "../testdata"
 
-  # This is a private URL, but this is also a private repo.
-  @slack_target_url "https://hooks.slack.com/services/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"
+  @doc """
+  Extract the slack url from the SLACK_URL environment variable.
+  """
+  def get_webhook_url() do
+    case System.get_env("SLACK_URL") do
+      nil ->
+        :no_slack_url_env_var
+      url ->
+        {:ok, url}
+    end
+  end
+
   @doc """
   Set up rules for all event types that will post alerts to Set up rules for all event types
   that will post alerts to #a2-notifications-test"
@@ -11,10 +21,11 @@ defmodule H do
   This function will do nothing if any rules already exist.
   """
   def init_default_slack_rules() do
-    add_rule("ccr-failure-to-slack", :SlackAlert, :CCRFailure,  @slack_target_url )
-    add_rule("ccr-success-to-slack", :SlackAlert, :CCRSuccess,  @slack_target_url)
-    add_rule("comp-success-to-slack", :SlackAlert, :ComplianceSuccess, @slack_target_url)
-    add_rule("comp-failure-to-slack", :SlackAlert, :ComplianceFailure, @slack_target_url)
+    {:ok, webhook_url} = get_webhook_url()
+    add_rule("ccr-failure-to-slack", :SlackAlert, :CCRFailure,  webhook_url)
+    add_rule("ccr-success-to-slack", :SlackAlert, :CCRSuccess,  webhook_url)
+    add_rule("comp-success-to-slack", :SlackAlert, :ComplianceSuccess, webhook_url)
+    add_rule("comp-failure-to-slack", :SlackAlert, :ComplianceFailure, webhook_url)
     :ok
   end
 
@@ -199,4 +210,3 @@ iex> H.levelup
 iex> import H
 
 """
-
