@@ -17,5 +17,10 @@ do
   export CYPRESS_BASE_URL="https://$instance"
   export CYPRESS_RECORD_KEY="$CYPRESS_RECORD_KEY"
 
-  cypress run --record
+  npm install # get dependencies defined in e2e/package.json
+
+  if ! npm run cypress:record; then
+      buildkite-agent artifact upload "cypress/videos/*;cypress/videos/**/*;cypress/screenshots/*;cypress/screenshots/**/*"
+      return 1
+  fi
 done

@@ -40,7 +40,9 @@ do_test_deploy() {
     cd "${A2_ROOT_DIR}/e2e" || return 1
     export CYPRESS_SKIP_SSO=true
     export CYPRESS_BASE_URL="https://$CONTAINER_HOSTNAME"
-    if ! cypress run; then
+
+    npm install # get dependencies defined in e2e/package.json
+    if ! npm run cypress:run; then
         buildkite-agent artifact upload "cypress/videos/*;cypress/videos/**/*;cypress/screenshots/*;cypress/screenshots/**/*"
         return 1
     fi

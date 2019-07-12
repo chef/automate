@@ -16,9 +16,11 @@ describe('team management', () => {
   it('lists system teams', () => {
     cy.contains('Create Team')
     cy.get('chef-sidebar')
-      .should('have.attr', 'major-version')
-      .then((version) => {
-        switch (version) {
+      .invoke('attr', 'major-version')
+      .then((obj: Cypress.ObjectLike) => {
+        // Cypress.ObjectLike can't be casted to a string directly, 
+        // so must convert to Object type (common to all JS objects) first
+        switch (<string><Object>obj) {
           case 'v2': {
             cy.get('#table-container chef-th').contains('ID')
             cy.get('#table-container chef-th').contains('Name')
