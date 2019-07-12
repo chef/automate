@@ -81,7 +81,7 @@ test_can_regenerate_cert_after_restore() {
     # periodic cert check will notice the deleted cert, regenerate it,
     # and restart us in the middle of the shutdown sequence, leading
     # to problems.
-    log_info " - Stopping deployment-service certificate"
+    log_info " - Stopping deployment-service"
     systemctl stop chef-automate
     log_info " - Removing deployment-service certificate"
     rm /hab/svc/deployment-service/data/deployment-service.crt
