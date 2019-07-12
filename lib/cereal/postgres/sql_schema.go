@@ -248,7 +248,7 @@ AS $$
 $$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION cereal_dequeue_task(_task_name TEXT)
-RETURNS TABLE(id BIGINT, workflow_instance_id BIGINT, parameters BYTEA)
+RETURNS TABLE(id BIGINT, parameters BYTEA)
 AS $$
 DECLARE
     r cereal_tasks%rowtype;
@@ -261,7 +261,6 @@ BEGIN
         UPDATE cereal_tasks SET task_state = 'running', updated_at = NOW() WHERE cereal_tasks.id = r.id;
 
         id := r.id;
-        workflow_instance_id := r.workflow_instance_id;
         parameters := r.parameters;
         RETURN NEXT;
     END LOOP;
