@@ -921,8 +921,9 @@ func (p *pg) insertRoleWithQuerier(ctx context.Context, role *v2.Role, q Querier
 
 	for _, project := range role.Projects {
 		_, err := q.ExecContext(ctx,
-			`INSERT INTO iam_role_projects (role_id, project_id) VALUES ($1, $2)`,
-			&dbID, &project)
+			`INSERT INTO iam_role_projects (role_id, project_id)
+			SELECT $1, db_id FROM iam_projects WHERE id=$2`,
+			dbID, project)
 		if err != nil {
 			return p.processError(err)
 		}
