@@ -192,7 +192,7 @@ func main() {
 	// until we need more flexibility.
 	//
 	outbuf := &bytes.Buffer{}
-	gitGrepCmd := fmt.Sprintf("git grep -a -E \"%s\" | grep -v -E \"%s\"",
+	gitGrepCmd := fmt.Sprintf("git grep -a -E \"%s\" | grep -a -v -E \"%s\"",
 		toGrepString(a2Config.contentInclude),
 		toGrepString(append(a2Config.contentExclude, a2Config.filenameExclude...)))
 	cmd = exec.Command("bash", "-c", gitGrepCmd)
