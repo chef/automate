@@ -40,4 +40,18 @@ CREATE OR REPLACE FUNCTION
 
 $$ LANGUAGE sql;
 
+CREATE FUNCTION
+  role_projects(_role_id TEXT)
+  RETURNS TEXT[] AS $$
+
+  SELECT COALESCE(array_agg(p.id) FILTER (WHERE p.id IS NOT NULL), '{(unassigned)}')
+  FROM iam_roles AS r
+  LEFT JOIN iam_role_projects AS rp
+  ON rp.role_id=r.db_id
+  LEFT JOIN iam_projects AS p
+  ON rp.project_id=p.db_id
+  WHERE r.id=_role_id
+
+$$ LANGUAGE sql;
+
 COMMIT;

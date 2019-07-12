@@ -6739,13 +6739,14 @@ func insertTestRole(t *testing.T,
 	role := genRole(t, id, name, actions, projects)
 
 	row := db.QueryRow(`INSERT INTO iam_roles (id, name, type, actions)  VALUES ($1, $2, $3, $4)
-	RETURNING db_id;`,
+	RETURNING db_id`,
 		role.ID, role.Name, role.Type.String(), pq.Array(role.Actions))
 	var dbID string
 	require.NoError(t, row.Scan(&dbID))
 
 	for _, project := range role.Projects {
-		_, err := db.Exec(`INSERT INTO iam_role_projects (role_id, project_id) VALUES ($1, $2)`,
+		_, err := db.Exec(`INSERT INTO iam_role_projects (role_id, project_id)
+			SELECT $1, db_id FROM iam_projects WHERE id=$2`,
 			&dbID, &project)
 		require.NoError(t, err)
 	}
