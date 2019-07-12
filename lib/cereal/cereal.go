@@ -221,9 +221,8 @@ func (w *workflowInstanceImpl) EnqueueTask(taskName string, parameters interface
 		return err
 	}
 	w.tasks = append(w.tasks, backend.Task{
-		WorkflowInstanceID: w.instanceID,
-		Name:               taskName,
-		Parameters:         paramsData,
+		Name:       taskName,
+		Parameters: paramsData,
 	})
 	return nil
 }
@@ -586,15 +585,13 @@ func (m *Manager) startTaskExecutors(ctx context.Context) error {
 		}
 
 		for i := 0; i < workerCount; i++ {
-			go m.RunTaskExecutor(ctx, taskName, i, exec.opts.Timeout, exec.executor)
+			go m.runTaskExecutor(ctx, taskName, i, exec.opts.Timeout, exec.executor)
 		}
 	}
 	return nil
 }
 
-// TODO(ssd) 2019-05-10: Why does Task need the WorkflowInstanceID?
-// TODO(jaym): should this be private?
-func (m *Manager) RunTaskExecutor(ctx context.Context, taskName string, workerIdx int, timeout time.Duration, exec TaskExecutor) {
+func (m *Manager) runTaskExecutor(ctx context.Context, taskName string, workerIdx int, timeout time.Duration, exec TaskExecutor) {
 	logctx := logrus.WithFields(logrus.Fields{
 		"worker_name": fmt.Sprintf("%s/%d", taskName, workerIdx),
 	})
