@@ -28,6 +28,8 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Service.PurgeActionsAfterDays = w.Int32(30)
 	c.V1.Sys.Service.MaxNumberOfBundledRunMsgs = w.Int32(2500)
 	c.V1.Sys.Service.MaxNumberOfBundledActionMsgs = w.Int32(10000)
+	c.V1.Sys.Service.NumberOfRunMsgsTransformers = w.Int32(9)
+
 	c.V1.Sys.Log.Level = w.String("info")
 	c.V1.Sys.Log.Format = w.String("text")
 	return c

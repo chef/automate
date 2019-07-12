@@ -85,6 +85,7 @@ func readCliParams() *serveropts.Opts {
 		PurgeActionsAfterDays:         int32(viper.GetInt("actions-days")),
 		MaxNumberOfBundledRunMsgs:     viper.GetInt("max-number-of-bundled-run-msgs"),
 		MaxNumberOfBundledActionMsgs:  viper.GetInt("max-number-of-bundled-action-msgs"),
+		NumberOfRunMsgsTransformers:   viper.GetInt("number-of-run-msgs-transformers"),
 		ConnFactory:                   factory,
 	}
 }
@@ -104,6 +105,7 @@ func init() {
 	serveCmd.Flags().Int32("actions-days", -1, "Number of days to keep actions for. A number less than or equal to 0 means data should never be deleted")
 	serveCmd.Flags().Int("max-number-of-bundled-run-msgs", 2500, "The maximum number of run messages to bundle togeter during ingestion")
 	serveCmd.Flags().Int("max-number-of-bundled-action-msgs", 10000, "The maximum number of action messages to bundle togeter during ingestion")
+	serveCmd.Flags().Int("number-of-run-msgs-transformers", 9, "The number of run messages to transform at a time")
 	serveCmd.Flags().String("key", "key.pem", "SSL Private key for gRPC server")
 	serveCmd.Flags().String("cert", "cert.pem", "SSL Certificate for gRPC server")
 	serveCmd.Flags().String("root-cert", "cacert.pem", "Root SSL CA Certificate for gRPC server")

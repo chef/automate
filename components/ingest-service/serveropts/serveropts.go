@@ -25,6 +25,7 @@ type Opts struct {
 	NodeManagerAddress            string
 	MaxNumberOfBundledRunMsgs     int
 	MaxNumberOfBundledActionMsgs  int
+	NumberOfRunMsgsTransformers   int
 }
 
 // SetLogLevel sets the log level for the service
