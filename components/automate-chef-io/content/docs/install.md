@@ -129,7 +129,10 @@ and retry opening Chef Automate in your browser.
 
 ### Configuring External Data Stores
 You can configure Chef Automate to use PostgreSQL and Elasticsearch clusters that are not
-deployed via Chef Automate itself.
+deployed via Chef Automate itself. The directions provided below are intended for use only
+during initial deployment of Chef Automate. Please reach out to a Customer Support or
+Customer Success representative for assistance with migrating from a standalone
+installation of Chef Automate to one using externally-deployed data stores.
 
 #### Configuring External Elasticsearch
 Add the following to your config.toml:

@@ -593,95 +593,6 @@ Uncomment and change settings as needed, then run `chef-automate config patch </
 # heapsize = "<your Elasticsearch heapsize>"
 ```
 
-#### Configuring External Elasticsearch
-
-To use Chef Automate with an external Elasticsearch cluster, set the global configuration to enable it and define your Elasticsearch nodes by creating a `.toml` file containing the following partial configuration.
-Uncomment and change settings as needed, then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
-
-Note that no data will be migrated from the built-in Elasticsearch service; therefore, this operation should only be performed on new Chef Automate deployments. If you would like to migrate an existing Chef Automate deployment to an external cluster, please contact support.
-
-```toml
-[global.v1.external.elasticsearch]
-  enable = true
-  nodes = ["http://elastic1.example:9200", "http://elastic2.example:9200", "..." ]
-
-# Uncomment and fill out if using external elasticsearch with SSL and/or basic auth
-# [global.v1.external.elasticsearch.auth]
-#   scheme = "basic_auth"
-# [global.v1.external.elasticsearch.basic_auth]
-#   username = "<admin username>"
-#   password = "<admin password>"
-# [global.v1.external.elasticsearch.ssl]
-#  Specify either a root_cert or a root_cert_file
-#  root_cert = """$(cat </path/to/cert_file.crt>)"""
-#  root_cert_file = "</path/to/cert/file>"
-#  server_name = "<elasticsearch server name>"
-```
-
-When using external Elasticsearch, Elasticsearch nodes will not have access to Automate's built-in backup storage services, so you must configure Elasticsearch backup settings separately from Automate's primary backup settings.
-
-To configure backups to a local filesystem, first ensure that the filesystems you intend to use for backups are mounted to the same path on all Elasticsearch master and data nodes and configure the Elasticsearch `path.repo` setting on each node as described in the Elasticsearch documentation.
-Next, create a `.toml` file containing the following partial configuration, uncomment and change settings as needed, and run `chef-automate config patch </path/to/your-file.toml>` to deploy the change.
-
-```toml
-[global.v1.external.elasticsearch.backup]
-enable = true
-location = "fs"
-
-[global.v1.external.elasticsearch.backup.fs]
-# The `path.repo` setting you've configured on your Elasticsearch nodes must be
-# a parent directory of the setting you configure here:
-path = "/var/opt/chef-automate/backups"
-```
-
-To configure backups to AWS S3, you must install the [`repository-s3` plugin](https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3.html) on all nodes in your Elasticsearch cluster.
-If you wish to use IAM authentication to provide your Elasticsearch nodes access to the S3 bucket, you must apply the appropriate IAM policy to each host system in the cluster.
-Next, configure each Elasticsearch node with a S3 client configuration containing the proper S3 endpoint, credentials, and other settings as [described in the Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-client.html).
-Then, enable S3 backups by creating a `.toml` file containing the following partial configuration, uncomment and change settings as needed.
-Finally, run `chef-automate config patch </path/to/your-file.toml>` to deploy the change.
-
-```toml
-[global.v1.external.elasticsearch.backup]
-enable = true
-location = "s3"
-
-[global.v1.external.elasticsearch.backup.s3]
-
-  # bucket (required): The name of the bucket
-  bucket = "<bucket name>"
-
-  # base_path (optional):  The path within the bucket where backups should be stored
-  # If base_path is not set, backups will be stored at the root of the bucket.
-  base_path = "<base path>"
-
-  # name of an s3 client configuration you create in your elasticsearch.yml
-  # see https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-client.html
-  # for full documentation on how to configure client settings on your
-  # Elasticsearch nodes
-  client = "<client name>"
-
-[global.v1.external.elasticsearch.backup.s3.settings]
-## The meaning of these settings is documented in the S3 Repository Plugin
-## documentation. See the following links:
-## https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3-repository.html
-
-## Backup repo settings
-# compress = false
-# server_side_encryption = false
-# buffer_size = "100mb"
-# canned_acl = "private"
-# storage_class = "standard"
-## Snapshot settings
-# max_snapshot_bytes_per_sec = "40mb"
-# max_restore_bytes_per_sec = "40mb"
-# chunk_size = "null"
-## S3 client settings
-# read_timeout = "50s"
-# max_retries = 3
-# use_throttle_retries = true
-# protocol = "https"
-```
-
 #### PostgreSQL
 
 To configure PostgreSQL for your Chef Automate installation, create a `.toml` file that contains the partial configuration below. Uncomment and change settings as needed, with the following caveats:
@@ -708,37 +619,6 @@ Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your c
 # level = "ERROR"
 [postgresql.v1.sys.superuser]
 # name = "automate"
-```
-
-#### Configuring An External PostgreSQL Database
-To use Chef Automate with an external PostgreSQL cluster, create a `.toml` file containing the following partial configuration.
-Uncomment and change settings as needed, then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
-
-Note that no data will be migrated from the built-in PostgreSQL service; therefore, this operation should only be performed on new Chef Automate deployments. If you would like to migrate an existing Chef Automate deployment to an external cluster, please contact support.
-
-```toml
-[global.v1.external.postgresql]
-enable = true
-nodes = ["<pghostname1>:<port1>", "<pghostname2>:<port2>", "..."]
-
-# To use postgres with SSL, uncomment and fill out the following:
-# [global.v1.external.postgresql.ssl]
-# enable = true
-# root_cert = """$(cat </path/to/root/cert.pem>)"""
-
-[global.v1.external.postgresql.auth]
-scheme = "password"
-
-[global.v1.external.postgresql.auth.password.superuser]
-username = "<admin username>"
-password = "<admin password>"
-[global.v1.external.postgresql.auth.password.dbuser]
-username = "<dbuser username>"
-password = "<dbuser password>"
-
-[global.v1.external.postgresql.backup]
-enable = true
-
 ```
 
 #### Load Balancer
