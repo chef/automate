@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"strings"
 
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
@@ -832,7 +831,7 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
 
 	row := tx.QueryRowContext(ctx,
 		`UPDATE iam_roles SET (name, actions) =
-			($2, $3) WHERE id = $1 RETURNING db_id;`,
+			($2, $3) WHERE id = $1 RETURNING db_id`,
 		role.ID, role.Name, pq.Array(role.Actions),
 	)
 	// TODO: check not found case
@@ -847,22 +846,17 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
 	// bd: for now, the below sql query assumes that all desired project changes are authorized
 	// so all we need to do is replace the existing projects with the desired projects
 	_, err = tx.ExecContext(ctx,
-		`DELETE FROM iam_role_projects WHERE role_id=$1`, &dbID)
+		"DELETE FROM iam_role_projects WHERE role_id=$1", dbID)
 	if err != nil {
 		return nil, p.processError(err)
 	}
 
-	if len(role.Projects) > 0 {
-		sql := "INSERT INTO iam_role_projects (role_id, project_id) VALUES "
-		for _, projectID := range role.Projects {
-			sql += fmt.Sprintf("(%s, '%s'), ", dbID, projectID)
-		}
-		sql = strings.TrimSuffix(sql, ", ")
-
-		_, err = tx.ExecContext(ctx, sql)
-		if err != nil {
-			return nil, p.processError(err)
-		}
+	_, err = tx.ExecContext(ctx,
+		`INSERT INTO iam_role_projects (role_id, project_id)
+		SELECT $1, db_id FROM iam_projects WHERE id=ANY($2)`,
+		dbID, pq.Array(role.Projects))
+	if err != nil {
+		return nil, p.processError(err)
 	}
 
 	err = p.notifyPolicyChange(ctx, tx)
@@ -888,7 +882,7 @@ func checkIfRoleIntersectsProjectsFilter(ctx context.Context, q Querier,
 
 	// Return true or false if there is intersection between iam_role_projects and projectsFilter,
 	// assuming '{(unassigned)}' in the case that iam_role_projects is empty. If a role of id
-	// doesn't exist, this will return 0 rows which will bubble up to NotFoundErr when passed to processError.
+	// doesn't exist, this will return a proper SQL "no rows" error when passed to processError.
 	row := q.QueryRowContext(ctx, "SELECT projects_match(role_projects($1), $2)", id, pq.Array(projectsFilter))
 
 	var result bool
