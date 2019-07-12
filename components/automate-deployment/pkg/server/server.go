@@ -1486,7 +1486,10 @@ func (s *server) shutItAllDown() error {
 		return err
 	}
 
-	if err := s.target().Stop(ctx); err != nil {
+	// NOTE(ssd) 2019-07-12: We use context.Background here
+	// because we want the hab-sup term command to continue even
+	// after this commands exits.
+	if err := s.target().Stop(context.Background()); err != nil {
 		return err
 	}
 
