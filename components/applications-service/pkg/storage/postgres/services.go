@@ -94,6 +94,33 @@ ORDER BY %s %s
 LIMIT $1
 OFFSET $2
 `
+	selectDisconnectedServices = `
+SELECT s.id
+  , s.origin AS origin
+  , s.name AS name
+  , s.version AS version
+  , s.release AS release
+  , s.status AS status
+  , s.health AS health
+  , sg.name AS group
+  , d.app_name AS application
+  , d.environment AS environment
+  , sup.member_id AS sup_member_id
+  , sup.fqdn AS fqdn
+  , s.channel as channel
+  , sup.site as site
+  , s.last_event_occurred_at as last_event_occurred_at
+  , s.previous_health as previous_health
+  , s.health_updated_at as health_updated_at
+FROM service AS s
+LEFT JOIN service_group AS sg
+  ON s.group_id = sg.id
+LEFT JOIN deployment AS d
+  ON s.deployment_id = d.id
+LEFT JOIN supervisor AS sup
+  ON s.sup_id = sup.id
+WHERE last_event_occurred_at < now() - ($1 || ' minutes')::interval
+`
 
 	selectServicesHealthCounts = `
 SELECT COUNT(*) AS total
@@ -167,6 +194,14 @@ func (db *Postgres) GetServices(
 	)
 
 	_, err = db.DbMap.Select(&services, formattedQuery, pageSize, offset)
+	return services, err
+}
+
+// GetDisconnectedServices returns a list of disconnected services
+func (db *Postgres) GetDisconnectedServices(thresholdMinutes int32) ([]*storage.Service, error) {
+	var services []*storage.Service
+
+	_, err := db.DbMap.Select(&services, selectDisconnectedServices, thresholdMinutes)
 	return services, err
 }
 

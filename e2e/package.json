@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "cypress:open": "cypress open",
-    "cypress:run": "cypress run"
+    "cypress:run": "cypress run",
+    "cypress:record": "cypress run --record"
   },
   "repository": {
     "type": "git",
@@ -14,6 +15,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cypress": "^3.1.5"
+    "cypress": "^3.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^2.9.2",
+    "webpack": "^4.35.3",
+    "@cypress/webpack-preprocessor": "^4.1.0",
+    "ts-loader": "^6.0.4"
   }
 }

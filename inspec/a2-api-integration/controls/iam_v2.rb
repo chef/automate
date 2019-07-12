@@ -952,7 +952,8 @@ EOF
               operator: "MEMBER_OF",
               values: ["tag1", "tag2"]
             }
-          ]
+          ],
+          status: "STAGED"
         }
 
         after(:each) do
@@ -987,7 +988,8 @@ EOF
             operator: "MEMBER_OF",
             values: ["tag1", "tag2"]
           }
-        ]
+        ],
+        status: "STAGED"
       }
 
       CUSTOM_RULE_2 = {
@@ -1001,7 +1003,8 @@ EOF
             operator: "EQUALS",
             values: ["server1"]
           }
-        ]
+        ],
+        status: "STAGED"
       }
 
       CUSTOM_PROJECT_ID_2 = "custom-project-2"
@@ -1016,7 +1019,8 @@ EOF
             operator: "EQUALS",
             values: ["org1"]
           }
-        ]
+        ],
+        status: "STAGED"
       }
 
       before(:each) do
@@ -1100,7 +1104,8 @@ EOF
               operator: "EQUALS",
               values: ["brand new server"]
             }
-           ]
+           ],
+           status: "STAGED"
          }
 
         resp = automate_api_request("/apis/iam/v2beta/rules/#{CUSTOM_RULE_2[:id]}",
@@ -1136,7 +1141,8 @@ EOF
               operator: "EQUALS",
               values: ["new tag"]
             }
-           ]
+           ],
+           status: "STAGED"
          }
 
         resp = automate_api_request("/apis/iam/v2beta/rules/#{CUSTOM_RULE_1[:id]}",

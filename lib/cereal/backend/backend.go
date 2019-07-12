@@ -73,9 +73,8 @@ type WorkflowEvent struct {
 }
 
 type Task struct {
-	Name               string
-	WorkflowInstanceID int64
-	Parameters         []byte
+	Name       string
+	Parameters []byte
 }
 
 type TaskResult struct {

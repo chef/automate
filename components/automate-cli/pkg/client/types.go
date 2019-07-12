@@ -1,6 +1,7 @@
 package client
 
 import (
+	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/components/automate-gateway/api/auth/teams"
 	"github.com/chef/automate/components/automate-gateway/api/auth/tokens"
 	"github.com/chef/automate/components/automate-gateway/api/auth/users"
@@ -22,5 +23,6 @@ type APIClient interface {
 	UsersClient() users.UsersMgmtClient
 	PoliciesClient() v2beta.PoliciesClient
 	ReportingClient() reporting.ReportingServiceClient
+	ApplicationsClient() applications.ApplicationsServiceClient
 	CloseConnection() error
 }

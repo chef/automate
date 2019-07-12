@@ -3,8 +3,8 @@ describe('user management', () => {
     cy.adminLogin('/settings/users').then(() => {
 
       // clean up leftover users in case of previous test failures
-      let admin = JSON.parse(localStorage.getItem('chef-automate-user'))
-      cy.cleanupUsers(admin.id_token)
+      let admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'))
+      cleanupUsers(admin.id_token)
     })
   })
 
@@ -101,3 +101,24 @@ describe('user management', () => {
   //   })
   // })
 })
+
+function cleanupUsers(id_token: string):void {
+  cy.request({
+    auth: { bearer: id_token },
+    method: 'GET',
+    url: '/api/v0/auth/users',
+    failOnStatusCode: false
+  }).then((resp) => {
+    let body = resp.body
+    for (let user of body.users) {
+      if (user.name.startsWith('cypress test user ')) {
+        cy.request({
+          auth: { bearer: id_token },
+          method: 'DELETE',
+          url: `/api/v0/auth/users/${user.username}`,
+          failOnStatusCode: false
+        })
+      }
+    }
+  })
+}

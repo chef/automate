@@ -42,7 +42,7 @@ func createBundleCreator(t *testing.T) *Creator {
 	for gid := range gids {
 		g, err := user.LookupGroupId(strconv.Itoa(int(gid)))
 		require.NoError(t, err)
-		allowedGroups = append(allowedUsers, g.Name)
+		allowedGroups = append(allowedGroups, g.Name)
 	}
 
 	return &Creator{

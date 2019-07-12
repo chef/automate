@@ -18,17 +18,19 @@ do_test_deploy() {
     # We cannot use 'chef-automate stop' yet because
     # there is no way for that command to return successfully
     # I'd rather not jam a fix in
+    log_info "Restarting chef-automate via chef-automate start/stop"
     chef-automate -d stop
     chef-automate -d start
     wait_for_healthy
+    log_info "Done restarting chef-automate"
 
-    chef-automate dev verify-packages
+    verify_packages
 }
 
 world_writable_files_test() {
     # Check for world writable files
     log_info "checking for world writable files"
-    matching="$(find /hab/ -xdev -perm -0002 -type f -print)" 
+    matching="$(find /hab/ -xdev -perm -0002 -type f -print)"
     if [ ! -z "$matching" ]; then
         log_error "the following files are world writable:"
         echo "$matching"

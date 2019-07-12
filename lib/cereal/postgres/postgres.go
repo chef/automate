@@ -628,7 +628,7 @@ func (pg *PostgresBackend) dequeueTask(tx *sql.Tx, taskName string) (int64, *bac
 	}
 
 	var tid int64
-	err := row.Scan(&tid, &task.WorkflowInstanceID, &task.Parameters)
+	err := row.Scan(&tid, &task.Parameters)
 	if err == sql.ErrNoRows {
 		return 0, nil, cereal.ErrNoTasks
 	} else if err != nil {

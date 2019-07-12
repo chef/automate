@@ -40,6 +40,9 @@ service Rules {
     option (chef.automate.api.iam.policy).action = "iam:rules:get";
   };
 
+  // TODO (tc): Right now we don't have plans to use this in the UI
+  // and it doesn't return the staged rules like all the other query APIs.
+  // Should probably delete it or update it to return staged rules.
   rpc ListRules (ListRulesReq) returns (ListRulesResp) {
     option (google.api.http).get = "/iam/v2beta/rules";
     option (chef.automate.api.policy).resource = "auth:rules";

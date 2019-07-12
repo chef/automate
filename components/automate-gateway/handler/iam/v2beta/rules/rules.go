@@ -291,8 +291,20 @@ func fromInternal(r *authz.ProjectRule) (*pb_common.Rule, error) {
 		Type:       t,
 		ProjectId:  r.ProjectId,
 		Conditions: cs,
+		Status:     fromInternalStatus(r.Status),
 	}
 	return &rule, nil
+}
+
+func fromInternalStatus(internalStatus string) pb_common.RuleStatus {
+	switch internalStatus {
+	case "staged":
+		return pb_common.RuleStatus_STAGED
+	case "applied":
+		return pb_common.RuleStatus_APPLIED
+	default:
+		return pb_common.RuleStatus_RULE_STATUS_UNSET
+	}
 }
 
 func fromInternalConditions(cs []*authz.Condition) ([]*pb_common.Condition, error) {

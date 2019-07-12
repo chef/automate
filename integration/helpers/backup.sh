@@ -76,9 +76,16 @@ test_missing_checksums_file_fails() {
 
 test_can_regenerate_cert_after_restore() {
     log_info "Checking that automate can regnerate certs after restore"
-    log_info "Removing deployment-service certificate"
+    # TODO(ssd) 2019-07-12: We stop the deployment service first to
+    # work around a bug. The bug is related to the fact that the
+    # periodic cert check will notice the deleted cert, regenerate it,
+    # and restart us in the middle of the shutdown sequence, leading
+    # to problems.
+    log_info " - Stopping deployment-service"
+    systemctl stop chef-automate
+    log_info " - Removing deployment-service certificate"
     rm /hab/svc/deployment-service/data/deployment-service.crt
-    log_info "Waiting for deployment-service to restart"
-    systemctl restart chef-automate
+    log_info " - Waiting for deployment-service to restart"
+    systemctl start chef-automate
     wait_for_healthy
 }
