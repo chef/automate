@@ -69,7 +69,7 @@ func TestCreatePolicy(t *testing.T) {
 			assert.Equal(t, []string{"cfgmgmt:nodes:*"}, resp.Statements[0].Actions)
 			assert.Equal(t, []string{"cfgmgmt:delete", "cfgmgmt:list"}, resp.Statements[0].Resources)
 			assert.Empty(t, resp.Statements[0].Role)
-			assert.Empty(t, resp.Statements[0].Projects)
+			assert.Equal(t, []string{constants_v2.AllProjectsExternalID}, resp.Statements[0].Projects)
 
 			// Note: these could be repeated for any of the following tests. But
 			// that wouldn't buy us much, so let's not do it.
@@ -425,7 +425,7 @@ func TestCreatePolicy(t *testing.T) {
 				Effect:    api_v2.Statement_DENY,
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
-				Projects:  []string{"*"},
+				Projects:  []string{constants_v2.AllProjectsExternalID},
 			}
 			statement2 := api_v2.Statement{
 				Effect:   api_v2.Statement_ALLOW,
@@ -451,7 +451,9 @@ func TestCreatePolicy(t *testing.T) {
 			require.ElementsMatch(t, []string{"my-other-project"}, pol.Statements[2].Projects)
 			require.ElementsMatch(t, []string{"my-other-project"}, resp.Statements[2].Projects)
 
-			// key check: internal vs external representation
+			assertPoliciesMatch(t, &pol, resp)
+			// check internal vs external representation: the alignment of these two fields
+			// is covered by assertPoliciesMatch, but important to check the specific expectations here, too
 			assert.ElementsMatch(t, []string{constants_v2.AllProjectsID}, pol.Statements[1].Projects)
 			assert.ElementsMatch(t, []string{constants_v2.AllProjectsExternalID}, resp.Statements[1].Projects)
 		}},
@@ -919,19 +921,17 @@ func TestUpdatePolicy(t *testing.T) {
 		}},
 		{"successfully updates policy statements", func(t *testing.T) {
 			storedPol, _ := addSomePoliciesToStore(t, store, prng)
-			// change original statement effect to allow
 			statement0 := api_v2.Statement{
 				Effect:    api_v2.Statement_ALLOW,
 				Resources: []string{"compliance:profiles"},
 				Actions:   []string{"compliance:profiles:upload"},
-				Projects:  []string{},
+				Projects:  []string{constants_v2.AllProjectsExternalID}, // explicit "all"
 			}
-			// add new statement
 			statement1 := api_v2.Statement{
 				Effect:    api_v2.Statement_ALLOW,
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
-				Projects:  []string{},
+				Projects:  []string{}, // implicit "all"
 			}
 			req := api_v2.UpdatePolicyReq{
 				Id:         storedPol.ID,
@@ -943,15 +943,19 @@ func TestUpdatePolicy(t *testing.T) {
 
 			require.NoError(t, err)
 
+			// These individual statement checks are included in the final assertPoliciesMatch,
+			// but useful to check these key elements explicitly.
 			s0 := pol.Statements[0]
 			assert.Equal(t, api_v2.Statement_ALLOW, s0.Effect)
 			assert.Equal(t, []string{"compliance:profiles"}, s0.Resources)
 			assert.Equal(t, []string{"compliance:profiles:upload"}, s0.Actions)
+			assert.Equal(t, []string{constants_v2.AllProjectsExternalID}, s0.Projects)
 
 			s1 := pol.Statements[1]
 			assert.Equal(t, api_v2.Statement_ALLOW, s1.Effect)
 			assert.Equal(t, []string{"cfgmgmt:delete", "cfgmgmt:list"}, s1.Resources)
 			assert.Equal(t, []string{"cfgmgmt:nodes:*"}, s1.Actions)
+			assert.Equal(t, []string{constants_v2.AllProjectsExternalID}, s1.Projects)
 
 			storedPol = getPolicyFromStore(t, store, storedPol.ID)
 			assertPoliciesMatch(t, &storedPol, pol)
@@ -2870,6 +2874,13 @@ func getPolicyFromStore(t *testing.T, store *cache.Cache, id string) storage.Pol
 	return *pol
 }
 
+func assertProjectsMatch(t *testing.T, storageProject string, apiProject string) {
+	if storageProject == constants_v2.AllProjectsID {
+		storageProject = constants_v2.AllProjectsExternalID
+	}
+	assert.Equal(t, storageProject, apiProject, "statement projects differ")
+}
+
 func assertStatementsMatch(t *testing.T, storageStatement storage.Statement, apiStatement api_v2.Statement) {
 	if storageStatement.Actions != nil && apiStatement.Actions != nil {
 		assert.Equal(t, storageStatement.Actions, apiStatement.Actions, "statement actions differ")
@@ -2881,7 +2892,9 @@ func assertStatementsMatch(t *testing.T, storageStatement storage.Statement, api
 	assert.Equal(t, storageStatement.Role, apiStatement.Role, "statement roles differ")
 	// This allows for grpc return of []string(nil) being compared to []string{}
 	if len(storageStatement.Projects) != 0 || len(apiStatement.Projects) != 0 {
-		assert.Equal(t, storageStatement.Projects, apiStatement.Projects, "statement projects differ")
+		for i, project := range storageStatement.Projects {
+			assertProjectsMatch(t, project, apiStatement.Projects[i])
+		}
 	}
 }
 
@@ -2977,7 +2990,8 @@ func setupV2WithMigrationState(t *testing.T,
 		require.NoError(t, migration(mem_v2)) // this is IAM v2
 	}
 
-	polV2, _, err := v2.NewPoliciesServer(ctx, l, mem_v2, writer, pl, vChan)
+	vSwitch := v2.NewSwitch(vChan)
+	polV2, _, err := v2.NewPoliciesServer(ctx, l, mem_v2, writer, pl, vSwitch, vChan)
 	require.NoError(t, err)
 
 	require.NoError(t, err)
@@ -2985,7 +2999,6 @@ func setupV2WithMigrationState(t *testing.T,
 		rulesRetriever, testhelpers.NewMockProjectUpdateManager(), testhelpers.NewMockPolicyRefresher())
 	require.NoError(t, err)
 
-	vSwitch := v2.NewSwitch(vChan)
 	authzV2, err := v2.NewAuthzServer(l, authorizer, vSwitch, projectsSrv)
 	require.NoError(t, err)
 
