@@ -1,7 +1,6 @@
 BEGIN;
 
 SET CONSTRAINTS iam_policy_members_policy_id_fkey DEFERRED;
-SET CONSTRAINTS iam_policy_statements_policy_id_fkey DEFERRED;
 
 UPDATE iam_members
     SET
@@ -26,7 +25,6 @@ UPDATE iam_roles
         id = 'operator';
 
 UPDATE iam_policies SET id='editor-access', name='Editors' WHERE id='operator-access';
-UPDATE iam_policy_statements SET policy_id = 'editor-access' WHERE policy_id='operator-access';
 
 UPDATE iam_roles
     SET
