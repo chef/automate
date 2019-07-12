@@ -33,5 +33,5 @@ do_deploy() {
 
 do_test_deploy() {
     do_test_deploy_default
-    chef-automate dev verify-packages
+    verify_packages
 }
