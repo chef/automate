@@ -29,7 +29,7 @@ The `chef-automate init-config` command generates an annotated Chef Automate con
 
 #### Chef Automate FQDN
 
-To change the fully qualified domain name (FQDN) of your Chef Automate installation, create a `.toml` file that contains the partial configuration:
+To change the fully qualified domain name (FQDN) of your Chef Automate installation, create a TOML file that contains the partial configuration:
 
 ```TOML
 [global.v1]
@@ -51,7 +51,7 @@ The upgrade strategy determines when a Chef Automate installation is upgraded. T
 
 Changing the upgrade strategy from `none` to `at-once` will install the latest packages from your install channel.
 
-To change the upgrade strategy of your Chef Automate installation, create a `.toml` file that contains the partial configuration:
+To change the upgrade strategy of your Chef Automate installation, create a TOML file that contains the partial configuration:
 
 ```toml
 [deployment.v1.svc]
@@ -91,7 +91,7 @@ curl -X PUT -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"name"
 
 #### Load Balancer Certificate and Private Key
 
-To change the load balancer certificate and private key of your Chef Automate installation, create a `.toml` file that contains the partial configuration:
+To change the load balancer certificate and private key of your Chef Automate installation, create a TOML file that contains the partial configuration:
 
 ```toml
 [[global.v1.frontend_tls]]
@@ -132,7 +132,7 @@ Chef Automate respects the proxy environment variables:
 Setting these environment variables prior to initial deployment of Chef Automate
 adds them to the configuration.
 
-To set a proxy by editing a configuration file, create a `.toml` file that contains the partial configuration:
+To set a proxy by editing a configuration file, create a TOML file that contains the partial configuration:
 
 ```toml
 [global.v1.proxy]
@@ -163,7 +163,7 @@ Chef Automate must be able to access the following:
 
 #### Global Log Level
 
-Configure the log level for all Chef Automate services by creating a `.toml` file. By default each service will initialize at the `info` level, but the following settings are available: `debug`, `info`, `warning`, `panic`, or `fatal`.
+Configure the log level for all Chef Automate services by creating a TOML file. By default each service will initialize at the `info` level, but the following settings are available: `debug`, `info`, `warning`, `panic`, or `fatal`.
 
 ```toml
 [global.v1.log]
@@ -223,7 +223,7 @@ Chef Automate can integrate with LDAP or SAML to authenticate your users against
 Chef Automate supports using both local users and externally managed users from no more than one external identity provider (IdP). You do not need to configure an external IdP if you simply want to create users and teams local to Chef Automate.
 See the [Users]({{< relref "users.md" >}}) documentation for additional information.
 
-Chef Automate uses `dex` to support LDAP and SAML integrations. To configure authentication for your Chef Automate installation, create a `.toml` file that contains the partial configuration for either LDAP or SAML. Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
+Chef Automate uses `dex` to support LDAP and SAML integrations. To configure authentication for your Chef Automate installation, create a TOML file that contains the partial configuration for either LDAP or SAML. Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
 Important NOTE: you may only integrate one IdP at a time.
 If you need to change your configured IdP, you will need to replace
@@ -488,7 +488,7 @@ For "Audience URI" or "SP Entity ID", use the same address.
 Authentication via Automate for Habitat Builder is still in Alpha.
 {{% /warning %}}
 
-To configure Chef Automate as an OAuth Provider for Habitat Builder, create a `.toml` file
+To configure Chef Automate as an OAuth Provider for Habitat Builder, create a TOML file
 that contains the partial configuration below.
 Run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
@@ -526,7 +526,7 @@ Further explanation on how to configure Builder to authenticate via Chef Automat
 
 #### General Elasticsearch Configuration
 
-To configure Elasticsearch for your Chef Automate installation, create a `.toml` file that contains the partial configuration below. Uncomment and change settings as needed, then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
+To configure Elasticsearch for your Chef Automate installation, create a TOML file that contains the partial configuration below. Uncomment and change settings as needed, then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
 ```toml
 [elasticsearch.v1.sys.proxy]
@@ -585,7 +585,7 @@ To configure Elasticsearch for your Chef Automate installation, create a `.toml`
 
 #### Setting Elasticsearch Heap
 
-Per the Elasticsearch documentation, the [Elasticsearch heap size](https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html) should be up to 50% of the available RAM, up to 32GB. To set the Elasticsearch heap size, create a `.toml` file that contains the partial configuration below.
+Per the Elasticsearch documentation, the [Elasticsearch heap size](https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html) should be up to 50% of the available RAM, up to 32GB. To set the Elasticsearch heap size, create a TOML file that contains the partial configuration below.
 Uncomment and change settings as needed, then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
 ```toml
@@ -595,7 +595,7 @@ Uncomment and change settings as needed, then run `chef-automate config patch </
 
 #### PostgreSQL
 
-To configure PostgreSQL for your Chef Automate installation, create a `.toml` file that contains the partial configuration below. Uncomment and change settings as needed, with the following caveats:
+To configure PostgreSQL for your Chef Automate installation, create a TOML file that contains the partial configuration below. Uncomment and change settings as needed, with the following caveats:
 
 * Chef Automate currently does not support use of an external Postgres database
 * Chef Automate uses TLS mutual authentication to communicate with its Postgres database
@@ -623,7 +623,7 @@ Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your c
 
 #### Load Balancer
 
-To configure your Chef Automate installation's load balancer, create a `.toml` file that contains the partial configuration below. Uncomment and change settings as needed, then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
+To configure your Chef Automate installation's load balancer, create a TOML file that contains the partial configuration below. Uncomment and change settings as needed, then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
 ```toml
 [load_balancer.v1.sys.service]
@@ -680,7 +680,7 @@ To configure your Chef Automate installation's load balancer, create a `.toml` f
 #### Data Retention
 
 The bulk of Chef Automate's data is stored by the ingest service and the compliance service.
-To configure how long these services store data, create a `.toml` file that contains the partial configuration below.
+To configure how long these services store data, create a TOML file that contains the partial configuration below.
 Uncomment and change settings as needed, then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
 ```toml
