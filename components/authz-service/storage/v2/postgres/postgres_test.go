@@ -6604,8 +6604,7 @@ func assertProjectsMatch(t *testing.T, db *testhelpers.TestDB, project storage.P
 func assertRolesMatch(t *testing.T, db *testhelpers.TestDB, role storage.Role) {
 	t.Helper()
 	dbRole := storage.Role{}
-	err := db.QueryRow(`SELECT query_role($1);`, role.ID).Scan(&dbRole)
-	require.NoError(t, err)
+	require.NoError(t, db.QueryRow(`SELECT query_role($1);`, role.ID).Scan(&dbRole))
 	assert.Equal(t, role, dbRole)
 }
 
