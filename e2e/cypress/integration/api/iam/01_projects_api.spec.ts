@@ -15,7 +15,7 @@ const xmen_project = {
   name: "Test X-men Project"
 }
 
-const avengers_rule = {
+let avengersRule = {
   id: "avengers-rule-1",
   name: "first rule of avengers project",
   type: "NODE",
@@ -102,6 +102,8 @@ describe('projects API', () => {
           })
         })
 
+        cy.wait(5000)
+
         // confirm nodes are unassigned
         cy.request({
           headers: {
@@ -160,7 +162,7 @@ describe('projects API', () => {
             ]
           }
         })
-      
+
       cy.request({
         headers: { 'api-token': admin_token },
         method: 'DELETE',
@@ -170,7 +172,7 @@ describe('projects API', () => {
 
     it('new rules get applied to nodes', () => {
 
-      for (let rule of [avengers_rule, xmen_rule]) {
+      for (let rule of [avengersRule, xmen_rule]) {
         cy.request({
           headers: { 'api-token': admin_token },
           method: 'POST',
@@ -192,7 +194,7 @@ describe('projects API', () => {
           }
         })
       }
-        
+
       cy.request({
         headers: { 'api-token': admin_token },
         method: 'POST',
@@ -240,14 +242,38 @@ describe('projects API', () => {
     })
 
     it('rules with updated conditions get applied to nodes', () => {
+      // Add condition to avengers rule
+      avengersRule.conditions.push({
+        attribute: "CHEF_ORGS",
+        operator: "EQUALS",
+        values: ["xmen"]
+      })
 
-      // update first rule to add another condition to add more nodes to the project
-      // apply rules
-      // confirm new nodes added to project
+      cy.request({
+        headers: { 'api-token': admin_token },
+        method: 'PUT',
+        url: `/apis/iam/v2beta/rules/${avengersRule.id}`,
+        body: avengersRule
+      })
 
-      // update the same rule to remove the first condition to remove nodes from the project
-      // apply rules
-      // confirm nodes removed from the project
+      cy.request({
+        headers: { 'api-token': admin_token },
+        method: 'POST',
+        url: '/apis/iam/v2beta/apply-rules'
+      })
+      cy.wait(5000)
+      // TODO check status until ready
+
+      cy.request({
+        headers: {
+          'api-token': admin_token,
+          'projects': avengers_project.id
+        },
+        method: 'GET',
+        url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
+      }).then((response) => {
+        expect(response.body).to.have.length(4)
+      })
     })
 
     it('deleted rules get applied to nodes', () => {
