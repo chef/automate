@@ -24,7 +24,7 @@ CREATE TABLE cereal_workflow_schedules (
     last_enqueued_at TIMESTAMPTZ,
     next_run_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-    CONSTRAINT say_my_name UNIQUE(instance_name, workflow_name)
+    CONSTRAINT cereal_workflow_schedules_name UNIQUE(instance_name, workflow_name)
 );
 
 CREATE OR REPLACE FUNCTION cereal_update_workflow_schedule_parameters(
@@ -78,7 +78,7 @@ CREATE TABLE cereal_workflow_instances (
     completed_tasks INTEGER NOT NULL DEFAULT 0,
     status cereal_workflow_instance_status NOT NULL DEFAULT 'running',
 
-    CONSTRAINT say_my_name1 UNIQUE(instance_name, workflow_name)
+    CONSTRAINT cereal_workflow_instances_name UNIQUE(instance_name, workflow_name)
 );
 
 CREATE TABLE cereal_workflow_results (
