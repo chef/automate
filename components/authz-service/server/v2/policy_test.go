@@ -469,6 +469,159 @@ func TestCreatePolicy(t *testing.T) {
 	}
 }
 
+func TestCreatePolicy2p1(t *testing.T) {
+	ctx := context.Background()
+	prng := prng.Seed(t)
+	ts := setupV2p1WithWriter(t, dummyWriter)
+	cl := ts.policy
+	store := ts.policyCache
+	cases := []struct {
+		desc string
+		f    func(*testing.T)
+	}{
+		{"fails with InvalidArgument when policy statement omits projects", func(t *testing.T) {
+			_, items := addSomePoliciesToStore(t, store, prng)
+			statement0 := api_v2.Statement{
+				Effect:    api_v2.Statement_ALLOW,
+				Projects:  []string{},
+				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
+				Actions:   []string{"cfgmgmt:nodes:*"},
+			}
+			req := api_v2.CreatePolicyReq{
+				Id:         "policy1",
+				Name:       "my favorite policy",
+				Members:    []string{"team:local:admins", "user:local:alice"},
+				Statements: []*api_v2.Statement{&statement0},
+			}
+
+			resp, err := cl.CreatePolicy(ctx, &req)
+
+			require.Nil(t, resp)
+			require.Equal(t, len(items), store.ItemCount())
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+			assert.Regexp(t, "statement.*must include projects", err.Error())
+		}},
+		{"successfully creates policy with assorted projects", func(t *testing.T) {
+			statement0 := api_v2.Statement{
+				Effect:    api_v2.Statement_ALLOW,
+				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
+				Actions:   []string{"cfgmgmt:nodes:*"},
+				Projects:  []string{constants_v2.UnassignedProjectID},
+			}
+			statement1 := api_v2.Statement{
+				Effect:    api_v2.Statement_DENY,
+				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
+				Actions:   []string{"cfgmgmt:nodes:*"},
+				Projects:  []string{constants_v2.AllProjectsExternalID},
+			}
+			statement2 := api_v2.Statement{
+				Effect:   api_v2.Statement_ALLOW,
+				Role:     "my-other-role",
+				Projects: []string{"my-project", "another-project"},
+			}
+			req := api_v2.CreatePolicyReq{
+				Id:         "policy1",
+				Name:       "my favorite policy",
+				Members:    []string{"team:local:admins", "user:local:alice"},
+				Statements: []*api_v2.Statement{&statement0, &statement1, &statement2},
+			}
+
+			resp, err := cl.CreatePolicy(ctx, &req)
+
+			require.NoError(t, err)
+			require.NotNil(t, resp)
+			require.Equal(t, 1, store.ItemCount())
+			pol := getPolicyFromStore(t, store, resp.Id)
+			assertPoliciesMatch(t, &pol, resp)
+		}},
+	}
+	rand.Shuffle(len(cases), func(i, j int) {
+		cases[i], cases[j] = cases[j], cases[i]
+	})
+
+	for _, test := range cases {
+		t.Run(test.desc, test.f)
+		store.Flush()
+	}
+}
+
+func TestUpdatePolicy2p1(t *testing.T) {
+	ctx := context.Background()
+	prng := prng.Seed(t)
+	ts := setupV2p1WithWriter(t, dummyWriter)
+	cl := ts.policy
+	store := ts.policyCache
+	cases := []struct {
+		desc string
+		f    func(*testing.T)
+	}{
+		{"fails with InvalidArgument when policy statement omits projects", func(t *testing.T) {
+			_, items := addSomePoliciesToStore(t, store, prng)
+			statement0 := api_v2.Statement{
+				Effect:    api_v2.Statement_ALLOW,
+				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
+				Actions:   []string{"cfgmgmt:nodes:*"},
+			}
+			req := api_v2.UpdatePolicyReq{
+				Id:         "policy1",
+				Name:       "my favorite policy",
+				Members:    []string{"team:local:admins", "user:local:alice"},
+				Statements: []*api_v2.Statement{&statement0},
+			}
+
+			resp, err := cl.UpdatePolicy(ctx, &req)
+
+			require.Nil(t, resp)
+			require.Equal(t, len(items), store.ItemCount())
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+			assert.Regexp(t, "statement.*must include projects", err.Error())
+		}},
+
+		{"successfully updates policy with assorted projects", func(t *testing.T) {
+			storedPol, _ := addSomePoliciesToStore(t, store, prng)
+			statement0 := api_v2.Statement{
+				Effect:    api_v2.Statement_ALLOW,
+				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
+				Actions:   []string{"cfgmgmt:nodes:*"},
+				Projects:  []string{constants_v2.UnassignedProjectID},
+			}
+			statement1 := api_v2.Statement{
+				Effect:    api_v2.Statement_DENY,
+				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
+				Actions:   []string{"cfgmgmt:nodes:*"},
+				Projects:  []string{constants_v2.AllProjectsExternalID},
+			}
+			statement2 := api_v2.Statement{
+				Effect:   api_v2.Statement_ALLOW,
+				Role:     "my-other-role",
+				Projects: []string{"my-project", "another-project"},
+			}
+
+			req := api_v2.UpdatePolicyReq{
+				Id:         storedPol.ID,
+				Name:       "TestPolicy1",
+				Statements: []*api_v2.Statement{&statement0, &statement1, &statement2},
+			}
+
+			pol, err := cl.UpdatePolicy(ctx, &req)
+
+			require.NoError(t, err)
+
+			storedPol = getPolicyFromStore(t, store, storedPol.ID)
+			assertPoliciesMatch(t, &storedPol, pol)
+		}},
+	}
+
+	rand.Shuffle(len(cases), func(i, j int) {
+		cases[i], cases[j] = cases[j], cases[i]
+	})
+
+	for _, test := range cases {
+		t.Run(test.desc, test.f)
+		store.Flush()
+	}
+}
+
 func TestDeletePolicy(t *testing.T) {
 	ctx := context.Background()
 	prng := prng.Seed(t)
@@ -2951,9 +3104,15 @@ type testSetup struct {
 func setupV2WithWriter(t *testing.T,
 	writer engine.V2pXWriter) testSetup {
 	return setupV2WithMigrationState(t, nil, writer, nil, nil, make(chan api_v2.Version, 1),
-		// if the MigrationStatus is set to "Success", that means we've migrated
-		// successfully to IAM v2 ("SuccessBeta1" is v2.1).
+		// Returning MigrationStatus of "Success" means we've migrated successfully to IAM v2
 		func(s storage.MigrationStatusProvider) error { return s.Success(context.Background()) })
+}
+
+func setupV2p1WithWriter(t *testing.T,
+	writer engine.V2pXWriter) testSetup {
+	return setupV2WithMigrationState(t, nil, writer, nil, nil, make(chan api_v2.Version, 1),
+		// Returning MigrationStatus of "SuccessBeta2.1" means we've migrated successfully to IAM v2.1
+		func(s storage.MigrationStatusProvider) error { return s.SuccessBeta1(context.Background()) })
 }
 
 func setupV2(t *testing.T,
