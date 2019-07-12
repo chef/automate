@@ -24,6 +24,7 @@ const (
 
 	enqueueWorkflowQuery  = `SELECT cereal_enqueue_workflow($1, $2, $3)`
 	dequeueWorkflowQuery  = `SELECT * FROM cereal_dequeue_workflow(VARIADIC $1)`
+	cancelWorkflowQuery   = `SELECT cereal_cancel_workflow($1, $2)`
 	completeWorkflowQuery = `SELECT cereal_complete_workflow($1, $2)`
 	failWorkflowQuery     = `SELECT cereal_fail_workflow($1, $2)`
 	continueWorkflowQuery = `SELECT cereal_continue_workflow($1, $2, $3, $4, $5)`
@@ -101,6 +102,16 @@ type PostgresBackend struct {
 	db      *sql.DB
 
 	cleaner *taskCleaner
+
+	taskPingInterval time.Duration
+}
+
+type PostgresBackendOpt func(*PostgresBackend)
+
+func WithTaskPingInterval(taskPingInterval time.Duration) PostgresBackendOpt {
+	return func(pg *PostgresBackend) {
+		pg.taskPingInterval = taskPingInterval
+	}
 }
 
 type PostgresTaskCompleter struct {
@@ -145,10 +156,16 @@ var _ backend.Driver = &PostgresBackend{}
 var _ backend.TaskCompleter = &PostgresTaskCompleter{}
 var _ backend.ScheduledWorkflowCompleter = &PostgresScheduledWorkflowCompleter{}
 
-func NewPostgresBackend(connURI string) *PostgresBackend {
-	return &PostgresBackend{
-		connURI: connURI,
+func NewPostgresBackend(connURI string, opts ...PostgresBackendOpt) *PostgresBackend {
+	pg := &PostgresBackend{
+		connURI:          connURI,
+		taskPingInterval: defaultPingDuration,
 	}
+
+	for _, o := range opts {
+		o(pg)
+	}
+	return pg
 }
 
 func (pg *PostgresBackend) Init() error {
@@ -551,10 +568,32 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 		return nil, nil, errors.Wrap(err, "failed to dequeue workflow")
 	}
 
-	logrus.WithFields(logrus.Fields{
-		"wid": workc.wid,
-		"eid": workc.eid,
-	}).Debug("dequeued workflow")
+	logctx := logrus.WithFields(logrus.Fields{
+		"wid":           workc.wid,
+		"eid":           workc.eid,
+		"status":        event.Instance.Status,
+		"workflow_name": event.Instance.WorkflowName,
+		"instance_name": event.Instance.InstanceName,
+		"event_type":    event.Type,
+	})
+
+	logctx.Debug("dequeued workflow")
+
+	if event.Instance.Status == backend.WorkflowInstanceStatusStarting && event.Type == backend.WorkflowCancel {
+		defer cancel()
+		logctx.Warn("Cancel received before start")
+		// This case should be an anomaly. Because our ordering scheme (time) doesn't guarantee
+		// that events get processed sequentially, only causally, it could be possible to have a
+		// cancel happen before a start event is processed.
+		if err := workc.Fail(errors.New("canceled starting workflow")); err != nil {
+			return nil, nil, errors.Wrap(err, "failed to cancel unstarted workflow")
+		}
+
+		// TODO (jaym): we could rerun this function, however i'm a little
+		// afraid of getting into an infinite recursion. The extra delay by not doing
+		// this is probably fine for now.
+		return nil, nil, cereal.ErrNoDueWorkflows
+	}
 
 	if event.Type == backend.TaskComplete {
 		event.CompletedTaskCount++
@@ -575,6 +614,21 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 	workc.completedTaskCount = event.CompletedTaskCount
 
 	return event, workc, nil
+}
+
+func (pg *PostgresBackend) CancelWorkflow(ctx context.Context, instanceName string, workflowName string) error {
+	row := pg.db.QueryRowContext(ctx, cancelWorkflowQuery, instanceName, workflowName)
+	var updated sql.NullBool
+
+	if err := row.Scan(&updated); err != nil {
+		return errors.Wrap(err, "failed to cancel workflow")
+	}
+
+	if !updated.Bool {
+		return cereal.ErrWorkflowInstanceNotFound
+	}
+
+	return nil
 }
 
 func (workc *PostgresWorkflowCompleter) EnqueueTask(task *backend.Task, opts backend.TaskEnqueueOpts) error {
@@ -632,7 +686,7 @@ func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*b
 		return nil, nil, err
 	}
 
-	pinger := newTaskPinger(pg.db, tid)
+	pinger := newTaskPinger(pg.db, tid, pg.taskPingInterval)
 
 	taskc := &PostgresTaskCompleter{
 		db:     pg.db,
@@ -642,15 +696,24 @@ func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*b
 		pinger: pinger,
 	}
 
-	pinger.Start(ctx)
+	pinger.Start(ctx, cancel)
 
 	return task, taskc, nil
+}
+func (taskc *PostgresTaskCompleter) Context() context.Context {
+	return taskc.ctx
 }
 
 func (taskc *PostgresTaskCompleter) Fail(errMsg string) error {
 	defer taskc.cancel()
 
 	taskc.pinger.Stop()
+
+	select {
+	case <-taskc.ctx.Done():
+		return cereal.ErrTaskLost
+	default:
+	}
 
 	_, err := taskc.db.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, backend.TaskStatusFailed, errMsg, "")
 
@@ -670,6 +733,12 @@ func (taskc *PostgresTaskCompleter) Succeed(results []byte) error {
 	defer taskc.cancel()
 
 	taskc.pinger.Stop()
+
+	select {
+	case <-taskc.ctx.Done():
+		return cereal.ErrTaskLost
+	default:
+	}
 
 	_, err := taskc.db.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, backend.TaskStatusSuccess, "", results)
 

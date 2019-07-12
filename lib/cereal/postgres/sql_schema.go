@@ -63,7 +63,7 @@ AS $$
     UPDATE cereal_workflow_schedules SET enabled = _enabled WHERE id = _id;
 $$ LANGUAGE SQL;
 
-CREATE TYPE cereal_workflow_instance_status AS ENUM('running');
+CREATE TYPE cereal_workflow_instance_status AS ENUM('starting', 'running');
 
 CREATE TABLE cereal_workflow_instances (
     id BIGSERIAL PRIMARY KEY,
@@ -75,7 +75,7 @@ CREATE TABLE cereal_workflow_instances (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     enqueued_tasks INTEGER NOT NULL DEFAULT 0,
     completed_tasks INTEGER NOT NULL DEFAULT 0,
-    status cereal_workflow_instance_status NOT NULL DEFAULT 'running',
+    status cereal_workflow_instance_status NOT NULL DEFAULT 'starting',
 
     CONSTRAINT cereal_workflow_instances_name UNIQUE(instance_name, workflow_name)
 );
@@ -188,12 +188,16 @@ AS $$
     SELECT * from nextwinst
 $$ LANGUAGE SQL;
 
-CREATE OR REPLACE FUNCTION cereal_cancel_workflow(_workflow_instance_id BIGINT)
-RETURNS VOID
+CREATE OR REPLACE FUNCTION cereal_cancel_workflow(_instance_name TEXT, _workflow_name TEXT)
+RETURNS BOOLEAN
 AS $$
+BEGIN
     INSERT INTO cereal_workflow_events(event_type, workflow_instance_id)
-        VALUES('cancel', _workflow_instance_id);
-$$ LANGUAGE SQL;
+        (SELECT 'cancel', id FROM cereal_workflow_instances WHERE instance_name = _instance_name
+            AND workflow_name = _workflow_name);
+    RETURN FOUND;
+END
+$$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION cereal_complete_workflow(_wid BIGINT, _result BYTEA)
 RETURNS VOID
@@ -253,7 +257,7 @@ CREATE OR REPLACE FUNCTION cereal_continue_workflow(wid BIGINT, _eid BIGINT, _pa
 RETURNS VOID
 LANGUAGE SQL
 AS $$
-    UPDATE cereal_workflow_instances SET updated_at = NOW(), payload = _payload,
+    UPDATE cereal_workflow_instances SET updated_at = NOW(), payload = _payload, status = 'running',
         enqueued_tasks = _enqueued_tasks, completed_tasks = _completed_tasks WHERE id = wid;
     -- We've decided there is more to do but are done processing this event.
     DELETE FROM cereal_workflow_events WHERE id = _eid

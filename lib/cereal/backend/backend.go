@@ -8,6 +8,7 @@ import (
 type Driver interface {
 	EnqueueWorkflow(ctx context.Context, workflow *WorkflowInstance) error
 	DequeueWorkflow(ctx context.Context, workflowNames []string) (*WorkflowEvent, WorkflowCompleter, error)
+	CancelWorkflow(ctx context.Context, instanceName string, workflowName string) error
 
 	DequeueTask(ctx context.Context, taskName string) (*Task, TaskCompleter, error)
 
@@ -27,6 +28,7 @@ type Driver interface {
 type WorkflowInstanceStatus string
 
 const (
+	WorkflowInstanceStatusStarting  WorkflowInstanceStatus = "starting"
 	WorkflowInstanceStatusRunning   WorkflowInstanceStatus = "running"
 	WorkflowInstanceStatusCompleted WorkflowInstanceStatus = "completed"
 )
@@ -46,9 +48,9 @@ type WorkflowInstance struct {
 type WorkflowEventType string
 
 const (
-	WorkflowStart WorkflowEventType = "start"
-	TaskComplete  WorkflowEventType = "task_complete"
-	Cancel        WorkflowEventType = "cancel"
+	WorkflowStart  WorkflowEventType = "start"
+	TaskComplete   WorkflowEventType = "task_complete"
+	WorkflowCancel WorkflowEventType = "cancel"
 )
 
 type TaskStatusType string
@@ -83,6 +85,7 @@ type TaskResult struct {
 }
 
 type TaskCompleter interface {
+	Context() context.Context
 	Fail(err string) error
 	Succeed(result []byte) error
 }

@@ -9,28 +9,32 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const defaultPingDuration = 15 * time.Second
+
 type taskPinger struct {
-	taskID          int64
-	db              *sql.DB
-	wgStart         sync.WaitGroup
-	wgStop          sync.WaitGroup
-	stop            context.CancelFunc
-	checkinInterval time.Duration
+	taskID       int64
+	db           *sql.DB
+	wgStart      sync.WaitGroup
+	wgStop       sync.WaitGroup
+	stop         context.CancelFunc
+	pingInterval time.Duration
 }
 
-func newTaskPinger(db *sql.DB, taskID int64) *taskPinger {
+func newTaskPinger(db *sql.DB, taskID int64, pingInterval time.Duration) *taskPinger {
 	pinger := &taskPinger{
-		taskID:          taskID,
-		db:              db,
-		checkinInterval: 30 * time.Second,
+		taskID:       taskID,
+		db:           db,
+		pingInterval: pingInterval,
 	}
 	pinger.wgStart.Add(1)
 	return pinger
 }
 
 // Start starts a goroutine that checks the task in on some interval.
-// This function is only allowed to be called once.
-func (w *taskPinger) Start(ctx context.Context) {
+// This function is only allowed to be called once. If the task is lost,
+// onTaskLost will be called. This can be used to cancel a context passed
+// to the TaskExecutor so that it can exit early.
+func (w *taskPinger) Start(ctx context.Context, onTaskLost func()) {
 	// Make sure this function is only called once. A second call will
 	// cause this to panic
 	w.wgStart.Done()
@@ -44,19 +48,26 @@ func (w *taskPinger) Start(ctx context.Context) {
 	go func() {
 		defer w.stop()
 
+		logctx := logrus.WithFields(logrus.Fields{
+			"taskID": w.taskID,
+		})
 	OUTER:
 		for {
+			logctx.Debug("pinging task")
 			select {
 			case <-ctx.Done():
 				break OUTER
-			case <-time.After(w.checkinInterval):
+			case <-time.After(w.pingInterval):
 				shouldExit, err := w.ping(ctx)
 				if err == nil && shouldExit {
+					onTaskLost()
 					break OUTER
 				}
 			}
 		}
 		w.wgStop.Done()
+		logctx.Debug("done pinging")
+
 	}()
 }
 

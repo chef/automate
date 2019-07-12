@@ -7,6 +7,9 @@ import (
 	"database/sql"
 	"os"
 	"testing"
+	"time"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
@@ -63,7 +66,7 @@ func runResetDB() error {
 func TestCerealPostgres(t *testing.T) {
 	ctx := context.Background()
 	require.NoError(t, runResetDB())
-	pgBackend := postgres.NewPostgresBackend(testDBURL())
+	pgBackend := postgres.NewPostgresBackend(testDBURL(), postgres.WithTaskPingInterval(3*time.Second))
 	defer pgBackend.Close()
 	s := &CerealTestSuite{
 		newManager: func(opts ...managerOptFunc) *cereal.Manager {
@@ -89,4 +92,8 @@ func TestCerealPostgres(t *testing.T) {
 	}
 	suite.Run(t, s)
 	require.NoError(t, pgBackend.Close())
+}
+
+func init() {
+	logrus.SetLevel(logrus.DebugLevel)
 }

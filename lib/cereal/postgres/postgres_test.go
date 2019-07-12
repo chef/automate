@@ -765,6 +765,267 @@ func TestWorkflowCompleteWithUnprocessedTask(t *testing.T) {
 	assertNoPendingWork(t, b1)
 }
 
+func TestWorkflowCancellationWithPendingTasks(t *testing.T) {
+	taskName := "task_name"
+	workflowName := "workflow_name"
+	instanceName := "workflow-instance"
+	err := runResetDB()
+	require.NoError(t, err)
+	b1 := NewPostgresBackend(testDBURL())
+	err = b1.Init()
+	require.NoError(t, err)
+	defer b1.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: instanceName,
+		WorkflowName: workflowName,
+	})
+
+	require.NoError(t, err, "failed to enqueue workflow")
+
+	evt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+	require.Equal(t, backend.WorkflowStart, evt.Type)
+	require.Equal(t, backend.WorkflowInstanceStatusStarting, evt.Instance.Status)
+
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{})
+
+	err = completer.Continue(nil)
+	require.NoError(t, err)
+
+	err = b1.CancelWorkflow(ctx, instanceName, workflowName)
+	require.NoError(t, err)
+
+	evt, completer, err = b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+	require.Equal(t, backend.WorkflowCancel, evt.Type)
+	require.Equal(t, backend.WorkflowInstanceStatusRunning, evt.Instance.Status)
+	err = completer.Done(nil)
+	require.NoError(t, err)
+
+	_, _, err = b1.DequeueTask(ctx, taskName)
+	require.Error(t, cereal.ErrNoTasks)
+
+	assertNoPendingWork(t, b1)
+}
+
+func TestWorkflowCancellationWithRunningTasks(t *testing.T) {
+	taskName := "task_name"
+	workflowName := "workflow_name"
+	instanceName := "workflow-instance"
+	err := runResetDB()
+	require.NoError(t, err)
+	b1 := NewPostgresBackend(testDBURL(), WithTaskPingInterval(3*time.Second))
+	err = b1.Init()
+	require.NoError(t, err)
+	defer b1.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: instanceName,
+		WorkflowName: workflowName,
+	})
+
+	require.NoError(t, err, "failed to enqueue workflow")
+
+	evt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+	require.Equal(t, backend.WorkflowStart, evt.Type)
+	require.Equal(t, backend.WorkflowInstanceStatusStarting, evt.Instance.Status)
+
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{})
+
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{})
+
+	err = completer.Continue(nil)
+	require.NoError(t, err)
+
+	_, taskCompleter1, err := b1.DequeueTask(ctx, taskName)
+	require.NoError(t, err)
+
+	_, taskCompleter2, err := b1.DequeueTask(ctx, taskName)
+	require.NoError(t, err)
+
+	err = b1.CancelWorkflow(ctx, instanceName, workflowName)
+	require.NoError(t, err)
+
+	evt, completer, err = b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+	require.Equal(t, backend.WorkflowCancel, evt.Type)
+	err = completer.Done(nil)
+	require.NoError(t, err)
+
+	<-taskCompleter1.Context().Done()
+	err = taskCompleter1.Succeed(nil)
+	require.Equal(t, cereal.ErrTaskLost, err)
+
+	<-taskCompleter2.Context().Done()
+	err = taskCompleter2.Fail("err")
+	require.Equal(t, cereal.ErrTaskLost, err)
+
+	_, _, err = b1.DequeueTask(ctx, taskName)
+	require.Error(t, cereal.ErrNoTasks)
+
+	assertNoPendingWork(t, b1)
+}
+
+func TestWorkflowCancellationWithCompletedTasks(t *testing.T) {
+	taskName := "task_name"
+	workflowName := "workflow_name"
+	instanceName := "workflow-instance"
+	err := runResetDB()
+	require.NoError(t, err)
+	b1 := NewPostgresBackend(testDBURL(), WithTaskPingInterval(3*time.Second))
+	err = b1.Init()
+	require.NoError(t, err)
+	defer b1.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: instanceName,
+		WorkflowName: workflowName,
+	})
+
+	require.NoError(t, err, "failed to enqueue workflow")
+
+	evt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+	require.Equal(t, backend.WorkflowStart, evt.Type)
+	require.Equal(t, backend.WorkflowInstanceStatusStarting, evt.Instance.Status)
+
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{})
+
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{})
+
+	err = completer.Continue(nil)
+	require.NoError(t, err)
+
+	err = b1.CancelWorkflow(ctx, instanceName, workflowName)
+	require.NoError(t, err)
+
+	_, taskCompleter1, err := b1.DequeueTask(ctx, taskName)
+	require.NoError(t, err)
+	err = taskCompleter1.Succeed(nil)
+	require.NoError(t, err)
+
+	_, taskCompleter2, err := b1.DequeueTask(ctx, taskName)
+	require.NoError(t, err)
+	err = taskCompleter2.Fail("err")
+	require.NoError(t, err)
+
+	evt, completer, err = b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+	// It's possible the next line fails, but it will be very rare if it does.
+	// cancel might not be delivered in the expected order as it is an external
+	// event.
+	require.Equal(t, backend.WorkflowCancel, evt.Type)
+	err = completer.Done(nil)
+	require.NoError(t, err)
+
+	assertNoPendingWork(t, b1)
+}
+
+func TestWorkflowCancellationDedup(t *testing.T) {
+	taskName := "task_name"
+	workflowName := "workflow_name"
+	instanceName := "workflow-instance"
+	err := runResetDB()
+	require.NoError(t, err)
+	b1 := NewPostgresBackend(testDBURL(), WithTaskPingInterval(3*time.Second))
+	err = b1.Init()
+	require.NoError(t, err)
+	defer b1.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: instanceName,
+		WorkflowName: workflowName,
+	})
+
+	require.NoError(t, err, "failed to enqueue workflow")
+
+	evt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+	require.Equal(t, backend.WorkflowStart, evt.Type)
+	require.Equal(t, backend.WorkflowInstanceStatusStarting, evt.Instance.Status)
+
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{})
+
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{})
+
+	err = completer.Continue(nil)
+	require.NoError(t, err)
+
+	err = b1.CancelWorkflow(ctx, instanceName, workflowName)
+	require.NoError(t, err)
+
+	err = b1.CancelWorkflow(ctx, instanceName, workflowName)
+	require.NoError(t, err)
+
+	evt, completer, err = b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+	require.Equal(t, backend.WorkflowCancel, evt.Type)
+	err = completer.Done(nil)
+
+	require.NoError(t, err)
+
+	assertNoPendingWork(t, b1)
+}
+
+func TestWorkflowCancellationBeforeStart(t *testing.T) {
+	workflowName := "workflow_name"
+	instanceName := "workflow-instance"
+	err := runResetDB()
+	require.NoError(t, err)
+	b1 := NewPostgresBackend(testDBURL(), WithTaskPingInterval(3*time.Second))
+	err = b1.Init()
+	require.NoError(t, err)
+	defer b1.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: instanceName,
+		WorkflowName: workflowName,
+	})
+	require.NoError(t, err, "failed to enqueue workflow")
+
+	err = b1.CancelWorkflow(ctx, instanceName, workflowName)
+	require.NoError(t, err)
+
+	_, err = b1.db.ExecContext(ctx, "UPDATE cereal_workflow_events SET enqueued_at = NOW() WHERE event_type = 'start'")
+	require.NoError(t, err)
+
+	_, _, err = b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.Error(t, cereal.ErrNoDueWorkflows)
+
+	assertNoPendingWork(t, b1)
+}
+
 func assertNoPendingWork(t *testing.T, b *PostgresBackend) {
 	t.Helper()
 
