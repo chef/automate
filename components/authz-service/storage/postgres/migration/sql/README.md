@@ -54,3 +54,4 @@
 - [`52_add_db_id_members.up.sql`](52_add_db_id_members.up.sql)
 - [`53_add_db_id_to_iam_policies.up.sql`](53_add_db_id_to_iam_policies.up.sql)
 - [`54_use_project_db_id_in_references_of_project_rules.up.sql`](54_use_project_db_id_in_references_of_project_rules.up.sql)
+- [`55_use_project_db_id_in_references_of_project_roles.up.sql`](55_use_project_db_id_in_references_of_project_roles.up.sql)
