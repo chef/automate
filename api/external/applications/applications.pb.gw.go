@@ -125,6 +125,26 @@ func request_ApplicationsService_GetServicesStats_0(ctx context.Context, marshal
 
 }
 
+var (
+	filter_ApplicationsService_GetDisconnectedServices_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+)
+
+func request_ApplicationsService_GetDisconnectedServices_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationsServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq DisconnectedServicesReq
+	var metadata runtime.ServerMetadata
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ApplicationsService_GetDisconnectedServices_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.GetDisconnectedServices(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
 func request_ApplicationsService_GetVersion_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationsServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq version.VersionInfoRequest
 	var metadata runtime.ServerMetadata
@@ -272,6 +292,26 @@ func RegisterApplicationsServiceHandlerClient(ctx context.Context, mux *runtime.
 
 	})
 
+	mux.Handle("GET", pattern_ApplicationsService_GetDisconnectedServices_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_ApplicationsService_GetDisconnectedServices_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ApplicationsService_GetDisconnectedServices_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("GET", pattern_ApplicationsService_GetVersion_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -306,6 +346,8 @@ var (
 
 	pattern_ApplicationsService_GetServicesStats_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"beta", "applications", "stats"}, "", runtime.AssumeColonVerbOpt(true)))
 
+	pattern_ApplicationsService_GetDisconnectedServices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"beta", "applications", "disconnected_services"}, "", runtime.AssumeColonVerbOpt(true)))
+
 	pattern_ApplicationsService_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"beta", "applications", "version"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
@@ -319,6 +361,8 @@ var (
 	forward_ApplicationsService_GetServicesBySG_0 = runtime.ForwardResponseMessage
 
 	forward_ApplicationsService_GetServicesStats_0 = runtime.ForwardResponseMessage
+
+	forward_ApplicationsService_GetDisconnectedServices_0 = runtime.ForwardResponseMessage
 
 	forward_ApplicationsService_GetVersion_0 = runtime.ForwardResponseMessage
 )

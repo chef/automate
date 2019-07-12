@@ -105,6 +105,22 @@ func (a *Applications) GetServicesStats(
 	return out, nil
 }
 
+func (a *Applications) GetDisconnectedServices(
+	ctx context.Context,
+	in *applications.DisconnectedServicesReq) (*applications.ServicesRes, error) {
+
+	inDomain := &applications.DisconnectedServicesReq{}
+	out := &applications.ServicesRes{}
+	f := func() (proto.Message, error) {
+		return a.client.GetDisconnectedServices(ctx, inDomain)
+	}
+	err := protobuf.CallDomainService(in, inDomain, f, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GetVersion fetches the version of team service
 func (a *Applications) GetVersion(ctx context.Context,
 	e *version.VersionInfoRequest) (*version.VersionInfo, error) {

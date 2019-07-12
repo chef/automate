@@ -381,6 +381,7 @@ paths = [
   "api/config/ui/*",
   "api/config/workflow_nginx/*",
   "api/config/workflow_server/*",
+  "api/external/applications/*",
   "api/external/common/*",
   "api/interservice/deployment/*",
   "api/interservice/es_sidecar/*",
