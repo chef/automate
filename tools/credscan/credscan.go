@@ -102,6 +102,10 @@ var a2Config = config{
 	},
 	contentInclude: []pattern{
 		{
+			description: "slack hooks",
+			regex:       `https://hooks.slack.com`,
+		},
+		{
 			description: "private keys",
 			regex:       `BEGIN.*PRIVATE`,
 		},
@@ -154,6 +158,14 @@ var a2Config = config{
 			description: "OpenJDK PGP key",
 			regex:       "DA1A4A13543B466853BAF164EB9B1D8886F44E2A",
 		},
+		{
+			description: "fake slack webhook 1",
+			regex:       "https://hooks.slack.com/services/FAKE/FAKE/THISISFAKE",
+		},
+		{
+			description: "fake slack webhook 2",
+			regex:       "https://hooks.slack.com/services/T00000000",
+		},
 	},
 }
 
@@ -180,7 +192,7 @@ func main() {
 	// until we need more flexibility.
 	//
 	outbuf := &bytes.Buffer{}
-	gitGrepCmd := fmt.Sprintf("git grep -E \"%s\" | grep -v -E \"%s\"",
+	gitGrepCmd := fmt.Sprintf("git grep -a -E \"%s\" | grep -v -E \"%s\"",
 		toGrepString(a2Config.contentInclude),
 		toGrepString(append(a2Config.contentExclude, a2Config.filenameExclude...)))
 	cmd = exec.Command("bash", "-c", gitGrepCmd)

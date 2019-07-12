@@ -9,7 +9,7 @@ from_json_fixture_test_() ->
     hoax:fixture(?MODULE, "from_json").
 
 from_json_posts_test_notification_to_slack_webhook() ->
-    WebhookURL = <<"https://hooks.slack.com/services/BLARG/BLARGBLARG/FLOOF">>,
+    WebhookURL = <<"https://hooks.slack.com/services/FAKE/FAKE/THISISFAKE">>,
 
     ReqEjson = {[
         {<<"url">>, WebhookURL}
@@ -47,7 +47,7 @@ from_json_posts_test_notification_to_slack_webhook() ->
     ?verifyAll.
 
 from_json_slack_failure_returns_failure_response() ->
-    WebhookURL = <<"https://hooks.slack.com/services/BLARG/BLARGBLARG/FLOOF">>,
+    WebhookURL = <<"https://hooks.slack.com/services/FAKE/FAKE/THISISFAKE">>,
 
     ReqEjson = {[
         {<<"url">>, WebhookURL}
@@ -89,7 +89,7 @@ from_json_slack_failure_returns_failure_response() ->
     ?verifyAll.
 
 from_json_returns_504_when_post_from_server_fails() ->
-    WebhookURL = <<"https://hooks.slack.com/services/BLARG/BLARGBLARG/FLOOF">>,
+    WebhookURL = <<"https://hooks.slack.com/services/FAKE/FAKE/THISISFAKE">>,
 
     ReqEjson = {[
         {<<"url">>, WebhookURL}
