@@ -239,7 +239,7 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 	//
 	// This will cascade delete all related statements.
 	if _, err := tx.ExecContext(ctx,
-		"DELETE FROM iam_policy_statements WHERE policy_id=$1",
+		"DELETE FROM iam_statements WHERE policy_id=policy_db_id($1)",
 		pol.ID,
 	); err != nil {
 		if err := p.processError(err); err != storage_errors.ErrNotFound {
