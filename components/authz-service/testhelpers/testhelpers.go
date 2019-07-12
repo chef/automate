@@ -90,7 +90,7 @@ func NewTestFramework(t *testing.T, ctx context.Context) *TestFramework {
 	vChan := make(chan api.Version, 1)
 	vSwitch := server.NewSwitch(vChan)
 
-	polSrv, polRefresher, err := server.NewPoliciesServer(ctx, l, pg, opaInstance, pgV1, vChan)
+	polSrv, polRefresher, err := server.NewPoliciesServer(ctx, l, pg, opaInstance, pgV1, vSwitch, vChan)
 	require.NoError(t, err)
 
 	projectUpdateManager := server.NewProjectUpdateManager(eventServiceClient, configMgr)
