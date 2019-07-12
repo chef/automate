@@ -19,6 +19,29 @@ SET
 ALTER TABLE iam_role_projects
     DROP COLUMN project_temp_id;
 
+-- returns NULL if there's no associated projects; the call can decide
+-- (by coalesce'ing) if they want that to be {} or {(unassigned)}.
+CREATE OR REPLACE FUNCTION
+  role_projects(_role_id TEXT, OUT _project_ids TEXT[])
+  RETURNS TEXT[] AS $$
+
+  DECLARE
+  role_db_id INTEGER;
+  BEGIN
+      SELECT db_id INTO STRICT role_db_id
+      FROM iam_roles AS r
+      WHERE r.id=_role_id;
+      IF FOUND THEN
+          SELECT array_agg(p.id) INTO _project_ids
+          FROM iam_role_projects AS rp
+          LEFT JOIN iam_projects AS p
+          ON rp.project_id=p.db_id
+          WHERE rp.role_id=role_db_id;
+     END IF;
+  END;
+$$ LANGUAGE plpgsql;
+
+
 CREATE OR REPLACE FUNCTION
   query_role(_role_id TEXT)
   RETURNS json AS $$
@@ -28,29 +51,27 @@ CREATE OR REPLACE FUNCTION
     'name', r.name,
     'type', r.type,
     'actions', r.actions,
-    'projects', COALESCE(json_agg(p.id) FILTER (WHERE p.id IS NOT NULL), '[]')
+    'projects', COALESCE(role_projects(r.id), '{}')
     ) AS role
   FROM iam_roles AS r
-  LEFT JOIN iam_role_projects AS rp
-  ON rp.role_id=r.db_id
-  LEFT JOIN iam_projects AS p
-  ON rp.project_id=p.db_id
   WHERE r.id=_role_id
-  GROUP BY r.id, r.name, r.type, r.actions
 
 $$ LANGUAGE sql;
 
-CREATE FUNCTION
-  role_projects(_role_id TEXT)
-  RETURNS TEXT[] AS $$
+CREATE OR REPLACE FUNCTION
+  query_roles(_projects_filter TEXT[])
+  RETURNS setof json AS $$
 
-  SELECT COALESCE(array_agg(p.id) FILTER (WHERE p.id IS NOT NULL), '{(unassigned)}')
+  SELECT
+    json_build_object(
+      'id', r.id,
+      'name', r.name,
+      'type', r.type,
+      'actions', r.actions,
+      'projects', COALESCE(role_projects(r.id), '{}')
+    ) AS role
   FROM iam_roles AS r
-  LEFT JOIN iam_role_projects AS rp
-  ON rp.role_id=r.db_id
-  LEFT JOIN iam_projects AS p
-  ON rp.project_id=p.db_id
-  WHERE r.id=_role_id
+  WHERE projects_match(COALESCE(role_projects(r.id), '{(unassigned)}'),  _projects_filter);
 
 $$ LANGUAGE sql;
 
