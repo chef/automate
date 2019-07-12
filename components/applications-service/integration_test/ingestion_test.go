@@ -648,3 +648,27 @@ func TestIngestDenySupervisorMemberIDUpdates(t *testing.T) {
 			"the service supervisor_id is not the expected one")
 	}
 }
+
+func TestIngestConcurrencySafe(t *testing.T) {
+	defer suite.DeleteDataFromStorage()
+	suite.Ingester.ResetStats()
+
+	var (
+		messageNumber int64 = 500
+		i             int64 = 0
+	)
+
+	for i = 0; i < messageNumber; i++ {
+		event := NewHabitatEventRandomized()
+		bytes, err := proto.Marshal(event)
+		require.NoError(t, err)
+		suite.Ingester.IngestMessage(bytes)
+	}
+	suite.WaitForEventsToProcess(messageNumber)
+
+	svcList, err := suite.StorageClient.GetServices("name", true, 1, int32(messageNumber+1), nil)
+	require.NoError(t, err)
+	assert.Equal(t, messageNumber, int64(len(svcList)))
+	assert.Equal(t, messageNumber, suite.Ingester.EventsProcessed())
+	assert.Equal(t, messageNumber, suite.Ingester.EventsSuccessful())
+}
