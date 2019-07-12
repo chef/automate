@@ -6604,7 +6604,7 @@ func assertProjectsMatch(t *testing.T, db *testhelpers.TestDB, project storage.P
 func assertRolesMatch(t *testing.T, db *testhelpers.TestDB, role storage.Role) {
 	t.Helper()
 	dbRole := storage.Role{}
-	require.NoError(t, db.QueryRow(`SELECT query_role($1);`, role.ID).Scan(&dbRole))
+	require.NoError(t, db.QueryRow("SELECT query_role($1)", role.ID).Scan(&dbRole))
 	assert.Equal(t, role, dbRole)
 }
 
@@ -6744,12 +6744,10 @@ func insertTestRole(t *testing.T,
 	var dbID string
 	require.NoError(t, row.Scan(&dbID))
 
-	for _, project := range role.Projects {
-		_, err := db.Exec(`INSERT INTO iam_role_projects (role_id, project_id)
-			SELECT $1, db_id FROM iam_projects WHERE id=$2`,
-			&dbID, &project)
-		require.NoError(t, err)
-	}
+	_, err := db.Exec(`INSERT INTO iam_role_projects (role_id, project_id)
+		SELECT $1, db_id FROM iam_projects WHERE id=ANY($2)`,
+		dbID, pq.Array(role.Projects))
+	require.NoError(t, err)
 
 	return role
 }
