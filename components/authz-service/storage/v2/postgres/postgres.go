@@ -1358,7 +1358,7 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 	}
 
 	if project.Type == v2.Custom {
-		row := tx.QueryRowContext(ctx, ` WITH t as (SELECT id from iam_projects WHERE type='custom') SELECT COUNT(*) FROM t;`)
+		row := tx.QueryRowContext(ctx, "SELECT count(*) FROM iam_projects WHERE type='custom'")
 		var numProjects int64
 		if err := row.Scan(&numProjects); err != nil {
 			return nil, p.processError(err)
