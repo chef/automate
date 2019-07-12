@@ -60,7 +60,7 @@ func runResetDB() error {
 	return nil
 }
 
-func TestPostgresManager(t *testing.T) {
+func TestCerealPostgres(t *testing.T) {
 	ctx := context.Background()
 	require.NoError(t, runResetDB())
 	pgBackend := postgres.NewPostgresBackend(testDBURL())

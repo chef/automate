@@ -55,7 +55,7 @@ describe File.basename(__FILE__) do
 
     ##### Success tests #####
     actual = GRPC jobs, :list, Jobs::Query.new()
-    assert_equal actual, Jobs::Jobs.new()
+    assert_equal Jobs::Jobs.new(), actual
 
     secret_id1 = (SS_GRPC secrets, :create, Secrets::Secret.new(
       name: "My SSH Login secrets",

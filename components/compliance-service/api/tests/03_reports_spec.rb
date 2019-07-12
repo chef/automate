@@ -674,7 +674,7 @@ describe File.basename(__FILE__) do
 
     # Get a specific report
     # actual_data = GRPC reporting, :read_report, Reporting::Query.new(id: 'bb93e1b2-36d6-439e-ac70-cccccccccc05')
-    # assert_assert_equal(actual_data.class, Reporting::Report)
+    # assert_assert_equal(Reporting::Report, actual_data.class)
     #
     # expected_json = {
     #   "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05",
