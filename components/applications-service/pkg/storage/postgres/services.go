@@ -119,7 +119,7 @@ LEFT JOIN deployment AS d
   ON s.deployment_id = d.id
 LEFT JOIN supervisor AS sup
   ON s.sup_id = sup.id
-WHERE last_event_occurred_at < now() - interval '%d minutes'
+WHERE last_event_occurred_at < now() - ($1 || ' minutes')::interval
 `
 
 	selectServicesHealthCounts = `
@@ -201,7 +201,7 @@ func (db *Postgres) GetServices(
 func (db *Postgres) GetDisconnectedServices(thresholdMinutes int32) ([]*storage.Service, error) {
 	var services []*storage.Service
 
-	_, err := db.DbMap.Select(&services, fmt.Sprintf(selectDisconnectedServices, thresholdMinutes))
+	_, err := db.DbMap.Select(&services, selectDisconnectedServices, thresholdMinutes)
 	return services, err
 }
 
