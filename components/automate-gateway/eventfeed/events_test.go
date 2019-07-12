@@ -11,10 +11,9 @@ import (
 	cmsReq "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	cmsRes "github.com/chef/automate/api/interservice/cfgmgmt/response"
 	cmsService "github.com/chef/automate/api/interservice/cfgmgmt/service"
+	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
 	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
 	subject "github.com/chef/automate/components/automate-gateway/eventfeed"
-	mock_automate_feed "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_feed"
-	automate_feed "github.com/chef/automate/components/compliance-service/api/automate-feed"
 	"github.com/golang/mock/gomock"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
@@ -33,12 +32,12 @@ func TestEventFeedEmpty(t *testing.T) {
 		return &cmsRes.Events{}, nil
 	})
 
-	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(ctrl)
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(ctrl)
 	mockFeedServiceClient.EXPECT().GetFeed(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, action *automate_feed.FeedRequest) (*automate_feed.FeedResponse, error) {
-		return &automate_feed.FeedResponse{}, nil
+	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
+		return &event_feed_api.FeedResponse{}, nil
 	})
 
 	eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)
@@ -69,11 +68,11 @@ func TestEventFeedCollectEventFeedCollapseFalse(t *testing.T) {
 		return cmsFixedEvents(t), nil
 	})
 
-	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(ctrl)
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(ctrl)
 	mockFeedServiceClient.EXPECT().GetFeed(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, action *automate_feed.FeedRequest) (*automate_feed.FeedResponse, error) {
+	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
 		return complianceEventFixedEvents(t), nil
 	})
 
@@ -105,11 +104,11 @@ func TestEventFeedCollectEventFeedCollapseNonoverlapping(t *testing.T) {
 		return cmsFixedEvents(t), nil
 	})
 
-	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(gomock.NewController(t))
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(gomock.NewController(t))
 	mockFeedServiceClient.EXPECT().GetFeed(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, action *automate_feed.FeedRequest) (*automate_feed.FeedResponse, error) {
+	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
 		return complianceEventFixedEvents(t), nil
 	})
 
@@ -179,34 +178,34 @@ func TestEventFeedCollectEventFeedCollapseOverlapping(t *testing.T) {
 		}, nil
 	})
 
-	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(gomock.NewController(t))
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(gomock.NewController(t))
 	mockFeedServiceClient.EXPECT().GetFeed(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, action *automate_feed.FeedRequest) (*automate_feed.FeedResponse, error) {
-		fixedEvents := make([]*automate_feed.FeedEntry, 0)
+	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
+		fixedEvents := make([]*event_feed_api.FeedEntry, 0)
 
 		for count := 0; count < 5; count++ {
-			fixedEvents = append(fixedEvents, &automate_feed.FeedEntry{
+			fixedEvents = append(fixedEvents, &event_feed_api.FeedEntry{
 				EventType:            "scanJobUpdated",
 				Tags:                 []string{"scanjob"},
 				Verb:                 "update",
 				SourceEventPublished: timestamp2,
-				Producer: &automate_feed.Producer{
+				Producer: &event_feed_api.Producer{
 					Name: "mocked_event",
 					ID:   "scanjob",
 				},
-				Actor: &automate_feed.Actor{
+				Actor: &event_feed_api.Actor{
 					Name:       "golang",
 					ObjectType: "automatic",
 				},
-				Target: &automate_feed.Target{
+				Target: &event_feed_api.Target{
 					Name: "localhost",
 				},
 			})
 		}
 
-		return &automate_feed.FeedResponse{
+		return &event_feed_api.FeedResponse{
 			FeedEntries:  fixedEvents,
 			TotalEntries: 2,
 		}, nil
@@ -269,33 +268,33 @@ func TestEventFeedCollectEventFeedSortedSameDates(t *testing.T) {
 		}, nil
 	})
 
-	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient((gomock.NewController(t)))
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient((gomock.NewController(t)))
 	mockFeedServiceClient.EXPECT().GetFeed(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, action *automate_feed.FeedRequest) (*automate_feed.FeedResponse, error) {
-		fixedEvents := make([]*automate_feed.FeedEntry, 0)
+	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
+		fixedEvents := make([]*event_feed_api.FeedEntry, 0)
 
-		fixedEvents = append(fixedEvents, &automate_feed.FeedEntry{
+		fixedEvents = append(fixedEvents, &event_feed_api.FeedEntry{
 			ID:                   "b",
 			EventType:            "scanJobUpdated",
 			Tags:                 []string{"scanjob"},
 			Verb:                 "update",
 			SourceEventPublished: timestamp1,
-			Producer: &automate_feed.Producer{
+			Producer: &event_feed_api.Producer{
 				Name: "mocked_event",
 				ID:   "scanjob",
 			},
-			Actor: &automate_feed.Actor{
+			Actor: &event_feed_api.Actor{
 				Name:       "golang",
 				ObjectType: "automatic",
 			},
-			Target: &automate_feed.Target{
+			Target: &event_feed_api.Target{
 				Name: "localhost",
 			},
 		})
 
-		return &automate_feed.FeedResponse{
+		return &event_feed_api.FeedResponse{
 			FeedEntries:  fixedEvents,
 			TotalEntries: 1,
 		}, nil
@@ -360,38 +359,38 @@ func TestEventFeedCollectEventFeedLastFullPage(t *testing.T) {
 		}, nil
 	})
 
-	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(gomock.NewController(t))
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(gomock.NewController(t))
 	mockFeedServiceClient.EXPECT().GetFeed(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, action *automate_feed.FeedRequest) (*automate_feed.FeedResponse, error) {
-		events := make([]*automate_feed.FeedEntry, 0)
+	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
+		events := make([]*event_feed_api.FeedEntry, 0)
 
 		for count := 1; count <= 10; count++ {
 			current := now.Add((time.Minute * time.Duration(count) * -1))
 			timestamp, err := ptypes.TimestampProto(current)
 			assert.Nil(t, err)
-			events = append(events, &automate_feed.FeedEntry{
+			events = append(events, &event_feed_api.FeedEntry{
 				ID:                   strconv.Itoa(count),
 				EventType:            "scanJobUpdated",
 				Tags:                 []string{"scanjob"},
 				Verb:                 "update",
 				SourceEventPublished: timestamp,
-				Producer: &automate_feed.Producer{
+				Producer: &event_feed_api.Producer{
 					Name: "mocked_event",
 					ID:   "scanjob",
 				},
-				Actor: &automate_feed.Actor{
+				Actor: &event_feed_api.Actor{
 					Name:       "golang",
 					ObjectType: "automatic",
 				},
-				Target: &automate_feed.Target{
+				Target: &event_feed_api.Target{
 					Name: "localhost",
 				},
 			})
 		}
 
-		return &automate_feed.FeedResponse{
+		return &event_feed_api.FeedResponse{
 			FeedEntries:  events,
 			TotalEntries: 50,
 		}, nil
@@ -489,38 +488,38 @@ func TestEventFeedCollectEventFeedLastHalfFullPage(t *testing.T) {
 		}, nil
 	})
 
-	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(gomock.NewController(t))
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(gomock.NewController(t))
 	mockFeedServiceClient.EXPECT().GetFeed(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, action *automate_feed.FeedRequest) (*automate_feed.FeedResponse, error) {
-		events := make([]*automate_feed.FeedEntry, 0)
+	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
+		events := make([]*event_feed_api.FeedEntry, 0)
 
 		for count := 1; count <= 10; count++ {
 			current := now.Add((time.Minute * time.Duration(count) * -1))
 			timestamp, err := ptypes.TimestampProto(current)
 			assert.Nil(t, err)
-			events = append(events, &automate_feed.FeedEntry{
+			events = append(events, &event_feed_api.FeedEntry{
 				ID:                   strconv.Itoa(count),
 				EventType:            "scanJobUpdated",
 				Tags:                 []string{"scanjob"},
 				Verb:                 "update",
 				SourceEventPublished: timestamp,
-				Producer: &automate_feed.Producer{
+				Producer: &event_feed_api.Producer{
 					Name: "mocked_event",
 					ID:   "scanjob",
 				},
-				Actor: &automate_feed.Actor{
+				Actor: &event_feed_api.Actor{
 					Name:       "golang",
 					ObjectType: "automatic",
 				},
-				Target: &automate_feed.Target{
+				Target: &event_feed_api.Target{
 					Name: "localhost",
 				},
 			})
 		}
 
-		return &automate_feed.FeedResponse{
+		return &event_feed_api.FeedResponse{
 			FeedEntries:  events,
 			TotalEntries: complianceTotalEvents,
 		}, nil
@@ -598,37 +597,37 @@ func TestEventFeedCollectEventFeedSameDatesNextFirstSecondPage(t *testing.T) {
 		}, nil
 	})
 
-	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(gomock.NewController(t))
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(gomock.NewController(t))
 	mockFeedServiceClient.EXPECT().GetFeed(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, action *automate_feed.FeedRequest) (*automate_feed.FeedResponse, error) {
-		events := make([]*automate_feed.FeedEntry, 0)
+	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
+		events := make([]*event_feed_api.FeedEntry, 0)
 
 		timestamp, err := ptypes.TimestampProto(beforePageBreakDate)
 		assert.Nil(t, err)
 		for count := 0; count < 10; count++ {
-			events = append(events, &automate_feed.FeedEntry{
+			events = append(events, &event_feed_api.FeedEntry{
 				ID:                   "a" + strconv.Itoa(count),
 				EventType:            "scanJobUpdated",
 				Tags:                 []string{"scanjob"},
 				Verb:                 "update",
 				SourceEventPublished: timestamp,
-				Producer: &automate_feed.Producer{
+				Producer: &event_feed_api.Producer{
 					Name: "mocked_event",
 					ID:   "scanjob",
 				},
-				Actor: &automate_feed.Actor{
+				Actor: &event_feed_api.Actor{
 					Name:       "golang",
 					ObjectType: "automatic",
 				},
-				Target: &automate_feed.Target{
+				Target: &event_feed_api.Target{
 					Name: "localhost",
 				},
 			})
 		}
 
-		return &automate_feed.FeedResponse{
+		return &event_feed_api.FeedResponse{
 			FeedEntries:  events,
 			TotalEntries: 50,
 		}, nil
@@ -707,37 +706,37 @@ func TestEventFeedCollectEventFeedSameDatesPreviousThirdToSecondPage(t *testing.
 		}, nil
 	})
 
-	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(gomock.NewController(t))
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(gomock.NewController(t))
 	mockFeedServiceClient.EXPECT().GetFeed(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, action *automate_feed.FeedRequest) (*automate_feed.FeedResponse, error) {
-		events := make([]*automate_feed.FeedEntry, 0)
+	).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
+		events := make([]*event_feed_api.FeedEntry, 0)
 
 		timestamp, err := ptypes.TimestampProto(afterPageBreakDate)
 		assert.Nil(t, err)
 		for count := 0; count < 10; count++ {
-			events = append(events, &automate_feed.FeedEntry{
+			events = append(events, &event_feed_api.FeedEntry{
 				ID:                   "f" + strconv.Itoa(count),
 				EventType:            "scanJobUpdated",
 				Tags:                 []string{"scanjob"},
 				Verb:                 "update",
 				SourceEventPublished: timestamp,
-				Producer: &automate_feed.Producer{
+				Producer: &event_feed_api.Producer{
 					Name: "mocked_event",
 					ID:   "scanjob",
 				},
-				Actor: &automate_feed.Actor{
+				Actor: &event_feed_api.Actor{
 					Name:       "golang",
 					ObjectType: "automatic",
 				},
-				Target: &automate_feed.Target{
+				Target: &event_feed_api.Target{
 					Name: "localhost",
 				},
 			})
 		}
 
-		return &automate_feed.FeedResponse{
+		return &event_feed_api.FeedResponse{
 			FeedEntries:  events,
 			TotalEntries: 50,
 		}, nil
@@ -848,12 +847,12 @@ func TestEventFeedCollectEventFeedReturnErrorWithWrongParameters(t *testing.T) {
 				return &cmsRes.Events{}, nil
 			})
 
-			mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(ctrl)
+			mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(ctrl)
 			mockFeedServiceClient.EXPECT().GetFeed(
 				context.Background(),
 				gomock.Any(),
-			).DoAndReturn(func(c context.Context, action *automate_feed.FeedRequest) (*automate_feed.FeedResponse, error) {
-				return &automate_feed.FeedResponse{}, nil
+			).DoAndReturn(func(c context.Context, action *event_feed_api.FeedRequest) (*event_feed_api.FeedResponse, error) {
+				return &event_feed_api.FeedResponse{}, nil
 			})
 
 			eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)
@@ -890,7 +889,7 @@ func cmsFixedEvents(t *testing.T) *cmsRes.Events {
 	assert.Nil(t, err)
 	var (
 		fixedEvents = []*cmsRes.Event{
-			&cmsRes.Event{
+			{
 				EventType:       "node",
 				Task:            "update",
 				Timestamp:       timestamp1,
@@ -946,7 +945,7 @@ func cmsFixedEvents(t *testing.T) *cmsRes.Events {
 }
 
 // complianceEventFixedEvents returns a fixed set of events. (101)
-func complianceEventFixedEvents(t *testing.T) *automate_feed.FeedResponse {
+func complianceEventFixedEvents(t *testing.T) *event_feed_api.FeedResponse {
 	time1, err := time.Parse(time.RFC3339, "2018-01-20T21:21:21Z")
 	assert.Nil(t, err)
 	timestamp1, err := ptypes.TimestampProto(time1)
@@ -961,58 +960,58 @@ func complianceEventFixedEvents(t *testing.T) *automate_feed.FeedResponse {
 	assert.Nil(t, err)
 
 	var (
-		fixedEvents = []*automate_feed.FeedEntry{
-			&automate_feed.FeedEntry{
+		fixedEvents = []*event_feed_api.FeedEntry{
+			{
 				EventType:            "scanJobUpdated",
 				Tags:                 []string{"scanjob"},
 				Verb:                 "update",
 				SourceEventPublished: timestamp1,
-				Producer: &automate_feed.Producer{
+				Producer: &event_feed_api.Producer{
 					Name: "mocked_event",
 					ID:   "scanjob",
 				},
-				Actor: &automate_feed.Actor{
+				Actor: &event_feed_api.Actor{
 					Name:       "golang",
 					ObjectType: "automatic",
 				},
-				Target: &automate_feed.Target{
+				Target: &event_feed_api.Target{
 					Name: "localhost",
 				},
 			},
 		}
 		// This is the event type we will add multiple times to group it or not
-		profileUpdateEvent = &automate_feed.FeedEntry{
+		profileUpdateEvent = &event_feed_api.FeedEntry{
 			EventType:            "profileUpdated",
 			Tags:                 []string{"profile"},
 			Verb:                 "update",
 			SourceEventPublished: timestamp2,
-			Producer: &automate_feed.Producer{
+			Producer: &event_feed_api.Producer{
 				Name: "mocked_event",
 				ID:   "profile",
 			},
-			Actor: &automate_feed.Actor{
+			Actor: &event_feed_api.Actor{
 				Name:       "golang",
 				ObjectType: "automatic",
 			},
-			Target: &automate_feed.Target{
+			Target: &event_feed_api.Target{
 				Name: "localhost",
 			},
 		}
 
-		laterProfileUpdateEvent = &automate_feed.FeedEntry{
+		laterProfileUpdateEvent = &event_feed_api.FeedEntry{
 			EventType:            "profileUpdated",
 			Tags:                 []string{"profile"},
 			Verb:                 "update",
 			SourceEventPublished: timestamp3,
-			Producer: &automate_feed.Producer{
+			Producer: &event_feed_api.Producer{
 				Name: "mocked_event",
 				ID:   "profile",
 			},
-			Actor: &automate_feed.Actor{
+			Actor: &event_feed_api.Actor{
 				Name:       "golang",
 				ObjectType: "automatic",
 			},
-			Target: &automate_feed.Target{
+			Target: &event_feed_api.Target{
 				Name: "localhost",
 			},
 		}
@@ -1038,5 +1037,5 @@ func complianceEventFixedEvents(t *testing.T) *automate_feed.FeedResponse {
 		return idate.After(jdate)
 	})
 
-	return &automate_feed.FeedResponse{FeedEntries: fixedEvents}
+	return &event_feed_api.FeedResponse{FeedEntries: fixedEvents}
 }

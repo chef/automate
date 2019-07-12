@@ -6,7 +6,9 @@ import { environment as env } from 'environments/environment';
 import { Project } from './project.model';
 
 import {
-  GetProjectsSuccessPayload, ProjectSuccessPayload
+  GetApplyRulesStatusSuccessPayload,
+  GetProjectsSuccessPayload,
+  ProjectSuccessPayload
 } from './project.actions';
 
 export interface ProjectsResponse {
@@ -40,5 +42,17 @@ export class ProjectRequests {
     return this.http.put<ProjectSuccessPayload>(
       `${env.auth_v2_url}/projects/${id}`,
       { name });
+  }
+
+  public applyRulesStart(): Observable<{}> {
+    return this.http.post<any>(`${env.auth_v2_url}/apply-rules`, '{}');
+  }
+
+  public applyRulesStop(): Observable<{}> {
+    return this.http.delete<any>(`${env.auth_v2_url}/apply-rules`);
+  }
+
+  public getApplyRulesStatus(): Observable<GetApplyRulesStatusSuccessPayload> {
+    return this.http.get<GetApplyRulesStatusSuccessPayload>(`${env.auth_v2_url}/apply-rules`);
   }
 }

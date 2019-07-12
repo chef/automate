@@ -7,11 +7,10 @@ import (
 	cmsReq "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	cmsRes "github.com/chef/automate/api/interservice/cfgmgmt/response"
 	cmsService "github.com/chef/automate/api/interservice/cfgmgmt/service"
+	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
 	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
 	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
 	subject "github.com/chef/automate/components/automate-gateway/eventfeed"
-	mock_automate_feed "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_feed"
-	complFeed "github.com/chef/automate/components/compliance-service/api/automate-feed"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
@@ -29,12 +28,12 @@ func TestEventTypeCountsAllEmpty(t *testing.T) {
 		return &cmsRes.EventCounts{}, nil
 	})
 
-	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(ctrl)
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(ctrl)
 	mockFeedServiceClient.EXPECT().GetFeedSummary(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, request *complFeed.FeedSummaryRequest) (*complFeed.FeedSummaryResponse, error) {
-		return &complFeed.FeedSummaryResponse{}, nil
+	).DoAndReturn(func(c context.Context, request *event_feed_api.FeedSummaryRequest) (*event_feed_api.FeedSummaryResponse, error) {
+		return &event_feed_api.FeedSummaryResponse{}, nil
 	})
 
 	eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)
@@ -59,11 +58,11 @@ func TestEventTypeCountsBothValues(t *testing.T) {
 		return &cmsRes.EventCounts{
 			Total: 5,
 			Counts: []*cmsRes.EventCount{
-				&cmsRes.EventCount{
+				{
 					Name:  "node",
 					Count: 3,
 				},
-				&cmsRes.EventCount{
+				{
 					Name:  "cookbook",
 					Count: 2,
 				},
@@ -71,19 +70,19 @@ func TestEventTypeCountsBothValues(t *testing.T) {
 		}, nil
 	})
 
-	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(ctrl)
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(ctrl)
 	mockFeedServiceClient.EXPECT().GetFeedSummary(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, request *complFeed.FeedSummaryRequest) (*complFeed.FeedSummaryResponse, error) {
-		return &complFeed.FeedSummaryResponse{
+	).DoAndReturn(func(c context.Context, request *event_feed_api.FeedSummaryRequest) (*event_feed_api.FeedSummaryResponse, error) {
+		return &event_feed_api.FeedSummaryResponse{
 			TotalEntries: 5,
-			EntryCounts: []*complFeed.EntryCount{
-				&complFeed.EntryCount{
+			EntryCounts: []*event_feed_api.EntryCount{
+				{
 					Category: "scanjobs",
 					Count:    3,
 				},
-				&complFeed.EntryCount{
+				{
 					Category: "profile",
 					Count:    2,
 				},
@@ -102,19 +101,19 @@ func TestEventTypeCountsBothValues(t *testing.T) {
 	assert.Equal(t, int64(10), eventCounts.Total, "Total number of counts should be ten")
 
 	expectedCounts := []*agRes.EventCount{
-		&agRes.EventCount{
+		{
 			Name:  "scanjobs",
 			Count: 3,
 		},
-		&agRes.EventCount{
+		{
 			Name:  "profile",
 			Count: 2,
 		},
-		&agRes.EventCount{
+		{
 			Name:  "node",
 			Count: 3,
 		},
-		&agRes.EventCount{
+		{
 			Name:  "cookbook",
 			Count: 2,
 		},
@@ -134,19 +133,19 @@ func TestEventTypeCountsOneEmpty(t *testing.T) {
 		return &cmsRes.EventCounts{}, nil
 	})
 
-	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(ctrl)
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(ctrl)
 	mockFeedServiceClient.EXPECT().GetFeedSummary(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, request *complFeed.FeedSummaryRequest) (*complFeed.FeedSummaryResponse, error) {
-		return &complFeed.FeedSummaryResponse{
+	).DoAndReturn(func(c context.Context, request *event_feed_api.FeedSummaryRequest) (*event_feed_api.FeedSummaryResponse, error) {
+		return &event_feed_api.FeedSummaryResponse{
 			TotalEntries: 5,
-			EntryCounts: []*complFeed.EntryCount{
-				&complFeed.EntryCount{
+			EntryCounts: []*event_feed_api.EntryCount{
+				{
 					Category: "scanjobs",
 					Count:    3,
 				},
-				&complFeed.EntryCount{
+				{
 					Category: "profile",
 					Count:    2,
 				},
@@ -165,11 +164,11 @@ func TestEventTypeCountsOneEmpty(t *testing.T) {
 	assert.Equal(t, int64(5), eventCounts.Total, "Total number of counts should be five")
 
 	expectedCounts := []*agRes.EventCount{
-		&agRes.EventCount{
+		{
 			Name:  "scanjobs",
 			Count: 3,
 		},
-		&agRes.EventCount{
+		{
 			Name:  "profile",
 			Count: 2,
 		},
@@ -189,19 +188,19 @@ func TestEventTypeCountsConfigMgmtDown(t *testing.T) {
 		return &cmsRes.EventCounts{}, status.Error(codes.Unavailable, "cfgmgmt service not running")
 	})
 
-	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(ctrl)
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(ctrl)
 	mockFeedServiceClient.EXPECT().GetFeedSummary(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, request *complFeed.FeedSummaryRequest) (*complFeed.FeedSummaryResponse, error) {
-		return &complFeed.FeedSummaryResponse{
+	).DoAndReturn(func(c context.Context, request *event_feed_api.FeedSummaryRequest) (*event_feed_api.FeedSummaryResponse, error) {
+		return &event_feed_api.FeedSummaryResponse{
 			TotalEntries: 5,
-			EntryCounts: []*complFeed.EntryCount{
-				&complFeed.EntryCount{
+			EntryCounts: []*event_feed_api.EntryCount{
+				{
 					Category: "scanjobs",
 					Count:    3,
 				},
-				&complFeed.EntryCount{
+				{
 					Category: "profile",
 					Count:    2,
 				},
@@ -233,11 +232,11 @@ func TestEventTypeCountsComplianceDown(t *testing.T) {
 		return &cmsRes.EventCounts{
 			Total: 5,
 			Counts: []*cmsRes.EventCount{
-				&cmsRes.EventCount{
+				{
 					Name:  "node",
 					Count: 3,
 				},
-				&cmsRes.EventCount{
+				{
 					Name:  "cookbook",
 					Count: 2,
 				},
@@ -245,12 +244,12 @@ func TestEventTypeCountsComplianceDown(t *testing.T) {
 		}, nil
 	})
 
-	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(ctrl)
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(ctrl)
 	mockFeedServiceClient.EXPECT().GetFeedSummary(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, request *complFeed.FeedSummaryRequest) (*complFeed.FeedSummaryResponse, error) {
-		return &complFeed.FeedSummaryResponse{}, status.Error(codes.Unavailable, "compliance service not running")
+	).DoAndReturn(func(c context.Context, request *event_feed_api.FeedSummaryRequest) (*event_feed_api.FeedSummaryResponse, error) {
+		return &event_feed_api.FeedSummaryResponse{}, status.Error(codes.Unavailable, "compliance service not running")
 	})
 
 	eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)
@@ -277,12 +276,12 @@ func TestEventTypeCountsAllSubServicesDown(t *testing.T) {
 		return &cmsRes.EventCounts{}, status.Error(codes.Unavailable, "cfgmgmt service not running")
 	})
 
-	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(ctrl)
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(ctrl)
 	mockFeedServiceClient.EXPECT().GetFeedSummary(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, request *complFeed.FeedSummaryRequest) (*complFeed.FeedSummaryResponse, error) {
-		return &complFeed.FeedSummaryResponse{}, status.Error(codes.Unavailable, "compliance service not running")
+	).DoAndReturn(func(c context.Context, request *event_feed_api.FeedSummaryRequest) (*event_feed_api.FeedSummaryResponse, error) {
+		return &event_feed_api.FeedSummaryResponse{}, status.Error(codes.Unavailable, "compliance service not running")
 	})
 
 	eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)

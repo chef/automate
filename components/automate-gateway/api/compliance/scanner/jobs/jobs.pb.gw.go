@@ -340,17 +340,17 @@ func RegisterJobsServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 }
 
 var (
-	pattern_JobsService_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"compliance", "scanner", "jobs"}, ""))
+	pattern_JobsService_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"compliance", "scanner", "jobs"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_JobsService_Read_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3}, []string{"compliance", "scanner", "jobs", "id"}, ""))
+	pattern_JobsService_Read_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3}, []string{"compliance", "scanner", "jobs", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_JobsService_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3}, []string{"compliance", "scanner", "jobs", "id"}, ""))
+	pattern_JobsService_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3}, []string{"compliance", "scanner", "jobs", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_JobsService_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3}, []string{"compliance", "scanner", "jobs", "id"}, ""))
+	pattern_JobsService_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3}, []string{"compliance", "scanner", "jobs", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_JobsService_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"compliance", "scanner", "jobs", "search"}, ""))
+	pattern_JobsService_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"compliance", "scanner", "jobs", "search"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_JobsService_Rerun_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 4}, []string{"compliance", "scanner", "jobs", "rerun", "id"}, ""))
+	pattern_JobsService_Rerun_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 4}, []string{"compliance", "scanner", "jobs", "rerun", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

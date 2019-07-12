@@ -87,6 +87,7 @@ function compile_client_mocks() {
     mockgen -source authn/authenticate.pb.go -destination authn/authenticate.pb.client_mock.go -package authn
     mockgen -source cfgmgmt/service/cfgmgmt.pb.go -destination cfgmgmt/service/cfgmgmt.pb.client_mock.go -package service
     mockgen -source ingest/chef.pb.go -destination ingest/chef.pb.client_mock.go -package ingest
+    mockgen -source event_feed/event_feed.pb.go -destination event_feed/event_feed.pb.client_mock.go -package event_feed
     mockgen -source ../../components/nodemanager-service/api/manager/manager.pb.go -destination ../../components/nodemanager-service/api/manager/manager.pb.client_mock.go -package manager
   popd >/dev/null
 }
@@ -226,22 +227,6 @@ function rebuild() {
   return $err
 }
 
-document "build_all" <<DOC
-  Build every hab package in components/
-DOC
-function build_all() {
-  log_line "Building all components..."
-  for d in /src/components/*/; do
-    [[ -f "$d/habitat/plan.sh" ]] || continue # skip what can't be built
-    if [[ "$d" = "/src/components/automate-chef-io" ]] && [[ -n "$AUTOMATE_OSS_BUILD" ]]; then
-        log_line "Skipping build of $d since AUTOMATE_OSS_BUILD is set."
-        continue
-    fi
-    log_line "Building $d"
-    build "$d" || return 1
-  done;
-}
-
 function verify_component() {
   if [[ "$1" == "deployment-service" || "$1" == "api" || "$1" == "config" ]]; then
     return 0
@@ -365,7 +350,7 @@ function build_all_changed_components() {
 
   build_commands=""
   pushd /src >/dev/null;
-    for component in $(./scripts/changed_components)
+    for component in $(./scripts/changed_components.rb)
     do
       if [[ -n "$AUTOMATE_OSS_BUILD" ]] && [[ "$component" = "components/automate-chef-io" ]]; then
         log_line "$component has changed but AUTOMATE_OSS_BUILD is set."

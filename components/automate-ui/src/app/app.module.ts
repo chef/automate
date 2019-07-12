@@ -51,6 +51,7 @@ import {
   NodeNoRunsDetailsResolverService
 } from './services/node-details/node-noruns-details-resolver.service';
 import { NodeRunsService } from './services/node-details/node-runs.service';
+import { ProjectService } from './entities/projects/project.service';
 import { ProjectsFilterService } from './services/projects-filter/projects-filter.service';
 import { RulesService } from './services/rules/rules.service';
 import { RunHistoryStore } from './services/run-history-store/run-history.store';
@@ -320,6 +321,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     PolicyRequests,
     ProfileRequests,
     ProjectRequests,
+    ProjectService,
     ProjectsFilterRequests,
     ProjectsFilterService,
     RoleRequests,

@@ -19,7 +19,7 @@ unit: build test
 
 .PHONY: ${MIGRATION_READMES}
 ${MIGRATION_READMES}:
-	../../scripts/generate_and_check_migration_files $@
+	../../scripts/generate_and_check_migration_files.sh $@
 
 ${BINS}: bin
 	@echo "GO $@"

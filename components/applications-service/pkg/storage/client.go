@@ -21,6 +21,10 @@ type Client interface {
 	// @param (filters)
 	GetServicesHealthCounts(map[string][]string) (*HealthCounts, error)
 	GetServiceGroupsHealthCounts() (*HealthCounts, error)
+	// @param (id)
+	GetDeployment(int32) (*Deployment, error)
+	// @param (id)
+	GetSupervisor(int32) (*Supervisor, error)
 
 	GetServicesCount() (int32, error)
 	GetServiceGroupsCount() (int32, error)
@@ -38,6 +42,36 @@ const (
 	None     = "NONE"
 )
 
+type UpdateStrategy int
+
+const (
+	NoneStrategy UpdateStrategy = iota
+	AtOnceStrategy
+	RollingStrategy
+)
+
+func (x UpdateStrategy) String() string {
+	switch x {
+	case AtOnceStrategy:
+		return "AT-ONCE"
+	case RollingStrategy:
+		return "ROLLING"
+	default:
+		return "NONE"
+	}
+}
+
+func HabitatUpdateStrategyToStorageFormat(strategy habitat.UpdateStrategy) UpdateStrategy {
+	switch strategy {
+	case habitat.UpdateStrategy_AtOnce:
+		return AtOnceStrategy
+	case habitat.UpdateStrategy_Rolling:
+		return RollingStrategy
+	default:
+		return NoneStrategy
+	}
+}
+
 type Service struct {
 	ID                  int32  `db:"id"`
 	SupMemberID         string `db:"sup_member_id"`
@@ -54,6 +88,7 @@ type Service struct {
 	Channel             string
 	Site                string
 	PreviousHealth      string    `db:"previous_health"`
+	UpdateStrategy      string    `db:"update_strategy"`
 	LastEventOccurredAt time.Time `db:"last_event_occurred_at"`
 	HealthUpdatedAt     time.Time `db:"health_updated_at"`
 }
@@ -74,6 +109,19 @@ type ServiceGroupDisplay struct {
 	ServicesHealthCounts HealthCounts
 	Application          string
 	Environment          string
+}
+
+type Supervisor struct {
+	ID       int32
+	MemberID string
+	Fqdn     string
+	Site     string
+}
+
+type Deployment struct {
+	ID          int32
+	Application string
+	Environment string
 }
 
 type HealthCounts struct {

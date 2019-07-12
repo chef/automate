@@ -960,8 +960,10 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 	}
 
 	row := tx.QueryRowContext(ctx,
-		`INSERT INTO iam_staged_project_rules (id, project_id, name, type, deleted) VALUES ($1, $2, $3, $4, $5) RETURNING db_id;`,
-		rule.ID, rule.ProjectID, rule.Name, rule.Type.String(), false)
+		`INSERT INTO iam_staged_project_rules (id, project_id, name, type, deleted)
+		(SELECT $1, db_id, $3, $4, false FROM iam_projects WHERE id=$2)
+		RETURNING db_id`,
+		rule.ID, rule.ProjectID, rule.Name, rule.Type.String())
 	var ruleDbID string
 	if err := row.Scan(&ruleDbID); err != nil {
 		return nil, p.processError(err)
@@ -1066,7 +1068,7 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 		res, err := tx.ExecContext(ctx,
 			`UPDATE iam_staged_project_rules
 				SET deleted=true
-				WHERE id=$1 AND projects_match_for_rule(project_id, $2);`,
+				WHERE id=$1 AND projects_match_for_rule(project_id, $2)`,
 			id, pq.Array(projectsFilter),
 		)
 		if err != nil {
@@ -1079,7 +1081,7 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 	} else if ruleApplied {
 		res, err := tx.ExecContext(ctx,
 			`SELECT db_id FROM iam_project_rules
-				WHERE id=$1 AND projects_match_for_rule(project_id, $2);`,
+				WHERE id=$1 AND projects_match_for_rule(project_id, $2)`,
 			id, pq.Array(projectsFilter),
 		)
 		if err != nil {
@@ -1094,7 +1096,7 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 			`INSERT INTO iam_staged_project_rules (id, project_id, name, type, deleted)
 				SELECT a.id, a.project_id, a.name, a.type, 'true'
 				FROM iam_project_rules AS a
-				WHERE a.id=$1 AND projects_match_for_rule(a.project_id, $2);`,
+				WHERE a.id=$1 AND projects_match_for_rule(a.project_id, $2)`,
 			id, pq.Array(projectsFilter),
 		)
 		if err != nil {
@@ -1105,7 +1107,7 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 		// Value will never be seen, so a dummy value is OK here.
 		_, err = tx.ExecContext(ctx,
 			`INSERT INTO iam_staged_rule_conditions (rule_db_id, value, attribute, operator)
-			 VALUES ((SELECT db_id FROM iam_staged_project_rules WHERE id=$1), '{dummy}', 'chef-server', 'equals');`,
+			 (SELECT db_id, '{dummy}', 'chef-server', 'equals'  FROM iam_staged_project_rules WHERE id=$1)`,
 			id,
 		)
 		if err != nil {
@@ -1114,7 +1116,7 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 	} else if ruleStaged {
 		res, err := tx.ExecContext(ctx,
 			`DELETE FROM iam_staged_project_rules
-				WHERE id=$1 AND projects_match_for_rule(project_id, $2);`,
+				WHERE id=$1 AND projects_match_for_rule(project_id, $2)`,
 			id, pq.Array(projectsFilter),
 		)
 		if err != nil {

@@ -3,6 +3,7 @@ syntax = "proto3";
 package chef.automate.api.applications;
 option go_package = "github.com/chef/automate/api/external/applications";
 
+import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
 
 // TODO @afiune Move or re-create the common messages inside the api/ folder
@@ -116,10 +117,11 @@ message Service {
   string environment = 7;
   string fqdn = 8;
   string channel = 9;
+  string update_strategy = 10;
   string site = 17;
   HealthStatus previous_health_check = 18;
   string current_health_since = 19;
-
+  google.protobuf.Timestamp health_updated_at = 20;
 }
 
 message ServiceGroupsHealthCountsReq {}

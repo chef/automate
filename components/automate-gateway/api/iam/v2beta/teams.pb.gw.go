@@ -490,23 +490,23 @@ func RegisterTeamsHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Teams_ListTeams_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "teams"}, ""))
+	pattern_Teams_ListTeams_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "teams"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Teams_GetTeam_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "teams", "id"}, ""))
+	pattern_Teams_GetTeam_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "teams", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Teams_CreateTeam_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "teams"}, ""))
+	pattern_Teams_CreateTeam_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "teams"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Teams_UpdateTeam_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "teams", "id"}, ""))
+	pattern_Teams_UpdateTeam_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "teams", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Teams_DeleteTeam_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "teams", "id"}, ""))
+	pattern_Teams_DeleteTeam_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2beta", "teams", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Teams_GetTeamMembership_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2beta", "teams", "id", "users"}, ""))
+	pattern_Teams_GetTeamMembership_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2beta", "teams", "id", "users"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Teams_AddTeamMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2beta", "teams", "id", "users"}, "add"))
+	pattern_Teams_AddTeamMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2beta", "teams", "id", "users"}, "add", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Teams_RemoveTeamMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2beta", "teams", "id", "users"}, "remove"))
+	pattern_Teams_RemoveTeamMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2beta", "teams", "id", "users"}, "remove", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Teams_GetTeamsForMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2beta", "users", "id", "teams"}, ""))
+	pattern_Teams_GetTeamsForMember_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2beta", "users", "id", "teams"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

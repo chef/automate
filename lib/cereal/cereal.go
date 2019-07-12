@@ -26,6 +26,7 @@ var (
 	ErrInvalidSchedule          = errors.New("workflow schedule is not valid")
 	ErrWorkflowInstanceNotFound = errors.New("workflow instance not found")
 	ErrWorkflowNotComplete      = errors.New("workflow instance is still running")
+	ErrTaskLost                 = errors.New("task lost before reporting its status")
 )
 
 // Schedule represents a recurring workflow.
@@ -104,16 +105,13 @@ func (r *taskResult) GetParameters(obj interface{}) error {
 }
 
 func (r *taskResult) Err() error {
-	if r.backendResult.Status == backend.TaskStatusFailed {
+	switch r.backendResult.Status {
+	case backend.TaskStatusFailed:
 		return errors.New(r.backendResult.ErrorText)
-	}
-	return nil
-}
-
-// WithRetries sets the number of automatic retries allowed for a task
-func WithRetries(numRetries int) EnqueueOpts {
-	return func(o *backend.TaskEnqueueOpts) {
-		o.TryRemaining = numRetries + 1
+	case backend.TaskStatusLost:
+		return ErrTaskLost
+	default:
+		return nil
 	}
 }
 
@@ -159,10 +157,7 @@ type WorkflowInstance interface {
 	EnqueueTask(taskName string, parameters interface{}) error
 
 	// Complete returns a decision to end execution of the workflow for
-	// the running workflow instance. If there are any uncompleted tasks,
-	// the workflow instance will be considered abandoned. Abandoned
-	// workflows will not complete until all running tasks have been
-	// completed. All tasks which are queued will be dequeued.
+	// the running workflow instance.
 	Complete(...CompleteOpts) Decision
 
 	// Continue returns a decision to continue execution of the workflow for
@@ -444,7 +439,11 @@ func (m *Manager) RegisterTaskExecutor(taskName string, executor TaskExecutor, o
 func (m *Manager) Start(ctx context.Context) error {
 	ctx, cancel := context.WithCancel(ctx)
 	m.cancel = cancel
-	m.startTaskExecutors(ctx)
+	err := m.startTaskExecutors(ctx)
+	if err != nil {
+		return err
+	}
+
 	go m.workflowScheduler.run(ctx)
 	go m.runWorkflowExecutor(ctx)
 	return nil
@@ -579,7 +578,7 @@ func (m *Manager) EnqueueWorkflow(ctx context.Context, workflowName string,
 	return err
 }
 
-func (m *Manager) startTaskExecutors(ctx context.Context) {
+func (m *Manager) startTaskExecutors(ctx context.Context) error {
 	for taskName, exec := range m.taskExecutors {
 		workerCount := exec.opts.Workers
 		if workerCount == 0 {
@@ -590,21 +589,23 @@ func (m *Manager) startTaskExecutors(ctx context.Context) {
 			go m.RunTaskExecutor(ctx, taskName, i, exec.opts.Timeout, exec.executor)
 		}
 	}
+	return nil
 }
 
 // TODO(ssd) 2019-05-10: Why does Task need the WorkflowInstanceID?
 // TODO(jaym): should this be private?
-func (m *Manager) RunTaskExecutor(ctx context.Context, taskName string, workerID int, timeout time.Duration, exec TaskExecutor) {
-	workerName := fmt.Sprintf("%s/%d", taskName, workerID)
-	logrus.Infof("starting task executor %s", workerName)
-
+func (m *Manager) RunTaskExecutor(ctx context.Context, taskName string, workerIdx int, timeout time.Duration, exec TaskExecutor) {
+	logctx := logrus.WithFields(logrus.Fields{
+		"worker_name": fmt.Sprintf("%s/%d", taskName, workerIdx),
+	})
+	logctx.Info("Starting task executor")
 	m.wg.Add(1)
 
 LOOP:
 	for {
 		select {
 		case <-ctx.Done():
-			logrus.Infof("exiting task executor %s", workerName)
+			logctx.Info("exiting task executor")
 			break LOOP
 		default:
 		}
@@ -615,11 +616,11 @@ LOOP:
 				// TODO(ssd) 2019-05-10: Once we have notifications we can probably sleep longer
 				time.Sleep(1 * time.Second)
 			} else {
-				logrus.WithError(err).Error("failed to dequeue task")
+				logctx.WithError(err).Error("failed to dequeue task")
 			}
 			continue
 		}
-		logrus.Debugf("Dequeued task %s", t.Name)
+		logctx.Debugf("Dequeued task %s", t.Name)
 
 		var runCtx context.Context
 		var cancel context.CancelFunc
@@ -633,12 +634,12 @@ LOOP:
 		if err != nil {
 			err := taskCompleter.Fail(err.Error())
 			if err != nil {
-				logrus.WithError(err).Error("failed to mark task as failed")
+				logctx.WithError(err).Error("failed to mark task as failed")
 			}
 		} else {
 			jsonResults, err := jsonify(result)
 			if err != nil {
-				logrus.WithError(err).Error("could not convert returned results to JSON")
+				logctx.WithError(err).Error("could not convert returned results to JSON")
 				if err := taskCompleter.Fail(err.Error()); err != nil {
 					logrus.WithError(err).Error("Failed to fail task completer")
 				}
@@ -702,31 +703,7 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 		instance:   wevt.Instance,
 		wevt:       wevt,
 	}
-	if wevt.Instance.Status == backend.WorkflowInstanceStatusAbandoned {
-		logrus.Info("Got abandoned workflow")
-		if wevt.CompletedTaskCount > wevt.EnqueuedTaskCount {
-			// we should never get here.
-			// TODO: just delete the workflow instance
-			panic("Invalid task count")
-		}
-		if wevt.CompletedTaskCount == wevt.EnqueuedTaskCount {
-			logrus.Info("Completing abandoned workflow")
-			if err := completer.Done(nil); err != nil {
-				logrus.WithError(err).Error("failed to complete with abandoned workflow")
-				return true
-			}
-		} else {
-			logrus.Info("Continuing abandoned workflow")
-			// jaym: Depending on how we support retries, this logic may still wait for
-			// an unlocked task to complete when we could have removed it
-			if err := completer.Continue(nil); err != nil {
-				logrus.WithError(err).Error("failed to continue with abandoned workflow")
-				return true
-			}
-		}
 
-		return false
-	}
 	s.Begin("user")
 	executor, ok := m.workflowExecutors[wevt.Instance.WorkflowName]
 	if !ok {
@@ -752,45 +729,43 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 	}
 	s.End("user")
 	logctx := logrus.WithFields(logrus.Fields{
+		"workflow_name":   wevt.Instance.WorkflowName,
+		"instance_name":   wevt.Instance.InstanceName,
 		"enqueued_tasks":  wevt.EnqueuedTaskCount,
 		"completed_tasks": wevt.CompletedTaskCount,
 	})
 	if decision.failed {
 		s.Begin("failed")
 		if wevt.CompletedTaskCount != wevt.EnqueuedTaskCount {
-			logctx.WithError(decision.err).Info(
-				"Abandoning workflow because it returned an error and has pending tasks")
-			if err := completer.Abandon(); err != nil {
-				logctx.WithError(err).Error("failed to abandon workflow")
-			}
+			logctx.WithError(decision.err).Warn("Workflow failed with pending tasks")
 		} else {
-			logctx.WithError(decision.err).Info("Ending workflow because of an error")
-			err = completer.Fail(decision.err)
-			if err != nil {
-				logctx.WithError(err).Error("failed to complete workflow")
-			}
+			logctx.WithError(decision.err).Info("Workflow complete with error")
 		}
+
+		err = completer.Fail(decision.err)
+		if err != nil {
+			logctx.WithError(err).Error("failed to complete workflow")
+		}
+
 		s.End("failed")
 	} else if decision.complete {
 		s.Begin("complete")
 		if wevt.CompletedTaskCount != wevt.EnqueuedTaskCount {
-			logctx.Info("Abandoning workflow because it has pending tasks")
-			if err := completer.Abandon(); err != nil {
-				logctx.WithError(err).Error("failed to abandon workflow")
-			}
+			logctx.Warn("Workflow complete with pending tasks")
 		} else {
 			logctx.Info("Completing workflow")
-			jsonResult, err := jsonify(decision.result)
-			if err != nil {
-				logctx.WithError(err).Error("failed to jsonify workflow result")
-				jsonResult = nil
-			}
-
-			err = completer.Done(jsonResult)
-			if err != nil {
-				logctx.WithError(err).Error("failed to complete workflow")
-			}
 		}
+		jsonResult, err := jsonify(decision.result)
+		if err != nil {
+			logctx.WithError(err).Error("failed to jsonify workflow result")
+			jsonResult = nil
+		}
+
+		err = completer.Done(jsonResult)
+		if err != nil {
+			logctx.WithError(err).Error("failed to complete workflow")
+		}
+
 		s.End("complete")
 	} else if decision.continuing {
 		s.Begin("enqueue_task")

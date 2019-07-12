@@ -31,14 +31,15 @@ NATS Options:
 	--raw-message <message> Sends a raw message to the NATS Server instead of the Habitat Event message
 
 Options to build a Habitat Event message:
-	--sup-id      <id>     The Supervisor ID
-	--group       <group>  The group name of a service (part of the service_group)
-	--fqdn        <fqdn>   The fqdn of the server where the service is running
-	--application <name>   The application name that this service is part of
-	--environment <name>   The environment name of the current deployment
-	--health      <code>   The health check code of a service
-	--site        <site>   The site of the server where the service is running
-	--channel     <name>   The habitat channel name that the service is subscribed to
+	--sup-id      <id>       The Supervisor ID
+	--group       <group>    The group name of a service (part of the service_group)
+	--fqdn        <fqdn>     The fqdn of the server where the service is running
+	--application <name>     The application name that this service is part of
+	--environment <name>     The environment name of the current deployment
+	--health      <code>     The health check code of a service
+	--site        <site>     The site of the server where the service is running
+	--channel     <channel>  The habitat channel name that the service is subscribed to
+	--strategy    <strategy> The habitat update strategy for the service. [ at-once | rolling ]
 
 	Package Identifier
 	--origin   <origin>  The origin of a package
@@ -76,6 +77,7 @@ func main() {
 		rawMessage   string
 		group        string
 		channel      string
+		strategy     string
 		origin       string
 		name         string
 		version      string
@@ -112,6 +114,7 @@ func main() {
 	flag.StringVar(&version, "version", "0.1.0", "The version of a package")
 	flag.StringVar(&release, "release", t.Format("20060102150405"), "The release of a package")
 	flag.StringVar(&channel, "channel", "", "The habitat channel name that the service is subscribed to")
+	flag.StringVar(&strategy, "strategy", "at-once", "The habitat update strategy for the service. [ at-once | rolling ]")
 	flag.IntVar(&health, "health", 0, "The health check code of a service")
 	flag.BoolVar(&uniqID, "uniq-client-id", false, "Generate a unique client-id to connect to server")
 	flag.BoolVar(&infiniteLoop, "infinite-stream", false, "Publish message every second infinitely")
@@ -124,6 +127,25 @@ func main() {
 
 	if uniqID {
 		clientID = "applications-publisher-" + strconv.FormatInt(t.UnixNano(), 10)
+	}
+
+	// If the channel was specified, add the update config
+	if len(channel) > 0 {
+		switch strategy {
+		case "at-once":
+			event.ServiceMetadata.UpdateConfig = &habitat.UpdateConfig{
+				Strategy: habitat.UpdateStrategy_AtOnce,
+				Channel:  channel,
+			}
+		case "rolling":
+			event.ServiceMetadata.UpdateConfig = &habitat.UpdateConfig{
+				Strategy: habitat.UpdateStrategy_Rolling,
+				Channel:  channel,
+			}
+		default:
+			fmt.Println("Unknown update strategy, choose between 'at-once' and 'rolling'.")
+			os.Exit(1)
+		}
 	}
 
 	if internalNats {
@@ -153,11 +175,6 @@ func main() {
 	event.Result = habitat.HealthCheckResult(health)
 	event.ServiceMetadata.ServiceGroup = fmt.Sprintf("%s.%s", name, group)
 	event.ServiceMetadata.PackageIdent = fmt.Sprintf("%s/%s/%s/%s", origin, name, version, release)
-
-	// If the channel was specified, add the update config
-	if len(channel) > 0 {
-		event.ServiceMetadata.UpdateConfig = &habitat.UpdateConfig{Channel: channel}
-	}
 
 	// Publish a single raw message
 	if len(rawMessage) > 0 {

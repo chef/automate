@@ -100,7 +100,7 @@ func RegisterLegacyDataCollectorHandlerClient(ctx context.Context, mux *runtime.
 }
 
 var (
-	pattern_LegacyDataCollector_Status_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"events", "data-collector"}, ""))
+	pattern_LegacyDataCollector_Status_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"events", "data-collector"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

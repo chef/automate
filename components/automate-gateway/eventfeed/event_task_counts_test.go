@@ -7,11 +7,10 @@ import (
 	cmsReq "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	cmsRes "github.com/chef/automate/api/interservice/cfgmgmt/response"
 	cmsService "github.com/chef/automate/api/interservice/cfgmgmt/service"
+	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
 	agReq "github.com/chef/automate/components/automate-gateway/api/event_feed/request"
 	agRes "github.com/chef/automate/components/automate-gateway/api/event_feed/response"
 	subject "github.com/chef/automate/components/automate-gateway/eventfeed"
-	mock_automate_feed "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_feed"
-	complFeed "github.com/chef/automate/components/compliance-service/api/automate-feed"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
@@ -27,12 +26,12 @@ func TestEventTaskCountsAllEmpty(t *testing.T) {
 		return &cmsRes.EventCounts{}, nil
 	})
 
-	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(ctrl)
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(ctrl)
 	mockFeedServiceClient.EXPECT().GetFeedSummary(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, request *complFeed.FeedSummaryRequest) (*complFeed.FeedSummaryResponse, error) {
-		return &complFeed.FeedSummaryResponse{}, nil
+	).DoAndReturn(func(c context.Context, request *event_feed_api.FeedSummaryRequest) (*event_feed_api.FeedSummaryResponse, error) {
+		return &event_feed_api.FeedSummaryResponse{}, nil
 	})
 
 	eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)
@@ -57,15 +56,15 @@ func TestEventTaskCountsBothValues(t *testing.T) {
 		return &cmsRes.EventCounts{
 			Total: 6,
 			Counts: []*cmsRes.EventCount{
-				&cmsRes.EventCount{
+				{
 					Name:  "create",
 					Count: 3,
 				},
-				&cmsRes.EventCount{
+				{
 					Name:  "update",
 					Count: 2,
 				},
-				&cmsRes.EventCount{
+				{
 					Name:  "delete",
 					Count: 1,
 				},
@@ -94,12 +93,12 @@ func TestEventTaskCountsBothValues(t *testing.T) {
 	//}, nil
 	//})
 
-	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(ctrl)
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(ctrl)
 	mockFeedServiceClient.EXPECT().GetFeedSummary(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, request *complFeed.FeedSummaryRequest) (*complFeed.FeedSummaryResponse, error) {
-		return &complFeed.FeedSummaryResponse{}, nil
+	).DoAndReturn(func(c context.Context, request *event_feed_api.FeedSummaryRequest) (*event_feed_api.FeedSummaryResponse, error) {
+		return &event_feed_api.FeedSummaryResponse{}, nil
 	})
 
 	eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)
@@ -113,15 +112,15 @@ func TestEventTaskCountsBothValues(t *testing.T) {
 	assert.Equal(t, int64(6), eventCounts.Total, "Total number of counts should be six")
 
 	expectedCounts := []*agRes.EventCount{
-		&agRes.EventCount{
+		{
 			Name:  "create",
 			Count: 3,
 		},
-		&agRes.EventCount{
+		{
 			Name:  "update",
 			Count: 2,
 		},
-		&agRes.EventCount{
+		{
 			Name:  "delete",
 			Count: 1,
 		},
@@ -141,11 +140,11 @@ func TestEventTaskCountsOneEmpty(t *testing.T) {
 		return &cmsRes.EventCounts{
 			Total: 6,
 			Counts: []*cmsRes.EventCount{
-				&cmsRes.EventCount{
+				{
 					Name:  "create",
 					Count: 3,
 				},
-				&cmsRes.EventCount{
+				{
 					Name:  "update",
 					Count: 2,
 				},
@@ -162,12 +161,12 @@ func TestEventTaskCountsOneEmpty(t *testing.T) {
 	//return &cmplEvents.EventCountsResponse{}, nil
 	//})
 
-	mockFeedServiceClient := mock_automate_feed.NewMockFeedServiceClient(ctrl)
+	mockFeedServiceClient := event_feed_api.NewMockEventFeedServiceClient(ctrl)
 	mockFeedServiceClient.EXPECT().GetFeedSummary(
 		context.Background(),
 		gomock.Any(),
-	).DoAndReturn(func(c context.Context, request *complFeed.FeedSummaryRequest) (*complFeed.FeedSummaryResponse, error) {
-		return &complFeed.FeedSummaryResponse{}, nil
+	).DoAndReturn(func(c context.Context, request *event_feed_api.FeedSummaryRequest) (*event_feed_api.FeedSummaryResponse, error) {
+		return &event_feed_api.FeedSummaryResponse{}, nil
 	})
 	eventFeedAggregate := subject.NewEventFeedAggregate(mockCfgMgmtClient, mockFeedServiceClient)
 
@@ -180,11 +179,11 @@ func TestEventTaskCountsOneEmpty(t *testing.T) {
 	assert.Equal(t, int64(6), eventCounts.Total, "Total number of counts should be five")
 
 	expectedCounts := []*agRes.EventCount{
-		&agRes.EventCount{
+		{
 			Name:  "create",
 			Count: 3,
 		},
-		&agRes.EventCount{
+		{
 			Name:  "update",
 			Count: 2,
 		},

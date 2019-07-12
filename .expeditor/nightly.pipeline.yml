@@ -2,19 +2,24 @@ expeditor:
   defaults:
     executor:
       docker:
-        image_sha256: 861987bfafe78bcedbc508b05fd2c092822326095a371969f6cf3a9530173632
+        image_sha256: db2f838b6ee3a48542254407a492b7704966ea579d8a3b1fe9c946e12cd8a7d6
         workdir: /go/src/github.com/chef/automate
 
 steps:
   - label: build
     command:
-      - scripts/verify_build
+      - scripts/verify_build.sh
     timeout_in_minutes: 45
     env:
+      BUILD_ALL: true
       ALLOW_LOCAL_PACKAGES: true
       HAB_STUDIO_SUP: false
       HAB_NONINTERACTIVE: true
     expeditor:
+      secrets:
+        HAB_STUDIO_SECRET_GITHUB_TOKEN:
+          account: github/chef-ci
+          field: token
       executor:
         linux:
           privileged: true

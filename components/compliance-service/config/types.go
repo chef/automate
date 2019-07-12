@@ -31,7 +31,6 @@ type Compliance struct {
 	ElasticSearchSidecar
 	DataRetention
 	EventConfig
-	FeedConfig
 	Notifications
 }
 
@@ -119,12 +118,8 @@ type ElasticSearchSidecar struct {
 // DataRetention describes data retention policies
 type DataRetention struct {
 	ComplianceReportDays int32
-	ComplianceEventDays  int32
 }
 
 type EventConfig struct {
 	Endpoint string
-}
-
-type FeedConfig struct {
 }

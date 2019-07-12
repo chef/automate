@@ -599,27 +599,27 @@ func RegisterNodeManagerServiceHandlerClient(ctx context.Context, mux *runtime.S
 }
 
 var (
-	pattern_NodeManagerService_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"nodemanagers"}, ""))
+	pattern_NodeManagerService_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"nodemanagers"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_NodeManagerService_Read_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1}, []string{"nodemanagers", "id"}, ""))
+	pattern_NodeManagerService_Read_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1}, []string{"nodemanagers", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_NodeManagerService_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1}, []string{"nodemanagers", "id"}, ""))
+	pattern_NodeManagerService_Update_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1}, []string{"nodemanagers", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_NodeManagerService_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1}, []string{"nodemanagers", "id"}, ""))
+	pattern_NodeManagerService_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1}, []string{"nodemanagers", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_NodeManagerService_DeleteWithNodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"nodemanagers", "id", "with-nodes"}, ""))
+	pattern_NodeManagerService_DeleteWithNodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"nodemanagers", "id", "with-nodes"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_NodeManagerService_DeleteWithNodeStateStopped_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"nodemanagers", "id", "with-node-state", "stopped"}, ""))
+	pattern_NodeManagerService_DeleteWithNodeStateStopped_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"nodemanagers", "id", "with-node-state", "stopped"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_NodeManagerService_DeleteWithNodeStateTerminated_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"nodemanagers", "id", "with-node-state", "terminated"}, ""))
+	pattern_NodeManagerService_DeleteWithNodeStateTerminated_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"nodemanagers", "id", "with-node-state", "terminated"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_NodeManagerService_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"nodemanagers", "search"}, ""))
+	pattern_NodeManagerService_List_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"nodemanagers", "search"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_NodeManagerService_SearchNodeFields_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"nodemanagers", "id", "node_manager_id", "search-fields"}, ""))
+	pattern_NodeManagerService_SearchNodeFields_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"nodemanagers", "id", "node_manager_id", "search-fields"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_NodeManagerService_SearchNodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"nodemanagers", "id", "node_manager_id", "search-nodes"}, ""))
+	pattern_NodeManagerService_SearchNodes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"nodemanagers", "id", "node_manager_id", "search-nodes"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_NodeManagerService_Connect_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 2}, []string{"nodemanagers", "rerun", "id"}, ""))
+	pattern_NodeManagerService_Connect_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 2}, []string{"nodemanagers", "rerun", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

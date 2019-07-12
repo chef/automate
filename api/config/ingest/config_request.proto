@@ -31,6 +31,8 @@ message ConfigRequest {
 				google.protobuf.Int32Value purge_converge_history_after_days = 3;
 				google.protobuf.Int32Value purge_actions_after_days = 4;
 				reserved 5;
+				google.protobuf.Int32Value max_number_of_bundled_run_msgs = 6;
+				google.protobuf.Int32Value max_number_of_bundled_action_msgs = 7;
 			}
 
 			message Log {

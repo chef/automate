@@ -286,17 +286,17 @@ func RegisterChefIngesterHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_ChefIngester_ProcessChefRun_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"ingest", "events", "chef", "run"}, ""))
+	pattern_ChefIngester_ProcessChefRun_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"ingest", "events", "chef", "run"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ChefIngester_ProcessChefAction_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"ingest", "events", "chef", "action"}, ""))
+	pattern_ChefIngester_ProcessChefAction_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"ingest", "events", "chef", "action"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ChefIngester_ProcessNodeDelete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"ingest", "events", "chef", "nodedelete"}, ""))
+	pattern_ChefIngester_ProcessNodeDelete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"ingest", "events", "chef", "nodedelete"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ChefIngester_ProcessMultipleNodeDeletes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"ingest", "events", "chef", "node-multiple-deletes"}, ""))
+	pattern_ChefIngester_ProcessMultipleNodeDeletes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"ingest", "events", "chef", "node-multiple-deletes"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ChefIngester_ProcessLivenessPing_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"ingest", "events", "chef", "liveness"}, ""))
+	pattern_ChefIngester_ProcessLivenessPing_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"ingest", "events", "chef", "liveness"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ChefIngester_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"ingest", "version"}, ""))
+	pattern_ChefIngester_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"ingest", "version"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

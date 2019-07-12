@@ -333,6 +333,9 @@ func init() {
         "channel": {
           "type": "string"
         },
+        "update_strategy": {
+          "type": "string"
+        },
         "site": {
           "type": "string"
         },
@@ -341,6 +344,10 @@ func init() {
         },
         "current_health_since": {
           "type": "string"
+        },
+        "health_updated_at": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },

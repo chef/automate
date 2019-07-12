@@ -7,15 +7,11 @@ vendor_origin=${vendor_origin:-"chef"}
 
 pkg_deps=(
   core/libossp-uuid
-  chef/openresty-noroot
+  # WARNING: Version pin managed by .expeditor/update_chef_server.sh
+  "${vendor_origin}/openresty-noroot/1.13.6.2/20190711080332"
   chef/mlsa
   core/bash
-  # TODO(ssd) 2019-07-03: PIN PIN PIN
-  #
-  # This is pinned until chef/openresty-noroot is rebuilt, at which
-  # point this pin will break our build again and we'll need to remove
-  # it.
-  core/curl/7.63.0/20190201004909
+  core/curl
   core/coreutils
   "${vendor_origin}/automate-workflow-web"
 )

@@ -6,7 +6,7 @@ expeditor:
   defaults:
     executor:
       docker:
-        image_sha256: bb7e88123c5ccea4c3e1c8818c0a74465ebd02fc872f43b2d346f04abfd482d5
+        image_sha256: db2f838b6ee3a48542254407a492b7704966ea579d8a3b1fe9c946e12cd8a7d6
         workdir: /go/src/github.com/chef/automate
 
 steps:
@@ -52,7 +52,7 @@ steps:
   # integration tests.
   - label: build
     command:
-      - scripts/verify_build
+      - scripts/verify_build.sh
     timeout_in_minutes: 45
     env:
       ALLOW_LOCAL_PACKAGES: true
@@ -70,7 +70,7 @@ steps:
 
   - label: "[unit] license-control-service"
     command:
-      - scripts/install_golang
+      - scripts/install_golang.sh
       - echo "\$A2_LICENSE" > dev/license.jwt
       - cd components/license-control-service
       - make setup review test
@@ -88,7 +88,7 @@ steps:
 
   - label: "[unit] trial-license-service"
     command:
-      - scripts/install_golang
+      - scripts/install_golang.sh
       - echo "\$A2_LICENSE" > dev/license.jwt
       - cd components/trial-license-service
       - make static unit
@@ -109,11 +109,11 @@ steps:
   # or take a long time.
   - wait
 
-  - label: "[integration] automate-load-balancer"
+  - label: "automate-load-balancer"
     command:
-      - . scripts/verify_setup
+      - . scripts/verify_setup.sh
       - |
-        hab studio run "source scripts/verify_studio_init &&
+        hab studio run "source scripts/verify_studio_init.sh &&
           start_deployment_service &&
           chef-automate dev deploy-some chef/automate-load-balancer --with-deps &&
           automate_load_balancer_integration"
@@ -129,10 +129,10 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
-  - label: "[integration] applications-service"
+  - label: "applications-service"
     command:
-      - . scripts/verify_setup
-      - hab studio run "source scripts/verify_studio_init && start_deployment_service && chef-automate dev deploy-some chef/applications-service --with-deps && applications_integration"
+      - . scripts/verify_setup.sh
+      - hab studio run "source scripts/verify_studio_init.sh && start_deployment_service && chef-automate dev deploy-some chef/applications-service --with-deps && applications_integration"
     timeout_in_minutes: 20
     retry:
       automatic:
@@ -147,11 +147,11 @@ steps:
 
   # The nodemanager tests require access to AWS and Azure accounts as
   # they test against the actual API endpoints of those services.
-  - label: "[integration] nodemanager-integration-tests"
+  - label: "nodemanager-integration-tests"
     command:
-      - . scripts/verify_setup
+      - . scripts/verify_setup.sh
       - |
-        hab studio run "source scripts/verify_studio_init &&
+        hab studio run "source scripts/verify_studio_init.sh &&
           start_deployment_service &&
           chef-automate dev deploy-some chef/compliance-service --with-deps &&
           nodemanager_scans_integration"
@@ -188,10 +188,10 @@ steps:
 
   # The license_usage_nodes_test appears to require AWS access. We
   # might consider splitting this into two different tests.
-  - label: "[integration] gateway-integration-tests"
+  - label: "gateway-integration-tests"
     command:
-      - . scripts/verify_setup
-      - hab studio run "source scripts/verify_studio_init && start_all_services && go_test components/automate-gateway/integration/license_usage_nodes_test.go && go_test components/automate-gateway/integration/nodes_test.go"
+      - . scripts/verify_setup.sh
+      - hab studio run "source scripts/verify_studio_init.sh && start_all_services && go_test components/automate-gateway/integration/license_usage_nodes_test.go && go_test components/automate-gateway/integration/nodes_test.go"
     timeout_in_minutes: 20
     retry:
       automatic:
@@ -228,11 +228,11 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
-  - label: "[integration] automate-gateway-iam-v1"
+  - label: "automate-gateway-iam-v1"
     command:
-      - . scripts/verify_setup
+      - . scripts/verify_setup.sh
       - |
-        hab studio run "source scripts/verify_studio_init &&
+        hab studio run "source scripts/verify_studio_init.sh &&
           start_deployment_service &&
           chef-automate dev deployinate &&
           gateway_integration"
@@ -248,11 +248,11 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
-  - label: "[integration] automate-gateway-iam-v2"
+  - label: "automate-gateway-iam-v2"
     command:
-      - . scripts/verify_setup
+      - . scripts/verify_setup.sh
       - |
-        hab studio run "source scripts/verify_studio_init &&
+        hab studio run "source scripts/verify_studio_init.sh &&
           start_deployment_service &&
           chef-automate dev deployinate &&
           chef-automate iam upgrade-to-v2 --skip-policy-migration &&
@@ -269,10 +269,10 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
-  - label: "[integration] secrets-service"
+  - label: "secrets-service"
     command:
-      - . scripts/verify_setup
-      - hab studio run "source scripts/verify_studio_init && start_deployment_service && chef-automate dev deploy-some chef/secrets-service --with-deps && secrets_integration"
+      - . scripts/verify_setup.sh
+      - hab studio run "source scripts/verify_studio_init.sh && start_deployment_service && chef-automate dev deploy-some chef/secrets-service --with-deps && secrets_integration"
     timeout_in_minutes: 10
     expeditor:
       executor:
@@ -282,10 +282,13 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
-  - label: "[integration] event-feed-service"
+  - label: "event-feed-service"
     command:
-      - . scripts/verify_setup
-      - hab studio run "source scripts/verify_studio_init && start_deployment_service && chef-automate dev deploy-some chef/event-feed-service --with-deps && event_feed_integration"
+      - . scripts/verify_setup.sh
+      - hab studio run "source scripts/verify_studio_init.sh &&
+          start_deployment_service &&
+          chef-automate dev deploy-some chef/data-lifecycle-service --with-deps &&
+          event_feed_integration"
     timeout_in_minutes: 10
     expeditor:
       executor:
@@ -295,10 +298,10 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
-  - label: "[integration] es-sidecar-service"
+  - label: "es-sidecar-service"
     command:
-      - . scripts/verify_setup
-      - hab studio run "source scripts/verify_studio_init && start_deployment_service && chef-automate dev deploy-some chef/es-sidecar-service --with-deps && es_sidecar_service_integration"
+      - . scripts/verify_setup.sh
+      - hab studio run "source scripts/verify_studio_init.sh && start_deployment_service && chef-automate dev deploy-some chef/es-sidecar-service --with-deps && es_sidecar_service_integration"
     timeout_in_minutes: 20
     retry:
       automatic:
@@ -311,10 +314,10 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
-  - label: "[integration] ingest-service"
+  - label: "ingest-service"
     command:
-      - . scripts/verify_setup
-      - hab studio run "source scripts/verify_studio_init && start_deployment_service && chef-automate dev deploy-some chef/ingest-service --with-deps && ingest_integration"
+      - . scripts/verify_setup.sh
+      - hab studio run "source scripts/verify_studio_init.sh && start_deployment_service && chef-automate dev deploy-some chef/ingest-service --with-deps && ingest_integration"
     timeout_in_minutes: 20
     retry:
       automatic:
@@ -328,10 +331,10 @@ steps:
             - HAB_NONINTERACTIVE=true
             - REST_SERVICE=https://localhost:10122
 
-  - label: "[integration] compliance-service"
+  - label: "compliance-service"
     command:
-      - . scripts/verify_setup
-      - hab studio run "source scripts/verify_studio_init && start_deployment_service && chef-automate dev deploy-some chef/compliance-service --with-deps && compliance_integration"
+      - . scripts/verify_setup.sh
+      - hab studio run "source scripts/verify_studio_init.sh && start_deployment_service && chef-automate dev deploy-some chef/compliance-service --with-deps && compliance_integration"
     timeout_in_minutes: 20
     retry:
       automatic:
@@ -344,10 +347,10 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
-  - label: "[integration] config-mgmt-service"
+  - label: "config-mgmt-service"
     command:
-      - . scripts/verify_setup
-      - hab studio run "source scripts/verify_studio_init && start_deployment_service && chef-automate dev deploy-some chef/automate-elasticsearch --with-deps && config_mgmt_integration"
+      - . scripts/verify_setup.sh
+      - hab studio run "source scripts/verify_studio_init.sh && start_deployment_service && chef-automate dev deploy-some chef/automate-elasticsearch --with-deps && config_mgmt_integration"
     timeout_in_minutes: 20
     retry:
       automatic:
@@ -360,10 +363,10 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
-  - label: "[integration] event-service"
+  - label: "event-service"
     command:
-      - . scripts/verify_setup
-      - hab studio run "source scripts/verify_studio_init && start_deployment_service && chef-automate dev deployinate && event_integration"
+      - . scripts/verify_setup.sh
+      - hab studio run "source scripts/verify_studio_init.sh && start_deployment_service && chef-automate dev deployinate && event_integration"
     timeout_in_minutes: 10
     expeditor:
       executor:
@@ -373,10 +376,10 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
-  - label: "[integration] event-gateway"
+  - label: "event-gateway"
     command:
-      - . scripts/verify_setup
-      - hab studio run "source scripts/verify_studio_init && start_deployment_service && chef-automate dev deployinate && event_gateway_integration"
+      - . scripts/verify_setup.sh
+      - hab studio run "source scripts/verify_studio_init.sh && start_deployment_service && chef-automate dev deployinate && event_gateway_integration"
     timeout_in_minutes: 10
     expeditor:
       executor:
@@ -386,31 +389,11 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
-  - label: "[integration] compliance-feed-service"
+  - label: "pg-sidecar-service"
     command:
-      - . scripts/verify_setup
+      - . scripts/verify_setup.sh
       - |
-        hab studio run "source scripts/verify_studio_init &&
-          start_deployment_service &&
-          chef-automate dev deploy-some chef/data-lifecycle-service --with-deps &&
-          feed_integration"
-    timeout_in_minutes: 20
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - HAB_STUDIO_SUP=false
-            - HAB_NONINTERACTIVE=true
-
-  - label: "[integration] pg-sidecar-service"
-    command:
-      - . scripts/verify_setup
-      - |
-        hab studio run "source scripts/verify_studio_init &&
+        hab studio run "source scripts/verify_studio_init.sh &&
         start_deployment_service &&
         chef-automate dev deploy-some chef/pg-sidecar-service --with-deps &&
         pg_sidecar_integration"
@@ -431,7 +414,53 @@ steps:
   # end-to-end testing. These tests all test full deployments of
   # Automate in different configurations.
   #
-  - label: "[integration] iam v2 (migrated)"
+  - label: ":cypress: IAMv1"
+    command:
+      - integration/run_test integration/tests/cypress_e2e.sh
+    timeout_in_minutes: 20
+    expeditor:
+      secrets: &cypress_secrets
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+        CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_HOST:
+          path: secret/a2/testing/target_host
+          field: data
+        CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_USERNAME:
+          path: secret/a2/testing/target_username
+          field: data
+        CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_PASSWORD:
+          path: secret/a2/testing/target_password
+          field: data
+        # Note: this isn't currently used for pre-merge tests
+        # CYPRESS_RECORD_KEY:
+        #   path: secret/a2/cypress
+        #   field: record_key
+      executor:
+        linux:
+          privileged: true
+
+  - label: ":cypress: IAMv2"
+    command:
+      - IAM=v2 integration/run_test integration/tests/cypress_e2e.sh
+    timeout_in_minutes: 20
+    expeditor:
+      secrets: *cypress_secrets
+      executor:
+        linux:
+          privileged: true
+
+  - label: ":cypress: IAMv2.1"
+    command:
+      - IAM=v2.1 integration/run_test integration/tests/cypress_e2e.sh
+    timeout_in_minutes: 20
+    expeditor:
+      secrets: *cypress_secrets
+      executor:
+        linux:
+          privileged: true
+
+  - label: "iam v2 (migrated)"
     command:
       - integration/run_test integration/tests/iam_v2.sh
     timeout_in_minutes: 20
@@ -440,7 +469,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "[integration] iam v2 (v2 only)"
+  - label: "iam v2 (v2 only)"
     command:
       - integration/run_test integration/tests/iam_v2_only.sh
     timeout_in_minutes: 20
@@ -453,7 +482,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "[integration] iam v2 (v2.1 only)"
+  - label: "iam v2 (v2.1 only)"
     command:
       - integration/run_test integration/tests/iam_v2p1_only.sh
     timeout_in_minutes: 20
@@ -466,7 +495,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "[integration] data-lifecycle-service"
+  - label: "data-lifecycle-service"
     command:
       - integration/run_test integration/tests/data_lifecycle.sh
     timeout_in_minutes: 20
@@ -475,7 +504,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "[integration] a1migration"
+  - label: "a1migration"
     command:
       - integration/run_test integration/tests/a1migration.sh
     timeout_in_minutes: 20
@@ -485,7 +514,7 @@ steps:
           single-use: true
           privileged: true
 
-  - label: "[integration] airgap a1migration"
+  - label: "airgap a1migration"
     command:
       - integration/run_test integration/tests/airgap_a1migration.sh
     timeout_in_minutes: 20
@@ -495,7 +524,7 @@ steps:
           single-use: true
           privileged: true
 
-  - label: "[integration] product"
+  - label: "product"
     command:
       - integration/run_test integration/tests/product.sh
     timeout_in_minutes: 20
@@ -505,7 +534,7 @@ steps:
           single-use: true
           privileged: true
 
-  - label: "[integration] product deployment stress mode"
+  - label: "product deployment stress mode"
     command:
       - integration/run_test integration/tests/product_deployment_stress.sh
     timeout_in_minutes: 20
@@ -515,7 +544,7 @@ steps:
           single-use: true
           privileged: true
 
-  - label: "[integration] product airgap"
+  - label: "product airgap"
     command:
       - integration/run_test integration/tests/airgap_product.sh
     timeout_in_minutes: 20
@@ -524,7 +553,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "[integration] airgap upgrade"
+  - label: "airgap upgrade"
     command:
       - integration/run_test integration/tests/airgap_upgrade.sh
     timeout_in_minutes: 30
@@ -533,7 +562,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "[integration] airgap backup"
+  - label: "airgap backup"
     command:
       - integration/run_test integration/tests/airgap_backup.sh
     timeout_in_minutes: 20
@@ -542,7 +571,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "[integration] chef server"
+  - label: "chef server"
     command:
       - integration/run_test integration/tests/chef_server.sh
     timeout_in_minutes: 30 # longer timeout for chef-server
@@ -551,7 +580,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "[integration] chef server only"
+  - label: "chef server only"
     command:
       - integration/run_test integration/tests/chef_server_only.sh
     timeout_in_minutes: 20
@@ -560,7 +589,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "[integration] ha chef server"
+  - label: "ha chef server"
     command:
       - integration/run_test integration/tests/ha_chef_server.sh
     timeout_in_minutes: 35
@@ -570,7 +599,7 @@ steps:
           single-use: true
           privileged: true
 
-  - label: "[integration] workflow"
+  - label: "workflow"
     command:
       - integration/run_test integration/tests/workflow.sh
     timeout_in_minutes: 30 # longer timeout for workflow
@@ -579,7 +608,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "[integration] backup to s3"
+  - label: "backup to s3"
     command:
       - integration/run_test integration/tests/backup_s3.sh
     timeout_in_minutes: 20
@@ -589,7 +618,7 @@ steps:
           single-use: true
           privileged: true
 
-  - label: "[integration] ontop backup "
+  - label: "ontop backup "
     command:
       - integration/run_test integration/tests/backup_ontop.sh
     timeout_in_minutes: 20
@@ -599,7 +628,7 @@ steps:
           single-use: true
           privileged: true
 
-  - label: "[integration] backup w external es"
+  - label: "backup w external es"
     command:
       - integration/run_test integration/tests/backup_external_es.sh
     timeout_in_minutes: 25
@@ -609,7 +638,7 @@ steps:
           single-use: true
           privileged: true
 
-  - label: "[integration] upgrade dev -> master"
+  - label: "upgrade dev -> master"
     command:
       - integration/run_test integration/tests/upgrade.sh
     timeout_in_minutes: 25
@@ -618,7 +647,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "[integration] upgrade acceptance -> master"
+  - label: "upgrade acceptance -> master"
     command:
       - integration/run_test integration/tests/upgrade_acceptance_master.sh
     timeout_in_minutes: 25
@@ -627,7 +656,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "[integration] upgrade current -> master"
+  - label: "upgrade current -> master"
     command:
       - integration/run_test integration/tests/upgrade_current_master.sh
     timeout_in_minutes: 25
@@ -636,7 +665,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "[integration] manual upgrade current -> master"
+  - label: "manual upgrade current -> master"
     command:
       - integration/run_test integration/tests/manual_upgrade.sh
     timeout_in_minutes: 25
@@ -645,7 +674,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "[integration] deep upgrades"
+  - label: "deep upgrades"
     command:
       - integration/run_test integration/tests/deep_upgrade.sh
     timeout_in_minutes: 25
@@ -654,7 +683,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "[integration] deep migrate upgrade"
+  - label: "deep migrate upgrade"
     command:
       - integration/run_test integration/tests/migrate_upgrade.sh
     timeout_in_minutes: 25
@@ -664,7 +693,7 @@ steps:
           single-use: true
           privileged: true
 
-  - label: "[integration] backups"
+  - label: "backups"
     command:
       - integration/run_test integration/tests/backup.sh
     timeout_in_minutes: 20
@@ -673,7 +702,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "[integration] reset admin access v1"
+  - label: "reset admin access v1"
     command:
       - integration/run_test integration/tests/reset_admin_access_v1.sh
     timeout_in_minutes: 20
@@ -682,7 +711,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "[integration] reset admin access v2"
+  - label: "reset admin access v2"
     command:
       - integration/run_test integration/tests/reset_admin_access_v2.sh
     timeout_in_minutes: 20
@@ -691,7 +720,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "[integration] upgrade / reset IAM v2"
+  - label: "upgrade / reset IAM v2"
     command:
       - integration/run_test integration/tests/upgrade_reset_iam_v2.sh
     timeout_in_minutes: 20
@@ -700,7 +729,16 @@ steps:
         linux:
           privileged: true
 
-  - label: "[integration] security"
+  - label: "upgrade / reset IAM v2.1"
+    command:
+      - integration/run_test integration/tests/upgrade_reset_iam_v2p1.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
+  - label: "security"
     command:
       - integration/run_test integration/tests/security.sh
     timeout_in_minutes: 20
@@ -709,7 +747,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "[integration] ha data services"
+  - label: "ha data services"
     command:
       - integration/run_test integration/tests/ha_data_services.sh
     timeout_in_minutes: 35

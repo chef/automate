@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"sync"
 	"time"
 
 	"github.com/golang-migrate/migrate"
@@ -18,7 +17,7 @@ import (
 )
 
 const (
-	enqueueTaskQuery   = `SELECT cereal_enqueue_task($1, $2, $3, $4, $5)`
+	enqueueTaskQuery   = `SELECT cereal_enqueue_task($1, $2, $3, $4)`
 	dequeueTaskQuery   = `SELECT * FROM cereal_dequeue_task($1)`
 	completeTaskQuery  = `SELECT cereal_complete_task($1, $2, $3, $4)`
 	getTaskResultQuery = `SELECT task_name, parameters, status, error, result FROM cereal_task_results WHERE id = $1`
@@ -28,7 +27,6 @@ const (
 	completeWorkflowQuery = `SELECT cereal_complete_workflow($1, $2)`
 	failWorkflowQuery     = `SELECT cereal_fail_workflow($1, $2)`
 	continueWorkflowQuery = `SELECT cereal_continue_workflow($1, $2, $3, $4, $5)`
-	abandonWorkflowQuery  = `SELECT cereal_abandon_workflow($1, $2, $3)`
 
 	listScheduledWorkflowsQuery = `
 		WITH res AS
@@ -88,6 +86,8 @@ WHERE
 type PostgresBackend struct {
 	connURI string
 	db      *sql.DB
+
+	cleaner *taskCleaner
 }
 
 type PostgresTaskCompleter struct {
@@ -95,13 +95,12 @@ type PostgresTaskCompleter struct {
 	// this to complete the correct task.
 	tid int64
 
-	_txLock sync.Mutex
-	// _tx is the transaction that is holding our dequeued task.
-	_tx *sql.Tx
-	// ctx is the context that the transaction was started with.
-	ctx context.Context
-	// canceling this will abort the transaction
+	db *sql.DB
+
+	ctx    context.Context
 	cancel context.CancelFunc
+
+	pinger *taskPinger
 }
 
 type PostgresWorkflowCompleter struct {
@@ -168,7 +167,7 @@ func (pg *PostgresBackend) Init() error {
 	if err != nil {
 		return err
 	}
-	// defer m.Close() I don't think we want to call close here because it'll close our db instance
+	defer m.Close() // nolint: errcheck
 
 	version, dirty, err := m.Version()
 	if err != nil && err != migrate.ErrNilVersion {
@@ -193,12 +192,19 @@ func (pg *PostgresBackend) Init() error {
 		return errors.Wrap(err, "migration failed")
 	}
 
+	pg.cleaner = newTaskCleaner(pg.db)
+	pg.cleaner.Start(context.Background())
+
 	return nil
 }
 
 func (pg *PostgresBackend) Close() error {
 	if pg.db != nil {
-		return pg.db.Close()
+		pg.cleaner.Stop()
+		logrus.Debug("closing cereal database")
+		err := pg.db.Close()
+		logrus.WithError(err).Debug("closed cereal database")
+		return err
 	}
 	return nil
 }
@@ -572,6 +578,11 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 		return nil, nil, errors.Wrap(err, "failed to dequeue workflow")
 	}
 
+	logrus.WithFields(logrus.Fields{
+		"wid": workc.wid,
+		"eid": workc.eid,
+	}).Debug("dequeued workflow")
+
 	event.InstanceID = workc.wid
 
 	if event.Type == backend.TaskComplete {
@@ -596,15 +607,12 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 }
 
 func (workc *PostgresWorkflowCompleter) EnqueueTask(task *backend.Task, opts backend.TaskEnqueueOpts) error {
-	if opts.TryRemaining <= 0 {
-		opts.TryRemaining = 1
-	}
 	if opts.StartAfter.IsZero() {
 		opts.StartAfter = time.Now()
 	}
 
 	_, err := workc.enqueueTaskStmt.ExecContext(workc.ctx,
-		task.WorkflowInstanceID, opts.TryRemaining, opts.StartAfter, task.Name, task.Parameters)
+		workc.wid, opts.StartAfter, task.Name, task.Parameters)
 	if err != nil {
 		return errors.Wrap(err, "failed to enqueue task")
 	}
@@ -626,87 +634,82 @@ func (pg *PostgresBackend) dequeueTask(tx *sql.Tx, taskName string) (int64, *bac
 	} else if err != nil {
 		return 0, nil, errors.Wrap(err, "failed to dequeue task")
 	}
+
 	return tid, task, nil
 }
+
 func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*backend.Task, backend.TaskCompleter, error) {
 	ctx, cancel := context.WithCancel(ctx)
 
 	tx, err := pg.db.BeginTx(ctx, nil)
 	if err != nil {
 		cancel()
-		return nil, nil, errors.Wrap(err, "failed to dequeue task")
-	}
-
-	taskc := &PostgresTaskCompleter{
-		ctx:    ctx,
-		_tx:    tx,
-		cancel: cancel,
+		return nil, nil, err
 	}
 
 	tid, task, err := pg.dequeueTask(tx, taskName)
 	if err != nil {
-		if rerr := tx.Rollback(); rerr != nil {
-			logrus.WithError(rerr).Error("Failed to rollback dequeue task")
+		if errR := tx.Rollback(); errR != nil {
+			logrus.WithError(err).Warn("failed to rollback dequeue transaction")
 		}
 		cancel()
 		return nil, nil, err
 	}
-	taskc.tid = tid
 
-	// pinger
-	go func() {
-		for {
-			select {
-			case <-taskc.ctx.Done():
-				return
-			case <-time.After(10 * time.Second):
-				err := taskc.useTx(func(tx *sql.Tx) error {
-					_, err := tx.ExecContext(taskc.ctx, "")
-					return err
-				})
+	if err := tx.Commit(); err != nil {
+		cancel()
+		return nil, nil, err
+	}
 
-				if err != nil {
-					logrus.WithError(err).Error("Transaction pinger failed")
-					return
-				}
-			}
-		}
-	}()
+	pinger := newTaskPinger(pg.db, tid)
+
+	taskc := &PostgresTaskCompleter{
+		db:     pg.db,
+		tid:    tid,
+		ctx:    ctx,
+		cancel: cancel,
+		pinger: pinger,
+	}
+
+	pinger.Start(ctx)
 
 	return task, taskc, nil
-}
-
-func (taskc *PostgresTaskCompleter) useTx(f func(tx *sql.Tx) error) error {
-	taskc._txLock.Lock()
-	defer taskc._txLock.Unlock()
-	return f(taskc._tx)
 }
 
 func (taskc *PostgresTaskCompleter) Fail(errMsg string) error {
 	defer taskc.cancel()
 
-	return taskc.useTx(func(tx *sql.Tx) error {
-		_, err := tx.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, backend.TaskStatusFailed, errMsg, "")
-		if err != nil {
-			return errors.Wrapf(err, "failed to mark task %d as failed", taskc.tid)
-		}
+	taskc.pinger.Stop()
 
-		return errors.Wrapf(tx.Commit(), "failed to mark task %d as failed", taskc.tid)
-	})
+	_, err := taskc.db.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, backend.TaskStatusFailed, errMsg, "")
+
+	if err != nil {
+		if isErrTaskLost(err) {
+			logrus.WithField("task_id", taskc.tid).Warn("task not updated")
+			return cereal.ErrTaskLost
+		}
+		return errors.Wrapf(err, "failed to mark task %d as failed", taskc.tid)
+	}
+
+	return nil
 }
 
 // TODO(ssd) 2019-05-10: Should this and Fail also take a context from the caller? If so, we'll need to
 func (taskc *PostgresTaskCompleter) Succeed(results []byte) error {
 	defer taskc.cancel()
 
-	return taskc.useTx(func(tx *sql.Tx) error {
-		_, err := tx.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, backend.TaskStatusSuccess, "", results)
-		if err != nil {
-			return errors.Wrapf(err, "failed to mark task %d as successful", taskc.tid)
-		}
+	taskc.pinger.Stop()
 
-		return errors.Wrapf(tx.Commit(), "failed to mark task %d as successful", taskc.tid)
-	})
+	_, err := taskc.db.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, backend.TaskStatusSuccess, "", results)
+
+	if err != nil {
+		if isErrTaskLost(err) {
+			logrus.WithField("task_id", taskc.tid).Warn("task not updated")
+			return cereal.ErrTaskLost
+		}
+		return errors.Wrapf(err, "failed to mark task %d as successful", taskc.tid)
+	}
+	return nil
 }
 
 func (workc *PostgresWorkflowCompleter) Done(result []byte) error {
@@ -744,18 +747,6 @@ func (workc *PostgresWorkflowCompleter) Continue(payload []byte) error {
 	}
 
 	return errors.Wrapf(workc.tx.Commit(), "failed to mark workflow event %d as processed", workc.eid)
-}
-
-func (workc *PostgresWorkflowCompleter) Abandon() error {
-	ctx := workc.ctx
-	defer workc.cancel()
-
-	_, err := workc.tx.ExecContext(ctx, abandonWorkflowQuery, workc.wid, workc.eid, workc.completedTaskCount)
-	if err != nil {
-		return errors.Wrapf(err, "failed to mark workflow %d as complete", workc.wid)
-	}
-
-	return errors.Wrapf(workc.tx.Commit(), "failed to mark workflow %d as complete", workc.wid)
 }
 
 func (workc *PostgresWorkflowCompleter) Close() error {
@@ -824,4 +815,13 @@ func (c *PostgresScheduledWorkflowCompleter) EnqueueScheduledWorkflow(s *backend
 
 func (c *PostgresScheduledWorkflowCompleter) Close() {
 	c.cancel()
+}
+
+func isErrTaskLost(err error) bool {
+	if err, ok := err.(*pq.Error); ok {
+		if err.Code == "23514" {
+			return true
+		}
+	}
+	return false
 }

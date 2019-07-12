@@ -1,5 +1,7 @@
 #!{{pkgPathFor "core/bash"}}/bin/bash
 
+set -e
+
 exec 2>&1
 
 # Call the script to block until user accepts the MLSA via the package's config

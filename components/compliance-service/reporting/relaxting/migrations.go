@@ -26,7 +26,6 @@ type esMigratable interface {
 	getSourceSummaryIndexPrefix() string
 	migrateProfiles() error
 	migrateTimeSeries(dateToMigrate time.Time) error
-	migrateFeeds() error
 	postTimeSeriesMigration(dateToMigrate time.Time) error
 	postProfilesMigration() error
 	postFeedsMigration() error
@@ -185,13 +184,6 @@ func (backend ES2Backend) migrate(migratable esMigratable, statusSrv *statusserv
 	myName := fmt.Sprintf("migrate (%s)", migrationLabel)
 	logrus.Debugf(myName)
 	defer util.TimeTrack(time.Now(), fmt.Sprintf(" %s reindex indices", myName))
-
-	//migrate the feeds index
-	statusserver.AddMigrationUpdate(statusSrv, migrationLabel, "Migrating the feeds index...")
-	err := migratable.migrateFeeds()
-	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("%s unable to migrate feeds in ElasticSearch", myName))
-	}
 
 	statusserver.AddMigrationUpdate(statusSrv, migrationLabel, "Post feeds migration cleanup...")
 	err = migratable.postFeedsMigration()

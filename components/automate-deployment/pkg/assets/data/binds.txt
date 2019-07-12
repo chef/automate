@@ -36,7 +36,6 @@ automate-workflow-nginx BINDING_MODE strict
 automate-workflow-server REQUIRED automate-pg-gateway pg-sidecar-service
 automate-workflow-server BINDING_MODE strict
 backup-gateway BINDING_MODE strict
-ui-library BINDING_MODE strict
 compliance-service REQUIRED authz-service automate-es-gateway automate-pg-gateway event-service nodemanager-service pg-sidecar-service secrets-service
 compliance-service OPTIONAL authn-service es-sidecar-service notifications-service
 compliance-service BINDING_MODE strict
@@ -44,11 +43,12 @@ config-mgmt-service REQUIRED automate-es-gateway
 config-mgmt-service BINDING_MODE strict
 data-feed-service REQUIRED config-mgmt-service notifications-service secrets-service
 data-feed-service BINDING_MODE strict
-data-lifecycle-service OPTIONAL compliance-service ingest-service
+data-lifecycle-service OPTIONAL compliance-service event-feed-service ingest-service
 data-lifecycle-service BINDING_MODE strict
 es-sidecar-service REQUIRED automate-elasticsearch automate-es-gateway
 es-sidecar-service BINDING_MODE strict
 event-feed-service REQUIRED automate-es-gateway
+event-feed-service OPTIONAL es-sidecar-service
 event-feed-service BINDING_MODE strict
 event-gateway REQUIRED authn-service authz-service event-service
 event-gateway BINDING_MODE strict

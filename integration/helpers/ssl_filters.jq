@@ -17,7 +17,6 @@ map(select(
          (.id != "cert_caIssuers" or .port != "443") and        # Test uses self-signed cert
          (.id != "cert_chain_of_trust" or .port != "443") and   # Test uses self-signed cert
          (.id != "cipherlist_128Bit" or .port != "443") and     # For browser compatibility (untested)
-         (.id != "HSTS" or .port != "443") and                  # TODO
 
          # automate-gateway
          (.id != "HSTS" or .port != "2000") and                 # HSTS doesn't seem relevant for this API
