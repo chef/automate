@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Performance Result Comparison</title>
+<style>
+.benchstat { border-collapse: collapse; }
+.benchstat th:nth-child(1) { text-align: left; }
+.benchstat tbody td:nth-child(1n+2):not(.note) { text-align: right; padding: 0em 1em; }
+.benchstat tr:not(.configs) th { border-top: 1px solid #666; border-bottom: 1px solid #ccc; }
+.benchstat .nodelta { text-align: center !important; }
+.benchstat .better td.delta { font-weight: bold; }
+.benchstat .worse td.delta { font-weight: bold; color: #c00; }
+</style>
+</head>
+<body>
+
+<table class='benchstat '>
+
+
+<tbody>
+
+<tr><th><th>time/op
+<tr><td>IngestionNewServices-4<td>16.5ms ±19%
+<tr><td>IngestionUpdateServices-4<td>11.8ms ± 5%
+<tr><td>GetServiceGroups/max_1000_with_0_groups-4<td>2.06ms ±11%
+<tr><td>GetServiceGroups/max_1000_with_100_groups-4<td>20.5ms ±50%
+<tr><td>GetServiceGroups/max_1000_with_200_groups-4<td>26.8ms ± 3%
+<tr><td>GetServiceGroups/max_1000_with_300_groups-4<td>46.9ms ±10%
+<tr><td>GetServiceGroups/max_1000_with_400_groups-4<td>65.9ms ± 1%
+<tr><td>GetServiceGroups/max_1000_with_500_groups-4<td>91.3ms ± 0%
+<tr><td>GetServiceGroups/max_1000_with_600_groups-4<td>122ms ± 1%
+<tr><td>GetServiceGroups/max_1000_with_700_groups-4<td>157ms ± 1%
+<tr><td>GetServiceGroups/max_1000_with_800_groups-4<td>204ms ± 5%
+<tr><td>GetServiceGroups/max_1000_with_900_groups-4<td>238ms ± 0%
+<tr><td>GetServiceGroups/max_1000_with_1000_groups-4<td>285ms ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_0_groups-4<td>1.95ms ± 3%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_1000_groups-4<td>227ms ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_2000_groups-4<td>881ms ± 1%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_3000_groups-4<td>1.96s ± 1%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_4000_groups-4<td>3.46s ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_5000_groups-4<td>5.48s ± 4%
+<tr><td>GetServices/max_1000_with_0_services-4<td>2.16ms ± 3%
+<tr><td>GetServices/max_1000_with_100_services-4<td>3.03ms ± 6%
+<tr><td>GetServices/max_1000_with_200_services-4<td>3.20ms ± 1%
+<tr><td>GetServices/max_1000_with_300_services-4<td>3.50ms ± 2%
+<tr><td>&nbsp;
+</tbody>
+
+<tbody>
+
+<tr><th><th>alloc/op
+<tr><td>IngestionNewServices-4<td>24.0kB ± 0%
+<tr><td>IngestionUpdateServices-4<td>25.3kB ± 0%
+<tr><td>GetServiceGroups/max_1000_with_0_groups-4<td>8.87kB ± 0%
+<tr><td>GetServiceGroups/max_1000_with_100_groups-4<td>41.0kB ± 0%
+<tr><td>GetServiceGroups/max_1000_with_200_groups-4<td>41.0kB ± 0%
+<tr><td>GetServiceGroups/max_1000_with_300_groups-4<td>41.0kB ± 0%
+<tr><td>GetServiceGroups/max_1000_with_400_groups-4<td>41.0kB ± 0%
+<tr><td>GetServiceGroups/max_1000_with_500_groups-4<td>41.0kB ± 0%
+<tr><td>GetServiceGroups/max_1000_with_600_groups-4<td>41.4kB ± 0%
+<tr><td>GetServiceGroups/max_1000_with_700_groups-4<td>41.4kB ± 0%
+<tr><td>GetServiceGroups/max_1000_with_800_groups-4<td>41.5kB ± 0%
+<tr><td>GetServiceGroups/max_1000_with_900_groups-4<td>41.5kB ± 0%
+<tr><td>GetServiceGroups/max_1000_with_1000_groups-4<td>41.5kB ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_0_groups-4<td>8.87kB ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_1000_groups-4<td>41.5kB ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_2000_groups-4<td>41.8kB ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_3000_groups-4<td>42.3kB ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_4000_groups-4<td>42.3kB ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_5000_groups-4<td>42.3kB ± 0%
+<tr><td>GetServices/max_1000_with_0_services-4<td>17.0kB ± 0%
+<tr><td>GetServices/max_1000_with_100_services-4<td>55.5kB ± 0%
+<tr><td>GetServices/max_1000_with_200_services-4<td>55.5kB ± 0%
+<tr><td>GetServices/max_1000_with_300_services-4<td>55.5kB ± 0%
+<tr><td>&nbsp;
+</tbody>
+
+<tbody>
+
+<tr><th><th>allocs/op
+<tr><td>IngestionNewServices-4<td>974 ± 0%
+<tr><td>IngestionUpdateServices-4<td>1.13k ± 0%
+<tr><td>GetServiceGroups/max_1000_with_0_groups-4<td>504 ± 0%
+<tr><td>GetServiceGroups/max_1000_with_100_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroups/max_1000_with_200_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroups/max_1000_with_300_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroups/max_1000_with_400_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroups/max_1000_with_500_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroups/max_1000_with_600_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroups/max_1000_with_700_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroups/max_1000_with_800_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroups/max_1000_with_900_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroups/max_1000_with_1000_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_0_groups-4<td>504 ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_1000_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_2000_groups-4<td>1.41k ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_3000_groups-4<td>1.42k ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_4000_groups-4<td>1.42k ± 0%
+<tr><td>GetServiceGroupsHeavyLoad/max_5000_with_5000_groups-4<td>1.42k ± 0%
+<tr><td>GetServices/max_1000_with_0_services-4<td>972 ± 0%
+<tr><td>GetServices/max_1000_with_100_services-4<td>2.10k ± 0%
+<tr><td>GetServices/max_1000_with_200_services-4<td>2.10k ± 0%
+<tr><td>GetServices/max_1000_with_300_services-4<td>2.10k ± 0%
+<tr><td>&nbsp;
+</tbody>
+
+</table>
+</body>
+</html>
