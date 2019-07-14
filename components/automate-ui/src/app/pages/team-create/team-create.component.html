@@ -33,7 +33,7 @@
                 <chef-input ngDefaultControl formControlName="teamName" type="text"></chef-input>
               </label>
                <chef-error *ngIf="(teamCreateForm.get('teamName').hasError('required') || teamCreateForm.get('teamName').hasError('pattern')) && teamCreateForm.get('teamName').dirty">
-                  Team {{ versionedDescOrName }} is required.
+                  {{ versionedDescOrName | titlecase }} is required.
                 </chef-error>
             </chef-form-field>
           </form>
