@@ -5,7 +5,7 @@
       <input chefInput formControlName="fullname" type="text">
     </label>
     <chef-error *ngIf="(createUserForm.get('fullname').hasError('required') || createUserForm.get('fullname').hasError('pattern')) && createUserForm.get('fullname').dirty">
-      Full Name is required.
+      User's Full Name is required.
     </chef-error>
   </chef-form-field>
   <chef-form-field>
@@ -13,8 +13,11 @@
       <span class="label">Username</span>
       <input chefInput formControlName="username" type="text">
     </label>
-    <chef-error *ngIf="(createUserForm.get('username').hasError('required') || createUserForm.get('username').hasError('pattern')) && createUserForm.get('username').dirty">
-      Invalid username.
+    <chef-error *ngIf="createUserForm.get('username').hasError('required') && createUserForm.get('username').dirty">
+      Username is required.
+    </chef-error>
+    <chef-error *ngIf="createUserForm.get('username').hasError('pattern') && createUserForm.get('username').dirty">
+      Only letters, numbers, and these characters (<strong>_@.+-</strong>) allowed.
     </chef-error>
   </chef-form-field>
   <chef-form-field>
