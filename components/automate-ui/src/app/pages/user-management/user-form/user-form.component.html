@@ -5,7 +5,7 @@
       <input chefInput formControlName="fullname" type="text">
     </label>
     <chef-error *ngIf="(createUserForm.get('fullname').hasError('required') || createUserForm.get('fullname').hasError('pattern')) && createUserForm.get('fullname').dirty">
-      Full name is required
+      Full Name is required.
     </chef-error>
   </chef-form-field>
   <chef-form-field>
@@ -14,7 +14,7 @@
       <input chefInput formControlName="username" type="text">
     </label>
     <chef-error *ngIf="(createUserForm.get('username').hasError('required') || createUserForm.get('username').hasError('pattern')) && createUserForm.get('username').dirty">
-      Invalid username
+      Invalid username.
     </chef-error>
   </chef-form-field>
   <chef-form-field>
@@ -23,10 +23,10 @@
       <input chefInput formControlName="password" type="password">
     </label>
     <chef-error *ngIf="createUserForm.get('password').hasError('required') && createUserForm.get('password').dirty">
-      Password is required
+      Password is required.
     </chef-error>
     <chef-error *ngIf="createUserForm.get('password').hasError('minlength') && createUserForm.get('password').dirty">
-      Password must be at least 8 characters
+      Password must be at least 8 characters.
     </chef-error>
   </chef-form-field>
   <chef-form-field>
@@ -35,7 +35,7 @@
       <input chefInput formControlName="confirmPassword" type="password">
     </label>
     <chef-error *ngIf="createUserForm.get('confirmPassword').hasError('noMatch') && createUserForm.get('confirmPassword').dirty">
-      Passwords must match
+      Passwords must match.
     </chef-error>
   </chef-form-field>
 </form>

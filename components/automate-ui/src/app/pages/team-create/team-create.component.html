@@ -18,13 +18,13 @@
                 <chef-input ngDefaultControl formControlName="teamId" type="text"></chef-input>
               </label>
               <chef-error *ngIf="teamCreateForm.get('teamId').hasError('required') && teamCreateForm.get('teamId').dirty">
-                Team {{ versionedNameOrId }} is required
+                Team {{ versionedNameOrId }} is required.
               </chef-error>
               <chef-error *ngIf="teamCreateForm.get('teamId').hasError('pattern') && teamCreateForm.get('teamId').dirty">
-                Only lowercase letters, numbers, and hyphens(-) are allowed
+                Only lowercase letters, numbers, and hyphens(-) are allowed.
               </chef-error>
               <chef-error *ngIf="teamCreateForm.get('teamId').hasError('maxlength') && teamCreateForm.get('teamId').dirty">
-                {{ versionedNameOrId }} must be 64 characters or less
+                {{ versionedNameOrId }} must be 64 characters or less.
               </chef-error>
             </chef-form-field>
             <chef-form-field id="create-name">
@@ -33,7 +33,7 @@
                 <chef-input ngDefaultControl formControlName="teamName" type="text"></chef-input>
               </label>
                <chef-error *ngIf="(teamCreateForm.get('teamName').hasError('required') || teamCreateForm.get('teamName').hasError('pattern')) && teamCreateForm.get('teamName').dirty">
-                  Team {{ versionedDescOrName }} is required
+                  Team {{ versionedDescOrName }} is required.
                 </chef-error>
             </chef-form-field>
           </form>

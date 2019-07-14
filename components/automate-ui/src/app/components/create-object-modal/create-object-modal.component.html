@@ -22,16 +22,16 @@
               <input chefInput formControlName="id" type="text" (keyup)="handleIDInput($event)" id="id-input">
             </label>
             <chef-error *ngIf="createForm?.controls['id'].hasError('maxlength')">
-              ID must be 64 characters or less
+              ID must be 64 characters or less.
             </chef-error>
             <chef-error *ngIf="createForm?.controls['id'].hasError('required')">
-              ID is required
+              ID is required.
             </chef-error>
             <chef-error *ngIf="createForm?.controls['id'].hasError('pattern')">
               Only lowercase letters, numbers, and hyphens(-) are allowed.
             </chef-error>
             <chef-error *ngIf="conflictError">
-              IDs must be unique--there is already a {{objectNoun}} with ID: {{createForm?.controls['id'].value}}
+              IDs must be unique--{{objectNoun}} with ID "{{createForm?.controls['id'].value}}" already exists.
             </chef-error>
           </chef-form-field>
           <span class="detail">{{ objectNoun | titlecase }} IDs are unique, permanent, and cannot be changed later.</span>

@@ -29,7 +29,7 @@
                   <chef-input ngDefaultControl formControlName="fullName"></chef-input>
                 </label>
                 <chef-error *ngIf="editForm.get('fullName').hasError('required') && editForm.get('fullName').dirty">
-                  Full Name is required
+                  Full Name is required.
                 </chef-error>
               </chef-form-field>
             </form>
@@ -72,10 +72,10 @@
             <chef-input ngDefaultControl formControlName="oldPassword" type="password"></chef-input>
           </label>
           <chef-error *ngIf="passwordForm.get('oldPassword').hasError('required') && passwordForm.get('oldPassword').dirty">
-            Old password is required
+            Old password is required.
           </chef-error>
           <chef-error *ngIf="passwordForm.get('oldPassword').hasError('minlength') && passwordForm.get('oldPassword').dirty">
-            Old password must be at least 8 characters
+            Old password must be at least 8 characters.
           </chef-error>
         </chef-form-field>
          <chef-form-field class="password">
@@ -84,10 +84,10 @@
             <chef-input ngDefaultControl formControlName="newPassword" type="password"></chef-input>
           </label>
           <chef-error *ngIf="passwordForm.get('newPassword').hasError('required') && passwordForm.get('newPassword').dirty">
-            Password is required
+            Password is required.
           </chef-error>
           <chef-error *ngIf="passwordForm.get('newPassword').hasError('minlength') && passwordForm.get('newPassword').dirty">
-            Password must be at least 8 characters
+            Password must be at least 8 characters.
           </chef-error>
         </chef-form-field>
         <chef-form-field class="password">
@@ -96,7 +96,7 @@
             <chef-input ngDefaultControl formControlName="confirmPassword" type="password"></chef-input>
           </label>
           <chef-error *ngIf="passwordForm.get('confirmPassword').hasError('noMatch') && passwordForm.get('confirmPassword').dirty">
-            Passwords must match
+            Passwords must match.
           </chef-error>
         </chef-form-field>
         <chef-button [disabled]="!passwordForm.valid" class="update-password-button" primary (click)="updatePassword()">
