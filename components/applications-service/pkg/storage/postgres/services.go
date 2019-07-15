@@ -2,12 +2,36 @@ package postgres
 
 import (
 	"fmt"
+	"time"
 
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/components/applications-service/pkg/storage"
 )
+
+// composedService is a more user friendly and clear representation of a service.
+// it is composed by values from other tables inside the database (JOINs)
+type composedService struct {
+	ID                  int32     `db:"id"`
+	SupMemberID         string    `db:"sup_member_id"`
+	Origin              string    `db:"origin"`
+	Name                string    `db:"name"`
+	Version             string    `db:"version"`
+	Release             string    `db:"release"`
+	Status              string    `db:"status"`
+	Health              string    `db:"health"`
+	Group               string    `db:"group"`
+	Fqdn                string    `db:"fqdn"`
+	Application         string    `db:"application"`
+	Environment         string    `db:"environment"`
+	Channel             string    `db:"channel"`
+	Site                string    `db:"site"`
+	PreviousHealth      string    `db:"previous_health"`
+	UpdateStrategy      string    `db:"update_strategy"`
+	LastEventOccurredAt time.Time `db:"last_event_occurred_at"`
+	HealthUpdatedAt     time.Time `db:"health_updated_at"`
+}
 
 const (
 	selectServiceInternal = `
@@ -172,7 +196,7 @@ func (db *Postgres) GetServices(
 	page = page - 1
 
 	var (
-		services              []*storage.Service
+		services              []*composedService
 		offset                = pageSize * page
 		sortOrder             = "ASC"
 		WhereConstraints, err = buildWhereConstraintsFromFilters(filters)
@@ -194,15 +218,15 @@ func (db *Postgres) GetServices(
 	)
 
 	_, err = db.DbMap.Select(&services, formattedQuery, pageSize, offset)
-	return services, err
+	return convertComposedServicesToStorage(services), err
 }
 
 // GetDisconnectedServices returns a list of disconnected services
 func (db *Postgres) GetDisconnectedServices(thresholdMinutes int32) ([]*storage.Service, error) {
-	var services []*storage.Service
+	var services []*composedService
 
 	_, err := db.DbMap.Select(&services, selectDisconnectedServices, thresholdMinutes)
-	return services, err
+	return convertComposedServicesToStorage(services), err
 }
 
 func (db *Postgres) GetServicesCount() (int32, error) {
@@ -217,13 +241,13 @@ func (db *Postgres) GetServiceFromUniqueFields(name, member string) (*storage.Se
 		return nil, false
 	}
 
-	var svc storage.Service
+	var svc composedService
 	err := db.SelectOne(&svc, selectServiceFromUniqueFields, name, member)
 	if err != nil {
 		return nil, false
 	}
 
-	return &svc, true
+	return convertComposedServiceToStorage(&svc), true
 }
 
 // getServiceFromUniqueFields is used to ingest/update services internally and it
@@ -236,6 +260,21 @@ func (db *Postgres) getServiceFromUniqueFields(name, member string) (*service, b
 	}
 
 	return &svc, true
+}
+
+// converts an array of composedService to an array of storage.Service
+func convertComposedServicesToStorage(svcs []*composedService) []*storage.Service {
+	storageSvcs := make([]*storage.Service, len(svcs))
+	for i, svc := range svcs {
+		storageSvcs[i] = convertComposedServiceToStorage(svc)
+	}
+	return storageSvcs
+}
+
+// converts a composedService to a storage.Service
+func convertComposedServiceToStorage(svc *composedService) *storage.Service {
+	// field names are the same, so we can cast this
+	return (*storage.Service)(svc)
 }
 
 // buildWhereConstraintsFromFilters converts the provided filters into SQL 'WHERE' constraints
