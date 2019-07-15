@@ -35,7 +35,7 @@
           <input chefInput formControlName="name" type="text" (keyup)="handleNameChange()">
         </chef-form-field>
       </form>
-      <chef-button primary [disabled]="disableSave || saveInProgress" (click)="saveNameChange()">
+      <chef-button primary [disabled]="!updateNameForm.valid || disableSave || saveInProgress" (click)="saveNameChange()">
         <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
         <ng-container *ngIf="!saveInProgress">
           <span *ngIf="disableSave">Saved</span>

@@ -34,6 +34,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
               fb: FormBuilder
               ) {
       this.updateNameForm = fb.group({
+        // Must stay in sync with error checks in api-token-details.component.html
         name: ['', Validators.required]
       });
     }
@@ -65,8 +66,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
     }
 
     public handleNameChange(): void {
-      this.disableSave = this.updateNameForm.controls['name'].value === this.token.name ||
-                         this.updateNameForm.controls['name'].value.trim() === '';
+      this.disableSave = this.updateNameForm.controls['name'].value === this.token.name;
     }
 
     public saveNameChange(): void {

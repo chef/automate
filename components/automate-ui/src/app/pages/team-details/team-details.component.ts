@@ -7,6 +7,7 @@ import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams, routeURL } from 'app/route.selectors';
+import { Regex } from 'app/helpers/auth/regex';
 import { EntityStatus } from 'app/entities/entities';
 import { User, HashMapOfUsers } from 'app/entities/users/user.model';
 import { allUsers, userStatus } from 'app/entities/users/user.selectors';
@@ -29,8 +30,6 @@ import {
   UpdateTeam
 } from 'app/entities/teams/team.actions';
 
-// NB: neither \S nor ^\s work inside the brackets in this regex language.
-const NON_BLANK = '.*[^ ].*';
 const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 
 @Component({
@@ -150,7 +149,8 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
   private createForms(fb: FormBuilder): void {
     this.editForm = fb.group({
-      teamName: ['', [Validators.required, Validators.pattern(NON_BLANK)]]
+      // Must stay in sync with error checks in team-details.component.html
+      teamName: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
   }
 

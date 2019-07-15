@@ -29,6 +29,7 @@ import {
   GetUsers
 } from 'app/entities/users/user.actions';
 import { User } from 'app/entities/users/user.model';
+import { Regex } from 'app/helpers/auth/regex';
 
 @Component({
   selector: 'app-policy-add-members',
@@ -72,7 +73,8 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     fb: FormBuilder) {
 
     this.expressionForm = fb.group({
-      expression: ['', Validators.required]
+      // Must stay in sync with error checks in policy-add-members.component.html
+      expression: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
   }
 
@@ -275,10 +277,14 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     return member.name in this.membersToAdd;
   }
 
-  public validateAndAddExpression(): void {
+  public resetErrors(): void {
     this.unparsableMember = false;
     this.duplicateMember = false;
     this.alreadyPolicyMember = false;
+  }
+
+  public validateAndAddExpression(): void {
+    this.resetErrors();
 
     const member = stringToMember(this.expressionForm.value.expression);
 
@@ -287,8 +293,8 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.duplicateMember = member.name in this.membersAvailableMap;
-    if (this.duplicateMember) {
+    if (member.name in this.membersAvailableMap) {
+      this.duplicateMember = true;
       return;
     }
 
@@ -298,9 +304,6 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
         return;
       }
     });
-    if (this.alreadyPolicyMember) {
-      return;
-    }
 
     this.addAvailableMember(member, true);
     this.addOrRemoveQueuedMember(true, member);

@@ -1,14 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators
-} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Observable ,  Subject } from 'rxjs';
 import { takeUntil, map } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { Regex } from 'app/helpers/auth/regex';
 import { EntityStatus, loading } from 'app/entities/entities';
 import { allUsers, userStatus } from 'app/entities/users/user.selectors';
 import {
@@ -77,8 +74,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       )));
 
     this.createUserForm = fb.group({
-      fullname: ['', Validators.required],
-      username: ['', Validators.pattern(USERNAME_PATTERN)],
+      // Must stay in sync with error checks in user-form.component.html
+      fullname: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      username: ['', [Validators.required, Validators.pattern(USERNAME_PATTERN)]],
       // length validator must be consistent with
       // backend password rules in local-user-service/password/password.go
       password: ['', [Validators.required, Validators.minLength(8)]],

@@ -4,33 +4,41 @@
       <span class="label">User's Full Name</span>
       <input chefInput formControlName="fullname" type="text">
     </label>
-    <chef-error *ngIf="createUserForm.get('fullname').hasError('required') && createUserForm.get('fullname').dirty">Full
-      name required</chef-error>
+    <chef-error *ngIf="(createUserForm.get('fullname').hasError('required') || createUserForm.get('fullname').hasError('pattern')) && createUserForm.get('fullname').dirty">
+      User's Full Name is required.
+    </chef-error>
   </chef-form-field>
   <chef-form-field>
     <label>
       <span class="label">Username</span>
       <input chefInput formControlName="username" type="text">
     </label>
-    <chef-error *ngIf="createUserForm.get('username').hasError('pattern') && createUserForm.get('username').dirty">Invalid
-      username</chef-error>
+    <chef-error *ngIf="createUserForm.get('username').hasError('required') && createUserForm.get('username').dirty">
+      Username is required.
+    </chef-error>
+    <chef-error *ngIf="createUserForm.get('username').hasError('pattern') && createUserForm.get('username').dirty">
+      Only letters, numbers, and these characters (<strong>_@.+-</strong>) allowed.
+    </chef-error>
   </chef-form-field>
   <chef-form-field>
     <label>
       <span class="label">Password</span>
       <input chefInput formControlName="password" type="password">
     </label>
-    <chef-error *ngIf="createUserForm.get('password').hasError('required') && createUserForm.get('password').dirty">Password
-      required</chef-error>
-    <chef-error *ngIf="createUserForm.get('password').hasError('minlength') && createUserForm.get('password').dirty">Password
-      must be at least 8 characters</chef-error>
+    <chef-error *ngIf="createUserForm.get('password').hasError('required') && createUserForm.get('password').dirty">
+      Password is required.
+    </chef-error>
+    <chef-error *ngIf="createUserForm.get('password').hasError('minlength') && createUserForm.get('password').dirty">
+      Password must be at least 8 characters.
+    </chef-error>
   </chef-form-field>
   <chef-form-field>
     <label>
       <span class="label">Confirm Password</span>
       <input chefInput formControlName="confirmPassword" type="password">
     </label>
-    <chef-error *ngIf="createUserForm.get('confirmPassword').hasError('noMatch') && createUserForm.get('confirmPassword').dirty">Password
-      must match</chef-error>
+    <chef-error *ngIf="createUserForm.get('confirmPassword').hasError('noMatch') && createUserForm.get('confirmPassword').dirty">
+      Passwords must match.
+    </chef-error>
   </chef-form-field>
 </form>

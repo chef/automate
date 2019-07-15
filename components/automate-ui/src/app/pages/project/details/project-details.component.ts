@@ -54,6 +54,7 @@ export class ProjectDetailsComponent implements OnDestroy {
         this.project = <Project>Object.assign({}, state);
         this.isChefManaged = this.project.type === 'CHEF_MANAGED';
         this.projectForm = fb.group({
+          // Must stay in sync with error checks in project-details.component.html
           name: [this.project.name, Validators.required]
         });
       })).subscribe();

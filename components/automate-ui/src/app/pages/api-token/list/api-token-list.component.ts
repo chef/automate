@@ -7,6 +7,7 @@ import { filter, takeUntil, map } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { Regex } from 'app/helpers/auth/regex';
 import { loading, EntityStatus } from 'app/entities/entities';
 import { Type } from 'app/entities/notifications/notification.model';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
@@ -19,8 +20,6 @@ import {
 } from 'app/entities/api-tokens/api-token.actions';
 import { CreateToken } from 'app/entities/api-tokens/api-token.actions';
 import { saveStatus, saveError } from 'app/entities/api-tokens/api-token.selectors';
-
-const ID_PATTERN = '[0-9a-z-]+';
 
 @Component({
   selector: 'app-api-tokens',
@@ -59,8 +58,10 @@ export class ApiTokenListComponent implements OnInit {
     this.apiTokenCount$ = store.pipe(select(totalApiTokens));
 
     this.createTokenForm = fb.group({
+      // Must stay in sync with error checks in create-object-modal.component.html
       name: ['', Validators.required],
-      id: ['', [Validators.required, Validators.pattern(ID_PATTERN), Validators.maxLength(64)]]
+      id: ['',
+        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]]
     });
   }
 

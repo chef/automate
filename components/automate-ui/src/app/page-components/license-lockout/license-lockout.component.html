@@ -36,19 +36,19 @@
             <chef-form-field>
               <label for="firstName">First Name *</label>
               <input chefInput name="firstName" id="firstName" formControlName="firstName" type="text" autofocus placeholder="First Name">
-              <chef-error *ngIf="trialForm.get('firstName').hasError('required') && trialForm.get('firstName').dirty">First name required</chef-error>
+              <chef-error *ngIf="trialForm.get('firstName').hasError('required') && trialForm.get('firstName').dirty">First name required.</chef-error>
             </chef-form-field>
             <chef-form-field>
               <label for="firstName">Last Name *</label>
               <input chefInput name="lastName" id="lastName" formControlName="lastName" type="text" placeholder="Last Name">
-              <chef-error *ngIf="trialForm.get('lastName').hasError('required') && trialForm.get('lastName').dirty">Last name required</chef-error>
+              <chef-error *ngIf="trialForm.get('lastName').hasError('required') && trialForm.get('lastName').dirty">Last name required.</chef-error>
             </chef-form-field>
           </div>
           <div class="email-container">
             <chef-form-field>
               <label for="email">Email *</label>
               <input chefInput name="email" id="email" formControlName="email" type="text" placeholder="Email">
-              <chef-error *ngIf="trialForm.get('email').hasError('email') && trialForm.get('email').dirty">Valid email required</chef-error>
+              <chef-error *ngIf="trialForm.get('email').hasError('email') && trialForm.get('email').dirty">Valid email required.</chef-error>
             </chef-form-field>
           </div>
           <chef-checkbox (change)="updateGDPR($event.detail)" [checked]="gdprAgree">I would like to receive email communications from Chef</chef-checkbox>

@@ -7,6 +7,7 @@ import { map, takeUntil, filter } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { Regex } from 'app/helpers/auth/regex';
 import { loading, EntityStatus } from 'app/entities/entities';
 import { ProjectService } from 'app/entities/projects/project.service';
 import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
@@ -16,8 +17,6 @@ import {
 import { GetProjects, CreateProject, DeleteProject  } from 'app/entities/projects/project.actions';
 import { Project } from 'app/entities/projects/project.model';
 import { ApplyRulesStatus, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
-
-const ID_PATTERN = '[0-9a-z-]+';
 
 @Component({
   selector: 'app-project-list',
@@ -73,8 +72,10 @@ export class ProjectListComponent implements OnInit {
     );
 
     this.createProjectForm = fb.group({
+      // Must stay in sync with error checks in create-object-modal.component.html
       name: ['', Validators.required],
-      id: ['', [Validators.required, Validators.pattern(ID_PATTERN), Validators.maxLength(64)]]
+      id: ['',
+        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]]
     });
   }
 
