@@ -54,7 +54,7 @@ func (a *ApplicationsServer) GetVersion(
 	}, nil
 }
 
-func (a *ApplicationsServer) GetServiceGroups(c context.Context,
+func (a *ApplicationsServer) GetServiceGroups(ctx context.Context,
 	request *applications.ServiceGroupsReq) (*applications.ServiceGroups, error) {
 
 	filters, err := params.FormatFilters(request.GetFilter())
@@ -119,7 +119,7 @@ func convertHealthStatusToProto(healthStatus string) applications.HealthStatus {
 
 // GetServiceGroupsHealthCounts returns the health counts from all service groups
 func (app *ApplicationsServer) GetServiceGroupsHealthCounts(
-	c context.Context, request *applications.ServiceGroupsHealthCountsReq,
+	ctx context.Context, request *applications.ServiceGroupsHealthCountsReq,
 ) (*applications.HealthCounts, error) {
 
 	svcsHealthCounts, err := app.storageClient.GetServiceGroupsHealthCounts()
@@ -139,7 +139,7 @@ func (app *ApplicationsServer) GetServiceGroupsHealthCounts(
 
 // GetServicesBySG returns a list of services within a service-group
 func (app *ApplicationsServer) GetServicesBySG(
-	c context.Context, request *applications.ServicesBySGReq,
+	ctx context.Context, request *applications.ServicesBySGReq,
 ) (*applications.ServicesBySGRes, error) {
 
 	sortField, sortAsc, err := params.GetSortParamsForServices(request.GetSorting())
@@ -204,7 +204,7 @@ func (app *ApplicationsServer) GetServicesBySG(
 
 // GetServices returns a list of services
 func (app *ApplicationsServer) GetServices(
-	c context.Context, request *applications.ServicesReq,
+	ctx context.Context, request *applications.ServicesReq,
 ) (*applications.ServicesRes, error) {
 
 	filters, err := params.FormatFilters(request.GetFilter())
@@ -234,7 +234,7 @@ func (app *ApplicationsServer) GetServices(
 	}, nil
 }
 
-func (app *ApplicationsServer) GetServicesStats(c context.Context,
+func (app *ApplicationsServer) GetServicesStats(ctx context.Context,
 	request *applications.ServicesStatsReq) (*applications.ServicesStatsRes, error) {
 
 	servicesCount, err := app.storageClient.GetServicesCount()
@@ -261,7 +261,7 @@ func (app *ApplicationsServer) GetServicesStats(c context.Context,
 }
 
 // GetDisconnectedServices returns a list of disconnected services
-func (app *ApplicationsServer) GetDisconnectedServices(c context.Context,
+func (app *ApplicationsServer) GetDisconnectedServices(ctx context.Context,
 	request *applications.DisconnectedServicesReq) (*applications.ServicesRes, error) {
 
 	thresholdMinutes := request.GetThresholdMinutes()
