@@ -3,9 +3,7 @@ package v2
 import (
 	"context"
 	"fmt"
-	"strings"
 	"sync"
-	"unsafe"
 
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
@@ -187,6 +185,7 @@ func (s *ProjectState) ApplyRulesStart(
 			"failed to parse state of rule apply")
 	}
 
+	s.log.Info("apply project rules: START")
 	err := s.store.ApplyStagedRules(ctx)
 	if err != nil {
 		s.log.Warnf("error applying staged projects: %s", err.Error())
@@ -456,41 +455,7 @@ func (s *ProjectState) listRulesWithFunction(ctx context.Context, req *api.ListR
 		rules[i] = apiRule
 	}
 
-	s.dumpRules(rules)
 	return &api.ListRulesResp{Rules: rules}, nil
-}
-
-func (s *ProjectState) dumpRules(rules []*api.ProjectRule) {
-	// we have the request object but we want to measure the response object,
-	// so adding in deleted (bool) and status ("applied|staged")
-	// The ListRulesResp object also contains 3 more fields:
-	// XXX_NoUnkeyedLiteral, XXX_unrecognized, XXX_sizecache. The last one is 4 bytes but not sure on the first two.
-	// Those unknown bits are greatly exacerbated in that each rule in the payload also has those 3 fields,
-	// and each condition of each rule does also!
-	for _, r := range rules {
-		cSize, cSizeStr := conditionSize(r.Conditions)
-		s.log.Infof("Rule size |%d|: %d+%d+%d+%d+%s+%d+%d(+%d+%d+%d)",
-			size(r.Id)+size(r.ProjectId)+size(r.Name)+int(unsafe.Sizeof(r.Type))+cSize+int(unsafe.Sizeof(r.Deleted))+size(r.Status)+int(unsafe.Sizeof(r.XXX_NoUnkeyedLiteral))+len(r.XXX_unrecognized)+int(unsafe.Sizeof(r.XXX_sizecache)),
-			size(r.Id), size(r.ProjectId), size(r.Name), unsafe.Sizeof(r.Type), cSizeStr, unsafe.Sizeof(r.Deleted), size(r.Status), unsafe.Sizeof(r.XXX_NoUnkeyedLiteral), len(r.XXX_unrecognized), unsafe.Sizeof(r.XXX_sizecache))
-	}
-}
-
-func conditionSize(conditions []*api.Condition) (int, string) {
-	var cList []string
-	cSize := 0
-	for _, c := range conditions {
-		vSize := 0
-		for _, v := range c.Values {
-			vSize += size(v)
-		}
-		cList = append(cList, fmt.Sprintf("{%d+%d+%d(+%d+%d+%d)}", unsafe.Sizeof(c.Attribute), unsafe.Sizeof(c.Operator), vSize, unsafe.Sizeof(c.XXX_NoUnkeyedLiteral), len(c.XXX_unrecognized), unsafe.Sizeof(c.XXX_sizecache)))
-		cSize += int(unsafe.Sizeof(c.Attribute)) + int(unsafe.Sizeof(c.Operator)) + vSize + int(unsafe.Sizeof(c.XXX_NoUnkeyedLiteral)) + len(c.XXX_unrecognized) + int(unsafe.Sizeof(c.XXX_sizecache))
-	}
-	return cSize, "[ " + strings.Join(cList, ", ") + " ]"
-}
-
-func size(s string) int {
-	return len([]byte(s))
 }
 
 func (s *ProjectState) ListRulesForProject(ctx context.Context, req *api.ListRulesForProjectReq) (*api.ListRulesForProjectResp, error) {
