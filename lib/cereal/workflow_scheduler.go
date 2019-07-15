@@ -86,10 +86,8 @@ func (w *workflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 		logrus.Warnf("Recurring workflow %fs past due. (expected at %s)", time.Since(s.NextDueAt).Seconds(), s.NextDueAt)
 	}
 
-	workflowInstanceName := s.InstanceName
-
 	// TODO(ssd) 2019-05-13: We might need two different
-	// rule types here to suppor the different use cases.
+	// rule types here to support the different use cases.
 	recurrence, err := rrule.StrToRRule(s.Recurrence)
 	if err != nil {
 		// TODO(ssd) 2019-05-13: Perhaps we should disable this rule so that it doesn't keep producing errors
@@ -103,7 +101,7 @@ func (w *workflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 		s.Enabled = false
 	}
 	sleepTime := time.Until(nextDueAt)
-	logrus.Infof("Starting scheduled workflow %q", workflowInstanceName)
+	logrus.Infof("Starting scheduled workflow %q", s.InstanceName)
 	s.NextDueAt = nextDueAt
 	s.LastEnqueuedAt = nowUTC
 	err = completer.EnqueueScheduledWorkflow(s)

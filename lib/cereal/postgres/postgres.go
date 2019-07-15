@@ -422,13 +422,9 @@ func (pg *PostgresBackend) CreateWorkflowSchedule(ctx context.Context, instanceN
 	parameters []byte, enabled bool, recurrence string, nextRunAt time.Time) error {
 
 	wrapErr := func(err error, msg string) error {
-		if pqErr, ok := err.(*pq.Error); ok {
-			// unique violation
-			if pqErr.Code == "23505" {
-				return cereal.ErrWorkflowScheduleExists
-			}
+		if isPGConflict(err) {
+			return cereal.ErrWorkflowScheduleExists
 		}
-
 		return errors.Wrap(err, msg)
 	}
 	ctx, cancel := context.WithCancel(ctx)
@@ -506,24 +502,22 @@ func (pg *PostgresBackend) GetWorkflowInstanceByName(ctx context.Context, instan
 }
 
 func (pg *PostgresBackend) EnqueueWorkflow(ctx context.Context, w *backend.WorkflowInstance) error {
-	wrapErr := func(err error, msg string) error {
-		return errors.Wrap(err, msg)
-	}
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
+
 	tx, err := pg.db.BeginTx(ctx, nil)
 	if err != nil {
-		return wrapErr(err, "failed to begin enqueue workflow transaction")
+		return errors.Wrap(err, "failed to begin enqueue workflow transaction")
 	}
 
 	row := tx.QueryRowContext(ctx, enqueueWorkflowQuery, w.InstanceName, w.WorkflowName, w.Parameters)
 	var count sql.NullInt64
 	err = row.Scan(&count)
 	if err != nil {
-		return wrapErr(err, "failed to enqueue workflow")
+		return errors.Wrap(err, "failed to enqueue workflow")
 	}
 	if err := tx.Commit(); err != nil {
-		return wrapErr(err, "failed to commit enqueue workflow")
+		return errors.Wrap(err, "failed to commit enqueue workflow")
 	}
 	if count.Int64 == 0 {
 		return cereal.ErrWorkflowInstanceExists
@@ -758,13 +752,9 @@ func (workc *PostgresWorkflowCompleter) Close() error {
 func (c *PostgresScheduledWorkflowCompleter) EnqueueScheduledWorkflow(s *backend.Schedule) error {
 	defer c.cancel()
 	wrapErr := func(err error, msg string) error {
-		if pqErr, ok := err.(*pq.Error); ok {
-			// unique violation
-			if pqErr.Code == "23505" {
-				return cereal.ErrWorkflowInstanceExists
-			}
+		if isPGConflict(err) {
+			return cereal.ErrWorkflowInstanceExists
 		}
-
 		return errors.Wrap(err, msg)
 	}
 
@@ -817,9 +807,23 @@ func (c *PostgresScheduledWorkflowCompleter) Close() {
 	c.cancel()
 }
 
+const (
+	pgErrUniqueViolation = "23505"
+	pgErrCheckViolation  = "23514"
+)
+
+func isPGConflict(err error) bool {
+	if pqErr, ok := err.(*pq.Error); ok {
+		if pqErr.Code == pgErrUniqueViolation {
+			return true
+		}
+	}
+	return false
+}
+
 func isErrTaskLost(err error) bool {
 	if err, ok := err.(*pq.Error); ok {
-		if err.Code == "23514" {
+		if err.Code == pgErrCheckViolation {
 			return true
 		}
 	}
