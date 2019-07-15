@@ -119,6 +119,7 @@ CREATE TABLE cereal_tasks (
 
 CREATE TABLE cereal_task_results (
     id BIGSERIAL PRIMARY KEY,
+    task_id BIGINT UNIQUE NOT NULL,
     workflow_instance_id BIGINT NOT NULL,
     parameters   BYTEA,
     task_name    TEXT NOT NULL,
@@ -283,6 +284,7 @@ RETURNS TABLE(tid BIGINT, workflow_instance_id BIGINT)
 AS $$
 DECLARE
     t cereal_tasks%rowtype;
+    task_results_id BIGINT;
 BEGIN
     FOR t IN
         SELECT *
@@ -294,11 +296,12 @@ BEGIN
     LOOP
         DELETE FROM cereal_tasks WHERE id = t.id;
 
-        INSERT INTO cereal_task_results(workflow_instance_id, parameters, task_name, enqueued_at, status)
-            VALUES(t.workflow_instance_id, t.parameters, t.task_name, t.enqueued_at, 'lost');
+        INSERT INTO cereal_task_results(task_id, workflow_instance_id, parameters, task_name, enqueued_at, status)
+            VALUES(t.id, t.workflow_instance_id, t.parameters, t.task_name, t.enqueued_at, 'lost') 
+            RETURNING id INTO task_results_id;
 
         INSERT INTO cereal_workflow_events(event_type, task_result_id, workflow_instance_id)
-            VALUES('task_complete', t.id, t.workflow_instance_id);
+            VALUES('task_complete', task_results_id, t.workflow_instance_id);
 
         tid := t.id;
         workflow_instance_id := t.workflow_instance_id;
@@ -314,15 +317,17 @@ LANGUAGE plpgsql
 AS $$
 DECLARE
     t cereal_tasks%rowtype;
+    task_results_id BIGINT;
 BEGIN
     FOR t IN
          SELECT * FROM cereal_tasks WHERE id = _tid FOR UPDATE
     LOOP
-        INSERT INTO cereal_task_results(id, workflow_instance_id, parameters, task_name, enqueued_at, status, error, result)
-        VALUES(t.id, t.workflow_instance_id, t.parameters, t.task_name, t.enqueued_at, _status, _error, _result);
+        INSERT INTO cereal_task_results(task_id, workflow_instance_id, parameters, task_name, enqueued_at, status, error, result)
+        VALUES(t.id, t.workflow_instance_id, t.parameters, t.task_name, t.enqueued_at, _status, _error, _result)
+        RETURNING id INTO task_results_id;
 
         INSERT INTO cereal_workflow_events(event_type, task_result_id, workflow_instance_id)
-        VALUES('task_complete', t.id, t.workflow_instance_id);
+        VALUES('task_complete', task_results_id, t.workflow_instance_id);
 
         DELETE FROM cereal_tasks WHERE id = t.id;
 
