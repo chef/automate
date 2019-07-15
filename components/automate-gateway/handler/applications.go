@@ -77,18 +77,14 @@ func (a *Applications) GetServicesBySG(
 
 func (a *Applications) GetServicesStats(
 	ctx context.Context,
-	in *applications.ServicesStatsReq) (*applications.ServicesStatsRes, error) {
+	request *applications.ServicesStatsReq) (*applications.ServicesStatsRes, error) {
 
-	inDomain := &applications.ServicesStatsReq{}
-	out := &applications.ServicesStatsRes{}
-	f := func() (proto.Message, error) {
-		return a.client.GetServicesStats(ctx, inDomain)
-	}
-	err := protobuf.CallDomainService(in, inDomain, f, out)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.client.GetServicesStats(ctx, request)
 }
 
 func (a *Applications) GetDisconnectedServices(
