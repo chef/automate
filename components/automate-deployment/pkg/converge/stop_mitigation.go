@@ -154,6 +154,16 @@ func (r *safeServiceRestartRunner) RestartServices() error {
 	return finalError
 }
 
+func (r *safeServiceRestartRunner) IsStopped(pkg habpkg.VersionedPackage) bool {
+	for _, svc := range r.stoppedServices {
+		if svc.Name() == pkg.Name() {
+			return true
+		}
+	}
+
+	return false
+}
+
 func mitigationRequiredForPkg(t target.Target, pkg habpkg.VersionedPackage) (bool, error) {
 	// Because this mitigation is expensive, we only do this for
 	// our main data services.
