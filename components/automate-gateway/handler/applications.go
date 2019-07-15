@@ -33,17 +33,7 @@ func (a *Applications) GetServiceGroupsHealthCounts(
 		"func":    nameOfFunc(),
 	}).Debug("rpc call")
 
-	response, err := a.client.GetServiceGroupsHealthCounts(ctx, &applications.ServiceGroupsHealthCountsReq{})
-	if err != nil {
-		return nil, err
-	}
-	return &applications.HealthCounts{
-		Total:    response.Total,
-		Ok:       response.Ok,
-		Warning:  response.Warning,
-		Critical: response.Critical,
-		Unknown:  response.Unknown,
-	}, nil
+	return a.client.GetServiceGroupsHealthCounts(ctx, request)
 }
 
 // GetServiceGroups returns a list of service groups
