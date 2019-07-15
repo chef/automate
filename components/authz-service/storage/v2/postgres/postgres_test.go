@@ -6529,9 +6529,9 @@ func assertPolicy(t *testing.T, expectedPolicy, returnedPolicy *storage.Policy) 
 	assert.Equal(t, expectedPolicy.ID, returnedPolicy.ID)
 	assert.Equal(t, expectedPolicy.Name, returnedPolicy.Name)
 	assert.Equal(t, expectedPolicy.Type, returnedPolicy.Type)
-	assert.ElementsMatch(t, expectedPolicy.Members, returnedPolicy.Members)
-	assert.ElementsMatch(t, expectedPolicy.Projects, returnedPolicy.Projects)
-	assert.ElementsMatch(t, expectedPolicy.Statements, returnedPolicy.Statements)
+	assert.ElementsMatch(t, expectedPolicy.Projects, returnedPolicy.Projects, "projects match")
+	assert.ElementsMatch(t, expectedPolicy.Members, returnedPolicy.Members, "members match")
+	assert.ElementsMatch(t, expectedPolicy.Statements, returnedPolicy.Statements, "statements match")
 }
 
 func assertPolicies(t *testing.T, expectedPolicies, returnedPolicies []*storage.Policy) {
@@ -6649,8 +6649,7 @@ func insertTestProject(t *testing.T, db *testhelpers.TestDB, id string, name str
 
 func insertPolicyProject(t *testing.T, db *testhelpers.TestDB, policyID string, projectId string) {
 	t.Helper()
-	_, err := db.Exec(`
-			INSERT INTO iam_policy_projects (policy_id, project_id) VALUES (policy_db_id($1), $2);`,
+	_, err := db.Exec("INSERT INTO iam_policy_projects (policy_id, project_id) VALUES (policy_db_id($1), project_db_id($2))",
 		policyID, projectId)
 	require.NoError(t, err)
 }

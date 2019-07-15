@@ -56,3 +56,4 @@
 - [`54_use_project_db_id_in_references_of_project_rules.up.sql`](54_use_project_db_id_in_references_of_project_rules.up.sql)
 - [`55_use_project_db_id_in_references_of_project_roles.up.sql`](55_use_project_db_id_in_references_of_project_roles.up.sql)
 - [`56_add_db_id_statements.up.sql`](56_add_db_id_statements.up.sql)
+- [`57_use_project_db_id_in_references_of_policies.up.sql`](57_use_project_db_id_in_references_of_policies.up.sql)
