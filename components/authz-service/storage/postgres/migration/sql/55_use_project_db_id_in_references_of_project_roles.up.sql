@@ -20,7 +20,7 @@ ALTER TABLE iam_role_projects
 -- returns NULL if there's no associated projects; the call can decide
 -- (by coalesce'ing) if they want that to be {} or {(unassigned)}.
 
-CREATE OR REPLACE FUNCTION role_projects (_role_id TEXT, OUT _project_ids TEXT[])
+CREATE OR REPLACE FUNCTION role_projects (_role_id iam_roles.id % TYPE, OUT _project_ids TEXT[])
     RETURNS TEXT[]
     AS $$
 DECLARE
@@ -42,7 +42,7 @@ BEGIN
 END;
 $$
 LANGUAGE plpgsql;
-CREATE OR REPLACE FUNCTION query_role (_role_id TEXT)
+CREATE OR REPLACE FUNCTION query_role (_role_id iam_roles.id % TYPE)
     RETURNS json
     AS $$
     SELECT
