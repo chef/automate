@@ -31,13 +31,12 @@ CREATE OR REPLACE FUNCTION
       SELECT db_id INTO STRICT role_db_id
       FROM iam_roles AS r
       WHERE r.id=_role_id;
-      IF FOUND THEN
-          SELECT array_agg(p.id) INTO _project_ids
-          FROM iam_role_projects AS rp
-          LEFT JOIN iam_projects AS p
-          ON rp.project_id=p.db_id
-          WHERE rp.role_id=role_db_id;
-     END IF;
+
+      SELECT array_agg(p.id) INTO _project_ids
+      FROM iam_role_projects AS rp
+      JOIN iam_projects AS p
+      ON rp.project_id=p.db_id
+      WHERE rp.role_id=role_db_id;
   END;
 $$ LANGUAGE plpgsql;
 
