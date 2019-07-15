@@ -6,10 +6,11 @@ import "strings"
 // external configurations. These uses OpenSSLs identifiers so they
 // can be passed to software that takes an OpenSSL cipher list.
 //
-// This list was generated using the "modern" profile in Mozilla's SSL
+// This list was generated using the "intermediate" profile in Mozilla's SSL
 // Configuration Generator
 //
 // https://mozilla.github.io/server-side-tls/ssl-config-generator/
+
 var commonCiphers = []string{
 	"ECDHE-ECDSA-AES256-GCM-SHA384",
 	"ECDHE-RSA-AES256-GCM-SHA384",
@@ -17,9 +18,8 @@ var commonCiphers = []string{
 	"ECDHE-RSA-CHACHA20-POLY1305",
 	"ECDHE-ECDSA-AES128-GCM-SHA256",
 	"ECDHE-RSA-AES128-GCM-SHA256",
-	"ECDHE-ECDSA-AES256-SHA384",
-	"ECDHE-RSA-AES256-SHA384",
-	"ECDHE-ECDSA-AES128-SHA256",
+	"DHE-RSA-AES128-GCM-SHA256",
+	"DHE-RSA-AES256-GCM-SHA384",
 }
 
 // commonExcludes are exclude directives to be included in SSL cipher
@@ -43,10 +43,7 @@ var InternalCipherSuite = toCipherString(append(commonCiphers, commonExcludes...
 var ExternalCipherSuite = toCipherString(append(
 	append(commonCiphers, commonExcludes...),
 	// Added to support AWS "classic" ELB
-	"AES256-GCM-SHA384",
-	// Added for compatibility even though our scanner flags
-	// 128bit CBC mode ciphers
-	"ECDHE-RSA-AES128-SHA256"))
+	"AES256-GCM-SHA384"))
 
 func toCipherString(l []string) string {
 	return strings.Join(l, ":")

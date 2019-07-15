@@ -179,16 +179,17 @@ func initCipherSuites() {
 		}
 	}
 	commonCiphers := []uint16{
-		// Disabled since our new SSL scanner disallows anything with 128 Bit CBC
+		tls.TLS_RSA_WITH_AES_128_GCM_SHA256,
+		tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
+		// Disabled since our new SSL scanner disallows anything with CBC
 		//
 		// tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,
 		// tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,
-		tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
-		tls.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
-		tls.TLS_RSA_WITH_AES_128_GCM_SHA256,
-		tls.TLS_RSA_WITH_AES_256_GCM_SHA384,
+		// tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
+		// tls.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,
 		// tls.TLS_RSA_WITH_AES_128_CBC_SHA,
-		tls.TLS_RSA_WITH_AES_256_CBC_SHA,
+		// tls.TLS_RSA_WITH_AES_256_CBC_SHA,
+		//
 		// Golang enables these but we disable them
 		// because 3DES makes scanners unhappy
 		//
