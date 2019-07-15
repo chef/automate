@@ -108,12 +108,30 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec.Profile, profilesSums [
 					SkipMessage: result.SkipMessage,
 				}
 			}
+			//fmt.Printf("\n******tags for profile %s control %s = %+v", profile.Name, control.Id, control.Tags.Fields)
+
+			stringTags := make([]relaxting.ESInSpecReportControlStringTags, 0)
+			for fKey, fValue := range control.Tags.Fields {
+				fmt.Printf("\n\n* fKey=%s fValue=%+v", fKey, fValue)
+				fmt.Printf("\n* GetKey=%s", fValue.GetKind())
+				// Add key with a null value as an empty Values array
+				if fmt.Sprintf("%s", fValue.GetKind()) == "&{NULL_VALUE}" {
+					stringTags = append(stringTags, relaxting.ESInSpecReportControlStringTags{
+						Key:    fKey,
+						Values: make([]string, 0),
+					})
+					// we need to remove now this fKey from the tags. Only leaving the tags we don't support
+				}
+			}
+
+			fmt.Printf("\n!!! Adding stringTags=%+v", stringTags)
 			minControls[i] = relaxting.ESInSpecReportControl{
-				ID:      control.Id,
-				Title:   control.Title,
-				Impact:  control.Impact,
-				Status:  control.Status(),
-				Results: minResults,
+				ID:         control.Id,
+				Title:      control.Title,
+				Impact:     control.Impact,
+				Status:     control.Status(),
+				Results:    minResults,
+				StringTags: stringTags,
 			}
 		}
 

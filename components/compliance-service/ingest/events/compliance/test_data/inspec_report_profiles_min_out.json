@@ -22,7 +22,8 @@
             "code_desc": "",
             "run_time": 0
           }
-        ]
+        ],
+        "string_tags": []
       },
       {
         "id": "ctrl-02",
@@ -40,7 +41,8 @@
             "code_desc": "",
             "run_time": 0
           }
-        ]
+        ],
+        "string_tags": []
       },
       {
         "id": "ctrl-03",
@@ -53,7 +55,8 @@
             "code_desc": "",
             "run_time": 0
           }
-        ]
+        ],
+        "string_tags": []
       }
     ],
     "controls_sums": {
@@ -93,7 +96,8 @@
             "code_desc": "",
             "run_time": 0
           }
-        ]
+        ],
+        "string_tags": []
       },
       {
         "id": "sysctl-02",
@@ -109,7 +113,8 @@
             "code_desc": "",
             "run_time": 0
           }
-        ]
+        ],
+        "string_tags": []
       },
       {
         "id": "sysctl-03",
@@ -120,7 +125,8 @@
             "code_desc": "",
             "run_time": 0
           }
-        ]
+        ],
+        "string_tags": []
       }
     ],
     "controls_sums": {

@@ -31,7 +31,28 @@ func TestSummary(t *testing.T) {
         "impact": 0,
         "title": "Checking for something1",
         "refs": [],
-        "tags": {},
+        "tags": {
+					"firewall": null,
+					"gtitle": "SRG-OS-000023-GPOS-00006",
+					"satisfies": [
+						"SRG-OS-000023-GPOS-00006",
+						"SRG-OS-000024-GPOS-00007"
+					],
+					"gid": "V-71863",
+					"rid": "SV-86487r2_rule",
+					"stig_id": "RHEL-07-010050",
+					"cci": [
+						"CCI-000048"
+					],
+					"hashy": {
+						"bad.one": [6]
+					},
+					"documentable": false,
+					"nist": [
+						"AC-8 a",
+						"Rev_4"
+					]
+				},
         "code": "control 'ctrl-01' do ...",
         "results":[
           {
@@ -47,7 +68,7 @@ func TestSummary(t *testing.T) {
       },{
         "id":"ctrl-02",
         "refs": [],
-        "tags": {},
+        "tags": { "tag1": "value1" },
         "impact": 0.8,
         "results":[ {"status":"failed"}, {"status":"passed"} ]
       },{
@@ -75,8 +96,6 @@ func TestSummary(t *testing.T) {
 	  "name":"profile2",
     "version":"2.2.2",
     "sha256":"9490b16f32922b284a82a36d4f111e1474fcd9b53c4689f77de7ef68a1664487",
-    "tags":{},
-    "refs":[],
     "controls":[
       {
         "id":"sysctl-01",
@@ -275,7 +294,7 @@ func TestStrLimitBytes(t *testing.T) {
 
 func parseProfile(js *string) *inspec.Profile {
 	var p inspec.Profile
-	err := json.Unmarshal([]byte(*js), &p)
+	err := (&jsonpb.Unmarshaler{}).Unmarshal(strings.NewReader(*js), &p)
 	if err != nil {
 		panic(fmt.Sprintf("Error unmarshalling profile: %s", err))
 	}
