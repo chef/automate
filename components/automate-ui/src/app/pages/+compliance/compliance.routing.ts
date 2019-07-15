@@ -17,23 +17,23 @@ const routes: Routes = [
       },
       {
         path: 'reporting',
-        loadChildren: './+reporting/reporting.module#ReportingModule'
+        loadChildren: () => import('./+reporting/reporting.module').then(m => m.ReportingModule)
       },
       {
         path: 'reports',
-        loadChildren: './+reporting/reporting.module#ReportingModule'
+        loadChildren: () => import('./+reporting/reporting.module').then(m => m.ReportingModule)
       },
       {
         path: 'scanner',
-        loadChildren: './+scanner/scanner.module#ScannerModule'
+        loadChildren: () => import('./+scanner/scanner.module').then(m => m.ScannerModule)
       },
       {
         path: 'scan-jobs',
-        loadChildren: './+scanner/scanner.module#ScannerModule'
+        loadChildren: () => import('./+scanner/scanner.module').then(m => m.ScannerModule)
       },
       {
         path: 'compliance-profiles',
-        loadChildren: './+profile/profile.module#ProfileModule'
+        loadChildren: () => import('./+profile/profile.module').then(m => m.ProfileModule)
       }
     ]
   }
