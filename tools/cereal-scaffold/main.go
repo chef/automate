@@ -263,6 +263,7 @@ func runSimpleWorkflow(_ *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	defer manager.Stop()
 
 	manager.RegisterWorkflowExecutor("simple-workflow", &SimpleWorkflow{})
 	manager.RegisterTaskExecutor("simple task", &SimpleTask{}, cereal.TaskExecutorOpts{
@@ -341,6 +342,8 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	defer manager.Stop()
+
 	manager.RegisterWorkflowExecutor("schedule-test", &ScheduleTestWorkflow{})
 	manager.RegisterTaskExecutor("test task", &ScheduleTestTask{}, cereal.TaskExecutorOpts{
 		Workers: simpleWorkflowOpts.DequeueWorkerCount,
