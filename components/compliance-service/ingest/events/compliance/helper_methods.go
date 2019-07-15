@@ -115,7 +115,7 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec.Profile, profilesSums [
 				fmt.Printf("\n\n* fKey=%s fValue=%+v", fKey, fValue)
 				fmt.Printf("\n* GetKey=%s", fValue.GetKind())
 				// Add key with a null value as an empty Values array
-				if fmt.Sprintf("%s", fValue.GetKind()) == "&{NULL_VALUE}" {
+				if _, isNullValue := fValue.GetKind().(*structpb.Value_NullValue); isNullValue {
 					stringTags = append(stringTags, relaxting.ESInSpecReportControlStringTags{
 						Key:    fKey,
 						Values: make([]string, 0),
