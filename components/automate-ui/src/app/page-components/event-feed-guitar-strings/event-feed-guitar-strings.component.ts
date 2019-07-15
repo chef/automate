@@ -279,8 +279,8 @@ export class EventFeedGuitarStringsComponent implements OnInit, OnDestroy, OnCha
   endSliderPosition = 100;
   sliderGrid = 100 / this.buttonDates.length;
   sliderWidth: number;
-  @ViewChild('startSlider') startSlider: ElementRef;
-  @ViewChild('endSlider') endSlider: ElementRef;
+  @ViewChild('startSlider', { static: true }) startSlider: ElementRef;
+  @ViewChild('endSlider', { static: true }) endSlider: ElementRef;
 
   constructor(private el: ElementRef) {}
 

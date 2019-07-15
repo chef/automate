@@ -26,7 +26,7 @@ export class OverviewFailuresComponent implements OnChanges, OnDestroy {
 
   @Output() itemSelected: EventEmitter<any> = new EventEmitter<any>();
 
-  @ViewChild('svg') svg;
+  @ViewChild('svg', { static: true }) svg;
 
   id: string;
 

@@ -19,7 +19,7 @@ import { JsonTreeComponent } from '../json-tree/json-tree.component';
 export class AttributesComponent implements OnInit {
   @Input() nodeId: string;
 
-  @ViewChild(JsonTreeComponent)
+  @ViewChild(JsonTreeComponent, { static: true })
   tree: JsonTreeComponent;
 
   selected_level = 'all';
