@@ -1,4 +1,13 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, Renderer2} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+  ElementRef,
+  Renderer2
+} from '@angular/core';
 import { clamp } from 'lodash';
 import { Subject, Observable, of as observableOf } from 'rxjs';
 import {
@@ -22,8 +31,8 @@ export class ReportingSearchbarComponent implements OnInit {
   @Output() filterAdded = new EventEmitter();
   @Output() dateChanged = new EventEmitter();
 
-  @ViewChild('keyInput') keyInput:ElementRef;
-  @ViewChild('valInput') valInput:ElementRef;
+  @ViewChild('keyInput') keyInput: ElementRef;
+  @ViewChild('valInput') valInput: ElementRef;
 
   private suggestionsVisibleStream = new Subject<boolean>();
   private suggestionSearchTermDebounce = new Subject<any>();
@@ -66,10 +75,10 @@ export class ReportingSearchbarComponent implements OnInit {
       }
       this.isLoadingSuggestions = true;
       setTimeout(() => {
-        this.isLoadingSuggestions = false;  
+        this.isLoadingSuggestions = false;
       }, 500);
       setTimeout(() => {
-        this.delayForNoSuggestions = true;  
+        this.delayForNoSuggestions = true;
       }, 800);
     });
   }
@@ -222,7 +231,7 @@ export class ReportingSearchbarComponent implements OnInit {
       }
     }
     this.showKeyInput();
-    setTimeout(() => { this.renderer.selectRootElement('#keyInput').focus();}, 10);
+    setTimeout(() => { this.renderer.selectRootElement('#keyInput').focus(); }, 10);
   }
 
   pressDefaultText(currentText: string): void {
@@ -261,7 +270,7 @@ export class ReportingSearchbarComponent implements OnInit {
       }
     } else {
       if (this.keyInput.nativeElement.value === '') {
-        this.clearFilterCategories()
+        this.clearFilterCategories();
       } else {
         this.updateVisibleCategories(currentText);
       }
@@ -307,12 +316,12 @@ export class ReportingSearchbarComponent implements OnInit {
         value: value
       }
     });
-    
+
     event.stopPropagation();
     this.showKeyInput();
     this.inputText = '';
     this.keyInput.nativeElement.value = '';
-    setTimeout(() => { this.renderer.selectRootElement('#keyInput').focus();}, 10);
+    setTimeout(() => { this.renderer.selectRootElement('#keyInput').focus(); }, 10);
     this.suggestionsVisibleStream.next(false);
   }
 
