@@ -64,7 +64,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Ngx.Http.TcpNodelay = w.String("on")
 	c.V1.Sys.Ngx.Http.TcpNopush = w.String("on")
 
-	c.V1.Sys.Ngx.Http.SslProtocols = w.String("TLSv1.2")
+	c.V1.Sys.Ngx.Http.SslProtocols = w.String("TLSv1.2 TLSv1.3")
 	c.V1.Sys.Ngx.Http.SslCiphers = w.String(ac.InternalCipherSuite)
 	c.V1.Sys.Ngx.Http.SslVerifyDepth = w.Int32(2)
 

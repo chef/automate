@@ -33,7 +33,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Ngx.Http.ClientBodyBufferSize = w.String("16k")
 
 	c.V1.Sys.Ngx.Http.SslCiphers = w.String(ac.InternalCipherSuite)
-	c.V1.Sys.Ngx.Http.SslProtocols = w.String("TLSv1.2")
+	c.V1.Sys.Ngx.Http.SslProtocols = w.String("TLSv1.2 TLSv1.3")
 	return c
 }
 
