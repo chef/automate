@@ -358,13 +358,13 @@ func (p *pg) associatePolicyWithProjects(ctx context.Context,
 	// TODO this might be simplified as we modify how projects are assigned
 	// Drop any existing associations.
 	_, err := q.ExecContext(ctx,
-		`DELETE FROM iam_policy_projects WHERE policy_id=policy_db_id($1);`, policyID)
+		"DELETE FROM iam_policy_projects WHERE policy_id=policy_db_id($1)", policyID)
 	if err != nil {
 		return err
 	}
 	for _, project := range inProjects {
 		_, err := q.ExecContext(ctx,
-			`INSERT INTO iam_policy_projects (policy_id, project_id) VALUES (policy_db_id($1), $2)`,
+			`INSERT INTO iam_policy_projects (policy_id, project_id) VALUES (policy_db_id($1), project_db_id($2))`,
 			&policyID, &project)
 		if err != nil {
 			err = p.processError(err)
@@ -401,10 +401,8 @@ func (p *pg) queryPolicy(ctx context.Context, id string, q Querier) (*v2.Policy,
 	}
 
 	var pol v2.Policy
-	row := q.QueryRowContext(ctx,
-		`SELECT query_policy from query_policy($1, $2);`, id, pq.Array(projectsFilter))
-	err = row.Scan(&pol)
-	if err != nil {
+	if err := q.QueryRowContext(ctx, "SELECT query_policy($1, $2)", id, pq.Array(projectsFilter)).
+		Scan(&pol); err != nil {
 		return nil, err
 	}
 	return &pol, nil
