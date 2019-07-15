@@ -21,6 +21,56 @@ import (
 // OK        | Else if all services are 'Ok'
 // ---------------------------------------------------------------------
 const (
+	// @afiune IDEA: Bring back the main query. The explanation why is below.
+	mainSelectServiceGroupHealth = `
+SELECT *
+  ,(CASE WHEN health_critical > 0 THEN '1_CRITICAL'
+         WHEN health_unknown  > 0 THEN '2_UNKNOWN'
+         WHEN health_warning  > 0 THEN '3_WARNING'
+         ELSE '4_OK' END ) as health
+FROM (
+  SELECT  sg.id
+    ,sg.deployment_id
+    ,sg.name as name
+    ,COUNT(s.health) FILTER (WHERE s.health = 'OK') AS health_ok
+    ,COUNT(s.health) FILTER (WHERE s.health = 'CRITICAL') AS health_critical
+    ,COUNT(s.health) FILTER (WHERE s.health = 'WARNING') AS health_warning
+    ,COUNT(s.health) FILTER (WHERE s.health = 'UNKNOWN') AS health_unknown
+    ,COUNT(s.health) AS health_total
+    ,round((COUNT(s.health) FILTER (WHERE s.health = 'OK')
+          / COUNT(s.health)::float) * 100) as percent_ok
+    ,(SELECT array_agg(DISTINCT CONCAT (s.package_ident))
+        FROM service AS s
+       WHERE s.group_id = sg.id) AS releases
+    ,d.app_name as app_name
+    ,d.environment as environment
+  FROM service_group AS sg
+  JOIN service AS s
+       ON s.group_id = sg.id
+  JOIN deployment as d
+       ON sg.deployment_id = d.id
+
+  -- @afiune my idea here is that we can put back the main big select that we moved to be a view
+  -- so that you can inject the filters through WHERE statements, these statements can be composed
+  -- in the same maner we are building the where statements in the services.go file at:
+  -- => https://github.com/chef/automate/blob/master/components/applications-service/pkg/storage/postgres/services.go#L241-L258
+
+  WHERE
+  -- Here is where we can add filters specifically for service
+    sg.id IN (SELECT DISTINCT group_id FROM service WHERE origin = 'custom' AND name = 'nginx')
+
+  AND
+  -- Here is where we can add filters specifically for deployment
+    sg.deployment_id IN (SELECT DISTINCT id FROM deployment WHERE app_name = 'demo' AND environment = 'demo')
+
+  AND
+  -- Here is where we can add filters specifically for service_group itself
+    sg.name = 'nginx.dev'
+
+  GROUP BY sg.id, sg.deployment_id, sg.name, d.app_name, d.environment
+) as service_groups_health_calculation
+`
+
 	// The service-group queries are based on a view which:
 	// 1) Counts health of services (How many ok, critical, warning and unknown) and its total
 	// 2) Calculates the percentage of services with an ok health.
@@ -48,24 +98,24 @@ const (
                AND health_warning  = 0
                AND health_unknown  = 0
        ) AS ok
-FROM service_group_health AS service_group_health_counts
+FROM (` + mainSelectServiceGroupHealth + `) AS service_group_health_counts
 `
 
 	selectServiceGroupHealthWithPageSort = `
-SELECT * FROM service_group_health AS service_group_health
+SELECT * FROM (` + mainSelectServiceGroupHealth + `) AS service_group_health
  ORDER BY %s
  LIMIT $1
 OFFSET $2
 `
 	selectServiceGroupHealthFilterCRITICAL = `
-SELECT * FROM service_group_health AS service_group_health
+SELECT * FROM (` + mainSelectServiceGroupHealth + `) AS service_group_health
  WHERE health_critical > 0
  ORDER BY %s
  LIMIT $1
 OFFSET $2
 `
 	selectServiceGroupHealthFilterUNKNOWN = `
-SELECT * FROM service_group_health AS service_group_health
+SELECT * FROM (` + mainSelectServiceGroupHealth + `) AS service_group_health
  WHERE health_unknown  > 0
    AND health_critical = 0
  ORDER BY %s
@@ -73,7 +123,7 @@ SELECT * FROM service_group_health AS service_group_health
 OFFSET $2
 `
 	selectServiceGroupHealthFilterWARNING = `
-SELECT * FROM service_group_health AS service_group_health
+SELECT * FROM (` + mainSelectServiceGroupHealth + `) AS service_group_health
  WHERE health_warning  > 0
    AND health_critical = 0
    AND health_unknown  = 0
@@ -82,7 +132,7 @@ SELECT * FROM service_group_health AS service_group_health
 OFFSET $2
 `
 	selectServiceGroupHealthFilterOK = `
-SELECT * FROM service_group_health AS service_group_health
+SELECT * FROM (` + mainSelectServiceGroupHealth + `) AS service_group_health
  WHERE health_ok > 0
    AND health_critical = 0
    AND health_warning  = 0
