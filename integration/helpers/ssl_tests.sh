@@ -4,13 +4,11 @@ run_ssl_scan() {
     install_testssl_prereqs
     if [[ ! -d "/testssl.sh" ]]; then
        pushd "/"
-         hab pkg exec core/git git clone -n https://github.com/drwetter/testssl.sh.git
+         hab pkg exec core/git git clone --depth 1 https://github.com/drwetter/testssl.sh.git
        popd
     fi
     local testssl_last_commit
     pushd /testssl.sh
-      # Pin testssl.sh to last known good version. PH Feb 11 2019
-      hab pkg exec core/git git checkout 691ca28bb9f63ab586a2b0b711cd19d456f0df7a
       testssl_last_commit=$(hab pkg exec core/git git log -1 --format=%cd)
       fixup_testssl
       hostfile=$(write_host_file)
