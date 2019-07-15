@@ -6,7 +6,9 @@ import (
 	"github.com/chef/automate/api/external/applications"
 	version "github.com/chef/automate/api/external/common/version"
 	"github.com/chef/automate/components/automate-gateway/protobuf"
+
 	"github.com/golang/protobuf/proto"
+	log "github.com/sirupsen/logrus"
 )
 
 // Applications - the applications service data structure
@@ -24,18 +26,24 @@ func NewApplicationsHandler(applicationsClient applications.ApplicationsServiceC
 // GetServiceGroupsHealthCounts returns the health counts from all service groups
 func (a *Applications) GetServiceGroupsHealthCounts(
 	ctx context.Context,
-	in *applications.ServiceGroupsHealthCountsReq) (*applications.HealthCounts, error) {
+	request *applications.ServiceGroupsHealthCountsReq) (*applications.HealthCounts, error) {
 
-	inDomain := &applications.ServiceGroupsHealthCountsReq{}
-	out := &applications.HealthCounts{}
-	f := func() (proto.Message, error) {
-		return a.client.GetServiceGroupsHealthCounts(ctx, inDomain)
-	}
-	err := protobuf.CallDomainService(in, inDomain, f, out)
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	response, err := a.client.GetServiceGroupsHealthCounts(ctx, &applications.ServiceGroupsHealthCountsReq{})
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	return &applications.HealthCounts{
+		Total:    response.Total,
+		Ok:       response.Ok,
+		Warning:  response.Warning,
+		Critical: response.Critical,
+		Unknown:  response.Unknown,
+	}, nil
 }
 
 // GetServiceGroups returns a list of service groups
