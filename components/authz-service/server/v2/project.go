@@ -185,6 +185,7 @@ func (s *ProjectState) ApplyRulesStart(
 			"failed to parse state of rule apply")
 	}
 
+	s.log.Info("apply project rules: START")
 	err := s.store.ApplyStagedRules(ctx)
 	if err != nil {
 		s.log.Warnf("error applying staged projects: %s", err.Error())

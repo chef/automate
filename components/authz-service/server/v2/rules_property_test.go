@@ -22,7 +22,7 @@ import (
 
 const (
 	idRegex        = "^[a-z0-9-]{1,64}$"
-	conditionLimit = 10 // avoid the grpc limit of 4194304
+	conditionLimit = 10 // help avoid the grpc limit of 4194304
 )
 
 type projectAndRuleReq struct {
@@ -633,9 +633,25 @@ func createRules(ctx context.Context, cl api.ProjectsClient, rules []api.CreateR
 
 func reportRules(t *testing.T, rules []api.CreateRuleReq) {
 	t.Helper()
-	outputs := make([]string, len(rules))
-	for i, rule := range rules {
-		outputs[i] = fmt.Sprintf("%d", len(rule.Conditions))
+	condCount := 0
+	valueCount := 0
+	ruleBytes := 0
+	valueBytes := 0
+	for _, rule := range rules {
+		condCount += len(rule.Conditions)
+		ruleBytes += rule.XXX_Size()
+		for _, c := range rule.Conditions {
+			valueCount += len(c.Values)
+			for _, v := range c.Values {
+				valueBytes += size(v)
+			}
+		}
 	}
-	t.Logf(fmt.Sprintf("%d rules with condition counts: %s", len(rules), strings.Join(outputs, ", ")))
+	t.Logf("===> %d rules, bytes=%d, avg/rule=%d, %d conditions, avg/rule=%d, %d values, avg/rule=%d, avg/cond=%d, bytes=%d, avg/value=%d",
+		len(rules), ruleBytes, (ruleBytes / len(rules)),
+		condCount, condCount/len(rules), valueCount, valueCount/len(rules), valueCount/condCount, valueBytes, valueBytes/valueCount)
+}
+
+func size(s string) int {
+	return len([]byte(s))
 }
