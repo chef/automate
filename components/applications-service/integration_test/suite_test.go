@@ -12,7 +12,8 @@ import (
 
 	"github.com/chef/automate/api/external/habitat"
 	"github.com/chef/automate/components/applications-service/pkg/config"
-	"github.com/chef/automate/components/applications-service/pkg/ingest"
+	"github.com/chef/automate/components/applications-service/pkg/ingester"
+	ingest "github.com/chef/automate/components/applications-service/pkg/ingester/v1"
 	"github.com/chef/automate/components/applications-service/pkg/server"
 	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/chef/automate/components/applications-service/pkg/storage/postgres"
@@ -31,7 +32,7 @@ import (
 // * Ingester: The mechanism to ingest messages to our system
 type Suite struct {
 	ApplicationsServer *server.ApplicationsServer
-	Ingester           *ingest.Ingester
+	Ingester           ingester.Client
 	StorageClient      storage.Client
 }
 
@@ -91,7 +92,7 @@ func NewSuite(database string) *Suite {
 	// ```
 	// res, err := suite.ApplicationsServer.GetServicesHealthCounts(ctx, &req)
 	// ```
-	s.ApplicationsServer = server.New(s.StorageClient)
+	s.ApplicationsServer = server.New(s.StorageClient, s.Ingester)
 
 	return s
 }
@@ -117,6 +118,16 @@ func (s *Suite) DeleteDataFromStorage() {
 
 // IngestService ingests a single HealthCheckEvent message into the database
 func (s *Suite) IngestService(event *habitat.HealthCheckEvent) {
+	eventsProcessed := s.Ingester.EventsProcessed()
+	bytes, err := proto.Marshal(event)
+	if err != nil {
+		fmt.Printf("Error trying to ingest hab service event: %s\n", err)
+	}
+	s.Ingester.IngestMessage(bytes)
+	s.WaitForEventsToProcess(eventsProcessed + 1)
+}
+
+func (s *Suite) IngestServiceViaStorageClient(event *habitat.HealthCheckEvent) {
 	err := s.StorageClient.IngestHealthCheckEvent(event)
 	if err != nil {
 		fmt.Printf("Error trying to ingest hab service event: %s\n", err)

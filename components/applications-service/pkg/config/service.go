@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/chef/automate/components/applications-service/pkg/ingester"
 	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/chef/automate/lib/tls/certs"
 
@@ -16,6 +17,7 @@ type Applications struct {
 	Postgres         `mapstructure:"postgres"`
 	*certs.TLSConfig `mapstructure:"tls"`
 	storageClient    storage.Client
+	ingesterClient   ingester.Client
 }
 
 // Service is a base config options struct for all services
@@ -38,6 +40,16 @@ type Postgres struct {
 	URI        string `mapstructure:"uri"`
 	Database   string `mapstructure:"database"`
 	SchemaPath string `mapstructure:"schema_path"`
+}
+
+// SetIngester sets the ingester client for the service
+func (s *Applications) SetIngester(i ingester.Client) {
+	s.ingesterClient = i
+}
+
+// GetIngester returns the ingester client for the service
+func (s *Applications) GetIngester() ingester.Client {
+	return s.ingesterClient
 }
 
 // SetStorage sets the storage client for the service

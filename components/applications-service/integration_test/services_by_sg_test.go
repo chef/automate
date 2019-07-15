@@ -170,21 +170,19 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 					Channel: c, UpdateStrategy: none, Site: s,
 				},
 				{
-					SupervisorId: "sup2",
-					Group:        "myapp.default",
-					Release:      "core/myapp/0.1.0/20190101121212",
-					Status:       applications.ServiceStatus_RUNNING,
-					HealthCheck:  applications.HealthStatus_OK,
-					Application:  a, Environment: e, Fqdn: "",
+					Group:       "myapp.default",
+					Release:     "core/myapp/0.1.0/20190101121212",
+					Status:      applications.ServiceStatus_RUNNING,
+					HealthCheck: applications.HealthStatus_OK,
+					Application: a, Environment: e, Fqdn: "",
 					Channel: c, UpdateStrategy: none, Site: s,
 				},
 				{
-					SupervisorId: "sup3",
-					Group:        "myapp.default",
-					Release:      "core/myapp/0.1.0/20190101121212",
-					Status:       applications.ServiceStatus_RUNNING,
-					HealthCheck:  applications.HealthStatus_OK,
-					Application:  a, Environment: e, Fqdn: "",
+					Group:       "myapp.default",
+					Release:     "core/myapp/0.1.0/20190101121212",
+					Status:      applications.ServiceStatus_RUNNING,
+					HealthCheck: applications.HealthStatus_OK,
+					Application: a, Environment: e, Fqdn: "",
 					Channel: c, UpdateStrategy: none, Site: s,
 				},
 			},
@@ -227,30 +225,27 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 			ServicesHealthCounts: &applications.HealthCounts{Total: 3, Ok: 3},
 			Services: []*applications.Service{
 				{
-					SupervisorId: "sup1",
-					Group:        "redis.default",
-					Release:      "core/redis/0.1.0/20190101121212",
-					Status:       applications.ServiceStatus_RUNNING,
-					HealthCheck:  applications.HealthStatus_OK,
-					Application:  a, Environment: e, Fqdn: "",
+					Group:       "redis.default",
+					Release:     "core/redis/0.1.0/20190101121212",
+					Status:      applications.ServiceStatus_RUNNING,
+					HealthCheck: applications.HealthStatus_OK,
+					Application: a, Environment: e, Fqdn: "",
 					Channel: "stable", UpdateStrategy: "ROLLING", Site: s,
 				},
 				{
-					SupervisorId: "sup2",
-					Group:        "redis.default",
-					Release:      "core/redis/0.1.0/20190101121212",
-					Status:       applications.ServiceStatus_RUNNING,
-					HealthCheck:  applications.HealthStatus_OK,
-					Application:  a, Environment: e, Fqdn: "",
+					Group:       "redis.default",
+					Release:     "core/redis/0.1.0/20190101121212",
+					Status:      applications.ServiceStatus_RUNNING,
+					HealthCheck: applications.HealthStatus_OK,
+					Application: a, Environment: e, Fqdn: "",
 					Channel: "stable", UpdateStrategy: "ROLLING", Site: s,
 				},
 				{
-					SupervisorId: "sup3",
-					Group:        "redis.default",
-					Release:      "core/redis/0.1.0/20190101121212",
-					Status:       applications.ServiceStatus_RUNNING,
-					HealthCheck:  applications.HealthStatus_OK,
-					Application:  a, Environment: e, Fqdn: "",
+					Group:       "redis.default",
+					Release:     "core/redis/0.1.0/20190101121212",
+					Status:      applications.ServiceStatus_RUNNING,
+					HealthCheck: applications.HealthStatus_OK,
+					Application: a, Environment: e, Fqdn: "",
 					Channel: "stable", UpdateStrategy: "ROLLING", Site: s,
 				},
 			},
@@ -279,7 +274,7 @@ func TestGetServicesBySGMultiService(t *testing.T) {
 
 		for i, sg := range sgList {
 
-			t.Run(fmt.Sprintf("verifying service group %d", sg.ID), func(t *testing.T) {
+			t.Run(fmt.Sprintf("verifying service group %s", sg.Name), func(t *testing.T) {
 				var (
 					ctx     = context.Background()
 					request = &applications.ServicesBySGReq{ServiceGroupId: sg.ID}
@@ -496,7 +491,7 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 		for i, sg := range sgList {
 
 			// OK Health
-			t.Run(fmt.Sprintf("verifying service group %d with health:OK", sg.ID), func(t *testing.T) {
+			t.Run(fmt.Sprintf("verifying service group %s with health:OK", sg.Name), func(t *testing.T) {
 				var (
 					ctx     = context.Background()
 					request = &applications.ServicesBySGReq{
@@ -513,7 +508,7 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 			})
 
 			// CRITICAL Health
-			t.Run(fmt.Sprintf("verifying service group %d with health:CRITICAL", sg.ID), func(t *testing.T) {
+			t.Run(fmt.Sprintf("verifying service group %s with health:CRITICAL", sg.Name), func(t *testing.T) {
 				var (
 					ctx     = context.Background()
 					request = &applications.ServicesBySGReq{
@@ -530,7 +525,7 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 			})
 
 			// WARNING Health
-			t.Run(fmt.Sprintf("verifying service group %d with health:WARNING", sg.ID), func(t *testing.T) {
+			t.Run(fmt.Sprintf("verifying service group %s with health:WARNING", sg.Name), func(t *testing.T) {
 				var (
 					ctx     = context.Background()
 					request = &applications.ServicesBySGReq{
@@ -547,7 +542,7 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 			})
 
 			// UNKNOWN Health
-			t.Run(fmt.Sprintf("verifying service group %d with health:UNKNOWN", sg.ID), func(t *testing.T) {
+			t.Run(fmt.Sprintf("verifying service group %s with health:UNKNOWN", sg.Name), func(t *testing.T) {
 				var (
 					ctx     = context.Background()
 					request = &applications.ServicesBySGReq{

@@ -23,6 +23,7 @@ func TestStatsWhenEmpty(t *testing.T) {
 			TotalSupervisors:   0,
 		}
 	)
+
 	response, err := suite.ApplicationsServer.GetServicesStats(ctx, request)
 	assert.Nil(t, err)
 	assert.Equal(t, expected, response)
@@ -43,6 +44,7 @@ func TestStatsWithOne(t *testing.T) {
 			withPackageIdent("core/postgres/0.1.0/20190101121212"),
 		)
 	)
+
 	suite.IngestService(mockHabService)
 	defer suite.DeleteDataFromStorage()
 

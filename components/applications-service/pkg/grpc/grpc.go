@@ -36,7 +36,7 @@ func Spawn(c *config.Applications, connFactory *secureconn.Factory) error {
 func NewGRPCServer(connFactory *secureconn.Factory, c *config.Applications) *grpc.Server {
 	grpcServer := connFactory.NewServer()
 
-	applicationsServer := server.New(c.GetStorage())
+	applicationsServer := server.New(c.GetStorage(), c.GetIngester())
 	applications.RegisterApplicationsServiceServer(grpcServer, applicationsServer)
 
 	health.RegisterHealthServer(grpcServer, applicationsServer.Health())
