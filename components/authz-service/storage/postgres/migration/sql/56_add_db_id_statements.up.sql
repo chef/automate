@@ -19,7 +19,7 @@ SET
 ALTER TABLE iam_statements
     DROP CONSTRAINT iam_statements_pkey;
 ALTER TABLE iam_statements
-    ADD COLUMN db_id SERIAL PRIMARY KEY UNIQUE,
+    ADD COLUMN db_id SERIAL PRIMARY KEY,
     ADD COLUMN policy_id INTEGER REFERENCES iam_policies(db_id) ON DELETE CASCADE DEFERRABLE,
     ADD UNIQUE (id);
 UPDATE
@@ -38,19 +38,20 @@ ALTER TABLE iam_statement_projects
     ADD CONSTRAINT iam_statement_projects_statement_id_fkey FOREIGN KEY (statement_id) REFERENCES iam_statements(id) ON DELETE CASCADE DEFERRABLE;
 
 -- add helper for statement db_id lookup
-CREATE FUNCTION statement_db_id (_id UUID)
-    RETURNS INTEGER
+CREATE OR REPLACE FUNCTION statement_db_id (_id iam_statements.id % TYPE, OUT _db_id iam_statements.db_id % TYPE)
+    RETURNS iam_statements.db_id % TYPE
     AS $$
+BEGIN
     SELECT
-        db_id
+        db_id INTO STRICT _db_id
     FROM
         iam_statements
     WHERE
         id = _id;
+END;
 $$
-LANGUAGE SQL;
-
- CREATE OR REPLACE FUNCTION query_policy (_policy_id TEXT, _projects_filter TEXT[])
+LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION query_policy (_policy_id TEXT, _projects_filter TEXT[])
     RETURNS json
     AS $$
     WITH temp AS (
@@ -109,7 +110,7 @@ WHERE
 $$
 LANGUAGE sql;
 
- CREATE OR REPLACE FUNCTION query_policies (_projects_filter TEXT[])
+CREATE OR REPLACE FUNCTION query_policies (_projects_filter TEXT[])
     RETURNS SETOF json
     AS $$
     WITH temp AS (
@@ -165,16 +166,16 @@ WHERE
 $$
 LANGUAGE sql;
 
- CREATE OR REPLACE FUNCTION
-  insert_iam_statement_into_policy(_policy_id TEXT, _statement_id UUID, _statement_effect iam_effect, _statement_actions TEXT[],
-  _statement_resources TEXT[], _statement_role TEXT, _statement_projects TEXT[])
-  RETURNS void AS $$
-    INSERT INTO iam_statements (policy_id, id, effect, actions, resources, role)
-      VALUES (policy_db_id(_policy_id), _statement_id, _statement_effect, _statement_actions, _statement_resources, _statement_role);
-
-     INSERT INTO iam_statement_projects (statement_id, project_id) 
-    SELECT _statement_id s_id, p_id
-    FROM UNNEST(_statement_projects) p_id ON CONFLICT DO NOTHING
-
- $$ LANGUAGE sql;
+CREATE OR REPLACE FUNCTION
+    insert_iam_statement_into_policy(_policy_id TEXT, _statement_id UUID, _statement_effect iam_effect, _statement_actions TEXT[],
+    _statement_resources TEXT[], _statement_role TEXT, _statement_projects TEXT[])
+        RETURNS void AS $$
+            INSERT INTO iam_statements (policy_id, id, effect, actions, resources, role)
+            VALUES (policy_db_id(_policy_id), _statement_id, _statement_effect, _statement_actions, _statement_resources, _statement_role);
+                INSERT INTO iam_statement_projects (statement_id, project_id) 
+                SELECT _statement_id s_id, p_id
+                FROM UNNEST(_statement_projects) p_id
+            ON CONFLICT DO NOTHING
+$$
+LANGUAGE sql;
 COMMIT; 

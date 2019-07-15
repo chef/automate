@@ -2527,7 +2527,6 @@ func TestUpdatePolicy(t *testing.T) {
 			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
 			VALUES ($1, 'deny'::iam_effect, array['iam:users:create', 'iam:users:delete'], array['iam:users'], (SELECT * FROM policy_db_id));`, genUUID(t), polID0)
 			require.NoError(t, err)
-			require.NoError(t, err)
 			insertTestPolicyMember(t, db, polID0, "user:local:albertine")
 
 			polID := genSimpleID(t, prngSeed)
