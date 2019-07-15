@@ -2,9 +2,10 @@ BEGIN;
 ALTER TABLE iam_policy_projects
     DROP CONSTRAINT iam_policy_projects_project_id_fkey;
 ALTER TABLE iam_policy_projects RENAME COLUMN project_id TO project_temp_id;
-ALTER TABLE iam_policy_projects ADD COLUMN project_id SERIAL;
-
-UPDATE iam_policy_projects t
+ALTER TABLE iam_policy_projects
+    ADD COLUMN project_id SERIAL;
+UPDATE
+    iam_policy_projects t
 SET
     project_id = (
         SELECT
@@ -15,10 +16,9 @@ SET
             id = t.project_temp_id);
 ALTER TABLE iam_policy_projects
     DROP COLUMN project_temp_id;
-
-ALTER TABLE iam_policy_projects ADD CONSTRAINT "iam_policy_projects_policy_id_project_id_unique" UNIQUE (policy_id, project_id);
-
-CREATE OR REPLACE FUNCTION policy_projects(_policy_id iam_policies.id%TYPE, OUT _project_ids TEXT[])
+ALTER TABLE iam_policy_projects
+    ADD CONSTRAINT "iam_policy_projects_policy_id_project_id_unique" UNIQUE (policy_id, project_id);
+CREATE OR REPLACE FUNCTION policy_projects (_policy_id iam_policies.id % TYPE, OUT _project_ids TEXT[])
     RETURNS TEXT[]
     AS $$
 DECLARE
@@ -38,8 +38,8 @@ BEGIN
     WHERE
         pp.policy_id = policy_db_id;
 END;
-$$ LANGUAGE plpgsql;
-
+$$
+LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION query_policy (_policy_id TEXT, _projects_filter TEXT[])
     RETURNS json
     AS $$
@@ -63,12 +63,14 @@ CREATE OR REPLACE FUNCTION query_policy (_policy_id TEXT, _projects_filter TEXT[
                                 COALESCE(json_agg(proj.id) FILTER (WHERE proj.id IS NOT NULL),
                                     '[]')
                                 FROM iam_statement_projects AS stmt_projs
-                            LEFT OUTER JOIN iam_projects AS proj ON stmt_projs.statement_id = stmt.id WHERE stmt_projs.project_id = proj.id) AS projects
-                    FROM iam_statements stmt
-                    INNER JOIN iam_policies
-                    ON stmt.policy_id=pol.db_id
+                            LEFT OUTER JOIN iam_projects AS proj ON stmt_projs.statement_id = stmt.id WHERE stmt_projs.project_id = proj.id) AS projects FROM iam_statements stmt
+                    INNER JOIN iam_policies ON stmt.policy_id = pol.db_id
                 GROUP BY
-                    stmt.id, stmt.effect, stmt.actions, stmt.resources, stmt.role)
+                    stmt.id,
+                    stmt.effect,
+                    stmt.actions,
+                    stmt.resources,
+                    stmt.role)
             SELECT
                 array_agg(statement_rows) FILTER (WHERE statement_rows.id IS NOT NULL)
             FROM statement_rows) AS statements,
@@ -98,7 +100,6 @@ WHERE
     projects_match (temp.projects::TEXT[], _projects_filter);
 $$
 LANGUAGE sql;
-
 CREATE OR REPLACE FUNCTION query_policies (_projects_filter TEXT[])
     RETURNS SETOF json
     AS $$
@@ -120,12 +121,14 @@ CREATE OR REPLACE FUNCTION query_policies (_projects_filter TEXT[])
                                 COALESCE(json_agg(proj.id) FILTER (WHERE proj.id IS NOT NULL),
                                     '[]')
                                 FROM iam_statement_projects AS stmt_projs
-                            LEFT OUTER JOIN iam_projects AS proj ON stmt_projs.statement_id = stmt.id WHERE stmt_projs.project_id = proj.id) AS projects
-                    FROM iam_statements stmt
-                    INNER JOIN iam_policies
-                    ON stmt.policy_id=pol.db_id
+                            LEFT OUTER JOIN iam_projects AS proj ON stmt_projs.statement_id = stmt.id WHERE stmt_projs.project_id = proj.id) AS projects FROM iam_statements stmt
+                    INNER JOIN iam_policies ON stmt.policy_id = pol.db_id
                 GROUP BY
-                    stmt.id, stmt.effect, stmt.actions, stmt.resources, stmt.role
+                    stmt.id,
+                    stmt.effect,
+                    stmt.actions,
+                    stmt.resources,
+                    stmt.role
 )
             SELECT
                 array_agg(statement_rows) FILTER (WHERE statement_rows.id IS NOT NULL)
