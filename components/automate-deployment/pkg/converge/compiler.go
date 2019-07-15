@@ -498,7 +498,7 @@ func (phase *RunningPhase) Run(writer *eventWriter) error {
 
 		// Reload the service if we are not already deployed
 		// or if we are out of date.
-		reloadNeeded := !deployed || pkgOutOfDate(deployedService, step.pkg)
+		reloadNeeded := !deployed || pkgOutOfDate(deployedService, step.pkg) || restartMitigation.IsStopped(step.pkg)
 
 		// Also reload the service if it requires a reload to
 		// safely reconfigure.
