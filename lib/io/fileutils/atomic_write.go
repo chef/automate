@@ -101,7 +101,7 @@ func NewAtomicWriter(p string, opts ...AtomicWriteOpt) (WriteCloserFailer, error
 	if writeOpts.chown {
 		err := os.Chown(tmpPath, writeOpts.uid, writeOpts.gid)
 		if err != nil {
-			f.Close() // nolint: err-check
+			f.Close() // nolint: errcheck
 			return nil, err
 		}
 	}
@@ -109,7 +109,7 @@ func NewAtomicWriter(p string, opts ...AtomicWriteOpt) (WriteCloserFailer, error
 	if writeOpts.chmod {
 		err := os.Chmod(tmpPath, writeOpts.chmodMode)
 		if err != nil {
-			f.Close() // nolint: err-check
+			f.Close() // nolint: errcheck
 			return nil, err
 		}
 	}
