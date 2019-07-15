@@ -83,10 +83,12 @@ func readCliParams() *serveropts.Opts {
 		LogLevel:                      viper.GetString("log-level"),
 		PurgeConvergeHistoryAfterDays: int32(viper.GetInt("converge-history-days")),
 		PurgeActionsAfterDays:         int32(viper.GetInt("actions-days")),
-		MaxNumberOfBundledRunMsgs:     viper.GetInt("max-number-of-bundled-run-msgs"),
-		MaxNumberOfBundledActionMsgs:  viper.GetInt("max-number-of-bundled-action-msgs"),
-		NumberOfRunMsgsTransformers:   viper.GetInt("number-of-run-msgs-transformers"),
-		ConnFactory:                   factory,
+		ChefIngestServerConfig: serveropts.ChefIngestServerConfig{
+			MaxNumberOfBundledRunMsgs:    viper.GetInt("max-number-of-bundled-run-msgs"),
+			MaxNumberOfBundledActionMsgs: viper.GetInt("max-number-of-bundled-action-msgs"),
+			NumberOfRunMsgsTransformers:  viper.GetInt("number-of-run-msgs-transformers"),
+		},
+		ConnFactory: factory,
 	}
 }
 
