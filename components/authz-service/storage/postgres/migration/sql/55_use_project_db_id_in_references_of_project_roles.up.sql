@@ -74,26 +74,27 @@ CREATE OR REPLACE FUNCTION
 
 $$ LANGUAGE sql;
 
--- helper functions, now made strict: if they don't find anything,
--- a "not found" exception is thrown
-CREATE OR REPLACE FUNCTION project_db_id (_id TEXT, OUT _db_id INTEGER)
-    RETURNS INTEGER
+-- Helper functions, now made strict: if they don't find anything,
+-- a "not found" exception is thrown; if they find more than one thing,
+-- they'll also throw an exception. (The latter should never happen.)
+CREATE OR REPLACE FUNCTION project_db_id (_id iam_projects.id%type, OUT _db_id iam_projects.db_id%type)
+    RETURNS iam_projects.db_id%type
     AS $$
     BEGIN
         SELECT db_id INTO STRICT _db_id
         FROM iam_projects
-        WHERE id = _id;
+        WHERE id=_id;
     END;
 $$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION project_id (_db_id INTEGER, OUT _id TEXT)
-    RETURNS TEXT
+CREATE OR REPLACE FUNCTION project_id (_db_id iam_projects.db_id%type, OUT _id iam_projects.id%type)
+    RETURNS iam_projects.id%type
     AS $$
     BEGIN
         SELECT id INTO STRICT _id
         FROM iam_projects
-        WHERE db_id = _db_id;
+        WHERE db_id=_db_id;
     END;
 $$
 LANGUAGE plpgsql;
