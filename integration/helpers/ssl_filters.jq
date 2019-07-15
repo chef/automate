@@ -41,6 +41,6 @@ map(select(
          # automate-cs erlang-services
          # TODO: erlang services use common prime
          (.id != "LOGJAM-common_primes" or (.port != "10201" and .port != "10202" and .port != "10203")) and
-         (.id != "cipherlist_AVERAGE" or (.port != "10201" and .port != "10202" and .port != "10203"))
+         (.id != "cipherlist_AVERAGE" or (.port != "10201" and .port != "10202" and .port != "10203")) and
          (.id != "LUCKY13" or (.port != "10201" and .port != "10202" and .port != "10203"))
 ))
