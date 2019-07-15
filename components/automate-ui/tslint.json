@@ -2,7 +2,6 @@
   "rulesDirectory": [
     "node_modules/codelyzer",
     "node_modules/rxjs-tslint",
-    "node_modules/ngrx-tslint-oftype",
     "node_modules/tslint-defocus/dist"
   ],
   "jsRules": {
@@ -160,8 +159,6 @@
     "use-pipe-transform-interface": true,
     "component-class-suffix": true,
     "directive-class-suffix": true,
-    "use-view-encapsulation": true,
-    "ngrx-effects-operators": true,
-    "ngrx-chained-pipes": true
+    "use-view-encapsulation": true
   }
 }
