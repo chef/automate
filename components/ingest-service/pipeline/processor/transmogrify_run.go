@@ -13,6 +13,9 @@ import (
 
 // BuildTransmogrify Builds the Transmogrify Processor(s)
 func BuildTransmogrify(numProcessors int) message.ChefRunPipe {
+	log.WithFields(log.Fields{
+		"numProcessors": numProcessors,
+	}).Debug("BuildTransmogrify")
 	return func(in <-chan message.ChefRun) <-chan message.ChefRun {
 		out := make(chan message.ChefRun, 100)
 

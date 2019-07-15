@@ -22,14 +22,15 @@ type ChefRunPipeline struct {
 
 // NewChefRunPipeline Create a new chef run pipeline
 func NewChefRunPipeline(client backend.Client, authzClient iam_v2.ProjectsClient,
-	nodeMgrClient manager.NodeManagerServiceClient, maxNumberOfBundledRunMsgs int) ChefRunPipeline {
+	nodeMgrClient manager.NodeManagerServiceClient,
+	maxNumberOfBundledRunMsgs, numberOfRunMsgTransformers int) ChefRunPipeline {
 	var (
 		in            = make(chan message.ChefRun, 100)
 		counter int64 = 0
 	)
 
 	chefRunPipeline(in,
-		processor.BuildTransmogrify(9),
+		processor.BuildTransmogrify(numberOfRunMsgTransformers),
 		processor.ChefRunCorrections,
 		processor.BuildRunProjectTagger(authzClient),
 		publisher.BuildNodeManagerPublisher(nodeMgrClient),

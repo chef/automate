@@ -27,6 +27,7 @@ import (
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
 	"github.com/chef/automate/components/ingest-service/config"
 	"github.com/chef/automate/components/ingest-service/server"
+	"github.com/chef/automate/components/ingest-service/serveropts"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 )
 
@@ -338,6 +339,11 @@ func createServices(s *Suite) {
 	//defer JobScheduler.Close()
 	//defer ConfigManager.Close()
 
+	chefIngestServerConfig := serveropts.ChefIngestServerConfig{
+		MaxNumberOfBundledRunMsgs:    100,
+		MaxNumberOfBundledActionMsgs: 100,
+		NumberOfRunMsgsTransformers:  1,
+	}
 	// A global ChefIngestServer instance to call any rpc function
 	//
 	// From any test you can directly call:
@@ -345,7 +351,7 @@ func createServices(s *Suite) {
 	// res, err := suite.ChefIngestServer.ProcessChefAction(ctx, &req)
 	// ```
 	s.ChefIngestServer = server.NewChefIngestServer(s.ingest, s.projectsClient,
-		s.managerServiceClientMock, 100, 100)
+		s.managerServiceClientMock, chefIngestServerConfig)
 	s.EventHandlerServer = server.NewAutomateEventHandlerServer(iClient, *s.ChefIngestServer,
 		s.projectsClient, s.eventServiceClientMock, s.ConfigManager)
 

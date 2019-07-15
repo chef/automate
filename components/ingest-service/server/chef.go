@@ -14,6 +14,7 @@ import (
 	"github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/pipeline"
+	"github.com/chef/automate/components/ingest-service/serveropts"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/lib/version"
 )
@@ -26,17 +27,18 @@ type ChefIngestServer struct {
 	nodeMgrClient      manager.NodeManagerServiceClient
 }
 
-// newServer creates a new server instance and it automatically
+// NewChefIngestServer creates a new server instance and it automatically
 // initializes the ChefRun Pipeline by consuming the provided
 // backend client
 func NewChefIngestServer(client backend.Client, authzClient iam_v2.ProjectsClient,
-	nodeMgrClient manager.NodeManagerServiceClient, maxNumberOfBundledRunMsgs int,
-	maxNumberOfBundledActionMsgs int) *ChefIngestServer {
+	nodeMgrClient manager.NodeManagerServiceClient,
+	chefIngestServerConfig serveropts.ChefIngestServerConfig) *ChefIngestServer {
 	return &ChefIngestServer{
 		chefRunPipeline: pipeline.NewChefRunPipeline(client, authzClient,
-			nodeMgrClient, maxNumberOfBundledRunMsgs),
+			nodeMgrClient, chefIngestServerConfig.MaxNumberOfBundledRunMsgs,
+			chefIngestServerConfig.NumberOfRunMsgsTransformers),
 		chefActionPipeline: pipeline.NewChefActionPipeline(client, authzClient,
-			maxNumberOfBundledActionMsgs),
+			chefIngestServerConfig.MaxNumberOfBundledActionMsgs),
 		client:        client,
 		authzClient:   authzClient,
 		nodeMgrClient: nodeMgrClient,

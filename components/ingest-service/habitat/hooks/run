@@ -23,6 +23,10 @@ CONFIG="$CONFIG --max-number-of-bundled-run-msgs {{cfg.service.max_number_of_bun
 CONFIG="$CONFIG --max-number-of-bundled-action-msgs {{cfg.service.max_number_of_bundled_action_msgs}}"
 {{~/if}}
 
+{{~#if cfg.service.number_of_run_msgs_transformers }}
+CONFIG="$CONFIG --number-of-run-msgs-transformers {{cfg.service.number_of_run_msgs_transformers}}"
+{{~/if}}
+
 # If we have a config pointing to an specific host,
 # lets use it, otherwise use the ipaddress of the server
 #

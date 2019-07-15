@@ -9,6 +9,12 @@ import (
 	"github.com/chef/automate/lib/grpc/secureconn"
 )
 
+type ChefIngestServerConfig struct {
+	MaxNumberOfBundledRunMsgs    int
+	MaxNumberOfBundledActionMsgs int
+	NumberOfRunMsgsTransformers  int
+}
+
 type Opts struct {
 	Host                          string
 	Port                          int
@@ -23,8 +29,7 @@ type Opts struct {
 	ConnFactory                   *secureconn.Factory
 	projectUpdateStateFilePath    string
 	NodeManagerAddress            string
-	MaxNumberOfBundledRunMsgs     int
-	MaxNumberOfBundledActionMsgs  int
+	ChefIngestServerConfig        ChefIngestServerConfig
 }
 
 // SetLogLevel sets the log level for the service
