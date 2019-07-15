@@ -60,3 +60,74 @@
   border-radius: $global-radius;
   padding: 0.5em;
 }
+
+.input-dropdown {
+  @include base-box-shadow();
+  border: 1px solid lightgrey;
+  border-radius: 3px;
+  background-color: $white;
+  position: absolute;
+  z-index: 99;
+  width: 232px;
+  font-size: 13px;
+  top: 171px;
+
+  &.categories {
+    width: 232px;
+  }
+
+  &.suggestions {
+    width: 400px;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    list-style: none;
+    padding: 8px 10px;
+    border-bottom: 1px solid lightGrey;
+
+    &.list-item {
+      &.selected {
+        color: $white;
+        cursor: pointer;
+        background-color: $chef-primary-bright;
+
+        &:last-child {
+          border-top-left-radius: 3px;
+          border-top-right-radius: 3px;
+        }
+
+        &:last-child {
+          border-bottom-left-radius: 3px;
+          border-bottom-right-radius: 3px;
+        }
+
+        &.category::after {
+          color: $white;
+        }
+      }
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &.suggestion-status {
+      color: $chef-dark-grey;
+    }
+
+    &.no-category-items {
+      font-size: 13px;
+      color: $chef-critical;
+    }
+
+    chef-icon {
+      color: $chef-primary-bright;
+      float: right;
+    }
+  }
+}

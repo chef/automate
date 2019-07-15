@@ -1,33 +1,62 @@
-<div class="reporting-search">
+<div class="reporting-search" (focusout)="handleFocusOut()">
   <div *ngIf="selectedType" class="reporting-search-prefix">
-    <strong>{{ selectedType.title }}:</strong>
+    <strong *ngIf="selectedType">{{ selectedType.title }}:</strong>
   </div>
 
   <input
     #keyInput
+    id="keyInput"
     class="reporting-search-input"
     type="text"
-    list="key-list"
     [hidden]="!keyInputVisible"
     placeholder="Filter reports by..."
-    (change)="onKeyChange($event)" />
-  <datalist id="key-list">
-    <option *ngFor="let type of filterTypes" [value]="type.title">{{ type.title }}</option>
-  </datalist>
+    (click)="handleFocus($event)"
+    (focus)="handleFocus($event)"
+    (change)="onKeyChange($event)"
+    (keyup)="handleInput($event.key, keyInput.value)" />
+  <div *ngIf="suggestionsVisible && !selectedType" class="input-dropdown categories">
+    <ul>
+      <li *ngIf="filterTypes.length === 0" class="no-category-items">
+        Not a Valid Filter Type
+      </li>
+      <li *ngFor="let type of filterTypes; let i = index"
+          (click)="filterClick(type, $event)"
+          (mouseenter)="handleSuggestionItemOnMouseOver(i)"
+          class="list-item category {{ highlightedIndex == i ? 'selected' : '' }}">
+        {{ type.title }}
+        <chef-icon>add</chef-icon>
+      </li>
+    </ul>
+  </div>
 
   <input
     #valInput
+    id="valInput"
     class="reporting-search-input"
     type="text"
-    list="val-list"
     [hidden]="!valInputVisible"
     [placeholder]="selectedType?.placeholder"
     (change)="onValChange($event)"
-    (input)="onValInput($event)"
-    (keydown)="onValKeydown($event)" />
-  <datalist id="val-list">
-    <option *ngFor="let value of filterValues" [value]="value.title">{{ value.title }}</option>
-  </datalist>
+    (input)="onValInputAndFocus($event)"
+    (focus)="onValInputAndFocus($event)"
+    [value]="inputText"
+    (keyup)="handleInput($event.key, valInput.value)"/>
+  <div *ngIf="suggestionsVisible && selectedType" class="input-dropdown suggestions">
+    <ul>
+      <li *ngIf="inputText !== '' && isLoadingSuggestions" class="suggestion-status">
+          Loading...
+      </li>
+      <li *ngIf="inputText !== '' && delayForNoSuggestions && !filterValues.length > 0" class="no-category-items">
+        No mactching result found
+      </li>
+      <li *ngFor="let value of filterValues; let i = index"
+          (click)="valueClick(value, $event)"
+          (mouseenter)="handleSuggestionItemOnMouseOver(i)"
+          class="list-item category {{ highlightedIndex == i ? 'selected' : '' }}">
+        {{ value.title }}
+      </li>
+    </ul>
+  </div>
 
   <div class="reporting-search-suffix">
     <chef-button class="filter-btn" *ngIf="filters.length > 0" secondary (click)="toggleFilters()">
