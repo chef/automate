@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"strings"
 
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
@@ -832,7 +831,7 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
 
 	row := tx.QueryRowContext(ctx,
 		`UPDATE iam_roles SET (name, actions) =
-			($2, $3) WHERE id = $1 RETURNING db_id;`,
+			($2, $3) WHERE id = $1 RETURNING db_id`,
 		role.ID, role.Name, pq.Array(role.Actions),
 	)
 	// TODO: check not found case
@@ -847,22 +846,17 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
 	// bd: for now, the below sql query assumes that all desired project changes are authorized
 	// so all we need to do is replace the existing projects with the desired projects
 	_, err = tx.ExecContext(ctx,
-		`DELETE FROM iam_role_projects WHERE role_id=$1`, &dbID)
+		"DELETE FROM iam_role_projects WHERE role_id=$1", dbID)
 	if err != nil {
 		return nil, p.processError(err)
 	}
 
-	if len(role.Projects) > 0 {
-		sql := "INSERT INTO iam_role_projects (role_id, project_id) VALUES "
-		for _, projectID := range role.Projects {
-			sql += fmt.Sprintf("(%s, '%s'), ", dbID, projectID)
-		}
-		sql = strings.TrimSuffix(sql, ", ")
-
-		_, err = tx.ExecContext(ctx, sql)
-		if err != nil {
-			return nil, p.processError(err)
-		}
+	_, err = tx.ExecContext(ctx,
+		`INSERT INTO iam_role_projects (role_id, project_id)
+		SELECT $1, db_id FROM iam_projects WHERE id=ANY($2)`,
+		dbID, pq.Array(role.Projects))
+	if err != nil {
+		return nil, p.processError(err)
 	}
 
 	err = p.notifyPolicyChange(ctx, tx)
@@ -888,14 +882,8 @@ func checkIfRoleIntersectsProjectsFilter(ctx context.Context, q Querier,
 
 	// Return true or false if there is intersection between iam_role_projects and projectsFilter,
 	// assuming '{(unassigned)}' in the case that iam_role_projects is empty. If a role of id
-	// doesn't exist, this will return 0 rows which will bubble up to NotFoundErr when passed to processError.
-	row := q.QueryRowContext(ctx,
-		`SELECT COALESCE(array_agg(rp.project_id)
-				FILTER (WHERE rp.project_id IS NOT NULL), '{(unassigned)}') && $2 AS intersection
-			FROM iam_roles AS r
-			LEFT OUTER JOIN iam_role_projects AS rp ON rp.role_id=r.db_id
-			WHERE r.id = $1;`,
-		id, pq.Array(projectsFilter))
+	// doesn't exist, this will return a proper SQL "no rows" error when passed to processError.
+	row := q.QueryRowContext(ctx, "SELECT projects_match(role_projects($1), $2)", id, pq.Array(projectsFilter))
 
 	var result bool
 	err := row.Scan(&result)
@@ -911,21 +899,20 @@ func (p *pg) insertRoleWithQuerier(ctx context.Context, role *v2.Role, q Querier
 		return p.processError(err)
 	}
 
-	row := q.QueryRowContext(ctx, `INSERT INTO iam_roles (id, name, type, actions)  VALUES ($1, $2, $3, $4)
-		RETURNING db_id;`,
+	row := q.QueryRowContext(ctx, `INSERT INTO iam_roles (id, name, type, actions) VALUES ($1, $2, $3, $4)
+		RETURNING db_id`,
 		role.ID, role.Name, role.Type.String(), pq.Array(role.Actions))
 	var dbID string
 	if err := row.Scan(&dbID); err != nil {
 		return p.processError(err)
 	}
 
-	for _, project := range role.Projects {
-		_, err := q.ExecContext(ctx,
-			`INSERT INTO iam_role_projects (role_id, project_id) VALUES ($1, $2)`,
-			&dbID, &project)
-		if err != nil {
-			return p.processError(err)
-		}
+	_, err = q.ExecContext(ctx,
+		`INSERT INTO iam_role_projects (role_id, project_id)
+		SELECT $1, db_id FROM iam_projects WHERE id=ANY($2)`,
+		dbID, pq.Array(role.Projects))
+	if err != nil {
+		return p.processError(err)
 	}
 
 	err = tx.Commit()
@@ -961,7 +948,7 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 
 	row := tx.QueryRowContext(ctx,
 		`INSERT INTO iam_staged_project_rules (id, project_id, name, type, deleted)
-		(SELECT $1, db_id, $3, $4, false FROM iam_projects WHERE id=$2)
+		VALUES ($1, project_db_id($2), $3, $4, false)
 		RETURNING db_id`,
 		rule.ID, rule.ProjectID, rule.Name, rule.Type.String())
 	var ruleDbID string
@@ -1007,9 +994,6 @@ func (p *pg) UpdateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 		rule.ID, rule.ProjectID, rule.Name, rule.Type.String(), pq.Array(projectsFilter))
 	var ruleDbID int
 	if err := row.Scan(&ruleDbID); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, storage_errors.ErrNotFound
-		}
 		return nil, p.processError(err)
 	}
 
@@ -1372,7 +1356,7 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 	}
 
 	if project.Type == v2.Custom {
-		row := tx.QueryRowContext(ctx, ` WITH t as (SELECT id from iam_projects WHERE type='custom') SELECT COUNT(*) FROM t;`)
+		row := tx.QueryRowContext(ctx, "SELECT count(*) FROM iam_projects WHERE type='custom'")
 		var numProjects int64
 		if err := row.Scan(&numProjects); err != nil {
 			return nil, p.processError(err)

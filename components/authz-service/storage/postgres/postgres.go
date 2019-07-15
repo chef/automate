@@ -77,6 +77,8 @@ func parsePQError(err *pq.Error) error {
 		return storage.ErrConflict
 	case "23503": // Foreign key violation
 		return storage.ErrForeignKey
+	case "P0002": // Not found in plpgsql ("no_data_found")
+		return storage.ErrNotFound
 	case "20000": // Not found
 		return storage.ErrNotFound
 	case "PRJTR": // Custom code: attempt to change a rule's projects that are immutable
