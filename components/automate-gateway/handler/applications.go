@@ -49,18 +49,14 @@ func (a *Applications) GetServiceGroupsHealthCounts(
 // GetServiceGroups returns a list of service groups
 func (a *Applications) GetServiceGroups(
 	ctx context.Context,
-	in *applications.ServiceGroupsReq) (*applications.ServiceGroups, error) {
+	request *applications.ServiceGroupsReq) (*applications.ServiceGroups, error) {
 
-	inDomain := &applications.ServiceGroupsReq{}
-	out := &applications.ServiceGroups{}
-	f := func() (proto.Message, error) {
-		return a.client.GetServiceGroups(ctx, inDomain)
-	}
-	err := protobuf.CallDomainService(in, inDomain, f, out)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.client.GetServiceGroups(ctx, request)
 }
 
 // GetServices returns a list of services
