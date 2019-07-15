@@ -749,7 +749,7 @@ func (workc *PostgresWorkflowCompleter) Close() error {
 }
 
 // TODO(ssd) 2019-05-14: We should probably allow bulk insertion of workflows and tasks
-func (c *PostgresScheduledWorkflowCompleter) EnqueueScheduledWorkflow(s *backend.Schedule) error {
+func (c *PostgresScheduledWorkflowCompleter) EnqueueAndUpdateScheduledWorkflow(s *backend.Schedule) error {
 	defer c.cancel()
 	wrapErr := func(err error, msg string) error {
 		if isPGConflict(err) {
@@ -801,6 +801,19 @@ func (c *PostgresScheduledWorkflowCompleter) EnqueueScheduledWorkflow(s *backend
 
 		return wrapErr(c.tx.Commit(), "failed to commit workflow instance")
 	}
+}
+
+func (c *PostgresScheduledWorkflowCompleter) DisableSchedule(s *backend.Schedule) error {
+	defer c.cancel()
+	_, err := c.tx.ExecContext(
+		c.ctx,
+		"UPDATE cereal_workflow_schedules SET enabled = FALSE WHERE id = $1",
+		s.ID)
+	if err != nil {
+		return errors.Wrap(err, "failed to update workflow schedule")
+	}
+
+	return errors.Wrap(c.tx.Commit(), "failed to commit workflow schedule update")
 }
 
 func (c *PostgresScheduledWorkflowCompleter) Close() {
