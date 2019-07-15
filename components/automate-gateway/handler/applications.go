@@ -5,9 +5,7 @@ import (
 
 	"github.com/chef/automate/api/external/applications"
 	version "github.com/chef/automate/api/external/common/version"
-	"github.com/chef/automate/components/automate-gateway/protobuf"
 
-	"github.com/golang/protobuf/proto"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -65,7 +63,7 @@ func (a *Applications) GetServices(
 // GetServicesBySG returns a list of services within a service-group
 func (a *Applications) GetServicesBySG(
 	ctx context.Context,
-	in *applications.ServicesBySGReq) (*applications.ServicesBySGRes, error) {
+	request *applications.ServicesBySGReq) (*applications.ServicesBySGRes, error) {
 
 	log.WithFields(log.Fields{
 		"request": request.String(),
@@ -89,18 +87,14 @@ func (a *Applications) GetServicesStats(
 
 func (a *Applications) GetDisconnectedServices(
 	ctx context.Context,
-	in *applications.DisconnectedServicesReq) (*applications.ServicesRes, error) {
+	request *applications.DisconnectedServicesReq) (*applications.ServicesRes, error) {
 
-	inDomain := &applications.DisconnectedServicesReq{}
-	out := &applications.ServicesRes{}
-	f := func() (proto.Message, error) {
-		return a.client.GetDisconnectedServices(ctx, inDomain)
-	}
-	err := protobuf.CallDomainService(in, inDomain, f, out)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.client.GetDisconnectedServices(ctx, request)
 }
 
 // GetVersion fetches the version of team service
