@@ -52,18 +52,14 @@ func (a *Applications) GetServiceGroups(
 // GetServices returns a list of services
 func (a *Applications) GetServices(
 	ctx context.Context,
-	in *applications.ServicesReq) (*applications.ServicesRes, error) {
+	request *applications.ServicesReq) (*applications.ServicesRes, error) {
 
-	inDomain := &applications.ServicesReq{}
-	out := &applications.ServicesRes{}
-	f := func() (proto.Message, error) {
-		return a.client.GetServices(ctx, inDomain)
-	}
-	err := protobuf.CallDomainService(in, inDomain, f, out)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.client.GetServices(ctx, request)
 }
 
 // GetServicesBySG returns a list of services within a service-group
@@ -71,16 +67,12 @@ func (a *Applications) GetServicesBySG(
 	ctx context.Context,
 	in *applications.ServicesBySGReq) (*applications.ServicesBySGRes, error) {
 
-	inDomain := &applications.ServicesBySGReq{}
-	out := &applications.ServicesBySGRes{}
-	f := func() (proto.Message, error) {
-		return a.client.GetServicesBySG(ctx, inDomain)
-	}
-	err := protobuf.CallDomainService(in, inDomain, f, out)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.client.GetServicesBySG(ctx, request)
 }
 
 func (a *Applications) GetServicesStats(
