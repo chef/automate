@@ -6,6 +6,7 @@ test_upgrades=true
 test_upgrade_strategy="none"
 test_loadbalancer_url="https://localhost:4443"
 upgrade_scaffold_pid_file="/tmp/upgrade-scaffold-pid"
+test_diagnostics_filters="~iam-v2"
 
 do_setup() {
     hab pkg install core/jq-static

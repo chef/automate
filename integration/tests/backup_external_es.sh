@@ -3,6 +3,7 @@
 #shellcheck disable=SC2034
 test_name="backup-external-es"
 test_backup_restore=true
+test_diagnostics_filters="~iam-v2"
 
 do_setup() {
     do_setup_default
