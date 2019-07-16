@@ -459,20 +459,23 @@ func (creator *InstallBundleCreator) downloadWithRetries(p habpkg.VersionedPacka
 				return nil // We don't log here since nearly every key is cached.
 			}
 
-			return creator.withRetry(func(tryCount int, ri retryInfo) error {
-				progress.Downloading(string(header.KeyName), tryCount)
-				err := creator.keyCache.CacheKey(header.KeyName, func(writer io.Writer) error {
-					return depotClient.DownloadOriginKey(header.KeyName, writer)
-				})
-				if err != nil {
-					if ri.willRetry {
-						progress.RetriableDownloadError(string(header.KeyName), err.Error(), ri.delay)
-					}
-					return err
-				}
-				progress.DownloadComplete(string(header.KeyName), false)
-				return nil
+			// NOTE(ssd) 2019-07-16: If this download
+			// fails, we unfortunately have to retry the
+			// package download as well. This is a bit
+			// odd, but I think more refactoring is needed
+			// to disentangle them.
+			progress.Downloading(string(header.KeyName), tryCount)
+			err = creator.keyCache.CacheKey(header.KeyName, func(writer io.Writer) error {
+				return depotClient.DownloadOriginKey(header.KeyName, writer)
 			})
+			if err != nil {
+				if ri.willRetry {
+					progress.RetriableDownloadError(string(header.KeyName), err.Error(), ri.delay)
+				}
+				return err
+			}
+			progress.DownloadComplete(string(header.KeyName), false)
+			return nil
 		})
 	})
 }
