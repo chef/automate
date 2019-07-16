@@ -12,6 +12,14 @@ options:
 - name: manifest
   shorthand: m
   usage: Path to a release manifest.json
+- name: retries
+  shorthand: r
+  default_value: "2"
+  usage: Number of times to retry failed hab package downloads
+- name: retry-delay
+  default_value: "-1"
+  usage: |
+    Number of seconds to wait between retries (exponential backoff is used if not provided)
 - name: workspace
   shorthand: w
   usage: |
