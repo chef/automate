@@ -44,7 +44,7 @@ func TestSummary(t *testing.T) {
 					"cci": [
 						"CCI-000048"
 					],
-					"hashy": {
+					"hashhash": {
 						"bad.one": [6]
 					},
 					"documentable": false
