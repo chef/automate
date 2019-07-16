@@ -37,7 +37,7 @@ func (w *workflowScheduler) run(ctx context.Context) {
 			if err != nil {
 				logrus.WithError(err).Error("failed to schedule workflows")
 			}
-			logrus.Infof("Recurring workflow scheduler sleep for %fs", nextSleep.Seconds())
+			logrus.Debugf("Recurring workflow scheduler sleep for %fs", nextSleep.Seconds())
 		}
 	}
 }
@@ -56,10 +56,6 @@ func (w *workflowScheduler) scheduleWorkflows(ctx context.Context) (time.Duratio
 		if err != nil {
 			return sleepTime, err
 		}
-		// BUG(jaym): It's possible to get into a busy loop here.
-		// If there is a workflow instance that is past due and
-		// currently running, we spin because we don't return an
-		// error
 	}
 }
 
@@ -86,36 +82,45 @@ func (w *workflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 		logrus.Warnf("Recurring workflow %fs past due. (expected at %s)", time.Since(s.NextDueAt).Seconds(), s.NextDueAt)
 	}
 
-	// TODO(ssd) 2019-05-13: We might need two different
-	// rule types here to support the different use cases.
 	recurrence, err := rrule.StrToRRule(s.Recurrence)
 	if err != nil {
-		// TODO(ssd) 2019-05-13: Perhaps we should disable this rule so that it doesn't keep producing errors
-		// We need to do this otherwise we'll just keep trying to enqueue this and nothing else
-		return maxWakeupInterval, errors.Wrap(err, "could not parse recurrence rule for workflow, skipping")
+		logrus.WithError(err).Error("scheduled workflow has invalid recurrence rule, attempting to disable it")
+		err2 := completer.DisableSchedule(s)
+		if err2 != nil {
+			return maxWakeupInterval, errors.Wrap(err2, "failed to disable workflow with invalid recurrence rule")
+		}
+
+		// NOTE(ssd) 2019-07-15: We return no error here
+		// because we've successfully disabled this rule, so
+		// the polling loop can keep going.
+		return maxWakeupInterval, nil
 	}
 
 	nowUTC := time.Now().UTC()
 	nextDueAt := recurrence.After(nowUTC, true).UTC()
 	if nextDueAt.IsZero() {
+		logrus.Infof("recurrence rule for scheduled workflow %q ends after this run", s.InstanceName)
 		s.Enabled = false
 	}
+
 	sleepTime := time.Until(nextDueAt)
-	logrus.Infof("Starting scheduled workflow %q", s.InstanceName)
 	s.NextDueAt = nextDueAt
 	s.LastEnqueuedAt = nowUTC
-	err = completer.EnqueueScheduledWorkflow(s)
+
+	logrus.Infof("Starting scheduled workflow %q", s.InstanceName)
+	err = completer.EnqueueAndUpdateScheduledWorkflow(s)
 	if err != nil {
 		if err == ErrWorkflowInstanceExists {
-			logrus.Warnf(
-				"Scheduled workflow %q still running, consider increasing recurrence interval",
-				s.InstanceName)
-			// TODO(jaym): what do we want to do here? i think we're going to keep trying
-			//             until we succeed here? Maybe we want to skip this interval?
-			return maxWakeupInterval, nil
+			logrus.Warnf("Scheduled workflow %q still running, consider increasing recurrence interval", s.InstanceName)
+			// NOTE(ssd) 2019-07-15: If we get
+			// ErrWorkflowInstanceExists, then we know
+			// we've successfully pushed this job into the
+			// future and it is safe to return no error
+			// here.
+			return sleepTime, nil
 		}
-		logrus.WithError(err).Error("could not update scheduled workflow record")
-		return sleepTime, err
+
+		return sleepTime, errors.Wrap(err, "could not update secheduled workflow record")
 	}
 
 	return sleepTime, nil

@@ -105,7 +105,8 @@ type WorkflowCompleter interface {
 }
 
 type ScheduledWorkflowCompleter interface {
-	EnqueueScheduledWorkflow(s *Schedule) error
+	EnqueueAndUpdateScheduledWorkflow(s *Schedule) error
+	DisableSchedule(s *Schedule) error
 	Close()
 }
 
