@@ -229,9 +229,9 @@ func (backend ES2Backend) getArrayAggSuggestions(client *elastic.Client, typePar
 		boolQuery = boolQuery.Must(matchQuery)
 	}
 
-	aggs := elastic.NewTermsAggregation().Field(target).Size(100)
+	aggs := elastic.NewTermsAggregation().Field(fmt.Sprintf("%s.lower", target)).Size(100)
 	if len(text) >= 2 {
-		aggs = aggs.Include(".*" + text + ".*")
+		aggs = aggs.Include(".*" + strings.ToLower(text) + ".*")
 	}
 	searchSource := elastic.NewSearchSource().
 		Query(boolQuery).

@@ -978,7 +978,7 @@ func TestReportingListSuggestionsLargeArrayValues(t *testing.T) {
 		"opscode-ci::_java",
 		"aws::default",
 		"opscode-ci::_omnibus",
-		"zum",
+		"Zum",
 	}
 
 	cases := []struct {
@@ -1023,13 +1023,13 @@ func TestReportingListSuggestionsLargeArrayValues(t *testing.T) {
 			require.NoError(t, err)
 			defer suite.DeleteAllDocuments()
 
-			// last term alphabetically
+			// last term alphabetically and lowercase
 			expectedTerm := "zum"
 
 			// defaults to 10
 			test.request.Size = 2
 			// term to give suggestions for
-			test.request.Text = "zum"
+			test.request.Text = "Zum"
 
 			// Make the request for suggestions
 			response, err := server.ListSuggestions(ctx, test.request)
