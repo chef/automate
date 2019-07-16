@@ -88,6 +88,18 @@ describe('projects API', () => {
             })
           }
 
+          let totalNodes = 0
+          cy.request({
+            headers: {
+              'api-token': admin_token,
+              'projects': '(unassigned)'
+            },
+            method: 'GET',
+            url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
+          }).then((response) => {
+            totalNodes = response.body.length
+          })
+
           cy.fixture('converge/avengers1.json').then(node1 => {
             cy.fixture('converge/avengers2.json').then(node2 => {
               cy.fixture('converge/xmen1.json').then(node3 => {
@@ -104,8 +116,7 @@ describe('projects API', () => {
               })
             })
           })
-
-          cy.wait(5000)  // TODO replace with polling apply status request
+          waitForNodes(totalNodes)
 
           // confirm nodes are unassigned
           cy.request({
@@ -158,10 +169,10 @@ describe('projects API', () => {
           url: 'api/v0/ingest/events/chef/node-multiple-deletes',
           body: {
             node_ids: [
-              "7188b88b-2236-4e27-a875-d3a10a70c497",
-              "639844f4-2ce6-42ba-8c9d-853db69adff3",
-              "75c2376e-d07e-4d2b-ab43-d658c6250a62",
-              "da60e383-67f6-4501-b726-1f28e03bf6ea"
+              "f6a5c33f-bef5-433b-815e-a8f6e69e6b1b", 
+              "82760210-4686-497e-b039-efca78dee64b", 
+              "9c139ad0-89a5-44bc-942c-d7f248b155ba", 
+              "6453a764-2415-4934-8cee-2a008834a74a"
             ]
           }
         })
@@ -203,7 +214,8 @@ describe('projects API', () => {
           method: 'POST',
           url: '/apis/iam/v2beta/apply-rules'
         })
-        cy.wait(5000) // TODO replace with polling apply status request
+        // waitForSuccessfulApply()
+        cy.wait(5000) 
 
         // confirm rules are applied
         for (let project of [avengers_project, xmen_project]) {
@@ -265,7 +277,8 @@ describe('projects API', () => {
           method: 'POST',
           url: '/apis/iam/v2beta/apply-rules'
         })
-        cy.wait(5000) // TODO replace with polling apply status request
+        // waitForSuccessfulApply()
+        cy.wait(5000) 
 
         cy.request({
           headers: {
@@ -292,7 +305,8 @@ describe('projects API', () => {
           method: 'POST',
           url: '/apis/iam/v2beta/apply-rules'
         })
-        cy.wait(5000)  // TODO replace with polling apply status request
+        // waitForSuccessfulApply()
+        cy.wait(5000) 
 
         cy.request({
           headers: {
@@ -319,3 +333,38 @@ describe('projects API', () => {
     })
   }
 })
+
+// TODO fix
+// function waitForSuccessfulApply() {
+//   cy
+//     .request({
+//       headers: {
+//         'api-token': admin_token      
+//       },
+//       method: 'GET',
+//       url: '/apis/iam/v2beta/apply-rules'
+//     })
+//     .then((resp: Cypress.ObjectLike) => {
+//       if (resp.body.percentage_complete == 1 && resp.body.state == "not_running" && !resp.body.failed)
+//         return
+
+//       waitForSuccessfulApply()
+//     })
+// }
+
+function waitForNodes(totalNodes: number) {
+  cy
+    .request({
+      headers: {
+        'api-token': admin_token
+      },
+      method: 'GET',
+      url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
+    })
+    .then((resp: Cypress.ObjectLike) => {
+      if (resp.body.length == totalNodes + 4)
+        return
+
+      waitForNodes(totalNodes)
+    })
+}
