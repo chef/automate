@@ -5,7 +5,7 @@ ALTER TABLE iam_statement_projects
 
 ALTER TABLE iam_statement_projects RENAME COLUMN project_id TO project_temp_id;
 
-ALTER TABLE iam_statement_projects ADD COLUMN project_id SERIAL;
+ALTER TABLE iam_statement_projects ADD COLUMN project_id INTEGER;
 
 UPDATE
     iam_statement_projects t
@@ -40,7 +40,6 @@ CREATE OR REPLACE FUNCTION query_policy (_policy_id TEXT, _projects_filter TEXT[
                         stmt.actions,
                         stmt.resources,
                         stmt.role,
-                        -- get each statement's projects by cross-referencing iam_policy_statements and iam_statement_projects
                         (
                             SELECT
                                 COALESCE(json_agg(proj.id) FILTER (WHERE proj.id IS NOT NULL),
