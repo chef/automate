@@ -16,6 +16,8 @@ do_deploy() {
     chef-automate license apply "$A2_LICENSE"
 
     case $IAM in
+        v1)
+            export CYPRESS_IAM_VERSION='v1'
         v2)
             log_info "run chef-automate iam upgrade-to-v2 --skip-policy-migration"
             if ! output=$(chef-automate iam upgrade-to-v2 --skip-policy-migration); then
@@ -23,6 +25,7 @@ do_deploy() {
                 log_error "$output"
                 return 1
             fi
+            export CYPRESS_IAM_VERSION='v2'
             ;;
         v2.1)
             log_info "run chef-automate iam upgrade-to-v2 --skip-policy-migration --beta2.1"
@@ -31,6 +34,7 @@ do_deploy() {
                 log_error "$output"
                 return 1
             fi
+            export CYPRESS_IAM_VERSION='v2.1'
             ;;
     esac
 
@@ -47,6 +51,6 @@ do_test_deploy() {
     npm install # get dependencies defined in e2e/package.json
     if ! npm run cypress:run; then
         buildkite-agent artifact upload "cypress/videos/*;cypress/videos/**/*;cypress/screenshots/*;cypress/screenshots/**/*"
-        return 1
+        exit 1
     fi
 }
