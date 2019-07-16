@@ -23,7 +23,12 @@
             "run_time": 0
           }
         ],
-        "string_tags": []
+        "string_tags": [
+          {
+            "key": "firewall",
+            "values": []
+          }
+        ]
       },
       {
         "id": "ctrl-02",

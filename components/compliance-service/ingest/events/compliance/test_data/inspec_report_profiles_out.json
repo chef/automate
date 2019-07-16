@@ -20,7 +20,7 @@
           "line": 0
         },
         "refs": "[]",
-        "tags": "{}"
+        "tags": "{\"cci\":[\"CCI-000048\"],\"documentable\":false,\"firewall\":null,\"gid\":\"V-71863\",\"gtitle\":\"SRG-OS-000023-GPOS-00006\",\"hashy\":{\"bad.one\":[6]},\"nist\":[\"AC-8 a\",\"Rev_4\"],\"rid\":\"SV-86487r2_rule\",\"satisfies\":[\"SRG-OS-000023-GPOS-00006\",\"SRG-OS-000024-GPOS-00007\"],\"stig_id\":\"RHEL-07-010050\"}"
       },
       {
         "id": "ctrl-02",
@@ -33,7 +33,7 @@
           "line": 0
         },
         "refs": "[]",
-        "tags": "{}"
+        "tags": "{\"tag1\":\"value1\"}"
       },
       {
         "id": "ctrl-03",
