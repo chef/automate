@@ -25,8 +25,24 @@
         ],
         "string_tags": [
           {
+            "key": "cci",
+            "values": ["CCI-000048"]
+          },
+          {
             "key": "firewall",
             "values": []
+          },
+          {
+            "key": "gtitle",
+            "values": ["SRG-OS-000023-GPOS-00006"]
+          },
+          {
+            "key": "satisfies",
+            "values": ["SRG-OS-000023-GPOS-00006", "SRG-OS-000024-GPOS-00007"]
+          },
+          {
+            "key": "stig_id",
+            "values": ["RHEL-07-010050"]
           }
         ]
       },
@@ -47,7 +63,12 @@
             "run_time": 0
           }
         ],
-        "string_tags": []
+        "string_tags": [
+          {
+            "key": "tag1",
+            "values": ["value1"]
+          }
+        ]
       },
       {
         "id": "ctrl-03",

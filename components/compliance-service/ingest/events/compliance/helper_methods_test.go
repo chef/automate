@@ -10,6 +10,8 @@ import (
 
 	"strings"
 
+	"sort"
+
 	"github.com/chef/automate/components/compliance-service/ingest/events/inspec"
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
@@ -38,8 +40,6 @@ func TestSummary(t *testing.T) {
 						"SRG-OS-000023-GPOS-00006",
 						"SRG-OS-000024-GPOS-00007"
 					],
-					"gid": "V-71863",
-					"rid": "SV-86487r2_rule",
 					"stig_id": "RHEL-07-010050",
 					"cci": [
 						"CCI-000048"
@@ -47,11 +47,7 @@ func TestSummary(t *testing.T) {
 					"hashy": {
 						"bad.one": [6]
 					},
-					"documentable": false,
-					"nist": [
-						"AC-8 a",
-						"Rev_4"
-					]
+					"documentable": false
 				},
         "code": "control 'ctrl-01' do ...",
         "results":[
@@ -193,6 +189,15 @@ func TestSummary(t *testing.T) {
 	actualProfilesMin := ReportProfilesFromInSpecProfiles([]*inspec.Profile{profile1, profile2}, summaryProfiles)
 	profilesJson := fileContents("test_data/inspec_report_profiles_min_out.json")
 	expectedProfilesMin := parseProfilesMin(&profilesJson)
+
+	// To avoid random test failures due to StringTags coming out with random order
+	for _, profileMin := range actualProfilesMin {
+		for _, controlMin := range profileMin.Controls {
+			sort.Slice(controlMin.StringTags, func(i, j int) bool {
+				return controlMin.StringTags[i].Key < controlMin.StringTags[j].Key
+			})
+		}
+	}
 	assert.Equal(t, expectedProfilesMin, actualProfilesMin, "profiles_min match")
 
 	p3json := `{
