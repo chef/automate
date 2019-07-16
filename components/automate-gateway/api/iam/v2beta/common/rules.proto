@@ -32,6 +32,13 @@ enum RuleStatus {
     APPLIED = 2;
 }
 
+enum ProjectRulesStatus {
+    PROJECT_RULES_STATUS_UNSET = 0;
+    RULES_APPLIED = 1;
+    EDITS_PENDING = 2;
+    NO_RULES = 3;
+}
+
 message Rule {
     string id = 1;
     string project_id = 2;

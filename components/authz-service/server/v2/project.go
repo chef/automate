@@ -459,7 +459,7 @@ func (s *ProjectState) listRulesWithFunction(ctx context.Context, req *api.ListR
 }
 
 func (s *ProjectState) ListRulesForProject(ctx context.Context, req *api.ListRulesForProjectReq) (*api.ListRulesForProjectResp, error) {
-	resp, err := s.store.ListRulesForProject(ctx, req.Id)
+	resp, statusResp, err := s.store.ListRulesForProject(ctx, req.Id)
 	if err != nil {
 		if err == storage_errors.ErrNotFound {
 			return nil, status.Errorf(codes.NotFound, "could not find project with ID %q", req.Id)
@@ -477,7 +477,10 @@ func (s *ProjectState) ListRulesForProject(ctx context.Context, req *api.ListRul
 		rules[i] = apiRule
 	}
 
-	return &api.ListRulesForProjectResp{Rules: rules}, nil
+	return &api.ListRulesForProjectResp{
+		Rules:  rules,
+		Status: statusResp.String(),
+	}, nil
 }
 
 func (s *ProjectState) DeleteRule(ctx context.Context, req *api.DeleteRuleReq) (*api.DeleteRuleResp, error) {

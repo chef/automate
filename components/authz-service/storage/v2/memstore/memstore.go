@@ -312,24 +312,39 @@ func (s *State) ListRules(_ context.Context) ([]*storage.Rule, error) {
 	return rules, nil
 }
 
-func (s *State) ListRulesForProject(_ context.Context, projectID string) ([]*storage.Rule, error) {
+func (s *State) ListRulesForProject(_ context.Context, projectID string) ([]*storage.Rule, storage.ProjectRulesStatus, error) {
 	_, exists := s.projects.Get(projectID)
 	if !exists {
-		return nil, storage_errors.ErrNotFound
+		return nil, storage.RulesStatusError, storage_errors.ErrNotFound
 	}
 
 	items := s.rules.Items()
 	rules := []*storage.Rule{}
 
+	anyStagedRules := false
 	for _, item := range items {
 		if rule, ok := item.Object.(*storage.Rule); ok {
 			if rule.ProjectID == projectID {
+				if rule.Status == "staged" {
+					anyStagedRules = true
+				}
 				rules = append(rules, rule)
 			}
 		}
 	}
 
-	return rules, nil
+	var rulesStatus v2.ProjectRulesStatus
+	if len(rules) == 0 {
+		rulesStatus = v2.NoRules
+	} else {
+		if anyStagedRules {
+			rulesStatus = v2.EditsPending
+		} else {
+			rulesStatus = v2.Applied
+		}
+	}
+
+	return rules, rulesStatus, nil
 }
 
 func (s *State) DeleteRule(ctx context.Context, id string) error {
