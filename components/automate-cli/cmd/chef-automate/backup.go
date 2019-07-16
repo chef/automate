@@ -8,6 +8,7 @@ import (
 	"os/user"
 	"path"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -153,11 +154,11 @@ var deleteBackupCmd = &cobra.Command{
 }
 
 var restoreBackupCmd = &cobra.Command{
-	Use:   "restore ID_OR_PATH",
+	Use:   "restore [ID_OR_PATH]",
 	Short: "restore a Chef Automate backup",
-	Long:  "Restore a Chef Automate backup",
+	Long:  "Restore a Chef Automate backup. If no ID or path is given the latest found backup will be restored.",
 	RunE:  runRestoreBackupCmd,
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MaximumNArgs(1),
 }
 
 var fixBackupRepoPermissionsCmd = &cobra.Command{
@@ -577,6 +578,42 @@ will modify the existing data to match the contents of the backup.
 Are you sure you want to continue?
 `
 
+// Find the latest complete backup task in a slice of backup tasks
+func findLatestComplete(backups []*api.BackupTask) (*api.BackupTask, error) {
+	if len(backups) < 1 {
+		return nil, status.New(status.BackupError, "No backups found")
+	}
+
+	type parsed struct {
+		task *api.BackupTask
+		date time.Time
+	}
+
+	parsedBackups := []parsed{}
+	for _, b := range backups {
+		if b.GetState() != api.BackupTask_COMPLETED {
+			continue
+		}
+
+		date, err := time.Parse(api.BackupTaskFormat, b.TaskID())
+		if err != nil {
+			return nil, status.Errorf(status.BackupError, "Unable to parse backup ID '%d' to time", b.Id)
+		}
+
+		parsedBackups = append(parsedBackups, parsed{task: b, date: date})
+	}
+
+	if len(parsedBackups) < 1 {
+		return nil, status.New(status.BackupError, "No complete backups were found")
+	}
+
+	sort.Slice(parsedBackups, func(i, j int) bool {
+		return parsedBackups[i].date.After(parsedBackups[j].date)
+	})
+
+	return parsedBackups[0].task, nil
+}
+
 func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 	if !backupCmdFlags.yes && !backupCmdFlags.skipPreflight {
 		deployed, err := isA2Deployed()
@@ -605,29 +642,52 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 	// 20180901000000
 	// or
 	// /path/to/20180901000000
-	uri := args[0]
+	// or blank, in which case the location and ID will be blank. If that's the
+	// case we'll try and find the latest in the default backup path.
+	var uri string
+	var backupId string
+	var location string
 
-	// Get the backup id: from the example above,
-	// all will be 20180901000000
-	backupId := path.Base(uri)
+	if len(args) > 0 {
+		uri = args[0]
 
-	// Remove the backup id from the uri
-	// s3://bucketname/foo/bar/20180901000000 => s3://bucketname/foo/bar/
-	// or
-	// 20180901000000 => ""
-	// or
-	// /path/to/20180901000000 => /path/to
-	location := strings.TrimSuffix(uri, backupId)
+		// Get the backup id: from the example above,
+		// all will be 20180901000000
+		backupId = path.Base(uri)
+
+		// Remove the backup id from the uri
+		// s3://bucketname/foo/bar/20180901000000 => s3://bucketname/foo/bar/
+		// or
+		// 20180901000000 => ""
+		// or
+		// /path/to/20180901000000 => /path/to
+		location = strings.TrimSuffix(uri, backupId)
+	}
 
 	// In the case only the backup id was provided, default the path to
 	// baseBackupDir (/var/opt/chef-automate/backups)
 	if location == "" {
 		location = backupCmdFlags.baseBackupDir
 	}
-
 	locationSpec, err := parseLocationSpecFromCLIArgs(location)
 	if err != nil {
 		return err
+	}
+
+	// Find backups
+	backups, err := listBackupsLocally(ctx, locationSpec)
+	if err != nil {
+		return status.Wrap(err, status.BackupRestoreError, "Listing backups failed")
+	}
+
+	// We don't have a backupId so use the latest
+	if backupId == "" {
+		latestBackup, err := findLatestComplete(backups)
+		if err != nil {
+			return err
+		}
+
+		backupId = latestBackup.TaskID()
 	}
 
 	rt, err := api.NewBackupRestoreTaskFromBackupID(backupId)
@@ -656,12 +716,6 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 			return status.Annotate(err, status.FileAccessError)
 		}
 		rt.HartifactsPath = fqHartifactsPath
-	}
-
-	// Find matching backup
-	backups, err := listBackupsLocally(ctx, locationSpec)
-	if err != nil {
-		return status.Wrap(err, status.BackupRestoreError, "Listing backups failed")
 	}
 
 	found := false
