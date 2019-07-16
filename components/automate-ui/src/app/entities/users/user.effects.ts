@@ -44,9 +44,9 @@ export class UserEffects {
 
   // 7/6/18: TODO in follow-up PR: fetch teams for all users - bd
   @Effect()
-  getUsers$ = combineLatest(
+  getUsers$ = combineLatest([
     this.actions$.pipe(ofType<GetUsers>(UserActionTypes.GET_ALL)),
-    this.store$.select(iamMajorVersion))
+    this.store$.select(iamMajorVersion)])
     .pipe(
       mergeMap(([_action, version]) =>
         this.requests.getUsers(version).pipe(
@@ -66,9 +66,9 @@ export class UserEffects {
 
   // TODO rename
   @Effect()
-  getUser$ = combineLatest(
+  getUser$ = combineLatest([
     this.actions$.pipe(ofType<GetUser>(UserActionTypes.GET)),
-    this.store$.select(iamMajorVersion))
+    this.store$.select(iamMajorVersion)])
     .pipe(
       mergeMap(([action, version]) =>
         this.requests.getUser(action.payload.id, version).pipe(
@@ -87,9 +87,9 @@ export class UserEffects {
     }));
 
   @Effect()
-  updateUser$ = combineLatest(
+  updateUser$ = combineLatest([
     this.actions$.pipe(ofType<UpdateUser>(UserActionTypes.UPDATE)),
-    this.store$.select(iamMajorVersion))
+    this.store$.select(iamMajorVersion)])
     .pipe(
       mergeMap(([action, version]) =>
       this.requests.updateUser(action.payload, version).pipe(
@@ -116,9 +116,9 @@ export class UserEffects {
     }));
 
   @Effect()
-  updateSelf$ = combineLatest(
+  updateSelf$ = combineLatest([
     this.actions$.pipe(ofType<UpdateSelf>(UserActionTypes.UPDATE_SELF)),
-    this.store$.select(iamMajorVersion))
+    this.store$.select(iamMajorVersion)])
     .pipe(
       mergeMap(([action, version]) =>
       this.requests.updateSelf(action.payload, version).pipe(
@@ -134,9 +134,9 @@ export class UserEffects {
     })));
 
   @Effect()
-  deleteUser$ = combineLatest(
+  deleteUser$ = combineLatest([
     this.actions$.pipe(ofType<DeleteUser>(UserActionTypes.DELETE)),
-    this.store$.select(iamMajorVersion))
+    this.store$.select(iamMajorVersion)])
     .pipe(
       mergeMap(([action, version]) =>
       this.requests.deleteUser(action.payload, version).pipe(
@@ -163,9 +163,9 @@ export class UserEffects {
     }));
 
   @Effect()
-  createUser$ = combineLatest(
+  createUser$ = combineLatest([
     this.actions$.pipe(ofType<CreateUser>(UserActionTypes.CREATE)),
-    this.store$.select(iamMajorVersion))
+    this.store$.select(iamMajorVersion)])
     .pipe(
       mergeMap(([action, version]) =>
       this.requests.createUser(action.payload, version).pipe(

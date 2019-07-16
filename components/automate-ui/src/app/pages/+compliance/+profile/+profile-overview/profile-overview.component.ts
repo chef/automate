@@ -227,9 +227,9 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
   }
 
   sendFiles(files) {
-    return observableCombineLatest(
+    return observableCombineLatest([
       ...files.map(file => this.uploadService.sendFile(file))
-    );
+    ]);
   }
 
   trackBy(file) {

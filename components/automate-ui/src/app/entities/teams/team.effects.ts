@@ -54,9 +54,9 @@ export class TeamEffects {
   ) { }
 
   @Effect()
-  getTeams$ = combineLatest(
+  getTeams$ = combineLatest([
     this.actions$.pipe(ofType<GetTeams>(TeamActionTypes.GET_ALL)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
       mergeMap(([_action, version]) =>
         this.requests.getTeams(version).pipe(
@@ -78,9 +78,9 @@ export class TeamEffects {
     }));
 
   @Effect()
-  getTeam$ = combineLatest(
+  getTeam$ = combineLatest([
     this.actions$.pipe(ofType<GetTeam>(TeamActionTypes.GET)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
       mergeMap(([{ payload: { id } }, version]) =>
         this.requests.getTeam(id, version).pipe(
@@ -99,9 +99,9 @@ export class TeamEffects {
     }));
 
   @Effect()
-  getTeamUsers$ = combineLatest(
+  getTeamUsers$ = combineLatest([
     this.actions$.pipe(ofType<GetTeamUsers>(TeamActionTypes.GET_USERS)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
       mergeMap(([{ payload: { id } }, version]) =>
         this.requests.getTeamUsers(id, version).pipe(
@@ -120,9 +120,9 @@ export class TeamEffects {
     }));
 
   @Effect()
-  createTeam$ = combineLatest(
+  createTeam$ = combineLatest([
     this.actions$.pipe(ofType<CreateTeam>(TeamActionTypes.CREATE)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
       mergeMap(([{ payload }, version]) =>
         this.requests.createTeam(payload, version).pipe(
@@ -130,9 +130,9 @@ export class TeamEffects {
           catchError((error) => observableOf(new CreateTeamFailure(error))))));
 
   @Effect()
-  createTeamSuccess$ = combineLatest(
+  createTeamSuccess$ = combineLatest([
     this.actions$.pipe(ofType<CreateTeamSuccess>(TeamActionTypes.CREATE_SUCCESS)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
       map(([{ payload }, version]) => {
         // Drop the user on the newly created team page.
@@ -158,9 +158,9 @@ export class TeamEffects {
     }));
 
   @Effect()
-  updateTeam$ = combineLatest(
+  updateTeam$ = combineLatest([
     this.actions$.pipe(ofType<UpdateTeam>(TeamActionTypes.UPDATE)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
       mergeMap(([{ payload }, version]) =>
         this.requests.updateTeam(payload, version).pipe(
@@ -187,9 +187,9 @@ export class TeamEffects {
     }));
 
   @Effect()
-  deleteTeam$ = combineLatest(
+  deleteTeam$ = combineLatest([
     this.actions$.pipe(ofType<DeleteTeam>(TeamActionTypes.DELETE)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
       mergeMap(([{ payload }, version ]) =>
         this.requests.deleteTeam(payload, version).pipe(
@@ -216,9 +216,9 @@ export class TeamEffects {
     }));
 
   @Effect()
-  addTeamUsers$ = combineLatest(
+  addTeamUsers$ = combineLatest([
     this.actions$.pipe(ofType<AddTeamUsers>(TeamActionTypes.ADD_USERS)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
       mergeMap(([{ payload }, version]) =>
         this.requests.addTeamUsers(payload, version).pipe(
@@ -239,9 +239,9 @@ export class TeamEffects {
     }));
 
   @Effect()
-  removeTeamUsers$ = combineLatest(
+  removeTeamUsers$ = combineLatest([
     this.actions$.pipe(ofType<RemoveTeamUsers>(TeamActionTypes.REMOVE_USERS)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
       mergeMap(([{ payload }, version ]) =>
         this.requests.removeTeamUsers(payload, version).pipe(

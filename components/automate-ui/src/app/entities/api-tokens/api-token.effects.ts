@@ -47,9 +47,9 @@ export class ApiTokenEffects {
   ) { }
 
   @Effect()
-  getAllTokens$ = combineLatest(
+  getAllTokens$ = combineLatest([
     this.actions$.pipe(ofType<GetAllTokens>(ApiTokenActionTypes.GET_ALL)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
       mergeMap(([_action, version]) =>
         this.requests.getAll(version).pipe(
@@ -65,9 +65,9 @@ export class ApiTokenEffects {
     })));
 
   @Effect()
-  getToken$ = combineLatest(
+  getToken$ = combineLatest([
     this.actions$.pipe(ofType<GetToken>(ApiTokenActionTypes.GET)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
       mergeMap(([{ payload: { id } }, version]) =>
         this.requests.get(id, version).pipe(
@@ -83,9 +83,9 @@ export class ApiTokenEffects {
     })));
 
   @Effect()
-  updateToken$ = combineLatest(
+  updateToken$ = combineLatest([
     this.actions$.pipe(ofType<UpdateToken>(ApiTokenActionTypes.UPDATE)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
       mergeMap(([{ payload: { token } }, version]) =>
         this.requests.update(token, version).pipe(
@@ -101,9 +101,9 @@ export class ApiTokenEffects {
     })));
 
   @Effect()
-  createToken$ = combineLatest(
+  createToken$ = combineLatest([
     this.actions$.pipe(ofType<CreateToken>(ApiTokenActionTypes.CREATE)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
       mergeMap(([{ payload: { id, name } }, version]) =>
         this.requests.create(id, name, version).pipe(
@@ -129,9 +129,9 @@ export class ApiTokenEffects {
     })));
 
   @Effect()
-  toggleToken$ = combineLatest(
+  toggleToken$ = combineLatest([
     this.actions$.pipe(ofType<ToggleTokenActive>(ApiTokenActionTypes.TOGGLE)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
       mergeMap(([{ payload: { id, active } }, version]) =>
         this.requests.toggleActive(id, active, version).pipe(
@@ -155,9 +155,9 @@ export class ApiTokenEffects {
     })));
 
   @Effect()
-  deleteToken$ = combineLatest(
+  deleteToken$ = combineLatest([
     this.actions$.pipe(ofType<DeleteToken>(ApiTokenActionTypes.DELETE)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
       mergeMap(([{ payload }, version]) =>
         this.requests.delete(payload.id, version).pipe(

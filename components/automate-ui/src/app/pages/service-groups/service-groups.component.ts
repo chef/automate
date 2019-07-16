@@ -94,7 +94,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed)
     ).subscribe(queryParams => this.listParamsChange(queryParams));
 
-    combineLatest(
+    combineLatest([
       this.route.queryParamMap.pipe(
         distinctUntilChanged((a, b) => {
           return a.get('sgId') === b.get('sgId') &&
@@ -103,7 +103,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
         })
       ),
       this.store.select(allServiceGroups)
-    )
+      ])
     .pipe(takeUntil(this.isDestroyed))
     .subscribe(([queryParams]) => this.detailParamsChange(queryParams));
 

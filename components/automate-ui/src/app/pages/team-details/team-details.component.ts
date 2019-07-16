@@ -132,11 +132,11 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         this.isMinorV1 = version === 'v1';
       });
 
-    this.sortedUsers$ = <Observable<User[]>>combineLatest(
+    this.sortedUsers$ = <Observable<User[]>>combineLatest([
       this.store.select(allUsers),
       this.store.select(userStatus),
       this.store.select(teamUsers),
-      this.store.select(getUsersStatus))
+      this.store.select(getUsersStatus)])
       .pipe(
         map(([users, uStatus, tUsers, tStatus]) => {
           if (uStatus !== EntityStatus.loadingSuccess ||

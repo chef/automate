@@ -67,10 +67,10 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
 
-    combineLatest(
+    combineLatest([
       this.store.select(getStatus),
       this.store.select(updateStatus)
-    ).pipe(
+    ]).pipe(
       takeUntil(this.isDestroyed),
       map(([gStatus, uStatus]) => {
         this.isLoading =
