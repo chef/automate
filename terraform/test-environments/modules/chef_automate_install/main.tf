@@ -56,10 +56,8 @@ module "chef_baseline" {
 
 locals {
   saml_config = <<SAML
-[dex.v1]
-  [dex.v1.sys]
-    [dex.v1.sys.connectors.saml]
-      ca_contents = """-----BEGIN CERTIFICATE-----
+[dex.v1.sys.connectors.saml]
+  ca_contents = """-----BEGIN CERTIFICATE-----
 MIIDnjCCAoagAwIBAgIGAUtB26KcMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG
 A1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU
 MBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB2dldGNoZWYxHDAaBgkqhkiG9w0BCQEWDWlu
@@ -79,11 +77,11 @@ bDZqKKny7qHKs4bioZ/HtS9NfgFV+pz1GpI50nw6ojItCPhqhgaFwtvf2brq9BHSK/DUmA3vF7/d
 XoB1V6vwQXRubclyH8Ei2+1j
 -----END CERTIFICATE-----
 """
-     sso_url = "https://chef.okta.com/app/chefsoftware_a2localfreshinstallunstable_1/exk1d6ztz4rioEOYA1d8/sso/saml"
-     entity_issuer = "https://automate.chef.co/dex/callback"
-     email_attr = "email"
-     username_attr = "email"
-     groups_attr = "groups"
+  sso_url = "https://chef.okta.com/app/chefsoftware_a2localfreshinstallunstable_1/exk1d6ztz4rioEOYA1d8/sso/saml"
+  entity_issuer = "https://automate.chef.co/dex/callback"
+  email_attr = "email"
+  username_attr = "email"
+  groups_attr = "groups"
 SAML
 }
 
@@ -234,74 +232,50 @@ EOF
 [global.v1]
   fqdn = "${var.alb_fqdn == "" ? element(var.instance_fqdn, count.index) : var.alb_fqdn}"
 
-[deployment.v1]
-  [deployment.v1.svc]
-    channel = "${var.channel}"
-    deployment_type = "${var.deployment_type}"
-    upgrade_strategy = "${var.upgrade == "true" ? "at-once" : "none"}"
-    manifest_cache_expiry = "0s"
-    enable_chef_server = ${var.enable_chef_server}
-    enable_workflow = ${var.enable_workflow}
+[deployment.v1.svc]
+  channel = "${var.channel}"
+  deployment_type = "${var.deployment_type}"
+  upgrade_strategy = "${var.upgrade == "true" ? "at-once" : "none"}"
+  manifest_cache_expiry = "0s"
+  enable_chef_server = ${var.enable_chef_server}
+  enable_workflow = ${var.enable_workflow}
 
-[gateway.v1]
-  [gateway.v1.sys]
-    [gateway.v1.sys.service]
-      trial_license_url = "https://licensing-${var.channel}.chef.io/create-trial"
-      enable_apps_feature = ${var.enable_eas_dashboard}
+[gateway.v1.sys.service]
+  trial_license_url = "https://licensing-${var.channel}.chef.io/create-trial"
+  enable_apps_feature = ${var.enable_eas_dashboard}
 
-[event_gateway.v1]
-  [event_gateway.v1.sys]
-    [event_gateway.v1.sys.service]
-      enable_nats_feature = ${var.enable_eas_dashboard}
+[event_gateway.v1.sys.service]
+  enable_nats_feature = ${var.enable_eas_dashboard}
 
-[event_service.v1]
-  [event_service.v1.sys]
-    [event_service.v1.sys.service]
-      enable_nats_feature = ${var.enable_eas_dashboard}
+[event_service.v1.sys.service]
+  enable_nats_feature = ${var.enable_eas_dashboard}
 
-[applications.v1]
-  [applications.v1.sys]
-    [applications.v1.sys.service]
-      enable_nats_feature = ${var.enable_eas_dashboard}
+[applications.v1.sys.service]
+  enable_nats_feature = ${var.enable_eas_dashboard}
 
-[load_balancer.v1]
-  [load_balancer.v1.sys]
-    [[load_balancer.v1.sys.frontend_tls]]
-      cert = """${join("\n", formatlist("%s", split("\n", data.aws_s3_bucket_object.wilcard_chef_co_crt.body)))}"""
-      key = """${join("\n", formatlist("%s", split("\n", data.aws_s3_bucket_object.wilcard_chef_co_key.body)))}"""
+[[load_balancer.v1.sys.frontend_tls]]
+  cert = """${join("\n", formatlist("%s", split("\n", data.aws_s3_bucket_object.wilcard_chef_co_crt.body)))}"""
+  key = """${join("\n", formatlist("%s", split("\n", data.aws_s3_bucket_object.wilcard_chef_co_key.body)))}"""
 
-[license_control.v1]
-  [license_control.v1.svc]
-    license = "${data.aws_s3_bucket_object.internal_license.body}"
-  [license_control.v1.sys.telemetry]
-    url = "https://telemetry-acceptance.chef.io"
+[license_control.v1.svc]
+  license = "${data.aws_s3_bucket_object.internal_license.body}"
+[license_control.v1.sys.telemetry]
+  url = "https://telemetry-acceptance.chef.io"
 
 ${var.saml == "true" ? local.saml_config : ""}
 
-[ingest]
-  [ingest.v1]
-    [ingest.v1.sys]
-      [ingest.v1.sys.service]
-        purge_converge_history_after_days = ${var.enable_cloudwatch_metrics == "true" ? 90 : 10}
-        purge_actions_after_days = ${var.enable_cloudwatch_metrics == "true" ? 90 : 10}
+[ingest.v1.sys.service]
+  purge_converge_history_after_days = ${var.enable_cloudwatch_metrics == "true" ? 60 : 10}
+  purge_actions_after_days = ${var.enable_cloudwatch_metrics == "true" ? 60 : 10}
 
-[compliance]
-  [compliance.v1]
-    [compliance.v1.sys]
-      [compliance.v1.sys.retention]
-        compliance_report_days = ${var.enable_cloudwatch_metrics == "true" ? 90 : 10}
+[compliance.v1.sys.retention]
+  compliance_report_days = ${var.enable_cloudwatch_metrics == "true" ? 60 : 10}
 
-[data_lifecycle]
-  [data_lifecycle.v1]
-    [data_lifecycle.v1.sys]
-      [data_lifecycle.v1.sys.service]
-        daily_run_at = "17:45:00"
+[data_lifecycle.v1.sys.service]
+  daily_run_at = "17:45:00"
 
-[elasticsearch]
-  [elasticsearch.v1]
-    [elasticsearch.v1.sys]
-      [elasticsearch.v1.sys.runtime]
-        heapsize = "${var.enable_cloudwatch_metrics == "true" ? "16g" : "2g"}"
+[elasticsearch.v1.sys.runtime]
+  heapsize = "${var.enable_cloudwatch_metrics == "true" ? "16g" : "2g"}"
 TOML
   }
 
