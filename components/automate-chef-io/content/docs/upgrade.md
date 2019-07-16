@@ -127,7 +127,7 @@ These flags enable you to upgrade by skipping preflight checks for unsupported f
 
 The Chef Automate 2 upgrade process requires manual intervention to upgrade a Chef Automate 1 installation that uses external Elasticsearch.
 
-Automated upgrade for this configuration is in development. To upgrade an external Elasticsearch cluster, please reach out to a Customer Success or Customer Support representative for assistance.
+To upgrade an external Elasticsearch cluster, please reach out to a Customer Success or Customer Support representative for assistance.
 
 ### New Data Paths
 

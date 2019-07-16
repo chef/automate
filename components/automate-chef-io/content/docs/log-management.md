@@ -33,7 +33,7 @@ journalctl --help
 
 ### Configuring Log Level
 
-You can configure Chef Automate log level for all services by creating a `.toml` and configuring the log level. By default each service will initialize at the "info" level but can be any of 'debug, 'info', 'warning', 'panic', or 'fatal'.
+You can configure Chef Automate log level for all services by creating a TOML file and configuring the log level. By default each service will initialize at the "info" level but can be any of 'debug, 'info', 'warning', 'panic', or 'fatal'.
 
 ```shell
 [global.v1.log]

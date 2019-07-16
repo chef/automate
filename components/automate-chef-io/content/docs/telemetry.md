@@ -19,7 +19,7 @@ Please see the [Chef Privacy Policy](https://chef.io/privacy-policy) for more in
 
 ### Opting Out of Telemetry
 
-Admins can opt out of telemetry for the Automate server and all of its users, by editing an existing `configuration.toml` or create a new `.toml` file. Add the following to the `.toml` file:
+Admins can opt out of telemetry for the Automate server and all of its users, by editing an existing `configuration.toml` or create a new TOML file. Add the following to the TOML file:
 
 ```toml
 [license_control.v1.sys.telemetry]
