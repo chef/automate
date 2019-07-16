@@ -64,7 +64,7 @@ func (backend ES2Backend) GetSuggestions(typeParam string, filters map[string][]
 		suggs, err = backend.getProfileSuggestions(client, typeParam, target, text, size, filters)
 	} else if typeParam == "control" {
 		suggs, err = backend.getControlSuggestions(client, typeParam, target, text, size, filters)
-	} else if typeParam == "recipe" || typeParam == "role" {
+	} else if suggestionFieldArray(typeParam) {
 		suggs, err = backend.getArrayAggSuggestions(client, typeParam, target, text, size, filters)
 	} else {
 		suggs, err = backend.getAggSuggestions(client, typeParam, target, text, size, filters)
@@ -93,6 +93,15 @@ func (backend ES2Backend) GetSuggestions(typeParam string, filters map[string][]
 		return suggs[0:size], nil
 	}
 	return suggs, nil
+}
+
+func suggestionFieldArray(field string) bool {
+	switch field {
+	case "recipe", "role", "chef_tags":
+		return true
+	default:
+		return false
+	}
 }
 
 func (backend ES2Backend) getAggSuggestions(client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string) ([]*reportingapi.Suggestion, error) {
@@ -219,8 +228,11 @@ func (backend ES2Backend) getArrayAggSuggestions(client *elastic.Client, typePar
 		matchQuery := elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text)
 		boolQuery = boolQuery.Must(matchQuery)
 	}
-	// multiplying the size by 50 as elasticsearch will sort array aggregations by doc_count. Will trim it back to size once we match it again in go
-	aggs := elastic.NewTermsAggregation().Field(target).Size(size * 50)
+
+	aggs := elastic.NewTermsAggregation().Field(target).Size(100)
+	if len(text) >= 2 {
+		aggs = aggs.Include(".*" + text + ".*")
+	}
 	searchSource := elastic.NewSearchSource().
 		Query(boolQuery).
 		Aggregation("myagg", aggs).
