@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -46,7 +47,7 @@ func newCreateInstallBundleProgressCollector() *createProgressCollector {
 	}
 }
 
-func (p *createProgressCollector) Downloading(name string) {
+func (p *createProgressCollector) Downloading(name string, _ int) {
 	p.downloading = append(p.downloading, name)
 }
 
@@ -56,6 +57,8 @@ func (p *createProgressCollector) DownloadComplete(name string, wasCached bool) 
 		p.cached = append(p.cached, name)
 	}
 }
+
+func (p *createProgressCollector) RetriableDownloadError(_ string, _ string, _ time.Duration) {}
 
 func TestRoundTrip(t *testing.T) {
 	tmpdir, err := ioutil.TempDir("", "a2-install-bundle-test")

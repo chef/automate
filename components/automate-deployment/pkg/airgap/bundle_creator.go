@@ -23,11 +23,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -100,14 +102,18 @@ func (dl *bintrayHabDownloader) DownloadHabBinary(version string, release string
 
 // InstallBundleCreatorProgress gets progress reports from the creator
 type InstallBundleCreatorProgress interface {
-	Downloading(name string)
+	Downloading(name string, tries int)
 	DownloadComplete(name string, wasCached bool)
+	RetriableDownloadError(name string, info string, delay time.Duration)
 }
 
 type noopInstallBundleCreatorProgress struct{}
 
-func (noopInstallBundleCreatorProgress) Downloading(string)            {}
-func (noopInstallBundleCreatorProgress) DownloadComplete(string, bool) {}
+func (noopInstallBundleCreatorProgress) Downloading(string, int)                              {}
+func (noopInstallBundleCreatorProgress) DownloadComplete(string, bool)                        {}
+func (noopInstallBundleCreatorProgress) RetriableDownloadError(string, string, time.Duration) {}
+
+var _ InstallBundleCreatorProgress = noopInstallBundleCreatorProgress{}
 
 // InstallBundleCreator creates installation bundles
 type InstallBundleCreator struct {
@@ -119,6 +125,8 @@ type InstallBundleCreator struct {
 	hartCache           HartifactCache
 	keyCache            KeyCache
 	habBinaryDownloader HabBinaryDownloader
+	retries             int
+	retryDelay          int
 
 	// For development
 	hartifactsPath string
@@ -165,12 +173,30 @@ func WithInstallBundleWorkspacePath(path string) InstallBundleCreatorOpt {
 	}
 }
 
+// WithInstallBundleRetries sets the number of retries to
+// attempt for failed package downloads.
+func WithInstallBundleRetries(r int) InstallBundleCreatorOpt {
+	return func(c *InstallBundleCreator) {
+		c.retries = r
+	}
+}
+
+// WithInstallBundleRetryDelay sets the number of seconds between
+// retries, if not set, an exponential backoff based on the number of
+// tries is used.
+func WithInstallBundleRetryDelay(d int) InstallBundleCreatorOpt {
+	return func(c *InstallBundleCreator) {
+		c.retryDelay = d
+	}
+}
+
 // NewInstallBundleCreator initializes a new artifact creator
 func NewInstallBundleCreator(opts ...InstallBundleCreatorOpt) *InstallBundleCreator {
 	creator := &InstallBundleCreator{
 		channel:             "current",
 		depotClient:         depot.NewClient(),
 		habBinaryDownloader: &bintrayHabDownloader{},
+		retryDelay:          -1, // auto-calculate by default
 	}
 
 	for _, o := range opts {
@@ -324,7 +350,7 @@ func (creator *InstallBundleCreator) downloadHab(m *manifest.A2, progress Instal
 
 	habBinaryName := fmt.Sprintf("%s binary", habpkg.Ident(&hab))
 	err := fileutils.AtomicWriter(habFilePath, func(w io.Writer) error {
-		progress.Downloading(habBinaryName)
+		progress.Downloading(habBinaryName, 1)
 		err := creator.habBinaryDownloader.DownloadHabBinary(hab.Version(), hab.Release(), w)
 		if err != nil {
 			return errors.Wrap(err, "Failed to download hab binary")
@@ -392,32 +418,115 @@ func (creator *InstallBundleCreator) fetchDependencies(depotClient depot.Client,
 	deps = uniq(deps)
 
 	for _, p := range deps {
-		name := fmt.Sprintf("%s/%s/%s/%s", p.Origin(), p.Name(), p.Version(), p.Release())
-		progress.Downloading(name)
-		if !creator.hartCache.IsCached(p) {
-			// Cache the artifact. If we successfully download the hart
-			// but fail to get the key, we will not cache the hart
-			err := creator.hartCache.CacheArtifact(p, func(writer io.Writer) error {
-				header, err := depotClient.DownloadPackage(p, writer)
-				if err == nil {
-					if !creator.keyCache.IsCached(header.KeyName) {
-						return creator.keyCache.CacheKey(header.KeyName, func(writer io.Writer) error {
-							return depotClient.DownloadOriginKey(header.KeyName, writer)
-						})
-					}
-				}
-				return err
-			})
-
-			if err != nil {
-				return status.Wrapf(err, status.DownloadError, "Failed to download package %s", p)
-			}
-			progress.DownloadComplete(name, false)
-		} else {
-			progress.DownloadComplete(name, true)
+		err := creator.downloadPackageAndKeys(p, depotClient, progress)
+		if err != nil {
+			return status.Wrapf(err, status.DownloadError, "Failed to download package %s", p)
 		}
 	}
 	return nil
+}
+
+func (creator *InstallBundleCreator) downloadPackageAndKeys(p habpkg.VersionedPackage,
+	depotClient depot.Client, progress InstallBundleCreatorProgress) error {
+	if creator.hartCache.IsCached(p) {
+		// Since the hart is only cached if the key is
+		// successfully cached, we know we have everything if
+		// the hart is in the cache.
+		name := habpkg.Ident(p)
+		progress.Downloading(name, 1)
+		progress.DownloadComplete(name, true)
+		return nil
+	}
+
+	return creator.hartCache.CacheArtifact(p, func(writer io.Writer) error {
+		header, err := creator.downloadPackageWithRetries(p, writer, depotClient, progress)
+		if err == nil {
+			if creator.keyCache.IsCached(header.KeyName) {
+				return nil // We don't log here since nearly every key is cached.
+			}
+
+			return creator.keyCache.CacheKey(header.KeyName, func(writer io.Writer) error {
+				return creator.downloadOriginKeyWithRetries(header.KeyName, writer, depotClient, progress)
+			})
+		}
+		return err
+	})
+}
+
+func (creator *InstallBundleCreator) downloadPackageWithRetries(p habpkg.VersionedPackage, writer io.Writer,
+	depotClient depot.Client, progress InstallBundleCreatorProgress) (*depot.HartHeader, error) {
+
+	name := habpkg.Ident(p)
+
+	var header *depot.HartHeader
+	err := creator.withRetry(func(tryCount int, ri retryInfo) error {
+		progress.Downloading(name, tryCount)
+		var err error
+		header, err = depotClient.DownloadPackage(p, writer)
+		if err != nil {
+			if ri.willRetry {
+				progress.RetriableDownloadError(name, err.Error(), ri.delay)
+			}
+			return err
+		}
+		progress.DownloadComplete(name, false)
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return header, nil
+}
+
+func (creator *InstallBundleCreator) downloadOriginKeyWithRetries(keyname depot.OriginKeyName, writer io.Writer,
+	depotClient depot.Client, progress InstallBundleCreatorProgress) error {
+
+	return creator.withRetry(func(tryCount int, ri retryInfo) error {
+		progress.Downloading(string(keyname), tryCount)
+		err := depotClient.DownloadOriginKey(keyname, writer)
+		if err != nil {
+			if ri.willRetry {
+				progress.RetriableDownloadError(string(keyname), err.Error(), ri.delay)
+			}
+			return err
+		}
+		progress.DownloadComplete(string(keyname), false)
+		return nil
+	})
+}
+
+type retryInfo struct {
+	willRetry bool
+	delay     time.Duration
+}
+
+type retriableFunc func(int, retryInfo) error
+
+func (creator *InstallBundleCreator) withRetry(f retriableFunc) error {
+	var err error
+	var nextRetryDelay time.Duration
+
+	for try := 1; try <= creator.retries+1; try++ {
+		if nextRetryDelay > 0 {
+			time.Sleep(nextRetryDelay)
+		}
+
+		if creator.retryDelay >= 0 {
+			nextRetryDelay = time.Second * time.Duration(creator.retryDelay)
+		} else {
+			sleep := math.Pow(2.0, float64(try))
+			nextRetryDelay = time.Second * time.Duration(sleep)
+		}
+
+		err = f(try, retryInfo{
+			willRetry: try+1 <= creator.retries+1,
+			delay:     nextRetryDelay})
+		if err == nil {
+			return nil
+		}
+	}
+	return err
 }
 
 func (creator *InstallBundleCreator) createTar(InstallBundleCreatorProgress) error {

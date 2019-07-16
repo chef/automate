@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -24,6 +25,8 @@ type airgapFlags struct {
 	hartifactsPath string
 	verbose        bool
 	hartsOnly      bool
+	retries        int
+	retryDelay     int
 }
 
 func (f airgapFlags) validateArgs() error {
@@ -93,6 +96,16 @@ func newAirgapCmd() *cobra.Command {
 		"Origin of habitat package creator",
 	)
 
+	bundleCreateCmd.PersistentFlags().IntVarP(
+		&airgapCmdFlags.retries, "retries", "r", 2,
+		"Number of times to retry failed hab package downloads",
+	)
+
+	bundleCreateCmd.PersistentFlags().IntVar(
+		&airgapCmdFlags.retryDelay, "retry-delay", -1,
+		"Number of seconds to wait between retries (exponential backoff is used if not provided)",
+	)
+
 	if !isDevMode() {
 		for _, flagName := range []string{
 			"override-origin",
@@ -153,17 +166,27 @@ type installBundlePath struct {
 
 type installBundleCreateProgress struct{}
 
-func (installBundleCreateProgress) Downloading(name string) {
-	writer.Bodyf("Downloading %s", name)
+func (installBundleCreateProgress) Downloading(name string, try int) {
+	if try > 1 {
+		writer.Bodyf("Downloading %s (try %d)", name, try)
+	} else {
+		writer.Bodyf("Downloading %s", name)
+	}
 	writer.StartSpinner()
 }
+
 func (installBundleCreateProgress) DownloadComplete(name string, wasCached bool) {
+	writer.StopSpinner()
 	if wasCached {
 		writer.Bodyf("%s found in cache", name)
 	} else {
 		writer.Bodyf("Downloaded %s", name)
 	}
+}
+
+func (installBundleCreateProgress) RetriableDownloadError(name string, info string, delay time.Duration) {
 	writer.StopSpinner()
+	writer.Bodyf("Downloading %s failed (will retry in %s): %s", name, delay, info)
 }
 
 func runAirgapCreateInstallBundle(cmd *cobra.Command, args []string) error {
@@ -223,12 +246,15 @@ func runAirgapCreateInstallBundle(cmd *cobra.Command, args []string) error {
 	opts = append(
 		opts,
 		airgap.WithInstallBundleWorkspacePath(airgapCmdFlags.workspacePath),
+		airgap.WithInstallBundleRetries(airgapCmdFlags.retries),
+		airgap.WithInstallBundleRetryDelay(airgapCmdFlags.retryDelay),
 	)
 
 	writer.Title("Creating Airgap Installation Bundle...")
 	creator := airgap.NewInstallBundleCreator(opts...)
 	outputFile, err := creator.Create(installBundleCreateProgress{})
 	if err != nil {
+		writer.StopSpinner()
 		return status.Annotate(err, status.AirgapCreateInstallBundleError)
 	}
 
