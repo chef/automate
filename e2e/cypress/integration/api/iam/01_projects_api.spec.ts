@@ -241,12 +241,14 @@ describe('projects API', () => {
     })
 
     it('rules with updated conditions get applied to nodes', () => {
-      // Add condition to avengers rule
-      avengersRule.conditions.push({
+      // change avengers rule to include both organizations
+      avengersRule.conditions = [
+        {
         attribute: "CHEF_ORGS",
-        operator: "EQUALS",
-        values: ["xmen"]
-      })
+        operator: "MEMBER_OF",
+        values: ["avengers", "xmen"]
+      }
+    ]
 
       cy.request({
         headers: { 'api-token': admin_token },
@@ -262,7 +264,6 @@ describe('projects API', () => {
       })
       cy.wait(5000) // TODO replace with polling apply status request
 
-      // TODO investigate failure by repro locally
       cy.request({
         headers: {
           'api-token': admin_token,
