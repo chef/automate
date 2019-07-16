@@ -118,8 +118,20 @@ subscriptions:
           post_commit: true
           only_if_modified:
             - components/chef-ui-library/*
-  # If a build in the habitat/build pipeline fails, unlock the staging area
+  # When the habitat/build pipeline fails, unlock the staging area
   - workload: buildkite_build_failed:{{agent_id}}:habitat/build:*
+    actions:
+      - unlock_staging_area:post_merge:
+          post_commit: true
+          always_run: true
+  # When the habitat/build pipeline completes successfully, unlock the staging area
+  - workload: buildkite_build_passed:{{agent_id}}:habitat/build:*
+    actions:
+      - unlock_staging_area:post_merge:
+          post_commit: true
+          always_run: true
+  # When the habitat/build pipeline is canceled, unlock the staging area
+  - workload: buildkite_build_canceled:{{agent_id}}:habitat/build:*
     actions:
       - unlock_staging_area:post_merge:
           post_commit: true
@@ -136,9 +148,6 @@ subscriptions:
           post_commit: true
       - bash:.expeditor/purge-cdn.sh:
           post_commit: true
-      - unlock_staging_area:post_merge:
-          post_commit: true
-          always_run: true
   # Update our compliance-profile pinnings when new profiles are released
   - workload: hab_package_published:unstable:chef/automate-compliance-profiles/*
     actions:
