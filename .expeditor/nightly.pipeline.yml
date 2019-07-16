@@ -24,6 +24,48 @@ steps:
         linux:
           privileged: true
 
+  - label: A2 proxy test (dev channel)
+    command:
+      - scripts/nightly_proxy.sh
+    timeout_in_minutes: 30
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+
+  - label: basic A1 -> A2 migration test (dev channel)
+    command:
+      - scripts/nightly_basic_a1.sh
+    env:
+      HAB_ORIGIN: chef
+    timeout_in_minutes: 30
+    expeditor:
+      secrets:
+        A1_LICENSE:
+          path: secret/a2/delivery_license
+          field: license
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+
+  - label: A1 -> A2 migration test (dev channel)
+    command:
+      - scripts/nightly_migration.sh
+    env:
+      HAB_ORIGIN: chef
+    timeout_in_minutes: 30
+    expeditor:
+      secrets:
+        A1_LICENSE:
+          path: secret/a2/delivery_license
+          field: license
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+
   - wait
 
   - label: "[integration] chef server upgrade"

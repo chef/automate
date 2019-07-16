@@ -44,24 +44,9 @@ pipelines:
   - deploy/ui-library:
       description: Deploy ui-library.cd.chef.co
       definition: .expeditor/deploy_ui_library.pipeline.yml
-  - deploy/proxy:
-      description: Deploy a2 proxy test environment
-      definition: .expeditor/proxy.pipeline.yml
-      env:
-        - CHANNEL: dev
   - code_coverage:
       description: Generate code coverage reports and upload them to data store
       definition: .expeditor/coverage.pipeline.yml
-      env:
-        - CHANNEL: dev
-  - a1-migration/dev:
-      description: all-in-one A1 -> A2 migration test of dev artifacts
-      definition: .expeditor/a1-migration.pipeline.yml
-      env:
-        - CHANNEL: dev
-  - basic-a1/dev:
-      description: A1 -> A2 migration test of dev artifacts, standard A1 config
-      definition: .expeditor/basic-a1.pipeline.yml
       env:
         - CHANNEL: dev
   - test-license-usage/dev:
@@ -172,9 +157,6 @@ subscriptions:
   # Trigger various pipelines every night
   - workload: schedule_triggered:chef/automate:master:nightly_tests:*
     actions:
-      - trigger_pipeline:a1-migration/dev
-      - trigger_pipeline:deploy/proxy
-      - trigger_pipeline:basic-a1/dev
       - trigger_pipeline:nightly
       - trigger_pipeline:test-license-usage/dev
   # When a new verification image is released, update the pinning
