@@ -1,7 +1,8 @@
 name: chef-automate backup restore
 synopsis: restore a Chef Automate backup
-usage: chef-automate backup restore ID_OR_PATH [flags]
-description: Restore a Chef Automate backup
+usage: chef-automate backup restore [ID_OR_PATH] [flags]
+description: |
+  Restore a Chef Automate backup. If no ID or path is given the latest found backup will be restored.
 options:
 - name: airgap-bundle
   usage: The artifact to use for an air-gapped installation
