@@ -108,20 +108,15 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec.Profile, profilesSums [
 					SkipMessage: result.SkipMessage,
 				}
 			}
-			//fmt.Printf("\n******tags for profile %s control %s = %+v", profile.Name, control.Id, control.Tags.Fields)
 
 			stringTags := make([]relaxting.ESInSpecReportControlStringTags, 0)
 			for fKey, fValue := range control.Tags.Fields {
-				fmt.Printf("\n\n* fKey=%s fValue=%+v", fKey, fValue)
-				fmt.Printf("\n* GetKey=%s", fValue.GetKind())
-
 				// Add key with a null value as an empty array for values
 				if _, isNullValue := fValue.GetKind().(*structpb.Value_NullValue); isNullValue {
 					stringTags = append(stringTags, relaxting.ESInSpecReportControlStringTags{
 						Key:    fKey,
 						Values: make([]string, 0),
 					})
-					// we need to remove now this fKey from the tags. Only leaving the tags we don't support
 				}
 
 				// Add key with a string value
@@ -130,26 +125,23 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec.Profile, profilesSums [
 						Key:    fKey,
 						Values: []string{fValue.GetStringValue()},
 					})
-					// we need to remove now this fKey from the tags. Only leaving the tags we don't support
 				}
 
 				// Add key with array of string values
 				if _, isListValue := fValue.GetKind().(*structpb.Value_ListValue); isListValue {
-					stringValues := make([]string, len(fValue.GetListValue().Values))
-					for i, listValue := range fValue.GetListValue().Values {
+					stringValues := make([]string, 0)
+					for _, listValue := range fValue.GetListValue().Values {
 						if _, isStringValue := listValue.GetKind().(*structpb.Value_StringValue); isStringValue {
-							stringValues[i] = listValue.GetStringValue()
+							stringValues = append(stringValues, listValue.GetStringValue())
 						}
 					}
 					stringTags = append(stringTags, relaxting.ESInSpecReportControlStringTags{
 						Key:    fKey,
 						Values: stringValues,
 					})
-					// we need to remove now this fKey from the tags. Only leaving the tags we don't support
 				}
 			}
 
-			fmt.Printf("\n!!! Adding stringTags=%+v", stringTags)
 			minControls[i] = relaxting.ESInSpecReportControl{
 				ID:         control.Id,
 				Title:      control.Title,
