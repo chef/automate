@@ -21,6 +21,93 @@ func (es Backend) GetSuggestions(term string, text string, filters map[string][]
 	return es.getAggSuggestions(term, text, filters)
 }
 
+// {
+// 	"aggregations":{
+// 		 "myagg":{
+// 				"aggregations":{
+// 					 "distinct":{
+// 							"top_hits":{
+// 								 "_source":false,
+// 								 "size":1
+// 							}
+// 					 },
+// 					 "mymaxscore":{
+// 							"max":{
+// 								 "script":{
+// 										"source":"_score"
+// 								 }
+// 							}
+// 					 }
+// 				},
+// 				"terms":{
+// 					 "field":"platform",
+// 					 "order":[
+// 							{
+// 								 "mymaxscore":"desc"
+// 							}
+// 					 ],
+// 					 "size":100
+// 				}
+// 		 }
+// 	},
+// 	"query":{
+// 		 "bool":{
+// 				"filter":{
+// 					 "bool":{
+// 							"should":{
+// 								 "terms":{
+// 										"exists":[
+// 											 "true"
+// 										]
+// 								 }
+// 							}
+// 					 }
+// 				},
+// 				"must":[
+// 					 {
+// 							"type":{
+// 								 "value":"node-state"
+// 							}
+// 					 },
+// 					 {
+// 							"match":{
+// 								 "platform.engram":{
+// 										"operator":"or",
+// 										"query":"kk"
+// 								 }
+// 							}
+// 					 },
+// 					 {
+// 							"match":{
+// 								 "platform.engram":{
+// 										"operator":"and",
+// 										"query":"kk"
+// 								 }
+// 							}
+// 					 }
+// 				],
+// 				"should":[
+// 					 {
+// 							"term":{
+// 								 "platform.lower":{
+// 										"boost":200,
+// 										"value":"kk"
+// 								 }
+// 							}
+// 					 },
+// 					 {
+// 							"prefix":{
+// 								 "platform.lower":{
+// 										"boost":100,
+// 										"value":"kk"
+// 								 }
+// 							}
+// 					 }
+// 				]
+// 		 }
+// 	},
+// 	"size":0
+// }
 func (es Backend) getAggSuggestions(term string, text string, filters map[string][]string) ([]backend.Suggestion, error) {
 	myagg := "myagg"
 	filters["exists"] = []string{"true"}
@@ -86,6 +173,58 @@ func (es Backend) getAggSuggestions(term string, text string, filters map[string
 	return suggs, nil
 }
 
+// {
+// 	"aggregations":{
+// 		 "myagg":{
+// 				"aggregations":{
+// 					 "typed_hits":{
+// 							"top_hits":{
+// 								 "_source":{
+// 										"includes":[
+// 											 "attributes"
+// 										]
+// 								 }
+// 							}
+// 					 }
+// 				},
+// 				"terms":{
+// 					 "field":"attributes",
+// 					 "include":".*yum.*",
+// 					 "size":100
+// 				}
+// 		 }
+// 	},
+// 	"query":{
+// 		 "bool":{
+// 				"filter":{
+// 					 "bool":{
+// 							"should":{
+// 								 "terms":{
+// 										"exists":[
+// 											 "true"
+// 										]
+// 								 }
+// 							}
+// 					 }
+// 				},
+// 				"must":[
+// 					 {
+// 							"type":{
+// 								 "value":"node-state"
+// 							}
+// 					 },
+// 					 {
+// 							"match":{
+// 								 "attributes.engram":{
+// 										"query":"yum"
+// 								 }
+// 							}
+// 					 }
+// 				]
+// 		 }
+// 	},
+// 	"size":0
+// }
 func (es Backend) getArrayAggSuggestions(term string, text string, filters map[string][]string) ([]backend.Suggestion, error) {
 	typeQuery := elastic.NewTypeQuery(IndexNodeState)
 	filters["exists"] = []string{"true"}
@@ -98,43 +237,50 @@ func (es Backend) getArrayAggSuggestions(term string, text string, filters map[s
 		matchQuery := elastic.NewMatchQuery(fmt.Sprintf("%s.engram", term), text)
 		boolQuery = boolQuery.Must(matchQuery)
 	}
-	// multiplying the size by 10 as elasticsearch will sort array aggregations by doc_count. Will trim it back to size once we match it again in go
-	aggs := elastic.NewTermsAggregation().Field(term).Size(SuggestionQuerySize)
+
+	// "aggregations": {
+	//   "myagg": {
+	//     "terms": {
+	//       "field": "recipes",
+	//       "include": ".*yum-.*",
+	//       "size": 100
+	//     },
+	//     "aggs": {
+	//       "typed_hits": {
+	//         "top_hits": {
+	//           "_source": {
+	//             "includes": [
+	//               "recipes"
+	//             ]
+	//           }
+	//         }
+	//       }
+	//     }
+	//   }
+	// }
+	outerAggs := elastic.NewTermsAggregation().Field(term).Size(100)
+	if len(text) >= 2 {
+		outerAggs = outerAggs.Include(".*" + text + ".*")
+	}
+
+	//     "aggs": {
+	//       "typed_hits": {
+	//         "top_hits": {
+	//           "_source": {
+	//             "includes": [
+	//               "recipes"
+	//             ]
+	//           }
+	//         }
+	//       }
+	innerAggs := elastic.NewTopHitsAggregation().FetchSourceContext(
+		elastic.NewFetchSourceContext(true).Include(term))
+	outerAggs.SubAggregation("typed_hits", innerAggs)
 	searchSource := elastic.NewSearchSource().
 		Query(boolQuery).
-		Aggregation("myagg", aggs).
+		Aggregation("myagg", outerAggs).
 		Size(0)
 
-	//// Sample search sent to ElasticSearch when suggesting roles:
-	//{
-	//	"query": {
-	//		"bool": {
-	//			"must": [
-	//				{
-	//					"type": {
-	//						"value": "myagg"
-	//					}
-	//				},
-	//				{
-	//					"match": {
-	//						"roles.engram": {
-	//							"query": "base"
-	//						}
-	//					}
-	//				}
-	//			]
-	//		}
-	//	},
-	//	"aggregations": {
-	//		"myagg": {
-	//			"terms": {
-	//				"field": "roles",
-	//				"size": 100
-	//			}
-	//		}
-	//	},
-	//	"size": 0
-	//}
 	searchResult, err := es.client.Search().
 		SearchSource(searchSource).
 		Index(IndexNodeState).
