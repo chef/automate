@@ -3,29 +3,22 @@
 run_diagnostics_pre_upgrade() {
     local loadbalancer_url="$1"
     local filters="$2"
+    local pre_upgrade_filters="$3"
     # shellcheck disable=SC2086
-    chef-automate diagnostics run $filters --lb-url "$loadbalancer_url" --skip-cleanup
-}
-
-run_diagnostics_pre_deep_upgrade() {
-    # Our CI scripts run diagnostics using the latest `chef-automate` executable.
-    # Not all current tests will run correctly against an old A2, so we tag unsafe tests
-    # and run the rest.
-    local loadbalancer_url="$1"
-    local filters="$2"
-    # shellcheck disable=SC2086
-    chef-automate diagnostics run $filters --lb-url "$loadbalancer_url" --skip-cleanup
+    chef-automate diagnostics run $filters $pre_upgrade_filters --lb-url "$loadbalancer_url" --skip-cleanup
 }
 
 run_diagnostics_post_upgrade() {
     local loadbalancer_url="$1"
     local filters="$2"
+    local pre_upgrade_filters="$2"
     # Verify the old data made it
     # shellcheck disable=SC2086
-    chef-automate diagnostics run $filters --lb-url "$loadbalancer_url" --skip-generate
+    chef-automate diagnostics run $filters $pre_upgrade_filters --lb-url "$loadbalancer_url" --skip-generate
 
     # Make sure we can exercise the entirety of the tests post upgrade
-    chef-automate diagnostics run --lb-url "$loadbalancer_url" --skip-cleanup
+    # shellcheck disable=SC2086
+    chef-automate diagnostics run $filters --lb-url "$loadbalancer_url" --skip-cleanup
 }
 
 run_inspec_tests() {

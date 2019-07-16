@@ -7,7 +7,6 @@ test_skip_diagnostics=true
 do_test_deploy() {
   # Make sure the default settings work as expected
   # do_test_deploy_default
-  set -x
 
   local base_backup_dir="/tmp/$test_build_slug/backups"
   local hab_backup_dir="$base_backup_dir/hab"
