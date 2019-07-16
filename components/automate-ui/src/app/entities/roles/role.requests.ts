@@ -6,7 +6,7 @@ import { environment as env } from 'environments/environment';
 import { Role } from './role.model';
 
 export interface RolesResponse {
-  policies: Role[];
+  roles: Role[];
 }
 
 export interface RoleResponse {

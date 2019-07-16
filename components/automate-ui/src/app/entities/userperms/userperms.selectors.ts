@@ -8,7 +8,7 @@ export const userpermsState = createFeatureSelector<PermEntityState>(NGRX_REDUCE
 
 export const permList = createSelector(
   userpermsState,
-  (state) => map((id) => get(['byId', id], state),
+  (state) => map((id: string) => get(['byId', id], state),
                  get('allIds', state))
 );
 
