@@ -97,6 +97,18 @@ func (a *Applications) GetDisconnectedServices(
 	return a.client.GetDisconnectedServices(ctx, request)
 }
 
+func (a *Applications) DeleteDisconnectedServices(
+	ctx context.Context,
+	request *applications.DisconnectedServicesReq) (*applications.ServicesRes, error) {
+
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.client.DeleteDisconnectedServices(ctx, request)
+}
+
 // GetVersion fetches the version of team service
 func (a *Applications) GetVersion(ctx context.Context,
 	e *version.VersionInfoRequest) (*version.VersionInfo, error) {

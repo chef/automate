@@ -67,6 +67,17 @@ service ApplicationsService {
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
   };
 
+  rpc DeleteDisconnectedServices(DisconnectedServicesReq) returns (ServicesRes ) {
+    option (google.api.http) = {
+      post: "/beta/applications/delete_disconnected_services"
+      body: "*"
+    };
+    option (chef.automate.api.policy).resource = "service_groups";
+    option (chef.automate.api.policy).action = "delete";
+    option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "applications:serviceGroups:delete";
+  };
+
   rpc GetVersion (common.version.VersionInfoRequest) returns (common.version.VersionInfo) {
     option (google.api.http).get = "/beta/applications/version";
     option (chef.automate.api.policy).resource = "service_info:version";
