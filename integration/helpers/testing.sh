@@ -11,7 +11,7 @@ run_diagnostics_pre_upgrade() {
 run_diagnostics_post_upgrade() {
     local loadbalancer_url="$1"
     local filters="$2"
-    local pre_upgrade_filters="$2"
+    local pre_upgrade_filters="$3"
     # Verify the old data made it
     # shellcheck disable=SC2086
     chef-automate diagnostics run $filters $pre_upgrade_filters --lb-url "$loadbalancer_url" --skip-generate
