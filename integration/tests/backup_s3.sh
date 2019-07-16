@@ -3,6 +3,7 @@
 #shellcheck disable=SC2034
 test_name="backup-s3"
 test_backup_restore=true
+test_diagnostics_filters="~iam-v2"
 
 __base_path() {
     if [ -z "$BUILDKITE_BUILD_ID" ]; then

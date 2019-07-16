@@ -3,7 +3,7 @@
 #shellcheck disable=SC2034
 test_name="backup-ontop"
 test_backup_restore=true
-
+test_diagnostics_filters="~iam-v2"
 
 do_prepare_restore() {
     # Run the diagnostics command again. We'll verify that this does not pass

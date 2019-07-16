@@ -2,6 +2,7 @@
 
 #shellcheck disable=SC2034
 test_name="workflow"
+test_diagnostics_filters="~iam-v2"
 
 do_deploy() {
     #shellcheck disable=SC2154

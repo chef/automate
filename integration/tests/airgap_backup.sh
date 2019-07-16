@@ -3,6 +3,7 @@
 #shellcheck disable=SC2034
 test_name="airgap_backup"
 test_backup_restore=true
+test_diagnostics_filters="~iam-v2"
 
 do_build() {
     do_build_default
