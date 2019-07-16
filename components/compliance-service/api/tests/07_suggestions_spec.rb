@@ -155,29 +155,11 @@ describe File.basename(__FILE__) do
     actual = res['suggestions'].flat_map {|s| s['text']}.sort
     assert_equal(["apache_deb", "apache_linux", "apache_windows"], actual)
 
-    res = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
-      type: 'role', text: 'Apache Linux', size: 4
-    )
-    actual = res['suggestions'].flat_map {|s| s['text']}.sort
-    assert_equal(["apache_deb", "apache_linux", "apache_windows", "base_linux"], actual)
-
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'recipe', text: 'apache_extras::harden'
     )
-    expected = [
-      "apache_extras::harden",
-      "apache_extras::windows_harden",
-      "apache_extras",
-      "nagios::fix",
-      "java::default",
-    ]
+    expected = ["apache_extras::harden"]
     assert_suggestions_text(expected, actual_data)
-
-
-    actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
-      type: 'recipe', size: 2, text: 'Hard Life'
-    )
-    assert_suggestions_text(["apache_extras::harden", "apache_extras::windows_harden"], actual_data)
 
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'recipe', text: 'j'
