@@ -233,8 +233,13 @@ func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *prng.Prng, *migration
 }
 
 func (d *TestDB) Flush(t *testing.T) {
-	_, err := d.Exec(`DELETE FROM iam_policies CASCADE; DELETE FROM iam_members CASCADE;
-		DELETE FROM iam_roles CASCADE; DELETE FROM iam_projects CASCADE; DELETE FROM iam_role_projects CASCADE;`)
+	_, err := d.Exec(`DELETE FROM iam_policies CASCADE;
+		DELETE FROM iam_members CASCADE;
+		DELETE FROM iam_roles CASCADE;
+		DELETE FROM iam_role_projects CASCADE;
+		DELETE FROM iam_project_rules;
+		DELETE FROM iam_staged_project_rules;
+		DELETE FROM iam_projects CASCADE;`)
 	require.NoError(t, err)
 }
 

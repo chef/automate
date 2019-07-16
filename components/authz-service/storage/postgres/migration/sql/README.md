@@ -58,3 +58,4 @@
 - [`56_add_db_id_statements.up.sql`](56_add_db_id_statements.up.sql)
 - [`57_use_project_db_id_in_references_of_policies.up.sql`](57_use_project_db_id_in_references_of_policies.up.sql)
 - [`58_use_project_db_id_in_references_of_policy_statements.up.sql`](58_use_project_db_id_in_references_of_policy_statements.up.sql)
+- [`59_use_db_id_as_primary_key_in_iam_projects.up.sql`](59_use_db_id_as_primary_key_in_iam_projects.up.sql)
