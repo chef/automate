@@ -438,61 +438,45 @@ func (creator *InstallBundleCreator) downloadPackageAndKeys(p habpkg.VersionedPa
 		return nil
 	}
 
-	return creator.hartCache.CacheArtifact(p, func(writer io.Writer) error {
-		header, err := creator.downloadPackageWithRetries(p, writer, depotClient, progress)
-		if err == nil {
+	return creator.downloadWithRetries(p, depotClient, progress)
+}
+
+func (creator *InstallBundleCreator) downloadWithRetries(p habpkg.VersionedPackage, depotClient depot.Client, progress InstallBundleCreatorProgress) error {
+	name := habpkg.Ident(p)
+	return creator.withRetry(func(tryCount int, ri retryInfo) error {
+		return creator.hartCache.CacheArtifact(p, func(writer io.Writer) error {
+			progress.Downloading(name, tryCount)
+			header, err := depotClient.DownloadPackage(p, writer)
+			if err != nil {
+				if ri.willRetry {
+					progress.RetriableDownloadError(name, err.Error(), ri.delay)
+				}
+				return err
+			}
+
+			progress.DownloadComplete(name, false)
 			if creator.keyCache.IsCached(header.KeyName) {
 				return nil // We don't log here since nearly every key is cached.
 			}
 
-			return creator.keyCache.CacheKey(header.KeyName, func(writer io.Writer) error {
-				return creator.downloadOriginKeyWithRetries(header.KeyName, writer, depotClient, progress)
+			// NOTE(ssd) 2019-07-16: If this download
+			// fails, we unfortunately have to retry the
+			// package download as well. This is a bit
+			// odd, but I think more refactoring is needed
+			// to disentangle them.
+			progress.Downloading(string(header.KeyName), tryCount)
+			err = creator.keyCache.CacheKey(header.KeyName, func(writer io.Writer) error {
+				return depotClient.DownloadOriginKey(header.KeyName, writer)
 			})
-		}
-		return err
-	})
-}
-
-func (creator *InstallBundleCreator) downloadPackageWithRetries(p habpkg.VersionedPackage, writer io.Writer,
-	depotClient depot.Client, progress InstallBundleCreatorProgress) (*depot.HartHeader, error) {
-
-	name := habpkg.Ident(p)
-
-	var header *depot.HartHeader
-	err := creator.withRetry(func(tryCount int, ri retryInfo) error {
-		progress.Downloading(name, tryCount)
-		var err error
-		header, err = depotClient.DownloadPackage(p, writer)
-		if err != nil {
-			if ri.willRetry {
-				progress.RetriableDownloadError(name, err.Error(), ri.delay)
+			if err != nil {
+				if ri.willRetry {
+					progress.RetriableDownloadError(string(header.KeyName), err.Error(), ri.delay)
+				}
+				return err
 			}
-			return err
-		}
-		progress.DownloadComplete(name, false)
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return header, nil
-}
-
-func (creator *InstallBundleCreator) downloadOriginKeyWithRetries(keyname depot.OriginKeyName, writer io.Writer,
-	depotClient depot.Client, progress InstallBundleCreatorProgress) error {
-
-	return creator.withRetry(func(tryCount int, ri retryInfo) error {
-		progress.Downloading(string(keyname), tryCount)
-		err := depotClient.DownloadOriginKey(keyname, writer)
-		if err != nil {
-			if ri.willRetry {
-				progress.RetriableDownloadError(string(keyname), err.Error(), ri.delay)
-			}
-			return err
-		}
-		progress.DownloadComplete(string(keyname), false)
-		return nil
+			progress.DownloadComplete(string(header.KeyName), false)
+			return nil
+		})
 	})
 }
 
