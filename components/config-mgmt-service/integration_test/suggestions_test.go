@@ -44,7 +44,7 @@ func TestSuggestionsWithAnInvalidTypeReturnsError(t *testing.T) {
 	}
 }
 
-func TestSuggestionsMany(t *testing.T) {
+func TestSuggestionsLargeArrayValues(t *testing.T) {
 
 	ctx := context.Background()
 
@@ -316,6 +316,142 @@ func TestSuggestionsMany(t *testing.T) {
 			assert.ElementsMatch(t, test.expected, actualSuggestions)
 		})
 	}
+}
+
+// If there are over one hundred and five attributes that start with the prefix 'zum' and one term 'zum'.
+// Test if the term 'zum' returned when the text 'zum' is requested.
+func TestSuggestionsLargeCollectionOfSamePrefixTerm(t *testing.T) {
+	node := iBackend.Node{
+		Exists: true,
+		Attributes: []string{ //106
+			"zum.1",
+			"zum.2",
+			"zum.unattended_upgrades.minimal_steps",
+			"zum.main.recent",
+			"zum.sudo.groups",
+			"zum.hints_path",
+			"zum.master.source",
+			"zum.cacher-client.restrict_environment",
+			"zum.unattended_upgrades.update_package_lists",
+			"zum.hostname_override",
+			"zum.jdk_version",
+			"zum.group",
+			"zum.main.errorlevel",
+			"zum.geoip.lib_checksum",
+			"zum.url",
+			"zum.confd.install_suggests",
+			"zum.unattended_upgrades.minimal_steps",
+			"zum.main.deltarpm",
+			"zum.worker_connections",
+			"zum.upstart.foreground",
+			"zum.caching_server",
+			"zum.unattended_upgrades.mail_only_on_error",
+			"zum.tls_certificate_file",
+			"zum-ci.monitoring.jmx_hostname",
+			"zum.upload_progress.zone_size",
+			"zum.source.sbin_path",
+			"zum.epel-source.gpgkey",
+			"zum.echo.url",
+			"zum.gzip_min_length",
+			"zum.sudo.env_keep_subtract",
+			"zum.rate_limit",
+			"zum.main.sslverify",
+			"zum.unattended_upgrades.package_blacklist",
+			"zum.main.throttle",
+			"zum-ci.master.days_to_keep_artifacts",
+			"zum.accept_mutex_delay",
+			"zum.passenger.ruby",
+			"zum.build_user_group",
+			"zum.build_user_home",
+			"zum.master.endpoint",
+			"zum.version",
+			"zum.checksum",
+			"zum.sudo.sudoers_defaults",
+			"zum.build_user",
+			"zum.ruby_version",
+			"zum.build_user_password",
+			"zum.sudo.include_sudoers_d",
+			"zum.sudo.agent_forwarding",
+			"zum-ci.omnitruck.metadata_bucket",
+			"zum-ci.omnitruck.packages_bucket",
+			"zum-ci.master.pipeline_types",
+			"zum-ci.master.host_name",
+			"zum-ci.master.days_to_keep_artifacts",
+			"zum-ci.master.artifacts_to_keep",
+			"zum-ci.artifactory.endpoint",
+			"zum.main.clean_requirements_on_remove",
+			"zum.main.plugins",
+			"zum.lua.version",
+			"zum.main.obsoletes",
+			"zum.databag_name",
+			"zum.rubyzipversion",
+			"zum.default_facility_logs.uucp,news.crit",
+			"zum.headers_more.source_checksum",
+			"zum.upstart.foreground",
+			"zum.logfile",
+			"zum.main.sslclientcert",
+			"zum.cacher_port",
+			"zum.confd.install_recommends",
+			"zum.log_dir_perm",
+			"zum.nokogiri.use_system_libraries",
+			"zum.epel.gpgkey",
+			"zum.main.color_list_installed_extra",
+			"zum.naxsi.checksum",
+			"zum.passenger.packages.rhel",
+			"zum.echo.url",
+			"zum.main.password",
+			"zum.main.color_list_available_reinstall",
+			"zum.databag_entry",
+			"zum.install_dir",
+			"zum.passenger.gem_binary",
+			"zum.epel-testing-debuginfo.description",
+			"zum.sudo.include_sudoers_d",
+			"zum.upload_progress.checksum",
+			"zum.source.use_existing_user",
+			"zum.source.version",
+			"zum.binary",
+			"zum.cacher_dir",
+			"zum.auto-update",
+			"zum.service_name",
+			"zum.passenger.packages.fedora",
+			"zum-ci.email.list_id",
+			"zum.right_aws_version",
+			"zum.geoip.country_dat_checksum",
+			"zum.pagespeed.packages.rhel",
+			"zum.tls_ca_file",
+			"zum.gpg_key_path",
+			"zum.epel-debuginfo.managed",
+			"zum.main.logfile",
+			"zum.executable",
+			"zum.allow_reboot_on_failure",
+			"zum.set_misc.version",
+			"zum.passenger.packages.debian",
+			"zum.auth_request.url",
+			"zum.epel-testing-debuginfo.make_cache",
+			"zum.epel-debuginfo.gpgcheck",
+			"zum.5",
+			"zum.6",
+			"zum.7",
+			"zum.9",
+			"zum",
+		},
+		NodeInfo: iBackend.NodeInfo{
+			EntityUuid: newUUID(),
+		},
+	}
+	request := request.Suggestion{
+		Type: "attribute",
+		Text: "zum",
+	}
+
+	suite.IngestNodes([]iBackend.Node{node})
+	defer suite.DeleteAllDocuments()
+	res, err := cfgmgmt.GetSuggestions(context.Background(), &request)
+	assert.Nil(t, err)
+
+	actualSuggestions := extractTextFromSuggestionsResponse(res, t)
+
+	assert.True(t, contains(actualSuggestions, "zum"), "Suggestions does not contain 'zum'")
 }
 
 func TestSuggestionsFiltered(t *testing.T) {
@@ -1437,4 +1573,13 @@ func extractTextFromSuggestionsResponse(list *gp.ListValue, t *testing.T) []stri
 		}
 	}
 	return textArray
+}
+
+func contains(actual []string, expected string) bool {
+	for _, a := range actual {
+		if a == expected {
+			return true
+		}
+	}
+	return false
 }
