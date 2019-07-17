@@ -644,7 +644,7 @@ func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*b
 	tid, task, err := pg.dequeueTask(tx, taskName)
 	if err != nil {
 		if errR := tx.Rollback(); errR != nil {
-			logrus.WithError(err).Warn("failed to rollback dequeue transaction")
+			logrus.WithError(errR).Warn("failed to rollback dequeue transaction")
 		}
 		cancel()
 		return nil, nil, err
