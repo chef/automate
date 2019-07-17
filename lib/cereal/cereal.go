@@ -25,6 +25,7 @@ var (
 	ErrNoScheduledWorkflows     = errors.New("no workflows are scheduled")
 	ErrInvalidSchedule          = errors.New("workflow schedule is not valid")
 	ErrWorkflowInstanceNotFound = errors.New("workflow instance not found")
+	ErrWorkflowScheduleNotFound = errors.New("workflow schedule not found")
 	ErrWorkflowNotComplete      = errors.New("workflow instance is still running")
 	ErrTaskLost                 = errors.New("task lost before reporting its status")
 )

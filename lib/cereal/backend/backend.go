@@ -12,13 +12,11 @@ type Driver interface {
 	DequeueTask(ctx context.Context, taskName string) (*Task, TaskCompleter, error)
 
 	CreateWorkflowSchedule(ctx context.Context, instanceName string, workflowName string, parameters []byte, enabled bool, recurrence string, nextRunAt time.Time) error
+	ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error)
 	GetDueScheduledWorkflow(ctx context.Context) (*Schedule, ScheduledWorkflowCompleter, error)
 	GetNextScheduledWorkflow(ctx context.Context) (*Schedule, error)
-	UpdateWorkflowScheduleByID(ctx context.Context, id int64, opts WorkflowScheduleUpdateOpts) error
-	UpdateWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string, opts WorkflowScheduleUpdateOpts) error
-
 	GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string) (*Schedule, error)
-	ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error)
+	UpdateWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string, opts WorkflowScheduleUpdateOpts) error
 
 	GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName string) (*WorkflowInstance, error)
 
