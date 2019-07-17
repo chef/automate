@@ -46,7 +46,7 @@ if ! git diff --exit-code --ignore-submodules=all; then
 fi
 
 echo "Shellchecking!"
-shellcheck -x \
+shellcheck -ax \
   .expeditor/*.sh \
   .expeditor/**/*.sh \
   .buildkite/hooks/* \

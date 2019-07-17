@@ -23,7 +23,8 @@ hab_curl() {
 }
 
 grant_permissions() {
-    local token=$(chef-automate admin-token)
+    local token
+    token="$(chef-automate admin-token)"
     hab_curl --insecure -H "api-token: $token" https://localhost/api/v0/auth/policies --data @<(cat <<EOF
     {
         "subjects": [
@@ -38,7 +39,7 @@ EOF
 
 test_cert_from_different_ca() {
     log_info "Running test_cert_from_different_ca"
-    cat << EOF
+    cat <<EOF
     This test makes sure that a valid cert that is not signed
     by the A2 deployment CA is rejected
 
@@ -52,7 +53,8 @@ EOF
 }
 
 invalid_cert_test_load_balancer() {
-    local result=$(hab_curl -sS --insecure --cert "$(invalid_cert_path)" --key "$(invalid_key_path)" "https://localhost/data-collector/v0")
+    local result
+    result=$(hab_curl -sS --insecure --cert "$(invalid_cert_path)" --key "$(invalid_key_path)" "https://localhost/data-collector/v0")
     if ! echo "$result" | grep -q "SSL certificate error"; then
         cat <<EOF
         ...Failed
@@ -70,7 +72,8 @@ EOF
 }
 
 invalid_cert_test_gateway() {
-    local result=$(hab_curl -o /dev/null -sS --insecure --cert "$(invalid_cert_path)" --key "$(invalid_key_path)" "https://localhost:2000/events/data-collector" || echo "$?")
+    local result
+    result=$(hab_curl -o /dev/null -sS --insecure --cert "$(invalid_cert_path)" --key "$(invalid_key_path)" "https://localhost:2000/events/data-collector" || echo "$?")
     if [ "$result" != "35" ]; then
         cat <<EOF
         ...Failed
@@ -90,7 +93,7 @@ EOF
 
 test_authorized_cert() {
     log_info "Running test_authorized_cert"
-    cat << EOF
+    cat <<EOF
     This test makes sure that a authorized cert that is signed
     by the A2 deployment CA and has been granted permissions is
     accepted
@@ -104,7 +107,8 @@ authorized_cert_test() {
     local endpoint="$1"
     echo "...Checking ${endpoint}"
 
-    local result=$(hab_curl -o /dev/null -w "%{http_code}" -sS --insecure --cert "$(authorized_cert_path)" --key "$(authorized_key_path)" "${endpoint}" )
+    local result
+    result=$(hab_curl -o /dev/null -w "%{http_code}" -sS --insecure --cert "$(authorized_cert_path)" --key "$(authorized_key_path)" "${endpoint}" )
     if [ "$result" != "200" ]; then
         cat <<EOF
         ...Failed
@@ -123,7 +127,7 @@ EOF
 
 test_authorized_cert_in_header_unauthenticated() {
     log_info "Running test_authorized_cert_in_header_unauthenticated"
-    cat << EOF
+    cat <<EOF
     This test makes sure that we do not use a certificate passed by the
     user in a header. Only the load balancer is allowed to set it.
 EOF
@@ -135,8 +139,9 @@ authorized_cert_in_header_unauthenticated_test() {
     local endpoint="$1"
     echo "...Checking ${endpoint}"
 
-    local result=$(hab_curl -o /dev/null -w "%{http_code}" -sS --insecure \
-        -H "X-Client-Cert: $(urlencode "$(cat $(authorized_cert_path))")"  \
+    local result
+    result=$(hab_curl -o /dev/null -w "%{http_code}" -sS --insecure \
+        -H "X-Client-Cert: $(urlencode "$(cat "$(authorized_cert_path)")")"  \
         "${endpoint}" )
     if [ "$result" != "401" ]; then
         cat <<EOF
@@ -156,7 +161,7 @@ EOF
 
 test_authorized_cert_in_header_authenticated() {
     log_info "Running test_authorized_cert_in_header_authenticated"
-    cat << EOF
+    cat <<EOF
     This test makes sure that we do not use a certificate passed by the
     user in a header. Only the load balancer is allowed to set it. In this
     scenario, we will authenticate with a valid cert, and pass a cert that
@@ -170,9 +175,10 @@ authorized_cert_in_header_authenticated_test() {
     local endpoint="$1"
     echo "...Checking ${endpoint}"
 
-    local result=$(hab_curl -o /dev/null -w "%{http_code}" -sS --insecure \
+    local result
+    result=$(hab_curl -o /dev/null -w "%{http_code}" -sS --insecure \
         --cert "$(authenticated_cert_path)" --key "$(authenticated_key_path)" \
-        -H "X-Client-Cert: $(urlencode "$(cat $(authorized_cert_path))")"  \
+        -H "X-Client-Cert: $(urlencode "$(cat "$(authorized_cert_path)")")"  \
         "${endpoint}" )
     if [ "$result" != "403" ]; then
         cat <<EOF
@@ -237,7 +243,7 @@ urlencode() {
     for (( i = 0; i < length; i++ )); do
         local c="${1:i:1}"
         case $c in
-            [a-zA-Z0-9.~_-]) printf "$c" ;;
+            [a-zA-Z0-9.~_-]) printf "%s" "$c" ;;
             *) printf '%%%02X' "'$c" ;;
         esac
     done
