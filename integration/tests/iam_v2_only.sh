@@ -1,8 +1,4 @@
 #!/bin/bash
-#shellcheck disable=SC2034
-#shellcheck disable=SC2039
-#shellcheck disable=SC2154
-#shellcheck disable=SC1091
 
 test_name="iam v2 only"
 # Note: the inspec profile takes care of deleting any migrated v1 legacy

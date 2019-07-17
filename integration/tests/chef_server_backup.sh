@@ -1,8 +1,4 @@
 #!/bin/bash
-#shellcheck disable=SC2034
-#shellcheck disable=SC2039
-#shellcheck disable=SC2154
-#shellcheck disable=SC1091
 
 test_name="chef-server-backup"
 test_backup_restore=true

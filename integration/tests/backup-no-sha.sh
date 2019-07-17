@@ -1,6 +1,4 @@
 #!/bin/bash
-#shellcheck disable=SC2034
-#shellcheck disable=SC2154
 
 test_name="backup-no-sha256"
 test_backup_restore=true

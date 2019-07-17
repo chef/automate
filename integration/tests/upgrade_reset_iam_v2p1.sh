@@ -1,8 +1,4 @@
 #!/bin/bash
-#shellcheck disable=SC2034
-#shellcheck disable=SC2039
-#shellcheck disable=SC2154
-#shellcheck disable=SC1091
 
 test_name="upgrade / reset IAM v2.1"
 test_deploy_inspec_profiles=(a2-iam-v2p1-only-integration)
