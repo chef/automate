@@ -77,7 +77,18 @@ var ProductMetadataJSON = `
     },
     {
       "name": "chef/secrets-service",
-      "metadata": null
+      "metadata": {
+        "name": "chef/secrets-service",
+        "data_service": false,
+        "binlinks": null,
+        "bootstrap": [
+          {
+            "type": "file",
+            "path": "data/secrets_key",
+            "optional": false
+          }
+        ]
+      }
     },
     {
       "name": "chef/applications-service",
