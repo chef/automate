@@ -5680,7 +5680,7 @@ func TestReset(t *testing.T) {
 }
 
 func TestDeleteRole(t *testing.T) {
-	store, db, _, _ := testhelpers.SetupTestDB(t)
+	store, db, prngSeed, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -5742,6 +5742,65 @@ func TestDeleteRole(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_roles WHERE id=$1`, role.ID))
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_roles`))
 		},
+		"when statements contains a role and no actions and are the last statements in a custom policy, on role deltion the policy is deleted": func(t *testing.T) {
+			ctx := context.Background()
+			project1 := storage.Project{
+				ID:       "project-1",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Projects: []string{"project-1"},
+			}
+			_, err := store.CreateProject(ctx, &project1)
+			require.NoError(t, err)
+
+			roleDeleted := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project1.ID})
+			roleRemaining := insertTestRole(t, db, "my-id-2", "name", []string{"action2"}, []string{project1.ID})
+
+			sID0 := genUUID(t)
+			sID1 := genUUID(t)
+			polID := genSimpleID(t, prngSeed)
+			_, err = db.Exec(`
+				WITH policy_db_id AS (
+					INSERT INTO iam_policies (id, name) VALUES ($3, 'testpolicy') RETURNING db_id
+				) INSERT INTO iam_statements (id, effect, actions, role_id, resources, policy_id)
+					VALUES ($1, 'allow'::iam_effect, '{}', role_db_id($4), array['iam:users'], (SELECT * FROM policy_db_id)),
+								($2, 'deny'::iam_effect, '{}', role_db_id($4), array['compliance:profiles'], (SELECT * FROM policy_db_id));`,
+				sID0, sID1, polID, roleDeleted.ID)
+			require.NoError(t, err)
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID1))
+
+			sID0WrongRole := genUUID(t)
+			sID1WrongRole := genUUID(t)
+			polIDWrongRole := genSimpleID(t, prngSeed)
+			_, err = db.Exec(`
+				WITH policy_db_id AS (
+					INSERT INTO iam_policies (id, name) VALUES ($3, 'testpolicy') RETURNING db_id
+				) INSERT INTO iam_statements (id, effect, actions, role_id, resources, policy_id)
+					VALUES ($1, 'allow'::iam_effect, '{}', role_db_id($4), array['iam:users'], (SELECT * FROM policy_db_id)),
+								($2, 'deny'::iam_effect, '{}', role_db_id($4), array['compliance:profiles'], (SELECT * FROM policy_db_id));`,
+				sID0WrongRole, sID1WrongRole, polIDWrongRole, roleRemaining.ID)
+			require.NoError(t, err)
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polIDWrongRole))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0WrongRole))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID1WrongRole))
+
+			err = store.DeleteRole(ctx, roleDeleted.ID)
+
+			require.NoError(t, err)
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_roles WHERE id=$1`, roleDeleted.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_roles`))
+
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID1))
+
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polIDWrongRole))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0WrongRole))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID1WrongRole))
+		},
+		// TODO (tc): Test rest of trigger cases
 		"deletes role with several roles in database when projects filter has intersection": func(t *testing.T) {
 			ctx := context.Background()
 			project1 := storage.Project{
