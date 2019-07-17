@@ -1,4 +1,5 @@
 #!/bin/bash
+
 #shellcheck disable=SC2034
 test_name="gather-logs data capture"
 test_upgrades=false

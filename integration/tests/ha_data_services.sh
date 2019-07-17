@@ -1,4 +1,5 @@
 #!/bin/bash
+
 #shellcheck disable=SC2034
 test_name="ha_data_services"
 test_external_services=(ha_backend)

@@ -1,4 +1,5 @@
 #!/bin/bash
+
 #shellcheck disable=SC2034
 test_name="product"
 test_deploy_inspec_profiles=(a2-deploy-integration)

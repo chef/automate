@@ -1,4 +1,5 @@
 #!/bin/bash
+
 #shellcheck disable=SC2034
 test_name="deprecated-backup-external-es"
 test_backup_restore=true

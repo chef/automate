@@ -1,4 +1,5 @@
 #!/bin/bash
+
 #shellcheck disable=SC2034
 test_name="manual upgrade"
 test_upgrades=true

@@ -1,4 +1,5 @@
 #!/bin/bash
+
 #shellcheck disable=SC2034
 test_name="airgap_a1_migration"
 test_container_name="a1-migration.test"

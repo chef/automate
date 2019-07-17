@@ -1,4 +1,5 @@
 #!/bin/bash
+
 #shellcheck disable=SC2034
 test_name="multi_node"
 test_external_services=(ha_backend automate_cluster)

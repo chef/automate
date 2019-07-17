@@ -1,4 +1,5 @@
 #!/bin/bash
+
 #shellcheck disable=SC2034
 test_name="upgrade_acceptance_master"
 test_upgrades=true
