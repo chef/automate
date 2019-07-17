@@ -6,44 +6,22 @@ import (
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
 )
 
-type ActivePipe struct {
-	in  chan message.ChefRun
-	out <-chan message.ChefRun
-}
-
 // BuildMsgDistributor a message distributor that sends all messages to the first child pipe until it is
 // full then start sending messages to the next child pipe in the line. When all the pipes are full the thread waits and
 // then checks to pipes again until it can place the message in a child pipe.
 func BuildMsgDistributor(childPipeBuilder message.ChefRunPipe, numProcessors, childPipeInboxSize int) message.ChefRunPipe {
 	return func(in <-chan message.ChefRun) <-chan message.ChefRun {
-		return fillOnePipeAtATime(in, childPipeBuilder, numProcessors, childPipeInboxSize)
+		return msgDistributor(in, childPipeBuilder, numProcessors, childPipeInboxSize)
 	}
 }
 
-func fillOnePipeAtATime(in <-chan message.ChefRun,
+func msgDistributor(in <-chan message.ChefRun,
 	childPipeBuilder message.ChefRunPipe, numProcessors, childPipeInboxSize int) <-chan message.ChefRun {
-
-	out := make(chan message.ChefRun, 100)
-	pipes := buildActivePipes(childPipeBuilder, numProcessors, childPipeInboxSize)
-	mergeOutChannels(pipes, out)
+	pipeInChannels, out := buildChildPipes(childPipeBuilder, numProcessors, childPipeInboxSize)
 
 	go func() {
 		for msg := range in {
-			messageProcessed := false
-			for !messageProcessed {
-				for _, pipe := range pipes {
-					if !pipe.isFull() {
-						pipe.add(msg)
-						messageProcessed = true
-						break
-					}
-				}
-				// This is only called when all the pipes are full
-				if !messageProcessed {
-					// Wait and check the pipes again for a spot for the msg
-					time.Sleep(time.Millisecond * 10)
-				}
-			}
+			sendMessage(pipeInChannels, msg)
 		}
 		close(out)
 	}()
@@ -51,35 +29,59 @@ func fillOnePipeAtATime(in <-chan message.ChefRun,
 	return out
 }
 
-func mergeOutChannels(pipes []ActivePipe, out chan message.ChefRun) {
-	for _, pipe := range pipes {
-		go func(subPipeOut <-chan message.ChefRun) {
-			for msg := range subPipeOut {
-				out <- msg
-			}
-		}(pipe.out)
+func sendMessage(pipeInChannels []chan message.ChefRun, msg message.ChefRun) {
+	for true {
+		messageProcessed := distributeMessage(pipeInChannels, msg)
+
+		if messageProcessed {
+			return
+		}
+
+		// All pipes are full. Wait and try again
+		time.Sleep(time.Millisecond * 10)
 	}
 }
 
-func buildActivePipes(pipeBuilder message.ChefRunPipe, numProcessors, childPipeInboxSize int) []ActivePipe {
-	activePipes := make([]ActivePipe, numProcessors)
-	for index := range activePipes {
-		in := make(chan message.ChefRun, childPipeInboxSize)
-		out := pipeBuilder(in)
-
-		activePipes[index] = ActivePipe{
-			in:  in,
-			out: out,
+// The first channel is filled before sending messages to any other channel. Once the first channel is
+// filled, the second channel recieves all the messages that can not fit into the first channel,
+// and so on with the rest of the channels.
+// If all the channels are full then false is returned
+func distributeMessage(pipeInChannels []chan message.ChefRun, msg message.ChefRun) bool {
+	for _, pipeInChannel := range pipeInChannels {
+		select {
+		case pipeInChannel <- msg:
+			return true
+		default:
 		}
 	}
-
-	return activePipes
+	return false
 }
 
-func (pipe ActivePipe) isFull() bool {
-	return len(pipe.in) == cap(pipe.in)
+func mergeOutChannels(pipeOutChannels []<-chan message.ChefRun) chan message.ChefRun {
+	mergedOut := make(chan message.ChefRun, 100)
+	for _, pipeOut := range pipeOutChannels {
+		go func(pipeOut <-chan message.ChefRun) {
+			for msg := range pipeOut {
+				mergedOut <- msg
+			}
+		}(pipeOut)
+	}
+
+	return mergedOut
 }
 
-func (pipe ActivePipe) add(msg message.ChefRun) {
-	pipe.in <- msg
+func buildChildPipes(pipeBuilder message.ChefRunPipe, numProcessors,
+	childPipeInboxSize int) ([]chan message.ChefRun, chan message.ChefRun) {
+	inChannels := make([]chan message.ChefRun, numProcessors)
+	outChannels := make([]<-chan message.ChefRun, numProcessors)
+	for index := range inChannels {
+		in := make(chan message.ChefRun, childPipeInboxSize)
+		out := pipeBuilder(in)
+		inChannels[index] = in
+		outChannels[index] = out
+	}
+
+	mergedOut := mergeOutChannels(outChannels)
+
+	return inChannels, mergedOut
 }

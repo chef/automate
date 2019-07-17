@@ -35,7 +35,8 @@ func NewChefRunPipeline(client backend.Client, authzClient iam_v2.ProjectsClient
 		processor.BuildRunProjectTagger(authzClient),
 		publisher.BuildNodeManagerPublisher(nodeMgrClient),
 		processor.BuildRunMsgToBulkRequestTransformer(client),
-		publisher.BuildMsgDistributor(publisher.BuildBulkRunPublisher(client, maxNumberOfBundledRunMsgs), 4, maxNumberOfBundledRunMsgs),
+		publisher.BuildMsgDistributor(publisher.BuildBulkRunPublisher(
+			client, maxNumberOfBundledRunMsgs), 4, maxNumberOfBundledRunMsgs),
 		processor.CountRuns(&counter),
 	)
 
