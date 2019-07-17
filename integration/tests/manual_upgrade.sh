@@ -1,4 +1,5 @@
 #!/bin/bash
+#shellcheck disable=SC2034
 test_name="manual upgrade"
 test_upgrades=true
 test_upgrade_strategy="none"
@@ -18,11 +19,14 @@ jq() {
 do_deploy() {
     set_test_manifest "current.json"
     upgrade_scaffold_bin="$(a2_root_dir)/components/automate-deployment/bin/linux/upgrade-test-scaffold"
-    $upgrade_scaffold_bin setup $test_manifest_path
-    $upgrade_scaffold_bin serve $test_manifest_path $upgrade_scaffold_pid_file &
+    #shellcheck disable=SC2154
+    $upgrade_scaffold_bin setup "$test_manifest_path"
+    $upgrade_scaffold_bin serve "$test_manifest_path" "$upgrade_scaffold_pid_file" &
     sleep 5
 
-    echo -e "[load_balancer.v1.sys.service]\nhttps_port = 4443" >> $test_config_path
+    #shellcheck disable=SC2154
+    echo -e "[load_balancer.v1.sys.service]\\nhttps_port = 4443" >> "$test_config_path"
+    #shellcheck disable=SC2154
     /bin/chef-automate deploy "$test_config_path" \
         --hartifacts "$test_hartifacts_path" \
         --override-origin "$HAB_ORIGIN" \
@@ -38,12 +42,14 @@ do_deploy() {
 # By default, do_prepare_upgrade will replace the latest manifest.
 # We don't want that. Instead, we want to test we can grab a specific release
 do_prepare_upgrade() {
-    mv -f $test_tmp_hartifacts_path/* "$test_hartifacts_path/" || true
+    #shellcheck disable=SC2154
+    mv -f "$test_tmp_hartifacts_path"/* "$test_hartifacts_path/" || true
 }
 
 do_upgrade() {
-    local release
-    local target_manifest="$test_manifest_dir/build.json"
+    local release target_manifest
+    #shellcheck disable=SC2154
+    target_manifest="$test_manifest_dir/build.json"
     release=$(jq -r .build <"$target_manifest")
     if [[ -z "$release" ]]
     then

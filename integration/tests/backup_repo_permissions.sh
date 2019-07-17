@@ -1,12 +1,11 @@
 #!/bin/bash
 
+#shellcheck disable=SC2034
 test_name="backup_repo_permissions"
 test_skip_diagnostics=true
 
 do_test_deploy() {
-  # Make sure the default settings work as expected
-  # do_test_deploy_default
-
+  #shellcheck disable=SC2154
   local base_backup_dir="/tmp/$test_build_slug/backups"
   local hab_backup_dir="$base_backup_dir/hab"
   local root_backup_dir="$base_backup_dir/root"
@@ -28,12 +27,12 @@ do_test_deploy() {
   umask "$previous_umask"
 
   # Create valid and invalid configurations
-  cat << EOF > "$hab_backup_cfg"
+  cat <<EOF > "$hab_backup_cfg"
 [global.v1.backups.filesystem]
   path = "${hab_backup_dir}"
 EOF
 
-  cat << EOF > "$root_backup_cfg"
+  cat <<EOF > "$root_backup_cfg"
 [global.v1.backups.filesystem]
   path = "${root_backup_dir}"
 EOF

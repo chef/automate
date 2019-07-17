@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#shellcheck disable=SC2034
 test_name="iam v2 only"
 # Note: the inspec profile takes care of deleting any migrated v1 legacy
 # policies
@@ -22,7 +23,7 @@ do_setup() {
     hab pkg install core/curl
     hab pkg install -b core/jo
 
-    umask $previous_umask
+    umask "$previous_umask"
 }
 
 hab_curl() {

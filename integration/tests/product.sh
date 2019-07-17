@@ -1,4 +1,5 @@
 #!/bin/bash
+#shellcheck disable=SC2034
 test_name="product"
 test_deploy_inspec_profiles=(a2-deploy-integration)
 # The inspec tests don't pass if the diagnostics are run
@@ -11,6 +12,8 @@ do_test_deploy() {
     chef-automate debug set-log-level automate-gateway debug
     chef-automate debug set-log-level deployment-service debug
 
+    #shellcheck disable=SC2154
+    #shellcheck source=integration/helpers/cert_auth_tests.sh
     source "${source_dir}/helpers/cert_auth_tests.sh"
     cert_auth_tests
 
@@ -32,7 +35,7 @@ world_writable_files_test() {
     # Check for world writable files
     log_info "checking for world writable files"
     matching="$(find /hab/ -xdev -perm -0002 -type f -print)"
-    if [ ! -z "$matching" ]; then
+    if [ -n "$matching" ]; then
         log_error "the following files are world writable:"
         echo "$matching"
         return 1

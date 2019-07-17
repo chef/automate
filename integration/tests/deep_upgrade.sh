@@ -1,4 +1,6 @@
 #!/bin/bash
+
+#shellcheck disable=SC2034
 test_name="deep_upgrade"
 test_upgrades=true
 test_upgrade_strategy="none"
@@ -27,24 +29,32 @@ do_create_config() {
 }
 
 do_deploy() {
-    cat $DEEP_UPGRADE_PATH > $test_manifest_path
+    #shellcheck disable=SC2154
+    cp "$DEEP_UPGRADE_PATH" "$test_manifest_path"
     install_hab "0.54.0"
     upgrade_scaffold_bin="$(a2_root_dir)/components/automate-deployment/bin/linux/upgrade-test-scaffold"
-    $upgrade_scaffold_bin setup $test_manifest_path
-    $upgrade_scaffold_bin serve $test_manifest_path $upgrade_scaffold_pid_file &
+    $upgrade_scaffold_bin setup "$test_manifest_path"
+    $upgrade_scaffold_bin serve "$test_manifest_path" "$upgrade_scaffold_pid_file" &
     sleep 5
 
     log_info "Generating Automate configuration"
+    #shellcheck disable=SC2154
     /bin/chef-automate init-config \
-        --channel $test_channel \
+        --channel "$test_channel" \
         --file "$test_config_path" \
         --upgrade-strategy "$test_upgrade_strategy"
-    # shellcheck disable=SC2129
-    echo -e "[deployment.v1.sys.log]\nlevel = \"debug\"" >> "$test_config_path"
-    echo -e "[dex.v1.sys.expiry]\nid_tokens = \"5m\"" >> "$test_config_path"
-    echo -e "[postgresql.v1.sys.pg]\nshared_buffers = \"1GB\"" >> "$test_config_path"
-    echo -e "[load_balancer.v1.sys.service]\nhttps_port = 4443" >> "$test_config_path"
+    cat <<EOF >>"$test_config_path"
+[deployment.v1.sys.log]
+  level = "debug"
+[dex.v1.sys.expiry]
+  id_tokens = "5m"
+[postgresql.v1.sys.pg]
+  shared_buffers = "1GB"
+[load_balancer.v1.sys.service]
+  https_port = 4443
+EOF
 
+    #shellcheck disable=SC2154
     /bin/chef-automate deploy "$test_config_path" \
         --hartifacts "$test_hartifacts_path" \
         --override-origin "$HAB_ORIGIN" \

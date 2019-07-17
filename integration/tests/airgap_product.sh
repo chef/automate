@@ -1,4 +1,5 @@
 #!/bin/bash
+#shellcheck disable=SC2034
 test_name="airgap_product"
 test_deploy_inspec_profiles=(a2-deploy-integration)
 # The inspec tests don't pass if the diagnostics are run
@@ -9,12 +10,14 @@ do_build() {
     set_test_manifest "build.json"
     log_info "Installing harts"
     # We need to make sure the harts are installed so that the bundle creation works
-    if ls ${test_hartifacts_path}/*.hart
+    #shellcheck disable=SC2154
+    if ls "${test_hartifacts_path}"/*.hart
     then
-        hab pkg install ${test_hartifacts_path}/*.hart
+        hab pkg install "${test_hartifacts_path}"/*.hart
     fi
 
     log_info "Creating airgap bundle"
+    #shellcheck disable=SC2154
     chef-automate airgap bundle create \
         --manifest "${test_manifest_path}" \
         --hartifacts "${test_hartifacts_path}" \

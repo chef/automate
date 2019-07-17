@@ -1,8 +1,10 @@
 #!/bin/bash
 
+#shellcheck disable=SC2034
 test_name="chef-server-backup"
 test_backup_restore=true
 
+#shellcheck source=.studio/chef-server-collection
 source .studio/chef-server-collection
 
 # This test
@@ -14,6 +16,7 @@ source .studio/chef-server-collection
 # 6. verifies the ohai_time matches the one in 2
 
 do_deploy() {
+    #shellcheck disable=SC2154
     chef-automate deploy config.toml \
         --hartifacts "$test_hartifacts_path" \
         --override-origin "$HAB_ORIGIN" \

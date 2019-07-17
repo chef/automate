@@ -1,4 +1,5 @@
 #!/bin/bash
+#shellcheck disable=SC2034
 test_name="gather-logs data capture"
 test_upgrades=false
 test_upgrade_strategy="none"
@@ -83,7 +84,7 @@ do_test_deploy() {
         (( ++error_count ))
     fi
 
-    if [ ! -z "$(ls -A $client_body_path)" ]; then
+    if [ -n "$(ls -A $client_body_path)" ]; then
         log_error "TEST ERROR - $client_body_path still contains files!"
         (( ++error_count ))
     fi

@@ -1,4 +1,5 @@
 #!/bin/bash
+#shellcheck disable=SC2034
 test_name=":cypress: e2e tests"
 # Note: we only run cypress here, ignore diagnostics and inspec
 test_deploy_inspec_profiles=()

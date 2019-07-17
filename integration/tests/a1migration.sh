@@ -1,4 +1,5 @@
 #!/bin/bash
+#shellcheck disable=SC2034
 test_name="a1_migration"
 test_container_name="a1-migration.test"
 test_upgrade_strategy="none"
@@ -17,6 +18,7 @@ do_build() {
 }
 
 do_deploy() {
+    #shellcheck disable=SC2154
     chef-automate upgrade-from-v1 "$test_config_path" \
         --hartifacts "$test_hartifacts_path" \
         --override-origin "$HAB_ORIGIN" \

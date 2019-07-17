@@ -1,4 +1,5 @@
 #!/bin/bash
+#shellcheck disable=SC2034
 test_name="deprecated-backup-external-es"
 test_backup_restore=true
 
@@ -11,13 +12,14 @@ do_setup() {
 
     start_external_elasticsearch
 
-    umask $previous_umask
+    umask "$previous_umask"
 }
 
 do_create_config() {
     do_create_config_default
 
-    cat << EOF >> "$test_config_path"
+    #shellcheck disable=SC2154
+    cat <<EOF >> "$test_config_path"
 [elasticsearch.v1.sys.node]
 master=false
 data=false
@@ -32,5 +34,3 @@ port = "9300-9400"
 ping_unicast_hosts = '''["127.0.0.1:59300"]'''
 EOF
 }
-
-

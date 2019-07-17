@@ -1,15 +1,18 @@
 #!/bin/bash
 
+#shellcheck disable=SC2034
 test_name="backup-ontop"
 test_backup_restore=true
 
 
 do_prepare_restore() {
     # Run the diagnostics command again. We'll verify that this does not pass
+    #shellcheck disable=SC2154
     chef-automate diagnostics run ~remove-this-tag-after-merge --lb-url "$test_loadbalancer_url" --skip-cleanup --save-file "/tmp/context2"
 }
 
 do_restore() {
+    #shellcheck disable=SC2154
     chef-automate backup restore \
         --debug \
         --override-origin "$HAB_ORIGIN" \

@@ -1,4 +1,5 @@
 #!/bin/bash
+#shellcheck disable=SC2034
 test_name="product_deployment_stress"
 test_deploy_inspec_profiles=(a2-deploy-integration)
 # The inspec tests don't pass if the diagnostics are run
@@ -7,6 +8,7 @@ test_skip_diagnostics=true
 do_deploy() {
     # adds `--enable-deploy-order-stress-mode` to the default version of the
     # command
+    #shellcheck disable=SC2154
     chef-automate deploy "$test_config_path" \
         --hartifacts "$test_hartifacts_path" \
         --override-origin "$HAB_ORIGIN" \
