@@ -14,6 +14,7 @@ ha_backend_config=$(service_config_path "ha_backend.toml")
 ha_backend_setup() {
     mkdir -p "$ha_backend_private"
     mkdir -p "$(dirname "$ha_backend_config")"
+    mkdir -p $(service_config_path "ha_backend_backups")
     local peer_ring_file
     peer_ring_file=$(service_config_path "ha_backend_peers")
     touch "$peer_ring_file"
@@ -102,6 +103,10 @@ ha_backend_setup() {
 [global.v1.external.elasticsearch]
 enable = true
 nodes = ["https://${ha_backend_container1_ip}:9200", "https://${ha_backend_container2_ip}:9200"]
+
+[global.v1.external.elasticsearch.backup]
+enable = true
+location = "fs"
 
 [global.v1.external.elasticsearch.auth]
 scheme = "basic_auth"

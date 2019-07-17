@@ -94,6 +94,9 @@ host = "_site_"
 [es_yaml.bootstrap]
 memory_lock = false
 
+[es_yaml.path]
+repo = "/services/ha_backend_backups"
+
 [es_yaml.discovery.zen.ping.unicast]
 hosts = ["$(head -n 1 /services/ha_backend_peers)"]
 [es_yaml.cluster.routing.allocation.disk.watermark]
