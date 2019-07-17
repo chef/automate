@@ -11,7 +11,7 @@ INSERT INTO iam_projects (id, name, type, projects)
 
 /* For any statements lacking projects, provide the default of 'all projects' */
 INSERT INTO iam_statement_projects (statement_id, project_id)
-    SELECT id, project_db_id('~~ALL-PROJECTS~~') FROM iam_statements
-    WHERE id NOT IN (SELECT statement_id FROM iam_statement_projects);
+    SELECT db_id, project_db_id('~~ALL-PROJECTS~~') FROM iam_statements
+    WHERE db_id NOT IN (SELECT statement_id FROM iam_statement_projects);
 
 COMMIT;
