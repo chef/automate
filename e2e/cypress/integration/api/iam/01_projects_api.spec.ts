@@ -1,16 +1,16 @@
-const admin_token = 'ZNhnqJyDqgkXVk_bpobS3YhIMz0='
-const admin_token_obj = {
+const adminToken = 'ZNhnqJyDqgkXVk_bpobS3YhIMz0='
+const adminTokenObj = {
   id: `test-token-${Cypress.moment().format('MMDDYYhhmm')}`,
   name: "cypress-api-test-admin-token",
-  value: admin_token
+  value: adminToken
 }
 
-const avengers_project = {
+const avengersProject = {
   id: `avengers-project-${Cypress.moment().format('MMDDYYhhmm')}`,
   name: "Test Avengers Project"
 }
 
-const xmen_project = {
+const xmenProject = {
   id: `xmen-project-${Cypress.moment().format('MMDDYYhhmm')}`,
   name: "Test X-men Project"
 }
@@ -19,7 +19,7 @@ let avengersRule = {
   id: "avengers-rule-1",
   name: "first rule of avengers project",
   type: "NODE",
-  project_id: avengers_project.id,
+  project_id: avengersProject.id,
   conditions: [
     {
       attribute: "CHEF_ORGS",
@@ -29,11 +29,11 @@ let avengersRule = {
   ]
 }
 
-const xmen_rule = {
+const xmenRule = {
   id: "xmen-rule-1",
   name: "first rule of xmen project",
   type: "NODE",
-  project_id: xmen_project.id,
+  project_id: xmenProject.id,
   conditions: [
     {
       attribute: "CHEF_ORGS",
@@ -61,7 +61,7 @@ describe('projects API', () => {
             method: 'POST',
             url: '/apis/iam/v2beta/tokens',
             failOnStatusCode: false,
-            body: admin_token_obj
+            body: adminTokenObj
           }).then((response) => {
             expect([200, 409]).to.include(response.status)
           })
@@ -71,14 +71,14 @@ describe('projects API', () => {
             method: 'POST',
             url: '/apis/iam/v2beta/policies/administrator-access/members:add',
             body: {
-              members: [`token:${admin_token_obj.id}`]
+              members: [`token:${adminTokenObj.id}`]
             }
           })
 
           // create projects or confirm they already exist
-          for (let project of [avengers_project, xmen_project]) {
+          for (let project of [avengersProject, xmenProject]) {
             cy.request({
-              headers: { 'api-token': admin_token },
+              headers: { 'api-token': adminToken },
               method: 'POST',
               url: '/apis/iam/v2beta/projects',
               failOnStatusCode: false,
@@ -91,8 +91,8 @@ describe('projects API', () => {
           let totalNodes = 0
           cy.request({
             headers: {
-              'api-token': admin_token,
-              'projects': '(unassigned)'
+              'api-token': adminToken,
+              projects: '(unassigned)'
             },
             method: 'GET',
             url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
@@ -106,7 +106,7 @@ describe('projects API', () => {
                 cy.fixture('converge/xmen2.json').then(node4 => {
                   for (let node of [node1, node2, node3, node4]) {
                     cy.request({
-                      headers: { 'api-token': admin_token },
+                      headers: { 'api-token': adminToken },
                       method: 'POST',
                       url: '/data-collector/v0',
                       body: node
@@ -121,8 +121,8 @@ describe('projects API', () => {
           // confirm nodes are unassigned
           cy.request({
             headers: {
-              'api-token': admin_token,
-              'projects': '(unassigned)'
+              'api-token': adminToken,
+              projects: '(unassigned)'
             },
             method: 'GET',
             url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
@@ -132,8 +132,8 @@ describe('projects API', () => {
 
           cy.request({
             headers: {
-              'api-token': admin_token,
-              'projects': avengers_project.id
+              'api-token': adminToken,
+              projects: avengersProject.id
             },
             method: 'GET',
             url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
@@ -143,8 +143,8 @@ describe('projects API', () => {
 
           cy.request({
             headers: {
-              'api-token': admin_token,
-              'projects': xmen_project.id
+              'api-token': adminToken,
+              projects: xmenProject.id
             },
             method: 'GET',
             url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
@@ -155,16 +155,16 @@ describe('projects API', () => {
       })
 
       after(() => {
-        for (let project of [avengers_project, xmen_project]) {
+        for (let project of [avengersProject, xmenProject]) {
           cy.request({
-            headers: { 'api-token': admin_token },
+            headers: { 'api-token': adminToken },
             method: 'DELETE',
             url: `/apis/iam/v2beta/projects/${project.id}`
           })
         }
 
         cy.request({
-          headers: { 'api-token': admin_token },
+          headers: { 'api-token': adminToken },
           method: 'POST',
           url: 'api/v0/ingest/events/chef/node-multiple-deletes',
           body: {
@@ -178,17 +178,17 @@ describe('projects API', () => {
         })
 
         cy.request({
-          headers: { 'api-token': admin_token },
+          headers: { 'api-token': adminToken },
           method: 'DELETE',
-          url: `/apis/iam/v2beta/tokens/${admin_token_obj.id}`
+          url: `/apis/iam/v2beta/tokens/${adminTokenObj.id}`
         })
       })
 
       it('new rules get applied to nodes', () => {
 
-        for (let rule of [avengersRule, xmen_rule]) {
+        for (let rule of [avengersRule, xmenRule]) {
           cy.request({
-            headers: { 'api-token': admin_token },
+            headers: { 'api-token': adminToken },
             method: 'POST',
             url: '/apis/iam/v2beta/rules',
             body: rule
@@ -196,9 +196,9 @@ describe('projects API', () => {
         }
 
         // confirm rules are staged
-        for (let project of [avengers_project, xmen_project]) {
+        for (let project of [avengersProject, xmenProject]) {
           cy.request({
-            headers: { 'api-token': admin_token },
+            headers: { 'api-token': adminToken },
             method: 'GET',
             url: `/apis/iam/v2beta/projects/${project.id}/rules`
           }).then((response) => {
@@ -210,7 +210,7 @@ describe('projects API', () => {
         }
 
         cy.request({
-          headers: { 'api-token': admin_token },
+          headers: { 'api-token': adminToken },
           method: 'POST',
           url: '/apis/iam/v2beta/apply-rules'
         })
@@ -218,9 +218,9 @@ describe('projects API', () => {
         cy.wait(5000) 
 
         // confirm rules are applied
-        for (let project of [avengers_project, xmen_project]) {
+        for (let project of [avengersProject, xmenProject]) {
           cy.request({
-            headers: { 'api-token': admin_token },
+            headers: { 'api-token': adminToken },
             method: 'GET',
             url: `/apis/iam/v2beta/projects/${project.id}/rules`
           }).then((response) => {
@@ -234,8 +234,8 @@ describe('projects API', () => {
         // confirm nodes are assigned to projects correctly
         cy.request({
           headers: {
-            'api-token': admin_token,
-            'projects': avengers_project.id
+            'api-token': adminToken,
+            projects: avengersProject.id
           },
           method: 'GET',
           url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
@@ -245,8 +245,8 @@ describe('projects API', () => {
 
         cy.request({
           headers: {
-            'api-token': admin_token,
-            'projects': xmen_project.id
+            'api-token': adminToken,
+            projects: xmenProject.id
           },
           method: 'GET',
           url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
@@ -266,14 +266,14 @@ describe('projects API', () => {
         ]
 
         cy.request({
-          headers: { 'api-token': admin_token },
+          headers: { 'api-token': adminToken },
           method: 'PUT',
           url: `/apis/iam/v2beta/rules/${avengersRule.id}`,
           body: avengersRule
         })
 
         cy.request({
-          headers: { 'api-token': admin_token },
+          headers: { 'api-token': adminToken },
           method: 'POST',
           url: '/apis/iam/v2beta/apply-rules'
         })
@@ -282,8 +282,8 @@ describe('projects API', () => {
 
         cy.request({
           headers: {
-            'api-token': admin_token,
-            'projects': avengers_project.id
+            'api-token': adminToken,
+            projects: avengersProject.id
           },
           method: 'GET',
           url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
@@ -294,14 +294,14 @@ describe('projects API', () => {
 
       it('deleted rules get applied to nodes', () => {
         cy.request({
-          headers: { 'api-token': admin_token },
+          headers: { 'api-token': adminToken },
           method: 'DELETE',
           url: `/apis/iam/v2beta/rules/${avengersRule.id}`,
           body: avengersRule
         })
 
         cy.request({
-          headers: { 'api-token': admin_token },
+          headers: { 'api-token': adminToken },
           method: 'POST',
           url: '/apis/iam/v2beta/apply-rules'
         })
@@ -310,8 +310,8 @@ describe('projects API', () => {
 
         cy.request({
           headers: {
-            'api-token': admin_token,
-            'projects': avengers_project.id
+            'api-token': adminToken,
+            projects: avengersProject.id
           },
           method: 'GET',
           url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
@@ -321,8 +321,8 @@ describe('projects API', () => {
 
         cy.request({
           headers: {
-            'api-token': admin_token,
-            'projects': '(unassigned)'
+            'api-token': adminToken,
+            projects: '(unassigned)'
           },
           method: 'GET',
           url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
@@ -339,7 +339,7 @@ describe('projects API', () => {
 //   cy
 //     .request({
 //       headers: {
-//         'api-token': admin_token      
+//         'api-token': adminToken      
 //       },
 //       method: 'GET',
 //       url: '/apis/iam/v2beta/apply-rules'
@@ -356,7 +356,7 @@ function waitForNodes(totalNodes: number) {
   cy
     .request({
       headers: {
-        'api-token': admin_token
+        'api-token': adminToken
       },
       method: 'GET',
       url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
