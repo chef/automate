@@ -86,7 +86,7 @@ func DeleteTeam(tstCtx diagnostics.TestContext, id string) error {
 func CreateAuthTeamsDiagnostic() diagnostics.Diagnostic {
 	return diagnostics.Diagnostic{
 		Name: "auth-teams",
-		Tags: diagnostics.Tags{"auth"},
+		Tags: diagnostics.Tags{"auth", "iam-v1"},
 		Generate: func(tstCtx diagnostics.TestContext) error {
 			teamInfo, err := CreateRandomTeam(tstCtx)
 			if err != nil {

@@ -88,7 +88,7 @@ type authUsersSave struct {
 func CreateAuthUsersDiagnostic() diagnostics.Diagnostic {
 	return diagnostics.Diagnostic{
 		Name: "auth-users",
-		Tags: diagnostics.Tags{"auth"},
+		Tags: diagnostics.Tags{"auth", "iam-v1"},
 		Generate: func(tstCtx diagnostics.TestContext) error {
 			userInfo, err := CreateRandomUser(tstCtx)
 			if err != nil {
