@@ -6,24 +6,30 @@ A new static website for Automate is based on [Hugo](https://gohugo.io), the Go-
 
 ### One Time Install
 
-**DISABLE SMART QUOTES**
-OS X tries to use smartquotes by default when editing Hugo docs. You want smartquotes disabled regardless if you are writing code. Here's how [you can disable it](http://www.iclarified.com/38772/how-to-disable-curly-quotes-in-mac-os-x-mavericks).
+1. Disable smart quotes. OS X tries to use smartquotes by default when editing Hugo docs. You want smartquotes disabled regardless if you are writing code. Here's how [you can disable it](http://www.iclarified.com/38772/how-to-disable-curly-quotes-in-mac-os-x-mavericks).
 
-1. Install Hugo
+1. [Install Hugo](https://gohugo.io/getting-started/installing/). If you're using homebrew:
 
     ```
-    $ brew install hugo
+    brew install hugo
     ```
 
-### Routine Setup
+1. [Install go-swagger](https://goswagger.io/install.html). If you're using homebrew:
 
-_These are the steps you'll need to run every time you launch a development environment._
+    ```
+    brew tap go-swagger/go-swagger
+    brew install go-swagger
+    ```
 
-1. From the `components/automate-chef-io` directory, run the following command to start the live-reload development environment. When this is running, any changes you make to content in the `components/automate-chef-io` directory will be automatically compiled and updated the browser.
+### Development
+
+1. From the `components/automate-chef-io` directory, run the following command to start the development server.
 
     ```
     $ make serve
     ```
+
+    When this is running, any changes you make to content in the `components/automate-chef-io` directory will be automatically compiled and updated the browser.
 
 ## Creating Blog Posts and Making Docs Changes
 

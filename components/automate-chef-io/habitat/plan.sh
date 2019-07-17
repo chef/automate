@@ -12,8 +12,13 @@ pkg_build_deps=(
 )
 
 do_build() {
-  make themes/chef
-  $(pkg_path_for core/hugo)/bin/hugo
+  download_file "https://github.com/go-swagger/go-swagger/releases/download/v0.19.0/swagger_linux_amd64" \
+    "$CACHE_PATH/swagger" \
+    "9a5dd86578a93d0e829f3607e12b8e6567fd0b5dc9ad805e1097978f30e060e2"
+  chmod +x "$CACHE_PATH/swagger"
+  export PATH="$PATH:$CACHE_PATH"
+
+  make build
 }
 
 do_install() {

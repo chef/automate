@@ -64,10 +64,6 @@ bin/
 
 components/automate-cs-nginx/chef-server-ctl
 
-# automate-chef-io
-components/automate-chef-io/public
-components/automate-chef-io/themes/chef
-
 # vim
 *.swp
 *.swo
