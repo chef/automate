@@ -1,0 +1,9 @@
+{
+  "name": "chef/secrets-service",
+  "bootstrap": [
+    {
+      "type": "file",
+      "path": "data/secrets_key"
+    }
+  ]
+}
