@@ -1,3 +1,4 @@
+#!/bin/bash
 test_name="airgap_upgrade"
 test_upgrades=true
 

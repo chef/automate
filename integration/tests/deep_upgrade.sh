@@ -1,3 +1,4 @@
+#!/bin/bash
 test_name="deep_upgrade"
 test_upgrades=true
 test_upgrade_strategy="none"

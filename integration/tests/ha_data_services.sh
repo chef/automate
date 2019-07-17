@@ -1,3 +1,4 @@
+#!/bin/bash
 test_name="ha_data_services"
 test_external_services=(ha_backend)
 #test_backup_restore=true

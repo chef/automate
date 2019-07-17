@@ -1,3 +1,4 @@
+#!/bin/bash
 test_name="airgap_product"
 test_deploy_inspec_profiles=(a2-deploy-integration)
 # The inspec tests don't pass if the diagnostics are run

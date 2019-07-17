@@ -1,3 +1,4 @@
+#!/bin/bash
 test_name="data_lifecycle"
 
 do_create_config() {

@@ -1,3 +1,4 @@
+#!/bin/bash
 test_name="backup-external-es"
 test_backup_restore=true
 

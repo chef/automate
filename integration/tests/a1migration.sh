@@ -1,3 +1,4 @@
+#!/bin/bash
 test_name="a1_migration"
 test_container_name="a1-migration.test"
 test_upgrade_strategy="none"

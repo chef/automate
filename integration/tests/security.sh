@@ -1,3 +1,4 @@
+#!/bin/bash
 test_name="security"
 test_deploy_inspec_profiles=()
 test_skip_diagnostics=true

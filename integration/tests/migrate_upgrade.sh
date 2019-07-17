@@ -1,3 +1,4 @@
+#!/bin/bash
 #shellcheck disable=SC2034
 
 test_name="deep_migrate_upgrade"

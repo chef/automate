@@ -1,3 +1,4 @@
+#!/bin/bash
 test_name="gather-logs data capture"
 test_upgrades=false
 test_upgrade_strategy="none"

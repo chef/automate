@@ -1,3 +1,4 @@
+#!/bin/bash
 test_name="airgap_backup"
 test_backup_restore=true
 

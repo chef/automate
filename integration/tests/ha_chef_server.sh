@@ -1,3 +1,4 @@
+#!/bin/bash
 test_name="ha_chef_server"
 test_external_services=(ha_backend)
 
