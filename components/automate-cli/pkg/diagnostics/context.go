@@ -177,7 +177,7 @@ func (c *testContext) adminToken() (string, error) {
 		})
 
 		if err != nil {
-			return "", nil
+			return "", err
 		}
 		c.Globals.CachedToken = resp.ApiToken
 	}

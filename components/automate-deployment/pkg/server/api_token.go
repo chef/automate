@@ -6,9 +6,12 @@ import (
 
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/authn"
 	"github.com/chef/automate/api/interservice/authz"
+	"github.com/chef/automate/api/interservice/authz/common"
+	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/lib/grpc/secureconn"
 )
@@ -57,6 +60,7 @@ func generateAdminToken(ctx context.Context,
 	defer authzConnection.Close() // nolint: errcheck
 
 	authzClient := authz.NewAuthorizationClient(authzConnection)
+	authzV2Client := authz_v2.NewPoliciesClient(authzConnection)
 
 	response, err := authnClient.CreateToken(ctx, &authn.CreateTokenReq{
 		Description: req.Description,
@@ -71,6 +75,20 @@ func generateAdminToken(ctx context.Context,
 		Subjects: []string{fmt.Sprintf("token:%s", response.Id)},
 		Resource: "*",
 	})
+	if isUseV2Error(err) {
+		_, err = authzV2Client.CreatePolicy(ctx, &authz_v2.CreatePolicyReq{
+			Id:   "diagnostics-admin-token",
+			Name: req.Description,
+			Statements: []*authz_v2.Statement{
+				{
+					Effect:    authz_v2.Statement_ALLOW,
+					Resources: []string{"*"},
+					Actions:   []string{"*"},
+				},
+			},
+			Members: []string{fmt.Sprintf("token:%s", response.Id)},
+		})
+	}
 	if err != nil {
 		// Attempt to be transactional
 		_, deleteTokenError := authnClient.DeleteToken(ctx, &authn.DeleteTokenReq{
@@ -80,11 +98,18 @@ func generateAdminToken(ctx context.Context,
 			return nil, errors.Wrap(deleteTokenError,
 				"failed to permission API token and rollback of token creation failed")
 		}
-
-		return nil, errors.Wrap(err, "permission API token")
+		return nil, errors.Wrap(err, "permission token error")
 	}
-
 	return &api.GenerateAdminTokenResponse{
 		ApiToken: response.Value,
 	}, nil
+}
+
+func isUseV2Error(err error) bool {
+	for _, detail := range status.Convert(err).Details() {
+		if _, ok := detail.(*common.ErrorShouldUseV2); ok {
+			return true
+		}
+	}
+	return false
 }
