@@ -25,8 +25,9 @@ func NewChefRunPipeline(client backend.Client, authzClient iam_v2.ProjectsClient
 	nodeMgrClient manager.NodeManagerServiceClient,
 	maxNumberOfBundledRunMsgs, numberOfRunMsgTransformers int) ChefRunPipeline {
 	var (
-		in            = make(chan message.ChefRun, 100)
-		counter int64 = 0
+		in                                   = make(chan message.ChefRun, 100)
+		counter                        int64 = 0
+		numberOfParallelBulkPublishers       = 6
 	)
 
 	chefRunPipeline(in,
@@ -36,7 +37,7 @@ func NewChefRunPipeline(client backend.Client, authzClient iam_v2.ProjectsClient
 		publisher.BuildNodeManagerPublisher(nodeMgrClient),
 		processor.BuildRunMsgToBulkRequestTransformer(client),
 		publisher.BuildMsgDistributor(publisher.BuildBulkRunPublisher(
-			client, maxNumberOfBundledRunMsgs), 4, maxNumberOfBundledRunMsgs),
+			client, maxNumberOfBundledRunMsgs), numberOfParallelBulkPublishers, maxNumberOfBundledRunMsgs),
 		processor.CountRuns(&counter),
 	)
 
