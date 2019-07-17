@@ -974,7 +974,34 @@ func (t *LocalTarget) DestroyPkgCache() error {
 	ctxLog := logrus.WithFields(logrus.Fields{
 		"path": habPath,
 	})
-	err := os.RemoveAll(habPath)
+
+	// If /hab is a mount point, remove the contents only.
+	mounts, err := ioutil.ReadFile("/proc/mounts")
+	if err != nil {
+		ctxLog.WithError(err).Error("failed to read file /proc/mounts")
+		return errors.Wrap(err, "failed to read file /proc/mounts")
+	}
+
+	// The trailing space avoids false matches on, e.g. /habababab.
+	habString := habPath + " "
+	if strings.Contains(string(mounts), habString) {
+		dirContents, err := filepath.Glob(filepath.Join(habPath, "*"))
+		if err != nil {
+			ctxLog.WithError(err).Errorf("failed to get contents of %s", habPath)
+			return errors.Wrapf(err, "failed to get contents of %s", habPath)
+		}
+		for _, file := range dirContents {
+			err = os.RemoveAll(file)
+			if err != nil {
+				ctxLog.WithError(err).Errorf("failed to remove hab file: %s", file)
+				return errors.Wrapf(err, "failed to remove remove hab file: %s", file)
+			}
+		}
+
+		return nil
+	}
+
+	err = os.RemoveAll(habPath)
 	if err != nil {
 		ctxLog.WithError(err).Error("failed to remove hab files")
 		return errors.Wrapf(err, "failed to delete hab files at %s", habPath)
