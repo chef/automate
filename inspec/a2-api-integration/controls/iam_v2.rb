@@ -881,6 +881,7 @@ EOF
           resp = automate_api_request("/apis/iam/v2beta/projects/project-not-found/rules")
           expect(resp.http_status).to eq 404
           expect(resp.parsed_response_body[:rules]).to eq(nil)
+          expect(resp.parsed_response_body[:status]).to eq(nil)
         end
       end
 
@@ -914,6 +915,7 @@ EOF
         resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_PROJECT_ID}/rules")
         expect(resp.http_status).to eq 200
         expect(resp.parsed_response_body[:rules]).to eq([])
+        expect(resp.parsed_response_body[:status]).to eq("NO_RULES")
       end
 
       it "GET /iam/v2beta/rules returns an empty list" do
@@ -1118,6 +1120,7 @@ EOF
         resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_PROJECT_ID}/rules")
         expect(resp.http_status).to eq 200
         expect(resp.parsed_response_body[:rules]).to match_array([CUSTOM_RULE_1, updated_rule])
+        expect(resp.parsed_response_body[:status]).to eq("EDITS_PENDING")
       end
 
       it "DELETE /iam/v2beta/rules/:id deletes the specific rule" do
