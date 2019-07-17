@@ -8,3 +8,4 @@
 - [`06_v2_roles.up.sql`](06_v2_roles.up.sql)
 - [`07_update_v2_roles.up.sql`](07_update_v2_roles.up.sql)
 - [`08_update_v2_projects.up.sql`](08_update_v2_projects.up.sql)
+- [`09_make_projects_wildcard_an_actual_project.up.sql`](09_make_projects_wildcard_an_actual_project.up.sql)
