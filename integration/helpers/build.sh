@@ -57,12 +57,10 @@ sync_a1_migration_data() {
 
     hab sup run &
 
-    set +x
     until hab svc status &> /dev/null; do
       echo "waiting for hab-sup to come up"
       sleep 1
     done
-    set -x
 
     DATA_PACKAGE_RELEASE="20181206000427"
     # hab pkg install "$(a2_root_dir)/results/devchef-a1-migration-data-minimal-0.0.1-${DATA_PACKAGE_RELEASE}-x86_64-linux.hart"

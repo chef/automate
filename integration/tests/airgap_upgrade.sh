@@ -1,6 +1,5 @@
 test_name="airgap_upgrade"
 test_upgrades=true
-test_diagnostics_filters="~remove-this-tag-after-merge"
 
 do_build() {
     do_build_default

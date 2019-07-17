@@ -20,6 +20,7 @@ test_deploy_inspec_profiles=()
 test_upgrade_inspec_profiles=()
 test_skip_diagnostics=false
 test_diagnostics_filters=""
+test_diagnostics_pre_upgrade_filters=""
 test_external_services=()
 
 # test_detect_broken_cli detects if we broke the cli. There was a
@@ -197,7 +198,7 @@ do_test_deploy() {
 
 do_test_deploy_default() {
     if [ $test_skip_diagnostics = false ]; then
-        run_diagnostics_pre_upgrade $test_loadbalancer_url "$test_diagnostics_filters"
+        run_diagnostics_pre_upgrade $test_loadbalancer_url "$test_diagnostics_filters" "$test_diagnostics_pre_upgrade_filters"
     fi
 
     run_inspec_tests "$A2_ROOT_DIR" "${test_deploy_inspec_profiles[@]}"
@@ -227,7 +228,7 @@ do_test_upgrade() {
 
 do_test_upgrade_default() {
     if [ $test_skip_diagnostics = false ]; then
-        run_diagnostics_post_upgrade $test_loadbalancer_url "$test_diagnostics_filters"
+        run_diagnostics_post_upgrade $test_loadbalancer_url "$test_diagnostics_filters" "$test_diagnostics_pre_upgrade_filters"
     fi
 
     run_inspec_tests "$A2_ROOT_DIR" "${test_upgrade_inspec_profiles[@]}"
@@ -280,7 +281,8 @@ do_test_restore() {
 }
 
 do_test_restore_default() {
-    chef-automate diagnostics run ~remove-this-tag-after-merge --skip-generate
+    # shellcheck disable=SC2086
+    chef-automate diagnostics run $test_diagnostics_filters ~remove-this-tag-after-merge --skip-generate
 }
 
 do_cleanup() {
