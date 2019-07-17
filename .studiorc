@@ -41,12 +41,12 @@ export ELASTICSEARCH_URL="http://localhost:10141"
 export POSTGRESQL_URL="localhost:5432"
 # Ingest
 export INGEST_URL="https://localhost:10122"
-export INGEST_PORT=$(echo $INGEST_URL | awk -F: '{ print $NF }')
-export INGEST_HOST=$(echo $INGEST_URL | awk -F: '{ print $2 }' | tr -d '/')
+export INGEST_PORT="localhost"
+export INGEST_HOST=10122
 # Automate Gateway service
 export GATEWAY_URL="https://localhost:2000"
-export GATEWAY_PORT=$(echo $GATEWAY_URL | awk -F: '{ print $NF }')
-export GATEWAY_HOST=$(echo $GATEWAY_URL | awk -F: '{ print $2 }' | tr -d '/')
+export GATEWAY_PORT="localhost"
+export GATEWAY_HOST=2000
 
 # Compiling with cgo require gcc to be in our path. We don't typically
 # use cgo so we set CGO_ENABLED=0 by default in the studio.
@@ -122,7 +122,7 @@ GETTING_STARTED
 # when we re-install it
 total_memory_kb=$(grep MemTotal /proc/meminfo | grep -o -E '[[:digit:]]+')
 # 8 gigs == 8164340kb, subtract a few kb so we can just do a less than comp
-if (( $total_memory_kb < 8164000 )); then
+if (( total_memory_kb < 8164000 )); then
   warn "!!!"
   warn "This system has less than 8Gb of RAM. You will not be able to run a full Automate deployment."
   warn "!!!"
@@ -133,7 +133,7 @@ document "start_all_services" <<DOC
   Simple wrapper for 'start_deployment_service' and 'chef-automate dev deployinate'.
   Also applies a license (if present), creates IAM v2 dev users, and upgrades IAM to v2.
 DOC
-function start_all_services() {
+start_all_services() {
   start_deployment_service
   chef-automate dev deployinate
   if [[ -f "/src/dev/license.jwt" ]]; then
@@ -146,14 +146,13 @@ function start_all_services() {
 document "get_admin_token" <<DOC
   This will idempotently generate an API token that has universal access for all your dev / curl needs.
 DOC
-function get_admin_token() {
+get_admin_token() {
   check_if_deployinate_started || return 1
   if [ -f /tmp/admin_token ]; then
     cat /tmp/admin_token
   else
     # note: we don't have to suppress stderr, $(get_api_token) won't capture it.
-    chef-automate admin-token >/tmp/admin_token
-    if [ $? -ne 0 ]; then
+    if ! chef-automate admin-token >/tmp/admin_token; then
       # attempt iam v2 cmd
       chef-automate iam token create "api-token-$$" --admin >/tmp/admin_token || return 1
     fi
@@ -164,7 +163,7 @@ function get_admin_token() {
 document "check_if_deployinate_started" <<DOC
   Returns 0 if deployinate is up or 1 if not and a relevant error.
 DOC
-function check_if_deployinate_started() {
+check_if_deployinate_started() {
   if ! type chef-automate > /dev/null 2>&1; then
     error "The deploy service has not been installed."
     log_line "Run '${GREEN}start_deployment_service${NC}' to consume the dev channel hart or '${GREEN}build components/automate-deployment${NC}' to build from source."
@@ -197,7 +196,7 @@ function check_if_deployinate_started() {
 generate_netrc_config
 
 # Prepare the environment to run our services
-function prepare_system() {
+prepare_system() {
   # These are needed for elasticsearch
   mount --bind / / > /dev/null
   install_if_missing core/busybox-static sysctl > /dev/null
@@ -219,7 +218,7 @@ function prepare_system() {
 prepare_system
 
 # Saves the in memory bash history to a file
-function save_history() {
+save_history() {
   history -a /src/.bash_history
 }
 
@@ -230,7 +229,7 @@ save_history
 # Load the bash history from a file
 history -r /src/.bash_history
 
-function cleanup() {
+cleanup() {
     save_history
     umount /
 }
