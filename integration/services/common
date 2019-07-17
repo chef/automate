@@ -45,7 +45,7 @@ docker_run() {
             "--workdir" "$A2_WORK_DIR"
     )
 
-    if [ ! -z "$SERVICES_CONFIG_PATH" ]; then
+    if [ -n "$SERVICES_CONFIG_PATH" ]; then
     docker_run_args+=(
             "--volume" "$SERVICES_CONFIG_PATH:/services"
     )
@@ -73,6 +73,7 @@ service_config_path() {
 }
 
 service_container_name() {
+    #shellcheck disable=SC2154
     echo "${1}-${test_build_slug}"
 }
 

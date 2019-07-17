@@ -1,5 +1,6 @@
-#shellcheck disable=SC2034
+#!/bin/bash
 
+#shellcheck disable=SC2034
 test_name="deep_migrate_upgrade"
 test_container_name="a1-migration.test"
 test_upgrades=true
@@ -28,12 +29,14 @@ do_build() {
 }
 
 do_deploy() {
-    cat $DEEP_UPGRADE_PATH > $test_manifest_path
+    #shellcheck disable=SC2154
+    cp "$DEEP_UPGRADE_PATH" "$test_manifest_path"
 
     local cli_bin="/bin/chef-automate-${CURRENT_OLDEST_VERSION}"
 
     download_cli "${CURRENT_OLDEST_VERSION}" "${cli_bin}"
 
+    #shellcheck disable=SC2154
     "${cli_bin}" upgrade-from-v1 "$test_config_path" \
         --hartifacts "$test_hartifacts_path" \
         --override-origin "$HAB_ORIGIN" \

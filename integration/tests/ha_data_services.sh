@@ -1,8 +1,12 @@
+#!/bin/bash
+
+#shellcheck disable=SC2034
 test_name="ha_data_services"
 test_external_services=(ha_backend)
 #test_backup_restore=true
 
 do_deploy() {
+    #shellcheck disable=SC2154
     chef-automate deploy config.toml \
         --hartifacts "$test_hartifacts_path" \
         --override-origin "$HAB_ORIGIN" \
@@ -14,7 +18,8 @@ do_deploy() {
 
 do_create_config() {
     do_create_config_default
-    cat /services/ha_backend.toml >> $test_config_path
+    #shellcheck disable=SC2154
+    cat /services/ha_backend.toml >> "$test_config_path"
 }
 
 do_cleanup() {

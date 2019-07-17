@@ -1,3 +1,6 @@
+#!/bin/bash
+
+#shellcheck disable=SC2034
 test_name="product_mitm"
 test_deploy_inspec_profiles=(a2-deploy-integration)
 # The inspec tests don't pass if the diagnostics are run
@@ -33,7 +36,7 @@ ExecStart=/usr/local/bin/mitmdump -p "${mitmport}" --mode transparent -k --confd
 WantedBy=multi-user.target
 EOF
 
-    umask $previous_umask
+    umask "$previous_umask"
 
     systemctl start mitmproxy
 }

@@ -1,10 +1,9 @@
-#shellcheck disable=SC2034
-#shellcheck disable=SC2039
-#shellcheck disable=SC2154
-#shellcheck disable=SC1091
+#!/bin/bash
 
+#shellcheck disable=SC2034
 test_name="chef-server"
 
+#shellcheck source=.studio/chef-server-collection
 source .studio/chef-server-collection
 
 do_create_config() {
@@ -20,7 +19,8 @@ do_create_config() {
         "https://github.com/chef/automate-liveness-agent/releases/download/$latest/automate-liveness-recipe.rb"
     chmod a+r /tmp/required_recipe.rb
 
-    cat << EOF >> "$test_config_path"
+    #shellcheck disable=SC2154
+    cat <<EOF >> "$test_config_path"
 [erchef.v1.sys.memory]
 max_bytes = 2000000000
 
@@ -31,6 +31,7 @@ EOF
 }
 
 do_deploy() {
+    #shellcheck disable=SC2154
     chef-automate deploy config.toml \
         --hartifacts "$test_hartifacts_path" \
         --override-origin "$HAB_ORIGIN" \

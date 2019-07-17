@@ -1,10 +1,9 @@
-#shellcheck disable=SC2034
-#shellcheck disable=SC2039
-#shellcheck disable=SC2154
-#shellcheck disable=SC1091
+#!/bin/bash
 
+#shellcheck disable=SC2034
 test_name="chef-server-only"
 
+#shellcheck source=.studio/chef-server-collection
 source .studio/chef-server-collection
 
 # This test
@@ -18,13 +17,15 @@ source .studio/chef-server-collection
 do_create_config() {
     do_create_config_default
 
-    cat << EOF >> "$test_config_path"
+    #shellcheck disable=SC2154
+    cat <<EOF >> "$test_config_path"
 [erchef.v1.sys.data_collector]
 enabled = false
 EOF
 }
 
 do_deploy() {
+    #shellcheck disable=SC2154
     chef-automate deploy config.toml \
         --product chef-server \
         --hartifacts "$test_hartifacts_path" \

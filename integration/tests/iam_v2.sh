@@ -1,8 +1,6 @@
-#shellcheck disable=SC2034
-#shellcheck disable=SC2039
-#shellcheck disable=SC2154
-#shellcheck disable=SC1091
+#!/bin/bash
 
+#shellcheck disable=SC2034
 test_name="iam v1 to v2"
 test_deploy_inspec_profiles=(a2-iam-v2-integration)
 # Note: we can't run diagnostics AND inspec, so skip diagnostics
@@ -23,7 +21,7 @@ do_setup() {
     hab pkg install core/curl
     hab pkg install -b core/jo
 
-    umask $previous_umask
+    umask "$previous_umask"
 }
 
 hab_curl() {

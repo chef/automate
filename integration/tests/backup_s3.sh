@@ -1,12 +1,12 @@
-#shellcheck disable=SC2034
-#shellcheck disable=SC2154
+#!/bin/bash
 
+#shellcheck disable=SC2034
 test_name="backup-s3"
 test_backup_restore=true
 
 __base_path() {
     if [ -z "$BUILDKITE_BUILD_ID" ]; then
-        echo "$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13)"
+        head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13
     else
         echo "$BUILDKITE_BUILD_ID"
     fi
@@ -25,7 +25,8 @@ do_setup() {
 do_create_config() {
     do_create_config_default
 
-    cat << EOF >> "$test_config_path"
+    #shellcheck disable=SC2154
+    cat <<EOF >> "$test_config_path"
 [global.v1.backups]
   location = "s3"
 [global.v1.backups.s3.bucket]
@@ -43,12 +44,14 @@ do_prepare_restore() {
 
     # make sure we can list the backups, and it contains
     # our backup
+    #shellcheck disable=SC2154
     chef-automate backup list \
         --debug \
         "s3://${bucket_name}/${base_path}" | awk -v s="${test_backup_id}" 'BEGIN{r=1}; $0~s{r=0} 1; END{exit(r)}'
 }
 
 do_restore() {
+    #shellcheck disable=SC2154
     chef-automate backup restore \
         --debug \
         --override-origin "$HAB_ORIGIN" \

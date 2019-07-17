@@ -1,8 +1,6 @@
-#shellcheck disable=SC2034
-#shellcheck disable=SC2039
-#shellcheck disable=SC2154
-#shellcheck disable=SC1091
+#!/bin/bash
 
+#shellcheck disable=SC2034
 test_name="iam v2.1 only"
 # Note: the inspec profile takes care of deleting any migrated v1 legacy
 # policies
@@ -25,7 +23,7 @@ do_setup() {
     hab pkg install core/curl
     hab pkg install -b core/jo
 
-    umask $previous_umask
+    umask "$previous_umask"
 }
 
 hab_curl() {
@@ -56,8 +54,9 @@ do_test_deploy() {
 }
 
 verify_legacy_policies_not_migrated() {
-    local token=$(chef-automate iam token create ADMIN_TEST --admin)
-    local legacy_policies=(secrets-access-legacy
+    local token legacy_policies code
+    token=$(chef-automate iam token create ADMIN_TEST --admin)
+    legacy_policies=(secrets-access-legacy
             events-access-legacy
             infrastructure-automation-access-legacy
             compliance-access-legacy
@@ -71,7 +70,8 @@ verify_legacy_policies_not_migrated() {
     do
         echo "checking legacy policy $id..."
 	# only capture the response code
-        local code=$(hab_curl -s -o /dev/null -k -w '%{http_code}' -H "api-token: $token" https://localhost/apis/iam/v2beta/policies/$id)
+        code="$(hab_curl -s -o /dev/null -k -w '%{http_code}' -H "api-token: $token" \
+          "https://localhost/apis/iam/v2beta/policies/$id")"
 	[[ $code -eq 404 ]] || return 1
     done
 }

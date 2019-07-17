@@ -1,3 +1,6 @@
+#!/bin/bash
+
+#shellcheck disable=SC2034
 test_name="airgap_a1_migration"
 test_container_name="a1-migration.test"
 test_upgrade_strategy="none"
@@ -16,12 +19,14 @@ do_build() {
     set_test_manifest "build.json"
     log_info "Installing harts"
     # We need to make sure the harts are installed so that the bundle creation works
-    if ls ${test_hartifacts_path}/*.hart
+    #shellcheck disable=SC2154
+    if ls "${test_hartifacts_path}"/*.hart
     then
-        hab pkg install ${test_hartifacts_path}/*.hart
+        hab pkg install "${test_hartifacts_path}"/*.hart
     fi
 
     log_info "Creating airgap bundle"
+    #shellcheck disable=SC2154
     chef-automate airgap bundle create \
         --manifest "${test_manifest_path}" \
         --hartifacts "${test_hartifacts_path}" \
@@ -35,6 +40,7 @@ do_build() {
 }
 
 do_deploy() {
+    #shellcheck disable=SC2154
     chef-automate upgrade-from-v1 "$test_config_path" \
         --airgap-bundle bundle.aib \
         --admin-password chefautomate \

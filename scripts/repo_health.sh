@@ -46,7 +46,12 @@ if ! git diff --exit-code --ignore-submodules=all; then
 fi
 
 echo "Shellchecking!"
-shellcheck ./.expeditor/*.sh ./.expeditor/**/*.sh ./scripts/*.sh ./.buildkite/hooks/*
+shellcheck -s bash -ax \
+  .expeditor/*.sh \
+  .expeditor/**/*.sh \
+  .buildkite/hooks/* \
+  scripts/*.sh \
+  integration/tests/*.sh
 
 echo "Checking for possible credentials in the source code"
 go run ./tools/credscan

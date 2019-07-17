@@ -1,10 +1,10 @@
+#!/bin/bash
+
 #shellcheck disable=SC2034
-#shellcheck disable=SC2039
-#shellcheck disable=SC2154
-#shellcheck disable=SC1091
 test_name="workflow"
 
 do_deploy() {
+    #shellcheck disable=SC2154
     chef-automate deploy config.toml \
         --hartifacts "$test_hartifacts_path" \
         --override-origin "$HAB_ORIGIN" \
