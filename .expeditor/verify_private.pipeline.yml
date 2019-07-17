@@ -495,6 +495,19 @@ steps:
         linux:
           privileged: true
 
+  - label: "iam v2 (v2 only, diagnostics)"
+    command:
+      - integration/run_test integration/tests/iam_v2_only_diagnostics.sh
+    timeout_in_minutes: 20
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
+
   - label: "data-lifecycle-service"
     command:
       - integration/run_test integration/tests/data_lifecycle.sh
