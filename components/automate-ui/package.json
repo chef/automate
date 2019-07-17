@@ -39,6 +39,7 @@
     "@ngrx/router-store": "8.1.0",
     "@ngrx/store": "8.1.0",
     "@ngrx/store-devtools": "8.1.0",
+    "acorn": "^6.0.5",
     "classlist.js": "^1.1.20150312",
     "core-js": "^2.4.1",
     "d3": "^5.6.0",
