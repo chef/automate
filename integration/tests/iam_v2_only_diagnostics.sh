@@ -5,6 +5,7 @@ test_name="iam v2 only (diagnostics)"
 # Note: we can't run diagnostics AND inspec, so no inspec here
 #shellcheck disable=SC2034
 test_deploy_inspec_profiles=()
+test_diagnostics_filters="~iam-v1"
 
 do_setup() {
     do_setup_default

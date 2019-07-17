@@ -20,7 +20,7 @@ type authPoliciesSave struct {
 func CreateAuthPoliciesDiagnostic() diagnostics.Diagnostic {
 	return diagnostics.Diagnostic{
 		Name: "auth-policies",
-		Tags: diagnostics.Tags{"auth"},
+		Tags: diagnostics.Tags{"auth", "iam-v1"},
 		Generate: func(tstCtx diagnostics.TestContext) error {
 			tokenInfo, err := CreateRandomToken(tstCtx)
 			if err != nil {
