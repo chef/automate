@@ -41,12 +41,12 @@ export ELASTICSEARCH_URL="http://localhost:10141"
 export POSTGRESQL_URL="localhost:5432"
 # Ingest
 export INGEST_URL="https://localhost:10122"
-export INGEST_PORT="localhost"
-export INGEST_HOST=10122
+export INGEST_HOST="localhost"
+export INGEST_PORT=10122
 # Automate Gateway service
 export GATEWAY_URL="https://localhost:2000"
-export GATEWAY_PORT="localhost"
-export GATEWAY_HOST=2000
+export GATEWAY_HOST="localhost"
+export GATEWAY_PORT=2000
 
 # Compiling with cgo require gcc to be in our path. We don't typically
 # use cgo so we set CGO_ENABLED=0 by default in the studio.
