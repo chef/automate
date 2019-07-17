@@ -4,8 +4,38 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestConvertComposedServiceToStorage(t *testing.T) {
+	expected := &storage.Service{}
+	assert.Equal(t, expected, convertComposedServiceToStorage(&composedService{}))
+
+	expected = &storage.Service{ID: 1, SupMemberID: "foo"}
+	assert.Equal(t, expected, convertComposedServiceToStorage(&composedService{ID: 1, SupMemberID: "foo"}))
+
+	expected = &storage.Service{Application: "abcd", PreviousHealth: "MORE-OR-LESS-OK"}
+	assert.Equal(t, expected, convertComposedServiceToStorage(&composedService{
+		Application: "abcd", PreviousHealth: "MORE-OR-LESS-OK", Status: "",
+	}))
+}
+
+func TestConvertComposedServicesToStorage(t *testing.T) {
+	expected := []*storage.Service{
+		&storage.Service{},
+		&storage.Service{ID: 1, SupMemberID: "foo"},
+		&storage.Service{Application: "abcd", PreviousHealth: "MORE-OR-LESS-OK"},
+	}
+	subject := convertComposedServicesToStorage([]*composedService{
+		&composedService{},
+		&composedService{ID: 1, SupMemberID: "foo"},
+		&composedService{Application: "abcd", PreviousHealth: "MORE-OR-LESS-OK", Status: ""},
+	})
+	for _, e := range expected {
+		assert.Contains(t, subject, e)
+	}
+}
 
 func TestBuildWhereConstraintsFromFiltersNoFilterReturnsEmptyString(t *testing.T) {
 	expected := ""

@@ -75,8 +75,8 @@ func HabitatUpdateStrategyToStorageFormat(strategy habitat.UpdateStrategy) Updat
 }
 
 type Service struct {
-	ID                  int32  `db:"id"`
-	SupMemberID         string `db:"sup_member_id"`
+	ID                  int32
+	SupMemberID         string
 	Origin              string
 	Name                string
 	Version             string
@@ -89,10 +89,10 @@ type Service struct {
 	Environment         string
 	Channel             string
 	Site                string
-	PreviousHealth      string    `db:"previous_health"`
-	UpdateStrategy      string    `db:"update_strategy"`
-	LastEventOccurredAt time.Time `db:"last_event_occurred_at"`
-	HealthUpdatedAt     time.Time `db:"health_updated_at"`
+	PreviousHealth      string
+	UpdateStrategy      string
+	LastEventOccurredAt time.Time
+	HealthUpdatedAt     time.Time
 }
 
 func (s *Service) FullReleaseString() string {
