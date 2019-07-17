@@ -89,6 +89,7 @@ control 'iam-v2-1' do
           "*"
         ],
         "projects": [
+          "*"
         ]
       }
     ],
