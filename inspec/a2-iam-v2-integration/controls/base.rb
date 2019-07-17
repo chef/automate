@@ -5,9 +5,6 @@
 title 'IAM v2 migration API integration tests'
 
 include_controls 'a2-api-integration' do
-   # this is for pre-migration v2 status
-  skip_control 'iam-v2-1'
-
   # stuff that changed with the changes in default profiles
   # see below for the IAM v2 behaviour
   skip_control 'authz-access-control-iam-v1'
