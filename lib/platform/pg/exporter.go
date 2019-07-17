@@ -16,13 +16,13 @@ import (
 
 // PGDumpCmd is the command we will run for pg_dump. This self-test
 // harness replaces this with a stub.
-var PGDumpCmd = []string{"hab", "pkg", "exec", "chef/automate-postgresql", "pg_dump"}
+var PGDumpCmd = []string{"hab", "pkg", "exec", "core/postgresql11-client", "pg_dump"}
 
 // PGRestoreCmd is the command we will run for pg_restore.
-var PGRestoreCmd = []string{"hab", "pkg", "exec", "chef/automate-postgresql", "pg_restore"}
+var PGRestoreCmd = []string{"hab", "pkg", "exec", "core/postgresql11-client", "pg_restore"}
 
 // PSQLCmd is the command we will run for psql.
-var PSQLCmd = []string{"hab", "pkg", "exec", "chef/automate-postgresql", "psql"}
+var PSQLCmd = []string{"hab", "pkg", "exec", "core/postgresql11-client", "psql"}
 
 // DatabaseExporter knows how to export and import a database. See
 // Export and Import for further details.
