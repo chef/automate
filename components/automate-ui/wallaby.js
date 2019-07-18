@@ -1,4 +1,6 @@
-// This "config" file comes from https://github.com/wallabyjs/ngCliWebpackSample/
+// This "config" file comes from:
+// URL: https://github.com/wallabyjs/ngCliWebpackSample/
+// Commit: 0128211c848270eb6c38ca7093ef1647fd9b3247
 
 module.exports = function (wallaby) {
   const wallabyWebpack = require('wallaby-webpack');
@@ -12,7 +14,10 @@ module.exports = function (wallaby) {
     return { name: key, ...angularConfig.projects[key] };
   }).filter(project => project.sourceRoot);
 
-  const applications = projects.filter(project => project.projectType === 'application');
+  const applications = projects
+    .filter(project => project.projectType === 'application')
+    .filter(project => project.architect && project.architect.test &&
+      project.architect.test.builder === '@angular-devkit/build-angular:karma');
   const libraries = projects.filter(project => project.projectType === 'library');
 
   const tsConfigFile = projects
@@ -34,9 +39,10 @@ module.exports = function (wallaby) {
         pattern: project.sourceRoot + specPattern,
         ignore: true
       })),
-      // 2017.09.30 Automate-UI: Added json-tree item to this list
-      { pattern: 'src/app/page-components/json-tree/vendor/**/*.*', load: false, instrument: false },
-      { pattern: './**/*.d.ts', ignore: true }
+      ...projects.map(project => ({
+        pattern: project.sourceRoot + '/**/*.d.ts',
+        ignore: true
+      }))
     ],
 
     tests: [
