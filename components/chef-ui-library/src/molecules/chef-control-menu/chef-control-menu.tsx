@@ -1,12 +1,4 @@
-import {
-  Component,
-  Element,
-  Event,
-  EventEmitter,
-  Listen,
-  Prop,
-  State
-} from '@stencil/core';
+import { Component, Element, Event, EventEmitter, Listen, Prop, State, h } from '@stencil/core';
 import clamp from 'lodash/fp/clamp';
 import findIndex from 'lodash/fp/findIndex';
 import getOr from 'lodash/fp/getOr';

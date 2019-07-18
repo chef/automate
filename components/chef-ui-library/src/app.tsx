@@ -4,7 +4,7 @@
 import '@stencil/router';
 /* tslint:enable:no-import-side-effect */
 
-import { Component, Prop } from '@stencil/core';
+import { Component, Prop, h } from '@stencil/core';
 import { Store } from '@stencil/redux';
 
 import { configureStore } from './store';

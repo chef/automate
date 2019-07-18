@@ -6,7 +6,8 @@ import {
   Listen,
   Prop,
   State,
-  Watch
+  Watch,
+  h
 } from '@stencil/core';
 
 /**

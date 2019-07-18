@@ -1,4 +1,4 @@
-import { Component, Element, Listen, Method, Prop, State } from '@stencil/core';
+import { Component, Element, Listen, Method, Prop, State, h } from '@stencil/core';
 import { Dictionary } from 'lodash';
 import zip from 'lodash/fp/zip';
 import multiply from 'lodash/fp/multiply';

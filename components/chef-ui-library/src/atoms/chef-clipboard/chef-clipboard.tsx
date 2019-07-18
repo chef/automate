@@ -1,10 +1,4 @@
-import {
-  Component,
-  Listen,
-  Method,
-  Prop,
-  State
-} from '@stencil/core';
+import { Component, Listen, Method, Prop, State, h } from '@stencil/core';
 
 const preClickText = 'Copy to clipboard';
 const postClickText = 'Copied!';

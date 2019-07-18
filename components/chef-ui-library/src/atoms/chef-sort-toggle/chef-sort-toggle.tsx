@@ -1,4 +1,4 @@
-import { Component, Event, EventEmitter, Method, Prop } from '@stencil/core';
+import { Component, Event, EventEmitter, Method, Prop, h } from '@stencil/core';
 
 /**
  * @description
