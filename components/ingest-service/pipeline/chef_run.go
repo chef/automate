@@ -27,7 +27,7 @@ func NewChefRunPipeline(client backend.Client, authzClient iam_v2.ProjectsClient
 	var (
 		in                                   = make(chan message.ChefRun, 100)
 		counter                        int64 = 0
-		numberOfParallelBulkPublishers       = 6
+		numberOfParallelBulkPublishers       = 100
 	)
 
 	chefRunPipeline(in,
