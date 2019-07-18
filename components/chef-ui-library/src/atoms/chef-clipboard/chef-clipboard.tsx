@@ -83,7 +83,7 @@ export class ChefClipboard {
   }
 
   @Method()
-  copy(value: string): boolean {
+  async copy(value: string): Promise<boolean> {
     // setup
     const el = document.createElement('textarea');
     el.value = value;
@@ -95,7 +95,7 @@ export class ChefClipboard {
     const copied = document.execCommand('copy');
     // cleanup
     document.body.removeChild(el);
-    return copied;
+    return Promise.resolve(copied);
   }
 
   get buttonProps() {
