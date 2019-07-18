@@ -22,8 +22,9 @@ import (
 // instances" rule.
 func (s *policyServer) okToMigrate(ctx context.Context, ms storage.MigrationStatus) error {
 	switch ms {
-	case storage.Successful, storage.SuccessfulBeta1:
-		return status.Error(codes.AlreadyExists, "already migrated")
+	// TODO make aware of flag?
+	// case storage.Successful, storage.SuccessfulBeta1:
+	// 	return status.Error(codes.AlreadyExists, "already migrated")
 	case storage.InProgress:
 		return status.Error(codes.FailedPrecondition, "migration already in progress")
 	case storage.Failed:

@@ -1520,7 +1520,13 @@ func (p *pg) Reset(ctx context.Context) error {
 
 func (p *pg) ResetV2Migrations(ctx context.Context) error {
 	if _, err := p.db.ExecContext(ctx,
-		`UPDATE data_migrations SET version=0`); err != nil {
+		`DO $$
+		BEGIN
+		IF EXISTS (select 1 from pg_class where relname='data_migrations') THEN 
+		   UPDATE data_migrations SET version=0, dirty=false;
+		END IF;
+		END
+		$$;`); err != nil {
 		return errors.Wrap(err, "reset v2 data migrations")
 	}
 

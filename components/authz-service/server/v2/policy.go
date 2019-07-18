@@ -519,8 +519,10 @@ func (s *policyServer) MigrateToV2(ctx context.Context,
 		return nil, status.Errorf(codes.Internal, "record migration status: %s", err.Error())
 	}
 
-	if err := s.store.ResetV2Migrations(ctx); err != nil {
-		return nil, status.Errorf(codes.Internal, "reset migration upgrade table: %s", err.Error())
+	if req.Flag == api.Flag_VERSION_2_1 && ms == storage.Successful {
+		if err := s.store.ResetV2Migrations(ctx); err != nil {
+			return nil, status.Errorf(codes.Internal, "reset migration upgrade table: %s", err.Error())
+		}
 	}
 
 	var reports []string
