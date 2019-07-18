@@ -340,9 +340,12 @@ func createServices(s *Suite) {
 	//defer ConfigManager.Close()
 
 	chefIngestServerConfig := serveropts.ChefIngestServerConfig{
-		MaxNumberOfBundledRunMsgs:    100,
 		MaxNumberOfBundledActionMsgs: 100,
-		NumberOfRunMsgsTransformers:  1,
+		ChefIngestRunPipelineConfig: serveropts.ChefIngestRunPipelineConfig{
+			MaxNumberOfBundledMsgs:   100,
+			NumberOfMsgsTransformers: 1,
+			NumberOfPublishers:       1,
+		},
 	}
 	// A global ChefIngestServer instance to call any rpc function
 	//
