@@ -192,6 +192,47 @@ func TestGenerateAdminToken(t *testing.T) {
 		require.NotNil(t, resp)
 	})
 
+	t.Run("when API token succeeds but policy creation fails due to 'already exists', v2 policy creation succeeds", func(t *testing.T) {
+		mockAuthN.CreateTokenFunc = func(
+			_ context.Context, req *authn.CreateTokenReq) (*authn.Token, error) {
+
+			assert.True(t, req.Active)
+			assert.Equal(t, testDescription, req.Description)
+
+			return &authn.Token{
+				Value: testTokenString,
+				Id:    testID,
+			}, nil
+		}
+
+		mockAuthZ.CreatePolicyFunc = func(
+			_ context.Context, req *authz.CreatePolicyReq) (*authz.CreatePolicyResp, error) {
+
+			assert.Equal(t, []string{testSubjectString}, req.Subjects)
+			assert.Equal(t, "*", req.Action)
+			assert.Equal(t, "*", req.Resource)
+
+			st := status.New(codes.FailedPrecondition, "authz-service set to v2")
+			st, _ = st.WithDetails(&common.ErrorShouldUseV2{})
+			return nil, st.Err()
+		}
+
+		mockV2PolicyServer.CreatePolicyFunc = func(
+			_ context.Context, req *authz_v2.CreatePolicyReq) (*authz_v2.Policy, error) {
+
+			assert.Equal(t, "diagnostics-admin-token", req.Id)
+			assert.Equal(t, testDescription, req.Name)
+			assert.Equal(t, authz_v2.Statement_ALLOW, req.Statements[0].Effect)
+
+			return nil, status.Error(codes.AlreadyExists, "policy with id \"diagnostics-admin-token\" already exists")
+		}
+
+		req := &api.GenerateAdminTokenRequest{Description: testDescription}
+		resp, err := generateAdminToken(ctx, req, connFactory, authnServer.URL, authzServer.URL)
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+	})
+
 	t.Run("when API token succeeds but policy creation fails and rollback fails", func(t *testing.T) {
 		mockAuthN.CreateTokenFunc = func(
 			_ context.Context, req *authn.CreateTokenReq) (*authn.Token, error) {
