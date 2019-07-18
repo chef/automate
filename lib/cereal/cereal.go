@@ -373,12 +373,51 @@ type TaskExecutor interface {
 	Run(ctx context.Context, task Task) (result interface{}, err error)
 }
 
+// waywardWorkflowList is a map of wayward workflows to the time they
+// entered the map. A wayward workflow is a workflow that has
+// experienced some fundamental processing error in the past. To avoid
+// stalling the processing of other workflows, we temporarily skip
+// events for any waywardWords.
+type waywardWorkflowList map[string]time.Time
+
+// waywardWorkflowTimeout is amount of time we will keep a given
+// workflow in our wayward workflow list.
+var waywardWorkflowTimeout = 60 * time.Second
+
+func (w waywardWorkflowList) Add(workflowName string) {
+	if w == nil {
+		w = make(waywardWorkflowList)
+	}
+	if workflowName != "" {
+		w[workflowName] = time.Now()
+	}
+}
+
+// Filter takes list of workflows and returns a list of all
+// non-wayward workflows from the original list.
+func (w waywardWorkflowList) Filter(workflowNames []string) []string {
+	out := make([]string, 0, len(workflowNames))
+	for _, name := range workflowNames {
+		if waywardTime, isWayward := w[name]; isWayward {
+			if time.Since(waywardTime) > waywardWorkflowTimeout {
+				// Carry on my wayward son...
+				delete(w, name)
+				out = append(out, name)
+			}
+		} else {
+			out = append(out, name)
+		}
+	}
+	return out
+}
+
 // Manager is responsible for for calling WorkflowExecutors and
 // TaskExecutors when they need to be processed, along with managing
 // the scheduling of workflows.
 type Manager struct {
 	workflowExecutors map[string]WorkflowExecutor
 	taskExecutors     map[string]registeredExecutor
+	waywardWorkflows  waywardWorkflowList
 	workflowScheduler *workflowScheduler
 	backend           backend.Driver
 	cancel            context.CancelFunc
@@ -394,6 +433,7 @@ func NewManager(backend backend.Driver) (*Manager, error) {
 	}
 	return &Manager{
 		backend:           backend,
+		waywardWorkflows:  make(waywardWorkflowList),
 		workflowExecutors: make(map[string]WorkflowExecutor),
 		taskExecutors:     make(map[string]registeredExecutor),
 		workflowScheduler: &workflowScheduler{backend},
@@ -689,7 +729,8 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 
 	s := newStatsInfo()
 	s.Begin("dequeue")
-	wevt, completer, err := m.backend.DequeueWorkflow(ctx, workflowNames)
+	workflowsToProcess := m.waywardWorkflows.Filter(workflowNames)
+	wevt, completer, err := m.backend.DequeueWorkflow(ctx, workflowsToProcess)
 	if err != nil {
 		if err != ErrNoWorkflowInstances {
 			logrus.WithError(err).Error("failed to dequeue workflow!")
@@ -713,6 +754,7 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 	executor, ok := m.workflowExecutors[wevt.Instance.WorkflowName]
 	if !ok {
 		logrus.Errorf("No workflow executor for %s", wevt.Instance.WorkflowName)
+		m.waywardWorkflows.Add(wevt.Instance.WorkflowName)
 		return true
 	}
 
@@ -730,8 +772,11 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 	case backend.Cancel:
 		decision = executor.OnCancel(w, CancelEvent{})
 	default:
-		panic("WTF")
+		logrus.Warnf("Unknown workflow event %q for workflow %q", wevt.Type, wevt.Instance.WorkflowName)
+		m.waywardWorkflows.Add(wevt.Instance.WorkflowName)
+		return true
 	}
+
 	s.End("user")
 	logctx := logrus.WithFields(logrus.Fields{
 		"workflow_name":   wevt.Instance.WorkflowName,
