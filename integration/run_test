@@ -71,7 +71,7 @@ fi
 
 if [ ${#test_external_services[@]} -ne 0 ]; then
     log_info "Start External Services"
-    source integration/services/common
+    source integration/services/common.sh
     create_services_config_path
 
     docker_run_args+=(
@@ -81,7 +81,7 @@ if [ ${#test_external_services[@]} -ne 0 ]; then
     for external_service in "${test_external_services[@]}"
     do
         log_info "Starting $external_service"
-        source integration/services/$external_service/init
+        source integration/services/$external_service/init.sh
         ${external_service}_setup
     done
 fi

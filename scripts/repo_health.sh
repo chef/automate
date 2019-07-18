@@ -51,7 +51,7 @@ shellcheck -s bash -ax \
   .expeditor/**/*.sh \
   .buildkite/hooks/* \
   scripts/*.sh \
-  integration/tests/*.sh
+  integration/**/*.sh
 
 echo "Checking for possible credentials in the source code"
 go run ./tools/credscan

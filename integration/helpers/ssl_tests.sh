@@ -1,4 +1,5 @@
-# shellcheck disable=SC2039
+#!/bin/bash
+
 # shellcheck disable=SC2164
 run_ssl_scan() {
     install_testssl_prereqs

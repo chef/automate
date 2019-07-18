@@ -4,7 +4,7 @@
 test_name="ha_chef_server"
 test_external_services=(ha_backend)
 
-source integration/services/common
+source integration/services/common.sh
 
 _frontend1_container_name="$(service_container_name "cs1")"
 _frontend2_container_name="$(service_container_name "cs2")"

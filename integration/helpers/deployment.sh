@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# shellcheck disable=SC2154
 
-#
 # $automate_config
 # $hartifacts_path
 # $manifest_path
@@ -53,6 +51,7 @@ run_upgrade() {
     # to be updated that isn't a service
     sleep 45
 
+    #shellcheck disable=SC2154
     wait_for_upgrade "$test_detect_broken_cli" "$test_detect_broken_packages"
 }
 
@@ -134,7 +133,7 @@ fix_broken_packages() {
     declare -a packages_to_check=("core/hab-sup")
 
     for pkg in "${packages_to_check[@]}"; do
-        for pkg_dir in /hab/pkgs/$pkg/*/*; do
+        for pkg_dir in "/hab/pkgs/$pkg"/*/*; do
             # TODO(ssd) 2018-12-07: This is an incomplete check,
             # really any number of files can be missing. A complete
             # check would look at FILES and check every file in the

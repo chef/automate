@@ -1,3 +1,4 @@
+#!/bin/bash
 # The purpose of this test is to make sure that only those
 # who possess the key for a certificate part of the a2 deployment
 # can use the certificate to authenticate either through the
@@ -5,6 +6,7 @@
 cert_auth_tests() {
     log_info "Starting the Certificate Authentication test suite"
     hab pkg install core/curl
+    #shellcheck disable=SC2154
     log_info "Generating policy to allow ${authorized_service_name} to GET the data collector endpoint"
     grant_permissions
     echo -e "\n\n"
