@@ -103,7 +103,7 @@ export class ChefModal {
   @State() prevFocusedElement: HTMLElement;
 
   // Listens on page outside of the modal component
-  @Listen('body:keydown') handleEscape(event) {
+  @Listen('keydown', { target: 'body' }) handleEscape(event) {
     if (event.key === 'Escape') {
       this.handleClose();
     }

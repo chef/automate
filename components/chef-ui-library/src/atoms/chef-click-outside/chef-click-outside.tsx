@@ -56,7 +56,7 @@ export class ChefClickOutside {
     );
   }
 
-  @Listen('document:click') onDocumentClick(event) {
+  @Listen('click', { target: 'document' }) onDocumentClick(event) {
     const clickedInside = this.el.contains(event.target);
     const clickedOmitted = this.omit && this.omit.length && event.target.closest(`.${this.omit}`);
 
