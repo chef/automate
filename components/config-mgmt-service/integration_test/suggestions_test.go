@@ -8,6 +8,7 @@ package integration_test
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"testing"
 
 	"google.golang.org/grpc/codes"
@@ -40,6 +41,178 @@ func TestSuggestionsWithAnInvalidTypeReturnsError(t *testing.T) {
 			res, err := cfgmgmt.GetSuggestions(ctx, &req)
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, res)
+		})
+	}
+}
+
+func TestSuggestionsLargeArrayValues(t *testing.T) {
+
+	ctx := context.Background()
+	terms := make([]string, 105)
+	for index := 0; index < 105; index++ {
+		terms[index] = "a_" + strconv.Itoa(index)
+	}
+
+	cases := []struct {
+		description string
+		nodes       []iBackend.Node
+		request     request.Suggestion
+		expected    []string
+	}{
+		{
+			description: "over 105 attributes",
+			nodes: []iBackend.Node{
+				{
+					Attributes: append(terms, "zum.epel-debuginfo.gpgcheck"),
+				},
+			},
+			request: request.Suggestion{
+				Type: "attribute",
+				Text: "zum.epel-debuginfo.gpgcheck",
+			},
+			expected: []string{"zum.epel-debuginfo.gpgcheck"},
+		},
+		{
+			description: "over 105 cookbooks",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zum.epel-debuginfo.gpgcheck"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zum.epel-debuginfo.gpgcheck",
+			},
+			expected: []string{"zum.epel-debuginfo.gpgcheck"},
+		},
+		{
+			description: "case sensitive 1",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "ZZZ.ZZZ-ZZzzzZZZ"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz.zzz-zzzzzzzz",
+			},
+			expected: []string{"zzz.zzz-zzzzzzzz"},
+		},
+		{
+			description: "case sensitive 2",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "ZZZ.ZZZ-ZZzzzZZZ"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "ZZZ.ZZZ-ZZzzzZZZ",
+			},
+			expected: []string{"zzz.zzz-zzzzzzzz"},
+		},
+		{
+			description: "case sensitive 3",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz.zzz-zzzzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "ZZZ.ZZZ-ZZzzzZZZ",
+			},
+			expected: []string{"zzz.zzz-zzzzzzzz"},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Many items: %s", test.description), func(t *testing.T) {
+			// Adding required node data
+			for index := range test.nodes {
+				test.nodes[index].Exists = true
+				test.nodes[index].NodeInfo.EntityUuid = newUUID()
+			}
+
+			suite.IngestNodes(test.nodes)
+			defer suite.DeleteAllDocuments()
+			res, err := cfgmgmt.GetSuggestions(ctx, &test.request)
+			assert.Nil(t, err)
+
+			actualSuggestions := extractTextFromSuggestionsResponse(res, t)
+
+			assert.ElementsMatch(t, test.expected, actualSuggestions)
+		})
+	}
+}
+
+// If there are over one hundred and five attributes that start with the prefix 'zum' and one term 'zum'.
+// Test if the term 'zum' returned when the text 'zum' is requested.
+func TestSuggestionsLargeCollectionOfSamePrefixTerm(t *testing.T) {
+	terms := make([]string, 110)
+	for index := 0; index < 110; index++ {
+		terms[index] = "zum_" + strconv.Itoa(index)
+	}
+	terms = append(terms, "zum")
+
+	node := iBackend.Node{
+		Exists:     true,
+		Attributes: terms,
+		NodeInfo: iBackend.NodeInfo{
+			EntityUuid: newUUID(),
+		},
+	}
+
+	suite.IngestNodes([]iBackend.Node{node})
+	defer suite.DeleteAllDocuments()
+
+	cases := []struct {
+		description  string
+		request      request.Suggestion
+		expectedTerm string
+	}{
+		{
+			description: "suggest term 'zum'",
+			request: request.Suggestion{
+				Type: "attribute",
+				Text: "zum",
+			},
+			expectedTerm: "zum",
+		},
+		{
+			description: "suggest term 'zum_0'",
+			request: request.Suggestion{
+				Type: "attribute",
+				Text: "zum_0",
+			},
+			expectedTerm: "zum_0",
+		},
+		{
+			description: "suggest term 'zum_99'",
+			request: request.Suggestion{
+				Type: "attribute",
+				Text: "zum_99",
+			},
+			expectedTerm: "zum_99",
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Find term: %s", test.description), func(t *testing.T) {
+			res, err := cfgmgmt.GetSuggestions(context.Background(), &test.request)
+			assert.Nil(t, err)
+
+			actualSuggestions := extractTextFromSuggestionsResponse(res, t)
+
+			assert.Contains(t, actualSuggestions, test.expectedTerm)
 		})
 	}
 }

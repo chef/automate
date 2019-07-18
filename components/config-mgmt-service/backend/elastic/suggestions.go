@@ -21,6 +21,93 @@ func (es Backend) GetSuggestions(term string, text string, filters map[string][]
 	return es.getAggSuggestions(term, text, filters)
 }
 
+// {
+// 	"aggregations":{
+// 		 "myagg":{
+// 				"aggregations":{
+// 					 "distinct":{
+// 							"top_hits":{
+// 								 "_source":false,
+// 								 "size":1
+// 							}
+// 					 },
+// 					 "mymaxscore":{
+// 							"max":{
+// 								 "script":{
+// 										"source":"_score"
+// 								 }
+// 							}
+// 					 }
+// 				},
+// 				"terms":{
+// 					 "field":"platform",
+// 					 "order":[
+// 							{
+// 								 "mymaxscore":"desc"
+// 							}
+// 					 ],
+// 					 "size":100
+// 				}
+// 		 }
+// 	},
+// 	"query":{
+// 		 "bool":{
+// 				"filter":{
+// 					 "bool":{
+// 							"should":{
+// 								 "terms":{
+// 										"exists":[
+// 											 "true"
+// 										]
+// 								 }
+// 							}
+// 					 }
+// 				},
+// 				"must":[
+// 					 {
+// 							"type":{
+// 								 "value":"node-state"
+// 							}
+// 					 },
+// 					 {
+// 							"match":{
+// 								 "platform.engram":{
+// 										"operator":"or",
+// 										"query":"kk"
+// 								 }
+// 							}
+// 					 },
+// 					 {
+// 							"match":{
+// 								 "platform.engram":{
+// 										"operator":"and",
+// 										"query":"kk"
+// 								 }
+// 							}
+// 					 }
+// 				],
+// 				"should":[
+// 					 {
+// 							"term":{
+// 								 "platform.lower":{
+// 										"boost":200,
+// 										"value":"kk"
+// 								 }
+// 							}
+// 					 },
+// 					 {
+// 							"prefix":{
+// 								 "platform.lower":{
+// 										"boost":100,
+// 										"value":"kk"
+// 								 }
+// 							}
+// 					 }
+// 				]
+// 		 }
+// 	},
+// 	"size":0
+// }
 func (es Backend) getAggSuggestions(term string, text string, filters map[string][]string) ([]backend.Suggestion, error) {
 	myagg := "myagg"
 	filters["exists"] = []string{"true"}
@@ -90,16 +177,20 @@ func (es Backend) getArrayAggSuggestions(term string, text string, filters map[s
 	typeQuery := elastic.NewTypeQuery(IndexNodeState)
 	filters["exists"] = []string{"true"}
 	boolQuery := newBoolQueryFromFilters(filters)
+	textLower := strings.ToLower(text)
 
 	boolQuery = boolQuery.Must(typeQuery)
 
 	// return all unless text has at least 2 chars
 	if len(text) >= 2 {
-		matchQuery := elastic.NewMatchQuery(fmt.Sprintf("%s.engram", term), text)
+		matchQuery := elastic.NewMatchQuery(fmt.Sprintf("%s.engram", term), textLower)
 		boolQuery = boolQuery.Must(matchQuery)
 	}
 	// multiplying the size by 10 as elasticsearch will sort array aggregations by doc_count. Will trim it back to size once we match it again in go
 	aggs := elastic.NewTermsAggregation().Field(term).Size(SuggestionQuerySize)
+	if len(text) >= 2 {
+		aggs = aggs.Include(".*" + textLower + ".*")
+	}
 	searchSource := elastic.NewSearchSource().
 		Query(boolQuery).
 		Aggregation("myagg", aggs).
@@ -129,6 +220,7 @@ func (es Backend) getArrayAggSuggestions(term string, text string, filters map[s
 	//		"myagg": {
 	//			"terms": {
 	//				"field": "roles",
+	//				"include":".*base.*",
 	//				"size": 100
 	//			}
 	//		}
@@ -158,7 +250,7 @@ func (es Backend) getArrayAggSuggestions(term string, text string, filters map[s
 			// When elasticsearch find a match in an array it returns that whole array and includes other values in that array as buckets.
 			// Because of this we will filter any buckets that do not contain any of the search string text
 			bucketname := string(bucket.KeyNumber)
-			if strings.Contains(bucketname, text) {
+			if strings.Contains(bucketname, textLower) {
 				suggs = append(suggs, bucketname)
 			}
 		}
@@ -172,7 +264,7 @@ func (es Backend) getArrayAggSuggestions(term string, text string, filters map[s
 		bagSizes := []int{2, 3}
 		// Create a closestmatch object
 		cm := closestmatch.New(suggs, bagSizes)
-		suggs = cm.ClosestN(text, SuggestionSize)
+		suggs = cm.ClosestN(textLower, SuggestionSize)
 	}
 
 	finalSuggs := make([]backend.Suggestion, 0)
