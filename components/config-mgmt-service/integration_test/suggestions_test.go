@@ -8,6 +8,7 @@ package integration_test
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"testing"
 
 	"google.golang.org/grpc/codes"
@@ -47,113 +48,9 @@ func TestSuggestionsWithAnInvalidTypeReturnsError(t *testing.T) {
 func TestSuggestionsLargeArrayValues(t *testing.T) {
 
 	ctx := context.Background()
-	terms := []string{
-		"california",
-		"m4",
-		"apt.unattended_upgrades.minimal_steps",
-		"yum.main.recent",
-		"authorization.sudo.groups",
-		"ohai.hints_path",
-		"jenkins.master.source",
-		"apt.cacher-client.restrict_environment",
-		"apt.unattended_upgrades.update_package_lists",
-		"packagecloud.hostname_override",
-		"java.jdk_version",
-		"rsyslog.group",
-		"yum.main.errorlevel",
-		"nginx.geoip.lib_checksum",
-		"git.url",
-		"apt.confd.install_suggests",
-		"apt.unattended_upgrades.minimal_steps",
-		"yum.main.deltarpm",
-		"nginx.worker_connections",
-		"nginx.upstart.foreground",
-		"apt.caching_server",
-		"apt.unattended_upgrades.mail_only_on_error",
-		"rsyslog.tls_certificate_file",
-		"opscode-ci.monitoring.jmx_hostname",
-		"nginx.upload_progress.zone_size",
-		"nginx.source.sbin_path",
-		"yum.epel-source.gpgkey",
-		"nginx.echo.url",
-		"nginx.gzip_min_length",
-		"authorization.sudo.env_keep_subtract",
-		"nginx.rate_limit",
-		"yum.main.sslverify",
-		"apt.unattended_upgrades.package_blacklist",
-		"yum.main.throttle",
-		"opscode-ci.master.days_to_keep_artifacts",
-		"nginx.accept_mutex_delay",
-		"nginx.passenger.ruby",
-		"omnibus.build_user_group",
-		"omnibus.build_user_home",
-		"jenkins.master.endpoint",
-		"git.version",
-		"git.checksum",
-		"authorization.sudo.sudoers_defaults",
-		"tags",
-		"omnibus.build_user",
-		"omnibus.ruby_version",
-		"omnibus.build_user_password",
-		"authorization.sudo.include_sudoers_d",
-		"authorization.sudo.agent_forwarding",
-		"opscode-ci.omnitruck.metadata_bucket",
-		"opscode-ci.omnitruck.packages_bucket",
-		"opscode-ci.master.pipeline_types",
-		"opscode-ci.master.host_name",
-		"opscode-ci.master.days_to_keep_artifacts",
-		"opscode-ci.master.artifacts_to_keep",
-		"opscode-ci.artifactory.endpoint",
-		"yum.main.clean_requirements_on_remove",
-		"yum.main.plugins",
-		"nginx.lua.version",
-		"yum.main.obsoletes",
-		"aws.databag_name",
-		"windows.rubyzipversion",
-		"rsyslog.default_facility_logs.uucp,news.crit",
-		"nginx.headers_more.source_checksum",
-		"nginx.upstart.foreground",
-		"bluepill.logfile",
-		"yum.main.sslclientcert",
-		"apt.cacher_port",
-		"apt.confd.install_recommends",
-		"nginx.log_dir_perm",
-		"xml.nokogiri.use_system_libraries",
-		"yum.epel.gpgkey",
-		"yum.main.color_list_installed_extra",
-		"nginx.naxsi.checksum",
-		"nginx.passenger.packages.rhel",
-		"nginx.echo.url",
-		"yum.main.password",
-		"yum.main.color_list_available_reinstall",
-		"aws.databag_entry",
-		"omnibus.install_dir",
-		"nginx.passenger.gem_binary",
-		"yum.epel-testing-debuginfo.description",
-		"authorization.sudo.include_sudoers_d",
-		"nginx.upload_progress.checksum",
-		"nginx.source.use_existing_user",
-		"nginx.source.version",
-		"nginx.binary",
-		"apt.cacher_dir",
-		"homebrew.auto-update",
-		"rsyslog.service_name",
-		"nginx.passenger.packages.fedora",
-		"opscode-ci.email.list_id",
-		"aws.right_aws_version",
-		"nginx.geoip.country_dat_checksum",
-		"nginx.pagespeed.packages.rhel",
-		"rsyslog.tls_ca_file",
-		"packagecloud.gpg_key_path",
-		"yum.epel-debuginfo.managed",
-		"yum.main.logfile",
-		"runit.executable",
-		"windows.allow_reboot_on_failure",
-		"nginx.set_misc.version",
-		"nginx.passenger.packages.debian",
-		"nginx.auth_request.url",
-		"yum.epel-testing-debuginfo.make_cache",
-		"zum.epel-debuginfo.gpgcheck",
+	terms := make([]string, 105)
+	for index := 0; index < 105; index++ {
+		terms[index] = "a_" + strconv.Itoa(index)
 	}
 
 	cases := []struct {
@@ -166,7 +63,7 @@ func TestSuggestionsLargeArrayValues(t *testing.T) {
 			description: "over 105 attributes",
 			nodes: []iBackend.Node{
 				{
-					Attributes: terms,
+					Attributes: append(terms, "zum.epel-debuginfo.gpgcheck"),
 				},
 			},
 			request: request.Suggestion{
@@ -180,7 +77,7 @@ func TestSuggestionsLargeArrayValues(t *testing.T) {
 			nodes: []iBackend.Node{
 				{
 					NodeInfo: iBackend.NodeInfo{
-						Cookbooks: terms,
+						Cookbooks: append(terms, "zum.epel-debuginfo.gpgcheck"),
 					},
 				},
 			},
@@ -260,137 +157,64 @@ func TestSuggestionsLargeArrayValues(t *testing.T) {
 // If there are over one hundred and five attributes that start with the prefix 'zum' and one term 'zum'.
 // Test if the term 'zum' returned when the text 'zum' is requested.
 func TestSuggestionsLargeCollectionOfSamePrefixTerm(t *testing.T) {
+	terms := make([]string, 110)
+	for index := 0; index < 110; index++ {
+		terms[index] = "zum_" + strconv.Itoa(index)
+	}
+	terms = append(terms, "zum")
+
 	node := iBackend.Node{
-		Exists: true,
-		Attributes: []string{ //106
-			"zum.1",
-			"zum.2",
-			"zum.unattended_upgrades.minimal_steps",
-			"zum.main.recent",
-			"zum.sudo.groups",
-			"zum.hints_path",
-			"zum.master.source",
-			"zum.cacher-client.restrict_environment",
-			"zum.unattended_upgrades.update_package_lists",
-			"zum.hostname_override",
-			"zum.jdk_version",
-			"zum.group",
-			"zum.main.errorlevel",
-			"zum.geoip.lib_checksum",
-			"zum.url",
-			"zum.confd.install_suggests",
-			"zum.unattended_upgrades.minimal_steps",
-			"zum.main.deltarpm",
-			"zum.worker_connections",
-			"zum.upstart.foreground",
-			"zum.caching_server",
-			"zum.unattended_upgrades.mail_only_on_error",
-			"zum.tls_certificate_file",
-			"zum-ci.monitoring.jmx_hostname",
-			"zum.upload_progress.zone_size",
-			"zum.source.sbin_path",
-			"zum.epel-source.gpgkey",
-			"zum.echo.url",
-			"zum.gzip_min_length",
-			"zum.sudo.env_keep_subtract",
-			"zum.rate_limit",
-			"zum.main.sslverify",
-			"zum.unattended_upgrades.package_blacklist",
-			"zum.main.throttle",
-			"zum-ci.master.days_to_keep_artifacts",
-			"zum.accept_mutex_delay",
-			"zum.passenger.ruby",
-			"zum.build_user_group",
-			"zum.build_user_home",
-			"zum.master.endpoint",
-			"zum.version",
-			"zum.checksum",
-			"zum.sudo.sudoers_defaults",
-			"zum.build_user",
-			"zum.ruby_version",
-			"zum.build_user_password",
-			"zum.sudo.include_sudoers_d",
-			"zum.sudo.agent_forwarding",
-			"zum-ci.omnitruck.metadata_bucket",
-			"zum-ci.omnitruck.packages_bucket",
-			"zum-ci.master.pipeline_types",
-			"zum-ci.master.host_name",
-			"zum-ci.master.days_to_keep_artifacts",
-			"zum-ci.master.artifacts_to_keep",
-			"zum-ci.artifactory.endpoint",
-			"zum.main.clean_requirements_on_remove",
-			"zum.main.plugins",
-			"zum.lua.version",
-			"zum.main.obsoletes",
-			"zum.databag_name",
-			"zum.rubyzipversion",
-			"zum.default_facility_logs.uucp,news.crit",
-			"zum.headers_more.source_checksum",
-			"zum.upstart.foreground",
-			"zum.logfile",
-			"zum.main.sslclientcert",
-			"zum.cacher_port",
-			"zum.confd.install_recommends",
-			"zum.log_dir_perm",
-			"zum.nokogiri.use_system_libraries",
-			"zum.epel.gpgkey",
-			"zum.main.color_list_installed_extra",
-			"zum.naxsi.checksum",
-			"zum.passenger.packages.rhel",
-			"zum.echo.url",
-			"zum.main.password",
-			"zum.main.color_list_available_reinstall",
-			"zum.databag_entry",
-			"zum.install_dir",
-			"zum.passenger.gem_binary",
-			"zum.epel-testing-debuginfo.description",
-			"zum.sudo.include_sudoers_d",
-			"zum.upload_progress.checksum",
-			"zum.source.use_existing_user",
-			"zum.source.version",
-			"zum.binary",
-			"zum.cacher_dir",
-			"zum.auto-update",
-			"zum.service_name",
-			"zum.passenger.packages.fedora",
-			"zum-ci.email.list_id",
-			"zum.right_aws_version",
-			"zum.geoip.country_dat_checksum",
-			"zum.pagespeed.packages.rhel",
-			"zum.tls_ca_file",
-			"zum.gpg_key_path",
-			"zum.epel-debuginfo.managed",
-			"zum.main.logfile",
-			"zum.executable",
-			"zum.allow_reboot_on_failure",
-			"zum.set_misc.version",
-			"zum.passenger.packages.debian",
-			"zum.auth_request.url",
-			"zum.epel-testing-debuginfo.make_cache",
-			"zum.epel-debuginfo.gpgcheck",
-			"zum.5",
-			"zum.6",
-			"zum.7",
-			"zum.9",
-			"zum",
-		},
+		Exists:     true,
+		Attributes: terms,
 		NodeInfo: iBackend.NodeInfo{
 			EntityUuid: newUUID(),
 		},
 	}
-	request := request.Suggestion{
-		Type: "attribute",
-		Text: "zum",
-	}
 
 	suite.IngestNodes([]iBackend.Node{node})
 	defer suite.DeleteAllDocuments()
-	res, err := cfgmgmt.GetSuggestions(context.Background(), &request)
-	assert.Nil(t, err)
 
-	actualSuggestions := extractTextFromSuggestionsResponse(res, t)
+	cases := []struct {
+		description  string
+		request      request.Suggestion
+		expectedTerm string
+	}{
+		{
+			description: "suggest term 'zum'",
+			request: request.Suggestion{
+				Type: "attribute",
+				Text: "zum",
+			},
+			expectedTerm: "zum",
+		},
+		{
+			description: "suggest term 'zum_0'",
+			request: request.Suggestion{
+				Type: "attribute",
+				Text: "zum_0",
+			},
+			expectedTerm: "zum_0",
+		},
+		{
+			description: "suggest term 'zum_99'",
+			request: request.Suggestion{
+				Type: "attribute",
+				Text: "zum_99",
+			},
+			expectedTerm: "zum_99",
+		},
+	}
 
-	assert.True(t, contains(actualSuggestions, "zum"), "Suggestions does not contain 'zum'")
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Find term: %s", test.description), func(t *testing.T) {
+			res, err := cfgmgmt.GetSuggestions(context.Background(), &test.request)
+			assert.Nil(t, err)
+
+			actualSuggestions := extractTextFromSuggestionsResponse(res, t)
+
+			assert.Contains(t, actualSuggestions, test.expectedTerm)
+		})
+	}
 }
 
 func TestSuggestionsFiltered(t *testing.T) {
@@ -1512,13 +1336,4 @@ func extractTextFromSuggestionsResponse(list *gp.ListValue, t *testing.T) []stri
 		}
 	}
 	return textArray
-}
-
-func contains(actual []string, expected string) bool {
-	for _, a := range actual {
-		if a == expected {
-			return true
-		}
-	}
-	return false
 }
