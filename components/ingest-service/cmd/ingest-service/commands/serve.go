@@ -88,7 +88,7 @@ func readCliParams() *serveropts.Opts {
 			ChefIngestRunPipelineConfig: serveropts.ChefIngestRunPipelineConfig{
 				MaxNumberOfBundledMsgs:   viper.GetInt("max-number-of-bundled-run-msgs"),
 				NumberOfMsgsTransformers: viper.GetInt("number-of-run-msgs-transformers"),
-				NumberOfPublishers:       viper.GetInt("number-of-run-publishers"),
+				NumberOfPublishers:       viper.GetInt("number-of-run-msg-publishers"),
 			},
 		},
 		ConnFactory: factory,
@@ -111,7 +111,7 @@ func init() {
 	serveCmd.Flags().Int("max-number-of-bundled-run-msgs", 2500, "The maximum number of run messages to bundle togeter during ingestion")
 	serveCmd.Flags().Int("max-number-of-bundled-action-msgs", 10000, "The maximum number of action messages to bundle togeter during ingestion")
 	serveCmd.Flags().Int("number-of-run-msgs-transformers", 9, "The number of run messages to transform at a time")
-	serveCmd.Flags().Int("number-of-run-publishers", 2, "The number of run messages publishers")
+	serveCmd.Flags().Int("number-of-run-msg-publishers", 2, "The number of run messages publishers")
 	serveCmd.Flags().String("key", "key.pem", "SSL Private key for gRPC server")
 	serveCmd.Flags().String("cert", "cert.pem", "SSL Certificate for gRPC server")
 	serveCmd.Flags().String("root-cert", "cacert.pem", "Root SSL CA Certificate for gRPC server")

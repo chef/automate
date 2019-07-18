@@ -28,7 +28,7 @@ CONFIG="$CONFIG --number-of-run-msgs-transformers {{cfg.service.number_of_run_ms
 {{~/if}}
 
 {{~#if cfg.service.number_of_run_msg_publishers }}
-CONFIG="$CONFIG --number-of-run-msgs-publishers {{cfg.service.number_of_run_msg_publishers}}"
+CONFIG="$CONFIG --number-of-run-msg-publishers {{cfg.service.number_of_run_msg_publishers}}"
 {{~/if}}
 
 # If we have a config pointing to an specific host,
