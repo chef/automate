@@ -146,6 +146,12 @@ LEFT JOIN supervisor AS sup
 WHERE last_event_occurred_at < now() - ($1 || ' minutes')::interval
 `
 
+	deleteDisconnectedServices = `
+DELETE
+FROM service
+WHERE service.last_event_occurred_at < now() - ($1 || ' minutes')::interval
+`
+
 	selectServicesHealthCounts = `
 SELECT COUNT(*) AS total
   , COUNT(*) FILTER (WHERE s.health = 'CRITICAL') AS critical
@@ -159,6 +165,19 @@ FROM service AS s
 	selectServicesTotalCount = `
 SELECT count(*)
   FROM service;
+`
+
+	// TODO: move to the relevant files
+	deleteSupsWithoutServices = `
+DELETE FROM supervisor WHERE NOT EXISTS (SELECT 1 FROM service WHERE service.sup_id = supervisor.id )
+`
+
+	deleteSvcGroupsWithoutServices = `
+DELETE FROM service_group WHERE NOT EXISTS (SELECT 1 FROM service WHERE service.group_id = service_group.id )
+`
+
+	deleteDeploymentsWithoutServices = `
+DELETE FROM deployment WHERE NOT EXISTS (SELECT 1 FROM service WHERE service.deployment_id = deployment.id )
 `
 )
 
@@ -227,6 +246,77 @@ func (db *Postgres) GetDisconnectedServices(thresholdMinutes int32) ([]*storage.
 
 	_, err := db.DbMap.Select(&services, selectDisconnectedServices, thresholdMinutes)
 	return convertComposedServicesToStorage(services), err
+}
+
+// DeleteDisconnectedServices deletes any service records where the time
+// elapsed since the last event is greater than the specified thresholdMinutes.
+// After deleting the services, it also removes all supervisor, service_group,
+// and deployment records that are not referenced by any service record because
+// the application treats these things as emergent properties of groups of
+// services so they shouldn't exist if there are no associated services. This
+// also prevents the need for a second cleanup operation to delete these
+// things.
+func (db *Postgres) DeleteDisconnectedServices(thresholdMinutes int32) ([]*storage.Service, error) {
+
+	tx, err := db.DbMap.Begin()
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to start DB transaction for DeleteDisconnectedServices")
+	}
+
+	// rollback to cancel the transaction if we fail later
+	var completed bool
+	defer func() {
+		if !completed {
+			tx.Rollback() //nolint: errcheck
+		}
+	}()
+
+	// We wish to avoid what the SQL standard specifies "phantom read":
+	// > A transaction re-executes a query returning a set of rows that satisfy a
+	// > search condition and finds that the set of rows satisfying the condition
+	// > has changed due to another recently-committed transaction.
+	// A phantom read would be bad here because we use a "query for a set of rows
+	// that satisfy a search condition" to find service groups, supervisors, and
+	// deployments that we want to delete. To avoid phantom reads in postgres, we
+	// need the "repeatable read" isolation level:
+	// https://www.postgresql.org/docs/9.6/transaction-iso.html
+	//
+	// The standard library sql package lets you pass options to BeginTx() but
+	// gorp doesn't support this so we do it by Exec as a workaround.
+	_, err = tx.Exec(`SET TRANSACTION ISOLATION LEVEL repeatable read`)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to configure DB transaction for DeleteDisconnectedServices")
+	}
+
+	var services []*composedService
+	_, err = tx.Select(&services, selectDisconnectedServices, thresholdMinutes)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to list disconnected services")
+	}
+	_, err = tx.Exec(deleteDisconnectedServices, thresholdMinutes)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to delete disconnected services")
+	}
+	_, err = tx.Exec(deleteSupsWithoutServices)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to cleanup unneeded supervisor records")
+	}
+	_, err = tx.Exec(deleteSvcGroupsWithoutServices)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to cleanup unneeded service group records")
+	}
+	_, err = tx.Exec(deleteDeploymentsWithoutServices)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to cleanup unneeded deployment records")
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to commit transaction deleting disconnected services")
+	}
+	completed = true // don't execute deferred tx.Rollback from above
+
+	return convertComposedServicesToStorage(services), nil
 }
 
 func (db *Postgres) GetServicesCount() (int32, error) {

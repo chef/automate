@@ -287,22 +287,24 @@ func (app *ApplicationsServer) GetDisconnectedServices(ctx context.Context,
 func (app *ApplicationsServer) DeleteDisconnectedServices(ctx context.Context,
 	request *applications.DisconnectedServicesReq) (*applications.ServicesRes, error) {
 
-	return nil, fmt.Errorf("TODO")
+	// TODO remove this comment
+	// applications_grpcurl -d '{"threshold_minutes": 5}' chef.automate.api.applications.ApplicationsService.DeleteDisconnectedServices
 
-	// thresholdMinutes := request.GetThresholdMinutes()
-	// if thresholdMinutes <= 0 {
-	// 	return new(applications.ServicesRes),
-	// 		status.Error(codes.InvalidArgument, "threshold must be greater than zero")
-	// }
-	// services, err := app.storageClient.GetDisconnectedServices(thresholdMinutes)
-	// if err != nil {
-	// 	log.WithError(err).Error("Error retrieving disconnected services")
-	// 	return new(applications.ServicesRes), status.Error(codes.Internal, err.Error())
-	// }
+	thresholdMinutes := request.GetThresholdMinutes()
+	if thresholdMinutes <= 0 {
+		return new(applications.ServicesRes),
+			status.Error(codes.InvalidArgument, "threshold must be greater than zero")
+	}
 
-	// return &applications.ServicesRes{
-	// 	Services: convertStorageServicesToApplicationsServices(services),
-	// }, nil
+	services, err := app.storageClient.DeleteDisconnectedServices(thresholdMinutes)
+	if err != nil {
+		log.WithError(err).Error("Error retrieving disconnected services")
+		return new(applications.ServicesRes), status.Error(codes.Internal, err.Error())
+	}
+
+	return &applications.ServicesRes{
+		Services: convertStorageServicesToApplicationsServices(services),
+	}, nil
 }
 
 // Convert storage.Service array to applications.Service array
