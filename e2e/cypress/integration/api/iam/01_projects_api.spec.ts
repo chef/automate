@@ -184,7 +184,7 @@ describe('projects API', () => {
         })
         // adding a wait here instead of a request poll since the apply status 
         // does not have precise enough timing for such a small data set
-        cy.wait(4000)        
+        cy.wait(5000)        
 
         // confirm rules are applied
         for (let project of [avengersProject, xmenProject]) {
@@ -249,7 +249,7 @@ describe('projects API', () => {
           method: 'POST',
           url: '/apis/iam/v2beta/apply-rules'
         })
-        cy.wait(4000) 
+        cy.wait(5000) 
 
         cy.request({
           headers: {
@@ -277,7 +277,7 @@ describe('projects API', () => {
           method: 'POST',
           url: '/apis/iam/v2beta/apply-rules'
         })
-        cy.wait(4000) 
+        cy.wait(5000) 
 
         cy.request({
           headers: {
