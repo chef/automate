@@ -34,6 +34,8 @@ module.exports = function (wallaby) {
         pattern: project.sourceRoot + specPattern,
         ignore: true
       })),
+      // 2017.09.30 Automate-UI: Added json-tree item to this list
+      { pattern: 'src/app/page-components/json-tree/vendor/**/*.*', load: false, instrument: false },
       { pattern: './**/*.d.ts', ignore: true }
     ],
 
