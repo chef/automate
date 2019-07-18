@@ -189,6 +189,7 @@ message ListRulesForProjectReq {
 
 message ListRulesForProjectResp {
     repeated ProjectRule rules = 1;
+    string status = 2;
 }
 
 message DeleteRuleReq {

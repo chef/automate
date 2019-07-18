@@ -324,6 +324,9 @@ func init() {
           "items": {
             "$ref": "#/definitions/v2betaRule"
           }
+        },
+        "status": {
+          "$ref": "#/definitions/v2betaProjectRulesStatus"
         }
       }
     },
@@ -337,6 +340,16 @@ func init() {
           }
         }
       }
+    },
+    "v2betaProjectRulesStatus": {
+      "type": "string",
+      "enum": [
+        "PROJECT_RULES_STATUS_UNSET",
+        "RULES_APPLIED",
+        "EDITS_PENDING",
+        "NO_RULES"
+      ],
+      "default": "PROJECT_RULES_STATUS_UNSET"
     },
     "v2betaRule": {
       "type": "object",

@@ -1184,18 +1184,18 @@ func (p *pg) listRulesUsingFunction(ctx context.Context, query string) ([]*v2.Ru
 	return rules, nil
 }
 
-func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.Rule, error) {
+func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.Rule, v2.ProjectRulesStatus, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
-		return nil, err
+		return nil, v2.RulesStatusError, err
 	}
 
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
-		return nil, p.processError(err)
+		return nil, v2.RulesStatusError, p.processError(err)
 	}
 
 	// verify project exists, otherwise we would return an empty list
@@ -1203,14 +1203,14 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 	var project v2.Project
 	row := tx.QueryRowContext(ctx, "SELECT query_project($1, $2)", projectID, pq.Array(projectsFilter))
 	if err := row.Scan(&project); err != nil {
-		return nil, p.processError(err)
+		return nil, v2.RulesStatusError, p.processError(err)
 	}
 
 	var rules []*v2.Rule
 	rows, err := tx.QueryContext(ctx, "SELECT query_rules_for_project($1, $2)",
 		projectID, pq.Array(projectsFilter))
 	if err != nil {
-		return nil, p.processError(err)
+		return nil, v2.RulesStatusError, p.processError(err)
 	}
 
 	defer func() {
@@ -1219,23 +1219,35 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 		}
 	}()
 
+	anyStagedRules := false
 	for rows.Next() {
 		var rule v2.Rule
 		if err := rows.Scan(&rule); err != nil {
-			return nil, p.processError(err)
+			return nil, v2.RulesStatusError, p.processError(err)
+		}
+		if rule.Status == pgStaged {
+			anyStagedRules = true
 		}
 		rules = append(rules, &rule)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, errors.Wrap(err, "error retrieving result rows")
+		return nil, v2.RulesStatusError, errors.Wrap(err, "error retrieving result rows")
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewErrTxCommit(err)
+		return nil, v2.RulesStatusError, storage_errors.NewErrTxCommit(err)
 	}
 
-	return rules, nil
+	rulesStatus := v2.Applied
+	if len(rules) == 0 {
+		rulesStatus = v2.NoRules
+	}
+	if anyStagedRules {
+		rulesStatus = v2.EditsPending
+	}
+
+	return rules, rulesStatus, nil
 }
 
 // ApplyStagedRules begins a db transaction, locks the rule tables, moves all staged rule updates

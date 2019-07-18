@@ -75,7 +75,7 @@ type ruleStorage interface {
 	ListRules(context.Context) ([]*Rule, error)
 	ListStagedAndAppliedRules(context.Context) ([]*Rule, error)
 	DeleteRule(context.Context, string) error
-	ListRulesForProject(context.Context, string) ([]*Rule, error)
+	ListRulesForProject(context.Context, string) ([]*Rule, ProjectRulesStatus, error)
 	ApplyStagedRules(context.Context) error
 }
 

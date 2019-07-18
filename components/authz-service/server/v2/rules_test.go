@@ -16,6 +16,7 @@ import (
 )
 
 const applied = "applied"
+const staged = "staged"
 
 func TestCreateRule(t *testing.T) {
 	ctx := context.Background()
@@ -93,7 +94,7 @@ func TestCreateRule(t *testing.T) {
 		}},
 		{"if a rule with that id already exists, returns 'already exists'", func(t *testing.T) {
 			id := "foo-rule"
-			addRuleToStore(t, store, id, "my foo rule", storage.Node, "foo-project", storageConditions)
+			addRuleToStore(t, store, id, "my foo rule", applied, storage.Node, "foo-project", storageConditions)
 
 			resp, err := cl.CreateRule(ctx, &api.CreateRuleReq{
 				Id:         id,
@@ -237,7 +238,7 @@ func TestUpdateRule(t *testing.T) {
 		}},
 		{"if the passed rule changes the project, returns 'failed precondition'", func(t *testing.T) {
 			id := "foo-rule"
-			addRuleToStore(t, store, id, "my foo rule", storage.Node, "foo-project", storageConditions)
+			addRuleToStore(t, store, id, "my foo rule", applied, storage.Node, "foo-project", storageConditions)
 
 			resp, err := cl.UpdateRule(ctx, &api.UpdateRuleReq{
 				Id:         id,
@@ -251,7 +252,7 @@ func TestUpdateRule(t *testing.T) {
 		}},
 		{"if the updated rule passes conditions not compatible with the type, throw 'invalid argument'", func(t *testing.T) {
 			id := "foo-rule"
-			addRuleToStore(t, store, id, "my foo rule", storage.Event, "foo-project", storageConditions)
+			addRuleToStore(t, store, id, "my foo rule", applied, storage.Event, "foo-project", storageConditions)
 
 			changedAPIConditions := []*api.Condition{
 				{
@@ -274,7 +275,7 @@ func TestUpdateRule(t *testing.T) {
 		{"with valid node rule data, returns no error and updates the rule in storage", func(t *testing.T) {
 			id := "foo-rule"
 			projectID := "foo-project"
-			addRuleToStore(t, store, id, "my foo rule", storage.Node, projectID, storageConditions)
+			addRuleToStore(t, store, id, "my foo rule", applied, storage.Node, projectID, storageConditions)
 
 			resp, err := cl.UpdateRule(ctx, &api.UpdateRuleReq{
 				Id:        id,
@@ -319,7 +320,7 @@ func TestUpdateRule(t *testing.T) {
 		{"with valid node rule data, returns no error and updates the rule in storage when using conditions valid for event type", func(t *testing.T) {
 			id := "foo-rule"
 			projectID := "foo-project"
-			addRuleToStore(t, store, id, "my foo rule", storage.Node, projectID, storageConditions)
+			addRuleToStore(t, store, id, "my foo rule", applied, storage.Node, projectID, storageConditions)
 
 			resp, err := cl.UpdateRule(ctx, &api.UpdateRuleReq{
 				Id:        id,
@@ -364,7 +365,7 @@ func TestUpdateRule(t *testing.T) {
 		{"with valid event rule data, returns no error and updates the rule in storage", func(t *testing.T) {
 			id := "foo-rule"
 			projectID := "foo-project"
-			addRuleToStore(t, store, id, "my foo rule", storage.Event, projectID, storageConditions)
+			addRuleToStore(t, store, id, "my foo rule", applied, storage.Event, projectID, storageConditions)
 
 			resp, err := cl.UpdateRule(ctx, &api.UpdateRuleReq{
 				Id:        id,
@@ -459,8 +460,8 @@ func TestGetRule(t *testing.T) {
 			id := "foo-rule"
 			projectID := "foo-project"
 			name := "my coo foo rule"
-			addRuleToStore(t, store, id, name, storage.Node, projectID, storageConditions)
-			addRuleToStore(t, store, "bar-rule", "bar rule", storage.Event, projectID, storageConditions)
+			addRuleToStore(t, store, id, name, applied, storage.Node, projectID, storageConditions)
+			addRuleToStore(t, store, "bar-rule", applied, "bar rule", storage.Event, projectID, storageConditions)
 			expectedRule := api.ProjectRule{
 				Id:         id,
 				Name:       name,
@@ -531,8 +532,8 @@ func TestListRules(t *testing.T) {
 			id1, id2 := "rule-number-1", "rule-number-2"
 			projectID := "foo-project"
 			name := "you don't talk about fight club"
-			addRuleToStore(t, store, id1, name, storage.Node, projectID, storageConditions1)
-			addRuleToStore(t, store, id2, name, storage.Event, projectID, storageConditions2)
+			addRuleToStore(t, store, id1, name, applied, storage.Node, projectID, storageConditions1)
+			addRuleToStore(t, store, id2, name, applied, storage.Event, projectID, storageConditions2)
 			expected1 := api.ProjectRule{
 				Id:         id1,
 				Name:       name,
@@ -620,7 +621,7 @@ func TestListRulesForProject(t *testing.T) {
 			addProjectToStore(t, projects, projectID, "my bar", storage.Custom)
 			resp, err := cl.ListRulesForProject(ctx, &api.ListRulesForProjectReq{Id: projectID})
 			require.NoError(t, err)
-			assert.Equal(t, &api.ListRulesForProjectResp{}, resp)
+			assert.Equal(t, &api.ListRulesForProjectResp{Status: storage.NoRules.String()}, resp)
 		}},
 		{"if multiple rules exist, returns rules for specific project", func(t *testing.T) {
 			projectID1 := "foo-project"
@@ -630,9 +631,9 @@ func TestListRulesForProject(t *testing.T) {
 
 			id1, id2, id3 := "rule-number-1", "rule-number-2", "rule-number-3"
 			name := "you don't talk about fight club"
-			addRuleToStore(t, rules, id1, name, storage.Node, projectID1, storageConditions1)
-			addRuleToStore(t, rules, id2, name, storage.Event, projectID2, storageConditions2)
-			addRuleToStore(t, rules, id3, name, storage.Event, projectID2, storageConditions3)
+			addRuleToStore(t, rules, id1, name, applied, storage.Node, projectID1, storageConditions1)
+			addRuleToStore(t, rules, id2, name, applied, storage.Event, projectID2, storageConditions2)
+			addRuleToStore(t, rules, id3, name, applied, storage.Event, projectID2, storageConditions3)
 			expected2 := api.ProjectRule{
 				Id:         id2,
 				Name:       name,
@@ -654,6 +655,41 @@ func TestListRulesForProject(t *testing.T) {
 			resp, err := cl.ListRulesForProject(ctx, &api.ListRulesForProjectReq{Id: projectID2})
 			require.NoError(t, err)
 			assert.ElementsMatch(t, expected, resp.Rules)
+			assert.Equal(t, storage.Applied.String(), resp.Status)
+		}},
+		{"if multiple rules exist, returns the staged and applied rules for specific project", func(t *testing.T) {
+			projectID1 := "foo-project"
+			projectID2 := "foo-project-2"
+			addProjectToStore(t, projects, projectID1, "proj 1", storage.Custom)
+			addProjectToStore(t, projects, projectID2, "proj 2", storage.Custom)
+
+			id1, id2, id3 := "rule-number-1", "rule-number-2", "rule-number-3"
+			name := "you don't talk about fight club"
+			addRuleToStore(t, rules, id1, name, applied, storage.Node, projectID1, storageConditions1)
+			addRuleToStore(t, rules, id2, name, applied, storage.Event, projectID2, storageConditions2)
+			addRuleToStore(t, rules, id3, name, staged, storage.Event, projectID2, storageConditions3)
+			expected2 := api.ProjectRule{
+				Id:         id2,
+				Name:       name,
+				Type:       api.ProjectRuleTypes_EVENT,
+				ProjectId:  projectID2,
+				Conditions: apiConditions2,
+				Status:     applied,
+			}
+			expected3 := api.ProjectRule{
+				Id:         id3,
+				Name:       name,
+				Type:       api.ProjectRuleTypes_EVENT,
+				ProjectId:  projectID2,
+				Conditions: apiConditions3,
+				Status:     staged,
+			}
+			expected := []*api.ProjectRule{&expected2, &expected3}
+
+			resp, err := cl.ListRulesForProject(ctx, &api.ListRulesForProjectReq{Id: projectID2})
+			require.NoError(t, err)
+			assert.ElementsMatch(t, expected, resp.Rules)
+			assert.Equal(t, storage.EditsPending.String(), resp.Status)
 		}},
 	}
 
@@ -709,8 +745,8 @@ func TestDeleteRule(t *testing.T) {
 			id1, id2 := "rule-number-1", "rule-number-2"
 			projectID := "foo-project"
 			name := "you don't talk about fight club"
-			addRuleToStore(t, store, id1, name, storage.Node, projectID, storageConditions1)
-			addRuleToStore(t, store, id2, name, storage.Event, projectID, storageConditions2)
+			addRuleToStore(t, store, id1, name, applied, storage.Node, projectID, storageConditions1)
+			addRuleToStore(t, store, id2, name, applied, storage.Event, projectID, storageConditions2)
 
 			resp, err := cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: id1})
 			require.NoError(t, err)
@@ -732,7 +768,7 @@ func TestDeleteRule(t *testing.T) {
 	}
 }
 
-func addRuleToStore(t *testing.T, store *cache.Cache, id, name string, ruleType storage.RuleType, projectID string,
+func addRuleToStore(t *testing.T, store *cache.Cache, id, name, status string, ruleType storage.RuleType, projectID string,
 	conditions []storage.Condition) {
 	t.Helper()
 
@@ -742,7 +778,7 @@ func addRuleToStore(t *testing.T, store *cache.Cache, id, name string, ruleType 
 		Type:       ruleType,
 		ProjectID:  projectID,
 		Conditions: conditions,
-		Status:     applied,
+		Status:     status,
 	}
 	store.Add(id, rule, 0)
 }

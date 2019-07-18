@@ -3445,19 +3445,21 @@ func TestListRulesForProject(t *testing.T) {
 	}{
 		{"when project does not exist, returns ErrNotFound", func(t *testing.T) {
 			ctx := context.Background()
-			resp, err := store.ListRulesForProject(ctx, "not-found")
+			resp, status, err := store.ListRulesForProject(ctx, "not-found")
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 			assert.Nil(t, resp)
+			assert.Equal(t, storage.RulesStatusError, status)
 		}},
 		{"when project exists but no rules exist, returns an empty list", func(t *testing.T) {
 			ctx := context.Background()
 			projID := "project-1"
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 
-			resp, err := store.ListRulesForProject(ctx, projID)
+			resp, status, err := store.ListRulesForProject(ctx, projID)
 			require.NoError(t, err)
 			assert.Nil(t, resp)
 			assert.Zero(t, len(resp))
+			assert.Equal(t, storage.NoRules, status)
 		}},
 		{"when rules exist but not for the project queried, returns an empty list", func(t *testing.T) {
 			ctx := context.Background()
@@ -3469,10 +3471,11 @@ func TestListRulesForProject(t *testing.T) {
 
 			insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID2, storage.Node)
 
-			resp, err := store.ListRulesForProject(ctx, projID)
+			resp, status, err := store.ListRulesForProject(ctx, projID)
 			require.NoError(t, err)
 			assert.Nil(t, resp)
 			assert.Zero(t, len(resp))
+			assert.Equal(t, storage.NoRules, status)
 		}},
 		{"when multiple applied rules exist with no project filter, returns rules for the project", func(t *testing.T) {
 			ctx := context.Background()
@@ -3487,10 +3490,11 @@ func TestListRulesForProject(t *testing.T) {
 			rule2 := insertAppliedRuleWithMultipleConditions(t, db, "rule-2", projID2, storage.Node)
 			rule3 := insertAppliedRuleWithMultipleConditions(t, db, "rule-3", projID2, storage.Event)
 
-			resp, err := store.ListRulesForProject(ctx, projID2)
+			resp, status, err := store.ListRulesForProject(ctx, projID2)
 			require.NoError(t, err)
 			assert.Equal(t, 2, len(resp))
 			assert.ElementsMatch(t, []*storage.Rule{rule2, rule3}, resp)
+			assert.Equal(t, storage.Applied, status)
 		}},
 		{"when the requested project is in the filter, returns the rules for the project", func(t *testing.T) {
 			ctx := context.Background()
@@ -3505,10 +3509,11 @@ func TestListRulesForProject(t *testing.T) {
 			rule2 := insertAppliedRuleWithMultipleConditions(t, db, "rule-2", projID2, storage.Event)
 			rule3 := insertAppliedRuleWithMultipleConditions(t, db, "rule-3", projID2, storage.Event)
 
-			resp, err := store.ListRulesForProject(ctx, projID2)
+			resp, status, err := store.ListRulesForProject(ctx, projID2)
 			require.NoError(t, err)
 			assert.Equal(t, 2, len(resp))
 			assert.ElementsMatch(t, []*storage.Rule{rule2, rule3}, resp)
+			assert.Equal(t, storage.Applied, status)
 		}},
 		{"when the requested project is not in the filter, returns ErrNotFound", func(t *testing.T) {
 			ctx := context.Background()
@@ -3525,9 +3530,10 @@ func TestListRulesForProject(t *testing.T) {
 			insertAppliedRuleWithMultipleConditions(t, db, "rule-2", projID2, ruleType)
 			insertAppliedRuleWithMultipleConditions(t, db, "rule-3", projID2, ruleType)
 
-			resp, err := store.ListRulesForProject(ctx, projID2)
+			resp, status, err := store.ListRulesForProject(ctx, projID2)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 			assert.Nil(t, resp)
+			assert.Equal(t, storage.RulesStatusError, status)
 		}},
 		{"when there are only staged changes for the project's rules, returns the staged versions of the rules", func(t *testing.T) {
 			ctx := context.Background()
@@ -3547,9 +3553,11 @@ func TestListRulesForProject(t *testing.T) {
 				[]storage.Condition{updatedCondition})
 			insertStagedRule(t, db, &updatedRule, false)
 
-			resp, err := store.ListRulesForProject(ctx, projID)
+			resp, status, err := store.ListRulesForProject(ctx, projID)
 			require.NoError(t, err)
 			assert.ElementsMatch(t, []*storage.Rule{&updatedRule}, resp)
+			assert.Equal(t, storage.EditsPending, status)
+
 		}},
 		{"when there are staged changes for some of the project's rules, returns those staged versions and rules that have no staged changes", func(t *testing.T) {
 			ctx := context.Background()
@@ -3572,9 +3580,10 @@ func TestListRulesForProject(t *testing.T) {
 
 			appliedRule := insertAppliedRuleWithMultipleConditions(t, db, "applied", projID, storage.Node)
 
-			resp, err := store.ListRulesForProject(ctx, projID)
+			resp, status, err := store.ListRulesForProject(ctx, projID)
 			require.NoError(t, err)
 			assert.ElementsMatch(t, []*storage.Rule{&updatedRule, appliedRule}, resp)
+			assert.Equal(t, storage.EditsPending, status)
 		}},
 		{"when a project has two applied rules and one is staged for deletion, returns only the non-deleted one", func(t *testing.T) {
 			ctx := context.Background()
@@ -3585,9 +3594,10 @@ func TestListRulesForProject(t *testing.T) {
 			rule2 := insertAppliedRuleWithMultipleConditions(t, db, "rule-2", projID, storage.Event)
 			insertDeletedStagedRule(t, db, rule2)
 
-			resp, err := store.ListRulesForProject(ctx, projID)
+			resp, status, err := store.ListRulesForProject(ctx, projID)
 			require.NoError(t, err)
 			assert.ElementsMatch(t, []*storage.Rule{rule1}, resp)
+			assert.Equal(t, storage.Applied, status)
 		}},
 		{"when multiple projects exist, returns only the requested project's rules", func(t *testing.T) {
 			ctx := context.Background()
@@ -3599,10 +3609,11 @@ func TestListRulesForProject(t *testing.T) {
 			insertTestProject(t, db, projID2, "second project", storage.Custom)
 			rule2 := insertAppliedRuleWithMultipleConditions(t, db, "rule-2", projID2, storage.Node)
 
-			resp, err := store.ListRulesForProject(ctx, projID1)
+			resp, status, err := store.ListRulesForProject(ctx, projID1)
 			require.NoError(t, err)
 			assert.ElementsMatch(t, []*storage.Rule{rule1}, resp)
 			assert.NotContains(t, resp, rule2)
+			assert.Equal(t, storage.Applied, status)
 		}},
 	}
 

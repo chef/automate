@@ -110,7 +110,8 @@ func (s *Server) ListRulesForProject(ctx context.Context, req *pb_req.ListRulesF
 	}
 
 	return &pb_resp.ListRulesForProjectResp{
-		Rules: rules,
+		Rules:  rules,
+		Status: fromInternalRulesStatus(resp.Status),
 	}, nil
 }
 
@@ -304,6 +305,19 @@ func fromInternalStatus(internalStatus string) pb_common.RuleStatus {
 		return pb_common.RuleStatus_APPLIED
 	default:
 		return pb_common.RuleStatus_RULE_STATUS_UNSET
+	}
+}
+
+func fromInternalRulesStatus(internalRulesStatus string) pb_common.ProjectRulesStatus {
+	switch internalRulesStatus {
+	case "applied":
+		return pb_common.ProjectRulesStatus_RULES_APPLIED
+	case "edits-pending":
+		return pb_common.ProjectRulesStatus_EDITS_PENDING
+	case "no-rules":
+		return pb_common.ProjectRulesStatus_NO_RULES
+	default:
+		return pb_common.ProjectRulesStatus_PROJECT_RULES_STATUS_UNSET
 	}
 }
 
