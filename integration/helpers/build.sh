@@ -2,8 +2,9 @@
 
 build_changed() {
     hab pkg install core/ruby
-    export PATH=$PATH:$(hab pkg path core/ruby)/bin
-    sudo $(hab pkg path core/ruby)/bin/gem install toml
+    PATH=$PATH:$(hab pkg path core/ruby)/bin
+    export PATH
+    sudo "$(hab pkg path core/ruby)/bin/gem" install toml
 
     build_commands=""
     for component in $("$(a2_root_dir)/scripts/changed_components.rb")
@@ -13,6 +14,7 @@ build_changed() {
 
     if [ "$build_commands" != "" ]
     then
+        #shellcheck disable=SC2086
         hab studio $STUDIO_OPTS run "source .studiorc; set -e; $build_commands"
     fi
 }
@@ -21,13 +23,14 @@ download_hartifacts() {
     "$(a2_root_dir)/scripts/download_verify_harts.sh"
 }
 
+#shellcheck disable=SC2164
 build_tools() {
     local deployment_root_dir
     deployment_root_dir="$(a2_root_dir)/components/automate-deployment"
 
     pushd "$(a2_root_dir)/components/automate-deployment"
-    make linux
-    make tools
+        make linux
+        make tools
     popd
 
     export PATH="$deployment_root_dir/bin/linux/:$PATH"
@@ -58,8 +61,8 @@ sync_a1_migration_data() {
     hab sup run &
 
     until hab svc status &> /dev/null; do
-      echo "waiting for hab-sup to come up"
-      sleep 1
+        echo "waiting for hab-sup to come up"
+        sleep 1
     done
 
     DATA_PACKAGE_RELEASE="20181206000427"

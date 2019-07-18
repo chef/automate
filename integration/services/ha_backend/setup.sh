@@ -74,10 +74,10 @@ HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${pgleader
 HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${postgresql_pkg_ident}"
 
 echo "Copying certs into place"
-hostname=`hostname`
+hostname=$(hostname)
 
 # copy the certs to the correct names
-mv /certificates/odfe-$hostname.pem /certificates/odfe-node.pem
+mv "/certificates/odfe-$hostname.pem" /certificates/odfe-node.pem
 
 echo "Configuring HA Backend Services"
 mkdir -p "/hab/user/${ELASTICSEARCH_PKG_NAME}/config/"
@@ -95,7 +95,7 @@ host = "_site_"
 memory_lock = false
 
 [es_yaml.discovery.zen.ping.unicast]
-hosts = ["$(cat /services/ha_backend_peers | head -n 1)"]
+hosts = ["$(head -n 1 /services/ha_backend_peers)"]
 [es_yaml.cluster.routing.allocation.disk.watermark]
 low = "95%"
 high = "98%"

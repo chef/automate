@@ -1,3 +1,6 @@
+#!/bin/bash
+
+#shellcheck disable=SC2034
 test_name="deep_upgrade"
 test_upgrades=true
 test_upgrade_strategy="at-once"
@@ -9,6 +12,7 @@ DEEP_UPGRADE_PATH="${OLD_MANIFEST_DIR}/${CURRENT_OLDEST_VERSION}.json"
 
 do_create_config() {
     do_create_config_default
+    #shellcheck disable=SC2154
     echo -e "[load_balancer.v1.sys.service]\nhttps_port = 4443" >> "$test_config_path"
 }
 
@@ -28,8 +32,10 @@ do_deploy() {
     #
     install_hab "0.54.0"
 
-    serve_manifest $test_manifest_path
+    #shellcheck disable=SC2154
+    serve_manifest "$test_manifest_path"
 
+    #shellcheck disable=SC2154
     chef-automate deploy "$test_config_path" \
         --hartifacts "$test_hartifacts_path" \
         --override-origin "$HAB_ORIGIN" \

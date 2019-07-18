@@ -1,4 +1,4 @@
-#shellcheck disable=SC2154
+#!/bin/bash
 
 assert_backup_missing() {
     log_info "checking to make sure backup $1 doesn't exist"
@@ -8,6 +8,7 @@ assert_backup_missing() {
 
 delete_backup_and_assert_idempotent() {
     # Delete the backup
+    #shellcheck disable=SC2154
     log_info "deleting backup ${test_backup_id}"
     chef-automate backup delete --yes "${test_backup_id}" || return 1
     # Make sure that our backup is not in the list
@@ -19,7 +20,7 @@ delete_backup_and_assert_idempotent() {
 }
 
 setup_broken_backups() {
-    cp -r $A2_ROOT_DIR/integration/fixtures/broken_backups/* "/var/opt/chef-automate/backups/"
+    cp -r "$A2_ROOT_DIR/integration/fixtures/broken_backups/"* "/var/opt/chef-automate/backups/"
     chown -R hab:hab /var/opt/chef-automate/backups/
 }
 
@@ -48,6 +49,8 @@ test_metadata_sha256_mismatch_fails() {
     echo "" >> "/var/opt/chef-automate/backups/$test_backup_id/deployment-service/metadata.json"
 
     log_info "Checking that restore fails when a service backup has a modified metadata.json file"
+
+    #shellcheck disable=SC2154
     chef-automate backup restore "$test_backup_id" --yes --skip-preflight --sha256 "$backup_sha256"
     if [ "$?" -ne "69" ]; then
       log_error "fail: 'chef-automate backup restore' with incorrect sha256 succeeded when it should not have"
