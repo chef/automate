@@ -21,7 +21,7 @@ describe('ProjectRulesComponent', () => {
     id: 'uuid-1', name: 'Default',
     type: <IAMType>'CHEF_MANAGED'
   };
-  
+
   beforeEach(async(() => {
 
     TestBed.configureTestingModule({
@@ -123,7 +123,7 @@ describe('ProjectRulesComponent', () => {
     });
 
     it('the heading should change to <Project Name>: <Rule Name>', () => {
-      const ruleName = "My Rule";
+      const ruleName = 'My Rule';
       component.ruleForm.get('name').setValue(ruleName);
       const heading = `${component.project.name}: ${ruleName}`;
       const compHeading = component.getHeading();
