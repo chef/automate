@@ -174,7 +174,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
       }),
       takeUntil(this.isDestroyed)
     )
-      .subscribe(suggestions => this.availableFilterValues = suggestions);
+      .subscribe(suggestions => this.availableFilterValues = suggestions.filter(e => e.text));
   }
 
   ngOnDestroy() {
