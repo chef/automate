@@ -8,17 +8,17 @@
   align-items: center;
   justify-content: space-between;
   flex-grow: 1;
-  border: 1px solid $chef-grey;
+  border: 1px solid $chef-light-grey;
   border-radius: $global-radius;
 
   .reporting-search-input {
-    padding: 1em;
+    padding: 1.25em;
     width: 100%;
     border: none;
     border-radius: $global-radius;
     background-color: $chef-white;
     font-family: inherit;
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .reporting-search-prefix {
@@ -130,4 +130,16 @@
       float: right;
     }
   }
+}
+
+::placeholder {
+  color: lightgray;
+} 
+
+:-ms-input-placeholder { 
+  color: lightgray;
+} 
+
+::-ms-input-placeholder { 
+  color: lightgray;
 }
