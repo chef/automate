@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
+	log "github.com/sirupsen/logrus"
 )
 
 // BuildMsgDistributor a message distributor that sends all messages to the first child pipe until it is
@@ -30,14 +31,16 @@ func msgDistributor(in <-chan message.ChefRun,
 }
 
 func sendMessage(pipeInChannels []chan message.ChefRun, msg message.ChefRun) {
-	for true {
+	for {
 		messageProcessed := distributeMessage(pipeInChannels, msg)
 
 		if messageProcessed {
 			return
 		}
 
-		// All pipes are full. Wait and try again
+		log.WithFields(log.Fields{
+			"number_of_publishers": len(pipeInChannels),
+		}).Warn("All elasticsearch publishers are full")
 		time.Sleep(time.Millisecond * 10)
 	}
 }
