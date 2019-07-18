@@ -115,6 +115,10 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     return `${this.project.name}: ` + (this.ruleForm.value.name || 'Rule');
   }
 
+  getAttributeLabel() {
+    return `${this.ruleForm.get('type').value} Attribute`;
+  }
+
   backRoute(): string[] {
     return ['/settings', 'projects', this.project.id];
   }
@@ -169,7 +173,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     }
   }
 
-  getCommaList(value): string {
+  getConditionValue(value): string {
     return (typeof value === 'string') ? value : value.join(', ');
   }
 
