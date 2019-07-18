@@ -18,6 +18,9 @@ type Storage interface {
 
 	// Reset allows "factory-resetting" IAM v2 policies
 	Reset(context.Context) error
+	// ResetV2Migrations resets v2 migrations table so v2 policies
+	// successfully match 2.1 requirements
+	ResetV2Migrations(context.Context) error
 
 	// Close closes the connection to the backend
 	Close() error

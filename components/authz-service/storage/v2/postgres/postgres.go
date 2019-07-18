@@ -1518,6 +1518,15 @@ func (p *pg) Reset(ctx context.Context) error {
 	return nil
 }
 
+func (p *pg) ResetV2Migrations(ctx context.Context) error {
+	if _, err := p.db.ExecContext(ctx,
+		`UPDATE data_migrations SET version=0`); err != nil {
+		return errors.Wrap(err, "reset v2 data migrations")
+	}
+
+	return nil
+}
+
 func (p *pg) Close() error {
 	return errors.Wrap(p.db.Close(), "close database connection")
 }

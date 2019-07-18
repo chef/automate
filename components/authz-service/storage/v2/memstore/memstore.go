@@ -517,6 +517,10 @@ func (s *State) UpdateRole(_ context.Context, r *storage.Role) (*storage.Role, e
 	return role, nil
 }
 
+func (s *State) ResetV2Migrations(ctx context.Context) error {
+	return nil
+}
+
 func (s *State) Reset(ctx context.Context) error {
 	s.policies.Flush()
 	s.roles.Flush()
