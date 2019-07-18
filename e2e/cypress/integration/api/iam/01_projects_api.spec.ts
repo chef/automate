@@ -1,10 +1,3 @@
-const adminToken = 'ZNhnqJyDqgkXVk_bpobS3YhIMz0='
-const adminTokenObj = {
-  id: `test-token-${Cypress.moment().format('MMDDYYhhmm')}`,
-  name: "cypress-api-test-admin-token",
-  value: adminToken
-}
-
 const avengersProject = {
   id: `avengers-project-${Cypress.moment().format('MMDDYYhhmm')}`,
   name: "Test Avengers Project"
@@ -15,7 +8,7 @@ const xmenProject = {
   name: "Test X-men Project"
 }
 
-let avengersRule = {
+const avengersRule = {
   id: "avengers-rule-1",
   name: "first rule of avengers project",
   type: "NODE",
@@ -45,7 +38,7 @@ const xmenRule = {
 
 describe('projects API', () => {
 
-  if (Cypress.env('IAM_VERSION') != 'v2.1') {
+  if (Cypress.env('IAM_VERSION') !== 'v2.1') {
     describe('applying project rules', () => {
       it.skip('must be run on IAM v2.1')
     })
@@ -55,30 +48,34 @@ describe('projects API', () => {
         cy.adminLogin('/').then(() => {
           let admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'))
 
-          // generate admin API token
-          cy.request({
-            auth: { bearer: admin.id_token },
-            method: 'POST',
-            url: '/apis/iam/v2beta/tokens',
-            failOnStatusCode: false,
-            body: adminTokenObj
-          }).then((response) => {
-            expect([200, 409]).to.include(response.status)
-          })
+          // Cypress recommends state cleanup in the before block to ensure
+          // it gets run every time:
+          // https://docs.cypress.io/guides/references/best-practices.html#Using-after-or-afterEach-hooks
+          cleanupTestProjects(admin.id_token)
 
           cy.request({
             auth: { bearer: admin.id_token },
             method: 'POST',
-            url: '/apis/iam/v2beta/policies/administrator-access/members:add',
+            url: 'api/v0/ingest/events/chef/node-multiple-deletes',
             body: {
-              members: [`token:${adminTokenObj.id}`]
-            }
+              node_ids: [
+                "f6a5c33f-bef5-433b-815e-a8f6e69e6b1b",
+                "82760210-4686-497e-b039-efca78dee64b",
+                "9c139ad0-89a5-44bc-942c-d7f248b155ba",
+                "6453a764-2415-4934-8cee-2a008834a74a"
+              ]
+            },
+            failOnStatusCode: false,
           })
+
+          // user our Admin user's ID token to generate an admin-level API token
+          // for use in the tests
+          cy.generateAdminToken(admin.id_token)
 
           // create projects or confirm they already exist
           for (let project of [avengersProject, xmenProject]) {
             cy.request({
-              headers: { 'api-token': adminToken },
+              headers: { 'api-token': Cypress.env('adminTokenValue') },
               method: 'POST',
               url: '/apis/iam/v2beta/projects',
               failOnStatusCode: false,
@@ -91,7 +88,7 @@ describe('projects API', () => {
           let totalNodes = 0
           cy.request({
             headers: {
-              'api-token': adminToken,
+              'api-token': Cypress.env('adminTokenValue'),
               projects: '(unassigned)'
             },
             method: 'GET',
@@ -106,7 +103,7 @@ describe('projects API', () => {
                 cy.fixture('converge/xmen2.json').then(node4 => {
                   for (let node of [node1, node2, node3, node4]) {
                     cy.request({
-                      headers: { 'api-token': adminToken },
+                      headers: { 'api-token': Cypress.env('adminTokenValue') },
                       method: 'POST',
                       url: '/data-collector/v0',
                       body: node
@@ -116,23 +113,24 @@ describe('projects API', () => {
               })
             })
           })
-          waitForNodes(totalNodes)
+          const maxRetries = 20
+          waitForNodes(admin.id_token, totalNodes, 0, maxRetries)
 
           // confirm nodes are unassigned
           cy.request({
             headers: {
-              'api-token': adminToken,
+              'api-token': Cypress.env('adminTokenValue'),
               projects: '(unassigned)'
             },
             method: 'GET',
             url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
           }).then((response) => {
-            expect(response.body).to.have.length(4)
+            expect(response.body).to.have.length(totalNodes + 4)
           })
 
           cy.request({
             headers: {
-              'api-token': adminToken,
+              'api-token': Cypress.env('adminTokenValue'),
               projects: avengersProject.id
             },
             method: 'GET',
@@ -143,7 +141,7 @@ describe('projects API', () => {
 
           cy.request({
             headers: {
-              'api-token': adminToken,
+              'api-token': Cypress.env('adminTokenValue'),
               projects: xmenProject.id
             },
             method: 'GET',
@@ -154,41 +152,11 @@ describe('projects API', () => {
         })
       })
 
-      after(() => {
-        for (let project of [avengersProject, xmenProject]) {
-          cy.request({
-            headers: { 'api-token': adminToken },
-            method: 'DELETE',
-            url: `/apis/iam/v2beta/projects/${project.id}`
-          })
-        }
-
-        cy.request({
-          headers: { 'api-token': adminToken },
-          method: 'POST',
-          url: 'api/v0/ingest/events/chef/node-multiple-deletes',
-          body: {
-            node_ids: [
-              "f6a5c33f-bef5-433b-815e-a8f6e69e6b1b", 
-              "82760210-4686-497e-b039-efca78dee64b", 
-              "9c139ad0-89a5-44bc-942c-d7f248b155ba", 
-              "6453a764-2415-4934-8cee-2a008834a74a"
-            ]
-          }
-        })
-
-        cy.request({
-          headers: { 'api-token': adminToken },
-          method: 'DELETE',
-          url: `/apis/iam/v2beta/tokens/${adminTokenObj.id}`
-        })
-      })
-
       it('new rules get applied to nodes', () => {
 
         for (let rule of [avengersRule, xmenRule]) {
           cy.request({
-            headers: { 'api-token': adminToken },
+            headers: { 'api-token': Cypress.env('adminTokenValue') },
             method: 'POST',
             url: '/apis/iam/v2beta/rules',
             body: rule
@@ -198,7 +166,7 @@ describe('projects API', () => {
         // confirm rules are staged
         for (let project of [avengersProject, xmenProject]) {
           cy.request({
-            headers: { 'api-token': adminToken },
+            headers: { 'api-token': Cypress.env('adminTokenValue') },
             method: 'GET',
             url: `/apis/iam/v2beta/projects/${project.id}/rules`
           }).then((response) => {
@@ -210,17 +178,18 @@ describe('projects API', () => {
         }
 
         cy.request({
-          headers: { 'api-token': adminToken },
+          headers: { 'api-token': Cypress.env('adminTokenValue') },
           method: 'POST',
           url: '/apis/iam/v2beta/apply-rules'
         })
-        // waitForSuccessfulApply()
-        cy.wait(5000) 
+        // adding a wait here instead of a request poll since the apply status 
+        // does not have precise enough timing for such a small data set
+        cy.wait(4000)        
 
         // confirm rules are applied
         for (let project of [avengersProject, xmenProject]) {
           cy.request({
-            headers: { 'api-token': adminToken },
+            headers: { 'api-token': Cypress.env('adminTokenValue') },
             method: 'GET',
             url: `/apis/iam/v2beta/projects/${project.id}/rules`
           }).then((response) => {
@@ -234,7 +203,7 @@ describe('projects API', () => {
         // confirm nodes are assigned to projects correctly
         cy.request({
           headers: {
-            'api-token': adminToken,
+            'api-token': Cypress.env('adminTokenValue'),
             projects: avengersProject.id
           },
           method: 'GET',
@@ -245,7 +214,7 @@ describe('projects API', () => {
 
         cy.request({
           headers: {
-            'api-token': adminToken,
+            'api-token': Cypress.env('adminTokenValue'),
             projects: xmenProject.id
           },
           method: 'GET',
@@ -256,8 +225,11 @@ describe('projects API', () => {
       })
 
       it('rules with updated conditions get applied to nodes', () => {
+
         // change avengers rule to include both organizations
-        avengersRule.conditions = [
+        let updatedAvengersRule = avengersRule
+        
+        updatedAvengersRule.conditions = [
           {
             attribute: "CHEF_ORGS",
             operator: "MEMBER_OF",
@@ -266,23 +238,22 @@ describe('projects API', () => {
         ]
 
         cy.request({
-          headers: { 'api-token': adminToken },
+          headers: { 'api-token': Cypress.env('adminTokenValue') },
           method: 'PUT',
           url: `/apis/iam/v2beta/rules/${avengersRule.id}`,
-          body: avengersRule
+          body: updatedAvengersRule
         })
 
         cy.request({
-          headers: { 'api-token': adminToken },
+          headers: { 'api-token': Cypress.env('adminTokenValue') },
           method: 'POST',
           url: '/apis/iam/v2beta/apply-rules'
         })
-        // waitForSuccessfulApply()
-        cy.wait(5000) 
+        cy.wait(4000) 
 
         cy.request({
           headers: {
-            'api-token': adminToken,
+            'api-token': Cypress.env('adminTokenValue'),
             projects: avengersProject.id
           },
           method: 'GET',
@@ -293,24 +264,24 @@ describe('projects API', () => {
       })
 
       it('deleted rules get applied to nodes', () => {
+
         cy.request({
-          headers: { 'api-token': adminToken },
+          headers: { 'api-token': Cypress.env('adminTokenValue') },
           method: 'DELETE',
           url: `/apis/iam/v2beta/rules/${avengersRule.id}`,
           body: avengersRule
         })
 
         cy.request({
-          headers: { 'api-token': adminToken },
+          headers: { 'api-token': Cypress.env('adminTokenValue') },
           method: 'POST',
           url: '/apis/iam/v2beta/apply-rules'
         })
-        // waitForSuccessfulApply()
-        cy.wait(5000) 
+        cy.wait(4000) 
 
         cy.request({
           headers: {
-            'api-token': adminToken,
+            'api-token': Cypress.env('adminTokenValue'),
             projects: avengersProject.id
           },
           method: 'GET',
@@ -321,7 +292,7 @@ describe('projects API', () => {
 
         cy.request({
           headers: {
-            'api-token': adminToken,
+            'api-token': Cypress.env('adminTokenValue'),
             projects: '(unassigned)'
           },
           method: 'GET',
@@ -334,37 +305,42 @@ describe('projects API', () => {
   }
 })
 
-// TODO fix
-// function waitForSuccessfulApply() {
-//   cy
-//     .request({
-//       headers: {
-//         'api-token': adminToken      
-//       },
-//       method: 'GET',
-//       url: '/apis/iam/v2beta/apply-rules'
-//     })
-//     .then((resp: Cypress.ObjectLike) => {
-//       if (resp.body.percentage_complete == 1 && resp.body.state == "not_running" && !resp.body.failed)
-//         return
-
-//       waitForSuccessfulApply()
-//     })
-// }
-
-function waitForNodes(totalNodes: number) {
+function waitForNodes(idToken: string, totalNodes: number, retries: number, maxRetries: number) {
   cy
     .request({
-      headers: {
-        'api-token': adminToken
-      },
+      auth: { bearer: idToken },
       method: 'GET',
       url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
     })
     .then((resp: Cypress.ObjectLike) => {
+      // to avoid getting stuck in an infinite loop
+      if (retries > maxRetries)
+        return
       if (resp.body.length == totalNodes + 4)
         return
 
-      waitForNodes(totalNodes)
+      retries = retries + 1
+      waitForNodes(idToken, totalNodes, retries, maxRetries)
     })
+}
+
+function cleanupTestProjects(id_token: string): void {
+  cy.request({
+    auth: { bearer: id_token },
+    method: 'GET',
+    url: '/apis/iam/v2beta/projects',
+    failOnStatusCode: false
+  }).then((resp) => {
+    let body = resp.body
+    for (let project of body.projects) {
+      if (project.id.startsWith('avengers') || project.id.startsWith('xmen')) {
+        cy.request({
+          auth: { bearer: id_token },
+          method: 'DELETE',
+          url: `/apis/iam/v2beta/projects/${project.id}`,
+          failOnStatusCode: false
+        })
+      }
+    }
+  })
 }
