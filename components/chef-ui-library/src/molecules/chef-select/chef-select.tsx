@@ -12,9 +12,7 @@ import findIndex from 'lodash/fp/findIndex';
 import getOr from 'lodash/fp/getOr';
 import find from 'lodash/fp/find';
 import lte from 'lodash/fp/lte';
-import map from 'lodash/fp/map';
 import max from 'lodash/fp/max';
-import pipe from 'lodash/fp/pipe';
 
 /**
  * @description
@@ -89,9 +87,11 @@ export class ChefSelect {
 
   @State() options: HTMLChefOptionElement[] = [];
   @State() selectedIndex = 0;
+  @State() selectedContent = '';
   @State() focusedIndex = 0;
   @State() focused = false;
   @State() active = false;
+  @State() minWidth = 0;
 
   /**
    * Emitted when the value of the molecule changes.
@@ -155,14 +155,10 @@ export class ChefSelect {
   }
 
   hostData() {
-    const minWidth = pipe(
-      map((o: HTMLChefOptionElement) => o.getWidth()
-    ), max)(this.options) || 0;
-
     return {
       tabindex: this.disabled ? '-1' : '0',
       role: 'combobox',
-      style: { minWidth: `${minWidth + 20}px` }
+      style: { minWidth: `${this.minWidth + 20}px` }
     };
   }
 
@@ -183,8 +179,15 @@ export class ChefSelect {
     this.syncOptions(index);
   }
 
-  render() {
+  async componentWillUpdate() {
+    const optionWidths = Promise.all(this.options.map((o: HTMLChefOptionElement) => o.getWidth()));
+    this.minWidth = max(await optionWidths) || 0;
+
     const selected = this.options[this.selectedIndex];
+    this.selectedContent = selected ? await selected.getContent() : '';
+  }
+
+  render() {
     const focused = this.options[this.focusedIndex];
 
     this.el.setAttribute('highlighted', getOr('', 'optionId', focused));
@@ -194,7 +197,7 @@ export class ChefSelect {
 
     return [
       <span class="selected-value" role="button" aria-haspopup="listbox" aria-expanded={ this.active }>
-        <span class="option-content" innerHTML={ selected ? selected.getContent() : '' }></span>
+        <span class="option-content" innerHTML={ this.selectedContent }></span>
         <chef-icon aria-hidden>expand_more</chef-icon>
       </span>,
 

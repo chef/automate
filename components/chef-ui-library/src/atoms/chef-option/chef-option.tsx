@@ -121,12 +121,14 @@ export class ChefOption {
     this.optionId = this.optionId || `chef-option${id}`;
   }
 
-  @Method() getContent(): string {
-    return this.el.querySelector('.option-content').innerHTML;
+  @Method()
+  async getContent(): Promise<string> {
+    return Promise.resolve(this.el.querySelector('.option-content').innerHTML);
   }
 
-  @Method() getWidth(): number {
-    return this.width;
+  @Method()
+  async getWidth(): Promise<number> {
+    return Promise.resolve(this.width);
   }
 
   componentWillLoad() {
