@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
@@ -70,16 +69,17 @@ func generateAdminToken(ctx context.Context,
 	if err != nil {
 		return nil, errors.Wrap(err, "create API token")
 	}
+	tokenID := response.Id
 
 	_, err = authzClient.CreatePolicy(ctx, &authz.CreatePolicyReq{
 		Action:   "*",
-		Subjects: []string{fmt.Sprintf("token:%s", response.Id)},
+		Subjects: []string{"token:" + tokenID},
 		Resource: "*",
 	})
 	if isUseV2Error(err) {
 		_, err = authzV2Client.CreatePolicy(ctx, &authz_v2.CreatePolicyReq{
-			Id:   "diagnostics-admin-token",
-			Name: req.Description,
+			Id:   "admin-token-" + tokenID,
+			Name: "admin policy for token " + tokenID,
 			Statements: []*authz_v2.Statement{
 				{
 					Effect:    authz_v2.Statement_ALLOW,
@@ -87,13 +87,13 @@ func generateAdminToken(ctx context.Context,
 					Actions:   []string{"*"},
 				},
 			},
-			Members: []string{fmt.Sprintf("token:%s", response.Id)},
+			Members: []string{"token:" + tokenID},
 		})
 	}
 	if err != nil && status.Convert(err).Code() != codes.AlreadyExists {
 		// Attempt to be transactional
 		_, deleteTokenError := authnClient.DeleteToken(ctx, &authn.DeleteTokenReq{
-			Id: response.Id,
+			Id: tokenID,
 		})
 		if deleteTokenError != nil {
 			return nil, errors.Wrap(deleteTokenError,
