@@ -10,7 +10,8 @@ import (
 // BuildMsgDistributor a message distributor that sends all messages to the first child pipe until it is
 // full then start sending messages to the next child pipe in the line. When all the pipes are full the thread waits and
 // then checks to pipes again until it can place the message in a child pipe.
-func BuildMsgDistributor(childPipeBuilder message.ChefRunPipe, numProcessors, childPipeInboxSize int) message.ChefRunPipe {
+func BuildMsgDistributor(childPipeBuilder message.ChefRunPipe, numProcessors,
+	childPipeInboxSize int) message.ChefRunPipe {
 	log.WithFields(log.Fields{
 		"numProcessors": numProcessors,
 	}).Debug("BuildMsgDistributor")
