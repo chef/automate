@@ -42,7 +42,7 @@
     "@stencil/router": "^0.2.1",
     "@stencil/sass": "0.1.1",
     "@types/jest": "23.3.9",
-    "@types/node": "^9.6.3",
+    "@types/node": "^12.6.8",
     "@types/puppeteer": "1.11.2",
     "jest": "23.6.0",
     "jest-cli": "23.6.0",
