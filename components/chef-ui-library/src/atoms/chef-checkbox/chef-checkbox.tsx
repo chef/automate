@@ -43,7 +43,13 @@ export class ChefCheckbox {
 
   @Event() change: EventEmitter;
 
-  @Listen('click, keydown.space') handleToggle(event) {
+  @Listen('keydown') handleKeydown(event: KeyboardEvent) {
+    if (event.key === ' ') {
+      this.handleToggle(event);
+    }
+  }
+
+  @Listen('click') handleToggle(event) {
     if (event.target.nodeName !== 'A') {
       this.toggle();
       event.preventDefault();
