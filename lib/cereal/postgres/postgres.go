@@ -224,6 +224,9 @@ func (pg *PostgresBackend) GetWorkflowScheduleByName(ctx context.Context, instan
 		&scheduledWorkflow.LastEnd,
 	)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, cereal.ErrWorkflowScheduleNotFound
+		}
 		return nil, errors.Wrap(err, "could not read workflow schedule")
 	}
 
@@ -347,73 +350,36 @@ func (pg *PostgresBackend) UpdateWorkflowScheduleByName(
 		instanceName, workflowName)
 	var id int64
 	if err := r.Scan(&id); err != nil {
-		if err != sql.ErrNoRows {
-			// TODO(jaym) return not found
+		if err == sql.ErrNoRows {
+			return cereal.ErrWorkflowScheduleNotFound
 		}
 		return err
 	}
 
-	err = pg.updateWorkflowScheduleByID(tx, id, &opts)
-	if err != nil {
-		return err
-	}
-
-	if err := tx.Commit(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (pg *PostgresBackend) UpdateWorkflowScheduleByID(ctx context.Context, id int64, opts backend.WorkflowScheduleUpdateOpts) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-	tx, err := pg.db.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-
-	// Lock row to update
-	r := tx.QueryRow("SELECT id FROM cereal_workflow_schedules WHERE id = $1 FOR UPDATE", id)
-	var throwaway int64
-	if err := r.Scan(&throwaway); err != nil {
-		if err != sql.ErrNoRows {
-			// TODO(jaym) return not found
-		}
-		return err
-	}
-
-	err = pg.updateWorkflowScheduleByID(tx, id, &opts)
-	if err != nil {
-		return err
-	}
-
-	if err := tx.Commit(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (pg *PostgresBackend) updateWorkflowScheduleByID(tx *sql.Tx, id int64, o *backend.WorkflowScheduleUpdateOpts) error {
-	if o.UpdateEnabled {
-		_, err := tx.Exec("SELECT cereal_update_workflow_schedule_enabled($1, $2)", id, o.Enabled)
+	if opts.UpdateEnabled {
+		_, err := tx.Exec("SELECT cereal_update_workflow_schedule_enabled($1, $2)", id, opts.Enabled)
 		if err != nil {
 			return err
 		}
 	}
 
-	if o.UpdateParameters {
-		_, err := tx.Exec("SELECT cereal_update_workflow_schedule_parameters($1, $2)", id, o.Parameters)
+	if opts.UpdateParameters {
+		_, err := tx.Exec("SELECT cereal_update_workflow_schedule_parameters($1, $2)", id, opts.Parameters)
 		if err != nil {
 			return err
 		}
 	}
 
-	if o.UpdateRecurrence {
+	if opts.UpdateRecurrence {
 		_, err := tx.Exec("SELECT cereal_update_workflow_schedule_recurrence($1, $2, $3)",
-			id, o.Recurrence, o.NextRunAt)
+			id, opts.Recurrence, opts.NextRunAt)
 		if err != nil {
 			return err
 		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
 	}
 	return nil
 }
