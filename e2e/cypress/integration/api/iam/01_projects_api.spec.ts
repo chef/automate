@@ -113,7 +113,7 @@ describe('projects API', () => {
               })
             })
           })
-          const maxRetries = 50
+          const maxRetries = 75
           waitForNodes(admin.id_token, totalNodes, 0, maxRetries)
 
           // confirm nodes are unassigned
