@@ -49,6 +49,6 @@ do_test_deploy() {
     npm install # get dependencies defined in e2e/package.json
     if ! npm run cypress:run; then
         buildkite-agent artifact upload "cypress/videos/*;cypress/videos/**/*;cypress/screenshots/*;cypress/screenshots/**/*"
-        exit 1
+        return 1
     fi
 }
