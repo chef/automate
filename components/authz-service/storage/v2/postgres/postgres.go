@@ -1239,15 +1239,12 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 		return nil, v2.RulesStatusError, storage_errors.NewErrTxCommit(err)
 	}
 
-	var rulesStatus v2.ProjectRulesStatus
+	rulesStatus := v2.Applied
 	if len(rules) == 0 {
 		rulesStatus = v2.NoRules
-	} else {
-		if anyStagedRules {
-			rulesStatus = v2.EditsPending
-		} else {
-			rulesStatus = v2.Applied
-		}
+	}
+	if anyStagedRules {
+		rulesStatus = v2.EditsPending
 	}
 
 	return rules, rulesStatus, nil
