@@ -201,8 +201,9 @@ $$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION cereal_complete_workflow(_wid BIGINT, _result BYTEA)
 RETURNS VOID
-LANGUAGE SQL
+LANGUAGE plpgsql
 AS $$
+BEGIN
     INSERT INTO cereal_workflow_results(instance_name, workflow_name, parameters, start_at, result)
         (SELECT instance_name, workflow_name, parameters, start_at, _result FROM cereal_workflow_instances WHERE id = _wid);
 
@@ -210,12 +211,14 @@ AS $$
     DELETE FROM cereal_task_results WHERE workflow_instance_id = _wid;
     DELETE FROM cereal_workflow_events WHERE workflow_instance_id = _wid;
     DELETE FROM cereal_workflow_instances WHERE id = _wid;
+END
 $$;
 
 CREATE OR REPLACE FUNCTION cereal_fail_workflow(_wid BIGINT, _error TEXT)
 RETURNS VOID
-LANGUAGE SQL
+LANGUAGE plpgsql
 AS $$
+BEGIN
     INSERT INTO cereal_workflow_results(instance_name, workflow_name, parameters, start_at, error)
         (SELECT instance_name, workflow_name, parameters, start_at, _error FROM cereal_workflow_instances WHERE id = _wid);
 
@@ -223,6 +226,30 @@ AS $$
     DELETE FROM cereal_task_results WHERE workflow_instance_id = _wid;
     DELETE FROM cereal_workflow_events WHERE workflow_instance_id = _wid;
     DELETE FROM cereal_workflow_instances WHERE id = _wid;
+END
+$$;
+
+CREATE OR REPLACE FUNCTION cereal_workflow_clean_workflow_results(_max_size BIGINT, _margin BIGINT)
+RETURNS BIGINT
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    count BIGINT;
+BEGIN
+SELECT COUNT(*) FROM cereal_workflow_results INTO count;
+IF count > _max_size THEN
+    DELETE FROM cereal_workflow_results
+    WHERE id IN (
+        SELECT id FROM cereal_workflow_results
+        ORDER BY end_at DESC OFFSET _max_size - _margin
+    );
+    GET DIAGNOSTICS count = ROW_COUNT;
+    RETURN count;
+ELSE
+    RETURN 0;
+END IF;
+
+END
 $$;
 
 CREATE OR REPLACE FUNCTION cereal_continue_workflow(wid BIGINT, _eid BIGINT, _payload BYTEA,
@@ -297,7 +324,7 @@ BEGIN
         DELETE FROM cereal_tasks WHERE id = t.id;
 
         INSERT INTO cereal_task_results(task_id, workflow_instance_id, parameters, task_name, enqueued_at, status)
-            VALUES(t.id, t.workflow_instance_id, t.parameters, t.task_name, t.enqueued_at, 'lost') 
+            VALUES(t.id, t.workflow_instance_id, t.parameters, t.task_name, t.enqueued_at, 'lost')
             RETURNING id INTO task_results_id;
 
         INSERT INTO cereal_workflow_events(event_type, task_result_id, workflow_instance_id)

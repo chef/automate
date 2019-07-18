@@ -17,15 +17,19 @@ import (
 	"github.com/chef/automate/lib/platform/pg"
 )
 
-var opts = struct {
+var opts struct {
 	Debug bool
-}{}
+}
 
 var simpleWorkflowOpts struct {
 	DequeueWorkerCount int
 	TaskCount          int
 	SlowTasks          bool
 	NoEnqueue          bool
+}
+
+var scheduleOpts struct {
+	Name string
 }
 
 func main() {
@@ -99,6 +103,13 @@ func main() {
 		SilenceErrors: true,
 		RunE:          runScheduleTest,
 	}
+
+	scheduleCmd.PersistentFlags().StringVar(
+		&scheduleOpts.Name,
+		"schedule-name",
+		"every minute",
+		"Name to use for the scheduled workflow",
+	)
 
 	cmd.AddCommand(simpleWorkflowCmd)
 	cmd.AddCommand(resetDBCmd)
@@ -358,7 +369,7 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 	}
 
 	err = manager.CreateWorkflowSchedule(
-		"every minute", "schedule-test", "youfail", true, recRule)
+		scheduleOpts.Name, "schedule-test", "youfail", true, recRule)
 	if err != nil {
 		if err == cereal.ErrWorkflowScheduleExists {
 			logrus.Info("workflow schedule exists...ignoring")
