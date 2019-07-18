@@ -15,7 +15,8 @@ ha_backend_setup() {
     mkdir -p "$ha_backend_private"
     mkdir -p "$(dirname "$ha_backend_config")"
     mkdir -p $(service_config_path "ha_backend_backups")
-    chmod 0777 $(service_config_path "ha_backend_backups")
+    chmod -R 0777 $(service_config_path "ha_backend_backups")
+    chmod -R 0777 $(service_config_path "")
     local peer_ring_file
     peer_ring_file=$(service_config_path "ha_backend_peers")
     touch "$peer_ring_file"

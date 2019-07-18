@@ -2,6 +2,8 @@
 
 set -e
 
+echo "Listing stuff"
+ls -lah /services
 echo "Doing sysctl stuff"
 cat > /etc/sysctl.d/00-chef.conf <<EOF
 vm.swappiness=10
