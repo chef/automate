@@ -221,8 +221,32 @@ var ComplianceRepDate = Mapping{
 	              "string_tags": {
 	                "type": "nested",
 	                "properties": {
-	                  "key": { "type": "keyword" },
-	                  "value": { "type": "keyword" }
+	                  "key": {
+	                    "type": "keyword",
+	                    "fields": {
+	                      "engram": {
+	                        "type": "text",
+	                        "analyzer": "autocomplete"
+	                      },
+	                      "lower": {
+	                        "type": "keyword",
+	                        "normalizer": "case_insensitive"
+	                      }
+	                    }
+	                  },
+	                  "value": {
+	                    "type": "keyword",
+	                    "fields": {
+	                      "engram": {
+	                        "type": "text",
+	                        "analyzer": "autocomplete"
+	                      },
+	                      "lower": {
+	                        "type": "keyword",
+	                        "normalizer": "case_insensitive"
+	                      }
+	                    }
+	                  }
 	                }
 	              },
                 "results": {
