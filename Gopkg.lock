@@ -625,6 +625,14 @@
   version = "v0.1.0"
 
 [[projects]]
+  digest = "1:58999a98719fddbac6303cb17e8d85b945f60b72f48e3a2df6b950b97fa926f1"
+  name = "github.com/konsorten/go-windows-terminal-sequences"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "f55edac94c9bbba5d6182a4be46d86a2c9b5b50e"
+  version = "v1.0.2"
+
+[[projects]]
   branch = "master"
   digest = "1:c5a4770f74cb34f5edc854c4b06a030d567a4e3d5bf502973852dbbbcb749eb8"
   name = "github.com/kylelemons/godebug"
@@ -1025,11 +1033,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c7ed05490ce708686e70615a3570e92bec5f14bdfd440078c0289af285433fb6"
+  digest = "1:6ca9d741b9af47955571e3213c24c1f63a96c35e24b668ecbcf27986780f81dd"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   pruneopts = "NUT"
-  revision = "768a92a02685ee7535069fc1581341b41bab9b72"
+  revision = "07a84ee7412e7a28663d92930a1d46f81b124ee1"
 
 [[projects]]
   digest = "1:0d70838fa3fb6e71d0988e53570766e87b60eba598be3098f024692813d898ef"
