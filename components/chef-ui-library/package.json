@@ -32,13 +32,13 @@
     "marked": "^0.7.0",
     "material-design-icons": "^3.0.1",
     "prismjs": "^1.16.0",
-    "redux": "=3.7.2",
-    "redux-devtools-extension": "=2.13.2",
-    "redux-thunk": "=2.2.0"
+    "redux": "^4.0.4",
+    "redux-devtools-extension": "^2.13.8",
+    "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
     "@stencil/core": "^0.17.0",
-    "@stencil/redux": "0.0.4",
+    "@stencil/redux": "^0.1.1",
     "@stencil/router": "^0.2.1",
     "@stencil/sass": "0.1.1",
     "@types/jest": "23.3.9",
