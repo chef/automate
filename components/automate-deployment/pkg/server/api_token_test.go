@@ -179,8 +179,8 @@ func TestGenerateAdminToken(t *testing.T) {
 		mockV2PolicyServer.CreatePolicyFunc = func(
 			_ context.Context, req *authz_v2.CreatePolicyReq) (*authz_v2.Policy, error) {
 
-			assert.Equal(t, "diagnostics-admin-token", req.Id)
-			assert.Equal(t, testDescription, req.Name)
+			assert.Equal(t, "admin-token-"+testID, req.Id)
+			assert.Equal(t, "admin policy for token "+testID, req.Name)
 			assert.Equal(t, authz_v2.Statement_ALLOW, req.Statements[0].Effect)
 
 			return &authz_v2.Policy{}, nil
@@ -220,8 +220,8 @@ func TestGenerateAdminToken(t *testing.T) {
 		mockV2PolicyServer.CreatePolicyFunc = func(
 			_ context.Context, req *authz_v2.CreatePolicyReq) (*authz_v2.Policy, error) {
 
-			assert.Equal(t, "diagnostics-admin-token", req.Id)
-			assert.Equal(t, testDescription, req.Name)
+			assert.Equal(t, "admin-token-"+testID, req.Id)
+			assert.Equal(t, "admin policy for token "+testID, req.Name)
 			assert.Equal(t, authz_v2.Statement_ALLOW, req.Statements[0].Effect)
 
 			return nil, status.Error(codes.AlreadyExists, "policy with id \"diagnostics-admin-token\" already exists")
