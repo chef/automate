@@ -1,7 +1,7 @@
 BEGIN;
 
 ALTER TABLE iam_statement_projects
-    DROP CONSTRAINT iam_statement_projects_project_id_fkey;
+    DROP CONSTRAINT iam_statement_projects_statement_id_fkey;
 
 ALTER TABLE iam_statement_projects RENAME COLUMN statement_id TO statement_temp_id;
 
