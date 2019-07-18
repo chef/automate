@@ -111,6 +111,8 @@ func (r *taskResult) Err() error {
 		return errors.New(r.backendResult.ErrorText)
 	case backend.TaskStatusLost:
 		return ErrTaskLost
+	case backend.TaskStatusUnusableResult:
+		return errors.New(r.backendResult.ErrorText)
 	default:
 		return nil
 	}

@@ -597,23 +597,44 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 
 	if event.Type == backend.TaskComplete {
 		event.CompletedTaskCount++
-		row := tx.QueryRowContext(ctx, getTaskResultQuery, taskResultID)
-		tr := backend.TaskResult{}
-		err = row.Scan(
-			&tr.TaskName, &tr.Parameters, &tr.Status, &tr.ErrorText, &tr.Result)
+		tr, err := getTaskResult(ctx, tx, taskResultID)
 		if err != nil {
 			cancel()
-			// FIXME FIXME FIXME
-			// TODO is this an infinite loop (this is panic situation)
-			return nil, nil, err
+			return nil, nil, errors.Wrap(err, "failed to retrieve task result for task complete event")
 		}
-		event.TaskResult = &tr
+		event.TaskResult = tr
 	}
 
 	workc.enqueuedTaskCount = event.EnqueuedTaskCount
 	workc.completedTaskCount = event.CompletedTaskCount
 
 	return event, workc, nil
+}
+
+func getTaskResult(ctx context.Context, tx *sql.Tx, taskResultID sql.NullInt64) (*backend.TaskResult, error) {
+	if !taskResultID.Valid {
+		return nil, errors.New("invalid task result id for completed task event")
+	}
+
+	row := tx.QueryRowContext(ctx, getTaskResultQuery, taskResultID.Int64)
+	tr := backend.TaskResult{}
+	err := row.Scan(
+		&tr.TaskName, &tr.Parameters, &tr.Status, &tr.ErrorText, &tr.Result)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// This is unlikely to be a transient problem
+			// that aborting and retrying will fix. Thus,
+			// we move on and allow the workflow to handle
+			// the error, if they needed this result.
+			return &backend.TaskResult{
+				Status:    backend.TaskStatusUnusableResult,
+				ErrorText: err.Error(),
+			}, nil
+		}
+		return nil, err
+	}
+
+	return &tr, nil
 }
 
 func (pg *PostgresBackend) CancelWorkflow(ctx context.Context, instanceName string, workflowName string) error {
