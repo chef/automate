@@ -9,10 +9,15 @@ import (
 	"github.com/chef/automate/lib/grpc/secureconn"
 )
 
+type ChefIngestRunPipelineConfig struct {
+	MaxNumberOfBundledMsgs   int
+	NumberOfMsgsTransformers int
+	NumberOfPublishers       int
+}
+
 type ChefIngestServerConfig struct {
-	MaxNumberOfBundledRunMsgs    int
 	MaxNumberOfBundledActionMsgs int
-	NumberOfRunMsgsTransformers  int
+	ChefIngestRunPipelineConfig  ChefIngestRunPipelineConfig
 }
 
 type Opts struct {

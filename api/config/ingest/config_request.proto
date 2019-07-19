@@ -34,6 +34,7 @@ message ConfigRequest {
 				google.protobuf.Int32Value max_number_of_bundled_run_msgs = 6;
 				google.protobuf.Int32Value max_number_of_bundled_action_msgs = 7;
 				google.protobuf.Int32Value number_of_run_msgs_transformers = 8;
+				google.protobuf.Int32Value number_of_run_msg_publishers = 9;
 			}
 
 			message Log {

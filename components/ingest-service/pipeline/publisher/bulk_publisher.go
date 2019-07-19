@@ -2,6 +2,7 @@ package publisher
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/olivere/elastic"
@@ -12,8 +13,11 @@ import (
 )
 
 func BuildBulkRunPublisher(client backend.Client, maxNumberOfBundledRunMsgs int) message.ChefRunPipe {
+	count := 0
 	return func(in <-chan message.ChefRun) <-chan message.ChefRun {
-		return bulkRunPublisherBundler(in, client, maxNumberOfBundledRunMsgs)
+		name := fmt.Sprintf("pub-%d", count)
+		count++
+		return bulkRunPublisherBundler(in, client, maxNumberOfBundledRunMsgs, name)
 	}
 }
 
@@ -24,9 +28,10 @@ func BuildBulkActionPublisher(client backend.Client, maxNumberOfBundledActionMsg
 }
 
 func bulkRunPublisherBundler(in <-chan message.ChefRun, client backend.Client,
-	maxNumberOfBundledRunMsgs int) <-chan message.ChefRun {
+	maxNumberOfBundledRunMsgs int, name string) <-chan message.ChefRun {
 	log.WithFields(log.Fields{
 		"maxNumberOfBundledRunMsgs": maxNumberOfBundledRunMsgs,
+		"name":                      name,
 	}).Debug("starting bulkRunPublisherBundler")
 	out := make(chan message.ChefRun, maxNumberOfBundledRunMsgs)
 	go func() {
@@ -56,6 +61,7 @@ func bulkRunPublisherBundler(in <-chan message.ChefRun, client backend.Client,
 						"bulkRequestsCount": len(bulkableRequests),
 						"error":             err,
 						"message":           "ChefRun",
+						"name":              name,
 					}).Error("bulkRunPublisherBundler Failed")
 				} else {
 					// elasticsearch publish was successful
@@ -68,6 +74,7 @@ func bulkRunPublisherBundler(in <-chan message.ChefRun, client backend.Client,
 					log.WithFields(log.Fields{
 						"message":           "ChefRun",
 						"publish_time":      dur,
+						"name":              name,
 						"bulkRequestsCount": len(bulkableRequests),
 					}).Debug("bulkRunPublisherBundler")
 				}
