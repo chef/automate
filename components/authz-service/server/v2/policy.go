@@ -536,15 +536,15 @@ func (s *policyServer) MigrateToV2(ctx context.Context,
 		return nil, status.Errorf(codes.Internal, "retrieve default policies: %s", err.Error())
 	}
 
-	for _, pol := range defaultPolicies {
-		if _, err := s.store.CreatePolicy(ctx, &pol); err != nil {
-			return nil, status.Errorf(codes.Internal, "reset to default policies: %s", err.Error())
-		}
-	}
-
 	for _, role := range storage.DefaultRoles() {
 		if _, err := s.store.CreateRole(ctx, &role); err != nil {
 			return nil, status.Errorf(codes.Internal, "reset to default roles: %s", err.Error())
+		}
+	}
+
+	for _, pol := range defaultPolicies {
+		if _, err := s.store.CreatePolicy(ctx, &pol); err != nil {
+			return nil, status.Errorf(codes.Internal, "reset to default policies: %s", err.Error())
 		}
 	}
 

@@ -1092,9 +1092,40 @@ func TestCreatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
 		},
-		"policy with one resources+actions statement": func(t *testing.T) {
+		"policy adding a role that doesn't exist should fail": func(t *testing.T) {
 			polID, sID := genSimpleID(t, prngSeed), genUUID(t)
 			name, typeVal := "toBeCreated", storage.Custom
+			resources := []string{"iam:users"}
+			role := "notFound"
+			member := genMember(t, "user:local:albertine")
+			statement := storage.Statement{
+				ID:        sID,
+				Effect:    storage.Deny,
+				Role:      role,
+				Resources: resources,
+			}
+
+			pol := storage.Policy{
+				ID:         polID,
+				Name:       name,
+				Members:    []storage.Member{member},
+				Type:       typeVal,
+				Statements: []storage.Statement{statement},
+			}
+
+			resp, err := store.CreatePolicy(ctx, &pol)
+			assert.Error(t, err)
+			assert.Nil(t, resp)
+
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+		},
+		"policy with one statement that contains resources and actions but no role": func(t *testing.T) {
+			polID, sID := genSimpleID(t, prngSeed), genUUID(t)
+			name, typeVal := "toBeCreated", storage.Custom
+
 			resources, actions := []string{"iam:users"}, []string{"iam:users:create", "iam:users:delete"}
 			member := genMember(t, "user:local:albertine")
 			statement := storage.Statement{
@@ -1121,8 +1152,88 @@ func TestCreatePolicy(t *testing.T) {
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
 					polID, name, typeVal.String()))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5)`,
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5) AND role_id IS NULL`,
 				sID, pq.Array(resources), pq.Array(actions), "deny", polID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertMembers(t, db, polID, []storage.Member{member})
+		},
+		"policy with one statement that contains resources, actions, and a role that exists": func(t *testing.T) {
+			polID, sID := genSimpleID(t, prngSeed), genUUID(t)
+			name, typeVal, projID := "toBeCreated", storage.Custom, "project1"
+			resources, actions, role := []string{"iam:users"}, []string{"iam:users:create", "iam:users:delete"}, "my-fancy-role"
+
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			insertTestRole(t, db, role, "role name", []string{"action1"}, []string{projID})
+
+			member := genMember(t, "user:local:albertine")
+			statement := storage.Statement{
+				ID:        sID,
+				Effect:    storage.Deny,
+				Resources: resources,
+				Actions:   actions,
+				Role:      role,
+			}
+
+			pol := storage.Policy{
+				ID:         polID,
+				Name:       name,
+				Members:    []storage.Member{member},
+				Type:       typeVal,
+				Statements: []storage.Statement{statement},
+			}
+
+			assertPolicyChange(t, store, func() {
+				resp, err := store.CreatePolicy(ctx, &pol)
+				require.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
+
+			assertOne(t,
+				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
+					polID, name, typeVal.String()))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5) AND role_id=role_db_id($6)`,
+				sID, pq.Array(resources), pq.Array(actions), "deny", polID, role))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertMembers(t, db, polID, []storage.Member{member})
+		},
+		"policy with one statement that contains resources, a role that exists, but no actions": func(t *testing.T) {
+			polID, sID := genSimpleID(t, prngSeed), genUUID(t)
+			name, typeVal, projID := "toBeCreated", storage.Custom, "project1"
+			resources, role := []string{"iam:users"}, "my-fancy-role"
+
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			insertTestRole(t, db, role, "role name", []string{"action1"}, []string{projID})
+
+			member := genMember(t, "user:local:albertine")
+			statement := storage.Statement{
+				ID:        sID,
+				Effect:    storage.Deny,
+				Resources: resources,
+				Role:      role,
+				Actions:   []string{},
+			}
+
+			pol := storage.Policy{
+				ID:         polID,
+				Name:       name,
+				Members:    []storage.Member{member},
+				Type:       typeVal,
+				Statements: []storage.Statement{statement},
+			}
+
+			assertPolicyChange(t, store, func() {
+				resp, err := store.CreatePolicy(ctx, &pol)
+				require.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
+
+			assertOne(t,
+				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
+					polID, name, typeVal.String()))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions='{}' AND effect=$3 AND policy_id=policy_db_id($4) AND role_id=role_db_id($5)`,
+				sID, pq.Array(resources), "deny", polID, role))
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
 			assertMembers(t, db, polID, []storage.Member{member})

@@ -9,11 +9,10 @@ UPDATE iam_statements t
 
 ALTER TABLE iam_statements DROP COLUMN role;
 
--- TODO: using trigger instead of constraint but leaving for reference for a sec.
--- ALTER TABLE iam_statements
---     ADD CONSTRAINT iam_statements_role_id_fkey FOREIGN KEY (role_id) REFERENCES iam_roles(db_id);
+ALTER TABLE iam_statements
+    ADD CONSTRAINT iam_statements_role_id_fkey FOREIGN KEY (role_id) REFERENCES iam_roles(db_id);
 
--- i wanted use an FKEY constraint and ON DELETE to clean up any statement where the
+-- i wanted use the above FKEY constraint with ON DELETE to clean up any statement where the
 -- role getting removed would result in a NULL role_id in iam_statements. that is doable, but
 -- what becomes tricky is adding the additional logic to completely remove the statement if the affected
 -- policy would also have no actions. so instead of splitting that logic up, let's handle it all in a trigger.
@@ -186,14 +185,31 @@ CREATE OR REPLACE FUNCTION
     insert_iam_statement_into_policy(_policy_id TEXT, _statement_id UUID, _statement_effect iam_effect, _statement_actions TEXT[],
     _statement_resources TEXT[], _statement_role TEXT, _statement_projects TEXT[])
         RETURNS void AS $$
-            INSERT INTO iam_statements (policy_id, id, effect, actions, resources, role_id)
-                VALUES (policy_db_id(_policy_id), _statement_id, _statement_effect, _statement_actions, _statement_resources, role_db_id(_statement_role));
+            BEGIN
+                -- if NULL or an empty string was passed for the role, we shouldn't try to insert a role.
+                IF _statement_role IS NULL OR _statement_role=''
+                THEN
+                    INSERT INTO iam_statements (policy_id, id, effect, actions, resources)
+                        VALUES (policy_db_id(_policy_id), _statement_id, _statement_effect, _statement_actions, _statement_resources);
 
-            INSERT INTO iam_statement_projects (statement_id, project_id)
-                SELECT statement_db_id(_statement_id) s_id, project_db_id(p_id)
-                FROM UNNEST(_statement_projects) project_db_id(p_id)
-            ON CONFLICT DO NOTHING
-$$
-LANGUAGE sql;
+                -- otherwise, we should try to insert a role. however, we want to catch the case where role_db_id returns null.
+                -- if we don't then the insert will just insert NULL for role_id, which is not what we want if a role was passed in.
+                ELSE
+                    IF role_db_id(_statement_role) IS NULL
+                    THEN
+                        RAISE EXCEPTION 'no role exists with ID %', _statement_role;
+                    END IF;
+
+                    INSERT INTO iam_statements (policy_id, id, effect, actions, resources, role_id)
+                        VALUES (policy_db_id(_policy_id), _statement_id, _statement_effect, _statement_actions, _statement_resources, role_db_id(_statement_role));
+                END IF;
+
+                INSERT INTO iam_statement_projects (statement_id, project_id)
+                    SELECT statement_db_id(_statement_id) s_id, project_db_id(p_id)
+                    FROM UNNEST(_statement_projects) project_db_id(p_id)
+                ON CONFLICT DO NOTHING;
+                RETURN;
+            END
+$$ LANGUAGE PLPGSQL;
 
 COMMIT;
