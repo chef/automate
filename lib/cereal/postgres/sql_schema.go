@@ -8,9 +8,8 @@ BEGIN;
 
 -- Workflows
 --
--- Workflows coordinate a set of tasks. For example, a scan job is a
--- workflow that create and then waits for the completion of a number
--- of inspec scan tasks.
+-- Workflows coordinate a set of tasks.
+--
 CREATE TABLE cereal_workflow_schedules (
     id BIGSERIAL PRIMARY KEY,
 
@@ -99,9 +98,6 @@ CREATE TABLE cereal_workflow_results (
 -- Workers dequeue tasks from the task table, do the work related to
 -- that task, and then post their results back.
 --
--- New and Completed tasks also notify a channel that can be
--- subscribed to by the workflows for more timely notification of new
--- task events related to their workflow.
 CREATE TYPE cereal_task_status AS ENUM('success', 'failed', 'lost');
 
 CREATE TYPE cereal_task_state  AS ENUM('queued', 'running');
@@ -130,7 +126,7 @@ CREATE TABLE cereal_task_results (
     result       BYTEA
 );
 
-CREATE TYPE cereal_workflow_event_type AS ENUM('start', 'task_complete', 'cancel', 'tasks_abandoned');
+CREATE TYPE cereal_workflow_event_type AS ENUM('start', 'task_complete', 'cancel');
 
 CREATE TABLE cereal_workflow_events (
     id BIGSERIAL PRIMARY KEY,

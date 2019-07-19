@@ -29,14 +29,18 @@ const (
 	continueWorkflowQuery = `SELECT cereal_continue_workflow($1, $2, $3, $4, $5)`
 
 	listScheduledWorkflowsQuery = `
-		WITH res AS
-			(SELECT DISTINCT ON (instance_name, workflow_name) * FROM cereal_workflow_results
-			ORDER BY instance_name, workflow_name, end_at DESC)
-		SELECT s.id, enabled, s.instance_name, s.workflow_name, s.parameters, recurrence,
-			next_run_at, start_at last_start, end_at last_end
-			FROM cereal_workflow_schedules s LEFT JOIN res
-			ON s.instance_name = res.instance_name AND s.workflow_name = res.workflow_name;
-		`
+WITH res AS (
+    SELECT DISTINCT ON (instance_name, workflow_name) *
+    FROM cereal_workflow_results
+    ORDER BY instance_name, workflow_name, end_at DESC
+)
+SELECT s.id, enabled,
+    s.instance_name, s.workflow_name, s.parameters, recurrence,
+    next_run_at, start_at last_start, end_at last_end
+FROM
+    cereal_workflow_schedules s
+    LEFT JOIN res ON s.instance_name = res.instance_name
+        AND s.workflow_name = res.workflow_name`
 
 	getScheduledWorkflowQuery = `
 WITH res AS (
@@ -52,35 +56,44 @@ FROM
         AND s.workflow_name = res.workflow_name
 WHERE
     s.instance_name = $1
-    AND s.workflow_name = $2;
-`
+    AND s.workflow_name = $2`
+
 	getNextScheduledWorkflowQuery = `
-        SELECT id, enabled, instance_name, workflow_name, parameters, recurrence, next_run_at
-        FROM cereal_workflow_schedules
-        WHERE enabled = TRUE
-        ORDER BY next_run_at LIMIT 1
-        `
+SELECT id, enabled, instance_name, workflow_name,
+    parameters, recurrence, next_run_at
+FROM cereal_workflow_schedules
+WHERE enabled = TRUE
+ORDER BY next_run_at
+LIMIT 1`
+
 	getDueScheduledWorkflowQuery = `
-        SELECT id, enabled, instance_name, workflow_name, parameters, recurrence, next_run_at
-        FROM cereal_workflow_schedules
-        WHERE next_run_at < NOW() AND enabled = TRUE
-        ORDER BY next_run_at
-        FOR UPDATE SKIP LOCKED LIMIT 1
-        `
+SELECT id, enabled, instance_name, workflow_name,
+    parameters, recurrence, next_run_at
+FROM cereal_workflow_schedules
+WHERE next_run_at < NOW()
+    AND enabled = TRUE
+ORDER BY next_run_at
+FOR UPDATE SKIP LOCKED
+LIMIT 1`
+
 	updateScheduledWorkflowQuery = `
-		UPDATE cereal_workflow_schedules
-		SET next_run_at = $2,
-		last_enqueued_at = $3,
-		enabled = $4
-		WHERE id = $1
-        `
+UPDATE
+    cereal_workflow_schedules
+SET
+    next_run_at = $2,
+    last_enqueued_at = $3,
+    enabled = $4
+WHERE
+    id = $1`
 
 	updateSlowScheduledWorkflowQuery = `
-		UPDATE cereal_workflow_schedules
-		SET next_run_at = $2,
-		enabled = $3
-		WHERE id = $1
-        `
+UPDATE
+    cereal_workflow_schedules
+SET
+    next_run_at = $2,
+    enabled = $3
+WHERE
+    id = $1`
 )
 
 type PostgresBackend struct {
@@ -91,7 +104,7 @@ type PostgresBackend struct {
 }
 
 type PostgresTaskCompleter struct {
-	// tid is the Task's id in our postgresql database.  We need
+	// tid is the Task's id in our postgresql database. We need
 	// this to complete the correct task.
 	tid int64
 
@@ -105,10 +118,10 @@ type PostgresTaskCompleter struct {
 
 type PostgresWorkflowCompleter struct {
 	cancel context.CancelFunc
-	// wid is the WorkflowInstance id in our postgresql database.  We need
-	// this to complete the correct workflow
+	// wid is the WorkflowInstance id in our postgresql database. We need
+	// this to complete the correct workflow.
 	wid int64
-	// eid is the WorkflowEvent id
+	// eid is the WorkflowEvent id.
 	eid int64
 
 	// tx is the transaction that is holding our dequeued workflow.
@@ -542,8 +555,6 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 		"wid": workc.wid,
 		"eid": workc.eid,
 	}).Debug("dequeued workflow")
-
-	event.InstanceID = workc.wid
 
 	if event.Type == backend.TaskComplete {
 		event.CompletedTaskCount++

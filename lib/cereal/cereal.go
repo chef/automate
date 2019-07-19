@@ -138,7 +138,7 @@ func WithResult(obj interface{}) CompleteOpts {
 // workflow instance. A workflow instance keeps state of a currently
 // running workflow, and decides what decisions need to be made
 // based and that state. This will be passed to the callback methods
-// of WorkflowExecutor. Only once instance of a WorkflowInstance can
+// of WorkflowExecutor. Only one instance of a WorkflowInstance can
 // execute at a time.
 type WorkflowInstance interface {
 	// GetPayload unmarshals the payload of the workflow instance into the
@@ -174,8 +174,9 @@ type WorkflowInstance interface {
 	// InstanceName returns the workflow instance name
 	InstanceName() string
 
-	// TotalEnqueuedTasks returns the total number of tasks that been enqueued
-	// for the lifetime of the running workflow instance.
+	// TotalEnqueuedTasks returns the total number of tasks that
+	// have been enqueued for the lifetime of the running workflow
+	// instance.
 	TotalEnqueuedTasks() int
 
 	// TotalCompletedTasks returns the total number of tasks that have finished
@@ -184,10 +185,9 @@ type WorkflowInstance interface {
 }
 
 type workflowInstanceImpl struct {
-	instanceID int64
-	instance   backend.WorkflowInstance
-	tasks      []backend.Task
-	wevt       *backend.WorkflowEvent
+	instance backend.WorkflowInstance
+	tasks    []backend.Task
+	wevt     *backend.WorkflowEvent
 }
 
 func (w *workflowInstanceImpl) GetPayload(obj interface{}) error {
@@ -704,9 +704,8 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 	}).Debug("Dequeued Workflow")
 
 	w := &workflowInstanceImpl{
-		instanceID: wevt.InstanceID,
-		instance:   wevt.Instance,
-		wevt:       wevt,
+		instance: wevt.Instance,
+		wevt:     wevt,
 	}
 
 	s.Begin("user")
