@@ -18,36 +18,43 @@ import (
 	"github.com/chef/automate/lib/stringutils"
 )
 
-type VerifyFailure struct {
+type VerifyErrChecksumMismatch struct {
+	pkg                string
 	filename           string
 	expectedChecksum   string
 	calculatedChecksum string
 }
 
-func (v *VerifyFailure) IsExtraFile() bool {
-	return v.expectedChecksum == ""
+type VerifyErrBadFileManifest struct {
+	pkg string
+	err error
 }
 
-func (v *VerifyFailure) IsMissingFile() bool {
-	return v.calculatedChecksum == ""
+type VerifyErrMissingFile struct {
+	pkg      string
+	filename string
 }
 
-func (v *VerifyFailure) IsMismatchedChecksum() bool {
-	return v.expectedChecksum != v.calculatedChecksum
+type VerifyErrExtraFile struct {
+	pkg      string
+	filename string
 }
 
-func (v *VerifyFailure) Error() string {
-	if v.IsExtraFile() {
-		return fmt.Sprintf("Extra File: %s", v.filename)
-	} else if v.IsMissingFile() {
-		return fmt.Sprintf("Missing File: %s", v.filename)
-	} else if v.IsMismatchedChecksum() {
-		return fmt.Sprintf("Mismatched Checksum: %s (expected=%s, calculated=%s)",
-			v.filename, v.expectedChecksum, v.calculatedChecksum)
-	} else {
-		return fmt.Sprintf("Unknown Error: %s (expected=%s, calculated=%s)",
-			v.filename, v.expectedChecksum, v.calculatedChecksum)
-	}
+func (v *VerifyErrMissingFile) Error() string {
+	return fmt.Sprintf("%s: missing file: %s", v.pkg, v.filename)
+}
+
+func (v *VerifyErrExtraFile) Error() string {
+	return fmt.Sprintf("%s: extra file: %s", v.pkg, v.filename)
+}
+
+func (v *VerifyErrBadFileManifest) Error() string {
+	return fmt.Sprintf("%s: bad FILES file: %s", v.pkg, v.err.Error())
+}
+
+func (v *VerifyErrChecksumMismatch) Error() string {
+	return fmt.Sprintf("%s: mismatched checksum: %s (expected=%s, calculated=%s)",
+		v.pkg, v.filename, v.expectedChecksum, v.calculatedChecksum)
 }
 
 type pkgFile struct {
@@ -194,7 +201,11 @@ func VerifyHabPackages() error {
 	for _, pkg := range pkgs {
 		expectedFiles, err := loadFILESFile(pkg)
 		if err != nil {
-			return err
+			errs = append(errs, &VerifyErrBadFileManifest{
+				pkg: habpkg.Ident(&pkg),
+				err: err,
+			})
+			continue
 		}
 		if expectedFiles == nil {
 			continue
@@ -203,20 +214,48 @@ func VerifyHabPackages() error {
 		if err != nil {
 			return err
 		}
-		// TODO (jaym): detect missing files
+
+		for name := range expectedFiles {
+			// Some versions of hab put MANIFEST in the
+			// FILES list and some do not. Because of
+			// this, listFilesInPkg filters them from
+			// present files, thus we skip it here too.
+			//
+			// See https://github.com/habitat-sh/habitat/issues/6746
+			//
+			if filepath.Base(name) == "MANIFEST" {
+				continue
+			}
+
+			found := false
+			for _, f := range presentFiles {
+				if f.filename == name {
+					found = true
+					break
+				}
+			}
+			if !found {
+				errs = append(errs, &VerifyErrMissingFile{
+					pkg:      habpkg.Ident(&pkg),
+					filename: name,
+				})
+			}
+		}
+
 		for _, f := range presentFiles {
 			if expectedChecksum, ok := expectedFiles[f.filename]; ok {
 				if expectedChecksum != f.checksum {
-					errs = append(errs, &VerifyFailure{
+					errs = append(errs, &VerifyErrChecksumMismatch{
+						pkg:                habpkg.Ident(&pkg),
 						filename:           f.filename,
 						expectedChecksum:   expectedChecksum,
 						calculatedChecksum: f.checksum,
 					})
 				}
 			} else {
-				errs = append(errs, &VerifyFailure{
-					filename:           f.filename,
-					calculatedChecksum: f.checksum,
+				errs = append(errs, &VerifyErrExtraFile{
+					pkg:      habpkg.Ident(&pkg),
+					filename: f.filename,
 				})
 			}
 		}

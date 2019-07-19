@@ -130,22 +130,16 @@ fix_broken_cli() {
 
 fix_broken_packages() {
     log_info "Checking for broken Habitat packages"
-    declare -a packages_to_check=("core/hab-sup")
-
-    for pkg in "${packages_to_check[@]}"; do
-        for pkg_dir in "/hab/pkgs/$pkg"/*/*; do
-            # TODO(ssd) 2018-12-07: This is an incomplete check,
-            # really any number of files can be missing. A complete
-            # check would look at FILES and check every file in the
-            # package.
-            if [[ ! -f "$pkg_dir/TARGET" ]]; then
-                log_error "BROKEN PACKAGE DETECTED (attempting fix): $pkg_dir"
-                rm -rf "$pkg_dir"
-                ident=$(echo "$pkg_dir" | cut -d/ -f4-7)
-                hab pkg install "$ident"
+    if ! output=$(chef-automate dev verify-packages); then
+        mapfile -t broken_packages < <(echo "$output" | cut -d':' -f1 | uniq)
+        for pkg in "${broken_packages[@]}"; do
+            if [[ -n "$pkg" ]]; then
+                log_error "BROKEN PACKAGES DETECTED (attempting fix): $pkg"
+                rm -rf "/hab/pkgs/$pkg"
+                hab pkg install "$pkg"
             fi
         done
-    done
+    fi
 }
 
 
