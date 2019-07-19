@@ -116,7 +116,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   }
 
   getAttributeLabel() {
-    return `${this.ruleForm.get('type').value} Attribute`;
+    return `${this.ruleForm.get('type').value.toLowerCase()} attribute`;
   }
 
   backRoute(): string[] {
@@ -143,6 +143,16 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   deleteCondition(index: number) {
     const conditions = this.ruleForm.get('conditions') as FormArray;
     conditions.removeAt(index);
+  }
+
+  showAndLabel(i: number): boolean {
+    const conditions = this.ruleForm.get('conditions') as FormArray;
+    return (i + 1) < conditions.length;
+  }
+
+  showDelete(i: number): boolean {
+    const conditions = this.ruleForm.get('conditions') as FormArray;
+    return (i + 1) < conditions.length;
   }
 
   populateConditions() {

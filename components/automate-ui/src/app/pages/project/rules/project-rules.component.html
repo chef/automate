@@ -32,7 +32,7 @@
           <chef-error
             *ngIf="ruleForm.get('type').hasError('required') && ruleForm.get('type').dirty"
           >Resource Type is required</chef-error>
-          <small>Resource types cannot be changed after the rule is created.</small>
+          <small class="help">Resource types cannot be changed after the rule is created.</small>
         </chef-form-field>
 
         <div id="add-condition">
@@ -82,12 +82,12 @@
                 ></chef-input>
               </label>
 
-              <small 
+              <small class="help"
                 *ngIf="condition.controls.operator.value === 'EQUALS'">
                   Case sensitive, must match exactly.
               </small>
 
-              <small
+              <small class="help"
                 *ngIf="condition.controls.operator.value === 'MEMBER_OF'">
                   Comma-separated list, at least one must match exactly.
               </small>
@@ -95,9 +95,11 @@
             </chef-form-field>
             <chef-form-field class="attribute-field">
               <label>
-                <span *ngIf="(i + 1) < ruleForm.get('conditions').controls.length" class="label">AND</span>
+                <span *ngIf="showAndLabel(i)" class="label">AND</span>
               </label>
-              <chef-icon (click)="deleteCondition(i)">delete</chef-icon>
+              <chef-button tertiary *ngIf="showDelete(i)" (click)="deleteCondition(i)">
+                <chef-icon>delete</chef-icon>
+              </chef-button>
             </chef-form-field>
 
           </div>

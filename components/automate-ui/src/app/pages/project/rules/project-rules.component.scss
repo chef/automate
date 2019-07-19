@@ -5,6 +5,10 @@ chef-page {
   small {
     color: $chef-dark-grey;
     font-size: 14px;
+
+    &.help {
+      font-size: 12px;
+    }
   }
 
   form {
@@ -23,7 +27,7 @@ chef-page {
 
   chef-form-field {
     .label {
-      font-size: 12px;
+      font-size: 16px;
     }
 
     &.attribute-field {
@@ -40,11 +44,15 @@ chef-page {
           display: inline-block;
         }
 
-        chef-icon {
-          cursor: pointer;
-          font-size: 1.2rem;
+        chef-button {
           position: absolute;
           right: 0;
+          top: -14px;
+
+          chef-icon {
+            color: $chef-primary-dark;
+            font-size: 1.2rem;
+          }
         }
       }
 

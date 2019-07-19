@@ -185,13 +185,35 @@ describe('ProjectRulesComponent', () => {
     it('should have attribute label with NODE type', () => {
       component.ruleForm.get('type').setValue('NODE');
       const attributeLabel = component.getAttributeLabel();
-      expect(attributeLabel).toBe('NODE Attribute');
+      expect(attributeLabel).toBe('node attribute');
     });
 
     it('should have attribute label with EVENT type', () => {
       component.ruleForm.get('type').setValue('EVENT');
       const attributeLabel = component.getAttributeLabel();
-      expect(attributeLabel).toBe('EVENT Attribute');
+      expect(attributeLabel).toBe('event attribute');
+    });
+
+    it('should not show add label with one condition', () => {
+      const showAndLabel = component.showAndLabel(0);
+      expect(showAndLabel).toBeFalsy();
+    });
+
+    it('should not show delete button with one condition', () => {
+      const showDelete = component.showDelete(0);
+      expect(showDelete).toBeFalsy();
+    });
+
+    it('should show add label with two conditions', () => {
+      component.addCondition();
+      const showAndLabel = component.showAndLabel(0);
+      expect(showAndLabel).toBeTruthy();
+    });
+
+    it('should show delete button with two conditions', () => {
+      component.addCondition();
+      const showDelete = component.showDelete(0);
+      expect(showDelete).toBeTruthy();
     });
   });
 });

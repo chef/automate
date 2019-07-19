@@ -12,13 +12,11 @@
         <thead>
           <tr class="detail-row">
             <th class="id-column">ID</th>
-            <th class="type-column">Type</th>
           </tr>
         </thead>
         <tbody>
           <tr class="detail-row">
             <td class="id-column">{{ project?.id }}</td>
-            <td class="type-column">{{ project?.type | iamType }}</td>
           </tr>
         </tbody>
       </table>
@@ -27,7 +25,7 @@
         <chef-option value='details'>Details</chef-option>
       </chef-tab-selector>
     </chef-page-header>
-    <section class="page-body" *ngIf="showTab('details')">
+    <section class="page-body" [hidden]="showTab('rules')">
       <form [formGroup]="projectForm">
         <chef-form-field>
           <label>
@@ -39,7 +37,7 @@
               (keyup)="keyPressed()">
           </label>
         </chef-form-field>
-        <span *ngIf="isChefManaged" id="changes-not-allowed">
+        <span [hidden]="!isChefManaged" id="changes-not-allowed">
           Name changes are not allowed for the default project.
         </span>
         <div id="button-bar" *ngIf="!isChefManaged">
@@ -53,7 +51,7 @@
         </div>
       </form>
     </section>
-    <section class="page-body" *ngIf="showTab('rules')">
+    <section class="page-body" [hidden]="showTab('details')">
       <ng-container *ngIf="showRulesTable()">
         <chef-toolbar>
           <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">
