@@ -68,14 +68,14 @@ describe('projects API', () => {
             failOnStatusCode: false,
           })
 
-          // user our Admin user's ID token to generate an admin-level API token
-          // for use in the tests
+          // use our Admin user's ID token to generate an admin-level API token
+          // for use in the tests as Cypress.env('adminTokenValue')
           cy.generateAdminToken(admin.id_token)
 
           // create projects or confirm they already exist
           for (let project of [avengersProject, xmenProject]) {
             cy.request({
-              headers: { 'api-token': Cypress.env('adminTokenValue') },
+              auth: { bearer: admin.id_token },
               method: 'POST',
               url: '/apis/iam/v2beta/projects',
               failOnStatusCode: false,
@@ -87,8 +87,8 @@ describe('projects API', () => {
 
           let totalNodes = 0
           cy.request({
+            auth: { bearer: admin.id_token },
             headers: {
-              'api-token': Cypress.env('adminTokenValue'),
               projects: '(unassigned)'
             },
             method: 'GET',
@@ -103,7 +103,7 @@ describe('projects API', () => {
                 cy.fixture('converge/xmen2.json').then(node4 => {
                   for (let node of [node1, node2, node3, node4]) {
                     cy.request({
-                      headers: { 'api-token': Cypress.env('adminTokenValue') },
+                      auth: { bearer: admin.id_token },
                       method: 'POST',
                       url: '/data-collector/v0',
                       body: node
@@ -118,8 +118,8 @@ describe('projects API', () => {
 
           // confirm nodes are unassigned
           cy.request({
+            auth: { bearer: admin.id_token },
             headers: {
-              'api-token': Cypress.env('adminTokenValue'),
               projects: '(unassigned)'
             },
             method: 'GET',
@@ -129,8 +129,8 @@ describe('projects API', () => {
           })
 
           cy.request({
+            auth: { bearer: admin.id_token },
             headers: {
-              'api-token': Cypress.env('adminTokenValue'),
               projects: avengersProject.id
             },
             method: 'GET',
@@ -140,8 +140,8 @@ describe('projects API', () => {
           })
 
           cy.request({
+            auth: { bearer: admin.id_token },
             headers: {
-              'api-token': Cypress.env('adminTokenValue'),
               projects: xmenProject.id
             },
             method: 'GET',
