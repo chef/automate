@@ -74,6 +74,12 @@ promote:
           - value_one: "{{target_channel}}"
             operator: equals
             value_two: current
+    - bash:.expeditor/push-git-tag.sh:
+        post_commit: true
+        only_if_conditions:
+          - value_one: "{{target_channel}}"
+            operator: equals
+            value_two: current
     - bash:.expeditor/announce-acceptance.sh:
         post_commit: true
         only_if_conditions:
