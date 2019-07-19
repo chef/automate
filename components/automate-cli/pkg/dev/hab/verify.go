@@ -216,6 +216,17 @@ func VerifyHabPackages() error {
 		}
 
 		for name := range expectedFiles {
+			// Some versions of hab put MANIFEST in the
+			// FILES list and some do not. Because of
+			// this, listFilesInPkg filters them from
+			// present files, thus we skip it here too.
+			//
+			// See https://github.com/habitat-sh/habitat/issues/6746
+			//
+			if filepath.Base(name) == "MANIFEST" {
+				continue
+			}
+
 			found := false
 			for _, f := range presentFiles {
 				if f.filename == name {
