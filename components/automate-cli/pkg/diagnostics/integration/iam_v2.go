@@ -11,11 +11,20 @@ import (
 
 type save struct {
 	PolicyID string `json:"id"`
+	RoleID   string `json:"role_id"`
 }
 
 // This is used to ensure the response body is valid JSON, where we don't
 // actually care about the content.
 type empty struct{}
+
+const roleCreateTemplateStr = `
+{
+  "id": "{{ .ID }}",
+  "name": "{{ .Name }}",
+	"actions": ["test:svc:someroleaction", "test:svc:someotherroleaction"]
+}
+`
 
 const v2PolicyCreateTemplateStr = `
 {
@@ -25,7 +34,7 @@ const v2PolicyCreateTemplateStr = `
   "statements": [
     {
       "effect": "DENY",
-      "role": "testrole"
+      "role": "{{ .RoleID }}"
     },
     {
       "effect": "ALLOW",
@@ -40,17 +49,30 @@ func CreateIAMV2Diagnostic() diagnostics.Diagnostic {
 	policyID := "test-policy-" + uuid.Must(uuid.NewV4()).String()
 	policyName := "This is a test IAM v2 backup and restore policy."
 	policyType := "CUSTOM"
+	roleID := "test-role-" + uuid.Must(uuid.NewV4()).String()
+	roleName := "This is a test IAM v2 backup and restore role."
 
 	return diagnostics.Diagnostic{
 		Name: "iam-v2",
 		Tags: diagnostics.Tags{"auth", "iam-v2", "skip-for-deep-upgrade"},
 		Generate: func(tstCtx diagnostics.TestContext) error {
-			tstCtx.SetValue("iam-v2-policy-id", save{PolicyID: policyID})
+			tstCtx.SetValue("iam-v2-policy-id", save{PolicyID: policyID, RoleID: roleID})
 			err := MustJSONDecodeSuccess(
+				tstCtx.DoLBRequest("/apis/iam/v2beta/roles",
+					lbrequest.WithMethod("POST"),
+					lbrequest.WithJSONStringTemplateBody(roleCreateTemplateStr,
+						struct{ ID, Name string }{ID: roleID, Name: roleName}),
+				)).WithValue(&empty{})
+
+			if err != nil {
+				return errors.Wrap(err, "Could not create role for use in IAM v2 policy")
+			}
+
+			err = MustJSONDecodeSuccess(
 				tstCtx.DoLBRequest("/apis/iam/v2beta/policies",
 					lbrequest.WithMethod("POST"),
 					lbrequest.WithJSONStringTemplateBody(v2PolicyCreateTemplateStr,
-						struct{ ID, Name string }{ID: policyID, Name: policyName}),
+						struct{ ID, Name, RoleID string }{ID: policyID, Name: policyName, RoleID: roleID}),
 				)).WithValue(&empty{})
 			return errors.Wrap(err, "Could not create IAM v2 policy")
 		},
@@ -78,7 +100,7 @@ func CreateIAMV2Diagnostic() diagnostics.Diagnostic {
 					Effect:    "ALLOW",
 				},
 				{
-					Role:      "testrole",
+					Role:      loaded.RoleID,
 					Actions:   []string{},
 					Resources: []string{"*"},
 					Effect:    "DENY",
@@ -97,7 +119,17 @@ func CreateIAMV2Diagnostic() diagnostics.Diagnostic {
 			if err := tstCtx.GetValue("iam-v2-policy-id", &loaded); err != nil {
 				return errors.Wrap(err, "Generated context was not found")
 			}
+
 			err := MustJSONDecodeSuccess(
+				tstCtx.DoLBRequest("/apis/iam/v2beta/roles/"+loaded.RoleID,
+					lbrequest.WithMethod("DELETE")),
+			).WithValue(&empty{})
+
+			if err != nil {
+				return errors.Wrap(err, "Could not delete role used in IAM v2 policy")
+			}
+
+			err = MustJSONDecodeSuccess(
 				tstCtx.DoLBRequest("/apis/iam/v2beta/policies/"+loaded.PolicyID,
 					lbrequest.WithMethod("DELETE")),
 			).WithValue(&empty{})

@@ -40,6 +40,10 @@ var (
 	// ErrChangeTypeForRule indicates that an update operation attempted to change
 	// the type for a rule, which is not allowed.
 	ErrChangeTypeForRule = errors.New("cannot change rule type")
+
+	// ErrRoleMustExistForStatement indicates that the user attempted to insert a role that
+	// does not exist into a new or updated policy statement
+	ErrRoleMustExistForStatement = errors.New("role must exist")
 )
 
 // ErrTxCommit occurs when the database attempts to commit a transaction and

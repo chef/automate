@@ -169,6 +169,8 @@ func (s *policyServer) CreatePolicy(
 	case storage_errors.ErrConflict:
 		return nil, status.Errorf(codes.AlreadyExists,
 			"policy with id %q already exists", req.Id)
+	case storage_errors.ErrRoleMustExistForStatement:
+		return nil, status.Error(codes.InvalidArgument, "a statement contained a role that does not exist")
 	default:
 		return nil, status.Errorf(codes.Internal,
 			"creating policy %q: %s", req.Id, err.Error())
@@ -273,6 +275,8 @@ func (s *policyServer) UpdatePolicy(
 			return nil, status.Errorf(codes.AlreadyExists, "policy with name %q already exists", req.Name)
 		case storage_errors.ErrNotFound:
 			return nil, status.Errorf(codes.NotFound, "no policy with ID %q found", req.Id)
+		case storage_errors.ErrRoleMustExistForStatement:
+			return nil, status.Error(codes.InvalidArgument, "a statement contained a role that does not exist")
 		}
 		return nil, err
 	}

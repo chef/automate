@@ -1114,7 +1114,7 @@ func TestCreatePolicy(t *testing.T) {
 			}
 
 			resp, err := store.CreatePolicy(ctx, &pol)
-			assert.Error(t, err)
+			assert.Equal(t, storage_errors.ErrRoleMustExistForStatement, err)
 			assert.Nil(t, resp)
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))

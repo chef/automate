@@ -200,7 +200,7 @@ CREATE OR REPLACE FUNCTION
                 ELSE
                     IF role_db_id(_statement_role) IS NULL
                     THEN
-                        RAISE EXCEPTION 'no role exists with ID %', _statement_role;
+                        RAISE EXCEPTION 'no role exists with ID %', _statement_role USING ERRCODE = 'RDNES';
                     END IF;
 
                     INSERT INTO iam_statements (policy_id, id, effect, actions, resources, role_id)
