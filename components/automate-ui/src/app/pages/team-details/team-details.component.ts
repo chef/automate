@@ -40,7 +40,7 @@ const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 export class TeamDetailsComponent implements OnInit, OnDestroy {
   public updateNameForm: FormGroup;
   public disableSave = true;
-  public saveInProgress = false
+  public saveInProgress = false;
   public tabValue = 'users';
   public url: string;
   public teamMembershipView = false;
@@ -59,6 +59,10 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     private fb: FormBuilder
   ) {
     this.createForms(this.fb);
+    this.updateNameForm = fb.group({
+      // Must stay in sync with error checks in team-details.component.html
+      name: ['', Validators.required]
+    });
   }
 
   private get teamId(): string {

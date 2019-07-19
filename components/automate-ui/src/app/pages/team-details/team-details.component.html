@@ -101,7 +101,7 @@
         <form [formGroup]="updateNameForm">
           <chef-form-field>
             <label>Name *</label>
-            <input chefInput formControlName="name" type="text">
+            <input chefInput formControlName="name" type="text" (keyup)="handleNameChange()">
           </chef-form-field>
         </form>
         <chef-button primary [disabled]="!updateNameForm.valid || disableSave || saveInProgress" (click)="saveNameChange()">
