@@ -46,10 +46,9 @@ type WorkflowInstance struct {
 type WorkflowEventType string
 
 const (
-	WorkflowStart  WorkflowEventType = "start"
-	TaskComplete   WorkflowEventType = "task_complete"
-	Cancel         WorkflowEventType = "cancel"
-	TasksAbandoned WorkflowEventType = "tasks_abandoned"
+	WorkflowStart WorkflowEventType = "start"
+	TaskComplete  WorkflowEventType = "task_complete"
+	Cancel        WorkflowEventType = "cancel"
 )
 
 type TaskStatusType string
@@ -61,7 +60,6 @@ const (
 )
 
 type WorkflowEvent struct {
-	InstanceID         int64
 	Instance           WorkflowInstance
 	Type               WorkflowEventType
 	EnqueuedTaskCount  int
@@ -109,9 +107,13 @@ type ScheduledWorkflowCompleter interface {
 }
 
 type Schedule struct {
-	// NOTE(ssd) 2019-05-13: Since name and workflow-name are
-	// user-controlled in the case of many scheduled workflows, we
-	// need the ID to create unique workflow names.
+	// TODO(ssd) 2019-07-19: ID was originally placed on backends
+	// because it was unclear whether (workflow_name,
+	// instance_name) can actually be unique in the case of
+	// scheduled workflows. We currently have a unique constraint
+	// on them, so we could remove this, but since it was on this
+	// struct it ended up in a few queries that would need to
+	// change.
 	ID             int64
 	Enabled        bool
 	InstanceName   string
