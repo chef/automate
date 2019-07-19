@@ -305,8 +305,7 @@ func convertA2v2ReportDocToLatest(src *ESInSpecReportA2v2, dstSum *ESInSpecSumma
 		for j, srcProfileMinControl := range srcProfileMin.Controls {
 			stringTags := make([]ESInSpecReportControlStringTags, 0)
 			var controlTags structpb.Struct
-			logrus.Infof("!!!! reportID = %s, profileID = %s, srcProfileMinControl.Tags = %s", src.ReportID, srcProfileMin.Name, srcProfileMinControl.Tags)
-			err := (&jsonpb.Unmarshaler{}).Unmarshal(strings.NewReader(srcProfileMinControl.Tags), &controlTags)
+			err := (&jsonpb.Unmarshaler{}).Unmarshal(strings.NewReader(profilesMetaMap[srcProfileMin.SHA256].Controls[srcProfileMinControl.ID].Tags), &controlTags)
 			if err == nil {
 				for fKey, fValue := range controlTags.Fields {
 					// Add key with a null value as an empty array for values
