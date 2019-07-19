@@ -377,7 +377,7 @@ type TaskExecutor interface {
 // entered the map. A wayward workflow is a workflow that has
 // experienced some fundamental processing error in the past. To avoid
 // stalling the processing of other workflows, we temporarily skip
-// events for any waywardWords.
+// events for any wayward workflows.
 type waywardWorkflowList map[string]time.Time
 
 // waywardWorkflowTimeout is amount of time we will keep a given
@@ -389,6 +389,7 @@ func (w waywardWorkflowList) Add(workflowName string) {
 		w = make(waywardWorkflowList)
 	}
 	if workflowName != "" {
+		logrus.Warnf("Ignoring workflow %q for the next %s", workflowName, waywardWorkflowTimeout)
 		w[workflowName] = time.Now()
 	}
 }
