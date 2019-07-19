@@ -12,12 +12,15 @@ ALTER TABLE iam_statements DROP COLUMN role;
 ALTER TABLE iam_statements
     ADD CONSTRAINT iam_statements_role_id_fkey FOREIGN KEY (role_id) REFERENCES iam_roles(db_id);
 
+-- This need to be DEFERRABLE INITIALLY DEFERRED so that we don't get a FKEY error before
+-- the trigger works it's magic below.
+ALTER TABLE iam_statements ALTER CONSTRAINT iam_statements_role_id_fkey DEFERRABLE INITIALLY DEFERRED;
+
 -- i wanted use the above FKEY constraint with ON DELETE to clean up any statement where the
 -- role getting removed would result in a NULL role_id in iam_statements. that is doable, but
 -- what becomes tricky is adding the additional logic to completely remove the statement if the affected
 -- policy would also have no actions. so instead of splitting that logic up, let's handle it all in a trigger.
 
--- TODO: let's add a database test for this
 CREATE OR REPLACE FUNCTION purge_statements_with_no_actions_or_role() RETURNS TRIGGER AS $$
   BEGIN
     -- for statements that will still have actions, simply remove the role since those
@@ -27,7 +30,7 @@ CREATE OR REPLACE FUNCTION purge_statements_with_no_actions_or_role() RETURNS TR
     -- for statements that become invalid (no role or actions), delete them
     DELETE FROM iam_statements WHERE role_id=OLD.db_id AND actions = '{}';
 
-    -- if as a result, if a policy now has no statements, remove the policy unless it's
+    -- if as a result, a policy now has no statements, remove the policy unless it's
     -- chef-managed (chef-managed case should never happen since chef-managed roles can't be
     -- deleted, but just to be safe adding it in)
     DELETE FROM iam_policies USING iam_policies AS p
@@ -192,7 +195,7 @@ CREATE OR REPLACE FUNCTION
                     INSERT INTO iam_statements (policy_id, id, effect, actions, resources)
                         VALUES (policy_db_id(_policy_id), _statement_id, _statement_effect, _statement_actions, _statement_resources);
 
-                -- otherwise, we should try to insert a role. however, we want to catch the case where role_db_id returns null.
+                -- otherwise, we should try to insert a role. however, we want to catch the case where role_db_id returns NULL.
                 -- if we don't then the insert will just insert NULL for role_id, which is not what we want if a role was passed in.
                 ELSE
                     IF role_db_id(_statement_role) IS NULL

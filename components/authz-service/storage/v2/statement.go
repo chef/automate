@@ -21,6 +21,10 @@ type Statement struct {
 // validation around what a valid statement is in terms of our storage layer.
 // It also generates a new ID for our statement.
 func NewStatement(effect Effect, role string, projects, resources, actions []string) (Statement, error) {
+	if actions == nil {
+		actions = []string{}
+	}
+
 	if role == "" && len(actions) == 0 {
 		return Statement{},
 			errors.New("unsupported statement variant: you must pass a role, a non-empty array of actions, or both")
