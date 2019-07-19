@@ -356,9 +356,6 @@ type WorkflowExecutor interface {
 	OnTaskComplete(w WorkflowInstance, ev TaskCompleteEvent) Decision
 
 	// OnCancel is called when a workflow instance is to be canceled.
-	//
-	// BUG(jaym): It's currently possible to receive a CancelEvent before
-	// OnStart for the postgres implementation.
 	OnCancel(w WorkflowInstance, ev CancelEvent) Decision
 }
 
@@ -627,37 +624,43 @@ LOOP:
 		}
 		logctx.Debugf("Dequeued task %s", t.Name)
 
-		var runCtx context.Context
+		runCtx := taskCompleter.Context()
 		var cancel context.CancelFunc
 		if timeout > 0 {
-			runCtx, cancel = context.WithTimeout(ctx, timeout)
+			runCtx, cancel = context.WithTimeout(runCtx, timeout)
 		} else {
-			runCtx, cancel = context.WithCancel(ctx)
+			runCtx, cancel = context.WithCancel(runCtx)
 		}
-
-		result, err := exec.Run(runCtx, &task{backendTask: t})
-		if err != nil {
-			err := taskCompleter.Fail(err.Error())
-			if err != nil {
-				logctx.WithError(err).Error("failed to mark task as failed")
-			}
-		} else {
-			jsonResults, err := jsonify(result)
-			if err != nil {
-				logctx.WithError(err).Error("could not convert returned results to JSON")
-				if err := taskCompleter.Fail(err.Error()); err != nil {
-					logrus.WithError(err).Error("Failed to fail task completer")
-				}
-			}
-			err = taskCompleter.Succeed(jsonResults)
-			if err != nil {
-				logrus.WithError(err).Error("failed to mark task as successful")
-			}
-		}
-
+		runTask(runCtx, logctx, exec, t, taskCompleter) // nolint: errcheck
 		cancel()
 	}
 	m.wg.Done()
+}
+
+func runTask(ctx context.Context, logctx logrus.FieldLogger, exec TaskExecutor, t *backend.Task, taskCompleter backend.TaskCompleter) error {
+	result, err := exec.Run(ctx, &task{backendTask: t})
+	if err != nil {
+		err := taskCompleter.Fail(err.Error())
+		if err != nil {
+			logctx.WithError(err).Error("failed to mark task as failed")
+			return err
+		}
+	} else {
+		jsonResults, err := jsonify(result)
+		if err != nil {
+			logctx.WithError(err).Error("could not convert returned results to JSON")
+			if err := taskCompleter.Fail(err.Error()); err != nil {
+				logrus.WithError(err).Error("Failed to fail task completer")
+				return err
+			}
+		}
+		err = taskCompleter.Succeed(jsonResults)
+		if err != nil {
+			logrus.WithError(err).Error("failed to mark task as successful")
+			return err
+		}
+	}
+	return nil
 }
 
 func (m *Manager) runWorkflowExecutor(ctx context.Context) {
@@ -726,7 +729,7 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 				backendResult: wevt.TaskResult,
 			},
 		})
-	case backend.Cancel:
+	case backend.WorkflowCancel:
 		decision = executor.OnCancel(w, CancelEvent{})
 	default:
 		panic("WTF")
@@ -804,6 +807,11 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 	logrus.Debugf("Processed Workflow: %s", s)
 
 	return false
+}
+
+func (m *Manager) CancelWorkflow(ctx context.Context, workflowName string,
+	instanceName string) error {
+	return m.backend.CancelWorkflow(ctx, instanceName, workflowName)
 }
 
 // TODO(ssd) 2019-05-17: Replace me with prometheus
