@@ -3,6 +3,7 @@
 #shellcheck disable=SC2034
 test_name="backup"
 test_backup_restore=true
+test_diagnostics_filters="~iam-v2"
 
 do_restore() {
     test_metadata_sha256_mismatch_fails || return 1

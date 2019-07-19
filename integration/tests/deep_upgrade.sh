@@ -7,6 +7,7 @@ test_upgrade_strategy="none"
 test_loadbalancer_url="https://localhost:4443"
 upgrade_scaffold_pid_file="/tmp/upgrade-scaffold-pid"
 test_diagnostics_pre_upgrade_filters="~skip-for-deep-upgrade"
+test_diagnostics_filters="~iam-v2"
 
 # The version deployed here has a bug where it's possible for it to
 # serve a CLI that is incomplete. We can't go back in time and fix it,

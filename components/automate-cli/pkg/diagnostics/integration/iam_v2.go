@@ -43,7 +43,7 @@ func CreateIAMV2Diagnostic() diagnostics.Diagnostic {
 
 	return diagnostics.Diagnostic{
 		Name: "iam-v2",
-		Tags: diagnostics.Tags{"auth", "skip-for-deep-upgrade"},
+		Tags: diagnostics.Tags{"auth", "iam-v2", "skip-for-deep-upgrade"},
 		Generate: func(tstCtx diagnostics.TestContext) error {
 			tstCtx.SetValue("iam-v2-policy-id", save{PolicyID: policyID})
 			err := MustJSONDecodeSuccess(

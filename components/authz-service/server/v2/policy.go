@@ -20,6 +20,7 @@ import (
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	storage_v1 "github.com/chef/automate/components/authz-service/storage/v1"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
+	v2 "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/memstore"
 	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
 )
@@ -30,6 +31,7 @@ type policyServer struct {
 	store           storage.Storage
 	engine          engine.V2pXWriter
 	v1              storage_v1.PoliciesLister
+	vSwitch         *VersionSwitch
 	vChan           chan api.Version
 	policyRefresher PolicyRefresher
 }
@@ -48,9 +50,10 @@ func NewMemstorePolicyServer(
 	l logger.Logger,
 	e engine.V2pXWriter,
 	pl storage_v1.PoliciesLister,
+	vSwitch *VersionSwitch,
 	vChan chan api.Version) (PolicyServer, PolicyRefresher, error) {
 
-	return NewPoliciesServer(ctx, l, memstore.New(), e, pl, vChan)
+	return NewPoliciesServer(ctx, l, memstore.New(), e, pl, vSwitch, vChan)
 }
 
 // NewPostgresPolicyServer instantiates a server.Server that connects to a postgres backend
@@ -61,13 +64,14 @@ func NewPostgresPolicyServer(
 	migrationsConfig migration.Config,
 	dataMigrationsConfig datamigration.Config,
 	pl storage_v1.PoliciesLister,
+	vSwitch *VersionSwitch,
 	vChan chan api.Version) (PolicyServer, PolicyRefresher, error) {
 
 	s, err := postgres.New(ctx, l, migrationsConfig, dataMigrationsConfig)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "failed to initialize v2 store state")
 	}
-	return NewPoliciesServer(ctx, l, s, e, pl, vChan)
+	return NewPoliciesServer(ctx, l, s, e, pl, vSwitch, vChan)
 }
 
 // NewPoliciesServer returns a new IAM v2 Policy server.
@@ -77,6 +81,7 @@ func NewPoliciesServer(
 	s storage.Storage,
 	e engine.V2pXWriter,
 	pl storage_v1.PoliciesLister,
+	vSwitch *VersionSwitch,
 	vChan chan api.Version) (PolicyServer, PolicyRefresher, error) {
 
 	policyRefresher, err := NewPolicyRefresher(ctx, l, s, e)
@@ -89,6 +94,7 @@ func NewPoliciesServer(
 		store:           s,
 		engine:          e,
 		v1:              pl,
+		vSwitch:         vSwitch,
 		vChan:           vChan,
 		policyRefresher: policyRefresher,
 	}
@@ -140,7 +146,7 @@ func (s *policyServer) CreatePolicy(
 
 	// API requests always create custom policies.
 
-	pol, err := policyFromAPI(
+	pol, err := s.policyFromAPI(
 		req.Id,
 		req.Name,
 		storage.Custom,
@@ -241,7 +247,7 @@ func (s *policyServer) UpdatePolicy(
 
 	statements := make([]storage.Statement, len(req.Statements))
 	for i, statement := range req.Statements {
-		statementInt, err := statementFromAPI(statement)
+		statementInt, err := s.statementFromAPI(statement)
 		if err != nil {
 			return nil, status.Errorf(codes.InvalidArgument, "parse statement: %s", err.Error())
 		}
@@ -719,12 +725,16 @@ func (s *policyServer) updateEngineStore(ctx context.Context) error {
 /* * * * * * * * * * * * * * * * * *  CONVERTERS   * * * * * * * * * * * * * * * * * * */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-func policyFromAPI(ID, name string, typeVal storage.Type,
-	membersToAttach []string, statementsToAttach []*api.Statement, inProjects []string) (storage.Policy, error) {
+func (s *policyServer) policyFromAPI(
+	ID, name string,
+	typeVal storage.Type,
+	membersToAttach []string,
+	statementsToAttach []*api.Statement,
+	inProjects []string) (storage.Policy, error) {
 
 	statements := make([]storage.Statement, len(statementsToAttach))
 	for i, statement := range statementsToAttach {
-		statementInt, err := statementFromAPI(statement)
+		statementInt, err := s.statementFromAPI(statement)
 		if err != nil {
 			return storage.Policy{}, errors.Wrap(err, "parse statement")
 		}
@@ -848,7 +858,7 @@ func membersFromAPI(apiMembers []string) ([]storage.Member, error) {
 	return members, nil
 }
 
-func statementFromAPI(statement *api.Statement) (storage.Statement, error) {
+func (s *policyServer) statementFromAPI(statement *api.Statement) (storage.Statement, error) {
 	effect, err := effectFromAPI(statement.Effect)
 	if err != nil {
 		return storage.Statement{}, err
@@ -859,8 +869,18 @@ func statementFromAPI(statement *api.Statement) (storage.Statement, error) {
 		statement.Resources = []string{"*"}
 	}
 
-	// map external representation of "all projects" to actual ID for that meta-project
 	projects := make([]string, len(statement.Projects))
+
+	if len(statement.Projects) == 0 {
+		if s.isBeta2p1() {
+			// no projects is an error for v2.1
+			return v2.Statement{}, errors.New("policy statements must include projects")
+		}
+		// no projects OK for v2.0 but set to "all" to allow 2.1 upgrade to work when needed
+		projects = append(projects, constants.AllProjectsID)
+	}
+
+	// map external representation of "all projects" to actual ID for that meta-project
 	for i, project := range statement.Projects {
 		if project == constants.AllProjectsExternalID {
 			projects[i] = constants.AllProjectsID
@@ -901,4 +921,9 @@ func (s *policyServer) setVersionForInterceptorSwitch(v api.Version) {
 	if s.vChan != nil {
 		s.vChan <- v
 	}
+}
+
+func (s *policyServer) isBeta2p1() bool {
+	version := s.vSwitch.Version
+	return version.Major == api.Version_V2 && version.Minor == api.Version_V1
 }
