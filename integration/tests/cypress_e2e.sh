@@ -34,6 +34,8 @@ do_deploy() {
             ;;
     esac
 
+    export CYPRESS_IAM_VERSION=$IAM
+
     log_info "fixing dns resolution for '${CONTAINER_HOSTNAME}'"
     echo "127.0.0.1 ${CONTAINER_HOSTNAME}" >> /etc/hosts
 }

@@ -1,5 +1,8 @@
 {
   "projectId": "yvg8zo",
   "defaultCommandTimeout": 25000,
-  "pageLoadTimeout": 80000
+  "pageLoadTimeout": 80000,
+  "env": {
+    "adminTokenValue": ""
+  }
 }

@@ -6,5 +6,6 @@ declare namespace Cypress {
     logout(): Cypress.Chainable<Object>
     saveStorage(): void
     restoreStorage(): void
+    generateAdminToken(idToken: string): void
   }
 }

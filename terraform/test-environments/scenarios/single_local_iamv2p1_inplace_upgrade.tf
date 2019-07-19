@@ -34,6 +34,7 @@ module "single_local_iamv2p1_inplace_upgrade" {
     X-Deployment-Type  = "local"
     X-Channel          = "${var.channel}"
     X-CI-Test          = "e2e"
+    X-IAM              = "v2.1"
   }
 }
 

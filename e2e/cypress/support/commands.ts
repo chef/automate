@@ -66,6 +66,38 @@ Cypress.Commands.add("restoreStorage", () => {
   })
 })
 
+Cypress.Commands.add("generateAdminToken", (idToken: string) => {
+  const adminTokenObj = {
+    id: "cypress-api-test-admin-token",
+    name: "cypress-api-test-admin-token"
+  }
+
+  // cleanup token from previous test
+  cy.request({
+    auth: { bearer: idToken },
+    method: 'DELETE',
+    url: '/apis/iam/v2beta/tokens/cypress-api-test-admin-token',
+    failOnStatusCode: false
+  })
+
+  cy.request({
+    auth: { bearer: idToken },
+    method: 'POST',
+    url: '/apis/iam/v2beta/tokens',
+    body: adminTokenObj
+  }).then((response: Cypress.ObjectLike) => {
+    Cypress.env('adminTokenValue', response.body.token.value)
+  })
+  cy.request({
+    auth: { bearer: idToken },
+    method: 'POST',
+    url: '/apis/iam/v2beta/policies/administrator-access/members:add',
+    body: {
+      members: [`token:${adminTokenObj.id}`]
+    }
+  })
+})
+
 // helpers
 
 function LoginHelper(username: string) {
