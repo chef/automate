@@ -59,36 +59,60 @@
         </ng-container>
       </div>
       <chef-tab-selector> <!-- (change)="onSelectedTab($event)"> -->
-        <chef-option value='users'>Users</chef-option>
+        <chef-option value='users' routerLink="./" fragment="users">Users</chef-option>
+        <chef-option value='details' routerLink="./" fragment="details">Details</chef-option>
         <!-- Uncomment when we implement policies
         <chef-option value='policies'>Policies</chef-option>
         -->
       </chef-tab-selector>
     </chef-page-header>
-    <section class="page-body" *ngIf="team?.id">
-      <div id="users-list">
-        <div *ngIf="!teamMembershipView">
-          <!-- TODO remove [overridePermissionsCheck]=true once the UI is able to check specific objects
-          since the path to permission on here is /auth/teams/:id/users we'll have to show everything for now. -->
-          <app-user-table
-            [addButtonText]="addButtonText"
-            [removeText]="removeText"
-            [users$]="sortedUsers$"
-            [addButtonEnabled]="!editMode"
-            [baseUrl]="'/auth/users/' + team.id"
-            [overridePermissionsCheck]=true
-            (addClicked)="toggleUserMembershipView()"
-            (removeClicked)="removeUser($event)">
-          </app-user-table>
+    <ng-container *ngIf="tabValue === 'users'">
+      <section class="page-body" *ngIf="team?.id">
+        <div id="users-list">
+        <!-- <ng-container *ngIf="tabValue === 'users'">
+          <div *ngIf="(sortedUsers$ | async)?.length === 0" id="getting-started">Add the first users to get started!</div>
+        <ng-container *ngIf="tabValue === 'users'"></ng-container> -->
+          <div *ngIf="!teamMembershipView">
+            <!-- TODO remove [overridePermissionsCheck]=true once the UI is able to check specific objects
+            since the path to permission on here is /auth/teams/:id/users we'll have to show everything for now. -->
+            <app-user-table
+              [addButtonText]="addButtonText"
+              [removeText]="removeText"
+              [users$]="sortedUsers$"
+              [addButtonEnabled]="!editMode"
+              [baseUrl]="'/auth/users/' + team.id"
+              [overridePermissionsCheck]=true
+              (addClicked)="toggleUserMembershipView()"
+              (removeClicked)="removeUser($event)">
+            </app-user-table>
+          </div>
+          <div *ngIf="teamMembershipView">
+            <app-user-team-membership-table
+              [usersToFilter]="sortedUsers$"
+              (addClicked)="addUsers($event)"
+              (cancelClicked)="toggleUserMembershipView()">
+            </app-user-team-membership-table>
+          </div>
         </div>
-        <div *ngIf="teamMembershipView">
-          <app-user-team-membership-table
-            [usersToFilter]="sortedUsers$"
-            (addClicked)="addUsers($event)"
-            (cancelClicked)="toggleUserMembershipView()">
-          </app-user-team-membership-table>
-        </div>
-      </div>
-    </section>
+      </section>
+    </ng-container>
+    <ng-container *ngIf="tabValue === 'details'">
+      <section class="page-body">
+        <form [formGroup]="updateNameForm">
+          <chef-form-field>
+            <label>Name *</label>
+            <input chefInput formControlName="name" type="text">
+          </chef-form-field>
+        </form>
+        <chef-button primary [disabled]="!updateNameForm.valid || disableSave || saveInProgress" (click)="saveNameChange()">
+          <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
+          <ng-container *ngIf="!saveInProgress">
+            <span *ngIf="disableSave">Saved</span>
+            <span *ngIf="!disableSave">Save</span>
+          </ng-container>
+          <span *ngIf="saveInProgress">Saving...</span>
+        </chef-button>
+      </section>
+  </ng-container>
   </main>
 </div>

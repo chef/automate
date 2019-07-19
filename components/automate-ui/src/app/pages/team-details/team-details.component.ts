@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import { identity, keyBy, at } from 'lodash/fp';
 import { combineLatest, Observable, Subject } from 'rxjs';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
@@ -8,7 +8,7 @@ import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams, routeURL } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus, loading } from 'app/entities/entities';
 import { User, HashMapOfUsers } from 'app/entities/users/user.model';
 import { allUsers, userStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
@@ -38,7 +38,11 @@ const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
   styleUrls: ['./team-details.component.scss']
 })
 export class TeamDetailsComponent implements OnInit, OnDestroy {
-
+  public updateNameForm: FormGroup;
+  public disableSave = true;
+  public saveInProgress = false
+  public tabValue = 'users';
+  public url: string;
   public teamMembershipView = false;
   public editMode = false;
   public team: Team;
@@ -66,6 +70,25 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
+      .subscribe((url: string) => {
+        this.url = url;
+        const splitFragment = url.split('#');
+        if (splitFragment.length === 2) {
+          switch (splitFragment[1]) {
+            case 'details': {
+              this.tabValue = 'details';
+              break;
+            }
+            default: { // If the user passed an invalid fragment or #users
+              this.tabValue = 'users';
+            }
+          }
+        } else {
+          // Default to definition in the case of no fragment.
+          this.tabValue = 'users';
+        }
+      });
     this.store.select(iamMajorVersion)
       .pipe(takeUntil(this.isDestroyed))
       .subscribe((version) => {
@@ -156,6 +179,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
   private getUsersForTeam(team: Team) {
     this.team = team;
+    this.updateNameForm.controls['name'].setValue(this.team.name);
     this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
     this.store.dispatch(new GetUsers());
   }
@@ -200,5 +224,30 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     if (state === EntityStatus.loadingSuccess) {
       this.editMode = false;
     }
+  }
+
+  public handleNameChange(): void {
+    this.disableSave = this.updateNameForm.controls['name'].value === this.team.name;
+  }
+
+  public saveNameChange(): void {
+    this.saveInProgress = true;
+    const teamToSave = <Team>Object.assign({}, this.team);
+    teamToSave.name = this.updateNameForm.controls['name'].value.trim();
+    this.store.dispatch(new UpdateTeam(teamToSave));
+
+    const pendingSave = new Subject<boolean>();
+    this.store.pipe(
+      select(updateStatus),
+      filter(identity),
+      takeUntil(pendingSave))
+      .subscribe((state) => {
+        if (!loading(state)) {
+          pendingSave.next(true);
+          pendingSave.complete();
+          this.saveInProgress = false;
+          this.disableSave = true;
+        }
+      });
   }
 }
