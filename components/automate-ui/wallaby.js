@@ -1,6 +1,6 @@
 // This "config" file comes from:
 // URL: https://github.com/wallabyjs/ngCliWebpackSample/
-// Commit: 0128211c848270eb6c38ca7093ef1647fd9b3247
+// Commit: 59ed9ba96ca00b21d1f637b593afa7e245ccae3b
 
 module.exports = function (wallaby) {
   const wallabyWebpack = require('wallaby-webpack');
@@ -12,12 +12,13 @@ module.exports = function (wallaby) {
 
   const projects = Object.keys(angularConfig.projects).map(key => {
     return { name: key, ...angularConfig.projects[key] };
-  }).filter(project => project.sourceRoot);
+  }).filter(project => project.sourceRoot)
+    .filter(project => project.projectType !== 'application' ||
+      (project.architect &&
+        project.architect.test &&
+        project.architect.test.builder === '@angular-devkit/build-angular:karma'));
 
-  const applications = projects
-    .filter(project => project.projectType === 'application')
-    .filter(project => project.architect && project.architect.test &&
-      project.architect.test.builder === '@angular-devkit/build-angular:karma');
+  const applications = projects.filter(project => project.projectType === 'application');
   const libraries = projects.filter(project => project.projectType === 'library');
 
   const tsConfigFile = projects
@@ -46,7 +47,7 @@ module.exports = function (wallaby) {
     ],
 
     tests: [
-      ...projects.map(project => ({
+      ...applications.map(project => ({
         pattern: project.sourceRoot + specPattern,
         load: false
       }))
