@@ -166,19 +166,6 @@ FROM service AS s
 SELECT count(*)
   FROM service;
 `
-
-	// TODO: move to the relevant files
-	deleteSupsWithoutServices = `
-DELETE FROM supervisor WHERE NOT EXISTS (SELECT 1 FROM service WHERE service.sup_id = supervisor.id )
-`
-
-	deleteSvcGroupsWithoutServices = `
-DELETE FROM service_group WHERE NOT EXISTS (SELECT 1 FROM service WHERE service.group_id = service_group.id )
-`
-
-	deleteDeploymentsWithoutServices = `
-DELETE FROM deployment WHERE NOT EXISTS (SELECT 1 FROM service WHERE service.deployment_id = deployment.id )
-`
 )
 
 // GetServicesHealthCounts retrieves the health counts from all services in the database.

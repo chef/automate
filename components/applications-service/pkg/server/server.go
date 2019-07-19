@@ -287,9 +287,6 @@ func (app *ApplicationsServer) GetDisconnectedServices(ctx context.Context,
 func (app *ApplicationsServer) DeleteDisconnectedServices(ctx context.Context,
 	request *applications.DisconnectedServicesReq) (*applications.ServicesRes, error) {
 
-	// TODO remove this comment
-	// applications_grpcurl -d '{"threshold_minutes": 5}' chef.automate.api.applications.ApplicationsService.DeleteDisconnectedServices
-
 	thresholdMinutes := request.GetThresholdMinutes()
 	if thresholdMinutes <= 0 {
 		return new(applications.ServicesRes),

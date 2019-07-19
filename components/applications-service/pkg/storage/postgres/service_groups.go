@@ -96,6 +96,10 @@ OFFSET $2
 SELECT count(*)
   FROM service_group;
 `
+
+	deleteSvcGroupsWithoutServices = `
+DELETE FROM service_group WHERE NOT EXISTS (SELECT 1 FROM service WHERE service.group_id = service_group.id )
+`
 )
 
 // serviceGroupHealth matches the results from the SELECT GroupHealth Query
