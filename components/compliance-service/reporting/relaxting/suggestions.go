@@ -3,6 +3,7 @@ package relaxting
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"sort"
 
 	"strings"
@@ -228,10 +229,11 @@ func (backend ES2Backend) getArrayAggSuggestions(client *elastic.Client, typePar
 		matchQuery := elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text)
 		boolQuery = boolQuery.Must(matchQuery)
 	}
-
-	aggs := elastic.NewTermsAggregation().Field(fmt.Sprintf("%s.lower", target)).Size(100)
+	// multiplying the size by 50 as elasticsearch will sort array aggregations by doc_count. Will trim it back to size once we match it again in go
+	aggs := elastic.NewTermsAggregation().Field(fmt.Sprintf("%s.lower", target)).Size(size * 50)
 	if len(text) >= 2 {
-		aggs = aggs.Include(".*" + strings.ToLower(text) + ".*")
+		regex := buildRegexForTextTokens(strings.ToLower(text))
+		aggs = aggs.Include(regex)
 	}
 	searchSource := elastic.NewSearchSource().
 		Query(boolQuery).
@@ -489,4 +491,29 @@ func (backend ES2Backend) getControlSuggestions(client *elastic.Client, typePara
 		}
 	}
 	return suggs, nil
+}
+
+// For the string "Apache Linux" ".*apache.*|.*linux.*" will be returned.
+// The space and the colon are the only delineators
+func buildRegexForTextTokens(text string) string {
+	tokenDelineators := ` |:`
+	tokens := regexp.MustCompile(tokenDelineators).Split(text, -1)
+
+	regex := ".*"
+	first := true
+	for _, token := range tokens {
+		// skip tokens with 1 or less characters
+		if len(token) < 2 {
+			continue
+		}
+		if first {
+			regex = regex + token
+			first = false
+			continue
+		}
+
+		regex = regex + ".*|.*" + token
+	}
+
+	return regex + ".*"
 }
