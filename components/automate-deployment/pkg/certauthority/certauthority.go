@@ -82,10 +82,21 @@ type ServiceCertData struct {
 
 const caNameFmt = "Chef Automate %s"
 
-// expiryMargin is how far before the NotAfter time on an x509
-// certificate we will mark the certificate as needing to be
-// regenerated.
-var expiryMargin = 28 * (time.Hour * 24)
+var (
+	// expiryMargin is how far before the NotAfter time on an x509
+	// certificate we will mark the certificate as needing to be
+	// regenerated.
+	expiryMargin = 28 * (time.Hour * 24)
+
+	// notBeforeMargin is how far before a NotBefore time on an
+	// x509 certificate we will allow without marking the
+	// certificate as needing to be regenerated. The thinking
+	// behind this margin is that if the NotBefore time is near,
+	// then it likely is worth it it to wait rather than
+	// regenerating a certificate that would then need to be
+	// redeployed to the relevant applications.
+	notBeforeMargin = 5 * time.Minute
+)
 
 // NotSignedByCA is returned by validation functions when the
 // certificate being validated is not signed by the CA doing
@@ -124,6 +135,15 @@ func (c *CertExpired) Error() string {
 	}
 
 	return fmt.Sprintf("Certificate expires in %s which is less than the %s expiry window", timeLeft, c.window)
+}
+
+type CertNotYetValid struct{ notBefore time.Time }
+
+func NewCertNotYetValid(notBefore time.Time) *CertNotYetValid {
+	return &CertNotYetValid{notBefore: notBefore}
+}
+func (c *CertNotYetValid) Error() string {
+	return fmt.Sprintf("Certificate is not valid until %s (%s from now)", c.notBefore, time.Until(c.notBefore))
 }
 
 // SANIPAddrMismatch is an error returned by validation functions when
@@ -293,6 +313,10 @@ func (a *CertAuthority) ValidateCA() error {
 		return NewCertExpired(a.rootCert.NotAfter, expiryMargin)
 	}
 
+	if time.Until(a.rootCert.NotBefore) > notBeforeMargin {
+		return NewCertNotYetValid(a.rootCert.NotBefore)
+	}
+
 	return nil
 }
 
@@ -323,6 +347,10 @@ func (a *CertAuthority) ValidateCertificateForRequest(cert *x509.Certificate, ce
 		return NewCertExpired(cert.NotAfter, expiryMargin)
 	}
 
+	if time.Until(cert.NotBefore) > notBeforeMargin {
+		return NewCertNotYetValid(cert.NotBefore)
+	}
+
 	if cert.Subject.CommonName != certRequest.name {
 		return NewCommonNameMismatch(certRequest.name, cert.Subject.CommonName)
 	}
@@ -342,10 +370,11 @@ func (r CertRequest) String() string {
 }
 
 func CertForLog(cert *x509.Certificate) string {
-	return fmt.Sprintf("Certificate{Subject: %s Issuer:, %s NotAfter: %s, IPAddresses: %v, DNSNames: %v}",
+	return fmt.Sprintf("Certificate{Subject: %s Issuer:, %s NotAfter: %s, NotBefore: %s, IPAddresses: %v, DNSNames: %v}",
 		cert.Subject,
 		cert.Issuer,
 		cert.NotAfter,
+		cert.NotBefore,
 		cert.IPAddresses,
 		cert.DNSNames,
 	)
