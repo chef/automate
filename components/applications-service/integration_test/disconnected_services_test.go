@@ -12,35 +12,52 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/chef/automate/api/external/applications"
 )
 
-func TestGetDisconnectedServicesMustProvideThresholdError(t *testing.T) {
+func TestDisconnectedServicesMustProvideThresholdError(t *testing.T) {
 	var (
 		ctx      = context.Background()
 		request  = new(applications.DisconnectedServicesReq)
 		expected = new(applications.ServicesRes)
 	)
-	response, err := suite.ApplicationsServer.GetDisconnectedServices(ctx, request)
-	assert.NotNil(t, err)
-	assert.Contains(t, err.Error(), "InvalidArgument")
-	assert.Contains(t, err.Error(), "threshold must be greater than zero")
-	assert.Equal(t, expected, response)
+	t.Run("GetDisconnectedServices with no params", func(t *testing.T) {
+		response, err := suite.ApplicationsServer.GetDisconnectedServices(ctx, request)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "InvalidArgument")
+		assert.Contains(t, err.Error(), "threshold must be greater than zero")
+		assert.Equal(t, expected, response)
+	})
+	t.Run("DeleteDisconnectedServices with no params", func(t *testing.T) {
+		response, err := suite.ApplicationsServer.DeleteDisconnectedServices(ctx, request)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "InvalidArgument")
+		assert.Contains(t, err.Error(), "threshold must be greater than zero")
+		assert.Equal(t, expected, response)
+	})
 }
 
-func TestGetDisconnectedServicesBasicNoData(t *testing.T) {
+func TestDisconnectedServicesBasicNoData(t *testing.T) {
 	var (
 		ctx      = context.Background()
 		request  = &applications.DisconnectedServicesReq{ThresholdMinutes: 5}
 		expected = &applications.ServicesRes{Services: []*applications.Service{}}
 	)
-	response, err := suite.ApplicationsServer.GetDisconnectedServices(ctx, request)
-	assert.Nil(t, err)
-	assert.Equal(t, expected, response)
+	t.Run("GetDisconnectedServices with no data", func(t *testing.T) {
+		response, err := suite.ApplicationsServer.GetDisconnectedServices(ctx, request)
+		require.NoError(t, err)
+		assert.Equal(t, expected, response)
+	})
+	t.Run("DeleteDisconnectedServices with no data", func(t *testing.T) {
+		response, err := suite.ApplicationsServer.DeleteDisconnectedServices(ctx, request)
+		require.NoError(t, err)
+		assert.Equal(t, expected, response)
+	})
 }
 
-func TestGetDisconnectedServicesBasicSingleServiceMockedAsDisconnected(t *testing.T) {
+func TestDisconnectedServicesBasicSingleServiceMockedAsDisconnected(t *testing.T) {
 	defer suite.DeleteDataFromStorage()
 
 	var (
@@ -76,15 +93,26 @@ func TestGetDisconnectedServicesBasicSingleServiceMockedAsDisconnected(t *testin
 
 	// Patch event timestamp to mock an old service message and mack it as disconnected
 	event.EventMetadata.OccurredAt, err = ptypes.TimestampProto(time.Now().Add(-time.Minute * 5))
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	suite.IngestService(event)
 
-	response, err := suite.ApplicationsServer.GetDisconnectedServices(ctx, request)
-	assert.Nil(t, err)
-	assertServicesEqual(t, expected.GetServices(), response.GetServices())
+	t.Run("GetDisconnectedServices with one disconnected service", func(t *testing.T) {
+		response, err := suite.ApplicationsServer.GetDisconnectedServices(ctx, request)
+		require.NoError(t, err)
+		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+	})
+	t.Run("DeleteDisconnectedServices with one disconnected service", func(t *testing.T) {
+		response, err := suite.ApplicationsServer.DeleteDisconnectedServices(ctx, request)
+		require.NoError(t, err)
+		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+		// verify we deleted it:
+		response, err = suite.ApplicationsServer.GetDisconnectedServices(ctx, request)
+		require.NoError(t, err)
+		assertServicesEqual(t, []*applications.Service{}, response.GetServices())
+	})
 }
 
-func TestGetDisconnectedServicesMultiServicesMixedConnectedAndDisconnected(t *testing.T) {
+func TestDisconnectedServicesMultiServicesMixedConnectedAndDisconnected(t *testing.T) {
 	defer suite.DeleteDataFromStorage()
 
 	var (
@@ -118,24 +146,47 @@ func TestGetDisconnectedServicesMultiServicesMixedConnectedAndDisconnected(t *te
 		withFqdn("mytest.example.com"),
 		withSite("testsite"),
 	)
+	// Patch event timestamp to mock an old service message, but one that is within the disconnected threshold
+	event.EventMetadata.OccurredAt, err = ptypes.TimestampProto(time.Now().Add(-time.Minute * 2))
 	suite.IngestService(event)
 
 	// Ingest service number two, different service because the supervisor id changes
 	UpdateHabitatEvent(event,
 		withSupervisorId("efgh"),
 	)
-	// Patch event timestamp to mock an old service message and mack it as disconnected
+	// Patch event timestamp to mock an old service message and mock it as disconnected
 	event.EventMetadata.OccurredAt, err = ptypes.TimestampProto(time.Now().Add(-time.Minute * 5))
 	assert.Nil(t, err)
 	suite.IngestService(event)
 
-	// We should only have a single disconnected service back
-	response, err := suite.ApplicationsServer.GetDisconnectedServices(ctx, request)
-	assert.Nil(t, err)
-	assertServicesEqual(t, expected.GetServices(), response.GetServices())
+	t.Run("GetDisconnectedServices with mixed connected and not", func(t *testing.T) {
+		// We should only have a single disconnected service back
+		response, err := suite.ApplicationsServer.GetDisconnectedServices(ctx, request)
+		require.NoError(t, err)
+		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+	})
+	t.Run("DeleteDisconnectedServices with mixed connected and not", func(t *testing.T) {
+		// We should only have a single disconnected service deleted
+		response, err := suite.ApplicationsServer.DeleteDisconnectedServices(ctx, request)
+		require.NoError(t, err)
+		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+
+		// After it's deleted, we shouldn't see the deleted one in GetDisconnectedServices
+		response, err = suite.ApplicationsServer.GetDisconnectedServices(ctx, request)
+		require.NoError(t, err)
+		assertServicesEqual(t, []*applications.Service{}, response.GetServices())
+
+		// We should see the other service if we use a threshold of 0
+		req2 := &applications.DisconnectedServicesReq{ThresholdMinutes: 1}
+		response, err = suite.ApplicationsServer.GetDisconnectedServices(ctx, req2)
+		require.NoError(t, err)
+		notDisconnectedSvcs := expected.GetServices()
+		notDisconnectedSvcs[0].SupervisorId = "abcd"
+		assertServicesEqual(t, notDisconnectedSvcs, response.GetServices())
+	})
 }
 
-func TestGetDisconnectedServicesMultiServicesAllConnected(t *testing.T) {
+func TestDisconnectedServicesMultiServicesAllConnected(t *testing.T) {
 	defer suite.DeleteDataFromStorage()
 
 	var (
@@ -146,9 +197,21 @@ func TestGetDisconnectedServicesMultiServicesAllConnected(t *testing.T) {
 
 	suite.IngestServices(habServicesMatrix())
 
-	// We should have no disconnected services
-	response, err := suite.ApplicationsServer.GetDisconnectedServices(ctx, request)
-	assert.Nil(t, err)
-	assert.Equal(t, expected, response)
-	assertServicesEqual(t, expected.GetServices(), response.GetServices())
+	t.Run("GetDisconnectedServices with several connected services", func(t *testing.T) {
+		// We should have no disconnected services
+		response, err := suite.ApplicationsServer.GetDisconnectedServices(ctx, request)
+		require.NoError(t, err)
+		assert.Equal(t, expected, response)
+		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+	})
+	t.Run("DeleteDisconnectedServices with several connected services", func(t *testing.T) {
+		// Nothing should be deleted:
+		response, err := suite.ApplicationsServer.DeleteDisconnectedServices(ctx, request)
+		require.NoError(t, err)
+		assert.Equal(t, expected, response)
+		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+		// the services should be there:
+		sgList := suite.GetServiceGroups()
+		assert.Len(t, sgList, 4)
+	})
 }
