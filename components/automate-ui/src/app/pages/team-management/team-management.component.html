@@ -26,12 +26,11 @@
             <chef-thead>
               <chef-tr>
                 <chef-th class="id-column">
-                  <span *ngIf="(iamMajorVersion$ | async) === 'v1'">Name</span>
-                  <span *ngIf="(iamMajorVersion$ | async) !== 'v1'">ID</span>
+                  <span>Name</span>
                 </chef-th>
                 <chef-th class="name-column">
                   <span *ngIf="(iamMajorVersion$ | async) === 'v1'">Description</span>
-                  <span *ngIf="(iamMajorVersion$ | async) !== 'v1'">Name</span>
+                  <span *ngIf="(iamMajorVersion$ | async) !== 'v1'">ID</span>
                 </chef-th>
                 <chef-th class="button-column"></chef-th>
               </chef-tr>
@@ -41,10 +40,11 @@
                 <chef-td class="id-column">
                   <!-- we must continue to use the guid as the identifier for teams while on v1 -->
                   <a *ngIf="(iamMajorVersion$ | async) === 'v1'" [routerLink]="['/settings/teams', team.guid]">{{ team.id }}</a>
-                  <a *ngIf="(iamMajorVersion$ | async) !== 'v1'" [routerLink]="['/settings/teams', team.id]">{{ team.id }}</a>
+                  <a *ngIf="(iamMajorVersion$ | async) !== 'v1'" [routerLink]="['/settings/teams', team.id]">{{ team.name }}</a>
                 </chef-td>
                 <chef-td class="name-column">
-                  {{ team.name }}
+                  <span *ngIf="(iamMajorVersion$ | async) === 'v1'">{{ team.name }}</span>
+                  <span *ngIf="(iamMajorVersion$ | async) !== 'v1'">{{ team.id }}</span>
                 </chef-td>
                 <chef-td class="button-column">
                   <!-- <app-authorized [allOf]="[`/auth/teams/${team.id}`, 'delete']"> -->
