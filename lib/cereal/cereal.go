@@ -230,8 +230,10 @@ func (w *workflowInstanceImpl) EnqueueTask(taskName string, parameters interface
 
 func (w *workflowInstanceImpl) Complete(opts ...CompleteOpts) Decision {
 	if len(w.tasks) > 0 {
-		panic("cannot call EnqueueTask and Complete() in same workflow step!")
+		logrus.Errorf("cannot call EnqueueTask and Complete in same workflow step! failing workflow")
+		return Decision{failed: true, err: errors.New("EnqueueTask and Complete called in same workflow step")}
 	}
+
 	d := Decision{
 		complete: true,
 	}
@@ -772,29 +774,24 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 		if err != nil {
 			logctx.WithError(err).Error("failed to complete workflow")
 		}
-
 		s.End("complete")
 	} else if decision.continuing {
 		s.Begin("enqueue_task")
 		for _, t := range decision.tasks {
 			err := completer.EnqueueTask(&t, backend.TaskEnqueueOpts{})
 			if err != nil {
-				// TODO(ssd) 2019-05-15: What do we
-				// want to do here? I think we need to
-				// rollback and have the workflow run
-				// again.
 				logrus.WithError(err).Error("failed to enqueue task!")
+				return true
 			}
 		}
 		s.End("enqueue_task")
 		s.Begin("continue")
 		jsonPayload, err := jsonify(decision.payload)
 		if err != nil {
-			logrus.WithError(err).Error("could not marshal payload to JSON, completing workflow")
-			// TODO: We need to fail workflows
-			err := completer.Done(nil)
+			logrus.WithError(err).Error("could not marshal payload to JSON, failing workflow")
+			err := completer.Fail(err)
 			if err != nil {
-				logrus.WithError(err).Error("failed to complete workflow after JSON marshal failure")
+				logrus.WithError(err).Error("failed to fail workflow after JSON marshal failure")
 			}
 		} else {
 			err := completer.Continue(jsonPayload)
@@ -804,8 +801,8 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 		}
 		s.End("continue")
 	}
-	logrus.Debugf("Processed Workflow: %s", s)
 
+	logrus.Debugf("Processed Workflow: %s", s)
 	return false
 }
 
