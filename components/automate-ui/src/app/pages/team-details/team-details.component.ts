@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
 import { identity, keyBy, at } from 'lodash/fp';
 import { combineLatest, Observable, Subject } from 'rxjs';
@@ -7,7 +8,6 @@ import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams, routeURL } from 'app/route.selectors';
-import { Regex } from 'app/helpers/auth/regex';
 import { EntityStatus, loading } from 'app/entities/entities';
 import { User, HashMapOfUsers } from 'app/entities/users/user.model';
 import { allUsers, userStatus } from 'app/entities/users/user.selectors';
@@ -44,9 +44,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public tabValue = 'users';
   public url: string;
   public teamMembershipView = false;
-  public editMode = false;
   public team: Team;
-  public editForm: FormGroup;
   private isV1 = true;
 
   public sortedUsers$: Observable<User[]>;
@@ -56,9 +54,9 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public removeText = 'Remove User';
 
   constructor(private store: Store<NgrxStateAtom>,
-    private fb: FormBuilder
+    public fb: FormBuilder,
+    private router: Router
   ) {
-    this.createForms(this.fb);
     this.updateNameForm = fb.group({
       // Must stay in sync with error checks in team-details.component.html
       name: ['', Validators.required]
@@ -161,24 +159,11 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
             }
           });
       });
-
-    this.store.select(updateStatus).pipe(
-      takeUntil(this.isDestroyed))
-      .subscribe((state: EntityStatus) => {
-        this.handleSave(state);
-      });
  }
 
   ngOnDestroy() {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
-  }
-
-  private createForms(fb: FormBuilder): void {
-    this.editForm = fb.group({
-      // Must stay in sync with error checks in team-details.component.html
-      teamName: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
-    });
   }
 
   private getUsersForTeam(team: Team) {
@@ -210,26 +195,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     }));
   }
 
-  updateTeam(): void {
-    const newTeam = <Team>Object.assign(
-      {}, this.team, { name: this.editForm.get('teamName').value });
-    this.store.dispatch(new UpdateTeam(newTeam));
-  }
-
-  setEditMode(isEditMode: boolean): void {
-    this.editForm.patchValue(
-      {
-        teamName: this.team.name
-      });
-    this.editMode = isEditMode;
-  }
-
-  handleSave(state: EntityStatus): void {
-    if (state === EntityStatus.loadingSuccess) {
-      this.editMode = false;
-    }
-  }
-
   public handleNameChange(): void {
     this.disableSave = this.updateNameForm.controls['name'].value === this.team.name;
   }
@@ -253,5 +218,11 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
           this.disableSave = true;
         }
       });
+  }
+
+  onSelectedTab(event): void {
+    this.tabValue = event.target.value;
+    // Current URL sans any now outdated fragment.
+    this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
 }

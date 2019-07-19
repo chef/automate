@@ -10,76 +10,38 @@
 
     <chef-page-header>
       <div class="flex-container">
-        <ng-container *ngIf="!editMode">
-          <div class="heading-container">
-            <chef-heading>{{team?.id}}</chef-heading>
-            <chef-subheading>{{team?.name}}</chef-subheading>
-          </div>
-          <div class="edit-container">
-              <!-- TODO (ms) Once the chef-button bug that allows enter to fire click
-              event on disabled buttons is fixed, this can be written as one button
-              with `[disabled]="teamMembershipView"`. -->
-            <chef-button secondary (click)="setEditMode(true)" *ngIf="!teamMembershipView">
-              <span>Edit</span>
-            </chef-button>
-            <chef-button primary disabled *ngIf="teamMembershipView">
-              <span>Edit</span>
-            </chef-button>
-          </div>
-        </ng-container>
-        <ng-container *ngIf="editMode">
-          <div class="form-container">
-            <form [formGroup]="editForm">
-              <chef-heading>{{team?.id}}</chef-heading>
-              <chef-form-field id="edit-name">
-                <label>
-                  <span class="label">Team {{ versionedDescOrName | titlecase }}</span>
-                  <chef-input ngDefaultControl formControlName="teamName" type="text"></chef-input>
-                </label>
-                <chef-error *ngIf="(editForm.get('teamName').hasError('required') || editForm.get('teamName').hasError('pattern')) && editForm.get('teamName').dirty">
-                  Team {{ versionedDescOrName | titlecase }} is required.
-                </chef-error>
-              </chef-form-field>
-            </form>
-          </div>
-          <div class="button-container">
-            <ng-container>
-              <!-- TODO (tc) Once the chef-button bug that allows enter to fire click
-              event on disabled buttons is fixed, this can be written as one button
-              with `[disabled]="!this.editForm.valid"`. -->
-              <chef-button class="save-button" primary (click)="updateTeam()" *ngIf="this.editForm.valid">
-                <span>Save</span>
-              </chef-button>
-              <chef-button class="save-button" primary disabled *ngIf="!this.editForm.valid">
-                <span>Save</span>
-              </chef-button>
-              <chef-button tertiary (click)="setEditMode(false)">Cancel</chef-button>
-            </ng-container>
-          </div>
-        </ng-container>
+        <div class="heading-container">
+          <!-- TODO name heading -->
+          <!-- ID label? -->
+          <!-- team ID -->
+          <chef-heading>{{team?.id}}</chef-heading>
+          <chef-subheading>{{team?.name}}</chef-subheading>
+        </div>
       </div>
-      <chef-tab-selector> <!-- (change)="onSelectedTab($event)"> -->
+      <chef-tab-selector (change)="onSelectedTab($event)" [value]="tabValue">
         <chef-option value='users' routerLink="./" fragment="users">Users</chef-option>
         <chef-option value='details' routerLink="./" fragment="details">Details</chef-option>
-        <!-- Uncomment when we implement policies
-        <chef-option value='policies'>Policies</chef-option>
-        -->
       </chef-tab-selector>
     </chef-page-header>
     <ng-container *ngIf="tabValue === 'users'">
       <section class="page-body" *ngIf="team?.id">
         <div id="users-list">
-        <!-- <ng-container *ngIf="tabValue === 'users'">
-          <div *ngIf="(sortedUsers$ | async)?.length === 0" id="getting-started">Add the first users to get started!</div>
-        <ng-container *ngIf="tabValue === 'users'"></ng-container> -->
-          <div *ngIf="!teamMembershipView">
+          <ng-container *ngIf="(sortedUsers$ | async)?.length === 0">
+            <div id="getting-started">Add the first users to get started!</div>
+            <!-- TODO use same button for user table? -->
+            <chef-toolbar>
+              <chef-button primary (click)="toggleUserMembershipView()">Add Users</chef-button>
+            </chef-toolbar>
+          </ng-container>
+          <!-- TODO fix this conditional -->
+          <div *ngIf="!teamMembershipView && (sortedUsers$ | async)?.length > 0">
             <!-- TODO remove [overridePermissionsCheck]=true once the UI is able to check specific objects
             since the path to permission on here is /auth/teams/:id/users we'll have to show everything for now. -->
             <app-user-table
               [addButtonText]="addButtonText"
               [removeText]="removeText"
               [users$]="sortedUsers$"
-              [addButtonEnabled]="!editMode"
+              [addButtonEnabled]=true
               [baseUrl]="'/auth/users/' + team.id"
               [overridePermissionsCheck]=true
               (addClicked)="toggleUserMembershipView()"
