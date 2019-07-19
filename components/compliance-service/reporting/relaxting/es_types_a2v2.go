@@ -123,6 +123,7 @@ type ESInSpecReportControlA2v2 struct {
 	Title   string                              `json:"title"`
 	Status  string                              `json:"status"`
 	Results []*ESInSpecReportControlsResultA2v2 `json:"results"`
+	Tags    string                              `json:"tags"`
 }
 
 type ESInSpecReportMinA2v2 struct {

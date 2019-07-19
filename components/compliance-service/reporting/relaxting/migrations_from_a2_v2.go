@@ -3,10 +3,13 @@ package relaxting
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting/util"
+	"github.com/golang/protobuf/jsonpb"
+	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -25,6 +28,7 @@ type A2V2ElasticSearchIndices struct {
 type missingControlMeta struct {
 	Title  string
 	Impact float32
+	Tags   string
 }
 type missingProfileMeta struct {
 	Title    string
@@ -87,6 +91,7 @@ func addProfileToMap(esProfile *ESInSpecReportProfileA2v2, profileId string) {
 		profilesMetaMap[profileId].Controls[control.ID] = missingControlMeta{
 			control.Title,
 			control.Impact,
+			control.Tags,
 		}
 	}
 }
@@ -298,11 +303,50 @@ func convertA2v2ReportDocToLatest(src *ESInSpecReportA2v2, dstSum *ESInSpecSumma
 		// Convert the controls within a profile
 		dstRep.Profiles[i].Controls = make([]ESInSpecReportControl, len(srcProfileMin.Controls))
 		for j, srcProfileMinControl := range srcProfileMin.Controls {
+			stringTags := make([]ESInSpecReportControlStringTags, 0)
+			var controlTags structpb.Struct
+			logrus.Infof("!!!! reportID = %s, profileID = %s, srcProfileMinControl.Tags = %s", src.ReportID, srcProfileMin.Name, srcProfileMinControl.Tags)
+			err := (&jsonpb.Unmarshaler{}).Unmarshal(strings.NewReader(srcProfileMinControl.Tags), &controlTags)
+			if err == nil {
+				for fKey, fValue := range controlTags.Fields {
+					// Add key with a null value as an empty array for values
+					if _, isNullValue := fValue.GetKind().(*structpb.Value_NullValue); isNullValue {
+						stringTags = append(stringTags, ESInSpecReportControlStringTags{
+							Key:    fKey,
+							Values: make([]string, 0),
+						})
+					}
+
+					// Add key with a string value
+					if _, isStringValue := fValue.GetKind().(*structpb.Value_StringValue); isStringValue {
+						stringTags = append(stringTags, ESInSpecReportControlStringTags{
+							Key:    fKey,
+							Values: []string{fValue.GetStringValue()},
+						})
+					}
+
+					// Add key with array of string values
+					if _, isListValue := fValue.GetKind().(*structpb.Value_ListValue); isListValue {
+						stringValues := make([]string, 0)
+						for _, listValue := range fValue.GetListValue().Values {
+							if _, isStringValue := listValue.GetKind().(*structpb.Value_StringValue); isStringValue {
+								stringValues = append(stringValues, listValue.GetStringValue())
+							}
+						}
+						stringTags = append(stringTags, ESInSpecReportControlStringTags{
+							Key:    fKey,
+							Values: stringValues,
+						})
+					}
+				}
+			}
+
 			dstRep.Profiles[i].Controls[j] = ESInSpecReportControl{
-				ID:     srcProfileMinControl.ID,
-				Title:  profilesMetaMap[srcProfileMin.SHA256].Controls[srcProfileMinControl.ID].Title,
-				Impact: profilesMetaMap[srcProfileMin.SHA256].Controls[srcProfileMinControl.ID].Impact,
-				Status: srcProfileMinControl.Status,
+				ID:         srcProfileMinControl.ID,
+				Title:      profilesMetaMap[srcProfileMin.SHA256].Controls[srcProfileMinControl.ID].Title,
+				Impact:     profilesMetaMap[srcProfileMin.SHA256].Controls[srcProfileMinControl.ID].Impact,
+				Status:     srcProfileMinControl.Status,
+				StringTags: stringTags,
 			}
 
 			// Convert the results within a control
