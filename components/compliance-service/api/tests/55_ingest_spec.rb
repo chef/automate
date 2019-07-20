@@ -152,16 +152,16 @@ describe File.basename(__FILE__) do
     exp_rep_profiles = {
       "profiles": [
         {
-          "name": "apache-baseline",
-          "title": "DevSec Apache Baseline",
-          "id": "3e1310b071dc4d706263e9d07083e10a92b4b69e4a36cffa1eda7eaecc09969a",
-          "version": "2.0.2",
-          "status": "skipped"
+          "name": "ssl-baseline",
+          "title": "DevSec SSL/TLS Baseline",
+          "id": "a9e6a3c330193aa1396939ae1ec277024f4e7df5337852616fc5bc0bdc746a84",
+          "version": "1.4.0",
+          "status": "passed"
         }
       ],
       "counts": {
         "total": 1,
-        "skipped": 1
+        "passed": 1
       }
     }.to_json
     assert_equal_json_sorted(exp_rep_profiles, act_rep_profiles.to_json)
