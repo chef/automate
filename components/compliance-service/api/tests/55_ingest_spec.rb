@@ -51,7 +51,7 @@ describe File.basename(__FILE__) do
         tags: [],
         type: "exec",
         nodes: [docker_node_id1],
-        profiles: ["https://github.com/dev-sec/apache-baseline/archive/2.0.2.tar.gz"],
+        profiles: ["https://github.com/dev-sec/ssl-baseline/archive/1.4.0.tar.gz"],
         retries: 1,
         node_selectors: []
       )
@@ -110,22 +110,24 @@ describe File.basename(__FILE__) do
           "latestReport": {
             "id": report_id,
             "endTime": "1970-01-01T00:00:01Z",
-            "status": "skipped",
+            "status": "passed",
             "controls": {
-              "total": 14,
-              "passed": {},
+              "total": 33,
+              "passed": {
+                "total": 1
+              },
               "skipped": {
-                "total": 14
+                "total": 32
               },
               "failed": {}
             }
           },
           "profiles": [
             {
-              "id": "3e1310b071dc4d706263e9d07083e10a92b4b69e4a36cffa1eda7eaecc09969a",
-              "name": "apache-baseline",
-              "status": "skipped",
-              "version": "2.0.2"
+              "id": "a9e6a3c330193aa1396939ae1ec277024f4e7df5337852616fc5bc0bdc746a84",
+              "name": "ssl-baseline",
+              "status": "passed",
+              "version": "1.4.0"
             }
           ]
         }
