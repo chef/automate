@@ -6,7 +6,8 @@
   "scripts": {
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "cypress:record": "cypress run --record"
+    "cypress:record": "cypress run --record",
+    "lint": "tslint -p tsconfig.json"
   },
   "repository": {
     "type": "git",
