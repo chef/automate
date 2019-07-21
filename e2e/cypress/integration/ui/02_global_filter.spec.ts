@@ -4,9 +4,12 @@ interface CreateProject {
 }
 
 describe('global projects filter', () => {
-  const proj1 = <CreateProject>{ id: 'cypress-project-1', name: 'Cypress Project 1 ' + Cypress.moment().format('MMDDYYhhmm') };
-  const proj2 = <CreateProject>{ id: 'cypress-project-2', name: 'Cypress Project 2 ' + Cypress.moment().format('MMDDYYhhmm')};
-  const proj3 = <CreateProject>{ id: 'cypress-project-3', name: 'Cypress Project 3 ' + Cypress.moment().format('MMDDYYhhmm') };
+  const proj1 = <CreateProject>
+    { id: 'cypress-project-1', name: 'Cypress Project 1 ' + Cypress.moment().format('MMDDYYhhmm') };
+  const proj2 = <CreateProject>
+    { id: 'cypress-project-2', name: 'Cypress Project 2 ' + Cypress.moment().format('MMDDYYhhmm')};
+  const proj3 = <CreateProject>
+    { id: 'cypress-project-3', name: 'Cypress Project 3 ' + Cypress.moment().format('MMDDYYhhmm') };
   // TODO uncomment with non-admin test
   // const pol_id = "cypress-policy"
   // const nonAdminUsername = "nonadmin"

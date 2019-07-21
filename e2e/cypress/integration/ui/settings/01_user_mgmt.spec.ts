@@ -69,7 +69,8 @@ describe('user management', () => {
   //     })
 
   //     cy.get('[formcontrolname=newPassword]').find('input').type(updated_password).then(() => {
-  //       cy.get('[formcontrolname=confirmPassword]').find('input').type(updated_password).then(() => {
+  //       cy.get('[formcontrolname=confirmPassword]').find('input').type(updated_password)
+  //         .then(() => {
   //         cy.get('chef-button').contains('Update Password').click().then(() => {
   //           // success alert displays
   //           cy.get('chef-notification.info').should('be.visible')
@@ -84,14 +85,16 @@ describe('user management', () => {
 
   // it("can delete user", () => {
   //   // find the created user row
-  //   cy.get('chef-tbody chef-tr').contains(name).parent().parent().find('chef-control-menu').as('control-menu')
+  //   cy.get('chef-tbody chef-tr').contains(name).parent().parent()
+  //     .find('chef-control-menu').as('control-menu')
 
   //   cy.get('@control-menu').click().then(() => {
 
   //     // force:true disables waiting for actionability
+  // tslint:disable-next-line:max-line-length
   //     // https://docs.cypress.io/guides/core-concepts/interacting-with-elements.html#Actionability
-  //     // in this case, the delete button is hidden under the control menu so we decrease test flakiness
-  //     // by having less stringent checks before clicking
+  //     // in this case, the delete button is hidden under the control menu so we decrease
+  //     // test flakiness by having less stringent checks before clicking
   //     cy.get('@control-menu').find('[data-cy=delete]').click({ force: true }).then(() => {
   //       // confirm user delete
   //       cy.get('chef-button').contains('Delete User').click().then(() => {

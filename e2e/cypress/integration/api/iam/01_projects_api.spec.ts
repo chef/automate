@@ -50,6 +50,7 @@ describe('projects API', () => {
 
           // Cypress recommends state cleanup in the before block to ensure
           // it gets run every time:
+          // tslint:disable-next-line:max-line-length
           // https://docs.cypress.io/guides/references/best-practices.html#Using-after-or-afterEach-hooks
           cleanupTestProjects(admin.id_token);
 
@@ -317,7 +318,7 @@ function waitForNodes(idToken: string, totalNodes: number, retries: number, maxR
       if (retries > maxRetries) {
         return;
       }
-      if (resp.body.length == totalNodes + 4) {
+      if (resp.body.length === totalNodes + 4) {
         return;
       }
 

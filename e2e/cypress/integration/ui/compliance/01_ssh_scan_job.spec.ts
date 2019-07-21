@@ -35,8 +35,10 @@ describe('create a manual node ssh scan job and cleanup after', () => {
 
       // fill in name for credential, username, and password
       cy.get('form input[formcontrolname="name"]').first().type(credName);
-      cy.get('form input[formcontrolname="username"]').first().type(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_USERNAME'));
-      cy.get('form input[formcontrolname="password"]').first().type(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_PASSWORD'));
+      cy.get('form input[formcontrolname="username"]').first()
+        .type(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_USERNAME'));
+      cy.get('form input[formcontrolname="password"]').first()
+        .type(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_PASSWORD'));
 
       // we save the route that will be called when we navigate to the page
       // in order to be able to wait for it later
@@ -83,7 +85,8 @@ describe('create a manual node ssh scan job and cleanup after', () => {
         cy.url().should('include', '/compliance/scan-jobs/nodes/add');
 
         // fill in hostname and select a credential for the node
-        cy.get('form input[formcontrolname="hosts"]').type(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_HOST'));
+        cy.get('form input[formcontrolname="hosts"]')
+          .type(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_HOST'));
         // add a prefix to ensure the node is at top of list
         cy.get('form input[formcontrolname="customPrefix"]').type(nodePrefix);
         cy.get('form select[formcontrolname="secrets"]').select(credName);
@@ -128,10 +131,11 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     // click on market profiles tab
     cy.get('chef-option[value="available"]').click().then(() => {
       cy.contains('CIS Amazon Linux 2 Benchmark Level 1').parent().parent().as('row');
-      cy.get('@row').contains('Get').parent().invoke('show').parent().invoke('show').click().then(() => {
-        // assert table has profile
-        cy.contains('CIS Amazon Linux 2 Benchmark Level 1').should('exist');
-      });
+      cy.get('@row').contains('Get').parent().invoke('show').parent().invoke('show').click()
+        .then(() => {
+          // assert table has profile
+          cy.contains('CIS Amazon Linux 2 Benchmark Level 1').should('exist');
+        });
     });
   });
 
