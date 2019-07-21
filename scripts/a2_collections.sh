@@ -130,12 +130,12 @@ authLoad() {
       # v1 resources work by just re-using output of authQuery except for users, which need a password added
       # TODO: check that all v2 resources work
       if [[ "$RESOURCE" == "users" ]]; then
-        line=$(jq -c '. += {"password": "chefautomate"}' <<< "$line")
+        line=$(jq -c '. += {password: "chefautomate"}' <<< "$line")
       fi
       if [[ "$show_cmd" == 1 ]] || [[ "$dry_run" == 1 ]]; then 
         echo "curl -sSkH \"api-token: \$token\" \"$host/$auth_path/$RESOURCE\" -d '$line'"
       fi
-      if [[ "$dry_run" == "" ]]; then 
+      if [[ -z "$dry_run" ]]; then 
         curl -sSkH "api-token: $token" "$host/$auth_path/$RESOURCE" -d "$line"
         echo
       fi
@@ -207,7 +207,8 @@ function create_resource {
   local id_index=$(($3 + SEED))
   local id=$ID_PREFIX-$id_index
   local name="$ID_PREFIX $id_index"
-  local json=""
+  local json
+  local resource
   case "$RESOURCE" in
     tokens)
       json=$(jo -p id="$id" name="$name" description="test token for $name" active=true)
@@ -220,7 +221,7 @@ function create_resource {
       json=$(jo id="$id" name="$name" description="test team for $name")
       resource=$RESOURCE ;;
     team-members)
-      # just add a 100 members to each team
+      # just add 100 members to each team
       json=$(jq -n --argjson n 100 'reduce range(1; $n) as $i (.; .user_ids += ["test-user-\($i)"])')
       resource="teams/test-teams-$id_index/users:add" ;;
     policies)
