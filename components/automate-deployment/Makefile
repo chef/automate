@@ -281,7 +281,7 @@ else
 endif
 
 proxy-diagnostics:
-	cd proxy && docker-compose exec a2-host /proxy/chef-automate diagnostics run
+	cd proxy && docker-compose exec a2-host /proxy/chef-automate diagnostics run ~iam-v2
 
 proxy-gather-logs:
 	cd proxy && mkdir -p logs && docker-compose exec a2-host bash -c "journalctl -u chef-automate > /proxy/logs/journal"
@@ -306,7 +306,7 @@ basic-a1-migrate: guard-HAB_ORIGIN
 	cd basic-a1 && docker-compose exec basic-a1 /basic-a1/chef-automate upgrade-from-v1 --channel dev --upgrade-strategy none --yes --skip-backup-check --override-origin ${HAB_ORIGIN} --hartifacts /a2/results
 
 basic-a1-diagnostics:
-	cd basic-a1 && docker-compose exec basic-a1 /basic-a1/chef-automate diagnostics run
+	cd basic-a1 && docker-compose exec basic-a1 /basic-a1/chef-automate diagnostics run ~iam-v2
 
 basic-a1-do-all: guard-HAB_ORIGIN basic-a1-build basic-a1-start-chef-server basic-a1-up basic-a1-reconfigure-chef-server basic-a1-migrate basic-a1-diagnostics basic-a1-test
 
