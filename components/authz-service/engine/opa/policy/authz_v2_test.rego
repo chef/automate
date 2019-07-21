@@ -225,6 +225,22 @@ test_authorized_project_returns_all_input_projects_when_projects_mixed_with_wild
 	actual_projects == {"p1", "p3", "p5"}
 }
 
+test_authorized_project_with_multiple_policies_returns_all_input_projects_due_to_wildcard {
+	actual_projects = authorized_project with data.policies as {
+		"pol1": {
+			"members": ["x"],
+			"statements": {"s1": {"effect": "allow", "actions": ["y"], "resources": ["*"], "projects": ["p1", "p2"]}},
+		},
+		"pol2": {
+			"members": ["*"],
+			"statements": {"s2": {"effect": "allow", "actions": ["iam:introspect:*"], "resources": ["*"], "projects": [common.const_all_projects]}},
+		},
+	}
+		 with input as {"subjects": ["x"], "action": "iam:introspect:getAllProjects", "resource": "z", "projects": ["p1", "p2", "p3"]}
+
+	actual_projects == {"p1", "p2", "p3"}
+}
+
 test_authorized_project_real_data {
 	actual_projects = authorized_project with data.policies.polid as {
 		"members": ["team:local:viewers"],
