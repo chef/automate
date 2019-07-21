@@ -148,7 +148,7 @@ function converge_chef_client() {
     curl -L -o "${chef_server_compliance_profiles_test_path}/ssl-baseline-1.4.0.tar.gz" https://github.com/dev-sec/ssl-baseline/archive/1.4.0.tar.gz
     # TODO: Upload the profile instead of relying on the migration
     hab svc unload chef/compliance-service
-    sleep 4
+    sleep 10
     chef-automate status -w -t 120 || return 1
   fi
   umask "$previous_umask"
