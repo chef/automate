@@ -191,7 +191,10 @@ authGen() {
   SEED=$4
   ID_PREFIX=test-$RESOURCE
   if [[ ! $MODE =~ ^(create|delete)$ ]]; then echo "mode must be 'create' or 'delete'"; return; fi
-  if [[ ! $RESOURCE =~ ^(tokens|users|teams|team-members|policies)$ ]]; then echo "resource must be in: tokens, users, teams, team-members, policies"; return; fi
+  if [[ ! $RESOURCE =~ ^(tokens|users|teams|team-members|policies|rules)$ ]]; then
+    echo "resource must be in: tokens, users, teams, team-members, policies, rules"
+    return
+  fi
 
   operation="${MODE}_resource"
   echo "$MODE $COUNT $RESOURCE..."
@@ -226,6 +229,10 @@ function create_resource {
       resource="teams/test-teams-$id_index/users:add" ;;
     policies)
       json=$(jo subjects="$(jo -a token:test-tokens-$id_index)" action=read resource="compliance:*")
+      resource=$RESOURCE ;;
+    rules)
+      # note: requires adding "foo-project" first
+      json=$(jo id="$id" name="$name" type=NODE project_id=foo-project conditions='[{"operator":"MEMBER_OF","attribute":"CHEF_SERVERS","values":["prod","staging"]}]')
       resource=$RESOURCE ;;
   esac
   curl -sSkH "api-token: $token" "$host/$auth_path/$resource" -X POST --data "$json"
