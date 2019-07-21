@@ -76,7 +76,7 @@ authQuery () {
 
   # execute
   if [[ "$show_cmd" == 1 ]]; then 
-    echo "curl -sSkH \"api-token: \$token\" -H \"$projects\" \"$host/$auth_path/$1\" | jq $jq_option '$jq_script'"
+    echo "curl -sSkH \"api-token: \$TOK\" -H \"$projects\" \"$host/$auth_path/$1\" | jq $jq_option '$jq_script'"
   fi
   curl -sSkH "api-token: $token" -H "$projects" "$host/$auth_path/$1" | jq $jq_option "$jq_script"
 }
