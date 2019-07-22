@@ -195,7 +195,7 @@ function kill_running_service() {
   verify_component $1 || return $?
   local component=$1
   SERVICE_PID=$(grep_component_pid $component)
-  if [[ ! -z ${SERVICE_PID} ]]; then
+  if [[ -n ${SERVICE_PID} ]]; then
     kill $SERVICE_PID
   fi
 }
@@ -222,7 +222,7 @@ function auto_go_update_component() {
   install_if_missing core/inotify-tools inotifywait
   log_line "Starting file watch for $component"
   inotifywait -m -r /src/components/$component -e create -e moved_to -e close_write |
-    while read path action file; do
+    while read -r path action file; do
         if [[ "$file" =~ .*go$ ]]; then
           log_line "File: $file change in $component"
           go_update_component $component

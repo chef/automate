@@ -72,7 +72,7 @@ function stop_automate_ui {
   install_if_missing core/busybox-static pgrep;
   local UI_PID
   UI_PID=$(pgrep npm);
-  if [ ! -z "$UI_PID" ]; then
+  if [ -n "$UI_PID" ]; then
     log_line "Stopping automate-ui PID '$(red "$UI_PID")'"
     kill "$UI_PID"
 
@@ -173,7 +173,7 @@ function _prepare_chef_ui_library(){
     _install_nodejs_from_nvmrc
     log_line "Installing npm modules for chef-ui-library (npm install)"
     npm install
-    _verify_stencil_cli_from_node_modules chef-ui-library 
+    _verify_stencil_cli_from_node_modules chef-ui-library
     _maybe_rebuild_node_sass
   popd >/dev/null || return 1
 }
@@ -183,7 +183,7 @@ function _verify_if_automate_ui_running() {
   install_if_missing core/busybox-static pgrep
   local UI_PID
   UI_PID=$(pgrep npm)
-  if [ ! -z "$UI_PID" ]; then
+  if [ -n "$UI_PID" ]; then
     warn "The $(red automate-ui) is already running with PID '$(red "$UI_PID")'"
     warn "Stop the process with '$(green stop_automate_ui)' retry.'"
     return 0
@@ -246,7 +246,7 @@ function _maybe_rebuild_node_sass {
 # (Internal) Install nodejs from the .nvmrc file.
 # If it can't find that file this function will fail.
 function _install_nodejs_from_nvmrc() {
-  if [ ! -z "$(node -v 2>/dev/null)" ]; then
+  if [ -n "$(node -v 2>/dev/null)" ]; then
     log_line "Using NodeJS $(node -v)"
     return 0
   fi
