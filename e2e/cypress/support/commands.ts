@@ -1,31 +1,31 @@
 // Cypress Commands: any action that could be taken in any test
 
-Cypress.Commands.add("login", (url: string, username: string) => {
+Cypress.Commands.add('login', (url: string, username: string) => {
   // CYPRESS_BASE_URL environment variable must be set
-  cy.visit(url)
+  cy.visit(url);
 
   // only environments using SAML or LDAP present this login method selection
   return cy.location('pathname')
     .then((path: any) => path.startsWith('/dex/auth/local'))
     .then((local: any) => {
       if (local) {
-        LoginHelper(username)
+        LoginHelper(username);
       } else {
-        cy.get('button').contains('Log in with Username').click().then(() => LoginHelper(username))
+        cy.get('button').contains('Log in with Username').click().then(() => LoginHelper(username));
       }
-    })
-})
+    });
+});
 
-Cypress.Commands.add("adminLogin", (url: string) => {
+Cypress.Commands.add('adminLogin', (url: string) => {
   // CYPRESS_BASE_URL environment variable must be set
-  return cy.login(url, 'admin')
-})
+  return cy.login(url, 'admin');
+});
 
-Cypress.Commands.add("logout", () => {
-  cy.get('[data-cy=user-profile-button]').click()
-  cy.get('[data-cy=sign-out-button]').click()
-  return cy.url().should('include', '/dex/auth')
-})
+Cypress.Commands.add('logout', () => {
+  cy.get('[data-cy=user-profile-button]').click();
+  cy.get('[data-cy=sign-out-button]').click();
+  return cy.url().should('include', '/dex/auth');
+});
 
 interface MemoryMap {
   [key: string]: any;
@@ -35,17 +35,17 @@ let LOCAL_STORAGE_MEMORY: MemoryMap = {};
 let SESSION_MEMORY: MemoryMap = {};
 
 
-Cypress.Commands.add("saveStorage", () => {
+Cypress.Commands.add('saveStorage', () => {
   Object.keys(localStorage).forEach(key => {
     LOCAL_STORAGE_MEMORY[key] = localStorage[key];
   });
   Object.keys(sessionStorage).forEach(key => {
     SESSION_MEMORY[key] = sessionStorage[key];
   });
-})
+});
 
 
-Cypress.Commands.add("restoreStorage", () => {
+Cypress.Commands.add('restoreStorage', () => {
   Object.keys(LOCAL_STORAGE_MEMORY).forEach(key => {
     localStorage.setItem(key, LOCAL_STORAGE_MEMORY[key]);
   });
@@ -53,9 +53,9 @@ Cypress.Commands.add("restoreStorage", () => {
     sessionStorage.setItem(key, SESSION_MEMORY[key]);
   });
 
-  cy.server()
+  cy.server();
   // mock refresh token call in case it fails
-  let user = JSON.parse(<string>localStorage.getItem('chef-automate-user'))
+  const user = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
   cy.route({
     method: 'GET',
     url: '**/session/refresh',
@@ -63,14 +63,14 @@ Cypress.Commands.add("restoreStorage", () => {
     response: {
       id_token: user.id_token
     }
-  })
-})
+  });
+});
 
-Cypress.Commands.add("generateAdminToken", (idToken: string) => {
+Cypress.Commands.add('generateAdminToken', (idToken: string) => {
   const adminTokenObj = {
-    id: "cypress-api-test-admin-token",
-    name: "cypress-api-test-admin-token"
-  }
+    id: 'cypress-api-test-admin-token',
+    name: 'cypress-api-test-admin-token'
+  };
 
   // cleanup token from previous test
   cy.request({
@@ -78,7 +78,7 @@ Cypress.Commands.add("generateAdminToken", (idToken: string) => {
     method: 'DELETE',
     url: '/apis/iam/v2beta/tokens/cypress-api-test-admin-token',
     failOnStatusCode: false
-  })
+  });
 
   cy.request({
     auth: { bearer: idToken },
@@ -86,8 +86,8 @@ Cypress.Commands.add("generateAdminToken", (idToken: string) => {
     url: '/apis/iam/v2beta/tokens',
     body: adminTokenObj
   }).then((response: Cypress.ObjectLike) => {
-    Cypress.env('adminTokenValue', response.body.token.value)
-  })
+    Cypress.env('adminTokenValue', response.body.token.value);
+  });
   cy.request({
     auth: { bearer: idToken },
     method: 'POST',
@@ -95,27 +95,27 @@ Cypress.Commands.add("generateAdminToken", (idToken: string) => {
     body: {
       members: [`token:${adminTokenObj.id}`]
     }
-  })
-})
+  });
+});
 
 // helpers
 
 function LoginHelper(username: string) {
-  cy.url().should('include', '/dex/auth/local')
-  cy.server()
-  cy.route('POST', '/api/v0/auth/introspect_some').as('getAuth')
+  cy.url().should('include', '/dex/auth/local');
+  cy.server();
+  cy.route('POST', '/api/v0/auth/introspect_some').as('getAuth');
 
   // login
-  cy.get('#login').type(username)
-  cy.get('#password').type('chefautomate')
+  cy.get('#login').type(username);
+  cy.get('#password').type('chefautomate');
 
   cy.get('[type=submit]').click().then(() => {
-    expect(localStorage.getItem('chef-automate-user')).to.contain(username)
+    expect(localStorage.getItem('chef-automate-user')).to.contain(username);
 
     // close welcome modal if present
-    cy.get('app-welcome-modal').invoke('hide')
-    cy.saveStorage()
+    cy.get('app-welcome-modal').invoke('hide');
+    cy.saveStorage();
 
-    cy.wait('@getAuth')
-  })
+    cy.wait('@getAuth');
+  });
 }

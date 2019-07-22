@@ -289,6 +289,15 @@ steps:
       executor:
         docker:
 
+  - label: "[static] e2e"
+    command:
+      - cd e2e
+      - npm install && npm run lint
+    timeout_in_minutes: 5
+    expeditor:
+      executor:
+        docker:
+
   - label: "[unit] compliance-service"
     command:
       - scripts/install_golang.sh

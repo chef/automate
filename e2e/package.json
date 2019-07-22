@@ -6,7 +6,8 @@
   "scripts": {
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "cypress:record": "cypress run --record"
+    "cypress:record": "cypress run --record",
+    "lint": "tslint -p tsconfig.json"
   },
   "repository": {
     "type": "git",
@@ -18,9 +19,10 @@
     "cypress": "^3.4.0"
   },
   "devDependencies": {
-    "typescript": "^2.9.2",
-    "webpack": "^4.35.3",
     "@cypress/webpack-preprocessor": "^4.1.0",
-    "ts-loader": "^6.0.4"
+    "ts-loader": "^6.0.4",
+    "tslint": "^5.18.0",
+    "typescript": "^2.9.2",
+    "webpack": "^4.35.3"
   }
 }
