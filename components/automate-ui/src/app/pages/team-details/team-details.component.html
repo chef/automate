@@ -26,15 +26,8 @@
     <ng-container *ngIf="tabValue === 'users'">
       <section class="page-body" *ngIf="team?.id">
         <div id="users-list">
-          <ng-container *ngIf="(sortedUsers$ | async)?.length === 0">
-            <div id="getting-started">Add the first users to get started!</div>
-            <!-- TODO use same button for user table? -->
-            <chef-toolbar>
-              <chef-button primary (click)="toggleUserMembershipView()">Add Users</chef-button>
-            </chef-toolbar>
-          </ng-container>
           <!-- TODO fix this conditional -->
-          <div *ngIf="!teamMembershipView && (sortedUsers$ | async)?.length > 0">
+          <div *ngIf="!teamMembershipView">
             <!-- TODO remove [overridePermissionsCheck]=true once the UI is able to check specific objects
             since the path to permission on here is /auth/teams/:id/users we'll have to show everything for now. -->
             <app-user-table

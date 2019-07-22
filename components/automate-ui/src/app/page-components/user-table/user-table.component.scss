@@ -1,3 +1,5 @@
+@import "~styles/variables";
+
 chef-table {
   .name-column {
     flex-basis: 30%;
@@ -10,4 +12,10 @@ chef-table {
   .garbage-column {
     justify-content: flex-end;
   }
+}
+
+#getting-started {
+  margin: 8px 0;
+  font-size: 14px;
+  color: $chef-dark-grey;
 }
