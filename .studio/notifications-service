@@ -120,7 +120,7 @@ function notifications_update_component() {
   pushd /src/components/notifications-service/server >/dev/null;
     mix local.hex --force
     mix local.rebar --force
-    MIX_ENV=habitat mix do deps.get, compile
+    MIX_ENV=habitat mix "do" deps.get, compile
     returnStatus=$?
   popd >/dev/null;
 
