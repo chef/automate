@@ -2,7 +2,7 @@
 
 build_changed() {
     hab pkg install core/ruby
-    PATH=$PATH:$(hab pkg path core/ruby)/bin
+    PATH=$(hab pkg path core/ruby)/bin:$PATH
     export PATH
     sudo "$(hab pkg path core/ruby)/bin/gem" install toml
 

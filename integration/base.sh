@@ -108,6 +108,8 @@ do_build() {
 }
 
 do_build_default() {
+    previous_umask=$(umask)
+    umask 022
     if [[ "$BUILDKITE" = "true" ]]; then
        log_info "Downloading pre-build artifacts"
        download_hartifacts
@@ -134,6 +136,7 @@ do_build_default() {
     build_tools
     log_info "Copying packages to hab artifact cache"
     copy_hartifacts "$test_hartifacts_path"
+    umask "$previous_umask"
 }
 
 do_create_config() {
