@@ -41,37 +41,36 @@ do_build() {
   # Disabling Usage Analytics
   export NG_CLI_ANALYTICS=false
 
-  for dir in $CACHE_PATH/chef-ui-library $CACHE_PATH/automate-ui; do
-    pushd $dir
-      echo "Building $dir"
-      # --unsafe-perm lets our package.json install task copy files when running
-      # as superuser during the hab package building.
-      # Copied from Habitat's node scaffolding:
-      # https://github.com/habitat-sh/core-plans/blob/be88f083c123ab998711fd3a93976ad10492a955/scaffolding-node/lib/scaffolding.sh#L111-L116
-      npm install \
+  local dir=$CACHE_PATH/automate-ui
+  pushd $dir
+    echo "Building $dir"
+    # --unsafe-perm lets our package.json install task copy files when running
+    # as superuser during the hab package building.
+    # Copied from Habitat's node scaffolding:
+    # https://github.com/habitat-sh/core-plans/blob/be88f083c123ab998711fd3a93976ad10492a955/scaffolding-node/lib/scaffolding.sh#L111-L116
+    npm install \
+      --unsafe-perm \
+      --production \
+      --loglevel error \
+      --fetch-retries 5
+    # Angular CLI isn't included in production deps so we need to install it manually.
+    npm install \
         --unsafe-perm \
-        --production \
         --loglevel error \
-        --fetch-retries 5
-      # Angular CLI isn't included in production deps so we need to install it manually.
-      npm install \
-          --unsafe-perm \
-          --loglevel error \
-          --fetch-retries 5 \
-          @angular/cli
+        --fetch-retries 5 \
+        @angular/cli
 
-      # Fix the interpreters of the binaries
-      for b in node_modules/.bin/*; do
-        fix_interpreter "$(readlink -f -n "$b")" core/coreutils bin/env
-      done
+    # Fix the interpreters of the binaries
+    for b in node_modules/.bin/*; do
+      fix_interpreter "$(readlink -f -n "$b")" core/coreutils bin/env
+    done
 
-      # Compile the Angular application
-      npm run build:prod
+    # Compile the Angular application
+    npm run build:prod
 
-      # Remove Angular CLI after the build
-      npm uninstall @angular/cli --no-save
-    popd
-  done
+    # Remove Angular CLI after the build
+    npm uninstall @angular/cli --no-save
+  popd
 }
 
 do_install() {
