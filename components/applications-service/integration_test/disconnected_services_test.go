@@ -109,6 +109,17 @@ func TestDisconnectedServicesBasicSingleServiceMockedAsDisconnected(t *testing.T
 		response, err = suite.ApplicationsServer.GetDisconnectedServices(ctx, request)
 		require.NoError(t, err)
 		assertServicesEqual(t, []*applications.Service{}, response.GetServices())
+
+		stats, err := suite.ApplicationsServer.GetServicesStats(ctx, &applications.ServicesStatsReq{})
+		require.NoError(t, err)
+
+		expectedStats := &applications.ServicesStatsRes{
+			TotalServices:      0,
+			TotalServiceGroups: 0,
+			TotalSupervisors:   0,
+			TotalDeployments:   0,
+		}
+		assert.Equal(t, expectedStats, stats)
 	})
 }
 
@@ -183,6 +194,17 @@ func TestDisconnectedServicesMultiServicesMixedConnectedAndDisconnected(t *testi
 		notDisconnectedSvcs := expected.GetServices()
 		notDisconnectedSvcs[0].SupervisorId = "abcd"
 		assertServicesEqual(t, notDisconnectedSvcs, response.GetServices())
+
+		stats, err := suite.ApplicationsServer.GetServicesStats(ctx, &applications.ServicesStatsReq{})
+		require.NoError(t, err)
+
+		expectedStats := &applications.ServicesStatsRes{
+			TotalServices:      1,
+			TotalServiceGroups: 1,
+			TotalSupervisors:   1,
+			TotalDeployments:   1,
+		}
+		assert.Equal(t, expectedStats, stats)
 	})
 }
 
@@ -213,5 +235,16 @@ func TestDisconnectedServicesMultiServicesAllConnected(t *testing.T) {
 		// the services should be there:
 		sgList := suite.GetServiceGroups()
 		assert.Len(t, sgList, 4)
+
+		stats, err := suite.ApplicationsServer.GetServicesStats(ctx, &applications.ServicesStatsReq{})
+		require.NoError(t, err)
+
+		expectedStats := &applications.ServicesStatsRes{
+			TotalServices:      10,
+			TotalServiceGroups: 4,
+			TotalSupervisors:   4,
+			TotalDeployments:   1,
+		}
+		assert.Equal(t, expectedStats, stats)
 	})
 }

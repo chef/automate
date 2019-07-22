@@ -21,6 +21,7 @@ func TestStatsWhenEmpty(t *testing.T) {
 			TotalServices:      0,
 			TotalServiceGroups: 0,
 			TotalSupervisors:   0,
+			TotalDeployments:   0,
 		}
 	)
 
@@ -37,6 +38,7 @@ func TestStatsWithOne(t *testing.T) {
 			TotalServices:      1,
 			TotalServiceGroups: 1,
 			TotalSupervisors:   1,
+			TotalDeployments:   1,
 		}
 		mockHabService = NewHabitatEvent(
 			withSupervisorId("sup2"),
@@ -62,6 +64,7 @@ func TestStatsWithSeveral(t *testing.T) {
 			TotalServices:      10,
 			TotalServiceGroups: 4,
 			TotalSupervisors:   4,
+			TotalDeployments:   1,
 		}
 		mockHabServicesMatrix = habServicesMatrix()
 	)
