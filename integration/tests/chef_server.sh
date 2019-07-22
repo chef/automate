@@ -47,6 +47,7 @@ liveness_error_dump() {
     ps fuax
     log_error "Dumping /var/log/chef/automate-liveness-agent/automate-liveness-agent.log:"
     cat /var/log/chef/automate-liveness-agent/automate-liveness-agent.log
+    find /hab/pkgs -printf "%M %p\n"
 }
 
 do_test_deploy() {
