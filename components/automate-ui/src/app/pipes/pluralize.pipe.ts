@@ -26,8 +26,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class PluralizePipe implements PipeTransform {
 
-  transform(value, word, suffix: string): string {
-    const isSingular = value && +value === 1;
+  transform(value: number, word: string, suffix: string): string {
+    const isSingular = value === 1;
     const plainSuffix = suffix.replace(/^\+/, '');
     if (plainSuffix !== suffix) {
       return value + ' ' + word + (isSingular ? '' : plainSuffix);
