@@ -24,7 +24,7 @@ func init() {
 		"Pass this flag when the environment is airgapped")
 	RootCmd.AddCommand(preflightCheckCmd)
 
-	preflightCheckCmd.AddCommand(newUpgradePreflightCmd())
+	preflightCheckCmd.AddCommand(newMigratePreflightCmd())
 }
 
 var preflightCmdFlags = struct {
@@ -49,72 +49,73 @@ func runPreflightCheckCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-var upgradePreflightCmdFlags = upgradeCmdFlagSet{}
+var migratePreflightCmdFlags = migrateCmdFlagSet{}
 
-func newUpgradePreflightCmd() *cobra.Command {
+func newMigratePreflightCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "upgrade-from-v1",
-		RunE:  runUpgradePreflight,
-		Short: "Run preflight checks specific to upgrading from Chef Automate v1",
+		Use:     "migrate-from-v1",
+		RunE:    runMigratePreflight,
+		Short:   "Run preflight checks specific to migrating from Chef Automate v1",
+		Aliases: []string{"upgrade-from-v1"},
 	}
 
 	cmd.PersistentFlags().StringVarP(
-		&upgradePreflightCmdFlags.deliverySecretsPath,
+		&migratePreflightCmdFlags.deliverySecretsPath,
 		"delivery-secrets",
 		"s",
 		"/etc/delivery/delivery-secrets.json",
 		"Path to delivery-secrets.json")
 	cmd.PersistentFlags().StringVarP(
-		&upgradePreflightCmdFlags.deliveryRunningPath,
+		&migratePreflightCmdFlags.deliveryRunningPath,
 		"delivery-running",
 		"r",
 		"/etc/delivery/delivery-running.json",
 		"Path to delivery-running.json")
 
 	cmd.PersistentFlags().BoolVar(
-		&upgradePreflightCmdFlags.skipBackupCheck,
+		&migratePreflightCmdFlags.skipBackupCheck,
 		"skip-backup-check",
 		false,
 		"Optionally do not check if your Chef Automate v1 installation has backups configured (default = false)")
 	cmd.PersistentFlags().BoolVar(
-		&upgradePreflightCmdFlags.skipDisasterRecoveryCheck,
+		&migratePreflightCmdFlags.skipDisasterRecoveryCheck,
 		"skip-disaster-recovery-check",
 		false,
 		"Optionally do not check if your Chef Automate v1 installation has disaster recovery configured (default = false)")
 	cmd.PersistentFlags().BoolVar(
-		&upgradePreflightCmdFlags.skipExternalESCheck,
+		&migratePreflightCmdFlags.skipExternalESCheck,
 		"skip-external-es-check",
 		false,
 		"Optionally do not check if your Chef Automate v1 installation has external Elasticsearch configured (default = false)")
 	cmd.PersistentFlags().BoolVar(
-		&upgradePreflightCmdFlags.skipFIPSCheck,
+		&migratePreflightCmdFlags.skipFIPSCheck,
 		"skip-fips-check",
 		false,
 		"Optionally do not check if your Chef Automate v1 installation has FIPS configured (default = false)")
 	cmd.PersistentFlags().BoolVar(
-		&upgradePreflightCmdFlags.skipSAMLCheck,
+		&migratePreflightCmdFlags.skipSAMLCheck,
 		"skip-saml-check",
 		false,
 		"Optionally do not check if your Chef Automate v1 installation has SAML configured (default = false)")
 
 	cmd.PersistentFlags().BoolVar(
-		&upgradePreflightCmdFlags.skipWorkflowCheck,
+		&migratePreflightCmdFlags.skipWorkflowCheck,
 		"skip-workflow-check",
 		false,
 		"Optionally do not check if your Chef Automate v1 installation has workflow configured (default = false)")
 
 	cmd.PersistentFlags().BoolVar(
-		&upgradePreflightCmdFlags.airgapPreflight,
+		&migratePreflightCmdFlags.airgapPreflight,
 		"airgap",
 		false,
 		"Pass this flag when the environment is airgapped")
 
 	// Chef Server flags (hidden)
-	cmd.PersistentFlags().BoolVar(&upgradePreflightCmdFlags.enableChefServer,
-		"enable-chef-server", false, "Enable Chef Server upgrade checks")
+	cmd.PersistentFlags().BoolVar(&migratePreflightCmdFlags.enableChefServer,
+		"enable-chef-server", false, "Enable Chef Server migration checks")
 
 	cmd.PersistentFlags().StringVar(
-		&upgradePreflightCmdFlags.chefServerRunningPath,
+		&migratePreflightCmdFlags.chefServerRunningPath,
 		"chef-server-running",
 		"/etc/opscode/chef-server-running.json",
 		"Path to chef-server-running.json")
@@ -135,29 +136,29 @@ func newUpgradePreflightCmd() *cobra.Command {
 	return cmd
 }
 
-func runUpgradePreflight(cmd *cobra.Command, args []string) error {
+func runMigratePreflight(cmd *cobra.Command, args []string) error {
 	u, err := a1upgrade.NewA1Upgrade(
-		a1upgrade.WithDeliveryRunning(upgradePreflightCmdFlags.deliveryRunningPath),
+		a1upgrade.WithDeliveryRunning(migratePreflightCmdFlags.deliveryRunningPath),
 
-		a1upgrade.WithDeliverySecrets(upgradePreflightCmdFlags.deliverySecretsPath),
+		a1upgrade.WithDeliverySecrets(migratePreflightCmdFlags.deliverySecretsPath),
 
-		a1upgrade.WithChefServerRunning(upgradePreflightCmdFlags.chefServerRunningPath, upgradePreflightCmdFlags.enableChefServer),
+		a1upgrade.WithChefServerRunning(migratePreflightCmdFlags.chefServerRunningPath, migratePreflightCmdFlags.enableChefServer),
 
-		a1upgrade.SkipBackupConfiguredCheck(upgradePreflightCmdFlags.skipBackupCheck),
+		a1upgrade.SkipBackupConfiguredCheck(migratePreflightCmdFlags.skipBackupCheck),
 
-		a1upgrade.SkipDisasterRecoveryConfiguredCheck(upgradePreflightCmdFlags.skipDisasterRecoveryCheck),
+		a1upgrade.SkipDisasterRecoveryConfiguredCheck(migratePreflightCmdFlags.skipDisasterRecoveryCheck),
 
-		a1upgrade.SkipExternalESConfiguredCheck(upgradePreflightCmdFlags.skipExternalESCheck),
+		a1upgrade.SkipExternalESConfiguredCheck(migratePreflightCmdFlags.skipExternalESCheck),
 
-		a1upgrade.SkipFIPSConfiguredCheck(upgradePreflightCmdFlags.skipFIPSCheck),
+		a1upgrade.SkipFIPSConfiguredCheck(migratePreflightCmdFlags.skipFIPSCheck),
 
-		a1upgrade.SkipSAMLConfiguredCheck(upgradePreflightCmdFlags.skipSAMLCheck),
+		a1upgrade.SkipSAMLConfiguredCheck(migratePreflightCmdFlags.skipSAMLCheck),
 
-		a1upgrade.SkipWorkflowConfiguredCheck(upgradePreflightCmdFlags.skipWorkflowCheck),
+		a1upgrade.SkipWorkflowConfiguredCheck(migratePreflightCmdFlags.skipWorkflowCheck),
 
-		a1upgrade.WithChefServerEnabled(upgradePreflightCmdFlags.enableChefServer),
+		a1upgrade.WithChefServerEnabled(migratePreflightCmdFlags.enableChefServer),
 
-		a1upgrade.WithWorkflowEnabled(upgradePreflightCmdFlags.enableWorkflow),
+		a1upgrade.WithWorkflowEnabled(migratePreflightCmdFlags.enableWorkflow),
 	)
 
 	if err != nil {
@@ -172,7 +173,7 @@ func runUpgradePreflight(cmd *cobra.Command, args []string) error {
 		return status.Wrap(err, status.PreflightError, "could not set SKIP_SHARED_PORTS environment variable")
 	}
 
-	if err := client.Preflight(writer, deployment.DefaultAutomateConfig(), version.BuildTime, upgradePreflightCmdFlags.airgapPreflight); err != nil {
+	if err := client.Preflight(writer, deployment.DefaultAutomateConfig(), version.BuildTime, migratePreflightCmdFlags.airgapPreflight); err != nil {
 		return status.Annotate(err, status.PreflightError)
 	}
 
@@ -207,7 +208,7 @@ func runUpgradePreflight(cmd *cobra.Command, args []string) error {
 
 	err = checker.RunAutomateChecks(u.A1Config, skips)
 	if err != nil {
-		return status.Wrap(err, status.PreflightError, "Unable to determine if your Chef Automate v1 configuration is suitable for upgrade.")
+		return status.Wrap(err, status.PreflightError, "Unable to determine if your Chef Automate v1 configuration is suitable for migration.")
 	}
 	rollupMsg := checker.Msgs.String()
 	if checker.Failures == 0 && checker.Warnings == 0 {
@@ -219,9 +220,9 @@ func runUpgradePreflight(cmd *cobra.Command, args []string) error {
 		builder := strings.Builder{}
 		fmt.Fprintf(&builder, "We found %d potential compatibility issue(s) between your Chef Automate v1 configuration with Chef Automate v2:\n", sum)
 		fmt.Fprintf(&builder, "%s\n", rollupMsg)
-		builder.WriteString("Please address these issues to continue with your upgrade to Chef Automate v2")
+		builder.WriteString("Please address these issues to continue with your migration to Chef Automate v2")
 		return status.WithRecovery(
-			status.New(status.PreflightError, "Upgrade compatibility checks failed"),
+			status.New(status.PreflightError, "Migration compatibility checks failed"),
 			builder.String(),
 		)
 	}
@@ -231,9 +232,9 @@ func runUpgradePreflight(cmd *cobra.Command, args []string) error {
 		builder := strings.Builder{}
 		fmt.Fprintf(&builder, "We found %d potential compatibility issue(s) between your Chef Automate v1 configuration and Chef Automate v2:\n", checker.Warnings)
 		fmt.Fprintf(&builder, "%s\n", rollupMsg)
-		builder.WriteString("Please address these issues to continue with your upgrade to Chef Automate v2")
+		builder.WriteString("Please address these issues to continue with your migration to Chef Automate v2")
 		return status.WithRecovery(
-			status.New(status.PreflightError, "Upgrade compatibility checks failed"),
+			status.New(status.PreflightError, "Migration compatibility checks failed"),
 			builder.String(),
 		)
 	}
@@ -253,7 +254,7 @@ func runUpgradePreflight(cmd *cobra.Command, args []string) error {
 }
 
 func runWorkflowChecks(u *a1upgrade.A1Upgrade) error {
-	if !upgradePreflightCmdFlags.enableWorkflow {
+	if !migratePreflightCmdFlags.enableWorkflow {
 		return nil
 	}
 
@@ -269,11 +270,11 @@ func runWorkflowChecks(u *a1upgrade.A1Upgrade) error {
 		rollupMsg := checker.Msgs.String()
 		sum := checker.Failures + checker.Warnings
 		builder := strings.Builder{}
-		fmt.Fprintf(&builder, "We found %d issue(s) with your Chef Automate Workflow configuration preventing it from being included in the Chef Automate upgrade:\n", sum)
+		fmt.Fprintf(&builder, "We found %d issue(s) with your Chef Automate Workflow configuration preventing it from being included in the Chef Automate migration:\n", sum)
 		fmt.Fprintf(&builder, "%s\n", rollupMsg)
-		builder.WriteString("Please address these issues to continue with your upgrade to Chef Automate v2")
+		builder.WriteString("Please address these issues to continue with your migration to Chef Automate v2")
 		return status.WithRecovery(
-			status.New(status.PreflightError, "Upgrade compatibility checks failed"),
+			status.New(status.PreflightError, "Migration compatibility checks failed"),
 			builder.String(),
 		)
 	}
@@ -284,7 +285,7 @@ func runWorkflowChecks(u *a1upgrade.A1Upgrade) error {
 }
 
 func runChefServerChecks(u *a1upgrade.A1Upgrade) error {
-	if !upgradePreflightCmdFlags.enableChefServer {
+	if !migratePreflightCmdFlags.enableChefServer {
 		return nil
 	}
 
@@ -302,9 +303,9 @@ func runChefServerChecks(u *a1upgrade.A1Upgrade) error {
 		rollupMsg := checker.Msgs.String()
 		sum := checker.Failures + checker.Warnings
 		builder := strings.Builder{}
-		fmt.Fprintf(&builder, "We found %d issue(s) with your Chef Server configuration preventing it from being included in the Chef Automate upgrade:\n", sum)
+		fmt.Fprintf(&builder, "We found %d issue(s) with your Chef Server configuration preventing it from being included in the Chef Automate migration:\n", sum)
 		fmt.Fprintf(&builder, "%s\n", rollupMsg)
-		builder.WriteString("Please address these issues to continue with your upgrade to Chef Automate v2")
+		builder.WriteString("Please address these issues to continue with your migration to Chef Automate v2")
 		return status.WithRecovery(
 			status.New(status.PreflightError, "Upgrade compatibility checks failed"),
 			builder.String(),

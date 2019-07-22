@@ -74,7 +74,7 @@ run-with-workflow: guard-HAB_ORIGIN
 
 run-upgrade-self-test: guard-HAB_ORIGIN
 	@echo "Starting deployment service with --hartifacts=${RESULT_DIR} and --override-origin=${HAB_ORIGIN}..."
-	./bin/linux/chef-automate upgrade-from-v1 \
+	./bin/linux/chef-automate migrate-from-v1 \
       --hartifacts ${RESULT_DIR} \
       --override-origin ${HAB_ORIGIN} \
       --channel dev \
@@ -230,7 +230,7 @@ a1-migration-shell:
 	cd a1-migration && docker-compose exec a1-migration /bin/bash
 
 a1-migration-migrate: guard-HAB_ORIGIN
-	cd a1-migration && docker-compose exec a1-migration bash -c 'HAB_ORIGIN=${HAB_ORIGIN} HARTIFACT_DIR=${HARTIFACT_DIR} /a1-migration/run_upgrade_from_a1.sh'
+	cd a1-migration && docker-compose exec a1-migration bash -c 'HAB_ORIGIN=${HAB_ORIGIN} HARTIFACT_DIR=${HARTIFACT_DIR} /a1-migration/run_migrate_from_a1.sh'
 
 AUTOMATE_API_DEFAULT_PASSWORD?=$(shell awk '/Admin password:/{print $$3}' a1-migration/keys/enterprise-test-admin-login-creds)
 A1_BUILDER_PASSWORD?=$(shell awk '/Builder Password:/{print $$3}' a1-migration/keys/enterprise-test-admin-login-creds)
@@ -238,7 +238,7 @@ a1-migration-test:
 	cd a1-migration && docker-compose exec a1-migration \
 	  env AUTOMATE_API_DEFAULT_PASSWORD=${AUTOMATE_API_DEFAULT_PASSWORD} \
 	    A1_BUILDER_PASSWORD=${A1_BUILDER_PASSWORD} \
-		inspec exec /a2/inspec/a2-upgrade-from-v1-integration/
+		inspec exec /a2/inspec/a2-migrate-from-v1-integration/
 
 a1-migration-gather-logs:
 	cd a1-migration && mkdir -p logs && docker-compose exec a1-migration bash -c "cd /a1-migration/logs && journalctl -u chef-automate > journal.log; chef-server-ctl gather-logs; automate-ctl gather-logs"
@@ -271,7 +271,7 @@ proxy-down:
 proxy-build:
 	docker build -m 4gb -t chef/a2-host proxy
 
-# Messier than a1-migration-migrate because `upgrade-from-v1` accepts an empty string for
+# Messier than a1-migration-migrate because `migrate-from-v1` accepts an empty string for
 # HAB_ORIGIN, but `deploy` does not.
 proxy-deploy:
 ifeq (${HAB_ORIGIN},"")
@@ -303,7 +303,7 @@ basic-a1-down: guard-HAB_ORIGIN
 	cd basic-a1 && docker-compose down
 
 basic-a1-migrate: guard-HAB_ORIGIN
-	cd basic-a1 && docker-compose exec basic-a1 /basic-a1/chef-automate upgrade-from-v1 --channel dev --upgrade-strategy none --yes --skip-backup-check --override-origin ${HAB_ORIGIN} --hartifacts /a2/results
+	cd basic-a1 && docker-compose exec basic-a1 /basic-a1/chef-automate migrate-from-v1 --channel dev --upgrade-strategy none --yes --skip-backup-check --override-origin ${HAB_ORIGIN} --hartifacts /a2/results
 
 basic-a1-diagnostics:
 	cd basic-a1 && docker-compose exec basic-a1 /basic-a1/chef-automate diagnostics run ~iam-v2
@@ -320,7 +320,7 @@ basic-a1-test:
           env AUTOMATE_API_DEFAULT_PASSWORD=${basic_a1_automate_api_password} \
             A1_BUILDER_PASSWORD=${basic_a1_builder_password} \
             NO_WORKFLOW_TEST=true \
-                inspec exec /a2/inspec/a2-upgrade-from-v1-integration/
+                inspec exec /a2/inspec/a2-migrate-from-v1-integration/
 
 cover:
 	./scripts/coverage.sh

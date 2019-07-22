@@ -4,7 +4,7 @@
 test_name="airgap_a1_migration"
 test_container_name="a1-migration.test"
 test_upgrade_strategy="none"
-test_deploy_inspec_profiles=(a2-upgrade-from-v1-integration)
+test_deploy_inspec_profiles=(a2-migrate-from-v1-integration)
 test_diagnostics_filters="~iam-v2"
 
 # Note: this matches the hashes in a1stub/server.go,
@@ -42,7 +42,7 @@ do_build() {
 
 do_deploy() {
     #shellcheck disable=SC2154
-    chef-automate upgrade-from-v1 "$test_config_path" \
+    chef-automate migrate-from-v1 "$test_config_path" \
         --airgap-bundle bundle.aib \
         --admin-password chefautomate \
         --skip-preflight \

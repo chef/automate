@@ -1,6 +1,6 @@
-name: chef-automate upgrade-from-v1 gen-config
+name: chef-automate migrate-from-v1 gen-config
 synopsis: Generate a config file
-usage: chef-automate upgrade-from-v1 gen-config [flags]
+usage: chef-automate migrate-from-v1 gen-config [flags]
 description: |
   Generate a Chef Automate v2 configuration file from Chef Automate v1
 options:
@@ -10,7 +10,7 @@ options:
   usage: help for gen-config
 - name: out
   shorthand: o
-  default_value: ./automate-upgrade.toml
+  default_value: ./automate-migrate.toml
   usage: Output file
 inherited_options:
 - name: airgap-bundle
@@ -36,7 +36,7 @@ inherited_options:
 - name: file-move-timeout
   default_value: "0"
   usage: |
-    Optional timeout for moving elasticsearch, compliance, and notifications files during Chef Automate v1 upgrade (0 to disable timeout)
+    Optional timeout for moving elasticsearch, compliance, and notifications files during Chef Automate v1 migration (0 to disable timeout)
 - name: no-check-version
   default_value: "false"
   usage: Disable version check
@@ -89,4 +89,4 @@ inherited_options:
   default_value: "false"
   usage: Do not prompt for confirmation; accept defaults and continue
 see_also:
-- chef-automate upgrade-from-v1 - Upgrade from Chef Automate v1
+- chef-automate migrate-from-v1 - Migrate from Chef Automate v1

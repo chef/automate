@@ -32,7 +32,7 @@ const samlDetectedMsg = `
 
       You may stop this upgrade and run:
 
-          chef-automate upgrade-from-v1 gen-config --skip-saml-check
+          chef-automate migrate-from-v1 gen-config --skip-saml-check
 
       This upgrade command will generate a configuration for your Chef Automate v2
       installation and offer you the opportunity to edit it. The SAML section of

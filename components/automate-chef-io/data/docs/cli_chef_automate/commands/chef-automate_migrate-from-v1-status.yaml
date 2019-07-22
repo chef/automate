@@ -1,11 +1,11 @@
-name: chef-automate upgrade-from-v1-status
+name: chef-automate migrate-from-v1-status
 synopsis: Watch the status of the migration to Chef Automate 2
-usage: chef-automate upgrade-from-v1-status [flags]
+usage: chef-automate migrate-from-v1-status [flags]
 options:
 - name: help
   shorthand: h
   default_value: "false"
-  usage: help for upgrade-from-v1-status
+  usage: help for migrate-from-v1-status
 inherited_options:
 - name: debug
   shorthand: d

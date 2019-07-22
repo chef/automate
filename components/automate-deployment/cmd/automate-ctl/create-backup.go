@@ -40,13 +40,13 @@ FAILURE=400 automate-ctl create-backup
 
 func automateCtlCreateBackup(cmd *cobra.Command, args []string) {
 	if !createBackupNoWait {
-		// in upgrade-from-v1 we always set --no-wait and then poll for es snapshot
+		// in migrate-from-v1 we always set --no-wait and then poll for es snapshot
 		// status via es API
 		fmt.Println("Expected --no-wait option to be set, failing")
 		os.Exit(10)
 	}
 	if len(args) != 1 {
-		// in upgrade-from-v1 we always set the backup name so we can correctly
+		// in migrate-from-v1 we always set the backup name so we can correctly
 		// query for the es snapshot status
 		fmt.Println("Expected BACKUP_NAME argument, failing")
 		os.Exit(10)

@@ -1,7 +1,7 @@
-name: chef-automate preflight-check upgrade-from-v1
+name: chef-automate preflight-check migrate-from-v1
 synopsis: |
-  Run preflight checks specific to upgrading from Chef Automate v1
-usage: chef-automate preflight-check upgrade-from-v1 [flags]
+  Run preflight checks specific to migrating from Chef Automate v1
+usage: chef-automate preflight-check migrate-from-v1 [flags]
 options:
 - name: delivery-running
   shorthand: r
@@ -14,7 +14,7 @@ options:
 - name: help
   shorthand: h
   default_value: "false"
-  usage: help for upgrade-from-v1
+  usage: help for migrate-from-v1
 - name: skip-backup-check
   default_value: "false"
   usage: |
@@ -54,3 +54,5 @@ inherited_options:
   usage: Write command result as JSON to PATH
 see_also:
 - chef-automate preflight-check - Perform preflight check
+aliases:
+- upgrade-from-v1

@@ -29,6 +29,8 @@ see_also:
 - internal-ca - Manage Chef Automate's internal certificate authority
 - license - Chef Automate license management
 - maintenance - Put Chef Automate into or out of maintenance mode
+- migrate-from-v1 - Migrate from Chef Automate v1
+- migrate-from-v1-status - Watch the status of the migration to Chef Automate 2
 - preflight-check - Perform preflight check
 - restart-services - restart deployment services
 - service-versions - Retrieve the versions of the individual Chef Automate services
@@ -38,6 +40,4 @@ see_also:
 - system-logs - Tail Chef Automate logs
 - uninstall - Uninstall Chef Automate
 - upgrade - upgrade automate to the latest version
-- upgrade-from-v1 - Upgrade from Chef Automate v1
-- upgrade-from-v1-status - Watch the status of the migration to Chef Automate 2
 - version - Show CLI version
