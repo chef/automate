@@ -87,7 +87,7 @@ required = [
 
 [[constraint]]
   name = "github.com/dexidp/dex"
-  version = "2.13.0"
+  version = "2.17.0"
 
 [[constraint]]
   branch = "master"
