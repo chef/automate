@@ -289,14 +289,11 @@ steps:
       executor:
         docker:
 
-  - label: "[unit] e2e"
+  - label: "[static] e2e"
     command:
       - cd e2e
       - npm install && npm run lint
     timeout_in_minutes: 5
-    retry:
-      automatic:
-        limit: 1
     expeditor:
       executor:
         docker:
