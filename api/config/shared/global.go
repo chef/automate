@@ -223,7 +223,6 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 				}
 			}
 		}
-
 	}
 
 	if externalPG := c.GetV1().GetExternal().GetPostgresql(); externalPG.GetEnable().GetValue() {
