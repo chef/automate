@@ -9,15 +9,20 @@
     </chef-breadcrumbs>
 
     <chef-page-header>
-      <div class="flex-container">
-        <div class="heading-container">
-          <!-- TODO name heading -->
-          <!-- ID label? -->
-          <!-- team ID -->
-          <chef-heading>{{team?.id}}</chef-heading>
-          <chef-subheading>{{team?.name}}</chef-subheading>
-        </div>
-      </div>
+      <chef-heading>{{ team?.name }}</chef-heading>
+      <table>
+        <thead>
+          <tr class="detail-row">
+            <th class="id-column">ID</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="detail-row">
+            <td class="id-column">{{ team?.id }}</td>
+          </tr>
+        </tbody>
+      </table>
+
       <chef-tab-selector (change)="onSelectedTab($event)" [value]="tabValue">
         <chef-option value='users' routerLink="./" fragment="users">Users</chef-option>
         <chef-option value='details' routerLink="./" fragment="details">Details</chef-option>
@@ -26,7 +31,6 @@
     <ng-container *ngIf="tabValue === 'users'">
       <section class="page-body" *ngIf="team?.id">
         <div id="users-list">
-          <!-- TODO fix this conditional -->
           <div *ngIf="!teamMembershipView">
             <!-- TODO remove [overridePermissionsCheck]=true once the UI is able to check specific objects
             since the path to permission on here is /auth/teams/:id/users we'll have to show everything for now. -->
@@ -68,6 +72,6 @@
           <span *ngIf="saveInProgress">Saving...</span>
         </chef-button>
       </section>
-  </ng-container>
+    </ng-container>
   </main>
 </div>
