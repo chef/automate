@@ -76,7 +76,7 @@ func (s *Store) LoadMarketProfiles(path string) error {
 
 	// filename returns an absolute path to the disk
 	for _, diskProfile := range profiles {
-		logrus.Infof("Upload profile %s", diskProfile)
+		logrus.Debugf("Upload profile %s", diskProfile)
 
 		// gather information that we need to store in postgres
 		sha256, tar, info, err := s.GetProfileInfo(diskProfile)
