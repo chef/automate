@@ -7,6 +7,8 @@ assignees: ''
 
 ---
 
+<!-- /!\ Please ensure that you are NOT disclosing any customer information without their consent /!\ -->
+
 ## Describe the bug
 A clear description of what the bug is.
 
