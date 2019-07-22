@@ -9,7 +9,6 @@ results/
 # just a particular file called 'src', *not* src directories that exist in some projects!
 src
 !src/
-package-lock.json
 
 # InSpec
 inspec.lock
