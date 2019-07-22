@@ -46,11 +46,12 @@ func TestValidate(t *testing.T) {
 
 	completeSAML := func() *dex.ConfigRequest_V1_Saml {
 		return &dex.ConfigRequest_V1_Saml{
-			CaContents:   w.String(string(devCert)),
-			SsoUrl:       w.String("https://saml.com/idp"),
-			EmailAttr:    w.String("email"),
-			UsernameAttr: w.String("username"),
-			GroupsAttr:   w.String("groups"),
+			CaContents:         w.String(string(devCert)),
+			SsoUrl:             w.String("https://saml.com/idp"),
+			EmailAttr:          w.String("email"),
+			UsernameAttr:       w.String("username"),
+			GroupsAttr:         w.String("groups"),
+			NameIdPolicyFormat: w.String("urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"),
 		}
 	}
 
@@ -331,6 +332,37 @@ func TestValidate(t *testing.T) {
 			cfg := dex.DefaultConfigRequest()
 			saml := completeSAML()
 			saml.EmailAttr = w.String("")
+			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Saml: saml}
+			assert.Error(t, cfg.Validate())
+		})
+	})
+
+	t.Run("name_id_policy_format (saml)", func(t *testing.T) {
+		valid := []string{
+			"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+			"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
+			"urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName",
+			"urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName",
+			"urn:oasis:names:tc:SAML:2.0:nameid-format:encrypted",
+			"urn:oasis:names:tc:SAML:2.0:nameid-format:entity",
+			"urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos",
+			"urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+			"urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
+		}
+		for _, v := range valid {
+			t.Run(v, func(t *testing.T) {
+				cfg := dex.DefaultConfigRequest()
+				saml := completeSAML()
+				saml.NameIdPolicyFormat = w.String(v)
+				cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Saml: saml}
+				assert.NoError(t, cfg.Validate())
+			})
+		}
+
+		t.Run("something:invalid", func(t *testing.T) {
+			cfg := dex.DefaultConfigRequest()
+			saml := completeSAML()
+			saml.NameIdPolicyFormat = w.String("something:invalid")
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Saml: saml}
 			assert.Error(t, cfg.Validate())
 		})

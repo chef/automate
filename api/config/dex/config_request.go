@@ -135,6 +135,23 @@ func (c *ConfigRequest) Validate() error {
 				}
 			}
 			checkCertsPEM(cfgErr, "dex.v1.sys.connector.saml.ca_contents", saml.CaContents.GetValue())
+			valid := map[string]bool{
+				"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress":               true,
+				"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified":                true,
+				"urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName":            true,
+				"urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName": true,
+				"urn:oasis:names:tc:SAML:2.0:nameid-format:encrypted":                  true,
+				"urn:oasis:names:tc:SAML:2.0:nameid-format:entity":                     true,
+				"urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos":                   true,
+				"urn:oasis:names:tc:SAML:2.0:nameid-format:persistent":                 true,
+				"urn:oasis:names:tc:SAML:2.0:nameid-format:transient":                  true,
+			}
+			if val := saml.NameIdPolicyFormat.GetValue(); val != "" {
+				if !valid[val] {
+					cfgErr.AddInvalidValue("dex.v1.sys.connector.saml.name_id_policy_format",
+						fmt.Sprintf("invalid name_id_policy_format: %q", val))
+				}
+			}
 		}
 	}
 
