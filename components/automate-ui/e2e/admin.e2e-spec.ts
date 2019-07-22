@@ -1477,13 +1477,10 @@ describe('Admin pages', () => {
         expect(idHeader.getText()).toBe('my-project');
       });
 
-      it('displays the type in the header', () => {
-        const typeHeader = $('header td:nth-child(2)');
-        expect(typeHeader.getText()).toBe('Custom');
-      });
-
       describe('before any typing occurs', () => {
         it('displays the project name in the input and the save button is disabled', () => {
+          const detailsLink = $('#chef-option2');
+          detailsLink.click();
           const projectNameInput = $('app-project-details section form chef-form-field input');
           expect(projectNameInput.getAttribute('value')).toBe('My Project');
 
@@ -1514,6 +1511,8 @@ describe('Admin pages', () => {
 
         it('enables the save button, updates the project, and notes the save, ' +
         'and then removes note once more typing occurs', () => {
+          const detailsLink = $('#chef-option2');
+          detailsLink.click();
           const projectSaveButton = $('app-project-details section #button-bar button');
           const projectNameInput = $('app-project-details section form chef-form-field input');
           expect(projectSaveButton.getAttribute('disabled')).toBe('true');
@@ -1683,6 +1682,8 @@ describe('Admin pages', () => {
     describe('Chef-managed project details', () => {
       it('the input is disabled, the save button is hidden, and the no changes allowed ' +
         'span is displayed', () => {
+        const detailsLink = $('#chef-option2');
+        detailsLink.click();
         const projectSaveButton = $('app-project-details section #button-bar button');
         const projectNameInput = $('app-project-details section form chef-form-field input');
         const projectNoChangesSpan = $('app-project-details section form #changes-not-allowed');
