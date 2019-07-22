@@ -12,9 +12,8 @@ import (
 
 	"gopkg.in/ldap.v2"
 
-	"github.com/sirupsen/logrus"
-
 	"github.com/dexidp/dex/connector"
+	"github.com/dexidp/dex/pkg/log"
 )
 
 // Config holds the configuration parameters for the LDAP connector. The LDAP
@@ -107,6 +106,10 @@ type Config struct {
 		IDAttr    string `json:"idAttr"`    // Defaults to "uid"
 		EmailAttr string `json:"emailAttr"` // Defaults to "mail"
 		NameAttr  string `json:"nameAttr"`  // No default.
+
+		// If this is set, the email claim of the id token will be constructed from the idAttr and
+		// value of emailSuffix. This should not include the @ character.
+		EmailSuffix string `json:"emailSuffix"` // No default.
 	} `json:"userSearch"`
 
 	// Group search configuration.
@@ -161,7 +164,7 @@ func parseScope(s string) (int, bool) {
 }
 
 // Open returns an authentication strategy using LDAP.
-func (c *Config) Open(id string, logger logrus.FieldLogger) (connector.Connector, error) {
+func (c *Config) Open(id string, logger log.Logger) (connector.Connector, error) {
 	conn, err := c.OpenConnector(logger)
 	if err != nil {
 		return nil, err
@@ -175,7 +178,7 @@ type refreshData struct {
 }
 
 // OpenConnector is the same as Open but returns a type with all implemented connector interfaces.
-func (c *Config) OpenConnector(logger logrus.FieldLogger) (interface {
+func (c *Config) OpenConnector(logger log.Logger) (interface {
 	connector.Connector
 	connector.PasswordConnector
 	connector.RefreshConnector
@@ -183,7 +186,7 @@ func (c *Config) OpenConnector(logger logrus.FieldLogger) (interface {
 	return c.openConnector(logger)
 }
 
-func (c *Config) openConnector(logger logrus.FieldLogger) (*ldapConnector, error) {
+func (c *Config) openConnector(logger log.Logger) (*ldapConnector, error) {
 
 	requiredFields := []struct {
 		name string
@@ -255,7 +258,7 @@ type ldapConnector struct {
 
 	tlsConfig *tls.Config
 
-	logger logrus.FieldLogger
+	logger log.Logger
 }
 
 var (
@@ -293,6 +296,9 @@ func (c *ldapConnector) do(ctx context.Context, f func(c *ldap.Conn) error) erro
 
 	// If bindDN and bindPW are empty this will default to an anonymous bind.
 	if err := conn.Bind(c.BindDN, c.BindPW); err != nil {
+		if c.BindDN == "" && c.BindPW == "" {
+			return fmt.Errorf("ldap: initial anonymous bind failed: %v", err)
+		}
 		return fmt.Errorf("ldap: initial bind for user %q failed: %v", c.BindDN, err)
 	}
 
@@ -328,17 +334,20 @@ func (c *ldapConnector) identityFromEntry(user ldap.Entry) (ident connector.Iden
 	if ident.UserID = getAttr(user, c.UserSearch.IDAttr); ident.UserID == "" {
 		missing = append(missing, c.UserSearch.IDAttr)
 	}
-	if ident.Email = getAttr(user, c.UserSearch.EmailAttr); ident.Email == "" {
-		missing = append(missing, c.UserSearch.EmailAttr)
-	}
-	// TODO(ericchiang): Let this value be set from an attribute.
-	ident.EmailVerified = true
 
 	if c.UserSearch.NameAttr != "" {
 		if ident.Username = getAttr(user, c.UserSearch.NameAttr); ident.Username == "" {
 			missing = append(missing, c.UserSearch.NameAttr)
 		}
 	}
+
+	if c.UserSearch.EmailSuffix != "" {
+		ident.Email = ident.Username + "@" + c.UserSearch.EmailSuffix
+	} else if ident.Email = getAttr(user, c.UserSearch.EmailAttr); ident.Email == "" {
+		missing = append(missing, c.UserSearch.EmailAttr)
+	}
+	// TODO(ericchiang): Let this value be set from an attribute.
+	ident.EmailVerified = true
 
 	if len(missing) != 0 {
 		err := fmt.Errorf("ldap: entry %q missing following required attribute(s): %q", user.DN, missing)
@@ -472,7 +481,7 @@ func (c *ldapConnector) Login(ctx context.Context, s connector.Scopes, username,
 func (c *ldapConnector) Refresh(ctx context.Context, s connector.Scopes, ident connector.Identity) (connector.Identity, error) {
 	var data refreshData
 	if err := json.Unmarshal(ident.ConnectorData, &data); err != nil {
-		return ident, fmt.Errorf("ldap: failed to unamrshal internal data: %v", err)
+		return ident, fmt.Errorf("ldap: failed to unmarshal internal data: %v", err)
 	}
 
 	var user ldap.Entry
