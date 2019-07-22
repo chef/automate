@@ -195,7 +195,7 @@ function kill_running_service() {
   verify_component $1 || return $?
   local component=$1
   SERVICE_PID=$(grep_component_pid $component)
-  if [[ ! -z ${SERVICE_PID} ]]; then
+  if [[ -n ${SERVICE_PID} ]]; then
     kill $SERVICE_PID
   fi
 }

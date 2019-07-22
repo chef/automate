@@ -358,7 +358,7 @@ function build_all_changed_components() {
         continue
       fi
 
-      if [[ ! -z "$whitelist" ]]; then
+      if [[ -n "$whitelist" ]]; then
         if [[ "$whitelist" == *"$(basename $component)"* ]]; then
           log_line "Building $component"
           build $component
