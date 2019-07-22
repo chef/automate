@@ -4,12 +4,14 @@ import { difference, get, pipe, set } from 'lodash/fp';
 import { EntityStatus } from '../entities';
 import { TeamActionTypes, TeamActions } from './team.actions';
 import { Team } from './team.model';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export interface TeamEntityState extends EntityState<Team> {
   getAllStatus: EntityStatus;
   getStatus: EntityStatus;
   getUsersStatus: EntityStatus;
   createStatus: EntityStatus;
+  createError: HttpErrorResponse;
   deleteStatus: EntityStatus;
   updateStatus: EntityStatus;
   addUsersStatus: EntityStatus;
@@ -24,6 +26,7 @@ export const TeamEntityInitialState: TeamEntityState = teamEntityAdapter.getInit
   getStatus: EntityStatus.notLoaded,
   getUsersStatus: EntityStatus.notLoaded,
   createStatus: EntityStatus.notLoaded,
+  createError: null, 
   deleteStatus: EntityStatus.notLoaded,
   updateStatus: EntityStatus.notLoaded,
   addUsersStatus: EntityStatus.notLoaded,
@@ -96,7 +99,10 @@ export function teamEntityReducer(state: TeamEntityState = TeamEntityInitialStat
     }
 
     case TeamActionTypes.CREATE_FAILURE: {
-      return set('createStatus', EntityStatus.loadingFailure, state) as TeamEntityState;
+      return pipe(
+        set('createError', action.payload),
+        set('createStatus', EntityStatus.loadingFailure),
+        )(state) as TeamEntityState;
     }
 
     case TeamActionTypes.UPDATE: {

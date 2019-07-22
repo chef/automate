@@ -10,10 +10,22 @@
       (close)="closeModal()"
       (deleteClicked)="deleteTeam()">
     </app-delete-object-modal>
+
     <chef-page-header>
       <chef-heading>Teams</chef-heading>
       <chef-subheading>Chef Automate only displays local teams.</chef-subheading>
     </chef-page-header>
+
+    <app-create-object-modal
+      [visible]="createModalVisible"
+      [creating]="creatingToken"
+      [conflictErrorEvent]="conflictErrorEvent"
+      objectNoun="token"
+      [createForm]="createTokenForm"
+      (close)="closeCreateModal()"
+      (createClicked)="createToken()">
+    </app-create-object-modal>
+
     <div class="page-body">
       <section>
         <chef-toolbar>
