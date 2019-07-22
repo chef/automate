@@ -242,7 +242,8 @@ function go_component_static_tests() {
   local component=$1
 
   log_line "Collecting ${component}'s go files"
-  local gofiles=$(find components/$component/ -maxdepth 3 -name '*.go');
+  local gofiles
+  gofiles=$(find components/$component/ -maxdepth 3 -name '*.go');
   [ -z "$gofiles" ] && return 0
 
   log_line "Installing gofmt"

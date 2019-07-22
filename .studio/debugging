@@ -30,7 +30,8 @@ function debug_go_service() {
           ;;
   esac
 
-  local pid=$(echo "$status_output" | awk "{print \$$needed_col}")
+  local pid
+  pid=$(echo "$status_output" | awk "{print \$$needed_col}")
   if [[ $pid == "" ]]; then
     log_error "Couldn't find running service ($1)"
     return 1

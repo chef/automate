@@ -125,9 +125,10 @@ function link_component_bin() {
   if [[ $component == "deployment-service" ]]; then
       component_dir="automate-deployment"
   fi
-  for d in $(ls -d components/$component_dir/cmd/* 2>/dev/null); do
-    local cmd_bin=$(basename $d)
-    hab pkg binlink --force $HAB_ORIGIN/$component $cmd_bin
+  for d in components/$component_dir/cmd/*/; do
+    local cmd_bin
+    cmd_bin=$(basename "$d")
+    hab pkg binlink --force "$HAB_ORIGIN/$component" "$cmd_bin"
   done
   return 0
 }
