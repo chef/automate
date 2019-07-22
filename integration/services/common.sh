@@ -13,7 +13,7 @@ create_services_config_path() {
 destroy_services_config_path() {
     if [ -n "$SERVICES_CONFIG_PATH" ]; then
         log_info "Removing services config path $SERVICES_CONFIG_PATH"
-        rm -r "$SERVICES_CONFIG_PATH"
+        sudo rm -rf "$SERVICES_CONFIG_PATH"
     fi
 }
 

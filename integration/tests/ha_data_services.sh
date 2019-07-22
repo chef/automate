@@ -3,8 +3,8 @@
 #shellcheck disable=SC2034
 test_name="ha_data_services"
 test_external_services=(ha_backend)
-#test_backup_restore=true
 test_diagnostics_filters="~iam-v2"
+test_backup_restore=true
 
 do_deploy() {
     #shellcheck disable=SC2154

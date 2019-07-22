@@ -2,6 +2,8 @@
 
 set -e
 
+echo "Listing stuff"
+ls -lah /services
 echo "Doing sysctl stuff"
 cat > /etc/sysctl.d/00-chef.conf <<EOF
 vm.swappiness=10
@@ -34,6 +36,7 @@ After=network-online.target
 
 [Service]
 Environment=HAB_LICENSE=accept-no-persist
+Environment=RUST_LOG=debug
 Type=simple
 ExecStartPre=-/bin/rm -f /hab/sup/default/LOCK
 ExecStart=/bin/hab sup run --peer-watch-file /services/ha_backend_peers
@@ -94,12 +97,18 @@ host = "_site_"
 [es_yaml.bootstrap]
 memory_lock = false
 
+[es_yaml.path]
+repo = "/services/ha_backend_backups"
+
 [es_yaml.discovery.zen.ping.unicast]
 hosts = ["$(head -n 1 /services/ha_backend_peers)"]
 [es_yaml.cluster.routing.allocation.disk.watermark]
 low = "95%"
 high = "98%"
 flood_stage = "99%"
+
+[es_yaml.opendistro_security]
+enable_snapshot_restore_privilege = true
 
 [opendistro_ssl]
 

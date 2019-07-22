@@ -69,6 +69,35 @@ then
     )
 fi
 
+cleanup() {
+    if [ ${#test_external_services[@]} -ne 0 ]; then
+        log_info "Cleaning Up External Services"
+
+        for external_service in "${test_external_services[@]}"
+        do
+            log_info "Dumping logs for $external_service"
+            ${external_service}_dump_logs
+            log_info "Stopping $external_service"
+            ${external_service}_teardown
+        done
+
+        destroy_services_config_path
+    fi
+    echo "Attempting to clean up docker container $test_container_name"
+    docker stop "$test_container_name"
+}
+
+cleanup_ci() {
+    # We condition this on CI so that in CI we always cleanup, even on failure
+    if [[ "$CI" = "true" ]]; then
+        cleanup
+    else
+        echo "Not cleaning up because CI=$CI"
+    fi
+}
+
+trap cleanup_ci EXIT
+
 if [ ${#test_external_services[@]} -ne 0 ]; then
     log_info "Start External Services"
     source integration/services/common.sh
@@ -94,36 +123,6 @@ fi
 echo "${docker_run_args[*]}"
 
 docker run "${docker_run_args[@]}" chefes/a2-integration:latest
-
-cleanup() {
-    echo "Attempting to clean up docker container $test_container_name"
-    docker stop "$test_container_name"
-
-    if [ ${#test_external_services[@]} -ne 0 ]; then
-        log_info "Cleaning Up External Services"
-
-        for external_service in "${test_external_services[@]}"
-        do
-            log_info "Dumping logs for $external_service"
-            ${external_service}_dump_logs
-            log_info "Stopping $external_service"
-            ${external_service}_teardown
-        done
-
-        destroy_services_config_path
-    fi
-}
-
-cleanup_ci() {
-    # We condition this on CI so that in CI we always cleanup, even on failure
-    if [[ "$CI" = "true" ]]; then
-        cleanup
-    else
-        echo "Not cleaning up because CI=$CI"
-    fi
-}
-
-trap cleanup_ci EXIT
 
 if [ $CI != "true" ]; then
     secret_origin_key=$(hab origin key export --type secret $HAB_ORIGIN)
