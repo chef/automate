@@ -76,7 +76,7 @@ authQuery () {
 
   # execute
   if [[ "$show_cmd" == 1 ]]; then 
-    echo "curl -sSkH \"api-token: \$token\" -H \"$projects\" \"$host/$auth_path/$1\" | jq $jq_option '$jq_script'"
+    echo "curl -sSkH \"api-token: \$TOK\" -H \"$projects\" \"$host/$auth_path/$1\" | jq $jq_option '$jq_script'"
   fi
   curl -sSkH "api-token: $token" -H "$projects" "$host/$auth_path/$1" | jq $jq_option "$jq_script"
 }
@@ -130,12 +130,12 @@ authLoad() {
       # v1 resources work by just re-using output of authQuery except for users, which need a password added
       # TODO: check that all v2 resources work
       if [[ "$RESOURCE" == "users" ]]; then
-        line=$(jq -c '. += {"password": "chefautomate"}' <<< "$line")
+        line=$(jq -c '. += {password: "chefautomate"}' <<< "$line")
       fi
       if [[ "$show_cmd" == 1 ]] || [[ "$dry_run" == 1 ]]; then 
         echo "curl -sSkH \"api-token: \$token\" \"$host/$auth_path/$RESOURCE\" -d '$line'"
       fi
-      if [[ "$dry_run" == "" ]]; then 
+      if [[ -z "$dry_run" ]]; then 
         curl -sSkH "api-token: $token" "$host/$auth_path/$RESOURCE" -d "$line"
         echo
       fi
@@ -191,7 +191,10 @@ authGen() {
   SEED=$4
   ID_PREFIX=test-$RESOURCE
   if [[ ! $MODE =~ ^(create|delete)$ ]]; then echo "mode must be 'create' or 'delete'"; return; fi
-  if [[ ! $RESOURCE =~ ^(tokens|users|teams|team-members|policies)$ ]]; then echo "resource must be in: tokens, users, teams, team-members, policies"; return; fi
+  if [[ ! $RESOURCE =~ ^(tokens|users|teams|team-members|policies|rules)$ ]]; then
+    echo "resource must be in: tokens, users, teams, team-members, policies, rules"
+    return
+  fi
 
   operation="${MODE}_resource"
   echo "$MODE $COUNT $RESOURCE..."
@@ -207,7 +210,8 @@ function create_resource {
   local id_index=$(($3 + SEED))
   local id=$ID_PREFIX-$id_index
   local name="$ID_PREFIX $id_index"
-  local json=""
+  local json
+  local resource
   case "$RESOURCE" in
     tokens)
       json=$(jo -p id="$id" name="$name" description="test token for $name" active=true)
@@ -220,11 +224,15 @@ function create_resource {
       json=$(jo id="$id" name="$name" description="test team for $name")
       resource=$RESOURCE ;;
     team-members)
-      # just add a 100 members to each team
+      # just add 100 members to each team
       json=$(jq -n --argjson n 100 'reduce range(1; $n) as $i (.; .user_ids += ["test-user-\($i)"])')
       resource="teams/test-teams-$id_index/users:add" ;;
     policies)
       json=$(jo subjects="$(jo -a token:test-tokens-$id_index)" action=read resource="compliance:*")
+      resource=$RESOURCE ;;
+    rules)
+      # note: requires adding "foo-project" first
+      json=$(jo id="$id" name="$name" type=NODE project_id=foo-project conditions='[{"operator":"MEMBER_OF","attribute":"CHEF_SERVERS","values":["prod","staging"]}]')
       resource=$RESOURCE ;;
   esac
   curl -sSkH "api-token: $token" "$host/$auth_path/$resource" -X POST --data "$json"

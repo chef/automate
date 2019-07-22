@@ -7,21 +7,18 @@ import { Pipe, PipeTransform } from '@angular/core';
  *
  * The primary argument (before the pipe) is the quantity.
  * The second argument is the word to be made plural (or not).
- * The third argument is the plural to apply, e.g. "s" or "es".
+ * The third argument is the plural to apply, e.g. "+s" or "+es".
  * An actual code example:
  *
- *   {{ membersToAddValues().length | pluralize : 'member' : 's' }} selected
+ *   {{ membersToAddValues().length | pluralize : 'member' : '+s' }} selected
  *
  * It gets more interesting for a word like "policy", which would become plural
- * by dropping the "y" and adding "ies". This is done by indicating how many
- * characters to drop off the end of the word, in this case 1,
- * so a single "<" is added at the front of the plural indicator:
+ * by dropping the "y" and adding "ies". Or then there's "goose/geese" ...
+ * That is done by simply omitting the "+", indicating you're providing the plural
+ * instead of a suffix:
  *
- *   There are {{ policies.length | pluralize : 'policy' : '<ies' }} selected
- *
- * If there are more characters to drop, just add more shifters:
- *
- *   There are {{ fowlCount | pluralize : 'goose' : '<<<<eese' }} on the farm.
+ *   There are {{ policies.length | pluralize : 'policy' : 'policies' }} selected
+ *   There are {{ birds.length | pluralize : 'goose' : 'geese' }} selected
  */
 
 @Pipe({
@@ -29,17 +26,12 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class PluralizePipe implements PipeTransform {
 
-  transform(value, word, suffix: string): string {
-    const shiftChar = '<';
-    if (!suffix.includes(shiftChar)) {
-      return value + ' ' + word + ((value && +value === 1) ? '' : suffix);
+  transform(value: number, word: string, suffix: string): string {
+    const isSingular = value === 1;
+    const plainSuffix = suffix.replace(/^\+/, '');
+    if (plainSuffix !== suffix) {
+      return value + ' ' + word + (isSingular ? '' : plainSuffix);
     }
-    const shiftChars = suffix.split(shiftChar);
-    const shifters = shiftChars.length - 1;
-    const newSuffix = shiftChars[shifters];
-    return value + ' ' +
-      (value && +value === 1
-        ? word
-        : (word.substr(0, word.length - shifters) + newSuffix));
+    return value + ' ' + (isSingular ? word : suffix);
   }
 }

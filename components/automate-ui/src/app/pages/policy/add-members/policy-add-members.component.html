@@ -47,7 +47,7 @@
       <div id="table-container" *ngIf="sortedMembersAvailable.length > 0">
         <div class="flex">
           <div id="members-selected" class="flex-right" >
-            {{ membersToAddValues().length | pluralize : 'member' : 's' }} selected
+            {{ membersToAddValues().length | pluralize : 'member' : '+s' }} selected
           </div>
         </div>
         <div id="inner-container">
