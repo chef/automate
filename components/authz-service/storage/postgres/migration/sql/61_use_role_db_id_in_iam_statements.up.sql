@@ -3,9 +3,17 @@ BEGIN;
 -- there was previously a bug that allowed NULL values to be inserted into
 -- the database for actions (and maybe resources). clean up any such instances.
 UPDATE iam_statements t SET actions = '{}' WHERE actions IS NULL;
-ALTER  TABLE iam_statements ALTER COLUMN actions SET NOT NULL;
+ALTER TABLE iam_statements ALTER COLUMN actions SET NOT NULL;
 UPDATE iam_statements t SET resources = '{}' WHERE resources IS NULL;
-ALTER  TABLE iam_statements ALTER COLUMN resources SET NOT NULL;
+ALTER TABLE iam_statements ALTER COLUMN resources SET NOT NULL;
+
+-- also set policy_id to NOT NULL since a statement can't exist
+-- outside of a policy. there should not be any instances of
+-- orphaned statements, but adding the delete line just in case
+-- so migrations don't explode if there are any somehow (they
+-- are useless if they exist anyway).
+DELETE FROM iam_statements WHERE policy_id IS NULL;
+ALTER TABLE iam_statements ALTER COLUMN policy_id SET NOT NULL;
 
 ALTER TABLE iam_statements ADD COLUMN role_id INTEGER;
 
