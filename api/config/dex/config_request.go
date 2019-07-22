@@ -31,24 +31,6 @@ func NewConfigRequest() *ConfigRequest {
 	}
 }
 
-// NewLdapConnector returns a new instance of ConfigRequest_Ldap with zero
-// values
-func NewLdapConnector() *ConfigRequest_V1_Ldap {
-	return &ConfigRequest_V1_Ldap{}
-}
-
-// NewMsadLdapConnector returns a new instance of ConfigRequest_Msad_Ldap with
-// zero values
-func NewMsadLdapConnector() *ConfigRequest_V1_Msad_Ldap {
-	return &ConfigRequest_V1_Msad_Ldap{}
-}
-
-// NewSamlConnector returns a new instance of ConfigRequest_Saml with zero
-// values
-func NewSamlConnector() *ConfigRequest_V1_Saml {
-	return &ConfigRequest_V1_Saml{}
-}
-
 // DefaultConfigRequest returns a new ConfigRequest instance with default values.
 func DefaultConfigRequest() *ConfigRequest {
 	c := NewConfigRequest()
