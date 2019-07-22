@@ -125,9 +125,10 @@ function link_component_bin() {
   if [[ $component == "deployment-service" ]]; then
       component_dir="automate-deployment"
   fi
-  for d in $(ls -d components/$component_dir/cmd/* 2>/dev/null); do
-    local cmd_bin=$(basename $d)
-    hab pkg binlink --force $HAB_ORIGIN/$component $cmd_bin
+  for d in components/$component_dir/cmd/*/; do
+    local cmd_bin
+    cmd_bin=$(basename "$d")
+    hab pkg binlink --force "$HAB_ORIGIN/$component" "$cmd_bin"
   done
   return 0
 }
@@ -172,7 +173,7 @@ function wait_for_svc_to_stop() {
   while hab_svc_up $1; do
     echo -n ".";
     [ $COUNTER -ge $SECONDS_WAITING ] && return 1
-    let COUNTER=COUNTER+1;
+    COUNTER=$((COUNTER+1))
     sleep 1;
   done;
 }
@@ -206,14 +207,14 @@ document "rebuild" <<EOF
   build time
 EOF
 function rebuild() {
-  output=$(set -o pipefail; NO_INSTALL_DEPS=1 build $@ | tee /dev/stderr)
+  output=$(set -o pipefail; NO_INSTALL_DEPS=1 build "$@" | tee /dev/stderr)
   err=$?
   if [[ $err != 0 ]]
   then
     echo $output | grep "Resolving '.*' failed" > /dev/null
     if [[ $? == 0 ]]
     then
-      build $@
+      build "$@"
       err=$?
     fi
   fi
@@ -235,7 +236,7 @@ function verify_component() {
     error "Component '$1' not found.\\n"
     display_available_components
     return 1
-  fi;
+  fi
   return 0
 }
 
@@ -298,7 +299,7 @@ _component_auto_complete()
     prev="${COMP_WORDS[COMP_CWORD-1]}"
     opts=$(ls /src/components | tr "\\n" " ")
 
-    if [[ ${cur} == * ]] ; then
+    if [[ ${cur} == * ]]; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
         return 0
     fi
@@ -309,7 +310,7 @@ function check_service_running_or_exit() {
   if ! service_running "$1"; then
     error "The component '$1' must be already running."
     return 1
-  fi;
+  fi
 }
 
 document "service_running" <<DOC
@@ -349,7 +350,7 @@ function build_all_changed_components() {
   ln -sv "$(hab pkg path core/coreutils)/bin/env" /usr/bin/env 2>/dev/null
 
   build_commands=""
-  pushd /src >/dev/null;
+  pushd /src >/dev/null
     for component in $(./scripts/changed_components.rb)
     do
       if [[ -n "$AUTOMATE_OSS_BUILD" ]] && [[ "$component" = "components/automate-chef-io" ]]; then
@@ -367,5 +368,5 @@ function build_all_changed_components() {
         build $component
       fi
     done
-  popd >/dev/null;
+  popd >/dev/null
 }

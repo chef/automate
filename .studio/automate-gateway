@@ -27,7 +27,8 @@ function gateway_integration() {
   log_line "The automate-gateway version"
   gateway_version || return 1
 
-  local viewer_token="$(get_api_token_with_policy viewer-access)"
+  local viewer_token
+  viewer_token="$(get_api_token_with_policy viewer-access)"
 
   log_line "Sending 30 Chef Action Messages"
   for i in {1..30}; do
@@ -55,7 +56,7 @@ document "gateway_version" <<DOC
   => curl $GATEWAY_URL/version
 DOC
 function gateway_version() {
-  install_if_missing core/jq-static jq;
+  install_if_missing core/jq-static jq
 
   log_line "Gateway"
   gateway_get /gateway/version | jq .
@@ -116,7 +117,8 @@ function send_chef_action_example() {
   local endpoint="/events/data-collector"
   local examples_path="/src/components/ingest-service/examples"
   local tmp_action_json
-  local rfc_time=$(date --rfc-3339=seconds  -d "$(($RANDOM % 144)) hour ago" | sed 's/ /T/' | sed 's/\+.*/Z/')
+  local rfc_time
+  rfc_time=$(date --rfc-3339=seconds  -d "$(($RANDOM % 144)) hour ago" | sed 's/ /T/' | sed 's/\+.*/Z/')
 
   # Update the 'recorded_at' time from the ChefAction Example; and set entity_type and task
   tmp_action_json="$(jq --arg event_task "$event_task" --arg rfc_time "$rfc_time" --arg event_type "$event_type" \
@@ -131,7 +133,7 @@ function send_chef_action_example() {
 document "send_chef_run_example" <<DOC
   Send the example chef run message to the chef run rest endpoint.
 
-  Options: by default the message is send directly to the gateway chef/run endpoint 
+  Options: by default the message is send directly to the gateway chef/run endpoint
     legacy - send the message directly to the gateway legacy endpoint
     lb - send the message through the load balancer
 
@@ -153,7 +155,7 @@ DOC
 function send_chef_run_example() {
   install_if_missing core/curl curl
 
-  local examples_json_path=${JSON_FILE:-/src/components/ingest-service/examples/converge-success-report.json};
+  local examples_json_path=${JSON_FILE:-/src/components/ingest-service/examples/converge-success-report.json}
 
   if [[ "$1" == "legacy" ]]; then
     endpoint=${GATEWAY_URL}"/events/data-collector"
@@ -177,9 +179,9 @@ function send_chef_run_example() {
 document "send_chef_run_start_example" <<DOC
   Send the example chef run start message to the chef run rest endpoint.
 
-  Arguments: by default the message is send directly to the gateway chef/run endpoint 
+  Arguments: by default the message is send directly to the gateway chef/run endpoint
     legacy - send the message directly to the gateway legacy endpoint
-    lb - send the message through the load balancer 
+    lb - send the message through the load balancer
 
   Example: Send a Chef Run start to the legacy endpoint:
   --------------------------------------------------------
@@ -190,9 +192,9 @@ document "send_chef_run_start_example" <<DOC
   # send_chef_run_start_example lb
 DOC
 function send_chef_run_start_example() {
-  install_if_missing core/curl curl;
+  install_if_missing core/curl curl
 
-  local examples_path="/src/components/ingest-service/examples";
+  local examples_path="/src/components/ingest-service/examples"
   if [[ "$1" == "legacy" ]]; then
     endpoint=${GATEWAY_URL}"/events/data-collector"
   elif [[ "$1" == "lb" ]]; then
@@ -223,12 +225,16 @@ function send_chef_run_failure_example() {
   install_if_missing core/curl curl
   install_if_missing core/jq-static jq
 
-  local run_uuid=$(uuidgen)
-  local node_uuid=$(uuidgen)
-  local node_name="node_failed_$(($RANDOM % 100))"
-  local rfc_time=$(date +%FT%TZ -d "$(($RANDOM % 144)) hour ago")
+  local run_uuid
+  run_uuid=$(uuidgen)
+  local node_uuid
+  node_uuid=$(uuidgen)
 
-  local examples_path="/src/components/ingest-service/examples";
+  local node_name="node_failed_$(($RANDOM % 100))"
+  local rfc_time
+  rfc_time=$(date +%FT%TZ -d "$(($RANDOM % 144)) hour ago")
+
+  local examples_path="/src/components/ingest-service/examples"
   [[ "$1" == "legacy" ]] && endpoint="/events/data-collector" || endpoint="/ingest/events/chef/run"
 
   # Update the IDs, names, and dates
@@ -247,9 +253,9 @@ document "send_chef_liveness_example" <<DOC
   # send_chef_liveness_example legacy
 DOC
 function send_chef_liveness_example() {
-  install_if_missing core/curl curl;
+  install_if_missing core/curl curl
 
-  local examples_path="/src/components/ingest-service/examples";
+  local examples_path="/src/components/ingest-service/examples"
   [[ "$1" == "legacy" ]] && endpoint="/events/data-collector" || endpoint="/ingest/events/chef/liveness"
 
   curl -f --insecure -H "api-token: $(get_api_token)" \
@@ -278,14 +284,17 @@ document "send_inspec_example" <<DOC
   Send the example inspec message to the inspec rest endpoint.
 DOC
 function send_inspec_example() {
-  install_if_missing core/curl curl;
+  install_if_missing core/curl curl
 
   local endpoint="/events/data-collector"
-  local examples_json_path=${JSON_FILE:-/src/components/compliance-service/ingest/examples/compliance-success-tiny-report.json};
+  local examples_json_path=${JSON_FILE:-/src/components/compliance-service/ingest/examples/compliance-success-tiny-report.json}
 
-  local uuid=$(uuidgen)
-  local report_uuid=$(uuidgen)
-  local rfc_time=$(date +%FT%TZ -d "$(($RANDOM % 144)) hour ago")
+  local uuid
+  local report_uuid
+  local rfc_time
+  uuid=$(uuidgen)
+  report_uuid=$(uuidgen)
+  rfc_time=$(date +%FT%TZ -d "$(($RANDOM % 144)) hour ago")
 
   tmp_inspec_json="$(jq --arg id "$uuid" --arg report_uuid "$report_uuid" --arg rfc_time "$rfc_time" '.node_uuid = $id | .report_uuid = $report_uuid | .end_time = $rfc_time' <$examples_json_path)"
 
@@ -297,11 +306,12 @@ document "send_inspec_failure_example" <<DOC
   Send the example failure inspec message to the inspec rest endpoint.
 DOC
 function send_inspec_failure_example() {
-  install_if_missing core/curl curl;
+  install_if_missing core/curl curl
 
   local examples_path="/src/components/compliance-service/ingest/examples"
   local endpoint="/events/data-collector"
-  local uuid=$(uuidgen)
+  local uuid
+  uuid=$(uuidgen)
 
   # Update the 'report_uuid'
   tmp_report_json="$(jq --arg uuid "$uuid" '.report_uuid = $uuid' <$examples_path/compliance-failure-big-report.json)"
@@ -321,8 +331,8 @@ document "gateway_list_secrets" <<DOC
   List the secrets stored in the secrets service
 DOC
 function gateway_list_secrets() {
-  install_if_missing core/curl curl;
-  install_if_missing core/jq-static jq;
+  install_if_missing core/curl curl
+  install_if_missing core/jq-static jq
 
   endpoint="/secrets/search"
 
@@ -339,8 +349,8 @@ function gateway_create_secret() {
   local username=${1:-"default"}
   local password=${2:-"super_secret"}
 
-  install_if_missing core/curl curl;
-  install_if_missing core/jq-static jq;
+  install_if_missing core/curl curl
+  install_if_missing core/jq-static jq
 
   endpoint="/secrets"
 
@@ -355,9 +365,9 @@ document "gateway_delete_secret" <<DOC
   arg 1 - ID required
 DOC
 function gateway_delete_secret() {
-  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1;
+  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1
 
-  install_if_missing core/curl curl;
+  install_if_missing core/curl curl
   local id=$1
 
   endpoint="/secrets/id/$id"
@@ -373,11 +383,11 @@ document "gateway_read_secret" <<DOC
   arg 1 - ID required
 DOC
 function gateway_read_secret() {
-  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1;
+  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1
   local id=$1
 
-  install_if_missing core/curl curl;
-  install_if_missing core/jq-static jq;
+  install_if_missing core/curl curl
+  install_if_missing core/jq-static jq
 
   endpoint="/secrets/id/$id"
 
@@ -394,7 +404,7 @@ document "gateway_update_secret" <<DOC
   art 3 - password optional
 DOC
 function gateway_update_secret() {
-  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1;
+  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1
   local id=$1
   local username=${2:-"default"}
   local password=${3:-"super_secret"}
@@ -412,11 +422,11 @@ document "gateway_delete_notification_rule" <<DOC
   arg 1 - ID required
 DOC
 function gateway_delete_notification_rule() {
-  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1;
+  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1
   local id=$1
 
-  install_if_missing core/curl curl;
-  install_if_missing core/jq-static jq;
+  install_if_missing core/curl curl
+  install_if_missing core/jq-static jq
 
   endpoint="/notifications/rules/$id"
 
@@ -429,8 +439,8 @@ document "gateway_create_notification_rule" <<DOC
   Create a notification rule
 DOC
 function gateway_create_notification_rule() {
-  install_if_missing core/curl curl;	
-  install_if_missing core/jq-static jq;
+  install_if_missing core/curl curl
+  install_if_missing core/jq-static jq
 
   endpoint="/notifications/rules"
 
@@ -445,11 +455,11 @@ document "gateway_get_notification_rule" <<DOC
   arg 1 - ID required
 DOC
 function gateway_get_notification_rule() {
-  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1;
+  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1
   local id=$1
 
-  install_if_missing core/curl curl;
-  install_if_missing core/jq-static jq;
+  install_if_missing core/curl curl
+  install_if_missing core/jq-static jq
 
   endpoint="/notifications/rules/$id"
 
@@ -465,10 +475,10 @@ document "gateway_notification_validate_connection" <<DOC
   arg 1 - URL required
 DOC
 function gateway_notification_validate_connection() {
-  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1;
+  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1
   local url=$1
 
-  install_if_missing core/curl curl;
+  install_if_missing core/curl curl
 
   endpoint="/notifications/webhook"
 
@@ -544,7 +554,8 @@ function get_api_token_with_policy() {
   check_if_deployinate_started || return 1
 
   local policy=${1:?"usage: get_api_token_with_policy POLICYNAME"}
-  local iam_version="$(chef-automate iam version | awk '{print $2}')"
+  local iam_version
+  iam_version="$(chef-automate iam version | awk '{print $2}')"
   local token_description="api-token-$$-${policy}"
   local token_file="/tmp/api_token_${iam_version}_${policy}"
 
@@ -557,7 +568,9 @@ function get_api_token_with_policy() {
       # create standard api token
       chef-automate iam token create "$token_description" >"$token_file" || return 1
       # retrieve the tokens' ID
-      local token_id="$(curl -fsS --insecure -H "api-token: $(get_admin_token)" \
+      local token_id
+      token_id="$(curl -fsS --insecure -H "api-token: $(get_admin_token)" \
+
        "${GATEWAY_URL}/auth/tokens" |\
          jq -er --arg token "$token_description" '[.tokens[] | select(.description == $token) | .id] | first' )"
       # and add it to policy

@@ -53,5 +53,7 @@ shellcheck -s bash -ax \
   scripts/*.sh \
   integration/**/*.sh
 
+shellcheck -s bash -ax -S error .studiorc .studio/*
+
 echo "Checking for possible credentials in the source code"
 go run ./tools/credscan
