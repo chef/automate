@@ -18,6 +18,32 @@ func init() {
     "application/json"
   ],
   "paths": {
+    "/beta/applications/delete_disconnected_services": {
+      "post": {
+        "operationId": "DeleteDisconnectedServices",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/applicationsServicesRes"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/applicationsDisconnectedServicesReq"
+            }
+          }
+        ],
+        "tags": [
+          "ApplicationsService"
+        ]
+      }
+    },
     "/beta/applications/disconnected_services": {
       "get": {
         "operationId": "GetDisconnectedServices",
@@ -273,6 +299,15 @@ func init() {
     }
   },
   "definitions": {
+    "applicationsDisconnectedServicesReq": {
+      "type": "object",
+      "properties": {
+        "threshold_minutes": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
     "applicationsHealthCounts": {
       "type": "object",
       "properties": {

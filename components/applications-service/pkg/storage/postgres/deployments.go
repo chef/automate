@@ -5,6 +5,12 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	deleteDeploymentsWithoutServices = `
+DELETE FROM deployment WHERE NOT EXISTS (SELECT 1 FROM service WHERE service.deployment_id = deployment.id )
+`
+)
+
 // GetDeployment returns a deployment from the database
 func (db *Postgres) GetDeployment(id int32) (*storage.Deployment, error) {
 	d, err := db.getDeployment(id)

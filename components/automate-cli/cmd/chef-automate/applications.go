@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/golang/protobuf/jsonpb"
@@ -23,17 +24,16 @@ import (
 var appsCmdFlags = struct {
 	thresholdMinutes int64
 	format           string
+	yes              bool
 }{}
 
 func init() {
 	appsSubcmd := newApplicationsRootSubcmd()
+
 	appsSubcmd.AddCommand(newApplicationsEnableCmd())
 	appsSubcmd.AddCommand(newApplicationsDisableCmd())
-
-	listDisconnectedServicesCmd := newApplicationsListDisconnectedServicesCmd()
-	listDisconnectedServicesCmd.PersistentFlags().Int64VarP(&appsCmdFlags.thresholdMinutes, "threshold-minutes", "m", 10, "Number of minutes since last event received")
-	listDisconnectedServicesCmd.PersistentFlags().StringVarP(&appsCmdFlags.format, "format", "f", "json", "Format to display data. [ json | pretty ]")
-	appsSubcmd.AddCommand(listDisconnectedServicesCmd)
+	appsSubcmd.AddCommand(newApplicationsListDisconnectedServicesCmd())
+	appsSubcmd.AddCommand(newApplicationsDeleteDisconnectedServicesCmd())
 
 	RootCmd.AddCommand(appsSubcmd)
 }
@@ -47,12 +47,28 @@ func newApplicationsRootSubcmd() *cobra.Command {
 }
 
 func newApplicationsListDisconnectedServicesCmd() *cobra.Command {
-	return &cobra.Command{
+	c := &cobra.Command{
 		Use:   "list-disconnected-services",
 		Short: "List services that haven't received events from a period of time",
 		RunE:  runApplicationsListDisconnectedServicesCmd,
 		Args:  cobra.NoArgs,
 	}
+	c.PersistentFlags().Int64VarP(&appsCmdFlags.thresholdMinutes, "threshold-minutes", "m", 10, "Number of minutes since last event received")
+	c.PersistentFlags().StringVarP(&appsCmdFlags.format, "format", "f", "pretty", "Format to display data. [ json | pretty ]")
+	return c
+}
+
+func newApplicationsDeleteDisconnectedServicesCmd() *cobra.Command {
+	c := &cobra.Command{
+		Use:   "delete-disconnected-services",
+		Short: "Delete services that haven't received events from a period of time",
+		RunE:  runApplicationsDeleteDisconnectedServicesCmd,
+		Args:  cobra.NoArgs,
+	}
+	c.PersistentFlags().Int64VarP(&appsCmdFlags.thresholdMinutes, "threshold-minutes", "m", 10, "Number of minutes since last event received")
+	c.PersistentFlags().StringVarP(&appsCmdFlags.format, "format", "f", "pretty", "Format to display data. [ json | pretty ]")
+	c.PersistentFlags().BoolVarP(&appsCmdFlags.yes, "yes", "y", false, "Delete services without a confirmation prompt.")
+	return c
 }
 
 func newApplicationsEnableCmd() *cobra.Command {
@@ -103,7 +119,7 @@ func runApplicationsListDisconnectedServicesCmd(*cobra.Command, []string) error 
 		},
 	)
 	if err != nil {
-		return status.Wrap(err, status.APIError, "failed to convert proto into json format")
+		return status.Wrap(err, status.APIError, "failed to get list of disconnected services from the server")
 	}
 
 	switch appsCmdFlags.format {
@@ -125,6 +141,84 @@ func runApplicationsListDisconnectedServicesCmd(*cobra.Command, []string) error 
 			return nil
 		}
 		err := (&proto.TextMarshaler{}).Marshal(os.Stdout, servicesRes)
+		if err != nil {
+			return status.Wrap(err, status.MarshalError, "failed to convert proto into pretty format")
+		}
+	}
+
+	return nil
+}
+
+func runApplicationsDeleteDisconnectedServicesCmd(*cobra.Command, []string) error {
+	if appsCmdFlags.thresholdMinutes <= 0 {
+		return status.Errorf(status.InvalidCommandArgsError,
+			"%d is not a valid threshold time in minutes. The expected time must be greater than zero.",
+			appsCmdFlags.thresholdMinutes,
+		)
+	}
+
+	if appsCmdFlags.format != "json" && appsCmdFlags.format != "pretty" {
+		return status.Errorf(status.InvalidCommandArgsError,
+			"%s is not a valid format type. Available formats are 'json' and 'pretty'.",
+			appsCmdFlags.format,
+		)
+	}
+
+	var (
+		ctx            = context.Background()
+		apiClient, err = apiclient.OpenConnection(ctx)
+	)
+	if err != nil {
+		return status.Wrap(err, status.APIUnreachableError,
+			"Failed to create a connection to the API")
+	}
+	req := &applications.DisconnectedServicesReq{
+		ThresholdMinutes: int32(appsCmdFlags.thresholdMinutes),
+	}
+
+	listRes, err := apiClient.ApplicationsClient().GetDisconnectedServices(ctx, req)
+	if err != nil {
+		return status.Wrap(err, status.APIError, "failed to get list of disconnected services from the server")
+	}
+
+	if len(listRes.Services) <= 0 {
+		// Print this to stderr, if the user is trying to parse stdout (e.g., as
+		// JSON), we don't want a text string there.
+		writer.Errorf(
+			"There are no disconnected services with a threshold of %d minute(s)\n",
+			appsCmdFlags.thresholdMinutes,
+		)
+		return nil
+	}
+	if !appsCmdFlags.yes {
+		confirmMsg := fmt.Sprintf("%d services will be deleted. Do you wish to delete them?", len(listRes.Services))
+		wantToContinue, err := writer.Confirm(confirmMsg)
+		if err != nil {
+			return status.Wrap(err, status.UnknownError, "failed to confirm deletion of services")
+		}
+		if !wantToContinue {
+			writer.Println("Canceled. Not deleting anything.")
+			return nil
+		}
+	}
+	deleteRes, err := apiClient.ApplicationsClient().DeleteDisconnectedServices(ctx, req)
+
+	if err != nil {
+		return status.Wrap(err, status.APIError, "request to delete disconnected services failed")
+	}
+
+	switch appsCmdFlags.format {
+	case "json":
+		json, err := (&jsonpb.Marshaler{
+			EmitDefaults: true,
+			OrigName:     true,
+		}).MarshalToString(deleteRes)
+		if err != nil {
+			return status.Wrap(err, status.MarshalError, "failed to convert proto into json format")
+		}
+		writer.Println(json)
+	case "pretty":
+		err := (&proto.TextMarshaler{}).Marshal(os.Stdout, deleteRes)
 		if err != nil {
 			return status.Wrap(err, status.MarshalError, "failed to convert proto into pretty format")
 		}

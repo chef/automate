@@ -5,6 +5,12 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	deleteSupsWithoutServices = `
+DELETE FROM supervisor WHERE NOT EXISTS (SELECT 1 FROM service WHERE service.sup_id = supervisor.id )
+`
+)
+
 // GetSupervisor returns a supervisor from the database
 func (db *Postgres) GetSupervisor(id int32) (*storage.Supervisor, error) {
 	sup, err := db.getSupervisor(id)
