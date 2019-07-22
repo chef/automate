@@ -140,7 +140,7 @@ function start_sup() {
 
   log_line "Launching the Habitat Supervisor in the background..."
   # We can change sec to ns when everyone is using gnu date
-  (hab sup run $* | while read -r line; do echo "[$(date -u -Isec)]" "$line"; done > /hab/sup/default/sup.log) &
+  (hab sup run "$@" | while read -r line; do echo "[$(date -u -Isec)]" "$line"; done > /hab/sup/default/sup.log) &
   while ! hab svc status >/dev/null 2>&1; do
     sleep 1
   done
