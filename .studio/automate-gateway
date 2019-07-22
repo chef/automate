@@ -570,7 +570,6 @@ function get_api_token_with_policy() {
       # retrieve the tokens' ID
       local token_id
       token_id="$(curl -fsS --insecure -H "api-token: $(get_admin_token)" \
-
        "${GATEWAY_URL}/auth/tokens" |\
          jq -er --arg token "$token_description" '[.tokens[] | select(.description == $token) | .id] | first' )"
       # and add it to policy
