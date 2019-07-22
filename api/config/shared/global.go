@@ -182,6 +182,77 @@ func (c *GlobalConfig) Validate() error { // nolint gocyclo
 		cfgErr.AddInvalidValue("global.v1.external.data_collector.auth.scheme", "scheme must be one of '', 'token'")
 	}
 
+	if externalES := c.GetV1().GetExternal().GetElasticsearch(); externalES.GetEnable().GetValue() {
+		// External ES nodes all either have https urls or https urls
+		nodes := externalES.GetNodes()
+		httpsNodes := make([]string, 0)
+		for _, n := range nodes {
+			ns := n.GetValue()
+			if strings.HasPrefix(ns, "https") {
+				httpsNodes = append(httpsNodes, ns)
+			}
+		}
+		if len(httpsNodes) > 0 && len(httpsNodes) < len(nodes) {
+			cfgErr.AddInvalidValue("global.v1.external.elasticsearch.nodes", "Cannot mix http and https nodes")
+		}
+
+		// Only one of root_cert or root_cert_file has been specified
+		rc := c.GetV1().GetExternal().GetElasticsearch().GetSsl().GetRootCert().GetValue()
+		rcf := c.GetV1().GetExternal().GetElasticsearch().GetSsl().GetRootCertFile().GetValue()
+		if rc != "" && rcf != "" {
+			cfgErr.AddInvalidValue("global.v1.external.elasticsearch.ssl", "Specify either global.v1.external.elasticsearch.ssl.root_cert or global.v1.external.elasticsearch.ssl.root_cert_file, but not both.")
+		}
+
+		auth := c.GetV1().GetExternal().GetElasticsearch().GetAuth()
+		scheme := auth.GetScheme().GetValue()
+		if scheme != "" {
+			// External ES uses a supported auth scheme
+			if scheme != "basic_auth" {
+				cfgErr.AddInvalidValue("global.v1.external.elasticsearch.auth.scheme", "Scheme should be 'basic_auth'.")
+			}
+
+			// Username and password specified in config if using basic auth
+			if scheme == "basic_auth" {
+				u := auth.GetBasicAuth().GetUsername().GetValue()
+				p := auth.GetBasicAuth().GetPassword().GetValue()
+				if u == "" {
+					cfgErr.AddMissingKey("global.v1.external.elasticsearch.basic_auth.username")
+				}
+				if p == "" {
+					cfgErr.AddMissingKey("global.v1.external.elasticsearch.basic_auth.password")
+				}
+			}
+		}
+	}
+
+	if externalPG := c.GetV1().GetExternal().GetPostgresql(); externalPG.GetEnable().GetValue() {
+		if auth := c.GetV1().GetExternal().GetPostgresql().GetAuth(); auth.GetScheme().GetValue() != "password" {
+			// use supported auth scheme (currently only password auth is
+			// supported for postgres)
+			cfgErr.AddInvalidValue("global.v1.external.postgresql.auth.scheme", "Scheme should be 'password'.")
+		} else {
+			// superuser username and password
+			su := auth.GetPassword().GetSuperuser().GetUsername().GetValue()
+			sp := auth.GetPassword().GetSuperuser().GetPassword().GetValue()
+			if su == "" {
+				cfgErr.AddMissingKey("global.v1.external.postgresql.auth.password.superuser.username")
+			}
+			if sp == "" {
+				cfgErr.AddMissingKey("global.v1.external.postgresql.auth.password.superuser.password")
+			}
+
+			// dbuser username and password
+			du := auth.GetPassword().GetDbuser().GetUsername().GetValue()
+			dp := auth.GetPassword().GetDbuser().GetPassword().GetValue()
+			if du == "" {
+				cfgErr.AddMissingKey("global.v1.external.postgresql.auth.password.dbuser.username")
+			}
+			if dp == "" {
+				cfgErr.AddMissingKey("global.v1.external.postgresql.auth.password.dbuser.password")
+			}
+		}
+	}
+
 	if cfgErr.IsEmpty() {
 		return nil
 	}

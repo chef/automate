@@ -3,6 +3,7 @@ package shared
 import (
 	"testing"
 
+	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -226,7 +227,7 @@ func TestValidate(t *testing.T) {
 		expected := NewInvalidConfigError()
 		expected.AddInvalidValue("global.v1.log.level",
 			"'trace' must be one of 'debug, 'info', 'warning', 'error', 'fatal', 'panic'")
-		assert.EqualError(t, cfgErr, expected.Error(), "")
+		assert.EqualError(t, cfgErr, expected.Error())
 	})
 
 	t.Run("with invalid log format", func(t *testing.T) {
@@ -239,7 +240,7 @@ func TestValidate(t *testing.T) {
 		require.True(t, ok)
 		expected := NewInvalidConfigError()
 		expected.AddInvalidValue("global.v1.log.format", "'xml' must be 'text' or 'json'")
-		assert.EqualError(t, cfgErr, expected.Error(), "")
+		assert.EqualError(t, cfgErr, expected.Error())
 	})
 
 	t.Run("with DefaultGlobalConfig", func(t *testing.T) {
@@ -290,6 +291,152 @@ format = "json"
 		res := c.Validate()
 		assert.Nil(t, res)
 	})
+
+	t.Run("with mixed http and https external elasticsearch nodes", func(t *testing.T) {
+		c := &GlobalConfig{
+			V1: &V1{
+				Fqdn: w.String("this.is.a.host"),
+				External: &External{
+					Elasticsearch: &External_Elasticsearch{
+						Enable: w.Bool(true),
+						Nodes: []*wrappers.StringValue{
+							w.String("http://server1:9200"),
+							w.String("https://server2:9200"),
+						},
+					},
+				},
+			},
+		}
+		err := c.Validate()
+		require.Error(t, err)
+		cfgErr, ok := err.(Error)
+		require.True(t, ok)
+		expected := NewInvalidConfigError()
+		expected.AddInvalidValue("global.v1.external.elasticsearch.nodes", "Cannot mix http and https nodes")
+		assert.EqualError(t, cfgErr, expected.Error())
+	})
+
+	t.Run("with both root_cert and root_cert_file set", func(t *testing.T) {
+		c := &GlobalConfig{
+			V1: &V1{
+				Fqdn: w.String("this.is.a.host"),
+				External: &External{
+					Elasticsearch: &External_Elasticsearch{
+						Enable: w.Bool(true),
+						Ssl: &External_Elasticsearch_SSL{
+							RootCert:     w.String("rootcert"),
+							RootCertFile: w.String("rootcertfile"),
+						},
+					},
+				},
+			},
+		}
+		err := c.Validate()
+		require.Error(t, err)
+		cfgErr, ok := err.(Error)
+		require.True(t, ok)
+		expected := NewInvalidConfigError()
+		expected.AddInvalidValue("global.v1.external.elasticsearch.ssl", "Specify either global.v1.external.elasticsearch.ssl.root_cert or global.v1.external.elasticsearch.ssl.root_cert_file, but not both.")
+		assert.EqualError(t, cfgErr, expected.Error())
+	})
+
+	t.Run("with invalid auth scheme for external elasticsearch", func(t *testing.T) {
+		c := &GlobalConfig{
+			V1: &V1{
+				Fqdn: w.String("this.is.a.host"),
+				External: &External{
+					Elasticsearch: &External_Elasticsearch{
+						Enable: w.Bool(true),
+						Auth: &External_Elasticsearch_Authentication{
+							Scheme: w.String("mystery_auth"),
+						},
+					},
+				},
+			},
+		}
+		err := c.Validate()
+		require.Error(t, err)
+		cfgErr, ok := err.(Error)
+		require.True(t, ok)
+		expected := NewInvalidConfigError()
+		expected.AddInvalidValue("global.v1.external.elasticsearch.auth.scheme", "Scheme should be 'basic_auth'.")
+		assert.EqualError(t, cfgErr, expected.Error())
+	})
+
+	t.Run("with external elasticsearch basic auth but no username and password set", func(t *testing.T) {
+		c := &GlobalConfig{
+			V1: &V1{
+				Fqdn: w.String("this.is.a.host"),
+				External: &External{
+					Elasticsearch: &External_Elasticsearch{
+						Enable: w.Bool(true),
+						Auth: &External_Elasticsearch_Authentication{
+							Scheme:    w.String("basic_auth"),
+							BasicAuth: &External_Elasticsearch_Authentication_BasicAuth{},
+						},
+					},
+				},
+			},
+		}
+		err := c.Validate()
+		require.Error(t, err)
+		cfgErr, ok := err.(Error)
+		require.True(t, ok)
+		assert.Contains(t, cfgErr.MissingKeys(), "global.v1.external.elasticsearch.basic_auth.username")
+		assert.Contains(t, cfgErr.MissingKeys(), "global.v1.external.elasticsearch.basic_auth.password")
+	})
+
+	t.Run("with external postgres and unsupported auth scheme", func(t *testing.T) {
+		c := &GlobalConfig{
+			V1: &V1{
+				Fqdn: w.String("this.is.a.host"),
+				External: &External{
+					Postgresql: &External_Postgresql{
+						Enable: w.Bool(true),
+						Auth: &External_Postgresql_Authentication{
+							Scheme: w.String("nonexistent_auth"),
+						},
+					},
+				},
+			},
+		}
+		err := c.Validate()
+		require.Error(t, err)
+		cfgErr, ok := err.(Error)
+		require.True(t, ok)
+		expected := NewInvalidConfigError()
+		expected.AddInvalidValue("global.v1.external.postgresql.auth.scheme", "Scheme should be 'password'.")
+		assert.EqualError(t, cfgErr, expected.Error())
+	})
+
+	t.Run("with external password auth but no superuser and dbuser username and password set", func(t *testing.T) {
+		c := &GlobalConfig{
+			V1: &V1{
+				Fqdn: w.String("this.is.a.host"),
+				External: &External{
+					Postgresql: &External_Postgresql{
+						Enable: w.Bool(true),
+						Auth: &External_Postgresql_Authentication{
+							Scheme: w.String("password"),
+							Password: &External_Postgresql_Authentication_PasswordAuthentication{
+								Superuser: &External_Postgresql_Authentication_PasswordAuthentication_User{},
+								Dbuser:    &External_Postgresql_Authentication_PasswordAuthentication_User{},
+							},
+						},
+					},
+				},
+			},
+		}
+		err := c.Validate()
+		require.Error(t, err)
+		cfgErr, ok := err.(Error)
+		require.True(t, ok)
+		assert.Contains(t, cfgErr.MissingKeys(), "global.v1.external.postgresql.auth.password.superuser.username")
+		assert.Contains(t, cfgErr.MissingKeys(), "global.v1.external.postgresql.auth.password.superuser.password")
+		assert.Contains(t, cfgErr.MissingKeys(), "global.v1.external.postgresql.auth.password.dbuser.username")
+		assert.Contains(t, cfgErr.MissingKeys(), "global.v1.external.postgresql.auth.password.dbuser.password")
+	})
+
 }
 
 func loadFromToml(s string) *GlobalConfig {
