@@ -5,7 +5,6 @@ import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
-import { customMatchers } from 'app/testing/custom-matchers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { IAMType } from 'app/entities/policies/policy.model';
 import { projectEntityReducer } from 'app/entities/projects/project.reducer';
@@ -102,7 +101,6 @@ describe('ProjectRulesComponent', () => {
   }));
 
   beforeEach(() => {
-    jasmine.addMatchers(customMatchers);
     fixture = TestBed.createComponent(ProjectRulesComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

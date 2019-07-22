@@ -6,7 +6,6 @@ import { MockComponent } from 'ng2-mock-component';
 
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { customMatchers } from 'app/testing/custom-matchers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { IAMType } from 'app/entities/policies/policy.model';
 import { GetProjectSuccess } from 'app/entities/projects/project.actions';
@@ -128,7 +127,6 @@ describe('ProjectListComponent', () => {
       }
     }));
 
-    jasmine.addMatchers(customMatchers);
     fixture = TestBed.createComponent(ProjectDetailsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
