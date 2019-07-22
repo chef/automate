@@ -579,6 +579,20 @@ func TestPrepareSystemConfig(t *testing.T) {
 		isFixed(c.GetConnectors().GetLdap().GetEmailAttr().GetValue())
 	})
 
+	t.Run("sets SAML name_id_policy_format default", func(t *testing.T) {
+		cfg := dex.DefaultConfigRequest()
+		cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{
+			Saml: &dex.ConfigRequest_V1_Saml{},
+		}
+		sys, err := cfg.PrepareSystemConfig(&shared.TLSCredentials{})
+		require.NoError(t, err)
+		require.NotNil(t, sys)
+		c, ok := sys.(*dex.ConfigRequest_V1_System)
+		require.True(t, ok)
+		assert.Equal(t, "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+			c.GetConnectors().GetSaml().GetNameIdPolicyFormat().GetValue())
+	})
+
 	t.Run("keeps unset values intact when fixing samAccountName", func(t *testing.T) {
 		cfg := dex.DefaultConfigRequest()
 		cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{

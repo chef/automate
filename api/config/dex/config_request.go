@@ -162,6 +162,9 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *shared.TLSCredentials) (share
 	// However, this workaround will make the papercut go away faster.
 	c.V1.Sys.GetConnectors().GetLdap().fixCommonCaseIssues()
 
+	// default name_id_policy_format (SAML)
+	c.V1.Sys.GetConnectors().GetSaml().setNameIDPolicyDefault()
+
 	return c.V1.Sys, nil
 }
 
@@ -250,5 +253,14 @@ func checkCertsPEM(cfgErr *shared.InvalidConfigError, key, data string) {
 			cfgErr.AddInvalidValue(key,
 				fmt.Sprintf("invalid PEM type: %q, expected \"CERTIFICATE\"", block.Type))
 		}
+	}
+}
+
+func (samlCfg *ConfigRequest_V1_Saml) setNameIDPolicyDefault() {
+	if samlCfg == nil {
+		return
+	}
+	if samlCfg.NameIdPolicyFormat == nil {
+		samlCfg.NameIdPolicyFormat = w.String("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
 	}
 }
