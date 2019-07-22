@@ -38,19 +38,20 @@ do_unpack() {
 }
 
 npm_install() {
-  # --unsafe-perm lets our package.json install task copy files when running
+  # --unsafe-perm enables the package.json install task to copy files when running
   # as superuser during the hab package building.
   # Copied from Habitat's node scaffolding:
   # https://github.com/habitat-sh/core-plans/blob/be88f083c123ab998711fd3a93976ad10492a955/scaffolding-node/lib/scaffolding.sh#L111-L116
   npm install \
     --unsafe-perm \
-    --production \
     --loglevel error \
-    --fetch-retries 5
+    --fetch-retries 5 \
+    "$@"
 }
 
 fix_interpreters() {
   # Fix the interpreters of the binaries
+  # Note: many bin/* files are links, so the output will have duplicate entries
   for b in node_modules/.bin/*; do
     fix_interpreter "$(readlink -f -n "$b")" core/coreutils bin/env
   done
@@ -69,16 +70,13 @@ do_build() {
 
   echo "Building $CACHE_PATH/automate-ui"
   pushd "$CACHE_PATH/automate-ui"
-    npm_install
+    npm_install --production
 
     # Angular CLI isn't included in production deps so we need to install it manually.
-    npm install \
-        --unsafe-perm \
-        --loglevel error \
-        --fetch-retries 5 \
-        @angular/cli
+    npm_install @angular/cli
 
     fix_interpreters
+    npm run build:prod
 
     npm uninstall @angular/cli --no-save
   popd
