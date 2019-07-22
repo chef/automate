@@ -223,6 +223,7 @@ connectors:
       usernameAttr: {{cfg.connectors.saml.username_attr}}
       emailAttr: {{cfg.connectors.saml.email_attr}}
       groupsAttr: {{cfg.connectors.saml.groups_attr}}
+      nameIDPolicyFormat: {{cfg.connectors.saml.name_id_policy_format}}
   {{- end}}
 {{- end}}
 
