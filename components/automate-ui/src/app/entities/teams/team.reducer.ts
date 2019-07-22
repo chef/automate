@@ -26,7 +26,7 @@ export const TeamEntityInitialState: TeamEntityState = teamEntityAdapter.getInit
   getStatus: EntityStatus.notLoaded,
   getUsersStatus: EntityStatus.notLoaded,
   createStatus: EntityStatus.notLoaded,
-  createError: null, 
+  createError: null,
   deleteStatus: EntityStatus.notLoaded,
   updateStatus: EntityStatus.notLoaded,
   addUsersStatus: EntityStatus.notLoaded,
@@ -101,7 +101,7 @@ export function teamEntityReducer(state: TeamEntityState = TeamEntityInitialStat
     case TeamActionTypes.CREATE_FAILURE: {
       return pipe(
         set('createError', action.payload),
-        set('createStatus', EntityStatus.loadingFailure),
+        set('createStatus', EntityStatus.loadingFailure)
         )(state) as TeamEntityState;
     }
 

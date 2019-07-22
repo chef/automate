@@ -4,7 +4,7 @@
 <div class="container">
   <main>
     <app-delete-object-modal
-      [visible]="modalVisible"
+      [visible]="deleteModalVisible"
       objectNoun="team"
       [objectName]="(iamMajorVersion$ | async) === 'v1' ? teamToDelete?.id : teamToDelete?.name"
       (close)="closeModal()"
@@ -18,19 +18,19 @@
 
     <app-create-object-modal
       [visible]="createModalVisible"
-      [creating]="creatingToken"
+      [creating]="creatingTeam"
       [conflictErrorEvent]="conflictErrorEvent"
-      objectNoun="token"
-      [createForm]="createTokenForm"
+      objectNoun="team"
+      [createForm]="createTeamForm"
       (close)="closeCreateModal()"
-      (createClicked)="createToken()">
+      (createClicked)="createTeam()">
     </app-create-object-modal>
 
     <div class="page-body">
       <section>
         <chef-toolbar>
           <app-authorized [allOf]="['/auth/teams', 'post']">
-            <chef-button primary [routerLink]="['/settings/add-team']">Create Team</chef-button>
+            <chef-button primary (click)="openCreateModal()">Create Team</chef-button>
           </app-authorized>
         </chef-toolbar>
         <div id="table-container">

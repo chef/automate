@@ -1,13 +1,17 @@
 import { Component, OnInit, EventEmitter } from '@angular/core';
 import { Store, select } from '@ngrx/store';
-import { Observable, Subject} from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { map, filter, takeUntil } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { loading, EntityStatus } from 'app/entities/entities';
 import { iamMajorVersion } from 'app/entities/policies/policy.selectors';
-import { createError, createStatus, allTeams, getAllStatus } from 'app/entities/teams/team.selectors';
+import {
+  createError,
+  createStatus,
+  allTeams,
+  getAllStatus } from 'app/entities/teams/team.selectors';
 import { Team } from 'app/entities/teams/team.model';
 import { CreateTeam, DeleteTeam, GetTeams } from 'app/entities/teams/team.actions';
 import { Validators, FormGroup, FormBuilder } from '@angular/forms';
@@ -23,7 +27,7 @@ export class TeamManagementComponent implements OnInit {
   public sortedTeams$: Observable<Team[]>;
   public loading$: Observable<boolean>;
   public teamToDelete: Team;
-  public modalVisible = false;
+  public deleteModalVisible = false;
   public createModalVisible = false;
   public createTeamForm: FormGroup;
   public creatingTeam = false;
@@ -62,12 +66,12 @@ export class TeamManagementComponent implements OnInit {
   }
 
   public closeModal(): void {
-    this.modalVisible = false;
+    this.deleteModalVisible = false;
   }
 
   public startTeamDelete(team: Team): void {
     this.teamToDelete = team;
-    this.modalVisible = true;
+    this.deleteModalVisible = true;
   }
 
   public deleteTeam(): void {
