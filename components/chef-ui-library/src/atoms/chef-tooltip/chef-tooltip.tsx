@@ -130,8 +130,13 @@ export class ChefTooltip {
     const [x, y] = this.screenPosition;
 
     return {
-      class: [this.visible ? 'visible' : '', this.position, this.follow ? 'follow' : '']
-        .join(' '),
+      class: [
+        this.visible ? 'visible' : '',
+        this.position,
+        this.follow ? 'follow' : ''
+      ]
+      .filter(className => className.length > 0)
+      .join(' '),
       style: { left: `${x}px`, top: `${y}px` }
     };
   }
