@@ -48,6 +48,7 @@ liveness_error_dump() {
     log_error "Dumping /var/log/chef/automate-liveness-agent/automate-liveness-agent.log:"
     cat /var/log/chef/automate-liveness-agent/automate-liveness-agent.log
     find /hab/pkgs -printf "%M %p\n"
+    cat /var/opt/chef/etc/config.json
 }
 
 do_test_deploy() {
