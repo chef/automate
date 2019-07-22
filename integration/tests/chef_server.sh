@@ -52,11 +52,14 @@ liveness_error_dump() {
 }
 
 do_test_deploy() {
+    previous_umask=$(umask)
+    umask 022
     PATH="/hab/bin:/bin" chef-server-ctl test
     test_chef_server_ctl
     test_knife
     test_cookbook_caching
     converge_chef_client
+    umask "$previous_umask"
 
     # Converging the chef client should run the required recipe which sets
     # up the liveness agent and starts it.
