@@ -207,14 +207,14 @@ document "rebuild" <<EOF
   build time
 EOF
 function rebuild() {
-  output=$(set -o pipefail; NO_INSTALL_DEPS=1 build $@ | tee /dev/stderr)
+  output=$(set -o pipefail; NO_INSTALL_DEPS=1 build "$@" | tee /dev/stderr)
   err=$?
   if [[ $err != 0 ]]
   then
     echo $output | grep "Resolving '.*' failed" > /dev/null
     if [[ $? == 0 ]]
     then
-      build $@
+      build "$@"
       err=$?
     fi
   fi
