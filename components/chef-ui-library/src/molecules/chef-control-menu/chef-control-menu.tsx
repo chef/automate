@@ -125,8 +125,21 @@ export class ChefControlMenu {
     }
   }
 
-  @Listen('keydown.enter')
-  @Listen('keydown.space') handleKeyActivation() {
+  @Listen('keydown') handleKeydown(event: KeyboardEvent) {
+    switch (event.key) {
+      case (' '):
+      case ('Enter'):
+        return this.handleKeyActivation();
+      case ('Escape'):
+        return this.handleEscape();
+      case ('ArrowUp'):
+        return this.handleUp(event);
+      case ('ArrowDown'):
+        return this.handleDown(event);
+    }
+  }
+
+  handleKeyActivation() {
     if (this.disabled) {
       return;
     } else if (this.active) {
@@ -136,17 +149,17 @@ export class ChefControlMenu {
     }
   }
 
-  @Listen('keydown.escape') handleEscape() {
+  handleEscape() {
     this.active = false;
     this.focusedIndex = this.selectedIndex;
   }
 
-  @Listen('keydown.up') handleUp(event) {
+  handleUp(event: KeyboardEvent) {
     event.preventDefault();
     this.focusedIndex = this.clamp(this.focusedIndex - 1);
   }
 
-  @Listen('keydown.down') handleDown(event) {
+  handleDown(event: KeyboardEvent) {
     event.preventDefault();
     this.focusedIndex = this.clamp(this.focusedIndex + 1);
   }

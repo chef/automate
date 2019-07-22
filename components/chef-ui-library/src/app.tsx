@@ -17,7 +17,7 @@ export class ChefLibraryApp {
 
   @Prop({ context: 'store' }) store: Store;
 
-  private getDocs: typeof getDocs;
+  getDocs: typeof getDocs;
 
   componentWillLoad() {
     this.store.setStore(configureStore({}));
