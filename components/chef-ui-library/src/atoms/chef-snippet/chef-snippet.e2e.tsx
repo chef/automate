@@ -21,13 +21,15 @@ describe('chef-snippet', () => {
     expect(element.textContent).toEqual('<h1>Example markup</h1>');
   });
 
-  describe('when `code` prop is empty', async () => {
-    const page = await newE2EPage();
-    const snippet = `<chef-snippet code='' lang='${lang}'></chef-snippet>`;
+  describe('when `code` prop is empty', () => {
+    it('displays nothing', async () => {
+      const page = await newE2EPage();
+      const snippet = `<chef-snippet code='' lang='${lang}'></chef-snippet>`;
 
-    await page.setContent(snippet);
+      await page.setContent(snippet);
 
-    const content = await page.find('pre');
-    expect(content).toBeFalsy();
+      const content = await page.find('pre');
+      expect(content).toBeFalsy();
+    });
   });
 });

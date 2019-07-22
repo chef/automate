@@ -64,9 +64,7 @@ describe('chef-select', () => {
 
     beforeEach(() => {
       select = new ChefSelect();
-      select.el = {
-        querySelector: jest.fn().mockReturnValue({ focus: jest.fn() })
-      };
+      select.el.querySelector = jest.fn().mockReturnValue({ focus: jest.fn() });
       select.change = {
         emit: jest.fn()
       };
@@ -92,7 +90,7 @@ describe('chef-select', () => {
     it('focuses on the dropdown during activation', () => {
       const focus = jest.fn();
       const querySelector = jest.fn().mockReturnValue({ focus });
-      select.el = { querySelector };
+      select.el.querySelector = querySelector;
       select.active = false;
       select.handleKeyActivation();
 
@@ -114,9 +112,7 @@ describe('chef-select', () => {
 
     beforeEach(() => {
       select = new ChefSelect();
-      select.el = {
-        querySelector: jest.fn().mockReturnValue({ focus: jest.fn() })
-      };
+      select.el.querySelector = jest.fn().mockReturnValue({ focus: jest.fn() });
       select.change = {
         emit: jest.fn()
       };
@@ -150,7 +146,7 @@ describe('chef-select', () => {
     it('focuses on the dropdown during activation', () => {
       const focus = jest.fn();
       const querySelector = jest.fn().mockReturnValue({ focus });
-      select.el = { querySelector };
+      select.el.querySelector = querySelector;
       select.active = false;
       select.handleKeyActivation();
 
