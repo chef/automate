@@ -152,7 +152,7 @@ export class ChefPage {
                   {this.getLoading()}
                   <ng-container>{this.confirmBtnText}</ng-container>
                 </chef-button>
-              : <chef-button primary onClick={this.handleConfirm.bind(this)}>
+              : <chef-button type="submit" form="ruleForm" primary onClick={this.handleConfirm.bind(this)}>
                   <ng-container>{this.confirmBtnText}</ng-container>
                 </chef-button>
             }

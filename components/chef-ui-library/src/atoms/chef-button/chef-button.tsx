@@ -377,6 +377,11 @@ export class ChefButton {
   @Prop({ reflectToAttr: true }) type: 'submit' | 'reset' | 'button' = 'button';
 
   /**
+   * Name for form to submit
+   */
+  @Prop({ reflectToAttr: true }) form: string;
+
+  /**
    * Create a primary button
    */
   @Prop({ reflectToAttr: true }) primary = false;
@@ -428,6 +433,7 @@ export class ChefButton {
       return (
         <button
           type={this.type}
+          form={this.form}
           disabled={this.disabled}
           aria-disabled={this.disabled}>
           <slot />

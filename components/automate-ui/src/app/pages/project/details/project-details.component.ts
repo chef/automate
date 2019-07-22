@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { identity } from 'lodash/fp';
+import { find as _find } from 'lodash';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -13,6 +14,11 @@ import {
 } from 'app/entities/projects/project.selectors';
 import { Project } from 'app/entities/projects/project.model';
 import { GetProject, UpdateProject } from 'app/entities/projects/project.actions';
+import { GetRulesForProject, DeleteRule } from 'app/entities/rules/rule.actions';
+import { Rule } from 'app/entities/rules/rule.model';
+import {
+  allRules
+} from 'app/entities/rules/rule.selectors';
 
 @Component({
   selector: 'app-project-details',
@@ -25,13 +31,23 @@ export class ProjectDetailsComponent implements OnDestroy {
   public projectForm: FormGroup;
   public saveSuccessful = false;
   public isChefManaged = false;
+  public rules: Rule[] = [];
+  public selectedTab: 'rules' | 'details' = 'rules';
+  public ruleToDelete: any;
+  public deleteModalVisible = false;
+  public createModalVisible = false;
+  public createProjectForm: FormGroup;
+  public creatingProject = false;
   // isLoading represents the initial load as well as subsequent updates in progress.
   public isLoading = true;
   public saving = false;
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
-  constructor(fb: FormBuilder,
-              private store: Store<NgrxStateAtom>) {
+  constructor(
+    fb: FormBuilder,
+    private store: Store<NgrxStateAtom>
+  ) {
+
     this.projectForm = fb.group({
       name: ['Loading...']
     });
@@ -45,13 +61,18 @@ export class ProjectDetailsComponent implements OnDestroy {
         this.isLoading =
           (gStatus !== EntityStatus.loadingSuccess) ||
           (uStatus === EntityStatus.loading);
-      })).subscribe();
+      })
+    ).subscribe();
 
     this.store.select(projectFromRoute).pipe(
       filter(identity),
       takeUntil(this.isDestroyed),
       map((state) => {
         this.project = <Project>Object.assign({}, state);
+        this.store.dispatch(new GetRulesForProject({ project_id: this.project.id }));
+        store.select(allRules).subscribe((rules) => {
+          this.rules = rules;
+        });
         this.isChefManaged = this.project.type === 'CHEF_MANAGED';
         this.projectForm = fb.group({
           // Must stay in sync with error checks in project-details.component.html
@@ -75,6 +96,50 @@ export class ProjectDetailsComponent implements OnDestroy {
 
   keyPressed() {
     this.saveSuccessful = false;
+  }
+
+  onTabChange(event) {
+    this.selectedTab = event.target.value;
+  }
+
+  showTab(tabName: string): boolean {
+    return this.selectedTab === tabName;
+  }
+
+  showFirstRuleMessage(): boolean {
+    return this.rules.length === 0;
+  }
+
+  showRulesTable(): boolean {
+    return this.rules.length > 0;
+  }
+
+  closeDeleteModal(): void {
+    this.deleteModalVisible = false;
+  }
+
+  startRuleDelete(r: any): void {
+    this.deleteModalVisible = true;
+    this.ruleToDelete = r;
+  }
+
+  deleteRule(): void {
+    this.store.dispatch(new DeleteRule({id: this.ruleToDelete.id}));
+    this.closeDeleteModal();
+  }
+
+  getEditStatus(status: string): string {
+    return status === 'staging'
+      ? 'Edits pending'
+      : 'Applied';
+  }
+
+  showDeleteRule(rule: Rule): boolean {
+    return rule.edits !== 'staging';
+  }
+
+  showProjectLink(): boolean {
+    return _find(this.rules, ['edits', 'staging']) ? true : false;
   }
 
   saveProject() {

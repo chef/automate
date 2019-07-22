@@ -1,0 +1,110 @@
+<chef-page
+  subheading="Resources that match the type and all conditions are included in the project."
+  confirm-btn-text="Save Rule"
+  [attr.heading]="getHeading()"
+  [attr.disable-confirm]="!ruleForm.valid"
+  [attr.page-loading]="isLoading"
+  [attr.confirm-loading]="saving"
+  (confirm)="saveRule()"
+  (close)="closePage()">
+  <div *ngIf="!isLoading">
+    <ng-container>
+      <form id="ruleForm" [formGroup]="ruleForm" (ngSubmit)="saveRule()">
+
+        <chef-form-field class="display3">
+          <label>
+            <span class="label">Rule Name</span>
+            <chef-input id="ruleName" ngDefaultControl formControlName="name"></chef-input>
+          </label>
+          <chef-error
+            *ngIf="ruleForm.get('name').hasError('required') && ruleForm.get('name').dirty"
+          >Name is required</chef-error>
+        </chef-form-field>
+
+        <chef-form-field class="display3">
+          <label>
+            <span class="label">Resource Type</span>
+            <select id="resourceType" ngDefaultControl formControlName="type">
+              <option value='NODE'>Node</option>
+              <option value='EVENT'>Event</option>
+            </select>
+          </label>
+          <chef-error
+            *ngIf="ruleForm.get('type').hasError('required') && ruleForm.get('type').dirty"
+          >Resource Type is required</chef-error>
+          <small class="help">Resource types cannot be changed after the rule is created.</small>
+        </chef-form-field>
+
+        <div id="add-condition">
+          <div class="label">Conditions</div>
+          <small>All conditions must be true for the rule to be true.</small>
+          <chef-button primary (click)="addCondition()">Add Condition</chef-button>
+        </div>
+
+        <div id="condition-list" formArrayName="conditions">
+
+          <div class="condition-item"
+            [formGroupName]="i"
+            *ngFor="let condition of ruleForm.get('conditions').controls; let i = index">
+
+            <chef-form-field class="attribute-field">
+              <label>
+                <span class="label">{{ getAttributeLabel() }}</span>
+                <select ngDefaultControl formControlName="attribute">
+                  <option 
+                    *ngFor="let option of attributes[ruleForm.get('type').value.toLowerCase()]; let i = index"
+                    [value]="option.key"
+                  >{{ option.value }}</option>
+                </select>
+              </label>
+            </chef-form-field>
+
+            <chef-form-field class="attribute-field">
+              <label>
+                <span class="label">Operator</span>
+                <select ngDefaultControl
+                  formControlName="operator"
+                  (change)="updateConditionValues(condition)"
+                >
+                  <option value='EQUALS'>equals</option>
+                  <option value='MEMBER_OF'>member of</option>
+                </select>
+              </label>
+            </chef-form-field>
+            
+            <chef-form-field class="attribute-field">
+              <label>
+                <span class="label">Value</span>
+                <chef-input ngDefaultControl
+                  formControlName="values"
+                  [value]="getConditionValue(condition.controls.values.value)"
+                  (change)="updateConditionValues(condition)"
+                ></chef-input>
+              </label>
+
+              <small class="help"
+                *ngIf="condition.controls.operator.value === 'EQUALS'">
+                  Case sensitive, must match exactly.
+              </small>
+
+              <small class="help"
+                *ngIf="condition.controls.operator.value === 'MEMBER_OF'">
+                  Comma-separated list, at least one must match exactly.
+              </small>
+
+            </chef-form-field>
+            <chef-form-field class="attribute-field">
+              <label>
+                <span *ngIf="showAndLabel(i)" class="label">AND</span>
+              </label>
+              <chef-button tertiary *ngIf="showDelete(i)" (click)="deleteCondition(i)">
+                <chef-icon>delete</chef-icon>
+              </chef-button>
+            </chef-form-field>
+
+          </div>
+        </div>
+      </form>
+    </ng-container>
+  </div>
+</chef-page>

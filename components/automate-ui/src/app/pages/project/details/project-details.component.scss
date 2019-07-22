@@ -4,6 +4,19 @@ chef-page-header {
   padding-bottom: 0;
 }
 
+chef-toolbar {
+  display: block;
+  position: relative;
+  margin-bottom: 5px;
+
+  small {
+    bottom: 2px;
+    color: $chef-dark-grey;
+    position: absolute;
+    right: 0;
+  }
+}
+
 chef-tab-selector {
   chef-option {
     margin-right: 16px;
@@ -80,4 +93,26 @@ tbody > .detail-row {
   width: 66%;
   padding-top: 0px;
   padding-left: 0px;
+}
+
+chef-table {
+  .controls {
+    justify-content: flex-end;
+  }
+}
+
+.empty-case-container {
+  display: flex;
+  justify-content: center;
+
+  p {
+    margin-top: 42px;
+    font-size: 18px;
+    margin-bottom: 0;
+    text-align: center;
+  }
+
+  chef-button {
+    margin-top: 18px;
+  }
 }

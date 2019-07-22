@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
+import { Router, ActivationStart } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Feature } from 'app/services/feature-flags/types';
 
 import { GetIamVersion } from 'app/entities/policies/policy.actions';
 import { notificationState } from 'app/entities/notifications/notification.selectors';
-import { routeURL } from './route.selectors';
 import { Notification } from 'app/entities/notifications/notification.model';
 import { DeleteNotification } from 'app/entities/notifications/notification.actions';
 import { LicenseApplyReason } from 'app/page-components/license-apply/license-apply.component';
@@ -39,21 +40,24 @@ export class UIComponent implements OnInit {
 
   licenseApplyReason: LicenseApplyReason;
 
-  // TODO(sr) 2018/12/03: This is specific to the policies page and should be
-  // handled differently. Unfortunately, I don't know how; but this isn't the
-  // correct way ;)
-  renderNavbar = window.location.pathname.split('/').pop() !== 'add-members';
+  renderNavbar = true;
 
   constructor(
-    private store: Store<NgrxStateAtom>
+    private store: Store<NgrxStateAtom>,
+    private router: Router
   ) {
     this.notifications$ = store.select(notificationState);
   }
 
   ngOnInit(): void {
-    this.store.select(routeURL).subscribe((url: string) => {
-      this.renderNavbar = url.split('/').pop() !== 'add-members';
+    this.router.events.pipe(
+        filter(event => event instanceof ActivationStart)
+    ).subscribe((event: any) => {
+      this.renderNavbar = event.snapshot.data.hideNavBar
+        ? false
+        : true;
     });
+
     this.store.dispatch(new GetIamVersion());
   }
 

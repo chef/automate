@@ -1,0 +1,85 @@
+@import "~styles/variables";
+
+chef-page {
+
+  small {
+    color: $chef-dark-grey;
+    font-size: 14px;
+
+    &.help {
+      font-size: 12px;
+    }
+  }
+
+  form {
+    height: calc(100vh - 350px);
+    overflow-y: scroll;
+  }
+
+  chef-input {
+    height: 45px;
+  }
+
+  #ruleName,
+  #resourceType {
+    width: 340px;
+  }
+
+  chef-form-field {
+    .label {
+      font-size: 16px;
+    }
+
+    &.attribute-field {
+      display: inline-block;
+      position: relative;
+      vertical-align: top;
+      width: 27%;
+
+      &:last-child {
+        margin: 2.5rem 0px;
+        width: 18%;
+
+        label {
+          display: inline-block;
+        }
+
+        chef-button {
+          position: absolute;
+          right: 0;
+          top: -14px;
+
+          chef-icon {
+            color: $chef-primary-dark;
+            font-size: 1.2rem;
+          }
+        }
+      }
+
+      .label {
+        color: $chef-dark-grey;
+        text-transform: uppercase;
+        font-weight: 100;
+      }
+
+      chef-select,
+      chef-input {
+        min-width: 0;
+        width: 95%;
+      }
+    }
+
+  }
+
+  #add-condition {
+    margin: 1rem 0;
+
+    small {
+      display: block;
+    }
+
+    chef-button {
+      margin-left: 0;
+    }
+  }
+}
