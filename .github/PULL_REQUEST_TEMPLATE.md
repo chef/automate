@@ -1,5 +1,7 @@
 ### :nut_and_bolt: Description
 
+<!-- /!\ Please ensure that you are NOT disclosing any customer information without their consent /!\ -->
+
 ### :+1: Definition of Done
 
 ### :athletic_shoe: Demo Script / Repro Steps
