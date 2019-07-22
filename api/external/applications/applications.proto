@@ -121,6 +121,7 @@ message ServicesStatsRes {
   int32 total_service_groups = 1;
   int32 total_services = 2;
   int32 total_supervisors = 3;
+  int32 total_deployments = 4;
 }
 
 message Service {

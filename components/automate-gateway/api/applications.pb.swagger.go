@@ -495,6 +495,10 @@ func init() {
         "total_supervisors": {
           "type": "integer",
           "format": "int32"
+        },
+        "total_deployments": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },

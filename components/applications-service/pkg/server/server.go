@@ -255,11 +255,17 @@ func (app *ApplicationsServer) GetServicesStats(ctx context.Context,
 		log.WithError(err).Error("Error retrieving supervisors count")
 		return nil, status.Error(codes.Internal, err.Error())
 	}
+	deploymentsCount, err := app.storageClient.GetDeploymentsCount()
+	if err != nil {
+		log.WithError(err).Error("Error retrieving deployments count")
+		return nil, status.Error(codes.Internal, err.Error())
+	}
 
 	return &applications.ServicesStatsRes{
 		TotalServices:      servicesCount,
 		TotalServiceGroups: serviceGroupsCount,
 		TotalSupervisors:   supervisorsCount,
+		TotalDeployments:   deploymentsCount,
 	}, nil
 }
 
