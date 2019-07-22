@@ -105,9 +105,9 @@ function send_chef_action_example() {
   install_if_missing core/jq-static jq
 
   local event_types=(cookbook bag client node policyfile role scanjobs profile)
-  local event_type=${event_types[$(($RANDOM % 8))]}
+  local event_type=${event_types[$((RANDOM % 8))]}
   local event_tasks=(update create delete)
-  local event_task=${event_tasks[$(($RANDOM % 3))]}
+  local event_task=${event_tasks[$((RANDOM % 3))]}
   if [[ "$1" != "" ]]; then
     event_type=$1
   fi
@@ -118,7 +118,7 @@ function send_chef_action_example() {
   local examples_path="/src/components/ingest-service/examples"
   local tmp_action_json
   local rfc_time
-  rfc_time=$(date --rfc-3339=seconds  -d "$(($RANDOM % 144)) hour ago" | sed 's/ /T/' | sed 's/\+.*/Z/')
+  rfc_time=$(date --rfc-3339=seconds  -d "$((RANDOM % 144)) hour ago" | sed 's/ /T/' | sed 's/\+.*/Z/')
 
   # Update the 'recorded_at' time from the ChefAction Example; and set entity_type and task
   tmp_action_json="$(jq --arg event_task "$event_task" --arg rfc_time "$rfc_time" --arg event_type "$event_type" \
@@ -230,9 +230,9 @@ function send_chef_run_failure_example() {
   local node_uuid
   node_uuid=$(uuidgen)
 
-  local node_name="node_failed_$(($RANDOM % 100))"
+  local node_name="node_failed_$((RANDOM % 100))"
   local rfc_time
-  rfc_time=$(date +%FT%TZ -d "$(($RANDOM % 144)) hour ago")
+  rfc_time=$(date +%FT%TZ -d "$((RANDOM % 144)) hour ago")
 
   local examples_path="/src/components/ingest-service/examples"
   [[ "$1" == "legacy" ]] && endpoint="/events/data-collector" || endpoint="/ingest/events/chef/run"
@@ -294,7 +294,7 @@ function send_inspec_example() {
   local rfc_time
   uuid=$(uuidgen)
   report_uuid=$(uuidgen)
-  rfc_time=$(date +%FT%TZ -d "$(($RANDOM % 144)) hour ago")
+  rfc_time=$(date +%FT%TZ -d "$((RANDOM % 144)) hour ago")
 
   tmp_inspec_json="$(jq --arg id "$uuid" --arg report_uuid "$report_uuid" --arg rfc_time "$rfc_time" '.node_uuid = $id | .report_uuid = $report_uuid | .end_time = $rfc_time' <$examples_json_path)"
 
