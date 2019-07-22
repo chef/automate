@@ -2017,6 +2017,13 @@ func (s *server) reloadBackupRunner() error {
 	// platformConfig knows how to deal with superuser, and external vs internal PG
 	platformConfig := platform.Config{
 		Config: &papi.Config{
+			Service: &papi.Config_Service{
+				// NOTE (jaym): The below hack is to allow deployment-service to find the
+				// root cert for external postgres.
+				// deployment-service doesn't fully participate in the platform config, and
+				// so it does not get the external postgres root cert automatically
+				Path: "/hab/svc/automate-pg-gateway",
+			},
 			Postgresql: &papi.Config_Postgresql{
 				Ip: s.deployment.Config.GetPgGateway().GetV1().GetSys().GetService().GetHost().GetValue(),
 				Cfg: &papi.Config_Postgresql_Cfg{
