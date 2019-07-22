@@ -57,7 +57,7 @@ func NewErrTxCommit(e error) error {
 }
 
 func (e *ErrTxCommit) Error() string {
-	return "commit db transaction: " + e.Error()
+	return "commit db transaction: " + e.underlying.Error()
 }
 
 // ErrMissingField occurs when a required field was not passed.

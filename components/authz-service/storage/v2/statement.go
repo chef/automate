@@ -24,6 +24,9 @@ func NewStatement(effect Effect, role string, projects, resources, actions []str
 	if actions == nil {
 		actions = []string{}
 	}
+	if resources == nil {
+		resources = []string{}
+	}
 
 	if role == "" && len(actions) == 0 {
 		return Statement{},

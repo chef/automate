@@ -1,5 +1,12 @@
 BEGIN;
 
+-- there was previously a bug that allowed NULL values to be inserted into
+-- the database for actions (and maybe resources). clean up any such instances.
+UPDATE iam_statements t SET actions = '{}' WHERE actions IS NULL;
+ALTER  TABLE iam_statements ALTER COLUMN actions SET NOT NULL;
+UPDATE iam_statements t SET resources = '{}' WHERE resources IS NULL;
+ALTER  TABLE iam_statements ALTER COLUMN resources SET NOT NULL;
+
 ALTER TABLE iam_statements ADD COLUMN role_id INTEGER;
 
 -- populate role_id in all statements that have a role
