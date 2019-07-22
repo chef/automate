@@ -116,6 +116,8 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   }
 
   getAttributeLabel() {
+    // Important for this to be all lower case for screen readers!
+    // (All uppercase is typically read as an acronym.)
     return `${this.ruleForm.get('type').value.toLowerCase()} attribute`;
   }
 

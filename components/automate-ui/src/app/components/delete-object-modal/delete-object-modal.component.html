@@ -2,11 +2,11 @@
   <h2 slot="title">Delete {{objectNoun | titlecase}}?</h2>
   <div>
     <span *ngIf="moreDetails">
-      Deleting {{objectNoun}} {{objectName}} <b>cannot be undone</b><br>
+      Deleting {{objectNoun}} {{objectName}} <strong>cannot be undone</strong><br>
       {{moreDetails}}.
     </span>
     <span *ngIf="!moreDetails">
-      Deleting {{objectNoun}} {{objectName}} <b>cannot be undone</b>.
+      Deleting {{objectNoun}} {{objectName}} <strong>cannot be undone</strong>.
     </span>
   </div>
 

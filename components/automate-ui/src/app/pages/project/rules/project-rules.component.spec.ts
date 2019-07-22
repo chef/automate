@@ -185,13 +185,15 @@ describe('ProjectRulesComponent', () => {
     it('should have attribute label with NODE type', () => {
       component.ruleForm.get('type').setValue('NODE');
       const attributeLabel = component.getAttributeLabel();
-      expect(attributeLabel).toBe('node attribute');
+      expect(attributeLabel)
+        .toBe('node attribute'); // specifically should be lowercase for screen reader
     });
 
     it('should have attribute label with EVENT type', () => {
       component.ruleForm.get('type').setValue('EVENT');
       const attributeLabel = component.getAttributeLabel();
-      expect(attributeLabel).toBe('event attribute');
+      expect(attributeLabel)
+        .toBe('event attribute'); // specifically should be lowercase for screen reader
     });
 
     it('should not show add label with one condition', () => {
