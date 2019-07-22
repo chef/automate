@@ -107,6 +107,9 @@ low = "95%"
 high = "98%"
 flood_stage = "99%"
 
+[es_yaml.opendistro_security]
+enable_snapshot_restore_privilege = true
+
 [opendistro_ssl]
 
 # root pem cert that signed the two cert/key pairs below
