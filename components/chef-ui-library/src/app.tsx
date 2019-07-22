@@ -2,6 +2,7 @@
 // cause side effects we need to disable that rule in this case.
 /* tslint:disable:no-import-side-effect */
 import '@stencil/router';
+import '@stencil/redux';
 /* tslint:enable:no-import-side-effect */
 
 import { Component, Prop, h } from '@stencil/core';
