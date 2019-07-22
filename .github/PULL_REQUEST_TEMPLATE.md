@@ -1,4 +1,4 @@
-### :nut_and_bolt: Description: what code has changed, and why?
+### :nut_and_bolt: Description: What code changed, and why?
 
 <!-- /!\ Please ensure that you are NOT disclosing any customer information without their consent /!\ -->
 
@@ -10,5 +10,6 @@
 
 - [ ] Tests added/updated?
 - [ ] Docs added/updated?
+- [ ] Code executed?
 
 ### :chains: Related Resources
