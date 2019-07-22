@@ -56,7 +56,7 @@ document "gateway_version" <<DOC
   => curl $GATEWAY_URL/version
 DOC
 function gateway_version() {
-  install_if_missing core/jq-static jq;
+  install_if_missing core/jq-static jq
 
   log_line "Gateway"
   gateway_get /gateway/version | jq .
@@ -155,7 +155,7 @@ DOC
 function send_chef_run_example() {
   install_if_missing core/curl curl
 
-  local examples_json_path=${JSON_FILE:-/src/components/ingest-service/examples/converge-success-report.json};
+  local examples_json_path=${JSON_FILE:-/src/components/ingest-service/examples/converge-success-report.json}
 
   if [[ "$1" == "legacy" ]]; then
     endpoint=${GATEWAY_URL}"/events/data-collector"
@@ -192,9 +192,9 @@ document "send_chef_run_start_example" <<DOC
   # send_chef_run_start_example lb
 DOC
 function send_chef_run_start_example() {
-  install_if_missing core/curl curl;
+  install_if_missing core/curl curl
 
-  local examples_path="/src/components/ingest-service/examples";
+  local examples_path="/src/components/ingest-service/examples"
   if [[ "$1" == "legacy" ]]; then
     endpoint=${GATEWAY_URL}"/events/data-collector"
   elif [[ "$1" == "lb" ]]; then
@@ -234,7 +234,7 @@ function send_chef_run_failure_example() {
   local rfc_time
   rfc_time=$(date +%FT%TZ -d "$(($RANDOM % 144)) hour ago")
 
-  local examples_path="/src/components/ingest-service/examples";
+  local examples_path="/src/components/ingest-service/examples"
   [[ "$1" == "legacy" ]] && endpoint="/events/data-collector" || endpoint="/ingest/events/chef/run"
 
   # Update the IDs, names, and dates
@@ -253,9 +253,9 @@ document "send_chef_liveness_example" <<DOC
   # send_chef_liveness_example legacy
 DOC
 function send_chef_liveness_example() {
-  install_if_missing core/curl curl;
+  install_if_missing core/curl curl
 
-  local examples_path="/src/components/ingest-service/examples";
+  local examples_path="/src/components/ingest-service/examples"
   [[ "$1" == "legacy" ]] && endpoint="/events/data-collector" || endpoint="/ingest/events/chef/liveness"
 
   curl -f --insecure -H "api-token: $(get_api_token)" \
@@ -284,10 +284,10 @@ document "send_inspec_example" <<DOC
   Send the example inspec message to the inspec rest endpoint.
 DOC
 function send_inspec_example() {
-  install_if_missing core/curl curl;
+  install_if_missing core/curl curl
 
   local endpoint="/events/data-collector"
-  local examples_json_path=${JSON_FILE:-/src/components/compliance-service/ingest/examples/compliance-success-tiny-report.json};
+  local examples_json_path=${JSON_FILE:-/src/components/compliance-service/ingest/examples/compliance-success-tiny-report.json}
 
   local uuid
   local report_uuid
@@ -306,7 +306,7 @@ document "send_inspec_failure_example" <<DOC
   Send the example failure inspec message to the inspec rest endpoint.
 DOC
 function send_inspec_failure_example() {
-  install_if_missing core/curl curl;
+  install_if_missing core/curl curl
 
   local examples_path="/src/components/compliance-service/ingest/examples"
   local endpoint="/events/data-collector"
@@ -331,8 +331,8 @@ document "gateway_list_secrets" <<DOC
   List the secrets stored in the secrets service
 DOC
 function gateway_list_secrets() {
-  install_if_missing core/curl curl;
-  install_if_missing core/jq-static jq;
+  install_if_missing core/curl curl
+  install_if_missing core/jq-static jq
 
   endpoint="/secrets/search"
 
@@ -349,8 +349,8 @@ function gateway_create_secret() {
   local username=${1:-"default"}
   local password=${2:-"super_secret"}
 
-  install_if_missing core/curl curl;
-  install_if_missing core/jq-static jq;
+  install_if_missing core/curl curl
+  install_if_missing core/jq-static jq
 
   endpoint="/secrets"
 
@@ -365,9 +365,9 @@ document "gateway_delete_secret" <<DOC
   arg 1 - ID required
 DOC
 function gateway_delete_secret() {
-  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1;
+  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1
 
-  install_if_missing core/curl curl;
+  install_if_missing core/curl curl
   local id=$1
 
   endpoint="/secrets/id/$id"
@@ -383,11 +383,11 @@ document "gateway_read_secret" <<DOC
   arg 1 - ID required
 DOC
 function gateway_read_secret() {
-  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1;
+  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1
   local id=$1
 
-  install_if_missing core/curl curl;
-  install_if_missing core/jq-static jq;
+  install_if_missing core/curl curl
+  install_if_missing core/jq-static jq
 
   endpoint="/secrets/id/$id"
 
@@ -404,7 +404,7 @@ document "gateway_update_secret" <<DOC
   art 3 - password optional
 DOC
 function gateway_update_secret() {
-  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1;
+  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1
   local id=$1
   local username=${2:-"default"}
   local password=${3:-"super_secret"}
@@ -422,11 +422,11 @@ document "gateway_delete_notification_rule" <<DOC
   arg 1 - ID required
 DOC
 function gateway_delete_notification_rule() {
-  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1;
+  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1
   local id=$1
 
-  install_if_missing core/curl curl;
-  install_if_missing core/jq-static jq;
+  install_if_missing core/curl curl
+  install_if_missing core/jq-static jq
 
   endpoint="/notifications/rules/$id"
 
@@ -439,8 +439,8 @@ document "gateway_create_notification_rule" <<DOC
   Create a notification rule
 DOC
 function gateway_create_notification_rule() {
-  install_if_missing core/curl curl;
-  install_if_missing core/jq-static jq;
+  install_if_missing core/curl curl
+  install_if_missing core/jq-static jq
 
   endpoint="/notifications/rules"
 
@@ -455,11 +455,11 @@ document "gateway_get_notification_rule" <<DOC
   arg 1 - ID required
 DOC
 function gateway_get_notification_rule() {
-  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1;
+  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1
   local id=$1
 
-  install_if_missing core/curl curl;
-  install_if_missing core/jq-static jq;
+  install_if_missing core/curl curl
+  install_if_missing core/jq-static jq
 
   endpoint="/notifications/rules/$id"
 
@@ -475,10 +475,10 @@ document "gateway_notification_validate_connection" <<DOC
   arg 1 - URL required
 DOC
 function gateway_notification_validate_connection() {
-  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1;
+  [[ "$1" == "" ]] && error "Missing ID argument; try 'describe ${FUNCNAME[0]}'" && return 1
   local url=$1
 
-  install_if_missing core/curl curl;
+  install_if_missing core/curl curl
 
   endpoint="/notifications/webhook"
 
