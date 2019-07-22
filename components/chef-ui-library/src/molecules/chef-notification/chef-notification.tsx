@@ -48,8 +48,12 @@ export class ChefNotification {
 
   hostData() {
     return {
-      class: [this.className(this.type),
-              this.visible ? 'visible' : ''].join(' ')
+      class: [
+        this.className(this.type),
+        this.visible ? 'visible' : ''
+      ]
+      .filter(className => className.length > 0)
+      .join(' ')
     };
   }
 
