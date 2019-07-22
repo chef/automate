@@ -26,7 +26,7 @@ func completeMSADWithoutOverrides() *dex.ConfigRequest_V1_Msad_Ldap {
 func TestValidate(t *testing.T) {
 	t.Run("Validates when there are no connectors", func(t *testing.T) {
 		cfg := dex.DefaultConfigRequest()
-		assert.Nil(t, cfg.Validate())
+		assert.NoError(t, cfg.Validate())
 	})
 
 	devCert, err := ioutil.ReadFile(helpers.DevRootCACert())
@@ -60,7 +60,7 @@ func TestValidate(t *testing.T) {
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{
 				Ldap: completeLDAP(),
 			}
-			assert.Nil(t, cfg.Validate())
+			assert.NoError(t, cfg.Validate())
 		})
 
 		t.Run("anon bind (no bind_dn or bind_password)", func(t *testing.T) {
@@ -69,7 +69,7 @@ func TestValidate(t *testing.T) {
 			ldap.BindPassword = nil
 			ldap.BindDn = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Ldap: ldap}
-			assert.Nil(t, cfg.Validate())
+			assert.NoError(t, cfg.Validate())
 		})
 
 		t.Run("unauthenticated bind (no bind_password))", func(t *testing.T) {
@@ -77,7 +77,7 @@ func TestValidate(t *testing.T) {
 			ldap := completeLDAP()
 			ldap.BindPassword = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Ldap: ldap}
-			assert.Nil(t, cfg.Validate())
+			assert.NoError(t, cfg.Validate())
 		})
 
 		t.Run("no base_group_search_dn", func(t *testing.T) {
@@ -85,7 +85,7 @@ func TestValidate(t *testing.T) {
 			ldap := completeLDAP()
 			ldap.BaseGroupSearchDn = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Ldap: ldap}
-			assert.Nil(t, cfg.Validate())
+			assert.NoError(t, cfg.Validate())
 		})
 	})
 
@@ -95,7 +95,7 @@ func TestValidate(t *testing.T) {
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{
 				MsadLdap: completeMSADWithoutOverrides(),
 			}
-			assert.Nil(t, cfg.Validate())
+			assert.NoError(t, cfg.Validate())
 		})
 
 		t.Run("anon bind (no bind_dn or bind_password)", func(t *testing.T) {
@@ -104,7 +104,7 @@ func TestValidate(t *testing.T) {
 			msad.BindPassword = nil
 			msad.BindDn = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{MsadLdap: msad}
-			assert.Nil(t, cfg.Validate())
+			assert.NoError(t, cfg.Validate())
 		})
 
 		t.Run("unauthenticated bind (no bind_password))", func(t *testing.T) {
@@ -112,7 +112,7 @@ func TestValidate(t *testing.T) {
 			msad := completeMSADWithoutOverrides()
 			msad.BindPassword = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{MsadLdap: msad}
-			assert.Nil(t, cfg.Validate())
+			assert.NoError(t, cfg.Validate())
 		})
 
 		t.Run("no base_group_search_dn", func(t *testing.T) {
@@ -120,7 +120,7 @@ func TestValidate(t *testing.T) {
 			msad := completeMSADWithoutOverrides()
 			msad.BaseGroupSearchDn = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{MsadLdap: msad}
-			assert.Nil(t, cfg.Validate())
+			assert.NoError(t, cfg.Validate())
 		})
 	})
 
@@ -129,7 +129,7 @@ func TestValidate(t *testing.T) {
 		cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{
 			Saml: completeSAML(),
 		}
-		assert.Nil(t, cfg.Validate())
+		assert.NoError(t, cfg.Validate())
 	})
 
 	t.Run("missing values (ldap)", func(t *testing.T) {
@@ -138,7 +138,7 @@ func TestValidate(t *testing.T) {
 			ldap := completeLDAP()
 			ldap.Host = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Ldap: ldap}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 
 		t.Run("bind_password without bind_dn", func(t *testing.T) {
@@ -146,7 +146,7 @@ func TestValidate(t *testing.T) {
 			ldap := completeLDAP()
 			ldap.BindDn = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Ldap: ldap}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 
 		t.Run("base_user_search_dn", func(t *testing.T) {
@@ -154,7 +154,7 @@ func TestValidate(t *testing.T) {
 			ldap := completeLDAP()
 			ldap.BaseUserSearchDn = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Ldap: ldap}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 
 		t.Run("username_attr", func(t *testing.T) {
@@ -162,7 +162,7 @@ func TestValidate(t *testing.T) {
 			ldap := completeLDAP()
 			ldap.UsernameAttr = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Ldap: ldap}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 
 		t.Run("user_id_attr", func(t *testing.T) {
@@ -170,7 +170,7 @@ func TestValidate(t *testing.T) {
 			ldap := completeLDAP()
 			ldap.UserIdAttr = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Ldap: ldap}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 	})
 
@@ -180,7 +180,7 @@ func TestValidate(t *testing.T) {
 			ldap := completeLDAP()
 			ldap.Host = w.String("")
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Ldap: ldap}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 
 		t.Run("bind_password without bind_dn", func(t *testing.T) {
@@ -188,7 +188,7 @@ func TestValidate(t *testing.T) {
 			ldap := completeLDAP()
 			ldap.BindDn = w.String("")
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Ldap: ldap}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 
 		t.Run("base_user_search_dn", func(t *testing.T) {
@@ -196,7 +196,7 @@ func TestValidate(t *testing.T) {
 			ldap := completeLDAP()
 			ldap.BaseUserSearchDn = w.String("")
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Ldap: ldap}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 
 		t.Run("username_attr", func(t *testing.T) {
@@ -204,7 +204,7 @@ func TestValidate(t *testing.T) {
 			ldap := completeLDAP()
 			ldap.UsernameAttr = w.String("")
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Ldap: ldap}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 
 		t.Run("user_id_attr", func(t *testing.T) {
@@ -212,7 +212,7 @@ func TestValidate(t *testing.T) {
 			ldap := completeLDAP()
 			ldap.UserIdAttr = w.String("")
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Ldap: ldap}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 	})
 
@@ -222,7 +222,7 @@ func TestValidate(t *testing.T) {
 			msad := completeMSADWithoutOverrides()
 			msad.Host = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{MsadLdap: msad}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 
 		t.Run("bind_password without bind_dn", func(t *testing.T) {
@@ -230,7 +230,7 @@ func TestValidate(t *testing.T) {
 			msad := completeMSADWithoutOverrides()
 			msad.BindDn = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{MsadLdap: msad}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 
 		t.Run("base_user_search_dn", func(t *testing.T) {
@@ -238,7 +238,7 @@ func TestValidate(t *testing.T) {
 			msad := completeMSADWithoutOverrides()
 			msad.BaseUserSearchDn = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{MsadLdap: msad}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 	})
 
@@ -248,7 +248,7 @@ func TestValidate(t *testing.T) {
 			msad := completeMSADWithoutOverrides()
 			msad.Host = w.String("")
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{MsadLdap: msad}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 
 		t.Run("bind_password without bind_dn", func(t *testing.T) {
@@ -256,7 +256,7 @@ func TestValidate(t *testing.T) {
 			msad := completeMSADWithoutOverrides()
 			msad.BindDn = w.String("")
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{MsadLdap: msad}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 
 		t.Run("base_user_search_dn", func(t *testing.T) {
@@ -264,7 +264,7 @@ func TestValidate(t *testing.T) {
 			msad := completeMSADWithoutOverrides()
 			msad.BaseUserSearchDn = w.String("")
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{MsadLdap: msad}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 	})
 
@@ -274,7 +274,7 @@ func TestValidate(t *testing.T) {
 			saml := completeSAML()
 			saml.CaContents = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Saml: saml}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 
 		t.Run("sso_url", func(t *testing.T) {
@@ -282,7 +282,7 @@ func TestValidate(t *testing.T) {
 			saml := completeSAML()
 			saml.SsoUrl = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Saml: saml}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 
 		t.Run("username_attr", func(t *testing.T) {
@@ -290,7 +290,7 @@ func TestValidate(t *testing.T) {
 			saml := completeSAML()
 			saml.UsernameAttr = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Saml: saml}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 
 		t.Run("email_attr", func(t *testing.T) {
@@ -298,7 +298,7 @@ func TestValidate(t *testing.T) {
 			saml := completeSAML()
 			saml.EmailAttr = nil
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Saml: saml}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 	})
 
@@ -308,7 +308,7 @@ func TestValidate(t *testing.T) {
 			saml := completeSAML()
 			saml.CaContents = w.String("")
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Saml: saml}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 
 		t.Run("sso_url", func(t *testing.T) {
@@ -316,7 +316,7 @@ func TestValidate(t *testing.T) {
 			saml := completeSAML()
 			saml.SsoUrl = w.String("")
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Saml: saml}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 
 		t.Run("username_attr", func(t *testing.T) {
@@ -324,7 +324,7 @@ func TestValidate(t *testing.T) {
 			saml := completeSAML()
 			saml.UsernameAttr = w.String("")
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Saml: saml}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 
 		t.Run("email_attr", func(t *testing.T) {
@@ -332,7 +332,7 @@ func TestValidate(t *testing.T) {
 			saml := completeSAML()
 			saml.EmailAttr = w.String("")
 			cfg.V1.Sys.Connectors = &dex.ConfigRequest_V1_Connectors{Saml: saml}
-			assert.NotNil(t, cfg.Validate())
+			assert.Error(t, cfg.Validate())
 		})
 	})
 
@@ -365,7 +365,7 @@ func TestValidate(t *testing.T) {
 					}
 					cfg := dex.DefaultConfigRequest()
 					cfg.V1.Sys.Connectors = connector(certs)
-					assert.Nil(t, cfg.Validate())
+					assert.NoError(t, cfg.Validate())
 				})
 
 				t.Run("multiple certs with more newlines", func(t *testing.T) {
@@ -377,14 +377,14 @@ func TestValidate(t *testing.T) {
 					}
 					cfg := dex.DefaultConfigRequest()
 					cfg.V1.Sys.Connectors = connector(certs)
-					assert.Nil(t, cfg.Validate())
+					assert.NoError(t, cfg.Validate())
 				})
 
 				failWithCert := func(cert string) func(*testing.T) {
 					return func(t *testing.T) {
 						cfg := dex.DefaultConfigRequest()
 						cfg.V1.Sys.Connectors = connector(cert)
-						assert.NotNil(t, cfg.Validate())
+						assert.Error(t, cfg.Validate())
 					}
 				}
 
