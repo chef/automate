@@ -67,7 +67,8 @@ export class ChefSortToggle {
   /**
    * Toggles order `prop` between `asc` ↑, `desc` ↓, or `none` ↕.
    */
-  @Method() toggle() {
+  @Method()
+  async toggle() {
     switch (this.order) {
       case 'none':
         this.order = 'asc';

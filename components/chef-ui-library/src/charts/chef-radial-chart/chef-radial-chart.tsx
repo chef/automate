@@ -108,7 +108,8 @@ export class ChefRadialChart {
     this.id = this.id || `radial${UID++}`;
   }
 
-  @Method() updateDataPoints() {
+  @Method()
+  async updateDataPoints() {
     const dataPoints = Array.from(this.el.querySelectorAll('chef-data-point'));
     const dataPointsWithValues = [];
     dataPoints.forEach((d) => (Number(d.value) > 0) ? dataPointsWithValues.push(d) : null);

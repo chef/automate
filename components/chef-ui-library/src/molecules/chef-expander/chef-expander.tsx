@@ -48,17 +48,17 @@ export class ChefExpander {
   @Prop({ mutable: true, reflectToAttr: true }) opened = false;
 
   @Method()
-  open() {
+  async open() {
     this.opened = true;
   }
 
   @Method()
-  close() {
+  async close() {
     this.opened = false;
   }
 
   @Method()
-  toggle() {
+  async toggle() {
     this.opened = !this.opened;
   }
 
