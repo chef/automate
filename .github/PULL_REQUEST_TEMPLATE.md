@@ -2,6 +2,8 @@
 
 <!-- /!\ Please ensure that you are NOT disclosing any customer information without their consent /!\ -->
 
+### :chains: Related Resources
+
 ### :+1: Definition of Done
 
 ### :athletic_shoe: How to Build and Test the Change
@@ -12,4 +14,4 @@
 - [ ] Docs added/updated?
 - [ ] Code executed?
 
-### :chains: Related Resources
+### :camera: Screenshots, if applicable
