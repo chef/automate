@@ -168,8 +168,6 @@ describe File.basename(__FILE__) do
       "apache_extras::harden",
       "apache_extras::windows_harden",
       "apache_extras",
-      "nagios::fix",
-      "java::default",
     ]
     assert_suggestions_text(expected, actual_data)
 

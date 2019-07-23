@@ -456,6 +456,88 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 	}
 }
 
+// The terms (sorted alphabetically) after the first 500 are not included in the suggestions.
+func TestReportingListSuggestionsLargeArrayValues(t *testing.T) {
+	server := reportingServer.New(&relaxting.ES2Backend{ESUrl: elasticsearchUrl})
+	ctx := context.Background()
+
+	terms := make([]string, 500)
+
+	for index := range terms {
+		terms[index] = fmt.Sprintf("aaa-%d", index)
+	}
+
+	for count := 0; count < 20; count++ {
+		terms = append(terms, fmt.Sprintf("zzz-%d", count))
+	}
+
+	cases := []struct {
+		description string
+		summary     *relaxting.ESInSpecSummary
+		request     *reporting.SuggestionRequest
+	}{
+		{
+			description: "chef_tags",
+			summary: &relaxting.ESInSpecSummary{
+				ChefTags: terms,
+			},
+			request: &reporting.SuggestionRequest{
+				Type: "chef_tags",
+			},
+		},
+		{
+			description: "recipe",
+			summary: &relaxting.ESInSpecSummary{
+				Recipes: terms,
+			},
+			request: &reporting.SuggestionRequest{
+				Type: "recipe",
+			},
+		},
+		{
+			description: "roles",
+			summary: &relaxting.ESInSpecSummary{
+				Roles: terms,
+			},
+			request: &reporting.SuggestionRequest{
+				Type: "role",
+			},
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(test.description, func(t *testing.T) {
+
+			// Ingest the reports
+			_, err := suite.InsertInspecSummaries([]*relaxting.ESInSpecSummary{test.summary})
+			require.NoError(t, err)
+			defer suite.DeleteAllDocuments()
+
+			// last term alphabetically and lowercase
+			expectedTerm := "zzz-9"
+
+			// defaults to 10
+			test.request.Size = 2
+			// term to give suggestions for
+			test.request.Text = "Zzz-9"
+
+			// Make the request for suggestions
+			response, err := server.ListSuggestions(ctx, test.request)
+			require.NoError(t, err)
+			require.NotNil(t, response)
+
+			// abstract the terms from the response
+			actualTerms := make([]string, len(response.Suggestions))
+			for i, suggestion := range response.Suggestions {
+				actualTerms[i] = suggestion.Text
+			}
+
+			// Check to see if last term alphabetically is a returned suggestion
+			assert.Contains(t, actualTerms, expectedTerm)
+		})
+	}
+}
+
 func TestReportingListSuggestions(t *testing.T) {
 	reportFileName := "../ingest/examples/compliance-success-tiny-report.json"
 	everythingCtx := contextWithProjects([]string{authzConstants.AllProjectsExternalID})

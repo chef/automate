@@ -3,6 +3,7 @@ package relaxting
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"sort"
 
 	"strings"
@@ -64,7 +65,7 @@ func (backend ES2Backend) GetSuggestions(typeParam string, filters map[string][]
 		suggs, err = backend.getProfileSuggestions(client, typeParam, target, text, size, filters)
 	} else if typeParam == "control" {
 		suggs, err = backend.getControlSuggestions(client, typeParam, target, text, size, filters)
-	} else if typeParam == "recipe" || typeParam == "role" {
+	} else if suggestionFieldArray(typeParam) {
 		suggs, err = backend.getArrayAggSuggestions(client, typeParam, target, text, size, filters)
 	} else {
 		suggs, err = backend.getAggSuggestions(client, typeParam, target, text, size, filters)
@@ -93,6 +94,15 @@ func (backend ES2Backend) GetSuggestions(typeParam string, filters map[string][]
 		return suggs[0:size], nil
 	}
 	return suggs, nil
+}
+
+func suggestionFieldArray(field string) bool {
+	switch field {
+	case "recipe", "role", "chef_tags":
+		return true
+	default:
+		return false
+	}
 }
 
 func (backend ES2Backend) getAggSuggestions(client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string) ([]*reportingapi.Suggestion, error) {
@@ -220,7 +230,11 @@ func (backend ES2Backend) getArrayAggSuggestions(client *elastic.Client, typePar
 		boolQuery = boolQuery.Must(matchQuery)
 	}
 	// multiplying the size by 50 as elasticsearch will sort array aggregations by doc_count. Will trim it back to size once we match it again in go
-	aggs := elastic.NewTermsAggregation().Field(target).Size(size * 50)
+	aggs := elastic.NewTermsAggregation().Field(fmt.Sprintf("%s.lower", target)).Size(size * 50)
+	if len(text) >= 2 {
+		regex := buildRegexForTextTokens(strings.ToLower(text))
+		aggs = aggs.Include(regex)
+	}
 	searchSource := elastic.NewSearchSource().
 		Query(boolQuery).
 		Aggregation("myagg", aggs).
@@ -477,4 +491,29 @@ func (backend ES2Backend) getControlSuggestions(client *elastic.Client, typePara
 		}
 	}
 	return suggs, nil
+}
+
+// For the string "Apache Linux" ".*apache.*|.*linux.*" will be returned.
+// The space and the colon are the only delineators
+func buildRegexForTextTokens(text string) string {
+	tokenDelineators := ` |:`
+	tokens := regexp.MustCompile(tokenDelineators).Split(text, -1)
+
+	regex := ".*"
+	first := true
+	for _, token := range tokens {
+		// skip tokens with 1 or less characters
+		if len(token) < 2 {
+			continue
+		}
+		if first {
+			regex = regex + token
+			first = false
+			continue
+		}
+
+		regex = regex + ".*|.*" + token
+	}
+
+	return regex + ".*"
 }
