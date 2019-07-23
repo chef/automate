@@ -19,7 +19,7 @@ if [ -d "${CI_STUDIO_COMMON:-}" ]; then
   echo "CI_STUDIO_COMMON override in effect; using $CI_STUDIO_COMMON, not chef/ci-studio-common habitat package"
   source "$CI_STUDIO_COMMON/bin/studio-common"
 else
-  hab pkg install chef/ci-studio-common --channel dev
+  hab pkg install chef/ci-studio-common --channel unstable
   source "$(hab pkg path chef/ci-studio-common)/bin/studio-common"
 fi
 
