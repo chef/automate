@@ -801,8 +801,7 @@ describe('Admin pages', () => {
               {
                 id: 'admins',
                 name: 'admins',
-                description: `Members of the admins team, by default,
-                have access to all parts of the API.`
+                description: 'admins'
               }
             ]
           }
