@@ -383,13 +383,7 @@ func (p *pg) associatePolicyWithProjects(ctx context.Context,
 func (p *pg) notifyPolicyChange(ctx context.Context, q Querier) error {
 	// We keep track of an id with each change. This lets us be smart about only updating
 	// the OPA rules when it might change.
-	_, err := q.ExecContext(ctx, "UPDATE policy_change_tracker SET policy_change_id = uuid_generate_v4();")
-	if err != nil {
-		return err
-	}
-	_, err = q.ExecContext(ctx,
-		"NOTIFY policychange;",
-	)
+	_, err := q.ExecContext(ctx, "SELECT notify_policy_change()")
 	return err
 }
 

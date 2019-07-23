@@ -4704,8 +4704,10 @@ func TestDeleteProject(t *testing.T) {
 			insertStatementProject(t, db, sID0Other, project2.ID)
 			insertStatementProject(t, db, sID1Other, project2.ID)
 
-			err = store.DeleteProject(ctx, project1.ID)
-			require.NoError(t, err)
+			assertPolicyChange(t, store, func() {
+				err = store.DeleteProject(ctx, project1.ID)
+				require.NoError(t, err)
+			})
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, project1.ID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
@@ -4751,8 +4753,10 @@ func TestDeleteProject(t *testing.T) {
 			insertStatementProject(t, db, sID0Other, project2.ID)
 			insertStatementProject(t, db, sID1Other, project2.ID)
 
-			err = store.DeleteProject(ctx, project1.ID)
-			require.NoError(t, err)
+			assertPolicyChange(t, store, func() {
+				err = store.DeleteProject(ctx, project1.ID)
+				require.NoError(t, err)
+			})
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, project1.ID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
@@ -4799,8 +4803,10 @@ func TestDeleteProject(t *testing.T) {
 			insertStatementProject(t, db, sID0Other, project2.ID)
 			insertStatementProject(t, db, sID1Other, project2.ID)
 
-			err = store.DeleteProject(ctx, project1.ID)
-			require.NoError(t, err)
+			assertPolicyChange(t, store, func() {
+				err = store.DeleteProject(ctx, project1.ID)
+				require.NoError(t, err)
+			})
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, project1.ID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0))
@@ -5911,9 +5917,11 @@ func TestDeleteRole(t *testing.T) {
 			sID0WrongRole := insertTestStatement(t, db, polIDWrongRole, "allow", roleRemaining.ID, []string{}, []string{"iam:users"})
 			sID1WrongRole := insertTestStatement(t, db, polIDWrongRole, "deny", roleRemaining.ID, []string{}, []string{"compliance:profiles"})
 
-			err = store.DeleteRole(ctx, roleDeleted.ID)
+			assertPolicyChange(t, store, func() {
+				err = store.DeleteRole(ctx, roleDeleted.ID)
+				require.NoError(t, err)
+			})
 
-			require.NoError(t, err)
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_roles WHERE id=$1`, roleDeleted.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_roles`))
 
@@ -5948,9 +5956,11 @@ func TestDeleteRole(t *testing.T) {
 			sID0WrongRole := insertTestStatement(t, db, polIDWrongRole, "allow", roleRemaining.ID, []string{}, []string{"iam:users"})
 			sID1WrongRole := insertTestStatement(t, db, polIDWrongRole, "deny", roleRemaining.ID, []string{}, []string{"compliance:profiles"})
 
-			err = store.DeleteRole(ctx, roleDeleted.ID)
+			assertPolicyChange(t, store, func() {
+				err = store.DeleteRole(ctx, roleDeleted.ID)
+				require.NoError(t, err)
+			})
 
-			require.NoError(t, err)
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_roles WHERE id=$1`, roleDeleted.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_roles`))
 

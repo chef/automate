@@ -38,15 +38,30 @@ ALTER TABLE iam_statement_projects ALTER COLUMN statement_id SET NOT NULL;
 DELETE FROM iam_statement_projects WHERE project_id IS NULL;
 ALTER TABLE iam_statement_projects ALTER COLUMN project_id SET NOT NULL;
 
+-- move code to update policy_change_tracker and notify into a PG function so we can
+-- leverage it from here and the go code.
+CREATE OR REPLACE FUNCTION notify_policy_change ()
+    RETURNS VOID
+    AS $$
+
+    UPDATE policy_change_tracker SET policy_change_id = uuid_generate_v4();
+
+    NOTIFY policychange;
+$$
+LANGUAGE SQL;
+
 CREATE OR REPLACE FUNCTION purge_statements_with_no_projects() RETURNS TRIGGER AS $$
   BEGIN
     -- delete all statements that now have no projects
     DELETE FROM iam_statements s
       WHERE NOT EXISTS (SELECT 1 FROM iam_statement_projects p WHERE s.db_id = p.statement_id AND p.project_id IS NOT NULL);
 
+    -- clean up any policies that don't have statements as a result
     DELETE FROM iam_policies p
         WHERE NOT EXISTS (SELECT 1 FROM iam_statements s WHERE p.db_id = s.policy_id)
         AND p.type != 'chef-managed';
+
+    PERFORM notify_policy_change();
 
     RETURN NULL;
   END
@@ -64,3 +79,33 @@ DELETE FROM iam_policies p
 CREATE TRIGGER on_project_deletion AFTER DELETE ON iam_projects
 FOR EACH ROW
 EXECUTE PROCEDURE purge_statements_with_no_projects();
+
+-- ADD notify_policy_change TO OUR ROLE'S TRIGGER! Everything else below is the same as 61 schema migration:
+
+-- i wanted to use the above FKEY constraint with ON DELETE to clean up any statement where the
+-- role getting removed would result in a NULL role_id in iam_statements. that is doable, but
+-- what becomes tricky is adding the additional logic to completely remove the statement if the affected
+-- policy would also have no actions. so instead of splitting that logic up, let's handle it all in a trigger.
+
+CREATE OR REPLACE FUNCTION purge_statements_with_no_actions_or_role() RETURNS TRIGGER AS $$
+  BEGIN
+    -- for statements that will still have actions, simply remove the role since those
+    -- statements are still valid
+    UPDATE iam_statements SET role_id=NULL WHERE role_id=OLD.db_id AND actions != '{}';
+
+    -- for statements that become invalid (no role or actions), delete them
+    DELETE FROM iam_statements WHERE role_id=OLD.db_id AND actions = '{}';
+
+    -- if as a result, a policy now has no statements, remove the policy unless it's
+    -- chef-managed (chef-managed case should never happen since chef-managed roles can't be
+    -- deleted, but just to be safe adding it in)
+    DELETE FROM iam_policies p
+        WHERE NOT EXISTS (SELECT 1 FROM iam_statements s WHERE p.db_id = s.policy_id)
+        AND p.type != 'chef-managed';
+
+    PERFORM notify_policy_change();
+
+    RETURN NULL;
+  END
+$$
+LANGUAGE plpgsql;
