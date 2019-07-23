@@ -7,3 +7,4 @@
 - [`05_change-projects-default.up.sql`](05_change-projects-default.up.sql)
 - [`06_add-filter-function.up.sql`](06_add-filter-function.up.sql)
 - [`07_add_db_id_field.up.sql`](07_add_db_id_field.up.sql)
+- [`08_update_admin_team_name.up.sql`](08_update_admin_team_name.up.sql)

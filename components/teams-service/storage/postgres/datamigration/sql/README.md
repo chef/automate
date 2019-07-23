@@ -2,4 +2,3 @@
 
 - [`01_rename_operators_team.up.sql`](01_rename_operators_team.up.sql)
 - [`02_set_all_team_projects_to_unassigned.up.sql`](02_set_all_team_projects_to_unassigned.up.sql)
-- [`03_update_admin_team_name.up.sql`](03_update_admin_team_name.up.sql)
