@@ -160,7 +160,7 @@ subscriptions:
       - bash:.expeditor/update-compliance-profiles.sh:
           post_commit: false
   # Update our InSpec pinnings when a new version of Inspec is released
-  - workload: hab_package_published:stable:chef/inspec/3.*
+  - workload: hab_package_published:stable:chef/inspec/4.*
     actions:
       - bash:.expeditor/update-inspec-version.sh:
           post_commit: false

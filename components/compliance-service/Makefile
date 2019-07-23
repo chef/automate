@@ -510,8 +510,8 @@ download-sample-market-profiles: $(MARKET_PATH)
 	done;
 
 	@# we use this to test zip upload
-	@if [ -f $(TMP_PATH)/apache-baseline-2.0.1.zip ]; then printf " * ${blue}apache-baseline-2.0.1${reset} already downloaded\n"; else curl -LSs -o $(TMP_PATH)/apache-baseline-2.0.1.zip https://github.com/dev-sec/apache-baseline/archive/2.0.1.zip; fi;
-	@if [ -f $(TMP_PATH)/apache-baseline-2.0.2.zip ]; then printf " * ${blue}apache-baseline-2.0.2${reset} already downloaded\n"; else curl -LSs -o $(TMP_PATH)/apache-baseline-2.0.2.zip https://github.com/dev-sec/apache-baseline/archive/2.0.2.zip; fi;
+	@if [ -f $(TMP_PATH)/ssl-baseline-1.3.0.zip ]; then printf " * ${blue}ssl-baseline-1.3.0${reset} already downloaded\n"; else curl -LSs -o $(TMP_PATH)/ssl-baseline-1.3.0.zip https://github.com/dev-sec/ssl-baseline/archive/1.3.0.zip; fi;
+	@if [ -f $(TMP_PATH)/ssl-baseline-1.4.0.zip ]; then printf " * ${blue}ssl-baseline-1.4.0${reset} already downloaded\n"; else curl -LSs -o $(TMP_PATH)/ssl-baseline-1.4.0.zip https://github.com/dev-sec/ssl-baseline/archive/1.4.0.zip; fi;
 	cp -f $(TEST_PATH)/mario-0.1.0.tar.gz $(TMP_PATH)
 
 # when running against local es this requires start-es

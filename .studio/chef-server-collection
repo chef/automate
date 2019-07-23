@@ -93,8 +93,8 @@ EOH
     "reporter": "chef-server-automate",
     "fetcher": "chef-server",
     "profiles": [{
-      "name": "apache-baseline",
-      "compliance": "test/apache-baseline"
+      "name": "ssl-baseline",
+      "compliance": "test/ssl-baseline"
     }]
   },
   "run_list": [
@@ -141,14 +141,14 @@ function converge_chef_client() {
   umask 022
   [ -d ${chef_server_compliance_profiles_test_path} ] || mkdir -p ${chef_server_compliance_profiles_test_path}
 
-  if [ ! -f "${chef_server_compliance_profiles_test_path}/apache-baseline-2.0.2.tar.gz" ]; then
+  if [ ! -f "${chef_server_compliance_profiles_test_path}/ssl-baseline-1.4.0.tar.gz" ]; then
     if ! type curl > /dev/null 2>&1; then
       hab pkg install -b core/curl
     fi
-    curl -L -o "${chef_server_compliance_profiles_test_path}/apache-baseline-2.0.2.tar.gz" https://github.com/dev-sec/apache-baseline/archive/2.0.2.tar.gz
+    curl -L -o "${chef_server_compliance_profiles_test_path}/ssl-baseline-1.4.0.tar.gz" https://github.com/dev-sec/ssl-baseline/archive/1.4.0.tar.gz
     # TODO: Upload the profile instead of relying on the migration
     hab svc unload chef/compliance-service
-    sleep 4
+    sleep 10
     chef-automate status -w -t 120 || return 1
   fi
   umask "$previous_umask"

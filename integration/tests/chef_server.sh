@@ -42,12 +42,24 @@ do_deploy() {
         --accept-terms-and-mlsa
 }
 
+liveness_error_dump() {
+    log_error "Dumping ps:"
+    ps fuax
+    log_error "Dumping /var/log/chef/automate-liveness-agent/automate-liveness-agent.log:"
+    cat /var/log/chef/automate-liveness-agent/automate-liveness-agent.log
+    log_error "Dumping /var/opt/chef/etc/config.json"
+    cat /var/opt/chef/etc/config.json
+}
+
 do_test_deploy() {
+    previous_umask=$(umask)
+    umask 022
     PATH="/hab/bin:/bin" chef-server-ctl test
     test_chef_server_ctl
     test_knife
     test_cookbook_caching
     converge_chef_client
+    umask "$previous_umask"
 
     # Converging the chef client should run the required recipe which sets
     # up the liveness agent and starts it.
@@ -55,9 +67,8 @@ do_test_deploy() {
     local COUNTER=1
     while [[ ! -f "$PIDFILE" ]]; do
         if [[ $COUNTER -ge 30 ]]; then
-            log_error "liveness agent pidfile never appeared. Dumping ps and log"
-            ps fuax
-            cat /var/log/chef/automate-liveness-agent/automate-liveness-agent.log
+            log_error "liveness agent pidfile never appeared."
+            liveness_error_dump
             return 1
         fi
         echo "Waiting for $PIDFILE to appear $COUNTER/30";
@@ -68,8 +79,8 @@ do_test_deploy() {
     pid=$(cat $PIDFILE)
     if ! ps -p "$pid"
     then
-        log_error "liveness agent (pid=$pid) was not found. Dumping ps..."
-        ps faux
+        log_error "liveness agent (pid=$pid) was not found."
+        liveness_error_dump
         return 1
     fi
 

@@ -183,7 +183,7 @@ describe File.basename(__FILE__) do
   end
 
   it "returns a success message when uploading a profile in zip format" do
-    profile_content = File.read(File.join('/tmp', 'apache-baseline-2.0.1.zip'), mode: 'rb')
+    profile_content = File.read(File.join('/tmp', 'ssl-baseline-1.3.0.zip'), mode: 'rb')
     req = Profiles::ProfilePostRequest.new(
         owner: 'chris',
         meta: Profiles::Metadata.new(contentType: 'application/zip'),
@@ -194,7 +194,7 @@ describe File.basename(__FILE__) do
   end
 
   it "returns a success message when uploading a newer version of an already uploaded profile" do
-    profile_content = File.read(File.join('/tmp', 'apache-baseline-2.0.2.zip'), mode: 'rb')
+    profile_content = File.read(File.join('/tmp', 'ssl-baseline-1.4.0.zip'), mode: 'rb')
     req = Profiles::ProfilePostRequest.new(
         owner: 'chris',
         meta: Profiles::Metadata.new(contentType: 'application/zip'),
@@ -207,22 +207,21 @@ describe File.basename(__FILE__) do
   it "returns the latest version of a profile when multiple are uploaded and no version number is specified" do
     res = GRPC profiles, :read, Profiles::ProfileDetails.new(
         owner: 'chris',
-        name: 'apache-baseline'
+        name: 'ssl-baseline'
     )
-    assert_equal('apache-baseline', res['name'])
-    assert_equal('DevSec Apache Baseline', res['title'])
+    assert_equal('ssl-baseline', res['name'])
+    assert_equal('DevSec SSL/TLS Baseline', res['title'])
     assert_equal('chris', res['owner'])
-    assert_equal('2.0.2', res['version'])
+    assert_equal('1.4.0', res['version'])
     assert_equal(false, res['controls'].nil?)
-    assert_equal(14, res['controls'].length) unless res['controls'].nil?
-    assert_equal('3e1310b071dc4d706263e9d07083e10a92b4b69e4a36cffa1eda7eaecc09969a', res['sha256'])
-    assert_equal("unix", res['supports'][0]['os_family'])
+    assert_equal(33, res['controls'].length) unless res['controls'].nil?
+    assert_equal('a9e6a3c330193aa1396939ae1ec277024f4e7df5337852616fc5bc0bdc746a84', res['sha256'])
   end
 
   it "returns the data for latest version of a profile" do
     res = GRPC profiles, :read_tar, Profiles::ProfileDetails.new(
         owner: 'chris',
-        name: 'apache-baseline'
+        name: 'ssl-baseline'
     )
     res = res.to_a
     assert_equal 1, res.size
@@ -232,8 +231,8 @@ describe File.basename(__FILE__) do
   it "returns the data for a specific version of a profile" do
     res = GRPC profiles, :read_tar, Profiles::ProfileDetails.new(
         owner: 'chris',
-        name: 'apache-baseline',
-        version: '2.0.1'
+        name: 'ssl-baseline',
+        version: '1.3.0'
     )
     res = res.to_a
     assert_equal 1, res.size
@@ -264,32 +263,6 @@ describe File.basename(__FILE__) do
     expected_data = {
         "profiles" => [
             {
-                "name" => "apache-baseline",
-                "title" => "DevSec Apache Baseline",
-                "maintainer" => "DevSec Hardening Framework Team",
-                "copyright" => "DevSec Hardening Framework Team",
-                "copyrightEmail" => "hello@dev-sec.io",
-                "license" => "Apache 2 license",
-                "summary" => "Test-suite for best-practice apache hardening",
-                "version" => "2.0.2",
-                "owner" => "chris",
-                "supports" => [{}],
-                "sha256" => "3e1310b071dc4d706263e9d07083e10a92b4b69e4a36cffa1eda7eaecc09969a"
-            },
-            {
-                "name" => "apache-baseline",
-                "title" => "DevSec Apache Baseline",
-                "maintainer" => "Hardening Framework Team",
-                "copyright" => "Hardening Framework Team",
-                "copyrightEmail" => "hello@dev-sec.io",
-                "license" => "Apache 2 license",
-                "summary" => "Test-suite for best-practice apache hardening",
-                "version" => "2.0.1",
-                "owner" => "chris",
-                "supports" => [{}],
-                "sha256" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9"
-            },
-            {
                 "name" => "linux-patch-baseline",
                 "title" => "DevSec Linux Patch Benchmark",
                 "maintainer" => "Christoph Hartmann",
@@ -301,6 +274,32 @@ describe File.basename(__FILE__) do
                 "owner" => "chris",
                 "supports" => [{}],
                 "sha256" => "c774e15f448a22f37fc798d36c0fdb9a8bdbb4c45ba86025c2833ed3ba6b0324"
+            },
+            {
+                "name" => "ssl-baseline",
+                "title" => "DevSec SSL/TLS Baseline",
+                "maintainer" => "DevSec Hardening Framework Team",
+                "copyright" => "DevSec Hardening Framework Team & Chef Software Inc.",
+                "copyrightEmail" => "hello@dev-sec.io",
+                "license" => "Apache-2.0",
+                "summary" => "Ensures a secure configuration for TCP ports",
+                "version" => "1.4.0",
+                "owner" => "chris",
+                "supports" => [{}, {}],
+                "sha256" => "a9e6a3c330193aa1396939ae1ec277024f4e7df5337852616fc5bc0bdc746a84"
+            },
+            {
+                "name" => "ssl-baseline",
+                "title" => "DevSec SSL/TLS Baseline",
+                "maintainer" => "DevSec Hardening Framework Team",
+                "copyright" => "DevSec Hardening Framework Team & Chef Software Inc.",
+                "copyrightEmail" => "hello@dev-sec.io",
+                "license" => "Apache 2 license",
+                "summary" => "Ensures a secure configuration for TCP ports",
+                "version" => "1.3.0",
+                "owner" => "chris",
+                "supports" => [{}],
+                "sha256" => "1ea86147f865efd32a9aa6d7be76e3745c25c2e7a1a382ebe2c70a2904e6c28f"
             },
             {
                 "name" => "mario",

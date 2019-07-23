@@ -91,7 +91,7 @@ func TestLicenseUsageNodes(t *testing.T) {
 		Name:     "test job with manual node",
 		Nodes:    []string{nodeId.GetId()},
 		Type:     "exec",
-		Profiles: []string{"https://github.com/dev-sec/apache-baseline/archive/master.tar.gz"},
+		Profiles: []string{"https://github.com/dev-sec/ssl-baseline/archive/master.tar.gz"},
 	})
 	require.NoError(t, err)
 
@@ -101,7 +101,7 @@ func TestLicenseUsageNodes(t *testing.T) {
 		Nodes:      []string{nodeId.GetId()},
 		Type:       "exec",
 		Recurrence: "FREQ=MINUTELY;INTERVAL=1;COUNT=2",
-		Profiles:   []string{"https://github.com/dev-sec/apache-baseline/archive/master.tar.gz"},
+		Profiles:   []string{"https://github.com/dev-sec/ssl-baseline/archive/master.tar.gz"},
 	})
 	require.NoError(t, err)
 
