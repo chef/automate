@@ -98,7 +98,11 @@ CREATE OR REPLACE FUNCTION query_policy (_policy_id TEXT, _projects_filter TEXT[
                                 COALESCE(json_agg(proj.id) FILTER (WHERE proj.id IS NOT NULL),
                                     '[]')
                                 FROM iam_statement_projects AS stmt_projs
-                            LEFT OUTER JOIN iam_projects AS proj ON stmt_projs.statement_id = stmt.db_id WHERE stmt_projs.project_id = proj.db_id) AS projects FROM iam_statements stmt
+                            LEFT OUTER JOIN iam_projects AS proj
+                            ON stmt_projs.statement_id = stmt.db_id
+                            WHERE stmt_projs.project_id = proj.db_id
+                        ) AS projects 
+                    FROM iam_statements stmt
                     INNER JOIN iam_policies ON stmt.policy_id = pol.db_id
                 GROUP BY
                     stmt.db_id,
