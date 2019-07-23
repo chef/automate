@@ -9,7 +9,7 @@ import (
 	"github.com/chef/automate/components/authz-service/storage"
 )
 
-func TestNewProject(t *testing.T) {
+func TestNewErrTxCommit(t *testing.T) {
 	t.Run("ErrTxCommit.Error() does not cause an infinite loop", func(t *testing.T) {
 		errStr := "this is some transaction error"
 		err := errors.New(errStr)
