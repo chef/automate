@@ -4673,6 +4673,150 @@ func TestDeleteProject(t *testing.T) {
 			err := store.DeleteProject(ctx, "test-project")
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 		}},
+		{"when a policy contains a single statement and that statement contains a single project, on project deletion, the statement and policy are deleted", func(t *testing.T) {
+			ctx := context.Background()
+			project1 := storage.Project{
+				ID:       "project-1",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Projects: []string{"project-1"},
+			}
+			_, err := store.CreateProject(ctx, &project1)
+			project2 := storage.Project{
+				ID:       "project-2",
+				Name:     "name2",
+				Type:     storage.Custom,
+				Projects: []string{"project-2"},
+			}
+			_, err = store.CreateProject(ctx, &project2)
+			require.NoError(t, err)
+
+			polID := insertTestPolicy(t, db, "testpolicy")
+			sID0 := insertTestStatement(t, db,
+				polID, "allow", "", []string{"iam:users:delete', 'iam:users:create"}, []string{"iam:users"})
+			insertStatementProject(t, db, sID0, project1.ID)
+
+			polIDOther := insertTestPolicy(t, db, "testpolicy2")
+			sID0Other := insertTestStatement(t, db,
+				polIDOther, "allow", "", []string{"iam:users:delete', 'iam:users:create"}, []string{"iam:users"})
+			sID1Other := insertTestStatement(t, db,
+				polIDOther, "deny", "", []string{"compliance:profiles:download", "compliance:profiles:delete"}, []string{"compliance:profiles"})
+			insertStatementProject(t, db, sID0Other, project2.ID)
+			insertStatementProject(t, db, sID1Other, project2.ID)
+
+			err = store.DeleteProject(ctx, project1.ID)
+			require.NoError(t, err)
+
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, project1.ID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0))
+
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polIDOther))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0Other))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID1Other))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=statement_db_id($2)`, project2.ID, sID0Other))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=statement_db_id($2)`, project2.ID, sID1Other))
+		}},
+		{"when a policy contains multiples statement and those statements contain a single project, on project deletion, the statement and policy are deleted", func(t *testing.T) {
+			ctx := context.Background()
+			project1 := storage.Project{
+				ID:       "project-1",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Projects: []string{"project-1"},
+			}
+			_, err := store.CreateProject(ctx, &project1)
+			project2 := storage.Project{
+				ID:       "project-2",
+				Name:     "name2",
+				Type:     storage.Custom,
+				Projects: []string{"project-2"},
+			}
+			_, err = store.CreateProject(ctx, &project2)
+			require.NoError(t, err)
+
+			polID := insertTestPolicy(t, db, "testpolicy")
+			sID0 := insertTestStatement(t, db,
+				polID, "allow", "", []string{"iam:users:delete', 'iam:users:create"}, []string{"iam:users"})
+			sID1 := insertTestStatement(t, db,
+				polID, "deny", "", []string{"compliance:profiles:download", "compliance:profiles:delete"}, []string{"compliance:profiles"})
+			insertStatementProject(t, db, sID0, project1.ID)
+			insertStatementProject(t, db, sID1, project1.ID)
+
+			polIDOther := insertTestPolicy(t, db, "testpolicy2")
+			sID0Other := insertTestStatement(t, db,
+				polIDOther, "allow", "", []string{"iam:users:delete', 'iam:users:create"}, []string{"iam:users"})
+			sID1Other := insertTestStatement(t, db,
+				polIDOther, "deny", "", []string{"compliance:profiles:download", "compliance:profiles:delete"}, []string{"compliance:profiles"})
+			insertStatementProject(t, db, sID0Other, project2.ID)
+			insertStatementProject(t, db, sID1Other, project2.ID)
+
+			err = store.DeleteProject(ctx, project1.ID)
+			require.NoError(t, err)
+
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, project1.ID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID1))
+
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polIDOther))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0Other))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID1Other))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=statement_db_id($2)`, project2.ID, sID0Other))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=statement_db_id($2)`, project2.ID, sID1Other))
+		}},
+		{"when a policy contains multiples statement and those statements contain different projects, on one project deletion, one statement is deleted and the policy remains", func(t *testing.T) {
+			ctx := context.Background()
+			project1 := storage.Project{
+				ID:       "project-1",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Projects: []string{"project-1"},
+			}
+			_, err := store.CreateProject(ctx, &project1)
+			project2 := storage.Project{
+				ID:       "project-2",
+				Name:     "name2",
+				Type:     storage.Custom,
+				Projects: []string{"project-2"},
+			}
+			_, err = store.CreateProject(ctx, &project2)
+			require.NoError(t, err)
+
+			polID := insertTestPolicy(t, db, "testpolicy")
+			sID0 := insertTestStatement(t, db,
+				polID, "allow", "", []string{"iam:users:delete', 'iam:users:create"}, []string{"iam:users"})
+			sID1 := insertTestStatement(t, db,
+				polID, "deny", "", []string{"compliance:profiles:download", "compliance:profiles:delete"}, []string{"compliance:profiles"})
+			insertStatementProject(t, db, sID0, project1.ID)
+			insertStatementProject(t, db, sID1, project2.ID)
+
+			polIDOther := insertTestPolicy(t, db, "testpolicy2")
+			sID0Other := insertTestStatement(t, db,
+				polIDOther, "allow", "", []string{"iam:users:delete', 'iam:users:create"}, []string{"iam:users"})
+			sID1Other := insertTestStatement(t, db,
+				polIDOther, "deny", "", []string{"compliance:profiles:download", "compliance:profiles:delete"}, []string{"compliance:profiles"})
+			insertStatementProject(t, db, sID0Other, project2.ID)
+			insertStatementProject(t, db, sID1Other, project2.ID)
+
+			err = store.DeleteProject(ctx, project1.ID)
+			require.NoError(t, err)
+
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, project1.ID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0))
+
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID1))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID1))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=statement_db_id($2)`, project2.ID, sID1))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=statement_db_id($2)`, project2.ID, sID1))
+
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polIDOther))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0Other))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID1Other))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=statement_db_id($2)`, project2.ID, sID0Other))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=statement_db_id($2)`, project2.ID, sID1Other))
+		}},
 		{"deletes project with one project in database", func(t *testing.T) {
 			ctx := context.Background()
 			proj := insertTestProject(t, db, "test-project", "name", storage.Custom)
