@@ -15,7 +15,7 @@ export HAB_LICENSE="accept-no-persist"
 
 sudo -E hab pkg install core/ruby
 export PATH
-PATH="$PATH:$(hab pkg path core/ruby)/bin"
+PATH="$(hab pkg path core/ruby)/bin:$PATH"
 sudo -E "$(hab pkg path core/ruby)"/bin/gem install toml
 
 if [[ $EUID -eq 0 ]]; then
