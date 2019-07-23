@@ -119,14 +119,14 @@ func (r *taskResult) Err() error {
 }
 
 // StartAfter indicates when the task should start running
-func StartAfter(startAfter time.Time) EnqueueOpts {
+func StartAfter(startAfter time.Time) TaskEnqueueOpts {
 	return func(o *backend.TaskEnqueueOpts) {
 		o.StartAfter = startAfter
 	}
 }
 
 // EnqueueOpts are optional parameters for enqueuing a task
-type EnqueueOpts func(*backend.TaskEnqueueOpts)
+type TaskEnqueueOpts func(*backend.TaskEnqueueOpts)
 
 type CompleteOpts func(*Decision)
 
@@ -157,7 +157,7 @@ type WorkflowInstance interface {
 	// after the currently running callback of the WorkflowExecutor
 	// returns.
 	// TODO (jaym): Allow passing enqueue options
-	EnqueueTask(taskName string, parameters interface{}) error
+	EnqueueTask(taskName string, parameters interface{}, opts ...TaskEnqueueOpts) error
 
 	// Complete returns a decision to end execution of the workflow for
 	// the running workflow instance.
@@ -186,9 +186,13 @@ type WorkflowInstance interface {
 	TotalCompletedTasks() int
 }
 
+type enqueueTaskRequest struct {
+	backendTask backend.Task
+	opts        backend.TaskEnqueueOpts
+}
 type workflowInstanceImpl struct {
 	instance backend.WorkflowInstance
-	tasks    []backend.Task
+	tasks    []enqueueTaskRequest
 	wevt     *backend.WorkflowEvent
 }
 
@@ -218,15 +222,23 @@ func (w *workflowInstanceImpl) TotalCompletedTasks() int {
 	return w.wevt.CompletedTaskCount
 }
 
-func (w *workflowInstanceImpl) EnqueueTask(taskName string, parameters interface{}) error {
+func (w *workflowInstanceImpl) EnqueueTask(taskName string, parameters interface{}, opts ...TaskEnqueueOpts) error {
 	paramsData, err := jsonify(parameters)
 	if err != nil {
 		return err
 	}
-	w.tasks = append(w.tasks, backend.Task{
-		Name:       taskName,
-		Parameters: paramsData,
-	})
+
+	req := enqueueTaskRequest{
+		backendTask: backend.Task{
+			Name:       taskName,
+			Parameters: paramsData,
+		},
+		opts: backend.TaskEnqueueOpts{},
+	}
+	for _, o := range opts {
+		o(&req.opts)
+	}
+	w.tasks = append(w.tasks, req)
 	return nil
 }
 
@@ -325,7 +337,7 @@ type Decision struct {
 	payload    interface{}
 	result     interface{}
 	err        error
-	tasks      []backend.Task
+	tasks      []enqueueTaskRequest
 }
 
 // StartEvent is passed to the OnStart callback of the WorkflowExecutor when
@@ -845,7 +857,7 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 	} else if decision.continuing {
 		s.Begin("enqueue_task")
 		for _, t := range decision.tasks {
-			err := completer.EnqueueTask(&t, backend.TaskEnqueueOpts{})
+			err := completer.EnqueueTask(&t.backendTask, t.opts)
 			if err != nil {
 				logrus.WithError(err).Error("failed to enqueue task!")
 				return true
