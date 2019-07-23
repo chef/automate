@@ -47,7 +47,7 @@ liveness_error_dump() {
     ps fuax
     log_error "Dumping /var/log/chef/automate-liveness-agent/automate-liveness-agent.log:"
     cat /var/log/chef/automate-liveness-agent/automate-liveness-agent.log
-    find /hab/pkgs -printf "%M %p\n"
+    log_error "Dumping /var/opt/chef/etc/config.json"
     cat /var/opt/chef/etc/config.json
 }
 
