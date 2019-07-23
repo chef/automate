@@ -243,6 +243,9 @@ are likely to encounter:
   call shell functions defined in `.studio/`. These tests then
   typically call either Go tests or custom shell functions.
 
+- Cypress tests: [cypress](https://www.cypress.io/) is an end to end testing framework
+  that we are currently using for UI e2e tests as well as some API integration testing.
+
 ### Debugging Tips and Tricks for Buildkite
 
 #### Accessing Logs
@@ -338,7 +341,7 @@ These tests report their failures in Buildkite, but the Buildkite
 output is the output of the `terraform apply`.  In many cases this
 simply shows a deploy timing out or a test failing to run and you will
 need to log into the machine.  The hostnames of each of the various
-environemnts can be seen from the dashboard
+environments can be seen from the dashboard
 
 http://a2-dev.cd.chef.co/
 
