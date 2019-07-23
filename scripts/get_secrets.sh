@@ -5,6 +5,27 @@ error() {
     echo "$*" >&2
 }
 
+token_is_cached() {
+    token_path="$HOME/.vault-token"
+    if [[ ! -f "$token_path" ]]; then
+        echo "No token found."
+        return 1
+    fi
+
+    local token_mod_time
+    token_mod_time=$(stat -f '%m' "$token_path")
+
+    local current_unix_time
+    current_unix_time=$(date +%s)
+
+    thirty_days_in_secs=2592000
+
+    if [[ $((current_unix_time - token_mod_time)) -gt $thirty_days_in_secs ]]; then
+        echo "Token found but may be exired."
+        return 1
+    fi
+}
+
 export VAULT_ADDR=${VAULT_ADDR:-https://vault.chef.co:8200}
 export VAULT_CACERT=""
 CHEF_USERNAME=${CHEF_USERNAME:-unknown}
@@ -43,8 +64,8 @@ echo "Using VAULT_ADDR=$VAULT_ADDR"
 echo "Using VAULT_CACERT=$VAULT_CACERT"
 echo "Using CHEF_USERNAME=$CHEF_USERNAME"
 
-if [[ ! -f "$HOME/.vault-token" ]]; then
-    echo "No cached token found. Attempting to log in."
+if ! token_is_cached; then
+    echo "Attempting to log in:"
     echo "Please enter your Chef password:"
     vault login -method=okta username="$CHEF_USERNAME"
 else
