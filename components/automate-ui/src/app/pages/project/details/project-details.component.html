@@ -27,15 +27,17 @@
     </chef-page-header>
     <section class="page-body" [hidden]="showTab('rules')">
       <form [formGroup]="projectForm">
-        <chef-form-field>
+        <chef-form-field id="update-name">
           <label>
-            <span class="label">Name
-              <span aria-hidden="true">*</span>
-            </span>
+            <span class="label">Name <span aria-hidden="true">*</span></span>
             <input chefInput formControlName="name" type="text"
               [attr.disabled]="(isChefManaged || isLoading) ? true : null"
               (keyup)="keyPressed()">
           </label>
+          <chef-error
+            *ngIf="(projectForm.get('name').hasError('required') || projectForm.get('name').hasError('pattern')) && projectForm.get('name').dirty">
+            Name is required.
+          </chef-error>
         </chef-form-field>
         <span [hidden]="!isChefManaged" id="changes-not-allowed">
           Name changes are not allowed for the default project.

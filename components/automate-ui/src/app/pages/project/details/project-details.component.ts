@@ -1,13 +1,14 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
+import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 import { find as _find } from 'lodash';
-import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
+import { Regex } from 'app/helpers/auth/regex';
 import { EntityStatus, loading } from 'app/entities/entities';
 import {
   getStatus, updateStatus, projectFromRoute
@@ -26,7 +27,7 @@ import {
   styleUrls: ['./project-details.component.scss']
 })
 
-export class ProjectDetailsComponent implements OnDestroy {
+export class ProjectDetailsComponent implements OnInit, OnDestroy {
   public project: Project;
   public projectForm: FormGroup;
   public saveSuccessful = false;
@@ -44,15 +45,11 @@ export class ProjectDetailsComponent implements OnDestroy {
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
   constructor(
-    fb: FormBuilder,
+    private fb: FormBuilder,
     private store: Store<NgrxStateAtom>
   ) {
 
-    this.projectForm = fb.group({
-      name: ['Loading...']
-    });
-
-    combineLatest(
+   combineLatest(
       this.store.select(getStatus),
       this.store.select(updateStatus)
     ).pipe(
@@ -74,10 +71,7 @@ export class ProjectDetailsComponent implements OnDestroy {
           this.rules = rules;
         });
         this.isChefManaged = this.project.type === 'CHEF_MANAGED';
-        this.projectForm = fb.group({
-          // Must stay in sync with error checks in project-details.component.html
-          name: [this.project.name, Validators.required]
-        });
+        this.projectForm.controls['name'].setValue(this.project.name);
       })).subscribe();
 
     this.store.select(routeParams).pipe(
@@ -87,6 +81,13 @@ export class ProjectDetailsComponent implements OnDestroy {
       .subscribe((id: string) => {
         this.store.dispatch(new GetProject({ id }));
       });
+  }
+
+  ngOnInit(): void {
+    this.projectForm = this.fb.group({
+      // Must stay in sync with error checks in project-details.component.html
+      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+    });
   }
 
   ngOnDestroy() {
