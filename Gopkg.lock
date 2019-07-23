@@ -203,31 +203,12 @@
   revision = "3a0bb77429bd3a61596f5e8a3172445844342120"
 
 [[projects]]
-  branch = "master"
-  digest = "1:38f5156a35bf46308723b52d09e41dc999137f0a364259c1fda83289434a6dfa"
+  digest = "1:c91a5363a19174cb0181832821a7bb9da0aeefb5e2180724614b1005c2269712"
   name = "github.com/coreos/go-oidc"
-  packages = [
-    ".",
-    "http",
-    "jose",
-    "key",
-    "oauth2",
-    "oidc",
-  ]
+  packages = ["."]
   pruneopts = "NUT"
-  revision = "a93f71fdfe73d2c0f5413c0565eea0af6523a6df"
-
-[[projects]]
-  digest = "1:e2c6ad2e212c0c9a8b13e5d1d52a6cd3a42411b636fcea10d286f7b6fc13fea0"
-  name = "github.com/coreos/pkg"
-  packages = [
-    "health",
-    "httputil",
-    "timeutil",
-  ]
-  pruneopts = "NUT"
-  revision = "3ac0863d7acf3bc44daf49afef8919af12f704ef"
-  version = "v3"
+  revision = "1180514eaf4d9f38d0d19eef639a1d695e066e72"
+  version = "v2.0.0"
 
 [[projects]]
   digest = "1:df69aec1aa0e6cfbd72112631ed768141661f3365810ce3335d56ae5eb8fe06c"
@@ -1513,7 +1494,6 @@
     "github.com/burntsushi/toml",
     "github.com/chef/toml",
     "github.com/coreos/go-oidc",
-    "github.com/coreos/go-oidc/oidc",
     "github.com/dave/jennifer/jen",
     "github.com/davecgh/go-spew/spew",
     "github.com/dexidp/dex/api",
