@@ -26,7 +26,7 @@ const (
 	//if we tied both to the same version, then a simple change to profiles structure would require us to do a full migration of timeseries (which is time consuming)
 	//the net result of separating them is that we can migrate them when one or both change by simply incrementing one or both.  cool, right!?
 	//ComplianceCurrentTimeSeriesIndicesVersion allows us to know, for any version of compliance, what level we are at with our timeseries indices
-	ComplianceCurrentTimeSeriesIndicesVersion = "3"
+	ComplianceCurrentTimeSeriesIndicesVersion = "4"
 	//ComplianceCurrentProfilesIndicesVersion allows us to know, for any version of compliance, what level we are at with our profiles and profiles-mappings indices
 	ComplianceCurrentProfilesIndicesVersion = "3"
 
