@@ -1,14 +1,14 @@
 <app-authorized [allOf]="getPermissionsPath" [overrideVisible]="overridePermissionsCheck">
   <ng-container *ngIf="(users$ | async)?.length === 0">
-    <div id="getting-started">Add the first users to get started!</div>
+    <div class="team-users-empty-state">
+      <p>Add some users to get started!</p>
+    </div>
   </ng-container>
   <chef-toolbar>
     <app-authorized [allOf]="createPermissionsPath" [overrideVisible]="overridePermissionsCheck">
-      <!-- TODO (ms) Once the chef-button bug that allows enter to fire click
-      event on disabled buttons is fixed, this can be written as one button
-      with `[disabled]="!addButtonEnabled"`. -->
-      <chef-button primary (click)="addClicked.emit($event)" *ngIf="addButtonEnabled"> {{ addButtonText }} </chef-button>
-      <chef-button primary disabled *ngIf="!addButtonEnabled"> {{ addButtonText }} </chef-button>
+      <div [ngClass]="(users$ | async)?.length === 0 ? 'team-users-empty-state' : ''">
+        <chef-button primary [disabled]="!addButtonEnabled" primary (click)="addClicked.emit($event)"> {{ addButtonText }} </chef-button>
+      </div>
     </app-authorized>
   </chef-toolbar>
   <ng-container *ngIf="(users$ | async)?.length > 0">
