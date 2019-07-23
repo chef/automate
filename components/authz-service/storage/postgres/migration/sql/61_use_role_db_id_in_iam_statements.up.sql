@@ -31,7 +31,7 @@ ALTER TABLE iam_statements
 -- the trigger works it's magic below.
 ALTER TABLE iam_statements ALTER CONSTRAINT iam_statements_role_id_fkey DEFERRABLE INITIALLY DEFERRED;
 
--- i wanted use the above FKEY constraint with ON DELETE to clean up any statement where the
+-- i wanted to use the above FKEY constraint with ON DELETE to clean up any statement where the
 -- role getting removed would result in a NULL role_id in iam_statements. that is doable, but
 -- what becomes tricky is adding the additional logic to completely remove the statement if the affected
 -- policy would also have no actions. so instead of splitting that logic up, let's handle it all in a trigger.
