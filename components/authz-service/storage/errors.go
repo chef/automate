@@ -42,6 +42,20 @@ var (
 	ErrChangeTypeForRule = errors.New("cannot change rule type")
 )
 
+// ErrRoleMustExistForStatement indicates that the user attempted to insert a role that
+// does not exist into a new or updated policy statement
+type ErrRoleMustExistForStatement struct {
+	pgErrMessage string
+}
+
+func NewErrRoleMustExistForStatement(pgErrMessage string) error {
+	return &ErrRoleMustExistForStatement{pgErrMessage: pgErrMessage}
+}
+
+func (e *ErrRoleMustExistForStatement) Error() string {
+	return e.pgErrMessage
+}
+
 // ErrTxCommit occurs when the database attempts to commit a transaction and
 // fails.
 type ErrTxCommit struct {
@@ -53,7 +67,7 @@ func NewErrTxCommit(e error) error {
 }
 
 func (e *ErrTxCommit) Error() string {
-	return "commit db transaction: " + e.Error()
+	return "commit db transaction: " + e.underlying.Error()
 }
 
 // ErrMissingField occurs when a required field was not passed.

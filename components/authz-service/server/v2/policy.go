@@ -164,6 +164,10 @@ func (s *policyServer) CreatePolicy(
 	}
 
 	returnPol, err := s.store.CreatePolicy(ctx, &pol)
+
+	if err, ok := err.(*storage_errors.ErrRoleMustExistForStatement); ok {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
 	switch err {
 	case nil: // continue
 	case storage_errors.ErrConflict:
@@ -267,6 +271,11 @@ func (s *policyServer) UpdatePolicy(
 	}
 
 	polInternal, err := s.store.UpdatePolicy(ctx, &storagePolicy)
+
+	if err, ok := err.(*storage_errors.ErrRoleMustExistForStatement); ok {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
 	if err != nil {
 		switch err {
 		case storage_errors.ErrConflict:
@@ -536,15 +545,15 @@ func (s *policyServer) MigrateToV2(ctx context.Context,
 		return nil, status.Errorf(codes.Internal, "retrieve default policies: %s", err.Error())
 	}
 
-	for _, pol := range defaultPolicies {
-		if _, err := s.store.CreatePolicy(ctx, &pol); err != nil {
-			return nil, status.Errorf(codes.Internal, "reset to default policies: %s", err.Error())
-		}
-	}
-
 	for _, role := range storage.DefaultRoles() {
 		if _, err := s.store.CreateRole(ctx, &role); err != nil {
 			return nil, status.Errorf(codes.Internal, "reset to default roles: %s", err.Error())
+		}
+	}
+
+	for _, pol := range defaultPolicies {
+		if _, err := s.store.CreatePolicy(ctx, &pol); err != nil {
+			return nil, status.Errorf(codes.Internal, "reset to default policies: %s", err.Error())
 		}
 	}
 

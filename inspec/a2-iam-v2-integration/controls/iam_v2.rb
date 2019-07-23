@@ -22,6 +22,16 @@ control 'iam-v2-1' do
 
   describe 'v2beta policy API' do
     before(:all) do
+      resp = automate_api_request("/apis/iam/v2beta/roles",
+        http_method: 'POST',
+        request_body: {
+          id: CUSTOM_ROLE_ID,
+          name: "display name !#$#",
+          actions: ["test:some:action", "test:other:action"]
+        }.to_json
+      )
+      expect(resp.http_status).to eq 200
+
       resp = automate_api_request("/apis/iam/v2beta/policies",
         http_method: 'POST',
         request_body: {
@@ -31,7 +41,7 @@ control 'iam-v2-1' do
           statements: [
             {
               effect: "DENY",
-              role: "test"
+              role: CUSTOM_ROLE_ID
             },
             {
               effect: "ALLOW",
@@ -45,6 +55,9 @@ control 'iam-v2-1' do
 
     after(:all) do
       resp = automate_api_request("/apis/iam/v2beta/policies/#{CUSTOM_POLICY_ID}", http_method: 'DELETE')
+      expect(resp.http_status).to eq 200
+
+      resp = automate_api_request("/apis/iam/v2beta/roles/#{CUSTOM_ROLE_ID}", http_method: 'DELETE')
       expect(resp.http_status).to eq 200
     end
 
@@ -63,7 +76,7 @@ control 'iam-v2-1' do
           statements: [
             {
               effect: "DENY",
-              role: "test"
+              role: CUSTOM_ROLE_ID
             },
           ]
         }.to_json()
@@ -84,7 +97,7 @@ control 'iam-v2-1' do
         "effect": "DENY",
         "actions": [
         ],
-        "role": "test",
+        "role": "#{CUSTOM_ROLE_ID}",
         "resources": [
           "*"
         ],
@@ -118,7 +131,7 @@ EOF
           statements: [
             {
               effect: "DENY",
-              role: "test"
+              role: CUSTOM_ROLE_ID
             },
           ]
         }.to_json()
@@ -155,7 +168,7 @@ EOF
             {
               effect: "DENY",
               resources: ["compliance:foo1","compliance:bar1"],
-              role: "test"
+              role: CUSTOM_ROLE_ID
             },
           ]
         }.to_json()

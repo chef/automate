@@ -97,21 +97,17 @@ func TestGetPolicy(t *testing.T) {
 		},
 		"policy with two statements found": func(t *testing.T) {
 			ctx := context.Background()
-			// Note (sr): Is it ugly to put the SQL statement in here, with no
-			// variables or any helper methods? Sure! It also helps isolate this test
-			// case from the others. Let's refactor this if can't bear it anymore, but
-			// maybe roll with it for now...
-			sID0 := genUUID(t)
-			sID1 := genUUID(t)
-			polID := genSimpleID(t, prngSeed)
 
-			_, err := db.Exec(`
-			WITH policy_db_id AS (
-				INSERT INTO iam_policies (id, name) VALUES ($3, 'testpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-				VALUES ($1, 'allow'::iam_effect, array['iam:users:delete', 'iam:users:create'], array['iam:users'], (SELECT * FROM policy_db_id)),
-				   	   ($2, 'deny'::iam_effect, array['compliance:profiles:download', 'compliance:profiles:delete'], array['compliance:profiles'], (SELECT * FROM policy_db_id));`, sID0, sID1, polID)
-			require.NoError(t, err)
+			polID := insertTestPolicy(t, db, "testpolicy")
+
+			s0Actions := []string{"iam:users:delete", "iam:users:create"}
+			s0Resources := []string{"iam:users"}
+			sID0 := insertTestStatement(t, db, polID, "allow", "", s0Actions, s0Resources)
+
+			s1Actions := []string{"compliance:profiles:download", "compliance:profiles:delete"}
+			s1Resources := []string{"compliance:profiles"}
+			sID1 := insertTestStatement(t, db, polID, "deny", "", s1Actions, s1Resources)
+
 			member := insertTestPolicyMember(t, db, polID, "user:local:albertine")
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_statements`))
 			resp, err := store.GetPolicy(ctx, polID)
@@ -125,15 +121,15 @@ func TestGetPolicy(t *testing.T) {
 					{
 						ID:        sID0,
 						Effect:    storage.Allow,
-						Resources: []string{"iam:users"},
-						Actions:   []string{"iam:users:delete", "iam:users:create"},
+						Resources: s0Resources,
+						Actions:   s0Actions,
 						Projects:  []string{},
 					},
 					{
 						ID:        sID1,
 						Effect:    storage.Deny,
-						Resources: []string{"compliance:profiles"},
-						Actions:   []string{"compliance:profiles:download", "compliance:profiles:delete"},
+						Resources: s1Resources,
+						Actions:   s1Actions,
 						Projects:  []string{},
 					},
 				},
@@ -142,24 +138,19 @@ func TestGetPolicy(t *testing.T) {
 		},
 		"policy with two statements and three members, among other policy": func(t *testing.T) {
 			ctx := context.Background()
-			_, err := db.Exec(`
-			WITH policy_db_id AS (
-				INSERT INTO iam_policies (id, name) VALUES (uuid_generate_v4(), 'firstpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-				VALUES (uuid_generate_v4(), 'allow'::iam_effect, array['iam:users:delete', 'iam:users:create'], array['iam:users'], (SELECT * FROM policy_db_id)),
-				   	   (uuid_generate_v4(), 'deny'::iam_effect, array['compliance:profiles:download', 'compliance:profiles:delete'], array['compliance:profiles'], (SELECT * FROM policy_db_id));`)
-			require.NoError(t, err)
+			s0Actions := []string{"iam:users:delete", "iam:users:create"}
+			s0Resources := []string{"iam:users"}
+			s1Actions := []string{"compliance:profiles:download", "compliance:profiles:delete"}
+			s1Resources := []string{"compliance:profiles"}
 
-			sID0 := genUUID(t)
-			sID1 := genUUID(t)
-			polID := genSimpleID(t, prngSeed)
-			_, err = db.Exec(`
-			WITH policy_db_id AS (
-				INSERT INTO iam_policies (id, name) VALUES ($3, 'testpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-				VALUES ($1, 'allow'::iam_effect, array['iam:users:delete', 'iam:users:create'], array['iam:users'], (SELECT * FROM policy_db_id)),
-				   	   ($2, 'deny'::iam_effect, array['compliance:profiles:download', 'compliance:profiles:delete'], array['compliance:profiles'], (SELECT * FROM policy_db_id));`, sID0, sID1, polID)
-			require.NoError(t, err)
+			firstPolID := insertTestPolicy(t, db, "firstpolicy")
+			insertTestStatement(t, db, firstPolID, "allow", "", s0Actions, s0Resources)
+			insertTestStatement(t, db, firstPolID, "deny", "", s1Actions, s1Resources)
+
+			polID := insertTestPolicy(t, db, "testpolicy")
+			sID0 := insertTestStatement(t, db, polID, "allow", "", s0Actions, s0Resources)
+			sID1 := insertTestStatement(t, db, polID, "deny", "", s1Actions, s1Resources)
+
 			member0 := insertTestPolicyMember(t, db, polID, "user:local:albertine")
 			member1 := insertTestPolicyMember(t, db, polID, "user:local:charmander")
 			member2 := insertTestPolicyMember(t, db, polID, "user:local:charizard")
@@ -175,15 +166,15 @@ func TestGetPolicy(t *testing.T) {
 					{
 						ID:        sID0,
 						Effect:    storage.Allow,
-						Resources: []string{"iam:users"},
-						Actions:   []string{"iam:users:delete", "iam:users:create"},
+						Resources: s0Resources,
+						Actions:   s0Actions,
 						Projects:  []string{},
 					},
 					{
 						ID:        sID1,
 						Effect:    storage.Deny,
-						Resources: []string{"compliance:profiles"},
-						Actions:   []string{"compliance:profiles:download", "compliance:profiles:delete"},
+						Resources: s1Resources,
+						Actions:   s1Actions,
 						Projects:  []string{},
 					},
 				},
@@ -192,29 +183,25 @@ func TestGetPolicy(t *testing.T) {
 		},
 		"policy with two statements, both with projects, and three members, among other policy": func(t *testing.T) {
 			ctx := context.Background()
-			projID0, projID1 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
-			polID := genSimpleID(t, prngSeed)
-			sID0, sID1 := genUUID(t), genUUID(t)
 
-			// insert projects
+			projID0, projID1 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 			project0 := insertTestProject(t, db, projID0, "test project 1", storage.Custom)
 			project1 := insertTestProject(t, db, projID1, "test project 2", storage.Custom)
 
-			// insert policy with statements
-			_, err := db.Exec(`
-			WITH policy_db_id AS (
-				INSERT INTO iam_policies (id, name) VALUES ($3, 'testpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-				VALUES ($1, 'allow'::iam_effect, array['iam:users:delete', 'iam:users:create'], array['iam:users'], (SELECT * FROM policy_db_id)),
-				   	   ($2, 'deny'::iam_effect, array['infra:nodes:delete', 'infra:nodes:rerun'], array['infra:nodes'], (SELECT * FROM policy_db_id));`, sID0, sID1, polID)
-			require.NoError(t, err)
+			polID := insertTestPolicy(t, db, "testpolicy")
 
-			// insert projects in statements
+			s0Actions := []string{"iam:users:delete", "iam:users:create"}
+			s0Resources := []string{"iam:users"}
+			sID0 := insertTestStatement(t, db, polID, "allow", "", s0Actions, s0Resources)
+
+			s1Actions := []string{"infra:nodes:delete", "infra:nodes:rerun"}
+			s1Resources := []string{"infra:nodes"}
+			sID1 := insertTestStatement(t, db, polID, "deny", "", s1Actions, s1Resources)
+
 			insertStatementProject(t, db, sID0, projID0)
 			insertStatementProject(t, db, sID1, projID0)
 			insertStatementProject(t, db, sID1, projID1)
 
-			// insert members
 			member0 := insertTestPolicyMember(t, db, polID, "user:local:charmander")
 			member1 := insertTestPolicyMember(t, db, polID, "user:local:charmeleon")
 			member2 := insertTestPolicyMember(t, db, polID, "user:local:charizard")
@@ -230,15 +217,15 @@ func TestGetPolicy(t *testing.T) {
 					{
 						ID:        sID0,
 						Effect:    storage.Allow,
-						Resources: []string{"iam:users"},
-						Actions:   []string{"iam:users:delete", "iam:users:create"},
+						Resources: s0Resources,
+						Actions:   s0Actions,
 						Projects:  []string{project0.ID},
 					},
 					{
 						ID:        sID1,
 						Effect:    storage.Deny,
-						Resources: []string{"infra:nodes"},
-						Actions:   []string{"infra:nodes:delete", "infra:nodes:rerun"},
+						Resources: s1Resources,
+						Actions:   s1Actions,
 						Projects:  []string{project0.ID, project1.ID},
 					},
 				},
@@ -346,17 +333,12 @@ func TestListPolicyMembers(t *testing.T) {
 			assert.Equal(t, []storage.Member{member}, members)
 		},
 		"policy with multiple members and statements returns alphabetically by name": func(t *testing.T) {
-			sID0 := genUUID(t)
-			sID1 := genUUID(t)
-			polID := genSimpleID(t, prngSeed)
+			polID := insertTestPolicy(t, db, "testpolicy")
+			insertTestStatement(t, db,
+				polID, "allow", "", []string{"iam:users:delete', 'iam:users:create"}, []string{"iam:users"})
+			insertTestStatement(t, db,
+				polID, "deny", "", []string{"infra:nodes:delete", "infra:nodes:rerun"}, []string{"infra:nodes"})
 
-			_, err := db.Exec(`
-			WITH policy_db_id AS (
-				INSERT INTO iam_policies (id, name) VALUES ($3, 'testpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-				VALUES ($1, 'allow'::iam_effect, array['iam:users:delete', 'iam:users:create'], array['iam:users'], (SELECT * FROM policy_db_id)),
-				   	   ($2, 'deny'::iam_effect, array['infra:nodes:delete', 'infra:nodes:rerun'], array['infra:nodes'], (SELECT * FROM policy_db_id));`, sID0, sID1, polID)
-			require.NoError(t, err)
 			member0 := insertTestPolicyMember(t, db, polID, "user:local:c")
 			member1 := insertTestPolicyMember(t, db, polID, "user:local:a")
 			member2 := insertTestPolicyMember(t, db, polID, "user:local:b")
@@ -467,17 +449,17 @@ func TestListPolicies(t *testing.T) {
 		},
 		"policy with two statements found": func(t *testing.T) {
 			ctx := context.Background()
-			sID0 := genUUID(t)
-			sID1 := genUUID(t)
-			polID := genSimpleID(t, prngSeed)
 
-			_, err := db.Exec(`
-			WITH policy_db_id AS (
-				INSERT INTO iam_policies (id, name) VALUES ($3, 'testpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-				VALUES ($1, 'allow'::iam_effect, array['iam:users:delete', 'iam:users:create'], array['iam:users'], (SELECT * FROM policy_db_id)),
-				   	   ($2, 'deny'::iam_effect, array['compliance:profiles:download', 'compliance:profiles:delete'], array['compliance:profiles'], (SELECT * FROM policy_db_id));`, sID0, sID1, polID)
-			require.NoError(t, err)
+			polID := insertTestPolicy(t, db, "testpolicy")
+
+			s0Actions := []string{"iam:users:delete', 'iam:users:create"}
+			s0Resources := []string{"*"}
+			sID0 := insertTestStatement(t, db, polID, "allow", "", s0Actions, s0Resources)
+
+			s1Actions := []string{"compliance:profiles:download", "compliance:profiles:delete"}
+			s1Resources := []string{"compliance:profiles"}
+			sID1 := insertTestStatement(t, db, polID, "deny", "", s1Actions, s1Resources)
+
 			member := insertTestPolicyMember(t, db, polID, "user:local:albertine")
 
 			resp, err := store.ListPolicies(ctx)
@@ -491,15 +473,15 @@ func TestListPolicies(t *testing.T) {
 					{
 						ID:        sID0,
 						Effect:    storage.Allow,
-						Resources: []string{"iam:users"},
-						Actions:   []string{"iam:users:delete", "iam:users:create"},
+						Resources: s0Resources,
+						Actions:   s0Actions,
 						Projects:  []string{},
 					},
 					{
 						ID:        sID1,
 						Effect:    storage.Deny,
-						Resources: []string{"compliance:profiles"},
-						Actions:   []string{"compliance:profiles:download", "compliance:profiles:delete"},
+						Resources: s1Resources,
+						Actions:   s1Actions,
 						Projects:  []string{},
 					},
 				},
@@ -508,20 +490,17 @@ func TestListPolicies(t *testing.T) {
 		},
 		"two policies, with one statement each": func(t *testing.T) {
 			ctx := context.Background()
-			sID0, sID1, polID0, polID1 := genUUID(t), genUUID(t), genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 
-			_, err := db.Exec(`
-			WITH policy_db_id AS (
-				INSERT INTO iam_policies (id, name) VALUES ($2, '01testpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-				VALUES ($1, 'allow'::iam_effect, array['iam:users:delete', 'iam:users:create'], array['iam:users'], (SELECT * FROM policy_db_id));`, sID0, polID0)
-			require.NoError(t, err)
-			_, err = db.Exec(`
-			WITH policy_db_id AS (
-				INSERT INTO iam_policies (id, name) VALUES ($2, '02testpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-				VALUES ($1, 'deny'::iam_effect, array['compliance:profiles:update'], array['compliance:profiles'], (SELECT * FROM policy_db_id));`, sID1, polID1)
-			require.NoError(t, err)
+			polID0 := insertTestPolicy(t, db, "01testpolicy")
+			s0Actions := []string{"iam:users:delete', 'iam:users:create"}
+			s0Resources := []string{"*"}
+			sID0 := insertTestStatement(t, db, polID0, "allow", "", s0Actions, s0Resources)
+
+			polID1 := insertTestPolicy(t, db, "02testpolicy")
+			s1Actions := []string{"compliance:profiles:update"}
+			s1Resources := []string{"compliance:profiles"}
+			sID1 := insertTestStatement(t, db, polID1, "deny", "", s1Actions, s1Resources)
+
 			member0 := insertTestPolicyMember(t, db, polID0, "user:local:albertine0")
 			member1 := insertTestPolicyMember(t, db, polID1, "user:local:albertine1")
 
@@ -537,8 +516,8 @@ func TestListPolicies(t *testing.T) {
 						{
 							ID:        sID0,
 							Effect:    storage.Allow,
-							Resources: []string{"iam:users"},
-							Actions:   []string{"iam:users:delete", "iam:users:create"},
+							Resources: s0Resources,
+							Actions:   s0Actions,
 							Projects:  []string{},
 						},
 					},
@@ -552,8 +531,8 @@ func TestListPolicies(t *testing.T) {
 						{
 							ID:        sID1,
 							Effect:    storage.Deny,
-							Resources: []string{"compliance:profiles"},
-							Actions:   []string{"compliance:profiles:update"},
+							Resources: s1Resources,
+							Actions:   s1Actions,
 							Projects:  []string{},
 						},
 					},
@@ -563,32 +542,26 @@ func TestListPolicies(t *testing.T) {
 		},
 		"two policies, each with one statement that contains 1+ projects": func(t *testing.T) {
 			ctx := context.Background()
-			sID0, sID1 := genUUID(t), genUUID(t)
-			polID0, polID1 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
-			projID0, projID1 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 
 			// insert projects
+			projID0, projID1 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 			project0 := insertTestProject(t, db, projID0, "test project 1", storage.Custom)
 			project1 := insertTestProject(t, db, projID1, "test project 2", storage.Custom)
 
 			// insert first policy with statement
-			_, err := db.Exec(`
-			WITH policy_db_id AS (
-				INSERT INTO iam_policies (id, name) VALUES ($2, '01testpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-				VALUES ($1, 'allow'::iam_effect, array['iam:users:delete', 'iam:users:create'], array['iam:users'], (SELECT * FROM policy_db_id));`, sID0, polID0)
-			require.NoError(t, err)
+			polID0 := insertTestPolicy(t, db, "01testpolicy")
+			s0Actions := []string{"iam:users:delete', 'iam:users:create"}
+			s0Resources := []string{"iam:users"}
+			sID0 := insertTestStatement(t, db, polID0, "allow", "", s0Actions, s0Resources)
 
 			// associate statement with project
 			insertStatementProject(t, db, sID0, projID0)
 
 			// insert second policy with statement
-			_, err = db.Exec(`
-			WITH policy_db_id AS (
-				INSERT INTO iam_policies (id, name) VALUES ($2, '02testpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-				VALUES ($1, 'deny'::iam_effect, array['compliance:profiles:update'], array['compliance:profiles'], (SELECT * FROM policy_db_id));`, sID1, polID1)
-			require.NoError(t, err)
+			polID1 := insertTestPolicy(t, db, "02testpolicy")
+			s1Actions := []string{"compliance:profiles:update"}
+			s1Resources := []string{"compliance:profiles"}
+			sID1 := insertTestStatement(t, db, polID1, "deny", "", s1Actions, s1Resources)
 
 			// associate statement with projects
 			insertStatementProject(t, db, sID1, projID0)
@@ -609,8 +582,8 @@ func TestListPolicies(t *testing.T) {
 						{
 							ID:        sID0,
 							Effect:    storage.Allow,
-							Resources: []string{"iam:users"},
-							Actions:   []string{"iam:users:delete", "iam:users:create"},
+							Resources: s0Resources,
+							Actions:   s0Actions,
 							Projects:  []string{project0.ID},
 						},
 					},
@@ -624,8 +597,8 @@ func TestListPolicies(t *testing.T) {
 						{
 							ID:        sID1,
 							Effect:    storage.Deny,
-							Resources: []string{"compliance:profiles"},
-							Actions:   []string{"compliance:profiles:update"},
+							Resources: s1Resources,
+							Actions:   s1Actions,
 							Projects:  []string{project0.ID, project1.ID},
 						},
 					},
@@ -635,11 +608,9 @@ func TestListPolicies(t *testing.T) {
 		},
 		"two policies, one with projects, one without": func(t *testing.T) {
 			ctx := context.Background()
-			polID1, polID2 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 			name1, name2 := "testPolicy", "anotherTestPolicy"
-			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2), ($3, $4)`,
-				polID1, name1, polID2, name2)
-			require.NoError(t, err)
+			polID1 := insertTestPolicy(t, db, name1)
+			polID2 := insertTestPolicy(t, db, name2)
 
 			projID := "special-project"
 			insertTestProject(t, db, projID, "too special", storage.Custom)
@@ -673,11 +644,9 @@ func TestListPolicies(t *testing.T) {
 		},
 		"two policies with projects": func(t *testing.T) {
 			ctx := context.Background()
-			polID1, polID2 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 			name1, name2 := "testPolicy", "anotherTestPolicy"
-			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2), ($3, $4)`,
-				polID1, name1, polID2, name2)
-			require.NoError(t, err)
+			polID1 := insertTestPolicy(t, db, name1)
+			polID2 := insertTestPolicy(t, db, name2)
 
 			projID := "special-project"
 			insertTestProject(t, db, projID, "too special", storage.Custom)
@@ -711,11 +680,9 @@ func TestListPolicies(t *testing.T) {
 		},
 		"when the list is filtered by a policy list, return intersection": func(t *testing.T) {
 			ctx := context.Background()
-			polID1, polID2 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 			name1, name2 := "testPolicy", "anotherTestPolicy"
-			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2), ($3, $4)`,
-				polID1, name1, polID2, name2)
-			require.NoError(t, err)
+			polID1 := insertTestPolicy(t, db, name1)
+			polID2 := insertTestPolicy(t, db, name2)
 
 			projID := "special-project"
 			insertTestProject(t, db, projID, "too special", storage.Custom)
@@ -742,11 +709,9 @@ func TestListPolicies(t *testing.T) {
 		},
 		"when the list is filtered by a policy list of *, return everything": func(t *testing.T) {
 			ctx := context.Background()
-			polID1, polID2 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 			name1, name2 := "testPolicy", "anotherTestPolicy"
-			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2), ($3, $4)`,
-				polID1, name1, polID2, name2)
-			require.NoError(t, err)
+			polID1 := insertTestPolicy(t, db, name1)
+			polID2 := insertTestPolicy(t, db, name2)
 
 			projID := "special-project"
 			insertTestProject(t, db, projID, "too special", storage.Custom)
@@ -778,11 +743,9 @@ func TestListPolicies(t *testing.T) {
 		},
 		"when the list is filtered by a policy list of (unassigned), return policies with no projects": func(t *testing.T) {
 			ctx := context.Background()
-			polID1, polID2 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 			name1, name2 := "testPolicy", "anotherTestPolicy"
-			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2), ($3, $4)`,
-				polID1, name1, polID2, name2)
-			require.NoError(t, err)
+			polID1 := insertTestPolicy(t, db, name1)
+			polID2 := insertTestPolicy(t, db, name2)
 
 			projID := "special-project"
 			insertTestProject(t, db, projID, "too special", storage.Custom)
@@ -806,11 +769,10 @@ func TestListPolicies(t *testing.T) {
 		},
 		"when the list is filtered by a project list of (unassigned) and another project, return matched policies": func(t *testing.T) {
 			ctx := context.Background()
-			polID1, polID2, polID3 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 			name1, name2, name3 := "testPolicy", "anotherTestPolicy", "pika"
-			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2), ($3, $4), ($5, $6)`,
-				polID1, name1, polID2, name2, polID3, name3)
-			require.NoError(t, err)
+			polID1 := insertTestPolicy(t, db, name1)
+			polID2 := insertTestPolicy(t, db, name2)
+			polID3 := insertTestPolicy(t, db, name3)
 
 			projID := "special-project"
 			insertTestProject(t, db, projID, "too special", storage.Custom)
@@ -846,11 +808,10 @@ func TestListPolicies(t *testing.T) {
 		},
 		"when there is no intersection between projects filter and projects, return empty list": func(t *testing.T) {
 			ctx := context.Background()
-			polID1, polID2, polID3 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 			name1, name2, name3 := "testPolicy", "anotherTestPolicy", "pika"
-			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2), ($3, $4), ($5, $6)`,
-				polID1, name1, polID2, name2, polID3, name3)
-			require.NoError(t, err)
+			polID1 := insertTestPolicy(t, db, name1)
+			insertTestPolicy(t, db, name2)
+			polID3 := insertTestPolicy(t, db, name3)
 
 			projID := "special-project"
 			insertTestProject(t, db, projID, "too special", storage.Custom)
@@ -896,16 +857,11 @@ func TestDeletePolicy(t *testing.T) {
 		"policy not found with existing policies in store": func(t *testing.T) {
 			ctx := context.Background()
 			// Add a different policy
-			_, err := db.Exec(`
-			WITH policy_db_id AS (
-				INSERT INTO iam_policies (id, name) VALUES (uuid_generate_v4(), 'testpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-				VALUES ($1, 'deny'::iam_effect, array['iam:users:create', 'iam:users:delete'], array['iam:users'], (SELECT * FROM policy_db_id));`, genUUID(t))
-			require.NoError(t, err)
+			polID := insertTestPolicy(t, db, "testpolicy")
+			insertTestStatement(t, db, polID, "allow", "", []string{"iam:users:delete", "iam:users:create"}, []string{"iam:users"})
 
-			polID := genSimpleID(t, prngSeed)
 			assertNoPolicyChange(t, store, func() {
-				err = store.DeletePolicy(ctx, polID)
+				err := store.DeletePolicy(ctx, genSimpleID(t, prngSeed))
 				assert.Equal(t, storage_errors.ErrNotFound, err)
 			})
 		},
@@ -936,15 +892,13 @@ func TestDeletePolicy(t *testing.T) {
 		},
 		"only one unattached policy with two statements": func(t *testing.T) {
 			ctx := context.Background()
-			sID0, sID1, polID := genUUID(t), genUUID(t), genSimpleID(t, prngSeed)
 
-			_, err := db.Exec(`
-			WITH policy_db_id AS (
-				INSERT INTO iam_policies (id, name) VALUES ($3, 'testpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-				VALUES ($1, 'allow'::iam_effect, array['iam:users:delete', 'iam:users:create'], array['iam:users'], (SELECT * FROM policy_db_id)),
-				   	   ($2, 'deny'::iam_effect, array['infra:nodes:delete', 'infra:nodes:rerun'], array['infra:nodes'], (SELECT * FROM policy_db_id));`, sID0, sID1, polID)
-			require.NoError(t, err)
+			polID := insertTestPolicy(t, db, "testpolicy")
+			sID0 := insertTestStatement(t, db,
+				polID, "allow", "", []string{"iam:users:delete', 'iam:users:create"}, []string{"iam:users"})
+			sID1 := insertTestStatement(t, db,
+				polID, "deny", "", []string{"infra:nodes:delete", "infra:nodes:rerun"}, []string{"infra:nodes"})
+
 			insertTestPolicyMember(t, db, polID, "user:local:albertine")
 
 			assertPolicyChange(t, store, func() {
@@ -958,26 +912,19 @@ func TestDeletePolicy(t *testing.T) {
 		},
 		"unattached policy with two statements, next to other policy": func(t *testing.T) {
 			ctx := context.Background()
-			polID0 := genSimpleID(t, prngSeed)
 
-			_, err := db.Exec(`
-			WITH policy_db_id AS (
-				INSERT INTO iam_policies (id, name) VALUES ($1, 'testpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-				VALUES (uuid_generate_v4(), 'allow'::iam_effect, array['iam:users:delete', 'iam:users:create'], array['iam:users'], (SELECT * FROM policy_db_id)),
-				   	   (uuid_generate_v4(), 'deny'::iam_effect, array['compliance:profiles:download', 'compliance:profiles:delete'], array['compliance:profiles'], (SELECT * FROM policy_db_id));`, polID0)
-			require.NoError(t, err)
+			polID0 := insertTestPolicy(t, db, "firstpolicy")
+			insertTestStatement(t, db,
+				polID0, "allow", "", []string{"iam:users:delete', 'iam:users:create"}, []string{"iam:users"})
+			insertTestStatement(t, db,
+				polID0, "deny", "", []string{"compliance:profiles:download", "compliance:profiles:delete"}, []string{"compliance:profiles"})
 			insertTestPolicyMember(t, db, polID0, "user:local:albertine")
 
-			sID0, sID1, polID1 := genUUID(t), genUUID(t), genSimpleID(t, prngSeed)
-
-			_, err = db.Exec(`
-			WITH policy_db_id AS (
-				INSERT INTO iam_policies (id, name) VALUES ($3, 'testpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-				VALUES ($1, 'allow'::iam_effect, array['iam:users:delete', 'iam:users:create'], array['iam:users'], (SELECT * FROM policy_db_id)),
-				   	   ($2, 'deny'::iam_effect, array['infra:nodes:delete', 'infra:nodes:rerun'], array['infra:nodes'], (SELECT * FROM policy_db_id));`, sID0, sID1, polID1)
-			require.NoError(t, err)
+			polID1 := insertTestPolicy(t, db, "testpolicy")
+			sID0 := insertTestStatement(t, db,
+				polID1, "allow", "", []string{"iam:users:delete', 'iam:users:create"}, []string{"iam:users"})
+			sID1 := insertTestStatement(t, db,
+				polID1, "deny", "", []string{"infra:nodes:delete'", "infra:nodes:rerun"}, []string{"infra:nodes"})
 			member := insertTestPolicyMember(t, db, polID1, "user:local:charmander")
 
 			assertPolicyChange(t, store, func() {
@@ -996,22 +943,15 @@ func TestDeletePolicy(t *testing.T) {
 		},
 		"only one unattached policy with one statement with projects": func(t *testing.T) {
 			ctx := context.Background()
-			sID0, polID := genUUID(t), genSimpleID(t, prngSeed)
-			projID0, projID1 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 
-			// insert projects
+			projID0, projID1 := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 			insertTestProject(t, db, projID0, "let's go eevee - prod", storage.Custom)
 			insertTestProject(t, db, projID1, "let's go eevee - dev", storage.Custom)
 
-			// insert policy with statements
-			_, err := db.Exec(`
-			WITH policy_db_id AS (
-				INSERT INTO iam_policies (id, name) VALUES ($2, 'testpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-				VALUES ($1, 'allow'::iam_effect, array['iam:users:delete', 'iam:users:create'], array['iam:users'], (SELECT * FROM policy_db_id));`, sID0, polID)
-			require.NoError(t, err)
+			polID := insertTestPolicy(t, db, "testpolicy")
+			sID0 := insertTestStatement(t, db,
+				polID, "allow", "", []string{"iam:users:delete', 'iam:users:create"}, []string{"iam:users"})
 
-			// insert project into statements
 			insertStatementProject(t, db, sID0, projID0)
 			insertStatementProject(t, db, sID0, projID1)
 
@@ -1152,9 +1092,44 @@ func TestCreatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
 		},
-		"policy with one resources+actions statement": func(t *testing.T) {
+		"policy adding a role that doesn't exist should fail": func(t *testing.T) {
 			polID, sID := genSimpleID(t, prngSeed), genUUID(t)
 			name, typeVal := "toBeCreated", storage.Custom
+			resources := []string{"iam:users"}
+			role := "notFound"
+			member := genMember(t, "user:local:albertine")
+			statement := storage.Statement{
+				ID:        sID,
+				Effect:    storage.Deny,
+				Role:      role,
+				Resources: resources,
+			}
+
+			pol := storage.Policy{
+				ID:         polID,
+				Name:       name,
+				Members:    []storage.Member{member},
+				Type:       typeVal,
+				Statements: []storage.Statement{statement},
+			}
+
+			resp, err := store.CreatePolicy(ctx, &pol)
+			err, wasCorrectError := err.(*storage_errors.ErrRoleMustExistForStatement)
+
+			assert.True(t, wasCorrectError)
+			assert.Equal(t,
+				fmt.Sprintf("role must exist to be inserted into a policy statement, missing role with ID: %s", role), err.Error())
+			assert.Nil(t, resp)
+
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+		},
+		"policy with one statement that contains resources and actions but no role": func(t *testing.T) {
+			polID, sID := genSimpleID(t, prngSeed), genUUID(t)
+			name, typeVal := "toBeCreated", storage.Custom
+
 			resources, actions := []string{"iam:users"}, []string{"iam:users:create", "iam:users:delete"}
 			member := genMember(t, "user:local:albertine")
 			statement := storage.Statement{
@@ -1181,8 +1156,88 @@ func TestCreatePolicy(t *testing.T) {
 			assertOne(t,
 				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
 					polID, name, typeVal.String()))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5)`,
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5) AND role_id IS NULL`,
 				sID, pq.Array(resources), pq.Array(actions), "deny", polID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertMembers(t, db, polID, []storage.Member{member})
+		},
+		"policy with one statement that contains resources, actions, and a role that exists": func(t *testing.T) {
+			polID, sID := genSimpleID(t, prngSeed), genUUID(t)
+			name, typeVal, projID := "toBeCreated", storage.Custom, "project1"
+			resources, actions, role := []string{"iam:users"}, []string{"iam:users:create", "iam:users:delete"}, "my-fancy-role"
+
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			insertTestRole(t, db, role, "role name", []string{"action1"}, []string{projID})
+
+			member := genMember(t, "user:local:albertine")
+			statement := storage.Statement{
+				ID:        sID,
+				Effect:    storage.Deny,
+				Resources: resources,
+				Actions:   actions,
+				Role:      role,
+			}
+
+			pol := storage.Policy{
+				ID:         polID,
+				Name:       name,
+				Members:    []storage.Member{member},
+				Type:       typeVal,
+				Statements: []storage.Statement{statement},
+			}
+
+			assertPolicyChange(t, store, func() {
+				resp, err := store.CreatePolicy(ctx, &pol)
+				require.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
+
+			assertOne(t,
+				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
+					polID, name, typeVal.String()))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5) AND role_id=role_db_id($6)`,
+				sID, pq.Array(resources), pq.Array(actions), "deny", polID, role))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertMembers(t, db, polID, []storage.Member{member})
+		},
+		"policy with one statement that contains resources, a role that exists, but no actions": func(t *testing.T) {
+			polID, sID := genSimpleID(t, prngSeed), genUUID(t)
+			name, typeVal, projID := "toBeCreated", storage.Custom, "project1"
+			resources, role := []string{"iam:users"}, "my-fancy-role"
+
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			insertTestRole(t, db, role, "role name", []string{"action1"}, []string{projID})
+
+			member := genMember(t, "user:local:albertine")
+			statement := storage.Statement{
+				ID:        sID,
+				Effect:    storage.Deny,
+				Resources: resources,
+				Role:      role,
+				Actions:   []string{},
+			}
+
+			pol := storage.Policy{
+				ID:         polID,
+				Name:       name,
+				Members:    []storage.Member{member},
+				Type:       typeVal,
+				Statements: []storage.Statement{statement},
+			}
+
+			assertPolicyChange(t, store, func() {
+				resp, err := store.CreatePolicy(ctx, &pol)
+				require.NoError(t, err)
+				assert.Equal(t, &pol, resp)
+			})
+
+			assertOne(t,
+				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
+					polID, name, typeVal.String()))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions='{}' AND effect=$3 AND policy_id=policy_db_id($4) AND role_id=role_db_id($5)`,
+				sID, pq.Array(resources), "deny", polID, role))
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
 			assertMembers(t, db, polID, []storage.Member{member})
@@ -1370,21 +1425,15 @@ func TestCreatePolicy(t *testing.T) {
 			assertMembers(t, db, polID, []storage.Member{member})
 		},
 		"policy with statement ID already used in other policy's statements": func(t *testing.T) {
-			// Note(sr): implementation detail worth noting (reconsidering?)
-			sID, polID, failedPolID := genUUID(t), genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
-
 			// add a policy using that statement
-			_, err := db.Exec(`
-			WITH policy_db_id AS (
-				INSERT INTO iam_policies (id, name) VALUES ($2, 'originalpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-				VALUES ($1, 'allow'::iam_effect, array['iam:users:delete', 'iam:users:create'], array['iam:users'], (SELECT * FROM policy_db_id));`, sID, polID)
-			require.NoError(t, err)
+			polID := insertTestPolicy(t, db, "originalpolicy")
+			resources, actions := []string{"iam:users"}, []string{"iam:users:delete", "iam:users:create"}
+			sID := insertTestStatement(t, db, polID, "allow", "", actions, resources)
 			insertTestPolicyMember(t, db, polID, "user:local:albertine")
 
 			// try to add another one using that statement
+			failedPolID := genSimpleID(t, prngSeed)
 			name, typeVal := "toBeCreated", storage.Custom
-			resources, actions := []string{"iam:users"}, []string{"iam:users:delete", "iam:users:create"}
 			member1 := genMember(t, "user:local:otheruser")
 			pol := storage.Policy{
 				ID:      failedPolID,
@@ -2520,20 +2569,15 @@ func TestUpdatePolicy(t *testing.T) {
 		"policy not found with existing policies in store": func(t *testing.T) {
 			ctx := context.Background()
 			// Add a different policy
-			polID0 := genSimpleID(t, prngSeed)
-			_, err := db.Exec(`
-			WITH policy_db_id AS (
-			INSERT INTO iam_policies (id, name) VALUES ($2, 'testpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-			VALUES ($1, 'deny'::iam_effect, array['iam:users:create', 'iam:users:delete'], array['iam:users'], (SELECT * FROM policy_db_id));`, genUUID(t), polID0)
-			require.NoError(t, err)
+			polID0 := insertTestPolicy(t, db, "testpolicy")
+			insertTestStatement(t, db,
+				polID0, "allow", "", []string{"iam:users:delete', 'iam:users:create"}, []string{"iam:users"})
 			insertTestPolicyMember(t, db, polID0, "user:local:albertine")
 
-			polID := genSimpleID(t, prngSeed)
 			name, typeVal := "somename", storage.Custom
 			member := genMember(t, "user:local:albertine")
 			pol := storage.Policy{
-				ID:      polID,
+				ID:      genSimpleID(t, prngSeed),
 				Name:    name,
 				Type:    typeVal,
 				Members: []storage.Member{member},
@@ -2574,14 +2618,7 @@ func TestUpdatePolicy(t *testing.T) {
 		},
 		"policy with no statements, changing the type": func(t *testing.T) {
 			ctx := context.Background()
-			row := db.QueryRow(`INSERT INTO iam_policies
-        (id, name, type)
-        VALUES (uuid_generate_v4(), 'testpolicy', 'custom')
-        RETURNING id`)
-			require.NotNil(t, row)
-			var polID string
-			err := row.Scan(&polID)
-			require.NoError(t, err)
+			polID := insertTestPolicy(t, db, "testpolicy")
 			insertTestPolicyMember(t, db, polID, "user:local:albertine")
 
 			name, typeVal := "new-name", storage.ChefManaged
@@ -2654,15 +2691,12 @@ func TestUpdatePolicy(t *testing.T) {
 		},
 		"policy with two statements, removing one statement": func(t *testing.T) {
 			ctx := context.Background()
-			polID, sID0, sID1 := genSimpleID(t, prngSeed), genUUID(t), genUUID(t)
 
-			_, err := db.Exec(`
-			WITH policy_db_id AS (
-				INSERT INTO iam_policies (id, name) VALUES ($3, 'testpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-				VALUES ($1, 'allow'::iam_effect, array['iam:users:delete', 'iam:users:create'], array['iam:users'], (SELECT * FROM policy_db_id)),
-				   	   ($2, 'deny'::iam_effect, array['infra:nodes:delete', 'infra:nodes:rerun'], array['infra:nodes'], (SELECT * FROM policy_db_id));`, sID0, sID1, polID)
-			require.NoError(t, err)
+			polID := insertTestPolicy(t, db, "testpolicy")
+			sID0 := insertTestStatement(t, db,
+				polID, "allow", "", []string{"iam:users:delete', 'iam:users:create"}, []string{"iam:users"})
+			sID1 := insertTestStatement(t, db,
+				polID, "deny", "", []string{"infra:nodes:delete", "infra:nodes:rerun"}, []string{"infra:nodes"})
 			insertTestPolicyMember(t, db, polID, "user:local:albertine")
 
 			resources, actions := []string{"iam:users"}, []string{"iam:users:create", "iam:users:delete"}
@@ -2699,33 +2733,25 @@ func TestUpdatePolicy(t *testing.T) {
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members WHERE id=$1 AND name=$2`, member.ID, member.Name))
 		},
 		"policy statement conflict with existing policies in store, triggering rollback": func(t *testing.T) {
-			ctx := context.Background()
 			// Note(sr): test case only serves to demonstrate transaction fix for update
-			sID, polID, originalPolID := genUUID(t), genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
-
+			ctx := context.Background()
 			// add a policy using that statement
-			_, err := db.Exec(`
-			WITH policy_db_id AS (
-				INSERT INTO iam_policies (id, name) VALUES ($2, 'firstpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-				VALUES ($1, 'deny'::iam_effect, array['iam:users:create', 'iam:users:delete'], array['iam:users'], (SELECT * FROM policy_db_id));`, sID, originalPolID)
-			require.NoError(t, err)
+			originalPolID := insertTestPolicy(t, db, "firstpolicy")
+			sID := insertTestStatement(t, db,
+				originalPolID, "deny", "", []string{"iam:users:create", "iam:users:delete"}, []string{"iam:users"})
 			member0 := insertTestPolicyMember(t, db, originalPolID, "user:local:albertine")
 
 			// Add a different policy
-			sID0, sID1 := genUUID(t), genUUID(t)
-			_, err = db.Exec(`
-			WITH policy_db_id AS (
-				INSERT INTO iam_policies (id, name) VALUES ($2, 'otherpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-				VALUES ($1, 'deny'::iam_effect, array['compliance:profiles:update'], array['compliance:profiles'], (SELECT * FROM policy_db_id));`, sID0, polID)
-			require.NoError(t, err)
+			polID := insertTestPolicy(t, db, "otherpolicy")
+			insertTestStatement(t, db,
+				polID, "deny", "", []string{"compliance:profiles:update"}, []string{"compliance:profiles"})
 			member1 := insertTestPolicyMember(t, db, polID, "user:local:albert")
 
 			// update second policy with statement conflicting with other policy
 			member := genMember(t, "user:local:new_member")
 			resources, actions := []string{"iam:users"}, []string{"iam:users:create", "iam:users:delete"}
 			resources1, actions1 := []string{"iam:teams"}, []string{"iam:teams:create"}
+			sID1 := genUUID(t)
 			statement0 := storage.Statement{
 				ID:        sID1, // fresh
 				Effect:    storage.Deny,
@@ -2773,16 +2799,12 @@ func TestUpdatePolicy(t *testing.T) {
 		},
 		"policy with one statement, adding existing project to statement": func(t *testing.T) {
 			ctx := context.Background()
-			polID, projID := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
-			sID := genUUID(t)
 
-			_, err := db.Exec(`
-			WITH policy_db_id AS (
-				INSERT INTO iam_policies (id, name) VALUES ($2, 'testpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-				VALUES ($1, 'deny'::iam_effect, array['compliance:profiles:download', 'compliance:profiles:delete'], array['compliance:profiles'], (SELECT * FROM policy_db_id));`, sID, polID)
-			require.NoError(t, err)
+			polID := insertTestPolicy(t, db, "testpolicy")
+			sID := insertTestStatement(t, db,
+				polID, "deny", "", []string{"compliance:profiles:download", "compliance:profiles:delete"}, []string{"compliance:profiles"})
 
+			projID := genSimpleID(t, prngSeed)
 			member := insertTestPolicyMember(t, db, polID, "user:local:totodile")
 			insertTestProject(t, db, projID, "pokemon crystal", storage.Custom)
 
@@ -2822,17 +2844,13 @@ func TestUpdatePolicy(t *testing.T) {
 		},
 		"policy with one statement, adding non-existent project to statement fails": func(t *testing.T) {
 			ctx := context.Background()
-			polID, projID := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
-			sID := genUUID(t)
 			resources, actions := []string{"compliance:profiles"}, []string{"compliance:profiles:download"}
 			assertEmpty(t, db.QueryRow("SELECT count(*) FROM iam_statements"))
 
-			_, err := db.Exec(`
-			WITH policy_db_id AS (
-				INSERT INTO iam_policies (id, name) VALUES ($2, 'testpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-				VALUES ($1, 'allow'::iam_effect, array['compliance:profiles:download'], array['compliance:profiles'], (SELECT * FROM policy_db_id));`, sID, polID)
-			require.NoError(t, err)
+			polID := insertTestPolicy(t, db, "testpolicy")
+			sID := insertTestStatement(t, db, polID, "allow", "", actions, resources)
+
+			projID := genSimpleID(t, prngSeed)
 			member := insertTestPolicyMember(t, db, polID, "user:local:totodile")
 
 			statement := storage.Statement{
@@ -2874,11 +2892,8 @@ func TestUpdatePolicy(t *testing.T) {
 		},
 		"policy with no projects to some projects": func(t *testing.T) {
 			ctx := context.Background()
-			polID := genSimpleID(t, prngSeed)
 			name := "testPolicy"
-			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2)`, polID, name)
-			require.NoError(t, err)
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID))
+			polID := insertTestPolicy(t, db, name)
 
 			projID := "special-project"
 			insertTestProject(t, db, projID, "too special", storage.Custom)
@@ -2902,10 +2917,8 @@ func TestUpdatePolicy(t *testing.T) {
 		},
 		"policy with project to no projects": func(t *testing.T) {
 			ctx := context.Background()
-			polID := genSimpleID(t, prngSeed)
 			name := "testPolicy"
-			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2)`, polID, name)
-			require.NoError(t, err)
+			polID := insertTestPolicy(t, db, name)
 
 			projID := "special-project"
 			insertTestProject(t, db, projID, "too special", storage.Custom)
@@ -2934,10 +2947,8 @@ func TestUpdatePolicy(t *testing.T) {
 			ctx := context.Background()
 			// TODO optimize/opt-out if they're the same?
 
-			polID := genSimpleID(t, prngSeed)
 			name := "testPolicy"
-			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2)`, polID, name)
-			require.NoError(t, err)
+			polID := insertTestPolicy(t, db, name)
 
 			projID := "special-project"
 			insertTestProject(t, db, projID, "too special", storage.Custom)
@@ -2969,10 +2980,9 @@ func TestUpdatePolicy(t *testing.T) {
 		},
 		"policy with single project to diff project": func(t *testing.T) {
 			ctx := context.Background()
-			polID := genSimpleID(t, prngSeed)
 			name := "testPolicy"
-			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2)`, polID, name)
-			require.NoError(t, err)
+			polID := insertTestPolicy(t, db, name)
+
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID))
 
 			projID := "special-project"
@@ -3003,11 +3013,9 @@ func TestUpdatePolicy(t *testing.T) {
 		},
 		"policy with one project to additional project": func(t *testing.T) {
 			ctx := context.Background()
-			polID := genSimpleID(t, prngSeed)
 			name := "testPolicy"
-			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2)`, polID, name)
+			polID := insertTestPolicy(t, db, name)
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID))
-			require.NoError(t, err)
 
 			projID := "special-project"
 			insertTestProject(t, db, projID, "too special", storage.Custom)
@@ -3040,10 +3048,8 @@ func TestUpdatePolicy(t *testing.T) {
 		},
 		"policy with project to add non-existent project fails": func(t *testing.T) {
 			ctx := context.Background()
-			polID := genSimpleID(t, prngSeed)
 			name := "testPolicy"
-			_, err := db.Exec(`INSERT INTO iam_policies (id, name) VALUES ($1, $2)`, polID, name)
-			require.NoError(t, err)
+			polID := insertTestPolicy(t, db, name)
 
 			projID := "special-project"
 			insertTestProject(t, db, projID, "too special", storage.Custom)
@@ -5634,7 +5640,7 @@ func TestGetRole(t *testing.T) {
 }
 
 func TestReset(t *testing.T) {
-	store, db, prngSeed, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
@@ -5654,14 +5660,11 @@ func TestReset(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects`))
 		},
 		"non-empty database, a policy with two statements and members": func(t *testing.T) {
-			polID := genSimpleID(t, prngSeed)
-			_, err := db.Exec(`
-			WITH policy_db_id AS (
-				INSERT INTO iam_policies (id, name) VALUES ($1, 'testpolicy') RETURNING db_id
-			) INSERT INTO iam_statements (id, effect, actions, resources, policy_id)
-				VALUES (uuid_generate_v4(), 'allow'::iam_effect, array['iam:users:delete', 'iam:users:create'], array['iam:users'], (SELECT * FROM policy_db_id)),
-				   	   (uuid_generate_v4(), 'deny'::iam_effect, array['compliance:profiles:download', 'compliance:profiles:delete'], array['compliance:profiles'], (SELECT * FROM policy_db_id));`, polID)
-			require.NoError(t, err)
+			polID := insertTestPolicy(t, db, "firstpolicy")
+			insertTestStatement(t, db,
+				polID, "allow", "", []string{"iam:users:delete', 'iam:users:create"}, []string{"iam:users"})
+			insertTestStatement(t, db,
+				polID, "deny", "", []string{"compliance:profiles:download", "compliance:profiles:delete"}, []string{"compliance:profiles"})
 			insertTestPolicyMember(t, db, polID, "user:local:albertine")
 			insertTestPolicyMember(t, db, polID, "user:local:othermember")
 
@@ -5741,6 +5744,79 @@ func TestDeleteRole(t *testing.T) {
 			require.NoError(t, err)
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_roles WHERE id=$1`, role.ID))
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_roles`))
+		},
+		"when statements contains a role and no actions and are the last statements in a policy, on role deletion the policy is deleted": func(t *testing.T) {
+			ctx := context.Background()
+			project1 := storage.Project{
+				ID:       "project-1",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Projects: []string{"project-1"},
+			}
+			_, err := store.CreateProject(ctx, &project1)
+			require.NoError(t, err)
+
+			roleDeleted := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project1.ID})
+			roleRemaining := insertTestRole(t, db, "my-id-2", "name", []string{"action2"}, []string{project1.ID})
+
+			polID := insertTestPolicy(t, db, "testpolicy")
+			sID0 := insertTestStatement(t, db, polID, "allow", roleDeleted.ID, []string{}, []string{"iam:users"})
+			sID1 := insertTestStatement(t, db, polID, "deny", roleDeleted.ID, []string{}, []string{"compliance:profiles"})
+
+			polIDWrongRole := insertTestPolicy(t, db, "testpolicy2")
+			sID0WrongRole := insertTestStatement(t, db, polIDWrongRole, "allow", roleRemaining.ID, []string{}, []string{"iam:users"})
+			sID1WrongRole := insertTestStatement(t, db, polIDWrongRole, "deny", roleRemaining.ID, []string{}, []string{"compliance:profiles"})
+
+			err = store.DeleteRole(ctx, roleDeleted.ID)
+
+			require.NoError(t, err)
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_roles WHERE id=$1`, roleDeleted.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_roles`))
+
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID1))
+
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polIDWrongRole))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND role_id=role_db_id($2)`, sID0WrongRole, roleRemaining.ID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND role_id=role_db_id($2)`, sID1WrongRole, roleRemaining.ID))
+		},
+		"when one statement contains a role and as well as actions but one statement contains no actions, on role deletion there is only one modified statement remaining": func(t *testing.T) {
+			ctx := context.Background()
+			project1 := storage.Project{
+				ID:       "project-1",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Projects: []string{"project-1"},
+			}
+			_, err := store.CreateProject(ctx, &project1)
+			require.NoError(t, err)
+
+			roleDeleted := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project1.ID})
+			roleRemaining := insertTestRole(t, db, "my-id-2", "name", []string{"action2"}, []string{project1.ID})
+
+			polID := insertTestPolicy(t, db, "testpolicy")
+			sID0 := insertTestStatement(t, db, polID, "allow", roleDeleted.ID, []string{}, []string{"iam:users"})
+			actions := []string{"compliance:profiles:download"}
+			sID1 := insertTestStatement(t, db, polID, "deny", roleDeleted.ID, actions, []string{"compliance:profiles"})
+
+			polIDWrongRole := insertTestPolicy(t, db, "testpolicy2")
+			sID0WrongRole := insertTestStatement(t, db, polIDWrongRole, "allow", roleRemaining.ID, []string{}, []string{"iam:users"})
+			sID1WrongRole := insertTestStatement(t, db, polIDWrongRole, "deny", roleRemaining.ID, []string{}, []string{"compliance:profiles"})
+
+			err = store.DeleteRole(ctx, roleDeleted.ID)
+
+			require.NoError(t, err)
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_roles WHERE id=$1`, roleDeleted.ID))
+			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_roles`))
+
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND actions=$2 AND role_id IS NULL`, sID1, pq.Array(actions)))
+
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polIDWrongRole))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND role_id=role_db_id($2)`, sID0WrongRole, roleRemaining.ID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND role_id=role_db_id($2)`, sID1WrongRole, roleRemaining.ID))
 		},
 		"deletes role with several roles in database when projects filter has intersection": func(t *testing.T) {
 			ctx := context.Background()
@@ -6613,6 +6689,47 @@ func insertTestPolicy(t *testing.T, db *testhelpers.TestDB, policyName string) s
 	var polID string
 	require.NoError(t, row.Scan(&polID))
 	return polID
+}
+
+// pass "" as roleID if you do not wish to populate a role
+func insertTestStatement(t *testing.T, db *testhelpers.TestDB,
+	policyID, effect, roleID string, actions, resources []string) uuid.UUID {
+
+	var id string
+	if roleID != "" {
+		row := db.QueryRow(`
+		INSERT INTO iam_statements (id, policy_id, effect, role_id, actions, resources)
+			VALUES (uuid_generate_v4(), policy_db_id($1), $2::iam_effect, role_db_id($3), $4, $5) RETURNING id`,
+			policyID, effect, roleID, pq.Array(actions), pq.Array(resources))
+		require.NoError(t, row.Scan(&id))
+
+		assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE
+			id=$1 AND
+			policy_id=policy_db_id($2) AND
+			effect=$3 AND
+			actions=$4 AND
+			resources=$5 AND
+			role_id=role_db_id($6)`,
+			id, policyID, effect, pq.Array(actions), pq.Array(resources), roleID))
+	} else {
+		row := db.QueryRow(`
+		INSERT INTO iam_statements (id, policy_id, effect, actions, resources)
+			VALUES (uuid_generate_v4(), policy_db_id($1), $2::iam_effect, $3, $4) RETURNING id`,
+			policyID, effect, pq.Array(actions), pq.Array(resources))
+		require.NoError(t, row.Scan(&id))
+
+		assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE
+			id=$1 AND
+			policy_id=policy_db_id($2) AND
+			effect=$3 AND
+			actions=$4 AND
+			resources=$5 AND
+			role_id IS NULL`,
+			id, policyID, effect, pq.Array(actions), pq.Array(resources)))
+	}
+	uuid, err := uuid.FromString(id)
+	require.NoError(t, err)
+	return uuid
 }
 
 // Will fail on conflict with existing name.

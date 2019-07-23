@@ -60,3 +60,4 @@
 - [`58_use_project_db_id_in_references_of_policy_statements.up.sql`](58_use_project_db_id_in_references_of_policy_statements.up.sql)
 - [`59_use_db_id_as_primary_key_in_iam_projects.up.sql`](59_use_db_id_as_primary_key_in_iam_projects.up.sql)
 - [`60_use_db_id_as_primary_key_in_iam_statement_projects.up.sql`](60_use_db_id_as_primary_key_in_iam_statement_projects.up.sql)
+- [`61_use_role_db_id_in_iam_statements.up.sql`](61_use_role_db_id_in_iam_statements.up.sql)
