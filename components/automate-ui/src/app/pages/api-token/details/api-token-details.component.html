@@ -37,11 +37,7 @@
       </form>
       <chef-button primary [disabled]="!updateNameForm.valid || disableSave || saveInProgress" (click)="saveNameChange()">
         <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
-        <ng-container *ngIf="!saveInProgress">
-          <span *ngIf="disableSave">Saved</span>
-          <span *ngIf="!disableSave">Save</span>
-        </ng-container>
-        <span *ngIf="saveInProgress">Saving...</span>
+        Save
       </chef-button>
     </section>
   </main>
