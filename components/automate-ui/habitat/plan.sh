@@ -37,41 +37,49 @@ do_unpack() {
   cp ${PLAN_CONTEXT}/environments/environment.prod.ts $CACHE_PATH/automate-ui/src/environments/environment.prod.ts
 }
 
+npm_install() {
+  # --unsafe-perm enables the package.json install task to copy files when running
+  # as superuser during the hab package building.
+  # Copied from Habitat's node scaffolding:
+  # https://github.com/habitat-sh/core-plans/blob/be88f083c123ab998711fd3a93976ad10492a955/scaffolding-node/lib/scaffolding.sh#L111-L116
+  npm install \
+    --unsafe-perm \
+    --loglevel error \
+    --fetch-retries 5 \
+    "$@"
+}
+
+fix_interpreters() {
+  # Fix the interpreters of the binaries
+  # Note: many bin/* files are links, so the output will have duplicate entries
+  for b in node_modules/.bin/*; do
+    fix_interpreter "$(readlink -f -n "$b")" core/coreutils bin/env
+  done
+}
+
 do_build() {
   # Disabling Usage Analytics
   export NG_CLI_ANALYTICS=false
 
-  for dir in $CACHE_PATH/chef-ui-library $CACHE_PATH/automate-ui; do
-    pushd $dir
-      echo "Building $dir"
-      # --unsafe-perm lets our package.json install task copy files when running
-      # as superuser during the hab package building.
-      # Copied from Habitat's node scaffolding:
-      # https://github.com/habitat-sh/core-plans/blob/be88f083c123ab998711fd3a93976ad10492a955/scaffolding-node/lib/scaffolding.sh#L111-L116
-      npm install \
-        --unsafe-perm \
-        --production \
-        --loglevel error \
-        --fetch-retries 5
-      # Angular CLI isn't included in production deps so we need to install it manually.
-      npm install \
-          --unsafe-perm \
-          --loglevel error \
-          --fetch-retries 5 \
-          @angular/cli
+  echo "Building $CACHE_PATH/chef-ui-library"
+  pushd "$CACHE_PATH/chef-ui-library"
+    npm_install
+    fix_interpreters
+    npm run build:prod
+  popd
 
-      # Fix the interpreters of the binaries
-      for b in node_modules/.bin/*; do
-        fix_interpreter "$(readlink -f -n "$b")" core/coreutils bin/env
-      done
+  echo "Building $CACHE_PATH/automate-ui"
+  pushd "$CACHE_PATH/automate-ui"
+    npm_install --production
 
-      # Compile the Angular application
-      npm run build:prod
+    # Angular CLI isn't included in production deps so we need to install it manually.
+    npm_install @angular/cli
 
-      # Remove Angular CLI after the build
-      npm uninstall @angular/cli --no-save
-    popd
-  done
+    fix_interpreters
+    npm run build:prod
+
+    npm uninstall @angular/cli --no-save
+  popd
 }
 
 do_install() {
