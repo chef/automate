@@ -22,7 +22,7 @@ const roleCreateTemplateStr = `
 {
   "id": "{{ .ID }}",
   "name": "{{ .Name }}",
-	"actions": ["test:svc:someroleaction", "test:svc:someotherroleaction"]
+  "actions": ["test:svc:someroleaction", "test:svc:someotherroleaction"]
 }
 `
 
