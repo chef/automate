@@ -18,11 +18,12 @@ chef-page {
 
   chef-input {
     height: 45px;
+    width: 100%;
   }
 
-  #ruleName,
-  #resourceType {
+  #create-name, #create-type, #create-type-dropdown {
     width: 340px;
+    max-width: 340px;
   }
 
   chef-form-field {

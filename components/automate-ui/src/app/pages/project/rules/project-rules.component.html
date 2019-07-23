@@ -11,20 +11,20 @@
     <ng-container>
       <form id="ruleForm" [formGroup]="ruleForm" (ngSubmit)="saveRule()">
 
-        <chef-form-field class="display3">
+        <chef-form-field id="create-name">
           <label>
             <span class="label">Rule Name</span>
-            <chef-input id="ruleName" ngDefaultControl formControlName="name"></chef-input>
+            <chef-input ngDefaultControl formControlName="name"></chef-input>
           </label>
           <chef-error
             *ngIf="ruleForm.get('name').hasError('required') && ruleForm.get('name').dirty"
-          >Name is required</chef-error>
+          >Rule Name is required</chef-error>
         </chef-form-field>
 
-        <chef-form-field class="display3">
+        <chef-form-field id="create-type">
           <label>
             <span class="label">Resource Type</span>
-            <select id="resourceType" ngDefaultControl formControlName="type">
+            <select id="create-type-dropdown" ngDefaultControl formControlName="type">
               <option value='NODE'>Node</option>
               <option value='EVENT'>Event</option>
             </select>
@@ -51,7 +51,7 @@
               <label>
                 <span class="label">{{ getAttributeLabel() }}</span>
                 <select ngDefaultControl formControlName="attribute">
-                  <option 
+                  <option
                     *ngFor="let option of attributes[ruleForm.get('type').value.toLowerCase()]; let i = index"
                     [value]="option.key"
                   >{{ option.value }}</option>
@@ -71,7 +71,7 @@
                 </select>
               </label>
             </chef-form-field>
-            
+
             <chef-form-field class="attribute-field">
               <label>
                 <span class="label">Value</span>
