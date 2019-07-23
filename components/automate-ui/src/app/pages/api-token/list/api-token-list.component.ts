@@ -21,6 +21,8 @@ import {
 import { CreateToken } from 'app/entities/api-tokens/api-token.actions';
 import { saveStatus, saveError } from 'app/entities/api-tokens/api-token.selectors';
 import { HttpStatus } from 'app/types/types';
+import { iamMajorVersion } from 'app/entities/policies/policy.selectors';
+import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 
 @Component({
   selector: 'app-api-tokens',
@@ -31,6 +33,7 @@ export class ApiTokenListComponent implements OnInit {
   public loading$: Observable<boolean>;
   public sortedApiTokens$: Observable<ApiToken[]>;
   public apiTokenCount$: Observable<number>;
+  public iamMajorVersion$: Observable<IAMMajorVersion>;
   public deleteModalVisible = false;
   public tokenToDelete: ApiToken;
   public createModalVisible = false;
@@ -64,6 +67,7 @@ export class ApiTokenListComponent implements OnInit {
       id: ['',
         [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]]
     });
+    this.iamMajorVersion$ = store.pipe(select(iamMajorVersion));
   }
 
   ngOnInit() {
