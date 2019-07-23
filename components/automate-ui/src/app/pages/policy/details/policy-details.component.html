@@ -37,10 +37,13 @@
         </section>
       </ng-container>
       <ng-container *ngIf="tabValue === 'members'">
-        <div *ngIf="(members$ | async)?.length === 0" id="getting-started">Add the first members to get started!</div>
+        <div *ngIf="(members$ | async)?.length === 0" class="members-empty-state">
+          <p>Add some members to get started!</p>
+        </div>
         <chef-toolbar>
-          <chef-button primary
-            [routerLink]="['/settings', 'policies', policy?.id, 'add-members']">Add Members</chef-button>
+          <div [ngClass]="(members$ | async)?.length === 0 ? 'members-empty-state' : ''">
+            <chef-button primary [routerLink]="['/settings', 'policies', policy?.id, 'add-members']">Add Members</chef-button>
+          </div>
         </chef-toolbar>
         <chef-table *ngIf="(members$ | async)?.length > 0">
           <chef-thead>

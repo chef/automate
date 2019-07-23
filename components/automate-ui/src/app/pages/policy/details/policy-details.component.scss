@@ -55,8 +55,12 @@ tbody > .detail-row {
   justify-content: flex-end;
 }
 
-#getting-started {
-  margin: 8px 0;
-  font-size: 14px;
-  color: $chef-dark-grey;
+.members-empty-state {
+  text-align: center;
+
+  p {
+    font-size: 18px;
+    font-weight: 400;
+    margin-top: 42px;
+  }
 }
