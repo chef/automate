@@ -333,6 +333,10 @@ func (d *dexAPI) CreateClient(context.Context, *api.CreateClientReq) (*api.Creat
 	return nil, errors.New("not implemented")
 }
 
+func (d *dexAPI) UpdateClient(context.Context, *api.UpdateClientReq) (*api.UpdateClientResp, error) {
+	return nil, errors.New("not implemented")
+}
+
 func (d *dexAPI) DeleteClient(context.Context, *api.DeleteClientReq) (*api.DeleteClientResp, error) {
 	return nil, errors.New("not implemented")
 }
