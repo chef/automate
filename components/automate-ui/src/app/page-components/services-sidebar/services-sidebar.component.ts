@@ -33,7 +33,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   //
   // TODO @afiune we should move this to a common place where other
   // components can usee this time format
-  readonly RFC2822 = 'ddd, DD MMM YYYY, hh:mm:ss [UTC]';
+  readonly RFC2822 = 'ddd, DD MMM YYYY, HH:mm:ss [UTC]';
 
   public services$: Observable<Service[]>;
   public servicesStatus$: Observable<EntityStatus>;
