@@ -33,7 +33,7 @@ export TOK=`chef-automate admin-token`
 
 #### Create a Team from Chef Automate
 
-As an administrative user, you can create a team in the UI from the **Settings** tab. Select _Teams_ in the sidebar then use the **Add Team** button:
+As an administrative user, you can create a team in the UI from the **Settings** tab. Select _Teams_ in the sidebar then use the **Create Team** button:
 
 ![Add Local Team](/images/docs/admin-tab-teams-list.png)
 
