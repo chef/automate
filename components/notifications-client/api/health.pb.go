@@ -3,9 +3,11 @@
 
 package api
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
+import (
+	fmt "fmt"
+	proto "github.com/golang/protobuf/proto"
+	math "math"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -16,7 +18,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type VersionRequest struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -28,16 +30,17 @@ func (m *VersionRequest) Reset()         { *m = VersionRequest{} }
 func (m *VersionRequest) String() string { return proto.CompactTextString(m) }
 func (*VersionRequest) ProtoMessage()    {}
 func (*VersionRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_health_1db7582e651219f9, []int{0}
+	return fileDescriptor_fdbebe66dda7cb29, []int{0}
 }
+
 func (m *VersionRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_VersionRequest.Unmarshal(m, b)
 }
 func (m *VersionRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_VersionRequest.Marshal(b, m, deterministic)
 }
-func (dst *VersionRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_VersionRequest.Merge(dst, src)
+func (m *VersionRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_VersionRequest.Merge(m, src)
 }
 func (m *VersionRequest) XXX_Size() int {
 	return xxx_messageInfo_VersionRequest.Size(m)
@@ -59,16 +62,17 @@ func (m *VersionResponse) Reset()         { *m = VersionResponse{} }
 func (m *VersionResponse) String() string { return proto.CompactTextString(m) }
 func (*VersionResponse) ProtoMessage()    {}
 func (*VersionResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_health_1db7582e651219f9, []int{1}
+	return fileDescriptor_fdbebe66dda7cb29, []int{1}
 }
+
 func (m *VersionResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_VersionResponse.Unmarshal(m, b)
 }
 func (m *VersionResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_VersionResponse.Marshal(b, m, deterministic)
 }
-func (dst *VersionResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_VersionResponse.Merge(dst, src)
+func (m *VersionResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_VersionResponse.Merge(m, src)
 }
 func (m *VersionResponse) XXX_Size() int {
 	return xxx_messageInfo_VersionResponse.Size(m)
@@ -91,9 +95,9 @@ func init() {
 	proto.RegisterType((*VersionResponse)(nil), "notifications.VersionResponse")
 }
 
-func init() { proto.RegisterFile("health.proto", fileDescriptor_health_1db7582e651219f9) }
+func init() { proto.RegisterFile("health.proto", fileDescriptor_fdbebe66dda7cb29) }
 
-var fileDescriptor_health_1db7582e651219f9 = []byte{
+var fileDescriptor_fdbebe66dda7cb29 = []byte{
 	// 111 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0xc9, 0x48, 0x4d, 0xcc,
 	0x29, 0xc9, 0xd0, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0xcd, 0xcb, 0x2f, 0xc9, 0x4c, 0xcb,

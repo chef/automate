@@ -1,0 +1,230 @@
+{
+  "version": "3.0.12",
+  "other_checks": [],
+  "profiles": [
+    {
+      "name": "mylinux-success",
+      "title": "My Demo Linux successful profile",
+      "maintainer": "Chef Software, Inc.",
+      "copyright": "Chef Software, Inc.",
+      "copyright_email": "support@chef.io",
+      "license": "Apache 2 license",
+      "summary": "Demonstrates the use of InSpec Compliance Profile",
+      "version": "1.8.9",
+      "supports": [ { "inspec": "~> 1.0" } ],
+      "depends": [
+        {
+          "name": "myprofile1-new-name",
+          "path": "../myprofile1",
+          "status": "skipped",
+          "skip_message": "Skipping profile: 'myprofile1' on unsupported platform: 'mac_os_x/17.7.0'."
+        }
+      ],
+      "controls": [
+        {
+          "title": "Checking for /etc/passwd",
+          "desc": "Checking for /etc/passwd desc",
+          "impact": 0.6,
+          "refs": [
+            {
+              "ref": []
+            }
+          ],
+          "tags": {},
+          "code": "control '/etc/passwd must exist' do\n  title 'Checking for /etc/passwd'\n  desc 'Checking for /etc/passwd desc'\n  impact 0.6\n  describe file('/etc/passwd') do\n    it { should be_file }\n  end\nend\n",
+          "source_location": {
+            "ref": "controls/success.rb",
+            "line": 2
+          },
+          "id": "/etc/passwd must exist",
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "File /etc/passwd should be file",
+              "run_time": 0.002524643,
+              "start_time": "2017-10-18 09:18:40 +0000"
+            }
+          ]
+        },
+        {
+          "title": "Checking for /etc/group",
+          "desc": "Checking for /etc/group desc",
+          "impact": 0.3,
+          "refs": [],
+          "tags": {},
+          "code": "control '/etc/group must exist' do\n  title 'Checking for /etc/group'\n  desc 'Checking for /etc/group desc'\n  impact 0.3\n  describe file('/etc/group') do\n    it { should be_file }\n  end\nend\n",
+          "source_location": {
+            "ref": "controls/success.rb",
+            "line": 11
+          },
+          "id": "/etc/group must exist",
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "File /etc/group should be file",
+              "run_time": 0.000176972,
+              "start_time": "2017-10-18 09:18:40 +0000"
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": null,
+          "controls": [
+            "/etc/passwd must exist",
+            "/etc/group must exist"
+          ],
+          "id": "controls/success.rb"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "role_name",
+          "options": {
+            "default": "base",
+            "description": "Chef Role"
+          }
+        },
+        {
+          "name": "profile_id",
+          "options": {
+            "default": 1,
+            "description": "An int id"
+          }
+        },
+        {
+          "name": "do.this?",
+          "options": {
+            "default": true,
+            "description": "A bool flag"
+          }
+        },
+        {
+          "name": "take_this",
+          "options": {
+            "default": [
+              "oh",
+              "hear"
+            ],
+            "description": "A bloody array"
+          }
+        },
+        {
+          "name": "bloody_hash",
+          "options": {
+            "default": {
+              "oh": "god"
+            }
+          }
+        },
+        {
+          "name": "no_default",
+          "options": {
+            "description": "Default is for lazies!"
+          }
+        }
+      ],
+      "sha256": "1de944869a847da87d3774feaacb41829935a2f46b558f7fc34b4da21586ae27",
+      "status": "loaded"
+    },
+    {
+      "name": "mylinux-success2",
+      "title": "My Demo Linux successful profile 2",
+      "maintainer": "Chef Software, Inc.",
+      "copyright": "Chef Software, Inc.",
+      "copyright_email": "support@chef.io",
+      "license": "Apache 2 license",
+      "summary": "Demonstrates the use of InSpec Compliance Profile",
+      "version": "1.0.0",
+      "supports": [],
+      "controls": [
+        {
+          "title": "Checking for /etc/services",
+          "desc": "Checking for /etc/services desc",
+          "impact": 0.3,
+          "refs": [
+            {
+              "ref": []
+            }
+          ],
+          "tags": {
+            "our_criticality": 98,
+            "reviewed": true,
+            "cce": "CCE-27072-8"
+          },
+          "code": "control '/etc/services must exist' do\n  title 'Checking for /etc/services'\n  desc 'Checking for /etc/services desc'\n  impact 0.3\n  describe file('/etc/services') do\n    it { should be_file }\n  end\nend\n",
+          "source_location": {
+            "ref": "controls/success.rb",
+            "line": 2
+          },
+          "id": "/etc/services must exist",
+          "results": [
+            {
+              "status": "passed",
+              "code_desc": "File /etc/services should be file",
+              "run_time": 0.000076582,
+              "start_time": "2017-10-18 09:18:40 +0000"
+            }
+          ]
+        }
+      ],
+      "groups": [
+        {
+          "title": null,
+          "controls": [
+            "/etc/services must exist"
+          ],
+          "id": "controls/success.rb"
+        }
+      ],
+      "attributes": [],
+      "sha256": "9490b16f32922b284a82a36d4f111e1474fcd9b53c4689f77de7ef68a1664487",
+      "status": "loaded"
+    },
+    {
+      "name": "mywindows",
+      "version": "0.1.3",
+      "sha256": "a41afaeb1d0ac15b9078d7ea139e741b6b27c1706c39ab0b09f3983f43c5940e",
+      "title": "My Demo Windows Profile",
+      "maintainer": "Demo, Inc.",
+      "summary": "Verify that Windows nodes are configured securely",
+      "license": "Proprietary, All rights reserved",
+      "copyright": "Demo, Inc.",
+      "copyright_email": "support@example.com",
+      "supports": [
+        {
+          "platform-family": "windows"
+        }
+      ],
+      "attributes": [],
+      "groups": [],
+      "controls": [],
+      "status": "skipped",
+      "skip_message": "Skipping profile: 'mywindows' on unsupported platform: 'mac_os_x/17.7.0'."
+    }
+  ],
+  "platform": {
+    "name": "centos",
+    "release": "6.6"
+  },
+  "statistics": {
+    "duration": 0.004522604
+  },
+
+  "node_uuid": "4567abcd-c628-4f82-86df-61c43866db6a",
+  "report_uuid": "34567890-36d6-439e-ac70-a41504242605",
+  "job_uuid": "12345678-36d6-439e-ac70-a41504242605",
+  "node_name": "My Compliant Node",
+  "environment": "DevSec Prod Beta",
+  "roles": ["base_linux", "apache_linux", "linux-hardening-prod", "dot.role"],
+  "recipes": ["apache_extras", "apache_extras::harden", "java::default", "nagios::fix"],
+  "end_time": "2018-10-25T10:18:41+01:00",
+  "policy_name": "tiny-policy-name",
+  "policy_group": "tiny-policy-group",
+  "organization_name": "tiny",
+  "source_fqdn": "api.chef.io",
+  "chef_tags": ["mylinux", "my.tag", "some=tag"],
+  "ipaddress": "192.168.56.33",
+  "fqdn": "lb-deb.example.com"
+}
