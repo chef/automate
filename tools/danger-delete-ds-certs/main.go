@@ -34,7 +34,7 @@ Do not run this tool when deployment-service is running.
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		Args:          cobra.NoArgs,
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		PersistentPreRun: func(*cobra.Command, []string) {
 			if opts.Debug {
 				logrus.SetLevel(logrus.DebugLevel)
 			}
