@@ -413,6 +413,8 @@ func (w waywardWorkflowList) Filter(workflowNames []string) []string {
 	return out
 }
 
+const defaultTaskPollInterval = 2 * time.Second
+
 // Manager is responsible for for calling WorkflowExecutors and
 // TaskExecutors when they need to be processed, along with managing
 // the scheduling of workflows.
@@ -424,22 +426,41 @@ type Manager struct {
 	backend           backend.Driver
 	cancel            context.CancelFunc
 	wg                sync.WaitGroup
+
+	taskPollInterval time.Duration
+}
+
+// ManagerOpt is an option that can be passed to NewManager.
+type ManagerOpt func(*Manager)
+
+// WithTaskPollInterval sets the default polling interval for all
+// TaskExecutor workers. Each worker will poll the database every
+// interval for new jobs.
+func WithTaskPollInterval(interval time.Duration) ManagerOpt {
+	return func(m *Manager) { m.taskPollInterval = interval }
 }
 
 // NewManager creates a new Manager with the given Driver. If
 // the driver fails to initialize, an error is returned.
-func NewManager(backend backend.Driver) (*Manager, error) {
+func NewManager(backend backend.Driver, opts ...ManagerOpt) (*Manager, error) {
 	err := backend.Init()
 	if err != nil {
 		return nil, err
 	}
-	return &Manager{
+	m := &Manager{
 		backend:           backend,
 		waywardWorkflows:  make(waywardWorkflowList),
 		workflowExecutors: make(map[string]WorkflowExecutor),
 		taskExecutors:     make(map[string]registeredExecutor),
 		workflowScheduler: &workflowScheduler{backend},
-	}, nil
+		taskPollInterval:  defaultTaskPollInterval,
+	}
+
+	for _, o := range opts {
+		o(m)
+	}
+
+	return m, nil
 }
 
 // RegisterWorkflowExecutor registers a WorkflowExecutor to execute workflows
@@ -659,12 +680,10 @@ LOOP:
 
 		t, taskCompleter, err := m.backend.DequeueTask(ctx, taskName)
 		if err != nil {
-			if err == ErrNoTasks {
-				// TODO(ssd) 2019-05-10: Once we have notifications we can probably sleep longer
-				time.Sleep(1 * time.Second)
-			} else {
+			if err != ErrNoTasks {
 				logctx.WithError(err).Error("failed to dequeue task")
 			}
+			time.Sleep(m.taskPollInterval)
 			continue
 		}
 		logctx.Debugf("Dequeued task %s", t.Name)
