@@ -125,7 +125,12 @@ CREATE OR REPLACE FUNCTION query_policy (_policy_id TEXT, _projects_filter TEXT[
             SELECT
                 array_agg(proj.id) FILTER (WHERE proj.id IS NOT NULL)
             FROM iam_policy_projects AS pol_projs
-            LEFT OUTER JOIN iam_projects AS proj ON pol_projs.project_id = proj.db_id WHERE pol_projs.policy_id = pol.db_id) AS projects FROM iam_policies AS pol WHERE pol.id = _policy_id
+            LEFT OUTER JOIN iam_projects AS proj
+            ON pol_projs.project_id = proj.db_id
+            WHERE pol_projs.policy_id = pol.db_id
+        ) AS projects
+    FROM iam_policies AS pol
+    WHERE pol.id = _policy_id
         GROUP BY
             pol.db_id,
             pol.id,
