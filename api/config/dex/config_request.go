@@ -31,24 +31,6 @@ func NewConfigRequest() *ConfigRequest {
 	}
 }
 
-// NewLdapConnector returns a new instance of ConfigRequest_Ldap with zero
-// values
-func NewLdapConnector() *ConfigRequest_V1_Ldap {
-	return &ConfigRequest_V1_Ldap{}
-}
-
-// NewMsadLdapConnector returns a new instance of ConfigRequest_Msad_Ldap with
-// zero values
-func NewMsadLdapConnector() *ConfigRequest_V1_Msad_Ldap {
-	return &ConfigRequest_V1_Msad_Ldap{}
-}
-
-// NewSamlConnector returns a new instance of ConfigRequest_Saml with zero
-// values
-func NewSamlConnector() *ConfigRequest_V1_Saml {
-	return &ConfigRequest_V1_Saml{}
-}
-
 // DefaultConfigRequest returns a new ConfigRequest instance with default values.
 func DefaultConfigRequest() *ConfigRequest {
 	c := NewConfigRequest()
@@ -135,6 +117,23 @@ func (c *ConfigRequest) Validate() error {
 				}
 			}
 			checkCertsPEM(cfgErr, "dex.v1.sys.connector.saml.ca_contents", saml.CaContents.GetValue())
+			valid := map[string]bool{
+				"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress":               true,
+				"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified":                true,
+				"urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName":            true,
+				"urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName": true,
+				"urn:oasis:names:tc:SAML:2.0:nameid-format:encrypted":                  true,
+				"urn:oasis:names:tc:SAML:2.0:nameid-format:entity":                     true,
+				"urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos":                   true,
+				"urn:oasis:names:tc:SAML:2.0:nameid-format:persistent":                 true,
+				"urn:oasis:names:tc:SAML:2.0:nameid-format:transient":                  true,
+			}
+			if val := saml.NameIdPolicyFormat.GetValue(); val != "" {
+				if !valid[val] {
+					cfgErr.AddInvalidValue("dex.v1.sys.connector.saml.name_id_policy_format",
+						fmt.Sprintf("invalid name_id_policy_format: %q", val))
+				}
+			}
 		}
 	}
 
@@ -162,6 +161,9 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *shared.TLSCredentials) (share
 	// There's an upstream PR to fix this here: https://github.com/dexidp/dex/pull/1251
 	// However, this workaround will make the papercut go away faster.
 	c.V1.Sys.GetConnectors().GetLdap().fixCommonCaseIssues()
+
+	// default name_id_policy_format (SAML)
+	c.V1.Sys.GetConnectors().GetSaml().setNameIDPolicyDefault()
 
 	return c.V1.Sys, nil
 }
@@ -251,5 +253,14 @@ func checkCertsPEM(cfgErr *shared.InvalidConfigError, key, data string) {
 			cfgErr.AddInvalidValue(key,
 				fmt.Sprintf("invalid PEM type: %q, expected \"CERTIFICATE\"", block.Type))
 		}
+	}
+}
+
+func (samlCfg *ConfigRequest_V1_Saml) setNameIDPolicyDefault() {
+	if samlCfg == nil {
+		return
+	}
+	if samlCfg.NameIdPolicyFormat == nil {
+		samlCfg.NameIdPolicyFormat = w.String("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent")
 	}
 }

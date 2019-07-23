@@ -430,6 +430,7 @@ email_attr = "<your email attribute>"       # required
 username_attr = "<your username attribute>" # required
 groups_attr = "<your groups attribute>"     # optional
 entity_issuer = "<your entity issuer>"      # optional
+name_id_policy_format = "<see below>"       # optional
 ```
 
 `ca_contents` must contain a copy of the certificate used to sign the SAML assertions.
@@ -470,17 +471,42 @@ Chef Automate supports using SAML to authenticate users and [applying permission
 
   # Optional: Manually specify Chef Automate's Issuer value.
   #
-  # When provided dex will include this as the Issuer value during AuthnRequest.
-  # It will also override the redirectURI as the required audience when evaluating
-  # AudienceRestriction elements in the response.
+  # When provided Chef Automate will include this as the Issuer value in the SAML
+  # AuthnRequest. It will also override the redirectURI as the required audience
+  # when evaluating AudienceRestriction elements in the response.
   # Example: "https://{{< example_fqdn "automate" >}}/dex/callback"
   entity_issuer = "<your entity issuer>"
+
+  # Optional: Specify the NameIDPolicy to use
+  #
+  # When provided, Chef Automate will request a name ID of the configured format
+  # in the SAML AuthnRequest.
+  # Defaults to "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent".
+  #
+  # Note: Even when configured otherwise, the username gathered from the SAML
+  # response is _treated_ as persistent. So, if this is set to
+  #    "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
+  # and a user has changed their email address, they'll be a _new_ user to Chef
+  # Automate.
+  name_id_policy_format = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
 ```
 
 In your SAML Identity Provider (IdP), your Chef Automate instance needs to be referenced as a Service Provider (SP).
 To do so, use `https://{{< example_fqdn "automate" >}}/dex/callback`.
 The concrete configuration items differ between IdP products, but it is often something like "Assertion Consumption URI" or "Single sign on URL".
 For "Audience URI" or "SP Entity ID", use the same address.
+
+These values are accepted for `name_id_policy_format`:
+
+ - `urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress`
+ - `urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified`
+ - `urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName`
+ - `urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName`
+ - `urn:oasis:names:tc:SAML:2.0:nameid-format:encrypted`
+ - `urn:oasis:names:tc:SAML:2.0:nameid-format:entity`
+ - `urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos`
+ - `urn:oasis:names:tc:SAML:2.0:nameid-format:persistent`
+ - `urn:oasis:names:tc:SAML:2.0:nameid-format:transient`
 
 #### Alpha: Setting up Automate as an OAuth Provider for Habitat Builder
 
