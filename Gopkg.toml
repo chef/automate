@@ -90,8 +90,8 @@ required = [
   version = "2.17.0"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/coreos/go-oidc"
+  version = "2.0.0"
 
 [[constraint]]
   branch = "master"
