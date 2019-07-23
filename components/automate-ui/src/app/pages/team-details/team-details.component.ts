@@ -178,7 +178,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   }
 
   addUsers(users: HashMapOfUsers): void {
-    this.toggleUserMembershipView();
 
     const userIDs = Object.values(users).map((user: User) => user.membership_id);
 
@@ -186,6 +185,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       id: this.teamId,
       user_ids: userIDs
     }));
+    this.toggleUserMembershipView();
   }
 
   removeUser(user: User): void {

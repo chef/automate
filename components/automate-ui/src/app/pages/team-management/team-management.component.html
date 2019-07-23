@@ -3,14 +3,6 @@
 
 <div class="container">
   <main>
-    <app-delete-object-modal
-      [visible]="deleteModalVisible"
-      objectNoun="team"
-      [objectName]="(iamMajorVersion$ | async) === 'v1' ? teamToDelete?.id : teamToDelete?.name"
-      (close)="closeModal()"
-      (deleteClicked)="deleteTeam()">
-    </app-delete-object-modal>
-
     <chef-page-header>
       <chef-heading>Teams</chef-heading>
       <chef-subheading>Chef Automate only displays local teams.</chef-subheading>
@@ -25,6 +17,14 @@
       (close)="closeCreateModal()"
       (createClicked)="createTeam()">
     </app-create-object-modal>
+
+    <app-delete-object-modal
+      [visible]="deleteModalVisible"
+      objectNoun="team"
+      [objectName]="(iamMajorVersion$ | async) === 'v1' ? teamToDelete?.id : teamToDelete?.name"
+      (close)="closeModal()"
+      (deleteClicked)="deleteTeam()">
+    </app-delete-object-modal>
 
     <div class="page-body">
       <section>
