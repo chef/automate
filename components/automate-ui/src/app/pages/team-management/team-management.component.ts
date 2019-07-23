@@ -17,6 +17,7 @@ import { CreateTeam, DeleteTeam, GetTeams } from 'app/entities/teams/team.action
 import { Validators, FormGroup, FormBuilder } from '@angular/forms';
 import { Regex } from 'app/helpers/auth/regex';
 import { Router } from '@angular/router';
+import { HttpStatus } from 'app/types/types';
 
 @Component({
   selector: 'app-team-management',
@@ -111,7 +112,7 @@ export class TeamManagementComponent implements OnInit {
               .subscribe((error) => {
                 pendingCreateError.next(true);
                 pendingCreateError.complete();
-                if (error.status === 409) {
+                if (error.status === HttpStatus.CONFLICT) {
                   this.conflictErrorEvent.emit(true);
                 // Close the modal on any error other than conflict and display in banner.
                 } else {

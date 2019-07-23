@@ -17,6 +17,7 @@ import {
 import { GetProjects, CreateProject, DeleteProject  } from 'app/entities/projects/project.actions';
 import { Project } from 'app/entities/projects/project.model';
 import { ApplyRulesStatus, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
+import { HttpStatus } from 'app/types/types';
 
 @Component({
   selector: 'app-project-list',
@@ -132,7 +133,7 @@ export class ProjectListComponent implements OnInit {
               .subscribe((error) => {
                 pendingCreateError.next(true);
                 pendingCreateError.complete();
-                if (error.status === 409) {
+                if (error.status === HttpStatus.CONFLICT) {
                   this.conflictErrorEvent.emit(true);
                 // Close the modal on any error other than conflict and display in banner.
                 } else {
