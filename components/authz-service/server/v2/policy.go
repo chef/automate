@@ -164,13 +164,15 @@ func (s *policyServer) CreatePolicy(
 	}
 
 	returnPol, err := s.store.CreatePolicy(ctx, &pol)
+
+	if err, ok := err.(*storage_errors.ErrRoleMustExistForStatement); ok {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
 	switch err {
 	case nil: // continue
 	case storage_errors.ErrConflict:
 		return nil, status.Errorf(codes.AlreadyExists,
 			"policy with id %q already exists", req.Id)
-	case storage_errors.ErrRoleMustExistForStatement:
-		return nil, status.Error(codes.InvalidArgument, "a statement contained a role that does not exist")
 	default:
 		return nil, status.Errorf(codes.Internal,
 			"creating policy %q: %s", req.Id, err.Error())
@@ -269,14 +271,17 @@ func (s *policyServer) UpdatePolicy(
 	}
 
 	polInternal, err := s.store.UpdatePolicy(ctx, &storagePolicy)
+
+	if err, ok := err.(*storage_errors.ErrRoleMustExistForStatement); ok {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
 	if err != nil {
 		switch err {
 		case storage_errors.ErrConflict:
 			return nil, status.Errorf(codes.AlreadyExists, "policy with name %q already exists", req.Name)
 		case storage_errors.ErrNotFound:
 			return nil, status.Errorf(codes.NotFound, "no policy with ID %q found", req.Id)
-		case storage_errors.ErrRoleMustExistForStatement:
-			return nil, status.Error(codes.InvalidArgument, "a statement contained a role that does not exist")
 		}
 		return nil, err
 	}

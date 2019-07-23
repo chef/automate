@@ -48,9 +48,9 @@ CREATE OR REPLACE FUNCTION purge_statements_with_no_actions_or_role() RETURNS TR
     -- if as a result, a policy now has no statements, remove the policy unless it's
     -- chef-managed (chef-managed case should never happen since chef-managed roles can't be
     -- deleted, but just to be safe adding it in)
-    DELETE FROM iam_policies USING iam_policies AS p
-      LEFT OUTER JOIN iam_statements AS s ON p.db_id=s.policy_id
-      WHERE s.policy_id IS NULL AND iam_policies.id=p.id AND p.type != 'chef-managed';
+    DELETE FROM iam_policies p
+        WHERE NOT EXISTS (SELECT 1 FROM iam_statements s WHERE p.db_id = s.policy_id)
+        AND p.type != 'chef-managed';
 
     RETURN NULL;
   END
@@ -224,7 +224,7 @@ CREATE OR REPLACE FUNCTION
                 ELSE
                     IF role_db_id(_statement_role) IS NULL
                     THEN
-                        RAISE EXCEPTION 'no role exists with ID %', _statement_role USING ERRCODE = 'RDNES';
+                        RAISE EXCEPTION 'role must exist to be inserted into a policy statement, missing role with ID: %', _statement_role USING ERRCODE = 'RDNES';
                     END IF;
 
                     INSERT INTO iam_statements (policy_id, id, effect, actions, resources, role_id)

@@ -453,7 +453,7 @@ func TestListPolicies(t *testing.T) {
 			polID := insertTestPolicy(t, db, "testpolicy")
 
 			s0Actions := []string{"iam:users:delete', 'iam:users:create"}
-			s0Resources := []string{"iam:users"}
+			s0Resources := []string{"*"}
 			sID0 := insertTestStatement(t, db, polID, "allow", "", s0Actions, s0Resources)
 
 			s1Actions := []string{"compliance:profiles:download", "compliance:profiles:delete"}
@@ -493,7 +493,7 @@ func TestListPolicies(t *testing.T) {
 
 			polID0 := insertTestPolicy(t, db, "01testpolicy")
 			s0Actions := []string{"iam:users:delete', 'iam:users:create"}
-			s0Resources := []string{"iam:users"}
+			s0Resources := []string{"*"}
 			sID0 := insertTestStatement(t, db, polID0, "allow", "", s0Actions, s0Resources)
 
 			polID1 := insertTestPolicy(t, db, "02testpolicy")
@@ -1114,7 +1114,11 @@ func TestCreatePolicy(t *testing.T) {
 			}
 
 			resp, err := store.CreatePolicy(ctx, &pol)
-			assert.Equal(t, storage_errors.ErrRoleMustExistForStatement, err)
+			err, wasCorrectError := err.(*storage_errors.ErrRoleMustExistForStatement)
+
+			assert.True(t, wasCorrectError)
+			assert.Equal(t,
+				fmt.Sprintf("role must exist to be inserted into a policy statement, missing role with ID: %s", role), err.Error())
 			assert.Nil(t, resp)
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
