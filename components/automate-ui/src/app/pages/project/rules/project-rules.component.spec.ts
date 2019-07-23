@@ -3,6 +3,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
+import * as faker from 'faker';
 
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
@@ -114,24 +115,21 @@ describe('ProjectRulesComponent', () => {
       fixture.detectChanges();
     });
 
-    it('the heading should show <Project Name>: Rule', () => {
+    it('with no rule name the heading shows "<Project Name>: Rule"', () => {
       const heading = `${component.project.name}: Rule`;
-      const compHeading = component.getHeading();
-      expect(heading).toBe(compHeading);
+      expect(component.getHeading()).toBe(heading);
     });
 
-    it('the heading should change to <Project Name>: <Rule Name>', () => {
+    it('with a rule name the heading shows "<Project Name>: <Rule Name>"', () => {
       const ruleName = 'My Rule';
       component.ruleForm.get('name').setValue(ruleName);
       const heading = `${component.project.name}: ${ruleName}`;
-      const compHeading = component.getHeading();
-      expect(heading).toBe(compHeading);
+      expect(component.getHeading()).toBe(heading);
     });
 
     it('should have a backroute to project page', () => {
       const backRoute = ['/settings', 'projects', component.project.id];
-      const compBackRoute = component.backRoute();
-      expect(backRoute).toEqual(compBackRoute);
+      expect(component.backRoute()).toEqual(backRoute);
     });
 
     it('the formgroup should have one condition', () => {
@@ -139,28 +137,35 @@ describe('ProjectRulesComponent', () => {
       expect(conditions).toBe(1);
     });
 
-    it('should create a condition', () => {
+    it('upon adding a condition the formgroup includes two conditions', () => {
       component.addCondition();
       const conditions = component.ruleForm.get('conditions').value.length;
       expect(conditions).toBe(2);
     });
 
-    it('should delete a condition', () => {
-      let conditions = component.ruleForm.get('conditions').value.length;
-      expect(conditions).toBe(1);
+    it('upon deleting a condition the condition is removed', () => {
+      component.addCondition();
+      component.addCondition();
+      let conditionCount = component.ruleForm.get('conditions').value.length;
+      expect(conditionCount).toBe(3);
       component.deleteCondition(0);
-      conditions = component.ruleForm.get('conditions').value.length;
-      expect(conditions).toBe(0);
+      conditionCount = component.ruleForm.get('conditions').value.length;
+      expect(conditionCount).toBe(2);
     });
 
     it('should return condition value of string', () => {
-      const conditionValue = component.getConditionValue('adasd');
-      expect(typeof conditionValue === 'string').toBeTruthy();
+      const word = faker.random.word();
+      expect(component.getConditionValue(word)).toBe(word);
     });
 
-    it('should return condition value of array', () => {
-      const conditionValue = component.getConditionValue(['adasd']);
-      expect(typeof conditionValue === 'string').toBeTruthy();
+    it('should return condition value of singleton array', () => {
+      const word = faker.random.word();
+      expect(component.getConditionValue([word])).toBe(word);
+    });
+
+     it('should return condition value of multi-valued array', () => {
+      const wordList = faker.random.words().split(' ');
+      expect(component.getConditionValue(wordList)).toBe(wordList.join(', '));
     });
 
     it('form should be invalid', () => {
@@ -194,7 +199,7 @@ describe('ProjectRulesComponent', () => {
         .toBe('event attribute'); // specifically should be lowercase for screen reader
     });
 
-    it('should not show add label with one condition', () => {
+    it('should not show "and" label with one condition', () => {
       const showAndLabel = component.showAndLabel(0);
       expect(showAndLabel).toBeFalsy();
     });
@@ -204,7 +209,7 @@ describe('ProjectRulesComponent', () => {
       expect(showDelete).toBeFalsy();
     });
 
-    it('should show add label with two conditions', () => {
+    it('should show "and" label with two conditions', () => {
       component.addCondition();
       const showAndLabel = component.showAndLabel(0);
       expect(showAndLabel).toBeTruthy();

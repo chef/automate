@@ -13,7 +13,7 @@ import { GetRulesSuccess } from 'app/entities/rules/rule.actions';
 import { projectEntityReducer } from 'app/entities/projects/project.reducer';
 import { ProjectDetailsComponent } from './project-details.component';
 
-describe('ProjectListComponent', () => {
+describe('ProjectDetailsComponent', () => {
   let component: ProjectDetailsComponent;
   let fixture: ComponentFixture<ProjectDetailsComponent>;
 
