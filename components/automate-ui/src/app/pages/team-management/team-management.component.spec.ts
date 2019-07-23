@@ -22,6 +22,11 @@ describe('TeamManagementComponent', () => {
         MockComponent({ selector: 'app-delete-object-modal',
                         inputs: ['default', 'visible', 'objectNoun', 'objectName'],
                         outputs: ['close', 'deleteClicked'] }),
+        MockComponent({
+          selector: 'app-create-object-modal',
+          inputs: ['visible', 'creating', 'conflictErrorEvent', 'objectNoun', 'createForm'],
+          outputs: ['close', 'createClicked']
+        }),
         MockComponent({ selector: 'chef-button',
                         inputs: ['disabled', 'routerLink'] }),
         MockComponent({ selector: 'chef-control-menu' }),

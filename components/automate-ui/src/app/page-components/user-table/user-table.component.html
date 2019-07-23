@@ -7,7 +7,7 @@
   <chef-toolbar>
     <app-authorized [allOf]="createPermissionsPath" [overrideVisible]="overridePermissionsCheck">
       <div [ngClass]="(users$ | async)?.length === 0 ? 'team-users-empty-state' : ''">
-        <chef-button primary [disabled]="!addButtonEnabled" primary (click)="addClicked.emit($event)"> {{ addButtonText }} </chef-button>
+        <chef-button primary [disabled]="!addButtonEnabled" (click)="addClicked.emit($event)"> {{ addButtonText }} </chef-button>
       </div>
     </app-authorized>
   </chef-toolbar>

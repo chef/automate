@@ -61,7 +61,9 @@ describe('TeamDetailsComponent', () => {
         MockComponent({ selector: 'chef-option' }),
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-subheading' }),
-        MockComponent({ selector: 'chef-tab-selector' }),
+        MockComponent({ selector: 'chef-tab-selector',
+          inputs: ['value', 'routerLink', 'fragment']
+        }),
         TeamDetailsComponent
       ],
       imports: [
