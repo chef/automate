@@ -73,6 +73,11 @@ instead of using the `start_automate_ui_background` helper method._
    and session storage and cookies) for `https://a2-dev.test` and re-navigate back to the root of
    <https://a2-dev.test/>.
 
+1. Optional step: Turn on client-side feature flags by typing the letter sequence on any page in the UI. After toggling a feature flag, a browser refresh is required.
+    * Type `beta` to open the beta features modal
+    * Type `feat` to open the experimental features modal
+    * Type `lega` to open the legacy features modal
+
 ### The Development Cycle: Making Changes to the UI Code
 
 * Changes in a file in `automate-ui` will show up in the browser as soon as you save a file.
