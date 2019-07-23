@@ -27,7 +27,7 @@ ALTER TABLE iam_statements DROP COLUMN role;
 ALTER TABLE iam_statements
     ADD CONSTRAINT iam_statements_role_id_fkey FOREIGN KEY (role_id) REFERENCES iam_roles(db_id);
 
--- This need to be DEFERRABLE INITIALLY DEFERRED so that we don't get a FKEY error before
+-- This needs to be DEFERRABLE INITIALLY DEFERRED so that we don't get a FKEY error before
 -- the trigger works it's magic below.
 ALTER TABLE iam_statements ALTER CONSTRAINT iam_statements_role_id_fkey DEFERRABLE INITIALLY DEFERRED;
 
