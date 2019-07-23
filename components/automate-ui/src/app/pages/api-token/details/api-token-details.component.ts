@@ -45,7 +45,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
         filter(identity),
         takeUntil(this.isDestroyed))
         .subscribe((state) => {
-          this.token = <ApiToken>Object.assign({}, state);
+          this.token = { ...state };
           this.status = this.token.active ? 'Active' : 'Inactive';
           this.updateNameForm.controls['name'].setValue(this.token.name);
         });
@@ -71,11 +71,9 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
 
     public saveNameChange(): void {
       this.saveInProgress = true;
-      const tokenToSave = <ApiToken>Object.assign({}, this.token);
-      tokenToSave.name = this.updateNameForm.controls['name'].value.trim();
-      this.store.dispatch(new UpdateToken({
-        token: tokenToSave
-      }));
+      const name = this.updateNameForm.controls['name'].value.trim();
+      const token: ApiToken = { ...this.token, name  };
+      this.store.dispatch(new UpdateToken({ token }));
 
       const pendingSave = new Subject<boolean>();
       this.store.pipe(
