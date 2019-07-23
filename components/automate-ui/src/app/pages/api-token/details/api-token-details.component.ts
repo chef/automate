@@ -24,18 +24,19 @@ import { ApiToken } from 'app/entities/api-tokens/api-token.model';
 export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
   public tabValue = 'details';
   public token: ApiToken;
-  public status: string;
+  public status: 'active' | 'inactive';
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
-  public updateNameForm: FormGroup;
+  public updateForm: FormGroup;
   public disableSave = true;
   public saveInProgress = false;
 
   constructor(private store: Store<NgrxStateAtom>,
               fb: FormBuilder
               ) {
-      this.updateNameForm = fb.group({
+      this.updateForm = fb.group({
         // Must stay in sync with error checks in api-token-details.component.html
-        name: ['', Validators.required]
+        name: ['', Validators.required],
+        status: ['active', Validators.required]
       });
     }
 
@@ -46,8 +47,9 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
         takeUntil(this.isDestroyed))
         .subscribe((state) => {
           this.token = { ...state };
-          this.status = this.token.active ? 'Active' : 'Inactive';
-          this.updateNameForm.controls['name'].setValue(this.token.name);
+          this.updateForm.controls['name'].setValue(this.token.name);
+          this.status = this.token.active ? 'active' : 'inactive';
+          this.updateForm.controls['status'].setValue(this.status);
         });
 
       this.store.pipe(
@@ -65,14 +67,18 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
       this.isDestroyed.complete();
     }
 
-    public handleNameChange(): void {
-      this.disableSave = this.updateNameForm.controls['name'].value === this.token.name;
+    public handleChange(): void {
+      // TODO(sr): these should use the formgroup's methods
+      this.disableSave = this.updateForm.controls['name'].value === this.token.name &&
+        this.updateForm.controls['status'].value === this.status;
+      console.log({ control: this.updateForm.controls['status'].value, status: this.status });
     }
 
-    public saveNameChange(): void {
+    public saveChange(): void {
       this.saveInProgress = true;
-      const name = this.updateNameForm.controls['name'].value.trim();
-      const token: ApiToken = { ...this.token, name  };
+      const name: string = this.updateForm.controls['name'].value.trim();
+      const active: boolean = this.updateForm.controls['status'].value === 'active';
+      const token: ApiToken = { ...this.token, name, active  };
       this.store.dispatch(new UpdateToken({ token }));
 
       const pendingSave = new Subject<boolean>();

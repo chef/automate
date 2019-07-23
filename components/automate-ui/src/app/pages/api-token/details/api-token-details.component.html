@@ -20,7 +20,7 @@
           <tr class="detail-row">
             <td class="header-column">{{ token?.id }}</td>
             <td class="header-column">{{ token?.created_at | datetime:'ddd, MMMM D, YYYY [at] H:mm a' }}</td>
-            <td class="header-column">{{ status }}</td>
+            <td class="header-column">{{ status | capitalize }}</td>
           </tr>
         </tbody>
       </table>
@@ -29,13 +29,20 @@
         </chef-tab-selector>
       </chef-page-header>
     <section class="page-body">
-      <form [formGroup]="updateNameForm">
+      <form [formGroup]="updateForm">
         <chef-form-field>
           <label>Name *</label>
-          <input chefInput formControlName="name" type="text" (keyup)="handleNameChange()">
+          <input chefInput formControlName="name" type="text" (keyup)="handleChange()">
+        </chef-form-field>
+        <chef-form-field>
+          <label>Status *</label>
+          <chef-phat-radio ngDefaultControl formControlName="status">
+            <chef-option value="active">Active</chef-option>
+            <chef-option value="inactive">Inactive</chef-option>
+          </chef-phat-radio>
         </chef-form-field>
       </form>
-      <chef-button primary [disabled]="!updateNameForm.valid || disableSave || saveInProgress" (click)="saveNameChange()">
+      <chef-button primary [disabled]="!updateForm.valid || disableSave || saveInProgress" (click)="saveChange()">
         <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
         Save
       </chef-button>
