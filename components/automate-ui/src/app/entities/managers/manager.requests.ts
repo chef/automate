@@ -11,6 +11,7 @@ import {
   ManagerSearchNodesPayload,
   ManagerSearchFieldsPayload
 } from './manager.actions';
+import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
 export interface ManagersSearchResponse {
   managers: Manager[];
@@ -34,7 +35,7 @@ export interface ManagerSearchFieldsResponse {
 @Injectable()
 export class ManagerRequests {
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private telemetryService: TelemetryService) { }
 
   public search(payload: ManagersSearchPayload): Observable<ManagersSearchResponse> {
     const url = `${env.nodemgrs_url}/search`;
@@ -79,6 +80,8 @@ export class ManagerRequests {
   }
 
   public create(managerData) {
+    const managerType = managerData['type'];
+    this.telemetryService.track('nodeManagerType', { managerType });
     return this.http.post<Manager>(`${env.nodemgrs_url}`, mapKeys(snakeCase, managerData));
   }
 
