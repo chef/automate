@@ -9,6 +9,7 @@ source_dir=$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)
 source "${source_dir}/helpers/log.sh"
 source "${source_dir}/base.sh"
 source "$1"
+complete_commandline="$0 $*"
 
 if [[ "$CI" = "true" ]]; then
     echo "===== PRE-TEST HOST HEALTH REPORT ====="
@@ -69,6 +70,21 @@ then
     )
 fi
 
+test_commandline() {
+    local env_vars
+    if [[ -n "$VAULT_UTIL_SECRETS" ]]; then
+        echo "    # When on the Chef VPN"
+        echo "    CHEF_USERNAME=yourusername scripts/get_secrets.sh"
+        echo "    export VAULT_ADDR=https://vault.chef.co:8200"
+        jq -r 'to_entries | map("    export " + .key + "=$(vault kv get -field=" + .value.field + " " + .value.path + ")")[]' <<<"$VAULT_UTIL_SECRETS"
+    fi
+
+    # Reproduce a select set of environment variables that influence
+    # the tests.
+    env_vars=$(set +o pipefail; env | grep -E '^(IAM)=' | tr '\n' ' ')
+    echo "    $env_vars $complete_commandline"
+}
+
 cleanup() {
     if [ ${#test_external_services[@]} -ne 0 ]; then
         log_info "Cleaning Up External Services"
@@ -85,6 +101,12 @@ cleanup() {
     fi
     echo "Attempting to clean up docker container $test_container_name"
     docker stop "$test_container_name"
+    echo "------------------------------------------------------------"
+    echo "To run this test locally:"
+    echo ""
+    test_commandline
+    echo ""
+    echo "------------------------------------------------------------"
 }
 
 cleanup_ci() {
