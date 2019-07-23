@@ -10,13 +10,13 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/coreos/go-oidc/oidc"
 	"go.uber.org/zap"
 	jose "gopkg.in/square/go-jose.v2"
 	"gopkg.in/square/go-jose.v2/jwt"
 
 	"github.com/chef/automate/components/authn-service/authenticator"
 	"github.com/chef/automate/components/authn-service/constants"
+	"github.com/chef/automate/lib/oidc"
 	"github.com/chef/automate/lib/tls/certs"
 )
 

@@ -16,7 +16,6 @@ import (
 	"github.com/alexedwards/scs"
 	"github.com/alexedwards/scs/stores/memstore"
 	"github.com/alexedwards/scs/stores/pgstore"
-	util "github.com/coreos/go-oidc/oidc"
 	"github.com/gorilla/mux"
 	"github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
@@ -26,6 +25,7 @@ import (
 	"github.com/chef/automate/components/session-service/oidc"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
+	util "github.com/chef/automate/lib/oidc"
 	"github.com/chef/automate/lib/tls/certs"
 )
 
