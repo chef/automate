@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { routerReducer } from '@ngrx/router-store';
 import { MockComponent } from 'ng2-mock-component';
@@ -61,6 +62,7 @@ describe('TeamDetailsComponent', () => {
         MockComponent({ selector: 'chef-option' }),
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-subheading' }),
+        MockComponent({ selector: 'chef-loading-spinner' }),
         MockComponent({ selector: 'chef-tab-selector',
           inputs: ['value', 'routerLink', 'fragment']
         }),
@@ -68,6 +70,7 @@ describe('TeamDetailsComponent', () => {
       ],
       imports: [
         ReactiveFormsModule,
+        RouterTestingModule,
         StoreModule.forRoot({
           router: routerReducer,
           teams: teamEntityReducer,

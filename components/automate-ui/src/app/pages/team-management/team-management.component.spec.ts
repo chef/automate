@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store } from '@ngrx/store';
@@ -51,6 +52,7 @@ describe('TeamManagementComponent', () => {
       imports: [
         FormsModule,
         ReactiveFormsModule,
+        RouterTestingModule,
         StoreModule.forRoot({
           teams: teamEntityReducer,
           policies: policyEntityReducer
