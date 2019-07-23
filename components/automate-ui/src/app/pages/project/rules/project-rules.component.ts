@@ -1,13 +1,15 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { EntityStatus, loading } from 'app/entities/entities';
 import { Store } from '@ngrx/store';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { routeParams } from 'app/route.selectors';
 import { Subject, combineLatest } from 'rxjs';
 import { map, takeUntil, pluck, filter } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
+
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { routeParams } from 'app/route.selectors';
+import { EntityStatus, loading } from 'app/entities/entities';
+import { Regex } from 'app/helpers/auth/regex';
 import { Rule } from 'app/entities/rules/rule.model';
 import {
   GetRule,
@@ -100,7 +102,8 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.ruleForm = this.fb.group({
-      name: [this.rule.name || '', Validators.required],
+      // Must stay in sync with error checks in project-rules.component.html
+      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       type: [this.rule.type || '', Validators.required],
       conditions: this.fb.array(this.populateConditions())
     });
