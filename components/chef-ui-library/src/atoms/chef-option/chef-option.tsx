@@ -1,4 +1,4 @@
-import { Component, Element, Method, Prop, h } from '@stencil/core';
+import { Component, Element, Host, Method, Prop, h } from '@stencil/core';
 
 let id = 0;
 
@@ -135,27 +135,26 @@ export class ChefOption {
     this.width = this.el.scrollWidth;
   }
 
-  hostData() {
-    return {
-      role: 'option',
-      id: this.optionId,
-      class: this.selected ? 'selected' : ''
-    };
-  }
-
   render() {
-    return [
-      <style>
-        { `[selected=${this.optionId}] [${this.optionId}], [highlighted=${this.optionId}] #${this.optionId} {
-             background-color: var(--chef-primary-bright);
-             color: var(--chef-white);
-           }`
-        }
-      </style>,
-      <span class="option-content">
-        <slot />
-      </span>
-    ];
+    return (
+      <Host
+        role="option"
+        id={this.optionId}
+        class={this.selected ? 'selected' : ''}>
+        <style>
+          {`
+            [selected=${this.optionId}] [${this.optionId}],
+            [highlighted=${this.optionId}] #${this.optionId} {
+              background-color: var(--chef-primary-bright);
+              color: var(--chef-white);
+            }
+          `}
+        </style>
+        <span class="option-content">
+          <slot />
+        </span>
+      </Host>
+    );
   }
 
 }
