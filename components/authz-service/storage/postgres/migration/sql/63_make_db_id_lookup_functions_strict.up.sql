@@ -1,5 +1,4 @@
 BEGIN;
-
 -- lookup by name, the UUID column can go away
 CREATE OR REPLACE FUNCTION member_db_id (
     _name iam_members.name % TYPE,
@@ -17,6 +16,21 @@ BEGIN
 END;
 $$
 LANGUAGE plpgsql;
-
+CREATE OR REPLACE FUNCTION policy_db_id (
+    _id iam_policies.id % TYPE,
+    OUT _db_id iam_policies.db_id % TYPE
+)
+    RETURNS iam_policies.db_id % TYPE
+    AS $$
+BEGIN
+    SELECT
+        db_id INTO STRICT _db_id
+    FROM
+        iam_policies
+    WHERE
+        id = _id;
+END;
+$$
+LANGUAGE plpgsql;
 COMMIT;
 
