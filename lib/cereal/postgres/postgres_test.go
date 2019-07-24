@@ -290,6 +290,66 @@ func TestTaskFail(t *testing.T) {
 	require.Equal(t, cereal.ErrNoWorkflowInstances, err)
 }
 
+func TestDelayedTask(t *testing.T) {
+	taskName := "task_name"
+	workflowName := "workflow_name"
+	err := runResetDB()
+	require.NoError(t, err)
+	b1 := NewPostgresBackend(testDBURL())
+	err = b1.Init()
+	require.NoError(t, err)
+	defer b1.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: "workflow-instance",
+		WorkflowName: workflowName,
+	})
+
+	require.NoError(t, err, "failed to enqueue workflow")
+
+	_, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err, "failed to dequeue workflow")
+
+	expectedTime := time.Now().Add(3 * time.Second)
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{
+		StartAfter: expectedTime,
+	})
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{
+		StartAfter: expectedTime.In(time.FixedZone("AEST", 10*60*60)),
+	})
+	completer.EnqueueTask(&backend.Task{
+		Name: taskName,
+	}, backend.TaskEnqueueOpts{
+		StartAfter: expectedTime.In(time.FixedZone("HST", -10*60*60)),
+	})
+	completer.Continue(nil)
+
+	_, taskCompleter, err := b1.DequeueTask(ctx, taskName)
+	require.Equal(t, cereal.ErrNoTasks, err)
+
+	time.Sleep(4 * time.Second)
+
+	_, taskCompleter, err = b1.DequeueTask(ctx, taskName)
+	require.NoError(t, err)
+	taskCompleter.Succeed([]byte("foo"))
+
+	_, taskCompleter, err = b1.DequeueTask(ctx, taskName)
+	require.NoError(t, err)
+
+	taskCompleter.Succeed([]byte("foo"))
+	_, taskCompleter, err = b1.DequeueTask(ctx, taskName)
+	require.NoError(t, err)
+	taskCompleter.Succeed([]byte("foo"))
+
+}
+
 func TestWorkflowsRerun(t *testing.T) {
 	taskName := "task_name"
 	workflowName := "workflow_name"
