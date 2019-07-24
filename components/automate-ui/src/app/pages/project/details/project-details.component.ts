@@ -56,9 +56,16 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private store: Store<NgrxStateAtom>
-  ) {
+  ) { }
 
-   combineLatest(
+  ngOnInit(): void {
+
+    this.projectForm = this.fb.group({
+      // Must stay in sync with error checks in project-details.component.html
+      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+    });
+
+    combineLatest(
       this.store.select(getStatus),
       this.store.select(updateStatus)
     ).pipe(
@@ -76,7 +83,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
       map((state) => {
         this.project = <Project>Object.assign({}, state);
         this.store.dispatch(new GetRulesForProject({ project_id: this.project.id }));
-        store.select(allRules).subscribe((rules) => {
+        this.store.select(allRules).subscribe((rules) => {
           this.rules = rules;
         });
         this.isChefManaged = this.project.type === 'CHEF_MANAGED';
@@ -90,13 +97,6 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
       .subscribe((id: string) => {
         this.store.dispatch(new GetProject({ id }));
       });
-  }
-
-  ngOnInit(): void {
-    this.projectForm = this.fb.group({
-      // Must stay in sync with error checks in project-details.component.html
-      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
-    });
   }
 
   ngOnDestroy() {
