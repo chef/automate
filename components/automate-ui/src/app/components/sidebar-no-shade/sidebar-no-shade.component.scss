@@ -10,7 +10,8 @@
   overflow-x: hidden;
   overflow-y: auto;
   width: $sidebar-width;
-  background-color: $chef-lightest-grey;
+  background-color: #fff;
+  border-right: 1px solid #dfe3e5;
 
   .sidebar-selector {
 
