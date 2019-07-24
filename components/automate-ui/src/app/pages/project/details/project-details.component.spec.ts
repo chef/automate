@@ -189,12 +189,12 @@ describe('ProjectDetailsComponent', () => {
       expect(component.showFirstRuleMessage()).toBeFalsy();
     });
 
-    it('shows a link back to project when a rule is in "edits pending" state', () => {
+    it('shows a link back to project when a rule has edits pending', () => {
       expect(component.showProjectLink()).toBeTruthy();
     });
 
-    it('disable delete rule button when a rule is in "staging" state', () => {
-      expect(component.showDeleteRule(component.rules[0])).toBeFalsy();
+    it('enables delete-rule button when a rule has edits pending', () => {
+      expect(component.showDeleteRule()).toBeTruthy();
     });
   });
 });

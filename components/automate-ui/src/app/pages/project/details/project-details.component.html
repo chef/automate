@@ -83,7 +83,7 @@
                 <chef-td class="controls">
                   <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project?.id]">
                     <chef-control-menu>
-                      <chef-option *ngIf="showDeleteRule(rule)" class="delete-rule" (click)="startRuleDelete(rule)">Delete Rule</chef-option>
+                      <chef-option *ngIf="showDeleteRule()" class="delete-rule" (click)="startRuleDelete(rule)">Delete Rule</chef-option>
                     </chef-control-menu>
                   </app-authorized>
                 </chef-td>

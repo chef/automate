@@ -128,13 +128,13 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
   }
 
-  startRuleDelete(r: any): void {
+  startRuleDelete(rule: Rule): void {
     this.deleteModalVisible = true;
-    this.ruleToDelete = r;
+    this.ruleToDelete = rule;
   }
 
   deleteRule(): void {
-    this.store.dispatch(new DeleteRule({id: this.ruleToDelete.id}));
+    this.store.dispatch(new DeleteRule({ id: this.ruleToDelete.id }));
     this.closeDeleteModal();
   }
 
@@ -142,8 +142,8 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     return rule.status === RuleStatus.Staged ? 'Edits pending' : 'Applied';
   }
 
-  showDeleteRule(rule: Rule): boolean {
-    return rule.edits !== 'staging';
+  showDeleteRule(): boolean {
+    return true; // TODO: return false when *project* status is "updating..."
   }
 
   showProjectLink(): boolean {
