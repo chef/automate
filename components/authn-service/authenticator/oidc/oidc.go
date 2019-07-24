@@ -12,12 +12,12 @@ import (
 	"golang.org/x/oauth2"
 
 	"github.com/coreos/go-oidc"
-	util "github.com/coreos/go-oidc/oidc"
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/components/authn-service/authenticator"
 	"github.com/chef/automate/components/authn-service/constants"
 	"github.com/chef/automate/lib/httputils"
+	util "github.com/chef/automate/lib/oidc"
 	"github.com/chef/automate/lib/tls/certs"
 )
 

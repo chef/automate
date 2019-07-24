@@ -11,10 +11,10 @@ import (
 	"sync"
 
 	"github.com/coreos/go-oidc"
-	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 
 	"github.com/dexidp/dex/connector"
+	"github.com/dexidp/dex/pkg/log"
 )
 
 // Config holds configuration options for OpenID Connect logins.
@@ -36,6 +36,20 @@ type Config struct {
 	// Optional list of whitelisted domains when using Google
 	// If this field is nonempty, only users from a listed domain will be allowed to log in
 	HostedDomains []string `json:"hostedDomains"`
+
+	// Override the value of email_verifed to true in the returned claims
+	InsecureSkipEmailVerified bool `json:"insecureSkipEmailVerified"`
+
+	// GetUserInfo uses the userinfo endpoint to get additional claims for
+	// the token. This is especially useful where upstreams return "thin"
+	// id tokens
+	GetUserInfo bool `json:"getUserInfo"`
+
+	// Configurable key which contains the user id claim
+	UserIDKey string `json:"userIDKey"`
+
+	// Configurable key which contains the user name claim
+	UserNameKey string `json:"userNameKey"`
 }
 
 // Domains that don't support basic auth. golang.org/x/oauth2 has an internal
@@ -75,7 +89,7 @@ func registerBrokenAuthHeaderProvider(url string) {
 
 // Open returns a connector which can be used to login users through an upstream
 // OpenID Connect provider.
-func (c *Config) Open(id string, logger logrus.FieldLogger) (conn connector.Connector, err error) {
+func (c *Config) Open(id string, logger log.Logger) (conn connector.Connector, err error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	provider, err := oidc.NewProvider(ctx, c.Issuer)
@@ -102,6 +116,7 @@ func (c *Config) Open(id string, logger logrus.FieldLogger) (conn connector.Conn
 
 	clientID := c.ClientID
 	return &oidcConnector{
+		provider:    provider,
 		redirectURI: c.RedirectURI,
 		oauth2Config: &oauth2.Config{
 			ClientID:     clientID,
@@ -113,9 +128,13 @@ func (c *Config) Open(id string, logger logrus.FieldLogger) (conn connector.Conn
 		verifier: provider.Verifier(
 			&oidc.Config{ClientID: clientID},
 		),
-		logger:        logger,
-		cancel:        cancel,
-		hostedDomains: c.HostedDomains,
+		logger:                    logger,
+		cancel:                    cancel,
+		hostedDomains:             c.HostedDomains,
+		insecureSkipEmailVerified: c.InsecureSkipEmailVerified,
+		getUserInfo:               c.GetUserInfo,
+		userIDKey:                 c.UserIDKey,
+		userNameKey:               c.UserNameKey,
 	}, nil
 }
 
@@ -125,13 +144,18 @@ var (
 )
 
 type oidcConnector struct {
-	redirectURI   string
-	oauth2Config  *oauth2.Config
-	verifier      *oidc.IDTokenVerifier
-	ctx           context.Context
-	cancel        context.CancelFunc
-	logger        logrus.FieldLogger
-	hostedDomains []string
+	provider                  *oidc.Provider
+	redirectURI               string
+	oauth2Config              *oauth2.Config
+	verifier                  *oidc.IDTokenVerifier
+	ctx                       context.Context
+	cancel                    context.CancelFunc
+	logger                    log.Logger
+	hostedDomains             []string
+	insecureSkipEmailVerified bool
+	getUserInfo               bool
+	userIDKey                 string
+	userNameKey               string
 }
 
 func (c *oidcConnector) Close() error {
@@ -185,36 +209,72 @@ func (c *oidcConnector) HandleCallback(s connector.Scopes, r *http.Request) (ide
 		return identity, fmt.Errorf("oidc: failed to verify ID Token: %v", err)
 	}
 
-	var claims struct {
-		Username      string `json:"name"`
-		Email         string `json:"email"`
-		EmailVerified bool   `json:"email_verified"`
-		HostedDomain  string `json:"hd"`
-	}
+	var claims map[string]interface{}
 	if err := idToken.Claims(&claims); err != nil {
 		return identity, fmt.Errorf("oidc: failed to decode claims: %v", err)
 	}
 
+	userNameKey := "name"
+	if c.userNameKey != "" {
+		userNameKey = c.userNameKey
+	}
+	name, found := claims[userNameKey].(string)
+	if !found {
+		return identity, fmt.Errorf("missing \"%s\" claim", userNameKey)
+	}
+	email, found := claims["email"].(string)
+	if !found {
+		return identity, errors.New("missing \"email\" claim")
+	}
+	emailVerified, found := claims["email_verified"].(bool)
+	if !found {
+		if c.insecureSkipEmailVerified {
+			emailVerified = true
+		} else {
+			return identity, errors.New("missing \"email_verified\" claim")
+		}
+	}
+	hostedDomain, _ := claims["hd"].(string)
+
 	if len(c.hostedDomains) > 0 {
 		found := false
 		for _, domain := range c.hostedDomains {
-			if claims.HostedDomain == domain {
+			if hostedDomain == domain {
 				found = true
 				break
 			}
 		}
 
 		if !found {
-			return identity, fmt.Errorf("oidc: unexpected hd claim %v", claims.HostedDomain)
+			return identity, fmt.Errorf("oidc: unexpected hd claim %v", hostedDomain)
+		}
+	}
+
+	if c.getUserInfo {
+		userInfo, err := c.provider.UserInfo(r.Context(), oauth2.StaticTokenSource(token))
+		if err != nil {
+			return identity, fmt.Errorf("oidc: error loading userinfo: %v", err)
+		}
+		if err := userInfo.Claims(&claims); err != nil {
+			return identity, fmt.Errorf("oidc: failed to decode userinfo claims: %v", err)
 		}
 	}
 
 	identity = connector.Identity{
 		UserID:        idToken.Subject,
-		Username:      claims.Username,
-		Email:         claims.Email,
-		EmailVerified: claims.EmailVerified,
+		Username:      name,
+		Email:         email,
+		EmailVerified: emailVerified,
 	}
+
+	if c.userIDKey != "" {
+		userID, found := claims[c.userIDKey].(string)
+		if !found {
+			return identity, fmt.Errorf("oidc: not found %v claim", c.userIDKey)
+		}
+		identity.UserID = userID
+	}
+
 	return identity, nil
 }
 

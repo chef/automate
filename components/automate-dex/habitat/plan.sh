@@ -16,7 +16,7 @@ pkg_binds=(
   [pg-sidecar-service]="port"
 )
 pkg_deps=(
-  core/dex/2.15.0
+  core/dex/2.17.0
   chef/mlsa
   ${local_platform_tools_origin:-chef}/automate-platform-tools
   core/bash

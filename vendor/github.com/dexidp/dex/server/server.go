@@ -16,24 +16,24 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/felixge/httpsnoop"
-	"github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/sirupsen/logrus"
-
 	"github.com/dexidp/dex/connector"
 	"github.com/dexidp/dex/connector/authproxy"
 	"github.com/dexidp/dex/connector/bitbucketcloud"
 	"github.com/dexidp/dex/connector/github"
 	"github.com/dexidp/dex/connector/gitlab"
+	"github.com/dexidp/dex/connector/keystone"
 	"github.com/dexidp/dex/connector/ldap"
 	"github.com/dexidp/dex/connector/linkedin"
 	"github.com/dexidp/dex/connector/microsoft"
 	"github.com/dexidp/dex/connector/mock"
 	"github.com/dexidp/dex/connector/oidc"
 	"github.com/dexidp/dex/connector/saml"
+	"github.com/dexidp/dex/pkg/log"
 	"github.com/dexidp/dex/storage"
+	"github.com/felixge/httpsnoop"
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 // LocalConnector is the local passwordDB connector which is an internal
@@ -68,8 +68,9 @@ type Config struct {
 	// Logging in implies approval.
 	SkipApprovalScreen bool
 
-	RotateKeysAfter  time.Duration // Defaults to 6 hours.
-	IDTokensValidFor time.Duration // Defaults to 24 hours
+	RotateKeysAfter      time.Duration // Defaults to 6 hours.
+	IDTokensValidFor     time.Duration // Defaults to 24 hours
+	AuthRequestsValidFor time.Duration // Defaults to 24 hours
 
 	GCFrequency time.Duration // Defaults to 5 minutes
 
@@ -78,7 +79,7 @@ type Config struct {
 
 	Web WebConfig
 
-	Logger logrus.FieldLogger
+	Logger log.Logger
 
 	PrometheusRegistry *prometheus.Registry
 }
@@ -137,9 +138,10 @@ type Server struct {
 
 	now func() time.Time
 
-	idTokensValidFor time.Duration
+	idTokensValidFor     time.Duration
+	authRequestsValidFor time.Duration
 
-	logger logrus.FieldLogger
+	logger log.Logger
 }
 
 // NewServer constructs a server from the provided config.
@@ -197,6 +199,7 @@ func newServer(ctx context.Context, c Config, rotationStrategy rotationStrategy)
 		storage:                newKeyCacher(c.Storage, now),
 		supportedResponseTypes: supported,
 		idTokensValidFor:       value(c.IDTokensValidFor, 24*time.Hour),
+		authRequestsValidFor:   value(c.AuthRequestsValidFor, 24*time.Hour),
 		skipApproval:           c.SkipApprovalScreen,
 		now:                    now,
 		templates:              tmpls,
@@ -238,8 +241,11 @@ func newServer(ctx context.Context, c Config, rotationStrategy rotationStrategy)
 	}
 
 	r := mux.NewRouter()
+	handle := func(p string, h http.Handler) {
+		r.Handle(path.Join(issuerURL.Path, p), instrumentHandlerCounter(p, h))
+	}
 	handleFunc := func(p string, h http.HandlerFunc) {
-		r.HandleFunc(path.Join(issuerURL.Path, p), instrumentHandlerCounter(p, h))
+		handle(p, h)
 	}
 	handlePrefix := func(p string, h http.Handler) {
 		prefix := path.Join(issuerURL.Path, p)
@@ -251,7 +257,7 @@ func newServer(ctx context.Context, c Config, rotationStrategy rotationStrategy)
 			corsOption := handlers.AllowedOrigins(c.AllowedOrigins)
 			handler = handlers.CORS(corsOption)(handler)
 		}
-		r.Handle(path.Join(issuerURL.Path, p), handler)
+		r.Handle(path.Join(issuerURL.Path, p), instrumentHandlerCounter(p, handler))
 	}
 	r.NotFoundHandler = http.HandlerFunc(http.NotFound)
 
@@ -264,6 +270,7 @@ func newServer(ctx context.Context, c Config, rotationStrategy rotationStrategy)
 	// TODO(ericchiang): rate limit certain paths based on IP.
 	handleWithCORS("/token", s.handleToken)
 	handleWithCORS("/keys", s.handlePublicKeys)
+	handleWithCORS("/userinfo", s.handleUserInfo)
 	handleFunc("/auth", s.handleAuthorization)
 	handleFunc("/auth/{connector}", s.handleConnectorLogin)
 	r.HandleFunc(path.Join(issuerURL.Path, "/callback"), func(w http.ResponseWriter, r *http.Request) {
@@ -280,7 +287,7 @@ func newServer(ctx context.Context, c Config, rotationStrategy rotationStrategy)
 	// "authproxy" connector.
 	handleFunc("/callback/{connector}", s.handleConnectorCallback)
 	handleFunc("/approval", s.handleApproval)
-	handleFunc("/healthz", s.handleHealth)
+	handle("/healthz", s.newHealthChecker(ctx))
 	handlePrefix("/static", static)
 	handlePrefix("/theme", theme)
 	s.mux = r
@@ -424,12 +431,13 @@ func (s *Server) startGarbageCollection(ctx context.Context, frequency time.Dura
 
 // ConnectorConfig is a configuration that can open a connector.
 type ConnectorConfig interface {
-	Open(id string, logger logrus.FieldLogger) (connector.Connector, error)
+	Open(id string, logger log.Logger) (connector.Connector, error)
 }
 
 // ConnectorsConfig variable provides an easy way to return a config struct
 // depending on the connector type.
 var ConnectorsConfig = map[string]func() ConnectorConfig{
+	"keystone":        func() ConnectorConfig { return new(keystone.Config) },
 	"mockCallback":    func() ConnectorConfig { return new(mock.CallbackConfig) },
 	"mockPassword":    func() ConnectorConfig { return new(mock.PasswordConfig) },
 	"ldap":            func() ConnectorConfig { return new(ldap.Config) },
@@ -446,7 +454,7 @@ var ConnectorsConfig = map[string]func() ConnectorConfig{
 }
 
 // openConnector will parse the connector config and open the connector.
-func openConnector(logger logrus.FieldLogger, conn storage.Connector) (connector.Connector, error) {
+func openConnector(logger log.Logger, conn storage.Connector) (connector.Connector, error) {
 	var c connector.Connector
 
 	f, ok := ConnectorsConfig[conn.Type]
@@ -478,7 +486,7 @@ func (s *Server) OpenConnector(conn storage.Connector) (Connector, error) {
 		c = newPasswordDB(s.storage)
 	} else {
 		var err error
-		c, err = openConnector(s.logger.WithField("connector", conn.Name), conn)
+		c, err = openConnector(s.logger, conn)
 		if err != nil {
 			return Connector{}, fmt.Errorf("failed to open connector: %v", err)
 		}

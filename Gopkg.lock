@@ -203,31 +203,12 @@
   revision = "3a0bb77429bd3a61596f5e8a3172445844342120"
 
 [[projects]]
-  branch = "master"
-  digest = "1:38f5156a35bf46308723b52d09e41dc999137f0a364259c1fda83289434a6dfa"
+  digest = "1:c91a5363a19174cb0181832821a7bb9da0aeefb5e2180724614b1005c2269712"
   name = "github.com/coreos/go-oidc"
-  packages = [
-    ".",
-    "http",
-    "jose",
-    "key",
-    "oauth2",
-    "oidc",
-  ]
+  packages = ["."]
   pruneopts = "NUT"
-  revision = "a93f71fdfe73d2c0f5413c0565eea0af6523a6df"
-
-[[projects]]
-  digest = "1:e2c6ad2e212c0c9a8b13e5d1d52a6cd3a42411b636fcea10d286f7b6fc13fea0"
-  name = "github.com/coreos/pkg"
-  packages = [
-    "health",
-    "httputil",
-    "timeutil",
-  ]
-  pruneopts = "NUT"
-  revision = "3ac0863d7acf3bc44daf49afef8919af12f704ef"
-  version = "v3"
+  revision = "1180514eaf4d9f38d0d19eef639a1d695e066e72"
+  version = "v2.0.0"
 
 [[projects]]
   digest = "1:df69aec1aa0e6cfbd72112631ed768141661f3365810ce3335d56ae5eb8fe06c"
@@ -246,7 +227,7 @@
   version = "v1.1.0"
 
 [[projects]]
-  digest = "1:e53d48950de3720d7c35c85652b029450b7ce8fabc746aa068342919f5182d4e"
+  digest = "1:917f5ab917ffd768329350ad92eaface2a3d37e59e120c8e238fe18dcc79b1c4"
   name = "github.com/dexidp/dex"
   packages = [
     "api",
@@ -255,12 +236,14 @@
     "connector/bitbucketcloud",
     "connector/github",
     "connector/gitlab",
+    "connector/keystone",
     "connector/ldap",
     "connector/linkedin",
     "connector/microsoft",
     "connector/mock",
     "connector/oidc",
     "connector/saml",
+    "pkg/log",
     "server",
     "server/internal",
     "storage",
@@ -268,8 +251,8 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "57b1031352a11789b9f87e95f58f60a46bc611de"
-  version = "v2.13.0"
+  revision = "39dc5dcfb79d5f926194c5e0b1b5a1cfe2e3ea33"
+  version = "v2.17.0"
 
 [[projects]]
   digest = "1:7a6852b35eb5bbc184561443762d225116ae630c26a7c4d90546619f1e7d2ad2"
@@ -1254,7 +1237,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:3fb85292078a1f811641c99d1f5dd62750eb46e9bb7d126d20b141d9ea9d6361"
+  digest = "1:83092771985abc190982ca3d7fc61e9a015e6560b6c400cdadfe4a97875f8a86"
   name = "golang.org/x/oauth2"
   packages = [
     ".",
@@ -1266,7 +1249,7 @@
     "jwt",
   ]
   pruneopts = "NUT"
-  revision = "0448841f0cbe9d174c6c1cedd177f583337b8e2c"
+  revision = "0f29369cfe4552d0e4bcddc57cc75f4d7e672a33"
 
 [[projects]]
   branch = "master"
@@ -1511,7 +1494,6 @@
     "github.com/burntsushi/toml",
     "github.com/chef/toml",
     "github.com/coreos/go-oidc",
-    "github.com/coreos/go-oidc/oidc",
     "github.com/dave/jennifer/jen",
     "github.com/davecgh/go-spew/spew",
     "github.com/dexidp/dex/api",
