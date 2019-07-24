@@ -11,7 +11,7 @@ import { IAMType } from 'app/entities/policies/policy.model';
 import { GetProjectSuccess } from 'app/entities/projects/project.actions';
 import { GetRulesSuccess } from 'app/entities/rules/rule.actions';
 import { projectEntityReducer } from 'app/entities/projects/project.reducer';
-import { ProjectDetailsComponent } from './project-details.component';
+import { ProjectDetailsComponent, ProjectTabNames } from './project-details.component';
 
 describe('ProjectDetailsComponent', () => {
   let component: ProjectDetailsComponent;
@@ -146,16 +146,25 @@ describe('ProjectDetailsComponent', () => {
       expect(component.rules.length).toBe(0);
     });
 
-    it('show rules section when rules tab is selected', () => {
-      component.onTabChange({ target: { value: 'rules'} });
-      expect(component.showTab('rules')).toBeTruthy();
+   it('defaults to showing rules section', () => {
+      expect(component.showTab(ProjectTabNames.Rules)).toBeTruthy();
+      expect(component.showTab(ProjectTabNames.Details)).toBeFalsy();
     });
 
-    it('should not display rule table when no rules', () => {
+    it('shows/hides sections when based on selection', () => {
+      component.onTabChange({ target: { value: ProjectTabNames.Details } });
+      expect(component.showTab(ProjectTabNames.Rules)).toBeFalsy();
+      expect(component.showTab(ProjectTabNames.Details)).toBeTruthy();
+      component.onTabChange({ target: { value: ProjectTabNames.Rules } });
+      expect(component.showTab(ProjectTabNames.Rules)).toBeTruthy();
+      expect(component.showTab(ProjectTabNames.Details)).toBeFalsy();
+    });
+
+    it('does not display rule table', () => {
       expect(component.showRulesTable()).toBeFalsy();
     });
 
-    it('the create your first rule message should display', () => {
+    it('displays create-your-first-rule message', () => {
       expect(component.showFirstRuleMessage()).toBeTruthy();
     });
   });
@@ -174,20 +183,29 @@ describe('ProjectDetailsComponent', () => {
       expect(component.rules.length).toBe(2);
     });
 
-    it('show rules section when rules tab is selected', () => {
-      component.onTabChange({ target: { value: 'rules'} });
-      expect(component.showTab('rules')).toBeTruthy();
+    it('defaults to showing rules section', () => {
+      expect(component.showTab(ProjectTabNames.Rules)).toBeTruthy();
+      expect(component.showTab(ProjectTabNames.Details)).toBeFalsy();
     });
 
-    it('should display rule table', () => {
+    it('shows/hides sections when based on selection', () => {
+      component.onTabChange({ target: { value: ProjectTabNames.Details } });
+      expect(component.showTab(ProjectTabNames.Rules)).toBeFalsy();
+      expect(component.showTab(ProjectTabNames.Details)).toBeTruthy();
+      component.onTabChange({ target: { value: ProjectTabNames.Rules } });
+      expect(component.showTab(ProjectTabNames.Rules)).toBeTruthy();
+      expect(component.showTab(ProjectTabNames.Details)).toBeFalsy();
+    });
+
+    it('displays rule table', () => {
       expect(component.showRulesTable()).toBeTruthy();
     });
 
-    it('the create your first rule message should not display', () => {
+    it('does not display create-your-first-rule message', () => {
       expect(component.showFirstRuleMessage()).toBeFalsy();
     });
 
-    it('show a link back to project when a rule is in "edits pending" state', () => {
+    it('shows a link back to project when a rule is in "edits pending" state', () => {
       expect(component.showProjectLink()).toBeTruthy();
     });
 

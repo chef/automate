@@ -21,6 +21,11 @@ import {
   allRules
 } from 'app/entities/rules/rule.selectors';
 
+export enum ProjectTabNames {
+  Rules = 'rules',
+  Details = 'details'
+}
+
 @Component({
   selector: 'app-project-details',
   templateUrl: './project-details.component.html',
@@ -33,7 +38,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   public saveSuccessful = false;
   public isChefManaged = false;
   public rules: Rule[] = [];
-  public selectedTab: 'rules' | 'details' = 'rules';
+  public selectedTab: ProjectTabNames.Rules | ProjectTabNames.Details = ProjectTabNames.Rules;
   public ruleToDelete: any;
   public deleteModalVisible = false;
   public createModalVisible = false;
