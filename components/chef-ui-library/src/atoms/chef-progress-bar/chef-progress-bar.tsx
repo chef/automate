@@ -1,4 +1,4 @@
-import { Component, Prop, h } from '@stencil/core';
+import { Component, Host, Prop, h } from '@stencil/core';
 
 /**
  * @description
@@ -89,16 +89,6 @@ export class ChefProgressBar {
     return `${this.valueMax}`;
   }
 
-  hostData() {
-    return {
-      'role': 'progressbar',
-      'aria-valuenow': this.ariaValueNow,
-      'aria-valuemin': this.ariaValueMin,
-      'aria-valuemax': this.ariaValueMax,
-      'aria-valuetext': this.ariaValueText
-    };
-  }
-
   render() {
     const progressText = this.hasProgressText ? (
       <div class="progress-text" aria-hidden>
@@ -115,6 +105,16 @@ export class ChefProgressBar {
       </div>
     );
 
-    return [progressText, progressBars];
+    return (
+      <Host
+        role="progressbar"
+        aria-valuenow={this.ariaValueNow}
+        aria-valuemin={this.ariaValueMin}
+        aria-valuemax={this.ariaValueMax}
+        aria-valuetext={this.ariaValueText}>
+        {progressText}
+        {progressBars}
+      </Host>
+    );
   }
 }
