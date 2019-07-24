@@ -26,7 +26,7 @@ describe('ProjectDetailsComponent', () => {
       id: 'rule-1',
       project_id: 'uuid-1',
       name: 'Rule 1',
-      type: 'NODE',
+      type: 'node',
       status: 'staged',
       conditions: [
         {
@@ -40,7 +40,7 @@ describe('ProjectDetailsComponent', () => {
       id: 'rule-2',
       project_id: 'uuid-1',
       name: 'Rule 2',
-      type: 'EVENT',
+      type: 'event',
       status: 'applied',
       conditions: [
         {
