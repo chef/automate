@@ -56,7 +56,7 @@ export class TeamManagementComponent implements OnInit {
     this.iamMajorVersion$ = store.select(iamMajorVersion);
     this.createTeamForm = fb.group({
       // Must stay in sync with error checks in create-object-modal.component.html
-      name: ['', Validators.required],
+      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       id: ['',
         [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]]
     });
