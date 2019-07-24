@@ -101,6 +101,9 @@ import {
 import {
   ConvergeRadialGraphComponent
 } from './page-components/converge-radial-graph/converge-radial-graph.component';
+import {
+  CreateV1TeamModalComponent
+} from './page-components/create-v1-team-modal/create-v1-team-modal.component';
 import { DateSelectorComponent } from './page-components/date-selector/date-selector.component';
 import {
   DeletableNodeControlComponent
@@ -198,7 +201,6 @@ import {
   UserTeamMembershipTableComponent
 } from './page-components/user-team-membership-table/user-team-membership-table.component';
 import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-modal.component';
-import { CreateV1TeamModalComponent } from './page-components/create-v1-team-modal/create-v1-team-modal.component';
 
 @NgModule({
   declarations: [
@@ -212,6 +214,7 @@ import { CreateV1TeamModalComponent } from './page-components/create-v1-team-mod
     ClientRunsSearchFiltersComponent,
     ClientRunsTableComponent,
     ConvergeRadialGraphComponent,
+    CreateV1TeamModalComponent,
     DateSelectorComponent,
     DeletableNodeControlComponent,
     DeleteNotificationDialogComponent,
@@ -266,8 +269,7 @@ import { CreateV1TeamModalComponent } from './page-components/create-v1-team-mod
     UserTableComponent,
     UserTeamMembershipTableComponent,
     UserManagementComponent,
-    WelcomeModalComponent,
-    CreateV1TeamModalComponent
+    WelcomeModalComponent
   ],
   entryComponents: [
     DeleteNotificationDialogComponent

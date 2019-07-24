@@ -29,10 +29,10 @@
     <div class="page-body">
       <chef-toolbar>
         <app-authorized [anyOf]="[['/iam/v2beta/tokens', 'post'], ['/auth/tokens', 'post']]">
-          <div *ngIf="(apiTokenCount$ | async) === 0" class="token-empty-state">
+          <div *ngIf="(apiTokenCount$ | async) === 0" class="empty-state">
             <p>Create the first token to get started!</p>
           </div>
-          <div [ngClass]="(apiTokenCount$ | async) === 0 ? 'token-empty-state' : ''">
+          <div [ngClass]="(apiTokenCount$ | async) === 0 ? 'empty-state' : ''">
             <chef-button id="create-button" primary (click)="openCreateModal()">Create Token</chef-button>
           </div>
         </app-authorized>

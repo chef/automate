@@ -88,8 +88,7 @@ func CreateUserOrUpdatePassword(ctx context.Context,
 // found or created.
 func CreateAdminTeamIfMissing(ctx context.Context,
 	apiClient client.APIClient, dryRun bool) (string, bool, error) {
-	descr := "admins"
-	return EnsureTeam(ctx, "admins", descr, apiClient, dryRun)
+	return EnsureTeam(ctx, "admins", "admins", apiClient, dryRun)
 }
 
 func AddAdminUserToTeam(ctx context.Context,

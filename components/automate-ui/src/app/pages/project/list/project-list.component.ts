@@ -11,6 +11,7 @@ import { Regex } from 'app/helpers/auth/regex';
 import { loading, EntityStatus } from 'app/entities/entities';
 import { ProjectService } from 'app/entities/projects/project.service';
 import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
+import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
 import {
   allProjects, getAllStatus, createStatus, createError
 } from 'app/entities/projects/project.selectors';
@@ -26,8 +27,8 @@ import { HttpStatus } from 'app/types/types';
 })
 export class ProjectListComponent implements OnInit {
   public loading$: Observable<boolean>;
-  public iamMajorVersion$: Observable<string>;
-  public iamMinorVersion$: Observable<string>;
+  public iamMajorVersion$: Observable<IAMMajorVersion>;
+  public iamMinorVersion$: Observable<IAMMinorVersion>;
   public sortedProjects$: Observable<Project[]>;
   public projectToDelete: Project;
   public deleteModalVisible = false;

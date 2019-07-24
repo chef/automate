@@ -1,4 +1,6 @@
-import { Component, OnInit, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
+import { Validators, FormGroup, FormBuilder } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
 import { map, filter, takeUntil } from 'rxjs/operators';
@@ -7,6 +9,7 @@ import { identity } from 'lodash/fp';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { loading, EntityStatus } from 'app/entities/entities';
 import { iamMajorVersion } from 'app/entities/policies/policy.selectors';
+import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import {
   createError,
   createStatus,
@@ -14,9 +17,7 @@ import {
   getAllStatus } from 'app/entities/teams/team.selectors';
 import { Team } from 'app/entities/teams/team.model';
 import { CreateTeam, DeleteTeam, GetTeams } from 'app/entities/teams/team.actions';
-import { Validators, FormGroup, FormBuilder } from '@angular/forms';
 import { Regex } from 'app/helpers/auth/regex';
-import { Router } from '@angular/router';
 import { HttpStatus } from 'app/types/types';
 
 @Component({
@@ -24,7 +25,7 @@ import { HttpStatus } from 'app/types/types';
   templateUrl: './team-management.component.html',
   styleUrls: ['./team-management.component.scss']
 })
-export class TeamManagementComponent implements OnInit {
+export class TeamManagementComponent implements OnInit, OnDestroy {
   public sortedTeams$: Observable<Team[]>;
   public loading$: Observable<boolean>;
   public teamToDelete: Team;
@@ -35,7 +36,10 @@ export class TeamManagementComponent implements OnInit {
   public createV1TeamModalVisible = false;
   public creatingTeam = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
-  public iamMajorVersion$: Observable<string>;
+  public iamMajorVersion$: Observable<IAMMajorVersion>;
+  public isV1 = true;
+
+  private isDestroyed = new Subject<boolean>();
 
  constructor(
     private store: Store<NgrxStateAtom>,
@@ -54,7 +58,8 @@ export class TeamManagementComponent implements OnInit {
           return a.id.localeCompare(b.id, undefined, opts)
           || a.id.localeCompare(b.id, undefined, {numeric: true});
         }
-      )));
+      )),
+      takeUntil(this.isDestroyed));
     this.iamMajorVersion$ = store.select(iamMajorVersion);
     this.createTeamForm = fb.group({
       // Must stay in sync with error checks in create-object-modal.component.html
@@ -76,6 +81,18 @@ export class TeamManagementComponent implements OnInit {
 
   ngOnInit() {
     this.store.dispatch(new GetTeams());
+
+    this.store.select(iamMajorVersion)
+      .pipe(takeUntil(this.isDestroyed))
+      .subscribe((version) => {
+        if (version === null) { return; }
+        this.isV1 = version === 'v1';
+      });
+  }
+
+  ngOnDestroy() {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   public closeModal(): void {

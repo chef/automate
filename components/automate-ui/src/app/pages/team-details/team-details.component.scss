@@ -37,12 +37,19 @@ chef-page-header {
 }
 
 section {
+  span#save-note {
+    display: inline-block;
+    margin-top: 5px;
+    font-size: 12px;
+  }
+
   chef-form-field {
     width: 240px;
   }
 
   chef-button {
-    margin: 0;
+    margin-top: 0;
+    margin-left: 0;
   }
 
   form {

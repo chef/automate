@@ -7,6 +7,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { loading } from 'app/entities/entities';
 import { GetRoles } from 'app/entities/roles/role.actions';
 import { iamMajorVersion } from 'app/entities/policies/policy.selectors';
+import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import { allRoles, getAllStatus } from 'app/entities/roles/role.selectors';
 import { Role } from 'app/entities/roles/role.model';
 
@@ -18,7 +19,7 @@ import { Role } from 'app/entities/roles/role.model';
 export class RolesListComponent implements OnInit {
   public loading$: Observable<boolean>;
   public sortedRoles$: Observable<Role[]>;
-  public iamMajorVersion$: Observable<string>;
+  public iamMajorVersion$: Observable<IAMMajorVersion>;
 
   constructor(
     private store: Store<NgrxStateAtom>

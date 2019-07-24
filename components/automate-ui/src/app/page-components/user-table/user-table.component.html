@@ -1,12 +1,12 @@
 <app-authorized [allOf]="getPermissionsPath" [overrideVisible]="overridePermissionsCheck">
   <ng-container *ngIf="(users$ | async)?.length === 0">
-    <div class="team-users-empty-state">
+    <div class="empty-state">
       <p>Add some users to get started!</p>
     </div>
   </ng-container>
   <chef-toolbar>
     <app-authorized [allOf]="createPermissionsPath" [overrideVisible]="overridePermissionsCheck">
-      <div [ngClass]="(users$ | async)?.length === 0 ? 'team-users-empty-state' : ''">
+      <div [ngClass]="(users$ | async)?.length === 0 ? 'empty-state' : ''">
         <chef-button primary [disabled]="!addButtonEnabled" (click)="addClicked.emit($event)"> {{ addButtonText }} </chef-button>
       </div>
     </app-authorized>

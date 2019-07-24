@@ -17,6 +17,7 @@ import {
   v1TeamFromRoute,
   v2TeamFromRoute,
   teamUsers,
+  getStatus,
   getUsersStatus,
   updateStatus
 } from 'app/entities/teams/team.selectors';
@@ -39,8 +40,10 @@ const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 })
 export class TeamDetailsComponent implements OnInit, OnDestroy {
   public updateNameForm: FormGroup;
-  public disableSave = true;
-  public saveInProgress = false;
+  // isLoading represents the initial load as well as subsequent updates in progress.
+  public isLoading = true;
+  public saving = false;
+  public saveSuccessful = false;
   public tabValue = 'users';
   public url: string;
   public teamMembershipView = false;
@@ -59,8 +62,20 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   ) {
     this.updateNameForm = fb.group({
       // Must stay in sync with error checks in team-details.component.html
-      name: ['', Validators.required]
+      name: ['Loading...', Validators.required]
     });
+
+    combineLatest(
+      this.store.select(getStatus),
+      this.store.select(updateStatus)
+    ).pipe(
+      takeUntil(this.isDestroyed),
+      map(([gStatus, uStatus]) => {
+        this.isLoading =
+          (gStatus !== EntityStatus.loadingSuccess) ||
+          (uStatus === EntityStatus.loading);
+      })
+    ).subscribe();
   }
 
   private get teamId(): string {
@@ -75,21 +90,9 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
       .subscribe((url: string) => {
         this.url = url;
-        const splitFragment = url.split('#');
-        if (splitFragment.length === 2) {
-          switch (splitFragment[1]) {
-            case 'details': {
-              this.tabValue = 'details';
-              break;
-            }
-            default: { // If the user passed an invalid fragment or #users
-              this.tabValue = 'users';
-            }
-          }
-        } else {
-          // Default to definition in the case of no fragment.
-          this.tabValue = 'users';
-        }
+        const [, fragment] = url.split('#');
+        // goes to #users is (1) explicit #users, (2) no fragment, or (3) invalid fragment
+        this.tabValue = (fragment === 'details') ? 'details' : 'users';
       });
     this.store.select(iamMajorVersion)
       .pipe(takeUntil(this.isDestroyed))
@@ -195,15 +198,15 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     }));
   }
 
-  public handleNameChange(): void {
-    this.disableSave = this.updateNameForm.controls['name'].value === this.team.name;
+  public keyPressed() {
+    this.saveSuccessful = false;
   }
 
   public saveNameChange(): void {
-    this.saveInProgress = true;
-    const teamToSave = <Team>Object.assign({}, this.team);
-    teamToSave.name = this.updateNameForm.controls['name'].value.trim();
-    this.store.dispatch(new UpdateTeam(teamToSave));
+    this.saveSuccessful = false;
+    this.saving = true;
+    const name: string = this.updateNameForm.controls['name'].value.trim();
+    this.store.dispatch(new UpdateTeam({ ...this.team, name }));
 
     const pendingSave = new Subject<boolean>();
     this.store.pipe(
@@ -214,8 +217,8 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         if (!loading(state)) {
           pendingSave.next(true);
           pendingSave.complete();
-          this.saveInProgress = false;
-          this.disableSave = true;
+          this.saving = false;
+          this.saveSuccessful = (state === EntityStatus.loadingSuccess);
         }
       });
   }

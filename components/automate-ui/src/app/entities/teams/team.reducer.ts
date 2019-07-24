@@ -1,10 +1,10 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { difference, get, pipe, set } from 'lodash/fp';
 
 import { EntityStatus } from '../entities';
 import { TeamActionTypes, TeamActions } from './team.actions';
 import { Team } from './team.model';
-import { HttpErrorResponse } from '@angular/common/http';
 
 export interface TeamEntityState extends EntityState<Team> {
   getAllStatus: EntityStatus;
