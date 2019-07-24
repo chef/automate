@@ -123,7 +123,7 @@ func (p *pg) PurgeSubjectFromPolicies(ctx context.Context, sub string) ([]string
 		)
 		SELECT array_agg(id)
 		FROM iam_policies
-		WHERE db_id IN (SELECT * FROM pol_db_ids);`, sub)
+		WHERE db_id IN (SELECT * FROM pol_db_ids)`, sub)
 	err = row.Scan(pq.Array(&polIDs))
 	if err != nil {
 		return nil, p.processError(err)
@@ -612,23 +612,24 @@ func (p *pg) insertOrReusePolicyMemberWithQuerier(ctx context.Context, policyID 
 	// updating either iam_members id or name columns which is the entire table. Also, we are currently
 	// not deleting any of the rows, but reusing them per name string.
 
-	_, err := q.ExecContext(ctx, `INSERT INTO iam_members (id, name)  VALUES ($1, $2) ON CONFLICT DO NOTHING;`,
+	_, err := q.ExecContext(ctx,
+		 `INSERT INTO iam_members (id, name) VALUES ($1, $2) ON CONFLICT DO NOTHING;`,
 		member.ID, member.Name)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "failed to upsert member %s (id %s)", member.Name, member.ID)
 	}
 
 	// For now, let's just ignore conflicts if someone is trying to add a user that is already a member.
 	_, err = q.ExecContext(ctx,
 		`INSERT INTO iam_policy_members (policy_id, member_id)
-			values(policy_db_id($1), (SELECT db_id FROM iam_members WHERE name=$2)) ON CONFLICT DO NOTHING;`, policyID, member.Name)
-	return err
+			VALUES (policy_db_id($1), member_db_id($2)) ON CONFLICT DO NOTHING`, policyID, member.Name)
+	return errors.Wrapf(err, "failed to upsert member link: member=%s, policy_id=%s", member.Name, policyID)
 }
 
 func (p *pg) getPolicyMembersWithQuerier(ctx context.Context, id string, q Querier) ([]v2.Member, error) {
 	rows, err := q.QueryContext(ctx,
 		`SELECT m.id, m.name FROM iam_policy_members AS pm
-			INNER JOIN iam_members AS m ON pm.member_id=m.db_id
+			JOIN iam_members AS m ON pm.member_id=m.db_id
 			WHERE pm.policy_id=policy_db_id($1) ORDER BY m.name ASC`, id)
 
 	if err != nil {
