@@ -415,10 +415,11 @@ func (s *policyServer) CreateRole(
 	case nil: // continue
 	case storage_errors.ErrConflict:
 		return nil, status.Errorf(codes.AlreadyExists, "role with id %q already exists", req.Id)
-	case storage_errors.ErrForeignKey:
-		return nil, status.Errorf(codes.NotFound, "could not create role with projects %s as "+
-			"some projects were not found", req.Projects)
 	default:
+		switch err.(type) {
+		case *storage_errors.ErrForeignKey:
+			return nil, status.Errorf(codes.NotFound, err.Error())
+		}
 		return nil, status.Errorf(codes.Internal, "creating role %q: %s", req.Id, err.Error())
 	}
 

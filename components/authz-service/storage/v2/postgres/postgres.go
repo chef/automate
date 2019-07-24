@@ -337,13 +337,7 @@ func (p *pg) insertPolicyStatementsWithQuerier(ctx context.Context,
 			pq.Array(s.Resources), s.Role, pq.Array(s.Projects),
 		)
 		if err != nil {
-			err = p.processError(err)
-			switch err {
-			case storage_errors.ErrForeignKey: // occurs when a project in the statement does not exist
-				return errors.Errorf("not allowed: one or more of the projects %s does not exist", s.Projects)
-			default:
-				return err
-			}
+			return p.processError(err)
 		}
 	}
 
@@ -367,13 +361,7 @@ func (p *pg) associatePolicyWithProjects(ctx context.Context,
 			`INSERT INTO iam_policy_projects (policy_id, project_id) VALUES (policy_db_id($1), project_db_id($2))`,
 			&policyID, &project)
 		if err != nil {
-			err = p.processError(err)
-			switch err {
-			case storage_errors.ErrForeignKey: // occurs when a project in the policy does not exist
-				return errors.Errorf("not allowed: one or more of the projects %s does not exist", inProjects)
-			default:
-				return err
-			}
+			return p.processError(err)
 		}
 	}
 
@@ -454,13 +442,7 @@ func (p *pg) AddPolicyMembers(ctx context.Context, id string, members []v2.Membe
 	for _, member := range members {
 		err := p.insertOrReusePolicyMemberWithQuerier(ctx, id, member, tx)
 		if err != nil {
-			err = p.processError(err)
-			switch err {
-			case storage_errors.ErrForeignKey: // occurs when id not found for policy
-				return nil, storage_errors.ErrNotFound
-			default:
-				return nil, err
-			}
+			return nil, p.processError(err)
 		}
 	}
 
@@ -499,13 +481,7 @@ func (p *pg) ReplacePolicyMembers(ctx context.Context, policyID string, members 
 
 	err = p.replacePolicyMembersWithQuerier(ctx, policyID, members, tx)
 	if err != nil {
-		err = p.processError(err)
-		switch err {
-		case storage_errors.ErrForeignKey: // occurs when id not found for policy
-			return nil, storage_errors.ErrNotFound
-		default:
-			return nil, err
-		}
+		return nil, p.processError(err)
 	}
 
 	// fetch fresh data so returned data will reflect that any pre-existing members re-use existing IDs
@@ -555,8 +531,6 @@ func (p *pg) RemovePolicyMembers(ctx context.Context,
 			err = p.processError(err)
 			switch err {
 			case storage_errors.ErrNotFound: // continue
-			case storage_errors.ErrForeignKey:
-				return nil, storage_errors.ErrNotFound
 			default:
 				return nil, err
 			}
@@ -613,7 +587,7 @@ func (p *pg) insertOrReusePolicyMemberWithQuerier(ctx context.Context, policyID 
 	// not deleting any of the rows, but reusing them per name string.
 
 	_, err := q.ExecContext(ctx,
-		 `INSERT INTO iam_members (id, name) VALUES ($1, $2) ON CONFLICT DO NOTHING;`,
+		`INSERT INTO iam_members (id, name) VALUES ($1, $2) ON CONFLICT DO NOTHING;`,
 		member.ID, member.Name)
 	if err != nil {
 		return errors.Wrapf(err, "failed to upsert member %s (id %s)", member.Name, member.ID)

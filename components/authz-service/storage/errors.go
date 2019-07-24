@@ -22,9 +22,6 @@ var (
 	// ErrGenerateUUID occurs when a UUID could not be generated for a new object.
 	ErrGenerateUUID = errors.New("could not generate UUID")
 
-	// ErrForeignKey occurs, among other times, when attempting to insert a foreign key whose referent does not exist
-	ErrForeignKey = errors.New("foreign key violation")
-
 	// ErrMaxProjectsExceeded indicates that a new project cannot be created
 	// since the max allowed are already created.
 	ErrMaxProjectsExceeded = errors.New("max projects allowed")
@@ -81,4 +78,12 @@ func NewMissingFieldError(f string) error {
 
 func (e *ErrMissingField) Error() string {
 	return "must supply policy " + e.field
+}
+
+type ErrForeignKey struct {
+	Msg string
+}
+
+func (e *ErrForeignKey) Error() string {
+	return e.Msg
 }

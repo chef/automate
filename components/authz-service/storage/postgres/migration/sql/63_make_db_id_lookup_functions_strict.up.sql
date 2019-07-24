@@ -32,5 +32,23 @@ BEGIN
 END;
 $$
 LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION role_db_id (
+    _id iam_roles.id % TYPE,
+    OUT _db_id iam_roles.db_id % TYPE
+)
+    RETURNS iam_roles.db_id % TYPE
+    AS $$
+BEGIN
+    SELECT
+        db_id INTO _db_id
+    FROM
+        iam_roles
+    WHERE
+        id = _id;
+    IF NOT FOUND THEN
+        RAISE foreign_key_violation USING MESSAGE='role not found: ' || _id;
+    END IF;
+END;
+$$
+LANGUAGE plpgsql;
 COMMIT;
-

@@ -3,7 +3,6 @@ package postgres_test
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"math/rand"
 	"sort"
 	"strconv"
@@ -1116,10 +1115,9 @@ func TestCreatePolicy(t *testing.T) {
 			require.Error(t, err)
 			assert.Nil(t, resp)
 
-			_, wasCorrectError := err.(*storage_errors.ErrRoleMustExistForStatement)
+			_, wasCorrectError := err.(*storage_errors.ErrForeignKey)
 			assert.True(t, wasCorrectError)
-			assert.Equal(t,
-				fmt.Sprintf("role must exist to be inserted into a policy statement, missing role with ID: %s", role), err.Error())
+			assert.Equal(t, "role not found: "+role, err.Error())
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID))
