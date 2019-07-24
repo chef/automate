@@ -3,6 +3,7 @@ import {
   Element,
   Event,
   EventEmitter,
+  Host,
   Listen,
   Prop,
   State,
@@ -126,33 +127,29 @@ export class ChefModal {
     }
   }
 
-  hostData() {
-    return {
-      class: this.visible ? 'visible' : ''
-    };
-  }
-
   render() {
-    return [
-      <div
-        class="modal-overlay"
-        onClick={this.handleClose.bind(this)}>
-      </div>,
-      <div
-        class="modal"
-        aria-modal="true"
-        role="dialog"
-        aria-labelledby={this.label}
-        tabindex="0">
-        <chef-trap-focus>
-          {
-            this.renderButton()
-          }
-          <slot name="title"></slot>
-          <slot />
-        </chef-trap-focus>
-      </div>
-    ];
+    return (
+      <Host class={this.visible ? 'visible' : ''}>
+        <div
+          class="modal-overlay"
+          onClick={this.handleClose.bind(this)}>
+        </div>
+        <div
+          class="modal"
+          aria-modal="true"
+          role="dialog"
+          aria-labelledby={this.label}
+          tabindex="0">
+          <chef-trap-focus>
+            {
+              this.renderButton()
+            }
+            <slot name="title"></slot>
+            <slot />
+          </chef-trap-focus>
+        </div>
+      </Host>
+    );
   }
 
   private renderButton() {
