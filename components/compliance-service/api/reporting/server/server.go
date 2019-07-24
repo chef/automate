@@ -128,7 +128,7 @@ func (srv *Server) ReadReport(ctx context.Context, in *reporting.Query) (*report
 func (srv *Server) ListSuggestions(ctx context.Context, in *reporting.SuggestionRequest) (*reporting.Suggestions, error) {
 	var suggestions reporting.Suggestions
 	if in.Size == 0 {
-		in.Size = 10
+		in.Size = 100
 	}
 	if in.Type == "" {
 		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("Parameter 'type' not specified"))

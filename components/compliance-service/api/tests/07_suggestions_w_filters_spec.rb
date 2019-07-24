@@ -16,7 +16,8 @@ describe File.basename(__FILE__) do
       filters: [
         Reporting::ListFilter.new(type: 'start_time', values: ['2018-01-01T23:59:59Z']),
         Reporting::ListFilter.new(type: 'end_time', values: ['2018-07-01T23:59:59Z'])
-      ]
+      ],
+      size: 10
     )
     expected = [
       "Check Apache config file owner, group and permissions.--apache-05--",
@@ -39,7 +40,8 @@ describe File.basename(__FILE__) do
       filters: [
         Reporting::ListFilter.new(type: 'start_time', values: ['2018-02-01T23:59:59Z']),
         Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-01T23:59:59Z'])
-      ]
+      ],
+      size: 10
     )
     expected = [
       "Disable neighbor solicitations to send out per address--sysctl-27--",
