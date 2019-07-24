@@ -135,15 +135,7 @@ describe('ProjectDetailsComponent', () => {
 
   describe('when there are no rules', () => {
     beforeEach(() => {
-      store.dispatch(new GetRulesSuccess({
-          rules: []
-      }));
       component.rules = [];
-      fixture.detectChanges();
-    });
-
-    it('rules array should be empty', () => {
-      expect(component.rules.length).toBe(0);
     });
 
    it('defaults to showing rules section', () => {
@@ -171,16 +163,8 @@ describe('ProjectDetailsComponent', () => {
 
   describe('when there are rules', () => {
     beforeEach(() => {
-      store.dispatch(new GetRulesSuccess({
-          rules: rules
-      }));
       component.project = project;
       component.rules = rules;
-      fixture.detectChanges();
-    });
-
-    it('rules array should have two rules', () => {
-      expect(component.rules.length).toBe(2);
     });
 
     it('defaults to showing rules section', () => {
