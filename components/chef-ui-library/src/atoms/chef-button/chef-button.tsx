@@ -1,4 +1,4 @@
-import { Component, Prop, h } from '@stencil/core';
+import { Component, Host, Prop, h } from '@stencil/core';
 
 /**
  * @description
@@ -413,29 +413,27 @@ export class ChefButton {
    */
   @Prop({ reflectToAttr: true }) target: string;
 
-  hostData() {
-    return {
-      'aria-disabled': this.disabled
-    };
-  }
-
   render() {
-    if (this.url) {
-      return (
-        <a href={this.url} target={this.target}>
-          <slot />
-        </a>
-      );
-    } else {
-      return (
-        <button
-          type={this.type}
-          form={this.form}
-          disabled={this.disabled}
-          aria-disabled={this.disabled}>
-          <slot />
-        </button>
-      );
-    }
+    const link = (
+      <a href={this.url} target={this.target}>
+        <slot />
+      </a>
+    );
+
+    const button = (
+      <button
+        type={this.type}
+        form={this.form}
+        disabled={this.disabled}
+        aria-disabled={this.disabled}>
+        <slot />
+      </button>
+    );
+
+    return (
+      <Host aria-disabled={this.disabled}>
+        {this.url ? link : button}
+      </Host>
+    );
   }
 }
