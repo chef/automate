@@ -378,11 +378,13 @@ func (db *Postgres) getServiceGroup(id int32) (*serviceGroup, error) {
 
 	return &sg, nil
 }
-func (db *Postgres) getServiceGroupID(name string) (int32, bool) {
+
+func (db *Postgres) getServiceGroupID(name string, deploymentID int32) (int32, bool) {
 	var gid int32
 	err := db.SelectOne(&gid,
-		"SELECT id FROM service_group WHERE name = $1",
+		"SELECT id FROM service_group WHERE name = $1 AND deployment_id = $2",
 		name,
+		deploymentID,
 	)
 	if err != nil {
 		return gid, false

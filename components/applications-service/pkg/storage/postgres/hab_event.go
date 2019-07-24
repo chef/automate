@@ -395,7 +395,16 @@ func (db *Postgres) insertNewService(
 		}
 
 		// 2) Service Group
-		gid, exist := db.getServiceGroupID(svcMetadata.GetServiceGroup())
+		// FIXME that's your problem right there :P
+		// we need to find service group by name and deployment id (done)
+		// TODO after this:
+		// * undo the view changes, retest to make sure all that still works
+		// * regression test
+		// * see how it behaves when running with existing bad data
+		// * does updateService work? (seems to, but be more systematic)
+		// 		* when deployment is not changed
+		//    * when deployment is changed
+		gid, exist := db.getServiceGroupID(svcMetadata.GetServiceGroup(), did)
 		if !exist {
 			svcGroup := &serviceGroup{
 				Name:         svcMetadata.GetServiceGroup(),
