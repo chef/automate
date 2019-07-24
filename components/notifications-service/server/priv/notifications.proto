@@ -96,7 +96,7 @@ message SourceLocation {
 }
 
 message Refs {
-  string ref = 1;
+  reserved 1; //string ref = 1; because the 'ref' can be an array also
   string uri = 2;
   string url = 3;
 }

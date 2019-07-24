@@ -211,13 +211,11 @@ defmodule Notifications.Refs do
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
-          ref: String.t(),
           uri: String.t(),
           url: String.t()
         }
-  defstruct [:ref, :uri, :url]
+  defstruct [:uri, :url]
 
-  field :ref, 1, type: :string
   field :uri, 2, type: :string
   field :url, 3, type: :string
 end

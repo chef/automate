@@ -3,9 +3,11 @@
 
 package api
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
+import (
+	fmt "fmt"
+	proto "github.com/golang/protobuf/proto"
+	math "math"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -16,7 +18,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type Rule_Event int32
 
@@ -35,6 +37,7 @@ var Rule_Event_name = map[int32]string{
 	3: "ComplianceSuccess",
 	4: "Assets",
 }
+
 var Rule_Event_value = map[string]int32{
 	"CCRFailure":        0,
 	"CCRSuccess":        1,
@@ -46,8 +49,9 @@ var Rule_Event_value = map[string]int32{
 func (x Rule_Event) String() string {
 	return proto.EnumName(Rule_Event_name, int32(x))
 }
+
 func (Rule_Event) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_rules_4de71be657257585, []int{4, 0}
+	return fileDescriptor_8e722d3e922f0937, []int{4, 0}
 }
 
 type URLValidationResponse_Code int32
@@ -67,6 +71,7 @@ var URLValidationResponse_Code_name = map[int32]string{
 	98: "NOTIFICATIONS_UNAVAIALBLE",
 	99: "INTERNAL_ERROR",
 }
+
 var URLValidationResponse_Code_value = map[string]int32{
 	"OK":                        0,
 	"ERROR":                     1,
@@ -78,8 +83,9 @@ var URLValidationResponse_Code_value = map[string]int32{
 func (x URLValidationResponse_Code) String() string {
 	return proto.EnumName(URLValidationResponse_Code_name, int32(x))
 }
+
 func (URLValidationResponse_Code) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_rules_4de71be657257585, []int{8, 0}
+	return fileDescriptor_8e722d3e922f0937, []int{8, 0}
 }
 
 type RuleUpdateResponse_Code int32
@@ -99,6 +105,7 @@ var RuleUpdateResponse_Code_name = map[int32]string{
 	4:  "VALIDATION_ERROR",
 	99: "INTERNAL_ERROR",
 }
+
 var RuleUpdateResponse_Code_value = map[string]int32{
 	"OK":               0,
 	"DUPLICATE_NAME":   1,
@@ -110,8 +117,9 @@ var RuleUpdateResponse_Code_value = map[string]int32{
 func (x RuleUpdateResponse_Code) String() string {
 	return proto.EnumName(RuleUpdateResponse_Code_name, int32(x))
 }
+
 func (RuleUpdateResponse_Code) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_rules_4de71be657257585, []int{10, 0}
+	return fileDescriptor_8e722d3e922f0937, []int{10, 0}
 }
 
 type RuleDeleteResponse_Code int32
@@ -127,6 +135,7 @@ var RuleDeleteResponse_Code_name = map[int32]string{
 	2:  "NOT_FOUND",
 	99: "INTERNAL_ERROR",
 }
+
 var RuleDeleteResponse_Code_value = map[string]int32{
 	"DELETED":        0,
 	"NOT_FOUND":      2,
@@ -136,8 +145,9 @@ var RuleDeleteResponse_Code_value = map[string]int32{
 func (x RuleDeleteResponse_Code) String() string {
 	return proto.EnumName(RuleDeleteResponse_Code_name, int32(x))
 }
+
 func (RuleDeleteResponse_Code) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_rules_4de71be657257585, []int{11, 0}
+	return fileDescriptor_8e722d3e922f0937, []int{11, 0}
 }
 
 type RuleAddResponse_Code int32
@@ -159,6 +169,7 @@ var RuleAddResponse_Code_name = map[int32]string{
 	4:  "VALIDATION_ERROR",
 	99: "INTERNAL_ERROR",
 }
+
 var RuleAddResponse_Code_value = map[string]int32{
 	"ADDED":                 0,
 	"DUPLICATE_NAME":        1,
@@ -171,8 +182,9 @@ var RuleAddResponse_Code_value = map[string]int32{
 func (x RuleAddResponse_Code) String() string {
 	return proto.EnumName(RuleAddResponse_Code_name, int32(x))
 }
+
 func (RuleAddResponse_Code) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_rules_4de71be657257585, []int{12, 0}
+	return fileDescriptor_8e722d3e922f0937, []int{12, 0}
 }
 
 type RuleGetResponse_Code int32
@@ -188,6 +200,7 @@ var RuleGetResponse_Code_name = map[int32]string{
 	2:  "NOT_FOUND",
 	99: "INTERNAL_ERROR",
 }
+
 var RuleGetResponse_Code_value = map[string]int32{
 	"OK":             0,
 	"NOT_FOUND":      2,
@@ -197,8 +210,9 @@ var RuleGetResponse_Code_value = map[string]int32{
 func (x RuleGetResponse_Code) String() string {
 	return proto.EnumName(RuleGetResponse_Code_name, int32(x))
 }
+
 func (RuleGetResponse_Code) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_rules_4de71be657257585, []int{13, 0}
+	return fileDescriptor_8e722d3e922f0937, []int{13, 0}
 }
 
 type RuleListResponse_Code int32
@@ -212,6 +226,7 @@ var RuleListResponse_Code_name = map[int32]string{
 	0:  "OK",
 	99: "INTERNAL_ERROR",
 }
+
 var RuleListResponse_Code_value = map[string]int32{
 	"OK":             0,
 	"INTERNAL_ERROR": 99,
@@ -220,13 +235,14 @@ var RuleListResponse_Code_value = map[string]int32{
 func (x RuleListResponse_Code) String() string {
 	return proto.EnumName(RuleListResponse_Code_name, int32(x))
 }
+
 func (RuleListResponse_Code) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_rules_4de71be657257585, []int{14, 0}
+	return fileDescriptor_8e722d3e922f0937, []int{14, 0}
 }
 
-// //
+////
 // Rules management messages and responses
-// //
+////
 type Empty struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -237,16 +253,17 @@ func (m *Empty) Reset()         { *m = Empty{} }
 func (m *Empty) String() string { return proto.CompactTextString(m) }
 func (*Empty) ProtoMessage()    {}
 func (*Empty) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rules_4de71be657257585, []int{0}
+	return fileDescriptor_8e722d3e922f0937, []int{0}
 }
+
 func (m *Empty) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Empty.Unmarshal(m, b)
 }
 func (m *Empty) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Empty.Marshal(b, m, deterministic)
 }
-func (dst *Empty) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Empty.Merge(dst, src)
+func (m *Empty) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Empty.Merge(m, src)
 }
 func (m *Empty) XXX_Size() int {
 	return xxx_messageInfo_Empty.Size(m)
@@ -268,16 +285,17 @@ func (m *SlackAlert) Reset()         { *m = SlackAlert{} }
 func (m *SlackAlert) String() string { return proto.CompactTextString(m) }
 func (*SlackAlert) ProtoMessage()    {}
 func (*SlackAlert) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rules_4de71be657257585, []int{1}
+	return fileDescriptor_8e722d3e922f0937, []int{1}
 }
+
 func (m *SlackAlert) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SlackAlert.Unmarshal(m, b)
 }
 func (m *SlackAlert) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_SlackAlert.Marshal(b, m, deterministic)
 }
-func (dst *SlackAlert) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SlackAlert.Merge(dst, src)
+func (m *SlackAlert) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SlackAlert.Merge(m, src)
 }
 func (m *SlackAlert) XXX_Size() int {
 	return xxx_messageInfo_SlackAlert.Size(m)
@@ -306,16 +324,17 @@ func (m *WebhookAlert) Reset()         { *m = WebhookAlert{} }
 func (m *WebhookAlert) String() string { return proto.CompactTextString(m) }
 func (*WebhookAlert) ProtoMessage()    {}
 func (*WebhookAlert) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rules_4de71be657257585, []int{2}
+	return fileDescriptor_8e722d3e922f0937, []int{2}
 }
+
 func (m *WebhookAlert) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_WebhookAlert.Unmarshal(m, b)
 }
 func (m *WebhookAlert) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_WebhookAlert.Marshal(b, m, deterministic)
 }
-func (dst *WebhookAlert) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_WebhookAlert.Merge(dst, src)
+func (m *WebhookAlert) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_WebhookAlert.Merge(m, src)
 }
 func (m *WebhookAlert) XXX_Size() int {
 	return xxx_messageInfo_WebhookAlert.Size(m)
@@ -346,16 +365,17 @@ func (m *ServiceNowAlert) Reset()         { *m = ServiceNowAlert{} }
 func (m *ServiceNowAlert) String() string { return proto.CompactTextString(m) }
 func (*ServiceNowAlert) ProtoMessage()    {}
 func (*ServiceNowAlert) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rules_4de71be657257585, []int{3}
+	return fileDescriptor_8e722d3e922f0937, []int{3}
 }
+
 func (m *ServiceNowAlert) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ServiceNowAlert.Unmarshal(m, b)
 }
 func (m *ServiceNowAlert) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_ServiceNowAlert.Marshal(b, m, deterministic)
 }
-func (dst *ServiceNowAlert) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ServiceNowAlert.Merge(dst, src)
+func (m *ServiceNowAlert) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ServiceNowAlert.Merge(m, src)
 }
 func (m *ServiceNowAlert) XXX_Size() int {
 	return xxx_messageInfo_ServiceNowAlert.Size(m)
@@ -405,16 +425,17 @@ func (m *Rule) Reset()         { *m = Rule{} }
 func (m *Rule) String() string { return proto.CompactTextString(m) }
 func (*Rule) ProtoMessage()    {}
 func (*Rule) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rules_4de71be657257585, []int{4}
+	return fileDescriptor_8e722d3e922f0937, []int{4}
 }
+
 func (m *Rule) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Rule.Unmarshal(m, b)
 }
 func (m *Rule) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Rule.Marshal(b, m, deterministic)
 }
-func (dst *Rule) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Rule.Merge(dst, src)
+func (m *Rule) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Rule.Merge(m, src)
 }
 func (m *Rule) XXX_Size() int {
 	return xxx_messageInfo_Rule.Size(m)
@@ -496,97 +517,13 @@ func (m *Rule) GetServiceNowAlert() *ServiceNowAlert {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*Rule) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _Rule_OneofMarshaler, _Rule_OneofUnmarshaler, _Rule_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*Rule) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*Rule_SlackAlert)(nil),
 		(*Rule_WebhookAlert)(nil),
 		(*Rule_ServiceNowAlert)(nil),
 	}
-}
-
-func _Rule_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*Rule)
-	// action
-	switch x := m.Action.(type) {
-	case *Rule_SlackAlert:
-		b.EncodeVarint(4<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.SlackAlert); err != nil {
-			return err
-		}
-	case *Rule_WebhookAlert:
-		b.EncodeVarint(5<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.WebhookAlert); err != nil {
-			return err
-		}
-	case *Rule_ServiceNowAlert:
-		b.EncodeVarint(6<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.ServiceNowAlert); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("Rule.Action has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _Rule_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*Rule)
-	switch tag {
-	case 4: // action.SlackAlert
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(SlackAlert)
-		err := b.DecodeMessage(msg)
-		m.Action = &Rule_SlackAlert{msg}
-		return true, err
-	case 5: // action.WebhookAlert
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(WebhookAlert)
-		err := b.DecodeMessage(msg)
-		m.Action = &Rule_WebhookAlert{msg}
-		return true, err
-	case 6: // action.ServiceNowAlert
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(ServiceNowAlert)
-		err := b.DecodeMessage(msg)
-		m.Action = &Rule_ServiceNowAlert{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _Rule_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*Rule)
-	// action
-	switch x := m.Action.(type) {
-	case *Rule_SlackAlert:
-		s := proto.Size(x.SlackAlert)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *Rule_WebhookAlert:
-		s := proto.Size(x.WebhookAlert)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *Rule_ServiceNowAlert:
-		s := proto.Size(x.ServiceNowAlert)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 type UsernamePassword struct {
@@ -601,16 +538,17 @@ func (m *UsernamePassword) Reset()         { *m = UsernamePassword{} }
 func (m *UsernamePassword) String() string { return proto.CompactTextString(m) }
 func (*UsernamePassword) ProtoMessage()    {}
 func (*UsernamePassword) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rules_4de71be657257585, []int{5}
+	return fileDescriptor_8e722d3e922f0937, []int{5}
 }
+
 func (m *UsernamePassword) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_UsernamePassword.Unmarshal(m, b)
 }
 func (m *UsernamePassword) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_UsernamePassword.Marshal(b, m, deterministic)
 }
-func (dst *UsernamePassword) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UsernamePassword.Merge(dst, src)
+func (m *UsernamePassword) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UsernamePassword.Merge(m, src)
 }
 func (m *UsernamePassword) XXX_Size() int {
 	return xxx_messageInfo_UsernamePassword.Size(m)
@@ -646,16 +584,17 @@ func (m *SecretId) Reset()         { *m = SecretId{} }
 func (m *SecretId) String() string { return proto.CompactTextString(m) }
 func (*SecretId) ProtoMessage()    {}
 func (*SecretId) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rules_4de71be657257585, []int{6}
+	return fileDescriptor_8e722d3e922f0937, []int{6}
 }
+
 func (m *SecretId) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SecretId.Unmarshal(m, b)
 }
 func (m *SecretId) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_SecretId.Marshal(b, m, deterministic)
 }
-func (dst *SecretId) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SecretId.Merge(dst, src)
+func (m *SecretId) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SecretId.Merge(m, src)
 }
 func (m *SecretId) XXX_Size() int {
 	return xxx_messageInfo_SecretId.Size(m)
@@ -689,16 +628,17 @@ func (m *URLValidationRequest) Reset()         { *m = URLValidationRequest{} }
 func (m *URLValidationRequest) String() string { return proto.CompactTextString(m) }
 func (*URLValidationRequest) ProtoMessage()    {}
 func (*URLValidationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rules_4de71be657257585, []int{7}
+	return fileDescriptor_8e722d3e922f0937, []int{7}
 }
+
 func (m *URLValidationRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_URLValidationRequest.Unmarshal(m, b)
 }
 func (m *URLValidationRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_URLValidationRequest.Marshal(b, m, deterministic)
 }
-func (dst *URLValidationRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_URLValidationRequest.Merge(dst, src)
+func (m *URLValidationRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_URLValidationRequest.Merge(m, src)
 }
 func (m *URLValidationRequest) XXX_Size() int {
 	return xxx_messageInfo_URLValidationRequest.Size(m)
@@ -766,97 +706,13 @@ func (m *URLValidationRequest) GetNone() *Empty {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*URLValidationRequest) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _URLValidationRequest_OneofMarshaler, _URLValidationRequest_OneofUnmarshaler, _URLValidationRequest_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*URLValidationRequest) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*URLValidationRequest_UsernamePassword)(nil),
 		(*URLValidationRequest_SecretId)(nil),
 		(*URLValidationRequest_None)(nil),
 	}
-}
-
-func _URLValidationRequest_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*URLValidationRequest)
-	// credentials
-	switch x := m.Credentials.(type) {
-	case *URLValidationRequest_UsernamePassword:
-		b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.UsernamePassword); err != nil {
-			return err
-		}
-	case *URLValidationRequest_SecretId:
-		b.EncodeVarint(3<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.SecretId); err != nil {
-			return err
-		}
-	case *URLValidationRequest_None:
-		b.EncodeVarint(4<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.None); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("URLValidationRequest.Credentials has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _URLValidationRequest_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*URLValidationRequest)
-	switch tag {
-	case 2: // credentials.username_password
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(UsernamePassword)
-		err := b.DecodeMessage(msg)
-		m.Credentials = &URLValidationRequest_UsernamePassword{msg}
-		return true, err
-	case 3: // credentials.secret_id
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(SecretId)
-		err := b.DecodeMessage(msg)
-		m.Credentials = &URLValidationRequest_SecretId{msg}
-		return true, err
-	case 4: // credentials.none
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(Empty)
-		err := b.DecodeMessage(msg)
-		m.Credentials = &URLValidationRequest_None{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _URLValidationRequest_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*URLValidationRequest)
-	// credentials
-	switch x := m.Credentials.(type) {
-	case *URLValidationRequest_UsernamePassword:
-		s := proto.Size(x.UsernamePassword)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *URLValidationRequest_SecretId:
-		s := proto.Size(x.SecretId)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case *URLValidationRequest_None:
-		s := proto.Size(x.None)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 type URLValidationResponse struct {
@@ -871,16 +727,17 @@ func (m *URLValidationResponse) Reset()         { *m = URLValidationResponse{} }
 func (m *URLValidationResponse) String() string { return proto.CompactTextString(m) }
 func (*URLValidationResponse) ProtoMessage()    {}
 func (*URLValidationResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rules_4de71be657257585, []int{8}
+	return fileDescriptor_8e722d3e922f0937, []int{8}
 }
+
 func (m *URLValidationResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_URLValidationResponse.Unmarshal(m, b)
 }
 func (m *URLValidationResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_URLValidationResponse.Marshal(b, m, deterministic)
 }
-func (dst *URLValidationResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_URLValidationResponse.Merge(dst, src)
+func (m *URLValidationResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_URLValidationResponse.Merge(m, src)
 }
 func (m *URLValidationResponse) XXX_Size() int {
 	return xxx_messageInfo_URLValidationResponse.Size(m)
@@ -916,16 +773,17 @@ func (m *RuleIdentifier) Reset()         { *m = RuleIdentifier{} }
 func (m *RuleIdentifier) String() string { return proto.CompactTextString(m) }
 func (*RuleIdentifier) ProtoMessage()    {}
 func (*RuleIdentifier) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rules_4de71be657257585, []int{9}
+	return fileDescriptor_8e722d3e922f0937, []int{9}
 }
+
 func (m *RuleIdentifier) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RuleIdentifier.Unmarshal(m, b)
 }
 func (m *RuleIdentifier) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_RuleIdentifier.Marshal(b, m, deterministic)
 }
-func (dst *RuleIdentifier) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RuleIdentifier.Merge(dst, src)
+func (m *RuleIdentifier) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RuleIdentifier.Merge(m, src)
 }
 func (m *RuleIdentifier) XXX_Size() int {
 	return xxx_messageInfo_RuleIdentifier.Size(m)
@@ -955,16 +813,17 @@ func (m *RuleUpdateResponse) Reset()         { *m = RuleUpdateResponse{} }
 func (m *RuleUpdateResponse) String() string { return proto.CompactTextString(m) }
 func (*RuleUpdateResponse) ProtoMessage()    {}
 func (*RuleUpdateResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rules_4de71be657257585, []int{10}
+	return fileDescriptor_8e722d3e922f0937, []int{10}
 }
+
 func (m *RuleUpdateResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RuleUpdateResponse.Unmarshal(m, b)
 }
 func (m *RuleUpdateResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_RuleUpdateResponse.Marshal(b, m, deterministic)
 }
-func (dst *RuleUpdateResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RuleUpdateResponse.Merge(dst, src)
+func (m *RuleUpdateResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RuleUpdateResponse.Merge(m, src)
 }
 func (m *RuleUpdateResponse) XXX_Size() int {
 	return xxx_messageInfo_RuleUpdateResponse.Size(m)
@@ -1001,16 +860,17 @@ func (m *RuleDeleteResponse) Reset()         { *m = RuleDeleteResponse{} }
 func (m *RuleDeleteResponse) String() string { return proto.CompactTextString(m) }
 func (*RuleDeleteResponse) ProtoMessage()    {}
 func (*RuleDeleteResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rules_4de71be657257585, []int{11}
+	return fileDescriptor_8e722d3e922f0937, []int{11}
 }
+
 func (m *RuleDeleteResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RuleDeleteResponse.Unmarshal(m, b)
 }
 func (m *RuleDeleteResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_RuleDeleteResponse.Marshal(b, m, deterministic)
 }
-func (dst *RuleDeleteResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RuleDeleteResponse.Merge(dst, src)
+func (m *RuleDeleteResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RuleDeleteResponse.Merge(m, src)
 }
 func (m *RuleDeleteResponse) XXX_Size() int {
 	return xxx_messageInfo_RuleDeleteResponse.Size(m)
@@ -1048,16 +908,17 @@ func (m *RuleAddResponse) Reset()         { *m = RuleAddResponse{} }
 func (m *RuleAddResponse) String() string { return proto.CompactTextString(m) }
 func (*RuleAddResponse) ProtoMessage()    {}
 func (*RuleAddResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rules_4de71be657257585, []int{12}
+	return fileDescriptor_8e722d3e922f0937, []int{12}
 }
+
 func (m *RuleAddResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RuleAddResponse.Unmarshal(m, b)
 }
 func (m *RuleAddResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_RuleAddResponse.Marshal(b, m, deterministic)
 }
-func (dst *RuleAddResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RuleAddResponse.Merge(dst, src)
+func (m *RuleAddResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RuleAddResponse.Merge(m, src)
 }
 func (m *RuleAddResponse) XXX_Size() int {
 	return xxx_messageInfo_RuleAddResponse.Size(m)
@@ -1102,16 +963,17 @@ func (m *RuleGetResponse) Reset()         { *m = RuleGetResponse{} }
 func (m *RuleGetResponse) String() string { return proto.CompactTextString(m) }
 func (*RuleGetResponse) ProtoMessage()    {}
 func (*RuleGetResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rules_4de71be657257585, []int{13}
+	return fileDescriptor_8e722d3e922f0937, []int{13}
 }
+
 func (m *RuleGetResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RuleGetResponse.Unmarshal(m, b)
 }
 func (m *RuleGetResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_RuleGetResponse.Marshal(b, m, deterministic)
 }
-func (dst *RuleGetResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RuleGetResponse.Merge(dst, src)
+func (m *RuleGetResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RuleGetResponse.Merge(m, src)
 }
 func (m *RuleGetResponse) XXX_Size() int {
 	return xxx_messageInfo_RuleGetResponse.Size(m)
@@ -1156,16 +1018,17 @@ func (m *RuleListResponse) Reset()         { *m = RuleListResponse{} }
 func (m *RuleListResponse) String() string { return proto.CompactTextString(m) }
 func (*RuleListResponse) ProtoMessage()    {}
 func (*RuleListResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rules_4de71be657257585, []int{14}
+	return fileDescriptor_8e722d3e922f0937, []int{14}
 }
+
 func (m *RuleListResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RuleListResponse.Unmarshal(m, b)
 }
 func (m *RuleListResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_RuleListResponse.Marshal(b, m, deterministic)
 }
-func (dst *RuleListResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RuleListResponse.Merge(dst, src)
+func (m *RuleListResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RuleListResponse.Merge(m, src)
 }
 func (m *RuleListResponse) XXX_Size() int {
 	return xxx_messageInfo_RuleListResponse.Size(m)
@@ -1198,6 +1061,13 @@ func (m *RuleListResponse) GetRules() []*Rule {
 }
 
 func init() {
+	proto.RegisterEnum("notifications.Rule_Event", Rule_Event_name, Rule_Event_value)
+	proto.RegisterEnum("notifications.URLValidationResponse_Code", URLValidationResponse_Code_name, URLValidationResponse_Code_value)
+	proto.RegisterEnum("notifications.RuleUpdateResponse_Code", RuleUpdateResponse_Code_name, RuleUpdateResponse_Code_value)
+	proto.RegisterEnum("notifications.RuleDeleteResponse_Code", RuleDeleteResponse_Code_name, RuleDeleteResponse_Code_value)
+	proto.RegisterEnum("notifications.RuleAddResponse_Code", RuleAddResponse_Code_name, RuleAddResponse_Code_value)
+	proto.RegisterEnum("notifications.RuleGetResponse_Code", RuleGetResponse_Code_name, RuleGetResponse_Code_value)
+	proto.RegisterEnum("notifications.RuleListResponse_Code", RuleListResponse_Code_name, RuleListResponse_Code_value)
 	proto.RegisterType((*Empty)(nil), "notifications.Empty")
 	proto.RegisterType((*SlackAlert)(nil), "notifications.SlackAlert")
 	proto.RegisterType((*WebhookAlert)(nil), "notifications.WebhookAlert")
@@ -1213,18 +1083,11 @@ func init() {
 	proto.RegisterType((*RuleAddResponse)(nil), "notifications.RuleAddResponse")
 	proto.RegisterType((*RuleGetResponse)(nil), "notifications.RuleGetResponse")
 	proto.RegisterType((*RuleListResponse)(nil), "notifications.RuleListResponse")
-	proto.RegisterEnum("notifications.Rule_Event", Rule_Event_name, Rule_Event_value)
-	proto.RegisterEnum("notifications.URLValidationResponse_Code", URLValidationResponse_Code_name, URLValidationResponse_Code_value)
-	proto.RegisterEnum("notifications.RuleUpdateResponse_Code", RuleUpdateResponse_Code_name, RuleUpdateResponse_Code_value)
-	proto.RegisterEnum("notifications.RuleDeleteResponse_Code", RuleDeleteResponse_Code_name, RuleDeleteResponse_Code_value)
-	proto.RegisterEnum("notifications.RuleAddResponse_Code", RuleAddResponse_Code_name, RuleAddResponse_Code_value)
-	proto.RegisterEnum("notifications.RuleGetResponse_Code", RuleGetResponse_Code_name, RuleGetResponse_Code_value)
-	proto.RegisterEnum("notifications.RuleListResponse_Code", RuleListResponse_Code_name, RuleListResponse_Code_value)
 }
 
-func init() { proto.RegisterFile("rules.proto", fileDescriptor_rules_4de71be657257585) }
+func init() { proto.RegisterFile("rules.proto", fileDescriptor_8e722d3e922f0937) }
 
-var fileDescriptor_rules_4de71be657257585 = []byte{
+var fileDescriptor_8e722d3e922f0937 = []byte{
 	// 870 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x96, 0xd1, 0x6e, 0xe3, 0x44,
 	0x14, 0x86, 0xed, 0xd8, 0xc9, 0x26, 0x27, 0x34, 0x9d, 0x1d, 0x5a, 0x48, 0x77, 0xc5, 0x12, 0x19,

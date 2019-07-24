@@ -19,7 +19,7 @@ func TestSingleProfileMultipleControlSingleCriticalFailure(t *testing.T) {
 	var report compliance.Report
 	// This test has 1 profile, with 2 controls. 1 of those controls
 	// has 1 of 3 failing tests.
-	from_json("inspec-report-single-failure.json", &report)
+	fromJSON("inspec-report-single-failure.json", &report)
 
 	ev, _ := Compliance(URL, &report)
 
@@ -76,7 +76,7 @@ func TestMultipleFailuresInMultipleProfiles(t *testing.T) {
 	var report compliance.Report
 	// This test has 1 profile, with 2 controls. 1 of those controls
 	// has 1 of 3 failing tests.
-	from_json("inspec-mixed.json", &report)
+	fromJSON("inspec-mixed.json", &report)
 
 	ev, _ := Compliance(URL, &report)
 	failure := ev.GetComplianceFailure()
@@ -156,7 +156,27 @@ func TestMultipleFailuresInMultipleProfiles(t *testing.T) {
 	}
 }
 
-func from_json(name string, out proto.Message) error {
+// There is a problem with custom InSpec reports where they sometimes have an array for the
+// 'controls.refs.ref' instead of a string.
+// "controls": [
+// 	{
+// 		"title": "Checking for /etc/passwd",
+// 		"desc": "Checking for /etc/passwd desc",
+// 		"impact": 0.6,
+// 		"refs": [
+// 			{
+// 				"ref": []
+// 			}
+// 		],
+func TestParseInspecReportWithRefBug(t *testing.T) {
+	var report compliance.Report
+	fromJSON("inspec-ref-bug-report.json", &report)
+
+	_, err := Compliance(URL, &report)
+	assert.NoError(t, err)
+}
+
+func fromJSON(name string, out proto.Message) error {
 	p := path.Join("testdata", name)
 
 	content, err := ioutil.ReadFile(p)
