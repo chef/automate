@@ -9,9 +9,9 @@
   z-index: 101;
   overflow-x: hidden;
   overflow-y: auto;
-  width: $sidebar-width;
-  background-color: $chef-lightest-grey;
-  box-shadow: 0 10px 48px 0 rgba(63, 83, 100, 0.2);
+  width: $sidebar-width + 1px;
+  background-color: #FFF;
+  border-right: 1px solid #DFE3E5;
 
   .sidebar-selector {
 

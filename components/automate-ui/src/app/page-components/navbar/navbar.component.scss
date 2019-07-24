@@ -30,7 +30,6 @@ header {
     justify-content: space-between;
     padding-top: 2px 36px 0 0;
     background-color: $white;
-    box-shadow: 0 0 6px $gray-pale;
     box-sizing: padding-box;
     z-index: 200;
     position: fixed;
@@ -38,6 +37,7 @@ header {
     left: 0;
     right: 0;
     height: $navigation-height;
+    border-bottom: 1px solid #DFE3E5;
 
     .left-nav {
       display: flex;
