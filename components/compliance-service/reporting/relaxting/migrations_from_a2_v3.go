@@ -66,13 +66,13 @@ func (migratable A2V3ElasticSearchIndices) postTimeSeriesMigration(dateToMigrate
 
 	//Cannot do wild card deletion of indices in prod.. so must do the following deletions one by one.
 	indexToDelete := fmt.Sprintf("%ss-%s", a2V3IndexPrefix, dateToMigrateAsString)
-	deleteIndex(client, indexToDelete)
+	_, _, err = deleteIndex(client, indexToDelete)
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("%s error deleting index: %s", myName, indexToDelete))
 	}
 
 	indexToDelete = fmt.Sprintf("%sr-%s", a2V3IndexPrefix, dateToMigrateAsString)
-	deleteIndex(client, indexToDelete)
+	_, _, err = deleteIndex(client, indexToDelete)
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("%s error deleting index: %s", myName, indexToDelete))
 	}
