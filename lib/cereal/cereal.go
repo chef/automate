@@ -156,7 +156,6 @@ type WorkflowInstance interface {
 	// with the given parameters. Any enqueued tasks will be started
 	// after the currently running callback of the WorkflowExecutor
 	// returns.
-	// TODO (jaym): Allow passing enqueue options
 	EnqueueTask(taskName string, parameters interface{}, opts ...TaskEnqueueOpts) error
 
 	// Complete returns a decision to end execution of the workflow for
