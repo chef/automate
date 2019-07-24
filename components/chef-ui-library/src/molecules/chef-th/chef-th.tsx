@@ -1,4 +1,4 @@
-import { Component, h } from '@stencil/core';
+import { Component, Host, h } from '@stencil/core';
 
 /**
  * @description
@@ -26,15 +26,11 @@ import { Component, h } from '@stencil/core';
 })
 export class ChefTh {
 
-  hostData() {
-    return {
-      role: 'columnheader'
-    };
-  }
-
   render() {
     return (
-      <slot />
+      <Host role="columnheader">
+        <slot />
+      </Host>
     );
   }
 }
