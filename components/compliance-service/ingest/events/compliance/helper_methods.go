@@ -110,35 +110,9 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec.Profile, profilesSums [
 			}
 
 			stringTags := make([]relaxting.ESInSpecReportControlStringTags, 0)
-			for fKey, fValue := range control.Tags.Fields {
-				// Add key with a null value as an empty array for values
-				if _, isNullValue := fValue.GetKind().(*structpb.Value_NullValue); isNullValue {
-					stringTags = append(stringTags, relaxting.ESInSpecReportControlStringTags{
-						Key:    fKey,
-						Values: make([]string, 0),
-					})
-				}
-
-				// Add key with a string value
-				if _, isStringValue := fValue.GetKind().(*structpb.Value_StringValue); isStringValue {
-					stringTags = append(stringTags, relaxting.ESInSpecReportControlStringTags{
-						Key:    fKey,
-						Values: []string{fValue.GetStringValue()},
-					})
-				}
-
-				// Add key with array of string values
-				if _, isListValue := fValue.GetKind().(*structpb.Value_ListValue); isListValue {
-					stringValues := make([]string, 0)
-					for _, listValue := range fValue.GetListValue().Values {
-						if _, isStringValue := listValue.GetKind().(*structpb.Value_StringValue); isStringValue {
-							stringValues = append(stringValues, listValue.GetStringValue())
-						}
-					}
-					stringTags = append(stringTags, relaxting.ESInSpecReportControlStringTags{
-						Key:    fKey,
-						Values: stringValues,
-					})
+			for tKey, tValue := range control.Tags.Fields {
+				if newStringTag := relaxting.StringTagsFromProtoFields(tKey, tValue); newStringTag != nil {
+					stringTags = append(stringTags, *newStringTag)
 				}
 			}
 
