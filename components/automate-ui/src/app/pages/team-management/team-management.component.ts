@@ -31,6 +31,8 @@ export class TeamManagementComponent implements OnInit {
   public deleteModalVisible = false;
   public createModalVisible = false;
   public createTeamForm: FormGroup;
+  public createV1TeamForm: FormGroup;
+  public createV1TeamModalVisible = false;
   public creatingTeam = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
   public iamMajorVersion$: Observable<string>;
@@ -59,6 +61,11 @@ export class TeamManagementComponent implements OnInit {
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       id: ['',
         [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]]
+    });
+    this.createV1TeamForm = fb.group({
+      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      description: ['',
+        [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK), Validators.maxLength(64)]]
     });
   }
 
@@ -124,12 +131,17 @@ export class TeamManagementComponent implements OnInit {
       });
   }
 
-  public openCreateModal(): void {
-    this.createModalVisible = true;
+  public openCreateModal(version): void {
+    if(version === 'v1') {
+      this.createV1TeamModalVisible = true;
+    } else {
+      this.createModalVisible = true;
+    }
     this.resetCreateModal();
   }
 
   public closeCreateModal(): void {
+    this.createV1TeamModalVisible = false;
     this.createModalVisible = false;
     this.resetCreateModal();
   }
@@ -137,5 +149,6 @@ export class TeamManagementComponent implements OnInit {
   resetCreateModal(): void {
     this.creatingTeam = false;
     this.createTeamForm.reset();
+    this.createV1TeamForm.reset();
   }
 }

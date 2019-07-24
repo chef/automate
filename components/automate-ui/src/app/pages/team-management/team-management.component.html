@@ -8,6 +8,16 @@
       <chef-subheading>Chef Automate only displays local teams.</chef-subheading>
     </chef-page-header>
 
+    <app-create-v1-team-modal
+      [visible]="createV1TeamModalVisible"
+      [creating]="creatingTeam"
+      [conflictErrorEvent]="conflictErrorEvent"
+      objectNoun="team"
+      [createForm]="createV1TeamForm"
+      (close)="closeCreateModal()"
+      (createClicked)="createTeam()">
+    </app-create-v1-team-modal>
+
     <app-create-object-modal
       [visible]="createModalVisible"
       [creating]="creatingTeam"
@@ -30,7 +40,7 @@
       <section>
         <chef-toolbar>
           <app-authorized [allOf]="['/auth/teams', 'post']">
-            <chef-button primary (click)="openCreateModal()">Create Team</chef-button>
+            <chef-button *ngIf="(iamMajorVersion$ | async) as version" primary (click)="openCreateModal(version)">Create Team</chef-button>
           </app-authorized>
         </chef-toolbar>
         <div id="table-container">

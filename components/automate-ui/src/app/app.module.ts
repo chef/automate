@@ -198,6 +198,7 @@ import {
   UserTeamMembershipTableComponent
 } from './page-components/user-team-membership-table/user-team-membership-table.component';
 import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-modal.component';
+import { CreateV1TeamModalComponent } from './page-components/create-v1-team-modal/create-v1-team-modal.component';
 
 @NgModule({
   declarations: [
@@ -265,7 +266,8 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     UserTableComponent,
     UserTeamMembershipTableComponent,
     UserManagementComponent,
-    WelcomeModalComponent
+    WelcomeModalComponent,
+    CreateV1TeamModalComponent
   ],
   entryComponents: [
     DeleteNotificationDialogComponent
