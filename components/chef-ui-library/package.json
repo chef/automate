@@ -38,7 +38,7 @@
     "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
-    "@stencil/core": "^1.1.8",
+    "@stencil/core": "^1.1.9",
     "@stencil/redux": "^0.1.1",
     "@stencil/router": "^1.0.1",
     "@stencil/sass": "^1.0.1",
