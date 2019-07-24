@@ -139,6 +139,7 @@ func (s *Suite) GlobalTeardown() {
 }
 
 func (s *Suite) ingestReport(fileName string, f func(*compliance.Report)) error {
+	var err error
 	fileData, err := os.Open(fileName)
 	if err != nil {
 		return err
@@ -153,7 +154,19 @@ func (s *Suite) ingestReport(fileName string, f func(*compliance.Report)) error 
 	f(&iReport)
 
 	ctx := context.Background()
-	_, err = s.ComplianceIngestServer.ProcessComplianceReport(ctx, &iReport)
+
+	for tries := 0; tries < 3; tries++ {
+		_, err = s.ComplianceIngestServer.ProcessComplianceReport(ctx, &iReport)
+		if err == nil {
+			break
+		}
+		logrus.Infof("ingestReport failed try %d: %s", tries, err.Error())
+		_, err := s.elasticClient.Refresh().Do(context.Background())
+		if err != nil {
+			fmt.Printf("ingestReport could not 'refresh' indices.\nError: %s", err)
+			os.Exit(3)
+		}
+	}
 
 	return err
 }
@@ -250,14 +263,22 @@ func (s *Suite) WaitForESJobToComplete(esJobID string) {
 // InsertInspecReports ingests a number of reports and at the end, refreshes the report index
 func (s *Suite) InsertInspecReports(reports []*relaxting.ESInSpecReport) ([]string, error) {
 	ids := make([]string, len(reports))
-
 	endTime := time.Now()
-	// Insert reports
+
 	for i, report := range reports {
+		var err error
 		id := newUUID()
 		ids[i] = id
 
-		err := s.ingesticESClient.InsertInspecReport(context.Background(), id, endTime, report)
+		for tries := 0; tries < 3; tries++ {
+			err = s.ingesticESClient.InsertInspecReport(context.Background(), id, endTime, report)
+			if err == nil {
+				break
+			}
+			logrus.Infof("InsertInspecReports failed try %d: %s", tries, err.Error())
+			s.RefreshComplianceReportIndex()
+		}
+
 		if err != nil {
 			return nil, err
 		}
@@ -271,14 +292,22 @@ func (s *Suite) InsertInspecReports(reports []*relaxting.ESInSpecReport) ([]stri
 // InsertInspecSummaries ingests a number of summaries and at the end, refreshes the summary index
 func (s *Suite) InsertInspecSummaries(summaries []*relaxting.ESInSpecSummary) ([]string, error) {
 	ids := make([]string, len(summaries))
-
 	endTime := time.Now()
-	// Insert summaries
+
 	for i, summary := range summaries {
+		var err error
 		id := newUUID()
 		ids[i] = id
 
-		err := s.ingesticESClient.InsertInspecSummary(context.Background(), id, endTime, summary)
+		for tries := 0; tries < 3; tries++ {
+			err = s.ingesticESClient.InsertInspecSummary(context.Background(), id, endTime, summary)
+			if err == nil {
+				break
+			}
+			logrus.Infof("InsertInspecSummaries failed try %d: %s", tries, err.Error())
+			s.RefreshComplianceSummaryIndex()
+		}
+
 		if err != nil {
 			return nil, err
 		}
