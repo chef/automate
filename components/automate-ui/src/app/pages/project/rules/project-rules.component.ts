@@ -156,9 +156,9 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     return (i + 1) < conditions.length;
   }
 
-  showDelete(i: number): boolean {
+  showDelete(): boolean {
     const conditions = this.ruleForm.get('conditions') as FormArray;
-    return (i + 1) < conditions.length;
+    return conditions.length > 1;
   }
 
   populateConditions() {

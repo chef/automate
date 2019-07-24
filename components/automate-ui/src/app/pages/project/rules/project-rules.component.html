@@ -104,7 +104,7 @@
               <label>
                 <span *ngIf="showAndLabel(i)" class="label">AND</span>
               </label>
-              <chef-button tertiary *ngIf="showDelete(i)" (click)="deleteCondition(i)">
+              <chef-button tertiary *ngIf="showDelete()" (click)="deleteCondition(i)">
                 <chef-icon>delete</chef-icon>
               </chef-button>
             </chef-form-field>

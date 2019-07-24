@@ -205,20 +205,19 @@ describe('ProjectRulesComponent', () => {
     });
 
     it('should not show delete button with one condition', () => {
-      const showDelete = component.showDelete(0);
+      const showDelete = component.showDelete();
       expect(showDelete).toBeFalsy();
     });
 
-    it('should show "and" label with two conditions', () => {
+    it('should show just one "and" label with two conditions', () => {
       component.addCondition();
-      const showAndLabel = component.showAndLabel(0);
-      expect(showAndLabel).toBeTruthy();
+      expect(component.showAndLabel(0)).toBeTruthy();
+      expect(component.showAndLabel(1)).toBeFalsy();
     });
 
-    it('should show delete button with two conditions', () => {
+    it('should show two delete buttons with two conditions', () => {
       component.addCondition();
-      const showDelete = component.showDelete(0);
-      expect(showDelete).toBeTruthy();
+      expect(component.showDelete()).toBeTruthy();
     });
   });
 });
