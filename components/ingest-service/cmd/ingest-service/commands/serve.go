@@ -77,6 +77,8 @@ func readCliParams() *serveropts.Opts {
 		RestPort:                      viper.GetInt("rest-port"),
 		ElasticSearchUrl:              viper.GetString("elasticsearch-url"),
 		EsSidecarAddress:              viper.GetString("es-sidecar-address"),
+		PGURL:                         viper.GetString("postgresql-url"),
+		PGDatabase:                    viper.GetString("postgresql-database"),
 		AuthzAddress:                  viper.GetString("authz-address"),
 		EventAddress:                  viper.GetString("event-address"),
 		NodeManagerAddress:            viper.GetString("nodemanager-address"),
@@ -106,6 +108,8 @@ func init() {
 	serveCmd.Flags().String("authz-address", "localhost:10130", "address of authz (domain:<port>)")
 	serveCmd.Flags().String("event-address", "localhost:10132", "address of event (domain:<port>)")
 	serveCmd.Flags().String("nodemanager-address", "localhost:10120", "address of nodemanager (domain:<port>)")
+	serveCmd.Flags().String("postgresql-url", "", "PG URI (postgres://host:port)")
+	serveCmd.Flags().String("postgresql-database", "chef_ingest_service", "PG Database name")
 	serveCmd.Flags().Int32("converge-history-days", -1, "Number of days to keep converge history for. A number less than or equal to 0 means data should never be deleted")
 	serveCmd.Flags().Int32("actions-days", -1, "Number of days to keep actions for. A number less than or equal to 0 means data should never be deleted")
 	serveCmd.Flags().Int("max-number-of-bundled-run-msgs", 2500, "The maximum number of run messages to bundle togeter during ingestion")

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/chef/automate/api/interservice/ingest"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
@@ -118,4 +119,7 @@ func TestMissingNodesForDeletionSchedulerModifyJobSettings(t *testing.T) {
 			assert.Equal(t, everySetting, job.Every, "job should not be running")
 		}
 	}
+
+	_, err = suite.JobSchedulerServer.ConfigureMissingNodesForDeletionScheduler(ctx, &ingest.JobSettings{Every: "15m"})
+	require.NoError(t, err)
 }

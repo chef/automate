@@ -80,22 +80,6 @@
         ]
       }
     },
-    "/job/job-scheduler/start": {
-      "post": {
-        "operationId": "StartJobScheduler",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/ingestStartJobSchedulerResponse"
-            }
-          }
-        },
-        "tags": [
-          "JobScheduler"
-        ]
-      }
-    },
     "/job/job-scheduler/status": {
       "get": {
         "operationId": "GetStatusJobScheduler",
@@ -104,22 +88,6 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/ingestJobSchedulerStatus"
-            }
-          }
-        },
-        "tags": [
-          "JobScheduler"
-        ]
-      }
-    },
-    "/job/job-scheduler/stop": {
-      "post": {
-        "operationId": "StopJobScheduler",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/ingestStopJobSchedulerResponse"
             }
           }
         },
@@ -261,9 +229,6 @@
     "ingestStartDeleteNodesSchedulerResponse": {
       "type": "object"
     },
-    "ingestStartJobSchedulerResponse": {
-      "type": "object"
-    },
     "ingestStartMissingNodesForDeletionSchedulerResponse": {
       "type": "object"
     },
@@ -271,9 +236,6 @@
       "type": "object"
     },
     "ingestStopDeleteNodesSchedulerResponse": {
-      "type": "object"
-    },
-    "ingestStopJobSchedulerResponse": {
       "type": "object"
     },
     "ingestStopMissingNodesForDeletionSchedulerResponse": {

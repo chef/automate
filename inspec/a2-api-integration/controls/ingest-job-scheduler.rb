@@ -93,6 +93,7 @@ control 'ingest-job-scheduler' do
           ).http_status
         ).to eq 200
 
+        sleep 10
         # wait for elastic search to update
         refresh_elasticsearch()
 
@@ -243,16 +244,16 @@ control 'ingest-job-scheduler' do
                 request_body: config.to_json,
               ).http_status
             ).to eq 200
-    
+
             job_scheduler_status = automate_api_request(
               job_scheduler_status_endpoint,
               http_method: 'GET',
             )
             expect(job_scheduler_status.http_status).to eq 200
-    
+
             job_status = job_scheduler_status
               .parsed_response_body[:jobs].select {|j| j[:name] == job[:name]}.first
-    
+
             expect(job_status[:running]).to eq(config[:running])
             expect(job_status[:every]).to eq(config[:every])
             expect(job_status[:threshold]).to eq(config[:threshold])

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc/reflection"
@@ -21,6 +23,9 @@ import (
 	"github.com/chef/automate/components/ingest-service/server"
 	"github.com/chef/automate/components/ingest-service/serveropts"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
+	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/postgres"
+	"github.com/chef/automate/lib/platform"
 )
 
 // Spawn starts a gRPC Server listening on the provided host and port,
@@ -130,21 +135,43 @@ func Spawn(opts *serveropts.Opts) error {
 	// Pass the chef ingest server to give status about the pipelines
 	ingestStatus.SetChefIngestServer(chefIngest)
 
-	// JobScheduler
-	// Create a job scheduler so we can triggers jobs like mark
-	// nodes as missing on a specific threshold every minute
-	jobScheduler := server.NewJobScheduler()
-	defer jobScheduler.Close()
+	pgURL, err := pgURL(opts.PGURL, opts.PGDatabase)
+	if err != nil {
+		log.WithError(err).Fatal("could not get PG URL")
+	}
 
+	jobManager, err := cereal.NewManager(postgres.NewPostgresBackend(pgURL))
+	if err != nil {
+		logrus.WithError(err).Fatal("could not create job manager")
+	}
+	defer jobManager.Stop()
+
+	err = server.InitializeJobManager(jobManager, client)
+	if err != nil {
+		logrus.WithError(err).Fatal("could not initialze job manager")
+	}
+
+	err = server.MigrateJobsSchedule(jobManager, viper.ConfigFileUsed())
+	if err != nil {
+		logrus.WithError(err).Fatal("could not migrate old job schedules")
+	}
+
+	err = jobManager.Start(context.Background())
+	if err != nil {
+		logrus.WithError(err).Fatal("could not start job manager")
+	}
+
+	// JobSchedulerServer
+	jobSchedulerServer := server.NewJobSchedulerServer(client, jobManager)
+	ingest.RegisterJobSchedulerServer(grpcServer, jobSchedulerServer)
+
+	// TODO(ssd) 2019-05-15: The projectUpdater process still uses
+	// the config manager.
 	configManager, err := config.NewManager(viper.ConfigFileUsed())
 	if err != nil {
 		return err
 	}
 	defer configManager.Close()
-
-	// JobSchedulerServer
-	jobSchedulerServer := server.NewJobSchedulerServer(client, jobScheduler, configManager)
-	ingest.RegisterJobSchedulerServer(grpcServer, jobSchedulerServer)
 
 	// EventHandler
 	eventHandlerServer := server.NewAutomateEventHandlerServer(client, *chefIngest,
@@ -181,4 +208,15 @@ func Spawn(opts *serveropts.Opts) error {
 	reflection.Register(grpcServer)
 
 	return grpcServer.Serve(conn)
+}
+
+func pgURL(pgURL string, pgDBName string) (string, error) {
+	if pgURL == "" {
+		var err error
+		pgURL, err = platform.PGURIFromEnvironment(pgDBName)
+		if err != nil {
+			return "", errors.Wrap(err, "Failed to get pg uri")
+		}
+	}
+	return pgURL, nil
 }

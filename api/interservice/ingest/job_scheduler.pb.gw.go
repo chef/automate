@@ -28,24 +28,6 @@ var _ status.Status
 var _ = runtime.String
 var _ = utilities.NewDoubleArray
 
-func request_JobScheduler_StartJobScheduler_0(ctx context.Context, marshaler runtime.Marshaler, client JobSchedulerClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq StartJobSchedulerRequest
-	var metadata runtime.ServerMetadata
-
-	msg, err := client.StartJobScheduler(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-
-}
-
-func request_JobScheduler_StopJobScheduler_0(ctx context.Context, marshaler runtime.Marshaler, client JobSchedulerClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq StopJobSchedulerRequest
-	var metadata runtime.ServerMetadata
-
-	msg, err := client.StopJobScheduler(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-
-}
-
 func request_JobScheduler_GetStatusJobScheduler_0(ctx context.Context, marshaler runtime.Marshaler, client JobSchedulerClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq JobSchedulerStatusRequest
 	var metadata runtime.ServerMetadata
@@ -186,46 +168,6 @@ func RegisterJobSchedulerHandler(ctx context.Context, mux *runtime.ServeMux, con
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "JobSchedulerClient" to call the correct interceptors.
 func RegisterJobSchedulerHandlerClient(ctx context.Context, mux *runtime.ServeMux, client JobSchedulerClient) error {
-
-	mux.Handle("POST", pattern_JobScheduler_StartJobScheduler_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_JobScheduler_StartJobScheduler_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_JobScheduler_StartJobScheduler_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
-	mux.Handle("POST", pattern_JobScheduler_StopJobScheduler_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_JobScheduler_StopJobScheduler_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_JobScheduler_StopJobScheduler_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
 
 	mux.Handle("GET", pattern_JobScheduler_GetStatusJobScheduler_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
@@ -411,10 +353,6 @@ func RegisterJobSchedulerHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_JobScheduler_StartJobScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "job-scheduler", "start"}, "", runtime.AssumeColonVerbOpt(true)))
-
-	pattern_JobScheduler_StopJobScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "job-scheduler", "stop"}, "", runtime.AssumeColonVerbOpt(true)))
-
 	pattern_JobScheduler_GetStatusJobScheduler_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "job-scheduler", "status"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_JobScheduler_MarkNodesMissing_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"job", "missing-nodes", "mark-nodes-missing"}, "", runtime.AssumeColonVerbOpt(true)))
@@ -435,10 +373,6 @@ var (
 )
 
 var (
-	forward_JobScheduler_StartJobScheduler_0 = runtime.ForwardResponseMessage
-
-	forward_JobScheduler_StopJobScheduler_0 = runtime.ForwardResponseMessage
-
 	forward_JobScheduler_GetStatusJobScheduler_0 = runtime.ForwardResponseMessage
 
 	forward_JobScheduler_MarkNodesMissing_0 = runtime.ForwardResponseMessage

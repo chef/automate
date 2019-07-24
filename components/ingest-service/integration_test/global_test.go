@@ -17,6 +17,7 @@ import (
 var (
 	// The elasticsearch URL is coming from the environment variable ELASTICSEARCH_URL
 	elasticsearchUrl = os.Getenv("ELASTICSEARCH_URL")
+	postgresUrl      = os.Getenv("PG_URL")
 
 	// This suite variable will be available for every single test as long as they
 	// belong to the 'integration_test' package.

@@ -635,6 +635,8 @@ paths = [
 plan_path = "components/ingest-service"
 paths = [
   "components/ingest-service/*",
+  "api/config/platform/*",
+  "api/config/shared/*",
   "api/external/ingest/*",
   "api/interservice/authz/*",
   "api/interservice/data_lifecycle/*",
@@ -650,10 +652,14 @@ paths = [
   "components/event-service/*",
   "components/nodemanager-service/*",
   "lib/authz/*",
+  "lib/cereal/*",
   "lib/config/*",
   "lib/event/*",
   "lib/grpc/*",
   "lib/io/*",
+  "lib/platform/*",
+  "lib/proc/*",
+  "lib/proxy/*",
   "lib/stringutils/*",
   "lib/tls/*",
   "lib/tracing/*",
