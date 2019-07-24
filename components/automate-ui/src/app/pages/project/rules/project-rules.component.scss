@@ -26,9 +26,28 @@ chef-page {
     max-width: 340px;
   }
 
+  #create-name {
+    padding-top: 9px;
+  }
+
+  #create-type {
+    padding-top: 26px;
+  }
+
+  #add-condition {
+    padding-top: 7px;
+  }
+
+  .label {
+    font-size: 14px;
+    font-weight: 600;
+    padding-bottom: 0;
+  }
+
   chef-form-field {
-    .label {
-      font-size: 16px;
+
+    label {
+      padding-bottom: 0;
     }
 
     &.attribute-field {
@@ -60,7 +79,8 @@ chef-page {
       .label {
         color: $chef-dark-grey;
         text-transform: uppercase;
-        font-weight: 100;
+        font-size: 12px;
+        font-weight: 200;
       }
 
       chef-select,
@@ -77,6 +97,7 @@ chef-page {
 
     small {
       display: block;
+      font-size: 12px;
     }
 
     chef-button {

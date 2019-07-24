@@ -13,7 +13,7 @@
 
         <chef-form-field id="create-name">
           <label>
-            <span class="label">Rule Name</span>
+            <span class="label">Rule Name <span aria-hidden="true">*</span></span>
             <chef-input ngDefaultControl formControlName="name"></chef-input>
           </label>
           <chef-error
@@ -23,7 +23,7 @@
 
         <chef-form-field id="create-type">
           <label>
-            <span class="label">Resource Type</span>
+            <span class="label">Resource Type <span aria-hidden="true">*</span></span>
             <select id="create-type-dropdown" ngDefaultControl formControlName="type">
               <option value='NODE'>Node</option>
               <option value='EVENT'>Event</option>
