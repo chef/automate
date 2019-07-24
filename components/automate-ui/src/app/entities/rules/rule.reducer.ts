@@ -4,10 +4,10 @@ import { set, pipe, unset } from 'lodash/fp';
 
 import { EntityStatus } from 'app/entities/entities';
 import { RuleActionTypes, RuleActions } from './rule.actions';
-import { Rule } from './rule.model';
+import { Rule, RuleTypeMappedObject } from './rule.model';
 
 export interface RuleEntityState extends EntityState<Rule> {
-  getAttributes: any;
+  getAttributes: RuleTypeMappedObject;
   getAllStatus: EntityStatus;
   getStatus: EntityStatus;
   createStatus: EntityStatus;
@@ -23,7 +23,7 @@ const CREATE_ERROR = 'createError';
 const DELETE_STATUS = 'deleteStatus';
 const UPDATE_STATUS = 'updateStatus';
 
-export const ruleAttributes = {
+export const ruleAttributes: RuleTypeMappedObject = {
   node: [
     {
       key: 'CHEF_ORGS',

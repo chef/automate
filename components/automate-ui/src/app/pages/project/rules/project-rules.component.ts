@@ -10,7 +10,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
 import { EntityStatus, loading } from 'app/entities/entities';
 import { Regex } from 'app/helpers/auth/regex';
-import { Rule } from 'app/entities/rules/rule.model';
+import { Rule, RuleTypeMappedObject } from 'app/entities/rules/rule.model';
 import {
   GetRule,
   GetRulesForProject,
@@ -37,10 +37,10 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   public ruleId: string;
   public ruleForm: FormGroup;
   public rule: Rule = <Rule>{};
-  public conditions: any[];
+  public conditions: FormGroup[];
   public isLoading = true;
   public saving = false;
-  public attributes: object;
+  public attributes: RuleTypeMappedObject;
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
   constructor(
