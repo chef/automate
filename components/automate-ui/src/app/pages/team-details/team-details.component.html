@@ -62,7 +62,8 @@
       <section class="page-body">
         <form [formGroup]="updateNameForm">
           <chef-form-field>
-            <label>Name *</label>
+            <label *ngIf="isV1">Description *</label>
+            <label *ngIf="!isV1">Name *</label>
             <input chefInput formControlName="name" type="text" (keyup)="handleNameChange()">
           </chef-form-field>
         </form>

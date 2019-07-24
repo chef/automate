@@ -45,7 +45,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public url: string;
   public teamMembershipView = false;
   public team: Team;
-  private isV1 = true;
+  public isV1 = true;
 
   public sortedUsers$: Observable<User[]>;
   private isDestroyed = new Subject<boolean>();

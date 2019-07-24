@@ -65,7 +65,12 @@ export class TeamManagementComponent implements OnInit {
     this.createV1TeamForm = fb.group({
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       description: ['',
-        [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK), Validators.maxLength(64)]]
+        [
+          Validators.required,
+          Validators.pattern(Regex.patterns.NON_BLANK),
+          Validators.maxLength(64)
+        ]
+      ]
     });
   }
 
@@ -176,7 +181,7 @@ export class TeamManagementComponent implements OnInit {
   }
 
   public openCreateModal(version): void {
-    if(version === 'v1') {
+    if (version === 'v1') {
       this.createV1TeamModalVisible = true;
     } else {
       this.createModalVisible = true;

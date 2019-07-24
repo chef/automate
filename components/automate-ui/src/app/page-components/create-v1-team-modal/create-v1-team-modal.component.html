@@ -15,6 +15,7 @@
             </chef-error>
             <chef-error *ngIf="conflictError">
               Name must be unique-- Team with name "{{createForm?.controls['name'].value}}" already exists.
+            </chef-error>
           </chef-form-field>
         </div>
         <div class="margin">
@@ -23,12 +24,12 @@
               <span class="label">Description
                 <span aria-hidden="true">*</span>
               </span>
-              <input chefInput formControlName="description" type="text" (keyup)="handleDescriptionInput($event)" id="id-input">
+              <input chefInput formControlName="description" type="text" (keyup)="handleDescriptionInput($event)">
             </label>
             <chef-error *ngIf="createForm?.controls['description'].hasError('maxlength')">
               Description must be 64 characters or less.
             </chef-error>
-            <chef-error *ngIf="createForm?.controls['description'].hasError('required') && createForm.get('name').dirty">
+            <chef-error *ngIf="createForm?.controls['description'].hasError('required') && createForm.get('description').dirty">
               Description is required.
             </chef-error>
           </chef-form-field>

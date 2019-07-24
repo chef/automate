@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { IdMapper } from 'app/helpers/auth/id-mapper';
 
 @Component({
   selector: 'app-create-v1-team-modal',
