@@ -375,6 +375,11 @@ func (s *Suite) DeleteAllDocuments() {
 			Do(context.Background())
 
 		if err != nil {
+			_, err := s.elasticClient.Refresh().Do(context.Background())
+			if err != nil {
+				fmt.Printf("Could not 'refresh' indices.\nError: %s", err)
+				os.Exit(3)
+			}
 			continue
 		}
 
