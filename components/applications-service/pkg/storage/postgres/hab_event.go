@@ -172,6 +172,21 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 	return err
 }
 
+type deploymentServiceGroup struct {
+	ServiceGroupID   int32  `db:"service_group_id"`
+	DeploymentID     int32  `db:"deployment_id"`
+	ServiceGroupName string `db:"sg_name"`
+	AppName          string `db:"app_name"`
+	Environment      string `db:"environment"`
+}
+
+const selectMatchingDeploymentAndSG = `
+SELECT sg.id AS service_group_id, d.id AS deployment_id, sg.name AS sg_name, d.app_name, d.environment
+  FROM service_group AS sg
+  JOIN deployment AS d ON sg.deployment_id = d.id
+ WHERE sg.name = $1 AND d.app_name = $2 AND d.environment = $3;
+`
+
 func (db *Postgres) updateTables(
 	svc *service,
 	eventMetadata *habitat.EventMetadata,
@@ -179,36 +194,113 @@ func (db *Postgres) updateTables(
 	pkgIdent *packageIdent,
 	health string) error {
 
-	db.updateService(svc, eventMetadata, svcMetadata, pkgIdent, health)
+	// The deployment and service group may have changed. When this happens, we
+	// don't want to _edit_ the deployment or service_group because other
+	// services could still belong to those and be unchanged, so if we change the
+	// values then the two services will get into an edit war.
+	//
+	// First, we look for a deploymentServiceGroup (joined deployment and
+	// service_group) that matches the metadata we were given in the hab event.
+	// If we find one, then we set the service's group_id and deployment_id to
+	// the one we found. This will correctly handle the case where a service is
+	// in the same service group and deployment as it is now, or the case that
+	// the service was "moved" to a different deployment and service group that
+	// already exist.
+	//
+	// If there is no existing deploymentServiceGroup that matches the metadata,
+	// then the service has been moved to a new deployment/service group. In that
+	// case, we need to create them.
+	// After that, we need to check if the old deployment and service group have
+	// no more related services, and delete them if so.
+	var existingDSG deploymentServiceGroup
+	err := db.DbMap.SelectOne(&existingDSG, selectMatchingDeploymentAndSG,
+		svcMetadata.GetServiceGroup(),
+		eventMetadata.GetApplication(),
+		eventMetadata.GetEnvironment(),
+	)
 
-	deploy, err := db.getDeployment(svc.DeploymentID)
-	if err != nil {
-		return errors.Wrap(err, "unable to update tables")
+	// When the service belongs to a deployment+service_group that exist (either
+	// the same one as before, or a different one):
+	if err == nil {
+		// The service could be in the same service_group and deployment as it was
+		// before, but it could also be in a new one.
+		// TODO/FIXME: updateService needs to adjust the deployment_id and group_id
+		// for the second case.
+		db.updateService(svc, eventMetadata, svcMetadata, pkgIdent, health, existingDSG)
+		if _, err := db.DbMap.Update(svc); err != nil {
+			return errors.Wrap(err, "unable to update service")
+		}
 	}
-	db.updateDeployment(deploy, eventMetadata)
 
-	sup, err := db.getSupervisor(svc.SupID)
-	if err != nil {
-		return errors.Wrap(err, "unable to update tables")
-	}
-	db.updateSupervisor(sup, eventMetadata)
+	return dblib.Transaction(db.DbMap, func(tx *gorp.Transaction) error {
 
-	sg, err := db.getServiceGroup(svc.GroupID)
-	if err != nil {
-		return errors.Wrap(err, "unable to update tables")
-	}
-	db.updateServiceGroup(sg, svcMetadata)
+		// oldDID := svc.DeploymentID
+		// oldGID := svc.GroupID
 
-	// @afiune in the future if we have more tables that might need
-	// to be updated, we will just add them to this map of tables
-	tables := map[string]dbTable{
-		"service":       svc,
-		"deployment":    deploy,
-		"supervisor":    sup,
-		"service_group": sg,
-	}
+		deploy := &deployment{
+			AppName:     eventMetadata.GetApplication(),
+			Environment: eventMetadata.GetEnvironment(),
+		}
+		if err := tx.Insert(deploy); err != nil {
+			return errors.Wrap(err, "Unable to insert deployment")
+		}
+		did := deploy.ID
 
-	return db.triggerDataUpdates(tables)
+		svcGroup := &serviceGroup{
+			Name:         svcMetadata.GetServiceGroup(),
+			DeploymentID: did,
+		}
+		if err := tx.Insert(svcGroup); err != nil {
+			return errors.Wrap(err, "Unable to insert service_group")
+		}
+		gid := svcGroup.ID
+
+		newDSG := deploymentServiceGroup{
+			DeploymentID:   did,
+			ServiceGroupID: gid,
+		}
+
+		db.updateService(svc, eventMetadata, svcMetadata, pkgIdent, health, newDSG)
+
+		if _, err := tx.Update(svc); err != nil {
+			return errors.Wrap(err, "Unable to update service")
+		}
+
+		// TODO/FIXME: delete the old service_group and/or deployment if they are now empty
+		// Add tests for that
+
+		return nil
+	})
+
+	/////////// old code /////////
+	// deploy, err := db.getDeployment(svc.DeploymentID)
+	// if err != nil {
+	// 	return errors.Wrap(err, "unable to update tables")
+	// }
+	// db.updateDeployment(deploy, eventMetadata)
+
+	// sup, err := db.getSupervisor(svc.SupID)
+	// if err != nil {
+	// 	return errors.Wrap(err, "unable to update tables")
+	// }
+	// db.updateSupervisor(sup, eventMetadata)
+
+	// sg, err := db.getServiceGroup(svc.GroupID)
+	// if err != nil {
+	// 	return errors.Wrap(err, "unable to update tables")
+	// }
+	// db.updateServiceGroup(sg, svcMetadata)
+
+	// // @afiune in the future if we have more tables that might need
+	// // to be updated, we will just add them to this map of tables
+	// tables := map[string]dbTable{
+	// 	"service":       svc,
+	// 	"deployment":    deploy,
+	// 	"supervisor":    sup,
+	// 	"service_group": sg,
+	// }
+
+	// return db.triggerDataUpdates(tables)
 }
 
 // triggerDataUpdates receives all the data that might need to be updated
@@ -313,7 +405,9 @@ func (db *Postgres) updateService(
 	eventMetadata *habitat.EventMetadata,
 	svcMetadata *habitat.ServiceMetadata,
 	pkgIdent *packageIdent,
-	health string) {
+	health string,
+	dsg deploymentServiceGroup,
+) {
 
 	// Verify if the service health changed, if so, save the current health
 	// into the previous_health and update it with the new one
@@ -335,6 +429,10 @@ func (db *Postgres) updateService(
 
 	// Update Channel
 	updateServiceStrategyAndChannel(svc, svcMetadata.GetUpdateConfig())
+
+	// Update relations to Deployment and ServiceGroup
+	svc.DeploymentID = dsg.DeploymentID
+	svc.GroupID = dsg.ServiceGroupID
 
 	// update always the timestamp of the last event received so that the database
 	// has a record of when the last message was received for a service
@@ -398,7 +496,6 @@ func (db *Postgres) insertNewService(
 		// FIXME that's your problem right there :P
 		// we need to find service group by name and deployment id (done)
 		// TODO after this:
-		// * undo the view changes, retest to make sure all that still works
 		// * regression test
 		// * see how it behaves when running with existing bad data
 		// * does updateService work? (seems to, but be more systematic)

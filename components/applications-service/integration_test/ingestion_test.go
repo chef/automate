@@ -6,6 +6,7 @@
 package integration_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -671,4 +672,61 @@ func TestIngestConcurrencySafe(t *testing.T) {
 	assert.Equal(t, messageNumber, int64(len(svcList)))
 	assert.Equal(t, messageNumber, suite.Ingester.EventsProcessed())
 	assert.Equal(t, messageNumber, suite.Ingester.EventsSuccessful())
+}
+
+func TestNewSgAndDeploymentUpdate(t *testing.T) {
+	defer suite.DeleteDataFromStorage()
+	suite.Ingester.ResetStats()
+
+	eventsProcessed := suite.Ingester.EventsProcessed()
+	event1 := NewHabitatEvent(
+		withSupervisorId("1"),
+		withPackageIdent("core/db/0.1.0/20200101121212"),
+		withServiceGroup("db.default"),
+	)
+	bytes1, err := proto.Marshal(event1)
+	require.NoError(t, err)
+	suite.Ingester.IngestMessage(bytes1)
+	eventsProcessed++
+
+	event2 := NewHabitatEvent(
+		withSupervisorId("2"),
+		withPackageIdent("core/db/0.1.0/20200101121212"),
+		withServiceGroup("db.default"),
+	)
+	bytes2, err := proto.Marshal(event2)
+	require.NoError(t, err)
+	suite.Ingester.IngestMessage(bytes2)
+	eventsProcessed++
+	suite.WaitForEventsToProcess(eventsProcessed)
+
+	// TODO: replace printf with test to assert we have 2 services w/ 2 supervisors in 1 service group in 1 deployment
+	svcList, err := suite.StorageClient.GetServices("name", true, 1, 5, nil)
+	require.NoError(t, err)
+	for _, svc := range svcList {
+		fmt.Printf("%+v\n", svc)
+	}
+
+	fmt.Println("-----------------------------")
+
+	// event3 changes the app_name and environment of the service from event 2
+	event3 := NewHabitatEvent(
+		withSupervisorId("2"),
+		withPackageIdent("core/db/0.1.0/20200101121212"),
+		withServiceGroup("db.default"),
+		withApplication("newApp"),
+		withEnvironment("newEnv"),
+	)
+	bytes3, err := proto.Marshal(event3)
+	require.NoError(t, err)
+	suite.Ingester.IngestMessage(bytes3)
+	eventsProcessed++
+	suite.WaitForEventsToProcess(eventsProcessed)
+
+	// TODO: replace printf with test to assert we have 2 services w/ 2 supervisors in 2 service groups in 2 deployments
+	svcList, err = suite.StorageClient.GetServices("name", true, 1, 5, nil)
+	require.NoError(t, err)
+	for _, svc := range svcList {
+		fmt.Printf("%+v\n", svc)
+	}
 }
