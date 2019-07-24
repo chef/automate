@@ -20,6 +20,12 @@ do_build() {
 }
 
 do_deploy() {
+    # We read chef-server-ctl directly from /opt/opscode/bin because automate
+    # has its own chef-server-ctl that can overwrite the original. This happens
+    # when bin and usr/bin are the same directory and thus migrations will fail.
+    mkdir -p /opt/opscode/bin/
+    cp "$A2_ROOT_DIR/components/automate-deployment/bin/linux/chef-server-ctl" /opt/opscode/bin/
+
     #shellcheck disable=SC2154
     chef-automate migrate-from-v1 "$test_config_path" \
         --hartifacts "$test_hartifacts_path" \

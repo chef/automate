@@ -123,7 +123,7 @@ func SystemCtlIsEnabledChefServer() bool {
 // ChefServerCtlStop stops all Chef Server services via
 // chef-server-ctl.
 func ChefServerCtlStop() error {
-	return defaultCommandExecutor.Run("chef-server-ctl",
+	return defaultCommandExecutor.Run("/opt/opscode/bin/chef-server-ctl",
 		command.Args("stop"),
 		command.Timeout(automateCtlTimeout))
 }
@@ -131,7 +131,7 @@ func ChefServerCtlStop() error {
 // ChefServerCtlStopService stops the given service using
 // chef-server-ctl.
 func ChefServerCtlStopService(svcName string) error {
-	return defaultCommandExecutor.Run("chef-server-ctl",
+	return defaultCommandExecutor.Run("/opt/opscode/bin/chef-server-ctl",
 		command.Args("stop", svcName),
 		command.Timeout(automateCtlTimeout))
 }
