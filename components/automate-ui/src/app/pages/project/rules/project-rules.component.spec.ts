@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormArray, FormGroup } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 import * as faker from 'faker';
@@ -198,6 +198,64 @@ describe('ProjectRulesComponent', () => {
       expect(attributeLabel)
         .toBe('event attribute'); // specifically should be lowercase for screen reader
     });
+
+
+    it('converts string to array when switching from equals to member-of', () => {
+      component.ruleForm.get('conditions').setValue([
+        {
+          attribute: 'CHEF_ORGS',
+          operator: 'EQUAL',
+          values: '   one,two,    three   '
+        }
+      ]);
+      const condition = <FormGroup>(<FormArray>component.ruleForm.controls.conditions).controls[0];
+      condition.controls.operator.setValue('MEMBER_OF');
+      component.updateConditionValues(condition);
+      expect(condition.controls.values.value).toEqual(['one', 'two', 'three']);
+    });
+
+    it('converts array to string when switching from member-of to equals', () => {
+      component.ruleForm.get('conditions').setValue([
+        {
+          attribute: 'CHEF_ORGS',
+          operator: 'MEMBER_OF',
+          values: ['one', 'two', 'three']
+        }
+      ]);
+      const condition = <FormGroup>(<FormArray>component.ruleForm.controls.conditions).controls[0];
+      condition.controls.operator.setValue('EQUALS');
+      component.updateConditionValues(condition);
+      expect(condition.controls.values.value).toEqual('one, two, three');
+    });
+
+      it('leaves array unchanged when switching from member-of to member-of', () => {
+      component.ruleForm.get('conditions').setValue([
+        {
+          attribute: 'CHEF_ORGS',
+          operator: 'MEMBER_OF',
+          values: ['one', 'two', 'three']
+        }
+      ]);
+      const condition = <FormGroup>(<FormArray>component.ruleForm.controls.conditions).controls[0];
+      condition.controls.operator.setValue('MEMBER_OF');
+      component.updateConditionValues(condition);
+      expect(condition.controls.values.value).toEqual(['one', 'two', 'three']);
+    });
+
+    it('leaves string unchanged when switching from equals to equals', () => {
+      component.ruleForm.get('conditions').setValue([
+        {
+          attribute: 'CHEF_ORGS',
+          operator: 'EQUAL',
+          values: '   one,two,    three   '
+        }
+      ]);
+      const condition = <FormGroup>(<FormArray>component.ruleForm.controls.conditions).controls[0];
+      condition.controls.operator.setValue('EQUALS');
+      component.updateConditionValues(condition);
+      expect(condition.controls.values.value).toEqual('   one,two,    three   ');
+    });
+
 
     it('should not show "and" label with one condition', () => {
       const showAndLabel = component.showAndLabel(0);

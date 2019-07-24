@@ -175,21 +175,21 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     return this.conditions;
   }
 
-  updateConditionValues(condition): void {
+  updateConditionValues(condition: FormGroup): void {
     if (condition.controls.operator.value === 'MEMBER_OF') {
-      condition.controls.values.value =
+      condition.controls.values.setValue(
         (typeof condition.controls.values.value === 'string')
-          ? [condition.controls.values.value]
-          : condition.controls.values.value.split(',').map((v) => v.trim());
+        ? condition.controls.values.value.split(/,\s*/).map((v: string) => v.trim())
+        : condition.controls.values.value) ;
     } else {
-      condition.controls.values.value =
+      condition.controls.values.setValue(
         (typeof condition.controls.values.value === 'string')
           ? condition.controls.values.value
-          : condition.controls.values.value.join(' ');
+          : condition.controls.values.value.join(', '));
     }
   }
 
-  getConditionValue(value): string {
+  getConditionValue(value: string | string[]): string {
     return (typeof value === 'string') ? value : value.join(', ');
   }
 
