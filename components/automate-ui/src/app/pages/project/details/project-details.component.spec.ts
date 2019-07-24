@@ -11,7 +11,7 @@ import { IAMType } from 'app/entities/policies/policy.model';
 import { GetProjectSuccess } from 'app/entities/projects/project.actions';
 import { GetRulesSuccess } from 'app/entities/rules/rule.actions';
 import { projectEntityReducer } from 'app/entities/projects/project.reducer';
-import { ProjectDetailsComponent, ProjectTabNames } from './project-details.component';
+import { ProjectDetailsComponent, ProjectTabNames, RuleStatus } from './project-details.component';
 
 describe('ProjectDetailsComponent', () => {
   let component: ProjectDetailsComponent;
@@ -27,7 +27,7 @@ describe('ProjectDetailsComponent', () => {
       project_id: 'uuid-1',
       name: 'Rule 1',
       type: 'NODE',
-      edits: 'staging',
+      status: RuleStatus.Staged,
       conditions: [
         {
           attribute: 'CHEF_ORGS',
@@ -41,7 +41,7 @@ describe('ProjectDetailsComponent', () => {
       project_id: 'uuid-1',
       name: 'Rule 2',
       type: 'EVENT',
-      edits: 'applied',
+      status: RuleStatus.Applied,
       conditions: [
         {
           attribute: 'CHEF_ORGS',

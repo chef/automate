@@ -42,7 +42,7 @@ export class RuleRequests {
     //   { rule });
     rule.id = `rule-${this.rules.length}`;
     rule.project_id = project_id;
-    rule.edits = 'staging';
+    rule.status = 'staged';
     this.rules.push(rule);
     return of({ rule: rule });
   }

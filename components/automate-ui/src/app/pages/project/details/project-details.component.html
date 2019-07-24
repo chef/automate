@@ -79,7 +79,7 @@
                 </chef-td>
                 <chef-td>{{ rule.type | titlecase }}</chef-td>
                 <chef-td>{{ rule.conditions.length | pluralize : 'condition' : 's' }}</chef-td>
-                <chef-td>{{ getEditStatus(rule.edits) }}</chef-td>
+                <chef-td>{{ getEditStatus(rule) }}</chef-td>
                 <chef-td class="controls">
                   <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project?.id]">
                     <chef-control-menu>

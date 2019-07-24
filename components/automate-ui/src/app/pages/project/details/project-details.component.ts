@@ -3,8 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
-import { identity } from 'lodash/fp';
-import { find as _find } from 'lodash';
+import { identity, find } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
@@ -24,6 +23,11 @@ import {
 export enum ProjectTabNames {
   Rules = 'rules',
   Details = 'details'
+}
+
+export enum RuleStatus {
+  Applied = 'applied',
+  Staged = 'staged'
 }
 
 @Component({
@@ -134,10 +138,8 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     this.closeDeleteModal();
   }
 
-  getEditStatus(status: string): string {
-    return status === 'staging'
-      ? 'Edits pending'
-      : 'Applied';
+  getEditStatus(rule: Rule): string {
+    return rule.status === RuleStatus.Staged ? 'Edits pending' : 'Applied';
   }
 
   showDeleteRule(rule: Rule): boolean {
@@ -145,7 +147,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   }
 
   showProjectLink(): boolean {
-    return _find(this.rules, ['edits', 'staging']) ? true : false;
+    return find(['status', RuleStatus.Staged], this.rules) ? true : false;
   }
 
   saveProject() {

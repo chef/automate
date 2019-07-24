@@ -3,7 +3,7 @@ export interface Rule {
   project_id?: string;
   name: string;
   type: string;
-  edits: string;
+  status: string;
   conditions: Condition[];
 }
 
