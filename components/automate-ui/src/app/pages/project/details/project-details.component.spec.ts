@@ -9,9 +9,9 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { IAMType } from 'app/entities/policies/policy.model';
 import { GetProjectSuccess } from 'app/entities/projects/project.actions';
-import { GetRulesSuccess } from 'app/entities/rules/rule.actions';
 import { projectEntityReducer } from 'app/entities/projects/project.reducer';
-import { ProjectDetailsComponent, ProjectTabNames, RuleStatus } from './project-details.component';
+import { Rule } from 'app/entities/rules/rule.model';
+import { ProjectDetailsComponent, ProjectTabNames } from './project-details.component';
 
 describe('ProjectDetailsComponent', () => {
   let component: ProjectDetailsComponent;
@@ -22,12 +22,12 @@ describe('ProjectDetailsComponent', () => {
     type: <IAMType>'CHEF_MANAGED'
   };
   const rules = [
-    {
+    <Rule>{
       id: 'rule-1',
       project_id: 'uuid-1',
       name: 'Rule 1',
       type: 'NODE',
-      status: RuleStatus.Staged,
+      status: 'staged',
       conditions: [
         {
           attribute: 'CHEF_ORGS',
@@ -36,12 +36,12 @@ describe('ProjectDetailsComponent', () => {
         }
       ]
     },
-    {
+    <Rule>{
       id: 'rule-2',
       project_id: 'uuid-1',
       name: 'Rule 2',
       type: 'EVENT',
-      status: RuleStatus.Applied,
+      status: 'applied',
       conditions: [
         {
           attribute: 'CHEF_ORGS',

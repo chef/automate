@@ -15,7 +15,7 @@ import {
 import { Project } from 'app/entities/projects/project.model';
 import { GetProject, UpdateProject } from 'app/entities/projects/project.actions';
 import { GetRulesForProject, DeleteRule } from 'app/entities/rules/rule.actions';
-import { Rule } from 'app/entities/rules/rule.model';
+import { Rule, RuleStatus } from 'app/entities/rules/rule.model';
 import {
   allRules
 } from 'app/entities/rules/rule.selectors';
@@ -23,11 +23,6 @@ import {
 export enum ProjectTabNames {
   Rules = 'rules',
   Details = 'details'
-}
-
-export enum RuleStatus {
-  Applied = 'applied',
-  Staged = 'staged'
 }
 
 @Component({
@@ -139,7 +134,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   }
 
   getEditStatus(rule: Rule): string {
-    return rule.status === RuleStatus.Staged ? 'Edits pending' : 'Applied';
+    return rule.status === 'staged' ? 'Edits pending' : 'Applied';
   }
 
   showDeleteRule(): boolean {
@@ -147,7 +142,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   }
 
   showProjectLink(): boolean {
-    return find(['status', RuleStatus.Staged], this.rules) ? true : false;
+    return find(['status', <RuleStatus>'staged'], this.rules) ? true : false;
   }
 
   saveProject() {

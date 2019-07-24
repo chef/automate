@@ -1,9 +1,11 @@
+export type RuleStatus = 'applied' | 'staged';
+
 export interface Rule {
   id?: string;
   project_id?: string;
   name: string;
   type: string;
-  status: string;
+  status: RuleStatus;
   conditions: Condition[];
 }
 
