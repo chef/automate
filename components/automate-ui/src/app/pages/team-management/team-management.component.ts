@@ -131,6 +131,50 @@ export class TeamManagementComponent implements OnInit {
       });
   }
 
+  public createV1Team(): void {
+    this.creatingTeam = true;
+    const team = {
+      id: this.createV1TeamForm.controls['name'].value.trim(),
+      name: this.createV1TeamForm.controls['description'].value.trim(),
+      projects: []
+    };
+    this.store.dispatch(new CreateTeam(team));
+
+    const pendingCreate = new Subject<boolean>();
+    this.store.pipe(
+      select(createStatus),
+      filter(identity),
+      takeUntil(pendingCreate))
+      .subscribe((state) => {
+        if (!loading(state)) {
+          pendingCreate.next(true);
+          pendingCreate.complete();
+          this.creatingTeam = false;
+          if (state === EntityStatus.loadingSuccess) {
+            this.closeCreateModal();
+            this.router.navigate(['/settings', 'teams', team.id]);
+          }
+          if (state === EntityStatus.loadingFailure) {
+            const pendingCreateError = new Subject<boolean>();
+            this.store.pipe(
+              select(createError),
+              filter(identity),
+              takeUntil(pendingCreateError))
+              .subscribe((error) => {
+                pendingCreateError.next(true);
+                pendingCreateError.complete();
+                if (error.status === HttpStatus.CONFLICT) {
+                  this.conflictErrorEvent.emit(true);
+                // Close the modal on any error other than conflict and display in banner.
+                } else {
+                  this.closeCreateModal();
+                }
+            });
+          }
+        }
+      });
+  }
+
   public openCreateModal(version): void {
     if(version === 'v1') {
       this.createV1TeamModalVisible = true;

@@ -17,27 +17,24 @@ export class CreateV1TeamModalComponent implements OnInit {
   @Output() close = new EventEmitter();
   @Output() createClicked = new EventEmitter();
 
-  // Whether the edit ID form is open or not.
-  public modifyID = false;
+  public modifyName = false;
   public conflictError = false;
 
   ngOnInit(): void {
     this.conflictErrorEvent.subscribe((isConflict: boolean) => {
       this.conflictError = isConflict;
-      // Open the ID input on conflict so user can resolve it.
-      this.modifyID = true;
+      // Open the Name input on conflict so user can resolve it.
+      this.modifyName = true;
     });
   }
 
   public handleNameInput(event: KeyboardEvent): void {
-    if (!this.modifyID && !this.isNavigationKey(event)) {
+    if (!this.modifyName && !this.isNavigationKey(event)) {
       this.conflictError = false;
-      this.createForm.controls['id'].setValue(
-        IdMapper.transform(this.createForm.controls['name'].value.trim()));
     }
   }
 
-  public handleIDInput(event: KeyboardEvent): void {
+  public handleDescriptionInput(event: KeyboardEvent): void {
     if (this.isNavigationKey(event)) {
       return;
     }
@@ -45,11 +42,11 @@ export class CreateV1TeamModalComponent implements OnInit {
   }
 
   closeEvent(): void {
-    this.modifyID = false;
+    this.modifyName = false;
     this.close.emit();
   }
 
-  createObject(): void {
+  createV1Team(): void {
     this.createClicked.emit();
   }
 

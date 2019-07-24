@@ -9,16 +9,19 @@
     </chef-breadcrumbs>
 
     <chef-page-header>
-      <chef-heading>{{ team?.name }}</chef-heading>
+      <chef-heading *ngIf="isV1">{{ team?.id }}</chef-heading>
+      <chef-heading *ngIf="!isV1">{{ team?.name }}</chef-heading>
       <table>
         <thead>
           <tr class="detail-row">
-            <th class="id-column">ID</th>
+            <th *ngIf="isV1" class="id-column">Description</th>
+            <th *ngIf="!isV1" class="id-column">ID</th>
           </tr>
         </thead>
         <tbody>
           <tr class="detail-row">
-            <td class="id-column">{{ team?.id }}</td>
+            <td *ngIf="isV1" class="id-column">{{ team?.name }}</td>
+            <td *ngIf="!isV1" class="id-column">{{ team?.id }}</td>
           </tr>
         </tbody>
       </table>
