@@ -11,10 +11,9 @@ ALTER TABLE iam_project_rules ALTER COLUMN project_id SET NOT NULL;
 
 -- if any iam_projects are somehow missing themselves in their projects array,
 -- update it to '{THEIR_ID}'.
-UPDATE iam_projects p1
-  SET projects = ARRAY[p2.id]
-  FROM iam_projects p2
-  WHERE p1.id = p2.id AND (p1.projects IS NULL OR p1.projects = '{}');
+UPDATE iam_projects
+  SET projects=ARRAY[id]
+  WHERE projects IS NULL OR projects = '{}';
 ALTER TABLE iam_projects ALTER COLUMN projects SET NOT NULL;
 
 DELETE FROM iam_role_projects WHERE project_id IS NULL;
@@ -87,7 +86,7 @@ EXECUTE PROCEDURE purge_statements_with_no_projects();
 -- what becomes tricky is adding the additional logic to completely remove the statement if the affected
 -- policy would also have no actions. so instead of splitting that logic up, let's handle it all in a trigger.
 
-CREATE OR REPLACE FUNCTION purge_statements_with_no_actions_or_role() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION purge_statements_missing_both_actions_and_role() RETURNS TRIGGER AS $$
   BEGIN
     -- for statements that will still have actions, simply remove the role since those
     -- statements are still valid
