@@ -135,11 +135,10 @@ func (backend *ESClient) InsertInspecSummary(ctx context.Context, id string, end
 		Refresh("false").
 		Do(ctx)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "InsertInspecSummary")
 	}
 
-	err = backend.setDailyLatestToFalse(ctx, data.NodeID, id, index)
-	return err
+	return backend.setDailyLatestToFalse(ctx, data.NodeID, id, index)
 }
 
 func (backend *ESClient) InsertInspecReport(ctx context.Context, id string, endTime time.Time, data *relaxting.ESInSpecReport) error {
@@ -158,11 +157,10 @@ func (backend *ESClient) InsertInspecReport(ctx context.Context, id string, endT
 		Refresh("false").
 		Do(ctx)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "InsertInspecReport")
 	}
 
-	err = backend.setDailyLatestToFalse(ctx, data.NodeID, id, index)
-	return err
+	return backend.setDailyLatestToFalse(ctx, data.NodeID, id, index)
 }
 
 func (backend *ESClient) InsertInspecProfile(ctx context.Context, data *relaxting.ESInspecProfile) error {
@@ -190,7 +188,7 @@ func (backend *ESClient) setDailyLatestToFalse(ctx context.Context, nodeId strin
 		Refresh("false").
 		Do(ctx)
 
-	return err
+	return errors.Wrap(err, "setDailyLatestToFalse")
 }
 
 func (backend *ESClient) UpdateProjectTags(ctx context.Context, projectTaggingRules map[string]*iam_v2.ProjectRules) ([]string, error) {
