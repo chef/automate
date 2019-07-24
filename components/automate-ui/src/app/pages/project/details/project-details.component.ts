@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
-import { identity, find } from 'lodash/fp';
+import { identity, some } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
@@ -139,7 +139,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   }
 
   showProjectLink(): boolean {
-    return find(['status', <RuleStatus>'staged'], this.rules) ? true : false;
+    return some(['status', <RuleStatus>'staged'], this.rules);
   }
 
   saveProject() {
