@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import { environment as env } from '../../../environments/environment';
 import { Job } from './job.model';
+import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
 export interface JobsResponse {
   jobs: Job[];
@@ -23,7 +24,7 @@ export interface JobUpdateResponse {
 @Injectable()
 export class JobRequests {
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private telemetryService: TelemetryService) {}
 
   public fetchJobs(params): Observable<JobsResponse> {
     return this.http.post<JobsResponse>(`${env.compliance_url}/scanner/jobs/search`, params);
@@ -34,6 +35,7 @@ export class JobRequests {
   }
 
   public jobCreate(params): Observable<JobCreateResponse> {
+    this.telemetryService.track('scanJobCreation', { params });
     return this.http.post<JobCreateResponse>(`${env.compliance_url}/scanner/jobs`, params);
   }
 
