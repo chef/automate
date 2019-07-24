@@ -57,6 +57,9 @@
                   >{{ option.value }}</option>
                 </select>
               </label>
+              <chef-error
+                *ngIf="ruleForm.get('conditions').controls[i].get('attribute').hasError('required') && ruleForm.get('conditions').controls[i].get('attribute').touched"
+              >Attribute is required</chef-error>
             </chef-form-field>
 
             <chef-form-field class="attribute-field">
@@ -70,6 +73,9 @@
                   <option value='MEMBER_OF'>member of</option>
                 </select>
               </label>
+              <chef-error
+                *ngIf="ruleForm.get('conditions').controls[i].get('operator').hasError('required') && ruleForm.get('conditions').controls[i].get('operator').touched"
+              >Operator is required</chef-error>
             </chef-form-field>
 
             <chef-form-field class="attribute-field">
@@ -81,18 +87,19 @@
                   (change)="updateConditionValues(condition)"
                 ></chef-input>
               </label>
-
+              <chef-error
+                *ngIf="(ruleForm.get('conditions').controls[i].get('values').hasError('required') || ruleForm.get('conditions').controls[i].get('values').hasError('pattern')) && ruleForm.get('conditions').controls[i].get('values').dirty"
+              >Value is required</chef-error>
               <small class="help"
                 *ngIf="condition.controls.operator.value === 'EQUALS'">
                   Case sensitive, must match exactly.
               </small>
-
               <small class="help"
                 *ngIf="condition.controls.operator.value === 'MEMBER_OF'">
                   Comma-separated list, at least one must match exactly.
               </small>
-
             </chef-form-field>
+
             <chef-form-field class="attribute-field">
               <label>
                 <span *ngIf="showAndLabel(i)" class="label">AND</span>

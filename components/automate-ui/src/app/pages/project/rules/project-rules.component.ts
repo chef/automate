@@ -134,9 +134,10 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
 
   createCondition(attribute = '', operator = '', values = ''): FormGroup {
     return this.fb.group({
+      // Must stay in sync with error checks in project-rules.component.html
       attribute: [attribute, Validators.required],
       operator: [operator, Validators.required],
-      values: [values, Validators.required]
+      values: [values, [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
   }
 
