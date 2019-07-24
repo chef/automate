@@ -53,8 +53,8 @@ export class ReportingComponent implements OnInit, OnDestroy {
     {
       'name': 'environment',
       'title': 'Environment',
-      'description': 'Add the name to filter this report to a specific environment',
-      'placeholder': 'Name'
+      'description': 'Add the environment name to filter this report to a specific environment',
+      'placeholder': 'Environment'
     },
     {
       'name': 'inspec_version',
@@ -64,10 +64,9 @@ export class ReportingComponent implements OnInit, OnDestroy {
     },
     {
       'name': 'node',
-      'title': 'Node',
-      'description':
-        'Add the name, ID, or hostname to filter this report against a specific node',
-      'placeholder': 'Name, ID, or hostname'
+      'title': 'Node Name',
+      'description': 'Add the node name to filter this report against a specific node',
+      'placeholder': 'Node Name'
     },
     {
       'name': 'organization',

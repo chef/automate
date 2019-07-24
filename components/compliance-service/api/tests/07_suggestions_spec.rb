@@ -29,7 +29,7 @@ describe File.basename(__FILE__) do
 
     # suggest environment, lower case text with space
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
-      type: 'environment', text: 'devsec zeT'
+      type: 'environment', text: 'devsec zeT', size: 10
     )
     assert_suggestions_text(["DevSec Prod Zeta", "DevSec Prod Alpha", "DevSec Prod beta"], actual_data)
 
@@ -104,7 +104,7 @@ describe File.basename(__FILE__) do
 
     # suggest all controls
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
-      type: 'control'
+      type: 'control', size: 10
     )
     expected = ["Check Apache config file owner, group and permissions.--apache-05--",
       "Disable Apache’s follows Symbolic Links for directories in alias.conf--apache-11--",
