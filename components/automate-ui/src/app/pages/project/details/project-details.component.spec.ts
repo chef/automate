@@ -11,7 +11,7 @@ import { IAMType } from 'app/entities/policies/policy.model';
 import { GetProjectSuccess } from 'app/entities/projects/project.actions';
 import { projectEntityReducer } from 'app/entities/projects/project.reducer';
 import { Rule } from 'app/entities/rules/rule.model';
-import { ProjectDetailsComponent, ProjectTabNames } from './project-details.component';
+import { ProjectDetailsComponent } from './project-details.component';
 
 describe('ProjectDetailsComponent', () => {
   let component: ProjectDetailsComponent;
@@ -139,17 +139,17 @@ describe('ProjectDetailsComponent', () => {
     });
 
    it('defaults to showing rules section', () => {
-      expect(component.showTab(ProjectTabNames.Rules)).toBeTruthy();
-      expect(component.showTab(ProjectTabNames.Details)).toBeFalsy();
+      expect(component.showTab('rules')).toBeTruthy();
+      expect(component.showTab('details')).toBeFalsy();
     });
 
     it('shows/hides sections when based on selection', () => {
-      component.onTabChange({ target: { value: ProjectTabNames.Details } });
-      expect(component.showTab(ProjectTabNames.Rules)).toBeFalsy();
-      expect(component.showTab(ProjectTabNames.Details)).toBeTruthy();
-      component.onTabChange({ target: { value: ProjectTabNames.Rules } });
-      expect(component.showTab(ProjectTabNames.Rules)).toBeTruthy();
-      expect(component.showTab(ProjectTabNames.Details)).toBeFalsy();
+      component.onTabChange({ target: { value: 'details' } });
+      expect(component.showTab('rules')).toBeFalsy();
+      expect(component.showTab('details')).toBeTruthy();
+      component.onTabChange({ target: { value: 'rules' } });
+      expect(component.showTab('rules')).toBeTruthy();
+      expect(component.showTab('details')).toBeFalsy();
     });
 
     it('does not display rule table', () => {
@@ -168,17 +168,17 @@ describe('ProjectDetailsComponent', () => {
     });
 
     it('defaults to showing rules section', () => {
-      expect(component.showTab(ProjectTabNames.Rules)).toBeTruthy();
-      expect(component.showTab(ProjectTabNames.Details)).toBeFalsy();
+      expect(component.showTab('rules')).toBeTruthy();
+      expect(component.showTab('details')).toBeFalsy();
     });
 
     it('shows/hides sections when based on selection', () => {
-      component.onTabChange({ target: { value: ProjectTabNames.Details } });
-      expect(component.showTab(ProjectTabNames.Rules)).toBeFalsy();
-      expect(component.showTab(ProjectTabNames.Details)).toBeTruthy();
-      component.onTabChange({ target: { value: ProjectTabNames.Rules } });
-      expect(component.showTab(ProjectTabNames.Rules)).toBeTruthy();
-      expect(component.showTab(ProjectTabNames.Details)).toBeFalsy();
+      component.onTabChange({ target: { value: 'details' } });
+      expect(component.showTab('rules')).toBeFalsy();
+      expect(component.showTab('details')).toBeTruthy();
+      component.onTabChange({ target: { value: 'rules' } });
+      expect(component.showTab('rules')).toBeTruthy();
+      expect(component.showTab('details')).toBeFalsy();
     });
 
     it('displays rule table', () => {
