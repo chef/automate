@@ -7,8 +7,7 @@
   "collection": "dist/collection/collection-manifest.json",
   "module": "dist/index.mjs",
   "files": [
-    "dist/",
-    "loader/"
+    "dist/"
   ],
   "scripts": {
     "build:prod": "npm run build",
