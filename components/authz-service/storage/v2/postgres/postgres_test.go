@@ -1115,8 +1115,8 @@ func TestCreatePolicy(t *testing.T) {
 			require.Error(t, err)
 			assert.Nil(t, resp)
 
-			_, wasCorrectError := err.(*storage_errors.ErrForeignKey)
-			assert.True(t, wasCorrectError)
+			_, ok:= err.(*storage_errors.ErrForeignKey)
+			assert.True(t, ok, "expected foreign key error")
 			assert.Equal(t, "role not found: "+role, err.Error())
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
@@ -1638,7 +1638,7 @@ func TestCreatePolicy(t *testing.T) {
 			projCount := db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID)
 			assertCount(t, 2, projCount)
 		},
-		"policy with non-existent project fails": func(t *testing.T) {
+		"policy with only one non-existent project fails": func(t *testing.T) {
 			polID := genSimpleID(t, prngSeed)
 
 			projID := "not-real-project"
@@ -1654,8 +1654,44 @@ func TestCreatePolicy(t *testing.T) {
 
 			assertNoPolicyChange(t, store, func() {
 				resp, err := store.CreatePolicy(ctx, &pol)
-				assert.Error(t, err)
+				require.Error(t, err)
 				assert.Nil(t, resp)
+				_, ok := err.(*storage_errors.ErrForeignKey)
+				require.True(t, ok, "expected foreign key error")
+				assert.Equal(t, "project not found: not-real-project", err.Error())
+			})
+
+			assertEmpty(t,
+				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
+					polID, name, typeVal.String()))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID))
+		},
+		"policy with one existent, one non-existent project fails": func(t *testing.T) {
+			polID := genSimpleID(t, prngSeed)
+
+			projID0 := "special-project"
+			insertTestProject(t, db, projID0, "too special", storage.Custom)
+			projID1 := "not-real-project"
+
+			name, members, typeVal := "toBeCreated", []storage.Member{}, storage.Custom
+			pol := storage.Policy{
+				ID:       polID,
+				Name:     name,
+				Type:     typeVal,
+				Members:  members,
+				Projects: []string{projID0, projID1},
+			}
+
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.CreatePolicy(ctx, &pol)
+				require.Error(t, err)
+				assert.Nil(t, resp)
+				_, ok := err.(*storage_errors.ErrForeignKey)
+				require.True(t, ok, "expected foreign key error")
+				assert.Equal(t, "project not found: not-real-project", err.Error())
 			})
 
 			assertEmpty(t,
@@ -3184,8 +3220,11 @@ func TestCreateRule(t *testing.T) {
 			require.NoError(t, err)
 
 			resp, err := store.CreateRule(ctx, &rule)
+			require.Error(t, err)
 			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			_, ok := err.(*storage_errors.ErrForeignKey)
+			require.True(t, ok, "mismatches expected error type")
+			assert.Equal(t, "project not found: project-not-found", err.Error())
 		},
 		"when rule exists in the applied rules table, return error": func(t *testing.T) {
 			projID := "project-1"
@@ -4531,6 +4570,21 @@ func TestUpdateProject(t *testing.T) {
 				Type:     storage.Custom,
 				Projects: []string{"not-found"},
 			}
+			resp, err := store.UpdateProject(ctx, &project)
+			assert.Equal(t, storage_errors.ErrNotFound, err)
+			assert.Nil(t, resp)
+		},
+		"returns ErrNotFound if one of its projects doesn't exist": func(t *testing.T) {
+			ctx := context.Background()
+			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
+			project := storage.Project{
+				ID:       "not-found",
+				Name:     "name1",
+				Type:     storage.Custom,
+				Projects: []string{"foo", "not-found"},
+			}
+			// Note(sr): if we used db_id to reference a project's projects, we'd also
+			// use the project_db_id() SQL function, and this error would change.
 			resp, err := store.UpdateProject(ctx, &project)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 			assert.Nil(t, resp)
