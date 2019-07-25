@@ -35,6 +35,10 @@ describe('CreateObjectModalComponent', () => {
     });
   });
 
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
   using([
     ['my-name', 'my-name', 'mirrors input with no leading/trailing whitespace'],
     ['  my-name  ', 'my-name', 'trims leading whitespace'],
