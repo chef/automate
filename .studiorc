@@ -9,18 +9,18 @@ scaffolding_go_repo_name=automate
 scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_name}"
 
 export HAB_ORIGIN=${HAB_ORIGIN:-chef}
-# Bring ci-studio-common to life
+# Bring studio-common to life
 RECOMMENDED_HAB_VERSION="0.77.0"
 
 GOLANGCILINTVERSION=1.16.0
 
 # shellcheck disable=1090
-if [ -d "${CI_STUDIO_COMMON:-}" ]; then
-  echo "CI_STUDIO_COMMON override in effect; using $CI_STUDIO_COMMON, not chef/ci-studio-common habitat package"
-  source "$CI_STUDIO_COMMON/bin/studio-common"
+if [ -d "${STUDIO_COMMON:-}" ]; then
+  echo "STUDIO_COMMON override in effect; using $STUDIO_COMMON, not chef/studio-common habitat package"
+  source "$STUDIO_COMMON/bin/studio-common"
 else
-  hab pkg install chef/ci-studio-common --channel dev
-  source "$(hab pkg path chef/ci-studio-common)/bin/studio-common"
+  hab pkg install chef/studio-common
+  source "$(hab pkg path chef/studio-common)/bin/studio-common"
 fi
 
 # Install busybox-static so script evaluations (e.g. #!/bin/bash) will work
