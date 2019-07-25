@@ -37,6 +37,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   public isLoading = true;
   public saving = false;
   public attributes: RuleTypeMappedObject;
+  public editingRule = false;
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
   public operators = [
@@ -91,6 +92,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         takeUntil(this.isDestroyed),
         map((state) => {
           this.rule = <Rule>Object.assign({}, state);
+          this.editingRule = true;
         })
         ).subscribe();
 
@@ -111,7 +113,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     this.ruleForm = this.fb.group({
       // Must stay in sync with error checks in project-rules.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      type: [this.rule.type || '', Validators.required],
+      type: [{ value: this.rule.type || '', disabled: this.editingRule } , Validators.required],
       conditions: this.fb.array(this.populateConditions())
     });
   }
