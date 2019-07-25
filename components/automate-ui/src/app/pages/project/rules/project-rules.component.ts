@@ -184,10 +184,6 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     return this.conditions;
   }
 
-  getConditionValue(value: string | string[]): string {
-    return (typeof value === 'string') ? value : value.join(', ');
-  }
-
   createRule() {
     this.store.dispatch(
       new CreateRule({

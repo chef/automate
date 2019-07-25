@@ -3,7 +3,6 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
-import * as faker from 'faker';
 
 import { using } from 'app/testing/spec-helpers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
@@ -152,21 +151,6 @@ describe('ProjectRulesComponent', () => {
       component.deleteCondition(0);
       conditionCount = component.ruleForm.get('conditions').value.length;
       expect(conditionCount).toBe(2);
-    });
-
-    it('should return condition value of string', () => {
-      const word = faker.random.word();
-      expect(component.getConditionValue(word)).toBe(word);
-    });
-
-    it('should return condition value of singleton array', () => {
-      const word = faker.random.word();
-      expect(component.getConditionValue([word])).toBe(word);
-    });
-
-     it('should return condition value of multi-valued array', () => {
-      const wordList = faker.random.words().split(' ');
-      expect(component.getConditionValue(wordList)).toBe(wordList.join(', '));
     });
 
     it('form should be invalid', () => {
