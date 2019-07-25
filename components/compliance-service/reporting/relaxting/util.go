@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/chef/automate/lib/grpc/auth_context"
-	"github.com/golang/protobuf/ptypes/struct"
+	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
