@@ -55,10 +55,10 @@ import (
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	notifications "github.com/chef/automate/components/notifications-client/api"
 	"github.com/chef/automate/components/notifications-client/notifier"
+	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tracing"
-	"github.com/chef/automate/lib/workflow"
-	"github.com/chef/automate/lib/workflow/postgres"
 )
 
 type serviceState int
@@ -138,7 +138,7 @@ func initBits(ctx context.Context, conf *config.Compliance) (db *pgdb.DB, connFa
 // register all the services, start the grpc server, and call setup
 func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory,
 	esr relaxting.ES2Backend, conf config.Compliance, binding string,
-	statusSrv *statusserver.Server, workflowManager *workflow.WorkflowManager) {
+	statusSrv *statusserver.Server, cerealManager *cereal.Manager) {
 
 	lis, err := net.Listen("tcp", binding)
 	if err != nil {
@@ -169,7 +169,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 			conf.InspecAgent.AutomateFQDN, notifier, authzProjectsClient, eventClient, configManager))
 
 	jobs.RegisterJobsServiceServer(s, jobsserver.New(db, connFactory, eventClient,
-		conf.Manager.Endpoint, workflowManager))
+		conf.Manager.Endpoint, cerealManager))
 	reporting.RegisterReportingServiceServer(s, reportingserver.New(&esr))
 
 	ps := profilesserver.New(db, &esr, &conf.Profiles, eventClient, statusSrv)
@@ -206,7 +206,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	// `setup` depends on `Serve` because it dials back to the compliance-service itself.
 	// For this to work we launch `Serve` in a goroutine and connect WithBlock to itself and other dependent services from `setup`
 	// A connect timeout is used to ensure error reporting in the event of failures to connect
-	err = setup(ctx, connFactory, conf, esr, db, workflowManager)
+	err = setup(ctx, connFactory, conf, esr, db, cerealManager)
 	if err != nil {
 		logrus.Fatalf("serveGrpc aborting, we have a problem, setup failed: %s", err.Error())
 	}
@@ -367,7 +367,7 @@ func setupDataLifecycleManageableInterface(ctx context.Context, connFactory *sec
 }
 
 func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Compliance,
-	esr relaxting.ES2Backend, db *pgdb.DB, workflowManager *workflow.WorkflowManager) error {
+	esr relaxting.ES2Backend, db *pgdb.DB, cerealManager *cereal.Manager) error {
 	var err error
 	var conn, mgrConn, secretsConn, authConn *grpc.ClientConn
 	timeoutCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
@@ -428,16 +428,16 @@ func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Com
 	// these are all inspec-agent packages
 	scanner := scanner.New(mgrClient, nodesClient, db)
 	resolver := resolver.New(mgrClient, nodesClient, db, secretsClient)
-	err = runner.InitWorkflowManager(workflowManager, conf.InspecAgent.JobWorkers, ingestClient, scanner, resolver, conf.RemoteInspecVersion)
+	err = runner.InitCerealManager(cerealManager, conf.InspecAgent.JobWorkers, ingestClient, scanner, resolver, conf.RemoteInspecVersion)
 	if err != nil {
-		return errors.Wrap(err, "failed to initialize workflow manager")
+		return errors.Wrap(err, "failed to initialize cereal manager")
 	}
 
-	err = workflowManager.Start(ctx)
+	err = cerealManager.Start(ctx)
 	if err != nil {
-		return errors.Wrap(err, "failed to start workflow manager")
+		return errors.Wrap(err, "failed to start cereal manager")
 	}
-	schedulerServer := scheduler.New(scanner, workflowManager)
+	schedulerServer := scheduler.New(scanner, cerealManager)
 
 	// start polling for jobs with a recurrence schedule that are due to run.
 	// this function will sleep for one minute, then query the db for all jobs
@@ -485,13 +485,13 @@ func Serve(conf config.Compliance, grpcBinding string) error {
 	}
 	SERVICE_STATE = serviceStateStarting
 
-	workflowManager, err := workflow.NewManager(postgres.NewPostgresBackend(conf.Postgres.ConnectionString))
+	cerealManager, err := cereal.NewManager(postgres.NewPostgresBackend(conf.Postgres.ConnectionString))
 	if err != nil {
 		return err
 	}
-	defer workflowManager.Stop()
+	defer cerealManager.Stop()
 
-	go serveGrpc(ctx, db, connFactory, esr, conf, grpcBinding, statusSrv, workflowManager) // nolint: errcheck
+	go serveGrpc(ctx, db, connFactory, esr, conf, grpcBinding, statusSrv, cerealManager) // nolint: errcheck
 
 	cfg := NewServiceConfig(&conf, connFactory)
 	return cfg.serveCustomRoutes()

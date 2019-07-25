@@ -11,17 +11,17 @@ import (
 
 	"github.com/chef/automate/components/compliance-service/api/jobs"
 	"github.com/chef/automate/components/compliance-service/scanner"
+	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/errorutils"
-	"github.com/chef/automate/lib/workflow"
 )
 
 type Scheduler struct {
-	scanner         *scanner.Scanner
-	workflowManager *workflow.WorkflowManager
+	scanner       *scanner.Scanner
+	cerealManager *cereal.Manager
 }
 
-func New(scanner *scanner.Scanner, workflowManager *workflow.WorkflowManager) *Scheduler {
-	return &Scheduler{scanner, workflowManager}
+func New(scanner *scanner.Scanner, cerealManager *cereal.Manager) *Scheduler {
+	return &Scheduler{scanner, cerealManager}
 }
 
 // Run a job. Schedule, resolve, distribute, and execute it.
@@ -51,7 +51,7 @@ func (a *Scheduler) Run(job *jobs.Job) error {
 
 func (a *Scheduler) pushWorkflow(job *jobs.Job) error {
 	logrus.Debugf("Calling EnqueueWorkflow for scan-job-workflow")
-	return a.workflowManager.EnqueueWorkflow(context.TODO(), "scan-job-workflow", fmt.Sprintf("scan-job-%s", job.Id), job)
+	return a.cerealManager.EnqueueWorkflow(context.TODO(), "scan-job-workflow", fmt.Sprintf("scan-job-%s", job.Id), job)
 }
 
 // PollForJobs loops every minute looking to create child jobs from recurring due jobs
@@ -74,7 +74,7 @@ func (a *Scheduler) processDueJobs(ctx context.Context, nowTime time.Time) {
 	for _, job := range dueJobs {
 		err := a.pushWorkflow(job)
 		if err != nil {
-			if err == workflow.ErrWorkflowInstanceExists {
+			if err == cereal.ErrWorkflowInstanceExists {
 				logrus.Infof("Job %q is still/already running", job.Id)
 			} else {
 				logrus.Errorf("Error handling job %q: %v", job.Id, err)

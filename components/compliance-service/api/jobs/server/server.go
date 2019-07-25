@@ -22,10 +22,10 @@ import (
 	"github.com/chef/automate/components/event-service/server"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
+	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/secureconn"
-	"github.com/chef/automate/lib/workflow"
 )
 
 // Server implementation for jobs
@@ -40,13 +40,13 @@ var empty = pb.Empty{}
 
 // New creates a new jobs server
 func New(db *pgdb.DB, connFactory *secureconn.Factory, eventsClient automate_event.EventServiceClient,
-	managerEndpoint string, workflowManager *workflow.WorkflowManager) *Server {
+	managerEndpoint string, cerealManager *cereal.Manager) *Server {
 	conf := &Server{
 		db:           db,
 		connFactory:  connFactory,
 		eventsClient: eventsClient,
 	}
-	conf.getComplianceAndSecretsConnection(connFactory, db, managerEndpoint, workflowManager)
+	conf.getComplianceAndSecretsConnection(connFactory, db, managerEndpoint, cerealManager)
 	return conf
 }
 
@@ -54,7 +54,7 @@ func New(db *pgdb.DB, connFactory *secureconn.Factory, eventsClient automate_eve
 // the scheduler server is used to call the inspec-agent
 func (srv *Server) getComplianceAndSecretsConnection(
 	connectionFactory *secureconn.Factory, db *pgdb.DB,
-	managerEndpoint string, workflowManager *workflow.WorkflowManager) {
+	managerEndpoint string, cerealManager *cereal.Manager) {
 	if managerEndpoint == "" {
 		logrus.Errorf("complianceEndpoint and managerEndpoint cannot be empty or Dial will get stuck")
 		return
@@ -79,7 +79,7 @@ func (srv *Server) getComplianceAndSecretsConnection(
 	}
 
 	scanner := scanner.New(mgrClient, nodesClient, db)
-	srv.schedulerServer = scheduler.New(scanner, workflowManager)
+	srv.schedulerServer = scheduler.New(scanner, cerealManager)
 }
 
 // GetJobResultByNodeId returns the results row for a given job id and node id

@@ -26,45 +26,45 @@ import (
 	"github.com/chef/automate/components/compliance-service/inspec-agent/resolver"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/chef/automate/components/compliance-service/scanner"
-	"github.com/chef/automate/lib/workflow"
+	"github.com/chef/automate/lib/cereal"
 )
 
 var ListenPort int = 2133
 
-func InitWorkflowManager(w *workflow.WorkflowManager, workerCount int, ingestClient ingest.ComplianceIngesterClient,
+func InitCerealManager(m *cereal.Manager, workerCount int, ingestClient ingest.ComplianceIngesterClient,
 	scanner *scanner.Scanner, resolver *resolver.Resolver, remoteInspecVersion string) error {
-	err := w.RegisterWorkflowExecutor("scan-job-workflow", &ScanJobWorkflow{})
+	err := m.RegisterWorkflowExecutor("scan-job-workflow", &ScanJobWorkflow{})
 	if err != nil {
 		return err
 	}
 
-	err = w.RegisterTaskExecutor("create-child", &CreateChildTask{
+	err = m.RegisterTaskExecutor("create-child", &CreateChildTask{
 		scanner,
-	}, workflow.TaskExecutorOpts{Workers: 1})
+	}, cereal.TaskExecutorOpts{Workers: 1})
 	if err != nil {
 		return err
 	}
 
-	err = w.RegisterTaskExecutor("resolve-job", &ResolveTask{
+	err = m.RegisterTaskExecutor("resolve-job", &ResolveTask{
 		remoteInspecVersion,
 		scanner,
 		resolver,
-	}, workflow.TaskExecutorOpts{Workers: 1})
+	}, cereal.TaskExecutorOpts{Workers: 1})
 	if err != nil {
 		return err
 	}
 
-	err = w.RegisterTaskExecutor("scan-job", &InspecJobTask{
+	err = m.RegisterTaskExecutor("scan-job", &InspecJobTask{
 		ingestClient,
 		scanner,
-	}, workflow.TaskExecutorOpts{Workers: workerCount})
+	}, cereal.TaskExecutorOpts{Workers: workerCount})
 	if err != nil {
 		return err
 	}
 
-	return w.RegisterTaskExecutor("scan-job-summary", &InspecJobSummaryTask{
+	return m.RegisterTaskExecutor("scan-job-summary", &InspecJobSummaryTask{
 		scanner,
-	}, workflow.TaskExecutorOpts{Workers: 1})
+	}, cereal.TaskExecutorOpts{Workers: 1})
 }
 
 type ScanJobWorkflow struct{}
@@ -75,8 +75,8 @@ type ScanJobWorkflowPayload struct {
 	OverallJobStatus string
 }
 
-func (p *ScanJobWorkflow) OnStart(w workflow.WorkflowInstance,
-	ev workflow.StartEvent) workflow.Decision {
+func (p *ScanJobWorkflow) OnStart(w cereal.WorkflowInstance,
+	ev cereal.StartEvent) cereal.Decision {
 
 	var job jobs.Job
 	err := w.GetParameters(&job)
@@ -108,8 +108,8 @@ func (p *ScanJobWorkflow) OnStart(w workflow.WorkflowInstance,
 	})
 }
 
-func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
-	ev workflow.TaskCompleteEvent) workflow.Decision {
+func (p *ScanJobWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
+	ev cereal.TaskCompleteEvent) cereal.Decision {
 
 	var payload ScanJobWorkflowPayload
 
@@ -227,7 +227,7 @@ func (p *ScanJobWorkflow) OnTaskComplete(w workflow.WorkflowInstance,
 	return w.Continue(&payload)
 }
 
-func (s *ScanJobWorkflow) OnCancel(w workflow.WorkflowInstance, ev workflow.CancelEvent) workflow.Decision {
+func (s *ScanJobWorkflow) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEvent) cereal.Decision {
 	logrus.Debugf("ScanJobWorkflow got OnCancel")
 	return w.Complete()
 }
@@ -251,7 +251,7 @@ type ResolveTask struct {
 	resolver            *resolver.Resolver
 }
 
-func (t *ResolveTask) Run(ctx context.Context, task workflow.Task) (interface{}, error) {
+func (t *ResolveTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
 	var job jobs.Job
 	if err := task.GetParameters(&job); err != nil {
 		return nil, errors.Wrap(err, "could not unmarshal job to resolve")
@@ -299,7 +299,7 @@ func (t *ResolveTask) Run(ctx context.Context, task workflow.Task) (interface{},
 	return nodeJobs, nil
 }
 
-func (t *InspecJobTask) Run(ctx context.Context, task workflow.Task) (interface{}, error) {
+func (t *InspecJobTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
 	var job types.InspecJob
 	if err := task.GetParameters(&job); err != nil {
 		return nil, errors.Wrap(err, "could not unmarshal inspec job")
@@ -469,7 +469,7 @@ func (t *InspecJobTask) validateJob(job *types.InspecJob) bool {
 	return true
 }
 
-func (t *InspecJobSummaryTask) Run(ctx context.Context, task workflow.Task) (interface{}, error) {
+func (t *InspecJobSummaryTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
 	var jobsPayload ScanJobWorkflowPayload
 
 	if err := task.GetParameters(&jobsPayload); err != nil {
@@ -489,7 +489,7 @@ func (t *InspecJobSummaryTask) Run(ctx context.Context, task workflow.Task) (int
 	return nil, nil
 }
 
-func (t *CreateChildTask) Run(ctx context.Context, task workflow.Task) (interface{}, error) {
+func (t *CreateChildTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
 	var job jobs.Job
 	if err := task.GetParameters(&job); err != nil {
 		return nil, errors.Wrap(err, "could not unmarshal parent job")
