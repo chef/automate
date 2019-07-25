@@ -94,3 +94,6 @@ sudo chmod a+r results/*.pub
 # jobs.
 tar cvzf results.tar.gz results/
 buildkite-agent artifact upload results.tar.gz
+
+log_section_start "docker inspect"
+docker inspect $(docker ps -aq)
