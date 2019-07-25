@@ -95,7 +95,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  public closeModal(): void {
+  public closeDeleteModal(): void {
     this.deleteModalVisible = false;
   }
 
@@ -105,7 +105,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   }
 
   public deleteTeam(): void {
-    this.closeModal();
+    this.closeDeleteModal();
     this.store.dispatch(new DeleteTeam(this.teamToDelete));
   }
 
