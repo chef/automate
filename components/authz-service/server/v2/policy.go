@@ -164,16 +164,15 @@ func (s *policyServer) CreatePolicy(
 	}
 
 	returnPol, err := s.store.CreatePolicy(ctx, &pol)
-
-	if err, ok := err.(*storage_errors.ErrRoleMustExistForStatement); ok {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
 	switch err {
 	case nil: // continue
 	case storage_errors.ErrConflict:
 		return nil, status.Errorf(codes.AlreadyExists,
 			"policy with id %q already exists", req.Id)
 	default:
+		if err, ok := err.(*storage_errors.ErrForeignKey); ok {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
 		return nil, status.Errorf(codes.Internal,
 			"creating policy %q: %s", req.Id, err.Error())
 	}
@@ -271,19 +270,18 @@ func (s *policyServer) UpdatePolicy(
 	}
 
 	polInternal, err := s.store.UpdatePolicy(ctx, &storagePolicy)
-
-	if err, ok := err.(*storage_errors.ErrRoleMustExistForStatement); ok {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
-
 	if err != nil {
 		switch err {
 		case storage_errors.ErrConflict:
 			return nil, status.Errorf(codes.AlreadyExists, "policy with name %q already exists", req.Name)
 		case storage_errors.ErrNotFound:
 			return nil, status.Errorf(codes.NotFound, "no policy with ID %q found", req.Id)
+		default:
+			if err, ok := err.(*storage_errors.ErrForeignKey); ok {
+				return nil, status.Error(codes.InvalidArgument, err.Error())
+			}
+			return nil, err
 		}
-		return nil, err
 	}
 
 	return policyFromInternal(polInternal)
@@ -415,10 +413,11 @@ func (s *policyServer) CreateRole(
 	case nil: // continue
 	case storage_errors.ErrConflict:
 		return nil, status.Errorf(codes.AlreadyExists, "role with id %q already exists", req.Id)
-	case storage_errors.ErrForeignKey:
-		return nil, status.Errorf(codes.NotFound, "could not create role with projects %s as "+
-			"some projects were not found", req.Projects)
 	default:
+		switch err.(type) {
+		case *storage_errors.ErrForeignKey:
+			return nil, status.Errorf(codes.NotFound, err.Error())
+		}
 		return nil, status.Errorf(codes.Internal, "creating role %q: %s", req.Id, err.Error())
 	}
 

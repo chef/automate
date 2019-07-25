@@ -22,9 +22,6 @@ var (
 	// ErrGenerateUUID occurs when a UUID could not be generated for a new object.
 	ErrGenerateUUID = errors.New("could not generate UUID")
 
-	// ErrForeignKey occurs, among other times, when attempting to insert a foreign key whose referent does not exist
-	ErrForeignKey = errors.New("foreign key violation")
-
 	// ErrMaxProjectsExceeded indicates that a new project cannot be created
 	// since the max allowed are already created.
 	ErrMaxProjectsExceeded = errors.New("max projects allowed")
@@ -41,20 +38,6 @@ var (
 	// the type for a rule, which is not allowed.
 	ErrChangeTypeForRule = errors.New("cannot change rule type")
 )
-
-// ErrRoleMustExistForStatement indicates that the user attempted to insert a role that
-// does not exist into a new or updated policy statement
-type ErrRoleMustExistForStatement struct {
-	pgErrMessage string
-}
-
-func NewErrRoleMustExistForStatement(pgErrMessage string) error {
-	return &ErrRoleMustExistForStatement{pgErrMessage: pgErrMessage}
-}
-
-func (e *ErrRoleMustExistForStatement) Error() string {
-	return e.pgErrMessage
-}
 
 // ErrTxCommit occurs when the database attempts to commit a transaction and
 // fails.
@@ -81,4 +64,12 @@ func NewMissingFieldError(f string) error {
 
 func (e *ErrMissingField) Error() string {
 	return "must supply policy " + e.field
+}
+
+type ErrForeignKey struct {
+	Msg string
+}
+
+func (e *ErrForeignKey) Error() string {
+	return e.Msg
 }

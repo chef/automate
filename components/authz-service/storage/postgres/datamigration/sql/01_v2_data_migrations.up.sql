@@ -9,12 +9,6 @@ UPDATE iam_members
         name = 'team:local:operators';
 
 UPDATE iam_statements
-    SET
-        role_id = role_db_id('editor')
-    WHERE
-        role_id = role_db_id('operator');
-
-UPDATE iam_statements
     SET resources = array_replace(resources, 'team:local:operator', 'team:local:editor');
 
 UPDATE iam_roles

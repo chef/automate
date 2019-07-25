@@ -69,14 +69,14 @@ func ProcessError(err error) error {
 }
 
 // parsePQError is able to parse pq specific errors into storage interface errors.
-func parsePQError(err *pq.Error) error {
-	switch err.Code {
+func parsePQError(e *pq.Error) error {
+	switch e.Code {
 	case "DRPPC": // Custom code: attempt to delete a non-deletable policy defined in migration 02
 		return storage.ErrCannotDelete
 	case "23505": // Unique violation
 		return storage.ErrConflict
 	case "23503": // Foreign key violation
-		return storage.ErrForeignKey
+		return &storage.ErrForeignKey{Msg: e.Message}
 	case "P0002": // Not found in plpgsql ("no_data_found")
 		return storage.ErrNotFound
 	case "20000": // Not found
@@ -87,8 +87,6 @@ func parsePQError(err *pq.Error) error {
 		return storage.ErrMarkedForDeletion
 	case "RLTYP": // Custom code: attempt to update a rule's type that is immutable
 		return storage.ErrChangeTypeForRule
-	case "RDNES": // Custom code: attempt to create a policy statement with a role that does not exist
-		return storage.NewErrRoleMustExistForStatement(err.Message)
 	}
 
 	return storage.ErrDatabase
