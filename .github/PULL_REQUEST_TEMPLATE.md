@@ -12,6 +12,5 @@
 
 - [ ] Tests added/updated?
 - [ ] Docs added/updated?
-- [ ] Code executed?
 
 ### :camera: Screenshots, if applicable
