@@ -2,6 +2,7 @@ package compliance
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"os"
 	"testing"
@@ -19,8 +20,13 @@ import (
 )
 
 var host = os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_HOST")
+var key = os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_KEY")
 
 func TestGatewayNodesClient(t *testing.T) {
+	// decode our encoded key
+	decoded, err := base64.StdEncoding.DecodeString(key)
+	require.NoError(t, err)
+
 	complianceEndpoint := "127.0.0.1:10121"
 	secretsEndpoint := "127.0.0.1:10131"
 	gatewayEndpoint := "127.0.0.1:2001"
@@ -67,7 +73,7 @@ func TestGatewayNodesClient(t *testing.T) {
 		Type: "ssh",
 		Data: []*secrets.Kv{
 			{Key: "username", Value: os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_USER")},
-			{Key: "key", Value: os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_KEY")},
+			{Key: "key", Value: string(decoded)},
 		},
 	})
 	require.NoError(t, err)
