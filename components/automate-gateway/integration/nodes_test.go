@@ -2,6 +2,7 @@ package compliance
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"os"
 	"testing"
@@ -21,6 +22,10 @@ import (
 var host = os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_HOST")
 
 func TestGatewayNodesClient(t *testing.T) {
+	// decode our encoded key
+	decoded, err := base64.StdEncoding.DecodeString(os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_KEY"))
+	require.NoError(t, err)
+
 	complianceEndpoint := "127.0.0.1:10121"
 	secretsEndpoint := "127.0.0.1:10131"
 	gatewayEndpoint := "127.0.0.1:2001"
@@ -66,8 +71,8 @@ func TestGatewayNodesClient(t *testing.T) {
 		Name: "test secret",
 		Type: "ssh",
 		Data: []*secrets.Kv{
-			{Key: "username", Value: os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_USERNAME")},
-			{Key: "password", Value: os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_PASSWORD")},
+			{Key: "username", Value: os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_USER")},
+			{Key: "key", Value: string(decoded)},
 		},
 	})
 	require.NoError(t, err)
@@ -77,7 +82,7 @@ func TestGatewayNodesClient(t *testing.T) {
 		Name: "test secret",
 		Type: "ssh",
 		Data: []*secrets.Kv{
-			{Key: "username", Value: os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_USERNAME")},
+			{Key: "username", Value: os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_USER")},
 			{Key: "password", Value: "definitely not the password"},
 		},
 	})
@@ -177,14 +182,17 @@ func TestGatewayNodesClient(t *testing.T) {
 		Status: "completed",
 	}, *node.LastJob)
 
+	tc := *node.TargetConfig
+	assert.Equal(t, 1, len(tc.KeyFiles))
+	tc.KeyFiles = []string{}
 	assert.Equal(t, nodes.TargetConfig{
 		Backend:  "ssh",
 		Host:     host,
 		Port:     22,
 		Secrets:  []string{secretId.GetId()},
-		User:     os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_USERNAME"),
-		Password: os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_PASSWORD"),
-	}, *node.TargetConfig)
+		User:     os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_USER"),
+		KeyFiles: []string{},
+	}, tc)
 
 	node.LastContact = nil
 	node.LastJob = nil

@@ -2,6 +2,7 @@ package compliance
 
 import (
 	"context"
+	"encoding/base64"
 	"os"
 	"testing"
 	"time"
@@ -27,6 +28,10 @@ const (
 )
 
 func TestLicenseUsageNodes(t *testing.T) {
+	// decode our encoded key
+	decoded, err := base64.StdEncoding.DecodeString(os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_KEY"))
+	require.NoError(t, err)
+
 	t.Skip("Skip LicenseUsageNodes test")
 	// timestamp of now
 	now := time.Now()
@@ -68,8 +73,8 @@ func TestLicenseUsageNodes(t *testing.T) {
 		Name: "test secret",
 		Type: "ssh",
 		Data: []*secrets.Kv{
-			{Key: "username", Value: os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_USERNAME")},
-			{Key: "password", Value: os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_PASSWORD")},
+			{Key: "username", Value: os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_USER")},
+			{Key: "key", Value: string(decoded)},
 		},
 	})
 	require.NoError(t, err)

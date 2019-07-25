@@ -59,20 +59,20 @@ vault kv get -field=license secret/a2/delivery_license | base64 --decode >compon
 
 # Automate acceptence env secrets
 target_host=$(vault kv get -field=data secret/a2/testing/target_host)
-target_username=$(vault kv get -field=data secret/a2/testing/target_username)
-target_password=$(vault kv get -field=data secret/a2/testing/target_password)
+target_user=$(vault kv get -field=data secret/a2/testing/target_user)
+target_key=$(vault kv get -field=data secret/a2/testing/target_key)
 record_key=$(vault kv get -field=record_key secret/a2/cypress)
 
 cat >dev/secrets-env.sh <<EOF
 # Secrets
 export AUTOMATE_ACCEPTANCE_TARGET_HOST=$target_host
-export AUTOMATE_ACCEPTANCE_TARGET_USERNAME=$target_username
-export AUTOMATE_ACCEPTANCE_TARGET_PASSWORD=$target_password
+export AUTOMATE_ACCEPTANCE_TARGET_USER=$target_user
+export AUTOMATE_ACCEPTANCE_TARGET_KEY="$target_key"
 export HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_HOST=$target_host
-export HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_USERNAME=$target_username
-export HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_PASSWORD=$target_password
+export HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_USER=$target_user
+export HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_KEY="$target_key"
 export CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_HOST=$target_host
-export CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_USERNAME=$target_username
-export CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_PASSWORD=$target_password
+export CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_USER=$target_user
+export CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_KEY="$target_key"
 export CYPRESS_RECORD_KEY=$record_key
 EOF

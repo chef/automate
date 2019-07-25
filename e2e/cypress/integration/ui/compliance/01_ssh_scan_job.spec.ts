@@ -1,3 +1,5 @@
+import { Base64 } from 'js-base64';
+
 describe('create a manual node ssh scan job and cleanup after', () => {
   before(() => {
     cy.adminLogin('/');
@@ -13,7 +15,9 @@ describe('create a manual node ssh scan job and cleanup after', () => {
   const credName = 'a test ' + nowTime;
   const nodePrefix = '0-' + nowTime;
   const jobName = 'job ' + nowTime;
-  it('can create a credential with a username and password', () => {
+  const decoded = Base64.decode(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_KEY'));
+
+  it('can create a credential with a username and key', () => {
     // navigate to credentials create page:
     // click on settings
     cy.get('.nav-link').contains('Settings').click();
@@ -33,12 +37,12 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     cy.contains('Add Credential').click().then(() => {
       cy.url().should('include', '/settings/node-credentials/add');
 
-      // fill in name for credential, username, and password
+      // fill in name for credential, username, and key
       cy.get('form input[formcontrolname="name"]').first().type(credName);
       cy.get('form input[formcontrolname="username"]').first()
-        .type(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_USERNAME'));
-      cy.get('form input[formcontrolname="password"]').first()
-        .type(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_PASSWORD'));
+        .type(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_USER'));
+      cy.get('form textarea[formcontrolname="key"]')
+        .type(decoded);
 
       // we save the route that will be called when we navigate to the page
       // in order to be able to wait for it later

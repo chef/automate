@@ -4,8 +4,8 @@
 #    export A2_URL='https://a2-dev.test'
 #    export A2_TOKEN='SOME-TOKEN'
 #    export AUTOMATE_ACCEPTANCE_TARGET_HOST=some-host
-#    export AUTOMATE_ACCEPTANCE_TARGET_USERNAME=some-host
-#    export AUTOMATE_ACCEPTANCE_TARGET_PASSWORD=some-password
+#    export AUTOMATE_ACCEPTANCE_TARGET_USER=some-host
+#    export AUTOMATE_ACCEPTANCE_TARGET_KEY=some-key
 #    components/compliance-service/scripts/create-pg-data.sh
 
 url=${A2_URL}
@@ -36,8 +36,8 @@ ssh_secret_ec2=$(curl -s --insecure -H "api-token: $token" $url/api/v0/secrets -
   "name": "my ssh secret",
   "type": "ssh",
   "data": [
-    { "key": "username", "value": "'${AUTOMATE_ACCEPTANCE_TARGET_USERNAME}'" },
-    { "key": "password", "value": "'${AUTOMATE_ACCEPTANCE_TARGET_PASSWORD}'" }
+    { "key": "username", "value": "'${AUTOMATE_ACCEPTANCE_TARGET_USER}'" },
+    { "key": "key", "value": "'${AUTOMATE_ACCEPTANCE_TARGET_KEY}'" }
   ]
 }'  | jq '.id')
 
@@ -119,8 +119,8 @@ for i in $(seq 1 ${job_count}); do
 #     "type": "aws-api",
 #     "instance_credentials": [],
 # 		"credential_data": [
-# 			{Key: "AWS_ACCESS_KEY_ID", Value: "value" },
-# 			{Key: "AWS_SECRET_ACCESS_KEY", Value: "value" },
-# 			{Key: "AWS_SESSION_TOKEN", Value: "value" }
+# 			{"key": "AWS_ACCESS_KEY_ID", "value": "value" },
+# 			{"key": "AWS_SECRET_ACCESS_KEY", "value": "value" },
+# 			{"key": "AWS_SESSION_TOKEN", "value": "value" }
 # 		]
 #   }'
