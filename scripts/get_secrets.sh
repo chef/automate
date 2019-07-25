@@ -59,10 +59,8 @@ vault kv get -field=license secret/a2/delivery_license | base64 --decode >compon
 
 # Automate acceptence env secrets
 target_host=$(vault kv get -field=data secret/a2/testing/target_host)
-target_username=$(vault kv get -field=data secret/a2/testing/target_username)
 target_user=$(vault kv get -field=data secret/a2/testing/target_user)
 target_key=$(vault kv get -field=data secret/a2/testing/target_key)
-target_password=$(vault kv get -field=data secret/a2/testing/target_password)
 record_key=$(vault kv get -field=record_key secret/a2/cypress)
 
 cat >dev/secrets-env.sh <<EOF
