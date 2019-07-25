@@ -26,6 +26,11 @@ describe File.basename(__FILE__) do
     # those nodes should not have been added to the manual node manager, as they were ingested nodes, not manually added nodes
     manually_managed_nodes = MANAGER_GRPC nodes, :list, Nodes::Query.new(filters: [Common::Filter.new(key: "manager_id", values: ["e69dc612-7e67-43f2-9b19-256afd385820"])])
     assert_equal(original_manually_managed_nodes.total, manually_managed_nodes.total)
+
+    # ensure we can read an ingested node
+    nodes_list['nodes'].each { |node|
+      node_read = MANAGER_GRPC nodes, :read, Nodes::Id.new(id: node.id)
+    }
   end
 
   it "nodes have scan data" do
