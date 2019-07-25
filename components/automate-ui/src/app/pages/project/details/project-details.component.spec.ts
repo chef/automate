@@ -31,7 +31,7 @@ describe('ProjectDetailsComponent', () => {
       conditions: [
         {
           attribute: 'CHEF_ORGS',
-          values: 'My value',
+          values: ['My value'],
           operator: 'EQUALS'
         }
       ]
@@ -45,7 +45,7 @@ describe('ProjectDetailsComponent', () => {
       conditions: [
         {
           attribute: 'CHEF_ORGS',
-          values: '["My value"]',
+          values: ['Value one', 'Value two'],
           operator: 'MEMBER_OF'
         }
       ]

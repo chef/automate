@@ -65,12 +65,10 @@
             <chef-form-field class="attribute-field">
               <label>
                 <span class="label">Operator</span>
-                <select ngDefaultControl
-                  formControlName="operator"
-                  (change)="updateConditionValues(condition)"
-                >
-                  <option value='EQUALS'>equals</option>
-                  <option value='MEMBER_OF'>member of</option>
+                <select ngDefaultControl formControlName="operator">
+                  <option *ngFor="let operator of operators"
+                    [value]="operator.key"
+                  >{{ operator.value }}</option>
                 </select>
               </label>
               <chef-error
@@ -84,7 +82,6 @@
                 <chef-input ngDefaultControl
                   formControlName="values"
                   [value]="getConditionValue(condition.controls.values.value)"
-                  (change)="updateConditionValues(condition)"
                 ></chef-input>
               </label>
               <chef-error

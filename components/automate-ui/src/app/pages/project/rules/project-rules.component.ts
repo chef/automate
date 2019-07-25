@@ -10,18 +10,14 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
 import { EntityStatus, loading } from 'app/entities/entities';
 import { Regex } from 'app/helpers/auth/regex';
-import { Rule, RuleTypeMappedObject } from 'app/entities/rules/rule.model';
 import {
-  GetRule,
-  GetRulesForProject,
-  CreateRule,
-  UpdateRule
+  Rule, RuleTypeMappedObject, Condition, ConditionOperator, KVPair
+} from 'app/entities/rules/rule.model';
+import {
+  GetRule, GetRulesForProject, CreateRule, UpdateRule
 } from 'app/entities/rules/rule.actions';
 import {
-  getRuleAttributes,
-  getStatus,
-  updateStatus,
-  ruleFromRoute
+  getRuleAttributes, getStatus, updateStatus, ruleFromRoute
 } from 'app/entities/rules/rule.selectors';
 import { projectFromRoute } from 'app/entities/projects/project.selectors';
 import { Project } from 'app/entities/projects/project.model';
@@ -42,6 +38,17 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   public saving = false;
   public attributes: RuleTypeMappedObject;
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
+
+  public operators = [
+    <KVPair>{
+      key: <ConditionOperator>'EQUALS',
+      value: 'equals'
+    },
+    <KVPair>{
+      key: <ConditionOperator>'MEMBER_OF',
+      value: 'member of'
+    }
+  ];
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -166,7 +173,9 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
 
     if (this.rule.conditions && this.rule.conditions.length !== 0) {
       this.rule.conditions.forEach(c => {
-        this.conditions.push(this.createCondition(c.attribute, c.operator, c.values));
+        this.conditions.push(
+          // Convert values array to display string
+          this.createCondition(c.attribute, c.operator, c.values.join(', ')));
       });
     } else {
       this.conditions.push(this.createCondition());
@@ -175,34 +184,45 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     return this.conditions;
   }
 
-  updateConditionValues(condition: FormGroup): void {
-    if (condition.controls.operator.value === 'MEMBER_OF') {
-      condition.controls.values.setValue(
-        (typeof condition.controls.values.value === 'string')
-        ? condition.controls.values.value.split(/,\s*/).map((v: string) => v.trim())
-        : condition.controls.values.value) ;
-    } else {
-      condition.controls.values.setValue(
-        (typeof condition.controls.values.value === 'string')
-          ? condition.controls.values.value
-          : condition.controls.values.value.join(', '));
-    }
-  }
-
   getConditionValue(value: string | string[]): string {
     return (typeof value === 'string') ? value : value.join(', ');
   }
 
   createRule() {
-    this.store.dispatch(new CreateRule({project_id: this.project.id, rule: this.ruleForm.value}));
+    this.store.dispatch(
+      new CreateRule({
+        project_id: this.project.id,
+        rule: this.convertToRule()
+      }));
   }
 
   updateRule() {
-    const updatedRule = this.ruleForm.value;
+    const updatedRule = this.convertToRule();
     updatedRule.id = this.rule.id;
     updatedRule.project_id = this.rule.project_id;
     this.store.dispatch(new UpdateRule({ rule: updatedRule }));
     this.store.dispatch(new GetRulesForProject({ project_id: this.rule.project_id }));
+  }
+
+  convertToRule(): Rule {
+    const ruleValue = this.ruleForm.value;
+    const conditions: Condition[] = [];
+    ruleValue.conditions.forEach(c => {
+      conditions.push(<Condition>{
+        attribute: c.attribute,
+        operator: c.operator,
+          // Convert values string to storage format
+        values: c.operator === <ConditionOperator>'EQUALS'
+          ? [c.values.trim()]
+          : c.values.split(/,\s*/).map(v => v.trim())
+      });
+    });
+    return <Rule>{
+      name: ruleValue.name,
+      type: ruleValue.type,
+      status: 'staged',
+      conditions: conditions
+    };
   }
 
   saveRule() {
