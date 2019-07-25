@@ -62,3 +62,4 @@
 - [`60_use_db_id_as_primary_key_in_iam_statement_projects.up.sql`](60_use_db_id_as_primary_key_in_iam_statement_projects.up.sql)
 - [`61_use_role_db_id_in_iam_statements.up.sql`](61_use_role_db_id_in_iam_statements.up.sql)
 - [`62_add_not_null_constraints.up.sql`](62_add_not_null_constraints.up.sql)
+- [`63_make_db_id_lookup_functions_strict.up.sql`](63_make_db_id_lookup_functions_strict.up.sql)
