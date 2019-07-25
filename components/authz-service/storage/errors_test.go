@@ -17,11 +17,3 @@ func TestNewErrTxCommit(t *testing.T) {
 		assert.Equal(t, "commit db transaction: "+errStr, txErr.Error())
 	})
 }
-
-func TestNewErrRoleMustExistForStatement(t *testing.T) {
-	t.Run("ErrTxCommit.Error() does not cause an infinite loop", func(t *testing.T) {
-		pgErrStr := "role must exist to be inserted into a policy statement, missing role with ID: missing"
-		err := storage.NewErrRoleMustExistForStatement(pgErrStr)
-		assert.Equal(t, pgErrStr, err.Error())
-	})
-}

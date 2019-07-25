@@ -83,4 +83,27 @@ END;
 $$
 LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION
+    insert_iam_statement_into_policy(_policy_id TEXT, _statement_id UUID, _statement_effect iam_effect, _statement_actions TEXT[],
+    _statement_resources TEXT[], _statement_role TEXT, _statement_projects TEXT[])
+        RETURNS void AS $$
+            BEGIN
+                -- if NULL or an empty string was passed for the role, we shouldn't try to insert a role.
+                IF _statement_role IS NULL OR _statement_role=''
+                THEN
+                    INSERT INTO iam_statements (policy_id, id, effect, actions, resources)
+                        VALUES (policy_db_id(_policy_id), _statement_id, _statement_effect, _statement_actions, _statement_resources);
+                ELSE
+                    INSERT INTO iam_statements (policy_id, id, effect, actions, resources, role_id)
+                        VALUES (policy_db_id(_policy_id), _statement_id, _statement_effect, _statement_actions, _statement_resources, role_db_id(_statement_role));
+                END IF;
+
+                INSERT INTO iam_statement_projects (statement_id, project_id)
+                    SELECT statement_db_id(_statement_id) s_id, project_db_id(p_id)
+                    FROM UNNEST(_statement_projects) project_db_id(p_id)
+                ON CONFLICT DO NOTHING;
+                RETURN;
+            END
+$$ LANGUAGE PLPGSQL;
+
 COMMIT;

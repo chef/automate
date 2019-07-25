@@ -87,8 +87,6 @@ func parsePQError(e *pq.Error) error {
 		return storage.ErrMarkedForDeletion
 	case "RLTYP": // Custom code: attempt to update a rule's type that is immutable
 		return storage.ErrChangeTypeForRule
-	case "RDNES": // Custom code: attempt to create a policy statement with a role that does not exist
-		return storage.NewErrRoleMustExistForStatement(e.Message)
 	}
 
 	return storage.ErrDatabase
