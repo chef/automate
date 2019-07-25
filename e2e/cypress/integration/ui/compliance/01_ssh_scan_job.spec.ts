@@ -15,7 +15,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
   const credName = 'a test ' + nowTime;
   const nodePrefix = '0-' + nowTime;
   const jobName = 'job ' + nowTime;
-  const decoded = Base64.decode(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_KEY'))
+  const decoded = Base64.decode(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_KEY'));
 
   it('can create a credential with a username and key', () => {
     // navigate to credentials create page:
