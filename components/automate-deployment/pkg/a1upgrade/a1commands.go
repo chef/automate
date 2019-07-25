@@ -69,12 +69,21 @@ type EsShardsStats struct {
 	Total int `json:"total"`
 }
 
-// MaintDotFlag is the path to the file which will make A1's nginx go into
-// maintenance mode. See also:
-// https://github.com/chef/a1/blob/e1278c5fbb4478fa31b0853788cad1f6714fecf7/cookbooks/delivery/templates/default/nginx-internal.conf.erb#L146
-const MaintDotFlag = "/var/opt/delivery/delivery/etc/maint.flag"
+const (
+	// A1ChefServerCtlPath is the full path to the expected
+	// location of chef-server-clt from the old chef-server
+	// installation. This is used to ensure we can access the
+	// correct chef-server-ctl even after the new A2
+	// chef-server-ctl has been binlinked into place.
+	A1ChefServerCtlPath = "/opt/opscode/bin/chef-server-ctl"
 
-const rabbitStatsURL = "https://localhost:15672/api/queues/%2Finsights/data-collector"
+	// MaintDotFlag is the path to the file which will make A1's nginx go into
+	// maintenance mode. See also:
+	// https://github.com/chef/a1/blob/e1278c5fbb4478fa31b0853788cad1f6714fecf7/cookbooks/delivery/templates/default/nginx-internal.conf.erb#L146
+	MaintDotFlag = "/var/opt/delivery/delivery/etc/maint.flag"
+
+	rabbitStatsURL = "https://localhost:15672/api/queues/%2Finsights/data-collector"
+)
 
 var duTimeout = 300 * time.Second
 var automateCtlTimeout = 300 * time.Second
@@ -123,7 +132,7 @@ func SystemCtlIsEnabledChefServer() bool {
 // ChefServerCtlStop stops all Chef Server services via
 // chef-server-ctl.
 func ChefServerCtlStop() error {
-	return defaultCommandExecutor.Run("/opt/opscode/bin/chef-server-ctl",
+	return defaultCommandExecutor.Run(A1ChefServerCtlPath,
 		command.Args("stop"),
 		command.Timeout(automateCtlTimeout))
 }
@@ -131,7 +140,7 @@ func ChefServerCtlStop() error {
 // ChefServerCtlStopService stops the given service using
 // chef-server-ctl.
 func ChefServerCtlStopService(svcName string) error {
-	return defaultCommandExecutor.Run("/opt/opscode/bin/chef-server-ctl",
+	return defaultCommandExecutor.Run(A1ChefServerCtlPath,
 		command.Args("stop", svcName),
 		command.Timeout(automateCtlTimeout))
 }
@@ -179,11 +188,12 @@ func RetrievePivotalKey() (string, error) {
 }
 
 func getChefServerSecret(secretGroup string, secretName string) (string, error) {
-	output, err := defaultCommandExecutor.Output("chef-server-ctl",
+	output, err := defaultCommandExecutor.Output(A1ChefServerCtlPath,
 		command.Args("show-secret", secretGroup, secretName),
 		command.Timeout(automateCtlTimeout))
 	if err != nil {
-		return output, errors.Errorf("chef-server-ctl show secret failed: %s\nstdout:\n%s\nstderr:\n%s\n",
+		return output, errors.Errorf("%s show secret failed: %s\nstdout:\n%s\nstderr:\n%s\n",
+			A1ChefServerCtlPath,
 			err.Error(),
 			output,
 			command.StderrFromError(err))
