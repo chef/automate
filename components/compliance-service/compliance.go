@@ -489,6 +489,7 @@ func Serve(conf config.Compliance, grpcBinding string) error {
 	if err != nil {
 		return err
 	}
+	defer workflowManager.Stop()
 
 	go serveGrpc(ctx, db, connFactory, esr, conf, grpcBinding, statusSrv, workflowManager) // nolint: errcheck
 
