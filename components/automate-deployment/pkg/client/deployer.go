@@ -1451,7 +1451,7 @@ func (d *deployer) writeA1ComplianceSecret() {
 func (d *deployer) cancelUpgradeInstructions() string {
 	restartCmd := "automate-ctl start"
 	if d.mergedCfg.GetDeployment().GetV1().GetSvc().GetEnableChefServer().GetValue() {
-		restartCmd += "\nchef-server-ctl start"
+		restartCmd = fmt.Sprintf("%s\n%s start", restartCmd, a1upgrade.A1ChefServerCtlPath)
 	}
 	return fmt.Sprintf(cancelUpgradeInstructionsFmt, restartCmd)
 }
