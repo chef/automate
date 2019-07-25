@@ -138,6 +138,9 @@ func GetNode(ctx context.Context, in *nodes.Id, db *pgdb.DB, secretsClient secre
 }
 
 func resolveInspecConfigWithSecrets(tc *nodes.TargetConfig, secretsMaps []map[string]string) error {
+	if tc == nil {
+		return nil
+	}
 	secretsArr := make([]*nodes.NodeSecrets, 0)
 
 	for _, secretsMap := range secretsMaps {
