@@ -9,28 +9,25 @@ import { FormGroup } from '@angular/forms';
 export class CreateV1TeamModalComponent implements OnInit {
   @Input() visible = false;
   @Input() creating = false;
-  @Input() objectNoun: string;
-  @Input() createForm: FormGroup; // NB: The form must contain 'name' and 'id' fields
-  @Input() conflictErrorEvent: EventEmitter<boolean>; // TC: This element assumes 'id' is the
-                                                      // only create field that can conflict.
+  @Input() createForm: FormGroup;
+  @Input() conflictErrorEvent: EventEmitter<boolean>;
+
   @Output() close = new EventEmitter();
   @Output() createClicked = new EventEmitter();
 
-  public modifyName = false;
   public conflictError = false;
 
   ngOnInit(): void {
     this.conflictErrorEvent.subscribe((isConflict: boolean) => {
       this.conflictError = isConflict;
-      // Open the Name input on conflict so user can resolve it.
-      this.modifyName = true;
     });
   }
 
   public handleNameInput(event: KeyboardEvent): void {
-    if (!this.modifyName && !this.isNavigationKey(event)) {
-      this.conflictError = false;
+    if (this.isNavigationKey(event)) {
+      return;
     }
+    this.conflictError = false;
   }
 
   public handleDescriptionInput(event: KeyboardEvent): void {
@@ -41,7 +38,6 @@ export class CreateV1TeamModalComponent implements OnInit {
   }
 
   closeEvent(): void {
-    this.modifyName = false;
     this.close.emit();
   }
 
