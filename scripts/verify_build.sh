@@ -63,7 +63,7 @@ done
 if [[ "$build_commands" != "" ]]; then
     # We override HAB_CACHE_KEY_PATH to ensure we only see the key we
     # generated in this build
-    HAB_DOCKER_OPTS="--tty" HAB_ORIGIN="" HAB_CACHE_KEY_PATH=$RESOLVED_RESULTS_DIR DO_CHECK=true hab studio -D run "source .studiorc; set -e; $build_commands"
+    HAB_ORIGIN=chef HAB_CACHE_KEY_PATH=$RESOLVED_RESULTS_DIR DO_CHECK=true hab studio run "source .studiorc; set -e; $build_commands"
 fi
 
 # Generate a local A2 manifest. This manifest represents the total
