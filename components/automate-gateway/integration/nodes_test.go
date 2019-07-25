@@ -20,11 +20,10 @@ import (
 )
 
 var host = os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_HOST")
-var key = os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_KEY")
 
 func TestGatewayNodesClient(t *testing.T) {
 	// decode our encoded key
-	decoded, err := base64.StdEncoding.DecodeString(key)
+	decoded, err := base64.StdEncoding.DecodeString(os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_KEY"))
 	require.NoError(t, err)
 
 	complianceEndpoint := "127.0.0.1:10121"

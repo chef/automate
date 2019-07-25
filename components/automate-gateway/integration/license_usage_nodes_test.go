@@ -29,7 +29,7 @@ const (
 
 func TestLicenseUsageNodes(t *testing.T) {
 	// decode our encoded key
-	decoded, err := base64.StdEncoding.DecodeString(key)
+	decoded, err := base64.StdEncoding.DecodeString(os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_KEY"))
 	require.NoError(t, err)
 
 	t.Skip("Skip LicenseUsageNodes test")
