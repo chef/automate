@@ -179,9 +179,7 @@ export class ChefControlMenu {
       this.focused ? 'focused' : '',
       this.active ? 'active' : '',
       this.disabled ? 'disabled' : ''
-    ]
-    .filter(className => className.length > 0)
-    .join(' ');
+    ].join(' ');
 
     return (
       <Host tabindex={this.disabled ? '-1' : '0'} role="combobox" class={classNames}>

@@ -77,9 +77,7 @@ export class ChefNotification {
     const classNames = [
       this.className(this.type),
       this.visible ? 'visible' : ''
-    ]
-    .filter(className => className.length > 0)
-    .join(' ');
+    ].join(' ');
 
     return (
       <Host class={classNames}>

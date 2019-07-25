@@ -201,9 +201,7 @@ export class ChefSelect {
       this.focused ? 'focused' : '',
       this.active ? 'active' : '',
       this.disabled ? 'disabled' : ''
-    ]
-    .filter(className => className.length > 0)
-    .join(' ');
+    ].join(' ');
 
     return (
       <Host

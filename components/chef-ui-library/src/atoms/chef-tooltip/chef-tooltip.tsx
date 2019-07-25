@@ -144,9 +144,7 @@ export class ChefTooltip {
       this.visible ? 'visible' : '',
       this.position,
       this.follow ? 'follow' : ''
-    ]
-    .filter(className => className.length > 0)
-    .join(' ');
+    ].join(' ');
 
     return (
       <Host class={classNames} style={styles}>
