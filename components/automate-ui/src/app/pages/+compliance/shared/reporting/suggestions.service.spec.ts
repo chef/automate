@@ -50,17 +50,17 @@ describe('SuggestionsService', () => {
       req.flush(mockResp);
     });
 
-    it('returns maximum of 25 items', () => {
+    it('returns maximum of 100 items', () => {
       const type = 'platform';
       const text = 'win';
       const filters = [];
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/suggestions`;
-      const expectedSuggestions = Array.from({ length: 50 }).map(i => ({ text: `suggest-${i}` }));
+      const expectedSuggestions = Array.from({ length: 150 }).map(i => ({ text: `suggest-${i}` }));
       const mockResp = { suggestions: expectedSuggestions };
 
       service.getSuggestions(type, text, filters).subscribe(suggestions => {
-        expect(suggestions.length).toEqual(25);
+        expect(suggestions.length).toEqual(100);
       });
 
       const req = httpTestingController.expectOne(expectedUrl);
