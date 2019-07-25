@@ -187,6 +187,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   }
 
   createRule() {
+    // TODO: Generate the id!
     this.store.dispatch(
       new CreateRule({
         project_id: this.project.id,
@@ -196,8 +197,6 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
 
   updateRule() {
     const updatedRule = this.convertToRule();
-    updatedRule.id = this.rule.id;
-    updatedRule.project_id = this.rule.project_id;
     this.store.dispatch(new UpdateRule({ rule: updatedRule }));
     this.store.dispatch(new GetRulesForProject({ project_id: this.rule.project_id }));
   }
@@ -216,6 +215,8 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
       });
     });
     return <Rule>{
+      project_id: this.project.id,
+      id: this.rule.id,
       name: ruleValue.name,
       type: ruleValue.type,
       status: 'staged',
