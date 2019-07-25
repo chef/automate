@@ -35,7 +35,8 @@
 
     <div class="page-body">
       <chef-toolbar>
-        <chef-button primary
+        <chef-button *ngIf="isAutomateManager(managerDetail.manager.type)"
+          primary
           routerLink="/compliance/scanner/nodes/add">
           Add Nodes
         </chef-button>

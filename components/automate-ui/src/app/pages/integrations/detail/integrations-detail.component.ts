@@ -57,6 +57,10 @@ export class IntegrationsDetailComponent {
     return includes(this.selectedNodes, id);
   }
 
+  isAutomateManager(type: string) {
+    return type === 'automate';
+  }
+
   hasSelectedNodes() {
     return this.selectedNodes.length > 0;
   }
