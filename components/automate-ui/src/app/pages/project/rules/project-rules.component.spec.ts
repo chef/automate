@@ -11,7 +11,7 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import { IAMType } from 'app/entities/policies/policy.model';
 import { projectEntityReducer } from 'app/entities/projects/project.reducer';
 import { ProjectRulesComponent } from './project-rules.component';
-import { Rule, Condition, ConditionOperator } from 'app/entities/rules/rule.model';
+import { Rule, Condition, ConditionOperator, RuleType } from 'app/entities/rules/rule.model';
 import { ruleEntityReducer } from 'app/entities/rules/rule.reducer';
 
 describe('ProjectRulesComponent', () => {
@@ -187,14 +187,14 @@ describe('ProjectRulesComponent', () => {
     });
 
     it('should have attribute label with NODE type', () => {
-      component.ruleForm.get('type').setValue('NODE');
+      component.ruleForm.get('type').setValue(<RuleType>'node');
       const attributeLabel = component.getAttributeLabel();
       expect(attributeLabel)
         .toBe('node attribute'); // specifically should be lowercase for screen reader
     });
 
     it('should have attribute label with EVENT type', () => {
-      component.ruleForm.get('type').setValue('EVENT');
+      component.ruleForm.get('type').setValue(<RuleType>'event');
       const attributeLabel = component.getAttributeLabel();
       expect(attributeLabel)
         .toBe('event attribute'); // specifically should be lowercase for screen reader
@@ -222,7 +222,7 @@ describe('ProjectRulesComponent', () => {
         expect(rule.conditions[0]).toEqual(
           <Condition>{
             attribute: uiRule.attribute,
-            operator: operator,
+            operator: uiRule.operator,
             values: expected
           });
       });
