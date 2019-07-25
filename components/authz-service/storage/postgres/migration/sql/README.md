@@ -63,3 +63,4 @@
 - [`61_use_role_db_id_in_iam_statements.up.sql`](61_use_role_db_id_in_iam_statements.up.sql)
 - [`62_add_not_null_constraints.up.sql`](62_add_not_null_constraints.up.sql)
 - [`63_make_db_id_lookup_functions_strict.up.sql`](63_make_db_id_lookup_functions_strict.up.sql)
+- [`64_drop_uuid_of_iam_members.up.sql`](64_drop_uuid_of_iam_members.up.sql)

@@ -523,10 +523,13 @@ func (p *pg) RemovePolicyMembers(ctx context.Context,
 		return nil, p.processError(err)
 	}
 
+	// Note: we're not using member_db_id() here, since we want to gracefully
+	// ignore "not found" errors.
 	for _, member := range members {
 		_, err := tx.ExecContext(ctx,
 			`DELETE FROM iam_policy_members WHERE policy_id=policy_db_id($1) AND
-				member_id=(SELECT db_id from iam_members WHERE name=$2);`, policyID, member.Name)
+				member_id=(SELECT db_id from iam_members WHERE name=$2)`,
+			policyID, member.Name)
 		if err != nil {
 			err = p.processError(err)
 			switch err {
@@ -587,10 +590,10 @@ func (p *pg) insertOrReusePolicyMemberWithQuerier(ctx context.Context, policyID 
 	// not deleting any of the rows, but reusing them per name string.
 
 	_, err := q.ExecContext(ctx,
-		`INSERT INTO iam_members (id, name) VALUES ($1, $2) ON CONFLICT DO NOTHING;`,
-		member.ID, member.Name)
+		"INSERT INTO iam_members (name) VALUES ($1) ON CONFLICT DO NOTHING",
+		member.Name)
 	if err != nil {
-		return errors.Wrapf(err, "failed to upsert member %s (id %s)", member.Name, member.ID)
+		return errors.Wrapf(err, "failed to upsert member %s", member.Name)
 	}
 
 	// For now, let's just ignore conflicts if someone is trying to add a user that is already a member.
@@ -602,7 +605,7 @@ func (p *pg) insertOrReusePolicyMemberWithQuerier(ctx context.Context, policyID 
 
 func (p *pg) getPolicyMembersWithQuerier(ctx context.Context, id string, q Querier) ([]v2.Member, error) {
 	rows, err := q.QueryContext(ctx,
-		`SELECT m.id, m.name FROM iam_policy_members AS pm
+		`SELECT m.name FROM iam_policy_members AS pm
 			JOIN iam_members AS m ON pm.member_id=m.db_id
 			WHERE pm.policy_id=policy_db_id($1) ORDER BY m.name ASC`, id)
 
@@ -619,7 +622,7 @@ func (p *pg) getPolicyMembersWithQuerier(ctx context.Context, id string, q Queri
 	members := []v2.Member{}
 	for rows.Next() {
 		var member v2.Member
-		if err := rows.Scan(&member.ID, &member.Name); err != nil {
+		if err := rows.Scan(&member.Name); err != nil {
 			return nil, p.processError(err)
 		}
 		members = append(members, member)

@@ -8,15 +8,9 @@ import (
 
 const (
 	universalAccessStatementID        = "9edf285c-fc96-4363-a0b9-59e5b46f2a76"
-	universalAccessMemberID           = "f04ed84e-37da-4d62-808b-cbf81d2da666"
-	ingestNginxMemberID               = "f00f256a-53c9-4311-8f8a-1dda7402ca9f"
-	ingestErchefMemberID              = "f777e560-663f-45b0-93a5-f955843be34c"
 	ingestProviderStatementID         = "f777e560-663f-45b0-93a5-f955843be34c"
-	systemMemberID                    = "123e3a47-4ebd-4162-a836-e2955c5b5034"
-	systemLocalUsersMemberID          = "eedcb506-4aa0-4fc4-9800-ea2859b7ffb2"
 	systemIntrospectionStatementID    = "4cc6e7cd-5e32-43e5-af04-d32b15796590"
 	systemPolicyVersionStatementID    = "173a18a6-c102-4e45-a0d0-dfec68c2eee5"
-	allMembersID                      = "ea130a63-6b97-41c9-84c4-b7d074d869ef"
 	systemVersionStatementID          = "d7ed1d1f-1f6a-4055-a07e-23430c267e42"
 	systemLicenseStatementID          = "e5e1da2d-bbda-4211-adf5-c83e13f1891a"
 	systemLocalUsersStatementID       = "e9faa7a9-d458-4009-8192-edee6024b5d9"
@@ -36,7 +30,6 @@ func SystemPolicies() []*storage.Policy {
 		Name: "deployment-service universal access",
 		Members: []storage.Member{
 			{
-				ID:   uuid.Must(uuid.FromString(universalAccessMemberID)),
 				Name: "tls:service:deployment-service:*",
 			},
 		},
@@ -55,7 +48,6 @@ func SystemPolicies() []*storage.Policy {
 		Name: "System",
 		Members: []storage.Member{
 			{
-				ID:   uuid.Must(uuid.FromString(systemMemberID)),
 				Name: "*",
 			},
 		},
@@ -97,7 +89,6 @@ func SystemPolicies() []*storage.Policy {
 		Name: "System Local Users",
 		Members: []storage.Member{
 			{
-				ID:   uuid.Must(uuid.FromString(systemLocalUsersMemberID)),
 				Name: "user:local:*",
 			},
 		},
@@ -125,11 +116,9 @@ func SystemPolicies() []*storage.Policy {
 		Name: "System Ingest Providers",
 		Members: []storage.Member{
 			{
-				ID:   uuid.Must(uuid.FromString(ingestNginxMemberID)),
 				Name: "tls:service:automate-cs-nginx:*",
 			},
 			{
-				ID:   uuid.Must(uuid.FromString(ingestErchefMemberID)),
 				Name: "tls:service:automate-cs-oc-erchef:*",
 			},
 		},
@@ -150,7 +139,6 @@ func SystemPolicies() []*storage.Policy {
 		Name: "System policy to protect Chef-managed entities",
 		Members: []storage.Member{
 			{
-				ID:   uuid.Must(uuid.FromString(allMembersID)),
 				Name: "*",
 			},
 		},
