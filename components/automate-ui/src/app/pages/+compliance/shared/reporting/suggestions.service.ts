@@ -19,6 +19,6 @@ export class SuggestionsService {
     const formatted = this.statsService.formatFilters(filters);
     const body = {type, text, filters: formatted};
     return this.httpClient.post<any>(url, body).pipe(
-      map(({suggestions}) => suggestions.slice(0, 25) || []));
+      map(({suggestions}) => suggestions.slice(0, 100) || []));
   }
 }
