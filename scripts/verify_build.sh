@@ -13,23 +13,14 @@ export HAB_NONINTERACTIVE=true
 export HAB_NOCOLORING=true
 export HAB_LICENSE="accept-no-persist"
 
+RESOLVED_RESULTS_DIR=$(realpath results/)
+
 sudo -E hab pkg install core/ruby
 export PATH
 PATH="$(hab pkg path core/ruby)/bin:$PATH"
 sudo -E "$(hab pkg path core/ruby)"/bin/gem install toml
 
-if [[ $EUID -eq 0 ]]; then
-    key_cache="/hab/cache/keys"
-else
-    key_cache="$HOME/.hab/cache/keys"
-fi
-
-keyname=$(hab origin key generate chef | grep -oE 'chef-[0-9]{14}')
-cp "${key_cache}/${keyname}.sig.key" results/
-cp "${key_cache}/${keyname}.pub" results/
-
-build_secret_key=$(cat "${key_cache}/${keyname}.sig.key")
-build_public_key=$(cat "${key_cache}/${keyname}.pub")
+HAB_CACHE_KEY_PATH=$RESOLVED_RESULTS_DIR hab origin key generate chef
 
 echo "Downloading manifests from packages.chef.io"
 curl "https://packages.chef.io/manifests/dev/automate/latest.json" > results/dev.json
@@ -61,13 +52,9 @@ for component in "${changed_components[@]}"; do
 done
 
 if [[ "$build_commands" != "" ]]; then
-    # We inject the previously created chef origin key into the build.
-    # We can't rely on habitat importing it for us because separate
-    # builds might be happening on the same machine with a shared key
-    # cache.
-    build_commands="echo '$build_secret_key' | hab origin key import; ${build_commands}"
-    build_commands="echo '$build_public_key' | hab origin key import; ${build_commands}"
-    HAB_DOCKER_OPTS="--tty" HAB_ORIGIN="" HAB_CACHE_KEY_PATH=$(realpath results/) DO_CHECK=true hab studio -D run "source .studiorc; set -e; $build_commands"
+    # We override HAB_CACHE_KEY_PATH to ensure we only see the key we
+    # generated in this build
+    HAB_DOCKER_OPTS="--tty" HAB_ORIGIN="" HAB_CACHE_KEY_PATH=$RESOLVED_RESULTS_DIR DO_CHECK=true hab studio -D run "source .studiorc; set -e; $build_commands"
 fi
 
 # Generate a local A2 manifest. This manifest represents the total
