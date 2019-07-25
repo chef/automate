@@ -9,24 +9,32 @@ if [[ "$CI" != "true" ]]; then
     echo "WARNING: This script is intended to run in buildkite.  It will likely fail outside of buildkite."
 fi
 
+log_section_start() {
+    echo "--- [$(date -u)] $*"
+}
+
 export HAB_NONINTERACTIVE=true
+export HAB_STUDIO_SECRET_HAB_NONINTERACTIVE=true
 export HAB_NOCOLORING=true
 export HAB_LICENSE="accept-no-persist"
 
 RESOLVED_RESULTS_DIR=$(realpath results/)
 
+log_section_start "install ruby"
 sudo -E hab pkg install core/ruby
 export PATH
 PATH="$(hab pkg path core/ruby)/bin:$PATH"
 sudo -E "$(hab pkg path core/ruby)"/bin/gem install toml
 
+log_section_start "generate ephemeral origin key"
 HAB_CACHE_KEY_PATH=$RESOLVED_RESULTS_DIR hab origin key generate chef
 
-echo "Downloading manifests from packages.chef.io"
+log_section_start "download manifests"
 curl "https://packages.chef.io/manifests/dev/automate/latest.json" > results/dev.json
 curl "https://packages.chef.io/manifests/current/automate/latest.json" > results/current.json
 curl "https://packages.chef.io/manifests/acceptance/automate/latest.json" > results/acceptance.json
 
+log_section_start "determine changed components"
 mapfile -t changed_components < <(./scripts/changed_components.rb)
 if [[ ${#changed_components[@]} -ne 0 ]]; then
     buildkite-agent annotate --style "info" << EOF
@@ -48,7 +56,8 @@ fi
 # Build all habitat packages that have changed
 build_commands=""
 for component in "${changed_components[@]}"; do
-    build_commands="${build_commands} build $component;"
+    component_build="echo \"--- [\$(date -u)] build $component\"; build $component"
+    build_commands="${build_commands} $component_build;"
 done
 
 if [[ "$build_commands" != "" ]]; then
@@ -67,9 +76,11 @@ fi
 # dev.json manifest downloaded before the build as their starting
 # point. We are still open to clock-sync affecting package versions
 # being older or newer than we might expect.
+log_section_start "create manifest"
 .expeditor/create-manifest.rb
 mv manifest.json results/build.json
 
+log_section_start "create buildkite artifact"
 # The integration test framework uses this file to decide whether or
 # not it needs to build packages directly.
 touch results/.prebuilt_artifacts
