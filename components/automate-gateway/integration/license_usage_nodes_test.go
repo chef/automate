@@ -68,8 +68,8 @@ func TestLicenseUsageNodes(t *testing.T) {
 		Name: "test secret",
 		Type: "ssh",
 		Data: []*secrets.Kv{
-			{Key: "username", Value: os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_USERNAME")},
-			{Key: "password", Value: os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_PASSWORD")},
+			{Key: "username", Value: os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_USER")},
+			{Key: "key", Value: os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_KEY")},
 		},
 	})
 	require.NoError(t, err)

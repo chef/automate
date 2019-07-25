@@ -215,11 +215,11 @@ steps:
         HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_HOST2:
           path: secret/a2/testing/target_host2
           field: data
-        HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_USERNAME:
-          path: secret/a2/testing/target_username
+        HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_USER:
+          path: secret/a2/testing/target_user
           field: data
-        HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_PASSWORD:
-          path: secret/a2/testing/target_password
+        HAB_STUDIO_SECRET_AUTOMATE_ACCEPTANCE_TARGET_KEY:
+          path: secret/a2/testing/target_key
           field: data
       executor:
         docker:
@@ -426,11 +426,11 @@ steps:
         CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_HOST:
           path: secret/a2/testing/target_host
           field: data
-        CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_USERNAME:
-          path: secret/a2/testing/target_username
+        CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_USER:
+          path: secret/a2/testing/target_user
           field: data
-        CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_PASSWORD:
-          path: secret/a2/testing/target_password
+        CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_KEY:
+          path: secret/a2/testing/target_key
           field: data
         # Note: this isn't currently used for pre-merge tests
         # CYPRESS_RECORD_KEY:
