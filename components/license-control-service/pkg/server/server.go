@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -12,6 +11,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	spanlog "github.com/opentracing/opentracing-go/log"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -44,23 +44,8 @@ type dateRange struct {
 var errInvalidLicenseData = errors.New("Invalid license data")
 
 // NewLicenseControlServer returns a new instance of our LicenseControlServer.
-func NewLicenseControlServer(config *Config) *LicenseControlServer {
-	ctx := context.TODO()
-
-	keysData, err := keys.Asset("data/keys.json")
-	if err != nil {
-		log.WithFields(
-			log.Fields{"error": err},
-		).Fatal("package main does not have expected asset 'data/keys.json'")
-	}
-
-	publicKeys, err := keys.LoadPublicKeys(keysData)
-	if err != nil {
-		log.WithFields(
-			log.Fields{"error": err},
-		).Fatal("Unable to load public keys")
-	}
-
+func NewLicenseControlServer(ctx context.Context, config *Config) *LicenseControlServer {
+	publicKeys := keys.LoadPublicKeys(keys.BuiltinKeyData)
 	updateQueue := make(chan func(*Config), 100)
 
 	srv := &LicenseControlServer{
