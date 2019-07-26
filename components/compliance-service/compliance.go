@@ -489,7 +489,12 @@ func Serve(conf config.Compliance, grpcBinding string) error {
 	if err != nil {
 		return err
 	}
-	defer cerealManager.Stop()
+	defer func() {
+		err := cerealManager.Stop()
+		if err != nil {
+			logrus.WithError(err).Error("could not stop cereal manager")
+		}
+	}()
 
 	go serveGrpc(ctx, db, connFactory, esr, conf, grpcBinding, statusSrv, cerealManager) // nolint: errcheck
 
