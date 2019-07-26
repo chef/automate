@@ -127,8 +127,6 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 		return err
 	}
 
-	// @afiune are we changing the grouping of a service group based of the application
-	// and environment names? if not, should we update those fields?
 	svc, exist := db.getServiceFromUniqueFields(
 		pkgIdent.Name,
 		eventMetadata.GetSupervisorId(),
@@ -141,7 +139,7 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 
 	// If the service already exists, we just do an update
 	if exist {
-		return db.updateTables(
+		return db.updateServiceAndRelations(
 			svc,
 			eventMetadata,
 			svcMetadata,
@@ -181,6 +179,12 @@ type deploymentServiceGroup struct {
 	Environment      string `db:"environment"`
 }
 
+// type serviceRelations struct {
+// 	ServiceGroupID int32
+// 	DeploymentID   int32
+// 	SupervisorId   int32
+// }
+
 const (
 	selectMatchingDeploymentAndSG = `
 SELECT sg.id AS service_group_id, d.id AS deployment_id, sg.name AS sg_name, d.app_name, d.environment
@@ -197,7 +201,7 @@ DELETE FROM deployment WHERE deployment.id = $1 AND (NOT EXISTS (SELECT 1 FROM s
 `
 )
 
-func (db *Postgres) updateTables(
+func (db *Postgres) updateServiceAndRelations(
 	svc *service,
 	eventMetadata *habitat.EventMetadata,
 	svcMetadata *habitat.ServiceMetadata,
@@ -234,20 +238,6 @@ func (db *Postgres) updateTables(
 
 	needToCreateDeploymentServiceGroup := (err != nil)
 	needToChangeDeploymentServiceGroup := needToCreateDeploymentServiceGroup || (existingDSG.ServiceGroupID != oldGID)
-
-	// When the service belongs to a deployment+service_group that exist (either
-	// the same one as before, or a different one):
-	if !needToCreateDeploymentServiceGroup && !needToChangeDeploymentServiceGroup {
-		// The service could be in the same service_group and deployment as it was
-		// before, but it could also be in a new one.
-		db.updateService(svc, eventMetadata, svcMetadata, pkgIdent, health, existingDSG)
-		if _, err := db.DbMap.Update(svc); err != nil {
-			return errors.Wrap(err, "unable to update service")
-		}
-		return nil
-	}
-
-	// FIXME: need to put the update for supervisor back in
 
 	return dblib.Transaction(db.DbMap, func(tx *gorp.Transaction) error {
 
@@ -291,46 +281,28 @@ func (db *Postgres) updateTables(
 			return errors.Wrap(err, "Unable to update service")
 		}
 
-		if _, err := tx.Exec(maybeCleanupServiceGroup, oldGID); err != nil {
-			return errors.Wrap(err, "Unable to cleanup possibly unused service group")
-		}
+		if needToChangeDeploymentServiceGroup {
+			if _, err := tx.Exec(maybeCleanupServiceGroup, oldGID); err != nil {
+				return errors.Wrap(err, "Unable to cleanup possibly unused service group")
+			}
 
-		if _, err := tx.Exec(maybeCleanupDeployment, oldDID); err != nil {
-			return errors.Wrap(err, "Unable to cleanup possibly unused service group")
+			if _, err := tx.Exec(maybeCleanupDeployment, oldDID); err != nil {
+				return errors.Wrap(err, "Unable to cleanup possibly unused service group")
+			}
+
+			sup, err := db.getSupervisor(svc.SupID)
+			if err != nil {
+				return errors.Wrap(err, "unable to update tables")
+			}
+			db.updateSupervisor(sup, eventMetadata)
+			if _, err := tx.Update(sup); err != nil {
+				return errors.Wrap(err, "Unable to update supervisor data")
+			}
+
 		}
 
 		return nil
 	})
-
-	/////////// old code /////////
-	// deploy, err := db.getDeployment(svc.DeploymentID)
-	// if err != nil {
-	// 	return errors.Wrap(err, "unable to update tables")
-	// }
-	// db.updateDeployment(deploy, eventMetadata)
-
-	// sup, err := db.getSupervisor(svc.SupID)
-	// if err != nil {
-	// 	return errors.Wrap(err, "unable to update tables")
-	// }
-	// db.updateSupervisor(sup, eventMetadata)
-
-	// sg, err := db.getServiceGroup(svc.GroupID)
-	// if err != nil {
-	// 	return errors.Wrap(err, "unable to update tables")
-	// }
-	// db.updateServiceGroup(sg, svcMetadata)
-
-	// // @afiune in the future if we have more tables that might need
-	// // to be updated, we will just add them to this map of tables
-	// tables := map[string]dbTable{
-	// 	"service":       svc,
-	// 	"deployment":    deploy,
-	// 	"supervisor":    sup,
-	// 	"service_group": sg,
-	// }
-
-	// return db.triggerDataUpdates(tables)
 }
 
 // updates the provided supervisor from a HealthCheck event
