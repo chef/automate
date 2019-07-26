@@ -13,7 +13,8 @@
     (click)="handleFocus($event)"
     (focus)="handleFocus($event)"
     (change)="onKeyChange($event)"
-    (keyup)="handleInput($event.key, keyInput.value)" />
+    (keyup)="handleInput($event.key, keyInput.value)"
+    autocomplete="off"/>
   <div *ngIf="suggestionsVisible && !selectedType" class="input-dropdown categories">
     <ul>
       <li *ngIf="filterTypes.length === 0" class="no-category-items">
@@ -40,7 +41,8 @@
     (input)="onValInputAndFocus($event)"
     (focus)="onValInputAndFocus($event)"
     [value]="inputText"
-    (keyup)="handleInput($event.key, valInput.value)"/>
+    (keyup)="handleInput($event.key, valInput.value)"
+    autocomplete="off"/>
   <div *ngIf="suggestionsVisible && selectedType" class="input-dropdown suggestions">
     <ul>
       <li *ngIf="inputText !== '' && isLoadingSuggestions" class="suggestion-status">
