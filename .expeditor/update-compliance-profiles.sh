@@ -12,7 +12,7 @@ case "${EXPEDITOR_PKG_TARGET:-unknown}" in
         echo "EXPEDITOR_PKG_TARGET is not set. Assuming this workload is for x86_64-linux"
         ;;
     *)
-        echo "EXPEDITOR_PKG_TARGET exists but is not our expected target (got: '$EXPEDITOR_PKG_TARGET', expected: 'x86_64-linux'). Exiting"
+        echo "EXPEDITOR_PKG_TARGET is set but is not our expected target (got: '$EXPEDITOR_PKG_TARGET', expected: 'x86_64-linux'). Exiting"
         exit 0
         ;;
 esac
