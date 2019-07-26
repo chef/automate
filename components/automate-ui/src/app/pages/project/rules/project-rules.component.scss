@@ -21,7 +21,9 @@ chef-page {
     width: 100%;
   }
 
-  #create-name, #create-type, #create-type-dropdown {
+  #create-name,
+  #create-type,
+  #create-type-dropdown {
     width: 340px;
     max-width: 340px;
   }
@@ -44,8 +46,11 @@ chef-page {
     padding-bottom: 0;
   }
 
-  chef-form-field {
+  .condition-item {
+    margin-bottom: 20px;
+  }
 
+  chef-form-field {
     label {
       padding-bottom: 0;
     }
@@ -55,26 +60,6 @@ chef-page {
       position: relative;
       vertical-align: top;
       width: 27%;
-
-      &:last-child {
-        margin: 2.5rem 0px;
-        width: 18%;
-
-        label {
-          display: inline-block;
-        }
-
-        chef-button {
-          position: absolute;
-          right: 0;
-          top: -14px;
-
-          chef-icon {
-            color: $chef-primary-dark;
-            font-size: 1.2rem;
-          }
-        }
-      }
 
       .label {
         color: $chef-dark-grey;
@@ -89,7 +74,31 @@ chef-page {
         width: 95%;
       }
     }
+  }
 
+  .end-row-items {
+    margin-top: 21px; // match labels in other columns
+    height: 45px; // match "values" input height
+    vertical-align: middle;
+    width: 18%;
+    display: inline-block;
+
+    span {
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 12px;
+      font-weight: 200;
+    }
+
+    chef-button {
+      margin-top: 2px;
+      float: right;
+
+      chef-icon {
+        color: $chef-primary-dark;
+        font-size: 1.2rem;
+      }
+    }
   }
 
   #add-condition {
