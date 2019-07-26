@@ -700,7 +700,6 @@ func TestNewSgAndDeploymentUpdate(t *testing.T) {
 		suite.WaitForEventsToProcess(eventsProcessed)
 	}
 
-	// TODO: test matrix:
 	t.Run("nothing changes when deployment and sg stay the same", func(t *testing.T) {
 		defer suite.DeleteDataFromStorage()
 		suite.Ingester.ResetStats()
@@ -943,9 +942,7 @@ func TestNewSgAndDeploymentUpdate(t *testing.T) {
 		setupData(t)
 		eventsProcessed := suite.Ingester.EventsProcessed()
 
-		// update1 changes the app_name and environment of the service from event 2
-		// there should be a new service group row in the database, it will have
-		// the same name "db.default" but have a different deployment_id
+		// update1 changes the app_name, environment, and service group of the service from event 2
 		update1 := NewHabitatEvent(
 			withSupervisorId("2"),
 			withPackageIdent("core/db/0.1.0/20200101121212"),
@@ -959,7 +956,7 @@ func TestNewSgAndDeploymentUpdate(t *testing.T) {
 		eventsProcessed++
 		suite.WaitForEventsToProcess(eventsProcessed)
 
-		// update2 changes the app_name and environment of the service from event 1
+		// update2 changes the app_name, environment, and service group of the service from event 1
 		update2 := NewHabitatEvent(
 			withSupervisorId("1"),
 			withPackageIdent("core/db/0.1.0/20200101121212"),
