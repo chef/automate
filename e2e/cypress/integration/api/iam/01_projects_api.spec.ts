@@ -114,8 +114,9 @@ describe('projects API', () => {
               });
             });
           });
-          const maxRetries = 75;
-          waitForNodes(admin.id_token, totalNodes, 0, maxRetries);
+          // There's no waiting involved, it's sending request after request.
+          const maxRetries = 200;
+          waitForNodes(admin.id_token, totalNodes, maxRetries);
 
           // confirm nodes are unassigned
           cy.request({
@@ -306,7 +307,7 @@ describe('projects API', () => {
   }
 });
 
-function waitForNodes(idToken: string, totalNodes: number, retries: number, maxRetries: number) {
+function waitForNodes(idToken: string, totalNodes: number, maxRetries: number) {
   cy
     .request({
       auth: { bearer: idToken },
@@ -315,15 +316,14 @@ function waitForNodes(idToken: string, totalNodes: number, retries: number, maxR
     })
     .then((resp: Cypress.ObjectLike) => {
       // to avoid getting stuck in an infinite loop
-      if (retries > maxRetries) {
+      if (maxRetries === 0) {
         return;
       }
       if (resp.body.length === totalNodes + 4) {
         return;
       }
 
-      retries = retries + 1;
-      waitForNodes(idToken, totalNodes, retries, maxRetries);
+      waitForNodes(idToken, totalNodes, maxRetries - 1);
     });
 }
 
