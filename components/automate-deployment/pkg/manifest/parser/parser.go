@@ -39,7 +39,7 @@ func ManifestFromBytes(body []byte) (*manifest.A2, error) {
 	versionedManifest := &versionedManifest{}
 	err := json.Unmarshal(body, versionedManifest)
 	if err != nil {
-		return nil, manifest.NewErrInvalidSchema(err)
+		return nil, manifest.NewInvalidSchemaError(err)
 	}
 
 	ver := versionedManifest.SchemaVersion
@@ -47,7 +47,7 @@ func ManifestFromBytes(body []byte) (*manifest.A2, error) {
 	case "1":
 		return parseV1Manifest(body)
 	default:
-		return nil, manifest.NewErrInvalidSchema(errors.Errorf("schema version unknown: %s", ver))
+		return nil, manifest.NewInvalidSchemaError(errors.Errorf("schema version unknown: %s", ver))
 	}
 }
 
@@ -55,7 +55,7 @@ func parseV1Manifest(body []byte) (*manifest.A2, error) {
 	v1 := &v1Manifest{}
 	err := json.Unmarshal(body, v1)
 	if err != nil {
-		return nil, manifest.NewErrCannotParse(err)
+		return nil, manifest.NewCannotParseError(err)
 	}
 
 	m := &manifest.A2{}
@@ -70,7 +70,7 @@ func parseA2Manifest(body []byte) (*manifest.A2, error) {
 	a2 := &manifest.A2{}
 	err := json.Unmarshal(body, a2)
 	if err != nil {
-		return nil, manifest.NewErrCannotParse(err)
+		return nil, manifest.NewCannotParseError(err)
 	}
 
 	return a2, nil

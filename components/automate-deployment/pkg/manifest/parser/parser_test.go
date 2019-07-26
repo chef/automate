@@ -104,22 +104,22 @@ func TestManifestFromBytes(t *testing.T) {
 	t.Run("unknown schema", func(t *testing.T) {
 		_, err := parser.ManifestFromBytes([]byte(unknownManifest))
 		require.Error(t, err)
-		_, ok := err.(*manifest.ErrInvalidSchema)
-		require.True(t, ok, "error should be a ErrInvalidSchema")
+		_, ok := err.(*manifest.InvalidSchemaError)
+		require.True(t, ok, "error should be a InvalidSchemaError")
 	})
 
 	t.Run("no schema", func(t *testing.T) {
 		_, err := parser.ManifestFromBytes([]byte(noSchemaManifest))
 		require.Error(t, err)
-		_, ok := err.(*manifest.ErrInvalidSchema)
-		require.True(t, ok, "error should be a ErrInvalidSchema")
+		_, ok := err.(*manifest.InvalidSchemaError)
+		require.True(t, ok, "error should be a InvalidSchemaError")
 	})
 
 	t.Run("malformed JSON", func(t *testing.T) {
 		_, err := parser.ManifestFromBytes([]byte(malformedJSON))
 		require.Error(t, err)
-		_, ok := err.(*manifest.ErrInvalidSchema)
-		require.True(t, ok, "error should be a ErrInvalidSchema")
+		_, ok := err.(*manifest.InvalidSchemaError)
+		require.True(t, ok, "error should be a InvalidSchemaError")
 	})
 
 	t.Run("v1", func(t *testing.T) {

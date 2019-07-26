@@ -2,38 +2,38 @@ package manifest
 
 import "github.com/pkg/errors"
 
-func NewErrInvalidSchema(err error) error {
-	return &ErrInvalidSchema{err}
+func NewInvalidSchemaError(err error) error {
+	return &InvalidSchemaError{err}
 }
 
-type ErrInvalidSchema struct {
+type InvalidSchemaError struct {
 	err error
 }
 
-func (e *ErrInvalidSchema) Error() string {
+func (e *InvalidSchemaError) Error() string {
 	return errors.Wrap(e.err, "unknown schema").Error()
 }
 
-type ErrCannotParse struct {
+type CannotParseError struct {
 	err error
 }
 
-func NewErrCannotParse(err error) error {
-	return &ErrCannotParse{err}
+func NewCannotParseError(err error) error {
+	return &CannotParseError{err}
 }
 
-func (e *ErrCannotParse) Error() string {
+func (e *CannotParseError) Error() string {
 	return errors.Wrap(e.err, "failed to parse manifest").Error()
 }
 
-type ErrNoSuchManifest struct {
+type NoSuchManifestError struct {
 	err error
 }
 
-func NewErrNoSuchManifest(err error) error {
-	return &ErrNoSuchManifest{err}
+func NewNoSuchManifestError(err error) error {
+	return &NoSuchManifestError{err}
 }
 
-func (e *ErrNoSuchManifest) Error() string {
+func (e *NoSuchManifestError) Error() string {
 	return errors.Wrap(e.err, "failed to locate manifest").Error()
 }

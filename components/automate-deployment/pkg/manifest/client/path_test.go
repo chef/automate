@@ -56,8 +56,8 @@ func TestDirectoryGetCurrentManifestWhenDoesntExist(t *testing.T) {
 	client := client.NewPathClient(dir)
 	_, err = client.GetCurrentManifest(context.Background(), "current")
 	require.Error(t, err)
-	_, ok := err.(*manifest.ErrNoSuchManifest)
-	require.True(t, ok, "error should be a ErrNoSuchManifest")
+	_, ok := err.(*manifest.NoSuchManifestError)
+	require.True(t, ok, "error should be a NoSuchManifestError")
 }
 
 func TestDirectoryGetCurrentManifestWhenInvalid(t *testing.T) {
@@ -71,8 +71,8 @@ func TestDirectoryGetCurrentManifestWhenInvalid(t *testing.T) {
 	client := client.NewPathClient(dir)
 	_, err = client.GetCurrentManifest(context.Background(), "current")
 	require.Error(t, err)
-	_, ok := err.(*manifest.ErrInvalidSchema)
-	require.True(t, ok, "error should be a ErrInvalidSchema")
+	_, ok := err.(*manifest.InvalidSchemaError)
+	require.True(t, ok, "error should be a InvalidSchemaError")
 }
 
 func TestFileGetCurrentManifestA2(t *testing.T) {
@@ -144,8 +144,8 @@ func TestFileGetCurrentManifestWhenDoesntExist(t *testing.T) {
 	client := client.NewPathClient(filename)
 	_, err = client.GetCurrentManifest(context.Background(), "current")
 	require.Error(t, err)
-	_, ok := err.(*manifest.ErrNoSuchManifest)
-	require.True(t, ok, "error should be a ErrNoSuchManifest")
+	_, ok := err.(*manifest.NoSuchManifestError)
+	require.True(t, ok, "error should be a NoSuchManifestError")
 }
 
 func TestFileGetCurrentManifestWhenInvalid(t *testing.T) {
@@ -159,8 +159,8 @@ func TestFileGetCurrentManifestWhenInvalid(t *testing.T) {
 	err = ioutil.WriteFile(filename, []byte("::::::"), 0700)
 	_, err = client.GetCurrentManifest(context.Background(), "current")
 	require.Error(t, err)
-	_, ok := err.(*manifest.ErrInvalidSchema)
-	require.True(t, ok, "error should be a ErrInvalidSchema")
+	_, ok := err.(*manifest.InvalidSchemaError)
+	require.True(t, ok, "error should be a InvalidSchemaError")
 }
 
 func TestFileGetManifest(t *testing.T) {

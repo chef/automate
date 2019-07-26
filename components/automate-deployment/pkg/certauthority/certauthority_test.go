@@ -186,44 +186,44 @@ func TestValidateCertificateForRequest(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	t.Run("returns a NotSignedByCA err if the given certificate was not signed by the CA", func(t *testing.T) {
+	t.Run("returns a ErrNotSignedByCA if the given certificate was not signed by the CA", func(t *testing.T) {
 		err := ca.ValidateCertificateForRequest(badCert, goodReq)
-		assert.Equal(t, certauthority.NotSignedByCA, err)
+		assert.Equal(t, certauthority.ErrNotSignedByCA, err)
 	})
 
-	t.Run("returns a CommonNameMismatch err if the given certificate has wrong common name", func(t *testing.T) {
+	t.Run("returns a CommonNameMismatchError if the given certificate has wrong common name", func(t *testing.T) {
 		req := certauthority.NewCertRequest("some-service", expectedIPs, expectedHostnames)
 		err := ca.ValidateCertificateForRequest(goodCert, req)
 		require.Error(t, err)
-		_, ok := err.(*certauthority.CommonNameMismatch)
-		assert.True(t, ok, "error should be a CommonNameMismatch")
+		_, ok := err.(*certauthority.CommonNameMismatchError)
+		assert.True(t, ok, "error should be a CommonNameMismatchError")
 	})
 
-	t.Run("returns a SANIPAddrMismatch err if the given certificate has wrong IP Addr SAN entries", func(t *testing.T) {
+	t.Run("returns a SANIPAddrMismatchError if the given certificate has wrong IP Addr SAN entries", func(t *testing.T) {
 		req := certauthority.NewCertRequest("deployment-service", []net.IP{net.IPv4(172, 0, 2, 2)}, expectedHostnames)
 		err := ca.ValidateCertificateForRequest(goodCert, req)
 		require.Error(t, err)
-		_, ok := err.(*certauthority.SANIPAddrMismatch)
-		assert.True(t, ok, "error should be a SANIPAddrMismatch")
+		_, ok := err.(*certauthority.SANIPAddrMismatchError)
+		assert.True(t, ok, "error should be a SANIPAddrMismatchError")
 	})
 
-	t.Run("returns a SANIPAddrMismatch err if the given certificate has extra IP Addr SAN entries", func(t *testing.T) {
+	t.Run("returns a SANIPAddrMismatchError if the given certificate has extra IP Addr SAN entries", func(t *testing.T) {
 		req := certauthority.NewCertRequest("deployment-service", []net.IP{}, expectedHostnames)
 		err := ca.ValidateCertificateForRequest(goodCert, req)
 		require.Error(t, err)
-		_, ok := err.(*certauthority.SANIPAddrMismatch)
-		assert.True(t, ok, "error should be a SANIPAddrMismatch")
+		_, ok := err.(*certauthority.SANIPAddrMismatchError)
+		assert.True(t, ok, "error should be a SANIPAddrMismatchError")
 	})
 
-	t.Run("returns a SANIPAddrMismatch err if the given certificate has too few IP Addr SAN entries", func(t *testing.T) {
+	t.Run("returns a SANIPAddrMismatchError if the given certificate has too few IP Addr SAN entries", func(t *testing.T) {
 		req := certauthority.NewCertRequest("deployment-service", append(expectedIPs, net.IPv4(172, 0, 2, 2)), expectedHostnames)
 		err := ca.ValidateCertificateForRequest(goodCert, req)
 		require.Error(t, err)
-		_, ok := err.(*certauthority.SANIPAddrMismatch)
-		assert.True(t, ok, "error should be a SANIPAddrMismatch")
+		_, ok := err.(*certauthority.SANIPAddrMismatchError)
+		assert.True(t, ok, "error should be a SANIPAddrMismatchError")
 	})
 
-	t.Run("returns a SANHostnameMismatch err if the given certificate has too few DNSName SAN entries", func(t *testing.T) {
+	t.Run("returns a SANHostnameMismatch if the given certificate has too few DNSName SAN entries", func(t *testing.T) {
 		// NOTE: deployment-service is an implicit DNSName entry
 		req := certauthority.NewCertRequest("deployment-service", expectedIPs, []string{"cool.domain"})
 		err := ca.ValidateCertificateForRequest(goodCert, req)

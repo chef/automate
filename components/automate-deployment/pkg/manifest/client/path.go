@@ -28,7 +28,7 @@ func NewPathClient(path string) *Path {
 func (d *Path) GetCurrentManifest(_ context.Context, channel string) (*manifest.A2, error) {
 	stat, err := os.Stat(d.path)
 	if err != nil {
-		return nil, manifest.NewErrNoSuchManifest(err)
+		return nil, manifest.NewNoSuchManifestError(err)
 	}
 	path := d.path
 
@@ -42,7 +42,7 @@ func (d *Path) GetCurrentManifest(_ context.Context, channel string) (*manifest.
 func (d *Path) GetManifest(_ context.Context, release string) (*manifest.A2, error) {
 	stat, err := os.Stat(d.path)
 	if err != nil {
-		return nil, manifest.NewErrNoSuchManifest(err)
+		return nil, manifest.NewNoSuchManifestError(err)
 	}
 	path := d.path
 
@@ -56,7 +56,7 @@ func (d *Path) GetManifest(_ context.Context, release string) (*manifest.A2, err
 func (d *Path) manifestFromPath(path string) (*manifest.A2, error) {
 	body, err := ioutil.ReadFile(path)
 	if err != nil {
-		return nil, manifest.NewErrNoSuchManifest(err)
+		return nil, manifest.NewNoSuchManifestError(err)
 	}
 
 	m, err := parser.ManifestFromBytes(body)

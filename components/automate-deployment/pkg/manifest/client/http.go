@@ -99,7 +99,7 @@ func (c *HTTP) manifestFromURL(ctx context.Context, url string) (*manifest.A2, e
 	case http.StatusOK:
 		// Yay!
 	case http.StatusNotFound:
-		return nil, manifest.NewErrNoSuchManifest(errors.Errorf("%s: %s", url, response.Status))
+		return nil, manifest.NewNoSuchManifestError(errors.Errorf("%s: %s", url, response.Status))
 	default:
 		return nil, errors.Errorf("Unexpected HTTP response from %s: %s", url, response.Status)
 	}
