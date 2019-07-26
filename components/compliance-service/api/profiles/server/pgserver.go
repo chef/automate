@@ -9,6 +9,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes"
 	pb "github.com/golang/protobuf/ptypes/empty"
+	_struct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
@@ -340,10 +341,11 @@ func (srv *PGProfileServer) fireEvent(eventType string, owner string, name strin
 
 func (srv *PGProfileServer) newEventMsg(eventType string, owner string, name string, version string) *automate_event.EventMsg {
 	var (
-		verbVal string
-		tagsVal []string
-		nameVal = name + " version " + version
-		userVal = owner
+		verbVal              string
+		tagsVal              []string
+		nameVal              = name + " version " + version
+		userVal              = owner
+		ProjectFilterableTag = "project_filterable"
 	)
 
 	switch eventType {
@@ -385,6 +387,15 @@ func (srv *PGProfileServer) newEventMsg(eventType string, owner string, name str
 			ID:          "",
 			ObjectType:  "Not Applicable",
 			DisplayName: "Not Applicable",
+		},
+		Data: &_struct.Struct{
+			Fields: map[string]*_struct.Value{
+				ProjectFilterableTag: {
+					Kind: &_struct.Value_BoolValue{
+						BoolValue: false,
+					},
+				},
+			},
 		},
 	}
 }

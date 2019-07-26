@@ -90,6 +90,19 @@ var feedProps = `
 		"target_object_type":{
 				"type":"text"
 		},
+		"organization_name": {
+			"type": "keyword"
+		},
+		"chef_server_fqdn": {
+			"type": "keyword"
+		},
+		"projects": {
+			"type": "keyword"
+		},
+		"project_filterable": {
+			"type": "boolean",
+			"null_value": true
+		},
 		"created":{
 				"type":"date",
 				"format":"strict_date_optional_time||epoch_millis"

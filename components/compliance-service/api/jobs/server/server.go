@@ -7,6 +7,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes"
 	pb "github.com/golang/protobuf/ptypes/empty"
+	_struct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	rrule "github.com/teambition/rrule-go"
@@ -281,10 +282,11 @@ func (srv *Server) fireEvent(eventType string, in *jobs.Job, id *jobs.Id, user s
 
 func (srv *Server) newEventMsg(eventType string, in *jobs.Job, id *jobs.Id, user string) *automate_event.EventMsg {
 	var (
-		verbVal string
-		tagsVal []string
-		nameVal string
-		userVal string
+		verbVal              string
+		tagsVal              []string
+		nameVal              string
+		userVal              string
+		ProjectFilterableTag = "project_filterable"
 	)
 
 	if len(user) == 0 {
@@ -340,6 +342,15 @@ func (srv *Server) newEventMsg(eventType string, in *jobs.Job, id *jobs.Id, user
 			ID:          "",
 			ObjectType:  "Not Applicable",
 			DisplayName: "Not Applicable",
+		},
+		Data: &_struct.Struct{
+			Fields: map[string]*_struct.Value{
+				ProjectFilterableTag: {
+					Kind: &_struct.Value_BoolValue{
+						BoolValue: false,
+					},
+				},
+			},
 		},
 	}
 }

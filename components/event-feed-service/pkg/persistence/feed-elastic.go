@@ -192,9 +192,9 @@ func (efs ElasticFeedStore) GetFeed(query *util.FeedQuery) ([]*util.FeedEntry, i
 			entries = append(entries, entry)
 		}
 		return entries, searchResult.Hits.TotalHits, nil
-	} else {
-		return entries, 0, nil
 	}
+
+	return entries, 0, nil
 }
 
 func (efs ElasticFeedStore) GetFeedSummary(q *util.FeedSummaryQuery) (map[string]int64, error) {

@@ -3,6 +3,7 @@ package server
 import (
 	"time"
 
+	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/sirupsen/logrus"
@@ -127,6 +128,10 @@ func (f *Feeds) HandleEvent(req *api.EventMsg) (*api.EventResponse, error) {
 		TargetName:         req.Target.DisplayName,
 		TargetObjectType:   req.Target.ObjectType,
 		Created:            time.Now().UTC(),
+		OrganizationName:   getOrganizationName(req),
+		ChefServerFQDN:     getChefServerFQDN(req),
+		ProjectFilterable:  getProjectFilterable(req),
+		Projects:           getProjects(req),
 	}
 
 	success, err := f.store.CreateFeedEntry(&feedEntry)
@@ -141,4 +146,57 @@ func (f *Feeds) HandleEvent(req *api.EventMsg) (*api.EventResponse, error) {
 	logrus.Debug("automate-feed has finished handling your event...")
 
 	return &res, nil
+}
+
+func getOrganizationName(event *automate_event.EventMsg) string {
+	OrganizationNameTag := "organization_name"
+	if event.Data != nil && event.Data.Fields != nil &&
+		event.Data.Fields[OrganizationNameTag] != nil &&
+		event.Data.Fields[OrganizationNameTag].GetStringValue() != "" {
+		return event.Data.Fields[OrganizationNameTag].GetStringValue()
+	}
+
+	return ""
+}
+
+func getChefServerFQDN(event *automate_event.EventMsg) string {
+	ChefServerFQDNTag := "chef_server_fqdn"
+	if event.Data != nil && event.Data.Fields != nil &&
+		event.Data.Fields[ChefServerFQDNTag] != nil &&
+		event.Data.Fields[ChefServerFQDNTag].GetStringValue() != "" {
+		return event.Data.Fields[ChefServerFQDNTag].GetStringValue()
+	}
+
+	return ""
+}
+
+func getProjects(event *automate_event.EventMsg) []string {
+	ProjectsTag := "projects"
+	if event.Data != nil && event.Data.Fields != nil &&
+		event.Data.Fields[ProjectsTag] != nil &&
+		event.Data.Fields[ProjectsTag].GetListValue() != nil {
+		list := event.Data.Fields[ProjectsTag].GetListValue()
+
+		projects := make([]string, 0)
+		for _, listItem := range list.GetValues() {
+			if listItem.GetStringValue() != "" {
+				projects = append(projects, listItem.GetStringValue())
+			}
+		}
+
+		return projects
+	}
+
+	return []string{}
+}
+
+func getProjectFilterable(event *automate_event.EventMsg) bool {
+	ProjectFilterableTag := "project_filterable"
+	if event.Data != nil && event.Data.Fields != nil &&
+		event.Data.Fields[ProjectFilterableTag] != nil {
+		return event.Data.Fields[ProjectFilterableTag].GetBoolValue()
+	}
+
+	// Default to filtering with projects
+	return true
 }
