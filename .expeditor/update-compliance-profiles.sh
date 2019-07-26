@@ -2,10 +2,20 @@
 
 set -eou pipefail
 
-if [[ "$EXPEDITOR_PKG_TARGET" != "x86_64-linux" ]]; then
-    echo "Ignoring $EXPEDITOR_PKG_VERSION/$EXPEDITOR_PKG_RELEASE because its target is '$EXPEDITOR_PKG_TARGET' (expected 'x86_64-linux')"
-    exit 0
-fi
+# EXPEDITOR_PKG_TARGET doesn't seem to always be part of the
+# workload. If it isn't there, assume it is correct.
+case "${EXPEDITOR_PKG_TARGET:-unknown}" in
+    "x86_64-linux")
+        echo "EXPEDITOR_PKG_TARGET is set to the expected target of x86_64-linux"
+        ;;
+    "unknown")
+        echo "EXPEDITOR_PKG_TARGET is not set. Assuming this workload is for x86_64-linux"
+        ;;
+    *)
+        echo "EXPEDITOR_PKG_TARGET is set but is not our expected target (got: '$EXPEDITOR_PKG_TARGET', expected: 'x86_64-linux'). Exiting"
+        exit 0
+        ;;
+esac
 
 branch="expeditor/bump-compliance-profiles"
 git checkout -b "$branch"
