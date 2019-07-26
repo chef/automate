@@ -218,11 +218,13 @@ func TestGetServiceGroupsSortedPercent(t *testing.T) {
 	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
 	assert.Nil(t, err)
 
-	if assert.Equal(t, 4, len(response.ServiceGroups)) {
+	if assert.Equal(t, 6, len(response.ServiceGroups)) {
 		assert.Equal(t, int32(100), response.ServiceGroups[0].HealthPercentage)
-		assert.Equal(t, int32(50), response.ServiceGroups[1].HealthPercentage)
-		assert.Equal(t, int32(25), response.ServiceGroups[2].HealthPercentage)
+		assert.Equal(t, int32(100), response.ServiceGroups[1].HealthPercentage)
+		assert.Equal(t, int32(33), response.ServiceGroups[2].HealthPercentage)
 		assert.Equal(t, int32(0), response.ServiceGroups[3].HealthPercentage)
+		assert.Equal(t, int32(0), response.ServiceGroups[4].HealthPercentage)
+		assert.Equal(t, int32(0), response.ServiceGroups[5].HealthPercentage)
 	}
 }
 
@@ -266,11 +268,13 @@ func TestGetServiceGroupsSortedPercentAsc(t *testing.T) {
 	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
 	assert.Nil(t, err)
 
-	if assert.Equal(t, 4, len(response.ServiceGroups)) {
+	if assert.Equal(t, 6, len(response.ServiceGroups)) {
 		assert.Equal(t, int32(0), response.ServiceGroups[0].HealthPercentage)
-		assert.Equal(t, int32(25), response.ServiceGroups[1].HealthPercentage)
-		assert.Equal(t, int32(50), response.ServiceGroups[2].HealthPercentage)
-		assert.Equal(t, int32(100), response.ServiceGroups[3].HealthPercentage)
+		assert.Equal(t, int32(0), response.ServiceGroups[1].HealthPercentage)
+		assert.Equal(t, int32(0), response.ServiceGroups[2].HealthPercentage)
+		assert.Equal(t, int32(33), response.ServiceGroups[3].HealthPercentage)
+		assert.Equal(t, int32(100), response.ServiceGroups[4].HealthPercentage)
+		assert.Equal(t, int32(100), response.ServiceGroups[5].HealthPercentage)
 	}
 }
 
