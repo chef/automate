@@ -35,75 +35,75 @@
         </chef-form-field>
         <small class="help">Resource types cannot be changed after the rule is created.</small>
 
-        <div id="add-condition">
+        <div id="condition-section" *ngIf="ruleForm.get('type').value">
           <div class="label">Conditions</div>
           <small>All conditions must be true for the rule to be true.</small>
           <chef-button primary (click)="addCondition()">Add Condition</chef-button>
-        </div>
 
-        <div id="condition-list" formArrayName="conditions">
-
-          <div class="condition-item"
-            [formGroupName]="i"
-            *ngFor="let condition of ruleForm.get('conditions').controls; let i = index">
-
-            <chef-form-field class="attribute-field">
-              <label>
-                <span class="label">{{ getAttributeLabel() }}</span>
-                <select ngDefaultControl formControlName="attribute">
-                  <option
-                    *ngFor="let option of attributes[ruleForm.get('type').value.toLowerCase()]; let i = index"
-                    [value]="option.key"
-                  >{{ option.value }}</option>
-                </select>
-              </label>
-              <chef-error
-                *ngIf="ruleForm.get('conditions').controls[i].get('attribute').hasError('required') && ruleForm.get('conditions').controls[i].get('attribute').touched"
-              >Attribute is required.</chef-error>
-            </chef-form-field>
-
-            <chef-form-field class="attribute-field">
-              <label>
-                <span class="label">Operator</span>
-                <select ngDefaultControl formControlName="operator">
-                  <option *ngFor="let operator of operators"
-                    [value]="operator.key"
-                  >{{ operator.value }}</option>
-                </select>
-              </label>
-              <chef-error
-                *ngIf="ruleForm.get('conditions').controls[i].get('operator').hasError('required') && ruleForm.get('conditions').controls[i].get('operator').touched"
-              >Operator is required.</chef-error>
-            </chef-form-field>
-
-            <chef-form-field class="attribute-field">
-              <label>
-                <span class="label">Value</span>
-                <chef-input ngDefaultControl
-                  formControlName="values"
-                  [value]="condition.controls.values.value"
-                ></chef-input>
-              </label>
-              <chef-error
-                *ngIf="(ruleForm.get('conditions').controls[i].get('values').hasError('required') || ruleForm.get('conditions').controls[i].get('values').hasError('pattern')) && ruleForm.get('conditions').controls[i].get('values').dirty"
-              >Value is required.</chef-error>
-              <small class="help"
-                *ngIf="condition.controls.operator.value === 'EQUALS'">
-                  Case sensitive, must match exactly.
-              </small>
-              <small class="help"
-                *ngIf="condition.controls.operator.value === 'MEMBER_OF'">
-                  Comma-separated list, at least one must match exactly.
-              </small>
-            </chef-form-field>
-
-            <div class="end-row-items">
-              <span *ngIf="showAndLabel(i)" class="label">AND</span>
-              <chef-button tertiary *ngIf="showDelete()" (click)="deleteCondition(i)">
-                <chef-icon>delete</chef-icon>
-              </chef-button>
+          <div id="condition-list" formArrayName="conditions">
+  
+            <div class="condition-item"
+              [formGroupName]="i"
+              *ngFor="let condition of ruleForm.get('conditions').controls; let i = index">
+  
+              <chef-form-field class="attribute-field">
+                <label>
+                  <span class="label">{{ getAttributeLabel() }}</span>
+                  <select ngDefaultControl formControlName="attribute">
+                    <option
+                      *ngFor="let option of attributes[ruleForm.get('type').value.toLowerCase()]; let i = index"
+                      [value]="option.key"
+                    >{{ option.value }}</option>
+                  </select>
+                </label>
+                <chef-error
+                  *ngIf="ruleForm.get('conditions').controls[i].get('attribute').hasError('required') && ruleForm.get('conditions').controls[i].get('attribute').touched"
+                >Attribute is required.</chef-error>
+              </chef-form-field>
+  
+              <chef-form-field class="attribute-field">
+                <label>
+                  <span class="label">Operator</span>
+                  <select ngDefaultControl formControlName="operator">
+                    <option *ngFor="let operator of operators"
+                      [value]="operator.key"
+                    >{{ operator.value }}</option>
+                  </select>
+                </label>
+                <chef-error
+                  *ngIf="ruleForm.get('conditions').controls[i].get('operator').hasError('required') && ruleForm.get('conditions').controls[i].get('operator').touched"
+                >Operator is required.</chef-error>
+              </chef-form-field>
+  
+              <chef-form-field class="attribute-field">
+                <label>
+                  <span class="label">Value</span>
+                  <chef-input ngDefaultControl
+                    formControlName="values"
+                    [value]="condition.controls.values.value"
+                  ></chef-input>
+                </label>
+                <chef-error
+                  *ngIf="(ruleForm.get('conditions').controls[i].get('values').hasError('required') || ruleForm.get('conditions').controls[i].get('values').hasError('pattern')) && ruleForm.get('conditions').controls[i].get('values').dirty"
+                >Value is required.</chef-error>
+                <small class="help"
+                  *ngIf="condition.controls.operator.value === 'EQUALS'">
+                    Case sensitive, must match exactly.
+                </small>
+                <small class="help"
+                  *ngIf="condition.controls.operator.value === 'MEMBER_OF'">
+                    Comma-separated list, at least one must match exactly.
+                </small>
+              </chef-form-field>
+  
+              <div class="end-row-items">
+                <span *ngIf="showAndLabel(i)" class="label">AND</span>
+                <chef-button tertiary *ngIf="showDelete()" (click)="deleteCondition(i)">
+                  <chef-icon>delete</chef-icon>
+                </chef-button>
+              </div>
+  
             </div>
-
           </div>
         </div>
       </form>

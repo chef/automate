@@ -233,7 +233,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   saveRule() {
     if (this.ruleForm.valid) {
       this.saving = true;
-      this.rule.id ? this.updateRule() : this.createRule();
+      this.rule.id ? this.updateRule() : this.createRule(); // TODO
       const pendingSave = new Subject<boolean>();
       this.store.select(updateStatus).pipe(
         filter(identity),

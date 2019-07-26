@@ -36,8 +36,18 @@ chef-page {
     padding-top: 26px;
   }
 
-  #add-condition {
+  #condition-section {
+    margin: 1rem 0;
     padding-top: 7px;
+
+    small {
+      display: block;
+      font-size: 12px;
+    }
+
+    chef-button {
+      margin-left: 0;
+    }
   }
 
   .label {
@@ -77,11 +87,11 @@ chef-page {
   }
 
   .end-row-items {
+    display: inline-block;
     margin-top: 21px; // match labels in other columns
     height: 45px; // match "values" input height
     vertical-align: middle;
     width: 18%;
-    display: inline-block;
 
     span {
       display: inline-block;
@@ -101,16 +111,4 @@ chef-page {
     }
   }
 
-  #add-condition {
-    margin: 1rem 0;
-
-    small {
-      display: block;
-      font-size: 12px;
-    }
-
-    chef-button {
-      margin-left: 0;
-    }
-  }
 }
