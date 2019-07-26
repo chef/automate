@@ -9,6 +9,10 @@ const (
 	deleteDeploymentsWithoutServices = `
 DELETE FROM deployment WHERE NOT EXISTS (SELECT 1 FROM service WHERE service.deployment_id = deployment.id )
 `
+	selectDeploymentsTotalCount = `
+SELECT count(*)
+  FROM deployment;
+`
 )
 
 // GetDeployment returns a deployment from the database
@@ -45,4 +49,9 @@ func (db *Postgres) getDeploymentID(app, env string) (int32, bool) {
 	}
 
 	return id, true
+}
+
+func (db *Postgres) GetDeploymentsCount() (int32, error) {
+	count, err := db.DbMap.SelectInt(selectDeploymentsTotalCount)
+	return int32(count), err
 }
