@@ -879,7 +879,7 @@ func (p *pg) insertRoleWithQuerier(ctx context.Context, role *v2.Role, q Querier
 
 	_, err = q.ExecContext(ctx,
 		`INSERT INTO iam_role_projects (role_id, project_id)
-		SELECT $1, db_id FROM iam_projects WHERE id=ANY($2)`,
+		SELECT $1, project_db_id(p) FROM unnest($2::TEXT[]) as p`,
 		dbID, pq.Array(role.Projects))
 	if err != nil {
 		return p.processError(err)
