@@ -9,9 +9,8 @@ import (
 )
 
 const (
-	a2V3IndexPrefix             = "comp-3-"
-	a2V3SumIndexPrefix          = a2V3IndexPrefix + "s-"
-	a2TimeSeriesMigrationScript = ""
+	a2V3IndexPrefix    = "comp-3-"
+	a2V3SumIndexPrefix = a2V3IndexPrefix + "s-"
 )
 
 type A2V3ElasticSearchIndices struct {
@@ -34,14 +33,14 @@ func (migratable A2V3ElasticSearchIndices) migrateTimeSeries(dateToMigrate time.
 
 	src := fmt.Sprintf("%ss-%s", a2V3IndexPrefix, dateToMigrateAsString)
 	dest := fmt.Sprintf("%s%s", CompDailySumIndexPrefix, dateToMigrateAsString)
-	_, _, err := migratable.backend.reindex(src, dest, a2TimeSeriesMigrationScript, "doc")
+	_, _, err := migratable.backend.reindex(src, dest, noScript, "_doc")
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("%s unable to reindex %s", src, myName))
 	}
 
 	src = fmt.Sprintf("%sr-%s", a2V3IndexPrefix, dateToMigrateAsString)
 	dest = fmt.Sprintf("%s%s", CompDailyRepIndexPrefix, dateToMigrateAsString)
-	_, _, err = migratable.backend.reindex(src, dest, a2TimeSeriesMigrationScript, "doc")
+	_, _, err = migratable.backend.reindex(src, dest, noScript, "_doc")
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("%s unable to reindex %s", src, myName))
 	}
