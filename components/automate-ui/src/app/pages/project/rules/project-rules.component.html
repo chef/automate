@@ -18,7 +18,7 @@
           </label>
           <chef-error
             *ngIf="(ruleForm.get('name').hasError('required') || ruleForm.get('name').hasError('pattern')) && ruleForm.get('name').dirty"
-          >Rule Name is required</chef-error>
+          >Rule Name is required.</chef-error>
         </chef-form-field>
 
         <chef-form-field id="create-type">
@@ -31,7 +31,7 @@
           </label>
           <chef-error
             *ngIf="ruleForm.get('type').hasError('required') && ruleForm.get('type').touched"
-          >Resource Type is required</chef-error>
+          >Resource Type is required.</chef-error>
         </chef-form-field>
         <small class="help">Resource types cannot be changed after the rule is created.</small>
 
@@ -59,7 +59,7 @@
               </label>
               <chef-error
                 *ngIf="ruleForm.get('conditions').controls[i].get('attribute').hasError('required') && ruleForm.get('conditions').controls[i].get('attribute').touched"
-              >Attribute is required</chef-error>
+              >Attribute is required.</chef-error>
             </chef-form-field>
 
             <chef-form-field class="attribute-field">
@@ -73,7 +73,7 @@
               </label>
               <chef-error
                 *ngIf="ruleForm.get('conditions').controls[i].get('operator').hasError('required') && ruleForm.get('conditions').controls[i].get('operator').touched"
-              >Operator is required</chef-error>
+              >Operator is required.</chef-error>
             </chef-form-field>
 
             <chef-form-field class="attribute-field">
@@ -86,7 +86,7 @@
               </label>
               <chef-error
                 *ngIf="(ruleForm.get('conditions').controls[i].get('values').hasError('required') || ruleForm.get('conditions').controls[i].get('values').hasError('pattern')) && ruleForm.get('conditions').controls[i].get('values').dirty"
-              >Value is required</chef-error>
+              >Value is required.</chef-error>
               <small class="help"
                 *ngIf="condition.controls.operator.value === 'EQUALS'">
                   Case sensitive, must match exactly.
