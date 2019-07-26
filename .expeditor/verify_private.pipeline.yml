@@ -146,6 +146,7 @@ steps:
   - label: "nodemanager-integration-tests"
     command:
       - . scripts/verify_setup.sh
+      - . scripts/base64_gcp_cred.sh
       - |
         hab studio run "source scripts/verify_studio_init.sh &&
           start_deployment_service &&
