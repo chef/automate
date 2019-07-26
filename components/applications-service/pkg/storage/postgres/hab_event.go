@@ -179,12 +179,6 @@ type deploymentServiceGroup struct {
 	Environment      string `db:"environment"`
 }
 
-// type serviceRelations struct {
-// 	ServiceGroupID int32
-// 	DeploymentID   int32
-// 	SupervisorId   int32
-// }
-
 const (
 	selectMatchingDeploymentAndSG = `
 SELECT sg.id AS service_group_id, d.id AS deployment_id, sg.name AS sg_name, d.app_name, d.environment
@@ -201,6 +195,29 @@ DELETE FROM deployment WHERE deployment.id = $1 AND (NOT EXISTS (SELECT 1 FROM s
 `
 )
 
+// updateServiceAndRelations updates the fields for a service row and makes
+// any required changes to an associated supervisor row. It also ensures the
+// deployment and service group are accurate, as described below:
+//
+// The deployment and service group may have changed since the previous update.
+// When this happens, we don't want to _edit_ the deployment or service_group
+// because other services could still belong to those and be unchanged, so if
+// we change the values then the two services will get into an edit war.
+//
+// First, we look for a deploymentServiceGroup (joined deployment and
+// service_group) that matches the metadata we were given in the hab event.
+// If none exists, then we need to create at least a service group and maybe a
+// deployment, and change the service's foreign key associations to the new
+// deployment and service group.
+//
+// If we did find a matching deployment and service group, and it's not what is
+// currently set on the service, we update the foreign key relations to the
+// other deployment and service group when we apply updates for the service's
+// other fields.
+//
+// If we changed the service's deployment and service group, then we run a
+// cleanup query to ensure the prior deployment and service group are deleted
+// if they no longer have associated services.
 func (db *Postgres) updateServiceAndRelations(
 	svc *service,
 	eventMetadata *habitat.EventMetadata,
@@ -211,24 +228,6 @@ func (db *Postgres) updateServiceAndRelations(
 	oldDID := svc.DeploymentID
 	oldGID := svc.GroupID
 
-	// The deployment and service group may have changed. When this happens, we
-	// don't want to _edit_ the deployment or service_group because other
-	// services could still belong to those and be unchanged, so if we change the
-	// values then the two services will get into an edit war.
-	//
-	// First, we look for a deploymentServiceGroup (joined deployment and
-	// service_group) that matches the metadata we were given in the hab event.
-	// If we find one, then we set the service's group_id and deployment_id to
-	// the one we found. This will correctly handle the case where a service is
-	// in the same service group and deployment as it is now, or the case that
-	// the service was "moved" to a different deployment and service group that
-	// already exist.
-	//
-	// If there is no existing deploymentServiceGroup that matches the metadata,
-	// then the service has been moved to a new deployment/service group. In that
-	// case, we need to create them.
-	// After that, we need to check if the old deployment and service group have
-	// no more related services, and delete them if so.
 	var existingDSG deploymentServiceGroup
 	err := db.DbMap.SelectOne(&existingDSG, selectMatchingDeploymentAndSG,
 		svcMetadata.GetServiceGroup(),
@@ -289,16 +288,15 @@ func (db *Postgres) updateServiceAndRelations(
 			if _, err := tx.Exec(maybeCleanupDeployment, oldDID); err != nil {
 				return errors.Wrap(err, "Unable to cleanup possibly unused service group")
 			}
+		}
 
-			sup, err := db.getSupervisor(svc.SupID)
-			if err != nil {
-				return errors.Wrap(err, "unable to update tables")
-			}
-			db.updateSupervisor(sup, eventMetadata)
-			if _, err := tx.Update(sup); err != nil {
-				return errors.Wrap(err, "Unable to update supervisor data")
-			}
-
+		sup, err := db.getSupervisor(svc.SupID)
+		if err != nil {
+			return errors.Wrap(err, "unable to update tables")
+		}
+		db.updateSupervisor(sup, eventMetadata)
+		if _, err := tx.Update(sup); err != nil {
+			return errors.Wrap(err, "Unable to update supervisor data")
 		}
 
 		return nil
