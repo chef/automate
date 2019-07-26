@@ -33,6 +33,8 @@ import {
 
 const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 
+type TeamTabNames = 'users' | 'details';
+
 @Component({
   selector: 'app-team-details',
   templateUrl: './team-details.component.html',
@@ -44,7 +46,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public isLoading = true;
   public saving = false;
   public saveSuccessful = false;
-  public tabValue = 'users';
+  public tabValue: TeamTabNames = 'users';
   public url: string;
   public teamMembershipView = false;
   public team: Team;
@@ -181,7 +183,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   }
 
   addUsers(users: HashMapOfUsers): void {
-
     const userIDs = Object.values(users).map((user: User) => user.membership_id);
 
     this.store.dispatch(new AddTeamUsers(<TeamUserMgmtPayload>{
