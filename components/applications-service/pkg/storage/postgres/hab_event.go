@@ -207,9 +207,6 @@ func (db *Postgres) updateTables(
 	oldDID := svc.DeploymentID
 	oldGID := svc.GroupID
 
-	// TODO remove
-	log.Info("update existing service...")
-
 	// The deployment and service group may have changed. When this happens, we
 	// don't want to _edit_ the deployment or service_group because other
 	// services could still belong to those and be unchanged, so if we change the
@@ -238,8 +235,6 @@ func (db *Postgres) updateTables(
 	needToCreateDeploymentServiceGroup := (err != nil)
 	needToChangeDeploymentServiceGroup := needToCreateDeploymentServiceGroup || (existingDSG.ServiceGroupID != oldGID)
 
-	log.Infof("need new DSG %+v need to change DSG %+v", needToCreateDeploymentServiceGroup, needToChangeDeploymentServiceGroup)
-
 	// When the service belongs to a deployment+service_group that exist (either
 	// the same one as before, or a different one):
 	if !needToCreateDeploymentServiceGroup && !needToChangeDeploymentServiceGroup {
@@ -252,9 +247,9 @@ func (db *Postgres) updateTables(
 		return nil
 	}
 
-	return dblib.Transaction(db.DbMap, func(tx *gorp.Transaction) error {
+	// FIXME: need to put the update for supervisor back in
 
-		log.Info("making that transaction happen")
+	return dblib.Transaction(db.DbMap, func(tx *gorp.Transaction) error {
 
 		var newDSG deploymentServiceGroup
 
@@ -266,7 +261,6 @@ func (db *Postgres) updateTables(
 					AppName:     eventMetadata.GetApplication(),
 					Environment: eventMetadata.GetEnvironment(),
 				}
-				log.Infof("creating deployment %+v", deploy)
 				if err := tx.Insert(deploy); err != nil {
 					return errors.Wrap(err, "Unable to insert deployment")
 				}
@@ -278,7 +272,6 @@ func (db *Postgres) updateTables(
 				Name:         svcMetadata.GetServiceGroup(),
 				DeploymentID: did,
 			}
-			log.Infof("creating svc group %+v", svcGroup)
 			if err := tx.Insert(svcGroup); err != nil {
 				return errors.Wrap(err, "Unable to insert service_group")
 			}
@@ -292,15 +285,11 @@ func (db *Postgres) updateTables(
 			newDSG = existingDSG
 		}
 
-		log.Infof("updating DSG to %+v", newDSG)
-
 		db.updateService(svc, eventMetadata, svcMetadata, pkgIdent, health, newDSG)
 
 		if _, err := tx.Update(svc); err != nil {
 			return errors.Wrap(err, "Unable to update service")
 		}
-
-		log.Infof("running cleanup query for gid %d and did %d\n", oldGID, oldDID)
 
 		if _, err := tx.Exec(maybeCleanupServiceGroup, oldGID); err != nil {
 			return errors.Wrap(err, "Unable to cleanup possibly unused service group")
@@ -344,27 +333,6 @@ func (db *Postgres) updateTables(
 	// return db.triggerDataUpdates(tables)
 }
 
-// triggerDataUpdates receives all the data that might need to be updated
-// and wraps it into a single transaction, on any error we will roll back
-// the modifications made to ensure we weren't able to apply the changes
-// from the message, all data structs has a field 'needUpdate' that should
-// be modified when an update is required.
-func (db *Postgres) triggerDataUpdates(tables map[string]dbTable) error {
-
-	return dblib.Transaction(db.DbMap, func(tx *gorp.Transaction) error {
-
-		for tname, data := range tables {
-			if data.NeedUpdate() {
-				if _, err := tx.Update(data); err != nil {
-					return errors.Wrap(err, "unable to update "+tname)
-				}
-			}
-		}
-
-		return nil
-	})
-}
-
 // updates the provided supervisor from a HealthCheck event
 func (db *Postgres) updateSupervisor(
 	sup *supervisor, eventMetadata *habitat.EventMetadata) {
@@ -378,49 +346,6 @@ func (db *Postgres) updateSupervisor(
 		sup.Site = eventMetadata.GetSite()
 		sup.needUpdate = true
 	}
-
-	// TODO @afiune we could have this column in all tables as well
-	// when a supervisor needs update, update the timestamp of the last event received
-	//if sup.needUpdate {
-	//sup.LastEventOccurredAt = convertOrCreateTimestamp(eventMetadata.GetOccurredAt())
-	//}
-}
-
-// updates the provided deployment from a HealthCheck event
-func (db *Postgres) updateDeployment(
-	deploy *deployment, eventMetadata *habitat.EventMetadata) {
-
-	if deploy.AppName != eventMetadata.GetApplication() {
-		deploy.AppName = eventMetadata.GetApplication()
-		deploy.needUpdate = true
-	}
-
-	if deploy.Environment != eventMetadata.GetEnvironment() {
-		deploy.Environment = eventMetadata.GetEnvironment()
-		deploy.needUpdate = true
-	}
-
-	// TODO @afiune we could have this column in all tables as well
-	// when a deployment needs update, update the timestamp of the last event received
-	//if deploy.needUpdate {
-	//deploy.LastEventOccurredAt = convertOrCreateTimestamp(eventMetadata.GetOccurredAt())
-	//}
-}
-
-// updates the provided service group from a HealthCheck event
-func (db *Postgres) updateServiceGroup(
-	sg *serviceGroup, svcMetadata *habitat.ServiceMetadata) {
-
-	if sg.Name != svcMetadata.GetServiceGroup() {
-		sg.Name = svcMetadata.GetServiceGroup()
-		sg.needUpdate = true
-	}
-
-	// TODO @afiune we could have this column in all tables as well
-	// when a service group needs update, update the timestamp of the last event received
-	//if sg.needUpdate {
-	//sg.LastEventOccurredAt = convertOrCreateTimestamp(eventMetadata.GetOccurredAt())
-	//}
 }
 
 // convert a proto timestamp to native go time,
@@ -517,7 +442,6 @@ func (db *Postgres) insertNewService(
 	pkgIdent *packageIdent,
 	health string) error {
 
-	// TODO Update me!
 	return dblib.Transaction(db.DbMap, func(tx *gorp.Transaction) error {
 
 		// 1) Deployment
@@ -534,14 +458,6 @@ func (db *Postgres) insertNewService(
 		}
 
 		// 2) Service Group
-		// FIXME that's your problem right there :P
-		// we need to find service group by name and deployment id (done)
-		// TODO after this:
-		// * regression test
-		// * see how it behaves when running with existing bad data
-		// * does updateService work? (seems to, but be more systematic)
-		// 		* when deployment is not changed
-		//    * when deployment is changed
 		gid, exist := db.getServiceGroupID(svcMetadata.GetServiceGroup(), did)
 		if !exist {
 			svcGroup := &serviceGroup{
