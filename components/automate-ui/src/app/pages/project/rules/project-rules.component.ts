@@ -124,7 +124,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   }
 
   getHeading() {
-    return `${this.project.name}: ` + (this.ruleForm.value.name || 'Rule');
+    return `${this.project.name}: ` + (this.ruleForm.value.name.trim() || 'Rule');
   }
 
   getAttributeLabel() {

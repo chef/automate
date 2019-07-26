@@ -120,6 +120,13 @@ describe('ProjectRulesComponent', () => {
       expect(component.getHeading()).toBe(heading);
     });
 
+    it('with whitespace for rule name the heading shows "<Project Name>: Rule"', () => {
+      const ruleName = '   ';
+      component.ruleForm.get('name').setValue(ruleName);
+      const heading = `${component.project.name}: Rule`;
+      expect(component.getHeading()).toBe(heading);
+    });
+
     it('with a rule name the heading shows "<Project Name>: <Rule Name>"', () => {
       const ruleName = 'My Rule';
       component.ruleForm.get('name').setValue(ruleName);
