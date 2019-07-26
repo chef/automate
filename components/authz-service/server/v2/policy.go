@@ -416,7 +416,7 @@ func (s *policyServer) CreateRole(
 	default:
 		switch err.(type) {
 		case *storage_errors.ErrForeignKey:
-			return nil, status.Errorf(codes.NotFound, err.Error())
+			return nil, status.Errorf(codes.InvalidArgument, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal, "creating role %q: %s", req.Id, err.Error())
 	}

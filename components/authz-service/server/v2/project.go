@@ -119,12 +119,17 @@ func (s *ProjectState) CreateProject(ctx context.Context,
 			"creating project with ID %q: %s", req.Id, err.Error())
 	}
 	resp, err := s.store.CreateProject(ctx, &p)
-	if err != nil {
-		if err == storage_errors.ErrConflict {
-			return nil, status.Errorf(codes.AlreadyExists, "project with ID %q already exists", req.Id)
-		} else if err == storage_errors.ErrMaxProjectsExceeded {
-			return nil, status.Errorf(codes.FailedPrecondition,
-				"max of %d projects allowed while IAM v2 Beta", constants_v2.MaxProjects)
+	switch err {
+	case nil: // continue
+	case storage_errors.ErrConflict:
+		return nil, status.Errorf(codes.AlreadyExists, "project with ID %q already exists", req.Id)
+	case storage_errors.ErrMaxProjectsExceeded:
+		return nil, status.Errorf(codes.FailedPrecondition,
+			"max of %d projects allowed while IAM v2 Beta", constants_v2.MaxProjects)
+	default:
+		switch err.(type) {
+		case *storage_errors.ErrForeignKey:
+			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal,
 			"error retrieving project with ID %q: %s", req.Id, err.Error())
@@ -368,9 +373,14 @@ func (s *ProjectState) CreateRule(ctx context.Context, req *api.CreateRuleReq) (
 	}
 
 	resp, err := s.store.CreateRule(ctx, r)
-	if err != nil {
-		if err == storage_errors.ErrConflict {
-			return nil, status.Errorf(codes.AlreadyExists, "rule with ID %q already exists", req.Id)
+	switch err {
+	case nil: // continue
+	case storage_errors.ErrConflict:
+		return nil, status.Errorf(codes.AlreadyExists, "rule with ID %q already exists", req.Id)
+	default:
+		switch err.(type) {
+		case *storage_errors.ErrForeignKey:
+			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal,
 			"error creating rule with ID %q: %s", req.Id, err.Error())
