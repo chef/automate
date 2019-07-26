@@ -263,7 +263,7 @@ func (s *State) IsAuthorized(
 	)
 	resultSet, err := s.partialAuth.Rego(rego.ParsedInput(input)).Eval(ctx)
 	if err != nil {
-		return false, &ErrEvaluation{e: err}
+		return false, &EvaluationError{e: err}
 	}
 
 	switch len(resultSet) {
@@ -272,12 +272,12 @@ func (s *State) IsAuthorized(
 	case 1:
 		exps := resultSet[0].Expressions
 		if len(exps) != 1 {
-			return false, &ErrUnexpectedResultExpression{exps: exps}
+			return false, &UnexpectedResultExpressionError{exps: exps}
 
 		}
 		return exps[0].Value == true, nil
 	default:
-		return false, &ErrUnexpectedResultSet{set: resultSet}
+		return false, &UnexpectedResultSetError{set: resultSet}
 	}
 }
 
@@ -300,7 +300,7 @@ func (s *State) V2IsAuthorized(
 	)
 	resultSet, err := s.v2PartialAuth.Rego(rego.ParsedInput(input)).Eval(ctx)
 	if err != nil {
-		return false, &ErrEvaluation{e: err}
+		return false, &EvaluationError{e: err}
 	}
 
 	switch len(resultSet) {
@@ -309,12 +309,12 @@ func (s *State) V2IsAuthorized(
 	case 1:
 		exps := resultSet[0].Expressions
 		if len(exps) != 1 {
-			return false, &ErrUnexpectedResultExpression{exps: exps}
+			return false, &UnexpectedResultExpressionError{exps: exps}
 
 		}
 		return exps[0].Value == true, nil
 	default:
-		return false, &ErrUnexpectedResultSet{set: resultSet}
+		return false, &UnexpectedResultSetError{set: resultSet}
 	}
 }
 
@@ -343,7 +343,7 @@ func (s *State) V2ProjectsAuthorized(
 	)
 	resultSet, err := s.v2PartialProjects.Rego(rego.ParsedInput(input)).Eval(ctx)
 	if err != nil {
-		return []string{}, &ErrEvaluation{e: err}
+		return []string{}, &EvaluationError{e: err}
 	}
 
 	return s.projectsFromResults(resultSet)
@@ -364,7 +364,7 @@ func (s *State) FilterAuthorizedPairs(
 	// NB: V1 only, so s.store used here
 	rs, err := s.evalQuery(ctx, s.queries[filteredPairsQuery], opaInput, s.store)
 	if err != nil {
-		return nil, &ErrEvaluation{e: err}
+		return nil, &EvaluationError{e: err}
 	}
 
 	return s.pairsFromResults(rs)
@@ -391,7 +391,7 @@ func (s *State) V2FilterAuthorizedPairs(
 	}
 	rs, err := s.evalQuery(ctx, s.queries[filteredPairsV2Query], opaInput, store)
 	if err != nil {
-		return nil, &ErrEvaluation{e: err}
+		return nil, &EvaluationError{e: err}
 	}
 
 	return s.pairsFromResults(rs)
@@ -410,7 +410,7 @@ func (s *State) V2FilterAuthorizedProjects(
 	// NB: V2.1 only, so s.v2p1Store used here
 	rs, err := s.evalQuery(ctx, s.queries[filteredProjectsV2Query], opaInput, s.v2p1Store)
 	if err != nil {
-		return nil, &ErrEvaluation{e: err}
+		return nil, &EvaluationError{e: err}
 	}
 
 	return s.projectsFromResults(rs)
@@ -469,19 +469,19 @@ func (s *State) pairsFromResults(rs rego.ResultSet) ([]engine.Pair, error) {
 	pairs := make([]engine.Pair, len(rs))
 	for i, r := range rs {
 		if len(r.Expressions) != 1 {
-			return nil, &ErrUnexpectedResultExpression{exps: r.Expressions}
+			return nil, &UnexpectedResultExpressionError{exps: r.Expressions}
 		}
 		m, ok := r.Expressions[0].Value.(map[string]interface{})
 		if !ok {
-			return nil, &ErrUnexpectedResultExpression{exps: r.Expressions}
+			return nil, &UnexpectedResultExpressionError{exps: r.Expressions}
 		}
 		res, ok := m["resource"].(string)
 		if !ok {
-			return nil, &ErrUnexpectedResultExpression{exps: r.Expressions}
+			return nil, &UnexpectedResultExpressionError{exps: r.Expressions}
 		}
 		act, ok := m["action"].(string)
 		if !ok {
-			return nil, &ErrUnexpectedResultExpression{exps: r.Expressions}
+			return nil, &UnexpectedResultExpressionError{exps: r.Expressions}
 		}
 		pairs[i] = engine.Pair{Resource: engine.Resource(res), Action: engine.Action(act)}
 	}
@@ -491,15 +491,15 @@ func (s *State) pairsFromResults(rs rego.ResultSet) ([]engine.Pair, error) {
 
 func (s *State) projectsFromResults(rs rego.ResultSet) ([]string, error) {
 	if len(rs) != 1 {
-		return nil, &ErrUnexpectedResultSet{set: rs}
+		return nil, &UnexpectedResultSetError{set: rs}
 	}
 	r := rs[0]
 	if len(r.Expressions) != 1 {
-		return nil, &ErrUnexpectedResultExpression{exps: r.Expressions}
+		return nil, &UnexpectedResultExpressionError{exps: r.Expressions}
 	}
 	projects, err := s.stringArrayFromResults(r.Expressions)
 	if err != nil {
-		return nil, &ErrUnexpectedResultExpression{exps: r.Expressions}
+		return nil, &UnexpectedResultExpressionError{exps: r.Expressions}
 	}
 	return projects, nil
 }
@@ -507,7 +507,7 @@ func (s *State) projectsFromResults(rs rego.ResultSet) ([]string, error) {
 func (s *State) stringArrayFromResults(exps []*rego.ExpressionValue) ([]string, error) {
 	rawArray, ok := exps[0].Value.([]interface{})
 	if !ok {
-		return nil, &ErrUnexpectedResultExpression{exps: exps}
+		return nil, &UnexpectedResultExpressionError{exps: exps}
 	}
 	vals := make([]string, len(rawArray))
 	for i := range rawArray {
@@ -572,31 +572,31 @@ func (s *State) SetRules(
 	return nil
 }
 
-// ErrUnexpectedResultExpression is returned when one of the result sets
+// UnexpectedResultExpressionError is returned when one of the result sets
 // expressions can't be made sense of
-type ErrUnexpectedResultExpression struct {
+type UnexpectedResultExpressionError struct {
 	exps []*rego.ExpressionValue
 }
 
-func (e *ErrUnexpectedResultExpression) Error() string {
+func (e *UnexpectedResultExpressionError) Error() string {
 	return fmt.Sprintf("unexpected result expressions: %v", e.exps)
 }
 
-// ErrUnexpectedResultSet is returned when the result set of an OPA query
+// UnexpectedResultSetError is returned when the result set of an OPA query
 // can't be made sense of
-type ErrUnexpectedResultSet struct {
+type UnexpectedResultSetError struct {
 	set rego.ResultSet
 }
 
-func (e *ErrUnexpectedResultSet) Error() string {
+func (e *UnexpectedResultSetError) Error() string {
 	return fmt.Sprintf("unexpected result set: %v", e.set)
 }
 
-// ErrEvaluation is returned when a query evaluation returns an error.
-type ErrEvaluation struct {
+// EvaluationError is returned when a query evaluation returns an error.
+type EvaluationError struct {
 	e error
 }
 
-func (e *ErrEvaluation) Error() string {
+func (e *EvaluationError) Error() string {
 	return fmt.Sprintf("error in query evaluation: %s", e.e.Error())
 }

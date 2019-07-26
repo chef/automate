@@ -39,37 +39,37 @@ var (
 	ErrChangeTypeForRule = errors.New("cannot change rule type")
 )
 
-// ErrTxCommit occurs when the database attempts to commit a transaction and
+// TxCommitError occurs when the database attempts to commit a transaction and
 // fails.
-type ErrTxCommit struct {
+type TxCommitError struct {
 	underlying error
 }
 
-func NewErrTxCommit(e error) error {
-	return &ErrTxCommit{underlying: e}
+func NewTxCommitError(e error) error {
+	return &TxCommitError{underlying: e}
 }
 
-func (e *ErrTxCommit) Error() string {
+func (e *TxCommitError) Error() string {
 	return "commit db transaction: " + e.underlying.Error()
 }
 
-// ErrMissingField occurs when a required field was not passed.
-type ErrMissingField struct {
+// MissingFieldError occurs when a required field was not passed.
+type MissingFieldError struct {
 	field string
 }
 
 func NewMissingFieldError(f string) error {
-	return &ErrMissingField{field: f}
+	return &MissingFieldError{field: f}
 }
 
-func (e *ErrMissingField) Error() string {
+func (e *MissingFieldError) Error() string {
 	return "must supply policy " + e.field
 }
 
-type ErrForeignKey struct {
+type ForeignKeyError struct {
 	Msg string
 }
 
-func (e *ErrForeignKey) Error() string {
+func (e *ForeignKeyError) Error() string {
 	return e.Msg
 }

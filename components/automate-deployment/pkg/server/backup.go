@@ -145,7 +145,7 @@ func (s *server) RestoreBackup(ctx context.Context, req *api.RestoreBackupReques
 		desiredManifest, err = manifestClient.GetCurrentManifest(ctx, "")
 
 		if err != nil {
-			_, ok := err.(*manifest.ErrCannotParse)
+			_, ok := err.(*manifest.CannotParseError)
 			if ok {
 				return nil, status.Errorf(codes.InvalidArgument, err.Error())
 			}

@@ -98,20 +98,20 @@ var (
 	notBeforeMargin = 5 * time.Minute
 )
 
-// NotSignedByCA is returned by validation functions when the
+// ErrNotSignedByCA is returned by validation functions when the
 // certificate being validated is not signed by the CA doing
 // the validation.
-var NotSignedByCA = errors.New("Certificate is not signed by Certificate Authority")
+var ErrNotSignedByCA = errors.New("Certificate is not signed by Certificate Authority")
 
-// CommonNameMismatch is an error returned by validation functions
+// CommonNameMismatchError is an error returned by validation functions
 // when the common name of the certificate subject does not match the
 // name of the given CertRequest.
-type CommonNameMismatch struct{ want, have string }
+type CommonNameMismatchError struct{ want, have string }
 
-func NewCommonNameMismatch(want, have string) *CommonNameMismatch {
-	return &CommonNameMismatch{want: want, have: have}
+func NewCommonNameMismatchError(want, have string) *CommonNameMismatchError {
+	return &CommonNameMismatchError{want: want, have: have}
 }
-func (c *CommonNameMismatch) Error() string {
+func (c *CommonNameMismatchError) Error() string {
 	return fmt.Sprintf("Certificate's common name (%q) does not match the requested name (%q)", c.have, c.want)
 }
 
@@ -146,15 +146,15 @@ func (c *CertNotYetValid) Error() string {
 	return fmt.Sprintf("Certificate is not valid until %s (%s from now)", c.notBefore, time.Until(c.notBefore))
 }
 
-// SANIPAddrMismatch is an error returned by validation functions when
+// SANIPAddrMismatchError is an error returned by validation functions when
 // the Subject Alternative Name extension in the certificate does not
 // have IP values for every IP in the given CertRequest.
-type SANIPAddrMismatch struct{ want, have []net.IP }
+type SANIPAddrMismatchError struct{ want, have []net.IP }
 
-func NewSANIPAddrMismatch(want, have []net.IP) *SANIPAddrMismatch {
-	return &SANIPAddrMismatch{want: want, have: have}
+func NewSANIPAddrMismatchError(want, have []net.IP) *SANIPAddrMismatchError {
+	return &SANIPAddrMismatchError{want: want, have: have}
 }
-func (c *SANIPAddrMismatch) Error() string {
+func (c *SANIPAddrMismatchError) Error() string {
 	return fmt.Sprintf("Certificate's Subject Alternative Name IP addresses (%v) do not match the requested IP addresses (%v)", c.have, c.want)
 }
 
@@ -340,7 +340,7 @@ func (a *CertAuthority) IsSignedBy(cert *x509.Certificate) bool {
 // not valid.
 func (a *CertAuthority) ValidateCertificateForRequest(cert *x509.Certificate, certRequest CertRequest) error {
 	if !a.IsSignedBy(cert) {
-		return NotSignedByCA
+		return ErrNotSignedByCA
 	}
 
 	if time.Until(cert.NotAfter) < expiryMargin {
@@ -352,11 +352,11 @@ func (a *CertAuthority) ValidateCertificateForRequest(cert *x509.Certificate, ce
 	}
 
 	if cert.Subject.CommonName != certRequest.name {
-		return NewCommonNameMismatch(certRequest.name, cert.Subject.CommonName)
+		return NewCommonNameMismatchError(certRequest.name, cert.Subject.CommonName)
 	}
 
 	if !allIPsMatch(cert.IPAddresses, certRequest.ips) {
-		return NewSANIPAddrMismatch(certRequest.ips, cert.IPAddresses)
+		return NewSANIPAddrMismatchError(certRequest.ips, cert.IPAddresses)
 	}
 
 	if !allHostnamesMatch(cert.DNSNames, certRequest.dnsNames) {

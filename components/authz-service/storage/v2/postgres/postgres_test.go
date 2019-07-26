@@ -1115,7 +1115,7 @@ func TestCreatePolicy(t *testing.T) {
 			require.Error(t, err)
 			assert.Nil(t, resp)
 
-			_, ok:= err.(*storage_errors.ErrForeignKey)
+			_, ok:= err.(*storage_errors.ForeignKeyError)
 			assert.True(t, ok, "expected foreign key error")
 			assert.Equal(t, "role not found: "+role, err.Error())
 
@@ -1654,7 +1654,7 @@ func TestCreatePolicy(t *testing.T) {
 				resp, err := store.CreatePolicy(ctx, &pol)
 				require.Error(t, err)
 				assert.Nil(t, resp)
-				_, ok := err.(*storage_errors.ErrForeignKey)
+				_, ok := err.(*storage_errors.ForeignKeyError)
 				require.True(t, ok, "expected foreign key error")
 				assert.Equal(t, "project not found: not-real-project", err.Error())
 			})
@@ -1687,7 +1687,7 @@ func TestCreatePolicy(t *testing.T) {
 				resp, err := store.CreatePolicy(ctx, &pol)
 				require.Error(t, err)
 				assert.Nil(t, resp)
-				_, ok := err.(*storage_errors.ErrForeignKey)
+				_, ok := err.(*storage_errors.ForeignKeyError)
 				require.True(t, ok, "expected foreign key error")
 				assert.Equal(t, "project not found: not-real-project", err.Error())
 			})
@@ -3216,7 +3216,7 @@ func TestCreateRule(t *testing.T) {
 			resp, err := store.CreateRule(ctx, &rule)
 			require.Error(t, err)
 			assert.Nil(t, resp)
-			_, ok := err.(*storage_errors.ErrForeignKey)
+			_, ok := err.(*storage_errors.ForeignKeyError)
 			require.True(t, ok, "mismatches expected error type")
 			assert.Equal(t, "project not found: project-not-found", err.Error())
 		},
