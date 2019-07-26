@@ -51,46 +51,31 @@ const (
 FROM service_group_health AS service_group_health_counts
 `
 
-	selectServiceGroupHealthWithPageSort = `
+	selectServiceGroupHealth = `
 SELECT * FROM service_group_health AS service_group_health
- ORDER BY %s
- LIMIT $1
-OFFSET $2
 `
 	selectServiceGroupHealthFilterCRITICAL = `
-SELECT * FROM service_group_health AS service_group_health
- WHERE health_critical > 0
- ORDER BY %s
- LIMIT $1
-OFFSET $2
+   health_critical > 0
 `
 	selectServiceGroupHealthFilterUNKNOWN = `
-SELECT * FROM service_group_health AS service_group_health
- WHERE health_unknown  > 0
+   health_unknown  > 0
    AND health_critical = 0
- ORDER BY %s
- LIMIT $1
-OFFSET $2
 `
 	selectServiceGroupHealthFilterWARNING = `
-SELECT * FROM service_group_health AS service_group_health
- WHERE health_warning  > 0
+   health_warning  > 0
    AND health_critical = 0
    AND health_unknown  = 0
- ORDER BY %s
- LIMIT $1
-OFFSET $2
 `
 	selectServiceGroupHealthFilterOK = `
-SELECT * FROM service_group_health AS service_group_health
- WHERE health_ok > 0
+   health_ok > 0
    AND health_critical = 0
    AND health_warning  = 0
    AND health_unknown  = 0
- ORDER BY %s
- LIMIT $1
-OFFSET $2
-`
+ `
+	paginationSorting = `
+  ORDER BY %s
+  LIMIT $1
+  OFFSET $2`
 
 	selectServiceGroupsTotalCount = `
 SELECT count(*)
@@ -117,6 +102,8 @@ type serviceGroupHealth struct {
 	PercentOk      int32          `db:"percent_ok"`
 	Application    string         `db:"app_name"`
 	Environment    string         `db:"environment"`
+	//We are not returning this just using it for filters
+	NameSuffix string `db:"name_suffix"`
 
 	// These fields are not mapped to any database field,
 	// they are here just to help us internally
@@ -134,10 +121,10 @@ func (db *Postgres) GetServiceGroups(
 	page = page - 1
 	offset := pageSize * page
 	var (
-		sgHealth    []*serviceGroupHealth
-		selectQuery string = selectServiceGroupHealthWithPageSort
-		sortOrder   string
-		err         error
+		sgHealth        []*serviceGroupHealth
+		selectMainQuery string = selectServiceGroupHealth
+		sortOrder       string
+		err             error
 	)
 
 	if sortAsc {
@@ -146,27 +133,55 @@ func (db *Postgres) GetServiceGroups(
 		sortOrder = "DESC"
 	}
 
+	first := true
+	whereQuery := ``
 	for filter, values := range filters {
 		if len(values) == 0 {
 			continue
+		} else if first {
+			whereQuery = ` WHERE `
+			first = false
+		} else { // not first, add on an AND
+			whereQuery = whereQuery + ` AND `
 		}
 
 		switch filter {
 		case "status", "STATUS":
 			// @afiune What if the user specify more than one Status Filter?
 			// status=["ok", "critical"]
-			selectQuery, err = queryFromStatusFilter(values[0])
+			selectQuery, err := queryFromStatusFilter(values[0])
+			whereQuery = whereQuery + selectQuery
 			if err != nil {
 				return nil, err
 			}
 
+		case "environment", "ENVIRONMENT":
+			selectQuery, err := queryFromFieldFilter("environment", values)
+			whereQuery = whereQuery + selectQuery
+			if err != nil {
+				return nil, err
+			}
+		case "application", "APPLICATION":
+			selectQuery, err := queryFromFieldFilter("app_name", values)
+			whereQuery = whereQuery + selectQuery
+			if err != nil {
+				return nil, err
+			}
+		case "group", "GROUP":
+			selectQuery, err := queryFromFieldFilter("name_suffix", values)
+			whereQuery = whereQuery + selectQuery
+			if err != nil {
+				return nil, err
+			}
 		default:
 			return nil, errors.Errorf("invalid filter. (%s:%s)", filter, values)
 		}
 	}
 
+	selectAllPartsQuery := selectMainQuery + whereQuery + paginationSorting
+
 	// Formatting our Query with sort field and sort order
-	formattedQuery := fmt.Sprintf(selectQuery, formatSortFields(sortField, sortOrder))
+	formattedQuery := fmt.Sprintf(selectAllPartsQuery, formatSortFields(sortField, sortOrder))
 
 	_, err = db.DbMap.Select(&sgHealth, formattedQuery, pageSize, offset)
 	if err != nil {
@@ -335,6 +350,14 @@ func queryFromStatusFilter(text string) (string, error) {
 	default:
 		return "", errors.Errorf("invalid status filter '%s'", text)
 	}
+}
+
+func queryFromFieldFilter(field string, envs []string) (string, error) {
+	formattedVals := strings.Join(envs[:], "','")
+	formattedVals = "'" + formattedVals + "'"
+	fmt.Println(formattedVals)
+	query := ` ` + field + ` in (` + formattedVals + `)`
+	return query, nil
 }
 
 // formatSortFields returns a customized ORDER BY statement from the provided sort field,

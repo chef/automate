@@ -425,6 +425,7 @@ func (db *Postgres) insertNewService(
 		if !exist {
 			svcGroup := &serviceGroup{
 				Name:         svcMetadata.GetServiceGroup(),
+				NameSuffix:   trimSuffix(svcMetadata.GetServiceGroup()),
 				DeploymentID: did,
 			}
 			if err := tx.Insert(svcGroup); err != nil {
@@ -479,4 +480,9 @@ func (db *Postgres) insertNewService(
 		return nil
 	})
 
+}
+
+func trimSuffix(name string) string {
+	parts := strings.Split(name, ".")
+	return parts[1]
 }
