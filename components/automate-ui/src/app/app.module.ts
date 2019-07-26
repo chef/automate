@@ -291,7 +291,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ReactiveFormsModule,
     RoleModule,
     StoreModule.forRoot(ngrxReducers),
-    StoreRouterConnectingModule,
+    StoreRouterConnectingModule.forRoot(),
     !environment.production ? StoreDevtoolsModule.instrument({ maxAge: 25 }) : []
   ],
   providers: [
