@@ -69,7 +69,6 @@ describe File.basename(__FILE__) do
       ],
       "total": 1
     }.to_json
-require 'pry'; binding.pry #############TODO: REMOVE ME
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
     # Node details API

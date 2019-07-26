@@ -52,11 +52,6 @@ func (migratable A2V3ElasticSearchIndices) postTimeSeriesMigration(dateToMigrate
 	myName := "postMigration"
 	defer util.TimeTrack(time.Now(), fmt.Sprintf("%s date: %s", myName, dateToMigrate))
 
-	err = migratable.backend.markTimeseriesDailyLatest(dateToMigrate)
-	if err != nil {
-		return err
-	}
-
 	client, err := migratable.backend.ES2Client()
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("%s cannot connect to ElasticSearch", myName))

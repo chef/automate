@@ -716,3 +716,29 @@ steps:
     plugins:
       - gopath-checkout#v1.0.1:
           import: github.com/chef/automate
+
+  - label: "compliance-service upgrade from Automate v2v3"
+    command:
+      - sudo sysctl -w vm.max_map_count=262144 # Needed for ElasticSearch 6
+      - export PATH=\$PATH:/usr/local/go/bin:\$HOME/.local/bin:\$HOME/bin
+      - sudo scripts/install_inspec.sh
+      - sudo scripts/install_golang.sh
+      - sudo scripts/install_grpcurl.sh
+      - cd components/compliance-service
+      - sudo -E PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-automate-upgrade
+    artifact_paths:
+      - /tmp/compliance.log
+    env:
+      TEST: "62_A2V3_migration_spec.rb"
+      A2V3_DATA: true
+      ES_VER: 6
+      LANG: en_US.UTF-8
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+    plugins:
+      - gopath-checkout#v1.0.1:
+          import: github.com/chef/automate
