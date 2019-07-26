@@ -94,7 +94,7 @@ func (p *pg) CreatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewErrTxCommit(err)
+		return nil, storage_errors.NewTxCommitError(err)
 	}
 
 	// Currently, we don't change anything from what is passed in.
@@ -212,7 +212,7 @@ func (p *pg) DeletePolicy(ctx context.Context, id string) error {
 
 	err = tx.Commit()
 	if err != nil {
-		return storage_errors.NewErrTxCommit(err)
+		return storage_errors.NewTxCommitError(err)
 	}
 
 	return nil
@@ -282,7 +282,7 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 	}
 
 	if err := tx.Commit(); err != nil {
-		return nil, storage_errors.NewErrTxCommit(err)
+		return nil, storage_errors.NewTxCommitError(err)
 	}
 
 	// Currently, we don't change anything from what is passed in.
@@ -417,7 +417,7 @@ func (p *pg) ListPolicyMembers(ctx context.Context, id string) ([]v2.Member, err
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewErrTxCommit(err)
+		return nil, storage_errors.NewTxCommitError(err)
 	}
 
 	return members, nil
@@ -458,7 +458,7 @@ func (p *pg) AddPolicyMembers(ctx context.Context, id string, members []v2.Membe
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewErrTxCommit(err)
+		return nil, storage_errors.NewTxCommitError(err)
 	}
 	return members, nil
 }
@@ -497,7 +497,7 @@ func (p *pg) ReplacePolicyMembers(ctx context.Context, policyID string, members 
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewErrTxCommit(err)
+		return nil, storage_errors.NewTxCommitError(err)
 	}
 
 	return members, err
@@ -553,7 +553,7 @@ func (p *pg) RemovePolicyMembers(ctx context.Context,
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewErrTxCommit(err)
+		return nil, storage_errors.NewTxCommitError(err)
 	}
 
 	return members, nil
@@ -658,7 +658,7 @@ func (p *pg) CreateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewErrTxCommit(err)
+		return nil, storage_errors.NewTxCommitError(err)
 	}
 
 	return role, nil
@@ -726,7 +726,7 @@ func (p *pg) GetRole(ctx context.Context, id string) (*v2.Role, error) {
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewErrTxCommit(err)
+		return nil, storage_errors.NewTxCommitError(err)
 	}
 
 	return &role, nil
@@ -771,7 +771,7 @@ func (p *pg) DeleteRole(ctx context.Context, id string) error {
 
 	err = tx.Commit()
 	if err != nil {
-		return storage_errors.NewErrTxCommit(err)
+		return storage_errors.NewTxCommitError(err)
 	}
 
 	return nil
@@ -836,7 +836,7 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewErrTxCommit(err)
+		return nil, storage_errors.NewTxCommitError(err)
 	}
 
 	return role, nil
@@ -887,7 +887,7 @@ func (p *pg) insertRoleWithQuerier(ctx context.Context, role *v2.Role, q Querier
 
 	err = tx.Commit()
 	if err != nil {
-		return storage_errors.NewErrTxCommit(err)
+		return storage_errors.NewTxCommitError(err)
 	}
 
 	return nil
@@ -938,7 +938,7 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewErrTxCommit(err)
+		return nil, storage_errors.NewTxCommitError(err)
 	}
 
 	rule.Status = pgStaged
@@ -985,7 +985,7 @@ func (p *pg) UpdateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewErrTxCommit(err)
+		return nil, storage_errors.NewTxCommitError(err)
 	}
 
 	rule.Status = pgStaged
@@ -1084,7 +1084,7 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 
 	err = tx.Commit()
 	if err != nil {
-		return storage_errors.NewErrTxCommit(err)
+		return storage_errors.NewTxCommitError(err)
 	}
 
 	return nil
@@ -1208,7 +1208,7 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, v2.RulesStatusError, storage_errors.NewErrTxCommit(err)
+		return nil, v2.RulesStatusError, storage_errors.NewTxCommitError(err)
 	}
 
 	rulesStatus := v2.Applied
@@ -1318,7 +1318,7 @@ func (p *pg) ApplyStagedRules(ctx context.Context) error {
 
 	err = tx.Commit()
 	if err != nil {
-		return storage_errors.NewErrTxCommit(err)
+		return storage_errors.NewTxCommitError(err)
 	}
 
 	return nil
@@ -1355,7 +1355,7 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 
 	err = tx.Commit()
 	if err != nil {
-		return nil, storage_errors.NewErrTxCommit(err)
+		return nil, storage_errors.NewTxCommitError(err)
 	}
 
 	// Currently, we don't change anything from what is passed in.
@@ -1541,7 +1541,7 @@ func (p *pg) recordMigrationStatusAndNotifyPG(ctx context.Context, ms string) er
 		return p.processError(err)
 	}
 	if err := tx.Commit(); err != nil {
-		return storage_errors.NewErrTxCommit(err)
+		return storage_errors.NewTxCommitError(err)
 	}
 	return nil
 }

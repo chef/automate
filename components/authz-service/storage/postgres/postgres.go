@@ -76,7 +76,7 @@ func parsePQError(e *pq.Error) error {
 	case "23505": // Unique violation
 		return storage.ErrConflict
 	case "23503": // Foreign key violation
-		return &storage.ErrForeignKey{Msg: e.Message}
+		return &storage.ForeignKeyError{Msg: e.Message}
 	case "P0002": // Not found in plpgsql ("no_data_found")
 		return storage.ErrNotFound
 	case "20000": // Not found

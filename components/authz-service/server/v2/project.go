@@ -128,7 +128,7 @@ func (s *ProjectState) CreateProject(ctx context.Context,
 			"max of %d projects allowed while IAM v2 Beta", constants_v2.MaxProjects)
 	default:
 		switch err.(type) {
-		case *storage_errors.ErrForeignKey:
+		case *storage_errors.ForeignKeyError:
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal,
@@ -379,7 +379,7 @@ func (s *ProjectState) CreateRule(ctx context.Context, req *api.CreateRuleReq) (
 		return nil, status.Errorf(codes.AlreadyExists, "rule with ID %q already exists", req.Id)
 	default:
 		switch err.(type) {
-		case *storage_errors.ErrForeignKey:
+		case *storage_errors.ForeignKeyError:
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal,

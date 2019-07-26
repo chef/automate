@@ -170,7 +170,7 @@ func (s *policyServer) CreatePolicy(
 		return nil, status.Errorf(codes.AlreadyExists,
 			"policy with id %q already exists", req.Id)
 	default:
-		if err, ok := err.(*storage_errors.ErrForeignKey); ok {
+		if err, ok := err.(*storage_errors.ForeignKeyError); ok {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal,
@@ -277,7 +277,7 @@ func (s *policyServer) UpdatePolicy(
 		case storage_errors.ErrNotFound:
 			return nil, status.Errorf(codes.NotFound, "no policy with ID %q found", req.Id)
 		default:
-			if err, ok := err.(*storage_errors.ErrForeignKey); ok {
+			if err, ok := err.(*storage_errors.ForeignKeyError); ok {
 				return nil, status.Error(codes.InvalidArgument, err.Error())
 			}
 			return nil, err
@@ -415,7 +415,7 @@ func (s *policyServer) CreateRole(
 		return nil, status.Errorf(codes.AlreadyExists, "role with id %q already exists", req.Id)
 	default:
 		switch err.(type) {
-		case *storage_errors.ErrForeignKey:
+		case *storage_errors.ForeignKeyError:
 			return nil, status.Errorf(codes.InvalidArgument, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal, "creating role %q: %s", req.Id, err.Error())
