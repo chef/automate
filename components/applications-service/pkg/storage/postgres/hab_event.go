@@ -266,6 +266,7 @@ func (db *Postgres) updateTables(
 					AppName:     eventMetadata.GetApplication(),
 					Environment: eventMetadata.GetEnvironment(),
 				}
+				log.Infof("creating deployment %+v", deploy)
 				if err := tx.Insert(deploy); err != nil {
 					return errors.Wrap(err, "Unable to insert deployment")
 				}
@@ -277,6 +278,7 @@ func (db *Postgres) updateTables(
 				Name:         svcMetadata.GetServiceGroup(),
 				DeploymentID: did,
 			}
+			log.Infof("creating svc group %+v", svcGroup)
 			if err := tx.Insert(svcGroup); err != nil {
 				return errors.Wrap(err, "Unable to insert service_group")
 			}
