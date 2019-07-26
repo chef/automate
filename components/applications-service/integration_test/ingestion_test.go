@@ -6,10 +6,12 @@
 package integration_test
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
 
+	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/habitat"
 	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/golang/protobuf/proto"
@@ -701,13 +703,16 @@ func TestNewSgAndDeploymentUpdate(t *testing.T) {
 	suite.WaitForEventsToProcess(eventsProcessed)
 
 	// TODO: replace printf with test to assert we have 2 services w/ 2 supervisors in 1 service group in 1 deployment
+	fmt.Println("start results-----------------------------")
+	stats, err := suite.ApplicationsServer.GetServicesStats(context.Background(), &applications.ServicesStatsReq{})
+	require.NoError(t, err)
+	fmt.Printf("%+v\n", stats)
 	svcList, err := suite.StorageClient.GetServices("name", true, 1, 5, nil)
 	require.NoError(t, err)
 	for _, svc := range svcList {
 		fmt.Printf("%+v\n", svc)
 	}
-
-	fmt.Println("-----------------------------")
+	fmt.Println("end results-----------------------------")
 
 	// event3 changes the app_name and environment of the service from event 2
 	event3 := NewHabitatEvent(
@@ -724,9 +729,46 @@ func TestNewSgAndDeploymentUpdate(t *testing.T) {
 	suite.WaitForEventsToProcess(eventsProcessed)
 
 	// TODO: replace printf with test to assert we have 2 services w/ 2 supervisors in 2 service groups in 2 deployments
+	fmt.Println("start results-----------------------------")
+	stats, err = suite.ApplicationsServer.GetServicesStats(context.Background(), &applications.ServicesStatsReq{})
+	require.NoError(t, err)
+	fmt.Printf("%+v\n", stats)
 	svcList, err = suite.StorageClient.GetServices("name", true, 1, 5, nil)
 	require.NoError(t, err)
 	for _, svc := range svcList {
 		fmt.Printf("%+v\n", svc)
 	}
+	fmt.Println("end results-----------------------------")
+
+	// event3 changes the app_name and environment of the service from event 1
+	event4 := NewHabitatEvent(
+		withSupervisorId("1"),
+		withPackageIdent("core/db/0.1.0/20200101121212"),
+		withServiceGroup("db.default"),
+		withApplication("newApp"),
+		withEnvironment("newEnv"),
+	)
+	bytes4, err := proto.Marshal(event4)
+	require.NoError(t, err)
+	suite.Ingester.IngestMessage(bytes4)
+	eventsProcessed++
+	suite.WaitForEventsToProcess(eventsProcessed)
+
+	// TODO: replace printf with test to assert we have 2 services w/ 2 supervisors in 1 service groups in 1 deployments
+	fmt.Println("start results-----------------------------")
+	stats, err = suite.ApplicationsServer.GetServicesStats(context.Background(), &applications.ServicesStatsReq{})
+	require.NoError(t, err)
+	fmt.Printf("%+v\n", stats)
+	svcList, err = suite.StorageClient.GetServices("name", true, 1, 5, nil)
+	require.NoError(t, err)
+	for _, svc := range svcList {
+		fmt.Printf("%+v\n", svc)
+	}
+	fmt.Println("end results-----------------------------")
+	// TODO: test matrix:
+	// 1) move service to a new deployment and service group that didn't exist before
+	// 2) move service to an existing deployment but new service group
+	// 3) move service to an existing deployment and service group
+	// 4) (for completeness) nothing changes when deployment and sg stay the same
+	// 5) when last service is removed from sg or deployment, they are deleted
 }

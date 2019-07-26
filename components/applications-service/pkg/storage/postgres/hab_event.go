@@ -91,6 +91,7 @@ func (db *Postgres) IngestHealthCheckEvent(event *habitat.HealthCheckEvent) erro
 	)
 	if err != nil {
 		label = labelFailure
+		log.WithError(err).Error("ingest failed")
 	}
 
 	ingestDurations.With(prometheus.Labels{
@@ -180,12 +181,21 @@ type deploymentServiceGroup struct {
 	Environment      string `db:"environment"`
 }
 
-const selectMatchingDeploymentAndSG = `
+const (
+	selectMatchingDeploymentAndSG = `
 SELECT sg.id AS service_group_id, d.id AS deployment_id, sg.name AS sg_name, d.app_name, d.environment
   FROM service_group AS sg
   JOIN deployment AS d ON sg.deployment_id = d.id
  WHERE sg.name = $1 AND d.app_name = $2 AND d.environment = $3;
 `
+
+	maybeCleanupServiceGroup = `
+DELETE FROM service_group WHERE service_group.id = $1 AND (NOT EXISTS (SELECT 1 FROM service WHERE service.group_id = service_group.id ))
+`
+	maybeCleanupDeployment = `
+DELETE FROM deployment WHERE deployment.id = $1 AND (NOT EXISTS (SELECT 1 FROM service WHERE service.deployment_id = deployment.id ))
+`
+)
 
 func (db *Postgres) updateTables(
 	svc *service,
@@ -193,6 +203,12 @@ func (db *Postgres) updateTables(
 	svcMetadata *habitat.ServiceMetadata,
 	pkgIdent *packageIdent,
 	health string) error {
+
+	oldDID := svc.DeploymentID
+	oldGID := svc.GroupID
+
+	// TODO remove
+	log.Info("update existing service...")
 
 	// The deployment and service group may have changed. When this happens, we
 	// don't want to _edit_ the deployment or service_group because other
@@ -219,46 +235,62 @@ func (db *Postgres) updateTables(
 		eventMetadata.GetEnvironment(),
 	)
 
+	needToCreateDeploymentServiceGroup := (err != nil)
+	needToChangeDeploymentServiceGroup := needToCreateDeploymentServiceGroup || (existingDSG.ServiceGroupID != oldGID)
+
+	log.Infof("need new DSG %+v need to change DSG %+v", needToCreateDeploymentServiceGroup, needToChangeDeploymentServiceGroup)
+
 	// When the service belongs to a deployment+service_group that exist (either
 	// the same one as before, or a different one):
-	if err == nil {
+	if !needToCreateDeploymentServiceGroup && !needToChangeDeploymentServiceGroup {
 		// The service could be in the same service_group and deployment as it was
 		// before, but it could also be in a new one.
-		// TODO/FIXME: updateService needs to adjust the deployment_id and group_id
-		// for the second case.
 		db.updateService(svc, eventMetadata, svcMetadata, pkgIdent, health, existingDSG)
 		if _, err := db.DbMap.Update(svc); err != nil {
 			return errors.Wrap(err, "unable to update service")
 		}
+		return nil
 	}
 
 	return dblib.Transaction(db.DbMap, func(tx *gorp.Transaction) error {
 
-		// oldDID := svc.DeploymentID
-		// oldGID := svc.GroupID
+		log.Info("making that transaction happen")
 
-		deploy := &deployment{
-			AppName:     eventMetadata.GetApplication(),
-			Environment: eventMetadata.GetEnvironment(),
-		}
-		if err := tx.Insert(deploy); err != nil {
-			return errors.Wrap(err, "Unable to insert deployment")
-		}
-		did := deploy.ID
+		var newDSG deploymentServiceGroup
 
-		svcGroup := &serviceGroup{
-			Name:         svcMetadata.GetServiceGroup(),
-			DeploymentID: did,
-		}
-		if err := tx.Insert(svcGroup); err != nil {
-			return errors.Wrap(err, "Unable to insert service_group")
-		}
-		gid := svcGroup.ID
+		if needToCreateDeploymentServiceGroup {
+			// 1) the deployment may or may not exist; create if needed
+			did, exist := db.getDeploymentID(eventMetadata.GetApplication(), eventMetadata.GetEnvironment())
+			if !exist {
+				deploy := &deployment{
+					AppName:     eventMetadata.GetApplication(),
+					Environment: eventMetadata.GetEnvironment(),
+				}
+				if err := tx.Insert(deploy); err != nil {
+					return errors.Wrap(err, "Unable to insert deployment")
+				}
+				did = deploy.ID
+			}
 
-		newDSG := deploymentServiceGroup{
-			DeploymentID:   did,
-			ServiceGroupID: gid,
+			// 2) the service group doesn't exist
+			svcGroup := &serviceGroup{
+				Name:         svcMetadata.GetServiceGroup(),
+				DeploymentID: did,
+			}
+			if err := tx.Insert(svcGroup); err != nil {
+				return errors.Wrap(err, "Unable to insert service_group")
+			}
+			gid := svcGroup.ID
+
+			newDSG = deploymentServiceGroup{
+				DeploymentID:   did,
+				ServiceGroupID: gid,
+			}
+		} else {
+			newDSG = existingDSG
 		}
+
+		log.Infof("updating DSG to %+v", newDSG)
 
 		db.updateService(svc, eventMetadata, svcMetadata, pkgIdent, health, newDSG)
 
@@ -266,8 +298,15 @@ func (db *Postgres) updateTables(
 			return errors.Wrap(err, "Unable to update service")
 		}
 
-		// TODO/FIXME: delete the old service_group and/or deployment if they are now empty
-		// Add tests for that
+		log.Infof("running cleanup query for gid %d and did %d\n", oldGID, oldDID)
+
+		if _, err := tx.Exec(maybeCleanupServiceGroup, oldGID); err != nil {
+			return errors.Wrap(err, "Unable to cleanup possibly unused service group")
+		}
+
+		if _, err := tx.Exec(maybeCleanupDeployment, oldDID); err != nil {
+			return errors.Wrap(err, "Unable to cleanup possibly unused service group")
+		}
 
 		return nil
 	})
