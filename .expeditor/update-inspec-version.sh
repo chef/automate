@@ -2,6 +2,11 @@
 
 set -eou pipefail
 
+if [[ "$EXPEDITOR_PKG_TARGET" != "x86_64-linux" ]]; then
+    echo "Ignoring $EXPEDITOR_PKG_VERSION/$EXPEDITOR_PKG_RELEASE because its target is '$EXPEDITOR_PKG_TARGET' (expected 'x86_64-linux')"
+    exit 0
+fi
+
 branch="expeditor/bump-inspec"
 git checkout -b "$branch"
 
