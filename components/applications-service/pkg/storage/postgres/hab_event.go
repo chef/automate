@@ -353,7 +353,6 @@ func (db *Postgres) updateService(
 		svc.HealthUpdatedAt = time.Now()
 		svc.PreviousHealth = svc.Health
 		svc.Health = health
-		svc.needUpdate = true
 	}
 
 	// Update Package Identifier
@@ -362,7 +361,6 @@ func (db *Postgres) updateService(
 		svc.Version = pkgIdent.Version
 		svc.Release = pkgIdent.Release
 		svc.FullPkgIdent = pkgIdent.FullPackageIdent()
-		svc.needUpdate = true
 	}
 
 	// Update Channel
@@ -375,7 +373,6 @@ func (db *Postgres) updateService(
 	// update always the timestamp of the last event received so that the database
 	// has a record of when the last message was received for a service
 	svc.LastEventOccurredAt = convertOrCreateGoTime(eventMetadata.GetOccurredAt())
-	svc.needUpdate = true
 }
 
 // update the service channel & update strategy from the provided habitat update config
@@ -383,24 +380,20 @@ func updateServiceStrategyAndChannel(svc *service, updateConfig *habitat.UpdateC
 	if updateConfig == nil {
 		if svc.Channel != "" {
 			svc.Channel = ""
-			svc.needUpdate = true
 		}
 
 		if svc.UpdateStrategy != storage.NoneStrategy.String() {
 			svc.UpdateStrategy = storage.NoneStrategy.String()
-			svc.needUpdate = true
 		}
 	} else {
 		channel := updateConfig.GetChannel()
 		if svc.Channel != channel {
 			svc.Channel = channel
-			svc.needUpdate = true
 		}
 
 		strategy := storage.HabitatUpdateStrategyToStorageFormat(updateConfig.GetStrategy())
 		if svc.UpdateStrategy != strategy.String() {
 			svc.UpdateStrategy = strategy.String()
-			svc.needUpdate = true
 		}
 	}
 }

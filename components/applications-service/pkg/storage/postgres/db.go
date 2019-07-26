@@ -87,10 +87,6 @@ func (db *Postgres) initDB() error {
 	return nil
 }
 
-type dbTable interface {
-	NeedUpdate() bool
-}
-
 // service struct is the representation of the service table inside the db
 type service struct {
 	ID                  int32     `db:"id"`
@@ -111,13 +107,6 @@ type service struct {
 	HealthUpdatedAt     time.Time `db:"health_updated_at"`
 	CreatedAt           time.Time `db:"-"`
 	UpdatedAt           time.Time `db:"-"`
-
-	// (internal) use it to know if the service needs an update or not
-	needUpdate bool `db:"-"`
-}
-
-func (svc *service) NeedUpdate() bool {
-	return svc.needUpdate
 }
 
 // supervisor struct is the representation of the supervisor table inside the db
@@ -144,13 +133,6 @@ type serviceGroup struct {
 	DeploymentID int32     `db:"deployment_id"`
 	CreatedAt    time.Time `db:"-"`
 	UpdatedAt    time.Time `db:"-"`
-
-	// (internal) use it to know if the service-group needs an update or not
-	needUpdate bool `db:"-"`
-}
-
-func (sg *serviceGroup) NeedUpdate() bool {
-	return sg.needUpdate
 }
 
 // deployment struct is the representation of the deployment table inside the db
@@ -160,11 +142,4 @@ type deployment struct {
 	Environment string    `db:"environment"`
 	CreatedAt   time.Time `db:"-"`
 	UpdatedAt   time.Time `db:"-"`
-
-	// (internal) use it to know if the deployment needs an update or not
-	needUpdate bool `db:"-"`
-}
-
-func (d *deployment) NeedUpdate() bool {
-	return d.needUpdate
 }
