@@ -43,7 +43,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   // isLoading represents the initial load as well as subsequent updates in progress.
   public isLoading = true;
   public saving = false;
-  private isDestroyed: Subject<boolean> = new Subject<boolean>();
+  private isDestroyed = new Subject<boolean>();
 
   constructor(
     private fb: FormBuilder,
@@ -139,7 +139,9 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   }
 
   showProjectLink(): boolean {
-    return some(['status', <RuleStatus>'staged'], this.rules);
+    const statusPropertyName = 'status';
+    const ruleStatus: RuleStatus = 'staged';
+    return some([statusPropertyName, ruleStatus], this.rules);
   }
 
   saveProject() {

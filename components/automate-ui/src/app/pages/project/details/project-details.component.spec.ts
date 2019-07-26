@@ -7,9 +7,9 @@ import { MockComponent } from 'ng2-mock-component';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { IAMType } from 'app/entities/policies/policy.model';
 import { GetProjectSuccess } from 'app/entities/projects/project.actions';
 import { projectEntityReducer } from 'app/entities/projects/project.reducer';
+import { Project } from 'app/entities/projects/project.model';
 import { Rule } from 'app/entities/rules/rule.model';
 import { ProjectDetailsComponent } from './project-details.component';
 
@@ -17,9 +17,10 @@ describe('ProjectDetailsComponent', () => {
   let component: ProjectDetailsComponent;
   let fixture: ComponentFixture<ProjectDetailsComponent>;
 
-  const project = {
-    id: 'uuid-1', name: 'Default',
-    type: <IAMType>'CHEF_MANAGED'
+  const project: Project = {
+    id: 'uuid-1',
+    name: 'Default',
+    type: 'CHEF_MANAGED'
   };
   const rules = [
     <Rule>{
@@ -124,7 +125,7 @@ describe('ProjectDetailsComponent', () => {
     store.dispatch(new GetProjectSuccess({
       project: {
         id: 'uuid-1', name: 'Default',
-        type: <IAMType>'CHEF_MANAGED'
+        type: 'CHEF_MANAGED'
       }
     }));
 

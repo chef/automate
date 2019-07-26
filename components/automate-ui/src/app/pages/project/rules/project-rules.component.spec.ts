@@ -7,19 +7,20 @@ import { MockComponent } from 'ng2-mock-component';
 import { using } from 'app/testing/spec-helpers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { IAMType } from 'app/entities/policies/policy.model';
 import { projectEntityReducer } from 'app/entities/projects/project.reducer';
-import { ProjectRulesComponent } from './project-rules.component';
 import { Rule, Condition, ConditionOperator, RuleType } from 'app/entities/rules/rule.model';
 import { ruleEntityReducer } from 'app/entities/rules/rule.reducer';
+import { Project } from 'app/entities/projects/project.model';
+import { ProjectRulesComponent } from './project-rules.component';
 
 describe('ProjectRulesComponent', () => {
   let component: ProjectRulesComponent;
   let fixture: ComponentFixture<ProjectRulesComponent>;
 
-  const project = {
-    id: 'uuid-1', name: 'Default',
-    type: <IAMType>'CHEF_MANAGED'
+  const project = <Project>{
+    id: 'uuid-1',
+    name: 'Default',
+    type: 'CHEF_MANAGED'
   };
 
   beforeEach(async(() => {
@@ -167,10 +168,11 @@ describe('ProjectRulesComponent', () => {
     it('should enable submit when valid', () => {
       component.ruleForm.get('name').setValue('My Rule');
       component.ruleForm.get('type').setValue('NODE');
+      const operator: ConditionOperator  = 'EQUALS';
       component.ruleForm.get('conditions').setValue([
         {
           attribute: 'CHEF_ORGS',
-          operator: <ConditionOperator>'EQUALS',
+          operator: operator,
           values: 'my value'
         }
       ]);
@@ -178,14 +180,16 @@ describe('ProjectRulesComponent', () => {
     });
 
     it('should have attribute label with NODE type', () => {
-      component.ruleForm.get('type').setValue(<RuleType>'node');
+      const ruleType: RuleType = 'node';
+      component.ruleForm.get('type').setValue(ruleType);
       const attributeLabel = component.getAttributeLabel();
       expect(attributeLabel)
         .toBe('node attribute'); // specifically should be lowercase for screen reader
     });
 
     it('should have attribute label with EVENT type', () => {
-      component.ruleForm.get('type').setValue(<RuleType>'event');
+      const ruleType: RuleType = 'event';
+      component.ruleForm.get('type').setValue(ruleType);
       const attributeLabel = component.getAttributeLabel();
       expect(attributeLabel)
         .toBe('event attribute'); // specifically should be lowercase for screen reader

@@ -40,13 +40,17 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   public editingRule = false;
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
+  // These constants ensure type safety
+  private equals_op: ConditionOperator = 'EQUALS';
+  private member_of_op: ConditionOperator = 'MEMBER_OF';
+
   public operators = [
     <KVPair>{
-      key: <ConditionOperator>'EQUALS',
+      key: this.equals_op,
       value: 'equals'
     },
     <KVPair>{
-      key: <ConditionOperator>'MEMBER_OF',
+      key: this.member_of_op,
       value: 'member of'
     }
   ];
@@ -204,12 +208,14 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   convertToRule(): Rule {
     const ruleValue = this.ruleForm.value;
     const conditions: Condition[] = [];
+    // This constant ensures type safety
+    const equals_op: ConditionOperator = 'EQUALS';
     ruleValue.conditions.forEach(c => {
       conditions.push(<Condition>{
         attribute: c.attribute,
         operator: c.operator,
           // Convert values string to storage format
-        values: c.operator === <ConditionOperator>'EQUALS'
+        values: c.operator === equals_op
           ? [c.values.trim()]
           : c.values.split(/,\s*/).map(v => v.trim())
       });
