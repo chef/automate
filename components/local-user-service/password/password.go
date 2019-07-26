@@ -12,28 +12,28 @@ type Validator struct {
 	cr   *crunchy.Validator
 }
 
-// ErrEmpty is returned if the validated password is empty or all whitespace.
-type ErrEmpty struct{}
+// EmptyError is returned if the validated password is empty or all whitespace.
+type EmptyError struct{}
 
-func (*ErrEmpty) Error() string { return "password is empty or all whitespace" }
+func (*EmptyError) Error() string { return "password is empty or all whitespace" }
 
-// ErrTooShort is returned if the password is shorter than the required number
+// TooShortError is returned if the password is shorter than the required number
 // of chars.
-type ErrTooShort struct {
+type TooShortError struct {
 	min int
 }
 
-func (e *ErrTooShort) Error() string {
+func (e *TooShortError) Error() string {
 	return fmt.Sprintf("password is too short (must be at least %d characters)", e.min)
 }
 
-// ErrTooFewChars is returned if the password has less than the required number
+// TooFewCharsError is returned if the password has less than the required number
 // of distinct characters.
-type ErrTooFewChars struct {
+type TooFewCharsError struct {
 	min int
 }
 
-func (e *ErrTooFewChars) Error() string {
+func (e *TooFewCharsError) Error() string {
 	return fmt.Sprintf("password does not contain enough distinct characters (minimum %d)", e.min)
 }
 
@@ -69,11 +69,11 @@ func (v *Validator) translateError(err error) error {
 		return nil
 
 	case crunchy.ErrEmpty:
-		return &ErrEmpty{}
+		return &EmptyError{}
 	case crunchy.ErrTooShort:
-		return &ErrTooShort{min: v.opts.MinLength}
+		return &TooShortError{min: v.opts.MinLength}
 	case crunchy.ErrTooFewChars:
-		return &ErrTooFewChars{min: v.opts.MinDiff}
+		return &TooFewCharsError{min: v.opts.MinDiff}
 	default: // includes err == nil
 		return err
 	}
