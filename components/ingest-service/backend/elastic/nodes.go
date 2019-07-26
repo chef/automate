@@ -15,6 +15,7 @@ import (
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
+	project_update_lib "github.com/chef/automate/lib/authz"
 )
 
 // InsertNode inserts the state of the node as a result of a Chef Client Run into node-state index
@@ -214,7 +215,8 @@ func (es *Backend) UpdateNodeProjectTags(ctx context.Context, projectTaggingRule
 	startTaskResult, err := elastic.NewUpdateByQueryService(es.client).
 		Index(mappings.NodeState.Alias).
 		Type(mappings.NodeState.Type).
-		Script(elastic.NewScript(script).Params(convertProjectTaggingRulesToEsParams(projectTaggingRules))).
+		Script(elastic.NewScript(script).Params(
+			project_update_lib.ConvertProjectTaggingRulesToEsParams(projectTaggingRules))).
 		WaitForCompletion(false).
 		ProceedOnVersionConflict().
 		DoAsync(ctx)
@@ -339,62 +341,4 @@ func (es *Backend) findNodeIDByFields(ctx context.Context, filters map[string]st
 
 	return docIDs, nil
 
-}
-
-func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*iam_v2.ProjectRules) map[string]interface{} {
-	esProjectCollection := make([]map[string]interface{}, len(projectTaggingRules))
-	projectIndex := 0
-	for projectName, projectRules := range projectTaggingRules {
-		esRuleCollection := make([]map[string]interface{}, len(projectRules.Rules))
-		for ruleIndex, rule := range projectRules.Rules {
-			esConditionCollection := make([]map[string]interface{}, len(rule.Conditions))
-
-			for conditionIndex, condition := range rule.Conditions {
-				chefServers := []string{}
-				organizations := []string{}
-				environments := []string{}
-				roles := []string{}
-				chefTags := []string{}
-				policyGroups := []string{}
-				policyNames := []string{}
-				switch condition.Attribute {
-				case iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS:
-					chefServers = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS:
-					organizations = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS:
-					environments = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_ROLES:
-					roles = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS:
-					chefTags = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_POLICY_GROUP:
-					policyGroups = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_POLICY_NAME:
-					policyNames = condition.Values
-				}
-				esConditionCollection[conditionIndex] = map[string]interface{}{
-					"chefServers":   chefServers,
-					"organizations": organizations,
-					"environments":  environments,
-					"roles":         roles,
-					"chefTags":      chefTags,
-					"policyGroups":  policyGroups,
-					"policyNames":   policyNames,
-				}
-
-			}
-			esRuleCollection[ruleIndex] = map[string]interface{}{
-				"conditions": esConditionCollection,
-			}
-		}
-
-		esProjectCollection[projectIndex] = map[string]interface{}{
-			"name":  projectName,
-			"rules": esRuleCollection,
-		}
-		projectIndex++
-	}
-
-	return map[string]interface{}{"projects": esProjectCollection}
 }

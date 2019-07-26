@@ -1,6 +1,7 @@
 package persistence
 
 import (
+	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/event-feed-service/pkg/util"
 	project_update_lib "github.com/chef/automate/lib/authz"
 	olivere "github.com/olivere/elastic"
@@ -12,13 +13,17 @@ type FeedStore interface {
 	DeleteIndex(ctx context.Context, index string) error
 	// @param (context, jobID)
 	JobStatus(context.Context, string) (project_update_lib.JobStatus, error)
+	// @param (context, projectUpdateID)
+	JobCancel(context.Context, string) error
+	// @param (context, project_rules)
+	UpdateProjectTags(context.Context, map[string]*iam_v2.ProjectRules) ([]string, error)
 	// @param (context, indexName)
 	DoesIndexExists(context.Context, string) (bool, error)
 	// @param (context, previousIndex)
 	ReindexFeedsToLatest(context.Context, string) (string, error)
 	// @param (context)
 	InitializeStore(context.Context) error
-	CreateFeedEntry(entry *util.FeedEntry) (bool, error)
+	CreateFeedEntry(entry *util.FeedEntry) error
 	GetFeed(query *util.FeedQuery) ([]*util.FeedEntry, int64, error)
 	GetFeedSummary(query *util.FeedSummaryQuery) (map[string]int64, error)
 	GetActionLine(filters []string, startDate string, endDate string, timezone string, interval int, action string) (*util.ActionLine, error)

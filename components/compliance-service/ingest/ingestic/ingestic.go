@@ -333,7 +333,8 @@ func (backend *ESClient) UpdateReportProjectsTags(ctx context.Context, projectTa
 	startTaskResult, err := elastic.NewUpdateByQueryService(backend.client).
 		Index(index).
 		Type(docType).
-		Script(elastic.NewScript(script).Params(convertProjectTaggingRulesToEsParams(projectTaggingRules))).
+		Script(elastic.NewScript(script).Params(
+			project_update_lib.ConvertProjectTaggingRulesToEsParams(projectTaggingRules))).
 		Refresh("true").
 		WaitForCompletion(false).
 		ProceedOnVersionConflict().
@@ -342,7 +343,8 @@ func (backend *ESClient) UpdateReportProjectsTags(ctx context.Context, projectTa
 	return startTaskResult.TaskId, err
 }
 
-func (backend *ESClient) UpdateSummaryProjectsTags(ctx context.Context, projectTaggingRules map[string]*iam_v2.ProjectRules) (string, error) {
+func (backend *ESClient) UpdateSummaryProjectsTags(ctx context.Context,
+	projectTaggingRules map[string]*iam_v2.ProjectRules) (string, error) {
 
 	script := `
 		ArrayList matchingProjects = new ArrayList();
@@ -465,7 +467,8 @@ func (backend *ESClient) UpdateSummaryProjectsTags(ctx context.Context, projectT
 	startTaskResult, err := elastic.NewUpdateByQueryService(backend.client).
 		Index(index).
 		Type(docType).
-		Script(elastic.NewScript(script).Params(convertProjectTaggingRulesToEsParams(projectTaggingRules))).
+		Script(elastic.NewScript(script).Params(
+			project_update_lib.ConvertProjectTaggingRulesToEsParams(projectTaggingRules))).
 		Refresh("true").
 		WaitForCompletion(false).
 		ProceedOnVersionConflict().
@@ -533,62 +536,4 @@ func getPercentageComplete(status interface{}) float64 {
 	}
 
 	return updated / total
-}
-
-func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*iam_v2.ProjectRules) map[string]interface{} {
-	esProjectCollection := make([]map[string]interface{}, len(projectTaggingRules))
-	projectIndex := 0
-	for projectName, projectRules := range projectTaggingRules {
-		esRuleCollection := make([]map[string]interface{}, len(projectRules.Rules))
-		for ruleIndex, rule := range projectRules.Rules {
-			esConditionCollection := make([]map[string]interface{}, len(rule.Conditions))
-
-			for conditionIndex, condition := range rule.Conditions {
-				chefServers := []string{}
-				organizations := []string{}
-				environments := []string{}
-				roles := []string{}
-				chefTags := []string{}
-				policyGroups := []string{}
-				policyNames := []string{}
-				switch condition.Attribute {
-				case iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS:
-					chefServers = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS:
-					organizations = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS:
-					environments = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_ROLES:
-					roles = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS:
-					chefTags = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_POLICY_GROUP:
-					policyGroups = condition.Values
-				case iam_v2.ProjectRuleConditionAttributes_POLICY_NAME:
-					policyNames = condition.Values
-				}
-				esConditionCollection[conditionIndex] = map[string]interface{}{
-					"chefServers":   chefServers,
-					"organizations": organizations,
-					"environments":  environments,
-					"roles":         roles,
-					"chefTags":      chefTags,
-					"policyGroups":  policyGroups,
-					"policyNames":   policyNames,
-				}
-
-			}
-			esRuleCollection[ruleIndex] = map[string]interface{}{
-				"conditions": esConditionCollection,
-			}
-		}
-
-		esProjectCollection[projectIndex] = map[string]interface{}{
-			"name":  projectName,
-			"rules": esRuleCollection,
-		}
-		projectIndex++
-	}
-
-	return map[string]interface{}{"projects": esProjectCollection}
 }

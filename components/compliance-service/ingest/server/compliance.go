@@ -67,7 +67,7 @@ func (srv *ComplianceIngestServer) HandleEvent(ctx context.Context, req *automat
 
 	response := &automate_event.EventResponse{}
 	if req.Type.Name == event.ProjectRulesUpdate {
-		projectUpdateID, err := getProjectUpdateID(req)
+		projectUpdateID, err := project_update_lib.GetProjectUpdateID(req)
 		if err != nil {
 			logrus.Errorf("Project Rule Update sent without a ProjectUpdateID eventID %q",
 				req.EventID)
@@ -76,7 +76,7 @@ func (srv *ComplianceIngestServer) HandleEvent(ctx context.Context, req *automat
 
 		srv.updateManager.Start(projectUpdateID)
 	} else if req.Type.Name == event.ProjectRulesCancelUpdate {
-		projectUpdateID, err := getProjectUpdateID(req)
+		projectUpdateID, err := project_update_lib.GetProjectUpdateID(req)
 		if err != nil {
 			logrus.Errorf("Project Rule Update Cancel sent without a ProjectUpdateID. eventID %q",
 				req.EventID)
@@ -101,15 +101,6 @@ func (srv *ComplianceIngestServer) ProjectUpdateStatus(ctx context.Context,
 		PercentageComplete:    srv.updateManager.PercentageComplete(),
 		EstimatedTimeComplete: time,
 	}, nil
-}
-
-func getProjectUpdateID(event *automate_event.EventMsg) (string, error) {
-	if event.Data != nil && event.Data.Fields != nil && event.Data.Fields["ProjectUpdateID"] != nil &&
-		event.Data.Fields["ProjectUpdateID"].GetStringValue() != "" {
-		return event.Data.Fields["ProjectUpdateID"].GetStringValue(), nil
-	}
-
-	return "", fmt.Errorf("Project Rule Update sent without a ProjectUpdateID eventID: %q", event.EventID)
 }
 
 func (s *ComplianceIngestServer) ProcessComplianceReport(ctx context.Context, in *compliance.Report) (*gp.Empty, error) {

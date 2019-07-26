@@ -69,7 +69,7 @@ func (s *AutomateEventHandlerServer) HandleEvent(ctx context.Context,
 			}
 		}
 	} else if req.Type.Name == server.ProjectRulesUpdate {
-		projectUpdateID, err := getProjectUpdateID(req)
+		projectUpdateID, err := project_update_lib.GetProjectUpdateID(req)
 		if err != nil {
 			logrus.Errorf("Project Rule Update sent without a ProjectUpdateID eventID %q",
 				req.EventID)
@@ -78,7 +78,7 @@ func (s *AutomateEventHandlerServer) HandleEvent(ctx context.Context,
 
 		s.updateManager.Start(projectUpdateID)
 	} else if req.Type.Name == server.ProjectRulesCancelUpdate {
-		projectUpdateID, err := getProjectUpdateID(req)
+		projectUpdateID, err := project_update_lib.GetProjectUpdateID(req)
 		if err != nil {
 			logrus.Errorf("Project Rule Update Cancel sent without a ProjectUpdateID. eventID %q",
 				req.EventID)
@@ -98,19 +98,8 @@ func (s *AutomateEventHandlerServer) ProjectUpdateStatus(ctx context.Context,
 		time = &tspb.Timestamp{}
 	}
 	return &ingest_api.ProjectUpdateStatusResp{
-		State:                  s.updateManager.State(),
-		PercentageComplete:     float32(s.updateManager.PercentageComplete()),
+		State:                 s.updateManager.State(),
+		PercentageComplete:    float32(s.updateManager.PercentageComplete()),
 		EstimatedTimeComplete: time,
 	}, nil
-}
-
-func getProjectUpdateID(event *automate_event.EventMsg) (string, error) {
-	if event.Data != nil && event.Data.Fields != nil &&
-		event.Data.Fields["ProjectUpdateID"] != nil &&
-		event.Data.Fields["ProjectUpdateID"].GetStringValue() != "" {
-		return event.Data.Fields["ProjectUpdateID"].GetStringValue(), nil
-	}
-
-	return "", fmt.Errorf("Project Rule Update sent without a ProjectUpdateID eventID: %q",
-		event.EventID)
 }

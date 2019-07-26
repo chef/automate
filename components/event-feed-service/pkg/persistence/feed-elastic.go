@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
+	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	feedErrors "github.com/chef/automate/components/event-feed-service/pkg/errors"
 	"github.com/chef/automate/components/event-feed-service/pkg/util"
 	project_update_lib "github.com/chef/automate/lib/authz"
@@ -45,6 +46,71 @@ func (efs ElasticFeedStore) InitializeStore(ctx context.Context) error {
 	efs.initialized = true
 
 	return nil
+}
+
+func (efs ElasticFeedStore) JobCancel(ctx context.Context, jobID string) error {
+	_, err := olivere.NewTasksCancelService(efs.client).
+		TaskId(jobID).
+		Do(ctx)
+	return err
+}
+
+func (efs ElasticFeedStore) UpdateProjectTags(ctx context.Context,
+	projectTaggingRules map[string]*iam_v2.ProjectRules) ([]string, error) {
+	logrus.Debug("starting project updater")
+	script := `
+		ArrayList matchingProjects = new ArrayList();
+		for (def project : params.projects) {
+			for (def rule : project.rules) {
+				def match = rule.conditions.length != 0;
+				for (def condition : rule.conditions) {
+					if (condition.chefServers.length > 0) {
+						def found = false;
+						for (def chefServer : condition.chefServers){
+							if (ctx._source.chef_server_fqdn == chefServer ) {
+								found = true;
+								break;
+							}
+						}
+						if ( !found ) {
+							match = false;
+							break;
+						}
+					}
+					if (condition.organizations.length > 0) {
+						def found = false;
+						for (def organization : condition.organizations){
+							if (ctx._source.organization_name == organization ) {
+								found = true;
+								break;
+							}
+						}
+						if ( !found ) {
+							match = false;
+							break;
+						}
+					}
+				}
+				if ( match ) {
+					matchingProjects.add(project.name);
+					break;
+				}
+			}
+		}
+
+		ctx._source.projects = matchingProjects.toArray();
+	`
+
+	startTaskResult, err := olivere.NewUpdateByQueryService(efs.client).
+		Index(IndexNameFeeds).
+		Type(DocType).
+		Script(olivere.NewScript(script).Params(
+			project_update_lib.ConvertProjectTaggingRulesToEsParams(projectTaggingRules))).
+		WaitForCompletion(false).
+		ProceedOnVersionConflict().
+		DoAsync(ctx)
+
+	return []string{startTaskResult.TaskId}, err
 }
 
 // DoesIndexExists - does the index 'indexName' exists in elasticsearch
@@ -98,7 +164,7 @@ func (efs ElasticFeedStore) JobStatus(ctx context.Context, jobID string) (projec
 	}, nil
 }
 
-func (efs ElasticFeedStore) CreateFeedEntry(entry *util.FeedEntry) (bool, error) {
+func (efs ElasticFeedStore) CreateFeedEntry(entry *util.FeedEntry) error {
 	ctx := context.Background()
 
 	logrus.Debug("Checking for index...")
@@ -106,13 +172,13 @@ func (efs ElasticFeedStore) CreateFeedEntry(entry *util.FeedEntry) (bool, error)
 
 	if err != nil {
 		logrus.Warn("Could not create feed entry; error determining whether or not Elasticsearch index exists")
-		return false, err
+		return err
 	}
 
 	// if the index doesn't exist, return an error
 	if !exists {
 		logrus.Warn("Could not create feed entry; Elasticsearch feeds index does not exist")
-		return false, err
+		return err
 	}
 
 	logrus.Debug("Adding new document to index...")
@@ -126,12 +192,12 @@ func (efs ElasticFeedStore) CreateFeedEntry(entry *util.FeedEntry) (bool, error)
 
 	if err != nil {
 		logrus.Warn("Could not create feed entry; Elasticsearch index create operation not acknowledged")
-		return false, err
+		return err
 	}
 
 	logrus.Debugf("Indexed feed entry %s to index %s, type %s", put1.Id, put1.Index, put1.Type)
 
-	return true, nil
+	return nil
 }
 
 func (efs ElasticFeedStore) GetFeed(query *util.FeedQuery) ([]*util.FeedEntry, int64, error) {

@@ -98,12 +98,12 @@ func (f *Feeds) GetActionLine(filters []string, startDate string, endDate string
 
 // Going forward, we'll need to maintain a map of event types to feed type(s). Since the
 // only events we support currently map to the "event" feed type, we're hard-coding the feed type below.
-func (f *Feeds) HandleEvent(req *api.EventMsg) (*api.EventResponse, error) {
+func (f *Feeds) CreateFeedEntry(req *api.EventMsg) error {
 	logrus.Debug("automate-feed is handling your event...")
 
 	publishedAt, err := ptypes.Timestamp(req.Published)
 	if err != nil {
-		return nil, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
+		return errors.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 
 	// translate event message into feed entry
@@ -134,18 +134,15 @@ func (f *Feeds) HandleEvent(req *api.EventMsg) (*api.EventResponse, error) {
 		Projects:           getProjects(req),
 	}
 
-	success, err := f.store.CreateFeedEntry(&feedEntry)
-	logrus.Debugf("Event was successfully handled: %t", success)
-	res := api.EventResponse{Success: success}
-
+	err = f.store.CreateFeedEntry(&feedEntry)
 	if err != nil {
 		logrus.Warn("Event was not handled... error creating feed entry")
-		return &res, err
+		return err
 	}
 
 	logrus.Debug("automate-feed has finished handling your event...")
 
-	return &res, nil
+	return nil
 }
 
 func getOrganizationName(event *automate_event.EventMsg) string {

@@ -8,25 +8,35 @@ import (
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 
+	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/errors"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
 	"github.com/chef/automate/components/event-feed-service/pkg/util"
+	event_service "github.com/chef/automate/components/event-service/server"
+	project_update_lib "github.com/chef/automate/lib/authz"
+	event_ids "github.com/chef/automate/lib/event"
 	"github.com/chef/automate/lib/grpc/health"
+	"github.com/chef/automate/lib/stringutils"
 )
 
 // EventFeedServer is the interface to this component.
 type EventFeedServer struct {
-	health      *health.Service
-	feedService *Feeds
+	health        *health.Service
+	feedService   *Feeds
+	updateManager *project_update_lib.DomainProjectUpdateManager
 }
 
 // New creates a new EventFeedServer instance.
-func New(feedStore persistence.FeedStore) *EventFeedServer {
+func New(feedStore persistence.FeedStore, authzProjectsClient iam_v2.ProjectsClient,
+	configManager *config.Manager) *EventFeedServer {
+	updateManager := project_update_lib.NewDomainProjectUpdateManager(feedStore, authzProjectsClient,
+		eventServiceClient, configManager, event_ids.EventFeedProducerID)
 	return &EventFeedServer{
-		health:      health.NewService(),
-		feedService: NewFeeds(feedStore),
+		health:        health.NewService(),
+		feedService:   NewFeeds(feedStore),
+		updateManager: updateManager,
 	}
 }
 
@@ -138,12 +148,33 @@ func (eventFeedServer *EventFeedServer) HandleEvent(ctx context.Context,
 		"func":    "HandleEvent",
 	}).Debug("rpc call")
 
-	response, err := eventFeedServer.feedService.HandleEvent(request)
-	if err != nil {
-		log.Warnf("Feed service couldn't handle event: %s", err)
-		return response, err
+	if isFeedEntryMsgType(request) {
+		err := eventFeedServer.feedService.CreateFeedEntry(request)
+		if err != nil {
+			log.Warnf("Feed service couldn't handle event: %s", err)
+			return &automate_event.EventResponse{Success: false}, err
+		}
+	} else if request.Type.Name == event_service.ProjectRulesUpdate {
+		projectUpdateID, err := project_update_lib.GetProjectUpdateID(request)
+		if err != nil {
+			log.Errorf("Project Rule Update sent without a ProjectUpdateID eventID %q",
+				request.EventID)
+			return &automate_event.EventResponse{Success: false}, err
+		}
+
+		eventFeedServer.updateManager.Start(projectUpdateID)
+	} else if request.Type.Name == event_service.ProjectRulesCancelUpdate {
+		projectUpdateID, err := project_update_lib.GetProjectUpdateID(request)
+		if err != nil {
+			log.Errorf("Project Rule Update Cancel sent without a ProjectUpdateID. eventID %q",
+				request.EventID)
+			return &automate_event.EventResponse{Success: false}, err
+		}
+
+		eventFeedServer.updateManager.Cancel(projectUpdateID)
 	}
-	return response, nil
+
+	return &automate_event.EventResponse{Success: true}, nil
 }
 
 func FromInternalFormatToList(entries []*util.FeedEntry) ([]*event_feed.FeedEntry, error) {
@@ -158,6 +189,19 @@ func FromInternalFormatToList(entries []*util.FeedEntry) ([]*event_feed.FeedEntr
 	}
 
 	return tl, nil
+}
+
+func isFeedEntryMsgType(request *automate_event.EventMsg) bool {
+	feedEntryTypes := []string{
+		event_service.ScanJobCreated,
+		event_service.ScanJobUpdated,
+		event_service.ScanJobDeleted,
+		event_service.ProfileCreated,
+		event_service.ProfileUpdated,
+		event_service.ProfileDeleted,
+	}
+
+	return stringutils.SliceContains(feedEntryTypes, request.Type.Name)
 }
 
 func validateFeedTimelineRequest(req *event_feed.FeedTimelineRequest) error {

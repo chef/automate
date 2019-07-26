@@ -137,7 +137,7 @@ func (manager *ProjectUpdateManager) ProcessFailEvent(eventMessage *automate_eve
 				return stage, errors.New("Producer ID was not provided in status message")
 			}
 			fromProducer := eventMessage.Producer.ID
-			projectUpdateID, err := getProjectUpdateID(eventMessage)
+			projectUpdateID, err := project_update_tags.GetProjectUpdateID(eventMessage)
 			if err != nil {
 				return stage, err
 			}
@@ -182,7 +182,7 @@ func (manager *ProjectUpdateManager) ProcessStatusEvent(
 				return stage, errors.New("Producer was not provided in status message")
 			}
 			fromProducer := eventMessage.Producer.ID
-			projectUpdateID, err := getProjectUpdateID(eventMessage)
+			projectUpdateID, err := project_update_tags.GetProjectUpdateID(eventMessage)
 			if err != nil {
 				return stage, err
 			}
@@ -469,18 +469,6 @@ func createEventUUID() string {
 	}
 
 	return uuid.String()
-}
-
-// Get the Project Update ID out of the event Data fields
-func getProjectUpdateID(event *automate_event.EventMsg) (string, error) {
-	fieldName := project_update_tags.ProjectUpdateIDTag
-	if event.Data != nil && event.Data.Fields != nil && event.Data.Fields[fieldName] != nil &&
-		event.Data.Fields[fieldName].GetStringValue() != "" {
-		return event.Data.Fields[fieldName].GetStringValue(), nil
-	}
-
-	return "", fmt.Errorf("Event message sent without a %s field eventID: %q",
-		fieldName, event.EventID)
 }
 
 func getFailureMessage(event *automate_event.EventMsg) string {

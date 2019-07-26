@@ -12,6 +12,7 @@ import (
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
+	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/olivere/elastic"
 )
 
@@ -80,7 +81,8 @@ func (es *Backend) UpdateActionProjectTags(ctx context.Context,
 	startTaskResult, err := elastic.NewUpdateByQueryService(es.client).
 		Index(index).
 		Type(mappings.Actions.Type).
-		Script(elastic.NewScript(script).Params(convertProjectTaggingRulesToEsParams(projectTaggingRules))).
+		Script(elastic.NewScript(script).Params(
+			project_update_lib.ConvertProjectTaggingRulesToEsParams(projectTaggingRules))).
 		WaitForCompletion(false).
 		ProceedOnVersionConflict().
 		DoAsync(ctx)

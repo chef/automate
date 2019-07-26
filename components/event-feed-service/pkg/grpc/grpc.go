@@ -85,7 +85,13 @@ func newGRPCServer(connFactory *secureconn.Factory, c *config.EventFeed,
 	feedStore persistence.FeedStore, esSidecarConn *grpc.ClientConn) *grpc.Server {
 	grpcServer := connFactory.NewServer()
 
-	eventFeedServer := server.New(feedStore)
+	configManager, err := config.NewManager(viper.ConfigFileUsed())
+	if err != nil {
+		return err
+	}
+	defer configManager.Close()
+
+	eventFeedServer := server.New(feedStore, configManager)
 
 	event_feed.RegisterEventFeedServiceServer(grpcServer, eventFeedServer)
 
