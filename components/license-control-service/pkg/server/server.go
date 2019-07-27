@@ -30,7 +30,6 @@ type LicenseControlServer struct {
 	publicKeys     map[string][]byte
 	licensedPeriod *dateRange
 	config         *Config
-	updateQueue    chan<- func(*Config)
 	health         *health.Service
 }
 
@@ -46,13 +45,11 @@ var errInvalidLicenseData = errors.New("Invalid license data")
 // NewLicenseControlServer returns a new instance of our LicenseControlServer.
 func NewLicenseControlServer(ctx context.Context, config *Config) *LicenseControlServer {
 	publicKeys := keys.LoadPublicKeys(keys.BuiltinKeyData)
-	updateQueue := make(chan func(*Config), 100)
 
 	srv := &LicenseControlServer{
-		publicKeys:  publicKeys,
-		config:      config,
-		updateQueue: updateQueue,
-		health:      health.NewService(),
+		publicKeys: publicKeys,
+		config:     config,
+		health:     health.NewService(),
 	}
 
 	if _, err := os.Stat(config.LicenseTokenPath); err == nil {
@@ -71,19 +68,7 @@ func NewLicenseControlServer(ctx context.Context, config *Config) *LicenseContro
 		}
 	}
 
-	// Single goroutine that updates the Config data and saves the data to the config file.
-	go func() {
-		for update := range updateQueue {
-			// Update the config object
-			update(srv.config)
-		}
-	}()
-
 	return srv
-}
-
-func (s *LicenseControlServer) send(updateFunc func(*Config)) {
-	s.updateQueue <- updateFunc
 }
 
 func (s *LicenseControlServer) restoreLicense(
