@@ -178,7 +178,7 @@ func TestUpdateValidLicenseWithWhiteSpace(t *testing.T) {
 	defer func() { cfg.LicenseTokenPath = origPath }()
 	cfg.LicenseTokenPath = tempLicenseTokenPath.Name()
 
-	svr := server.NewLicenseControlServer(&cfg)
+	svr := server.NewLicenseControlServer(context.Background(), &cfg)
 	raw, err := ioutil.ReadFile(validLicenseFile)
 	assert.NoError(t, err, "reading test license")
 	license := string(raw) + " \n"
@@ -201,13 +201,13 @@ func TestLoadedLicenseFromDiskNotNil(t *testing.T) {
 
 	configWithLicense := cfg
 	configWithLicense.LicenseTokenPath = validLicenseFile
-	svr := server.NewLicenseControlServer(&configWithLicense)
+	svr := server.NewLicenseControlServer(context.Background(), &configWithLicense)
 	res, _ := svr.License(context.Background(), &lc.LicenseRequest{})
 	assert.NotNil(t, res.License, "LicenseControlServer should load the license on disk")
 }
 
 func TestUpdateInvalidLicense(t *testing.T) {
-	svr := server.NewLicenseControlServer(&cfg)
+	svr := server.NewLicenseControlServer(context.Background(), &cfg)
 	res, err := svr.Update(
 		context.Background(),
 		&lc.UpdateRequest{
@@ -220,7 +220,7 @@ func TestUpdateInvalidLicense(t *testing.T) {
 }
 
 func TestDefaultLicenseNil(t *testing.T) {
-	svr := server.NewLicenseControlServer(&cfg)
+	svr := server.NewLicenseControlServer(context.Background(), &cfg)
 	res, _ := svr.License(context.Background(), &lc.LicenseRequest{})
 	assert.Nil(t, res.License, "LicenseControlServer should default to nil license")
 }
@@ -228,7 +228,7 @@ func TestDefaultLicenseNil(t *testing.T) {
 func TestLoadedCorruptLicenseFromDiskNil(t *testing.T) {
 	configWithLicense := cfg
 	configWithLicense.LicenseTokenPath = corruptLicenseFile
-	svr := server.NewLicenseControlServer(&configWithLicense)
+	svr := server.NewLicenseControlServer(context.Background(), &configWithLicense)
 	res, _ := svr.License(context.Background(), &lc.LicenseRequest{})
 	assert.Nil(t, res.License, "LicenseControlServer should not have loaded the license on disk")
 }

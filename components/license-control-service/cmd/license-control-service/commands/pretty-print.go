@@ -26,16 +26,7 @@ var printCmd = &cobra.Command{
 }
 
 func runPrintCmd(cmd *cobra.Command, args []string) {
-	keysData, err := keys.Asset("data/keys.json")
-	if err != nil {
-		log.WithError(err).Fatal("package main does not have expected asset 'data/keys.json'")
-	}
-
-	publicKeys, err := keys.LoadPublicKeys(keysData)
-	if err != nil {
-		log.WithError(err).Fatal("failed to load public key data")
-	}
-
+	publicKeys := keys.LoadPublicKeys(keys.BuiltinKeyData)
 	licData, err := maybeFromFile(args[0])
 	if err != nil {
 		log.WithError(err).Fatal("failed to read user-provided license data")

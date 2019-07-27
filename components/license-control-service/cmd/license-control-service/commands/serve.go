@@ -2,7 +2,6 @@ package commands
 
 import (
 	"context"
-	"os"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -20,7 +19,6 @@ var serveCmd = &cobra.Command{
 		cfg, err := server.ConfigFromViper()
 		if err != nil {
 			log.WithError(err).Fatal("Failed to configure service")
-			os.Exit(1)
 		}
 
 		closer, err := tracing.NewGlobalTracer("license-control-service")
@@ -31,7 +29,7 @@ var serveCmd = &cobra.Command{
 
 		err = server.StartGRPC(context.Background(), cfg)
 		if err != nil {
-			os.Exit(1)
+			log.Fatal(err)
 		}
 	},
 }

@@ -23,7 +23,7 @@ func NewGRPC(ctx context.Context, config *Config) *grpc.Server {
 
 	// Register our API
 	grpcServer := connFactory.NewServer(tracing.GlobalServerInterceptor())
-	srv := NewLicenseControlServer(config)
+	srv := NewLicenseControlServer(ctx, config)
 	lc.RegisterLicenseControlServer(grpcServer, srv)
 	health.RegisterHealthServer(grpcServer, srv.health)
 
