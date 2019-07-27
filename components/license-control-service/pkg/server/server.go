@@ -337,12 +337,10 @@ func (s *LicenseControlServer) Telemetry(ctx context.Context, req *lc.TelemetryR
 
 // Convert license entitlements to policy capabilities, to preserve the service
 // boundary. (policy is the "published language" of this service, not license.)
-func buildCapabilities(
-	ctx context.Context, es []*lic.Entitlement,
-) (cs []*lc.Capability) {
+func buildCapabilities(ctx context.Context, es []*lic.Entitlement) []*lc.Capability {
 	span, ctx := tracing.StartSpanFromContext(ctx, "build_capabilities") // nolint: ineffassign
 	defer span.Finish()
-
+	cs := make([]*lc.Capability, 0, len(es))
 	for _, c := range es {
 		cs = append(cs, &lc.Capability{
 			Name:    c.Name,
@@ -361,7 +359,6 @@ func buildRules(ctx context.Context, entitlements []*lic.Entitlement) map[string
 	span, ctx := tracing.StartSpanFromContext(ctx, "build_rules") // nolint: ineffassign
 	defer span.Finish()
 
-	// sadly we can't just name the response value, have to use make()
 	rules := make(map[string]string)
 
 	// stand-in for actual business logic
