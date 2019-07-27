@@ -11,7 +11,7 @@ import { GetProjectSuccess } from 'app/entities/projects/project.actions';
 import { projectEntityReducer } from 'app/entities/projects/project.reducer';
 import { Project } from 'app/entities/projects/project.model';
 import { Rule } from 'app/entities/rules/rule.model';
-import { ProjectDetailsComponent } from './project-details.component';
+import { ProjectDetailsComponent, ProjectTabName } from './project-details.component';
 
 describe('ProjectDetailsComponent', () => {
   let component: ProjectDetailsComponent;
@@ -145,11 +145,14 @@ describe('ProjectDetailsComponent', () => {
     });
 
     it('shows/hides sections when based on selection', () => {
-      component.onTabChange({ target: { value: 'details' } });
+      let tabName: ProjectTabName = 'details';
+      component.onTabChange({ target: { value: tabName } });
+      expect(component.showTab(tabName)).toBeTruthy();
       expect(component.showTab('rules')).toBeFalsy();
-      expect(component.showTab('details')).toBeTruthy();
-      component.onTabChange({ target: { value: 'rules' } });
-      expect(component.showTab('rules')).toBeTruthy();
+
+      tabName = 'rules';
+      component.onTabChange({ target: { value: tabName } });
+      expect(component.showTab(tabName)).toBeTruthy();
       expect(component.showTab('details')).toBeFalsy();
     });
 

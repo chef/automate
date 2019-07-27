@@ -20,7 +20,7 @@ import {
   allRules
 } from 'app/entities/rules/rule.selectors';
 
-type ProjectTabNames = 'rules' | 'details';
+export type ProjectTabName = 'rules' | 'details';
 
 @Component({
   selector: 'app-project-details',
@@ -34,7 +34,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   public saveSuccessful = false;
   public isChefManaged = false;
   public rules: Rule[] = [];
-  public selectedTab: ProjectTabNames = 'rules';
+  public selectedTab: ProjectTabName = 'rules';
   public ruleToDelete: any;
   public deleteModalVisible = false;
   public createModalVisible = false;
@@ -104,7 +104,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     this.selectedTab = event.target.value;
   }
 
-  showTab(tabName: ProjectTabNames): boolean {
+  showTab(tabName: ProjectTabName): boolean {
     return this.selectedTab === tabName;
   }
 
