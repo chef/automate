@@ -2,11 +2,9 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"net"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
@@ -39,10 +37,7 @@ func StartGRPC(ctx context.Context, config *Config) error {
 	// Create our listener channel
 	listener, err := net.Listen("tcp", config.ListenAddress())
 	if err != nil {
-		log.WithFields(log.Fields{
-			"err": err,
-		}).Fatal(fmt.Sprintf("could not listen on address: %s", config.ListenAddress()))
-		return errors.Wrap(err, "listen")
+		return errors.Wrapf(err, "could no listen on %s", config.ListenAddress())
 	}
 
 	return g.Serve(listener)
