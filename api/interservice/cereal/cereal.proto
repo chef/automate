@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package chef.automate.infra.cereal;
+option go_package = "github.com/chef/automate/api/interservice/cereal";
+
+message Task {
+  string name = 1;
+  bytes parameters = 2;
+}
+
+message WorkflowInstance {
+  string domain = 1;
+  string instance_name = 2;
+  string workflow_name = 3;
+  string status = 4;
+  bytes parameters = 5;
+  bytes payload = 6;
+}
+
+message TaskResult {
+  string task_name = 1;
+  bytes parameters = 2;
+  string status = 3;
+  string error_text = 4;
+  bytes result = 5;
+}
+
+message WorkflowEvent {
+  string type = 1;
+  int64 enqueued_task_count = 2;
+  int64 completed_task_count = 3;
+  TaskResult task_result = 4;
+}
+
+message DequeueWorkflowRequest {
+  message Dequeue {
+    string domain = 1;
+    repeated string workflow_names = 2;
+  }
+  message Continue {
+    bytes payload = 1;
+    repeated Task tasks = 2;
+  }
+  message Fail { string err = 1; }
+  message Done { bytes result = 1; }
+  oneof cmd {
+    Dequeue dequeue = 1;
+    Continue continue = 2;
+    Done done = 3;
+    Fail fail = 4;
+  }
+}
+
+message DequeueWorkflowResponse {
+  message Dequeue {
+    WorkflowInstance instance = 1;
+    WorkflowEvent event = 2;
+  }
+  message Status { string err = 1; }
+  oneof cmd {
+    Dequeue dequeue = 1;
+    Status status = 2;
+  }
+}
+
+message EnqueueWorkflowRequest {
+  string domain = 1;
+  string instance_name = 2;
+  string workflow_name = 3;
+  bytes parameters = 4;
+}
+
+message EnqueueWorkflowResponse {}
+
+message DequeueTaskRequest {
+  message Dequeue {
+    string domain = 1;
+    string task_name = 2;
+  }
+  message Fail { string error = 1; }
+  message Succeed { bytes result = 1; }
+
+  oneof cmd {
+    Dequeue dequeue = 1;
+    Succeed succeed = 2;
+    Fail fail = 3;
+  }
+}
+
+message DequeueTaskResponse {
+  message Dequeue { Task task = 1; }
+
+  message Cancel { string err = 1; }
+
+  oneof cmd {
+    Dequeue dequeue = 1;
+    Cancel cancel = 2;
+  }
+}
+
+service Cereal {
+  rpc EnqueueWorkflow(EnqueueWorkflowRequest) returns (EnqueueWorkflowResponse);
+  rpc DequeueWorkflow(stream DequeueWorkflowRequest)
+      returns (stream DequeueWorkflowResponse);
+  rpc DequeueTask(stream DequeueTaskRequest)
+      returns (stream DequeueTaskResponse);
+}

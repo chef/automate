@@ -11,9 +11,11 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/teambition/rrule-go"
+	"google.golang.org/grpc"
 
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/backend"
+	grpccereal "github.com/chef/automate/lib/cereal/grpc"
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/platform/pg"
 )
@@ -183,12 +185,18 @@ type SimpleTaskParams struct {
 
 func (t *SimpleTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
 	params := SimpleTaskParams{}
+	logrus.Debug("here")
 	if err := task.GetParameters(&params); err != nil {
 		panic(err)
 	}
 	logrus.WithField("id", params.ID).Debug("Running task")
 	if simpleWorkflowOpts.SlowTasks {
-		time.Sleep(time.Duration(23+params.Sleepy) * time.Second)
+		select {
+		case <-time.After(time.Duration(23+params.Sleepy) * time.Second):
+		case <-ctx.Done():
+			logrus.Info("task cancelled")
+			return nil, ctx.Err()
+		}
 	}
 	logrus.Debug("Finished Task")
 	return params.ID, nil
@@ -286,8 +294,15 @@ func runSimpleWorkflow(_ *cobra.Command, args []string) error {
 	if len(args) > 0 {
 		dbName = args[0]
 	}
+	logrus.Debug(dbName)
 
-	manager, err := cereal.NewManager(postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName)))
+	conn, err := grpc.Dial(":3210", grpc.WithInsecure())
+	if err != nil {
+		panic(err)
+	}
+	grpcBackend := grpccereal.NewGrpcBackendFromConn(conn)
+	//manager, err := cereal.NewManager(postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName)))
+	manager, err := cereal.NewManager(grpcBackend)
 	if err != nil {
 		return err
 	}
@@ -319,6 +334,10 @@ func runSimpleWorkflow(_ *cobra.Command, args []string) error {
 		time.Sleep(time.Second)
 	}
 
+	for {
+		logrus.Info("waiting")
+		time.Sleep(10 * time.Second)
+	}
 	return nil
 }
 
