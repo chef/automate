@@ -2,7 +2,7 @@ export type RuleStatus = 'applied' | 'staged';
 export type RuleType = 'node' | 'event';
 export type ConditionOperator = 'MEMBER_OF' | 'EQUALS';
 
-export interface KVPair {
+interface KVPair {
   key: string;
   value: string;
 }

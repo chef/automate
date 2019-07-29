@@ -22,8 +22,8 @@ describe('ProjectDetailsComponent', () => {
     name: 'Default',
     type: 'CHEF_MANAGED'
   };
-  const rules = [
-    <Rule>{
+  const rules: Rule[] = [
+    {
       id: 'rule-1',
       project_id: 'uuid-1',
       name: 'Rule 1',
@@ -37,7 +37,7 @@ describe('ProjectDetailsComponent', () => {
         }
       ]
     },
-    <Rule>{
+    {
       id: 'rule-2',
       project_id: 'uuid-1',
       name: 'Rule 2',
@@ -145,14 +145,12 @@ describe('ProjectDetailsComponent', () => {
     });
 
     it('shows/hides sections when based on selection', () => {
-      let tabName: ProjectTabName = 'details';
-      component.onTabChange({ target: { value: tabName } });
-      expect(component.showTab(tabName)).toBeTruthy();
+      component.onTabChange({ target: { value: 'details' } });
+      expect(component.showTab('details')).toBeTruthy();
       expect(component.showTab('rules')).toBeFalsy();
 
-      tabName = 'rules';
-      component.onTabChange({ target: { value: tabName } });
-      expect(component.showTab(tabName)).toBeTruthy();
+      component.onTabChange({ target: { value: 'rules' } });
+      expect(component.showTab('rules')).toBeTruthy();
       expect(component.showTab('details')).toBeFalsy();
     });
 

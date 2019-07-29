@@ -100,7 +100,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     this.saveSuccessful = false;
   }
 
-  onTabChange(event) {
+  onTabChange(event: { target: { value: ProjectTabName } }) {
     this.selectedTab = event.target.value;
   }
 

@@ -13,7 +13,7 @@ import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Regex } from 'app/helpers/auth/regex';
 import { EntityStatus, loading } from 'app/entities/entities';
 import {
-  Rule, RuleTypeMappedObject, Condition, ConditionOperator, KVPair
+  Rule, RuleTypeMappedObject, Condition, ConditionOperator
 } from 'app/entities/rules/rule.model';
 import {
   GetRule, GetRulesForProject, CreateRule, UpdateRule
@@ -24,6 +24,11 @@ import {
 import { projectFromRoute } from 'app/entities/projects/project.selectors';
 import { Project } from 'app/entities/projects/project.model';
 import { GetProject } from 'app/entities/projects/project.actions';
+
+interface KVCondition {
+  key: ConditionOperator;
+  value: string;
+}
 
 @Component({
   selector: 'app-project-rules',
@@ -48,17 +53,13 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   // This element assumes 'id' is the only create field that can conflict.
   private conflictErrorEvent = new EventEmitter<boolean>();
 
-  // These constants ensure type safety
-  private equals_op: ConditionOperator = 'EQUALS';
-  private member_of_op: ConditionOperator = 'MEMBER_OF';
-
-  public operators = [
-    <KVPair>{
-      key: this.equals_op,
+  public operators: KVCondition[] = [
+    {
+      key: 'EQUALS',
       value: 'equals'
     },
-    <KVPair>{
-      key: this.member_of_op,
+    {
+      key: 'MEMBER_OF',
       value: 'member of'
     }
   ];
