@@ -51,9 +51,8 @@ type WorkflowInstance struct {
 	Parameters   []byte
 	Payload      []byte
 
-	IsRunning bool
-	Err       error
-	Result    []byte
+	Err    error
+	Result []byte
 }
 
 type WorkflowEventType string

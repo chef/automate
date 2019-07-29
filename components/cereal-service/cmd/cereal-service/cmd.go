@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"os"
@@ -28,6 +29,7 @@ func defaultConnURIForDatabase(dbname string) string {
 }
 
 func main() {
+	ctx := context.Background()
 	dbName := defaultDatabaseName
 
 	pgBackend := postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName))
@@ -35,7 +37,7 @@ func main() {
 		panic(err)
 	}
 
-	svc := server.NewCerealService(pgBackend)
+	svc := server.NewCerealService(ctx, pgBackend)
 	grpcServer := grpc.NewServer()
 	grpcceral.RegisterCerealServer(grpcServer, svc)
 	lis, err := net.Listen("tcp", fmt.Sprintf(":3210"))

@@ -7,6 +7,8 @@ import (
 	context "context"
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
+	timestamp "github.com/golang/protobuf/ptypes/timestamp"
+	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	grpc "google.golang.org/grpc"
 	math "math"
 )
@@ -76,6 +78,8 @@ type WorkflowInstance struct {
 	Status               string   `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty" toml:"status,omitempty" mapstructure:"status,omitempty"`
 	Parameters           []byte   `protobuf:"bytes,5,opt,name=parameters,proto3" json:"parameters,omitempty" toml:"parameters,omitempty" mapstructure:"parameters,omitempty"`
 	Payload              []byte   `protobuf:"bytes,6,opt,name=payload,proto3" json:"payload,omitempty" toml:"payload,omitempty" mapstructure:"payload,omitempty"`
+	Result               []byte   `protobuf:"bytes,7,opt,name=result,proto3" json:"result,omitempty" toml:"result,omitempty" mapstructure:"result,omitempty"`
+	Err                  string   `protobuf:"bytes,8,opt,name=err,proto3" json:"err,omitempty" toml:"err,omitempty" mapstructure:"err,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -146,6 +150,20 @@ func (m *WorkflowInstance) GetPayload() []byte {
 		return m.Payload
 	}
 	return nil
+}
+
+func (m *WorkflowInstance) GetResult() []byte {
+	if m != nil {
+		return m.Result
+	}
+	return nil
+}
+
+func (m *WorkflowInstance) GetErr() string {
+	if m != nil {
+		return m.Err
+	}
+	return ""
 }
 
 type TaskResult struct {
@@ -1202,6 +1220,619 @@ func (m *DequeueTaskResponse_Cancel) GetErr() string {
 	return ""
 }
 
+type CreateWorkflowScheduleRequest struct {
+	Domain               string               `protobuf:"bytes,1,opt,name=domain,proto3" json:"domain,omitempty" toml:"domain,omitempty" mapstructure:"domain,omitempty"`
+	InstanceName         string               `protobuf:"bytes,2,opt,name=instance_name,json=instanceName,proto3" json:"instance_name,omitempty" toml:"instance_name,omitempty" mapstructure:"instance_name,omitempty"`
+	WorkflowName         string               `protobuf:"bytes,3,opt,name=workflow_name,json=workflowName,proto3" json:"workflow_name,omitempty" toml:"workflow_name,omitempty" mapstructure:"workflow_name,omitempty"`
+	Parameters           []byte               `protobuf:"bytes,4,opt,name=parameters,proto3" json:"parameters,omitempty" toml:"parameters,omitempty" mapstructure:"parameters,omitempty"`
+	Enabled              bool                 `protobuf:"varint,5,opt,name=enabled,proto3" json:"enabled,omitempty" toml:"enabled,omitempty" mapstructure:"enabled,omitempty"`
+	Recurrence           string               `protobuf:"bytes,6,opt,name=recurrence,proto3" json:"recurrence,omitempty" toml:"recurrence,omitempty" mapstructure:"recurrence,omitempty"`
+	Payload              []byte               `protobuf:"bytes,7,opt,name=payload,proto3" json:"payload,omitempty" toml:"payload,omitempty" mapstructure:"payload,omitempty"`
+	NextRunAt            *timestamp.Timestamp `protobuf:"bytes,8,opt,name=next_run_at,json=nextRunAt,proto3" json:"next_run_at,omitempty" toml:"next_run_at,omitempty" mapstructure:"next_run_at,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte               `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32                `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *CreateWorkflowScheduleRequest) Reset()         { *m = CreateWorkflowScheduleRequest{} }
+func (m *CreateWorkflowScheduleRequest) String() string { return proto.CompactTextString(m) }
+func (*CreateWorkflowScheduleRequest) ProtoMessage()    {}
+func (*CreateWorkflowScheduleRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_96e4c16478599b1f, []int{10}
+}
+
+func (m *CreateWorkflowScheduleRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateWorkflowScheduleRequest.Unmarshal(m, b)
+}
+func (m *CreateWorkflowScheduleRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateWorkflowScheduleRequest.Marshal(b, m, deterministic)
+}
+func (m *CreateWorkflowScheduleRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateWorkflowScheduleRequest.Merge(m, src)
+}
+func (m *CreateWorkflowScheduleRequest) XXX_Size() int {
+	return xxx_messageInfo_CreateWorkflowScheduleRequest.Size(m)
+}
+func (m *CreateWorkflowScheduleRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateWorkflowScheduleRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateWorkflowScheduleRequest proto.InternalMessageInfo
+
+func (m *CreateWorkflowScheduleRequest) GetDomain() string {
+	if m != nil {
+		return m.Domain
+	}
+	return ""
+}
+
+func (m *CreateWorkflowScheduleRequest) GetInstanceName() string {
+	if m != nil {
+		return m.InstanceName
+	}
+	return ""
+}
+
+func (m *CreateWorkflowScheduleRequest) GetWorkflowName() string {
+	if m != nil {
+		return m.WorkflowName
+	}
+	return ""
+}
+
+func (m *CreateWorkflowScheduleRequest) GetParameters() []byte {
+	if m != nil {
+		return m.Parameters
+	}
+	return nil
+}
+
+func (m *CreateWorkflowScheduleRequest) GetEnabled() bool {
+	if m != nil {
+		return m.Enabled
+	}
+	return false
+}
+
+func (m *CreateWorkflowScheduleRequest) GetRecurrence() string {
+	if m != nil {
+		return m.Recurrence
+	}
+	return ""
+}
+
+func (m *CreateWorkflowScheduleRequest) GetPayload() []byte {
+	if m != nil {
+		return m.Payload
+	}
+	return nil
+}
+
+func (m *CreateWorkflowScheduleRequest) GetNextRunAt() *timestamp.Timestamp {
+	if m != nil {
+		return m.NextRunAt
+	}
+	return nil
+}
+
+type CreateWorkflowScheduleResponse struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *CreateWorkflowScheduleResponse) Reset()         { *m = CreateWorkflowScheduleResponse{} }
+func (m *CreateWorkflowScheduleResponse) String() string { return proto.CompactTextString(m) }
+func (*CreateWorkflowScheduleResponse) ProtoMessage()    {}
+func (*CreateWorkflowScheduleResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_96e4c16478599b1f, []int{11}
+}
+
+func (m *CreateWorkflowScheduleResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateWorkflowScheduleResponse.Unmarshal(m, b)
+}
+func (m *CreateWorkflowScheduleResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateWorkflowScheduleResponse.Marshal(b, m, deterministic)
+}
+func (m *CreateWorkflowScheduleResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateWorkflowScheduleResponse.Merge(m, src)
+}
+func (m *CreateWorkflowScheduleResponse) XXX_Size() int {
+	return xxx_messageInfo_CreateWorkflowScheduleResponse.Size(m)
+}
+func (m *CreateWorkflowScheduleResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateWorkflowScheduleResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateWorkflowScheduleResponse proto.InternalMessageInfo
+
+type ListWorkflowSchedulesRequest struct {
+	Domain               string   `protobuf:"bytes,1,opt,name=domain,proto3" json:"domain,omitempty" toml:"domain,omitempty" mapstructure:"domain,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *ListWorkflowSchedulesRequest) Reset()         { *m = ListWorkflowSchedulesRequest{} }
+func (m *ListWorkflowSchedulesRequest) String() string { return proto.CompactTextString(m) }
+func (*ListWorkflowSchedulesRequest) ProtoMessage()    {}
+func (*ListWorkflowSchedulesRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_96e4c16478599b1f, []int{12}
+}
+
+func (m *ListWorkflowSchedulesRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListWorkflowSchedulesRequest.Unmarshal(m, b)
+}
+func (m *ListWorkflowSchedulesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListWorkflowSchedulesRequest.Marshal(b, m, deterministic)
+}
+func (m *ListWorkflowSchedulesRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListWorkflowSchedulesRequest.Merge(m, src)
+}
+func (m *ListWorkflowSchedulesRequest) XXX_Size() int {
+	return xxx_messageInfo_ListWorkflowSchedulesRequest.Size(m)
+}
+func (m *ListWorkflowSchedulesRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListWorkflowSchedulesRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListWorkflowSchedulesRequest proto.InternalMessageInfo
+
+func (m *ListWorkflowSchedulesRequest) GetDomain() string {
+	if m != nil {
+		return m.Domain
+	}
+	return ""
+}
+
+type Schedule struct {
+	Domain               string               `protobuf:"bytes,1,opt,name=domain,proto3" json:"domain,omitempty" toml:"domain,omitempty" mapstructure:"domain,omitempty"`
+	InstanceName         string               `protobuf:"bytes,2,opt,name=instance_name,json=instanceName,proto3" json:"instance_name,omitempty" toml:"instance_name,omitempty" mapstructure:"instance_name,omitempty"`
+	WorkflowName         string               `protobuf:"bytes,3,opt,name=workflow_name,json=workflowName,proto3" json:"workflow_name,omitempty" toml:"workflow_name,omitempty" mapstructure:"workflow_name,omitempty"`
+	Parameters           []byte               `protobuf:"bytes,4,opt,name=parameters,proto3" json:"parameters,omitempty" toml:"parameters,omitempty" mapstructure:"parameters,omitempty"`
+	Recurrence           string               `protobuf:"bytes,5,opt,name=recurrence,proto3" json:"recurrence,omitempty" toml:"recurrence,omitempty" mapstructure:"recurrence,omitempty"`
+	NextDueAt            *timestamp.Timestamp `protobuf:"bytes,6,opt,name=next_due_at,json=nextDueAt,proto3" json:"next_due_at,omitempty" toml:"next_due_at,omitempty" mapstructure:"next_due_at,omitempty"`
+	Enabled              bool                 `protobuf:"varint,7,opt,name=enabled,proto3" json:"enabled,omitempty" toml:"enabled,omitempty" mapstructure:"enabled,omitempty"`
+	LastStart            *timestamp.Timestamp `protobuf:"bytes,8,opt,name=last_start,json=lastStart,proto3" json:"last_start,omitempty" toml:"last_start,omitempty" mapstructure:"last_start,omitempty"`
+	LastEnd              *timestamp.Timestamp `protobuf:"bytes,9,opt,name=last_end,json=lastEnd,proto3" json:"last_end,omitempty" toml:"last_end,omitempty" mapstructure:"last_end,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte               `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32                `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *Schedule) Reset()         { *m = Schedule{} }
+func (m *Schedule) String() string { return proto.CompactTextString(m) }
+func (*Schedule) ProtoMessage()    {}
+func (*Schedule) Descriptor() ([]byte, []int) {
+	return fileDescriptor_96e4c16478599b1f, []int{13}
+}
+
+func (m *Schedule) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Schedule.Unmarshal(m, b)
+}
+func (m *Schedule) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Schedule.Marshal(b, m, deterministic)
+}
+func (m *Schedule) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Schedule.Merge(m, src)
+}
+func (m *Schedule) XXX_Size() int {
+	return xxx_messageInfo_Schedule.Size(m)
+}
+func (m *Schedule) XXX_DiscardUnknown() {
+	xxx_messageInfo_Schedule.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Schedule proto.InternalMessageInfo
+
+func (m *Schedule) GetDomain() string {
+	if m != nil {
+		return m.Domain
+	}
+	return ""
+}
+
+func (m *Schedule) GetInstanceName() string {
+	if m != nil {
+		return m.InstanceName
+	}
+	return ""
+}
+
+func (m *Schedule) GetWorkflowName() string {
+	if m != nil {
+		return m.WorkflowName
+	}
+	return ""
+}
+
+func (m *Schedule) GetParameters() []byte {
+	if m != nil {
+		return m.Parameters
+	}
+	return nil
+}
+
+func (m *Schedule) GetRecurrence() string {
+	if m != nil {
+		return m.Recurrence
+	}
+	return ""
+}
+
+func (m *Schedule) GetNextDueAt() *timestamp.Timestamp {
+	if m != nil {
+		return m.NextDueAt
+	}
+	return nil
+}
+
+func (m *Schedule) GetEnabled() bool {
+	if m != nil {
+		return m.Enabled
+	}
+	return false
+}
+
+func (m *Schedule) GetLastStart() *timestamp.Timestamp {
+	if m != nil {
+		return m.LastStart
+	}
+	return nil
+}
+
+func (m *Schedule) GetLastEnd() *timestamp.Timestamp {
+	if m != nil {
+		return m.LastEnd
+	}
+	return nil
+}
+
+type ListWorkflowSchedulesResponse struct {
+	Schedules            []*Schedule `protobuf:"bytes,1,rep,name=schedules,proto3" json:"schedules,omitempty" toml:"schedules,omitempty" mapstructure:"schedules,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte      `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32       `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *ListWorkflowSchedulesResponse) Reset()         { *m = ListWorkflowSchedulesResponse{} }
+func (m *ListWorkflowSchedulesResponse) String() string { return proto.CompactTextString(m) }
+func (*ListWorkflowSchedulesResponse) ProtoMessage()    {}
+func (*ListWorkflowSchedulesResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_96e4c16478599b1f, []int{14}
+}
+
+func (m *ListWorkflowSchedulesResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListWorkflowSchedulesResponse.Unmarshal(m, b)
+}
+func (m *ListWorkflowSchedulesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListWorkflowSchedulesResponse.Marshal(b, m, deterministic)
+}
+func (m *ListWorkflowSchedulesResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListWorkflowSchedulesResponse.Merge(m, src)
+}
+func (m *ListWorkflowSchedulesResponse) XXX_Size() int {
+	return xxx_messageInfo_ListWorkflowSchedulesResponse.Size(m)
+}
+func (m *ListWorkflowSchedulesResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListWorkflowSchedulesResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListWorkflowSchedulesResponse proto.InternalMessageInfo
+
+func (m *ListWorkflowSchedulesResponse) GetSchedules() []*Schedule {
+	if m != nil {
+		return m.Schedules
+	}
+	return nil
+}
+
+type GetWorkflowScheduleByNameRequest struct {
+	Domain               string   `protobuf:"bytes,1,opt,name=domain,proto3" json:"domain,omitempty" toml:"domain,omitempty" mapstructure:"domain,omitempty"`
+	InstanceName         string   `protobuf:"bytes,2,opt,name=instance_name,json=instanceName,proto3" json:"instance_name,omitempty" toml:"instance_name,omitempty" mapstructure:"instance_name,omitempty"`
+	WorkflowName         string   `protobuf:"bytes,3,opt,name=workflow_name,json=workflowName,proto3" json:"workflow_name,omitempty" toml:"workflow_name,omitempty" mapstructure:"workflow_name,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *GetWorkflowScheduleByNameRequest) Reset()         { *m = GetWorkflowScheduleByNameRequest{} }
+func (m *GetWorkflowScheduleByNameRequest) String() string { return proto.CompactTextString(m) }
+func (*GetWorkflowScheduleByNameRequest) ProtoMessage()    {}
+func (*GetWorkflowScheduleByNameRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_96e4c16478599b1f, []int{15}
+}
+
+func (m *GetWorkflowScheduleByNameRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetWorkflowScheduleByNameRequest.Unmarshal(m, b)
+}
+func (m *GetWorkflowScheduleByNameRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetWorkflowScheduleByNameRequest.Marshal(b, m, deterministic)
+}
+func (m *GetWorkflowScheduleByNameRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetWorkflowScheduleByNameRequest.Merge(m, src)
+}
+func (m *GetWorkflowScheduleByNameRequest) XXX_Size() int {
+	return xxx_messageInfo_GetWorkflowScheduleByNameRequest.Size(m)
+}
+func (m *GetWorkflowScheduleByNameRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetWorkflowScheduleByNameRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetWorkflowScheduleByNameRequest proto.InternalMessageInfo
+
+func (m *GetWorkflowScheduleByNameRequest) GetDomain() string {
+	if m != nil {
+		return m.Domain
+	}
+	return ""
+}
+
+func (m *GetWorkflowScheduleByNameRequest) GetInstanceName() string {
+	if m != nil {
+		return m.InstanceName
+	}
+	return ""
+}
+
+func (m *GetWorkflowScheduleByNameRequest) GetWorkflowName() string {
+	if m != nil {
+		return m.WorkflowName
+	}
+	return ""
+}
+
+type GetWorkflowScheduleByNameResponse struct {
+	Schedule             *Schedule `protobuf:"bytes,1,opt,name=schedule,proto3" json:"schedule,omitempty" toml:"schedule,omitempty" mapstructure:"schedule,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32     `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *GetWorkflowScheduleByNameResponse) Reset()         { *m = GetWorkflowScheduleByNameResponse{} }
+func (m *GetWorkflowScheduleByNameResponse) String() string { return proto.CompactTextString(m) }
+func (*GetWorkflowScheduleByNameResponse) ProtoMessage()    {}
+func (*GetWorkflowScheduleByNameResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_96e4c16478599b1f, []int{16}
+}
+
+func (m *GetWorkflowScheduleByNameResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetWorkflowScheduleByNameResponse.Unmarshal(m, b)
+}
+func (m *GetWorkflowScheduleByNameResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetWorkflowScheduleByNameResponse.Marshal(b, m, deterministic)
+}
+func (m *GetWorkflowScheduleByNameResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetWorkflowScheduleByNameResponse.Merge(m, src)
+}
+func (m *GetWorkflowScheduleByNameResponse) XXX_Size() int {
+	return xxx_messageInfo_GetWorkflowScheduleByNameResponse.Size(m)
+}
+func (m *GetWorkflowScheduleByNameResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetWorkflowScheduleByNameResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetWorkflowScheduleByNameResponse proto.InternalMessageInfo
+
+func (m *GetWorkflowScheduleByNameResponse) GetSchedule() *Schedule {
+	if m != nil {
+		return m.Schedule
+	}
+	return nil
+}
+
+type UpdateWorkflowScheduleByNameRequest struct {
+	Domain               string                `protobuf:"bytes,1,opt,name=domain,proto3" json:"domain,omitempty" toml:"domain,omitempty" mapstructure:"domain,omitempty"`
+	InstanceName         string                `protobuf:"bytes,2,opt,name=instance_name,json=instanceName,proto3" json:"instance_name,omitempty" toml:"instance_name,omitempty" mapstructure:"instance_name,omitempty"`
+	WorkflowName         string                `protobuf:"bytes,3,opt,name=workflow_name,json=workflowName,proto3" json:"workflow_name,omitempty" toml:"workflow_name,omitempty" mapstructure:"workflow_name,omitempty"`
+	Enabled              *wrappers.BoolValue   `protobuf:"bytes,4,opt,name=enabled,proto3" json:"enabled,omitempty" toml:"enabled,omitempty" mapstructure:"enabled,omitempty"`
+	Parameters           *wrappers.BytesValue  `protobuf:"bytes,5,opt,name=parameters,proto3" json:"parameters,omitempty" toml:"parameters,omitempty" mapstructure:"parameters,omitempty"`
+	Recurrence           *wrappers.StringValue `protobuf:"bytes,6,opt,name=recurrence,proto3" json:"recurrence,omitempty" toml:"recurrence,omitempty" mapstructure:"recurrence,omitempty"`
+	NextRunAt            *timestamp.Timestamp  `protobuf:"bytes,7,opt,name=next_run_at,json=nextRunAt,proto3" json:"next_run_at,omitempty" toml:"next_run_at,omitempty" mapstructure:"next_run_at,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}              `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte                `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32                 `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *UpdateWorkflowScheduleByNameRequest) Reset()         { *m = UpdateWorkflowScheduleByNameRequest{} }
+func (m *UpdateWorkflowScheduleByNameRequest) String() string { return proto.CompactTextString(m) }
+func (*UpdateWorkflowScheduleByNameRequest) ProtoMessage()    {}
+func (*UpdateWorkflowScheduleByNameRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_96e4c16478599b1f, []int{17}
+}
+
+func (m *UpdateWorkflowScheduleByNameRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UpdateWorkflowScheduleByNameRequest.Unmarshal(m, b)
+}
+func (m *UpdateWorkflowScheduleByNameRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UpdateWorkflowScheduleByNameRequest.Marshal(b, m, deterministic)
+}
+func (m *UpdateWorkflowScheduleByNameRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpdateWorkflowScheduleByNameRequest.Merge(m, src)
+}
+func (m *UpdateWorkflowScheduleByNameRequest) XXX_Size() int {
+	return xxx_messageInfo_UpdateWorkflowScheduleByNameRequest.Size(m)
+}
+func (m *UpdateWorkflowScheduleByNameRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpdateWorkflowScheduleByNameRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UpdateWorkflowScheduleByNameRequest proto.InternalMessageInfo
+
+func (m *UpdateWorkflowScheduleByNameRequest) GetDomain() string {
+	if m != nil {
+		return m.Domain
+	}
+	return ""
+}
+
+func (m *UpdateWorkflowScheduleByNameRequest) GetInstanceName() string {
+	if m != nil {
+		return m.InstanceName
+	}
+	return ""
+}
+
+func (m *UpdateWorkflowScheduleByNameRequest) GetWorkflowName() string {
+	if m != nil {
+		return m.WorkflowName
+	}
+	return ""
+}
+
+func (m *UpdateWorkflowScheduleByNameRequest) GetEnabled() *wrappers.BoolValue {
+	if m != nil {
+		return m.Enabled
+	}
+	return nil
+}
+
+func (m *UpdateWorkflowScheduleByNameRequest) GetParameters() *wrappers.BytesValue {
+	if m != nil {
+		return m.Parameters
+	}
+	return nil
+}
+
+func (m *UpdateWorkflowScheduleByNameRequest) GetRecurrence() *wrappers.StringValue {
+	if m != nil {
+		return m.Recurrence
+	}
+	return nil
+}
+
+func (m *UpdateWorkflowScheduleByNameRequest) GetNextRunAt() *timestamp.Timestamp {
+	if m != nil {
+		return m.NextRunAt
+	}
+	return nil
+}
+
+type UpdateWorkflowScheduleByNameResponse struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *UpdateWorkflowScheduleByNameResponse) Reset()         { *m = UpdateWorkflowScheduleByNameResponse{} }
+func (m *UpdateWorkflowScheduleByNameResponse) String() string { return proto.CompactTextString(m) }
+func (*UpdateWorkflowScheduleByNameResponse) ProtoMessage()    {}
+func (*UpdateWorkflowScheduleByNameResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_96e4c16478599b1f, []int{18}
+}
+
+func (m *UpdateWorkflowScheduleByNameResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UpdateWorkflowScheduleByNameResponse.Unmarshal(m, b)
+}
+func (m *UpdateWorkflowScheduleByNameResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UpdateWorkflowScheduleByNameResponse.Marshal(b, m, deterministic)
+}
+func (m *UpdateWorkflowScheduleByNameResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpdateWorkflowScheduleByNameResponse.Merge(m, src)
+}
+func (m *UpdateWorkflowScheduleByNameResponse) XXX_Size() int {
+	return xxx_messageInfo_UpdateWorkflowScheduleByNameResponse.Size(m)
+}
+func (m *UpdateWorkflowScheduleByNameResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpdateWorkflowScheduleByNameResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UpdateWorkflowScheduleByNameResponse proto.InternalMessageInfo
+
+type GetWorkflowInstanceByNameRequest struct {
+	Domain               string   `protobuf:"bytes,1,opt,name=domain,proto3" json:"domain,omitempty" toml:"domain,omitempty" mapstructure:"domain,omitempty"`
+	InstanceName         string   `protobuf:"bytes,2,opt,name=instance_name,json=instanceName,proto3" json:"instance_name,omitempty" toml:"instance_name,omitempty" mapstructure:"instance_name,omitempty"`
+	WorkflowName         string   `protobuf:"bytes,3,opt,name=workflow_name,json=workflowName,proto3" json:"workflow_name,omitempty" toml:"workflow_name,omitempty" mapstructure:"workflow_name,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *GetWorkflowInstanceByNameRequest) Reset()         { *m = GetWorkflowInstanceByNameRequest{} }
+func (m *GetWorkflowInstanceByNameRequest) String() string { return proto.CompactTextString(m) }
+func (*GetWorkflowInstanceByNameRequest) ProtoMessage()    {}
+func (*GetWorkflowInstanceByNameRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_96e4c16478599b1f, []int{19}
+}
+
+func (m *GetWorkflowInstanceByNameRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetWorkflowInstanceByNameRequest.Unmarshal(m, b)
+}
+func (m *GetWorkflowInstanceByNameRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetWorkflowInstanceByNameRequest.Marshal(b, m, deterministic)
+}
+func (m *GetWorkflowInstanceByNameRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetWorkflowInstanceByNameRequest.Merge(m, src)
+}
+func (m *GetWorkflowInstanceByNameRequest) XXX_Size() int {
+	return xxx_messageInfo_GetWorkflowInstanceByNameRequest.Size(m)
+}
+func (m *GetWorkflowInstanceByNameRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetWorkflowInstanceByNameRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetWorkflowInstanceByNameRequest proto.InternalMessageInfo
+
+func (m *GetWorkflowInstanceByNameRequest) GetDomain() string {
+	if m != nil {
+		return m.Domain
+	}
+	return ""
+}
+
+func (m *GetWorkflowInstanceByNameRequest) GetInstanceName() string {
+	if m != nil {
+		return m.InstanceName
+	}
+	return ""
+}
+
+func (m *GetWorkflowInstanceByNameRequest) GetWorkflowName() string {
+	if m != nil {
+		return m.WorkflowName
+	}
+	return ""
+}
+
+type GetWorkflowInstanceByNameResponse struct {
+	WorkflowInstance     *WorkflowInstance `protobuf:"bytes,1,opt,name=workflow_instance,json=workflowInstance,proto3" json:"workflow_instance,omitempty" toml:"workflow_instance,omitempty" mapstructure:"workflow_instance,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte            `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32             `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *GetWorkflowInstanceByNameResponse) Reset()         { *m = GetWorkflowInstanceByNameResponse{} }
+func (m *GetWorkflowInstanceByNameResponse) String() string { return proto.CompactTextString(m) }
+func (*GetWorkflowInstanceByNameResponse) ProtoMessage()    {}
+func (*GetWorkflowInstanceByNameResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_96e4c16478599b1f, []int{20}
+}
+
+func (m *GetWorkflowInstanceByNameResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetWorkflowInstanceByNameResponse.Unmarshal(m, b)
+}
+func (m *GetWorkflowInstanceByNameResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetWorkflowInstanceByNameResponse.Marshal(b, m, deterministic)
+}
+func (m *GetWorkflowInstanceByNameResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetWorkflowInstanceByNameResponse.Merge(m, src)
+}
+func (m *GetWorkflowInstanceByNameResponse) XXX_Size() int {
+	return xxx_messageInfo_GetWorkflowInstanceByNameResponse.Size(m)
+}
+func (m *GetWorkflowInstanceByNameResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetWorkflowInstanceByNameResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetWorkflowInstanceByNameResponse proto.InternalMessageInfo
+
+func (m *GetWorkflowInstanceByNameResponse) GetWorkflowInstance() *WorkflowInstance {
+	if m != nil {
+		return m.WorkflowInstance
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*Task)(nil), "chef.automate.infra.cereal.Task")
 	proto.RegisterType((*WorkflowInstance)(nil), "chef.automate.infra.cereal.WorkflowInstance")
@@ -1224,6 +1855,17 @@ func init() {
 	proto.RegisterType((*DequeueTaskResponse)(nil), "chef.automate.infra.cereal.DequeueTaskResponse")
 	proto.RegisterType((*DequeueTaskResponse_Dequeue)(nil), "chef.automate.infra.cereal.DequeueTaskResponse.Dequeue")
 	proto.RegisterType((*DequeueTaskResponse_Cancel)(nil), "chef.automate.infra.cereal.DequeueTaskResponse.Cancel")
+	proto.RegisterType((*CreateWorkflowScheduleRequest)(nil), "chef.automate.infra.cereal.CreateWorkflowScheduleRequest")
+	proto.RegisterType((*CreateWorkflowScheduleResponse)(nil), "chef.automate.infra.cereal.CreateWorkflowScheduleResponse")
+	proto.RegisterType((*ListWorkflowSchedulesRequest)(nil), "chef.automate.infra.cereal.ListWorkflowSchedulesRequest")
+	proto.RegisterType((*Schedule)(nil), "chef.automate.infra.cereal.Schedule")
+	proto.RegisterType((*ListWorkflowSchedulesResponse)(nil), "chef.automate.infra.cereal.ListWorkflowSchedulesResponse")
+	proto.RegisterType((*GetWorkflowScheduleByNameRequest)(nil), "chef.automate.infra.cereal.GetWorkflowScheduleByNameRequest")
+	proto.RegisterType((*GetWorkflowScheduleByNameResponse)(nil), "chef.automate.infra.cereal.GetWorkflowScheduleByNameResponse")
+	proto.RegisterType((*UpdateWorkflowScheduleByNameRequest)(nil), "chef.automate.infra.cereal.UpdateWorkflowScheduleByNameRequest")
+	proto.RegisterType((*UpdateWorkflowScheduleByNameResponse)(nil), "chef.automate.infra.cereal.UpdateWorkflowScheduleByNameResponse")
+	proto.RegisterType((*GetWorkflowInstanceByNameRequest)(nil), "chef.automate.infra.cereal.GetWorkflowInstanceByNameRequest")
+	proto.RegisterType((*GetWorkflowInstanceByNameResponse)(nil), "chef.automate.infra.cereal.GetWorkflowInstanceByNameResponse")
 }
 
 func init() {
@@ -1231,64 +1873,94 @@ func init() {
 }
 
 var fileDescriptor_96e4c16478599b1f = []byte{
-	// 900 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x56, 0x4d, 0x6f, 0xf3, 0x44,
-	0x10, 0xae, 0x63, 0xe7, 0x6b, 0xf2, 0x86, 0xb7, 0x6c, 0xab, 0x34, 0x18, 0xa8, 0x4a, 0x0a, 0x28,
-	0x48, 0xc8, 0xa9, 0x1c, 0xd4, 0x4a, 0x45, 0xa2, 0x52, 0x43, 0x21, 0x3d, 0x50, 0x21, 0xb7, 0xa2,
-	0x02, 0x21, 0x45, 0x5b, 0x67, 0x43, 0xad, 0x3a, 0x76, 0xb0, 0xd7, 0xfd, 0xe0, 0xc0, 0x81, 0x3f,
-	0xc0, 0x85, 0x03, 0xe2, 0xc4, 0xaf, 0xe1, 0xc8, 0x81, 0x5f, 0xc3, 0x11, 0xed, 0x87, 0x13, 0xdb,
-	0xf9, 0x8e, 0xc4, 0x29, 0xde, 0xdd, 0x99, 0x67, 0x9e, 0x9d, 0x99, 0x67, 0x36, 0xf0, 0x3e, 0x1e,
-	0x39, 0x2d, 0xc7, 0xa3, 0x24, 0x08, 0x49, 0xf0, 0xe8, 0xd8, 0xa4, 0x65, 0x93, 0x80, 0x60, 0x57,
-	0xfe, 0x18, 0xa3, 0xc0, 0xa7, 0x3e, 0xd2, 0xed, 0x7b, 0x32, 0x30, 0x70, 0x44, 0xfd, 0x21, 0xa6,
-	0xc4, 0x70, 0xbc, 0x41, 0x80, 0x0d, 0x61, 0xd1, 0x38, 0x05, 0xed, 0x06, 0x87, 0x0f, 0x08, 0x81,
-	0xe6, 0xe1, 0x21, 0xa9, 0x2b, 0x07, 0x4a, 0xb3, 0x6c, 0xf1, 0x6f, 0xb4, 0x0f, 0x30, 0xc2, 0x01,
-	0x1e, 0x12, 0x86, 0x5f, 0xcf, 0x1d, 0x28, 0xcd, 0x57, 0x56, 0x62, 0xa7, 0xf1, 0x97, 0x02, 0xdb,
-	0xb7, 0x7e, 0xf0, 0x30, 0x70, 0xfd, 0xa7, 0x4b, 0x2f, 0xa4, 0xd8, 0xb3, 0x09, 0xaa, 0x41, 0xa1,
-	0xef, 0x0f, 0xb1, 0xe3, 0x49, 0x28, 0xb9, 0x42, 0x87, 0x50, 0x75, 0xa4, 0x4d, 0x8f, 0x47, 0xca,
-	0xf1, 0xe3, 0x57, 0xf1, 0xe6, 0x15, 0x8b, 0x78, 0x08, 0xd5, 0x27, 0x09, 0x28, 0x8c, 0x54, 0x61,
-	0x14, 0x6f, 0x72, 0xa3, 0x1a, 0x14, 0x42, 0x8a, 0x69, 0x14, 0xd6, 0x35, 0x11, 0x41, 0xac, 0x32,
-	0x74, 0xf3, 0x59, 0xba, 0xa8, 0x0e, 0xc5, 0x11, 0x7e, 0x71, 0x7d, 0xdc, 0xaf, 0x17, 0xf8, 0x61,
-	0xbc, 0x6c, 0xfc, 0xae, 0x00, 0xb0, 0x2c, 0x58, 0x24, 0x8c, 0x5c, 0x8a, 0xde, 0x86, 0x32, 0xc5,
-	0xe1, 0x43, 0x2f, 0x91, 0x90, 0x12, 0xdb, 0xb8, 0x5a, 0x21, 0x29, 0x09, 0x76, 0x6a, 0x8a, 0xdd,
-	0xbb, 0x00, 0x24, 0x08, 0xfc, 0xa0, 0x47, 0xc9, 0x33, 0x95, 0xcc, 0xcb, 0x7c, 0xe7, 0x86, 0x3c,
-	0x53, 0xe6, 0x16, 0xf0, 0xe8, 0x92, 0xb8, 0x5c, 0x35, 0xfe, 0x56, 0xa0, 0x1a, 0xe7, 0xf8, 0xe2,
-	0x91, 0x78, 0x94, 0x55, 0x8a, 0xbe, 0x8c, 0xc6, 0x95, 0x62, 0xdf, 0xc8, 0x80, 0x1d, 0xe2, 0xfd,
-	0x18, 0x91, 0x88, 0xf4, 0x7b, 0x9c, 0xba, 0xed, 0x47, 0x1e, 0xe5, 0xec, 0x54, 0xeb, 0xcd, 0xf8,
-	0x88, 0x5d, 0xb1, 0xc3, 0x0e, 0xd0, 0x11, 0xec, 0xda, 0xfe, 0x70, 0xe4, 0x12, 0x9a, 0x76, 0x50,
-	0xb9, 0x03, 0x1a, 0x9f, 0x4d, 0x3c, 0xbe, 0x84, 0x0a, 0xb7, 0x93, 0x24, 0x19, 0xff, 0x8a, 0xf9,
-	0xa1, 0x31, 0xbf, 0xb3, 0x8c, 0x49, 0x42, 0x2d, 0xa0, 0xe3, 0xef, 0xc6, 0x3f, 0x1a, 0xd4, 0x3e,
-	0x27, 0x9c, 0x50, 0x7c, 0x2f, 0x8b, 0x2d, 0x43, 0x8a, 0xbe, 0x81, 0x62, 0x5f, 0x9c, 0xf0, 0xcb,
-	0x55, 0xcc, 0xd3, 0x45, 0xf8, 0xb3, 0x41, 0xe2, 0xed, 0xee, 0x96, 0x15, 0x83, 0xa1, 0x6f, 0xa1,
-	0x64, 0xfb, 0x1e, 0x75, 0xbc, 0x48, 0x74, 0x5d, 0xc5, 0xfc, 0x74, 0x03, 0xe0, 0x8e, 0x84, 0xe8,
-	0x6e, 0x59, 0x63, 0x38, 0xf4, 0x15, 0x68, 0x7d, 0xdf, 0x13, 0x7d, 0x5a, 0x31, 0x4f, 0x36, 0xe1,
-	0xeb, 0x7b, 0x0c, 0x92, 0xc3, 0x30, 0xb8, 0x01, 0x76, 0x5c, 0x99, 0xde, 0x4d, 0xe0, 0xbe, 0xc0,
-	0x8e, 0xcb, 0xe0, 0x18, 0x8c, 0xde, 0x85, 0xa2, 0x34, 0x9b, 0x2b, 0xcb, 0x0f, 0xe0, 0x8d, 0x94,
-	0xe2, 0x58, 0x4b, 0xab, 0xcd, 0xb2, 0x55, 0x4d, 0x4a, 0x2e, 0xd4, 0xbf, 0x87, 0x52, 0x7c, 0xff,
-	0xa4, 0x8e, 0x94, 0x94, 0x8e, 0xd0, 0x31, 0xe4, 0x59, 0xa5, 0x05, 0x46, 0xc5, 0x3c, 0x58, 0xda,
-	0x1e, 0xc2, 0x5c, 0xaf, 0x83, 0xc6, 0x78, 0xa3, 0x6d, 0x50, 0x49, 0x10, 0x48, 0x86, 0xec, 0x53,
-	0xdf, 0x07, 0x8d, 0x25, 0x28, 0x21, 0x0f, 0x25, 0x29, 0x8f, 0xf3, 0x3c, 0xa8, 0xf6, 0xb0, 0xdf,
-	0xf8, 0x45, 0x85, 0xbd, 0xa9, 0x84, 0x84, 0x23, 0xdf, 0x0b, 0x09, 0xba, 0xcd, 0x76, 0xd5, 0x7a,
-	0xc5, 0x17, 0x28, 0xb3, 0xda, 0xea, 0x66, 0xac, 0xf4, 0xdc, 0x06, 0xdd, 0x2a, 0x71, 0xaf, 0x39,
-	0x42, 0x77, 0x2b, 0x9e, 0x13, 0xfa, 0x6f, 0xca, 0xa4, 0x68, 0x5d, 0x28, 0xc5, 0xe3, 0x51, 0x72,
-	0xff, 0x78, 0x51, 0x8c, 0xec, 0x2c, 0xb6, 0xc6, 0xde, 0xe8, 0x0c, 0xf2, 0x84, 0x4d, 0x0f, 0x49,
-	0xf5, 0xa3, 0x55, 0x60, 0xf8, 0xb8, 0xb1, 0x84, 0x9f, 0xae, 0x43, 0x41, 0x50, 0x9d, 0x2e, 0x52,
-	0x5c, 0x84, 0x3f, 0x14, 0xa8, 0x5d, 0x78, 0x33, 0x95, 0xfd, 0xff, 0x3f, 0x0a, 0xe9, 0xb1, 0xac,
-	0x4d, 0xbd, 0x55, 0x6f, 0xc1, 0xde, 0x14, 0x37, 0x51, 0x82, 0xc6, 0xaf, 0x2a, 0x20, 0x99, 0x71,
-	0x31, 0xb3, 0x04, 0x67, 0x2b, 0xdb, 0x37, 0xc7, 0x2b, 0xd4, 0x37, 0x01, 0x30, 0xab, 0x65, 0x2c,
-	0x28, 0x86, 0x91, 0x6d, 0x13, 0xd2, 0x97, 0x85, 0x58, 0x17, 0xf3, 0x5a, 0x78, 0x33, 0x4c, 0x09,
-	0x84, 0x2e, 0xe5, 0xcc, 0x10, 0x23, 0xa8, 0xbd, 0x26, 0x60, 0x6a, 0x5e, 0x7c, 0xb6, 0x7c, 0x5e,
-	0xa4, 0xde, 0xc6, 0x5c, 0xfa, 0x6d, 0xd4, 0xdf, 0x91, 0x3a, 0xde, 0x85, 0x3c, 0x7f, 0xd9, 0xa4,
-	0xaf, 0x58, 0xe8, 0xef, 0x41, 0x51, 0xd2, 0x5f, 0x26, 0xe7, 0x3f, 0x73, 0xb0, 0x93, 0xe2, 0x2a,
-	0xa5, 0x7c, 0x9d, 0x2d, 0xc9, 0xc9, 0xca, 0xb7, 0x9d, 0x2f, 0xe3, 0xaf, 0xa1, 0x60, 0xb3, 0x5e,
-	0x73, 0xd7, 0x2e, 0x89, 0xc4, 0xec, 0x70, 0x6f, 0x26, 0x61, 0x81, 0xa3, 0x9f, 0x4d, 0xd2, 0xf8,
-	0x09, 0x68, 0x2c, 0x3b, 0x92, 0xee, 0xf2, 0x81, 0xc8, 0xad, 0x99, 0xd8, 0x04, 0xe8, 0x5c, 0xb1,
-	0x99, 0xff, 0xe6, 0xa0, 0xd0, 0xe1, 0x8e, 0xe8, 0x27, 0x78, 0x9d, 0x69, 0x6d, 0x64, 0x2e, 0x0a,
-	0x34, 0x5b, 0xa3, 0x7a, 0x7b, 0x2d, 0x1f, 0x59, 0x91, 0x9f, 0xe1, 0x75, 0x66, 0xb2, 0x2d, 0x8e,
-	0x3d, 0xfb, 0xd5, 0xd2, 0xdb, 0x1b, 0x8c, 0xce, 0xa6, 0x72, 0xa4, 0xa0, 0x00, 0x2a, 0x89, 0x92,
-	0x20, 0x63, 0xbd, 0xee, 0xd7, 0x5b, 0x6b, 0xd6, 0x9a, 0xc5, 0x3c, 0x37, 0xbf, 0x3b, 0xfa, 0xc1,
-	0xa1, 0xf7, 0xd1, 0x9d, 0x61, 0xfb, 0xc3, 0x16, 0x03, 0x68, 0xc5, 0x00, 0xad, 0x39, 0xff, 0xc7,
-	0xef, 0x0a, 0xfc, 0x9f, 0x78, 0xfb, 0xbf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x6b, 0x25, 0xf5, 0xc4,
-	0xb1, 0x0b, 0x00, 0x00,
+	// 1385 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x58, 0xdd, 0x6e, 0xd4, 0xc6,
+	0x17, 0xc7, 0xfb, 0xbd, 0x67, 0xc9, 0x1f, 0x18, 0xf8, 0x87, 0xc5, 0x84, 0x34, 0x18, 0x8a, 0x52,
+	0xa9, 0xf2, 0xa2, 0x0d, 0x85, 0x12, 0x68, 0x81, 0x04, 0x4a, 0x90, 0x5a, 0x54, 0x79, 0x53, 0x10,
+	0x55, 0xa5, 0xd5, 0xc4, 0x9e, 0x04, 0x2b, 0x5e, 0x7b, 0x6b, 0x8f, 0x49, 0xd2, 0x0b, 0x2e, 0xaa,
+	0x5e, 0x56, 0xe2, 0xa6, 0x17, 0xa8, 0x57, 0xed, 0x23, 0xf4, 0x45, 0x7a, 0xd1, 0x27, 0xa9, 0xd4,
+	0x3e, 0x40, 0x35, 0x1f, 0xde, 0xb5, 0xbd, 0x5e, 0xef, 0x47, 0xd5, 0x88, 0xab, 0x78, 0x66, 0xce,
+	0xf9, 0xcd, 0x99, 0xf3, 0xf1, 0x3b, 0x67, 0x03, 0x57, 0x71, 0xdf, 0x6e, 0xd9, 0x2e, 0x25, 0x7e,
+	0x40, 0xfc, 0x57, 0xb6, 0x49, 0x5a, 0x26, 0xf1, 0x09, 0x76, 0xe4, 0x1f, 0xbd, 0xef, 0x7b, 0xd4,
+	0x43, 0xaa, 0xf9, 0x92, 0xec, 0xea, 0x38, 0xa4, 0x5e, 0x0f, 0x53, 0xa2, 0xdb, 0xee, 0xae, 0x8f,
+	0x75, 0x21, 0xa1, 0xbe, 0xb7, 0xe7, 0x79, 0x7b, 0x0e, 0x69, 0x71, 0xc9, 0x9d, 0x70, 0xb7, 0x45,
+	0xed, 0x1e, 0x09, 0x28, 0xee, 0xf5, 0x85, 0xb2, 0xba, 0x9c, 0x16, 0x38, 0xf0, 0x71, 0xbf, 0x4f,
+	0xfc, 0x40, 0x9c, 0x6b, 0xeb, 0x50, 0xda, 0xc6, 0xc1, 0x3e, 0x42, 0x50, 0x72, 0x71, 0x8f, 0x34,
+	0x95, 0x15, 0x65, 0xb5, 0x6e, 0xf0, 0x6f, 0xb4, 0x0c, 0xd0, 0xc7, 0x3e, 0xee, 0x11, 0x66, 0x60,
+	0xb3, 0xb0, 0xa2, 0xac, 0x9e, 0x34, 0x62, 0x3b, 0xda, 0x9f, 0x0a, 0x9c, 0x7e, 0xee, 0xf9, 0xfb,
+	0xbb, 0x8e, 0x77, 0xf0, 0xc4, 0x0d, 0x28, 0x76, 0x4d, 0x82, 0x16, 0xa1, 0x62, 0x79, 0x3d, 0x6c,
+	0xbb, 0x12, 0x4a, 0xae, 0xd0, 0x15, 0x58, 0xb0, 0xa5, 0x4c, 0x97, 0xdf, 0x54, 0xe0, 0xc7, 0x27,
+	0xa3, 0xcd, 0xa7, 0xec, 0xc6, 0x2b, 0xb0, 0x70, 0x20, 0x01, 0x85, 0x50, 0x51, 0x08, 0x45, 0x9b,
+	0x5c, 0x68, 0x11, 0x2a, 0x01, 0xc5, 0x34, 0x0c, 0x9a, 0x25, 0x71, 0x83, 0x58, 0xa5, 0xcc, 0x2d,
+	0xa7, 0xcd, 0x45, 0x4d, 0xa8, 0xf6, 0xf1, 0x91, 0xe3, 0x61, 0xab, 0x59, 0xe1, 0x87, 0xd1, 0x92,
+	0x21, 0xfa, 0x24, 0x08, 0x1d, 0xda, 0xac, 0xf2, 0x03, 0xb9, 0x42, 0xa7, 0xa1, 0x48, 0x7c, 0xbf,
+	0x59, 0xe3, 0xd7, 0xb0, 0x4f, 0xed, 0xad, 0x02, 0xc0, 0xfc, 0x65, 0x08, 0x81, 0x8b, 0x50, 0xa7,
+	0x38, 0xd8, 0xef, 0xc6, 0x5c, 0x57, 0x63, 0x1b, 0x4f, 0xa7, 0x70, 0x5f, 0xec, 0x1d, 0xc5, 0xc4,
+	0x3b, 0x2e, 0x01, 0x10, 0xdf, 0xf7, 0xfc, 0x2e, 0x25, 0x87, 0x54, 0xbe, 0xb1, 0xce, 0x77, 0xb6,
+	0xc9, 0x21, 0x8d, 0x19, 0x5b, 0x8e, 0x1b, 0xab, 0xfd, 0xae, 0xc0, 0x42, 0x14, 0x8d, 0x47, 0xaf,
+	0x88, 0x4b, 0x59, 0x4c, 0xe9, 0x51, 0x7f, 0x10, 0x53, 0xf6, 0x8d, 0x74, 0x38, 0x4b, 0xdc, 0x6f,
+	0x43, 0x12, 0x12, 0xab, 0xcb, 0x4d, 0x37, 0xbd, 0xd0, 0xa5, 0xdc, 0xba, 0xa2, 0x71, 0x26, 0x3a,
+	0x62, 0x4f, 0xdc, 0x64, 0x07, 0xe8, 0x3a, 0x9c, 0x33, 0xbd, 0x5e, 0xdf, 0x21, 0x34, 0xa9, 0x50,
+	0xe4, 0x0a, 0x68, 0x70, 0x36, 0xd4, 0x78, 0x0c, 0x0d, 0x2e, 0x27, 0x8d, 0x64, 0xf6, 0x37, 0xda,
+	0xd7, 0xf4, 0xf1, 0x49, 0xac, 0x0f, 0x1d, 0x6a, 0x00, 0x1d, 0x7c, 0x6b, 0x7f, 0x94, 0x60, 0xf1,
+	0x21, 0xe1, 0x06, 0x45, 0xef, 0x32, 0xd8, 0x32, 0xa0, 0xe8, 0x19, 0x54, 0x2d, 0x71, 0xc2, 0x1f,
+	0xd7, 0x68, 0xaf, 0xe7, 0xe1, 0x67, 0x83, 0x44, 0xdb, 0x5b, 0x27, 0x8c, 0x08, 0x0c, 0xbd, 0x80,
+	0x9a, 0xe9, 0xb9, 0xd4, 0x76, 0x43, 0x91, 0x9f, 0x8d, 0xf6, 0x9d, 0x39, 0x80, 0x37, 0x25, 0xc4,
+	0xd6, 0x09, 0x63, 0x00, 0x87, 0xbe, 0x80, 0x92, 0xe5, 0xb9, 0x22, 0xa3, 0x1b, 0xed, 0x5b, 0xf3,
+	0xd8, 0xeb, 0xb9, 0x0c, 0x92, 0xc3, 0x30, 0xb8, 0x5d, 0x6c, 0x3b, 0xd2, 0xbd, 0xf3, 0xc0, 0x7d,
+	0x86, 0x6d, 0x87, 0xc1, 0x31, 0x18, 0x75, 0x0b, 0xaa, 0x52, 0x6c, 0x6c, 0x01, 0xbf, 0x0f, 0xff,
+	0x4b, 0xd4, 0x26, 0x4b, 0xe9, 0xe2, 0x6a, 0xdd, 0x58, 0x88, 0x17, 0x67, 0xa0, 0x7e, 0x03, 0xb5,
+	0xe8, 0xfd, 0xf1, 0x8a, 0x53, 0x92, 0x15, 0x77, 0x13, 0xca, 0x2c, 0xd2, 0x02, 0xa3, 0xd1, 0x5e,
+	0x99, 0x98, 0x1e, 0x42, 0x5c, 0x6d, 0x42, 0x89, 0xd9, 0x1d, 0x55, 0xa6, 0x32, 0xa8, 0x4c, 0x75,
+	0x19, 0x4a, 0xcc, 0x41, 0xb1, 0xf2, 0x50, 0xe2, 0xe5, 0xb1, 0x51, 0x86, 0xa2, 0xd9, 0xb3, 0xb4,
+	0xef, 0x8b, 0x70, 0x7e, 0xc4, 0x21, 0x41, 0xdf, 0x73, 0x03, 0x82, 0x9e, 0xa7, 0xb3, 0x6a, 0xb6,
+	0xe0, 0x0b, 0x94, 0xac, 0xb4, 0xda, 0x1e, 0x54, 0x7a, 0x61, 0x8e, 0x6c, 0x95, 0xb8, 0x1d, 0x8e,
+	0xb0, 0x75, 0x22, 0xe2, 0x09, 0xf5, 0x27, 0x65, 0x18, 0xb4, 0x2d, 0xa8, 0x45, 0x44, 0x2a, 0x6d,
+	0xff, 0x30, 0xef, 0x8e, 0x34, 0x6b, 0x1b, 0x03, 0x6d, 0x74, 0x0f, 0xca, 0x84, 0xb1, 0x87, 0x34,
+	0xf5, 0x83, 0x69, 0x60, 0x38, 0xdd, 0x18, 0x42, 0x4f, 0x55, 0xa1, 0x22, 0x4c, 0x1d, 0x0d, 0x52,
+	0x14, 0x84, 0x9f, 0x15, 0x58, 0x7c, 0xe4, 0x66, 0x56, 0xf6, 0x7f, 0xdf, 0x3e, 0x92, 0xb4, 0x5c,
+	0x1a, 0xe9, 0x6a, 0x17, 0xe0, 0xfc, 0x88, 0x6d, 0x22, 0x04, 0xda, 0x9b, 0x22, 0x20, 0xe9, 0x71,
+	0xc1, 0x59, 0xc2, 0x66, 0x23, 0x9d, 0x37, 0x37, 0xa7, 0x88, 0x6f, 0x0c, 0x20, 0x2b, 0x65, 0x0c,
+	0xa8, 0x06, 0xa1, 0x69, 0x12, 0x62, 0xc9, 0x40, 0xcc, 0x8a, 0xd9, 0x11, 0xda, 0x0c, 0x53, 0x02,
+	0xa1, 0x27, 0x92, 0x33, 0x04, 0x05, 0xad, 0xcd, 0x08, 0x98, 0xe0, 0x8b, 0x4f, 0x27, 0xf3, 0x45,
+	0xa2, 0x37, 0x16, 0x92, 0xbd, 0x51, 0x5d, 0x92, 0x75, 0x7c, 0x0e, 0xca, 0xbc, 0xb3, 0x49, 0x5d,
+	0xb1, 0x50, 0x2f, 0x43, 0x55, 0x9a, 0x3f, 0xa9, 0x9c, 0x7f, 0x29, 0xc0, 0xd9, 0x84, 0xad, 0xb2,
+	0x94, 0x3b, 0xe9, 0x90, 0xdc, 0x9a, 0xfa, 0xb5, 0xe3, 0xcb, 0xf8, 0x4b, 0xa8, 0x98, 0x2c, 0xd7,
+	0x9c, 0x99, 0x43, 0x22, 0x31, 0x37, 0xb9, 0x36, 0x2b, 0x61, 0x81, 0xa3, 0xde, 0x1b, 0xba, 0xf1,
+	0x06, 0x94, 0x98, 0x77, 0xa4, 0xb9, 0x93, 0x09, 0x91, 0x4b, 0xb3, 0x62, 0x13, 0xa0, 0xe3, 0x8b,
+	0xed, 0xb7, 0x02, 0x5c, 0xda, 0xf4, 0x09, 0xa6, 0x83, 0x7c, 0xee, 0x98, 0x2f, 0x89, 0x15, 0x3a,
+	0xe4, 0x9d, 0xa9, 0x39, 0xd6, 0x28, 0x88, 0x8b, 0x77, 0x1c, 0x62, 0xf1, 0xa1, 0xa6, 0x66, 0x44,
+	0x4b, 0xa6, 0xe9, 0x13, 0x33, 0xf4, 0x7d, 0xc2, 0xa8, 0xad, 0xc2, 0xb1, 0x63, 0x3b, 0xf1, 0x16,
+	0x53, 0x4d, 0xb6, 0x98, 0x75, 0x68, 0xb8, 0xe4, 0x90, 0x76, 0xfd, 0xd0, 0xed, 0x62, 0xca, 0x87,
+	0xb8, 0x46, 0x5b, 0xd5, 0xc5, 0x3c, 0xac, 0x47, 0xf3, 0xb0, 0xbe, 0x1d, 0x0d, 0xcc, 0x46, 0x9d,
+	0x89, 0x1b, 0xa1, 0xfb, 0x80, 0x6a, 0x2b, 0xb0, 0x3c, 0xce, 0x65, 0x92, 0x0a, 0x6e, 0xc2, 0xd2,
+	0xe7, 0x76, 0x40, 0xd3, 0xe7, 0xc1, 0x04, 0x9f, 0x6a, 0x7f, 0x17, 0xa0, 0x16, 0x09, 0xbf, 0x03,
+	0x8e, 0x4f, 0xba, 0xb7, 0x3c, 0xe2, 0xde, 0xc8, 0x89, 0x56, 0x48, 0x98, 0x13, 0x2b, 0xd3, 0x39,
+	0xf1, 0x61, 0x48, 0x1e, 0xd0, 0x78, 0x50, 0xab, 0xc9, 0xa0, 0xde, 0x06, 0x70, 0x70, 0x40, 0xbb,
+	0x01, 0xc5, 0xfe, 0x54, 0x91, 0x61, 0xd2, 0x1d, 0x26, 0x8c, 0x3e, 0x82, 0x1a, 0x57, 0x25, 0xae,
+	0xd5, 0xac, 0x4f, 0x54, 0xac, 0x32, 0xd9, 0x47, 0xae, 0xa5, 0x99, 0x70, 0x69, 0x4c, 0xb8, 0x24,
+	0x61, 0x6c, 0x40, 0x3d, 0x88, 0x36, 0x9b, 0x0a, 0x1f, 0x4a, 0xae, 0xe6, 0xd5, 0xe0, 0x20, 0x21,
+	0x86, 0x6a, 0xda, 0x0f, 0x0a, 0xac, 0x3c, 0x26, 0x23, 0x97, 0x6c, 0x1c, 0xb1, 0x50, 0x1c, 0x5b,
+	0xb1, 0x69, 0x04, 0x2e, 0xe7, 0x58, 0x21, 0xdf, 0x7b, 0x1f, 0x6a, 0x91, 0xe1, 0x92, 0x72, 0xa6,
+	0x7b, 0xee, 0x40, 0x8b, 0x65, 0xf2, 0x95, 0xaf, 0xfa, 0x56, 0x46, 0x91, 0x1c, 0xf3, 0x83, 0xd1,
+	0x8d, 0x61, 0xa2, 0x95, 0xc6, 0xa4, 0xc4, 0x86, 0xe7, 0x39, 0xcf, 0xb0, 0x13, 0x92, 0x61, 0x12,
+	0xde, 0x19, 0xf9, 0xb9, 0xd8, 0x68, 0x5f, 0x1c, 0x55, 0x3c, 0xa2, 0x24, 0x10, 0x9a, 0xf1, 0xba,
+	0xb9, 0x3b, 0x42, 0x4b, 0x8d, 0xf6, 0xd2, 0x88, 0x72, 0x87, 0xfa, 0xb6, 0xbb, 0x27, 0xb5, 0x33,
+	0xaa, 0x4a, 0x52, 0x53, 0x75, 0x16, 0x6a, 0xba, 0x06, 0x57, 0xf3, 0xbd, 0x2e, 0x09, 0x2a, 0x95,
+	0x8c, 0xd1, 0xa4, 0x77, 0xdc, 0xc9, 0xf8, 0x3a, 0x91, 0x8c, 0x69, 0x2b, 0x64, 0x32, 0xbe, 0x80,
+	0x33, 0x03, 0xa4, 0x7f, 0x35, 0xc6, 0x9e, 0x3e, 0x48, 0xed, 0xb4, 0xff, 0xaa, 0x41, 0x65, 0x93,
+	0x4b, 0xa3, 0xef, 0xe0, 0x54, 0x6a, 0xb0, 0x43, 0xed, 0x3c, 0xf4, 0xec, 0x09, 0x55, 0x5d, 0x9b,
+	0x49, 0x47, 0xbe, 0xf0, 0x35, 0x9c, 0x4a, 0xcd, 0xf5, 0xf9, 0x77, 0x67, 0xff, 0x66, 0x53, 0xd7,
+	0xe6, 0xf8, 0xe1, 0xb0, 0xaa, 0x5c, 0x57, 0x90, 0x0f, 0x8d, 0xd8, 0x40, 0x82, 0xf4, 0xd9, 0x66,
+	0x3f, 0xb5, 0x35, 0xe3, 0xa4, 0xc3, 0xef, 0x7c, 0xa3, 0xc0, 0x62, 0x76, 0x17, 0x45, 0xb7, 0xf3,
+	0xf0, 0x72, 0x87, 0x15, 0x75, 0x7d, 0x1e, 0x55, 0x19, 0x85, 0x1f, 0x15, 0xf8, 0x7f, 0x66, 0x1b,
+	0x40, 0x1f, 0xe7, 0xa1, 0xe6, 0x35, 0x7a, 0xf5, 0xf6, 0x1c, 0x9a, 0xd2, 0x9c, 0xb7, 0x0a, 0x5c,
+	0x18, 0xcb, 0xd4, 0xe8, 0x6e, 0x1e, 0xf0, 0xa4, 0x36, 0xa3, 0x7e, 0x32, 0xa7, 0xb6, 0x34, 0xed,
+	0x57, 0x05, 0x96, 0xf2, 0x68, 0x06, 0xdd, 0xcb, 0xc3, 0x9f, 0xa2, 0x2d, 0xa8, 0xf7, 0xe7, 0x07,
+	0xc8, 0x76, 0x5f, 0x92, 0x5b, 0xa6, 0x76, 0x5f, 0x26, 0x31, 0x4e, 0xed, 0xbe, 0x6c, 0x42, 0xdb,
+	0x68, 0x7f, 0x7d, 0x7d, 0xcf, 0xa6, 0x2f, 0xc3, 0x1d, 0xdd, 0xf4, 0x7a, 0x2d, 0x06, 0xd5, 0x8a,
+	0xa0, 0x5a, 0x63, 0xfe, 0xe7, 0xbb, 0x53, 0xe1, 0xbc, 0xbf, 0xf6, 0x4f, 0x00, 0x00, 0x00, 0xff,
+	0xff, 0x4a, 0x53, 0xeb, 0x96, 0x15, 0x16, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1306,6 +1978,11 @@ type CerealClient interface {
 	EnqueueWorkflow(ctx context.Context, in *EnqueueWorkflowRequest, opts ...grpc.CallOption) (*EnqueueWorkflowResponse, error)
 	DequeueWorkflow(ctx context.Context, opts ...grpc.CallOption) (Cereal_DequeueWorkflowClient, error)
 	DequeueTask(ctx context.Context, opts ...grpc.CallOption) (Cereal_DequeueTaskClient, error)
+	CreateWorkflowSchedule(ctx context.Context, in *CreateWorkflowScheduleRequest, opts ...grpc.CallOption) (*CreateWorkflowScheduleResponse, error)
+	ListWorkflowSchedules(ctx context.Context, in *ListWorkflowSchedulesRequest, opts ...grpc.CallOption) (*ListWorkflowSchedulesResponse, error)
+	GetWorkflowScheduleByName(ctx context.Context, in *GetWorkflowScheduleByNameRequest, opts ...grpc.CallOption) (*GetWorkflowScheduleByNameResponse, error)
+	UpdateWorkflowScheduleByName(ctx context.Context, in *UpdateWorkflowScheduleByNameRequest, opts ...grpc.CallOption) (*UpdateWorkflowScheduleByNameResponse, error)
+	GetWorkflowInstanceByName(ctx context.Context, in *GetWorkflowInstanceByNameRequest, opts ...grpc.CallOption) (*GetWorkflowInstanceByNameResponse, error)
 }
 
 type cerealClient struct {
@@ -1387,11 +2064,61 @@ func (x *cerealDequeueTaskClient) Recv() (*DequeueTaskResponse, error) {
 	return m, nil
 }
 
+func (c *cerealClient) CreateWorkflowSchedule(ctx context.Context, in *CreateWorkflowScheduleRequest, opts ...grpc.CallOption) (*CreateWorkflowScheduleResponse, error) {
+	out := new(CreateWorkflowScheduleResponse)
+	err := c.cc.Invoke(ctx, "/chef.automate.infra.cereal.Cereal/CreateWorkflowSchedule", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cerealClient) ListWorkflowSchedules(ctx context.Context, in *ListWorkflowSchedulesRequest, opts ...grpc.CallOption) (*ListWorkflowSchedulesResponse, error) {
+	out := new(ListWorkflowSchedulesResponse)
+	err := c.cc.Invoke(ctx, "/chef.automate.infra.cereal.Cereal/ListWorkflowSchedules", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cerealClient) GetWorkflowScheduleByName(ctx context.Context, in *GetWorkflowScheduleByNameRequest, opts ...grpc.CallOption) (*GetWorkflowScheduleByNameResponse, error) {
+	out := new(GetWorkflowScheduleByNameResponse)
+	err := c.cc.Invoke(ctx, "/chef.automate.infra.cereal.Cereal/GetWorkflowScheduleByName", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cerealClient) UpdateWorkflowScheduleByName(ctx context.Context, in *UpdateWorkflowScheduleByNameRequest, opts ...grpc.CallOption) (*UpdateWorkflowScheduleByNameResponse, error) {
+	out := new(UpdateWorkflowScheduleByNameResponse)
+	err := c.cc.Invoke(ctx, "/chef.automate.infra.cereal.Cereal/UpdateWorkflowScheduleByName", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cerealClient) GetWorkflowInstanceByName(ctx context.Context, in *GetWorkflowInstanceByNameRequest, opts ...grpc.CallOption) (*GetWorkflowInstanceByNameResponse, error) {
+	out := new(GetWorkflowInstanceByNameResponse)
+	err := c.cc.Invoke(ctx, "/chef.automate.infra.cereal.Cereal/GetWorkflowInstanceByName", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CerealServer is the server API for Cereal service.
 type CerealServer interface {
 	EnqueueWorkflow(context.Context, *EnqueueWorkflowRequest) (*EnqueueWorkflowResponse, error)
 	DequeueWorkflow(Cereal_DequeueWorkflowServer) error
 	DequeueTask(Cereal_DequeueTaskServer) error
+	CreateWorkflowSchedule(context.Context, *CreateWorkflowScheduleRequest) (*CreateWorkflowScheduleResponse, error)
+	ListWorkflowSchedules(context.Context, *ListWorkflowSchedulesRequest) (*ListWorkflowSchedulesResponse, error)
+	GetWorkflowScheduleByName(context.Context, *GetWorkflowScheduleByNameRequest) (*GetWorkflowScheduleByNameResponse, error)
+	UpdateWorkflowScheduleByName(context.Context, *UpdateWorkflowScheduleByNameRequest) (*UpdateWorkflowScheduleByNameResponse, error)
+	GetWorkflowInstanceByName(context.Context, *GetWorkflowInstanceByNameRequest) (*GetWorkflowInstanceByNameResponse, error)
 }
 
 func RegisterCerealServer(s *grpc.Server, srv CerealServer) {
@@ -1468,6 +2195,96 @@ func (x *cerealDequeueTaskServer) Recv() (*DequeueTaskRequest, error) {
 	return m, nil
 }
 
+func _Cereal_CreateWorkflowSchedule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateWorkflowScheduleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CerealServer).CreateWorkflowSchedule(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.infra.cereal.Cereal/CreateWorkflowSchedule",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CerealServer).CreateWorkflowSchedule(ctx, req.(*CreateWorkflowScheduleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Cereal_ListWorkflowSchedules_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListWorkflowSchedulesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CerealServer).ListWorkflowSchedules(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.infra.cereal.Cereal/ListWorkflowSchedules",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CerealServer).ListWorkflowSchedules(ctx, req.(*ListWorkflowSchedulesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Cereal_GetWorkflowScheduleByName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWorkflowScheduleByNameRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CerealServer).GetWorkflowScheduleByName(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.infra.cereal.Cereal/GetWorkflowScheduleByName",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CerealServer).GetWorkflowScheduleByName(ctx, req.(*GetWorkflowScheduleByNameRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Cereal_UpdateWorkflowScheduleByName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateWorkflowScheduleByNameRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CerealServer).UpdateWorkflowScheduleByName(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.infra.cereal.Cereal/UpdateWorkflowScheduleByName",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CerealServer).UpdateWorkflowScheduleByName(ctx, req.(*UpdateWorkflowScheduleByNameRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Cereal_GetWorkflowInstanceByName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWorkflowInstanceByNameRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CerealServer).GetWorkflowInstanceByName(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.infra.cereal.Cereal/GetWorkflowInstanceByName",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CerealServer).GetWorkflowInstanceByName(ctx, req.(*GetWorkflowInstanceByNameRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Cereal_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "chef.automate.infra.cereal.Cereal",
 	HandlerType: (*CerealServer)(nil),
@@ -1475,6 +2292,26 @@ var _Cereal_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "EnqueueWorkflow",
 			Handler:    _Cereal_EnqueueWorkflow_Handler,
+		},
+		{
+			MethodName: "CreateWorkflowSchedule",
+			Handler:    _Cereal_CreateWorkflowSchedule_Handler,
+		},
+		{
+			MethodName: "ListWorkflowSchedules",
+			Handler:    _Cereal_ListWorkflowSchedules_Handler,
+		},
+		{
+			MethodName: "GetWorkflowScheduleByName",
+			Handler:    _Cereal_GetWorkflowScheduleByName_Handler,
+		},
+		{
+			MethodName: "UpdateWorkflowScheduleByName",
+			Handler:    _Cereal_UpdateWorkflowScheduleByName_Handler,
+		},
+		{
+			MethodName: "GetWorkflowInstanceByName",
+			Handler:    _Cereal_GetWorkflowInstanceByName_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

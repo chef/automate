@@ -3,6 +3,9 @@ syntax = "proto3";
 package chef.automate.infra.cereal;
 option go_package = "github.com/chef/automate/api/interservice/cereal";
 
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
 message Task {
   string name = 1;
   bytes parameters = 2;
@@ -15,6 +18,8 @@ message WorkflowInstance {
   string status = 4;
   bytes parameters = 5;
   bytes payload = 6;
+  bytes result = 7;
+  string err = 8;
 }
 
 message TaskResult {
@@ -98,10 +103,81 @@ message DequeueTaskResponse {
   }
 }
 
+message CreateWorkflowScheduleRequest {
+  string domain = 1;
+  string instance_name = 2;
+  string workflow_name = 3;
+  bytes parameters = 4;
+  bool enabled = 5;
+  string recurrence = 6;
+  bytes payload = 7;
+  google.protobuf.Timestamp next_run_at = 8;
+}
+
+message CreateWorkflowScheduleResponse {}
+
+message ListWorkflowSchedulesRequest { string domain = 1; }
+
+message Schedule {
+  string domain = 1;
+  string instance_name = 2;
+  string workflow_name = 3;
+  bytes parameters = 4;
+  string recurrence = 5;
+  google.protobuf.Timestamp next_due_at = 6;
+  bool enabled = 7;
+
+  google.protobuf.Timestamp last_start = 8;
+  google.protobuf.Timestamp last_end = 9;
+}
+
+message ListWorkflowSchedulesResponse { repeated Schedule schedules = 1; }
+
+message GetWorkflowScheduleByNameRequest {
+  string domain = 1;
+  string instance_name = 2;
+  string workflow_name = 3;
+}
+
+message GetWorkflowScheduleByNameResponse { Schedule schedule = 1; }
+
+message UpdateWorkflowScheduleByNameRequest {
+  string domain = 1;
+  string instance_name = 2;
+  string workflow_name = 3;
+
+  google.protobuf.BoolValue enabled = 4;
+  google.protobuf.BytesValue parameters = 5;
+  google.protobuf.StringValue recurrence = 6;
+  google.protobuf.Timestamp next_run_at = 7;
+}
+
+message UpdateWorkflowScheduleByNameResponse {}
+
+message GetWorkflowInstanceByNameRequest {
+  string domain = 1;
+  string instance_name = 2;
+  string workflow_name = 3;
+}
+
+message GetWorkflowInstanceByNameResponse {
+  WorkflowInstance workflow_instance = 1;
+}
+
 service Cereal {
   rpc EnqueueWorkflow(EnqueueWorkflowRequest) returns (EnqueueWorkflowResponse);
   rpc DequeueWorkflow(stream DequeueWorkflowRequest)
       returns (stream DequeueWorkflowResponse);
   rpc DequeueTask(stream DequeueTaskRequest)
       returns (stream DequeueTaskResponse);
+  rpc CreateWorkflowSchedule(CreateWorkflowScheduleRequest)
+      returns (CreateWorkflowScheduleResponse);
+  rpc ListWorkflowSchedules(ListWorkflowSchedulesRequest)
+      returns (ListWorkflowSchedulesResponse);
+  rpc GetWorkflowScheduleByName(GetWorkflowScheduleByNameRequest)
+      returns (GetWorkflowScheduleByNameResponse);
+  rpc UpdateWorkflowScheduleByName(UpdateWorkflowScheduleByNameRequest)
+      returns (UpdateWorkflowScheduleByNameResponse);
+  rpc GetWorkflowInstanceByName(GetWorkflowInstanceByNameRequest)
+      returns (GetWorkflowInstanceByNameResponse);
 }
