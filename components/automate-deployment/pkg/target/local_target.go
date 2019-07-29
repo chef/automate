@@ -32,10 +32,9 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/services"
 	"github.com/chef/automate/components/automate-deployment/pkg/toml"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/platform/sys"
-
-	"github.com/chef/automate/lib/io/fileutils"
 )
 
 // LocalTarget struct
@@ -50,13 +49,15 @@ type LocalTarget struct {
 
 const HabitatInstallScriptURL = "https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh"
 
-var defaultHabBackoff = 500 * time.Millisecond
-var defaultHabDir = "/hab"
-var habUser = "hab"
-var habGroup = "hab"
-
-var systemdUnitPath = "/usr/lib/systemd/system/"
-var habSupUnitName = "chef-automate.service"
+var (
+	defaultHabBackoff  = 500 * time.Millisecond
+	defaultHabDir      = "/hab"
+	habUser            = "hab"
+	habGroup           = "hab"
+	systemdUnitPath    = "/usr/lib/systemd/system/"
+	habSupUnitName     = "chef-automate.service"
+	habStatusRetryWait = 1 * time.Second
+)
 
 // We must clean up the PID files in ExecStartPre as hab sup term currently does not
 // See https://github.com/habitat-sh/habitat/issues/5045
@@ -83,8 +84,6 @@ Environment = "HAB_LAUNCH_BINARY=%s"
 [Install]
 WantedBy = default.target
 `
-
-var habStatusRetryWait = 1 * time.Second
 
 // The following interfaces are used to allow us to inject mock versions of these
 // in the unit tests.
@@ -341,7 +340,7 @@ func (t *LocalTarget) SetUserToml(name, config string) error {
 		}
 	}()
 
-	_, err = file.Write([]byte(config))
+	_, err = file.WriteString(config)
 	if err != nil {
 		return errors.Wrapf(err, "Error writing config file for service %s", name)
 	}
@@ -895,9 +894,9 @@ func (t *LocalTarget) Disable() error {
 	if err != nil {
 		ctxLog.WithError(err).Error("failed to disable Chef Automate via systemd")
 		return errors.Wrap(err, "failed to disable Chef Automate via systemd disable chef-automate.service")
-	} else {
-		ctxLog.Info("disabled Chef Automate via systemd")
 	}
+
+	ctxLog.Info("disabled Chef Automate via systemd")
 
 	habSupUnitPath := filepath.Join(systemdUnitPath, habSupUnitName)
 	ctxLog = logrus.WithFields(logrus.Fields{
@@ -907,9 +906,9 @@ func (t *LocalTarget) Disable() error {
 	if err != nil {
 		ctxLog.WithError(err).Error("failed to remove hab supervisor systemd unit file")
 		return errors.Wrapf(err, "failed to delete systemd unit file at %s", habSupUnitPath)
-	} else {
-		ctxLog.Info("removed hab supervisor systemd unit file")
 	}
+
+	ctxLog.Info("removed hab supervisor systemd unit file")
 	return nil
 }
 
@@ -931,9 +930,9 @@ func (t *LocalTarget) DestroySupervisor() error {
 	if err != nil {
 		ctxLog.WithError(err).Error("failed to remove hab supervisor files")
 		return errors.Wrapf(err, "failed to delete hab supervisor files at %s", habSupPath)
-	} else {
-		ctxLog.Info("removed hab supervisor files")
 	}
+
+	ctxLog.Info("removed hab supervisor files")
 
 	// rm -rf /hab/user
 	habUserPath := "/hab/user"
@@ -944,10 +943,9 @@ func (t *LocalTarget) DestroySupervisor() error {
 	if err != nil {
 		ctxLog.WithError(err).Error("failed to remove hab user configuration")
 		return errors.Wrapf(err, "failed to delete hab user files at %s", habUserPath)
-	} else {
-		ctxLog.Info("removed hab user configuration")
 	}
 
+	ctxLog.Info("removed hab user configuration")
 	// userdel hab || true
 	return t.ensureHabUserRemoved()
 }
@@ -962,9 +960,9 @@ func (t *LocalTarget) DestroyData() error {
 	if err != nil {
 		ctxLog.WithError(err).Error("failed to remove hab service data")
 		return errors.Wrapf(err, "failed to delete hab service data at %s", habSvcPath)
-	} else {
-		ctxLog.Info("removed hab service data")
 	}
+
+	ctxLog.Info("removed hab service data")
 	return nil
 }
 
@@ -1005,9 +1003,9 @@ func (t *LocalTarget) DestroyPkgCache() error {
 	if err != nil {
 		ctxLog.WithError(err).Error("failed to remove hab files")
 		return errors.Wrapf(err, "failed to delete hab files at %s", habPath)
-	} else {
-		ctxLog.Info("removed hab files")
 	}
+
+	ctxLog.Info("removed hab files")
 	return nil
 }
 
@@ -1506,9 +1504,9 @@ func (t *LocalTarget) ensureHabUserRemoved() error {
 	if err != nil {
 		ctxLog.WithError(err).Error("failed to remove habitat user")
 		return errors.Wrapf(err, "failed to delete habitat user via userdel %s", habUser)
-	} else {
-		ctxLog.Info("deleted hab user")
 	}
+
+	ctxLog.Info("deleted hab user")
 	return nil
 }
 
