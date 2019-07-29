@@ -42,6 +42,11 @@ chef-form-field {
   width: 240px;
 }
 
+// nest? it's only used in chef-form-field
+chef-phat-radio {
+  display: inline-flex;
+}
+
 section {
   chef-button {
     margin: 0;
