@@ -378,3 +378,69 @@ func TestServiceGroupsFilterServiceGroupName(t *testing.T) {
 	assert.Nil(t, err)
 	assertServiceGroupsEqual(t, expected, response)
 }
+
+// This tests out the or-ing together of the same field.
+func TestServiceGroupsFilterServiceGroupNameDouble(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"group:default", "group:test"},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "a.default",
+					Package:          "core/a",
+					Release:          "0.1.0/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+				{
+					Name:             "a.test",
+					Package:          "core/a",
+					Release:          "0.1.0/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+			},
+		}
+		//2 services in different service groups
+		mockHabServices = []*habitat.HealthCheckEvent{
+			NewHabitatEvent(
+				withSupervisorId("sup2"),
+				withServiceGroup("a.default"),
+				withPackageIdent("core/a/0.1.0/20190101121212"),
+				withHealth("UNKNOWN"),
+				withApplication("a_app"),
+				withEnvironment("a_env"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("sup3"),
+				withServiceGroup("a.test"),
+				withPackageIdent("core/a/0.1.0/20190101121212"),
+				withHealth("UNKNOWN"),
+				withApplication("a_app"),
+				withEnvironment("a_env"),
+			),
+		}
+	)
+
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
+}
