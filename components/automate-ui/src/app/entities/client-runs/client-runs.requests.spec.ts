@@ -75,7 +75,7 @@ describe('ClientRunsRequests', () => {
         expectedData.push({'text': i.toString(), 'type': ''});
       }
       const expectedUrl = CONFIG_MGMT_URL + '/suggestions?' +
-      'filter=name:bob&filter=source_fqdn:chef.org&filter=organization:org1&type=name&text=fred';
+      'filter=name:bob&filter=chef_server:chef.org&filter=organization:org1&type=name&text=fred';
 
       const filters: NodeFilter = <NodeFilter>{
         page: 0,
@@ -83,7 +83,7 @@ describe('ClientRunsRequests', () => {
         status: 'success',
         searchBar: [
           {'text': 'bob', 'type': 'name'},
-          {'text': 'chef.org', 'type': 'source_fqdn'},
+          {'text': 'chef.org', 'type': 'chef_server'},
           {'text': 'org1', 'type': 'organization'}]
       };
 
@@ -202,12 +202,12 @@ describe('ClientRunsRequests', () => {
         sortField: 'name',
         sortDirection: 'asc',
         searchBar: [{type: 'platform', text: 'Bla bla platform'},
-         {type: 'source_fqdn', text: 'chefserver1'}, {type: 'organization', text: 'megaOrg'}]
+         {type: 'chef_server', text: 'chefserver1'}, {type: 'organization', text: 'megaOrg'}]
       };
 
       const expectedPath = `${CONFIG_MGMT_URL}/stats/node_counts`;
       const expectedSearch = 'filter=platform:Bla%2520bla%2520platform' +
-        '&filter=source_fqdn:chefserver1' +
+        '&filter=chef_server:chefserver1' +
         '&filter=organization:megaOrg';
       const expectedUrl = `${expectedPath}?${expectedSearch}`;
       const expectedData: NodeCount = {total: 0, success: 0, failure: 0, missing: 0};
@@ -233,12 +233,12 @@ describe('ClientRunsRequests', () => {
 
     it('multiple servers in filter multiple params', () => {
       const result: HttpParams = service.buildURLSearchParams({ searchBar:
-        [{type: 'source_fqdn', text: 'fake.com'}, {type: 'source_fqdn', text: 'example.com'}]});
+        [{type: 'chef_server', text: 'fake.com'}, {type: 'chef_server', text: 'example.com'}]});
 
       expect(2).toEqual(result.getAll('filter').length);
       const elements = result.getAll('filter');
-      expect(elements.indexOf('source_fqdn:fake.com')).toBeGreaterThan(-1);
-      expect(elements.indexOf('source_fqdn:example.com')).toBeGreaterThan(-1);
+      expect(elements.indexOf('chef_server:fake.com')).toBeGreaterThan(-1);
+      expect(elements.indexOf('chef_server:example.com')).toBeGreaterThan(-1);
     });
 
     it('multiple organizations in filter multiple params', () => {

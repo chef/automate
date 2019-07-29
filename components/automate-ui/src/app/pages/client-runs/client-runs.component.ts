@@ -68,7 +68,7 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
       text: 'Chef Organization'
     },
     {
-      type: 'source_fqdn',
+      type: 'chef_server',
       text: 'Chef Server'
     },
     {

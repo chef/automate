@@ -21,7 +21,7 @@ const (
 	ChefTagsSug
 	ErrorSug
 	OrganizationSug
-	SourceFQDNSug
+	ChefServerSug
 )
 
 var suggestionType = map[string]SuggestionType{
@@ -40,7 +40,7 @@ var suggestionType = map[string]SuggestionType{
 	"chef_tags":       ChefTagsSug,
 	"error":           ErrorSug,
 	"organization":    OrganizationSug,
-	"source_fqdn":     SourceFQDNSug,
+	"chef_server":     ChefServerSug,
 }
 
 func ValidSuggestionParam(field string) bool {
