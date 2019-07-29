@@ -131,7 +131,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   }
 
   getEditStatus(rule: Rule): string {
-    return rule.status === 'staged' ? 'Edits pending' : 'Applied';
+    return rule.status === 'STAGED' ? 'Edits pending' : 'Applied';
   }
 
   showDeleteRule(): boolean {
@@ -140,7 +140,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
 
   showProjectLink(): boolean {
     const statusPropertyName = 'status';
-    const ruleStatus: RuleStatus = 'staged';
+    const ruleStatus: RuleStatus = 'STAGED';
     return some([statusPropertyName, ruleStatus], this.rules);
   }
 
