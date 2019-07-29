@@ -32,7 +32,11 @@
       <form [formGroup]="updateForm">
         <chef-form-field>
           <label>Name *</label>
-          <input chefInput formControlName="name" type="text" (keyup)="handleChange()">
+          <input chefInput formControlName="name" type="text">
+          <chef-error *ngIf="updateForm.get('name').hasError('required') && updateForm.get('name').dirty">
+            Name is required.<!-- drop period? -->
+          </chef-error>
+          <!-- error for NON_BLANK validator? -->
         </chef-form-field>
         <chef-form-field>
           <label>Status *</label>
@@ -42,7 +46,7 @@
           </chef-phat-radio>
         </chef-form-field>
       </form>
-      <chef-button primary [disabled]="!updateForm.valid || disableSave || saveInProgress" (click)="saveChange()">
+      <chef-button primary [disabled]="!updateForm.valid || !updateForm.dirty || saveInProgress" (click)="saveChange()">
         <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
         Save
       </chef-button>
