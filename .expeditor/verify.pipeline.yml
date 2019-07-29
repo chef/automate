@@ -490,10 +490,6 @@ steps:
     expeditor:
       executor:
         docker:
-          privileged: true
-          environment:
-            - HAB_STUDIO_SUP=false
-            - HAB_NONINTERACTIVE=true
 
   # TODO(ssd) 2019-03-19: I've added a couple of basic tests here but
   # there are a number of A1 tests we might want to integrate.
@@ -521,7 +517,6 @@ steps:
     expeditor:
       executor:
         docker:
-          privileged: true
           # a1-buildkite has erlang 18 pre-installed
           image: chefes/a1-buildkite
 
