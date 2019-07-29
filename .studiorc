@@ -10,7 +10,7 @@ scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_na
 
 export HAB_ORIGIN=${HAB_ORIGIN:-chef}
 # Bring studio-common to life
-RECOMMENDED_HAB_VERSION="0.77.0"
+RECOMMENDED_HAB_VERSION="0.83.0"
 
 GOLANGCILINTVERSION=1.16.0
 
