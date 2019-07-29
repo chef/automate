@@ -46,10 +46,13 @@
           </chef-phat-radio>
         </chef-form-field>
       </form>
+      <div id="save">
       <chef-button primary [disabled]="!updateForm.valid || !updateForm.dirty || saveInProgress" (click)="saveChange()">
         <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
         Save
       </chef-button>
+      <span id="saved-note" *ngIf="!firstLoad && !updateForm.dirty">All changes saved.</span>
+      </div>
     </section>
   </main>
 </div>

@@ -47,7 +47,8 @@ chef-form-field {
 // nest? it's only used in chef-form-field
 chef-phat-radio {
   chef-option {
-    background-color: transparent; // TODO still looks different
+    background-color: $haze;
+    box-shadow: unset;
     font-size: 0.75em;
     height: auto;
     padding: 0;
@@ -69,5 +70,15 @@ section {
       top: 2px;
       margin-right: 5px;
     }
+  }
+
+  #saved-note {
+    font-size: 0.75em;
+    padding-left: 12px;
+  }
+
+  div#save {
+    display: flex;
+    align-items: center;
   }
 }

@@ -28,6 +28,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
   public updateForm: FormGroup;
   public saveInProgress = false;
+  public firstLoad = true;
 
   constructor(private store: Store<NgrxStateAtom>,
               fb: FormBuilder
@@ -67,6 +68,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
     }
 
     public saveChange(): void {
+      this.firstLoad = false;
       this.saveInProgress = true;
       const name: string = this.updateForm.controls.name.value.trim();
       const active: boolean = this.updateForm.controls.status.value === 'active';
@@ -83,6 +85,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
             pendingSave.next(true);
             pendingSave.complete();
             this.saveInProgress = false;
+            this.updateForm.reset({ name, status: active ? 'active' : 'inactive' });
           }
         });
     }
