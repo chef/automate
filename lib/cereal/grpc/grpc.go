@@ -301,12 +301,6 @@ func (*GrpcBackend) CreateWorkflowSchedule(ctx context.Context, instanceName str
 func (*GrpcBackend) ListWorkflowSchedules(ctx context.Context) ([]*backend.Schedule, error) {
 	return nil, nil
 }
-func (*GrpcBackend) GetDueScheduledWorkflow(ctx context.Context) (*backend.Schedule, backend.ScheduledWorkflowCompleter, error) {
-	return nil, nil, cereal.ErrNoDueWorkflows
-}
-func (*GrpcBackend) GetNextScheduledWorkflow(ctx context.Context) (*backend.Schedule, error) {
-	return nil, cereal.ErrNoScheduledWorkflows
-}
 func (*GrpcBackend) GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string) (*backend.Schedule, error) {
 	return nil, nil
 }
