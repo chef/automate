@@ -10,6 +10,7 @@
 syntax = "proto3";
 
 package license;
+option go_package = "github.com/chef/automate/lib/license";
 
 import "google/protobuf/timestamp.proto";
 

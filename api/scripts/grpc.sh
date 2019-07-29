@@ -10,6 +10,7 @@ IMPORTS=(-I.
          -Ivendor/github.com/grpc-ecosystem/grpc-gateway
          -Ivendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
          -Ivendor/github.com/lyft/protoc-gen-validate
+         -Ilib/license
         )
 
 shopt -s globstar
