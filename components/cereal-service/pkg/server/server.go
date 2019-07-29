@@ -30,7 +30,7 @@ func NewCerealService(ctx context.Context, b backend.Driver) *CerealService {
 
 	if v, ok := b.(backend.SchedulerDriver); ok {
 		cs.workflowScheduler = libcereal.NewWorkflowScheduler(v)
-		cs.workflowScheduler.Run(ctx)
+		go cs.workflowScheduler.Run(ctx)
 	}
 
 	return cs
