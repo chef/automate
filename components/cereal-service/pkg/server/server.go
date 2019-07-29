@@ -38,62 +38,75 @@ func (s *CerealService) EnqueueWorkflow(ctx context.Context, req *cereal.Enqueue
 	return &cereal.EnqueueWorkflowResponse{}, nil
 }
 
+func readDeqWorkReqMsg(ctx context.Context, s cereal.Cereal_DequeueWorkflowServer) (*cereal.DequeueWorkflowRequest, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	type chanMsg struct {
+		Msg *cereal.DequeueWorkflowRequest
+		Err error
+	}
+
+	in := make(chan chanMsg)
+	go func() {
+		defer close(in)
+		// s.Recv will return once it receives a message or its underlying
+		// context is canceled
+		msg, err := s.Recv()
+		select {
+		case <-ctx.Done():
+		case in <- chanMsg{Msg: msg, Err: err}:
+		}
+	}()
+
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	case msg, ok := <-in:
+		if !ok {
+			return nil, errors.New("message not received")
+		}
+		return msg.Msg, msg.Err
+	}
+}
+
+func writeDeqWorkRespMsg(ctx context.Context, s cereal.Cereal_DequeueWorkflowServer, msg *cereal.DequeueWorkflowResponse) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	out := make(chan error)
+	go func() {
+		defer close(out)
+		// s.Send will return once it sends the message or its underlying context
+		// is closed
+		err := s.Send(msg)
+		select {
+		case <-ctx.Done():
+		case out <- err:
+		}
+	}()
+
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case err := <-out:
+		return err
+	}
+}
+
 func (s *CerealService) DequeueWorkflow(req cereal.Cereal_DequeueWorkflowServer) error {
 	ctx, cancel := context.WithTimeout(req.Context(), time.Minute)
 	defer cancel()
 
-	in := make(chan *cereal.DequeueWorkflowRequest)
-	out := make(chan *cereal.DequeueWorkflowResponse)
-
-	// receiver
-	go func() {
-		defer close(in)
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			default:
-			}
-			msg, err := req.Recv()
-			if err != nil {
-				return
-			}
-			select {
-			case <-ctx.Done():
-				return
-			case in <- msg:
-			}
-		}
-	}()
-
-	// sender
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case msg := <-out:
-				if err := req.Send(msg); err != nil {
-					logrus.WithError(err).Error("failed to send msg")
-					cancel()
-					return
-				}
-			}
-		}
-	}()
-
+	// read dequeue message
 	var deqMsg *cereal.DequeueWorkflowRequest_Dequeue
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case msg, ok := <-in:
-		if !ok {
-			return errors.New("problem")
-		}
-		deqMsg = msg.GetDequeue()
-		if deqMsg == nil {
-			return errors.New("invalid msg")
-		}
+	msg, err := readDeqWorkReqMsg(ctx, req)
+	if err != nil {
+		return err
+	}
+	deqMsg = msg.GetDequeue()
+	if deqMsg == nil {
+		return errors.New("invalid msg")
 	}
 
 	evt, completer, err := s.backend.DequeueWorkflow(ctx, deqMsg.GetWorkflowNames())
@@ -117,10 +130,7 @@ func (s *CerealService) DequeueWorkflow(req cereal.Cereal_DequeueWorkflowServer)
 			Result:     evt.TaskResult.Result,
 		}
 	}
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case out <- &cereal.DequeueWorkflowResponse{
+	err = writeDeqWorkRespMsg(ctx, req, &cereal.DequeueWorkflowResponse{
 		Cmd: &cereal.DequeueWorkflowResponse_Dequeue_{
 			Dequeue: &cereal.DequeueWorkflowResponse_Dequeue{
 				Instance: &cereal.WorkflowInstance{
@@ -138,100 +148,115 @@ func (s *CerealService) DequeueWorkflow(req cereal.Cereal_DequeueWorkflowServer)
 				},
 			},
 		},
-	}:
+	})
+	if err != nil {
+		return err
 	}
 
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case msg, ok := <-in:
-		if !ok {
-			logrus.Error("problem")
-			return errors.New("problem")
+	// read workflow completion message
+	msg, err = readDeqWorkReqMsg(ctx, req)
+	if err != nil {
+		return err
+	}
+	if done := msg.GetDone(); done != nil {
+		if err := completer.Done(done.GetResult()); err != nil {
+			return err
 		}
-		logrus.Info("got msg")
-		if done := msg.GetDone(); done != nil {
-			if err := completer.Done(done.GetResult()); err != nil {
-				return err
-			}
-		} else if cont := msg.GetContinue(); cont != nil {
-			for _, task := range cont.GetTasks() {
-				opts := backend.TaskEnqueueOpts{}
-				opts.StartAfter = time.Time{}
-				err := completer.EnqueueTask(&backend.Task{
-					Name:       task.Name,
-					Parameters: task.Parameters,
-				}, opts)
+	} else if cont := msg.GetContinue(); cont != nil {
+		for _, task := range cont.GetTasks() {
+			opts := backend.TaskEnqueueOpts{}
+			opts.StartAfter = time.Time{}
+			err := completer.EnqueueTask(&backend.Task{
+				Name:       task.Name,
+				Parameters: task.Parameters,
+			}, opts)
 
-				if err != nil {
-					return err
-				}
-			}
-
-			if err := completer.Continue(cont.GetPayload()); err != nil {
-				return err
-			}
-		} else if fail := msg.GetFail(); fail != nil {
-			if err := completer.Fail(errors.New(fail.Err)); err != nil {
+			if err != nil {
 				return err
 			}
 		}
+
+		if err := completer.Continue(cont.GetPayload()); err != nil {
+			return err
+		}
+	} else if fail := msg.GetFail(); fail != nil {
+		if err := completer.Fail(errors.New(fail.Err)); err != nil {
+			return err
+		}
+	} else {
+		return errors.New("invalid msg")
 	}
 
 	return nil
 }
 
-func (s *CerealService) DequeueTask(req cereal.Cereal_DequeueTaskServer) error {
-	ctx, cancel := context.WithCancel(req.Context())
+func readDeqTaskReqMsg(ctx context.Context, s cereal.Cereal_DequeueTaskServer) (*cereal.DequeueTaskRequest, error) {
+	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	in := make(chan *cereal.DequeueTaskRequest)
-	out := make(chan *cereal.DequeueTaskResponse)
 
-	// receiver
+	type chanMsg struct {
+		Msg *cereal.DequeueTaskRequest
+		Err error
+	}
+
+	in := make(chan chanMsg)
 	go func() {
 		defer close(in)
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			default:
-			}
-			msg, err := req.Recv()
-			if err != nil {
-				return
-			}
-			in <- msg
+		// s.Recv will return once it receives a message or its underlying
+		// context is canceled
+		msg, err := s.Recv()
+		select {
+		case <-ctx.Done():
+		case in <- chanMsg{Msg: msg, Err: err}:
 		}
 	}()
 
-	// sender
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	case msg, ok := <-in:
+		if !ok {
+			return nil, errors.New("message not received")
+		}
+		return msg.Msg, msg.Err
+	}
+}
+
+func writeDeqTaskRespMsg(ctx context.Context, s cereal.Cereal_DequeueTaskServer, msg *cereal.DequeueTaskResponse) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	out := make(chan error)
 	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case msg := <-out:
-				if err := req.Send(msg); err != nil {
-					logrus.WithError(err).Error("failed to send msg")
-					cancel()
-					return
-				}
-			}
+		defer close(out)
+		// s.Send will return once it sends the message or its underlying context
+		// is closed
+		err := s.Send(msg)
+		select {
+		case <-ctx.Done():
+		case out <- err:
 		}
 	}()
 
-	var deqMsg *cereal.DequeueTaskRequest_Dequeue
 	select {
 	case <-ctx.Done():
 		return ctx.Err()
-	case msg, ok := <-in:
-		if !ok {
-			return errors.New("problem")
-		}
-		deqMsg = msg.GetDequeue()
-		if deqMsg == nil {
-			return errors.New("invalid msg")
-		}
+	case err := <-out:
+		return err
+	}
+}
+
+func (s *CerealService) DequeueTask(req cereal.Cereal_DequeueTaskServer) error {
+	ctx, cancel := context.WithCancel(req.Context())
+	defer cancel()
+
+	msg, err := readDeqTaskReqMsg(ctx, req)
+	if err != nil {
+		return err
+	}
+	deqMsg := msg.GetDequeue()
+	if deqMsg == nil {
+		return errors.New("invalid msg")
 	}
 
 	task, completer, err := s.backend.DequeueTask(ctx, deqMsg.TaskName)
@@ -242,22 +267,7 @@ func (s *CerealService) DequeueTask(req cereal.Cereal_DequeueTaskServer) error {
 		return err
 	}
 
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case <-completer.Context().Done():
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case out <- &cereal.DequeueTaskResponse{
-			Cmd: &cereal.DequeueTaskResponse_Cancel_{
-				Cancel: &cereal.DequeueTaskResponse_Cancel{},
-			},
-		}:
-			return completer.Context().Err()
-		}
-
-	case out <- &cereal.DequeueTaskResponse{
+	err = writeDeqTaskRespMsg(ctx, req, &cereal.DequeueTaskResponse{
 		Cmd: &cereal.DequeueTaskResponse_Dequeue_{
 			Dequeue: &cereal.DequeueTaskResponse_Dequeue{
 				Task: &cereal.Task{
@@ -266,50 +276,45 @@ func (s *CerealService) DequeueTask(req cereal.Cereal_DequeueTaskServer) error {
 				},
 			},
 		},
-	}:
+	})
+	if err != nil {
+		return err
 	}
 
 	logrus.Info("waiting for task complete")
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case <-completer.Context().Done():
-		logrus.WithError(completer.Context().Err()).Info("Trying cancel")
-		select {
-		case <-ctx.Done():
-			logrus.WithError(ctx.Err()).Info("context is done")
-			return ctx.Err()
-		case out <- &cereal.DequeueTaskResponse{
-			Cmd: &cereal.DequeueTaskResponse_Cancel_{
-				Cancel: &cereal.DequeueTaskResponse_Cancel{},
-			},
-		}:
-			logrus.Info("Sending cancel")
-			<-ctx.Done()
+	msg, err = readDeqTaskReqMsg(completer.Context(), req)
+	if err != nil {
+		if completer.Context().Err() != nil {
+			logrus.WithError(completer.Context().Err()).Info("Trying cancel")
+			err = writeDeqTaskRespMsg(ctx, req, &cereal.DequeueTaskResponse{
+				Cmd: &cereal.DequeueTaskResponse_Cancel_{
+					Cancel: &cereal.DequeueTaskResponse_Cancel{},
+				},
+			})
+			if err != nil {
+				return err
+			}
 			return completer.Context().Err()
 		}
+		return err
+	}
 
-	case msg, ok := <-in:
-		if !ok {
-			return errors.New("problem")
-		}
-		if fail := msg.GetFail(); fail != nil {
-			if err := completer.Fail(fail.GetError()); err != nil {
-				if err == libcereal.ErrTaskLost {
-					return status.Error(codes.FailedPrecondition, err.Error())
-				}
-				return err
+	if fail := msg.GetFail(); fail != nil {
+		if err := completer.Fail(fail.GetError()); err != nil {
+			if err == libcereal.ErrTaskLost {
+				return status.Error(codes.FailedPrecondition, err.Error())
 			}
-		} else if succeed := msg.GetSucceed(); succeed != nil {
-			if err := completer.Succeed(succeed.GetResult()); err != nil {
-				if err == libcereal.ErrTaskLost {
-					return status.Error(codes.FailedPrecondition, err.Error())
-				}
-				return err
-			}
-		} else {
-			return errors.New("invalid msg")
+			return err
 		}
+	} else if succeed := msg.GetSucceed(); succeed != nil {
+		if err := completer.Succeed(succeed.GetResult()); err != nil {
+			if err == libcereal.ErrTaskLost {
+				return status.Error(codes.FailedPrecondition, err.Error())
+			}
+			return err
+		}
+	} else {
+		return errors.New("invalid msg")
 	}
 
 	return nil
