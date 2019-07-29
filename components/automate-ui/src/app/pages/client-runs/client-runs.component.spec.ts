@@ -58,7 +58,7 @@ describe('ClientRunsComponent', () => {
       const expected = [
         'attribute', 'cookbook', 'chef_tags', 'chef_version', 'environment', 'name', 'platform',
         'policy_group', 'policy_name', 'policy_revision', 'recipe', 'role', 'resource_name',
-        'error'];
+        'error', 'organization', 'source_fqdn'];
 
       const types = component.categoryTypes.map(type => type.type);
 

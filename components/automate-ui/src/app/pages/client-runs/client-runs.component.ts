@@ -64,6 +64,10 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
       text: 'Chef Client Version'
     },
     {
+      type: 'source_fqdn',
+      text: 'Chef Server'
+    },
+    {
       type: 'chef_tags',
       text: 'Chef Tag'
     },
@@ -82,6 +86,10 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
     {
       type: 'name',
       text: 'Node Name'
+    },
+    {
+      type: 'organization',
+      text: 'Organization'
     },
     {
       type: 'platform',
@@ -178,9 +186,6 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
 
   // The currently viewable nodes
   nodes$: Observable<Node[]>;
-
-  // Is workflow installed
-  isWorkflowEnabled$: Observable<boolean>;
 
   // The direction nodes are sorted
   fieldDirection$: Observable<SortDirection>;
@@ -295,25 +300,9 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
         this.notificationVisible = isError;
       });
 
-    this.isWorkflowEnabled$ = this.store.select(createSelector(clientRunsState,
-      (state) => state.workflowEnabled));
-
     this.columns$ = this.store.select(clientRunsColumns);
 
-    combineLatest(
-      this.store.select(createSelector(
-        state => state.sidebar, (state) => state.selectedOrgs)),
-      this.store.select(createSelector(
-        state => state.sidebar, (state) => state.selectedChefServers)),
-      this.store.select(createSelector(
-        clientRunsState, (state) => state.nodeFilter)))
-      .pipe(
-        map(([selectedOrgs, selectedChefServers, nodeFilter]) => {
-          nodeFilter.organizations = selectedOrgs;
-          nodeFilter.servers = selectedChefServers;
-          return nodeFilter;
-        }))
-      .subscribe(
+    this.store.select(createSelector(clientRunsState, (state) => state.nodeFilter)).subscribe(
         (nodeFilter: NodeFilter) => {
           this.nodeFilter = nodeFilter;
         });

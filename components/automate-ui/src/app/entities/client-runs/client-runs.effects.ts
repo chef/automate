@@ -22,8 +22,6 @@ import {
 import { ClientRunsRequests } from './client-runs.requests';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
-import { SidebarState } from '../../services/sidebar/sidebar.reducer';
-import { ClientRunsEntityState } from './client-runs.reducer';
 
 @Injectable()
 export class ClientRunsEffects {
@@ -38,11 +36,6 @@ export class ClientRunsEffects {
       ofType(ClientRunsActionTypes.GET_NODES),
       withLatestFrom(this.store),
       switchMap(([_action, storeState]) => {
-        const sidebarState: SidebarState = storeState.sidebar;
-        const clientRunsState: ClientRunsEntityState = storeState.clientRunsEntity;
-        const nodeFilter = clientRunsState.nodeFilter;
-        nodeFilter.organizations = sidebarState.selectedOrgs;
-        nodeFilter.servers = sidebarState.selectedChefServers;
         return this.requests.getNodes(storeState.clientRunsEntity.nodeFilter).pipe(
         map(responseNodes => new GetNodesSuccess({ nodes: responseNodes })),
         catchError((error) => of(new GetNodesFailure(error))));

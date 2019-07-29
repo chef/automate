@@ -3,13 +3,7 @@
   <p>Please contact your administrator for permission.</p>
 </div>
 
-<app-server-org-filter-sidebar>
-  <a *ngIf="isWorkflowEnabled$ | async" href="/workflow">
-    <chef-icon class="sidebar-icon" aria-hidden="true">local_shipping</chef-icon>
-    Workflow
-    <chef-icon class="arrow" aria-hidden="true">play_arrow</chef-icon>
-  </a>
-</app-server-org-filter-sidebar>
+<app-client-runs-sidebar></app-client-runs-sidebar>
 
 <div class="container">
   <chef-notification

@@ -80,10 +80,11 @@ describe('ClientRunsRequests', () => {
       const filters: NodeFilter = <NodeFilter>{
         page: 0,
         pageSize: 100,
-        organizations: ['org1'],
-        servers: ['chef.org'],
         status: 'success',
-        searchBar: [{'text': 'bob', 'type': 'name'}]
+        searchBar: [
+          {'text': 'bob', 'type': 'name'},
+          {'text': 'chef.org', 'type': 'source_fqdn'},
+          {'text': 'org1', 'type': 'organization'}]
       };
 
       service.getSuggestions('name', 'fred', filters).subscribe();
@@ -193,16 +194,15 @@ describe('ClientRunsRequests', () => {
     });
   });
 
-  describe('filtering by platform , org an server', () => {
+  describe('filtering by platform , org and server', () => {
     it('encodes the value only once', () => {
       const filters: NodeFilter = <NodeFilter>{
         page: 0,
         pageSize: 100,
         sortField: 'name',
         sortDirection: 'asc',
-        searchBar: [{type: 'platform', text: 'Bla bla platform'}],
-        organizations: ['megaOrg'],
-        servers: ['chefserver1']
+        searchBar: [{type: 'platform', text: 'Bla bla platform'},
+         {type: 'source_fqdn', text: 'chefserver1'}, {type: 'organization', text: 'megaOrg'}]
       };
 
       const expectedPath = `${CONFIG_MGMT_URL}/stats/node_counts`;
@@ -232,8 +232,8 @@ describe('ClientRunsRequests', () => {
     });
 
     it('multiple servers in filter multiple params', () => {
-      const servers = ['fake.com', 'example.com'];
-      const result: HttpParams = service.buildURLSearchParams({ servers });
+      const result: HttpParams = service.buildURLSearchParams({ searchBar:
+        [{type: 'source_fqdn', text: 'fake.com'}, {type: 'source_fqdn', text: 'example.com'}]});
 
       expect(2).toEqual(result.getAll('filter').length);
       const elements = result.getAll('filter');
@@ -242,8 +242,8 @@ describe('ClientRunsRequests', () => {
     });
 
     it('multiple organizations in filter multiple params', () => {
-      const organizations = ['Golds', 'CapitalOne'];
-      const result: HttpParams = service.buildURLSearchParams({ organizations });
+      const result: HttpParams = service.buildURLSearchParams({ searchBar:
+        [{type: 'organization', text: 'Golds'}, {type: 'organization', text: 'CapitalOne'}]});
       const elements = result.getAll('filter');
 
       expect(2).toEqual(result.getAll('filter').length);

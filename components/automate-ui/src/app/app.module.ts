@@ -90,6 +90,9 @@ import { AttributesComponent } from './page-components/attributes/attributes.com
 import { AutomateSettingsComponent } from './pages/automate-settings/automate-settings.component';
 import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
 import {
+  ClientRunsSidebarComponent
+} from './page-components/client-runs-sidebar/client-runs-sidebar.component';
+import {
   ClientRunsSearchBarComponent
 } from './page-components/client-runs-search-bar/client-runs-search-bar.component';
 import {
@@ -208,6 +211,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ApplicationsComponent,
     AttributesComponent,
     ClientRunsComponent,
+    ClientRunsSidebarComponent,
     ClientRunsSearchBarComponent,
     ClientRunsSearchFiltersComponent,
     ClientRunsTableComponent,
