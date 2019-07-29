@@ -6,6 +6,7 @@ package keys
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -21,6 +22,10 @@ type LoadedKeyData map[string][]byte
 
 type LicenseParser struct {
 	keyData LoadedKeyData
+}
+
+type LicenseMetadata struct {
+	ConfiguredAt time.Time
 }
 
 func NewLicenseParser(pub PublicKeysData) *LicenseParser {

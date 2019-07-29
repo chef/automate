@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
@@ -58,7 +57,7 @@ func (s *LicenseControlServer) Policy(ctx context.Context, req *lc.PolicyRequest
 	span, ctx := tracing.StartSpanFromContext(ctx, "policy") // nolint: ineffassign
 	defer span.Finish()
 
-	licenseData, err := s.storage.GetLicense(ctx)
+	licenseData, licenseMetadata, err := s.storage.GetLicense(ctx)
 	switch err.(type) {
 	case *storage.NoLicenseError:
 		return &lc.PolicyResponse{}, nil
@@ -67,7 +66,7 @@ func (s *LicenseControlServer) Policy(ctx context.Context, req *lc.PolicyRequest
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "invalid license in license store: %s", err.Error())
 		}
-		return &lc.PolicyResponse{Policy: generatePolicy(ctx, lic)}, nil
+		return &lc.PolicyResponse{Policy: generatePolicy(ctx, lic, licenseMetadata)}, nil
 	default:
 		return nil, status.Errorf(codes.Internal, "failed to retrieve error from storage backend: %s", err.Error())
 	}
@@ -78,7 +77,7 @@ func (s *LicenseControlServer) License(ctx context.Context, req *lc.LicenseReque
 	span, ctx := tracing.StartSpanFromContext(ctx, "license") // nolint: ineffassign
 	defer span.Finish()
 
-	licenseData, err := s.storage.GetLicense(ctx)
+	licenseData, _, err := s.storage.GetLicense(ctx)
 	switch err.(type) {
 	case *storage.NoLicenseError:
 		return &lc.LicenseResponse{}, nil
@@ -98,7 +97,7 @@ func (s *LicenseControlServer) Status(ctx context.Context, req *lc.StatusRequest
 	span, ctx := tracing.StartSpanFromContext(ctx, "license_status") // nolint: ineffassign
 	defer span.Finish()
 
-	licenseData, err := s.storage.GetLicense(ctx)
+	licenseData, licenseMetadata, err := s.storage.GetLicense(ctx)
 	switch err.(type) {
 	case *storage.NoLicenseError:
 		return &lc.StatusResponse{}, nil
@@ -108,12 +107,8 @@ func (s *LicenseControlServer) Status(ctx context.Context, req *lc.StatusRequest
 			return nil, status.Errorf(codes.Internal, "invalid license in license store: %s", err.Error())
 		}
 
-		policy := generatePolicy(ctx, lic)
+		policy := generatePolicy(ctx, lic, licenseMetadata)
 		licensedPeriod := licensedPeriod(lic)
-		// TODO(ssd) 2019-07-29: This configuredAt field is
-		// strange now, put it in the db? Before it was
-		// basically "when was this license applied or when
-		// did the server last start"
 		return &lc.StatusResponse{
 			LicenseId:    lic.Id,
 			CustomerName: lic.Customer,
@@ -224,7 +219,7 @@ func licensedPeriod(license *lic.License) dateRange {
 
 // Generate a Policy based on a given license. Decoding will be attempted with
 // all available public keys until one is found or the list is exhausted.
-func generatePolicy(ctx context.Context, license *lic.License) *lc.Policy {
+func generatePolicy(ctx context.Context, license *lic.License, metadata keys.LicenseMetadata) *lc.Policy {
 	span, ctx := tracing.StartSpanFromContext(ctx, "generate_policy") // nolint: ineffassign
 	defer span.Finish()
 
@@ -233,7 +228,7 @@ func generatePolicy(ctx context.Context, license *lic.License) *lc.Policy {
 		Valid:        true, // Always true if license and signature check out
 		Capabilities: buildCapabilities(ctx, license.Entitlements),
 		Rules:        buildRules(ctx, license.Entitlements),
-		ConfiguredAt: &timestamp.Timestamp{Seconds: time.Now().Unix()},
+		ConfiguredAt: &timestamp.Timestamp{Seconds: metadata.ConfiguredAt.Unix()},
 	}
 }
 
