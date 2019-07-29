@@ -101,6 +101,9 @@ import {
 import {
   ConvergeRadialGraphComponent
 } from './page-components/converge-radial-graph/converge-radial-graph.component';
+import {
+  CreateV1TeamModalComponent
+} from './page-components/create-v1-team-modal/create-v1-team-modal.component';
 import { DateSelectorComponent } from './page-components/date-selector/date-selector.component';
 import {
   DeletableNodeControlComponent
@@ -184,7 +187,6 @@ import {
   SidebarSelectListComponent
 } from './page-components/sidebar-select-list/sidebar-select-list.component';
 import { SigninComponent } from './pages/signin/signin.component';
-import { TeamCreateComponent } from './pages/team-create/team-create.component';
 import { TeamDetailsComponent } from './pages/team-details/team-details.component';
 import { TeamManagementComponent } from './pages/team-management/team-management.component';
 import {
@@ -212,6 +214,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ClientRunsSearchFiltersComponent,
     ClientRunsTableComponent,
     ConvergeRadialGraphComponent,
+    CreateV1TeamModalComponent,
     DateSelectorComponent,
     DeletableNodeControlComponent,
     DeleteNotificationDialogComponent,
@@ -257,7 +260,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     SettingsLandingComponent,
     SidebarSelectListComponent,
     SigninComponent,
-    TeamCreateComponent,
     TeamDetailsComponent,
     TeamManagementComponent,
     TelemetryCheckboxComponent,

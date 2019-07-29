@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
 import { GetIamVersion } from 'app/entities/policies/policy.actions';
+import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
 
 @Component({
   selector: 'app-admin-sidebar',
@@ -13,8 +14,8 @@ import { GetIamVersion } from 'app/entities/policies/policy.actions';
 })
 
 export class AdminSidebarComponent implements OnInit {
-  public iamMajorVersion$: Observable<string>;
-  public iamMinorVersion$: Observable<string>;
+  public iamMajorVersion$: Observable<IAMMajorVersion>;
+  public iamMinorVersion$: Observable<IAMMinorVersion>;
 
   constructor(
     private store: Store<NgrxStateAtom>

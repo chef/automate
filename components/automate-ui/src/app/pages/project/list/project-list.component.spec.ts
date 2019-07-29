@@ -10,7 +10,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { customMatchers } from 'app/testing/custom-matchers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { ProjectService } from 'app/entities/projects/project.service';
-import { IAMType } from 'app/entities/policies/policy.model';
+import { IAMType, IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
 import { GetProjectsSuccess } from 'app/entities/projects/project.actions';
 import { projectEntityReducer } from 'app/entities/projects/project.reducer';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
@@ -141,23 +141,23 @@ describe('ProjectListComponent', () => {
     });
 
     it('displays project data for v2', () => {
-      component.iamMajorVersion$ = observableOf('v2');
-      component.iamMinorVersion$ = observableOf('v1');
+      component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v2');
+      component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v1');
       fixture.detectChanges();
       expect(element).toContainPath('chef-table');
     });
 
     it('does not display project data for v1', () => {
-      component.iamMajorVersion$ = observableOf('v1');
-      component.iamMinorVersion$ = observableOf('v0');
+      component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v1');
+      component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v0');
       fixture.detectChanges();
       expect(element).not.toContainPath('chef-table');
     });
 
     describe('create modal', () => {
       it('create modal opens upon clicking create button', () => {
-        component.iamMajorVersion$ = observableOf('v2');
-        component.iamMinorVersion$ = observableOf('v1');
+        component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v2');
+        component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v1');
         fixture.detectChanges();
         expect(component.createModalVisible).toBe(false);
         (<HTMLButtonElement>(element.querySelector('#create-button'))).click();
@@ -165,8 +165,8 @@ describe('ProjectListComponent', () => {
       });
 
       it('opening create modal resets name to empty string', () => {
-        component.iamMajorVersion$ = observableOf('v2');
-        component.iamMinorVersion$ = observableOf('v1');
+        component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v2');
+        component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v1');
         fixture.detectChanges();
         component.createProjectForm.controls['name'].setValue('any');
         (<HTMLButtonElement>(element.querySelector('#create-button'))).click();

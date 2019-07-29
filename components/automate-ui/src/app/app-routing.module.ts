@@ -18,7 +18,6 @@ import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { NotificationFormComponent } from './pages/notification-form/notification-form.component';
 import { SigninComponent } from './pages/signin/signin.component';
-import { TeamCreateComponent } from './pages/team-create/team-create.component';
 import { TeamDetailsComponent } from './pages/team-details/team-details.component';
 import { TeamManagementComponent } from './pages/team-management/team-management.component';
 import { UserDetailsComponent } from './pages/user-details/user-details.component';
@@ -88,10 +87,6 @@ const routes: Routes = [
         {
           path: 'teams/:id',
           component: TeamDetailsComponent
-        },
-        {
-          path: 'add-team',
-          component: TeamCreateComponent
         },
         {
           path: 'users',

@@ -32,6 +32,11 @@ export const createStatus = createSelector(
   (state) => state.createStatus
 );
 
+export const createError = createSelector(
+  teamState,
+  (state) => state.createError
+);
+
 export const updateStatus = createSelector(
   teamState,
   (state) => state.updateStatus

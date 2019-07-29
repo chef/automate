@@ -3,22 +3,43 @@
 
 <div class="container">
   <main>
-    <app-delete-object-modal
-      [visible]="modalVisible"
-      objectNoun="team"
-      [objectName]="(iamMajorVersion$ | async) === 'v1' ? teamToDelete?.id : teamToDelete?.name"
-      (close)="closeModal()"
-      (deleteClicked)="deleteTeam()">
-    </app-delete-object-modal>
     <chef-page-header>
       <chef-heading>Teams</chef-heading>
       <chef-subheading>Chef Automate only displays local teams.</chef-subheading>
     </chef-page-header>
+
+    <app-create-v1-team-modal
+      [visible]="createV1TeamModalVisible"
+      [creating]="creatingTeam"
+      [conflictErrorEvent]="conflictErrorEvent"
+      [createForm]="createV1TeamForm"
+      (close)="closeCreateModal()"
+      (createClicked)="createV1Team()">
+    </app-create-v1-team-modal>
+
+    <app-create-object-modal
+      [visible]="createModalVisible"
+      [creating]="creatingTeam"
+      [conflictErrorEvent]="conflictErrorEvent"
+      objectNoun="team"
+      [createForm]="createTeamForm"
+      (close)="closeCreateModal()"
+      (createClicked)="createV2Team()">
+    </app-create-object-modal>
+
+    <app-delete-object-modal
+      [visible]="deleteModalVisible"
+      objectNoun="team"
+      [objectName]="isV1 ? teamToDelete?.id : teamToDelete?.name"
+      (close)="closeDeleteModal()"
+      (deleteClicked)="deleteTeam()">
+    </app-delete-object-modal>
+
     <div class="page-body">
       <section>
         <chef-toolbar>
           <app-authorized [allOf]="['/auth/teams', 'post']">
-            <chef-button primary [routerLink]="['/settings/add-team']">Create Team</chef-button>
+            <chef-button primary (click)="openCreateModal()">Create Team</chef-button>
           </app-authorized>
         </chef-toolbar>
         <div id="table-container">
@@ -26,12 +47,11 @@
             <chef-thead>
               <chef-tr>
                 <chef-th class="id-column">
-                  <span *ngIf="(iamMajorVersion$ | async) === 'v1'">Name</span>
-                  <span *ngIf="(iamMajorVersion$ | async) !== 'v1'">ID</span>
+                  <span>Name</span>
                 </chef-th>
                 <chef-th class="name-column">
-                  <span *ngIf="(iamMajorVersion$ | async) === 'v1'">Description</span>
-                  <span *ngIf="(iamMajorVersion$ | async) !== 'v1'">Name</span>
+                  <span *ngIf="isV1">Description</span>
+                  <span *ngIf="!isV1">ID</span>
                 </chef-th>
                 <chef-th class="button-column"></chef-th>
               </chef-tr>
@@ -40,11 +60,12 @@
               <chef-tr *ngFor="let team of sortedTeams$ | async">
                 <chef-td class="id-column">
                   <!-- we must continue to use the guid as the identifier for teams while on v1 -->
-                  <a *ngIf="(iamMajorVersion$ | async) === 'v1'" [routerLink]="['/settings/teams', team.guid]">{{ team.id }}</a>
-                  <a *ngIf="(iamMajorVersion$ | async) !== 'v1'" [routerLink]="['/settings/teams', team.id]">{{ team.id }}</a>
+                  <a *ngIf="isV1" [routerLink]="['/settings/teams', team.guid]">{{ team.id }}</a>
+                  <a *ngIf="!isV1" [routerLink]="['/settings/teams', team.id]">{{ team.name }}</a>
                 </chef-td>
                 <chef-td class="name-column">
-                  {{ team.name }}
+                  <span *ngIf="isV1">{{ team.name }}</span>
+                  <span *ngIf="!isV1">{{ team.id }}</span>
                 </chef-td>
                 <chef-td class="button-column">
                   <!-- <app-authorized [allOf]="[`/auth/teams/${team.id}`, 'delete']"> -->

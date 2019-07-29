@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { HttpStatus } from 'app/types/types';
 import { CreateNotification } from '../notifications/notification.actions';
 import { Type } from '../notifications/notification.model';
 import { iamMajorVersion } from 'app/entities/policies/policy.selectors';
@@ -145,7 +146,9 @@ export class TeamEffects {
 
   @Effect()
   createTeamFailure$ = this.actions$.pipe(
-    ofType(TeamActionTypes.CREATE_FAILURE),
+    ofType<CreateTeamFailure>(TeamActionTypes.CREATE_FAILURE),
+    // ID conflict handled in the modal, see team-management.component.ts
+    filter(({ payload: { status } }) => status !== HttpStatus.CONFLICT),
     map(({ payload }: CreateTeamFailure) => {
       const msg = payload.error.error;
       return new CreateNotification({

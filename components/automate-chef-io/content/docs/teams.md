@@ -33,21 +33,25 @@ export TOK=`chef-automate admin-token`
 
 #### Create a Team from Chef Automate
 
-As an administrative user, you can create a team in the UI from the **Settings** tab. Select _Teams_ in the sidebar then use the **Add Team** button:
+As an administrative user, you can create a team in the UI from the **Settings** tab. Select _Teams_ in the sidebar, and then use the **Create Team** button:
 
-![Add Local Team](/images/docs/admin-tab-teams-list.png)
+![Create Local Team](/images/docs/admin-tab-teams-list.png)
 
 First, enter a unique name and description for the team. Save your new team:
 
-![Create Team](/images/docs/admin-tab-team-add.png)
+![Create Team](/images/docs/admin-tab-team-create.png)
 
 Upon creating the team, you'll be taken to the new team's details page:
 
-![Team Details](/images/docs/admin-tab-team-edit.png)
+![Team Details](/images/docs/admin-tab-team-details.png)
 
 Add users to the new team:
 
 ![Add Users](/images/docs/admin-tab-team-add-users.png)
+
+Edit the team name:
+
+![Edit Team](/images/docs/admin-tab-team-edit.png)
 
 Now, you can [create a new policy]({{< ref "authorization-overview.md#common-use-cases" >}}) for your team. All members will now have additional access based on that new policy.
 

@@ -1,14 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
+import { Router } from '@angular/router';
+import { Store, select } from '@ngrx/store';
 import { identity, keyBy, at } from 'lodash/fp';
 import { combineLatest, Observable, Subject } from 'rxjs';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams, routeURL } from 'app/route.selectors';
-import { Regex } from 'app/helpers/auth/regex';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus, loading } from 'app/entities/entities';
 import { User, HashMapOfUsers } from 'app/entities/users/user.model';
 import { allUsers, userStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
@@ -17,6 +17,7 @@ import {
   v1TeamFromRoute,
   v2TeamFromRoute,
   teamUsers,
+  getStatus,
   getUsersStatus,
   updateStatus
 } from 'app/entities/teams/team.selectors';
@@ -29,8 +30,11 @@ import {
   RemoveTeamUsers,
   UpdateTeam
 } from 'app/entities/teams/team.actions';
+import { Regex } from 'app/helpers/auth/regex';
 
 const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
+
+export type TeamTabName = 'users' | 'details';
 
 @Component({
   selector: 'app-team-details',
@@ -38,12 +42,16 @@ const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
   styleUrls: ['./team-details.component.scss']
 })
 export class TeamDetailsComponent implements OnInit, OnDestroy {
-
+  public updateNameForm: FormGroup;
+  // isLoading represents the initial load as well as subsequent updates in progress.
+  public isLoading = true;
+  public saving = false;
+  public saveSuccessful = false;
+  public tabValue: TeamTabName = 'users';
+  public url: string;
   public teamMembershipView = false;
-  public editMode = false;
   public team: Team;
-  public editForm: FormGroup;
-  private isV1 = true;
+  public isV1 = true;
 
   public sortedUsers$: Observable<User[]>;
   private isDestroyed = new Subject<boolean>();
@@ -52,20 +60,43 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public removeText = 'Remove User';
 
   constructor(private store: Store<NgrxStateAtom>,
-    private fb: FormBuilder
+    public fb: FormBuilder,
+    private router: Router
   ) {
-    this.createForms(this.fb);
+    this.updateNameForm = fb.group({
+      // Must stay in sync with error checks in team-details.component.html
+      name: ['Loading...', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+    });
+
+    combineLatest(
+      this.store.select(getStatus),
+      this.store.select(updateStatus)
+    ).pipe(
+      takeUntil(this.isDestroyed),
+      map(([gStatus, uStatus]) => {
+        this.isLoading =
+          (gStatus !== EntityStatus.loadingSuccess) ||
+          (uStatus === EntityStatus.loading);
+      })
+    ).subscribe();
   }
 
   private get teamId(): string {
     return this.isV1 ? this.team.guid : this.team.id;
   }
 
-  public get versionedDescOrName(): string {
+  public get descriptionOrName(): string {
     return this.isV1 ? 'description' : 'name';
   }
 
   ngOnInit(): void {
+    this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
+      .subscribe((url: string) => {
+        this.url = url;
+        const [, fragment] = url.split('#');
+        // goes to #users if (1) explicit #users, (2) no fragment, or (3) invalid fragment
+        this.tabValue = (fragment === 'details') ? 'details' : 'users';
+      });
     this.store.select(iamMajorVersion)
       .pipe(takeUntil(this.isDestroyed))
       .subscribe((version) => {
@@ -134,12 +165,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
             }
           });
       });
-
-    this.store.select(updateStatus).pipe(
-      takeUntil(this.isDestroyed))
-      .subscribe((state: EntityStatus) => {
-        this.handleSave(state);
-      });
  }
 
   ngOnDestroy() {
@@ -147,15 +172,9 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  private createForms(fb: FormBuilder): void {
-    this.editForm = fb.group({
-      // Must stay in sync with error checks in team-details.component.html
-      teamName: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
-    });
-  }
-
   private getUsersForTeam(team: Team) {
     this.team = team;
+    this.updateNameForm.controls.name.setValue(this.team.name);
     this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
     this.store.dispatch(new GetUsers());
   }
@@ -165,14 +184,13 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   }
 
   addUsers(users: HashMapOfUsers): void {
-    this.toggleUserMembershipView();
-
     const userIDs = Object.values(users).map((user: User) => user.membership_id);
 
     this.store.dispatch(new AddTeamUsers(<TeamUserMgmtPayload>{
       id: this.teamId,
       user_ids: userIDs
     }));
+    this.toggleUserMembershipView();
   }
 
   removeUser(user: User): void {
@@ -182,23 +200,34 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     }));
   }
 
-  updateTeam(): void {
-    const newTeam = <Team>Object.assign(
-      {}, this.team, { name: this.editForm.get('teamName').value });
-    this.store.dispatch(new UpdateTeam(newTeam));
+  public keyPressed() {
+    this.saveSuccessful = false;
   }
 
-  setEditMode(isEditMode: boolean): void {
-    this.editForm.patchValue(
-      {
-        teamName: this.team.name
+  public saveNameChange(): void {
+    this.saveSuccessful = false;
+    this.saving = true;
+    const name: string = this.updateNameForm.controls.name.value.trim();
+    this.store.dispatch(new UpdateTeam({ ...this.team, name }));
+
+    const pendingSave = new Subject<boolean>();
+    this.store.pipe(
+      select(updateStatus),
+      filter(identity),
+      takeUntil(pendingSave))
+      .subscribe((state) => {
+        if (!loading(state)) {
+          pendingSave.next(true);
+          pendingSave.complete();
+          this.saving = false;
+          this.saveSuccessful = (state === EntityStatus.loadingSuccess);
+        }
       });
-    this.editMode = isEditMode;
   }
 
-  handleSave(state: EntityStatus): void {
-    if (state === EntityStatus.loadingSuccess) {
-      this.editMode = false;
-    }
+  onSelectedTab(event): void {
+    this.tabValue = event.target.value;
+    // Current URL sans any now outdated fragment.
+    this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
 }
