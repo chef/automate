@@ -22,6 +22,7 @@ chef-page {
   }
 
   #create-name,
+  #create-id,
   #create-type,
   #create-type-dropdown {
     width: 340px;
@@ -32,8 +33,13 @@ chef-page {
     padding-top: 9px;
   }
 
-  #create-type {
+  #create-id,
+  #create-id-static {
     padding-top: 26px;
+  }
+
+  #create-type {
+    padding-top: 20px;
   }
 
   #condition-section {
@@ -50,10 +56,18 @@ chef-page {
     }
   }
 
-  .label {
+  .label, .key-label {
     font-size: 14px;
     font-weight: 600;
     padding-bottom: 0;
+  }
+
+  .key-label {
+    display: inline-block;
+  }
+
+  .key-value {
+    font-size: 14px;
   }
 
   .condition-item {

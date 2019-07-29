@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -8,8 +8,10 @@ import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
-import { EntityStatus, loading } from 'app/entities/entities';
+import { HttpStatus } from 'app/types/types';
+import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Regex } from 'app/helpers/auth/regex';
+import { EntityStatus, loading } from 'app/entities/entities';
 import {
   Rule, RuleTypeMappedObject, Condition, ConditionOperator, KVPair
 } from 'app/entities/rules/rule.model';
@@ -17,7 +19,7 @@ import {
   GetRule, GetRulesForProject, CreateRule, UpdateRule
 } from 'app/entities/rules/rule.actions';
 import {
-  getRuleAttributes, getStatus, updateStatus, ruleFromRoute
+  getRuleAttributes, getStatus, updateStatus, ruleFromRoute, createError, createStatus
 } from 'app/entities/rules/rule.selectors';
 import { projectFromRoute } from 'app/entities/projects/project.selectors';
 import { Project } from 'app/entities/projects/project.model';
@@ -39,6 +41,12 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   public attributes: RuleTypeMappedObject;
   public editingRule = false;
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
+
+  // Whether the edit ID form is open or not.
+  public modifyID = false;
+  public conflictError = false;
+  // This element assumes 'id' is the only create field that can conflict.
+  private conflictErrorEvent = new EventEmitter<boolean>();
 
   // These constants ensure type safety
   private equals_op: ConditionOperator = 'EQUALS';
@@ -114,9 +122,17 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.conflictErrorEvent.subscribe((isConflict: boolean) => {
+      this.conflictError = isConflict;
+      // Open the ID input on conflict so user can resolve it.
+      this.modifyID = true;
+    });
+
     this.ruleForm = this.fb.group({
       // Must stay in sync with error checks in project-rules.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      id: ['',
+        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]],
       type: [{ value: this.rule.type || '', disabled: this.editingRule } , Validators.required],
       conditions: this.fb.array(this.populateConditions())
     });
@@ -191,7 +207,6 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   }
 
   createRule() {
-    // TODO: Generate the id!
     this.store.dispatch(
       new CreateRule({
         project_id: this.project.id,
@@ -222,7 +237,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     });
     return <Rule>{
       project_id: this.project.id,
-      id: this.rule.id,
+      id: ruleValue.id,
       name: ruleValue.name,
       type: ruleValue.type,
       status: 'staged',
@@ -230,12 +245,14 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     };
   }
 
+  // TODO: Leveraged much from ID section of create-object-modal... make a shared component...?
   saveRule() {
     if (this.ruleForm.valid) {
       this.saving = true;
       this.rule.id ? this.updateRule() : this.createRule(); // TODO
+      const selector = this.rule.id ? updateStatus : createStatus;
       const pendingSave = new Subject<boolean>();
-      this.store.select(updateStatus).pipe(
+      this.store.select(selector).pipe(
         filter(identity),
         takeUntil(pendingSave))
         .subscribe((state) => {
@@ -243,9 +260,46 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
             pendingSave.next(true);
             pendingSave.complete();
             this.saving = false;
-            this.closePage();
+            if (state === EntityStatus.loadingSuccess) {
+              this.closePage();
+            } else if (state === EntityStatus.loadingFailure) {
+            const pendingCreateError = new Subject<boolean>();
+            this.store.select(createError).pipe(
+              filter(identity),
+              takeUntil(pendingCreateError))
+              .subscribe((error) => {
+                pendingCreateError.next(true);
+                pendingCreateError.complete();
+                if (error.status === HttpStatus.CONFLICT) {
+                  this.conflictErrorEvent.emit(true);
+                } else {
+                  // Close on any error other than conflict and display in banner.
+                  this.closePage();
+                }
+            });
+            }
           }
         });
     }
   }
+
+  public handleNameInput(event: KeyboardEvent): void {
+    if (!this.modifyID && !this.isNavigationKey(event)) {
+      this.conflictError = false;
+      this.ruleForm.controls.id.setValue(
+        IdMapper.transform(this.ruleForm.controls.name.value.trim()));
+    }
+  }
+
+  handleIDInput(event: KeyboardEvent): void {
+    if (this.isNavigationKey(event)) {
+      return;
+    }
+    this.conflictError = false;
+  }
+
+  private isNavigationKey(event: KeyboardEvent): boolean {
+    return event.key === 'Shift' || event.key === 'Tab';
+  }
+
 }

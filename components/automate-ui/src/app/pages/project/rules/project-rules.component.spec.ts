@@ -167,6 +167,7 @@ describe('ProjectRulesComponent', () => {
 
     it('should enable submit when valid', () => {
       component.ruleForm.get('name').setValue('My Rule');
+      component.ruleForm.get('id').setValue('my-rule');
       component.ruleForm.get('type').setValue('NODE');
       const operator: ConditionOperator  = 'EQUALS';
       component.ruleForm.get('conditions').setValue([

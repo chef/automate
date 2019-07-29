@@ -40,9 +40,6 @@ export class RuleRequests {
     // return this.http.post<RuleSuccessPayload>(
     //   `${env.auth_v2_url}/project/${project_id}/rules`,
     //   { rule });
-    rule.id = `rule-${this.rules.length}`;
-    rule.project_id = project_id;
-    rule.status = 'staged';
     this.rules.push(rule);
     return of({ rule: rule });
   }

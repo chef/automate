@@ -14,12 +14,40 @@
         <chef-form-field id="create-name">
           <label>
             <span class="label">Rule Name <span aria-hidden="true">*</span></span>
-            <chef-input ngDefaultControl formControlName="name"></chef-input>
+            <chef-input ngDefaultControl formControlName="name" (keyup)="handleNameInput($event)"></chef-input>
           </label>
           <chef-error
             *ngIf="(ruleForm.get('name').hasError('required') || ruleForm.get('name').hasError('pattern')) && ruleForm.get('name').dirty"
           >Rule Name is required.</chef-error>
         </chef-form-field>
+
+        <div *ngIf="modifyID">
+          <chef-form-field id="create-id">
+            <label>
+              <span class="label">ID <span aria-hidden="true">*</span> </span>
+              <chef-input ngDefaultControl formControlName="id" (keyup)="handleIDInput($event)"></chef-input>
+            </label>
+            <chef-error *ngIf="ruleForm.controls['id'].hasError('maxlength')">
+              ID must be 64 characters or less.
+            </chef-error>
+            <chef-error *ngIf="ruleForm.controls['id'].hasError('required')">
+              ID is required.
+            </chef-error>
+            <chef-error *ngIf="ruleForm.controls['id'].hasError('pattern')">
+              Only lowercase letters, numbers, and hyphens(-) are allowed.
+            </chef-error>
+            <chef-error *ngIf="conflictError">
+              IDs must be unique--Rule with ID "{{ruleForm.controls.id.value}}" already exists.
+            </chef-error>
+          </chef-form-field>
+          <small class="help">Rule IDs are unique, permanent, and cannot be changed later.</small>
+        </div>
+        <div *ngIf="!modifyID" id="create-id-static">
+          <span class="key-label">ID:&nbsp;</span><span class="key-value">{{ this.ruleForm.value.id }}</span>
+          <chef-toolbar>
+            <chef-button tertiary (click)="modifyID=true;">Edit ID</chef-button>
+          </chef-toolbar>
+        </div>
 
         <chef-form-field id="create-type">
           <label>
@@ -41,11 +69,11 @@
           <chef-button primary (click)="addCondition()">Add Condition</chef-button>
 
           <div id="condition-list" formArrayName="conditions">
-  
+
             <div class="condition-item"
               [formGroupName]="i"
               *ngFor="let condition of ruleForm.get('conditions').controls; let i = index">
-  
+
               <chef-form-field class="attribute-field">
                 <label>
                   <span class="label">{{ getAttributeLabel() }}</span>
@@ -60,7 +88,7 @@
                   *ngIf="ruleForm.get('conditions').controls[i].get('attribute').hasError('required') && ruleForm.get('conditions').controls[i].get('attribute').touched"
                 >Attribute is required.</chef-error>
               </chef-form-field>
-  
+
               <chef-form-field class="attribute-field">
                 <label>
                   <span class="label">Operator</span>
@@ -74,7 +102,7 @@
                   *ngIf="ruleForm.get('conditions').controls[i].get('operator').hasError('required') && ruleForm.get('conditions').controls[i].get('operator').touched"
                 >Operator is required.</chef-error>
               </chef-form-field>
-  
+
               <chef-form-field class="attribute-field">
                 <label>
                   <span class="label">Value</span>
@@ -95,14 +123,14 @@
                     Comma-separated list, at least one must match exactly.
                 </small>
               </chef-form-field>
-  
+
               <div class="end-row-items">
                 <span *ngIf="showAndLabel(i)" class="label">AND</span>
                 <chef-button tertiary *ngIf="showDelete()" (click)="deleteCondition(i)">
                   <chef-icon>delete</chef-icon>
                 </chef-button>
               </div>
-  
+
             </div>
           </div>
         </div>

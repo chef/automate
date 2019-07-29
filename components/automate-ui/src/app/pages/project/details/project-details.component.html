@@ -66,6 +66,7 @@
             <chef-thead>
               <chef-tr>
                 <chef-th>Name</chef-th>
+                <chef-th>ID</chef-th>
                 <chef-th>Resource Type</chef-th>
                 <chef-th>Conditions</chef-th>
                 <chef-th>Edits</chef-th>
@@ -77,6 +78,7 @@
                 <chef-td>
                   <a [routerLink]="['/settings', 'projects', project?.id, 'rules', rule.id]">{{ rule.name }}</a>
                 </chef-td>
+                <chef-td>{{ rule.id }}</chef-td>
                 <chef-td>{{ rule.type | titlecase }}</chef-td>
                 <chef-td>{{ rule.conditions.length | pluralize : 'condition' : 's' }}</chef-td>
                 <chef-td>{{ getEditStatus(rule) }}</chef-td>
