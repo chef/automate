@@ -54,6 +54,7 @@ import (
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/io/chunks"
 	"github.com/chef/automate/lib/platform"
+	"github.com/chef/automate/lib/product"
 	"github.com/chef/automate/lib/secrets"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/tls/certs"
@@ -411,6 +412,7 @@ func (s *server) configRenderer() (ConfigRenderer, error) {
 		logrus.WithError(err).Error("Could not render platform config")
 		return nil, errors.Wrap(err, "Could not render platform config")
 	}
+
 	return func(service *deployment.Service) (string, error) {
 		rootCert := s.deployment.CA().RootCert()
 		creds := &config.TLSCredentials{
@@ -437,7 +439,14 @@ func (s *server) configRenderer() (ConfigRenderer, error) {
 			return "", errors.Wrapf(err, "could not converge %s configuration to TOML", service.Name())
 		}
 
-		if usesPlatformScaffolding(service) {
+		pkgsMeta := make([]*product.PackageMetadata, 0, len(s.deployment.ExpectedServices))
+		for _, e := range s.deployment.ExpectedServices {
+			if metadata := services.MetadataForPackage(e.Name()); metadata != nil {
+				pkgsMeta = append(pkgsMeta, metadata)
+			}
+		}
+
+		if usesPlatformScaffolding(service, pkgsMeta) {
 			return fmt.Sprintf("%s\n%s", string(bytes), platformConfigToml), nil
 		} else {
 			return string(bytes), nil
@@ -445,12 +454,11 @@ func (s *server) configRenderer() (ConfigRenderer, error) {
 	}, nil
 }
 
-func usesPlatformScaffolding(service *deployment.Service) bool {
-	//TODO (jaym): find a better way to get this information
-	switch service.Name() {
-	case "secrets-service", "pg-sidecar-service", "teams-service", "authz-service", "session-service", "automate-dex",
-		"authn-service", "compliance-service", "nodemanager-service", "notifications-service", "applications-service",
-		"automate-cs-bookshelf", "automate-cs-oc-erchef", "automate-cs-oc-bifrost", "ingest-service", "license-control-service":
+func usesPlatformScaffolding(service *deployment.Service, pkgsMeta []*product.PackageMetadata) bool {
+	for _, metadata := range pkgsMeta {
+		if service.Name() != metadata.Name.Name || !metadata.UsesPlatformScaffolding {
+			continue
+		}
 		return true
 	}
 	return false

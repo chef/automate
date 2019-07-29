@@ -1,0 +1,4 @@
+{
+  "name": "chef/ingest-service",
+  "uses_platform_scaffolding": true
+}
