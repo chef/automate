@@ -25,7 +25,7 @@
       </chef-button>
     </div>
   </div>
-  <div *ngIf="suggestionsVisible && selectedCategoryType && search_box.value.length > 0"
+  <div *ngIf="suggestionsVisible && selectedCategoryType && (search_box.value.length > 0 || hasStaticSuggestions())"
     class="input-dropdown suggestions">
     <ul>
       <li *ngIf="isLoadingSuggestions" class="suggestion-status">
@@ -41,7 +41,13 @@
         (keyup)="handleInput($event.key, hint)"
         class="list-item category
               {{ highlightedIndex === i ? 'selected' : '' }}">
-        {{ hint }}
+        <div *ngIf="hint.icon">
+          <div class="suggestion-name-with-icon">{{hint.title}}</div>
+          <chef-icon> {{hint.icon}} </chef-icon>
+        </div>
+        <div *ngIf="!hint.icon" >
+          <div>{{hint.title}}</div>
+        </div>
       </li>
     </ul>
   </div>
@@ -51,13 +57,13 @@
             class="no-category-items">
           Not a Valid Filter Category
       </li>
-      <li *ngFor="let suggestion of visibleCategories.toJS(); let i = index"
-          (click)="handleCategoryItemClick(suggestion, $event)"
+      <li *ngFor="let category of visibleCategories.toJS(); let i = index"
+          (click)="handleCategoryItemClick(category, $event)"
           (mouseenter)="handleCategoryItemOnMouseOver(i)"
           class="list-item category
-                  {{ suggestion.type }}
+                  {{ category.type }}
                   {{ highlightedIndex == i ? 'selected' : '' }}">
-        {{ suggestion.text }}
+        {{ category.text }}
         <chef-icon>add</chef-icon>
       </li>
     </ul>

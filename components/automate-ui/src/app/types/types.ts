@@ -66,6 +66,12 @@ export interface Chicklet {
   type: string;
 }
 
+export interface SearchBarCategoryItem {
+  text: string;
+  type: string;
+  providedValues?: any[];
+}
+
 export interface NodeFilter {
   attribute?: string;
   compliance?: RollupCompliance;
@@ -649,8 +655,8 @@ export interface SidebarFilter {
 }
 
 export interface EventFeedFilter {
-  entityType?: Array<string>;
   requestorName?: string;
+  searchBar?: Array<Chicklet>;
   task?: string;
   collapse?: boolean;
   pageSize?: number;

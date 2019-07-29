@@ -27,8 +27,8 @@
 
         <app-client-runs-search-bar
           [numberOfFilters]="numberOfSearchBarFilters$ | async"
-          [filterTypes]="categoryTypes"
-          [filterValues]="nodeSuggestions$ | async"
+          [categories]="categoryTypes"
+          [dynamicSuggestions]="nodeSuggestions$ | async"
           (suggestValues)="onSuggestValues($event)"
           (itemSelected)="onFilterAdded($event)"
           (filtersButtonClick)="toggleFilters()">

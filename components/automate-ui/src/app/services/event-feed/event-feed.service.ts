@@ -1,9 +1,9 @@
 import { map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of as observableOf } from 'rxjs';
 
-import { reduce } from 'lodash/fp';
+import { reduce, includes, concat } from 'lodash/fp';
 import { sortBy } from 'lodash';
 import { ChefEvent,
   RespChefEvent,
@@ -18,11 +18,17 @@ import { ChefEvent,
   EventTypeCount,
   EventTaskCount,
   ChefEventCollection,
-  SidebarFilter
+  Chicklet
 } from '../../types/types';
 import { environment } from '../../../environments/environment';
 import * as moment from 'moment';
 const GATEWAY_URL = environment.gateway_url;
+const CONFIG_MGMT_URL = environment.config_mgmt_url;
+const ENTITY_TYPE_TAG = 'entity_type';
+const ENTITY_TYPE_DATA_BAG_ITEM_TAG = 'item';
+const ENTITY_TYPE_DATA_BAG_TAG = 'bag';
+const ENTITY_TYPE_COOKBOOK_TAG = 'cookbook';
+const ENTITY_TYPE_COOKBOOK_VERSION_TAG = 'version';
 
 @Injectable()
 export class EventFeedService {
@@ -30,12 +36,11 @@ export class EventFeedService {
     private httpClient: HttpClient
   ) {}
 
-  getEventFeed(filters: EventFeedFilter,
-    sidebarFilter: SidebarFilter): Observable<ChefEventCollection> {
+  getEventFeed(filters: EventFeedFilter): Observable<ChefEventCollection> {
     const url = `${GATEWAY_URL}/eventfeed`;
 
     const options = {
-      params: this.buildEventFeedURLSearchParams(filters, sidebarFilter, null)
+      params: this.buildEventFeedURLSearchParams(filters, null)
     };
 
     return this.httpClient
@@ -43,12 +48,12 @@ export class EventFeedService {
       map((res) => this.convertResponseToChefEvents(res)));
   }
 
-  loadMoreEventFeed(filters: EventFeedFilter, sidebarFilter: SidebarFilter,
+  loadMoreEventFeed(filters: EventFeedFilter,
     lastEvent: ChefEvent): Observable<ChefEventCollection> {
     const url = `${GATEWAY_URL}/eventfeed`;
 
     const options = {
-      params: this.buildEventFeedURLSearchParams(filters, sidebarFilter, lastEvent)
+      params: this.buildEventFeedURLSearchParams(filters, lastEvent)
     };
 
     return this.httpClient
@@ -56,12 +61,11 @@ export class EventFeedService {
       map((res) => this.convertResponseToChefEvents(res)));
   }
 
-  getEventTypeCount(filters: EventFeedFilter,
-    sidebarFilter: SidebarFilter): Observable<EventTypeCount> {
+  getEventTypeCount(filters: EventFeedFilter): Observable<EventTypeCount> {
     const url = `${GATEWAY_URL}/event_type_counts`;
 
     const options = {
-      params: this.buildEventTypeCountsURLSearchParams(filters, sidebarFilter)
+      params: this.buildEventTypeCountsURLSearchParams(filters)
     };
 
     return this.httpClient
@@ -69,12 +73,11 @@ export class EventFeedService {
       map((respCounts) => new EventTypeCount(respCounts)));
   }
 
-  getEventTaskCount(filters: EventFeedFilter,
-    sidebarFilter: SidebarFilter): Observable<EventTaskCount> {
+  getEventTaskCount(filters: EventFeedFilter): Observable<EventTaskCount> {
     const url = `${GATEWAY_URL}/event_task_counts`;
 
     const options = {
-      params: this.buildEventTaskCountsURLSearchParams(filters, sidebarFilter)
+      params: this.buildEventTaskCountsURLSearchParams(filters)
     };
 
     return this.httpClient
@@ -84,12 +87,27 @@ export class EventFeedService {
     }));
   }
 
-  getGuitarStrings(filters: EventFeedFilter,
-    sidebarFilter: SidebarFilter): Observable<GuitarStringCollection> {
+  getSuggestions(type: string, text: string): Observable<string[]> {
+    if (text && text.length > 0) {
+      if ( type === 'organization' || type === 'chef_server' ) {
+        const params = new HttpParams().set('type', type).set('text', text);
+        const url = `${CONFIG_MGMT_URL}/suggestions`;
+
+        return this.httpClient.get<Chicklet[]>(url, {params}).pipe(map((suggestions: Chicklet[]) =>
+          suggestions.map(item => item.text)));
+      } else {
+        console.error('Currently do not support ' + type + ' type');
+      }
+    } else {
+      return observableOf([]);
+    }
+  }
+
+  getGuitarStrings(filters: EventFeedFilter): Observable<GuitarStringCollection> {
     const url = `${GATEWAY_URL}/eventstrings`;
 
     const options = {
-      params: this.buildEventStringsURLSearchParams(filters, sidebarFilter)
+      params: this.buildEventStringsURLSearchParams(filters)
     };
 
     return this.httpClient
@@ -142,30 +160,11 @@ export class EventFeedService {
     return new ChefEventCollection(events, respEventCollection.total_events);
   }
 
-  private buildEventTaskCountsURLSearchParams(filters: EventFeedFilter,
-    sidebarFilter: SidebarFilter): HttpParams {
+  private buildEventTaskCountsURLSearchParams(filters: EventFeedFilter): HttpParams {
     let searchParam: HttpParams = new HttpParams();
 
-    if (sidebarFilter.servers) {
-      searchParam = reduce((param, server) => param.append('filter', `source_fqdn:${server}`),
-                           searchParam,
-                           sidebarFilter.servers);
-    }
-
-    if (sidebarFilter.organizations) {
-      searchParam = reduce((param, org) => param.append('filter', `organization:${org}`),
-                           searchParam,
-                           sidebarFilter.organizations);
-    }
-
-    if (filters.entityType) {
-      if (filters.entityType instanceof Array) {
-        searchParam = reduce((param, eType) => param.append('filter', `entity_type:${eType}`),
-                             searchParam,
-                             filters.entityType);
-      } else {
-        searchParam = searchParam.append('filter', `entity_type:${filters.entityType}`);
-      }
+    if (filters.searchBar) {
+      searchParam = this.flattenSearchBar(filters.searchBar, searchParam);
     }
 
     if (filters.startDate) {
@@ -182,20 +181,11 @@ export class EventFeedService {
     return searchParam;
   }
 
-  private buildEventTypeCountsURLSearchParams(filters: EventFeedFilter,
-    sidebarFilter: SidebarFilter): HttpParams {
+  private buildEventTypeCountsURLSearchParams(filters: EventFeedFilter): HttpParams {
     let searchParam: HttpParams = new HttpParams();
 
-    if (sidebarFilter.servers) {
-      searchParam = reduce((param, server) => param.append('filter', `source_fqdn:${server}`),
-                           searchParam,
-                           sidebarFilter.servers);
-    }
-
-    if (sidebarFilter.organizations) {
-      searchParam = reduce((param, org) => param.append('filter', `organization:${org}`),
-                           searchParam,
-                           sidebarFilter.organizations);
+    if (filters.searchBar) {
+      searchParam = this.flattenSearchBar(filters.searchBar, searchParam);
     }
 
     if (filters.startDate) {
@@ -216,30 +206,11 @@ export class EventFeedService {
     return searchParam;
   }
 
-  private buildEventStringsURLSearchParams(filters: EventFeedFilter,
-    sidebarFilter: SidebarFilter): HttpParams {
+  private buildEventStringsURLSearchParams(filters: EventFeedFilter): HttpParams {
     let searchParam: HttpParams = new HttpParams();
 
-    if (sidebarFilter.servers) {
-      searchParam = reduce((param, server) => param.append('filter', `source_fqdn:${server}`),
-                           searchParam,
-                           sidebarFilter.servers);
-    }
-
-    if (sidebarFilter.organizations) {
-      searchParam = reduce((param, org) => param.append('filter', `organization:${org}`),
-                           searchParam,
-                           sidebarFilter.organizations);
-    }
-
-    if (filters.entityType) {
-      if (filters.entityType instanceof Array) {
-        searchParam = reduce((param, eType) => param.append('filter', `entity_type:${eType}`),
-                             searchParam,
-                             filters.entityType);
-      } else {
-        searchParam = searchParam.append('filter', `entity_type:${filters.entityType}`);
-      }
+    if (filters.searchBar) {
+      searchParam = this.flattenSearchBar(filters.searchBar, searchParam);
     }
 
     searchParam = searchParam.append('timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
@@ -269,8 +240,32 @@ export class EventFeedService {
     return searchParam;
   }
 
+  private flattenSearchBar(filters: Chicklet[], searchParam: HttpParams): HttpParams {
+    return reduce((params: HttpParams, filter: { type: string, text: string }) => {
+      const filterParam = `${encodeURIComponent(filter.type)}:${encodeURIComponent(filter.text)}`;
+      return params.append('filter', filterParam);
+    }, searchParam, filters);
+  }
+
+  private addChildEventTypes(filters: Chicklet[]): Chicklet[] {
+    const entityTypes: string[] = filters.filter((filter: Chicklet) =>
+      filter.type === ENTITY_TYPE_TAG).map((filter: Chicklet) => filter.text);
+
+    if (includes(ENTITY_TYPE_DATA_BAG_TAG, entityTypes) &&
+      !includes(ENTITY_TYPE_DATA_BAG_ITEM_TAG, entityTypes)) {
+      filters = concat(filters, {type: ENTITY_TYPE_TAG, text: ENTITY_TYPE_DATA_BAG_ITEM_TAG});
+    }
+
+    if (includes(ENTITY_TYPE_COOKBOOK_TAG, entityTypes) &&
+      !includes(ENTITY_TYPE_COOKBOOK_VERSION_TAG, entityTypes)) {
+      filters = concat(filters, {type: ENTITY_TYPE_TAG, text: ENTITY_TYPE_COOKBOOK_VERSION_TAG});
+    }
+
+    return filters;
+  }
+
   private buildEventFeedURLSearchParams(filters: EventFeedFilter,
-    sidebarFilter: SidebarFilter, lastEvent: ChefEvent): HttpParams {
+    lastEvent: ChefEvent): HttpParams {
     let searchParam: HttpParams = new HttpParams();
 
     // By default, we want to collapse events of the same type, action and
@@ -281,26 +276,9 @@ export class EventFeedService {
       searchParam = searchParam.append('collapse', 'true');
     }
 
-    if (sidebarFilter.servers) {
-      searchParam = reduce((params, server) => params.append('filter', `source_fqdn:${server}`),
-                           searchParam,
-                           sidebarFilter.servers);
-    }
-
-    if (sidebarFilter.organizations) {
-      searchParam = reduce((params, org) => params.append('filter', `organization:${org}`),
-                           searchParam,
-                           sidebarFilter.organizations);
-    }
-
-    if (filters.entityType) {
-      if (filters.entityType instanceof Array) {
-        searchParam = reduce((params, eType) => params.append('filter', `entity_type:${eType}`),
-                             searchParam,
-                             filters.entityType);
-      } else {
-        searchParam = searchParam.append('filter', `entity_type:${filters.entityType}`);
-      }
+    if (filters.searchBar) {
+      const searchBarWithChildren = this.addChildEventTypes(filters.searchBar);
+      searchParam = this.flattenSearchBar(searchBarWithChildren, searchParam);
     }
 
     if (filters.task) {

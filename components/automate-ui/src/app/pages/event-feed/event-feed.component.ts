@@ -1,6 +1,6 @@
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, map } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
 
 import {
   ChefEvent,
@@ -9,14 +9,20 @@ import {
   DateRange,
   GuitarStringCollection
 } from '../../types/types';
-import { Store } from '@ngrx/store';
+import { Store, createSelector } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
 import * as eventFeedSelectors from '../../services/event-feed/event-feed.selectors';
 import * as eventFeedActions from '../../services/event-feed/event-feed.actions';
+import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { Status } from '../../services/event-feed/event-feed.reducer';
+import { Chicklet, SearchBarCategoryItem } from '../../types/types';
 import { sumBy } from 'lodash';
 import { initialState } from '../../services/event-feed/event-feed.reducer';
 import * as moment from 'moment';
+import { some, pickBy, filter as fpFilter } from 'lodash/fp';
+import {
+  eventFeedState
+} from '../../services/event-feed/event-feed.selectors';
 
 @Component({
   selector: 'app-event-feed',
@@ -45,8 +51,102 @@ export class EventFeedComponent implements OnInit, OnDestroy {
   @ViewChild('guitarStrings') guitarStrings;
   resetTimescaleDisabled = true;
 
+  // Should the search bar filter bar be displayed
+  filtersVisible = true;
+
+  // The currently set collection of searchbar filters
+  searchBarFilters$: Observable<Chicklet[]>;
+
+  // The number of currently set searchbar filters
+  numberOfSearchBarFilters$: Observable<number>;
+
+  // autocomplete suggestions
+  suggestions$: Observable<any[]>;
+
+  // The catagories allowed for searching
+  categoryTypes: SearchBarCategoryItem[] = [
+    {
+      type: 'organization',
+      text: 'Chef Organization'
+    },
+    {
+      type: 'chef_server',
+      text: 'Chef Server'
+    },
+    {
+      type: 'entity_type',
+      text: 'Event Type',
+      providedValues: [
+        {name: 'client', title: 'Clients', icon: 'assignment_ind'},
+        {name: 'cookbook', title: 'Cookbooks', icon: 'chrome_reader_mode'},
+        {name: 'bag', title: 'Data Bags', icon: 'business_center'},
+        {name: 'environment', title: 'Environments', icon: 'public'},
+        {name: 'node', title: 'Nodes', icon: 'storage'},
+        {name: 'policyfile', title: 'Policyfiles', icon: 'add_to_photos'},
+        {name: 'profile', title: 'Profiles', icon: 'library_books'},
+        {name: 'role', title: 'Roles', icon: 'book'},
+        {name: 'organization', title: 'Organizations', icon: 'layers'},
+        {name: 'permission', title: 'Permissions', icon: 'lock_open'},
+        {name: 'user', title: 'Users', icon: 'person'},
+        {name: 'group', title: 'Groups', icon: 'people'},
+        {name: 'scan_job', title: 'Scan Jobs', icon: 'wifi_tethering'}
+      ]
+    }
+  ];
+
+  toggleFilters() {
+    this.filtersVisible = !this.filtersVisible;
+  }
+
+  onSuggestValues(event) {
+    this.store.dispatch(eventFeedActions.getSuggestions(event.detail.type, event.detail.text));
+  }
+
+  onFilterAdded(event) {
+    const {type, text} = event.detail;
+
+    if (some({type}, this.categoryTypes) ) {
+      const {queryParamMap} = this.route.snapshot;
+      const queryParams = {...this.route.snapshot.queryParams};
+      const values = queryParamMap.getAll(type).filter(value => value !== text).concat(text);
+
+      queryParams[type] = values;
+
+      this.router.navigate([], {queryParams});
+    }
+  }
+
+  onFiltersClear(_event) {
+    const queryParams = {...this.route.snapshot.queryParams};
+
+    const filteredParams = pickBy((_value, key) => {
+        return !some({'type': key}, this.categoryTypes);
+      }, queryParams);
+
+    delete filteredParams['page'];
+
+    this.router.navigate([], {queryParams: filteredParams});
+  }
+
+  onFilterRemoved(event) {
+    const {type, text} = event.detail;
+    const {queryParamMap} = this.route.snapshot;
+    const queryParams = {...this.route.snapshot.queryParams};
+    const values = queryParamMap.getAll(type).filter(value => value !== text);
+
+    if (values.length === 0) {
+      delete queryParams[type];
+    } else {
+      queryParams[type] = values;
+    }
+
+    this.router.navigate([], {queryParams});
+  }
+
   constructor(
-    private store: Store<NgrxStateAtom>
+    private store: Store<NgrxStateAtom>,
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -58,6 +158,21 @@ export class EventFeedComponent implements OnInit, OnDestroy {
         this.loadedEmptySetOfEvents = this.events.length === 0 &&
           this.initialFeedStatus === Status.loadingSuccess;
     });
+
+    const allUrlParameters$ = this.getAllUrlParameters();
+
+    this.searchBarFilters$ = allUrlParameters$.pipe(map((chicklets: Chicklet[]) =>
+      chicklets.filter(chicklet => some({'type': chicklet.type}, this.categoryTypes))));
+
+    this.numberOfSearchBarFilters$ = this.searchBarFilters$.pipe(
+        map((chicklets: Chicklet[]) => chicklets.length));
+
+    // URL change listener
+    allUrlParameters$.pipe(takeUntil(this.isDestroyed)).subscribe(
+      allUrlParameters => this.dispatchSearchbarFilterUpdate(allUrlParameters));
+
+    this.suggestions$ = this.store.select(createSelector(eventFeedState,
+          (state) => state.suggestions));
 
     this.store.select(eventFeedSelectors.completeNumberOfEvents).pipe(
       takeUntil(this.isDestroyed))
@@ -128,29 +243,25 @@ export class EventFeedComponent implements OnInit, OnDestroy {
     }
   }
 
-  selectEventType(event) {
-    const value = event.target.value;
-    this.updateSelectionBox(value);
-    switch (value) {
-      case 'bag':
-        this.store.dispatch(eventFeedActions.addFeedFilter('entityType', ['item', value]));
-        break;
-      case 'cookbook':
-        this.store.dispatch(eventFeedActions.addFeedFilter('entityType', ['version', value]));
-        break;
-      default:
-        this.store.dispatch(eventFeedActions.addFeedFilter('entityType', value));
-        break;
-    }
+  dispatchSearchbarFilterUpdate(allUrlParameters: Chicklet[]): void {
+
+    const searchBarFilters = fpFilter(chicklet => {
+        return some({'type': chicklet.type}, this.categoryTypes);
+      }, allUrlParameters);
+
+    this.store.dispatch(eventFeedActions.addSearchbarFilters(searchBarFilters));
   }
 
   private countTotalNumberOfEvents(loadedEvents: ChefEvent[]): number {
     return sumBy(loadedEvents, (event) => event.eventCount);
   }
 
-  private updateSelectionBox(entityType: string): void {
-    if (entityType !== undefined && entityType !== this.selectedEntityType) {
-      this.selectedEntityType = entityType;
-    }
+  private getAllUrlParameters(): Observable<Chicklet[]> {
+    return this.route.queryParamMap.pipe(map((params: ParamMap) => {
+      return params.keys.reduce((list, key) => {
+        const paramValues = params.getAll(key);
+        return list.concat(paramValues.map(value => ({type: key, text: value})));
+      }, []);
+    }));
   }
 }

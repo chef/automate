@@ -117,6 +117,9 @@ import {
   EventFeedSelectComponent
 } from './page-components/event-feed-select/event-feed-select.component';
 import {
+  EventFeedSidebarComponent
+} from './page-components/event-feed-sidebar/event-feed-sidebar.component';
+import {
   EventFeedTableComponent
 } from './page-components/event-feed-table/event-feed-table.component';
 import { EventIconComponent } from './page-components/event-icon/event-icon.component';
@@ -219,6 +222,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     EventFeedComponent,
     EventFeedGuitarStringsComponent,
     EventFeedSelectComponent,
+    EventFeedSidebarComponent,
     EventFeedTableComponent,
     EventIconComponent,
     FeatureFlagsComponent,

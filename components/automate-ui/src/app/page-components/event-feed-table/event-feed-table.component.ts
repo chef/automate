@@ -1,13 +1,9 @@
-import { takeUntil } from 'rxjs/operators';
 import { Component, Input, ViewChild, ElementRef, OnDestroy, OnInit } from '@angular/core';
 import { capitalize, getOr, endsWith, replace } from 'lodash/fp';
 import { Subject, Subscription } from 'rxjs';
 import { ChefEvent, ChefEventCollection, EventFeedFilter } from '../../types/types';
 import { EventFeedService } from '../../services/event-feed/event-feed.service';
 import * as moment from 'moment';
-import * as sidebarSelectors from '../../services/sidebar/sidebar.selectors';
-import { Store } from '@ngrx/store';
-import { NgrxStateAtom } from '../../ngrx.reducers';
 
 @Component({
   selector: 'app-event-feed-table',
@@ -21,29 +17,16 @@ export class EventFeedTableComponent implements OnDestroy, OnInit {
   groupedEvent: ChefEvent;
   groupedEvents: ChefEvent[];
   groupedEventsButton;
-  private selectedOrgs: string[];
-  private selectedChefServers: string[];
   @ViewChild('groupSidePanel') sidepanel: ElementRef;
   private subscription: Subscription;
   private isDestroyed = new Subject<boolean>();
 
   constructor(
-    private eventFeedService: EventFeedService,
-    private store: Store<NgrxStateAtom>
+    private eventFeedService: EventFeedService
   ) { }
 
   ngOnInit() {
-    this.store.select(sidebarSelectors.selectedOrgs).pipe(
-      takeUntil(this.isDestroyed))
-      .subscribe(selectedOrgs => {
-        this.selectedOrgs = selectedOrgs;
-      });
 
-    this.store.select(sidebarSelectors.selectedChefServers).pipe(
-      takeUntil(this.isDestroyed))
-      .subscribe(selectedChefServers => {
-        this.selectedChefServers = selectedChefServers;
-      });
   }
 
   ngOnDestroy(): void {
@@ -67,17 +50,11 @@ export class EventFeedTableComponent implements OnDestroy, OnInit {
       endDate: moment(this.groupedEvent.endTime),
       requestorName: this.groupedEvent.requestorName,
       task: this.groupedEvent.task,
-      entityType: [this.groupedEvent.eventType],
       collapse: false,
       pageSize: this.groupedEvent.eventCount
     };
 
-    const sidebarFilter = {
-      organizations: this.selectedOrgs,
-      servers: this.selectedChefServers
-    };
-
-    this.subscription = this.eventFeedService.getEventFeed(filter, sidebarFilter)
+    this.subscription = this.eventFeedService.getEventFeed(filter)
       .subscribe((eventCollection: ChefEventCollection) => {
         this.groupedEvents = eventCollection.events;
       });

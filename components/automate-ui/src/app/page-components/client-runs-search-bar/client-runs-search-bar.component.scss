@@ -67,10 +67,25 @@
 
   &.categories {
     width: 232px;
+
+    chef-icon {
+      color: $chef-primary-bright;
+      float: right;
+    }
   }
 
   &.suggestions {
     width: 400px;
+
+    chef-icon {
+      color: black;
+      transform: translateY(-110%);
+      float: left;
+    }
+
+    .suggestion-name-with-icon {
+      transform: translateX(1.5em);
+    }
   }
 
   ul {
@@ -116,11 +131,6 @@
     &.no-category-items {
       font-size: 13px;
       color: $chef-critical;
-    }
-
-    chef-icon {
-      color: $chef-primary-bright;
-      float: right;
     }
   }
 }

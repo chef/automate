@@ -58,7 +58,7 @@ const routes: Routes = [
     canActivate: [ChefSessionService],
     children: [{
       path: '',
-      redirectTo: 'event-feed',
+      redirectTo: 'dashboards/event-feed',
       pathMatch: 'full'
     },
     {
@@ -226,7 +226,7 @@ const routes: Routes = [
       ]
     },
     {
-      path: 'event-feed',
+      path: 'dashboards/event-feed',
       children: [
         {
           path: '',

@@ -3,8 +3,7 @@
   <p>If this is a mistake, then reach out to your administrator.</p>
 </div>
 
-<app-server-org-filter-sidebar>
-</app-server-org-filter-sidebar>
+<app-event-feed-sidebar></app-event-feed-sidebar>
 
 <div class="container">
   <main>
@@ -13,16 +12,23 @@
         <chef-page-header>
           <chef-heading>Event Feed</chef-heading>
           <chef-subheading>Displays events for the past week. Use <em>SHIFT+R</em>  to reset the time scale.</chef-subheading>
+          <app-client-runs-search-bar
+          [numberOfFilters]="numberOfSearchBarFilters$ | async"
+          [categories]="categoryTypes"
+          [dynamicSuggestions]="suggestions$ | async"
+          (suggestValues)="onSuggestValues($event)"
+          (itemSelected)="onFilterAdded($event)"
+          (filtersButtonClick)="toggleFilters()">
+          </app-client-runs-search-bar>
+          <app-client-runs-search-filters *ngIf="filtersVisible"
+            [filters]="searchBarFilters$ | async"
+            (filtersCleared)="onFiltersClear($event)"
+            (filterRemoved)="onFilterRemoved($event)">
+          </app-client-runs-search-filters>
         </chef-page-header>
       </div>
       <div class="page-body">
           <div class="event-summary-bar">
-            <app-event-feed-select
-              [selectedValue]="selectedEntityType"
-              [eventTypeCount]="eventTypeCount"
-              (change)="selectEventType($event)"
-              [disabled]="permissionDenied">
-            </app-event-feed-select>
             <div class="summary-totals small strong">
               <div class="summary">
                 <div class="title">Total events</div>

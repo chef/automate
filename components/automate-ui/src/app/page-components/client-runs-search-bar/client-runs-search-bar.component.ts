@@ -12,10 +12,16 @@ import {
 import { Subject, Observable, of as observableOf } from 'rxjs';
 import { List } from 'immutable';
 import { clamp, compact } from 'lodash';
-import { Chicklet } from '../../types/types';
+import { SearchBarCategoryItem } from '../../types/types';
 import {
   debounceTime, switchMap, distinctUntilChanged
 } from 'rxjs/operators';
+
+export interface SuggestionItem {
+  name: string;
+  title: string;
+  icon: string;
+}
 
 @Component({
   selector: 'app-client-runs-search-bar',
@@ -27,15 +33,15 @@ export class ClientRunsSearchBarComponent implements OnChanges {
   isLoadingSuggestions = false;
   highlightedIndex = -1;
   inputText = '';
-  selectedCategoryType: Chicklet = undefined;
-  visibleCategories = List<Chicklet>();
-  suggestions: List<string> = List<string>();
+  selectedCategoryType: SearchBarCategoryItem = undefined;
+  visibleCategories = List<SearchBarCategoryItem>();
+  suggestions: List<SuggestionItem> = List<SuggestionItem>();
   private suggestionsVisibleStream = new Subject<boolean>();
-  private suggestionSearchTermDebounce = new Subject<Chicklet>();
+  private suggestionSearchTermDebounce = new Subject<SearchBarCategoryItem>();
 
   @Input() numberOfFilters: number;
-  @Input() filterTypes: Chicklet[] = [];
-  @Input() filterValues: string[];
+  @Input() categories: SearchBarCategoryItem[] = [];
+  @Input() dynamicSuggestions: string[];
   @Output() suggestValues: EventEmitter<any> = new EventEmitter<any>();
   @Output() itemSelected: EventEmitter<any> = new EventEmitter<any>();
   @Output() filtersButtonClick: EventEmitter<any> = new EventEmitter<any>();
@@ -60,7 +66,7 @@ export class ClientRunsSearchBarComponent implements OnChanges {
       debounceTime(300),
       // ignore new term if same as previous term
       distinctUntilChanged()
-    ).subscribe((c: Chicklet) => {
+    ).subscribe((c: SearchBarCategoryItem) => {
       if (c.text && c.text.length > 0) {
         this.isLoadingSuggestions = true;
         this.suggestValues.emit({ detail: c });
@@ -69,13 +75,17 @@ export class ClientRunsSearchBarComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.filterValues) {
-      this.suggestions = List<string>(compact(changes.filterValues.currentValue));
+    if (changes.dynamicSuggestions) {
+      this.suggestions = List<SuggestionItem>(
+        compact(changes.dynamicSuggestions.currentValue.map((suggestion) => {
+        return {name: suggestion, title: suggestion};
+      })));
+
       this.isLoadingSuggestions = false;
     }
 
     if (changes.filterTypes) {
-      this.visibleCategories = List<Chicklet>(changes.filterTypes.currentValue);
+      this.visibleCategories = List<SearchBarCategoryItem>(changes.filterTypes.currentValue);
     }
   }
 
@@ -103,16 +113,15 @@ export class ClientRunsSearchBarComponent implements OnChanges {
     this.suggestionsVisibleStream.next(true);
   }
 
-  handleSuggestionClick(suggestion: string, event: Event): void {
+  handleSuggestionClick(suggestion: any, event: Event): void {
     event.stopPropagation();
     const type = this.selectedCategoryType.type;
     this.clearAll();
-    this.itemSelected.emit({ detail: { text: suggestion,
-      type: type}});
+    this.itemSelected.emit({ detail: { text: suggestion.name, type: type}});
   }
 
   // This is triggered when a user clicks on an item in the dropdown.
-  handleCategoryItemClick(type: Chicklet, event: Event): void {
+  handleCategoryItemClick(type: SearchBarCategoryItem, event: Event): void {
     event.stopPropagation();
     if (!this.selectedCategoryType) {
       this.categorySelected(type);
@@ -151,26 +160,38 @@ export class ClientRunsSearchBarComponent implements OnChanges {
 
   pressEnterCategorySelected(currentText: string): void {
     if (this.highlightedIndex >= 0) {
-      const search = this.suggestions.get(this.highlightedIndex);
+      const sug = this.suggestions.get(this.highlightedIndex);
       const type = this.selectedCategoryType.type;
       this.clearAll();
-      this.itemSelected.emit({ detail: { text: search,
+      this.itemSelected.emit({ detail: { text: sug.name,
         type: type }});
     } else {
-      if (currentText.indexOf('?') >= 0 || currentText.indexOf('*') >= 0) {
-        const type = this.selectedCategoryType.type;
-        this.clearAll();
-        this.itemSelected.emit({ detail: { text: currentText,
-          type: type}});
-      } else if (!this.suggestions.isEmpty()) {
-        const foundSuggestion = this.suggestions.find((suggestion: string,
-          _key: number, _iter: any) => suggestion === currentText);
-
-        if (foundSuggestion) {
+      if (this.hasStaticSuggestions()) {
+        if (!this.suggestions.isEmpty()) {
+          if ( this.suggestions.size === 1) {
+            const sug = this.suggestions.first();
+            const type = this.selectedCategoryType.type;
+            this.clearAll();
+            this.itemSelected.emit({ detail: { text: sug.name,
+              type: type}});
+          }
+        }
+      } else {
+        if (currentText.indexOf('?') >= 0 || currentText.indexOf('*') >= 0) {
           const type = this.selectedCategoryType.type;
           this.clearAll();
-          this.itemSelected.emit({ detail: { text: foundSuggestion,
+          this.itemSelected.emit({ detail: { text: currentText,
             type: type}});
+        } else if (!this.suggestions.isEmpty()) {
+          const foundSuggestion = this.suggestions.find((suggestion: SuggestionItem,
+            _key: number, _iter: any) => suggestion.title === currentText);
+
+          if (foundSuggestion) {
+            const type = this.selectedCategoryType.type;
+            this.clearAll();
+            this.itemSelected.emit({ detail: { text: foundSuggestion.name,
+              type: type}});
+          }
         }
       }
     }
@@ -198,10 +219,14 @@ export class ClientRunsSearchBarComponent implements OnChanges {
       if (this.inputText === '') {
         this.clearCategorySelected();
       } else {
-        const type = this.selectedCategoryType.type;
-        this.clearSuggestions();
-        this.requestForSuggestions({ text: currentText,
-          type: type });
+        if (!this.hasStaticSuggestions()) {
+          const type = this.selectedCategoryType.type;
+          this.clearSuggestions();
+          this.requestForSuggestions({ text: currentText,
+            type: type });
+        } else {
+          this.updateVisibleProvidedSuggestions(currentText);
+        }
       }
     } else {
       if (this.inputText === '') {
@@ -216,10 +241,14 @@ export class ClientRunsSearchBarComponent implements OnChanges {
 
   pressDefaultText(currentText: string): void {
     if (this.selectedCategoryType) {
-      const type = this.selectedCategoryType.type;
-      this.clearSuggestions();
-      this.requestForSuggestions({ text: currentText,
-        type: type });
+      if (!this.hasStaticSuggestions()) {
+        const type = this.selectedCategoryType.type;
+        this.clearSuggestions();
+        this.requestForSuggestions({ text: currentText,
+          type: type });
+      } else {
+        this.updateVisibleProvidedSuggestions(currentText);
+      }
     } else {
       this.updateVisibleCategories(currentText);
     }
@@ -275,17 +304,22 @@ export class ClientRunsSearchBarComponent implements OnChanges {
     }
   }
 
-  categorySelected(type: Chicklet): void {
+  categorySelected(type: SearchBarCategoryItem): void {
     this.selectedCategoryType = type;
     this.inputText = '';
     this.highlightedIndex = -1;
     this.inputField.nativeElement.value = '';
     this.inputField.nativeElement.focus();
+    if (this.hasStaticSuggestions()) {
+      this.suggestions = List<SuggestionItem>(type.providedValues);
+      this.suggestionsVisible = true;
+      this.isLoadingSuggestions = false;
+    }
   }
 
   clearCategorySelected(): void {
     this.selectedCategoryType = undefined;
-    this.visibleCategories = List(this.filterTypes);
+    this.visibleCategories = List(this.categories);
     this.highlightedIndex = -1;
   }
 
@@ -297,20 +331,32 @@ export class ClientRunsSearchBarComponent implements OnChanges {
   }
 
   clearSuggestions(): void {
-    this.suggestions = List<string>();
-    this.filterValues = [];
+    this.suggestions = List<SuggestionItem>();
+    this.dynamicSuggestions = [];
     this.highlightedIndex = -1;
   }
 
   updateVisibleCategories(currentText: string): void {
     this.highlightedIndex = -1;
-    this.visibleCategories = List(this.filterTypes.filter(cat => {
+    this.visibleCategories = List(this.categories.filter(cat => {
       return cat.text.toLowerCase().indexOf(currentText.toLowerCase()) !== -1;
     }));
   }
 
-  requestForSuggestions(c: Chicklet): void {
+  updateVisibleProvidedSuggestions(currentText: string): void {
+    this.highlightedIndex = -1;
+    this.suggestions = List(this.selectedCategoryType.providedValues.filter(
+      (item: SuggestionItem) => {
+      return item.title.toLowerCase().indexOf(currentText.toLowerCase()) !== -1;
+    }));
+  }
+
+  requestForSuggestions(c: SearchBarCategoryItem): void {
     this.isLoadingSuggestions = true;
     this.suggestionSearchTermDebounce.next(c);
+  }
+
+  hasStaticSuggestions(): boolean {
+    return this.selectedCategoryType.providedValues !== undefined;
   }
 }
