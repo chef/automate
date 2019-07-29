@@ -64,6 +64,10 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
       text: 'Chef Client Version'
     },
     {
+      type: 'organization',
+      text: 'Chef Organization'
+    },
+    {
       type: 'source_fqdn',
       text: 'Chef Server'
     },
@@ -86,10 +90,6 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
     {
       type: 'name',
       text: 'Node Name'
-    },
-    {
-      type: 'organization',
-      text: 'Organization'
     },
     {
       type: 'platform',
