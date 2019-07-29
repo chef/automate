@@ -363,11 +363,11 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
-  - label: "[static] local-user-service"
+  - label: "[unit] local-user-service"
     command:
       - scripts/install_golang.sh
       - cd components/local-user-service
-      - make static
+      - make static unit
     timeout_in_minutes: 10
     retry:
       automatic:
@@ -375,21 +375,6 @@ steps:
     expeditor:
       executor:
         docker:
-
-  - label: "[unit] local-user-service"
-    command:
-      - hab studio run "source .studiorc && go_component_unit local-user-service"
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - HAB_STUDIO_SUP=false
-            - HAB_NONINTERACTIVE=true
 
   - label: "[unit] notifications-client"
     command:
@@ -423,8 +408,6 @@ steps:
             - PORT=4001
             - RULE_STORE_FILE=test_rule_store
 
-  # (@afiune) If this requires the data-store (postgres)
-  # shouldn't this be integration tests? (FWIW we can move it to the studio)
   - label: "[unit] session-service"
     command:
       - scripts/install_golang.sh
