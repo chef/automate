@@ -47,9 +47,9 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
         takeUntil(this.isDestroyed))
         .subscribe((state) => {
           this.token = { ...state };
-          this.updateForm.controls['name'].setValue(this.token.name);
+          this.updateForm.controls.name.setValue(this.token.name);
           this.status = this.token.active ? 'active' : 'inactive';
-          this.updateForm.controls['status'].setValue(this.status);
+          this.updateForm.controls.status.setValue(this.status);
         });
 
       this.store.pipe(
@@ -69,15 +69,15 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
 
     public handleChange(): void {
       // TODO(sr): these should use the formgroup's methods
-      this.disableSave = this.updateForm.controls['name'].value === this.token.name &&
-        this.updateForm.controls['status'].value === this.status;
-      console.log({ control: this.updateForm.controls['status'].value, status: this.status });
+      this.disableSave = this.updateForm.controls.name.value === this.token.name &&
+        this.updateForm.controls.status.value === this.status;
+      console.log({ control: this.updateForm.controls.status.value, status: this.status });
     }
 
     public saveChange(): void {
       this.saveInProgress = true;
-      const name: string = this.updateForm.controls['name'].value.trim();
-      const active: boolean = this.updateForm.controls['status'].value === 'active';
+      const name: string = this.updateForm.controls.name.value.trim();
+      const active: boolean = this.updateForm.controls.status.value === 'active';
       const token: ApiToken = { ...this.token, name, active  };
       this.store.dispatch(new UpdateToken({ token }));
 
