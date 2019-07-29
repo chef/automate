@@ -40,11 +40,24 @@ chef-tab-selector {
 
 chef-form-field {
   width: 240px;
+
+  padding-bottom: 30px;
 }
 
 // nest? it's only used in chef-form-field
 chef-phat-radio {
-  display: inline-flex;
+  chef-option {
+    background-color: transparent; // TODO still looks different
+    font-size: 0.75em;
+    height: auto;
+    padding: 0;
+    width: auto;
+  }
+
+  // TODO: still changes color when clicked -- ok?
+  &.selected {
+    color: unset;
+  }
 }
 
 section {
@@ -56,9 +69,5 @@ section {
       top: 2px;
       margin-right: 5px;
     }
-  }
-
-  form {
-    margin-bottom: 38px;
   }
 }
