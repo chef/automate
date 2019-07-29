@@ -433,7 +433,7 @@ type Manager struct {
 	workflowExecutors map[string]WorkflowExecutor
 	taskExecutors     map[string]registeredExecutor
 	waywardWorkflows  waywardWorkflowList
-	workflowScheduler *workflowScheduler
+	workflowScheduler *WorkflowScheduler
 	backend           backend.Driver
 	cancel            context.CancelFunc
 	wg                sync.WaitGroup
@@ -453,17 +453,22 @@ func WithTaskPollInterval(interval time.Duration) ManagerOpt {
 
 // NewManager creates a new Manager with the given Driver. If
 // the driver fails to initialize, an error is returned.
-func NewManager(backend backend.Driver, opts ...ManagerOpt) (*Manager, error) {
-	err := backend.Init()
+func NewManager(b backend.Driver, opts ...ManagerOpt) (*Manager, error) {
+	err := b.Init()
 	if err != nil {
 		return nil, err
 	}
+
+	var workflowScheduler *WorkflowScheduler
+	if v, ok := b.(backend.SchedulerDriver); ok {
+		workflowScheduler = NewWorkflowScheduler(v)
+	}
 	m := &Manager{
-		backend:           backend,
+		backend:           b,
 		waywardWorkflows:  make(waywardWorkflowList),
 		workflowExecutors: make(map[string]WorkflowExecutor),
 		taskExecutors:     make(map[string]registeredExecutor),
-		workflowScheduler: &workflowScheduler{backend},
+		workflowScheduler: workflowScheduler,
 		taskPollInterval:  defaultTaskPollInterval,
 	}
 
@@ -518,7 +523,10 @@ func (m *Manager) Start(ctx context.Context) error {
 		return err
 	}
 
-	go m.workflowScheduler.run(ctx)
+	if m.workflowScheduler != nil {
+		go m.workflowScheduler.Run(ctx)
+	}
+
 	go m.runWorkflowExecutor(ctx)
 	return nil
 }

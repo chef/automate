@@ -20,11 +20,17 @@ var (
 	lateWarningThreshold = 10 * time.Second
 )
 
-type workflowScheduler struct {
-	backend backend.Driver
+type WorkflowScheduler struct {
+	backend backend.SchedulerDriver
 }
 
-func (w *workflowScheduler) run(ctx context.Context) {
+func NewWorkflowScheduler(b backend.SchedulerDriver) *WorkflowScheduler {
+	return &WorkflowScheduler{
+		backend: b,
+	}
+}
+
+func (w *WorkflowScheduler) Run(ctx context.Context) {
 	var err error
 	var nextSleep time.Duration
 	for {
@@ -42,7 +48,7 @@ func (w *workflowScheduler) run(ctx context.Context) {
 	}
 }
 
-func (w *workflowScheduler) scheduleWorkflows(ctx context.Context) (time.Duration, error) {
+func (w *WorkflowScheduler) scheduleWorkflows(ctx context.Context) (time.Duration, error) {
 	sleepTime := maxWakeupInterval
 
 	for {
@@ -59,7 +65,7 @@ func (w *workflowScheduler) scheduleWorkflows(ctx context.Context) (time.Duratio
 	}
 }
 
-func (w *workflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration, error) {
+func (w *WorkflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration, error) {
 	s, completer, err := w.backend.GetDueScheduledWorkflow(ctx)
 	if err != nil {
 		if err == ErrNoDueWorkflows {
