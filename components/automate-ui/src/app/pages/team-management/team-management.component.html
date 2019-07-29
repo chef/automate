@@ -24,14 +24,14 @@
       objectNoun="team"
       [createForm]="createTeamForm"
       (close)="closeCreateModal()"
-      (createClicked)="createTeam()">
+      (createClicked)="createV2Team()">
     </app-create-object-modal>
 
     <app-delete-object-modal
       [visible]="deleteModalVisible"
       objectNoun="team"
       [objectName]="isV1 ? teamToDelete?.id : teamToDelete?.name"
-      (close)="closeModal()"
+      (close)="closeDeleteModal()"
       (deleteClicked)="deleteTeam()">
     </app-delete-object-modal>
 
@@ -39,7 +39,7 @@
       <section>
         <chef-toolbar>
           <app-authorized [allOf]="['/auth/teams', 'post']">
-            <chef-button *ngIf="(iamMajorVersion$ | async) as version" primary (click)="openCreateModal(version)">Create Team</chef-button>
+            <chef-button primary (click)="openCreateModal()">Create Team</chef-button>
           </app-authorized>
         </chef-toolbar>
         <div id="table-container">

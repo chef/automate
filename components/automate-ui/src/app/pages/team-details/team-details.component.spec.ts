@@ -7,7 +7,6 @@ import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store } from '@ngrx/store';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { customMatchers } from 'app/testing/custom-matchers';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import {
   userEntityReducer,
@@ -21,13 +20,12 @@ import {
 } from 'app/entities/teams/team.reducer';
 import {
   GetTeamSuccess,
-  GetTeamUsersSuccess,
-  UpdateTeamSuccess
+  GetTeamUsersSuccess
 } from 'app/entities/teams/team.actions';
 import { Team } from 'app/entities/teams/team.model';
-import { TeamDetailsComponent } from './team-details.component';
+import { TeamDetailsComponent, TeamTabName } from './team-details.component';
 
-fdescribe('TeamDetailsComponent', () => {
+describe('TeamDetailsComponent', () => {
   let component: TeamDetailsComponent;
   let fixture: ComponentFixture<TeamDetailsComponent>;
   let router: Router;
@@ -101,7 +99,6 @@ fdescribe('TeamDetailsComponent', () => {
     router = TestBed.get(Router);
     spyOn(router, 'navigate').and.stub();
 
-    jasmine.addMatchers(customMatchers);
     fixture = TestBed.createComponent(TeamDetailsComponent);
     component = fixture.componentInstance;
     component.team = someTeam;
@@ -117,13 +114,15 @@ fdescribe('TeamDetailsComponent', () => {
   });
 
   it('show users section when users tab is selected', () => {
-    component.onSelectedTab({ target: { value: 'users' } });
-    expect(component.tabValue).toBe('users');
+    const tabName: TeamTabName = 'users';
+    component.onSelectedTab({ target: { value: tabName } });
+    expect(component.tabValue).toBe(tabName);
   });
 
   it('show details section when details tab is selected', () => {
-    component.onSelectedTab({ target: { value: 'details' } });
-    expect(component.tabValue).toBe('details');
+    const tabName: TeamTabName = 'details';
+    component.onSelectedTab({ target: { value: tabName } });
+    expect(component.tabValue).toBe(tabName);
   });
 
   describe('empty state', () => {
@@ -165,8 +164,8 @@ fdescribe('TeamDetailsComponent', () => {
     beforeEach(() => {
       store = TestBed.get(Store);
       store.dispatch(new GetTeamSuccess(someTeam));
-      store.dispatch(new GetTeamUsersSuccess({
-        user_ids: []
+      store.dispatch(new GetUsersSuccess({
+        users: [user1, user2]
       }));
     });
 
@@ -177,35 +176,14 @@ fdescribe('TeamDetailsComponent', () => {
 
       expect(component.teamMembershipView).toBe(false);
       store.dispatch(new GetTeamUsersSuccess({
-        user_ids: ['user1', 'user2']
+        user_ids: [user1.membership_id, user2.membership_id]
       }));
 
-      // TODO fix
-      // for (const user of [user1, user2]) {
-      //   component.sortedUsers$.subscribe(users => {
-      //     expect(users).toContain(user);
-      //   });
-      // }
-    });
-  });
-
-  describe('update team', () => {
-    let store: Store<NgrxStateAtom>;
-    beforeEach(() => {
-      store = TestBed.get(Store);
-      store.dispatch(new GetTeamSuccess(someTeam));
-    });
-
-    it('successfully updates name', () => {
-      const name = 'new name';
-      component.updateNameForm.controls['name'].setValue('new name');
-      component.saveNameChange();
-
-      store.dispatch(new UpdateTeamSuccess({ ...component.team, name }));
-      fixture.detectChanges();
-
-      // TODO fix
-      // expect(component.team.name).toBe(name);
+      for (const user of [user1, user2]) {
+        component.sortedUsers$.subscribe(users => {
+          expect(users).toContain(user);
+        });
+      }
     });
   });
 

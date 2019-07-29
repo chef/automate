@@ -82,10 +82,10 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.store.dispatch(new GetTeams());
 
-    this.store.select(iamMajorVersion)
-      .pipe(takeUntil(this.isDestroyed))
-      .subscribe((version) => {
-        if (version === null) { return; }
+    this.iamMajorVersion$
+    .pipe(takeUntil(this.isDestroyed))
+    .subscribe((version) => {
+      if (version === null) { return; }
         this.isV1 = version === 'v1';
       });
   }
@@ -109,57 +109,26 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
     this.store.dispatch(new DeleteTeam(this.teamToDelete));
   }
 
-  public createTeam(): void {
-    this.creatingTeam = true;
-    const team = {
-      id: this.createTeamForm.controls['id'].value,
-      name: this.createTeamForm.controls['name'].value.trim(),
-      projects: []
-    };
-    this.store.dispatch(new CreateTeam(team));
-
-    const pendingCreate = new Subject<boolean>();
-    this.store.pipe(
-      select(createStatus),
-      filter(identity),
-      takeUntil(pendingCreate))
-      .subscribe((state) => {
-        if (!loading(state)) {
-          pendingCreate.next(true);
-          pendingCreate.complete();
-          this.creatingTeam = false;
-          if (state === EntityStatus.loadingSuccess) {
-            this.closeCreateModal();
-            this.router.navigate(['/settings', 'teams', team.id]);
-          }
-          if (state === EntityStatus.loadingFailure) {
-            const pendingCreateError = new Subject<boolean>();
-            this.store.pipe(
-              select(createError),
-              filter(identity),
-              takeUntil(pendingCreateError))
-              .subscribe((error) => {
-                pendingCreateError.next(true);
-                pendingCreateError.complete();
-                if (error.status === HttpStatus.CONFLICT) {
-                  this.conflictErrorEvent.emit(true);
-                // Close the modal on any error other than conflict and display in banner.
-                } else {
-                  this.closeCreateModal();
-                }
-            });
-          }
-        }
-      });
+  public createV2Team(): void {
+    this.createTeamCommon({
+      id: this.createTeamForm.controls.id.value.trim(),
+      name: this.createTeamForm.controls.name.value.trim(),
+      projects: [],
+      guid: null
+    });
   }
 
   public createV1Team(): void {
+    this.createTeamCommon({
+      id: this.createV1TeamForm.controls.name.value.trim(),
+      name: this.createV1TeamForm.controls.description.value.trim(),
+      projects: [],
+      guid: null
+    });
+  }
+
+  public createTeamCommon(team: Team): void {
     this.creatingTeam = true;
-    const team = {
-      id: this.createV1TeamForm.controls['name'].value.trim(),
-      name: this.createV1TeamForm.controls['description'].value.trim(),
-      projects: []
-    };
     this.store.dispatch(new CreateTeam(team));
 
     const pendingCreate = new Subject<boolean>();
@@ -174,6 +143,9 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
           this.creatingTeam = false;
           if (state === EntityStatus.loadingSuccess) {
             this.closeCreateModal();
+            if (this.isV1) {
+              this.router.navigate(['/settings', 'teams', team.name]);
+            }
             this.router.navigate(['/settings', 'teams', team.id]);
           }
           if (state === EntityStatus.loadingFailure) {
@@ -197,8 +169,8 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
       });
   }
 
-  public openCreateModal(version): void {
-    if (version === 'v1') {
+  public openCreateModal(): void {
+    if (this.isV1) {
       this.createV1TeamModalVisible = true;
     } else {
       this.createModalVisible = true;

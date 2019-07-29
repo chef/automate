@@ -30,10 +30,11 @@ import {
   RemoveTeamUsers,
   UpdateTeam
 } from 'app/entities/teams/team.actions';
+import { Regex } from 'app/helpers/auth/regex';
 
 const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 
-type TeamTabNames = 'users' | 'details';
+export type TeamTabName = 'users' | 'details';
 
 @Component({
   selector: 'app-team-details',
@@ -46,7 +47,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public isLoading = true;
   public saving = false;
   public saveSuccessful = false;
-  public tabValue: TeamTabNames = 'users';
+  public tabValue: TeamTabName = 'users';
   public url: string;
   public teamMembershipView = false;
   public team: Team;
@@ -64,7 +65,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   ) {
     this.updateNameForm = fb.group({
       // Must stay in sync with error checks in team-details.component.html
-      name: ['Loading...', Validators.required]
+      name: ['Loading...', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
 
     combineLatest(
@@ -84,7 +85,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     return this.isV1 ? this.team.guid : this.team.id;
   }
 
-  public get versionedDescOrName(): string {
+  public get descriptionOrName(): string {
     return this.isV1 ? 'description' : 'name';
   }
 
@@ -93,7 +94,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       .subscribe((url: string) => {
         this.url = url;
         const [, fragment] = url.split('#');
-        // goes to #users is (1) explicit #users, (2) no fragment, or (3) invalid fragment
+        // goes to #users if (1) explicit #users, (2) no fragment, or (3) invalid fragment
         this.tabValue = (fragment === 'details') ? 'details' : 'users';
       });
     this.store.select(iamMajorVersion)
@@ -173,7 +174,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
   private getUsersForTeam(team: Team) {
     this.team = team;
-    this.updateNameForm.controls['name'].setValue(this.team.name);
+    this.updateNameForm.controls.name.setValue(this.team.name);
     this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
     this.store.dispatch(new GetUsers());
   }
@@ -206,7 +207,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public saveNameChange(): void {
     this.saveSuccessful = false;
     this.saving = true;
-    const name: string = this.updateNameForm.controls['name'].value.trim();
+    const name: string = this.updateNameForm.controls.name.value.trim();
     this.store.dispatch(new UpdateTeam({ ...this.team, name }));
 
     const pendingSave = new Subject<boolean>();

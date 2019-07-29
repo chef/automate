@@ -19,6 +19,7 @@ import {
 import { TeamManagementComponent } from './team-management.component';
 import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import { HttpErrorResponse } from '@angular/common/http';
+import { HttpStatus } from 'app/types/types';
 
 describe('TeamManagementComponent', () => {
   let component: TeamManagementComponent;
@@ -102,16 +103,13 @@ describe('TeamManagementComponent', () => {
 
     beforeEach(() => {
       store = TestBed.get(Store);
-      store.dispatch(new GetTeamsSuccess({
-        teams: []
-      }));
       component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v1');
     });
 
     it('openCreateModal on v1 opens v1 modal', () => {
       expect(component.createV1TeamModalVisible).toBe(false);
       expect(component.createModalVisible).toBe(false);
-      component.openCreateModal('v1');
+      component.openCreateModal();
       expect(component.createV1TeamModalVisible).toBe(true);
       expect(component.createModalVisible).toBe(false);
     });
@@ -119,7 +117,7 @@ describe('TeamManagementComponent', () => {
     it('opening create modal resets name and description to empty string', () => {
       component.createV1TeamForm.controls['name'].setValue('any');
       component.createV1TeamForm.controls['description'].setValue('any');
-      component.openCreateModal('v1');
+      component.openCreateModal();
       expect(component.createV1TeamForm.controls['name'].value).toBe(null);
       expect(component.createV1TeamForm.controls['description'].value).toBe(null);
     });
@@ -138,13 +136,13 @@ describe('TeamManagementComponent', () => {
 
     it('on conflict error, modal is open with conflict error', () => {
       spyOn(component.conflictErrorEvent, 'emit');
-      component.openCreateModal('v1');
+      component.openCreateModal();
       component.createV1TeamForm.controls['name'].setValue(team.id);
       component.createV1TeamForm.controls['description'].setValue(team.name);
       component.createV1Team();
 
       const conflict = <HttpErrorResponse>{
-        status: 409,
+        status: HttpStatus.CONFLICT,
         ok: false
       };
       store.dispatch(new CreateTeamFailure(conflict));
@@ -155,13 +153,13 @@ describe('TeamManagementComponent', () => {
 
     it('on create error, modal is closed with failure banner', () => {
       spyOn(component.conflictErrorEvent, 'emit');
-      component.openCreateModal('v1');
+      component.openCreateModal();
       component.createV1TeamForm.controls['name'].setValue(team.id);
       component.createV1TeamForm.controls['description'].setValue(team.name);
       component.createV1Team();
 
       const error = <HttpErrorResponse>{
-        status: 500,
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
         ok: false
       };
       store.dispatch(new CreateTeamFailure(error));
@@ -182,26 +180,23 @@ describe('TeamManagementComponent', () => {
 
     beforeEach(() => {
       store = TestBed.get(Store);
-      store.dispatch(new GetTeamsSuccess({
-        teams: []
-      }));
-      component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v2');
+      component.isV1 = false;
       fixture.detectChanges();
     });
 
     it('openCreateModal on v2 opens v2 modal', () => {
       expect(component.createV1TeamModalVisible).toBe(false);
       expect(component.createModalVisible).toBe(false);
-      component.openCreateModal('v2');
+      component.openCreateModal();
       expect(component.createV1TeamModalVisible).toBe(false);
       expect(component.createModalVisible).toBe(true);
     });
 
     it('on success, closes modal and adds new team', () => {
-      component.openCreateModal('v2');
+      component.openCreateModal();
       component.createTeamForm.controls['name'].setValue(team.name);
       component.createTeamForm.controls['id'].setValue(team.id);
-      component.createTeam();
+      component.createV2Team();
 
       store.dispatch(new CreateTeamSuccess(team));
 
@@ -232,7 +227,7 @@ describe('TeamManagementComponent', () => {
       component.startTeamDelete(deleteTeam);
       fixture.detectChanges();
 
-      expect(component.deleteModalVisible).toEqual(true);
+      expect(component.deleteModalVisible).toBe(true);
     });
 
     it('confirming delete closes modal and removes the team', () => {
@@ -241,7 +236,7 @@ describe('TeamManagementComponent', () => {
       store.dispatch(new DeleteTeamSuccess(deleteTeam));
       fixture.detectChanges();
 
-      expect(component.deleteModalVisible).toEqual(false);
+      expect(component.deleteModalVisible).toBe(false);
       component.sortedTeams$.subscribe(teams => {
         expect(teams).not.toContain(deleteTeam);
       });

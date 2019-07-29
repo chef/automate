@@ -62,9 +62,12 @@
       <section class="page-body">
         <form [formGroup]="updateNameForm">
           <chef-form-field>
-            <label *ngIf="isV1">Description *</label>
-            <label *ngIf="!isV1">Name *</label>
+            <label>{{ descriptionOrName | titlecase }} <span aria-hidden="true">*</span></label>
             <input chefInput formControlName="name" type="text" (keyup)="keyPressed()">
+            <chef-error
+              *ngIf="(updateNameForm.get('name').hasError('required') || updateNameForm.get('name').hasError('pattern')) && updateNameForm.get('name').dirty">
+              {{ descriptionOrName | titlecase }} is required.
+            </chef-error>
           </chef-form-field>
         </form>
           <chef-button [disabled]="isLoading || !updateNameForm.valid || updateNameForm.controls['name'].value === team?.name"
