@@ -71,7 +71,7 @@ required = [
 
 [[constraint]]
   name = "github.com/grpc-ecosystem/grpc-gateway"
-  version = "1.9.4"
+  version = "1.9.5"
 
 [[constraint]]
   name = "github.com/olivere/elastic"
