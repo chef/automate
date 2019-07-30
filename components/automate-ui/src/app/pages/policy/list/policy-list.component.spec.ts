@@ -8,7 +8,7 @@ import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { customMatchers } from 'app/testing/custom-matchers';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import { GetPoliciesSuccess } from 'app/entities/policies/policy.actions';
-import { IAMMajorVersion, IAMType } from 'app/entities/policies/policy.model';
+import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import { PolicyListComponent } from './policy-list.component';
 
 describe('PolicyListComponent', () => {
@@ -90,19 +90,19 @@ describe('PolicyListComponent', () => {
         policies: [
           {
             id: 'uuid-1', name: 'Viewer',
-            members: [], statements: [], type: <IAMType>'CHEF_MANAGED'
+            members: [], statements: [], type: 'CHEF_MANAGED'
           },
           {
             id: 'uuid-2', name: 'developer',
-            members: [], statements: [], type: <IAMType>'CUSTOM'
+            members: [], statements: [], type: 'CUSTOM'
           },
           {
             id: 'uuid-5', name: 'Developer',
-            members: [], statements: [], type: <IAMType>'CUSTOM'
+            members: [], statements: [], type: 'CUSTOM'
           },
           {
             id: 'uuid-6', name: 'viewer',
-            members: [], statements: [], type: <IAMType>'CHEF_MANAGED'
+            members: [], statements: [], type: 'CHEF_MANAGED'
           }
         ]
       }));
@@ -120,15 +120,15 @@ describe('PolicyListComponent', () => {
         policies: [
           {
             id: 'uuid-2', name: 'developer',
-            members: [], statements: [], type: <IAMType>'CUSTOM'
+            members: [], statements: [], type: 'CUSTOM'
           },
           {
             id: 'uuid-4', name: 'developer-Manager',
-            members: [], statements: [], type: <IAMType>'CUSTOM'
+            members: [], statements: [], type: 'CUSTOM'
           },
           {
             id: 'uuid-5', name: 'Developer',
-            members: [], statements: [], type: <IAMType>'CUSTOM'
+            members: [], statements: [], type: 'CUSTOM'
           }
         ]
       }));
@@ -145,23 +145,23 @@ describe('PolicyListComponent', () => {
         policies: [
           {
             id: 'uuid-1', name: 'Viewer01',
-            members: [], statements: [], type: <IAMType>'CHEF_MANAGED'
+            members: [], statements: [], type: 'CHEF_MANAGED'
           },
           {
             id: 'uuid-2', name: 'Viewer300',
-            members: [], statements: [], type: <IAMType>'CUSTOM'
+            members: [], statements: [], type: 'CUSTOM'
           },
           {
             id: 'uuid-3', name: 'Viewer3',
-            members: [], statements: [], type: <IAMType>'CUSTOM'
+            members: [], statements: [], type: 'CUSTOM'
           },
           {
             id: 'uuid-4', name: 'Viewer-2', // does not fit in same grouping
-            members: [], statements: [], type: <IAMType>'CUSTOM'
+            members: [], statements: [], type: 'CUSTOM'
           },
           {
             id: 'uuid-6', name: 'viewer',
-            members: [], statements: [], type: <IAMType>'CHEF_MANAGED'
+            members: [], statements: [], type: 'CHEF_MANAGED'
           }
         ]
       }));
