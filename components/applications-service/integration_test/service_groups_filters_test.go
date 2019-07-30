@@ -442,5 +442,17 @@ func TestServiceGroupsFilterServiceGroupNameDouble(t *testing.T) {
 
 	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
 	assert.Nil(t, err)
-	assertServiceGroupsEqual(t, expected, response)
+
+	//Should return both service groups
+	if assert.Equal(t, 2, len(response.GetServiceGroups())) {
+		svcList := response.GetServiceGroups()
+		svcIdList := make([]string, 2)
+		for i, svc := range svcList {
+			svcIdList[i] = svc.Name
+		}
+		assert.Contains(t, svcIdList, expected.GetServiceGroups()[0].Name,
+			"the service group name is not the expected one")
+		assert.Contains(t, svcIdList, expected.GetServiceGroups()[1].Name,
+			"the service group name is not the expected one")
+	}
 }

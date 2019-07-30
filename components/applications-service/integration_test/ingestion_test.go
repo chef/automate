@@ -644,9 +644,13 @@ func TestIngestDenySupervisorMemberIDUpdates(t *testing.T) {
 
 	// we expect to have two services
 	if assert.Equal(t, 2, len(svcList)) {
-		assert.Equal(t, "4f1un3", svcList[0].SupMemberID,
+		svcIdList := make([]string, 2)
+		for i, svc := range svcList {
+			svcIdList[i] = svc.SupMemberID
+		}
+		assert.Contains(t, svcIdList, "4f1un3",
 			"the service supervisor_id is not the expected one")
-		assert.Equal(t, "foo", svcList[1].SupMemberID,
+		assert.Contains(t, svcIdList, "foo",
 			"the service supervisor_id is not the expected one")
 	}
 }
