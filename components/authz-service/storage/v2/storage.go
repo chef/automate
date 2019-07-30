@@ -195,14 +195,12 @@ func DefaultProjects() []Project {
 		ID:       constants_v2.AllProjectsID,
 		Name:     "All Projects",
 		Type:     ChefManaged,
-		Projects: []string{constants_v2.AllProjectsID},
 	}
 
 	unassignedProject := Project{
 		ID:       constants_v2.UnassignedProjectID,
 		Name:     constants_v2.UnassignedProjectID,
 		Type:     ChefManaged,
-		Projects: []string{constants_v2.UnassignedProjectID},
 	}
 
 	return []Project{allProjects, unassignedProject}

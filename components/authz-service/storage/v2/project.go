@@ -14,7 +14,6 @@ type Project struct {
 	ID       string   `json:"id"`
 	Name     string   `json:"name"`
 	Type     Type     `json:"type"`
-	Projects []string `json:"projects"`
 }
 
 // Note: also catches empty names ("")
@@ -47,6 +46,5 @@ func NewProject(id string, name string, typeVal Type) (Project, error) {
 		ID:       id,
 		Name:     name,
 		Type:     typeVal,
-		Projects: []string{id},
 	}, nil
 }

@@ -1115,7 +1115,7 @@ func TestCreatePolicy(t *testing.T) {
 			require.Error(t, err)
 			assert.Nil(t, resp)
 
-			_, ok:= err.(*storage_errors.ForeignKeyError)
+			_, ok := err.(*storage_errors.ForeignKeyError)
 			assert.True(t, ok, "expected foreign key error")
 			assert.Equal(t, "role not found: "+role, err.Error())
 
@@ -4397,7 +4397,6 @@ func TestCreateProject(t *testing.T) {
 				ID:       "my-id-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"my-id-1"},
 			}
 			resp, err := store.CreateProject(ctx, &project)
 			require.NoError(t, err)
@@ -4410,7 +4409,6 @@ func TestCreateProject(t *testing.T) {
 				ID:       "my-id-1",
 				Name:     "name1",
 				Type:     storage.ChefManaged,
-				Projects: []string{"my-id-1"},
 			}
 			resp, err := store.CreateProject(ctx, &project)
 			require.NoError(t, err)
@@ -4424,7 +4422,6 @@ func TestCreateProject(t *testing.T) {
 				ID:       projectID,
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"my-id-1"},
 			}
 			resp, err := store.CreateProject(ctx, &projectOriginal)
 			require.NoError(t, err)
@@ -4434,7 +4431,6 @@ func TestCreateProject(t *testing.T) {
 				ID:       projectID,
 				Name:     "Something Else",
 				Type:     storage.Custom,
-				Projects: []string{"my-id-1"},
 			}
 			resp, err = store.CreateProject(ctx, &projectConflict)
 			assert.Error(t, err)
@@ -4448,7 +4444,6 @@ func TestCreateProject(t *testing.T) {
 					ID:       projectID,
 					Name:     "name-" + strconv.Itoa(i),
 					Type:     storage.Custom,
-					Projects: []string{projectID},
 				}
 				resp, err := store.CreateProject(ctx, &project)
 				require.NoError(t, err)
@@ -4460,7 +4455,6 @@ func TestCreateProject(t *testing.T) {
 				ID:       oneProjectTooManyID,
 				Name:     "Something Else",
 				Type:     storage.Custom,
-				Projects: []string{oneProjectTooManyID},
 			}
 			resp, err := store.CreateProject(ctx, &oneProjectTooMany)
 			assert.Nil(t, resp)
@@ -4473,7 +4467,6 @@ func TestCreateProject(t *testing.T) {
 					ID:       projectID,
 					Name:     "name-" + strconv.Itoa(i),
 					Type:     storage.Custom,
-					Projects: []string{projectID},
 				}
 				resp, err := store.CreateProject(ctx, &project)
 				require.NoError(t, err)
@@ -4485,7 +4478,6 @@ func TestCreateProject(t *testing.T) {
 				ID:       chefManagedProjectID,
 				Name:     "Something Else",
 				Type:     storage.ChefManaged,
-				Projects: []string{chefManagedProjectID},
 			}
 			resp, err := store.CreateProject(ctx, &chefManagedProject)
 			require.NoError(t, err)
@@ -4513,7 +4505,6 @@ func TestUpdateProject(t *testing.T) {
 				ID:       "foo",
 				Name:     "updated-name",
 				Type:     storage.Custom,
-				Projects: []string{"foo"},
 			}
 			resp, err := store.UpdateProject(ctx, &project)
 			require.NoError(t, err)
@@ -4529,7 +4520,6 @@ func TestUpdateProject(t *testing.T) {
 				ID:       "foo",
 				Name:     "updated-name",
 				Type:     storage.Custom,
-				Projects: []string{"foo"},
 			}
 			ctx = insertProjectsIntoContext(ctx, []string{"foo", "bar"})
 			resp, err := store.UpdateProject(ctx, &project)
@@ -4546,7 +4536,6 @@ func TestUpdateProject(t *testing.T) {
 				ID:       "foo",
 				Name:     "updated-name",
 				Type:     storage.Custom,
-				Projects: []string{"foo"},
 			}
 			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 
@@ -4562,23 +4551,7 @@ func TestUpdateProject(t *testing.T) {
 				ID:       "not-found",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"not-found"},
 			}
-			resp, err := store.UpdateProject(ctx, &project)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
-			assert.Nil(t, resp)
-		},
-		"returns ErrNotFound if one of its projects doesn't exist": func(t *testing.T) {
-			ctx := context.Background()
-			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
-			project := storage.Project{
-				ID:       "not-found",
-				Name:     "name1",
-				Type:     storage.Custom,
-				Projects: []string{"foo", "not-found"},
-			}
-			// Note(sr): if we used db_id to reference a project's projects, we'd also
-			// use the project_db_id() SQL function, and this error would change.
 			resp, err := store.UpdateProject(ctx, &project)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 			assert.Nil(t, resp)
@@ -4591,7 +4564,6 @@ func TestUpdateProject(t *testing.T) {
 				ID:       "foo",
 				Name:     "updated-name",
 				Type:     storage.Custom,
-				Projects: []string{"foo"},
 			}
 			ctx = insertProjectsIntoContext(ctx, []string{"wrong", "projects"})
 
@@ -4632,7 +4604,6 @@ func TestGetProject(t *testing.T) {
 				ID:       "foo",
 				Name:     "my foo project",
 				Type:     storage.ChefManaged,
-				Projects: []string{"foo"},
 			}
 			assert.Equal(t, &expectedProject, p)
 		}},
@@ -4648,7 +4619,6 @@ func TestGetProject(t *testing.T) {
 				ID:       "foo",
 				Name:     "my foo project",
 				Type:     storage.Custom,
-				Projects: []string{"foo"},
 			}
 			assert.Equal(t, &expectedProject, p)
 		}},
@@ -4664,7 +4634,6 @@ func TestGetProject(t *testing.T) {
 				ID:       "foo",
 				Name:     "my foo project",
 				Type:     storage.Custom,
-				Projects: []string{"foo"},
 			}
 			assert.Equal(t, &expectedProject, p)
 		}},
@@ -4719,14 +4688,12 @@ func TestDeleteProject(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			project2 := storage.Project{
 				ID:       "project-2",
 				Name:     "name2",
 				Type:     storage.Custom,
-				Projects: []string{"project-2"},
 			}
 			_, err = store.CreateProject(ctx, &project2)
 			require.NoError(t, err)
@@ -4765,14 +4732,12 @@ func TestDeleteProject(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			project2 := storage.Project{
 				ID:       "project-2",
 				Name:     "name2",
 				Type:     storage.Custom,
-				Projects: []string{"project-2"},
 			}
 			_, err = store.CreateProject(ctx, &project2)
 			require.NoError(t, err)
@@ -4815,14 +4780,12 @@ func TestDeleteProject(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			project2 := storage.Project{
 				ID:       "project-2",
 				Name:     "name2",
 				Type:     storage.Custom,
-				Projects: []string{"project-2"},
 			}
 			_, err = store.CreateProject(ctx, &project2)
 			require.NoError(t, err)
@@ -4966,13 +4929,11 @@ func TestListProjects(t *testing.T) {
 					ID:       "foo",
 					Name:     "my foo project",
 					Type:     storage.ChefManaged,
-					Projects: []string{"foo"},
 				},
 				{
 					ID:       "bar",
 					Name:     "my bar project",
 					Type:     storage.Custom,
-					Projects: []string{"bar"},
 				},
 			}
 
@@ -4993,13 +4954,11 @@ func TestListProjects(t *testing.T) {
 					ID:       "foo",
 					Name:     "my foo project",
 					Type:     storage.ChefManaged,
-					Projects: []string{"foo"},
 				},
 				{
 					ID:       "bar",
 					Name:     "my bar project",
 					Type:     storage.Custom,
-					Projects: []string{"bar"},
 				},
 			}
 
@@ -5018,13 +4977,11 @@ func TestListProjects(t *testing.T) {
 					ID:       "foo",
 					Name:     "my foo project",
 					Type:     storage.ChefManaged,
-					Projects: []string{"foo"},
 				},
 				{
 					ID:       "bar",
 					Name:     "my bar project",
 					Type:     storage.Custom,
-					Projects: []string{"bar"},
 				},
 			}
 
@@ -5045,13 +5002,11 @@ func TestListProjects(t *testing.T) {
 					ID:       "foo",
 					Name:     "my foo project",
 					Type:     storage.ChefManaged,
-					Projects: []string{"foo"},
 				},
 				{
 					ID:       "bar",
 					Name:     "my bar project",
 					Type:     storage.Custom,
-					Projects: []string{"bar"},
 				},
 			}
 
@@ -5073,19 +5028,16 @@ func TestListProjects(t *testing.T) {
 					ID:       "foo",
 					Name:     "my foo project",
 					Type:     storage.ChefManaged,
-					Projects: []string{"foo"},
 				},
 				{
 					ID:       "bar",
 					Name:     "my bar project",
 					Type:     storage.Custom,
-					Projects: []string{"bar"},
 				},
 				{
 					ID:       "baz",
 					Name:     "my baz project",
 					Type:     storage.Custom,
-					Projects: []string{"baz"},
 				},
 			}
 
@@ -5106,19 +5058,16 @@ func TestListProjects(t *testing.T) {
 					ID:       "foo",
 					Name:     "my foo project",
 					Type:     storage.ChefManaged,
-					Projects: []string{"foo"},
 				},
 				{
 					ID:       "bar",
 					Name:     "my bar project",
 					Type:     storage.Custom,
-					Projects: []string{"bar"},
 				},
 				{
 					ID:       "baz",
 					Name:     "my baz project",
 					Type:     storage.Custom,
-					Projects: []string{"baz"},
 				},
 			}
 
@@ -5180,7 +5129,6 @@ func TestCreateRole(t *testing.T) {
 				ID:       "my-id-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"my-id-1"},
 			}
 
 			_, err := store.CreateProject(ctx, &project)
@@ -5191,7 +5139,7 @@ func TestCreateRole(t *testing.T) {
 				Name:     "name2",
 				Type:     storage.Custom,
 				Actions:  []string{"action1", "action2", "action3"},
-				Projects: []string{project.ID},
+				Projects: []string{"my-id-1"},
 			}
 			assertPolicyChange(t, store, func() {
 				resp, err := store.CreateRole(ctx, &role)
@@ -5206,7 +5154,6 @@ func TestCreateRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -5215,7 +5162,6 @@ func TestCreateRole(t *testing.T) {
 				ID:       "project-2",
 				Name:     "name2",
 				Type:     storage.Custom,
-				Projects: []string{"project-2"},
 			}
 			_, err = store.CreateProject(ctx, &project2)
 			require.NoError(t, err)
@@ -5305,7 +5251,6 @@ func TestListRoles(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -5314,7 +5259,6 @@ func TestListRoles(t *testing.T) {
 				ID:       "project-2",
 				Name:     "name2",
 				Type:     storage.Custom,
-				Projects: []string{"project-2"},
 			}
 			_, err = store.CreateProject(ctx, &project2)
 			require.NoError(t, err)
@@ -5353,7 +5297,6 @@ func TestListRoles(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -5362,7 +5305,6 @@ func TestListRoles(t *testing.T) {
 				ID:       "project-2",
 				Name:     "name2",
 				Type:     storage.Custom,
-				Projects: []string{"project-2"},
 			}
 			_, err = store.CreateProject(ctx, &project2)
 			require.NoError(t, err)
@@ -5371,7 +5313,6 @@ func TestListRoles(t *testing.T) {
 				ID:       "project-3",
 				Name:     "name3",
 				Type:     storage.Custom,
-				Projects: []string{"project-3"},
 			}
 			_, err = store.CreateProject(ctx, &project3)
 			require.NoError(t, err)
@@ -5428,7 +5369,6 @@ func TestListRoles(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -5437,7 +5377,6 @@ func TestListRoles(t *testing.T) {
 				ID:       "project-2",
 				Name:     "name2",
 				Type:     storage.Custom,
-				Projects: []string{"project-2"},
 			}
 			_, err = store.CreateProject(ctx, &project2)
 			require.NoError(t, err)
@@ -5446,7 +5385,6 @@ func TestListRoles(t *testing.T) {
 				ID:       "project-3",
 				Name:     "name3",
 				Type:     storage.Custom,
-				Projects: []string{"project-3"},
 			}
 			_, err = store.CreateProject(ctx, &project3)
 			require.NoError(t, err)
@@ -5498,7 +5436,6 @@ func TestListRoles(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -5507,7 +5444,6 @@ func TestListRoles(t *testing.T) {
 				ID:       "project-2",
 				Name:     "name2",
 				Type:     storage.Custom,
-				Projects: []string{"project-2"},
 			}
 			_, err = store.CreateProject(ctx, &project2)
 			require.NoError(t, err)
@@ -5556,7 +5492,6 @@ func TestListRoles(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -5565,7 +5500,6 @@ func TestListRoles(t *testing.T) {
 				ID:       "project-2",
 				Name:     "name2",
 				Type:     storage.Custom,
-				Projects: []string{"project-2"},
 			}
 			_, err = store.CreateProject(ctx, &project2)
 			require.NoError(t, err)
@@ -5633,7 +5567,6 @@ func TestGetRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -5654,7 +5587,6 @@ func TestGetRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -5678,7 +5610,6 @@ func TestGetRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -5687,7 +5618,6 @@ func TestGetRole(t *testing.T) {
 				ID:       "project-2",
 				Name:     "name2",
 				Type:     storage.Custom,
-				Projects: []string{"project-2"},
 			}
 			_, err = store.CreateProject(ctx, &project2)
 			require.NoError(t, err)
@@ -5712,7 +5642,6 @@ func TestGetRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -5721,7 +5650,6 @@ func TestGetRole(t *testing.T) {
 				ID:       "project-2",
 				Name:     "name2",
 				Type:     storage.Custom,
-				Projects: []string{"project-2"},
 			}
 			_, err = store.CreateProject(ctx, &project2)
 			require.NoError(t, err)
@@ -5746,7 +5674,6 @@ func TestGetRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -5771,7 +5698,6 @@ func TestGetRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -5796,7 +5722,6 @@ func TestGetRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -5805,7 +5730,6 @@ func TestGetRole(t *testing.T) {
 				ID:       "project-2",
 				Name:     "name2",
 				Type:     storage.Custom,
-				Projects: []string{"project-2"},
 			}
 			_, err = store.CreateProject(ctx, &project2)
 			require.NoError(t, err)
@@ -5890,7 +5814,6 @@ func TestDeleteRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -5919,7 +5842,6 @@ func TestDeleteRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -5941,7 +5863,6 @@ func TestDeleteRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -5979,7 +5900,6 @@ func TestDeleteRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -6018,7 +5938,6 @@ func TestDeleteRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -6027,7 +5946,6 @@ func TestDeleteRole(t *testing.T) {
 				ID:       "project-2",
 				Name:     "name2",
 				Type:     storage.Custom,
-				Projects: []string{"project-2"},
 			}
 			_, err = store.CreateProject(ctx, &project2)
 			require.NoError(t, err)
@@ -6036,7 +5954,6 @@ func TestDeleteRole(t *testing.T) {
 				ID:       "project-3",
 				Name:     "name3",
 				Type:     storage.Custom,
-				Projects: []string{"project-3"},
 			}
 			_, err = store.CreateProject(ctx, &project3)
 			require.NoError(t, err)
@@ -6059,7 +5976,6 @@ func TestDeleteRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -6068,7 +5984,6 @@ func TestDeleteRole(t *testing.T) {
 				ID:       "project-2",
 				Name:     "name2",
 				Type:     storage.Custom,
-				Projects: []string{"project-2"},
 			}
 			_, err = store.CreateProject(ctx, &project2)
 			require.NoError(t, err)
@@ -6077,7 +5992,6 @@ func TestDeleteRole(t *testing.T) {
 				ID:       "project-3",
 				Name:     "name3",
 				Type:     storage.Custom,
-				Projects: []string{"project-3"},
 			}
 			_, err = store.CreateProject(ctx, &project3)
 			require.NoError(t, err)
@@ -6100,7 +6014,6 @@ func TestDeleteRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -6109,7 +6022,6 @@ func TestDeleteRole(t *testing.T) {
 				ID:       "project-2",
 				Name:     "name2",
 				Type:     storage.Custom,
-				Projects: []string{"project-2"},
 			}
 			_, err = store.CreateProject(ctx, &project2)
 			require.NoError(t, err)
@@ -6118,7 +6030,6 @@ func TestDeleteRole(t *testing.T) {
 				ID:       "project-3",
 				Name:     "name3",
 				Type:     storage.Custom,
-				Projects: []string{"project-3"},
 			}
 			_, err = store.CreateProject(ctx, &project3)
 			require.NoError(t, err)
@@ -6141,7 +6052,6 @@ func TestDeleteRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -6150,7 +6060,6 @@ func TestDeleteRole(t *testing.T) {
 				ID:       "project-2",
 				Name:     "name2",
 				Type:     storage.Custom,
-				Projects: []string{"project-2"},
 			}
 			_, err = store.CreateProject(ctx, &project2)
 			require.NoError(t, err)
@@ -6159,7 +6068,6 @@ func TestDeleteRole(t *testing.T) {
 				ID:       "project-3",
 				Name:     "name3",
 				Type:     storage.Custom,
-				Projects: []string{"project-3"},
 			}
 			_, err = store.CreateProject(ctx, &project3)
 			require.NoError(t, err)
@@ -6238,7 +6146,6 @@ func TestUpdateRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -6266,7 +6173,6 @@ func TestUpdateRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -6275,7 +6181,6 @@ func TestUpdateRole(t *testing.T) {
 				ID:       "project-2",
 				Name:     "name2",
 				Type:     storage.Custom,
-				Projects: []string{"project-2"},
 			}
 			_, err = store.CreateProject(ctx, &project2)
 			require.NoError(t, err)
@@ -6284,7 +6189,6 @@ func TestUpdateRole(t *testing.T) {
 				ID:       "project-3",
 				Name:     "name3",
 				Type:     storage.Custom,
-				Projects: []string{"project-3"},
 			}
 			_, err = store.CreateProject(ctx, &project3)
 			require.NoError(t, err)
@@ -6293,7 +6197,6 @@ func TestUpdateRole(t *testing.T) {
 				ID:       "project-4",
 				Name:     "name4",
 				Type:     storage.Custom,
-				Projects: []string{"project-4"},
 			}
 			_, err = store.CreateProject(ctx, &project4)
 			require.NoError(t, err)
@@ -6321,7 +6224,6 @@ func TestUpdateRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -6330,7 +6232,6 @@ func TestUpdateRole(t *testing.T) {
 				ID:       "project-2",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-2"},
 			}
 			_, err = store.CreateProject(ctx, &project2)
 			require.NoError(t, err)
@@ -6358,7 +6259,6 @@ func TestUpdateRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -6367,7 +6267,6 @@ func TestUpdateRole(t *testing.T) {
 				ID:       "project-2",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-2"},
 			}
 			_, err = store.CreateProject(ctx, &project2)
 			require.NoError(t, err)
@@ -6392,7 +6291,6 @@ func TestUpdateRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -6401,7 +6299,6 @@ func TestUpdateRole(t *testing.T) {
 				ID:       "project-2",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-2"},
 			}
 			_, err = store.CreateProject(ctx, &project2)
 			require.NoError(t, err)
@@ -6410,7 +6307,6 @@ func TestUpdateRole(t *testing.T) {
 				ID:       "project-3",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-3"},
 			}
 			_, err = store.CreateProject(ctx, &project3)
 			require.NoError(t, err)
@@ -6439,7 +6335,6 @@ func TestUpdateRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -6489,7 +6384,6 @@ func TestUpdateRole(t *testing.T) {
 				ID:       "project-1",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-1"},
 			}
 			_, err := store.CreateProject(ctx, &project1)
 			require.NoError(t, err)
@@ -6498,7 +6392,6 @@ func TestUpdateRole(t *testing.T) {
 				ID:       "project-2",
 				Name:     "name1",
 				Type:     storage.Custom,
-				Projects: []string{"project-2"},
 			}
 			_, err = store.CreateProject(ctx, &project2)
 			require.NoError(t, err)
@@ -6961,8 +6854,8 @@ func insertTestProject(t *testing.T, db *testhelpers.TestDB, id string, name str
 	proj, err := storage.NewProject(id, name, projType)
 	require.NoError(t, err)
 
-	_, err = db.Exec(`INSERT INTO iam_projects (id, name, type, projects) values ($1, $2, $3, $4)`,
-		proj.ID, proj.Name, projType.String(), pq.Array([]string{proj.ID}))
+	_, err = db.Exec(`INSERT INTO iam_projects (id, name, type) values ($1, $2, $3)`,
+		proj.ID, proj.Name, projType.String())
 	require.NoError(t, err)
 
 	return proj

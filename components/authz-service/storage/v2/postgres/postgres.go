@@ -1374,8 +1374,8 @@ func (p *pg) UpdateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 	// Update project if ID found AND intersection between projects and projectsFilter,
 	// unless the projectsFilter is empty (v2.0 case).
 	res, err := p.db.ExecContext(ctx,
-		`UPDATE iam_projects SET name =
-			$2 WHERE id = $1 AND (array_length($3::TEXT[], 1) IS NULL OR projects && $3);`,
+		`UPDATE iam_projects SET name=$2
+		WHERE id=$1 AND (array_length($3::TEXT[], 1) IS NULL OR id=ANY($3));`,
 		project.ID, project.Name, pq.Array(projectsFilter))
 	if err != nil {
 		return nil, p.processError(err)
@@ -1403,7 +1403,6 @@ func (p *pg) GetProject(ctx context.Context, id string) (*v2.Project, error) {
 	if err := row.Scan(&project); err != nil {
 		return nil, p.processError(err)
 	}
-
 	return &project, nil
 }
 
@@ -1416,7 +1415,7 @@ func (p *pg) DeleteProject(ctx context.Context, id string) error {
 	// Delete project if ID found AND intersection between projects and projectsFilter,
 	// unless the projectsFilter is empty (v2.0 case).
 	res, err := p.db.ExecContext(ctx,
-		`DELETE FROM iam_projects WHERE id=$1 AND (array_length($2::TEXT[], 1) IS NULL OR projects && $2);`,
+		`DELETE FROM iam_projects WHERE id=$1 AND (array_length($2::TEXT[], 1) IS NULL OR id=ANY($2));`,
 		id, pq.Array(projectsFilter),
 	)
 	if err != nil {
@@ -1465,12 +1464,9 @@ func (p *pg) ListProjects(ctx context.Context) ([]*v2.Project, error) {
 }
 
 func (p *pg) insertProjectWithQuerier(ctx context.Context, project *v2.Project, q Querier) error {
-	_, err := q.ExecContext(ctx, `INSERT INTO iam_projects (id, name, type, projects)  VALUES ($1, $2, $3, $4);`,
-		project.ID, project.Name, project.Type.String(), pq.Array([]string{project.ID}))
-	if err != nil {
-		return err
-	}
-	return nil
+	_, err := q.ExecContext(ctx, `INSERT INTO iam_projects (id, name, type)  VALUES ($1, $2, $3);`,
+		project.ID, project.Name, project.Type.String())
+	return err
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
