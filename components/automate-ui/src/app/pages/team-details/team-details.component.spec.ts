@@ -87,7 +87,7 @@ describe('TeamDetailsComponent', () => {
     }).compileComponents();
   }));
 
-  const someTeam = <Team>{
+  const someTeam: Team = {
     id: 'some-team',
     name: 'some team',
     guid: 'a-team-uuid-01',
@@ -139,6 +139,50 @@ describe('TeamDetailsComponent', () => {
       component.sortedUsers$.subscribe((users) => {
         expect(users.length).toBe(0);
       });
+    });
+  });
+
+  describe('add users', () => {
+    let store: Store<NgrxStateAtom>;
+
+    const user1: User = {
+      id: 'user1',
+      name: 'user1',
+      membership_id: 'uuid-1'
+    };
+    const user2: User = {
+      id: 'user2',
+      name: 'user2',
+      membership_id: 'uuid-2'
+    };
+    const usersToAdd: HashMapOfUsers = {
+      'user1': user1,
+      'user2': user2
+    };
+
+    beforeEach(() => {
+      store = TestBed.get(Store);
+      store.dispatch(new GetTeamSuccess(someTeam));
+      store.dispatch(new GetUsersSuccess({
+        users: [user1, user2]
+      }));
+    });
+
+    it('successfully adds users', () => {
+      component.teamMembershipView = false;
+      component.toggleUserMembershipView();
+      component.addUsers(usersToAdd);
+
+      expect(component.teamMembershipView).toBe(false);
+      store.dispatch(new GetTeamUsersSuccess({
+        user_ids: [user1.membership_id, user2.membership_id]
+      }));
+
+      for (const user of [user1, user2]) {
+        component.sortedUsers$.subscribe(users => {
+          expect(users).toContain(user);
+        });
+      }
     });
   });
 

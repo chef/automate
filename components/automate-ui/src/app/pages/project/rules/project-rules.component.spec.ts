@@ -17,7 +17,7 @@ describe('ProjectRulesComponent', () => {
   let component: ProjectRulesComponent;
   let fixture: ComponentFixture<ProjectRulesComponent>;
 
-  const project = <Project>{
+  const project: Project = {
     id: 'uuid-1',
     name: 'Default',
     type: 'CHEF_MANAGED'

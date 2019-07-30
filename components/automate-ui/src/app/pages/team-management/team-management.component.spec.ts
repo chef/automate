@@ -171,7 +171,7 @@ describe('TeamManagementComponent', () => {
 
   describe('create v2 team', () => {
     let store: Store<NgrxStateAtom>;
-    const team = <Team>{
+    const team: Team = {
       guid: 'uuid-1',
       id: 'new-team',
       name: 'new team',
@@ -208,7 +208,7 @@ describe('TeamManagementComponent', () => {
 
   describe('delete team', () => {
     let store: Store<NgrxStateAtom>;
-    const deleteTeam = <Team>{
+    const deleteTeam: Team = {
       guid: 'uuid-1',
       id: 'new-team',
       name: 'new team',
