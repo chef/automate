@@ -156,7 +156,7 @@ func (p *PGBackend) GetLicense(ctx context.Context) (string, keys.LicenseMetadat
 }
 
 func (p *PGBackend) doGetLicense(ctx context.Context) (string, keys.LicenseMetadata, error) {
-	row := p.db.QueryRowContext(ctx, "SELECT configured_at, data FROM license WHERE current=TRUE")
+	row := p.db.QueryRowContext(ctx, "SELECT configured_at, data FROM licenses WHERE active=TRUE")
 
 	md := keys.LicenseMetadata{}
 	var licenseData string
@@ -178,7 +178,7 @@ func (p *PGBackend) SetLicense(ctx context.Context, data string) error {
 }
 
 func (p *PGBackend) doSetLicense(ctx context.Context, data string) error {
-	_, err := p.db.ExecContext(ctx, "INSERT INTO license(data) VALUES ($1) ON CONFLICT (current) DO UPDATE SET data = $1, configured_at = NOW()", data)
+	_, err := p.db.ExecContext(ctx, "SELECT set_active_license_v1($1)", data)
 	return err
 }
 
