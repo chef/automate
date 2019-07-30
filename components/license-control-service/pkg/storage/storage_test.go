@@ -47,22 +47,6 @@ func TestPGBackend(t *testing.T) {
 		_, err = db.Exec(resetDatabaseStatement)
 		require.NoError(t, err, "reset db")
 	}
-	t.Run("GetLicense should fail if called before init", func(t *testing.T) {
-		backend := storage.NewCurrentBackend(pgURL, "../../migrations", "/definitely/should/not/exist")
-		_, _, err := backend.GetLicense(context.Background())
-		require.Error(t, err)
-		_, ok := err.(*storage.NotInitializedError)
-		assert.True(t, ok, "is a *storage.NotIntializedError")
-	})
-
-	t.Run("SetLicense should fail if called before init", func(t *testing.T) {
-		backend := storage.NewCurrentBackend(pgURL, "../../migrations", "/definitely/should/not/exist")
-		err := backend.SetLicense(context.Background(), "foo")
-		require.Error(t, err)
-		_, ok := err.(*storage.NotInitializedError)
-		assert.True(t, ok, "is a *storage.NotIntiailizedError")
-	})
-
 	t.Run("Init should succeed with non-existent legacy migration file", func(t *testing.T) {
 		defer resetDB(t)
 		backend := storage.NewCurrentBackend(pgURL, "../../migrations", "/definitely/should/not/exist")

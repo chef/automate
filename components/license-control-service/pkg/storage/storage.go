@@ -27,18 +27,12 @@ func (n *NoLicenseError) Error() string {
 	return fmt.Sprintf("No license found in %s storage backend", n.backend)
 }
 
-// NotInitializedError is returned by a CurrentBackend when the user fails to
-// call Init() before interacting with it.
-type NotInitializedError struct{ backend string }
-
-func (n *NotInitializedError) Error() string {
-	return fmt.Sprintf("Init() never called on %s storage backend", n.backend)
-}
-
 // A CurrentBackend can be used as a storage backend for the
 // license-control-service.
 type CurrentBackend interface {
-	// Init migrates data from any known Upgradeable Backends
+	// Init prepares the backend and migrates data from any known
+	// Upgradeable Backends. Must be called before GetLicense and
+	// SetLicense.
 	Init(context.Context, *keys.LicenseParser) error
 	// GetLicense returns the currently configured autoamte
 	// license. If no license is configured, NoLicense is
@@ -80,20 +74,10 @@ type PGBackend struct {
 	migrationPath     string
 	legacyFileBackend UpgradeableBackend
 
-	db          *sql.DB
-	initialized bool
+	db *sql.DB
 }
 
 func (p *PGBackend) Init(ctx context.Context, l *keys.LicenseParser) error {
-	err := p.doInit(ctx, l)
-	if err != nil {
-		return err
-	}
-	p.initialized = true
-	return nil
-}
-
-func (p *PGBackend) doInit(ctx context.Context, l *keys.LicenseParser) error {
 	db, err := sql.Open("postgres", p.pgURL)
 	if err != nil {
 		return errors.Wrap(err, "failed to open database connection")
@@ -105,7 +89,7 @@ func (p *PGBackend) doInit(ctx context.Context, l *keys.LicenseParser) error {
 		return errors.Wrap(err, "failed to apply database schema")
 	}
 
-	_, _, err = p.doGetLicense(ctx)
+	_, _, err = p.GetLicense(ctx)
 	switch err.(type) {
 	case nil:
 		// Already migrated
@@ -132,7 +116,7 @@ func (p *PGBackend) migrateFromFileBackend(ctx context.Context, l *keys.LicenseP
 			return nil
 		}
 
-		err = p.doSetLicense(ctx, license)
+		err = p.SetLicense(ctx, license)
 		if err != nil {
 			return errors.Wrap(err, "failed to migrate license to postgresql")
 		}
@@ -149,13 +133,6 @@ func (p *PGBackend) migrateFromFileBackend(ctx context.Context, l *keys.LicenseP
 }
 
 func (p *PGBackend) GetLicense(ctx context.Context) (string, keys.LicenseMetadata, error) {
-	if !p.initialized {
-		return "", keys.LicenseMetadata{}, &NotInitializedError{backend: "sql"}
-	}
-	return p.doGetLicense(ctx)
-}
-
-func (p *PGBackend) doGetLicense(ctx context.Context) (string, keys.LicenseMetadata, error) {
 	row := p.db.QueryRowContext(ctx, "SELECT configured_at, data FROM licenses WHERE active=TRUE")
 
 	md := keys.LicenseMetadata{}
@@ -171,13 +148,6 @@ func (p *PGBackend) doGetLicense(ctx context.Context) (string, keys.LicenseMetad
 }
 
 func (p *PGBackend) SetLicense(ctx context.Context, data string) error {
-	if !p.initialized {
-		return &NotInitializedError{backend: "sql"}
-	}
-	return p.doSetLicense(ctx, data)
-}
-
-func (p *PGBackend) doSetLicense(ctx context.Context, data string) error {
 	_, err := p.db.ExecContext(ctx, "SELECT set_active_license_v1($1)", data)
 	return err
 }
@@ -215,7 +185,6 @@ func (f *FileBackend) Cleanup(context.Context) error {
 
 // MemBackend is a CurrentBackend for testing purposes only.
 type MemBackend struct {
-	initialized  bool
 	licenseData  string
 	configuredAt time.Time
 
@@ -223,10 +192,6 @@ type MemBackend struct {
 }
 
 func (m *MemBackend) Init(context.Context, *keys.LicenseParser) error {
-	m.Lock()
-	defer m.Unlock()
-
-	m.initialized = true
 	return nil
 }
 
@@ -237,10 +202,6 @@ func (m *MemBackend) GetLicense(context.Context) (string, keys.LicenseMetadata, 
 	md := keys.LicenseMetadata{
 		ConfiguredAt: m.configuredAt,
 	}
-	if !m.initialized {
-		return "", md, &NotInitializedError{backend: "memory"}
-	}
-
 	if m.licenseData == "" {
 		return "", md, &NoLicenseError{backend: "memory"}
 	}
@@ -252,9 +213,6 @@ func (m *MemBackend) SetLicense(ctx context.Context, s string) error {
 	m.Lock()
 	defer m.Unlock()
 
-	if !m.initialized {
-		return &NotInitializedError{backend: "memory"}
-	}
 	m.configuredAt = time.Now()
 	m.licenseData = s
 	return nil
