@@ -15,56 +15,45 @@ import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service Rules {
   rpc CreateRule (CreateRuleReq) returns (CreateRuleResp) {
-    option (google.api.http).post = "/iam/v2beta/rules";
+    option (google.api.http).post = "/iam/v2beta/projects/{project_id}/rules";
     option (google.api.http).body = "*";
-    option (chef.automate.api.policy).resource = "auth:rules";
-    option (chef.automate.api.policy).action = "create";
-    option (chef.automate.api.iam.policy).resource = "iam:rules"; // TODO: not really iam, is it?
-    option (chef.automate.api.iam.policy).action = "iam:rules:create";
+    option (chef.automate.api.policy).resource = "auth:projects:{project_id}";
+    option (chef.automate.api.policy).action = "update";
+    option (chef.automate.api.iam.policy).resource = "iam:projects:{project_id}";
+    option (chef.automate.api.iam.policy).action = "iam:projects:update";
   };
 
   rpc UpdateRule (UpdateRuleReq) returns (UpdateRuleResp) {
-    option (google.api.http).put = "/iam/v2beta/rules/{id}";
+    option (google.api.http).put = "/iam/v2beta/projects/{project_id}/rules/{id}";
     option (google.api.http).body = "*";
-    option (chef.automate.api.policy).resource = "auth:rules:{id}";
+    option (chef.automate.api.policy).resource = "auth:projects:{project_id}";
     option (chef.automate.api.policy).action = "update";
-    option (chef.automate.api.iam.policy).resource = "iam:rules:{id}";
-    option (chef.automate.api.iam.policy).action = "iam:rules:update";
+    option (chef.automate.api.iam.policy).resource = "iam:projects:{project_id}";
+    option (chef.automate.api.iam.policy).action = "iam:projects:update";
   };
 
   rpc GetRule (GetRuleReq) returns (GetRuleResp) {
-    option (google.api.http).get = "/iam/v2beta/rules/{id}";
-    option (chef.automate.api.policy).resource = "auth:rules:{id}";
+    option (google.api.http).get = "/iam/v2beta/projects/{project_id}/rules/{id}";
+    option (chef.automate.api.policy).resource = "auth:projects:{project_id}";
     option (chef.automate.api.policy).action = "get";
-    option (chef.automate.api.iam.policy).resource = "iam:rules:{id}";
-    option (chef.automate.api.iam.policy).action = "iam:rules:get";
-  };
-
-  // TODO (tc): Right now we don't have plans to use this in the UI
-  // and it doesn't return the staged rules like all the other query APIs.
-  // Should probably delete it or update it to return staged rules.
-  rpc ListRules (ListRulesReq) returns (ListRulesResp) {
-    option (google.api.http).get = "/iam/v2beta/rules";
-    option (chef.automate.api.policy).resource = "auth:rules";
-    option (chef.automate.api.policy).action = "read";
-    option (chef.automate.api.iam.policy).resource = "iam:rules";
-    option (chef.automate.api.iam.policy).action = "iam:rules:list";
+    option (chef.automate.api.iam.policy).resource = "iam:projects:{project_id}";
+    option (chef.automate.api.iam.policy).action = "iam:projects:get";
   };
 
   rpc ListRulesForProject (ListRulesForProjectReq) returns (ListRulesForProjectResp) {
     option (google.api.http).get = "/iam/v2beta/projects/{id}/rules";
-    option (chef.automate.api.policy).resource = "auth:projects:{id}:rules";
-    option (chef.automate.api.policy).action = "read";
-    option (chef.automate.api.iam.policy).resource = "iam:projects:{id}:rules";
-    option (chef.automate.api.iam.policy).action = "iam:rules:list";
+    option (chef.automate.api.policy).resource = "auth:projects:{id}";
+    option (chef.automate.api.policy).action = "get";
+    option (chef.automate.api.iam.policy).resource = "iam:projects:{id}";
+    option (chef.automate.api.iam.policy).action = "iam:projects:get";
   };
 
   rpc DeleteRule (DeleteRuleReq) returns (DeleteRuleResp) {
-    option (google.api.http).delete = "/iam/v2beta/rules/{id}";
-    option (chef.automate.api.policy).resource = "auth:rules:{id}";
-    option (chef.automate.api.policy).action = "delete";
-    option (chef.automate.api.iam.policy).resource = "iam:rules:{id}";
-    option (chef.automate.api.iam.policy).action = "iam:rules:delete";
+    option (google.api.http).delete = "/iam/v2beta/projects/{project_id}/rules/{id}";
+    option (chef.automate.api.policy).resource = "auth:projects:{project_id}";
+    option (chef.automate.api.policy).action = "update";
+    option (chef.automate.api.iam.policy).resource = "iam:projects:{project_id}";
+    option (chef.automate.api.iam.policy).action = "iam:projects:update";
   };
 
   rpc ApplyRulesStart (ApplyRulesStartReq) returns (ApplyRulesStartResp) {
