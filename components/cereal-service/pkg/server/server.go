@@ -196,6 +196,17 @@ func (s *CerealService) DequeueWorkflow(req cereal.Cereal_DequeueWorkflowServer)
 	return nil
 }
 
+func (s *CerealService) CancelWorkflow(ctx context.Context, req *cereal.CancelWorkflowRequest) (*cereal.CancelWorkflowResponse, error) {
+	err := s.backend.CancelWorkflow(ctx, req.InstanceName, req.WorkflowName)
+	if err != nil {
+		if err == libcereal.ErrWorkflowInstanceNotFound {
+			return nil, status.Error(codes.NotFound, err.Error())
+		}
+		return nil, err
+	}
+	return &cereal.CancelWorkflowResponse{}, nil
+}
+
 func readDeqTaskReqMsg(ctx context.Context, s cereal.Cereal_DequeueTaskServer) (*cereal.DequeueTaskRequest, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()

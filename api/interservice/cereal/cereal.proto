@@ -77,6 +77,14 @@ message EnqueueWorkflowRequest {
 
 message EnqueueWorkflowResponse {}
 
+message CancelWorkflowRequest{
+  string domain = 1;
+  string instance_name = 2;
+  string workflow_name = 3;
+}
+
+message CancelWorkflowResponse {}
+
 message DequeueTaskRequest {
   message Dequeue {
     string domain = 1;
@@ -168,6 +176,7 @@ service Cereal {
   rpc EnqueueWorkflow(EnqueueWorkflowRequest) returns (EnqueueWorkflowResponse);
   rpc DequeueWorkflow(stream DequeueWorkflowRequest)
       returns (stream DequeueWorkflowResponse);
+  rpc CancelWorkflow(CancelWorkflowRequest) returns (CancelWorkflowResponse);
   rpc DequeueTask(stream DequeueTaskRequest)
       returns (stream DequeueTaskResponse);
   rpc CreateWorkflowSchedule(CreateWorkflowScheduleRequest)
