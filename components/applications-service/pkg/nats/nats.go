@@ -18,8 +18,8 @@ import (
 const (
 	connectionRetries                      = 5
 	deprecatedNATSStreamHealthCheckChannel = "habitat"
-	// natsMessagingHealthcheckSubject        = "habitat.event.healthcheck"
-	// natsMessagingQueueGroup                = "automate"
+	natsMessagingHealthcheckSubject        = "habitat.event.healthcheck"
+	natsMessagingQueueGroup                = "automate"
 )
 
 // The subject is the topic this subscriber will be listening to,

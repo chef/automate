@@ -1,7 +1,7 @@
 package nats
 
 import (
-	//natsc "github.com/nats-io/go-nats"
+	natsc "github.com/nats-io/go-nats"
 	stan "github.com/nats-io/go-nats-streaming"
 	log "github.com/sirupsen/logrus"
 )
@@ -29,11 +29,17 @@ func (nc *NatsClient) Subscribe(eventsCh chan<- []byte) error {
 		eventsCh <- msg.Data
 	}, stan.DurableName(nc.durableID))
 
-	// if err != nil {
-	// 	return err
-	// }
-	// _, err = nc.msgConn.QueueSubscribe(natsMessagingHealthcheckSubject, natsMessagingQueueGroup, func(msg *natsc.Msg) {
-	// })
+	if err != nil {
+		return err
+	}
+	_, err = nc.msgConn.QueueSubscribe(natsMessagingHealthcheckSubject, natsMessagingQueueGroup, func(msg *natsc.Msg) {
+		log.WithFields(log.Fields{
+			"protocol":        "nats messaging",
+			"message_data":    string(msg.Data),
+			"message_subject": msg.Subject,
+		}).Debug("Message received")
+		eventsCh <- msg.Data
+	})
 
 	return err
 
