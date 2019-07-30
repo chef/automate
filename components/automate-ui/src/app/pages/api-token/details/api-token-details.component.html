@@ -33,10 +33,9 @@
         <chef-form-field>
           <label>Name *</label>
           <input chefInput formControlName="name" type="text">
-          <chef-error *ngIf="updateForm.get('name').hasError('required') && updateForm.get('name').dirty">
+          <chef-error *ngIf="(nameCtrl.hasError('required') || nameCtrl.hasError('pattern')) && nameCtrl.dirty">
             Name is required.<!-- drop period? -->
           </chef-error>
-          <!-- error for NON_BLANK validator? -->
         </chef-form-field>
         <chef-form-field>
           <label>Status *</label>
