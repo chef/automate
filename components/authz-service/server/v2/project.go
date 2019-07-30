@@ -540,7 +540,6 @@ func fromStorageProject(p *storage.Project) (*api.Project, error) {
 		Id:       p.ID,
 		Name:     p.Name,
 		Type:     typeFromInternal(p.Type),
-		Projects: p.Projects,
 	}, nil
 }
 

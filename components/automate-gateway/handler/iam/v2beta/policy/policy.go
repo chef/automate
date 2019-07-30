@@ -622,6 +622,5 @@ func domainProjectToAPIProject(p *authz.Project) (*pb_common.Project, error) {
 		Id:       p.Id,
 		Name:     p.Name,
 		Type:     t,
-		Projects: p.Projects,
 	}, nil
 }
