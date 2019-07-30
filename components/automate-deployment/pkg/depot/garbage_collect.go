@@ -61,6 +61,22 @@ func (gc *GarbageCollector) ConservativeCollect(rootPackages []habpkg.HabPkg) er
 		keepersByShortIdent[s] = append(keepersByShortIdent[s], pkg)
 	}
 
+	// Here, we need to find any other copies of our rootPackages
+	// we need to keep.
+	for _, root := range rootPackages {
+		deps, err := gc.cache.TDepsForPackage(&root)
+		if err != nil {
+			return errors.Wrapf(err, "Failed to list dependencies for %q", habpkg.Ident(&root))
+		}
+		for _, dep := range deps {
+			depIdent := habpkg.ShortIdent(&dep)
+			keepers, isAutomatePkg := keepersByShortIdent[depIdent]
+			if isAutomatePkg {
+				keepersByShortIdent[depIdent] = append(keepers, dep)
+			}
+		}
+	}
+
 	pkgsToDelete := []habpkg.HabPkg{}
 
 	for _, candidate := range installedPkgs {
