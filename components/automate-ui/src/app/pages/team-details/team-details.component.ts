@@ -9,7 +9,8 @@ import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams, routeURL } from 'app/route.selectors';
 import { EntityStatus, loading } from 'app/entities/entities';
-import { User, HashMapOfUsers } from 'app/entities/users/user.model';
+import { User } from 'app/entities/users/user.model';
+import { Regex } from 'app/helpers/auth/regex';
 import { allUsers, userStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
 import { iamMajorVersion } from 'app/entities/policies/policy.selectors';
@@ -23,14 +24,12 @@ import {
 } from 'app/entities/teams/team.selectors';
 import { Team } from 'app/entities/teams/team.model';
 import {
-  AddTeamUsers,
   GetTeam,
   GetTeamUsers,
   TeamUserMgmtPayload,
   RemoveTeamUsers,
   UpdateTeam
 } from 'app/entities/teams/team.actions';
-import { Regex } from 'app/helpers/auth/regex';
 
 const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 
@@ -50,13 +49,14 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public tabValue: TeamTabName = 'users';
   public url: string;
   public teamMembershipView = false;
+
   public team: Team;
   public isV1 = true;
 
   public sortedUsers$: Observable<User[]>;
   private isDestroyed = new Subject<boolean>();
 
-  public addButtonText = 'Add User';
+  public addButtonText = 'Add Users';
   public removeText = 'Remove User';
 
   constructor(private store: Store<NgrxStateAtom>,
@@ -180,17 +180,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   }
 
   toggleUserMembershipView(): void {
-    this.teamMembershipView = !this.teamMembershipView;
-  }
-
-  addUsers(users: HashMapOfUsers): void {
-    const userIDs = Object.values(users).map((user: User) => user.membership_id);
-
-    this.store.dispatch(new AddTeamUsers(<TeamUserMgmtPayload>{
-      id: this.teamId,
-      user_ids: userIDs
-    }));
-    this.toggleUserMembershipView();
+    this.router.navigate(['/settings', 'teams', this.teamId, 'add-users']);
   }
 
   removeUser(user: User): void {

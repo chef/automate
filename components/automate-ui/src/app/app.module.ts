@@ -187,6 +187,7 @@ import {
   SidebarSelectListComponent
 } from './page-components/sidebar-select-list/sidebar-select-list.component';
 import { SigninComponent } from './pages/signin/signin.component';
+import { TeamAddUsersComponent } from './pages/team-add-users/team-add-users.component';
 import { TeamDetailsComponent } from './pages/team-details/team-details.component';
 import { TeamManagementComponent } from './pages/team-management/team-management.component';
 import {
@@ -197,9 +198,6 @@ import { UserDetailsComponent } from './pages/user-details/user-details.componen
 import { UserFormComponent } from './pages/user-management/user-form/user-form.component';
 import { UserManagementComponent } from './pages/user-management/user-management.component';
 import { UserTableComponent } from './page-components/user-table/user-table.component';
-import {
-  UserTeamMembershipTableComponent
-} from './page-components/user-team-membership-table/user-team-membership-table.component';
 import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-modal.component';
 
 @NgModule({
@@ -260,6 +258,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     SettingsLandingComponent,
     SidebarSelectListComponent,
     SigninComponent,
+    TeamAddUsersComponent,
     TeamDetailsComponent,
     TeamManagementComponent,
     TelemetryCheckboxComponent,
@@ -267,7 +266,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     UserDetailsComponent,
     UserFormComponent,
     UserTableComponent,
-    UserTeamMembershipTableComponent,
     UserManagementComponent,
     WelcomeModalComponent
   ],

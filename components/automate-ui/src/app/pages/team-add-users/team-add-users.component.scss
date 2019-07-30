@@ -1,0 +1,30 @@
+@import "~styles/variables";
+
+chef-page {
+  #no-users-container {
+    position: relative;
+    top: 70px;
+    text-align: center;
+  }
+
+  #table-container {
+    #users-selected {
+      font-size: 12px;
+      color: $chef-dark-grey;
+      margin-bottom: 5px;
+    }
+
+    #inner-container {
+      chef-table {
+        chef-tbody {
+          height: calc(100vh - 350px);
+          overflow-y: scroll;
+        }
+
+        .checkbox-row {
+          max-width: 50px;
+        }
+      }
+    }
+  }
+}

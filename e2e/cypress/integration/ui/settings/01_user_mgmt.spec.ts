@@ -4,7 +4,7 @@ describe('user management', () => {
 
       // clean up leftover users in case of previous test failures
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
-      cleanupUsers(admin.id_token);
+      cy.cleanupUsersByNamePrefix(admin.id_token, 'cypress test user ');
     });
   });
 
@@ -104,24 +104,3 @@ describe('user management', () => {
   //   })
   // })
 });
-
-function cleanupUsers(id_token: string): void {
-  cy.request({
-    auth: { bearer: id_token },
-    method: 'GET',
-    url: '/api/v0/auth/users',
-    failOnStatusCode: false
-  }).then((resp) => {
-    const body = resp.body;
-    for (const user of body.users) {
-      if (user.name.startsWith('cypress test user ')) {
-        cy.request({
-          auth: { bearer: id_token },
-          method: 'DELETE',
-          url: `/api/v0/auth/users/${user.username}`,
-          failOnStatusCode: false
-        });
-      }
-    }
-  });
-}

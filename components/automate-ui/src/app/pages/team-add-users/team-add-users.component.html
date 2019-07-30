@@ -1,0 +1,50 @@
+<chef-page
+  subheading="Automate only displays local users."
+  [attr.secondary-btn-show]="showSecondary"
+  [attr.heading]="getHeading()"
+  [attr.confirm-btn-text]="getConfirmBtnText()"
+  [attr.page-loading]="loading"
+  [attr.confirm-loading]="addingUsers"
+  [attr.disable-confirm]="usersToAddValues().length === 0"
+  [attr.error-message]="getErrorMessage()"
+  (confirm)="addUsers()"
+  (close)="closePage()">
+  <div *ngIf="!loading">
+    <div id="no-users-container" *ngIf="usersNotFiltered()?.length === 0">
+      <h3>There are no more local <a [routerLink]="['/settings', 'users']" target="_blank">users</a> to add; create some more!</h3>
+    </div>
+    <div id="table-container" *ngIf="usersNotFiltered()?.length > 0">
+      <div class="flex">
+        <div id="users-selected" class="flex-right" >
+          {{ usersToAddValues().length | pluralize : 'user' : '+s' }} selected
+        </div>
+      </div>
+      <div id="inner-container">
+        <chef-table>
+          <chef-thead>
+            <chef-tr>
+              <chef-th class="checkbox-row"></chef-th>
+              <chef-th>Name</chef-th>
+              <chef-th>Username</chef-th>
+            </chef-tr>
+          </chef-thead>
+          <chef-tbody>
+            <chef-tr *ngFor="let user of usersNotFiltered()">
+              <chef-td class="checkbox-row">
+                <chef-checkbox (change)="addOrRemoveQueuedUser($event.detail, user)" [checked]="isUserChecked(user)"></chef-checkbox>
+              </chef-td>
+              <chef-td>
+                <a [routerLink]="['/settings', 'users', user.id]" target="_blank">
+                  {{ user.name }}
+                </a>
+              </chef-td>
+              <chef-td>
+                {{ user.id }}
+              </chef-td>
+            </chef-tr>
+          </chef-tbody>
+        </chef-table>
+      </div>
+    </div>
+  </div>
+</chef-page>

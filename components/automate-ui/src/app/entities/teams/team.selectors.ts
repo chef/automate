@@ -52,6 +52,12 @@ export const addUsersStatus = createSelector(
   (state) => state.addUsersStatus
 );
 
+export const addUsersStatusHTTPError = createSelector(
+  teamState,
+  (state) => state.addUsersStatusHTTPError
+);
+
+
 export const removeUsersStatus = createSelector(
   teamState,
   (state) => state.removeUsersStatus

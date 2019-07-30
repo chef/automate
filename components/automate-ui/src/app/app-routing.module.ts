@@ -18,6 +18,7 @@ import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { NotificationFormComponent } from './pages/notification-form/notification-form.component';
 import { SigninComponent } from './pages/signin/signin.component';
+import { TeamAddUsersComponent } from './pages/team-add-users/team-add-users.component';
 import { TeamDetailsComponent } from './pages/team-details/team-details.component';
 import { TeamManagementComponent } from './pages/team-management/team-management.component';
 import { UserDetailsComponent } from './pages/user-details/user-details.component';
@@ -87,6 +88,11 @@ const routes: Routes = [
         {
           path: 'teams/:id',
           component: TeamDetailsComponent
+        },
+        {
+          path: 'teams/:id/add-users',
+          component: TeamAddUsersComponent,
+          data: { hideNavBar: true }
         },
         {
           path: 'users',
