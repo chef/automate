@@ -1,16 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
 import { identity } from 'lodash/fp';
 import { Subject } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators
-} from '@angular/forms';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
+import { Regex } from 'app/helpers/auth/regex';
 import { loading } from 'app/entities/entities';
 import { GetToken, UpdateToken } from 'app/entities/api-tokens/api-token.actions';
 import { apiTokenFromRoute, updateStatus } from 'app/entities/api-tokens/api-token.selectors';
@@ -35,7 +32,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
               ) {
       this.updateForm = fb.group({
         // Must stay in sync with error checks in api-token-details.component.html
-        name: ['', Validators.required],
+        name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
         status: ['active', Validators.required]
       });
     }
@@ -90,4 +87,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
         });
     }
 
+    get nameCtrl(): FormControl {
+      return <FormControl>this.updateForm.controls.name;
+    }
 }
