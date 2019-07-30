@@ -105,13 +105,12 @@ func (p *PGBackend) doInit(ctx context.Context, l *keys.LicenseParser) error {
 		return errors.Wrap(err, "failed to apply database schema")
 	}
 
-	_, _, err = p.GetLicense(ctx)
+	_, _, err = p.doGetLicense(ctx)
 	switch err.(type) {
 	case nil:
 		// Already migrated
 		return nil
 	case *NoLicenseError:
-		logrus.Info("migrating from file-based storage to postgresql-based storage")
 		return p.migrateFromFileBackend(ctx, l)
 	default:
 		return err
@@ -124,6 +123,7 @@ func (p *PGBackend) migrateFromFileBackend(ctx context.Context, l *keys.LicenseP
 	license, err := p.legacyFileBackend.GetLicense(ctx)
 	switch err.(type) {
 	case nil:
+		logrus.Info("migrating from file-based storage to postgresql-based storage")
 		_, err := l.Parse(license)
 		if err != nil {
 			logrus.WithError(err).Warn("invalid license found on disk")
@@ -132,7 +132,7 @@ func (p *PGBackend) migrateFromFileBackend(ctx context.Context, l *keys.LicenseP
 			return nil
 		}
 
-		err = p.SetLicense(ctx, license)
+		err = p.doSetLicense(ctx, license)
 		if err != nil {
 			return errors.Wrap(err, "failed to migrate license to postgresql")
 		}
@@ -152,7 +152,10 @@ func (p *PGBackend) GetLicense(ctx context.Context) (string, keys.LicenseMetadat
 	if !p.initialized {
 		return "", keys.LicenseMetadata{}, &NotInitializedError{backend: "sql"}
 	}
+	return p.doGetLicense(ctx)
+}
 
+func (p *PGBackend) doGetLicense(ctx context.Context) (string, keys.LicenseMetadata, error) {
 	row := p.db.QueryRowContext(ctx, "SELECT configured_at, data FROM license WHERE current=TRUE")
 
 	md := keys.LicenseMetadata{}
@@ -171,6 +174,10 @@ func (p *PGBackend) SetLicense(ctx context.Context, data string) error {
 	if !p.initialized {
 		return &NotInitializedError{backend: "sql"}
 	}
+	return p.doSetLicense(ctx, data)
+}
+
+func (p *PGBackend) doSetLicense(ctx context.Context, data string) error {
 	_, err := p.db.ExecContext(ctx, "INSERT INTO license(data) VALUES ($1) ON CONFLICT (current) DO UPDATE SET data = $1, configured_at = NOW()", data)
 	return err
 }
@@ -179,6 +186,12 @@ func (p *PGBackend) SetLicense(ctx context.Context, data string) error {
 // license storage.
 type FileBackend struct {
 	path string
+}
+
+func NewFileBackend(path string) *FileBackend {
+	return &FileBackend{
+		path: path,
+	}
 }
 
 func (f *FileBackend) GetLicense(context.Context) (string, error) {

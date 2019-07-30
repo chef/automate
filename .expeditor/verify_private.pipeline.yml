@@ -71,6 +71,7 @@ steps:
   - label: "[unit] license-control-service"
     command:
       - scripts/install_golang.sh
+      - scripts/setup_buildkite_pg.sh lcs_test
       - echo "\$A2_LICENSE" > dev/license.jwt
       - cd components/license-control-service
       - make lint test

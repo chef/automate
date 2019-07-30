@@ -147,18 +147,6 @@ func TestUpdateValidLicenseWithWhiteSpace(t *testing.T) {
 	assert.NotNil(t, res)
 }
 
-// func TestLoadedLicenseFromDiskNotNil(t *testing.T) {
-// 	if skipValidLicenseTests {
-// 		t.Skip("Valid license file not present, skipping tests that require it")
-// 	}
-
-// 	configWithLicense := cfg
-// 	configWithLicense.LicenseTokenPath = validLicenseFile
-// 	svr := server.NewLicenseControlServer(context.Background(), &configWithLicense)
-// 	res, _ := svr.License(context.Background(), &lc.LicenseRequest{})
-// 	assert.NotNil(t, res.License, "LicenseControlServer should load the license on disk")
-// }
-
 func TestUpdateInvalidLicense(t *testing.T) {
 	srv := testLicenseControlServer(t)
 	res, err := srv.Update(
@@ -177,14 +165,6 @@ func TestDefaultLicenseNil(t *testing.T) {
 	res, _ := srv.License(context.Background(), &lc.LicenseRequest{})
 	assert.Nil(t, res.License, "LicenseControlServer should default to nil license")
 }
-
-// func TestLoadedCorruptLicenseFromDiskNil(t *testing.T) {
-// 	configWithLicense := cfg
-// 	configWithLicense.LicenseTokenPath = corruptLicenseFile
-// 	svr := server.NewLicenseControlServer(context.Background(), &configWithLicense)
-// 	res, _ := svr.License(context.Background(), &lc.LicenseRequest{})
-// 	assert.Nil(t, res.License, "LicenseControlServer should not have loaded the license on disk")
-// }
 
 func TestUnforcedUpdateToExpiredLicense(t *testing.T) {
 	srv := testLicenseControlServer(t)
