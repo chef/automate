@@ -81,8 +81,8 @@ export class RuleEffects {
   @Effect()
   createRule$ = this.actions$.pipe(
       ofType(RuleActionTypes.CREATE),
-      mergeMap(({ payload: { project_id, rule } }: CreateRule) =>
-      this.requests.createRule(project_id, rule).pipe(
+      mergeMap(({ payload: { rule } }: CreateRule) =>
+      this.requests.createRule(rule).pipe(
         map((resp: RuleSuccessPayload) => new CreateRuleSuccess(resp)),
         catchError((error: HttpErrorResponse) => observableOf(new CreateRuleFailure(error))))));
 

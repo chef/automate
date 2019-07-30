@@ -15,32 +15,28 @@ export interface RulesResponse {
 @Injectable()
 export class RuleRequests {
 
-  // Mocked Rule data until API's are finished.
-  rules: Rule[] = [];
   constructor(private http: HttpClient) { }
 
   public getRulesForProject(project_id: string): Observable<GetRulesSuccessPayload> {
     return this.http.get<GetRulesSuccessPayload>(
-      `${env.auth_v2_url}/project/${project_id}/rules`);
+      `${env.auth_v2_url}/projects/${project_id}/rules`);
   }
 
-  public getRule(id: string): Observable<RuleSuccessPayload> {
+  public getRule(project_id: string, id: string): Observable<RuleSuccessPayload> {
     return this.http.get<RuleSuccessPayload>(`${env.auth_v2_url}/rules/${id}`);
   }
 
-  public createRule(project_id, rule: Rule): Observable<RuleSuccessPayload> {
+  public createRule(rule: Rule): Observable<RuleSuccessPayload> {
     return this.http.post<RuleSuccessPayload>(
-      `${env.auth_v2_url}/project/${project_id}/rules`,
-      { rule });
+      `${env.auth_v2_url}/projects/${rule.project_id}/rules`, rule);
   }
 
-  public deleteRule(id: string): Observable<{}> {
-    return this.http.delete(`${env.auth_v2_url}/rules/${id}`);
+  public deleteRule(project_id: string, id: string): Observable<{}> {
+    return this.http.delete(`${env.auth_v2_url}/projects/${project_id}/rules/${id}`);
   }
 
   public updateRule(rule: Rule): Observable<RuleSuccessPayload> {
     return this.http.put<RuleSuccessPayload>(
-      `${env.auth_v2_url}/project/${rule.project_id}/rules/${rule.id}`,
-      { rule });
+      `${env.auth_v2_url}/projects/${rule.project_id}/rules/${rule.id}`, rule);
   }
 }
