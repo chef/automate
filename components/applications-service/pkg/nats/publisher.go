@@ -24,7 +24,7 @@ func (nc *NatsClient) PublishHabEvent(msg *habitat.HealthCheckEvent) error {
 	if err != nil {
 		return err
 	}
-	return nc.conn.Publish(nc.subject, b)
+	return nc.streamConn.Publish(nc.subject, b)
 }
 
 // PublishBytes publishes an array of bytes to the NATS server
@@ -40,5 +40,5 @@ func (nc *NatsClient) PublishBytes(b []byte) error {
 		"message": string(b),
 	}).Info("Publishing message")
 
-	return nc.conn.Publish(nc.subject, b)
+	return nc.streamConn.Publish(nc.subject, b)
 }

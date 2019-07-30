@@ -14,7 +14,7 @@ func (nc *NatsClient) Subscribe(eventsCh chan<- []byte) (stan.Subscription, erro
 	}).Info("Subscribing to subject")
 
 	// Subscribe with durable name
-	return nc.conn.Subscribe(nc.subject, func(msg *stan.Msg) {
+	return nc.streamConn.Subscribe(nc.subject, func(msg *stan.Msg) {
 
 		log.WithFields(log.Fields{
 			"protocol":          "nats",

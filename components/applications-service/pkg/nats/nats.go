@@ -39,7 +39,8 @@ type NatsClient struct {
 	durableID string
 	subject   string
 	certs.TLSConfig
-	conn               stan.Conn
+	msgConn            *natsc.Conn
+	streamConn         stan.Conn
 	retries            int
 	InsecureSkipVerify bool
 	DisableTLS         bool
@@ -95,9 +96,10 @@ func NewAndConnect(url, id string, tlsConfig certs.TLSConfig) (*NatsClient, erro
 // of retries and instead continue until we succeed. (when the server is up)
 func (nc *NatsClient) Connect() error {
 	var (
-		conn  stan.Conn
-		err   error
-		tries = uint64(0)
+		msgConn    *natsc.Conn
+		streamConn stan.Conn
+		err        error
+		tries      = uint64(0)
 	)
 
 	tlsConf, err := nc.natsTLSConfig()
@@ -117,9 +119,10 @@ func (nc *NatsClient) Connect() error {
 	}).Info("Connecting to NATS Server")
 
 	for tries < uint64(nc.retries) {
-		conn, err = nc.tryConnect(tlsConf)
+		msgConn, streamConn, err = nc.tryConnect(tlsConf)
 		if err == nil {
-			nc.conn = conn
+			nc.msgConn = msgConn
+			nc.streamConn = streamConn
 			return nil
 		}
 
@@ -142,7 +145,7 @@ func (nc *NatsClient) Connect() error {
 	return errors.Wrapf(err, "failed to connect to nats streaming via %q", nc.natsURL)
 }
 
-func (nc *NatsClient) tryConnect(tlsConf *tls.Config) (stan.Conn, error) {
+func (nc *NatsClient) tryConnect(tlsConf *tls.Config) (*natsc.Conn, stan.Conn, error) {
 	natsOpts := []natsc.Option{}
 	if tlsConf != nil {
 		natsOpts = append(natsOpts, natsc.Secure(tlsConf))
@@ -150,7 +153,7 @@ func (nc *NatsClient) tryConnect(tlsConf *tls.Config) (stan.Conn, error) {
 
 	rawNATSconn, err := natsc.Connect(nc.natsURL, natsOpts...)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	conn, err := stan.Connect(nc.clusterID,
@@ -159,9 +162,9 @@ func (nc *NatsClient) tryConnect(tlsConf *tls.Config) (stan.Conn, error) {
 	)
 	if err != nil {
 		rawNATSconn.Close()
-		return nil, err
+		return nil, nil, err
 	}
-	return conn, nil
+	return rawNATSconn, conn, nil
 }
 
 // ConnectAndSubscribe will attempt to connect to the NATS Server and then
@@ -207,9 +210,8 @@ func (nc *NatsClient) ConnectAndPublish(msg *habitat.HealthCheckEvent) error {
 // connection. Since we have to create the raw NATS connection manually in
 // order to configure TLS, we are responsible for closing it.
 func (nc *NatsClient) Close() {
-	natsConn := nc.conn.NatsConn()
-	nc.conn.Close()  // nolint: errcheck
-	natsConn.Close() // nolint: errcheck
+	nc.streamConn.Close() // nolint: errcheck
+	nc.msgConn.Close()    // nolint: errcheck
 }
 
 func (nc *NatsClient) natsTLSConfig() (*tls.Config, error) {
