@@ -96,6 +96,7 @@ To send data from your Chef Server or Chef Clients to Chef Automate 2, the proce
 See [Configure Data Collection]({{< relref "data-collection.md" >}}) for more information.
 
 ### Upgrades
+To upgrade an airgapped install, you must supply an airgap bundle.
 
 On an internet-connected host, follow the steps in [Create an Airgap
 Installation Bundle]({{< relref "#create-an-airgap-installation-bundle" >}}) to upgrade your
