@@ -73,7 +73,7 @@ steps:
       - scripts/install_golang.sh
       - echo "\$A2_LICENSE" > dev/license.jwt
       - cd components/license-control-service
-      - make setup review test
+      - make lint test
     timeout_in_minutes: 10
     retry:
       automatic:
