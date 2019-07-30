@@ -62,10 +62,10 @@ type UpgradeableBackend interface {
 	Cleanup(context.Context) error
 }
 
-var _ CurrentBackend = &PGBackend{}
-var _ UpgradeableBackend = &FileBackend{}
+var _ CurrentBackend = (*PGBackend)(nil)
+var _ UpgradeableBackend = (*FileBackend)(nil)
 
-func NewCurrentBackend(pgURL string, migrationPath string, legacyFilePath string) CurrentBackend {
+func NewCurrentBackend(pgURL, migrationPath, legacyFilePath string) CurrentBackend {
 	return &PGBackend{
 		pgURL:             pgURL,
 		migrationPath:     migrationPath,
@@ -139,7 +139,7 @@ func (p *PGBackend) migrateFromFileBackend(ctx context.Context, l *keys.LicenseP
 }
 
 func (p *PGBackend) GetLicense(ctx context.Context) (string, keys.LicenseMetadata, error) {
-	row := p.db.QueryRowContext(ctx, "SELECT configured_at, data FROM licenses WHERE active=TRUE")
+	row := p.db.QueryRowContext(ctx, "SELECT configured_at, data FROM licenses WHERE active")
 
 	md := keys.LicenseMetadata{}
 	var licenseData string
