@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	_ "github.com/lib/pq" // required for pg backend
+	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
@@ -26,6 +26,12 @@ type NoLicenseError struct{ backend string }
 func (n *NoLicenseError) Error() string {
 	return fmt.Sprintf("No license found in %s storage backend", n.backend)
 }
+
+// RetriableBackendError is the error returned by a backend when an
+// update has failed but may work if retried.
+type RetriableBackendError struct{ err error }
+
+func (r *RetriableBackendError) Error() string { return r.err.Error() }
 
 // A CurrentBackend can be used as a storage backend for the
 // license-control-service.
@@ -149,7 +155,30 @@ func (p *PGBackend) GetLicense(ctx context.Context) (string, keys.LicenseMetadat
 
 func (p *PGBackend) SetLicense(ctx context.Context, data string) error {
 	_, err := p.db.ExecContext(ctx, "SELECT set_active_license_v1($1)", data)
+	if err != nil {
+		if isPGConflict(err) {
+			// This can happen during concurrent
+			// applications of new licenses. One of the
+			// writers will fail but can retry if they
+			// want.
+			err := errors.Wrap(
+				err,
+				"conflict when attempting to set license (likely caused by concurrent license update), please retry",
+			)
+			return &RetriableBackendError{err: err}
+		}
+	}
+
 	return err
+}
+
+func isPGConflict(err error) bool {
+	if pqErr, ok := err.(*pq.Error); ok {
+		if pqErr.Code == "23505" {
+			return true
+		}
+	}
+	return false
 }
 
 // The FileBackend is a UpgradeableBackend for the previous file-based

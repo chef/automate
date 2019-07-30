@@ -162,15 +162,19 @@ func (s *LicenseControlServer) Update(ctx context.Context, req *lc.UpdateRequest
 	}
 
 	logctx.Info("Applying license")
-	if err := s.persistLicenseToken(ctx, licData); err != nil {
+	err = s.persistLicenseToken(ctx, licData)
+	switch err.(type) {
+	case nil:
+		return &lc.UpdateResponse{
+			Updated: true,
+			Message: fmt.Sprintf("Policy configured from license ID %s", license.Id),
+		}, nil
+	case *storage.RetriableBackendError:
+		return nil, status.Error(codes.Aborted, err.Error())
+	default:
 		logctx.WithError(err).Error("Unable to persist license")
 		return nil, status.Errorf(codes.Internal, "unable to persist license: %s", err.Error())
 	}
-
-	return &lc.UpdateResponse{
-		Updated: true,
-		Message: fmt.Sprintf("Policy configured from license ID %s", license.Id),
-	}, nil
 }
 
 //Telemetry endpoint to return telemetry configuration
