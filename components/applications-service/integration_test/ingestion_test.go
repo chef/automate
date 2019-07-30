@@ -6,9 +6,11 @@
 package integration_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
+	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/habitat"
 	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/golang/protobuf/proto"
@@ -671,4 +673,333 @@ func TestIngestConcurrencySafe(t *testing.T) {
 	assert.Equal(t, messageNumber, int64(len(svcList)))
 	assert.Equal(t, messageNumber, suite.Ingester.EventsProcessed())
 	assert.Equal(t, messageNumber, suite.Ingester.EventsSuccessful())
+}
+
+func TestNewSgAndDeploymentUpdate(t *testing.T) {
+	setupData := func(t *testing.T) {
+		eventsProcessed := suite.Ingester.EventsProcessed()
+		event1 := NewHabitatEvent(
+			withSupervisorId("1"),
+			withPackageIdent("core/db/0.1.0/20200101121212"),
+			withServiceGroup("db.default"),
+		)
+		bytes1, err := proto.Marshal(event1)
+		require.NoError(t, err)
+		suite.Ingester.IngestMessage(bytes1)
+		eventsProcessed++
+
+		event2 := NewHabitatEvent(
+			withSupervisorId("2"),
+			withPackageIdent("core/db/0.1.0/20200101121212"),
+			withServiceGroup("db.default"),
+		)
+		bytes2, err := proto.Marshal(event2)
+		require.NoError(t, err)
+		suite.Ingester.IngestMessage(bytes2)
+		eventsProcessed++
+		suite.WaitForEventsToProcess(eventsProcessed)
+	}
+
+	t.Run("nothing changes when deployment and sg stay the same", func(t *testing.T) {
+		defer suite.DeleteDataFromStorage()
+		suite.Ingester.ResetStats()
+		setupData(t)
+		eventsProcessed := suite.Ingester.EventsProcessed()
+
+		// service stays in same service group and deployment
+		update1 := NewHabitatEvent(
+			withSupervisorId("1"),
+			withPackageIdent("core/db/0.1.0/20200101121212"),
+			withServiceGroup("db.default"),
+		)
+		updateBytes, err := proto.Marshal(update1)
+		require.NoError(t, err)
+		suite.Ingester.IngestMessage(updateBytes)
+		eventsProcessed++
+		suite.WaitForEventsToProcess(eventsProcessed)
+
+		stats, err := suite.ApplicationsServer.GetServicesStats(context.Background(), &applications.ServicesStatsReq{})
+		require.NoError(t, err)
+		assert.Equal(t, int32(1), stats.TotalServiceGroups)
+		assert.Equal(t, int32(1), stats.TotalDeployments)
+		assert.Equal(t, int32(2), stats.TotalSupervisors)
+		assert.Equal(t, int32(2), stats.TotalServices)
+
+		svcList, err := suite.StorageClient.GetServices("name", true, 1, 5, nil)
+		require.NoError(t, err)
+		require.Equal(t, 2, len(svcList))
+		for _, svc := range svcList {
+			assert.Equal(t, "db.default", svc.Group)
+			assert.Equal(t, "app", svc.Application)
+			assert.Equal(t, "test-env", svc.Environment)
+		}
+	})
+	t.Run("move service to a new deployment and service group that didn't exist before", func(t *testing.T) {
+		defer suite.DeleteDataFromStorage()
+		setupData(t)
+		suite.Ingester.ResetStats()
+		eventsProcessed := suite.Ingester.EventsProcessed()
+
+		// update1 changes the app_name and environment of the service from event 2
+		update1 := NewHabitatEvent(
+			withSupervisorId("2"),
+			withPackageIdent("core/db/0.1.0/20200101121212"),
+			withServiceGroup("db.newGroup"),
+			withApplication("newApp"),
+			withEnvironment("newEnv"),
+		)
+		update1Bytes, err := proto.Marshal(update1)
+		require.NoError(t, err)
+		suite.Ingester.IngestMessage(update1Bytes)
+		eventsProcessed++
+		suite.WaitForEventsToProcess(eventsProcessed)
+
+		stats, err := suite.ApplicationsServer.GetServicesStats(context.Background(), &applications.ServicesStatsReq{})
+		require.NoError(t, err)
+		assert.Equal(t, int32(2), stats.TotalServiceGroups)
+		assert.Equal(t, int32(2), stats.TotalDeployments)
+		assert.Equal(t, int32(2), stats.TotalSupervisors)
+		assert.Equal(t, int32(2), stats.TotalServices)
+		svcs, err := suite.StorageClient.GetServices("name", true, 1, 5, nil)
+		require.NoError(t, err)
+		require.Equal(t, 2, len(svcs))
+
+		for _, svc := range svcs {
+			if svc.SupMemberID != "1" {
+				continue
+			}
+			// first service should be unchanged
+			assert.Equal(t, "db.default", svc.Group)
+			assert.Equal(t, "app", svc.Application)
+			assert.Equal(t, "test-env", svc.Environment)
+		}
+
+		for _, svc := range svcs {
+			if svc.SupMemberID != "2" {
+				continue
+			}
+			// second service should be changed
+			assert.Equal(t, "db.newGroup", svc.Group)
+			assert.Equal(t, "newApp", svc.Application)
+			assert.Equal(t, "newEnv", svc.Environment)
+		}
+
+	})
+	t.Run("move service to an existing deployment but new service group", func(t *testing.T) {
+		defer suite.DeleteDataFromStorage()
+		suite.Ingester.ResetStats()
+		setupData(t)
+		eventsProcessed := suite.Ingester.EventsProcessed()
+
+		// Event 3 creates the deployment for newApp+newEnv, but is a different
+		// service so the service group should not be used for service 2 when we update it later
+		event3 := NewHabitatEvent(
+			withSupervisorId("3"),
+			withPackageIdent("core/otherpkg/0.1.0/20200101121212"),
+			withServiceGroup("otherpkg.default"),
+			withApplication("newApp"),
+			withEnvironment("newEnv"),
+		)
+		bytes3, err := proto.Marshal(event3)
+		require.NoError(t, err)
+		suite.Ingester.IngestMessage(bytes3)
+		eventsProcessed++
+		suite.WaitForEventsToProcess(eventsProcessed)
+
+		// update1 changes the app_name and environment of the service from event 2
+		// there should be a new service group row in the database, it will have
+		// the same name "db.default" but have a different deployment_id
+		update1 := NewHabitatEvent(
+			withSupervisorId("2"),
+			withPackageIdent("core/db/0.1.0/20200101121212"),
+			withApplication("newApp"),
+			withEnvironment("newEnv"),
+			withServiceGroup("db.default"),
+		)
+		update1Bytes, err := proto.Marshal(update1)
+		require.NoError(t, err)
+		suite.Ingester.IngestMessage(update1Bytes)
+		eventsProcessed++
+		suite.WaitForEventsToProcess(eventsProcessed)
+
+		stats, err := suite.ApplicationsServer.GetServicesStats(context.Background(), &applications.ServicesStatsReq{})
+		require.NoError(t, err)
+		assert.Equal(t, int32(3), stats.TotalServiceGroups)
+		assert.Equal(t, int32(2), stats.TotalDeployments)
+		assert.Equal(t, int32(3), stats.TotalSupervisors)
+		assert.Equal(t, int32(3), stats.TotalServices)
+		svcs, err := suite.StorageClient.GetServices("name", true, 1, 5, nil)
+		require.NoError(t, err)
+		require.Equal(t, 3, len(svcs))
+
+		for _, svc := range svcs {
+			if svc.SupMemberID != "1" {
+				continue
+			}
+			// first service should be unchanged
+			assert.Equal(t, "db.default", svc.Group)
+			assert.Equal(t, "app", svc.Application)
+			assert.Equal(t, "test-env", svc.Environment)
+		}
+
+		for _, svc := range svcs {
+			if svc.SupMemberID != "2" {
+				continue
+			}
+			// second service should be changed
+			assert.Equal(t, "db.default", svc.Group)
+			assert.Equal(t, "newApp", svc.Application)
+			assert.Equal(t, "newEnv", svc.Environment)
+		}
+
+		for _, svc := range svcs {
+			if svc.SupMemberID != "3" {
+				continue
+			}
+			// third service shouldn't be changed
+			assert.Equal(t, "otherpkg.default", svc.Group)
+			assert.Equal(t, "newApp", svc.Application)
+			assert.Equal(t, "newEnv", svc.Environment)
+		}
+	})
+	t.Run("move service to an existing deployment and service group", func(t *testing.T) {
+		defer suite.DeleteDataFromStorage()
+		suite.Ingester.ResetStats()
+		setupData(t)
+		eventsProcessed := suite.Ingester.EventsProcessed()
+
+		// Event 3 creates the deployment for newApp+newEnv and service group db.newGroup
+		event3 := NewHabitatEvent(
+			withSupervisorId("3"),
+			withPackageIdent("core/db/0.1.0/20200101121212"),
+			withApplication("newApp"),
+			withEnvironment("newEnv"),
+			withServiceGroup("db.newGroup"),
+		)
+		bytes3, err := proto.Marshal(event3)
+		require.NoError(t, err)
+		suite.Ingester.IngestMessage(bytes3)
+		eventsProcessed++
+		suite.WaitForEventsToProcess(eventsProcessed)
+
+		// update1 changes the app_name and environment of the service from event 2
+		update1 := NewHabitatEvent(
+			withSupervisorId("2"),
+			withPackageIdent("core/db/0.1.0/20200101121212"),
+			withApplication("newApp"),
+			withEnvironment("newEnv"),
+			withServiceGroup("db.newGroup"),
+		)
+		update1Bytes, err := proto.Marshal(update1)
+		require.NoError(t, err)
+		suite.Ingester.IngestMessage(update1Bytes)
+		eventsProcessed++
+		suite.WaitForEventsToProcess(eventsProcessed)
+
+		stats, err := suite.ApplicationsServer.GetServicesStats(context.Background(), &applications.ServicesStatsReq{})
+		require.NoError(t, err)
+		assert.Equal(t, int32(2), stats.TotalServiceGroups)
+		assert.Equal(t, int32(2), stats.TotalDeployments)
+		assert.Equal(t, int32(3), stats.TotalSupervisors)
+		assert.Equal(t, int32(3), stats.TotalServices)
+		svcs, err := suite.StorageClient.GetServices("name", true, 1, 5, nil)
+		require.NoError(t, err)
+		require.Equal(t, 3, len(svcs))
+
+		for _, svc := range svcs {
+			if svc.SupMemberID != "1" {
+				continue
+			}
+			// first service should be unchanged
+			assert.Equal(t, "db.default", svc.Group)
+			assert.Equal(t, "app", svc.Application)
+			assert.Equal(t, "test-env", svc.Environment)
+		}
+
+		for _, svc := range svcs {
+			if svc.SupMemberID != "2" {
+				continue
+			}
+			// second service should be changed
+			assert.Equal(t, "db.newGroup", svc.Group)
+			assert.Equal(t, "newApp", svc.Application)
+			assert.Equal(t, "newEnv", svc.Environment)
+		}
+
+		for _, svc := range svcs {
+			if svc.SupMemberID != "3" {
+				continue
+			}
+			// third service shouldn't be changed
+			assert.Equal(t, "db.newGroup", svc.Group)
+			assert.Equal(t, "newApp", svc.Application)
+			assert.Equal(t, "newEnv", svc.Environment)
+		}
+	})
+	t.Run("empty service groups and deployments are cleaned up", func(t *testing.T) {
+		defer suite.DeleteDataFromStorage()
+		suite.Ingester.ResetStats()
+		setupData(t)
+		eventsProcessed := suite.Ingester.EventsProcessed()
+
+		// update1 changes the app_name, environment, and service group of the service from event 2
+		update1 := NewHabitatEvent(
+			withSupervisorId("2"),
+			withPackageIdent("core/db/0.1.0/20200101121212"),
+			withApplication("newApp"),
+			withEnvironment("newEnv"),
+			withServiceGroup("db.newGroup"),
+		)
+		update1Bytes, err := proto.Marshal(update1)
+		require.NoError(t, err)
+		suite.Ingester.IngestMessage(update1Bytes)
+		eventsProcessed++
+		suite.WaitForEventsToProcess(eventsProcessed)
+
+		// update2 changes the app_name, environment, and service group of the service from event 1
+		update2 := NewHabitatEvent(
+			withSupervisorId("1"),
+			withPackageIdent("core/db/0.1.0/20200101121212"),
+			withApplication("newApp"),
+			withEnvironment("newEnv"),
+			withServiceGroup("db.newGroup"),
+		)
+		update2Bytes, err := proto.Marshal(update2)
+		require.NoError(t, err)
+		suite.Ingester.IngestMessage(update2Bytes)
+		eventsProcessed++
+		suite.WaitForEventsToProcess(eventsProcessed)
+
+		stats, err := suite.ApplicationsServer.GetServicesStats(context.Background(), &applications.ServicesStatsReq{})
+		require.NoError(t, err)
+		// the old service groups and deployments should be deleted, leaving just one of each
+		assert.Equal(t, int32(1), stats.TotalServiceGroups)
+		assert.Equal(t, int32(1), stats.TotalDeployments)
+		assert.Equal(t, int32(2), stats.TotalSupervisors)
+		assert.Equal(t, int32(2), stats.TotalServices)
+		svcs, err := suite.StorageClient.GetServices("name", true, 1, 5, nil)
+		require.NoError(t, err)
+		require.Equal(t, 2, len(svcs))
+
+		for _, svc := range svcs {
+			if svc.SupMemberID != "1" {
+				continue
+			}
+			// first service was changed
+			assert.Equal(t, "db.newGroup", svc.Group)
+			assert.Equal(t, "newApp", svc.Application)
+			assert.Equal(t, "newEnv", svc.Environment)
+		}
+
+		for _, svc := range svcs {
+			if svc.SupMemberID != "2" {
+				continue
+			}
+			// second service should be changed
+			assert.Equal(t, "db.newGroup", svc.Group)
+			assert.Equal(t, "newApp", svc.Application)
+			assert.Equal(t, "newEnv", svc.Environment)
+		}
+	})
+
 }
