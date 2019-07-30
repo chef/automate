@@ -15,7 +15,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const connectionRetries = 5
+const (
+	connectionRetries                      = 5
+	deprecatedNATSStreamHealthCheckChannel = "habitat"
+	// natsMessagingHealthcheckSubject        = "habitat.event.healthcheck"
+	// natsMessagingQueueGroup                = "automate"
+)
 
 // The subject is the topic this subscriber will be listening to,
 // right now we will hardcode this value but in the future it could
@@ -37,7 +42,6 @@ type NatsClient struct {
 	clusterID string
 	clientID  string
 	durableID string
-	subject   string
 	certs.TLSConfig
 	msgConn            *natsc.Conn
 	streamConn         stan.Conn
@@ -52,19 +56,17 @@ func NewExternalClient(url, cluster, client, durable, subject string) *NatsClien
 		clusterID: cluster,
 		clientID:  client,
 		durableID: durable,
-		subject:   subject,
 		retries:   connectionRetries,
 	}
 }
 
 // New creates a new client struct with some defaults
-func New(url, cluster, client, durable, subject string, tlsConfig certs.TLSConfig) *NatsClient {
+func New(url, cluster, client, durable string, tlsConfig certs.TLSConfig) *NatsClient {
 	return &NatsClient{
 		natsURL:   url,
 		clusterID: cluster,
 		clientID:  client,
 		durableID: durable,
-		subject:   subject,
 		retries:   connectionRetries,
 		TLSConfig: tlsConfig,
 	}
@@ -77,7 +79,6 @@ func NewDefaults(url, id string, tlsConfig certs.TLSConfig) *NatsClient {
 		id,
 		"applications-service",
 		"applications-service",
-		"habitat",
 		tlsConfig,
 	)
 }
@@ -176,7 +177,7 @@ func (nc *NatsClient) ConnectAndSubscribe(eventsCh chan<- []byte) error {
 		return err
 	}
 
-	_, err = nc.Subscribe(eventsCh)
+	err = nc.Subscribe(eventsCh)
 	if err != nil {
 		return err
 	}
@@ -244,9 +245,4 @@ func (nc *NatsClient) natsTLSConfig() (*tls.Config, error) {
 
 	return t, nil
 
-}
-
-// Returns the configured subject
-func (nc *NatsClient) Subject() string {
-	return nc.subject
 }

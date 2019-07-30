@@ -1,23 +1,25 @@
 package nats
 
 import (
+	//natsc "github.com/nats-io/go-nats"
 	stan "github.com/nats-io/go-nats-streaming"
 	log "github.com/sirupsen/logrus"
 )
 
-func (nc *NatsClient) Subscribe(eventsCh chan<- []byte) (stan.Subscription, error) {
+func (nc *NatsClient) Subscribe(eventsCh chan<- []byte) error {
 
 	log.WithFields(log.Fields{
-		"subject":    nc.subject,
+		"subject":    deprecatedNATSStreamHealthCheckChannel,
 		"durable_id": nc.durableID,
 		"client_id":  nc.clientID,
 	}).Info("Subscribing to subject")
 
 	// Subscribe with durable name
-	return nc.streamConn.Subscribe(nc.subject, func(msg *stan.Msg) {
+	_, err := nc.streamConn.Subscribe(deprecatedNATSStreamHealthCheckChannel, func(msg *stan.Msg) {
 
 		log.WithFields(log.Fields{
-			"protocol":          "nats",
+			"protocol":          "nats streaming",
+			"channel":           deprecatedNATSStreamHealthCheckChannel,
 			"message_data":      string(msg.Data),
 			"message_timestamp": msg.Timestamp,
 			"message_subject":   msg.Subject,
@@ -26,4 +28,13 @@ func (nc *NatsClient) Subscribe(eventsCh chan<- []byte) (stan.Subscription, erro
 
 		eventsCh <- msg.Data
 	}, stan.DurableName(nc.durableID))
+
+	// if err != nil {
+	// 	return err
+	// }
+	// _, err = nc.msgConn.QueueSubscribe(natsMessagingHealthcheckSubject, natsMessagingQueueGroup, func(msg *natsc.Msg) {
+	// })
+
+	return err
+
 }
