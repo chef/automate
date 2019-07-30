@@ -78,10 +78,6 @@ required = [
   version = "^6.2.16"
 
 [[constraint]]
-  name = "github.com/robfig/cron"
-  branch = "master"
-
-[[constraint]]
   name = "google.golang.org/grpc"
   version = "1.22.0"
 
