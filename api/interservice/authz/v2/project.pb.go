@@ -1261,6 +1261,7 @@ func (m *UpdateRuleResp) GetRule() *ProjectRule {
 
 type GetRuleReq struct {
 	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" toml:"id,omitempty" mapstructure:"id,omitempty"`
+	ProjectId            string   `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty" toml:"project_id,omitempty" mapstructure:"project_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -1294,6 +1295,13 @@ var xxx_messageInfo_GetRuleReq proto.InternalMessageInfo
 func (m *GetRuleReq) GetId() string {
 	if m != nil {
 		return m.Id
+	}
+	return ""
+}
+
+func (m *GetRuleReq) GetProjectId() string {
+	if m != nil {
+		return m.ProjectId
 	}
 	return ""
 }
@@ -1503,6 +1511,7 @@ func (m *ListRulesForProjectResp) GetStatus() string {
 
 type DeleteRuleReq struct {
 	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" toml:"id,omitempty" mapstructure:"id,omitempty"`
+	ProjectId            string   `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty" toml:"project_id,omitempty" mapstructure:"project_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
@@ -1536,6 +1545,13 @@ var xxx_messageInfo_DeleteRuleReq proto.InternalMessageInfo
 func (m *DeleteRuleReq) GetId() string {
 	if m != nil {
 		return m.Id
+	}
+	return ""
+}
+
+func (m *DeleteRuleReq) GetProjectId() string {
+	if m != nil {
+		return m.ProjectId
 	}
 	return ""
 }

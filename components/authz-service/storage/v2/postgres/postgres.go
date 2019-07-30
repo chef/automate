@@ -992,6 +992,7 @@ func (p *pg) UpdateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 	return rule, nil
 }
 
+// TODO veryify projects exists
 func (p *pg) DeleteRule(ctx context.Context, id string) error {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
@@ -1090,6 +1091,7 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 	return nil
 }
 
+// TODO verify project exists
 func (p *pg) GetStagedOrAppliedRule(ctx context.Context, id string) (*v2.Rule, error) {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
@@ -1100,7 +1102,7 @@ func (p *pg) GetStagedOrAppliedRule(ctx context.Context, id string) (*v2.Rule, e
 	defer cancel()
 
 	var rule v2.Rule
-	row := p.db.QueryRowContext(ctx, "SELECT query_staged_or_applied_rule($1, $2)",
+	row := p.db.QueryRowContext(ctx, "SELECT query_staged_or_applied_rule($1, $2, $3)",
 		id, pq.Array(projectsFilter),
 	)
 	err = row.Scan(&rule)
@@ -1167,14 +1169,6 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
-		return nil, v2.RulesStatusError, p.processError(err)
-	}
-
-	// verify project exists, otherwise we would return an empty list
-	// that could be misleading
-	var project v2.Project
-	row := tx.QueryRowContext(ctx, "SELECT query_project($1, $2)", projectID, pq.Array(projectsFilter))
-	if err := row.Scan(&project); err != nil {
 		return nil, v2.RulesStatusError, p.processError(err)
 	}
 

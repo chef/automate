@@ -168,6 +168,7 @@ message UpdateRuleResp {
 
 message GetRuleReq {
     string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+    string project_id = 2 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
 }
 
 message GetRuleResp {
@@ -193,6 +194,7 @@ message ListRulesForProjectResp {
 
 message DeleteRuleReq {
     string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+    string project_id = 2 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
 }
 
 message DeleteRuleResp {}
