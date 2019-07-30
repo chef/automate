@@ -49,7 +49,8 @@
       <div id="save">
       <chef-button primary [disabled]="!updateForm.valid || !updateForm.dirty || saveInProgress" (click)="saveChange()">
         <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
-        Save
+        <span *ngIf="saveInProgress">Saving...</span>
+        <span *ngIf="!saveInProgress">Save</span>
       </chef-button>
       <span id="saved-note" *ngIf="!firstLoad && !updateForm.dirty">All changes saved.</span>
       </div>
