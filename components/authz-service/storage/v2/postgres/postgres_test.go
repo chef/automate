@@ -6835,7 +6835,7 @@ func insertTestRole(t *testing.T,
 
 	role := genRole(t, id, name, actions, projects)
 
-	row := db.QueryRow(`INSERT INTO iam_roles (id, name, type, actions)  VALUES ($1, $2, $3, $4)
+	row := db.QueryRow(`INSERT INTO iam_roles (id, name, type, actions) VALUES ($1, $2, $3, $4)
 	RETURNING db_id`,
 		role.ID, role.Name, role.Type.String(), pq.Array(role.Actions))
 	var dbID string

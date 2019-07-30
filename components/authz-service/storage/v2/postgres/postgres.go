@@ -1464,7 +1464,7 @@ func (p *pg) ListProjects(ctx context.Context) ([]*v2.Project, error) {
 }
 
 func (p *pg) insertProjectWithQuerier(ctx context.Context, project *v2.Project, q Querier) error {
-	_, err := q.ExecContext(ctx, `INSERT INTO iam_projects (id, name, type)  VALUES ($1, $2, $3);`,
+	_, err := q.ExecContext(ctx, `INSERT INTO iam_projects (id, name, type) VALUES ($1, $2, $3);`,
 		project.ID, project.Name, project.Type.String())
 	return err
 }
