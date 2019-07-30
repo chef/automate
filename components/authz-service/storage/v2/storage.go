@@ -192,15 +192,15 @@ func DefaultPolicies() ([]Policy, error) {
 // At present, this list contains internally required projects only, hidden from the user.
 func DefaultProjects() []Project {
 	allProjects := Project{
-		ID:       constants_v2.AllProjectsID,
-		Name:     "All Projects",
-		Type:     ChefManaged,
+		ID:   constants_v2.AllProjectsID,
+		Name: "All Projects",
+		Type: ChefManaged,
 	}
 
 	unassignedProject := Project{
-		ID:       constants_v2.UnassignedProjectID,
-		Name:     constants_v2.UnassignedProjectID,
-		Type:     ChefManaged,
+		ID:   constants_v2.UnassignedProjectID,
+		Name: constants_v2.UnassignedProjectID,
+		Type: ChefManaged,
 	}
 
 	return []Project{allProjects, unassignedProject}

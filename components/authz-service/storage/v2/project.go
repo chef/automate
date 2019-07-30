@@ -11,9 +11,9 @@ import (
 
 // Project represents a project definition to be persisted to storage.
 type Project struct {
-	ID       string   `json:"id"`
-	Name     string   `json:"name"`
-	Type     Type     `json:"type"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	Type Type   `json:"type"`
 }
 
 // Note: also catches empty names ("")
@@ -43,8 +43,8 @@ func NewProject(id string, name string, typeVal Type) (Project, error) {
 	}
 
 	return Project{
-		ID:       id,
-		Name:     name,
-		Type:     typeVal,
+		ID:   id,
+		Name: name,
+		Type: typeVal,
 	}, nil
 }
