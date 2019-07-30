@@ -25,7 +25,6 @@ bin:
 build: ${BINS}
 
 test:
-	@go test -i $(packages)
 	@go test $(packages) -cover
 
 # Regenerate all *.pb.go files
