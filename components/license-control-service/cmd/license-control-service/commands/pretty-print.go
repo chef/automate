@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
@@ -60,7 +61,7 @@ func maybeFromFile(maybeToken string) (string, error) {
 		log.Debugf("Reading token data from file: %s\n", maybeToken)
 		data, err := ioutil.ReadFile(maybeToken)
 		if err != nil {
-			log.WithError(err).Fatal("Reading token data from file failed")
+			return "", errors.Wrap(err, "reading token data from file failed")
 		}
 		strippedData := strings.TrimSpace(string(data))
 		return strippedData, nil

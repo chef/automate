@@ -4,7 +4,7 @@ package chef.automate.domain.license_control;
 option go_package = "github.com/chef/automate/api/interservice/license_control";
 
 import "google/protobuf/timestamp.proto";
-import "github.com/chef/automate/lib/license/license.proto";
+import "lib/license/license.proto";
 
 service LicenseControl {
   rpc License (LicenseRequest) returns (LicenseResponse);

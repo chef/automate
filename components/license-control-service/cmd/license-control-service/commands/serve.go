@@ -13,7 +13,7 @@ import (
 var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "Start the license control gRPC server",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(*cobra.Command, []string) {
 		log.Info("Starting License Control Service")
 
 		cfg, err := server.ConfigFromViper()

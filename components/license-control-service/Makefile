@@ -1,6 +1,3 @@
-GOFILES=$(shell go list ./... | grep -v '/vendor|asset\.go|proto/' | sed 's/^_//')
-GOPATH=$(shell go env GOPATH)
-
 default: ci
 
 ci: build
@@ -20,24 +17,17 @@ clean:
 generate:
 	go generate ./...
 
-test:
-	GOMAXPROCS=4 go test -v -cover $(GOFILES)
+setup_docker_pg:
+	docker run --name lcs-postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=lcs_test -p 5432:5432 -d postgres:9
 
-vet:
-	go vet $(GOFILES)
+kill_docker_pg:
+	docker rm -f lcs-postgres || true
+
+PG_URL ?= "postgresql://postgres@127.0.0.1:5432/lcs_test?sslmode=disable"
+test:
+	PG_URL=$(PG_URL) go test -cover ./...
 
 run:
 	go run cmd/license-control-service/license-control-service.go serve --config config.dev.toml
 
-# Etc
-edit:
-	$(EDITOR) Makefile
-
-view:
-	$(PAGER) Makefile || cat Makefile
-
-.PHONY: ci review setup clean
-.PHONY: build clean fmt lint test vet
-.PHONY: edit view
-.PHONY: run
-.PHONY: generate
+.PHONY: ci review clean generate test run
