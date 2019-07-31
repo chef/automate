@@ -117,4 +117,20 @@ CREATE OR REPLACE FUNCTION
 
 $$ LANGUAGE sql;
  
+
+CREATE OR REPLACE FUNCTION
+  query_rule_table_associations(_id TEXT, _project_id TEXT)
+  RETURNS TEXT[] AS $$
+
+  -- confirm project exists
+  SELECT project_db_id(_project_id);
+
+  SELECT ARRAY(
+    SELECT 'applied' AS TableName FROM iam_project_rules a WHERE a.id=_id
+    UNION
+    SELECT 'staged' AS TableName FROM iam_staged_project_rules s WHERE s.id=_id
+    );
+
+$$ LANGUAGE sql;
+
 COMMIT;

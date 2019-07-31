@@ -906,7 +906,7 @@ func (p *pg) CreateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 		return nil, p.processError(err)
 	}
 
-	assocMap, err := p.getMapOfRuleAssociations(ctx, tx, rule.ID)
+	assocMap, err := p.getMapOfRuleAssociations(ctx, tx, rule.ID, rule.ProjectID)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -1006,7 +1006,7 @@ func (p *pg) DeleteRule(ctx context.Context, projectID string, ruleID string) er
 		return p.processError(err)
 	}
 
-	assocMap, err := p.getMapOfRuleAssociations(ctx, tx, ruleID)
+	assocMap, err := p.getMapOfRuleAssociations(ctx, tx, ruleID, projectID)
 	if err != nil {
 		return p.processError(err)
 	}
@@ -1101,7 +1101,7 @@ func (p *pg) GetStagedOrAppliedRule(ctx context.Context, projectID string, ruleI
 
 	var rule v2.Rule
 	row := p.db.QueryRowContext(ctx, "SELECT query_staged_or_applied_rule($1, $2, $3)",
-		ruleID, pq.Array(projectsFilter),
+		ruleID, projectID, pq.Array(projectsFilter),
 	)
 	err = row.Scan(&rule)
 	if err != nil {
@@ -1166,7 +1166,7 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 	}
 
 	// in our other APIs we use a a postgres query to do filtering
-	// however in this case, we can't automatically assume NoRows means NotFound 
+	// however in this case, we can't automatically assume NoRows means NotFound
 	// because we want to differentiate between a project that is not in the project filter
 	// and a project that has no rules
 	if len(projectsFilter) > 0 {
@@ -1517,8 +1517,8 @@ func (p *pg) singleRowResultOrNotFoundErr(result sql.Result) error {
 	return nil
 }
 
-func (p *pg) getMapOfRuleAssociations(ctx context.Context, q Querier, id string) (map[string]bool, error) {
-	assocRow := q.QueryRowContext(ctx, `SELECT query_rule_table_associations($1);`, id)
+func (p *pg) getMapOfRuleAssociations(ctx context.Context, q Querier, id string, projectID string) (map[string]bool, error) {
+	assocRow := q.QueryRowContext(ctx, `SELECT query_rule_table_associations($1, $2);`, id, projectID)
 	var associations []string
 	if err := assocRow.Scan(pq.Array(&associations)); err != nil {
 		return nil, err

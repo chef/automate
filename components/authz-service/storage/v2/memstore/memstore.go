@@ -244,6 +244,11 @@ func (s *State) GetPolicyChangeNotifier(ctx context.Context) (v2.PolicyChangeNot
 
 func (s *State) CreateRule(_ context.Context, rule *storage.Rule) (*storage.Rule, error) {
 	rule.Status = "applied"
+
+	_, exists := s.projects.Get(rule.ProjectID)
+	if !exists {
+		return nil, &storage_errors.ForeignKeyError{Msg: "project not found"}
+	}
 	if err := s.rules.Add(rule.ID, rule, cache.NoExpiration); err != nil {
 		return nil, storage_errors.ErrConflict
 	}
@@ -273,12 +278,11 @@ func (s *State) UpdateRule(_ context.Context, rule *storage.Rule) (*storage.Rule
 }
 
 func (s *State) GetStagedOrAppliedRule(_ context.Context, projectID, ruleID string) (*storage.Rule, error) {
-	item, exists := s.projects.Get(projectID)
+	_, exists := s.projects.Get(projectID)
 	if !exists {
-		return nil, storage_errors.ErrNotFound
+		return nil, &storage_errors.ForeignKeyError{Msg: "project not found"}
 	}
-	
-	item, exists = s.rules.Get(ruleID)
+	item, exists := s.rules.Get(ruleID)
 	if !exists {
 		return nil, storage_errors.ErrNotFound
 	}

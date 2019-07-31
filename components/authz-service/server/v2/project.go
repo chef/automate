@@ -380,7 +380,7 @@ func (s *ProjectState) CreateRule(ctx context.Context, req *api.CreateRuleReq) (
 	default:
 		switch err.(type) {
 		case *storage_errors.ForeignKeyError:
-			return nil, status.Error(codes.InvalidArgument, err.Error())
+			return nil, status.Error(codes.NotFound, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal,
 			"error creating rule with ID %q: %s", req.Id, err.Error())
@@ -401,13 +401,17 @@ func (s *ProjectState) UpdateRule(ctx context.Context, req *api.UpdateRuleReq) (
 	}
 
 	resp, err := s.store.UpdateRule(ctx, r)
-	if err != nil {
-		if err == storage_errors.ErrNotFound {
-			return nil, status.Errorf(codes.NotFound, "rule with ID %q not found", req.Id)
-		}
-		if err == storage_errors.ErrChangeProjectForRule {
-			return nil, status.Errorf(codes.FailedPrecondition,
-				"cannot change project_id for existing rule with ID %q ", req.Id)
+	switch err {
+	case nil: // continue
+	case storage_errors.ErrNotFound:
+		return nil, status.Errorf(codes.NotFound, "rule with ID %q not found", req.Id)
+	case storage_errors.ErrChangeProjectForRule:
+		return nil, status.Errorf(codes.FailedPrecondition,
+			"cannot change project_id for existing rule with ID %q ", req.Id)
+	default:
+		switch err.(type) {
+		case *storage_errors.ForeignKeyError:
+			return nil, status.Error(codes.NotFound, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal,
 			"error updating rule with ID %q: %s", req.Id, err.Error())
@@ -423,9 +427,14 @@ func (s *ProjectState) UpdateRule(ctx context.Context, req *api.UpdateRuleReq) (
 
 func (s *ProjectState) GetRule(ctx context.Context, req *api.GetRuleReq) (*api.GetRuleResp, error) {
 	resp, err := s.store.GetStagedOrAppliedRule(ctx, req.ProjectId, req.Id)
-	if err != nil {
-		if err == storage_errors.ErrNotFound {
-			return nil, status.Errorf(codes.NotFound, "could not find rule with ID %q", req.Id)
+	switch err {
+	case nil: // continue
+	case storage_errors.ErrNotFound:
+		return nil, status.Errorf(codes.NotFound, "could not find rule with ID %q", req.Id)
+	default:
+		switch err.(type) {
+		case *storage_errors.ForeignKeyError:
+			return nil, status.Error(codes.NotFound, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal,
 			"error retrieving rule with ID %q: %s", req.Id, err.Error())
@@ -470,11 +479,17 @@ func (s *ProjectState) listRulesWithFunction(ctx context.Context, req *api.ListR
 
 func (s *ProjectState) ListRulesForProject(ctx context.Context, req *api.ListRulesForProjectReq) (*api.ListRulesForProjectResp, error) {
 	resp, statusResp, err := s.store.ListRulesForProject(ctx, req.Id)
-	if err != nil {
-		if err == storage_errors.ErrNotFound {
-			return nil, status.Errorf(codes.NotFound, "could not find project with ID %q", req.Id)
+	switch err {
+	case nil: // continue
+	case storage_errors.ErrNotFound:
+		return nil, status.Errorf(codes.NotFound, "could not find rule with ID %q", req.Id)
+	default:
+		switch err.(type) {
+		case *storage_errors.ForeignKeyError:
+			return nil, status.Error(codes.NotFound, err.Error())
 		}
-		return nil, status.Errorf(codes.Internal, "error retrieving rules: %s", err.Error())
+		return nil, status.Errorf(codes.Internal,
+			"error retrieving rules for project id %q: %s", req.Id, err.Error())
 	}
 
 	rules := make([]*api.ProjectRule, len(resp))
@@ -500,7 +515,11 @@ func (s *ProjectState) DeleteRule(ctx context.Context, req *api.DeleteRuleReq) (
 		return &api.DeleteRuleResp{}, nil
 	case storage_errors.ErrNotFound:
 		return nil, status.Errorf(codes.NotFound, "could not find rule with ID %q", req.Id)
-	default: // any other error
+	default:
+		switch err.(type) {
+		case *storage_errors.ForeignKeyError:
+			return nil, status.Error(codes.NotFound, err.Error())
+		}
 		return nil, status.Errorf(codes.Internal,
 			"error deleting rule with ID %q: %s", req.Id, err.Error())
 	}

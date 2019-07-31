@@ -3511,11 +3511,15 @@ func TestUpdateRule(t *testing.T) {
 	cases := map[string]func(*testing.T){
 		"when the project does not exist, return ForeignKeyError": func(t *testing.T) {
 			ctx := context.Background()
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 			condition1, err := storage.NewCondition([]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
 			require.NoError(t, err)
-			rule, err := storage.NewRule("rule1", "project-not-found", "name", storage.Node, []storage.Condition{condition1})
+			rule, err := storage.NewRule("rule1", projID, "name", storage.Node, []storage.Condition{condition1})
+			insertAppliedRule(t, db, &rule)
 			require.NoError(t, err)
 
+			rule.ProjectID = "project-not-found"
 			resp, err := store.UpdateRule(ctx, &rule)
 			require.Error(t, err)
 			assert.Nil(t, resp)
