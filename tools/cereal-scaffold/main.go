@@ -313,7 +313,6 @@ func runSimpleWorkflow(_ *cobra.Command, args []string) error {
 	if len(args) > 0 {
 		dbName = args[0]
 	}
-	logrus.Debug(dbName)
 
 	b := getBackend(dbName)
 	manager, err := cereal.NewManager(b)
