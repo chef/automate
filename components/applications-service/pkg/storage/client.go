@@ -53,16 +53,22 @@ const (
 	NoneStrategy UpdateStrategy = iota
 	AtOnceStrategy
 	RollingStrategy
+	UnrecognizedStrategy
 )
+
+// Set as a const to share with the tests
+const updateStrategyUnrecognizedName = "UNRECOGNIZED"
 
 func (x UpdateStrategy) String() string {
 	switch x {
+	case NoneStrategy:
+		return "NONE"
 	case AtOnceStrategy:
 		return "AT-ONCE"
 	case RollingStrategy:
 		return "ROLLING"
 	default:
-		return "NONE"
+		return updateStrategyUnrecognizedName
 	}
 }
 
@@ -73,7 +79,7 @@ func HabitatUpdateStrategyToStorageFormat(strategy habitat.UpdateStrategy) Updat
 	case habitat.UpdateStrategy_Rolling:
 		return RollingStrategy
 	default:
-		return NoneStrategy
+		return UnrecognizedStrategy
 	}
 }
 
