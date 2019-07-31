@@ -3256,7 +3256,6 @@ func genPolicy(t *testing.T, id string, p *prng.Prng) storage.Policy {
 		}
 
 		statements[i] = storage.Statement{
-			ID:        genUUID(t),
 			Actions:   actions,
 			Resources: resources,
 			Role:      faker.Lorem().Word(),
