@@ -45,7 +45,8 @@ else
     buildkite-agent annotate --style "info" "This change rebuilds no components."
 fi
 
-mapfile -t modified_sql_files < <(git diff --name-status "$(./scripts/git_difference_expression.rb)" | awk '/^[RMD][0-9]*.*\.sql/{ print $2 }')
+mapfile -t modified_sql_files < <(git diff --name-status "$(./scripts/git_difference_expression.rb)" |\
+                                    awk '!/datamigration/ && /^[RMD][0-9]*.*\.sql/ { print $2 }')
 if [[ ${#modified_sql_files[@]} -ne 0 ]]; then
     buildkite-agent annotate --context sql-check --style "warning" <<EOF
 This change modifies the following SQL files:
