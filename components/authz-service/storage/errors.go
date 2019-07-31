@@ -19,9 +19,6 @@ var (
 	// ErrDatabase results from unexpected database errors.
 	ErrDatabase = errors.New("database internal")
 
-	// ErrGenerateUUID occurs when a UUID could not be generated for a new object.
-	ErrGenerateUUID = errors.New("could not generate UUID")
-
 	// ErrMaxProjectsExceeded indicates that a new project cannot be created
 	// since the max allowed are already created.
 	ErrMaxProjectsExceeded = errors.New("max projects allowed")
