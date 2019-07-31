@@ -65,7 +65,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   ) {
     this.updateNameForm = fb.group({
       // Must stay in sync with error checks in team-details.component.html
-      name: ['Loading...', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
 
     combineLatest(

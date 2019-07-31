@@ -73,7 +73,7 @@ describe('ProjectDetailsComponent', () => {
           outputs: ['close', 'deleteClicked']
         }),
         MockComponent({ selector: 'chef-control-menu' }),
-        MockComponent({ selector: 'chef-form-field'}),
+        MockComponent({ selector: 'chef-form-field', inputs: ['watch', 'control']}),
         MockComponent({ selector: 'chef-breadcrumbs'}),
         MockComponent({ selector: 'chef-error'}),
         MockComponent({ selector: 'chef-breadcrumb', inputs: ['link'] }),

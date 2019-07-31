@@ -27,7 +27,7 @@
     </chef-page-header>
     <section class="page-body" [hidden]="showTab('rules')">
       <form [formGroup]="projectForm">
-        <chef-form-field id="update-name">
+        <chef-form-field id="update-name" [watch]="projectForm.controls.name.value" [control]="projectForm.controls.name">
           <label>
             <span class="label">Name <span aria-hidden="true">*</span></span>
             <input chefInput formControlName="name" type="text"
@@ -43,7 +43,7 @@
           Name changes are not allowed for the default project.
         </span>
         <div id="button-bar" *ngIf="!isChefManaged">
-          <chef-button [disabled]="isLoading || !projectForm.valid || projectForm.controls['name'].value === project?.name"
+          <chef-button [disabled]="isLoading || !projectForm.valid || !projectForm.dirty"
             primary inline (click)="saveProject()">
             <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
             <span *ngIf="saving">Saving...</span>

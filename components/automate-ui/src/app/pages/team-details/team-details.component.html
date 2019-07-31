@@ -61,7 +61,7 @@
     <ng-container *ngIf="tabValue === 'details'">
       <section class="page-body">
         <form [formGroup]="updateNameForm">
-          <chef-form-field>
+          <chef-form-field [watch]="updateNameForm.controls.name.value" [control]="updateNameForm.controls.name">
             <label>{{ descriptionOrName | titlecase }} <span aria-hidden="true">*</span></label>
             <input chefInput formControlName="name" type="text" (keyup)="keyPressed()">
             <chef-error
@@ -70,7 +70,7 @@
             </chef-error>
           </chef-form-field>
         </form>
-          <chef-button [disabled]="isLoading || !updateNameForm.valid || updateNameForm.controls['name'].value === team?.name"
+          <chef-button [disabled]="isLoading || !updateNameForm.valid || !updateNameForm.dirty"
             primary inline (click)="saveNameChange()">
             <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
             <span *ngIf="saving">Saving...</span>

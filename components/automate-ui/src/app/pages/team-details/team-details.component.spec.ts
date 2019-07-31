@@ -63,7 +63,7 @@ describe('TeamDetailsComponent', () => {
         MockComponent({ selector: 'chef-breadcrumbs' }),
         MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
         MockComponent({ selector: 'chef-error' }),
-        MockComponent({ selector: 'chef-form-field' }),
+        MockComponent({ selector: 'chef-form-field', inputs: ['watch', 'control']}),
         MockComponent({ selector: 'chef-input' }),
         MockComponent({ selector: 'chef-page-header' }),
         MockComponent({ selector: 'chef-option' }),
