@@ -540,15 +540,24 @@ func migrateTimeSeriesDate(ctx context.Context, esClient *elastic.Client, dateTo
 					if err != nil {
 						return errors.Wrapf(err, "migrateTimeSeries unable to unmarshall report with ID=%s", reportId)
 					}
+					staticProfileMissing := false
 					for _, esInSpecReportProfile := range esInSpecSummary.ProfilesSums {
 						_, profileId := rightSplit(esInSpecReportProfile.Profile, "|")
 						if profilesMetaMap[profileId] == nil {
 							esProfile, err := getProfileA2v2(esClient, ctx, profileId)
 							if err != nil {
-								return errors.Wrapf(err, "migrateTimeSeries unable to get profile %s", profileId)
+								logrus.Errorf("migrateTimeSeries unable to get profile %s, not migrating report %s", profileId, reportId)
+								staticProfileMissing = true
+								// If one of the profiles used by the report can't be found in the static profiles index
+								// we break out of this loop as the report won't be migrated anyway
+								break
 							}
 							addProfileToMap(esProfile, profileId)
 						}
+					}
+
+					if staticProfileMissing {
+						continue
 					}
 
 					if esInSpecSummary.ReportID == "" {
@@ -557,25 +566,43 @@ func migrateTimeSeriesDate(ctx context.Context, esClient *elastic.Client, dateTo
 					}
 
 					if esInSpecReports[reportId] != nil {
-						dstSum := convertA2v2SummaryDocToLatest(&esInSpecSummary)
+						dstSum, err := convertA2v2SummaryDocToLatest(&esInSpecSummary)
+						if err != nil {
+							logrus.Errorf(err.Error())
+							// Only log errors and avoid migrating incomplete reports
+							continue
+						}
+
 						dstSum.Statistics.Duration = esInSpecReports[hit.Id].Statistics.Duration
 						dstSum.InSpecVersion = esInSpecReports[hit.Id].InSpecVersion
+
+						dstRep, err := convertA2v2ReportDocToLatest(esInSpecReports[hit.Id], dstSum)
+						if err != nil {
+							logrus.Errorf(err.Error())
+							// Only log errors and avoid migrating incomplete reports
+							continue
+						}
+
 						dstSums = append(dstSums, dstSum)
-						dstReps = append(dstReps, convertA2v2ReportDocToLatest(esInSpecReports[hit.Id], dstSum))
+						dstReps = append(dstReps, dstRep)
 					} else {
-						return errors.Errorf("Report %s missing for index %s", reportId, srcRepIndex)
+						logrus.Errorf("Not migrating report %s as it's missing from index %s", reportId, srcRepIndex)
 					}
 				}
 			}
 
-			err = BulkInsertComplianceSummaryDocs(esClient, ctx, dstSumIndex, dstSums)
-			if err != nil {
-				return errors.Wrapf(err, "migrateTimeSeries unable to bulk insert %d summary docs in index %s", len(dstSums), dstSumIndex)
+			if len(dstSums) > 0 {
+				err = BulkInsertComplianceSummaryDocs(esClient, ctx, dstSumIndex, dstSums)
+				if err != nil {
+					return errors.Wrapf(err, "migrateTimeSeries unable to bulk insert %d summary docs in index %s", len(dstSums), dstSumIndex)
+				}
 			}
 
-			err = BulkInsertComplianceReportDocs(esClient, ctx, dstRepIndex, dstReps)
-			if err != nil {
-				return errors.Wrapf(err, "migrateTimeSeries unable to bulk insert %d report docs in index %s", len(dstReps), dstRepIndex)
+			if len(dstReps) > 0 {
+				err = BulkInsertComplianceReportDocs(esClient, ctx, dstRepIndex, dstReps)
+				if err != nil {
+					return errors.Wrapf(err, "migrateTimeSeries unable to bulk insert %d report docs in index %s", len(dstReps), dstRepIndex)
+				}
 			}
 		}
 	}
