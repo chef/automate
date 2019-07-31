@@ -107,8 +107,10 @@ func (p *PGBackend) Init(ctx context.Context, l *keys.LicenseParser) error {
 	}
 }
 
-// TODO(ssd) 2019-07-29: This migration would be problematic in
-// multi-node, but this should only happen on single node clusters.
+// NOTE(ssd) 2019-07-29: This migration would be problematic in
+// multi-node, but this should only happen on single node clusters
+// since we aren't currently planning on direct upgrades from
+// single-node to multi-node clusters.
 func (p *PGBackend) migrateFromFileBackend(ctx context.Context, l *keys.LicenseParser) error {
 	license, err := p.legacyFileBackend.GetLicense(ctx)
 	switch err.(type) {
