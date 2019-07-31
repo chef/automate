@@ -35,11 +35,15 @@ curl "https://packages.chef.io/manifests/current/automate/latest.json" > results
 curl "https://packages.chef.io/manifests/acceptance/automate/latest.json" > results/acceptance.json
 
 log_section_start "determine changed components"
-mapfile -t changed_components < <(./scripts/changed_components.rb)
-if [[ ${#changed_components[@]} -ne 0 ]]; then
+mapfile -t changed_components < <(./scripts/changed_components.rb 2>/dev/null)
+# ignore stdout, take lines after "======"
+changed_components_details=$(./scripts/changed_components.rb 2>&1 >/dev/null |\
+  sed '0,/======/d')
+
+if [ -n "$changed_components_details" ]; then
     buildkite-agent annotate --style "info" <<EOF
 This change rebuilds the following components:
-$(printf '* %s\n' "${changed_components[@]}")
+${changed_components_details}
 EOF
 else
     buildkite-agent annotate --style "info" "This change rebuilds no components."
