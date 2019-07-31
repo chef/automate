@@ -1,6 +1,6 @@
 // +build integration
 
-package integration_test
+package integration
 
 import (
 	"context"
@@ -10,27 +10,27 @@ import (
 	"github.com/chef/automate/lib/cereal"
 )
 
-// TestEnqueueDuplicateWorkflowInstance tries the enqueue the same workflow
-// instance twice. The first one must be accepted, the second one must fail
-func (suite *CerealTestSuite) TestEnqueueDuplicateWorkflowInstance() {
-	taskName := randName("duplicate_test")
-	workflowName := randName("duplicate_test")
+// TestCompleteSimpleWorkflow tests that a workflow the launches a
+// single task completes
+//
+// Workflow:
+// - OnStart -> Launch 'simple' task
+// - OnTaskComplete -> Done
+func (suite *CerealTestSuite) TestCompleteSimpleWorkflow() {
+	taskName := randName("simple")
+	workflowName := randName("simple")
 	instanceName := randName("instance")
 
+	// There will be once task that runs, along
+	// with the TaskCompleted
 	wgTask := sync.WaitGroup{}
-	wgTask.Add(1)
-
-	// wgBarrier is used to block the completion of the task.
-	// This allows us to make sure there is a running workflow
-	// instance
-	wgBarrier := sync.WaitGroup{}
-	wgBarrier.Add(1)
+	wgTask.Add(2)
 
 	m := suite.newManager(
 		WithTaskExecutorF(
 			taskName,
 			func(context.Context, cereal.Task) (interface{}, error) {
-				wgBarrier.Wait()
+				wgTask.Done()
 				return nil, nil
 			}),
 		WithWorkflowExecutor(
@@ -42,6 +42,8 @@ func (suite *CerealTestSuite) TestEnqueueDuplicateWorkflowInstance() {
 					return w.Continue(nil)
 				},
 				onTaskComplete: func(w cereal.WorkflowInstance, ev cereal.TaskCompleteEvent) cereal.Decision {
+					suite.Assert().Equal(1, w.TotalCompletedTasks())
+					suite.Assert().Equal(1, w.TotalEnqueuedTasks())
 					wgTask.Done()
 					return w.Complete()
 				},
@@ -51,9 +53,6 @@ func (suite *CerealTestSuite) TestEnqueueDuplicateWorkflowInstance() {
 	defer m.Stop()
 	err := m.EnqueueWorkflow(context.Background(), workflowName, instanceName, nil)
 	suite.Require().NoError(err, "Failed to enqueue workflow")
-	err = m.EnqueueWorkflow(context.Background(), workflowName, instanceName, "dummy")
-	suite.Assert().Equal(cereal.ErrWorkflowInstanceExists, err)
-	wgBarrier.Done()
 	wgTask.Wait()
 	time.Sleep(20 * time.Millisecond)
 	err = m.Stop()

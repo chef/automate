@@ -1,9 +1,11 @@
-package integration_test
+package integration
 
 import (
 	"context"
 	"sync"
 	"time"
+
+	"github.com/davecgh/go-spew/spew"
 
 	"github.com/teambition/rrule-go"
 
@@ -228,6 +230,7 @@ func (suite *CerealTestSuite) TestExpiringSchedule() {
 	found := false
 	schedules, err := m.ListWorkflowSchedules(context.Background())
 	for _, s := range schedules {
+		spew.Dump(s)
 		if s.WorkflowName == workflowName && s.InstanceName == instanceName {
 			suite.Assert().True(s.Enabled)
 			found = true

@@ -11,12 +11,19 @@ import (
 
 	"github.com/sirupsen/logrus"
 
+	"github.com/chef/automate/components/cereal-service/pkg/server"
+	"github.com/chef/automate/lib/cereal"
+
+	grpcceral "github.com/chef/automate/api/interservice/cereal"
+	libgrpc "github.com/chef/automate/lib/cereal/grpc"
+	cerealintegration "github.com/chef/automate/lib/cereal/integration"
+	"github.com/chef/automate/lib/cereal/postgres"
+	"github.com/chef/automate/lib/grpc/grpctest"
+	"github.com/chef/automate/lib/platform/pg"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-
-	"github.com/chef/automate/lib/cereal/postgres"
-	"github.com/chef/automate/lib/platform/pg"
+	"google.golang.org/grpc"
 )
 
 const (
@@ -62,16 +69,27 @@ func runResetDB() error {
 	return nil
 }
 
-func TestCerealPostgres(t *testing.T) {
+func TestGrpcPostgres(t *testing.T) {
 	ctx := context.Background()
+	logrus.SetLevel(logrus.DebugLevel)
 	require.NoError(t, runResetDB())
 	pgBackend := postgres.NewPostgresBackend(testDBURL(), postgres.WithTaskPingInterval(3*time.Second))
-	defer pgBackend.Close()
-	s := NewSuiteForBackend(ctx, t, pgBackend)
-	suite.Run(t, s)
-	require.NoError(t, pgBackend.Close())
-}
+	require.NoError(t, pgBackend.Init())
 
-func init() {
-	logrus.SetLevel(logrus.DebugLevel)
+	grpcServer := grpc.NewServer()
+	svc := server.NewCerealService(ctx, pgBackend)
+	grpcceral.RegisterCerealServer(grpcServer, svc)
+	g := grpctest.NewServer(grpcServer)
+	cereal.MaxWakeupInterval = 2 * time.Second
+
+	defer g.Close()
+
+	conn, err := grpc.Dial(g.URL, grpc.WithInsecure(), grpc.WithMaxMsgSize(64*1024*1024))
+	if err != nil {
+		panic(err)
+	}
+	grpcBackend := libgrpc.NewGrpcBackendFromConn(conn)
+	s := cerealintegration.NewSuiteForBackend(ctx, t, grpcBackend)
+	suite.Run(t, s)
+	require.NoError(t, grpcBackend.Close())
 }

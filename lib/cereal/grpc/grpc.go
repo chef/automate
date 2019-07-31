@@ -63,10 +63,18 @@ type workflowCompleter struct {
 var _ backend.WorkflowCompleter = &workflowCompleter{}
 
 func (c *workflowCompleter) EnqueueTask(task *backend.Task, opts backend.TaskEnqueueOpts) error {
-	c.tasks = append(c.tasks, &grpccereal.Task{
+	t := &grpccereal.Task{
 		Name:       task.Name,
 		Parameters: task.Parameters,
-	})
+	}
+	if !opts.StartAfter.IsZero() {
+		ts, err := ptypes.TimestampProto(opts.StartAfter)
+		if err != nil {
+			return err
+		}
+		t.StartAfter = ts
+	}
+	c.tasks = append(c.tasks, t)
 	return nil
 }
 
@@ -162,6 +170,7 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 		taskResult = &backend.TaskResult{
 			TaskName:   tr.GetTaskName(),
 			Parameters: tr.GetParameters(),
+			Status:     backend.TaskStatusType(tr.GetStatus()),
 			ErrorText:  tr.GetErrorText(),
 			Result:     tr.GetResult(),
 		}
@@ -399,6 +408,7 @@ func grpcSchedToBackend(grpcSched *grpccereal.Schedule) *backend.Schedule {
 		WorkflowName: grpcSched.WorkflowName,
 		Parameters:   grpcSched.Parameters,
 		Recurrence:   grpcSched.Recurrence,
+		Enabled:      grpcSched.Enabled,
 	}
 	if grpcSched.NextDueAt != nil {
 		ts, err := ptypes.Timestamp(grpcSched.NextDueAt)

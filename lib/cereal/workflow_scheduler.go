@@ -14,10 +14,10 @@ import (
 var (
 	// maxWakeupInterval is the maximum amount of time we will
 	// sleep between checking the recurrence table.
-	maxWakeupInterval = 60 * time.Second
+	MaxWakeupInterval = 60 * time.Second
 	// lateWarningThreshold is how late a job can be before we
 	// will log a warning.
-	lateWarningThreshold = 10 * time.Second
+	LateWarningThreshold = 10 * time.Second
 )
 
 type WorkflowScheduler struct {
@@ -49,7 +49,7 @@ func (w *WorkflowScheduler) Run(ctx context.Context) {
 }
 
 func (w *WorkflowScheduler) scheduleWorkflows(ctx context.Context) (time.Duration, error) {
-	sleepTime := maxWakeupInterval
+	sleepTime := MaxWakeupInterval
 
 	for {
 		s, err := w.scheduleWorkflow(ctx)
@@ -72,19 +72,19 @@ func (w *WorkflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 			s, err2 := w.backend.GetNextScheduledWorkflow(ctx)
 			if err2 != nil {
 				if err2 == ErrNoScheduledWorkflows {
-					return maxWakeupInterval, err
+					return MaxWakeupInterval, err
 				}
 				logrus.WithError(err2).Error("failed to determine next scheduled workflow")
-				return maxWakeupInterval, err
+				return MaxWakeupInterval, err
 			}
 			logrus.Debugf("Woke up %fs early for task", time.Until(s.NextDueAt).Seconds())
 			return time.Until(s.NextDueAt), err
 		}
-		return maxWakeupInterval, errors.Wrap(err, "could not fetch recurring workflows")
+		return MaxWakeupInterval, errors.Wrap(err, "could not fetch recurring workflows")
 	}
 	defer completer.Close()
 
-	if time.Since(s.NextDueAt) > lateWarningThreshold {
+	if time.Since(s.NextDueAt) > LateWarningThreshold {
 		logrus.Warnf("Recurring workflow %fs past due. (expected at %s)", time.Since(s.NextDueAt).Seconds(), s.NextDueAt)
 	}
 
@@ -93,13 +93,13 @@ func (w *WorkflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 		logrus.WithError(err).Error("scheduled workflow has invalid recurrence rule, attempting to disable it")
 		err2 := completer.DisableSchedule(s)
 		if err2 != nil {
-			return maxWakeupInterval, errors.Wrap(err2, "failed to disable workflow with invalid recurrence rule")
+			return MaxWakeupInterval, errors.Wrap(err2, "failed to disable workflow with invalid recurrence rule")
 		}
 
 		// NOTE(ssd) 2019-07-15: We return no error here
 		// because we've successfully disabled this rule, so
 		// the polling loop can keep going.
-		return maxWakeupInterval, nil
+		return MaxWakeupInterval, nil
 	}
 
 	nowUTC := time.Now().UTC()

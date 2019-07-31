@@ -9,6 +9,7 @@ import "google/protobuf/wrappers.proto";
 message Task {
   string name = 1;
   bytes parameters = 2;
+  google.protobuf.Timestamp start_after = 3;
 }
 
 message WorkflowInstance {

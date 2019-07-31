@@ -298,7 +298,7 @@ func (SimpleWorkflow) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEvent)
 
 func getBackend(dbName string) backend.Driver {
 	if opts.Endpoint != "" {
-		conn, err := grpc.Dial(opts.Endpoint, grpc.WithInsecure())
+		conn, err := grpc.Dial(opts.Endpoint, grpc.WithInsecure(), grpc.WithMaxMsgSize(64*1024*1024))
 		if err != nil {
 			panic(err)
 		}

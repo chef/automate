@@ -1,6 +1,6 @@
 // +build integration
 
-package integration_test
+package integration
 
 import (
 	"context"
@@ -10,26 +10,22 @@ import (
 	"github.com/chef/automate/lib/cereal"
 )
 
-// TestCompleteSimpleWorkflow tests that a workflow the launches a
-// single task completes
-//
-// Workflow:
-// - OnStart -> Launch 'simple' task
-// - OnTaskComplete -> Done
-func (suite *CerealTestSuite) TestCompleteSimpleWorkflow() {
-	taskName := randName("simple")
-	workflowName := randName("simple")
+func (suite *CerealTestSuite) TestDelayedTask() {
+	taskName := randName("delayed")
+	workflowName := randName("delayed")
 	instanceName := randName("instance")
 
-	// There will be once task that runs, along
-	// with the TaskCompleted
 	wgTask := sync.WaitGroup{}
 	wgTask.Add(2)
 
+	expectedTime := time.Now().Add(10 * time.Second)
 	m := suite.newManager(
 		WithTaskExecutorF(
 			taskName,
 			func(context.Context, cereal.Task) (interface{}, error) {
+				suite.Assert().True(time.Now().After(expectedTime), "expected task scheduled into the future")
+				// Tasks are scheduled every 2 seconds. A little extra time is provided
+				suite.Assert().WithinDuration(expectedTime, time.Now(), 3*time.Second)
 				wgTask.Done()
 				return nil, nil
 			}),
@@ -37,7 +33,7 @@ func (suite *CerealTestSuite) TestCompleteSimpleWorkflow() {
 			workflowName,
 			&workflowExecutorWrapper{
 				onStart: func(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
-					err := w.EnqueueTask(taskName, nil)
+					err := w.EnqueueTask(taskName, nil, cereal.StartAfter(expectedTime))
 					suite.Require().NoError(err, "failed to enqueue task")
 					return w.Continue(nil)
 				},

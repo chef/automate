@@ -205,6 +205,16 @@ func (s *CerealService) DequeueWorkflow(req cereal.Cereal_DequeueWorkflowServer)
 		for _, task := range cont.GetTasks() {
 			opts := backend.TaskEnqueueOpts{}
 			opts.StartAfter = time.Time{}
+			if task.StartAfter != nil {
+				ts, err := ptypes.Timestamp(task.StartAfter)
+				if err != nil {
+					logctx.WithError(err).Error("invalid timestamp")
+					return err
+				} else {
+					opts.StartAfter = ts
+				}
+			}
+
 			err := completer.EnqueueTask(&backend.Task{
 				Name:       task.Name,
 				Parameters: task.Parameters,
@@ -498,6 +508,7 @@ func cerealScheduleToGrpcSchedule(logctx *logrus.Entry, schedule *backend.Schedu
 		WorkflowName: schedule.WorkflowName,
 		Parameters:   schedule.Parameters,
 		Recurrence:   schedule.Recurrence,
+		Enabled:      schedule.Enabled,
 	}
 	var err error
 	grpcSchedule.NextDueAt, err = ptypes.TimestampProto(schedule.NextDueAt)
@@ -535,17 +546,21 @@ func (s *CerealService) UpdateWorkflowScheduleByName(ctx context.Context, req *c
 	opts := backend.WorkflowScheduleUpdateOpts{}
 
 	if req.GetEnabled() != nil {
+		logctx.Info("updating enabled")
 		opts.UpdateEnabled = true
 		opts.Enabled = req.GetEnabled().GetValue()
 	}
 
 	if req.GetParameters() != nil {
+		logctx.Info("updating parameters")
 		opts.UpdateParameters = true
 		opts.Parameters = req.GetParameters().GetValue()
 	}
 
 	if req.GetRecurrence() != nil {
+		logctx.Info("updating recurrence")
 		opts.UpdateRecurrence = true
+		opts.Recurrence = req.GetRecurrence().GetValue()
 		_, err := rrule.StrToRRule(req.GetRecurrence().GetValue())
 		if err != nil {
 			logctx.WithError(err).Error("recurrence rule not valid")

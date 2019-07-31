@@ -1,12 +1,15 @@
-package integration_test
+package integration
 
 import (
 	"context"
+	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/backend"
 )
 
 type taskExecutor struct {
@@ -89,4 +92,30 @@ func randName(name string) string {
 type CerealTestSuite struct {
 	suite.Suite
 	newManager func(...managerOptFunc) *cereal.Manager
+}
+
+func NewSuiteForBackend(ctx context.Context, t *testing.T, d backend.Driver) *CerealTestSuite {
+	cereal.MaxWakeupInterval = 2 * time.Second
+	return &CerealTestSuite{
+		newManager: func(opts ...managerOptFunc) *cereal.Manager {
+			o := managerOpt{}
+			for _, f := range opts {
+				f(&o)
+			}
+			m, err := cereal.NewManager(d)
+			require.NoError(t, err)
+			for _, w := range o.WorkflowExecutors {
+				err := m.RegisterWorkflowExecutor(w.Name, w.Executor)
+				require.NoError(t, err)
+			}
+			for _, te := range o.TaskExecutors {
+				err := m.RegisterTaskExecutor(te.Name, te.Executor, cereal.TaskExecutorOpts{})
+				require.NoError(t, err)
+			}
+			if !o.NoStart {
+				m.Start(ctx) // nolint: errcheck
+			}
+			return m
+		},
+	}
 }
