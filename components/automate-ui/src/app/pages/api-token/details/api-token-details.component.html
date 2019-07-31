@@ -31,6 +31,9 @@
     <section class="page-body">
       <form [formGroup]="updateForm">
         <chef-form-field>
+        <!-- Once the changes from https://github.com/chef/automate/pull/1115 merge,
+            uncomment this and get rid of `handleChange`:
+        <chef-form-field [watch]="nameCtrl.value" [control]="nameCtrl"> -->
           <label>Name <span aria-hidden="true">*</span></label>
           <input chefInput formControlName="name" type="text" (keyup)="handleChange()">
           <chef-error *ngIf="(nameCtrl.hasError('required') || nameCtrl.hasError('pattern')) && nameCtrl.dirty">
