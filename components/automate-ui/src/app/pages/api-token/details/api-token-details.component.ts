@@ -14,6 +14,7 @@ import { apiTokenFromRoute, updateStatus } from 'app/entities/api-tokens/api-tok
 import { ApiToken } from 'app/entities/api-tokens/api-token.model';
 
 type TokenStatus = 'active' | 'inactive';
+type TokenTabName = 'details';
 
 @Component({
   selector: 'app-api-token-details',
@@ -21,7 +22,7 @@ type TokenStatus = 'active' | 'inactive';
   styleUrls: ['./api-token-details.component.scss']
 })
 export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
-  public tabValue = 'details';
+  public tabValue: TokenTabName = 'details';
   public token: ApiToken;
   public status: TokenStatus;
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
