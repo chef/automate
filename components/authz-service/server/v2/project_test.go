@@ -75,8 +75,6 @@ func TestUpdateProject(t *testing.T) {
 				assert.Equal(t, id, resp.Project.GetId())
 				assert.Equal(t, updatedName, resp.Project.GetName())
 				assert.Equal(t, api.Type_CUSTOM, resp.Project.GetType())
-				require.Equal(t, 1, len(resp.Project.GetProjects()))
-				assert.Equal(t, id, resp.Project.Projects[0])
 			}},
 		{"when a project is updated an event is NOT published",
 			func(t *testing.T) {
@@ -189,8 +187,6 @@ func TestCreateProject(t *testing.T) {
 			assert.Equal(t, id, resp.Project.GetId())
 			assert.Equal(t, name, resp.Project.GetName())
 			assert.Equal(t, api.Type_CUSTOM, resp.Project.GetType())
-			require.Equal(t, 1, len(resp.Project.GetProjects()))
-			assert.Equal(t, id, resp.Project.Projects[0])
 		}},
 	}
 
@@ -418,10 +414,9 @@ func addProjectToStore(t *testing.T, store *cache.Cache, id, name string, projTy
 	t.Helper()
 
 	proj := &storage.Project{
-		ID:       id,
-		Name:     name,
-		Type:     projType,
-		Projects: []string{id},
+		ID:   id,
+		Name: name,
+		Type: projType,
 	}
 	store.Add(id, proj, 0)
 
@@ -430,10 +425,9 @@ func addProjectToStore(t *testing.T, store *cache.Cache, id, name string, projTy
 		returnType = api.Type_CUSTOM
 	}
 	return api.Project{
-		Id:       id,
-		Name:     name,
-		Type:     returnType,
-		Projects: []string{id},
+		Id:   id,
+		Name: name,
+		Type: returnType,
 	}
 }
 

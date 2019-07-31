@@ -130,6 +130,7 @@ func (s *supervisor) NeedUpdate() bool {
 type serviceGroup struct {
 	ID           int32     `db:"id"`
 	Name         string    `db:"name"`
+	NameSuffix   string    `db:"name_suffix"`
 	DeploymentID int32     `db:"deployment_id"`
 	CreatedAt    time.Time `db:"-"`
 	UpdatedAt    time.Time `db:"-"`

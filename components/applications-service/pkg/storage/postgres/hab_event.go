@@ -257,10 +257,7 @@ func (db *Postgres) updateServiceAndRelations(
 			}
 
 			// 2) the service group doesn't exist
-			svcGroup := &serviceGroup{
-				Name:         svcMetadata.GetServiceGroup(),
-				DeploymentID: did,
-			}
+			svcGroup := bakeServiceGroup(svcMetadata.GetServiceGroup(), did)
 			if err := tx.Insert(svcGroup); err != nil {
 				return errors.Wrap(err, "Unable to insert service_group")
 			}
@@ -301,6 +298,15 @@ func (db *Postgres) updateServiceAndRelations(
 
 		return nil
 	})
+}
+
+// constructs service group
+func bakeServiceGroup(name string, did int32) *serviceGroup {
+	return &serviceGroup{
+		Name:         name,
+		NameSuffix:   trimSuffix(name),
+		DeploymentID: did,
+	}
 }
 
 // updates the provided supervisor from a HealthCheck event
@@ -423,10 +429,7 @@ func (db *Postgres) insertNewService(
 		// 2) Service Group
 		gid, exist := db.getServiceGroupID(svcMetadata.GetServiceGroup(), did)
 		if !exist {
-			svcGroup := &serviceGroup{
-				Name:         svcMetadata.GetServiceGroup(),
-				DeploymentID: did,
-			}
+			svcGroup := bakeServiceGroup(svcMetadata.GetServiceGroup(), did)
 			if err := tx.Insert(svcGroup); err != nil {
 				return errors.Wrap(err, "Unable to insert service_group")
 			}
@@ -479,4 +482,9 @@ func (db *Postgres) insertNewService(
 		return nil
 	})
 
+}
+
+func trimSuffix(name string) string {
+	parts := strings.Split(name, ".")
+	return parts[1]
 }
