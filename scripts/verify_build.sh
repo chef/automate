@@ -37,7 +37,7 @@ curl "https://packages.chef.io/manifests/acceptance/automate/latest.json" > resu
 log_section_start "determine changed components"
 mapfile -t changed_components < <(./scripts/changed_components.rb)
 if [[ ${#changed_components[@]} -ne 0 ]]; then
-    buildkite-agent annotate --style "info" << EOF
+    buildkite-agent annotate --style "info" <<EOF
 This change rebuilds the following components:
 $(printf '* %s\n' "${changed_components[@]}")
 EOF
@@ -47,7 +47,7 @@ fi
 
 mapfile -t modified_sql_files < <(git diff --name-status "$(./scripts/git_difference_expression.rb)" | awk '/^[RMD][0-9]*.*\.sql/{ print $2 }')
 if [[ ${#modified_sql_files[@]} -ne 0 ]]; then
-    buildkite-agent annotate --append --style "warning" << EOF
+    buildkite-agent annotate --context sql-check --style "warning" <<EOF
 This change modifies the following SQL files:
 $(printf '* %s\n' "${modified_sql_files[@]}")
 EOF
