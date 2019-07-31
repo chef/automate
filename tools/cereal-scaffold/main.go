@@ -348,10 +348,6 @@ func runSimpleWorkflow(_ *cobra.Command, args []string) error {
 		time.Sleep(time.Second)
 	}
 
-	for {
-		logrus.Info("waiting")
-		time.Sleep(10 * time.Second)
-	}
 	return nil
 }
 
