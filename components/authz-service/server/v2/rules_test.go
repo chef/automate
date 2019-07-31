@@ -83,6 +83,16 @@ func TestCreateRule(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
+		{"if the passed rule project id does not exist, returns 'not found'", func(t *testing.T) {
+			resp, err := cl.CreateRule(ctx, &api.CreateRuleReq{
+				Id:         "any-name",
+				Name:       "any name",
+				ProjectId:  "not-found",
+				Conditions: apiConditions,
+			})
+			grpctest.AssertCode(t, codes.NotFound, err)
+			assert.Nil(t, resp)
+		}},
 		{"if there are no conditions, returns 'invalid argument'", func(t *testing.T) {
 			resp, err := cl.CreateRule(ctx, &api.CreateRuleReq{
 				Id:        "foo",
@@ -107,6 +117,7 @@ func TestCreateRule(t *testing.T) {
 		}},
 		// happy path
 		{"with valid rule data, returns no error and creates the rule in storage", func(t *testing.T) {
+			addProjectToStore(t, projects, projectID, "foo", storage.Custom)
 			resp, err := cl.CreateRule(ctx, &api.CreateRuleReq{
 				Id:        "any-name",
 				Name:      "any name",
@@ -232,6 +243,16 @@ func TestUpdateRule(t *testing.T) {
 				ProjectId:  "bar",
 				Conditions: apiConditions,
 				Type:       api.ProjectRuleTypes_NODE,
+			})
+			grpctest.AssertCode(t, codes.NotFound, err)
+			assert.Nil(t, resp)
+		}},
+		{"if the project of the rule does not exist, returns 'not found'", func(t *testing.T) {
+			resp, err := cl.UpdateRule(ctx, &api.UpdateRuleReq{
+				Id:         "any-name",
+				Name:       "any name",
+				ProjectId:  "not-found",
+				Conditions: apiConditions,
 			})
 			grpctest.AssertCode(t, codes.NotFound, err)
 			assert.Nil(t, resp)
@@ -452,7 +473,12 @@ func TestGetRule(t *testing.T) {
 			assert.Nil(t, resp)
 		}},
 		{"if the rule does not exist, returns 'not found'", func(t *testing.T) {
-			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: "foo"})
+			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: "foo", ProjectId: "some-project"})
+			grpctest.AssertCode(t, codes.NotFound, err)
+			assert.Nil(t, resp)
+		}},
+		{"if the project of the rule does not exist, returns 'invalid argument'", func(t *testing.T) {
+			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: "any-name", ProjectId: "not-found"})
 			grpctest.AssertCode(t, codes.NotFound, err)
 			assert.Nil(t, resp)
 		}},
@@ -738,6 +764,11 @@ func TestDeleteRule(t *testing.T) {
 		}},
 		{"if the rule does not exist, returns 'not found'", func(t *testing.T) {
 			resp, err := cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: "foo"})
+			grpctest.AssertCode(t, codes.NotFound, err)
+			assert.Nil(t, resp)
+		}},
+		{"if the project of the rule does not exist, returns 'not found'", func(t *testing.T) {
+			resp, err := cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: "any-name", ProjectId: "not-found"})
 			grpctest.AssertCode(t, codes.NotFound, err)
 			assert.Nil(t, resp)
 		}},

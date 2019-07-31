@@ -3038,7 +3038,7 @@ func TestCreateRule(t *testing.T) {
 	ctx := context.Background()
 
 	cases := map[string]func(*testing.T){
-		"when the project doesn't exist, return error": func(t *testing.T) {
+		"when the project doesn't exist, return ForeignKeyError": func(t *testing.T) {
 			condition1, err := storage.NewCondition([]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
 			require.NoError(t, err)
 			rule, err := storage.NewRule("new-id-1", "project-not-found", "name", storage.Node, []storage.Condition{condition1})
@@ -3305,12 +3305,31 @@ func TestListRulesForProject(t *testing.T) {
 		desc string
 		f    func(*testing.T)
 	}{
-		{"when project does not exist, returns ErrNotFound", func(t *testing.T) {
+		{"when no rules exist and requested project does not exist, returns ForeignKeyError", func(t *testing.T) {
 			ctx := context.Background()
-			resp, status, err := store.ListRulesForProject(ctx, "not-found")
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			insertTestProject(t, db, "some-project", "some other project", storage.Custom)
+
+			resp, status, err := store.ListRulesForProject(ctx, "project-not-found")
+			require.Error(t, err)
 			assert.Nil(t, resp)
 			assert.Equal(t, storage.RulesStatusError, status)
+			_, ok := err.(*storage_errors.ForeignKeyError)
+			require.True(t, ok, "mismatches expected error type")
+			assert.Equal(t, "project not found: project-not-found", err.Error())
+		}},
+		{"when requested project does not exist, returns ForeignKeyError", func(t *testing.T) {
+			ctx := context.Background()
+			projID := "some-project"
+			insertTestProject(t, db, projID, "some other project", storage.Custom)
+			insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID, storage.Node)
+
+			resp, status, err := store.ListRulesForProject(ctx, "project-not-found")
+			require.Error(t, err)
+			assert.Nil(t, resp)
+			assert.Equal(t, storage.RulesStatusError, status)
+			_, ok := err.(*storage_errors.ForeignKeyError)
+			require.True(t, ok, "mismatches expected error type")
+			assert.Equal(t, "project not found: project-not-found", err.Error())
 		}},
 		{"when project exists but no rules exist, returns an empty list", func(t *testing.T) {
 			ctx := context.Background()
@@ -3379,23 +3398,18 @@ func TestListRulesForProject(t *testing.T) {
 		}},
 		{"when the requested project is not in the filter, returns ErrNotFound", func(t *testing.T) {
 			ctx := context.Background()
-
-			projID := "project-1"
-			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 			projID2 := "project-2"
 			insertTestProject(t, db, projID2, "pika p", storage.Custom)
 			ctx = insertProjectsIntoContext(ctx, []string{"project-3", "project-4"})
-
 			ruleType := storage.Event
-			insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID, ruleType)
-
 			insertAppliedRuleWithMultipleConditions(t, db, "rule-2", projID2, ruleType)
 			insertAppliedRuleWithMultipleConditions(t, db, "rule-3", projID2, ruleType)
 
 			resp, status, err := store.ListRulesForProject(ctx, projID2)
-			assert.Equal(t, storage_errors.ErrNotFound, err)
+			require.Error(t, err)
 			assert.Nil(t, resp)
 			assert.Equal(t, storage.RulesStatusError, status)
+			assert.Equal(t, storage_errors.ErrNotFound, err)
 		}},
 		{"when there are only staged changes for the project's rules, returns the staged versions of the rules", func(t *testing.T) {
 			ctx := context.Background()
@@ -3495,6 +3509,20 @@ func TestUpdateRule(t *testing.T) {
 	defer store.Close()
 
 	cases := map[string]func(*testing.T){
+		"when the project does not exist, return ForeignKeyError": func(t *testing.T) {
+			ctx := context.Background()
+			condition1, err := storage.NewCondition([]string{"chef-server-1"}, storage.ChefServer, storage.MemberOf)
+			require.NoError(t, err)
+			rule, err := storage.NewRule("rule1", "project-not-found", "name", storage.Node, []storage.Condition{condition1})
+			require.NoError(t, err)
+
+			resp, err := store.UpdateRule(ctx, &rule)
+			require.Error(t, err)
+			assert.Nil(t, resp)
+			_, ok := err.(*storage_errors.ForeignKeyError)
+			require.True(t, ok, "mismatches expected error type")
+			assert.Equal(t, "project not found: project-not-found", err.Error())
+		},
 		"when the rule doesn't exist in either applied or staged, return ErrNotFound": func(t *testing.T) {
 			ctx := context.Background()
 			projID := "project-1"
@@ -3756,9 +3784,20 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 	defer store.Close()
 
 	cases := map[string]func(*testing.T){
+		"when no rules exist and requested project does not exist, returns ForeignKeyError": func(t *testing.T) {
+			ctx := context.Background()
+			resp, err := store.GetStagedOrAppliedRule(ctx, "project-not-found", "some-rule")
+			require.Error(t, err)
+			assert.Nil(t, resp)
+			_, ok := err.(*storage_errors.ForeignKeyError)
+			require.True(t, ok, "mismatches expected error type")
+			assert.Equal(t, "project not found: project-not-found", err.Error())
+		},
 		"when no rules exist in either staged or applied, returns NotFoundErr": func(t *testing.T) {
 			ctx := context.Background()
-			resp, err := store.GetStagedOrAppliedRule(ctx, "not-found")
+			projID := "project-1"
+			insertTestProject(t, db, projID, "testing", storage.Custom)
+			resp, err := store.GetStagedOrAppliedRule(ctx, projID, "not-found")
 			assert.Nil(t, resp)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 		},
@@ -3769,7 +3808,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 
 			insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID, storage.Node)
 
-			resp, err := store.GetStagedOrAppliedRule(ctx, "not-found")
+			resp, err := store.GetStagedOrAppliedRule(ctx, projID, "not-found")
 			assert.Nil(t, resp)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 		},
@@ -3781,7 +3820,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 			ruleToGet := insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID, storage.Node)
 			insertAppliedRuleWithMultipleConditions(t, db, "other-rule", projID, storage.Event)
 
-			resp, err := store.GetStagedOrAppliedRule(ctx, ruleToGet.ID)
+			resp, err := store.GetStagedOrAppliedRule(ctx, projID, ruleToGet.ID)
 			require.NoError(t, err)
 			assert.Equal(t, ruleToGet, resp)
 		},
@@ -3797,7 +3836,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 			ruleToGet := insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID, storage.Node)
 			insertAppliedRuleWithMultipleConditions(t, db, "other-project-rule", projID2, storage.Event)
 
-			resp, err := store.GetStagedOrAppliedRule(ctx, ruleToGet.ID)
+			resp, err := store.GetStagedOrAppliedRule(ctx, projID, ruleToGet.ID)
 			require.NoError(t, err)
 			assert.Equal(t, ruleToGet, resp)
 		},
@@ -3813,7 +3852,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 			ruleToGet := insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID, storage.Event)
 			insertAppliedRuleWithMultipleConditions(t, db, "other-rule", projID2, storage.Node)
 
-			resp, err := store.GetStagedOrAppliedRule(ctx, ruleToGet.ID)
+			resp, err := store.GetStagedOrAppliedRule(ctx, projID, ruleToGet.ID)
 			assert.Error(t, err)
 			assert.Nil(t, resp)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
@@ -3829,7 +3868,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 			require.NoError(t, err)
 			insertStagedRule(t, db, &rule, false)
 
-			resp, err := store.GetStagedOrAppliedRule(ctx, rule.ID)
+			resp, err := store.GetStagedOrAppliedRule(ctx, projID, rule.ID)
 			require.NoError(t, err)
 			assert.NotNil(t, resp)
 			expectedRule := storage.Rule{
@@ -3853,7 +3892,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 			rule, err := storage.NewRule("new-id-1", projID, "name", storage.Event, []storage.Condition{condition1})
 			insertAppliedRule(t, db, &rule)
 
-			resp, err := store.GetStagedOrAppliedRule(ctx, rule.ID)
+			resp, err := store.GetStagedOrAppliedRule(ctx, projID, rule.ID)
 			require.NoError(t, err)
 			assert.NotNil(t, resp)
 			expectedRule := storage.Rule{
@@ -3881,7 +3920,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 			stagedRule, err := storage.NewRule(rule.ID, rule.ProjectID, "update: staged name", rule.Type, rule.Conditions)
 			require.NoError(t, err)
 			insertStagedRule(t, db, &stagedRule, false)
-			resp, err := store.GetStagedOrAppliedRule(ctx, rule.ID)
+			resp, err := store.GetStagedOrAppliedRule(ctx, projID, rule.ID)
 			require.NoError(t, err)
 			assert.NotNil(t, resp)
 			expectedRule := storage.Rule{
@@ -3909,9 +3948,19 @@ func TestDeleteRule(t *testing.T) {
 	defer store.Close()
 
 	cases := map[string]func(*testing.T){
-		"when no rules exist, returns NotFoundErr": func(t *testing.T) {
+		"when no rules exist and requested project does not exist, returns ForeignKeyError": func(t *testing.T) {
 			ctx := context.Background()
-			err := store.DeleteRule(ctx, "not-found")
+			err := store.DeleteRule(ctx, "project-not-found", "rule1")
+			require.Error(t, err)
+			_, ok := err.(*storage_errors.ForeignKeyError)
+			require.True(t, ok, "mismatches expected error type")
+			assert.Equal(t, "project not found: project-not-found", err.Error())
+		},
+		"when no rules exist but requested project exists, returns NotFoundErr": func(t *testing.T) {
+			ctx := context.Background()
+			projID := "foo-project"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			err := store.DeleteRule(ctx, projID, "not-found")
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 		},
 		"when an applied rule exists but the wrong id requested, returns NotFoundErr": func(t *testing.T) {
@@ -3921,7 +3970,7 @@ func TestDeleteRule(t *testing.T) {
 
 			rule := insertAppliedRuleWithMultipleConditions(t, db, "some-rule", projID, storage.Event)
 
-			err := store.DeleteRule(ctx, "not-found")
+			err := store.DeleteRule(ctx, projID, "not-found")
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule.ID))
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_rule_conditions`))
@@ -3934,7 +3983,7 @@ func TestDeleteRule(t *testing.T) {
 			rule := insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID, storage.Event)
 			insertStagedRuleWithMultipleConditions(t, db, rule.ID, rule.ProjectID, rule.Type, false)
 
-			err := store.DeleteRule(ctx, "not-found")
+			err := store.DeleteRule(ctx, projID, "not-found")
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_project_rules WHERE id=$1`, rule.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, rule.ID))
@@ -3948,7 +3997,7 @@ func TestDeleteRule(t *testing.T) {
 
 			rule := insertStagedRuleWithMultipleConditions(t, db, "staged", projID, storage.Event, false)
 
-			err := store.DeleteRule(ctx, "not-found")
+			err := store.DeleteRule(ctx, projID, "not-found")
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, rule.ID))
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_staged_rule_conditions`))
@@ -3963,7 +4012,7 @@ func TestDeleteRule(t *testing.T) {
 			ruleToDelete := insertStagedRuleWithMultipleConditions(t, db, "delete-me", projID, ruleType, false)
 			ruleToSave := insertStagedRuleWithMultipleConditions(t, db, "save-me", projID, ruleType, false)
 
-			err := store.DeleteRule(ctx, ruleToDelete.ID)
+			err := store.DeleteRule(ctx, projID, ruleToDelete.ID)
 			require.NoError(t, err)
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToDelete.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToSave.ID))
@@ -3981,7 +4030,7 @@ func TestDeleteRule(t *testing.T) {
 			ruleToDelete := insertStagedRuleWithMultipleConditions(t, db, "delete-me", projID, ruleType, false)
 			insertStagedRuleWithMultipleConditions(t, db, "save-me", projID, ruleType, false)
 
-			err := store.DeleteRule(ctx, ruleToDelete.ID)
+			err := store.DeleteRule(ctx, projID, ruleToDelete.ID)
 			require.NoError(t, err)
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToDelete.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules`))
@@ -3998,7 +4047,7 @@ func TestDeleteRule(t *testing.T) {
 			ruleToDelete := insertStagedRuleWithMultipleConditions(t, db, "delete-me", projID, ruleType, false)
 			ruleToSave := insertStagedRuleWithMultipleConditions(t, db, "save-me", projID, ruleType, false)
 
-			err := store.DeleteRule(ctx, ruleToDelete.ID)
+			err := store.DeleteRule(ctx, projID, ruleToDelete.ID)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToDelete.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToSave.ID))
@@ -4024,7 +4073,7 @@ func TestDeleteRule(t *testing.T) {
 			insertStagedRule(t, db, &ruleToSave, false)
 			insertAppliedRule(t, db, &ruleToSave)
 
-			err = store.DeleteRule(ctx, ruleToDelete.ID)
+			err = store.DeleteRule(ctx, projID, ruleToDelete.ID)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=false`, ruleToDelete.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=false`, ruleToSave.ID))
@@ -4040,7 +4089,7 @@ func TestDeleteRule(t *testing.T) {
 			ruleToDelete := insertAppliedRuleWithMultipleConditions(t, db, "delete-me", projID, storage.Node)
 			ruleToSave := insertStagedRuleWithMultipleConditions(t, db, "save-me", projID, storage.Event, false)
 
-			err := store.DeleteRule(ctx, ruleToDelete.ID)
+			err := store.DeleteRule(ctx, projID, ruleToDelete.ID)
 			require.NoError(t, err)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=true`, ruleToDelete.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=false`, ruleToSave.ID))
@@ -4057,7 +4106,7 @@ func TestDeleteRule(t *testing.T) {
 			ruleToDelete := insertAppliedRuleWithMultipleConditions(t, db, "delete-me", projID, ruleType)
 			ruleToSave := insertAppliedRuleWithMultipleConditions(t, db, "save-me", projID, ruleType)
 
-			err := store.DeleteRule(ctx, ruleToDelete.ID)
+			err := store.DeleteRule(ctx, projID, ruleToDelete.ID)
 			require.NoError(t, err)
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=true`, ruleToDelete.ID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1 AND deleted=false`, ruleToSave.ID))
@@ -4073,7 +4122,7 @@ func TestDeleteRule(t *testing.T) {
 			ruleToDelete := insertAppliedRuleWithMultipleConditions(t, db, "delete-me", projID, storage.Event)
 			ruleToSave := insertAppliedRuleWithMultipleConditions(t, db, "save-me", projID, storage.Node)
 
-			err := store.DeleteRule(ctx, ruleToDelete.ID)
+			err := store.DeleteRule(ctx, projID, ruleToDelete.ID)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToDelete.ID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_staged_project_rules WHERE id=$1`, ruleToSave.ID))
