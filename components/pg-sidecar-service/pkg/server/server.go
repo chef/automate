@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
@@ -27,20 +28,17 @@ import (
 func StartGRPC(ctx context.Context, cfg *Config) error {
 	tlsOpts, err := cfg.ReadCerts()
 	if err != nil {
-		logrus.WithError(err).Fatal("failed to load SSL key/cert files")
-		return err
+		return errors.Wrap(err, "failed to load SSL key/cert files")
 	}
 
 	platformConfig, err := platform.ConfigFromEnvironment()
 	if err != nil {
-		logrus.WithError(err).Fatal("failed to load platform config")
-		return err
+		return errors.Wrap(err, "failed to load platform config")
 	}
 
 	listener, err := net.Listen("tcp", cfg.ListenAddress())
 	if err != nil {
-		logrus.WithError(err).Fatalf("failed to listen on address %s", cfg.ListenAddress())
-		return err
+		return errors.Wrapf(err, "failed to listen on address %s", cfg.ListenAddress())
 	}
 
 	connFactory := secureconn.NewFactory(*tlsOpts, secureconn.WithVersionInfo(
@@ -75,9 +73,7 @@ func StartGRPC(ctx context.Context, cfg *Config) error {
 		os.Exit(0)
 	}()
 
-	grpcServer.Serve(listener)
-
-	return nil
+	return grpcServer.Serve(listener)
 }
 
 // PGSidecarServerOpt is a functional option for configuring the PGSidecarServer
