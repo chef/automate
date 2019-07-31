@@ -10,6 +10,7 @@ import (
 	"github.com/chef/automate/components/cereal-service/pkg/server"
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/platform/pg"
+
 	"google.golang.org/grpc"
 )
 

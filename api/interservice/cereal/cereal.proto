@@ -133,10 +133,11 @@ message Schedule {
   bytes parameters = 4;
   string recurrence = 5;
   google.protobuf.Timestamp next_due_at = 6;
-  bool enabled = 7;
+  google.protobuf.Timestamp last_enqueued_at = 7;
+  bool enabled = 8;
 
-  google.protobuf.Timestamp last_start = 8;
-  google.protobuf.Timestamp last_end = 9;
+  google.protobuf.Timestamp last_start = 9;
+  google.protobuf.Timestamp last_end = 10;
 }
 
 message ListWorkflowSchedulesResponse { repeated Schedule schedules = 1; }

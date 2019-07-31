@@ -21,7 +21,8 @@ import (
 )
 
 var opts struct {
-	Debug bool
+	Debug    bool
+	Endpoint string
 }
 
 var simpleWorkflowOpts struct {
@@ -63,6 +64,12 @@ func main() {
 		"d",
 		false,
 		"Enabled debug output")
+	cmd.PersistentFlags().StringVarP(
+		&opts.Endpoint,
+		"endpoint",
+		"e",
+		"",
+		"grpc endpoint")
 
 	simpleWorkflowCmd := &cobra.Command{
 		Use:           "simple-workflow-test",
@@ -289,6 +296,18 @@ func (SimpleWorkflow) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEvent)
 	return w.Complete()
 }
 
+func getBackend(dbName string) backend.Driver {
+	if opts.Endpoint != "" {
+		conn, err := grpc.Dial(opts.Endpoint, grpc.WithInsecure())
+		if err != nil {
+			panic(err)
+		}
+		grpcBackend := grpccereal.NewGrpcBackendFromConn(conn)
+		return grpcBackend
+	}
+	return postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName))
+}
+
 func runSimpleWorkflow(_ *cobra.Command, args []string) error {
 	dbName := defaultDatabaseName
 	if len(args) > 0 {
@@ -296,13 +315,8 @@ func runSimpleWorkflow(_ *cobra.Command, args []string) error {
 	}
 	logrus.Debug(dbName)
 
-	conn, err := grpc.Dial(":3210", grpc.WithInsecure())
-	if err != nil {
-		panic(err)
-	}
-	grpcBackend := grpccereal.NewGrpcBackendFromConn(conn)
-	//manager, err := cereal.NewManager(postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName)))
-	manager, err := cereal.NewManager(grpcBackend)
+	b := getBackend(dbName)
+	manager, err := cereal.NewManager(b)
 	if err != nil {
 		return err
 	}
@@ -385,7 +399,8 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 		dbName = args[0]
 	}
 
-	manager, err := cereal.NewManager(postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName)))
+	b := getBackend(dbName)
+	manager, err := cereal.NewManager(b)
 	if err != nil {
 		return err
 	}

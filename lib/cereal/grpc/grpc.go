@@ -5,6 +5,10 @@ import (
 	"errors"
 	"time"
 
+	"github.com/golang/protobuf/ptypes/wrappers"
+
+	"github.com/golang/protobuf/ptypes"
+
 	"github.com/chef/automate/lib/cereal"
 	"github.com/sirupsen/logrus"
 
@@ -161,14 +165,9 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 			Result:     tr.GetResult(),
 		}
 	}
+	backendInstance := grpcWorkflowInstanceToBackend(deq.GetInstance())
 	wevt := &backend.WorkflowEvent{
-		Instance: backend.WorkflowInstance{
-			InstanceName: deq.GetInstance().GetInstanceName(),
-			WorkflowName: deq.GetInstance().GetWorkflowName(),
-			Status:       backend.WorkflowInstanceStatus(deq.GetInstance().GetStatus()),
-			Parameters:   deq.GetInstance().GetParameters(),
-			Payload:      deq.GetInstance().GetPayload(),
-		},
+		Instance:           backendInstance,
 		Type:               backend.WorkflowEventType(deq.GetEvent().GetType()),
 		EnqueuedTaskCount:  int(deq.GetEvent().GetEnqueuedTaskCount()),
 		CompletedTaskCount: int(deq.GetEvent().GetCompletedTaskCount()),
@@ -180,14 +179,41 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 	}, nil
 }
 
+func grpcWorkflowInstanceToBackend(grpcInstance *grpccereal.WorkflowInstance) backend.WorkflowInstance {
+	var err error
+	if grpcInstance.Err != "" {
+		err = errors.New(grpcInstance.Err)
+	}
+	return backend.WorkflowInstance{
+		InstanceName: grpcInstance.GetInstanceName(),
+		WorkflowName: grpcInstance.GetWorkflowName(),
+		Status:       backend.WorkflowInstanceStatus(grpcInstance.GetStatus()),
+		Parameters:   grpcInstance.GetParameters(),
+		Payload:      grpcInstance.GetPayload(),
+		Err:          err,
+		Result:       grpcInstance.Result,
+	}
+}
+
 func (g *GrpcBackend) CancelWorkflow(ctx context.Context, instanceName string, workflowName string) error {
+	_, err := g.client.CancelWorkflow(ctx, &grpccereal.CancelWorkflowRequest{
+		InstanceName: instanceName,
+		WorkflowName: workflowName,
+	})
+	if err != nil {
+		if st, ok := status.FromError(err); ok {
+			if st.Code() == codes.NotFound {
+				return cereal.ErrWorkflowInstanceNotFound
+			}
+		}
+		return err
+	}
 	return nil
 }
 
 type taskCompleter struct {
-	s      grpccereal.Cereal_DequeueTaskClient
-	ctx    context.Context
-	cancel context.CancelFunc
+	s   grpccereal.Cereal_DequeueTaskClient
+	ctx context.Context
 }
 
 func (c *taskCompleter) Context() context.Context {
@@ -237,7 +263,6 @@ func (c *taskCompleter) Succeed(result []byte) error {
 }
 
 func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*backend.Task, backend.TaskCompleter, error) {
-	ctx, cancel := context.WithCancel(ctx)
 	s, err := g.client.DequeueTask(ctx)
 	if err != nil {
 		return nil, nil, err
@@ -269,6 +294,7 @@ func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*backen
 	}
 
 	logrus.Info("Dequeued task")
+	taskCtx, cancel := context.WithCancel(ctx)
 	go func() {
 		for {
 			msg, err := s.Recv()
@@ -290,32 +316,182 @@ func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*backen
 			Parameters: deq.GetTask().GetParameters(),
 		}, &taskCompleter{
 			s:   s,
-			ctx: ctx,
+			ctx: taskCtx,
 		}, nil
 }
 
-func (*GrpcBackend) CreateWorkflowSchedule(ctx context.Context, instanceName string, workflowName string, parameters []byte, enabled bool, recurrence string, nextRunAt time.Time) error {
+func (g *GrpcBackend) CreateWorkflowSchedule(ctx context.Context, instanceName string, workflowName string, parameters []byte, enabled bool, recurrence string, nextRunAt time.Time) error {
+	nextRunAtProto, err := ptypes.TimestampProto(nextRunAt)
+	if err != nil {
+		return err
+	}
+	_, err = g.client.CreateWorkflowSchedule(ctx, &grpccereal.CreateWorkflowScheduleRequest{
+		InstanceName: instanceName,
+		WorkflowName: workflowName,
+		Parameters:   parameters,
+		Enabled:      enabled,
+		Recurrence:   recurrence,
+		NextRunAt:    nextRunAtProto,
+	})
+	if err != nil {
+		if st, ok := status.FromError(err); ok {
+			if st.Code() == codes.FailedPrecondition {
+				return cereal.ErrWorkflowScheduleExists
+			}
+		}
+		return err
+	}
 	return nil
 }
 
-func (*GrpcBackend) ListWorkflowSchedules(ctx context.Context) ([]*backend.Schedule, error) {
-	return nil, nil
+func (g *GrpcBackend) ListWorkflowSchedules(ctx context.Context) ([]*backend.Schedule, error) {
+	resp, err := g.client.ListWorkflowSchedules(ctx, &grpccereal.ListWorkflowSchedulesRequest{})
+	if err != nil {
+		return nil, err
+	}
+	schedules := make([]*backend.Schedule, 0, len(resp.Schedules))
+	for _, grpcSched := range resp.Schedules {
+		if grpcSched == nil {
+			logrus.Error("missing schedule")
+			continue
+		}
+		schedules = append(schedules, grpcSchedToBackend(grpcSched))
+	}
+
+	return schedules, nil
 }
-func (*GrpcBackend) GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string) (*backend.Schedule, error) {
-	return nil, nil
+
+func (g *GrpcBackend) GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string) (*backend.Schedule, error) {
+	resp, err := g.client.GetWorkflowScheduleByName(ctx, &grpccereal.GetWorkflowScheduleByNameRequest{
+		InstanceName: instanceName,
+		WorkflowName: workflowName,
+	})
+	if err != nil {
+		if st, ok := status.FromError(err); ok {
+			if st.Code() == codes.NotFound {
+				return nil, cereal.ErrWorkflowScheduleNotFound
+			}
+		}
+		return nil, err
+	}
+	if resp.Schedule == nil {
+		logrus.Error("missing schedule")
+		return nil, cereal.ErrWorkflowScheduleNotFound
+	}
+	return grpcSchedToBackend(resp.Schedule), nil
 }
-func (*GrpcBackend) UpdateWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string, opts backend.WorkflowScheduleUpdateOpts) error {
+
+func grpcSchedToBackend(grpcSched *grpccereal.Schedule) *backend.Schedule {
+	schedule := &backend.Schedule{
+		InstanceName: grpcSched.InstanceName,
+		WorkflowName: grpcSched.WorkflowName,
+		Parameters:   grpcSched.Parameters,
+		Recurrence:   grpcSched.Recurrence,
+	}
+	if grpcSched.NextDueAt != nil {
+		ts, err := ptypes.Timestamp(grpcSched.NextDueAt)
+		if err != nil {
+			logrus.WithError(err).Warn("could not decode NextDueAt timestamp")
+		}
+		schedule.NextDueAt = ts
+	}
+
+	if grpcSched.LastEnqueuedAt != nil {
+		ts, err := ptypes.Timestamp(grpcSched.LastEnqueuedAt)
+		if err != nil {
+			logrus.WithError(err).Warn("could not decode LastEnqueuedAt timestamp")
+		} else {
+			schedule.LastEnqueuedAt = ts
+		}
+	}
+
+	if grpcSched.LastStart != nil {
+		ts, err := ptypes.Timestamp(grpcSched.LastStart)
+		if err != nil {
+			logrus.WithError(err).Warn("could not decode LastStart timestamp")
+		} else {
+			schedule.LastStart = &ts
+		}
+	}
+
+	if grpcSched.LastEnd != nil {
+		ts, err := ptypes.Timestamp(grpcSched.LastEnd)
+		if err != nil {
+			logrus.WithError(err).Warn("could not decode LastEnd timestamp")
+		} else {
+			schedule.LastEnd = &ts
+		}
+	}
+	return schedule
+}
+
+func (g *GrpcBackend) UpdateWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string, opts backend.WorkflowScheduleUpdateOpts) error {
+	req := grpccereal.UpdateWorkflowScheduleByNameRequest{
+		InstanceName: instanceName,
+		WorkflowName: workflowName,
+	}
+
+	if opts.UpdateEnabled {
+		req.Enabled = &wrappers.BoolValue{
+			Value: opts.Enabled,
+		}
+	}
+
+	if opts.UpdateParameters {
+		req.Parameters = &wrappers.BytesValue{
+			Value: opts.Parameters,
+		}
+	}
+
+	if opts.UpdateRecurrence {
+		req.Recurrence = &wrappers.StringValue{
+			Value: opts.Recurrence,
+		}
+		ts, err := ptypes.TimestampProto(opts.NextRunAt)
+		if err != nil {
+			return err
+		}
+		req.NextRunAt = ts
+	}
+
+	_, err := g.client.UpdateWorkflowScheduleByName(ctx, &req)
+	if err != nil {
+		if st, ok := status.FromError(err); ok {
+			if st.Code() == codes.NotFound {
+				return cereal.ErrWorkflowScheduleNotFound
+			}
+		}
+		return err
+	}
+
 	return nil
 }
 
-func (*GrpcBackend) GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName string) (*backend.WorkflowInstance, error) {
-	return nil, nil
+func (g *GrpcBackend) GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName string) (*backend.WorkflowInstance, error) {
+	resp, err := g.client.GetWorkflowInstanceByName(ctx, &grpccereal.GetWorkflowInstanceByNameRequest{
+		InstanceName: instanceName,
+		WorkflowName: workflowName,
+	})
+	if err != nil {
+		if st, ok := status.FromError(err); ok {
+			if st.Code() == codes.NotFound {
+				return nil, cereal.ErrWorkflowInstanceNotFound
+			}
+		}
+		return nil, err
+	}
+	if resp.WorkflowInstance == nil {
+		logrus.Error("missing workflow instance")
+		return nil, cereal.ErrWorkflowInstanceNotFound
+	}
+	backendInstance := grpcWorkflowInstanceToBackend(resp.WorkflowInstance)
+	return &backendInstance, nil
 }
 
 func (*GrpcBackend) Init() error {
 	return nil
 }
 
-func (*GrpcBackend) Close() error {
+func (g *GrpcBackend) Close() error {
 	return nil
 }
