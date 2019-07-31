@@ -1,4 +1,4 @@
-import { Component, Element, Listen, Method, Prop, State } from '@stencil/core';
+import { Component, Element, Listen, Method, Prop, State, h } from '@stencil/core';
 import { Dictionary } from 'lodash';
 import zip from 'lodash/fp/zip';
 import multiply from 'lodash/fp/multiply';
@@ -108,7 +108,8 @@ export class ChefRadialChart {
     this.id = this.id || `radial${UID++}`;
   }
 
-  @Method() updateDataPoints() {
+  @Method()
+  async updateDataPoints() {
     const dataPoints = Array.from(this.el.querySelectorAll('chef-data-point'));
     const dataPointsWithValues = [];
     dataPoints.forEach((d) => (Number(d.value) > 0) ? dataPointsWithValues.push(d) : null);

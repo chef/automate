@@ -3,9 +3,11 @@ import {
   Element,
   Event,
   EventEmitter,
+  Host,
   Listen,
   Prop,
-  State
+  State,
+  h
 } from '@stencil/core';
 import clamp from 'lodash/fp/clamp';
 import findIndex from 'lodash/fp/findIndex';
@@ -167,14 +169,6 @@ export class ChefSelect {
     this.focusedIndex = this.clamp(this.focusedIndex + 1);
   }
 
-  hostData() {
-    return {
-      tabindex: this.disabled ? '-1' : '0',
-      role: 'combobox',
-      style: { minWidth: `${this.minWidth + 20}px` }
-    };
-  }
-
   componentDidLoad() {
     this.options = Array.from(this.el.querySelectorAll('chef-option'));
     // The default option is determined by first checking the value property, then
@@ -202,24 +196,31 @@ export class ChefSelect {
 
   render() {
     const focused = this.options[this.focusedIndex];
+    const styles = { minWidth: `${this.minWidth + 20}px` };
+    const classNames = [
+      this.focused ? 'focused' : '',
+      this.active ? 'active' : '',
+      this.disabled ? 'disabled' : ''
+    ].join(' ');
 
-    this.el.setAttribute('highlighted', getOr('', 'optionId', focused));
-    this.el.classList.toggle('focused', this.focused);
-    this.el.classList.toggle('active', this.active);
-    this.el.classList.toggle('disabled', this.disabled);
-
-    return [
-      <span class="selected-value" role="button" aria-haspopup="listbox" aria-expanded={ this.active }>
-        <span class="option-content" innerHTML={ this.selectedContent }></span>
-        <chef-icon aria-hidden>expand_more</chef-icon>
-      </span>,
-
-      <div class="options">
-        <chef-dropdown tabindex="-1" visible={ this.active } role="listbox" aria-activedescendant={ getOr('', 'optionId', focused) }>
-          <slot />
-        </chef-dropdown>
-      </div>
-    ];
+    return (
+      <Host
+        role="combobox"
+        class={classNames}
+        style={styles}
+        tabindex={this.disabled ? '-1' : '0'}
+        highlighted={getOr('', 'optionId', focused)}>
+        <span class="selected-value" role="button" aria-haspopup="listbox" aria-expanded={ this.active }>
+          <span class="option-content" innerHTML={ this.selectedContent }></span>
+          <chef-icon aria-hidden>expand_more</chef-icon>
+        </span>
+        <div class="options">
+          <chef-dropdown tabindex="-1" visible={ this.active } role="listbox" aria-activedescendant={ getOr('', 'optionId', focused) }>
+            <slot />
+          </chef-dropdown>
+        </div>
+      </Host>
+    );
   }
 
   private clamp(value: number) {

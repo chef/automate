@@ -1,4 +1,4 @@
-import { Component } from '@stencil/core';
+import { Component, Host, h } from '@stencil/core';
 
 /**
  * @description
@@ -26,15 +26,11 @@ import { Component } from '@stencil/core';
 })
 export class ChefTr {
 
-  hostData() {
-    return {
-      role: 'row'
-    };
-  }
-
   render() {
     return (
-      <slot />
+      <Host role="row">
+        <slot />
+      </Host>
     );
   }
 }

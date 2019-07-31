@@ -1,4 +1,4 @@
-import { Component, Prop, State } from '@stencil/core';
+import { Component, Prop, State, h } from '@stencil/core';
 import { Store } from '@stencil/redux';
 import get from 'lodash/fp/get';
 import getOr from 'lodash/fp/getOr';

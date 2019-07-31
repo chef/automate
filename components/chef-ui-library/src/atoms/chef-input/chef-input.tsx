@@ -1,4 +1,4 @@
-import { Component, Listen, Prop, State } from '@stencil/core';
+import { Component, Host, Listen, Prop, State, h } from '@stencil/core';
 
 /**
  * @description
@@ -53,13 +53,15 @@ export class ChefInput {
     this.focused = false;
   }
 
-  hostData() {
-    return {
-      class: this.focused ? 'focused' : ''
-    };
+  render() {
+    return (
+      <Host class={this.focused ? 'focused' : ''}>
+        {this.renderContent()}
+      </Host>
+    );
   }
 
-  render() {
+  renderContent() {
     switch (this.type) {
       case 'key-value':
         return this.renderKeyValue();

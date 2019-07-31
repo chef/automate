@@ -1,4 +1,4 @@
-import { Component, Prop } from '@stencil/core';
+import { Component, Host, Prop, h } from '@stencil/core';
 
 /**
  * @description
@@ -23,17 +23,13 @@ export class ChefAlert {
    */
   @Prop() type: string;
 
-  hostData() {
-    return {
-      role: 'alert'
-    };
-  }
-
   render() {
-    return [
-      <chef-icon aria-hidden="true">{ this.alertIcon(this.type) }</chef-icon>,
-      <slot />
-    ];
+    return (
+      <Host role="alert">
+        <chef-icon aria-hidden="true">{ this.alertIcon(this.type) }</chef-icon>
+        <slot />
+      </Host>
+    );
   }
 
   private alertIcon(type: string) {

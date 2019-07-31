@@ -1,6 +1,6 @@
 import { newE2EPage } from '@stencil/core/testing';
 
-describe('chef-option', async () => {
+describe('chef-option', () => {
   it('getContent returns the options content', async () => {
     const page = await newE2EPage();
 

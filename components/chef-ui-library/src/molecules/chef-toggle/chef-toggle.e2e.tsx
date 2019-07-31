@@ -83,7 +83,7 @@ describe('chef-toggle', () => {
   describe('selection', () => {
     let html, page;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       html = `
         <chef-toggle>
           <chef-option value='opt1'>Option 1</chef-option>

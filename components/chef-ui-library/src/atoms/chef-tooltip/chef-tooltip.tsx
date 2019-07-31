@@ -1,4 +1,4 @@
-import { Component, Element, Prop, State } from '@stencil/core';
+import { Component, Element, Host, Prop, State, h } from '@stencil/core';
 import debounce from 'lodash/fp/debounce';
 
 /**
@@ -126,16 +126,6 @@ export class ChefTooltip {
 
   @Element() el: HTMLElement;
 
-  hostData() {
-    const [x, y] = this.screenPosition;
-
-    return {
-      class: [this.visible ? 'visible' : '', this.position, this.follow ? 'follow' : '']
-        .join(' '),
-      style: { left: `${x}px`, top: `${y}px` }
-    };
-  }
-
   componentDidLoad() {
     const ref: HTMLElement = document.querySelector(`#${this.for}`);
     if (ref) {
@@ -148,8 +138,18 @@ export class ChefTooltip {
   }
 
   render() {
+    const [x, y] = this.screenPosition;
+    const styles = { left: `${x}px`, top: `${y}px` };
+    const classNames = [
+      this.visible ? 'visible' : '',
+      this.position,
+      this.follow ? 'follow' : ''
+    ].join(' ');
+
     return (
-      <slot />
+      <Host class={classNames} style={styles}>
+        <slot />
+      </Host>
     );
   }
 

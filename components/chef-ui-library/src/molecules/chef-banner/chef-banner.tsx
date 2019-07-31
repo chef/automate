@@ -1,9 +1,4 @@
-import {
-    Component,
-    Event,
-    EventEmitter,
-    Prop
-} from '@stencil/core';
+import { Component, Event, EventEmitter, Host, Prop, h } from '@stencil/core';
 
 /**
  * @description
@@ -24,8 +19,8 @@ import {
  * <chef-banner>This is also an info message.</chef-banner>
  */
 @Component({
-    tag: 'chef-banner',
-    styleUrl: 'chef-banner.scss'
+  tag: 'chef-banner',
+  styleUrl: 'chef-banner.scss'
 })
 export class ChefBanner {
 
@@ -41,29 +36,20 @@ export class ChefBanner {
 
   @Event() buttonClicked: EventEmitter;
 
-  hostData() {
-    return {
-      class: this.type
-    };
-  }
-
   render() {
-    let html = [
-      <slot />
-    ];
-    if (this.buttonText) {
-      html = [
-        ...html,
-        <chef-button onClick={this.handleClick.bind(this)}>{this.buttonText}</chef-button>,
-      ];
-    }
-    if (this.getIconString()) {
-      html = [
-        <chef-icon>{this.getIconString()}</chef-icon>,
-        ...html
-      ];
-    }
-    return html;
+    const iconString = this.getIconString();
+    const icon = (<chef-icon>{iconString}</chef-icon>);
+    const button = (
+      <chef-button onClick={this.handleClick.bind(this)}>{this.buttonText}</chef-button>
+    );
+
+    return (
+      <Host class={this.type}>
+        {iconString ? icon : null}
+        <slot />
+        {this.buttonText ? button : null}
+      </Host>
+    );
   }
 
   private handleClick() {

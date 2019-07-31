@@ -1,4 +1,4 @@
-import { Component, Prop } from '@stencil/core';
+import { Component, Prop, h } from '@stencil/core';
 import range from 'lodash/fp/range';
 import map from 'lodash/fp/map';
 import clamp from 'lodash/fp/clamp';

@@ -1,7 +1,8 @@
-var sassLib = require('node-sass');
-var { sass } = require('@stencil/sass');
+import { Config } from '@stencil/core';
+import { sass } from '@stencil/sass';
+import sassLib from 'node-sass';
 
-exports.config = {
+export const config: Config = {
   namespace: 'chef',
   outputTargets: [
     {

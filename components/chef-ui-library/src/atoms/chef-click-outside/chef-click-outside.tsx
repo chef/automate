@@ -1,4 +1,4 @@
-import { Component, Element, Event, EventEmitter, Listen, Prop } from '@stencil/core';
+import { Component, Element, Event, EventEmitter, Listen, Prop, h } from '@stencil/core';
 
 /**
  * @description
@@ -56,7 +56,7 @@ export class ChefClickOutside {
     );
   }
 
-  @Listen('document:click') onDocumentClick(event) {
+  @Listen('click', { target: 'document' }) onDocumentClick(event) {
     const clickedInside = this.el.contains(event.target);
     const clickedOmitted = this.omit && this.omit.length && event.target.closest(`.${this.omit}`);
 

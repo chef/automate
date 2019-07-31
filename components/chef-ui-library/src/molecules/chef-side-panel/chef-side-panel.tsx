@@ -1,4 +1,4 @@
-import { Component, Element, Prop, Watch } from '@stencil/core';
+import { Component, Element, Prop, Watch, h } from '@stencil/core';
 
 /**
  * @description

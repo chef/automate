@@ -3,10 +3,12 @@ import {
   Element,
   Event,
   EventEmitter,
+  Host,
   Listen,
   Prop,
   State,
-  Watch
+  Watch,
+  h
 } from '@stencil/core';
 
 /**
@@ -102,7 +104,7 @@ export class ChefModal {
   @State() prevFocusedElement: HTMLElement;
 
   // Listens on page outside of the modal component
-  @Listen('body:keydown') handleEscape(event) {
+  @Listen('keydown', { target: 'body' }) handleEscape(event) {
     if (event.key === 'Escape') {
       this.handleClose();
     }
@@ -125,33 +127,29 @@ export class ChefModal {
     }
   }
 
-  hostData() {
-    return {
-      class: this.visible ? 'visible' : ''
-    };
-  }
-
   render() {
-    return [
-      <div
-        class="modal-overlay"
-        onClick={this.handleClose.bind(this)}>
-      </div>,
-      <div
-        class="modal"
-        aria-modal="true"
-        role="dialog"
-        aria-labelledby={this.label}
-        tabindex="0">
-        <chef-trap-focus>
-          {
-            this.renderButton()
-          }
-          <slot name="title"></slot>
-          <slot />
-        </chef-trap-focus>
-      </div>
-    ];
+    return (
+      <Host class={this.visible ? 'visible' : ''}>
+        <div
+          class="modal-overlay"
+          onClick={this.handleClose.bind(this)}>
+        </div>
+        <div
+          class="modal"
+          aria-modal="true"
+          role="dialog"
+          aria-labelledby={this.label}
+          tabindex="0">
+          <chef-trap-focus>
+            {
+              this.renderButton()
+            }
+            <slot name="title"></slot>
+            <slot />
+          </chef-trap-focus>
+        </div>
+      </Host>
+    );
   }
 
   private renderButton() {

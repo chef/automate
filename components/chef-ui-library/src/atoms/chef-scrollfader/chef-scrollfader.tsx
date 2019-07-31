@@ -1,4 +1,4 @@
-import { Component, Element } from '@stencil/core';
+import { Component, Element, h } from '@stencil/core';
 import delay from 'lodash/fp/delay';
 
 /**
