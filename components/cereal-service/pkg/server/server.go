@@ -437,27 +437,37 @@ func (s *CerealService) CreateWorkflowSchedule(ctx context.Context, req *cereal.
 	return &cereal.CreateWorkflowScheduleResponse{}, nil
 }
 
-func (s *CerealService) ListWorkflowSchedules(ctx context.Context, _ *cereal.ListWorkflowSchedulesRequest) (*cereal.ListWorkflowSchedulesResponse, error) {
+func (s *CerealService) ListWorkflowSchedules(req *cereal.ListWorkflowSchedulesRequest, out cereal.Cereal_ListWorkflowSchedulesServer) error {
 	logctx := logrus.WithFields(logrus.Fields{
 		"id":     generateRequestID(),
 		"method": "ListWorkflowSchedules",
 	})
 	logctx.Info("listing workflows")
-	schedules, err := s.backend.ListWorkflowSchedules(ctx)
+	schedules, err := s.backend.ListWorkflowSchedules(out.Context())
 	if err != nil {
-		return nil, err
+		logctx.WithError(err).Error("failed to list workflow schedules")
+		return err
 	}
 
 	if len(schedules) > 0 {
-		grpcSchedules := make([]*cereal.Schedule, len(schedules))
-		for i, schedule := range schedules {
-			grpcSchedules[i] = cerealScheduleToGrpcSchedule(logctx, schedule)
+		err := out.Send(&cereal.ListWorkflowSchedulesResponse{
+			NumSchedules: int32(len(schedules)),
+		})
+		if err != nil {
+			logctx.WithError(err).Error("failed to send message")
 		}
-		return &cereal.ListWorkflowSchedulesResponse{
-			Schedules: grpcSchedules,
-		}, nil
+		for _, schedule := range schedules {
+			grpcSchedule := cerealScheduleToGrpcSchedule(logctx, schedule)
+			err := out.Send(&cereal.ListWorkflowSchedulesResponse{
+				Schedule: grpcSchedule,
+			})
+			if err != nil {
+				logctx.WithError(err).Error("failed to send message")
+			}
+		}
+
 	}
-	return &cereal.ListWorkflowSchedulesResponse{}, nil
+	return nil
 }
 
 func (s *CerealService) GetWorkflowScheduleByName(ctx context.Context, req *cereal.GetWorkflowScheduleByNameRequest) (*cereal.GetWorkflowScheduleByNameResponse, error) {

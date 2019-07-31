@@ -140,7 +140,10 @@ message Schedule {
   google.protobuf.Timestamp last_end = 10;
 }
 
-message ListWorkflowSchedulesResponse { repeated Schedule schedules = 1; }
+message ListWorkflowSchedulesResponse {
+  int32 num_schedules = 1;
+  Schedule schedule = 2; 
+}
 
 message GetWorkflowScheduleByNameRequest {
   string domain = 1;
@@ -183,7 +186,7 @@ service Cereal {
   rpc CreateWorkflowSchedule(CreateWorkflowScheduleRequest)
       returns (CreateWorkflowScheduleResponse);
   rpc ListWorkflowSchedules(ListWorkflowSchedulesRequest)
-      returns (ListWorkflowSchedulesResponse);
+      returns (stream ListWorkflowSchedulesResponse);
   rpc GetWorkflowScheduleByName(GetWorkflowScheduleByNameRequest)
       returns (GetWorkflowScheduleByNameResponse);
   rpc UpdateWorkflowScheduleByName(UpdateWorkflowScheduleByNameRequest)

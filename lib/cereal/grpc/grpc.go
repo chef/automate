@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"errors"
+	"io"
 	"time"
 
 	"github.com/golang/protobuf/ptypes/wrappers"
@@ -345,19 +346,30 @@ func (g *GrpcBackend) CreateWorkflowSchedule(ctx context.Context, instanceName s
 }
 
 func (g *GrpcBackend) ListWorkflowSchedules(ctx context.Context) ([]*backend.Schedule, error) {
-	resp, err := g.client.ListWorkflowSchedules(ctx, &grpccereal.ListWorkflowSchedulesRequest{})
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	s, err := g.client.ListWorkflowSchedules(ctx, &grpccereal.ListWorkflowSchedulesRequest{})
 	if err != nil {
 		return nil, err
 	}
-	schedules := make([]*backend.Schedule, 0, len(resp.Schedules))
-	for _, grpcSched := range resp.Schedules {
-		if grpcSched == nil {
-			logrus.Error("missing schedule")
-			continue
-		}
-		schedules = append(schedules, grpcSchedToBackend(grpcSched))
-	}
+	var schedules []*backend.Schedule
 
+	for {
+		resp, err := s.Recv()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return nil, err
+		}
+		if resp.NumSchedules > 0 && schedules == nil {
+			schedules = make([]*backend.Schedule, 0, resp.NumSchedules)
+		}
+		if resp.Schedule != nil {
+			schedules = append(schedules, grpcSchedToBackend(resp.Schedule))
+		}
+	}
 	return schedules, nil
 }
 
