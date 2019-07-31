@@ -2,7 +2,6 @@
 
 source "$(pkg_path_for "$pkg_scaffolding")/lib/shared.sh"
 
-
 scaffolding_load() {
     local lib
     lib="$(pkg_path_for "chef/scaffolding-go")/lib/scaffolding.sh"
