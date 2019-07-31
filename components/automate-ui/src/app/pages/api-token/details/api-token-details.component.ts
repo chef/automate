@@ -13,6 +13,8 @@ import { GetToken, UpdateToken } from 'app/entities/api-tokens/api-token.actions
 import { apiTokenFromRoute, updateStatus } from 'app/entities/api-tokens/api-token.selectors';
 import { ApiToken } from 'app/entities/api-tokens/api-token.model';
 
+type TokenStatus = 'active' | 'inactive';
+
 @Component({
   selector: 'app-api-token-details',
   templateUrl: './api-token-details.component.html',
@@ -21,7 +23,7 @@ import { ApiToken } from 'app/entities/api-tokens/api-token.model';
 export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
   public tabValue = 'details';
   public token: ApiToken;
-  public status: 'active' | 'inactive';
+  public status: TokenStatus;
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
   public updateForm: FormGroup;
   public saveInProgress = false;
@@ -31,10 +33,11 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
     private store: Store<NgrxStateAtom>,
     fb: FormBuilder
   ) {
+    const initialStatus: TokenStatus = 'active';
     this.updateForm = fb.group({
       // Must stay in sync with error checks in api-token-details.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      status: ['active', Validators.required]
+      status: [initialStatus, Validators.required]
     });
   }
 
@@ -75,7 +78,8 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
     this.firstLoad = false;
     this.saveInProgress = true;
     const name: string = this.updateForm.controls.name.value.trim();
-    const active: boolean = this.updateForm.controls.status.value === 'active';
+    const active: boolean = <TokenStatus>this.updateForm.controls.status.value === 'active';
+    const status: TokenStatus = active ? 'active' : 'inactive';
     const token: ApiToken = { ...this.token, name, active };
     this.store.dispatch(new UpdateToken({ token }));
 
@@ -89,7 +93,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
           pendingSave.next(true);
           pendingSave.complete();
           this.saveInProgress = false;
-          this.updateForm.reset({ name, status: active ? 'active' : 'inactive' });
+          this.updateForm.reset({ name, status });
         }
       });
   }
