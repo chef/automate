@@ -24,10 +24,10 @@
           </tr>
         </tbody>
       </table>
-        <chef-tab-selector [value]="tabValue">
-          <chef-option value='details'>Details</chef-option>
-        </chef-tab-selector>
-      </chef-page-header>
+      <chef-tab-selector [value]="tabValue">
+        <chef-option value='details'>Details</chef-option>
+      </chef-tab-selector>
+    </chef-page-header>
     <section class="page-body">
       <form [formGroup]="updateForm">
         <chef-form-field>
@@ -49,12 +49,12 @@
         </chef-form-field>
       </form>
       <div id="save">
-      <chef-button primary [disabled]="!updateForm.valid || !updateForm.dirty || saveInProgress" (click)="saveChange()">
-        <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
-        <span *ngIf="saveInProgress">Saving...</span>
-        <span *ngIf="!saveInProgress">Save</span>
-      </chef-button>
-      <span id="saved-note" *ngIf="!firstLoad && !updateForm.dirty">All changes saved.</span>
+        <chef-button primary [disabled]="!updateForm.valid || !updateForm.dirty || saveInProgress" (click)="saveChange()">
+          <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
+          <span *ngIf="saveInProgress">Saving...</span>
+          <span *ngIf="!saveInProgress">Save</span>
+        </chef-button>
+        <span id="saved-note" *ngIf="!firstLoad && !updateForm.dirty">All changes saved.</span>
       </div>
     </section>
   </main>

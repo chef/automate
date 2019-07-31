@@ -38,7 +38,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
     this.updateForm = fb.group({
       // Must stay in sync with error checks in api-token-details.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      status: [initialStatus, Validators.required]
+      status: [initialStatus]
     });
   }
 
@@ -79,7 +79,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
     this.firstLoad = false;
     this.saveInProgress = true;
     const name: string = this.updateForm.controls.name.value.trim();
-    const active: boolean = <TokenStatus>this.updateForm.controls.status.value === 'active';
+    const active = <TokenStatus>this.updateForm.controls.status.value === 'active';
     const status: TokenStatus = active ? 'active' : 'inactive';
     const token: ApiToken = { ...this.token, name, active };
     this.store.dispatch(new UpdateToken({ token }));
@@ -99,7 +99,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
-  get nameCtrl(): FormControl {
+  public get nameCtrl(): FormControl {
     return <FormControl>this.updateForm.controls.name;
   }
 }
