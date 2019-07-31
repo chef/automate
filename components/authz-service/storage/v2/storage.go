@@ -70,11 +70,11 @@ type projectStorage interface {
 
 type ruleStorage interface {
 	CreateRule(context.Context, *Rule) (*Rule, error)
-	GetStagedOrAppliedRule(context.Context, string) (*Rule, error)
+	GetStagedOrAppliedRule(ctx context.Context, projectID string, ruleID string) (*Rule, error)
 	UpdateRule(context.Context, *Rule) (*Rule, error)
 	ListRules(context.Context) ([]*Rule, error)
 	ListStagedAndAppliedRules(context.Context) ([]*Rule, error)
-	DeleteRule(context.Context, string) error
+	DeleteRule(ctx context.Context, projectID string, ruleID string) error
 	ListRulesForProject(context.Context, string) ([]*Rule, ProjectRulesStatus, error)
 	ApplyStagedRules(context.Context) error
 }

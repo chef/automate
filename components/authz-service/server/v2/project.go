@@ -422,7 +422,7 @@ func (s *ProjectState) UpdateRule(ctx context.Context, req *api.UpdateRuleReq) (
 }
 
 func (s *ProjectState) GetRule(ctx context.Context, req *api.GetRuleReq) (*api.GetRuleResp, error) {
-	resp, err := s.store.GetStagedOrAppliedRule(ctx, req.Id)
+	resp, err := s.store.GetStagedOrAppliedRule(ctx, req.ProjectId, req.Id)
 	if err != nil {
 		if err == storage_errors.ErrNotFound {
 			return nil, status.Errorf(codes.NotFound, "could not find rule with ID %q", req.Id)
@@ -494,7 +494,7 @@ func (s *ProjectState) ListRulesForProject(ctx context.Context, req *api.ListRul
 }
 
 func (s *ProjectState) DeleteRule(ctx context.Context, req *api.DeleteRuleReq) (*api.DeleteRuleResp, error) {
-	err := s.store.DeleteRule(ctx, req.Id)
+	err := s.store.DeleteRule(ctx, req.ProjectId, req.Id)
 	switch err {
 	case nil:
 		return &api.DeleteRuleResp{}, nil

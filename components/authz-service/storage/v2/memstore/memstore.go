@@ -272,8 +272,13 @@ func (s *State) UpdateRule(_ context.Context, rule *storage.Rule) (*storage.Rule
 	return rule, nil
 }
 
-func (s *State) GetStagedOrAppliedRule(_ context.Context, id string) (*storage.Rule, error) {
-	item, exists := s.rules.Get(id)
+func (s *State) GetStagedOrAppliedRule(_ context.Context, projectID, ruleID string) (*storage.Rule, error) {
+	item, exists := s.projects.Get(projectID)
+	if !exists {
+		return nil, storage_errors.ErrNotFound
+	}
+	
+	item, exists = s.rules.Get(ruleID)
 	if !exists {
 		return nil, storage_errors.ErrNotFound
 	}
@@ -344,14 +349,14 @@ func (s *State) ListRulesForProject(_ context.Context, projectID string) ([]*sto
 	return rules, rulesStatus, nil
 }
 
-func (s *State) DeleteRule(ctx context.Context, id string) error {
-	_, err := s.GetStagedOrAppliedRule(ctx, id)
+func (s *State) DeleteRule(ctx context.Context, projectID, ruleID string) error {
+	_, err := s.GetStagedOrAppliedRule(ctx, projectID, ruleID)
 
 	if err != nil {
 		return err
 	}
 
-	s.rules.Delete(id)
+	s.rules.Delete(ruleID)
 	s.bumpPolicyVersion()
 	return nil
 }

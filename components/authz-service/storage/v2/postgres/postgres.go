@@ -992,8 +992,7 @@ func (p *pg) UpdateRule(ctx context.Context, rule *v2.Rule) (*v2.Rule, error) {
 	return rule, nil
 }
 
-// TODO veryify projects exists
-func (p *pg) DeleteRule(ctx context.Context, id string) error {
+func (p *pg) DeleteRule(ctx context.Context, projectID string, ruleID string) error {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return err
@@ -1007,7 +1006,7 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 		return p.processError(err)
 	}
 
-	assocMap, err := p.getMapOfRuleAssociations(ctx, tx, id)
+	assocMap, err := p.getMapOfRuleAssociations(ctx, tx, ruleID)
 	if err != nil {
 		return p.processError(err)
 	}
@@ -1023,8 +1022,8 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 		res, err := tx.ExecContext(ctx,
 			`UPDATE iam_staged_project_rules
 				SET deleted=true
-				WHERE id=$1 AND projects_match_for_rule(project_id, $2)`,
-			id, pq.Array(projectsFilter),
+				WHERE id=$1 AND project_id=project_db_id($2) AND projects_match_for_rule($2, $3)`,
+			ruleID, projectID, pq.Array(projectsFilter),
 		)
 		if err != nil {
 			return p.processError(err)
@@ -1036,8 +1035,8 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 	} else if ruleApplied {
 		res, err := tx.ExecContext(ctx,
 			`SELECT db_id FROM iam_project_rules
-				WHERE id=$1 AND projects_match_for_rule(project_id, $2)`,
-			id, pq.Array(projectsFilter),
+				WHERE id=$1 AND project_id=project_db_id($2) AND projects_match_for_rule($2, $3)`,
+			ruleID, projectID, pq.Array(projectsFilter),
 		)
 		if err != nil {
 			return p.processError(err)
@@ -1052,7 +1051,7 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 				SELECT a.id, a.project_id, a.name, a.type, 'true'
 				FROM iam_project_rules AS a
 				WHERE a.id=$1 AND projects_match_for_rule(a.project_id, $2)`,
-			id, pq.Array(projectsFilter),
+			ruleID, pq.Array(projectsFilter),
 		)
 		if err != nil {
 			return p.processError(err)
@@ -1063,7 +1062,7 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 		_, err = tx.ExecContext(ctx,
 			`INSERT INTO iam_staged_rule_conditions (rule_db_id, value, attribute, operator)
 			 (SELECT db_id, '{dummy}', 'chef-server', 'equals'  FROM iam_staged_project_rules WHERE id=$1)`,
-			id,
+			ruleID,
 		)
 		if err != nil {
 			return p.processError(err)
@@ -1071,8 +1070,8 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 	} else if ruleStaged {
 		res, err := tx.ExecContext(ctx,
 			`DELETE FROM iam_staged_project_rules
-				WHERE id=$1 AND projects_match_for_rule(project_id, $2)`,
-			id, pq.Array(projectsFilter),
+				WHERE id=$1 AND project_id=project_db_id($2) AND projects_match_for_rule($2, $3)`,
+			ruleID, projectID, pq.Array(projectsFilter),
 		)
 		if err != nil {
 			return p.processError(err)
@@ -1091,8 +1090,7 @@ func (p *pg) DeleteRule(ctx context.Context, id string) error {
 	return nil
 }
 
-// TODO verify project exists
-func (p *pg) GetStagedOrAppliedRule(ctx context.Context, id string) (*v2.Rule, error) {
+func (p *pg) GetStagedOrAppliedRule(ctx context.Context, projectID string, ruleID string) (*v2.Rule, error) {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -1103,7 +1101,7 @@ func (p *pg) GetStagedOrAppliedRule(ctx context.Context, id string) (*v2.Rule, e
 
 	var rule v2.Rule
 	row := p.db.QueryRowContext(ctx, "SELECT query_staged_or_applied_rule($1, $2, $3)",
-		id, pq.Array(projectsFilter),
+		ruleID, pq.Array(projectsFilter),
 	)
 	err = row.Scan(&rule)
 	if err != nil {
@@ -1165,6 +1163,23 @@ func (p *pg) ListRulesForProject(ctx context.Context, projectID string) ([]*v2.R
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return nil, v2.RulesStatusError, err
+	}
+
+	// in our other APIs we use a a postgres query to do filtering
+	// however in this case, we can't automatically assume NoRows means NotFound 
+	// because we want to differentiate between a project that is not in the project filter
+	// and a project that has no rules
+	if len(projectsFilter) > 0 {
+		var projectInFilter bool
+		for _, id := range projectsFilter {
+			if id == projectID {
+				projectInFilter = true
+				break
+			}
+		}
+		if !projectInFilter {
+			return nil, v2.RulesStatusError, storage_errors.ErrNotFound
+		}
 	}
 
 	tx, err := p.db.BeginTx(ctx, nil)
