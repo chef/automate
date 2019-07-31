@@ -81,9 +81,7 @@ control 'iam-v2-global-projects-filter-1' do
             statements: [
               {
                 effect: "ALLOW",
-                # TODO this test will fail if there is a lone parameterized action (i.e. just iam:teams:get)
-                # ...what?! (@srenatus)
-                actions: ["iam:teams:list", "iam:teams:get"],
+                actions: ["iam:teams:get"],
                 projects: [PROJECT_ID_1, PROJECT_ID_2]
               }
             ]
