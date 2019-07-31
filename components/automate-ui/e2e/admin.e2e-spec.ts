@@ -1376,8 +1376,7 @@ describe('Admin pages', () => {
                 project: {
                   name: 'Test Name',
                   id: 'test-name',
-                  type: 'CUSTOM',
-                  projects: ['test-name']
+                  type: 'CUSTOM'
                 }
               }
             ));
@@ -1417,8 +1416,7 @@ describe('Admin pages', () => {
                 project: {
                   name: 'Test Name',
                   id: 'custom-id',
-                  type: 'CUSTOM',
-                  projects: ['custom-id']
+                  type: 'CUSTOM'
                 }
               }
             ));
@@ -1455,7 +1453,6 @@ describe('Admin pages', () => {
             project: {
               id: 'my-project',
               name: 'My Project',
-              projects: ['my-project'],
               type: 'CUSTOM'
             }
           }
@@ -1499,7 +1496,6 @@ describe('Admin pages', () => {
                 project: {
                   id: 'my-project',
                   name: 'My Project Changed',
-                  projects: ['my-project'],
                   type: 'CUSTOM'
                 }
               }
@@ -1668,7 +1664,6 @@ describe('Admin pages', () => {
             project: {
               id: 'default',
               name: 'Default Project',
-              projects: ['default'],
               type: 'CHEF_MANAGED'
             }
           }

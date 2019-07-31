@@ -794,12 +794,6 @@ func init() {
         },
         "type": {
           "$ref": "#/definitions/iamv2betaType"
-        },
-        "projects": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
         }
       }
     },

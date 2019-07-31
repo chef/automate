@@ -537,10 +537,9 @@ func storageCondition(apiCondition *api.Condition) (storage.Condition, error) {
 // nolint: unparam
 func fromStorageProject(p *storage.Project) (*api.Project, error) {
 	return &api.Project{
-		Id:       p.ID,
-		Name:     p.Name,
-		Type:     typeFromInternal(p.Type),
-		Projects: p.Projects,
+		Id:   p.ID,
+		Name: p.Name,
+		Type: typeFromInternal(p.Type),
 	}, nil
 }
 

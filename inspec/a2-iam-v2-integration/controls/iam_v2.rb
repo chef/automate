@@ -363,7 +363,6 @@ EOF
       expect(resp.http_status).to eq 200
       expect(resp.parsed_response_body[:project][:id]).to eq id
       expect(resp.parsed_response_body[:project][:name]).to eq 'display name !#$#'
-      expect(resp.parsed_response_body[:project][:projects]).to eq [id]
 
       resp = automate_api_request("/apis/iam/v2beta/projects")
       expect(resp.http_status).to eq 200
