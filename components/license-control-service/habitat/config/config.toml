@@ -1,7 +1,7 @@
 host = "{{cfg.service.host}}"
 port = "{{cfg.service.port}}"
 database = "chef_license_control_service"
-migrations_path = "{{pkg.svc_static_path}}/migrations"
+migrations_path = "{{pkg.path}}/migrations"
 license_token_path = "{{pkg.svc_data_path}}/license_token.jwt"
 cert_path = "{{pkg.svc_config_path}}/service.crt"
 key_path = "{{pkg.svc_config_path}}/service.key"
