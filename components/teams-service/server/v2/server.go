@@ -2,7 +2,6 @@ package v2
 
 import (
 	"context"
-	"fmt"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -92,9 +91,7 @@ func (s *Server) DeleteTeam(ctx context.Context, req *teams.DeleteTeamReq) (*tea
 	})
 	if err != nil {
 		s.service.Logger.Warnf("failed to purge subjects on team delete: %s", err.Error())
-		return nil, status.Error(codes.Internal,
-			fmt.Sprintf("the team named %q with ID %q was successfully deleted but its "+
-				"subject could not be purged from the policies: %s", team.Name, req.Id, err.Error()))
+		return nil, status.Errorf(codes.Internal, "failed to purge team %q from policies: %s", req.Id, err.Error())
 	}
 
 	return &teams.DeleteTeamResp{
