@@ -155,10 +155,6 @@ func (s *policyServer) CreatePolicy(
 		req.Projects)
 
 	if err != nil {
-		if errors.Cause(err) == storage_errors.ErrGenerateUUID {
-			return nil, status.Errorf(codes.Internal,
-				"error generating UUID for policy database entry %q: %s", req.Id, err.Error())
-		}
 		return nil, status.Errorf(codes.InvalidArgument,
 			"error parsing policy %q: %s", req.Id, err.Error())
 	}

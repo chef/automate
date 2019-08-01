@@ -19,12 +19,24 @@ import (
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/testhelpers"
 	"github.com/chef/automate/lib/grpc/auth_context"
-	uuid "github.com/chef/automate/lib/uuid4"
 )
 
 const (
 	Applied = "applied"
 	Staged  = "staged"
+)
+
+const (
+	policyMembersByMemberName = "SELECT count(*) FROM iam_policy_members WHERE member_id=member_db_id($1)"
+	policyMembersByPolicyID   = "SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)"
+	policyMembersFull         = "SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1) and member_id=member_db_id($2)"
+	policyWithID              = "SELECT count(*) FROM iam_policies WHERE id=$1"
+	statementWithID           = "SELECT count(*) FROM iam_statements WHERE db_id=$1"
+	statementQueryWithRole    = "SELECT count(*) FROM iam_statements WHERE resources=$1 AND actions=$2 AND effect=$3 AND policy_id=policy_db_id($4) AND role_id=role_db_id($5)"
+	statementQueryFull        = "SELECT count(*) FROM iam_statements WHERE resources=$1 AND actions=$2 AND effect=$3 AND policy_id=policy_db_id($4)"
+	policyFull                = "SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3"
+	membersCount              = "SELECT count(*) FROM iam_members"
+	policyProjectsByProjectID = "SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)"
 )
 
 // Note: to set up PG locally for running these tests,
@@ -96,16 +108,15 @@ func TestGetPolicy(t *testing.T) {
 		},
 		"policy with two statements found": func(t *testing.T) {
 			ctx := context.Background()
-
 			polID := insertTestPolicy(t, db, "testpolicy")
 
 			s0Actions := []string{"iam:users:delete", "iam:users:create"}
 			s0Resources := []string{"iam:users"}
-			sID0 := insertTestStatement(t, db, polID, "allow", "", s0Actions, s0Resources)
+			insertTestStatement(t, db, polID, "allow", "", s0Actions, s0Resources)
 
 			s1Actions := []string{"compliance:profiles:download", "compliance:profiles:delete"}
 			s1Resources := []string{"compliance:profiles"}
-			sID1 := insertTestStatement(t, db, polID, "deny", "", s1Actions, s1Resources)
+			insertTestStatement(t, db, polID, "deny", "", s1Actions, s1Resources)
 
 			member := insertTestPolicyMember(t, db, polID, "user:local:albertine")
 			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_statements`))
@@ -118,14 +129,12 @@ func TestGetPolicy(t *testing.T) {
 				Type:    storage.Custom,
 				Statements: []storage.Statement{
 					{
-						ID:        sID0,
 						Effect:    storage.Allow,
 						Resources: s0Resources,
 						Actions:   s0Actions,
 						Projects:  []string{},
 					},
 					{
-						ID:        sID1,
 						Effect:    storage.Deny,
 						Resources: s1Resources,
 						Actions:   s1Actions,
@@ -147,8 +156,8 @@ func TestGetPolicy(t *testing.T) {
 			insertTestStatement(t, db, firstPolID, "deny", "", s1Actions, s1Resources)
 
 			polID := insertTestPolicy(t, db, "testpolicy")
-			sID0 := insertTestStatement(t, db, polID, "allow", "", s0Actions, s0Resources)
-			sID1 := insertTestStatement(t, db, polID, "deny", "", s1Actions, s1Resources)
+			insertTestStatement(t, db, polID, "allow", "", s0Actions, s0Resources)
+			insertTestStatement(t, db, polID, "deny", "", s1Actions, s1Resources)
 
 			member0 := insertTestPolicyMember(t, db, polID, "user:local:albertine")
 			member1 := insertTestPolicyMember(t, db, polID, "user:local:charmander")
@@ -163,14 +172,12 @@ func TestGetPolicy(t *testing.T) {
 				Type:    storage.Custom,
 				Statements: []storage.Statement{
 					{
-						ID:        sID0,
 						Effect:    storage.Allow,
 						Resources: s0Resources,
 						Actions:   s0Actions,
 						Projects:  []string{},
 					},
 					{
-						ID:        sID1,
 						Effect:    storage.Deny,
 						Resources: s1Resources,
 						Actions:   s1Actions,
@@ -214,14 +221,12 @@ func TestGetPolicy(t *testing.T) {
 				Type:    storage.Custom,
 				Statements: []storage.Statement{
 					{
-						ID:        sID0,
 						Effect:    storage.Allow,
 						Resources: s0Resources,
 						Actions:   s0Actions,
 						Projects:  []string{project0.ID},
 					},
 					{
-						ID:        sID1,
 						Effect:    storage.Deny,
 						Resources: s1Resources,
 						Actions:   s1Actions,
@@ -453,11 +458,11 @@ func TestListPolicies(t *testing.T) {
 
 			s0Actions := []string{"iam:users:delete', 'iam:users:create"}
 			s0Resources := []string{"*"}
-			sID0 := insertTestStatement(t, db, polID, "allow", "", s0Actions, s0Resources)
+			insertTestStatement(t, db, polID, "allow", "", s0Actions, s0Resources)
 
 			s1Actions := []string{"compliance:profiles:download", "compliance:profiles:delete"}
 			s1Resources := []string{"compliance:profiles"}
-			sID1 := insertTestStatement(t, db, polID, "deny", "", s1Actions, s1Resources)
+			insertTestStatement(t, db, polID, "deny", "", s1Actions, s1Resources)
 
 			member := insertTestPolicyMember(t, db, polID, "user:local:albertine")
 
@@ -470,14 +475,12 @@ func TestListPolicies(t *testing.T) {
 				Type:    storage.Custom,
 				Statements: []storage.Statement{
 					{
-						ID:        sID0,
 						Effect:    storage.Allow,
 						Resources: s0Resources,
 						Actions:   s0Actions,
 						Projects:  []string{},
 					},
 					{
-						ID:        sID1,
 						Effect:    storage.Deny,
 						Resources: s1Resources,
 						Actions:   s1Actions,
@@ -493,12 +496,12 @@ func TestListPolicies(t *testing.T) {
 			polID0 := insertTestPolicy(t, db, "01testpolicy")
 			s0Actions := []string{"iam:users:delete', 'iam:users:create"}
 			s0Resources := []string{"*"}
-			sID0 := insertTestStatement(t, db, polID0, "allow", "", s0Actions, s0Resources)
+			insertTestStatement(t, db, polID0, "allow", "", s0Actions, s0Resources)
 
 			polID1 := insertTestPolicy(t, db, "02testpolicy")
 			s1Actions := []string{"compliance:profiles:update"}
 			s1Resources := []string{"compliance:profiles"}
-			sID1 := insertTestStatement(t, db, polID1, "deny", "", s1Actions, s1Resources)
+			insertTestStatement(t, db, polID1, "deny", "", s1Actions, s1Resources)
 
 			member0 := insertTestPolicyMember(t, db, polID0, "user:local:albertine0")
 			member1 := insertTestPolicyMember(t, db, polID1, "user:local:albertine1")
@@ -513,7 +516,6 @@ func TestListPolicies(t *testing.T) {
 					Type:    storage.Custom,
 					Statements: []storage.Statement{
 						{
-							ID:        sID0,
 							Effect:    storage.Allow,
 							Resources: s0Resources,
 							Actions:   s0Actions,
@@ -528,7 +530,6 @@ func TestListPolicies(t *testing.T) {
 					Type:    storage.Custom,
 					Statements: []storage.Statement{
 						{
-							ID:        sID1,
 							Effect:    storage.Deny,
 							Resources: s1Resources,
 							Actions:   s1Actions,
@@ -579,7 +580,6 @@ func TestListPolicies(t *testing.T) {
 					Type:    storage.Custom,
 					Statements: []storage.Statement{
 						{
-							ID:        sID0,
 							Effect:    storage.Allow,
 							Resources: s0Resources,
 							Actions:   s0Actions,
@@ -594,7 +594,6 @@ func TestListPolicies(t *testing.T) {
 					Type:    storage.Custom,
 					Statements: []storage.Statement{
 						{
-							ID:        sID1,
 							Effect:    storage.Deny,
 							Resources: s1Resources,
 							Actions:   s1Actions,
@@ -875,7 +874,7 @@ func TestDeletePolicy(t *testing.T) {
 			})
 
 			// assert that stuff happened to the database
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(policyWithID, polID))
 		},
 		"only one unattached policy with no statements": func(t *testing.T) {
 			ctx := context.Background()
@@ -887,7 +886,7 @@ func TestDeletePolicy(t *testing.T) {
 			})
 
 			// assert that stuff happened to the database
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(policyWithID, polID))
 		},
 		"only one unattached policy with two statements": func(t *testing.T) {
 			ctx := context.Background()
@@ -905,9 +904,9 @@ func TestDeletePolicy(t *testing.T) {
 				require.NoError(t, err)
 			})
 
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND policy_id=policy_db_id($2)`, sID1, polID))
+			assertEmpty(t, db.QueryRow(policyWithID, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE db_id=$1`, sID0))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE db_id=$1 AND policy_id=policy_db_id($2)`, sID1, polID))
 		},
 		"unattached policy with two statements, next to other policy": func(t *testing.T) {
 			ctx := context.Background()
@@ -931,9 +930,9 @@ func TestDeletePolicy(t *testing.T) {
 				require.NoError(t, err)
 			})
 
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID1))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID1))
+			assertEmpty(t, db.QueryRow(policyWithID, polID1))
+			assertEmpty(t, db.QueryRow(statementWithID, sID0))
+			assertEmpty(t, db.QueryRow(statementWithID, sID1))
 			// Members get left in the table for now.
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members WHERE name=$1`, member.Name))
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies`))
@@ -960,9 +959,9 @@ func TestDeletePolicy(t *testing.T) {
 				require.NoError(t, err)
 			})
 
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND policy_id=policy_db_id($2)`, sID0, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE statement_id=statement_db_id($1)`, sID0))
+			assertEmpty(t, db.QueryRow(policyWithID, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE db_id=$1 AND policy_id=policy_db_id($2)`, sID0, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE statement_id=$1`, sID0))
 		},
 		"when the policy overlaps with the project filter, delete the policy": func(t *testing.T) {
 			ctx := context.Background()
@@ -978,7 +977,7 @@ func TestDeletePolicy(t *testing.T) {
 				err := store.DeletePolicy(ctx, polID)
 				require.NoError(t, err)
 			})
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(policyWithID, polID))
 		},
 		"when the policy has no projects with a filter of (unassigned), delete the policy": func(t *testing.T) {
 			ctx := context.Background()
@@ -993,7 +992,7 @@ func TestDeletePolicy(t *testing.T) {
 				err := store.DeletePolicy(ctx, polID)
 				require.NoError(t, err)
 			})
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(policyWithID, polID))
 		},
 		"when the the policy filter is *, delete the policy": func(t *testing.T) {
 			ctx := context.Background()
@@ -1007,7 +1006,7 @@ func TestDeletePolicy(t *testing.T) {
 			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 			err := store.DeletePolicy(ctx, polID)
 			require.NoError(t, err)
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertEmpty(t, db.QueryRow(policyWithID, polID))
 		},
 		"when the policy does not overlap with the project filter, return not found": func(t *testing.T) {
 			ctx := context.Background()
@@ -1059,12 +1058,10 @@ func TestCreatePolicy(t *testing.T) {
 				assert.Equal(t, &pol, resp)
 			})
 
-			assertOne(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
+			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertEmpty(t, db.QueryRow(membersCount))
 		},
 		"unattached chef-managed policy with no statement": func(t *testing.T) {
 			polID := genSimpleID(t, prngSeed)
@@ -1083,21 +1080,18 @@ func TestCreatePolicy(t *testing.T) {
 				assert.Equal(t, &pol, resp)
 			})
 
-			assertOne(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
+			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertEmpty(t, db.QueryRow(membersCount))
 		},
 		"policy adding a role that doesn't exist should fail": func(t *testing.T) {
-			polID, sID := genSimpleID(t, prngSeed), genUUID(t)
+			polID := genSimpleID(t, prngSeed)
 			name, typeVal := "toBeCreated", storage.Custom
 			resources := []string{"iam:users"}
 			role := "notFound"
 			member := genMember(t, "user:local:albertine")
 			statement := storage.Statement{
-				ID:        sID,
 				Effect:    storage.Deny,
 				Role:      role,
 				Resources: resources,
@@ -1119,19 +1113,18 @@ func TestCreatePolicy(t *testing.T) {
 			assert.True(t, ok, "expected foreign key error")
 			assert.Equal(t, "role not found: "+role, err.Error())
 
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertEmpty(t, db.QueryRow(policyWithID, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertEmpty(t, db.QueryRow(membersCount))
 		},
 		"policy with one statement that contains resources and actions but no role": func(t *testing.T) {
-			polID, sID := genSimpleID(t, prngSeed), genUUID(t)
+			polID := genSimpleID(t, prngSeed)
 			name, typeVal := "toBeCreated", storage.Custom
 
 			resources, actions := []string{"iam:users"}, []string{"iam:users:create", "iam:users:delete"}
 			member := genMember(t, "user:local:albertine")
 			statement := storage.Statement{
-				ID:        sID,
 				Effect:    storage.Deny,
 				Resources: resources,
 				Actions:   actions,
@@ -1151,17 +1144,15 @@ func TestCreatePolicy(t *testing.T) {
 				assert.Equal(t, &pol, resp)
 			})
 
-			assertOne(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5) AND role_id IS NULL`,
-				sID, pq.Array(resources), pq.Array(actions), "deny", polID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE resources=$1 AND actions=$2 AND effect=$3 AND policy_id=policy_db_id($4) AND role_id IS NULL`,
+				pq.Array(resources), pq.Array(actions), "deny", polID))
+			assertOne(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertOne(t, db.QueryRow(membersCount))
 			assertMembers(t, db, polID, []storage.Member{member})
 		},
 		"policy with one statement that contains resources, actions, and a role that exists": func(t *testing.T) {
-			polID, sID := genSimpleID(t, prngSeed), genUUID(t)
+			polID := genSimpleID(t, prngSeed)
 			name, typeVal, projID := "toBeCreated", storage.Custom, "project1"
 			resources, actions, role := []string{"iam:users"}, []string{"iam:users:create", "iam:users:delete"}, "my-fancy-role"
 
@@ -1170,7 +1161,6 @@ func TestCreatePolicy(t *testing.T) {
 
 			member := genMember(t, "user:local:albertine")
 			statement := storage.Statement{
-				ID:        sID,
 				Effect:    storage.Deny,
 				Resources: resources,
 				Actions:   actions,
@@ -1191,17 +1181,15 @@ func TestCreatePolicy(t *testing.T) {
 				assert.Equal(t, &pol, resp)
 			})
 
-			assertOne(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5) AND role_id=role_db_id($6)`,
-				sID, pq.Array(resources), pq.Array(actions), "deny", polID, role))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
+			assertOne(t, db.QueryRow(statementQueryWithRole,
+				pq.Array(resources), pq.Array(actions), "deny", polID, role))
+			assertOne(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertOne(t, db.QueryRow(membersCount))
 			assertMembers(t, db, polID, []storage.Member{member})
 		},
 		"policy with one statement that contains resources, a role that exists, but no actions": func(t *testing.T) {
-			polID, sID := genSimpleID(t, prngSeed), genUUID(t)
+			polID := genSimpleID(t, prngSeed)
 			name, typeVal, projID := "toBeCreated", storage.Custom, "project1"
 			resources, role := []string{"iam:users"}, "my-fancy-role"
 
@@ -1210,7 +1198,6 @@ func TestCreatePolicy(t *testing.T) {
 
 			member := genMember(t, "user:local:albertine")
 			statement := storage.Statement{
-				ID:        sID,
 				Effect:    storage.Deny,
 				Resources: resources,
 				Role:      role,
@@ -1231,21 +1218,18 @@ func TestCreatePolicy(t *testing.T) {
 				assert.Equal(t, &pol, resp)
 			})
 
-			assertOne(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions='{}' AND effect=$3 AND policy_id=policy_db_id($4) AND role_id=role_db_id($5)`,
-				sID, pq.Array(resources), "deny", polID, role))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE resources=$1 AND actions='{}' AND effect=$2 AND policy_id=policy_db_id($3) AND role_id=role_db_id($4)`,
+				pq.Array(resources), "deny", polID, role))
+			assertOne(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertOne(t, db.QueryRow(membersCount))
 			assertMembers(t, db, polID, []storage.Member{member})
 		},
 		"policy with one resources+actions statement and two members": func(t *testing.T) {
-			polID, sID := genSimpleID(t, prngSeed), genUUID(t)
+			polID := genSimpleID(t, prngSeed)
 			name, typeVal := "toBeCreated", storage.Custom
 			resources, actions := []string{"iam:users"}, []string{"iam:users:create", "iam:users:delete"}
 			statement0 := storage.Statement{
-				ID:        sID,
 				Effect:    storage.Deny,
 				Resources: resources,
 				Actions:   actions,
@@ -1267,26 +1251,22 @@ func TestCreatePolicy(t *testing.T) {
 				assert.Equal(t, &pol, resp)
 			})
 
-			assertOne(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5)`,
-				sID, pq.Array(resources), pq.Array(actions), "deny", polID))
+			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
+			assertOne(t, db.QueryRow(statementQueryFull,
+				pq.Array(resources), pq.Array(actions), "deny", polID))
 			assertMembers(t, db, polID, []storage.Member{member0, member1})
 		},
 		"policy with two resources+actions statements": func(t *testing.T) {
-			polID, sID0, sID1 := genSimpleID(t, prngSeed), genUUID(t), genUUID(t)
+			polID := genSimpleID(t, prngSeed)
 			name, typeVal := "toBeCreated", storage.Custom
 			resources0, actions0 := []string{"iam:users"}, []string{"iam:users:create", "iam:users:delete"}
 			resources1, actions1 := []string{"compliance:profiles"}, []string{"compliance:profiles:upload", "compliance:profiles:delete"}
 			statement0 := storage.Statement{
-				ID:        sID0,
 				Effect:    storage.Deny,
 				Resources: resources0,
 				Actions:   actions0,
 			}
 			statement1 := storage.Statement{
-				ID:        sID1,
 				Effect:    storage.Allow,
 				Resources: resources1,
 				Actions:   actions1,
@@ -1307,21 +1287,18 @@ func TestCreatePolicy(t *testing.T) {
 				assert.Equal(t, &pol, resp)
 			})
 
-			assertOne(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5)`,
-				sID0, pq.Array(resources0), pq.Array(actions0), "deny", polID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5)`,
-				sID1, pq.Array(resources1), pq.Array(actions1), "allow", polID))
+			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
+			assertOne(t, db.QueryRow(statementQueryFull,
+				pq.Array(resources0), pq.Array(actions0), "deny", polID))
+			assertOne(t, db.QueryRow(statementQueryFull,
+				pq.Array(resources1), pq.Array(actions1), "allow", polID))
 			assertMembers(t, db, polID, []storage.Member{member})
 		},
 		"policy with one resources+actions statement and two members with the same name ignores the duplicate": func(t *testing.T) {
-			polID, sID0 := genSimpleID(t, prngSeed), genUUID(t)
+			polID := genSimpleID(t, prngSeed)
 			name, typeVal := "toBeCreated", storage.Custom
 			resources0, actions0 := []string{"iam:users"}, []string{"iam:users:create", "iam:users:delete"}
 			statement0 := storage.Statement{
-				ID:        sID0,
 				Effect:    storage.Deny,
 				Resources: resources0,
 				Actions:   actions0,
@@ -1342,22 +1319,22 @@ func TestCreatePolicy(t *testing.T) {
 				assert.Equal(t, &pol, resp)
 			})
 
-			assertOne(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5)`,
-				sID0, pq.Array(resources0), pq.Array(actions0), "deny", polID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
+			assertOne(t, db.QueryRow(statementQueryFull,
+				pq.Array(resources0), pq.Array(actions0), "deny", polID))
+			assertOne(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertOne(t, db.QueryRow(membersCount))
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1) AND member_id=member_db_id($2)`, polID, member0.Name))
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members WHERE name=$1`, member0.Name))
 		},
+
+		// Note(sr): This changed when we've dropped the iam_statements' id column.
+		// I don't think it's a thing we need to fix, though.
 		"policy with the same resources+actions statement passed twice": func(t *testing.T) {
-			polID, sID := genSimpleID(t, prngSeed), genUUID(t)
+			polID := genSimpleID(t, prngSeed)
 			name, typeVal := "toBeCreated", storage.Custom
 			resources, actions := []string{"iam:users"}, []string{"iam:users:create", "iam:users:delete"}
 			statement := storage.Statement{
-				ID:        sID,
 				Effect:    storage.Deny,
 				Resources: resources,
 				Actions:   actions,
@@ -1371,26 +1348,24 @@ func TestCreatePolicy(t *testing.T) {
 				Statements: []storage.Statement{statement, statement},
 			}
 
-			assertNoPolicyChange(t, store, func() {
+			assertPolicyChange(t, store, func() {
 				resp, err := store.CreatePolicy(ctx, &pol)
-				require.Error(t, err)
-				assert.Nil(t, resp)
+				require.NoError(t, err)
+				assert.NotNil(t, resp)
 			})
 		},
-		"policy with same resources+actions, but different ID statements": func(t *testing.T) {
+		"policy with same resources+actions generates two different iam_statements": func(t *testing.T) {
 			// Note (sr): I don't think this is wrong, just worth noting; so, here's
 			// a test for this behaviour
-			polID, sID0, sID1 := genSimpleID(t, prngSeed), genUUID(t), genUUID(t)
+			polID := genSimpleID(t, prngSeed)
 			name, typeVal := "toBeCreated", storage.Custom
 			resources, actions := []string{"iam:users"}, []string{"iam:users:create", "iam:users:delete"}
 			statement0 := storage.Statement{
-				ID:        sID0,
 				Effect:    storage.Deny,
 				Resources: resources,
 				Actions:   actions,
 			}
 			statement1 := storage.Statement{
-				ID:        sID1,
 				Effect:    storage.Deny,
 				Resources: resources,
 				Actions:   actions,
@@ -1410,58 +1385,14 @@ func TestCreatePolicy(t *testing.T) {
 				assert.Equal(t, &pol, resp)
 			})
 
-			assertOne(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5)`,
-				sID0, pq.Array(resources), pq.Array(actions), "deny", polID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5)`,
-				sID1, pq.Array(resources), pq.Array(actions), "deny", polID))
+			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
+			assertCount(t, 2, db.QueryRow(statementQueryFull,
+				pq.Array(resources), pq.Array(actions), "deny", polID))
 			assertMembers(t, db, polID, []storage.Member{member})
 		},
-		"policy with statement ID already used in other policy's statements": func(t *testing.T) {
-			// add a policy using that statement
-			polID := insertTestPolicy(t, db, "originalpolicy")
-			resources, actions := []string{"iam:users"}, []string{"iam:users:delete", "iam:users:create"}
-			sID := insertTestStatement(t, db, polID, "allow", "", actions, resources)
-			insertTestPolicyMember(t, db, polID, "user:local:albertine")
 
-			// try to add another one using that statement
-			failedPolID := genSimpleID(t, prngSeed)
-			name, typeVal := "toBeCreated", storage.Custom
-			member1 := genMember(t, "user:local:otheruser")
-			pol := storage.Policy{
-				ID:      failedPolID,
-				Name:    name,
-				Members: []storage.Member{member1},
-				Type:    typeVal,
-				Statements: []storage.Statement{{
-					ID:        sID,
-					Effect:    storage.Allow,
-					Resources: resources,
-					Actions:   actions,
-				}},
-			}
-
-			assertNoPolicyChange(t, store, func() {
-				resp, err := store.CreatePolicy(ctx, &pol)
-				assert.Equal(t, storage_errors.ErrConflict, err)
-				assert.Nil(t, resp)
-			})
-
-			// the second policy was NOT added,
-			assertEmpty(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
-			// however, the original statement is still there
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5)`,
-				sID, pq.Array(resources), pq.Array(actions), "allow", polID))
-			// and the original member is NOT updated because our policy-create db interaction
-			// is properly transactional.
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members WHERE name=$1`, member1.Name))
-		},
 		"policy with two resources+actions+existing project statements": func(t *testing.T) {
-			polID, sID0, sID1, projID := genSimpleID(t, prngSeed), genUUID(t), genUUID(t), genSimpleID(t, prngSeed)
+			polID, projID := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 			name, typeVal := "toBeCreated", storage.Custom
 			resources0, actions0 := []string{"iam:teams"}, []string{"iam:teams:create", "iam:teams:delete"}
 			resources1, actions1 := []string{"infra:nodes"}, []string{"infra:nodes:delete", "infra:nodes:rerun"}
@@ -1469,14 +1400,12 @@ func TestCreatePolicy(t *testing.T) {
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 
 			statement0 := storage.Statement{
-				ID:        sID0,
 				Effect:    storage.Deny,
 				Resources: resources0,
 				Actions:   actions0,
 				Projects:  []string{projID},
 			}
 			statement1 := storage.Statement{
-				ID:        sID1,
 				Effect:    storage.Allow,
 				Resources: resources1,
 				Actions:   actions1,
@@ -1498,32 +1427,27 @@ func TestCreatePolicy(t *testing.T) {
 				assert.Equal(t, &pol, resp)
 			})
 
-			assertOne(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5)`,
-				sID0, pq.Array(resources0), pq.Array(actions0), "deny", polID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5)`,
-				sID1, pq.Array(resources1), pq.Array(actions1), "allow", polID))
+			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
+			assertOne(t, db.QueryRow(statementQueryFull,
+				pq.Array(resources0), pq.Array(actions0), "deny", polID))
+			assertOne(t, db.QueryRow(statementQueryFull,
+				pq.Array(resources1), pq.Array(actions1), "allow", polID))
 			assertMembers(t, db, polID, []storage.Member{member})
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE statement_id=statement_db_id($1) AND project_id=project_db_id($2)`, sID0, projID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE statement_id=statement_db_id($1) AND project_id=project_db_id($2)`, sID1, projID))
+			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1)`, projID))
 		},
 		"policy with two resources+actions+non-existent project statements fails": func(t *testing.T) {
-			polID, sID0, sID1, projID := genSimpleID(t, prngSeed), genUUID(t), genUUID(t), genSimpleID(t, prngSeed)
+			polID, projID := genSimpleID(t, prngSeed), genSimpleID(t, prngSeed)
 			name, typeVal := "toBeCreated", storage.Custom
 			resources0, actions0 := []string{"iam:teams"}, []string{"iam:teams:create", "iam:teams:delete"}
 			resources1, actions1 := []string{"infra:nodes"}, []string{"infra:nodes:delete", "infra:nodes:rerun"}
 
 			statement0 := storage.Statement{
-				ID:        sID0,
 				Effect:    storage.Deny,
 				Resources: resources0,
 				Actions:   actions0,
 				Projects:  []string{projID},
 			}
 			statement1 := storage.Statement{
-				ID:        sID1,
 				Effect:    storage.Allow,
 				Resources: resources1,
 				Actions:   actions1,
@@ -1566,13 +1490,11 @@ func TestCreatePolicy(t *testing.T) {
 				assert.Equal(t, &pol, resp)
 			})
 
-			assertOne(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
+			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertEmpty(t, db.QueryRow(membersCount))
+			assertEmpty(t, db.QueryRow(policyProjectsByProjectID, polID))
 		},
 		"policy with single project": func(t *testing.T) {
 			polID := genSimpleID(t, prngSeed)
@@ -1595,13 +1517,11 @@ func TestCreatePolicy(t *testing.T) {
 				assert.Equal(t, &pol, resp)
 			})
 
-			assertOne(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
+			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertEmpty(t, db.QueryRow(membersCount))
+			assertOne(t, db.QueryRow(policyProjectsByProjectID, polID))
 		},
 		"policy with multiple projects": func(t *testing.T) {
 			polID := genSimpleID(t, prngSeed)
@@ -1626,14 +1546,12 @@ func TestCreatePolicy(t *testing.T) {
 				assert.Equal(t, &pol, resp)
 			})
 
-			assertOne(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
+			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertEmpty(t, db.QueryRow(membersCount))
 
-			projCount := db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID)
+			projCount := db.QueryRow(policyProjectsByProjectID, polID)
 			assertCount(t, 2, projCount)
 		},
 		"policy with only one non-existent project fails": func(t *testing.T) {
@@ -1659,13 +1577,11 @@ func TestCreatePolicy(t *testing.T) {
 				assert.Equal(t, "project not found: not-real-project", err.Error())
 			})
 
-			assertEmpty(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
+			assertEmpty(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertEmpty(t, db.QueryRow(membersCount))
+			assertEmpty(t, db.QueryRow(policyProjectsByProjectID, polID))
 		},
 		"policy with one existent, one non-existent project fails": func(t *testing.T) {
 			polID := genSimpleID(t, prngSeed)
@@ -1692,13 +1608,11 @@ func TestCreatePolicy(t *testing.T) {
 				assert.Equal(t, "project not found: not-real-project", err.Error())
 			})
 
-			assertEmpty(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
+			assertEmpty(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertEmpty(t, db.QueryRow(membersCount))
+			assertEmpty(t, db.QueryRow(policyProjectsByProjectID, polID))
 		},
 	}
 
@@ -1743,8 +1657,8 @@ func TestReplacePolicyMembers(t *testing.T) {
 			polID := insertTestPolicy(t, db, "testpolicy")
 			member1 := genMember(t, "user:local:fred")
 			member2 := genMember(t, "user:local:mary")
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertEmpty(t, db.QueryRow(membersCount))
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{member1, member2})
@@ -1752,8 +1666,8 @@ func TestReplacePolicyMembers(t *testing.T) {
 				require.NotNil(t, resp)
 			})
 
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 			assertMembers(t, db, polID, []storage.Member{member1, member2})
 		},
 		"updating policy with SOME members to NO members": func(t *testing.T) {
@@ -1761,8 +1675,8 @@ func TestReplacePolicyMembers(t *testing.T) {
 			polID := insertTestPolicy(t, db, "testpolicy")
 			insertTestPolicyMember(t, db, polID, "user:local:fred")
 			insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{})
@@ -1770,17 +1684,17 @@ func TestReplacePolicyMembers(t *testing.T) {
 				require.NotNil(t, resp)
 			})
 
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
 			// deleting last use of member does NOT delete member
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(membersCount))
 		},
 		"updating policy with SOME members to NEW members": func(t *testing.T) {
 			ctx := context.Background()
 			polID := insertTestPolicy(t, db, "testpolicy")
 			polMember1 := insertTestPolicyMember(t, db, polID, "user:local:fred")
 			polMember2 := insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 			member1 := genMember(t, "user:local:foo")
 			member2 := genMember(t, "user:local:bar")
 			member3 := genMember(t, "team:saml:gophers")
@@ -1793,12 +1707,12 @@ func TestReplacePolicyMembers(t *testing.T) {
 				require.NotNil(t, resp)
 			})
 
-			assertCount(t, len(members), db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, len(members)+2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, len(members), db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, len(members)+2, db.QueryRow(membersCount))
 
 			// old members no longer associated with policy
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1) and member_id=member_db_id($2)`, polID, polMember1.Name))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1) and member_id=member_db_id($2)`, polID, polMember2.Name))
+			assertEmpty(t, db.QueryRow(policyMembersFull, polID, polMember1.Name))
+			assertEmpty(t, db.QueryRow(policyMembersFull, polID, polMember2.Name))
 
 			// new members
 			assertMembers(t, db, polID, members)
@@ -1809,8 +1723,8 @@ func TestReplacePolicyMembers(t *testing.T) {
 			polMember1 := insertTestPolicyMember(t, db, polID, "user:local:fred")
 			polMember2 := insertTestPolicyMember(t, db, polID, "user:local:mary")
 			polMember3 := insertTestPolicyMember(t, db, polID, "team:local:friends")
-			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 3, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 3, db.QueryRow(membersCount))
 			member1 := genMember(t, "user:local:fred")
 			member2 := genMember(t, "user:local:mary")
 			member3 := genMember(t, "team:saml:gophers")
@@ -1823,15 +1737,15 @@ func TestReplacePolicyMembers(t *testing.T) {
 				require.NotNil(t, resp)
 			})
 
-			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 5, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 4, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 5, db.QueryRow(membersCount))
 
 			// re-used members plus new members
 			assertMembers(t, db, polID, []storage.Member{polMember1, polMember2, member3, member4})
 
 			// member still exists but disassociated from policy
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members WHERE name=$1`, polMember3.Name))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1) and member_id=member_db_id($2)`, polID, polMember3.Name))
+			assertEmpty(t, db.QueryRow(policyMembersFull, polID, polMember3.Name))
 		},
 		"updating policy by ADDING member from ANOTHER policy": func(t *testing.T) {
 			ctx := context.Background()
@@ -1842,9 +1756,9 @@ func TestReplacePolicyMembers(t *testing.T) {
 			member := genMember(t, "user:local:originaluser")
 
 			// baseline: member is in just one policy
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, otherPolID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertOne(t, db.QueryRow(membersCount))
+			assertOne(t, db.QueryRow(policyMembersByPolicyID, otherPolID))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{member})
@@ -1853,9 +1767,9 @@ func TestReplacePolicyMembers(t *testing.T) {
 			})
 
 			// now still just one member but in two policies
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, otherPolID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertOne(t, db.QueryRow(membersCount))
+			assertOne(t, db.QueryRow(policyMembersByPolicyID, otherPolID))
+			assertOne(t, db.QueryRow(policyMembersByPolicyID, polID))
 		},
 		"updating policy by REMOVING member from ANOTHER policy": func(t *testing.T) {
 			ctx := context.Background()
@@ -1867,9 +1781,9 @@ func TestReplacePolicyMembers(t *testing.T) {
 			require.NoError(t, err)
 
 			// baseline: member is in two policies
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, otherPolID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertOne(t, db.QueryRow(membersCount))
+			assertOne(t, db.QueryRow(policyMembersByPolicyID, otherPolID))
+			assertOne(t, db.QueryRow(policyMembersByPolicyID, polID))
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{})
@@ -1878,9 +1792,9 @@ func TestReplacePolicyMembers(t *testing.T) {
 			})
 
 			// now member remains in just one policy
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, otherPolID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertOne(t, db.QueryRow(membersCount))
+			assertOne(t, db.QueryRow(policyMembersByPolicyID, otherPolID))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
 		},
 		"when the policy's projects and the project filter intersect, replace members": func(t *testing.T) {
 			ctx := context.Background()
@@ -1890,8 +1804,8 @@ func TestReplacePolicyMembers(t *testing.T) {
 			insertPolicyProject(t, db, polID, projID1)
 			insertTestPolicyMember(t, db, polID, "user:local:fred")
 			insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 
 			ctx = insertProjectsIntoContext(ctx, []string{projID1})
 			assertPolicyChange(t, store, func() {
@@ -1900,9 +1814,9 @@ func TestReplacePolicyMembers(t *testing.T) {
 				require.NotNil(t, resp)
 			})
 
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
 			// deleting last use of member does NOT delete member
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(membersCount))
 		},
 		"when the * project filter is passed, replace members": func(t *testing.T) {
 			ctx := context.Background()
@@ -1912,8 +1826,8 @@ func TestReplacePolicyMembers(t *testing.T) {
 			insertPolicyProject(t, db, polID, projID1)
 			insertTestPolicyMember(t, db, polID, "user:local:fred")
 			insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 
 			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 			assertPolicyChange(t, store, func() {
@@ -1922,17 +1836,17 @@ func TestReplacePolicyMembers(t *testing.T) {
 				require.NotNil(t, resp)
 			})
 
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
 			// deleting last use of member does NOT delete member
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(membersCount))
 		},
 		"when the policy has no projects and (unassigned) is in the projects filter, replace members": func(t *testing.T) {
 			ctx := context.Background()
 			polID := insertTestPolicy(t, db, "testpolicy")
 			insertTestPolicyMember(t, db, polID, "user:local:fred")
 			insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 
 			projID1 := "team-rocket"
 			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
@@ -1943,9 +1857,9 @@ func TestReplacePolicyMembers(t *testing.T) {
 				require.NotNil(t, resp)
 			})
 
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
 			// deleting last use of member does NOT delete member
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(membersCount))
 		},
 		"when the policy's projects and projects filter do not intersect, return NotFound": func(t *testing.T) {
 			ctx := context.Background()
@@ -1955,8 +1869,8 @@ func TestReplacePolicyMembers(t *testing.T) {
 			insertPolicyProject(t, db, polID, projID1)
 			insertTestPolicyMember(t, db, polID, "user:local:fred")
 			insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 
 			projID2 := "team-montag"
 			insertTestProject(t, db, projID2, "we like dags", storage.Custom)
@@ -1966,7 +1880,7 @@ func TestReplacePolicyMembers(t *testing.T) {
 				assert.Nil(t, resp)
 				assert.Equal(t, storage_errors.ErrNotFound, err)
 			})
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
 		},
 	}
 
@@ -2010,8 +1924,8 @@ func TestRemovePolicyMembers(t *testing.T) {
 			ctx := context.Background()
 			polID := insertTestPolicy(t, db, "testpolicy")
 			member := genMember(t, "user:local:fred")
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertEmpty(t, db.QueryRow(membersCount))
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.RemovePolicyMembers(ctx, polID, []storage.Member{member})
@@ -2020,16 +1934,16 @@ func TestRemovePolicyMembers(t *testing.T) {
 				require.Empty(t, resp)
 			})
 
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertEmpty(t, db.QueryRow(membersCount))
 		},
 		"removing members from policy with SOME members to now have NO members": func(t *testing.T) {
 			ctx := context.Background()
 			polID := insertTestPolicy(t, db, "testpolicy")
 			insertTestPolicyMember(t, db, polID, "user:local:fred")
 			insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 
 			member1 := genMember(t, "user:local:fred")
 			member2 := genMember(t, "user:local:mary")
@@ -2040,16 +1954,16 @@ func TestRemovePolicyMembers(t *testing.T) {
 				require.Empty(t, resp)
 			})
 
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 		},
 		"removing repeat members from policy with SOME members to now have LESS members": func(t *testing.T) {
 			ctx := context.Background()
 			polID := insertTestPolicy(t, db, "testpolicy")
 			insertTestPolicyMember(t, db, polID, "user:local:fred")
 			remainingMember := insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 
 			member1 := genMember(t, "user:local:fred")
 			member2 := genMember(t, "user:local:fred")
@@ -2062,16 +1976,16 @@ func TestRemovePolicyMembers(t *testing.T) {
 			})
 
 			assertOne(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1) and member_id=member_db_id($2)`,
+				db.QueryRow(policyMembersFull,
 					polID, remainingMember.Name))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(membersCount))
 		},
 		"removing members from policy with ONE member to now have NO members": func(t *testing.T) {
 			ctx := context.Background()
 			polID := insertTestPolicy(t, db, "testpolicy")
 			insertTestPolicyMember(t, db, polID, "user:local:fred")
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 1, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 1, db.QueryRow(membersCount))
 
 			member1 := genMember(t, "user:local:fred")
 			assertPolicyChange(t, store, func() {
@@ -2081,16 +1995,16 @@ func TestRemovePolicyMembers(t *testing.T) {
 				require.Empty(t, resp)
 			})
 
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 1, db.QueryRow(membersCount))
 		},
 		"removing only non-members from policy results in no change to policy membership": func(t *testing.T) {
 			ctx := context.Background()
 			polID := insertTestPolicy(t, db, "testpolicy")
 			member1 := insertTestPolicyMember(t, db, polID, "user:local:fred")
 			member2 := insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.RemovePolicyMembers(ctx, polID, []storage.Member{})
@@ -2101,8 +2015,8 @@ func TestRemovePolicyMembers(t *testing.T) {
 				require.Contains(t, resp, member2)
 			})
 
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 		},
 		"removing members from policy with SOME members to now have less members with some ignored": func(t *testing.T) {
 			ctx := context.Background()
@@ -2112,8 +2026,8 @@ func TestRemovePolicyMembers(t *testing.T) {
 			polMember3 := insertTestPolicyMember(t, db, polID, "user:local:charmander")
 			polMember4 := insertTestPolicyMember(t, db, polID, "user:local:squirtle")
 			polMember5 := insertTestPolicyMember(t, db, polID, "user:local:bulbasaur")
-			assertCount(t, 5, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 5, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 5, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 5, db.QueryRow(membersCount))
 			member1 := genMember(t, "user:local:fred")
 			member2 := genMember(t, "team:saml:notfound1")
 			member3 := genMember(t, "user:local:mary")
@@ -2130,8 +2044,8 @@ func TestRemovePolicyMembers(t *testing.T) {
 				require.Contains(t, resp, polMember5)
 			})
 
-			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 5, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 3, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 5, db.QueryRow(membersCount))
 			assertMembers(t, db, polID, []storage.Member{polMember3, polMember4, polMember5})
 		},
 		"when the policy's projects and the project filter intersect, remove members": func(t *testing.T) {
@@ -2142,8 +2056,8 @@ func TestRemovePolicyMembers(t *testing.T) {
 			insertPolicyProject(t, db, polID, projID1)
 			member1 := insertTestPolicyMember(t, db, polID, "user:local:fred")
 			member2 := insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 			members := []storage.Member{member1, member2}
 
 			ctx = insertProjectsIntoContext(ctx, []string{projID1})
@@ -2153,7 +2067,7 @@ func TestRemovePolicyMembers(t *testing.T) {
 				require.NotNil(t, resp)
 			})
 
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
 		},
 		"when the * project filter is passed, remove members": func(t *testing.T) {
 			ctx := context.Background()
@@ -2163,8 +2077,8 @@ func TestRemovePolicyMembers(t *testing.T) {
 			insertPolicyProject(t, db, polID, projID1)
 			member1 := insertTestPolicyMember(t, db, polID, "user:local:fred")
 			member2 := insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 
 			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 			assertPolicyChange(t, store, func() {
@@ -2173,15 +2087,15 @@ func TestRemovePolicyMembers(t *testing.T) {
 				require.NotNil(t, resp)
 			})
 
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
 		},
 		"when the policy has no projects and (unassigned) is in the projects filter, remove members": func(t *testing.T) {
 			ctx := context.Background()
 			polID := insertTestPolicy(t, db, "testpolicy")
 			member1 := insertTestPolicyMember(t, db, polID, "user:local:fred")
 			member2 := insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 
 			projID1 := "team-rocket"
 			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
@@ -2192,7 +2106,7 @@ func TestRemovePolicyMembers(t *testing.T) {
 				require.NotNil(t, resp)
 			})
 
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
 		},
 		"when the policy's projects and projects filter do not intersect, return NotFound": func(t *testing.T) {
 			ctx := context.Background()
@@ -2202,8 +2116,8 @@ func TestRemovePolicyMembers(t *testing.T) {
 			insertPolicyProject(t, db, polID, projID1)
 			member1 := insertTestPolicyMember(t, db, polID, "user:local:fred")
 			member2 := insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 
 			projID2 := "team-montag"
 			insertTestProject(t, db, projID2, "we like dags", storage.Custom)
@@ -2213,7 +2127,7 @@ func TestRemovePolicyMembers(t *testing.T) {
 				assert.Nil(t, resp)
 				assert.Equal(t, storage_errors.ErrNotFound, err)
 			})
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
 		},
 	}
 
@@ -2259,8 +2173,8 @@ func TestAddPolicyMembers(t *testing.T) {
 			ctx := context.Background()
 			polID := insertTestPolicy(t, db, "testpolicy")
 			member := genMember(t, "user:local:fred")
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertEmpty(t, db.QueryRow(membersCount))
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.AddPolicyMembers(ctx, polID, []storage.Member{member})
@@ -2269,8 +2183,8 @@ func TestAddPolicyMembers(t *testing.T) {
 				require.NotEmpty(t, resp)
 			})
 
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 1, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 1, db.QueryRow(membersCount))
 			assertMembers(t, db, polID, []storage.Member{member})
 		},
 		"adding several members to a policy with NO members results in members being added": func(t *testing.T) {
@@ -2280,8 +2194,8 @@ func TestAddPolicyMembers(t *testing.T) {
 			member2 := genMember(t, "user:local:mary")
 			member3 := genMember(t, "user:local:max")
 			member4 := genMember(t, "user:local:ellen")
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertEmpty(t, db.QueryRow(membersCount))
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.AddPolicyMembers(ctx, polID, []storage.Member{member1, member2, member3, member4})
@@ -2290,8 +2204,8 @@ func TestAddPolicyMembers(t *testing.T) {
 				require.NotEmpty(t, resp)
 			})
 
-			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 4, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 4, db.QueryRow(membersCount))
 			assertMembers(t, db, polID, []storage.Member{member1, member2, member3, member4})
 		},
 		"adding one member to a policy with SOME members succeeds": func(t *testing.T) {
@@ -2299,8 +2213,8 @@ func TestAddPolicyMembers(t *testing.T) {
 			polID := insertTestPolicy(t, db, "testpolicy")
 			member1 := insertTestPolicyMember(t, db, polID, "user:local:fred")
 			member2 := insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 			assertMembers(t, db, polID, []storage.Member{member1, member2})
 			member3 := genMember(t, "user:local:max")
 
@@ -2311,8 +2225,8 @@ func TestAddPolicyMembers(t *testing.T) {
 				require.NotEmpty(t, resp)
 			})
 
-			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 3, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 3, db.QueryRow(membersCount))
 			assertMembers(t, db, polID, []storage.Member{member1, member2, member3})
 		},
 		"adding several members to a policy with SOME members succeeds": func(t *testing.T) {
@@ -2320,8 +2234,8 @@ func TestAddPolicyMembers(t *testing.T) {
 			polID := insertTestPolicy(t, db, "testpolicy")
 			member1 := insertTestPolicyMember(t, db, polID, "user:local:fred")
 			member2 := insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 			assertMembers(t, db, polID, []storage.Member{member1, member2})
 			member3 := genMember(t, "user:local:max")
 			member4 := genMember(t, "user:local:ellen")
@@ -2335,8 +2249,8 @@ func TestAddPolicyMembers(t *testing.T) {
 				require.NotEmpty(t, resp)
 			})
 
-			assertCount(t, 6, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 6, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 6, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 6, db.QueryRow(membersCount))
 			assertMembers(t, db, polID, []storage.Member{member1, member2, member3, member4, member5, member6})
 		},
 		"adding same member more than once w/ single request doesn't result in duplicate policy membership": func(t *testing.T) {
@@ -2344,8 +2258,8 @@ func TestAddPolicyMembers(t *testing.T) {
 			polID := insertTestPolicy(t, db, "testpolicy")
 			member1 := insertTestPolicyMember(t, db, polID, "user:local:fred")
 			member2 := insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 			member3 := genMember(t, "user:local:ellen")
 			repeatMember3 := genMember(t, "user:local:ellen")
 
@@ -2356,8 +2270,8 @@ func TestAddPolicyMembers(t *testing.T) {
 				require.Equal(t, 3, len(resp))
 			})
 
-			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 3, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 3, db.QueryRow(membersCount))
 			assertMembers(t, db, polID, []storage.Member{member1, member2, member3})
 		},
 		"adding same member more than once w/ duplicate request doesn't result in duplicate policy membership": func(t *testing.T) {
@@ -2365,8 +2279,8 @@ func TestAddPolicyMembers(t *testing.T) {
 			polID := insertTestPolicy(t, db, "testpolicy")
 			member1 := insertTestPolicyMember(t, db, polID, "user:local:fred")
 			member2 := insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 			member3 := genMember(t, "user:local:ellen")
 
 			assertPolicyChange(t, store, func() {
@@ -2377,8 +2291,8 @@ func TestAddPolicyMembers(t *testing.T) {
 				require.Equal(t, 3, len(resp))
 			})
 
-			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 3, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 3, db.QueryRow(membersCount))
 			assertMembers(t, db, polID, []storage.Member{member1, member2, member3})
 
 			// This isn't quite right. It's better if we don't update the change id, but that requires
@@ -2391,8 +2305,8 @@ func TestAddPolicyMembers(t *testing.T) {
 				require.Equal(t, 3, len(resp))
 			})
 
-			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 3, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 3, db.QueryRow(membersCount))
 			assertMembers(t, db, polID, []storage.Member{member1, member2, member3})
 		},
 		"adding subset of members that's already part of a different policy succeeds": func(t *testing.T) {
@@ -2403,8 +2317,8 @@ func TestAddPolicyMembers(t *testing.T) {
 			member2 := insertTestPolicyMember(t, db, polID1, "user:local:mary")
 			member3 := insertTestPolicyMember(t, db, polID1, "user:local:ellen")
 			member4 := genMember(t, "user:local:max")
-			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID1))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID2))
+			assertCount(t, 3, db.QueryRow(policyMembersByPolicyID, polID1))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID2))
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.AddPolicyMembers(ctx, polID2, []storage.Member{member1, member2, member3, member4})
@@ -2415,17 +2329,17 @@ func TestAddPolicyMembers(t *testing.T) {
 
 			assertMembers(t, db, polID1, []storage.Member{member1, member2, member3})
 			assertMembers(t, db, polID2, []storage.Member{member1, member2, member3, member4})
-			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID1))
-			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID2))
-			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 3, db.QueryRow(policyMembersByPolicyID, polID1))
+			assertCount(t, 4, db.QueryRow(policyMembersByPolicyID, polID2))
+			assertCount(t, 4, db.QueryRow(membersCount))
 		},
 		"adding members where the members match the existing policy membership results in no new members": func(t *testing.T) {
 			ctx := context.Background()
 			polID := insertTestPolicy(t, db, "testpolicy")
 			member1 := insertTestPolicyMember(t, db, polID, "user:local:fred")
 			member2 := insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.AddPolicyMembers(ctx, polID, []storage.Member{member1, member2})
@@ -2434,8 +2348,8 @@ func TestAddPolicyMembers(t *testing.T) {
 				require.Equal(t, 2, len(resp))
 			})
 
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 			assertMembers(t, db, polID, []storage.Member{member1, member2})
 		},
 		"adding member that's already a member of a different policy doesn't result in additional iam_members entry": func(t *testing.T) {
@@ -2443,9 +2357,9 @@ func TestAddPolicyMembers(t *testing.T) {
 			polID1 := insertTestPolicy(t, db, "testpolicy1")
 			polID2 := insertTestPolicy(t, db, "testpolicy2")
 			member := insertTestPolicyMember(t, db, polID1, "user:local:fred")
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID1))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID2))
+			assertOne(t, db.QueryRow(membersCount))
+			assertOne(t, db.QueryRow(policyMembersByPolicyID, polID1))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID2))
 
 			assertPolicyChange(t, store, func() {
 				resp, err := store.AddPolicyMembers(ctx, polID2, []storage.Member{member})
@@ -2456,9 +2370,9 @@ func TestAddPolicyMembers(t *testing.T) {
 
 			assertMembers(t, db, polID1, []storage.Member{member})
 			assertMembers(t, db, polID2, []storage.Member{member})
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1) and member_id=member_db_id($2)`, polID1, member.Name))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1) and member_id=member_db_id($2)`, polID2, member.Name))
+			assertOne(t, db.QueryRow(membersCount))
+			assertOne(t, db.QueryRow(policyMembersFull, polID1, member.Name))
+			assertOne(t, db.QueryRow(policyMembersFull, polID2, member.Name))
 		},
 		"when the policy's projects and the project filter intersect, add members": func(t *testing.T) {
 			ctx := context.Background()
@@ -2468,8 +2382,8 @@ func TestAddPolicyMembers(t *testing.T) {
 			insertPolicyProject(t, db, polID, projID1)
 			insertTestPolicyMember(t, db, polID, "user:local:fred")
 			insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 
 			member1 := genMember(t, "user:local:max")
 			member2 := genMember(t, "user:local:sue")
@@ -2482,7 +2396,7 @@ func TestAddPolicyMembers(t *testing.T) {
 				require.NotNil(t, resp)
 			})
 
-			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertCount(t, 4, db.QueryRow(policyMembersByPolicyID, polID))
 		},
 		"when the * project filter is passed, add members": func(t *testing.T) {
 			ctx := context.Background()
@@ -2492,8 +2406,8 @@ func TestAddPolicyMembers(t *testing.T) {
 			insertPolicyProject(t, db, polID, projID1)
 			insertTestPolicyMember(t, db, polID, "user:local:fred")
 			insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 
 			member1 := genMember(t, "user:local:max")
 			member2 := genMember(t, "user:local:sue")
@@ -2506,15 +2420,15 @@ func TestAddPolicyMembers(t *testing.T) {
 				require.NotNil(t, resp)
 			})
 
-			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertCount(t, 4, db.QueryRow(policyMembersByPolicyID, polID))
 		},
 		"when the policy has no projects and (unassigned) is in the projects filter, add members": func(t *testing.T) {
 			ctx := context.Background()
 			polID := insertTestPolicy(t, db, "testpolicy")
 			insertTestPolicyMember(t, db, polID, "user:local:fred")
 			insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 
 			member1 := genMember(t, "user:local:max")
 			member2 := genMember(t, "user:local:sue")
@@ -2529,7 +2443,7 @@ func TestAddPolicyMembers(t *testing.T) {
 				require.NotNil(t, resp)
 			})
 
-			assertCount(t, 4, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertCount(t, 4, db.QueryRow(policyMembersByPolicyID, polID))
 		},
 		"when the policy's projects and projects filter do not intersect, return NotFound": func(t *testing.T) {
 			ctx := context.Background()
@@ -2539,8 +2453,8 @@ func TestAddPolicyMembers(t *testing.T) {
 			insertPolicyProject(t, db, polID, projID1)
 			insertTestPolicyMember(t, db, polID, "user:local:fred")
 			insertTestPolicyMember(t, db, polID, "user:local:mary")
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
+			assertCount(t, 2, db.QueryRow(membersCount))
 
 			member1 := genMember(t, "user:local:max")
 			member2 := genMember(t, "user:local:sue")
@@ -2554,7 +2468,7 @@ func TestAddPolicyMembers(t *testing.T) {
 				assert.Nil(t, resp)
 				assert.Equal(t, storage_errors.ErrNotFound, err)
 			})
-			assertCount(t, 2, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
 		},
 	}
 
@@ -2631,12 +2545,10 @@ func TestUpdatePolicy(t *testing.T) {
 				assert.Equal(t, &pol, resp)
 			})
 
-			assertOne(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
+			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertOne(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertOne(t, db.QueryRow(membersCount))
 		},
 		"policy with no statements, changing the type": func(t *testing.T) {
 			ctx := context.Background()
@@ -2659,11 +2571,9 @@ func TestUpdatePolicy(t *testing.T) {
 				assert.Equal(t, &pol, resp)
 			})
 
-			assertOne(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
+			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
 			assertCount(t, 0, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertOne(t, db.QueryRow(policyMembersByPolicyID, polID))
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members WHERE name=$1`, member.Name))
 		},
 		"policy with no statements, adding two statements": func(t *testing.T) {
@@ -2671,17 +2581,14 @@ func TestUpdatePolicy(t *testing.T) {
 			polID := insertTestPolicy(t, db, "testpolicy")
 			insertTestPolicyMember(t, db, polID, "user:local:albertine")
 
-			sID0, sID1 := genUUID(t), genUUID(t)
 			resources, actions := []string{"iam:users"}, []string{"iam:users:create", "iam:users:delete"}
 			member := genMember(t, "user:local:new_member")
 			statement0 := storage.Statement{
-				ID:        sID0,
 				Effect:    storage.Deny,
 				Resources: resources,
 				Actions:   actions,
 			}
 			statement1 := storage.Statement{
-				ID:        sID1,
 				Effect:    storage.Deny,
 				Resources: resources,
 				Actions:   actions,
@@ -2701,14 +2608,11 @@ func TestUpdatePolicy(t *testing.T) {
 				assert.Equal(t, &pol, resp)
 			})
 
-			assertOne(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5)`,
-				sID0, pq.Array(resources), pq.Array(actions), "deny", polID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5)`,
-				sID1, pq.Array(resources), pq.Array(actions), "deny", polID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
+			// there's two, but we don't know their db_id
+			assertCount(t, 2, db.QueryRow(statementQueryFull,
+				pq.Array(resources), pq.Array(actions), "deny", polID))
+			assertOne(t, db.QueryRow(policyMembersByPolicyID, polID))
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members WHERE name=$1`, member.Name))
 		},
 		"policy with two statements, removing one statement": func(t *testing.T) {
@@ -2716,14 +2620,13 @@ func TestUpdatePolicy(t *testing.T) {
 
 			polID := insertTestPolicy(t, db, "testpolicy")
 			sID0 := insertTestStatement(t, db,
-				polID, "allow", "", []string{"iam:users:delete', 'iam:users:create"}, []string{"iam:users"})
+				polID, "allow", "", []string{"iam:users:delete", "iam:users:create"}, []string{"iam:users"})
 			sID1 := insertTestStatement(t, db,
 				polID, "deny", "", []string{"infra:nodes:delete", "infra:nodes:rerun"}, []string{"infra:nodes"})
 			insertTestPolicyMember(t, db, polID, "user:local:albertine")
 
 			resources, actions := []string{"iam:users"}, []string{"iam:users:create", "iam:users:delete"}
 			statement := storage.Statement{
-				ID:        sID0,
 				Effect:    storage.Deny,
 				Resources: resources,
 				Actions:   actions,
@@ -2744,81 +2647,19 @@ func TestUpdatePolicy(t *testing.T) {
 				assert.Equal(t, &pol, resp)
 			})
 
-			assertOne(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 and policy_id=policy_db_id($5)`,
+			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
+			// old statements are removed
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE db_id=$1 AND resources=$2 AND actions=$3 AND effect=$4 and policy_id=policy_db_id($5)`,
 				sID0, pq.Array(resources), pq.Array(actions), "deny", polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5)`,
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE db_id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5)`,
 				sID1, pq.Array(resources), pq.Array(actions), "deny", polID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			// and the new statement is in place
+			assertOne(t, db.QueryRow(statementQueryFull,
+				pq.Array(resources), pq.Array(actions), "deny", polID))
+			assertOne(t, db.QueryRow(policyMembersByPolicyID, polID))
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members WHERE name=$1`, member.Name))
 		},
-		"policy statement conflict with existing policies in store, triggering rollback": func(t *testing.T) {
-			// Note(sr): test case only serves to demonstrate transaction fix for update
-			ctx := context.Background()
-			// add a policy using that statement
-			originalPolID := insertTestPolicy(t, db, "firstpolicy")
-			sID := insertTestStatement(t, db,
-				originalPolID, "deny", "", []string{"iam:users:create", "iam:users:delete"}, []string{"iam:users"})
-			member0 := insertTestPolicyMember(t, db, originalPolID, "user:local:albertine")
 
-			// Add a different policy
-			polID := insertTestPolicy(t, db, "otherpolicy")
-			insertTestStatement(t, db,
-				polID, "deny", "", []string{"compliance:profiles:update"}, []string{"compliance:profiles"})
-			member1 := insertTestPolicyMember(t, db, polID, "user:local:albert")
-
-			// update second policy with statement conflicting with other policy
-			member := genMember(t, "user:local:new_member")
-			resources, actions := []string{"iam:users"}, []string{"iam:users:create", "iam:users:delete"}
-			resources1, actions1 := []string{"iam:teams"}, []string{"iam:teams:create"}
-			sID1 := genUUID(t)
-			statement0 := storage.Statement{
-				ID:        sID1, // fresh
-				Effect:    storage.Deny,
-				Resources: resources1,
-				Actions:   actions1,
-			}
-			statement1 := storage.Statement{
-				ID:        sID, // conflict
-				Effect:    storage.Deny,
-				Resources: resources,
-				Actions:   actions,
-			}
-			name, typeVal := "new-name", storage.Custom
-			pol := storage.Policy{
-				ID:         polID,
-				Name:       name,
-				Members:    []storage.Member{member},
-				Type:       typeVal,
-				Statements: []storage.Statement{statement0, statement1},
-			}
-
-			assertNoPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol)
-				assert.Error(t, err)
-				assert.Nil(t, resp)
-			})
-
-			// The first policy was left intact
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, originalPolID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5)`,
-				sID, pq.Array(resources), pq.Array(actions), "deny", originalPolID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1) AND member_id=member_db_id($2)`, originalPolID, member0.Name))
-
-			// The update of the second policy was NOT half-done
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5)`,
-				sID1, pq.Array(resources1), pq.Array(actions1), "deny", polID))
-
-			// The policy has no new statement after the update
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
-
-			// and the policy members have not changed
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1) AND member_id=member_db_id($2)`, polID, member1.Name))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1) AND member_id=(SELECT db_id FROM iam_members WHERE name=$2)`, polID, member.Name))
-		},
 		"policy with one statement, adding existing project to statement": func(t *testing.T) {
 			ctx := context.Background()
 
@@ -2832,7 +2673,6 @@ func TestUpdatePolicy(t *testing.T) {
 
 			resources, actions := []string{"iam:users"}, []string{"iam:users:create", "iam:users:delete"}
 			statement := storage.Statement{
-				ID:        sID,
 				Effect:    storage.Deny,
 				Resources: resources,
 				Actions:   actions,
@@ -2853,15 +2693,15 @@ func TestUpdatePolicy(t *testing.T) {
 				assert.Equal(t, &pol, resp)
 			})
 
-			assertOne(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
+			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5)`,
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1)`, projID))
+			// removed in update
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE db_id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5)`,
 				sID, pq.Array(resources), pq.Array(actions), "deny", polID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE statement_id=statement_db_id($1) AND project_id=project_db_id($2)`, sID, projID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE statement_id=$1 AND project_id=project_db_id($2)`, sID, projID))
 
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertOne(t, db.QueryRow(policyMembersByPolicyID, polID))
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members WHERE name=$1`, member.Name))
 		},
 		"policy with one statement, adding non-existent project to statement fails": func(t *testing.T) {
@@ -2876,7 +2716,6 @@ func TestUpdatePolicy(t *testing.T) {
 			member := insertTestPolicyMember(t, db, polID, "user:local:totodile")
 
 			statement := storage.Statement{
-				ID:        sID,
 				Effect:    storage.Allow,
 				Resources: resources,
 				Actions:   actions,
@@ -2900,16 +2739,14 @@ func TestUpdatePolicy(t *testing.T) {
 			})
 
 			// no update to policy or members
-			assertEmpty(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, newName, typeVal.String()))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`, polID, "testpolicy", typeVal.String()))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
+			assertEmpty(t, db.QueryRow(policyFull, polID, newName, typeVal.String()))
+			assertOne(t, db.QueryRow(policyFull, polID, "testpolicy", typeVal.String()))
+			assertOne(t, db.QueryRow(policyMembersByPolicyID, polID))
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members WHERE name=$1`, member.Name))
 
 			// no update to statement
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE statement_id=statement_db_id($1) AND project_id=project_db_id($2)`, sID, projID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5)`,
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE statement_id=$1 AND project_id=project_db_id($2)`, sID, projID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE db_id=$1 AND resources=$2 AND actions=$3 AND effect=$4 AND policy_id=policy_db_id($5)`,
 				sID, pq.Array(resources), pq.Array(actions), "allow", polID))
 		},
 		"policy with no projects to some projects": func(t *testing.T) {
@@ -2931,11 +2768,11 @@ func TestUpdatePolicy(t *testing.T) {
 				require.NoError(t, err)
 				assert.ElementsMatch(t, []string{projID}, resp.Projects)
 			})
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertOne(t, db.QueryRow(policyWithID, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertEmpty(t, db.QueryRow(membersCount))
+			assertOne(t, db.QueryRow(policyProjectsByProjectID, polID))
 		},
 		"policy with project to no projects": func(t *testing.T) {
 			ctx := context.Background()
@@ -2945,7 +2782,7 @@ func TestUpdatePolicy(t *testing.T) {
 			projID := "special-project"
 			insertTestProject(t, db, projID, "too special", storage.Custom)
 			insertPolicyProject(t, db, polID, projID)
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID))
+			assertOne(t, db.QueryRow(policyProjectsByProjectID, polID))
 
 			expProjs := []string{}
 			pol := storage.Policy{
@@ -2959,11 +2796,11 @@ func TestUpdatePolicy(t *testing.T) {
 				require.NoError(t, err)
 				assert.ElementsMatch(t, expProjs, resp.Projects)
 			})
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertOne(t, db.QueryRow(policyWithID, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertEmpty(t, db.QueryRow(membersCount))
+			assertEmpty(t, db.QueryRow(policyProjectsByProjectID, polID))
 		},
 		"policy with projects to same projects": func(t *testing.T) {
 			ctx := context.Background()
@@ -2978,7 +2815,7 @@ func TestUpdatePolicy(t *testing.T) {
 			projID2 := "ordinary-project"
 			insertTestProject(t, db, projID2, "too ordinary", storage.Custom)
 			insertPolicyProject(t, db, polID, projID2)
-			initPolProjCount := db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID)
+			initPolProjCount := db.QueryRow(policyProjectsByProjectID, polID)
 			assertCount(t, 2, initPolProjCount)
 
 			expProjs := []string{projID, projID2}
@@ -2993,11 +2830,11 @@ func TestUpdatePolicy(t *testing.T) {
 				require.NoError(t, err)
 				assert.Equal(t, expProjs, resp.Projects)
 			})
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertOne(t, db.QueryRow(policyWithID, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
-			expPolProjCount := db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID)
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertEmpty(t, db.QueryRow(membersCount))
+			expPolProjCount := db.QueryRow(policyProjectsByProjectID, polID)
 			assertCount(t, 2, expPolProjCount)
 		},
 		"policy with single project to diff project": func(t *testing.T) {
@@ -3005,12 +2842,12 @@ func TestUpdatePolicy(t *testing.T) {
 			name := "testPolicy"
 			polID := insertTestPolicy(t, db, name)
 
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID))
+			assertEmpty(t, db.QueryRow(policyProjectsByProjectID, polID))
 
 			projID := "special-project"
 			insertTestProject(t, db, projID, "too special", storage.Custom)
 			insertPolicyProject(t, db, polID, projID)
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID))
+			assertOne(t, db.QueryRow(policyProjectsByProjectID, polID))
 
 			projID2 := "ordinary-project"
 			insertTestProject(t, db, projID2, "too ordinary", storage.Custom)
@@ -3027,22 +2864,22 @@ func TestUpdatePolicy(t *testing.T) {
 				assert.ElementsMatch(t, expProjs, resp.Projects)
 			})
 
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertOne(t, db.QueryRow(policyWithID, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertEmpty(t, db.QueryRow(membersCount))
+			assertOne(t, db.QueryRow(policyProjectsByProjectID, polID))
 		},
 		"policy with one project to additional project": func(t *testing.T) {
 			ctx := context.Background()
 			name := "testPolicy"
 			polID := insertTestPolicy(t, db, name)
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID))
+			assertEmpty(t, db.QueryRow(policyProjectsByProjectID, polID))
 
 			projID := "special-project"
 			insertTestProject(t, db, projID, "too special", storage.Custom)
 			insertPolicyProject(t, db, polID, projID)
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID))
+			assertOne(t, db.QueryRow(policyProjectsByProjectID, polID))
 
 			projID2 := "another-project"
 			insertTestProject(t, db, projID2, "more", storage.Custom)
@@ -3060,12 +2897,12 @@ func TestUpdatePolicy(t *testing.T) {
 				assert.Equal(t, expProjs, resp.Projects)
 			})
 
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertOne(t, db.QueryRow(policyWithID, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertEmpty(t, db.QueryRow(membersCount))
 
-			projCount := db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID)
+			projCount := db.QueryRow(policyProjectsByProjectID, polID)
 			assertCount(t, 2, projCount)
 		},
 		"policy with project to add non-existent project fails": func(t *testing.T) {
@@ -3076,7 +2913,7 @@ func TestUpdatePolicy(t *testing.T) {
 			projID := "special-project"
 			insertTestProject(t, db, projID, "too special", storage.Custom)
 			insertPolicyProject(t, db, polID, projID)
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID))
+			assertOne(t, db.QueryRow(policyProjectsByProjectID, polID))
 
 			pol := storage.Policy{
 				ID:       polID,
@@ -3090,11 +2927,11 @@ func TestUpdatePolicy(t *testing.T) {
 				assert.Nil(t, resp)
 			})
 
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
+			assertOne(t, db.QueryRow(policyWithID, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)`, polID))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertEmpty(t, db.QueryRow(membersCount))
+			assertOne(t, db.QueryRow(policyProjectsByProjectID, polID))
 		},
 		"when the policy's projects and the project filter intersect, update policy": func(t *testing.T) {
 			ctx := context.Background()
@@ -3116,9 +2953,7 @@ func TestUpdatePolicy(t *testing.T) {
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
-			assertOne(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
+			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
 		},
 		"when the * project filter is passed, update policy": func(t *testing.T) {
 			ctx := context.Background()
@@ -3140,9 +2975,7 @@ func TestUpdatePolicy(t *testing.T) {
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
-			assertOne(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
+			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
 		},
 		"when the policy has no projects and (unassigned) is in the projects filter, update policy": func(t *testing.T) {
 			ctx := context.Background()
@@ -3162,9 +2995,7 @@ func TestUpdatePolicy(t *testing.T) {
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
-			assertOne(t,
-				db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3`,
-					polID, name, typeVal.String()))
+			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
 		},
 		"when the policy's projects and projects filter do not intersect, return NotFound": func(t *testing.T) {
 			ctx := context.Background()
@@ -4717,14 +4548,14 @@ func TestDeleteProject(t *testing.T) {
 			})
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, project1.ID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0))
+			assertEmpty(t, db.QueryRow(policyWithID, polID))
+			assertEmpty(t, db.QueryRow(statementWithID, sID0))
 
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polIDOther))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0Other))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID1Other))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=statement_db_id($2)`, project2.ID, sID0Other))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=statement_db_id($2)`, project2.ID, sID1Other))
+			assertOne(t, db.QueryRow(policyWithID, polIDOther))
+			assertOne(t, db.QueryRow(statementWithID, sID0Other))
+			assertOne(t, db.QueryRow(statementWithID, sID1Other))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=$2`, project2.ID, sID0Other))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=$2`, project2.ID, sID1Other))
 		}},
 		{"when a policy contains multiples statement and those statements contain a single project, on project deletion, the statement and policy are deleted", func(t *testing.T) {
 			ctx := context.Background()
@@ -4764,15 +4595,15 @@ func TestDeleteProject(t *testing.T) {
 			})
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, project1.ID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID1))
+			assertEmpty(t, db.QueryRow(policyWithID, polID))
+			assertEmpty(t, db.QueryRow(statementWithID, sID0))
+			assertEmpty(t, db.QueryRow(statementWithID, sID1))
 
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polIDOther))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0Other))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID1Other))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=statement_db_id($2)`, project2.ID, sID0Other))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=statement_db_id($2)`, project2.ID, sID1Other))
+			assertOne(t, db.QueryRow(policyWithID, polIDOther))
+			assertOne(t, db.QueryRow(statementWithID, sID0Other))
+			assertOne(t, db.QueryRow(statementWithID, sID1Other))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=$2`, project2.ID, sID0Other))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=$2`, project2.ID, sID1Other))
 		}},
 		{"when a policy contains multiples statement and those statements contain different projects, on one project deletion, one statement is deleted and the policy remains", func(t *testing.T) {
 			ctx := context.Background()
@@ -4812,19 +4643,19 @@ func TestDeleteProject(t *testing.T) {
 			})
 
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, project1.ID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0))
+			assertEmpty(t, db.QueryRow(statementWithID, sID0))
 
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID1))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID1))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=statement_db_id($2)`, project2.ID, sID1))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=statement_db_id($2)`, project2.ID, sID1))
+			assertOne(t, db.QueryRow(policyWithID, polID))
+			assertOne(t, db.QueryRow(statementWithID, sID1))
+			assertOne(t, db.QueryRow(statementWithID, sID1))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=$2`, project2.ID, sID1))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=$2`, project2.ID, sID1))
 
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polIDOther))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0Other))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID1Other))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=statement_db_id($2)`, project2.ID, sID0Other))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=statement_db_id($2)`, project2.ID, sID1Other))
+			assertOne(t, db.QueryRow(policyWithID, polIDOther))
+			assertOne(t, db.QueryRow(statementWithID, sID0Other))
+			assertOne(t, db.QueryRow(statementWithID, sID1Other))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=$2`, project2.ID, sID0Other))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=$2`, project2.ID, sID1Other))
 		}},
 		{"deletes project with one project in database", func(t *testing.T) {
 			ctx := context.Background()
@@ -5784,7 +5615,7 @@ func TestReset(t *testing.T) {
 
 			require.NoError(t, store.Reset(ctx))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies`))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members`))
+			assertEmpty(t, db.QueryRow(membersCount))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_roles`))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects`))
 		},
@@ -5886,13 +5717,13 @@ func TestDeleteRole(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_roles WHERE id=$1`, roleDeleted.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_roles`))
 
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID1))
+			assertEmpty(t, db.QueryRow(policyWithID, polID))
+			assertEmpty(t, db.QueryRow(statementWithID, sID0))
+			assertEmpty(t, db.QueryRow(statementWithID, sID1))
 
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polIDWrongRole))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND role_id=role_db_id($2)`, sID0WrongRole, roleRemaining.ID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND role_id=role_db_id($2)`, sID1WrongRole, roleRemaining.ID))
+			assertOne(t, db.QueryRow(policyWithID, polIDWrongRole))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE db_id=$1 AND role_id=role_db_id($2)`, sID0WrongRole, roleRemaining.ID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE db_id=$1 AND role_id=role_db_id($2)`, sID1WrongRole, roleRemaining.ID))
 		},
 		"when one statement contains a role and as well as actions but one statement contains no actions, on role deletion there is only one modified statement remaining": func(t *testing.T) {
 			ctx := context.Background()
@@ -5924,13 +5755,13 @@ func TestDeleteRole(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_roles WHERE id=$1`, roleDeleted.ID))
 			assertCount(t, 1, db.QueryRow(`SELECT count(*) FROM iam_roles`))
 
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polID))
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1`, sID0))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND actions=$2 AND role_id IS NULL`, sID1, pq.Array(actions)))
+			assertOne(t, db.QueryRow(policyWithID, polID))
+			assertEmpty(t, db.QueryRow(statementWithID, sID0))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE db_id=$1 AND actions=$2 AND role_id IS NULL`, sID1, pq.Array(actions)))
 
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policies WHERE id=$1`, polIDWrongRole))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND role_id=role_db_id($2)`, sID0WrongRole, roleRemaining.ID))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE id=$1 AND role_id=role_db_id($2)`, sID1WrongRole, roleRemaining.ID))
+			assertOne(t, db.QueryRow(policyWithID, polIDWrongRole))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE db_id=$1 AND role_id=role_db_id($2)`, sID0WrongRole, roleRemaining.ID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE db_id=$1 AND role_id=role_db_id($2)`, sID1WrongRole, roleRemaining.ID))
 		},
 		"deletes role with several roles in database when projects filter has intersection": func(t *testing.T) {
 			ctx := context.Background()
@@ -6601,7 +6432,7 @@ func TestPurgeSubjectFromPolicies(t *testing.T) {
 			require.NoError(t, err)
 			assert.Empty(t, ids)
 
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE member_id=member_db_id($1)`, member.Name))
+			assertOne(t, db.QueryRow(policyMembersByMemberName, member.Name))
 		}},
 		{"one policy matches, returns this policy's ID", func(t *testing.T) {
 			polID := insertTestPolicy(t, db, "testpolicy")
@@ -6611,7 +6442,7 @@ func TestPurgeSubjectFromPolicies(t *testing.T) {
 			require.NoError(t, err)
 			assert.Equal(t, []string{polID}, ids)
 
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE member_id=member_db_id($1)`, member.Name))
+			assertEmpty(t, db.QueryRow(policyMembersByMemberName, member.Name))
 		}},
 		{"two policies match, returns their IDs", func(t *testing.T) {
 			polID0 := insertTestPolicy(t, db, "testpolicy0")
@@ -6624,7 +6455,7 @@ func TestPurgeSubjectFromPolicies(t *testing.T) {
 			require.NoError(t, err)
 			assert.ElementsMatch(t, []string{polID0, polID1}, ids)
 
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE member_id=member_db_id($1)`, member.Name))
+			assertEmpty(t, db.QueryRow(policyMembersByMemberName, member.Name))
 		}},
 		{"one policy matches, with extra members, those are kept intact", func(t *testing.T) {
 			polID := insertTestPolicy(t, db, "testpolicy")
@@ -6635,8 +6466,8 @@ func TestPurgeSubjectFromPolicies(t *testing.T) {
 			require.NoError(t, err)
 			assert.Equal(t, []string{polID}, ids)
 
-			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE member_id=member_db_id($1)`, member0.Name))
-			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE member_id=member_db_id($1)`, member1.Name))
+			assertEmpty(t, db.QueryRow(policyMembersByMemberName, member0.Name))
+			assertOne(t, db.QueryRow(policyMembersByMemberName, member1.Name))
 		}},
 	}
 
@@ -6692,7 +6523,7 @@ func assertMembers(t *testing.T, db *testhelpers.TestDB, policyID string, member
 
 func assertNoMembers(t *testing.T, db *testhelpers.TestDB, policyID string, members []storage.Member) {
 	t.Helper()
-	assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policy_members WHERE policy_id=policy_db_id($1)`, policyID))
+	assertEmpty(t, db.QueryRow(policyMembersByPolicyID, policyID))
 	for _, member := range members {
 		assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_members WHERE name=$1`, member.Name))
 	}
@@ -6740,13 +6571,6 @@ func assertPolicies(t *testing.T, expectedPolicies, returnedPolicies []*storage.
 	assert.ElementsMatch(t, expectedPolicies, returnedPolicies)
 }
 
-func genUUID(t *testing.T) uuid.UUID {
-	t.Helper()
-	id, err := uuid.New()
-	require.NoError(t, err)
-	return id
-}
-
 func genSimpleID(t *testing.T, p *prng.Prng) string {
 	t.Helper()
 	faker := faker.NewWithSeed(p)
@@ -6779,43 +6603,39 @@ func insertTestPolicy(t *testing.T, db *testhelpers.TestDB, policyName string) s
 
 // pass "" as roleID if you do not wish to populate a role
 func insertTestStatement(t *testing.T, db *testhelpers.TestDB,
-	policyID, effect, roleID string, actions, resources []string) uuid.UUID {
+	policyID, effect, roleID string, actions, resources []string) int {
 
-	var id string
+	var dbID int
 	if roleID != "" {
 		row := db.QueryRow(`
-		INSERT INTO iam_statements (id, policy_id, effect, role_id, actions, resources)
-			VALUES (uuid_generate_v4(), policy_db_id($1), $2::iam_effect, role_db_id($3), $4, $5) RETURNING id`,
+		INSERT INTO iam_statements (policy_id, effect, role_id, actions, resources)
+			VALUES (policy_db_id($1), $2::iam_effect, role_db_id($3), $4, $5) RETURNING db_id`,
 			policyID, effect, roleID, pq.Array(actions), pq.Array(resources))
-		require.NoError(t, row.Scan(&id))
+		require.NoError(t, row.Scan(&dbID))
 
 		assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE
-			id=$1 AND
-			policy_id=policy_db_id($2) AND
-			effect=$3 AND
-			actions=$4 AND
-			resources=$5 AND
-			role_id=role_db_id($6)`,
-			id, policyID, effect, pq.Array(actions), pq.Array(resources), roleID))
+			policy_id=policy_db_id($1) AND
+			effect=$2 AND
+			actions=$3 AND
+			resources=$4 AND
+			role_id=role_db_id($5)`,
+			policyID, effect, pq.Array(actions), pq.Array(resources), roleID))
 	} else {
 		row := db.QueryRow(`
-		INSERT INTO iam_statements (id, policy_id, effect, actions, resources)
-			VALUES (uuid_generate_v4(), policy_db_id($1), $2::iam_effect, $3, $4) RETURNING id`,
+		INSERT INTO iam_statements (policy_id, effect, actions, resources)
+			VALUES (policy_db_id($1), $2::iam_effect, $3, $4) RETURNING db_id`,
 			policyID, effect, pq.Array(actions), pq.Array(resources))
-		require.NoError(t, row.Scan(&id))
+		require.NoError(t, row.Scan(&dbID))
 
 		assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE
-			id=$1 AND
-			policy_id=policy_db_id($2) AND
-			effect=$3 AND
-			actions=$4 AND
-			resources=$5 AND
+			policy_id=policy_db_id($1) AND
+			effect=$2 AND
+			actions=$3 AND
+			resources=$4 AND
 			role_id IS NULL`,
-			id, policyID, effect, pq.Array(actions), pq.Array(resources)))
+			policyID, effect, pq.Array(actions), pq.Array(resources)))
 	}
-	uuid, err := uuid.FromString(id)
-	require.NoError(t, err)
-	return uuid
+	return dbID
 }
 
 // Will fail on conflict with existing name.
@@ -6868,10 +6688,10 @@ func insertPolicyProject(t *testing.T, db *testhelpers.TestDB, policyID string, 
 	require.NoError(t, err)
 }
 
-func insertStatementProject(t *testing.T, db *testhelpers.TestDB, statementID uuid.UUID, projectId string) {
+func insertStatementProject(t *testing.T, db *testhelpers.TestDB, statementID int, projectId string) {
 	t.Helper()
 	_, err := db.Exec(`
-			INSERT INTO iam_statement_projects (statement_id, project_id) VALUES (statement_db_id($1), project_db_id($2));`,
+			INSERT INTO iam_statement_projects (statement_id, project_id) VALUES ($1, project_db_id($2));`,
 		statementID, projectId)
 	require.NoError(t, err)
 }

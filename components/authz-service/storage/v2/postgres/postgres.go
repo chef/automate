@@ -332,8 +332,8 @@ func (p *pg) insertPolicyStatementsWithQuerier(ctx context.Context,
 	q Querier) error {
 	for _, s := range inputStatements {
 		_, err := q.ExecContext(ctx,
-			`SELECT insert_iam_statement_into_policy($1, $2, $3, $4, $5, $6, $7);`,
-			policyID, s.ID, s.Effect.String(), pq.Array(s.Actions),
+			`SELECT insert_iam_statement_into_policy($1, $2, $3, $4, $5, $6);`,
+			policyID, s.Effect.String(), pq.Array(s.Actions),
 			pq.Array(s.Resources), s.Role, pq.Array(s.Projects),
 		)
 		if err != nil {
@@ -754,7 +754,7 @@ func (p *pg) DeleteRole(ctx context.Context, id string) error {
 		return storage_errors.ErrNotFound
 	}
 
-	res, err := tx.ExecContext(ctx, `DELETE FROM iam_roles WHERE id=$1;`, id)
+	res, err := tx.ExecContext(ctx, "DELETE FROM iam_roles WHERE id=$1", id)
 	if err != nil {
 		return p.processError(err)
 	}

@@ -65,3 +65,4 @@
 - [`63_make_db_id_lookup_functions_strict.up.sql`](63_make_db_id_lookup_functions_strict.up.sql)
 - [`64_drop_uuid_of_iam_members.up.sql`](64_drop_uuid_of_iam_members.up.sql)
 - [`65_iam_projects_drop_projects_column.up.sql`](65_iam_projects_drop_projects_column.up.sql)
+- [`66_iam_statements_drop_id_column.up.sql`](66_iam_statements_drop_id_column.up.sql)
