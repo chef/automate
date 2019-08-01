@@ -114,7 +114,7 @@ func main() {
 	flag.StringVar(&version, "version", "0.1.0", "The version of a package")
 	flag.StringVar(&release, "release", t.Format("20060102150405"), "The release of a package")
 	flag.StringVar(&channel, "channel", "", "The habitat channel name that the service is subscribed to")
-	flag.StringVar(&strategy, "strategy", "at-once", "The habitat update strategy for the service. [ at-once | rolling ]")
+	flag.StringVar(&strategy, "strategy", "at-once", "The habitat update strategy for the service. [ at-once | rolling | unrecognized ]")
 	flag.IntVar(&health, "health", 0, "The health check code of a service")
 	flag.BoolVar(&uniqID, "uniq-client-id", false, "Generate a unique client-id to connect to server")
 	flag.BoolVar(&infiniteLoop, "infinite-stream", false, "Publish message every second infinitely")
@@ -142,8 +142,19 @@ func main() {
 				Strategy: habitat.UpdateStrategy_Rolling,
 				Channel:  channel,
 			}
+		case "unrecognized":
+			event.ServiceMetadata.UpdateConfig = &habitat.UpdateConfig{
+				// "unrecognized" isn't a real update strategy, it's the Automate term
+				// for an update strategy that isn't a recognized enum member in the
+				// version of automate that's running. This would happen if a new
+				// update strategy is added to habitat but automate doesn't have the
+				// updated protobuf definition. To send this kind of message across the
+				// wire requires some shenanigans:
+				Strategy: habitat.UpdateStrategy(int32(2)),
+				Channel:  channel,
+			}
 		default:
-			fmt.Println("Unknown update strategy, choose between 'at-once' and 'rolling'.")
+			fmt.Println("Unknown update strategy, choose between 'at-once', 'rolling', or 'unrecognized'.")
 			os.Exit(1)
 		}
 	}
