@@ -337,7 +337,7 @@ func (s *CerealService) DequeueTask(req cereal.Cereal_DequeueTaskServer) error {
 		return err
 	}
 
-	logctx = logrus.WithFields(logrus.Fields{
+	logctx = logctx.WithFields(logrus.Fields{
 		"task_name": deqMsg.TaskName,
 	})
 
