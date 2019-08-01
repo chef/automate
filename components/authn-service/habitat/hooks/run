@@ -12,10 +12,9 @@ pg-helper ensure-service-database "{{cfg.storage.database}}"
 pg-helper create-extension "{{cfg.storage.database}}" "pgcrypto"
 
 {{~#eachAlive bind.automate-dex.members as |member|}}
-  {{~#if @last}}
-# Add dex to no_proxy
+{{~#if @last}}
 addNoProxy {{member.sys.ip}}
-  {{~/if}}
+{{~/if}}
 {{~/eachAlive}}
 {{~#eachAlive bind.teams-service.members as |teams-service|}}
 {{~#if @last}}

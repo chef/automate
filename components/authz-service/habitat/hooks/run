@@ -22,4 +22,10 @@ rm -rf {{pkg.svc_static_path}}/{migrations,data-migrations}
 cp -r {{pkg.path}}/migrations {{pkg.svc_static_path}}
 cp -r {{pkg.path}}/data-migrations {{pkg.svc_static_path}}
 
+{{~#eachAlive bind.event-service.members as |event-service|}}
+{{~#if @last}}
+addNoProxy {{event-service.sys.ip}}
+{{~/if}}
+{{~/eachAlive}}
+
 exec authz-service {{pkg.svc_config_path}}/config.yml
