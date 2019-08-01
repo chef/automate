@@ -1,3 +1,5 @@
+// +build integration
+
 package integration
 
 import (
@@ -52,7 +54,7 @@ func (suite *CerealTestSuite) TestSimpleScheduleWorkflow() {
 		),
 		WithNoStart(),
 	)
-	defer m.Stop()
+	defer m.Stop() // nolint: errcheck
 	recurrence, err := rrule.NewRRule(rrule.ROption{
 		Freq:     rrule.SECONDLY,
 		Interval: 10,
@@ -71,6 +73,7 @@ func (suite *CerealTestSuite) TestSimpleScheduleWorkflow() {
 
 	found := false
 	schedules, err := m.ListWorkflowSchedules(context.Background())
+	suite.Require().NoError(err)
 	for _, s := range schedules {
 		if s.WorkflowName == workflowName && s.InstanceName == instanceName {
 			found = true
@@ -105,7 +108,7 @@ func (suite *CerealTestSuite) TestScheduleUpdates() {
 		),
 		WithNoStart(),
 	)
-	defer m.Stop()
+	defer m.Stop() // nolint: errcheck
 
 	recurrence, err := rrule.NewRRule(rrule.ROption{
 		Freq:     rrule.SECONDLY,
@@ -204,7 +207,7 @@ func (suite *CerealTestSuite) TestExpiringSchedule() {
 		),
 		WithNoStart(),
 	)
-	defer m.Stop()
+	defer m.Stop() // nolint: errcheck
 
 	// This recurrence is expected to run one time starting now. It's reoccurs
 	// every 10 seconds, but that's not possible because the rule is only good
@@ -229,6 +232,7 @@ func (suite *CerealTestSuite) TestExpiringSchedule() {
 
 	found := false
 	schedules, err := m.ListWorkflowSchedules(context.Background())
+	suite.Require().NoError(err)
 	for _, s := range schedules {
 		spew.Dump(s)
 		if s.WorkflowName == workflowName && s.InstanceName == instanceName {
@@ -244,6 +248,7 @@ func (suite *CerealTestSuite) TestExpiringSchedule() {
 
 	found = false
 	schedules, err = m.ListWorkflowSchedules(context.Background())
+	suite.Require().NoError(err)
 	for _, s := range schedules {
 		if s.WorkflowName == workflowName && s.InstanceName == instanceName {
 			suite.Assert().False(s.Enabled,

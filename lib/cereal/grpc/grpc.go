@@ -79,7 +79,7 @@ func (c *workflowCompleter) EnqueueTask(task *backend.Task, opts backend.TaskEnq
 }
 
 func (c *workflowCompleter) Continue(payload []byte) error {
-	defer c.s.CloseSend()
+	defer c.s.CloseSend() // nolint: errcheck
 	err := c.s.Send(&grpccereal.DequeueWorkflowRequest{
 		Cmd: &grpccereal.DequeueWorkflowRequest_Continue_{
 			Continue: &grpccereal.DequeueWorkflowRequest_Continue{
@@ -91,13 +91,16 @@ func (c *workflowCompleter) Continue(payload []byte) error {
 	if err != nil {
 		return err
 	}
-	c.s.CloseSend()
+	if err := c.s.CloseSend(); err != nil {
+		logrus.WithError(err).Error("failed to continue workflow")
+		return err
+	}
 	_, _ = c.s.Recv()
 	return nil
 }
 
 func (c *workflowCompleter) Fail(errMsg error) error {
-	defer c.s.CloseSend()
+	defer c.s.CloseSend() // nolint: errcheck
 	err := c.s.Send(&grpccereal.DequeueWorkflowRequest{
 		Cmd: &grpccereal.DequeueWorkflowRequest_Fail_{
 			Fail: &grpccereal.DequeueWorkflowRequest_Fail{
@@ -108,13 +111,16 @@ func (c *workflowCompleter) Fail(errMsg error) error {
 	if err != nil {
 		return err
 	}
-	c.s.CloseSend()
+	if err := c.s.CloseSend(); err != nil {
+		logrus.WithError(err).Error("failed to fail workflow")
+		return err
+	}
 	_, _ = c.s.Recv()
 	return nil
 }
 
 func (c *workflowCompleter) Done(result []byte) error {
-	defer c.s.CloseSend()
+	defer c.s.CloseSend() // nolint: errcheck
 	err := c.s.Send(&grpccereal.DequeueWorkflowRequest{
 		Cmd: &grpccereal.DequeueWorkflowRequest_Done_{
 			Done: &grpccereal.DequeueWorkflowRequest_Done{
@@ -125,7 +131,10 @@ func (c *workflowCompleter) Done(result []byte) error {
 	if err != nil {
 		return err
 	}
-	c.s.CloseSend()
+	if err := c.s.CloseSend(); err != nil {
+		logrus.WithError(err).Error("failed to complete workflow")
+		return err
+	}
 	_, _ = c.s.Recv()
 	return nil
 }
@@ -231,7 +240,7 @@ func (c *taskCompleter) Context() context.Context {
 }
 
 func (c *taskCompleter) Fail(errMsg string) error {
-	defer c.s.CloseSend()
+	defer c.s.CloseSend() // nolint: errcheck
 	logrus.Info("Failing")
 	err := c.s.Send(&grpccereal.DequeueTaskRequest{
 		Cmd: &grpccereal.DequeueTaskRequest_Fail_{
@@ -252,7 +261,7 @@ func (c *taskCompleter) Fail(errMsg string) error {
 }
 
 func (c *taskCompleter) Succeed(result []byte) error {
-	defer c.s.CloseSend()
+	defer c.s.CloseSend() // nolint: errcheck
 	logrus.Info("Succeeding")
 	err := c.s.Send(&grpccereal.DequeueTaskRequest{
 		Cmd: &grpccereal.DequeueTaskRequest_Succeed_{
