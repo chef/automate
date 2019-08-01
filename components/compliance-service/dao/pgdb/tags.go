@@ -1,10 +1,9 @@
 package pgdb
 
 import (
-	"encoding/json"
+	"github.com/pkg/errors"
 
 	"github.com/chef/automate/components/compliance-service/api/common"
-	"github.com/pkg/errors"
 )
 
 type tag struct {
@@ -67,31 +66,4 @@ func RemoveKeyValue(tags []*common.Kv, key string) []*common.Kv {
 		}
 	}
 	return tags
-}
-
-// KeyValueToRawMap helps convert an array of KeyValues in a Map and convert it to json
-func KeyValueToRawMap(arr []*common.Kv) (json.RawMessage, error) {
-	zaMap := make(map[string]string, 0)
-	for _, kv := range arr {
-		zaMap[kv.Key] = kv.Value
-	}
-	jsonMap, err := json.Marshal(zaMap)
-	if err != nil {
-		return jsonMap, errors.Wrap(err, "keyValueToRawMap unable to marshal map")
-	}
-	return jsonMap, nil
-}
-
-// RawMapToKeyValue helps convert an array of KeyValues in a Map and convert it to json
-func RawMapToKeyValue(rawJSON json.RawMessage) ([]*common.Kv, error) {
-	var zaMap map[string]string
-	var zaArray []*common.Kv
-	err := json.Unmarshal(rawJSON, &zaMap)
-	if err != nil {
-		return zaArray, errors.Wrap(err, "rawMapToKeyValue unable to unmarshal map")
-	}
-	for k, v := range zaMap {
-		zaArray = append(zaArray, &common.Kv{Key: k, Value: v})
-	}
-	return zaArray, nil
 }
