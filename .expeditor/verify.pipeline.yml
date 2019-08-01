@@ -482,7 +482,7 @@ steps:
     command:
       - scripts/install_golang.sh
       - cd components/pg-sidecar-service
-      - go test -v ./pkg/...
+      - make lint test
     timeout_in_minutes: 10
     retry:
       automatic:

@@ -18,6 +18,7 @@ import (
 	"github.com/chef/automate/components/pg-sidecar-service/pkg/pgw"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/platform"
 	"github.com/chef/automate/lib/tracing"
 	"github.com/chef/automate/lib/version"
@@ -126,7 +127,7 @@ func (p *PGSidecarServer) SetPublicSchemaRole(ctx context.Context, req *api.SetP
 	if err != nil {
 		return res, status.New(codes.FailedPrecondition, err.Error()).Err()
 	}
-	defer client.Close()
+	defer fileutils.LogClose(client, logrus.StandardLogger(), "failed to close client")
 
 	proc, err := p.queueSerialProcedure(
 		ctx,
@@ -149,7 +150,7 @@ func (p *PGSidecarServer) AlterRole(ctx context.Context, req *api.AlterRoleReq) 
 	if err != nil {
 		return res, status.New(codes.FailedPrecondition, err.Error()).Err()
 	}
-	defer client.Close()
+	defer fileutils.LogClose(client, logrus.StandardLogger(), "failed to close client")
 
 	query := pgw.NewAlterRoleQuery()
 	b, err = json.Marshal(req.With)
@@ -188,7 +189,7 @@ func (p *PGSidecarServer) CreateDB(ctx context.Context, req *api.CreateDBReq) (*
 	if err != nil {
 		return res, status.New(codes.FailedPrecondition, err.Error()).Err()
 	}
-	defer client.Close()
+	defer fileutils.LogClose(client, logrus.StandardLogger(), "failed to close client")
 
 	proc, err := p.queueSerialProcedure(
 		ctx,
@@ -213,7 +214,7 @@ func (p *PGSidecarServer) CreateExtension(ctx context.Context, req *api.CreateEx
 	if err != nil {
 		return res, status.New(codes.FailedPrecondition, err.Error()).Err()
 	}
-	defer client.Close()
+	defer fileutils.LogClose(client, logrus.StandardLogger(), "failed to close client")
 
 	proc, err := p.queueSerialProcedure(
 		ctx,
@@ -235,7 +236,7 @@ func (p *PGSidecarServer) DeploySqitch(ctx context.Context, req *api.DeploySqitc
 	if err != nil {
 		return res, status.New(codes.FailedPrecondition, err.Error()).Err()
 	}
-	defer client.Close()
+	defer fileutils.LogClose(client, logrus.StandardLogger(), "failed to close client")
 
 	proc, err := p.queueSerialProcedure(
 		ctx,
@@ -257,7 +258,7 @@ func (p *PGSidecarServer) MigrateTables(ctx context.Context, req *api.MigrateTab
 	if err != nil {
 		return res, status.New(codes.FailedPrecondition, err.Error()).Err()
 	}
-	defer client.Close()
+	defer fileutils.LogClose(client, logrus.StandardLogger(), "failed to close client")
 
 	proc, err := p.queueSerialProcedure(
 		ctx,
@@ -307,7 +308,7 @@ func (p *PGSidecarServer) DropTables(ctx context.Context, req *api.DropTablesReq
 	if err != nil {
 		return res, status.New(codes.FailedPrecondition, err.Error()).Err()
 	}
-	defer client.Close()
+	defer fileutils.LogClose(client, logrus.StandardLogger(), "failed to close client")
 
 	query := pgw.NewDropTablesQuery()
 	query.Tables = req.Tables
@@ -335,7 +336,7 @@ func (p *PGSidecarServer) RenameDB(ctx context.Context, req *api.RenameDBReq) (*
 	if err != nil {
 		return res, status.New(codes.FailedPrecondition, err.Error()).Err()
 	}
-	defer client.Close()
+	defer fileutils.LogClose(client, logrus.StandardLogger(), "failed to close client")
 
 	proc, err := p.queueSerialProcedure(
 		ctx,
@@ -356,7 +357,7 @@ func (p *PGSidecarServer) Start() error {
 	if err != nil {
 		return err
 	}
-	defer client.Close()
+	defer fileutils.LogClose(client, logrus.StandardLogger(), "failed to close client")
 
 	// Start the serial procedure runner
 	p.spr = pgw.NewSerialProcedureRunner()
