@@ -40,6 +40,11 @@ chef-tab-selector {
 
 chef-form-field {
   width: 240px;
+  padding-bottom: 30px;
+}
+
+chef-radio chef-option {
+  display: inline-block;
 }
 
 section {
@@ -53,7 +58,13 @@ section {
     }
   }
 
-  form {
-    margin-bottom: 38px;
+  #saved-note {
+    font-size: 0.75em;
+    padding-left: 12px;
+  }
+
+  div#save {
+    display: flex;
+    align-items: center;
   }
 }
