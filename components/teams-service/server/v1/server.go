@@ -60,10 +60,7 @@ func (s *Server) CreateTeam(ctx context.Context, req *teams.CreateTeamReq) (*tea
 	var err error
 	if team, err = s.service.Storage.StoreTeam(ctx, req.Name, req.Description); err != nil {
 		if err == storage.ErrConflict {
-			return nil, status.Errorf(
-				codes.AlreadyExists,
-				"unable to create team: a team with name %q already exists.",
-				req.Name)
+			return nil, status.Errorf(codes.AlreadyExists, "team with name %q already exists", req.Name)
 		}
 		return nil, status.Error(codes.Internal, err.Error())
 	}
