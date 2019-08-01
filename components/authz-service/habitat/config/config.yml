@@ -9,8 +9,8 @@ tls:
   root_ca_path: {{pkg.svc_config_path}}/root_ca.crt
 
 database: {{cfg.storage.database}}
-migrations-path: {{ pkg.svc_static_path }}/migrations
-data-migrations-path: {{ pkg.svc_static_path }}/data-migrations
+migrations-path: {{pkg.path}}/migrations
+data-migrations-path: {{pkg.path}}/data-migrations
 
 {{~#eachAlive bind.event-service.members as |event-service|}}
   {{~#if @last}}

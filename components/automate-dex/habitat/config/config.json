@@ -2,6 +2,7 @@
 "service": {{ toJson cfg.service }},
 "storage": {{ toJson cfg.storage }},
 "grpc": {{ toJson cfg.grpc }},
+"frontend_dir": "{{pkg.path}}/web",
 {{ ~#if cfg.log }}
 "log": {{ toJson cfg.log }},
 {{ ~/if }}

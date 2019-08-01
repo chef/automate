@@ -10,18 +10,6 @@ pg-helper ensure-service-database "{{cfg.storage.database}}"
 pg-helper create-extension "{{cfg.storage.database}}" "pgcrypto"
 pg-helper create-extension "{{cfg.storage.database}}" "uuid-ossp"
 
-# Note: We only want the current hart's contents there. Nothing else.
-# When we had merged two PRs both featuring a migration number 45, we
-# ended up with two 45_*.up.sql files in pkg.svc_static_path.
-# Fixing the file names resolved the issue for fresh installs, but our
-# inplace upgrades still failed -- the old, two, 45 files are still
-# present. To solve that, and not ever be hit by this `cp -r` bug again,
-# we'll ensure that svc_static_path never contains any old cruft by
-# clearing it out first:
-rm -rf {{pkg.svc_static_path}}/{migrations,data-migrations}
-cp -r {{pkg.path}}/migrations {{pkg.svc_static_path}}
-cp -r {{pkg.path}}/data-migrations {{pkg.svc_static_path}}
-
 {{~#eachAlive bind.event-service.members as |event-service|}}
 {{~#if @last}}
 addNoProxy {{event-service.sys.ip}}

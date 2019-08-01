@@ -22,12 +22,6 @@ pg-helper fix-permissions "$DBNAME"
 
 mkdir -p "{{pkg.svc_data_path}}/profiles"
 
-# remove the stale dir that was created by a lack of trailing slash on the next command!
-rm -rf "{{pkg.svc_static_path}}/migrations"
-
-# trailing slash is important here!!! (to make cp not create extra subdirs and mess up the pg migrations)
-cp -r {{pkg.path}}/migrations/* {{pkg.svc_static_path}}/
-
 {{!--
 # we use bash to test for the existence of the automate-compliance-profiles path
 # because the handlebars combo of `#if pkgPathFor "chef/automate-compliance-profiles"`
@@ -151,7 +145,7 @@ ES_BACKEND="--es-url http://127.0.0.1:{{member.cfg.http-port}}"
 {{~/eachAlive}}
 
 # Postgres
-PG_BACKEND="--postgres-database {{cfg.storage.database}} --migrations-path {{pkg.svc_static_path}}"
+PG_BACKEND="--postgres-database {{cfg.storage.database}} --migrations-path {{pkg.path}}/migrations"
 
 export HOME="{{pkg.svc_data_path}}"
 
