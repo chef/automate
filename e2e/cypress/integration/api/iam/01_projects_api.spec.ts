@@ -270,8 +270,7 @@ describe('projects API', () => {
         cy.request({
           headers: { 'api-token': Cypress.env('adminTokenValue') },
           method: 'DELETE',
-          url: `/apis/iam/v2beta/projects/${avengersRule.project_id}/rules/${avengersRule.id}`,
-          body: avengersRule
+          url: `/apis/iam/v2beta/projects/${avengersRule.project_id}/rules/${avengersRule.id}`
         });
 
         cy.request({

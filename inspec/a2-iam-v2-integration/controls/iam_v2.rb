@@ -924,19 +924,19 @@ EOF
       end
 
       it "GET /iam/v2beta/projects/:project_id/rules/:id returns a 404" do
-        resp = automate_api_request("/apis/iam/v2beta/iam/v2beta/projects/#{CUSTOM_PROJECT_ID}/rules/not-found")
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_PROJECT_ID}/rules/not-found")
         expect(resp.http_status).to eq 404
         expect(resp.parsed_response_body[:rule]).to eq(nil)
       end
 
       it "PUT /iam/v2beta/projects/:project_id/rules/:id returns a 404" do
-        resp = automate_api_request("/apis/iam/v2beta/iam/v2beta/projects/#{CUSTOM_PROJECT_ID}/rules/not-found")
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_PROJECT_ID}/rules/not-found")
         expect(resp.http_status).to eq 404
         expect(resp.parsed_response_body[:rule]).to eq(nil)
       end
 
       it "DELETE /iam/v2beta/projects/:project_id/rules/:id returns a 404" do
-        resp = automate_api_request("/apis/iam/v2beta/iam/v2beta/projects/#{CUSTOM_PROJECT_ID}/rules/not-found", http_method: 'DELETE')
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_PROJECT_ID}/rules/not-found", http_method: 'DELETE')
         expect(resp.http_status).to eq 404
         expect(resp.parsed_response_body[:rule]).to eq(nil)
       end
