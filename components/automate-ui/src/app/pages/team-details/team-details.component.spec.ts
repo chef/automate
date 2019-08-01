@@ -22,7 +22,7 @@ import {
   GetTeamUsersSuccess
 } from 'app/entities/teams/team.actions';
 import { Team } from 'app/entities/teams/team.model';
-import { TeamDetailsComponent, TeamTabName } from './team-details.component';
+import { TeamDetailsComponent } from './team-details.component';
 
 describe('TeamDetailsComponent', () => {
   let component: TeamDetailsComponent;
@@ -113,15 +113,13 @@ describe('TeamDetailsComponent', () => {
   });
 
   it('show users section when users tab is selected', () => {
-    const tabName: TeamTabName = 'users';
-    component.onSelectedTab({ target: { value: tabName } });
-    expect(component.tabValue).toBe(tabName);
+    component.onSelectedTab({ target: { value: 'users' } });
+    expect(component.tabValue).toBe('users');
   });
 
   it('show details section when details tab is selected', () => {
-    const tabName: TeamTabName = 'details';
-    component.onSelectedTab({ target: { value: tabName } });
-    expect(component.tabValue).toBe(tabName);
+    component.onSelectedTab({ target: { value: 'details' } });
+    expect(component.tabValue).toBe('details');
   });
 
   describe('empty state', () => {
@@ -139,50 +137,6 @@ describe('TeamDetailsComponent', () => {
       component.sortedUsers$.subscribe((users) => {
         expect(users.length).toBe(0);
       });
-    });
-  });
-
-  describe('add users', () => {
-    let store: Store<NgrxStateAtom>;
-
-    const user1: User = {
-      id: 'user1',
-      name: 'user1',
-      membership_id: 'uuid-1'
-    };
-    const user2: User = {
-      id: 'user2',
-      name: 'user2',
-      membership_id: 'uuid-2'
-    };
-    const usersToAdd: HashMapOfUsers = {
-      'user1': user1,
-      'user2': user2
-    };
-
-    beforeEach(() => {
-      store = TestBed.get(Store);
-      store.dispatch(new GetTeamSuccess(someTeam));
-      store.dispatch(new GetUsersSuccess({
-        users: [user1, user2]
-      }));
-    });
-
-    it('successfully adds users', () => {
-      component.teamMembershipView = false;
-      component.toggleUserMembershipView();
-      component.addUsers(usersToAdd);
-
-      expect(component.teamMembershipView).toBe(false);
-      store.dispatch(new GetTeamUsersSuccess({
-        user_ids: [user1.membership_id, user2.membership_id]
-      }));
-
-      for (const user of [user1, user2]) {
-        component.sortedUsers$.subscribe(users => {
-          expect(users).toContain(user);
-        });
-      }
     });
   });
 

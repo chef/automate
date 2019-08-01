@@ -215,7 +215,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
-  onSelectedTab(event): void {
+  onSelectedTab(event: { target: { value: TeamTabName } }): void {
     this.tabValue = event.target.value;
     // Current URL sans any now outdated fragment.
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
