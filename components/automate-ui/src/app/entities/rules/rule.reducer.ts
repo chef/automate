@@ -23,10 +23,11 @@ const CREATE_ERROR = 'createError';
 const DELETE_STATUS = 'deleteStatus';
 const UPDATE_STATUS = 'updateStatus';
 
+// must correspond to enum type in automate-gateway/.../common/rules.proto
 export const ruleAttributes: RuleTypeMappedObject = {
   node: [
     {
-      key: 'CHEF_ORGS',
+      key: 'CHEF_ORGANIZATION',
       value: 'Chef Organization'
     },
     {
@@ -34,7 +35,7 @@ export const ruleAttributes: RuleTypeMappedObject = {
       value: 'Chef Server'
     },
     {
-      key: 'CHEF_ENV',
+      key: 'ENVIRONMENT',
       value: 'Environment'
     },
     {
@@ -56,7 +57,7 @@ export const ruleAttributes: RuleTypeMappedObject = {
   ],
   event: [
     {
-      key: 'CHEF_ORGS',
+      key: 'CHEF_ORGANIZATION',
       value: 'Chef Organization'
     },
     {
