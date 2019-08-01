@@ -15,6 +15,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"github.com/chef/automate/api/external/secrets"
 )
 
 // ProcessSQLNotFound checks for err of type sql.ErrNoRows and returns NotFoundError if true,
@@ -100,6 +102,10 @@ func checkErrorMsg(err error, id string) error {
 	}
 
 	if _, ok := err.(*InvalidError); ok {
+		return status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if _, ok := err.(*secrets.InvalidSecretError); ok {
 		return status.Error(codes.InvalidArgument, err.Error())
 	}
 

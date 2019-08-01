@@ -3,17 +3,17 @@ package gcp
 import (
 	"context"
 
-	"github.com/chef/automate/api/external/secrets"
-	secretsTypes "github.com/chef/automate/components/secrets-service/types"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2/google"
 	compute "google.golang.org/api/compute/v1"
+
+	"github.com/chef/automate/api/external/secrets"
 )
 
 type GcpCreds struct {
 	asString string
-	asStruct *secretsTypes.GcpCredential
+	asStruct *secrets.GcpCredential
 }
 
 func New(secret *secrets.Secret) (gcpCreds *GcpCreds, err error) {
