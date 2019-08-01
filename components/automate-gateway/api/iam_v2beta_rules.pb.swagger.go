@@ -264,13 +264,13 @@ func init() {
       "type": "string",
       "enum": [
         "CONDITION_ATTRIBUTE_UNSET",
-        "CHEF_SERVERS",
-        "CHEF_ORGS",
-        "CHEF_ENVIRONMENTS",
-        "ROLES",
-        "CHEF_TAGS",
-        "POLICY_GROUP",
-        "POLICY_NAME"
+        "CHEF_SERVER",
+        "CHEF_ORGANIZATION",
+        "ENVIRONMENT",
+        "CHEF_ROLE",
+        "CHEF_TAG",
+        "CHEF_POLICY_GROUP",
+        "CHEF_POLICY_NAME"
       ],
       "default": "CONDITION_ATTRIBUTE_UNSET"
     },

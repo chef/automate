@@ -11,13 +11,13 @@ enum RuleType {
 
 enum ConditionAttribute {
     CONDITION_ATTRIBUTE_UNSET = 0;
-    CHEF_SERVERS = 1;
-    CHEF_ORGS = 2;
-    CHEF_ENVIRONMENTS = 3;
-    ROLES = 4;
-    CHEF_TAGS = 5;
-    POLICY_GROUP = 6;
-    POLICY_NAME = 7;
+    CHEF_SERVER = 1;
+    CHEF_ORGANIZATION = 2;
+    ENVIRONMENT = 3;
+    CHEF_ROLE = 4;
+    CHEF_TAG = 5;
+    CHEF_POLICY_GROUP = 6;
+    CHEF_POLICY_NAME = 7;
 }
 
 enum ConditionOperator {
