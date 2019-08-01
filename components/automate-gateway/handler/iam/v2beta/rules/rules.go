@@ -60,7 +60,7 @@ func (s *Server) UpdateRule(ctx context.Context, req *pb_req.UpdateRuleReq) (*pb
 }
 
 func (s *Server) GetRule(ctx context.Context, req *pb_req.GetRuleReq) (*pb_resp.GetRuleResp, error) {
-	resp, err := s.projects.GetRule(ctx, &authz.GetRuleReq{Id: req.Id})
+	resp, err := s.projects.GetRule(ctx, &authz.GetRuleReq{Id: req.Id, ProjectId: req.ProjectId})
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (s *Server) ListRulesForProject(ctx context.Context, req *pb_req.ListRulesF
 }
 
 func (s *Server) DeleteRule(ctx context.Context, req *pb_req.DeleteRuleReq) (*pb_resp.DeleteRuleResp, error) {
-	_, err := s.projects.DeleteRule(ctx, &authz.DeleteRuleReq{Id: req.Id})
+	_, err := s.projects.DeleteRule(ctx, &authz.DeleteRuleReq{Id: req.Id, ProjectId: req.ProjectId})
 	if err != nil {
 		return nil, err
 	}

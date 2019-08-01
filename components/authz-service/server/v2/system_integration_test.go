@@ -329,7 +329,7 @@ func TestIntegrationRuleApplyAndList(t *testing.T) {
 			}, time.Second*3, "State did not switch to Running")
 
 			// Update and delete rules
-			_, err = ts.Projects.DeleteRule(ctx, &api_v2.DeleteRuleReq{Id: id1})
+			_, err = ts.Projects.DeleteRule(ctx, &api_v2.DeleteRuleReq{Id: id1, ProjectId: pid1})
 			require.NoError(t, err)
 
 			newConditions := []*api_v2.Condition{

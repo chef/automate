@@ -20,7 +20,7 @@ const staged = "staged"
 
 func TestCreateRule(t *testing.T) {
 	ctx := context.Background()
-	cl, _, store, _, _ := setupProjectsAndRules(t)
+	cl, projects, rules, _, _ := setupProjectsAndRules(t)
 
 	// it's cumbersome to set this up, so we re-use it in a few of the following
 	// cases
@@ -83,6 +83,20 @@ func TestCreateRule(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
+		{"if the passed rule project id does not exist, returns 'not found'", func(t *testing.T) {
+			id := "foo-rule"
+			projectID := "foo-project"
+			addProjectToStore(t, projects, projectID, "proj another", storage.Custom)
+			addRuleToStore(t, rules, id, "my foo rule", applied, storage.Node, projectID, storageConditions)
+			resp, err := cl.CreateRule(ctx, &api.CreateRuleReq{
+				Id:         "any-name",
+				Name:       "any name",
+				ProjectId:  "not-found",
+				Conditions: apiConditions,
+			})
+			grpctest.AssertCode(t, codes.NotFound, err)
+			assert.Nil(t, resp)
+		}},
 		{"if there are no conditions, returns 'invalid argument'", func(t *testing.T) {
 			resp, err := cl.CreateRule(ctx, &api.CreateRuleReq{
 				Id:        "foo",
@@ -94,12 +108,16 @@ func TestCreateRule(t *testing.T) {
 		}},
 		{"if a rule with that id already exists, returns 'already exists'", func(t *testing.T) {
 			id := "foo-rule"
-			addRuleToStore(t, store, id, "my foo rule", applied, storage.Node, "foo-project", storageConditions)
+			projectID := "foo-project"
+			otherProjectID := "bar-project"
+			addProjectToStore(t, projects, projectID, "project name", storage.Custom)
+			addProjectToStore(t, projects, otherProjectID, "project name", storage.Custom)
+			addRuleToStore(t, rules, id, "my foo rule", applied, storage.Node, projectID, storageConditions)
 
 			resp, err := cl.CreateRule(ctx, &api.CreateRuleReq{
 				Id:         id,
 				Name:       "my other foo",
-				ProjectId:  "bar",
+				ProjectId:  otherProjectID,
 				Conditions: apiConditions,
 			})
 			grpctest.AssertCode(t, codes.AlreadyExists, err)
@@ -107,10 +125,12 @@ func TestCreateRule(t *testing.T) {
 		}},
 		// happy path
 		{"with valid rule data, returns no error and creates the rule in storage", func(t *testing.T) {
+			projectID := "project-id"
+			addProjectToStore(t, projects, projectID, "foo", storage.Custom)
 			resp, err := cl.CreateRule(ctx, &api.CreateRuleReq{
 				Id:        "any-name",
 				Name:      "any name",
-				ProjectId: "foo",
+				ProjectId: projectID,
 				Type:      api.ProjectRuleTypes_NODE,
 				Conditions: []*api.Condition{
 					{
@@ -130,7 +150,7 @@ func TestCreateRule(t *testing.T) {
 				Rule: &api.ProjectRule{
 					Id:        "any-name",
 					Name:      "any name",
-					ProjectId: "foo",
+					ProjectId: projectID,
 					Type:      api.ProjectRuleTypes_NODE,
 					Conditions: []*api.Condition{
 						{
@@ -156,7 +176,8 @@ func TestCreateRule(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.desc, test.f)
-		store.Flush()
+		rules.Flush()
+		projects.Flush()
 	}
 }
 
@@ -232,6 +253,16 @@ func TestUpdateRule(t *testing.T) {
 				ProjectId:  "bar",
 				Conditions: apiConditions,
 				Type:       api.ProjectRuleTypes_NODE,
+			})
+			grpctest.AssertCode(t, codes.NotFound, err)
+			assert.Nil(t, resp)
+		}},
+		{"if the project of the rule does not exist, returns 'not found'", func(t *testing.T) {
+			resp, err := cl.UpdateRule(ctx, &api.UpdateRuleReq{
+				Id:         "any-name",
+				Name:       "any name",
+				ProjectId:  "not-found",
+				Conditions: apiConditions,
 			})
 			grpctest.AssertCode(t, codes.NotFound, err)
 			assert.Nil(t, resp)
@@ -421,7 +452,7 @@ func TestUpdateRule(t *testing.T) {
 
 func TestGetRule(t *testing.T) {
 	ctx := context.Background()
-	cl, _, store, _, _ := setupProjectsAndRules(t)
+	cl, projects, rules, _, _ := setupProjectsAndRules(t)
 	apiConditions := []*api.Condition{
 		{
 			Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGS,
@@ -452,7 +483,14 @@ func TestGetRule(t *testing.T) {
 			assert.Nil(t, resp)
 		}},
 		{"if the rule does not exist, returns 'not found'", func(t *testing.T) {
-			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: "foo"})
+			projectID := "foo-project"
+			addProjectToStore(t, projects, projectID, "proj name", storage.Custom)
+			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: "foo", ProjectId: "some-project"})
+			grpctest.AssertCode(t, codes.NotFound, err)
+			assert.Nil(t, resp)
+		}},
+		{"if the project of the rule does not exist, returns 'invalid argument'", func(t *testing.T) {
+			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: "any-name", ProjectId: "not-found"})
 			grpctest.AssertCode(t, codes.NotFound, err)
 			assert.Nil(t, resp)
 		}},
@@ -460,8 +498,9 @@ func TestGetRule(t *testing.T) {
 			id := "foo-rule"
 			projectID := "foo-project"
 			name := "my coo foo rule"
-			addRuleToStore(t, store, id, name, applied, storage.Node, projectID, storageConditions)
-			addRuleToStore(t, store, "bar-rule", applied, "bar rule", storage.Event, projectID, storageConditions)
+			addProjectToStore(t, projects, projectID, "proj name", storage.Custom)
+			addRuleToStore(t, rules, id, name, applied, storage.Node, projectID, storageConditions)
+			addRuleToStore(t, rules, "bar-rule", applied, "bar rule", storage.Event, projectID, storageConditions)
 			expectedRule := api.ProjectRule{
 				Id:         id,
 				Name:       name,
@@ -471,7 +510,7 @@ func TestGetRule(t *testing.T) {
 				Status:     applied,
 			}
 
-			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: id})
+			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: id, ProjectId: projectID})
 			require.NoError(t, err)
 			assert.Equal(t, &expectedRule, resp.Rule)
 		}},
@@ -483,7 +522,8 @@ func TestGetRule(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.desc, test.f)
-		store.Flush()
+		rules.Flush()
+		projects.Flush()
 	}
 }
 
@@ -706,7 +746,7 @@ func TestListRulesForProject(t *testing.T) {
 
 func TestDeleteRule(t *testing.T) {
 	ctx := context.Background()
-	cl, _, store, _, _ := setupProjectsAndRules(t)
+	cl, projects, rules, _, _ := setupProjectsAndRules(t)
 	storageConditions1 := []storage.Condition{
 		{
 			Attribute: storage.Organization,
@@ -737,7 +777,14 @@ func TestDeleteRule(t *testing.T) {
 			assert.Nil(t, resp)
 		}},
 		{"if the rule does not exist, returns 'not found'", func(t *testing.T) {
-			resp, err := cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: "foo"})
+			projectID := "foo-project"
+			addProjectToStore(t, projects, projectID, "a project", storage.Custom)
+			resp, err := cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: "foo", ProjectId: projectID})
+			grpctest.AssertCode(t, codes.NotFound, err)
+			assert.Nil(t, resp)
+		}},
+		{"if the project of the rule does not exist, returns 'not found'", func(t *testing.T) {
+			resp, err := cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: "any-name", ProjectId: "not-found"})
 			grpctest.AssertCode(t, codes.NotFound, err)
 			assert.Nil(t, resp)
 		}},
@@ -745,14 +792,15 @@ func TestDeleteRule(t *testing.T) {
 			id1, id2 := "rule-number-1", "rule-number-2"
 			projectID := "foo-project"
 			name := "you don't talk about fight club"
-			addRuleToStore(t, store, id1, name, applied, storage.Node, projectID, storageConditions1)
-			addRuleToStore(t, store, id2, name, applied, storage.Event, projectID, storageConditions2)
+			addProjectToStore(t, projects, projectID, "a project", storage.Custom)
+			addRuleToStore(t, rules, id1, name, applied, storage.Node, projectID, storageConditions1)
+			addRuleToStore(t, rules, id2, name, applied, storage.Event, projectID, storageConditions2)
 
-			resp, err := cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: id1})
+			resp, err := cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: id1, ProjectId: projectID})
 			require.NoError(t, err)
 			assert.Equal(t, &api.DeleteRuleResp{}, resp)
 
-			rule, exists := store.Get(id1)
+			rule, exists := rules.Get(id1)
 			assert.Nil(t, rule)
 			assert.False(t, exists)
 		}},
@@ -764,7 +812,8 @@ func TestDeleteRule(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.desc, test.f)
-		store.Flush()
+		rules.Flush()
+		projects.Flush()
 	}
 }
 

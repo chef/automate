@@ -23,6 +23,7 @@ message UpdateRuleReq {
 
 message GetRuleReq {
   string id = 1;
+  string project_id = 2;
 }
 
 message ListRulesReq {}
@@ -33,6 +34,7 @@ message ListRulesForProjectReq {
 
 message DeleteRuleReq {
   string id = 1;
+  string project_id = 2;
 }
 
 message ApplyRulesStartReq {}
