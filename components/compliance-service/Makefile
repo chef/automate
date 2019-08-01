@@ -1,8 +1,5 @@
-# lll: ignore long lines
-# unparam: unused parameters
 # nakedret: naked returns in long functions
-# prealloc: slices that could be preallocated
-LINTERARGS=-v -D lll -D unparam -D nakedret -D prealloc --deadline 1m ./...
+LINTERARGS=-v -D nakedret ./...
 # govet in 1.16 is very confused by some of the code in this component
 include ../../Makefile.common_go
 
