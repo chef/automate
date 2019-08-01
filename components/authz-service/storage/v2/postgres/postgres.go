@@ -1518,7 +1518,7 @@ func (p *pg) singleRowResultOrNotFoundErr(result sql.Result) error {
 }
 
 func (p *pg) getMapOfRuleAssociations(ctx context.Context, q Querier, id string, projectID string) (map[string]bool, error) {
-	assocRow := q.QueryRowContext(ctx, `SELECT query_rule_table_associations($1, $2);`, id, projectID)
+	assocRow := q.QueryRowContext(ctx, "SELECT query_rule_table_associations($1, $2)", id, projectID)
 	var associations []string
 	if err := assocRow.Scan(pq.Array(&associations)); err != nil {
 		return nil, err
