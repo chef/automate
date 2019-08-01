@@ -32,9 +32,6 @@ do_unpack() {
   mkdir -p $CACHE_PATH/chef-ui-library
   rsync --archive --exclude node_modules $PLAN_CONTEXT/.. $CACHE_PATH/automate-ui
   rsync --archive --exclude node_modules $PLAN_CONTEXT/../../chef-ui-library $CACHE_PATH
-
-  # Copy our alternate environment file into place
-  cp ${PLAN_CONTEXT}/environments/environment.prod.ts $CACHE_PATH/automate-ui/src/environments/environment.prod.ts
 }
 
 npm_install() {
