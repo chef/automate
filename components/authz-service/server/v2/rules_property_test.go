@@ -479,20 +479,20 @@ func getGenerators() (gopter.Gen, gopter.Gen, gopter.Gen) {
 
 	conditionsGenNode := gen.StructPtr(reflect.TypeOf(&api.Condition{}), map[string]gopter.Gen{
 		"Type": gen.OneConstOf(
-			api.ProjectRuleConditionAttributes_CHEF_SERVERS,
-			api.ProjectRuleConditionAttributes_CHEF_ORGS,
-			api.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
-			api.ProjectRuleConditionAttributes_ROLES,
-			api.ProjectRuleConditionAttributes_CHEF_TAGS,
-			api.ProjectRuleConditionAttributes_POLICY_GROUP,
-			api.ProjectRuleConditionAttributes_POLICY_NAME,
+			api.ProjectRuleConditionAttributes_CHEF_SERVER,
+			api.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+			api.ProjectRuleConditionAttributes_ENVIRONMENT,
+			api.ProjectRuleConditionAttributes_CHEF_ROLE,
+			api.ProjectRuleConditionAttributes_CHEF_TAG,
+			api.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+			api.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 		),
 		"Values": gen.SliceOf(gen.UnicodeString(graphicRange)),
 	})
 	conditionsGenEvent := gen.StructPtr(reflect.TypeOf(&api.Condition{}), map[string]gopter.Gen{
 		"Type": gen.OneConstOf(
-			api.ProjectRuleConditionAttributes_CHEF_SERVERS,
-			api.ProjectRuleConditionAttributes_CHEF_ORGS,
+			api.ProjectRuleConditionAttributes_CHEF_SERVER,
+			api.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 		),
 		"Values": gen.SliceOf(gen.UnicodeString(graphicRange)),
 	})

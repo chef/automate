@@ -48,7 +48,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env1"},
 								},
 							},
@@ -76,7 +76,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env1", "env2"},
 								},
 							},
@@ -104,11 +104,11 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env1"},
 								},
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -136,11 +136,11 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env1"},
 								},
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -168,7 +168,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env2"},
 								},
 							},
@@ -176,7 +176,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env1"},
 								},
 							},
@@ -204,7 +204,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env2"},
 								},
 							},
@@ -216,7 +216,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env1"},
 								},
 							},
@@ -244,7 +244,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org2"},
 								},
 							},
@@ -256,7 +256,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
 									Values:    []string{"env1"},
 								},
 							},
@@ -286,7 +286,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -314,7 +314,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org2"},
 								},
 							},
@@ -342,7 +342,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -371,7 +371,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
 									Values:    []string{"chef-server.org"},
 								},
 							},
@@ -398,7 +398,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
 									Values:    []string{"chef-server.org"},
 								},
 							},
@@ -425,7 +425,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
 									Values:    []string{"chef-server.org"},
 								},
 							},
@@ -452,7 +452,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
 									Values:    []string{"chef-server.org", "chef-server2.org"},
 								},
 							},
@@ -480,7 +480,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
 									Values:    []string{"chef-server.org"},
 								},
 							},
@@ -488,7 +488,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values: []string{"org1"},
 								},
 							},
@@ -516,7 +516,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
+									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
 									Values: []string{"chef-server2.org"},
 								},
 							},
@@ -524,7 +524,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values: []string{"org1"},
 								},
 							},
@@ -553,7 +553,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_ROLES,
+									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values: []string{"area_51"},
 								},
 							},
@@ -580,7 +580,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_ROLES,
+									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values: []string{"area_52"},
 								},
 							},
@@ -607,7 +607,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ROLES,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_51"},
 								},
 							},
@@ -634,7 +634,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ROLES,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_51", "area_52"},
 								},
 							},
@@ -662,7 +662,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ROLES,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_51"},
 								},
 							},
@@ -670,7 +670,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -698,7 +698,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ROLES,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_51"},
 								},
 							},
@@ -706,7 +706,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org2"},
 								},
 							},
@@ -734,11 +734,11 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ROLES,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_51"},
 								},
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org2"},
 								},
 							},
@@ -765,7 +765,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ROLES,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_51"},
 								},
 							},
@@ -792,7 +792,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_ROLES,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
 									Values:    []string{"area_54"},
 								},
 							},
@@ -821,7 +821,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_51"},
 								},
 							},
@@ -848,7 +848,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_52"},
 								},
 							},
@@ -875,7 +875,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_51"},
 								},
 							},
@@ -902,7 +902,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_51", "area_52"},
 								},
 							},
@@ -930,7 +930,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_51"},
 								},
 							},
@@ -938,7 +938,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -966,7 +966,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_51"},
 								},
 							},
@@ -974,7 +974,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org2"},
 								},
 							},
@@ -1002,11 +1002,11 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_51"},
 								},
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org2"},
 								},
 							},
@@ -1033,7 +1033,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_51"},
 								},
 							},
@@ -1060,7 +1060,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
 									Values:    []string{"area_54"},
 								},
 							},
@@ -1089,7 +1089,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_POLICY_GROUP,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 									Values:    []string{"prod"},
 								},
 							},
@@ -1116,7 +1116,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_POLICY_GROUP,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 									Values:    []string{"dev"},
 								},
 							},
@@ -1143,7 +1143,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_POLICY_GROUP,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 									Values:    []string{"Prod"},
 								},
 							},
@@ -1170,7 +1170,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_POLICY_GROUP,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 									Values:    []string{"prod", "dev"},
 								},
 							},
@@ -1198,7 +1198,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_POLICY_GROUP,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 									Values:    []string{"prod"},
 								},
 							},
@@ -1206,7 +1206,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -1234,7 +1234,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_POLICY_GROUP,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
 									Values:    []string{"dev"},
 								},
 							},
@@ -1242,7 +1242,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values:    []string{"org1"},
 								},
 							},
@@ -1271,7 +1271,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_POLICY_NAME,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 									Values:    []string{"prod"},
 								},
 							},
@@ -1298,7 +1298,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute: iam_v2.ProjectRuleConditionAttributes_POLICY_NAME,
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 									Values:    []string{"dev"},
 								},
 							},
@@ -1325,7 +1325,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_POLICY_NAME,
+									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 									Values: []string{"Prod"},
 								},
 							},
@@ -1352,7 +1352,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_POLICY_NAME,
+									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 									Values: []string{"prod", "dev"},
 								},
 							},
@@ -1380,7 +1380,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_POLICY_NAME,
+									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 									Values: []string{"prod"},
 								},
 							},
@@ -1388,7 +1388,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values: []string{"org1"},
 								},
 							},
@@ -1416,7 +1416,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_POLICY_NAME,
+									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 									Values: []string{"dev"},
 								},
 							},
@@ -1424,7 +1424,7 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 									Values: []string{"org1"},
 								},
 							},

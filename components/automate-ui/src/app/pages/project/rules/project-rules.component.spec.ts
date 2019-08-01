@@ -172,7 +172,7 @@ describe('ProjectRulesComponent', () => {
       const operator: ConditionOperator  = 'EQUALS';
       component.ruleForm.get('conditions').setValue([
         {
-          attribute: 'CHEF_ORGS',
+          attribute: 'CHEF_ORGANIZATION',
           operator: operator,
           values: 'my value'
         }
@@ -209,7 +209,7 @@ describe('ProjectRulesComponent', () => {
       description: string, operator: ConditionOperator, values: string, expected: string[]) {
       it('converts condition values with ' + description, () => {
         const uiRule = {
-          attribute: 'CHEF_ORGS',
+          attribute: 'CHEF_ORGANIZATION',
           operator: operator,
           values: values
         };

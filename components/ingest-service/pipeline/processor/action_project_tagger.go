@@ -81,11 +81,11 @@ func actionMatchesAllConditions(action *chef.Action, conditions []*iam_v2.Condit
 
 	for _, condition := range conditions {
 		switch condition.Attribute {
-		case iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS:
+		case iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER:
 			if !stringutils.SliceContains(condition.Values, action.RemoteHostname) {
 				return false
 			}
-		case iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS:
+		case iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION:
 			if !stringutils.SliceContains(condition.Values, action.OrganizationName) {
 				return false
 			}

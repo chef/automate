@@ -613,13 +613,13 @@ func fromStorageCondition(c storage.Condition) (*api.Condition, error) {
 }
 
 var storageToAPIConditionAttributes = map[storage.ConditionAttribute]api.ProjectRuleConditionAttributes{
-	storage.ChefRole:     api.ProjectRuleConditionAttributes_ROLES,
-	storage.ChefServer:   api.ProjectRuleConditionAttributes_CHEF_SERVERS,
-	storage.ChefTag:      api.ProjectRuleConditionAttributes_CHEF_TAGS,
-	storage.Environment:  api.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
-	storage.Organization: api.ProjectRuleConditionAttributes_CHEF_ORGS,
-	storage.PolicyGroup:  api.ProjectRuleConditionAttributes_POLICY_GROUP,
-	storage.PolicyName:   api.ProjectRuleConditionAttributes_POLICY_NAME,
+	storage.ChefRole:     api.ProjectRuleConditionAttributes_CHEF_ROLE,
+	storage.ChefServer:   api.ProjectRuleConditionAttributes_CHEF_SERVER,
+	storage.ChefTag:      api.ProjectRuleConditionAttributes_CHEF_TAG,
+	storage.Environment:  api.ProjectRuleConditionAttributes_ENVIRONMENT,
+	storage.Organization: api.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+	storage.PolicyGroup:  api.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+	storage.PolicyName:   api.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 }
 
 var apiToStorageConditionAttributes = map[api.ProjectRuleConditionAttributes]storage.ConditionAttribute{}
