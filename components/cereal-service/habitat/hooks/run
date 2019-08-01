@@ -1,0 +1,10 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash -e
+
+exec 2>&1
+
+# Call the script to block until user accepts the MLSA via the package's config
+{{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
+
+pg-helper ensure-service-database "cereal_service"
+
+exec cereal-service serve --config {{pkg.svc_config_path}}/config.json

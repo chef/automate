@@ -57,6 +57,16 @@ var ProductMetadataJSON = `
       }
     },
     {
+      "name": "chef/cereal-service",
+      "metadata": {
+        "name": "chef/cereal-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
+    },
+    {
       "name": "chef/event-service",
       "metadata": null
     },
@@ -378,6 +388,19 @@ var ProductMetadataJSON = `
       "hidden": false
     },
     {
+      "name": "cereal",
+      "aliases": null,
+      "type": "base",
+      "services": [
+        "chef/cereal-service"
+      ],
+      "packages": null,
+      "dependencies": [
+        "postgresql"
+      ],
+      "hidden": false
+    },
+    {
       "name": "auth",
       "aliases": null,
       "type": "base",
@@ -423,6 +446,7 @@ var ProductMetadataJSON = `
         "core",
         "postgresql",
         "elasticsearch",
+        "cereal",
         "auth"
       ],
       "hidden": false

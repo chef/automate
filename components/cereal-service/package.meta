@@ -1,0 +1,4 @@
+{
+  "name": "chef/cereal-service",
+  "uses_platform_scaffolding": true
+}

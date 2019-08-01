@@ -55,6 +55,7 @@ var rootCmd = &cobra.Command{
 
 var serveCmd = &cobra.Command{
 	Use:  "serve",
+	Args: cobra.NoArgs,
 	RunE: serve,
 }
 
@@ -83,6 +84,28 @@ func initConfig() error {
 		logrus.Error(logrus.ErrorLevel)
 	}
 
+	if C.Database.URL == "" {
+		var err error
+		C.Database.URL, err = platform.PGURIFromEnvironment("cereal_service")
+		if err != nil {
+			return err
+		}
+	}
+
+	if C.TLS.CertPath == "" {
+		platformCfg, err := platform.ConfigFromEnvironment()
+		if err != nil {
+			return err
+		}
+		tlsConfig := platformCfg.GetService().GetTls()
+		if tlsConfig == nil {
+			return errors.New("could not load TLS config")
+		}
+		C.TLS.CertPath = tlsConfig.GetCertPath()
+		C.TLS.KeyPath = tlsConfig.GetKeyPath()
+		C.TLS.RootCACertPath = tlsConfig.GetRootCaPath()
+	}
+
 	return nil
 }
 
@@ -107,17 +130,6 @@ func init() {
 	rootCmd.AddCommand(serveCmd)
 }
 
-func connURI() (string, error) {
-	if C.Database.URL != "" {
-		return C.Database.URL, nil
-	}
-	u, err := platform.PGURIFromEnvironment("cereal-service")
-	if err != nil {
-		return "", err
-	}
-	return u, nil
-}
-
 func serve(*cobra.Command, []string) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -126,11 +138,7 @@ func serve(*cobra.Command, []string) error {
 		return errors.Wrap(err, "failed to load config")
 	}
 
-	uri, err := connURI()
-	if err != nil {
-		return errors.Wrap(err, "failed to get database connection info")
-	}
-	pgBackend := postgres.NewPostgresBackend(uri)
+	pgBackend := postgres.NewPostgresBackend(C.Database.URL)
 	if err := pgBackend.Init(); err != nil {
 		return errors.Wrap(err, "could not initialize database")
 	}
