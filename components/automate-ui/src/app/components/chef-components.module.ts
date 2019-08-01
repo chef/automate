@@ -14,6 +14,7 @@ import { CalendarComponent } from './calendar/calendar.component';
 import { CreateObjectModalComponent } from './create-object-modal/create-object-modal.component';
 import { DeleteObjectModalComponent } from './delete-object-modal/delete-object-modal.component';
 import { ErrorDirective } from './error/error.directive';
+import { FormControlDirective } from './form-control/form-control.directive';
 import { FormFieldComponent } from './form-field/form-field.component';
 import {
   GuitarStringComponent
@@ -77,6 +78,7 @@ import { TabsComponent } from './tabs/tabs.component';
 
     // Directives
     ErrorDirective,
+    FormControlDirective,
     InputDirective
   ],
   declarations: [
@@ -88,6 +90,7 @@ import { TabsComponent } from './tabs/tabs.component';
     CreateObjectModalComponent,
     DeleteObjectModalComponent,
     ErrorDirective,
+    FormControlDirective,
     FormFieldComponent,
     GuitarStringComponent,
     GuitarStringCollectionComponent,
