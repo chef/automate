@@ -63,6 +63,12 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     public fb: FormBuilder,
     private router: Router
   ) {
+    this.team = {
+      id: '',
+      name: '',
+      guid: null,
+      projects: []
+    };
     this.updateNameForm = fb.group({
       // Must stay in sync with error checks in team-details.component.html
       name: ['Loading...', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
