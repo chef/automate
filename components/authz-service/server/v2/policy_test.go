@@ -198,7 +198,7 @@ func TestCreatePolicy(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, resp)
 		}},
-		{"successfully creates policy with no statement", func(t *testing.T) {
+		{"policy with no statement returns InvalidArgument", func(t *testing.T) {
 			_, items := addSomePoliciesToStore(t, store, prng)
 			req := api_v2.CreatePolicyReq{
 				Id:      "policy1",
@@ -208,9 +208,9 @@ func TestCreatePolicy(t *testing.T) {
 
 			resp, err := cl.CreatePolicy(ctx, &req)
 
-			require.NoError(t, err)
-			require.NotNil(t, resp)
-			assert.Equal(t, len(items)+1, store.ItemCount())
+			require.Nil(t, resp)
+			require.Equal(t, len(items), store.ItemCount())
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		}},
 		{"successfully creates policy with one project", func(t *testing.T) {
 			statement0 := api_v2.Statement{
@@ -999,6 +999,14 @@ func TestUpdatePolicy(t *testing.T) {
 		{"fails with InvalidArgument when missing policy ID", func(t *testing.T) {
 			req := api_v2.UpdatePolicyReq{
 				Name: "testPolicy1",
+				Statements: []*api_v2.Statement{
+					&api_v2.Statement{
+						Effect:    api_v2.Statement_ALLOW,
+						Resources: []string{"compliance:profiles"},
+						Actions:   []string{"compliance:profiles:upload"},
+						Projects:  []string{constants_v2.AllProjectsExternalID},
+					},
+				},
 			}
 
 			pol, err := cl.UpdatePolicy(ctx, &req)
@@ -1010,6 +1018,14 @@ func TestUpdatePolicy(t *testing.T) {
 			req := api_v2.UpdatePolicyReq{
 				Id:   "no_underscore",
 				Name: "testPolicy1",
+				Statements: []*api_v2.Statement{
+					&api_v2.Statement{
+						Effect:    api_v2.Statement_ALLOW,
+						Resources: []string{"compliance:profiles"},
+						Actions:   []string{"compliance:profiles:upload"},
+						Projects:  []string{constants_v2.AllProjectsExternalID},
+					},
+				},
 			}
 
 			pol, err := cl.UpdatePolicy(ctx, &req)
@@ -1020,6 +1036,14 @@ func TestUpdatePolicy(t *testing.T) {
 		{"fails with InvalidArgument when missing policy name", func(t *testing.T) {
 			req := api_v2.UpdatePolicyReq{
 				Id: existingPolicyId,
+				Statements: []*api_v2.Statement{
+					&api_v2.Statement{
+						Effect:    api_v2.Statement_ALLOW,
+						Resources: []string{"compliance:profiles"},
+						Actions:   []string{"compliance:profiles:upload"},
+						Projects:  []string{constants_v2.AllProjectsExternalID},
+					},
+				},
 			}
 
 			pol, err := cl.UpdatePolicy(ctx, &req)
@@ -1032,6 +1056,14 @@ func TestUpdatePolicy(t *testing.T) {
 			req := api_v2.UpdatePolicyReq{
 				Id:   "this-is-wrong",
 				Name: "testPolicy1",
+				Statements: []*api_v2.Statement{
+					&api_v2.Statement{
+						Effect:    api_v2.Statement_ALLOW,
+						Resources: []string{"compliance:profiles"},
+						Actions:   []string{"compliance:profiles:upload"},
+						Projects:  []string{constants_v2.AllProjectsExternalID},
+					},
+				},
 			}
 
 			pol, err := cl.UpdatePolicy(ctx, &req)
@@ -1044,6 +1076,14 @@ func TestUpdatePolicy(t *testing.T) {
 			req := api_v2.UpdatePolicyReq{
 				Id:   storedPol.ID,
 				Name: "newTestPolicy1",
+				Statements: []*api_v2.Statement{
+					&api_v2.Statement{
+						Effect:    api_v2.Statement_ALLOW,
+						Resources: []string{"compliance:profiles"},
+						Actions:   []string{"compliance:profiles:upload"},
+						Projects:  []string{constants_v2.AllProjectsExternalID},
+					},
+				},
 			}
 
 			pol, err := cl.UpdatePolicy(ctx, &req)
@@ -1061,6 +1101,14 @@ func TestUpdatePolicy(t *testing.T) {
 				Id:      storedPol.ID,
 				Name:    "TestPolicy1",
 				Members: []string{"team:local:heroines", "team:local:ladies"},
+				Statements: []*api_v2.Statement{
+					&api_v2.Statement{
+						Effect:    api_v2.Statement_ALLOW,
+						Resources: []string{"compliance:profiles"},
+						Actions:   []string{"compliance:profiles:upload"},
+						Projects:  []string{constants_v2.AllProjectsExternalID},
+					},
+				},
 			}
 
 			pol, err := cl.UpdatePolicy(ctx, &req)
@@ -1119,6 +1167,14 @@ func TestUpdatePolicy(t *testing.T) {
 				Id:      storedPol.ID,
 				Name:    "newTestPolicy1",
 				Members: []string{"team:local:ladies"},
+				Statements: []*api_v2.Statement{
+					&api_v2.Statement{
+						Effect:    api_v2.Statement_ALLOW,
+						Resources: []string{"compliance:profiles"},
+						Actions:   []string{"compliance:profiles:upload"},
+						Projects:  []string{constants_v2.AllProjectsExternalID},
+					},
+				},
 			}
 
 			pol, err := cl.UpdatePolicy(ctx, &req)

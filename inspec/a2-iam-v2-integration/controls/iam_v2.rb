@@ -241,6 +241,12 @@ EOF
         http_method: 'PUT',
         request_body: {
           name: "updated policy!",
+          statements: [
+            {
+              effect:    "ALLOW",
+              actions:   ["compliance:profiles:upload"]
+            }
+          ],
           members: []
         }.to_json
       )

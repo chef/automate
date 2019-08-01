@@ -233,6 +233,13 @@ func (m *CreatePolicyReq) Validate() error {
 
 	}
 
+	if len(m.GetStatements()) < 1 {
+		return CreatePolicyReqValidationError{
+			field:  "Statements",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
+
 	for idx, item := range m.GetStatements() {
 		_, _ = idx, item
 
@@ -878,6 +885,13 @@ func (m *UpdatePolicyReq) Validate() error {
 			}
 		}
 
+	}
+
+	if len(m.GetStatements()) < 1 {
+		return UpdatePolicyReqValidationError{
+			field:  "Statements",
+			reason: "value must contain at least 1 item(s)",
+		}
 	}
 
 	for idx, item := range m.GetStatements() {

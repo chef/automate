@@ -34,7 +34,7 @@ message CreatePolicyReq {
             }
         }
        }];
-    repeated Statement statements = 4;
+    repeated Statement statements = 4 [(validate.rules).repeated.min_items = 1];
     repeated string projects = 5 [(validate.rules).repeated = {
         unique: true,
         items: {
@@ -102,7 +102,7 @@ message UpdatePolicyReq {
             }
         }
        }];
-    repeated Statement statements = 3;
+    repeated Statement statements = 3 [(validate.rules).repeated.min_items = 1];
     string name = 8;
     repeated string projects = 9 [(validate.rules).repeated = {
         unique: true,
