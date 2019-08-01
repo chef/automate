@@ -18,9 +18,9 @@ import (
 	"github.com/chef/automate/components/compliance-service/inspec-agent/runner"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/chef/automate/components/compliance-service/scanner"
-	"github.com/chef/automate/components/compliance-service/utils"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
+	"github.com/chef/automate/lib/errorutils"
 )
 
 type Scheduler struct {
@@ -106,7 +106,7 @@ func (a *Scheduler) scheduleJob(job *jobs.Job) (*jobs.Job, error) {
 	// Ensure recurrence rule can be parsed
 	_, err := rrule.StrToRRule(job.Recurrence)
 	if err != nil {
-		return nil, &utils.InvalidError{Msg: fmt.Sprintf("invalid job recurrence rule: %v", err)}
+		return nil, &errorutils.InvalidError{Msg: fmt.Sprintf("invalid job recurrence rule: %v", err)}
 	}
 	a.scannerServer.UpdateParentJobSchedule(job.Id, job.JobCount, job.Recurrence, job.ScheduledTime)
 	return nil, nil

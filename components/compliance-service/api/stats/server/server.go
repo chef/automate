@@ -9,7 +9,7 @@ import (
 
 	"github.com/chef/automate/components/compliance-service/api/stats"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
-	"github.com/chef/automate/components/compliance-service/utils"
+	"github.com/chef/automate/lib/errorutils"
 )
 
 // Server implementation for stats
@@ -28,13 +28,13 @@ func (srv *Server) ReadSummary(ctx context.Context, in *stats.Query) (*stats.Sum
 
 	formattedFilters, err := relaxting.FilterByProjects(ctx, formatFilters(in.Filters))
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 
 	if in.Type == "" {
 		reportSummary, err := srv.es.GetStatsSummary(formattedFilters)
 		if err != nil {
-			err = utils.FormatErrorMsg(err, "")
+			err = errorutils.FormatErrorMsg(err, "")
 			return nil, err
 		}
 		summary.ReportSummary = reportSummary
@@ -42,7 +42,7 @@ func (srv *Server) ReadSummary(ctx context.Context, in *stats.Query) (*stats.Sum
 	if in.Type == "nodes" {
 		nodeSummary, err := srv.es.GetStatsSummaryNodes(formattedFilters)
 		if err != nil {
-			err = utils.FormatErrorMsg(err, "")
+			err = errorutils.FormatErrorMsg(err, "")
 			return nil, err
 		}
 		summary.NodeSummary = nodeSummary
@@ -50,7 +50,7 @@ func (srv *Server) ReadSummary(ctx context.Context, in *stats.Query) (*stats.Sum
 	if in.Type == "controls" {
 		controlSummary, err := srv.es.GetStatsSummaryControls(formattedFilters)
 		if err != nil {
-			err = utils.FormatErrorMsg(err, "")
+			err = errorutils.FormatErrorMsg(err, "")
 			return nil, err
 		}
 		summary.ControlsSummary = controlSummary
@@ -64,7 +64,7 @@ func (srv *Server) ReadTrend(ctx context.Context, in *stats.Query) (*stats.Trend
 	var trend []*stats.Trend
 	formattedFilters, err := relaxting.FilterByProjects(ctx, formatFilters(in.Filters))
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	// set a default interval here if it is 0. This is done here instead
 	// of in the validateTrendData function b/c it is a nicety that modifies
@@ -80,7 +80,7 @@ func (srv *Server) ReadTrend(ctx context.Context, in *stats.Query) (*stats.Trend
 
 	trend, err = srv.es.GetTrend(formattedFilters, int(in.Interval), in.Type)
 	if err != nil {
-		err = utils.FormatErrorMsg(err, "")
+		err = errorutils.FormatErrorMsg(err, "")
 		return nil, err
 	}
 
@@ -97,7 +97,7 @@ func (srv *Server) ReadProfiles(ctx context.Context, in *stats.Query) (*stats.Pr
 
 	formattedFilters, err := relaxting.FilterByProjects(ctx, formatFilters(in.Filters))
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 
 	if in.Id != "" {
@@ -107,7 +107,7 @@ func (srv *Server) ReadProfiles(ctx context.Context, in *stats.Query) (*stats.Pr
 		if in.Type == "summary" {
 			profileSummary, err := srv.es.GetProfileSummaryByProfileId(in.Id, formattedFilters)
 			if err != nil {
-				err = utils.FormatErrorMsg(err, "")
+				err = errorutils.FormatErrorMsg(err, "")
 				return nil, err
 			}
 			profile.ProfileSummary = profileSummary
@@ -119,7 +119,7 @@ func (srv *Server) ReadProfiles(ctx context.Context, in *stats.Query) (*stats.Pr
 			}
 			controlStats, err := srv.es.GetControlListStatsByProfileID(in.Id, int(from), int(perPage), formattedFilters, sort, order)
 			if err != nil {
-				err = utils.FormatErrorMsg(err, "")
+				err = errorutils.FormatErrorMsg(err, "")
 				return nil, err
 			}
 			profile.ControlStats = controlStats
@@ -127,7 +127,7 @@ func (srv *Server) ReadProfiles(ctx context.Context, in *stats.Query) (*stats.Pr
 	} else {
 		profileList, err := srv.es.GetProfileListWithAggregatedComplianceSummaries(formattedFilters, in.Size)
 		if err != nil {
-			err = utils.FormatErrorMsg(err, "")
+			err = errorutils.FormatErrorMsg(err, "")
 			return nil, err
 		}
 		profile.ProfileList = profileList
@@ -139,7 +139,7 @@ func (srv *Server) ReadProfiles(ctx context.Context, in *stats.Query) (*stats.Pr
 func (srv *Server) ReadFailures(ctx context.Context, in *stats.Query) (*stats.Failures, error) {
 	formattedFilters, err := relaxting.FilterByProjects(ctx, formatFilters(in.Filters))
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	// i went back and forth on this one for a while. while i see
 	// the reason it could be its own field in the query message type,
@@ -155,7 +155,7 @@ func (srv *Server) ReadFailures(ctx context.Context, in *stats.Query) (*stats.Fa
 	}
 	failures, err := srv.es.GetStatsFailures(formattedFilters["types"], int(in.Size), formattedFilters)
 	if err != nil {
-		err = utils.FormatErrorMsg(err, "")
+		err = errorutils.FormatErrorMsg(err, "")
 		return nil, err
 	}
 	return failures, nil

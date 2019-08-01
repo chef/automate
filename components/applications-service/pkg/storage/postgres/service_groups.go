@@ -5,7 +5,8 @@ import (
 	"strings"
 
 	"github.com/chef/automate/components/applications-service/pkg/storage"
-	"github.com/chef/automate/components/secrets-service/utils"
+	"github.com/chef/automate/lib/errorutils"
+	"github.com/chef/automate/lib/pgutils"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -354,13 +355,13 @@ func queryFromStatusFilter(text string) (string, error) {
 }
 
 func queryFromFieldFilter(field string, arr []string) (string, error) {
-	if !utils.IsSqlSafe(field) {
-		return "", &utils.InvalidError{Msg: fmt.Sprintf("Unsupported character found in field: %s", field)}
+	if !pgutils.IsSqlSafe(field) {
+		return "", &errorutils.InvalidError{Msg: fmt.Sprintf("Unsupported character found in field: %s", field)}
 	}
 	condition := fmt.Sprintf(" %s IN (", field)
 	if len(arr) > 0 {
 		for index, item := range arr {
-			condition += fmt.Sprintf("'%s'", utils.EscapeLiteralForPG(item))
+			condition += fmt.Sprintf("'%s'", pgutils.EscapeLiteralForPG(item))
 			if index < len(arr)-1 {
 				condition += ","
 			}

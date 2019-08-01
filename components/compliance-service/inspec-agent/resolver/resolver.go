@@ -18,6 +18,7 @@ import (
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	"github.com/chef/automate/components/nodemanager-service/managers"
 	"github.com/chef/automate/components/nodemanager-service/mgrtypes"
+	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"
 
 	"github.com/pkg/errors"
@@ -165,7 +166,7 @@ func (r *Resolver) handleGcpApiNodes(ctx context.Context, m *manager.NodeManager
 
 	dbNodes, err := r.nodesClient.List(ctx, &nodes.Query{PerPage: 1000000, Filters: nmFilter})
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 
 	secret, err := r.secretsClient.Read(ctx, &secrets.Id{Id: m.CredentialId})

@@ -26,10 +26,10 @@ import (
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
-	"github.com/chef/automate/components/compliance-service/utils"
 	"github.com/chef/automate/components/compliance-service/utils/pool"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/pgdb"
+	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"
 )
 
@@ -144,7 +144,7 @@ func (creds *AwsCreds) GetAccountID(ctx context.Context) (string, error) {
 	params := sts.GetCallerIdentityInput{}
 	resp, err := client.GetCallerIdentityWithContext(ctx, &params)
 	if err != nil {
-		return "", errors.Wrap(&utils.InvalidError{Msg: err.Error()}, "GetAccountID unable to call GetCallerIdentity API")
+		return "", errors.Wrap(&errorutils.InvalidError{Msg: err.Error()}, "GetAccountID unable to call GetCallerIdentity API")
 	}
 	return *resp.Account, nil
 }
@@ -545,7 +545,7 @@ func (creds *AwsCreds) TestConnectivity(ctx context.Context) error {
 	if err != nil {
 		awsErr, ok := err.(awserr.Error)
 		if !ok || awsErr.Code() != "DryRunOperation" {
-			return utils.ProcessUnauthenticated(awsErr, "Unsuccessful DescribeRegions check")
+			return errorutils.ProcessUnauthenticated(awsErr, "Unsuccessful DescribeRegions check")
 		}
 	}
 
@@ -553,7 +553,7 @@ func (creds *AwsCreds) TestConnectivity(ctx context.Context) error {
 	if err != nil {
 		awsErr, ok := err.(awserr.Error)
 		if !ok || awsErr.Code() != "DryRunOperation" {
-			return utils.ProcessUnauthenticated(awsErr, "Unsuccessful DescribeInstances check")
+			return errorutils.ProcessUnauthenticated(awsErr, "Unsuccessful DescribeInstances check")
 		}
 	}
 
@@ -561,7 +561,7 @@ func (creds *AwsCreds) TestConnectivity(ctx context.Context) error {
 	if err != nil {
 		awsErr, ok := err.(awserr.Error)
 		if !ok || awsErr.Code() != "DryRunOperation" {
-			return utils.ProcessUnauthenticated(awsErr, "Unsuccessful DescribeInstanceStatus check")
+			return errorutils.ProcessUnauthenticated(awsErr, "Unsuccessful DescribeInstanceStatus check")
 		}
 	}
 	return nil
