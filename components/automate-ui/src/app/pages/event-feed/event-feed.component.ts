@@ -81,15 +81,15 @@ export class EventFeedComponent implements OnInit, OnDestroy {
         {name: 'cookbook', title: 'Cookbooks', icon: 'chrome_reader_mode'},
         {name: 'bag', title: 'Data Bags', icon: 'business_center'},
         {name: 'environment', title: 'Environments', icon: 'public'},
+        {name: 'group', title: 'Groups', icon: 'people'},
         {name: 'node', title: 'Nodes', icon: 'storage'},
+        {name: 'organization', title: 'Organizations', icon: 'layers'},
+        {name: 'permission', title: 'Permissions', icon: 'lock_open'},
         {name: 'policyfile', title: 'Policyfiles', icon: 'add_to_photos'},
         {name: 'profile', title: 'Profiles', icon: 'library_books'},
         {name: 'role', title: 'Roles', icon: 'book'},
-        {name: 'organization', title: 'Organizations', icon: 'layers'},
-        {name: 'permission', title: 'Permissions', icon: 'lock_open'},
-        {name: 'user', title: 'Users', icon: 'person'},
-        {name: 'group', title: 'Groups', icon: 'people'},
-        {name: 'scan_job', title: 'Scan Jobs', icon: 'wifi_tethering'}
+        {name: 'scan_job', title: 'Scan Jobs', icon: 'wifi_tethering'},
+        {name: 'user', title: 'Users', icon: 'person'}
       ]
     }
   ];

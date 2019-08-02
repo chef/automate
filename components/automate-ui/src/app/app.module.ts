@@ -93,8 +93,8 @@ import {
   SearchBarComponent
 } from './page-components/search-bar/search-bar.component';
 import {
-  ClientRunsSearchFiltersComponent
-} from './page-components/client-runs-search-filters/client-runs-search-filters.component';
+  SearchBarFilterBarComponent
+} from './page-components/search-bar-filter-bar/search-bar-filter-bar.component';
 import {
   ClientRunsTableComponent
 } from './page-components/client-runs-table/client-runs-table.component';
@@ -205,7 +205,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ApplicationsComponent,
     AttributesComponent,
     ClientRunsComponent,
-    ClientRunsSearchFiltersComponent,
     ClientRunsTableComponent,
     ConvergeRadialGraphComponent,
     DateSelectorComponent,
@@ -247,6 +246,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     RunListTableComponent,
     RunSummaryComponent,
     SearchBarComponent,
+    SearchBarFilterBarComponent,
     SelectListItemComponent,
     ServiceGroupsComponent,
     ServicesSidebarComponent,

@@ -20,11 +20,11 @@
           (itemSelected)="onFilterAdded($event)"
           (filtersButtonClick)="toggleFilters()">
           </app-search-bar>
-          <app-client-runs-search-filters *ngIf="filtersVisible"
+          <app-search-bar-filter-bar *ngIf="filtersVisible"
             [filters]="searchBarFilters$ | async"
             (filtersCleared)="onFiltersClear($event)"
             (filterRemoved)="onFilterRemoved($event)">
-          </app-client-runs-search-filters>
+          </app-search-bar-filter-bar>
         </chef-page-header>
       </div>
       <div class="page-body">

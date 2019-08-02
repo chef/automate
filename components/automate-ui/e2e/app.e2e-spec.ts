@@ -85,8 +85,8 @@ describe('Main Navigation', () => {
 
   it('redirects to Event Feed', () => {
     browser.waitForAngularEnabled(false);
-    element(by.linkText('Event Feed')).click();
-    expect(browser.getCurrentUrl()).toMatch(/\/event-feed/);
+    element(by.linkText('Dashboards')).click();
+    expect(browser.getCurrentUrl()).toMatch(/dashboards\/event-feed/);
   });
 
   // TODO: this now depends on authz introspection -- it's hidden in the e2e

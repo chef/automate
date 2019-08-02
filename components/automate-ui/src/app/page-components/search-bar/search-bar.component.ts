@@ -84,8 +84,8 @@ export class SearchBarComponent implements OnChanges {
       this.isLoadingSuggestions = false;
     }
 
-    if (changes.filterTypes) {
-      this.visibleCategories = List<SearchBarCategoryItem>(changes.filterTypes.currentValue);
+    if (changes.categories) {
+      this.visibleCategories = List<SearchBarCategoryItem>(changes.categories.currentValue);
     }
   }
 
