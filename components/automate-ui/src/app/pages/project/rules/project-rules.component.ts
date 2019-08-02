@@ -84,24 +84,20 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
             : false;
         })).subscribe();
 
-      this.store.select(routeParams).pipe(
-        pluck('ruleid'),
-        filter(identity),
-        takeUntil(this.isDestroyed))
-        .subscribe((id: string) => {
+      combineLatest(
+        this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
+        this.store.select(routeParams).pipe(pluck('ruleid'), filter(identity))
+      ).pipe(
+        takeUntil(this.isDestroyed),
+        map(([pId, rId]) => {
+          const project_id = pId as string;
+          const rule_id = rId as string;
           this.store.dispatch(new GetRule({
-            project_id: this.project.id,
-            id: id
+            id: rule_id,
+            project_id: project_id
           }));
-        });
-
-      this.store.select(routeParams).pipe(
-        pluck('id'),
-        filter(identity),
-        takeUntil(this.isDestroyed))
-        .subscribe((id: string) => {
-          this.store.dispatch(new GetProject({ id }));
-        });
+          this.store.dispatch(new GetProject({ id: project_id }));
+        })).subscribe();
 
       this.store.select(ruleFromRoute).pipe(
         filter(identity),
@@ -134,7 +130,9 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
 
     this.ruleForm = this.fb.group({
       // Must stay in sync with error checks in project-rules.component.html
-      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      name: [
+        this.rule.name || '',
+        [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       id: ['',
         [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]],
       type: [{ value: this.rule.type || '', disabled: this.editingRule } , Validators.required],
@@ -211,19 +209,36 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   }
 
   createRule() {
+    const ruleValue = this.ruleForm.value;
+    const ruleToCreate: Rule = {
+        project_id: this.project.id,
+        id: ruleValue.id,
+        name: ruleValue.name,
+        type: ruleValue.type,
+        status: 'STAGED',
+      conditions: this.convertConditions()
+      };
     this.store.dispatch(
       new CreateRule({
-        rule: this.convertToRule()
+        rule: ruleToCreate
       }));
   }
 
   updateRule() {
-    const updatedRule = this.convertToRule();
+    const ruleValue = this.ruleForm.value;
+    const updatedRule: Rule = {
+      project_id: this.project.id,
+      id: this.rule.id, // rule id can't be updated
+      name: ruleValue.name,
+      type: this.rule.type, // rule type can't be updated
+      status: 'STAGED',
+      conditions: this.convertConditions()
+    };
     this.store.dispatch(new UpdateRule({ rule: updatedRule }));
     this.store.dispatch(new GetRulesForProject({ project_id: this.rule.project_id }));
   }
 
-  convertToRule(): Rule {
+  convertConditions(): Condition[] {
     const ruleValue = this.ruleForm.value;
     const conditions: Condition[] = [];
     // This constant ensures type safety
@@ -238,14 +253,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
           : c.values.split(/,/).map((v: string) => v.trim())
       });
     });
-    return <Rule>{
-      project_id: this.project.id,
-      id: ruleValue.id,
-      name: ruleValue.name.trim(),
-      type: ruleValue.type,
-      status: 'STAGED',
-      conditions: conditions
-    };
+    return conditions;
   }
 
   // TODO: Leveraged much from ID section of create-object-modal... make a shared component...?
