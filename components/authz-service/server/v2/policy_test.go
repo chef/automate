@@ -987,6 +987,14 @@ func TestGetPolicy(t *testing.T) {
 
 func TestUpdatePolicy(t *testing.T) {
 	existingPolicyId := "75b3f659-b734-4b37-84bf-15a53a67349c"
+	testStatement := []*api_v2.Statement{
+		&api_v2.Statement{
+			Effect:    api_v2.Statement_ALLOW,
+			Resources: []string{"compliance:profiles"},
+			Actions:   []string{"compliance:profiles:upload"},
+			Projects:  []string{constants_v2.AllProjectsExternalID},
+		},
+	}
 	ctx := context.Background()
 	prng := prng.Seed(t)
 	ts := setupV2WithWriter(t, dummyWriter)
@@ -1016,16 +1024,9 @@ func TestUpdatePolicy(t *testing.T) {
 		}},
 		{"fails with InvalidArgument when ID is invalid", func(t *testing.T) {
 			req := api_v2.UpdatePolicyReq{
-				Id:   "no_underscore",
-				Name: "testPolicy1",
-				Statements: []*api_v2.Statement{
-					&api_v2.Statement{
-						Effect:    api_v2.Statement_ALLOW,
-						Resources: []string{"compliance:profiles"},
-						Actions:   []string{"compliance:profiles:upload"},
-						Projects:  []string{constants_v2.AllProjectsExternalID},
-					},
-				},
+				Id:         "no_underscore",
+				Name:       "testPolicy1",
+				Statements: testStatement,
 			}
 
 			pol, err := cl.UpdatePolicy(ctx, &req)
@@ -1035,15 +1036,8 @@ func TestUpdatePolicy(t *testing.T) {
 		}},
 		{"fails with InvalidArgument when missing policy name", func(t *testing.T) {
 			req := api_v2.UpdatePolicyReq{
-				Id: existingPolicyId,
-				Statements: []*api_v2.Statement{
-					&api_v2.Statement{
-						Effect:    api_v2.Statement_ALLOW,
-						Resources: []string{"compliance:profiles"},
-						Actions:   []string{"compliance:profiles:upload"},
-						Projects:  []string{constants_v2.AllProjectsExternalID},
-					},
-				},
+				Id:         existingPolicyId,
+				Statements: testStatement,
 			}
 
 			pol, err := cl.UpdatePolicy(ctx, &req)
@@ -1054,16 +1048,9 @@ func TestUpdatePolicy(t *testing.T) {
 		{"fails with NotFound when policy ID doesn't match any policies", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
 			req := api_v2.UpdatePolicyReq{
-				Id:   "this-is-wrong",
-				Name: "testPolicy1",
-				Statements: []*api_v2.Statement{
-					&api_v2.Statement{
-						Effect:    api_v2.Statement_ALLOW,
-						Resources: []string{"compliance:profiles"},
-						Actions:   []string{"compliance:profiles:upload"},
-						Projects:  []string{constants_v2.AllProjectsExternalID},
-					},
-				},
+				Id:         "this-is-wrong",
+				Name:       "testPolicy1",
+				Statements: testStatement,
 			}
 
 			pol, err := cl.UpdatePolicy(ctx, &req)
@@ -1074,16 +1061,9 @@ func TestUpdatePolicy(t *testing.T) {
 		{"successfully updates policy name", func(t *testing.T) {
 			storedPol, _ := addSomePoliciesToStore(t, store, prng)
 			req := api_v2.UpdatePolicyReq{
-				Id:   storedPol.ID,
-				Name: "newTestPolicy1",
-				Statements: []*api_v2.Statement{
-					&api_v2.Statement{
-						Effect:    api_v2.Statement_ALLOW,
-						Resources: []string{"compliance:profiles"},
-						Actions:   []string{"compliance:profiles:upload"},
-						Projects:  []string{constants_v2.AllProjectsExternalID},
-					},
-				},
+				Id:         storedPol.ID,
+				Name:       "newTestPolicy1",
+				Statements: testStatement,
 			}
 
 			pol, err := cl.UpdatePolicy(ctx, &req)
@@ -1098,17 +1078,10 @@ func TestUpdatePolicy(t *testing.T) {
 		{"successfully updates policy members", func(t *testing.T) {
 			storedPol, _ := addSomePoliciesToStore(t, store, prng)
 			req := api_v2.UpdatePolicyReq{
-				Id:      storedPol.ID,
-				Name:    "TestPolicy1",
-				Members: []string{"team:local:heroines", "team:local:ladies"},
-				Statements: []*api_v2.Statement{
-					&api_v2.Statement{
-						Effect:    api_v2.Statement_ALLOW,
-						Resources: []string{"compliance:profiles"},
-						Actions:   []string{"compliance:profiles:upload"},
-						Projects:  []string{constants_v2.AllProjectsExternalID},
-					},
-				},
+				Id:         storedPol.ID,
+				Name:       "TestPolicy1",
+				Members:    []string{"team:local:heroines", "team:local:ladies"},
+				Statements: testStatement,
 			}
 
 			pol, err := cl.UpdatePolicy(ctx, &req)
@@ -1164,17 +1137,10 @@ func TestUpdatePolicy(t *testing.T) {
 		{"successfully updates multiple properties at once", func(t *testing.T) {
 			storedPol, _ := addSomePoliciesToStore(t, store, prng)
 			req := api_v2.UpdatePolicyReq{
-				Id:      storedPol.ID,
-				Name:    "newTestPolicy1",
-				Members: []string{"team:local:ladies"},
-				Statements: []*api_v2.Statement{
-					&api_v2.Statement{
-						Effect:    api_v2.Statement_ALLOW,
-						Resources: []string{"compliance:profiles"},
-						Actions:   []string{"compliance:profiles:upload"},
-						Projects:  []string{constants_v2.AllProjectsExternalID},
-					},
-				},
+				Id:         storedPol.ID,
+				Name:       "newTestPolicy1",
+				Members:    []string{"team:local:ladies"},
+				Statements: testStatement,
 			}
 
 			pol, err := cl.UpdatePolicy(ctx, &req)
