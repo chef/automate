@@ -230,19 +230,11 @@ export class TeamEffects {
   @Effect()
   addTeamUsersSuccess$ = this.actions$.pipe(
     ofType(TeamActionTypes.ADD_USERS_SUCCESS),
-    map(() => new CreateNotification({
-      type: Type.info,
-      message: 'Added user(s) to team.'
-    })));
-
-  @Effect()
-  addTeamUsersFailure$ = this.actions$.pipe(
-    ofType(TeamActionTypes.ADD_USERS_FAILURE),
-    map(({ payload }: AddTeamUsersFailure) => {
-      const msg = payload.error.error;
+    map(({ payload: { user_ids } }: AddTeamUsersSuccess ) => {
+      const message = user_ids.length === 1 ? 'Added 1 user.' : `Added ${user_ids.length} users.`;
       return new CreateNotification({
-        type: Type.error,
-        message: `Could not add user(s) to team: ${msg || payload.error}.`
+        type: Type.info,
+        message: message
       });
     }));
 

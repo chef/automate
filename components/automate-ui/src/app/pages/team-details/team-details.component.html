@@ -34,7 +34,7 @@
     <ng-container *ngIf="tabValue === 'users'">
       <section class="page-body" *ngIf="team?.id">
         <div id="users-list">
-          <div *ngIf="!teamMembershipView">
+          <div>
             <!-- TODO remove [overridePermissionsCheck]=true once the UI is able to check specific objects
             since the path to permission on here is /auth/teams/:id/users we'll have to show everything for now. -->
             <app-user-table
@@ -47,13 +47,6 @@
               (addClicked)="toggleUserMembershipView()"
               (removeClicked)="removeUser($event)">
             </app-user-table>
-          </div>
-          <div *ngIf="teamMembershipView">
-            <app-user-team-membership-table
-              [usersToFilter]="sortedUsers$"
-              (addClicked)="addUsers($event)"
-              (cancelClicked)="toggleUserMembershipView()">
-            </app-user-team-membership-table>
           </div>
         </div>
       </section>

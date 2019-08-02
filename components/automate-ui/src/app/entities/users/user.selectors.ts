@@ -26,3 +26,8 @@ export const userFromRoute = createSelector(
   routeParams,
   (state, {id}) => find({id}, state)
 );
+
+export const getUserById = (id) => createSelector(
+  userEntities,
+  (state) => state[id]
+);
