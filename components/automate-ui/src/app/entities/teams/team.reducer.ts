@@ -17,7 +17,7 @@ export interface TeamEntityState extends EntityState<Team> {
   addUsersStatus: EntityStatus;
   removeUsersStatus: EntityStatus;
   userIDs: string[];
-  addUsersStatusHTTPError: HttpErrorResponse;
+  addUsersStatusError: HttpErrorResponse;
 }
 
 export const teamEntityAdapter: EntityAdapter<Team> = createEntityAdapter<Team>();
@@ -33,7 +33,7 @@ export const TeamEntityInitialState: TeamEntityState = teamEntityAdapter.getInit
   addUsersStatus: EntityStatus.notLoaded,
   removeUsersStatus: EntityStatus.notLoaded,
   userIDs: [],
-  addUsersStatusHTTPError: null
+  addUsersStatusError: null
 });
 
 export function teamEntityReducer(state: TeamEntityState = TeamEntityInitialState,
@@ -156,7 +156,7 @@ export function teamEntityReducer(state: TeamEntityState = TeamEntityInitialStat
 
     case TeamActionTypes.ADD_USERS_FAILURE: {
       return pipe(
-        set('addUsersStatusHTTPError', action.payload),
+        set('addUsersStatusError', action.payload),
         set('addUsersStatus', EntityStatus.loadingFailure)
       )(state) as TeamEntityState;
     }

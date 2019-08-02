@@ -88,15 +88,13 @@ describe('team add users', () => {
   });
 
   it('when the x is clicked, it returns to the team details page', () => {
-    cy.get('chef-page chef-button.close-button').click().then(() => {
-      cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamUIRouteIdentifier}`);
-    });
+    cy.get('chef-page chef-button.close-button').click();
+    cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamUIRouteIdentifier}`);
   });
 
   it('when the cancel button is clicked, it returns to the team details page', () => {
-    cy.get('#page-footer #right-buttons chef-button').last().click().then(() => {
-      cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamUIRouteIdentifier}`);
-    });
+    cy.get('#page-footer #right-buttons chef-button').last().click();
+    cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamUIRouteIdentifier}`);
   });
 
   it('navigates to the team users add page', () => {
@@ -121,27 +119,26 @@ describe('team add users', () => {
     cy.get('#users-selected').contains('1 user selected');
 
     cy.get('#page-footer #right-buttons chef-button ng-container')
-      .first().contains('Add User').click().then(() => {
+      .first().contains('Add User').click();
 
-      // drops you back on the team details page with user in the team users table
-      cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamUIRouteIdentifier}`);
-      cy.get('chef-tbody').children().should('have.length', 1);
-      cy.get('chef-tbody chef-td a').first().contains(nameForUser);
+    // drops you back on the team details page with user in the team users table
+    cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamUIRouteIdentifier}`);
+    cy.get('chef-tbody').children().should('have.length', 1);
+    cy.get('chef-tbody chef-td a').first().contains(nameForUser);
 
-      // remove user from team
+    // remove user from team
+    cy.request({
+      auth: { bearer: adminToken },
+      method: 'GET',
+      url: `/api/v0/auth/users/${usernameForUser}`
+    }).then((resp) => {
       cy.request({
         auth: { bearer: adminToken },
-        method: 'GET',
-        url: `/api/v0/auth/users/${usernameForUser}`
-      }).then((resp) => {
-        cy.request({
-          auth: { bearer: adminToken },
-          method: 'PUT',
-          url: `/api/v0/auth/teams/${teamID}/users`,
-          body: {
-            user_ids: [resp.body.id]
-          }
-        });
+        method: 'PUT',
+        url: `/api/v0/auth/teams/${teamID}/users`,
+        body: {
+          user_ids: [resp.body.id]
+        }
       });
     });
   });
@@ -154,24 +151,23 @@ describe('team add users', () => {
     cy.get('#users-selected').contains('2 users selected');
 
     cy.get('#page-footer #right-buttons chef-button ng-container')
-      .first().contains('Add 2 Users').click().then(() => {
+      .first().contains('Add 2 Users').click();
 
-      // drops you back on the team details page with user in the team users table
-      cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamUIRouteIdentifier}`);
-      cy.get('chef-tbody').children().should('have.length', 2);
-      cy.get('chef-tbody chef-td a').first().contains(nameForUser);
-      cy.get('chef-tbody chef-td a').last().contains('Local Administrator');
+    // drops you back on the team details page with user in the team users table
+    cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamUIRouteIdentifier}`);
+    cy.get('chef-tbody').children().should('have.length', 2);
+    cy.get('chef-tbody chef-td a').first().contains(nameForUser);
+    cy.get('chef-tbody chef-td a').last().contains('Local Administrator');
 
-      // navigate back to add users and see empty page and message
-      cy.get('chef-toolbar chef-button').contains('Add Users').click();
-      cy.url().should('eq',
-      `${Cypress.config().baseUrl}/settings/teams/${teamUIRouteIdentifier}/add-users`);
-      cy.get('chef-table').should('not.exist');
-      cy.get('#no-users-container h3')
-        .contains('There are no more local users to add, create some more!');
-      cy.get('#no-users-container h3 a')
-        .should('have.attr', 'target', '_blank')
-        .should('have.attr', 'href', '/settings/users');
-    });
+    // navigate back to add users and see empty page and message
+    cy.get('chef-toolbar chef-button').contains('Add Users').click();
+    cy.url().should('eq',
+    `${Cypress.config().baseUrl}/settings/teams/${teamUIRouteIdentifier}/add-users`);
+    cy.get('chef-table').should('not.exist');
+    cy.get('#no-users-container p')
+      .contains('There are no more local users to add; create some more!');
+    cy.get('#no-users-container p a')
+      .should('have.attr', 'target', '_blank')
+      .should('have.attr', 'href', '/settings/users');
   });
 });

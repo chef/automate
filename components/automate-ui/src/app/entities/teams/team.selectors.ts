@@ -52,9 +52,9 @@ export const addUsersStatus = createSelector(
   (state) => state.addUsersStatus
 );
 
-export const addUsersStatusHTTPError = createSelector(
+export const addUsersStatusError = createSelector(
   teamState,
-  (state) => state.addUsersStatusHTTPError
+  (state) => state.addUsersStatusError
 );
 
 

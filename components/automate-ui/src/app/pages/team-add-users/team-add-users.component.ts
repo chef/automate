@@ -1,11 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { identity, keyBy, at } from 'lodash/fp';
 import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { combineLatest, Subject } from 'rxjs';
+import { identity, keyBy, at } from 'lodash/fp';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 import { filter as lodashFilter } from 'lodash/fp';
-import { HttpErrorResponse } from '@angular/common/http';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams, routeURL } from 'app/route.selectors';
@@ -20,14 +20,13 @@ import {
   teamUsers,
   addUsersStatus,
   getUsersStatus as getTeamUsersStatus,
-  addUsersStatusHTTPError as addTeamUsersStatusHTTPError
+  addUsersStatusError as addTeamUsersStatusError
 } from 'app/entities/teams/team.selectors';
 import { Team } from 'app/entities/teams/team.model';
 import {
   GetTeam,
   GetTeamUsers,
-  AddTeamUsers,
-  TeamUserMgmtPayload
+  AddTeamUsers
 } from 'app/entities/teams/team.actions';
 
 const TEAM_ADD_USERS_ROUTE = /^\/settings\/teams\/.*\/add-users$/;
@@ -90,6 +89,8 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
           });
       });
 
+      // select all local users, the users for this team, and the query status for both.
+      // when both queries are finished we'll find all users that are not yet a member of the team.
       combineLatest(
         this.store.select(allUsers),
         this.store.select(userStatus),
@@ -134,7 +135,7 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
     this.addingUsers = true;
     this.addUsersFailed = '';
     const userIDs = Object.values(this.usersToAdd).map((user: User) => user.membership_id);
-    this.store.dispatch(new AddTeamUsers(<TeamUserMgmtPayload>{
+    this.store.dispatch(new AddTeamUsers({
       id: this.teamId,
       user_ids: userIDs
     }));
@@ -151,7 +152,7 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
           this.closePage();
         }
         if (state === EntityStatus.loadingFailure) {
-          this.store.select(addTeamUsersStatusHTTPError).pipe(
+          this.store.select(addTeamUsersStatusError).pipe(
             filter(identity),
             takeUntil(pendingAdd)).subscribe((error: HttpErrorResponse) => {
               if (error.message === undefined) {
@@ -166,18 +167,18 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
       });
   }
 
-  public getHeading(): string {
+  getHeading(): string {
     if (this.team) {
       return `Add Users to ${this.team.name}`;
     }
     return 'Loading...';
   }
 
-  private userNotFiltered(user: User): boolean {
+  userNotFiltered(user: User): boolean {
     return !(user.membership_id in this.mapOfUsersToFilter);
   }
 
-  public usersNotFiltered(): User[] {
+  usersNotFiltered(): User[] {
     return lodashFilter(user => this.userNotFiltered(user), this.users);
   }
 

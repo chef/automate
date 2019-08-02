@@ -1,5 +1,5 @@
 <chef-page
-  subheading="Automate only displays local users."
+  subheading="Only local users can be added to teams."
   [attr.secondary-btn-show]="showSecondary"
   [attr.heading]="getHeading()"
   [attr.confirm-btn-text]="getConfirmBtnText()"
@@ -10,8 +10,8 @@
   (confirm)="addUsers()"
   (close)="closePage()">
   <div *ngIf="!loading">
-    <div id="no-users-container" *ngIf="usersNotFiltered()?.length === 0">
-      <h3>There are no more local <a [routerLink]="['/settings', 'users']" target="_blank">users</a> to add; create some more!</h3>
+    <div id="no-users-container" *ngIf="usersNotFiltered().length === 0">
+      <p>There are no more local <a [routerLink]="['/settings', 'users']" target="_blank">users</a> to add; create some more!</p>
     </div>
     <div id="table-container" *ngIf="usersNotFiltered()?.length > 0">
       <div class="flex">
