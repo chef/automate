@@ -1,2 +1,0 @@
-#!/bin/bash
-docker run -p 11025:22 -d c7:latest
