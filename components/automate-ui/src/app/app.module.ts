@@ -90,8 +90,8 @@ import { AttributesComponent } from './page-components/attributes/attributes.com
 import { AutomateSettingsComponent } from './pages/automate-settings/automate-settings.component';
 import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
 import {
-  ClientRunsSearchBarComponent
-} from './page-components/client-runs-search-bar/client-runs-search-bar.component';
+  SearchBarComponent
+} from './page-components/search-bar/search-bar.component';
 import {
   ClientRunsSearchFiltersComponent
 } from './page-components/client-runs-search-filters/client-runs-search-filters.component';
@@ -205,7 +205,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ApplicationsComponent,
     AttributesComponent,
     ClientRunsComponent,
-    ClientRunsSearchBarComponent,
     ClientRunsSearchFiltersComponent,
     ClientRunsTableComponent,
     ConvergeRadialGraphComponent,
@@ -247,6 +246,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     RunListRoleHeaderComponent,
     RunListTableComponent,
     RunSummaryComponent,
+    SearchBarComponent,
     SelectListItemComponent,
     ServiceGroupsComponent,
     ServicesSidebarComponent,

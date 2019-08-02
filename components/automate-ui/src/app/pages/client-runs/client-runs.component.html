@@ -25,14 +25,14 @@
         <chef-heading>Client Runs</chef-heading>
         <chef-subheading>Nodes connected to Chef Automate by way of chef-client.</chef-subheading>
 
-        <app-client-runs-search-bar
+        <app-search-bar
           [numberOfFilters]="numberOfSearchBarFilters$ | async"
           [categories]="categoryTypes"
           [dynamicSuggestions]="nodeSuggestions$ | async"
           (suggestValues)="onSuggestValues($event)"
           (itemSelected)="onFilterAdded($event)"
           (filtersButtonClick)="toggleFilters()">
-        </app-client-runs-search-bar>
+        </app-search-bar>
         <div class="copy-dropdown">
           <chef-button class="dropdown-toggle" secondary (click)="toggleShareDropdown()">
             <chef-icon>share</chef-icon>

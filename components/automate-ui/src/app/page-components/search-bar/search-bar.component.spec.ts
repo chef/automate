@@ -1,23 +1,26 @@
 import { TestBed } from '@angular/core/testing';
-import { ClientRunsSearchBarComponent } from './client-runs-search-bar.component';
+import { SearchBarComponent } from './search-bar.component';
 import { MockComponent } from 'ng2-mock-component';
 import { List } from 'immutable';
 import { Chicklet } from '../../types/types';
+import { SimpleChange } from '@angular/core';
 
-describe('ClientRunsSearchBarComponent', () => {
-  let component: ClientRunsSearchBarComponent;
+describe('SearchBarComponent', () => {
+  let component: SearchBarComponent;
+  let fixture;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [
-        ClientRunsSearchBarComponent,
+        SearchBarComponent,
         MockComponent({ selector: 'chef-icon' }),
         MockComponent({ selector: 'chef-button' })
       ]
     });
 
-    component = TestBed.createComponent(ClientRunsSearchBarComponent).componentInstance;
-    component.filterTypes = [
+    fixture = TestBed.createComponent(SearchBarComponent);
+    component = fixture.componentInstance;
+    component.categories = [
       {
         type: 'attribute',
         text: 'Attribute'
@@ -63,7 +66,7 @@ describe('ClientRunsSearchBarComponent', () => {
         text: 'Role'
       }
     ];
-    component.visibleCategories = List<Chicklet>(component.filterTypes);
+    component.visibleCategories = List<Chicklet>(component.categories);
   });
 
   it('when clicking the category name, the selected category is removed', () => {
@@ -100,9 +103,13 @@ describe('ClientRunsSearchBarComponent', () => {
     it('a category is selected, 3 suggestions, and none of the suggestions are highlighted: ' +
     'highlight the first suggestion', () => {
       component.selectedCategoryType = { type: 'attribute', text: 'Attribute' };
-      component.highlightedIndex = -1;
-      component.suggestions = List<string>(['1', '2', '3']);
+      component.dynamicSuggestions = ['1', '2', '3'];
+      component.ngOnChanges({
+        dynamicSuggestions: new SimpleChange(null, component.dynamicSuggestions, false)
+      });
+      fixture.detectChanges();
 
+      component.highlightedIndex = -1;
       component.handleInput('arrowdown', '');
 
       expect(component.highlightedIndex).toEqual(0);
@@ -113,8 +120,13 @@ describe('ClientRunsSearchBarComponent', () => {
     'highlight the third suggestion', () => {
       component.selectedCategoryType = { type: 'attribute', text: 'Attribute' };
       component.highlightedIndex = 1;
-      component.suggestions = List<string>(['1', '2', '3']);
+      component.dynamicSuggestions = ['1', '2', '3'];
+      component.ngOnChanges({
+        dynamicSuggestions: new SimpleChange(null, component.dynamicSuggestions, false)
+      });
+      fixture.detectChanges();
 
+      component.highlightedIndex = 1;
       component.handleInput('arrowdown', '');
 
       expect(component.highlightedIndex).toEqual(2);
@@ -124,9 +136,13 @@ describe('ClientRunsSearchBarComponent', () => {
     it('a category is selected, 3 suggestions, and the last suggestions is highlighted: ' +
     'do not change the highlight', () => {
       component.selectedCategoryType = { type: 'attribute', text: 'Attribute' };
-      component.highlightedIndex = 2;
-      component.suggestions = List<string>(['1', '2', '3']);
+      component.dynamicSuggestions = ['1', '2', '3'];
+      component.ngOnChanges({
+        dynamicSuggestions: new SimpleChange(null, component.dynamicSuggestions, false)
+      });
+      fixture.detectChanges();
 
+      component.highlightedIndex = 2;
       component.handleInput('arrowdown', '');
 
       expect(component.highlightedIndex).toEqual(2);
@@ -158,7 +174,12 @@ describe('ClientRunsSearchBarComponent', () => {
     it('a category is selected, 3 suggestions, and the last suggestions is highlighted: ' +
     'highlight the previous suggestion', () => {
       component.selectedCategoryType = { type: 'attribute', text: 'Attribute' };
-      component.suggestions = List<string>(['1', '2', '3']);
+      component.dynamicSuggestions = ['1', '2', '3'];
+      component.ngOnChanges({
+        dynamicSuggestions: new SimpleChange(null, component.dynamicSuggestions, false)
+      });
+      fixture.detectChanges();
+
       component.highlightedIndex = component.suggestions.size - 1;
 
       component.handleInput('arrowup', '');
@@ -171,7 +192,12 @@ describe('ClientRunsSearchBarComponent', () => {
     'highlight the first suggestion', () => {
       component.selectedCategoryType = { type: 'attribute', text: 'Attribute' };
       component.highlightedIndex = 1;
-      component.suggestions = List<string>(['1', '2', '3']);
+      component.dynamicSuggestions = ['1', '2', '3'];
+
+      component.ngOnChanges({
+        dynamicSuggestions: new SimpleChange(null, component.dynamicSuggestions, false)
+      });
+      fixture.detectChanges();
 
       component.handleInput('arrowup', '');
 
@@ -183,7 +209,7 @@ describe('ClientRunsSearchBarComponent', () => {
     'do not change the highlight', () => {
       component.selectedCategoryType = { type: 'attribute', text: 'Attribute' };
       component.highlightedIndex = -1;
-      component.suggestions = List<string>(['1', '2', '3']);
+      component.dynamicSuggestions = ['1', '2', '3'];
 
       component.handleInput('arrowup', '');
 
@@ -247,8 +273,13 @@ describe('ClientRunsSearchBarComponent', () => {
       it('input text is empty, ' +
       'and a suggested item is highlighted: select the highlighted item', (done) => {
         component.selectedCategoryType = { type: 'attribute', text: 'Attribute' };
-        component.suggestions = List<string>(['1', '2', '3']);
+        component.dynamicSuggestions = ['1', '2', '3'];
         component.highlightedIndex = 1;
+
+        component.ngOnChanges({
+          dynamicSuggestions: new SimpleChange(null, component.dynamicSuggestions, false)
+        });
+        fixture.detectChanges();
 
         component.itemSelected.subscribe(({detail: {type: type, text: text}}) => {
           expect(text).toEqual('2');
@@ -262,8 +293,13 @@ describe('ClientRunsSearchBarComponent', () => {
       it('no items are highlighted, and the input text matching a suggestion is available: ' +
       'select the matching suggestion item', (done) => {
         component.selectedCategoryType = { type: 'attribute', text: 'Attribute' };
-        component.suggestions = List<string>(['1', '2', '3']);
+        component.dynamicSuggestions = ['1', '2', '3'];
         component.highlightedIndex = -1;
+
+        component.ngOnChanges({
+          dynamicSuggestions: new SimpleChange(null, component.dynamicSuggestions, false)
+        });
+        fixture.detectChanges();
 
         component.itemSelected.subscribe(({detail: {type: type, text: text}}) => {
           expect(text).toEqual('2');
@@ -278,7 +314,7 @@ describe('ClientRunsSearchBarComponent', () => {
         jasmine.clock().uninstall();
         jasmine.clock().install();
         component.selectedCategoryType = { type: 'attribute', text: 'Attribute' };
-        component.suggestions = List<string>(['1', '2', 'bbbb']);
+        component.dynamicSuggestions = ['1', '2', 'bbbb'];
         component.highlightedIndex = -1;
 
         let isItemSelectedCalled = false;
@@ -299,7 +335,7 @@ describe('ClientRunsSearchBarComponent', () => {
       describe('input text contains wildcards', () => {
         it('no items are highlighted: select the wildcard * item', (done) => {
           component.selectedCategoryType = { type: 'name', text: 'Node Name' };
-          component.suggestions = List<string>(['chef-load-1', 'chef-load-2', 'chef-load-3']);
+          component.dynamicSuggestions = ['chef-load-1', 'chef-load-2', 'chef-load-3'];
           component.highlightedIndex = -1;
 
           component.itemSelected.subscribe(({detail: {type: type, text: text}}) => {
@@ -313,7 +349,7 @@ describe('ClientRunsSearchBarComponent', () => {
 
         it('no items are highlighted: select the wildcard ? item', (done) => {
           component.selectedCategoryType = { type: 'name', text: 'Node Name' };
-          component.suggestions = List<string>(['chef-1-nodes', 'chef-2-nodes', 'chef-3-nodes']);
+          component.dynamicSuggestions = ['chef-1-nodes', 'chef-2-nodes', 'chef-3-nodes'];
           component.highlightedIndex = -1;
 
           component.itemSelected.subscribe(({detail: {type: type, text: text}}) => {

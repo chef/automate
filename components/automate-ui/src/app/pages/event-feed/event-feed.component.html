@@ -12,14 +12,14 @@
         <chef-page-header>
           <chef-heading>Event Feed</chef-heading>
           <chef-subheading>Displays events for the past week. Use <em>SHIFT+R</em>  to reset the time scale.</chef-subheading>
-          <app-client-runs-search-bar
+          <app-search-bar
           [numberOfFilters]="numberOfSearchBarFilters$ | async"
           [categories]="categoryTypes"
           [dynamicSuggestions]="suggestions$ | async"
           (suggestValues)="onSuggestValues($event)"
           (itemSelected)="onFilterAdded($event)"
           (filtersButtonClick)="toggleFilters()">
-          </app-client-runs-search-bar>
+          </app-search-bar>
           <app-client-runs-search-filters *ngIf="filtersVisible"
             [filters]="searchBarFilters$ | async"
             (filtersCleared)="onFiltersClear($event)"

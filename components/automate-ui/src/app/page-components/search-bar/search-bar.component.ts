@@ -24,11 +24,11 @@ export interface SuggestionItem {
 }
 
 @Component({
-  selector: 'app-client-runs-search-bar',
-  templateUrl: './client-runs-search-bar.component.html',
-  styleUrls: ['./client-runs-search-bar.component.scss']
+  selector: 'app-search-bar',
+  templateUrl: './search-bar.component.html',
+  styleUrls: ['./search-bar.component.scss']
 })
-export class ClientRunsSearchBarComponent implements OnChanges {
+export class SearchBarComponent implements OnChanges {
   suggestionsVisible = false;
   isLoadingSuggestions = false;
   highlightedIndex = -1;
