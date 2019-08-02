@@ -89,7 +89,10 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         filter(identity),
         takeUntil(this.isDestroyed))
         .subscribe((id: string) => {
-          this.store.dispatch(new GetRule({ id }));
+          this.store.dispatch(new GetRule({
+            project_id: this.project.id,
+            id: id
+          }));
         });
 
       this.store.select(routeParams).pipe(
@@ -210,7 +213,6 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   createRule() {
     this.store.dispatch(
       new CreateRule({
-        project_id: this.project.id,
         rule: this.convertToRule()
       }));
   }

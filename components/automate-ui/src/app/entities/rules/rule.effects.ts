@@ -62,8 +62,8 @@ export class RuleEffects {
   @Effect()
   getRule$ = this.actions$.pipe(
       ofType(RuleActionTypes.GET),
-      mergeMap(({ payload: { id } }: GetRule) =>
-        this.requests.getRule(id).pipe(
+      mergeMap(({ payload: { project_id, id } }: GetRule) =>
+        this.requests.getRule(project_id, id).pipe(
           map((resp: RuleSuccessPayload) => new GetRuleSuccess(resp)),
           catchError((error: HttpErrorResponse) => observableOf(new GetRuleFailure(error))))));
 
@@ -106,8 +106,8 @@ export class RuleEffects {
   @Effect()
   deleteRule$ = this.actions$.pipe(
       ofType(RuleActionTypes.DELETE),
-      mergeMap(({ payload: { id } }: DeleteRule) =>
-        this.requests.deleteRule(id).pipe(
+      mergeMap(({ payload: { project_id, id } }: DeleteRule) =>
+        this.requests.deleteRule(project_id, id).pipe(
           map(() => new DeleteRuleSuccess({id})),
           catchError((error: HttpErrorResponse) =>
             observableOf(new DeleteRuleFailure(error))))));

@@ -23,7 +23,8 @@ export class RuleRequests {
   }
 
   public getRule(project_id: string, id: string): Observable<RuleSuccessPayload> {
-    return this.http.get<RuleSuccessPayload>(`${env.auth_v2_url}/rules/${id}`);
+    return this.http.get<RuleSuccessPayload>(
+      `${env.auth_v2_url}/projects/${project_id}/rules/${id}`);
   }
 
   public createRule(rule: Rule): Observable<RuleSuccessPayload> {

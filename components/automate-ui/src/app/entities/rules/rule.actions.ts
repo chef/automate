@@ -50,7 +50,7 @@ export class GetRulesFailure implements Action {
 export class GetRule implements Action {
   readonly type = RuleActionTypes.GET;
 
-  constructor(public payload: { id: string }) { }
+  constructor(public payload: { project_id: string, id: string }) { }
 }
 
 export class GetRuleSuccess implements Action {
@@ -67,7 +67,7 @@ export class GetRuleFailure implements Action {
 
 export class CreateRule implements Action {
   readonly type = RuleActionTypes.CREATE;
-  constructor(public payload: {project_id: string, rule: Rule}) { }
+  constructor(public payload: { rule: Rule }) { }
 }
 
 export class CreateRuleSuccess implements Action {
@@ -83,7 +83,7 @@ export class CreateRuleFailure implements Action {
 export class DeleteRule implements Action {
   readonly type = RuleActionTypes.DELETE;
 
-  constructor(public payload: { id: string }) { }
+  constructor(public payload: { project_id: string, id: string }) { }
 }
 
 export class DeleteRuleSuccess implements Action {

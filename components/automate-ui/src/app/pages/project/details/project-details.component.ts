@@ -35,7 +35,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   public isChefManaged = false;
   public rules: Rule[] = [];
   public selectedTab: ProjectTabName = 'rules';
-  public ruleToDelete: any;
+  public ruleToDelete: Rule;
   public deleteModalVisible = false;
   public createModalVisible = false;
   public createProjectForm: FormGroup;
@@ -126,7 +126,10 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   }
 
   deleteRule(): void {
-    this.store.dispatch(new DeleteRule({ id: this.ruleToDelete.id }));
+    this.store.dispatch(new DeleteRule({
+      project_id: this.ruleToDelete.project_id,
+      id: this.ruleToDelete.id
+    }));
     this.closeDeleteModal();
   }
 
