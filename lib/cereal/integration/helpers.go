@@ -84,6 +84,8 @@ func (wrapper *workflowExecutorWrapper) OnCancel(w cereal.WorkflowInstance,
 	return wrapper.onCancel(w, ev)
 }
 
+// nolint: deadcode
+// it's used. the linter just isn't using the right tags
 func randName(name string) string {
 	now := time.Now()
 	return name + now.String()
