@@ -126,6 +126,8 @@ func getProfileA2v2(client *elastic.Client, ctx context.Context, profileId strin
 
 			}
 		}
+	} else {
+		return nil, fmt.Errorf("getProfileA2v2 unable to find profile %s", profileId)
 	}
 	return &esProfile, nil
 }
@@ -173,7 +175,7 @@ func getReportsA2v2(client *elastic.Client, ctx context.Context, esIndex string,
 }
 
 // Converts A1, A2v1, A2v2 ElasticSearch compliance summary documents to the Latest format we support
-func convertA2v2SummaryDocToLatest(src *ESInSpecSummaryA2v2) *ESInSpecSummary {
+func convertA2v2SummaryDocToLatest(src *ESInSpecSummaryA2v2) (*ESInSpecSummary, error) {
 	var dstSum ESInSpecSummary
 	dstSum.NodeID = src.NodeID
 	dstSum.ReportID = src.ReportID
@@ -208,6 +210,8 @@ func convertA2v2SummaryDocToLatest(src *ESInSpecSummaryA2v2) *ESInSpecSummary {
 		if profilesMetaMap[profileId] != nil {
 			profileTitle = profilesMetaMap[profileId].Title
 			profileVersion = profilesMetaMap[profileId].Version
+		} else {
+			return nil, fmt.Errorf("convertA2v2SummaryDocToLatest aborts convertion due to missing profile %s", profileId)
 		}
 		profileStatus := srcProfileSum.Status
 		if profileStatus == "" || profileStatus == "loaded" {
@@ -225,11 +229,11 @@ func convertA2v2SummaryDocToLatest(src *ESInSpecSummaryA2v2) *ESInSpecSummary {
 			Version:      profileVersion,
 		}
 	}
-	return &dstSum
+	return &dstSum, nil
 }
 
 // Converts A1, A2v1, A2v2 ElasticSearch compliance report documents to the latest format we support
-func convertA2v2ReportDocToLatest(src *ESInSpecReportA2v2, dstSum *ESInSpecSummary) *ESInSpecReport {
+func convertA2v2ReportDocToLatest(src *ESInSpecReportA2v2, dstSum *ESInSpecSummary) (*ESInSpecReport, error) {
 	// controls_sums were not in report documents before, but we are harmonizing that now and
 	// bringing those per profile calculations from summary to report documents as well
 	profilesSumsMap := make(map[string]reporting.NodeControlSummary, len(src.ProfilesMin))
@@ -278,6 +282,8 @@ func convertA2v2ReportDocToLatest(src *ESInSpecReportA2v2, dstSum *ESInSpecSumma
 				// also overwriting the inspec report "loaded" state with actual profile run status
 				profileStatus = profilesStatusMap[srcProfileMin.SHA256]
 			}
+		} else {
+			return nil, fmt.Errorf("convertA2v2ReportDocToLatest aborts convertion due to missing profile %s", srcProfileMin.SHA256)
 		}
 		dstRep.Profiles[i] = ESInSpecReportProfile{
 			Profile:      fmt.Sprintf("%s|%s", srcProfileMin.Name, srcProfileMin.SHA256),
@@ -312,7 +318,7 @@ func convertA2v2ReportDocToLatest(src *ESInSpecReportA2v2, dstSum *ESInSpecSumma
 			}
 		}
 	}
-	return &dstRep
+	return &dstRep, nil
 }
 
 func (migratable A2V2ElasticSearchIndices) postTimeSeriesMigration(dateToMigrate time.Time) error {
