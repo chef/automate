@@ -11,6 +11,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/platform"
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/platform/pg"
@@ -260,7 +261,10 @@ func (client *Client) CreateDB(db, role string) error {
 
 	if exists {
 		log.Info("Database exists. Asserting correct owner")
-		client.DB.AlterDatabaseOwner(db, role)
+		err := client.DB.AlterDatabaseOwner(db, role)
+		if err != nil {
+			log.WithError(err).Error("failed to alter database ownership")
+		}
 	} else {
 		log.Info("Creating database with owner")
 		err = client.DB.CreateDatabaseWithOwner(db, role)
@@ -288,7 +292,7 @@ func (client *Client) CreateDB(db, role string) error {
 
 		return err
 	}
-	defer chownClient.Close() // nolint: errcheck
+	defer fileutils.LogClose(chownClient, log, "failed to close client")
 
 	if err := chownClient.SetPublicSchemaRole(role); err != nil {
 		log.WithFields(logrus.Fields{
