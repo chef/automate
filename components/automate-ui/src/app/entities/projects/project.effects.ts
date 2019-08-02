@@ -2,8 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { interval as observableInterval, of as observableOf } from 'rxjs';
-import { catchError, mergeMap, map, filter, switchMap } from 'rxjs/operators';
+import { catchError, mergeMap, map, filter, switchMap, withLatestFrom } from 'rxjs/operators';
+import { identity } from 'lodash/fp';
+import { Store } from '@ngrx/store';
 
+import { NgrxStateAtom } from '../../ngrx.reducers';
 import { HttpStatus } from 'app/types/types';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
@@ -40,6 +43,7 @@ import {
 import {
   ProjectRequests
 } from './project.requests';
+import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
 
 const POLLING_INTERVAL_IN_SECONDS = 5;
 
@@ -47,7 +51,8 @@ const POLLING_INTERVAL_IN_SECONDS = 5;
 export class ProjectEffects {
   constructor(
     private actions$: Actions,
-    private requests: ProjectRequests
+    private requests: ProjectRequests,
+    private store: Store<NgrxStateAtom>
   ) { }
 
   @Effect()
@@ -196,7 +201,14 @@ export class ProjectEffects {
           observableOf(new GetApplyRulesStatusFailure(error))))));
 
   @Effect()
-  getLatestApplyRulesStatus$ = observableInterval(1000 * POLLING_INTERVAL_IN_SECONDS)
-    .pipe(map(() => new GetApplyRulesStatus()));
+  getLatestApplyRulesStatus$ = observableInterval(1000 * POLLING_INTERVAL_IN_SECONDS).pipe(
+    withLatestFrom(this.store.select(iamMajorVersion).pipe(filter(identity))),
+    withLatestFrom(this.store.select(iamMinorVersion).pipe(filter(identity))),
+    switchMap(([[_, iamMajorVersion], iamMinorVersion]) => observableOf(iamMajorVersion === 'v2' && iamMinorVersion === 'v1')),
+    filter(identity),
+    mergeMap(() => {
+      this.requests.getApplyRulesStatus().pipe(
+        map(() => new GetApplyRulesStatus()));
+    }));
 }
 
