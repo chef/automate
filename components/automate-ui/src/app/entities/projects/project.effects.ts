@@ -1,15 +1,19 @@
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Store } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { interval as observableInterval, of as observableOf } from 'rxjs';
 import { catchError, mergeMap, map, filter, switchMap, withLatestFrom } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
-import { Store } from '@ngrx/store';
 
-import { NgrxStateAtom } from '../../ngrx.reducers';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { HttpStatus } from 'app/types/types';
+import { NoopAction } from 'app/entities/entities';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
+import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
+
+import { ProjectRequests } from './project.requests';
 
 import {
   GetProjectsSuccess,
@@ -39,11 +43,6 @@ import {
   ProjectSuccessPayload,
   ProjectActionTypes
 } from './project.actions';
-
-import {
-  ProjectRequests
-} from './project.requests';
-import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
 
 const POLLING_INTERVAL_IN_SECONDS = 5;
 
@@ -204,11 +203,13 @@ export class ProjectEffects {
   getLatestApplyRulesStatus$ = observableInterval(1000 * POLLING_INTERVAL_IN_SECONDS).pipe(
     withLatestFrom(this.store.select(iamMajorVersion).pipe(filter(identity))),
     withLatestFrom(this.store.select(iamMinorVersion).pipe(filter(identity))),
-    switchMap(([[_, iamMajorVersion], iamMinorVersion]) => observableOf(iamMajorVersion === 'v2' && iamMinorVersion === 'v1')),
-    filter(identity),
-    mergeMap(() => {
-      this.requests.getApplyRulesStatus().pipe(
-        map(() => new GetApplyRulesStatus()));
+    switchMap(([[_, major], minor]) => {
+      if (major === 'v2' && minor === 'v1') {
+        return this.requests.getApplyRulesStatus().pipe(
+          map(() => new GetApplyRulesStatus()));
+      } else {
+        return observableOf(new NoopAction());
+      }
     }));
 }
 
