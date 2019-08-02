@@ -119,3 +119,47 @@ function LoginHelper(username: string) {
     cy.wait('@getAuth');
   });
 }
+
+Cypress.Commands.add('cleanupPoliciesByIDPrefix', (idToken: string, idPrefix: string) => {
+  cy.request({
+    auth: { bearer: idToken },
+    method: 'GET',
+    url: '/apis/iam/v2beta/policies',
+    failOnStatusCode: false
+  }).then((resp) => {
+    const body = resp.body;
+    for (const policy of body.policies) {
+      if (policy.id.startsWith(idPrefix)) {
+        cy.request({
+          auth: { bearer: idToken },
+          method: 'DELETE',
+          url: `/apis/iam/v2beta/policies/${policy.id}`,
+          failOnStatusCode: false
+        });
+      }
+    }
+  });
+});
+
+Cypress.Commands.add('cleanupProjectsByIDPrefix', (idToken: string, idPrefix: string) => {
+  cy.request({
+    auth: { bearer: idToken },
+    method: 'GET',
+    url: '/apis/iam/v2beta/projects',
+    failOnStatusCode: false
+  }).then((resp) => {
+    const body = resp.body;
+    for (const project of body.projects) {
+      if (project.id.startsWith(idPrefix)) {
+        cy.request({
+          auth: { bearer: idToken },
+          method: 'DELETE',
+          url: `/apis/iam/v2beta/projects/${project.id}`,
+          failOnStatusCode: false
+        });
+      }
+    }
+  });
+});
+
+
