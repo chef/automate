@@ -16,7 +16,7 @@
           [value]="inputText"
           type="text"
           class="suggester-input"
-          placeholder="{{ get_filter_text() }}"
+          placeholder="{{ getFilterText() }}"
           autocomplete="off">
     <ng-content select=".suggester-input-buttons"></ng-content>
     <div *ngIf="numberOfFilters > 0" class="search-suffix">

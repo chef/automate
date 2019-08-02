@@ -114,9 +114,6 @@ import {
   EventFeedGuitarStringsComponent
 } from './page-components/event-feed-guitar-strings/event-feed-guitar-strings.component';
 import {
-  EventFeedSelectComponent
-} from './page-components/event-feed-select/event-feed-select.component';
-import {
   EventFeedSidebarComponent
 } from './page-components/event-feed-sidebar/event-feed-sidebar.component';
 import {
@@ -179,9 +176,6 @@ import {
   ServicesSidebarComponent
 } from './page-components/services-sidebar/services-sidebar.component';
 import { ServiceGroupsComponent } from './pages/service-groups/service-groups.component';
-import {
-  ServerOrgFilterSidebarComponent
-} from './page-components/server-org-filter-sidebar/server-org-filter-sidebar.component';
 import { SettingsLandingComponent } from './pages/settings-landing/settings-landing.component';
 import {
   SidebarSelectListComponent
@@ -221,7 +215,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     DeltaViewerComponent,
     EventFeedComponent,
     EventFeedGuitarStringsComponent,
-    EventFeedSelectComponent,
     EventFeedSidebarComponent,
     EventFeedTableComponent,
     EventIconComponent,
@@ -256,7 +249,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     RunSummaryComponent,
     SelectListItemComponent,
     ServiceGroupsComponent,
-    ServerOrgFilterSidebarComponent,
     ServicesSidebarComponent,
     SettingsLandingComponent,
     SidebarSelectListComponent,

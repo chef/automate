@@ -113,7 +113,7 @@ export class ClientRunsSearchBarComponent implements OnChanges {
     this.suggestionsVisibleStream.next(true);
   }
 
-  handleSuggestionClick(suggestion: any, event: Event): void {
+  handleSuggestionClick(suggestion: SuggestionItem, event: Event): void {
     event.stopPropagation();
     const type = this.selectedCategoryType.type;
     this.clearAll();
@@ -160,8 +160,8 @@ export class ClientRunsSearchBarComponent implements OnChanges {
 
   pressEnterCategorySelected(currentText: string): void {
     if (this.highlightedIndex >= 0) {
-      const sug = this.suggestions.get(this.highlightedIndex);
-      const type = this.selectedCategoryType.type;
+      const sug: SuggestionItem = this.suggestions.get(this.highlightedIndex);
+      const type: string = this.selectedCategoryType.type;
       this.clearAll();
       this.itemSelected.emit({ detail: { text: sug.name,
         type: type }});
@@ -285,7 +285,7 @@ export class ClientRunsSearchBarComponent implements OnChanges {
     }
   }
 
-  get_filter_text(): string {
+  getFilterText(): string {
     if (this.selectedCategoryType) {
       switch (this.selectedCategoryType.type) {
         case 'platform':
