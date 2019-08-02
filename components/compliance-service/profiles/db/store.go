@@ -9,13 +9,14 @@ import (
 	"os"
 
 	"github.com/blang/semver"
-	"github.com/chef/automate/components/compliance-service/dao/pgdb"
-	"github.com/chef/automate/components/compliance-service/inspec"
-	"github.com/chef/automate/components/compliance-service/profiles/market"
 	"github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"github.com/chef/automate/components/compliance-service/dao/pgdb"
+	"github.com/chef/automate/components/compliance-service/inspec"
+	"github.com/chef/automate/components/compliance-service/profiles/market"
 )
 
 type Store struct {
@@ -85,40 +86,9 @@ func (s *Store) LoadMarketProfiles(path string) error {
 			logrus.Error(err)
 		} else {
 			shaList = append(shaList, sha256)
-
-			// store profile into database
-			tx, err := s.DB.Begin()
+			err := s.insertProfile(sha256, tar, info)
 			if err != nil {
-				return err
-			}
-
-			// prepare db statements
-			addStoreStmt, err := tx.Prepare("INSERT INTO store_profiles (sha256, tar, info) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING")
-			if err != nil {
-				return err
-			}
-
-			addMarketStmt, err := tx.Prepare("INSERT INTO store_market (sha256) VALUES ($1) ON CONFLICT DO NOTHING")
-			if err != nil {
-				return err
-			}
-
-			_, err = addStoreStmt.Exec(sha256, tar, info)
-			if err != nil {
-				tx.Rollback() // nolint: errcheck
-				logrus.Errorf("%v", err)
-			}
-
-			_, err = addMarketStmt.Exec(sha256)
-			if err != nil {
-				tx.Rollback() // nolint: errcheck
-				logrus.Errorf("%v", err)
-			}
-
-			err = tx.Commit()
-			if err != nil {
-				tx.Rollback() // nolint: errcheck
-				logrus.Errorf("%v", err)
+				logrus.WithError(err).Error("failed to insert profile into databases")
 			}
 		}
 	}
@@ -133,18 +103,34 @@ func (s *Store) LoadMarketProfiles(path string) error {
         )
 	`
 
-	cleanMarketStmt, err := s.DB.Prepare(cleanMarketSQL)
-	if err != nil {
-		logrus.Errorf("could not create clean market statement: %v", err)
-		return err
-	}
-
-	_, err = cleanMarketStmt.Exec(pq.Array(shaList))
+	_, err = s.DB.Exec(cleanMarketSQL, pq.Array(shaList))
 	if err != nil {
 		logrus.Errorf("could not clean up market %v", err)
 	}
 
 	return nil
+}
+
+func (s *Store) insertProfile(sha256 string, tar []byte, info []byte) error {
+	tx, err := s.DB.Begin()
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec("INSERT INTO store_profiles (sha256, tar, info) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING",
+		sha256, tar, info)
+	if err != nil {
+		tx.Rollback() // nolint: errcheck
+		return err
+	}
+
+	_, err = tx.Exec("INSERT INTO store_market (sha256) VALUES ($1) ON CONFLICT DO NOTHING", sha256)
+	if err != nil {
+		tx.Rollback() // nolint: errcheck
+		return err
+	}
+
+	return tx.Commit()
 }
 
 func (s *Store) UploadProfile(sha256 string, namespace string, tar []byte, info []byte) error {
