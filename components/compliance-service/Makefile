@@ -204,24 +204,24 @@ start-es-pg: start-pg create-es-data-dir
 	@data_dir="$(PWD)/elasticsearch/.tmp/esdata$(ES_VER)"; \
 	if [ "$(A1_DATA)" == "true" ]; then \
 	  printf "\n===> ${yellow}Loading test a1 data into ElasticSearch${reset} ($$data_dir)...\n"; \
-	  tar -xzvf generator/dump/es-pg/es5-a1-data.tar.gz -C "$$data_dir"; \
+	  tar -xzvf test_data/es-pg/es5-a1-data.tar.gz -C "$$data_dir"; \
 	  printf "===> ${yellow}Loading test a1 data into Postgres${reset}...\n"; \
-	  docker cp generator/dump/es-pg/a1-pg-dump.sql.gz cc_pg:/tmp/; \
+	  docker cp test_data/es-pg/a1-pg-dump.sql.gz cc_pg:/tmp/; \
 	  docker exec cc_pg rm -f /tmp/a1-pg-dump.sql; \
 	  docker exec cc_pg gunzip /tmp/a1-pg-dump.sql.gz; \
 	  docker exec cc_pg psql -Upostgres chef_automate -f /tmp/a1-pg-dump.sql; \
 	fi; \
 	if [ "$(A2V1_DATA)" == "true" ]; then \
 		printf "\n===> ${yellow}Loading test A2v1 data into ElasticSearch${reset} ($$data_dir)...\n"; \
-		tar -xzvf generator/dump/es-pg/es6-a2v1-data.tar.gz -C "$$data_dir"; \
+		tar -xzvf test_data/es-pg/es6-a2v1-data.tar.gz -C "$$data_dir"; \
 	fi; \
 	if [ "$(A2V2_DATA)" == "true" ]; then \
 	  printf "\n===> ${yellow}Loading test A2v2 data into ElasticSearch${reset} ($$data_dir)...\n"; \
-	  tar -xzvf generator/dump/es-pg/es6-a2v2-data.tar.gz -C "$$data_dir"; \
+	  tar -xzvf test_data/es-pg/es6-a2v2-data.tar.gz -C "$$data_dir"; \
 	fi; \
 	if [ "$(A2V3_DATA)" == "true" ]; then \
 	  printf "\n===> ${yellow}Loading test A2v3 data into ElasticSearch${reset} ($$data_dir)...\n"; \
-	  tar -xzvf generator/dump/es-pg/es6-a2v3-data.tar.gz -C "$$data_dir"; \
+	  tar -xzvf test_data/es-pg/es6-a2v3-data.tar.gz -C "$$data_dir"; \
 	fi; \
 	chmod -R 775 "$$data_dir"; \
 	my_primary_group=`id -g -n $(USER)`; \
@@ -520,10 +520,10 @@ download-sample-market-profiles: $(MARKET_PATH)
 # in order to tunnel to a remote ES, we must trust the certificate that the remote instance is offering.  get this from your browser and add it to the keychain on the respective OS.
 ingest-reports-into-es:
 	@if  [ "$(A1_DATA)" != "true" ] && [ "$(A2V1_DATA)" != "true" ] && [ "$(A2V2_DATA)" != "true" ] && [ "$(A2V3_DATA)" != "true" ]; then \
-	  @printf "\n===> PROCESSING REPORTS FROM ${blue}generator/dump/audit_reports${reset}\n"; \
-	  FILES=$$(ls -1 generator/dump/audit_reports | grep '\.json'); \
+	  @printf "\n===> PROCESSING REPORTS FROM ${blue}test_data/audit_reports${reset}\n"; \
+	  FILES=$$(ls -1 test_data/audit_reports | grep '\.json'); \
 	  for file in $$FILES; do \
-	    file="generator/dump/audit_reports/$$file"; \
+	    file="test_data/audit_reports/$$file"; \
 	    printf "\n * Ingesting report: ${blue}$$file${reset}\n"; \
 	    go run examples/ingest/ingest_client.go --file "$$file"; \
 	  done; \
