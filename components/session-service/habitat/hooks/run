@@ -9,4 +9,7 @@ pg-helper ensure-service-database "{{cfg.storage.database}}"
 
 pg-helper create-extension "{{cfg.storage.database}}" "pgcrypto"
 
+# cleanup old migration files
+rm -rf {{pkg.svc_static_path}}/migrations
+
 exec session-service {{pkg.svc_config_path}}/config.yml

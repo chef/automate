@@ -14,4 +14,7 @@ render-template config.yml {{pkg.svc_var_path}}/etc/config.yml --conf {{pkg.svc_
 pg-helper ensure-service-database "{{cfg.storage.database}}"
 pg-helper create-extension "{{cfg.storage.database}}" "pgcrypto"
 
+# cleanup static path
+rm -rf "{{pkg.svc_static_path}}/web"
+
 exec dex serve {{pkg.svc_var_path}}/etc/config.yml

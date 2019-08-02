@@ -22,6 +22,9 @@ pg-helper fix-permissions "$DBNAME"
 
 mkdir -p "{{pkg.svc_data_path}}/profiles"
 
+# cleanup old migration files
+rm -rf "{{pkg.svc_static_path}}/migrations" {{pkg.svc_static_path}}/*.sql
+
 {{!--
 # we use bash to test for the existence of the automate-compliance-profiles path
 # because the handlebars combo of `#if pkgPathFor "chef/automate-compliance-profiles"`
