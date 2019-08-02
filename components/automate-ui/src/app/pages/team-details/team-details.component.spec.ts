@@ -7,7 +7,9 @@ import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store } from '@ngrx/store';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
+import {
+  policyEntityReducer, PolicyEntityInitialState
+} from 'app/entities/policies/policy.reducer';
 import {
   userEntityReducer,
   UserEntityInitialState
@@ -40,7 +42,8 @@ describe('TeamDetailsComponent', () => {
       navigationId: 0 // what's that zero?
     },
     users: UserEntityInitialState,
-    teams: TeamEntityInitialState
+    teams: TeamEntityInitialState,
+    policies: PolicyEntityInitialState
   };
 
   beforeEach(async(() => {
