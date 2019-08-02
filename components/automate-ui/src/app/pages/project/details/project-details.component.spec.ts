@@ -31,7 +31,7 @@ describe('ProjectDetailsComponent', () => {
       status: 'staged',
       conditions: [
         {
-          attribute: 'CHEF_ORGS',
+          attribute: 'CHEF_ORGANIZATION',
           values: ['My value'],
           operator: 'EQUALS'
         }
@@ -45,7 +45,7 @@ describe('ProjectDetailsComponent', () => {
       status: 'applied',
       conditions: [
         {
-          attribute: 'CHEF_ORGS',
+          attribute: 'CHEF_ORGANIZATION',
           values: ['Value one', 'Value two'],
           operator: 'MEMBER_OF'
         }

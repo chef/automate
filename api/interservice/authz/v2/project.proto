@@ -120,13 +120,13 @@ enum ProjectRuleTypes {
 }
 
 enum ProjectRuleConditionAttributes {
-    CHEF_SERVERS = 0;
-    CHEF_ORGS = 1;
-    CHEF_ENVIRONMENTS = 2;
-    ROLES = 3;
-    CHEF_TAGS = 4;
-    POLICY_GROUP = 5;
-    POLICY_NAME = 6;
+    CHEF_SERVER = 0;
+    CHEF_ORGANIZATION = 1;
+    ENVIRONMENT = 2;
+    CHEF_ROLE = 3;
+    CHEF_TAG = 4;
+    CHEF_POLICY_GROUP = 5;
+    CHEF_POLICY_NAME = 6;
 }
 
 enum ProjectRuleConditionOperators {

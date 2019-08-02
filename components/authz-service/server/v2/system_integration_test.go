@@ -121,7 +121,7 @@ func TestIntegrationRuleApplyAndList(t *testing.T) {
 	type1 := api_v2.ProjectRuleTypes_NODE
 	conditions1 := []*api_v2.Condition{
 		{
-			Attribute: api_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+			Attribute: api_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 			Values:    values1,
 			Operator:  api_v2.ProjectRuleConditionOperators_MEMBER_OF,
 		},
@@ -129,14 +129,14 @@ func TestIntegrationRuleApplyAndList(t *testing.T) {
 	type2 := api_v2.ProjectRuleTypes_EVENT
 	conditions2 := []*api_v2.Condition{
 		{
-			Attribute: api_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+			Attribute: api_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 			Values:    values2,
 			Operator:  api_v2.ProjectRuleConditionOperators_EQUALS,
 		},
 	}
 	conditions3 := []*api_v2.Condition{
 		{
-			Attribute: api_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+			Attribute: api_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 			Values:    values3,
 			Operator:  api_v2.ProjectRuleConditionOperators_MEMBER_OF,
 		},
@@ -334,12 +334,12 @@ func TestIntegrationRuleApplyAndList(t *testing.T) {
 
 			newConditions := []*api_v2.Condition{
 				{
-					Attribute: api_v2.ProjectRuleConditionAttributes_CHEF_TAGS,
+					Attribute: api_v2.ProjectRuleConditionAttributes_CHEF_TAG,
 					Values:    []string{"test_tag1", "test_tag2"},
 					Operator:  api_v2.ProjectRuleConditionOperators_MEMBER_OF,
 				},
 				{
-					Attribute: api_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+					Attribute: api_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 					Values:    []string{"test_org"},
 					Operator:  api_v2.ProjectRuleConditionOperators_EQUALS,
 				},

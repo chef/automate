@@ -955,7 +955,7 @@ EOF
           type: "NODE",
           conditions: [
             {
-              attribute: "CHEF_TAGS",
+              attribute: "CHEF_TAG",
               operator: "MEMBER_OF",
               values: ["tag1", "tag2"]
             }
@@ -991,7 +991,7 @@ EOF
         type: "NODE",
         conditions: [
           {
-            attribute: "CHEF_TAGS",
+            attribute: "CHEF_TAG",
             operator: "MEMBER_OF",
             values: ["tag1", "tag2"]
           }
@@ -1006,7 +1006,7 @@ EOF
         type: "EVENT",
         conditions: [
           {
-            attribute: "CHEF_SERVERS",
+            attribute: "CHEF_SERVER",
             operator: "EQUALS",
             values: ["server1"]
           }
@@ -1022,7 +1022,7 @@ EOF
         type: "NODE",
         conditions: [
           {
-            attribute: "CHEF_ORGS",
+            attribute: "CHEF_ORGANIZATION",
             operator: "EQUALS",
             values: ["org1"]
           }
@@ -1107,7 +1107,7 @@ EOF
           type: "EVENT",
           conditions: [
             {
-              attribute: "CHEF_SERVERS",
+              attribute: "CHEF_SERVER",
               operator: "EQUALS",
               values: ["brand new server"]
             }
@@ -1145,7 +1145,7 @@ EOF
           type: "NODE",
           conditions: [
             {
-              attribute: "CHEF_TAGS",
+              attribute: "CHEF_TAG",
               operator: "EQUALS",
               values: ["new tag"]
             }

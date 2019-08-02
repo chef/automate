@@ -15,7 +15,7 @@ const avengersRule = {
   project_id: avengersProject.id,
   conditions: [
     {
-      attribute: 'CHEF_ORGS',
+      attribute: 'CHEF_ORGANIZATION',
       operator: 'EQUALS',
       values: ['avengers']
     }
@@ -29,7 +29,7 @@ const xmenRule = {
   project_id: xmenProject.id,
   conditions: [
     {
-      attribute: 'CHEF_ORGS',
+      attribute: 'CHEF_ORGANIZATION',
       operator: 'EQUALS',
       values: ['xmen']
     }
@@ -233,7 +233,7 @@ describe('projects API', () => {
 
         updatedAvengersRule.conditions = [
           {
-            attribute: 'CHEF_ORGS',
+            attribute: 'CHEF_ORGANIZATION',
             operator: 'MEMBER_OF',
             values: ['avengers', 'xmen']
           }

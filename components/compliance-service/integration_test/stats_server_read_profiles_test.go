@@ -442,7 +442,7 @@ func setupReadProfiles(t *testing.T) *statsServer.Server {
 				{
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_ROLES,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
 							Values: v,
 						},
 					},
