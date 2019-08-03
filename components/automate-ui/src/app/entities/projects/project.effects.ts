@@ -12,8 +12,10 @@ import { NoopAction } from 'app/entities/entities';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
 import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
+import { allPerms } from 'app/entities/userperms/userperms.selectors';
 
 import { ProjectRequests } from './project.requests';
+import { ProjectConstants } from './project.model';
 
 import {
   GetProjectsSuccess,
@@ -203,8 +205,11 @@ export class ProjectEffects {
   getLatestApplyRulesStatus$ = observableInterval(1000 * POLLING_INTERVAL_IN_SECONDS).pipe(
     withLatestFrom(this.store.select(iamMajorVersion).pipe(filter(identity))),
     withLatestFrom(this.store.select(iamMinorVersion).pipe(filter(identity))),
-    switchMap(([[_, major], minor]) => {
-      if (major === 'v2' && minor === 'v1') {
+    withLatestFrom(this.store.select(allPerms)),
+    switchMap(([[[_, major], minor], perms]) => {
+      const permObject = perms[ProjectConstants.APPLY_RULES_ENDPOINT];
+      const allowed = permObject && permObject.get;
+      if (allowed && major === 'v2' && minor === 'v1') {
         return this.requests.getApplyRulesStatus().pipe(
           map(() => new GetApplyRulesStatus()));
       } else {

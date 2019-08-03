@@ -12,6 +12,8 @@ import { notificationState } from 'app/entities/notifications/notification.selec
 import { Notification } from 'app/entities/notifications/notification.model';
 import { DeleteNotification } from 'app/entities/notifications/notification.actions';
 import { LicenseApplyReason } from 'app/page-components/license-apply/license-apply.component';
+import { GetSomeUserPerms } from 'app/entities/userperms/userperms.actions';
+import { ProjectConstants } from 'app/entities/projects/project.model';
 
 @Component({
   selector: 'app-ui',
@@ -63,7 +65,9 @@ export class UIComponent implements OnInit {
         filter(event => event instanceof ActivationStart)
     ).subscribe((event: any) => this.renderNavbar = !event.snapshot.data.hideNavBar);
 
+    // Initial calls for polled events
     this.store.dispatch(new GetIamVersion());
+    this.store.dispatch(new GetSomeUserPerms({ paths: [ProjectConstants.APPLY_RULES_ENDPOINT] }));
   }
 
   onTriggerApplyLicense(reason: LicenseApplyReason): void {
