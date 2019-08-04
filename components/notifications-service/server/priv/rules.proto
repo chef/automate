@@ -62,7 +62,7 @@ message URLValidationResponse {
     OK = 0;  // we made the request and it succeeded with a 20x response
     ERROR = 1; // We made the request and it failed for any reason.
     INVALID_URL = 4; // the url was not valid.
-    NOTIFICATIONS_UNAVAIALBLE = 98; // we could not make the request due to capacity
+    NOTIFICATIONS_UNAVAILABLE = 98; // we could not make the request due to capacity
     INTERNAL_ERROR = 99;
   }
   Code code = 1;
