@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, ActivationStart, RoutesRecognized } from '@angular/router';
+import { ActivationStart, ActivationEnd, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -44,10 +44,19 @@ export class UIComponent implements OnInit {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private router: Router,
-    private route: ActivatedRoute
+    private router: Router
   ) {
     this.notifications$ = store.select(notificationState);
+
+    this.router.events.pipe(
+      filter(event => {
+        return event instanceof ActivationEnd;
+      })
+    ).subscribe((event: any) => {
+      this.renderNavbar = !this.renderNavbar
+        ? false
+        : !event.snapshot.data.hideNavBar;
+    });
   }
 
   ngOnInit(): void {
@@ -56,12 +65,8 @@ export class UIComponent implements OnInit {
           return event instanceof ActivationStart;
         })
     ).subscribe((event: any) => {
-      this.renderNavbar = event.snapshot.data.hideNavBar
-        ? false
-        : true;
+      this.renderNavbar = !event.snapshot.data.hideNavBar;
     });
-
-    this.renderNavbar = this.route.snapshot.data.hideNavBar;
 
     this.store.dispatch(new GetIamVersion());
   }
