@@ -149,7 +149,7 @@
 
   <!--
     Loading Success + Empty ServiceGroups: This state will be displayed when the main status is
-    a success, that is that the request to the backend was made successfuly and the returned
+    a success; that is, that the request to the backend was made successfully and the returned
     response is empty, when there are NO service-groups to display.
   -->
   <div class="empty-status" *ngIf="(serviceGroupStatus$ | async) === 'loadingSuccess' && sgHealthSummary.total === 0">

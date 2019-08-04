@@ -49,7 +49,7 @@
           Loading...
       </li>
       <li *ngIf="inputText !== '' && delayForNoSuggestions && !filterValues.length > 0" class="no-category-items">
-        No mactching result found
+        No matching result found
       </li>
       <li *ngFor="let value of filterValues; let i = index"
           (click)="valueClick(value, $event)"

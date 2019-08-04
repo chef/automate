@@ -11,7 +11,7 @@ const (
 	MaxNumberOfTimeUnits     = 6
 )
 
-// IntervalUntilNow is the short of 'DiffPrettyNUnits(timeA, now, defaulUnits)'
+// IntervalUntilNow is the short form of 'DiffPrettyNUnits(timeA, now, defaultUnits)'
 func IntervalUntilNow(t time.Time) string {
 	return DiffPrettyNUnits(t, time.Now(), DefaultNumberOfTimeUnits)
 }

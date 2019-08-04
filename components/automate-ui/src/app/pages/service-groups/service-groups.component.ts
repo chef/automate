@@ -60,7 +60,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   // The collection of allowable sort directions
   private allowedSortDirections = ['asc', 'desc', 'ASC', 'DESC'];
 
-  // Sorft field by default
+  // Sort field by default
   readonly defaultSortField = 'percent_ok';
 
   private selectedFieldDirection$: Observable<SortDirection>;

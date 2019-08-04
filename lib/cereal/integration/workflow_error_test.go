@@ -80,7 +80,7 @@ func (suite *CerealTestSuite) TestWorkflowFailOnBadEnqueue() {
 	suite.NoError(err)
 }
 
-func (suite *CerealTestSuite) TestWorkflowFailOnUnmarshableJSON() {
+func (suite *CerealTestSuite) TestWorkflowFailOnUnmarshalableJSON() {
 	workflowName := randName("failing")
 	instanceName := randName("instance")
 
