@@ -239,7 +239,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     return <Rule>{
       project_id: this.project.id,
       id: ruleValue.id,
-      name: ruleValue.name,
+      name: ruleValue.name.trim(),
       type: ruleValue.type,
       status: 'staged',
       conditions: conditions

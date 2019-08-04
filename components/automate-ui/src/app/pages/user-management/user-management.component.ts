@@ -124,7 +124,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     const formValues = this.createUserForm.value;
 
     const userCreateReq = <CreateUserPayload>{
-      name: formValues.fullname,
+      name: formValues.fullname.trim(),
       id: formValues.username,
       password: formValues.password
     };

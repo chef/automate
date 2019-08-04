@@ -178,7 +178,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   }
 
   public updateFullName(): void {
-    const name = this.editForm.get('fullName').value;
+    const name = this.editForm.get('fullName').value.trim();
     this.store.dispatch(
       this.isAdminView ?
         new UpdateUser({ ...this.user, name })
