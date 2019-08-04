@@ -53,9 +53,9 @@ export class UIComponent implements OnInit {
         return event instanceof ActivationEnd;
       })
     ).subscribe((event: any) => {
-      this.renderNavbar = !this.renderNavbar
-        ? false
-        : !event.snapshot.data.hideNavBar;
+      this.renderNavbar = typeof event.snapshot.data.hideNavBar !== 'undefined'
+        ? !event.snapshot.data.hideNavBar
+        : this.renderNavbar;
     });
   }
 
