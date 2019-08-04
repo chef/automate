@@ -23,7 +23,7 @@
               <chef-error *ngIf="duplicateMember">Member expression already in table.</chef-error>
               <chef-error *ngIf="alreadyPolicyMember">Member already in policy.</chef-error>
               <chef-error *ngIf="(expressionForm.get('expression').hasError('required') || expressionForm.get('expression').hasError('pattern')) && expressionForm.get('expression').dirty">
-                Expression is required.
+                Member expression is required.
               </chef-error>
             </chef-form-field>
           </form>
