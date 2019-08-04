@@ -25,7 +25,7 @@
       <span class="label">Password <span aria-hidden="true">*</span></span>
       <input chefInput formControlName="password" type="password">
     </label>
-    <chef-error *ngIf="createUserForm.get('password').hasError('required') && createUserForm.get('password').dirty">
+    <chef-error *ngIf="createUserForm.get('password').hasError('required') || (createUserForm.get('password').hasError('pattern')) && createUserForm.get('password').dirty">
       Password is required.
     </chef-error>
     <chef-error *ngIf="createUserForm.get('password').hasError('minlength') && createUserForm.get('password').dirty">

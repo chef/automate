@@ -20,6 +20,7 @@ import {
   allUsers, userStatus, userFromRoute, updateStatus
 } from 'app/entities/users/user.selectors';
 import { User } from 'app/entities/users/user.model';
+import { Regex } from 'app/helpers/auth/regex';
 
 // TODO: deduplicate (copied from user-management.component.ts)
 function matchFieldValidator() {
@@ -128,12 +129,16 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   }
 
   private createForms(fb: FormBuilder): void {
+    // Must stay in sync with error checks in user-details.component.html
     this.editForm = fb.group({
-      fullName: ['', Validators.required]
+      fullName: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
     this.passwordForm = fb.group({
       oldPassword: ['', [nonAdminValidator(this.isAdminView, 8)]],
-      newPassword: ['', [Validators.required, Validators.minLength(8)]],
+      newPassword: ['',
+        [Validators.required,
+        Validators.pattern(Regex.patterns.NON_BLANK),
+        Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required, matchFieldValidator()]]
     });
   }
