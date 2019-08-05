@@ -100,16 +100,12 @@ describe('team add users', () => {
   it('navigates to the team users add page', () => {
     cy.get('chef-page-header h1').contains(`Add Users to ${descriptionForTeam}`);
 
+    cy.get('chef-tbody chef-tr').contains('chef-tr', usernameForUser)
+      .contains(nameForUser);
+
     // The admin user exists by default
-    cy.get('chef-tbody').children().should('have.length', 2);
-
-    cy.get('chef-tbody chef-tr').first().children('chef-td').eq(2).contains(usernameForUser);
-    cy.get('chef-tbody chef-tr').first().children('chef-td')
-      .eq(1).children('a').contains(nameForUser);
-
-    cy.get('chef-tbody chef-tr').last().children('chef-td').eq(2).contains('admin');
-    cy.get('chef-tbody chef-tr').last().children('chef-td')
-      .eq(1).children('a').contains('Local Administrator');
+    cy.get('chef-tbody chef-tr').contains('chef-tr', 'admin')
+      .contains('Local Administrator');
 
     cy.get('#page-footer #right-buttons chef-button ng-container').first().contains('Add User');
   });
@@ -143,21 +139,17 @@ describe('team add users', () => {
     });
   });
 
-  it('adds both users then sees empty message on attempting to add more users', () => {
-    cy.get('chef-tbody chef-checkbox').first().click();
-    cy.get('#users-selected').contains('1 user selected');
-
-    cy.get('chef-tbody chef-checkbox').last().click();
-    cy.get('#users-selected').contains('2 users selected');
+  it('adds all users then sees empty message on attempting to add more users', () => {
+    cy.get('chef-tbody chef-checkbox').click({ multiple: true }); // check all checkboxes
+    cy.get('#users-selected').contains(/[0-9]+ users selected/);
 
     cy.get('#page-footer #right-buttons chef-button ng-container')
-      .first().contains('Add 2 Users').click();
+      .first().contains(/Add [0-9]+ Users/).click();
 
     // drops you back on the team details page with user in the team users table
     cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamUIRouteIdentifier}`);
-    cy.get('chef-tbody').children().should('have.length', 2);
-    cy.get('chef-tbody chef-td a').first().contains(nameForUser);
-    cy.get('chef-tbody chef-td a').last().contains('Local Administrator');
+    cy.get('chef-tbody chef-td a').contains(nameForUser);
+    cy.get('chef-tbody chef-td a').contains('Local Administrator');
 
     // navigate back to add users and see empty page and message
     cy.get('chef-toolbar chef-button').contains('Add Users').click();
