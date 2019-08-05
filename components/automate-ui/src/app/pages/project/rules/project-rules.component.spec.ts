@@ -181,7 +181,7 @@ describe('ProjectRulesComponent', () => {
     });
 
     it('should have attribute label with NODE type', () => {
-      const ruleType: RuleType = 'node';
+      const ruleType: RuleType = 'NODE';
       component.ruleForm.get('type').setValue(ruleType);
       const attributeLabel = component.getAttributeLabel();
       expect(attributeLabel)
@@ -189,7 +189,7 @@ describe('ProjectRulesComponent', () => {
     });
 
     it('should have attribute label with EVENT type', () => {
-      const ruleType: RuleType = 'event';
+      const ruleType: RuleType = 'EVENT';
       component.ruleForm.get('type').setValue(ruleType);
       const attributeLabel = component.getAttributeLabel();
       expect(attributeLabel)
@@ -214,8 +214,8 @@ describe('ProjectRulesComponent', () => {
           values: values
         };
         component.ruleForm.get('conditions').setValue([uiRule]);
-        const rule = component.convertToRule();
-        expect(rule.conditions[0]).toEqual(
+        const conditions = component.convertConditions();
+        expect(conditions[0]).toEqual(
           <Condition>{
             attribute: uiRule.attribute,
             operator: uiRule.operator,
