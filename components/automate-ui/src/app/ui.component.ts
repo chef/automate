@@ -63,9 +63,7 @@ export class UIComponent implements OnInit {
   ngOnInit(): void {
     this.router.events.pipe(
         filter(event => event instanceof ActivationStart)
-    ).subscribe((event: any) => {
-      this.renderNavbar = !event.snapshot.data.hideNavBar;
-    });
+    ).subscribe((event: any) => this.renderNavbar = !event.snapshot.data.hideNavBar);
 
     this.store.dispatch(new GetIamVersion());
   }
