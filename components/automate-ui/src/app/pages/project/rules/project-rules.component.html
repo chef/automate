@@ -76,7 +76,7 @@
 
               <chef-form-field class="attribute-field">
                 <label>
-                  <span class="label">{{ getAttributeLabel() }} <span aria-hidden="true">*</span></span>
+                  <span class="label">{{ getAttributeLabel() }}</span>
                   <select ngDefaultControl formControlName="attribute">
                     <option
                       *ngFor="let option of attributes[ruleForm.get('type').value.toLowerCase()]; let i = index"
@@ -91,7 +91,7 @@
 
               <chef-form-field class="attribute-field">
                 <label>
-                  <span class="label">Operator <span aria-hidden="true">*</span></span>
+                  <span class="label">Operator</span>
                   <select ngDefaultControl formControlName="operator">
                     <option *ngFor="let operator of operators"
                       [value]="operator.key"
@@ -105,7 +105,7 @@
 
               <chef-form-field class="attribute-field">
                 <label>
-                  <span class="label">Value <span aria-hidden="true">*</span></span>
+                  <span class="label">Value</span>
                   <chef-input ngDefaultControl
                     formControlName="values"
                     [value]="condition.controls.values.value"
