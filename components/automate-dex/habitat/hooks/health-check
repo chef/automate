@@ -11,6 +11,6 @@ res=$?
 # we translate everything != 0 to exit code 2 ("critical")
 if test "$res" != "0"; then
    echo "health check curl command returned exit code ${res}:"
-   echo $output
+   echo "$output"
    exit 2
 fi

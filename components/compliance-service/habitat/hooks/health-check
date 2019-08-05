@@ -1,5 +1,5 @@
 #!{{pkgPathFor "core/bash"}}/bin/bash
-
+{{!--
 # The protocol for hab's health_check is to exit with a status of: 0 for
 # success, 1 for warning, 2 for error, and 3 for unknown.
 # https://www.habitat.sh/docs/reference/#health_check
@@ -11,20 +11,26 @@
 # That will return an HTTP status code of 200 for success and warning, 503 for
 # critical, and 500 for unknown:
 # https://github.com/habitat-sh/habitat/pull/4873
-# shellcheck disable=SC2140
-
-rc=3
-
-opts="-cert {{pkg.svc_config_path}}/service.crt"
-opts="${opts} -key {{pkg.svc_config_path}}/service.key"
-opts="${opts} {{sys.ip}}:{{cfg.service.port}}"
 
 # A successful response looks like:
-# { "name": "compliance", "version": "1.11.1", "sha": "223c3690b", "built": "2018-04-14_00:47:47", api": "compliance" }
-response=$({{pkgPathFor "core/grpcurl"}}/bin/grpcurl -max-time 2 -insecure ${opts} chef.automate.domain.compliance.api.version.VersionService.Version 2>&1)
+# { "name": "compliance",
+#   "version": "1.11.1",
+#   "sha": "223c3690b",
+#   "built": "2018-04-14_00:47:47",
+#   "api": "compliance"
+# }
+--}}
 
-parse_result=$(echo $response | {{pkgPathFor "core/jq-static"}}/bin/jq .name -r 2>&1)
+response=$(grpcurl -max-time 2 \
+  -cacert {{pkg.svc_config_path}}/root_ca.crt \
+  -cert {{pkg.svc_config_path}}/service.crt \
+  -key {{pkg.svc_config_path}}/service.key \
+  {{sys.ip}}:{{cfg.service.port}} \
+  chef.automate.domain.compliance.api.version.VersionService.Version 2>&1)
 
+parse_result=$(echo "$response" | jq -r .name)
+
+rc=3
 case $parse_result in
   "compliance")
     rc=0 ;;
