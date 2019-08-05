@@ -151,6 +151,20 @@ steps:
       executor:
         docker:
 
+  - label: "[unit] cereal service"
+    command:
+      - scripts/install_golang.sh
+      - scripts/setup_buildkite_pg.sh cereal_test
+      - cd components/cereal-service/
+      - PG_USER="postgres" PATH=/usr/lib/postgresql/9.6/bin/:\$PATH make lint unit integration
+    timeout_in_minutes: 10
+    retry:
+      automatic:
+        limit: 1
+    expeditor:
+      executor:
+        docker:
+
   - label: "[unit] automate-platform-tools"
     command:
       - scripts/install_golang.sh

@@ -184,5 +184,8 @@ func serve(*cobra.Command, []string) error {
 }
 
 func main() {
-	rootCmd.Execute()
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
 }

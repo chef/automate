@@ -56,7 +56,7 @@ func (suite *CerealTestSuite) TestWorkflowFailOnBadEnqueue() {
 			workflowName,
 			&workflowExecutorWrapper{
 				onStart: func(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
-					close(doneChan)
+					defer close(doneChan)
 					w.EnqueueTask("foo", nil)
 					return w.Complete(nil)
 				},
@@ -90,7 +90,7 @@ func (suite *CerealTestSuite) TestWorkflowFailOnUnmarshalableJSON() {
 			workflowName,
 			&workflowExecutorWrapper{
 				onStart: func(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
-					close(doneChan)
+					defer close(doneChan)
 					return w.Continue(doneChan) // channels can't be marshalled
 				},
 				onTaskComplete: func(w cereal.WorkflowInstance, ev cereal.TaskCompleteEvent) cereal.Decision {
