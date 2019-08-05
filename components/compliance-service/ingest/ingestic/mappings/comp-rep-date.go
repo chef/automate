@@ -234,7 +234,7 @@ var ComplianceRepDate = Mapping{
 	                      }
 	                    }
 	                  },
-	                  "value": {
+	                  "values": {
 	                    "type": "keyword",
 	                    "fields": {
 	                      "engram": {
