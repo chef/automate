@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { remove } from 'lodash';
+import { remove, filter } from 'lodash';
 import { StatsService } from './stats.service';
 import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
 
@@ -19,7 +19,12 @@ export class ReportDataService {
   nodesListEmpty = false;
   nodesList: any = {
     items: [],
-    total: 0
+    total: 0,
+    statusCount: {
+      failed: 0,
+      passed: 0,
+      skipped: 0
+    }
   };
   nodesListParams: any = {
     perPage: 100,
@@ -64,6 +69,7 @@ export class ReportDataService {
       .subscribe(data => {
         this.nodesListLoading = false;
         this.nodesListEmpty = this.isEmpty(data.items);
+        data.statusCount = this.getStatusCount(data.items);
         this.nodesList = Object.assign({}, this.nodesList, data);
       });
   }
@@ -83,6 +89,19 @@ export class ReportDataService {
       return true;
     }
     return false;
+  }
+
+  getStatusCount(nodes) {
+    return {
+      failed: this.countNodesByStatus(nodes, 'failed'),
+      passed: this.countNodesByStatus(nodes, 'passed'),
+      skipped: this.countNodesByStatus(nodes, 'skipped')
+    };
+  }
+
+  countNodesByStatus(nodes, status) {
+    return filter(nodes, (node) =>
+      node.latest_report.status === status).length;
   }
 
   isAllZeros(data) {

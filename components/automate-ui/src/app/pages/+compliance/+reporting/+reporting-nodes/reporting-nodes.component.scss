@@ -1,5 +1,79 @@
 @import "~styles/variables";
 
+.nodes-list-status-filters {
+  display: flex;
+  margin: 35px;
+  align-items: center;
+
+  ::ng-deep .filter {
+    font-size: 14px;
+    height: auto;
+
+    &::before {
+      display: none;
+    }
+
+    .option-content {
+      display: flex;
+      padding: 0;
+      flex-direction: column;
+    }
+
+    .filter-total {
+      display: flex;
+      align-items: center;
+
+      chef-icon {
+        margin: -2px 0.5em 0 0;
+      }
+    }
+
+    &.selected {
+      background: blue;
+
+      .filter-label,
+      .filter-total,
+      .filter-total chef-icon {
+        color: $chef-white;
+      }
+
+      &.all  {
+        background: $chef-primary-bright;
+      }
+
+      &.critical  {
+        background: $chef-critical;
+      }
+
+      &.skipped  {
+        background: $chef-dark-grey;
+      }
+
+      &.passed  {
+        background: $chef-success;
+      }
+    }
+
+    &:not(.selected) {
+      &.all .filter-total  {
+        color: $chef-primary-bright;
+      }
+
+      &.critical .filter-total  {
+        color: $chef-critical;
+      }
+
+      &.skipped .filter-total  {
+        color: $chef-dark-grey;
+      }
+
+      &.passed .filter-total  {
+        color: $chef-success;
+      }
+    }
+  }
+}
+
 .reporting-nodes-table {
   margin: 2em 35px 0;
 
