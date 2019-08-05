@@ -5,10 +5,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/chef/automate/components/compliance-service/api/common"
-	"github.com/chef/automate/components/compliance-service/utils"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/components/compliance-service/api/common"
+	"github.com/chef/automate/components/compliance-service/utils"
 )
 
 func mergeFilters(mergeableFilters []*common.Filter) ([]common.Filter, error) {
@@ -50,7 +51,7 @@ func buildWhereFilter(mergeableFilters []*common.Filter, tableAbbrev string, fil
 		return "", errors.Wrap(err, "buildWhereFilter error")
 	}
 
-	var conditions []string
+	conditions := make([]string, 0, len(filters))
 	for _, filter := range filters {
 		var newCondition string
 		var err error

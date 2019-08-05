@@ -64,7 +64,7 @@ func (trans *DBTrans) addProfiles(profiles []string) ([]string, error) {
 		delete(profilesToInsert, p.URL)
 	}
 
-	var profilesToBeInserted []interface{}
+	profilesToBeInserted := make([]interface{}, 0, len(profilesToInsert))
 	//iterate over what's left in the map.  this is what needs to be inserted into profiles table.
 	for k := range profilesToInsert {
 		namespace, name, err := parseNamespaceAndNameFromUrl(k)
