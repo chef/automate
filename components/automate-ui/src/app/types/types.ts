@@ -70,6 +70,7 @@ export interface SearchBarCategoryItem {
   text: string;
   type: string;
   providedValues?: any[];
+  allowWildcards: boolean;
 }
 
 export interface NodeFilter {

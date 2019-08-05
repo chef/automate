@@ -63,7 +63,10 @@
         <p class="is-empty" *ngIf="errorLoadingEvents">There was an error loading events.</p>
         <chef-loading-spinner *ngIf="eventsLoading" size="50"></chef-loading-spinner>
         <ng-container>
-            <app-event-feed-table [events]="events"></app-event-feed-table>
+            <app-event-feed-table
+              [events]="events"
+              [searchBarFilters]="searchBarFilters$ | async">
+            </app-event-feed-table>
         </ng-container>
         <chef-separator class="load-more" *ngIf="completeNumberOfEvents > totalNumberOfEventsLoaded">
           <chef-button primary (click)="loadMore()" >

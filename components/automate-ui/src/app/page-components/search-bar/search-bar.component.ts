@@ -12,7 +12,7 @@ import {
 import { Subject, Observable, of as observableOf } from 'rxjs';
 import { List } from 'immutable';
 import { clamp, compact } from 'lodash';
-import { SearchBarCategoryItem } from '../../types/types';
+import { SearchBarCategoryItem, Chicklet } from '../../types/types';
 import {
   debounceTime, switchMap, distinctUntilChanged
 } from 'rxjs/operators';
@@ -37,7 +37,7 @@ export class SearchBarComponent implements OnChanges {
   visibleCategories = List<SearchBarCategoryItem>();
   suggestions: List<SuggestionItem> = List<SuggestionItem>();
   private suggestionsVisibleStream = new Subject<boolean>();
-  private suggestionSearchTermDebounce = new Subject<SearchBarCategoryItem>();
+  private suggestionSearchTermDebounce = new Subject<Chicklet>();
 
   @Input() numberOfFilters: number;
   @Input() categories: SearchBarCategoryItem[] = [];
@@ -66,7 +66,7 @@ export class SearchBarComponent implements OnChanges {
       debounceTime(300),
       // ignore new term if same as previous term
       distinctUntilChanged()
-    ).subscribe((c: SearchBarCategoryItem) => {
+    ).subscribe((c: Chicklet) => {
       if (c.text && c.text.length > 0) {
         this.isLoadingSuggestions = true;
         this.suggestValues.emit({ detail: c });
@@ -177,7 +177,8 @@ export class SearchBarComponent implements OnChanges {
           }
         }
       } else {
-        if (currentText.indexOf('?') >= 0 || currentText.indexOf('*') >= 0) {
+        if (this.selectedCategoryType.allowWildcards &&
+          (currentText.indexOf('?') >= 0 || currentText.indexOf('*') >= 0) ) {
           const type = this.selectedCategoryType.type;
           this.clearAll();
           this.itemSelected.emit({ detail: { text: currentText,
@@ -351,7 +352,7 @@ export class SearchBarComponent implements OnChanges {
     }));
   }
 
-  requestForSuggestions(c: SearchBarCategoryItem): void {
+  requestForSuggestions(c: Chicklet): void {
     this.isLoadingSuggestions = true;
     this.suggestionSearchTermDebounce.next(c);
   }

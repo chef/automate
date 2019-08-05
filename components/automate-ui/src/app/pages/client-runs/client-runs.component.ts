@@ -9,7 +9,13 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { Subject, Observable, combineLatest } from 'rxjs';
-import { Chicklet, NodeCount, RollupState, SortDirection } from '../../types/types';
+import {
+  Chicklet,
+  SearchBarCategoryItem,
+  NodeCount,
+  RollupState,
+  SortDirection
+} from '../../types/types';
 import { Store, createSelector } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
 import { find, filter as fpFilter, pickBy, some, includes } from 'lodash/fp';
@@ -54,62 +60,76 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
   pageSize = 100;
 
   // The catagories allowed for searching
-  categoryTypes: Chicklet[] = [
+  categoryTypes: SearchBarCategoryItem[] = [
     {
       type: 'attribute',
-      text: 'Attribute'
+      text: 'Attribute',
+      allowWildcards: true
     },
     {
       type: 'chef_version',
-      text: 'Chef Client Version'
+      text: 'Chef Client Version',
+      allowWildcards: true
     },
     {
       type: 'chef_tags',
-      text: 'Chef Tag'
+      text: 'Chef Tag',
+      allowWildcards: true
     },
     {
       type: 'cookbook',
-      text: 'Cookbook'
+      text: 'Cookbook',
+      allowWildcards: true
     },
     {
       type: 'environment',
-      text: 'Environment'
+      text: 'Environment',
+      allowWildcards: true
     },
     {
       type: 'error',
-      text: 'Error'
+      text: 'Error',
+      allowWildcards: true
     },
     {
       type: 'name',
-      text: 'Node Name'
+      text: 'Node Name',
+      allowWildcards: true
     },
     {
       type: 'platform',
-      text: 'Platform'
+      text: 'Platform',
+      allowWildcards: true
     },
     {
       type: 'policy_group',
-      text: 'Policy Group'
+      text: 'Policy Group',
+      allowWildcards: true
     },
     {
       type: 'policy_name',
-      text: 'Policy Name'
+      text: 'Policy Name',
+      allowWildcards: true
     },
     {
       type: 'policy_revision',
-      text: 'Policy Revision'
+      text: 'Policy Revision',
+      allowWildcards: true
     },
     {
       type: 'recipe',
-      text: 'Recipe'
+      text: 'Recipe',
+      allowWildcards: true
     },
     {
       type: 'resource_name',
-      text: 'Resource Name'
+      text: 'Resource Name',
+      allowWildcards: true
     },
     {
       type: 'role',
-      text: 'Role'
+      text: 'Role',
+      allowWildcards: true
     }
   ];
 

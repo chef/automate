@@ -1,10 +1,11 @@
 import { Component, Input, ViewChild, ElementRef, OnDestroy, OnInit } from '@angular/core';
-import { capitalize, getOr, endsWith, replace } from 'lodash/fp';
+import { capitalize, getOr, endsWith, replace, concat } from 'lodash/fp';
 import { Subject, Subscription } from 'rxjs';
-import { ChefEvent, ChefEventCollection, EventFeedFilter } from '../../types/types';
+import { ChefEvent, ChefEventCollection, EventFeedFilter, Chicklet } from '../../types/types';
 import { EventFeedService } from '../../services/event-feed/event-feed.service';
 import * as moment from 'moment';
 
+const ENTITY_TYPE_TAG = 'entity_type';
 @Component({
   selector: 'app-event-feed-table',
   templateUrl: './event-feed-table.component.html',
@@ -13,6 +14,8 @@ import * as moment from 'moment';
 
 export class EventFeedTableComponent implements OnDestroy, OnInit {
   @Input() events: ChefEvent[];
+  // The currently set collection of searchbar filters
+  @Input() searchBarFilters: Chicklet[];
   showEventGroupPanel = false;
   groupedEvent: ChefEvent;
   groupedEvents: ChefEvent[];
@@ -45,10 +48,14 @@ export class EventFeedTableComponent implements OnDestroy, OnInit {
     this.sidepanel.nativeElement.focus();
     this.groupedEventsButton = document.getElementById(clickEvent.target.id);
 
+    const searchBar = concat({ type: ENTITY_TYPE_TAG, text: this.groupedEvent.eventType },
+      this.searchBarFilters.filter((f: Chicklet) => f.type !== ENTITY_TYPE_TAG));
+
     const filter: EventFeedFilter = {
       startDate: moment(this.groupedEvent.startTime),
       endDate: moment(this.groupedEvent.endTime),
       requestorName: this.groupedEvent.requestorName,
+      searchBar: searchBar,
       task: this.groupedEvent.task,
       collapse: false,
       pageSize: this.groupedEvent.eventCount

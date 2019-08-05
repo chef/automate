@@ -19,7 +19,7 @@ import { Chicklet, SearchBarCategoryItem } from '../../types/types';
 import { sumBy } from 'lodash';
 import { initialState } from '../../services/event-feed/event-feed.reducer';
 import * as moment from 'moment';
-import { some, pickBy, filter as fpFilter } from 'lodash/fp';
+import { some, pickBy } from 'lodash/fp';
 import {
   eventFeedState
 } from '../../services/event-feed/event-feed.selectors';
@@ -67,15 +67,18 @@ export class EventFeedComponent implements OnInit, OnDestroy {
   categoryTypes: SearchBarCategoryItem[] = [
     {
       type: 'organization',
-      text: 'Chef Organization'
+      text: 'Chef Organization',
+      allowWildcards: false
     },
     {
       type: 'chef_server',
-      text: 'Chef Server'
+      text: 'Chef Server',
+      allowWildcards: false
     },
     {
       type: 'entity_type',
       text: 'Event Type',
+      allowWildcards: false,
       providedValues: [
         {name: 'client', title: 'Clients', icon: 'assignment_ind'},
         {name: 'cookbook', title: 'Cookbooks', icon: 'chrome_reader_mode'},
@@ -168,8 +171,10 @@ export class EventFeedComponent implements OnInit, OnDestroy {
         map((chicklets: Chicklet[]) => chicklets.length));
 
     // URL change listener
-    allUrlParameters$.pipe(takeUntil(this.isDestroyed)).subscribe(
-      allUrlParameters => this.dispatchSearchbarFilterUpdate(allUrlParameters));
+    this.searchBarFilters$.pipe(takeUntil(this.isDestroyed)).subscribe(
+      searchBarFilters => {
+        this.store.dispatch(eventFeedActions.addSearchbarFilters(searchBarFilters));
+      });
 
     this.suggestions$ = this.store.select(createSelector(eventFeedState,
           (state) => state.suggestions));
@@ -241,15 +246,6 @@ export class EventFeedComponent implements OnInit, OnDestroy {
       case 'scanjobs': return 'scan jobs';
       default: return eventType + 's';
     }
-  }
-
-  dispatchSearchbarFilterUpdate(allUrlParameters: Chicklet[]): void {
-
-    const searchBarFilters = fpFilter(chicklet => {
-        return some({'type': chicklet.type}, this.categoryTypes);
-      }, allUrlParameters);
-
-    this.store.dispatch(eventFeedActions.addSearchbarFilters(searchBarFilters));
   }
 
   private countTotalNumberOfEvents(loadedEvents: ChefEvent[]): number {
