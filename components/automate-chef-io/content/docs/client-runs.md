@@ -5,6 +5,10 @@ date = 2018-03-26T16:01:58-07:00
 draft = false
 bref = ""
 toc = true
+[menu]
+  [menu.docs]
+    parent = "infrastructure"
+    weight = 10
 +++
 
 ## Overview
