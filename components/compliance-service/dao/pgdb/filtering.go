@@ -9,6 +9,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/utils"
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/pgutils"
+
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
