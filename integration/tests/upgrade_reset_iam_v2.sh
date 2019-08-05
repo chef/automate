@@ -9,19 +9,8 @@ test_skip_diagnostics=true
 do_setup() {
     do_setup_default
 
-    # We are defaulting to a umask of 077 to test
-    # installations on systems that are super locked down.
-    # Briefly override that strict default so we can install
-    # packages that non-root users can use (like the hab user
-    # for health checks or this script).
-    local previous_umask
-    previous_umask=$(umask)
-    umask 022
-
-    hab pkg install core/curl
-    hab pkg install -b core/jq-static core/jo
-
-    umask "$previous_umask"
+    hab_pkg_install core/curl
+    hab_pkg_install -b core/jq-static core/jo
 }
 
 hab_curl() {
