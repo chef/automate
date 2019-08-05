@@ -34,21 +34,21 @@ func TestSummary(t *testing.T) {
         "title": "Checking for something1",
         "refs": [],
         "tags": {
-					"firewall": null,
-					"gtitle": "SRG-OS-000023-GPOS-00006",
-					"satisfies": [
-						"SRG-OS-000023-GPOS-00006",
-						"SRG-OS-000024-GPOS-00007"
-					],
-					"stig_id": "RHEL-07-010050",
-					"cci": [
-						"CCI-000048"
-					],
-					"hashhash": {
-						"bad.one": [6]
-					},
-					"documentable": false
-				},
+          "firewall": null,
+          "gtitle": "SRG-OS-000023-GPOS-00006",
+          "satisfies": [
+            "SRG-OS-000023-GPOS-00006",
+            "SRG-OS-000024-GPOS-00007"
+          ],
+          "stig_id": "RHEL-07-010050",
+          "cci": [
+            "CCI-000048"
+          ],
+          "hashhash": {
+            "bad.one": [6]
+          },
+          "documentable": false
+        },
         "code": "control 'ctrl-01' do ...",
         "results":[
           {
