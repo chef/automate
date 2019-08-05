@@ -20,7 +20,7 @@ export class UploadService {
     let owner = this.chefSessionService.username;
     let url = `${environment.compliance_url}/profiles?contentType=${contentType}&owner=${owner}`;
     let done = false;
-    return Observable.create(observer => {
+    return new Observable(observer => {
       let formData: FormData = new FormData();
       let xhr: XMLHttpRequest = new XMLHttpRequest();
 

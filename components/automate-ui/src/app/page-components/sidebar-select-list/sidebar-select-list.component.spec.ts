@@ -31,7 +31,7 @@ describe('SidebarSelectListComponent', () => {
     it('interprets the label correctly', () => {
       component.label = 'Servers';
 
-      component.allItemsObs = Observable.create((observer: Observer<Array<string>>) => {
+      component.allItemsObs = new Observable((observer: Observer<Array<string>>) => {
         observer.next([]);
         observer.complete();
       });
@@ -41,12 +41,12 @@ describe('SidebarSelectListComponent', () => {
     });
 
     it('no items are selected', () => {
-      component.allItemsObs = Observable.create((observer: Observer<Array<string>>) => {
+      component.allItemsObs = new Observable((observer: Observer<Array<string>>) => {
         observer.next(['Ice Cream', 'Cookies', 'Cake']);
         observer.complete();
       });
 
-      component.selectedItemsObs = Observable.create((observer: Observer<Array<string>>) => {
+      component.selectedItemsObs = new Observable((observer: Observer<Array<string>>) => {
         observer.next([]);
         observer.complete();
       });
@@ -59,12 +59,12 @@ describe('SidebarSelectListComponent', () => {
     });
 
     it('some items are selected', () => {
-      component.allItemsObs = Observable.create((observer: Observer<Array<string>>) => {
+      component.allItemsObs = new Observable((observer: Observer<Array<string>>) => {
         observer.next(['Ice Cream', 'Cookies', 'Cake']);
         observer.complete();
       });
 
-      component.selectedItemsObs = Observable.create((observer: Observer<Array<string>>) => {
+      component.selectedItemsObs = new Observable((observer: Observer<Array<string>>) => {
         observer.next(['Ice Cream', 'Cookies']);
         observer.complete();
       });
@@ -78,12 +78,12 @@ describe('SidebarSelectListComponent', () => {
 
     describe('remove selection', () => {
       it('should remove the Cookies from being selected', (done) => {
-        component.allItemsObs = Observable.create((observer: Observer<Array<string>>) => {
+        component.allItemsObs = new Observable((observer: Observer<Array<string>>) => {
           observer.next(['Ice Cream', 'Cookies', 'Cake']);
           observer.complete();
         });
 
-        component.selectedItemsObs = Observable.create((observer: Observer<Array<string>>) => {
+        component.selectedItemsObs = new Observable((observer: Observer<Array<string>>) => {
           observer.next(['Ice Cream', 'Cookies']);
           observer.complete();
         });
@@ -99,12 +99,12 @@ describe('SidebarSelectListComponent', () => {
       });
 
       it('should remove Cake and leave Ice Cream and Cookies', (done) => {
-        component.allItemsObs = Observable.create((observer: Observer<Array<string>>) => {
+        component.allItemsObs = new Observable((observer: Observer<Array<string>>) => {
           observer.next(['Ice Cream', 'Cookies', 'Cake']);
           observer.complete();
         });
 
-        component.selectedItemsObs = Observable.create((observer: Observer<Array<string>>) => {
+        component.selectedItemsObs = new Observable((observer: Observer<Array<string>>) => {
           observer.next(['Ice Cream', 'Cookies', 'Cake']);
           observer.complete();
         });
@@ -123,12 +123,12 @@ describe('SidebarSelectListComponent', () => {
       });
 
       it('should remove Cake and have an empty selection', (done) => {
-        component.allItemsObs = Observable.create((observer: Observer<Array<string>>) => {
+        component.allItemsObs = new Observable((observer: Observer<Array<string>>) => {
           observer.next(['Ice Cream', 'Cookies', 'Cake']);
           observer.complete();
         });
 
-        component.selectedItemsObs = Observable.create((observer: Observer<Array<string>>) => {
+        component.selectedItemsObs = new Observable((observer: Observer<Array<string>>) => {
           observer.next(['Cake']);
           observer.complete();
         });
@@ -147,12 +147,12 @@ describe('SidebarSelectListComponent', () => {
 
     describe('add selection', () => {
       it('should add Ice Cream to selections', (done) => {
-        component.allItemsObs = Observable.create((observer: Observer<Array<string>>) => {
+        component.allItemsObs = new Observable((observer: Observer<Array<string>>) => {
           observer.next(['Ice Cream', 'Cookies', 'Cake']);
           observer.complete();
         });
 
-        component.selectedItemsObs = Observable.create((observer: Observer<Array<string>>) => {
+        component.selectedItemsObs = new Observable((observer: Observer<Array<string>>) => {
           observer.next([]);
           observer.complete();
         });
@@ -168,12 +168,12 @@ describe('SidebarSelectListComponent', () => {
       });
 
       it('should add Cookies to selections with Ice Cream', (done) => {
-        component.allItemsObs = Observable.create((observer: Observer<Array<string>>) => {
+        component.allItemsObs = new Observable((observer: Observer<Array<string>>) => {
           observer.next(['Ice Cream', 'Cookies', 'Cake']);
           observer.complete();
         });
 
-        component.selectedItemsObs = Observable.create((observer: Observer<Array<string>>) => {
+        component.selectedItemsObs = new Observable((observer: Observer<Array<string>>) => {
           observer.next(['Ice Cream']);
           observer.complete();
         });
@@ -192,12 +192,12 @@ describe('SidebarSelectListComponent', () => {
 
       it('should not add missing item to selections', () => {
         spyOn(component.selected, 'emit');
-        component.allItemsObs = Observable.create((observer: Observer<Array<string>>) => {
+        component.allItemsObs = new Observable((observer: Observer<Array<string>>) => {
           observer.next(['Ice Cream', 'Cookies', 'Cake']);
           observer.complete();
         });
 
-        component.selectedItemsObs = Observable.create((observer: Observer<Array<string>>) => {
+        component.selectedItemsObs = new Observable((observer: Observer<Array<string>>) => {
           observer.next(['Ice Cream']);
           observer.complete();
         });
