@@ -123,8 +123,12 @@ func convertHealthStatusToProto(healthStatus string) applications.HealthStatus {
 func (a *ApplicationsServer) GetServicesDistinctValues(ctx context.Context,
 	request *applications.ServicesDistinctValuesReq) (*applications.ServicesDistinctValuesRes, error) {
 
-	//a.storageClient.GetServicesDistinctValues(request.FieldName, request.QueryFragment)
-	return &applications.ServicesDistinctValuesRes{}, nil
+	values, err := a.storageClient.GetServicesDistinctValues(request.FieldName, request.QueryFragment)
+	if err != nil {
+		return nil, err
+	}
+
+	return &applications.ServicesDistinctValuesRes{Values: values}, nil
 }
 
 // GetServiceGroupsHealthCounts returns the health counts from all service groups

@@ -185,6 +185,50 @@ func (db *Postgres) GetServices(
 	return convertComposedServicesToStorage(services), err
 }
 
+func (db *Postgres) GetServicesDistinctValues(fieldName, queryFragment string) ([]string, error) {
+	var tableName string
+	switch fieldName {
+	case "origin", "service_name", "version", "channel", "buildstamp":
+		tableName = "service"
+	case "application", "environment":
+		tableName = "deployment"
+	case "site":
+		tableName = "supervisor"
+	case "group_name":
+		tableName = "service_group"
+	default:
+		return nil, errors.Errorf("fieldName %q is invalid", fieldName)
+	}
+	columnName := columnNameForField(fieldName)
+	query := fmt.Sprintf("SELECT DISTINCT %s from %s AS t WHERE t.%s ILIKE $1 ORDER BY %s ASC LIMIT 100;",
+		columnName,
+		tableName,
+		columnName,
+		columnName,
+	)
+	matcher := fmt.Sprintf("%s%%", queryFragment)
+
+	var matches []string
+	_, err := db.DbMap.Select(&matches, query, matcher)
+	if err != nil {
+		return nil, err
+	}
+	return matches, nil
+}
+
+func columnNameForField(fieldName string) string {
+	switch fieldName {
+	case "service_name":
+		return "name"
+	case "application":
+		return "app_name"
+	case "buildstamp":
+		return "release"
+	default:
+		return fieldName
+	}
+}
+
 // GetDisconnectedServices returns a list of disconnected services
 func (db *Postgres) GetDisconnectedServices(thresholdMinutes int32) ([]*storage.Service, error) {
 	var services []*composedService
