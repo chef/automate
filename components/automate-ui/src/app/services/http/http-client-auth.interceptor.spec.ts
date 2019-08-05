@@ -36,7 +36,7 @@ describe('HttpClientAuthInterceptor', () => {
 
     it('when a 401 response is intercepted logs out the session', done => {
       spyOn(chefSession, 'logout');
-      httpClient.get('/endpoint').subscribe(null, done);
+      httpClient.get('/endpoint').subscribe({ error: done });
 
       const httpRequest = httpMock.expectOne('/endpoint');
       // Note 2019/06/27 (sr): When using HTTP/2, statusText will always be "OK"
