@@ -47,7 +47,7 @@ export class UIComponent implements OnInit {
     private router: Router
   ) {
     this.notifications$ = store.select(notificationState);
-    
+
     // ActivationEnd specifically needs to be here in the constructor to catch early events.
     this.router.events.pipe(
       filter(event => {
