@@ -729,7 +729,7 @@ steps:
     artifact_paths:
       - /tmp/compliance.log
     env:
-      TEST: "62_A2V3_migration_spec.rb"
+      TEST: "63_A2V3_migration_spec.rb"
       A2V3_DATA: true
       ES_VER: 6
       LANG: en_US.UTF-8
