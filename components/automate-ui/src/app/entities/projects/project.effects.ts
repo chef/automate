@@ -8,7 +8,6 @@ import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { HttpStatus } from 'app/types/types';
-import { NoopAction } from 'app/entities/entities';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
 import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
@@ -206,15 +205,15 @@ export class ProjectEffects {
     withLatestFrom(this.store.select(iamMajorVersion).pipe(filter(identity))),
     withLatestFrom(this.store.select(iamMinorVersion).pipe(filter(identity))),
     withLatestFrom(this.store.select(allPerms)),
-    switchMap(([[[_, major], minor], perms]) => {
+    filter(([[[_, major], minor], perms]) => {
       const permObject = perms[ProjectConstants.APPLY_RULES_ENDPOINT];
       const allowed = permObject && permObject.get;
-      if (allowed && major === 'v2' && minor === 'v1') {
-        return this.requests.getApplyRulesStatus().pipe(
-          map(() => new GetApplyRulesStatus()));
-      } else {
-        return observableOf(new NoopAction());
-      }
-    }));
+      return allowed && major === 'v2' && minor === 'v1';
+    }),
+    switchMap(() =>
+      this.requests.getApplyRulesStatus().pipe(
+        map((resp) => new GetApplyRulesStatusSuccess(resp)),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new GetApplyRulesStatusFailure(error))))));
 }
 
