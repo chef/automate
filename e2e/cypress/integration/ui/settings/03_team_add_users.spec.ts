@@ -74,8 +74,6 @@ describe('team add users', () => {
 
     cy.visit(`/settings/teams/${teamUIRouteIdentifier}/add-users`);
     cy.wait(['@getTeam', '@getTeamUsers', '@getUsers']);
-
-    cy.get('app-welcome-modal').invoke('hide');
   });
 
   afterEach(() => {

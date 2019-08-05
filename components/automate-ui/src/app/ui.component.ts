@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivationStart } from '@angular/router';
+import { ActivationStart, ActivationEnd, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -47,16 +47,21 @@ export class UIComponent implements OnInit {
     private router: Router
   ) {
     this.notifications$ = store.select(notificationState);
+
+    // ActivationEnd specifically needs to be here in the constructor to catch early events.
+    this.router.events.pipe(
+      filter(event => event instanceof ActivationEnd)
+    ).subscribe((event: any) => {
+      this.renderNavbar = typeof event.snapshot.data.hideNavBar !== 'undefined'
+        ? !event.snapshot.data.hideNavBar
+        : this.renderNavbar;
+    });
   }
 
   ngOnInit(): void {
     this.router.events.pipe(
         filter(event => event instanceof ActivationStart)
-    ).subscribe((event: any) => {
-      this.renderNavbar = event.snapshot.data.hideNavBar
-        ? false
-        : true;
-    });
+    ).subscribe((event: any) => this.renderNavbar = !event.snapshot.data.hideNavBar);
 
     this.store.dispatch(new GetIamVersion());
   }
