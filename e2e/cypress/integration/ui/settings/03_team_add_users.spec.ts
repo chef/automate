@@ -140,11 +140,16 @@ describe('team add users', () => {
   });
 
   it('adds all users then sees empty message on attempting to add more users', () => {
-    cy.get('chef-tbody chef-checkbox').click({ multiple: true }); // check all checkboxes
-    cy.get('#users-selected').contains(/[0-9]+ users selected/);
+    // Note: we add one user, and there always is an admin user. So,
+    // we don't need to care for singular texts here ("Add 1 user" etc).
+    cy.get('chef-tbody').find('chef-tr').then(rows => {
+      const userCount = Cypress.$(rows).length;
+      cy.get('chef-tbody chef-checkbox').click({ multiple: true }); // check all checkboxes
+      cy.get('#users-selected').contains(`${userCount} users selected`);
 
-    cy.get('#page-footer #right-buttons chef-button ng-container')
-      .first().contains(/Add [0-9]+ Users/).click();
+      cy.get('#page-footer #right-buttons chef-button')
+        .contains(`Add ${userCount} Users`).click();
+    });
 
     // drops you back on the team details page with user in the team users table
     cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamUIRouteIdentifier}`);
