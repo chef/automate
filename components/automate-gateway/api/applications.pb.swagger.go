@@ -264,6 +264,46 @@ func init() {
         ]
       }
     },
+    "/beta/applications/services-distinct-values": {
+      "get": {
+        "operationId": "GetServicesDistinctValues",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/applicationsServicesDistinctValuesRes"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "field_name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "query_fragment",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ApplicationsService"
+        ]
+      }
+    },
     "/beta/applications/stats": {
       "get": {
         "operationId": "GetServicesStats",
@@ -466,6 +506,17 @@ func init() {
         },
         "services_health_counts": {
           "$ref": "#/definitions/applicationsHealthCounts"
+        }
+      }
+    },
+    "applicationsServicesDistinctValuesRes": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

@@ -15,6 +15,21 @@ func init() {
 	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServices", "service_groups", "list", "GET", "/beta/applications/services", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServicesDistinctValues", "service_groups", "list", "GET", "/beta/applications/services-distinct-values", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*ServicesDistinctValuesReq); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "field_name":
+					return m.FieldName
+				case "query_fragment":
+					return m.QueryFragment
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetServicesBySG", "service_groups", "list", "GET", "/beta/applications/service-groups/{service_group_id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*ServicesBySGReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
