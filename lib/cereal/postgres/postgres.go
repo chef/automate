@@ -29,6 +29,29 @@ const (
 	failWorkflowQuery     = `SELECT cereal_fail_workflow($1, $2)`
 	continueWorkflowQuery = `SELECT cereal_continue_workflow($1, $2, $3, $4, $5)`
 
+	listWorkflowInstancesQuery = `
+WITH res AS (
+	SELECT DISTINCT ON (instance_name, workflow_name) *
+    FROM cereal_workflow_results
+	ORDER BY instance_name, workflow_name, end_at DESC
+)
+SELECT COALESCE(a.id, res.id) id, 
+       COALESCE(a.status, 'completed') status,
+       COALESCE(a.instance_name, res.instance_name) instance_name,
+	   COALESCE(a.workflow_name, res.workflow_name) workflow_name,
+	   COALESCE(a.parameters, res.parameters) parameters,
+	   a.payload payload,
+	   res.result result,
+	   res.error error
+FROM cereal_workflow_instances a
+FULL OUTER JOIN res ON a.workflow_name = res.workflow_name AND a.instance_name = res.instance_name
+WHERE
+	(a.workflow_name = COALESCE($1, a.workflow_name) OR 
+	res.workflow_name = COALESCE($1, res.workflow_name)) AND
+	(a.instance_name = COALESCE($2, a.instance_name) OR 
+	res.instance_name = COALESCE($2, res.instance_name)) AND
+	(($3::boolean IS NULL) OR ($3::boolean IS NOT NULL AND $3::boolean AND a.status IS NOT NULL) OR ($3::boolean IS NOT NULL AND NOT $3::boolean AND a.status IS NULL));
+	`
 	listScheduledWorkflowsQuery = `
 WITH res AS (
     SELECT DISTINCT ON (instance_name, workflow_name) *
@@ -495,6 +518,52 @@ func (pg *PostgresBackend) GetWorkflowInstanceByName(ctx context.Context, instan
 		return nil, err
 	}
 	return &workflowInstance, nil
+}
+
+func (pg *PostgresBackend) ListWorkflowInstances(ctx context.Context, opts backend.ListWorkflowOpts) ([]*backend.WorkflowInstance, error) {
+	rows, err := pg.db.Query(listWorkflowInstancesQuery, opts.WorkflowName, opts.InstanceName, opts.IsRunning)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close() // nolint: errcheck
+
+	instances := []*backend.WorkflowInstance{}
+	for rows.Next() {
+		var id int64
+		workflowInstance := backend.WorkflowInstance{}
+		errText := sql.NullString{}
+		err := rows.Scan(
+			&id,
+			&workflowInstance.Status,
+			&workflowInstance.InstanceName,
+			&workflowInstance.WorkflowName,
+			&workflowInstance.Parameters,
+			&workflowInstance.Payload,
+			&workflowInstance.Result,
+			&errText,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if workflowInstance.Status == backend.WorkflowInstanceStatusCompleted {
+			workflowInstance.IsRunning = false
+			workflowInstance.Payload = nil
+			if errText.Valid {
+				workflowInstance.Err = errors.New(errText.String)
+			}
+		} else {
+			workflowInstance.IsRunning = true
+			workflowInstance.Result = nil
+		}
+		instances = append(instances, &workflowInstance)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return instances, nil
 }
 
 func (pg *PostgresBackend) EnqueueWorkflow(ctx context.Context, w *backend.WorkflowInstance) error {

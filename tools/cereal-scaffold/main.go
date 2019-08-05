@@ -7,12 +7,15 @@ import (
 	"os"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
+
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/teambition/rrule-go"
 
 	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/backend"
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/platform/pg"
 )
@@ -30,6 +33,12 @@ var simpleWorkflowOpts struct {
 
 var scheduleOpts struct {
 	Name string
+}
+
+var listInstanceOpts struct {
+	IsRunning    string
+	WorkflowName string
+	InstanceName string
 }
 
 func main() {
@@ -111,9 +120,19 @@ func main() {
 		"Name to use for the scheduled workflow",
 	)
 
+	listInstancesCmd := &cobra.Command{
+		Use:  "list-instances",
+		RunE: runListInstances,
+	}
+
+	listInstancesCmd.PersistentFlags().StringVar(&listInstanceOpts.IsRunning, "is-running", "", "true or false")
+	listInstancesCmd.PersistentFlags().StringVar(&listInstanceOpts.WorkflowName, "workflow-name", "", "the name of the workflow")
+	listInstancesCmd.PersistentFlags().StringVar(&listInstanceOpts.InstanceName, "instance-name", "", "the name of the instance")
+
 	cmd.AddCommand(simpleWorkflowCmd)
 	cmd.AddCommand(resetDBCmd)
 	cmd.AddCommand(scheduleCmd)
+	cmd.AddCommand(listInstancesCmd)
 
 	err := cmd.Execute()
 	if err != nil {
@@ -409,5 +428,42 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 		time.Sleep(10 * time.Second)
 	}
 
+	return nil
+}
+
+func runListInstances(_ *cobra.Command, args []string) error {
+	dbName := defaultDatabaseName
+	if len(args) > 0 {
+		dbName = args[0]
+	}
+
+	b := postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName))
+	err := b.Init()
+	if err != nil {
+		return err
+	}
+
+	opts := backend.ListWorkflowOpts{}
+	if listInstanceOpts.IsRunning == "true" {
+		m := true
+		opts.IsRunning = &m
+	} else if listInstanceOpts.IsRunning == "false" {
+		m := false
+		opts.IsRunning = &m
+	}
+
+	if listInstanceOpts.InstanceName != "" {
+		opts.InstanceName = &listInstanceOpts.InstanceName
+	}
+
+	if listInstanceOpts.WorkflowName != "" {
+		opts.WorkflowName = &listInstanceOpts.WorkflowName
+	}
+
+	instances, err := b.ListWorkflowInstances(context.Background(), opts)
+	if err != nil {
+		return err
+	}
+	spew.Dump(instances)
 	return nil
 }
