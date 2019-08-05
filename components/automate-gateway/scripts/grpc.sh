@@ -9,7 +9,7 @@ IMPORTS=(-I.
          -Ivendor
          -Ivendor/github.com/grpc-ecosystem/grpc-gateway
          -Ivendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
-         -Ivendor/github.com/lyft/protoc-gen-validate
+         -Ivendor/github.com/envoyproxy/protoc-gen-validate
         )
 
 # globstar: makes **/ resolve nested directories

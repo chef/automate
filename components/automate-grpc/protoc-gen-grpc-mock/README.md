@@ -23,7 +23,7 @@ Validate() error
 
 it will call this function, and return a status with `codes.InvalidArgument` if it exits non-nil.
 
-This interface is what [PGV](https://github.com/lyft/protoc-gen-validate) gives us, which is currently used for API validation in authz-service.
+This interface is what [PGV](https://github.com/envoyproxy/protoc-gen-validate) gives us, which is currently used for API validation in authz-service.
 
 ## Generate mock code
 

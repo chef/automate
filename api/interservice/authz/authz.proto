@@ -84,7 +84,7 @@ message DeletePolicyReq {
 // Note: This regular expression describes a valid UUIDv4. It would be nice
 // to make UUIDv4 a "well-known format" of protoc-gen-validate, like email
 // or URI or IPv4.
-// See https://github.com/lyft/protoc-gen-validate/blob/930a67cf7ba4/README.md#strings
+// See https://github.com/envoyproxy/protoc-gen-validate/blob/930a67cf7ba4/README.md#strings
 // for "well-known formats".
 
 message DeletePolicyResp {
