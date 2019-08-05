@@ -194,7 +194,7 @@ const routes: Routes = [
       loadChildren: 'app/pages/+compliance/compliance.module#ComplianceModule'
     },
     {
-      path: 'client-runs',
+      path: 'infrastructure/client-runs',
       children: [
         {
           path: '',
@@ -311,7 +311,7 @@ const routes: Routes = [
   // END Deprecated routes.
   { // everything unknown goes to client runs
     path: '**',
-    redirectTo: 'client-runs'
+    redirectTo: 'infrastructure/client-runs'
   }
 ];
 
