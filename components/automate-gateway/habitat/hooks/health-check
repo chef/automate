@@ -2,8 +2,10 @@
 
 # For now we will just use curl and ensure that we have GRPC Error code 16
 # that means that Auth is blocking the requests
-url="https://{{sys.ip}}:{{cfg.service.port}}"
-health=$(curl --insecure --max-time 2 --noproxy {{sys.ip}} ${url}/gateway/health 2>/dev/null)
+health=$(curl --cacert {{pkg.svc_config_path}}/root_ca.crt \
+  --max-time 2 \
+  --noproxy {{sys.ip}} \
+  "https://{{sys.ip}}:{{cfg.service.port}}/gateway/health" 2>/dev/null)
 status=$(echo "$health" | jq -r '.code // .status')
 
 # Inspect the health of the automate-gateway service

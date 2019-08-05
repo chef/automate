@@ -1,7 +1,7 @@
 #!{{pkgPathFor "core/bash"}}/bin/bash
 
 health=$(grpcurl -max-time 2 \
-  -insecure \
+  -cacert {{pkg.svc_config_path}}/root_ca.crt \
   -cert {{pkg.svc_config_path}}/service.crt \
   -key {{pkg.svc_config_path}}/service.key \
   {{sys.ip}}:{{cfg.service.port}} \
