@@ -103,15 +103,16 @@ describe('team add users', () => {
     cy.get('chef-tbody chef-tr').contains('chef-tr', usernameForUser)
       .contains(nameForUser);
 
-    // The admin user exists by default
-    cy.get('chef-tbody chef-tr').contains('chef-tr', 'admin')
-      .contains('Local Administrator');
+    // Assert that there's more than two users: the one we created and admin,
+    // that always exists.
+    cy.get('chef-tbody').find('chef-tr').its('length').should('be.gte', 2);
 
     cy.get('#page-footer #right-buttons chef-button ng-container').first().contains('Add User');
   });
 
   it('adds a single user', () => {
-    cy.get('chef-tbody chef-checkbox').first().click();
+    cy.get('chef-tbody').contains('chef-tr', usernameForUser)
+      .find('chef-checkbox').click();
     cy.get('#users-selected').contains('1 user selected');
 
     cy.get('#page-footer #right-buttons chef-button ng-container')
