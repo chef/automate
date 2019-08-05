@@ -108,4 +108,5 @@ CONFIG="$CONFIG --nodemanager-address {{manager.sys.ip}}:{{manager.cfg.port}}"
 pg-helper ensure-service-database "$DBNAME"
 
 # Start Ingest Service
+# shellcheck disable=SC2086
 exec ingest-service serve $CONFIG $BACKEND

@@ -8,7 +8,6 @@ pkg_upstream_url="http://github.com/chef/automate/components/compliance-service"
 pkg_build_deps=(
   core/curl
   core/gcc
-  core/jq-static
   core/tar
 )
 pkg_bin_dirs=(bin)

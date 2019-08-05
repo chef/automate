@@ -26,8 +26,10 @@ ln -fs "{{pkg.svc_config_path}}/custom_s3.crt" "{{pkg.svc_var_path}}/config/cert
 secrets-helper generate backup-gateway.access_key 64 --if-not-exists
 secrets-helper generate backup-gateway.secret_key 64 --if-not-exists
 
-export MINIO_ACCESS_KEY="$(secrets-helper show backup-gateway.access_key)"
-export MINIO_SECRET_KEY="$(secrets-helper show backup-gateway.secret_key)"
+MINIO_ACCESS_KEY="$(secrets-helper show backup-gateway.access_key)"
+export MINIO_ACCESS_KEY
+MINIO_SECRET_KEY="$(secrets-helper show backup-gateway.secret_key)"
+export MINIO_SECRET_KEY
 export MINIO_BROWSER=off
 export SSL_CERT_FILE={{pkgPathFor "core/cacerts"}}/ssl/cert.pem
 export SSL_CERT_DIR={{pkgPathFor "core/cacerts"}}/ssl/certs

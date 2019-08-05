@@ -2,4 +2,4 @@
 
 PID=$(cat {{pkg.svc_pid_file}})
 echo "Sending SIGHUP to deployment-service (PID=$PID)"
-kill -HUP $PID
+kill -HUP "$PID"

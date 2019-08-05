@@ -63,4 +63,5 @@ PG_BACKEND="--postgres-database {{cfg.storage.database}} --migrations-path {{pkg
 export HOME="{{pkg.svc_data_path}}"
 
 # Start our service
+# shellcheck disable=SC2086
 exec nodemanager-service run ${CONFIG} ${PG_BACKEND}

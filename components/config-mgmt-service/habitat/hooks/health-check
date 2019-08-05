@@ -1,12 +1,11 @@
 #!{{pkgPathFor "core/bash"}}/bin/bash
 
-rc=0
-
-opts="-cert {{pkg.svc_config_path}}/service.crt"
-opts="${opts} -key {{pkg.svc_config_path}}/service.key"
-opts="${opts} {{sys.ip}}:{{cfg.service.port}}"
-
-health=$(grpcurl -max-time 2 -insecure ${opts} chef.automate.domain.cfgmgmt.service.CfgMgmt.GetHealth)
+health=$(grpcurl -max-time 2 \
+  -insecure \
+  -cert {{pkg.svc_config_path}}/service.crt \
+  -key {{pkg.svc_config_path}}/service.key \
+  {{sys.ip}}:{{cfg.service.port}} \
+  chef.automate.domain.cfgmgmt.service.CfgMgmt.GetHealth)
 
 # Inspect the health of the config-mgmt-service
 #
@@ -14,7 +13,7 @@ health=$(grpcurl -max-time 2 -insecure ${opts} chef.automate.domain.cfgmgmt.serv
 # {
 #   "status": "ok"
 # }
-status=$(echo $health | jq .status -r)
+status=$(echo "$health" | jq -r .status)
 case $status in
   "ok")
     rc=0 ;;
