@@ -142,7 +142,7 @@ defmodule Notifications.URLValidationResponse.Code do
   field :OK, 0
   field :ERROR, 1
   field :INVALID_URL, 4
-  field :NOTIFICATIONS_UNAVAILABLE, 98
+  field :NOTIFICATIONS_UNAVAIALBLE, 98
   field :INTERNAL_ERROR, 99
 end
 
