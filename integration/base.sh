@@ -359,7 +359,8 @@ source "${source_dir}/helpers/testing.sh"
 source "${source_dir}/helpers/studio_stubs.sh"
 # shellcheck source=./helpers/backup.sh
 source "${source_dir}/helpers/backup.sh"
-
+# shellcheck source=./helpers/hab.sh
+source "${source_dir}/helpers/hab.sh"
 
 __run_test() {
     trap dump_logs EXIT
