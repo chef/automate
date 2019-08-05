@@ -94,5 +94,5 @@ func recipe(r string) string {
 
 //TODO: move to gateway
 func runUrlFor(base_url string, entity_uuid string, run_id string) string {
-	return fmt.Sprintf("%s/client-runs/%s/runs/%s", base_url, entity_uuid, run_id)
+	return fmt.Sprintf("%s/infrastructure/client-runs/%s/runs/%s", base_url, entity_uuid, run_id)
 }
