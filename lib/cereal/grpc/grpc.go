@@ -241,7 +241,6 @@ func (c *taskCompleter) Context() context.Context {
 
 func (c *taskCompleter) Fail(errMsg string) error {
 	defer c.s.CloseSend() // nolint: errcheck
-	logrus.Info("Failing")
 	err := c.s.Send(&grpccereal.DequeueTaskRequest{
 		Cmd: &grpccereal.DequeueTaskRequest_Fail_{
 			Fail: &grpccereal.DequeueTaskRequest_Fail{
@@ -262,7 +261,6 @@ func (c *taskCompleter) Fail(errMsg string) error {
 
 func (c *taskCompleter) Succeed(result []byte) error {
 	defer c.s.CloseSend() // nolint: errcheck
-	logrus.Info("Succeeding")
 	err := c.s.Send(&grpccereal.DequeueTaskRequest{
 		Cmd: &grpccereal.DequeueTaskRequest_Succeed_{
 			Succeed: &grpccereal.DequeueTaskRequest_Succeed{
@@ -312,18 +310,17 @@ func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*backen
 		return nil, nil, errors.New("invalid msg")
 	}
 
-	logrus.Info("Dequeued task")
 	taskCtx, cancel := context.WithCancel(ctx)
 	go func() {
 		for {
 			msg, err := s.Recv()
 			if err != nil {
-				logrus.WithError(err).Info("DOING THE CANCEL")
+				logrus.WithError(err).Debug("received error: canceling task context")
 				cancel()
 				return
 			}
 			if c := msg.GetCancel(); c != nil {
-				logrus.Info("DOING THE CANCEL")
+				logrus.Debug("received cancel: canceling task context")
 				cancel()
 				return
 			}
