@@ -16,8 +16,8 @@ trigger_migrations
 
 pg-helper ensure-service-database "$DBNAME" || exit 1
 
-# Copy the migrations files
-cp -r {{pkg.path}}/migrations/* {{pkg.svc_static_path}}/
+# cleanup old migration files
+rm -rf {{pkg.svc_static_path}}/*.sql
 
 secrets-service init "{{pkg.svc_data_path}}/secrets_key" || exit 1
 
