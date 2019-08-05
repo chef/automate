@@ -4,10 +4,10 @@
   display: block;
 }
 
+// NOTE (delete before merge): review if this is still correct with susan.
 // todo: update dropdown to have min-width of 250px and increase in width based on length of project name
 .dropdown-wrap {
   position: relative;
-  width: 250px;
 
   #projects-selected {
     // TODO (tc): the value for $chef-dark-grey here

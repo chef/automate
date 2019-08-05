@@ -44,6 +44,13 @@
             <chef-button tertiary (click)="modifyID = true" id="edit-button-object-modal">Edit ID</chef-button>
           </chef-toolbar>
         </div>
+        <div *ngIf="showProjectsDropdown">
+          <app-projects-dropdown
+            [projects]="projectsAssignable"
+            (onSelection)="projectsDropdownAction($event)"
+            [disabled]="projectsAssignable.length === 0">
+          </app-projects-dropdown>
+        </div>
         <div id="button-bar">
           <chef-button primary id="create-button-object-modal"
             [disabled]="!createForm?.valid || creating || conflictError" (click)="createObject()">

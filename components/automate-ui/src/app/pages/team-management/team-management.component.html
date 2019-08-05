@@ -23,62 +23,84 @@
       [conflictErrorEvent]="conflictErrorEvent"
       objectNoun="team"
       [createForm]="createTeamForm"
+      [showProjectsDropdown]="!isMajorV1 && isMinorV1"
+      [projectsAssignable]="dropdownProjects"
       (close)="closeCreateModal()"
-      (createClicked)="createV2Team()">
+      (createClicked)="createV2Team($event)">
     </app-create-object-modal>
 
     <app-delete-object-modal
       [visible]="deleteModalVisible"
       objectNoun="team"
-      [objectName]="isV1 ? teamToDelete?.id : teamToDelete?.name"
+      [objectName]="isMajorV1 ? teamToDelete?.id : teamToDelete?.name"
       (close)="closeDeleteModal()"
       (deleteClicked)="deleteTeam()">
     </app-delete-object-modal>
 
     <div class="page-body">
-      <section>
-        <chef-toolbar>
+      <ng-container *ngIf="(sortedTeams$ | async)?.length > 0">
+        <section>
+          <chef-toolbar>
+            <app-authorized [allOf]="['/auth/teams', 'post']">
+              <chef-button primary (click)="openCreateModal()">Create Team</chef-button>
+            </app-authorized>
+          </chef-toolbar>
+          <div id="table-container">
+            <chef-table>
+              <chef-thead>
+                <chef-tr>
+                  <chef-th class="id-column">
+                    <span>Name</span>
+                  </chef-th>
+                  <chef-th class="name-column">
+                    <span *ngIf="isMajorV1">Description</span>
+                    <span *ngIf="!isMajorV1">ID</span>
+                  </chef-th>
+                  <chef-th class="button-column"></chef-th>
+                </chef-tr>
+              </chef-thead>
+              <chef-tbody>
+                <chef-tr *ngFor="let team of sortedTeams$ | async">
+                  <chef-td class="id-column">
+                    <!-- we must continue to use the guid as the identifier for teams while on v1 -->
+                    <a *ngIf="isMajorV1" [routerLink]="['/settings/teams', team.guid]">{{ team.id }}</a>
+                    <a *ngIf="!isMajorV1" [routerLink]="['/settings/teams', team.id]">{{ team.name }}</a>
+                  </chef-td>
+                  <chef-td class="name-column">
+                    <span *ngIf="isMajorV1">{{ team.name }}</span>
+                    <span *ngIf="!isMajorV1">{{ team.id }}</span>
+                  </chef-td>
+                  <chef-td class="button-column">
+                    <!-- <app-authorized [allOf]="[`/auth/teams/${team.id}`, 'delete']"> -->
+                    <chef-control-menu>
+                      <chef-option (click)="startTeamDelete(team)">Delete Team</chef-option>
+                    </chef-control-menu>
+                    <!-- <app-authorized -->
+                  </chef-td>
+                </chef-tr>
+              </chef-tbody>
+            </chef-table>
+          </div>
+        </section>
+      </ng-container>
+      <ng-container *ngIf="(sortedTeams$ | async)?.length === 0">
           <app-authorized [allOf]="['/auth/teams', 'post']">
-            <chef-button primary (click)="openCreateModal()">Create Team</chef-button>
+            <div class="empty-case-container">
+              <p>Create the first team to get started!</p>
+            </div>
+            <div class="empty-case-container">
+                <chef-button primary (click)="openCreateModal()">Create Team</chef-button>
+            </div>
           </app-authorized>
-        </chef-toolbar>
-        <div id="table-container">
-          <chef-table>
-            <chef-thead>
-              <chef-tr>
-                <chef-th class="id-column">
-                  <span>Name</span>
-                </chef-th>
-                <chef-th class="name-column">
-                  <span *ngIf="isV1">Description</span>
-                  <span *ngIf="!isV1">ID</span>
-                </chef-th>
-                <chef-th class="button-column"></chef-th>
-              </chef-tr>
-            </chef-thead>
-            <chef-tbody>
-              <chef-tr *ngFor="let team of sortedTeams$ | async">
-                <chef-td class="id-column">
-                  <!-- we must continue to use the guid as the identifier for teams while on v1 -->
-                  <a *ngIf="isV1" [routerLink]="['/settings/teams', team.guid]">{{ team.id }}</a>
-                  <a *ngIf="!isV1" [routerLink]="['/settings/teams', team.id]">{{ team.name }}</a>
-                </chef-td>
-                <chef-td class="name-column">
-                  <span *ngIf="isV1">{{ team.name }}</span>
-                  <span *ngIf="!isV1">{{ team.id }}</span>
-                </chef-td>
-                <chef-td class="button-column">
-                  <!-- <app-authorized [allOf]="[`/auth/teams/${team.id}`, 'delete']"> -->
-                  <chef-control-menu>
-                    <chef-option (click)="startTeamDelete(team)">Delete Team</chef-option>
-                  </chef-control-menu>
-                  <!-- <app-authorized -->
-                </chef-td>
-              </chef-tr>
-            </chef-tbody>
-          </chef-table>
-        </div>
-      </section>
+          <app-authorized not [allOf]="['/auth/teams', 'post']">
+            <div class="empty-case-container">
+              <p>It looks like no one has created any teams yet and you<br/>
+                don't have permission to create them.<br/><br/>
+                If this is a mistake, then reach out to your administrator.
+              </p>
+            </div>
+          </app-authorized>
+      </ng-container>
     </div>
   </main>
 </div>
