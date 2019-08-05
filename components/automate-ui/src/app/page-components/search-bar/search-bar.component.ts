@@ -12,16 +12,10 @@ import {
 import { Subject, Observable, of as observableOf } from 'rxjs';
 import { List } from 'immutable';
 import { clamp, compact } from 'lodash';
-import { SearchBarCategoryItem, Chicklet } from '../../types/types';
+import { SearchBarCategoryItem, Chicklet, SuggestionItem } from '../../types/types';
 import {
   debounceTime, switchMap, distinctUntilChanged
 } from 'rxjs/operators';
-
-export interface SuggestionItem {
-  name: string;
-  title: string;
-  icon: string;
-}
 
 @Component({
   selector: 'app-search-bar',

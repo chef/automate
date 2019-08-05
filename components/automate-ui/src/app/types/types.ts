@@ -66,11 +66,17 @@ export interface Chicklet {
   type: string;
 }
 
+export interface SuggestionItem {
+  name: string;
+  title: string;
+  icon: string;
+}
+
 export interface SearchBarCategoryItem {
   text: string;
   type: string;
-  providedValues?: any[];
-  allowWildcards: boolean;
+  providedValues?: SuggestionItem[];
+  allowWildcards?: boolean;
 }
 
 export interface NodeFilter {
