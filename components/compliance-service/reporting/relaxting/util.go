@@ -82,10 +82,6 @@ func (backend *ES2Backend) ReindexStatus(ctx context.Context, taskID string) (bo
 		return false, err
 	}
 
-	if tasksGetTaskResponse.Task == nil {
-		return false, fmt.Errorf("ReindexStatus: task %s not found", taskID)
-	}
-
 	return tasksGetTaskResponse.Completed, nil
 }
 
