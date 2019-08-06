@@ -111,7 +111,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
 
   public createV2Team(): void {
     this.createTeamCommon({
-      id: this.createTeamForm.controls.id.value.trim(),
+      id: this.createTeamForm.controls.id.value,
       name: this.createTeamForm.controls.name.value.trim(),
       projects: [],
       guid: null
@@ -120,7 +120,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
 
   public createV1Team(): void {
     this.createTeamCommon({
-      id: this.createV1TeamForm.controls.name.value.trim(),
+      id: this.createV1TeamForm.controls.name.value,
       name: this.createV1TeamForm.controls.description.value.trim(),
       projects: [],
       guid: null

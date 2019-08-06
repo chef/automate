@@ -5,9 +5,7 @@
         <div class="margin">
           <chef-form-field>
             <label>
-              <span class="label">Name
-                <span aria-hidden="true">*</span>
-              </span>
+              <span class="label">Name <span aria-hidden="true">*</span></span>
               <input chefInput formControlName="name" type="text" (keyup)="handleNameInput($event)" id="name-input">
             </label>
             <chef-error *ngIf="(createForm.get('name').hasError('required') || createForm.get('name').hasError('pattern')) && createForm.get('name').dirty">
@@ -19,9 +17,7 @@
         <div *ngIf="modifyID" class="margin">
           <chef-form-field>
             <label>
-              <span class="label">ID
-                <span aria-hidden="true">*</span>
-              </span>
+              <span class="label">ID <span aria-hidden="true">*</span></span>
               <input chefInput formControlName="id" type="text" (keyup)="handleIDInput($event)" id="id-input">
             </label>
             <chef-error *ngIf="createForm?.controls['id'].hasError('maxlength')">
