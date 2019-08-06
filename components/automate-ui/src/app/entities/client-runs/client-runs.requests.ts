@@ -117,18 +117,6 @@ export class ClientRunsRequests {
         searchParam = searchParam.append('sorting.order', filters.sortDirection);
       }
 
-      if (filters.servers) {
-        searchParam = reduce((param, server) => param.append('filter', `source_fqdn:${server}`),
-                             searchParam,
-                             filters.servers);
-      }
-
-      if (filters.organizations) {
-        searchParam = reduce((param, org) => param.append('filter', `organization:${org}`),
-                             searchParam,
-                             filters.organizations);
-      }
-
       if (filters.searchBar) {
         searchParam = reduce((param, pill) => {
           const filterParam = `${encodeURIComponent(pill.type)}:${encodeURIComponent(pill.text)}`;
@@ -148,22 +136,6 @@ export class ClientRunsRequests {
 
   private buildFilters(nodeFilter: NodeFilter): string[] {
     let filters: string[] = [];
-    if (nodeFilter.servers) {
-      const serverFilters = reduce((arrSum: string[], server: string) => {
-        return union(arrSum, [`source_fqdn:${server}`]);
-      }, [], nodeFilter.servers);
-
-      filters = filters.concat(serverFilters);
-    }
-
-    if (nodeFilter.organizations) {
-      const orgFilters = reduce((arrSum: string[], org: string) => {
-        return union(arrSum, [`organization:${org}`]);
-      }, [], nodeFilter.organizations);
-
-      filters = filters.concat(orgFilters);
-    }
-
     if (nodeFilter.searchBar) {
       const searchBarFilters = reduce((arr: string[], chicklet: Chicklet) => {
         const filterParam =
@@ -227,12 +199,6 @@ export class ClientRunsRequests {
     if (filters.searchBar) {
       searchParam = this.flattenSearchBar(filters.searchBar, searchParam);
     }
-    if (filters.servers) {
-      searchParam = this.flattenServerFilter(filters.servers, searchParam);
-    }
-    if (filters.organizations) {
-      searchParam = this.flattenOrganizationFilter(filters.organizations, searchParam);
-    }
 
     return searchParam;
   }
@@ -242,17 +208,5 @@ export class ClientRunsRequests {
       const filterParam = `${encodeURIComponent(filter.type)}:${encodeURIComponent(filter.text)}`;
       return params.append('filter', filterParam);
     }, searchParam, filters);
-  }
-
-  private flattenServerFilter(filters: string[], searchParam: HttpParams): HttpParams {
-    return reduce((params, filter) => params.append('filter', `source_fqdn:${filter}`),
-                  searchParam,
-                  filters);
-  }
-
-  private flattenOrganizationFilter(filters: string[], searchParam: HttpParams) {
-    return reduce((params, filter) => params.append('filter', `organization:${filter}`),
-                  searchParam,
-                  filters);
   }
 }

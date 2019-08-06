@@ -25,14 +25,12 @@ export interface NodeFilter {
   cookbook?: string;
   environment?: string;
   node_name?: string;
-  organizations?: Array<string>;
   page: number;
   pageSize: number;
   recipe?: string;
   resource_name?: string;
   role?: string;
   searchBar?: Array<Chicklet>;
-  servers?: Array<string>;
   sortDirection?: SortDirection;
   sortField?: string;
   status?: RollupState;

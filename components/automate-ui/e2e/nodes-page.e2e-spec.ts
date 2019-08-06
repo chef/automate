@@ -24,7 +24,7 @@ describe('Nodes page', () => {
 
   it('displays the node counts', () => {
     browser.waitForAngularEnabled(false);
-    browser.get('/client-runs');
+    browser.get('/infrastructure/client-runs)');
 
     const legend = $('.chart-legend');
 
@@ -45,7 +45,7 @@ describe('Nodes page', () => {
 
   it('displays the node list', () => {
     browser.waitForAngularEnabled(false);
-    browser.get('/client-runs');
+    browser.get('/infrastructure/client-runs');
 
     const node_list = $$('chef-table.node-list chef-tbody chef-tr');
 
@@ -58,6 +58,6 @@ describe('Nodes page', () => {
 
   xit('is accessible', (done) => {
     browser.waitForAngularEnabled(false);
-    expectUrlToBeAccessible('/client-runs', done);
+    expectUrlToBeAccessible('/infrastructure/client-runs', done);
   });
 });

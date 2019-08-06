@@ -10,7 +10,7 @@
         <div *ngIf="applicationsFeatureFlagOn" role="menuitem" class="nav-link"><a routerLink="/applications" routerLinkActive="active" tabindex="0">Applications</a></div>
 
         <app-authorized [allOf]="[['/cfgmgmt/nodes', 'get'], ['/cfgmgmt/stats/node_counts', 'get']]">
-          <div role="menuitem" class="nav-link"><a routerLink="/client-runs" routerLinkActive="active" tabindex="0">Client Runs</a></div>
+          <div role="menuitem" class="nav-link"><a routerLink="/infrastructure/client-runs" routerLinkActive="active" tabindex="0">Infrastructure</a></div>
         </app-authorized>
 
         <app-authorized

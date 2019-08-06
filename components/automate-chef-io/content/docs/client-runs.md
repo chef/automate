@@ -61,6 +61,12 @@ To save a search, select the share button to the right of the search bar, and co
 [Attribute](https://docs.chef.io/attributes.html)
 : Search for an attribute key, this will not search across attribute values.
 
+[Chef Organization](https://docs.chef.io/server_orgs.html)
+: A Chef Server organization name.
+
+[Chef Server](https://docs.chef.io/server_components.html)
+: A Chef Server URL.
+
 [Cookbook](https://docs.chef.io/cookbooks.html)
 : A cookbook name.
 
@@ -92,11 +98,6 @@ To save a search, select the share button to the right of the search bar, and co
 : Search by nodes assigned to a role. Nodes can have zero or many roles.
 
 See more about [policyfiles](https://docs.chef.io/policyfile.html).
-
-### Sidebar Filter
-
-Find nodes on the basis of their related Chef Server or Chef Server organization from the sidebar on the left side of the screen.
-The sidebar shows all Chef Servers and all available Chef Server organizations.
 
 ## Managing Node Data
 
