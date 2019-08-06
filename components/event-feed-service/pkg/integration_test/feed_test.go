@@ -84,7 +84,7 @@ func TestEventFeedReturnErrorWithWrongParameters(t *testing.T) {
 		t.Run(fmt.Sprintf("with parameters filters=%v it %s should return an error",
 			test.request, test.description), func(t *testing.T) {
 
-			_, err := testSuite.feedServer.GetFeed(ctx, &test.request)
+			_, err := testSuite.feedClient.GetFeed(ctx, &test.request)
 
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		})
@@ -211,7 +211,7 @@ func TestEventFeedReturnOnlyEventsWithinDateRange(t *testing.T) {
 	for _, test := range cases {
 		t.Run(fmt.Sprintf("with request '%v' it %s", test.request, test.description),
 			func(t *testing.T) {
-				res, err := testSuite.feedServer.GetFeed(ctx, &test.request)
+				res, err := testSuite.feedClient.GetFeed(ctx, &test.request)
 				if assert.Nil(t, err) {
 					assert.Equal(t, len(test.expected), len(res.FeedEntries))
 					for index, expectedEvent := range test.expected {
@@ -346,7 +346,7 @@ func TestEventFeedFilterEventType(t *testing.T) {
 	for _, test := range cases {
 		t.Run(fmt.Sprintf("with request '%v' it %s", test.request, test.description),
 			func(t *testing.T) {
-				res, err := testSuite.feedServer.GetFeed(ctx, &test.request)
+				res, err := testSuite.feedClient.GetFeed(ctx, &test.request)
 				if assert.Nil(t, err) {
 					assert.Equal(t, int64(len(test.expected)), res.TotalEntries)
 					assert.ElementsMatch(t, test.expected, res.FeedEntries)

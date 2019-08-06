@@ -3,7 +3,7 @@
 #shellcheck disable=SC2034
 test_name="airgap_upgrade"
 test_upgrades=true
-test_diagnostics_filters="~iam-v2"
+test_diagnostics_filters="~iam-v2 ~purge" # remove purge until 1219 makes it to current
 
 do_build() {
     do_build_default

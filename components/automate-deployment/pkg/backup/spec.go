@@ -391,7 +391,6 @@ func DefaultSpecs(serviceNames []string) []Spec {
 		{Name: "automate-ui", WriteMetadata: false},
 		{Name: "backup-gateway", WriteMetadata: false},
 		{Name: "config-mgmt-service", WriteMetadata: false},
-		{Name: "data-lifecycle-service", WriteMetadata: false},
 		{Name: "es-sidecar-service", WriteMetadata: false},
 		{Name: "event-service", WriteMetadata: false},
 		{Name: "local-user-service", WriteMetadata: false},

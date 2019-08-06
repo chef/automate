@@ -320,7 +320,6 @@ paths = [
   "api/config/compliance/*",
   "api/config/cs_nginx/*",
   "api/config/data_feed/*",
-  "api/config/data_lifecycle/*",
   "api/config/deployment/*",
   "api/config/dex/*",
   "api/config/elasticsearch/*",
@@ -487,6 +486,7 @@ paths = [
   "components/notifications-client/*",
   "lib/authz/*",
   "lib/cereal/*",
+  "lib/datalifecycle/*",
   "lib/db/*",
   "lib/errorutils/*",
   "lib/grpc/*",
@@ -620,43 +620,6 @@ paths = [
   "vendor/gopkg.in/yaml.v2/*"
 ]
 
-[data-lifecycle-service]
-plan_path = "components/data-lifecycle-service"
-paths = [
-  "components/data-lifecycle-service/*",
-  "api/interservice/data_lifecycle/*",
-  "components/automate-gateway/api/authz/*",
-  "components/automate-gateway/authz/policy_v2/*",
-  "components/automate-grpc/*",
-  "components/compliance-service/*",
-  "components/es-sidecar-service/*",
-  "lib/grpc/*",
-  "lib/io/*",
-  "lib/tls/*",
-  "lib/tracing/*",
-  "lib/version/*",
-  "vendor/github.com/apache/thrift/*",
-  "vendor/github.com/burntsushi/toml/*",
-  "vendor/github.com/codahale/hdrhistogram/*",
-  "vendor/github.com/gofrs/uuid/*",
-  "vendor/github.com/golang/protobuf/*",
-  "vendor/github.com/grpc-ecosystem/grpc-opentracing/*",
-  "vendor/github.com/mailru/easyjson/*",
-  "vendor/github.com/olivere/elastic/*",
-  "vendor/github.com/opentracing/opentracing-go/*",
-  "vendor/github.com/pkg/errors/*",
-  "vendor/github.com/sirupsen/logrus/*",
-  "vendor/github.com/spf13/cobra/*",
-  "vendor/github.com/spf13/pflag/*",
-  "vendor/github.com/uber/jaeger-client-go/*",
-  "vendor/github.com/uber/jaeger-lib/*",
-  "vendor/golang.org/x/net/*",
-  "vendor/golang.org/x/sys/*",
-  "vendor/golang.org/x/text/*",
-  "vendor/google.golang.org/genproto/*",
-  "vendor/google.golang.org/grpc/*"
-]
-
 [automate-cli]
 plan_path = "components/automate-cli"
 paths = [
@@ -672,7 +635,6 @@ paths = [
   "api/config/compliance/*",
   "api/config/cs_nginx/*",
   "api/config/data_feed/*",
-  "api/config/data_lifecycle/*",
   "api/config/deployment/*",
   "api/config/dex/*",
   "api/config/elasticsearch/*",
@@ -703,6 +665,7 @@ paths = [
   "api/config/workflow_server/*",
   "api/external/applications/*",
   "api/external/common/*",
+  "api/interservice/data_lifecycle/*",
   "api/interservice/deployment/*",
   "api/interservice/es_sidecar/*",
   "components/authz-service/*",
@@ -792,7 +755,6 @@ paths = [
   "api/config/compliance/*",
   "api/config/cs_nginx/*",
   "api/config/data_feed/*",
-  "api/config/data_lifecycle/*",
   "api/config/deployment/*",
   "api/config/dex/*",
   "api/config/elasticsearch/*",
@@ -1300,6 +1262,7 @@ paths = [
   "components/nodemanager-service/*",
   "lib/authz/*",
   "lib/cereal/*",
+  "lib/datalifecycle/*",
   "lib/errorutils/*",
   "lib/grpc/*",
   "lib/io/*",
@@ -1817,6 +1780,7 @@ paths = [
   "components/automate-grpc/*",
   "lib/authz/*",
   "lib/cereal/*",
+  "lib/datalifecycle/*",
   "lib/grpc/*",
   "lib/io/*",
   "lib/stringutils/*",

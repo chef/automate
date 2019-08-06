@@ -1106,6 +1106,8 @@ func periodicConverger(s *server, grpcServer *grpc.Server) func() {
 			return
 		}
 
+		logrus.Debug("Starting periodic converge")
+
 		restartRequired, err := s.periodicCertCheck()
 		if err != nil {
 			logrus.WithError(err).Warn("Periodic certificate authority validity check failed")
@@ -1122,6 +1124,8 @@ func periodicConverger(s *server, grpcServer *grpc.Server) func() {
 		if err != nil {
 			logrus.WithError(err).Error("Periodic converge failed")
 		}
+
+		logrus.Debug("Periodic converge complete")
 	}
 }
 
@@ -1230,18 +1234,18 @@ func (s *server) convergeDeployment() error {
 			"next_manifest":    nextVersion,
 		})
 		if nextVersion > currentVersion {
-			logctx.Info("Starting periodic converge with UPDATED manifest")
+			logctx.Info("Starting converge with UPDATED manifest")
 		} else if nextVersion < currentVersion {
 			// We should not see this because of the current implementation of
 			// nextManifest()
-			logctx.Warn("Starting periodic converge with DOWNGRADED manifest")
+			logctx.Warn("Starting converge with DOWNGRADED manifest")
 		} else {
-			logctx.Debug("Starting periodic converge")
+			logctx.Debug("Starting converge")
 		}
 	} else {
 		logrus.WithFields(logrus.Fields{
 			"next_manifest": nextManifest.Version(),
-		}).Info("Starting periodic converge with NEW manifest")
+		}).Info("Starting converge with NEW manifest")
 	}
 
 	s.deployment.CurrentReleaseManifest = nextManifest
@@ -1258,7 +1262,6 @@ func (s *server) convergeDeployment() error {
 			logrus.WithError(err).Error("Failed to converge")
 		}
 	}
-	logrus.Debug("Periodic converge complete")
 	return eDeploy.err
 }
 

@@ -30,11 +30,13 @@ directories:
   - ./components/automate-workflow-nginx
   - ./components/automate-workflow-server
   - ./components/backup-gateway
+  - ./components/cereal-service
   - ./components/chef-ui-library
   - ./components/compliance-service
   - ./components/config-mgmt-service
-  - ./components/data-lifecycle-service
   - ./components/es-sidecar-service
+  - ./components/event-feed-service
+  - ./components/event-gateway
   - ./components/event-service
   - ./components/ingest-service
   - ./components/license-control-service

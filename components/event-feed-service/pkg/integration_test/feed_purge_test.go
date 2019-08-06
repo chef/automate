@@ -5,189 +5,194 @@ import (
 	"time"
 
 	"context"
-	"fmt"
 
-	dls "github.com/chef/automate/api/interservice/data_lifecycle"
+	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
-	log "github.com/sirupsen/logrus"
+	"github.com/chef/automate/components/event-feed-service/pkg/server"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/teambition/rrule-go"
 )
 
-type purgeTestCase struct {
-	description       string
-	request           *dls.TriggerPurgeRequest
-	expectedResponse  *dls.TriggerPurgeResponse
-	expectedFeedRes   *dls.PurgeResponse
-	expectedRemaining int64
-}
+// TestPurgeServer tests the data lifecycle purge Server
+func TestPurgeServer(t *testing.T) {
+	t.Run("Configure", func(t *testing.T) {
+		var (
+			ctx  = context.Background()
+			rec1 *rrule.RRule
+			rec2 *rrule.RRule
+			err  error
+			res  *data_lifecycle.ShowResponse
+		)
 
-// The data lifecycle is set to only the keep the last 7 days of events
-// Create 1000 events one for every 24 hours going back from now
-// triggering the data lifecycle should remove 993 and leave the most recent 7 events
-func TestFeedPurge(t *testing.T) {
-	var (
-		totalEntries = 1000
-		startDate    = time.Now().UTC()
-		timeDiff     = int(time.Hour) * -24
-		entries      = createEntries(startDate, totalEntries, timeDiff)
-		statusMap    = make(map[string]*dls.PurgeStatus)
-		resMap       = make(map[string]*dls.PurgeResponse)
-		purgeReqId   = newUUID()
-	)
+		rec1, err = rrule.NewRRule(rrule.ROption{
+			Freq:     rrule.HOURLY,
+			Interval: 1,
+			Dtstart:  time.Now(),
+		})
+		require.NoError(t, err)
 
-	purgeReq := dls.TriggerPurgeRequest{Id: purgeReqId, ServiceName: "event-feed-service"}
+		rec2, err = rrule.NewRRule(rrule.ROption{
+			Freq:     rrule.DAILY,
+			Interval: 1,
+			Dtstart:  time.Now(),
+		})
+		require.NoError(t, err)
 
-	purgeStatusOK := dls.PurgeStatus{
-		Status: dls.PurgeStatus_SUCCESS,
-		Msg:    "",
-	}
-	statusMap[persistence.IndexNameFeeds] = &purgeStatusOK
-	purgeRes := dls.PurgeResponse{
-		Id:              purgeReqId,
-		ComponentStatus: statusMap,
-	}
+		cases := []struct {
+			description string
+			enabled     bool
+			recurrence  string
+			update      *data_lifecycle.PolicyUpdate
+		}{
+			{description: "enabled with hourly recurrence",
+				enabled:    true,
+				recurrence: rec1.String(),
+				update: &data_lifecycle.PolicyUpdate{
+					Es: []*data_lifecycle.EsPolicyUpdate{
+						{
+							PolicyName: server.PurgeFeedPolicyName,
+						},
+					},
+				},
+			},
+			{description: "disabled with daily recurrence",
+				enabled:    false,
+				recurrence: rec2.String(),
+				update: &data_lifecycle.PolicyUpdate{
+					Es: []*data_lifecycle.EsPolicyUpdate{
+						{
+							PolicyName: server.PurgeFeedPolicyName,
+						},
+					},
+				},
+			},
+		}
 
-	resMap["event-feed-service"] = &purgeRes
-	triggerPurgeRes := dls.TriggerPurgeResponse{Responses: resMap}
+		for _, c := range cases {
+			_, err := testSuite.purgeClient.Configure(ctx, &data_lifecycle.ConfigureRequest{
+				Enabled:      c.enabled,
+				Recurrence:   c.recurrence,
+				PolicyUpdate: c.update,
+			})
 
-	for _, entry := range entries {
-		testSuite.feedBackend.CreateFeedEntry(entry)
-	}
+			require.NoError(t, err)
 
-	testSuite.RefreshIndices(persistence.IndexNameFeeds)
-	defer GetTestSuite().DeleteAllDocuments()
+			res, err = testSuite.purgeClient.Show(ctx, &data_lifecycle.ShowRequest{})
+			require.Equal(t, res.Enabled, c.enabled)
+			require.Equal(t, res.Recurrence, c.recurrence)
 
-	cases := []purgeTestCase{
-		{
-			description:       "purge should delete 993 docs and leave 7 docs",
-			request:           &purgeReq,
-			expectedResponse:  &triggerPurgeRes,
-			expectedFeedRes:   &purgeRes,
-			expectedRemaining: 7,
-		},
-	}
-
-	// Run all the cases!
-	runPurgeTestCases(t, cases)
-}
-
-// Runing the data lifecycle when there are zero events
-func TestFeedPurgeNoDocsInIndex(t *testing.T) {
-	var (
-		statusMap  = make(map[string]*dls.PurgeStatus)
-		resMap     = make(map[string]*dls.PurgeResponse)
-		purgeReqId = newUUID()
-	)
-
-	purgeReq := dls.TriggerPurgeRequest{Id: purgeReqId, ServiceName: "event-feed-service"}
-
-	purgeStatusOK := dls.PurgeStatus{
-		Status: dls.PurgeStatus_SUCCESS,
-		Msg:    "",
-	}
-	statusMap[persistence.IndexNameFeeds] = &purgeStatusOK
-	purgeRes := dls.PurgeResponse{
-		Id:              purgeReqId,
-		ComponentStatus: statusMap,
-	}
-
-	resMap["event-feed-service"] = &purgeRes
-	triggerPurgeRes := dls.TriggerPurgeResponse{Responses: resMap}
-
-	cases := []purgeTestCase{
-		{
-			description:       "no docs in index... purge should delete 0 docs",
-			request:           &purgeReq,
-			expectedResponse:  &triggerPurgeRes,
-			expectedFeedRes:   &purgeRes,
-			expectedRemaining: 0,
-		},
-	}
-
-	// Run all the cases!
-	runPurgeTestCases(t, cases)
-}
-
-// The data lifecycle is set to only the keep the last 7 days of events
-// Create 1000 events within the last 7 days
-// triggering the data lifecycle should not remove any events
-func TestFeedPurgeNoDocsToDelete(t *testing.T) {
-	var (
-		totalEntries = 1000
-		startDate    = time.Now().UTC()
-		timeDiff     = 0
-		entries      = createEntries(startDate, totalEntries, timeDiff)
-		statusMap    = make(map[string]*dls.PurgeStatus)
-		resMap       = make(map[string]*dls.PurgeResponse)
-		purgeReqId   = newUUID()
-	)
-
-	purgeReq := dls.TriggerPurgeRequest{Id: purgeReqId, ServiceName: "event-feed-service"}
-
-	purgeStatusOK := dls.PurgeStatus{
-		Status: dls.PurgeStatus_SUCCESS,
-		Msg:    "",
-	}
-	statusMap[persistence.IndexNameFeeds] = &purgeStatusOK
-	purgeRes := dls.PurgeResponse{
-		Id:              purgeReqId,
-		ComponentStatus: statusMap,
-	}
-
-	resMap["event-feed-service"] = &purgeRes
-	triggerPurgeRes := dls.TriggerPurgeResponse{Responses: resMap}
-
-	for _, entry := range entries {
-		testSuite.feedBackend.CreateFeedEntry(entry)
-	}
-
-	testSuite.RefreshIndices(persistence.IndexNameFeeds)
-	defer GetTestSuite().DeleteAllDocuments()
-
-	cases := []purgeTestCase{
-		{
-			description:       "purge should delete 0 docs and leave 1000 docs",
-			request:           &purgeReq,
-			expectedResponse:  &triggerPurgeRes,
-			expectedFeedRes:   &purgeRes,
-			expectedRemaining: 1000,
-		},
-	}
-
-	// Run all the cases!
-	runPurgeTestCases(t, cases)
-}
-
-func runPurgeTestCases(t *testing.T, cases []purgeTestCase) {
-	for _, test := range cases {
-		t.Run(fmt.Sprintf("with request '%v' it %s", test.request, test.description),
-			func(t *testing.T) {
-				res, err := dataLifecycleClient.TriggerPurge(context.Background(), test.request)
-				testSuite.RefreshIndices(persistence.IndexNameFeeds)
-				require.NoError(t, err)
-
-				// get the feed purge response; there should be only one
-				var count int
-				var feedRes *dls.PurgeResponse
-
-				for _, r := range res.Responses {
-					if r.Id == test.request.Id {
-						count++
-						feedRes = r
+			for _, s := range c.update.Es {
+				found := false
+				for _, p := range res.EsPolicies {
+					if p.Name == s.PolicyName {
+						found = true
+						require.Equal(t, p.OlderThanDays, s.OlderThanDays)
+						break
 					}
 				}
-				require.Equal(t, 1, count)
-				require.Equal(t, test.expectedFeedRes.Id, feedRes.Id)
-				log.Infof("Purge response: %+v", feedRes)
-				assert.Equal(t, test.expectedFeedRes.ComponentStatus[persistence.IndexNameFeeds].Status, feedRes.ComponentStatus[persistence.IndexNameFeeds].Status)
+				require.Truef(t, found, "unable to find matching policy for %s", s.PolicyName)
+			}
+		}
+	})
 
-				counts, err := testSuite.feedServer.GetFeedSummary(context.Background(), &event_feed.FeedSummaryRequest{CountCategory: "event-type"})
+	t.Run("Configure with unknown policy", func(t *testing.T) {
+		var (
+			recurrence *rrule.RRule
+			err        error
+		)
+
+		recurrence, err = rrule.NewRRule(rrule.ROption{
+			Freq:     rrule.DAILY,
+			Interval: 1,
+			Dtstart:  time.Now(),
+		})
+		require.NoError(t, err)
+
+		_, err = testSuite.purgeClient.Configure(context.Background(), &data_lifecycle.ConfigureRequest{
+			Enabled:    true,
+			Recurrence: recurrence.String(),
+			PolicyUpdate: &data_lifecycle.PolicyUpdate{
+				Es: []*data_lifecycle.EsPolicyUpdate{
+					{
+						PolicyName: "not-a-valid-policy",
+					},
+				},
+			},
+		})
+
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "not a valid ES policy")
+
+	})
+
+	t.Run("Run", func(t *testing.T) {
+		cases := []struct {
+			description       string
+			expectedRemaining int64
+			before            func()
+			after             func()
+		}{
+			{description: "purge should delete 900 docs and leave 100 docs",
+				expectedRemaining: 100,
+				after:             func() { GetTestSuite().DeleteAllDocuments(); return },
+				before: func() {
+					for _, entry := range createEntries(time.Now().UTC(), 100, int(time.Hour)*-24) {
+						testSuite.feedBackend.CreateFeedEntry(entry)
+					}
+
+					testSuite.RefreshIndices(persistence.IndexNameFeeds)
+				},
+			},
+			{
+				description:       "no docs in index... purge should delete 0 docs",
+				expectedRemaining: 0,
+				after:             func() { GetTestSuite().DeleteAllDocuments(); return },
+			},
+		}
+
+		for _, test := range cases {
+			t.Run(test.description, func(t *testing.T) {
+				if a := test.after; a != nil {
+					defer a()
+				}
+				if b := test.before; b != nil {
+					b()
+				}
+
+				recurrence, err := rrule.NewRRule(rrule.ROption{
+					Freq:     rrule.HOURLY,
+					Interval: 2,
+					Dtstart:  time.Now(),
+				})
+				require.NoError(t, err)
+
+				_, err = testSuite.purgeClient.Configure(context.Background(), &data_lifecycle.ConfigureRequest{
+					Enabled:    true,
+					Recurrence: recurrence.String(),
+					PolicyUpdate: &data_lifecycle.PolicyUpdate{
+						Es: []*data_lifecycle.EsPolicyUpdate{
+							{
+								PolicyName:    server.PurgeFeedPolicyName,
+								OlderThanDays: 1,
+							},
+						},
+					},
+				})
+				require.NoError(t, err)
+
+				_, err = testSuite.purgeClient.Run(context.Background(), &data_lifecycle.RunRequest{})
+				require.NoError(t, err)
+
+				testSuite.RefreshIndices(persistence.IndexNameFeeds)
+
+				counts, err := testSuite.feedClient.GetFeedSummary(context.Background(), &event_feed.FeedSummaryRequest{CountCategory: "event-type"})
 				require.NoError(t, err)
 
 				assert.Equal(t, test.expectedRemaining, counts.TotalEntries,
 					"Expected number of post-purge documents remaining does not match results %d != %d", test.expectedRemaining, counts.TotalEntries)
 			})
-	}
+		}
+	})
 }

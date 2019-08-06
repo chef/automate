@@ -4,10 +4,17 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path"
 
+	"github.com/chef/automate/api/interservice/data_lifecycle"
+	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
-	"github.com/chef/automate/components/event-feed-service/pkg/server"
+	"github.com/chef/automate/lib/grpc/secureconn"
+	"github.com/chef/automate/lib/tls/certs"
 	olivere "github.com/olivere/elastic"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
 )
 
 // Suite helps you manipulate various stages of your tests. It provides
@@ -17,15 +24,18 @@ import (
 // at a global level.
 //
 // This struct holds:
-// * A Feeds backend client (FeedStore) for feeds persistence operations.
-// * An Elasticsearch client for ES queries.
+// * A FeedServiceClient for making requests against the FeedServiceServer
+// * A PurgeClient for making requests against the PurgeServer
+// * An Elasticsearch client for ES queries to build up and tear down test cases
 //   => Docs: https://godoc.org/gopkg.in/olivere/elastic.v5
 type Suite struct {
-	feedServer  *server.EventFeedServer
+	feedClient  event_feed.EventFeedServiceClient
 	feedBackend persistence.FeedStore
+	purgeClient data_lifecycle.PurgeClient
 	esClient    *olivere.Client
 	indices     []string
 	types       []string
+	cleanup     func() error
 }
 
 // Initialize the test suite
@@ -33,7 +43,7 @@ type Suite struct {
 // TODO: add check for Elasticsearch connectivity.
 // If we can't connect, we'll skip the tests and
 // print an error message
-func NewSuite(url string) *Suite {
+func NewSuite(url string) (*Suite, error) {
 	s := new(Suite)
 
 	esClient, err := olivere.NewClient(
@@ -41,24 +51,32 @@ func NewSuite(url string) *Suite {
 		olivere.SetSniff(false),
 	)
 	if err != nil {
-		fmt.Printf("could not connect to elasticsearch (%s)", url)
-		os.Exit(1)
+		return nil, errors.Wrapf(err, "could not connect to elasticsearch (%s)", url)
 	}
-
-	s.feedBackend = persistence.NewFeedStore(esClient)
-
-	err = s.feedBackend.InitializeStore(context.Background())
-	if err != nil {
-		fmt.Printf("Failed initializing elasticsearch (%s)", url)
-		os.Exit(1)
-	}
-
 	s.esClient = esClient
 	s.indices = []string{persistence.IndexNameFeeds}
 	s.types = []string{persistence.DocType}
 
-	s.feedServer = server.New(s.feedBackend)
-	return s
+	s.feedBackend = persistence.NewFeedStore(esClient)
+	err = s.feedBackend.InitializeStore(context.Background())
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to initialize feed store backend")
+	}
+
+	factory, err := secureConnFactoryHab()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to load hab grpc conn factory")
+	}
+
+	feedClient, purgeClient, cleanup, err := initClients(factory)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to initialize gRPC clients")
+	}
+	s.feedClient = feedClient
+	s.purgeClient = purgeClient
+	s.cleanup = cleanup
+
+	return s, nil
 }
 
 // Set up global test fixtures
@@ -67,8 +85,9 @@ func (s *Suite) GlobalSetup() {
 
 // Tear down global test fixtures
 func (s *Suite) GlobalTeardown() {
-	// Make sure we clean them all!
+	defer s.cleanup() // nolint errcheck
 
+	// Make sure we clean them all!
 	toDelete := s.verifyIndices(s.indices...)
 	// if there are no valid Indices, stop processing
 	if len(toDelete) == 0 {
@@ -152,4 +171,50 @@ func (s *Suite) verifyIndices(indices ...string) []string {
 func (s *Suite) indexExists(i string) bool {
 	exists, _ := s.esClient.IndexExists(i).Do(context.Background())
 	return exists
+}
+
+func initClients(connFactory *secureconn.Factory) (event_feed.EventFeedServiceClient, data_lifecycle.PurgeClient, func() error, error) {
+	var (
+		efc     event_feed.EventFeedServiceClient
+		pc      data_lifecycle.PurgeClient
+		err     error
+		conn    *grpc.ClientConn
+		cleanup func() error
+	)
+
+	conn, err = connFactory.DialContext(
+		context.Background(),
+		"event-feed-service",
+		"localhost:10134",
+		grpc.WithBlock(),
+	)
+
+	if err != nil {
+		return efc, pc, cleanup, err
+	}
+
+	return event_feed.NewEventFeedServiceClient(conn), data_lifecycle.NewPurgeClient(conn), conn.Close, nil
+}
+
+func secureConnFactoryHab() (*secureconn.Factory, error) {
+	certs, err := loadCertsHab()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to load event-feed-service TLS certs")
+	}
+
+	return secureconn.NewFactory(*certs), nil
+}
+
+// uses the certs in a running hab env
+func loadCertsHab() (*certs.ServiceCerts, error) {
+	dirname := "/hab/svc/event-feed-service/config"
+	log.Infof("certs dir is %s", dirname)
+
+	cfg := certs.TLSConfig{
+		CertPath:       path.Join(dirname, "service.crt"),
+		KeyPath:        path.Join(dirname, "service.key"),
+		RootCACertPath: path.Join(dirname, "root_ca.crt"),
+	}
+
+	return cfg.ReadCerts()
 }

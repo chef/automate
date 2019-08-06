@@ -34,6 +34,9 @@ var conf = config.Compliance{
 		TmpDir:        os.Getenv("TMPDIR"),
 	},
 	ElasticSearch: config.ElasticSearch{},
+	ElasticSearchSidecar: config.ElasticSearchSidecar{
+		Address: "127.0.0.1:10123",
+	},
 	Profiles: config.Profiles{
 		MarketPath:   "./market",
 		ProfilesPath: "./profiles",
@@ -102,7 +105,7 @@ func init() {
 
 	// ElasticSearch Config Flags
 	runCmd.Flags().StringVar(&conf.ElasticSearch.Url, "es-url", conf.ElasticSearch.Url, "ES Url")
-	runCmd.Flags().StringVar(&conf.ESSidecarAddress, "es-sidecar-address", conf.ESSidecarAddress, "ES Sidecar Address")
+	runCmd.Flags().StringVar(&conf.ElasticSearchSidecar.Address, "es-sidecar-address", conf.ElasticSearchSidecar.Address, "ES Sidecar Address")
 
 	// Profiles Config Flags
 	runCmd.Flags().StringVar(&conf.Profiles.MarketPath, "market-path", conf.Profiles.MarketPath, "Market Profiles Path")

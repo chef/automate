@@ -436,19 +436,6 @@ steps:
       executor:
         docker:
 
-  - label: "[unit] data-lifecycle-service"
-    command:
-      - scripts/install_golang.sh
-      - cd components/data-lifecycle-service
-      - make lint unit
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
-
   - label: "[static] es-sidecar-service"
     command:
       - scripts/install_golang.sh

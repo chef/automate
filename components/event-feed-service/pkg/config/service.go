@@ -12,7 +12,8 @@ type EventFeed struct {
 	*certs.TLSConfig     `mapstructure:"tls"`
 	ElasticSearch        `mapstructure:"elasticsearch"`
 	ElasticSearchSidecar `mapstructure:"elasticsearch_sidecar"`
-	DataLifecycle        `mapstructure:"data_lifecycle"`
+	Cereal               `mapstructure:"cereal"`
+	Jobs                 `mapstructure:"jobs"`
 }
 
 // Service is a base config options struct for all services
@@ -32,9 +33,16 @@ type ElasticSearchSidecar struct {
 	ESSidecarAddress string `mapstructure:"address"`
 }
 
-// DataLifecycle number of days to keep and to remove the events after
-type DataLifecycle struct {
-	PurgeEventFeedAfterDays int `mapstructure:"purge_event_feed_after_days"`
+// Cereal is the workflow backend for scheduled jobs
+type Cereal struct {
+	Address string `mapstructure:"address"`
+}
+
+// Jobs contains the default settings for the jobs scheduler. In many cases
+// these are only applied when the job workflows are created, after which they
+// are managed through gRPC requests and not config.
+type Jobs struct {
+	DefaultPurgeAfterDays int `mapstructure:"default_purge_after_days"`
 }
 
 // SetLogLevel sets the log level for the service

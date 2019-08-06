@@ -53,9 +53,6 @@ func TestDefaultSpecs(t *testing.T) {
 	t.Run("config-mgmt-service", func(t *testing.T) {
 		testSpecFor(t, "config-mgmt-service")
 	})
-	t.Run("data-lifecycle-service", func(t *testing.T) {
-		testSpecFor(t, "data-lifecycle-service")
-	})
 	t.Run("deployment-service", func(t *testing.T) {
 		spec := testSpecFor(t, "deployment-service")
 		testRequireMetadata(t, spec)

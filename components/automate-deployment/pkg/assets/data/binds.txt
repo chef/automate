@@ -45,11 +45,9 @@ config-mgmt-service REQUIRED automate-es-gateway
 config-mgmt-service BINDING_MODE strict
 data-feed-service REQUIRED config-mgmt-service notifications-service secrets-service
 data-feed-service BINDING_MODE strict
-data-lifecycle-service OPTIONAL compliance-service event-feed-service ingest-service
-data-lifecycle-service BINDING_MODE strict
 es-sidecar-service REQUIRED automate-elasticsearch automate-es-gateway
 es-sidecar-service BINDING_MODE strict
-event-feed-service REQUIRED automate-es-gateway
+event-feed-service REQUIRED automate-es-gateway cereal-service
 event-feed-service OPTIONAL es-sidecar-service
 event-feed-service BINDING_MODE strict
 event-gateway REQUIRED authn-service authz-service event-service

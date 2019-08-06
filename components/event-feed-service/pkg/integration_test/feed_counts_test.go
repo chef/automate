@@ -39,7 +39,7 @@ func TestFeedCountsReturnErrorWithWrongParameters(t *testing.T) {
 		date = time.Now()
 	)
 
-	_, err := testSuite.feedServer.GetFeedSummary(ctx, &event_feed.FeedSummaryRequest{
+	_, err := testSuite.feedClient.GetFeedSummary(ctx, &event_feed.FeedSummaryRequest{
 		End:   date.AddDate(0, 0, -6).Unix() * 1000,
 		Start: date.Unix() * 1000,
 	})
@@ -123,7 +123,7 @@ func TestFeedCountsReturnCountOverAThousandActions(t *testing.T) {
 
 	t.Run("Test to see if 1001 actions were counted",
 		func(t *testing.T) {
-			res, err := testSuite.feedServer.GetFeedSummary(ctx, &request)
+			res, err := testSuite.feedClient.GetFeedSummary(ctx, &request)
 			if assert.Nil(t, err) {
 				assert.Equal(t, int64(1001), res.TotalEntries)
 
@@ -444,7 +444,7 @@ func runCases(t *testing.T, cases []testCase) {
 	for _, test := range cases {
 		t.Run(fmt.Sprintf("with request '%v' it %s", test.request, test.description),
 			func(t *testing.T) {
-				res, err := testSuite.feedServer.GetFeedSummary(ctx, &test.request)
+				res, err := testSuite.feedClient.GetFeedSummary(ctx, &test.request)
 				if assert.Nil(t, err) {
 					assert.Equal(t, test.expectedCounts.TotalEntries, res.TotalEntries)
 

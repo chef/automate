@@ -8,18 +8,21 @@ package integration_test
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
+	"path"
 	"testing"
 	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/olivere/elastic"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/data_lifecycle"
+	"github.com/chef/automate/api/interservice/es_sidecar"
 	"github.com/chef/automate/api/interservice/event"
 	cfgBackend "github.com/chef/automate/components/config-mgmt-service/backend"
 	cfgElastic "github.com/chef/automate/components/config-mgmt-service/backend/elastic"
@@ -31,6 +34,9 @@ import (
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/postgres"
+	"github.com/chef/automate/lib/datalifecycle/purge"
+	"github.com/chef/automate/lib/grpc/secureconn"
+	"github.com/chef/automate/lib/tls/certs"
 )
 
 var actionIndexes = fmt.Sprintf("%s-%s", mappings.Actions.Index, "*")
@@ -44,7 +50,6 @@ var actionIndexes = fmt.Sprintf("%s-%s", mappings.Actions.Index, "*")
 // multiple tests, consider putting it here so that we have them available globally
 //
 // This struct holds:
-// * A ConfigManager, the configuration manager for the service, required for the JobSchedulerServer
 // * A ChefIngestServer, the exposed GRPC Server that ingest Chef Data
 // * A JobSchedulerServer, the exposed GRPC Server to start, stop, configure and run jobs
 // * A CfgMgmt backend client, that you can leverate to verify Chef Data.
@@ -55,17 +60,20 @@ var actionIndexes = fmt.Sprintf("%s-%s", mappings.Actions.Index, "*")
 //      https://github.com/github.com/chef/automate/components/ingest-service/blob/master/backend/client.go#L1
 // * An Elasticsearch client, that you can use to throw ES queries.
 //   => Docs: https://godoc.org/gopkg.in/olivere/elastic.v5
+// * A PurgeServer, the exposed gRPC Server that configures and runs purge workflows
 type Suite struct {
 	ChefIngestServer         *server.ChefIngestServer
 	JobSchedulerServer       *server.JobSchedulerServer
 	JobManager               *cereal.Manager
 	EventHandlerServer       *server.AutomateEventHandlerServer
+	PurgeServer              data_lifecycle.PurgeServer
 	cfgmgmt                  cfgBackend.Client
 	ingest                   iBackend.Client
 	client                   *elastic.Client
 	projectsClient           *iam_v2.MockProjectsClient
 	eventServiceClientMock   *event.MockEventServiceClient
 	managerServiceClientMock *manager.MockNodeManagerServiceClient
+	cleanup                  func() error
 }
 
 // Initialize the test suite
@@ -75,21 +83,22 @@ type Suite struct {
 //
 // NOTE: This function expects ES to be already up and running.
 // (@afiune) We are going to start ES from the studio
-func NewGlobalSuite() *Suite {
+func NewGlobalSuite() (*Suite, error) {
 	s := new(Suite)
 
 	createMocksWithDefaultFunctions(s)
-	createServices(s)
-	return s
+	err := createServices(s)
+
+	return s, err
 }
 
-func NewLocalSuite(t *testing.T) *Suite {
+func NewLocalSuite(t *testing.T) (*Suite, error) {
 	s := new(Suite)
 
 	createMocksWithTestObject(s, t)
-	createServices(s)
+	err := createServices(s)
 
-	return s
+	return s, err
 }
 
 // GlobalSetup is the place where you prepare anything that we need before
@@ -106,6 +115,10 @@ func (s *Suite) GlobalTeardown() {
 	os.Remove(cFile)
 	if s.JobManager != nil {
 		s.JobManager.Stop()
+	}
+
+	if s.cleanup != nil {
+		s.cleanup() // nolint errcheck
 	}
 }
 
@@ -308,29 +321,26 @@ func (s *Suite) Indices() []string {
 	return indices
 }
 
-func createServices(s *Suite) {
+func createServices(s *Suite) error {
 	// Create a new elastic Client
 	esClient, err := elastic.NewClient(
 		elastic.SetURL(elasticsearchUrl),
 		elastic.SetSniff(false),
 	)
 	if err != nil {
-		fmt.Printf("Could not create elasticsearch client from %q: %s\n", elasticsearchUrl, err)
-		os.Exit(1)
+		return errors.Wrapf(err, "Could not create elasticsearch client from %q: %s\n", elasticsearchUrl, err)
 	}
 
 	s.client = esClient
 	s.cfgmgmt = cfgElastic.New(elasticsearchUrl)
 	iClient, err := iElastic.New(elasticsearchUrl)
 	if err != nil {
-		fmt.Printf("Could not create ingest backend client from %q: %s\n", elasticsearchUrl, err)
-		os.Exit(3)
+		return errors.Wrapf(err, "Could not create ingest backend client from %q: %s\n", elasticsearchUrl, err)
 	}
 
 	s.ingest = iClient
 
 	// TODO @afiune Modify the time of the jobs
-
 	chefIngestServerConfig := serveropts.ChefIngestServerConfig{
 		MaxNumberOfBundledActionMsgs: 100,
 		ChefIngestRunPipelineConfig: serveropts.ChefIngestRunPipelineConfig{
@@ -363,26 +373,59 @@ func createServices(s *Suite) {
 	// ```
 	jobManager, err := cereal.NewManager(postgres.NewPostgresBackend(postgresUrl))
 	if err != nil {
-		logrus.WithError(err).Fatal("could not create job manager")
+		return errors.Wrap(err, "could not create job manager")
 	}
 	s.JobManager = jobManager
 
-	err = server.InitializeJobManager(jobManager, s.ingest)
+	connFactory, err := secureConnFactoryHab()
 	if err != nil {
-		logrus.WithError(err).Fatal("could not initialize job manager")
+		return errors.Wrap(err, "failed to load hab grpc conn factory")
+	}
+
+	esSidecarConn, err := connFactory.Dial("es-sidecar-service", "localhost:10123")
+	if err != nil {
+		return errors.Wrap(err, "failed to create connection to es-sidecar-service")
+	}
+	esSidecarClient := es_sidecar.NewEsSidecarClient(esSidecarConn)
+	s.cleanup = esSidecarConn.Close
+
+	err = server.InitializeJobManager(jobManager, s.ingest, es_sidecar.NewEsSidecarClient(esSidecarConn))
+	if err != nil {
+		return errors.Wrap(err, "could not initialize job manager")
 	}
 
 	err = server.MigrateJobsSchedule(jobManager, viper.ConfigFileUsed())
 	if err != nil {
-		logrus.WithError(err).Fatal("could not migrate old job schedules")
+		return errors.Wrap(err, "could not migrate old job schedules")
+	}
+
+	err = server.ConfigurePurge(jobManager, &serveropts.Opts{
+		PurgeConvergeHistoryAfterDays: 1,
+		PurgeActionsAfterDays:         1,
+	})
+	if err != nil {
+		return errors.Wrap(err, "could not configure purge policies")
 	}
 
 	err = jobManager.Start(context.Background())
 	if err != nil {
-		logrus.WithError(err).Fatal("could not start job manager")
+		return errors.Wrap(err, "could not start job manager")
+	}
+
+	s.PurgeServer, err = purge.NewServer(
+		jobManager,
+		server.PurgeScheduleName,
+		server.PurgeJobName,
+		server.DefaultPurgePolicies,
+		purge.WithServerEsSidecarClient(esSidecarClient),
+	)
+	if err != nil {
+		return errors.Wrap(err, "could not start purge server")
 	}
 
 	s.JobSchedulerServer = server.NewJobSchedulerServer(s.ingest, jobManager)
+
+	return nil
 }
 
 func createMocksWithDefaultFunctions(s *Suite) {
@@ -402,4 +445,27 @@ func createMocksWithDefaultFunctions(s *Suite) {
 func createMocksWithTestObject(s *Suite, t *testing.T) {
 	s.projectsClient = iam_v2.NewMockProjectsClient(gomock.NewController(t))
 	s.eventServiceClientMock = event.NewMockEventServiceClient(gomock.NewController(t))
+}
+
+func secureConnFactoryHab() (*secureconn.Factory, error) {
+	certs, err := loadCertsHab()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to load ingest-service TLS certs")
+	}
+
+	return secureconn.NewFactory(*certs), nil
+}
+
+// uses the certs in a running hab env
+func loadCertsHab() (*certs.ServiceCerts, error) {
+	dirname := "/hab/svc/ingest-service/config"
+	logrus.Infof("certs dir is %s", dirname)
+
+	cfg := certs.TLSConfig{
+		CertPath:       path.Join(dirname, "service.crt"),
+		KeyPath:        path.Join(dirname, "service.key"),
+		RootCACertPath: path.Join(dirname, "root_ca.crt"),
+	}
+
+	return cfg.ReadCerts()
 }

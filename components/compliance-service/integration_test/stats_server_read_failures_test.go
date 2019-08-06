@@ -74,8 +74,8 @@ func TestReadFailures(t *testing.T) {
 				{
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
-							Values: v,
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Values:    v,
 						},
 					},
 				},
