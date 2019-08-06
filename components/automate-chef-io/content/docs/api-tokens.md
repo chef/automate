@@ -38,7 +38,7 @@ By default, standard tokens have access only to data collection API endpoints, s
 
 You must log in as an Admin to create or modify standard tokens from the browser. Open the **Settings** tab and navigate to the _API Tokens_ page.
 
-Selecting the **Create Token** button opens a pop-up. Enter a name for your token into the form and select the **Create Token** button on the form to submit the information. Token names can contain lower-case letters, hyphens, and numbers, but they cannot contain symbols or upper-case letters. In some situations, you may prefer to set the token ID to something different than the name. In this case, select "Edit ID" on the form and edit the token ID in the form.
+Selecting the **Create Token** button opens a pop-up. Enter a name for your token into the form and select the **Create Token** button on the form to submit the information. Token names can contain lower-case letters, hyphens, underscores, and numbers, but they cannot contain symbols or upper-case letters. In some situations, you may prefer to set the token ID to something different than the name. In this case, select "Edit ID" on the form and edit the token ID in the form.
 After selecting the **Create Token** button that closes the form,
 your token will appear in the API Tokens table.
 
