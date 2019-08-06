@@ -27,7 +27,7 @@ func (migratable A2V1ElasticSearchIndices) migrateProfiles() error {
 	defer util.TimeTrack(time.Now(), myName)
 
 	src := a2V1IndexPrefix + "profiles"
-	_, _, err := migratable.backend.reindex(src, CompProfilesIndex, noScript, "doc")
+	_, err := migratable.backend.reindex(src, CompProfilesIndex, noScript, "doc")
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("%s unable to reindex %s", src, myName))
 	}

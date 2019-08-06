@@ -359,22 +359,22 @@ func (backend ES2Backend) getScanDateRange(indexPrefix string) (*time.Time, *tim
 	return &earliestScanDate, &mostRecentScanDate, nil
 }
 
-func (backend ES2Backend) reindex(src, dest, reindexScript, srcDocType string) (*elastic.BulkIndexByScrollResponse, bool, error) {
+func (backend ES2Backend) reindex(src, dest, reindexScript, srcDocType string) (bool, error) {
 	myName := "reindex"
 
 	client, err := backend.ES2Client()
 	if err != nil {
-		return nil, false, errors.Wrap(err, fmt.Sprintf("%s cannot connect to ElasticSearch", myName))
+		return false, errors.Wrap(err, fmt.Sprintf("%s cannot connect to ElasticSearch", myName))
 	}
 
 	indexToMigrateExists, err := StoreExists(client, src)
 	if err != nil {
-		return nil, false, errors.Wrap(err, fmt.Sprintf("%s Error checking if index exists", myName))
+		return false, errors.Wrap(err, fmt.Sprintf("%s Error checking if index exists", myName))
 	}
 
 	//if the index does not exist but there was no error trying to determine its existence, leave it up to caller how to proceed.
 	if !indexToMigrateExists {
-		return nil, indexToMigrateExists, nil
+		return indexToMigrateExists, nil
 	}
 
 	defer util.TimeTrack(time.Now(), fmt.Sprintf("%s src: %s dest: %s", myName, src, dest))
@@ -399,12 +399,24 @@ func (backend ES2Backend) reindex(src, dest, reindexScript, srcDocType string) (
 		reindexCall = reindexCall.Script(script)
 	}
 
-	reindexCallResponse, err := reindexCall.Do(context.Background())
-
+	startTaskResult, err := reindexCall.DoAsync(context.Background())
 	if err != nil {
-		return nil, indexToMigrateExists, errors.Wrap(err, fmt.Sprintf("%s call to reindex failed", myName))
+		return indexToMigrateExists, errors.Wrap(err, fmt.Sprintf("%s call to reindex failed", myName))
 	}
-	return reindexCallResponse, indexToMigrateExists, err
+
+	for {
+		time.Sleep(time.Second * 1)
+		completed, err := backend.ReindexStatus(context.Background(), startTaskResult.TaskId)
+		if err != nil {
+			return indexToMigrateExists, err
+		}
+		if completed {
+			break
+		}
+		logrus.Debugf(" * migrating: waiting for reindex task %s to complete", startTaskResult.TaskId)
+	}
+
+	return indexToMigrateExists, nil
 }
 
 func (backend ES2Backend) getLatestReportIds(sumDailyToday string) ([]string, error) {
