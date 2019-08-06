@@ -292,7 +292,7 @@ describe('teamStatusEntityReducer', () => {
   describe('ADD_USERS', () => {
     const team = genTeam();
     const teamId = team.id;
-    const payload = <TeamUserMgmtPayload>{
+    const payload: TeamUserMgmtPayload = {
       id: teamId,
       user_ids: [
         faker.random.uuid(),
@@ -326,7 +326,7 @@ describe('teamStatusEntityReducer', () => {
           faker.random.uuid(),
           faker.random.uuid()
         ];
-        const payload = <TeamUserMgmtPayload>{
+        const payload: TeamUserMgmtPayload = {
           id: faker.random.uuid(),
           user_ids: userIDArray
         };
@@ -351,7 +351,7 @@ describe('teamStatusEntityReducer', () => {
   describe('REMOVE_USERS', () => {
     const team = genTeam();
     const teamId = team.id;
-    const payload = <TeamUserMgmtPayload>{
+    const payload: TeamUserMgmtPayload = {
       id: teamId,
       user_ids: [
         faker.random.uuid()
@@ -382,7 +382,7 @@ describe('teamStatusEntityReducer', () => {
     ], function (state: TeamEntityState, description: string,
         _initialUserIdLength: number, usersToRemove: string[]) {
       it('removes users from the payload to the state for ' + description, () => {
-        const payload = <TeamUserMgmtPayload>{
+        const payload: TeamUserMgmtPayload = {
           id: faker.random.uuid(),
           user_ids: usersToRemove
         };

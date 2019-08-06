@@ -75,7 +75,11 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     // TODO (tc) This needs to be refactored to resemble our other patterns
     // for specific object pages.
     // combineLatest depends on the user object existing already.
-    this.user = <User>{};
+    this.user = {
+      id: '',
+      name: '',
+      membership_id: ''
+    };
 
     this.done$ = <Observable<boolean>>combineLatest(
       store.select(allUsers),

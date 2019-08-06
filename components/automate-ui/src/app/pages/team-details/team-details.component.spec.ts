@@ -7,7 +7,9 @@ import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store } from '@ngrx/store';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
+import {
+  policyEntityReducer, PolicyEntityInitialState
+} from 'app/entities/policies/policy.reducer';
 import {
   userEntityReducer,
   UserEntityInitialState
@@ -22,7 +24,7 @@ import {
   GetTeamUsersSuccess
 } from 'app/entities/teams/team.actions';
 import { Team } from 'app/entities/teams/team.model';
-import { TeamDetailsComponent, TeamTabName } from './team-details.component';
+import { TeamDetailsComponent } from './team-details.component';
 
 describe('TeamDetailsComponent', () => {
   let component: TeamDetailsComponent;
@@ -40,7 +42,8 @@ describe('TeamDetailsComponent', () => {
       navigationId: 0 // what's that zero?
     },
     users: UserEntityInitialState,
-    teams: TeamEntityInitialState
+    teams: TeamEntityInitialState,
+    policies: PolicyEntityInitialState
   };
 
   beforeEach(async(() => {
@@ -87,7 +90,7 @@ describe('TeamDetailsComponent', () => {
     }).compileComponents();
   }));
 
-  const someTeam = <Team>{
+  const someTeam: Team = {
     id: 'some-team',
     name: 'some team',
     guid: 'a-team-uuid-01',
@@ -113,15 +116,13 @@ describe('TeamDetailsComponent', () => {
   });
 
   it('show users section when users tab is selected', () => {
-    const tabName: TeamTabName = 'users';
-    component.onSelectedTab({ target: { value: tabName } });
-    expect(component.tabValue).toBe(tabName);
+    component.onSelectedTab({ target: { value: 'users' } });
+    expect(component.tabValue).toBe('users');
   });
 
   it('show details section when details tab is selected', () => {
-    const tabName: TeamTabName = 'details';
-    component.onSelectedTab({ target: { value: tabName } });
-    expect(component.tabValue).toBe(tabName);
+    component.onSelectedTab({ target: { value: 'details' } });
+    expect(component.tabValue).toBe('details');
   });
 
   describe('empty state', () => {

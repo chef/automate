@@ -2,24 +2,24 @@
 <app-profile-sidebar *ngIf="!isAdminView"> </app-profile-sidebar>
 
 <div class="container">
-  <main *ngIf="isAdminView || user?.id">
+  <main *ngIf="isAdminView || user.id">
     <app-delete-object-modal
       [visible]="modalVisible"
       objectNoun="user"
-      [objectName]="user?.name"
+      [objectName]="user.name"
       (close)="closeDeleteConfirmationModal()"
       (deleteClicked)="deleteUser()">
     </app-delete-object-modal>
     <chef-breadcrumbs *ngIf="isAdminView">
       <chef-breadcrumb [link]="['/settings/users']">Users</chef-breadcrumb>
-      {{ user?.name }}
+      {{ user.name }}
     </chef-breadcrumbs>
 
     <chef-page-header>
       <div class="detail-row">
         <div class="name-column">
           <ng-container *ngIf="!editMode">
-            <div class="display3">{{ user?.name }}</div>
+            <div class="display3">{{ user.name }}</div>
           </ng-container>
           <ng-container *ngIf="editMode">
             <form [formGroup]="editForm">
@@ -35,7 +35,7 @@
             </form>
           </ng-container>
           <div class="container-big-header inline-container">
-            <span class="text"> {{ user?.id }}</span>
+            <span class="text"> {{ user.id }}</span>
           </div>
         </div>
         <div class="button-column">

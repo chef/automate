@@ -10,7 +10,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { customMatchers } from 'app/testing/custom-matchers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { ProjectService } from 'app/entities/projects/project.service';
-import { IAMType, IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
+import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
 import { GetProjectsSuccess } from 'app/entities/projects/project.actions';
 import { projectEntityReducer } from 'app/entities/projects/project.reducer';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
@@ -95,15 +95,15 @@ describe('ProjectListComponent', () => {
       projects: [
         {
           id: 'uuid-1', name: 'Default',
-          type: <IAMType>'CHEF_MANAGED'
+          type: 'CHEF_MANAGED'
         },
         {
           id: 'uuid-2', name: 'another-project',
-          type: <IAMType>'CUSTOM'
+          type: 'CUSTOM'
         },
         {
           id: 'uuid-5', name: 'zzz-project',
-          type: <IAMType>'CUSTOM'
+          type: 'CUSTOM'
         }
       ]
     }));
@@ -126,15 +126,15 @@ describe('ProjectListComponent', () => {
         projects: [
           {
             id: 'uuid-1', name: 'Default',
-            type: <IAMType>'CHEF_MANAGED'
+            type: 'CHEF_MANAGED'
           },
           {
             id: 'uuid-2', name: 'another-project',
-            type: <IAMType>'CUSTOM'
+            type: 'CUSTOM'
           },
           {
             id: 'uuid-5', name: 'zzz-project',
-            type: <IAMType>'CUSTOM'
+            type: 'CUSTOM'
           }
         ]
       }));
@@ -181,15 +181,15 @@ describe('ProjectListComponent', () => {
         projects: [
           {
             id: 'uuid-1', name: 'Default',
-            type: <IAMType>'CHEF_MANAGED'
+            type: 'CHEF_MANAGED'
           },
           {
             id: 'uuid-2', name: 'another-project',
-            type: <IAMType>'CUSTOM'
+            type: 'CUSTOM'
           },
           {
             id: 'uuid-5', name: 'zzz-project',
-            type: <IAMType>'CUSTOM'
+            type: 'CUSTOM'
           }
         ]
       }));
@@ -206,15 +206,15 @@ describe('ProjectListComponent', () => {
         projects: [
           {
             id: 'uuid-2', name: 'default',
-            type: <IAMType>'CUSTOM'
+            type: 'CUSTOM'
           },
           {
             id: 'uuid-4', name: 'default-resources',
-            type: <IAMType>'CUSTOM'
+            type: 'CUSTOM'
           },
           {
             id: 'uuid-5', name: 'Default',
-            type: <IAMType>'CUSTOM'
+            type: 'CUSTOM'
           }
         ]
       }));
@@ -231,23 +231,23 @@ describe('ProjectListComponent', () => {
         projects: [
           {
             id: 'uuid-1', name: 'Project01',
-            type: <IAMType>'CHEF_MANAGED'
+            type: 'CHEF_MANAGED'
           },
           {
             id: 'uuid-2', name: 'Project300',
-            type: <IAMType>'CUSTOM'
+            type: 'CUSTOM'
           },
           {
             id: 'uuid-3', name: 'Project3',
-            type: <IAMType>'CUSTOM'
+            type: 'CUSTOM'
           },
           {
             id: 'uuid-4', name: 'Project-2',
-            type: <IAMType>'CUSTOM'
+            type: 'CUSTOM'
           },
           {
             id: 'uuid-6', name: 'project',
-            type: <IAMType>'CHEF_MANAGED'
+            type: 'CHEF_MANAGED'
           }
         ]
       }));

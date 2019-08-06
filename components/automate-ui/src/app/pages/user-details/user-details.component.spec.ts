@@ -128,11 +128,7 @@ describe('UserDetailsComponent', () => {
       expect(component).toBeTruthy();
     });
 
-    it('has an empty user object', () => {
-      expect(component.user).toEqual({} as User);
-    });
-
-    it('dispatches an action to get its user data', () => {
+   it('dispatches an action to get its user data', () => {
       expect(store.dispatch).toHaveBeenCalledWith(
         new GetUser({ id: user.id }));
     });

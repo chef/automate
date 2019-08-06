@@ -65,8 +65,12 @@ export enum Type {
 }
 
 export function stringToMember(memberString: string): Member {
-  const member = <Member>{};
-  member.name = memberString;
+  const member: Member = {
+    name: memberString,
+    type: Type.Unknown,
+    displayName: '',
+    displayType: ''
+  };
   if (memberString.split('').pop() === ':') {
     member.type = Type.Unknown;
     return member;
