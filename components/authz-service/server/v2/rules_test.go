@@ -65,7 +65,7 @@ func TestCreateRule(t *testing.T) {
 		}},
 		{"if the rule id is invalid, returns 'invalid argument'", func(t *testing.T) {
 			resp, err := cl.CreateRule(ctx, &api.CreateRuleReq{
-				Id:         "no_underscores",
+				Id:         "no spaces",
 				Name:       "any name",
 				ProjectId:  "foo",
 				Conditions: apiConditions,
@@ -227,7 +227,7 @@ func TestUpdateRule(t *testing.T) {
 		}},
 		{"if the rule id is invalid, returns 'invalid argument'", func(t *testing.T) {
 			resp, err := cl.UpdateRule(ctx, &api.UpdateRuleReq{
-				Id:         "no_underscores",
+				Id:         "no spaces",
 				Name:       "any name",
 				ProjectId:  "foo",
 				Conditions: apiConditions,
@@ -478,7 +478,7 @@ func TestGetRule(t *testing.T) {
 			assert.Nil(t, resp)
 		}},
 		{"if the rule id is invalid, returns 'invalid argument'", func(t *testing.T) {
-			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: "no_underscore_allowed"})
+			resp, err := cl.GetRule(ctx, &api.GetRuleReq{Id: "no spaces allowed"})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
@@ -772,7 +772,7 @@ func TestDeleteRule(t *testing.T) {
 			assert.Nil(t, resp)
 		}},
 		{"if the rule id is invalid, returns 'invalid argument'", func(t *testing.T) {
-			resp, err := cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: "no_underscore_allowed"})
+			resp, err := cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: "no spaces allowed"})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
