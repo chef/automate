@@ -111,14 +111,15 @@ func AddGCPManager(ctx context.Context, mgrClient manager.NodeManagerServiceClie
 	if err != nil {
 		return nil, err
 	}
-	escaped := strings.ReplaceAll(string(decoded), "\n", "\\n")
-	formatted := strings.TrimSuffix(escaped, "\\n")
+	formatted := strings.ReplaceAll(string(decoded), "\n", "")
+	newLineForKeyBeg := strings.ReplaceAll(formatted, "KEY-----", "KEY-----\\n")
+	newLineForKeyEnd := strings.ReplaceAll(newLineForKeyBeg, "-----END", "\\n-----END")
 
 	gcpMgr := manager.NodeManager{
 		Name: fmt.Sprintf("my test %s mgr", mgrType),
 		Type: mgrType,
 		CredentialData: []*common.Kv{
-			{Key: "GOOGLE_CREDENTIALS_JSON", Value: formatted},
+			{Key: "GOOGLE_CREDENTIALS_JSON", Value: newLineForKeyEnd},
 		},
 	}
 
