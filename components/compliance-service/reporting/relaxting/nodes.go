@@ -172,7 +172,7 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 		// get node counts of passed/failed/skipped nodes to append to totals response
 		nodeSummary, err := backend.GetStatsSummaryNodes(filters)
 		if err != nil {
-			return nil, emptyTotals, errors.Wrapf(err, "error retrieving node count totals: ", myName)
+			return nil, emptyTotals, errors.Wrapf(err, "%s error retrieving node count totals: ", myName)
 		}
 		return nodes, TotalNodeCounts{Total: int32(searchResult.TotalHits()), Passed: nodeSummary.Compliant, Failed: nodeSummary.Noncompliant, Skipped: nodeSummary.Skipped}, nil
 	}
