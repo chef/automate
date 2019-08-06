@@ -5,10 +5,6 @@ date = 2018-03-26T16:01:47-07:00
 draft = false
 bref = ""
 toc = true
-[menu]
-  [menu.docs]
-    parent = "dashboards"
-    weight = 10
 +++
 
 ## About the Event Feed

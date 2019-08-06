@@ -58,10 +58,10 @@ weight = 20
 identifier = "configuring_automate"
 
 [[menu.docs]]
-name = "Dashboards"
+name = "Event Feed"
 weight = 40
-identifier = "dashboards"
-url = "/docs/dashboards"
+identifier = "event_feed"
+url = "/docs/event-feed"
 
 [[menu.docs]]
 name = "Client Runs"
