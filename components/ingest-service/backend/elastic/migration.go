@@ -122,7 +122,6 @@ func (es *Backend) ReindexInsightstoActions(ctx context.Context,
 			"cookbook", "role", "node", "group", "organization", "user")
 
 	startTaskResult, err := es.client.Reindex().
-		WaitForCompletion(true).
 		Source(reindexSource).
 		DestinationIndexAndType(actionsIndexName, "actions").
 		Script(esScript).
@@ -179,7 +178,6 @@ func (es *Backend) ReindexInsightstoConvergeHistory(ctx context.Context, insight
 		Query(boolQuery)
 
 	startTaskResult, err := es.client.Reindex().
-		WaitForCompletion(true).
 		Source(reindexSource).
 		DestinationIndexAndType(convergeHistoryIndexName, "converge").
 		Script(esScript).
@@ -239,7 +237,6 @@ func (es *Backend) ReindexNodeStateA1(ctx context.Context, a1NodeStateIndexName 
 	`
 	esScript := elastic.NewScript(script).Lang("painless")
 	startTaskResult, err := es.client.Reindex().
-		WaitForCompletion(true).
 		SourceIndex(a1NodeStateIndexName).
 		DestinationIndex(mappings.NodeState.Index).
 		Script(esScript).
