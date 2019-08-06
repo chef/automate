@@ -177,6 +177,16 @@ func RunMigrations(backend ES2Backend, statusSrv *statusserver.Server) error {
 		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa2v2, statusserver.MigrationFailedMsg)
 		return errMsg
 	}
+
+	// Migrates A2 version 3 indices to the current version
+	a2V3Indices := A2V3ElasticSearchIndices{backend: &backend}
+	err = backend.migrate(a2V3Indices, statusSrv, statusserver.MigrationLabelESa2v3)
+	if err != nil {
+		errMsg := errors.Wrap(err, fmt.Sprintf("%s, migration failed for %s", myName, statusserver.MigrationLabelESa2v3))
+		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa2v3, errMsg.Error())
+		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa2v3, statusserver.MigrationFailedMsg)
+		return errMsg
+	}
 	return nil
 }
 
@@ -349,22 +359,22 @@ func (backend ES2Backend) getScanDateRange(indexPrefix string) (*time.Time, *tim
 	return &earliestScanDate, &mostRecentScanDate, nil
 }
 
-func (backend ES2Backend) reindex(src, dest, reindexScript, srcDocType string) (*elastic.BulkIndexByScrollResponse, bool, error) {
+func (backend ES2Backend) reindex(src, dest, reindexScript, srcDocType string) (bool, error) {
 	myName := "reindex"
 
 	client, err := backend.ES2Client()
 	if err != nil {
-		return nil, false, errors.Wrap(err, fmt.Sprintf("%s cannot connect to ElasticSearch", myName))
+		return false, errors.Wrap(err, fmt.Sprintf("%s cannot connect to ElasticSearch", myName))
 	}
 
 	indexToMigrateExists, err := StoreExists(client, src)
 	if err != nil {
-		return nil, false, errors.Wrap(err, fmt.Sprintf("%s Error checking if index exists", myName))
+		return false, errors.Wrap(err, fmt.Sprintf("%s Error checking if index exists", myName))
 	}
 
 	//if the index does not exist but there was no error trying to determine its existence, leave it up to caller how to proceed.
 	if !indexToMigrateExists {
-		return nil, indexToMigrateExists, nil
+		return indexToMigrateExists, nil
 	}
 
 	defer util.TimeTrack(time.Now(), fmt.Sprintf("%s src: %s dest: %s", myName, src, dest))
@@ -389,12 +399,24 @@ func (backend ES2Backend) reindex(src, dest, reindexScript, srcDocType string) (
 		reindexCall = reindexCall.Script(script)
 	}
 
-	reindexCallResponse, err := reindexCall.Do(context.Background())
-
+	startTaskResult, err := reindexCall.DoAsync(context.Background())
 	if err != nil {
-		return nil, indexToMigrateExists, errors.Wrap(err, fmt.Sprintf("%s call to reindex failed", myName))
+		return indexToMigrateExists, errors.Wrap(err, fmt.Sprintf("%s call to reindex failed", myName))
 	}
-	return reindexCallResponse, indexToMigrateExists, err
+
+	for {
+		time.Sleep(time.Second * 1)
+		completed, err := backend.ReindexStatus(context.Background(), startTaskResult.TaskId)
+		if err != nil {
+			return indexToMigrateExists, err
+		}
+		if completed {
+			break
+		}
+		logrus.Debugf(" * migrating: waiting for reindex task %s to complete", startTaskResult.TaskId)
+	}
+
+	return indexToMigrateExists, nil
 }
 
 func (backend ES2Backend) getLatestReportIds(sumDailyToday string) ([]string, error) {
@@ -540,15 +562,24 @@ func migrateTimeSeriesDate(ctx context.Context, esClient *elastic.Client, dateTo
 					if err != nil {
 						return errors.Wrapf(err, "migrateTimeSeries unable to unmarshall report with ID=%s", reportId)
 					}
+					staticProfileMissing := false
 					for _, esInSpecReportProfile := range esInSpecSummary.ProfilesSums {
 						_, profileId := rightSplit(esInSpecReportProfile.Profile, "|")
 						if profilesMetaMap[profileId] == nil {
 							esProfile, err := getProfileA2v2(esClient, ctx, profileId)
 							if err != nil {
-								return errors.Wrapf(err, "migrateTimeSeries unable to get profile %s", profileId)
+								logrus.Errorf("migrateTimeSeries unable to get profile %s, not migrating report %s", profileId, reportId)
+								staticProfileMissing = true
+								// If one of the profiles used by the report can't be found in the static profiles index
+								// we break out of this loop as the report won't be migrated anyway
+								break
 							}
 							addProfileToMap(esProfile, profileId)
 						}
+					}
+
+					if staticProfileMissing {
+						continue
 					}
 
 					if esInSpecSummary.ReportID == "" {
@@ -557,25 +588,43 @@ func migrateTimeSeriesDate(ctx context.Context, esClient *elastic.Client, dateTo
 					}
 
 					if esInSpecReports[reportId] != nil {
-						dstSum := convertA2v2SummaryDocToLatest(&esInSpecSummary)
+						dstSum, err := convertA2v2SummaryDocToLatest(&esInSpecSummary)
+						if err != nil {
+							logrus.Errorf(err.Error())
+							// Only log errors and avoid migrating incomplete reports
+							continue
+						}
+
 						dstSum.Statistics.Duration = esInSpecReports[hit.Id].Statistics.Duration
 						dstSum.InSpecVersion = esInSpecReports[hit.Id].InSpecVersion
+
+						dstRep, err := convertA2v2ReportDocToLatest(esInSpecReports[hit.Id], dstSum)
+						if err != nil {
+							logrus.Errorf(err.Error())
+							// Only log errors and avoid migrating incomplete reports
+							continue
+						}
+
 						dstSums = append(dstSums, dstSum)
-						dstReps = append(dstReps, convertA2v2ReportDocToLatest(esInSpecReports[hit.Id], dstSum))
+						dstReps = append(dstReps, dstRep)
 					} else {
-						return errors.Errorf("Report %s missing for index %s", reportId, srcRepIndex)
+						logrus.Errorf("Not migrating report %s as it's missing from index %s", reportId, srcRepIndex)
 					}
 				}
 			}
 
-			err = BulkInsertComplianceSummaryDocs(esClient, ctx, dstSumIndex, dstSums)
-			if err != nil {
-				return errors.Wrapf(err, "migrateTimeSeries unable to bulk insert %d summary docs in index %s", len(dstSums), dstSumIndex)
+			if len(dstSums) > 0 {
+				err = BulkInsertComplianceSummaryDocs(esClient, ctx, dstSumIndex, dstSums)
+				if err != nil {
+					return errors.Wrapf(err, "migrateTimeSeries unable to bulk insert %d summary docs in index %s", len(dstSums), dstSumIndex)
+				}
 			}
 
-			err = BulkInsertComplianceReportDocs(esClient, ctx, dstRepIndex, dstReps)
-			if err != nil {
-				return errors.Wrapf(err, "migrateTimeSeries unable to bulk insert %d report docs in index %s", len(dstReps), dstRepIndex)
+			if len(dstReps) > 0 {
+				err = BulkInsertComplianceReportDocs(esClient, ctx, dstRepIndex, dstReps)
+				if err != nil {
+					return errors.Wrapf(err, "migrateTimeSeries unable to bulk insert %d report docs in index %s", len(dstReps), dstRepIndex)
+				}
 			}
 		}
 	}

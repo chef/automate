@@ -17,8 +17,8 @@ message Message {
     string fallback = 2;
     string pretext = 3;
     string text = 4;
-    /* valid values for mrkdn_in, which indicates
-       which fields contain markdwon formatting:
+    /* valid values for mrkdwn_in, which indicates
+       which fields contain markdown formatting:
        text, pretext, fields */
     string mrkdwn_in = 5;
     repeated Field fields = 6;

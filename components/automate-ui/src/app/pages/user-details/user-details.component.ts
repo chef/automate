@@ -20,6 +20,7 @@ import {
   allUsers, userStatus, userFromRoute, updateStatus
 } from 'app/entities/users/user.selectors';
 import { User } from 'app/entities/users/user.model';
+import { Regex } from 'app/helpers/auth/regex';
 
 // TODO: deduplicate (copied from user-management.component.ts)
 function matchFieldValidator() {
@@ -75,7 +76,11 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     // TODO (tc) This needs to be refactored to resemble our other patterns
     // for specific object pages.
     // combineLatest depends on the user object existing already.
-    this.user = <User>{};
+    this.user = {
+      id: '',
+      name: '',
+      membership_id: ''
+    };
 
     this.done$ = <Observable<boolean>>combineLatest(
       store.select(allUsers),
@@ -128,12 +133,16 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   }
 
   private createForms(fb: FormBuilder): void {
+    // Must stay in sync with error checks in user-details.component.html
     this.editForm = fb.group({
-      fullName: ['', Validators.required]
+      fullName: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
     this.passwordForm = fb.group({
       oldPassword: ['', [nonAdminValidator(this.isAdminView, 8)]],
-      newPassword: ['', [Validators.required, Validators.minLength(8)]],
+      newPassword: ['',
+        [Validators.required,
+        Validators.pattern(Regex.patterns.NON_BLANK),
+        Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required, matchFieldValidator()]]
     });
   }
@@ -173,7 +182,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   }
 
   public updateFullName(): void {
-    const name = this.editForm.get('fullName').value;
+    const name = this.editForm.get('fullName').value.trim();
     this.store.dispatch(
       this.isAdminView ?
         new UpdateUser({ ...this.user, name })

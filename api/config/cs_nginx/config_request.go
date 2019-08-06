@@ -115,14 +115,14 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 	}
 
 	if gExternalAutomate := g.GetV1().GetExternal().GetAutomate(); gExternalAutomate.GetEnable().GetValue() {
-		externalAutoamteURL, err := url.Parse(gExternalAutomate.GetNode().GetValue())
+		externalAutomateURL, err := url.Parse(gExternalAutomate.GetNode().GetValue())
 		if err != nil {
 			logrus.WithError(err).Error("failed to parse external automate url")
 			return
 		}
-		host := externalAutoamteURL.Host
-		port := externalAutoamteURL.Port()
-		scheme := externalAutoamteURL.Scheme
+		host := externalAutomateURL.Host
+		port := externalAutomateURL.Port()
+		scheme := externalAutomateURL.Scheme
 		if scheme == "" {
 			scheme = "https"
 		}

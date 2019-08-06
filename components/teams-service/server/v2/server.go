@@ -2,7 +2,6 @@ package v2
 
 import (
 	"context"
-	"fmt"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -64,10 +63,7 @@ func (s *Server) CreateTeam(ctx context.Context,
 	var err error
 	if team, err = s.service.Storage.StoreTeamWithProjects(ctx, req.Id, req.Name, req.Projects); err != nil {
 		if err == storage.ErrConflict {
-			return nil, status.Errorf(
-				codes.AlreadyExists,
-				"unable to create team: a team with id %q already exists.",
-				req.Id)
+			return nil, status.Errorf(codes.AlreadyExists, "team with ID %q already exists", req.Id)
 		}
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -95,9 +91,7 @@ func (s *Server) DeleteTeam(ctx context.Context, req *teams.DeleteTeamReq) (*tea
 	})
 	if err != nil {
 		s.service.Logger.Warnf("failed to purge subjects on team delete: %s", err.Error())
-		return nil, status.Error(codes.Internal,
-			fmt.Sprintf("the team named %q with id %q was successfully deleted but its "+
-				"subject could not be purged from the policies: %s", team.Name, req.Id, err.Error()))
+		return nil, status.Errorf(codes.Internal, "failed to purge team %q from policies: %s", req.Id, err.Error())
 	}
 
 	return &teams.DeleteTeamResp{
@@ -127,7 +121,7 @@ func (s *Server) AddTeamMembers(ctx context.Context,
 	req *teams.AddTeamMembersReq) (*teams.AddTeamMembersResp, error) {
 
 	if len(req.UserIds) == 0 {
-		return nil, status.Error(codes.InvalidArgument, "missing user ids")
+		return nil, status.Error(codes.InvalidArgument, "missing user IDs")
 	}
 	// TODO (tc): The storage interface is still using V1 verbiage, so
 	// name is really the ID in V2 terms. We'll refactor at GA when V1 is removed.

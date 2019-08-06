@@ -1,8 +1,6 @@
 package pgdb
 
 import (
-	"encoding/json"
-
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
@@ -103,53 +101,4 @@ func (trans *DBTrans) tagNode(nodeID string, tagIDs []string) error {
 		}
 	}
 	return trans.Insert(links...)
-}
-
-// FindKeyValue finds a Tag object in the array based on key match
-func FindKeyValue(tags []*common.Kv, key string) *common.Kv {
-	for _, tag := range tags {
-		if tag.Key == key {
-			return tag
-		}
-	}
-	return &common.Kv{}
-}
-
-// RemoveKeyValue removes an item from the array base on key match
-func RemoveKeyValue(tags []*common.Kv, key string) []*common.Kv {
-	for i, tag := range tags {
-		if tag.Key == key {
-			tags[i] = tags[len(tags)-1]
-			return tags[:len(tags)-1]
-		}
-	}
-	return tags
-}
-
-// KeyValueToRawMap helps convert an array of KeyValues in a Map and convert it to json
-func KeyValueToRawMap(arr []*common.Kv) (json.RawMessage, error) {
-	zaMap := make(map[string]string, 0)
-	for _, kv := range arr {
-		zaMap[kv.Key] = kv.Value
-	}
-	jsonMap, err := json.Marshal(zaMap)
-	if err != nil {
-		return jsonMap, errors.Wrap(err, "keyValueToRawMap unable to marshal map")
-	}
-	return jsonMap, nil
-}
-
-// RawMapToKeyValue helps convert an array of KeyValues in a Map and convert it to json
-func RawMapToKeyValue(rawJSON json.RawMessage) ([]*common.Kv, error) {
-	var zaMap map[string]string
-	err := json.Unmarshal(rawJSON, &zaMap)
-	if err != nil {
-		return nil, errors.Wrap(err, "rawMapToKeyValue unable to unmarshal map")
-	}
-
-	zaArray := make([]*common.Kv, 0, len(zaMap))
-	for k, v := range zaMap {
-		zaArray = append(zaArray, &common.Kv{Key: k, Value: v})
-	}
-	return zaArray, nil
 }

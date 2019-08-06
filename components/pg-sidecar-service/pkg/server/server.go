@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
@@ -17,6 +18,7 @@ import (
 	"github.com/chef/automate/components/pg-sidecar-service/pkg/pgw"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/platform"
 	"github.com/chef/automate/lib/tracing"
 	"github.com/chef/automate/lib/version"
@@ -27,20 +29,17 @@ import (
 func StartGRPC(ctx context.Context, cfg *Config) error {
 	tlsOpts, err := cfg.ReadCerts()
 	if err != nil {
-		logrus.WithError(err).Fatal("failed to load SSL key/cert files")
-		return err
+		return errors.Wrap(err, "failed to load SSL key/cert files")
 	}
 
 	platformConfig, err := platform.ConfigFromEnvironment()
 	if err != nil {
-		logrus.WithError(err).Fatal("failed to load platform config")
-		return err
+		return errors.Wrap(err, "failed to load platform config")
 	}
 
 	listener, err := net.Listen("tcp", cfg.ListenAddress())
 	if err != nil {
-		logrus.WithError(err).Fatalf("failed to listen on address %s", cfg.ListenAddress())
-		return err
+		return errors.Wrapf(err, "failed to listen on address %s", cfg.ListenAddress())
 	}
 
 	connFactory := secureconn.NewFactory(*tlsOpts, secureconn.WithVersionInfo(
@@ -75,9 +74,7 @@ func StartGRPC(ctx context.Context, cfg *Config) error {
 		os.Exit(0)
 	}()
 
-	grpcServer.Serve(listener)
-
-	return nil
+	return grpcServer.Serve(listener)
 }
 
 // PGSidecarServerOpt is a functional option for configuring the PGSidecarServer
@@ -130,7 +127,7 @@ func (p *PGSidecarServer) SetPublicSchemaRole(ctx context.Context, req *api.SetP
 	if err != nil {
 		return res, status.New(codes.FailedPrecondition, err.Error()).Err()
 	}
-	defer client.Close()
+	defer fileutils.LogClose(client, logrus.StandardLogger(), "failed to close client")
 
 	proc, err := p.queueSerialProcedure(
 		ctx,
@@ -153,7 +150,7 @@ func (p *PGSidecarServer) AlterRole(ctx context.Context, req *api.AlterRoleReq) 
 	if err != nil {
 		return res, status.New(codes.FailedPrecondition, err.Error()).Err()
 	}
-	defer client.Close()
+	defer fileutils.LogClose(client, logrus.StandardLogger(), "failed to close client")
 
 	query := pgw.NewAlterRoleQuery()
 	b, err = json.Marshal(req.With)
@@ -192,7 +189,7 @@ func (p *PGSidecarServer) CreateDB(ctx context.Context, req *api.CreateDBReq) (*
 	if err != nil {
 		return res, status.New(codes.FailedPrecondition, err.Error()).Err()
 	}
-	defer client.Close()
+	defer fileutils.LogClose(client, logrus.StandardLogger(), "failed to close client")
 
 	proc, err := p.queueSerialProcedure(
 		ctx,
@@ -217,7 +214,7 @@ func (p *PGSidecarServer) CreateExtension(ctx context.Context, req *api.CreateEx
 	if err != nil {
 		return res, status.New(codes.FailedPrecondition, err.Error()).Err()
 	}
-	defer client.Close()
+	defer fileutils.LogClose(client, logrus.StandardLogger(), "failed to close client")
 
 	proc, err := p.queueSerialProcedure(
 		ctx,
@@ -239,7 +236,7 @@ func (p *PGSidecarServer) DeploySqitch(ctx context.Context, req *api.DeploySqitc
 	if err != nil {
 		return res, status.New(codes.FailedPrecondition, err.Error()).Err()
 	}
-	defer client.Close()
+	defer fileutils.LogClose(client, logrus.StandardLogger(), "failed to close client")
 
 	proc, err := p.queueSerialProcedure(
 		ctx,
@@ -261,7 +258,7 @@ func (p *PGSidecarServer) MigrateTables(ctx context.Context, req *api.MigrateTab
 	if err != nil {
 		return res, status.New(codes.FailedPrecondition, err.Error()).Err()
 	}
-	defer client.Close()
+	defer fileutils.LogClose(client, logrus.StandardLogger(), "failed to close client")
 
 	proc, err := p.queueSerialProcedure(
 		ctx,
@@ -311,7 +308,7 @@ func (p *PGSidecarServer) DropTables(ctx context.Context, req *api.DropTablesReq
 	if err != nil {
 		return res, status.New(codes.FailedPrecondition, err.Error()).Err()
 	}
-	defer client.Close()
+	defer fileutils.LogClose(client, logrus.StandardLogger(), "failed to close client")
 
 	query := pgw.NewDropTablesQuery()
 	query.Tables = req.Tables
@@ -339,7 +336,7 @@ func (p *PGSidecarServer) RenameDB(ctx context.Context, req *api.RenameDBReq) (*
 	if err != nil {
 		return res, status.New(codes.FailedPrecondition, err.Error()).Err()
 	}
-	defer client.Close()
+	defer fileutils.LogClose(client, logrus.StandardLogger(), "failed to close client")
 
 	proc, err := p.queueSerialProcedure(
 		ctx,
@@ -360,7 +357,7 @@ func (p *PGSidecarServer) Start() error {
 	if err != nil {
 		return err
 	}
-	defer client.Close()
+	defer fileutils.LogClose(client, logrus.StandardLogger(), "failed to close client")
 
 	// Start the serial procedure runner
 	p.spr = pgw.NewSerialProcedureRunner()

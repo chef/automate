@@ -107,7 +107,7 @@ func TestGetRuleProperties(t *testing.T) {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				rStaged, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				rStaged, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
@@ -127,7 +127,7 @@ func TestGetRuleProperties(t *testing.T) {
 
 				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-				rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
@@ -261,7 +261,7 @@ func TestUpdateRuleProperties(t *testing.T) {
 
 				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-				rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
@@ -283,7 +283,7 @@ func TestUpdateRuleProperties(t *testing.T) {
 
 				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-				rInitialApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				rInitialApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
@@ -302,7 +302,7 @@ func TestUpdateRuleProperties(t *testing.T) {
 
 				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-				rFinalApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				rFinalApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
@@ -351,7 +351,7 @@ func TestUpdateRuleProperties(t *testing.T) {
 
 				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-				rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
@@ -380,17 +380,17 @@ func TestDeleteRuleProperties(t *testing.T) {
 
 				_, err := createProjectAndRule(ctx, cl, reqs)
 
-				_, err = cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: reqs.rules[0].Id})
+				_, err = cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				deletedWhenStaged := grpctest.AssertCode(t, codes.NotFound, err)
 
 				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				deletedWhenApplied := grpctest.AssertCode(t, codes.NotFound, err)
 
 				return deletedWhenStaged && deletedWhenApplied
@@ -407,17 +407,17 @@ func TestDeleteRuleProperties(t *testing.T) {
 
 				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-				_, err = cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: reqs.rules[0].Id})
+				_, err = cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				markedforDeletion := grpctest.AssertCode(t, codes.NotFound, err) && strings.Contains(err.Error(), "marked for deletion")
 
 				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				fullyDeleted := grpctest.AssertCode(t, codes.NotFound, err) && !strings.Contains(err.Error(), "marked for deletion")
 
 				return markedforDeletion && fullyDeleted
@@ -446,16 +446,16 @@ func TestDeleteRuleProperties(t *testing.T) {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				_, err = cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: reqs.rules[0].Id})
+				_, err = cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				markedforDeletion := grpctest.AssertCode(t, codes.NotFound, err) && strings.Contains(err.Error(), "marked for deletion")
 				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id})
+				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				fullyDeleted := grpctest.AssertCode(t, codes.NotFound, err) && !strings.Contains(err.Error(), "marked for deletion")
 
 				return markedforDeletion && fullyDeleted
@@ -479,20 +479,20 @@ func getGenerators() (gopter.Gen, gopter.Gen, gopter.Gen) {
 
 	conditionsGenNode := gen.StructPtr(reflect.TypeOf(&api.Condition{}), map[string]gopter.Gen{
 		"Type": gen.OneConstOf(
-			api.ProjectRuleConditionAttributes_CHEF_SERVERS,
-			api.ProjectRuleConditionAttributes_CHEF_ORGS,
-			api.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
-			api.ProjectRuleConditionAttributes_ROLES,
-			api.ProjectRuleConditionAttributes_CHEF_TAGS,
-			api.ProjectRuleConditionAttributes_POLICY_GROUP,
-			api.ProjectRuleConditionAttributes_POLICY_NAME,
+			api.ProjectRuleConditionAttributes_CHEF_SERVER,
+			api.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+			api.ProjectRuleConditionAttributes_ENVIRONMENT,
+			api.ProjectRuleConditionAttributes_CHEF_ROLE,
+			api.ProjectRuleConditionAttributes_CHEF_TAG,
+			api.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+			api.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 		),
 		"Values": gen.SliceOf(gen.UnicodeString(graphicRange)),
 	})
 	conditionsGenEvent := gen.StructPtr(reflect.TypeOf(&api.Condition{}), map[string]gopter.Gen{
 		"Type": gen.OneConstOf(
-			api.ProjectRuleConditionAttributes_CHEF_SERVERS,
-			api.ProjectRuleConditionAttributes_CHEF_ORGS,
+			api.ProjectRuleConditionAttributes_CHEF_SERVER,
+			api.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 		),
 		"Values": gen.SliceOf(gen.UnicodeString(graphicRange)),
 	})

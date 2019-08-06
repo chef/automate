@@ -60,7 +60,7 @@ func (s *Server) UpdateRule(ctx context.Context, req *pb_req.UpdateRuleReq) (*pb
 }
 
 func (s *Server) GetRule(ctx context.Context, req *pb_req.GetRuleReq) (*pb_resp.GetRuleResp, error) {
-	resp, err := s.projects.GetRule(ctx, &authz.GetRuleReq{Id: req.Id})
+	resp, err := s.projects.GetRule(ctx, &authz.GetRuleReq{Id: req.Id, ProjectId: req.ProjectId})
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (s *Server) ListRulesForProject(ctx context.Context, req *pb_req.ListRulesF
 }
 
 func (s *Server) DeleteRule(ctx context.Context, req *pb_req.DeleteRuleReq) (*pb_resp.DeleteRuleResp, error) {
-	_, err := s.projects.DeleteRule(ctx, &authz.DeleteRuleReq{Id: req.Id})
+	_, err := s.projects.DeleteRule(ctx, &authz.DeleteRuleReq{Id: req.Id, ProjectId: req.ProjectId})
 	if err != nil {
 		return nil, err
 	}
@@ -239,13 +239,13 @@ func fromExternalCondition(c *pb_common.Condition) (*authz.Condition, error) {
 }
 
 var externalToAPIConditionAttributes = map[pb_common.ConditionAttribute]authz.ProjectRuleConditionAttributes{
-	pb_common.ConditionAttribute_ROLES:             authz.ProjectRuleConditionAttributes_ROLES,
-	pb_common.ConditionAttribute_CHEF_SERVERS:      authz.ProjectRuleConditionAttributes_CHEF_SERVERS,
-	pb_common.ConditionAttribute_CHEF_TAGS:         authz.ProjectRuleConditionAttributes_CHEF_TAGS,
-	pb_common.ConditionAttribute_CHEF_ENVIRONMENTS: authz.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
-	pb_common.ConditionAttribute_CHEF_ORGS:         authz.ProjectRuleConditionAttributes_CHEF_ORGS,
-	pb_common.ConditionAttribute_POLICY_GROUP:      authz.ProjectRuleConditionAttributes_POLICY_GROUP,
-	pb_common.ConditionAttribute_POLICY_NAME:       authz.ProjectRuleConditionAttributes_POLICY_NAME,
+	pb_common.ConditionAttribute_CHEF_ROLE:         authz.ProjectRuleConditionAttributes_CHEF_ROLE,
+	pb_common.ConditionAttribute_CHEF_SERVER:       authz.ProjectRuleConditionAttributes_CHEF_SERVER,
+	pb_common.ConditionAttribute_CHEF_TAG:          authz.ProjectRuleConditionAttributes_CHEF_TAG,
+	pb_common.ConditionAttribute_ENVIRONMENT:       authz.ProjectRuleConditionAttributes_ENVIRONMENT,
+	pb_common.ConditionAttribute_CHEF_ORGANIZATION: authz.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+	pb_common.ConditionAttribute_CHEF_POLICY_GROUP: authz.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+	pb_common.ConditionAttribute_CHEF_POLICY_NAME:  authz.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
 }
 var apiToExternalConditionAttributes = map[authz.ProjectRuleConditionAttributes]pb_common.ConditionAttribute{}
 var onceReverseConditionAttributesMapping sync.Once

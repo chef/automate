@@ -15,7 +15,7 @@ const avengersRule = {
   project_id: avengersProject.id,
   conditions: [
     {
-      attribute: 'CHEF_ORGS',
+      attribute: 'CHEF_ORGANIZATION',
       operator: 'EQUALS',
       values: ['avengers']
     }
@@ -29,7 +29,7 @@ const xmenRule = {
   project_id: xmenProject.id,
   conditions: [
     {
-      attribute: 'CHEF_ORGS',
+      attribute: 'CHEF_ORGANIZATION',
       operator: 'EQUALS',
       values: ['xmen']
     }
@@ -160,7 +160,7 @@ describe('projects API', () => {
           cy.request({
             headers: { 'api-token': Cypress.env('adminTokenValue') },
             method: 'POST',
-            url: '/apis/iam/v2beta/rules',
+            url: `/apis/iam/v2beta/projects/${rule.project_id}/rules`,
             body: rule
           });
         }
@@ -233,7 +233,7 @@ describe('projects API', () => {
 
         updatedAvengersRule.conditions = [
           {
-            attribute: 'CHEF_ORGS',
+            attribute: 'CHEF_ORGANIZATION',
             operator: 'MEMBER_OF',
             values: ['avengers', 'xmen']
           }
@@ -242,7 +242,7 @@ describe('projects API', () => {
         cy.request({
           headers: { 'api-token': Cypress.env('adminTokenValue') },
           method: 'PUT',
-          url: `/apis/iam/v2beta/rules/${avengersRule.id}`,
+          url: `/apis/iam/v2beta/projects/${avengersRule.project_id}/rules/${avengersRule.id}`,
           body: updatedAvengersRule
         });
 
@@ -270,8 +270,7 @@ describe('projects API', () => {
         cy.request({
           headers: { 'api-token': Cypress.env('adminTokenValue') },
           method: 'DELETE',
-          url: `/apis/iam/v2beta/rules/${avengersRule.id}`,
-          body: avengersRule
+          url: `/apis/iam/v2beta/projects/${avengersRule.project_id}/rules/${avengersRule.id}`
         });
 
         cy.request({

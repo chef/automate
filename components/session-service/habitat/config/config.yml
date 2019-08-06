@@ -17,7 +17,7 @@ bldr-client-secret: {{ cfg.service.bldr_client_secret }}
 log-level: {{ cfg.logger.level }}
 log-format: {{ cfg.logger.format }}
 database: {{ cfg.storage.database }}
-migrations-path: {{ pkg.svc_static_path }}/migrations
+migrations-path: {{ pkg.path }}/migrations
 
 tls:
   cert_path: {{pkg.svc_config_path}}/service.crt

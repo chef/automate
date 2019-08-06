@@ -70,11 +70,11 @@ type projectStorage interface {
 
 type ruleStorage interface {
 	CreateRule(context.Context, *Rule) (*Rule, error)
-	GetStagedOrAppliedRule(context.Context, string) (*Rule, error)
+	GetStagedOrAppliedRule(ctx context.Context, projectID string, ruleID string) (*Rule, error)
 	UpdateRule(context.Context, *Rule) (*Rule, error)
 	ListRules(context.Context) ([]*Rule, error)
 	ListStagedAndAppliedRules(context.Context) ([]*Rule, error)
-	DeleteRule(context.Context, string) error
+	DeleteRule(ctx context.Context, projectID string, ruleID string) error
 	ListRulesForProject(context.Context, string) ([]*Rule, ProjectRulesStatus, error)
 	ApplyStagedRules(context.Context) error
 }
@@ -192,17 +192,15 @@ func DefaultPolicies() ([]Policy, error) {
 // At present, this list contains internally required projects only, hidden from the user.
 func DefaultProjects() []Project {
 	allProjects := Project{
-		ID:       constants_v2.AllProjectsID,
-		Name:     "All Projects",
-		Type:     ChefManaged,
-		Projects: []string{constants_v2.AllProjectsID},
+		ID:   constants_v2.AllProjectsID,
+		Name: "All Projects",
+		Type: ChefManaged,
 	}
 
 	unassignedProject := Project{
-		ID:       constants_v2.UnassignedProjectID,
-		Name:     constants_v2.UnassignedProjectID,
-		Type:     ChefManaged,
-		Projects: []string{constants_v2.UnassignedProjectID},
+		ID:   constants_v2.UnassignedProjectID,
+		Name: constants_v2.UnassignedProjectID,
+		Type: ChefManaged,
 	}
 
 	return []Project{allProjects, unassignedProject}

@@ -3,6 +3,7 @@ package v2
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/pkg/errors"
@@ -211,7 +212,7 @@ func (refresher *policyRefresher) getPolicyMap(ctx context.Context) (map[string]
 	for _, p := range policies {
 
 		statements := make(map[string]interface{})
-		for _, st := range p.Statements {
+		for i, st := range p.Statements {
 			stmt := map[string]interface{}{
 				"effect":   st.Effect.String(),
 				"projects": st.Projects,
@@ -226,7 +227,7 @@ func (refresher *policyRefresher) getPolicyMap(ctx context.Context) (map[string]
 			if len(st.Resources) != 0 {
 				stmt["resources"] = st.Resources
 			}
-			statements[st.ID.String()] = stmt
+			statements[strconv.Itoa(i)] = stmt
 		}
 
 		members := make([]string, len(p.Members))

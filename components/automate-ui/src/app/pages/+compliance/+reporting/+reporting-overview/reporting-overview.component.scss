@@ -15,7 +15,6 @@
   margin: 35px;
 
   figure {
-    @include base-box-shadow();
     display: flex;
     margin: 0;
     padding: 1em;

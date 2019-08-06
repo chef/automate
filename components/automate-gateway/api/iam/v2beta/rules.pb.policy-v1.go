@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	policy.MapMethodTo("/chef.automate.api.iam.v2beta.Rules/CreateRule", "auth:rules", "create", "POST", "/iam/v2beta/rules", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2beta.Rules/CreateRule", "auth:projects:{project_id}", "update", "POST", "/iam/v2beta/projects/{project_id}/rules", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.CreateRuleReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -26,7 +26,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2beta.Rules/UpdateRule", "auth:rules:{id}", "update", "PUT", "/iam/v2beta/rules/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2beta.Rules/UpdateRule", "auth:projects:{project_id}", "update", "PUT", "/iam/v2beta/projects/{project_id}/rules/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.UpdateRuleReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -43,12 +43,14 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2beta.Rules/GetRule", "auth:rules:{id}", "get", "GET", "/iam/v2beta/rules/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2beta.Rules/GetRule", "auth:projects:{project_id}", "get", "GET", "/iam/v2beta/projects/{project_id}/rules/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.GetRuleReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
 				case "id":
 					return m.Id
+				case "project_id":
+					return m.ProjectId
 				default:
 					return ""
 				}
@@ -56,10 +58,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2beta.Rules/ListRules", "auth:rules", "read", "GET", "/iam/v2beta/rules", func(unexpandedResource string, input interface{}) string {
-		return unexpandedResource
-	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2beta.Rules/ListRulesForProject", "auth:projects:{id}:rules", "read", "GET", "/iam/v2beta/projects/{id}/rules", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2beta.Rules/ListRulesForProject", "auth:projects:{id}", "get", "GET", "/iam/v2beta/projects/{id}/rules", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.ListRulesForProjectReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -72,12 +71,14 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2beta.Rules/DeleteRule", "auth:rules:{id}", "delete", "DELETE", "/iam/v2beta/rules/{id}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.iam.v2beta.Rules/DeleteRule", "auth:projects:{project_id}", "update", "DELETE", "/iam/v2beta/projects/{project_id}/rules/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.DeleteRuleReq); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
 				case "id":
 					return m.Id
+				case "project_id":
+					return m.ProjectId
 				default:
 					return ""
 				}

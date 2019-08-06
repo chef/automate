@@ -87,7 +87,8 @@ func (esprofile *ESInspecProfile) parseInspecProfile(profile inspec.Profile) err
 	esprofile.Dependencies = convertRSProfileDependenciesToInspecDependencies(profile.Dependencies)
 	esprofile.Sha256 = profile.Sha256
 	// no need for Status and SkipMessage here as it's not static metadata of the profile
-	var groups []inspec.Group
+
+	groups := make([]inspec.Group, 0, len(profile.Groups))
 	for _, group := range profile.Groups {
 		eGroup := inspec.Group{
 			ID:       group.Id,
@@ -98,7 +99,7 @@ func (esprofile *ESInspecProfile) parseInspecProfile(profile inspec.Profile) err
 	}
 	esprofile.Groups = groups
 
-	esprofile.Attributes = make([]ESInspecAttribute, 0)
+	esprofile.Attributes = make([]ESInspecAttribute, 0, len(profile.Attributes))
 	for _, attribute := range profile.Attributes {
 		esAttribute := ESInspecAttribute{
 			Name: attribute.Name,
@@ -115,8 +116,7 @@ func (esprofile *ESInspecProfile) parseInspecProfile(profile inspec.Profile) err
 		esprofile.Attributes = append(esprofile.Attributes, esAttribute)
 	}
 
-	esprofile.Controls = make([]ESInspecControl, 0)
-
+	esprofile.Controls = make([]ESInspecControl, 0, len(profile.Controls))
 	// we need to marshal refs and tags for each control
 	for _, control := range profile.Controls {
 		esControl := ESInspecControl{
@@ -126,7 +126,8 @@ func (esprofile *ESInspecProfile) parseInspecProfile(profile inspec.Profile) err
 			ID:     control.ID,
 			Title:  control.Title,
 		}
-		var results []reportingapi.Result
+
+		results := make([]reportingapi.Result, 0, len(control.Results))
 		for _, res := range control.Results {
 			eRes := reportingapi.Result{
 				Status:      res.Status,
@@ -179,7 +180,8 @@ func (esprofile *ESInspecProfile) convertToInspecProfile() (reportingapi.Profile
 	inspecProfile.Sha256 = esprofile.Sha256
 	inspecProfile.Status = esprofile.Status
 	inspecProfile.SkipMessage = esprofile.SkipMessage
-	var groups []*reportingapi.Group
+
+	groups := make([]*reportingapi.Group, 0, len(esprofile.Groups))
 	for _, group := range esprofile.Groups {
 		eGroup := reportingapi.Group{
 			Id:       group.ID,
@@ -193,7 +195,7 @@ func (esprofile *ESInspecProfile) convertToInspecProfile() (reportingapi.Profile
 	inspecProfile.Groups = groups
 
 	// we need to unmarshal attributes
-	inspecProfile.Attributes = make([]*reportingapi.Attribute, 0)
+	inspecProfile.Attributes = make([]*reportingapi.Attribute, 0, len(esprofile.Attributes))
 	for _, esAttribute := range esprofile.Attributes {
 		attribute := reportingapi.Attribute{
 			Name: esAttribute.Name,
@@ -214,7 +216,7 @@ func (esprofile *ESInspecProfile) convertToInspecProfile() (reportingapi.Profile
 	}
 
 	// we need to unmarshal refs and tags for each control
-	inspecProfile.Controls = make([]*reportingapi.Control, 0)
+	inspecProfile.Controls = make([]*reportingapi.Control, 0, len(esprofile.Controls))
 	for _, esControl := range esprofile.Controls {
 		control := reportingapi.Control{
 			Code:   esControl.Code,
@@ -223,7 +225,7 @@ func (esprofile *ESInspecProfile) convertToInspecProfile() (reportingapi.Profile
 			Id:     esControl.ID,
 			Title:  esControl.Title,
 		}
-		var results []*reportingapi.Result
+		results := make([]*reportingapi.Result, 0, len(esControl.Results))
 		for _, res := range esControl.Results {
 			eRes := reportingapi.Result{
 				Status:      res.Status,

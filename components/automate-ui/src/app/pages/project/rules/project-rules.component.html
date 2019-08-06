@@ -11,97 +11,127 @@
     <ng-container>
       <form id="ruleForm" [formGroup]="ruleForm" (ngSubmit)="saveRule()">
 
-        <chef-form-field class="display3">
+        <chef-form-field id="create-name">
           <label>
-            <span class="label">Rule Name</span>
-            <chef-input id="ruleName" ngDefaultControl formControlName="name"></chef-input>
+            <span class="label">Rule Name <span aria-hidden="true">*</span></span>
+            <chef-input ngDefaultControl formControlName="name" (keyup)="handleNameInput($event)"></chef-input>
           </label>
           <chef-error
-            *ngIf="ruleForm.get('name').hasError('required') && ruleForm.get('name').dirty"
-          >Name is required</chef-error>
+            *ngIf="(ruleForm.get('name').hasError('required') || ruleForm.get('name').hasError('pattern')) && ruleForm.get('name').dirty"
+          >Rule Name is required.</chef-error>
         </chef-form-field>
 
-        <chef-form-field class="display3">
+        <div *ngIf="modifyID">
+          <chef-form-field id="create-id">
+            <label>
+              <span class="label">ID <span aria-hidden="true">*</span> </span>
+              <chef-input ngDefaultControl formControlName="id" (keyup)="handleIDInput($event)"></chef-input>
+            </label>
+            <chef-error *ngIf="ruleForm.controls['id'].hasError('maxlength')">
+              ID must be 64 characters or less.
+            </chef-error>
+            <chef-error *ngIf="ruleForm.controls['id'].hasError('required')">
+              ID is required.
+            </chef-error>
+            <chef-error *ngIf="ruleForm.controls['id'].hasError('pattern')">
+              Only lowercase letters, numbers, and hyphens(-) are allowed.
+            </chef-error>
+            <chef-error *ngIf="conflictError">
+              IDs must be unique--Rule with ID "{{ruleForm.controls.id.value}}" already exists.
+            </chef-error>
+          </chef-form-field>
+          <small class="help">Rule IDs are unique, permanent, and cannot be changed later.</small>
+        </div>
+        <div *ngIf="!modifyID" id="create-id-static">
+          <span class="key-label">ID:&nbsp;</span><span class="key-value">{{ this.ruleForm.value.id }}</span>
+          <chef-toolbar>
+            <chef-button tertiary (click)="modifyID=true;">Edit ID</chef-button>
+          </chef-toolbar>
+        </div>
+
+        <chef-form-field id="create-type">
           <label>
-            <span class="label">Resource Type</span>
-            <select id="resourceType" ngDefaultControl formControlName="type">
-              <option value='NODE'>Node</option>
-              <option value='EVENT'>Event</option>
+            <span class="label">Resource Type <span aria-hidden="true">*</span></span>
+            <select id="create-type-dropdown" ngDefaultControl formControlName="type">
+              <option value='node'>Node</option>
+              <option value='event'>Event</option>
             </select>
           </label>
           <chef-error
-            *ngIf="ruleForm.get('type').hasError('required') && ruleForm.get('type').dirty"
-          >Resource Type is required</chef-error>
-          <small class="help">Resource types cannot be changed after the rule is created.</small>
+            *ngIf="ruleForm.get('type').hasError('required') && ruleForm.get('type').touched"
+          >Resource Type is required.</chef-error>
         </chef-form-field>
+        <small class="help">Resource types cannot be changed after the rule is created.</small>
 
-        <div id="add-condition">
+        <div id="condition-section" *ngIf="ruleForm.get('type').value">
           <div class="label">Conditions</div>
           <small>All conditions must be true for the rule to be true.</small>
           <chef-button primary (click)="addCondition()">Add Condition</chef-button>
-        </div>
 
-        <div id="condition-list" formArrayName="conditions">
+          <div id="condition-list" formArrayName="conditions">
 
-          <div class="condition-item"
-            [formGroupName]="i"
-            *ngFor="let condition of ruleForm.get('conditions').controls; let i = index">
+            <div class="condition-item"
+              [formGroupName]="i"
+              *ngFor="let condition of ruleForm.get('conditions').controls; let i = index">
 
-            <chef-form-field class="attribute-field">
-              <label>
-                <span class="label">{{ getAttributeLabel() }}</span>
-                <select ngDefaultControl formControlName="attribute">
-                  <option 
-                    *ngFor="let option of attributes[ruleForm.get('type').value.toLowerCase()]; let i = index"
-                    [value]="option.key"
-                  >{{ option.value }}</option>
-                </select>
-              </label>
-            </chef-form-field>
+              <chef-form-field class="attribute-field">
+                <label>
+                  <span class="label">{{ getAttributeLabel() }}</span>
+                  <select ngDefaultControl formControlName="attribute">
+                    <option
+                      *ngFor="let option of attributes[ruleForm.get('type').value.toLowerCase()]; let i = index"
+                      [value]="option.key"
+                    >{{ option.value }}</option>
+                  </select>
+                </label>
+                <chef-error
+                  *ngIf="ruleForm.get('conditions').controls[i].get('attribute').hasError('required') && ruleForm.get('conditions').controls[i].get('attribute').touched"
+                >Attribute is required.</chef-error>
+              </chef-form-field>
 
-            <chef-form-field class="attribute-field">
-              <label>
-                <span class="label">Operator</span>
-                <select ngDefaultControl
-                  formControlName="operator"
-                  (change)="updateConditionValues(condition)"
-                >
-                  <option value='EQUALS'>equals</option>
-                  <option value='MEMBER_OF'>member of</option>
-                </select>
-              </label>
-            </chef-form-field>
-            
-            <chef-form-field class="attribute-field">
-              <label>
-                <span class="label">Value</span>
-                <chef-input ngDefaultControl
-                  formControlName="values"
-                  [value]="getConditionValue(condition.controls.values.value)"
-                  (change)="updateConditionValues(condition)"
-                ></chef-input>
-              </label>
+              <chef-form-field class="attribute-field">
+                <label>
+                  <span class="label">Operator</span>
+                  <select ngDefaultControl formControlName="operator">
+                    <option *ngFor="let operator of operators"
+                      [value]="operator.key"
+                    >{{ operator.value }}</option>
+                  </select>
+                </label>
+                <chef-error
+                  *ngIf="ruleForm.get('conditions').controls[i].get('operator').hasError('required') && ruleForm.get('conditions').controls[i].get('operator').touched"
+                >Operator is required.</chef-error>
+              </chef-form-field>
 
-              <small class="help"
-                *ngIf="condition.controls.operator.value === 'EQUALS'">
-                  Case sensitive, must match exactly.
-              </small>
+              <chef-form-field class="attribute-field">
+                <label>
+                  <span class="label">Value</span>
+                  <chef-input ngDefaultControl
+                    formControlName="values"
+                    [value]="condition.controls.values.value"
+                  ></chef-input>
+                </label>
+                <chef-error
+                  *ngIf="(ruleForm.get('conditions').controls[i].get('values').hasError('required') || ruleForm.get('conditions').controls[i].get('values').hasError('pattern')) && ruleForm.get('conditions').controls[i].get('values').dirty"
+                >Value is required.</chef-error>
+                <small class="help"
+                  *ngIf="condition.controls.operator.value === 'EQUALS'">
+                    Case sensitive, must match exactly.
+                </small>
+                <small class="help"
+                  *ngIf="condition.controls.operator.value === 'MEMBER_OF'">
+                    Comma-separated list, at least one must match exactly.
+                </small>
+              </chef-form-field>
 
-              <small class="help"
-                *ngIf="condition.controls.operator.value === 'MEMBER_OF'">
-                  Comma-separated list, at least one must match exactly.
-              </small>
-
-            </chef-form-field>
-            <chef-form-field class="attribute-field">
-              <label>
+              <div class="end-row-items">
                 <span *ngIf="showAndLabel(i)" class="label">AND</span>
-              </label>
-              <chef-button tertiary *ngIf="showDelete(i)" (click)="deleteCondition(i)">
-                <chef-icon>delete</chef-icon>
-              </chef-button>
-            </chef-form-field>
+                <chef-button tertiary *ngIf="showDelete()" (click)="deleteCondition(i)">
+                  <chef-icon>delete</chef-icon>
+                </chef-button>
+              </div>
 
+            </div>
           </div>
         </div>
       </form>

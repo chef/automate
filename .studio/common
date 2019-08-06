@@ -41,7 +41,7 @@ function compile_go_protobuf_component() {
       github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config
     )
     install_go_tool "${proto_go_tools[@]}"
-    GO_TOOL_VENDOR=true install_go_tool github.com/lyft/protoc-gen-validate
+    GO_TOOL_VENDOR=true install_go_tool github.com/envoyproxy/protoc-gen-validate
   )
 
   # "api" doesn't compile the config directory so let's not delete the config directory in that case

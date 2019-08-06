@@ -108,12 +108,21 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec.Profile, profilesSums [
 					SkipMessage: result.SkipMessage,
 				}
 			}
+
+			stringTags := make([]relaxting.ESInSpecReportControlStringTags, 0)
+			for tKey, tValue := range control.Tags.Fields {
+				if newStringTag := relaxting.StringTagsFromProtoFields(tKey, tValue); newStringTag != nil {
+					stringTags = append(stringTags, *newStringTag)
+				}
+			}
+
 			minControls[i] = relaxting.ESInSpecReportControl{
-				ID:      control.Id,
-				Title:   control.Title,
-				Impact:  control.Impact,
-				Status:  control.Status(),
-				Results: minResults,
+				ID:         control.Id,
+				Title:      control.Title,
+				Impact:     control.Impact,
+				Status:     control.Status(),
+				Results:    minResults,
+				StringTags: stringTags,
 			}
 		}
 

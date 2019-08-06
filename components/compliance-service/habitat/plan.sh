@@ -8,7 +8,6 @@ pkg_upstream_url="http://github.com/chef/automate/components/compliance-service"
 pkg_build_deps=(
   core/curl
   core/gcc
-  core/jq-static
   core/tar
 )
 pkg_bin_dirs=(bin)
@@ -51,7 +50,7 @@ else
     # WARNING: chef/automate-compliance-profiles is managed by Expeditor
     # See .expeditor/update-compliance-profiles.sh for details
     pkg_deps+=(
-        chef/automate-compliance-profiles/1.0.0/20190726093640
+        chef/automate-compliance-profiles/1.0.0/20190805095953
     )
 fi
 

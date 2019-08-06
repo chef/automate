@@ -22,7 +22,7 @@ func ConvertToPSProfile(profile inspec.Profile, namespace string) (profiles.Prof
 	convertedProfile.Sha256 = profile.Sha256
 	convertedProfile.Owner = namespace
 
-	var convertedSupports []*profiles.Support
+	convertedSupports := make([]*profiles.Support, 0, len(profile.Supports))
 	for _, support := range profile.Supports {
 		family := support["os-family"]
 		if len(family) == 0 {
@@ -72,7 +72,7 @@ func ConvertToPSProfile(profile inspec.Profile, namespace string) (profiles.Prof
 		convertedProfile.Attributes = convertedAttributes
 	}
 
-	var convertedControls []*profiles.Control
+	convertedControls := make([]*profiles.Control, 0, len(profile.Controls))
 	for _, control := range profile.Controls {
 		convertedControl := profiles.Control{
 			Id:     control.ID,
@@ -112,7 +112,7 @@ func ConvertToPSProfile(profile inspec.Profile, namespace string) (profiles.Prof
 			convertedControl.Refs = convertedRefs
 		}
 
-		var convertedResults []*profiles.Result
+		convertedResults := make([]*profiles.Result, 0, len(control.Results))
 		for _, result := range control.Results {
 			convertedResult := profiles.Result{
 				Status:      result.Status,

@@ -3,10 +3,13 @@ package relaxting
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting/util"
+	"github.com/golang/protobuf/jsonpb"
+	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -25,6 +28,7 @@ type A2V2ElasticSearchIndices struct {
 type missingControlMeta struct {
 	Title  string
 	Impact float32
+	Tags   string
 }
 type missingProfileMeta struct {
 	Title    string
@@ -45,7 +49,7 @@ func (migratable A2V2ElasticSearchIndices) migrateProfiles() error {
 	defer util.TimeTrack(time.Now(), myName)
 
 	src := a2V2IndexPrefix + "profiles"
-	_, _, err := migratable.backend.reindex(src, CompProfilesIndex, noScript, "_doc")
+	_, err := migratable.backend.reindex(src, CompProfilesIndex, noScript, "_doc")
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("%s unable to reindex %s", src, myName))
 	}
@@ -87,6 +91,7 @@ func addProfileToMap(esProfile *ESInSpecReportProfileA2v2, profileId string) {
 		profilesMetaMap[profileId].Controls[control.ID] = missingControlMeta{
 			control.Title,
 			control.Impact,
+			control.Tags,
 		}
 	}
 }
@@ -126,6 +131,8 @@ func getProfileA2v2(client *elastic.Client, ctx context.Context, profileId strin
 
 			}
 		}
+	} else {
+		return nil, fmt.Errorf("getProfileA2v2 unable to find profile %s", profileId)
 	}
 	return &esProfile, nil
 }
@@ -173,7 +180,7 @@ func getReportsA2v2(client *elastic.Client, ctx context.Context, esIndex string,
 }
 
 // Converts A1, A2v1, A2v2 ElasticSearch compliance summary documents to the Latest format we support
-func convertA2v2SummaryDocToLatest(src *ESInSpecSummaryA2v2) *ESInSpecSummary {
+func convertA2v2SummaryDocToLatest(src *ESInSpecSummaryA2v2) (*ESInSpecSummary, error) {
 	var dstSum ESInSpecSummary
 	dstSum.NodeID = src.NodeID
 	dstSum.ReportID = src.ReportID
@@ -208,6 +215,8 @@ func convertA2v2SummaryDocToLatest(src *ESInSpecSummaryA2v2) *ESInSpecSummary {
 		if profilesMetaMap[profileId] != nil {
 			profileTitle = profilesMetaMap[profileId].Title
 			profileVersion = profilesMetaMap[profileId].Version
+		} else {
+			return nil, fmt.Errorf("convertA2v2SummaryDocToLatest aborts convertion due to missing profile %s", profileId)
 		}
 		profileStatus := srcProfileSum.Status
 		if profileStatus == "" || profileStatus == "loaded" {
@@ -225,11 +234,11 @@ func convertA2v2SummaryDocToLatest(src *ESInSpecSummaryA2v2) *ESInSpecSummary {
 			Version:      profileVersion,
 		}
 	}
-	return &dstSum
+	return &dstSum, nil
 }
 
 // Converts A1, A2v1, A2v2 ElasticSearch compliance report documents to the latest format we support
-func convertA2v2ReportDocToLatest(src *ESInSpecReportA2v2, dstSum *ESInSpecSummary) *ESInSpecReport {
+func convertA2v2ReportDocToLatest(src *ESInSpecReportA2v2, dstSum *ESInSpecSummary) (*ESInSpecReport, error) {
 	// controls_sums were not in report documents before, but we are harmonizing that now and
 	// bringing those per profile calculations from summary to report documents as well
 	profilesSumsMap := make(map[string]reporting.NodeControlSummary, len(src.ProfilesMin))
@@ -278,6 +287,8 @@ func convertA2v2ReportDocToLatest(src *ESInSpecReportA2v2, dstSum *ESInSpecSumma
 				// also overwriting the inspec report "loaded" state with actual profile run status
 				profileStatus = profilesStatusMap[srcProfileMin.SHA256]
 			}
+		} else {
+			return nil, fmt.Errorf("convertA2v2ReportDocToLatest aborts convertion due to missing profile %s", srcProfileMin.SHA256)
 		}
 		dstRep.Profiles[i] = ESInSpecReportProfile{
 			Profile:      fmt.Sprintf("%s|%s", srcProfileMin.Name, srcProfileMin.SHA256),
@@ -292,11 +303,23 @@ func convertA2v2ReportDocToLatest(src *ESInSpecReportA2v2, dstSum *ESInSpecSumma
 		// Convert the controls within a profile
 		dstRep.Profiles[i].Controls = make([]ESInSpecReportControl, len(srcProfileMin.Controls))
 		for j, srcProfileMinControl := range srcProfileMin.Controls {
+			stringTags := make([]ESInSpecReportControlStringTags, 0)
+			var controlTags structpb.Struct
+			err := (&jsonpb.Unmarshaler{}).Unmarshal(strings.NewReader(profilesMetaMap[srcProfileMin.SHA256].Controls[srcProfileMinControl.ID].Tags), &controlTags)
+			if err == nil {
+				for tKey, tValue := range controlTags.Fields {
+					if newStringTag := StringTagsFromProtoFields(tKey, tValue); newStringTag != nil {
+						stringTags = append(stringTags, *newStringTag)
+					}
+				}
+			}
+
 			dstRep.Profiles[i].Controls[j] = ESInSpecReportControl{
-				ID:     srcProfileMinControl.ID,
-				Title:  profilesMetaMap[srcProfileMin.SHA256].Controls[srcProfileMinControl.ID].Title,
-				Impact: profilesMetaMap[srcProfileMin.SHA256].Controls[srcProfileMinControl.ID].Impact,
-				Status: srcProfileMinControl.Status,
+				ID:         srcProfileMinControl.ID,
+				Title:      profilesMetaMap[srcProfileMin.SHA256].Controls[srcProfileMinControl.ID].Title,
+				Impact:     profilesMetaMap[srcProfileMin.SHA256].Controls[srcProfileMinControl.ID].Impact,
+				Status:     srcProfileMinControl.Status,
+				StringTags: stringTags,
 			}
 
 			// Convert the results within a control
@@ -312,7 +335,7 @@ func convertA2v2ReportDocToLatest(src *ESInSpecReportA2v2, dstSum *ESInSpecSumma
 			}
 		}
 	}
-	return &dstRep
+	return &dstRep, nil
 }
 
 func (migratable A2V2ElasticSearchIndices) postTimeSeriesMigration(dateToMigrate time.Time) error {

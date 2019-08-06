@@ -1,11 +1,15 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { routerReducer } from '@ngrx/router-store';
 import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store } from '@ngrx/store';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
+import {
+  policyEntityReducer, PolicyEntityInitialState
+} from 'app/entities/policies/policy.reducer';
 import {
   userEntityReducer,
   UserEntityInitialState
@@ -15,12 +19,17 @@ import {
   teamEntityReducer,
   TeamEntityInitialState
 } from 'app/entities/teams/team.reducer';
-import { GetTeamUsersSuccess } from 'app/entities/teams/team.actions';
+import {
+  GetTeamSuccess,
+  GetTeamUsersSuccess
+} from 'app/entities/teams/team.actions';
+import { Team } from 'app/entities/teams/team.model';
 import { TeamDetailsComponent } from './team-details.component';
 
 describe('TeamDetailsComponent', () => {
   let component: TeamDetailsComponent;
   let fixture: ComponentFixture<TeamDetailsComponent>;
+  let router: Router;
 
   const initialState = {
     router: {
@@ -33,7 +42,8 @@ describe('TeamDetailsComponent', () => {
       navigationId: 0 // what's that zero?
     },
     users: UserEntityInitialState,
-    teams: TeamEntityInitialState
+    teams: TeamEntityInitialState,
+    policies: PolicyEntityInitialState
   };
 
   beforeEach(async(() => {
@@ -61,11 +71,15 @@ describe('TeamDetailsComponent', () => {
         MockComponent({ selector: 'chef-option' }),
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-subheading' }),
-        MockComponent({ selector: 'chef-tab-selector' }),
+        MockComponent({ selector: 'chef-loading-spinner' }),
+        MockComponent({ selector: 'chef-tab-selector',
+          inputs: ['value', 'routerLink', 'fragment']
+        }),
         TeamDetailsComponent
       ],
       imports: [
         ReactiveFormsModule,
+        RouterTestingModule,
         StoreModule.forRoot({
           router: routerReducer,
           teams: teamEntityReducer,
@@ -76,15 +90,57 @@ describe('TeamDetailsComponent', () => {
     }).compileComponents();
   }));
 
+  const someTeam: Team = {
+    id: 'some-team',
+    name: 'some team',
+    guid: 'a-team-uuid-01',
+    projects: []
+  };
+
   beforeEach(() => {
+    router = TestBed.get(Router);
+    spyOn(router, 'navigate').and.stub();
+
     fixture = TestBed.createComponent(TeamDetailsComponent);
     component = fixture.componentInstance;
-
+    component.team = someTeam;
     fixture.detectChanges();
   });
 
   it('should be created', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('defaults to showing users section', () => {
+    expect(component.tabValue).toBe('users');
+  });
+
+  it('show users section when users tab is selected', () => {
+    component.onSelectedTab({ target: { value: 'users' } });
+    expect(component.tabValue).toBe('users');
+  });
+
+  it('show details section when details tab is selected', () => {
+    component.onSelectedTab({ target: { value: 'details' } });
+    expect(component.tabValue).toBe('details');
+  });
+
+  describe('empty state', () => {
+    let store: Store<NgrxStateAtom>;
+    beforeEach(() => {
+      store = TestBed.get(Store);
+      store.dispatch(new GetTeamSuccess(someTeam));
+      store.dispatch(new GetTeamUsersSuccess({
+        user_ids: []
+      }));
+      fixture.detectChanges();
+    });
+
+    it('users array should be empty', () => {
+      component.sortedUsers$.subscribe((users) => {
+        expect(users.length).toBe(0);
+      });
+    });
   });
 
   describe('sortedUsers$', () => {

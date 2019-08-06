@@ -1,4 +1,4 @@
-import { Component, Prop } from '@stencil/core';
+import { Component, Prop, h } from '@stencil/core';
 import map from 'lodash/fp/map';
 import get from 'lodash/fp/get';
 import getOr from 'lodash/fp/getOr';

@@ -39,6 +39,7 @@ var (
 	ChefTags           string = "chef_tags"
 	Project            string = "projects"
 	ErrorMessage       string = "error_message"
+	ChefServer         string = NodeFieldToJson("SourceFqdn")
 )
 
 // NodeFieldToJson returns the value associated with key in the tag

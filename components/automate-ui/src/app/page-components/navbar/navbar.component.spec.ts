@@ -10,6 +10,7 @@ import {
   PolicyEntityInitialState,
   policyEntityReducer
 } from 'app/entities/policies/policy.reducer';
+import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
 
 describe('NavbarComponent', () => {
   let component: NavbarComponent;
@@ -54,10 +55,10 @@ describe('NavbarComponent', () => {
   });
 
   using([
-    ['Dashboards',  '/dashboards/event-feed',  1],
-    ['Client Runs', '/client-runs',            2],
-    ['Compliance',  '/compliance',             3],
-    ['Settings',    '/settings',               4]
+    ['Dashboards',     '/dashboards/event-feed',         1],
+    ['Infrastructure', '/infrastructure/client-runs',    2],
+    ['Compliance',     '/compliance',                    3],
+    ['Settings',       '/settings',                      4]
   ], function (label: string, path: string, position: number) {
     it(`displays the ${label} navigation link`, () => {
       const link = element.querySelector(`.navigation-menu > *:nth-child(${position}) a`);
@@ -72,8 +73,8 @@ describe('NavbarComponent', () => {
 
   describe('when IAM v2.1 is enabled', () => {
     beforeEach(() => {
-      component.iamMajorVersion$ = observableOf('v2');
-      component.iamMinorVersion$ = observableOf('v1');
+      component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v2');
+      component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v1');
       fixture.detectChanges();
     });
 

@@ -9,21 +9,16 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/grpc"
 
 	lc "github.com/chef/automate/api/interservice/license_control"
+	"github.com/chef/automate/components/license-control-service/pkg/keys"
 	"github.com/chef/automate/components/license-control-service/pkg/server"
-	"github.com/chef/automate/lib/grpc/secureconn"
+	"github.com/chef/automate/components/license-control-service/pkg/storage"
 )
 
-var cfg server.Config
-var cancelFunc context.CancelFunc
-var ctx context.Context
-var conn *grpc.ClientConn
-var client lc.LicenseControlClient
+var validLicenseData []byte
 var skipValidLicenseTests bool
 
 const (
@@ -32,42 +27,17 @@ const (
 	validLicenseFile   = "../../../../dev/license.jwt"
 )
 
-// Setup a test gRPC server
+func testLicenseControlServer(t *testing.T) lc.LicenseControlServer {
+	licenseParser := keys.NewLicenseParser(keys.BuiltinKeyData)
+	backend := &storage.MemBackend{}
+	err := backend.Init(context.Background(), licenseParser)
+	require.NoError(t, err)
+	return server.NewLicenseControlServer(context.Background(), backend, licenseParser, &server.Config{})
+}
+
 func TestMain(m *testing.M) {
-	viper.SetConfigFile("./testdata/config.toml")
-
-	err := viper.ReadInConfig()
-	if err != nil {
-		log.WithFields(log.Fields{
-			"err":  err,
-			"file": viper.ConfigFileUsed(),
-		}).Fatal("Error reading config file")
-	}
-
-	cfg, err := server.ConfigFromViper()
-	if err != nil {
-		log.WithError(err).Fatal("Failed to configure service")
-	}
-
-	ctx, cancelFunc = context.WithCancel(context.Background())
-
-	go server.StartGRPC(ctx, cfg)
-
-	connFactory := secureconn.NewFactory(*cfg.ServiceCerts)
-
-	conn, err := connFactory.Dial("license-control-service", cfg.ListenAddress(), grpc.WithBlock())
-	if err != nil {
-		log.WithFields(
-			log.Fields{
-				"license_control_service_address": cfg.ListenAddress(),
-				"error":                           err,
-			},
-		).Fatal("Unable to connect to license-control-service")
-	}
-
-	client = lc.NewLicenseControlClient(conn)
-
-	licenseToken, err := ioutil.ReadFile(validLicenseFile)
+	var err error
+	validLicenseData, err = ioutil.ReadFile(validLicenseFile)
 	if err != nil {
 		if os.IsNotExist(err) {
 			log.Warn("No license file, skipping tests that require it")
@@ -75,20 +45,8 @@ func TestMain(m *testing.M) {
 		} else {
 			log.WithError(err).Fatal("Unable to read license file")
 		}
-	} else {
-		resp, err := client.Update(
-			context.Background(),
-			&lc.UpdateRequest{
-				LicenseData: string(licenseToken),
-			},
-		)
-		if err != nil || !resp.Updated {
-			log.WithError(err).Fatal("Unable to set initial license")
-		}
 	}
-
 	e := m.Run()
-	cancelFunc()
 	os.Exit(e)
 }
 
@@ -96,8 +54,12 @@ func TestAppliedLicense(t *testing.T) {
 	if skipValidLicenseTests {
 		t.Skip("Valid license file not present, skipping tests that require it")
 	}
+
+	srv := testLicenseControlServer(t)
+	srv.Update(context.Background(), &lc.UpdateRequest{LicenseData: string(validLicenseData)})
+
 	t.Run("License() with a valid license applied", func(t *testing.T) {
-		res, err := client.License(
+		res, err := srv.License(
 			context.Background(),
 			&lc.LicenseRequest{},
 		)
@@ -106,7 +68,7 @@ func TestAppliedLicense(t *testing.T) {
 		assert.Equal(t, res.License.CustomerId, "0000000000000000", "License should be valid")
 	})
 	t.Run("Policy() with a valid license applied", func(t *testing.T) {
-		res, err := client.Policy(
+		res, err := srv.Policy(
 			context.Background(),
 			&lc.PolicyRequest{},
 		)
@@ -120,7 +82,7 @@ func TestAppliedLicense(t *testing.T) {
 		startTime := time.Now()
 		licenseIDMatcher := regexp.MustCompile(`^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$`)
 
-		res, err := client.Status(
+		res, err := srv.Status(
 			context.Background(),
 			&lc.StatusRequest{},
 		)
@@ -169,21 +131,12 @@ func TestUpdateValidLicenseWithWhiteSpace(t *testing.T) {
 		t.Skip("Valid license file not present, skipping tests that require it")
 	}
 
-	origPath := cfg.LicenseTokenPath
-	tempLicenseTokenPath, err := ioutil.TempFile("", "update-with-whitespace-test")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.Remove(tempLicenseTokenPath.Name())
-	defer func() { cfg.LicenseTokenPath = origPath }()
-	cfg.LicenseTokenPath = tempLicenseTokenPath.Name()
-
-	svr := server.NewLicenseControlServer(&cfg)
+	srv := testLicenseControlServer(t)
 	raw, err := ioutil.ReadFile(validLicenseFile)
 	assert.NoError(t, err, "reading test license")
 	license := string(raw) + " \n"
 
-	res, err := svr.Update(
+	res, err := srv.Update(
 		context.Background(),
 		&lc.UpdateRequest{
 			LicenseData: license,
@@ -194,21 +147,9 @@ func TestUpdateValidLicenseWithWhiteSpace(t *testing.T) {
 	assert.NotNil(t, res)
 }
 
-func TestLoadedLicenseFromDiskNotNil(t *testing.T) {
-	if skipValidLicenseTests {
-		t.Skip("Valid license file not present, skipping tests that require it")
-	}
-
-	configWithLicense := cfg
-	configWithLicense.LicenseTokenPath = validLicenseFile
-	svr := server.NewLicenseControlServer(&configWithLicense)
-	res, _ := svr.License(context.Background(), &lc.LicenseRequest{})
-	assert.NotNil(t, res.License, "LicenseControlServer should load the license on disk")
-}
-
 func TestUpdateInvalidLicense(t *testing.T) {
-	svr := server.NewLicenseControlServer(&cfg)
-	res, err := svr.Update(
+	srv := testLicenseControlServer(t)
+	res, err := srv.Update(
 		context.Background(),
 		&lc.UpdateRequest{
 			LicenseData: "invalid",
@@ -220,40 +161,34 @@ func TestUpdateInvalidLicense(t *testing.T) {
 }
 
 func TestDefaultLicenseNil(t *testing.T) {
-	svr := server.NewLicenseControlServer(&cfg)
-	res, _ := svr.License(context.Background(), &lc.LicenseRequest{})
+	srv := testLicenseControlServer(t)
+	res, _ := srv.License(context.Background(), &lc.LicenseRequest{})
 	assert.Nil(t, res.License, "LicenseControlServer should default to nil license")
 }
 
-func TestLoadedCorruptLicenseFromDiskNil(t *testing.T) {
-	configWithLicense := cfg
-	configWithLicense.LicenseTokenPath = corruptLicenseFile
-	svr := server.NewLicenseControlServer(&configWithLicense)
-	res, _ := svr.License(context.Background(), &lc.LicenseRequest{})
-	assert.Nil(t, res.License, "LicenseControlServer should not have loaded the license on disk")
-}
-
 func TestUnforcedUpdateToExpiredLicense(t *testing.T) {
+	srv := testLicenseControlServer(t)
+
 	raw, err := ioutil.ReadFile(expiredLicenseFile)
 	require.NoError(t, err, "reading test license")
 	license := string(raw) + " \n"
 
-	_, err = client.Update(
+	_, err = srv.Update(
 		context.Background(),
 		&lc.UpdateRequest{
 			LicenseData: license,
 		},
 	)
-
 	require.Error(t, err, "unforced update to an expired license should have failed")
 }
 
 func TestForcedUpdateToExpiredLicense(t *testing.T) {
+	srv := testLicenseControlServer(t)
 	raw, err := ioutil.ReadFile(expiredLicenseFile)
 	require.NoError(t, err, "reading test license")
 	license := string(raw) + " \n"
 
-	res, err := client.Update(
+	res, err := srv.Update(
 		context.Background(),
 		&lc.UpdateRequest{
 			Force:       true,

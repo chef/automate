@@ -4,7 +4,7 @@ describe('policy model', () => {
   describe('stringToMember', () => {
 
     it('All members', () => {
-      const expectedMember = <Member>{
+      const expectedMember: Member = {
         name: '*',
         displayName: 'All members',
         displayType: 'All members',
@@ -14,7 +14,7 @@ describe('policy model', () => {
     });
 
     it('All users', () => {
-      const expectedMember = <Member>{
+      const expectedMember: Member = {
         name: 'user:*',
         displayName: 'All users',
         displayType: 'All users',
@@ -24,7 +24,7 @@ describe('policy model', () => {
     });
 
     it('All local users', () => {
-      const expectedMember = <Member>{
+      const expectedMember: Member = {
         name: 'user:local:*',
         displayName: 'All local users',
         displayType: 'All local users',
@@ -34,7 +34,7 @@ describe('policy model', () => {
     });
 
     it('Specific local user', () => {
-      const expectedMember = <Member>{
+      const expectedMember: Member = {
         name: 'user:local:localuser',
         displayName: 'localuser',
         displayType: 'Local user',
@@ -44,7 +44,7 @@ describe('policy model', () => {
     });
 
     it('All LDAP users', () => {
-      const expectedMember = <Member>{
+      const expectedMember: Member = {
         name: 'user:ldap:*',
         displayName: 'All LDAP users',
         displayType: 'All LDAP users',
@@ -54,7 +54,7 @@ describe('policy model', () => {
     });
 
     it('Specific LDAP user', () => {
-      const expectedMember = <Member>{
+      const expectedMember: Member = {
         name: 'user:ldap:ldapuser',
         displayName: 'ldapuser',
         displayType: 'LDAP user',
@@ -64,7 +64,7 @@ describe('policy model', () => {
     });
 
     it('All SAML users', () => {
-      const expectedMember = <Member>{
+      const expectedMember: Member = {
         name: 'user:saml:*',
         displayName: 'All SAML users',
         displayType: 'All SAML users',
@@ -74,7 +74,7 @@ describe('policy model', () => {
     });
 
     it('Specific SAML user', () => {
-      const expectedMember = <Member>{
+      const expectedMember: Member = {
         name: 'user:saml:samluser',
         displayName: 'samluser',
         displayType: 'SAML user',
@@ -84,7 +84,7 @@ describe('policy model', () => {
     });
 
     it('All local teams', () => {
-      const expectedMember = <Member>{
+      const expectedMember: Member = {
         name: 'team:local:*',
         displayName: 'All local teams',
         displayType: 'All local teams',
@@ -94,7 +94,7 @@ describe('policy model', () => {
     });
 
     it('Specific local team', () => {
-      const expectedMember = <Member>{
+      const expectedMember: Member = {
         name: 'team:local:localteam',
         displayName: 'localteam',
         displayType: 'Local team',
@@ -104,7 +104,7 @@ describe('policy model', () => {
     });
 
     it('All LDAP teams', () => {
-      const expectedMember = <Member>{
+      const expectedMember: Member = {
         name: 'team:ldap:*',
         displayName: 'All LDAP teams',
         displayType: 'All LDAP teams',
@@ -114,7 +114,7 @@ describe('policy model', () => {
     });
 
     it('Specific LDAP team', () => {
-      const expectedMember = <Member>{
+      const expectedMember: Member = {
         name: 'team:ldap:ldapteam',
         displayName: 'ldapteam',
         displayType: 'LDAP team',
@@ -124,7 +124,7 @@ describe('policy model', () => {
     });
 
     it('All SAML teams', () => {
-      const expectedMember = <Member>{
+      const expectedMember: Member = {
         name: 'team:saml:*',
         displayName: 'All SAML teams',
         displayType: 'All SAML teams',
@@ -134,7 +134,7 @@ describe('policy model', () => {
     });
 
     it('Specific SAML team', () => {
-      const expectedMember = <Member>{
+      const expectedMember: Member = {
         name: 'team:saml:samlteam',
         displayName: 'samlteam',
         displayType: 'SAML team',
@@ -144,7 +144,7 @@ describe('policy model', () => {
     });
 
     it('All tokens', () => {
-      const expectedMember = <Member>{
+      const expectedMember: Member = {
         name: 'token:*',
         displayName: 'All API tokens',
         displayType: 'All API tokens',
@@ -154,7 +154,7 @@ describe('policy model', () => {
     });
 
     it('Specific token', () => {
-      const expectedMember = <Member>{
+      const expectedMember: Member = {
         name: 'token:tokenname',
         displayName: 'tokenname',
         displayType: 'API token',
@@ -297,7 +297,10 @@ describe('policy model', () => {
 
   describe('policyFromPayload', () => {
     it('removes empty strings from statements', () => {
-      const policy = <Policy>{
+      const policy: Policy = {
+        id: 'any',
+        name: 'any',
+        type: 'CUSTOM',
         members: [],
         statements: [
           {
@@ -313,7 +316,10 @@ describe('policy model', () => {
     });
 
     it('removes empty arrays from statements', () => {
-      const policy = <Policy>{
+      const policy: Policy = {
+        id: 'any',
+        name: 'any',
+        type: 'CUSTOM',
         members: [],
         statements: [
           {

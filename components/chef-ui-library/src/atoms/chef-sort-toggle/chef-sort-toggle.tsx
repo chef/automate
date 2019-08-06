@@ -1,4 +1,4 @@
-import { Component, Event, EventEmitter, Method, Prop } from '@stencil/core';
+import { Component, Event, EventEmitter, Host, Method, Prop, h } from '@stencil/core';
 
 /**
  * @description
@@ -67,7 +67,8 @@ export class ChefSortToggle {
   /**
    * Toggles order `prop` between `asc` ↑, `desc` ↓, or `none` ↕.
    */
-  @Method() toggle() {
+  @Method()
+  async toggle() {
     switch (this.order) {
       case 'none':
         this.order = 'asc';
@@ -86,18 +87,14 @@ export class ChefSortToggle {
     });
   }
 
-  hostData() {
-    return {
-      role: 'button'
-    };
-  }
-
   render() {
     return (
-      <chef-button tertiary onClick={this.onClick.bind(this)}>
-        <chef-icon class="asc-icon">arrow_drop_up</chef-icon>
-        <chef-icon class="desc-icon">arrow_drop_down</chef-icon>
-      </chef-button>
+      <Host role="button">
+        <chef-button tertiary onClick={this.onClick.bind(this)}>
+          <chef-icon class="asc-icon">arrow_drop_up</chef-icon>
+          <chef-icon class="desc-icon">arrow_drop_down</chef-icon>
+        </chef-button>
+      </Host>
     );
   }
 

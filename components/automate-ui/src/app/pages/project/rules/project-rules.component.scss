@@ -18,16 +18,69 @@ chef-page {
 
   chef-input {
     height: 45px;
+    width: 100%;
   }
 
-  #ruleName,
-  #resourceType {
+  #create-name,
+  #create-id,
+  #create-type,
+  #create-type-dropdown {
     width: 340px;
+    max-width: 340px;
+  }
+
+  #create-name {
+    padding-top: 9px;
+  }
+
+  #create-id,
+  #create-id-static {
+    padding-top: 26px;
+  }
+
+  #create-type {
+    padding-top: 20px;
+  }
+
+  #condition-section {
+    margin: 1rem 0;
+    padding-top: 7px;
+
+    small {
+      display: block;
+      font-size: 12px;
+    }
+
+    chef-button {
+      margin-left: 0;
+    }
+  }
+
+  #condition-list {
+    padding-top: 4px;
+  }
+
+  .label, .key-label {
+    font-size: 14px;
+    font-weight: 600;
+    padding-bottom: 0;
+  }
+
+  .key-label {
+    display: inline-block;
+  }
+
+  .key-value {
+    font-size: 14px;
+  }
+
+  .condition-item {
+    margin-bottom: 20px;
   }
 
   chef-form-field {
-    .label {
-      font-size: 16px;
+    label {
+      padding-bottom: 0;
     }
 
     &.attribute-field {
@@ -36,30 +89,11 @@ chef-page {
       vertical-align: top;
       width: 27%;
 
-      &:last-child {
-        margin: 2.5rem 0px;
-        width: 18%;
-
-        label {
-          display: inline-block;
-        }
-
-        chef-button {
-          position: absolute;
-          right: 0;
-          top: -14px;
-
-          chef-icon {
-            color: $chef-primary-dark;
-            font-size: 1.2rem;
-          }
-        }
-      }
-
       .label {
         color: $chef-dark-grey;
         text-transform: uppercase;
-        font-weight: 100;
+        font-size: 12px;
+        font-weight: 200;
       }
 
       chef-select,
@@ -68,18 +102,31 @@ chef-page {
         width: 95%;
       }
     }
-
   }
 
-  #add-condition {
-    margin: 1rem 0;
+  .end-row-items {
+    display: inline-block;
+    margin-top: 21px; // match labels in other columns
+    height: 45px; // match "values" input height
+    vertical-align: middle;
+    width: 18%;
 
-    small {
-      display: block;
+    span {
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 12px;
+      font-weight: 200;
     }
 
     chef-button {
-      margin-left: 0;
+      margin-top: 2px;
+      float: right;
+
+      chef-icon {
+        color: $chef-primary-dark;
+        font-size: 1.2rem;
+      }
     }
   }
+
 }

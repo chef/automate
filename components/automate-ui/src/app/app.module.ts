@@ -93,6 +93,9 @@ import {
   SearchBarComponent
 } from './page-components/search-bar/search-bar.component';
 import {
+  ClientRunsSidebarComponent
+} from './page-components/client-runs-sidebar/client-runs-sidebar.component';
+import {
   SearchBarFilterBarComponent
 } from './page-components/search-bar-filter-bar/search-bar-filter-bar.component';
 import {
@@ -101,6 +104,9 @@ import {
 import {
   ConvergeRadialGraphComponent
 } from './page-components/converge-radial-graph/converge-radial-graph.component';
+import {
+  CreateV1TeamModalComponent
+} from './page-components/create-v1-team-modal/create-v1-team-modal.component';
 import { DateSelectorComponent } from './page-components/date-selector/date-selector.component';
 import {
   DeletableNodeControlComponent
@@ -181,7 +187,7 @@ import {
   SidebarSelectListComponent
 } from './page-components/sidebar-select-list/sidebar-select-list.component';
 import { SigninComponent } from './pages/signin/signin.component';
-import { TeamCreateComponent } from './pages/team-create/team-create.component';
+import { TeamAddUsersComponent } from './pages/team-add-users/team-add-users.component';
 import { TeamDetailsComponent } from './pages/team-details/team-details.component';
 import { TeamManagementComponent } from './pages/team-management/team-management.component';
 import {
@@ -192,9 +198,6 @@ import { UserDetailsComponent } from './pages/user-details/user-details.componen
 import { UserFormComponent } from './pages/user-management/user-form/user-form.component';
 import { UserManagementComponent } from './pages/user-management/user-management.component';
 import { UserTableComponent } from './page-components/user-table/user-table.component';
-import {
-  UserTeamMembershipTableComponent
-} from './page-components/user-team-membership-table/user-team-membership-table.component';
 import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-modal.component';
 
 @NgModule({
@@ -205,8 +208,10 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ApplicationsComponent,
     AttributesComponent,
     ClientRunsComponent,
+    ClientRunsSidebarComponent,
     ClientRunsTableComponent,
     ConvergeRadialGraphComponent,
+    CreateV1TeamModalComponent,
     DateSelectorComponent,
     DeletableNodeControlComponent,
     DeleteNotificationDialogComponent,
@@ -253,7 +258,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     SettingsLandingComponent,
     SidebarSelectListComponent,
     SigninComponent,
-    TeamCreateComponent,
+    TeamAddUsersComponent,
     TeamDetailsComponent,
     TeamManagementComponent,
     TelemetryCheckboxComponent,
@@ -261,7 +266,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     UserDetailsComponent,
     UserFormComponent,
     UserTableComponent,
-    UserTeamMembershipTableComponent,
     UserManagementComponent,
     WelcomeModalComponent
   ],

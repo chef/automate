@@ -91,7 +91,7 @@ func runAllServerTests(
 			require.NoError(t, err)
 			require.NotNil(t, resp)
 			assert.Equal(t, storage.AdminsTeamName, resp.Team.Id)
-			assert.Equal(t, "Members of the admins team, by default, have access to all parts of the API.",
+			assert.Equal(t, "admins",
 				resp.Team.Name)
 		})
 

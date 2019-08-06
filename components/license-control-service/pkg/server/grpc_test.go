@@ -5,7 +5,6 @@ import (
 	"os"
 	"testing"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -23,34 +22,29 @@ func TestHealthCheck(t *testing.T) {
 	viper.SetConfigFile("./testdata/config.toml")
 
 	err := viper.ReadInConfig()
-	if err != nil {
-		t.Fatalf("Error reading config file: %s", err)
-	}
+	require.NoError(t, err, "reading config file")
 
 	cfg, err := server.ConfigFromViper()
-	if err != nil {
-		t.Fatalf("Failed to configure service: %s", err)
+	require.NoError(t, err, "configuring service")
+	cfg.PGURL = os.Getenv("PG_URL")
+	if cfg.PGURL == "" {
+		t.Fatal("test requires PG_URL to be set")
 	}
 
-	g := grpctest.NewServer(server.NewGRPC(ctx, cfg))
+	srv, err := server.NewGRPC(ctx, cfg)
+	require.NoError(t, err, "initializing grpc server")
+
+	g := grpctest.NewServer(srv)
 	defer g.Close()
 
 	connFactory := secureconn.NewFactory(*cfg.ServiceCerts)
-	conn, err := connFactory.Dial("license-control-service", cfg.ListenAddress())
-	if err != nil {
-		log.WithFields(
-			log.Fields{
-				"license_control_service_address": cfg.ListenAddress(),
-				"error":                           err,
-			},
-		).Error("Unable to connect to license-control-service")
-		os.Exit(1)
-	}
+	conn, err := connFactory.Dial("license-control-service", g.URL)
+	require.NoError(t, err, "dialing license-control-service")
 
 	cl := healthpb.NewHealthClient(conn)
 	t.Run("Check", func(t *testing.T) {
 		actual, err := cl.Check(ctx, &healthpb.HealthCheckRequest{})
-		require.NoError(t, err, "No error failed")
-		assert.Equal(t, healthpb.HealthCheckResponse_SERVING, actual.GetStatus(), "Assert failed")
+		require.NoError(t, err)
+		assert.Equal(t, healthpb.HealthCheckResponse_SERVING, actual.GetStatus())
 	})
 }

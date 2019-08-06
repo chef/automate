@@ -619,9 +619,8 @@ func domainProjectToAPIProject(p *authz.Project) (*pb_common.Project, error) {
 		return nil, errors.Wrapf(err, "project %q", p.Id)
 	}
 	return &pb_common.Project{
-		Id:       p.Id,
-		Name:     p.Name,
-		Type:     t,
-		Projects: p.Projects,
+		Id:   p.Id,
+		Name: p.Name,
+		Type: t,
 	}, nil
 }

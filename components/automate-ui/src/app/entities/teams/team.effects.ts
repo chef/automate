@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { HttpStatus } from 'app/types/types';
 import { CreateNotification } from '../notifications/notification.actions';
 import { Type } from '../notifications/notification.model';
 import { iamMajorVersion } from 'app/entities/policies/policy.selectors';
@@ -145,7 +146,9 @@ export class TeamEffects {
 
   @Effect()
   createTeamFailure$ = this.actions$.pipe(
-    ofType(TeamActionTypes.CREATE_FAILURE),
+    ofType<CreateTeamFailure>(TeamActionTypes.CREATE_FAILURE),
+    // ID conflict handled in the modal, see team-management.component.ts
+    filter(({ payload: { status } }) => status !== HttpStatus.CONFLICT),
     map(({ payload }: CreateTeamFailure) => {
       const msg = payload.error.error;
       return new CreateNotification({
@@ -227,19 +230,11 @@ export class TeamEffects {
   @Effect()
   addTeamUsersSuccess$ = this.actions$.pipe(
     ofType(TeamActionTypes.ADD_USERS_SUCCESS),
-    map(() => new CreateNotification({
-      type: Type.info,
-      message: 'Added user(s) to team.'
-    })));
-
-  @Effect()
-  addTeamUsersFailure$ = this.actions$.pipe(
-    ofType(TeamActionTypes.ADD_USERS_FAILURE),
-    map(({ payload }: AddTeamUsersFailure) => {
-      const msg = payload.error.error;
+    map(({ payload: { user_ids } }: AddTeamUsersSuccess ) => {
+      const message = user_ids.length === 1 ? 'Added 1 user.' : `Added ${user_ids.length} users.`;
       return new CreateNotification({
-        type: Type.error,
-        message: `Could not add user(s) to team: ${msg || payload.error}.`
+        type: Type.info,
+        message: message
       });
     }));
 

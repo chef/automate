@@ -8,6 +8,7 @@ import { loading } from 'app/entities/entities';
 import { DeletePolicy, GetPolicies } from 'app/entities/policies/policy.actions';
 import { allPolicies, getAllStatus, iamMajorVersion } from 'app/entities/policies/policy.selectors';
 import { Policy } from 'app/entities/policies/policy.model';
+import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 
 @Component({
   selector: 'app-policy-list',
@@ -17,7 +18,7 @@ import { Policy } from 'app/entities/policies/policy.model';
 export class PolicyListComponent implements OnInit {
   public loading$: Observable<boolean>;
   public sortedPolicies$: Observable<Policy[]>;
-  public iamMajorVersion$: Observable<string>;
+  public iamMajorVersion$: Observable<IAMMajorVersion>;
   public policyToDelete: Policy;
   public deleteModalVisible = false;
 

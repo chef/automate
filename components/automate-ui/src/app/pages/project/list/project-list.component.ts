@@ -11,12 +11,14 @@ import { Regex } from 'app/helpers/auth/regex';
 import { loading, EntityStatus } from 'app/entities/entities';
 import { ProjectService } from 'app/entities/projects/project.service';
 import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
+import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
 import {
   allProjects, getAllStatus, createStatus, createError
 } from 'app/entities/projects/project.selectors';
 import { GetProjects, CreateProject, DeleteProject  } from 'app/entities/projects/project.actions';
 import { Project } from 'app/entities/projects/project.model';
 import { ApplyRulesStatus, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
+import { HttpStatus } from 'app/types/types';
 
 @Component({
   selector: 'app-project-list',
@@ -25,8 +27,8 @@ import { ApplyRulesStatus, ApplyRulesStatusState } from 'app/entities/projects/p
 })
 export class ProjectListComponent implements OnInit {
   public loading$: Observable<boolean>;
-  public iamMajorVersion$: Observable<string>;
-  public iamMinorVersion$: Observable<string>;
+  public iamMajorVersion$: Observable<IAMMajorVersion>;
+  public iamMinorVersion$: Observable<IAMMinorVersion>;
   public sortedProjects$: Observable<Project[]>;
   public projectToDelete: Project;
   public deleteModalVisible = false;
@@ -132,7 +134,7 @@ export class ProjectListComponent implements OnInit {
               .subscribe((error) => {
                 pendingCreateError.next(true);
                 pendingCreateError.complete();
-                if (error.status === 409) {
+                if (error.status === HttpStatus.CONFLICT) {
                   this.conflictErrorEvent.emit(true);
                 // Close the modal on any error other than conflict and display in banner.
                 } else {

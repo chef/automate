@@ -16,8 +16,8 @@ trigger_migrations
 
 pg-helper ensure-service-database "$DBNAME" || exit 1
 
-# Copy the migrations files
-cp -r {{pkg.path}}/migrations/* {{pkg.svc_static_path}}/
+# cleanup old migration files
+rm -rf {{pkg.svc_static_path}}/*.sql
 
 # Setting coming from our default.toml
 CONFIG="--log-level {{cfg.log.level}}"
@@ -58,9 +58,10 @@ CONFIG="$CONFIG --event-endpoint {{event.sys.ip}}:{{event.cfg.port}}"
 {{~/eachAlive}}
 
 # Postgres
-PG_BACKEND="--postgres-database {{cfg.storage.database}} --migrations-path {{pkg.svc_static_path}}"
+PG_BACKEND="--postgres-database {{cfg.storage.database}} --migrations-path {{pkg.path}}/migrations"
 
 export HOME="{{pkg.svc_data_path}}"
 
 # Start our service
+# shellcheck disable=SC2086
 exec nodemanager-service run ${CONFIG} ${PG_BACKEND}

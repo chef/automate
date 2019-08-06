@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"github.com/chef/automate/lib/grpc/auth_context"
-	"golang.org/x/net/context"
-
+	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/net/context"
 )
 
 type ES2Backend struct {
@@ -71,6 +71,18 @@ func (backend *ES2Backend) ES2Client() (*elastic.Client, error) {
 		)
 	})
 	return esClient, err
+}
+
+func (backend *ES2Backend) ReindexStatus(ctx context.Context, taskID string) (bool, error) {
+	tasksGetTaskResponse, err := elastic.NewTasksGetTaskService(esClient).
+		TaskId(taskID).
+		WaitForCompletion(false).
+		Do(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	return tasksGetTaskResponse.Completed, nil
 }
 
 // Removes element with index i from array arr
@@ -225,4 +237,40 @@ func FilterByProjects(ctx context.Context, filters map[string][]string) (map[str
 
 	filters["projects"] = projectsFilter
 	return filters, nil
+}
+
+// StringTagsFromProtoFields extracts tags supported from generic protobuf struct
+func StringTagsFromProtoFields(tKey string, tValue *structpb.Value) *ESInSpecReportControlStringTags {
+	// A null value tag is turned into an empty values array
+	if _, isNullValue := tValue.GetKind().(*structpb.Value_NullValue); isNullValue {
+		return &ESInSpecReportControlStringTags{
+			Key:    tKey,
+			Values: make([]string, 0),
+		}
+	}
+
+	// A tag with one string value returns a Values array with one element
+	if _, isStringValue := tValue.GetKind().(*structpb.Value_StringValue); isStringValue {
+		return &ESInSpecReportControlStringTags{
+			Key:    tKey,
+			Values: []string{tValue.GetStringValue()},
+		}
+	}
+
+	// A tag with multiple string values returns a Values array with multiple elements
+	if _, isListValue := tValue.GetKind().(*structpb.Value_ListValue); isListValue {
+		stringValues := make([]string, 0)
+		for _, listValue := range tValue.GetListValue().Values {
+			if _, isStringValue := listValue.GetKind().(*structpb.Value_StringValue); isStringValue {
+				stringValues = append(stringValues, listValue.GetStringValue())
+			}
+		}
+		if len(stringValues) > 0 {
+			return &ESInSpecReportControlStringTags{
+				Key:    tKey,
+				Values: stringValues,
+			}
+		}
+	}
+	return nil
 }

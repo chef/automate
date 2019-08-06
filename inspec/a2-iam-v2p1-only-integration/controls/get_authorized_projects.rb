@@ -12,21 +12,15 @@ control 'iam-v2-global-projects-filter-1' do
     UNASSIGNED_PROJECT_ID = '(unassigned)'
     UNASSIGNED_PROJECT_NAME = UNASSIGNED_PROJECT_ID
 
-    def genInputProject(id, name)
-      return { id: id,
-              name: name
-            }
-    end
-
     PROJECT_ID_1 = "inspec-custom-project-1-#{Time.now.utc.to_i}"
     PROJECT_ID_2 = "inspec-custom-project-2-#{Time.now.utc.to_i}"
     PROJECT_ID_3 = "inspec-custom-project-3-#{Time.now.utc.to_i}"
 
-    PROJECT_1 = genInputProject(PROJECT_ID_1, "Test Project 1")
-    PROJECT_2 = genInputProject(PROJECT_ID_2, "Test Project 2")
-    PROJECT_3 = genInputProject(PROJECT_ID_3, "Test Project 3")
+    PROJECT_1 = { id: PROJECT_ID_1, name: "Test Project 1" }
+    PROJECT_2 = { id: PROJECT_ID_2, name: "Test Project 2" }
+    PROJECT_3 = { id: PROJECT_ID_3, name: "Test Project 3" }
     PROJECTS = [ PROJECT_1, PROJECT_2, PROJECT_3 ]
-    UNASSIGNED = genInputProject(UNASSIGNED_PROJECT_ID, UNASSIGNED_PROJECT_NAME)
+    UNASSIGNED = { id: UNASSIGNED_PROJECT_ID, name: UNASSIGNED_PROJECT_NAME }
  
     before(:all) do
       PROJECTS.each do|project|
@@ -55,7 +49,6 @@ control 'iam-v2-global-projects-filter-1' do
           expect(resp.parsed_response_body[:projects]).to include(
             { id: p[:id],
               name: p[:name],
-              projects: [ p[:id] ],
               type: p[:id] == UNASSIGNED_PROJECT_ID ? "CHEF_MANAGED" : "CUSTOM"
             })
         end
@@ -88,8 +81,7 @@ control 'iam-v2-global-projects-filter-1' do
             statements: [
               {
                 effect: "ALLOW",
-                # TODO this test will fail if there is a lone parameterized action (i.e. just iam:teams:get)
-                actions: ["iam:teams:list", "iam:teams:get"],
+                actions: ["iam:teams:get"],
                 projects: [PROJECT_ID_1, PROJECT_ID_2]
               }
             ]
@@ -115,7 +107,10 @@ control 'iam-v2-global-projects-filter-1' do
       end
 
       it 'returns list of allowed projects' do
-        resp = automate_api_request("/apis/iam/v2beta/introspect_projects", http_method: 'GET', user: non_admin_username)
+        resp = automate_api_request("/apis/iam/v2beta/introspect_projects",
+          http_method: 'GET',
+          user: non_admin_username,
+        )
 
         expect(resp.http_status).to eq 200
         expected_projects = [PROJECT_1, PROJECT_2]
@@ -123,7 +118,6 @@ control 'iam-v2-global-projects-filter-1' do
           expected_projects.map { |p|
             { id: p[:id],
               name: p[:name],
-              projects: [ p[:id] ],
               type: "CUSTOM"
             }}
         )

@@ -46,114 +46,147 @@ func TestWhatItLooksLikeInJSON(t *testing.T) {
 }
 
 func TestValidationCreatePolicy(t *testing.T) {
+	validStatement := v2.Statement{
+		Effect:    v2.Statement_ALLOW,
+		Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
+		Actions:   []string{"cfgmgmt:nodes:*"},
+	}
+
 	negativeCases := map[string]*v2.CreatePolicyReq{
 		// ID
 		"with uppercase ID": &v2.CreatePolicyReq{
-			Id: "TestID",
+			Id:         "TestID",
+			Statements: []*v2.Statement{&validStatement},
 		},
 		// Members
 		"zero-length members in create req": &v2.CreatePolicyReq{
-			Id:      "test-id",
-			Members: []string{""},
+			Id:         "test-id",
+			Members:    []string{""},
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"empty members in create req": &v2.CreatePolicyReq{
-			Id:      "test-id",
-			Members: []string{"user:local:not-empty", "", "user:local:another-one"},
+			Id:         "test-id",
+			Members:    []string{"user:local:not-empty", "", "user:local:another-one"},
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"repeated members in create req": &v2.CreatePolicyReq{
-			Id:      "test-id",
-			Members: []string{"user:local:repeat", "user:local:not-repeat", "user:local:repeat"},
+			Id:         "test-id",
+			Members:    []string{"user:local:repeat", "user:local:not-repeat", "user:local:repeat"},
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"malformed user": &v2.CreatePolicyReq{
-			Id:      "test-id",
-			Members: []string{"user:"},
+			Id:         "test-id",
+			Members:    []string{"user:"},
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"malformed team": &v2.CreatePolicyReq{
-			Id:      "test-id",
-			Members: []string{"team:"},
+			Id:         "test-id",
+			Members:    []string{"team:"},
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"malformed token": &v2.CreatePolicyReq{
-			Id:      "test-id",
-			Members: []string{"token:"},
+			Id:         "test-id",
+			Members:    []string{"token:"},
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"malformed type": &v2.CreatePolicyReq{
-			Id:      "test-id",
-			Members: []string{"user:notldap:something"},
+			Id:         "test-id",
+			Members:    []string{"user:notldap:something"},
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"malformed token type": &v2.CreatePolicyReq{
-			Id:      "test-id",
-			Members: []string{"token:moretype:lmpT7GHDJ1Ec3H08rVXKyfBKc78="},
+			Id:         "test-id",
+			Members:    []string{"token:moretype:lmpT7GHDJ1Ec3H08rVXKyfBKc78="},
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"wildcard with specific member": &v2.CreatePolicyReq{
-			Id:      "test-id",
-			Members: []string{"user:*:username"},
+			Id:         "test-id",
+			Members:    []string{"user:*:username"},
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"leading wildcard": &v2.CreatePolicyReq{
-			Id:      "test-id",
-			Members: []string{"*:local:*"},
+			Id:         "test-id",
+			Members:    []string{"*:local:*"},
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"empty member": &v2.CreatePolicyReq{
-			Id:      "test-id",
-			Members: []string{"user:local:test", "", "team:local:test"},
+			Id:         "test-id",
+			Members:    []string{"user:local:test", "", "team:local:test"},
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"unknown first term any:*": &v2.CreatePolicyReq{
-			Id:      "test-id",
-			Members: []string{"any:*"},
+			Id:         "test-id",
+			Members:    []string{"any:*"},
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"missing third term user:local:": &v2.CreatePolicyReq{
-			Id:      "test-id",
-			Members: []string{"user:local:"},
+			Id:         "test-id",
+			Members:    []string{"user:local:"},
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"wrong second term tls:other:a:b": &v2.CreatePolicyReq{
-			Id:      "test-id",
-			Members: []string{"tls:other:a:b"},
+			Id:         "test-id",
+			Members:    []string{"tls:other:a:b"},
+			Statements: []*v2.Statement{&validStatement},
 		},
 		// projects
 		"whitespace projects list": &v2.CreatePolicyReq{
-			Id:       "this-is-valid-1",
-			Projects: []string{"     ", "test"},
+			Id:         "this-is-valid-1",
+			Projects:   []string{"     ", "test"},
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"repeated projects in list": &v2.CreatePolicyReq{
-			Id:       "this-is-valid-1",
-			Projects: []string{"repeat", "repeat"},
+			Id:         "this-is-valid-1",
+			Projects:   []string{"repeat", "repeat"},
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"Project has invalid characters": &v2.CreatePolicyReq{
-			Id:       "this-is-valid-1",
-			Projects: []string{"valid", "wrong~"},
+			Id:         "this-is-valid-1",
+			Projects:   []string{"valid", "wrong~"},
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"Project has spaces": &v2.CreatePolicyReq{
-			Id:       "this-is-valid-1",
-			Projects: []string{"valid", "wrong space"},
+			Id:         "this-is-valid-1",
+			Projects:   []string{"valid", "wrong space"},
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"project has uppercase characters": &v2.CreatePolicyReq{
-			Id:       "this-is-valid-1",
-			Projects: []string{"valid", "PROJECT1"},
+			Id:         "this-is-valid-1",
+			Projects:   []string{"valid", "PROJECT1"},
+			Statements: []*v2.Statement{&validStatement},
 		},
 	}
 	positiveCases := map[string]*v2.CreatePolicyReq{
 		// ID
 		"with ID all lowercase": &v2.CreatePolicyReq{
-			Id: "test",
+			Id:         "test",
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"with ID that has dashes": &v2.CreatePolicyReq{
-			Id: "-test-with-dashes-",
+			Id:         "-test-with-dashes-",
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"with ID that has dashes and numbers": &v2.CreatePolicyReq{
-			Id: "1-test-with-1-and-dashes-0",
+			Id:         "1-test-with-1-and-dashes-0",
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"with ID that has only numbers": &v2.CreatePolicyReq{
-			Id: "1235",
+			Id:         "1235",
+			Statements: []*v2.Statement{&validStatement},
 		},
 		// Members
 		"without members": &v2.CreatePolicyReq{
-			Id: "test-id",
+			Id:         "test-id",
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"a single member": &v2.CreatePolicyReq{
-			Id:      "test-id",
-			Members: []string{"user:local:member1"},
+			Id:         "test-id",
+			Members:    []string{"user:local:member1"},
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"multiple members": &v2.CreatePolicyReq{
-			Id: "test-id",
+			Id:         "test-id",
+			Statements: []*v2.Statement{&validStatement},
 			Members: []string{"user:local:member1", "user:saml:member2", "user:ldap:member3",
 				"user:local:*", "user:ldap:*", "user:saml:*", "team:local:member1", "team:saml:member2",
 				"team:ldap:member3", "team:local:*", "team:ldap:*", "team:saml:*", "token:lmpT7GHDJ1Ec3H08rVXKyfBKc78=",
@@ -206,19 +239,23 @@ func TestValidationCreatePolicy(t *testing.T) {
 		},
 		// Projects
 		"without projects": &v2.CreatePolicyReq{
-			Id: "test-id",
+			Id:         "test-id",
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"empty projects": &v2.CreatePolicyReq{
-			Id:       "test-id",
-			Projects: []string{},
+			Id:         "test-id",
+			Projects:   []string{},
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"a single project": &v2.CreatePolicyReq{
-			Id:       "test-id",
-			Projects: []string{"project-1"},
+			Id:         "test-id",
+			Projects:   []string{"project-1"},
+			Statements: []*v2.Statement{&validStatement},
 		},
 		"multiple projects": &v2.CreatePolicyReq{
-			Id:       "test-id",
-			Projects: []string{"project-1", "project-2", "project-3"},
+			Id:         "test-id",
+			Projects:   []string{"project-1", "project-2", "project-3"},
+			Statements: []*v2.Statement{&validStatement},
 		},
 		// Resources
 		"no resources (validated in server.go)": &v2.CreatePolicyReq{

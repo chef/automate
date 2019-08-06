@@ -45,7 +45,7 @@ grpc:
   tlsKey: {{svc_key_path}}
   tlsClientCA: {{svc_root_ca_path}}
 frontend:
-  dir: {{svc_static_path}}/web
+  dir: {{cfg.frontend_dir}}
   issuer: Chef Automate
   theme: chef
 logger:

@@ -21,7 +21,7 @@ log_level = "{{cfg.log.level}}"
 
 [postgres]
 database = "{{cfg.storage.database}}"
-migrations_path = "{{pkg.svc_static_path}}"
+migrations_path = "{{pkg.path}}/migrations"
 
 [tls]
 cert_path = "{{pkg.svc_config_path}}/service.crt"

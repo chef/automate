@@ -79,8 +79,8 @@ describe('Main Navigation', () => {
 
   xit('redirects to Client Runs', () => {
     browser.waitForAngularEnabled(false);
-    element(by.linkText('Client Runs')).click();
-    expect(browser.getCurrentUrl()).toMatch(/\/client-runs/);
+    element(by.linkText('Infrastructure')).click();
+    expect(browser.getCurrentUrl()).toMatch(/infrastructure\/client-runs/);
   });
 
   it('redirects to Event Feed', () => {

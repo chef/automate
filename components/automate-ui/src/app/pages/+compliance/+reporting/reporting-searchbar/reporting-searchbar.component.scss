@@ -2,7 +2,6 @@
 @import "~styles/mixins";
 
 .reporting-search {
-  @include base-box-shadow();
   display: flex;
   height: 50px;
   align-items: center;

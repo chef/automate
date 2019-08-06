@@ -286,7 +286,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   public validateAndAddExpression(): void {
     this.resetErrors();
 
-    const member = stringToMember(this.expressionForm.value.expression);
+    const member = stringToMember(this.expressionForm.value.expression.trim());
 
     if (member.type === Type.Unknown) {
       this.unparsableMember = true;

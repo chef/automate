@@ -52,7 +52,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_EVENT,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ENVIRONMENTS,
+							Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
 							Values:    []string{"production"},
 						},
 					},
@@ -71,7 +71,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values: []string{"org_1"},
 						},
 					},
@@ -90,7 +90,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values: []string{"org_1"},
 						},
 					},
@@ -99,7 +99,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_EVENT,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values: []string{"org_1"},
 						},
 					},
@@ -120,7 +120,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_EVENT,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values: []string{"org_1"},
 						},
 					},
@@ -139,7 +139,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_EVENT,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values: []string{"org_1"},
 						},
 					},
@@ -158,7 +158,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values: []string{"org_2"},
 						},
 					},
@@ -177,7 +177,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_EVENT,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 							Values: []string{"org_1", "org_2"},
 						},
 					},
@@ -198,7 +198,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_EVENT,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
 							Values: []string{"chef_server_1"},
 						},
 					},
@@ -217,7 +217,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_EVENT,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
 							Values: []string{"chef_server_1"},
 						},
 					},
@@ -236,7 +236,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_EVENT,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
 							Values: []string{"chef_server_1"},
 						},
 					},
@@ -255,7 +255,7 @@ func TestActionProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_EVENT,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVERS,
+							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
 							Values: []string{"chef_server_1", "chef_server_2"},
 						},
 					},
@@ -337,7 +337,7 @@ func TestActionBundlerMatchProjectRule(t *testing.T) {
 				Type: iam_v2.ProjectRuleTypes_EVENT,
 				Conditions: []*iam_v2.Condition{
 					{
-						Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGS,
+						Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
 						Values: []string{orgName},
 					},
 				},

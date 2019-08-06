@@ -271,6 +271,26 @@
   revision = "6c6132ff69f0f6c088739067407b5d32c52e1d0f"
 
 [[projects]]
+  digest = "1:bac13387c0d262a2307fb23819e2b2638cd7f54a4337f5d7007ab421613b6567"
+  name = "github.com/envoyproxy/protoc-gen-validate"
+  packages = [
+    ".",
+    "gogoproto",
+    "module",
+    "templates",
+    "templates/cc",
+    "templates/go",
+    "templates/gogo",
+    "templates/goshared",
+    "templates/java",
+    "templates/shared",
+    "validate",
+  ]
+  pruneopts = "UT"
+  revision = "9eff07ddfcb4001aa1aab280648153f46e1a8ddc"
+  version = "v0.1.0"
+
+[[projects]]
   branch = "master"
   digest = "1:7c4b5e23bb01e5945b0df8a5f181efa2d90abd19e368be7c7bd55a5737db0739"
   name = "github.com/fatih/color"
@@ -481,7 +501,7 @@
   version = "v1.2.0"
 
 [[projects]]
-  digest = "1:622ee79f2c74e6f03e4dfdbcb3fd7b82869f0a3e2ffe52f96f285dd3cb256bdf"
+  digest = "1:20fdee92b940d438a4b38d7e5eae5e25e390e9480ee6ae756fc6f015b382a345"
   name = "github.com/grpc-ecosystem/grpc-gateway"
   packages = [
     "codegenerator",
@@ -498,8 +518,8 @@
     "utilities",
   ]
   pruneopts = "T"
-  revision = "bebc7374a79e1105d786ef3468b474e47d652511"
-  version = "v1.9.4"
+  revision = "ad529a448ba494a88058f9e5be0988713174ac86"
+  version = "v1.9.5"
 
 [[projects]]
   branch = "master"
@@ -559,6 +579,14 @@
   pruneopts = "NUT"
   revision = "6d14f0c70869faabd9e60ba7ed88a6cbbd6a661f"
   version = "v1.0.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:b0b1cae9ff30d8c219dc64e5f8dcfbb3f5f3f10f9e67dec737ce0bc04bf31a54"
+  name = "github.com/iancoleman/strcase"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "e506e3ef73653e84c592ba44aab577a46678f68c"
 
 [[projects]]
   digest = "1:406338ad39ab2e37b7f4452906442a3dbf0eb3379dd1f06aafb5c07e769a5fbb"
@@ -650,34 +678,15 @@
   revision = "83612a56d3dd153a94a629cd64925371c9adad78"
 
 [[projects]]
-  digest = "1:a89ea33e096d43b43e9c5afb1b0f0c29ac52e4dcb06cb39bfb4c804780ef4e11"
+  digest = "1:25137843ccba72b5fe72019b7beae542d100b4d96d9ffc03bede2fe36b749b5f"
   name = "github.com/lyft/protoc-gen-star"
   packages = [
     ".",
     "lang/go",
   ]
   pruneopts = "NUT"
-  revision = "78210b0b9a1b1fbbef0111ad44cacdd67b3decc9"
-  version = "v0.4.5"
-
-[[projects]]
-  branch = "master"
-  digest = "1:46ccf3a499c8b307ca7b17ddc8d1567e6f2dcb9a32b386d8c15304894c081a18"
-  name = "github.com/lyft/protoc-gen-validate"
-  packages = [
-    ".",
-    "gogoproto",
-    "module",
-    "templates",
-    "templates/cc",
-    "templates/go",
-    "templates/gogo",
-    "templates/goshared",
-    "templates/shared",
-    "validate",
-  ]
-  pruneopts = "UT"
-  revision = "5bc324a895abfe5123708ae0572c86b2987ebc82"
+  revision = "6c0470b785d07d39f59cd434f9c0ce0682b5c4aa"
+  version = "v0.4.11"
 
 [[projects]]
   digest = "1:6540c20407c0637773dc6ccfdb9a6790b59d629fb38fa81a0c363e41af4c4c03"
@@ -1493,6 +1502,8 @@
     "github.com/dexidp/dex/storage",
     "github.com/dexidp/dex/storage/memory",
     "github.com/dgrijalva/jwt-go",
+    "github.com/envoyproxy/protoc-gen-validate",
+    "github.com/envoyproxy/protoc-gen-validate/validate",
     "github.com/fatih/color",
     "github.com/ghodss/yaml",
     "github.com/go-gorp/gorp",
@@ -1541,8 +1552,6 @@
     "github.com/lib/pq",
     "github.com/lyft/protoc-gen-star",
     "github.com/lyft/protoc-gen-star/lang/go",
-    "github.com/lyft/protoc-gen-validate",
-    "github.com/lyft/protoc-gen-validate/validate",
     "github.com/mitchellh/mapstructure",
     "github.com/muesli/crunchy",
     "github.com/nats-io/gnatsd/server",

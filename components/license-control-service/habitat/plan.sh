@@ -17,8 +17,12 @@ pkg_exports=(
   [port]=service.port
   [host]=service.host
 )
+pkg_binds=(
+  [automate-pg-gateway]="port"
+  [pg-sidecar-service]="port"
+)
 pkg_exposes=(port)
-pkg_scaffolding=chef/scaffolding-go
+pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
 scaffolding_go_base_path=github.com/chef
 scaffolding_go_repo_name=automate
 scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_name}/components/${pkg_name}"
@@ -33,4 +37,12 @@ do_prepare() {
   GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/automate/lib/version.BuildTime=${pkg_release}"
   export GO_LDFLAGS
   build_line "Setting GO_LDFLAGS=${GO_LDFLAGS}"
+}
+
+do_install() {
+  # Scaffolding go install callback
+  scaffolding_go_install
+
+  build_line "Copying migration files"
+  cp -r migrations "${pkg_prefix}/migrations"
 }

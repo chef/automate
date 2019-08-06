@@ -20,29 +20,42 @@
           <tr class="detail-row">
             <td class="header-column">{{ token?.id }}</td>
             <td class="header-column">{{ token?.created_at | datetime:'ddd, MMMM D, YYYY [at] H:mm a' }}</td>
-            <td class="header-column">{{ status }}</td>
+            <td class="header-column">{{ status | capitalize }}</td>
           </tr>
         </tbody>
       </table>
-        <chef-tab-selector [value]="tabValue">
-          <chef-option value='details'>Details</chef-option>
-        </chef-tab-selector>
-      </chef-page-header>
+      <chef-tab-selector [value]="tabValue">
+        <chef-option value='details'>Details</chef-option>
+      </chef-tab-selector>
+    </chef-page-header>
     <section class="page-body">
-      <form [formGroup]="updateNameForm">
+      <form [formGroup]="updateForm">
         <chef-form-field>
-          <label>Name *</label>
-          <input chefInput formControlName="name" type="text" (keyup)="handleNameChange()">
+        <!-- Once the changes from https://github.com/chef/automate/pull/1115 merge,
+            uncomment this and get rid of `handleChange`:
+        <chef-form-field [watch]="nameCtrl.value" [control]="nameCtrl"> -->
+          <label>Name <span aria-hidden="true">*</span></label>
+          <input chefInput formControlName="name" type="text" (keyup)="handleChange()">
+          <chef-error *ngIf="(nameCtrl.hasError('required') || nameCtrl.hasError('pattern')) && nameCtrl.dirty">
+            Name is required.
+          </chef-error>
+        </chef-form-field>
+        <chef-form-field>
+          <label>Status <span aria-hidden="true">*</span></label>
+          <chef-radio ngDefaultControl formControlName="status">
+            <chef-option value="active">Active</chef-option>
+            <chef-option value="inactive">Inactive</chef-option>
+          </chef-radio>
         </chef-form-field>
       </form>
-      <chef-button primary [disabled]="!updateNameForm.valid || disableSave || saveInProgress" (click)="saveNameChange()">
-        <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
-        <ng-container *ngIf="!saveInProgress">
-          <span *ngIf="disableSave">Saved</span>
-          <span *ngIf="!disableSave">Save</span>
-        </ng-container>
-        <span *ngIf="saveInProgress">Saving...</span>
-      </chef-button>
+      <div id="save">
+        <chef-button primary [disabled]="!updateForm.valid || !updateForm.dirty || saveInProgress" (click)="saveChange()">
+          <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
+          <span *ngIf="saveInProgress">Saving...</span>
+          <span *ngIf="!saveInProgress">Save</span>
+        </chef-button>
+        <span id="saved-note" *ngIf="!firstLoad && !updateForm.dirty">All changes saved.</span>
+      </div>
     </section>
   </main>
 </div>

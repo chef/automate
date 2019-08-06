@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
@@ -26,16 +27,7 @@ var printCmd = &cobra.Command{
 }
 
 func runPrintCmd(cmd *cobra.Command, args []string) {
-	keysData, err := keys.Asset("data/keys.json")
-	if err != nil {
-		log.WithError(err).Fatal("package main does not have expected asset 'data/keys.json'")
-	}
-
-	publicKeys, err := keys.LoadPublicKeys(keysData)
-	if err != nil {
-		log.WithError(err).Fatal("failed to load public key data")
-	}
-
+	publicKeys := keys.LoadPublicKeys(keys.BuiltinKeyData)
 	licData, err := maybeFromFile(args[0])
 	if err != nil {
 		log.WithError(err).Fatal("failed to read user-provided license data")
@@ -69,7 +61,7 @@ func maybeFromFile(maybeToken string) (string, error) {
 		log.Debugf("Reading token data from file: %s\n", maybeToken)
 		data, err := ioutil.ReadFile(maybeToken)
 		if err != nil {
-			log.WithError(err).Fatal("Reading token data from file failed")
+			return "", errors.Wrap(err, "reading token data from file failed")
 		}
 		strippedData := strings.TrimSpace(string(data))
 		return strippedData, nil

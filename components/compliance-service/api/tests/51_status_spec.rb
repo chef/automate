@@ -10,8 +10,8 @@ describe File.basename(__FILE__) do
     # Uncomment to see the entire migrations output when troubleshooting
     # puts resp.to_json
 
-    assert_equal(24, resp.total)
-    assert_equal(24, resp.completed)
+    assert_equal(26, resp.total)
+    assert_equal(26, resp.completed)
     assert_equal(:FINISHED, resp.status)
   end
 end

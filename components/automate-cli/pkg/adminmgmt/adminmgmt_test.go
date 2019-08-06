@@ -163,7 +163,7 @@ func TestEnsureTeam(t *testing.T) {
 				_ context.Context, req *teams_req.CreateTeamReq) (*teams_resp.CreateTeamResp, error) {
 
 				if "admins" != req.Name ||
-					"Members of the admins team, by default, have access to all parts of the API." != req.Description {
+					"admins" != req.Description {
 					return nil, errors.New("unexpected arguments")
 				}
 

@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { difference, get, pipe, set } from 'lodash/fp';
 
@@ -10,11 +11,13 @@ export interface TeamEntityState extends EntityState<Team> {
   getStatus: EntityStatus;
   getUsersStatus: EntityStatus;
   createStatus: EntityStatus;
+  createError: HttpErrorResponse;
   deleteStatus: EntityStatus;
   updateStatus: EntityStatus;
   addUsersStatus: EntityStatus;
   removeUsersStatus: EntityStatus;
   userIDs: string[];
+  addUsersStatusError: HttpErrorResponse;
 }
 
 export const teamEntityAdapter: EntityAdapter<Team> = createEntityAdapter<Team>();
@@ -24,11 +27,13 @@ export const TeamEntityInitialState: TeamEntityState = teamEntityAdapter.getInit
   getStatus: EntityStatus.notLoaded,
   getUsersStatus: EntityStatus.notLoaded,
   createStatus: EntityStatus.notLoaded,
+  createError: null,
   deleteStatus: EntityStatus.notLoaded,
   updateStatus: EntityStatus.notLoaded,
   addUsersStatus: EntityStatus.notLoaded,
   removeUsersStatus: EntityStatus.notLoaded,
-  userIDs: []
+  userIDs: [],
+  addUsersStatusError: null
 });
 
 export function teamEntityReducer(state: TeamEntityState = TeamEntityInitialState,
@@ -96,7 +101,10 @@ export function teamEntityReducer(state: TeamEntityState = TeamEntityInitialStat
     }
 
     case TeamActionTypes.CREATE_FAILURE: {
-      return set('createStatus', EntityStatus.loadingFailure, state) as TeamEntityState;
+      return pipe(
+        set('createError', action.payload),
+        set('createStatus', EntityStatus.loadingFailure)
+        )(state) as TeamEntityState;
     }
 
     case TeamActionTypes.UPDATE: {
@@ -147,7 +155,10 @@ export function teamEntityReducer(state: TeamEntityState = TeamEntityInitialStat
     }
 
     case TeamActionTypes.ADD_USERS_FAILURE: {
-      return set('addUsersStatus', EntityStatus.loadingFailure, state) as TeamEntityState;
+      return pipe(
+        set('addUsersStatusError', action.payload),
+        set('addUsersStatus', EntityStatus.loadingFailure)
+      )(state) as TeamEntityState;
     }
 
     case TeamActionTypes.REMOVE_USERS: {

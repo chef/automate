@@ -20,7 +20,7 @@ cluster_id = "{{events.cfg.cluster_id}}"
 
 [postgres]
 database = "{{cfg.storage.database}}"
-schema_path = "{{pkg.svc_static_path}}/schema"
+schema_path = "{{pkg.path}}/schema"
 
 [tls]
 cert_path = "{{pkg.svc_config_path}}/service.crt"

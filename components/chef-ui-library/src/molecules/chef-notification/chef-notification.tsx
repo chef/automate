@@ -1,11 +1,4 @@
-import {
-  Component,
-  Element,
-  Event,
-  EventEmitter,
-  Prop,
-  State
-} from '@stencil/core';
+import { Component, Element, Event, EventEmitter, Host, Prop, State, h } from '@stencil/core';
 import isUndefined from 'lodash/fp/isUndefined';
 
 /**
@@ -53,13 +46,6 @@ export class ChefNotification {
     this.observer = new MutationObserver(this.setVisibility.bind(this));
   }
 
-  hostData() {
-    return {
-      class: [this.className(this.type),
-              this.visible ? 'visible' : ''].join(' ')
-    };
-  }
-
   componentDidLoad() {
     this.observer.observe(this.el, { childList: true });
     this.setVisibility();
@@ -88,10 +74,17 @@ export class ChefNotification {
   }
 
   render() {
-    return [
-      <slot />,
-      <chef-icon onClick={this.handleClose.bind(this)}>close</chef-icon>
-    ];
+    const classNames = [
+      this.className(this.type),
+      this.visible ? 'visible' : ''
+    ].join(' ');
+
+    return (
+      <Host class={classNames}>
+        <slot />
+        <chef-icon onClick={this.handleClose.bind(this)}>close</chef-icon>
+      </Host>
+    );
   }
 
   handleClose() {

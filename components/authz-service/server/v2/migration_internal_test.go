@@ -2412,23 +2412,15 @@ func hasName(name string) checkFunc {
 }
 
 func hasStatements(expected ...storage_v2.Statement) checkFunc {
-	return func(t *testing.T, pol *storage_v2.Policy) {
-		statementsSansIDs := make([]storage_v2.Statement, len(pol.Statements))
-		for i, statement := range pol.Statements {
-			st := statement
-			// We don't know statement IDs, so we reset the ones we get back;
-			// making it easier to compare the expected and actual set below in ElementsMatch.
-			st.ID = uuid.UUID{}
-
-			// expected statement in test case does not initialize projects slice
-			// so we initialize it here
-			if expected[i].Projects == nil {
-				expected[i].Projects = []string{}
-			}
-
-			statementsSansIDs[i] = st
+	// expected statement in test case does not initialize projects slice
+	// so we initialize it here
+	for i := range expected {
+		if expected[i].Projects == nil {
+			expected[i].Projects = []string{}
 		}
-		assert.ElementsMatch(t, expected, statementsSansIDs)
+	}
+	return func(t *testing.T, pol *storage_v2.Policy) {
+		assert.ElementsMatch(t, expected, pol.Statements)
 	}
 }
 

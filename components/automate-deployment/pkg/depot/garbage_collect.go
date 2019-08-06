@@ -50,58 +50,19 @@ func (gc *GarbageCollector) Collect(roots []habpkg.HabPkg, cleanupMode string) e
 // dependencies on-disk. Automate packages update much more frequently than
 // dependencies so this should give most of the benefits of package cleanup.
 func (gc *GarbageCollector) ConservativeCollect(rootPackages []habpkg.HabPkg) error {
-	installedPkgs, err := gc.cache.ListAllPackages()
-	if err != nil {
-		return errors.Wrap(err, "Failed to list installed packages")
+	if len(rootPackages) == 0 {
+		return nil
 	}
 
-	keepersByShortIdent := make(map[string][]habpkg.HabPkg, len(rootPackages))
+	rootsByShortIdent := make(map[string]struct{}, len(rootPackages))
 	for _, pkg := range rootPackages {
-		s := habpkg.ShortIdent(&pkg)
-		keepersByShortIdent[s] = append(keepersByShortIdent[s], pkg)
+		rootsByShortIdent[habpkg.ShortIdent(&pkg)] = struct{}{}
 	}
 
-	pkgsToDelete := []habpkg.HabPkg{}
-
-	for _, candidate := range installedPkgs {
-		// only check packages like chef/deployment-service (part of automate) but
-		// skip packages like core/curl or chef/chef (not in automate)
-		keepers, isAutomatePkg := keepersByShortIdent[habpkg.ShortIdent(&candidate)]
-		if !isAutomatePkg {
-			continue
-		}
-
-		// don't delete if the version is the one we want
-		isKeeper := false
-		for _, keeper := range keepers {
-			if habpkg.Ident(&keeper) == habpkg.Ident(&candidate) {
-				isKeeper = true
-				break
-			}
-		}
-		if isKeeper {
-			continue
-		}
-
-		pkgsToDelete = append(pkgsToDelete, candidate)
-
-	}
-
-	if len(pkgsToDelete) > 0 {
-		logrus.WithFields(logrus.Fields{
-			"roots": rootPackages,
-			"mode":  ConservativeGC,
-		}).Info("Cleaning up unused packages")
-	}
-
-	for _, pkg := range pkgsToDelete {
-		logrus.WithField("package", pkg).Info("Removing package")
-		if err := gc.cache.Delete(pkg); err != nil {
-			return errors.Wrapf(err, "Failed to delete %s", pkg)
-		}
-	}
-
-	return nil
+	return gc.genericCollect(rootPackages, func(p habpkg.HabPkg) bool {
+		_, ok := rootsByShortIdent[habpkg.ShortIdent(&p)]
+		return ok
+	})
 }
 
 // AggressiveCollect deletes all habitat packages except those that are listed
@@ -113,7 +74,15 @@ func (gc *GarbageCollector) AggressiveCollect(roots []habpkg.HabPkg) error {
 	if len(roots) == 0 {
 		return errors.New("refusing to delete all the things")
 	}
+	return gc.genericCollect(roots, func(habpkg.HabPkg) bool { return true })
+}
 
+// genericCollect marks all packages not contained in the roots or
+// their transitive dependencies for potential deletion. The caller
+// can pass a deleteFilter which should return true for any package
+// that should be deleted to additionally filter the list of marked
+// packages.
+func (gc *GarbageCollector) genericCollect(roots []habpkg.HabPkg, deleteFilter func(habpkg.HabPkg) bool) error {
 	installedPkgs, err := gc.cache.ListAllPackages()
 	if err != nil {
 		return errors.Wrap(err, "Failed to list installed packages")
@@ -141,6 +110,10 @@ func (gc *GarbageCollector) AggressiveCollect(roots []habpkg.HabPkg) error {
 	// that things are topologically sorted by their dependencies
 	for _, pkg := range installedPkgs {
 		if !markMap[pkg] {
+			if !deleteFilter(pkg) {
+				continue
+			}
+
 			if !loggedOnce {
 				logrus.WithFields(logrus.Fields{
 					"roots": roots,

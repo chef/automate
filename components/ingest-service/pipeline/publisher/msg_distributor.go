@@ -3,8 +3,9 @@ package publisher
 import (
 	"time"
 
-	"github.com/chef/automate/components/ingest-service/pipeline/message"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/components/ingest-service/pipeline/message"
 )
 
 // BuildMsgDistributor a message distributor that sends all messages to the first child pipe until it is
@@ -50,9 +51,9 @@ func sendMessage(pipeInChannels []chan message.ChefRun, msg message.ChefRun) {
 }
 
 // The first channel is filled before sending messages to any other channel. Once the first channel is
-// filled, the second channel recieves all the messages that can not fit into the first channel,
+// filled, the second channel receives all the messages that can not fit into the first channel,
 // and so on with the rest of the channels.
-// If all the channels are full then false is returned
+// If all the channels are full then false is returned.
 func distributeMessage(pipeInChannels []chan message.ChefRun, msg message.ChefRun) bool {
 	for _, pipeInChannel := range pipeInChannels {
 		select {

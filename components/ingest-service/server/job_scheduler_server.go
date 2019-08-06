@@ -118,7 +118,7 @@ func rruleToEvery(rruleStr string) (string, error) {
 		// TODO(ssd) 2019-06-28: We should replace this with
 		// something that remembers the user-provided
 		// recurrence since our translation to an rrule will
-		// necessilarly lose the user's preferred description.
+		// necessarily lose the user's preferred description.
 		if r.OrigOptions.Interval%3600 == 0 {
 			return fmt.Sprintf("%dh", r.OrigOptions.Interval/3600), nil
 		} else if r.OrigOptions.Interval%60 == 0 {

@@ -6,33 +6,33 @@ import { MockComponent } from 'ng2-mock-component';
 
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { customMatchers } from 'app/testing/custom-matchers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { IAMType } from 'app/entities/policies/policy.model';
 import { GetProjectSuccess } from 'app/entities/projects/project.actions';
-import { GetRulesSuccess } from 'app/entities/rules/rule.actions';
 import { projectEntityReducer } from 'app/entities/projects/project.reducer';
+import { Project } from 'app/entities/projects/project.model';
+import { Rule } from 'app/entities/rules/rule.model';
 import { ProjectDetailsComponent } from './project-details.component';
 
-describe('ProjectListComponent', () => {
+describe('ProjectDetailsComponent', () => {
   let component: ProjectDetailsComponent;
   let fixture: ComponentFixture<ProjectDetailsComponent>;
 
-  const project = {
-    id: 'uuid-1', name: 'Default',
-    type: <IAMType>'CHEF_MANAGED'
+  const project: Project = {
+    id: 'uuid-1',
+    name: 'Default',
+    type: 'CHEF_MANAGED'
   };
-  const rules = [
+  const rules: Rule[] = [
     {
       id: 'rule-1',
       project_id: 'uuid-1',
       name: 'Rule 1',
-      type: 'NODE',
-      edits: 'staging',
+      type: 'node',
+      status: 'staged',
       conditions: [
         {
-          attribute: 'CHEF_ORGS',
-          values: 'My value',
+          attribute: 'CHEF_ORGANIZATION',
+          values: ['My value'],
           operator: 'EQUALS'
         }
       ]
@@ -41,12 +41,12 @@ describe('ProjectListComponent', () => {
       id: 'rule-2',
       project_id: 'uuid-1',
       name: 'Rule 2',
-      type: 'EVENT',
-      edits: 'applied',
+      type: 'event',
+      status: 'applied',
       conditions: [
         {
-          attribute: 'CHEF_ORGS',
-          values: '["My value"]',
+          attribute: 'CHEF_ORGANIZATION',
+          values: ['Value one', 'Value two'],
           operator: 'MEMBER_OF'
         }
       ]
@@ -75,6 +75,7 @@ describe('ProjectListComponent', () => {
         MockComponent({ selector: 'chef-control-menu' }),
         MockComponent({ selector: 'chef-form-field'}),
         MockComponent({ selector: 'chef-breadcrumbs'}),
+        MockComponent({ selector: 'chef-error'}),
         MockComponent({ selector: 'chef-breadcrumb', inputs: ['link'] }),
         MockComponent({ selector: 'chef-tab-selector', inputs: ['value'] }),
         MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
@@ -124,11 +125,10 @@ describe('ProjectListComponent', () => {
     store.dispatch(new GetProjectSuccess({
       project: {
         id: 'uuid-1', name: 'Default',
-        type: <IAMType>'CHEF_MANAGED'
+        type: 'CHEF_MANAGED'
       }
     }));
 
-    jasmine.addMatchers(customMatchers);
     fixture = TestBed.createComponent(ProjectDetailsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -136,64 +136,67 @@ describe('ProjectListComponent', () => {
 
   describe('when there are no rules', () => {
     beforeEach(() => {
-      store.dispatch(new GetRulesSuccess({
-          rules: []
-      }));
       component.rules = [];
-      fixture.detectChanges();
     });
 
-    it('rules array should be empty', () => {
-      expect(component.rules.length).toBe(0);
-    });
-
-    it('show rules section when rules tab is selected', () => {
-      component.onTabChange({ target: { value: 'rules'} });
+   it('defaults to showing rules section', () => {
       expect(component.showTab('rules')).toBeTruthy();
+      expect(component.showTab('details')).toBeFalsy();
     });
 
-    it('should not display rule table when no rules', () => {
+    it('shows/hides sections when based on selection', () => {
+      component.onTabChange({ target: { value: 'details' } });
+      expect(component.showTab('details')).toBeTruthy();
+      expect(component.showTab('rules')).toBeFalsy();
+
+      component.onTabChange({ target: { value: 'rules' } });
+      expect(component.showTab('rules')).toBeTruthy();
+      expect(component.showTab('details')).toBeFalsy();
+    });
+
+    it('does not display rule table', () => {
       expect(component.showRulesTable()).toBeFalsy();
     });
 
-    it('the create your first rule message should display', () => {
+    it('displays create-your-first-rule message', () => {
       expect(component.showFirstRuleMessage()).toBeTruthy();
     });
   });
 
   describe('when there are rules', () => {
     beforeEach(() => {
-      store.dispatch(new GetRulesSuccess({
-          rules: rules
-      }));
       component.project = project;
       component.rules = rules;
-      fixture.detectChanges();
     });
 
-    it('rules array should have two rules', () => {
-      expect(component.rules.length).toBe(2);
-    });
-
-    it('show rules section when rules tab is selected', () => {
-      component.onTabChange({ target: { value: 'rules'} });
+    it('defaults to showing rules section', () => {
       expect(component.showTab('rules')).toBeTruthy();
+      expect(component.showTab('details')).toBeFalsy();
     });
 
-    it('should display rule table', () => {
+    it('shows/hides sections when based on selection', () => {
+      component.onTabChange({ target: { value: 'details' } });
+      expect(component.showTab('rules')).toBeFalsy();
+      expect(component.showTab('details')).toBeTruthy();
+      component.onTabChange({ target: { value: 'rules' } });
+      expect(component.showTab('rules')).toBeTruthy();
+      expect(component.showTab('details')).toBeFalsy();
+    });
+
+    it('displays rule table', () => {
       expect(component.showRulesTable()).toBeTruthy();
     });
 
-    it('the create your first rule message should not display', () => {
+    it('does not display create-your-first-rule message', () => {
       expect(component.showFirstRuleMessage()).toBeFalsy();
     });
 
-    it('show a link back to project when a rule is in "edits pending" state', () => {
+    it('shows a link back to project when a rule has edits pending', () => {
       expect(component.showProjectLink()).toBeTruthy();
     });
 
-    it('disable delete rule button when a rule is in "staging" state', () => {
-      expect(component.showDeleteRule(component.rules[0])).toBeFalsy();
+    it('enables delete-rule button when a rule has edits pending', () => {
+      expect(component.showDeleteRule()).toBeTruthy();
     });
   });
 });

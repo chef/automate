@@ -6,8 +6,8 @@ package common
 import (
 	context "context"
 	fmt "fmt"
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
-	_ "github.com/lyft/protoc-gen-validate/validate"
 	grpc "google.golang.org/grpc"
 	math "math"
 )

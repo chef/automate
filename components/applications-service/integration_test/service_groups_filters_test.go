@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/chef/automate/api/external/applications"
+	"github.com/chef/automate/api/external/habitat"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -187,5 +188,271 @@ func TestServiceGroupsFilterWrongType(t *testing.T) {
 	assert.NotNil(t, err)
 	if assert.Error(t, err) {
 		assert.Contains(t, err.Error(), expectedErr)
+	}
+}
+
+func TestServiceGroupsFilterEnvironment(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"environment:a_env"},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "a.default",
+					Package:          "core/a",
+					Release:          "0.1.0/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+			},
+		}
+		mockHabServicesMatrix = habServicesABCD()
+	)
+
+	suite.IngestServices(mockHabServicesMatrix)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
+}
+
+func TestServiceGroupsFilterApp(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"application:a_app"},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "a.default",
+					Package:          "core/a",
+					Release:          "0.1.0/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+			},
+		}
+		mockHabServicesMatrix = habServicesABCD()
+	)
+
+	suite.IngestServices(mockHabServicesMatrix)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
+}
+
+func TestServiceGroupsMultiServiceFilterAppEnv(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"application:a_app", "environment:a_env"},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "a.default",
+					Package:          "core/a",
+					Release:          "0.1.0/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+			},
+		}
+		mockHabServicesMatrix = habServicesABCD()
+	)
+
+	suite.IngestServices(mockHabServicesMatrix)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
+}
+
+func TestServiceGroupsFilterAppEnvStatus(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"application:a_app", "environment:a_env", "status:UNKNOWN"},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "a.default",
+					Package:          "core/a",
+					Release:          "0.1.0/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+			},
+		}
+		mockHabServicesMatrix = habServicesABCD()
+	)
+
+	suite.IngestServices(mockHabServicesMatrix)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
+}
+
+func TestServiceGroupsFilterServiceGroupName(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"group:default"},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "a.default",
+					Package:          "core/a",
+					Release:          "0.1.0/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+			},
+		}
+		//2 services in different service groups
+		mockHabServices = []*habitat.HealthCheckEvent{
+			NewHabitatEvent(
+				withSupervisorId("sup2"),
+				withServiceGroup("a.default"),
+				withPackageIdent("core/a/0.1.0/20190101121212"),
+				withHealth("UNKNOWN"),
+				withApplication("a_app"),
+				withEnvironment("a_env"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("sup3"),
+				withServiceGroup("a.test"),
+				withPackageIdent("core/b/0.1.0/20190101121212"),
+				withHealth("OK"),
+				withApplication("a_app"),
+				withEnvironment("a_env"),
+			),
+		}
+	)
+
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
+}
+
+// This tests out the or-ing together of the same field.
+func TestServiceGroupsFilterServiceGroupNameDouble(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"group:default", "group:test"},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "a.default",
+					Package:          "core/a",
+					Release:          "0.1.0/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+				{
+					Name:             "a.test",
+					Package:          "core/a",
+					Release:          "0.1.0/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+			},
+		}
+		//2 services in different service groups
+		mockHabServices = []*habitat.HealthCheckEvent{
+			NewHabitatEvent(
+				withSupervisorId("sup2"),
+				withServiceGroup("a.default"),
+				withPackageIdent("core/a/0.1.0/20190101121212"),
+				withHealth("UNKNOWN"),
+				withApplication("a_app"),
+				withEnvironment("a_env"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("sup3"),
+				withServiceGroup("a.test"),
+				withPackageIdent("core/a/0.1.0/20190101121212"),
+				withHealth("UNKNOWN"),
+				withApplication("a_app"),
+				withEnvironment("a_env"),
+			),
+		}
+	)
+
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+
+	//Should return both service groups
+	if assert.Equal(t, 2, len(response.GetServiceGroups())) {
+		svcList := response.GetServiceGroups()
+		svcIdList := make([]string, 2)
+		for i, svc := range svcList {
+			svcIdList[i] = svc.Name
+		}
+		assert.Contains(t, svcIdList, expected.GetServiceGroups()[0].Name,
+			"the service group name is not the expected one")
+		assert.Contains(t, svcIdList, expected.GetServiceGroups()[1].Name,
+			"the service group name is not the expected one")
 	}
 }

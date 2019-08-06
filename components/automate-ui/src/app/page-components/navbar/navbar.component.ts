@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { iamMinorVersion, iamMajorVersion } from 'app/entities/policies/policy.selectors';
+import { IAMMinorVersion, IAMMajorVersion } from 'app/entities/policies/policy.model';
 
 @Component({
   selector: 'app-navbar',
@@ -13,10 +14,8 @@ import { iamMinorVersion, iamMajorVersion } from 'app/entities/policies/policy.s
 
 export class NavbarComponent implements OnInit {
   public applicationsFeatureFlagOn: boolean;
-
-  public iamMajorVersion$: Observable<string>;
-
-  public iamMinorVersion$: Observable<string>;
+  public iamMajorVersion$: Observable<IAMMajorVersion>;
+  public iamMinorVersion$: Observable<IAMMinorVersion>;
 
   constructor(
     private featureFlagsService: FeatureFlagsService,

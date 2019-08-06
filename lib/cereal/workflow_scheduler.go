@@ -120,7 +120,7 @@ func (w *workflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 			return sleepTime, nil
 		}
 
-		return sleepTime, errors.Wrap(err, "could not update secheduled workflow record")
+		return sleepTime, errors.Wrap(err, "could not update scheduled workflow record")
 	}
 
 	return sleepTime, nil

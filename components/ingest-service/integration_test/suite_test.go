@@ -379,7 +379,7 @@ func createServices(s *Suite) {
 
 	err = server.InitializeJobManager(jobManager, s.ingest)
 	if err != nil {
-		logrus.WithError(err).Fatal("could not initialze job manager")
+		logrus.WithError(err).Fatal("could not initialize job manager")
 	}
 
 	err = server.MigrateJobsSchedule(jobManager, viper.ConfigFileUsed())

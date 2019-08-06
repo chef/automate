@@ -138,6 +138,11 @@ func TestConservativeGarbageCollector(t *testing.T) {
 				habpkg.NewFQ("chef", "mlsa", "1.0.1", "20181011015551"),
 				habpkg.NewFQ("chef", "deployment-service", "0.1.0", "20181019225550"),
 				habpkg.NewFQ("chef", "deployment-service", "0.1.0", "20180126213931"),
+				habpkg.NewFQ("chef", "other-service", "0.1.0", "20181019225550"),
+				habpkg.NewFQ("chef", "other-service", "0.1.0", "20180126213931"),
+				habpkg.NewFQ("chef", "other-service2", "0.1.0", "20181019225550"),
+				habpkg.NewFQ("chef", "other-service2", "0.1.0", "20180126213931"),
+
 				habpkg.NewFQ("core", "busybox-static", "1.28.1", "20180608102729"),
 				habpkg.NewFQ("core", "glibc", "2.22", "20170513201042"),
 				habpkg.NewFQ("core", "linux-headers", "4.3", "20170513200956"),
@@ -152,12 +157,14 @@ func TestConservativeGarbageCollector(t *testing.T) {
 		assert.FileExists(t, path.Join(tmpdir, "cache", "artifacts", "core-glibc-2.22-20170513201042-x86_64-linux.hart"))
 	})
 
-	t.Run("deletes packages that are different versions of the given roots", func(t *testing.T) {
+	t.Run("deletes packages that are different versions of the given roots unless they are dependencies of another root", func(t *testing.T) {
 		gc, tmpdir, cleanup := newTestGarbageCollector(t)
 		defer cleanup()
 		err := gc.ConservativeCollect([]habpkg.HabPkg{
 			habpkg.NewFQ("chef", "mlsa", "1.0.1", "20181011015551"),
 			habpkg.NewFQ("chef", "deployment-service", "0.1.0", "20181019225550"),
+			habpkg.NewFQ("chef", "other-service", "0.1.0", "20181019225550"),
+			habpkg.NewFQ("chef", "other-service2", "0.1.0", "20181019225550"),
 		})
 		require.NoError(t, err)
 
@@ -167,6 +174,12 @@ func TestConservativeGarbageCollector(t *testing.T) {
 			[]habpkg.HabPkg{
 				habpkg.NewFQ("chef", "mlsa", "1.0.1", "20181011015551"),
 				habpkg.NewFQ("chef", "deployment-service", "0.1.0", "20181019225550"),
+				habpkg.NewFQ("chef", "other-service", "0.1.0", "20181019225550"),
+				// We expect both versions of other-service2 to be available because
+				// - other-service2/0.1.0/20180126213931 is a dependency of other-service/0.1.0/20181019225550
+				// - other-service2/0.1.0/20181019225550 is in our roots
+				habpkg.NewFQ("chef", "other-service2", "0.1.0", "20181019225550"),
+				habpkg.NewFQ("chef", "other-service2", "0.1.0", "20180126213931"),
 				habpkg.NewFQ("core", "busybox-static", "1.28.1", "20180608102729"),
 				habpkg.NewFQ("core", "glibc", "2.22", "20170513201042"),
 				habpkg.NewFQ("core", "linux-headers", "4.3", "20170513200956"),

@@ -241,6 +241,12 @@ EOF
         http_method: 'PUT',
         request_body: {
           name: "updated policy!",
+          statements: [
+            {
+              effect:    "ALLOW",
+              actions:   ["compliance:profiles:upload"]
+            }
+          ],
           members: []
         }.to_json
       )
@@ -363,7 +369,6 @@ EOF
       expect(resp.http_status).to eq 200
       expect(resp.parsed_response_body[:project][:id]).to eq id
       expect(resp.parsed_response_body[:project][:name]).to eq 'display name !#$#'
-      expect(resp.parsed_response_body[:project][:projects]).to eq [id]
 
       resp = automate_api_request("/apis/iam/v2beta/projects")
       expect(resp.http_status).to eq 200
@@ -898,14 +903,6 @@ EOF
           expect(resp.parsed_response_body[:status]).to eq(nil)
         end
       end
-
-      describe "GET /iam/v2beta/rules" do
-        it "returns an empty list" do
-          resp = automate_api_request("/apis/iam/v2beta/rules")
-          expect(resp.http_status).to eq 200
-          expect(resp.parsed_response_body[:rules]).to eq([])
-        end
-      end
     end
 
     context "when there are no rules but the project exists" do
@@ -932,31 +929,25 @@ EOF
         expect(resp.parsed_response_body[:status]).to eq("NO_RULES")
       end
 
-      it "GET /iam/v2beta/rules returns an empty list" do
-        resp = automate_api_request("/apis/iam/v2beta/rules")
-        expect(resp.http_status).to eq 200
-        expect(resp.parsed_response_body[:rules]).to eq([])
-      end
-
-      it "GET /iam/v2beta/rules/:id returns a 404" do
-        resp = automate_api_request("/apis/iam/v2beta/rules/not-found")
+      it "GET /iam/v2beta/projects/:project_id/rules/:id returns a 404" do
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_PROJECT_ID}/rules/not-found")
         expect(resp.http_status).to eq 404
         expect(resp.parsed_response_body[:rule]).to eq(nil)
       end
 
-      it "PUT /iam/v2beta/rules/:id returns a 404" do
-        resp = automate_api_request("/apis/iam/v2beta/rules/not-found")
+      it "PUT /iam/v2beta/projects/:project_id/rules/:id returns a 404" do
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_PROJECT_ID}/rules/not-found")
         expect(resp.http_status).to eq 404
         expect(resp.parsed_response_body[:rule]).to eq(nil)
       end
 
-      it "DELETE /iam/v2beta/rules/:id returns a 404" do
-        resp = automate_api_request("/apis/iam/v2beta/rules/not-found", http_method: 'DELETE')
+      it "DELETE /iam/v2beta/projects/:project_id/rules/:id returns a 404" do
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_PROJECT_ID}/rules/not-found", http_method: 'DELETE')
         expect(resp.http_status).to eq 404
         expect(resp.parsed_response_body[:rule]).to eq(nil)
       end
 
-      describe "POST /iam/v2beta/rules" do
+      describe "POST /iam/v2beta/projects/:project_id/rules" do
         CUSTOM_RULE = {
           id: "custom-rule",
           name: "display name !#$#",
@@ -964,7 +955,7 @@ EOF
           type: "NODE",
           conditions: [
             {
-              attribute: "CHEF_TAGS",
+              attribute: "CHEF_TAG",
               operator: "MEMBER_OF",
               values: ["tag1", "tag2"]
             }
@@ -973,19 +964,19 @@ EOF
         }
 
         after(:each) do
-          resp = automate_api_request("/apis/iam/v2beta/rules/#{CUSTOM_RULE[:id]}", http_method: 'DELETE')
+          resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_RULE[:project_id]}/rules/#{CUSTOM_RULE[:id]}", http_method: 'DELETE')
           expect(resp.http_status.to_s).to match(/200|404/)
         end
 
         it "creates a new rule" do
-          resp = automate_api_request("/apis/iam/v2beta/rules",
+          resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_PROJECT_ID}/rules",
             http_method: 'POST',
             request_body: CUSTOM_RULE.to_json
           )
           expect(resp.http_status).to eq 200
           expect(resp.parsed_response_body[:rule]).to eq(CUSTOM_RULE)
 
-          resp = automate_api_request("/apis/iam/v2beta/rules/#{CUSTOM_RULE[:id]}")
+          resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_RULE[:project_id]}/rules/#{CUSTOM_RULE[:id]}")
           expect(resp.http_status).to eq 200
           expect(resp.parsed_response_body[:rule]).to eq(CUSTOM_RULE)
         end
@@ -1000,7 +991,7 @@ EOF
         type: "NODE",
         conditions: [
           {
-            attribute: "CHEF_TAGS",
+            attribute: "CHEF_TAG",
             operator: "MEMBER_OF",
             values: ["tag1", "tag2"]
           }
@@ -1015,7 +1006,7 @@ EOF
         type: "EVENT",
         conditions: [
           {
-            attribute: "CHEF_SERVERS",
+            attribute: "CHEF_SERVER",
             operator: "EQUALS",
             values: ["server1"]
           }
@@ -1031,7 +1022,7 @@ EOF
         type: "NODE",
         conditions: [
           {
-            attribute: "CHEF_ORGS",
+            attribute: "CHEF_ORGANIZATION",
             operator: "EQUALS",
             values: ["org1"]
           }
@@ -1058,19 +1049,19 @@ EOF
         )
         expect(resp.http_status).to eq 200
 
-        resp = automate_api_request("/apis/iam/v2beta/rules",
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_PROJECT_ID}/rules",
           http_method: 'POST',
           request_body: CUSTOM_RULE_1.to_json
         )
         expect(resp.http_status).to eq 200
 
-        resp = automate_api_request("/apis/iam/v2beta/rules",
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_PROJECT_ID}/rules",
           http_method: 'POST',
           request_body: CUSTOM_RULE_2.to_json
         )
         expect(resp.http_status).to eq 200
 
-        resp = automate_api_request("/apis/iam/v2beta/rules",
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_PROJECT_ID_2}/rules",
           http_method: 'POST',
           request_body: CUSTOM_RULE_3.to_json
         )
@@ -1078,16 +1069,16 @@ EOF
       end
 
       after(:each) do
-        resp = automate_api_request("/apis/iam/v2beta/rules/#{CUSTOM_RULE_1[:id]}", http_method: 'DELETE')
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_RULE[:project_id]}/rules/#{CUSTOM_RULE[:id]}", http_method: 'DELETE')
+        expect(resp.http_status.to_s).to match(/200|404/)
+
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_RULE_2[:project_id]}/rules/#{CUSTOM_RULE_2[:id]}", http_method: 'DELETE')
         expect(resp.http_status.to_s).to match(/200|404/)
 
         resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_PROJECT_ID}", http_method: 'DELETE')
         expect(resp.http_status.to_s).to match(/200|404/)
 
-        resp = automate_api_request("/apis/iam/v2beta/rules/#{CUSTOM_RULE_2[:id]}", http_method: 'DELETE')
-        expect(resp.http_status.to_s).to match(/200|404/)
-
-        resp = automate_api_request("/apis/iam/v2beta/rules/#{CUSTOM_RULE_3[:id]}", http_method: 'DELETE')
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_RULE_3[:project_id]}/rules/#{CUSTOM_RULE_3[:id]}", http_method: 'DELETE')
         expect(resp.http_status.to_s).to match(/200|404/)
 
         resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_PROJECT_ID_2}", http_method: 'DELETE')
@@ -1102,8 +1093,8 @@ EOF
       #   expect(resp.parsed_response_body[:rules]).to match_array([CUSTOM_RULE_1, CUSTOM_RULE_2, CUSTOM_RULE_3])
       # end
 
-      it "GET /iam/v2beta/rules/:id returns a specific rule" do
-        resp = automate_api_request("/apis/iam/v2beta/rules/#{CUSTOM_RULE_1[:id]}")
+      it "GET /iam/v2beta/projects/:project_id/rules/:id returns a specific rule" do
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_RULE_1[:project_id]}/rules/#{CUSTOM_RULE_1[:id]}")
         expect(resp.http_status).to eq 200
         expect(resp.parsed_response_body[:rule]).to eq(CUSTOM_RULE_1)
       end
@@ -1116,7 +1107,7 @@ EOF
           type: "EVENT",
           conditions: [
             {
-              attribute: "CHEF_SERVERS",
+              attribute: "CHEF_SERVER",
               operator: "EQUALS",
               values: ["brand new server"]
             }
@@ -1124,7 +1115,7 @@ EOF
            status: "STAGED"
          }
 
-        resp = automate_api_request("/apis/iam/v2beta/rules/#{CUSTOM_RULE_2[:id]}",
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_RULE_2[:project_id]}/rules/#{CUSTOM_RULE_2[:id]}",
           http_method: 'PUT',
           request_body: updated_rule.to_json
         )
@@ -1137,16 +1128,16 @@ EOF
         expect(resp.parsed_response_body[:status]).to eq("EDITS_PENDING")
       end
 
-      it "DELETE /iam/v2beta/rules/:id deletes the specific rule" do
-        resp = automate_api_request("/apis/iam/v2beta/rules/#{CUSTOM_RULE_1[:id]}", http_method: 'DELETE')
+      it "DELETE /iam/v2beta/projects/:project_id/rules/:id deletes the specific rule" do
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_PROJECT_ID}/rules/#{CUSTOM_RULE_1[:id]}", http_method: 'DELETE')
         expect(resp.http_status).to eq 200
         expect(resp.parsed_response_body[:rule]).to eq(nil)
 
-        resp = automate_api_request("/apis/iam/v2beta/rules/#{CUSTOM_RULE_1[:id]}")
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_PROJECT_ID}/rules/#{CUSTOM_RULE_1[:id]}")
         expect(resp.http_status).to eq 404
       end
 
-      it "PUT /iam/v2beta/rules/:id updates the rule" do
+      it "PUT /iam/v2beta/projects/:project_id/rules/:id updates the rule" do
         updated_rule = {
           id: CUSTOM_RULE_1[:id],
           name: "updated display name",
@@ -1154,7 +1145,7 @@ EOF
           type: "NODE",
           conditions: [
             {
-              attribute: "CHEF_TAGS",
+              attribute: "CHEF_TAG",
               operator: "EQUALS",
               values: ["new tag"]
             }
@@ -1162,14 +1153,14 @@ EOF
            status: "STAGED"
          }
 
-        resp = automate_api_request("/apis/iam/v2beta/rules/#{CUSTOM_RULE_1[:id]}",
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_RULE_1[:project_id]}/rules/#{CUSTOM_RULE_1[:id]}",
           http_method: 'PUT',
           request_body: updated_rule.to_json
         )
         expect(resp.http_status).to eq 200
         expect(resp.parsed_response_body[:rule]).to eq(updated_rule)
 
-        resp = automate_api_request("/apis/iam/v2beta/rules/#{CUSTOM_RULE_1[:id]}")
+        resp = automate_api_request("/apis/iam/v2beta/projects/#{CUSTOM_RULE_1[:project_id]}/rules/#{CUSTOM_RULE_1[:id]}")
         expect(resp.http_status).to eq 200
         expect(resp.parsed_response_body[:rule]).to eq(updated_rule)
       end

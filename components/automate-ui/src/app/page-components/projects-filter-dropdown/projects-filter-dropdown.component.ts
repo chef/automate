@@ -65,21 +65,21 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
     this.onSelection.emit(this.editableOptions);
   }
 
-  handleArrowUp(event) {
+  handleArrowUp(event: KeyboardEvent) {
     event.preventDefault();
 
-    const element = event.target.previousElementSibling;
+    const element = (event.target as Element).previousElementSibling;
     if (element) {
-      element.focus();
+      (element as HTMLElement).focus();
     }
   }
 
-  handleArrowDown(event) {
+  handleArrowDown(event: KeyboardEvent) {
     event.preventDefault();
 
-    const element = event.target.nextElementSibling;
+    const element = (event.target as Element).nextElementSibling;
     if (element) {
-      element.focus();
+      (element as HTMLElement).focus();
     }
   }
 }

@@ -28,16 +28,16 @@ func (migratable A1ElasticSearchIndices) migrateProfiles() error {
 	defer util.TimeTrack(time.Now(), myName)
 
 	src := a1IndexPrefix + "profiles"
-	reindexResp, _, err := migratable.backend.reindex(src, CompProfilesIndex, a1ProfilesMigrationScript, "inspec_profile")
+	indexExists, err := migratable.backend.reindex(src, CompProfilesIndex, a1ProfilesMigrationScript, "inspec_profile")
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("%s unable to reindex %s", src, myName))
 	}
 
-	if reindexResp == nil {
+	if !indexExists {
 		//there must not have been an alias to named compliance-profiles
 		//so let's see if there is an index named compliance-profiles-2 and if so reindex that
 		src := a1IndexPrefix + "profiles-2"
-		_, _, err = migratable.backend.reindex(src, CompProfilesIndex, a1ProfilesMigrationScript, "inspec_profile")
+		_, err = migratable.backend.reindex(src, CompProfilesIndex, a1ProfilesMigrationScript, "inspec_profile")
 		if err != nil {
 			return errors.Wrap(err, fmt.Sprintf("%s unable to reindex %s", src, myName))
 		}

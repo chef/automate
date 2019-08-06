@@ -450,7 +450,7 @@ func usesPlatformScaffolding(service *deployment.Service) bool {
 	switch service.Name() {
 	case "secrets-service", "pg-sidecar-service", "teams-service", "authz-service", "session-service", "automate-dex",
 		"authn-service", "compliance-service", "nodemanager-service", "notifications-service", "applications-service",
-		"automate-cs-bookshelf", "automate-cs-oc-erchef", "automate-cs-oc-bifrost", "ingest-service":
+		"automate-cs-bookshelf", "automate-cs-oc-erchef", "automate-cs-oc-bifrost", "ingest-service", "license-control-service":
 		return true
 	}
 	return false

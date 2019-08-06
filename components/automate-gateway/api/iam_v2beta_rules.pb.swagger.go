@@ -86,22 +86,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2beta/rules": {
-      "get": {
-        "summary": "TODO (tc): Right now we don't have plans to use this in the UI\nand it doesn't return the staged rules like all the other query APIs.\nShould probably delete it or update it to return staged rules.",
-        "operationId": "ListRules",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v2betaListRulesResp"
-            }
-          }
-        },
-        "tags": [
-          "Rules"
-        ]
-      },
+    "/iam/v2beta/projects/{project_id}/rules": {
       "post": {
         "operationId": "CreateRule",
         "responses": {
@@ -113,6 +98,12 @@ func init() {
           }
         },
         "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
           {
             "name": "body",
             "in": "body",
@@ -127,7 +118,7 @@ func init() {
         ]
       }
     },
-    "/iam/v2beta/rules/{id}": {
+    "/iam/v2beta/projects/{project_id}/rules/{id}": {
       "get": {
         "operationId": "GetRule",
         "responses": {
@@ -139,6 +130,12 @@ func init() {
           }
         },
         "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
           {
             "name": "id",
             "in": "path",
@@ -162,6 +159,12 @@ func init() {
         },
         "parameters": [
           {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
             "name": "id",
             "in": "path",
             "required": true,
@@ -183,6 +186,12 @@ func init() {
           }
         },
         "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
           {
             "name": "id",
             "in": "path",
@@ -255,13 +264,13 @@ func init() {
       "type": "string",
       "enum": [
         "CONDITION_ATTRIBUTE_UNSET",
-        "CHEF_SERVERS",
-        "CHEF_ORGS",
-        "CHEF_ENVIRONMENTS",
-        "ROLES",
-        "CHEF_TAGS",
-        "POLICY_GROUP",
-        "POLICY_NAME"
+        "CHEF_SERVER",
+        "CHEF_ORGANIZATION",
+        "ENVIRONMENT",
+        "CHEF_ROLE",
+        "CHEF_TAG",
+        "CHEF_POLICY_GROUP",
+        "CHEF_POLICY_NAME"
       ],
       "default": "CONDITION_ATTRIBUTE_UNSET"
     },
@@ -327,17 +336,6 @@ func init() {
         },
         "status": {
           "$ref": "#/definitions/v2betaProjectRulesStatus"
-        }
-      }
-    },
-    "v2betaListRulesResp": {
-      "type": "object",
-      "properties": {
-        "rules": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v2betaRule"
-          }
         }
       }
     },

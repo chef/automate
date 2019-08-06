@@ -1,14 +1,28 @@
+export type RuleStatus = 'applied' | 'staged';
+export type RuleType = 'node' | 'event';
+export type ConditionOperator = 'MEMBER_OF' | 'EQUALS';
+
+interface KVPair {
+  key: string;
+  value: string;
+}
+
+// Using array of pairs instead of a hashmap to allow ordering
+export type RuleTypeMappedObject = {
+  [K in 'node' | 'event']: KVPair[]
+};
+
 export interface Rule {
   id?: string;
   project_id?: string;
   name: string;
-  type: string;
-  edits: string;
+  type: RuleType;
+  status: RuleStatus;
   conditions: Condition[];
 }
 
 export interface Condition {
   attribute: string;
-  values: any;
-  operator: string;
+  operator: ConditionOperator;
+  values: string[];
 }

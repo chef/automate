@@ -29,10 +29,10 @@
     <div class="page-body">
       <chef-toolbar>
         <app-authorized [anyOf]="[['/iam/v2beta/tokens', 'post'], ['/auth/tokens', 'post']]">
-          <div *ngIf="(apiTokenCount$ | async) === 0" class="token-empty-state">
+          <div *ngIf="(apiTokenCount$ | async) === 0" class="empty-state">
             <p>Create the first token to get started!</p>
           </div>
-          <div [ngClass]="(apiTokenCount$ | async) === 0 ? 'token-empty-state' : ''">
+          <div [ngClass]="(apiTokenCount$ | async) === 0 ? 'empty-state' : ''">
             <chef-button id="create-button" primary (click)="openCreateModal()">Create Token</chef-button>
           </div>
         </app-authorized>
@@ -42,7 +42,8 @@
           <chef-thead>
             <chef-tr>
               <chef-th>Name</chef-th>
-              <chef-th>Created date</chef-th>
+              <chef-th *ngIf="(iamMajorVersion$ | async) !== 'v1'">ID</chef-th>
+              <chef-th>Created Date</chef-th>
               <chef-th>Status</chef-th>
               <chef-th class="controls"></chef-th>
             </chef-tr>
@@ -52,6 +53,7 @@
               <chef-td>
                 <a [routerLink]="['/settings/tokens', token.id]">{{ token.name }}</a>
               </chef-td>
+              <chef-td *ngIf="(iamMajorVersion$ | async) !== 'v1'">{{ token.id }}</chef-td>
               <chef-td>{{ token.created_at | datetime:'ddd, MMMM D, YYYY [at] H:mm a' }}</chef-td>
               <chef-td>
                 <ng-container *ngIf="token.active">Active</ng-container>

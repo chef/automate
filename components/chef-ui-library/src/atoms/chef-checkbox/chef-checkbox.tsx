@@ -1,11 +1,4 @@
-import {
-  Component,
-  Event,
-  EventEmitter,
-  Listen,
-  Prop,
-  State
-} from '@stencil/core';
+import { Component, Event, EventEmitter, Host, Listen, Prop, State, h } from '@stencil/core';
 
 let id = 0;
 
@@ -60,8 +53,14 @@ export class ChefCheckbox {
 
   @State() labelled = false;
 
+  labelEl: HTMLElement;
+
   componentWillLoad() {
     this.labelId = `label-${++id}`;
+  }
+
+  componentDidRender() {
+    this.labelled = this.labelEl.innerHTML.trim().length > 0;
   }
 
   toggle() {
@@ -70,26 +69,23 @@ export class ChefCheckbox {
     this.change.emit(this.checked);
   }
 
-  hostData() {
-    return {
-      'role': 'checkbox',
-      'tabindex': this.disabled ? '-1' : '0',
-      'aria-checked': this.checked ? 'true' : this.indeterminate ? 'mixed' : 'false',
-      'aria-disabled': this.disabled ? 'true' : null,
-      'aria-labelledby': this.labelled ? this.labelId : null
-    };
-  }
-
   render() {
     const checkIcon = this.checked ? 'check' : this.indeterminate ? 'remove' : 'close';
-    const labelRef = el => this.labelled = el && el.innerHTML.trim().length > 0;
-    return ([
-      <div class="check-wrap">
-        <chef-icon>{checkIcon}</chef-icon>
-      </div>,
-      <div class="label-wrap" id={this.labelId} ref={labelRef}>
-        <slot />
-      </div>
-    ]);
+    const labelRef = el => this.labelEl = el;
+    return (
+      <Host
+        role="checkbox"
+        tabindex={this.disabled ? '-1' : '0'}
+        aria-checked={this.checked ? 'true' : this.indeterminate ? 'mixed' : 'false'}
+        aria-disabled={this.disabled ? 'true' : null}
+        aria-labelledby={this.labelled ? this.labelId : null}>
+        <div class="check-wrap">
+          <chef-icon>{checkIcon}</chef-icon>
+        </div>
+        <div class="label-wrap" id={this.labelId} ref={labelRef}>
+          <slot />
+        </div>
+      </Host>
+    );
   }
 }

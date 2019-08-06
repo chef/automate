@@ -9,7 +9,6 @@ import { SidebarService } from './sidebar.service';
 import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
-import { GetNodes, GetNodeCount } from '../../entities/client-runs/client-runs.actions';
 
 @Injectable()
 export class SidebarEffects {
@@ -94,9 +93,7 @@ export class SidebarEffects {
         eventFeedActions.getInitialFeed(),
         eventFeedActions.getGuitarStrings(),
         eventFeedActions.getTypeCounts(),
-        eventFeedActions.getTaskCounts(),
-        new GetNodes(),
-        new GetNodeCount()
+        eventFeedActions.getTaskCounts()
       ]));
 
   @Effect()
@@ -107,8 +104,6 @@ export class SidebarEffects {
         eventFeedActions.getInitialFeed(),
         eventFeedActions.getGuitarStrings(),
         eventFeedActions.getTypeCounts(),
-        eventFeedActions.getTaskCounts(),
-        new GetNodes(),
-        new GetNodeCount()
+        eventFeedActions.getTaskCounts()
       ]));
 }

@@ -302,8 +302,7 @@ func (m *memstore) teamIncludesUser(teamID uuid.UUID, userID string) bool {
 }
 
 func (m *memstore) EnsureAdminsTeam(ctx context.Context) error {
-	if _, err := m.StoreTeam(ctx, storage.AdminsTeamName,
-		"Members of the admins team, by default, have access to all parts of the API."); err != nil {
+	if _, err := m.StoreTeam(ctx, storage.AdminsTeamName, "admins"); err != nil {
 		if err != storage.ErrConflict {
 			return err
 		}

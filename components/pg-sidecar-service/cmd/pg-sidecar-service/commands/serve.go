@@ -2,7 +2,6 @@ package commands
 
 import (
 	"context"
-	"os"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -29,7 +28,7 @@ var serveCmd = &cobra.Command{
 		*/
 
 		if err = server.StartGRPC(context.Background(), conf); err != nil {
-			os.Exit(1)
+			log.Fatal(err)
 		}
 	},
 }

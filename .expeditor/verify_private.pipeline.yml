@@ -71,9 +71,10 @@ steps:
   - label: "[unit] license-control-service"
     command:
       - scripts/install_golang.sh
+      - scripts/setup_buildkite_pg.sh lcs_test
       - echo "\$A2_LICENSE" > dev/license.jwt
       - cd components/license-control-service
-      - make setup review test
+      - make lint test
     timeout_in_minutes: 10
     retry:
       automatic:
@@ -768,4 +769,13 @@ steps:
       executor:
         linux:
           single-use: true
+          privileged: true
+
+  - label: "shellcheck hooks"
+    command:
+      - integration/run_test integration/tests/shellcheck_rendered_hooks.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
           privileged: true

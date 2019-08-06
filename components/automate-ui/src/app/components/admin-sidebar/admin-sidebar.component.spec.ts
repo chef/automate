@@ -9,6 +9,7 @@ import { using } from 'app/testing/spec-helpers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { SettingsLandingComponent } from 'app/pages/settings-landing/settings-landing.component';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
+import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
 import { checkFirstPerm } from 'app/testing/spec-helpers';
 import { AdminSidebarComponent } from './admin-sidebar.component';
 
@@ -62,8 +63,8 @@ describe('AdminSidebarComponent', () => {
 
   describe('IAM v2', () => {
     beforeEach(() => {
-      component.iamMajorVersion$ = observableOf('v2');
-      component.iamMinorVersion$ = observableOf('v1');
+      component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v2');
+      component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v1');
     });
 
     it('shows all links consistent with settings-landing', () => {
@@ -107,7 +108,7 @@ describe('AdminSidebarComponent', () => {
 
   describe('IAM v1', () => {
     beforeEach(() => {
-      component.iamMajorVersion$ = observableOf('v1');
+      component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v1');
     });
 
     it('shows 7 links', () => {

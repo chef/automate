@@ -4,10 +4,10 @@ import { set, pipe, unset } from 'lodash/fp';
 
 import { EntityStatus } from 'app/entities/entities';
 import { RuleActionTypes, RuleActions } from './rule.actions';
-import { Rule } from './rule.model';
+import { Rule, RuleTypeMappedObject } from './rule.model';
 
 export interface RuleEntityState extends EntityState<Rule> {
-  getAttributes: any;
+  getAttributes: RuleTypeMappedObject;
   getAllStatus: EntityStatus;
   getStatus: EntityStatus;
   createStatus: EntityStatus;
@@ -23,10 +23,11 @@ const CREATE_ERROR = 'createError';
 const DELETE_STATUS = 'deleteStatus';
 const UPDATE_STATUS = 'updateStatus';
 
-export const ruleAttributes = {
+// must correspond to enum type in automate-gateway/.../common/rules.proto
+export const ruleAttributes: RuleTypeMappedObject = {
   node: [
     {
-      key: 'CHEF_ORGS',
+      key: 'CHEF_ORGANIZATION',
       value: 'Chef Organization'
     },
     {
@@ -34,7 +35,7 @@ export const ruleAttributes = {
       value: 'Chef Server'
     },
     {
-      key: 'CHEF_ENV',
+      key: 'ENVIRONMENT',
       value: 'Environment'
     },
     {
@@ -56,7 +57,7 @@ export const ruleAttributes = {
   ],
   event: [
     {
-      key: 'CHEF_ORGS',
+      key: 'CHEF_ORGANIZATION',
       value: 'Chef Organization'
     },
     {

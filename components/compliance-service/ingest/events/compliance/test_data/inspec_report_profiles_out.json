@@ -20,7 +20,7 @@
           "line": 0
         },
         "refs": "[]",
-        "tags": "{}"
+        "tags": "{\"cci\":[\"CCI-000048\"],\"documentable\":false,\"firewall\":null,\"gtitle\":\"SRG-OS-000023-GPOS-00006\",\"hashhash\":{\"bad.one\":[6]},\"satisfies\":[\"SRG-OS-000023-GPOS-00006\",\"SRG-OS-000024-GPOS-00007\"],\"stig_id\":\"RHEL-07-010050\"}"
       },
       {
         "id": "ctrl-02",
@@ -33,7 +33,7 @@
           "line": 0
         },
         "refs": "[]",
-        "tags": "{}"
+        "tags": "{\"tag1\":\"value1\"}"
       },
       {
         "id": "ctrl-03",

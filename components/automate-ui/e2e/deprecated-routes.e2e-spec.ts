@@ -13,7 +13,6 @@ describe('Deprecated routes redirect to the correct new route for backwards comp
     ['/admin/tokens/my-object',                '/settings/tokens/my-object'],
     ['/admin/teams',                           '/settings/teams'],
     ['/admin/teams/my-object',                 '/settings/teams/my-object'],
-    ['/admin/add-team',                        '/settings/add-team'],
     ['/admin/users',                           '/settings/users'],
     ['/admin/users/my-object',                 '/settings/users/my-object'],
     ['/admin/policies',                        '/settings/policies'],

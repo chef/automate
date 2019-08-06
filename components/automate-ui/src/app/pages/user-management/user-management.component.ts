@@ -79,7 +79,10 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       username: ['', [Validators.required, Validators.pattern(USERNAME_PATTERN)]],
       // length validator must be consistent with
       // backend password rules in local-user-service/password/password.go
-      password: ['', [Validators.required, Validators.minLength(8)]],
+      password: ['', [
+        Validators.required,
+        Validators.pattern(Regex.patterns.NON_BLANK),
+        Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required, matchFieldValidator()]]
     });
   }
@@ -121,7 +124,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     const formValues = this.createUserForm.value;
 
     const userCreateReq = <CreateUserPayload>{
-      name: formValues.fullname,
+      name: formValues.fullname.trim(),
       id: formValues.username,
       password: formValues.password
     };

@@ -18,7 +18,7 @@ import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { NotificationFormComponent } from './pages/notification-form/notification-form.component';
 import { SigninComponent } from './pages/signin/signin.component';
-import { TeamCreateComponent } from './pages/team-create/team-create.component';
+import { TeamAddUsersComponent } from './pages/team-add-users/team-add-users.component';
 import { TeamDetailsComponent } from './pages/team-details/team-details.component';
 import { TeamManagementComponent } from './pages/team-management/team-management.component';
 import { UserDetailsComponent } from './pages/user-details/user-details.component';
@@ -90,8 +90,9 @@ const routes: Routes = [
           component: TeamDetailsComponent
         },
         {
-          path: 'add-team',
-          component: TeamCreateComponent
+          path: 'teams/:id/add-users',
+          component: TeamAddUsersComponent,
+          data: { hideNavBar: true }
         },
         {
           path: 'users',
@@ -194,7 +195,7 @@ const routes: Routes = [
       loadChildren: 'app/pages/+compliance/compliance.module#ComplianceModule'
     },
     {
-      path: 'client-runs',
+      path: 'infrastructure/client-runs',
       children: [
         {
           path: '',
@@ -311,7 +312,7 @@ const routes: Routes = [
   // END Deprecated routes.
   { // everything unknown goes to client runs
     path: '**',
-    redirectTo: 'client-runs'
+    redirectTo: 'infrastructure/client-runs'
   }
 ];
 

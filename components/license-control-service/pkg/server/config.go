@@ -7,9 +7,11 @@ import (
 	"path"
 	"strconv"
 
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
+	"github.com/chef/automate/lib/platform"
 	"github.com/chef/automate/lib/tls/certs"
 )
 
@@ -18,6 +20,9 @@ type Config struct {
 	Host             string          `mapstructure:"host" toml:"host"`
 	Port             int             `mapstructure:"port" toml:"port"`
 	LicenseTokenPath string          `mapstructure:"license_token_path" toml:"license_token_path"`
+	MigrationsPath   string          `mapstructure:"migrations_path" toml:"migrations_path"`
+	PGURL            string          `mapstructure:"pg_url" toml:"pg_url"`
+	Database         string          `mapstructure:"database" toml:"database"`
 	TLSConfig        certs.TLSConfig `toml:"tls"`
 	OptOutPath       string          `mapstructure:"opt_out_path" toml:"opt_out_path"`
 	URL              string          `mapstructure:"url" toml:"url"`
@@ -68,6 +73,13 @@ func ConfigFromViper() (*Config, error) {
 		return config, err
 	}
 	config.ServiceCerts = serviceCerts
+
+	if config.PGURL == "" {
+		config.PGURL, err = platform.PGURIFromEnvironment(config.Database)
+		if err != nil {
+			return config, errors.Wrap(err, "failed to get pg url")
+		}
+	}
 
 	log.WithFields(log.Fields{
 		"telemetry opt out path": config.OptOutPath,

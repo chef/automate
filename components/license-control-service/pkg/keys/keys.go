@@ -1,13 +1,16 @@
 package keys
 
 // Generate key bindata
-//go:generate curl --fail --silent --output data/keys.json http://license-acceptance.chef.co/keys
-//go:generate go-bindata -pkg $GOPACKAGE -o keys.bindata.go data/...
+//go:generate go run ../../tools/gen-keys https://license-generation-service.chef.co/keys keys.bindata.go
 
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
+	"time"
+
+	"github.com/pkg/errors"
+
+	lic "github.com/chef/automate/lib/license"
 )
 
 // PublicKeysData is our license public keys helper
@@ -15,29 +18,48 @@ type PublicKeysData struct {
 	Keys []string `json:"keys"`
 }
 
-// LoadPublicKeys loads our keys and returns map with checksums
-func LoadPublicKeys(pubKeysData []byte) (map[string][]byte, error) {
-	pub := PublicKeysData{}
+type LoadedKeyData map[string][]byte
 
-	err := json.Unmarshal(pubKeysData, &pub)
+type LicenseParser struct {
+	keyData LoadedKeyData
+}
+
+type LicenseMetadata struct {
+	ConfiguredAt time.Time
+}
+
+func NewLicenseParser(pub PublicKeysData) *LicenseParser {
+	return &LicenseParser{
+		keyData: LoadPublicKeys(pub),
+	}
+}
+
+func (l *LicenseParser) Parse(licenseData string) (*lic.License, error) {
+	publicKeySha256, err := lic.GetKeySha256(licenseData)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "GetKeySha256")
 	}
 
-	keysWithChecksums := make(map[string][]byte)
+	license, err := lic.Read(licenseData, l.keyData[publicKeySha256])
+	if err != nil {
+		return nil, errors.Wrap(err, "Read")
+	}
+
+	return license, nil
+}
+
+// LoadPublicKeys loads our keys and returns map with checksums
+func LoadPublicKeys(pub PublicKeysData) LoadedKeyData {
+	keysWithChecksums := make(map[string][]byte, len(pub.Keys))
 	for _, v := range pub.Keys {
 		key := []byte(v)
 		checksum := makeChecksum(key)
-
 		keysWithChecksums[checksum] = key
 	}
-
-	return keysWithChecksums, nil
+	return keysWithChecksums
 }
 
 func makeChecksum(key []byte) string {
 	keySha256 := sha256.Sum256(key)
-	keyString := hex.EncodeToString(keySha256[:])
-
-	return keyString
+	return hex.EncodeToString(keySha256[:])
 }

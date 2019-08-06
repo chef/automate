@@ -1,17 +1,14 @@
 #!{{pkgPathFor "core/bash"}}/bin/bash
 
 # query /health handler
-output=$(curl --fail --cacert {{pkg.svc_config_path}}/root_ca.crt \
+# potential curl exit codes are various, see https://ec.haxx.se/usingcurl-returns.html
+# we translate everything != 0 to exit code 2 ("critical")
+if ! output=$(curl --fail --cacert {{pkg.svc_config_path}}/root_ca.crt \
   --resolve session-service:{{cfg.service.port}}:{{sys.ip}} \
   --noproxy session-service \
   --max-time 2 \
-  https://session-service:{{cfg.service.port}}/health 2>&1)
-res=$?
-
-# potential curl exit codes are various, see https://ec.haxx.se/usingcurl-returns.html
-# we translate everything != 0 to exit code 2 ("critical")
-if test "$res" != "0"; then
-   echo "health check curl command returned exit code ${res}:"
-   echo $output
+  https://session-service:{{cfg.service.port}}/health 2>&1); then
+  echo "health check curl command returned exit code $?:"
+   echo "$output"
    exit 2
 fi

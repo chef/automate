@@ -84,7 +84,7 @@ describe('chef-radio', () => {
   describe('selection', () => {
     let html, page;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       html = `
         <chef-radio>
           <chef-option value='opt1'>Option 1</chef-option>

@@ -1,10 +1,12 @@
 package relaxting
 
 import (
+	"sort"
+	"strings"
 	"testing"
 
-	"sort"
-
+	"github.com/golang/protobuf/jsonpb"
+	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -65,4 +67,41 @@ func TestRemove(t *testing.T) {
 
 	Remove(&arr, 0)
 	assert.Equal(t, []string{"item3"}, arr)
+}
+
+func TestStringTagsFromProtoFields(t *testing.T) {
+	var controlTags structpb.Struct
+
+	// Testing the tags not supported by the ESInSpecReportControlStringTags struct
+	jsonTags := "{\"tag0\":{\"secondkey\":\"value0\"},\"tag1\": 5, \"tag2\": [{\"a\":\"b\"}]}"
+	err := (&jsonpb.Unmarshaler{}).Unmarshal(strings.NewReader(jsonTags), &controlTags)
+	if err == nil {
+		for tKey, tValue := range controlTags.Fields {
+			assert.Equal(t, (*ESInSpecReportControlStringTags)(nil), StringTagsFromProtoFields(tKey, tValue))
+		}
+	}
+
+	jsonTags = "{\"tag3\": null}"
+	err = (&jsonpb.Unmarshaler{}).Unmarshal(strings.NewReader(jsonTags), &controlTags)
+	if err == nil {
+		for tKey, tValue := range controlTags.Fields {
+			assert.Equal(t, &ESInSpecReportControlStringTags{"tag3", []string{}}, StringTagsFromProtoFields(tKey, tValue))
+		}
+	}
+
+	jsonTags = "{\"tag4\":\"value4\"}"
+	err = (&jsonpb.Unmarshaler{}).Unmarshal(strings.NewReader(jsonTags), &controlTags)
+	if err == nil {
+		for tKey, tValue := range controlTags.Fields {
+			assert.Equal(t, &ESInSpecReportControlStringTags{"tag4", []string{"value4"}}, StringTagsFromProtoFields(tKey, tValue))
+		}
+	}
+
+	jsonTags = "{\"tag5\": [\"a\", \"b\"]}"
+	err = (&jsonpb.Unmarshaler{}).Unmarshal(strings.NewReader(jsonTags), &controlTags)
+	if err == nil {
+		for tKey, tValue := range controlTags.Fields {
+			assert.Equal(t, &ESInSpecReportControlStringTags{"tag5", []string{"a", "b"}}, StringTagsFromProtoFields(tKey, tValue))
+		}
+	}
 }

@@ -8,6 +8,7 @@ import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
+import { HttpStatus } from 'app/types/types';
 import { loading, EntityStatus } from 'app/entities/entities';
 import { Type } from 'app/entities/notifications/notification.model';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
@@ -20,6 +21,8 @@ import {
 } from 'app/entities/api-tokens/api-token.actions';
 import { CreateToken } from 'app/entities/api-tokens/api-token.actions';
 import { saveStatus, saveError } from 'app/entities/api-tokens/api-token.selectors';
+import { iamMajorVersion } from 'app/entities/policies/policy.selectors';
+import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 
 @Component({
   selector: 'app-api-tokens',
@@ -30,6 +33,7 @@ export class ApiTokenListComponent implements OnInit {
   public loading$: Observable<boolean>;
   public sortedApiTokens$: Observable<ApiToken[]>;
   public apiTokenCount$: Observable<number>;
+  public iamMajorVersion$: Observable<IAMMajorVersion>;
   public deleteModalVisible = false;
   public tokenToDelete: ApiToken;
   public createModalVisible = false;
@@ -63,6 +67,7 @@ export class ApiTokenListComponent implements OnInit {
       id: ['',
         [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]]
     });
+    this.iamMajorVersion$ = store.pipe(select(iamMajorVersion));
   }
 
   ngOnInit() {
@@ -114,7 +119,7 @@ export class ApiTokenListComponent implements OnInit {
               .subscribe((error) => {
                 pendingCreateError.next(true);
                 pendingCreateError.complete();
-                if (error.status === 409) {
+                if (error.status === HttpStatus.CONFLICT) {
                   this.conflictErrorEvent.emit(true);
                 // Close the modal on any error other than conflict and display in banner.
                 } else {

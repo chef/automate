@@ -60,6 +60,11 @@ func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	offlineMode := upgradeRunCmdFlags.airgap != ""
+
+	if airgap.AirgapInUse() && !offlineMode {
+		return status.New(status.InvalidCommandArgsError, "To upgrade a deployment created with an airgap bundle, use --airgap-bundle to specify a bundle to use for the upgrade.")
+	}
+
 	if upgradeRunCmdFlags.version != "" && offlineMode {
 		return status.New(status.InvalidCommandArgsError, "--version and --airgap-bundle cannot be used together")
 	}
