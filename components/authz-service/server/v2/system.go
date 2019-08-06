@@ -60,6 +60,12 @@ func SystemPolicies() []*storage.Policy {
 				Resources: []string{"iam:policyVersion"},
 				Projects:  []string{constants.AllProjectsID},
 			},
+			{
+				Effect:    storage.Allow,
+				Actions:   []string{"iam:rules:status"},
+				Resources: []string{"iam:rules"},
+				Projects:  []string{constants.AllProjectsID},
+			},
 		},
 	}
 
