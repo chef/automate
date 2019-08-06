@@ -27,7 +27,7 @@
               ID is required.
             </chef-error>
             <chef-error *ngIf="createForm?.controls['id'].hasError('pattern')">
-              Only lowercase letters, numbers, hyphens (-), and underscores (_) are allowed.
+              Only lowercase letters, numbers, hyphens, and underscores are allowed.
             </chef-error>
             <chef-error *ngIf="conflictError">
               IDs must be unique--{{objectNoun}} with ID "{{createForm?.controls['id'].value}}" already exists.
