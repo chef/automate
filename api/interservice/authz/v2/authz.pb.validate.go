@@ -262,7 +262,7 @@ func (m *ProjectsAuthorizedReq) Validate() error {
 		if !_ProjectsAuthorizedReq_ProjectsFilter_Pattern.MatchString(item) {
 			return ProjectsAuthorizedReqValidationError{
 				field:  fmt.Sprintf("ProjectsFilter[%v]", idx),
-				reason: "value does not match regex pattern \"^[a-z0-9()-]{1,64}$\"",
+				reason: "value does not match regex pattern \"^[a-z0-9()-_]{1,64}$\"",
 			}
 		}
 
@@ -333,7 +333,7 @@ var _ProjectsAuthorizedReq_Resource_Pattern = regexp.MustCompile("^[a-z][^:*]*(?
 
 var _ProjectsAuthorizedReq_Action_Pattern = regexp.MustCompile("^[a-z][a-zA-Z]*(?::[a-z][a-zA-Z]*){2}$")
 
-var _ProjectsAuthorizedReq_ProjectsFilter_Pattern = regexp.MustCompile("^[a-z0-9()-]{1,64}$")
+var _ProjectsAuthorizedReq_ProjectsFilter_Pattern = regexp.MustCompile("^[a-z0-9()-_]{1,64}$")
 
 // Validate checks the field values on ProjectsAuthorizedResp with the rules
 // defined in the proto definition for this message. If any rules are
@@ -360,7 +360,7 @@ func (m *ProjectsAuthorizedResp) Validate() error {
 		if !_ProjectsAuthorizedResp_Projects_Pattern.MatchString(item) {
 			return ProjectsAuthorizedRespValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
-				reason: "value does not match regex pattern \"^[a-z0-9-]{1,64}$\"",
+				reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
 			}
 		}
 
@@ -425,7 +425,7 @@ var _ interface {
 	ErrorName() string
 } = ProjectsAuthorizedRespValidationError{}
 
-var _ProjectsAuthorizedResp_Projects_Pattern = regexp.MustCompile("^[a-z0-9-]{1,64}$")
+var _ProjectsAuthorizedResp_Projects_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on FilterAuthorizedPairsReq with the rules
 // defined in the proto definition for this message. If any rules are
