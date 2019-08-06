@@ -91,13 +91,14 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
 
       // select all local users, the users for this team, and the query status for both.
       // when both queries are finished we'll find all users that are not yet a member of the team.
-      combineLatest(
+      combineLatest([
         this.store.select(allUsers),
         this.store.select(userStatus),
         this.store.select(teamUsers),
-        this.store.select(getTeamUsersStatus))
+        this.store.select(getTeamUsersStatus)])
         .pipe(
-          map(([users, uStatus, tUsers, tStatus]) => {
+          map(([users, uStatus, tUsers, tStatus]:
+              [User[], EntityStatus, string[], EntityStatus]) => {
             if (uStatus !== EntityStatus.loadingSuccess ||
               tStatus !== EntityStatus.loadingSuccess) {
               this.loading = true;

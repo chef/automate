@@ -288,7 +288,7 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
     this.totalNumberOfNodesWithStatusFilter$ = combineLatest([
       this.selectedStatus$, this.nodeCounts$])
       .pipe(
-        map(([status, nodeCount]) => {
+        map(([status, nodeCount]: [string, NodeCount]) => {
           switch (status) {
             case 'success':
               return nodeCount.success;
@@ -339,7 +339,9 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
       this.numberOfSearchBarFilters$.pipe(distinctUntilChanged())
     ])
     .pipe(takeUntil(this.isDestroyed))
-    .subscribe(([nodeCounts, filterCount]) => {
+    .subscribe((values: any[]) => {
+      const nodeCounts: NodeCount = values[0];
+      const filterCount: number = values[1];
       if ( filterCount === 0 && nodeCounts.total > 0 ) {
         this.telemetryService.track('clientRunPureCount', nodeCounts);
       }

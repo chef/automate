@@ -78,7 +78,8 @@ export class NodesEditComponent implements OnInit {
           this.fetchSecrets(),
           this.backendValue
         ]).pipe(
-          map(([secrets, backend]) => secrets.filter(s => s.type === backend || s.type === 'sudo'))
+          map(([secrets, backend]: [any[], string]) =>
+            secrets.filter(s => s.type === backend || s.type === 'sudo'))
         );
       });
   }

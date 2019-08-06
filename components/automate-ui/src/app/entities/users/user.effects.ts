@@ -6,9 +6,10 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of, combineLatest } from 'rxjs';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { CreateNotification } from '../notifications/notification.actions';
+import { CreateNotification } from 'app/entities/notifications/notification.actions';
+import { Type } from 'app/entities/notifications/notification.model';
 import { iamMajorVersion } from 'app/entities/policies/policy.selectors';
-import { Type } from '../notifications/notification.model';
+import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import {
   CreateUser,
   CreateUserSuccess,
@@ -48,7 +49,7 @@ export class UserEffects {
     this.actions$.pipe(ofType<GetUsers>(UserActionTypes.GET_ALL)),
     this.store$.select(iamMajorVersion)])
     .pipe(
-      mergeMap(([_action, version]) =>
+      mergeMap(([_action, version]: [GetUsers, IAMMajorVersion]) =>
         this.requests.getUsers(version).pipe(
           map((resp: GetUsersSuccessPayload) => new GetUsersSuccess(resp)),
           catchError((error: HttpErrorResponse) => of(new GetUsersFailure(error))))));
@@ -70,7 +71,7 @@ export class UserEffects {
     this.actions$.pipe(ofType<GetUser>(UserActionTypes.GET)),
     this.store$.select(iamMajorVersion)])
     .pipe(
-      mergeMap(([action, version]) =>
+      mergeMap(([action, version]: [GetUser, IAMMajorVersion]) =>
         this.requests.getUser(action.payload.id, version).pipe(
           map((resp: User) => new GetUserSuccess(resp)),
           catchError((error: HttpErrorResponse) => of(new GetUserFailure(error))))));
@@ -91,7 +92,7 @@ export class UserEffects {
     this.actions$.pipe(ofType<UpdateUser>(UserActionTypes.UPDATE)),
     this.store$.select(iamMajorVersion)])
     .pipe(
-      mergeMap(([action, version]) =>
+      mergeMap(([action, version]: [UpdateUser, IAMMajorVersion]) =>
       this.requests.updateUser(action.payload, version).pipe(
         map((resp: User) => new UpdateUserSuccess(resp)),
         catchError((error: HttpErrorResponse) => of(new UpdateUserFailure(error))))));
@@ -120,7 +121,7 @@ export class UserEffects {
     this.actions$.pipe(ofType<UpdateSelf>(UserActionTypes.UPDATE_SELF)),
     this.store$.select(iamMajorVersion)])
     .pipe(
-      mergeMap(([action, version]) =>
+      mergeMap(([action, version]: [UpdateSelf, IAMMajorVersion]) =>
       this.requests.updateSelf(action.payload, version).pipe(
         map((resp: SelfUser) => new UpdateSelfSuccess(resp)),
         catchError((error: HttpErrorResponse) => of(new UpdateUserFailure(error))))));
@@ -138,7 +139,7 @@ export class UserEffects {
     this.actions$.pipe(ofType<DeleteUser>(UserActionTypes.DELETE)),
     this.store$.select(iamMajorVersion)])
     .pipe(
-      mergeMap(([action, version]) =>
+      mergeMap(([action, version]: [DeleteUser, IAMMajorVersion]) =>
       this.requests.deleteUser(action.payload, version).pipe(
         map((user: User) => new DeleteUserSuccess(user)),
         catchError((error: HttpErrorResponse) => of(new DeleteUserFailure(error))))));
@@ -167,7 +168,7 @@ export class UserEffects {
     this.actions$.pipe(ofType<CreateUser>(UserActionTypes.CREATE)),
     this.store$.select(iamMajorVersion)])
     .pipe(
-      mergeMap(([action, version]) =>
+      mergeMap(([action, version]: [CreateUser, IAMMajorVersion]) =>
       this.requests.createUser(action.payload, version).pipe(
         map((resp: User) => new CreateUserSuccess(resp)),
         catchError((error) => of(new CreateUserFailure(error))))));

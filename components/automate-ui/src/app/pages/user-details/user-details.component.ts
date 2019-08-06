@@ -58,7 +58,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       store.select(allUsers),
       store.select(userStatus)])
       .pipe(
-        map(([state, status]) => {
+        map(([state, status]: [User[], EntityStatus]) => {
           const id = this.user.id;
           return status === EntityStatus.loadingSuccess && !find({ id }, state);
         }));
