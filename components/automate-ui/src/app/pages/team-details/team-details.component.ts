@@ -13,7 +13,7 @@ import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
 import { allUsers, userStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
-import { iamMajorVersion } from 'app/entities/policies/policy.selectors';
+import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
 import {
   v1TeamFromRoute,
   v2TeamFromRoute,
@@ -30,6 +30,7 @@ import {
   RemoveTeamUsers,
   UpdateTeam
 } from 'app/entities/teams/team.actions';
+import { ProjectConstants } from 'app/entities/projects/project.model';
 
 const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 
@@ -51,13 +52,16 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public teamMembershipView = false;
 
   public team: Team;
-  public isV1 = true;
+  public isMajorV1 = true;
+  public isMinorV1 = false;
 
   public sortedUsers$: Observable<User[]>;
   private isDestroyed = new Subject<boolean>();
 
   public addButtonText = 'Add Users';
   public removeText = 'Remove User';
+
+  public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
   constructor(private store: Store<NgrxStateAtom>,
     public fb: FormBuilder,
@@ -88,11 +92,11 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   }
 
   private get teamId(): string {
-    return this.isV1 ? this.team.guid : this.team.id;
+    return this.isMajorV1 ? this.team.guid : this.team.id;
   }
 
   public get descriptionOrName(): string {
-    return this.isV1 ? 'description' : 'name';
+    return this.isMajorV1 ? 'description' : 'name';
   }
 
   ngOnInit(): void {
@@ -107,10 +111,10 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.isDestroyed))
       .subscribe((version) => {
         if (version === null) { return; }
-        this.isV1 = version === 'v1';
+        this.isMajorV1 = version === 'v1';
 
         // Triggered every time the team is updated.
-        if (this.isV1) {
+        if (this.isMajorV1) {
           this.store.select(v1TeamFromRoute)
             .pipe(filter(identity), takeUntil(this.isDestroyed))
             .subscribe(this.getUsersForTeam.bind(this));
@@ -119,6 +123,13 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
             .pipe(filter(identity), takeUntil(this.isDestroyed))
             .subscribe(this.getUsersForTeam.bind(this));
         }
+      });
+
+    this.store.select(iamMinorVersion)
+      .pipe(takeUntil(this.isDestroyed))
+      .subscribe((version) => {
+        if (version === null) { return; }
+        this.isMinorV1 = version === 'v1';
       });
 
     this.sortedUsers$ = <Observable<User[]>>combineLatest(

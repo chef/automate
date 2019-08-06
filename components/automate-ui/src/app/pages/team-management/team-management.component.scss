@@ -2,11 +2,15 @@
 
 chef-table {
   .id-column {
-    flex-basis: 30%;
+    flex-basis: 33%;
   }
 
   .name-column {
-    flex-basis: 70%;
+    flex-basis: 33%;
+  }
+
+  .projects-column {
+    flex-basis: 33%;
   }
 
   .button-column {

@@ -21,7 +21,7 @@ import { Regex } from 'app/helpers/auth/regex';
 import { HttpStatus } from 'app/types/types';
 import { projectsAssignable } from 'app/services/projects-filter/projects-filter.selectors';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
-import { Project } from 'app/entities/projects/project.model';
+import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 
 @Component({
   selector: 'app-team-management',
@@ -44,6 +44,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   public isMajorV1 = true;
   public isMinorV1 = false;
   public dropdownProjects: Project[] = [];
+  public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
   private isDestroyed = new Subject<boolean>();
 
@@ -103,22 +104,6 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
           this.isMinorV1 = minorVersion === 'v1';
         });
 
-    // NOTE FOR REVIEW (delete before merge): I've selected the project assignable options here
-    // but it could have just as easily been done in app-create-object-modal
-    // if showProjectsDropdown===true.
-    //
-    // Pros of doing it here:
-    //
-    // we want to keep components like app-create-object-modal very simple.
-    // in general we don't want those kinds of components to know about the store etc.
-    //
-    // Cons of doing it here:
-    //
-    // this bit of boilerplate will be in every list component at some point.
-    // even if we push some of this into the selector, we'll still have to select it
-    // and pass it to app-create-object-modal. not a big deal, just a bit of a downside.
-    //
-    // please comment and lmk what the better practice is!
     this.store.select(projectsAssignable)
       .subscribe((assignable: ProjectsFilterOption[]) => {
         this.dropdownProjects = assignable.map(p => {

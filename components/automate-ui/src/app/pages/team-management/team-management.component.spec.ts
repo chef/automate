@@ -42,7 +42,8 @@ describe('TeamManagementComponent', () => {
         }),
         MockComponent({
           selector: 'app-create-object-modal',
-          inputs: ['visible', 'creating', 'conflictErrorEvent', 'objectNoun', 'createForm'],
+          inputs: ['visible', 'creating', 'conflictErrorEvent', 'objectNoun',
+            'createForm', 'showProjectsDropdown', 'projectsAssignable'],
           outputs: ['close', 'createClicked']
         }),
         MockComponent({ selector: 'chef-button',
@@ -180,7 +181,7 @@ describe('TeamManagementComponent', () => {
 
     beforeEach(() => {
       store = TestBed.get(Store);
-      component.isV1 = false;
+      component.isMajorV1 = false;
       fixture.detectChanges();
     });
 
@@ -196,7 +197,7 @@ describe('TeamManagementComponent', () => {
       component.openCreateModal();
       component.createTeamForm.controls['name'].setValue(team.name);
       component.createTeamForm.controls['id'].setValue(team.id);
-      component.createV2Team();
+      component.createV2Team([]);
 
       store.dispatch(new CreateTeamSuccess(team));
 

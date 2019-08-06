@@ -6,7 +6,7 @@
           <chef-form-field>
             <label>
               <span class="label">Name <span aria-hidden="true">*</span></span>
-              <input chefInput formControlName="name" type="text" (keyup)="handleNameInput($event)" id="name-input">
+              <input chefInput formControlName="name" type="text" (keyup)="handleNameInput($event)" id="name-input" data-cy="create-name">
             </label>
             <chef-error *ngIf="(createForm.get('name').hasError('required') || createForm.get('name').hasError('pattern')) && createForm.get('name').dirty">
               Name is required.
@@ -18,7 +18,7 @@
           <chef-form-field>
             <label>
               <span class="label">ID <span aria-hidden="true">*</span></span>
-              <input chefInput formControlName="id" type="text" (keyup)="handleIDInput($event)" id="id-input">
+              <input chefInput formControlName="id" type="text" (keyup)="handleIDInput($event)" id="id-input" data-cy="create-id">
             </label>
             <chef-error *ngIf="createForm?.controls['id'].hasError('maxlength')">
               ID must be 64 characters or less.
@@ -38,10 +38,10 @@
         <div *ngIf="!modifyID" class="margin">
           <div id="id-fields">
             <span class="key-label">ID:&nbsp;</span>
-            <span>{{ this.createForm?.value.id }}</span>
+            <span data-cy="id-label">{{ this.createForm?.value.id }}</span>
           </div>
           <chef-toolbar>
-            <chef-button tertiary (click)="modifyID = true" id="edit-button-object-modal">Edit ID</chef-button>
+            <chef-button tertiary (click)="modifyID = true" id="edit-button-object-modal" data-cy="edit-button">Edit ID</chef-button>
           </chef-toolbar>
         </div>
         <div *ngIf="showProjectsDropdown">
@@ -52,7 +52,7 @@
           </app-projects-dropdown>
         </div>
         <div id="button-bar">
-          <chef-button primary id="create-button-object-modal"
+          <chef-button primary id="create-button-object-modal" data-cy="save-button"
             [disabled]="!createForm?.valid || creating || conflictError" (click)="createObject()">
             <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
             <span *ngIf="!creating">Create {{ objectNoun | titlecase }}</span>

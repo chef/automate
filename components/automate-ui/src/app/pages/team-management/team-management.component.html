@@ -56,6 +56,9 @@
                     <span *ngIf="isMajorV1">Description</span>
                     <span *ngIf="!isMajorV1">ID</span>
                   </chef-th>
+                  <chef-th *ngIf="!isMajorV1 && isMinorV1" class="projects-column">
+                    <span>Projects</span>
+                  </chef-th>
                   <chef-th class="button-column"></chef-th>
                 </chef-tr>
               </chef-thead>
@@ -69,6 +72,11 @@
                   <chef-td class="name-column">
                     <span *ngIf="isMajorV1">{{ team.name }}</span>
                     <span *ngIf="!isMajorV1">{{ team.id }}</span>
+                  </chef-td>
+                  <chef-td *ngIf="!isMajorV1 && isMinorV1" class="projects-column">
+                    <span *ngIf="team.projects.length === 0">{{ unassigned }}</span>
+                    <span *ngIf="team.projects.length === 1">{{ team.projects[0] }}</span>
+                    <span *ngIf="team.projects.length > 1">{{ team.projects.length }} projects</span>
                   </chef-td>
                   <chef-td class="button-column">
                     <!-- <app-authorized [allOf]="[`/auth/teams/${team.id}`, 'delete']"> -->
