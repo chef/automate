@@ -68,7 +68,9 @@ export class AuthorizedChecker {
   }
 
   private permsPopulated(perms: IndexedEntities<UserPermEntity>): boolean {
-    return every(check => has(check.endpoint, perms), concat(this.allOf, this.anyOf));
+    return every(
+      (check: CheckObj) => has(check.endpoint, perms),
+      concat(this.allOf, this.anyOf));
   }
 
   private toUserPermsPayload(allOf: CheckObj[], anyOf: CheckObj[]): UserPermsPayload {

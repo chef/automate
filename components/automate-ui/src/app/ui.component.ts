@@ -63,6 +63,7 @@ export class UIComponent implements OnInit {
         filter(event => event instanceof ActivationStart)
     ).subscribe((event: any) => this.renderNavbar = !event.snapshot.data.hideNavBar);
 
+    // Initial calls for polled events
     this.store.dispatch(new GetIamVersion());
   }
 
