@@ -1,9 +1,9 @@
 package elastic
 
 import (
-	"encoding/json"
-
 	"context"
+	"encoding/json"
+	"time"
 
 	"github.com/olivere/elastic"
 	log "github.com/sirupsen/logrus"
@@ -121,26 +121,32 @@ func (es *Backend) ReindexInsightstoActions(ctx context.Context,
 		Type("bag", "environment", "policy_group", "cookbook_artifact", "client",
 			"cookbook", "role", "node", "group", "organization", "user")
 
-	bulkIndexByScrollResponse, err := es.client.Reindex().
+	startTaskResult, err := es.client.Reindex().
 		WaitForCompletion(true).
 		Source(reindexSource).
 		DestinationIndexAndType(actionsIndexName, "actions").
 		Script(esScript).
-		Do(ctx)
+		DoAsync(ctx)
 
-	if bulkIndexByScrollResponse != nil {
-		log.WithFields(log.Fields{
-			"Updated":          bulkIndexByScrollResponse.Updated,
-			"Created":          bulkIndexByScrollResponse.Created,
-			"Canceled":         bulkIndexByScrollResponse.Canceled,
-			"Failures":         bulkIndexByScrollResponse.Failures,
-			"VersionConflicts": bulkIndexByScrollResponse.VersionConflicts,
-			"error":            err,
-			"Total":            bulkIndexByScrollResponse.Total}).
-			Info("ReindexInsightstoActions")
+	if err != nil {
+		return err
 	}
 
-	return err
+	// Wait for Reindex task to complete
+	for {
+		time.Sleep(time.Millisecond * 500)
+
+		status, err := es.JobStatus(ctx, startTaskResult.TaskId)
+		if err != nil {
+			return err
+		}
+
+		if status.Completed {
+			break
+		}
+	}
+
+	return nil
 }
 
 // ReindexInsightstoConvergeHistory - reindex the A1 insights indexes to the converge-history indexes
@@ -172,24 +178,30 @@ func (es *Backend) ReindexInsightstoConvergeHistory(ctx context.Context, insight
 		Type("converge").
 		Query(boolQuery)
 
-	bulkIndexByScrollResponse, err := es.client.Reindex().
+	startTaskResult, err := es.client.Reindex().
 		WaitForCompletion(true).
 		Source(reindexSource).
 		DestinationIndexAndType(convergeHistoryIndexName, "converge").
 		Script(esScript).
 		Size(50). // Reindex batches of 50 documents (AIA-562)
-		Do(ctx)
+		DoAsync(ctx)
 
-	if bulkIndexByScrollResponse != nil {
-		log.WithFields(log.Fields{
-			"Updated":          bulkIndexByScrollResponse.Updated,
-			"Created":          bulkIndexByScrollResponse.Created,
-			"Canceled":         bulkIndexByScrollResponse.Canceled,
-			"Failures":         bulkIndexByScrollResponse.Failures,
-			"VersionConflicts": bulkIndexByScrollResponse.VersionConflicts,
-			"error":            err,
-			"Total":            bulkIndexByScrollResponse.Total}).
-			Info("ReindexInsightstoConvergeHistory")
+	if err != nil {
+		return err
+	}
+
+	// Wait for Reindex task to complete
+	for {
+		time.Sleep(time.Millisecond * 500)
+
+		status, err := es.JobStatus(ctx, startTaskResult.TaskId)
+		if err != nil {
+			return err
+		}
+
+		if status.Completed {
+			break
+		}
 	}
 
 	return err
@@ -226,23 +238,29 @@ func (es *Backend) ReindexNodeStateA1(ctx context.Context, a1NodeStateIndexName 
 		}
 	`
 	esScript := elastic.NewScript(script).Lang("painless")
-	bulkIndexByScrollResponse, err := es.client.Reindex().
+	startTaskResult, err := es.client.Reindex().
 		WaitForCompletion(true).
 		SourceIndex(a1NodeStateIndexName).
 		DestinationIndex(mappings.NodeState.Index).
 		Script(esScript).
-		Do(ctx)
+		DoAsync(ctx)
 
-	if bulkIndexByScrollResponse != nil {
-		log.WithFields(log.Fields{
-			"Updated":          bulkIndexByScrollResponse.Updated,
-			"Created":          bulkIndexByScrollResponse.Created,
-			"Canceled":         bulkIndexByScrollResponse.Canceled,
-			"Failures":         bulkIndexByScrollResponse.Failures,
-			"VersionConflicts": bulkIndexByScrollResponse.VersionConflicts,
-			"error":            err,
-			"Total":            bulkIndexByScrollResponse.Total}).
-			Info("ReindexNodeStateA1toA2")
+	if err != nil {
+		return err
+	}
+
+	// Wait for Reindex task to complete
+	for {
+		time.Sleep(time.Millisecond * 500)
+
+		status, err := es.JobStatus(ctx, startTaskResult.TaskId)
+		if err != nil {
+			return err
+		}
+
+		if status.Completed {
+			break
+		}
 	}
 
 	es.RefreshIndex(ctx, mappings.NodeState.Index)
