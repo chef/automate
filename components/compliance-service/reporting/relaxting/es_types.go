@@ -96,12 +96,18 @@ type ESInSpecReportControlsResult struct {
 	SkipMessage string  `json:"skip_message,omitempty"`
 }
 
+type ESInSpecReportControlStringTags struct {
+	Key    string   `json:"key"`
+	Values []string `json:"values"`
+}
+
 type ESInSpecReportControl struct {
-	ID      string                          `json:"id"`
-	Impact  float32                         `json:"impact"`
-	Title   string                          `json:"title"`
-	Status  string                          `json:"status"`
-	Results []*ESInSpecReportControlsResult `json:"results"`
+	ID         string                            `json:"id"`
+	Impact     float32                           `json:"impact"`
+	Title      string                            `json:"title"`
+	Status     string                            `json:"status"`
+	Results    []*ESInSpecReportControlsResult   `json:"results"`
+	StringTags []ESInSpecReportControlStringTags `json:"string_tags"`
 }
 
 type ESInSpecReportProfile struct {

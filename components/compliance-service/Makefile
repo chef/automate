@@ -219,6 +219,10 @@ start-es-pg: start-pg create-es-data-dir
 	  printf "\n===> ${yellow}Loading test A2v2 data into ElasticSearch${reset} ($$data_dir)...\n"; \
 	  tar -xzvf generator/dump/es-pg/es6-a2v2-data.tar.gz -C "$$data_dir"; \
 	fi; \
+	if [ "$(A2V3_DATA)" == "true" ]; then \
+	  printf "\n===> ${yellow}Loading test A2v3 data into ElasticSearch${reset} ($$data_dir)...\n"; \
+	  tar -xzvf generator/dump/es-pg/es6-a2v3-data.tar.gz -C "$$data_dir"; \
+	fi; \
 	chmod -R 775 "$$data_dir"; \
 	my_primary_group=`id -g -n $(USER)`; \
 	chown -R $$USER:$$my_primary_group "$$data_dir"; \
@@ -400,8 +404,8 @@ test-integration-scanner: start-es start-pg start-ssh-node download-sample-marke
 
 test-automate-upgrade: clean-all
 	printf "\n===> Running Automate upgrade integration tests with TEST=$(TEST)\n"
-	@if [ "$(A1_DATA)" != "true" ] && [ "$(A2V1_DATA)" != "true" ] && [ "$(A2V2_DATA)" != "true" ]; then \
-	  printf "===> ${red}Aborting test-automate-upgrade as one of these ENV variables is not true: A1_DATA, A2V1_DATA, A2V2_DATA${reset}\n"; \
+	@if [ "$(A1_DATA)" != "true" ] && [ "$(A2V1_DATA)" != "true" ] && [ "$(A2V2_DATA)" != "true" ] && [ "$(A2V3_DATA)" != "true" ]; then \
+	  printf "===> ${red}Aborting test-automate-upgrade as one of these ENV variables is not true: A1_DATA, A2V1_DATA, A2V2_DATA, A2V3_DATA${reset}\n"; \
 	  exit 2; \
 	fi;
 	if ! [[ $(TEST) == 6* ]]; then \
@@ -515,7 +519,7 @@ download-sample-market-profiles: $(MARKET_PATH)
 # when running against es that is inside vm (virtualbox)  be sure to edit /opt/delivery/sv/elasticsearch/run and change -Des.network.host=127.0.0.1 to -Des.network.host=0.0.0.0
 # in order to tunnel to a remote ES, we must trust the certificate that the remote instance is offering.  get this from your browser and add it to the keychain on the respective OS.
 ingest-reports-into-es:
-	@if  [ "$(A1_DATA)" != "true" ] && [ "$(A2V1_DATA)" != "true" ] && [ "$(A2V2_DATA)" != "true" ]; then \
+	@if  [ "$(A1_DATA)" != "true" ] && [ "$(A2V1_DATA)" != "true" ] && [ "$(A2V2_DATA)" != "true" ] && [ "$(A2V3_DATA)" != "true" ]; then \
 	  @printf "\n===> PROCESSING REPORTS FROM ${blue}generator/dump/audit_reports${reset}\n"; \
 	  FILES=$$(ls -1 generator/dump/audit_reports | grep '\.json'); \
 	  for file in $$FILES; do \

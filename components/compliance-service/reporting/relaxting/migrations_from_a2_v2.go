@@ -3,10 +3,13 @@ package relaxting
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting/util"
+	"github.com/golang/protobuf/jsonpb"
+	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -25,6 +28,7 @@ type A2V2ElasticSearchIndices struct {
 type missingControlMeta struct {
 	Title  string
 	Impact float32
+	Tags   string
 }
 type missingProfileMeta struct {
 	Title    string
@@ -87,6 +91,7 @@ func addProfileToMap(esProfile *ESInSpecReportProfileA2v2, profileId string) {
 		profilesMetaMap[profileId].Controls[control.ID] = missingControlMeta{
 			control.Title,
 			control.Impact,
+			control.Tags,
 		}
 	}
 }
@@ -298,11 +303,23 @@ func convertA2v2ReportDocToLatest(src *ESInSpecReportA2v2, dstSum *ESInSpecSumma
 		// Convert the controls within a profile
 		dstRep.Profiles[i].Controls = make([]ESInSpecReportControl, len(srcProfileMin.Controls))
 		for j, srcProfileMinControl := range srcProfileMin.Controls {
+			stringTags := make([]ESInSpecReportControlStringTags, 0)
+			var controlTags structpb.Struct
+			err := (&jsonpb.Unmarshaler{}).Unmarshal(strings.NewReader(profilesMetaMap[srcProfileMin.SHA256].Controls[srcProfileMinControl.ID].Tags), &controlTags)
+			if err == nil {
+				for tKey, tValue := range controlTags.Fields {
+					if newStringTag := StringTagsFromProtoFields(tKey, tValue); newStringTag != nil {
+						stringTags = append(stringTags, *newStringTag)
+					}
+				}
+			}
+
 			dstRep.Profiles[i].Controls[j] = ESInSpecReportControl{
-				ID:     srcProfileMinControl.ID,
-				Title:  profilesMetaMap[srcProfileMin.SHA256].Controls[srcProfileMinControl.ID].Title,
-				Impact: profilesMetaMap[srcProfileMin.SHA256].Controls[srcProfileMinControl.ID].Impact,
-				Status: srcProfileMinControl.Status,
+				ID:         srcProfileMinControl.ID,
+				Title:      profilesMetaMap[srcProfileMin.SHA256].Controls[srcProfileMinControl.ID].Title,
+				Impact:     profilesMetaMap[srcProfileMin.SHA256].Controls[srcProfileMinControl.ID].Impact,
+				Status:     srcProfileMinControl.Status,
+				StringTags: stringTags,
 			}
 
 			// Convert the results within a control
