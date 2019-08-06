@@ -54,7 +54,6 @@ import (
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/io/chunks"
 	"github.com/chef/automate/lib/platform"
-	"github.com/chef/automate/lib/product"
 	"github.com/chef/automate/lib/secrets"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/tls/certs"
@@ -439,14 +438,7 @@ func (s *server) configRenderer() (ConfigRenderer, error) {
 			return "", errors.Wrapf(err, "could not converge %s configuration to TOML", service.Name())
 		}
 
-		pkgsMeta := make([]*product.PackageMetadata, 0, len(s.deployment.ExpectedServices))
-		for _, e := range s.deployment.ExpectedServices {
-			if metadata := services.MetadataForPackage(e.Name()); metadata != nil {
-				pkgsMeta = append(pkgsMeta, metadata)
-			}
-		}
-
-		if usesPlatformScaffolding(service, pkgsMeta) {
+		if usesPlatformScaffolding(service) {
 			return fmt.Sprintf("%s\n%s", string(bytes), platformConfigToml), nil
 		} else {
 			return string(bytes), nil
@@ -454,14 +446,9 @@ func (s *server) configRenderer() (ConfigRenderer, error) {
 	}, nil
 }
 
-func usesPlatformScaffolding(service *deployment.Service, pkgsMeta []*product.PackageMetadata) bool {
-	for _, metadata := range pkgsMeta {
-		if service.Name() != metadata.Name.Name || !metadata.UsesPlatformScaffolding {
-			continue
-		}
-		return true
-	}
-	return false
+func usesPlatformScaffolding(service *deployment.Service) bool {
+	metadata := services.MetadataForPackage(service.Name())
+	return metadata != nil && metadata.UsesPlatformScaffolding
 }
 
 func (s *errDeployer) convergeServices(task *converge.Task, eventSink converge.EventSink) {
