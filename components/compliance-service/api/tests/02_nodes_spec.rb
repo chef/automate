@@ -80,7 +80,8 @@ describe File.basename(__FILE__) do
                 ]
               }
         ],
-        "total" => 1
+        "total" => 1,
+        "totalPassed" => 1
     }
     assert_equal_json_sorted(expected_nodes.to_json, actual_nodes.to_json)
 
@@ -291,7 +292,10 @@ describe File.basename(__FILE__) do
                 ]
             }
         ],
-        "total" => 5
+        "total" => 5,
+        "totalFailed"=>3,
+        "totalPassed"=>1,
+        "totalSkipped"=>1
     }
     assert_equal_json_sorted(expected_nodes.to_json, actual_nodes.to_json)
 
@@ -335,7 +339,8 @@ describe File.basename(__FILE__) do
                 ]
             }
         ],
-        "total" => 1
+        "total" => 1,
+        "totalSkipped" => 1
     }
     assert_equal_json_sorted(expected_nodes.to_json, actual_nodes.to_json)
 
@@ -377,7 +382,8 @@ describe File.basename(__FILE__) do
                 ]
             }
         ],
-        "total" => 5
+        "total" => 5,
+        "totalSkipped" => 1
     }
     assert_equal_json_sorted(expected_nodes.to_json, actual_nodes.to_json)
 
@@ -430,7 +436,8 @@ describe File.basename(__FILE__) do
                 ]
             }
         ],
-        "total" => 5
+        "total" => 5,
+        "totalFailed" => 1
     }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
@@ -471,7 +478,8 @@ describe File.basename(__FILE__) do
                 ]
             }
         ],
-        "total" => 1
+        "total" => 1,
+        "totalSkipped" => 1
     }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
@@ -527,7 +535,8 @@ describe File.basename(__FILE__) do
                 ]
             }
         ],
-        "total" => 1
+        "total" => 1,
+        "totalPassed" => 1
     }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
@@ -592,7 +601,8 @@ describe File.basename(__FILE__) do
                 ]
             }
         ],
-        "total" => 1
+        "total" => 1,
+        "totalPassed" => 1
     }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
@@ -649,7 +659,8 @@ describe File.basename(__FILE__) do
                 ]
             }
         ],
-        "total" => 1
+        "total" => 1,
+        "totalPassed" => 1
     }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
@@ -705,7 +716,8 @@ describe File.basename(__FILE__) do
                 ]
             }
         ],
-        "total" => 1
+        "total" => 1,
+        "totalPassed" => 1
     }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
@@ -798,7 +810,9 @@ describe File.basename(__FILE__) do
                 ]
             }
         ],
-        "total" => 2
+        "total" => 2,
+        "totalPassed" => 1,
+        "totalSkipped" => 1
     }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
@@ -1021,7 +1035,10 @@ describe File.basename(__FILE__) do
                     ]
                 }
             ],
-            "total" => 5
+            "total" => 5,
+            "totalFailed" => 3,
+            "totalPassed" => 1,
+            "totalSkipped" => 1
         }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
@@ -1232,7 +1249,10 @@ describe File.basename(__FILE__) do
                     ]
                 }
             ],
-            "total" => 5
+            "total" => 5,
+            "totalFailed" => 3,
+            "totalPassed" => 1,
+            "totalSkipped" => 1
         }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 

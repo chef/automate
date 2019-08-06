@@ -326,11 +326,14 @@ func (srv *Server) ListNodes(ctx context.Context, in *reporting.Query) (*reporti
 		return nil, utils.FormatErrorMsg(err, "")
 	}
 
-	nodesList, total, err := srv.es.GetNodes(from, perPage, formattedFilters, SORT_FIELDS[sort], asc)
+	nodesList, totalCounts, err := srv.es.GetNodes(from, perPage, formattedFilters, SORT_FIELDS[sort], asc)
 	if err != nil {
 		return nil, utils.FormatErrorMsg(err, "")
 	}
-	nodes.Total = int32(total)
+	nodes.Total = totalCounts.Total
+	nodes.TotalPassed = totalCounts.Passed
+	nodes.TotalSkipped = totalCounts.Skipped
+	nodes.TotalFailed = totalCounts.Failed
 	nodes.Nodes = nodesList
 	return &nodes, nil
 }

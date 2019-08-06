@@ -210,6 +210,9 @@ message Node {
 message Nodes {
 	repeated Node nodes = 1;
 	int32 total = 20;
+	int32 total_passed = 21;
+	int32 total_failed = 22;
+	int32 total_skipped = 23;
 }
 message Kv {
 	string key = 1;
