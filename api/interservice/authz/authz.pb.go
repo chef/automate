@@ -7,9 +7,9 @@ import (
 	context "context"
 	fmt "fmt"
 	version "github.com/chef/automate/api/external/common/version"
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
-	_ "github.com/lyft/protoc-gen-validate/validate"
 	grpc "google.golang.org/grpc"
 	math "math"
 )

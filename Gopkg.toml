@@ -1,9 +1,9 @@
 required = [
+  "github.com/envoyproxy/protoc-gen-validate",
+  "github.com/golang/mock/mockgen",
   "github.com/golang/protobuf/protoc-gen-go",
   "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway",
-  "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger",
-  "github.com/golang/mock/mockgen",
-  "github.com/lyft/protoc-gen-validate"
+  "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger"
 ]
 
 [prune]
@@ -17,9 +17,9 @@ required = [
     non-go = false
 
   # proto files using protoc-gen-validate for validation will import
-  # vendor/github.com/lyft/protoc-gen-validate/validate/validate.proto (non-go)
+  # vendor/github.com/envoyproxy/protoc-gen-validate/validate/validate.proto (non-go)
   [[prune.project]]
-    name = "github.com/lyft/protoc-gen-validate"
+    name = "github.com/envoyproxy/protoc-gen-validate"
     non-go = false
 
 [[override]]
@@ -31,9 +31,9 @@ required = [
   name = "github.com/sirupsen/logrus"
   branch = "master"
 
-[[override]]
-  name = "github.com/lyft/protoc-gen-validate"
-  branch = "master"
+[[constraint]]
+  name = "github.com/envoyproxy/protoc-gen-validate"
+  version = "0.1.0"
 
 # github.com/Azure/go-autorest pins v3.1.0
 [[override]]
@@ -51,11 +51,9 @@ required = [
 
 # end of grpc-gateway-related overrides
 
-# Note: currently, 0.3.4 is the only version that works with pb 1.1.0+
-# see https://github.com/lyft/protoc-gen-star/issues/24.
 [[constraint]]
   name = "github.com/lyft/protoc-gen-star"
-  version = "=0.4.5"
+  version = "=0.4.11"
 
 [[constraint]]
   branch = "master"

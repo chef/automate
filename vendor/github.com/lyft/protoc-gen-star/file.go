@@ -29,6 +29,8 @@ type File interface {
 
 	setPackage(p Package)
 
+	addFileDep(fl File)
+
 	addService(s Service)
 
 	addPackageSourceCodeInfo(info SourceCodeInfo)
@@ -36,8 +38,11 @@ type File interface {
 
 type file struct {
 	desc                    *descriptor.FileDescriptorProto
+	fqn                     string
 	pkg                     Package
 	enums                   []Enum
+	defExts                 []Extension
+	fileDeps                []File
 	msgs                    []Message
 	srvs                    []Service
 	buildTarget             bool
@@ -45,7 +50,7 @@ type file struct {
 }
 
 func (f *file) Name() Name                                  { return Name(f.desc.GetName()) }
-func (f *file) FullyQualifiedName() string                  { return "." + f.desc.GetPackage() }
+func (f *file) FullyQualifiedName() string                  { return f.fqn }
 func (f *file) Syntax() Syntax                              { return Syntax(f.desc.GetSyntax()) }
 func (f *file) Package() Package                            { return f.pkg }
 func (f *file) File() File                                  { return f }
@@ -86,17 +91,33 @@ func (f *file) Services() []Service {
 }
 
 func (f *file) Imports() (i []File) {
+	// Mapping for avoiding duplicate entries
+	importMap := make(map[string]File, len(f.AllMessages())+len(f.srvs))
+	for _, fl := range f.fileDeps {
+		importMap[fl.Name().String()] = fl
+	}
 	for _, m := range f.AllMessages() {
-		i = append(i, m.Imports()...)
+		for _, imp := range m.Imports() {
+			importMap[imp.File().Name().String()] = imp
+		}
 	}
 	for _, s := range f.srvs {
-		i = append(i, s.Imports()...)
+		for _, imp := range s.Imports() {
+			importMap[imp.File().Name().String()] = imp
+		}
+	}
+	for _, imp := range importMap {
+		i = append(i, imp)
 	}
 	return
 }
 
 func (f *file) Extension(desc *proto.ExtensionDesc, ext interface{}) (bool, error) {
 	return extension(f.desc.GetOptions(), desc, &ext)
+}
+
+func (f *file) DefinedExtensions() []Extension {
+	return f.defExts
 }
 
 func (f *file) accept(v Visitor) (err error) {
@@ -126,7 +147,17 @@ func (f *file) accept(v Visitor) (err error) {
 		}
 	}
 
+	for _, ext := range f.defExts {
+		if err = ext.accept(v); err != nil {
+			return
+		}
+	}
+
 	return
+}
+
+func (f *file) addDefExtension(ext Extension) {
+	f.defExts = append(f.defExts, ext)
 }
 
 func (f *file) setPackage(pkg Package) { f.pkg = pkg }
@@ -134,6 +165,10 @@ func (f *file) setPackage(pkg Package) { f.pkg = pkg }
 func (f *file) addEnum(e Enum) {
 	e.setParent(f)
 	f.enums = append(f.enums, e)
+}
+
+func (f *file) addFileDep(fl File) {
+	f.fileDeps = append(f.fileDeps, fl)
 }
 
 func (f *file) addMessage(m Message) {

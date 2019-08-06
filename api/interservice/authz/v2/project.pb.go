@@ -7,9 +7,9 @@ import (
 	context "context"
 	fmt "fmt"
 	event "github.com/chef/automate/api/interservice/event"
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
-	_ "github.com/lyft/protoc-gen-validate/validate"
 	grpc "google.golang.org/grpc"
 	math "math"
 )
