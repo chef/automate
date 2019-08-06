@@ -73,6 +73,22 @@ func (backend *ES2Backend) ES2Client() (*elastic.Client, error) {
 	return esClient, err
 }
 
+func (backend *ES2Backend) ReindexStatus(ctx context.Context, taskID string) (bool, error) {
+	tasksGetTaskResponse, err := elastic.NewTasksGetTaskService(esClient).
+		TaskId(taskID).
+		WaitForCompletion(false).
+		Do(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	if tasksGetTaskResponse.Task == nil {
+		return false, fmt.Errorf("ReindexStatus: task %s not found", taskID)
+	}
+
+	return tasksGetTaskResponse.Completed, nil
+}
+
 // Removes element with index i from array arr
 func Remove(arr *[]string, i int) {
 	if len(*arr) <= i {
