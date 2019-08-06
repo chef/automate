@@ -2,9 +2,8 @@ import { debounceTime, mergeMap, map, catchError } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { interval, of } from 'rxjs';
+import { of } from 'rxjs';
 
-import { ProjectConstants } from 'app/entities/projects/project.model';
 import {
   UserPermsTypes,
   GetAllUserPermsSuccess,
@@ -18,8 +17,6 @@ import {
   GetUserParamPermsFailure
 } from './userperms.actions';
 import { UserPermsRequests } from './userperms.requests';
-
-const POLLING_INTERVAL_IN_SECONDS = 300; // every 5 minutes
 
 @Injectable()
 export class UserPermEffects {
@@ -50,10 +47,4 @@ export class UserPermEffects {
     mergeMap((action: GetUserParamPerms) => this.requests.fetchParameterized(action.payload).pipe(
       map((resp: UserPermsResponsePayload) => new GetUserParamPermsSuccess(resp.endpoints)),
       catchError((error: HttpErrorResponse) => of(new GetUserParamPermsFailure(error))))));
-
-  @Effect()
-  fetchApplyRulesStatusAllowed$ = interval(1000 * POLLING_INTERVAL_IN_SECONDS).pipe(
-    mergeMap(() => this.requests.fetchSome({ paths: [ProjectConstants.APPLY_RULES_ENDPOINT] }).pipe(
-      map((resp: UserPermsResponsePayload) => new GetSomeUserPermsSuccess(resp.endpoints)),
-      catchError((error: HttpErrorResponse) => of(new GetSomeUserPermsFailure(error))))));
 }

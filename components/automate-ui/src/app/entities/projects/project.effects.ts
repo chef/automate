@@ -11,10 +11,7 @@ import { HttpStatus } from 'app/types/types';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
 import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
-import { allPerms } from 'app/entities/userperms/userperms.selectors';
-
 import { ProjectRequests } from './project.requests';
-import { ProjectConstants } from './project.model';
 
 import {
   GetProjectsSuccess,
@@ -204,11 +201,8 @@ export class ProjectEffects {
   getLatestApplyRulesStatus$ = observableInterval(1000 * POLLING_INTERVAL_IN_SECONDS).pipe(
     withLatestFrom(this.store.select(iamMajorVersion).pipe(filter(identity))),
     withLatestFrom(this.store.select(iamMinorVersion).pipe(filter(identity))),
-    withLatestFrom(this.store.select(allPerms)),
-    filter(([[[_, major], minor], perms]) => {
-      const permObject = perms[ProjectConstants.APPLY_RULES_ENDPOINT];
-      const allowed = permObject && permObject.get;
-      return allowed && major === 'v2' && minor === 'v1';
+    filter(([[_, major], minor]) => {
+      return major === 'v2' && minor === 'v1';
     }),
     switchMap(() =>
       this.requests.getApplyRulesStatus().pipe(
