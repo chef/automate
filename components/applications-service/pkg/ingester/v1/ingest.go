@@ -6,12 +6,13 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
+	"github.com/golang/protobuf/proto"
+	"github.com/pkg/errors"
+
 	"github.com/chef/automate/api/external/habitat"
 	"github.com/chef/automate/components/applications-service/pkg/config"
 	"github.com/chef/automate/components/applications-service/pkg/nats"
 	"github.com/chef/automate/components/applications-service/pkg/storage"
-	"github.com/golang/protobuf/proto"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -129,17 +130,17 @@ func (i *Ingester) IngestMessage(msg []byte) {
 	i.eventsCh <- msg
 }
 
-// Returns the total number of events processed by the ingestor client
+// Returns the total number of events processed by the ingester client
 func (i *Ingester) EventsProcessed() int64 {
 	return atomic.LoadInt64(&i.totalEventsProcessed)
 }
 
-// Returns the total number of failed events by the ingestor client
+// Returns the total number of failed events by the ingester client
 func (i *Ingester) EventsFailed() int64 {
 	return atomic.LoadInt64(&i.totalEventsFailed)
 }
 
-// Returns the total number of successful events by the ingestor client
+// Returns the total number of successful events by the ingester client
 func (i *Ingester) EventsSuccessful() int64 {
 	return atomic.LoadInt64(&i.totalEventsSuccessful)
 }
@@ -156,7 +157,7 @@ func (i *Ingester) ResetStats() {
 	atomic.StoreInt64(&i.totalEventsSuccessful, 0)
 }
 
-// Returns the total number of event messages in the ingestor client queue
+// Returns the total number of event messages in the ingester client queue
 func (i *Ingester) QueueLen() int {
 	return len(i.eventsCh)
 }

@@ -123,7 +123,7 @@ func (w *taskCleaner) cleanResultsTable(ctx context.Context) error {
 		return err
 	}
 
-	// NOTE(ssd) 2019-07-17: We are using a pg advsiory lock here,
+	// NOTE(ssd) 2019-07-17: We are using a pg advisory lock here,
 	// because this might run concurrently and we want the
 	// predictability of only running this deleting once.
 	row := tx.QueryRowContext(ctx, "SELECT pg_try_advisory_xact_lock(23320, 4090)")

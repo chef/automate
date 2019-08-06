@@ -40,9 +40,9 @@ type CurrentBackend interface {
 	// Upgradeable Backends. Must be called before GetLicense and
 	// SetLicense.
 	Init(context.Context, *keys.LicenseParser) error
-	// GetLicense returns the currently configured autoamte
+	// GetLicense returns the currently configured automate
 	// license. If no license is configured, NoLicense is
-	// returend.
+	// returned.
 	GetLicense(context.Context) (string, keys.LicenseMetadata, error)
 	// SetLicense stores the given license in the backend.
 	SetLicense(context.Context, string) error
@@ -52,9 +52,9 @@ type CurrentBackend interface {
 // as a backend for the license-control-service but which might have
 // data that needs to be migrated into the CurrentBackend.
 type UpgradeableBackend interface {
-	// GetLicense returns the currently configured autoamte
+	// GetLicense returns the currently configured automate
 	// license. If no license is configured, ErrNoLicense is
-	// returend.
+	// returned.
 	GetLicense(context.Context) (string, error)
 	// Cleanup removes the state kept by this backend. After
 	// Cleanup is called, GetLicense should return a

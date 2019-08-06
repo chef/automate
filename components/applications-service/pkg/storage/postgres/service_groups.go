@@ -273,7 +273,7 @@ func (sgh *serviceGroupHealth) breakReleases() {
 		return
 	}
 
-	// If either one of the composed releases/packages have memebers
+	// If either one of the composed releases/packages have members
 	// it means that this function has ran already and therefore we
 	// wont continue processing
 	// TODO @afiune we could have a bool flag to force the execution

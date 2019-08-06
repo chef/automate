@@ -257,7 +257,7 @@ func JobSettingsToUpdateOpts(settings *ingest.JobSettings, oldSchedule *cereal.S
 			Dtstart:  oldRecurrence.OrigOptions.Dtstart,
 		})
 		if err != nil {
-			return nil, shouldRunNow, errors.Wrap(err, "could not constrcut new recurrence rule")
+			return nil, shouldRunNow, errors.Wrap(err, "could not construct new recurrence rule")
 		}
 		ret = append(ret, cereal.UpdateRecurrence(r))
 	}

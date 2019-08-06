@@ -10,16 +10,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/chef/automate/api/external/applications"
-	"github.com/chef/automate/api/external/habitat"
-	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/chef/automate/api/external/applications"
+	"github.com/chef/automate/api/external/habitat"
+	"github.com/chef/automate/components/applications-service/pkg/storage"
 )
 
-func TestIngestSigleService(t *testing.T) {
+func TestIngestSingleService(t *testing.T) {
 	defer suite.DeleteDataFromStorage()
 
 	var (
@@ -199,7 +200,7 @@ func TestIngestMultiServicesSameServiceGroup(t *testing.T) {
 	// service-group we will hit a uniqueness constraint, and then we should retry.
 	// On the retry we should get the existing deployment ID and use it.
 	//
-	// The main reason we encounter the uniqueness contstraint is because we process
+	// The main reason we encounter the uniqueness constraint is because we process
 	// 50 things at a time (worker pool)
 	//
 	// Verify there is only one service_group
@@ -276,7 +277,7 @@ func TestIngestMultiServicesSameServiceGroupExistingDeployment(t *testing.T) {
 	assert.Equal(t, int32(2), suite.GetServiceGroupsCountForStatsEndpoint(), "there should be two service groups")
 }
 
-func TestIngestSigleServiceInsertAndUpdate(t *testing.T) {
+func TestIngestSingleServiceInsertAndUpdate(t *testing.T) {
 	defer suite.DeleteDataFromStorage()
 
 	var (

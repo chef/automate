@@ -355,7 +355,7 @@ type TaskCompleteEvent struct {
 }
 
 // CancelEvent is passed to the OnCancel callback of the WorkflowExecutor
-// when the workflow is signaled for cancelation.
+// when the workflow is signaled for cancellation.
 type CancelEvent struct{}
 
 // WorkflowExecutor is the interface implemented by objects that can process

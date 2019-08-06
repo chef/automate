@@ -148,7 +148,7 @@ func Spawn(opts *serveropts.Opts) error {
 
 	err = server.InitializeJobManager(jobManager, client)
 	if err != nil {
-		logrus.WithError(err).Fatal("could not initialze job manager")
+		logrus.WithError(err).Fatal("could not initialize job manager")
 	}
 
 	err = server.MigrateJobsSchedule(jobManager, viper.ConfigFileUsed())
