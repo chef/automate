@@ -220,6 +220,8 @@ func columnNameForField(fieldName string) string {
 	switch fieldName {
 	case "service_name":
 		return "name"
+	case "group_name":
+		return "name_suffix"
 	case "application":
 		return "app_name"
 	case "buildstamp":
