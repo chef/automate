@@ -133,16 +133,23 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
       this.modifyID = true;
     });
 
-    this.ruleForm = this.fb.group({
-      // Must stay in sync with error checks in project-rules.component.html
-      name: [
-        this.rule.name || '',
-        [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      id: [{ value: this.rule.id || '' },
-      [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]],
-      type: [{ value: this.rule.type || '', disabled: this.editingRule }, Validators.required],
-      conditions: this.fb.array(this.populateConditions())
-    });
+    if (this.editingRule) {
+      this.ruleForm = this.fb.group({
+        name: [this.rule.name, [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+        id: [this.rule.id], // no id input so id can't change, no validation needed
+        type: [{ value: this.rule.type, disabled: true }], // always disabled, no validation needed
+        conditions: this.fb.array(this.populateConditions())
+      });
+    } else {
+      this.ruleForm = this.fb.group({
+        // Must stay in sync with error checks in project-rules.component.html
+        name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+        id: ['', [Validators.required, Validators.pattern(Regex.patterns.ID),
+        Validators.maxLength(64)]],
+        type: ['', Validators.required],
+        conditions: this.fb.array(this.populateConditions())
+      });
+    }
   }
 
   ngOnDestroy() {
@@ -320,7 +327,6 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
 
   handleConditionChange(): void {
     if (this.editingRule) {
-      this.ruleForm.controls.id.setValue(this.rule.id);
       this.ruleForm.markAsDirty();
     }
   }
