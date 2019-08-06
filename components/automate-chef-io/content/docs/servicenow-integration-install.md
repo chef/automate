@@ -179,8 +179,8 @@ The `x_chef_incident.logging.verbosity` property sets the logging level when log
 
 Chef Automate can be configured to send a notification to the REST APIs exposed by the application. There are two REST APIs:
 
-* Chef Client run API /api/x_chef_incident/v1/client_run
-* InSpec scan API /api/x_chef_incident/v1/inspec_scan
+* Chef Client run API /api/x_chef_incident/client_run
+* InSpec scan API /api/x_chef_incident/inspec_scan
 
 #### Chef Client Run API
 
