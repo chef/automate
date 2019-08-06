@@ -64,10 +64,10 @@ identifier = "event_feed"
 url = "/docs/event-feed"
 
 [[menu.docs]]
-name = "Infrastructure"
+name = "Client Runs"
 weight = 50
-identifier = "infrastructure"
-url = "/docs/infrastructure"
+identifier = "client_runs"
+url = "/docs/client-runs"
 
 [[menu.docs]]
 name = "Compliance"
