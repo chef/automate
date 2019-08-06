@@ -16,7 +16,7 @@ message Project {
 
 message CreateProjectReq {
     string name = 1;
-    string id = 2 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+    string id = 2 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
 }
 
 message CreateProjectResp {
@@ -24,7 +24,7 @@ message CreateProjectResp {
 }
 
 message GetProjectReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
 }
 
 message GetProjectResp {
@@ -39,7 +39,7 @@ message ListProjectsResp {
 
 message UpdateProjectReq {
     string name = 1;
-    string id = 2 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+    string id = 2 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
 }
 
 message UpdateProjectResp {
@@ -47,7 +47,7 @@ message UpdateProjectResp {
 }
 
 message DeleteProjectReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
 }
 
 message DeleteProjectResp {}
@@ -143,8 +143,8 @@ message Condition {
 // CreateRuleReq is ProjectRule, so the input is just one JSON object. Also adds
 // basic validation.
 message CreateRuleReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
-    string project_id = 2 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string project_id = 2 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
     string name = 3 [(validate.rules).string.min_len = 1];
     ProjectRuleTypes type = 4;
     repeated Condition conditions = 5 [(validate.rules).repeated.min_items = 1];
@@ -155,8 +155,8 @@ message CreateRuleResp {
 }
 
 message UpdateRuleReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
-    string project_id = 2 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string project_id = 2 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
     string name = 3 [(validate.rules).string.min_len = 1];
     ProjectRuleTypes type = 4;
     repeated Condition conditions = 5 [(validate.rules).repeated.min_items = 1];
@@ -167,8 +167,8 @@ message UpdateRuleResp {
 }
 
 message GetRuleReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
-    string project_id = 2 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string project_id = 2 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
 }
 
 message GetRuleResp {
@@ -184,7 +184,7 @@ message ListRulesResp {
 }
 
 message ListRulesForProjectReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
 }
 
 message ListRulesForProjectResp {
@@ -193,8 +193,8 @@ message ListRulesForProjectResp {
 }
 
 message DeleteRuleReq {
-    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
-    string project_id = 2 [(validate.rules).string.pattern = "^[a-z0-9-]{1,64}$"];
+    string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
+    string project_id = 2 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
 }
 
 message DeleteRuleResp {}
