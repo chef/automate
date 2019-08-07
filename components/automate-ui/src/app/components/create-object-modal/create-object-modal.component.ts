@@ -13,7 +13,7 @@ export class CreateObjectModalComponent implements OnInit {
   @Input() creating = false;
   @Input() objectNoun: string;
   @Input() showProjectsDropdown = false;
-  @Input() projectsAssignable: Project[] = [];
+  @Input() assignableProjects: Project[] = [];
   @Input() createForm: FormGroup; // NB: The form must contain 'name' and 'id' fields
   @Input() conflictErrorEvent: EventEmitter<boolean>; // TC: This element assumes 'id' is the
                                                       // only create field that can conflict.

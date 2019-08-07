@@ -24,7 +24,7 @@
       objectNoun="team"
       [createForm]="createTeamForm"
       [showProjectsDropdown]="!isMajorV1 && isMinorV1"
-      [projectsAssignable]="dropdownProjects"
+      [assignableProjects]="dropdownProjects"
       (close)="closeCreateModal()"
       (createClicked)="createV2Team($event)">
     </app-create-object-modal>

@@ -46,9 +46,9 @@
         </div>
         <div *ngIf="showProjectsDropdown">
           <app-projects-dropdown
-            [projects]="projectsAssignable"
+            [projects]="assignableProjects"
             (onSelection)="projectsDropdownAction($event)"
-            [disabled]="projectsAssignable.length === 0">
+            [disabled]="assignableProjects.length === 0">
           </app-projects-dropdown>
         </div>
         <div id="button-bar">

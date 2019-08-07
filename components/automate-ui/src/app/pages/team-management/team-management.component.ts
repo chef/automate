@@ -19,7 +19,7 @@ import { Team } from 'app/entities/teams/team.model';
 import { CreateTeam, DeleteTeam, GetTeams } from 'app/entities/teams/team.actions';
 import { Regex } from 'app/helpers/auth/regex';
 import { HttpStatus } from 'app/types/types';
-import { projectsAssignable } from 'app/services/projects-filter/projects-filter.selectors';
+import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
 import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 
@@ -104,7 +104,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
           this.isMinorV1 = minorVersion === 'v1';
         });
 
-    this.store.select(projectsAssignable)
+    this.store.select(assignableProjects)
       .subscribe((assignable: ProjectsFilterOption[]) => {
         this.dropdownProjects = assignable.map(p => {
           return <Project>{
