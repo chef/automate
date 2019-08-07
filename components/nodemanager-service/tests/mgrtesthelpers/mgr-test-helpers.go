@@ -3,10 +3,12 @@ package mgrtesthelpers
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
 
+	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/examples/helpers"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
@@ -115,6 +117,11 @@ func AddGCPManager(ctx context.Context, mgrClient manager.NodeManagerServiceClie
 	newLineForKeyBeg := strings.ReplaceAll(formatted, "KEY-----", "KEY-----\\n")
 	newLineForKeyEnd := strings.ReplaceAll(newLineForKeyBeg, "-----END", "\\n-----END")
 
+	var gcpCred *secrets.GcpCredential
+	err = json.Unmarshal([]byte(newLineForKeyEnd), &gcpCred)
+	if err != nil {
+		fmt.Print(err)
+	}
 	gcpMgr := manager.NodeManager{
 		Name: fmt.Sprintf("my test %s mgr", mgrType),
 		Type: mgrType,
