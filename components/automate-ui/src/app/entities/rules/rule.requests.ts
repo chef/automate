@@ -5,7 +5,7 @@ import { environment as env } from 'environments/environment';
 import { Rule } from './rule.model';
 
 import {
-  GetRulesSuccessPayload, RuleSuccessPayload
+  RulesSuccessPayload, RuleSuccessPayload
 } from './rule.actions';
 
 export interface RulesResponse {
@@ -17,8 +17,8 @@ export class RuleRequests {
 
   constructor(private http: HttpClient) { }
 
-  public getRulesForProject(project_id: string): Observable<GetRulesSuccessPayload> {
-    return this.http.get<GetRulesSuccessPayload>(
+  public getRulesForProject(project_id: string): Observable<RulesSuccessPayload> {
+    return this.http.get<RulesSuccessPayload>(
       `${env.auth_v2_url}/projects/${project_id}/rules`);
   }
 

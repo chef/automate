@@ -79,7 +79,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         this.store.select(getProjectStatus)
       ).pipe(
         takeUntil(this.isDestroyed),
-        map(([gStatus, uStatus, gpStatus]) => {
+        map(([gStatus, uStatus, gpStatus]: [string, string, string]) => {
           const routeId = this.route.snapshot.paramMap.get('ruleid');
           this.isLoading =
             routeId
@@ -94,9 +94,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         this.store.select(routeParams).pipe(pluck('ruleid'), filter(identity))
       ).pipe(
         takeUntil(this.isDestroyed),
-        map(([pId, rId]) => {
-          const project_id = pId as string;
-          const rule_id = rId as string;
+        map(([project_id, rule_id]: [string, string]) => {
           this.store.dispatch(new GetProject({ id: project_id }));
           this.store.dispatch(new GetRule({
             id: rule_id,
@@ -108,7 +106,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         filter(identity),
         takeUntil(this.isDestroyed),
         map((state) => {
-          this.project = <Project>Object.assign({}, state);
+          this.project = { ...state };
         })
       ).subscribe();
 
@@ -116,7 +114,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         filter(identity),
         takeUntil(this.isDestroyed),
         map((state) => {
-          this.rule = <Rule>Object.assign({}, state);
+          this.rule = { ...state };
           this.editingRule = true;
         })
         ).subscribe();
@@ -136,7 +134,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     if (this.editingRule) {
       this.ruleForm = this.fb.group({
         name: [this.rule.name, [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-        id: [this.rule.id], // no id input so id can't change, no validation needed
+        id: [{ value: this.rule.id, disabled: true }], // always disabled, no validation needed
         type: [{ value: this.rule.type, disabled: true }], // always disabled, no validation needed
         conditions: this.fb.array(this.populateConditions())
       });
@@ -151,6 +149,8 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
       });
     }
   }
+
+  get getConditions() { return this.ruleForm.get('conditions'); }
 
   ngOnDestroy() {
     this.isDestroyed.next(true);
@@ -327,6 +327,8 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
 
   handleConditionChange(): void {
     if (this.editingRule) {
+      // changes on the condition forms do not bubble up to the ruleForm
+      // so we explicitly set it to dirty here
       this.ruleForm.markAsDirty();
     }
   }

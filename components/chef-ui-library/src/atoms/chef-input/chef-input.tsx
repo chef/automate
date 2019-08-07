@@ -14,6 +14,9 @@ import { Component, Host, Listen, Prop, State, h } from '@stencil/core';
  * <chef-input placeholder='Enter value...'></chef-input>
  *
  * @example
+ * <chef-input disabled placeholder='Cannot change value'></chef-input>
+ *
+ * @example
  * <chef-input value='foobar' placeholder='Enter value...'></chef-input>
  *
  * @example
@@ -42,6 +45,11 @@ export class ChefInput {
    * The placeholder text for the input.
    */
   @Prop() placeholder = '';
+
+  /**
+   * Indicate input as disabled
+   */
+  @Prop({ reflectToAttr: true }) disabled = false;
 
   @State() focused = false;
 
@@ -75,7 +83,8 @@ export class ChefInput {
       <chef-input-key-value
         value={ this.value }
         placeholder={ this.placeholder }
-        onChange={ this.handleChange.bind(this) }></chef-input-key-value>
+        onChange={ this.handleChange.bind(this)
+        }></chef-input-key-value>
     );
   }
 
@@ -84,7 +93,9 @@ export class ChefInput {
       <input type={ this.type }
         value={ this.value }
         placeholder={ this.placeholder }
-        onChange={ this.handleChange.bind(this) }></input>
+        onChange={ this.handleChange.bind(this) }
+        disabled={this.disabled}
+        aria-disabled={this.disabled}></input>
     );
   }
 

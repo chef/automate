@@ -31,14 +31,14 @@ export class GetRulesForProject implements Action {
   constructor(public payload: { project_id: string }) { }
 }
 
-export interface GetRulesSuccessPayload {
+export interface RulesSuccessPayload {
   rules: Rule[];
 }
 
 export class GetRulesSuccess implements Action {
   readonly type = RuleActionTypes.GET_ALL_SUCCESS;
 
-  constructor(public payload: GetRulesSuccessPayload) { }
+  constructor(public payload: RulesSuccessPayload) { }
 }
 
 export class GetRulesFailure implements Action {

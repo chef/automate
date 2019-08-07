@@ -11,7 +11,7 @@ import { Type } from 'app/entities/notifications/notification.model';
 import {
   GetRulesForProject,
   GetRulesSuccess,
-  GetRulesSuccessPayload,
+  RulesSuccessPayload,
   GetRulesFailure,
   GetRule,
   GetRuleSuccess,
@@ -45,7 +45,7 @@ export class RuleEffects {
       ofType(RuleActionTypes.GET_ALL),
       mergeMap(({ payload: { project_id } }: GetRulesForProject) =>
         this.requests.getRulesForProject(project_id).pipe(
-          map((resp: GetRulesSuccessPayload) => new GetRulesSuccess(resp)),
+          map((resp: RulesSuccessPayload) => new GetRulesSuccess(resp)),
           catchError((error: HttpErrorResponse) => observableOf(new GetRulesFailure(error))))));
 
   @Effect()
