@@ -50,7 +50,7 @@ else
     # WARNING: chef/automate-compliance-profiles is managed by Expeditor
     # See .expeditor/update-compliance-profiles.sh for details
     pkg_deps+=(
-        chef/automate-compliance-profiles/1.0.0/20190805095953
+        chef/automate-compliance-profiles/1.0.0/20190807122346
     )
 fi
 
