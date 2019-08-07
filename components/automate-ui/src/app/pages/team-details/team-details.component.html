@@ -40,8 +40,8 @@
       </table>
 
       <chef-tab-selector (change)="onSelectedTab($event)" [value]="tabValue">
-        <chef-option value='users' routerLink="./" fragment="users">Users</chef-option>
-        <chef-option value='details' routerLink="./" fragment="details">Details</chef-option>
+        <chef-option value='users'>Users</chef-option>
+        <chef-option value='details'>Details</chef-option>
       </chef-tab-selector>
     </chef-page-header>
     <ng-container *ngIf="tabValue === 'users'">
