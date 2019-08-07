@@ -221,41 +221,23 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   }
 
   createRule() {
-    const ruleValue = this.ruleForm.value;
-    const ruleToCreate: Rule = {
-        project_id: this.project.id,
-        id: ruleValue.id,
-        name: ruleValue.name,
-        type: ruleValue.type,
-        status: 'STAGED',
-      conditions: this.convertConditions()
-      };
     this.store.dispatch(
       new CreateRule({
-        rule: ruleToCreate
+        rule: this.convertToRule()
       }));
   }
 
   updateRule() {
-    const ruleValue = this.ruleForm.value;
-    const updatedRule: Rule = {
-      project_id: this.project.id,
-      id: this.rule.id, // rule id can't be updated
-      name: ruleValue.name,
-      type: this.rule.type, // rule type can't be updated
-      status: 'STAGED',
-      conditions: this.convertConditions()
-    };
+    const updatedRule = this.convertToRule();
     this.store.dispatch(new UpdateRule({ rule: updatedRule }));
     this.store.dispatch(new GetRulesForProject({ project_id: this.rule.project_id }));
   }
 
-  convertConditions(): Condition[] {
-    const ruleValue = this.ruleForm.value;
+  convertToRule(): Rule {
     const conditions: Condition[] = [];
     // This constant ensures type safety
     const equals_op: ConditionOperator = 'EQUALS';
-    ruleValue.conditions.forEach(c => {
+    this.ruleForm.controls.conditions.value.forEach(c => {
       conditions.push(<Condition>{
         attribute: c.attribute,
         operator: c.operator,
@@ -265,7 +247,14 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
           : c.values.split(/,/).map((v: string) => v.trim())
       });
     });
-    return conditions;
+    return {
+      project_id: this.project.id,
+      id: this.ruleForm.controls.id.value,
+      name: this.ruleForm.controls.name.value.trim(),
+      type: this.ruleForm.controls.type.value,
+      status: 'STAGED',
+      conditions: conditions
+    };
   }
 
   // TODO: Leveraged much from ID section of create-object-modal... make a shared component...?
