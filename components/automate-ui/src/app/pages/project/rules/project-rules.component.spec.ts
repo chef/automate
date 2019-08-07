@@ -214,8 +214,8 @@ describe('ProjectRulesComponent', () => {
           values: values
         };
         component.ruleForm.get('conditions').setValue([uiRule]);
-        const conditions = component.convertConditions();
-        expect(conditions[0]).toEqual(
+        const rule = component.convertToRule();
+        expect(rule.conditions[0]).toEqual(
           <Condition>{
             attribute: uiRule.attribute,
             operator: uiRule.operator,

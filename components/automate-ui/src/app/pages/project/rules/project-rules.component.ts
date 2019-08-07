@@ -79,7 +79,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         this.store.select(getProjectStatus)
       ).pipe(
         takeUntil(this.isDestroyed),
-        map(([gStatus, uStatus, gpStatus]: [string, string, string]) => {
+        map(([gStatus, uStatus, gpStatus]: string[]) => {
           const routeId = this.route.snapshot.paramMap.get('ruleid');
           this.isLoading =
             routeId
@@ -94,7 +94,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         this.store.select(routeParams).pipe(pluck('ruleid'), filter(identity))
       ).pipe(
         takeUntil(this.isDestroyed),
-        map(([project_id, rule_id]: [string, string]) => {
+        map(([project_id, rule_id]: string[]) => {
           this.store.dispatch(new GetProject({ id: project_id }));
           this.store.dispatch(new GetRule({
             id: rule_id,
