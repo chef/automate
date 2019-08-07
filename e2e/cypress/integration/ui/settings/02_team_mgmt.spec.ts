@@ -12,10 +12,10 @@ describe('team management', () => {
   const unassigned = '(unassigned)';
 
   let iamVersion = <string><Object>Cypress.env('IAM_VERSION');
-  // assume 2.1 if not in CI. if you wish something different start cypress with
+  // assume 2.0 if not in CI. if you wish something different start cypress with
   // IAM_VERSION set to what you are testing.
   if (iamVersion === undefined) {
-    iamVersion = 'v2.1';
+    iamVersion = 'v2.0';
   }
 
   const describeIAMV2 = iamVersion.match(/v2/) ? describe : describe.skip;
