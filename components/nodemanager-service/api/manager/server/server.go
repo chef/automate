@@ -22,6 +22,7 @@ import (
 	"github.com/chef/automate/components/nodemanager-service/managers"
 	"github.com/chef/automate/components/nodemanager-service/mgrtypes"
 	"github.com/chef/automate/components/nodemanager-service/pgdb"
+	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/stringutils"
 )
@@ -76,26 +77,26 @@ func (srv *Server) Create(ctx context.Context, in *manager.NodeManager) (*manage
 	// validate the node manager type provided
 	err := validateNodeManager(in, []string{"aws-ec2", "aws-api", "azure-api", "aws", "azure", "azure-vm", "gcp", "gcp-api"})
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Name)
+		return nil, errorutils.FormatErrorMsg(err, in.Name)
 	}
 
 	if len(in.CredentialData) > 0 {
 		in.CredentialId, err = srv.handleCredentialData(ctx, in)
 		if err != nil {
-			return nil, utils.FormatErrorMsg(err, "")
+			return nil, errorutils.FormatErrorMsg(err, "")
 		}
 	}
 
 	// fetch account id
 	acctID, err := srv.getMgrAccountID(ctx, in, srv.DB)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Name)
+		return nil, errorutils.FormatErrorMsg(err, in.Name)
 	}
 
 	// attempt a dry run connection to ensure the account credentials have the correct permissions
 	_, err = srv.Connect(ctx, in)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Name)
+		return nil, errorutils.FormatErrorMsg(err, in.Name)
 	}
 	// if we set it here, we consider the manager reachable and that's how we save it in the database
 	in.Status = types.StatusReachable
@@ -108,7 +109,7 @@ func (srv *Server) Create(ctx context.Context, in *manager.NodeManager) (*manage
 	for _, mgr := range managers {
 		mgrID, err := srv.addManagerAndNodes(ctx, mgr, acctID)
 		if err != nil {
-			return nil, utils.FormatErrorMsg(err, mgrID)
+			return nil, errorutils.FormatErrorMsg(err, mgrID)
 		}
 		mgrIds = append(mgrIds, &manager.Id{Id: mgrID})
 	}
@@ -134,7 +135,7 @@ func (srv *Server) handleCredentialData(ctx context.Context, in *manager.NodeMan
 	}
 	err := newSecret.Validate()
 	if err != nil {
-		return "", utils.ProcessInvalid(err, "handleCredentialData: unable to validate secret")
+		return "", errorutils.ProcessInvalid(err, "handleCredentialData: unable to validate secret")
 	}
 	var id string
 	if len(in.CredentialId) > 0 {
@@ -202,10 +203,10 @@ func (srv *Server) addNodes(ctx context.Context, id string, in *manager.NodeMana
 		deleteErr := srv.DB.DeleteNodeManager(id)
 		if deleteErr != nil {
 			deleteErr = errors.Wrapf(deleteErr, "failed to add nodes to db for created node manager %s", err.Error())
-			deleteErr = utils.FormatErrorMsg(deleteErr, id)
+			deleteErr = errorutils.FormatErrorMsg(deleteErr, id)
 			return deleteErr
 		}
-		err = utils.FormatErrorMsg(err, in.Name)
+		err = errorutils.FormatErrorMsg(err, in.Name)
 		return err
 	}
 	return nil
@@ -216,7 +217,7 @@ func (srv *Server) Read(ctx context.Context, in *manager.Id) (*manager.NodeManag
 	logrus.Infof("read node manager with : %+v", in.Id)
 	mngr, err := srv.DB.GetNodeManager(in.Id)
 	if err != nil {
-		err = utils.FormatErrorMsg(err, in.Id)
+		err = errorutils.FormatErrorMsg(err, in.Id)
 		return nil, err
 	}
 	return mngr, nil
@@ -234,18 +235,18 @@ func (srv *Server) Update(ctx context.Context, in *manager.NodeManager) (*pb.Emp
 	// validate the node manager type provided
 	err := validateNodeManager(in, []string{"aws-ec2", "aws-api", "azure-api", "azure-vm", "gcp-api"})
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	credID, err := srv.handleNodeManagerCredentialUpdate(ctx, in)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	in.CredentialId = credID
 
 	// get the account id
 	acctID, err := srv.getMgrAccountID(ctx, in, srv.DB)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	in.AccountId = acctID
 
@@ -253,21 +254,21 @@ func (srv *Server) Update(ctx context.Context, in *manager.NodeManager) (*pb.Emp
 	// permissions
 	_, err = srv.Connect(ctx, in)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Name)
+		return nil, errorutils.FormatErrorMsg(err, in.Name)
 	}
 	in.Status = "reachable"
 
 	// add node manager to db (table: node_managers)
 	id, err := srv.DB.UpdateNodeManager(in)
 	if err != nil {
-		err = utils.FormatErrorMsg(err, id)
+		err = errorutils.FormatErrorMsg(err, id)
 		return nil, err
 	}
 
 	// add nodes to db (table: nodes)
 	err = srv.addNodes(ctx, id, in, acctID)
 	if err != nil {
-		err = utils.FormatErrorMsg(err, id)
+		err = errorutils.FormatErrorMsg(err, id)
 		return nil, err
 	}
 	return &empty, nil
@@ -278,7 +279,7 @@ func (srv *Server) Delete(ctx context.Context, in *manager.Id) (*pb.Empty, error
 	logrus.Infof("Deleting manager id: %+v", in.Id)
 	err := srv.DB.DeleteNodeManager(in.Id)
 	if err != nil {
-		err = utils.FormatErrorMsg(err, in.Id)
+		err = errorutils.FormatErrorMsg(err, in.Id)
 		return nil, err
 	}
 	return &empty, nil
@@ -289,7 +290,7 @@ func (srv *Server) DeleteWithNodes(ctx context.Context, in *manager.Id) (*manage
 	logrus.Infof("Deleting manager id with nodes: %+v", in.Id)
 	ids, err := srv.DB.DeleteNodeManagerWithNodes(in.Id)
 	if err != nil {
-		err = utils.FormatErrorMsg(err, in.Id)
+		err = errorutils.FormatErrorMsg(err, in.Id)
 		return nil, err
 	}
 	result := make([]*manager.Id, len(ids))
@@ -304,7 +305,7 @@ func (srv *Server) DeleteWithNodeStateStopped(ctx context.Context, in *manager.I
 	logrus.Infof("Deleting manager id with nodes: %+v", in.Id)
 	err := srv.DB.DeleteNodeManagerWithNodeStateUpdate(in.Id, "stopped")
 	if err != nil {
-		err = utils.FormatErrorMsg(err, in.Id)
+		err = errorutils.FormatErrorMsg(err, in.Id)
 		return nil, err
 	}
 	return &empty, nil
@@ -315,7 +316,7 @@ func (srv *Server) DeleteWithNodeStateTerminated(ctx context.Context, in *manage
 	logrus.Infof("Deleting manager id with nodes: %+v", in.Id)
 	err := srv.DB.DeleteNodeManagerWithNodeStateUpdate(in.Id, "terminated")
 	if err != nil {
-		err = utils.FormatErrorMsg(err, in.Id)
+		err = errorutils.FormatErrorMsg(err, in.Id)
 		return nil, err
 	}
 	return &empty, nil
@@ -326,7 +327,7 @@ func (srv *Server) List(ctx context.Context, in *manager.Query) (*manager.NodeMa
 	logrus.Debugf("Getting Nodes with query: %+v", in)
 	nodeManagers, totalCount, err := srv.DB.GetNodeManagers(in.Sort, in.Order, in.Page, in.PerPage, in.FilterMap)
 	if err != nil {
-		err = utils.FormatErrorMsg(err, "")
+		err = errorutils.FormatErrorMsg(err, "")
 		return nil, err
 	}
 	return &manager.NodeManagers{Managers: nodeManagers, Total: int32(totalCount)}, nil
@@ -338,33 +339,33 @@ func (srv *Server) Connect(ctx context.Context, in *manager.NodeManager) (*pb.Em
 	if strings.HasPrefix(in.Type, "aws") {
 		myaws, err := managers.GetAWSManagerFromCredential(ctx, in.CredentialId, srv.DB, srv.secretsClient)
 		if err != nil {
-			return nil, utils.FormatErrorMsg(err, "")
+			return nil, errorutils.FormatErrorMsg(err, "")
 		}
 		err = myaws.TestConnectivity(ctx)
 		if err != nil {
-			return nil, utils.FormatErrorMsg(err, "")
+			return nil, errorutils.FormatErrorMsg(err, "")
 		}
 		logrus.Info("AWS connection successful.")
 	}
 	if strings.HasPrefix(in.Type, "azure") {
 		myazure, err := managers.GetAzureManagerFromCredential(ctx, in.CredentialId, srv.DB, srv.secretsClient)
 		if err != nil {
-			return nil, utils.FormatErrorMsg(err, "")
+			return nil, errorutils.FormatErrorMsg(err, "")
 		}
 		err = myazure.TestConnectivity(ctx)
 		if err != nil {
-			return nil, utils.FormatErrorMsg(err, "")
+			return nil, errorutils.FormatErrorMsg(err, "")
 		}
 		logrus.Info("Azure connection successful.")
 	}
 	if strings.HasPrefix(in.Type, "gcp") {
 		mygcp, err := managers.GetGCPManagerFromCredential(ctx, in.CredentialId, srv.DB, srv.secretsClient)
 		if err != nil {
-			return nil, utils.FormatErrorMsg(err, "")
+			return nil, errorutils.FormatErrorMsg(err, "")
 		}
 		err = mygcp.TestConnectivity(ctx)
 		if err != nil {
-			return nil, utils.FormatErrorMsg(err, "")
+			return nil, errorutils.FormatErrorMsg(err, "")
 		}
 
 		logrus.Info("GCP connection successful.")
@@ -382,7 +383,7 @@ func (srv *Server) ConnectManager(ctx context.Context, in *manager.Id) (*pb.Empt
 	// get the manager
 	mgr, err := srv.DB.GetNodeManager(in.Id)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 
 	var status string
@@ -398,7 +399,7 @@ func (srv *Server) ConnectManager(ctx context.Context, in *manager.Id) (*pb.Empt
 		status = "reachable"
 	}
 	if err := srv.DB.UpdateManagerStatus(in.Id, status); err != nil {
-		return nil, utils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	return &pb.Empty{}, nil
 }
@@ -409,7 +410,7 @@ func (srv *Server) SearchNodeFields(ctx context.Context, in *manager.FieldQuery)
 
 	mgr, err := srv.DB.GetNodeManager(in.NodeManagerId)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.NodeManagerId)
+		return nil, errorutils.FormatErrorMsg(err, in.NodeManagerId)
 	}
 	switch mgr.Type {
 	case "aws-ec2", "aws-api":
@@ -421,22 +422,22 @@ func (srv *Server) SearchNodeFields(ctx context.Context, in *manager.FieldQuery)
 	case "automate":
 		return srv.searchGenericNodesFields(ctx, in, mgrtypes.AutomateManagerID)
 	default:
-		return nil, &utils.InvalidError{Msg: fmt.Sprintf("Unsupported manager type: %s", mgr.Type)}
+		return nil, &errorutils.InvalidError{Msg: fmt.Sprintf("Unsupported manager type: %s", mgr.Type)}
 	}
 }
 
 func (srv *Server) searchAzureFields(ctx context.Context, in *manager.FieldQuery) (*manager.Fields, error) {
 	myazure, err := managers.GetAzureManagerFromID(ctx, in.NodeManagerId, srv.DB, srv.secretsClient)
 	if err != nil {
-		err = utils.FormatErrorMsg(err, in.NodeManagerId)
+		err = errorutils.FormatErrorMsg(err, in.NodeManagerId)
 		return nil, err
 	}
 	if in.Query == nil {
-		return nil, &utils.InvalidError{Msg: "Please provide a query."}
+		return nil, &errorutils.InvalidError{Msg: "Please provide a query."}
 	}
 	results, err := myazure.QueryField(ctx, in.GetQuery().GetFilterMap(), in.Field)
 	if err != nil {
-		err = utils.FormatErrorMsg(err, "")
+		err = errorutils.FormatErrorMsg(err, "")
 		return nil, err
 	}
 	return &manager.Fields{Fields: results}, nil
@@ -444,13 +445,13 @@ func (srv *Server) searchAzureFields(ctx context.Context, in *manager.FieldQuery
 
 func (srv *Server) searchGenericNodesFields(ctx context.Context, in *manager.FieldQuery, managerId string) (*manager.Fields, error) {
 	if in.Query == nil {
-		return nil, &utils.InvalidError{Msg: "Please provide a query."}
+		return nil, &errorutils.InvalidError{Msg: "Please provide a query."}
 	}
 	filters := in.GetQuery().GetFilterMap()
 	filters = append(filters, &common.Filter{Key: "manager_id", Values: []string{managerId}})
 	results, err := srv.DB.QueryManualNodesFields(ctx, filters, in.Field)
 	if err != nil {
-		err = utils.FormatErrorMsg(err, "")
+		err = errorutils.FormatErrorMsg(err, "")
 		return nil, err
 	}
 	return &manager.Fields{Fields: results}, nil
@@ -459,15 +460,15 @@ func (srv *Server) searchGenericNodesFields(ctx context.Context, in *manager.Fie
 func (srv *Server) searchAwsFields(ctx context.Context, in *manager.FieldQuery) (*manager.Fields, error) {
 	myaws, _, err := managers.GetAWSManagerFromID(ctx, in.NodeManagerId, srv.DB, srv.secretsClient)
 	if err != nil {
-		err = utils.FormatErrorMsg(err, in.NodeManagerId)
+		err = errorutils.FormatErrorMsg(err, in.NodeManagerId)
 		return nil, err
 	}
 	if in.Query == nil {
-		return nil, &utils.InvalidError{Msg: "Please provide a query."}
+		return nil, &errorutils.InvalidError{Msg: "Please provide a query."}
 	}
 	results, err := myaws.QueryField(ctx, in.GetQuery().GetFilterMap(), in.Field)
 	if err != nil {
-		err = utils.FormatErrorMsg(err, "")
+		err = errorutils.FormatErrorMsg(err, "")
 		return nil, err
 	}
 	return &manager.Fields{Fields: results}, nil
@@ -479,7 +480,7 @@ func (srv *Server) SearchNodes(ctx context.Context, in *manager.NodeQuery) (*man
 
 	mgr, err := srv.DB.GetNodeManager(in.NodeManagerId)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.NodeManagerId)
+		return nil, errorutils.FormatErrorMsg(err, in.NodeManagerId)
 	}
 	switch mgr.Type {
 	case "aws-ec2":
@@ -495,14 +496,14 @@ func (srv *Server) SearchNodes(ctx context.Context, in *manager.NodeQuery) (*man
 	case "automate":
 		return srv.searchGenericNodes(ctx, in.GetQuery().GetFilterMap(), mgrtypes.AutomateManagerID)
 	default:
-		return nil, &utils.InvalidError{Msg: fmt.Sprintf("Unsupported manager type: %s", mgr.Type)}
+		return nil, &errorutils.InvalidError{Msg: fmt.Sprintf("Unsupported manager type: %s", mgr.Type)}
 	}
 }
 
 func (srv *Server) searchAwsRegions(ctx context.Context, in *manager.NodeQuery) (*manager.Nodes, error) {
 	myaws, _, err := managers.GetAWSManagerFromID(ctx, in.NodeManagerId, srv.DB, srv.secretsClient)
 	if err != nil {
-		err = utils.FormatErrorMsg(err, "")
+		err = errorutils.FormatErrorMsg(err, "")
 		return nil, err
 	}
 
@@ -524,13 +525,13 @@ func (srv *Server) searchAwsRegions(ctx context.Context, in *manager.NodeQuery) 
 	}
 
 	if len(includeFilters) > 0 && len(excludeFilters) > 0 {
-		err = &utils.InvalidError{Msg: "using include and exclude filters in the same request is unsupported"}
-		return nil, utils.FormatErrorMsg(err, "")
+		err = &errorutils.InvalidError{Msg: "using include and exclude filters in the same request is unsupported"}
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 
 	regions, err := myaws.GetRegions(ctx)
 	if err != nil {
-		err = utils.FormatErrorMsg(err, "")
+		err = errorutils.FormatErrorMsg(err, "")
 		return nil, err
 	}
 
@@ -559,11 +560,11 @@ func (srv *Server) searchAwsRegions(ctx context.Context, in *manager.NodeQuery) 
 func (srv *Server) searchAzureSubscriptions(ctx context.Context, in *manager.NodeQuery) (*manager.Nodes, error) {
 	myazure, err := managers.GetAzureManagerFromID(ctx, in.NodeManagerId, srv.DB, srv.secretsClient)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.NodeManagerId)
+		return nil, errorutils.FormatErrorMsg(err, in.NodeManagerId)
 	}
 	subs, err := myazure.GetSubscriptions(ctx, in.GetQuery().GetFilterMap())
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 
 	nodes := make([]string, 0, len(subs))
@@ -576,13 +577,13 @@ func (srv *Server) searchAzureSubscriptions(ctx context.Context, in *manager.Nod
 func (srv *Server) searchAzureNodes(ctx context.Context, in *manager.NodeQuery) (*manager.Nodes, error) {
 	myazure, err := managers.GetAzureManagerFromID(ctx, in.NodeManagerId, srv.DB, srv.secretsClient)
 	if err != nil {
-		err = utils.FormatErrorMsg(err, in.NodeManagerId)
+		err = errorutils.FormatErrorMsg(err, in.NodeManagerId)
 		return nil, err
 	}
 
 	nodesRes, err := myazure.QueryVMs(ctx, in.GetQuery().GetFilterMap())
 	if err != nil {
-		err = utils.FormatErrorMsg(err, "")
+		err = errorutils.FormatErrorMsg(err, "")
 		return nil, err
 	}
 
@@ -605,7 +606,7 @@ func (srv *Server) searchGenericNodes(ctx context.Context, filters []*common.Fil
 		logrus.Debugf("getting nodes with page %d for total %d, per_page %d", cnt, total, perPage)
 		pageNodes, totalCount, err := srv.DB.GetNodes("name", 0, cnt, perPage, filters)
 		if err != nil {
-			err = utils.FormatErrorMsg(err, "")
+			err = errorutils.FormatErrorMsg(err, "")
 			return nil, err
 		}
 		total = totalCount.Total
@@ -623,13 +624,13 @@ func (srv *Server) searchGenericNodes(ctx context.Context, filters []*common.Fil
 func (srv *Server) searchAwsNodes(ctx context.Context, in *manager.NodeQuery) (*manager.Nodes, error) {
 	myaws, _, err := managers.GetAWSManagerFromID(ctx, in.NodeManagerId, srv.DB, srv.secretsClient)
 	if err != nil {
-		err = utils.FormatErrorMsg(err, "")
+		err = errorutils.FormatErrorMsg(err, "")
 		return nil, err
 	}
 
 	nodesRes, err := myaws.QueryNodes(ctx, in.GetQuery().GetFilterMap(), false)
 	if err != nil {
-		err = utils.FormatErrorMsg(err, "")
+		err = errorutils.FormatErrorMsg(err, "")
 		logrus.Errorf("There was an error listing nodes: %s", err.Error())
 		return nil, err
 	}
@@ -676,7 +677,7 @@ func (srv *Server) addManagerNodesToDB(ctx context.Context, managerId string, ma
 			return errors.Wrapf(err, "addManagerNodesToDb unable to add a node for each api region for manager %s", managerId)
 		}
 	default:
-		return &utils.InvalidError{Msg: "valid manager types are: 'aws-ec2', 'aws-api', 'azure-api', 'azure-vm', 'gcp-api'"}
+		return &errorutils.InvalidError{Msg: "valid manager types are: 'aws-ec2', 'aws-api', 'azure-api', 'azure-vm', 'gcp-api'"}
 	}
 	return srv.DB.RemoveStaleNodeAssociations(managerId, nodeIds)
 }
@@ -794,7 +795,7 @@ func (srv *Server) ProcessNode(ctx context.Context, in *manager.NodeMetadata) (*
 
 	err := srv.DB.ProcessIncomingNode(in)
 	if err != nil {
-		err = utils.FormatErrorMsg(err, in.Uuid)
+		err = errorutils.FormatErrorMsg(err, in.Uuid)
 		return nil, err
 	}
 
@@ -809,7 +810,7 @@ func (srv *Server) ChangeNodeState(ctx context.Context, in *manager.NodeState) (
 	// first we get the current node state
 	state, err := srv.DB.GetNodeState(in.Id)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	// if node state is terminated, the user can no longer update the node state. they terminated it.
 	if state == manager.NodeState_TERMINATED.String() {
@@ -818,19 +819,19 @@ func (srv *Server) ChangeNodeState(ctx context.Context, in *manager.NodeState) (
 	// update the node state
 	err = srv.DB.ChangeNodeState(in)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	return &manager.ChangeNodeStateResponse{}, nil
 }
 
 func validateNodeManager(in *manager.NodeManager, validMgrTypes []string) error {
 	if len(in.CredentialId) > 0 && len(in.CredentialData) > 0 {
-		return &utils.InvalidError{Msg: fmt.Sprintf("only one or no credential is allowed %+s %+v", in.CredentialId, in.CredentialData)}
+		return &errorutils.InvalidError{Msg: fmt.Sprintf("only one or no credential is allowed %+s %+v", in.CredentialId, in.CredentialData)}
 	}
 	if stringutils.SliceContains(validMgrTypes, in.Type) {
 		return nil
 	}
-	return &utils.InvalidError{Msg: fmt.Sprintf("valid types for node manager instance are %+v", validMgrTypes)}
+	return &errorutils.InvalidError{Msg: fmt.Sprintf("valid types for node manager instance are %+v", validMgrTypes)}
 }
 
 func (srv *Server) handleNodeManagerCredentialUpdate(ctx context.Context, in *manager.NodeManager) (string, error) {

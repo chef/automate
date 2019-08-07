@@ -19,6 +19,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/api/jobs"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/chef/automate/components/compliance-service/utils"
+	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"
 )
 
@@ -633,14 +634,14 @@ func validateJobFilters(filters []*common.Filter) error {
 		case "job_type":
 			for _, item := range filter.Values {
 				if !isValidJobType(item) {
-					return &utils.InvalidError{Msg: fmt.Sprintf("Invalid job_type filter: %s. job_type must be one of the following: 'detect' or 'exec'", item)}
+					return &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid job_type filter: %s. job_type must be one of the following: 'detect' or 'exec'", item)}
 				}
 			}
 		case "parent_job":
 			for _, item := range filter.Values {
 				if item != "" {
 					if !utils.IsSafeUUID(item) {
-						return &utils.InvalidError{Msg: fmt.Sprintf("Invalid parent_job uuid filter: %s", item)}
+						return &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid parent_job uuid filter: %s", item)}
 					}
 				}
 			}
@@ -648,7 +649,7 @@ func validateJobFilters(filters []*common.Filter) error {
 			for _, item := range filter.Values {
 				if item != "" {
 					if !isValidJobStatus(item) {
-						return &utils.InvalidError{Msg: fmt.Sprintf("Invalid status filter: %s. status must be one of the following: 'completed', 'failed', 'new', 'running', 'scheduled'", item)}
+						return &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid status filter: %s. status must be one of the following: 'completed', 'failed', 'new', 'running', 'scheduled'", item)}
 					}
 				}
 			}
@@ -669,10 +670,10 @@ func (db *DB) GetJobs(sortField string, insortOrder jobs.Query_OrderType, pageNr
 	perPage = valueOrDefaultInt(perPage, 100)
 
 	if jobsSortFields[sortField] == "" {
-		return nil, 0, &utils.InvalidError{Msg: fmt.Sprintf("Invalid sort field, valid ones are: %v", getMapKeys(jobsSortFields))}
+		return nil, 0, &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid sort field, valid ones are: %v", getMapKeys(jobsSortFields))}
 	}
 	if !stringutils.SliceContains(validOrderFields, sortOrder) {
-		return nil, 0, &utils.InvalidError{Msg: fmt.Sprintf("Invalid order, valid ones are: %v", validOrderFields)}
+		return nil, 0, &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid order, valid ones are: %v", validOrderFields)}
 	}
 	var jobDaos []*jobSelectSummary
 
@@ -729,7 +730,7 @@ func (db *DB) GetJob(id string) (*jobs.Job, error) {
 
 	err := db.SelectOne(&job, selectJob, id)
 	if err != nil {
-		return &newJob, utils.ProcessSQLNotFound(err, id, "GetJob error")
+		return &newJob, errorutils.ProcessSQLNotFound(err, id, "GetJob error")
 	}
 
 	newJob, err = fromDBSelectJob(&job)
@@ -750,7 +751,7 @@ func (db *DB) DeleteJob(id string) error {
 
 func (db *DB) UpdateJob(inJob *jobs.Job) error {
 	if err := validateJob(inJob); err != nil {
-		return utils.ProcessInvalid(err, "UpdateJob error validating job")
+		return errorutils.ProcessInvalid(err, "UpdateJob error validating job")
 	}
 
 	job, err := toDBJob(inJob)
@@ -896,7 +897,7 @@ func validateJob(in *jobs.Job) error {
 	in.RetriesLeft = in.Retries
 
 	if in.Name == "" {
-		return &utils.InvalidError{Msg: "Invalid job, 'name' is a required parameter"}
+		return &errorutils.InvalidError{Msg: "Invalid job, 'name' is a required parameter"}
 	}
 	in.Status = types.StatusNew
 

@@ -8,7 +8,7 @@ import (
 
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/secrets-service/dao"
-	"github.com/chef/automate/components/secrets-service/utils"
+	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/health"
 )
 
@@ -29,11 +29,11 @@ func New(secretsDb *dao.DB) *SecretsServer {
 // Create a new secret
 func (ss *SecretsServer) Create(ctx context.Context, in *secrets.Secret) (*secrets.Id, error) {
 	if err := in.Validate(); err != nil {
-		return nil, utils.FormatErrorMsg(errors.Wrap(err, "Create: unable to validate secret"), "")
+		return nil, errorutils.FormatErrorMsg(errors.Wrap(err, "Create: unable to validate secret"), "")
 	}
 	sID, err := ss.secretsDb.AddSecret(in)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	return &secrets.Id{Id: sID}, nil
 }
@@ -43,7 +43,7 @@ func (ss *SecretsServer) Read(ctx context.Context, in *secrets.Id) (*secrets.Sec
 	logs.Infof("read secret with : %+v", in.Id)
 	secret, err := ss.secretsDb.GetSecret(in.Id)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	return secret, nil
 }
@@ -54,7 +54,7 @@ func (ss *SecretsServer) Update(ctx context.Context, in *secrets.Secret) (*secre
 
 	newSecret, err := ss.secretsDb.GetSecret(in.Id)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(utils.ProcessSQLNotFound(err, in.Id, "updateSecretValidation error getting secret from db"), in.Id)
+		return nil, errorutils.FormatErrorMsg(errorutils.ProcessSQLNotFound(err, in.Id, "updateSecretValidation error getting secret from db"), in.Id)
 	}
 
 	newSecret.Merge(in)
@@ -62,12 +62,12 @@ func (ss *SecretsServer) Update(ctx context.Context, in *secrets.Secret) (*secre
 	// do some error checking
 	err = newSecret.Validate()
 	if err != nil {
-		return nil, utils.FormatErrorMsg(utils.ProcessInvalid(err, "updateSecretValidation: unable to validate secret"), in.Id)
+		return nil, errorutils.FormatErrorMsg(errorutils.ProcessInvalid(err, "updateSecretValidation: unable to validate secret"), in.Id)
 	}
 
 	err = ss.secretsDb.UpdateSecret(newSecret)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	return &secrets.UpdateResponse{}, nil
 }
@@ -77,7 +77,7 @@ func (ss *SecretsServer) Delete(ctx context.Context, in *secrets.Id) (*secrets.D
 	logs.Infof("Deleting Secret id: %+v", in.Id)
 	_, err := ss.secretsDb.DeleteSecret(in.Id)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	return &secrets.DeleteResponse{}, nil
 }
@@ -87,7 +87,7 @@ func (ss *SecretsServer) List(ctx context.Context, in *secrets.Query) (*secrets.
 	logs.Debugf("Getting Secrets with query: %+v", in)
 	dbsecrets, totalCount, err := ss.secretsDb.GetSecrets(in.Sort, in.Order, in.Page, in.PerPage, in.Filters)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	return &secrets.Secrets{Secrets: dbsecrets, Total: int32(totalCount)}, nil
 }

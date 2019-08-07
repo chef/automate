@@ -16,6 +16,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	"github.com/chef/automate/components/compliance-service/reporting/util"
 	"github.com/chef/automate/components/compliance-service/utils"
+	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/io/chunks"
 	"github.com/chef/automate/lib/stringutils"
@@ -52,11 +53,11 @@ func (srv *Server) ListReports(ctx context.Context, in *reporting.Query) (*repor
 	formattedFilters := formatFilters(in.Filters)
 	formattedFilters, err = filterByProjects(ctx, formattedFilters)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	reportsList, total, err := srv.es.GetReports(from, perPage, formattedFilters, SORT_FIELDS[sort], asc)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	reports.Reports = reportsList
 	reports.Total = int32(total)
@@ -114,12 +115,12 @@ func (srv *Server) ReadReport(ctx context.Context, in *reporting.Query) (*report
 	}
 	formattedFilters, err := filterByProjects(ctx, formattedFilters)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	// Using ComplianceTwenty as the report might not be in the latest index
 	report, err := srv.es.GetReport(relaxting.ComplianceDailyRepTwenty, in.Id, formattedFilters)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	return report, nil
 }
@@ -136,11 +137,11 @@ func (srv *Server) ListSuggestions(ctx context.Context, in *reporting.Suggestion
 	formattedFilters := formatFilters(in.Filters)
 	formattedFilters, err := filterByProjects(ctx, formattedFilters)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	suggestionsList, err := srv.es.GetSuggestions(in.Type, formattedFilters, in.Text, in.Size)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	suggestions.Suggestions = suggestionsList
 	return &suggestions, nil
@@ -166,7 +167,7 @@ func (srv *Server) ListProfiles(ctx context.Context, in *reporting.Query) (*repo
 
 	profiles, counts, err := srv.es.GetAllProfilesFromNodes(from, perPage, formattedFilters, SORT_FIELDS[sort], asc)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	profileMins.Counts = counts
 	profileMins.Profiles = profiles
@@ -323,12 +324,12 @@ func (srv *Server) ListNodes(ctx context.Context, in *reporting.Query) (*reporti
 	formattedFilters := formatFilters(in.Filters)
 	formattedFilters, err = filterByProjects(ctx, formattedFilters)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 
 	nodesList, total, err := srv.es.GetNodes(from, perPage, formattedFilters, SORT_FIELDS[sort], asc)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	nodes.Total = int32(total)
 	nodes.Nodes = nodesList
@@ -340,12 +341,12 @@ func (srv *Server) ReadNode(ctx context.Context, in *reporting.Id) (*reporting.N
 	formattedFilters := formatFilters([]*reporting.ListFilter{})
 	formattedFilters, err := filterByProjects(ctx, formattedFilters)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 
 	node, err := srv.es.GetNode(in.Id, formattedFilters)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	return node, nil
 }
@@ -383,7 +384,7 @@ func validatePaginationAndSorting(in *reporting.Query, validSortFields map[strin
 		}
 		if !stringutils.SliceContains(valid_fields, in.Sort) {
 			sorter.Strings(valid_fields)
-			err = &utils.InvalidError{Msg: fmt.Sprintf("Parameter 'sort' only supports one of the following fields: %v", valid_fields)}
+			err = &errorutils.InvalidError{Msg: fmt.Sprintf("Parameter 'sort' only supports one of the following fields: %v", valid_fields)}
 			return
 		}
 		sort = in.Sort

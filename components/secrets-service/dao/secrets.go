@@ -18,7 +18,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 
 	"github.com/chef/automate/api/external/secrets"
-	"github.com/chef/automate/components/secrets-service/utils"
+	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"
 )
 
@@ -294,10 +294,10 @@ func (secretsDb *DB) GetSecrets(sortField string, insortOrder secrets.Query_Orde
 	perPage = valueOrDefaultInt(perPage, 100) //limit
 
 	if secretsSortFields[sortField] == "" {
-		return nil, 0, &utils.InvalidError{Msg: fmt.Sprintf("Invalid sort field, valid ones are: %v", getMapKeys(secretsSortFields))}
+		return nil, 0, &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid sort field, valid ones are: %v", getMapKeys(secretsSortFields))}
 	}
 	if !stringutils.SliceContains(validOrderFields, sortOrder) {
-		return nil, 0, &utils.InvalidError{Msg: fmt.Sprintf("Invalid order, valid ones are: %v", validOrderFields)}
+		return nil, 0, &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid order, valid ones are: %v", validOrderFields)}
 	}
 	err := validateSecretFilters(filters)
 	if err != nil {
@@ -340,7 +340,7 @@ func validateSecretFilters(filters []*secrets.Filter) error {
 		case "type":
 			for _, item := range filter.Values {
 				if !isValidSecretType(item) {
-					return &utils.InvalidError{Msg: fmt.Sprintf("Invalid type filter: %s. type must be one of the following: ssh, winrm, sudo, aws, azure, service_now", item)}
+					return &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid type filter: %s. type must be one of the following: ssh, winrm, sudo, aws, azure, service_now", item)}
 				}
 			}
 		}
@@ -363,7 +363,7 @@ func (secretsDb *DB) GetSecret(id string) (*secrets.Secret, error) {
 	err := secretsDb.SelectOne(&secret, selectSecret, id)
 	var newSecret *secrets.Secret
 	if err != nil {
-		return nil, utils.ProcessSQLNotFound(err, id, "GetSecret")
+		return nil, errorutils.ProcessSQLNotFound(err, id, "GetSecret")
 	}
 
 	newSecret, err = secretsDb.fromDBSelectSecret(&secret)
@@ -383,7 +383,7 @@ func (secretsDb *DB) DeleteSecret(id string) (int64, error) {
 
 		_, err := tx.Exec(deleteSecretTags, id)
 		if err != nil {
-			return utils.ProcessSQLNotFound(err, id, "DeleteSecret")
+			return errorutils.ProcessSQLNotFound(err, id, "DeleteSecret")
 		}
 
 		_, err = tx.Exec(deleteNodesSecrets, id)

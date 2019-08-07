@@ -12,9 +12,9 @@ import (
 
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/compliance-service/api/common"
-	"github.com/chef/automate/components/compliance-service/utils"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/mgrtypes"
+	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"
 )
 
@@ -340,7 +340,7 @@ func validateNodeManagerFilters(filters []*common.Filter) error {
 		case "manager_type":
 			for _, item := range filter.Values {
 				if !isValidManagerType(item) {
-					return &utils.InvalidError{Msg: fmt.Sprintf("Invalid manager type filter: %s. manager_type must be one of the following: 'aws-ec2', 'aws-api', 'azure-api'", item)}
+					return &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid manager type filter: %s. manager_type must be one of the following: 'aws-ec2', 'aws-api', 'azure-api'", item)}
 				}
 			}
 		}
@@ -396,7 +396,7 @@ func deleteNodeManager(db *DB, id string, deleteFunc func(*DBTrans) error) error
 	}
 	// return err if user is trying to delete manual node manager
 	if mgr.Type == "automate" {
-		return &utils.InvalidError{Msg: "Invalid request. Unable to delete manual node manager"}
+		return &errorutils.InvalidError{Msg: "Invalid request. Unable to delete manual node manager"}
 	}
 
 	err = Transact(db, func(tx *DBTrans) error {

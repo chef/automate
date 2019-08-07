@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
-	"github.com/chef/automate/components/compliance-service/utils"
+	"github.com/chef/automate/lib/errorutils"
 	elastic "github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/schollz/closestmatch"
@@ -44,7 +44,7 @@ func (backend ES2Backend) GetSuggestions(typeParam string, filters map[string][]
 
 	target, ok := SUGGESTIONS_TYPES[typeParam]
 	if !ok {
-		return nil, utils.ProcessInvalid(nil, fmt.Sprintf("Invalid suggestion type '%s'", typeParam))
+		return nil, errorutils.ProcessInvalid(nil, fmt.Sprintf("Invalid suggestion type '%s'", typeParam))
 	}
 
 	// Not filtering the type we are suggesting on. Otherwise, we would only get what we filter on

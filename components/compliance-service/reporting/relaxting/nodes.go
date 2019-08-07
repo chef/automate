@@ -8,7 +8,7 @@ import (
 
 	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting"
-	"github.com/chef/automate/components/compliance-service/utils"
+	"github.com/chef/automate/lib/errorutils"
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -292,5 +292,5 @@ func (backend *ES2Backend) GetNode(nodeUuid string, filters map[string][]string)
 			}
 		}
 	}
-	return nil, utils.ProcessNotFound(nil, nodeUuid)
+	return nil, errorutils.ProcessNotFound(nil, nodeUuid)
 }

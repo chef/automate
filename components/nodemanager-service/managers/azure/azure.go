@@ -20,10 +20,10 @@ import (
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
-	"github.com/chef/automate/components/compliance-service/utils"
 	"github.com/chef/automate/components/compliance-service/utils/pool"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/pgdb"
+	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"
 )
 
@@ -109,7 +109,7 @@ func (creds *Creds) TestConnectivity(ctx context.Context) error {
 	}
 	// With bad credentials, Azure returns an empty list.
 	if len(subs) == 0 {
-		return utils.ProcessUnauthenticated(nil, "TestConnectivity unable to list subscriptions")
+		return errorutils.ProcessUnauthenticated(nil, "TestConnectivity unable to list subscriptions")
 	}
 	return nil
 }
@@ -305,7 +305,7 @@ func handleResources(vals map[string][]resources.GenericResource, filters []*com
 	if len(resourceGroupNames) == 0 {
 		err := fmt.Sprintf("No results available for provided filters: %v", filters)
 		logrus.Error(err)
-		return []string{}, &utils.InvalidError{Msg: err}
+		return []string{}, &errorutils.InvalidError{Msg: err}
 	}
 	// get the intersect of the resource group names for each map entry
 	// in other words, if there are 3 map entries (filter by region useast + tag:Test-VJ + tag:more-another_tag)
@@ -317,7 +317,7 @@ func handleResources(vals map[string][]resources.GenericResource, filters []*com
 	if len(resourceGroupNamesList) == 0 {
 		err := fmt.Sprintf("No results available for provided filters: %v", filters)
 		logrus.Error(err)
-		return []string{}, &utils.InvalidError{Msg: err}
+		return []string{}, &errorutils.InvalidError{Msg: err}
 	}
 	return resourceGroupNamesList, nil
 }
@@ -716,7 +716,7 @@ func (creds *Creds) QueryField(ctx context.Context, filters []*common.Filter, fi
 				}
 			}
 		} else {
-			return resultArray, utils.ProcessInvalid(nil, fmt.Sprintf("invalid filter field %s", field))
+			return resultArray, errorutils.ProcessInvalid(nil, fmt.Sprintf("invalid filter field %s", field))
 		}
 	}
 
