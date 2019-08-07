@@ -157,12 +157,28 @@ const alreadyMigratedMessage = `You have already upgraded to IAM %s.
 
   Then re-run this command.`
 
+type vsn struct {
+	Major policies_common.Version_VersionNumber
+	Minor policies_common.Version_VersionNumber
+}
+
+func display(v *policies_common.Version) string {
+	x := vsn{Minor: v.Minor, Major: v.Major}
+	switch x {
+	case vsn{Major: policies_common.Version_V2, Minor: policies_common.Version_V1}:
+		return "v2.1"
+	case vsn{Major: policies_common.Version_V2, Minor: policies_common.Version_V0}:
+		return "v2.0"
+	default:
+		return "v1.0"
+	}
+}
+
 func runIAMUpgradeToV2Cmd(cmd *cobra.Command, args []string) error {
 	label := map[bool]string{
 		true:  "v2.1",
 		false: "v2",
 	}
-
 	upgradeReq := &policies_req.UpgradeToV2Req{
 		Flag:           policies_common.Flag_VERSION_2_0,
 		SkipV1Policies: iamCmdFlags.skipLegacyUpgrade,
@@ -279,10 +295,7 @@ func runIAMVersionCmd(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return status.Wrap(err, status.APIError, "Failed to retrieve IAM version")
 	}
-	major := strings.ToLower(resp.Version.Major.String())
-	minor := strings.Replace(resp.Version.Minor.String(), "V", ".", 1)
-	version := major + minor
-	writer.Printf("IAM %s\n", version)
+	writer.Printf("IAM %s\n", display(resp.Version))
 	return nil
 }
 
@@ -349,7 +362,7 @@ func runRestoreDefaultAdminAccessAdminCmd(cmd *cobra.Command, args []string) err
 		return status.Wrap(err, status.APIError, "Failed to verify IAM version")
 	}
 
-	writer.Titlef("Checking IAM %s policies for admin policy with admins team.\n", resp.Version)
+	writer.Titlef("Checking IAM %s policies for admin policy with admins team.\n", display(resp.Version))
 
 	switch resp.Version.Major {
 	case policies_common.Version_V1:
