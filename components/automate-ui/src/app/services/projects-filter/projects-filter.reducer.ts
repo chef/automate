@@ -16,6 +16,7 @@ const {
 export interface ProjectsFilterOption {
   label: string;
   value: string;
+  type:  string;
   checked: boolean;
 }
 

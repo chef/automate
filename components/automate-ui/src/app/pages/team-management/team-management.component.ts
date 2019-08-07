@@ -109,7 +109,8 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
         this.dropdownProjects = assignable.map(p => {
           return <Project>{
             id: p.value,
-            name: p.label
+            name: p.label,
+            type: p.type
           };
         });
       });

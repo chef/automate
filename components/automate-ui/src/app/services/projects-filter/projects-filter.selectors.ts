@@ -1,13 +1,14 @@
 import { createSelector } from '@ngrx/store';
 
 import { ProjectConstants } from 'app/entities/projects/project.model';
+import { ProjectsFilterOption } from './projects-filter.reducer';
 
 export const projectsFilterState = state => state.projectsFilter;
 
 export const options = createSelector(projectsFilterState, state => state.options);
 
 export const projectsAssignable = createSelector(projectsFilterState, state => {
-  let projectOptions = state.options.filter(p => p.checked);
+  let projectOptions = state.options.filter((p: ProjectsFilterOption) => p.checked);
 
   // there is no project filter, populate all projects.
   if (projectOptions.length === 0) {
