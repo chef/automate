@@ -21,16 +21,13 @@ describe('team management', () => {
   const describeIAMV2 = iamVersion.match(/v2/) ? describe : describe.skip;
   const describeProjectsEnabled = iamVersion === 'v2.1' ? describe : describe.skip;
 
-  before(() => {
+  beforeEach(() => {
     cy.adminLogin('/settings/teams').then(() => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
       adminToken = admin.id_token;
       cy.cleanupTeamsByDescriptionPrefix(adminToken, cypressPrefix);
       cy.cleanupProjectsByIDPrefix(adminToken, cypressPrefix);
     });
-  });
-
-  beforeEach(() => {
     cy.restoreStorage();
   });
 
@@ -84,7 +81,6 @@ describe('team management', () => {
       cy.get('chef-notification.info').should('be.visible');
       cy.contains(teamName).should('exist');
       cy.contains(generatedTeamID).should('exist');
-      cy.go('back');
     });
 
     it('can create a team with a custom ID', () => {
@@ -104,7 +100,6 @@ describe('team management', () => {
       cy.contains(teamName).should('exist');
       cy.contains(customTeamID).should('exist');
       cy.contains(generatedTeamID).should('not.exist');
-      cy.go('back');
     });
   });
 
@@ -149,7 +144,6 @@ describe('team management', () => {
         cy.contains(teamName).should('exist');
         cy.contains(generatedTeamID).should('exist');
         cy.get('[data-cy=team-details-projects]').contains(unassigned);
-        cy.go('back');
       });
     });
 
@@ -239,7 +233,6 @@ describe('team management', () => {
         cy.contains(teamName).should('exist');
         cy.contains(generatedTeamID).should('exist');
         cy.get('[data-cy=team-details-projects]').contains(projectSummary);
-        cy.go('back');
       });
 
       it('can create a team with one project selected', () => {
@@ -273,7 +266,6 @@ describe('team management', () => {
         cy.contains(teamName).should('exist');
         cy.contains(generatedTeamID).should('exist');
         cy.get('[data-cy=team-details-projects]').contains(project2ID);
-        cy.go('back');
       });
 
       it('can create a team with no projects selected (unassigned)', () => {
@@ -306,7 +298,6 @@ describe('team management', () => {
         cy.contains(teamName).should('exist');
         cy.contains(generatedTeamID).should('exist');
         cy.get('[data-cy=team-details-projects]').contains(unassigned);
-        cy.go('back');
       });
     });
   });
@@ -319,7 +310,6 @@ describe('team management', () => {
 
     cy.get('.page-title').contains('admins');
     cy.contains('Add User');
-    cy.go('back');
   });
 
   it('displays team users for admins team', () => {
@@ -329,6 +319,5 @@ describe('team management', () => {
     cy.get('app-user-table chef-th').contains('Username');
     cy.get('app-user-table chef-td').contains('Local Administrator');
     cy.get('app-user-table chef-td').contains('admin');
-    cy.go('back');
   });
 });
