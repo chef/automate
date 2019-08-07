@@ -8,6 +8,7 @@ import { filter, pluck, map } from 'rxjs/operators';
 import { find, identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { ChefValidators } from 'app/helpers/auth/validator';
 import { routeParams } from 'app/route.selectors';
 import { EntityStatus } from 'app/entities/entities';
 import {
@@ -21,35 +22,6 @@ import {
 } from 'app/entities/users/user.selectors';
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
-
-// TODO: deduplicate (copied from user-management.component.ts)
-function matchFieldValidator() {
-  return (control): { [key: string]: any } => {
-    if (!control.root || !control.root.controls) {
-      return null;
-    }
-    const valid = control.value === control.root.controls.newPassword.value;
-    return valid ? null : {
-      'noMatch': { value: control }
-    };
-  };
-}
-
-function nonAdminValidator(isAdminView: boolean, minLength: number) {
-  return (control): { [key: string]: any } => {
-    // Don't error if we are in admin view.
-    if (isAdminView) {
-      return null;
-    }
-    if (!control.value) {
-      return { 'required': { value: control } };
-    }
-    if (control.value.length < minLength) {
-      return { 'minlength': { value: control } };
-    }
-    return null;
-  };
-}
 
 @Component({
   selector: 'app-user-details',
@@ -138,12 +110,13 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       fullName: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
     this.passwordForm = fb.group({
-      oldPassword: ['', [nonAdminValidator(this.isAdminView, 8)]],
+      oldPassword: ['', [ChefValidators.nonAdminLengthValidator(this.isAdminView, 8)]],
       newPassword: ['',
         [Validators.required,
         Validators.pattern(Regex.patterns.NON_BLANK),
         Validators.minLength(8)]],
-      confirmPassword: ['', [Validators.required, matchFieldValidator()]]
+      confirmPassword: ['',
+        [Validators.required, ChefValidators.matchFieldValidator('newPassword')]]
     });
   }
 
