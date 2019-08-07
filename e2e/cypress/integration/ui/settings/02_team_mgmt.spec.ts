@@ -17,6 +17,8 @@ describe('team management', () => {
   if (iamVersion === undefined) {
     iamVersion = 'v2.1';
   }
+
+  const describeIAMV2 = iamVersion.match(/v2/) ? describe : describe.skip;
   const describeProjectsEnabled = iamVersion === 'v2.1' ? describe : describe.skip;
 
   before(() => {
@@ -68,7 +70,7 @@ describe('team management', () => {
     });
   });
 
-  describe('team create modal', () => {
+  describeIAMV2('team create modal (IAM v2.x)', () => {
     it('can create a team with a default ID', () => {
       cy.get('app-team-management chef-toolbar chef-button').contains('Create Team').click();
       cy.get('app-team-management chef-modal').should('exist');
