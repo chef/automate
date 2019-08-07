@@ -42,7 +42,7 @@
         <section>
           <chef-toolbar>
             <app-authorized [allOf]="['/auth/teams', 'post']">
-              <chef-button primary (click)="openCreateModal()">Create Team</chef-button>
+              <chef-button primary (click)="openCreateModal()" data-cy="team-create-button">Create Team</chef-button>
             </app-authorized>
           </chef-toolbar>
           <div id="table-container">

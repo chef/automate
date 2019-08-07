@@ -64,7 +64,9 @@ To target those specific sets of tests set that environment variable when starti
 CYPRESS_IAM_VERSION="v2.1" npm run cypress:run
 ```
 
-You might see failures if your dev environment doesn't match.
+Possible values are `"v1.0"`, `"v2.0"`, and `"v2.1"`.
+
+Your dev environment's IAM version MUST match the value of CYPRESS_IAM_VERSION for the tests to pass locally.
 
 ## Running Cypress pipeline tests
 
