@@ -6,23 +6,13 @@ import { takeUntil, map } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
+import { ChefValidators } from 'app/helpers/auth/validator';
 import { EntityStatus, loading } from 'app/entities/entities';
 import { allUsers, userStatus } from 'app/entities/users/user.selectors';
 import {
   CreateUser, DeleteUser, GetUsers, CreateUserPayload
 } from 'app/entities/users/user.actions';
 import { User } from 'app/entities/users/user.model';
-
-function matchFieldValidator() {
-    return (control): { [key: string]: any } => {
-      if (!control.root || !control.root.controls) {
-        return null;
-      }
-      const valid = control.value === control.root.controls.password.value;
-      return valid ? null : { 'noMatch': { value: control }
-    };
-  };
-}
 
 // pattern for valid usernames
 const USERNAME_PATTERN = '[0-9A-Za-z_@.+-]+';
@@ -83,7 +73,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
         Validators.required,
         Validators.pattern(Regex.patterns.NON_BLANK),
         Validators.minLength(8)]],
-      confirmPassword: ['', [Validators.required, matchFieldValidator()]]
+      confirmPassword: ['', [Validators.required, ChefValidators.matchFieldValidator('password')]]
     });
   }
 
