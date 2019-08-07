@@ -17,6 +17,8 @@ import {
   RemovePolicyMembers, PolicyMembersMgmtPayload
 } from 'app/entities/policies/policy.actions';
 
+export type PolicyTabName = 'definition' | 'members';
+
 const POLICY_DETAILS_ROUTE = /^\/settings\/policies/;
 
 @Component({
@@ -28,7 +30,7 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
   public policy: Policy;
   public policyJSON: string;
   public members$: Observable<Member[]>;
-  public tabValue = 'definition';
+  public tabValue: PolicyTabName = 'definition';
   public url: string;
   // Map of local user and team member IDs to URLs.
   // Will not contain LDAP, SAML, or * members.
@@ -44,22 +46,10 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
     this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
       .subscribe((url: string) => {
         this.url = url;
-        const splitFragment = url.split('#');
-        if (splitFragment.length === 2) {
-          switch (splitFragment[1]) {
-            case 'members': {
-              this.tabValue = 'members';
-              break;
-            }
-            default: { // If the user passed an invalid fragment or #definition
-              this.tabValue = 'definition';
-            }
-          }
-        } else {
-          // Default to definition in the case of no fragment.
-          this.tabValue = 'definition';
-        }
-      });
+        const [, fragment] = url.split('#');
+        // goes to #definition if (1) explicit #definition, (2) no fragment, or (3) invalid fragment
+        this.tabValue = (fragment === 'members') ? 'members' : 'definition';
+     });
 
     this.members$ = this.store.select(policyFromRoute).pipe(
       filter(identity),
@@ -119,7 +109,7 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
     }));
   }
 
-  onSelectedTab(event): void {
+  onSelectedTab(event: { target: { value: PolicyTabName } } ): void {
     this.tabValue = event.target.value;
     // Current URL sans any now outdated fragment.
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
