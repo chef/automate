@@ -456,3 +456,413 @@ func TestServiceGroupsFilterServiceGroupNameDouble(t *testing.T) {
 			"the service group name is not the expected one")
 	}
 }
+
+func TestServiceGroupsFilterServiceOrigin(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"origin:core"},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "a.default",
+					Package:          "core/a",
+					Release:          "0.1.0/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+			},
+		}
+		//2 services in different service groups
+		mockHabServices = []*habitat.HealthCheckEvent{
+			NewHabitatEvent(
+				withSupervisorId("sup2"),
+				withServiceGroup("a.default"),
+				withPackageIdent("core/a/0.1.0/20190101121212"),
+				withHealth("UNKNOWN"),
+				withApplication("a_app"),
+				withEnvironment("a_env"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("sup3"),
+				withServiceGroup("a.test"),
+				withPackageIdent("chef/b/0.1.0/20190101121212"),
+				withHealth("OK"),
+				withApplication("a_app"),
+				withEnvironment("a_env"),
+			),
+		}
+	)
+
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
+}
+
+// This test tests what happens when a service group contains two different origins
+// and is filtered by origin.
+
+//TODO: this test should result in just the desired package, but actually brings back both
+// We want to revisit this with another card. The counts are correctly filtered
+func TestServiceGroupsFilterSGPartOrigin(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"origin:core"},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "a.default",
+					Package:          "2 packages",
+					Release:          "0.1.0/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+			},
+		}
+		//2 services in different service groups
+		mockHabServices = []*habitat.HealthCheckEvent{
+			NewHabitatEvent(
+				withSupervisorId("sup2"),
+				withServiceGroup("a.default"),
+				withPackageIdent("core/a/0.1.0/20190101121212"),
+				withHealth("UNKNOWN"),
+				withApplication("a_app"),
+				withEnvironment("a_env"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("sup3"),
+				withServiceGroup("a.default"),
+				withPackageIdent("chef/a/0.1.0/20190101121212"),
+				withHealth("OK"),
+				withApplication("a_app"),
+				withEnvironment("a_env"),
+			),
+		}
+	)
+
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
+}
+
+func TestServiceGroupsFilterService(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"service:a"},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "a.default",
+					Package:          "core/a",
+					Release:          "0.1.0/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+			},
+		}
+		mockHabServicesMatrix = habServicesABCD()
+	)
+
+	suite.IngestServices(mockHabServicesMatrix)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
+}
+
+func TestServiceGroupsFilterSite(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"site:downtown"},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "a.default",
+					Package:          "core/a",
+					Release:          "0.1.0/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+			},
+		}
+		//2 services in different service groups
+		mockHabServices = []*habitat.HealthCheckEvent{
+			NewHabitatEvent(
+				withSupervisorId("sup2"),
+				withServiceGroup("a.default"),
+				withPackageIdent("core/a/0.1.0/20190101121212"),
+				withHealth("UNKNOWN"),
+				withApplication("a_app"),
+				withEnvironment("a_env"),
+				withSite("downtown"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("sup3"),
+				withServiceGroup("b.test"),
+				withPackageIdent("core/b/0.1.0/20190101121212"),
+				withHealth("OK"),
+				withApplication("b_app"),
+				withEnvironment("b_env"),
+				withSite("uptown"),
+			),
+		}
+	)
+
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
+}
+
+func TestServiceGroupsFilterChannel(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"channel:stable"},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "a.default",
+					Package:          "core/a",
+					Release:          "0.1.0/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+			},
+		}
+		//2 services in different service groups
+		mockHabServices = []*habitat.HealthCheckEvent{
+			NewHabitatEvent(
+				withSupervisorId("sup2"),
+				withServiceGroup("a.default"),
+				withPackageIdent("core/a/0.1.0/20190101121212"),
+				withHealth("UNKNOWN"),
+				withApplication("a_app"),
+				withEnvironment("a_env"),
+				withStrategyAtOnce("stable"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("sup3"),
+				withServiceGroup("b.test"),
+				withPackageIdent("core/b/0.1.0/20190101121212"),
+				withHealth("OK"),
+				withApplication("b_app"),
+				withEnvironment("b_env"),
+				withStrategyAtOnce("unstable"),
+			),
+		}
+	)
+
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
+}
+
+func TestServiceGroupsFilterVersion(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"version:0.2.2"},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "a.default",
+					Package:          "core/a",
+					Release:          "0.2.2/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+			},
+		}
+		//2 services in different service groups
+		mockHabServices = []*habitat.HealthCheckEvent{
+			NewHabitatEvent(
+				withSupervisorId("sup2"),
+				withServiceGroup("a.default"),
+				withPackageIdent("core/a/0.2.2/20190101121212"),
+				withHealth("UNKNOWN"),
+				withApplication("a_app"),
+				withEnvironment("a_env"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("sup3"),
+				withServiceGroup("b.test"),
+				withPackageIdent("core/a/0.1.0/20190101121212"),
+				withHealth("OK"),
+				withApplication("b_app"),
+				withEnvironment("b_env"),
+			),
+		}
+	)
+
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
+}
+
+//TODO: this test should result in just the desired release, but actually brings back both
+// We want to revisit this with another card. The counts are correctly filtered
+
+func TestServiceGroupsFilterPartSGVersion(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"version:0.2.2"},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "a.default",
+					Package:          "core/a",
+					Release:          "2 releases",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+			},
+		}
+		//2 services in the same service group, with different package versions
+		mockHabServices = []*habitat.HealthCheckEvent{
+			NewHabitatEvent(
+				withSupervisorId("sup2"),
+				withServiceGroup("a.default"),
+				withPackageIdent("core/a/0.2.2/20190101121212"),
+				withHealth("UNKNOWN"),
+				withApplication("a_app"),
+				withEnvironment("a_env"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("sup3"),
+				withServiceGroup("a.default"),
+				withPackageIdent("core/a/0.1.0/20190101121212"),
+				withHealth("OK"),
+				withApplication("a_app"),
+				withEnvironment("a_env"),
+			),
+		}
+	)
+
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
+}
+
+func TestServiceGroupsFilterBuildstamp(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"buildstamp:20190101121212"},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "a.default",
+					Package:          "core/a",
+					Release:          "0.1.0/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+			},
+		}
+		//2 services in different service groups
+		mockHabServices = []*habitat.HealthCheckEvent{
+			NewHabitatEvent(
+				withSupervisorId("sup2"),
+				withServiceGroup("a.default"),
+				withPackageIdent("core/a/0.1.0/20190101121212"),
+				withHealth("UNKNOWN"),
+				withApplication("a_app"),
+				withEnvironment("a_env"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("sup3"),
+				withServiceGroup("b.test"),
+				withPackageIdent("core/a/0.1.0/00000000000000"),
+				withHealth("OK"),
+				withApplication("b_app"),
+				withEnvironment("b_env"),
+			),
+		}
+	)
+
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
+}
