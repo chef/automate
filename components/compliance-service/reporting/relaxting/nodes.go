@@ -29,18 +29,23 @@ type ControlSource struct {
 	Status string  `json:"status"`
 }
 
+type TotalNodeCounts struct {
+	Total, Passed, Failed, Skipped int32
+}
+
 // TODO: header with amount of results
 // TODO: need to be able to sort on
 //  "latest_report.controls.failed.total":    "controls_sums.failed.total",
 //  "latest_report.controls.failed.critical": "controls_sums.failed.critical"
 //GetNodes - list all of the nodes or all nodes for a profile-id
 func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][]string,
-	sortField string, sortAsc bool) ([]*reportingapi.Node, int64, error) {
+	sortField string, sortAsc bool) ([]*reportingapi.Node, TotalNodeCounts, error) {
+	emptyTotals := TotalNodeCounts{Total: 0, Passed: 0, Skipped: 0, Failed: 0}
 	myName := "GetNodes"
 
 	depth, err := backend.NewDepth(filters, false, true)
 	if err != nil {
-		return nil, 0, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
+		return nil, emptyTotals, errors.Wrap(err, fmt.Sprintf("%s unable to get depth level for report", myName))
 	}
 
 	queryInfo := depth.getQueryInfo()
@@ -80,7 +85,7 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 
 	source, err := searchSource.Source()
 	if err != nil {
-		return nil, 0, errors.Wrapf(err, "%s unable to get Source", myName)
+		return nil, emptyTotals, errors.Wrapf(err, "%s unable to get Source", myName)
 	}
 	LogQueryPartMin(queryInfo.esIndex, source, fmt.Sprintf("%s query searchSource", myName))
 
@@ -96,7 +101,7 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 		Do(context.Background())
 
 	if err != nil {
-		return nil, 0, errors.Wrapf(err, "%s unable to complete search", myName)
+		return nil, emptyTotals, errors.Wrapf(err, "%s unable to complete search", myName)
 	}
 	nodes := make([]*reportingapi.Node, 0)
 	// extract node information from ESInSpecSummary into Node
@@ -136,7 +141,7 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 
 					timestamp, err := ptypes.TimestampProto(item.EndTime)
 					if err != nil {
-						return nil, 0, errors.Wrapf(err, "%s time error: ", myName)
+						return nil, emptyTotals, errors.Wrapf(err, "%s time error: ", myName)
 					} else {
 						latestReport.EndTime = timestamp
 					}
@@ -151,25 +156,29 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 					} else if queryInfo.level == ProfileLevel || queryInfo.level == ControlLevel {
 						nodeControlSummary, status, err = getDeepControlsSums(hit, queryInfo)
 						if err != nil {
-							return nil, 0, errors.Wrapf(err, "%s unable to get control sums", myName)
+							return nil, emptyTotals, errors.Wrapf(err, "%s unable to get control sums", myName)
 						}
 					}
 
 					latestReport.Controls = convertToRSControlSummary(nodeControlSummary)
 					latestReport.Status = status
-
 					nodes = append(nodes, &node)
 				} else {
-					return nil, 0, errors.Wrapf(err, "%s unmarshal error: ", myName)
+					return nil, emptyTotals, errors.Wrapf(err, "%s unmarshal error: ", myName)
 				}
 			}
 
 		}
-		return nodes, searchResult.TotalHits(), nil
+		// get node counts of passed/failed/skipped nodes to append to totals response
+		nodeSummary, err := backend.GetStatsSummaryNodes(filters)
+		if err != nil {
+			return nil, emptyTotals, errors.Wrapf(err, "%s error retrieving node count totals: ", myName)
+		}
+		return nodes, TotalNodeCounts{Total: int32(searchResult.TotalHits()), Passed: nodeSummary.Compliant, Failed: nodeSummary.Noncompliant, Skipped: nodeSummary.Skipped}, nil
 	}
 
 	logrus.Debugf("%s Found no nodes\n", myName)
-	return nodes, 0, nil
+	return nodes, emptyTotals, nil
 }
 
 func convertToRSControlSummary(summ reporting.NodeControlSummary) *reportingapi.ControlSummary {

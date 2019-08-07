@@ -521,6 +521,18 @@ func init() {
         "total": {
           "type": "integer",
           "format": "int32"
+        },
+        "total_passed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "total_failed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "total_skipped": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
