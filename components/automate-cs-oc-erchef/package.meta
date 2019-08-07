@@ -21,5 +21,6 @@
       "type": "file",
       "path": "data/dark_launch_features.json"
     }
-  ]
+  ],
+  "uses_platform_scaffolding": true
 }

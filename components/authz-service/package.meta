@@ -1,0 +1,4 @@
+{
+  "name": "chef/authz-service",
+  "uses_platform_scaffolding": true
+}
