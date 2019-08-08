@@ -13,6 +13,7 @@ import (
 	"github.com/teambition/rrule-go"
 
 	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/multiworkflow"
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/platform/pg"
 )
@@ -276,22 +277,35 @@ func runSimpleWorkflow(_ *cobra.Command, args []string) error {
 	}
 	defer manager.Stop()
 
-	manager.RegisterWorkflowExecutor("simple-workflow", &SimpleWorkflow{})
+	executor := multiworkflow.NewMultiWorkflowExecutor(map[string]cereal.WorkflowExecutor{
+		"supersimple1": &SimpleWorkflow{},
+		"supersimple2": &SimpleWorkflow{},
+	})
+	//manager.RegisterWorkflowExecutor("simple-workflow", &SimpleWorkflow{})
+	manager.RegisterWorkflowExecutor("simple-workflow", executor)
 	manager.RegisterTaskExecutor("simple task", &SimpleTask{}, cereal.TaskExecutorOpts{
 		Workers: simpleWorkflowOpts.DequeueWorkerCount})
 
 	params := SimpleWorkflowParams{
 		simpleWorkflowOpts.TaskCount,
 	}
+	params2 := SimpleWorkflowParams{
+		simpleWorkflowOpts.TaskCount + 10,
+	}
 
 	manager.Start(context.Background())
 
 	if !simpleWorkflowOpts.NoEnqueue {
 		instanceName := fmt.Sprintf("simple-workflow-%s", time.Now())
-		err = manager.EnqueueWorkflow(context.TODO(),
-			"simple-workflow", instanceName,
-			&params,
-		)
+		/*
+			err = manager.EnqueueWorkflow(context.TODO(),
+				"simple-workflow", instanceName,
+				&params,
+			)*/
+		err = multiworkflow.EnqueueWorkflow(context.TODO(), manager, "simple-workflow", instanceName, map[string]interface{}{
+			"supersimple1": params,
+			"supersimple2": params2,
+		})
 		if err != nil {
 			logrus.WithError(err).Error("Unexpected error enqueueing workflow")
 			return err
@@ -302,6 +316,9 @@ func runSimpleWorkflow(_ *cobra.Command, args []string) error {
 		time.Sleep(time.Second)
 	}
 
+	for {
+		time.Sleep(time.Minute)
+	}
 	return nil
 }
 
