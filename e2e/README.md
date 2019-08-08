@@ -55,6 +55,25 @@ npm run cypress:run
 You can test against dev/acceptance environments as well. Just be
 sure to leave off the trailing `/`.
 
+## Writing Cypress Tests
+
+This [Cypress guide](https://docs.cypress.io/guides/getting-started/writing-your-first-test.html#Add-a-test-file)
+provides an introduction on writing your first Cypress test.
+
+Automate's Cypress tests are divided into two main categories: UI and API tests,
+under the `api` and `ui` directories respectively.
+
+API tests communicate only with the backend using `cy.request`. The `api/` sub-directories
+correspond to the sub-directories under `automate-gateway/api`. When adding new API tests,
+you may need to add the appropriate sub-directory if it doesn't exist yet.
+
+UI tests are end-to-end tests that interact with the UI backed by a running Automade backend.
+The `ui/` sub-directories correspond to the top navbar links, Event Feed, Infrastructure, Compliance,
+and Settings. When adding new UI tests, you may need to add the appropriate sub-directory if it doesn't exist yet.
+
+The last sub-directory is `common`, for testing UI interactions, such as logging in,
+that don't fall into the above categories.
+
 ### IAM Version
 
 Some tests will conditionally run in CI depending on what `CYPRESS_IAM_VERSION` is set to.
