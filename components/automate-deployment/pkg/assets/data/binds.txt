@@ -1,4 +1,4 @@
-applications-service REQUIRED automate-pg-gateway event-service pg-sidecar-service
+applications-service REQUIRED automate-pg-gateway cereal-service event-service pg-sidecar-service
 applications-service BINDING_MODE strict
 authn-service REQUIRED authz-service automate-dex automate-pg-gateway pg-sidecar-service teams-service
 authn-service BINDING_MODE strict
