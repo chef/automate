@@ -13,6 +13,7 @@ import (
 	"github.com/teambition/rrule-go"
 
 	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/backend"
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/platform/pg"
 )
@@ -30,6 +31,12 @@ var simpleWorkflowOpts struct {
 
 var scheduleOpts struct {
 	Name string
+}
+
+var listInstanceOpts struct {
+	IsRunning    string
+	WorkflowName string
+	InstanceName string
 }
 
 func main() {
@@ -111,9 +118,19 @@ func main() {
 		"Name to use for the scheduled workflow",
 	)
 
+	listInstancesCmd := &cobra.Command{
+		Use:  "list-instances",
+		RunE: runListInstances,
+	}
+
+	listInstancesCmd.PersistentFlags().StringVar(&listInstanceOpts.IsRunning, "is-running", "", "true or false")
+	listInstancesCmd.PersistentFlags().StringVar(&listInstanceOpts.WorkflowName, "workflow-name", "", "the name of the workflow")
+	listInstancesCmd.PersistentFlags().StringVar(&listInstanceOpts.InstanceName, "instance-name", "", "the name of the instance")
+
 	cmd.AddCommand(simpleWorkflowCmd)
 	cmd.AddCommand(resetDBCmd)
 	cmd.AddCommand(scheduleCmd)
+	cmd.AddCommand(listInstancesCmd)
 
 	err := cmd.Execute()
 	if err != nil {
@@ -407,6 +424,54 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 			}).Debug("Found schedule")
 		}
 		time.Sleep(10 * time.Second)
+	}
+
+	return nil
+}
+
+func runListInstances(_ *cobra.Command, args []string) error {
+	dbName := defaultDatabaseName
+	if len(args) > 0 {
+		dbName = args[0]
+	}
+
+	b := postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName))
+	err := b.Init()
+	if err != nil {
+		return err
+	}
+
+	opts := backend.ListWorkflowOpts{}
+	if listInstanceOpts.IsRunning == "true" {
+		m := true
+		opts.IsRunning = &m
+	} else if listInstanceOpts.IsRunning == "false" {
+		m := false
+		opts.IsRunning = &m
+	}
+
+	if listInstanceOpts.InstanceName != "" {
+		opts.InstanceName = &listInstanceOpts.InstanceName
+	}
+
+	if listInstanceOpts.WorkflowName != "" {
+		opts.WorkflowName = &listInstanceOpts.WorkflowName
+	}
+
+	instances, err := b.ListWorkflowInstances(context.Background(), opts)
+	if err != nil {
+		return err
+	}
+	for _, instance := range instances {
+		fmt.Printf("%13s: %s\n", "Workflow Name", instance.WorkflowName)
+		fmt.Printf("%13s: %s\n", "Instance Name", instance.InstanceName)
+		fmt.Printf("%13s: %s\n", "Status", string(instance.Status))
+		fmt.Printf("%13s: %v\n", "Is Running", instance.IsRunning)
+		fmt.Printf("%13s: %s\n", "Parameters", string(instance.Parameters))
+		fmt.Printf("%13s: %s\n", "Payload", string(instance.Payload))
+		fmt.Printf("%13s: %s\n", "Result", string(instance.Result))
+		fmt.Printf("%13s: %v\n", "Err", instance.Err)
+		fmt.Println("-----------------------------------")
 	}
 
 	return nil

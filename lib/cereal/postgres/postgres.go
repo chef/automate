@@ -29,6 +29,62 @@ const (
 	failWorkflowQuery     = `SELECT cereal_fail_workflow($1, $2)`
 	continueWorkflowQuery = `SELECT cereal_continue_workflow($1, $2, $3, $4, $5)`
 
+	// listWorkflowInstanceQuery is quite a tricky query. It's intent is to select
+	// one run of each workflow instance. This means it has to consult the actively
+	// running workflow instances from the cereal_workflow_instances table, and the
+	// completed workflow results from cereal_workflow_results.
+	// Parameters:
+	// $1 : workflow_name OR NULL: only workflow_names of the given value will match.
+	//                             all will match on NULL
+	// $2 : instance_name OR NULL: only instance_names of the given value will match.
+	//                             all will match on NULL
+	// $3 : is_running OR NULL: if true, only running instances will match. if false,
+	//                          only completed instances will match. if NULL, all will
+	//                          match.
+	listWorkflowInstancesQuery = `
+-- Find at most one of each (instance_name, workflow_name) from results,
+-- picking at the most recent result if multiple exist
+WITH res AS (
+	SELECT DISTINCT ON (instance_name, workflow_name) *
+    FROM cereal_workflow_results
+	ORDER BY instance_name, workflow_name, end_at DESC
+)
+-- Select the workflow instance data, giving priority to that coming
+-- from the cereal_workflow_instances table
+SELECT COALESCE(a.id, res.id) id, 
+       COALESCE(a.status, 'completed') status,
+       COALESCE(a.instance_name, res.instance_name) instance_name,
+	   COALESCE(a.workflow_name, res.workflow_name) workflow_name,
+	   COALESCE(a.parameters, res.parameters) parameters,
+	   a.payload payload,
+	   -- The result, and error only in the cereal_workflow_results table.
+	   -- This means that these could potentially be garbage if the previous
+	   -- data (id, status, etc) came from the cereal_workflow_instances.
+	   -- This means we need to clean this up after the query
+	   res.result result,
+	   res.error error
+-- We do a full outer join on the two tables on (workflow_name, instance_name).
+-- This gives us 1 row for every distinct (workflow_name, instance_name) pair.
+FROM cereal_workflow_instances a
+FULL OUTER JOIN res ON a.workflow_name = res.workflow_name AND a.instance_name = res.instance_name
+WHERE
+	-- NOTE: The WHERE clause is processed after the join.
+	-- The pattern below allows us to either specify a contraint by giving a value for the column,
+	-- or passing in NULL. If a value is given for a column, we make sure the value matches either
+	-- of the cereal_workflow_instances table or the cereal_workflow_results table. Passing in NULL
+	-- for the value reduces down into saying the value in the column matches the value in the column.
+	(a.workflow_name = COALESCE($1, a.workflow_name) OR 
+	res.workflow_name = COALESCE($1, res.workflow_name)) AND
+	(a.instance_name = COALESCE($2, a.instance_name) OR 
+	res.instance_name = COALESCE($2, res.instance_name)) AND
+	-- We'll select the row if is_running is now specified
+	(($3::boolean IS NULL) OR
+	-- If is_running is true, there must be a status in the cereal_workflow_instances
+	-- table.
+	 ($3::boolean IS NOT NULL AND $3::boolean AND a.status IS NOT NULL) OR
+	-- If is_running is false, there must not be a status
+	 ($3::boolean IS NOT NULL AND NOT $3::boolean AND a.status IS NULL));
+	`
 	listScheduledWorkflowsQuery = `
 WITH res AS (
     SELECT DISTINCT ON (instance_name, workflow_name) *
@@ -495,6 +551,52 @@ func (pg *PostgresBackend) GetWorkflowInstanceByName(ctx context.Context, instan
 		return nil, err
 	}
 	return &workflowInstance, nil
+}
+
+func (pg *PostgresBackend) ListWorkflowInstances(ctx context.Context, opts backend.ListWorkflowOpts) ([]*backend.WorkflowInstance, error) {
+	rows, err := pg.db.Query(listWorkflowInstancesQuery, opts.WorkflowName, opts.InstanceName, opts.IsRunning)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close() // nolint: errcheck
+
+	instances := []*backend.WorkflowInstance{}
+	for rows.Next() {
+		var id int64
+		workflowInstance := backend.WorkflowInstance{}
+		errText := sql.NullString{}
+		err := rows.Scan(
+			&id,
+			&workflowInstance.Status,
+			&workflowInstance.InstanceName,
+			&workflowInstance.WorkflowName,
+			&workflowInstance.Parameters,
+			&workflowInstance.Payload,
+			&workflowInstance.Result,
+			&errText,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if workflowInstance.Status == backend.WorkflowInstanceStatusCompleted {
+			workflowInstance.IsRunning = false
+			workflowInstance.Payload = nil
+			if errText.Valid {
+				workflowInstance.Err = errors.New(errText.String)
+			}
+		} else {
+			workflowInstance.IsRunning = true
+			workflowInstance.Result = nil
+		}
+		instances = append(instances, &workflowInstance)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return instances, nil
 }
 
 func (pg *PostgresBackend) EnqueueWorkflow(ctx context.Context, w *backend.WorkflowInstance) error {

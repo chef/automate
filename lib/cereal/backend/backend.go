@@ -20,9 +20,16 @@ type Driver interface {
 	UpdateWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string, opts WorkflowScheduleUpdateOpts) error
 
 	GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName string) (*WorkflowInstance, error)
+	ListWorkflowInstances(ctx context.Context, opts ListWorkflowOpts) ([]*WorkflowInstance, error)
 
 	Init() error
 	Close() error
+}
+
+type ListWorkflowOpts struct {
+	WorkflowName *string
+	InstanceName *string
+	IsRunning    *bool
 }
 
 type WorkflowInstanceStatus string
