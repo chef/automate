@@ -7,7 +7,7 @@ bref = ""
 toc = true
 [menu]
   [menu.docs]
-    parent = "authorization"
+    parent = "configuring_automate"
     weight = 30
 +++
 
@@ -25,9 +25,9 @@ Once the user has provided a username and password at the login screen, Chef
 Automate goes through a sequence of operations to complete the login: Connect,
 Bind, User Search, Login Bind, and Group Search.
 
-### Authorization with LDAP
+#### Authorization with LDAP
 
-Chef Automate supports using your LDAP server to authenticate users and define their permissions based on [LDAP group memberships]({{< ref "authorization-overview.md" >}}).
+Chef Automate supports defining permissions for [LDAP users and their groups]({{< ref "authorization-overview.md" >}}).
 
 #### Connect
 
