@@ -63,9 +63,9 @@ X0uRzUPlpttd5tYFs43nkqxJT6s=
 
 Note: you can provide multiple CA certs, and they have to be PEM encoded.
 
-{{< warning >}}
+{{% warning %}}
 Connecting to an LDAP service without TLS is not recommended.
-{{< /warning >}}
+{{% /warning %}}
 
 However, if you wish to integrate with an LDAP server with TLS disabled:
 
@@ -110,9 +110,9 @@ If configured, it will retrieve additional attributes, using the configured
 names (`user_id_attr`, `email_attr`, and `user_display_name_attr`). See
 [Configuration: LDAP]({{< relref "configuration.md#ldap" >}}) for an overview.
 
-{{< warning >}}
+{{% warning %}}
 If the LDAP search fails to retrieve the configured attributes, the login process will fail.
-{{< /warning >}}
+{{% /warning %}}
 
 ##### Filtering Which Users Can Log In
 
@@ -181,10 +181,10 @@ group_query_filter = "(objectClass=group)"
 The correct configuration settings again depend on your directory server's schema;
 see the example configs below.
 
-{{< warning >}}
+{{% warning %}}
 The `base_group_search_dn` setting is optional. However, if it's not provided,
 users authenticating via LDAP (or MSAD) will not be members of any teams.
-{{< /warning >}}
+{{% /warning %}}
 
 #### Configuration Overview
 
@@ -485,9 +485,9 @@ level=info msg="performing ldap search ou=People,dc=example,dc=org sub (&(object
 level=error msg="ldap: no results returned for filter: \"(&(objectClass=person(cn=jane))\"" connector=LDAP
 ```
 
-{{< warning >}}
+{{% warning %}}
 User search also fails if more than one user is returned.
-{{< /warning >}}
+{{% /warning %}}
 
 Ensure that a search for `username_attr` with the given search base can only
 return one user.  Something like this could happen (simplified for
@@ -519,10 +519,10 @@ This situation would be averted by setting `username_attr = "cn"`; or by
 restricting `base_user_search_dn`, if you only want to allow people from one of
 either cities to use Chef Automate.
 
-{{< warning >}}
+{{% warning %}}
 Attributes that have been configured, but are not found in the results, lead to
 user search failures, too. Note that this also affects default values.
-{{< /warning >}}
+{{% /warning %}}
 
 Finally, a successful user search logs a line like the following:
 
