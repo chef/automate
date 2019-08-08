@@ -37,7 +37,7 @@
               Only lowercase letters, numbers, hyphens, and underscores are allowed.
             </chef-error>
             <chef-error *ngIf="conflictError">
-              Rule IDs must be unique--Rule with ID "{{ ruleForm.controls.id.value }}" already exists.
+              Rule IDs must be unique--Rule with ID "{{ ruleForm.get('id').value }}" already exists.
             </chef-error>
           </chef-form-field>
           <small class="help">Rule IDs are unique, permanent, and cannot be changed later.</small>
