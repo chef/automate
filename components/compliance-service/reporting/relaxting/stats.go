@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/context"
 
 	"github.com/chef/automate/components/compliance-service/api/stats"
-	"github.com/chef/automate/components/compliance-service/utils"
+	"github.com/chef/automate/lib/errorutils"
 )
 
 //GetStatsSummary - Report #16
@@ -139,7 +139,7 @@ func (backend ES2Backend) GetStatsFailures(reportTypes []string, size int, filte
 		case "profile", "control", "environment", "platform":
 			break
 		default:
-			return failures, &utils.InvalidError{Msg: fmt.Sprintf("Invalid type '%s'", reportType)}
+			return failures, &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid type '%s'", reportType)}
 		}
 	}
 

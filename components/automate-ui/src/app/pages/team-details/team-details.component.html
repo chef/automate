@@ -5,24 +5,36 @@
   <main>
     <chef-breadcrumbs>
       <chef-breadcrumb [link]="['/settings/teams']">Teams</chef-breadcrumb>
-      <span  *ngIf="isV1">{{ team.id }}</span>
-      <span  *ngIf="!isV1">{{ team.name }}</span>
+      <span  *ngIf="isMajorV1">{{ team.id }}</span>
+      <span  *ngIf="!isMajorV1">{{ team.name }}</span>
     </chef-breadcrumbs>
 
     <chef-page-header>
-      <chef-heading *ngIf="isV1">{{ team.id }}</chef-heading>
-      <chef-heading *ngIf="!isV1">{{ team.name }}</chef-heading>
+      <chef-heading *ngIf="isMajorV1">{{ team.id }}</chef-heading>
+      <chef-heading *ngIf="!isMajorV1">{{ team.name }}</chef-heading>
       <table>
         <thead>
           <tr class="detail-row">
-            <th *ngIf="isV1" class="id-column">Description</th>
-            <th *ngIf="!isV1" class="id-column">ID</th>
+            <th *ngIf="isMajorV1" class="id-column">Description</th>
+            <th *ngIf="!isMajorV1" class="id-column">ID</th>
+            <th *ngIf="!isMajorV1 && isMinorV1" class="projects-column">Projects</th>
           </tr>
         </thead>
         <tbody>
           <tr class="detail-row">
-            <td *ngIf="isV1" class="id-column">{{ team.name }}</td>
-            <td *ngIf="!isV1" class="id-column">{{ team.id }}</td>
+            <td *ngIf="isMajorV1" class="id-column">{{ team.name }}</td>
+            <td *ngIf="!isMajorV1" class="id-column">{{ team.id }}</td>
+            <td class="projects-column" *ngIf="!isMajorV1 && isMinorV1" data-cy="team-details-projects">
+              <ng-container *ngIf="team.projects.length === 0">
+                  {{ unassigned }}
+              </ng-container>
+              <ng-container *ngIf="team.projects.length === 1">
+                  {{ team.projects[0] }}
+              </ng-container>
+              <ng-container *ngIf="team.projects.length > 1">
+                  {{ team.projects.length }} projects
+              </ng-container>
+            </td>
           </tr>
         </tbody>
       </table>

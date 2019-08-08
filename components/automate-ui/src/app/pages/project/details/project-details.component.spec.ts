@@ -27,8 +27,8 @@ describe('ProjectDetailsComponent', () => {
       id: 'rule-1',
       project_id: 'uuid-1',
       name: 'Rule 1',
-      type: 'node',
-      status: 'staged',
+      type: 'NODE',
+      status: 'STAGED',
       conditions: [
         {
           attribute: 'CHEF_ORGANIZATION',
@@ -41,8 +41,8 @@ describe('ProjectDetailsComponent', () => {
       id: 'rule-2',
       project_id: 'uuid-1',
       name: 'Rule 2',
-      type: 'event',
-      status: 'applied',
+      type: 'EVENT',
+      status: 'APPLIED',
       conditions: [
         {
           attribute: 'CHEF_ORGANIZATION',

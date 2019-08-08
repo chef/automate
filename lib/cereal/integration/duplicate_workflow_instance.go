@@ -1,6 +1,6 @@
 // +build integration
 
-package integration_test
+package integration
 
 import (
 	"context"
@@ -10,35 +10,38 @@ import (
 	"github.com/chef/automate/lib/cereal"
 )
 
-func (suite *CerealTestSuite) TestDelayedTask() {
-	taskName := randName("delayed")
-	workflowName := randName("delayed")
+// TestEnqueueDuplicateWorkflowInstance tries the enqueue the same workflow
+// instance twice. The first one must be accepted, the second one must fail
+func (suite *CerealTestSuite) TestEnqueueDuplicateWorkflowInstance() {
+	taskName := randName("duplicate_test")
+	workflowName := randName("duplicate_test")
 	instanceName := randName("instance")
 
 	wgTask := sync.WaitGroup{}
-	wgTask.Add(2)
+	wgTask.Add(1)
 
-	expectedTime := time.Now().Add(10 * time.Second)
+	// wgBarrier is used to block the completion of the task.
+	// This allows us to make sure there is a running workflow
+	// instance
+	wgBarrier := sync.WaitGroup{}
+	wgBarrier.Add(1)
+
 	m := suite.newManager(
 		WithTaskExecutorF(
 			taskName,
 			func(context.Context, cereal.Task) (interface{}, error) {
-				// Tasks are scheduled every 2 seconds. A little extra time is provided
-				suite.Assert().WithinDuration(expectedTime, time.Now(), 3*time.Second)
-				wgTask.Done()
+				wgBarrier.Wait()
 				return nil, nil
 			}),
 		WithWorkflowExecutor(
 			workflowName,
 			&workflowExecutorWrapper{
 				onStart: func(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
-					err := w.EnqueueTask(taskName, nil, cereal.StartAfter(expectedTime))
+					err := w.EnqueueTask(taskName, nil)
 					suite.Require().NoError(err, "failed to enqueue task")
 					return w.Continue(nil)
 				},
 				onTaskComplete: func(w cereal.WorkflowInstance, ev cereal.TaskCompleteEvent) cereal.Decision {
-					suite.Assert().Equal(1, w.TotalCompletedTasks())
-					suite.Assert().Equal(1, w.TotalEnqueuedTasks())
 					wgTask.Done()
 					return w.Complete()
 				},
@@ -48,6 +51,9 @@ func (suite *CerealTestSuite) TestDelayedTask() {
 	defer m.Stop()
 	err := m.EnqueueWorkflow(context.Background(), workflowName, instanceName, nil)
 	suite.Require().NoError(err, "Failed to enqueue workflow")
+	err = m.EnqueueWorkflow(context.Background(), workflowName, instanceName, "dummy")
+	suite.Assert().Equal(cereal.ErrWorkflowInstanceExists, err)
+	wgBarrier.Done()
 	wgTask.Wait()
 	time.Sleep(20 * time.Millisecond)
 	err = m.Stop()

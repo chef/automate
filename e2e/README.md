@@ -55,6 +55,19 @@ npm run cypress:run
 You can test against dev/acceptance environments as well. Just be
 sure to leave off the trailing `/`.
 
+### IAM Version
+
+Some tests will conditionally run in CI depending on what `CYPRESS_IAM_VERSION` is set to.
+To target those specific sets of tests set that environment variable when starting cypress:
+
+```bash
+CYPRESS_IAM_VERSION="v2.1" npm run cypress:run
+```
+
+Possible values are `"v1.0"`, `"v2.0"`, and `"v2.1"`.
+
+Your dev environment's IAM version MUST match the value of CYPRESS_IAM_VERSION for the tests to pass locally.
+
 ## Running Cypress pipeline tests
 
 As part of our [deploy

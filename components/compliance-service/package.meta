@@ -1,0 +1,4 @@
+{
+  "name": "chef/compliance-service",
+  "uses_platform_scaffolding": true
+}

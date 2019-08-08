@@ -3,7 +3,7 @@ package secrets
 import (
 	"encoding/json"
 
-	"github.com/pkg/errors"
+	"github.com/chef/automate/lib/errorutils"
 	logs "github.com/sirupsen/logrus"
 )
 
@@ -37,10 +37,6 @@ type GcpCredential struct {
 	AuthProviderX509CertUrl string `json:"auth_provider_x509_cert_url"`
 	ClientX509CertUrl       string `json:"client_x509_cert_url"`
 }
-
-type InvalidSecretError struct{ reason string }
-
-func (i *InvalidSecretError) Error() string { return i.reason }
 
 // Validate validates a Secret and returns the first validation error encountered.
 func (s *Secret) Validate() error {
@@ -85,7 +81,7 @@ func (s *Secret) Validate() error {
 	// Eventually I'd like to switch our error handling to be handle an aggregation of errors
 	// for now we only support one failrue so I'm returning the first one we encounter
 	if len(errors) > 0 {
-		return &InvalidSecretError{reason: (*errors[0]).Error()}
+		return *errors[0]
 	}
 
 	return nil
@@ -167,7 +163,7 @@ func mapToKvs(m map[string]string) []*Kv {
 func requiredField(value string, message string, errorList []*error) []*error {
 	if value == "" {
 		newErrors := append(make([]*error, 0), errorList...)
-		err := errors.New(message)
+		err := errorutils.ProcessInvalid(nil, message)
 		return append(newErrors, &err)
 	}
 
@@ -184,7 +180,7 @@ func requiredChoice(values []string, message string, errorList []*error) []*erro
 	}
 
 	newErrors := append(make([]*error, 0), errorList...)
-	err := errors.New(message)
+	err := errorutils.ProcessInvalid(nil, message)
 	return append(newErrors, &err)
 }
 
@@ -203,7 +199,7 @@ func requiredExclusiveChoice(values []string, message string, errorList []*error
 	}
 
 	newErrors := append(make([]*error, 0), errorList...)
-	err := errors.New(message)
+	err := errorutils.ProcessInvalid(nil, message)
 	return append(newErrors, &err)
 }
 
@@ -212,10 +208,10 @@ func requiredExclusiveChoice(values []string, message string, errorList []*error
 func UnmarshalGcpServiceAcc(gcpJSONCred string) (gcpCred *GcpCredential, err error) {
 	err = json.Unmarshal([]byte(gcpJSONCred), &gcpCred)
 	if err != nil {
-		return nil, errors.New("Unable to unmarshal Google Credentials JSON")
+		return nil, errorutils.ProcessInvalid(err, "Unable to unmarshal Google Credentials JSON")
 	}
 	if gcpCred.Type != "service_account" {
-		return nil, errors.New("Only 'service_account' type is supported for GOOGLE_CREDENTIALS_JSON")
+		return nil, errorutils.ProcessInvalid(nil, "Only 'service_account' type is supported for GOOGLE_CREDENTIALS_JSON")
 	}
 	return gcpCred, nil
 }

@@ -5,11 +5,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/utils"
+	"github.com/chef/automate/lib/errorutils"
+	"github.com/chef/automate/lib/pgutils"
+
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 func mergeFilters(mergeableFilters []*common.Filter) ([]common.Filter, error) {
@@ -62,7 +64,7 @@ func buildWhereFilter(mergeableFilters []*common.Filter, tableAbbrev string, fil
 		} else {
 			switch filterField[filter.Key] {
 			case "":
-				return "", &utils.InvalidError{Msg: fmt.Sprintf("Unsupported filter field: %s", filter.Key)}
+				return "", &errorutils.InvalidError{Msg: fmt.Sprintf("Unsupported filter field: %s", filter.Key)}
 			case "source_region", "name":
 				newCondition, err = wherePatternMatch(filterField[filter.Key], filter.Values, tableAbbrev)
 			case "statechange_timestamp", "last_contact":
@@ -94,13 +96,13 @@ func buildWhereFilter(mergeableFilters []*common.Filter, tableAbbrev string, fil
 
 // Builds an IN where condition like: j.parent_id IN ('e57605ed-bb8a-49b8-606c-af0e2b31b139')
 func whereFieldIn(field string, arr []string, tableAbbrev string) (condition string, err error) {
-	if !utils.IsSqlSafe(field) {
-		return "", &utils.InvalidError{Msg: fmt.Sprintf("Unsupported character found in field: %s", field)}
+	if !pgutils.IsSqlSafe(field) {
+		return "", &errorutils.InvalidError{Msg: fmt.Sprintf("Unsupported character found in field: %s", field)}
 	}
 	condition += fmt.Sprintf("%s.%s IN (", tableAbbrev, field)
 	if len(arr) > 0 {
 		for index, item := range arr {
-			condition += fmt.Sprintf("'%s'", utils.EscapeLiteralForPG(item))
+			condition += fmt.Sprintf("'%s'", pgutils.EscapeLiteralForPG(item))
 			if index < len(arr)-1 {
 				condition += ","
 			}
@@ -112,16 +114,16 @@ func whereFieldIn(field string, arr []string, tableAbbrev string) (condition str
 }
 
 func whereFieldBetween(field string, arr []string, tableAbbrev string) (condition string, err error) {
-	if !utils.IsSqlSafe(field) {
-		return "", &utils.InvalidError{Msg: fmt.Sprintf("Unsupported character found in field: %s", field)}
+	if !pgutils.IsSqlSafe(field) {
+		return "", &errorutils.InvalidError{Msg: fmt.Sprintf("Unsupported character found in field: %s", field)}
 	}
 	if len(arr) != 2 {
-		return "", &utils.InvalidError{Msg: fmt.Sprintf("Two params requires for whereFieldBetween %d", len(arr))}
+		return "", &errorutils.InvalidError{Msg: fmt.Sprintf("Two params requires for whereFieldBetween %d", len(arr))}
 	}
 	for _, elem := range arr {
 		_, err := time.Parse(time.RFC3339, elem)
 		if err != nil {
-			return "", &utils.InvalidError{Msg: fmt.Sprintf("Invalid timestamp: %s", elem)}
+			return "", &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid timestamp: %s", elem)}
 		}
 	}
 	condition = fmt.Sprintf("%s.%s BETWEEN SYMMETRIC '%s' AND '%s'", tableAbbrev, field, arr[0], arr[1])
@@ -129,8 +131,8 @@ func whereFieldBetween(field string, arr []string, tableAbbrev string) (conditio
 }
 
 func wherePatternMatchTags(field string, arr []string, tableAbbrev string) (condition string, err error) {
-	if !utils.IsSqlSafe(field) {
-		return "", &utils.InvalidError{Msg: fmt.Sprintf("Unsupported character found in field: %s", field)}
+	if !pgutils.IsSqlSafe(field) {
+		return "", &errorutils.InvalidError{Msg: fmt.Sprintf("Unsupported character found in field: %s", field)}
 	}
 	condition += fmt.Sprintf("%s.key LIKE '%s' AND %s.value LIKE ", tableAbbrev, field, tableAbbrev)
 
@@ -139,7 +141,7 @@ func wherePatternMatchTags(field string, arr []string, tableAbbrev string) (cond
 		return condition, nil
 	}
 	for index, item := range arr {
-		condition += fmt.Sprintf("'%s%%'", utils.EscapeLiteralForPGPatternMatch(item))
+		condition += fmt.Sprintf("'%s%%'", pgutils.EscapeLiteralForPGPatternMatch(item))
 		if index < len(arr)-1 {
 			condition += fmt.Sprintf(" OR %s.value LIKE ", tableAbbrev)
 		}
@@ -149,8 +151,8 @@ func wherePatternMatchTags(field string, arr []string, tableAbbrev string) (cond
 }
 
 func wherePatternMatch(field string, arr []string, tableAbbrev string) (condition string, err error) {
-	if !utils.IsSqlSafe(field) {
-		return "", &utils.InvalidError{Msg: fmt.Sprintf("Unsupported character found in field: %s", field)}
+	if !pgutils.IsSqlSafe(field) {
+		return "", &errorutils.InvalidError{Msg: fmt.Sprintf("Unsupported character found in field: %s", field)}
 	}
 	condition += fmt.Sprintf("%s.%s LIKE ", tableAbbrev, field)
 
@@ -160,7 +162,7 @@ func wherePatternMatch(field string, arr []string, tableAbbrev string) (conditio
 	}
 	for index, item := range arr {
 		item = strings.TrimSuffix(item, "*")
-		condition += fmt.Sprintf("'%s%%'", utils.EscapeLiteralForPGPatternMatch(item))
+		condition += fmt.Sprintf("'%s%%'", pgutils.EscapeLiteralForPGPatternMatch(item))
 		if index < len(arr)-1 {
 			condition += fmt.Sprintf(" OR %s.%s LIKE ", tableAbbrev, field)
 		}
@@ -170,8 +172,8 @@ func wherePatternMatch(field string, arr []string, tableAbbrev string) (conditio
 }
 
 func whereNodeManagerNodeExists(field string, arr []string, tableAbbrev string) (condition string, err error) {
-	if !utils.IsSqlSafe(field) {
-		return "", &utils.InvalidError{Msg: fmt.Sprintf("Unsupported character found in field: %s", field)}
+	if !pgutils.IsSqlSafe(field) {
+		return "", &errorutils.InvalidError{Msg: fmt.Sprintf("Unsupported character found in field: %s", field)}
 	}
 
 	if len(arr) == 0 {
@@ -181,7 +183,7 @@ func whereNodeManagerNodeExists(field string, arr []string, tableAbbrev string) 
 
 	for _, item := range arr {
 		if !utils.IsSafeUUID(item) {
-			return "", &utils.InvalidError{Msg: fmt.Sprintf("Unsupported character found in: %s", item)}
+			return "", &errorutils.InvalidError{Msg: fmt.Sprintf("Unsupported character found in: %s", item)}
 		}
 	}
 
@@ -193,7 +195,7 @@ func whereJobProfilesMatch(field string, arr []string, tableAbbrev string) (cond
 	template := "(p.namespace like '%s%%' OR p.name like '%s%%' OR p.namespace || '/' || p.name like '%s%%')"
 	clauses := make([]string, len(arr))
 	for i, item := range arr {
-		term := utils.EscapeLiteralForPGPatternMatch(item)
+		term := pgutils.EscapeLiteralForPGPatternMatch(item)
 		clauses[i] = fmt.Sprintf(template, term, term, term)
 	}
 

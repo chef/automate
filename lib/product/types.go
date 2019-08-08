@@ -155,12 +155,16 @@ func (b *BootstrapSpec) validate() error {
 type PackageMetadata struct {
 	Name PackageName `json:"name"`
 
-	// DataService is set to true if this service is a a data service.
+	// DataService is set to true if this service is a data service.
 	// For example, postgres, elasticsearch, s3
 	DataService bool `json:"data_service"`
 
 	// A list of binaries to be binlinked when the package is deployed
 	Binlinks []string `json:"binlinks"`
+
+	// UsesPlatformScaffolding is set to true if the service uses the platform
+	// scaffolding for config
+	UsesPlatformScaffolding bool `json:"uses_platform_scaffolding"`
 
 	Bootstrap []BootstrapSpec `json:"bootstrap"`
 }

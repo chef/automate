@@ -58,6 +58,10 @@ func TestValidationCreatePolicy(t *testing.T) {
 			Id:         "TestID",
 			Statements: []*v2.Statement{&validStatement},
 		},
+		"with ID with spaces": &v2.CreatePolicyReq{
+			Id:         "test id",
+			Statements: []*v2.Statement{&validStatement},
+		},
 		// Members
 		"zero-length members in create req": &v2.CreatePolicyReq{
 			Id:         "test-id",
@@ -510,6 +514,11 @@ func TestValidationCreateRole(t *testing.T) {
 	negativeCases := map[string]*v2.CreateRoleReq{
 		"empty ID": &v2.CreateRoleReq{
 			Id:       "",
+			Name:     "name of my team",
+			Projects: []string{"test"},
+		},
+		"invalid ID": &v2.CreateRoleReq{
+			Id:       "i d !",
 			Name:     "name of my team",
 			Projects: []string{"test"},
 		},

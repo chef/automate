@@ -369,4 +369,10 @@ $$;
 COMMIT;
 `,
 	},
+	{
+		desc: "completed workflow instance status",
+		upSQL: `
+ALTER TYPE cereal_workflow_instance_status ADD VALUE 'completed';
+`,
+	},
 }

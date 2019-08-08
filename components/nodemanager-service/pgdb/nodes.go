@@ -21,6 +21,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/utils"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
+	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"
 )
 
@@ -200,7 +201,7 @@ func toDBNode(inNode *nodes.Node) (node, error) {
 	backend := inNode.TargetConfig.Backend
 	port := inNode.TargetConfig.Port
 	if (backend == "winrm" || backend == "ssh") && (port < 1 || port > 65535) {
-		return newNode, &utils.InvalidError{Msg: "Invalid node. Port for node must be within range: 1-65535"}
+		return newNode, &errorutils.InvalidError{Msg: "Invalid node. Port for node must be within range: 1-65535"}
 	}
 	newNode.ID = inNode.Id
 	newNode.Name = inNode.Name
@@ -362,7 +363,7 @@ func (db *DB) BulkAddNodes(inNodes []*nodes.Node) (nodeIDs []string, err error) 
 	logrus.Debugf("BulkAddNodes adding nodes: %+v", inNodes)
 	for _, inNode := range inNodes {
 		if inNode.Name == "" && inNode.NamePrefix == "" {
-			return nodeIDs, &utils.InvalidError{Msg: "Invalid node, a node 'name' or 'prefix-name' must be supplied"}
+			return nodeIDs, &errorutils.InvalidError{Msg: "Invalid node, a node 'name' or 'prefix-name' must be supplied"}
 		}
 
 		node, err := toDBNode(inNode)
@@ -427,7 +428,7 @@ func (db *DB) BulkAddNodes(inNodes []*nodes.Node) (nodeIDs []string, err error) 
 
 func (db *DB) AddNode(inNode *nodes.Node) (string, error) {
 	if inNode.Name == "" {
-		return "", &utils.InvalidError{Msg: "Invalid node, 'name' is a required parameter"}
+		return "", &errorutils.InvalidError{Msg: "Invalid node, 'name' is a required parameter"}
 	}
 
 	node, err := toDBNode(inNode)
@@ -486,10 +487,10 @@ func (db *DB) GetNodes(sortField string, insortOrder nodes.Query_OrderType, page
 	perPage = valueOrDefaultInt(perPage, 100)
 
 	if nodesSortFields[sortField] == "" {
-		return nil, nil, &utils.InvalidError{Msg: fmt.Sprintf("Invalid sort field, valid ones are: %v", getMapKeys(nodesSortFields))}
+		return nil, nil, &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid sort field, valid ones are: %v", getMapKeys(nodesSortFields))}
 	}
 	if !stringutils.SliceContains(validOrderFields, sortOrder) {
-		return nil, nil, &utils.InvalidError{Msg: fmt.Sprintf("Invalid order, valid ones are: %v", validOrderFields)}
+		return nil, nil, &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid order, valid ones are: %v", validOrderFields)}
 	}
 
 	filters = handleNodeTagFilters(filters)
@@ -634,33 +635,33 @@ func validateNodeFilters(filters []*common.Filter) error {
 		case "manager_type":
 			for _, item := range filter.Values {
 				if !isValidNodeManagerType(item) {
-					return &utils.InvalidError{Msg: fmt.Sprintf("Invalid manager_type filter: %s. manager_type must be one of the following: 'aws-ec2', 'aws-api', 'azure-api', 'automate'", item)}
+					return &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid manager_type filter: %s. manager_type must be one of the following: 'aws-ec2', 'aws-api', 'azure-api', 'automate'", item)}
 				}
 			}
 		case "status":
 			for _, item := range filter.Values {
 				if !isValidStatus(item) {
-					return &utils.InvalidError{Msg: fmt.Sprintf("Invalid status filter: %s. status must be one of the following: 'reachable', 'unreachable', 'unknown'", item)}
+					return &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid status filter: %s. status must be one of the following: 'reachable', 'unreachable', 'unknown'", item)}
 				}
 			}
 		case "state":
 			for _, item := range filter.Values {
 				if !isValidState(item) {
-					return &utils.InvalidError{Msg: fmt.Sprintf("Invalid state filter: %s. state must be one of the following: 'RUNNING', 'STOPPED', 'TERMINATED'", item)}
+					return &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid state filter: %s. state must be one of the following: 'RUNNING', 'STOPPED', 'TERMINATED'", item)}
 				}
 			}
 		case "statechange_timerange":
 			for _, item := range filter.Values {
 				_, err := time.Parse(time.RFC3339, item)
 				if err != nil {
-					return &utils.InvalidError{Msg: fmt.Sprintf("Invalid statechange_timerange filter: %s. statechange_timerange entered is not valid timestamp", item)}
+					return &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid statechange_timerange filter: %s. statechange_timerange entered is not valid timestamp", item)}
 				}
 			}
 		case "last_contact":
 			for _, item := range filter.Values {
 				_, err := time.Parse(time.RFC3339, item)
 				if err != nil {
-					return &utils.InvalidError{Msg: fmt.Sprintf("Invalid last_contact filter: %s. last_contact entered is not valid timestamp", item)}
+					return &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid last_contact filter: %s. last_contact entered is not valid timestamp", item)}
 				}
 			}
 		}
@@ -717,7 +718,7 @@ func (db *DB) GetNode(ctx context.Context, id string) (*nodes.Node, error) {
 	// Args are the query, limit, offset, node id
 	err := db.SelectOne(&node, query, 1, 0, id)
 	if err != nil {
-		return nil, utils.ProcessSQLNotFound(err, id, "GetNode unable to select node")
+		return nil, errorutils.ProcessSQLNotFound(err, id, "GetNode unable to select node")
 	}
 
 	n, err := db.fromDBNodeWithTargetConfig(&node)

@@ -2,14 +2,34 @@
 
 chef-table {
   .id-column {
-    flex-basis: 30%;
+    flex-basis: 33%;
   }
 
   .name-column {
-    flex-basis: 70%;
+    flex-basis: 33%;
+  }
+
+  .projects-column {
+    flex-basis: 33%;
   }
 
   .button-column {
     justify-content: flex-end;
+  }
+}
+
+.empty-case-container {
+  display: flex;
+  justify-content: center;
+
+  p {
+    margin-top: 42px;
+    font-size: 18px;
+    margin-bottom: 0;
+    text-align: center;
+  }
+
+  chef-button {
+    margin-top: 18px;
   }
 }

@@ -9,10 +9,10 @@ import (
 
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/compliance-service/secretsint"
-	"github.com/chef/automate/components/compliance-service/utils"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	"github.com/chef/automate/components/nodemanager-service/mgrtypes"
 	"github.com/chef/automate/components/nodemanager-service/pgdb"
+	"github.com/chef/automate/lib/errorutils"
 	pb "github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -63,18 +63,18 @@ func (srv *Server) Create(ctx context.Context, in *nodes.Node) (*nodes.Id, error
 	secrets := secretsint.New(srv.secretsClient)
 	allExist, _, _ := secrets.CheckSecrets(in.GetTargetConfig().GetSecrets())
 	if !allExist {
-		return nil, utils.FormatErrorMsg(&utils.InvalidError{Msg: "AddNode unable to confirm secrets existence"}, "")
+		return nil, errorutils.FormatErrorMsg(&errorutils.InvalidError{Msg: "AddNode unable to confirm secrets existence"}, "")
 	}
 	in.Manager = "automate"
 	nID, err := srv.db.AddNode(in)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	in.Id = nID
 	// associate node id with manual manager id
 	err = srv.db.AssociateNodeIDsWithManagerID([]string{nID}, mgrtypes.AutomateManagerID)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 
 	return &nodes.Id{Id: nID}, nil
@@ -88,20 +88,20 @@ func (srv *Server) BulkCreate(ctx context.Context, in *nodes.Nodes) (*nodes.Ids,
 	for _, node := range in.GetNodes() {
 		allExist, _, _ := secrets.CheckSecrets(node.TargetConfig.Secrets)
 		if !allExist {
-			return nil, utils.FormatErrorMsg(&utils.InvalidError{Msg: "AddNode unable to confirm secrets existence"}, "")
+			return nil, errorutils.FormatErrorMsg(&errorutils.InvalidError{Msg: "AddNode unable to confirm secrets existence"}, "")
 		}
 	}
 
 	ids, err := srv.db.BulkAddNodes(in.GetNodes())
 	if err != nil {
 		ids := strings.Join(ids, ",")
-		return nil, utils.FormatErrorMsg(err, ids)
+		return nil, errorutils.FormatErrorMsg(err, ids)
 	}
 
 	// associate node id with manual manager id
 	err = srv.db.AssociateNodeIDsWithManagerID(ids, mgrtypes.AutomateManagerID)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 
 	return &nodes.Ids{Ids: ids}, nil
@@ -116,22 +116,22 @@ func (srv *Server) Read(ctx context.Context, in *nodes.Id) (*nodes.Node, error) 
 func GetNode(ctx context.Context, in *nodes.Id, db *pgdb.DB, secretsClient secrets.SecretsServiceClient) (*nodes.Node, error) {
 	node, err := db.GetNode(ctx, in.Id)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 
 	secretIds, err := db.GetNodeSecretIds(ctx, in.Id)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 
 	secretsAgg, err := getSecretsAgg(ctx, secretIds, secretsClient)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 
 	err = resolveInspecConfigWithSecrets(node.TargetConfig, secretsAgg)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 
 	return node, nil
@@ -235,20 +235,20 @@ func (srv *Server) Update(ctx context.Context, in *nodes.Node) (*pb.Empty, error
 	// validate the node can be updated
 	in, err := srv.validateNodeUpdate(ctx, in)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 
 	secrets := secretsint.New(srv.secretsClient)
 	if in.GetTargetConfig() != nil {
 		allExist, _, _ := secrets.CheckSecrets(in.GetTargetConfig().GetSecrets())
 		if !allExist {
-			return nil, utils.FormatErrorMsg(&utils.InvalidError{Msg: "AddNode unable to confirm secrets existence"}, "")
+			return nil, errorutils.FormatErrorMsg(&errorutils.InvalidError{Msg: "AddNode unable to confirm secrets existence"}, "")
 		}
 	}
 
 	err = srv.db.UpdateNode(in)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 
 	return &empty, nil
@@ -259,7 +259,7 @@ func (srv *Server) Delete(ctx context.Context, in *nodes.Id) (*pb.Empty, error) 
 	logrus.Infof("Node manager is deleting node id: %+v", in)
 	_, err := srv.db.DeleteNode(in.Id)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	return &empty, nil
 }
@@ -269,7 +269,7 @@ func (srv *Server) List(ctx context.Context, in *nodes.Query) (*nodes.Nodes, err
 	logrus.Debugf("Getting Nodes with query: %+v", in)
 	dbnodes, totalCount, err := srv.db.GetNodes(in.Sort, in.Order, in.Page, in.PerPage, in.Filters)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	return &nodes.Nodes{
 		Nodes:            dbnodes,
@@ -284,7 +284,7 @@ func (srv *Server) BulkDelete(ctx context.Context, in *nodes.Query) (*nodes.Bulk
 	logrus.Debugf("Deleting Nodes with query: %+v", in)
 	names, err := srv.db.DeleteNodesWithQuery(in.Filters)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	return &nodes.BulkDeleteResponse{Names: names}, nil
 }
@@ -297,7 +297,7 @@ func (srv *Server) validateNodeUpdate(ctx context.Context, in *nodes.Node) (*nod
 	}
 	switch node.Manager {
 	case "aws-api", "azure-api", "gcp-api":
-		return fullNode, &utils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update %s node", in.Manager)}
+		return fullNode, &errorutils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update %s node", in.Manager)}
 	case "aws-ec2", "azure-vm":
 		// the name, host, and tags of these nodes is retrieved from the provider, so let's not let the user update it
 		fullNode.Name = node.Name

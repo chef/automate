@@ -51,7 +51,7 @@ func TestUpdateProject(t *testing.T) {
 		{"if the project id is invalid, returns 'invalid argument'", func(t *testing.T) {
 			cl, _, _ := setupProjects(t)
 			resp, err := cl.UpdateProject(ctx,
-				&api.UpdateProjectReq{Id: "no_underscores", Name: "any name"})
+				&api.UpdateProjectReq{Id: "no spaces", Name: "any name"})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
@@ -147,7 +147,7 @@ func TestCreateProject(t *testing.T) {
 			assert.Nil(t, resp)
 		}},
 		{"if the project id is invalid, returns 'invalid argument'", func(t *testing.T) {
-			resp, err := cl.CreateProject(ctx, &api.CreateProjectReq{Id: "no_underscores", Name: "any name"})
+			resp, err := cl.CreateProject(ctx, &api.CreateProjectReq{Id: "no spaces", Name: "any name"})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
@@ -213,7 +213,7 @@ func TestGetProject(t *testing.T) {
 			assert.Nil(t, resp)
 		}},
 		{"if the project id is invalid, returns 'invalid argument'", func(t *testing.T) {
-			resp, err := cl.GetProject(ctx, &api.GetProjectReq{Id: "no_underscore_allowed"})
+			resp, err := cl.GetProject(ctx, &api.GetProjectReq{Id: "no spaces allowed"})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
@@ -265,7 +265,7 @@ func TestDeleteProject(t *testing.T) {
 			assert.Nil(t, resp)
 		}},
 		{"if the project id is invalid, returns 'invalid argument'", func(t *testing.T) {
-			resp, err := cl.DeleteProject(ctx, &api.DeleteProjectReq{Id: "no_underscore_allowed"})
+			resp, err := cl.DeleteProject(ctx, &api.DeleteProjectReq{Id: "no spaces allowed"})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},

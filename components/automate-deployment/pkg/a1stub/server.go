@@ -325,6 +325,8 @@ func setupEsAPIServer() *http.Server {
 		mux.HandleFunc(path, handleEsIndicesStatsStore)
 	}
 
+	mux.HandleFunc("/elasticsearch/_tasks/", handleEsTaskStatus)
+
 	mux.HandleFunc("/", debug404Handler)
 
 	esAPIServer = &http.Server{
@@ -504,6 +506,11 @@ func handleEsSnapshotStatus(w http.ResponseWriter, r *http.Request) {
 func handleEsIndicesSettings(w http.ResponseWriter, r *http.Request) {
 	thPrintf("sending indicesSettingsJSON\n")
 	fmt.Fprint(w, indicesSettingsJSON())
+}
+
+func handleEsTaskStatus(w http.ResponseWriter, r *http.Request) {
+	thPrintf("sending task complete\n")
+	fmt.Fprint(w, `{"completed": true}`)
 }
 
 func handleEsIndexCreate(w http.ResponseWriter, r *http.Request) {

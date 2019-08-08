@@ -10,6 +10,7 @@ import (
 	backupgateway "github.com/chef/automate/api/config/backup_gateway"
 	bifrost "github.com/chef/automate/api/config/bifrost"
 	bookshelf "github.com/chef/automate/api/config/bookshelf"
+	cereal "github.com/chef/automate/api/config/cereal"
 	cfgmgmt "github.com/chef/automate/api/config/cfgmgmt"
 	compliance "github.com/chef/automate/api/config/compliance"
 	csnginx "github.com/chef/automate/api/config/cs_nginx"
@@ -52,6 +53,7 @@ func NewAutomateConfig() *AutomateConfig {
 		BackupGateway:    backupgateway.NewConfigRequest(),
 		Bifrost:          bifrost.NewConfigRequest(),
 		Bookshelf:        bookshelf.NewConfigRequest(),
+		Cereal:           cereal.NewConfigRequest(),
 		Compliance:       compliance.NewConfigRequest(),
 		ConfigMgmt:       cfgmgmt.NewConfigRequest(),
 		CsNginx:          csnginx.NewConfigRequest(),
@@ -96,6 +98,7 @@ func DefaultAutomateConfig() *AutomateConfig {
 		BackupGateway:    backupgateway.DefaultConfigRequest(),
 		Bifrost:          bifrost.DefaultConfigRequest(),
 		Bookshelf:        bookshelf.DefaultConfigRequest(),
+		Cereal:           cereal.DefaultConfigRequest(),
 		Compliance:       compliance.DefaultConfigRequest(),
 		ConfigMgmt:       cfgmgmt.DefaultConfigRequest(),
 		CsNginx:          csnginx.DefaultConfigRequest(),
@@ -138,7 +141,7 @@ and enforces other invariants on configuration option values.
 If the configuration is valid, the returned error is nil.
 */
 func (c *AutomateConfig) Validate() error {
-	err := shared.Validate(c.Global.Validate(), c.AuthN.Validate(), c.AuthZ.Validate(), c.Compliance.Validate(), c.ConfigMgmt.Validate(), c.Deployment.Validate(), c.Dex.Validate(), c.Elasticsearch.Validate(), c.Esgateway.Validate(), c.EsSidecar.Validate(), c.Gateway.Validate(), c.Ingest.Validate(), c.LoadBalancer.Validate(), c.LocalUser.Validate(), c.LicenseControl.Validate(), c.Notifications.Validate(), c.Postgresql.Validate(), c.Session.Validate(), c.Teams.Validate(), c.UI.Validate(), c.DataLifecycle.Validate(), c.Secrets.Validate(), c.BackupGateway.Validate(), c.PgSidecar.Validate(), c.PgGateway.Validate(), c.Applications.Validate(), c.Bookshelf.Validate(), c.Bifrost.Validate(), c.Erchef.Validate(), c.CsNginx.Validate(), c.Workflow.Validate(), c.WorkflowNginx.Validate(), c.EventService.Validate(), c.Nodemanager.Validate(), c.EventGateway.Validate(), c.Prometheus.Validate(), c.DataFeedService.Validate(), c.EventFeedService.Validate())
+	err := shared.Validate(c.Global.Validate(), c.AuthN.Validate(), c.AuthZ.Validate(), c.Compliance.Validate(), c.ConfigMgmt.Validate(), c.Deployment.Validate(), c.Dex.Validate(), c.Elasticsearch.Validate(), c.Esgateway.Validate(), c.EsSidecar.Validate(), c.Gateway.Validate(), c.Ingest.Validate(), c.LoadBalancer.Validate(), c.LocalUser.Validate(), c.LicenseControl.Validate(), c.Notifications.Validate(), c.Postgresql.Validate(), c.Session.Validate(), c.Teams.Validate(), c.UI.Validate(), c.DataLifecycle.Validate(), c.Secrets.Validate(), c.BackupGateway.Validate(), c.PgSidecar.Validate(), c.PgGateway.Validate(), c.Applications.Validate(), c.Bookshelf.Validate(), c.Bifrost.Validate(), c.Erchef.Validate(), c.CsNginx.Validate(), c.Workflow.Validate(), c.WorkflowNginx.Validate(), c.EventService.Validate(), c.Nodemanager.Validate(), c.EventGateway.Validate(), c.Prometheus.Validate(), c.DataFeedService.Validate(), c.EventFeedService.Validate(), c.Cereal.Validate())
 	if err == nil {
 		return nil
 	}
@@ -190,6 +193,7 @@ func (c *AutomateConfig) SetGlobalConfig() {
 	c.Prometheus.SetGlobalConfig(c.Global)
 	c.DataFeedService.SetGlobalConfig(c.Global)
 	c.EventFeedService.SetGlobalConfig(c.Global)
+	c.Cereal.SetGlobalConfig(c.Global)
 }
 
 // PlatformServiceConfigForService gets the config for the service by name
@@ -269,6 +273,8 @@ func (c *AutomateConfig) PlatformServiceConfigForService(serviceName string) (sh
 		return c.DataFeedService, true
 	case "event-feed-service":
 		return c.EventFeedService, true
+	case "cereal-service":
+		return c.Cereal, true
 	default:
 		return nil, false
 	}

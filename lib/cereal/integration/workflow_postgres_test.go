@@ -1,6 +1,6 @@
 // +build integration
 
-package integration_test
+package integration
 
 import (
 	"context"
@@ -15,7 +15,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/platform/pg"
 )
@@ -68,28 +67,7 @@ func TestCerealPostgres(t *testing.T) {
 	require.NoError(t, runResetDB())
 	pgBackend := postgres.NewPostgresBackend(testDBURL(), postgres.WithTaskPingInterval(3*time.Second))
 	defer pgBackend.Close()
-	s := &CerealTestSuite{
-		newManager: func(opts ...managerOptFunc) *cereal.Manager {
-			o := managerOpt{}
-			for _, f := range opts {
-				f(&o)
-			}
-			m, err := cereal.NewManager(pgBackend)
-			require.NoError(t, err)
-			for _, w := range o.WorkflowExecutors {
-				err := m.RegisterWorkflowExecutor(w.Name, w.Executor)
-				require.NoError(t, err)
-			}
-			for _, te := range o.TaskExecutors {
-				err := m.RegisterTaskExecutor(te.Name, te.Executor, cereal.TaskExecutorOpts{})
-				require.NoError(t, err)
-			}
-			if !o.NoStart {
-				m.Start(ctx)
-			}
-			return m
-		},
-	}
+	s := NewSuiteForBackend(ctx, t, pgBackend)
 	suite.Run(t, s)
 	require.NoError(t, pgBackend.Close())
 }

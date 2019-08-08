@@ -17,7 +17,9 @@ export function ensureTeamV2(team: Team | TeamV1): Team {
       id: team.name, // v1 team names are unique
       name: team.description, // v1 team description corresponds to v2 team name
       guid: team.id,
-      projects: [] // TODO add real projects
+      // WARNING (tc): /api/v0/teams never returns the projects field.
+      // We should never use the v0 teams API in the UI when projects matter.
+      projects: []
     };
   }
   return team;

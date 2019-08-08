@@ -8,8 +8,8 @@ import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { loading, EntityStatus } from 'app/entities/entities';
-import { iamMajorVersion } from 'app/entities/policies/policy.selectors';
-import { IAMMajorVersion } from 'app/entities/policies/policy.model';
+import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
+import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
 import {
   createError,
   createStatus,
@@ -19,6 +19,9 @@ import { Team } from 'app/entities/teams/team.model';
 import { CreateTeam, DeleteTeam, GetTeams } from 'app/entities/teams/team.actions';
 import { Regex } from 'app/helpers/auth/regex';
 import { HttpStatus } from 'app/types/types';
+import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
+import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
+import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 
 @Component({
   selector: 'app-team-management',
@@ -37,7 +40,11 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   public creatingTeam = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
   public iamMajorVersion$: Observable<IAMMajorVersion>;
-  public isV1 = true;
+  public iamMinorVersion$: Observable<IAMMinorVersion>;
+  public isMajorV1 = true;
+  public isMinorV1 = false;
+  public dropdownProjects: Project[] = [];
+  public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
   private isDestroyed = new Subject<boolean>();
 
@@ -61,6 +68,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
       )),
       takeUntil(this.isDestroyed));
     this.iamMajorVersion$ = store.select(iamMajorVersion);
+    this.iamMinorVersion$ = store.select(iamMinorVersion);
     this.createTeamForm = fb.group({
       // Must stay in sync with error checks in create-object-modal.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
@@ -83,10 +91,28 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetTeams());
 
     this.iamMajorVersion$
-    .pipe(takeUntil(this.isDestroyed))
-    .subscribe((version) => {
-      if (version === null) { return; }
-        this.isV1 = version === 'v1';
+      .pipe(takeUntil(this.isDestroyed))
+      .subscribe((majorVersion) => {
+        if (majorVersion === null) { return; }
+          this.isMajorV1 = majorVersion === 'v1';
+        });
+
+    this.iamMinorVersion$
+      .pipe(takeUntil(this.isDestroyed))
+      .subscribe((minorVersion) => {
+        if (minorVersion === null) { return; }
+          this.isMinorV1 = minorVersion === 'v1';
+        });
+
+    this.store.select(assignableProjects)
+      .subscribe((assignable: ProjectsFilterOption[]) => {
+        this.dropdownProjects = assignable.map(p => {
+          return <Project>{
+            id: p.value,
+            name: p.label,
+            type: p.type
+          };
+        });
       });
   }
 
@@ -109,11 +135,15 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
     this.store.dispatch(new DeleteTeam(this.teamToDelete));
   }
 
-  public createV2Team(): void {
+  public createV2Team(projectsSelected: Project[]): void {
+    let projectsPayload: string[] = [];
+    if (this.isMinorV1) {
+      projectsPayload = projectsSelected.map(p => p.id);
+    }
     this.createTeamCommon({
       id: this.createTeamForm.controls.id.value,
       name: this.createTeamForm.controls.name.value.trim(),
-      projects: [],
+      projects: projectsPayload,
       guid: null
     });
   }
@@ -143,7 +173,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
           this.creatingTeam = false;
           if (state === EntityStatus.loadingSuccess) {
             this.closeCreateModal();
-            if (this.isV1) {
+            if (this.isMajorV1) {
               this.router.navigate(['/settings', 'teams', team.name]);
             }
             this.router.navigate(['/settings', 'teams', team.id]);
@@ -170,7 +200,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   }
 
   public openCreateModal(): void {
-    if (this.isV1) {
+    if (this.isMajorV1) {
       this.createV1TeamModalVisible = true;
     } else {
       this.createModalVisible = true;

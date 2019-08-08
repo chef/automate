@@ -21,6 +21,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting/util"
 	"github.com/chef/automate/components/compliance-service/utils"
+	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"
 
 	"github.com/olivere/elastic"
@@ -558,7 +559,7 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 		return report, nil
 	}
 
-	return report, utils.ProcessNotFound(nil, reportId)
+	return report, errorutils.ProcessNotFound(nil, reportId)
 }
 
 //getFiltersQuery - builds up an elasticsearch query filter based on the filters map that is passed in

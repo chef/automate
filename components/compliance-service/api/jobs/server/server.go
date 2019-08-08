@@ -20,10 +20,10 @@ import (
 	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"github.com/chef/automate/components/compliance-service/ingest/ingest"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/scheduler"
-	"github.com/chef/automate/components/compliance-service/utils"
 	"github.com/chef/automate/components/event-service/server"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
+	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/secureconn"
 )
@@ -107,7 +107,7 @@ func (srv *Server) getComplianceAndSecretsConnection(connectionFactory *secureco
 // GetJobResultByNodeId returns the results row for a given job id and node id
 func (srv *Server) GetJobResultByNodeId(ctx context.Context, in *jobs.GetJobResultByNodeIdRequest) (*jobs.ResultsRow, error) {
 	if len(in.NodeId) == 0 || len(in.JobId) == 0 {
-		return nil, utils.ProcessInvalid(nil, "Invalid request: node id and job id are required fields")
+		return nil, errorutils.ProcessInvalid(nil, "Invalid request: node id and job id are required fields")
 	}
 	return srv.db.GetJobResultByNodeId(ctx, in)
 }
@@ -119,8 +119,8 @@ func (srv *Server) Create(ctx context.Context, in *jobs.Job) (*jobs.Id, error) {
 		// Ensure recurrence rule can be parsed
 		_, err := rrule.StrToRRule(in.Recurrence)
 		if err != nil {
-			err = utils.ProcessInvalid(nil, fmt.Sprintf("Invalid job recurrence rule %+v", err))
-			return nil, utils.FormatErrorMsg(err, "")
+			err = errorutils.ProcessInvalid(nil, fmt.Sprintf("Invalid job recurrence rule %+v", err))
+			return nil, errorutils.FormatErrorMsg(err, "")
 		}
 	}
 
@@ -130,7 +130,7 @@ func (srv *Server) Create(ctx context.Context, in *jobs.Job) (*jobs.Id, error) {
 
 	sID, err := srv.db.AddJob(in)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 
 	in.Id = sID
@@ -151,7 +151,7 @@ func (srv *Server) Read(ctx context.Context, in *jobs.Id) (*jobs.Job, error) {
 	logrus.Debugf("Read job with id: %+v", in.Id)
 	node, err := srv.db.GetJob(in.Id)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	return node, nil
 }
@@ -160,22 +160,22 @@ func (srv *Server) Read(ctx context.Context, in *jobs.Id) (*jobs.Job, error) {
 func (srv *Server) Update(ctx context.Context, in *jobs.Job) (*pb.Empty, error) {
 	logrus.Debugf("Update job with id: %+v", in)
 	if in.Recurrence == "" && in.ParentId != "" {
-		err := &utils.InvalidError{Msg: fmt.Sprintf("Invalid job. Child jobs may not be updated. If you wish to update the parent job, please find job: " + in.ParentId)}
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		err := &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid job. Child jobs may not be updated. If you wish to update the parent job, please find job: " + in.ParentId)}
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 
 	if in.Recurrence != "" {
 		// Ensure recurrence rule can be parsed
 		_, err := rrule.StrToRRule(in.Recurrence)
 		if err != nil {
-			err := &utils.InvalidError{Msg: fmt.Sprintf("Invalid job recurrence rule %+v", in.Recurrence)}
-			return nil, utils.FormatErrorMsg(err, in.Id)
+			err := &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid job recurrence rule %+v", in.Recurrence)}
+			return nil, errorutils.FormatErrorMsg(err, in.Id)
 		}
 	}
 
 	err := srv.db.UpdateJob(in)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	// Trigger Agent. Agents are responsible for all further steps.
 	go srv.schedulerServer.Run(in) // nolint: errcheck
@@ -194,13 +194,13 @@ func (srv *Server) Delete(ctx context.Context, in *jobs.Id) (*pb.Empty, error) {
 	// delete the job (this is a soft delete)
 	err := srv.db.DeleteJob(in.Id)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 
 	// get job name to populate event feed with useful info later
 	name, err := srv.db.GetJobName(in.GetId())
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 
 	// fire scan job deleted event
@@ -236,7 +236,7 @@ func (srv *Server) List(ctx context.Context, in *jobs.Query) (*jobs.Jobs, error)
 	logrus.Debugf("Getting Jobs with query: %+v", in)
 	dbjobs, totalCount, err := srv.db.GetJobs(in.Sort, in.Order, in.Page, in.PerPage, in.Filters)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	return &jobs.Jobs{Jobs: dbjobs, Total: int32(totalCount)}, nil
 }
@@ -247,7 +247,7 @@ func (srv *Server) Rerun(ctx context.Context, in *jobs.Id) (*jobs.RerunResponse,
 	logrus.Debugf("Rerunning job with id: %s", in.Id)
 	job, err := srv.db.GetJob(in.Id)
 	if err != nil {
-		return nil, utils.FormatErrorMsg(err, in.Id)
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	if job.Recurrence != "" || job.ParentId != "" {
 		return nil, status.Error(codes.InvalidArgument, "Unable to rerun a scheduled job")

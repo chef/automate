@@ -5,7 +5,7 @@ import (
 
 	"github.com/chef/automate/components/compliance-service/api/stats"
 	"github.com/chef/automate/components/compliance-service/reporting"
-	"github.com/chef/automate/components/compliance-service/utils"
+	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
@@ -142,7 +142,7 @@ func (depth *ReportDepth) getStatsTopFailuresAggs(
 					SubAggregation("failures", elastic.NewFilterAggregation().
 						Filter(elastic.NewRangeQuery("profiles.controls_sums.failed.total").Gt(0))))
 		default:
-			return aggs, &utils.InvalidError{Msg: fmt.Sprintf("Invalid type '%s'", reportType)}
+			return aggs, &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid type '%s'", reportType)}
 		}
 
 		if err != nil {
@@ -170,7 +170,7 @@ func (depth *ReportDepth) getStatsTopFailuresResult(
 		case "profile":
 			depth.topFailuresResultProfile(aggRoot, topFailures)
 		default:
-			return topFailures, &utils.InvalidError{Msg: fmt.Sprintf("Invalid type '%s'", reportType)}
+			return topFailures, &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid type '%s'", reportType)}
 		}
 
 	}

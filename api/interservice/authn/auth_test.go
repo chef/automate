@@ -20,7 +20,7 @@ func TestValidationCreateTokenID(t *testing.T) {
 			Projects: []string{"project1", "project2"},
 		},
 		"with non-dash characters": &authn.CreateTokenReq{
-			Id:       "test_underscore",
+			Id:       "test#space",
 			Projects: []string{"project1", "project2"},
 		},
 		"with spaces": &authn.CreateTokenReq{
@@ -51,6 +51,10 @@ func TestValidationCreateTokenID(t *testing.T) {
 	positiveCases := map[string]*authn.CreateTokenReq{
 		"projects are missing": &authn.CreateTokenReq{
 			Id: "valid-id",
+		},
+		"underscore in IDs": &authn.CreateTokenReq{
+			Id: "valid_id",
+			Projects: []string{"project_1", "project_2"},
 		},
 		"with no characters": &authn.CreateTokenReq{
 			Id:       "",

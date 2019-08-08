@@ -10,6 +10,7 @@ var ProductMetadataJSON = `
         "name": "chef/backup-gateway",
         "data_service": true,
         "binlinks": null,
+        "uses_platform_scaffolding": false,
         "bootstrap": null
       }
     },
@@ -19,6 +20,7 @@ var ProductMetadataJSON = `
         "name": "chef/automate-postgresql",
         "data_service": true,
         "binlinks": null,
+        "uses_platform_scaffolding": false,
         "bootstrap": null
       }
     },
@@ -32,6 +34,7 @@ var ProductMetadataJSON = `
         "name": "chef/automate-elasticsearch",
         "data_service": true,
         "binlinks": null,
+        "uses_platform_scaffolding": false,
         "bootstrap": null
       }
     },
@@ -45,7 +48,23 @@ var ProductMetadataJSON = `
     },
     {
       "name": "chef/pg-sidecar-service",
-      "metadata": null
+      "metadata": {
+        "name": "chef/pg-sidecar-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
+    },
+    {
+      "name": "chef/cereal-service",
+      "metadata": {
+        "name": "chef/cereal-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/event-service",
@@ -61,19 +80,43 @@ var ProductMetadataJSON = `
     },
     {
       "name": "chef/authz-service",
-      "metadata": null
+      "metadata": {
+        "name": "chef/authz-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/automate-dex",
-      "metadata": null
+      "metadata": {
+        "name": "chef/automate-dex",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/teams-service",
-      "metadata": null
+      "metadata": {
+        "name": "chef/teams-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/authn-service",
-      "metadata": null
+      "metadata": {
+        "name": "chef/authn-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/secrets-service",
@@ -81,6 +124,7 @@ var ProductMetadataJSON = `
         "name": "chef/secrets-service",
         "data_service": false,
         "binlinks": null,
+        "uses_platform_scaffolding": true,
         "bootstrap": [
           {
             "type": "file",
@@ -92,23 +136,53 @@ var ProductMetadataJSON = `
     },
     {
       "name": "chef/applications-service",
-      "metadata": null
+      "metadata": {
+        "name": "chef/applications-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/notifications-service",
-      "metadata": null
+      "metadata": {
+        "name": "chef/notifications-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/nodemanager-service",
-      "metadata": null
+      "metadata": {
+        "name": "chef/nodemanager-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/compliance-service",
-      "metadata": null
+      "metadata": {
+        "name": "chef/compliance-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/license-control-service",
-      "metadata": null
+      "metadata": {
+        "name": "chef/license-control-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/local-user-service",
@@ -116,11 +190,23 @@ var ProductMetadataJSON = `
     },
     {
       "name": "chef/session-service",
-      "metadata": null
+      "metadata": {
+        "name": "chef/session-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/ingest-service",
-      "metadata": null
+      "metadata": {
+        "name": "chef/ingest-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/config-mgmt-service",
@@ -144,11 +230,23 @@ var ProductMetadataJSON = `
     },
     {
       "name": "chef/automate-cs-bookshelf",
-      "metadata": null
+      "metadata": {
+        "name": "chef/automate-cs-bookshelf",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/automate-cs-oc-bifrost",
-      "metadata": null
+      "metadata": {
+        "name": "chef/automate-cs-oc-bifrost",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/automate-cs-oc-erchef",
@@ -156,6 +254,7 @@ var ProductMetadataJSON = `
         "name": "chef/automate-cs-oc-erchef",
         "data_service": false,
         "binlinks": null,
+        "uses_platform_scaffolding": true,
         "bootstrap": [
           {
             "type": "file",
@@ -194,6 +293,7 @@ var ProductMetadataJSON = `
           "knife",
           "chef-server-ctl"
         ],
+        "uses_platform_scaffolding": false,
         "bootstrap": null
       }
     },
@@ -205,6 +305,7 @@ var ProductMetadataJSON = `
         "binlinks": [
           "workflow-ctl"
         ],
+        "uses_platform_scaffolding": false,
         "bootstrap": null
       }
     },
@@ -222,6 +323,7 @@ var ProductMetadataJSON = `
         "name": "chef/automate-prometheus",
         "data_service": true,
         "binlinks": null,
+        "uses_platform_scaffolding": false,
         "bootstrap": null
       }
     },
@@ -233,6 +335,7 @@ var ProductMetadataJSON = `
         "binlinks": [
           "chef-automate"
         ],
+        "uses_platform_scaffolding": false,
         "bootstrap": null
       }
     },
@@ -285,6 +388,19 @@ var ProductMetadataJSON = `
       "hidden": false
     },
     {
+      "name": "cereal",
+      "aliases": null,
+      "type": "base",
+      "services": [
+        "chef/cereal-service"
+      ],
+      "packages": null,
+      "dependencies": [
+        "postgresql"
+      ],
+      "hidden": false
+    },
+    {
       "name": "auth",
       "aliases": null,
       "type": "base",
@@ -330,6 +446,7 @@ var ProductMetadataJSON = `
         "core",
         "postgresql",
         "elasticsearch",
+        "cereal",
         "auth"
       ],
       "hidden": false

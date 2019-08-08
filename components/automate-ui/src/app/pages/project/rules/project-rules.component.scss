@@ -78,9 +78,18 @@ chef-page {
     margin-bottom: 20px;
   }
 
+  [disabled]:hover {
+    cursor: not-allowed;
+  }
+
   chef-form-field {
     label {
       padding-bottom: 0;
+    }
+
+    chef-input[disabled] {
+      background-color: #E6EBEE;
+      opacity: 0.5;
     }
 
     &.attribute-field {

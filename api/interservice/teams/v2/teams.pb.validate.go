@@ -433,7 +433,7 @@ func (m *UpdateTeamReq) Validate() error {
 		if !_UpdateTeamReq_Projects_Pattern.MatchString(item) {
 			return UpdateTeamReqValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
-				reason: "value does not match regex pattern \"^[a-z0-9-]{1,64}$\"",
+				reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
 			}
 		}
 
@@ -500,7 +500,7 @@ var _UpdateTeamReq_Id_Pattern = regexp.MustCompile("\\S")
 
 var _UpdateTeamReq_Name_Pattern = regexp.MustCompile("\\S")
 
-var _UpdateTeamReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-]{1,64}$")
+var _UpdateTeamReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on UpdateTeamResp with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
@@ -737,7 +737,7 @@ func (m *CreateTeamReq) Validate() error {
 	if !_CreateTeamReq_Id_Pattern.MatchString(m.GetId()) {
 		return CreateTeamReqValidationError{
 			field:  "Id",
-			reason: "value does not match regex pattern \"^[a-z0-9-]{1,64}$\"",
+			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
 		}
 	}
 
@@ -765,7 +765,7 @@ func (m *CreateTeamReq) Validate() error {
 		if !_CreateTeamReq_Projects_Pattern.MatchString(item) {
 			return CreateTeamReqValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
-				reason: "value does not match regex pattern \"^[a-z0-9-]{1,64}$\"",
+				reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
 			}
 		}
 
@@ -828,11 +828,11 @@ var _ interface {
 	ErrorName() string
 } = CreateTeamReqValidationError{}
 
-var _CreateTeamReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-]{1,64}$")
+var _CreateTeamReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 var _CreateTeamReq_Name_Pattern = regexp.MustCompile("\\S")
 
-var _CreateTeamReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-]{1,64}$")
+var _CreateTeamReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on CreateTeamResp with the rules defined in
 // the proto definition for this message. If any rules are violated, an error

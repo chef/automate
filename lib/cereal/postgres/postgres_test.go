@@ -1086,6 +1086,253 @@ func TestWorkflowCancellationBeforeStart(t *testing.T) {
 	assertNoPendingWork(t, b1)
 }
 
+func TestListWorkflowInstancesEmpty(t *testing.T) {
+	err := runResetDB()
+	require.NoError(t, err)
+	b1 := NewPostgresBackend(testDBURL())
+	err = b1.Init()
+	require.NoError(t, err)
+	defer b1.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	instances, err := b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{})
+	require.NoError(t, err)
+	assert.Len(t, instances, 0)
+}
+
+func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
+	workflowName := "workflow_name"
+	err := runResetDB()
+	require.NoError(t, err)
+	b1 := NewPostgresBackend(testDBURL())
+	err = b1.Init()
+	require.NoError(t, err)
+	defer b1.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	instance1Name := "instance1"
+	instance1Parameters := []byte("instance1Parameters")
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: instance1Name,
+		WorkflowName: workflowName,
+		Parameters:   instance1Parameters,
+	})
+	require.NoError(t, err)
+	instance2Name := "instance2"
+	instance2Parameters := []byte("instance2Parameters")
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: instance2Name,
+		WorkflowName: workflowName,
+		Parameters:   instance2Parameters,
+	})
+	require.NoError(t, err)
+
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: instance1Name,
+		WorkflowName: "someotherworkflow",
+		Parameters:   nil,
+	})
+	require.NoError(t, err)
+
+	instances, err := b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{})
+	require.NoError(t, err)
+	assert.Len(t, instances, 3)
+
+	for _, instance := range instances {
+		assert.Equal(t, backend.WorkflowInstanceStatusStarting, instance.Status)
+		if instance.WorkflowName == workflowName {
+			if instance.InstanceName == instance1Name {
+				assert.Equal(t, instance1Parameters, instance.Parameters)
+			} else {
+				assert.Equal(t, instance2Parameters, instance.Parameters)
+			}
+		}
+	}
+
+	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+		WorkflowName: &workflowName,
+	})
+	require.NoError(t, err)
+	assert.Len(t, instances, 2)
+
+	for _, instance := range instances {
+		assert.Equal(t, backend.WorkflowInstanceStatusStarting, instance.Status)
+		if instance.InstanceName == instance1Name {
+			assert.Equal(t, instance1Parameters, instance.Parameters)
+		} else {
+			assert.Equal(t, instance2Parameters, instance.Parameters)
+		}
+	}
+
+	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+		WorkflowName: &workflowName,
+		InstanceName: &instance1Name,
+	})
+	require.NoError(t, err)
+	require.Len(t, instances, 1)
+	assert.Equal(t, backend.WorkflowInstanceStatusStarting, instances[0].Status)
+	assert.Equal(t, instance1Parameters, instances[0].Parameters)
+
+	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+		WorkflowName: &workflowName,
+		InstanceName: &instance2Name,
+	})
+	require.NoError(t, err)
+	require.Len(t, instances, 1)
+	assert.Equal(t, backend.WorkflowInstanceStatusStarting, instances[0].Status)
+	assert.Equal(t, instance2Parameters, instances[0].Parameters)
+
+	isRunning := true
+	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+		WorkflowName: &workflowName,
+		IsRunning:    &isRunning,
+	})
+	require.NoError(t, err)
+	assert.Len(t, instances, 2)
+
+	for _, instance := range instances {
+		assert.Equal(t, backend.WorkflowInstanceStatusStarting, instance.Status)
+		if instance.InstanceName == instance1Name {
+			assert.Equal(t, instance1Parameters, instance.Parameters)
+		} else {
+			assert.Equal(t, instance2Parameters, instance.Parameters)
+		}
+	}
+
+	isRunning = false
+	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+		WorkflowName: &workflowName,
+		IsRunning:    &isRunning,
+	})
+	require.NoError(t, err)
+	assert.Len(t, instances, 0)
+
+	w1, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	err = completer.Done([]byte("result"))
+	require.NoError(t, err)
+	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+		WorkflowName: &workflowName,
+		IsRunning:    &isRunning,
+	})
+	require.NoError(t, err)
+	require.Len(t, instances, 1)
+	assert.Equal(t, backend.WorkflowInstanceStatusCompleted, instances[0].Status)
+	assert.Equal(t, w1.Instance.WorkflowName, instances[0].WorkflowName)
+	assert.Equal(t, w1.Instance.InstanceName, instances[0].InstanceName)
+	assert.Equal(t, w1.Instance.Parameters, instances[0].Parameters)
+	assert.Equal(t, []byte("result"), instances[0].Result)
+
+	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+		WorkflowName: &workflowName,
+		InstanceName: &w1.Instance.InstanceName,
+	})
+	require.NoError(t, err)
+	require.Len(t, instances, 1)
+	assert.Equal(t, backend.WorkflowInstanceStatusCompleted, instances[0].Status)
+	assert.Equal(t, w1.Instance.WorkflowName, instances[0].WorkflowName)
+	assert.Equal(t, w1.Instance.InstanceName, instances[0].InstanceName)
+	assert.Equal(t, w1.Instance.Parameters, instances[0].Parameters)
+	assert.Nil(t, instances[0].Payload)
+	assert.Equal(t, []byte("result"), instances[0].Result)
+
+	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+		WorkflowName: &workflowName,
+	})
+	require.NoError(t, err)
+	require.Len(t, instances, 2)
+
+	isRunning = false
+	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+		IsRunning: &isRunning,
+	})
+	require.NoError(t, err)
+	require.Len(t, instances, 1)
+
+	isRunning = true
+	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+		IsRunning: &isRunning,
+	})
+	require.NoError(t, err)
+	require.Len(t, instances, 2)
+
+	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{})
+	require.NoError(t, err)
+	require.Len(t, instances, 3)
+
+	w2, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
+	require.NoError(t, err)
+	err = completer.Fail(errors.New("fail"))
+	require.NoError(t, err)
+
+	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+		WorkflowName: &workflowName,
+		InstanceName: &w2.Instance.InstanceName,
+	})
+
+	require.NoError(t, err)
+	require.Len(t, instances, 1)
+	assert.Equal(t, backend.WorkflowInstanceStatusCompleted, instances[0].Status)
+	assert.Equal(t, w2.Instance.WorkflowName, instances[0].WorkflowName)
+	assert.Equal(t, w2.Instance.InstanceName, instances[0].InstanceName)
+	assert.Equal(t, w2.Instance.Parameters, instances[0].Parameters)
+	assert.Nil(t, instances[0].Result)
+	assert.Nil(t, instances[0].Payload)
+	assert.Equal(t, "fail", instances[0].Err.Error())
+
+	isRunning = false
+	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+		IsRunning: &isRunning,
+	})
+	require.NoError(t, err)
+	require.Len(t, instances, 2)
+
+	isRunning = true
+	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+		IsRunning: &isRunning,
+	})
+	require.NoError(t, err)
+	require.Len(t, instances, 1)
+
+	instance1Parameters = []byte("instance1Parameters-new")
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: instance1Name,
+		WorkflowName: workflowName,
+		Parameters:   instance1Parameters,
+	})
+	require.NoError(t, err)
+	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+		WorkflowName: &workflowName,
+		InstanceName: &instance1Name,
+	})
+	require.NoError(t, err)
+	require.Len(t, instances, 1)
+	assert.Equal(t, backend.WorkflowInstanceStatusStarting, instances[0].Status)
+	assert.Equal(t, instance1Parameters, instances[0].Parameters)
+	assert.Nil(t, instances[0].Result)
+	assert.Nil(t, instances[0].Err)
+
+	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		InstanceName: instance2Name,
+		WorkflowName: workflowName,
+		Parameters:   instance2Parameters,
+	})
+	require.NoError(t, err)
+	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+		WorkflowName: &workflowName,
+		InstanceName: &instance2Name,
+	})
+	require.NoError(t, err)
+	require.Len(t, instances, 1)
+	assert.Equal(t, backend.WorkflowInstanceStatusStarting, instances[0].Status)
+	assert.Equal(t, instance2Parameters, instances[0].Parameters)
+	assert.Nil(t, instances[0].Result)
+	assert.Nil(t, instances[0].Err)
+}
+
 func assertNoPendingWork(t *testing.T, b *PostgresBackend) {
 	t.Helper()
 

@@ -18,7 +18,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/reporting"
-	"github.com/chef/automate/components/compliance-service/utils"
+	"github.com/chef/automate/lib/errorutils"
 )
 
 type ESInspecControl struct {
@@ -308,7 +308,7 @@ func (backend *ES2Backend) GetProfile(hash string) (reportingapi.Profile, error)
 		}
 	}
 
-	return profile, utils.ProcessNotFound(nil, profile.Name)
+	return profile, errorutils.ProcessNotFound(nil, profile.Name)
 }
 
 //GetProfileSummaryByProfileId across nodes - report 8 - top
@@ -409,7 +409,7 @@ func (backend ES2Backend) GetProfileSummaryByProfileId(profileId string, filters
 
 		return profileMeta, nil
 	}
-	return nil, utils.ProcessNotFound(nil, profileId)
+	return nil, errorutils.ProcessNotFound(nil, profileId)
 
 }
 
@@ -478,7 +478,7 @@ func (backend *ES2Backend) getProfileMetadata(profileID string) (*stats.ProfileS
 		return prof, nil
 	}
 
-	return nil, utils.ProcessNotFound(nil, profileID)
+	return nil, errorutils.ProcessNotFound(nil, profileID)
 }
 
 // internal helper method to get control meta information
@@ -547,7 +547,7 @@ func (backend *ES2Backend) getControlsMetadata(profileId string) (map[string]Con
 		}
 	}
 
-	return controlMetaMap, utils.ProcessNotFound(nil, profileId)
+	return controlMetaMap, errorutils.ProcessNotFound(nil, profileId)
 }
 
 // TODO: header with amount of results

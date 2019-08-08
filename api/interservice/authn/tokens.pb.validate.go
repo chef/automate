@@ -44,7 +44,7 @@ func (m *CreateTokenReq) Validate() error {
 	if !_CreateTokenReq_Id_Pattern.MatchString(m.GetId()) {
 		return CreateTokenReqValidationError{
 			field:  "Id",
-			reason: "value does not match regex pattern \"^[a-z0-9-]{1,64}$|^$\"",
+			reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$|^$\"",
 		}
 	}
 
@@ -69,7 +69,7 @@ func (m *CreateTokenReq) Validate() error {
 		if !_CreateTokenReq_Projects_Pattern.MatchString(item) {
 			return CreateTokenReqValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
-				reason: "value does not match regex pattern \"^[a-z0-9-]{1,64}$\"",
+				reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
 			}
 		}
 
@@ -132,9 +132,9 @@ var _ interface {
 	ErrorName() string
 } = CreateTokenReqValidationError{}
 
-var _CreateTokenReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-]{1,64}$|^$")
+var _CreateTokenReq_Id_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$|^$")
 
-var _CreateTokenReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-]{1,64}$")
+var _CreateTokenReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on CreateTokenWithValueReq with the rules
 // defined in the proto definition for this message. If any rules are
@@ -169,7 +169,7 @@ func (m *CreateTokenWithValueReq) Validate() error {
 		if !_CreateTokenWithValueReq_Projects_Pattern.MatchString(item) {
 			return CreateTokenWithValueReqValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
-				reason: "value does not match regex pattern \"^[a-z0-9-]{1,64}$\"",
+				reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
 			}
 		}
 
@@ -234,7 +234,7 @@ var _ interface {
 	ErrorName() string
 } = CreateTokenWithValueReqValidationError{}
 
-var _CreateTokenWithValueReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-]{1,64}$")
+var _CreateTokenWithValueReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on UpdateTokenReq with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
@@ -267,7 +267,7 @@ func (m *UpdateTokenReq) Validate() error {
 		if !_UpdateTokenReq_Projects_Pattern.MatchString(item) {
 			return UpdateTokenReqValidationError{
 				field:  fmt.Sprintf("Projects[%v]", idx),
-				reason: "value does not match regex pattern \"^[a-z0-9-]{1,64}$\"",
+				reason: "value does not match regex pattern \"^[a-z0-9-_]{1,64}$\"",
 			}
 		}
 
@@ -330,7 +330,7 @@ var _ interface {
 	ErrorName() string
 } = UpdateTokenReqValidationError{}
 
-var _UpdateTokenReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-]{1,64}$")
+var _UpdateTokenReq_Projects_Pattern = regexp.MustCompile("^[a-z0-9-_]{1,64}$")
 
 // Validate checks the field values on Token with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.

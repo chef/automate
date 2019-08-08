@@ -65,7 +65,8 @@ describe File.basename(__FILE__) do
           ]
         }
       ],
-      "total": 1
+      "total": 1,
+      "totalPassed"=>1
     }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 

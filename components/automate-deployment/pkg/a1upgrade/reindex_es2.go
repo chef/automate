@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
@@ -254,10 +255,28 @@ func (r *Reindexer) reindexWithNewMapping(srcIndex, mappingAssetPath string) err
 	// improvement. It may be useful on more production-like systems, depending
 	// on the configuration. It can be enabled by adding `.Slices(n=int)` to the
 	// method chain here:
-	_, err = r.es.Reindex().SourceIndex(srcIndex).DestinationIndex(destIndex).Refresh("true").WaitForCompletion(true).Do(ctx)
+	startTaskResult, err := r.es.Reindex().SourceIndex(srcIndex).DestinationIndex(destIndex).Refresh("true").DoAsync(ctx)
 	if err != nil {
 		return errors.Wrapf(err, "failed to reindex source index '%s' to destination '%s'", srcIndex, destIndex)
 	}
+
+	// Wait for Reindex task to complete
+	for {
+		time.Sleep(time.Millisecond * 500)
+
+		tasksGetTaskResponse, err := elastic.NewTasksGetTaskService(r.es).
+			TaskId(startTaskResult.TaskId).
+			WaitForCompletion(false).
+			Do(ctx)
+		if err != nil {
+			return err
+		}
+
+		if tasksGetTaskResponse.Completed {
+			break
+		}
+	}
+
 	deleteResponse, err := r.es.DeleteIndex(srcIndex).Do(ctx)
 	if err != nil {
 		return errors.Wrapf(err, "failed to remove index '%s' after reindexing to '%s'", srcIndex, destIndex)

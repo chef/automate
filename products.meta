@@ -7,6 +7,7 @@
     "chef/automate-es-gateway",
     "chef/automate-ui",
     "chef/pg-sidecar-service",
+    "chef/cereal-service",
     "chef/event-service",
     "chef/event-feed-service",
     "chef/authz-service",
@@ -75,6 +76,14 @@
       ]
     },
     {
+      "name": "cereal",
+      "type": "base",
+      "dependencies": ["postgresql"],
+      "services": [
+        "chef/cereal-service"
+      ]
+    },
+    {
       "name": "auth",
       "type": "base",
       "dependencies": ["core", "postgresql"],
@@ -90,7 +99,7 @@
     {
       "name": "automate",
       "type": "product",
-      "dependencies": ["core", "postgresql", "elasticsearch", "auth"],
+      "dependencies": ["core", "postgresql", "elasticsearch", "cereal", "auth"],
       "aliases": ["automate-full"],
       "services": [
         "chef/automate-ui",

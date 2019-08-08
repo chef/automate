@@ -411,6 +411,7 @@ func (s *server) configRenderer() (ConfigRenderer, error) {
 		logrus.WithError(err).Error("Could not render platform config")
 		return nil, errors.Wrap(err, "Could not render platform config")
 	}
+
 	return func(service *deployment.Service) (string, error) {
 		rootCert := s.deployment.CA().RootCert()
 		creds := &config.TLSCredentials{
@@ -446,14 +447,8 @@ func (s *server) configRenderer() (ConfigRenderer, error) {
 }
 
 func usesPlatformScaffolding(service *deployment.Service) bool {
-	//TODO (jaym): find a better way to get this information
-	switch service.Name() {
-	case "secrets-service", "pg-sidecar-service", "teams-service", "authz-service", "session-service", "automate-dex",
-		"authn-service", "compliance-service", "nodemanager-service", "notifications-service", "applications-service",
-		"automate-cs-bookshelf", "automate-cs-oc-erchef", "automate-cs-oc-bifrost", "ingest-service", "license-control-service":
-		return true
-	}
-	return false
+	metadata := services.MetadataForPackage(service.Name())
+	return metadata != nil && metadata.UsesPlatformScaffolding
 }
 
 func (s *errDeployer) convergeServices(task *converge.Task, eventSink converge.EventSink) {
