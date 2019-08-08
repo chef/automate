@@ -1,4 +1,6 @@
 #!{{pkgPathFor "core/bash"}}/bin/bash -ex
 
+source {{pkg.svc_config_path}}/render-certs.sh
+
 PID=$(cat {{pkg.svc_var_path}}/pid)
 kill -HUP "$PID"
