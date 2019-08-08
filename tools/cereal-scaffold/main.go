@@ -11,15 +11,18 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/teambition/rrule-go"
+	"google.golang.org/grpc"
 
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/backend"
+	grpccereal "github.com/chef/automate/lib/cereal/grpc"
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/platform/pg"
 )
 
 var opts struct {
-	Debug bool
+	Debug    bool
+	Endpoint string
 }
 
 var simpleWorkflowOpts struct {
@@ -61,6 +64,12 @@ func main() {
 		"d",
 		false,
 		"Enabled debug output")
+	cmd.PersistentFlags().StringVarP(
+		&opts.Endpoint,
+		"endpoint",
+		"e",
+		"",
+		"grpc endpoint")
 
 	simpleWorkflowCmd := &cobra.Command{
 		Use:           "simple-workflow-test",
@@ -183,12 +192,18 @@ type SimpleTaskParams struct {
 
 func (t *SimpleTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
 	params := SimpleTaskParams{}
+	logrus.Debug("here")
 	if err := task.GetParameters(&params); err != nil {
 		panic(err)
 	}
 	logrus.WithField("id", params.ID).Debug("Running task")
 	if simpleWorkflowOpts.SlowTasks {
-		time.Sleep(time.Duration(23+params.Sleepy) * time.Second)
+		select {
+		case <-time.After(time.Duration(23+params.Sleepy) * time.Second):
+		case <-ctx.Done():
+			logrus.Info("task cancelled")
+			return nil, ctx.Err()
+		}
 	}
 	logrus.Debug("Finished Task")
 	return params.ID, nil
@@ -281,13 +296,26 @@ func (SimpleWorkflow) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEvent)
 	return w.Complete()
 }
 
+func getBackend(dbName string) backend.Driver {
+	if opts.Endpoint != "" {
+		conn, err := grpc.Dial(opts.Endpoint, grpc.WithInsecure(), grpc.WithMaxMsgSize(64*1024*1024))
+		if err != nil {
+			panic(err)
+		}
+		grpcBackend := grpccereal.NewGrpcBackendFromConn(conn)
+		return grpcBackend
+	}
+	return postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName))
+}
+
 func runSimpleWorkflow(_ *cobra.Command, args []string) error {
 	dbName := defaultDatabaseName
 	if len(args) > 0 {
 		dbName = args[0]
 	}
 
-	manager, err := cereal.NewManager(postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName)))
+	b := getBackend(dbName)
+	manager, err := cereal.NewManager(b)
 	if err != nil {
 		return err
 	}
@@ -366,7 +394,8 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 		dbName = args[0]
 	}
 
-	manager, err := cereal.NewManager(postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName)))
+	b := getBackend(dbName)
+	manager, err := cereal.NewManager(b)
 	if err != nil {
 		return err
 	}
@@ -435,9 +464,8 @@ func runListInstances(_ *cobra.Command, args []string) error {
 		dbName = args[0]
 	}
 
-	b := postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName))
-	err := b.Init()
-	if err != nil {
+	b := getBackend(dbName)
+	if err := b.Init(); err != nil {
 		return err
 	}
 
@@ -466,7 +494,6 @@ func runListInstances(_ *cobra.Command, args []string) error {
 		fmt.Printf("%13s: %s\n", "Workflow Name", instance.WorkflowName)
 		fmt.Printf("%13s: %s\n", "Instance Name", instance.InstanceName)
 		fmt.Printf("%13s: %s\n", "Status", string(instance.Status))
-		fmt.Printf("%13s: %v\n", "Is Running", instance.IsRunning)
 		fmt.Printf("%13s: %s\n", "Parameters", string(instance.Parameters))
 		fmt.Printf("%13s: %s\n", "Payload", string(instance.Payload))
 		fmt.Printf("%13s: %s\n", "Result", string(instance.Result))

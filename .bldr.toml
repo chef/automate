@@ -165,6 +165,7 @@ paths = [
   "api/config/backup_gateway/*",
   "api/config/bifrost/*",
   "api/config/bookshelf/*",
+  "api/config/cereal/*",
   "api/config/cfgmgmt/*",
   "api/config/compliance/*",
   "api/config/cs_nginx/*",
@@ -354,6 +355,7 @@ paths = [
   "api/config/backup_gateway/*",
   "api/config/bifrost/*",
   "api/config/bookshelf/*",
+  "api/config/cereal/*",
   "api/config/cfgmgmt/*",
   "api/config/compliance/*",
   "api/config/cs_nginx/*",
@@ -425,6 +427,7 @@ paths = [
   "api/config/backup_gateway/*",
   "api/config/bifrost/*",
   "api/config/bookshelf/*",
+  "api/config/cereal/*",
   "api/config/cfgmgmt/*",
   "api/config/compliance/*",
   "api/config/cs_nginx/*",
@@ -906,6 +909,29 @@ paths = [
   "lib/errorutils/*",
   "lib/grpc/*",
   "lib/io/*",
+  "lib/stringutils/*",
+  "lib/tls/*",
+  "lib/tracing/*",
+  "lib/version/*",
+  "Gopkg.lock"
+]
+
+[cereal-service]
+plan_path = "components/cereal-service"
+paths = [
+  "components/cereal-service/*",
+  "api/config/platform/*",
+  "api/config/shared/*",
+  "api/interservice/cereal/*",
+  "components/automate-gateway/api/authz/*",
+  "components/automate-gateway/authz/policy_v2/*",
+  "components/automate-grpc/*",
+  "lib/cereal/*",
+  "lib/grpc/*",
+  "lib/io/*",
+  "lib/platform/*",
+  "lib/proc/*",
+  "lib/proxy/*",
   "lib/stringutils/*",
   "lib/tls/*",
   "lib/tracing/*",

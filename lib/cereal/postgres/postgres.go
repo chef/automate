@@ -581,13 +581,11 @@ func (pg *PostgresBackend) ListWorkflowInstances(ctx context.Context, opts backe
 		}
 
 		if workflowInstance.Status == backend.WorkflowInstanceStatusCompleted {
-			workflowInstance.IsRunning = false
 			workflowInstance.Payload = nil
 			if errText.Valid {
 				workflowInstance.Err = errors.New(errText.String)
 			}
 		} else {
-			workflowInstance.IsRunning = true
 			workflowInstance.Result = nil
 		}
 		instances = append(instances, &workflowInstance)

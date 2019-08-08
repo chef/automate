@@ -14,8 +14,7 @@ type Driver interface {
 
 	CreateWorkflowSchedule(ctx context.Context, instanceName string, workflowName string, parameters []byte, enabled bool, recurrence string, nextRunAt time.Time) error
 	ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error)
-	GetDueScheduledWorkflow(ctx context.Context) (*Schedule, ScheduledWorkflowCompleter, error)
-	GetNextScheduledWorkflow(ctx context.Context) (*Schedule, error)
+
 	GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string) (*Schedule, error)
 	UpdateWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string, opts WorkflowScheduleUpdateOpts) error
 
@@ -24,6 +23,11 @@ type Driver interface {
 
 	Init() error
 	Close() error
+}
+
+type SchedulerDriver interface {
+	GetDueScheduledWorkflow(ctx context.Context) (*Schedule, ScheduledWorkflowCompleter, error)
+	GetNextScheduledWorkflow(ctx context.Context) (*Schedule, error)
 }
 
 type ListWorkflowOpts struct {
@@ -47,9 +51,8 @@ type WorkflowInstance struct {
 	Parameters   []byte
 	Payload      []byte
 
-	IsRunning bool
-	Err       error
-	Result    []byte
+	Err    error
+	Result []byte
 }
 
 type WorkflowEventType string

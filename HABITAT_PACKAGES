@@ -69,3 +69,4 @@ automate-workflow-web components/automate-workflow-web
 # automate-chef-io components/automate-chef-io
 data-feed-service components/data-feed-service
 event-feed-service components/event-feed-service
+cereal-service components/cereal-service

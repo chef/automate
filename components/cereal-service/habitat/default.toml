@@ -1,0 +1,10 @@
+[mlsa]
+accept = false
+
+[service]
+host = "localhost"
+port = 10101
+
+[log]
+level = "info"
+format = "json"

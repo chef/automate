@@ -1,0 +1,210 @@
+syntax = "proto3";
+
+package chef.automate.infra.cereal;
+option go_package = "github.com/chef/automate/api/interservice/cereal";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+message Task {
+  string name = 1;
+  bytes parameters = 2;
+  google.protobuf.Timestamp start_after = 3;
+}
+
+message WorkflowInstance {
+  string domain = 1;
+  string instance_name = 2;
+  string workflow_name = 3;
+  string status = 4;
+  bytes parameters = 5;
+  bytes payload = 6;
+  bytes result = 7;
+  string err = 8;
+}
+
+message TaskResult {
+  string task_name = 1;
+  bytes parameters = 2;
+  string status = 3;
+  string error_text = 4;
+  bytes result = 5;
+}
+
+message WorkflowEvent {
+  string type = 1;
+  int64 enqueued_task_count = 2;
+  int64 completed_task_count = 3;
+  TaskResult task_result = 4;
+}
+
+message DequeueWorkflowRequest {
+  message Dequeue {
+    string domain = 1;
+    repeated string workflow_names = 2;
+  }
+  message Continue {
+    bytes payload = 1;
+    repeated Task tasks = 2;
+  }
+  message Fail { string err = 1; }
+  message Done { bytes result = 1; }
+  oneof cmd {
+    Dequeue dequeue = 1;
+    Continue continue = 2;
+    Done done = 3;
+    Fail fail = 4;
+  }
+}
+
+message DequeueWorkflowResponse {
+  message Dequeue {
+    WorkflowInstance instance = 1;
+    WorkflowEvent event = 2;
+  }
+  message Status { string err = 1; }
+  oneof cmd {
+    Dequeue dequeue = 1;
+    Status status = 2;
+  }
+}
+
+message EnqueueWorkflowRequest {
+  string domain = 1;
+  string instance_name = 2;
+  string workflow_name = 3;
+  bytes parameters = 4;
+}
+
+message EnqueueWorkflowResponse {}
+
+message CancelWorkflowRequest {
+  string domain = 1;
+  string instance_name = 2;
+  string workflow_name = 3;
+}
+
+message CancelWorkflowResponse {}
+
+message DequeueTaskRequest {
+  message Dequeue {
+    string domain = 1;
+    string task_name = 2;
+  }
+  message Fail { string error = 1; }
+  message Succeed { bytes result = 1; }
+
+  oneof cmd {
+    Dequeue dequeue = 1;
+    Succeed succeed = 2;
+    Fail fail = 3;
+  }
+}
+
+message DequeueTaskResponse {
+  message Dequeue { Task task = 1; }
+
+  message Cancel { string err = 1; }
+
+  oneof cmd {
+    Dequeue dequeue = 1;
+    Cancel cancel = 2;
+  }
+}
+
+message CreateWorkflowScheduleRequest {
+  string domain = 1;
+  string instance_name = 2;
+  string workflow_name = 3;
+  bytes parameters = 4;
+  bool enabled = 5;
+  string recurrence = 6;
+  bytes payload = 7;
+  google.protobuf.Timestamp next_run_at = 8;
+}
+
+message CreateWorkflowScheduleResponse {}
+
+message ListWorkflowSchedulesRequest { string domain = 1; }
+
+message Schedule {
+  string domain = 1;
+  string instance_name = 2;
+  string workflow_name = 3;
+  bytes parameters = 4;
+  string recurrence = 5;
+  google.protobuf.Timestamp next_due_at = 6;
+  google.protobuf.Timestamp last_enqueued_at = 7;
+  bool enabled = 8;
+
+  google.protobuf.Timestamp last_start = 9;
+  google.protobuf.Timestamp last_end = 10;
+}
+
+message ListWorkflowSchedulesResponse {
+  int32 num_schedules = 1;
+  Schedule schedule = 2;
+}
+
+message GetWorkflowScheduleByNameRequest {
+  string domain = 1;
+  string instance_name = 2;
+  string workflow_name = 3;
+}
+
+message GetWorkflowScheduleByNameResponse { Schedule schedule = 1; }
+
+message UpdateWorkflowScheduleByNameRequest {
+  string domain = 1;
+  string instance_name = 2;
+  string workflow_name = 3;
+
+  google.protobuf.BoolValue enabled = 4;
+  google.protobuf.BytesValue parameters = 5;
+  google.protobuf.StringValue recurrence = 6;
+  google.protobuf.Timestamp next_run_at = 7;
+}
+
+message UpdateWorkflowScheduleByNameResponse {}
+
+message GetWorkflowInstanceByNameRequest {
+  string domain = 1;
+  string instance_name = 2;
+  string workflow_name = 3;
+}
+
+message GetWorkflowInstanceByNameResponse {
+  WorkflowInstance workflow_instance = 1;
+}
+
+message ListWorkflowInstancesRequest {
+  string domain = 1;
+  google.protobuf.StringValue workflow_name = 2;
+  google.protobuf.StringValue instance_name = 3;
+  google.protobuf.BoolValue is_running = 4;
+}
+
+message ListWorkflowInstancesResponse {
+  WorkflowInstance workflow_instance = 1;
+}
+
+service Cereal {
+  rpc EnqueueWorkflow(EnqueueWorkflowRequest) returns (EnqueueWorkflowResponse);
+  rpc DequeueWorkflow(stream DequeueWorkflowRequest)
+      returns (stream DequeueWorkflowResponse);
+  rpc CancelWorkflow(CancelWorkflowRequest) returns (CancelWorkflowResponse);
+  rpc DequeueTask(stream DequeueTaskRequest)
+      returns (stream DequeueTaskResponse);
+  rpc CreateWorkflowSchedule(CreateWorkflowScheduleRequest)
+      returns (CreateWorkflowScheduleResponse);
+  rpc ListWorkflowSchedules(ListWorkflowSchedulesRequest)
+      returns (stream ListWorkflowSchedulesResponse);
+  rpc GetWorkflowScheduleByName(GetWorkflowScheduleByNameRequest)
+      returns (GetWorkflowScheduleByNameResponse);
+  rpc UpdateWorkflowScheduleByName(UpdateWorkflowScheduleByNameRequest)
+      returns (UpdateWorkflowScheduleByNameResponse);
+  rpc GetWorkflowInstanceByName(GetWorkflowInstanceByNameRequest)
+      returns (GetWorkflowInstanceByNameResponse);
+  rpc ListWorkflowInstances(ListWorkflowInstancesRequest)
+      returns (stream ListWorkflowInstancesResponse);
+}
