@@ -27,6 +27,31 @@ Cypress.Commands.add('logout', () => {
   return cy.url().should('include', '/dex/auth');
 });
 
+// applyProjectsFilter will deselect any selected projects from the filter,
+// check any projects by NAME (not id) passed -- if any -- and apply any changes.
+// if there are no resulting changes to apply, it will simply click out of the filter.
+Cypress.Commands.add('applyProjectsFilter', (projectsToFilterOn: string[]) => {
+  cy.get('[data-cy=projects-filter-button]').click();
+  cy.get('[data-cy=projects-filter-dropdown]').find('chef-checkbox').each(child => {
+    // deselect every checkbox
+    if (child.attr('aria-checked')) {
+      child.click();
+    }
+  });
+  // check all desired checkboxes
+  projectsToFilterOn.forEach(proj =>
+    cy.get('[data-cy=projects-filter-dropdown]').contains(proj).parent().click());
+  const applyButton = Cypress.$('[data-cy=projects-filter-apply-changes]');
+  if (applyButton.is('[disabled]')) {
+    // no changes to apply, close projects filter
+    cy.get('[data-cy=projects-filter-button]').click();
+  } else {
+    // apply projects filter
+    applyButton.click();
+  }
+});
+
+
 interface MemoryMap {
   [key: string]: any;
 }

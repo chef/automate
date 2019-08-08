@@ -24,7 +24,7 @@
         (keydown.arrowup)="handleArrowUp($event)"
         (keydown.arrowdown)="handleArrowDown($event)">{{ option.label }}</chef-checkbox>
       <div class="dropdown-footer">
-        <chef-button primary [attr.disabled]="!optionsEdited" (click)="handleApplyClick()">Apply Changes</chef-button>
+        <chef-button primary [attr.disabled]="!optionsEdited" (click)="handleApplyClick()" data-cy="projects-filter-apply-changes">Apply Changes</chef-button>
       </div>
     </div>
   </chef-dropdown>

@@ -1,8 +1,8 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
-import { identity, keyBy, at } from 'lodash/fp';
+import { identity, keyBy, at, xor, indexOf } from 'lodash/fp';
 import { combineLatest, Observable, Subject } from 'rxjs';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 
@@ -30,7 +30,18 @@ import {
   RemoveTeamUsers,
   UpdateTeam
 } from 'app/entities/teams/team.actions';
-import { ProjectConstants } from 'app/entities/projects/project.model';
+import { GetProject } from 'app/entities/projects/project.actions';
+import {
+  getStatus as getProjectStatus,
+  projectEntities
+} from 'app/entities/projects/project.selectors';
+import {
+  ProjectsDropdownComponent
+} from 'app/components/projects-dropdown/projects-dropdown.component';
+
+import { ProjectConstants, Project, sortProjectsByName } from 'app/entities/projects/project.model';
+import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
+import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
 
 const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 
@@ -42,9 +53,11 @@ export type TeamTabName = 'users' | 'details';
   styleUrls: ['./team-details.component.scss']
 })
 export class TeamDetailsComponent implements OnInit, OnDestroy {
+  @ViewChild(ProjectsDropdownComponent) projectsDropdownChildComponent: ProjectsDropdownComponent;
+
   public updateNameForm: FormGroup;
-  // isLoading represents the initial load as well as subsequent updates in progress.
-  public isLoading = true;
+  // isLoadingTeam represents the initial team load as well as subsequent updates in progress.
+  public isLoadingTeam = true;
   public saving = false;
   public saveSuccessful = false;
   public tabValue: TeamTabName = 'users';
@@ -62,6 +75,9 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public removeText = 'Remove User';
 
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
+  public dropdownProjects: Project[] = [];
+  public teamProjectsLeftToFetch: string[] = [];
+  private projectsSelected: Project[] = [];
 
   constructor(private store: Store<NgrxStateAtom>,
     public fb: FormBuilder,
@@ -84,7 +100,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     ]).pipe(
       takeUntil(this.isDestroyed),
       map(([gStatus, uStatus]) => {
-        this.isLoading =
+        this.isLoadingTeam =
           (gStatus !== EntityStatus.loadingSuccess) ||
           (uStatus === EntityStatus.loading);
       })
@@ -117,11 +133,11 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         if (this.isMajorV1) {
           this.store.select(v1TeamFromRoute)
             .pipe(filter(identity), takeUntil(this.isDestroyed))
-            .subscribe(this.getUsersForTeam.bind(this));
+            .subscribe(this.getTeamDependentData.bind(this));
         } else {
           this.store.select(v2TeamFromRoute)
             .pipe(filter(identity), takeUntil(this.isDestroyed))
-            .subscribe(this.getUsersForTeam.bind(this));
+            .subscribe(this.getTeamDependentData.bind(this));
         }
       });
 
@@ -131,6 +147,56 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         if (version === null) { return; }
         this.isMinorV1 = version === 'v1';
       });
+
+    this.store.select(assignableProjects)
+      .subscribe((assignable: ProjectsFilterOption[]) => {
+        assignable.forEach(p => {
+          const proj = <Project>{
+            id: p.value,
+            name: p.label,
+            type: p.type
+          };
+          // we don't want to override values that we fetched
+          // that were part of the team already
+          if (indexOf(proj.id, this.dropdownProjects.map(p => p.id)) === -1) {
+            this.dropdownProjects.push(proj);
+            this.dropdownProjects = sortProjectsByName(this.dropdownProjects);
+          }
+        });
+      });
+
+    combineLatest([
+      this.store.select(getProjectStatus),
+      this.store.select(projectEntities)])
+      .pipe(
+        map(([status, projectMap]) => {
+          if (status === EntityStatus.loadingSuccess) {
+            console.log('we in here');
+            const projectsFound: { [id: string]: boolean } = {};
+            this.teamProjectsLeftToFetch.forEach((pID) => {
+              const project = projectMap[pID];
+              if (project !== undefined) {
+                const previousIndex = indexOf(project.id, this.dropdownProjects.map(p => p.id));
+                // project hasn't been inserted yet
+                if (previousIndex === -1) {
+                  this.dropdownProjects.push(project);
+                } else {
+                  // remove original entry and replace with ours
+                  this.dropdownProjects[previousIndex] = project;
+                }
+                this.dropdownProjects = sortProjectsByName(this.dropdownProjects);
+                this.projectsSelected.push(project);
+                // check the project in our projects dropdown
+                this.projectsDropdownChildComponent.updateSelectedProjects(project, true);
+                projectsFound[pID] = true;
+              }
+            });
+
+            // Remove all projects that have been fetched.
+            this.teamProjectsLeftToFetch =
+              this.teamProjectsLeftToFetch.filter(pID => projectsFound[pID] === undefined);
+          }
+      })).subscribe();
 
     this.sortedUsers$ = <Observable<User[]>>combineLatest([
       this.store.select(allUsers),
@@ -189,8 +255,13 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  private getUsersForTeam(team: Team) {
+  private getTeamDependentData(team: Team) {
     this.team = team;
+    console.log('refreshing');
+    this.team.projects.forEach(pID => {
+      this.teamProjectsLeftToFetch.push(pID);
+      this.store.dispatch(new GetProject({ id: pID }));
+    });
     this.updateNameForm.controls.name.setValue(this.team.name);
     this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
     this.store.dispatch(new GetUsers());
@@ -211,11 +282,16 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     this.saveSuccessful = false;
   }
 
-  public saveNameChange(): void {
+  public updateTeam(): void {
     this.saveSuccessful = false;
     this.saving = true;
-    const name: string = this.updateNameForm.controls.name.value.trim();
-    this.store.dispatch(new UpdateTeam({ ...this.team, name }));
+    const newName: string = this.updateNameForm.controls.name.value.trim();
+    this.store.dispatch(new UpdateTeam({
+        id: this.team.id,
+        name: newName,
+        guid: this.team.guid, // to be deprecated after GA
+        projects: this.projectsSelected.map(p => p.id)
+      }));
 
     const pendingSave = new Subject<boolean>();
     this.store.pipe(
@@ -236,5 +312,13 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     this.tabValue = event.target.value;
     // Drop the previous fragment and add the incoming fragment.
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
+  }
+
+  projectsDropdownAction(projects: Project[]): void {
+    this.projectsSelected = projects;
+  }
+
+  noProjectsUpdated(): boolean {
+    return xor(this.team.projects, this.projectsSelected.map(p => p.id)).length === 0;
   }
 }

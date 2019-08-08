@@ -72,8 +72,16 @@
           </chef-error>
         </chef-form-field>
       </form>
-      <chef-button [disabled]="isLoading || !updateNameForm.valid || updateNameForm.controls['name'].value === team.name"
-        primary inline (click)="saveNameChange()">
+      <div id='projects-container' *ngIf="!isMajorV1 && isMinorV1">
+        <app-projects-dropdown
+          [projects]="dropdownProjects"
+          (onSelection)="projectsDropdownAction($event)"
+          [disabled]="dropdownProjects.length === 0 || teamProjectsLeftToFetch.length !== 0">
+        </app-projects-dropdown>
+        <chef-loading-spinner  size="30" *ngIf="teamProjectsLeftToFetch.length !== 0"></chef-loading-spinner>
+      </div>
+      <chef-button [disabled]="isLoadingTeam || teamProjectsLeftToFetch.length !== 0 || !updateNameForm.valid || (updateNameForm.controls['name'].value === team.name && noProjectsUpdated())"
+        primary inline (click)="updateTeam()">
         <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
         <span *ngIf="saving">Saving...</span>
         <span *ngIf="!saving">Save</span>

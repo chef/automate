@@ -16,7 +16,7 @@
     <chef-dropdown [attr.visible]="active">
       <chef-checkbox
         *ngFor="let project of projects; index as i"
-        [checked]="project.enabled"
+        [checked]="projectSelected(project)"
         (change)="updateProjects($event.detail, i)"
         (keydown.enter)="closeColumnDropdown()"
         (keydown.esc)="closeColumnDropdown()"

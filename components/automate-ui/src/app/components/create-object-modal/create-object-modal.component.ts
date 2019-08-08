@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Project } from 'app/entities/projects/project.model';
 
@@ -61,7 +62,7 @@ export class CreateObjectModalComponent implements OnInit {
     return event.key === 'Shift' || event.key === 'Tab';
   }
 
-  projectsDropdownAction(projects) {
+  projectsDropdownAction(projects: Project[]): void {
     this.projectsSelected = projects;
   }
 }

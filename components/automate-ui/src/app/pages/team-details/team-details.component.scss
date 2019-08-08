@@ -50,7 +50,20 @@ section {
   }
 
   chef-form-field {
-    width: 240px;
+    width: 310px;
+  }
+
+  #projects-container {
+    display: flex;
+
+    chef-loading-spinner {
+      margin-top: 40px;
+      margin-left: 10px;
+    }
+
+    app-projects-dropdown {
+      width: 310px;
+    }
   }
 
   chef-button {

@@ -1,10 +1,8 @@
 import {
-  Component, EventEmitter, OnInit, Input, Output
+  Component, EventEmitter, Input, Output
 } from '@angular/core';
 
-import { orderBy } from 'lodash/fp';
-
-import { Project, ProjectConstants } from 'app/entities/projects/project.model';
+import { ProjectConstants, Project } from 'app/entities/projects/project.model';
 
 const { UNASSIGNED_PROJECT_ID } = ProjectConstants;
 
@@ -13,11 +11,10 @@ const { UNASSIGNED_PROJECT_ID } = ProjectConstants;
   templateUrl: './projects-dropdown.component.html',
   styleUrls: ['./projects-dropdown.component.scss']
 })
-export class ProjectsDropdownComponent implements OnInit {
+export class ProjectsDropdownComponent {
 
-  // The array of projects that you pass into the component. This array gets updated when a user
-  // makes changes and is emitted to the parent component.
-  @Input() projects:  Array<Project> = [];
+  // The array of projects that you pass into the component.
+  @Input() projects: Array<Project> = [];
 
   // Setting required to true means the dropdown will show an error if a user tries to close the
   // dropdown but hasn't selected any projects.
@@ -34,13 +31,28 @@ export class ProjectsDropdownComponent implements OnInit {
   label = UNASSIGNED_PROJECT_ID;
 
   // Map of projects currently selected
-  selectedProjects = {};
+  selectedProjects: { [id: string]: Project } = {};
 
-  constructor() {
-    this.projects = this.sortProjectsByName(this.projects);
+  constructor() { }
+
+  // If you want to mark some projects as pre-selected, use @ViewChild.
+  // See team-details.component.ts for an example.
+  public updateSelectedProjects(project: Project, enabled: boolean): void {
+    console.log('update');
+    console.log(project);
+    console.log(enabled);
+    console.log(this.selectedProjects);
+    if (enabled) {
+      this.selectedProjects[project.id] = project;
+    } else {
+      delete this.selectedProjects[project.id];
+    }
+    this.updateLabel();
   }
 
-  ngOnInit() {}
+  projectSelected(project: Project): boolean {
+    return this.selectedProjects[project.id] !== undefined;
+  }
 
   toggleDropdown(event: MouseEvent): void {
     event.stopPropagation();
@@ -64,7 +76,13 @@ export class ProjectsDropdownComponent implements OnInit {
     }
 
     if (this.active) {
-      this.onSelection.emit(Object.values(this.selectedProjects));
+      const result = <Project[]>Object.values(this.selectedProjects);
+      const resultProjects = result.map(p => <Project>{
+        id: p.id,
+        name: p.name,
+        type: p.type
+      });
+      this.onSelection.emit(resultProjects);
       this.active = false;
     }
   }
@@ -91,16 +109,7 @@ export class ProjectsDropdownComponent implements OnInit {
     }
   }
 
-  sortProjectsByName(projects: Array<Project>): Array<Project> {
-    return orderBy(['name'], ['asc'], projects);
-  }
-
-  private updateSelectedProjects(project: Project, enabled: boolean): void {
-    if (enabled) {
-      this.selectedProjects[project.id] = project;
-    } else {
-      delete this.selectedProjects[project.id];
-    }
+  private updateLabel(): void {
     const selectedLen = Object.keys(this.selectedProjects).length;
     switch (selectedLen) {
       case 1: {
