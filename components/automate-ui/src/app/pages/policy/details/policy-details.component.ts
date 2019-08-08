@@ -31,7 +31,7 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
   public policyJSON: string;
   public members$: Observable<Member[]>;
   public tabValue: PolicyTabName = 'definition';
-  public url: string;
+  private url: string;
   // Map of local user and team member IDs to URLs.
   // Will not contain LDAP, SAML, or * members.
   private memberURLs: { [id: string]: string[] } = {};

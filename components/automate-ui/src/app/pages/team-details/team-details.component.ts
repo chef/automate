@@ -48,7 +48,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public saving = false;
   public saveSuccessful = false;
   public tabValue: TeamTabName = 'users';
-  public url: string;
+  private url: string;
   public teamMembershipView = false;
 
   public team: Team;
