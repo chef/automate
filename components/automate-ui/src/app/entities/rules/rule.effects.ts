@@ -11,7 +11,7 @@ import { Type } from 'app/entities/notifications/notification.model';
 import {
   GetRulesForProject,
   GetRulesSuccess,
-  GetRulesSuccessPayload,
+  RulesSuccessPayload,
   GetRulesFailure,
   GetRule,
   GetRuleSuccess,
@@ -45,7 +45,7 @@ export class RuleEffects {
       ofType(RuleActionTypes.GET_ALL),
       mergeMap(({ payload: { project_id } }: GetRulesForProject) =>
         this.requests.getRulesForProject(project_id).pipe(
-          map((resp: GetRulesSuccessPayload) => new GetRulesSuccess(resp)),
+          map((resp: RulesSuccessPayload) => new GetRulesSuccess(resp)),
           catchError((error: HttpErrorResponse) => observableOf(new GetRulesFailure(error))))));
 
   @Effect()
@@ -62,8 +62,8 @@ export class RuleEffects {
   @Effect()
   getRule$ = this.actions$.pipe(
       ofType(RuleActionTypes.GET),
-      mergeMap(({ payload: { id } }: GetRule) =>
-        this.requests.getRule(id).pipe(
+      mergeMap(({ payload: { project_id, id } }: GetRule) =>
+        this.requests.getRule(project_id, id).pipe(
           map((resp: RuleSuccessPayload) => new GetRuleSuccess(resp)),
           catchError((error: HttpErrorResponse) => observableOf(new GetRuleFailure(error))))));
 
@@ -81,8 +81,8 @@ export class RuleEffects {
   @Effect()
   createRule$ = this.actions$.pipe(
       ofType(RuleActionTypes.CREATE),
-      mergeMap(({ payload: { project_id, rule } }: CreateRule) =>
-      this.requests.createRule(project_id, rule).pipe(
+      mergeMap(({ payload: { rule } }: CreateRule) =>
+      this.requests.createRule(rule).pipe(
         map((resp: RuleSuccessPayload) => new CreateRuleSuccess(resp)),
         catchError((error: HttpErrorResponse) => observableOf(new CreateRuleFailure(error))))));
 
@@ -106,8 +106,8 @@ export class RuleEffects {
   @Effect()
   deleteRule$ = this.actions$.pipe(
       ofType(RuleActionTypes.DELETE),
-      mergeMap(({ payload: { id } }: DeleteRule) =>
-        this.requests.deleteRule(id).pipe(
+      mergeMap(({ payload: { project_id, id } }: DeleteRule) =>
+        this.requests.deleteRule(project_id, id).pipe(
           map(() => new DeleteRuleSuccess({id})),
           catchError((error: HttpErrorResponse) =>
             observableOf(new DeleteRuleFailure(error))))));

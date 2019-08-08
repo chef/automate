@@ -21,7 +21,10 @@ import {
 import {
   getRuleAttributes, getStatus, updateStatus, ruleFromRoute, createError, createStatus
 } from 'app/entities/rules/rule.selectors';
-import { projectFromRoute } from 'app/entities/projects/project.selectors';
+import {
+  getStatus as getProjectStatus,
+  projectFromRoute
+} from 'app/entities/projects/project.selectors';
 import { Project } from 'app/entities/projects/project.model';
 import { GetProject } from 'app/entities/projects/project.actions';
 
@@ -72,48 +75,47 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
 
       combineLatest(
         this.store.select(getStatus),
-        this.store.select(updateStatus)
+        this.store.select(updateStatus),
+        this.store.select(getProjectStatus)
       ).pipe(
         takeUntil(this.isDestroyed),
-        map(([gStatus, uStatus]) => {
+        map(([gStatus, uStatus, gpStatus]: string[]) => {
           const routeId = this.route.snapshot.paramMap.get('ruleid');
           this.isLoading =
             routeId
             ? (gStatus !== EntityStatus.loadingSuccess) ||
-              (uStatus === EntityStatus.loading)
+              (uStatus === EntityStatus.loading) ||
+              (gpStatus !== EntityStatus.loadingSuccess)
             : false;
         })).subscribe();
 
-      this.store.select(routeParams).pipe(
-        pluck('ruleid'),
-        filter(identity),
-        takeUntil(this.isDestroyed))
-        .subscribe((id: string) => {
-          this.store.dispatch(new GetRule({ id }));
-        });
-
-      this.store.select(routeParams).pipe(
-        pluck('id'),
-        filter(identity),
-        takeUntil(this.isDestroyed))
-        .subscribe((id: string) => {
-          this.store.dispatch(new GetProject({ id }));
-        });
-
-      this.store.select(ruleFromRoute).pipe(
-        filter(identity),
+      combineLatest(
+        this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
+        this.store.select(routeParams).pipe(pluck('ruleid'), filter(identity))
+      ).pipe(
         takeUntil(this.isDestroyed),
-        map((state) => {
-          this.rule = <Rule>Object.assign({}, state);
-          this.editingRule = true;
-        })
-        ).subscribe();
+        map(([project_id, rule_id]: string[]) => {
+          this.store.dispatch(new GetProject({ id: project_id }));
+          this.store.dispatch(new GetRule({
+            id: rule_id,
+            project_id: project_id
+          }));
+        })).subscribe();
 
       this.store.select(projectFromRoute).pipe(
         filter(identity),
         takeUntil(this.isDestroyed),
         map((state) => {
-          this.project = <Project>Object.assign({}, state);
+          this.project = { ...state };
+        })
+      ).subscribe();
+
+      this.store.select(ruleFromRoute).pipe(
+        filter(identity),
+        takeUntil(this.isDestroyed),
+        map((state) => {
+          this.rule = { ...state };
+          this.editingRule = true;
         })
         ).subscribe();
 
@@ -129,15 +131,26 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
       this.modifyID = true;
     });
 
-    this.ruleForm = this.fb.group({
-      // Must stay in sync with error checks in project-rules.component.html
-      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      id: ['',
-        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]],
-      type: [{ value: this.rule.type || '', disabled: this.editingRule } , Validators.required],
-      conditions: this.fb.array(this.populateConditions())
-    });
+    if (this.editingRule) {
+      this.ruleForm = this.fb.group({
+        name: [this.rule.name, [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+        id: [{ value: this.rule.id, disabled: true }], // always disabled, no validation needed
+        type: [{ value: this.rule.type, disabled: true }], // always disabled, no validation needed
+        conditions: this.fb.array(this.populateConditions())
+      });
+    } else {
+      this.ruleForm = this.fb.group({
+        // Must stay in sync with error checks in project-rules.component.html
+        name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+        id: ['', [Validators.required, Validators.pattern(Regex.patterns.ID),
+        Validators.maxLength(64)]],
+        type: ['', Validators.required],
+        conditions: this.fb.array(this.populateConditions())
+      });
+    }
   }
+
+  get getConditions() { return this.ruleForm.get('conditions'); }
 
   ngOnDestroy() {
     this.isDestroyed.next(true);
@@ -210,7 +223,6 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   createRule() {
     this.store.dispatch(
       new CreateRule({
-        project_id: this.project.id,
         rule: this.convertToRule()
       }));
   }
@@ -222,11 +234,10 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   }
 
   convertToRule(): Rule {
-    const ruleValue = this.ruleForm.value;
     const conditions: Condition[] = [];
     // This constant ensures type safety
     const equals_op: ConditionOperator = 'EQUALS';
-    ruleValue.conditions.forEach(c => {
+    this.ruleForm.controls.conditions.value.forEach(c => {
       conditions.push(<Condition>{
         attribute: c.attribute,
         operator: c.operator,
@@ -236,12 +247,12 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
           : c.values.split(/,/).map((v: string) => v.trim())
       });
     });
-    return <Rule>{
+    return {
       project_id: this.project.id,
-      id: ruleValue.id,
-      name: ruleValue.name.trim(),
-      type: ruleValue.type,
-      status: 'staged',
+      id: this.ruleForm.controls.id.value,
+      name: this.ruleForm.controls.name.value.trim(),
+      type: this.ruleForm.controls.type.value,
+      status: 'STAGED',
       conditions: conditions
     };
   }
@@ -285,10 +296,14 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   }
 
   public handleNameInput(event: KeyboardEvent): void {
-    if (!this.modifyID && !this.isNavigationKey(event)) {
+    if (!this.modifyID && !this.isNavigationKey(event) && !this.editingRule) {
       this.conflictError = false;
       this.ruleForm.controls.id.setValue(
         IdMapper.transform(this.ruleForm.controls.name.value.trim()));
+    }
+
+    if (this.editingRule) {
+      this.ruleForm.markAsDirty();
     }
   }
 
@@ -297,6 +312,14 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
       return;
     }
     this.conflictError = false;
+  }
+
+  handleConditionChange(): void {
+    if (this.editingRule) {
+      // changes on the condition forms do not bubble up to the ruleForm
+      // so we explicitly set it to dirty here
+      this.ruleForm.markAsDirty();
+    }
   }
 
   private isNavigationKey(event: KeyboardEvent): boolean {

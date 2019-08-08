@@ -1,5 +1,5 @@
-export type RuleStatus = 'applied' | 'staged';
-export type RuleType = 'node' | 'event';
+export type RuleStatus = 'APPLIED' | 'STAGED';
+export type RuleType = 'NODE' | 'EVENT';
 export type ConditionOperator = 'MEMBER_OF' | 'EQUALS';
 
 interface KVPair {
