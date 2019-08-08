@@ -6,7 +6,7 @@
           <chef-form-field>
             <label>
               <span class="label">Name <span aria-hidden="true">*</span></span>
-              <input chefInput formControlName="name" type="text" (keyup)="handleNameInput($event)" id="name-input">
+              <input chefInput formControlName="name" type="text" (keyup)="handleNameInput($event)" id="name-input" autocomplete="off"/>
             </label>
             <chef-error *ngIf="(createForm.get('name').hasError('required') || createForm.get('name').hasError('pattern')) && createForm.get('name').dirty">
               Name is required.
@@ -20,7 +20,7 @@
           <chef-form-field>
             <label>
               <span class="label">Description <span aria-hidden="true">*</span></span>
-              <input chefInput formControlName="description" type="text" (keyup)="handleDescriptionInput($event)">
+              <input chefInput formControlName="description" type="text" (keyup)="handleDescriptionInput($event)" autocomplete="off"/>
             </label>
             <chef-error *ngIf="createForm?.controls['description'].hasError('maxlength')">
               Description must be 64 characters or less.

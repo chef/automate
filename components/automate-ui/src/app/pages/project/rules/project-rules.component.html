@@ -109,8 +109,7 @@
                   <chef-input ngDefaultControl
                     formControlName="values"
                     [value]="condition.controls.values.value"
-                    (keyup)="handleConditionChange()"
-                  ></chef-input>
+                    (keyup)="handleConditionChange()"></chef-input>
                 </label>
                 <chef-error
                   *ngIf="(ruleForm.get('conditions').controls[i].get('values').hasError('required') || ruleForm.get('conditions').controls[i].get('values').hasError('pattern')) && ruleForm.get('conditions').controls[i].get('values').dirty"

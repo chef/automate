@@ -6,7 +6,7 @@
           <chef-form-field>
             <label>
               <span class="label">Name <span aria-hidden="true">*</span></span>
-              <input chefInput formControlName="name" type="text" (keyup)="handleNameInput($event)" id="name-input" data-cy="create-name">
+              <input chefInput formControlName="name" type="text" (keyup)="handleNameInput($event)" id="name-input" data-cy="create-name" autocomplete="off">
             </label>
             <chef-error *ngIf="(createForm.get('name').hasError('required') || createForm.get('name').hasError('pattern')) && createForm.get('name').dirty">
               Name is required.
@@ -18,7 +18,7 @@
           <chef-form-field>
             <label>
               <span class="label">ID <span aria-hidden="true">*</span></span>
-              <input chefInput formControlName="id" type="text" (keyup)="handleIDInput($event)" id="id-input" data-cy="create-id">
+              <input chefInput formControlName="id" type="text" (keyup)="handleIDInput($event)" id="id-input" data-cy="create-id" autocomplete="off"/>
             </label>
             <chef-error *ngIf="createForm?.controls['id'].hasError('maxlength')">
               ID must be 64 characters or less.
