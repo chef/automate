@@ -1144,7 +1144,6 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 
 	for _, instance := range instances {
 		assert.Equal(t, backend.WorkflowInstanceStatusStarting, instance.Status)
-		assert.True(t, instance.IsRunning)
 		if instance.WorkflowName == workflowName {
 			if instance.InstanceName == instance1Name {
 				assert.Equal(t, instance1Parameters, instance.Parameters)
@@ -1162,7 +1161,6 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 
 	for _, instance := range instances {
 		assert.Equal(t, backend.WorkflowInstanceStatusStarting, instance.Status)
-		assert.True(t, instance.IsRunning)
 		if instance.InstanceName == instance1Name {
 			assert.Equal(t, instance1Parameters, instance.Parameters)
 		} else {
@@ -1177,7 +1175,6 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, instances, 1)
 	assert.Equal(t, backend.WorkflowInstanceStatusStarting, instances[0].Status)
-	assert.True(t, instances[0].IsRunning)
 	assert.Equal(t, instance1Parameters, instances[0].Parameters)
 
 	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
@@ -1187,7 +1184,6 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, instances, 1)
 	assert.Equal(t, backend.WorkflowInstanceStatusStarting, instances[0].Status)
-	assert.True(t, instances[0].IsRunning)
 	assert.Equal(t, instance2Parameters, instances[0].Parameters)
 
 	isRunning := true
@@ -1200,7 +1196,6 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 
 	for _, instance := range instances {
 		assert.Equal(t, backend.WorkflowInstanceStatusStarting, instance.Status)
-		assert.True(t, instance.IsRunning)
 		if instance.InstanceName == instance1Name {
 			assert.Equal(t, instance1Parameters, instance.Parameters)
 		} else {
@@ -1316,7 +1311,6 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, instances, 1)
 	assert.Equal(t, backend.WorkflowInstanceStatusStarting, instances[0].Status)
-	assert.True(t, instances[0].IsRunning)
 	assert.Equal(t, instance1Parameters, instances[0].Parameters)
 	assert.Nil(t, instances[0].Result)
 	assert.Nil(t, instances[0].Err)
@@ -1334,7 +1328,6 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, instances, 1)
 	assert.Equal(t, backend.WorkflowInstanceStatusStarting, instances[0].Status)
-	assert.True(t, instances[0].IsRunning)
 	assert.Equal(t, instance2Parameters, instances[0].Parameters)
 	assert.Nil(t, instances[0].Result)
 	assert.Nil(t, instances[0].Err)

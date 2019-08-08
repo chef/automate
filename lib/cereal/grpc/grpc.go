@@ -516,6 +516,49 @@ func (g *GrpcBackend) GetWorkflowInstanceByName(ctx context.Context, instanceNam
 	return &backendInstance, nil
 }
 
+func (g *GrpcBackend) ListWorkflowInstances(ctx context.Context, opts backend.ListWorkflowOpts) ([]*backend.WorkflowInstance, error) {
+	req := grpccereal.ListWorkflowInstancesRequest{}
+	if opts.WorkflowName != nil {
+		req.WorkflowName = &wrappers.StringValue{
+			Value: *opts.WorkflowName,
+		}
+	}
+	if opts.InstanceName != nil {
+		req.InstanceName = &wrappers.StringValue{
+			Value: *opts.InstanceName,
+		}
+	}
+	if opts.IsRunning != nil {
+		req.IsRunning = &wrappers.BoolValue{
+			Value: *opts.IsRunning,
+		}
+	}
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	stream, err := g.client.ListWorkflowInstances(ctx, &req)
+	if err != nil {
+		return nil, err
+	}
+
+	instances := []*backend.WorkflowInstance{}
+	for {
+		instance, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		if instance.WorkflowInstance == nil {
+			logrus.Error("received nil workflow instance")
+		}
+		backendInstance := grpcWorkflowInstanceToBackend(instance.WorkflowInstance)
+		instances = append(instances, &backendInstance)
+	}
+	return instances, nil
+}
+
 func (*GrpcBackend) Init() error {
 	return nil
 }

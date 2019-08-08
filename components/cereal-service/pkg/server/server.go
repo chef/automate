@@ -615,6 +615,50 @@ func (s *CerealService) GetWorkflowInstanceByName(ctx context.Context, req *cere
 	}, nil
 }
 
+func (s *CerealService) ListWorkflowInstances(req *cereal.ListWorkflowInstancesRequest, resp cereal.Cereal_ListWorkflowInstancesServer) error {
+	logctx := logrus.WithFields(logrus.Fields{
+		"id":     generateRequestID(),
+		"method": "ListWorkflowInstances",
+	})
+
+	opts := backend.ListWorkflowOpts{}
+
+	if workflowName := req.GetWorkflowName().GetValue(); workflowName != "" {
+		opts.WorkflowName = &workflowName
+		logctx = logctx.WithField("workflow_name", workflowName)
+	}
+
+	if instanceName := req.GetInstanceName().GetValue(); instanceName != "" {
+		opts.InstanceName = &instanceName
+		logctx = logctx.WithField("instance_name", instanceName)
+	}
+
+	if req.GetIsRunning() != nil {
+		isRunning := req.GetIsRunning().GetValue()
+		opts.IsRunning = &isRunning
+		logctx = logctx.WithField("isRunning", isRunning)
+	}
+
+	logctx.Info("listing workflow instances")
+	instances, err := s.backend.ListWorkflowInstances(resp.Context(), opts)
+	if err != nil {
+		logctx.WithError(err).Error("failed to list workflow instances")
+		return err
+	}
+
+	logctx.Infof("found %d matching instances", len(instances))
+	for _, instance := range instances {
+		err := resp.Send(&cereal.ListWorkflowInstancesResponse{
+			WorkflowInstance: cerealWorkflowInstanceToGrpc(instance),
+		})
+		if err != nil {
+			logctx.WithError(err).Error("failed to send workflow instance")
+			return err
+		}
+	}
+	return nil
+}
+
 func cerealWorkflowInstanceToGrpc(workflowInstance *backend.WorkflowInstance) *cereal.WorkflowInstance {
 	grpcInstance := &cereal.WorkflowInstance{
 		InstanceName: workflowInstance.InstanceName,

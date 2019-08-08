@@ -464,9 +464,8 @@ func runListInstances(_ *cobra.Command, args []string) error {
 		dbName = args[0]
 	}
 
-	b := postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName))
-	err := b.Init()
-	if err != nil {
+	b := getBackend(dbName)
+	if err := b.Init(); err != nil {
 		return err
 	}
 
@@ -495,7 +494,6 @@ func runListInstances(_ *cobra.Command, args []string) error {
 		fmt.Printf("%13s: %s\n", "Workflow Name", instance.WorkflowName)
 		fmt.Printf("%13s: %s\n", "Instance Name", instance.InstanceName)
 		fmt.Printf("%13s: %s\n", "Status", string(instance.Status))
-		fmt.Printf("%13s: %v\n", "Is Running", instance.IsRunning)
 		fmt.Printf("%13s: %s\n", "Parameters", string(instance.Parameters))
 		fmt.Printf("%13s: %s\n", "Payload", string(instance.Payload))
 		fmt.Printf("%13s: %s\n", "Result", string(instance.Result))

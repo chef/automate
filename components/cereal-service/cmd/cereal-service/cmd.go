@@ -92,18 +92,20 @@ func initConfig() error {
 		}
 	}
 
-	if C.TLS.CertPath == "" {
-		platformCfg, err := platform.ConfigFromEnvironment()
-		if err != nil {
-			return err
+	if !C.Service.DisableTLS {
+		if C.TLS.CertPath == "" {
+			platformCfg, err := platform.ConfigFromEnvironment()
+			if err != nil {
+				return err
+			}
+			tlsConfig := platformCfg.GetService().GetTls()
+			if tlsConfig == nil {
+				return errors.New("could not load TLS config")
+			}
+			C.TLS.CertPath = tlsConfig.GetCertPath()
+			C.TLS.KeyPath = tlsConfig.GetKeyPath()
+			C.TLS.RootCACertPath = tlsConfig.GetRootCaPath()
 		}
-		tlsConfig := platformCfg.GetService().GetTls()
-		if tlsConfig == nil {
-			return errors.New("could not load TLS config")
-		}
-		C.TLS.CertPath = tlsConfig.GetCertPath()
-		C.TLS.KeyPath = tlsConfig.GetKeyPath()
-		C.TLS.RootCACertPath = tlsConfig.GetRootCaPath()
 	}
 
 	return nil

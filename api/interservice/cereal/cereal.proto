@@ -78,7 +78,7 @@ message EnqueueWorkflowRequest {
 
 message EnqueueWorkflowResponse {}
 
-message CancelWorkflowRequest{
+message CancelWorkflowRequest {
   string domain = 1;
   string instance_name = 2;
   string workflow_name = 3;
@@ -143,7 +143,7 @@ message Schedule {
 
 message ListWorkflowSchedulesResponse {
   int32 num_schedules = 1;
-  Schedule schedule = 2; 
+  Schedule schedule = 2;
 }
 
 message GetWorkflowScheduleByNameRequest {
@@ -177,6 +177,17 @@ message GetWorkflowInstanceByNameResponse {
   WorkflowInstance workflow_instance = 1;
 }
 
+message ListWorkflowInstancesRequest {
+  string domain = 1;
+  google.protobuf.StringValue workflow_name = 2;
+  google.protobuf.StringValue instance_name = 3;
+  google.protobuf.BoolValue is_running = 4;
+}
+
+message ListWorkflowInstancesResponse {
+  WorkflowInstance workflow_instance = 1;
+}
+
 service Cereal {
   rpc EnqueueWorkflow(EnqueueWorkflowRequest) returns (EnqueueWorkflowResponse);
   rpc DequeueWorkflow(stream DequeueWorkflowRequest)
@@ -194,4 +205,6 @@ service Cereal {
       returns (UpdateWorkflowScheduleByNameResponse);
   rpc GetWorkflowInstanceByName(GetWorkflowInstanceByNameRequest)
       returns (GetWorkflowInstanceByNameResponse);
+  rpc ListWorkflowInstances(ListWorkflowInstancesRequest)
+      returns (stream ListWorkflowInstancesResponse);
 }
