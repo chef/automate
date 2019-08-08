@@ -63,6 +63,7 @@ func (s *CerealService) EnqueueWorkflow(ctx context.Context, req *cereal.Enqueue
 		if err == libcereal.ErrWorkflowInstanceExists {
 			return nil, status.Error(codes.FailedPrecondition, err.Error())
 		}
+		return nil, err
 	}
 	return &cereal.EnqueueWorkflowResponse{}, nil
 }
