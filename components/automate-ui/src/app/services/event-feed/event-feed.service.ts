@@ -20,6 +20,7 @@ import { ChefEvent,
   ChefEventCollection,
   Chicklet
 } from '../../types/types';
+import { initialState } from './event-feed.reducer';
 import { environment } from '../../../environments/environment';
 import * as moment from 'moment';
 const GATEWAY_URL = environment.gateway_url;
@@ -65,7 +66,7 @@ export class EventFeedService {
     const url = `${GATEWAY_URL}/event_type_counts`;
 
     const options = {
-      params: this.buildEventTypeCountsURLSearchParams(filters)
+      params: this.buildEventCountsURLSearchParams(filters)
     };
 
     return this.httpClient
@@ -77,7 +78,7 @@ export class EventFeedService {
     const url = `${GATEWAY_URL}/event_task_counts`;
 
     const options = {
-      params: this.buildEventTaskCountsURLSearchParams(filters)
+      params: this.buildEventCountsURLSearchParams(filters)
     };
 
     return this.httpClient
@@ -89,15 +90,11 @@ export class EventFeedService {
 
   getSuggestions(type: string, text: string): Observable<string[]> {
     if (text && text.length > 0) {
-      if ( type === 'organization' || type === 'chef_server' ) {
-        const params = new HttpParams().set('type', type).set('text', text);
-        const url = `${CONFIG_MGMT_URL}/suggestions`;
+      const params = new HttpParams().set('type', type).set('text', text);
+      const url = `${CONFIG_MGMT_URL}/suggestions`;
 
-        return this.httpClient.get<Chicklet[]>(url, {params}).pipe(map((suggestions: Chicklet[]) =>
-          suggestions.map(item => item.text)));
-      } else {
-        console.error('Currently do not support ' + type + ' type');
-      }
+      return this.httpClient.get<Chicklet[]>(url, {params}).pipe(map((suggestions: Chicklet[]) =>
+        suggestions.map(item => item.text)));
     } else {
       return observableOf([]);
     }
@@ -160,7 +157,7 @@ export class EventFeedService {
     return new ChefEventCollection(events, respEventCollection.total_events);
   }
 
-  private buildEventTaskCountsURLSearchParams(filters: EventFeedFilter): HttpParams {
+  buildEventCountsURLSearchParams(filters: EventFeedFilter): HttpParams {
     let searchParam: HttpParams = new HttpParams();
 
     if (filters.searchBar) {
@@ -171,7 +168,7 @@ export class EventFeedService {
       searchParam = searchParam.append('start', filters.startDate.valueOf().toString());
     } else {
       searchParam = searchParam.append('start',
-      moment().subtract(6, 'days').startOf('day').valueOf().toString());
+        initialState.filters.startDate.valueOf().toString());
     }
 
     if (filters.endDate) {
@@ -181,32 +178,7 @@ export class EventFeedService {
     return searchParam;
   }
 
-  private buildEventTypeCountsURLSearchParams(filters: EventFeedFilter): HttpParams {
-    let searchParam: HttpParams = new HttpParams();
-
-    if (filters.searchBar) {
-      searchParam = this.flattenSearchBar(filters.searchBar, searchParam);
-    }
-
-    if (filters.startDate) {
-      searchParam = searchParam.append('start', filters.startDate.valueOf().toString());
-    } else {
-      searchParam = searchParam.append('start',
-                                       moment()
-                                       .subtract(6, 'days')
-                                       .startOf('day')
-                                       .valueOf()
-                                       .toString());
-    }
-
-    if (filters.endDate) {
-      searchParam = searchParam.append('end', filters.endDate.valueOf().toString());
-    }
-
-    return searchParam;
-  }
-
-  private buildEventStringsURLSearchParams(filters: EventFeedFilter): HttpParams {
+  buildEventStringsURLSearchParams(filters: EventFeedFilter): HttpParams {
     let searchParam: HttpParams = new HttpParams();
 
     if (filters.searchBar) {
@@ -225,10 +197,7 @@ export class EventFeedService {
       searchParam = searchParam.append('start', filters.startDate.format('YYYY-MM-DD'));
     } else {
       searchParam = searchParam.append('start',
-                                       moment()
-                                       .subtract(6, 'days')
-                                       .startOf('day')
-                                       .format('YYYY-MM-DD'));
+        initialState.filters.startDate.format('YYYY-MM-DD'));
     }
 
     if (filters.endDate) {
@@ -247,7 +216,7 @@ export class EventFeedService {
     }, searchParam, filters);
   }
 
-  private addChildEventTypes(filters: Chicklet[]): Chicklet[] {
+  addChildEventTypes(filters: Chicklet[]): Chicklet[] {
     const entityTypes: string[] = filters.filter((filter: Chicklet) =>
       filter.type === ENTITY_TYPE_TAG).map((filter: Chicklet) => filter.text);
 
@@ -264,7 +233,7 @@ export class EventFeedService {
     return filters;
   }
 
-  private buildEventFeedURLSearchParams(filters: EventFeedFilter,
+  buildEventFeedURLSearchParams(filters: EventFeedFilter,
     lastEvent: ChefEvent): HttpParams {
     let searchParam: HttpParams = new HttpParams();
 
@@ -299,11 +268,7 @@ export class EventFeedService {
       searchParam = searchParam.append('start', filters.startDate.valueOf().toString());
     } else {
       searchParam = searchParam.append('start',
-                                       moment()
-                                       .subtract(6, 'days')
-                                       .startOf('day')
-                                       .valueOf()
-                                       .toString());
+        initialState.filters.startDate.valueOf().toString());
     }
 
     if (filters.endDate) {

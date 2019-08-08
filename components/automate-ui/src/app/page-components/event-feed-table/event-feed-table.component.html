@@ -24,7 +24,7 @@
           </ng-container>
 
           <ng-container *ngIf="isGroup(event)">
-            <button class="event-group-button" (click)="getGroupedEvents(event, $event)" [attr.id]="'event-button-' + i">{{event.eventCount}} {{getEventTypeLabel(event)}}</button>
+            <button class="event-group-button" (click)="displayGroupedEvents(event, $event)" [attr.id]="'event-button-' + i">{{event.eventCount}} {{getEventTypeLabel(event)}}</button>
             {{getFormattedEventType(event)}} {{displayRequestorPreposition(event.requestorName)}} <b>{{displayRequestorName(event.requestorName)}}</b>
           </ng-container>
         </div>

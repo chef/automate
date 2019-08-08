@@ -1,6 +1,7 @@
 import { Component, Input, ViewChild, ElementRef, OnDestroy, OnInit } from '@angular/core';
 import { capitalize, getOr, endsWith, replace, concat } from 'lodash/fp';
-import { Subject, Subscription } from 'rxjs';
+import { Subject, Subscription, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ChefEvent, ChefEventCollection, EventFeedFilter, Chicklet } from '../../types/types';
 import { EventFeedService } from '../../services/event-feed/event-feed.service';
 import * as moment from 'moment';
@@ -37,36 +38,40 @@ export class EventFeedTableComponent implements OnDestroy, OnInit {
     this.isDestroyed.complete();
   }
 
-  isGroup(event: ChefEvent) {
+  isGroup(event: ChefEvent): boolean {
     return event.eventCount > 1;
   }
 
-  getGroupedEvents(event: ChefEvent, clickEvent) {
+  displayGroupedEvents(event: ChefEvent, clickEvent) {
     this.groupedEvent = null;
     this.groupedEvents = [];
     this.groupedEvent = event;
     this.sidepanel.nativeElement.focus();
     this.groupedEventsButton = document.getElementById(clickEvent.target.id);
 
-    const searchBar = concat({ type: ENTITY_TYPE_TAG, text: this.groupedEvent.eventType },
+    this.getGroupedEvents(event).subscribe((events: ChefEvent[]) => {
+      this.groupedEvents = events;
+    });
+
+    this.showEventGroupPanel = true;
+  }
+
+  getGroupedEvents(event: ChefEvent): Observable<ChefEvent[]> {
+    const searchBar = concat({ type: ENTITY_TYPE_TAG, text: event.eventType },
       this.searchBarFilters.filter((f: Chicklet) => f.type !== ENTITY_TYPE_TAG));
 
     const filter: EventFeedFilter = {
-      startDate: moment(this.groupedEvent.startTime),
-      endDate: moment(this.groupedEvent.endTime),
-      requestorName: this.groupedEvent.requestorName,
+      startDate: moment(event.startTime),
+      endDate: moment(event.endTime),
+      requestorName: event.requestorName,
       searchBar: searchBar,
-      task: this.groupedEvent.task,
+      task: event.task,
       collapse: false,
-      pageSize: this.groupedEvent.eventCount
+      pageSize: event.eventCount
     };
 
-    this.subscription = this.eventFeedService.getEventFeed(filter)
-      .subscribe((eventCollection: ChefEventCollection) => {
-        this.groupedEvents = eventCollection.events;
-      });
-
-    this.showEventGroupPanel = true;
+    return this.eventFeedService.getEventFeed(filter).pipe(map(
+      (eventCollection: ChefEventCollection) => eventCollection.events));
   }
 
   hideGroupedEvents() {
