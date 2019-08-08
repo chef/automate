@@ -58,15 +58,34 @@ sure to leave off the trailing `/`.
 ### IAM Version
 
 Some tests will conditionally run in CI depending on what `CYPRESS_IAM_VERSION` is set to.
-To target those specific sets of tests set that environment variable when starting cypress:
+To target those specific sets of tests set that environment variable when starting Cypress:
 
 ```bash
-CYPRESS_IAM_VERSION="v2.1" npm run cypress:run
+CYPRESS_IAM_VERSION=v2.1 npm run cypress:run
 ```
 
-Possible values are `"v1.0"`, `"v2.0"`, and `"v2.1"`.
+Possible values are `v1.0`, `v2.0`, and `v2.1`.
 
 Your dev environment's IAM version MUST match the value of CYPRESS_IAM_VERSION for the tests to pass locally.
+
+## Writing Cypress Tests
+
+This [Cypress guide](https://docs.cypress.io/guides/getting-started/writing-your-first-test.html#Add-a-test-file)
+provides an introduction on writing your first Cypress test.
+
+Automate's Cypress tests are divided into two main categories: UI and API tests,
+under the `api` and `ui` directories respectively.
+
+API tests communicate only with the backend using `cy.request`. The `api/` sub-directories
+correspond to the sub-directories under `automate-gateway/api`. When adding new API tests,
+you may need to add the appropriate sub-directory if it doesn't exist yet.
+
+UI tests are end-to-end tests that interact with the UI backed by a running Automade backend.
+The `ui/` sub-directories correspond to the top navbar links, Event Feed, Infrastructure, Compliance,
+and Settings. When adding new UI tests, you may need to add the appropriate sub-directory if it doesn't exist yet.
+
+The last sub-directory is `common`, for testing UI interactions, such as logging in,
+that don't fall into the above categories.
 
 ## Running Cypress pipeline tests
 
