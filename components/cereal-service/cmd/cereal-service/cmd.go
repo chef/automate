@@ -86,7 +86,7 @@ func initConfig() error {
 
 	if C.Database.URL == "" {
 		var err error
-		C.Database.URL, err = platform.PGURIFromEnvironment("cereal_service")
+		C.Database.URL, err = platform.PGURIFromEnvironment("chef_cereal_service")
 		if err != nil {
 			return err
 		}
