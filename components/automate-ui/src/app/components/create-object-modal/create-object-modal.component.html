@@ -30,7 +30,7 @@
               Only lowercase letters, numbers, hyphens, and underscores are allowed.
             </chef-error>
             <chef-error *ngIf="conflictError">
-              IDs must be unique--{{objectNoun}} with ID "{{createForm?.controls['id'].value}}" already exists.
+              {{ objectNoun | titlecase }} ID "{{createForm.get('id').value}}" already exists.
             </chef-error>
           </chef-form-field>
           <span class="detail">{{ objectNoun | titlecase }} IDs are unique, permanent, and cannot be changed later.</span>
