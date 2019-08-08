@@ -22,59 +22,57 @@
           </tr>
         </tbody>
       </table>
-        <chef-tab-selector (change)="onSelectedTab($event)" [value]="tabValue">
-          <chef-option value='definition'>Definition</chef-option>
-          <chef-option value='members' routerLink="./" fragment="members">Members</chef-option>
-        </chef-tab-selector>
-      </chef-page-header>
-    <section class="page-body">
-      <ng-container *ngIf="tabValue === 'definition'">
-        <chef-toolbar>
-          <chef-clipboard value={{policyJSON}} label="Copy Definition" icon=""></chef-clipboard>
-        </chef-toolbar>
-        <section id="json-bg">
-          <chef-snippet [code]="policy | json" lang="json"></chef-snippet>
-        </section>
-      </ng-container>
-      <ng-container *ngIf="tabValue === 'members'">
-        <div *ngIf="(members$ | async)?.length === 0" class="empty-state">
-          <p>Add some members to get started!</p>
+      <chef-tab-selector (change)="onSelectedTab($event)" [value]="tabValue">
+        <chef-option value='definition'>Definition</chef-option>
+        <chef-option value='members'>Members</chef-option>
+      </chef-tab-selector>
+    </chef-page-header>
+    <section class="page-body" *ngIf="tabValue === 'definition'">
+      <chef-toolbar>
+        <chef-clipboard value={{policyJSON}} label="Copy Definition" icon=""></chef-clipboard>
+      </chef-toolbar>
+      <section id="json-bg">
+        <chef-snippet [code]="policy | json" lang="json"></chef-snippet>
+      </section>
+    </section>
+    <section class="page-body" *ngIf="tabValue === 'members'">
+      <div *ngIf="(members$ | async)?.length === 0" class="empty-state">
+        <p>Add some members to get started!</p>
+      </div>
+      <chef-toolbar>
+        <div [ngClass]="(members$ | async)?.length === 0 ? 'empty-state' : ''">
+          <chef-button primary [routerLink]="['/settings', 'policies', policy?.id, 'add-members']">Add Members</chef-button>
         </div>
-        <chef-toolbar>
-          <div [ngClass]="(members$ | async)?.length === 0 ? 'empty-state' : ''">
-            <chef-button primary [routerLink]="['/settings', 'policies', policy?.id, 'add-members']">Add Members</chef-button>
-          </div>
-        </chef-toolbar>
-        <chef-table *ngIf="(members$ | async)?.length > 0">
-          <chef-thead>
-            <chef-tr>
-              <chef-th>ID</chef-th>
-              <chef-th>Type</chef-th>
-              <chef-th></chef-th>
-            </chef-tr>
-          </chef-thead>
-          <chef-tbody>
-            <chef-tr *ngFor="let member of members$ | async">
-              <chef-td>
-                <a *ngIf="memberURLs.hasOwnProperty(member.name)" [routerLink]="memberURLs[member.name]">
-                  {{ member.displayName }}
-                </a>
-                <ng-container *ngIf="!memberURLs.hasOwnProperty(member.name)">
-                  {{ member.displayName }}
-                </ng-container>
-              </chef-td>
-              <chef-td>
-                {{ member.displayType }}
-              </chef-td>
-              <chef-td class="three-dot-entry">
-                <chef-control-menu>
-                  <chef-option (click)="removeMember(member)">Remove Member</chef-option>
-                </chef-control-menu>
-              </chef-td>
-            </chef-tr>
-          </chef-tbody>
-        </chef-table>
-      </ng-container>
+      </chef-toolbar>
+      <chef-table *ngIf="(members$ | async)?.length > 0">
+        <chef-thead>
+          <chef-tr>
+            <chef-th>ID</chef-th>
+            <chef-th>Type</chef-th>
+            <chef-th></chef-th>
+          </chef-tr>
+        </chef-thead>
+        <chef-tbody>
+          <chef-tr *ngFor="let member of members$ | async">
+            <chef-td>
+              <a *ngIf="memberURLs.hasOwnProperty(member.name)" [routerLink]="memberURLs[member.name]">
+                {{ member.displayName }}
+              </a>
+              <ng-container *ngIf="!memberURLs.hasOwnProperty(member.name)">
+                {{ member.displayName }}
+              </ng-container>
+            </chef-td>
+            <chef-td>
+              {{ member.displayType }}
+            </chef-td>
+            <chef-td class="three-dot-entry">
+              <chef-control-menu>
+                <chef-option (click)="removeMember(member)">Remove Member</chef-option>
+              </chef-control-menu>
+            </chef-td>
+          </chef-tr>
+        </chef-tbody>
+      </chef-table>
     </section>
   </main>
 </div>

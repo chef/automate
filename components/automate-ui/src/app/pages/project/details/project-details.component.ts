@@ -1,12 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 import { identity, some } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { routeParams } from 'app/route.selectors';
+import { routeParams, routeURL } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
 import { EntityStatus, loading } from 'app/entities/entities';
 import {
@@ -16,9 +17,7 @@ import { Project } from 'app/entities/projects/project.model';
 import { GetProject, UpdateProject } from 'app/entities/projects/project.actions';
 import { GetRulesForProject, DeleteRule } from 'app/entities/rules/rule.actions';
 import { Rule, RuleStatus } from 'app/entities/rules/rule.model';
-import {
-  allRules
-} from 'app/entities/rules/rule.selectors';
+import { allRules } from 'app/entities/rules/rule.selectors';
 
 export type ProjectTabName = 'rules' | 'details';
 
@@ -34,7 +33,8 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   public saveSuccessful = false;
   public isChefManaged = false;
   public rules: Rule[] = [];
-  public selectedTab: ProjectTabName = 'rules';
+  public tabValue: ProjectTabName = 'rules';
+  public url: string;
   public ruleToDelete: Rule;
   public deleteModalVisible = false;
   public createModalVisible = false;
@@ -47,10 +47,20 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    private store: Store<NgrxStateAtom>
+    private store: Store<NgrxStateAtom>,
+    private router: Router
+
   ) { }
 
   ngOnInit(): void {
+    // Populate our tabValue from the fragment.
+    this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
+      .subscribe((url: string) => {
+        this.url = url;
+        const [, fragment] = url.split('#');
+        // goes to #rules if (1) explicit #definition, (2) no fragment, or (3) invalid fragment
+        this.tabValue = (fragment === 'details') ? 'details' : 'rules';
+     });
 
     this.projectForm = this.fb.group({
       // Must stay in sync with error checks in project-details.component.html
@@ -100,12 +110,10 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     this.saveSuccessful = false;
   }
 
-  onTabChange(event: { target: { value: ProjectTabName } }) {
-    this.selectedTab = event.target.value;
-  }
-
-  showTab(tabName: ProjectTabName): boolean {
-    return this.selectedTab === tabName;
+  onSelectedTab(event: { target: { value: ProjectTabName } }) {
+    this.tabValue = event.target.value;
+    // Drop the previous fragment and add the incoming fragment.
+    this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
 
   showFirstRuleMessage(): boolean {

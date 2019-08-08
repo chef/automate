@@ -20,12 +20,12 @@
           </tr>
         </tbody>
       </table>
-      <chef-tab-selector [value]="selectedTab" (change)="onTabChange($event)">
+      <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
         <chef-option value='rules'>Ingest Rules</chef-option>
         <chef-option value='details'>Details</chef-option>
       </chef-tab-selector>
     </chef-page-header>
-    <section class="page-body" [hidden]="showTab('rules')">
+    <section class="page-body" *ngIf="tabValue === 'details'">
       <form [formGroup]="projectForm">
         <chef-form-field id="update-name">
           <label>
@@ -53,7 +53,7 @@
         </div>
       </form>
     </section>
-    <section class="page-body" [hidden]="showTab('details')">
+    <section class="page-body" *ngIf="tabValue === 'rules'">
       <ng-container *ngIf="showRulesTable()">
         <chef-toolbar>
           <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">

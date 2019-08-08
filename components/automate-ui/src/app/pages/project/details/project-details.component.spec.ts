@@ -61,7 +61,7 @@ describe('ProjectDetailsComponent', () => {
           selector: 'chef-toolbar',
           template: '<ng-content></ng-content>'
         }),
-         MockComponent({
+        MockComponent({
           selector: 'app-authorized',
           inputs: ['allOf', 'not'],
           template: '<ng-content></ng-content>'
@@ -73,9 +73,9 @@ describe('ProjectDetailsComponent', () => {
           outputs: ['close', 'deleteClicked']
         }),
         MockComponent({ selector: 'chef-control-menu' }),
-        MockComponent({ selector: 'chef-form-field'}),
-        MockComponent({ selector: 'chef-breadcrumbs'}),
-        MockComponent({ selector: 'chef-error'}),
+        MockComponent({ selector: 'chef-form-field' }),
+        MockComponent({ selector: 'chef-breadcrumbs' }),
+        MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-breadcrumb', inputs: ['link'] }),
         MockComponent({ selector: 'chef-tab-selector', inputs: ['value'] }),
         MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
@@ -139,19 +139,16 @@ describe('ProjectDetailsComponent', () => {
       component.rules = [];
     });
 
-   it('defaults to showing rules section', () => {
-      expect(component.showTab('rules')).toBeTruthy();
-      expect(component.showTab('details')).toBeFalsy();
+    it('defaults to showing rules section', () => {
+      expect(component.tabValue).toBe('rules');
     });
 
     it('shows/hides sections when based on selection', () => {
-      component.onTabChange({ target: { value: 'details' } });
-      expect(component.showTab('details')).toBeTruthy();
-      expect(component.showTab('rules')).toBeFalsy();
+      component.onSelectedTab({ target: { value: 'details' } });
+      expect(component.tabValue).toBe('details');
 
-      component.onTabChange({ target: { value: 'rules' } });
-      expect(component.showTab('rules')).toBeTruthy();
-      expect(component.showTab('details')).toBeFalsy();
+      component.onSelectedTab({ target: { value: 'rules' } });
+      expect(component.tabValue).toBe('rules');
     });
 
     it('does not display rule table', () => {
@@ -170,17 +167,14 @@ describe('ProjectDetailsComponent', () => {
     });
 
     it('defaults to showing rules section', () => {
-      expect(component.showTab('rules')).toBeTruthy();
-      expect(component.showTab('details')).toBeFalsy();
+      expect(component.tabValue).toBe('rules');
     });
 
     it('shows/hides sections when based on selection', () => {
-      component.onTabChange({ target: { value: 'details' } });
-      expect(component.showTab('rules')).toBeFalsy();
-      expect(component.showTab('details')).toBeTruthy();
-      component.onTabChange({ target: { value: 'rules' } });
-      expect(component.showTab('rules')).toBeTruthy();
-      expect(component.showTab('details')).toBeFalsy();
+      component.onSelectedTab({ target: { value: 'details' } });
+      expect(component.tabValue).toBe('details');
+      component.onSelectedTab({ target: { value: 'rules' } });
+      expect(component.tabValue).toBe('rules');
     });
 
     it('displays rule table', () => {
