@@ -6,11 +6,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/codes"
 
 	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
+	"github.com/chef/automate/lib/grpc/grpctest"
 )
 
 /************ ************ ************ ************ ************ ************
@@ -119,6 +121,34 @@ func TestV2ProjectsAuthorized(t *testing.T) {
 				})
 				require.NoError(t, err)
 				assert.Equal(t, tc.result, resp.Projects)
+			})
+		}
+	})
+
+	t.Run("invalid input", func(t *testing.T) {
+		cases := map[string]struct {
+			valid bool
+			input []string
+		}{
+			"a bit of everything": {valid: true, input: []string{"a-bit_(of)-123-everything_"}},
+			"spaces":              {input: []string{"project 120"}},
+			"trailing spaces":     {input: []string{"project120  "}},
+			"one bad seed":        {input: []string{"project1", "project2", "project!!@#@#"}},
+		}
+		for name, tc := range cases {
+			t.Run(name, func(t *testing.T) {
+				_, err := ts.authz.ProjectsAuthorized(ctx, &api_v2.ProjectsAuthorizedReq{
+					Subjects:       []string{"user:local:admin"},
+					Resource:       "some:thing",
+					Action:         "do:that:thing",
+					ProjectsFilter: tc.input,
+				})
+				if tc.valid {
+					require.NoError(t, err)
+				} else {
+					require.Error(t, err)
+					grpctest.AssertCode(t, codes.InvalidArgument, err)
+				}
 			})
 		}
 	})

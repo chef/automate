@@ -643,7 +643,7 @@ func TestDeletePolicy(t *testing.T) {
 		}},
 		{"fails with InvalidArgument when ID is not valid", func(t *testing.T) {
 			require.Zero(t, store.ItemCount())
-			req := api_v2.DeletePolicyReq{Id: "no_underscores"}
+			req := api_v2.DeletePolicyReq{Id: "no spacess"}
 
 			_, err := cl.DeletePolicy(ctx, &req)
 
@@ -878,7 +878,7 @@ func TestListPolicyMembers(t *testing.T) {
 		}},
 		{"fails with InvalidArgument when ID is not valid", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
-			req := api_v2.ListPolicyMembersReq{Id: "no_underscore"}
+			req := api_v2.ListPolicyMembersReq{Id: "no spaces"}
 
 			resp, err := cl.ListPolicyMembers(ctx, &req)
 
@@ -966,7 +966,7 @@ func TestGetPolicy(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		}},
 		{"fails with InvalidArgument when ID isn't valid", func(t *testing.T) {
-			req := api_v2.GetPolicyReq{Id: "no_underscore"}
+			req := api_v2.GetPolicyReq{Id: "no spaces"}
 
 			pol, err := cl.GetPolicy(ctx, &req)
 
@@ -1024,7 +1024,7 @@ func TestUpdatePolicy(t *testing.T) {
 		}},
 		{"fails with InvalidArgument when ID is invalid", func(t *testing.T) {
 			req := api_v2.UpdatePolicyReq{
-				Id:         "no_underscore",
+				Id:         "no spaces",
 				Name:       "testPolicy1",
 				Statements: testStatement,
 			}
@@ -1759,7 +1759,7 @@ func TestUpdateRole(t *testing.T) {
 		},
 		"fails with InvalidArgument when ID is invalid": func(t *testing.T) {
 			req := api_v2.UpdateRoleReq{
-				Id:       "no_underscore",
+				Id:       "no spaces",
 				Name:     "name",
 				Actions:  []string{"foo:bar:baz"},
 				Projects: []string{},

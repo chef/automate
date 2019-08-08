@@ -34,7 +34,7 @@
               ID is required.
             </chef-error>
             <chef-error *ngIf="ruleForm.controls['id'].hasError('pattern')">
-              Only lowercase letters, numbers, and hyphens(-) are allowed.
+              Only lowercase letters, numbers, hyphens, and underscores are allowed.
             </chef-error>
             <chef-error *ngIf="conflictError">
               IDs must be unique--Rule with ID "{{ruleForm.controls.id.value}}" already exists.
