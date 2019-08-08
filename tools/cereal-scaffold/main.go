@@ -7,8 +7,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
-
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -464,6 +462,17 @@ func runListInstances(_ *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	spew.Dump(instances)
+	for _, instance := range instances {
+		fmt.Printf("%13s: %s\n", "Workflow Name", instance.WorkflowName)
+		fmt.Printf("%13s: %s\n", "Instance Name", instance.InstanceName)
+		fmt.Printf("%13s: %s\n", "Status", string(instance.Status))
+		fmt.Printf("%13s: %v\n", "Is Running", instance.IsRunning)
+		fmt.Printf("%13s: %s\n", "Parameters", string(instance.Parameters))
+		fmt.Printf("%13s: %s\n", "Payload", string(instance.Payload))
+		fmt.Printf("%13s: %s\n", "Result", string(instance.Result))
+		fmt.Printf("%13s: %v\n", "Err", instance.Err)
+		fmt.Println("-----------------------------------")
+	}
+
 	return nil
 }
