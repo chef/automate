@@ -350,6 +350,25 @@ type Decision struct {
 	tasks      []enqueueTaskRequest
 }
 
+func (d *Decision) IsComplete() bool {
+	return d.complete
+}
+func (d *Decision) IsContinuing() bool {
+	return d.continuing
+}
+func (d *Decision) IsFailed() bool {
+	return d.failed
+}
+func (d *Decision) Payload() interface{} {
+	return d.payload
+}
+func (d *Decision) Result() interface{} {
+	return d.result
+}
+func (d *Decision) Err() error {
+	return d.err
+}
+
 // StartEvent is passed to the OnStart callback of the WorkflowExecutor when
 // a workflow instance is signaled to be started.
 type StartEvent struct{}
