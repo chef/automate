@@ -27,13 +27,13 @@
               <span class="label">Rule ID <span aria-hidden="true">*</span> </span>
               <chef-input ngDefaultControl formControlName="id" (keyup)="handleIDInput($event)"></chef-input>
             </label>
-            <chef-error *ngIf="ruleForm.controls['id'].hasError('maxlength')">
+            <chef-error *ngIf="ruleForm.get('id').hasError('maxlength') && ruleForm.get('id').dirty">
               Rule ID must be 64 characters or less.
             </chef-error>
-            <chef-error *ngIf="ruleForm.controls['id'].hasError('required')">
+            <chef-error *ngIf="ruleForm.get('id').hasError('required') && ruleForm.get('id').dirty">
               Rule ID is required.
             </chef-error>
-            <chef-error *ngIf="ruleForm.controls['id'].hasError('pattern')">
+            <chef-error *ngIf="ruleForm.get('id').hasError('pattern') && ruleForm.get('id').dirty">
               Only lowercase letters, numbers, hyphens, and underscores are allowed.
             </chef-error>
             <chef-error *ngIf="conflictError">
