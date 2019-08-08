@@ -33,8 +33,8 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   public saveSuccessful = false;
   public isChefManaged = false;
   public rules: Rule[] = [];
-  public selectedTab: ProjectTabName = 'rules';
   public ruleToDelete: Rule;
+  public tabValue: ProjectTabName = 'rules';
   public url: string;
   public deleteModalVisible = false;
   public createModalVisible = false;
@@ -59,7 +59,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
         this.url = url;
         const [, fragment] = url.split('#');
         // goes to #rules if (1) explicit #definition, (2) no fragment, or (3) invalid fragment
-        this.selectedTab = (fragment === 'details') ? 'details' : 'rules';
+        this.tabValue = (fragment === 'details') ? 'details' : 'rules';
      });
 
     this.projectForm = this.fb.group({
@@ -110,14 +110,14 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     this.saveSuccessful = false;
   }
 
-  onTabChange(event: { target: { value: ProjectTabName } }) {
-    this.selectedTab = event.target.value;
+  onSelectedTab(event: { target: { value: ProjectTabName } }) {
+    this.tabValue = event.target.value;
     // Current URL sans any now outdated fragment.
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
 
   showTab(tabName: ProjectTabName): boolean {
-    return this.selectedTab === tabName;
+    return this.tabValue === tabName;
   }
 
   showFirstRuleMessage(): boolean {

@@ -145,11 +145,11 @@ describe('ProjectDetailsComponent', () => {
     });
 
     it('shows/hides sections when based on selection', () => {
-      component.onTabChange({ target: { value: 'details' } });
+      component.onSelectedTab({ target: { value: 'details' } });
       expect(component.showTab('details')).toBeTruthy();
       expect(component.showTab('rules')).toBeFalsy();
 
-      component.onTabChange({ target: { value: 'rules' } });
+      component.onSelectedTab({ target: { value: 'rules' } });
       expect(component.showTab('rules')).toBeTruthy();
       expect(component.showTab('details')).toBeFalsy();
     });
@@ -175,10 +175,10 @@ describe('ProjectDetailsComponent', () => {
     });
 
     it('shows/hides sections when based on selection', () => {
-      component.onTabChange({ target: { value: 'details' } });
+      component.onSelectedTab({ target: { value: 'details' } });
       expect(component.showTab('rules')).toBeFalsy();
       expect(component.showTab('details')).toBeTruthy();
-      component.onTabChange({ target: { value: 'rules' } });
+      component.onSelectedTab({ target: { value: 'rules' } });
       expect(component.showTab('rules')).toBeTruthy();
       expect(component.showTab('details')).toBeFalsy();
     });
