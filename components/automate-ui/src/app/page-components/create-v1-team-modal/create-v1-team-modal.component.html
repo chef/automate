@@ -12,7 +12,7 @@
               Name is required.
             </chef-error>
             <chef-error *ngIf="conflictError">
-              Name must be unique-- Team with name "{{createForm?.controls['name'].value}}" already exists.
+              Team name "{{createForm.get('name').value}}" already exists.
             </chef-error>
           </chef-form-field>
         </div>
