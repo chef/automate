@@ -259,10 +259,10 @@ Chef Automate comes with a default LDAP configuration for Microsoft Active Direc
 The MSAD configuration is intended for getting started with minimal configuration for standard MSAD systems.
 Default values in this MSAD configuration can be overridden.
 
-{{< warning >}}
+{{% warning %}}
 Chef Automate's default configuration for Microsoft AD is specific to LDAP.
 To configure Microsoft AD using SAML, see the [SAML configuration section]({{< relref "configuration.md#saml" >}}).
-{{< /warning >}}
+{{% /warning %}}
 
 In this config, the required fields are `host`, `bind_dn`,
 `bind_password`, `base_user_search_dn`, and `base_group_search_dn`.
@@ -303,9 +303,9 @@ ca_contents = "<your ca contents>" # optional
 # group_display_name_attr = "displayName"
 ```
 
-{{< warning >}}
+{{% warning %}}
 Connecting to an LDAP service without TLS is not recommended.
-{{< /warning >}}
+{{% /warning %}}
 
 However, if you wish to integrate with an LDAP server with TLS disabled:
 
@@ -341,9 +341,9 @@ group_display_name_attr = "<group display name attribute>"
 See the [LDAP]({{< relref "ldap.md" >}}) for more information on configuration fields.
 You have the full extent of TOML is at your disposal for declaring configuration fields.
 
-{{< warning >}}
+{{% warning %}}
 Connecting to an LDAP service without TLS is not recommended.
-{{< /warning >}}
+{{% /warning %}}
 
 However, if you wish to integrate with an LDAP server with TLS disabled:
 
@@ -382,10 +382,10 @@ k2WFcoiiKyeIznNScx/K6AeykKR/lPrJedanSA==
 """
 ```
 
-{{< warning >}}
+{{% warning %}}
 The `groups_attr` setting is optional. However, if it's not provided,
 users authenticating via SAML will not be members of any teams.
-{{< /warning >}}
+{{% /warning %}}
 
 Chef Automate supports using SAML to authenticate users and [applying permissions to SAML groups]({{< relref "authorization-overview.md" >}}).
 
