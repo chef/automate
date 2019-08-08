@@ -33,9 +33,9 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   public saveSuccessful = false;
   public isChefManaged = false;
   public rules: Rule[] = [];
-  public ruleToDelete: Rule;
   public tabValue: ProjectTabName = 'rules';
   public url: string;
+  public ruleToDelete: Rule;
   public deleteModalVisible = false;
   public createModalVisible = false;
   public createProjectForm: FormGroup;
@@ -112,7 +112,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
 
   onSelectedTab(event: { target: { value: ProjectTabName } }) {
     this.tabValue = event.target.value;
-    // Current URL sans any now outdated fragment.
+    // Drop the previous fragment and add the incoming fragment.
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
 

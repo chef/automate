@@ -111,7 +111,7 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
 
   onSelectedTab(event: { target: { value: PolicyTabName } } ): void {
     this.tabValue = event.target.value;
-    // Current URL sans any now outdated fragment.
+    // Drop the previous fragment and add the incoming fragment.
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
 }
