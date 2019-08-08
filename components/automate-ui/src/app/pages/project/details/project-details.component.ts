@@ -116,10 +116,6 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
 
-  showTab(tabName: ProjectTabName): boolean {
-    return this.tabValue === tabName;
-  }
-
   showFirstRuleMessage(): boolean {
     return this.rules.length === 0;
   }
