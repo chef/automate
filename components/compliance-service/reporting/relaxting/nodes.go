@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"sort"
+	"strings"
 
 	"github.com/golang/protobuf/ptypes"
 
@@ -175,11 +177,30 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 		if err != nil {
 			return nil, emptyTotals, errors.Wrapf(err, "%s error retrieving node count totals: ", myName)
 		}
+		// sort nodes by the platform name and release
+		if sortField == "platform.name.lower" {
+			sortNodes(nodes, sortField, sortAsc)
+		}
 		return nodes, TotalNodeCounts{Total: int32(searchResult.TotalHits()), Passed: nodeSummary.Compliant, Failed: nodeSummary.Noncompliant, Skipped: nodeSummary.Skipped}, nil
 	}
 
 	logrus.Debugf("%s Found no nodes\n", myName)
 	return nodes, emptyTotals, nil
+}
+
+func sortNodes(nodes []*reportingapi.Node, sortField string, sortAsc bool) {
+	sort.Slice(nodes, func(i, j int) bool {
+		if sortAsc {
+			if strings.Compare(nodes[i].Platform.Name, nodes[j].Platform.Name) == 0 {
+				return nodes[i].Platform.Release < nodes[j].Platform.Release
+			}
+			return nodes[i].Platform.Name < nodes[j].Platform.Name
+		}
+		if strings.Compare(nodes[i].Platform.Name, nodes[j].Platform.Name) == 0 {
+			return nodes[i].Platform.Release > nodes[j].Platform.Release
+		}
+		return nodes[i].Platform.Name > nodes[j].Platform.Name
+	})
 }
 
 func convertToRSControlSummary(summ reporting.NodeControlSummary) *reportingapi.ControlSummary {
