@@ -13,3 +13,8 @@ chef-table {
     justify-content: flex-end;
   }
 }
+
+.page-body {
+  padding-top: 1px;
+  background-color: $page-body-background;
+}

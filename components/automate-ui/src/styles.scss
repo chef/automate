@@ -30,8 +30,6 @@ html, body {
 
 .page-body {
   padding: $content-container-padding;
-  padding-top: 1px;
-  background-color: $page-body-background;
 
   .is-empty {
     border: 1px dashed lighten($chef-dark-grey, 10%);

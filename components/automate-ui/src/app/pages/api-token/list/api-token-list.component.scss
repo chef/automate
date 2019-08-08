@@ -6,6 +6,11 @@ chef-table {
   }
 }
 
+.page-body {
+  padding-top: 1px;
+  background-color: $page-body-background;
+}
+
 .empty-state {
   text-align: center;
 

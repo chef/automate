@@ -156,3 +156,8 @@ chef-loading-spinner {
   display: block;
   text-align: center;
 }
+
+.page-body {
+  padding-top: 1px;
+  background-color: $page-body-background;
+}
