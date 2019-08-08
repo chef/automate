@@ -88,7 +88,7 @@ func TestGrpcPostgres(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	grpcBackend := libgrpc.NewGrpcBackendFromConn(conn)
+	grpcBackend := libgrpc.NewGrpcBackendFromConn("test", conn)
 	s := cerealintegration.NewSuiteForBackend(ctx, t, grpcBackend)
 	suite.Run(t, s)
 	require.NoError(t, grpcBackend.Close())

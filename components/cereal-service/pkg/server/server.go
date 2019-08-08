@@ -3,6 +3,8 @@ package server
 import (
 	"context"
 	"errors"
+	"path"
+	"strings"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -46,17 +48,41 @@ func generateRequestID() string {
 	return id.String()
 }
 
+func namespace(domain string, name string) string {
+	return path.Join(domain, name)
+}
+
+func unnamespace(domainAndName string) (domain string, name string) {
+	splits := strings.SplitN(domainAndName, "/", 2)
+	if len(splits) != 2 {
+		return "", domainAndName
+	} else {
+		return splits[0], splits[1]
+	}
+}
+
+func validateDomain(domain string) error {
+	if domain == "" {
+		return status.Error(codes.InvalidArgument, "must specify domain")
+	}
+	return nil
+}
+
 func (s *CerealService) EnqueueWorkflow(ctx context.Context, req *cereal.EnqueueWorkflowRequest) (*cereal.EnqueueWorkflowResponse, error) {
 	logctx := logrus.WithFields(logrus.Fields{
 		"id":            generateRequestID(),
 		"method":        "EnqueueWorkflow",
+		"domain":        req.Domain,
 		"workflow_name": req.WorkflowName,
 		"instance_name": req.InstanceName,
 	})
+	if err := validateDomain(req.Domain); err != nil {
+		return nil, err
+	}
 	logctx.Info("enqueuing workflow")
 	if err := s.backend.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
 		InstanceName: req.InstanceName,
-		WorkflowName: req.WorkflowName,
+		WorkflowName: namespace(req.Domain, req.WorkflowName),
 		Parameters:   req.Parameters,
 	}); err != nil {
 		logctx.WithError(err).Error("failed to enqueue workflow")
@@ -143,9 +169,21 @@ func (s *CerealService) DequeueWorkflow(req cereal.Cereal_DequeueWorkflowServer)
 		logctx.WithError(errInvalidMsg).Error("failed to get dequeue msg")
 		return errInvalidMsg
 	}
-	logctx.WithField("workflow_names", deqMsg.WorkflowNames).Debug("got dequeue msg")
+	logctx.WithFields(
+		logrus.Fields{
+			"workflow_names": deqMsg.WorkflowNames,
+			"domain":         deqMsg.Domain,
+		}).Debug("got dequeue msg")
 
-	evt, completer, err := s.backend.DequeueWorkflow(ctx, deqMsg.GetWorkflowNames())
+	if err := validateDomain(deqMsg.Domain); err != nil {
+		return err
+	}
+
+	workflowNames := make([]string, len(deqMsg.WorkflowNames))
+	for _, workflowName := range deqMsg.WorkflowNames {
+		workflowNames = append(workflowNames, namespace(deqMsg.Domain, workflowName))
+	}
+	evt, completer, err := s.backend.DequeueWorkflow(ctx, workflowNames)
 	if err != nil {
 		if err == libcereal.ErrNoWorkflowInstances {
 			return status.Error(codes.NotFound, err.Error())
@@ -154,7 +192,10 @@ func (s *CerealService) DequeueWorkflow(req cereal.Cereal_DequeueWorkflowServer)
 	}
 	defer completer.Close() // nolint: errcheck
 
+	domain, workflowName := unnamespace(evt.Instance.WorkflowName)
+	evt.Instance.WorkflowName = workflowName
 	logctx = logctx.WithFields(logrus.Fields{
+		"domain-recv":     domain,
 		"workflow_name":   evt.Instance.WorkflowName,
 		"instance_name":   evt.Instance.InstanceName,
 		"workflow_status": evt.Instance.Status,
@@ -217,7 +258,7 @@ func (s *CerealService) DequeueWorkflow(req cereal.Cereal_DequeueWorkflowServer)
 			}
 
 			err := completer.EnqueueTask(&backend.Task{
-				Name:       task.Name,
+				Name:       namespace(deqMsg.Domain, task.Name),
 				Parameters: task.Parameters,
 			}, opts)
 
@@ -246,11 +287,15 @@ func (s *CerealService) CancelWorkflow(ctx context.Context, req *cereal.CancelWo
 	logctx := logrus.WithFields(logrus.Fields{
 		"id":            generateRequestID(),
 		"method":        "CancelWorkflow",
+		"domain":        req.Domain,
 		"workflow_name": req.WorkflowName,
 		"instance_name": req.InstanceName,
 	})
+	if err := validateDomain(req.Domain); err != nil {
+		return nil, err
+	}
 	logctx.Info("canceling workflow")
-	err := s.backend.CancelWorkflow(ctx, req.InstanceName, req.WorkflowName)
+	err := s.backend.CancelWorkflow(ctx, req.InstanceName, namespace(req.Domain, req.WorkflowName))
 	if err != nil {
 		logctx.WithError(err).Error("failed to cancel workflow")
 		if err == libcereal.ErrWorkflowInstanceNotFound {
@@ -337,13 +382,17 @@ func (s *CerealService) DequeueTask(req cereal.Cereal_DequeueTaskServer) error {
 		logctx.WithError(err).Error("failed to get dequeue message")
 		return err
 	}
+	if err := validateDomain(deqMsg.Domain); err != nil {
+		return err
+	}
 
 	logctx = logctx.WithFields(logrus.Fields{
+		"domain":    deqMsg.Domain,
 		"task_name": deqMsg.TaskName,
 	})
 
 	logctx.Debug("dequeuing task")
-	task, completer, err := s.backend.DequeueTask(ctx, deqMsg.TaskName)
+	task, completer, err := s.backend.DequeueTask(ctx, namespace(deqMsg.Domain, deqMsg.TaskName))
 	if err != nil {
 		if err == libcereal.ErrNoTasks {
 			logctx.WithError(err).Debug("failed to dequeue task")
@@ -354,7 +403,7 @@ func (s *CerealService) DequeueTask(req cereal.Cereal_DequeueTaskServer) error {
 	}
 
 	logctx.Info("dequeued task")
-
+	_, task.Name = unnamespace(task.Name)
 	err = writeDeqTaskRespMsg(ctx, req, &cereal.DequeueTaskResponse{
 		Cmd: &cereal.DequeueTaskResponse_Dequeue_{
 			Dequeue: &cereal.DequeueTaskResponse_Dequeue{
@@ -419,12 +468,17 @@ func (s *CerealService) CreateWorkflowSchedule(ctx context.Context, req *cereal.
 	logctx := logrus.WithFields(logrus.Fields{
 		"id":            generateRequestID(),
 		"method":        "CreateWorkflowSchedule",
+		"domain":        req.Domain,
 		"workflow_name": req.WorkflowName,
 		"instance_name": req.InstanceName,
 		"recurrence":    req.Recurrence,
 		"next_run_at":   req.NextRunAt,
 		"enabled":       req.Enabled,
 	})
+
+	if err := validateDomain(req.Domain); err != nil {
+		return nil, err
+	}
 
 	_, err := rrule.StrToRRule(req.GetRecurrence())
 	if err != nil {
@@ -437,7 +491,7 @@ func (s *CerealService) CreateWorkflowSchedule(ctx context.Context, req *cereal.
 		return nil, status.Error(codes.InvalidArgument, "nextRun not valid")
 	}
 	logctx.Info("creating workflow schedule")
-	err = s.backend.CreateWorkflowSchedule(ctx, req.InstanceName, req.WorkflowName, req.Parameters, req.Enabled, req.Recurrence, nextRun)
+	err = s.backend.CreateWorkflowSchedule(ctx, req.InstanceName, namespace(req.Domain, req.WorkflowName), req.Parameters, req.Enabled, req.Recurrence, nextRun)
 	if err != nil {
 		logctx.WithError(err).Error("failed to create workflow schedule")
 		if err == libcereal.ErrWorkflowScheduleExists {
@@ -453,6 +507,11 @@ func (s *CerealService) ListWorkflowSchedules(req *cereal.ListWorkflowSchedulesR
 		"id":     generateRequestID(),
 		"method": "ListWorkflowSchedules",
 	})
+
+	if err := validateDomain(req.Domain); err != nil {
+		return err
+	}
+
 	logctx.Info("listing workflows")
 	schedules, err := s.backend.ListWorkflowSchedules(out.Context())
 	if err != nil {
@@ -468,6 +527,11 @@ func (s *CerealService) ListWorkflowSchedules(req *cereal.ListWorkflowSchedulesR
 			logctx.WithError(err).Error("failed to send message")
 		}
 		for _, schedule := range schedules {
+			var domain string
+			domain, schedule.WorkflowName = unnamespace(schedule.WorkflowName)
+			if domain != req.Domain {
+				continue
+			}
 			grpcSchedule := cerealScheduleToGrpcSchedule(logctx, schedule)
 			err := out.Send(&cereal.ListWorkflowSchedulesResponse{
 				Schedule: grpcSchedule,
@@ -485,10 +549,13 @@ func (s *CerealService) GetWorkflowScheduleByName(ctx context.Context, req *cere
 	logctx := logrus.WithFields(logrus.Fields{
 		"id":            generateRequestID(),
 		"method":        "GetWorkflowScheduleByName",
+		"domain":        req.Domain,
 		"workflow_name": req.WorkflowName,
 		"instance_name": req.InstanceName,
 	})
-
+	if err := validateDomain(req.Domain); err != nil {
+		return nil, err
+	}
 	logctx.Info("getting workflow schedule")
 	schedule, err := s.backend.GetWorkflowScheduleByName(ctx, req.InstanceName, req.WorkflowName)
 	if err != nil {
@@ -498,6 +565,7 @@ func (s *CerealService) GetWorkflowScheduleByName(ctx context.Context, req *cere
 		}
 		return nil, err
 	}
+	_, schedule.WorkflowName = unnamespace(schedule.WorkflowName)
 	return &cereal.GetWorkflowScheduleByNameResponse{
 		Schedule: cerealScheduleToGrpcSchedule(logctx, schedule),
 	}, nil
@@ -540,9 +608,14 @@ func (s *CerealService) UpdateWorkflowScheduleByName(ctx context.Context, req *c
 	logctx := logrus.WithFields(logrus.Fields{
 		"id":            generateRequestID(),
 		"method":        "UpdateWorkflowScheduleByName",
+		"domain":        req.Domain,
 		"workflow_name": req.WorkflowName,
 		"instance_name": req.InstanceName,
 	})
+
+	if err := validateDomain(req.Domain); err != nil {
+		return nil, err
+	}
 
 	opts := backend.WorkflowScheduleUpdateOpts{}
 
@@ -581,7 +654,7 @@ func (s *CerealService) UpdateWorkflowScheduleByName(ctx context.Context, req *c
 	}
 
 	logctx.Info("updating workflow schedule")
-	err := s.backend.UpdateWorkflowScheduleByName(ctx, req.InstanceName, req.WorkflowName, opts)
+	err := s.backend.UpdateWorkflowScheduleByName(ctx, req.InstanceName, namespace(req.Domain, req.WorkflowName), opts)
 	if err != nil {
 		logctx.WithError(err).Error("failed to update workflow schedule")
 		if err == libcereal.ErrWorkflowScheduleNotFound {
@@ -596,12 +669,15 @@ func (s *CerealService) GetWorkflowInstanceByName(ctx context.Context, req *cere
 	logctx := logrus.WithFields(logrus.Fields{
 		"id":            generateRequestID(),
 		"method":        "GetWorkflowInstanceByName",
+		"domain":        req.Domain,
 		"workflow_name": req.WorkflowName,
 		"instance_name": req.InstanceName,
 	})
-
+	if err := validateDomain(req.Domain); err != nil {
+		return nil, err
+	}
 	logctx.Info("getting workflow instance")
-	workflowInstance, err := s.backend.GetWorkflowInstanceByName(ctx, req.GetInstanceName(), req.GetWorkflowName())
+	workflowInstance, err := s.backend.GetWorkflowInstanceByName(ctx, req.GetInstanceName(), namespace(req.GetDomain(), req.GetWorkflowName()))
 	if err != nil {
 		logctx.WithError(err).Error("failed to get workflow instance")
 		if err == libcereal.ErrWorkflowInstanceNotFound {
@@ -609,6 +685,7 @@ func (s *CerealService) GetWorkflowInstanceByName(ctx context.Context, req *cere
 		}
 		return nil, err
 	}
+	_, workflowInstance.WorkflowName = unnamespace(workflowInstance.WorkflowName)
 	grpcInstance := cerealWorkflowInstanceToGrpc(workflowInstance)
 
 	return &cereal.GetWorkflowInstanceByNameResponse{
@@ -619,12 +696,18 @@ func (s *CerealService) GetWorkflowInstanceByName(ctx context.Context, req *cere
 func (s *CerealService) ListWorkflowInstances(req *cereal.ListWorkflowInstancesRequest, resp cereal.Cereal_ListWorkflowInstancesServer) error {
 	logctx := logrus.WithFields(logrus.Fields{
 		"id":     generateRequestID(),
+		"domain": req.Domain,
 		"method": "ListWorkflowInstances",
 	})
+
+	if err := validateDomain(req.Domain); err != nil {
+		return err
+	}
 
 	opts := backend.ListWorkflowOpts{}
 
 	if workflowName := req.GetWorkflowName().GetValue(); workflowName != "" {
+		workflowName = namespace(req.Domain, workflowName)
 		opts.WorkflowName = &workflowName
 		logctx = logctx.WithField("workflow_name", workflowName)
 	}
@@ -649,6 +732,11 @@ func (s *CerealService) ListWorkflowInstances(req *cereal.ListWorkflowInstancesR
 
 	logctx.Infof("found %d matching instances", len(instances))
 	for _, instance := range instances {
+		domain, workflowName := unnamespace(instance.WorkflowName)
+		if domain != req.Domain {
+			continue
+		}
+		instance.WorkflowName = workflowName
 		err := resp.Send(&cereal.ListWorkflowInstancesResponse{
 			WorkflowInstance: cerealWorkflowInstanceToGrpc(instance),
 		})

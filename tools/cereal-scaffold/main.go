@@ -302,7 +302,7 @@ func getBackend(dbName string) backend.Driver {
 		if err != nil {
 			panic(err)
 		}
-		grpcBackend := grpccereal.NewGrpcBackendFromConn(conn)
+		grpcBackend := grpccereal.NewGrpcBackendFromConn("test", conn)
 		return grpcBackend
 	}
 	return postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName))
