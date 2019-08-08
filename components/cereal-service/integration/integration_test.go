@@ -14,7 +14,7 @@ import (
 	"github.com/chef/automate/components/cereal-service/pkg/server"
 	"github.com/chef/automate/lib/cereal"
 
-	grpcceral "github.com/chef/automate/api/interservice/cereal"
+	grpccereal "github.com/chef/automate/api/interservice/cereal"
 	libgrpc "github.com/chef/automate/lib/cereal/grpc"
 	cerealintegration "github.com/chef/automate/lib/cereal/integration"
 	"github.com/chef/automate/lib/cereal/postgres"
@@ -78,7 +78,7 @@ func TestGrpcPostgres(t *testing.T) {
 
 	grpcServer := grpc.NewServer()
 	svc := server.NewCerealService(ctx, pgBackend)
-	grpcceral.RegisterCerealServer(grpcServer, svc)
+	grpccereal.RegisterCerealServer(grpcServer, svc)
 	g := grpctest.NewServer(grpcServer)
 	cereal.MaxWakeupInterval = 2 * time.Second
 

@@ -20,7 +20,7 @@ import (
 
 	"github.com/spf13/viper"
 
-	grpcceral "github.com/chef/automate/api/interservice/cereal"
+	grpccereal "github.com/chef/automate/api/interservice/cereal"
 	"github.com/chef/automate/components/cereal-service/pkg/server"
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/tls/certs"
@@ -162,7 +162,7 @@ func serve(*cobra.Command, []string) error {
 	}
 
 	svc := server.NewCerealService(ctx, pgBackend)
-	grpcceral.RegisterCerealServer(grpcServer, svc)
+	grpccereal.RegisterCerealServer(grpcServer, svc)
 
 	healthSvc := health.NewService()
 	health.RegisterHealthServer(grpcServer, healthSvc)
