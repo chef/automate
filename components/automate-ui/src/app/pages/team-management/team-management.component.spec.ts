@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -7,7 +8,9 @@ import { StoreModule, Store } from '@ngrx/store';
 import { of as observableOf } from 'rxjs';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { HttpStatus } from 'app/types/types';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
+import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import { teamEntityReducer } from 'app/entities/teams/team.reducer';
 import { Team } from 'app/entities/teams/team.model';
 import {
@@ -16,10 +19,8 @@ import {
   CreateTeamFailure,
   DeleteTeamSuccess
 } from 'app/entities/teams/team.actions';
+import { projectsFilterReducer } from 'app/services/projects-filter/projects-filter.reducer';
 import { TeamManagementComponent } from './team-management.component';
-import { IAMMajorVersion } from 'app/entities/policies/policy.model';
-import { HttpErrorResponse } from '@angular/common/http';
-import { HttpStatus } from 'app/types/types';
 
 describe('TeamManagementComponent', () => {
   let component: TeamManagementComponent;
@@ -42,7 +43,8 @@ describe('TeamManagementComponent', () => {
         }),
         MockComponent({
           selector: 'app-create-object-modal',
-          inputs: ['visible', 'creating', 'conflictErrorEvent', 'objectNoun', 'createForm'],
+          inputs: ['visible', 'creating', 'conflictErrorEvent', 'objectNoun',
+            'createForm', 'showProjectsDropdown', 'assignableProjects'],
           outputs: ['close', 'createClicked']
         }),
         MockComponent({ selector: 'chef-button',
@@ -72,7 +74,8 @@ describe('TeamManagementComponent', () => {
         RouterTestingModule,
         StoreModule.forRoot({
           teams: teamEntityReducer,
-          policies: policyEntityReducer
+          policies: policyEntityReducer,
+          projectsFilter: projectsFilterReducer
         })
       ]
     })
@@ -180,7 +183,7 @@ describe('TeamManagementComponent', () => {
 
     beforeEach(() => {
       store = TestBed.get(Store);
-      component.isV1 = false;
+      component.isMajorV1 = false;
       fixture.detectChanges();
     });
 
@@ -196,7 +199,7 @@ describe('TeamManagementComponent', () => {
       component.openCreateModal();
       component.createTeamForm.controls['name'].setValue(team.name);
       component.createTeamForm.controls['id'].setValue(team.id);
-      component.createV2Team();
+      component.createV2Team([]);
 
       store.dispatch(new CreateTeamSuccess(team));
 

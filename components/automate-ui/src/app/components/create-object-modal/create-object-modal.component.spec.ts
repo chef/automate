@@ -18,7 +18,8 @@ describe('CreateObjectModalComponent', () => {
         MockComponent({ selector: 'chef-form-field' }),
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'chef-modal', inputs: ['visible'] })
+        MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),
+        MockComponent({ selector: 'app-projects-dropdown', inputs: ['projects', 'disabled'] })
       ],
      imports: [
         ReactiveFormsModule

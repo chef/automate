@@ -52,22 +52,22 @@ describe('HttpClientAuthInterceptor', () => {
     using([
       ['with some projects and ALL checked',
         [
-          { value: 'proj1', label: 'proj 1', checked: true },
-          { value: 'proj2', label: 'proj 2', checked: true },
-          { value: 'proj3', label: 'proj 3', checked: true }
+          { value: 'proj1', label: 'proj 1', type: 'CUSTOM', checked: true },
+          { value: 'proj2', label: 'proj 2', type: 'CUSTOM', checked: true },
+          { value: 'proj3', label: 'proj 3', type: 'CUSTOM', checked: true }
         ]],
       ['with some projects and SOME checked',
         [
-          { value: 'proj1', label: 'proj 1', checked: true },
-          { value: 'proj2', label: 'proj 2', checked: false },
-          { value: 'proj3', label: 'proj 3', checked: true },
-          { value: 'proj4', label: 'proj 4', checked: false }
+          { value: 'proj1', label: 'proj 1', type: 'CUSTOM', checked: true },
+          { value: 'proj2', label: 'proj 2', type: 'CUSTOM', checked: false },
+          { value: 'proj3', label: 'proj 3', type: 'CUSTOM', checked: true },
+          { value: 'proj4', label: 'proj 4', type: 'CUSTOM', checked: false }
         ]],
       ['with some projects and ONE checked',
         [
-          { value: 'proj1', label: 'proj 1', checked: false },
-          { value: 'proj2', label: 'proj 2', checked: false },
-          { value: 'proj3', label: 'proj 3', checked: true }
+          { value: 'proj1', label: 'proj 1', type: 'CUSTOM', checked: false },
+          { value: 'proj2', label: 'proj 2', type: 'CUSTOM', checked: false },
+          { value: 'proj3', label: 'proj 3', type: 'CUSTOM', checked: true }
         ]]
     ], function (description: string, projectList: ProjectsFilterOption[]) {
 
@@ -96,9 +96,9 @@ describe('HttpClientAuthInterceptor', () => {
     using([
       ['with some projects and NONE checked',
         [
-          { value: 'proj1', label: 'proj 1', checked: false },
-          { value: 'proj2', label: 'proj 2', checked: false },
-          { value: 'proj3', label: 'proj 3', checked: false }
+          { value: 'proj1', label: 'proj 1', type: 'CUSTOM', checked: false },
+          { value: 'proj2', label: 'proj 2', type: 'CUSTOM', checked: false },
+          { value: 'proj3', label: 'proj 3', type: 'CUSTOM', checked: false }
         ]],
       ['with NO projects',
         [
@@ -129,10 +129,10 @@ describe('HttpClientAuthInterceptor', () => {
     describe('unfiltered flag', () => {
       beforeEach(() => {
         const projectList = [
-          { value: 'proj1', label: 'proj 1', checked: true },
-          { value: 'proj2', label: 'proj 2', checked: false },
-          { value: 'proj3', label: 'proj 3', checked: true },
-          { value: 'proj4', label: 'proj 4', checked: false }
+          { value: 'proj1', label: 'proj 1', type: 'CUSTOM', checked: true },
+          { value: 'proj2', label: 'proj 2', type: 'CUSTOM', checked: false },
+          { value: 'proj3', label: 'proj 3', type: 'CUSTOM', checked: true },
+          { value: 'proj4', label: 'proj 4', type: 'CUSTOM', checked: false }
         ];
         configure(projectList);
         httpClient = TestBed.get(HttpClient);

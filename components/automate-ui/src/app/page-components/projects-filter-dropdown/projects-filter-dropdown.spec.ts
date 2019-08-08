@@ -101,11 +101,13 @@ describe('ProjectsFilterDropdownComponent', () => {
         {
           value: 'project-1',
           label: 'Project 1',
+          type: 'CUSTOM',
           checked: false
         },
         {
           value: 'project-2',
           label: 'Project 2',
+          type: 'CUSTOM',
           checked: true
         }
       ];
@@ -186,11 +188,13 @@ describe('ProjectsFilterDropdownComponent', () => {
         {
           value: 'project-1',
           label: 'Project 1',
+          type: 'CUSTOM',
           checked: false
         },
         {
           value: 'project-2',
           label: 'Project 2',
+          type: 'CUSTOM',
           checked: true
         }
       ];
@@ -218,11 +222,13 @@ describe('ProjectsFilterDropdownComponent', () => {
           {
             value: 'project-1',
             label: 'Project 1',
+            type: 'CUSTOM',
             checked: false
           },
           {
             value: 'project-2',
             label: 'Project 2',
+            type: 'CUSTOM',
             checked: false
           }
         ];
@@ -247,6 +253,7 @@ describe('ProjectsFilterDropdownComponent', () => {
           {
             value: 'project-1',
             label: 'Project 1',
+            type: 'CUSTOM',
             checked: false
           }
         ];
@@ -285,6 +292,7 @@ describe('ProjectsFilterDropdownComponent', () => {
         {
           value: 'project-1',
           label: 'Project 1',
+          type: 'CUSTOM',
           checked: false
         }
       ];

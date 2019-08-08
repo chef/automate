@@ -61,6 +61,7 @@ export class ProjectsFilterEffects {
       project => <ProjectsFilterOption>{
         label: project.name,
         value: project.id,
+        type:  project.type,
         checked: false
       });
   }
