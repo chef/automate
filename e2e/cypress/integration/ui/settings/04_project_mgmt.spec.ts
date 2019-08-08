@@ -1,4 +1,18 @@
-describe('project management', () => {
+interface Project {
+  id: string;
+  name: string;
+  type: string;
+}
+
+// assume 2.0 if not in CI. if you wish something different start cypress with
+// IAM_VERSION set to what you are testing.
+if (Cypress.env('IAM_VERSION') === undefined) {
+  Cypress.env('IAM_VERSION', 'v2.0');
+}
+
+const describeIAMV2P1 = Cypress.env('IAM_VERSION') === 'v2.1' ? describe : describe.skip;
+
+describeIAMV2P1('project management', () => {
   let adminToken = '';
   const now = Cypress.moment().format('MMDDYYhhmm');
   const cypressPrefix = 'cypress-test';
@@ -6,16 +20,6 @@ describe('project management', () => {
   const project1Name = `${cypressPrefix} project1 ${now}`;
   const project2ID = `${cypressPrefix}-project2-${now}`;
   const project2Name = `${cypressPrefix} project2 ${now}`;
-
-  let iamVersion = <string><Object>Cypress.env('IAM_VERSION');
-  // assume 2.0 if not in CI. if you wish something different start cypress with
-  // IAM_VERSION set to what you are testing.
-  if (iamVersion === undefined) {
-    iamVersion = 'v2.0';
-  }
-
-  const describeIAMV2 = iamVersion.match(/v2/) ? describe : describe.skip;
-  const describeProjectsEnabled = iamVersion === 'v2.1' ? describe : describe.skip;
 
   before(() => {
     cy.adminLogin('/settings/projects').then(() => {
@@ -49,25 +53,36 @@ describe('project management', () => {
     cy.get('chef-notification.info').should('be.visible');
     cy.contains(project1Name).should('exist');
     cy.contains(project1ID).should('exist');
-      // should see "Create the first ingest rule to get started"
-      // click "Create Rule" button
-      // should open rule detail
-      // type rule name
-      // select resource type
-      // click add condition
-      // select node attribute, operator, value
-      // click save rule
-
   });
 
   it('list projects', () => {
+    let projectIDs: string[];
+    cy.request({
+      auth: { bearer: adminToken },
+      method: 'GET',
+      url: '/apis/iam/v2beta/projects'
+    }).then((response) => {
+      expect(response.status).to.equal(200);
+      projectIDs = response.body.map((project: Project) => project.id);
+
+      projectIDS.forEach((id: string) => {
+        // check each project in table rows
+      });
+      // cy.get('app-project-list chef-table chef-tr').should('have.length', totalProjects);
+    });
+
+    // make sure new project exists in list in entirety
   });
 
-  it('delete a project', () => {
-  });
-
-  it('can create a project with a rule', () => {
-    // or add rule to project?
+  it('can create a rule for the new project', () => {
+    // should see "Create the first ingest rule to get started"
+    // click "Create Rule" button
+    // should open rule detail
+    // type rule name
+    // select resource type
+    // click add condition
+    // select node attribute, operator, value
+    // click save rule
   });
 
   it('can see a list of rules for a project', () => {
@@ -80,5 +95,8 @@ describe('project management', () => {
   });
 
   it('can update a project name', () => {
+  });
+
+  it('delete a project', () => {
   });
 });
