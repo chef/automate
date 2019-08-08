@@ -7,8 +7,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
-
 	"github.com/teambition/rrule-go"
 
 	"github.com/chef/automate/lib/cereal"
@@ -234,7 +232,6 @@ func (suite *CerealTestSuite) TestExpiringSchedule() {
 	schedules, err := m.ListWorkflowSchedules(context.Background())
 	suite.Require().NoError(err)
 	for _, s := range schedules {
-		spew.Dump(s)
 		if s.WorkflowName == workflowName && s.InstanceName == instanceName {
 			suite.Assert().True(s.Enabled)
 			found = true
