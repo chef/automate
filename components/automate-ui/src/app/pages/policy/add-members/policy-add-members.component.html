@@ -18,7 +18,7 @@
           <form [formGroup]="expressionForm">
             <chef-form-field>
               <label>Member expression *</label>
-              <input chefInput formControlName="expression" type="text" (keyup)="resetErrors()" >
+              <input chefInput formControlName="expression" type="text" (keyup)="resetErrors()" autocomplete="off">
               <chef-error *ngIf="unparsableMember">Invalid member expression.</chef-error>
               <chef-error *ngIf="duplicateMember">Member expression already in table.</chef-error>
               <chef-error *ngIf="alreadyPolicyMember">Member already in policy.</chef-error>

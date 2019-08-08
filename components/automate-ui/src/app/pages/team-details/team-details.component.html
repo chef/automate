@@ -65,7 +65,7 @@
       <form [formGroup]="updateNameForm">
         <chef-form-field>
           <label>{{ descriptionOrName | titlecase }} <span aria-hidden="true">*</span></label>
-          <input chefInput formControlName="name" type="text" (keyup)="keyPressed()">
+          <input chefInput formControlName="name" type="text" (keyup)="keyPressed()" autocomplete="off">
           <chef-error
             *ngIf="(updateNameForm.get('name').hasError('required') || updateNameForm.get('name').hasError('pattern')) && updateNameForm.get('name').dirty">
             {{ descriptionOrName | titlecase }} is required.
