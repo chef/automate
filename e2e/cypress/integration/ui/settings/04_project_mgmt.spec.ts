@@ -37,23 +37,6 @@ describeIAMV2P1('project management', () => {
     cy.saveStorage();
   });
 
-  it('can create a project', () => {
-    cy.get('#create-button').contains('Create Project').click();
-    cy.get('app-create-object-modal chef-modal').should('have.class', 'visible');
-
-    cy.get('[data-cy=create-name]').type(project1Name);
-
-    cy.get('[data-cy=create-id]').should('not.be.visible');
-    cy.get('[data-cy=edit-button]').contains('Edit ID').click();
-    cy.get('[data-cy=id-label]').should('not.be.visible');
-    cy.get('[data-cy=create-id]').should('be.visible').clear().type(project1ID);
-
-    cy.get('[data-cy=save-button]').click();
-    cy.get('app-create-object-modal chef-modal').should('not.be.visible');
-    cy.get('chef-notification.info').should('be.visible');
-    cy.contains(project1Name).should('exist');
-    cy.contains(project1ID).should('exist');
-  });
 
   it('list projects', () => {
     let projectIDs: string[];
@@ -63,15 +46,32 @@ describeIAMV2P1('project management', () => {
       url: '/apis/iam/v2beta/projects'
     }).then((response) => {
       expect(response.status).to.equal(200);
-      projectIDs = response.body.map((project: Project) => project.id);
+      projectIDs = response.body.projects.map((project: Project) => project.id);
 
-      projectIDS.forEach((id: string) => {
-        // check each project in table rows
+      projectIDs.forEach((id: string) => {
+        cy.get('chef-table chef-td').contains(id);
       });
-      // cy.get('app-project-list chef-table chef-tr').should('have.length', totalProjects);
     });
+  });
 
-    // make sure new project exists in list in entirety
+  it('can create a project', () => {
+    cy.get('#create-button').contains('Create Project').click();
+    cy.get('app-create-object-modal chef-modal').should('have.class', 'visible');
+
+    cy.get('[data-cy=create-name]').type(project1Name);
+
+    cy.get('[data-cy=create-id]').should('not.be.visible');
+    cy.get('[data-cy=edit-button]').contains('Edit ID').click();
+    cy.get('[data-cy=id-label]').should('not.be.visible');
+    cy.get('#id-input').should('have.value', project1ID);
+
+    cy.get('[data-cy=save-button]').click();
+    cy.get('app-create-object-modal chef-modal').should('not.be.visible');
+    cy.get('chef-notification.info').should('be.visible');
+    cy.contains(project1Name).should('exist');
+    cy.contains(project1ID).should('exist');
+
+    cy.url().should('include', `/settings/projects/${project1ID}`);
   });
 
   it('can create a rule for the new project', () => {
