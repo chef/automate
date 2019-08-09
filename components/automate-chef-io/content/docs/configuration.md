@@ -225,7 +225,7 @@ Both _one_ LDAP service (or MSAD for simplified configuration of Active Director
 You do not need to configure an external IdP if you simply want to create users and teams local to Chef Automate.
 See the [Users]({{< relref "users.md" >}}) documentation for additional information.
 
-Chef Automate uses `dex` to support LDAP and SAML integrations. To configure authentication for your Chef Automate
+Chef Automate uses [Dex](https://github.com/dexidp/dex) to support LDAP and SAML integrations. To configure authentication for your Chef Automate
 installation, create a TOML file that contains the partial configuration for either LDAP or SAML. Then run
 `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
