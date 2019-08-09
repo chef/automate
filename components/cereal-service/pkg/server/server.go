@@ -199,7 +199,7 @@ func (s *CerealService) DequeueWorkflow(req cereal.Cereal_DequeueWorkflowServer)
 	domain, workflowName := unnamespace(evt.Instance.WorkflowName)
 	evt.Instance.WorkflowName = workflowName
 	logctx = logctx.WithFields(logrus.Fields{
-		"domain-recv":     domain,
+		"domain_recv":     domain,
 		"workflow_name":   evt.Instance.WorkflowName,
 		"instance_name":   evt.Instance.InstanceName,
 		"workflow_status": evt.Instance.Status,
