@@ -27,7 +27,7 @@ Bind, User Search, Login Bind, and Group Search.
 
 #### Authorization with LDAP
 
-Chef Automate supports defining permissions for [LDAP users and their groups]({{< ref "authorization-overview.md" >}}).
+Chef Automate supports defining permissions for [LDAP users and their groups]({{< ref "authorization-overview.md#subjects" >}}).
 
 #### Connect
 
