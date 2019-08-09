@@ -15,21 +15,17 @@
 html, body {
     height: 100%;
     font-family: 'Muli';
-    color: rgb(87,105,120);
+    color: #222435;
     font-size: 14px;
     font-weight: 400;
 }
 
 button, div.dex-btn {
     background-color: #3864f2;
-    color: white;
+    color: #fff;
     width: 279px;
     height: 53px;
     margin: 0 auto;
-}
-
-label {
-    color: #222435;
 }
 
 div.logo {
@@ -40,8 +36,6 @@ a.back {
     text-decoration: none;
     display: inline-block;
     margin: 15px 30px;
-    font-size: 14px;
-    font-weight: 400;
     color: #222435;
 }
 
@@ -71,20 +65,19 @@ a.back:hover {
     padding: 0px 6px;
 }
 
-.dex-btn-icon--local {
-    margin-top: 8px;
-    background-color: #3864f2;
-    background-image: url(../static/img/email-icon.png)
-}
-
-.dex-btn-icon--saml {
-    margin-top: 8px;
-    background-color: #3864f2;
-}
-
+.dex-btn-icon--local,
+.dex-btn-icon--saml,
+.dex-btn-icon--ldap,
 .dex-btn-icon--msad {
     margin-top: 8px;
     background-color: #3864f2;
+}
+
+.dex-btn-icon--local {
+    background-image: url(../static/img/email-icon.png)
+}
+
+.dex-btn-icon--msad {
     background-image: url(../static/img/microsoft-icon.png)
 }
 
