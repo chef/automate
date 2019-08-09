@@ -210,7 +210,7 @@ func (db *Postgres) GetServiceGroups(
 				return nil, err
 			}
 		case "origin", "ORIGIN":
-			selectQuery, err := queryFromOriginFilter(values, first)
+			selectQuery, err := queryFromFieldFilter("s.origin", values, first)
 			whereQuery = whereQuery + selectQuery
 			if err != nil {
 				return nil, err
@@ -461,28 +461,6 @@ func queryFromFieldFilter(field string, arr []string, first bool) (string, error
 		condition += "''"
 	}
 	return condition + ")", nil
-}
-
-func queryFromOriginFilter(arr []string, first bool) (string, error) {
-	var condition string
-	if first {
-		condition = ` WHERE `
-		first = false
-	} else { // not first, add on an AND before IN part
-		condition = ` AND `
-	}
-	condition = condition + fmt.Sprintf("s.id IN (SELECT DISTINCT id FROM service WHERE origin IN (")
-	if len(arr) > 0 {
-		for index, item := range arr {
-			condition += fmt.Sprintf("'%s'", pgutils.EscapeLiteralForPG(item))
-			if index < len(arr)-1 {
-				condition += ","
-			}
-		}
-	} else {
-		condition += "''"
-	}
-	return condition + "))", nil
 }
 
 // formatSortFields returns a customized ORDER BY statement from the provided sort field,
