@@ -1,3 +1,5 @@
+import forEach = require("cypress/types/lodash/forEach");
+
 interface Project {
   id: string;
   name: string;
@@ -18,8 +20,8 @@ describeIAMV2P1('project management', () => {
   const cypressPrefix = 'cypress-test';
   const project1ID = `${cypressPrefix}-project1-${now}`;
   const project1Name = `${cypressPrefix} project1 ${now}`;
-  const project2ID = `${cypressPrefix}-project2-${now}`;
-  const project2Name = `${cypressPrefix} project2 ${now}`;
+  const ruleID = `${cypressPrefix}-rule-${now}`;
+  const ruleName = `${cypressPrefix} rule ${now}`;
 
   before(() => {
     cy.adminLogin('/settings/projects').then(() => {
@@ -75,14 +77,42 @@ describeIAMV2P1('project management', () => {
   });
 
   it('can create a rule for the new project', () => {
-    // should see "Create the first ingest rule to get started"
-    // click "Create Rule" button
-    // should open rule detail
-    // type rule name
-    // select resource type
-    // click add condition
-    // select node attribute, operator, value
-    // click save rule
+    cy.get('app-authorized button').contains('Create Rule').click();
+
+    cy.url().should('include', `/settings/projects/${project1ID}/rules`);
+    cy.get('chef-page').should('be.visible');
+
+    cy.get('#create-name input').type(ruleName)
+    cy.get('[data-cy=edit-id]').click();
+
+    cy.get('#create-id input').should('have.value', ruleID);
+
+    // Verify correct attributes/operators are selectable for each resource
+    // Event
+    cy.get('#create-type-dropdown').select('Event');
+    cy.get('[data-cy=attribute-dropdown]').select('Chef Organization');
+    cy.get('[data-cy=attribute-dropdown]').select('Chef Server');
+    cy.get('[data-cy=operator-dropdown]').select('equals');
+    cy.get('[data-cy=operator-dropdown]').select('member of');
+
+    // Node
+    cy.get('#create-type-dropdown').select('Node');
+    const nodeAttributes = ['Chef Organization', 'Chef Server', 'Environment',
+        'Chef Role', 'Chef Tag', 'Chef Policy Name', 'Chef Policy Group']
+
+    nodeAttributes.forEach((att: string) => {
+        cy.get('[data-cy=attribute-dropdown]').select(att);
+    });
+
+    cy.get('[data-cy=operator-dropdown]').select('member of');
+    cy.get('[data-cy=operator-dropdown]').select('equals');
+    cy.get('[data-cy=rule-value] input').type('Chef Policy Group Foo');
+
+    cy.get('#right-buttons button').contains('Save Rule').click();
+    cy.get('chef-page').should('not.be.visible')
+
+    cy.url().should('include', `/settings/projects/${project1ID}`);
+    cy.get('chef-td').contains(ruleID)
   });
 
   it('can see a list of rules for a project', () => {
