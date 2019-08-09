@@ -22,7 +22,7 @@ import (
 )
 
 var errInvalidMsg = errors.New("invalid msg")
-var domainRegex = regexp.MustCompile("^[a-zA-Z0-9]+$")
+var domainRegex = regexp.MustCompile("^[a-zA-Z0-9_\\-\\.]+$")
 
 type CerealService struct {
 	workflowScheduler *libcereal.WorkflowScheduler
@@ -64,9 +64,11 @@ func unnamespace(domainAndName string) (domain string, name string) {
 }
 
 func validateDomain(domain string) error {
-
-	if !domainRegex.MatchString(domain) {
+	if domain == "" {
 		return status.Error(codes.InvalidArgument, "must specify domain")
+	}
+	if !domainRegex.MatchString(domain) {
+		return status.Errorf(codes.InvalidArgument, "you specified an invalid domain. must match %q", domainRegex.String())
 	}
 
 	return nil
