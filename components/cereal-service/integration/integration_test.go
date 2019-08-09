@@ -80,6 +80,7 @@ func TestGrpcPostgres(t *testing.T) {
 	svc := server.NewCerealService(ctx, pgBackend)
 	grpccereal.RegisterCerealServer(grpcServer, svc)
 	g := grpctest.NewServer(grpcServer)
+	defer g.Close()
 	cereal.MaxWakeupInterval = 2 * time.Second
 
 	defer g.Close()
@@ -88,7 +89,7 @@ func TestGrpcPostgres(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	grpcBackend := libgrpc.NewGrpcBackendFromConn(conn)
+	grpcBackend := libgrpc.NewGrpcBackendFromConn("test", conn)
 	s := cerealintegration.NewSuiteForBackend(ctx, t, grpcBackend)
 	suite.Run(t, s)
 	require.NoError(t, grpcBackend.Close())

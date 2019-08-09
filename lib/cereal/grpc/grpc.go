@@ -25,21 +25,25 @@ import (
 var _ backend.Driver = &GrpcBackend{}
 
 type GrpcBackend struct {
+	domain string
 	client grpccereal.CerealClient
 }
 
-func NewGrpcBackend(client grpccereal.CerealClient) *GrpcBackend {
+func NewGrpcBackend(domain string, client grpccereal.CerealClient) *GrpcBackend {
 	return &GrpcBackend{
+		domain: domain,
 		client: client,
 	}
 }
-func NewGrpcBackendFromConn(conn *grpc.ClientConn) *GrpcBackend {
+func NewGrpcBackendFromConn(domain string, conn *grpc.ClientConn) *GrpcBackend {
 	return &GrpcBackend{
+		domain: domain,
 		client: grpccereal.NewCerealClient(conn),
 	}
 }
 func (g *GrpcBackend) EnqueueWorkflow(ctx context.Context, workflow *backend.WorkflowInstance) error {
 	if _, err := g.client.EnqueueWorkflow(ctx, &grpccereal.EnqueueWorkflowRequest{
+		Domain:       g.domain,
 		InstanceName: workflow.InstanceName,
 		WorkflowName: workflow.WorkflowName,
 		Parameters:   workflow.Parameters,
@@ -48,9 +52,8 @@ func (g *GrpcBackend) EnqueueWorkflow(ctx context.Context, workflow *backend.Wor
 			if s.Code() == codes.FailedPrecondition {
 				return cereal.ErrWorkflowInstanceExists
 			}
-		} else {
-			return err
 		}
+		return err
 	}
 	return nil
 }
@@ -152,6 +155,7 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 	if err := s.Send(&grpccereal.DequeueWorkflowRequest{
 		Cmd: &grpccereal.DequeueWorkflowRequest_Dequeue_{
 			Dequeue: &grpccereal.DequeueWorkflowRequest_Dequeue{
+				Domain:        g.domain,
 				WorkflowNames: workflowNames,
 			},
 		},
@@ -216,6 +220,7 @@ func grpcWorkflowInstanceToBackend(grpcInstance *grpccereal.WorkflowInstance) ba
 
 func (g *GrpcBackend) CancelWorkflow(ctx context.Context, instanceName string, workflowName string) error {
 	_, err := g.client.CancelWorkflow(ctx, &grpccereal.CancelWorkflowRequest{
+		Domain:       g.domain,
 		InstanceName: instanceName,
 		WorkflowName: workflowName,
 	})
@@ -288,6 +293,7 @@ func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*backen
 	if err := s.Send(&grpccereal.DequeueTaskRequest{
 		Cmd: &grpccereal.DequeueTaskRequest_Dequeue_{
 			Dequeue: &grpccereal.DequeueTaskRequest_Dequeue{
+				Domain:   g.domain,
 				TaskName: taskName,
 			},
 		},
@@ -342,6 +348,7 @@ func (g *GrpcBackend) CreateWorkflowSchedule(ctx context.Context, instanceName s
 		return err
 	}
 	_, err = g.client.CreateWorkflowSchedule(ctx, &grpccereal.CreateWorkflowScheduleRequest{
+		Domain:       g.domain,
 		InstanceName: instanceName,
 		WorkflowName: workflowName,
 		Parameters:   parameters,
@@ -364,7 +371,9 @@ func (g *GrpcBackend) ListWorkflowSchedules(ctx context.Context) ([]*backend.Sch
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	s, err := g.client.ListWorkflowSchedules(ctx, &grpccereal.ListWorkflowSchedulesRequest{})
+	s, err := g.client.ListWorkflowSchedules(ctx, &grpccereal.ListWorkflowSchedulesRequest{
+		Domain: g.domain,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -390,6 +399,7 @@ func (g *GrpcBackend) ListWorkflowSchedules(ctx context.Context) ([]*backend.Sch
 
 func (g *GrpcBackend) GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string) (*backend.Schedule, error) {
 	resp, err := g.client.GetWorkflowScheduleByName(ctx, &grpccereal.GetWorkflowScheduleByNameRequest{
+		Domain:       g.domain,
 		InstanceName: instanceName,
 		WorkflowName: workflowName,
 	})
@@ -455,6 +465,7 @@ func grpcSchedToBackend(grpcSched *grpccereal.Schedule) *backend.Schedule {
 
 func (g *GrpcBackend) UpdateWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string, opts backend.WorkflowScheduleUpdateOpts) error {
 	req := grpccereal.UpdateWorkflowScheduleByNameRequest{
+		Domain:       g.domain,
 		InstanceName: instanceName,
 		WorkflowName: workflowName,
 	}
@@ -497,6 +508,7 @@ func (g *GrpcBackend) UpdateWorkflowScheduleByName(ctx context.Context, instance
 
 func (g *GrpcBackend) GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName string) (*backend.WorkflowInstance, error) {
 	resp, err := g.client.GetWorkflowInstanceByName(ctx, &grpccereal.GetWorkflowInstanceByNameRequest{
+		Domain:       g.domain,
 		InstanceName: instanceName,
 		WorkflowName: workflowName,
 	})
@@ -517,7 +529,9 @@ func (g *GrpcBackend) GetWorkflowInstanceByName(ctx context.Context, instanceNam
 }
 
 func (g *GrpcBackend) ListWorkflowInstances(ctx context.Context, opts backend.ListWorkflowOpts) ([]*backend.WorkflowInstance, error) {
-	req := grpccereal.ListWorkflowInstancesRequest{}
+	req := grpccereal.ListWorkflowInstancesRequest{
+		Domain: g.domain,
+	}
 	if opts.WorkflowName != nil {
 		req.WorkflowName = &wrappers.StringValue{
 			Value: *opts.WorkflowName,
