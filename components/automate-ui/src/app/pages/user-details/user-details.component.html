@@ -50,7 +50,7 @@
             </chef-button>
           </ng-container>
           <ng-container *ngIf="editMode">
-            <chef-button primary class="save-button" (click)="updateFullName()">
+            <chef-button primary class="save-button" [disabled]="!editForm.valid || !editForm.dirty" (click)="updateFullName()">
               <span>Save</span>
             </chef-button>
             <chef-button tertiary (click)="setEditMode(false)">Cancel</chef-button>
