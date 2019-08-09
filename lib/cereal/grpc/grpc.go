@@ -24,6 +24,8 @@ import (
 
 var _ backend.Driver = &GrpcBackend{}
 
+var errUnexpectedMessage = errors.New("Unexpected message")
+
 type GrpcBackend struct {
 	domain string
 	client grpccereal.CerealClient
@@ -246,6 +248,17 @@ func (c *taskCompleter) Context() context.Context {
 
 func (c *taskCompleter) Fail(errMsg string) error {
 	defer c.s.CloseSend() // nolint: errcheck
+	transformErr := func(err error) error {
+		if err != nil {
+			if st, ok := status.FromError(err); ok {
+				if st.Code() == codes.FailedPrecondition {
+					return cereal.ErrTaskLost
+				}
+			}
+			return err
+		}
+		return nil
+	}
 	err := c.s.Send(&grpccereal.DequeueTaskRequest{
 		Cmd: &grpccereal.DequeueTaskRequest_Fail_{
 			Fail: &grpccereal.DequeueTaskRequest_Fail{
@@ -254,18 +267,36 @@ func (c *taskCompleter) Fail(errMsg string) error {
 		},
 	})
 	if err != nil {
-		if st, ok := status.FromError(err); ok {
-			if st.Code() == codes.FailedPrecondition {
-				return cereal.ErrTaskLost
-			}
-		}
-		return err
+		return transformErr(err)
 	}
-	return nil
+
+	// The stream will be closed once the server has processed the
+	// request.
+	// We must wait to figure out if it was successful
+	_, err = c.s.Recv()
+	if err == nil {
+		return errUnexpectedMessage
+	} else {
+		if err == io.EOF {
+			return nil
+		}
+		return transformErr(err)
+	}
 }
 
 func (c *taskCompleter) Succeed(result []byte) error {
 	defer c.s.CloseSend() // nolint: errcheck
+	transformErr := func(err error) error {
+		if err != nil {
+			if st, ok := status.FromError(err); ok {
+				if st.Code() == codes.FailedPrecondition {
+					return cereal.ErrTaskLost
+				}
+			}
+			return err
+		}
+		return nil
+	}
 	err := c.s.Send(&grpccereal.DequeueTaskRequest{
 		Cmd: &grpccereal.DequeueTaskRequest_Succeed_{
 			Succeed: &grpccereal.DequeueTaskRequest_Succeed{
@@ -274,14 +305,21 @@ func (c *taskCompleter) Succeed(result []byte) error {
 		},
 	})
 	if err != nil {
-		if st, ok := status.FromError(err); ok {
-			if st.Code() == codes.FailedPrecondition {
-				return cereal.ErrTaskLost
-			}
-		}
-		return err
+		return transformErr(err)
 	}
-	return nil
+
+	// The stream will be closed once the server has processed the
+	// request.
+	// We must wait to figure out if it was successful
+	_, err = c.s.Recv()
+	if err == nil {
+		return errUnexpectedMessage
+	} else {
+		if err == io.EOF {
+			return nil
+		}
+		return transformErr(err)
+	}
 }
 
 func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*backend.Task, backend.TaskCompleter, error) {
