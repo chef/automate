@@ -90,14 +90,8 @@ import { AttributesComponent } from './page-components/attributes/attributes.com
 import { AutomateSettingsComponent } from './pages/automate-settings/automate-settings.component';
 import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
 import {
-  SearchBarComponent
-} from './page-components/search-bar/search-bar.component';
-import {
   ClientRunsSidebarComponent
 } from './page-components/client-runs-sidebar/client-runs-sidebar.component';
-import {
-  SearchBarFilterBarComponent
-} from './page-components/search-bar-filter-bar/search-bar-filter-bar.component';
 import {
   ClientRunsTableComponent
 } from './page-components/client-runs-table/client-runs-table.component';
@@ -175,6 +169,12 @@ import {
 } from './page-components/run-list-role-header/run-list-role-header.component';
 import { RunListTableComponent } from './page-components/run-list-table/run-list-table.component';
 import { RunSummaryComponent } from './page-components/run-summary/run-summary.component';
+import {
+  SearchBarComponent
+} from './page-components/search-bar/search-bar.component';
+import {
+  SearchBarFilterBarComponent
+} from './page-components/search-bar-filter-bar/search-bar-filter-bar.component';
 import {
   SelectListItemComponent
 } from './page-components/select-list-item/select-list-item.component';
