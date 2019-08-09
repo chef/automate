@@ -40,6 +40,7 @@ var (
 	Project            string = "projects"
 	ErrorMessage       string = "error_message"
 	ChefServer         string = NodeFieldToJson("SourceFqdn")
+	EntityTypeName     string = "entity_type"
 )
 
 // NodeFieldToJson returns the value associated with key in the tag

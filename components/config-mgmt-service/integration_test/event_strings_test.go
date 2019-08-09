@@ -688,7 +688,7 @@ func TestEventStringsFilterEventType(t *testing.T) {
 		{
 			description: "should return only the 4 policyfile items on the string",
 			request: request.EventStrings{
-				Filter:       []string{"entity_type:policyfile"},
+				Filter:       []string{"event-type:policyfile"},
 				HoursBetween: 1,
 				Start:        startDate.Format("2006-01-02"),
 				End:          endDate.Format("2006-01-02"),
@@ -701,7 +701,7 @@ func TestEventStringsFilterEventType(t *testing.T) {
 		{
 			description: "should return only the 4 node items on the string",
 			request: request.EventStrings{
-				Filter:       []string{"entity_type:node"},
+				Filter:       []string{"event-type:node"},
 				HoursBetween: 1,
 				Start:        startDate.Format("2006-01-02"),
 				End:          endDate.Format("2006-01-02"),
@@ -714,7 +714,7 @@ func TestEventStringsFilterEventType(t *testing.T) {
 		{
 			description: "should return only the 4 cookbook items on the string",
 			request: request.EventStrings{
-				Filter:       []string{"entity_type:cookbook"},
+				Filter:       []string{"event-type:cookbook"},
 				HoursBetween: 1,
 				Start:        startDate.Format("2006-01-02"),
 				End:          endDate.Format("2006-01-02"),
@@ -727,7 +727,7 @@ func TestEventStringsFilterEventType(t *testing.T) {
 		{
 			description: "should return only the 4 bag items on the string",
 			request: request.EventStrings{
-				Filter:       []string{"entity_type:bag"},
+				Filter:       []string{"event-type:bag"},
 				HoursBetween: 1,
 				Start:        startDate.Format("2006-01-02"),
 				End:          endDate.Format("2006-01-02"),
@@ -740,7 +740,7 @@ func TestEventStringsFilterEventType(t *testing.T) {
 		{
 			description: "should return only the 4 environment items on the string",
 			request: request.EventStrings{
-				Filter:       []string{"entity_type:environment"},
+				Filter:       []string{"event-type:environment"},
 				HoursBetween: 1,
 				Start:        startDate.Format("2006-01-02"),
 				End:          endDate.Format("2006-01-02"),
@@ -753,7 +753,7 @@ func TestEventStringsFilterEventType(t *testing.T) {
 		{
 			description: "should return only the 4 role items on the string",
 			request: request.EventStrings{
-				Filter:       []string{"entity_type:role"},
+				Filter:       []string{"event-type:role"},
 				HoursBetween: 1,
 				Start:        startDate.Format("2006-01-02"),
 				End:          endDate.Format("2006-01-02"),
@@ -766,7 +766,7 @@ func TestEventStringsFilterEventType(t *testing.T) {
 		{
 			description: "should return no items on the string",
 			request: request.EventStrings{
-				Filter:       []string{"entity_type:fake"},
+				Filter:       []string{"event-type:fake"},
 				HoursBetween: 1,
 				Start:        startDate.Format("2006-01-02"),
 				End:          endDate.Format("2006-01-02"),

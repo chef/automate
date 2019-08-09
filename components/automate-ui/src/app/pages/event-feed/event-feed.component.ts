@@ -76,7 +76,7 @@ export class EventFeedComponent implements OnInit, OnDestroy {
       allowWildcards: false
     },
     {
-      type: 'entity_type',
+      type: 'event-type',
       text: 'Event Type',
       allowWildcards: false,
       providedValues: [

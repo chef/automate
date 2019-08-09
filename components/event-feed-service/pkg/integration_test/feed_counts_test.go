@@ -67,13 +67,13 @@ func TestFeedCountsReturnOnlyEventsWithinDateRange(t *testing.T) {
 	cases := []testCase{
 		{
 			description:    "should count 10 events (default)",
-			request:        event_feed.FeedSummaryRequest{CountCategory: "entity_type"},
+			request:        event_feed.FeedSummaryRequest{CountCategory: "event-type"},
 			expectedCounts: expectedCounts,
 		},
 		{
 			description: "should count all 10 events",
 			request: event_feed.FeedSummaryRequest{
-				CountCategory: "entity_type",
+				CountCategory: "event-type",
 				Start:         startDate.AddDate(0, 0, -11).Unix() * 1000,
 			},
 			expectedCounts: expectedCounts,
@@ -81,7 +81,7 @@ func TestFeedCountsReturnOnlyEventsWithinDateRange(t *testing.T) {
 		{
 			description: "should count only first event",
 			request: event_feed.FeedSummaryRequest{
-				CountCategory: "entity_type",
+				CountCategory: "event-type",
 				End:           startDate.AddDate(0, 0, -1).Unix() * 1000,
 			},
 			expectedCounts: entriesToTypeCounts(entries[1:10]),
@@ -89,7 +89,7 @@ func TestFeedCountsReturnOnlyEventsWithinDateRange(t *testing.T) {
 		{
 			description: "should count only one event",
 			request: event_feed.FeedSummaryRequest{
-				CountCategory: "entity_type",
+				CountCategory: "event-type",
 				Start:         startDate.AddDate(0, 0, -5).Unix() * 1000,
 				End:           startDate.AddDate(0, 0, -5).Unix() * 1000,
 			},
@@ -109,7 +109,7 @@ func TestFeedCountsReturnCountOverAThousandActions(t *testing.T) {
 		timeDiff     = int(time.Minute) * -1
 		entries      = createEntries(startDate, totalEntries, timeDiff)
 		request      = event_feed.FeedSummaryRequest{
-			CountCategory: "entity_type",
+			CountCategory: "event-type",
 			Start:         startDate.AddDate(0, 0, -11).Unix() * 1000,
 		}
 		expectedCounts = entriesToTypeCounts(entries)
@@ -161,7 +161,7 @@ func TestFeedCountsCountOnlyFilteredUsers(t *testing.T) {
 		{
 			description: "should count only 'User' events",
 			request: event_feed.FeedSummaryRequest{
-				CountCategory: "entity_type",
+				CountCategory: "event-type",
 				Filters:       []string{"requestorName:User"},
 			},
 			expectedCounts: entriesToTypeCounts(filter(entries, func(a *util.FeedEntry) bool {
@@ -171,7 +171,7 @@ func TestFeedCountsCountOnlyFilteredUsers(t *testing.T) {
 		{
 			description: "should count only 'UI User' actions",
 			request: event_feed.FeedSummaryRequest{
-				CountCategory: "entity_type",
+				CountCategory: "event-type",
 				Filters:       []string{"requestorName:UI User"},
 			},
 			expectedCounts: entriesToTypeCounts(filter(entries, func(a *util.FeedEntry) bool {
@@ -181,7 +181,7 @@ func TestFeedCountsCountOnlyFilteredUsers(t *testing.T) {
 		{
 			description: "should count 'User' and 'UI User' actions",
 			request: event_feed.FeedSummaryRequest{
-				CountCategory: "entity_type",
+				CountCategory: "event-type",
 				Filters:       []string{"requestorName:UI User", "requestorName:User"},
 			},
 			expectedCounts: entriesToTypeCounts(filter(entries, func(a *util.FeedEntry) bool {

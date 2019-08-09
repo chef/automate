@@ -154,7 +154,7 @@ func TestEventStringsFilterEventType(t *testing.T) {
 		{
 			description: "should return only the 12 profiles items on the string",
 			request: event_feed.FeedTimelineRequest{
-				Filters:  []string{"entity_type:profile"},
+				Filters:  []string{"event-type:profile"},
 				Interval: 1,
 				Start:    startDate.Format("2006-01-02"),
 				End:      endDate.Format("2006-01-02"),
@@ -167,7 +167,7 @@ func TestEventStringsFilterEventType(t *testing.T) {
 		{
 			description: "should return only the 12 scanjob items on the string",
 			request: event_feed.FeedTimelineRequest{
-				Filters:  []string{"entity_type:scanjobs"},
+				Filters:  []string{"event-type:scanjobs"},
 				Interval: 1,
 				Start:    startDate.Format("2006-01-02"),
 				End:      endDate.Format("2006-01-02"),
@@ -180,7 +180,7 @@ func TestEventStringsFilterEventType(t *testing.T) {
 		{
 			description: "should return no items on the string",
 			request: event_feed.FeedTimelineRequest{
-				Filters:  []string{"entity_type:fake"},
+				Filters:  []string{"event-type:fake"},
 				Interval: 1,
 				Start:    startDate.Format("2006-01-02"),
 				End:      endDate.Format("2006-01-02"),
