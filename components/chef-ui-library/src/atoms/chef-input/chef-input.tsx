@@ -10,6 +10,8 @@ import { Component, Host, Listen, Prop, State, h } from '@stencil/core';
  * provided is `key-value`. The key/value can be provided via the value
  * attribute as a ':' delimited string, 'key:value'.
  *
+ * The underlying <input> element has autocomplete set to "off".
+ *
  * @example
  * <chef-input placeholder='Enter value...'></chef-input>
  *
@@ -95,7 +97,8 @@ export class ChefInput {
         placeholder={ this.placeholder }
         onChange={ this.handleChange.bind(this) }
         disabled={this.disabled}
-        aria-disabled={this.disabled}></input>
+        aria-disabled={this.disabled}
+        autocomplete="off"/>
     );
   }
 
