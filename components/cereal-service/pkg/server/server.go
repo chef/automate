@@ -3,7 +3,8 @@ package server
 import (
 	"context"
 	"errors"
-	"path"
+	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -21,6 +22,7 @@ import (
 )
 
 var errInvalidMsg = errors.New("invalid msg")
+var domainRegex = regexp.MustCompile("^[a-zA-Z0-9]+$")
 
 type CerealService struct {
 	workflowScheduler *libcereal.WorkflowScheduler
@@ -49,7 +51,7 @@ func generateRequestID() string {
 }
 
 func namespace(domain string, name string) string {
-	return path.Join(domain, name)
+	return fmt.Sprintf("%s/%s", domain, name)
 }
 
 func unnamespace(domainAndName string) (domain string, name string) {
@@ -62,9 +64,11 @@ func unnamespace(domainAndName string) (domain string, name string) {
 }
 
 func validateDomain(domain string) error {
-	if domain == "" {
+
+	if !domainRegex.MatchString(domain) {
 		return status.Error(codes.InvalidArgument, "must specify domain")
 	}
+
 	return nil
 }
 
