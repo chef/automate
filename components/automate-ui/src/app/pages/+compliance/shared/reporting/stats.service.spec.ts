@@ -47,7 +47,7 @@ describe('StatsService', () => {
         total: expectedTotal,
         total_failed: expectedTotalFailed,
         total_passed: expectedTotalPassed,
-        total_skipped: expectedTotalSkipped,
+        total_skipped: expectedTotalSkipped
       };
 
       service.getNodes(filters, listParams).subscribe(data => {
@@ -56,7 +56,7 @@ describe('StatsService', () => {
           items: expectedItems,
           total_failed: expectedTotalFailed,
           total_passed: expectedTotalPassed,
-          total_skipped: expectedTotalSkipped,
+          total_skipped: expectedTotalSkipped
         });
       });
 
