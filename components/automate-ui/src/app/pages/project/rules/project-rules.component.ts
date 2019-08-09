@@ -301,10 +301,6 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
       this.ruleForm.controls.id.setValue(
         IdMapper.transform(this.ruleForm.controls.name.value.trim()));
     }
-
-    if (this.editingRule) {
-      this.ruleForm.markAsDirty();
-    }
   }
 
   handleIDInput(event: KeyboardEvent): void {
@@ -312,14 +308,6 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
       return;
     }
     this.conflictError = false;
-  }
-
-  handleConditionChange(): void {
-    if (this.editingRule) {
-      // changes on the condition forms do not bubble up to the ruleForm
-      // so we explicitly set it to dirty here
-      this.ruleForm.markAsDirty();
-    }
   }
 
   private isNavigationKey(event: KeyboardEvent): boolean {
