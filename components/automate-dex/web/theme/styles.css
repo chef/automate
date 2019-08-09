@@ -20,11 +20,12 @@ html, body {
     font-weight: 400;
 }
 
-button {
+button, div.dex-btn {
     background-color: #3864f2;
     color: white;
     width: 279px;
     height: 53px;
+    margin: 0 auto;
 }
 
 label {
@@ -35,12 +36,17 @@ div.logo {
     margin-bottom: 30px;
 }
 
-.back {
+a.back {
+    text-decoration: none;
+    display: inline-block;
     margin: 15px 30px;
     font-size: 14px;
     font-weight: 400;
     color: #222435;
-    cursor: pointer;
+}
+
+a.back:hover {
+    text-decoration: underline;
 }
 
 .dex-error-box {
@@ -61,15 +67,23 @@ div.logo {
     font-size: 14px;
     font-weight: 400;
     float: left;
+    margin-top: 8px;
     padding: 0px 6px;
 }
 
 .dex-btn-icon--local {
+    margin-top: 8px;
     background-color: #3864f2;
     background-image: url(../static/img/email-icon.png)
 }
 
+.dex-btn-icon--saml {
+    margin-top: 8px;
+    background-color: #3864f2;
+}
+
 .dex-btn-icon--msad {
+    margin-top: 8px;
     background-color: #3864f2;
     background-image: url(../static/img/microsoft-icon.png)
 }
