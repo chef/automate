@@ -45,6 +45,21 @@ func TestValidateDomain(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
+	t.Run("also-valid", func(t *testing.T) {
+		err := validateDomain("also-valid")
+		assert.NoError(t, err)
+	})
+
+	t.Run("super_valid", func(t *testing.T) {
+		err := validateDomain("super_valid")
+		assert.NoError(t, err)
+	})
+
+	t.Run("super.duper.valid", func(t *testing.T) {
+		err := validateDomain("super.duper.valid")
+		assert.NoError(t, err)
+	})
+
 	t.Run("invalid if empty", func(t *testing.T) {
 		err := validateDomain("")
 		assert.Error(t, err)
