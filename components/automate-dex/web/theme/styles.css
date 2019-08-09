@@ -14,31 +14,32 @@
 
 html, body {
     height: 100%;
-    background-color: rgba(255,255,255,0);
     font-family: 'Muli';
     color: rgb(87,105,120);
-    font-size: 12px;
-    font-weight: 100;
-    background-color: rgb(243, 246, 248);
+    font-size: 14px;
+    font-weight: 400;
 }
 
 button {
-    border: 1px solid #2A9FD8;
-    background-color: rgb(56,131,179);
+    background-color: #3864f2;
     color: white;
     width: 279px;
     height: 53px;
 }
 
 label {
-    color: rgb(64,136,182);
+    color: #222435;
+}
+
+div.logo {
+    margin-bottom: 30px;
 }
 
 .back {
     margin: 15px 30px;
-    font-size: 12px;
-    font-weight: 100;
-    color: rgb(64,136,182);
+    font-size: 14px;
+    font-weight: 400;
+    color: #222435;
     cursor: pointer;
 }
 
@@ -46,41 +47,37 @@ label {
     background-color: rgb(248,140,35);
     width: 250px;
     border-radius: 3px;
-    margin: 10px auto;
+    margin: 12px auto;
 }
 
 .dex-error-text {
-    font-size: 10px;
+    font-size: 12px;
     top: -2px;
     position: relative;
 }
 
 .dex-btn-text {
     font-family: 'Muli';
-    font-size: 12px;
-    font-weight: 100;
+    font-size: 14px;
+    font-weight: 400;
     float: left;
     padding: 0px 6px;
 }
 
-.dex-btn-icon {
-    background-color: rgb(56,131,179);
-}
-
 .dex-btn-icon--local {
-    background-color: rgb(56,131,179);
+    background-color: #3864f2;
     background-image: url(../static/img/email-icon.png)
 }
 
 .dex-btn-icon--msad {
-    background-color: rgb(56,131,179);
+    background-color: #3864f2;
     background-image: url(../static/img/microsoft-icon.png)
 }
 
 .theme-btn--primary {
     width: 150px;
-    font-weight: 100;
-    font-size: 12px;
+    font-weight: 400;
+    font-size: 14px;
     margin-top: 10px;
 }
 

@@ -11,7 +11,9 @@
     <link href="{{ url "theme/styles.css" }}" rel="stylesheet">
   </head>
   <div class="theme-panel">
-    <img class="theme-navbar__logo" src="{{url "static/img/automate-blue-d9789f4b.svg" }}">
+    <div class="logo">
+      <img class="theme-navbar__logo" src="{{url "static/img/automate-blue-d9789f4b.svg" }}">
+    </div>
     <div>
       {{ range $c := .Connectors }}
       <div class="theme-form-row">
