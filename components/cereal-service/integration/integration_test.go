@@ -80,6 +80,7 @@ func TestGrpcPostgres(t *testing.T) {
 	svc := server.NewCerealService(ctx, pgBackend)
 	grpccereal.RegisterCerealServer(grpcServer, svc)
 	g := grpctest.NewServer(grpcServer)
+	defer g.Close()
 	cereal.MaxWakeupInterval = 2 * time.Second
 
 	defer g.Close()

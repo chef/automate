@@ -52,9 +52,8 @@ func (g *GrpcBackend) EnqueueWorkflow(ctx context.Context, workflow *backend.Wor
 			if s.Code() == codes.FailedPrecondition {
 				return cereal.ErrWorkflowInstanceExists
 			}
-		} else {
-			return err
 		}
+		return err
 	}
 	return nil
 }
@@ -530,7 +529,9 @@ func (g *GrpcBackend) GetWorkflowInstanceByName(ctx context.Context, instanceNam
 }
 
 func (g *GrpcBackend) ListWorkflowInstances(ctx context.Context, opts backend.ListWorkflowOpts) ([]*backend.WorkflowInstance, error) {
-	req := grpccereal.ListWorkflowInstancesRequest{}
+	req := grpccereal.ListWorkflowInstancesRequest{
+		Domain: g.domain,
+	}
 	if opts.WorkflowName != nil {
 		req.WorkflowName = &wrappers.StringValue{
 			Value: *opts.WorkflowName,
