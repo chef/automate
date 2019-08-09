@@ -43,7 +43,7 @@
           Name changes are not allowed for the default project.
         </span>
         <div id="button-bar" *ngIf="!isChefManaged">
-          <chef-button [disabled]="isLoading || !projectForm.valid || projectForm.controls['name'].value === project?.name"
+          <chef-button [disabled]="isLoading || !projectForm.valid || !projectForm.dirty"
             primary inline (click)="saveProject()">
             <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
             <span *ngIf="saving">Saving...</span>
