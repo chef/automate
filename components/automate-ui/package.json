@@ -18,8 +18,7 @@
     "test": "ng test --watch=false --code-coverage --source-map=false --configuration=no_auth",
     "test:watch": "ng test --watch=true --browsers='Chrome' --source-map=true --configuration=no_auth",
     "e2e": "ng e2e",
-    "lint": "npm run lint:ts && npm run lint:html && npm run lint:sass",
-    "lint:ts": "/bin/bash -c 'exec 5>&1; t1=$(ng lint | grep -v \": analyzing \" | grep -v \"select is deprecated\" | tee /dev/fd/5; exit ${PIPESTATUS[0]}); if [ $? -ne 0 ]; then exit 1; else echo $t1 | grep \"is deprecated\" >/dev/null; test $? -ne 0; fi'",
+    "lint": "/bin/bash -c 'exec 5>&1; t1=$(ng lint | grep -v \": analyzing \" | grep -v \"select is deprecated\" | tee /dev/fd/5; exit ${PIPESTATUS[0]}); if [ $? -ne 0 ]; then exit 1; else echo $t1 | grep \"is deprecated\" >/dev/null; test $? -ne 0; fi'",
     "lint:html": "node_modules/htmlhint/bin/htmlhint --config .htmlhintrc src/app/**/*.html",
     "lint:sass": "node node_modules/sass-lint/bin/sass-lint.js -v -q"
   },
