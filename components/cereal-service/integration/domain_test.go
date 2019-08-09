@@ -247,6 +247,58 @@ func TestDomains(t *testing.T) {
 		err = workflowCompleter1.Done(nil)
 		require.NoError(t, err)
 	})
+
+	t.Run("Schedules", func(t *testing.T) {
+		workflowName := "mytestschedulesworkflow"
+		instanceName := "mytestinstance"
+		grpcBackendDomain1 := libgrpc.NewGrpcBackendFromConn("domain1", conn)
+		grpcBackendDomain2 := libgrpc.NewGrpcBackendFromConn("domain2", conn)
+		domain1Params := []byte("domain1workflow")
+		domain2Params := []byte("domain2workflow")
+
+		err := grpcBackendDomain1.CreateWorkflowSchedule(ctx, instanceName,
+			workflowName, domain1Params, true, "FREQ=HOURLY;INTERVAL=1", time.Now())
+		require.NoError(t, err)
+
+		err = grpcBackendDomain2.CreateWorkflowSchedule(ctx, instanceName,
+			workflowName, domain2Params, true, "FREQ=HOURLY;INTERVAL=1", time.Now())
+		require.NoError(t, err)
+
+		schedulesDomain1, err := grpcBackendDomain1.ListWorkflowSchedules(ctx)
+		require.NoError(t, err)
+		require.Len(t, schedulesDomain1, 1)
+		validateScheduleMatches(t, schedulesDomain1[0], workflowName, instanceName, domain1Params)
+
+		schedulesDomain2, err := grpcBackendDomain2.ListWorkflowSchedules(ctx)
+		require.NoError(t, err)
+		require.Len(t, schedulesDomain2, 1)
+		validateScheduleMatches(t, schedulesDomain2[0], workflowName, instanceName, domain2Params)
+
+		// Test updating the schedule
+		domain1Params = []byte("domain1workflow-updated")
+		err = grpcBackendDomain1.UpdateWorkflowScheduleByName(ctx, instanceName, workflowName, backend.WorkflowScheduleUpdateOpts{
+			UpdateParameters: true,
+			Parameters:       domain1Params,
+		})
+		require.NoError(t, err)
+
+		domain2Params = []byte("domain2workflow-updated")
+		err = grpcBackendDomain2.UpdateWorkflowScheduleByName(ctx, instanceName, workflowName, backend.WorkflowScheduleUpdateOpts{
+			UpdateParameters: true,
+			Parameters:       domain2Params,
+		})
+		require.NoError(t, err)
+
+		schedulesDomain1, err = grpcBackendDomain1.ListWorkflowSchedules(ctx)
+		require.NoError(t, err)
+		require.Len(t, schedulesDomain1, 1)
+		validateScheduleMatches(t, schedulesDomain1[0], workflowName, instanceName, domain1Params)
+
+		schedulesDomain2, err = grpcBackendDomain2.ListWorkflowSchedules(ctx)
+		require.NoError(t, err)
+		require.Len(t, schedulesDomain2, 1)
+		validateScheduleMatches(t, schedulesDomain2[0], workflowName, instanceName, domain2Params)
+	})
 }
 
 func validateInstanceMatches(t *testing.T, instance *backend.WorkflowInstance, workflowName string, instanceName string, params []byte) {
@@ -260,4 +312,11 @@ func validateTaskMatches(t *testing.T, task *backend.Task, taskName string, task
 	t.Helper()
 	require.Equal(t, taskName, task.Name)
 	require.Equal(t, taskParams, task.Parameters)
+}
+
+func validateScheduleMatches(t *testing.T, schedule *backend.Schedule, workflowName string, instanceName string, params []byte) {
+	t.Helper()
+	require.Equal(t, workflowName, schedule.WorkflowName)
+	require.Equal(t, instanceName, schedule.InstanceName)
+	require.Equal(t, params, schedule.Parameters)
 }
