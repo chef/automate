@@ -506,6 +506,7 @@ func (s *CerealService) ListWorkflowSchedules(req *cereal.ListWorkflowSchedulesR
 	logctx := logrus.WithFields(logrus.Fields{
 		"id":     generateRequestID(),
 		"method": "ListWorkflowSchedules",
+		"domain": req.Domain,
 	})
 
 	if err := validateDomain(req.Domain); err != nil {
@@ -557,7 +558,7 @@ func (s *CerealService) GetWorkflowScheduleByName(ctx context.Context, req *cere
 		return nil, err
 	}
 	logctx.Info("getting workflow schedule")
-	schedule, err := s.backend.GetWorkflowScheduleByName(ctx, req.InstanceName, req.WorkflowName)
+	schedule, err := s.backend.GetWorkflowScheduleByName(ctx, req.InstanceName, namespace(req.Domain, req.WorkflowName))
 	if err != nil {
 		logctx.WithError(err).Error("failed to get workflow schedule")
 		if err == libcereal.ErrWorkflowScheduleNotFound {
