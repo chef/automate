@@ -220,12 +220,20 @@ Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your c
 
 Chef Automate can integrate with LDAP or SAML to authenticate your users against Chef Automate, and thus use their existing group memberships to determine their Chef Automate permissions.
 
-Chef Automate supports using both local users and externally managed users from no more than one external identity provider (IdP). You do not need to configure an external IdP if you simply want to create users and teams local to Chef Automate.
+Chef Automate supports using both local users and externally managed users from an external identity provider (IdP).
+Both _one_ LDAP service (or MSAD for simplified configuration of Active Directory setups) and _one_ SAML IdP can be used.
+You do not need to configure an external IdP if you simply want to create users and teams local to Chef Automate.
 See the [Users]({{< relref "users.md" >}}) documentation for additional information.
 
-Chef Automate uses `dex` to support LDAP and SAML integrations. To configure authentication for your Chef Automate installation, create a TOML file that contains the partial configuration for either LDAP or SAML. Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
+Chef Automate uses `dex` to support LDAP and SAML integrations. To configure authentication for your Chef Automate
+installation, create a TOML file that contains the partial configuration for either LDAP or SAML. Then run
+`chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
-Important NOTE: you may only integrate one IdP at a time.
+{{% warning %}}
+You may only integrate one IdP using SAML, and one IdP using LDAP at a time.
+It's not supported to integrate with _two_ SAML IdPs, or _two_ LDAP services.
+{{% /warning %}}
+
 If you need to change your configured IdP, you will need to replace
 your existing configuration by following these steps:
 
