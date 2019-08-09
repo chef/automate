@@ -20,19 +20,19 @@
     <chef-option class="filter critical" value='failed'>
       <span class="filter-label">Failed Nodes</span>
       <span class="filter-total">
-        <chef-icon>report_problem</chef-icon> {{ reportData.nodesList.statusCount.failed | number}}
+        <chef-icon>report_problem</chef-icon> {{ reportData.nodesList.total_failed | number}}
       </span>
     </chef-option>
     <chef-option class="filter passed" value='passed'>
       <span class="filter-label">Passed Nodes</span>
       <span class="filter-total">
-        <chef-icon>check_circle</chef-icon> {{ reportData.nodesList.statusCount.passed | number}}
+        <chef-icon>check_circle</chef-icon> {{ reportData.nodesList.total_passed | number}}
       </span>
     </chef-option>
     <chef-option class="filter skipped" value='skipped'>
       <span class="filter-label">Skipped Nodes</span>
       <span class="filter-total">
-        <chef-icon>help</chef-icon> {{ reportData.nodesList.statusCount.skipped | number}}
+        <chef-icon>help</chef-icon> {{ reportData.nodesList.total_skipped | number}}
       </span>
     </chef-option>
   </chef-phat-radio>

@@ -38,11 +38,26 @@ describe('StatsService', () => {
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/nodes/search`;
       const expectedTotal = 20;
+      const expectedTotalFailed = 1;
+      const expectedTotalPassed = 18;
+      const expectedTotalSkipped = 2;
       const expectedItems = [{}, {}];
-      const mockResp = { nodes: expectedItems, total: expectedTotal };
+      const mockResp = {
+        nodes: expectedItems,
+        total: expectedTotal,
+        total_failed: expectedTotalFailed,
+        total_passed: expectedTotalPassed,
+        total_skipped: expectedTotalSkipped,
+      };
 
       service.getNodes(filters, listParams).subscribe(data => {
-        expect(data).toEqual({total: expectedTotal, items: expectedItems});
+        expect(data).toEqual({
+          total: expectedTotal,
+          items: expectedItems,
+          total_failed: expectedTotalFailed,
+          total_passed: expectedTotalPassed,
+          total_skipped: expectedTotalSkipped,
+        });
       });
 
       const req = httpTestingController.expectOne(expectedUrl);

@@ -112,7 +112,8 @@ export class StatsService {
     }
 
     return this.httpClient.post<any>(url, body).pipe(
-      map(({ nodes, total }) => ({total, items: nodes})));
+      map(({ nodes, total, total_failed, total_passed, total_skipped }) =>
+        ({total, total_failed, total_passed, total_skipped, items: nodes})));
   }
 
   getProfiles(filters: any[], listParams: any): Observable<any> {
