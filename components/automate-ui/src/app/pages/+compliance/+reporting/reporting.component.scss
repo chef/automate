@@ -132,6 +132,10 @@ chef-subheading {
 
   .unknown .summary-toggle {
     background: $chef-grey;
+
+    p, chef-icon {
+      color: $chef-primary-dark;
+    }
   }
 
   .summary-body {
