@@ -536,7 +536,9 @@ func (m *Manager) Stop() error {
 		m.cancel()
 	}
 
+	logrus.Info("waiting for goroutines to stop")
 	m.wg.Wait()
+	logrus.Info("goroutines stopped")
 
 	var err error
 	if m.backend != nil {

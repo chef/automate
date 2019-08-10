@@ -221,14 +221,16 @@ func TestDomains(t *testing.T) {
 		task1, taskCompleter1, err := grpcBackendDomain1.DequeueTask(ctx, taskName)
 		require.NoError(t, err)
 		validateTaskMatches(t, task1, taskName, domain1TaskParams)
-		taskCompleter1.Succeed(nil)
+		err = taskCompleter1.Succeed(nil)
+		require.NoError(t, err)
 		_, _, err = grpcBackendDomain1.DequeueTask(ctx, taskName)
 		require.Equal(t, cereal.ErrNoTasks, err)
 
 		task2, taskCompleter2, err := grpcBackendDomain2.DequeueTask(ctx, taskName)
 		require.NoError(t, err)
 		validateTaskMatches(t, task2, taskName, domain2TaskParams)
-		taskCompleter2.Succeed(nil)
+		err = taskCompleter2.Succeed(nil)
+		require.NoError(t, err)
 		_, _, err = grpcBackendDomain2.DequeueTask(ctx, taskName)
 		require.Equal(t, cereal.ErrNoTasks, err)
 

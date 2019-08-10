@@ -464,6 +464,7 @@ func (s *CerealService) DequeueTask(req cereal.Cereal_DequeueTaskServer) error {
 			return err
 		}
 	} else {
+		logctx.Error("invalid message")
 		return errInvalidMsg
 	}
 
