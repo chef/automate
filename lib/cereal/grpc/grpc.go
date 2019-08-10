@@ -24,8 +24,6 @@ import (
 
 var _ backend.Driver = &GrpcBackend{}
 
-var errUnexpectedMessage = errors.New("Unexpected message")
-
 type GrpcBackend struct {
 	domain string
 	client grpccereal.CerealClient
@@ -238,8 +236,9 @@ func (g *GrpcBackend) CancelWorkflow(ctx context.Context, instanceName string, w
 }
 
 type taskCompleter struct {
-	s   grpccereal.Cereal_DequeueTaskClient
-	ctx context.Context
+	s        grpccereal.Cereal_DequeueTaskClient
+	ctx      context.Context
+	doneChan chan error
 }
 
 func (c *taskCompleter) Context() context.Context {
@@ -273,13 +272,10 @@ func (c *taskCompleter) Fail(errMsg string) error {
 	// The stream will be closed once the server has processed the
 	// request.
 	// We must wait to figure out if it was successful
-	_, err = c.s.Recv()
-	if err == nil {
-		return errUnexpectedMessage
+	err = <-c.doneChan
+	if err == nil || err == io.EOF {
+		return nil
 	} else {
-		if err == io.EOF {
-			return nil
-		}
 		return transformErr(err)
 	}
 }
@@ -311,13 +307,10 @@ func (c *taskCompleter) Succeed(result []byte) error {
 	// The stream will be closed once the server has processed the
 	// request.
 	// We must wait to figure out if it was successful
-	_, err = c.s.Recv()
-	if err == nil {
-		return errUnexpectedMessage
+	err = <-c.doneChan
+	if err == nil || err == io.EOF {
+		return nil
 	} else {
-		if err == io.EOF {
-			return nil
-		}
 		return transformErr(err)
 	}
 }
@@ -355,17 +348,20 @@ func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*backen
 	}
 
 	taskCtx, cancel := context.WithCancel(ctx)
+	doneChan := make(chan error, 1)
 	go func() {
 		for {
 			msg, err := s.Recv()
 			if err != nil {
 				logrus.WithError(err).Debug("received error: canceling task context")
 				cancel()
+				doneChan <- err
 				return
 			}
 			if c := msg.GetCancel(); c != nil {
 				logrus.Debug("received cancel: canceling task context")
 				cancel()
+				doneChan <- errors.New("canceled")
 				return
 			}
 		}
@@ -375,8 +371,9 @@ func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*backen
 			Name:       deq.GetTask().GetName(),
 			Parameters: deq.GetTask().GetParameters(),
 		}, &taskCompleter{
-			s:   s,
-			ctx: taskCtx,
+			s:        s,
+			ctx:      taskCtx,
+			doneChan: doneChan,
 		}, nil
 }
 
