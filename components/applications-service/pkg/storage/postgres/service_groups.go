@@ -159,10 +159,11 @@ func (db *Postgres) GetServiceGroups(
 	page = page - 1
 	offset := pageSize * page
 	var (
-		sgHealth        []*serviceGroupHealth
-		selectMainQuery string = selectServiceGroupHealth
-		sortOrder       string
-		err             error
+		sgHealth            []*serviceGroupHealth
+		selectMainQuery     string = selectServiceGroupHealth
+		sortOrder           string
+		err                 error
+		selectAllPartsQuery string
 	)
 
 	if sortAsc {
@@ -171,86 +172,9 @@ func (db *Postgres) GetServiceGroups(
 		sortOrder = "DESC"
 	}
 
-	first := true
-	statusFilter := false
-	needSupervisorTable := false
-	whereQuery := ``
-	statusQuery := ``
-	selectAllPartsQuery := ``
-	for filter, values := range filters {
-		if len(values) == 0 {
-			continue
-		}
-		switch filter {
-		case "status", "STATUS":
-			// @afiune What if the user specify more than one Status Filter?
-			// status=["ok", "critical"]
-			statusFilter = true
-			statusQuery, err = queryFromStatusFilter(values[0])
-			if err != nil {
-				return nil, err
-			}
-
-		case "environment", "ENVIRONMENT":
-			selectQuery, err := queryFromFieldFilter("d.environment", values, first)
-			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return nil, err
-			}
-		case "application", "APPLICATION":
-			selectQuery, err := queryFromFieldFilter("d.app_name", values, first)
-			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return nil, err
-			}
-		case "group", "GROUP":
-			selectQuery, err := queryFromFieldFilter("sg.name_suffix", values, first)
-			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return nil, err
-			}
-		case "origin", "ORIGIN":
-			selectQuery, err := queryFromFieldFilter("s.origin", values, first)
-			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return nil, err
-			}
-		case "service", "SERVICE":
-			selectQuery, err := queryFromFieldFilter("s.name", values, first)
-			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return nil, err
-			}
-		case "site", "SITE":
-			// If we are filtering by site which is on the sueprvisor table we have to join this table onto our inner query
-			needSupervisorTable = true
-			selectQuery, err := queryFromFieldFilter("sup.site", values, first)
-			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return nil, err
-			}
-		case "channel", "CHANNEL":
-			selectQuery, err := queryFromFieldFilter("s.channel", values, first)
-			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return nil, err
-			}
-		case "version", "VERSION":
-			selectQuery, err := queryFromFieldFilter("s.version", values, first)
-			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return nil, err
-			}
-		case "buildstamp", "BUILDSTAMP":
-			selectQuery, err := queryFromFieldFilter("s.release", values, first)
-			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return nil, err
-			}
-		default:
-			return nil, errors.Errorf("invalid filter. (%s:%s)", filter, values, first)
-		}
-		first = false
+	whereQuery, statusQuery, statusFilter, needSupervisorTable, err := formatFilters(filters)
+	if err != nil {
+		return nil, err
 	}
 
 	if statusFilter && needSupervisorTable {
@@ -296,6 +220,96 @@ func (db *Postgres) GetServiceGroups(
 	}
 
 	return sgDisplay, nil
+}
+
+func formatFilters(filters map[string][]string) (string, string, bool, bool, error) {
+	var (
+		err         error
+		statusQuery string
+		whereQuery  string
+	)
+	first := true
+	statusFilter := false
+	needSupervisorTable := false
+	for filter, values := range filters {
+		if len(values) == 0 {
+			continue
+		}
+		switch filter {
+		case "status", "STATUS":
+			// @afiune What if the user specify more than one Status Filter?
+			// status=["ok", "critical"]
+			statusFilter = true
+			statusQuery, err = queryFromStatusFilter(values[0])
+			if err != nil {
+				return "", "", false, false, err
+			}
+
+		case "environment", "ENVIRONMENT":
+			selectQuery, err := queryFromFieldFilter("d.environment", values, first)
+			whereQuery = whereQuery + selectQuery
+			if err != nil {
+				return "", "", false, false, err
+			}
+		case "application", "APPLICATION":
+			selectQuery, err := queryFromFieldFilter("d.app_name", values, first)
+			whereQuery = whereQuery + selectQuery
+			if err != nil {
+				return "", "", false, false, err
+			}
+		case "group", "GROUP":
+			selectQuery, err := queryFromFieldFilter("sg.name_suffix", values, first)
+			whereQuery = whereQuery + selectQuery
+			if err != nil {
+				return "", "", false, false, err
+			}
+		case "origin", "ORIGIN":
+			selectQuery, err := queryFromFieldFilter("s.origin", values, first)
+			whereQuery = whereQuery + selectQuery
+			if err != nil {
+				return "", "", false, false, err
+			}
+		case "service", "SERVICE":
+			selectQuery, err := queryFromFieldFilter("s.name", values, first)
+			whereQuery = whereQuery + selectQuery
+			if err != nil {
+				return "", "", false, false, err
+			}
+		case "site", "SITE":
+			// If we are filtering by site which is on the sueprvisor table we have to join this table onto our inner query
+			needSupervisorTable = true
+			selectQuery, err := queryFromFieldFilter("sup.site", values, first)
+			whereQuery = whereQuery + selectQuery
+			if err != nil {
+				return "", "", false, false, err
+			}
+		case "channel", "CHANNEL":
+			selectQuery, err := queryFromFieldFilter("s.channel", values, first)
+			whereQuery = whereQuery + selectQuery
+			if err != nil {
+				return "", "", false, false, err
+			}
+		case "version", "VERSION":
+			selectQuery, err := queryFromFieldFilter("s.version", values, first)
+			whereQuery = whereQuery + selectQuery
+			if err != nil {
+				return "", "", false, false, err
+			}
+		case "buildstamp", "BUILDSTAMP":
+			selectQuery, err := queryFromFieldFilter("s.release", values, first)
+			whereQuery = whereQuery + selectQuery
+			if err != nil {
+				return "", "", false, false, err
+			}
+		default:
+			return "", "", false, false, errors.Errorf("invalid filter. (%s:%s)", filter, values)
+		}
+		if first {
+			first = false
+		}
+
+	}
+	return whereQuery, statusQuery, statusFilter, needSupervisorTable, nil
 }
 
 func (db *Postgres) GetServiceGroupsCount() (int32, error) {
@@ -442,7 +456,6 @@ func queryFromFieldFilter(field string, arr []string, first bool) (string, error
 	var condition string
 	if first {
 		condition = ` WHERE `
-		first = false
 	} else { // not first, add on an AND before IN part
 		condition = ` AND `
 	}
