@@ -69,12 +69,6 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  public handleChange(): void {
-    if (this.nameCtrl.value === this.token.name) {
-      this.nameCtrl.markAsPristine();
-    }
-  }
-
   public saveChange(): void {
     this.firstLoad = false;
     this.saveInProgress = true;

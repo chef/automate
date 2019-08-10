@@ -32,7 +32,7 @@
       <form [formGroup]="updateForm">
         <chef-form-field>
           <label>Name <span aria-hidden="true">*</span></label>
-          <input chefInput formControlName="name" type="text" (keyup)="handleChange()" autocomplete="off"/>
+          <input chefInput formControlName="name" type="text" autocomplete="off"/>
           <chef-error *ngIf="(nameCtrl.hasError('required') || nameCtrl.hasError('pattern')) && nameCtrl.dirty">
             Name is required.
           </chef-error>
