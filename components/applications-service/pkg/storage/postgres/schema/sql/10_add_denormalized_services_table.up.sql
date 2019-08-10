@@ -1,5 +1,3 @@
--- TODO: remove this, just for testing.
-DROP TABLE service_full;
 CREATE TABLE IF NOT EXISTS service_full (
   id                        SERIAL    PRIMARY KEY,
 
@@ -39,13 +37,17 @@ CREATE TABLE IF NOT EXISTS service_full (
   last_event_occurred_at    TIMESTAMP NOT NULL DEFAULT NOW(),
 
   -- informational, not used in the application
-  -- TODO: triggers
   created_at                TIMESTAMP NOT NULL DEFAULT NOW(),
   updated_at                TIMESTAMP NOT NULL DEFAULT NOW(),
 
-  -- TODO: is this correct?
+  -- A supervisor can have only one of a service with a given name;
+  -- origin, release, etc. can change.
   UNIQUE (name, supervisor_id)
 );
+
+-- TODO: create indexes for search-able things
+-- we might want to use this technique to do case-insensitive LIKE queries with an index
+-- https://www.postgresql.org/docs/9.6/indexes-expressional.html
 
 
 CREATE TRIGGER update_service_full_updated_at BEFORE UPDATE
@@ -107,14 +109,16 @@ save_previous_health_on_state_change();
 
 
 -- INSERT INTO service_full (
---   origin, name, version, release, package_ident, status, health,
---   channel, update_strategy, supervisor_id, fqdn, site,
+--   name, supervisor_id,
+--   origin, version, release, package_ident, status, health,
+--   channel, update_strategy, fqdn, site,
 --   service_group_name, service_group_name_suffix,
 --   application, environment
 -- )
 -- VALUES (
---   'core', 'pkg', '0.1.0', '2019blahblah', 'core/pkg/0.1.0/2019blahblah', '', 'CRITICAL',
---   'stable', 'AT-ONCE', '1111', 'example.com', 'default',
+--   'pkg', '1111',
+--   'core', '0.1.0', '2019blahblah', 'core/pkg/0.1.0/2019blahblah', '', 'CRITICAL',
+--   'stable', 'AT-ONCE', 'example.com', 'default',
 --   'pkg.default', 'default',
 --   'myapp', 'myenv'
 -- )
