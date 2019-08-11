@@ -64,7 +64,7 @@ export class UploadService {
     });
   }
 
-  private getProgress(file: string, percent: number, status?: number, response?: string): any {
+  getProgress(file: string, percent: number, status?: number, response?: string): any {
     return {
       'name': file,
       'percent': percent,
@@ -73,7 +73,7 @@ export class UploadService {
     };
   }
 
-  private estimateContentType(mime, name): string {
+  estimateContentType(mime, name): string {
     switch (mime) {
       case 'application/gzip':
       case 'application/x-gzip':

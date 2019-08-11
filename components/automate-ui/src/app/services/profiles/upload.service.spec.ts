@@ -8,17 +8,20 @@ class MockChefSessionService {
 }
 
 describe('UploadService', () => {
+  let service: UploadService;
+  let mockChefSessionService;
+
   beforeEach(() => {
-     this.mockChefSessionService = new MockChefSessionService();
-     this.service = new UploadService(this.mockChefSessionService);
+     mockChefSessionService = new MockChefSessionService();
+     service = new UploadService(mockChefSessionService);
   });
   describe('getProgress', () => {
     it('returns the correct object', () => {
-      expect(this.service.getProgress('file', 'percent', 'status', 'response'))
+      expect(service.getProgress('file', 25, 1, 'response'))
         .toEqual({
           'name': 'file',
-          'percent': 'percent',
-          'status': 'status',
+          'percent': 25,
+          'status': 1,
           'response': 'response'
         });
     });
@@ -26,8 +29,8 @@ describe('UploadService', () => {
 
   describe('estimateContentType', () => {
     it('returns the expected type', () => {
-      expect(this.service.estimateContentType(null, 'file.tgz')).toEqual('application/gzip');
-      expect(this.service.estimateContentType(null, 'file.zip')).toEqual('application/zip');
+      expect(service.estimateContentType(null, 'file.tgz')).toEqual('application/gzip');
+      expect(service.estimateContentType(null, 'file.zip')).toEqual('application/zip');
     });
   });
 });
