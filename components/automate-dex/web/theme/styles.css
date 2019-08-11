@@ -43,6 +43,12 @@ a.back:hover {
     text-decoration: underline;
 }
 
+h1 {
+    font-size: 18px;
+    font-weight: 400;
+    margin: 0 auto 20px;
+}
+
 .dex-error-box {
     background-color: rgb(248,140,35);
     width: 250px;
