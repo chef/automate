@@ -98,6 +98,8 @@
     border-bottom: 1px solid lightGrey;
 
     &.list-item {
+      overflow-wrap: break-word;
+      
       &.selected {
         color: $white;
         cursor: pointer;
