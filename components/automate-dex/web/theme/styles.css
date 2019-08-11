@@ -67,8 +67,7 @@ a.back:hover {
 
 .dex-btn-icon--local,
 .dex-btn-icon--saml,
-.dex-btn-icon--ldap,
-.dex-btn-icon--msad {
+.dex-btn-icon--ldap {
     margin-top: 8px;
     background-color: #3864f2;
 }
