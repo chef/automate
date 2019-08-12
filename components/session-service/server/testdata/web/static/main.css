@@ -74,12 +74,12 @@ body {
 }
 
 .dex-btn-icon--ldap, .dex-btn-icon--tectonic-ldap {
-  background-color: #84B6EF;
+  background-color: #84B6EF; 
   background-image: url(../static/img/ldap-icon.svg);
 }
 
 .dex-btn-icon--saml {
-  background-color: #84B6EF;
+  background-color: #84B6EF; 
   background-image: url(../static/img/saml-icon.svg);
 }
 

@@ -56,11 +56,9 @@ func (c *ConfigRequest) Validate() error {
 
 	if conn := c.V1.Sys.Connectors; conn != nil {
 		// we can only have one connector: ldap, saml, or msad_ldap
-		if (conn.Saml != nil && conn.Ldap != nil) ||
-			(conn.MsadLdap != nil && conn.Ldap != nil) ||
-			(conn.MsadLdap != nil && conn.Saml != nil) {
+		if conn.MsadLdap != nil && conn.Ldap != nil {
 			cfgErr.AddInvalidValue("dex.v1.sys.connectors",
-				"auth config can only have one of the following connectors: [ldap, saml, msad_ldap]")
+				"auth config can only have one of the following connectors: [ldap, msad_ldap]")
 		}
 
 		if ldap := conn.Ldap; ldap != nil {

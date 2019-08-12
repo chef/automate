@@ -1,6 +1,7 @@
 package dex_test
 
 import (
+	"fmt"
 	"io/ioutil"
 	"testing"
 
@@ -430,20 +431,35 @@ func TestValidate(t *testing.T) {
 		}
 	})
 
-	t.Run("Validate fails when there is more than one connector", func(t *testing.T) {
+	t.Run("Validate succeeds for (LDAP XOR MSAD) AND SAML", func(t *testing.T) {
 		cfg := dex.DefaultConfigRequest()
 		combinations := []dex.ConfigRequest_V1_Connectors{
 			{
-				Ldap: &dex.ConfigRequest_V1_Ldap{},
-				Saml: &dex.ConfigRequest_V1_Saml{},
+				Ldap: completeLDAP(),
+				Saml: completeSAML(),
 			},
+
+			{
+				MsadLdap: completeMSADWithoutOverrides(),
+				Saml:     completeSAML(),
+			},
+		}
+		for i, connector := range combinations {
+			t.Run(fmt.Sprintf("combination %d", i), func(t *testing.T) {
+				cfg.V1.Sys.Connectors = &connector
+
+				err := cfg.Validate()
+				require.NoError(t, err)
+			})
+		}
+	})
+
+	t.Run("Validate fails when there is both the LDAP and MSAD connector", func(t *testing.T) {
+		cfg := dex.DefaultConfigRequest()
+		combinations := []dex.ConfigRequest_V1_Connectors{
 			{
 				Ldap:     &dex.ConfigRequest_V1_Ldap{},
 				MsadLdap: &dex.ConfigRequest_V1_Msad_Ldap{},
-			},
-			{
-				MsadLdap: &dex.ConfigRequest_V1_Msad_Ldap{},
-				Saml:     &dex.ConfigRequest_V1_Saml{},
 			},
 			{
 				MsadLdap: &dex.ConfigRequest_V1_Msad_Ldap{},
