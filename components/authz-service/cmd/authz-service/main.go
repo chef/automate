@@ -19,6 +19,9 @@ import (
 	"github.com/chef/automate/lib/platform"
 	"github.com/chef/automate/lib/tls/certs"
 	"github.com/chef/automate/lib/tracing"
+
+	teams_datamigration "github.com/chef/automate/components/authz-service/storage/postgres/teams/datamigration"
+	teams_migration "github.com/chef/automate/components/authz-service/storage/postgres/teams/migration"
 )
 
 func main() {
@@ -35,16 +38,20 @@ func main() {
 }
 
 type config struct {
-	GRPC               string `mapstructure:"grpc"`
-	LogFormat          string `mapstructure:"log-format"`
-	LogLevel           string `mapstructure:"log-level"`
-	certs.TLSConfig    `mapstructure:"tls"`
-	PGURL              string `mapstructure:"pg_url"`
-	Database           string `mapstructure:"database"`
-	MigrationsPath     string `mapstructure:"migrations-path"`
-	DataMigrationsPath string `mapstructure:"data-migrations-path"`
-	EventAddress       string `mapstructure:"event-address"`
-	ConfigFile         string `mapstructure:"config"`
+	GRPC                    string `mapstructure:"grpc"`
+	LogFormat               string `mapstructure:"log-format"`
+	LogLevel                string `mapstructure:"log-level"`
+	certs.TLSConfig         `mapstructure:"tls"`
+	PGURL                   string `mapstructure:"pg_url"`
+	TeamsPGURL              string `mapstructure:"pg_url"`
+	Database                string `mapstructure:"database"`
+	MigrationsPath          string `mapstructure:"migrations-path"`
+	DataMigrationsPath      string `mapstructure:"data-migrations-path"`
+	TeamsDatabase           string `mapstructure:"teams-database"`
+	TeamsMigrationsPath     string `mapstructure:"teams-migrations-path"`
+	TeamsDataMigrationsPath string `mapstructure:"teams-data-migrations-path"`
+	EventAddress            string `mapstructure:"event-address"`
+	ConfigFile              string `mapstructure:"config"`
 }
 
 func serve(_ *cobra.Command, args []string) {
@@ -114,9 +121,49 @@ Please pass a config file as the only argument to this command.`))
 		Logger: l,
 	}
 
+	// start teams-service
+	if cfg.TeamsPGURL == "" {
+		var err error
+		cfg.TeamsPGURL, err = platform.PGURIFromEnvironment(cfg.TeamsDatabase)
+		if err != nil {
+			fail(errors.Wrap(err, "Failed to get pg uri"))
+		}
+	}
+
+	mustBeADirectory(cfg.TeamsMigrationsPath)
+	mustBeADirectory(cfg.TeamsDataMigrationsPath)
+
+	teamsPGURL, err := url.Parse(cfg.TeamsPGURL)
+	if err != nil {
+		msg := fmt.Sprintf("could not parse teams_pg_url %s from config", cfg.TeamsPGURL)
+		fail(errors.Wrap(err, msg))
+	}
+
+	l.Warnf("WARNING WARNING WARNING: %s", teamsPGURL)
+
+	teamsMigrationConfig := teams_migration.Config{
+		Path:   cfg.TeamsMigrationsPath,
+		PGURL:  teamsPGURL,
+		Logger: l,
+	}
+
+	// NOTE (TC): These are IAM V2 specific data migrations.
+	// Read more in v2_data_migrations.md.
+	teamsDataMigrationConfig := teams_datamigration.Config{
+		Path:   cfg.TeamsDataMigrationsPath,
+		PGURL:  teamsPGURL,
+		Logger: l,
+	}
+
+	// teamsService, err := teams_service.NewPostgresService(l, connFactory,
+	// 	teamsMigrationConfig, teamsDataMigrationConfig, authzClient, authzV2Client)
+	// if err != nil {
+	// 	fail(errors.Wrapf(err, "could not start teams GRPC service"))
+	// }
+
 	// if server.GRPC() returns, it's with an error
 	fail(server.GRPC(ctx, cfg.GRPC, l, connFactory, engine, migrationConfig,
-		dataMigrationConfig, cfg.EventAddress, cfg.ConfigFile))
+		dataMigrationConfig, teamsMigrationConfig, teamsDataMigrationConfig, cfg.EventAddress, cfg.ConfigFile))
 }
 
 // fail outputs the error and exits with a non-zero code

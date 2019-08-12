@@ -31,7 +31,6 @@ type Config struct {
 	Logger          *zap.Logger
 	Users           UsersConfig
 	ServiceCerts    *certs.ServiceCerts
-	TeamsAddress    string
 	AuthzAddress    string
 }
 
@@ -79,11 +78,6 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		return nil, errors.Wrap(err, "initialize password validator")
 	}
 
-	conn, err := factory.DialContext(ctx, "teams-service", c.TeamsAddress)
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to dial teams-service at (%s)", c.TeamsAddress)
-	}
-
 	authzConn, err := factory.DialContext(ctx, "authz-service", c.AuthzAddress)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to dial authz-service at (%s)", c.AuthzAddress)
@@ -94,7 +88,7 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		users:           usrs,
 		validator:       val,
 		connFactory:     secureconn.NewFactory(*c.ServiceCerts),
-		teamsClient:     teams.NewTeamsV1Client(conn),
+		teamsClient:     teams.NewTeamsV1Client(authzConn),
 		a1UserData:      c.A1UserData,
 		a1UserRolesData: c.A1UserRolesData,
 		authzClient:     authz.NewSubjectPurgeClient(authzConn),

@@ -200,14 +200,6 @@ grpc: 0.0.0.0:8910
 				GRPC:     "0.0.0.0:8910",
 			},
 		},
-		"teams-service endpoint": {
-			rawConfig: []byte(`
-teams_address: 127.0.0.2:2912
-      `),
-			expectedConfig: Config{
-				TeamsAddress: "127.0.0.2:2912",
-			},
-		},
 	}
 
 	for n, d := range tests {

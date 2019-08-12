@@ -46,7 +46,6 @@ var defaultEndpoints = map[string]string{
 	"license-control-service": "0.0.0.0:10124",
 	"local-user-service":      "0.0.0.0:9092",
 	"notifications-service":   "0.0.0.0:4001",
-	"teams-service":           "0.0.0.0:9093",
 	"secrets-service":         "0.0.0.0:10131",
 	"applications-service":    "0.0.0.0:10133",
 	"nodemanager-service":     "0.0.0.0:10120",
@@ -307,7 +306,7 @@ func (c *clientsFactory) ProjectsClient() (iam_v2beta.ProjectsClient, error) {
 // TeamsV1Client returns a V1 client for the Teams service.
 // It requires the `teams` endpoint to be configured
 func (c *clientsFactory) TeamsV1Client() (teams_v1.TeamsV1Client, error) {
-	conn, err := c.connectionByName("teams-service")
+	conn, err := c.connectionByName("authz-service")
 	if err != nil {
 		return nil, err
 	}
@@ -317,7 +316,7 @@ func (c *clientsFactory) TeamsV1Client() (teams_v1.TeamsV1Client, error) {
 // TeamsV2Client returns a V2 client for the Teams service.
 // It requires the `teams` endpoint to be configured
 func (c *clientsFactory) TeamsV2Client() (teams_v2.TeamsV2Client, error) {
-	conn, err := c.connectionByName("teams-service")
+	conn, err := c.connectionByName("authz-service")
 	if err != nil {
 		return nil, err
 	}

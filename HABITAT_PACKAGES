@@ -53,7 +53,6 @@ local-user-service components/local-user-service
 # notifications-service components/notifications-service
 secrets-service components/secrets-service
 session-service components/session-service
-teams-service components/teams-service
 trial-license-service components/trial-license-service
 automate-cs-bookshelf components/automate-cs-bookshelf
 automate-cs-oc-bifrost components/automate-cs-oc-bifrost

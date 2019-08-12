@@ -99,16 +99,6 @@ var ProductMetadataJSON = `
       }
     },
     {
-      "name": "chef/teams-service",
-      "metadata": {
-        "name": "chef/teams-service",
-        "data_service": false,
-        "binlinks": null,
-        "uses_platform_scaffolding": true,
-        "bootstrap": null
-      }
-    },
-    {
       "name": "chef/authn-service",
       "metadata": {
         "name": "chef/authn-service",
@@ -408,7 +398,6 @@ var ProductMetadataJSON = `
         "chef/authz-service",
         "chef/authn-service",
         "chef/automate-dex",
-        "chef/teams-service",
         "chef/local-user-service",
         "chef/session-service"
       ],

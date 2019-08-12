@@ -10,5 +10,6 @@ format = "json"
 level = "info"
 
 [storage]
+teams_database = "chef_teams_service"
 database = "chef_authz_service"
 user = "authz"

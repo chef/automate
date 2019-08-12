@@ -27,7 +27,6 @@ pkg_binds=(
   [automate-dex]="port"
   [automate-pg-gateway]="port"
   [pg-sidecar-service]="port"
-  [teams-service]="port"
   [authz-service]="port"
 )
 pkg_bin_dirs=(bin)

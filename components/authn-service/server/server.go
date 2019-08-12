@@ -33,7 +33,6 @@ type Config struct {
 	Logger                   *zap.Logger
 	Token                    tokens.TokenConfig
 	ServiceCerts             *certs.ServiceCerts
-	TeamsAddress             string // "ip:port"
 	AuthzAddress             string
 	LegacyDataCollectorToken string
 }
@@ -133,11 +132,6 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		c.Logger.Debug("no tokens adapter defined")
 	}
 
-	teamsConn, err := factory.Dial("teams-service", c.TeamsAddress)
-	if err != nil {
-		return nil, errors.Wrapf(err, "dial teams-service (%s)", c.TeamsAddress)
-	}
-
 	authzConn, err := factory.Dial("authz-service", c.AuthzAddress)
 	if err != nil {
 		return nil, errors.Wrapf(err, "dial authz-service (%s)", c.AuthzAddress)
@@ -165,7 +159,7 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		logger:         c.Logger,
 		token:          ts,
 		connFactory:    factory,
-		teamsClient:    teams.NewTeamsV1Client(teamsConn),
+		teamsClient:    teams.NewTeamsV1Client(authzConn),
 		health:         health.NewService(),
 	}
 

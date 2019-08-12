@@ -7,9 +7,9 @@ import (
 	"github.com/lib/pq" // adapter for database/sql
 	"github.com/pkg/errors"
 
+	"github.com/chef/automate/components/authz-service/storage/postgres/teams/datamigration"
+	"github.com/chef/automate/components/authz-service/storage/postgres/teams/migration"
 	"github.com/chef/automate/components/teams-service/storage"
-	"github.com/chef/automate/components/teams-service/storage/postgres/datamigration"
-	"github.com/chef/automate/components/teams-service/storage/postgres/migration"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/logger"
 	uuid "github.com/chef/automate/lib/uuid4"

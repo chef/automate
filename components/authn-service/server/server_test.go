@@ -340,7 +340,6 @@ func newTestServer(ctx context.Context,
 		Upstream:       upstream,
 		Logger:         logger,
 		Authenticators: authenticators,
-		TeamsAddress:   teamURL,
 		ServiceCerts:   serviceCerts,
 	}
 

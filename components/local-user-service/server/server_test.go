@@ -45,8 +45,7 @@ func setupWithAdapter(t *testing.T, usersFile, rolesFile, teamsAddress string) (
 		Logger:          l,
 		Users:           &usersMock.Config{Users: users},
 		A1UserData:      usersFile,
-		A1UserRolesData: rolesFile,
-		TeamsAddress:    teamsAddress,
+		A1UserRolesData: rolesFile
 	}
 	serv, err := server.NewServer(ctx, config)
 	require.NoError(t, err)

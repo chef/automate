@@ -13,7 +13,6 @@
     "chef/authz-service",
     "chef/es-sidecar-service",
     "chef/automate-dex",
-    "chef/teams-service",
     "chef/authn-service",
     "chef/secrets-service",
     "chef/applications-service",
@@ -91,7 +90,6 @@
         "chef/authz-service",
         "chef/authn-service",
         "chef/automate-dex",
-        "chef/teams-service",
         "chef/local-user-service",
         "chef/session-service"
       ]

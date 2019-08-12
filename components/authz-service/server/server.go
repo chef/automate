@@ -30,12 +30,21 @@ import (
 	v2 "github.com/chef/automate/components/authz-service/server/v2"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
+
+	teams_grpc_v1 "github.com/chef/automate/api/interservice/teams/v1"
+	teams_grpc_v2 "github.com/chef/automate/api/interservice/teams/v2"
+	teams_datamigration "github.com/chef/automate/components/authz-service/storage/postgres/teams/datamigration"
+	teams_migration "github.com/chef/automate/components/authz-service/storage/postgres/teams/migration"
+	teams_v1 "github.com/chef/automate/components/teams-service/server/v1"
+	teams_v2 "github.com/chef/automate/components/teams-service/server/v2"
+	teams_service "github.com/chef/automate/components/teams-service/service"
 )
 
 // GRPC creates and listens on grpc server.
 func GRPC(ctx context.Context,
 	addr string, l logger.Logger, connFactory *secureconn.Factory,
 	e engine.Engine, migrationsConfig migration.Config, dataMigrationsConfig datamigration.Config,
+	teamsMigrationsConfig teams_migration.Config, teamsDataMigrationsConfig teams_datamigration.Config,
 	eventServiceAddress string, configFile string) error {
 
 	grpclog.SetLoggerV2(l)
@@ -45,8 +54,18 @@ func GRPC(ctx context.Context,
 	}
 	l.Printf("Authz GRPC API listening on %s", addr)
 
-	server, err := NewGRPCServer(ctx, connFactory, l, e, migrationsConfig,
-		dataMigrationsConfig, eventServiceAddress, configFile)
+	server, err := NewGRPCServer(
+		ctx,
+		addr,
+		connFactory,
+		l,
+		e,
+		migrationsConfig,
+		dataMigrationsConfig,
+		teamsMigrationsConfig,
+		teamsDataMigrationsConfig,
+		eventServiceAddress,
+		configFile)
 	if err != nil {
 		return err
 	}
@@ -55,11 +74,18 @@ func GRPC(ctx context.Context,
 }
 
 // NewGRPCServer creates a grpc server.
-func NewGRPCServer(ctx context.Context,
-	connFactory *secureconn.Factory, l logger.Logger,
-	e engine.Engine, migrationsConfig migration.Config,
+func NewGRPCServer(
+	ctx context.Context,
+	addr string,
+	connFactory *secureconn.Factory,
+	l logger.Logger,
+	e engine.Engine,
+	migrationsConfig migration.Config,
 	dataMigrationsConfig datamigration.Config,
-	eventServiceAddress string, configFile string) (*grpc.Server, error) {
+	teamsMigrationsConfig teams_migration.Config,
+	teamsDataMigrationsConfig teams_datamigration.Config,
+	eventServiceAddress string,
+	configFile string) (*grpc.Server, error) {
 
 	// Note(sr): we're buffering one version struct, as NewPostgresPolicyServer writes
 	// to this before we've got readers
@@ -105,6 +131,18 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "could not initialize subject purge server")
 	}
 
+	authzConn, err := connFactory.Dial("authz-service", addr)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to dial authz-service at (%s)", addr)
+	}
+	authzClient := common.NewSubjectPurgeClient(authzConn)
+	version, err := v2PolServer.GetPolicyVersion(ctx, &api_v2.GetPolicyVersionReq{})
+	teamsService, err := teams_service.NewPostgresService(l, connFactory,
+		teamsMigrationsConfig, teamsDataMigrationsConfig, authzClient, version)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not start teams GRPC service")
+	}
+
 	// This function determines the log level based on the returned status code:
 	// We divert from the default only by pushing non-error-returns into debug
 	// logs. See DefaultCodeToLevel for the rest of the mapping.
@@ -145,6 +183,8 @@ func NewGRPCServer(ctx context.Context,
 	api_v2.RegisterProjectsServer(g, v2ProjectsServer)
 	api_v2.RegisterAuthorizationServer(g, v2AuthzServer)
 	common.RegisterSubjectPurgeServer(g, subjectPurgeServer)
+	teams_grpc_v1.RegisterTeamsV1Server(g, teams_v1.NewServer(teamsService))
+	teams_grpc_v2.RegisterTeamsV2Server(g, teams_v2.NewServer(teamsService))
 	reflection.Register(g)
 	return g, nil
 }

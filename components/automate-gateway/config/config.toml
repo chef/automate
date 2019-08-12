@@ -36,6 +36,3 @@ level = "debug"
   [grpc_clients.endpoints.notifications-service]
     target = "0.0.0.0:4001"
     secure = true
-  [grpc_clients.endpoints.teams-service]
-    target = "0.0.0.0:9093"
-    secure = true

@@ -101,10 +101,6 @@ func serve(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	if c.TeamsAddress == "" {
-		return fmt.Errorf("missing address for teams service")
-	}
-
 	if c.AuthzAddress == "" {
 		return fmt.Errorf("missing address for authz service")
 	}
@@ -115,7 +111,6 @@ func serve(cmd *cobra.Command, args []string) error {
 		Authenticators:           authenticatorConfigMap,
 		Token:                    c.Token.Config,
 		ServiceCerts:             serviceCerts,
-		TeamsAddress:             c.TeamsAddress,
 		AuthzAddress:             c.AuthzAddress,
 		LegacyDataCollectorToken: c.LegacyDataCollectorToken,
 	}

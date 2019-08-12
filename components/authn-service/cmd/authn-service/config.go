@@ -19,7 +19,6 @@ type Config struct {
 	Upstream                 string          `json:"upstream"`
 	Logger                   Logger          `json:"logger"`
 	Token                    Token           `json:"tokens"` //!\\ only one token adapter
-	TeamsAddress             string          `json:"teams_address"`
 	AuthzAddress             string          `json:"authz_address"`
 	LegacyDataCollectorToken string          `json:"legacy_data_collector_token"`
 	certs.TLSConfig          `json:"tls"`

@@ -31,6 +31,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Logger.Format = w.String("text")
 	c.V1.Sys.Storage.Database = w.String("chef_authz_service")
 	c.V1.Sys.Storage.User = w.String("authz")
+	c.V1.Sys.Storage.TeamsDatabase = w.String("chef_teams_service")
 
 	return c
 }

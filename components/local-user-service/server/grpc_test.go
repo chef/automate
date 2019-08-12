@@ -102,7 +102,6 @@ func TestUsersGRPC(t *testing.T) {
 		Logger:       logger,
 		Users:        mockUsers,
 		ServiceCerts: serviceCerts,
-		TeamsAddress: teamsServer.URL,
 		AuthzAddress: authzServer.URL,
 	}
 

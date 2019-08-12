@@ -8,11 +8,11 @@ import (
 
 	authz "github.com/chef/automate/api/interservice/authz/common"
 	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/components/authz-service/storage/postgres/teams/datamigration"
+	"github.com/chef/automate/components/authz-service/storage/postgres/teams/migration"
 	"github.com/chef/automate/components/teams-service/storage"
 	"github.com/chef/automate/components/teams-service/storage/memstore"
 	"github.com/chef/automate/components/teams-service/storage/postgres"
-	"github.com/chef/automate/components/teams-service/storage/postgres/datamigration"
-	"github.com/chef/automate/components/teams-service/storage/postgres/migration"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
 )
@@ -45,14 +45,9 @@ func NewInMemoryService(l logger.Logger, connFactory *secureconn.Factory,
 // NewPostgresService returns an instance of Service that connects to a postgres storage backend.
 func NewPostgresService(l logger.Logger, connFactory *secureconn.Factory, migrationsConfig migration.Config,
 	dataMigrationsConfig datamigration.Config, authzClient authz.SubjectPurgeClient,
-	authzV2Client authz_v2.PoliciesClient) (*Service, error) {
+	authzVersion *authz_v2.GetPolicyVersionResp) (*Service, error) {
 
-	resp, err := authzV2Client.GetPolicyVersion(context.Background(), &authz_v2.GetPolicyVersionReq{})
-	if err != nil {
-		return nil, err
-	}
-
-	p, err := postgres.New(l, migrationsConfig, dataMigrationsConfig, resp.Version.Major == authz_v2.Version_V2)
+	p, err := postgres.New(l, migrationsConfig, dataMigrationsConfig, authzVersion.Version.Major == authz_v2.Version_V2)
 	if err != nil {
 		return nil, err
 	}

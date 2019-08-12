@@ -16,7 +16,6 @@ type Config struct {
 	A1UserRolesData string `json:"a1_user_roles_data"`
 	Logger          Logger `json:"logger"`
 	Users           Users  `json:"users"` //!\\ only one users adapter
-	TeamsAddress    string `json:"teams_address"`
 	AuthzAddress    string `json:"authz_address"`
 	certs.TLSConfig `json:"tls"`
 }

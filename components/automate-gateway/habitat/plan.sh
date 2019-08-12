@@ -28,7 +28,6 @@ pkg_binds_optional=(
   [ingest-service]="port"
   [local-user-service]="port"
   [notifications-service]="port"
-  [teams-service]="port"
   [license-control-service]="port"
   [secrets-service]="port"
   [event-service]="port"

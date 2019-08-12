@@ -40,6 +40,7 @@ message ConfigRequest {
 				reserved 3 to 4;
 				google.protobuf.StringValue database = 1;
 				google.protobuf.StringValue user = 2;
+				google.protobuf.StringValue teams_database = 5;
 			}
 		}
 

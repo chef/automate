@@ -78,10 +78,6 @@ func serve(cmd *cobra.Command, args []string) error {
 	// use sugared logger here for convenience
 	l := logger.Sugar()
 
-	if c.TeamsAddress == "" {
-		return errors.New("missing config value teams_address")
-	}
-
 	if c.AuthzAddress == "" {
 		return errors.New("missing config value authz_address")
 	}
@@ -92,7 +88,6 @@ func serve(cmd *cobra.Command, args []string) error {
 		A1UserData:      c.A1UserData,
 		A1UserRolesData: c.A1UserRolesData,
 		ServiceCerts:    serviceCerts,
-		TeamsAddress:    c.TeamsAddress,
 		AuthzAddress:    c.AuthzAddress,
 	}
 

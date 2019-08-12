@@ -39,12 +39,6 @@ tokens:
     database: {{cfg.storage.database}}
     migrations: {{pkg.path}}/migrations
 
-{{~#eachAlive bind.teams-service.members as |teams-service|}}
-{{~#if @last}}
-teams_address: {{teams-service.sys.ip}}:{{teams-service.cfg.port}}
-{{~/if}}
-{{~/eachAlive}}
-
 {{~#eachAlive bind.authz-service.members as |authz-service|}}
 {{~#if @last}}
 authz_address: {{authz-service.sys.ip}}:{{authz-service.cfg.port}}

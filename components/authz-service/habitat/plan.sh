@@ -56,4 +56,6 @@ do_install() {
   build_line "Copying migration files"
   cp -r storage/postgres/migration/sql "${pkg_prefix}/migrations"
   cp -r storage/postgres/datamigration/sql "${pkg_prefix}/data-migrations"
+  cp -r storage/postgres/teams/migration/sql "${pkg_prefix}/teams-migrations"
+  cp -r storage/postgres/teams/datamigration/sql "${pkg_prefix}/teams-data-migrations"
 }

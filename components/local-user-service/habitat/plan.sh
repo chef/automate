@@ -22,7 +22,6 @@ pkg_exposes=(
 )
 pkg_binds=(
   [automate-dex]="grpc-host grpc-port port"
-  [teams-service]="port"
   [authz-service]="port"
 )
 pkg_bin_dirs=(bin)

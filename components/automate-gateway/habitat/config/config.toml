@@ -85,13 +85,6 @@ level = "{{cfg.service.log.level}}"
     secure = true
 {{~/if}}
 {{~/eachAlive}}
-{{~#eachAlive bind.teams-service.members as |teams|}}
-{{~#if @last}}
-  [grpc_clients.endpoints.teams-service]
-    target = "{{teams.sys.ip}}:{{teams.cfg.port}}"
-    secure = true
-{{~/if}}
-{{~/eachAlive}}
 {{~#eachAlive bind.secrets-service.members as |secrets|}}
 {{~#if @last}}
   [grpc_clients.endpoints.secrets-service]

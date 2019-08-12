@@ -12,6 +12,10 @@ database: {{cfg.storage.database}}
 migrations-path: {{pkg.path}}/migrations
 data-migrations-path: {{pkg.path}}/data-migrations
 
+teams-database: {{cfg.storage.teams_database}}
+teams-migrations-path: {{ pkg.path }}/teams-migrations
+teams-data-migrations-path: {{ pkg.path }}/teams-data-migrations
+
 {{~#eachAlive bind.event-service.members as |event-service|}}
   {{~#if @last}}
 event-address: {{event-service.sys.ip}}:{{event-service.cfg.port}}
