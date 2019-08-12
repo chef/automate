@@ -25,6 +25,9 @@ import { Component, Host, Listen, Prop, State, h } from '@stencil/core';
  * <chef-input type='key-value' placeholder='Enter value...'></chef-input>
  *
  * @example
+ * <chef-input placeholder='Enter value...' autocomplete="on"></chef-input>
+ *
+ * @example
  * <chef-input type='key-value' value='foobar:bizbang' placeholder='Enter value...'></chef-input>
  */
 @Component({
@@ -52,6 +55,11 @@ export class ChefInput {
    * Indicate input as disabled
    */
   @Prop({ reflectToAttr: true }) disabled = false;
+
+  /**
+   * Enable or disable autocomplete for input (defaults to "off").
+   */
+  @Prop() autocomplete = 'off';
 
   @State() focused = false;
 
@@ -96,9 +104,9 @@ export class ChefInput {
         value={ this.value }
         placeholder={ this.placeholder }
         onChange={ this.handleChange.bind(this) }
-        disabled={this.disabled}
-        aria-disabled={this.disabled}
-        autocomplete="off"/>
+        disabled={ this.disabled }
+        aria-disabled={ this.disabled }
+        autocomplete={ this.autocomplete }/>
     );
   }
 
