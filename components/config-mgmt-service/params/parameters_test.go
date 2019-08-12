@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/chef/automate/components/config-mgmt-service/errors"
 	subject "github.com/chef/automate/components/config-mgmt-service/params"
 	"github.com/stretchr/testify/assert"
 )
@@ -23,33 +22,6 @@ func TestFormatFiltersEmptyArray(t *testing.T) {
 	filters, err := subject.FormatNodeFilters(empty)
 	assert.Nil(t, err)
 	assert.Equal(t, expected, filters)
-}
-
-func TestFormatFiltersWrongFilters(t *testing.T) {
-	cases := []struct {
-		filters []string
-	}{
-		{[]string{"platform=centos"}},
-		{[]string{"wrong"}},
-		{[]string{":success"}},
-		{[]string{"platform:"}},
-		{[]string{"platform:foo:bar"}},
-		{[]string{"platform:%20"}}, // space
-		{[]string{"platform:%09"}}, // tab
-		{[]string{"platform:%0A"}}, // new line
-	}
-
-	for _, test := range cases {
-		t.Run(fmt.Sprintf("with filter(s) %v it should return an error", test.filters), func(t *testing.T) {
-			filters, err := subject.FormatNodeFilters(test.filters)
-
-			assert.NotNil(t, err)
-			assert.Equal(t, errors.InvalidParameter, err.(*errors.StandardError).Type)
-			assert.Contains(t, err.(*errors.StandardError).Message, "Invalid filter")
-			assert.Contains(t, err.(*errors.StandardError).Message, "format: key:value")
-			assert.Nil(t, filters)
-		})
-	}
 }
 
 func TestStringDateRangeToTimeWithInvalidDatesReturnFalse(t *testing.T) {

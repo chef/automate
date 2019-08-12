@@ -171,7 +171,7 @@ func (efs ElasticFeedStore) GetFeed(query *util.FeedQuery) ([]*util.FeedEntry, i
 		return nil, 0, err
 	}
 
-	var entries []*util.FeedEntry
+	entries := make([]*util.FeedEntry, 0, len(searchResult.Hits.Hits))
 	for _, hit := range searchResult.Hits.Hits {
 		entry := new(util.FeedEntry)
 		if err := json.Unmarshal(*hit.Source, entry); err != nil {

@@ -7,13 +7,13 @@ package util
 
 import (
 	"encoding/json"
-	"github.com/chef/automate/lib/stringutils"
 	"time"
 
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 
 	eventErrors "github.com/chef/automate/components/event-feed-service/pkg/errors"
+	"github.com/chef/automate/lib/stringutils"
 )
 
 type FeedSummary struct {
