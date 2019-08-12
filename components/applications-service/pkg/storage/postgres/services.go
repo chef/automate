@@ -114,7 +114,7 @@ LEFT JOIN deployment AS d
 LEFT JOIN supervisor AS sup
   ON s.sup_id = sup.id
  %s
-ORDER BY %s %s
+ORDER BY %s %s, sup_member_id ASC
 LIMIT $1
 OFFSET $2
 `
