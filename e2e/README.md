@@ -61,7 +61,7 @@ This [Cypress guide](https://docs.cypress.io/guides/getting-started/writing-your
 provides an introduction on writing your first Cypress test.
 
 Automate's Cypress tests are divided into two main categories: UI and API tests,
-under the `api` and `ui` directories respectively.
+under the `ui` and `api` directories respectively.
 
 API tests communicate only with the backend using `cy.request`. The `api/` sub-directories
 correspond to the sub-directories under `automate-gateway/api`. When adding new API tests,
