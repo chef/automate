@@ -4,7 +4,7 @@ import { set, pipe, unset } from 'lodash/fp';
 
 import { EntityStatus } from 'app/entities/entities';
 import { RuleActionTypes, RuleActions } from './rule.actions';
-import { Rule, RuleTypeMappedObject } from './rule.model';
+import { Rule, RuleTypeMappedObject, ProjectStatus } from './rule.model';
 
 export interface RuleEntityState extends EntityState<Rule> {
   getAttributes: RuleTypeMappedObject;
@@ -14,6 +14,7 @@ export interface RuleEntityState extends EntityState<Rule> {
   createError: HttpErrorResponse;
   updateStatus: EntityStatus;
   deleteStatus: EntityStatus;
+  projectRulesStatus: ProjectStatus;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
@@ -22,6 +23,7 @@ const CREATE_STATUS = 'createStatus';
 const CREATE_ERROR = 'createError';
 const DELETE_STATUS = 'deleteStatus';
 const UPDATE_STATUS = 'updateStatus';
+const PROJECT_RULES_STATUS = 'projectRulesStatus';
 
 // must correspond to enum type in automate-gateway/.../common/rules.proto
 export const ruleAttributes: RuleTypeMappedObject = {
@@ -76,7 +78,8 @@ export const RuleEntityInitialState: RuleEntityState = ruleEntityAdapter.getInit
   createStatus: EntityStatus.notLoaded,
   createError: null,
   deleteStatus: EntityStatus.notLoaded,
-  updateStatus: EntityStatus.notLoaded
+  updateStatus: EntityStatus.notLoaded,
+  projectRulesStatus: <ProjectStatus>'PROJECT_RULES_STATUS_UNSET'
 });
 
 export function ruleEntityReducer(
@@ -88,8 +91,10 @@ export function ruleEntityReducer(
       return set(GET_ALL_STATUS, EntityStatus.loading, state);
 
     case RuleActionTypes.GET_ALL_SUCCESS:
-      return set(GET_ALL_STATUS, EntityStatus.loadingSuccess,
-        ruleEntityAdapter.addAll(action.payload.rules, state));
+      return pipe(
+        set(GET_ALL_STATUS, EntityStatus.loadingSuccess),
+        set(PROJECT_RULES_STATUS, action.payload.status))
+        (ruleEntityAdapter.addAll(action.payload.rules, state)) as RuleEntityState;
 
     case RuleActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);

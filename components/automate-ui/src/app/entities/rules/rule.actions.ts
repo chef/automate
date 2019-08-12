@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 
-import { Rule } from './rule.model';
+import { Rule, ProjectStatus } from './rule.model';
 
 export enum RuleActionTypes {
   GET_ALL         = 'RULES::GET_ALL',
@@ -33,6 +33,7 @@ export class GetRulesForProject implements Action {
 
 export interface RulesSuccessPayload {
   rules: Rule[];
+  status: ProjectStatus;
 }
 
 export class GetRulesSuccess implements Action {

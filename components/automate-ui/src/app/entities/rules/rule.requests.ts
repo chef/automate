@@ -8,10 +8,6 @@ import {
   RulesSuccessPayload, RuleSuccessPayload
 } from './rule.actions';
 
-export interface RulesResponse {
-  rules: Rule[];
-}
-
 @Injectable()
 export class RuleRequests {
 

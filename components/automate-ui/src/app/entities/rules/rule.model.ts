@@ -1,3 +1,5 @@
+export type ProjectStatus =
+  'PROJECT_RULES_STATUS_UNSET' | 'RULES_APPLIED' | 'EDITS_PENDING' | 'NO_RULES';
 export type RuleStatus = 'APPLIED' | 'STAGED';
 export type RuleType = 'NODE' | 'EVENT';
 export type ConditionOperator = 'MEMBER_OF' | 'EQUALS';
