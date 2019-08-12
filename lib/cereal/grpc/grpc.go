@@ -87,9 +87,30 @@ func (c *workflowCompleter) EnqueueTask(task *backend.Task, opts backend.TaskEnq
 	c.tasks = append(c.tasks, t)
 	return nil
 }
+func (c *workflowCompleter) finish(err error) error {
+	defer c.s.CloseSend() // nolint: errcheck
+
+	if err != nil {
+		return err
+	}
+
+	if err := c.s.CloseSend(); err != nil {
+		logrus.WithError(err).Error("Failed to continue workflow")
+		return err
+	}
+	committedMsg, err := c.s.Recv()
+	if err != nil {
+		logrus.WithError(err).Error("Did not get committed message")
+		return err
+	}
+	if committedMsg.GetCommitted() == nil {
+		return errUnknownMessage
+	}
+
+	return nil
+}
 
 func (c *workflowCompleter) Continue(payload []byte) error {
-	defer c.s.CloseSend() // nolint: errcheck
 	err := c.s.Send(&grpccereal.DequeueWorkflowRequest{
 		Cmd: &grpccereal.DequeueWorkflowRequest_Continue_{
 			Continue: &grpccereal.DequeueWorkflowRequest_Continue{
@@ -98,19 +119,10 @@ func (c *workflowCompleter) Continue(payload []byte) error {
 			},
 		},
 	})
-	if err != nil {
-		return err
-	}
-	if err := c.s.CloseSend(); err != nil {
-		logrus.WithError(err).Error("Failed to continue workflow")
-		return err
-	}
-	_, _ = c.s.Recv()
-	return nil
+	return c.finish(err)
 }
 
 func (c *workflowCompleter) Fail(errMsg error) error {
-	defer c.s.CloseSend() // nolint: errcheck
 	err := c.s.Send(&grpccereal.DequeueWorkflowRequest{
 		Cmd: &grpccereal.DequeueWorkflowRequest_Fail_{
 			Fail: &grpccereal.DequeueWorkflowRequest_Fail{
@@ -118,19 +130,10 @@ func (c *workflowCompleter) Fail(errMsg error) error {
 			},
 		},
 	})
-	if err != nil {
-		return err
-	}
-	if err := c.s.CloseSend(); err != nil {
-		logrus.WithError(err).Error("Failed to fail workflow")
-		return err
-	}
-	_, _ = c.s.Recv()
-	return nil
+	return c.finish(err)
 }
 
 func (c *workflowCompleter) Done(result []byte) error {
-	defer c.s.CloseSend() // nolint: errcheck
 	err := c.s.Send(&grpccereal.DequeueWorkflowRequest{
 		Cmd: &grpccereal.DequeueWorkflowRequest_Done_{
 			Done: &grpccereal.DequeueWorkflowRequest_Done{
@@ -138,15 +141,7 @@ func (c *workflowCompleter) Done(result []byte) error {
 			},
 		},
 	})
-	if err != nil {
-		return err
-	}
-	if err := c.s.CloseSend(); err != nil {
-		logrus.WithError(err).Error("Failed to complete workflow")
-		return err
-	}
-	_, _ = c.s.Recv()
-	return nil
+	return c.finish(err)
 }
 
 func (c *workflowCompleter) Close() error {
