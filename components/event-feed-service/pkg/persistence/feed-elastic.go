@@ -205,7 +205,7 @@ func (efs ElasticFeedStore) GetFeedSummary(q *util.FeedSummaryQuery) (map[string
 	}
 
 	if exists {
-		if q.CountsCategory == "entity_type" {
+		if q.CountsCategory == "event-type" {
 			q.CountsCategory = "object_object_type"
 		} else if q.CountsCategory == "task" {
 			q.CountsCategory = "verb"

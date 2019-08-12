@@ -60,10 +60,20 @@ export const getTaskCountsSuccess = (payload): EventFeedAction =>
 
 export const GET_TASK_COUNTS_ERROR = 'GET::TASK::COUNTS::ERROR';
 
-export const ADD_FEED_FILTER = 'ADD::FEED::FILTER';
-export const addFeedFilter = (type, filter): EventFeedAction =>
-  ({ type: ADD_FEED_FILTER, payload: {type, filter} });
+export const ADD_SEARCH_BAR_FILTERS = 'ADD::SEARCH::BAR::FILTERS';
+export const addSearchbarFilters = (searchBarFilters): EventFeedAction =>
+  ({ type: ADD_SEARCH_BAR_FILTERS, payload: {searchBarFilters} });
 
 export const ADD_FEED_DATE_RANGE_FILTER = 'ADD::FEED::DATE:RANGE::FILTER';
 export const addFeedDateRangeFilter = (start, end): EventFeedAction =>
   ({ type: ADD_FEED_DATE_RANGE_FILTER, payload: {start, end} });
+
+export const GET_SUGGESTIONS = 'GET::SUGGESTIONS';
+export const getSuggestions = (type, text): EventFeedAction =>
+  ({ type: GET_SUGGESTIONS, payload: {type, text} });
+
+export const GET_SUGGESTIONS_SUCCESS = 'GET::SUGGESTIONS::SUCCESS';
+export const getSuggestionsSuccess = (payload): EventFeedAction =>
+  ({ type: GET_SUGGESTIONS_SUCCESS, payload });
+
+export const GET_SUGGESTIONS_ERROR  = 'GET::SUGGESTIONS::ERROR';

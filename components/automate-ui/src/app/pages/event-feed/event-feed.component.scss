@@ -31,6 +31,19 @@
   min-width: 540px;
 }
 
+chef-page-header {
+  position: relative;
+
+  chef-subheading {
+    padding-bottom: 32px;
+  }
+}
+
+app-client-runs-search-bar {
+  display: inline-block;
+  width: 100%;
+}
+
 .event-summary-bar {
   display: flex;
   min-width: 540px;

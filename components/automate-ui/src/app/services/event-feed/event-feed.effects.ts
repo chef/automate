@@ -7,10 +7,8 @@ import * as actions from './event-feed.actions';
 import { EventFeedService } from './event-feed.service';
 import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 import { EventFeedState } from './event-feed.reducer';
-import { SidebarState } from '../sidebar/sidebar.reducer';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
-import { SidebarFilter } from '../../types/types';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable()
@@ -25,7 +23,7 @@ export class EventFeedEffects {
   navToEventFeed$ = this.actions$.pipe(
     ofType(ROUTER_NAVIGATION),
     map((action: RouterNavigationAction) => action.payload.routerState.url),
-    filter(path => path.startsWith('/event-feed')),
+    filter(path => path.startsWith('/dashboards/event-feed')),
     map((_path) => actions.getInitialEventFeedLoad()));
 
   @Effect()
@@ -41,13 +39,8 @@ export class EventFeedEffects {
     withLatestFrom(this.store),
     switchMap(([_action, storeState]) => {
       const eventFeedState: EventFeedState = storeState.event_feed;
-      const sidebarState: SidebarState = storeState.sidebar;
-      const sidebarFilter: SidebarFilter = {
-        organizations: Array.from(sidebarState.selectedOrgs),
-        servers: Array.from(sidebarState.selectedChefServers)
-      };
 
-      return this.eventFeedService.getEventFeed(eventFeedState.filters, sidebarFilter).pipe(
+      return this.eventFeedService.getEventFeed(eventFeedState.filters).pipe(
       map(actions.getInitialFeedSuccess),
       catchError((error: HttpErrorResponse) => {
         if (error.status === 403) {
@@ -64,16 +57,11 @@ export class EventFeedEffects {
     withLatestFrom(this.store),
     switchMap(([_action, storeState]) => {
       const eventFeedState: EventFeedState = storeState.event_feed;
-      const sidebarState: SidebarState = storeState.sidebar;
       const events = eventFeedState.loadedEvents;
       const lastEvent = events[events.length - 1];
-      const sidebarFilter: SidebarFilter = {
-        organizations: Array.from(sidebarState.selectedOrgs),
-        servers: Array.from(sidebarState.selectedChefServers)
-      };
 
       return this.eventFeedService.loadMoreEventFeed(eventFeedState.filters,
-        sidebarFilter, lastEvent).pipe(
+        lastEvent).pipe(
       map(actions.loadMoreFeedSuccess),
       catchError(() => observableOf({type: actions.LOAD_MORE_FEED_ERROR})));
     }));
@@ -84,13 +72,8 @@ export class EventFeedEffects {
     withLatestFrom(this.store),
     switchMap(([_action, storeState]) => {
       const eventFeedState: EventFeedState = storeState.event_feed;
-      const sidebarState: SidebarState = storeState.sidebar;
-      const sidebarFilter: SidebarFilter = {
-        organizations: Array.from(sidebarState.selectedOrgs),
-        servers: Array.from(sidebarState.selectedChefServers)
-      };
 
-      return this.eventFeedService.getGuitarStrings(eventFeedState.filters, sidebarFilter).pipe(
+      return this.eventFeedService.getGuitarStrings(eventFeedState.filters).pipe(
       map(actions.getGuitarStringsSuccess),
       catchError(() => observableOf({type: actions.GET_GUITAR_STRINGS_ERROR})));
     }));
@@ -101,13 +84,8 @@ export class EventFeedEffects {
     withLatestFrom(this.store),
     switchMap(([_action, storeState]) => {
       const eventFeedState: EventFeedState = storeState.event_feed;
-      const sidebarState: SidebarState = storeState.sidebar;
-      const sidebarFilter: SidebarFilter = {
-        organizations: Array.from(sidebarState.selectedOrgs),
-        servers: Array.from(sidebarState.selectedChefServers)
-      };
 
-      return this.eventFeedService.getEventTypeCount(eventFeedState.filters, sidebarFilter).pipe(
+      return this.eventFeedService.getEventTypeCount(eventFeedState.filters).pipe(
       map(actions.getTypeCountsSuccess),
       catchError(() => observableOf({type: actions.GET_TYPE_COUNTS_ERROR})));
     }));
@@ -118,20 +96,27 @@ export class EventFeedEffects {
     withLatestFrom(this.store),
     switchMap(([_action, storeState]) => {
       const eventFeedState: EventFeedState = storeState.event_feed;
-      const sidebarState: SidebarState = storeState.sidebar;
-      const sidebarFilter: SidebarFilter = {
-        organizations: Array.from(sidebarState.selectedOrgs),
-        servers: Array.from(sidebarState.selectedChefServers)
-      };
 
-      return this.eventFeedService.getEventTaskCount(eventFeedState.filters, sidebarFilter).pipe(
+      return this.eventFeedService.getEventTaskCount(eventFeedState.filters).pipe(
       map(actions.getTaskCountsSuccess),
       catchError(() => observableOf({type: actions.GET_TASK_COUNTS_ERROR})));
     }));
 
   @Effect()
+  getSuggestions$ = this.actions$.pipe(
+    ofType(actions.GET_SUGGESTIONS),
+    withLatestFrom(this.store),
+    switchMap(([action, _storeState]) => {
+      const getSuggestions = action as actions.EventFeedAction;
+      return this.eventFeedService.getSuggestions(
+        getSuggestions.payload.type, getSuggestions.payload.text).pipe(
+      map(suggestions => actions.getSuggestionsSuccess({suggestions})),
+      catchError(() => observableOf({type: actions.GET_SUGGESTIONS_ERROR})));
+    }));
+
+  @Effect()
   addFeedFilter$ = this.actions$.pipe(
-    ofType(actions.ADD_FEED_FILTER),
+    ofType(actions.ADD_SEARCH_BAR_FILTERS),
     mergeMap((_action: actions.EventFeedAction) =>
       [actions.getInitialFeed(), actions.getGuitarStrings(), actions.getTaskCounts()]));
 

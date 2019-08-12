@@ -66,6 +66,19 @@ export interface Chicklet {
   type: string;
 }
 
+export interface SuggestionItem {
+  name: string;
+  title: string;
+  icon: string;
+}
+
+export interface SearchBarCategoryItem {
+  text: string;
+  type: string;
+  providedValues?: SuggestionItem[];
+  allowWildcards?: boolean;
+}
+
 export interface NodeFilter {
   attribute?: string;
   compliance?: RollupCompliance;
@@ -649,8 +662,8 @@ export interface SidebarFilter {
 }
 
 export interface EventFeedFilter {
-  entityType?: Array<string>;
   requestorName?: string;
+  searchBar?: Array<Chicklet>;
   task?: string;
   collapse?: boolean;
   pageSize?: number;

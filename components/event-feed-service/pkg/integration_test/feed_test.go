@@ -308,7 +308,7 @@ func TestEventFeedFilterTags(t *testing.T) {
 		{
 			description: "should return only 'org_2' and profiles events",
 			request: event_feed.FeedRequest{
-				Filters: []string{"org_name:org_2", "entity_type:profiles"},
+				Filters: []string{"org_name:org_2", "event-type:profiles"},
 				Size:    pageSize,
 			},
 			expected: expectedEntries[0:5],
@@ -433,7 +433,7 @@ func TestEventFeedFilterEventType(t *testing.T) {
 		{
 			description: "should return only 6 profile type events",
 			request: event_feed.FeedRequest{
-				Filters: []string{"entity_type:" + eventTypes[0]},
+				Filters: []string{"event-type:" + eventTypes[0]},
 				Size:    pageSize,
 			},
 			expected: expectedEntries[0:6],
@@ -441,7 +441,7 @@ func TestEventFeedFilterEventType(t *testing.T) {
 		{
 			description: "should return only 6 scan job type events",
 			request: event_feed.FeedRequest{
-				Filters: []string{"entity_type:" + eventTypes[1]},
+				Filters: []string{"event-type:" + eventTypes[1]},
 				Size:    pageSize,
 			},
 			expected: expectedEntries[6:12],

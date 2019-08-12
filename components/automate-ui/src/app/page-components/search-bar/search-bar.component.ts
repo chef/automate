@@ -12,30 +12,30 @@ import {
 import { Subject, Observable, of as observableOf } from 'rxjs';
 import { List } from 'immutable';
 import { clamp, compact } from 'lodash';
-import { Chicklet } from '../../types/types';
+import { SearchBarCategoryItem, Chicklet, SuggestionItem } from '../../types/types';
 import {
   debounceTime, switchMap, distinctUntilChanged
 } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-client-runs-search-bar',
-  templateUrl: './client-runs-search-bar.component.html',
-  styleUrls: ['./client-runs-search-bar.component.scss']
+  selector: 'app-search-bar',
+  templateUrl: './search-bar.component.html',
+  styleUrls: ['./search-bar.component.scss']
 })
-export class ClientRunsSearchBarComponent implements OnChanges {
+export class SearchBarComponent implements OnChanges {
   suggestionsVisible = false;
   isLoadingSuggestions = false;
   highlightedIndex = -1;
   inputText = '';
-  selectedCategoryType: Chicklet = undefined;
-  visibleCategories = List<Chicklet>();
-  suggestions: List<string> = List<string>();
+  selectedCategoryType: SearchBarCategoryItem = undefined;
+  visibleCategories = List<SearchBarCategoryItem>();
+  suggestions: List<SuggestionItem> = List<SuggestionItem>();
   private suggestionsVisibleStream = new Subject<boolean>();
   private suggestionSearchTermDebounce = new Subject<Chicklet>();
 
   @Input() numberOfFilters: number;
-  @Input() filterTypes: Chicklet[] = [];
-  @Input() filterValues: string[];
+  @Input() categories: SearchBarCategoryItem[] = [];
+  @Input() dynamicSuggestions: string[];
   @Output() suggestValues: EventEmitter<any> = new EventEmitter<any>();
   @Output() itemSelected: EventEmitter<any> = new EventEmitter<any>();
   @Output() filtersButtonClick: EventEmitter<any> = new EventEmitter<any>();
@@ -69,13 +69,17 @@ export class ClientRunsSearchBarComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.filterValues) {
-      this.suggestions = List<string>(compact(changes.filterValues.currentValue));
+    if (changes.dynamicSuggestions) {
+      this.suggestions = List<SuggestionItem>(
+        compact(changes.dynamicSuggestions.currentValue.map((suggestion) => {
+        return {name: suggestion, title: suggestion};
+      })));
+
       this.isLoadingSuggestions = false;
     }
 
-    if (changes.filterTypes) {
-      this.visibleCategories = List<Chicklet>(changes.filterTypes.currentValue);
+    if (changes.categories) {
+      this.visibleCategories = List<SearchBarCategoryItem>(changes.categories.currentValue);
     }
   }
 
@@ -103,16 +107,15 @@ export class ClientRunsSearchBarComponent implements OnChanges {
     this.suggestionsVisibleStream.next(true);
   }
 
-  handleSuggestionClick(suggestion: string, event: Event): void {
+  handleSuggestionClick(suggestion: SuggestionItem, event: Event): void {
     event.stopPropagation();
     const type = this.selectedCategoryType.type;
     this.clearAll();
-    this.itemSelected.emit({ detail: { text: suggestion,
-      type: type}});
+    this.itemSelected.emit({ detail: { text: suggestion.name, type: type}});
   }
 
   // This is triggered when a user clicks on an item in the dropdown.
-  handleCategoryItemClick(type: Chicklet, event: Event): void {
+  handleCategoryItemClick(type: SearchBarCategoryItem, event: Event): void {
     event.stopPropagation();
     if (!this.selectedCategoryType) {
       this.categorySelected(type);
@@ -151,26 +154,39 @@ export class ClientRunsSearchBarComponent implements OnChanges {
 
   pressEnterCategorySelected(currentText: string): void {
     if (this.highlightedIndex >= 0) {
-      const search = this.suggestions.get(this.highlightedIndex);
-      const type = this.selectedCategoryType.type;
+      const sug: SuggestionItem = this.suggestions.get(this.highlightedIndex);
+      const type: string = this.selectedCategoryType.type;
       this.clearAll();
-      this.itemSelected.emit({ detail: { text: search,
+      this.itemSelected.emit({ detail: { text: sug.name,
         type: type }});
     } else {
-      if (currentText.indexOf('?') >= 0 || currentText.indexOf('*') >= 0) {
-        const type = this.selectedCategoryType.type;
-        this.clearAll();
-        this.itemSelected.emit({ detail: { text: currentText,
-          type: type}});
-      } else if (!this.suggestions.isEmpty()) {
-        const foundSuggestion = this.suggestions.find((suggestion: string,
-          _key: number, _iter: any) => suggestion === currentText);
-
-        if (foundSuggestion) {
+      if (this.hasStaticSuggestions()) {
+        if (!this.suggestions.isEmpty()) {
+          if ( this.suggestions.size === 1) {
+            const sug = this.suggestions.first();
+            const type = this.selectedCategoryType.type;
+            this.clearAll();
+            this.itemSelected.emit({ detail: { text: sug.name,
+              type: type}});
+          }
+        }
+      } else {
+        if (this.selectedCategoryType.allowWildcards &&
+          (currentText.indexOf('?') >= 0 || currentText.indexOf('*') >= 0) ) {
           const type = this.selectedCategoryType.type;
           this.clearAll();
-          this.itemSelected.emit({ detail: { text: foundSuggestion,
+          this.itemSelected.emit({ detail: { text: currentText,
             type: type}});
+        } else if (!this.suggestions.isEmpty()) {
+          const foundSuggestion = this.suggestions.find((suggestion: SuggestionItem,
+            _key: number, _iter: any) => suggestion.title === currentText);
+
+          if (foundSuggestion) {
+            const type = this.selectedCategoryType.type;
+            this.clearAll();
+            this.itemSelected.emit({ detail: { text: foundSuggestion.name,
+              type: type}});
+          }
         }
       }
     }
@@ -198,10 +214,14 @@ export class ClientRunsSearchBarComponent implements OnChanges {
       if (this.inputText === '') {
         this.clearCategorySelected();
       } else {
-        const type = this.selectedCategoryType.type;
-        this.clearSuggestions();
-        this.requestForSuggestions({ text: currentText,
-          type: type });
+        if (!this.hasStaticSuggestions()) {
+          const type = this.selectedCategoryType.type;
+          this.clearSuggestions();
+          this.requestForSuggestions({ text: currentText,
+            type: type });
+        } else {
+          this.updateVisibleProvidedSuggestions(currentText);
+        }
       }
     } else {
       if (this.inputText === '') {
@@ -216,10 +236,14 @@ export class ClientRunsSearchBarComponent implements OnChanges {
 
   pressDefaultText(currentText: string): void {
     if (this.selectedCategoryType) {
-      const type = this.selectedCategoryType.type;
-      this.clearSuggestions();
-      this.requestForSuggestions({ text: currentText,
-        type: type });
+      if (!this.hasStaticSuggestions()) {
+        const type = this.selectedCategoryType.type;
+        this.clearSuggestions();
+        this.requestForSuggestions({ text: currentText,
+          type: type });
+      } else {
+        this.updateVisibleProvidedSuggestions(currentText);
+      }
     } else {
       this.updateVisibleCategories(currentText);
     }
@@ -256,7 +280,7 @@ export class ClientRunsSearchBarComponent implements OnChanges {
     }
   }
 
-  get_filter_text(): string {
+  getFilterText(): string {
     if (this.selectedCategoryType) {
       switch (this.selectedCategoryType.type) {
         case 'platform':
@@ -275,17 +299,22 @@ export class ClientRunsSearchBarComponent implements OnChanges {
     }
   }
 
-  categorySelected(type: Chicklet): void {
+  categorySelected(type: SearchBarCategoryItem): void {
     this.selectedCategoryType = type;
     this.inputText = '';
     this.highlightedIndex = -1;
     this.inputField.nativeElement.value = '';
     this.inputField.nativeElement.focus();
+    if (this.hasStaticSuggestions()) {
+      this.suggestions = List<SuggestionItem>(type.providedValues);
+      this.suggestionsVisible = true;
+      this.isLoadingSuggestions = false;
+    }
   }
 
   clearCategorySelected(): void {
     this.selectedCategoryType = undefined;
-    this.visibleCategories = List(this.filterTypes);
+    this.visibleCategories = List(this.categories);
     this.highlightedIndex = -1;
   }
 
@@ -297,20 +326,32 @@ export class ClientRunsSearchBarComponent implements OnChanges {
   }
 
   clearSuggestions(): void {
-    this.suggestions = List<string>();
-    this.filterValues = [];
+    this.suggestions = List<SuggestionItem>();
+    this.dynamicSuggestions = [];
     this.highlightedIndex = -1;
   }
 
   updateVisibleCategories(currentText: string): void {
     this.highlightedIndex = -1;
-    this.visibleCategories = List(this.filterTypes.filter(cat => {
+    this.visibleCategories = List(this.categories.filter(cat => {
       return cat.text.toLowerCase().indexOf(currentText.toLowerCase()) !== -1;
+    }));
+  }
+
+  updateVisibleProvidedSuggestions(currentText: string): void {
+    this.highlightedIndex = -1;
+    this.suggestions = List(this.selectedCategoryType.providedValues.filter(
+      (item: SuggestionItem) => {
+      return item.title.toLowerCase().indexOf(currentText.toLowerCase()) !== -1;
     }));
   }
 
   requestForSuggestions(c: Chicklet): void {
     this.isLoadingSuggestions = true;
     this.suggestionSearchTermDebounce.next(c);
+  }
+
+  hasStaticSuggestions(): boolean {
+    return this.selectedCategoryType.providedValues !== undefined;
   }
 }

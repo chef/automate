@@ -36,10 +36,8 @@ In the event feed, events of the same type by the same user are grouped. The eve
 
 ## Filtering events
 
-To filter the event feed and event timeline by event type use the drop-down menu in the upper right corner. It defaults to show all events. Available event type filters are clients, cookbooks, data bags, environments, nodes, policyfiles, profiles, roles, and scan jobs.
-![Event feed filters by type](/images/docs/event-feed-filters-types.png)
-
-To filter by Chef Server or Chef Server organization use the filters available in the sidebar on the left hand side. The sidebar shows all Chef Servers and all available Chef Server organizations. You cannot filter compliance events--profiles and scan jobs--by organization or Chef Server. Compliance events are not visible when either of these filters are applied.
+To filter the event feed and event timeline by event type, Chef Server, or Chef Organization, use the search bar. Available event type filters are clients, cookbooks, data bags, environments, nodes, policyfiles, profiles, roles, and scan jobs.
+To filter, select Event Type, Chef Server or Chef Organization in the search bar and start typing the name. You cannot filter compliance events -- profiles and scan jobs -- by organization or Chef Server. Compliance events are not visible when either of these filters are applied.
 
 ![Event feed filters by server](/images/docs/event-feed-filters-servers.png)
 
