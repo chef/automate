@@ -19,7 +19,10 @@ export class ReportDataService {
   nodesListEmpty = false;
   nodesList: any = {
     items: [],
-    total: 0
+    total: 0,
+    total_failed: 0,
+    total_passed: 0,
+    total_skipped: 0
   };
   nodesListParams: any = {
     perPage: 100,
