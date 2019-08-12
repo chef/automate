@@ -230,8 +230,8 @@ installation, create a TOML file that contains the partial configuration for eit
 `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
 {{% warning %}}
-You may only integrate one IdP using SAML, and one IdP using LDAP at a time.
-It's not supported to integrate with _two_ SAML IdPs, or _two_ LDAP services.
+You may only integrate one IdP using SAML and one IdP using LDAP at a time.
+Chef Automate does not support using _two_ SAML IdPs or _two_ LDAP services simultaneously.
 {{% /warning %}}
 
 If you need to change your configured IdP, you will need to replace
