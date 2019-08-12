@@ -26,6 +26,8 @@ const (
 	uniqueServiceGroupError = "Unable to insert service_group: pq: duplicate key value violates unique constraint \"service_group_name_deployment_id_key\""
 )
 
+var IngestToSingleTable = false
+
 type packageIdent struct {
 	Origin  string
 	Name    string
@@ -131,17 +133,19 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 	// uppercases but habitat is actually sending case sensitive strings
 	eventHealth := strings.ToUpper(event.GetResult().String())
 
-	err = db.upsertServiceAndMetadata(
-		eventMetadata,
-		svcMetadata,
-		pkgIdent,
-		eventHealth,
-	)
-	// upsert should handle races and such so we don't have to retry to handle
-	// unique constraint problems, thus an error here is something we don't know how to handle.
-	if err != nil {
-		log.WithError(err).Error("failed to upsert healthcheck data")
-		return err
+	if IngestToSingleTable {
+		err = db.upsertServiceAndMetadata(
+			eventMetadata,
+			svcMetadata,
+			pkgIdent,
+			eventHealth,
+		)
+		// upsert should handle races and such so we don't have to retry to handle
+		// unique constraint problems, thus an error here is something we don't know how to handle.
+		if err != nil {
+			log.WithError(err).Error("failed to upsert healthcheck data")
+			return err
+		}
 	}
 
 	svc, exist := db.getServiceFromUniqueFields(
