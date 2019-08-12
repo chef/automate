@@ -14,7 +14,7 @@ import {
   GET_TYPE_COUNTS,
   GET_TYPE_COUNTS_SUCCESS,
   GET_TYPE_COUNTS_ERROR,
-  ADD_FEED_FILTER,
+  ADD_SEARCH_BAR_FILTERS,
   LOAD_MORE_FEED,
   LOAD_MORE_FEED_ERROR,
   LOAD_MORE_FEED_SUCCESS,
@@ -23,6 +23,9 @@ import {
   GET_TASK_COUNTS_ERROR,
   ADD_FEED_DATE_RANGE_FILTER,
   GET_INITIAL_EVENT_FEED_LOAD,
+  GET_SUGGESTIONS,
+  GET_SUGGESTIONS_SUCCESS,
+  GET_SUGGESTIONS_ERROR,
   EventFeedAction } from './event-feed.actions';
 import * as moment from 'moment';
 
@@ -45,7 +48,9 @@ export interface EventFeedState {
   guitarStringCollection: GuitarStringCollection;
   typeCounts: EventTypeCount;
   taskCounts: EventTaskCount;
+  suggestions: any[];
   filters: EventFeedFilter;
+  suggestionsStatus: Status;
   initialFeedStatus: Status;
   loadMorefeedStatus: Status;
   guitarStringsStatus: Status;
@@ -56,6 +61,7 @@ export interface EventFeedState {
 export const initialState: EventFeedState = {
   completeNumberOfEvents: 0,
   loadedEvents: [],
+  suggestions: [],
   guitarStringCollection:
     new GuitarStringCollection([],
     moment().subtract(6, 'days').startOf('day'),
@@ -63,7 +69,7 @@ export const initialState: EventFeedState = {
   typeCounts: EventTypeCount.Null,
   taskCounts: EventTaskCount.Null,
   filters: {
-    entityType: [],
+    searchBar: [],
     endDate: moment().endOf('day'),
     startDate: moment().subtract(6, 'days').startOf('day'),
     hoursBetween: 1,
@@ -74,7 +80,8 @@ export const initialState: EventFeedState = {
   initialFeedStatus: Status.notLoaded,
   guitarStringsStatus: Status.notLoaded,
   eventTypeCountStatus: Status.notLoaded,
-  eventTaskCountStatus: Status.notLoaded
+  eventTaskCountStatus: Status.notLoaded,
+  suggestionsStatus: Status.notLoaded
 };
 
 export function eventFeedReducer(
@@ -186,9 +193,9 @@ export function eventFeedReducer(
       return set('eventTaskCountStatus', Status.loadingFailure, state) as EventFeedState;
     }
 
-    case ADD_FEED_FILTER: {
-      const {type, filter} = action.payload;
-      return set('filters.' + type, filter, state) as EventFeedState;
+    case ADD_SEARCH_BAR_FILTERS: {
+      const {searchBarFilters} = action.payload;
+      return set('filters.searchBar', searchBarFilters, state) as EventFeedState;
     }
 
     case ADD_FEED_DATE_RANGE_FILTER: {
@@ -198,6 +205,21 @@ export function eventFeedReducer(
         set('filters.endDate', end)
       )(state) as EventFeedState;
     }
+
+    case GET_SUGGESTIONS:
+      return pipe(
+        set('suggestionsStatus', Status.loading),
+        set('suggestions', []))(state) as EventFeedState;
+
+    case GET_SUGGESTIONS_SUCCESS:
+      return pipe(
+        set('suggestionsStatus', Status.loadingSuccess),
+        set('suggestions', action.payload.suggestions))(state) as EventFeedState;
+
+    case GET_SUGGESTIONS_ERROR:
+      return pipe(
+        set('suggestions', []),
+        set('suggestionsStatus', Status.loadingFailure))(state) as EventFeedState;
   }
 
   return state;

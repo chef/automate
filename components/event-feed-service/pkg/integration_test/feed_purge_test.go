@@ -183,7 +183,7 @@ func runPurgeTestCases(t *testing.T, cases []purgeTestCase) {
 				log.Infof("Purge response: %+v", feedRes)
 				assert.Equal(t, test.expectedFeedRes.ComponentStatus[persistence.IndexNameFeeds].Status, feedRes.ComponentStatus[persistence.IndexNameFeeds].Status)
 
-				counts, err := testSuite.feedServer.GetFeedSummary(context.Background(), &event_feed.FeedSummaryRequest{CountCategory: "entity_type"})
+				counts, err := testSuite.feedServer.GetFeedSummary(context.Background(), &event_feed.FeedSummaryRequest{CountCategory: "event-type"})
 				require.NoError(t, err)
 
 				assert.Equal(t, test.expectedRemaining, counts.TotalEntries,

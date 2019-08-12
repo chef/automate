@@ -19,6 +19,7 @@ export class ReportingNodesComponent implements OnInit, OnDestroy {
   layerOneData: any = {};
   layerTwoData: any = {};
   control: any = {};
+  nodeFilterStatus = 'all';
 
   scanResultsPane = 0;
   openControls = {};
@@ -40,6 +41,20 @@ export class ReportingNodesComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  filterNodeStatus(_event, status) {
+    this.nodeFilterStatus = status;
+  }
+
+  isNodeStatusSelected(status): boolean {
+    return this.nodeFilterStatus === status;
+  }
+
+  filteredNodes(nodes) {
+    return this.nodeFilterStatus === 'all'
+      ? nodes
+      : nodes.filter((node) => node.latest_report.status === this.nodeFilterStatus);
   }
 
   onNodesListPageChanged(event) {

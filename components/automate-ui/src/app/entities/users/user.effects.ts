@@ -77,7 +77,7 @@ export class UserEffects {
 
   @Effect()
   getUserFailure$ = this.actions$.pipe(
-    ofType(UserActionTypes.GET),
+    ofType(UserActionTypes.GET_FAILURE),
     map(({ payload: { error } }: GetUserFailure) => {
       const msg = error.error;
       return new CreateNotification({

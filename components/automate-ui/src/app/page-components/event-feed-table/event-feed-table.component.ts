@@ -1,14 +1,12 @@
-import { takeUntil } from 'rxjs/operators';
 import { Component, Input, ViewChild, ElementRef, OnDestroy, OnInit } from '@angular/core';
-import { capitalize, getOr, endsWith, replace } from 'lodash/fp';
-import { Subject, Subscription } from 'rxjs';
-import { ChefEvent, ChefEventCollection, EventFeedFilter } from '../../types/types';
+import { capitalize, getOr, endsWith, replace, concat } from 'lodash/fp';
+import { Subject, Subscription, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { ChefEvent, ChefEventCollection, EventFeedFilter, Chicklet } from '../../types/types';
 import { EventFeedService } from '../../services/event-feed/event-feed.service';
 import * as moment from 'moment';
-import * as sidebarSelectors from '../../services/sidebar/sidebar.selectors';
-import { Store } from '@ngrx/store';
-import { NgrxStateAtom } from '../../ngrx.reducers';
 
+const ENTITY_TYPE_TAG = 'entity_type';
 @Component({
   selector: 'app-event-feed-table',
   templateUrl: './event-feed-table.component.html',
@@ -17,33 +15,22 @@ import { NgrxStateAtom } from '../../ngrx.reducers';
 
 export class EventFeedTableComponent implements OnDestroy, OnInit {
   @Input() events: ChefEvent[];
+  // The currently set collection of searchbar filters
+  @Input() searchBarFilters: Chicklet[];
   showEventGroupPanel = false;
   groupedEvent: ChefEvent;
   groupedEvents: ChefEvent[];
   groupedEventsButton;
-  private selectedOrgs: string[];
-  private selectedChefServers: string[];
   @ViewChild('groupSidePanel') sidepanel: ElementRef;
   private subscription: Subscription;
   private isDestroyed = new Subject<boolean>();
 
   constructor(
-    private eventFeedService: EventFeedService,
-    private store: Store<NgrxStateAtom>
+    private eventFeedService: EventFeedService
   ) { }
 
   ngOnInit() {
-    this.store.select(sidebarSelectors.selectedOrgs).pipe(
-      takeUntil(this.isDestroyed))
-      .subscribe(selectedOrgs => {
-        this.selectedOrgs = selectedOrgs;
-      });
 
-    this.store.select(sidebarSelectors.selectedChefServers).pipe(
-      takeUntil(this.isDestroyed))
-      .subscribe(selectedChefServers => {
-        this.selectedChefServers = selectedChefServers;
-      });
   }
 
   ngOnDestroy(): void {
@@ -51,38 +38,40 @@ export class EventFeedTableComponent implements OnDestroy, OnInit {
     this.isDestroyed.complete();
   }
 
-  isGroup(event: ChefEvent) {
+  isGroup(event: ChefEvent): boolean {
     return event.eventCount > 1;
   }
 
-  getGroupedEvents(event: ChefEvent, clickEvent) {
+  displayGroupedEvents(event: ChefEvent, clickEvent) {
     this.groupedEvent = null;
     this.groupedEvents = [];
     this.groupedEvent = event;
     this.sidepanel.nativeElement.focus();
     this.groupedEventsButton = document.getElementById(clickEvent.target.id);
 
-    const filter: EventFeedFilter = {
-      startDate: moment(this.groupedEvent.startTime),
-      endDate: moment(this.groupedEvent.endTime),
-      requestorName: this.groupedEvent.requestorName,
-      task: this.groupedEvent.task,
-      entityType: [this.groupedEvent.eventType],
-      collapse: false,
-      pageSize: this.groupedEvent.eventCount
-    };
-
-    const sidebarFilter = {
-      organizations: this.selectedOrgs,
-      servers: this.selectedChefServers
-    };
-
-    this.subscription = this.eventFeedService.getEventFeed(filter, sidebarFilter)
-      .subscribe((eventCollection: ChefEventCollection) => {
-        this.groupedEvents = eventCollection.events;
-      });
+    this.getGroupedEvents(event).subscribe((events: ChefEvent[]) => {
+      this.groupedEvents = events;
+    });
 
     this.showEventGroupPanel = true;
+  }
+
+  getGroupedEvents(event: ChefEvent): Observable<ChefEvent[]> {
+    const searchBar = concat({ type: ENTITY_TYPE_TAG, text: event.eventType },
+      this.searchBarFilters.filter((f: Chicklet) => f.type !== ENTITY_TYPE_TAG));
+
+    const filter: EventFeedFilter = {
+      startDate: moment(event.startTime),
+      endDate: moment(event.endTime),
+      requestorName: event.requestorName,
+      searchBar: searchBar,
+      task: event.task,
+      collapse: false,
+      pageSize: event.eventCount
+    };
+
+    return this.eventFeedService.getEventFeed(filter).pipe(map(
+      (eventCollection: ChefEventCollection) => eventCollection.events));
   }
 
   hideGroupedEvents() {

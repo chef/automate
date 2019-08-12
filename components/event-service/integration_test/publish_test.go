@@ -237,7 +237,7 @@ func TestPublishLoad(t *testing.T) {
 		time.Sleep(10 * time.Second)
 		suite.refreshIndices(persistence.IndexNameFeeds)
 
-		fsr := &event_feed_api.FeedSummaryRequest{CountCategory: "entity_type"}
+		fsr := &event_feed_api.FeedSummaryRequest{CountCategory: "event-type"}
 		res, err := getFeedClient().GetFeedSummary(ctx, fsr)
 		if assert.Nil(t, err) {
 			assert.Equal(t, test.expectedEntryCount, res.TotalEntries)

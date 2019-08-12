@@ -738,7 +738,7 @@ func TestEventFeedFilterEventType(t *testing.T) {
 		{
 			description: "should return only the 2 policyfile type events",
 			request: request.EventFilter{
-				Filter:   []string{"entity_type:policyfile"},
+				Filter:   []string{"event-type:policyfile"},
 				PageSize: pageSize,
 			},
 			expected: []*response.Event{expectedEvents[0], expectedEvents[6]},
@@ -746,7 +746,7 @@ func TestEventFeedFilterEventType(t *testing.T) {
 		{
 			description: "should return only the 2 node type events",
 			request: request.EventFilter{
-				Filter:   []string{"entity_type:node"},
+				Filter:   []string{"event-type:node"},
 				PageSize: pageSize,
 			},
 			expected: []*response.Event{expectedEvents[1], expectedEvents[7]},
@@ -754,7 +754,7 @@ func TestEventFeedFilterEventType(t *testing.T) {
 		{
 			description: "should return only the 2 cookbook type events",
 			request: request.EventFilter{
-				Filter:   []string{"entity_type:cookbook"},
+				Filter:   []string{"event-type:cookbook"},
 				PageSize: pageSize,
 			},
 			expected: []*response.Event{expectedEvents[2], expectedEvents[8]},
@@ -762,7 +762,7 @@ func TestEventFeedFilterEventType(t *testing.T) {
 		{
 			description: "should return only the 2 bag type events",
 			request: request.EventFilter{
-				Filter:   []string{"entity_type:bag"},
+				Filter:   []string{"event-type:bag"},
 				PageSize: pageSize,
 			},
 			expected: []*response.Event{expectedEvents[3], expectedEvents[9]},
@@ -770,7 +770,7 @@ func TestEventFeedFilterEventType(t *testing.T) {
 		{
 			description: "should return only the 2 environment type events",
 			request: request.EventFilter{
-				Filter:   []string{"entity_type:environment"},
+				Filter:   []string{"event-type:environment"},
 				PageSize: pageSize,
 			},
 			expected: []*response.Event{expectedEvents[4], expectedEvents[10]},
@@ -778,7 +778,7 @@ func TestEventFeedFilterEventType(t *testing.T) {
 		{
 			description: "should return only the 2 role type events",
 			request: request.EventFilter{
-				Filter:   []string{"entity_type:role"},
+				Filter:   []string{"event-type:role"},
 				PageSize: pageSize,
 			},
 			expected: []*response.Event{expectedEvents[5], expectedEvents[11]},
@@ -786,7 +786,7 @@ func TestEventFeedFilterEventType(t *testing.T) {
 		{
 			description: "should return no events",
 			request: request.EventFilter{
-				Filter:   []string{"entity_type:fake"},
+				Filter:   []string{"event-type:fake"},
 				PageSize: pageSize,
 			},
 			expected: []*response.Event{},

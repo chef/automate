@@ -7,6 +7,36 @@
 </div>
 
 <ng-container *ngIf="!reportData.nodesListEmpty">
+    <chef-phat-radio
+    class="nodes-list-status-filters"
+    [value]="nodeFilterStatus"
+    (change)="filterNodeStatus($event, $event.target.value)">
+    <chef-option class="filter all" value='all'>
+      <span class="filter-label">Total Nodes</span>
+      <span class="filter-total">
+        <chef-icon>storage</chef-icon> {{ reportData.nodesList.total | number}}
+      </span>
+    </chef-option>
+    <chef-option class="filter critical" value='failed'>
+      <span class="filter-label">Failed Nodes</span>
+      <span class="filter-total">
+        <chef-icon>report_problem</chef-icon> {{ reportData.nodesList.total_failed | number}}
+      </span>
+    </chef-option>
+    <chef-option class="filter passed" value='passed'>
+      <span class="filter-label">Passed Nodes</span>
+      <span class="filter-total">
+        <chef-icon>check_circle</chef-icon> {{ reportData.nodesList.total_passed | number}}
+      </span>
+    </chef-option>
+    <chef-option class="filter skipped" value='skipped'>
+      <span class="filter-label">Skipped Nodes</span>
+      <span class="filter-total">
+        <chef-icon>help</chef-icon> {{ reportData.nodesList.total_skipped | number}}
+      </span>
+    </chef-option>
+  </chef-phat-radio>
+  
   <chef-table class="reporting-nodes-table" (sort-toggled)="onNodesListSortToggled($event)">
     <chef-thead>
       <chef-tr>
@@ -49,7 +79,7 @@
       </chef-tr>
     </chef-thead>
     <chef-tbody *ngIf="!reportData.nodesListLoading">
-      <chef-tr *ngFor="let node of reportData.nodesList.items">
+      <chef-tr *ngFor="let node of filteredNodes(reportData.nodesList.items)">
         <chef-td>
           <chef-icon class="status-icon" [ngClass]="node.latest_report.status">
             {{ statusIcon(node.latest_report.status) }}

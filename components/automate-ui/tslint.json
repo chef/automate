@@ -144,12 +144,7 @@
       "check-type",
       "check-type-operator"
     ],
-    "directive-selector": [
-      true,
-      ["attribute", "element"],
-      ["app", "chef"],
-      ["camelCase", "kebab-case"]
-    ],
+    "directive-selector": false,
     "component-selector": [
       true,
       ["element", "attribute"],

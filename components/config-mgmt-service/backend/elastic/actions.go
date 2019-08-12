@@ -162,7 +162,7 @@ func (es Backend) GetActions(filters map[string][]string, start, end time.Time,
 
 // GetActionEventTypeCounts - counts the number of action event types
 func (es Backend) GetActionEventTypeCounts(filters map[string][]string, start, end time.Time) (map[string]int64, error) {
-	return es.getActionCounts("entity_type", filters, start, end)
+	return es.getActionCounts(backend.EntityTypeName, filters, start, end)
 }
 
 // GetActionEventTaskCounts - counts the number of action event tasks
@@ -296,7 +296,7 @@ func (es Backend) GetEventString(filters map[string][]string, startDate, endDate
 		Format(timeFormatRFC3339).
 		TimeZone(timezone). // needed start the buckets at the beginning of the day.
 		SubAggregation(eventTypeItems,
-			elastic.NewTermsAggregation().Field("entity_type"))
+			elastic.NewTermsAggregation().Field(backend.EntityTypeName))
 
 	searchResult, err := es.client.Search().
 		Index(IndexAction).

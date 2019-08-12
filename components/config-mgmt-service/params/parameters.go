@@ -63,6 +63,8 @@ func ConvertParamToActionBackend(parameter string) string {
 		return backend.ActionOrganization
 	case "source_fqdn":
 		return backend.ActionSourceFQDN
+	case "event-type":
+		return backend.EntityTypeName
 	default:
 		return parameter
 	}

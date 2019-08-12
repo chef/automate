@@ -7,11 +7,11 @@ import {
 import { Chicklet } from '../../types/types';
 
 @Component({
-  selector: 'app-client-runs-search-filters',
-  templateUrl: './client-runs-search-filters.component.html',
-  styleUrls: ['./client-runs-search-filters.component.scss']
+  selector: 'app-search-bar-filter-bar',
+  templateUrl: './search-bar-filter-bar.component.html',
+  styleUrls: ['./search-bar-filter-bar.component.scss']
 })
-export class ClientRunsSearchFiltersComponent {
+export class SearchBarFilterBarComponent {
   @Input() filters: Chicklet[] = [];
   @Output() filtersCleared: EventEmitter<any> = new EventEmitter<any>();
   @Output() filterRemoved: EventEmitter<any> = new EventEmitter<any>();

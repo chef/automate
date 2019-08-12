@@ -93,12 +93,6 @@ import {
   ClientRunsSidebarComponent
 } from './page-components/client-runs-sidebar/client-runs-sidebar.component';
 import {
-  ClientRunsSearchBarComponent
-} from './page-components/client-runs-search-bar/client-runs-search-bar.component';
-import {
-  ClientRunsSearchFiltersComponent
-} from './page-components/client-runs-search-filters/client-runs-search-filters.component';
-import {
   ClientRunsTableComponent
 } from './page-components/client-runs-table/client-runs-table.component';
 import {
@@ -120,8 +114,8 @@ import {
   EventFeedGuitarStringsComponent
 } from './page-components/event-feed-guitar-strings/event-feed-guitar-strings.component';
 import {
-  EventFeedSelectComponent
-} from './page-components/event-feed-select/event-feed-select.component';
+  EventFeedSidebarComponent
+} from './page-components/event-feed-sidebar/event-feed-sidebar.component';
 import {
   EventFeedTableComponent
 } from './page-components/event-feed-table/event-feed-table.component';
@@ -176,15 +170,18 @@ import {
 import { RunListTableComponent } from './page-components/run-list-table/run-list-table.component';
 import { RunSummaryComponent } from './page-components/run-summary/run-summary.component';
 import {
+  SearchBarComponent
+} from './page-components/search-bar/search-bar.component';
+import {
+  SearchBarFilterBarComponent
+} from './page-components/search-bar-filter-bar/search-bar-filter-bar.component';
+import {
   SelectListItemComponent
 } from './page-components/select-list-item/select-list-item.component';
 import {
   ServicesSidebarComponent
 } from './page-components/services-sidebar/services-sidebar.component';
 import { ServiceGroupsComponent } from './pages/service-groups/service-groups.component';
-import {
-  ServerOrgFilterSidebarComponent
-} from './page-components/server-org-filter-sidebar/server-org-filter-sidebar.component';
 import { SettingsLandingComponent } from './pages/settings-landing/settings-landing.component';
 import {
   SidebarSelectListComponent
@@ -212,8 +209,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     AttributesComponent,
     ClientRunsComponent,
     ClientRunsSidebarComponent,
-    ClientRunsSearchBarComponent,
-    ClientRunsSearchFiltersComponent,
     ClientRunsTableComponent,
     ConvergeRadialGraphComponent,
     CreateV1TeamModalComponent,
@@ -223,7 +218,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     DeltaViewerComponent,
     EventFeedComponent,
     EventFeedGuitarStringsComponent,
-    EventFeedSelectComponent,
+    EventFeedSidebarComponent,
     EventFeedTableComponent,
     EventIconComponent,
     FeatureFlagsComponent,
@@ -255,9 +250,10 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     RunListRoleHeaderComponent,
     RunListTableComponent,
     RunSummaryComponent,
+    SearchBarComponent,
+    SearchBarFilterBarComponent,
     SelectListItemComponent,
     ServiceGroupsComponent,
-    ServerOrgFilterSidebarComponent,
     ServicesSidebarComponent,
     SettingsLandingComponent,
     SidebarSelectListComponent,
