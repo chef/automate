@@ -70,69 +70,7 @@ BEGIN
 END;
 $$;
 
-
 CREATE TRIGGER service_full_save_previous_health_on_state_change BEFORE UPDATE
 ON service_full FOR EACH ROW EXECUTE PROCEDURE
 save_previous_health_on_state_change();
-
-
--- service       | id                     | integer
--- service       | origin                 | text
--- service       | name                   | text
--- service       | version                | text
--- service       | release                | text
--- service       | status                 | text
--- service       | health                 | text
--- service       | channel                | text
--- service       | update_strategy        | text
-
--- service       | package_ident          | text
--- service       | last_event_occurred_at | timestamp without time zone
---  service       | created_at             | timestamp without time zone
---  service       | updated_at             | timestamp without time zone
--- service       | previous_health        | text
--- service       | health_updated_at      | timestamp without time zone
--- supervisor    | member_id              | text
--- supervisor    | fqdn                   | text
--- supervisor    | site                   | text
--- service_group | name                   | text
--- service_group | name_suffix            | text
--- deployment    | app_name               | text
--- deployment    | environment            | text
-
-
--- SELECT table_name, column_name, data_type
---   FROM information_schema.columns
---  WHERE table_schema = 'public'
---    AND table_name IN ('deployment', 'service', 'service_group', 'supervisor')
---      ;
-
-
--- INSERT INTO service_full (
---   name, supervisor_id,
---   origin, version, release, package_ident, status, health,
---   channel, update_strategy, fqdn, site,
---   service_group_name, service_group_name_suffix,
---   application, environment
--- )
--- VALUES (
---   'pkg', '1111',
---   'core', '0.1.0', '2019blahblah', 'core/pkg/0.1.0/2019blahblah', '', 'CRITICAL',
---   'stable', 'AT-ONCE', 'example.com', 'default',
---   'pkg.default', 'default',
---   'myapp', 'myenv'
--- )
--- ON CONFLICT ON CONSTRAINT service_full_name_supervisor_id_key
--- DO UPDATE SET (
---   origin, version, release, package_ident, status, health,
---   channel, update_strategy, fqdn, site,
---   service_group_name, service_group_name_suffix,
---   application, environment
--- ) = (
---   EXCLUDED.origin, EXCLUDED.version, EXCLUDED.release, EXCLUDED.package_ident, EXCLUDED.status, EXCLUDED.health,
---   EXCLUDED.channel, EXCLUDED.update_strategy, EXCLUDED.fqdn, EXCLUDED.site,
---   EXCLUDED.service_group_name, EXCLUDED.service_group_name_suffix,
---   EXCLUDED.application, EXCLUDED.environment
--- )
--- ;
 
