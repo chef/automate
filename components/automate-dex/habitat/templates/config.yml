@@ -73,6 +73,7 @@ connectors:
     id: ldap
     name: LDAP
     config:
+      usernamePrompt: LDAP
       host: {{cfg.connectors.ldap.host}}
       bindDN: $LDAP_BINDDN
       bindPW: $LDAP_BINDPW
@@ -129,6 +130,7 @@ connectors:
     id: ldap
     name: LDAP Microsoft AD
     config:
+      usernamePrompt: LDAP Microsoft AD
       host: {{cfg.connectors.msad_ldap.host}}
       bindDN: $LDAP_BINDDN
       bindPW: $LDAP_BINDPW
