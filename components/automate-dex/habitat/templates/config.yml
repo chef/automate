@@ -68,20 +68,6 @@ staticClients:
     name: Automate Session Service
 {{- if cfg.connectors}}
 connectors:
-  {{- if cfg.connectors.google}}
-  - type: oidc
-    id: google
-    name: Google
-    config:
-      issuer: https://accounts.google.com
-      clientID: {{cfg.connectors.google.client_id}}
-      clientSecret: {{cfg.connectors.google.client_secret}}
-      {{- if cfg.service.external_fqdn}}
-      redirectURI: https://{{cfg.service.external_fqdn}}/dex/callback
-      {{- else}}
-      redirectURI: http://{{cfg.service.host}}:{{cfg.service.port}}/dex/callback
-      {{- end}}
-  {{- end}}
   {{- if cfg.connectors.ldap}}
   - type: ldap
     id: ldap
