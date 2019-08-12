@@ -28,6 +28,9 @@ func New(scanner *scanner.Scanner, cerealManager *cereal.Manager) *Scheduler {
 func (a *Scheduler) Run(job *jobs.Job) error {
 	logrus.Debugf("Processing job: %+v", job)
 
+	if job.Status == "running" {
+		return errors.Errorf("job %q (%q) already running", job.Id, job.Name)
+	}
 	// If the job has a recurrence, we update the job schedule
 	if job.Recurrence != "" {
 		// Ensure recurrence rule can be parsed
@@ -40,7 +43,7 @@ func (a *Scheduler) Run(job *jobs.Job) error {
 		return nil
 	}
 
-	err := a.pushWorkflow(job)
+	err := a.pushWorkflow(job, true)
 	if err != nil {
 		strErr := fmt.Sprintf("Unable to add jobs to inspec agent: %s", err.Error())
 		logrus.Error(strErr)
@@ -49,9 +52,24 @@ func (a *Scheduler) Run(job *jobs.Job) error {
 	return nil
 }
 
-func (a *Scheduler) pushWorkflow(job *jobs.Job) error {
+func (a *Scheduler) pushWorkflow(job *jobs.Job, retry bool) error {
 	logrus.Debugf("Calling EnqueueWorkflow for scan-job-workflow")
-	return a.cerealManager.EnqueueWorkflow(context.TODO(), "scan-job-workflow", fmt.Sprintf("scan-job-%s", job.Id), job)
+	ctx, cancel := context.WithTimeout(context.TODO(), 20*time.Second)
+	defer cancel()
+
+	for {
+		err := a.cerealManager.EnqueueWorkflow(context.TODO(), "scan-job-workflow", fmt.Sprintf("scan-job-%s", job.Id), job)
+		if err == nil || !retry || err != cereal.ErrWorkflowInstanceExists {
+			return err
+		}
+
+		logrus.WithError(err).Warn("failed to enqueue workflow. retrying")
+		select {
+		case <-ctx.Done():
+			return err
+		case <-time.After(2 * time.Second):
+		}
+	}
 }
 
 // PollForJobs loops every minute looking to create child jobs from recurring due jobs
@@ -72,7 +90,7 @@ func (a *Scheduler) processDueJobs(ctx context.Context, nowTime time.Time) {
 		logrus.Debugf("processDueJobs, %d recurring jobs are due for running...", len(dueJobs))
 	}
 	for _, job := range dueJobs {
-		err := a.pushWorkflow(job)
+		err := a.pushWorkflow(job, false)
 		if err != nil {
 			if err == cereal.ErrWorkflowInstanceExists {
 				logrus.Infof("Job %q is still/already running", job.Id)
