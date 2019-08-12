@@ -8,7 +8,7 @@ vendor_origin=${vendor_origin:-"chef"}
 pkg_deps=(
   core/libossp-uuid
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
-  "${vendor_origin}/openresty-noroot/1.13.6.2/20190711080332"
+  "${vendor_origin}/openresty-noroot/1.13.6.2/20190812175716"
   chef/mlsa
   core/bash
   core/curl
