@@ -11,7 +11,7 @@ Cypress.Commands.add('login', (url: string, username: string) => {
       if (local) {
         LoginHelper(username);
       } else {
-        cy.get('button').contains('Log in with Username').click().then(() => LoginHelper(username));
+        cy.get('a').contains('Sign in as a local user').click().then(() => LoginHelper(username));
       }
     });
 });

@@ -17,24 +17,23 @@ if (Cypress.env('SKIP_SSO')) {
           .should('include', '/dex/auth?')
           .should('include', 'client_id=automate-session')
           .should('include', 'redirect_uri');
-        cy.contains('Choose a method to log in');
-        cy.contains('Log in with Username');
-        cy.contains('Log in with SAML');
+        cy.contains('Sign in as a local user');
+        cy.contains('Sign in with SAML');
       });
 
       it('selecting username sign-on transits to local page', () => {
-        cy.contains('Log in with Username').click().then(() => {
+        cy.contains('Sign in as a local user').click({ force: true }).then(() => {
           cy.url().should('include', '/dex/auth/');
-          cy.contains('Log in to Your Account');
           cy.contains('Username');
           cy.contains('Password');
-          cy.contains('Log In');
+          cy.contains('Sign In');
         });
       });
 
       it('back button returns to SSO login page', () => {
         cy.contains('Back').click().then(() => {
-          cy.contains('Choose a method to log in');
+          cy.contains('Sign in as a local user');
+          cy.contains('Sign in with SAML');
         });
       });
     });
@@ -46,7 +45,7 @@ if (Cypress.env('SKIP_SSO')) {
       });
 
       it('displays error with wrong credentials entered', () => {
-        cy.contains('Log in with Username').click().then(() => {
+        cy.contains('Sign in as a local user').click({ force: true }).then(() => {
 
           cy.get('#login').type('admin');
           cy.get('#password').type('wrong');
@@ -66,7 +65,7 @@ if (Cypress.env('SKIP_SSO')) {
       });
 
       it('can login and welcome modal appears', () => {
-        cy.contains('Log in with Username').click().then(() => {
+        cy.contains('Sign in as a local user').click({ force: true }).then(() => {
           cy.get('#login').type('admin');
           cy.get('#password').type('chefautomate');
 
@@ -124,7 +123,8 @@ if (Cypress.env('SKIP_SSO')) {
         cy.get('[data-cy=user-profile-button]').click().then(() => {
           cy.get('[data-cy=sign-out-button]').click().then(() => {
             cy.url().should('include', '/dex/auth');
-            cy.contains('Choose a method to log in');
+            cy.contains('Sign in as a local user');
+            cy.contains('Sign in with SAML');
           });
         });
       });
