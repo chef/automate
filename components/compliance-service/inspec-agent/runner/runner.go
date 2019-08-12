@@ -73,6 +73,8 @@ type ScanJobWorkflowPayload struct {
 	ParentJobID      string
 	ChildJobID       string
 	OverallJobStatus string
+	LostJobIDs       []string
+	StartTime        time.Time
 }
 
 func (p *ScanJobWorkflow) OnStart(w cereal.WorkflowInstance,
@@ -101,10 +103,12 @@ func (p *ScanJobWorkflow) OnStart(w cereal.WorkflowInstance,
 	}
 
 	return w.Continue(&ScanJobWorkflowPayload{
-		0,
-		job.Id,
-		"",
-		types.StatusRunning,
+		OutstandingJobs:  0,
+		ParentJobID:      job.Id,
+		ChildJobID:       "",
+		OverallJobStatus: types.StatusRunning,
+		LostJobIDs:       nil,
+		StartTime:        time.Now(),
 	})
 }
 
@@ -184,18 +188,37 @@ func (p *ScanJobWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 		payload.OutstandingJobs--
 
 		var childJobStatus string
+		var job *types.InspecJob
+		jobName := "unknown"
+		jobID := "unknown"
 
-		if ev.Result.Err() != nil {
-			logrus.WithError(ev.Result.Err()).Error("scan-job failed with abnormal error")
+		if err := ev.Result.GetParameters(&job); err != nil {
+			logrus.WithError(err).Warn("could not read scan job parameters")
+		}
+
+		if job != nil {
+			jobID = job.JobID
+			jobName = job.JobName
+		}
+
+		logctx := logrus.WithFields(logrus.Fields{
+			"jobID":   jobID,
+			"jobName": jobName,
+		})
+		if err := ev.Result.Err(); err != nil {
+			logctx.WithError(ev.Result.Err()).Error("scan-job failed with abnormal error")
 			childJobStatus = types.StatusFailed
+			if err == cereal.ErrTaskLost && jobID != "" {
+				payload.LostJobIDs = append(payload.LostJobIDs, jobID)
+			}
 		} else {
 			if err := ev.Result.Get(&childJobStatus); err != nil {
-				logrus.WithError(err).Error("could not decode scan-job result, marking as failed")
+				logctx.WithError(err).Error("could not decode scan-job result, marking as failed")
 				childJobStatus = types.StatusFailed
 			}
 		}
 
-		logrus.Debugf("ScanJobWorkflow > OnTaskComplete with %d outstanding jobs and childJobStatus of %s", payload.OutstandingJobs, childJobStatus)
+		logctx.Debugf("ScanJobWorkflow > OnTaskComplete with %d outstanding jobs and childJobStatus of %s", payload.OutstandingJobs, childJobStatus)
 		switch childJobStatus {
 		case types.StatusFailed:
 			payload.OverallJobStatus = types.StatusFailed
@@ -213,7 +236,7 @@ func (p *ScanJobWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 			err := w.EnqueueTask("scan-job-summary", payload)
 			if err != nil {
 				err = errors.Wrap(err, "failed to enqueue scan-job-summary task")
-				logrus.WithError(err)
+				logctx.WithError(err).Error("failed to enqueue scan-job-summary")
 				return w.Fail(err)
 			}
 		}
@@ -474,6 +497,23 @@ func (t *InspecJobSummaryTask) Run(ctx context.Context, task cereal.Task) (inter
 
 	if err := task.GetParameters(&jobsPayload); err != nil {
 		return nil, errors.Wrap(err, "could not unmarshal summary job parameters")
+	}
+
+	for _, jobID := range jobsPayload.LostJobIDs {
+		endTime := time.Now()
+		startTime := jobsPayload.StartTime
+		if startTime.IsZero() {
+			startTime = endTime
+		}
+		job := &types.InspecJob{
+			InspecBaseJob: types.InspecBaseJob{
+				JobID: jobID,
+			},
+			StartTime:  &startTime,
+			EndTime:    &endTime,
+			NodeStatus: types.StatusFailed,
+		}
+		t.scannerServer.UpdateResult(context.TODO(), job, nil, &inspec.Error{Message: "job lost likely due to process restart"}, "")
 	}
 
 	// If this is a /recurring/ job, then we will have a
