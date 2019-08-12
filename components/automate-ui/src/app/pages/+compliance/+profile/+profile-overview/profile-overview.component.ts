@@ -214,7 +214,6 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
   onFilesSelected(event) {
     this.sendFiles(Array.from(event.target.files)).subscribe({
       next: fileUploads => { this.fileUploads = fileUploads; },
-      error: null,
       complete: () => {
         this.refreshProfiles();
         const failures = this.fileUploads.some(f => f.failed);

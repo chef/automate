@@ -70,7 +70,7 @@ export class NodesAddComponent implements OnInit {
       this.fetchSecrets(),
       this.backendValue
     ]).pipe(
-      map(([secrets, backend]: [any[], string]) =>
+      map(([secrets, backend]: [{ type: string }[], string]) =>
         secrets.filter(s => s.type === backend || s.type === 'sudo'))
     );
   }
