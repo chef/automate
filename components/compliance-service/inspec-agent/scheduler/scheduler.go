@@ -10,6 +10,7 @@ import (
 	rrule "github.com/teambition/rrule-go"
 
 	"github.com/chef/automate/components/compliance-service/api/jobs"
+	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/chef/automate/components/compliance-service/scanner"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/errorutils"
@@ -28,8 +29,14 @@ func New(scanner *scanner.Scanner, cerealManager *cereal.Manager) *Scheduler {
 func (a *Scheduler) Run(job *jobs.Job) error {
 	logrus.Debugf("Processing job: %+v", job)
 
-	if job.Status == "running" {
-		return errors.Errorf("job %q (%q) already running", job.Id, job.Name)
+	// If the compliance database says the thing is already running,
+	// we'll try to insert it into cereal once to make sure it is correct
+	// Otherwise, compliance has completed and we're waiting for cereal
+	// to agree
+	shouldRetry := true
+	if job.Status == types.StatusRunning {
+		shouldRetry = false
+		logrus.Warnf("job %q (%q) already running", job.Id, job.Name)
 	}
 	// If the job has a recurrence, we update the job schedule
 	if job.Recurrence != "" {
@@ -43,7 +50,7 @@ func (a *Scheduler) Run(job *jobs.Job) error {
 		return nil
 	}
 
-	err := a.pushWorkflow(job, true)
+	err := a.pushWorkflow(job, shouldRetry)
 	if err != nil {
 		strErr := fmt.Sprintf("Unable to add jobs to inspec agent: %s", err.Error())
 		logrus.Error(strErr)
