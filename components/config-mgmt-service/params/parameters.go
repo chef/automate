@@ -10,13 +10,11 @@ package params
 // so that any endpoint can access them
 
 import (
-	"fmt"
-	"net/url"
-	"strings"
 	"time"
 
 	"github.com/chef/automate/components/config-mgmt-service/backend"
 	"github.com/chef/automate/components/config-mgmt-service/errors"
+	"github.com/chef/automate/lib/stringutils"
 	"google.golang.org/grpc/codes"
 )
 
@@ -24,8 +22,6 @@ import (
 // into a parameter that the 'backend' can understand.
 //
 // We HAVE to use this function on every parameter query that we collect
-// TODO: (@afiune) Delete me when we finish the migration since it now lives
-// inside `proto/request/parameters.go`
 func ConvertParamToNodeRunBackend(parameter string) string {
 	switch parameter {
 	case "id":
@@ -91,7 +87,7 @@ func ConvertParamToActionBackend(parameter string) string {
 // 	"roles": ["lalala"],
 // ]
 func FormatNodeFilters(filters []string) (map[string][]string, error) {
-	return formatFilters(filters, ConvertParamToNodeRunBackend)
+	return stringutils.FormatFiltersWithKeyConverter(filters, ConvertParamToNodeRunBackend)
 }
 
 // FormatActionFilters Will receive an array of filters and will format them into a map of strings
@@ -113,64 +109,7 @@ func FormatNodeFilters(filters []string) (map[string][]string, error) {
 // 	"roles": ["lalala"],
 // ]
 func FormatActionFilters(filters []string) (map[string][]string, error) {
-	return formatFilters(filters, ConvertParamToActionBackend)
-}
-
-// formatFilters Will receive an array of filters and will format them into a map of strings
-//
-// Example:
-//   [
-//    "environment:adios",
-//    "environment:hola",
-//    "cookbook:awesome",
-//    "roles:lalala",
-//   ]
-//
-// The returned filters would look like:
-//
-// map[string][]string [
-// 	"environment": ["adios","hola"],
-// 	"cookbook": ["awesome"],
-// 	"roles": ["lalala"],
-// ]
-//
-// TODO: (afiune) Migrate this to a common go package that other teams can consume
-func formatFilters(filters []string, convertParamToBackend func(string) string) (map[string][]string, error) {
-	filterMap := make(map[string][]string, len(filters))
-
-	for _, filter := range filters {
-		keyValuePair := strings.Split(filter, ":")
-		// If we do not have a filter with the format (KEY:VALUE)
-		if len(keyValuePair) != 2 || keyValuePair[0] == "" || keyValuePair[1] == "" {
-			return nil, errors.New(
-				errors.InvalidParameter,
-				fmt.Sprintf("Invalid filter '%s' (format: key:value)", filter),
-			)
-		}
-		key := convertParamToBackend(keyValuePair[0])
-		value, err := decodeValue(keyValuePair[1])
-		if err != nil {
-			return nil, err
-		}
-
-		filterMap[key] = append(filterMap[key], value)
-	}
-	return filterMap, nil
-}
-
-func decodeValue(rawValue string) (string, error) {
-	value, err := url.QueryUnescape(rawValue)
-	if err != nil {
-		return value, err
-	}
-
-	trimmedValue := strings.TrimSpace(value)
-	if len(trimmedValue) == 0 {
-		return trimmedValue, errors.New(errors.InvalidParameter,
-			"Invalid filter; Empty value in format: key:value")
-	}
-
-	return trimmedValue, nil
+	return stringutils.FormatFiltersWithKeyConverter(filters, ConvertParamToActionBackend)
 }
 
 // ValidateDateRange will validate that the provided start & end date are valid. That means they

@@ -7,9 +7,7 @@ package util
 
 import (
 	"encoding/json"
-	"errors"
-	"net/url"
-	"strings"
+	"github.com/chef/automate/lib/stringutils"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -29,7 +27,7 @@ type FeedQuery struct {
 	End        time.Time
 	Before     int64
 	After      int64
-	Filters    []string
+	Filters    map[string][]string
 	CursorID   string
 	CursorDate time.Time
 	Ascending  bool
@@ -40,7 +38,7 @@ type FeedSummaryQuery struct {
 	Buckets        bool
 	Start          time.Time
 	End            time.Time
-	Filters        []string
+	Filters        map[string][]string
 }
 
 // a feed timeline has multiple lines, one per action (verb)
@@ -131,7 +129,23 @@ func BytesToString(data []byte) string {
 	return string(data[:])
 }
 
-// formatFilters Will receive an array of filters and will format them into a map of strings
+// ConvertAPIKeyToBackendKey Transforms the keys used for the API to the keys used in the
+// backend (Elasticsearch).
+func ConvertAPIKeyToBackendKey(parameter string) string {
+	switch parameter {
+	case "entity_type":
+		return "object_object_type"
+	case "task":
+		return "verb"
+	case "requestorName":
+		return "actor_name"
+	default:
+		return parameter
+	}
+}
+
+// FormatFilters Will receive an array of filters and will format them into a map of strings
+// To be used on filtering Events
 //
 // Example:
 //   [
@@ -145,46 +159,11 @@ func BytesToString(data []byte) string {
 //
 // map[string][]string [
 // 	"environment": ["adios","hola"],
-//  "cookbook": ["awesome"],
-//  "roles": ["lalala"]
+// 	"cookbook": ["awesome"],
+// 	"roles": ["lalala"],
 // ]
-//
 func FormatFilters(filters []string) (map[string][]string, error) {
-	filterMap := make(map[string][]string, len(filters))
-
-	for _, filter := range filters {
-		keyValuePair := strings.Split(filter, ":")
-		// If we do not have a filter with the format (KEY:VALUE)
-		if len(keyValuePair) != 2 || keyValuePair[0] == "" || keyValuePair[1] == "" {
-			return nil, errors.New("Invalid filter (format: key:value) " + filter)
-		}
-
-		key, err := decodeValue(keyValuePair[0])
-		if err != nil {
-			return nil, err
-		}
-		value, err := decodeValue(keyValuePair[1])
-		if err != nil {
-			return nil, err
-		}
-
-		filterMap[key] = append(filterMap[key], value)
-	}
-	return filterMap, nil
-}
-
-func decodeValue(rawValue string) (string, error) {
-	value, err := url.QueryUnescape(rawValue)
-	if err != nil {
-		return value, err
-	}
-
-	trimmedValue := strings.TrimSpace(value)
-	if len(trimmedValue) == 0 {
-		return trimmedValue, errors.New("invalid filter; empty value in format: key:value")
-	}
-
-	return trimmedValue, nil
+	return stringutils.FormatFiltersWithKeyConverter(filters, ConvertAPIKeyToBackendKey)
 }
 
 func MillisecondsToTime(dateTime int64) time.Time {

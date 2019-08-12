@@ -64,7 +64,7 @@ var feedProps = `
 				"type":"text"
 		},
 		"actor_name":{
-				"type":"text"
+				"type":"keyword"
 		},
 		"actor_object_type":{
 				"type":"text"

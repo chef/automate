@@ -165,7 +165,7 @@ func TestFeedCountsCountOnlyFilteredUsers(t *testing.T) {
 				Filters:       []string{"requestorName:User"},
 			},
 			expectedCounts: entriesToTypeCounts(filter(entries, func(a *util.FeedEntry) bool {
-				return stringutils.SliceContains(a.Tags, "User")
+				return a.ActorName == "User"
 			})),
 		},
 		{
@@ -175,7 +175,7 @@ func TestFeedCountsCountOnlyFilteredUsers(t *testing.T) {
 				Filters:       []string{"requestorName:UI User"},
 			},
 			expectedCounts: entriesToTypeCounts(filter(entries, func(a *util.FeedEntry) bool {
-				return stringutils.SliceContains(a.Tags, "UI User")
+				return a.ActorName == "UI User"
 			})),
 		},
 		{
@@ -185,7 +185,7 @@ func TestFeedCountsCountOnlyFilteredUsers(t *testing.T) {
 				Filters:       []string{"requestorName:UI User", "requestorName:User"},
 			},
 			expectedCounts: entriesToTypeCounts(filter(entries, func(a *util.FeedEntry) bool {
-				return stringutils.SliceContains(a.Tags, "UI User") || stringutils.SliceContains(a.Tags, "User")
+				return a.ActorName == "UI User" || a.ActorName == "User"
 			})),
 		},
 	}
@@ -365,7 +365,7 @@ func createEntries(startDate time.Time, amountToCreate int, timeDiff int) []*uti
 			Tags:               tags,
 			Published:          time.UTC(),
 			ActorID:            "actorId",
-			ActorName:          "actorName",
+			ActorName:          user,
 			ActorObjectType:    "actorType",
 			Verb:               verb,
 			ObjectID:           "objectId",

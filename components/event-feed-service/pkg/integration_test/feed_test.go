@@ -222,128 +222,6 @@ func TestEventFeedReturnOnlyEventsWithinDateRange(t *testing.T) {
 	}
 }
 
-func TestEventFeedFilterTags(t *testing.T) {
-	var (
-		ctx          = context.Background()
-		totalEntries = 15
-		pageSize     = int32(totalEntries)
-		entries      = []*util.FeedEntry{}
-	)
-
-	for i := 0; i < totalEntries; i++ {
-		var (
-			name    string
-			userURN string
-			tags    []string
-		)
-
-		if i <= 4 {
-			name = "Fred"
-			userURN = "urn:mycompany:user:fred"
-			tags = []string{"org_1", "compliance", "scanjobs"}
-		} else if i < 10 {
-			name = "Violet"
-			userURN = "urn:mycompany:user:violet"
-			tags = []string{"org_2", "compliance", "scanjobs"}
-		} else {
-			name = "Jonesy"
-			userURN = "urn:mycompany:user:jonesy"
-			tags = []string{"org_2", "compliance", "profiles"}
-		}
-
-		data := util.FeedEntry{
-			ID:                 uuid.Must(uuid.NewV4()).String(),
-			ProducerID:         userURN,
-			ProducerName:       name,
-			ProducerObjectType: "user",
-			ProducerTags:       []string{"mycompany", "engineering department", "compliance team"},
-			FeedType:           "event",
-			EventType:          event_server.ScanJobUpdated,
-			Tags:               tags,
-			Published:          time.Now().UTC(),
-			ActorID:            userURN,
-			ActorObjectType:    "User",
-			ActorName:          name,
-			Verb:               "update",
-			ObjectID:           "urn:chef:compliance:scan-job",
-			ObjectObjectType:   "ScanJob",
-			ObjectName:         "Scan Job",
-			TargetID:           "urn:mycompany:environment:production",
-			TargetObjectType:   "Environment",
-			TargetName:         "Production",
-			Created:            time.Now().UTC(),
-		}
-
-		entries = append(entries, &data)
-		// TODO: write bulk load
-		testSuite.feedBackend.CreateFeedEntry(&data)
-	}
-
-	testSuite.RefreshIndices(persistence.IndexNameFeeds)
-	defer testSuite.DeleteAllDocuments()
-
-	expectedEntries, err := server.FromInternalFormatToList(entries)
-	if err != nil {
-		log.Warnf("Couldn't set up expected result set... error converting feed entries from internal format to rpc; error: %v", err)
-		expectedEntries = []*event_feed.FeedEntry{}
-	}
-
-	// reverse the list of expected entries to put them in desc order
-	for i, j := 0, len(expectedEntries)-1; i < j; i, j = i+1, j-1 {
-		expectedEntries[i], expectedEntries[j] = expectedEntries[j], expectedEntries[i]
-	}
-
-	cases := []struct {
-		description string
-		request     event_feed.FeedRequest
-		expected    []*event_feed.FeedEntry
-	}{
-		{
-			description: "should return all 10 events (default)",
-			request: event_feed.FeedRequest{
-				Size: pageSize,
-			},
-			expected: expectedEntries,
-		},
-		{
-			description: "should return only 'org_2' and profiles events",
-			request: event_feed.FeedRequest{
-				Filters: []string{"org_name:org_2", "entity_type:profiles"},
-				Size:    pageSize,
-			},
-			expected: expectedEntries[0:5],
-		},
-		{
-			description: "should return only 'org_1' organization events",
-			request: event_feed.FeedRequest{
-				Filters: []string{"org_name:org_1"},
-				Size:    pageSize,
-			},
-			expected: expectedEntries[10:15],
-		},
-		{
-			description: "should return only 'org_2' organization events",
-			request: event_feed.FeedRequest{
-				Filters: []string{"org_name:org_2"},
-				Size:    pageSize,
-			},
-			expected: expectedEntries[0:10],
-		},
-	}
-
-	// Run all the cases!
-	for _, test := range cases {
-		t.Run(fmt.Sprintf("with request '%v' it %s", test.request, test.description),
-			func(t *testing.T) {
-				res, err := testSuite.feedServer.GetFeed(ctx, &test.request)
-				if assert.Nil(t, err) {
-					expectedEvents := &event_feed.FeedResponse{FeedEntries: test.expected, TotalEntries: int64(len(test.expected))}
-					assert.Equal(t, expectedEvents, res)
-				}
-			})
-	}
-}
-
 func TestEventFeedFilterEventType(t *testing.T) {
 	var (
 		ctx          = context.Background()
@@ -361,7 +239,7 @@ func TestEventFeedFilterEventType(t *testing.T) {
 			tags             = []string{"org_1", "compliance", eventTypes[1]}
 			verb             = "update"
 			objectID         = "urn:chef:compliance:scan-job"
-			objectObjectType = "ScanJob"
+			objectObjectType = eventTypes[1]
 			objectName       = "Scan Job"
 		)
 
@@ -372,7 +250,7 @@ func TestEventFeedFilterEventType(t *testing.T) {
 			tags = []string{"org_2", "compliance", eventTypes[0]}
 			verb = "create"
 			objectID = "urn:chef:compliance:profile"
-			objectObjectType = "Profile"
+			objectObjectType = eventTypes[0]
 			objectName = "Profile"
 		}
 
@@ -454,8 +332,8 @@ func TestEventFeedFilterEventType(t *testing.T) {
 			func(t *testing.T) {
 				res, err := testSuite.feedServer.GetFeed(ctx, &test.request)
 				if assert.Nil(t, err) {
-					expectedEvents := &event_feed.FeedResponse{FeedEntries: test.expected, TotalEntries: int64(len(test.expected))}
-					assert.Equal(t, expectedEvents, res)
+					assert.Equal(t, int64(len(test.expected)), res.TotalEntries)
+					assert.ElementsMatch(t, test.expected, res.FeedEntries)
 				}
 			})
 	}
