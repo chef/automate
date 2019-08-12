@@ -20,6 +20,8 @@ import (
 
 var _ backend.Driver = &GrpcBackend{}
 
+var errUnknownMessage = errors.New("Unknown message received")
+
 type GrpcBackend struct {
 	domain string
 	client grpccereal.CerealClient
@@ -278,11 +280,10 @@ func (c *taskCompleter) Fail(errMsg string) error {
 	// request.
 	// We must wait to figure out if it was successful
 	err = <-c.doneChan
-	if err == nil || err == io.EOF {
-		return nil
-	} else {
+	if err != nil {
 		return transformErr(err)
 	}
+	return nil
 }
 
 func (c *taskCompleter) Succeed(result []byte) error {
@@ -355,22 +356,24 @@ func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*backen
 	taskCtx, cancel := context.WithCancel(ctx)
 	doneChan := make(chan error, 1)
 	go func() {
-		for {
-			msg, err := s.Recv()
-			if err != nil {
-				logrus.WithError(err).Debug("Received error: canceling task context")
-				cancel()
-				doneChan <- err
-				return
-			}
-			if c := msg.GetCancel(); c != nil {
-				logrus.Debug("Received cancel: canceling task context")
-				cancel()
-				doneChan <- errors.New("canceled")
-				return
-			}
+		// This goroutine will read the next, and what must be the last
+		// message.
+		var errOut error
+		msg, err := s.Recv()
+		if err != nil {
+			logrus.WithError(err).Debug("Received error while waiting for commited message")
+			errOut = err
+		} else if c := msg.GetCancel(); c != nil {
+			logrus.Debug("Received cancel while waiting for commited message")
+			errOut = context.Canceled
+		} else if c := msg.GetCommitted(); c != nil {
+			logrus.Debug("Received comitted")
+			errOut = nil
+		} else {
+			errOut = errUnknownMessage
 		}
-
+		cancel()
+		doneChan <- errOut
 	}()
 	return &backend.Task{
 			Name:       deq.GetTask().GetName(),

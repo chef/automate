@@ -469,7 +469,12 @@ func (s *CerealService) DequeueTask(req cereal.Cereal_DequeueTaskServer) error {
 		return errInvalidMsg
 	}
 
-	return nil
+	err = writeDeqTaskRespMsg(ctx, req, &cereal.DequeueTaskResponse{
+		Cmd: &cereal.DequeueTaskResponse_Committed_{
+			Committed: &cereal.DequeueTaskResponse_Committed{},
+		},
+	})
+	return err
 }
 
 func (s *CerealService) CreateWorkflowSchedule(ctx context.Context, req *cereal.CreateWorkflowScheduleRequest) (*cereal.CreateWorkflowScheduleResponse, error) {

@@ -106,9 +106,12 @@ message DequeueTaskResponse {
 
   message Cancel { string err = 1; }
 
+  message Committed {}
+
   oneof cmd {
     Dequeue dequeue = 1;
     Cancel cancel = 2;
+    Committed committed = 3;
   }
 }
 
