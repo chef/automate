@@ -10,6 +10,7 @@ import (
 
 var (
 	eventFeedZeroIndexName    = "eventfeed-0-feeds"
+	eventFeedOneIndexName     = "eventfeed-1-feeds"
 	compliance1FeedsIndexName = "comp-1-feeds"
 	compliance2FeedsIndexName = "comp-2-feeds"
 )
@@ -66,6 +67,11 @@ func (migrator *Migrator) getMigrations() []migrationVersion {
 		{
 			migratedIfNeeded: func() (bool, error) {
 				return migrator.complianceMigrationIfNeeded(compliance2FeedsIndexName)
+			},
+		},
+		{
+			migratedIfNeeded: func() (bool, error) {
+				return migrator.complianceMigrationIfNeeded(eventFeedOneIndexName)
 			},
 		},
 	}
