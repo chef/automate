@@ -31,7 +31,7 @@ type Node struct {
 	HasDeprecations   bool      `json:"has_deprecations"`
 	DeprecationsCount int       `json:"deprecations_count"`
 	Projects          []string  `json:"projects"`
-	ErrorMessage      string    `json:"error_message"`
+	ErrorMessage      string    `json:"error_message,omitempty"`
 }
 
 // NodeAttribute is the representation of the

@@ -147,7 +147,7 @@ func TestSuggestionsLargeArrayValues(t *testing.T) {
 			res, err := cfgmgmt.GetSuggestions(ctx, &test.request)
 			assert.Nil(t, err)
 
-			actualSuggestions := extractTextFromSuggestionsResponse(res, t)
+			actualSuggestions := extractTextFromSuggestionsResponse(res)
 
 			assert.ElementsMatch(t, test.expected, actualSuggestions)
 		})
@@ -210,7 +210,7 @@ func TestSuggestionsLargeCollectionOfSamePrefixTerm(t *testing.T) {
 			res, err := cfgmgmt.GetSuggestions(context.Background(), &test.request)
 			assert.Nil(t, err)
 
-			actualSuggestions := extractTextFromSuggestionsResponse(res, t)
+			actualSuggestions := extractTextFromSuggestionsResponse(res)
 
 			assert.Contains(t, actualSuggestions, test.expectedTerm)
 		})
@@ -707,12 +707,64 @@ func TestSuggestionsFiltered(t *testing.T) {
 			res, err := cfgmgmt.GetSuggestions(ctx, &test.request)
 			assert.Nil(t, err)
 
-			actualSuggestions := extractTextFromSuggestionsResponse(res, t)
+			actualSuggestions := extractTextFromSuggestionsResponse(res)
 
 			assert.ElementsMatch(t, test.expected, actualSuggestions)
 		})
 	}
 
+}
+
+func TestSuggestionsEmptyErrorMessage(t *testing.T) {
+	nodes := []iBackend.Node{
+		{
+			NodeInfo: iBackend.NodeInfo{
+				NodeName: "1",
+			},
+			ErrorMessage: "", //nonvalid suggestion 1"
+		},
+		{
+			NodeInfo: iBackend.NodeInfo{
+				NodeName: "2",
+			},
+			ErrorMessage: "", //nonvalid suggestion 2"
+		},
+		{
+			NodeInfo: iBackend.NodeInfo{
+				NodeName: "3",
+			},
+			ErrorMessage: "valid suggestion 1",
+		},
+		{
+			NodeInfo: iBackend.NodeInfo{
+				NodeName: "4",
+			},
+			ErrorMessage: "valid suggestion 2",
+		},
+	}
+
+	request := request.Suggestion{
+		Type: "error",
+		Text: "v",
+	}
+
+	expected := []string{"valid suggestion 1", "valid suggestion 2"}
+
+	// Adding required node data
+	for index := range nodes {
+		nodes[index].Exists = true
+		nodes[index].NodeInfo.EntityUuid = newUUID()
+	}
+
+	// Add node with project
+	suite.IngestNodes(nodes)
+	defer suite.DeleteAllDocuments()
+	res, err := cfgmgmt.GetSuggestions(context.Background(), &request)
+	assert.Nil(t, err)
+
+	actualSuggestions := extractTextFromSuggestionsResponse(res)
+
+	assert.ElementsMatch(t, expected, actualSuggestions)
 }
 
 func TestSuggestionsWithTableDriven(t *testing.T) {
@@ -873,13 +925,13 @@ func TestSuggestionsWithTableDriven(t *testing.T) {
 		// Suggestions for Environments
 		{"should return all environment suggestions",
 			request.Suggestion{Type: "environment"},
-			[]string{"dev", "prod", "games", "new-york"}},
+			[]string{"dev", "prod", "games", "new-york", ""}},
 		{"should return zero environment suggestions",
 			request.Suggestion{Type: "platform", Text: "lol"},
 			[]string{}},
 		{"should return results when starting typing 'new-york'",
 			request.Suggestion{Type: "environment", Text: "n"}, // less than 2 characters we return all results?
-			[]string{"dev", "prod", "games", "new-york"}},
+			[]string{"dev", "prod", "games", "new-york", ""}},
 		{"should return one environment suggestion 'new-york'",
 			request.Suggestion{Type: "environment", Text: "ne"},
 			[]string{"new-york"}},
@@ -907,13 +959,13 @@ func TestSuggestionsWithTableDriven(t *testing.T) {
 		// Suggestions for Policy Group
 		{"should return all policy_group suggestions",
 			request.Suggestion{Type: "policy_group"},
-			[]string{"sports", "tv_series", "rpgs", "heros", "movies", "nintendo"}},
+			[]string{"sports", "tv_series", "rpgs", "heros", "movies", "nintendo", ""}},
 		{"should return zero policy_group suggestions",
 			request.Suggestion{Type: "policy_group", Text: "lol"},
 			[]string{}},
 		{"should return results when starting typing 'nintendo'",
 			request.Suggestion{Type: "policy_group", Text: "n"}, // less than 2 characters we return all results?
-			[]string{"sports", "tv_series", "rpgs", "heros", "movies", "nintendo"}},
+			[]string{"sports", "tv_series", "rpgs", "heros", "movies", "nintendo", ""}},
 		{"should return one policy_group suggestion 'nintendo'",
 			request.Suggestion{Type: "policy_group", Text: "ni"},
 			[]string{"nintendo"}},
@@ -924,13 +976,13 @@ func TestSuggestionsWithTableDriven(t *testing.T) {
 		// Suggestions for Policy Name
 		{"should return all policy_name suggestions",
 			request.Suggestion{Type: "policy_name"},
-			[]string{"time_to_be_funny", "games", "boardgames", "comics", "videogames"}},
+			[]string{"time_to_be_funny", "games", "boardgames", "comics", "videogames", ""}},
 		{"should return zero policy_name suggestions",
 			request.Suggestion{Type: "policy_name", Text: "lol"},
 			[]string{}},
 		{"should return results when starting typing 'games'",
 			request.Suggestion{Type: "policy_name", Text: "g"}, // less than 2 characters we return all results?
-			[]string{"time_to_be_funny", "games", "boardgames", "comics", "videogames"}},
+			[]string{"time_to_be_funny", "games", "boardgames", "comics", "videogames", ""}},
 		{"should return one policy_name suggestion 'games'",
 			request.Suggestion{Type: "policy_name", Text: "ga"},
 			[]string{"games"}},
@@ -941,13 +993,13 @@ func TestSuggestionsWithTableDriven(t *testing.T) {
 		// Suggestions for Policy Revision
 		{"should return all policy_revision suggestions",
 			request.Suggestion{Type: "policy_revision"},
-			[]string{"extream", "friends", "fantasy", "marvel", "old_school", "zelda"}},
+			[]string{"extream", "friends", "fantasy", "marvel", "old_school", "zelda", ""}},
 		{"should return zero policy_revision suggestions",
 			request.Suggestion{Type: "policy_revision", Text: "lol"},
 			[]string{}},
 		{"should return results when starting typing 'friends'",
 			request.Suggestion{Type: "policy_revision", Text: "f"}, // less than 2 characters we return all results?
-			[]string{"extream", "friends", "fantasy", "marvel", "old_school", "zelda"}},
+			[]string{"extream", "friends", "fantasy", "marvel", "old_school", "zelda", ""}},
 		{"should return one policy_revision suggestion 'friends'",
 			request.Suggestion{Type: "policy_revision", Text: "fr"},
 			[]string{"friends"}},
@@ -1065,7 +1117,7 @@ func TestSuggestionsWithTableDriven(t *testing.T) {
 		// Suggestions for chef version
 		{"should return all chef_version suggestions",
 			request.Suggestion{Type: "chef_version"},
-			[]string{"1.0", "1.1", "1.1.0", "2.0", "3.0"}},
+			[]string{"1.0", "1.1", "1.1.0", "2.0", "3.0", ""}},
 		{"should return zero chef_version suggestions",
 			request.Suggestion{Type: "chef_version", Text: "lol"},
 			[]string{}},
@@ -1101,7 +1153,7 @@ func TestSuggestionsWithTableDriven(t *testing.T) {
 				// We actually don't care about the scores since it is something
 				// the UI uses to order the results, therefore we will just abstract
 				// the text into an array and compare it
-				actualSuggestionsArray := extractTextFromSuggestionsResponse(res, t)
+				actualSuggestionsArray := extractTextFromSuggestionsResponse(res)
 
 				// Verify they both are the same length
 				assert.Equal(t, len(test.expected), len(actualSuggestionsArray))
@@ -1277,7 +1329,7 @@ func TestSuggestionsProjectFilter(t *testing.T) {
 			res, err := cfgmgmt.GetSuggestions(test.ctx, &request.Suggestion{Type: "name"})
 			assert.Nil(t, err)
 
-			actualSuggestionsArray := extractTextFromSuggestionsResponse(res, t)
+			actualSuggestionsArray := extractTextFromSuggestionsResponse(res)
 
 			assert.ElementsMatch(t, test.expected, actualSuggestionsArray)
 		})
@@ -1323,16 +1375,14 @@ func TestSuggestionsProjectFilter(t *testing.T) {
 // TODO: (@afiune) Is this the normal behavior? If not lets fix it.
 // for now the fixt in the tests will be to check if there is a "string"
 // value or not.
-func extractTextFromSuggestionsResponse(list *gp.ListValue, t *testing.T) []string {
+func extractTextFromSuggestionsResponse(list *gp.ListValue) []string {
 	// We don't initialize the slice size since we might found empty Values
 	textArray := make([]string, 0)
 
 	if list != nil {
 		for _, sugg := range list.Values {
 			sugStruct := sugg.GetStructValue()
-			if txt := sugStruct.Fields["text"].GetStringValue(); txt != "" {
-				textArray = append(textArray, txt)
-			}
+			textArray = append(textArray, sugStruct.Fields["text"].GetStringValue())
 		}
 	}
 	return textArray

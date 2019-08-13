@@ -79,7 +79,8 @@ export class ClientRunsRequests {
       const params = this.formatFilters(filters).set('type', type).set('text', text);
       const url = `${CONFIG_MGMT_URL}/suggestions`;
 
-      return this.httpClient.get<Chicklet[]>(url, {params});
+      return this.httpClient.get<any[]>(url, {params}).pipe(map(
+        (suggestions) => suggestions.filter(s => s && s.text && s.text.length !== 0)));
     } else {
       return observableOf([]);
     }

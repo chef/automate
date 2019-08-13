@@ -71,7 +71,8 @@ export class SearchBarComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes.dynamicSuggestions) {
       this.suggestions = List<SuggestionItem>(
-        compact(changes.dynamicSuggestions.currentValue.map((suggestion) => {
+        compact(changes.dynamicSuggestions.currentValue.filter(
+          (suggestion) => suggestion && suggestion.length !== 0).map((suggestion) => {
         return {name: suggestion, title: suggestion};
       })));
 

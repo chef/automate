@@ -279,6 +279,17 @@ describe('SearchBarComponent', () => {
 
         expect(component.suggestionsVisible).toEqual(true);
       });
+
+      it('remove empty string returned suggestions', () => {
+        component.selectedCategoryType = component.categories[0];
+        component.dynamicSuggestions = ['1', '2', '3', '', undefined, null];
+        component.ngOnChanges({
+          dynamicSuggestions: new SimpleChange(null, component.dynamicSuggestions, false)
+        });
+        fixture.detectChanges();
+
+        expect(component.suggestions.size).toEqual(3);
+      });
     });
 
     describe('enter is pressed', () => {
