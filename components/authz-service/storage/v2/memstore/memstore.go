@@ -10,7 +10,6 @@ import (
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
-	v2 "github.com/chef/automate/components/authz-service/storage/v2"
 )
 
 type State struct {
@@ -237,7 +236,7 @@ func (s *State) GetPolicyChangeID(_ context.Context) (string, error) {
 	return string(atomic.LoadInt64(&s.policyChangeID)), nil
 }
 
-func (s *State) GetPolicyChangeNotifier(ctx context.Context) (v2.PolicyChangeNotifier, error) {
+func (s *State) GetPolicyChangeNotifier(ctx context.Context) (storage.PolicyChangeNotifier, error) {
 	notifier := s.changeManager.register()
 	return notifier, nil
 }
@@ -342,12 +341,12 @@ func (s *State) ListRulesForProject(_ context.Context, projectID string) ([]*sto
 		}
 	}
 
-	rulesStatus := v2.Applied
+	rulesStatus := storage.Applied
 	if len(rules) == 0 {
-		rulesStatus = v2.NoRules
+		rulesStatus = storage.NoRules
 	}
 	if anyStagedRules {
-		rulesStatus = v2.EditsPending
+		rulesStatus = storage.EditsPending
 	}
 
 	return rules, rulesStatus, nil
