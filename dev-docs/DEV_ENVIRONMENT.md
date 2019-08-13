@@ -237,6 +237,11 @@ a different terminal, run
 If you are using vagrant, ssh into the VM again in a separate tab in
 run `sl`.
 
+### Running a Specific Build of Automate
+* Save the manifest `.json` of the particular build you need (e.g., https://packages.chef.io/manifests/current/automate/20190806202030.json is for build 20190806202030)
+* Run `chef-automate dev configure-deployment --config dev/config.toml --manifest-dir json-file-name`
+* `rebuild components/automate-deployment`
+
 ## Working with Secrets
 
 Some tests require access to build infrastructure and other secret
