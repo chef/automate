@@ -35,7 +35,11 @@ func (p *Project) Scan(src interface{}) error {
 
 // NewProject is a factory for creating a Project storage object that also does
 // validation around what a valid project is in terms of our storage layer.
-func NewProject(id string, name string, typeVal Type) (Project, error) {
+func NewProject(
+	id string,
+	name string,
+	typeVal Type,
+	status ProjectRulesStatus) (Project, error) {
 	if emptyOrWhitespaceOnlyRE.MatchString(name) {
 		return Project{}, errors.New("a project name must contain non-whitespace characters")
 	}
@@ -44,8 +48,9 @@ func NewProject(id string, name string, typeVal Type) (Project, error) {
 	}
 
 	return Project{
-		ID:   id,
-		Name: name,
-		Type: typeVal,
+		ID:     id,
+		Name:   name,
+		Type:   typeVal,
+		Status: status.String(),
 	}, nil
 }
