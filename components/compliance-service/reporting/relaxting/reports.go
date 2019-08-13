@@ -574,14 +574,17 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	boolQuery := elastic.NewBoolQuery()
 	boolQuery = boolQuery.Must(typeQuery)
 
+	// These are filter types where we use ElasticSearch Term Queries
 	filterTypes := []string{"environment", "organization", "chef_server", "chef_tags",
 		"policy_group", "policy_name", "status", "node_name", "platform", "role", "recipe",
 		"inspec_version"}
 
 	for _, filterType := range filterTypes {
-		ESFieldName := backend.getESFieldName(filterType)
-		termQuery := backend.newTermQueryFromFilter(ESFieldName, filters[filterType])
-		boolQuery = boolQuery.Must(termQuery)
+		if len(filters[filterType]) > 0 {
+			ESFieldName := backend.getESFieldName(filterType)
+			termQuery := backend.newTermQueryFromFilter(ESFieldName, filters[filterType])
+			boolQuery = boolQuery.Must(termQuery)
+		}
 	}
 
 	if len(filters["control_name"]) > 0 {
