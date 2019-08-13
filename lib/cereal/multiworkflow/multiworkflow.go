@@ -3,13 +3,18 @@ package multiworkflow
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"reflect"
+
+	"github.com/davecgh/go-spew/spew"
 
 	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/lib/cereal"
 )
+
+var ErrSubworkflowNotFound error = errors.New("subworkflow not found")
 
 type MultiWorkflow struct {
 	executors map[string]cereal.WorkflowExecutor
@@ -37,21 +42,25 @@ type MultiWorkflowTaskParam struct {
 }
 
 func marshal(key string, obj interface{}) (json.RawMessage, error) {
-	newType := reflect.StructOf([]reflect.StructField{
-		{
+	structFields := []reflect.StructField{}
+	if obj != nil {
+		structFields = append(structFields, reflect.StructField{
 			Name:      "Anonymous",
 			Type:      reflect.TypeOf(obj),
 			Anonymous: true,
-		},
-		{
-			Name: "MultiWorkflowKey",
-			Type: reflect.TypeOf(""),
-			Tag:  "json:\"__key\"",
-		},
+		})
+	}
+	structFields = append(structFields, reflect.StructField{
+		Name: "MultiWorkflowKey",
+		Type: reflect.TypeOf(""),
+		Tag:  "json:\"__key\"",
 	})
+	newType := reflect.StructOf(structFields)
 
 	v := reflect.New(newType).Elem()
-	v.Field(0).Set(reflect.ValueOf(obj))
+	if obj != nil {
+		v.Field(0).Set(reflect.ValueOf(obj))
+	}
 	v.FieldByName("MultiWorkflowKey").SetString(key)
 	return json.Marshal(v.Interface())
 }
@@ -86,6 +95,8 @@ type enqueueTaskRequest struct {
 }
 
 func (w *workflowInstance) EnqueueTask(taskName string, parameters interface{}, opts ...cereal.TaskEnqueueOpts) error {
+	logrus.Info("Enqueuing task")
+	spew.Dump(parameters)
 	jsonVal, err := marshal(w.key, parameters)
 	if err != nil {
 		return err
@@ -305,4 +316,136 @@ func EnqueueWorkflow(ctx context.Context, m *cereal.Manager, workflowName string
 	}
 
 	return m.EnqueueWorkflow(ctx, workflowName, instanceName, transformedParams)
+}
+
+type WorkflowInstance struct {
+	payload   *MultiWorkflowPayload
+	result    *MultiWorkflowPayload
+	params    *MultiWorkflowParams
+	isRunning bool
+	err       error
+}
+
+type immutableWorkflowInstanceImpl struct {
+	params json.RawMessage
+	state  WorkflowState
+}
+
+func (instance *immutableWorkflowInstanceImpl) GetParameters(obj interface{}) error {
+	if len(instance.params) > 0 {
+		return json.Unmarshal(instance.params, obj)
+	}
+	return nil
+}
+
+func (instance *immutableWorkflowInstanceImpl) GetPayload(obj interface{}) error {
+	if instance.state.Err != "" {
+		return errors.New(instance.state.Err)
+	}
+	if len(instance.state.Payload) > 0 {
+		return json.Unmarshal(instance.state.Payload, obj)
+	}
+	return nil
+}
+
+func (instance *immutableWorkflowInstanceImpl) GetResult(obj interface{}) error {
+	if instance.state.Err != "" {
+		return errors.New(instance.state.Err)
+	}
+	if len(instance.state.Result) > 0 {
+		return json.Unmarshal(instance.state.Result, obj)
+	}
+	return nil
+}
+
+func (instance *immutableWorkflowInstanceImpl) IsRunning() bool {
+	return !instance.state.IsFinished
+}
+
+func (instance *immutableWorkflowInstanceImpl) Err() error {
+	if instance.state.Err != "" {
+		return errors.New(instance.state.Err)
+	}
+	return nil
+}
+
+func (instance *WorkflowInstance) GetSubWorkflow(workflowName string) (cereal.ImmutableWorkflowInstance, error) {
+	payload := instance.payload
+	if !instance.isRunning {
+		payload = instance.result
+	}
+
+	// OnStart has not run yet
+	if payload == nil {
+		return nil, ErrSubworkflowNotFound
+	}
+
+	v, ok := payload.State[workflowName]
+	if !ok {
+		return nil, ErrSubworkflowNotFound
+	}
+	var params json.RawMessage
+	if instance.params.WorkflowParams != nil {
+		params = instance.params.WorkflowParams[workflowName]
+	}
+
+	subWorkflow := &immutableWorkflowInstanceImpl{
+		state:  v,
+		params: params,
+	}
+
+	return subWorkflow, nil
+}
+
+func (instance *WorkflowInstance) GetPayload() (*MultiWorkflowPayload, error) {
+	return instance.payload, nil
+}
+
+func (instance *WorkflowInstance) GetParameters() (*MultiWorkflowParams, error) {
+	return instance.params, nil
+}
+
+func (instance *WorkflowInstance) IsRunning() bool {
+	return instance.isRunning
+}
+
+func (instance *WorkflowInstance) GetResult() (*MultiWorkflowPayload, error) {
+	return instance.result, nil
+}
+
+func (instance *WorkflowInstance) Err() error {
+	return instance.err
+}
+
+func GetWorkflowInstance(ctx context.Context, m *cereal.Manager, workflowName string, instanceName string) (*WorkflowInstance, error) {
+	instance, err := m.GetWorkflowInstanceByName(ctx, instanceName, workflowName)
+	if err != nil {
+		return nil, err
+	}
+	multiInstance := WorkflowInstance{}
+	if err := instance.Err(); err != nil {
+		multiInstance.err = err
+	} else {
+		if instance.IsRunning() {
+			payload := &MultiWorkflowPayload{}
+			if err := instance.GetPayload(&payload); err != nil {
+				return nil, err
+			}
+			multiInstance.payload = payload
+		} else {
+			result := &MultiWorkflowPayload{}
+			if err := instance.GetResult(&result); err != nil {
+				return nil, err
+			}
+			multiInstance.result = result
+		}
+	}
+	multiInstance.isRunning = instance.IsRunning()
+
+	params := MultiWorkflowParams{}
+	if err := instance.GetParameters(&params); err != nil {
+		return nil, err
+	}
+	multiInstance.params = &params
+	return &multiInstance, nil
 }

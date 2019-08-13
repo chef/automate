@@ -79,8 +79,7 @@ func (m *DomainProjectUpdateWorkflowExecutor) OnTaskComplete(
 				"Failed to deserialize %s result", m.startProjectTagUpdaterTaskName)
 			return w.Fail(err)
 		}
-		w.EnqueueTask(m.projectTagUpdaterStatusTaskName, esJobIDs,
-			cereal.StartAfter(m.nextCheck())) // nolint: errcheck
+		w.EnqueueTask(m.projectTagUpdaterStatusTaskName, esJobIDs, cereal.StartAfter(m.nextCheck())) // nolint: errcheck
 		return w.Continue(payload)
 	case m.projectTagUpdaterStatusTaskName:
 		if err := ev.Result.Err(); err != nil {
@@ -88,8 +87,7 @@ func (m *DomainProjectUpdateWorkflowExecutor) OnTaskComplete(
 			if payload.ConsecutiveJobCheckFailures > maxNumberOfConsecutiveFails {
 				return w.Fail(err)
 			}
-			w.EnqueueTask(m.projectTagUpdaterStatusTaskName, payload.ESJobID,
-				cereal.StartAfter(m.nextCheck())) // nolint: errcheck
+			w.EnqueueTask(m.projectTagUpdaterStatusTaskName, payload.ESJobID, cereal.StartAfter(m.nextCheck())) // nolint: errcheck
 			return w.Continue(payload)
 		}
 		mergedJobStatus := JobStatus{}
@@ -102,11 +100,10 @@ func (m *DomainProjectUpdateWorkflowExecutor) OnTaskComplete(
 		if mergedJobStatus.Completed {
 			return w.Complete(cereal.WithResult(payload))
 		}
-		w.EnqueueTask(m.projectTagUpdaterStatusTaskName, payload.ESJobID,
-			cereal.StartAfter(m.nextCheck())) // nolint: errcheck
+		w.EnqueueTask(m.projectTagUpdaterStatusTaskName, payload.ESJobID, cereal.StartAfter(m.nextCheck())) // nolint: errcheck
 		return w.Continue(payload)
 	default:
-		return w.Fail(errors.New("Unknown task type"))
+		return w.Fail(errors.Errorf("Unknown task type %q", ev.TaskName))
 	}
 
 }
@@ -296,14 +293,51 @@ func (manager *WorkflowProjectUpdateManager) getJobStatus() (jobStatus *JobStatu
 	}
 }
 
-func NewWorkflowExecutor(workflowName string) *DomainProjectUpdateWorkflowExecutor {
+func NewWorkflowExecutorForDomainService(domainService string) *DomainProjectUpdateWorkflowExecutor {
 	return &DomainProjectUpdateWorkflowExecutor{
 		PollInterval: 10 * time.Second,
 
-		cancelUpdateProjectTagsTaskName: fmt.Sprintf("%s/%s", workflowName, cancelUpdateProjectTagsTaskName),
-		startProjectTagUpdaterTaskName:  fmt.Sprintf("%s/%s", workflowName, startProjectTagUpdaterTaskName),
-		projectTagUpdaterStatusTaskName: fmt.Sprintf("%s/%s", workflowName, projectTagUpdaterStatusTaskName),
+		cancelUpdateProjectTagsTaskName: fmt.Sprintf("%s/%s", domainService, cancelUpdateProjectTagsTaskName),
+		startProjectTagUpdaterTaskName:  fmt.Sprintf("%s/%s", domainService, startProjectTagUpdaterTaskName),
+		projectTagUpdaterStatusTaskName: fmt.Sprintf("%s/%s", domainService, projectTagUpdaterStatusTaskName),
 	}
+}
+
+func RegisterTaskExecutors(manager *cereal.Manager, domainService string, esClient EsClient, authzProjectsClient iam_v2.ProjectsClient) error {
+	cancelUpdateProjectTagsTaskName := fmt.Sprintf("%s/%s", domainService, cancelUpdateProjectTagsTaskName)
+	startProjectTagUpdaterTaskName := fmt.Sprintf("%s/%s", domainService, startProjectTagUpdaterTaskName)
+	projectTagUpdaterStatusTaskName := fmt.Sprintf("%s/%s", domainService, projectTagUpdaterStatusTaskName)
+
+	taskExecutorOpts := cereal.TaskExecutorOpts{
+		Workers: 1,
+	}
+
+	cancelTaskExecutor := &CancelUpdateProjectTagsTask{
+		esClient: esClient,
+	}
+	if err := manager.RegisterTaskExecutor(cancelUpdateProjectTagsTaskName, cancelTaskExecutor,
+		taskExecutorOpts); err != nil {
+		return err
+	}
+
+	startTagsUpdaterTask := &StartProjectTagUpdaterTask{
+		esClient:            esClient,
+		authzProjectsClient: authzProjectsClient,
+	}
+	if err := manager.RegisterTaskExecutor(startProjectTagUpdaterTaskName, startTagsUpdaterTask,
+		taskExecutorOpts); err != nil {
+		return err
+	}
+
+	statusTask := &ProjectTagUpdaterStatusTask{
+		esClient: esClient,
+	}
+	if err := manager.RegisterTaskExecutor(projectTagUpdaterStatusTaskName, statusTask,
+		taskExecutorOpts); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func RegisterWorkflow(manager *cereal.Manager, instanceName string, workflowName string,

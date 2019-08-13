@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/multiworkflow"
+
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes"
 	_struct "github.com/golang/protobuf/ptypes/struct"
@@ -39,8 +42,6 @@ type update struct {
 type ProjectUpdateMgr interface {
 	Cancel() error
 	Start() error
-	ProcessFailEvent(eventMessage *automate_event.EventMsg) error
-	ProcessStatusEvent(eventMessage *automate_event.EventMsg) error
 	Failed() bool
 	FailureMessage() string
 	PercentageComplete() float64
@@ -522,4 +523,181 @@ func getEstimatedTimeCompleteInSec(event *automate_event.EventMsg) (time.Time, e
 
 	return time.Time{}, fmt.Errorf("Event message sent without a %s field eventID: %q",
 		fieldName, event.EventID)
+}
+
+func NewWorkflowExecutor(domainServices []string) *multiworkflow.MultiWorkflow {
+	workflowMap := make(map[string]cereal.WorkflowExecutor, len(domainServices))
+	for _, d := range domainServices {
+		workflowMap[d] = project_update_tags.NewWorkflowExecutorForDomainService(d)
+	}
+	return multiworkflow.NewMultiWorkflowExecutor(workflowMap)
+}
+
+type CerealProjectUpdateManager struct {
+	manager        *cereal.Manager
+	workflowName   string
+	instanceName   string
+	domainServices []string
+}
+
+func RegisterCerealProjectUpdateManager(manager *cereal.Manager, workflowName string, instanceName string, domainServices []string) (ProjectUpdateMgr, error) {
+	domainServicesWorkflowExecutor := NewWorkflowExecutor(domainServices)
+
+	if err := manager.RegisterWorkflowExecutor(workflowName, domainServicesWorkflowExecutor); err != nil {
+		return nil, err
+	}
+
+	updateManager := &CerealProjectUpdateManager{
+		manager:      manager,
+		workflowName: workflowName,
+		instanceName: instanceName,
+	}
+
+	return updateManager, nil
+}
+
+func (m *CerealProjectUpdateManager) Cancel() error {
+	err := m.manager.CancelWorkflow(context.Background(), m.workflowName, m.instanceName)
+	if err == cereal.ErrWorkflowInstanceNotFound {
+		return nil
+	}
+	return err
+}
+
+func (m *CerealProjectUpdateManager) Start() error {
+	params := map[string]interface{}{}
+
+	for _, svc := range m.domainServices {
+		params[svc] = project_update_tags.DomainProjectUpdateWorkflowParameters{
+			ProjectUpdateID: "project-update-id",
+		}
+	}
+	return multiworkflow.EnqueueWorkflow(context.Background(), m.manager, m.workflowName, m.instanceName, params)
+}
+
+func (m *CerealProjectUpdateManager) Failed() bool {
+	instance, err := multiworkflow.GetWorkflowInstance(context.Background(), m.manager, m.workflowName, m.instanceName)
+	if err != nil {
+		if err == cereal.ErrWorkflowInstanceNotFound {
+			return false
+		}
+		logrus.WithError(err).Error("failed to get workflow instance")
+		return true
+	}
+
+	if instance.Err() != nil {
+		return true
+	}
+
+	var payload *multiworkflow.MultiWorkflowPayload
+	if instance.IsRunning() {
+		var err error
+		payload, err = instance.GetPayload()
+		if err != nil {
+			logrus.WithError(err).Error("failed to get workflow instance payload")
+			return true
+		}
+	} else {
+		var err error
+		payload, err = instance.GetResult()
+		if err != nil {
+			logrus.WithError(err).Error("failed to get workflow instance payload")
+			return true
+		}
+	}
+
+	// OnStart has not run yet
+	if payload == nil {
+		return false
+	}
+
+	for _, d := range m.domainServices {
+		subWorkflow, err := instance.GetSubWorkflow(d)
+		if err != nil {
+			logrus.Warnf("subworkflow %q not found", d)
+			continue
+		}
+
+		if subWorkflow.Err() != nil {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (m *CerealProjectUpdateManager) FailureMessage() string {
+	instance, err := multiworkflow.GetWorkflowInstance(context.Background(), m.manager, m.workflowName, m.instanceName)
+	if err != nil {
+		if err == cereal.ErrWorkflowInstanceNotFound {
+			return ""
+		}
+		logrus.WithError(err).Error("failed to get workflow instance")
+		return err.Error()
+	}
+
+	if instance.Err() != nil {
+		return instance.Err().Error()
+	}
+
+	var payload *multiworkflow.MultiWorkflowPayload
+	if instance.IsRunning() {
+		var err error
+		payload, err = instance.GetPayload()
+		if err != nil {
+			logrus.WithError(err).Error("failed to get workflow instance payload")
+			return err.Error()
+		}
+	} else {
+		var err error
+		payload, err = instance.GetResult()
+		if err != nil {
+			logrus.WithError(err).Error("failed to get workflow instance payload")
+			return err.Error()
+		}
+	}
+
+	// OnStart has not run yet
+	if payload == nil {
+		return ""
+	}
+
+	errMsg := ""
+	for _, d := range m.domainServices {
+		subWorkflow, err := instance.GetSubWorkflow(d)
+		if err != nil {
+			logrus.Warnf("subworkflow %q not found", d)
+			continue
+		}
+
+		if subWorkflow.Err() != nil {
+			errMsg = fmt.Sprintf("%s; %s: %s", errMsg, d, subWorkflow.Err().Error())
+		}
+	}
+
+	return errMsg
+}
+
+func (*CerealProjectUpdateManager) PercentageComplete() float64 {
+	return 0
+}
+
+func (*CerealProjectUpdateManager) EstimatedTimeComplete() time.Time {
+	return time.Now()
+}
+
+func (m *CerealProjectUpdateManager) State() string {
+	instance, err := m.manager.GetWorkflowInstanceByName(context.Background(), m.instanceName, m.workflowName)
+	if err == cereal.ErrWorkflowInstanceNotFound {
+		return config.NotRunningState
+	}
+	if err != nil {
+		logrus.WithError(err).Error("failed to get workflow instance")
+		return "unknown"
+	}
+	if instance.IsRunning() {
+		return config.RunningState
+	}
+
+	return config.NotRunningState
 }

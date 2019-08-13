@@ -15,7 +15,8 @@ import (
 	"google.golang.org/grpc/status"
 
 	automate_event "github.com/chef/automate/api/interservice/event"
-
+	"github.com/chef/automate/lib/cereal"
+	grpccereal "github.com/chef/automate/lib/cereal/grpc"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
@@ -79,18 +80,18 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "could not initialize v2 policy server")
 	}
 
-	eventServiceClient, err := createEventServiceConnection(connFactory, eventServiceAddress)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not create event service client")
-	}
-
 	configManager, err := config.NewManager(configFile)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not create config manager")
 	}
 
+	cerealManager, err := createProjectUpdateCerealManager(connFactory)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not create cereal manager")
+	}
+
 	v2ProjectsServer, err := v2.NewPostgresProjectsServer(ctx, l, migrationsConfig,
-		dataMigrationsConfig, e, eventServiceClient, configManager, policyRefresher)
+		dataMigrationsConfig, e, cerealManager, configManager, policyRefresher)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 projects server")
 	}
@@ -146,6 +147,10 @@ func NewGRPCServer(ctx context.Context,
 	api_v2.RegisterAuthorizationServer(g, v2AuthzServer)
 	common.RegisterSubjectPurgeServer(g, subjectPurgeServer)
 	reflection.Register(g)
+
+	if err := cerealManager.Start(ctx); err != nil {
+		return nil, errors.Wrap(err, "failed to start cereal manager")
+	}
 	return g, nil
 }
 
@@ -166,6 +171,22 @@ func createEventServiceConnection(connFactory *secureconn.Factory,
 	}
 
 	return eventServiceClient, nil
+}
+
+func createProjectUpdateCerealManager(connFactory *secureconn.Factory) (*cereal.Manager, error) {
+	conn, err := connFactory.Dial("cereal-service", ":10101")
+	if err != nil {
+		return nil, errors.Wrap(err, "error dialing cereal service")
+	}
+
+	grpcBackend := grpccereal.NewGrpcBackendFromConn("project-update", conn)
+	manager, err := cereal.NewManager(grpcBackend)
+	if err != nil {
+		grpcBackend.Close() // nolint: errcheck
+		return nil, err
+	}
+
+	return manager, nil
 }
 
 // InputValidationInterceptor is a middleware for running the protobuf validation.

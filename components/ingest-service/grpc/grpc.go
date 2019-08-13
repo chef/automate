@@ -23,8 +23,11 @@ import (
 	"github.com/chef/automate/components/ingest-service/server"
 	"github.com/chef/automate/components/ingest-service/serveropts"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
+	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/cereal"
+	grpccereal "github.com/chef/automate/lib/cereal/grpc"
 	"github.com/chef/automate/lib/cereal/postgres"
+	"github.com/chef/automate/lib/grpc/secureconn"
 	platform_config "github.com/chef/automate/lib/platform/config"
 )
 
@@ -173,6 +176,21 @@ func Spawn(opts *serveropts.Opts) error {
 	}
 	defer configManager.Close()
 
+	projectUpdateManager, err := createProjectUpdateCerealManager(opts.ConnFactory)
+	if err != nil {
+		return err
+	}
+
+	err = project_update_lib.RegisterTaskExecutors(projectUpdateManager, "ingest", client, authzProjectsClient)
+	if err != nil {
+		return err
+	}
+
+	if err := projectUpdateManager.Start(context.Background()); err != nil {
+		return err
+	}
+	defer projectUpdateManager.Stop() // nolint: errcheck
+
 	// EventHandler
 	eventHandlerServer := server.NewAutomateEventHandlerServer(client, *chefIngest,
 		authzProjectsClient, eventServiceClient, configManager)
@@ -219,4 +237,20 @@ func pgURL(pgURL string, pgDBName string) (string, error) {
 		}
 	}
 	return pgURL, nil
+}
+
+func createProjectUpdateCerealManager(connFactory *secureconn.Factory) (*cereal.Manager, error) {
+	conn, err := connFactory.Dial("cereal-service", ":10101")
+	if err != nil {
+		return nil, errors.Wrap(err, "error dialing cereal service")
+	}
+
+	grpcBackend := grpccereal.NewGrpcBackendFromConn("project-update", conn)
+	manager, err := cereal.NewManager(grpcBackend)
+	if err != nil {
+		grpcBackend.Close() // nolint: errcheck
+		return nil, err
+	}
+
+	return manager, nil
 }

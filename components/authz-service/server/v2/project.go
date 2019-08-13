@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/stringutils"
@@ -27,7 +28,6 @@ import (
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/memstore"
 	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
-	event "github.com/chef/automate/components/event-service/server"
 )
 
 // ProjectState holds the server state for projects
@@ -45,12 +45,19 @@ func NewMemstoreProjectsServer(
 	ctx context.Context,
 	l logger.Logger,
 	e engine.ProjectRulesRetriever,
-	eventServiceClient automate_event.EventServiceClient,
-	configManager *config.Manager,
+	projectUpdateCerealManager *cereal.Manager,
 	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
 
-	projectUpdateManager := NewProjectUpdateManager(eventServiceClient, configManager)
+	//projectUpdateManager := NewProjectUpdateManager(eventServiceClient, configManager)
+	projectUpdateManager, err := RegisterCerealProjectUpdateManager(projectUpdateCerealManager,
+		"ProjectUpdate", "Runner", []string{
+			"ingest",
+			"compliance",
+		})
+	if err != nil {
+		return nil, err
+	}
 	return NewProjectsServer(ctx, l, memstore.New(), e, projectUpdateManager, pr)
 }
 
@@ -61,7 +68,7 @@ func NewPostgresProjectsServer(
 	migrationsConfig migration.Config,
 	dataMigrationsConfig datamigration.Config,
 	e engine.ProjectRulesRetriever,
-	eventServiceClient automate_event.EventServiceClient,
+	projectUpdateCerealManager *cereal.Manager,
 	configManager *config.Manager,
 	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
@@ -70,7 +77,15 @@ func NewPostgresProjectsServer(
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize v2 store state")
 	}
-	projectUpdateManager := NewProjectUpdateManager(eventServiceClient, configManager)
+	//projectUpdateManager := NewProjectUpdateManager(eventServiceClient, configManager)
+	projectUpdateManager, err := RegisterCerealProjectUpdateManager(projectUpdateCerealManager,
+		"ProjectUpdate", "Runner", []string{
+			"ingest",
+			"compliance",
+		})
+	if err != nil {
+		return nil, err
+	}
 	return NewProjectsServer(ctx, l, s, e, projectUpdateManager, pr)
 }
 
@@ -351,17 +366,6 @@ func (s *ProjectState) HandleEvent(ctx context.Context,
 	s.log.Debugf("authz is handling your event %s", req.EventID)
 
 	response := &automate_event.EventResponse{}
-	if req.Type.Name == event.ProjectRulesUpdateStatus {
-		err := s.ProjectUpdateManager.ProcessStatusEvent(req)
-		if err != nil {
-			return response, err
-		}
-	} else if req.Type.Name == event.ProjectRulesUpdateFailed {
-		err := s.ProjectUpdateManager.ProcessFailEvent(req)
-		if err != nil {
-			return response, err
-		}
-	}
 
 	return response, nil
 }
