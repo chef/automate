@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS service_full (
   package_ident             TEXT      NOT NULL,
 
   -- health check data
-  status                    TEXT      NOT NULL,
   health                    TEXT      NOT NULL,
+  health_check_message      TEXT      NOT NULL,
 
   -- updates
   channel                   TEXT      NOT NULL,
