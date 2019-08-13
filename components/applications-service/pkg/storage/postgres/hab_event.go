@@ -26,6 +26,8 @@ const (
 	uniqueServiceGroupError = "Unable to insert service_group: pq: duplicate key value violates unique constraint \"service_group_name_deployment_id_key\""
 )
 
+var IngestToSingleTable = false
+
 type packageIdent struct {
 	Origin  string
 	Name    string
@@ -127,14 +129,30 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 		return err
 	}
 
+	// @afiune all our backend was designed for the health check to be all
+	// uppercases but habitat is actually sending case sensitive strings
+	eventHealth := strings.ToUpper(event.GetResult().String())
+
+	if IngestToSingleTable {
+		err = db.upsertServiceAndMetadata(
+			eventMetadata,
+			svcMetadata,
+			pkgIdent,
+			eventHealth,
+		)
+		// upsert should handle races and such so we don't have to retry to handle
+		// unique constraint problems, thus an error here is something we don't know how to handle.
+		if err != nil {
+			log.WithError(err).Error("failed to upsert healthcheck data")
+			return err
+		}
+	}
+
 	svc, exist := db.getServiceFromUniqueFields(
 		pkgIdent.Name,
 		eventMetadata.GetSupervisorId(),
 	)
 
-	// @afiune all our backend was designed for the health check to be all
-	// uppercases but habitat is actually sending case sensitive strings
-	eventHealth := strings.ToUpper(event.GetResult().String())
 	// TODO @afiune verify health
 
 	// If the service already exists, we just do an update
@@ -193,7 +211,107 @@ DELETE FROM service_group WHERE service_group.id = $1 AND (NOT EXISTS (SELECT 1 
 	maybeCleanupDeployment = `
 DELETE FROM deployment WHERE deployment.id = $1 AND (NOT EXISTS (SELECT 1 FROM service WHERE service.deployment_id = deployment.id ))
 `
+	upsertServiceAndMetadata = `
+INSERT INTO service_full (
+	origin,
+	name,
+	version,
+	release,
+	package_ident,
+	health,
+	health_check_message,
+	channel,
+	update_strategy,
+	supervisor_id,
+	fqdn,
+	site,
+	service_group_name,
+	service_group_name_suffix,
+	application,
+	environment,
+	last_event_occurred_at
 )
+VALUES (
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17
+  )
+ON CONFLICT ON CONSTRAINT service_full_name_supervisor_id_key
+DO UPDATE SET (
+	origin,
+	version,
+	release,
+	package_ident,
+	health,
+	health_check_message,
+	channel,
+	update_strategy,
+	fqdn,
+	site,
+	service_group_name,
+	service_group_name_suffix,
+	application,
+	environment,
+	last_event_occurred_at
+) = (
+	EXCLUDED.origin,
+	EXCLUDED.version,
+	EXCLUDED.release,
+	EXCLUDED.package_ident,
+	EXCLUDED.health,
+	EXCLUDED.health_check_message,
+	EXCLUDED.channel,
+	EXCLUDED.update_strategy,
+	EXCLUDED.fqdn,
+	EXCLUDED.site,
+	EXCLUDED.service_group_name,
+	EXCLUDED.service_group_name_suffix,
+	EXCLUDED.application,
+	EXCLUDED.environment,
+	EXCLUDED.last_event_occurred_at
+)
+;
+`
+)
+
+func (db *Postgres) upsertServiceAndMetadata(
+	eventMetadata *habitat.EventMetadata,
+	svcMetadata *habitat.ServiceMetadata,
+	pkgIdent *packageIdent,
+	health string) error {
+
+	var (
+		channel        string
+		updateStrategy string
+	)
+
+	if svcMetadata.GetUpdateConfig() == nil {
+		channel = ""
+		updateStrategy = storage.NoneStrategy.String()
+	} else {
+		channel = svcMetadata.GetUpdateConfig().Channel
+		updateStrategy = svcMetadata.GetUpdateConfig().Strategy.String()
+	}
+	_, err := db.DbMap.Exec(upsertServiceAndMetadata,
+		pkgIdent.Origin,                 // origin,
+		pkgIdent.Name,                   // name,
+		pkgIdent.Version,                // version,
+		pkgIdent.Release,                // release,
+		pkgIdent.FullPackageIdent(),     // package_ident,
+		health,                          // health,
+		"",                              // health_check_message, // TODO 13Aug2019 - hab isn't sending this yet
+		channel,                         // channel,
+		updateStrategy,                  // update_strategy,
+		eventMetadata.GetSupervisorId(), // supervisor_id,
+		eventMetadata.GetFqdn(),         // fqdn,
+		eventMetadata.GetSite(),         // site,
+		svcMetadata.GetServiceGroup(),   // service_group_name,
+		trimSuffix(svcMetadata.GetServiceGroup()),            // service_group_name_suffix,
+		eventMetadata.GetApplication(),                       // application,
+		eventMetadata.GetEnvironment(),                       // environment
+		convertOrCreateGoTime(eventMetadata.GetOccurredAt()), // last_event_occurred_at
+	)
+
+	return err
+}
 
 // updateServiceAndRelations updates the fields for a service row and makes
 // any required changes to an associated supervisor row. It also ensures the

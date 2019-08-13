@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	numWorkers       = 50
+	numWorkers       = 25
 	eventsBufferSize = 100
 )
 
