@@ -213,21 +213,21 @@ DELETE FROM deployment WHERE deployment.id = $1 AND (NOT EXISTS (SELECT 1 FROM s
 `
 	upsertServiceAndMetadata = `
 INSERT INTO service_full (
-  origin,
+	origin,
 	name,
 	version,
 	release,
 	package_ident,
 	status,
 	health,
-  channel,
+	channel,
 	update_strategy,
 	supervisor_id,
 	fqdn,
 	site,
-  service_group_name,
+	service_group_name,
 	service_group_name_suffix,
-  application,
+	application,
 	environment,
 	last_event_occurred_at
 )
@@ -236,35 +236,35 @@ VALUES (
   )
 ON CONFLICT ON CONSTRAINT service_full_name_supervisor_id_key
 DO UPDATE SET (
-  origin,
+	origin,
 	version,
 	release,
 	package_ident,
 	status,
 	health,
-  channel,
+	channel,
 	update_strategy,
 	fqdn,
 	site,
-  service_group_name,
+	service_group_name,
 	service_group_name_suffix,
-  application,
+	application,
 	environment,
 	last_event_occurred_at
 ) = (
-  EXCLUDED.origin,
+	EXCLUDED.origin,
 	EXCLUDED.version,
 	EXCLUDED.release,
 	EXCLUDED.package_ident,
 	EXCLUDED.status,
 	EXCLUDED.health,
-  EXCLUDED.channel,
+	EXCLUDED.channel,
 	EXCLUDED.update_strategy,
 	EXCLUDED.fqdn,
 	EXCLUDED.site,
-  EXCLUDED.service_group_name,
+	EXCLUDED.service_group_name,
 	EXCLUDED.service_group_name_suffix,
-  EXCLUDED.application,
+	EXCLUDED.application,
 	EXCLUDED.environment,
 	EXCLUDED.last_event_occurred_at
 )
