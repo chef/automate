@@ -31,9 +31,8 @@ interface MemoryMap {
   [key: string]: any;
 }
 
-let LOCAL_STORAGE_MEMORY: MemoryMap = {};
-let SESSION_MEMORY: MemoryMap = {};
-
+const LOCAL_STORAGE_MEMORY: MemoryMap = {};
+const SESSION_MEMORY: MemoryMap = {};
 
 Cypress.Commands.add('saveStorage', () => {
   Object.keys(localStorage).forEach(key => {
@@ -98,28 +97,6 @@ Cypress.Commands.add('generateAdminToken', (idToken: string) => {
   });
 });
 
-// helpers
-
-function LoginHelper(username: string) {
-  cy.url().should('include', '/dex/auth/local');
-  cy.server();
-  cy.route('POST', '/api/v0/auth/introspect_some').as('getAuth');
-
-  // login
-  cy.get('#login').type(username);
-  cy.get('#password').type('chefautomate');
-
-  cy.get('[type=submit]').click().then(() => {
-    expect(localStorage.getItem('chef-automate-user')).to.contain(username);
-
-    // close welcome modal if present
-    cy.get('app-welcome-modal').invoke('hide');
-    cy.saveStorage();
-
-    cy.wait('@getAuth');
-  });
-}
-
 Cypress.Commands.add('cleanupPoliciesByIDPrefix', (idToken: string, idPrefix: string) => {
   cy.request({
     auth: { bearer: idToken },
@@ -183,6 +160,28 @@ Cypress.Commands.add('cleanupProjectsByIDPrefix', (idToken: string, idPrefix: st
   });
 });
 
+
+// helpers
+
+function LoginHelper(username: string) {
+  cy.url().should('include', '/dex/auth/local');
+  cy.server();
+  cy.route('POST', '/api/v0/auth/introspect_some').as('getAuth');
+
+  // login
+  cy.get('#login').type(username);
+  cy.get('#password').type('chefautomate');
+
+  cy.get('[type=submit]').click().then(() => {
+    expect(localStorage.getItem('chef-automate-user')).to.contain(username);
+
+    // close welcome modal if present
+    cy.get('app-welcome-modal').invoke('hide');
+    cy.saveStorage();
+
+    cy.wait('@getAuth');
+  });
+}
 
 Cypress.Commands.add('cleanupTeamsByDescriptionPrefix', (idToken: string, namePrefix: string) => {
   cy.request({
