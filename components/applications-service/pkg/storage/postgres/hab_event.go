@@ -211,8 +211,6 @@ DELETE FROM service_group WHERE service_group.id = $1 AND (NOT EXISTS (SELECT 1 
 	maybeCleanupDeployment = `
 DELETE FROM deployment WHERE deployment.id = $1 AND (NOT EXISTS (SELECT 1 FROM service WHERE service.deployment_id = deployment.id ))
 `
-	// TODO: add last_event_occurred_at
-	// TODO: verify healthcheck message is stored
 	upsertServiceAndMetadata = `
 INSERT INTO service_full (
   origin,
@@ -230,10 +228,11 @@ INSERT INTO service_full (
   service_group_name,
 	service_group_name_suffix,
   application,
-	environment
+	environment,
+	last_event_occurred_at
 )
 VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17
   )
 ON CONFLICT ON CONSTRAINT service_full_name_supervisor_id_key
 DO UPDATE SET (
@@ -250,7 +249,8 @@ DO UPDATE SET (
   service_group_name,
 	service_group_name_suffix,
   application,
-	environment
+	environment,
+	last_event_occurred_at
 ) = (
   EXCLUDED.origin,
 	EXCLUDED.version,
@@ -265,7 +265,8 @@ DO UPDATE SET (
   EXCLUDED.service_group_name,
 	EXCLUDED.service_group_name_suffix,
   EXCLUDED.application,
-	EXCLUDED.environment
+	EXCLUDED.environment,
+	EXCLUDED.last_event_occurred_at
 )
 ;
 `
@@ -295,17 +296,18 @@ func (db *Postgres) upsertServiceAndMetadata(
 		pkgIdent.Version,                // version,
 		pkgIdent.Release,                // release,
 		pkgIdent.FullPackageIdent(),     // package_ident,
-		"",                              // status,
+		"",                              // status, // TODO 13Aug2019 - hab isn't sending this yet
 		health,                          // health,
-		channel,                         // channel, // TODO: double check these are correct for none strategy
+		channel,                         // channel,
 		updateStrategy,                  // update_strategy,
 		eventMetadata.GetSupervisorId(), // supervisor_id,
 		eventMetadata.GetFqdn(),         // fqdn,
 		eventMetadata.GetSite(),         // site,
 		svcMetadata.GetServiceGroup(),   // service_group_name,
-		trimSuffix(svcMetadata.GetServiceGroup()), // service_group_name_suffix,
-		eventMetadata.GetApplication(),            // application,
-		eventMetadata.GetEnvironment(),            // environment
+		trimSuffix(svcMetadata.GetServiceGroup()),            // service_group_name_suffix,
+		eventMetadata.GetApplication(),                       // application,
+		eventMetadata.GetEnvironment(),                       // environment
+		convertOrCreateGoTime(eventMetadata.GetOccurredAt()), // last_event_occurred_at
 	)
 
 	return err
