@@ -67,13 +67,17 @@ func InitCerealManager(m *cereal.Manager, workerCount int, ingestClient ingest.C
 	}, cereal.TaskExecutorOpts{Workers: 1})
 }
 
+type LostJob struct {
+	JobID  string
+	NodeID string
+}
 type ScanJobWorkflow struct{}
 type ScanJobWorkflowPayload struct {
 	OutstandingJobs  int
 	ParentJobID      string
 	ChildJobID       string
 	OverallJobStatus string
-	LostJobIDs       []string
+	LostJobs         []LostJob
 	StartTime        time.Time
 }
 
@@ -107,7 +111,7 @@ func (p *ScanJobWorkflow) OnStart(w cereal.WorkflowInstance,
 		ParentJobID:      job.Id,
 		ChildJobID:       "",
 		OverallJobStatus: types.StatusRunning,
-		LostJobIDs:       nil,
+		LostJobs:         nil,
 		StartTime:        time.Now(),
 	})
 }
@@ -191,6 +195,7 @@ func (p *ScanJobWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 		var job *types.InspecJob
 		jobName := "unknown"
 		jobID := "unknown"
+		nodeID := "unknown"
 
 		if err := ev.Result.GetParameters(&job); err != nil {
 			logrus.WithError(err).Warn("could not read scan job parameters")
@@ -199,17 +204,22 @@ func (p *ScanJobWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 		if job != nil {
 			jobID = job.JobID
 			jobName = job.JobName
+			nodeID = job.NodeID
 		}
 
 		logctx := logrus.WithFields(logrus.Fields{
 			"jobID":   jobID,
 			"jobName": jobName,
+			"nodeID":  nodeID,
 		})
 		if err := ev.Result.Err(); err != nil {
 			logctx.WithError(ev.Result.Err()).Error("scan-job failed with abnormal error")
 			childJobStatus = types.StatusFailed
 			if err == cereal.ErrTaskLost && jobID != "" {
-				payload.LostJobIDs = append(payload.LostJobIDs, jobID)
+				payload.LostJobs = append(payload.LostJobs, LostJob{
+					JobID:  jobID,
+					NodeID: nodeID,
+				})
 			}
 		} else {
 			if err := ev.Result.Get(&childJobStatus); err != nil {
@@ -499,7 +509,7 @@ func (t *InspecJobSummaryTask) Run(ctx context.Context, task cereal.Task) (inter
 		return nil, errors.Wrap(err, "could not unmarshal summary job parameters")
 	}
 
-	for _, jobID := range jobsPayload.LostJobIDs {
+	for _, job := range jobsPayload.LostJobs {
 		endTime := time.Now()
 		startTime := jobsPayload.StartTime
 		if startTime.IsZero() {
@@ -507,7 +517,8 @@ func (t *InspecJobSummaryTask) Run(ctx context.Context, task cereal.Task) (inter
 		}
 		job := &types.InspecJob{
 			InspecBaseJob: types.InspecBaseJob{
-				JobID: jobID,
+				JobID:  job.JobID,
+				NodeID: job.NodeID,
 			},
 			StartTime:  &startTime,
 			EndTime:    &endTime,
