@@ -4851,6 +4851,33 @@ func TestListProjects(t *testing.T) {
 
 			assert.ElementsMatch(t, expectedProjects, ps)
 		}},
+		{"returns rule status for projects for none, staged, and applied individually", func(t *testing.T) {
+			ctx := context.Background()
+			p1 := insertTestProjectWithRules(t, db, "foo", "my foo project", storage.ChefManaged, storage.EditsPending)
+			insertStagedRuleWithMultipleConditions(t, db, "staged-rule-1", p1.ID, storage.Node, false)
+			p2 := insertTestProjectWithRules(t, db, "bar", "my bar project", storage.Custom, storage.Applied)
+			insertAppliedRuleWithMultipleConditions(t, db, "staged-rule-2", p2.ID, storage.Node)
+			p3 := insertTestProjectWithRules(t, db, "baz", "my baz project", storage.Custom, storage.NoRules)
+
+			ps, err := store.ListProjects(ctx)
+			require.NoError(t, err)
+			expectedProjects := []*storage.Project{&p1, &p2, &p3}
+
+			assert.ElementsMatch(t, expectedProjects, ps)
+		}},
+		{"returns rule status of staged for project with both staged and applied rules", func(t *testing.T) {
+			ctx := context.Background()
+			p1 := insertTestProjectWithRules(t, db, "foo", "my foo project", storage.ChefManaged, storage.EditsPending)
+			insertStagedRuleWithMultipleConditions(t, db, "staged-rule-1", p1.ID, storage.Node, false)
+			insertAppliedRuleWithMultipleConditions(t, db, "staged-rule-2", p1.ID, storage.Node)
+			insertAppliedRuleWithMultipleConditions(t, db, "staged-rule-3", p1.ID, storage.Node)
+
+			ps, err := store.ListProjects(ctx)
+			require.NoError(t, err)
+			expectedProjects := []*storage.Project{&p1}
+
+			assert.ElementsMatch(t, expectedProjects, ps)
+		}},
 	}
 	rand.Shuffle(len(cases), func(i, j int) {
 		cases[i], cases[j] = cases[j], cases[i]
