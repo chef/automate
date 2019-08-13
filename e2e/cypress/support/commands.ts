@@ -31,26 +31,30 @@ Cypress.Commands.add('logout', () => {
 // check any projects by NAME (not id) passed -- if any -- and apply any changes.
 // if there are no resulting changes to apply, it will simply click out of the filter.
 Cypress.Commands.add('applyProjectsFilter', (projectsToFilterOn: string[]) => {
-  cy.get('[data-cy=projects-filter-button]').click();
-  cy.get('[data-cy=projects-filter-dropdown]').find('chef-checkbox').each(child => {
+  cy.get('app-projects-filter button#projects-filter-button').click();
+  cy.get('app-projects-filter chef-dropdown#projects-filter-dropdown')
+    .find('chef-checkbox').each(child => {
     // deselect every checkbox
-    if (child.attr('aria-checked')) {
+    console.log('wat');
+    console.log(child);
+    console.log(child.attr('aria-checked') === 'true');
+    if (child.attr('aria-checked') === 'true') {
       child.click();
     }
   });
+
   // check all desired checkboxes
   projectsToFilterOn.forEach(proj =>
-    cy.get('[data-cy=projects-filter-dropdown]').contains(proj).parent().click());
-  const applyButton = Cypress.$('[data-cy=projects-filter-apply-changes]');
-  if (applyButton.is('[disabled]')) {
+    cy.get(`chef-checkbox[title="${proj}"]`).find('chef-icon').click());
+
+  if (projectsToFilterOn.length === 0) {
     // no changes to apply, close projects filter
-    cy.get('[data-cy=projects-filter-button]').click();
+    cy.get('app-projects-filter button#projects-filter-button').click();
   } else {
     // apply projects filter
-    applyButton.click();
+    cy.get('app-projects-filter chef-button#projects-filter-apply-changes').click();
   }
 });
-
 
 interface MemoryMap {
   [key: string]: any;

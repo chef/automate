@@ -130,8 +130,6 @@ describe('team management', () => {
   });
 
   describeProjectsEnabled('team create modal with projects (IAM v2.1 only)', () => {
-    const unusedProject = 'cypress-unused';
-    const STORE_OPTIONS_KEY = 'projectsFilter.options';
     const dropdownNameUntilEllipsisLen = 25;
 
     context('when only the unassigned project is selected', () => {

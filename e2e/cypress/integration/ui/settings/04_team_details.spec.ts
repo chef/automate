@@ -100,21 +100,44 @@ describe('team management', () => {
     cy.restoreStorage();
   });
 
-  it('displays team details for admins team', () => {
-    cy.get('chef-breadcrumbs').contains('Teams');
-    cy.get('chef-breadcrumbs').contains(teamName);
+  // it('displays team details for admins team', () => {
+  //   cy.get('chef-breadcrumbs').contains('Teams');
+  //   cy.get('chef-breadcrumbs').contains(teamName);
 
-    cy.get('.page-title').contains(teamName);
-    cy.contains('Add User');
-  });
+  //   cy.get('.page-title').contains(teamName);
+  //   cy.contains('Add User');
+  // });
 
-  context('when the team has users', () => {
-    it('displays team users', () => {
-      cy.get('chef-option').contains('Users');
-      cy.get('app-user-table chef-th').contains('Name');
-      cy.get('app-user-table chef-th').contains('Username');
-      cy.get('app-user-table chef-td').contains(usernameForUser);
-      cy.get('app-user-table chef-td').contains(nameForUser);
+  // context('when the team has users', () => {
+  //   it('displays team users', () => {
+  //     cy.get('chef-option').contains('Users');
+  //     cy.get('app-user-table chef-th').contains('Name');
+  //     cy.get('app-user-table chef-th').contains('Username');
+  //     cy.get('app-user-table chef-td').contains(usernameForUser);
+  //     cy.get('app-user-table chef-td').contains(nameForUser);
+  //   });
+  // });
+
+  describeProjectsEnabled('update team projects (IAM v2.1 only)', () => {
+    const dropdownNameUntilEllipsisLen = 25;
+
+    context('when only the unassigned project is selected', () => {
+      beforeEach(() => {
+        cy.applyProjectsFilter([unassigned]);
+      });
+
+      it('cannot access projects dropdown but changing name allows team update submission', () => {
+        cy.get('[data-cy=team-details-tab-details]').click();
+        cy.get('[data-cy=team-details-name-input]').should('have.value', teamName);
+        cy.get('[data-cy=team-details-submit-button]').should('have.attr', 'aria-disabled');
+
+        // initial state of dropdown
+        cy.get('app-team-details app-projects-dropdown #projects-selected').contains(unassigned);
+        cy.get('app-projects-dropdown .dropdown-button').should('have.attr', 'disabled');
+
+        cy.get('[data-cy=team-details-name-input]').type('updated name');
+        cy.get('[data-cy=team-details-submit-button]').should('not.have.attr', 'aria-disabled');
+      });
     });
   });
 });
