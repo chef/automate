@@ -20,7 +20,6 @@ const (
 
 type DomainProjectUpdateWorkflowExecutor struct {
 	producer     string
-	esClient     EsClient
 	PollInterval time.Duration
 
 	cancelUpdateProjectTagsTaskName string
@@ -297,11 +296,20 @@ func (manager *WorkflowProjectUpdateManager) getJobStatus() (jobStatus *JobStatu
 	}
 }
 
+func NewWorkflowExecutor(workflowName string) *DomainProjectUpdateWorkflowExecutor {
+	return &DomainProjectUpdateWorkflowExecutor{
+		PollInterval: 10 * time.Second,
+
+		cancelUpdateProjectTagsTaskName: fmt.Sprintf("%s/%s", workflowName, cancelUpdateProjectTagsTaskName),
+		startProjectTagUpdaterTaskName:  fmt.Sprintf("%s/%s", workflowName, startProjectTagUpdaterTaskName),
+		projectTagUpdaterStatusTaskName: fmt.Sprintf("%s/%s", workflowName, projectTagUpdaterStatusTaskName),
+	}
+}
+
 func RegisterWorkflow(manager *cereal.Manager, instanceName string, workflowName string,
 	esClient EsClient, authzProjectsClient iam_v2.ProjectsClient) (*WorkflowProjectUpdateManager, error) {
 
 	workflowExecutor := &DomainProjectUpdateWorkflowExecutor{
-		esClient:     esClient,
 		PollInterval: 10 * time.Second,
 
 		cancelUpdateProjectTagsTaskName: fmt.Sprintf("%s/%s", workflowName, cancelUpdateProjectTagsTaskName),
