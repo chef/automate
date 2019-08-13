@@ -75,8 +75,7 @@ func (server *JobSchedulerServer) GetStatusJobScheduler(ctx context.Context,
 }
 
 func (server *JobSchedulerServer) runJobNow(ctx context.Context, jobName string) error {
-	sched, err := server.jobManager.GetWorkflowScheduleByName(ctx,
-		MissingNodesForDeletionScheduleName, MissingNodesForDeletionJobName)
+	sched, err := server.jobManager.GetWorkflowScheduleByName(ctx, jobNameToInstanceName(jobName), jobName)
 	if err != nil {
 		return err
 	}
