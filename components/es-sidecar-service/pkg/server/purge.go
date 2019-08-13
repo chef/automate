@@ -6,9 +6,9 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	api "github.com/chef/automate/api/interservice/es_sidecar"
-	"github.com/chef/automate/components/config-mgmt-service/errors"
 	"github.com/chef/automate/components/es-sidecar-service/pkg/elastic"
 	"github.com/chef/automate/lib/version"
 )
@@ -27,7 +27,7 @@ func (server *EsSidecarServer) PurgeTimeSeriesIndicesByAge(ctx context.Context, 
 		return &api.PurgeResponse{
 			Success: false,
 			Message: errStr,
-		}, errors.GrpcError(codes.Internal, errStr)
+		}, status.Error(codes.Internal, errStr)
 	}
 
 	return &api.PurgeResponse{
@@ -63,10 +63,10 @@ func (server *EsSidecarServer) PurgeDocumentsFromIndexByAge(ctx context.Context,
 				Success:  false,
 				Message:  errStr,
 				Failures: failures,
-			}, errors.GrpcError(codes.Internal, errStr)
+			}, status.Error(codes.Internal, errStr)
 		}
 	}
-	return nil, errors.GrpcError(codes.Internal, err.Error())
+	return nil, status.Error(codes.Internal, err.Error())
 }
 
 // Version returns the Version of the ES Sidecar Service
