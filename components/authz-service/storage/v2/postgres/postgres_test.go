@@ -4801,30 +4801,6 @@ func TestListProjects(t *testing.T) {
 			require.NoError(t, err)
 			assert.Empty(t, ps)
 		}},
-		{"when two projects (custom and chef-managed) exist, returns them", func(t *testing.T) {
-			ctx := context.Background()
-			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
-			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
-
-			ps, err := store.ListProjects(ctx)
-			require.NoError(t, err)
-			expectedProjects := []*storage.Project{
-				{
-					ID:     "foo",
-					Name:   "my foo project",
-					Type:   storage.ChefManaged,
-					Status: "NoRules",
-				},
-				{
-					ID:     "bar",
-					Name:   "my bar project",
-					Type:   storage.Custom,
-					Status: "NoRules",
-				},
-			}
-
-			assert.ElementsMatch(t, expectedProjects, ps)
-		}},
 		{"when multiple projects exist, filter based on projects lists", func(t *testing.T) {
 			ctx := context.Background()
 			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
@@ -4852,7 +4828,7 @@ func TestListProjects(t *testing.T) {
 
 			assert.ElementsMatch(t, expectedProjects, ps)
 		}},
-		{"when multiple projects exist, returns everything when no project filter is specified (v2.0 case)", func(t *testing.T) {
+		{"when multiple projects exist, returns everything when empty filter is specified (v2.0 case)", func(t *testing.T) {
 			ctx := context.Background()
 			ctx = insertProjectsIntoContext(ctx, []string{})
 			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
@@ -4877,41 +4853,11 @@ func TestListProjects(t *testing.T) {
 
 			assert.ElementsMatch(t, expectedProjects, ps)
 		}},
-		{"when multiple projects exist, filter based on projects lists", func(t *testing.T) {
-			ctx := context.Background()
-			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
-			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
-			insertTestProject(t, db, "baz", "my baz project", storage.Custom)
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"foo", "bar"}, "resource", "action", "pol"))
-
-			ps, err := store.ListProjects(ctx)
-			require.NoError(t, err)
-			expectedProjects := []*storage.Project{
-				{
-					ID:     "foo",
-					Name:   "my foo project",
-					Type:   storage.ChefManaged,
-					Status: "NoRules",
-				},
-				{
-					ID:     "bar",
-					Name:   "my bar project",
-					Type:   storage.Custom,
-					Status: "NoRules",
-				},
-			}
-
-			assert.ElementsMatch(t, expectedProjects, ps)
-		}},
 		{"when multiple projects exist, returns everything when no project filter is specified (v2.0 case)", func(t *testing.T) {
 			ctx := context.Background()
 			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
 			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
 			insertTestProject(t, db, "baz", "my baz project", storage.Custom)
-
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{}, "resource", "action", "pol"))
 
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
@@ -4938,7 +4884,7 @@ func TestListProjects(t *testing.T) {
 
 			assert.ElementsMatch(t, expectedProjects, ps)
 		}},
-		{"when multiple projects exist, returns all projects will * filter passed", func(t *testing.T) {
+		{"when multiple projects exist, returns all projects when * filter passed", func(t *testing.T) {
 			ctx := context.Background()
 			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
 			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
