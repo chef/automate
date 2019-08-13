@@ -67,3 +67,4 @@
 - [`65_iam_projects_drop_projects_column.up.sql`](65_iam_projects_drop_projects_column.up.sql)
 - [`66_iam_statements_drop_id_column.up.sql`](66_iam_statements_drop_id_column.up.sql)
 - [`67_update_rule_queries.up.sql`](67_update_rule_queries.up.sql)
+- [`68_add_status_to_projects.up.sql`](68_add_status_to_projects.up.sql)

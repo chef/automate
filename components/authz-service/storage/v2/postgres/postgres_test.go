@@ -4810,14 +4810,16 @@ func TestListProjects(t *testing.T) {
 			require.NoError(t, err)
 			expectedProjects := []*storage.Project{
 				{
-					ID:   "foo",
-					Name: "my foo project",
-					Type: storage.ChefManaged,
+					ID:     "foo",
+					Name:   "my foo project",
+					Type:   storage.ChefManaged,
+					Status: "NoRules",
 				},
 				{
-					ID:   "bar",
-					Name: "my bar project",
-					Type: storage.Custom,
+					ID:     "bar",
+					Name:   "my bar project",
+					Type:   storage.Custom,
+					Status: "NoRules",
 				},
 			}
 
@@ -4835,14 +4837,16 @@ func TestListProjects(t *testing.T) {
 			require.NoError(t, err)
 			expectedProjects := []*storage.Project{
 				{
-					ID:   "foo",
-					Name: "my foo project",
-					Type: storage.ChefManaged,
+					ID:     "foo",
+					Name:   "my foo project",
+					Type:   storage.ChefManaged,
+					Status: "NoRules",
 				},
 				{
-					ID:   "bar",
-					Name: "my bar project",
-					Type: storage.Custom,
+					ID:     "bar",
+					Name:   "my bar project",
+					Type:   storage.Custom,
+					Status: "NoRules",
 				},
 			}
 
@@ -4858,14 +4862,16 @@ func TestListProjects(t *testing.T) {
 			require.NoError(t, err)
 			expectedProjects := []*storage.Project{
 				{
-					ID:   "foo",
-					Name: "my foo project",
-					Type: storage.ChefManaged,
+					ID:     "foo",
+					Name:   "my foo project",
+					Type:   storage.ChefManaged,
+					Status: "NoRules",
 				},
 				{
-					ID:   "bar",
-					Name: "my bar project",
-					Type: storage.Custom,
+					ID:     "bar",
+					Name:   "my bar project",
+					Type:   storage.Custom,
+					Status: "NoRules",
 				},
 			}
 
@@ -4883,14 +4889,16 @@ func TestListProjects(t *testing.T) {
 			require.NoError(t, err)
 			expectedProjects := []*storage.Project{
 				{
-					ID:   "foo",
-					Name: "my foo project",
-					Type: storage.ChefManaged,
+					ID:     "foo",
+					Name:   "my foo project",
+					Type:   storage.ChefManaged,
+					Status: "NoRules",
 				},
 				{
-					ID:   "bar",
-					Name: "my bar project",
-					Type: storage.Custom,
+					ID:     "bar",
+					Name:   "my bar project",
+					Type:   storage.Custom,
+					Status: "NoRules",
 				},
 			}
 
@@ -4909,19 +4917,22 @@ func TestListProjects(t *testing.T) {
 			require.NoError(t, err)
 			expectedProjects := []*storage.Project{
 				{
-					ID:   "foo",
-					Name: "my foo project",
-					Type: storage.ChefManaged,
+					ID:     "foo",
+					Name:   "my foo project",
+					Type:   storage.ChefManaged,
+					Status: "NoRules",
 				},
 				{
-					ID:   "bar",
-					Name: "my bar project",
-					Type: storage.Custom,
+					ID:     "bar",
+					Name:   "my bar project",
+					Type:   storage.Custom,
+					Status: "NoRules",
 				},
 				{
-					ID:   "baz",
-					Name: "my baz project",
-					Type: storage.Custom,
+					ID:     "baz",
+					Name:   "my baz project",
+					Type:   storage.Custom,
+					Status: "NoRules",
 				},
 			}
 
@@ -4939,19 +4950,22 @@ func TestListProjects(t *testing.T) {
 			require.NoError(t, err)
 			expectedProjects := []*storage.Project{
 				{
-					ID:   "foo",
-					Name: "my foo project",
-					Type: storage.ChefManaged,
+					ID:     "foo",
+					Name:   "my foo project",
+					Type:   storage.ChefManaged,
+					Status: "NoRules",
 				},
 				{
-					ID:   "bar",
-					Name: "my bar project",
-					Type: storage.Custom,
+					ID:     "bar",
+					Name:   "my bar project",
+					Type:   storage.Custom,
+					Status: "NoRules",
 				},
 				{
-					ID:   "baz",
-					Name: "my baz project",
-					Type: storage.Custom,
+					ID:     "baz",
+					Name:   "my baz project",
+					Type:   storage.Custom,
+					Status: "NoRules",
 				},
 			}
 

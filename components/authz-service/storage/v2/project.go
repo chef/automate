@@ -11,9 +11,10 @@ import (
 
 // Project represents a project definition to be persisted to storage.
 type Project struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-	Type Type   `json:"type"`
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	Type   Type   `json:"type"`
+	Status string `json:"status"`
 }
 
 // Note: also catches empty names ("")
