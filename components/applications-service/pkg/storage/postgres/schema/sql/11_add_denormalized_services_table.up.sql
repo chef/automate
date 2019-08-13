@@ -29,7 +29,6 @@ CREATE TABLE IF NOT EXISTS service_full (
   environment               TEXT      NOT NULL DEFAULT '',
 
   -- "time wizard" -- what the previous status was, and when it changed
-  -- TODO: figure out how to use a trigger to fill this out when updating (?)
   previous_health           TEXT      NOT NULL DEFAULT 'NONE',
   health_updated_at         TIMESTAMP NOT NULL DEFAULT NOW(),
 
@@ -45,9 +44,20 @@ CREATE TABLE IF NOT EXISTS service_full (
   UNIQUE (name, supervisor_id)
 );
 
--- TODO: create indexes for search-able things
--- we might want to use this technique to do case-insensitive LIKE queries with an index
+-- Create indexes for search-able things
+-- TODO/question for review: we might want to use this technique to do
+-- case-insensitive LIKE queries with an index:
 -- https://www.postgresql.org/docs/9.6/indexes-expressional.html
+-- but if we do that, then we also need a not-lower one to do any case-sensitive stuff?
+CREATE INDEX service_full_name_idx ON service_full (name);
+CREATE INDEX service_full_origin_idx ON service_full (origin);
+CREATE INDEX service_full_service_group_name_suffix_idx ON service_full (service_group_name_suffix);
+CREATE INDEX service_full_version_idx ON service_full (version);
+CREATE INDEX service_full_release_idx ON service_full (release);
+CREATE INDEX service_full_environment_idx ON service_full (environment);
+CREATE INDEX service_full_application_idx ON service_full (application);
+CREATE INDEX service_full_channel_idx ON service_full (channel);
+CREATE INDEX service_full_site_idx ON service_full (site);
 
 
 CREATE TRIGGER update_service_full_updated_at BEFORE UPDATE
