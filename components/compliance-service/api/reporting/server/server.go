@@ -326,7 +326,6 @@ func (srv *Server) ListNodes(ctx context.Context, in *reporting.Query) (*reporti
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	
 	formattedFilters, err = filterByProjects(ctx, formattedFilters)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
