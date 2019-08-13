@@ -22,8 +22,13 @@ common cases.
 ### Login with LDAP
 
 Once the user has provided a username and password at the login screen, Chef
-Automate goes through a sequence of operations to complete the login: Connect,
-Bind, User Search, Login Bind, and Group Search.
+Automate goes through a sequence of operations to complete the login:
+
+1. [Connect]({{< relref "#connect" >}}),
+2. [Bind]({{< relref "#bind" >}}),
+3. [User Search]({{< relref "#user-search" >}}),
+4. [Login Bind]({{< relref "#login-bind" >}}), and
+5. [Group Search]({{< relref "#group-search" >}}).
 
 #### Authorization with LDAP
 
@@ -73,6 +78,9 @@ However, if you wish to integrate with an LDAP server with TLS disabled:
 insecure_no_ssl = true
 ```
 
+See [Troubleshoot your Connection]({{< relref "#troubleshoot-your-connection" >}})
+for common issues related to _Connect_.
+
 #### Bind
 
 Chef Automate then authenticates with (or "binds to") the LDAP service using
@@ -97,6 +105,9 @@ Wrap special characters in a bind_password in triple single quotes.
 bind_password = '''$p3c"i'@l ! %#'''
 ```
 
+See [Troubleshoot Bind]({{< relref "#troubleshoot-bind" >}})
+for common issues related to _Bind_.
+
 #### User Search
 
 After binding successfully, Chef Automate will try to obtain the directory name
@@ -110,9 +121,25 @@ If configured, it will retrieve additional attributes, using the configured
 names (`user_id_attr`, `email_attr`, and `user_display_name_attr`). See
 [Configuration: LDAP]({{< relref "configuration.md#ldap" >}}) for an overview.
 
+{{% info %}}
+The `ldapsearch` command line corresponding do _User Search_ is
+```shell
+ldapsearch -h $host -D $bind_dn -w $bind_password \
+  -s sub \
+  -b $base_user_search_dn \
+  "($username_attr=$username)" \
+  $user_id_attr $user_display_name_attr $email_attr
+```
+where `username` is what was typed into the **username input box** in the Sign in
+form.
+{{% /info %}}
+
 {{% warning %}}
 If the LDAP search fails to retrieve the configured attributes, the login process will fail.
 {{% /warning %}}
+
+See [Troubleshoot User Search]({{< relref "#troubleshoot-user-search" >}})
+for common issues related to _User Search_.
 
 ##### Filtering Which Users Can Log In
 
@@ -141,19 +168,21 @@ When a user tries to log in, they would only be authorized if they were found af
 (&(objectClass=person)(memberof=CN=YourGroupToFilterOn,OU=Users,DC=YourDomain,DC=com))
 ```
 
-You can test out your filter by using `ldapsearch` to see if the users you expect are being returned:
-
+{{% info %}}
+The `ldapsearch` command line corresponding do _User Search_ with restricted
+groups is
 ```shell
-ldapsearch -H ldap://ldap-server:636/ \  # host
-  -D cn=service_account,dc=corp,dc=com \ # bind_dn
-  -w admin \                             # bind_password
-  -b ou=People,dc=corp,dc=com \          # base_user_search_dn
+ldapsearch -h $host -D $bind_dn -w $bind_password \
   -s sub \
-  '(&(objectClass=person)(memberof=CN=YourGroupToFilterOn,OU=Users,DC=YourDomain,DC=com))'
+  -b $base_user_search_dn \
+  "(&$user_query_filter($username_attr=$username))"
 ```
+where `username` is what was typed into the username input box in the Sign in
+form.
+{{% /info %}}
 
-See [Troubleshoot LDAP Search Queries]({{< relref "ldap.md#troubleshoot-ldap-search-queries" >}}) for more info on debugging
-your LDAP integration via `ldapsearch`.
+See [`ldapsearch` Example Queries]({{< relref "#ldapsearch-example-queries" >}})
+for an example on using `ldapsearch`, and different directory layouts.
 
 #### Login Bind
 
@@ -163,6 +192,24 @@ will attempt to bind as the user entry, using the supplied password.
 For example, if the login using `jane:janespassword` has resulted in a
 successful user search, returning `cn=jane,ou=People,dc=corp,dc=com`, the next
 step will be to _bind again_ using that DN, and the password `janespassword`.
+
+{{% info %}}
+The `ldapsearch` command line corresponding do _User Search_ is
+```shell
+ldapsearch -h $host -D $user_dn -w $password
+```
+where `user_dn` is the DN of the user that was returned in [User Search]({{< relref "#user-search" >}}),
+and `password` is what was typed into the **password input box** in the Sign in form.
+
+Note that `result: 32 No such object` is the successful response here, a failed login bind using `ldapsearch` returns
+```
+ldap_bind: Invalid credentials (49)
+        additional info: INVALID_CREDENTIALS: Bind failed: Cannot authenticate user uid=test2,ou=users,ou=system
+```
+{{% /info %}}
+
+See [Troubleshoot Login Bind]({{< relref "#troubleshoot-login-bind" >}})
+for common issues related to _Login Bind_.
 
 #### Group Search
 
@@ -185,6 +232,22 @@ see the example configs below.
 The `base_group_search_dn` setting is optional. However, if it's not provided,
 users authenticating via LDAP (or MSAD) will not be members of any teams.
 {{% /warning %}}
+
+
+{{% info %}}
+The `ldapsearch` command line corresponding do _Group Search_ is
+```shell
+ldapsearch -h $host -D $bind_dn -w $bind_password \
+  -s sub \
+  -b $base_group_search_dn \
+  "($filter_groups_by_user_attr=$user_attr)" \
+  $group_display_name_attr
+```
+where `user_attr` is the `$filter_groups_by_user_value` of the user that was returned in [User Search]({{< relref "#user-search" >}}).
+{{% /info %}}
+
+See [Troubleshoot Group Search]({{< relref "#troubleshoot-group-search" >}})
+for common issues related to _Group Search_.
 
 #### Configuration Overview
 
@@ -556,7 +619,7 @@ level=error msg="Failed to login user: ldap: failed to query groups: ldap: searc
 ```
 
 This, for example, is what you see when the `base_group_search_dn` does not
-exist ("ou=Groups,dc=...").
+exist (`"ou=Groups,dc=..."`).
 
 However, contrary to how _User Search_ works, an empty result from _Group
 Search_ will not inhibit login, it will merely not populate the user's
@@ -577,11 +640,13 @@ and subsequent API authorization request logs containing the user's _subjects_:
 level=info msg="Authorization Query" action=search resource="compliance:profiles" result=true subject="[team:ldap:admins team:ldap:developers user:ldap:jane]"
 ```
 
-#### Troubleshoot LDAP search Queries
+#### `ldapsearch` Example Queries
 
 For debugging purposes it can be useful to execute LDAP queries manually using
 the `ldapsearch` utility. On Ubuntu, it's provided via `ldap-utils` (i.e.,
 `sudo apt-get install ldap-utils`).
+In what follows, we'll outline an example directory layout, and the `ldapsearch`
+queries corresponding to the different phases.
 
 The _User Search_ query looks like this, with comments referencing the
 configurables for LDAP integration:
