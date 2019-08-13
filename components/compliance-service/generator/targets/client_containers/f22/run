@@ -1,2 +1,0 @@
-#!/bin/bash
-docker run -p 11026:22 -d f22:latest

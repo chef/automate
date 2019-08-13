@@ -1,2 +1,0 @@
-#!/bin/bash
-docker run -p 11032:22 -d c5:latest
