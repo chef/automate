@@ -78,10 +78,10 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       name: ['Loading...', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
 
-    combineLatest(
+    combineLatest([
       this.store.select(getStatus),
       this.store.select(updateStatus)
-    ).pipe(
+    ]).pipe(
       takeUntil(this.isDestroyed),
       map(([gStatus, uStatus]) => {
         this.isLoading =
@@ -132,13 +132,13 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         this.isMinorV1 = version === 'v1';
       });
 
-    this.sortedUsers$ = <Observable<User[]>>combineLatest(
+    this.sortedUsers$ = <Observable<User[]>>combineLatest([
       this.store.select(allUsers),
       this.store.select(userStatus),
       this.store.select(teamUsers),
-      this.store.select(getUsersStatus))
+      this.store.select(getUsersStatus)])
       .pipe(
-        map(([users, uStatus, tUsers, tStatus]) => {
+        map(([users, uStatus, tUsers, tStatus]: [User[], EntityStatus, string[], EntityStatus]) => {
           if (uStatus !== EntityStatus.loadingSuccess ||
             tStatus !== EntityStatus.loadingSuccess) {
             return [];

@@ -73,13 +73,13 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private fb: FormBuilder) {
 
-      combineLatest(
+      combineLatest([
         this.store.select(getStatus),
         this.store.select(updateStatus),
         this.store.select(getProjectStatus)
-      ).pipe(
+      ]).pipe(
         takeUntil(this.isDestroyed),
-        map(([gStatus, uStatus, gpStatus]: string[]) => {
+        map(([gStatus, uStatus, gpStatus]) => {
           const routeId = this.route.snapshot.paramMap.get('ruleid');
           this.isLoading =
             routeId
@@ -89,10 +89,10 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
             : false;
         })).subscribe();
 
-      combineLatest(
+      combineLatest([
         this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
         this.store.select(routeParams).pipe(pluck('ruleid'), filter(identity))
-      ).pipe(
+      ]).pipe(
         takeUntil(this.isDestroyed),
         map(([project_id, rule_id]: string[]) => {
           this.store.dispatch(new GetProject({ id: project_id }));

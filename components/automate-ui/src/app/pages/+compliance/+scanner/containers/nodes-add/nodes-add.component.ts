@@ -66,11 +66,12 @@ export class NodesAddComponent implements OnInit {
     });
 
     // Switch selectable secrets based on selected "backend" value (ssh, winrm)
-    this.secrets$ = combineLatest(
+    this.secrets$ = combineLatest([
       this.fetchSecrets(),
       this.backendValue
-    ).pipe(
-      map(([secrets, backend]) => secrets.filter(s => s.type === backend || s.type === 'sudo'))
+    ]).pipe(
+      map(([secrets, backend]: [{ type: string }[], string]) =>
+        secrets.filter(s => s.type === backend || s.type === 'sudo'))
     );
   }
 

@@ -285,10 +285,10 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
     this.selectedStatus$ = this.store.select(createSelector(clientRunsState,
       (state) => state.nodeFilter.status));
 
-    this.totalNumberOfNodesWithStatusFilter$ = combineLatest(
-      this.selectedStatus$, this.nodeCounts$)
+    this.totalNumberOfNodesWithStatusFilter$ = combineLatest([
+      this.selectedStatus$, this.nodeCounts$])
       .pipe(
-        map(([status, nodeCount]) => {
+        map(([status, nodeCount]: [string, NodeCount]) => {
           switch (status) {
             case 'success':
               return nodeCount.success;
@@ -334,12 +334,14 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
       // We want to report total nodes to telemetry, but only when there are no
     // filters. This way we can see how many nodes a customer has connected to
     // automate in total.
-    combineLatest(
+    combineLatest([
       this.nodeCounts$.pipe(distinctUntilKeyChanged('total')),
       this.numberOfSearchBarFilters$.pipe(distinctUntilChanged())
-    )
+    ])
     .pipe(takeUntil(this.isDestroyed))
-    .subscribe(([nodeCounts, filterCount]) => {
+    .subscribe((values: any[]) => {
+      const nodeCounts: NodeCount = values[0];
+      const filterCount: number = values[1];
       if ( filterCount === 0 && nodeCounts.total > 0 ) {
         this.telemetryService.track('clientRunPureCount', nodeCounts);
       }

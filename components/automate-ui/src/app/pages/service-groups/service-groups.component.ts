@@ -67,8 +67,8 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   private selectedSortField$: Observable<string>;
   private healthSummary$: Observable<HealthSummary>;
   private currentPage$: Observable<number>;
-  private currentFieldDirection: SortDirection;
-  private currentSortField: string;
+  public currentFieldDirection: SortDirection;
+  public currentSortField: string;
   private defaultFieldDirection: FieldDirection = {
     name: 'ASC',
     percent_ok: 'ASC',
@@ -78,8 +78,8 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
-    private store: Store<NgrxStateAtom>,
+    public router: Router,
+    public store: Store<NgrxStateAtom>,
     private telemetryService: TelemetryService
   ) { }
 
@@ -94,7 +94,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed)
     ).subscribe(queryParams => this.listParamsChange(queryParams));
 
-    combineLatest(
+    combineLatest([
       this.route.queryParamMap.pipe(
         distinctUntilChanged((a, b) => {
           return a.get('sgId') === b.get('sgId') &&
@@ -103,7 +103,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
         })
       ),
       this.store.select(allServiceGroups)
-    )
+      ])
     .pipe(takeUntil(this.isDestroyed))
     .subscribe(([queryParams]) => this.detailParamsChange(queryParams));
 

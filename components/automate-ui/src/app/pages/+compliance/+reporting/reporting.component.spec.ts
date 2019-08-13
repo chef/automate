@@ -88,7 +88,7 @@ describe('ReportingComponent', () => {
 
   describe('ngOnDestroy()', () => {
     it('notifies subscriptions to unsubscribe', () => {
-      const source = Observable.create(() => {});
+      const source = new Observable(() => {});
       const subscription = source.pipe(
           takeUntil((component as any).isDestroyed))
         .subscribe(() => {});
@@ -191,7 +191,7 @@ describe('ReportingComponent', () => {
 
   describe('onDownloadOptPressed', () => {
     it('calls downloadReport with correct format type', () => {
-      spyOn(statsService, 'downloadReport').and.returnValue(Observable.create(() => {}));
+      spyOn(statsService, 'downloadReport').and.returnValue(new Observable(() => {}));
       component.onDownloadOptPressed('json');
       expect(statsService.downloadReport).toHaveBeenCalledWith('json', jasmine.any(Object));
     });

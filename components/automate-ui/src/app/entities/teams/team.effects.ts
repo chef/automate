@@ -1,18 +1,18 @@
-import { combineLatest, of as observableOf } from 'rxjs';
-import { Store } from '@ngrx/store';
-
-import { catchError, mergeMap, map, filter } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { Actions, Effect, ofType } from '@ngrx/effects';
+import { combineLatest, of as observableOf } from 'rxjs';
+import { catchError, mergeMap, map, filter } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { HttpStatus } from 'app/types/types';
-import { CreateNotification } from '../notifications/notification.actions';
-import { Type } from '../notifications/notification.model';
+import { CreateNotification } from 'app/entities/notifications/notification.actions';
+import { Type } from 'app/entities/notifications/notification.model';
 import { iamMajorVersion } from 'app/entities/policies/policy.selectors';
+import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import {
   GetTeam,
   GetTeamSuccess,
@@ -54,11 +54,11 @@ export class TeamEffects {
   ) { }
 
   @Effect()
-  getTeams$ = combineLatest(
+  getTeams$ = combineLatest([
     this.actions$.pipe(ofType<GetTeams>(TeamActionTypes.GET_ALL)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
-      mergeMap(([_action, version]) =>
+      mergeMap(([_action, version]: [GetTeams, IAMMajorVersion]) =>
         this.requests.getTeams(version).pipe(
           map((resp: GetTeamsSuccessPayload) => {
             const convertedTeams = resp.teams.map(team => versionizeTeam(team));
@@ -78,11 +78,11 @@ export class TeamEffects {
     }));
 
   @Effect()
-  getTeam$ = combineLatest(
+  getTeam$ = combineLatest([
     this.actions$.pipe(ofType<GetTeam>(TeamActionTypes.GET)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
-      mergeMap(([{ payload: { id } }, version]) =>
+      mergeMap(([{ payload: { id } }, version]: [GetTeam, IAMMajorVersion]) =>
         this.requests.getTeam(id, version).pipe(
           map(({ team }: TeamResponse) => new GetTeamSuccess(versionizeTeam(team))),
           catchError((error: HttpErrorResponse) => observableOf(new GetTeamFailure(error))))));
@@ -99,11 +99,11 @@ export class TeamEffects {
     }));
 
   @Effect()
-  getTeamUsers$ = combineLatest(
+  getTeamUsers$ = combineLatest([
     this.actions$.pipe(ofType<GetTeamUsers>(TeamActionTypes.GET_USERS)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
-      mergeMap(([{ payload: { id } }, version]) =>
+      mergeMap(([{ payload: { id } }, version]: [GetTeamUsers, IAMMajorVersion]) =>
         this.requests.getTeamUsers(id, version).pipe(
           map((resp: UsersResponse) => new GetTeamUsersSuccess(resp)),
           catchError((error: HttpErrorResponse) => observableOf(new GetTeamUsersFailure(error))))));
@@ -120,21 +120,21 @@ export class TeamEffects {
     }));
 
   @Effect()
-  createTeam$ = combineLatest(
+  createTeam$ = combineLatest([
     this.actions$.pipe(ofType<CreateTeam>(TeamActionTypes.CREATE)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
-      mergeMap(([{ payload }, version]) =>
+      mergeMap(([{ payload }, version]: [CreateTeam, IAMMajorVersion]) =>
         this.requests.createTeam(payload, version).pipe(
           map(({ team }: TeamResponse) => new CreateTeamSuccess(versionizeTeam(team))),
           catchError((error) => observableOf(new CreateTeamFailure(error))))));
 
   @Effect()
-  createTeamSuccess$ = combineLatest(
+  createTeamSuccess$ = combineLatest([
     this.actions$.pipe(ofType<CreateTeamSuccess>(TeamActionTypes.CREATE_SUCCESS)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
-      map(([{ payload }, version]) => {
+      map(([{ payload }, version]: [CreateTeamSuccess, IAMMajorVersion]) => {
         // Drop the user on the newly created team page.
         const id = version === 'v1' ? payload.guid : payload.id;
         this.router.navigate(['admin', 'teams', id]);
@@ -158,11 +158,11 @@ export class TeamEffects {
     }));
 
   @Effect()
-  updateTeam$ = combineLatest(
+  updateTeam$ = combineLatest([
     this.actions$.pipe(ofType<UpdateTeam>(TeamActionTypes.UPDATE)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
-      mergeMap(([{ payload }, version]) =>
+      mergeMap(([{ payload }, version]: [UpdateTeam, IAMMajorVersion]) =>
         this.requests.updateTeam(payload, version).pipe(
           map(({ team }: TeamResponse) => new UpdateTeamSuccess(versionizeTeam(team))),
           catchError((error) => observableOf(new UpdateTeamFailure(error))))));
@@ -187,11 +187,11 @@ export class TeamEffects {
     }));
 
   @Effect()
-  deleteTeam$ = combineLatest(
+  deleteTeam$ = combineLatest([
     this.actions$.pipe(ofType<DeleteTeam>(TeamActionTypes.DELETE)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
-      mergeMap(([{ payload }, version ]) =>
+      mergeMap(([{ payload }, version ]: [DeleteTeam, IAMMajorVersion]) =>
         this.requests.deleteTeam(payload, version).pipe(
           map(({ team }: TeamResponse) => new DeleteTeamSuccess(versionizeTeam(team))),
           catchError((error: HttpErrorResponse) => observableOf(new DeleteTeamFailure(error))))));
@@ -216,11 +216,11 @@ export class TeamEffects {
     }));
 
   @Effect()
-  addTeamUsers$ = combineLatest(
+  addTeamUsers$ = combineLatest([
     this.actions$.pipe(ofType<AddTeamUsers>(TeamActionTypes.ADD_USERS)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
-      mergeMap(([{ payload }, version]) =>
+      mergeMap(([{ payload }, version]: [AddTeamUsers, IAMMajorVersion]) =>
         this.requests.addTeamUsers(payload, version).pipe(
           // TODO: v2 returns the team's users but v1 returns the team. Once v1 is removed,
           // update this to pass the response instead of the payload for more timely data.
@@ -239,11 +239,11 @@ export class TeamEffects {
     }));
 
   @Effect()
-  removeTeamUsers$ = combineLatest(
+  removeTeamUsers$ = combineLatest([
     this.actions$.pipe(ofType<RemoveTeamUsers>(TeamActionTypes.REMOVE_USERS)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity)))
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
-      mergeMap(([{ payload }, version ]) =>
+      mergeMap(([{ payload }, version ]: [RemoveTeamUsers, IAMMajorVersion]) =>
         this.requests.removeTeamUsers(payload, version).pipe(
           // TODO: v2 returns the team's users but v1 returns the team. Once v1 is removed,
           // update this to pass the response instead of the payload for more timely data.

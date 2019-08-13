@@ -74,11 +74,12 @@ export class NodesEditComponent implements OnInit {
           }
         });
 
-        this.secrets$ = combineLatest(
+        this.secrets$ = combineLatest([
           this.fetchSecrets(),
           this.backendValue
-        ).pipe(
-          map(([secrets, backend]) => secrets.filter(s => s.type === backend || s.type === 'sudo'))
+        ]).pipe(
+          map(([secrets, backend]: [any[], string]) =>
+            secrets.filter(s => s.type === backend || s.type === 'sudo'))
         );
       });
   }

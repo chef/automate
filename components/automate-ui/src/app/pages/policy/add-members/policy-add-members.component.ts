@@ -85,14 +85,17 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed))
       .subscribe((id: string) => {
         this.store.dispatch(new GetPolicy({ id }));
-        combineLatest(
+        combineLatest([
           this.store.select(getAllTeamsStatus),
           this.store.select(userStatus),
           this.store.select(getPolicyStatus),
           this.store.select(allTeams),
           this.store.select(allUsers)
-        ).pipe(takeUntil(this.isDestroyed))
-          .subscribe(([tStatus, uStatus, pStatus, teams, users]) => {
+        ]).pipe(takeUntil(this.isDestroyed))
+          .subscribe((values: any[]) => {
+            const [tStatus, uStatus, pStatus]: EntityStatus[] = values.slice(0, 3);
+            const teams: Team[] = values[3];
+            const users: User[] = values[4];
             if (tStatus === EntityStatus.loadingSuccess &&
                 uStatus === EntityStatus.loadingSuccess &&
                 pStatus === EntityStatus.loadingSuccess) {

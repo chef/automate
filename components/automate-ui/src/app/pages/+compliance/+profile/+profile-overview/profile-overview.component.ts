@@ -212,10 +212,9 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
   }
 
   onFilesSelected(event) {
-    this.sendFiles(Array.from(event.target.files)).subscribe(
-      fileUploads => { this.fileUploads = fileUploads; },
-      null,
-      () => {
+    this.sendFiles(Array.from(event.target.files)).subscribe({
+      next: fileUploads => { this.fileUploads = fileUploads; },
+      complete: () => {
         this.refreshProfiles();
         const failures = this.fileUploads.some(f => f.failed);
         if (!failures) {
@@ -223,13 +222,13 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
           this.fileUploads = [];
         }
       }
-    );
+    });
   }
 
   sendFiles(files) {
-    return observableCombineLatest(
+    return observableCombineLatest([
       ...files.map(file => this.uploadService.sendFile(file))
-    );
+    ]);
   }
 
   trackBy(file) {

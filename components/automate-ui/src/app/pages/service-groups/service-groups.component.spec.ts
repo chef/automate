@@ -1,10 +1,11 @@
-import { StoreModule, Store } from '@ngrx/store';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { RouterTestingModule } from '@angular/router/testing';
+import { TestBed, fakeAsync, tick, ComponentFixture } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { StoreModule, Store } from '@ngrx/store';
 import { ServiceGroupsComponent  } from './service-groups.component';
 import { ServiceStatusIconPipe } from '../../pipes/service-status-icon.pipe';
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { serviceGroupEntityReducer } from 'app/entities/service-groups/service-groups.reducer';
 import {
   UpdateServiceGroupFilters,
@@ -19,8 +20,10 @@ class MockTelemetryService {
 }
 
 describe('ServiceGroupsComponent', () => {
-  let fixture, component;
+  let fixture: ComponentFixture<ServiceGroupsComponent>;
+  let component: ServiceGroupsComponent;
   let router: Router;
+  let ngrxStore: Store<NgrxStateAtom>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -41,7 +44,7 @@ describe('ServiceGroupsComponent', () => {
     fixture = TestBed.createComponent(ServiceGroupsComponent);
     component = fixture.componentInstance;
     router = TestBed.get(Router);
-    this.ngrxStore = TestBed.get(Store);
+    ngrxStore = TestBed.get(Store);
     component.ngOnInit();
   });
 
@@ -54,7 +57,7 @@ describe('ServiceGroupsComponent', () => {
 
     describe('with ServiceGroupsCounts', () => {
       beforeEach(() => {
-        this.ngrxStore.dispatch(new GetServiceGroupsCountsSuccess({
+        ngrxStore.dispatch(new GetServiceGroupsCountsSuccess({
           total: 21,
           ok: 10,
           warning: 5,
@@ -69,7 +72,7 @@ describe('ServiceGroupsComponent', () => {
 
       describe('and OK status filter update', () => {
         beforeEach(() => {
-          this.ngrxStore.dispatch(new UpdateServiceGroupFilters({filters: {status: 'ok'}}));
+          ngrxStore.dispatch(new UpdateServiceGroupFilters({filters: {status: 'ok'}}));
         });
 
         it('should update the total number of service groups and selected status', fakeAsync(() => {
@@ -155,7 +158,13 @@ describe('ServiceGroupsComponent', () => {
 
   describe('onPageChange', () => {
     it('when the first page is selected remove page from URL', fakeAsync(() => {
-      component.sgHealthSummary = { total: 30, ok: 30 };
+      component.sgHealthSummary = {
+        total: 30,
+        ok: 30,
+        warning: 0,
+        critical: 0,
+        unknown: 0
+      };
       router.navigate([''], {queryParams: { }});
 
       tick();

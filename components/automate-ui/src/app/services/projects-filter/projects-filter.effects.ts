@@ -5,10 +5,9 @@ import { interval as observableInterval, of as observableOf, Observable } from '
 import { catchError, mergeMap, map, tap } from 'rxjs/operators';
 
 import { Project } from 'app/entities/projects/project.model';
-import { GetProjectsSuccessPayload } from 'app/entities/projects/project.actions';
 import { ProjectsFilterOption, ProjectsFilterOptionTuple } from './projects-filter.reducer';
 import { ProjectsFilterService } from './projects-filter.service';
-import { ProjectsFilterRequests } from './projects-filter.requests';
+import { ProjectsFilterRequests, AuthorizedProjectsResponse } from './projects-filter.requests';
 import {
   ProjectsFilterActionTypes,
   ProjectsFilterActions,
@@ -45,7 +44,7 @@ export class ProjectsFilterEffects {
 
   private loadOptionsAction$(): () => Observable<ProjectsFilterActions> {
     return () => this.requests.fetchOptions().pipe(
-      map((fetched: GetProjectsSuccessPayload) => {
+      map((fetched: AuthorizedProjectsResponse) => {
         const converted = this.convertResponse(fetched.projects);
         const restored = this.projectsFilter.restoreOptions() || [];
         return new LoadOptionsSuccess(<ProjectsFilterOptionTuple>{

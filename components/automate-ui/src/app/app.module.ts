@@ -178,9 +178,6 @@ import {
 import {
   SelectListItemComponent
 } from './page-components/select-list-item/select-list-item.component';
-import {
-  ServicesSidebarComponent
-} from './page-components/services-sidebar/services-sidebar.component';
 import { ServiceGroupsComponent } from './pages/service-groups/service-groups.component';
 import { SettingsLandingComponent } from './pages/settings-landing/settings-landing.component';
 import {
@@ -189,6 +186,9 @@ import {
 import { SigninComponent } from './pages/signin/signin.component';
 import { TeamAddUsersComponent } from './pages/team-add-users/team-add-users.component';
 import { TeamDetailsComponent } from './pages/team-details/team-details.component';
+import {
+  ServicesSidebarComponent
+} from './page-components/services-sidebar/services-sidebar.component';
 import { TeamManagementComponent } from './pages/team-management/team-management.component';
 import {
   TelemetryCheckboxComponent
@@ -203,10 +203,10 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
 @NgModule({
   declarations: [
     // Page Components
-    AutomateSettingsComponent,
     AppComponent,
     ApplicationsComponent,
     AttributesComponent,
+    AutomateSettingsComponent,
     ClientRunsComponent,
     ClientRunsSidebarComponent,
     ClientRunsTableComponent,
