@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { Subject, Observable, of as observableOf } from 'rxjs';
 import { List } from 'immutable';
-import { clamp, compact } from 'lodash';
+import { clamp, compact, isEmpty } from 'lodash';
 import { SearchBarCategoryItem, Chicklet, SuggestionItem } from '../../types/types';
 import {
   debounceTime, switchMap, distinctUntilChanged
@@ -71,7 +71,8 @@ export class SearchBarComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes.dynamicSuggestions) {
       this.suggestions = List<SuggestionItem>(
-        compact(changes.dynamicSuggestions.currentValue.map((suggestion) => {
+        compact(changes.dynamicSuggestions.currentValue.filter((suggestion) =>
+          !isEmpty(suggestion)).map((suggestion) => {
         return {name: suggestion, title: suggestion};
       })));
 

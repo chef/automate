@@ -31,7 +31,7 @@ describe('ClientRunsRequests', () => {
     it('returns all provided values', () => {
       const expectedData: Chicklet[] = [];
       for (let i = 0; i < 50; i++) {
-        expectedData.push({'text': '', 'type': ''});
+        expectedData.push({'text': i.toString(), 'type': 'name'});
       }
       const expectedUrl = `${CONFIG_MGMT_URL}/suggestions?type=name&text=fred`;
       const filters: NodeFilter = <NodeFilter>{};
@@ -50,8 +50,35 @@ describe('ClientRunsRequests', () => {
     it('returns 10 values when 10 are provided', () => {
       const expectedData: Chicklet[] = [];
       for (let i = 0; i < 10; i++) {
-        expectedData.push({'text': i.toString(), 'type': ''});
+        expectedData.push({'text': i.toString(), 'type': 'name'});
       }
+      const expectedUrl = `${CONFIG_MGMT_URL}/suggestions?type=name&text=fred`;
+
+      const filters: NodeFilter = <NodeFilter>{};
+      service.getSuggestions('name', 'fred', filters).subscribe(data => {
+        expect(data.length).toEqual(10);
+        for ( const item of data ) {
+          expect(Number(item.text)).toBeLessThan(10);
+        }
+      });
+
+      const req = httpTestingController.expectOne(expectedUrl);
+
+      expect(req.request.method).toEqual('GET');
+
+      req.flush(expectedData);
+    });
+
+    it('remove empty suggestions', () => {
+      const expectedData: any[] = [];
+      for (let i = 0; i < 10; i++) {
+        expectedData.push({'text': i.toString(), 'type': 'name'});
+      }
+
+      // Add empty suggestions
+      expectedData.push({'type': ''});
+      expectedData.push({'text': '', 'type': 'name'});
+
       const expectedUrl = `${CONFIG_MGMT_URL}/suggestions?type=name&text=fred`;
 
       const filters: NodeFilter = <NodeFilter>{};
