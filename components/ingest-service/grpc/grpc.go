@@ -18,7 +18,6 @@ import (
 	"github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic"
-	"github.com/chef/automate/components/ingest-service/config"
 	"github.com/chef/automate/components/ingest-service/migration"
 	"github.com/chef/automate/components/ingest-service/server"
 	"github.com/chef/automate/components/ingest-service/serveropts"
@@ -168,14 +167,6 @@ func Spawn(opts *serveropts.Opts) error {
 	jobSchedulerServer := server.NewJobSchedulerServer(client, jobManager)
 	ingest.RegisterJobSchedulerServer(grpcServer, jobSchedulerServer)
 
-	// TODO(ssd) 2019-05-15: The projectUpdater process still uses
-	// the config manager.
-	configManager, err := config.NewManager(viper.ConfigFileUsed())
-	if err != nil {
-		return err
-	}
-	defer configManager.Close()
-
 	projectUpdateManager, err := createProjectUpdateCerealManager(opts.ConnFactory)
 	if err != nil {
 		return err
@@ -193,7 +184,7 @@ func Spawn(opts *serveropts.Opts) error {
 
 	// EventHandler
 	eventHandlerServer := server.NewAutomateEventHandlerServer(client, *chefIngest,
-		authzProjectsClient, eventServiceClient, configManager)
+		authzProjectsClient, eventServiceClient)
 	ingest.RegisterEventHandlerServer(grpcServer, eventHandlerServer)
 
 	// Data Lifecycle Interface

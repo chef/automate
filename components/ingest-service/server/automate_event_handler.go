@@ -1,11 +1,7 @@
 package server
 
 import (
-	"fmt"
-
-	"github.com/golang/protobuf/ptypes"
 	"github.com/sirupsen/logrus"
-	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 
 	chef "github.com/chef/automate/api/external/ingest/request"
@@ -14,27 +10,19 @@ import (
 	ingest_api "github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/components/event-service/server"
 	"github.com/chef/automate/components/ingest-service/backend"
-	"github.com/chef/automate/components/ingest-service/config"
-	project_update_lib "github.com/chef/automate/lib/authz"
-	event_ids "github.com/chef/automate/lib/event"
-	tspb "github.com/golang/protobuf/ptypes/timestamp"
 )
 
 type AutomateEventHandlerServer struct {
 	client           backend.Client
 	chefIngestServer ChefIngestServer
-	updateManager    *project_update_lib.DomainProjectUpdateManager
 }
 
 func NewAutomateEventHandlerServer(client backend.Client, chefIngestServer ChefIngestServer,
-	authzProjectsClient iam_v2.ProjectsClient, eventServiceClient automate_event.EventServiceClient,
-	configManager *config.Manager) *AutomateEventHandlerServer {
-	updateManager := project_update_lib.NewDomainProjectUpdateManager(client, authzProjectsClient,
-		eventServiceClient, configManager, event_ids.InfraClientRunsProducerID)
+	authzProjectsClient iam_v2.ProjectsClient, eventServiceClient automate_event.EventServiceClient) *AutomateEventHandlerServer {
+
 	server := &AutomateEventHandlerServer{
 		client:           client,
 		chefIngestServer: chefIngestServer,
-		updateManager:    updateManager,
 	}
 	return server
 }
@@ -68,49 +56,12 @@ func (s *AutomateEventHandlerServer) HandleEvent(ctx context.Context,
 				return response, err
 			}
 		}
-	} else if req.Type.Name == server.ProjectRulesUpdate {
-		projectUpdateID, err := getProjectUpdateID(req)
-		if err != nil {
-			logrus.Errorf("Project Rule Update sent without a ProjectUpdateID eventID %q",
-				req.EventID)
-			return response, err
-		}
-
-		s.updateManager.Start(projectUpdateID)
-	} else if req.Type.Name == server.ProjectRulesCancelUpdate {
-		projectUpdateID, err := getProjectUpdateID(req)
-		if err != nil {
-			logrus.Errorf("Project Rule Update Cancel sent without a ProjectUpdateID. eventID %q",
-				req.EventID)
-			return response, err
-		}
-
-		s.updateManager.Cancel(projectUpdateID)
 	}
 	return response, nil
 }
 
 func (s *AutomateEventHandlerServer) ProjectUpdateStatus(ctx context.Context,
 	req *ingest_api.ProjectUpdateStatusReq) (*ingest_api.ProjectUpdateStatusResp, error) {
-	time, err := ptypes.TimestampProto(s.updateManager.EstimatedTimeComplete())
-	if err != nil {
-		log.Errorf("Could not convert EstimatedTimeComplete to protobuf Timestamp %v", err)
-		time = &tspb.Timestamp{}
-	}
-	return &ingest_api.ProjectUpdateStatusResp{
-		State:                  s.updateManager.State(),
-		PercentageComplete:     float32(s.updateManager.PercentageComplete()),
-		EstimatedTimeComplete: time,
-	}, nil
-}
 
-func getProjectUpdateID(event *automate_event.EventMsg) (string, error) {
-	if event.Data != nil && event.Data.Fields != nil &&
-		event.Data.Fields["ProjectUpdateID"] != nil &&
-		event.Data.Fields["ProjectUpdateID"].GetStringValue() != "" {
-		return event.Data.Fields["ProjectUpdateID"].GetStringValue(), nil
-	}
-
-	return "", fmt.Errorf("Project Rule Update sent without a ProjectUpdateID eventID: %q",
-		event.EventID)
+	return nil, nil
 }

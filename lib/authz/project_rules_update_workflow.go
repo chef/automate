@@ -19,7 +19,6 @@ const (
 )
 
 type DomainProjectUpdateWorkflowExecutor struct {
-	producer     string
 	PollInterval time.Duration
 
 	cancelUpdateProjectTagsTaskName string
@@ -218,85 +217,6 @@ func (m *ProjectTagUpdaterStatusTask) collectJobStatus(ctx context.Context, esJo
 	return jobStatuses, nil
 }
 
-type WorkflowProjectUpdateManager struct {
-	c            *cereal.Manager
-	workflowName string
-	instanceName string
-}
-
-func (manager *WorkflowProjectUpdateManager) Cancel(projectUpdateID string) {
-	err := manager.c.CancelWorkflow(context.Background(), manager.workflowName,
-		manager.instanceName)
-	if err != nil {
-		if err != cereal.ErrWorkflowInstanceNotFound {
-			logrus.WithError(err).Error("failed to cancel workflow")
-		}
-	}
-}
-
-func (manager *WorkflowProjectUpdateManager) Start(projectUpdateID string) {
-	err := manager.c.EnqueueWorkflow(context.Background(), manager.workflowName,
-		manager.instanceName, DomainProjectUpdateWorkflowParameters{
-			ProjectUpdateID: projectUpdateID,
-		})
-	if err != nil {
-		logrus.WithError(err).Error("failed to enqueue project update workflow")
-	}
-}
-
-func (manager *WorkflowProjectUpdateManager) PercentageComplete() float32 {
-	jobStatus, running, err := manager.getJobStatus()
-	if err != nil || !running || jobStatus == nil {
-		return 1
-	}
-	return jobStatus.PercentageComplete
-}
-
-func (manager *WorkflowProjectUpdateManager) EstimatedTimeComplete() time.Time {
-	jobStatus, running, err := manager.getJobStatus()
-	if err != nil || !running || jobStatus == nil {
-		return time.Time{}
-	}
-	return time.Unix(jobStatus.EstimatedEndTimeInSec, 0)
-}
-
-func (manager *WorkflowProjectUpdateManager) State() string {
-	_, running, err := manager.getJobStatus()
-
-	if err != nil {
-		return "unknown"
-	}
-
-	if running {
-		return RunningState
-	} else {
-		return NotRunningState
-	}
-}
-
-func (manager *WorkflowProjectUpdateManager) getJobStatus() (jobStatus *JobStatus, running bool, err error) {
-	a, err := manager.c.GetWorkflowInstanceByName(context.Background(),
-		manager.instanceName, manager.workflowName)
-	if err != nil {
-		if err == cereal.ErrWorkflowInstanceNotFound {
-			return nil, false, nil
-		}
-		logrus.WithError(err).Error("Failed to get state")
-		return nil, false, err
-	}
-
-	if a.IsRunning() {
-		jobStatus := JobStatus{}
-		if err := a.GetPayload(&jobStatus); err != nil {
-			return nil, true, nil
-		}
-
-		return &jobStatus, true, nil
-	} else {
-		return nil, false, nil
-	}
-}
-
 func NewWorkflowExecutorForDomainService(domainService string) *DomainProjectUpdateWorkflowExecutor {
 	return &DomainProjectUpdateWorkflowExecutor{
 		PollInterval: 10 * time.Second,
@@ -342,54 +262,4 @@ func RegisterTaskExecutors(manager *cereal.Manager, domainService string, esClie
 	}
 
 	return nil
-}
-
-func RegisterWorkflow(manager *cereal.Manager, instanceName string, workflowName string,
-	esClient EsClient, authzProjectsClient iam_v2.ProjectsClient) (*WorkflowProjectUpdateManager, error) {
-
-	workflowExecutor := &DomainProjectUpdateWorkflowExecutor{
-		PollInterval: 10 * time.Second,
-
-		cancelUpdateProjectTagsTaskName: fmt.Sprintf("%s/%s", workflowName, cancelUpdateProjectTagsTaskName),
-		startProjectTagUpdaterTaskName:  fmt.Sprintf("%s/%s", workflowName, startProjectTagUpdaterTaskName),
-		projectTagUpdaterStatusTaskName: fmt.Sprintf("%s/%s", workflowName, projectTagUpdaterStatusTaskName),
-	}
-	if err := manager.RegisterWorkflowExecutor(workflowName, workflowExecutor); err != nil {
-		return nil, err
-	}
-
-	taskExecutorOpts := cereal.TaskExecutorOpts{
-		Workers: 1,
-	}
-
-	cancelTaskExecutor := &CancelUpdateProjectTagsTask{
-		esClient: esClient,
-	}
-	if err := manager.RegisterTaskExecutor(workflowExecutor.cancelUpdateProjectTagsTaskName, cancelTaskExecutor,
-		taskExecutorOpts); err != nil {
-		return nil, err
-	}
-
-	startTagsUpdaterTask := &StartProjectTagUpdaterTask{
-		esClient:            esClient,
-		authzProjectsClient: authzProjectsClient,
-	}
-	if err := manager.RegisterTaskExecutor(workflowExecutor.startProjectTagUpdaterTaskName, startTagsUpdaterTask,
-		taskExecutorOpts); err != nil {
-		return nil, err
-	}
-
-	statusTask := &ProjectTagUpdaterStatusTask{
-		esClient: esClient,
-	}
-	if err := manager.RegisterTaskExecutor(workflowExecutor.projectTagUpdaterStatusTaskName, statusTask,
-		taskExecutorOpts); err != nil {
-		return nil, err
-	}
-
-	return &WorkflowProjectUpdateManager{
-		c:            manager,
-		workflowName: workflowName,
-		instanceName: instanceName,
-	}, nil
 }
