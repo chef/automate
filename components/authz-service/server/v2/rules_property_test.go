@@ -16,6 +16,7 @@ import (
 	"google.golang.org/grpc/codes"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
+	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/testhelpers"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
@@ -459,6 +460,47 @@ func TestDeleteRuleProperties(t *testing.T) {
 				fullyDeleted := grpctest.AssertCode(t, codes.NotFound, err) && !strings.Contains(err.Error(), "marked for deletion")
 
 				return markedforDeletion && fullyDeleted
+			},
+			createProjectAndRuleGen,
+		))
+
+	properties.TestingRun(t)
+}
+
+func TestListProjectProperties(t *testing.T) {
+	ctx := context.Background()
+	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	properties := getGopterParams(seed)
+
+	properties.Property("all staged rules are reported as staged",
+		prop.ForAll(
+			func(reqs projectAndRuleReq) bool {
+				defer testDB.Flush(t)
+
+				_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				reqs.rules, err = createRules(ctx, cl, reqs.rules)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				resp, err := cl.ListProjects(ctx, &api.ListProjectsReq{})
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				if 1 != len(resp.Projects) {
+					return false
+				}
+				respProject := resp.Projects[0]
+				t.Logf("===> %d rules", len(reqs.rules))
+				return respProject.Id == reqs.CreateProjectReq.Id &&
+					respProject.Name == reqs.CreateProjectReq.Name &&
+					respProject.Type.String() == "CUSTOM" &&
+					respProject.Status == storage.EditsPending.String()
 			},
 			createProjectAndRuleGen,
 		))
