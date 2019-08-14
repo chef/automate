@@ -4,7 +4,7 @@ const projectID = `${cypressPrefix}-project-${now}`;
 
 // This is to prevent tests from running in wrong
 // CI environments. If local, just always run it.
-let iamVersion = <string><Object>Cypress.env('IAM_VERSION');
+let iamVersion: string = Cypress.env('IAM_VERSION');
 if (iamVersion === undefined) {
   iamVersion = 'v2.0';
 }

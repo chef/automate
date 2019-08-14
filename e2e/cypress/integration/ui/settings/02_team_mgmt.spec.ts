@@ -11,7 +11,7 @@ describe('team management', () => {
   const generatedTeamID = teamName.split(' ').join('-');
   const unassigned = '(unassigned)';
 
-  let iamVersion = <string><Object>Cypress.env('IAM_VERSION');
+  let iamVersion: string = Cypress.env('IAM_VERSION');
   // assume 2.0 if not in CI. if you wish something different start cypress with
   // IAM_VERSION set to what you are testing.
   if (iamVersion === undefined) {

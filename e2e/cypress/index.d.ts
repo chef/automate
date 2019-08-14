@@ -7,6 +7,7 @@ declare namespace Cypress {
     saveStorage(): void
     restoreStorage(): void
     generateAdminToken(idToken: string): void
+    getIAMVersion(idToken: string): void
     cleanupPoliciesByIDPrefix(idToken: string, idPrefix: string): void
     cleanupProjectsByIDPrefix(idToken: string, idPrefix: string): void
     cleanupUsersByNamePrefix(idToken: string, namePrefix: string): void

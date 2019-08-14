@@ -97,6 +97,24 @@ Cypress.Commands.add('generateAdminToken', (idToken: string) => {
   });
 });
 
+Cypress.Commands.add('getIAMVersion', (idToken: string) => {
+  cy.request({
+    auth: { bearer: idToken },
+    method: 'GET',
+    url: '/apis/iam/v2beta/policy_version'
+  }).then((response: Cypress.ObjectLike) => {
+    if (response.version.major === 'V1') {
+      Cypress.env('IAM_VERSION', 'v1.0');
+    } else {
+      if (response.version.minor === 'V0') {
+        Cypress.env('IAM_VERSION', 'v2.0');
+      } else {
+        Cypress.env('IAM_VERSION', 'v2.1');
+      }
+    }
+  });
+});
+
 Cypress.Commands.add('cleanupPoliciesByIDPrefix', (idToken: string, idPrefix: string) => {
   cy.request({
     auth: { bearer: idToken },
@@ -160,6 +178,27 @@ Cypress.Commands.add('cleanupProjectsByIDPrefix', (idToken: string, idPrefix: st
   });
 });
 
+Cypress.Commands.add('cleanupTeamsByDescriptionPrefix', (idToken: string, namePrefix: string) => {
+  cy.request({
+    auth: { bearer: idToken },
+    method: 'GET',
+    url: '/api/v0/auth/teams',
+    failOnStatusCode: false
+  }).then((resp) => {
+    const body = resp.body;
+    for (const team of body.teams) {
+      if (team.description.startsWith(namePrefix)) {
+        cy.request({
+          auth: { bearer: idToken },
+          method: 'DELETE',
+          url: `/api/v0/auth/teams/${team.id}`,
+          failOnStatusCode: false
+        });
+      }
+    }
+  });
+});
+
 
 // helpers
 
@@ -183,24 +222,11 @@ function LoginHelper(username: string) {
   });
 }
 
-Cypress.Commands.add('cleanupTeamsByDescriptionPrefix', (idToken: string, namePrefix: string) => {
-  cy.request({
-    auth: { bearer: idToken },
-    method: 'GET',
-    url: '/api/v0/auth/teams',
-    failOnStatusCode: false
-  }).then((resp) => {
-    const body = resp.body;
-    for (const team of body.teams) {
-      if (team.description.startsWith(namePrefix)) {
-        cy.request({
-          auth: { bearer: idToken },
-          method: 'DELETE',
-          url: `/api/v0/auth/teams/${team.id}`,
-          failOnStatusCode: false
-        });
-      }
-    }
-  });
-});
+interface IAMVersion {
+  version: Version;
+}
 
+interface Version {
+  major: 'V1' | 'V2';
+  minor: 'V0' | 'V1';
+}
