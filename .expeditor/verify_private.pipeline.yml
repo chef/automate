@@ -627,6 +627,8 @@ steps:
       - integration/run_test integration/tests/backup_s3.sh
     timeout_in_minutes: 20
     expeditor:
+      accounts:
+        - aws/chef-cd
       executor:
         linux:
           single-use: true
