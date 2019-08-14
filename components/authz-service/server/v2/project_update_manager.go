@@ -548,9 +548,10 @@ func RegisterCerealProjectUpdateManager(manager *cereal.Manager, workflowName st
 	}
 
 	updateManager := &CerealProjectUpdateManager{
-		manager:      manager,
-		workflowName: workflowName,
-		instanceName: instanceName,
+		manager:        manager,
+		workflowName:   workflowName,
+		instanceName:   instanceName,
+		domainServices: domainServices,
 	}
 
 	return updateManager, nil
@@ -678,12 +679,64 @@ func (m *CerealProjectUpdateManager) FailureMessage() string {
 	return errMsg
 }
 
-func (*CerealProjectUpdateManager) PercentageComplete() float64 {
-	return 0
+func (m *CerealProjectUpdateManager) PercentageComplete() float64 {
+	instance, err := multiworkflow.GetWorkflowInstance(context.Background(), m.manager, m.workflowName, m.instanceName)
+	if err != nil {
+		return 1.0
+	}
+
+	if !instance.IsRunning() {
+		return 1.0
+	}
+
+	percentComplete := 0.0
+	for _, d := range m.domainServices {
+		subWorkflow, err := instance.GetSubWorkflow(d)
+		if err != nil {
+			logrus.WithError(err).Errorf("failed to get subworkflow for %q", d)
+			continue
+		}
+		payload := project_update_tags.DomainProjectUpdateWorkflowPayload{}
+		if subWorkflow.IsRunning() {
+			if err := subWorkflow.GetPayload(&payload); err != nil {
+				logrus.WithError(err).Errorf("failed to get payload for %q", d)
+				continue
+			}
+			percentComplete = percentComplete + (float64(payload.MergedJobStatus.PercentageComplete) / float64(len(m.domainServices)))
+		} else {
+			percentComplete = percentComplete + 1.0/float64(len(m.domainServices))
+		}
+	}
+
+	return percentComplete
 }
 
-func (*CerealProjectUpdateManager) EstimatedTimeComplete() time.Time {
-	return time.Now()
+func (m *CerealProjectUpdateManager) EstimatedTimeComplete() time.Time {
+	instance, err := multiworkflow.GetWorkflowInstance(context.Background(), m.manager, m.workflowName, m.instanceName)
+	if err != nil || !instance.IsRunning() {
+		return time.Now()
+	}
+	longestEstimatedTimeComplete := time.Time{}
+	for _, d := range m.domainServices {
+		subWorkflow, err := instance.GetSubWorkflow(d)
+		if err != nil {
+			logrus.WithError(err).Errorf("failed to get subworkflow for %q", d)
+			continue
+		}
+		payload := project_update_tags.DomainProjectUpdateWorkflowPayload{}
+		if subWorkflow.IsRunning() {
+			if err := subWorkflow.GetPayload(&payload); err != nil {
+				logrus.WithError(err).Errorf("failed to get payload for %q", d)
+				continue
+			}
+			estimatedTime := time.Unix(payload.MergedJobStatus.EstimatedEndTimeInSec, 0)
+			if estimatedTime.After(longestEstimatedTimeComplete) {
+				longestEstimatedTimeComplete = estimatedTime
+			}
+		}
+	}
+
+	return longestEstimatedTimeComplete
 }
 
 func (m *CerealProjectUpdateManager) State() string {
