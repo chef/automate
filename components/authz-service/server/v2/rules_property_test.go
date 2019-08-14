@@ -31,7 +31,7 @@ type projectAndRuleReq struct {
 	rules []api.CreateRuleReq
 }
 
-var createRuleReqGen, createProjectReqGen, createProjectAndRuleGen = getGenerators()
+var createRuleReqGen, createProjectReqGen, createProjectAndRulesGen = getGenerators()
 
 func TestCreateRuleProperties(t *testing.T) {
 	ctx := context.Background()
@@ -53,7 +53,7 @@ func TestCreateRuleProperties(t *testing.T) {
 				return respRule.Status == "staged" &&
 					ruleMatches(reqs.rules[0], *respRule)
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 
 	properties.Property("creating rules with non-unique IDs is prohibited",
@@ -116,7 +116,7 @@ func TestGetRuleProperties(t *testing.T) {
 				return rStaged.Rule.Status == "staged" &&
 					ruleMatches(reqs.rules[0], *rStaged.Rule)
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 
 	properties.Property("applied rules are reported as applied",
@@ -136,7 +136,7 @@ func TestGetRuleProperties(t *testing.T) {
 				return rApplied.Rule.Status == "applied" &&
 					ruleMatches(reqs.rules[0], *rApplied.Rule)
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 
 	properties.TestingRun(t)
@@ -172,7 +172,7 @@ func TestListRuleProperties(t *testing.T) {
 				return rulesMatch(reqs.rules, resp)
 
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 
 	properties.Property("staged rules are not reported as applied",
@@ -200,7 +200,7 @@ func TestListRuleProperties(t *testing.T) {
 				return len(resp.Rules) == 0
 
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 
 	properties.Property("applied rules are reported as applied",
@@ -230,7 +230,7 @@ func TestListRuleProperties(t *testing.T) {
 				return rulesMatch(reqs.rules, resp)
 
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 
 	properties.TestingRun(t)
@@ -272,7 +272,7 @@ func TestUpdateRuleProperties(t *testing.T) {
 					rStaged.Rule.Status == "staged" &&
 					ruleMatches(updateReq, *rStaged.Rule)
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 
 	properties.Property("updating applied rules become staged",
@@ -314,7 +314,7 @@ func TestUpdateRuleProperties(t *testing.T) {
 					ruleMatches(updateReq, *rStaged.Rule) &&
 					ruleMatches(updateReq, *rFinalApplied.Rule)
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 
 	properties.Property("updating applied and staged rules remain staged",
@@ -364,7 +364,7 @@ func TestUpdateRuleProperties(t *testing.T) {
 					ruleMatches(updateReq2, *rFinalStaged.Rule) &&
 					ruleMatches(updateReq2, *rApplied.Rule)
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 	properties.TestingRun(t)
 }
@@ -396,7 +396,7 @@ func TestDeleteRuleProperties(t *testing.T) {
 
 				return deletedWhenStaged && deletedWhenApplied
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 
 	properties.Property("deleting applied rules marks them for deletion and finalizes deletion upon applying rules",
@@ -423,7 +423,7 @@ func TestDeleteRuleProperties(t *testing.T) {
 
 				return markedforDeletion && fullyDeleted
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 
 	properties.Property("deleting applied rules with staged updates marks them for deletion and finalizes deletion upon applying rules",
@@ -461,7 +461,7 @@ func TestDeleteRuleProperties(t *testing.T) {
 
 				return markedforDeletion && fullyDeleted
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 
 	properties.TestingRun(t)
@@ -502,7 +502,7 @@ func TestListProjectProperties(t *testing.T) {
 					respProject.Type.String() == "CUSTOM" &&
 					respProject.Status == storage.EditsPending.String()
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 
 	properties.TestingRun(t)
@@ -570,7 +570,7 @@ func getGenerators() (gopter.Gen, gopter.Gen, gopter.Gen) {
 		"Name": gen.UnicodeString(graphicRange),
 	})
 
-	createProjectAndRuleGen := gopter.CombineGens(
+	createProjectAndRulesGen := gopter.CombineGens(
 		createProjectReqGen, gen.SliceOf(createRuleReqGen),
 	).Map(func(vals []interface{}) projectAndRuleReq {
 		p := vals[0].(api.CreateProjectReq)
@@ -578,7 +578,7 @@ func getGenerators() (gopter.Gen, gopter.Gen, gopter.Gen) {
 		return genStandardProjectAndRules(p, rules)
 	})
 
-	return createRuleReqGen, createProjectReqGen, createProjectAndRuleGen
+	return createRuleReqGen, createProjectReqGen, createProjectAndRulesGen
 }
 
 func genStandardProjectAndRules(p api.CreateProjectReq, rules []api.CreateRuleReq) projectAndRuleReq {
