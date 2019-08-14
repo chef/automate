@@ -72,66 +72,6 @@ describe('NodeRunsService', () => {
       req.flush(getNodeRunResponse);
     });
 
-    it('when run\'s error description title gets updated from 412 "Precondition Failed"' +
-      ' to Error Resolving Cookbooks for Run List.', () => {
-      const nodeId = 'fake_id';
-      const runId = 'runId';
-      const endTime = new Date(0);
-      const expectedUrl =
-        `${CONFIG_MGMT_URL}/nodes/${nodeId}/runs/${runId}?end_time=1970-01-01T00:00:00.000Z`;
-
-      const getNodeRunResponse = getRawRun({
-        'class': '',
-        'message': '',
-        'backtrace': [],
-        'description': {
-          'title': '412 "Precondition Failed"'
-        }
-      }, []);
-
-      service.getNodeRun(nodeId, runId, endTime).then(nodeRun => {
-        expect(nodeRun).toBeDefined();
-        expect(nodeRun.error.description.title).toEqual('Error Resolving Cookbooks for Run List.');
-      });
-
-      const req = httpTestingController.expectOne(expectedUrl);
-
-      expect(req.request.method).toEqual('GET');
-
-      req.flush(getNodeRunResponse);
-    });
-
-    it('the run\'s error description title replaces the ' +
-      '":" at the end of the line with a ".". The title is updated from ' +
-      '"Error Resolving Cookbooks for Run List:" to ' +
-      '"Error Resolving Cookbooks for Run List."', () => {
-      const nodeId = 'fake_id';
-      const runId = 'runId';
-      const endTime = new Date(0);
-      const expectedUrl =
-        `${CONFIG_MGMT_URL}/nodes/${nodeId}/runs/${runId}?end_time=1970-01-01T00:00:00.000Z`;
-
-      const getNodeRunResponse = getRawRun({
-        'class': '',
-        'message': '',
-        'backtrace': [],
-        'description': {
-          'title': 'Error Resolving Cookbooks for Run List:'
-        }
-      }, []);
-
-      service.getNodeRun(nodeId, runId, endTime).then(nodeRun => {
-        expect(nodeRun).toBeDefined();
-        expect(nodeRun.error.description.title).toEqual('Error Resolving Cookbooks for Run List.');
-      });
-
-      const req = httpTestingController.expectOne(expectedUrl);
-
-      expect(req.request.method).toEqual('GET');
-
-      req.flush(getNodeRunResponse);
-    });
-
     it('when deprecations are not provided', () => {
       const nodeId = 'fake_id';
       const runId = 'runId';

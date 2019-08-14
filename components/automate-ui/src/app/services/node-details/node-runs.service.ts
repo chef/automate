@@ -75,29 +75,7 @@ export class NodeRunsService {
 
     return this.httpClient
       .get<RespNodeRun>(url, options).toPromise()
-      .then((res) => new NodeRun(this.formatError(res)));
-  }
-
-  // This method cleans up an error message comming from chef server.
-  // Because 412 "Precondition Failed" is not user friendly, the message was changed to
-  // "Error Resolving Cookbooks for Run List."
-  //
-  // TODO remove to the backend. This could be moved to the ingest service.
-  private formatError(respNodeRun: RespNodeRun): RespNodeRun {
-    if (this.isNullErrorDescription(respNodeRun)) {
-        // remove confusing colon at end of cookbook depsolve error
-        if ( respNodeRun.error.description.title === '412 "Precondition Failed"' ||
-        respNodeRun.error.description.title === 'Error Resolving Cookbooks for Run List:' ) {
-          respNodeRun.error.description.title = 'Error Resolving Cookbooks for Run List.';
-        }
-    }
-    return respNodeRun;
-  }
-
-  private isNullErrorDescription(respNodeRun: RespNodeRun): boolean {
-    return respNodeRun != null &&
-      respNodeRun.error != null &&
-      respNodeRun.error.description != null;
+      .then((res) => new NodeRun(res));
   }
 
   private buildURLSearchParams(filters: NodeHistoryFilter): HttpParams {
