@@ -20,6 +20,10 @@ const CONFIG_MGMT_URL = environment.config_mgmt_url;
 const INGEST_URL = environment.ingest_url;
 const DEPLOYMENT_URL = environment.deployment_url;
 
+interface RespSuggestion {
+  text: string;
+}
+
 @Injectable()
 export class ClientRunsRequests {
   constructor(
@@ -79,7 +83,7 @@ export class ClientRunsRequests {
       const params = this.formatFilters(filters).set('type', type).set('text', text);
       const url = `${CONFIG_MGMT_URL}/suggestions`;
 
-      return this.httpClient.get<any[]>(url, {params}).pipe(map(
+      return this.httpClient.get<RespSuggestion[]>(url, {params}).pipe(map(
         (suggestions) => suggestions.filter(s => s && s.text && s.text.length !== 0)));
     } else {
       return observableOf([]);
