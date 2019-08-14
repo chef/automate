@@ -169,11 +169,15 @@ describe('team management', () => {
 
       context('when the project filter contains team project and other project', () => {
         beforeEach(() => {
+          cy.route('GET', `/apis/iam/v2beta/projects/${project1ID}`).as('getProjectForTeam');
           // TODO (tc): Note that as stands, if you ever update a team to only contain projects
           // not in the project filter -- including (unassigned) -- you'll get an error on save
           // since the project filter is applied to the request to re-fetch the team. Known issue
           // we are going to address in future work.
           cy.applyProjectsFilter([unassigned, project1Name, project2Name]);
+
+          // Wait for the project contained in the team to 
+          cy.wait('@getProjectForTeam');
         });
 
         it('both are contained in the projects dropdown and the team project is selected,' +
@@ -185,7 +189,8 @@ describe('team management', () => {
           cy.get('[data-cy=team-details-submit-button]').should('have.attr', 'aria-disabled');
 
           // initial state of dropdown
-          cy.get('app-team-details app-projects-dropdown #projects-selected').contains(project1ID);
+          cy.get('app-team-details app-projects-dropdown #projects-selected')
+            .contains(`${project1Name.substring(0, dropdownNameUntilEllipsisLen)}...`);
           cy.get('app-team-details app-projects-dropdown .dropdown-button')
             .should('not.have.attr', 'disabled');
 

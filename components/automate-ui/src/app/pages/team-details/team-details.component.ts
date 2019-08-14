@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, AfterViewChecked } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
@@ -52,8 +52,8 @@ export type TeamTabName = 'users' | 'details';
   templateUrl: './team-details.component.html',
   styleUrls: ['./team-details.component.scss']
 })
-export class TeamDetailsComponent implements OnInit, OnDestroy {
-  @ViewChild(ProjectsDropdownComponent) projectsDropdownChildComponent: ProjectsDropdownComponent;
+export class TeamDetailsComponent implements OnInit, OnDestroy, AfterViewChecked {
+  @ViewChild(ProjectsDropdownComponent) projectsDropdownChildComponent !: ProjectsDropdownComponent;
 
   public updateNameForm: FormGroup;
   // isLoadingTeam represents the initial team load as well as subsequent updates in progress.
@@ -78,6 +78,10 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public dropdownProjects: Project[] = [];
   public teamProjectsLeftToFetch: string[] = [];
   private projectsSelected: Project[] = [];
+
+  private isMajorVersionLoaded = false;
+  private isMinorVersionLoaded = false;
+  private hasGetProjectsBeenInstantiated = false;
 
   constructor(private store: Store<NgrxStateAtom>,
     public fb: FormBuilder,
@@ -123,28 +127,12 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         // goes to #users if (1) explicit #users, (2) no fragment, or (3) invalid fragment
         this.tabValue = (fragment === 'details') ? 'details' : 'users';
       });
-    this.store.select(iamMajorVersion)
-      .pipe(takeUntil(this.isDestroyed))
-      .subscribe((version) => {
-        if (version === null) { return; }
-        this.isMajorV1 = version === 'v1';
-
-        // Triggered every time the team is updated.
-        if (this.isMajorV1) {
-          this.store.select(v1TeamFromRoute)
-            .pipe(filter(identity), takeUntil(this.isDestroyed))
-            .subscribe(this.getTeamDependentData.bind(this));
-        } else {
-          this.store.select(v2TeamFromRoute)
-            .pipe(filter(identity), takeUntil(this.isDestroyed))
-            .subscribe(this.getTeamDependentData.bind(this));
-        }
-      });
 
     this.store.select(iamMinorVersion)
       .pipe(takeUntil(this.isDestroyed))
       .subscribe((version) => {
         if (version === null) { return; }
+        this.isMinorVersionLoaded = true;
         this.isMinorV1 = version === 'v1';
       });
 
@@ -165,38 +153,24 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         });
       });
 
-    combineLatest([
-      this.store.select(getProjectStatus),
-      this.store.select(projectEntities)])
-      .pipe(
-        map(([status, projectMap]) => {
-          if (status === EntityStatus.loadingSuccess) {
-            console.log('we in here');
-            const projectsFound: { [id: string]: boolean } = {};
-            this.teamProjectsLeftToFetch.forEach((pID) => {
-              const project = projectMap[pID];
-              if (project !== undefined) {
-                const previousIndex = indexOf(project.id, this.dropdownProjects.map(p => p.id));
-                // project hasn't been inserted yet
-                if (previousIndex === -1) {
-                  this.dropdownProjects.push(project);
-                } else {
-                  // remove original entry and replace with ours
-                  this.dropdownProjects[previousIndex] = project;
-                }
-                this.dropdownProjects = sortProjectsByName(this.dropdownProjects);
-                this.projectsSelected.push(project);
-                // check the project in our projects dropdown
-                this.projectsDropdownChildComponent.updateSelectedProjects(project, true);
-                projectsFound[pID] = true;
-              }
-            });
+    this.store.select(iamMajorVersion)
+      .pipe(takeUntil(this.isDestroyed))
+      .subscribe((version) => {
+        if (version === null) { return; }
+        this.isMajorV1 = version === 'v1';
+        this.isMajorVersionLoaded = true;
 
-            // Remove all projects that have been fetched.
-            this.teamProjectsLeftToFetch =
-              this.teamProjectsLeftToFetch.filter(pID => projectsFound[pID] === undefined);
-          }
-      })).subscribe();
+        // Triggered every time the team is updated.
+        if (this.isMajorV1) {
+          this.store.select(v1TeamFromRoute)
+            .pipe(filter(identity), takeUntil(this.isDestroyed))
+            .subscribe(this.getTeamDependentData.bind(this));
+        } else {
+          this.store.select(v2TeamFromRoute)
+            .pipe(filter(identity), takeUntil(this.isDestroyed))
+            .subscribe(this.getTeamDependentData.bind(this));
+        }
+      });
 
     this.sortedUsers$ = <Observable<User[]>>combineLatest([
       this.store.select(allUsers),
@@ -250,14 +224,64 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       });
  }
 
+  // the project query code needs to happen in ngAfterViewChecked because it depends on
+  // a @ChildView which is only for sure instantiated ngAfterViewInit and later, but we also depend
+  // on the versions being fetched, and we can't fetch them in here because they are being used in
+  // project dropdown's ngIf which casues an ExpressionChangedAfterItHasBeenCheckedError.
+  // See this blog for more details:
+  //
+  // https://blog.angular-university.io/angular-debugging/
+  ngAfterViewChecked() {
+  // only run if both versions have been loaded AND the below hasn't been run yet
+  if (this.isMinorVersionLoaded && this.isMajorVersionLoaded
+    && !this.hasGetProjectsBeenInstantiated) {
+    // pretty sure this is a ng bug. ViewChild should never be undefined in ngAfterViewChecked.
+    if (this.projectsDropdownChildComponent === undefined) { return; }
+    this.hasGetProjectsBeenInstantiated = true;
+    combineLatest([
+      this.store.select(getProjectStatus),
+      this.store.select(projectEntities)])
+      .pipe(
+        map(([status, projectMap]) => {
+          if (status === EntityStatus.loadingSuccess) {
+            const projectsFound: { [id: string]: boolean } = {};
+            this.teamProjectsLeftToFetch.forEach((pID) => {
+              const project = projectMap[pID];
+              if (project !== undefined) {
+                const previousIndex = indexOf(project.id, this.dropdownProjects.map(p => p.id));
+                // project hasn't been inserted yet
+                if (previousIndex === -1) {
+                  this.dropdownProjects.push(project);
+                } else {
+                  // remove original entry and replace with ours
+                  this.dropdownProjects[previousIndex] = project;
+                }
+                this.dropdownProjects = sortProjectsByName(this.dropdownProjects);
+                this.projectsSelected.push(project);
+                // check the project in our projects dropdown. child is null if its ngIf is false
+                // which will happen when we are not on v2.1.
+                if (this.projectsDropdownChildComponent !== null) {
+                  this.projectsDropdownChildComponent.updateSelectedProjects(project, true);
+                }
+                projectsFound[pID] = true;
+              }
+            });
+
+            // Remove all projects that have been fetched.
+            this.teamProjectsLeftToFetch =
+              this.teamProjectsLeftToFetch.filter(pID => projectsFound[pID] === undefined);
+          }
+      })).subscribe();
+    }
+  }
+
   ngOnDestroy() {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
   }
 
-  private getTeamDependentData(team: Team) {
+  private getTeamDependentData(team: Team): void {
     this.team = team;
-    console.log('refreshing');
     this.team.projects.forEach(pID => {
       this.teamProjectsLeftToFetch.push(pID);
       this.store.dispatch(new GetProject({ id: pID }));
