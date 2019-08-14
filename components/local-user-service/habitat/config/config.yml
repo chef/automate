@@ -11,11 +11,9 @@ tls:
 users:
   type: dex
   config:
-    issuerURL: https://{{cfg.service.external_fqdn}}/dex
     {{~#eachAlive bind.automate-dex.members as |automate-dex|}}
       {{~#if @last}}
     grpcHost: {{automate-dex.sys.ip}}:{{automate-dex.cfg.grpc-port}}
-    dexURL: https://{{automate-dex.sys.ip}}:{{automate-dex.cfg.port}}/dex
       {{~/if}}
     {{~/eachAlive}}
 
