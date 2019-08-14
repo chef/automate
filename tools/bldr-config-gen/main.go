@@ -28,8 +28,7 @@ type PackageSpec struct {
 }
 
 type GoDepInfo struct {
-	deps       []string
-	usesVendor bool
+	deps []string
 }
 
 var opts = struct {
@@ -167,10 +166,6 @@ func generateHabPackageConfig(outBuf io.Writer, habPackages []PackageSpec) error
 		for _, dep := range depInfo.deps {
 			fmt.Fprintf(outBuf, ",\n  \"%s/*\"", dep)
 		}
-
-		if depInfo.usesVendor {
-			fmt.Fprintf(outBuf, ",\n  \"Gopkg.lock\"")
-		}
 		fmt.Fprintf(outBuf, "\n]\n")
 	}
 	return nil
@@ -201,11 +196,6 @@ func getGoDepInfo(path string) (GoDepInfo, error) {
 				return info, errors.Errorf("unknown go dependency path for %s: %s", path, line)
 			}
 
-			if parts[3] == "vendor" {
-				info.usesVendor = true
-				continue
-			}
-
 			end := len(parts)
 			switch parts[3] {
 			case "api":
@@ -214,6 +204,8 @@ func getGoDepInfo(path string) (GoDepInfo, error) {
 				// We want to avoid rebuilds so we don't depend
 				// on the entire lib directory
 				end = 5
+			case "vendor":
+				end = 7
 			case "components":
 				if len(parts) > 4 && parts[4] == "automate-gateway" {
 					// Many services depend on
