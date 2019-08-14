@@ -211,6 +211,7 @@ func (s *CerealService) DequeueWorkflow(req cereal.Cereal_DequeueWorkflowServer)
 
 	var taskResult *cereal.TaskResult
 	if evt.TaskResult != nil {
+		_, evt.TaskResult.TaskName = unnamespace(evt.TaskResult.TaskName)
 		taskResult = &cereal.TaskResult{
 			TaskName:   evt.TaskResult.TaskName,
 			Parameters: evt.TaskResult.Parameters,
