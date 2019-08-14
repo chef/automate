@@ -301,8 +301,47 @@ func (m *MultiWorkflow) OnTaskComplete(w cereal.WorkflowInstance, ev cereal.Task
 	return w.Continue(payload)
 }
 
-func (*MultiWorkflow) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEvent) cereal.Decision {
-	return w.Complete()
+func (m *MultiWorkflow) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEvent) cereal.Decision {
+	payload := MultiWorkflowPayload{
+		State: make(map[string]WorkflowState),
+	}
+	if err := w.GetPayload(&payload); err != nil {
+		return w.Fail(err)
+	}
+	parameters := MultiWorkflowParams{
+		WorkflowParams: make(map[string]json.RawMessage),
+	}
+
+	if err := w.GetParameters(&parameters); err != nil {
+		return w.Fail(err)
+	}
+	nextPayload := MultiWorkflowPayload{
+		State: make(map[string]WorkflowState),
+	}
+
+	for key, executor := range m.executors {
+		var subWorkflowParams json.RawMessage
+		if parameters.WorkflowParams != nil {
+			subWorkflowParams = parameters.WorkflowParams[key]
+		}
+		workflowState, ok := payload.State[key]
+		if !ok {
+			return w.Fail(fmt.Errorf("could not find workflow state for %q", key))
+		}
+		instance := &workflowInstance{
+			key:        key,
+			w:          w,
+			lastState:  &workflowState,
+			parameters: subWorkflowParams,
+		}
+		decision := executor.OnCancel(instance, ev)
+		ns := applyDecision(instance, decision)
+		nextPayload.State[key] = ns
+	}
+	if nextPayload.Finished() {
+		return w.Complete(cereal.WithResult(nextPayload))
+	}
+	return w.Continue(nextPayload)
 }
 
 func NewMultiWorkflowExecutor(executors map[string]cereal.WorkflowExecutor) *MultiWorkflow {
