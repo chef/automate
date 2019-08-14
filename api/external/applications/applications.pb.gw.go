@@ -98,7 +98,7 @@ func request_ApplicationsService_GetServicesBySG_0(ctx context.Context, marshale
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "service_group_id")
 	}
 
-	protoReq.ServiceGroupId, err = runtime.Int32(val)
+	protoReq.ServiceGroupId, err = runtime.String(val)
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "service_group_id", err)

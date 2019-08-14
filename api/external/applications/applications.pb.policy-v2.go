@@ -19,6 +19,8 @@ func init() {
 		if m, ok := input.(*ServicesBySGReq); ok {
 			return policyv2.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
+				case "service_group_id":
+					return m.ServiceGroupId
 				case "health":
 					return m.Health
 				default:

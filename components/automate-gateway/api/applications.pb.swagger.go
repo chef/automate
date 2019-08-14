@@ -144,8 +144,7 @@ func init() {
             "name": "service_group_id",
             "in": "path",
             "required": true,
-            "type": "integer",
-            "format": "int32"
+            "type": "string"
           },
           {
             "name": "pagination.page",
