@@ -149,7 +149,14 @@ export class ChefSessionService implements CanActivate {
   logout(url = '/'): void {
     this.deleteSession();
     // note: url will end up url-encoded in this string (magic)
-    window.location.href = `/session/new?state=${url}`;
+    let signinURL: string;
+    if (this.user && this.user.id_token) {
+      signinURL = `/session/new?state=${url}&id_token_hint=${this.user.id_token}`;
+    } else {
+      signinURL = `/session/new?state=${url}`;
+    }
+
+    window.location.href = signinURL;
   }
 
   storeTelemetryPreference(isOptedIn: boolean): void {
