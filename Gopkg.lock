@@ -227,7 +227,7 @@
   version = "v1.1.0"
 
 [[projects]]
-  digest = "1:917f5ab917ffd768329350ad92eaface2a3d37e59e120c8e238fe18dcc79b1c4"
+  digest = "1:746dcdabe712f3f748a35d4aba1208bb17212d525b34cb04cc1fdb9c9d6d012c"
   name = "github.com/dexidp/dex"
   packages = [
     "api",
@@ -243,6 +243,7 @@
     "connector/mock",
     "connector/oidc",
     "connector/saml",
+    "pkg/groups",
     "pkg/log",
     "server",
     "server/internal",
@@ -251,8 +252,8 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "39dc5dcfb79d5f926194c5e0b1b5a1cfe2e3ea33"
-  version = "v2.17.0"
+  revision = "aeb2861a40b50b283d3dcd964a421be7780b43b7"
+  version = "v2.18.0"
 
 [[projects]]
   digest = "1:7a6852b35eb5bbc184561443762d225116ae630c26a7c4d90546619f1e7d2ad2"

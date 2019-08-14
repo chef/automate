@@ -1428,7 +1428,6 @@ paths = [
   "components/automate-grpc/*",
   "components/session-service/*",
   "lib/grpc/*",
-  "lib/httputils/*",
   "lib/io/*",
   "lib/logger/*",
   "lib/stringutils/*",
@@ -1438,7 +1437,6 @@ paths = [
   "lib/version/*",
   "vendor/github.com/apache/thrift/*",
   "vendor/github.com/codahale/hdrhistogram/*",
-  "vendor/github.com/coreos/go-oidc/*",
   "vendor/github.com/dexidp/dex/*",
   "vendor/github.com/envoyproxy/protoc-gen-validate/*",
   "vendor/github.com/ghodss/yaml/*",
@@ -1449,7 +1447,6 @@ paths = [
   "vendor/github.com/muesli/crunchy/*",
   "vendor/github.com/opentracing/opentracing-go/*",
   "vendor/github.com/pkg/errors/*",
-  "vendor/github.com/pquerna/cachecontrol/*",
   "vendor/github.com/sirupsen/logrus/*",
   "vendor/github.com/spf13/cobra/*",
   "vendor/github.com/spf13/pflag/*",
@@ -1464,12 +1461,10 @@ paths = [
   "vendor/go.uber.org/zap/zapcore/*",
   "vendor/golang.org/x/crypto/*",
   "vendor/golang.org/x/net/*",
-  "vendor/golang.org/x/oauth2/*",
   "vendor/golang.org/x/sys/*",
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
-  "vendor/gopkg.in/square/go-jose.v2/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
 
