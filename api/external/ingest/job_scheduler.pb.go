@@ -13,6 +13,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -136,6 +138,23 @@ type JobSchedulerServer interface {
 	ConfigureNodesMissingScheduler(context.Context, *request.SchedulerConfig) (*response.ConfigureNodesMissingScheduler, error)
 	ConfigureDeleteNodesScheduler(context.Context, *request.SchedulerConfig) (*response.ConfigureDeleteNodesScheduler, error)
 	ConfigureMissingNodesForDeletionScheduler(context.Context, *request.SchedulerConfig) (*response.ConfigureMissingNodesForDeletionScheduler, error)
+}
+
+// UnimplementedJobSchedulerServer can be embedded to have forward compatible implementations.
+type UnimplementedJobSchedulerServer struct {
+}
+
+func (*UnimplementedJobSchedulerServer) GetStatusJobScheduler(ctx context.Context, req *request.GetStatusJobScheduler) (*response.JobSchedulerStatus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetStatusJobScheduler not implemented")
+}
+func (*UnimplementedJobSchedulerServer) ConfigureNodesMissingScheduler(ctx context.Context, req *request.SchedulerConfig) (*response.ConfigureNodesMissingScheduler, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfigureNodesMissingScheduler not implemented")
+}
+func (*UnimplementedJobSchedulerServer) ConfigureDeleteNodesScheduler(ctx context.Context, req *request.SchedulerConfig) (*response.ConfigureDeleteNodesScheduler, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfigureDeleteNodesScheduler not implemented")
+}
+func (*UnimplementedJobSchedulerServer) ConfigureMissingNodesForDeletionScheduler(ctx context.Context, req *request.SchedulerConfig) (*response.ConfigureMissingNodesForDeletionScheduler, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfigureMissingNodesForDeletionScheduler not implemented")
 }
 
 func RegisterJobSchedulerServer(s *grpc.Server, srv JobSchedulerServer) {

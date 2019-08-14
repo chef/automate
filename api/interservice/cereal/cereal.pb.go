@@ -10,6 +10,8 @@ import (
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -2413,6 +2415,41 @@ type CerealServer interface {
 	UpdateWorkflowScheduleByName(context.Context, *UpdateWorkflowScheduleByNameRequest) (*UpdateWorkflowScheduleByNameResponse, error)
 	GetWorkflowInstanceByName(context.Context, *GetWorkflowInstanceByNameRequest) (*GetWorkflowInstanceByNameResponse, error)
 	ListWorkflowInstances(*ListWorkflowInstancesRequest, Cereal_ListWorkflowInstancesServer) error
+}
+
+// UnimplementedCerealServer can be embedded to have forward compatible implementations.
+type UnimplementedCerealServer struct {
+}
+
+func (*UnimplementedCerealServer) EnqueueWorkflow(ctx context.Context, req *EnqueueWorkflowRequest) (*EnqueueWorkflowResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EnqueueWorkflow not implemented")
+}
+func (*UnimplementedCerealServer) DequeueWorkflow(srv Cereal_DequeueWorkflowServer) error {
+	return status.Errorf(codes.Unimplemented, "method DequeueWorkflow not implemented")
+}
+func (*UnimplementedCerealServer) CancelWorkflow(ctx context.Context, req *CancelWorkflowRequest) (*CancelWorkflowResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CancelWorkflow not implemented")
+}
+func (*UnimplementedCerealServer) DequeueTask(srv Cereal_DequeueTaskServer) error {
+	return status.Errorf(codes.Unimplemented, "method DequeueTask not implemented")
+}
+func (*UnimplementedCerealServer) CreateWorkflowSchedule(ctx context.Context, req *CreateWorkflowScheduleRequest) (*CreateWorkflowScheduleResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateWorkflowSchedule not implemented")
+}
+func (*UnimplementedCerealServer) ListWorkflowSchedules(req *ListWorkflowSchedulesRequest, srv Cereal_ListWorkflowSchedulesServer) error {
+	return status.Errorf(codes.Unimplemented, "method ListWorkflowSchedules not implemented")
+}
+func (*UnimplementedCerealServer) GetWorkflowScheduleByName(ctx context.Context, req *GetWorkflowScheduleByNameRequest) (*GetWorkflowScheduleByNameResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWorkflowScheduleByName not implemented")
+}
+func (*UnimplementedCerealServer) UpdateWorkflowScheduleByName(ctx context.Context, req *UpdateWorkflowScheduleByNameRequest) (*UpdateWorkflowScheduleByNameResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateWorkflowScheduleByName not implemented")
+}
+func (*UnimplementedCerealServer) GetWorkflowInstanceByName(ctx context.Context, req *GetWorkflowInstanceByNameRequest) (*GetWorkflowInstanceByNameResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWorkflowInstanceByName not implemented")
+}
+func (*UnimplementedCerealServer) ListWorkflowInstances(req *ListWorkflowInstancesRequest, srv Cereal_ListWorkflowInstancesServer) error {
+	return status.Errorf(codes.Unimplemented, "method ListWorkflowInstances not implemented")
 }
 
 func RegisterCerealServer(s *grpc.Server, srv CerealServer) {

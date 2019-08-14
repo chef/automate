@@ -12,6 +12,8 @@ import (
 	empty "github.com/golang/protobuf/ptypes/empty"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -1773,6 +1775,29 @@ type ProfilesServiceServer interface {
 	ReadTar(*ProfileDetails, ProfilesService_ReadTarServer) error
 	Delete(context.Context, *ProfileDetails) (*empty.Empty, error)
 	List(context.Context, *Query) (*Profiles, error)
+}
+
+// UnimplementedProfilesServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedProfilesServiceServer struct {
+}
+
+func (*UnimplementedProfilesServiceServer) Create(srv ProfilesService_CreateServer) error {
+	return status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
+func (*UnimplementedProfilesServiceServer) Read(ctx context.Context, req *ProfileDetails) (*Profile, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Read not implemented")
+}
+func (*UnimplementedProfilesServiceServer) ReadFromMarket(ctx context.Context, req *ProfileDetails) (*Profile, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadFromMarket not implemented")
+}
+func (*UnimplementedProfilesServiceServer) ReadTar(req *ProfileDetails, srv ProfilesService_ReadTarServer) error {
+	return status.Errorf(codes.Unimplemented, "method ReadTar not implemented")
+}
+func (*UnimplementedProfilesServiceServer) Delete(ctx context.Context, req *ProfileDetails) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (*UnimplementedProfilesServiceServer) List(ctx context.Context, req *Query) (*Profiles, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
 }
 
 func RegisterProfilesServiceServer(s *grpc.Server, srv ProfilesServiceServer) {

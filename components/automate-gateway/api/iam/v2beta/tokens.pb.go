@@ -13,6 +13,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -145,6 +147,26 @@ type TokensServer interface {
 	UpdateToken(context.Context, *request.UpdateTokenReq) (*response.UpdateTokenResp, error)
 	DeleteToken(context.Context, *request.DeleteTokenReq) (*response.DeleteTokenResp, error)
 	ListTokens(context.Context, *request.ListTokensReq) (*response.ListTokensResp, error)
+}
+
+// UnimplementedTokensServer can be embedded to have forward compatible implementations.
+type UnimplementedTokensServer struct {
+}
+
+func (*UnimplementedTokensServer) CreateToken(ctx context.Context, req *request.CreateTokenReq) (*response.CreateTokenResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateToken not implemented")
+}
+func (*UnimplementedTokensServer) GetToken(ctx context.Context, req *request.GetTokenReq) (*response.GetTokenResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetToken not implemented")
+}
+func (*UnimplementedTokensServer) UpdateToken(ctx context.Context, req *request.UpdateTokenReq) (*response.UpdateTokenResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateToken not implemented")
+}
+func (*UnimplementedTokensServer) DeleteToken(ctx context.Context, req *request.DeleteTokenReq) (*response.DeleteTokenResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteToken not implemented")
+}
+func (*UnimplementedTokensServer) ListTokens(ctx context.Context, req *request.ListTokensReq) (*response.ListTokensResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListTokens not implemented")
 }
 
 func RegisterTokensServer(s *grpc.Server, srv TokensServer) {

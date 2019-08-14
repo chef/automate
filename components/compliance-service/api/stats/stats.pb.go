@@ -10,6 +10,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -1458,6 +1460,23 @@ type StatsServiceServer interface {
 	ReadTrend(context.Context, *Query) (*Trends, error)
 	ReadProfiles(context.Context, *Query) (*Profile, error)
 	ReadFailures(context.Context, *Query) (*Failures, error)
+}
+
+// UnimplementedStatsServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedStatsServiceServer struct {
+}
+
+func (*UnimplementedStatsServiceServer) ReadSummary(ctx context.Context, req *Query) (*Summary, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadSummary not implemented")
+}
+func (*UnimplementedStatsServiceServer) ReadTrend(ctx context.Context, req *Query) (*Trends, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadTrend not implemented")
+}
+func (*UnimplementedStatsServiceServer) ReadProfiles(ctx context.Context, req *Query) (*Profile, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadProfiles not implemented")
+}
+func (*UnimplementedStatsServiceServer) ReadFailures(ctx context.Context, req *Query) (*Failures, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadFailures not implemented")
 }
 
 func RegisterStatsServiceServer(s *grpc.Server, srv StatsServiceServer) {

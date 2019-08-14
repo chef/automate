@@ -14,6 +14,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -181,6 +183,32 @@ type AuthorizationServer interface {
 	IntrospectAll(context.Context, *request.IntrospectAllReq) (*response.IntrospectResp, error)
 	IntrospectSome(context.Context, *request.IntrospectSomeReq) (*response.IntrospectResp, error)
 	Introspect(context.Context, *request.IntrospectReq) (*response.IntrospectResp, error)
+}
+
+// UnimplementedAuthorizationServer can be embedded to have forward compatible implementations.
+type UnimplementedAuthorizationServer struct {
+}
+
+func (*UnimplementedAuthorizationServer) GetVersion(ctx context.Context, req *version.VersionInfoRequest) (*version.VersionInfo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetVersion not implemented")
+}
+func (*UnimplementedAuthorizationServer) CreatePolicy(ctx context.Context, req *request.CreatePolicyReq) (*response.CreatePolicyResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePolicy not implemented")
+}
+func (*UnimplementedAuthorizationServer) ListPolicies(ctx context.Context, req *request.ListPoliciesReq) (*response.ListPoliciesResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListPolicies not implemented")
+}
+func (*UnimplementedAuthorizationServer) DeletePolicy(ctx context.Context, req *request.DeletePolicyReq) (*response.DeletePolicyResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeletePolicy not implemented")
+}
+func (*UnimplementedAuthorizationServer) IntrospectAll(ctx context.Context, req *request.IntrospectAllReq) (*response.IntrospectResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IntrospectAll not implemented")
+}
+func (*UnimplementedAuthorizationServer) IntrospectSome(ctx context.Context, req *request.IntrospectSomeReq) (*response.IntrospectResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IntrospectSome not implemented")
+}
+func (*UnimplementedAuthorizationServer) Introspect(ctx context.Context, req *request.IntrospectReq) (*response.IntrospectResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Introspect not implemented")
 }
 
 func RegisterAuthorizationServer(s *grpc.Server, srv AuthorizationServer) {

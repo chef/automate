@@ -10,6 +10,8 @@ import (
 	empty "github.com/golang/protobuf/ptypes/empty"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -253,6 +255,14 @@ func (c *complianceStatusClient) GetMigrationStatus(ctx context.Context, in *emp
 // ComplianceStatusServer is the server API for ComplianceStatus service.
 type ComplianceStatusServer interface {
 	GetMigrationStatus(context.Context, *empty.Empty) (*MigrationStatus, error)
+}
+
+// UnimplementedComplianceStatusServer can be embedded to have forward compatible implementations.
+type UnimplementedComplianceStatusServer struct {
+}
+
+func (*UnimplementedComplianceStatusServer) GetMigrationStatus(ctx context.Context, req *empty.Empty) (*MigrationStatus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMigrationStatus not implemented")
 }
 
 func RegisterComplianceStatusServer(s *grpc.Server, srv ComplianceStatusServer) {

@@ -10,6 +10,8 @@ import (
 	empty "github.com/golang/protobuf/ptypes/empty"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -159,6 +161,14 @@ func (c *versionServiceClient) Version(ctx context.Context, in *empty.Empty, opt
 // VersionServiceServer is the server API for VersionService service.
 type VersionServiceServer interface {
 	Version(context.Context, *empty.Empty) (*VersionInfo, error)
+}
+
+// UnimplementedVersionServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedVersionServiceServer struct {
+}
+
+func (*UnimplementedVersionServiceServer) Version(ctx context.Context, req *empty.Empty) (*VersionInfo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
 }
 
 func RegisterVersionServiceServer(s *grpc.Server, srv VersionServiceServer) {

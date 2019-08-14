@@ -10,6 +10,8 @@ import (
 	empty "github.com/golang/protobuf/ptypes/empty"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -1747,6 +1749,26 @@ type ProfilesServiceServer interface {
 	List(context.Context, *Query) (*Profiles, error)
 }
 
+// UnimplementedProfilesServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedProfilesServiceServer struct {
+}
+
+func (*UnimplementedProfilesServiceServer) Create(srv ProfilesService_CreateServer) error {
+	return status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
+func (*UnimplementedProfilesServiceServer) Read(ctx context.Context, req *ProfileDetails) (*Profile, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Read not implemented")
+}
+func (*UnimplementedProfilesServiceServer) ReadTar(req *ProfileDetails, srv ProfilesService_ReadTarServer) error {
+	return status.Errorf(codes.Unimplemented, "method ReadTar not implemented")
+}
+func (*UnimplementedProfilesServiceServer) Delete(ctx context.Context, req *ProfileDetails) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (*UnimplementedProfilesServiceServer) List(ctx context.Context, req *Query) (*Profiles, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+
 func RegisterProfilesServiceServer(s *grpc.Server, srv ProfilesServiceServer) {
 	s.RegisterService(&_ProfilesService_serviceDesc, srv)
 }
@@ -1922,6 +1944,17 @@ func (c *profilesAdminServiceClient) MigrateDiskProfiles(ctx context.Context, in
 type ProfilesAdminServiceServer interface {
 	RebuildElasticCache(context.Context, *empty.Empty) (*empty.Empty, error)
 	MigrateDiskProfiles(context.Context, *empty.Empty) (*empty.Empty, error)
+}
+
+// UnimplementedProfilesAdminServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedProfilesAdminServiceServer struct {
+}
+
+func (*UnimplementedProfilesAdminServiceServer) RebuildElasticCache(ctx context.Context, req *empty.Empty) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RebuildElasticCache not implemented")
+}
+func (*UnimplementedProfilesAdminServiceServer) MigrateDiskProfiles(ctx context.Context, req *empty.Empty) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MigrateDiskProfiles not implemented")
 }
 
 func RegisterProfilesAdminServiceServer(s *grpc.Server, srv ProfilesAdminServiceServer) {

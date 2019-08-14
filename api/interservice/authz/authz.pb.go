@@ -11,6 +11,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -882,6 +884,32 @@ type AuthorizationServer interface {
 	ListPolicies(context.Context, *ListPoliciesReq) (*ListPoliciesResp, error)
 	DeletePolicy(context.Context, *DeletePolicyReq) (*DeletePolicyResp, error)
 	PurgeSubjectFromPolicies(context.Context, *PurgeSubjectFromPoliciesReq) (*PurgeSubjectFromPoliciesResp, error)
+}
+
+// UnimplementedAuthorizationServer can be embedded to have forward compatible implementations.
+type UnimplementedAuthorizationServer struct {
+}
+
+func (*UnimplementedAuthorizationServer) GetVersion(ctx context.Context, req *version.VersionInfoRequest) (*version.VersionInfo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetVersion not implemented")
+}
+func (*UnimplementedAuthorizationServer) IsAuthorized(ctx context.Context, req *IsAuthorizedReq) (*IsAuthorizedResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IsAuthorized not implemented")
+}
+func (*UnimplementedAuthorizationServer) FilterAuthorizedPairs(ctx context.Context, req *FilterAuthorizedPairsReq) (*FilterAuthorizedPairsResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FilterAuthorizedPairs not implemented")
+}
+func (*UnimplementedAuthorizationServer) CreatePolicy(ctx context.Context, req *CreatePolicyReq) (*CreatePolicyResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePolicy not implemented")
+}
+func (*UnimplementedAuthorizationServer) ListPolicies(ctx context.Context, req *ListPoliciesReq) (*ListPoliciesResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListPolicies not implemented")
+}
+func (*UnimplementedAuthorizationServer) DeletePolicy(ctx context.Context, req *DeletePolicyReq) (*DeletePolicyResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeletePolicy not implemented")
+}
+func (*UnimplementedAuthorizationServer) PurgeSubjectFromPolicies(ctx context.Context, req *PurgeSubjectFromPoliciesReq) (*PurgeSubjectFromPoliciesResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PurgeSubjectFromPolicies not implemented")
 }
 
 func RegisterAuthorizationServer(s *grpc.Server, srv AuthorizationServer) {

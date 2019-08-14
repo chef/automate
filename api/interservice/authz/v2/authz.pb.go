@@ -9,6 +9,8 @@ import (
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -564,6 +566,23 @@ type AuthorizationServer interface {
 	FilterAuthorizedPairs(context.Context, *FilterAuthorizedPairsReq) (*FilterAuthorizedPairsResp, error)
 	FilterAuthorizedProjects(context.Context, *FilterAuthorizedProjectsReq) (*FilterAuthorizedProjectsResp, error)
 	ProjectsAuthorized(context.Context, *ProjectsAuthorizedReq) (*ProjectsAuthorizedResp, error)
+}
+
+// UnimplementedAuthorizationServer can be embedded to have forward compatible implementations.
+type UnimplementedAuthorizationServer struct {
+}
+
+func (*UnimplementedAuthorizationServer) IsAuthorized(ctx context.Context, req *IsAuthorizedReq) (*IsAuthorizedResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IsAuthorized not implemented")
+}
+func (*UnimplementedAuthorizationServer) FilterAuthorizedPairs(ctx context.Context, req *FilterAuthorizedPairsReq) (*FilterAuthorizedPairsResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FilterAuthorizedPairs not implemented")
+}
+func (*UnimplementedAuthorizationServer) FilterAuthorizedProjects(ctx context.Context, req *FilterAuthorizedProjectsReq) (*FilterAuthorizedProjectsResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FilterAuthorizedProjects not implemented")
+}
+func (*UnimplementedAuthorizationServer) ProjectsAuthorized(ctx context.Context, req *ProjectsAuthorizedReq) (*ProjectsAuthorizedResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ProjectsAuthorized not implemented")
 }
 
 func RegisterAuthorizationServer(s *grpc.Server, srv AuthorizationServer) {

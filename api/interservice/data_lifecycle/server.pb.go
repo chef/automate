@@ -8,6 +8,8 @@ import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -270,6 +272,17 @@ type DataLifecycleServer interface {
 	// Health checks and metadata
 	Version(context.Context, *VersionRequest) (*VersionResponse, error)
 	TriggerPurge(context.Context, *TriggerPurgeRequest) (*TriggerPurgeResponse, error)
+}
+
+// UnimplementedDataLifecycleServer can be embedded to have forward compatible implementations.
+type UnimplementedDataLifecycleServer struct {
+}
+
+func (*UnimplementedDataLifecycleServer) Version(ctx context.Context, req *VersionRequest) (*VersionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
+}
+func (*UnimplementedDataLifecycleServer) TriggerPurge(ctx context.Context, req *TriggerPurgeRequest) (*TriggerPurgeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TriggerPurge not implemented")
 }
 
 func RegisterDataLifecycleServer(s *grpc.Server, srv DataLifecycleServer) {

@@ -13,6 +13,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -188,6 +190,35 @@ type RulesServer interface {
 	ApplyRulesStart(context.Context, *request.ApplyRulesStartReq) (*response.ApplyRulesStartResp, error)
 	ApplyRulesCancel(context.Context, *request.ApplyRulesCancelReq) (*response.ApplyRulesCancelResp, error)
 	ApplyRulesStatus(context.Context, *request.ApplyRulesStatusReq) (*response.ApplyRulesStatusResp, error)
+}
+
+// UnimplementedRulesServer can be embedded to have forward compatible implementations.
+type UnimplementedRulesServer struct {
+}
+
+func (*UnimplementedRulesServer) CreateRule(ctx context.Context, req *request.CreateRuleReq) (*response.CreateRuleResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateRule not implemented")
+}
+func (*UnimplementedRulesServer) UpdateRule(ctx context.Context, req *request.UpdateRuleReq) (*response.UpdateRuleResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateRule not implemented")
+}
+func (*UnimplementedRulesServer) GetRule(ctx context.Context, req *request.GetRuleReq) (*response.GetRuleResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRule not implemented")
+}
+func (*UnimplementedRulesServer) ListRulesForProject(ctx context.Context, req *request.ListRulesForProjectReq) (*response.ListRulesForProjectResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListRulesForProject not implemented")
+}
+func (*UnimplementedRulesServer) DeleteRule(ctx context.Context, req *request.DeleteRuleReq) (*response.DeleteRuleResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteRule not implemented")
+}
+func (*UnimplementedRulesServer) ApplyRulesStart(ctx context.Context, req *request.ApplyRulesStartReq) (*response.ApplyRulesStartResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ApplyRulesStart not implemented")
+}
+func (*UnimplementedRulesServer) ApplyRulesCancel(ctx context.Context, req *request.ApplyRulesCancelReq) (*response.ApplyRulesCancelResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ApplyRulesCancel not implemented")
+}
+func (*UnimplementedRulesServer) ApplyRulesStatus(ctx context.Context, req *request.ApplyRulesStatusReq) (*response.ApplyRulesStatusResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ApplyRulesStatus not implemented")
 }
 
 func RegisterRulesServer(s *grpc.Server, srv RulesServer) {

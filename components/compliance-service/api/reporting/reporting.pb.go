@@ -10,6 +10,8 @@ import (
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -2538,6 +2540,35 @@ type ReportingServiceServer interface {
 	Export(*Query, ReportingService_ExportServer) error
 	ReadNode(context.Context, *Id) (*Node, error)
 	ListNodes(context.Context, *Query) (*Nodes, error)
+}
+
+// UnimplementedReportingServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedReportingServiceServer struct {
+}
+
+func (*UnimplementedReportingServiceServer) ListReports(ctx context.Context, req *Query) (*Reports, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListReports not implemented")
+}
+func (*UnimplementedReportingServiceServer) ListReportIds(ctx context.Context, req *Query) (*ReportIds, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListReportIds not implemented")
+}
+func (*UnimplementedReportingServiceServer) ReadReport(ctx context.Context, req *Query) (*Report, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadReport not implemented")
+}
+func (*UnimplementedReportingServiceServer) ListSuggestions(ctx context.Context, req *SuggestionRequest) (*Suggestions, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListSuggestions not implemented")
+}
+func (*UnimplementedReportingServiceServer) ListProfiles(ctx context.Context, req *Query) (*ProfileMins, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListProfiles not implemented")
+}
+func (*UnimplementedReportingServiceServer) Export(req *Query, srv ReportingService_ExportServer) error {
+	return status.Errorf(codes.Unimplemented, "method Export not implemented")
+}
+func (*UnimplementedReportingServiceServer) ReadNode(ctx context.Context, req *Id) (*Node, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadNode not implemented")
+}
+func (*UnimplementedReportingServiceServer) ListNodes(ctx context.Context, req *Query) (*Nodes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListNodes not implemented")
 }
 
 func RegisterReportingServiceServer(s *grpc.Server, srv ReportingServiceServer) {

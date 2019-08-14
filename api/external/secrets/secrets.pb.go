@@ -12,6 +12,8 @@ import (
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -599,6 +601,26 @@ type SecretsServiceServer interface {
 	Update(context.Context, *Secret) (*UpdateResponse, error)
 	Delete(context.Context, *Id) (*DeleteResponse, error)
 	List(context.Context, *Query) (*Secrets, error)
+}
+
+// UnimplementedSecretsServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedSecretsServiceServer struct {
+}
+
+func (*UnimplementedSecretsServiceServer) Create(ctx context.Context, req *Secret) (*Id, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
+func (*UnimplementedSecretsServiceServer) Read(ctx context.Context, req *Id) (*Secret, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Read not implemented")
+}
+func (*UnimplementedSecretsServiceServer) Update(ctx context.Context, req *Secret) (*UpdateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
+}
+func (*UnimplementedSecretsServiceServer) Delete(ctx context.Context, req *Id) (*DeleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (*UnimplementedSecretsServiceServer) List(ctx context.Context, req *Query) (*Secrets, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
 }
 
 func RegisterSecretsServiceServer(s *grpc.Server, srv SecretsServiceServer) {

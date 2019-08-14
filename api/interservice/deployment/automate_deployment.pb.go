@@ -10,6 +10,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -6012,6 +6014,146 @@ type DeploymentServer interface {
 	Usage(context.Context, *UsageRequest) (*UsageResponse, error)
 	GetCLIExecutable(*GetCLIExecutableRequest, Deployment_GetCLIExecutableServer) error
 	BootstrapBundle(*BootstrapBundleRequest, Deployment_BootstrapBundleServer) error
+}
+
+// UnimplementedDeploymentServer can be embedded to have forward compatible implementations.
+type UnimplementedDeploymentServer struct {
+}
+
+func (*UnimplementedDeploymentServer) Deploy(ctx context.Context, req *DeployRequest) (*DeployResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Deploy not implemented")
+}
+func (*UnimplementedDeploymentServer) DeployDataServices(ctx context.Context, req *DeployRequest) (*DeployResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeployDataServices not implemented")
+}
+func (*UnimplementedDeploymentServer) DeploySome(ctx context.Context, req *DeployRequest) (*DeployResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeploySome not implemented")
+}
+func (*UnimplementedDeploymentServer) DeployStatus(req *DeployStatusRequest, srv Deployment_DeployStatusServer) error {
+	return status.Errorf(codes.Unimplemented, "method DeployStatus not implemented")
+}
+func (*UnimplementedDeploymentServer) Preload(ctx context.Context, req *DeployRequest) (*DeployResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Preload not implemented")
+}
+func (*UnimplementedDeploymentServer) RemoveSome(ctx context.Context, req *RemoveRequest) (*RemoveResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveSome not implemented")
+}
+func (*UnimplementedDeploymentServer) StartNonDataServices(ctx context.Context, req *DeployRequest) (*DeployResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StartNonDataServices not implemented")
+}
+func (*UnimplementedDeploymentServer) NewDeployment(ctx context.Context, req *NewDeploymentRequest) (*DeploymentID, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NewDeployment not implemented")
+}
+func (*UnimplementedDeploymentServer) ConfigureDeployment(ctx context.Context, req *ConfigureDeploymentRequest) (*ConfigureDeploymentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfigureDeployment not implemented")
+}
+func (*UnimplementedDeploymentServer) Ping(ctx context.Context, req *PingRequest) (*PingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
+}
+func (*UnimplementedDeploymentServer) Status(ctx context.Context, req *StatusRequest) (*StatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Status not implemented")
+}
+func (*UnimplementedDeploymentServer) ServiceVersions(ctx context.Context, req *ServiceVersionsRequest) (*ServiceVersionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ServiceVersions not implemented")
+}
+func (*UnimplementedDeploymentServer) LicenseStatus(ctx context.Context, req *LicenseStatusRequest) (*LicenseStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LicenseStatus not implemented")
+}
+func (*UnimplementedDeploymentServer) LicenseApply(ctx context.Context, req *LicenseApplyRequest) (*LicenseApplyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LicenseApply not implemented")
+}
+func (*UnimplementedDeploymentServer) Stop(ctx context.Context, req *StopRequest) (*StopResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Stop not implemented")
+}
+func (*UnimplementedDeploymentServer) SystemLogs(req *SystemLogsRequest, srv Deployment_SystemLogsServer) error {
+	return status.Errorf(codes.Unimplemented, "method SystemLogs not implemented")
+}
+func (*UnimplementedDeploymentServer) GatherLogs(ctx context.Context, req *GatherLogsRequest) (*GatherLogsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GatherLogs not implemented")
+}
+func (*UnimplementedDeploymentServer) GatherLogsDownload(req *GatherLogsDownloadRequest, srv Deployment_GatherLogsDownloadServer) error {
+	return status.Errorf(codes.Unimplemented, "method GatherLogsDownload not implemented")
+}
+func (*UnimplementedDeploymentServer) StopConverge(ctx context.Context, req *StopConvergeRequest) (*StopConvergeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StopConverge not implemented")
+}
+func (*UnimplementedDeploymentServer) StartConverge(ctx context.Context, req *StartConvergeRequest) (*StartConvergeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StartConverge not implemented")
+}
+func (*UnimplementedDeploymentServer) UpgradeStatus(ctx context.Context, req *UpgradeStatusRequest) (*UpgradeStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpgradeStatus not implemented")
+}
+func (*UnimplementedDeploymentServer) RestartServices(ctx context.Context, req *RestartServicesRequest) (*RestartServicesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RestartServices not implemented")
+}
+func (*UnimplementedDeploymentServer) GetAutomateConfig(ctx context.Context, req *GetAutomateConfigRequest) (*GetAutomateConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAutomateConfig not implemented")
+}
+func (*UnimplementedDeploymentServer) PatchAutomateConfig(ctx context.Context, req *PatchAutomateConfigRequest) (*PatchAutomateConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PatchAutomateConfig not implemented")
+}
+func (*UnimplementedDeploymentServer) SetAutomateConfig(ctx context.Context, req *SetAutomateConfigRequest) (*SetAutomateConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetAutomateConfig not implemented")
+}
+func (*UnimplementedDeploymentServer) DumpDB(req *DumpDBRequest, srv Deployment_DumpDBServer) error {
+	return status.Errorf(codes.Unimplemented, "method DumpDB not implemented")
+}
+func (*UnimplementedDeploymentServer) ManifestVersion(ctx context.Context, req *ManifestVersionRequest) (*ManifestVersionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ManifestVersion not implemented")
+}
+func (*UnimplementedDeploymentServer) CreateBackup(ctx context.Context, req *CreateBackupRequest) (*CreateBackupResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateBackup not implemented")
+}
+func (*UnimplementedDeploymentServer) ListBackups(ctx context.Context, req *ListBackupsRequest) (*ListBackupsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListBackups not implemented")
+}
+func (*UnimplementedDeploymentServer) ShowBackup(ctx context.Context, req *ShowBackupRequest) (*ShowBackupResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ShowBackup not implemented")
+}
+func (*UnimplementedDeploymentServer) DeleteBackups(ctx context.Context, req *DeleteBackupsRequest) (*DeleteBackupsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteBackups not implemented")
+}
+func (*UnimplementedDeploymentServer) RestoreBackup(ctx context.Context, req *RestoreBackupRequest) (*RestoreBackupResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RestoreBackup not implemented")
+}
+func (*UnimplementedDeploymentServer) BackupStatus(ctx context.Context, req *BackupStatusRequest) (*BackupStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BackupStatus not implemented")
+}
+func (*UnimplementedDeploymentServer) CancelBackup(ctx context.Context, req *CancelBackupRequest) (*CancelBackupResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CancelBackup not implemented")
+}
+func (*UnimplementedDeploymentServer) Upgrade(ctx context.Context, req *UpgradeRequest) (*UpgradeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Upgrade not implemented")
+}
+func (*UnimplementedDeploymentServer) SetLogLevel(ctx context.Context, req *SetLogLevelRequest) (*SetLogLevelResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetLogLevel not implemented")
+}
+func (*UnimplementedDeploymentServer) GenerateAdminToken(ctx context.Context, req *GenerateAdminTokenRequest) (*GenerateAdminTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GenerateAdminToken not implemented")
+}
+func (*UnimplementedDeploymentServer) DeployID(ctx context.Context, req *DeployIDRequest) (*DeployIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeployID not implemented")
+}
+func (*UnimplementedDeploymentServer) CurrentReleaseManifest(ctx context.Context, req *CurrentReleaseManifestRequest) (*ReleaseManifest, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CurrentReleaseManifest not implemented")
+}
+func (*UnimplementedDeploymentServer) A1UpgradeStatus(req *A1UpgradeStatusRequest, srv Deployment_A1UpgradeStatusServer) error {
+	return status.Errorf(codes.Unimplemented, "method A1UpgradeStatus not implemented")
+}
+func (*UnimplementedDeploymentServer) NodeInventory(ctx context.Context, req *NodeInventoryRequest) (*NodeInventoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NodeInventory not implemented")
+}
+func (*UnimplementedDeploymentServer) InfrastructureNodeDelete(ctx context.Context, req *InfrastructureNodeDeleteRequest) (*InfrastructureNodeDeleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InfrastructureNodeDelete not implemented")
+}
+func (*UnimplementedDeploymentServer) Usage(ctx context.Context, req *UsageRequest) (*UsageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Usage not implemented")
+}
+func (*UnimplementedDeploymentServer) GetCLIExecutable(req *GetCLIExecutableRequest, srv Deployment_GetCLIExecutableServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetCLIExecutable not implemented")
+}
+func (*UnimplementedDeploymentServer) BootstrapBundle(req *BootstrapBundleRequest, srv Deployment_BootstrapBundleServer) error {
+	return status.Errorf(codes.Unimplemented, "method BootstrapBundle not implemented")
 }
 
 func RegisterDeploymentServer(s *grpc.Server, srv DeploymentServer) {

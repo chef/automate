@@ -12,6 +12,8 @@ import (
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -475,6 +477,20 @@ type LicenseServer interface {
 	ApplyLicense(context.Context, *ApplyLicenseReq) (*ApplyLicenseResp, error)
 	GetStatus(context.Context, *GetStatusReq) (*GetStatusResp, error)
 	RequestLicense(context.Context, *RequestLicenseReq) (*RequestLicenseResp, error)
+}
+
+// UnimplementedLicenseServer can be embedded to have forward compatible implementations.
+type UnimplementedLicenseServer struct {
+}
+
+func (*UnimplementedLicenseServer) ApplyLicense(ctx context.Context, req *ApplyLicenseReq) (*ApplyLicenseResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ApplyLicense not implemented")
+}
+func (*UnimplementedLicenseServer) GetStatus(ctx context.Context, req *GetStatusReq) (*GetStatusResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetStatus not implemented")
+}
+func (*UnimplementedLicenseServer) RequestLicense(ctx context.Context, req *RequestLicenseReq) (*RequestLicenseResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RequestLicense not implemented")
 }
 
 func RegisterLicenseServer(s *grpc.Server, srv LicenseServer) {

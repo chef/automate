@@ -14,6 +14,8 @@ import (
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -879,6 +881,44 @@ type NodeManagerServiceServer interface {
 	SearchNodeFields(context.Context, *FieldQuery) (*Fields, error)
 	SearchNodes(context.Context, *NodeQuery) (*Nodes, error)
 	Connect(context.Context, *Id) (*ConnectResponse, error)
+}
+
+// UnimplementedNodeManagerServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedNodeManagerServiceServer struct {
+}
+
+func (*UnimplementedNodeManagerServiceServer) Create(ctx context.Context, req *NodeManager) (*Ids, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) Read(ctx context.Context, req *Id) (*NodeManager, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Read not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) Update(ctx context.Context, req *NodeManager) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) Delete(ctx context.Context, req *Id) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) DeleteWithNodes(ctx context.Context, req *Id) (*Ids, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteWithNodes not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) DeleteWithNodeStateStopped(ctx context.Context, req *Id) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteWithNodeStateStopped not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) DeleteWithNodeStateTerminated(ctx context.Context, req *Id) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteWithNodeStateTerminated not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) List(ctx context.Context, req *Query) (*NodeManagers, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) SearchNodeFields(ctx context.Context, req *FieldQuery) (*Fields, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchNodeFields not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) SearchNodes(ctx context.Context, req *NodeQuery) (*Nodes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchNodes not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) Connect(ctx context.Context, req *Id) (*ConnectResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Connect not implemented")
 }
 
 func RegisterNodeManagerServiceServer(s *grpc.Server, srv NodeManagerServiceServer) {

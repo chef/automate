@@ -8,6 +8,8 @@ import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -1145,6 +1147,35 @@ type PGSidecarServer interface {
 	SetPublicSchemaRole(context.Context, *SetPublicSchemaRoleReq) (*SetPublicSchemaRoleRes, error)
 	AlterRole(context.Context, *AlterRoleReq) (*AlterRoleRes, error)
 	DropTables(context.Context, *DropTablesReq) (*DropTablesRes, error)
+}
+
+// UnimplementedPGSidecarServer can be embedded to have forward compatible implementations.
+type UnimplementedPGSidecarServer struct {
+}
+
+func (*UnimplementedPGSidecarServer) MigrateTables(ctx context.Context, req *MigrateTablesReq) (*MigrateTablesRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MigrateTables not implemented")
+}
+func (*UnimplementedPGSidecarServer) RenameDB(ctx context.Context, req *RenameDBReq) (*RenameDBRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RenameDB not implemented")
+}
+func (*UnimplementedPGSidecarServer) CreateDB(ctx context.Context, req *CreateDBReq) (*CreateDBRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateDB not implemented")
+}
+func (*UnimplementedPGSidecarServer) CreateExtension(ctx context.Context, req *CreateExtensionReq) (*CreateExtensionRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateExtension not implemented")
+}
+func (*UnimplementedPGSidecarServer) DeploySqitch(ctx context.Context, req *DeploySqitchReq) (*DeploySqitchRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeploySqitch not implemented")
+}
+func (*UnimplementedPGSidecarServer) SetPublicSchemaRole(ctx context.Context, req *SetPublicSchemaRoleReq) (*SetPublicSchemaRoleRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetPublicSchemaRole not implemented")
+}
+func (*UnimplementedPGSidecarServer) AlterRole(ctx context.Context, req *AlterRoleReq) (*AlterRoleRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AlterRole not implemented")
+}
+func (*UnimplementedPGSidecarServer) DropTables(ctx context.Context, req *DropTablesReq) (*DropTablesRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DropTables not implemented")
 }
 
 func RegisterPGSidecarServer(s *grpc.Server, srv PGSidecarServer) {

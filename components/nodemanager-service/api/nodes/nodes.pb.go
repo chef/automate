@@ -12,6 +12,8 @@ import (
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -1470,6 +1472,41 @@ type NodesServiceServer interface {
 	UpdateNodeDetectInfo(context.Context, *NodeDetectJobInfo) (*empty.Empty, error)
 	UpdateNodeConnectionError(context.Context, *NodeError) (*empty.Empty, error)
 	BulkDeleteById(context.Context, *Ids) (*BulkDeleteResponse, error)
+}
+
+// UnimplementedNodesServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedNodesServiceServer struct {
+}
+
+func (*UnimplementedNodesServiceServer) Create(ctx context.Context, req *Node) (*Id, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
+func (*UnimplementedNodesServiceServer) Read(ctx context.Context, req *Id) (*Node, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Read not implemented")
+}
+func (*UnimplementedNodesServiceServer) Update(ctx context.Context, req *Node) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
+}
+func (*UnimplementedNodesServiceServer) Delete(ctx context.Context, req *Id) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (*UnimplementedNodesServiceServer) List(ctx context.Context, req *Query) (*Nodes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (*UnimplementedNodesServiceServer) BulkDelete(ctx context.Context, req *Query) (*BulkDeleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BulkDelete not implemented")
+}
+func (*UnimplementedNodesServiceServer) BulkCreate(ctx context.Context, req *Nodes) (*Ids, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BulkCreate not implemented")
+}
+func (*UnimplementedNodesServiceServer) UpdateNodeDetectInfo(ctx context.Context, req *NodeDetectJobInfo) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateNodeDetectInfo not implemented")
+}
+func (*UnimplementedNodesServiceServer) UpdateNodeConnectionError(ctx context.Context, req *NodeError) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateNodeConnectionError not implemented")
+}
+func (*UnimplementedNodesServiceServer) BulkDeleteById(ctx context.Context, req *Ids) (*BulkDeleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BulkDeleteById not implemented")
 }
 
 func RegisterNodesServiceServer(s *grpc.Server, srv NodesServiceServer) {

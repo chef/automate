@@ -9,6 +9,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -181,6 +183,14 @@ type AuthenticationServer interface {
 	// request, or the tokens are wrong, the AuthenticationService will return the
 	// corresponding error code, with details in the message.
 	Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateResponse, error)
+}
+
+// UnimplementedAuthenticationServer can be embedded to have forward compatible implementations.
+type UnimplementedAuthenticationServer struct {
+}
+
+func (*UnimplementedAuthenticationServer) Authenticate(ctx context.Context, req *AuthenticateRequest) (*AuthenticateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Authenticate not implemented")
 }
 
 func RegisterAuthenticationServer(s *grpc.Server, srv AuthenticationServer) {

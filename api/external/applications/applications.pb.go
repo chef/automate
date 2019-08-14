@@ -14,6 +14,8 @@ import (
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -1197,6 +1199,35 @@ type ApplicationsServiceServer interface {
 	GetDisconnectedServices(context.Context, *DisconnectedServicesReq) (*ServicesRes, error)
 	DeleteDisconnectedServices(context.Context, *DisconnectedServicesReq) (*ServicesRes, error)
 	GetVersion(context.Context, *version.VersionInfoRequest) (*version.VersionInfo, error)
+}
+
+// UnimplementedApplicationsServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedApplicationsServiceServer struct {
+}
+
+func (*UnimplementedApplicationsServiceServer) GetServiceGroups(ctx context.Context, req *ServiceGroupsReq) (*ServiceGroups, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetServiceGroups not implemented")
+}
+func (*UnimplementedApplicationsServiceServer) GetServiceGroupsHealthCounts(ctx context.Context, req *ServiceGroupsHealthCountsReq) (*HealthCounts, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetServiceGroupsHealthCounts not implemented")
+}
+func (*UnimplementedApplicationsServiceServer) GetServices(ctx context.Context, req *ServicesReq) (*ServicesRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetServices not implemented")
+}
+func (*UnimplementedApplicationsServiceServer) GetServicesBySG(ctx context.Context, req *ServicesBySGReq) (*ServicesBySGRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetServicesBySG not implemented")
+}
+func (*UnimplementedApplicationsServiceServer) GetServicesStats(ctx context.Context, req *ServicesStatsReq) (*ServicesStatsRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetServicesStats not implemented")
+}
+func (*UnimplementedApplicationsServiceServer) GetDisconnectedServices(ctx context.Context, req *DisconnectedServicesReq) (*ServicesRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDisconnectedServices not implemented")
+}
+func (*UnimplementedApplicationsServiceServer) DeleteDisconnectedServices(ctx context.Context, req *DisconnectedServicesReq) (*ServicesRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteDisconnectedServices not implemented")
+}
+func (*UnimplementedApplicationsServiceServer) GetVersion(ctx context.Context, req *version.VersionInfoRequest) (*version.VersionInfo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetVersion not implemented")
 }
 
 func RegisterApplicationsServiceServer(s *grpc.Server, srv ApplicationsServiceServer) {

@@ -11,6 +11,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -1213,6 +1215,32 @@ type NotificationsServer interface {
 	ListRules(context.Context, *RuleListRequest) (*RuleListResponse, error)
 	ValidateWebhook(context.Context, *URLValidationRequest) (*URLValidationResponse, error)
 	Version(context.Context, *VersionRequest) (*VersionResponse, error)
+}
+
+// UnimplementedNotificationsServer can be embedded to have forward compatible implementations.
+type UnimplementedNotificationsServer struct {
+}
+
+func (*UnimplementedNotificationsServer) AddRule(ctx context.Context, req *RuleAddRequest) (*RuleAddResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddRule not implemented")
+}
+func (*UnimplementedNotificationsServer) DeleteRule(ctx context.Context, req *RuleIdentifier) (*RuleDeleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteRule not implemented")
+}
+func (*UnimplementedNotificationsServer) UpdateRule(ctx context.Context, req *RuleUpdateRequest) (*RuleUpdateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateRule not implemented")
+}
+func (*UnimplementedNotificationsServer) GetRule(ctx context.Context, req *RuleIdentifier) (*RuleGetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRule not implemented")
+}
+func (*UnimplementedNotificationsServer) ListRules(ctx context.Context, req *RuleListRequest) (*RuleListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListRules not implemented")
+}
+func (*UnimplementedNotificationsServer) ValidateWebhook(ctx context.Context, req *URLValidationRequest) (*URLValidationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ValidateWebhook not implemented")
+}
+func (*UnimplementedNotificationsServer) Version(ctx context.Context, req *VersionRequest) (*VersionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
 }
 
 func RegisterNotificationsServer(s *grpc.Server, srv NotificationsServer) {
