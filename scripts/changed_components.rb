@@ -74,8 +74,9 @@ hab_deps.tsort.each do |p|
 end
 
 changed_package_files.each do |p, files|
-  STDERR.puts "- #{p}"
+  STDERR.puts "<details><summary>#{p}</summary>\n\n"
   files.each do |file|
     STDERR.puts "  - #{file}"
   end
+  STDERR.puts "</details>"
 end
