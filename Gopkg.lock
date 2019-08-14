@@ -417,7 +417,7 @@
   revision = "837231f7bb377b365da147e5ff6c031b12f0dfaa"
 
 [[projects]]
-  digest = "1:328e72b35acbe8bd8ca553e075d33461fb71e02ccc5ddb31d2b3c33e2d008e5b"
+  digest = "1:6b3d0f402c88b60e78bca3ee8332a79f02e6964d2b4a44092620f1448e16cbb6"
   name = "github.com/golang/protobuf"
   packages = [
     "descriptor",
@@ -438,8 +438,8 @@
     "ptypes/wrappers",
   ]
   pruneopts = "NUT"
-  revision = "b5d812f8a3706043e23a9cd5babf2e5423744d30"
-  version = "v1.3.1"
+  revision = "6c65a5562fc06764971b7c5d05c76c75e84bdbf7"
+  version = "v1.3.2"
 
 [[projects]]
   digest = "1:39f0aa89737a0f37df361fba39858b685d00caff4bdcd4363f768075fbedbb15"
@@ -1360,7 +1360,7 @@
   revision = "67d6565462c5a0d99b88193d59fefa10ca7e3010"
 
 [[projects]]
-  digest = "1:72979c5a2c853cb42434d7082e70496014a1449872bdc4b25ef2a215bc6c8ef6"
+  digest = "1:53c6cedea8e03c74798be20889807a872935554abbe1bfd7617dfee004417f51"
   name = "google.golang.org/grpc"
   packages = [
     ".",
@@ -1404,8 +1404,8 @@
     "test/bufconn",
   ]
   pruneopts = "NUT"
-  revision = "1d89a3c832915b2314551c1d2a506874d62e53f7"
-  version = "v1.22.0"
+  revision = "6eaf6f47437a6b4e2153a190160ef39a92c7eceb"
+  version = "v1.23.0"
 
 [[projects]]
   digest = "1:aea6e9483c167cc6fdf1274c442558c5dda8fd3373372be04d98c79100868da1"
