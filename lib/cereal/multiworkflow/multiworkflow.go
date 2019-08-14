@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"runtime/debug"
 
 	"github.com/davecgh/go-spew/spew"
 
@@ -44,6 +45,7 @@ type MultiWorkflowTaskParam struct {
 func marshal(key string, obj interface{}) (json.RawMessage, error) {
 	structFields := []reflect.StructField{}
 	if obj != nil {
+		debug.PrintStack()
 		structFields = append(structFields, reflect.StructField{
 			Name:      "Anonymous",
 			Type:      reflect.TypeOf(obj),
@@ -145,8 +147,10 @@ func applyDecision(instance *workflowInstance, decision cereal.Decision) Workflo
 			if err != nil {
 				logrus.WithError(err).Error("failed to enqueue task")
 				return WorkflowState{
-					IsFinished: true,
-					Err:        err.Error(),
+					IsFinished:     true,
+					Err:            err.Error(),
+					EnqueuedTasks:  instance.TotalEnqueuedTasks(),
+					CompletedTasks: instance.TotalCompletedTasks(),
 				}
 			}
 		}
@@ -155,9 +159,10 @@ func applyDecision(instance *workflowInstance, decision cereal.Decision) Workflo
 		payload, err = json.Marshal(decision.Payload())
 		if err != nil {
 			return WorkflowState{
-				IsFinished: true,
-				Err:        err.Error(),
-			}
+				IsFinished:     true,
+				Err:            err.Error(),
+				EnqueuedTasks:  instance.TotalEnqueuedTasks(),
+				CompletedTasks: instance.TotalCompletedTasks()}
 		}
 		return WorkflowState{
 			IsFinished:     false,
@@ -182,13 +187,17 @@ func applyDecision(instance *workflowInstance, decision cereal.Decision) Workflo
 		result, err = json.Marshal(decision.Result())
 		if err != nil {
 			return WorkflowState{
-				IsFinished: true,
-				Err:        err.Error(),
+				IsFinished:     true,
+				Err:            err.Error(),
+				EnqueuedTasks:  instance.TotalEnqueuedTasks(),
+				CompletedTasks: instance.TotalCompletedTasks(),
 			}
 		}
 		return WorkflowState{
-			IsFinished: true,
-			Result:     result,
+			IsFinished:     true,
+			Result:         result,
+			EnqueuedTasks:  instance.TotalEnqueuedTasks(),
+			CompletedTasks: instance.TotalCompletedTasks(),
 		}
 	}
 	return WorkflowState{

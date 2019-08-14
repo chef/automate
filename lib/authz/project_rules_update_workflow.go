@@ -38,6 +38,10 @@ type DomainProjectUpdateWorkflowPayload struct {
 	MergedJobStatus             JobStatus
 }
 
+type statusParameters struct {
+	EsJobIDs []string
+}
+
 func (m *DomainProjectUpdateWorkflowExecutor) OnStart(
 	w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
 
@@ -79,7 +83,7 @@ func (m *DomainProjectUpdateWorkflowExecutor) OnTaskComplete(
 				"Failed to deserialize %s result", m.startProjectTagUpdaterTaskName)
 			return w.Fail(err)
 		}
-		w.EnqueueTask(m.projectTagUpdaterStatusTaskName, esJobIDs, cereal.StartAfter(m.nextCheck())) // nolint: errcheck
+		w.EnqueueTask(m.projectTagUpdaterStatusTaskName, statusParameters{esJobIDs}, cereal.StartAfter(m.nextCheck())) // nolint: errcheck
 		return w.Continue(payload)
 	case m.projectTagUpdaterStatusTaskName:
 		if err := ev.Result.Err(); err != nil {
@@ -87,7 +91,7 @@ func (m *DomainProjectUpdateWorkflowExecutor) OnTaskComplete(
 			if payload.ConsecutiveJobCheckFailures > maxNumberOfConsecutiveFails {
 				return w.Fail(err)
 			}
-			w.EnqueueTask(m.projectTagUpdaterStatusTaskName, payload.ESJobID, cereal.StartAfter(m.nextCheck())) // nolint: errcheck
+			w.EnqueueTask(m.projectTagUpdaterStatusTaskName, statusParameters{payload.ESJobID}, cereal.StartAfter(m.nextCheck())) // nolint: errcheck
 			return w.Continue(payload)
 		}
 		mergedJobStatus := JobStatus{}
@@ -100,7 +104,7 @@ func (m *DomainProjectUpdateWorkflowExecutor) OnTaskComplete(
 		if mergedJobStatus.Completed {
 			return w.Complete(cereal.WithResult(payload))
 		}
-		w.EnqueueTask(m.projectTagUpdaterStatusTaskName, payload.ESJobID, cereal.StartAfter(m.nextCheck())) // nolint: errcheck
+		w.EnqueueTask(m.projectTagUpdaterStatusTaskName, statusParameters{payload.ESJobID}, cereal.StartAfter(m.nextCheck())) // nolint: errcheck
 		return w.Continue(payload)
 	default:
 		return w.Fail(errors.Errorf("Unknown task type %q", ev.TaskName))
@@ -185,13 +189,13 @@ type ProjectTagUpdaterStatusTask struct {
 func (m *ProjectTagUpdaterStatusTask) Run(
 	ctx context.Context, task cereal.Task) (interface{}, error) {
 
-	esJobIDs := []string{}
-	if err := task.GetParameters(&esJobIDs); err != nil {
+	params := statusParameters{}
+	if err := task.GetParameters(&params); err != nil {
 		logrus.WithError(err).Error("Could not deserialize ProjectTagUpdaterStatusTask params")
 		return nil, err
 	}
 
-	jobStatuses, err := m.collectJobStatus(ctx, esJobIDs)
+	jobStatuses, err := m.collectJobStatus(ctx, params.EsJobIDs)
 	if err != nil {
 		return nil, errors.Errorf("Failed to check the running job: %v", err)
 	}
