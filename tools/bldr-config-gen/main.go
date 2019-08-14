@@ -205,7 +205,11 @@ func getGoDepInfo(path string) (GoDepInfo, error) {
 				// on the entire lib directory
 				end = 5
 			case "vendor":
-				end = 7
+				if len(parts) > 4 && parts[4] == "google.golang.org" {
+					end = 6
+				} else {
+					end = 7
+				}
 			case "components":
 				if len(parts) > 4 && parts[4] == "automate-gateway" {
 					// Many services depend on
