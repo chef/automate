@@ -404,10 +404,15 @@ func (pg *PostgresBackend) GetDueScheduledWorkflow(ctx context.Context) (*backen
 	)
 
 	if err != nil {
-		cancel()
 		if err == sql.ErrNoRows {
+			err := tx.Commit()
+			if err != nil {
+				logrus.WithError(err).Warn("failed to commit transaction in GetDueScheduledWorkflows")
+			}
+			cancel()
 			return nil, nil, cereal.ErrNoDueWorkflows
 		}
+		cancel()
 		return nil, nil, errors.Wrap(err, "error fetching due workflows")
 	}
 
