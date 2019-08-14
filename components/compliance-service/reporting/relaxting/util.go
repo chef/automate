@@ -96,8 +96,18 @@ func Remove(arr *[]string, i int) {
 	*arr = s
 }
 
+// Splits a string by its rightmost delimiter
 func rightSplit(stringToSplit string, delimiter string) (string, string) {
 	n := strings.LastIndex(stringToSplit, delimiter)
+	if n >= 0 {
+		return stringToSplit[0:n], stringToSplit[n+1:]
+	}
+	return stringToSplit, ""
+}
+
+// Splits a string by its leftmost delimiter
+func leftSplit(stringToSplit string, delimiter string) (string, string) {
+	n := strings.Index(stringToSplit, delimiter)
 	if n >= 0 {
 		return stringToSplit[0:n], stringToSplit[n+1:]
 	}

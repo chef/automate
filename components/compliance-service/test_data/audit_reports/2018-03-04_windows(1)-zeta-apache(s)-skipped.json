@@ -32,7 +32,7 @@
       "controls": [
         {
           "id": "apache-03",
-          "code": "control 'apache-03' do\n  title 'Apache should start max. 1 root-task'\n  desc 'The Apache service in its own non-privileged account. If the web server process runs with administrative privileges, an attack who obtains control over the apache process may control the entire system.'\n  total_tasks = command(\"ps aux | grep #{apache.service} | grep -v grep | grep root | wc -l | tr -d [:space:]\").stdout.to_i\n  describe total_tasks do\n    it { should eq 1 }\n  end\nend\n",
+          "code": "control 'apache-03' do\n  title 'Apache should start max. 1 root-task'\n  desc 'The Apache service in its own non-privileged account. If the web server process runs with administrative privileges, an attack who obtains control over the apache process may control the entire system.'\n  total_tasks = command(\"ps aux | grep #{apache.service} | grep -v grep | grep root | wc -l | tr -d [:space:]\").stdout.to_i\n  describe total_tasks do\n    it { should eq 1 }\n  end\n  tag 'web'\n  tag 'scope': 'Apache'\n  tag 'satisfies': ['apache-1', 'apache-2']\nend\n",
           "desc": "The Apache service in its own non-privileged account. If the web server process runs with administrative privileges, an attack who obtains control over the apache process may control the entire system.",
           "impact": 0.5,
           "title": "Apache should start max. 1 root-task",
@@ -41,7 +41,11 @@
             "line": 49
           },
           "refs": [],
-          "tags": {},
+          "tags": {
+            "web": null,
+            "scope": "Apache",
+            "satisfies": ["apache-1", "apache-2"]
+          },
           "results": [
             {
               "status": "skipped",

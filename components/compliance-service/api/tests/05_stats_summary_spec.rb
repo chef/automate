@@ -72,6 +72,23 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
 
+      # Filter by control tag
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(filters: [
+        Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
+        Stats::ListFilter.new(type: 'control_tag:scope', values: ['nginx', 'Apache'])
+      ])
+      expected_data = {
+        "reportSummary" => {
+          "status" => "failed",
+          "stats" => {
+            "nodes" => 3,
+            "platforms" => 3,
+            "environments" => 2,
+            "profiles" => 3
+          }
+        }
+      }.to_json
+      assert_equal(expected_data, actual_data.to_json)
 
       # Filter by job_id
       actual_data = GRPC stats, :read_summary, Stats::Query.new(filters: [
