@@ -288,7 +288,7 @@ describe('SearchBarComponent', () => {
         });
         fixture.detectChanges();
 
-        expect(component.suggestions.size).toEqual(3);
+        expect(component.suggestions.sort()).toEqual(['1', '2', '3']);
       });
     });
 
