@@ -77,7 +77,8 @@ func (eventFeedServer *EventFeedServer) GetFeedSummary(ctx context.Context,
 		return &event_feed.FeedSummaryResponse{}, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 
-	fs, err := eventFeedServer.feedService.GetFeedSummary(request.CountCategory, request.Filters, startTime, endTime)
+	fs, err := eventFeedServer.feedService.GetFeedSummary(request.CountCategory, request.Filters,
+		startTime, endTime)
 	if err != nil {
 		return &event_feed.FeedSummaryResponse{}, errors.GrpcErrorFromErr(codes.Internal, err)
 	}

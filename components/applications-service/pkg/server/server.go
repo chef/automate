@@ -15,6 +15,7 @@ import (
 	"github.com/chef/automate/components/applications-service/pkg/params"
 	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/chef/automate/lib/grpc/health"
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/timef"
 	"github.com/chef/automate/lib/version"
 
@@ -60,7 +61,7 @@ func (a *ApplicationsServer) GetVersion(
 func (a *ApplicationsServer) GetServiceGroups(ctx context.Context,
 	request *applications.ServiceGroupsReq) (*applications.ServiceGroups, error) {
 
-	filters, err := params.FormatFilters(request.GetFilter())
+	filters, err := stringutils.FormatFilters(request.GetFilter())
 	if err != nil {
 		return new(applications.ServiceGroups), status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -210,7 +211,7 @@ func (app *ApplicationsServer) GetServices(
 	ctx context.Context, request *applications.ServicesReq,
 ) (*applications.ServicesRes, error) {
 
-	filters, err := params.FormatFilters(request.GetFilter())
+	filters, err := stringutils.FormatFilters(request.GetFilter())
 	if err != nil {
 		return new(applications.ServicesRes), status.Error(codes.InvalidArgument, err.Error())
 	}

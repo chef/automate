@@ -7,7 +7,7 @@ var AllMappings = []Mapping{
 }
 
 const (
-	feedsIndicesVersion = "1"
+	feedsIndicesVersion = "2"
 	DocType             = "_doc"
 	IndexNameFeeds      = "eventfeed-" + feedsIndicesVersion + "-feeds"
 )
@@ -27,72 +27,112 @@ type Mapping struct {
 var feedProps = `
 	"properties":{
 		"entity_uuid":{
-				"type":"keyword"
+			"type":"keyword"
 		},
 		"producer_id":{
 				"type":"keyword"
 		},
 		"producer_name":{
-				"type":"text"
+			"type":"text"
 		},
 		"producer_object_type":{
-				"type":"text"
+			"type":"text"
 		},
 		"producer_tags":{
-				"type":"keyword"
+			"type":"keyword"
 		},
 		"feed_type":{
-				"type":"text"
+			"type":"text"
 		},
 		"event_type":{
-				"type":"keyword"
+			"fields": {
+				"engram": {
+					"analyzer": "autocomplete",
+					"type": "text"
+				},
+				"lower": {
+					"normalizer": "case_insensitive",
+					"type": "keyword"
+				}
+			},
+			"type":"keyword"
 		},
 		"tags":{
-				"type":"keyword",
-				"fields":{
-					"keyword":{
-							"type":"keyword",
-							"ignore_above":256
-					}
+			"type":"keyword",
+			"fields":{
+				"keyword":{
+						"type":"keyword",
+						"ignore_above":256
 				}
+			}
 		},
 		"pub_timestamp":{
-				"type":"date",
-				"format":"strict_date_optional_time||epoch_millis"
+			"type":"date",
+			"format":"strict_date_optional_time||epoch_millis"
 		},
 		"actor_id":{
-				"type":"text"
+			"type":"text"
 		},
 		"actor_name":{
-				"type":"text"
+			"fields": {
+				"engram": {
+					"analyzer": "autocomplete",
+					"type": "text"
+				},
+				"lower": {
+					"normalizer": "case_insensitive",
+					"type": "keyword"
+				}
+			},
+			"type":"keyword"
 		},
 		"actor_object_type":{
-				"type":"text"
+			"type":"text"
 		},
 		"verb":{
-				"type":"keyword"
+			"fields": {
+				"engram": {
+					"analyzer": "autocomplete",
+					"type": "text"
+				},
+				"lower": {
+					"normalizer": "case_insensitive",
+					"type": "keyword"
+				}
+			},
+			"type":"keyword"
 		},
 		"object_id":{
-				"type":"text"
+			"type":"text"
 		},
 		"object_name":{
-				"type":"text"
+			"type":"text"
 		},
 		"object_object_type":{
-				"type":"keyword"
+			"fields": {
+				"engram": {
+					"analyzer": "autocomplete",
+					"type": "text"
+				},
+				"lower": {
+					"normalizer": "case_insensitive",
+					"type": "keyword"
+				}
+			},
+			"type":"keyword"
 		},
 		"target_id":{
-				"type":"text"
+			"type":"text"
 		},
 		"target_name":{
-				"type":"text"
+			"type":"text"
 		},
 		"target_object_type":{
-				"type":"text"
+			"type":"text"
 		},
 		"created":{
-				"type":"date",
-				"format":"strict_date_optional_time||epoch_millis"
+			"type":"date",
+			"format":"strict_date_optional_time||epoch_millis"
 		}
 	}
 `
@@ -107,6 +147,34 @@ var Feeds = Mapping{
 			{
 				"template":"`+IndexNameFeeds+`",
 				"settings":{
+					"analysis": {
+						"analyzer": {
+							"autocomplete": {
+								"filter": [
+									"lowercase"
+								],
+								"tokenizer": "autocomplete_tokenizer"
+							}
+						},
+						"tokenizer": {
+							"autocomplete_tokenizer": {
+								"max_gram": 20,
+								"min_gram": 2,
+								"token_chars": [
+									"letter",
+									"digit"
+								],
+								"type": "edge_ngram"
+							}
+						},
+						"normalizer": {
+							"case_insensitive": {
+								"type": "custom",
+								"char_filter": [],
+								"filter": ["lowercase", "asciifolding"]
+							}
+						}
+					},
 					"index":{
 							"refresh_interval":"1s"
 					}

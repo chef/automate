@@ -41,12 +41,17 @@ func (f *Feeds) GetFeed(req *event_feed.FeedRequest) ([]*util.FeedEntry, int64, 
 			"The page size must be greater than 0")
 	}
 
+	filters, err := util.FormatFilters(req.Filters)
+	if err != nil {
+		return nil, 0, err
+	}
+
 	fq := util.FeedQuery{
 		UserID:     req.UserID,
 		Size:       int(req.Size),
 		Start:      startTime.UTC(),
 		End:        endTime.UTC(),
-		Filters:    req.Filters,
+		Filters:    filters,
 		CursorDate: cursorTime.UTC(),
 		CursorID:   req.Cursor,
 		Ascending:  ascending,
@@ -59,17 +64,23 @@ func (f *Feeds) GetFeed(req *event_feed.FeedRequest) ([]*util.FeedEntry, int64, 
 	return resp, hits, nil
 }
 
-func (f *Feeds) GetFeedSummary(countCategory string, filters []string, start time.Time, end time.Time) (*util.FeedSummary, error) {
+func (f *Feeds) GetFeedSummary(countCategory string, filters []string,
+	start time.Time, end time.Time) (*util.FeedSummary, error) {
 
 	// remove count category from the filters array
 	filters = util.Remove(filters, countCategory)
 
+	mapFilters, err := util.FormatFilters(filters)
+	if err != nil {
+		return nil, err
+	}
+
 	fq := util.FeedSummaryQuery{
-		CountsCategory: countCategory,
+		CountsCategory: util.ConvertAPIKeyToBackendKey(countCategory),
 		Buckets:        false,
 		Start:          start,
 		End:            end,
-		Filters:        filters,
+		Filters:        mapFilters,
 	}
 	counts, err := f.store.GetFeedSummary(&fq)
 	if err != nil {

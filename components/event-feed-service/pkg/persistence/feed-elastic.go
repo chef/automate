@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"math"
 	"strconv"
 	"time"
@@ -134,124 +135,88 @@ func (efs ElasticFeedStore) CreateFeedEntry(entry *util.FeedEntry) (bool, error)
 	return true, nil
 }
 
+// GetFeed - get event feed entries with the provided query constraints
 func (efs ElasticFeedStore) GetFeed(query *util.FeedQuery) ([]*util.FeedEntry, int64, error) {
 	exists, err := efs.indexExists(IndexNameFeeds)
 	if err != nil {
 		logrus.Warnf("Could not get feed; error: %+v", err)
 		return nil, 0, err
 	}
-
-	var entries []*util.FeedEntry
-
-	if exists {
-		filters, err := util.FormatFilters(query.Filters)
-		if err != nil {
-			return nil, 0, err
-		}
-
-		var mainQuery = newBoolQueryFromFilters(filters)
-
-		rangeQuery, ok := newRangeQueryTime(query.Start, query.End, PublishedTimestampField)
-
-		logrus.WithFields(logrus.Fields{
-			"start":       query.Start,
-			"end":         query.End,
-			"range query": rangeQuery,
-		}).Info("range query string")
-
-		if ok {
-			mainQuery = mainQuery.Must(rangeQuery)
-		}
-
-		searchService := efs.client.Search().
-			Query(mainQuery).
-			Index(IndexNameFeeds).
-			Size(query.Size).
-			Sort(PublishedTimestampField, query.Ascending).
-			Sort(FeedEntryID, query.Ascending)
-
-		if query.CursorDate.Unix() != 0 && query.CursorID != "" {
-			milliseconds := query.CursorDate.UnixNano() / int64(time.Millisecond)
-			searchService = searchService.SearchAfter(milliseconds, query.CursorID) // the date has to be in milliseconds
-		}
-
-		searchResult, err := searchService.Do(context.Background())
-
-		// Return an error if the search was not successful
-		if err != nil {
-			logrus.WithFields(logrus.Fields{"error": err}).Error("Error retrieving feed entries") // only log non-404
-			return nil, 0, err
-		}
-
-		for _, hit := range searchResult.Hits.Hits {
-			entry := new(util.FeedEntry)
-			if err := json.Unmarshal(*hit.Source, entry); err != nil {
-				logrus.WithFields(logrus.Fields{"error": err, "object": hit.Source}).Error("Error unmarshalling the feed entry object(s)")
-				return nil, 0, err
-			}
-			entries = append(entries, entry)
-		}
-		return entries, searchResult.Hits.TotalHits, nil
-	} else {
-		return entries, 0, nil
+	if !exists {
+		panic(fmt.Sprintf("index %q is missing in Elasticsearch", IndexNameFeeds))
 	}
+
+	var mainQuery = newBoolQueryFromFilters(query.Filters)
+
+	rangeQuery, ok := newRangeQueryTime(query.Start, query.End, PublishedTimestampField)
+	if ok {
+		mainQuery = mainQuery.Must(rangeQuery)
+	}
+
+	searchService := efs.client.Search().
+		Query(mainQuery).
+		Index(IndexNameFeeds).
+		Size(query.Size).
+		Sort(PublishedTimestampField, query.Ascending).
+		Sort(FeedEntryID, query.Ascending)
+
+	if query.CursorDate.Unix() != 0 && query.CursorID != "" {
+		milliseconds := query.CursorDate.UnixNano() / int64(time.Millisecond)
+		searchService = searchService.SearchAfter(milliseconds, query.CursorID) // the date has to be in milliseconds
+	}
+
+	searchResult, err := searchService.Do(context.Background())
+	if err != nil {
+		logrus.WithFields(logrus.Fields{"error": err}).Error("Error retrieving feed entries")
+		return nil, 0, err
+	}
+
+	entries := make([]*util.FeedEntry, 0, len(searchResult.Hits.Hits))
+	for _, hit := range searchResult.Hits.Hits {
+		entry := new(util.FeedEntry)
+		if err := json.Unmarshal(*hit.Source, entry); err != nil {
+			logrus.WithFields(logrus.Fields{"error": err, "object": hit.Source}).Error("Error unmarshalling the feed entry object(s)")
+			return nil, 0, err
+		}
+		entries = append(entries, entry)
+	}
+
+	return entries, searchResult.Hits.TotalHits, nil
 }
 
-func (efs ElasticFeedStore) GetFeedSummary(q *util.FeedSummaryQuery) (map[string]int64, error) {
+func (efs ElasticFeedStore) GetFeedSummary(query *util.FeedSummaryQuery) (map[string]int64, error) {
 	exists, err := efs.indexExists(IndexNameFeeds)
 	if err != nil {
 		logrus.WithError(err).Warn("Could not get feed summary; error determining whether or not Elasticsearch index exists")
 		return nil, err
 	}
-
-	if exists {
-		if q.CountsCategory == "event-type" {
-			q.CountsCategory = "object_object_type"
-		} else if q.CountsCategory == "task" {
-			q.CountsCategory = "verb"
-		} else {
-			logrus.Warnf("Could not get feed summary; unsupported counts category '%s'", q.CountsCategory)
-			return nil, feedErrors.NewBackendError("Could not get feed summary; unsupported counts category '%s'", q.CountsCategory)
-		}
-
-		counts, err := efs.getCounts(q)
-		if err != nil {
-			logrus.WithError(err).Warn("Could not get feed summary; Elasticsearch query error.")
-			return nil, err
-		}
-
-		return counts, nil
+	if !exists {
+		panic(fmt.Sprintf("index %q is missing in Elasticsearch", IndexNameFeeds))
 	}
 
-	logrus.Info("No feed index found... no feed entries have been created yet. Returning empty result set.")
-	return make(map[string]int64), nil
+	counts, err := efs.getCounts(query)
+	if err != nil {
+		logrus.WithError(err).Warn("Could not get feed summary; Elasticsearch query error.")
+		return nil, err
+	}
+
+	return counts, nil
 }
 
-func (efs ElasticFeedStore) getCounts(q *util.FeedSummaryQuery) (map[string]int64, error) {
+func (efs ElasticFeedStore) getCounts(query *util.FeedSummaryQuery) (map[string]int64, error) {
 	// E.g.,
 	// scanjobs: 57
 	// profile:  66
 	counts := map[string]int64{}
 
-	filters, err := util.FormatFilters(q.Filters)
-	if err != nil {
-		return nil, err
-	}
-
-	mainQuery := newBoolQueryFromFilters(filters)
-	rangeQuery, ok := newRangeQueryTime(q.Start, q.End, PublishedTimestampField)
-
-	logrus.WithFields(logrus.Fields{
-		"start":       q.Start,
-		"end":         q.End,
-		"range query": rangeQuery,
-	}).Info("range query string")
+	mainQuery := newBoolQueryFromFilters(query.Filters)
+	rangeQuery, ok := newRangeQueryTime(query.Start, query.End, PublishedTimestampField)
 
 	if ok {
 		mainQuery = mainQuery.Must(rangeQuery)
 	}
 
-	buckets, err := efs.getAggregationBucket(mainQuery, IndexNameFeeds, q.CountsCategory)
+	buckets, err := efs.getAggregationBucket(mainQuery, IndexNameFeeds, query.CountsCategory)
 
 	// Return an error if the search was not successful
 	if err != nil {
@@ -267,26 +232,27 @@ func (efs ElasticFeedStore) getCounts(q *util.FeedSummaryQuery) (map[string]int6
 
 func newBoolQueryFromFilters(filters map[string][]string) *olivere.BoolQuery {
 	boolQuery := olivere.NewBoolQuery()
-	field := "tags" // all filter terms are in the "tags" field
 
-	for _, values := range filters {
-		if len(values) > 0 {
-			if len(values) > 1 {
-				// if the same key is associated with multiple values, construct an OR query (terms query)
-				termsQuery := olivere.NewTermsQuery(field, util.StringArrayToInterfaceArray(values)...)
-				boolQuery = boolQuery.Must(termsQuery)
-			} else {
-				// if there's only one value, construct an AND query (one MUST with multiple values for "tags"), e.g.:
-				// "must":[
-				//    {"term":{"tags":"org_1"},
-				//	  {"term":{"tags":"org_2"}
-				//  ]
-				value := values[0]
-				boolQuery.Must(olivere.NewTermQuery(field, value))
-			}
+	for field, values := range filters {
+		if len(values) == 0 {
+			continue
 		}
+		filterQuery := olivere.NewBoolQuery().Should(
+			olivere.NewTermsQuery(field, stringArrayToInterfaceArray(values)...))
+
+		boolQuery = boolQuery.Filter(filterQuery)
 	}
+
 	return boolQuery
+}
+
+// stringArrayToInterfaceArray Converts an array of strings into an array of interfaces
+func stringArrayToInterfaceArray(array []string) []interface{} {
+	interfaceArray := make([]interface{}, len(array))
+	for i, v := range array {
+		interfaceArray[i] = v
+	}
+	return interfaceArray
 }
 
 // newRangeQuery Creates an `elastic.RangeQuery` from
@@ -426,7 +392,7 @@ func (efs *ElasticFeedStore) indexExists(name string) (bool, error) {
 		return false, err
 	}
 	if !exists {
-		logrus.Infof("No index %s found... no feed entries have been created yet.", name)
+		logrus.Warnf("No index %s found... no feed entries have been created yet.", name)
 		return false, nil
 	}
 	return true, nil

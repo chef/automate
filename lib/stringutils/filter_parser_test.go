@@ -1,21 +1,42 @@
-package params_test
+package stringutils_test
 
 import (
 	"fmt"
 	"testing"
 
-	subject "github.com/chef/automate/components/applications-service/pkg/params"
 	"github.com/stretchr/testify/assert"
+
+	subject "github.com/chef/automate/lib/stringutils"
 )
 
 func TestFormatFiltersEmptyArray(t *testing.T) {
-	var (
-		empty    = make([]string, 0)
-		expected = make(map[string][]string, 0)
-	)
+	empty := make([]string, 0)
+	expected := make(map[string][]string, 0)
 	filters, err := subject.FormatFilters(empty)
 	assert.Nil(t, err)
 	assert.Equal(t, expected, filters)
+}
+
+func TestFormatFiltersWrongFilters(t *testing.T) {
+	cases := []struct {
+		filters []string
+	}{
+		{[]string{"platform=centos"}},
+		{[]string{"wrong"}},
+		{[]string{":success"}},
+		{[]string{"platform:"}},
+		{[]string{"platform:foo:bar"}},
+		{[]string{"platform:%20"}}, // space
+		{[]string{"platform:%09"}}, // tab
+		{[]string{"platform:%0A"}}, // new line
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("with filter(s) %v it should return an error", test.filters), func(t *testing.T) {
+			_, err := subject.FormatFilters(test.filters)
+			assert.Error(t, err)
+		})
+	}
 }
 
 func TestFormatFiltersMatrixOfFilters(t *testing.T) {
@@ -84,32 +105,6 @@ func TestFormatFiltersMatrixOfFilters(t *testing.T) {
 			filters, err := subject.FormatFilters(test.filters)
 			assert.Nil(t, err)
 			assert.Equal(t, test.expected, filters)
-		})
-	}
-}
-
-func TestFormatFiltersWrongFilters(t *testing.T) {
-	cases := []struct {
-		filters []string
-	}{
-		{[]string{"platform=centos"}},
-		{[]string{"wrong"}},
-		{[]string{":success"}},
-		{[]string{"platform:"}},
-		{[]string{"platform:foo:bar"}},
-		{[]string{"platform:%20"}}, // space
-		{[]string{"platform:%09"}}, // tab
-		{[]string{"platform:%0A"}}, // new line
-	}
-
-	for _, test := range cases {
-		t.Run(fmt.Sprintf("with filter(s) %v it should return an error", test.filters), func(t *testing.T) {
-			filters, err := subject.FormatFilters(test.filters)
-
-			assert.NotNil(t, err)
-			assert.Contains(t, err.Error(), "Invalid filter")
-			assert.Contains(t, err.Error(), "format: key:value")
-			assert.Nil(t, filters)
 		})
 	}
 }
