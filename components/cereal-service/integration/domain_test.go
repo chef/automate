@@ -238,6 +238,8 @@ func TestDomains(t *testing.T) {
 		domain2Evt, workflowCompleter2, err = grpcBackendDomain2.DequeueWorkflow(ctx, []string{workflowName})
 		require.NoError(t, err)
 		validateInstanceMatches(t, &domain2Evt.Instance, workflowName, instanceName, domain2Params)
+		require.NotNil(t, domain2Evt.TaskResult)
+		require.Equal(t, taskName, domain2Evt.TaskResult.TaskName)
 		require.Equal(t, domain2TaskParams, domain2Evt.TaskResult.Parameters)
 		err = workflowCompleter2.Done(nil)
 		require.NoError(t, err)
