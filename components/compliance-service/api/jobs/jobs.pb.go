@@ -12,6 +12,8 @@ import (
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -897,6 +899,35 @@ type JobsServiceServer interface {
 	Rerun(context.Context, *Id) (*RerunResponse, error)
 	ListInitiatedScans(context.Context, *TimeQuery) (*Ids, error)
 	GetJobResultByNodeId(context.Context, *GetJobResultByNodeIdRequest) (*ResultsRow, error)
+}
+
+// UnimplementedJobsServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedJobsServiceServer struct {
+}
+
+func (*UnimplementedJobsServiceServer) Create(ctx context.Context, req *Job) (*Id, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
+func (*UnimplementedJobsServiceServer) Read(ctx context.Context, req *Id) (*Job, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Read not implemented")
+}
+func (*UnimplementedJobsServiceServer) Update(ctx context.Context, req *Job) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
+}
+func (*UnimplementedJobsServiceServer) Delete(ctx context.Context, req *Id) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (*UnimplementedJobsServiceServer) List(ctx context.Context, req *Query) (*Jobs, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (*UnimplementedJobsServiceServer) Rerun(ctx context.Context, req *Id) (*RerunResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Rerun not implemented")
+}
+func (*UnimplementedJobsServiceServer) ListInitiatedScans(ctx context.Context, req *TimeQuery) (*Ids, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListInitiatedScans not implemented")
+}
+func (*UnimplementedJobsServiceServer) GetJobResultByNodeId(ctx context.Context, req *GetJobResultByNodeIdRequest) (*ResultsRow, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetJobResultByNodeId not implemented")
 }
 
 func RegisterJobsServiceServer(s *grpc.Server, srv JobsServiceServer) {

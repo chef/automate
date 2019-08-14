@@ -10,6 +10,8 @@ import (
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -836,6 +838,23 @@ type EventServiceServer interface {
 	Subscribe(context.Context, *SubscribeRequest) (*SubscribeResponse, error)
 	Start(context.Context, *StartRequest) (*StartResponse, error)
 	Stop(context.Context, *StopRequest) (*StopResponse, error)
+}
+
+// UnimplementedEventServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedEventServiceServer struct {
+}
+
+func (*UnimplementedEventServiceServer) Publish(ctx context.Context, req *PublishRequest) (*PublishResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Publish not implemented")
+}
+func (*UnimplementedEventServiceServer) Subscribe(ctx context.Context, req *SubscribeRequest) (*SubscribeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Subscribe not implemented")
+}
+func (*UnimplementedEventServiceServer) Start(ctx context.Context, req *StartRequest) (*StartResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Start not implemented")
+}
+func (*UnimplementedEventServiceServer) Stop(ctx context.Context, req *StopRequest) (*StopResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Stop not implemented")
 }
 
 func RegisterEventServiceServer(s *grpc.Server, srv EventServiceServer) {

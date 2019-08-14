@@ -13,6 +13,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -131,6 +133,23 @@ type EventFeedServer interface {
 	GetEventTypeCounts(context.Context, *request.EventCountsFilter) (*response.EventCounts, error)
 	GetEventTaskCounts(context.Context, *request.EventCountsFilter) (*response.EventCounts, error)
 	GetEventStringBuckets(context.Context, *request.EventStrings) (*response.EventStrings, error)
+}
+
+// UnimplementedEventFeedServer can be embedded to have forward compatible implementations.
+type UnimplementedEventFeedServer struct {
+}
+
+func (*UnimplementedEventFeedServer) GetEventFeed(ctx context.Context, req *request.EventFilter) (*response.Events, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetEventFeed not implemented")
+}
+func (*UnimplementedEventFeedServer) GetEventTypeCounts(ctx context.Context, req *request.EventCountsFilter) (*response.EventCounts, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetEventTypeCounts not implemented")
+}
+func (*UnimplementedEventFeedServer) GetEventTaskCounts(ctx context.Context, req *request.EventCountsFilter) (*response.EventCounts, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetEventTaskCounts not implemented")
+}
+func (*UnimplementedEventFeedServer) GetEventStringBuckets(ctx context.Context, req *request.EventStrings) (*response.EventStrings, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetEventStringBuckets not implemented")
 }
 
 func RegisterEventFeedServer(s *grpc.Server, srv EventFeedServer) {

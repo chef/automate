@@ -13,6 +13,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -159,6 +161,29 @@ type UsersServer interface {
 	DeleteUser(context.Context, *request.DeleteUserReq) (*response.DeleteUserResp, error)
 	UpdateUser(context.Context, *request.UpdateUserReq) (*response.UpdateUserResp, error)
 	UpdateSelf(context.Context, *request.UpdateSelfReq) (*response.UpdateSelfResp, error)
+}
+
+// UnimplementedUsersServer can be embedded to have forward compatible implementations.
+type UnimplementedUsersServer struct {
+}
+
+func (*UnimplementedUsersServer) CreateUser(ctx context.Context, req *request.CreateUserReq) (*response.CreateUserResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
+}
+func (*UnimplementedUsersServer) ListUsers(ctx context.Context, req *request.ListUsersReq) (*response.ListUsersResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListUsers not implemented")
+}
+func (*UnimplementedUsersServer) GetUser(ctx context.Context, req *request.GetUserReq) (*response.GetUserResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
+}
+func (*UnimplementedUsersServer) DeleteUser(ctx context.Context, req *request.DeleteUserReq) (*response.DeleteUserResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
+}
+func (*UnimplementedUsersServer) UpdateUser(ctx context.Context, req *request.UpdateUserReq) (*response.UpdateUserResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
+}
+func (*UnimplementedUsersServer) UpdateSelf(ctx context.Context, req *request.UpdateSelfReq) (*response.UpdateSelfResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateSelf not implemented")
 }
 
 func RegisterUsersServer(s *grpc.Server, srv UsersServer) {

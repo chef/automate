@@ -10,6 +10,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -190,6 +192,17 @@ func (c *eventHandlerClient) ProjectUpdateStatus(ctx context.Context, in *Projec
 type EventHandlerServer interface {
 	HandleEvent(context.Context, *event.EventMsg) (*event.EventResponse, error)
 	ProjectUpdateStatus(context.Context, *ProjectUpdateStatusReq) (*ProjectUpdateStatusResp, error)
+}
+
+// UnimplementedEventHandlerServer can be embedded to have forward compatible implementations.
+type UnimplementedEventHandlerServer struct {
+}
+
+func (*UnimplementedEventHandlerServer) HandleEvent(ctx context.Context, req *event.EventMsg) (*event.EventResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HandleEvent not implemented")
+}
+func (*UnimplementedEventHandlerServer) ProjectUpdateStatus(ctx context.Context, req *ProjectUpdateStatusReq) (*ProjectUpdateStatusResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ProjectUpdateStatus not implemented")
 }
 
 func RegisterEventHandlerServer(s *grpc.Server, srv EventHandlerServer) {

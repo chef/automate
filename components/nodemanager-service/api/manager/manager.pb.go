@@ -13,6 +13,8 @@ import (
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -1407,6 +1409,59 @@ type NodeManagerServiceServer interface {
 	ChangeNodeState(context.Context, *NodeState) (*ChangeNodeStateResponse, error)
 	GetNodeWithSecrets(context.Context, *Id) (*nodes.Node, error)
 	SearchManagerNodes(context.Context, *NodeQuery) (*ManagerNodes, error)
+}
+
+// UnimplementedNodeManagerServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedNodeManagerServiceServer struct {
+}
+
+func (*UnimplementedNodeManagerServiceServer) Create(ctx context.Context, req *NodeManager) (*Ids, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) Read(ctx context.Context, req *Id) (*NodeManager, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Read not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) Update(ctx context.Context, req *NodeManager) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) Delete(ctx context.Context, req *Id) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) DeleteWithNodes(ctx context.Context, req *Id) (*Ids, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteWithNodes not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) DeleteWithNodeStateStopped(ctx context.Context, req *Id) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteWithNodeStateStopped not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) DeleteWithNodeStateTerminated(ctx context.Context, req *Id) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteWithNodeStateTerminated not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) List(ctx context.Context, req *Query) (*NodeManagers, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) Connect(ctx context.Context, req *NodeManager) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Connect not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) ConnectManager(ctx context.Context, req *Id) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConnectManager not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) SearchNodeFields(ctx context.Context, req *FieldQuery) (*Fields, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchNodeFields not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) SearchNodes(ctx context.Context, req *NodeQuery) (*Nodes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchNodes not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) ProcessNode(ctx context.Context, req *NodeMetadata) (*ProcessNodeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ProcessNode not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) ChangeNodeState(ctx context.Context, req *NodeState) (*ChangeNodeStateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ChangeNodeState not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) GetNodeWithSecrets(ctx context.Context, req *Id) (*nodes.Node, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNodeWithSecrets not implemented")
+}
+func (*UnimplementedNodeManagerServiceServer) SearchManagerNodes(ctx context.Context, req *NodeQuery) (*ManagerNodes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchManagerNodes not implemented")
 }
 
 func RegisterNodeManagerServiceServer(s *grpc.Server, srv NodeManagerServiceServer) {

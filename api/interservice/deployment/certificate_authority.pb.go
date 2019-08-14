@@ -8,6 +8,8 @@ import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -231,6 +233,17 @@ func (c *certificateAuthorityClient) RegenerateRoot(ctx context.Context, in *Reg
 type CertificateAuthorityServer interface {
 	GetRootCert(context.Context, *RootCertRequest) (*RootCertResponse, error)
 	RegenerateRoot(context.Context, *RegenerateRootRequest) (*RegenerateRootResponse, error)
+}
+
+// UnimplementedCertificateAuthorityServer can be embedded to have forward compatible implementations.
+type UnimplementedCertificateAuthorityServer struct {
+}
+
+func (*UnimplementedCertificateAuthorityServer) GetRootCert(ctx context.Context, req *RootCertRequest) (*RootCertResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRootCert not implemented")
+}
+func (*UnimplementedCertificateAuthorityServer) RegenerateRoot(ctx context.Context, req *RegenerateRootRequest) (*RegenerateRootResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegenerateRoot not implemented")
 }
 
 func RegisterCertificateAuthorityServer(s *grpc.Server, srv CertificateAuthorityServer) {

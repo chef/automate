@@ -13,6 +13,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -399,6 +401,80 @@ type PoliciesServer interface {
 	UpgradeToV2(context.Context, *request.UpgradeToV2Req) (*response.UpgradeToV2Resp, error)
 	ResetToV1(context.Context, *request.ResetToV1Req) (*response.ResetToV1Resp, error)
 	IntrospectAllProjects(context.Context, *request.ListProjectsReq) (*response.ListProjectsResp, error)
+}
+
+// UnimplementedPoliciesServer can be embedded to have forward compatible implementations.
+type UnimplementedPoliciesServer struct {
+}
+
+func (*UnimplementedPoliciesServer) CreatePolicy(ctx context.Context, req *request.CreatePolicyReq) (*response.CreatePolicyResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePolicy not implemented")
+}
+func (*UnimplementedPoliciesServer) GetPolicy(ctx context.Context, req *request.GetPolicyReq) (*response.GetPolicyResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPolicy not implemented")
+}
+func (*UnimplementedPoliciesServer) ListPolicies(ctx context.Context, req *request.ListPoliciesReq) (*response.ListPoliciesResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListPolicies not implemented")
+}
+func (*UnimplementedPoliciesServer) DeletePolicy(ctx context.Context, req *request.DeletePolicyReq) (*response.DeletePolicyResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeletePolicy not implemented")
+}
+func (*UnimplementedPoliciesServer) UpdatePolicy(ctx context.Context, req *request.UpdatePolicyReq) (*response.UpdatePolicyResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdatePolicy not implemented")
+}
+func (*UnimplementedPoliciesServer) GetPolicyVersion(ctx context.Context, req *request.GetPolicyVersionReq) (*response.GetPolicyVersionResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPolicyVersion not implemented")
+}
+func (*UnimplementedPoliciesServer) ListPolicyMembers(ctx context.Context, req *request.ListPolicyMembersReq) (*response.ListPolicyMembersResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListPolicyMembers not implemented")
+}
+func (*UnimplementedPoliciesServer) ReplacePolicyMembers(ctx context.Context, req *request.ReplacePolicyMembersReq) (*response.ReplacePolicyMembersResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReplacePolicyMembers not implemented")
+}
+func (*UnimplementedPoliciesServer) RemovePolicyMembers(ctx context.Context, req *request.RemovePolicyMembersReq) (*response.RemovePolicyMembersResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemovePolicyMembers not implemented")
+}
+func (*UnimplementedPoliciesServer) AddPolicyMembers(ctx context.Context, req *request.AddPolicyMembersReq) (*response.AddPolicyMembersResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddPolicyMembers not implemented")
+}
+func (*UnimplementedPoliciesServer) CreateRole(ctx context.Context, req *request.CreateRoleReq) (*response.CreateRoleResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateRole not implemented")
+}
+func (*UnimplementedPoliciesServer) ListRoles(ctx context.Context, req *request.ListRolesReq) (*response.ListRolesResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListRoles not implemented")
+}
+func (*UnimplementedPoliciesServer) GetRole(ctx context.Context, req *request.GetRoleReq) (*response.GetRoleResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRole not implemented")
+}
+func (*UnimplementedPoliciesServer) DeleteRole(ctx context.Context, req *request.DeleteRoleReq) (*response.DeleteRoleResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteRole not implemented")
+}
+func (*UnimplementedPoliciesServer) UpdateRole(ctx context.Context, req *request.UpdateRoleReq) (*response.UpdateRoleResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateRole not implemented")
+}
+func (*UnimplementedPoliciesServer) CreateProject(ctx context.Context, req *request.CreateProjectReq) (*response.CreateProjectResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateProject not implemented")
+}
+func (*UnimplementedPoliciesServer) UpdateProject(ctx context.Context, req *request.UpdateProjectReq) (*response.UpdateProjectResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateProject not implemented")
+}
+func (*UnimplementedPoliciesServer) GetProject(ctx context.Context, req *request.GetProjectReq) (*response.GetProjectResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProject not implemented")
+}
+func (*UnimplementedPoliciesServer) ListProjects(ctx context.Context, req *request.ListProjectsReq) (*response.ListProjectsResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListProjects not implemented")
+}
+func (*UnimplementedPoliciesServer) DeleteProject(ctx context.Context, req *request.DeleteProjectReq) (*response.DeleteProjectResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteProject not implemented")
+}
+func (*UnimplementedPoliciesServer) UpgradeToV2(ctx context.Context, req *request.UpgradeToV2Req) (*response.UpgradeToV2Resp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpgradeToV2 not implemented")
+}
+func (*UnimplementedPoliciesServer) ResetToV1(ctx context.Context, req *request.ResetToV1Req) (*response.ResetToV1Resp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResetToV1 not implemented")
+}
+func (*UnimplementedPoliciesServer) IntrospectAllProjects(ctx context.Context, req *request.ListProjectsReq) (*response.ListProjectsResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IntrospectAllProjects not implemented")
 }
 
 func RegisterPoliciesServer(s *grpc.Server, srv PoliciesServer) {

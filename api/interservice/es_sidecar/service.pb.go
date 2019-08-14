@@ -9,6 +9,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -1171,6 +1173,44 @@ type EsSidecarServer interface {
 	RestoreSnapshotStatus(context.Context, *RestoreSnapshotStatusRequest) (*RestoreSnapshotStatusResponse, error)
 	DeleteSnapshot(context.Context, *DeleteSnapshotRequest) (*DeleteSnapshotResponse, error)
 	Version(context.Context, *empty.Empty) (*VersionResponse, error)
+}
+
+// UnimplementedEsSidecarServer can be embedded to have forward compatible implementations.
+type UnimplementedEsSidecarServer struct {
+}
+
+func (*UnimplementedEsSidecarServer) PurgeTimeSeriesIndicesByAge(ctx context.Context, req *PurgeRequest) (*PurgeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PurgeTimeSeriesIndicesByAge not implemented")
+}
+func (*UnimplementedEsSidecarServer) PurgeDocumentsFromIndexByAge(ctx context.Context, req *PurgeRequest) (*PurgeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PurgeDocumentsFromIndexByAge not implemented")
+}
+func (*UnimplementedEsSidecarServer) CreateRepository(ctx context.Context, req *CreateRepositoryRequest) (*CreateRepositoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateRepository not implemented")
+}
+func (*UnimplementedEsSidecarServer) ConvergeRepositorySettings(ctx context.Context, req *ConvergeRepositorySettingsRequest) (*ConvergeRepositorySettingsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConvergeRepositorySettings not implemented")
+}
+func (*UnimplementedEsSidecarServer) RemoveRepository(ctx context.Context, req *RemoveRepositoryRequest) (*RemoveRepositoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveRepository not implemented")
+}
+func (*UnimplementedEsSidecarServer) CreateSnapshot(ctx context.Context, req *CreateSnapshotRequest) (*CreateSnapshotResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateSnapshot not implemented")
+}
+func (*UnimplementedEsSidecarServer) CreateSnapshotStatus(ctx context.Context, req *CreateSnapshotStatusRequest) (*CreateSnapshotStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateSnapshotStatus not implemented")
+}
+func (*UnimplementedEsSidecarServer) RestoreSnapshot(ctx context.Context, req *RestoreSnapshotRequest) (*RestoreSnapshotResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RestoreSnapshot not implemented")
+}
+func (*UnimplementedEsSidecarServer) RestoreSnapshotStatus(ctx context.Context, req *RestoreSnapshotStatusRequest) (*RestoreSnapshotStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RestoreSnapshotStatus not implemented")
+}
+func (*UnimplementedEsSidecarServer) DeleteSnapshot(ctx context.Context, req *DeleteSnapshotRequest) (*DeleteSnapshotResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteSnapshot not implemented")
+}
+func (*UnimplementedEsSidecarServer) Version(ctx context.Context, req *empty.Empty) (*VersionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
 }
 
 func RegisterEsSidecarServer(s *grpc.Server, srv EsSidecarServer) {

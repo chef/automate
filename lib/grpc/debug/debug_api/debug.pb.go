@@ -11,6 +11,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	duration "github.com/golang/protobuf/ptypes/duration"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -521,6 +523,23 @@ type DebugServer interface {
 	Profile(*ProfileRequest, Debug_ProfileServer) error
 	SetLogLevel(context.Context, *SetLogLevelRequest) (*SetLogLevelResponse, error)
 	GetVersion(context.Context, *VersionRequest) (*VersionResponse, error)
+}
+
+// UnimplementedDebugServer can be embedded to have forward compatible implementations.
+type UnimplementedDebugServer struct {
+}
+
+func (*UnimplementedDebugServer) Trace(req *TraceRequest, srv Debug_TraceServer) error {
+	return status.Errorf(codes.Unimplemented, "method Trace not implemented")
+}
+func (*UnimplementedDebugServer) Profile(req *ProfileRequest, srv Debug_ProfileServer) error {
+	return status.Errorf(codes.Unimplemented, "method Profile not implemented")
+}
+func (*UnimplementedDebugServer) SetLogLevel(ctx context.Context, req *SetLogLevelRequest) (*SetLogLevelResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetLogLevel not implemented")
+}
+func (*UnimplementedDebugServer) GetVersion(ctx context.Context, req *VersionRequest) (*VersionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetVersion not implemented")
 }
 
 func RegisterDebugServer(s *grpc.Server, srv DebugServer) {

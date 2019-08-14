@@ -13,6 +13,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -189,6 +191,35 @@ type UsersMgmtServer interface {
 	// deprecated API
 	GetUser(context.Context, *request.Email) (*response.User, error)
 	DeleteUser(context.Context, *request.Email) (*response.DeleteUserResp, error)
+}
+
+// UnimplementedUsersMgmtServer can be embedded to have forward compatible implementations.
+type UnimplementedUsersMgmtServer struct {
+}
+
+func (*UnimplementedUsersMgmtServer) GetUsers(ctx context.Context, req *request.GetUsersReq) (*response.Users, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUsers not implemented")
+}
+func (*UnimplementedUsersMgmtServer) GetUserByUsername(ctx context.Context, req *request.Username) (*response.User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserByUsername not implemented")
+}
+func (*UnimplementedUsersMgmtServer) CreateUser(ctx context.Context, req *request.CreateUser) (*response.User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
+}
+func (*UnimplementedUsersMgmtServer) DeleteUserByUsername(ctx context.Context, req *request.Username) (*response.DeleteUserResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteUserByUsername not implemented")
+}
+func (*UnimplementedUsersMgmtServer) UpdateUser(ctx context.Context, req *request.UpdateUser) (*response.User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
+}
+func (*UnimplementedUsersMgmtServer) UpdateSelf(ctx context.Context, req *request.UpdateSelf) (*response.User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateSelf not implemented")
+}
+func (*UnimplementedUsersMgmtServer) GetUser(ctx context.Context, req *request.Email) (*response.User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
+}
+func (*UnimplementedUsersMgmtServer) DeleteUser(ctx context.Context, req *request.Email) (*response.DeleteUserResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
 }
 
 func RegisterUsersMgmtServer(s *grpc.Server, srv UsersMgmtServer) {

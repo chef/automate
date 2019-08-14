@@ -9,6 +9,8 @@ import (
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -2009,6 +2011,65 @@ type PoliciesServer interface {
 	RemovePolicyMembers(context.Context, *RemovePolicyMembersReq) (*RemovePolicyMembersResp, error)
 	AddPolicyMembers(context.Context, *AddPolicyMembersReq) (*AddPolicyMembersResp, error)
 	PurgeSubjectFromPolicies(context.Context, *PurgeSubjectFromPoliciesReq) (*PurgeSubjectFromPoliciesResp, error)
+}
+
+// UnimplementedPoliciesServer can be embedded to have forward compatible implementations.
+type UnimplementedPoliciesServer struct {
+}
+
+func (*UnimplementedPoliciesServer) ReplacePolicyMembers(ctx context.Context, req *ReplacePolicyMembersReq) (*ReplacePolicyMembersResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReplacePolicyMembers not implemented")
+}
+func (*UnimplementedPoliciesServer) CreatePolicy(ctx context.Context, req *CreatePolicyReq) (*Policy, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePolicy not implemented")
+}
+func (*UnimplementedPoliciesServer) DeletePolicy(ctx context.Context, req *DeletePolicyReq) (*DeletePolicyResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeletePolicy not implemented")
+}
+func (*UnimplementedPoliciesServer) ListPolicies(ctx context.Context, req *ListPoliciesReq) (*ListPoliciesResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListPolicies not implemented")
+}
+func (*UnimplementedPoliciesServer) GetPolicy(ctx context.Context, req *GetPolicyReq) (*Policy, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPolicy not implemented")
+}
+func (*UnimplementedPoliciesServer) UpdatePolicy(ctx context.Context, req *UpdatePolicyReq) (*Policy, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdatePolicy not implemented")
+}
+func (*UnimplementedPoliciesServer) MigrateToV2(ctx context.Context, req *MigrateToV2Req) (*MigrateToV2Resp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MigrateToV2 not implemented")
+}
+func (*UnimplementedPoliciesServer) GetPolicyVersion(ctx context.Context, req *GetPolicyVersionReq) (*GetPolicyVersionResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPolicyVersion not implemented")
+}
+func (*UnimplementedPoliciesServer) ResetToV1(ctx context.Context, req *ResetToV1Req) (*ResetToV1Resp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResetToV1 not implemented")
+}
+func (*UnimplementedPoliciesServer) CreateRole(ctx context.Context, req *CreateRoleReq) (*Role, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateRole not implemented")
+}
+func (*UnimplementedPoliciesServer) ListRoles(ctx context.Context, req *ListRolesReq) (*ListRolesResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListRoles not implemented")
+}
+func (*UnimplementedPoliciesServer) GetRole(ctx context.Context, req *GetRoleReq) (*Role, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRole not implemented")
+}
+func (*UnimplementedPoliciesServer) DeleteRole(ctx context.Context, req *DeleteRoleReq) (*DeleteRoleResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteRole not implemented")
+}
+func (*UnimplementedPoliciesServer) UpdateRole(ctx context.Context, req *UpdateRoleReq) (*Role, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateRole not implemented")
+}
+func (*UnimplementedPoliciesServer) ListPolicyMembers(ctx context.Context, req *ListPolicyMembersReq) (*ListPolicyMembersResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListPolicyMembers not implemented")
+}
+func (*UnimplementedPoliciesServer) RemovePolicyMembers(ctx context.Context, req *RemovePolicyMembersReq) (*RemovePolicyMembersResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemovePolicyMembers not implemented")
+}
+func (*UnimplementedPoliciesServer) AddPolicyMembers(ctx context.Context, req *AddPolicyMembersReq) (*AddPolicyMembersResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddPolicyMembers not implemented")
+}
+func (*UnimplementedPoliciesServer) PurgeSubjectFromPolicies(ctx context.Context, req *PurgeSubjectFromPoliciesReq) (*PurgeSubjectFromPoliciesResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PurgeSubjectFromPolicies not implemented")
 }
 
 func RegisterPoliciesServer(s *grpc.Server, srv PoliciesServer) {

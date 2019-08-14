@@ -12,6 +12,8 @@ import (
 	empty "github.com/golang/protobuf/ptypes/empty"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -231,6 +233,17 @@ func (c *gatewayClient) GetHealth(ctx context.Context, in *empty.Empty, opts ...
 type GatewayServer interface {
 	GetVersion(context.Context, *empty.Empty) (*Version, error)
 	GetHealth(context.Context, *empty.Empty) (*Health, error)
+}
+
+// UnimplementedGatewayServer can be embedded to have forward compatible implementations.
+type UnimplementedGatewayServer struct {
+}
+
+func (*UnimplementedGatewayServer) GetVersion(ctx context.Context, req *empty.Empty) (*Version, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetVersion not implemented")
+}
+func (*UnimplementedGatewayServer) GetHealth(ctx context.Context, req *empty.Empty) (*Health, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetHealth not implemented")
 }
 
 func RegisterGatewayServer(s *grpc.Server, srv GatewayServer) {

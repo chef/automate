@@ -10,6 +10,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -1074,6 +1076,23 @@ type EventFeedServiceServer interface {
 	GetFeedSummary(context.Context, *FeedSummaryRequest) (*FeedSummaryResponse, error)
 	GetFeedTimeline(context.Context, *FeedTimelineRequest) (*FeedTimelineResponse, error)
 	HandleEvent(context.Context, *event.EventMsg) (*event.EventResponse, error)
+}
+
+// UnimplementedEventFeedServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedEventFeedServiceServer struct {
+}
+
+func (*UnimplementedEventFeedServiceServer) GetFeed(ctx context.Context, req *FeedRequest) (*FeedResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFeed not implemented")
+}
+func (*UnimplementedEventFeedServiceServer) GetFeedSummary(ctx context.Context, req *FeedSummaryRequest) (*FeedSummaryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFeedSummary not implemented")
+}
+func (*UnimplementedEventFeedServiceServer) GetFeedTimeline(ctx context.Context, req *FeedTimelineRequest) (*FeedTimelineResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFeedTimeline not implemented")
+}
+func (*UnimplementedEventFeedServiceServer) HandleEvent(ctx context.Context, req *event.EventMsg) (*event.EventResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HandleEvent not implemented")
 }
 
 func RegisterEventFeedServiceServer(s *grpc.Server, srv EventFeedServiceServer) {

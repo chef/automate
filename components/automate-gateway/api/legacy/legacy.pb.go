@@ -12,6 +12,8 @@ import (
 	empty "github.com/golang/protobuf/ptypes/empty"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -145,6 +147,14 @@ type LegacyDataCollectorServer interface {
 	// Since this is for legacy-support only, we don't bother much about having
 	// google.protobuf.Empty as argument.
 	Status(context.Context, *empty.Empty) (*StatusResponse, error)
+}
+
+// UnimplementedLegacyDataCollectorServer can be embedded to have forward compatible implementations.
+type UnimplementedLegacyDataCollectorServer struct {
+}
+
+func (*UnimplementedLegacyDataCollectorServer) Status(ctx context.Context, req *empty.Empty) (*StatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Status not implemented")
 }
 
 func RegisterLegacyDataCollectorServer(s *grpc.Server, srv LegacyDataCollectorServer) {

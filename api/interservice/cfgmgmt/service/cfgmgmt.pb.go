@@ -11,6 +11,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -320,6 +322,65 @@ type CfgMgmtServer interface {
 	GetEventStringBuckets(context.Context, *request.EventStrings) (*response.EventStrings, error)
 	GetInventoryNodes(context.Context, *request.InventoryNodes) (*response.InventoryNodes, error)
 	NodeExport(*request.NodeExport, CfgMgmt_NodeExportServer) error
+}
+
+// UnimplementedCfgMgmtServer can be embedded to have forward compatible implementations.
+type UnimplementedCfgMgmtServer struct {
+}
+
+func (*UnimplementedCfgMgmtServer) GetVersion(ctx context.Context, req *request.VersionInfo) (*response.VersionInfo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetVersion not implemented")
+}
+func (*UnimplementedCfgMgmtServer) GetHealth(ctx context.Context, req *request.Health) (*response.Health, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetHealth not implemented")
+}
+func (*UnimplementedCfgMgmtServer) GetNodesCounts(ctx context.Context, req *request.NodesCounts) (*response.NodesCounts, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNodesCounts not implemented")
+}
+func (*UnimplementedCfgMgmtServer) GetRunsCounts(ctx context.Context, req *request.RunsCounts) (*response.RunsCounts, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRunsCounts not implemented")
+}
+func (*UnimplementedCfgMgmtServer) GetNodeRun(ctx context.Context, req *request.NodeRun) (*response.Run, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNodeRun not implemented")
+}
+func (*UnimplementedCfgMgmtServer) GetNodes(ctx context.Context, req *request.Nodes) (*_struct.ListValue, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNodes not implemented")
+}
+func (*UnimplementedCfgMgmtServer) GetRuns(ctx context.Context, req *request.Runs) (*_struct.ListValue, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRuns not implemented")
+}
+func (*UnimplementedCfgMgmtServer) GetSuggestions(ctx context.Context, req *request.Suggestion) (*_struct.ListValue, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSuggestions not implemented")
+}
+func (*UnimplementedCfgMgmtServer) GetOrganizations(ctx context.Context, req *request.Organizations) (*_struct.ListValue, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOrganizations not implemented")
+}
+func (*UnimplementedCfgMgmtServer) GetSourceFqdns(ctx context.Context, req *request.SourceFQDNS) (*_struct.ListValue, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSourceFqdns not implemented")
+}
+func (*UnimplementedCfgMgmtServer) GetAttributes(ctx context.Context, req *request.Node) (*response.NodeAttribute, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAttributes not implemented")
+}
+func (*UnimplementedCfgMgmtServer) GetPolicyCookbooks(ctx context.Context, req *request.PolicyRevision) (*response.PolicyCookbooks, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPolicyCookbooks not implemented")
+}
+func (*UnimplementedCfgMgmtServer) GetEventFeed(ctx context.Context, req *request.EventFilter) (*response.Events, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetEventFeed not implemented")
+}
+func (*UnimplementedCfgMgmtServer) GetEventTypeCounts(ctx context.Context, req *request.EventCountsFilter) (*response.EventCounts, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetEventTypeCounts not implemented")
+}
+func (*UnimplementedCfgMgmtServer) GetEventTaskCounts(ctx context.Context, req *request.EventCountsFilter) (*response.EventCounts, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetEventTaskCounts not implemented")
+}
+func (*UnimplementedCfgMgmtServer) GetEventStringBuckets(ctx context.Context, req *request.EventStrings) (*response.EventStrings, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetEventStringBuckets not implemented")
+}
+func (*UnimplementedCfgMgmtServer) GetInventoryNodes(ctx context.Context, req *request.InventoryNodes) (*response.InventoryNodes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetInventoryNodes not implemented")
+}
+func (*UnimplementedCfgMgmtServer) NodeExport(req *request.NodeExport, srv CfgMgmt_NodeExportServer) error {
+	return status.Errorf(codes.Unimplemented, "method NodeExport not implemented")
 }
 
 func RegisterCfgMgmtServer(s *grpc.Server, srv CfgMgmtServer) {

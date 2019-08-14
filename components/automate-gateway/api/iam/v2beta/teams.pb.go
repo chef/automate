@@ -13,6 +13,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -220,6 +222,41 @@ type TeamsServer interface {
 	// Expose on GRPC API only so we don't expose this to the enduser.
 	// Just want to be able to trigger this via automate-cli.
 	ApplyV2DataMigrations(context.Context, *request.ApplyV2DataMigrationsReq) (*response.ApplyV2DataMigrationsResp, error)
+}
+
+// UnimplementedTeamsServer can be embedded to have forward compatible implementations.
+type UnimplementedTeamsServer struct {
+}
+
+func (*UnimplementedTeamsServer) ListTeams(ctx context.Context, req *request.ListTeamsReq) (*response.ListTeamsResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListTeams not implemented")
+}
+func (*UnimplementedTeamsServer) GetTeam(ctx context.Context, req *request.GetTeamReq) (*response.GetTeamResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTeam not implemented")
+}
+func (*UnimplementedTeamsServer) CreateTeam(ctx context.Context, req *request.CreateTeamReq) (*response.CreateTeamResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateTeam not implemented")
+}
+func (*UnimplementedTeamsServer) UpdateTeam(ctx context.Context, req *request.UpdateTeamReq) (*response.UpdateTeamResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTeam not implemented")
+}
+func (*UnimplementedTeamsServer) DeleteTeam(ctx context.Context, req *request.DeleteTeamReq) (*response.DeleteTeamResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteTeam not implemented")
+}
+func (*UnimplementedTeamsServer) GetTeamMembership(ctx context.Context, req *request.GetTeamMembershipReq) (*response.GetTeamMembershipResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTeamMembership not implemented")
+}
+func (*UnimplementedTeamsServer) AddTeamMembers(ctx context.Context, req *request.AddTeamMembersReq) (*response.AddTeamMembersResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddTeamMembers not implemented")
+}
+func (*UnimplementedTeamsServer) RemoveTeamMembers(ctx context.Context, req *request.RemoveTeamMembersReq) (*response.RemoveTeamMembersResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveTeamMembers not implemented")
+}
+func (*UnimplementedTeamsServer) GetTeamsForMember(ctx context.Context, req *request.GetTeamsForMemberReq) (*response.GetTeamsForMemberResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTeamsForMember not implemented")
+}
+func (*UnimplementedTeamsServer) ApplyV2DataMigrations(ctx context.Context, req *request.ApplyV2DataMigrationsReq) (*response.ApplyV2DataMigrationsResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ApplyV2DataMigrations not implemented")
 }
 
 func RegisterTeamsServer(s *grpc.Server, srv TeamsServer) {

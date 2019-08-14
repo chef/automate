@@ -10,6 +10,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -779,6 +781,26 @@ type LicenseControlServer interface {
 	Status(context.Context, *StatusRequest) (*StatusResponse, error)
 	Update(context.Context, *UpdateRequest) (*UpdateResponse, error)
 	Telemetry(context.Context, *TelemetryRequest) (*TelemetryResponse, error)
+}
+
+// UnimplementedLicenseControlServer can be embedded to have forward compatible implementations.
+type UnimplementedLicenseControlServer struct {
+}
+
+func (*UnimplementedLicenseControlServer) License(ctx context.Context, req *LicenseRequest) (*LicenseResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method License not implemented")
+}
+func (*UnimplementedLicenseControlServer) Policy(ctx context.Context, req *PolicyRequest) (*PolicyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Policy not implemented")
+}
+func (*UnimplementedLicenseControlServer) Status(ctx context.Context, req *StatusRequest) (*StatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Status not implemented")
+}
+func (*UnimplementedLicenseControlServer) Update(ctx context.Context, req *UpdateRequest) (*UpdateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
+}
+func (*UnimplementedLicenseControlServer) Telemetry(ctx context.Context, req *TelemetryRequest) (*TelemetryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Telemetry not implemented")
 }
 
 func RegisterLicenseControlServer(s *grpc.Server, srv LicenseControlServer) {

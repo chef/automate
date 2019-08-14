@@ -9,6 +9,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -1322,6 +1324,50 @@ type JobSchedulerServer interface {
 	ConfigureMissingNodesForDeletionScheduler(context.Context, *JobSettings) (*ConfigureMissingNodesForDeletionSchedulerResponse, error)
 	StartMissingNodesForDeletionScheduler(context.Context, *StartMissingNodesForDeletionSchedulerRequest) (*StartMissingNodesForDeletionSchedulerResponse, error)
 	StopMissingNodesForDeletionScheduler(context.Context, *StopMissingNodesForDeletionSchedulerRequest) (*StopMissingNodesForDeletionSchedulerResponse, error)
+}
+
+// UnimplementedJobSchedulerServer can be embedded to have forward compatible implementations.
+type UnimplementedJobSchedulerServer struct {
+}
+
+func (*UnimplementedJobSchedulerServer) GetStatusJobScheduler(ctx context.Context, req *JobSchedulerStatusRequest) (*JobSchedulerStatus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetStatusJobScheduler not implemented")
+}
+func (*UnimplementedJobSchedulerServer) MarkNodesMissing(ctx context.Context, req *MarkNodesMissingRequest) (*MarkNodesMissingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MarkNodesMissing not implemented")
+}
+func (*UnimplementedJobSchedulerServer) ConfigureNodesMissingScheduler(ctx context.Context, req *JobSettings) (*ConfigureNodesMissingSchedulerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfigureNodesMissingScheduler not implemented")
+}
+func (*UnimplementedJobSchedulerServer) StartNodesMissingScheduler(ctx context.Context, req *StartNodesMissingSchedulerRequest) (*StartNodesMissingSchedulerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StartNodesMissingScheduler not implemented")
+}
+func (*UnimplementedJobSchedulerServer) StopNodesMissingScheduler(ctx context.Context, req *StopNodesMissingSchedulerRequest) (*StopNodesMissingSchedulerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StopNodesMissingScheduler not implemented")
+}
+func (*UnimplementedJobSchedulerServer) DeleteMarkedNodes(ctx context.Context, req *DeleteMarkedNodesRequest) (*DeleteMarkedNodesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteMarkedNodes not implemented")
+}
+func (*UnimplementedJobSchedulerServer) StartDeleteNodesScheduler(ctx context.Context, req *StartDeleteNodesSchedulerRequest) (*StartDeleteNodesSchedulerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StartDeleteNodesScheduler not implemented")
+}
+func (*UnimplementedJobSchedulerServer) StopDeleteNodesScheduler(ctx context.Context, req *StopDeleteNodesSchedulerRequest) (*StopDeleteNodesSchedulerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StopDeleteNodesScheduler not implemented")
+}
+func (*UnimplementedJobSchedulerServer) ConfigureDeleteNodesScheduler(ctx context.Context, req *JobSettings) (*ConfigureDeleteNodesSchedulerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfigureDeleteNodesScheduler not implemented")
+}
+func (*UnimplementedJobSchedulerServer) MarkMissingNodesForDeletion(ctx context.Context, req *MarkMissingNodesForDeletionRequest) (*MarkMissingNodesForDeletionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MarkMissingNodesForDeletion not implemented")
+}
+func (*UnimplementedJobSchedulerServer) ConfigureMissingNodesForDeletionScheduler(ctx context.Context, req *JobSettings) (*ConfigureMissingNodesForDeletionSchedulerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfigureMissingNodesForDeletionScheduler not implemented")
+}
+func (*UnimplementedJobSchedulerServer) StartMissingNodesForDeletionScheduler(ctx context.Context, req *StartMissingNodesForDeletionSchedulerRequest) (*StartMissingNodesForDeletionSchedulerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StartMissingNodesForDeletionScheduler not implemented")
+}
+func (*UnimplementedJobSchedulerServer) StopMissingNodesForDeletionScheduler(ctx context.Context, req *StopMissingNodesForDeletionSchedulerRequest) (*StopMissingNodesForDeletionSchedulerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StopMissingNodesForDeletionScheduler not implemented")
 }
 
 func RegisterJobSchedulerServer(s *grpc.Server, srv JobSchedulerServer) {

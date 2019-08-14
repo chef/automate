@@ -10,6 +10,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -588,6 +590,29 @@ type UsersMgmtServer interface {
 	DeleteUser(context.Context, *Email) (*DeleteUserResp, error)
 	UpdateUser(context.Context, *UpdateUserReq) (*User, error)
 	UpdateSelf(context.Context, *UpdateSelfReq) (*User, error)
+}
+
+// UnimplementedUsersMgmtServer can be embedded to have forward compatible implementations.
+type UnimplementedUsersMgmtServer struct {
+}
+
+func (*UnimplementedUsersMgmtServer) GetUsers(ctx context.Context, req *GetUsersReq) (*Users, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUsers not implemented")
+}
+func (*UnimplementedUsersMgmtServer) GetUser(ctx context.Context, req *Email) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
+}
+func (*UnimplementedUsersMgmtServer) CreateUser(ctx context.Context, req *CreateUserReq) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
+}
+func (*UnimplementedUsersMgmtServer) DeleteUser(ctx context.Context, req *Email) (*DeleteUserResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
+}
+func (*UnimplementedUsersMgmtServer) UpdateUser(ctx context.Context, req *UpdateUserReq) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
+}
+func (*UnimplementedUsersMgmtServer) UpdateSelf(ctx context.Context, req *UpdateSelfReq) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateSelf not implemented")
 }
 
 func RegisterUsersMgmtServer(s *grpc.Server, srv UsersMgmtServer) {

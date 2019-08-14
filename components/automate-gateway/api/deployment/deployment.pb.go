@@ -12,6 +12,8 @@ import (
 	empty "github.com/golang/protobuf/ptypes/empty"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -293,6 +295,17 @@ func (c *deploymentClient) ServiceVersions(ctx context.Context, in *ServiceVersi
 type DeploymentServer interface {
 	GetVersion(context.Context, *empty.Empty) (*Version, error)
 	ServiceVersions(context.Context, *ServiceVersionsRequest) (*ServiceVersionsResponse, error)
+}
+
+// UnimplementedDeploymentServer can be embedded to have forward compatible implementations.
+type UnimplementedDeploymentServer struct {
+}
+
+func (*UnimplementedDeploymentServer) GetVersion(ctx context.Context, req *empty.Empty) (*Version, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetVersion not implemented")
+}
+func (*UnimplementedDeploymentServer) ServiceVersions(ctx context.Context, req *ServiceVersionsRequest) (*ServiceVersionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ServiceVersions not implemented")
 }
 
 func RegisterDeploymentServer(s *grpc.Server, srv DeploymentServer) {

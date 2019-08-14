@@ -16,6 +16,8 @@ import (
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -237,6 +239,44 @@ type ConfigMgmtServer interface {
 	GetAttributes(context.Context, *request.Node) (*response.NodeAttribute, error)
 	GetVersion(context.Context, *version.VersionInfoRequest) (*version.VersionInfo, error)
 	GetPolicyCookbooks(context.Context, *request.PolicyRevision) (*response.PolicyCookbooks, error)
+}
+
+// UnimplementedConfigMgmtServer can be embedded to have forward compatible implementations.
+type UnimplementedConfigMgmtServer struct {
+}
+
+func (*UnimplementedConfigMgmtServer) GetNodes(ctx context.Context, req *request.Nodes) (*_struct.ListValue, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNodes not implemented")
+}
+func (*UnimplementedConfigMgmtServer) GetRuns(ctx context.Context, req *request.Runs) (*_struct.ListValue, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRuns not implemented")
+}
+func (*UnimplementedConfigMgmtServer) GetNodesCounts(ctx context.Context, req *request.NodesCounts) (*response.NodesCounts, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNodesCounts not implemented")
+}
+func (*UnimplementedConfigMgmtServer) GetRunsCounts(ctx context.Context, req *request.RunsCounts) (*response.RunsCounts, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRunsCounts not implemented")
+}
+func (*UnimplementedConfigMgmtServer) GetNodeRun(ctx context.Context, req *request.NodeRun) (*response.Run, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNodeRun not implemented")
+}
+func (*UnimplementedConfigMgmtServer) GetSuggestions(ctx context.Context, req *query.Suggestion) (*_struct.ListValue, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSuggestions not implemented")
+}
+func (*UnimplementedConfigMgmtServer) GetOrganizations(ctx context.Context, req *request.Organizations) (*_struct.ListValue, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOrganizations not implemented")
+}
+func (*UnimplementedConfigMgmtServer) GetSourceFqdns(ctx context.Context, req *request.SourceFqdns) (*_struct.ListValue, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSourceFqdns not implemented")
+}
+func (*UnimplementedConfigMgmtServer) GetAttributes(ctx context.Context, req *request.Node) (*response.NodeAttribute, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAttributes not implemented")
+}
+func (*UnimplementedConfigMgmtServer) GetVersion(ctx context.Context, req *version.VersionInfoRequest) (*version.VersionInfo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetVersion not implemented")
+}
+func (*UnimplementedConfigMgmtServer) GetPolicyCookbooks(ctx context.Context, req *request.PolicyRevision) (*response.PolicyCookbooks, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPolicyCookbooks not implemented")
 }
 
 func RegisterConfigMgmtServer(s *grpc.Server, srv ConfigMgmtServer) {

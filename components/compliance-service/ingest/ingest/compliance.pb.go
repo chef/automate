@@ -13,6 +13,8 @@ import (
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -211,6 +213,20 @@ type ComplianceIngesterServer interface {
 	ProcessComplianceReport(context.Context, *compliance.Report) (*empty.Empty, error)
 	HandleEvent(context.Context, *event.EventMsg) (*event.EventResponse, error)
 	ProjectUpdateStatus(context.Context, *ProjectUpdateStatusReq) (*ProjectUpdateStatusResp, error)
+}
+
+// UnimplementedComplianceIngesterServer can be embedded to have forward compatible implementations.
+type UnimplementedComplianceIngesterServer struct {
+}
+
+func (*UnimplementedComplianceIngesterServer) ProcessComplianceReport(ctx context.Context, req *compliance.Report) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ProcessComplianceReport not implemented")
+}
+func (*UnimplementedComplianceIngesterServer) HandleEvent(ctx context.Context, req *event.EventMsg) (*event.EventResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HandleEvent not implemented")
+}
+func (*UnimplementedComplianceIngesterServer) ProjectUpdateStatus(ctx context.Context, req *ProjectUpdateStatusReq) (*ProjectUpdateStatusResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ProjectUpdateStatus not implemented")
 }
 
 func RegisterComplianceIngesterServer(s *grpc.Server, srv ComplianceIngesterServer) {

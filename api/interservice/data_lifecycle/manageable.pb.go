@@ -8,6 +8,8 @@ import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -261,6 +263,14 @@ type DataLifecycleManageableServer interface {
 	// We could make this streaming and return how much is
 	// finished
 	Purge(context.Context, *PurgeRequest) (*PurgeResponse, error)
+}
+
+// UnimplementedDataLifecycleManageableServer can be embedded to have forward compatible implementations.
+type UnimplementedDataLifecycleManageableServer struct {
+}
+
+func (*UnimplementedDataLifecycleManageableServer) Purge(ctx context.Context, req *PurgeRequest) (*PurgeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Purge not implemented")
 }
 
 func RegisterDataLifecycleManageableServer(s *grpc.Server, srv DataLifecycleManageableServer) {

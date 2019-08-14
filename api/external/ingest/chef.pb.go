@@ -14,6 +14,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -169,6 +171,29 @@ type ChefIngesterServer interface {
 	ProcessMultipleNodeDeletes(context.Context, *request.MultipleNodeDeleteRequest) (*response.ProcessMultipleNodeDeleteResponse, error)
 	ProcessLivenessPing(context.Context, *request.Liveness) (*response.ProcessLivenessResponse, error)
 	GetVersion(context.Context, *version.VersionInfoRequest) (*version.VersionInfo, error)
+}
+
+// UnimplementedChefIngesterServer can be embedded to have forward compatible implementations.
+type UnimplementedChefIngesterServer struct {
+}
+
+func (*UnimplementedChefIngesterServer) ProcessChefRun(ctx context.Context, req *request.Run) (*response.ProcessChefRunResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ProcessChefRun not implemented")
+}
+func (*UnimplementedChefIngesterServer) ProcessChefAction(ctx context.Context, req *request.Action) (*response.ProcessChefActionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ProcessChefAction not implemented")
+}
+func (*UnimplementedChefIngesterServer) ProcessNodeDelete(ctx context.Context, req *request.Delete) (*response.ProcessNodeDeleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ProcessNodeDelete not implemented")
+}
+func (*UnimplementedChefIngesterServer) ProcessMultipleNodeDeletes(ctx context.Context, req *request.MultipleNodeDeleteRequest) (*response.ProcessMultipleNodeDeleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ProcessMultipleNodeDeletes not implemented")
+}
+func (*UnimplementedChefIngesterServer) ProcessLivenessPing(ctx context.Context, req *request.Liveness) (*response.ProcessLivenessResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ProcessLivenessPing not implemented")
+}
+func (*UnimplementedChefIngesterServer) GetVersion(ctx context.Context, req *version.VersionInfoRequest) (*version.VersionInfo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetVersion not implemented")
 }
 
 func RegisterChefIngesterServer(s *grpc.Server, srv ChefIngesterServer) {

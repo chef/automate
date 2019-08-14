@@ -9,6 +9,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -427,6 +429,20 @@ type IngestStatusServer interface {
 	GetMetrics(context.Context, *MetricsRequest) (*Metrics, error)
 	GetHealth(context.Context, *HealthRequest) (*Health, error)
 	GetMigrationStatus(context.Context, *MigrationStatusRequest) (*MigrationStatus, error)
+}
+
+// UnimplementedIngestStatusServer can be embedded to have forward compatible implementations.
+type UnimplementedIngestStatusServer struct {
+}
+
+func (*UnimplementedIngestStatusServer) GetMetrics(ctx context.Context, req *MetricsRequest) (*Metrics, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMetrics not implemented")
+}
+func (*UnimplementedIngestStatusServer) GetHealth(ctx context.Context, req *HealthRequest) (*Health, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetHealth not implemented")
+}
+func (*UnimplementedIngestStatusServer) GetMigrationStatus(ctx context.Context, req *MigrationStatusRequest) (*MigrationStatus, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMigrationStatus not implemented")
 }
 
 func RegisterIngestStatusServer(s *grpc.Server, srv IngestStatusServer) {

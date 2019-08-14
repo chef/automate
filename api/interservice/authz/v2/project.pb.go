@@ -11,6 +11,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -1943,6 +1945,62 @@ type ProjectsServer interface {
 	ListRulesForProject(context.Context, *ListRulesForProjectReq) (*ListRulesForProjectResp, error)
 	DeleteRule(context.Context, *DeleteRuleReq) (*DeleteRuleResp, error)
 	ListRulesForAllProjects(context.Context, *ListRulesForAllProjectsReq) (*ListRulesForAllProjectsResp, error)
+}
+
+// UnimplementedProjectsServer can be embedded to have forward compatible implementations.
+type UnimplementedProjectsServer struct {
+}
+
+func (*UnimplementedProjectsServer) UpdateProject(ctx context.Context, req *UpdateProjectReq) (*UpdateProjectResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateProject not implemented")
+}
+func (*UnimplementedProjectsServer) CreateProject(ctx context.Context, req *CreateProjectReq) (*CreateProjectResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateProject not implemented")
+}
+func (*UnimplementedProjectsServer) GetProject(ctx context.Context, req *GetProjectReq) (*GetProjectResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProject not implemented")
+}
+func (*UnimplementedProjectsServer) DeleteProject(ctx context.Context, req *DeleteProjectReq) (*DeleteProjectResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteProject not implemented")
+}
+func (*UnimplementedProjectsServer) ListProjects(ctx context.Context, req *ListProjectsReq) (*ListProjectsResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListProjects not implemented")
+}
+func (*UnimplementedProjectsServer) ListProjectsForIntrospection(ctx context.Context, req *ListProjectsReq) (*ListProjectsResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListProjectsForIntrospection not implemented")
+}
+func (*UnimplementedProjectsServer) HandleEvent(ctx context.Context, req *event.EventMsg) (*event.EventResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HandleEvent not implemented")
+}
+func (*UnimplementedProjectsServer) ApplyRulesStart(ctx context.Context, req *ApplyRulesStartReq) (*ApplyRulesStartResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ApplyRulesStart not implemented")
+}
+func (*UnimplementedProjectsServer) ApplyRulesCancel(ctx context.Context, req *ApplyRulesCancelReq) (*ApplyRulesCancelResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ApplyRulesCancel not implemented")
+}
+func (*UnimplementedProjectsServer) ApplyRulesStatus(ctx context.Context, req *ApplyRulesStatusReq) (*ApplyRulesStatusResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ApplyRulesStatus not implemented")
+}
+func (*UnimplementedProjectsServer) CreateRule(ctx context.Context, req *CreateRuleReq) (*CreateRuleResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateRule not implemented")
+}
+func (*UnimplementedProjectsServer) UpdateRule(ctx context.Context, req *UpdateRuleReq) (*UpdateRuleResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateRule not implemented")
+}
+func (*UnimplementedProjectsServer) GetRule(ctx context.Context, req *GetRuleReq) (*GetRuleResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRule not implemented")
+}
+func (*UnimplementedProjectsServer) ListRules(ctx context.Context, req *ListRulesReq) (*ListRulesResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListRules not implemented")
+}
+func (*UnimplementedProjectsServer) ListRulesForProject(ctx context.Context, req *ListRulesForProjectReq) (*ListRulesForProjectResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListRulesForProject not implemented")
+}
+func (*UnimplementedProjectsServer) DeleteRule(ctx context.Context, req *DeleteRuleReq) (*DeleteRuleResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteRule not implemented")
+}
+func (*UnimplementedProjectsServer) ListRulesForAllProjects(ctx context.Context, req *ListRulesForAllProjectsReq) (*ListRulesForAllProjectsResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListRulesForAllProjects not implemented")
 }
 
 func RegisterProjectsServer(s *grpc.Server, srv ProjectsServer) {
