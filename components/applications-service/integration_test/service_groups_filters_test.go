@@ -511,9 +511,6 @@ func TestServiceGroupsFilterServiceOrigin(t *testing.T) {
 
 // This test tests what happens when a service group contains two different origins
 // and is filtered by origin.
-
-//TODO: this test should result in just the desired package, but actually brings back both
-// We want to revisit this with another card. The counts are correctly filtered
 func TestServiceGroupsFilterSGPartOrigin(t *testing.T) {
 	var (
 		ctx     = context.Background()
@@ -524,7 +521,7 @@ func TestServiceGroupsFilterSGPartOrigin(t *testing.T) {
 			ServiceGroups: []*applications.ServiceGroup{
 				{
 					Name:             "a.default",
-					Package:          "2 packages",
+					Package:          "core/a",
 					Release:          "0.1.0/20190101121212",
 					Status:           applications.HealthStatus_UNKNOWN,
 					HealthPercentage: 0,
@@ -760,9 +757,6 @@ func TestServiceGroupsFilterVersion(t *testing.T) {
 	assertServiceGroupsEqual(t, expected, response)
 }
 
-//TODO: this test should result in just the desired release, but actually brings back both
-// We want to revisit this with another card. The counts are correctly filtered
-
 func TestServiceGroupsFilterPartSGVersion(t *testing.T) {
 	var (
 		ctx     = context.Background()
@@ -774,7 +768,7 @@ func TestServiceGroupsFilterPartSGVersion(t *testing.T) {
 				{
 					Name:             "a.default",
 					Package:          "core/a",
-					Release:          "2 releases",
+					Release:          "0.2.2/20190101121212",
 					Status:           applications.HealthStatus_UNKNOWN,
 					HealthPercentage: 0,
 					Application:      "a_app",
@@ -855,6 +849,74 @@ func TestServiceGroupsFilterBuildstamp(t *testing.T) {
 				withHealth("OK"),
 				withApplication("b_app"),
 				withEnvironment("b_env"),
+			),
+		}
+	)
+
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
+}
+
+func TestServiceGroupsFilterPartSGVersionOrigin(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"version:0.2.2", "origin:core"},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "a.default",
+					Package:          "core/a",
+					Release:          "0.2.2/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+			},
+		}
+		//2 services in the same service group, with different package versions
+		mockHabServices = []*habitat.HealthCheckEvent{
+			NewHabitatEvent(
+				withSupervisorId("sup2"),
+				withServiceGroup("a.default"),
+				withPackageIdent("core/a/0.2.2/20190101121212"),
+				withHealth("UNKNOWN"),
+				withApplication("a_app"),
+				withEnvironment("a_env"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("sup3"),
+				withServiceGroup("a.default"),
+				withPackageIdent("core/a/0.1.0/20190101121212"),
+				withHealth("OK"),
+				withApplication("a_app"),
+				withEnvironment("a_env"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("sup4"),
+				withServiceGroup("a.default"),
+				withPackageIdent("chef/a/0.2.2/20190101121212"),
+				withHealth("OK"),
+				withApplication("a_app"),
+				withEnvironment("a_env"),
+			),
+			NewHabitatEvent(
+				withSupervisorId("sup5"),
+				withServiceGroup("a.default"),
+				withPackageIdent("chef/a/0.1.0/20190101121212"),
+				withHealth("OK"),
+				withApplication("a_app"),
+				withEnvironment("a_env"),
 			),
 		}
 	)

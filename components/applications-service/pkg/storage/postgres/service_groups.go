@@ -52,29 +52,32 @@ const (
        ) AS ok
   FROM ( ` + selectServiceGroupHealth + groupByPart + ` ) AS service_group_health_counts
 `
+	selectServiceGroupHealth = selectServiceGroupHealthFirst + selectServiceGroupHealthSecond
 
-	selectServiceGroupHealth = `
+	selectServiceGroupHealthFirst = `
   SELECT *
          ,(CASE WHEN health_critical > 0 THEN '1_CRITICAL'
                 WHEN health_unknown  > 0 THEN '2_UNKNOWN'
                 WHEN health_warning  > 0 THEN '3_WARNING'
                 ELSE '4_OK' END ) as health
+          ,(SELECT array_agg(DISTINCT CONCAT (s_for_releases.package_ident))
+                FROM service_full AS s_for_releases
+                WHERE s_for_releases.service_group_id = sghc.id `
+
+	selectServiceGroupHealthSecond = `) AS releases
     FROM (SELECT  s.service_group_id as id
-                 ,s.service_group_name as name
-                 ,COUNT(s.health) FILTER (WHERE s.health = 'OK') AS health_ok
-                 ,COUNT(s.health) FILTER (WHERE s.health = 'CRITICAL') AS health_critical
-                 ,COUNT(s.health) FILTER (WHERE s.health = 'WARNING') AS health_warning
-                 ,COUNT(s.health) FILTER (WHERE s.health = 'UNKNOWN') AS health_unknown
-                 ,COUNT(s.health) AS health_total
-                 ,round((COUNT(s.health) FILTER (WHERE s.health = 'OK')
-                       / COUNT(s.health)::float) * 100) as percent_ok
-                 ,(SELECT array_agg(DISTINCT CONCAT (s_for_releases.package_ident))
-                     FROM service_full AS s_for_releases
-                     WHERE s_for_releases.service_group_id = s.service_group_id) AS releases
-                 ,s.application as app_name
-                 ,s.environment as environment
-                 ,s.service_group_name_suffix as name_suffix
-          FROM service_full AS s
+      ,s.service_group_name as name
+      ,COUNT(s.health) FILTER (WHERE s.health = 'OK') AS health_ok
+      ,COUNT(s.health) FILTER (WHERE s.health = 'CRITICAL') AS health_critical
+      ,COUNT(s.health) FILTER (WHERE s.health = 'WARNING') AS health_warning
+      ,COUNT(s.health) FILTER (WHERE s.health = 'UNKNOWN') AS health_unknown
+      ,COUNT(s.health) AS health_total
+      ,round((COUNT(s.health) FILTER (WHERE s.health = 'OK')
+            / COUNT(s.health)::float) * 100) as percent_ok
+      ,s.application as app_name
+      ,s.environment as environment
+      ,s.service_group_name_suffix as name_suffix
+    FROM service_full AS s
 `
 	groupByPart = `
   GROUP BY s.service_group_id, s.application, s.environment, s.service_group_name, s.service_group_name_suffix ) as sghc
@@ -104,7 +107,7 @@ const (
 	paginationSorting = `
   ORDER BY %s
   LIMIT $1
-	OFFSET $2 `
+  OFFSET $2 `
 
 	selectServiceGroupsTotalCount = `
 SELECT COUNT(DISTINCT service_group_id) FROM service_full;
@@ -145,7 +148,6 @@ func (db *Postgres) GetServiceGroups(
 	offset := pageSize * page
 	var (
 		sgHealth            []*serviceGroupHealth
-		selectMainQuery     string = selectServiceGroupHealth
 		sortOrder           string
 		err                 error
 		selectAllPartsQuery string
@@ -157,22 +159,17 @@ func (db *Postgres) GetServiceGroups(
 		sortOrder = "DESC"
 	}
 
-	whereQuery, statusQuery, statusFilter, needSupervisorTable, err := formatFilters(filters)
+	whereQuery, statusQuery, packageQuery, statusFilter, err := formatFilters(filters)
 	if err != nil {
 		return nil, err
 	}
 
-	if statusFilter && needSupervisorTable {
-		// We need to join to the supervisor table is we are filtering by Site
-		selectAllPartsQuery = selectMainQuery + whereQuery + groupByPart + statusQuery + paginationSorting
-	} else if statusFilter {
+	if statusFilter {
 		// The status query has to go outside of the inner query because the health count filters need to be calculated
 		// in order to be used in the where clause
-		selectAllPartsQuery = selectMainQuery + whereQuery + groupByPart + statusQuery + paginationSorting
-	} else if needSupervisorTable {
-		selectAllPartsQuery = selectMainQuery + whereQuery + groupByPart + paginationSorting
+		selectAllPartsQuery = selectServiceGroupHealthFirst + packageQuery + selectServiceGroupHealthSecond + whereQuery + groupByPart + statusQuery + paginationSorting
 	} else {
-		selectAllPartsQuery = selectMainQuery + whereQuery + groupByPart + paginationSorting
+		selectAllPartsQuery = selectServiceGroupHealthFirst + packageQuery + selectServiceGroupHealthSecond + whereQuery + groupByPart + paginationSorting
 	}
 
 	// Formatting our Query with sort field and sort order
@@ -207,15 +204,15 @@ func (db *Postgres) GetServiceGroups(
 	return sgDisplay, nil
 }
 
-func formatFilters(filters map[string][]string) (string, string, bool, bool, error) {
+func formatFilters(filters map[string][]string) (string, string, string, bool, error) {
 	var (
 		err         error
 		statusQuery string
 		whereQuery  string
 	)
+	packageWhereQuery := ``
 	first := true
 	statusFilter := false
-	needSupervisorTable := false
 	for filter, values := range filters {
 		if len(values) == 0 {
 			continue
@@ -227,74 +224,75 @@ func formatFilters(filters map[string][]string) (string, string, bool, bool, err
 			statusFilter = true
 			statusQuery, err = queryFromStatusFilter(values[0])
 			if err != nil {
-				return "", "", false, false, err
+				return "", "", "", false, err
 			}
 
 		case "environment", "ENVIRONMENT":
 			selectQuery, err := queryFromFieldFilter("s.environment", values, first)
 			whereQuery = whereQuery + selectQuery
 			if err != nil {
-				return "", "", false, false, err
+				return "", "", "", false, err
 			}
 		case "application", "APPLICATION":
 			selectQuery, err := queryFromFieldFilter("s.application", values, first)
 			whereQuery = whereQuery + selectQuery
 			if err != nil {
-				return "", "", false, false, err
+				return "", "", "", false, err
 			}
 		case "group", "GROUP":
 			selectQuery, err := queryFromFieldFilter("s.service_group_name_suffix", values, first)
 			whereQuery = whereQuery + selectQuery
 			if err != nil {
-				return "", "", false, false, err
+				return "", "", "", false, err
 			}
 		case "origin", "ORIGIN":
 			selectQuery, err := queryFromFieldFilter("s.origin", values, first)
 			whereQuery = whereQuery + selectQuery
+			q, err := queryFromFieldFilter("s_for_releases.origin", values, false)
+			packageWhereQuery = packageWhereQuery + q
 			if err != nil {
-				return "", "", false, false, err
+				return "", "", "", false, err
 			}
 		case "service", "SERVICE":
 			selectQuery, err := queryFromFieldFilter("s.name", values, first)
 			whereQuery = whereQuery + selectQuery
 			if err != nil {
-				return "", "", false, false, err
+				return "", "", "", false, err
 			}
 		case "site", "SITE":
-			// If we are filtering by site which is on the sueprvisor table we have to join this table onto our inner query
-			needSupervisorTable = true
 			selectQuery, err := queryFromFieldFilter("s.site", values, first)
 			whereQuery = whereQuery + selectQuery
 			if err != nil {
-				return "", "", false, false, err
+				return "", "", "", false, err
 			}
 		case "channel", "CHANNEL":
 			selectQuery, err := queryFromFieldFilter("s.channel", values, first)
 			whereQuery = whereQuery + selectQuery
 			if err != nil {
-				return "", "", false, false, err
+				return "", "", "", false, err
 			}
 		case "version", "VERSION":
 			selectQuery, err := queryFromFieldFilter("s.version", values, first)
 			whereQuery = whereQuery + selectQuery
+			q, err := queryFromFieldFilter("s_for_releases.version", values, false)
+			packageWhereQuery = packageWhereQuery + q
 			if err != nil {
-				return "", "", false, false, err
+				return "", "", "", false, err
 			}
 		case "buildstamp", "BUILDSTAMP":
 			selectQuery, err := queryFromFieldFilter("s.release", values, first)
 			whereQuery = whereQuery + selectQuery
 			if err != nil {
-				return "", "", false, false, err
+				return "", "", "", false, err
 			}
 		default:
-			return "", "", false, false, errors.Errorf("invalid filter. (%s:%s)", filter, values)
+			return "", "", "", false, errors.Errorf("invalid filter. (%s:%s)", filter, values)
 		}
 		if first {
 			first = false
 		}
-
 	}
-	return whereQuery, statusQuery, statusFilter, needSupervisorTable, nil
+	return whereQuery, statusQuery, packageWhereQuery, statusFilter, nil
 }
 
 func (db *Postgres) GetServiceGroupsCount() (int32, error) {
