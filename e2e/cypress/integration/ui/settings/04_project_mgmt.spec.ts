@@ -39,16 +39,14 @@ describeIAMV2P1('project management', () => {
 
 
   it('list projects', () => {
-    let projectIDs: string[];
     cy.request({
       auth: { bearer: adminToken },
       method: 'GET',
       url: '/apis/iam/v2beta/projects'
     }).then((response) => {
       expect(response.status).to.equal(200);
-      projectIDs = response.body.projects.map((project: Project) => project.id);
-
-      projectIDs.forEach((id: string) => {
+      response.body.projects.map((project: Project) => project.id)
+        .forEach((id: string) => {
         cy.get('chef-table chef-td').contains(id);
       });
     });
