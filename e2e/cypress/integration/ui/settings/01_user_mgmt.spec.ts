@@ -27,16 +27,16 @@ describe('user management', () => {
     cy.get('app-user-management chef-modal').should('exist');
 
     cy.get('[formcontrolname=fullname]')
-      .type(name);
+      .focus().type(name);
 
     cy.get('[formcontrolname=username]')
-      .type(username);
+      .focus().type(username);
 
     cy.get('[formcontrolname=password]')
-      .type('chefautomate');
+      .focus().type('chefautomate');
 
     cy.get('[formcontrolname=confirmPassword]')
-      .type('chefautomate');
+      .focus().type('chefautomate');
 
     // save new user
     cy.get('[data-cy=save-user]').click();
@@ -60,15 +60,17 @@ describe('user management', () => {
     cy.get('chef-form-field').contains('Confirm New Password').should('exist');
 
     cy.get('chef-button.edit-button').click();
-    cy.get('[formcontrolname=fullName]').find('input').clear().type(updated_name, { delay: 5 });
+    cy.get('[formcontrolname=fullName]').find('input')
+      .clear().focus().type(updated_name);
 
     cy.get('chef-button.save-button').click();
     cy.wait('@updateUser');
     cy.contains(updated_name).should('exist');
 
-    // adding a delay mimics a real user's typing
-    cy.get('[formcontrolname=newPassword]').find('input').type(updated_password, { delay: 5 });
-    cy.get('[formcontrolname=confirmPassword]').find('input').type(updated_password, { delay: 5 });
+    cy.get('[formcontrolname=newPassword]').find('input')
+      .focus().type(updated_password);
+    cy.get('[formcontrolname=confirmPassword]').find('input')
+      .focus().type(updated_password);
     cy.get('chef-button').contains('Update Password').click({ force: true} );
 
     // success alert displays
