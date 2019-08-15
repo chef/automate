@@ -39,7 +39,7 @@ build_all = (ENV["BUILDKITE_BRANCH"] || "").include?("verify-rebuild-all") || EN
 # on us, we could end up missing a required dependency.
 #
 changed_packages = Hash.new
-changed_package_files = Hash.new
+changed_package_file_globs = Hash.new
 hab_deps = Hash.new
 
 config.each do |pkg_name, metadata|
@@ -53,12 +53,12 @@ config.each do |pkg_name, metadata|
   if build_all
     changed_packages[pkg_name] = metadata["plan_path"]
   else
-    files = changed_files.select do |file|
-          Array(metadata["paths"]).any? { |glob| File.fnmatch(glob, file) }
-        end
-    unless files.empty?
+    globs = Array(metadata["paths"]).select do |glob|
+      changed_files.any? { |file| File.fnmatch(glob, file) }
+    end
+    unless globs.empty?
       changed_packages[pkg_name] = metadata["plan_path"]
-      changed_package_files[pkg_name] = files
+      changed_package_file_globs[pkg_name] = globs
     end
   end
 end
@@ -73,10 +73,10 @@ hab_deps.tsort.each do |p|
   puts changed_packages[p] if changed_packages[p]
 end
 
-changed_package_files.each do |p, files|
+changed_package_file_globs.each do |p, globs|
   STDERR.puts "<details><summary>#{p}</summary>\n\n"
-  files.each do |file|
-    STDERR.puts "  - #{file}"
+  globs.each do |glob|
+    STDERR.puts "  - #{glob}"
   end
   STDERR.puts "</details>"
 end
