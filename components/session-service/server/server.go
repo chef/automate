@@ -29,20 +29,6 @@ import (
 	"github.com/chef/automate/lib/tls/certs"
 )
 
-// This determines how often the PG backend will cleanup expired session
-// records. It does not affect session expiration; only records that have
-// already expired are dropped.
-// Note 2017/12/07 (sr): 12hrs here is completely arbitrary.
-const dbCleanupInterval = 12 * time.Hour
-
-// This duration drives the refresh process: if the token expires within the
-// next minute, we'll refresh. This is a first guess and might need tweaking.
-const remainingDuration = time.Minute
-
-// servingStatus is our -- currently hardcoded -- /health endpoint response.
-// It mimics the grpc.health.v1 response we return in GRPC services.
-const servingStatus = "SERVING"
-
 // BldrClient holds the config for the bldr oauth2 client.
 type BldrClient struct {
 	SignInURL    *url.URL
@@ -70,6 +56,20 @@ const (
 	clientStateKeyPrefix     = "client_state_" // coming from the browser, passed back on success
 	numRelayStateRandomBytes = 10
 	redirectURIKey           = "redirect_uri"
+
+	// This determines how often the PG backend will cleanup expired session
+	// records. It does not affect session expiration; only records that have
+	// already expired are dropped.
+	// Note 2017/12/07 (sr): 12hrs here is completely arbitrary.
+	dbCleanupInterval = 12 * time.Hour
+
+	// This duration drives the refresh process: if the token expires within the
+	// next minute, we'll refresh. This is a first guess and might need tweaking.
+	remainingDuration = time.Minute
+
+	// servingStatus is our -- currently hardcoded -- /health endpoint response.
+	// It mimics the grpc.health.v1 response we return in GRPC services.
+	servingStatus = "SERVING"
 )
 
 // New returns a new instance of the server

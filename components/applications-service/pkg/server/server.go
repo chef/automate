@@ -6,7 +6,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/golang/protobuf/ptypes"
+	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/external/applications"
 	ver_api "github.com/chef/automate/api/external/common/version"
@@ -18,11 +22,6 @@ import (
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/timef"
 	"github.com/chef/automate/lib/version"
-
-	"github.com/golang/protobuf/ptypes"
-	timestamp "github.com/golang/protobuf/ptypes/timestamp"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // ApplicationsServer is the interface to this component.
