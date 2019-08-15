@@ -30,7 +30,7 @@ pkg_binds_optional=(
   [authn-service]="port"
   [notifications-service]="port"
 )
-inspec_release="chef/inspec/4.7.24/20190725222329"
+inspec_release="chef/inspec/4.12.0/20190815184753"
 pkg_deps=(
   core/bash
   core/glibc
