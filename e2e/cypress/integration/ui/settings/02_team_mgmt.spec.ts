@@ -149,10 +149,10 @@ describe('team management', () => {
         cy.get('[data-cy=id-label]').contains(generatedTeamID);
 
         // initial state of dropdown
-        cy.get('app-projects-dropdown #projects-selected').contains(unassigned);
-
-        // TODO (tc) why doesn't this work?
-        // cy.get('app-projects-dropdown .dropdown-button').should('have.attr', 'disabled', true);
+        cy.get('app-team-management app-projects-dropdown #projects-selected')
+          .contains(unassigned);
+        cy.get('app-team-management app-projects-dropdown .dropdown-button')
+          .should('have.attr', 'disabled');
 
         // save team
         cy.get('[data-cy=save-button]').click();
@@ -188,21 +188,23 @@ describe('team management', () => {
         cy.get('[data-cy=id-label]').contains(generatedTeamID);
 
         // initial state of dropdown
-        cy.get('app-projects-dropdown #projects-selected').contains(unassigned);
-        cy.get('app-projects-dropdown .dropdown-button').should('not.have.attr', 'disabled');
+        cy.get('app-team-management app-projects-dropdown #projects-selected').contains(unassigned);
+        cy.get('app-team-management app-projects-dropdown .dropdown-button')
+          .should('not.have.attr', 'disabled');
 
         // open projects dropdown
-        cy.get('app-projects-dropdown .dropdown-button').click();
+        cy.get('app-team-management app-projects-dropdown .dropdown-button').click();
 
         // dropdown contains both custom projects, click them both
-        cy.get('app-projects-dropdown chef-dropdown')
-          .children('chef-checkbox').contains(project1Name).click();
-        cy.get('app-projects-dropdown chef-dropdown')
-          .children('chef-checkbox').contains(project2Name).click();
+        cy.get(`app-team-management app-projects-dropdown chef-checkbox[title="${project1Name}"]`)
+          .should('have.attr', 'aria-checked', 'false').click();
+        cy.get(`app-team-management app-projects-dropdown chef-checkbox[title="${project2Name}"]`)
+          .should('have.attr', 'aria-checked', 'false').click();
 
         // close projects dropdown
-        cy.get('app-projects-dropdown .dropdown-button').click();
-        cy.get('app-projects-dropdown #projects-selected').contains(projectSummary);
+        cy.get('app-team-management app-projects-dropdown .dropdown-button').click();
+        cy.get('app-team-management app-projects-dropdown #projects-selected')
+          .contains(projectSummary);
 
         // save team
         cy.get('[data-cy=save-button]').click();
@@ -221,21 +223,22 @@ describe('team management', () => {
         cy.get('[data-cy=id-label]').contains(generatedTeamID);
 
         // initial state of dropdown
-        cy.get('app-projects-dropdown #projects-selected').contains(unassigned);
-        cy.get('app-projects-dropdown .dropdown-button').should('not.have.attr', 'disabled');
+        cy.get('app-team-management app-projects-dropdown #projects-selected').contains(unassigned);
+        cy.get('app-team-management app-projects-dropdown .dropdown-button')
+          .should('not.have.attr', 'disabled');
 
         // open projects dropdown
-        cy.get('app-projects-dropdown .dropdown-button').click();
+        cy.get('app-team-management app-projects-dropdown .dropdown-button').click();
 
         // dropdown contains both custom projects, click one
-        cy.get('app-projects-dropdown chef-dropdown')
-          .children('chef-checkbox').contains(project1Name);
-        cy.get('app-projects-dropdown chef-dropdown')
-          .children('chef-checkbox').contains(project2Name).click();
+        cy.get(`app-team-management app-projects-dropdown chef-checkbox[title="${project1Name}"]`)
+          .should('have.attr', 'aria-checked', 'false');
+        cy.get(`app-team-management app-projects-dropdown chef-checkbox[title="${project2Name}"]`)
+          .should('have.attr', 'aria-checked', 'false').click();
 
         // close projects dropdown
-        cy.get('app-projects-dropdown .dropdown-button').click();
-        cy.get('app-projects-dropdown #projects-selected')
+        cy.get('app-team-management app-projects-dropdown .dropdown-button').click();
+        cy.get('app-team-management app-projects-dropdown #projects-selected')
           .contains(`${project2Name.substring(0, dropdownNameUntilEllipsisLen)}...`);
 
         // save team
@@ -255,17 +258,18 @@ describe('team management', () => {
         cy.get('[data-cy=id-label]').contains(generatedTeamID);
 
         // initial state of dropdown
-        cy.get('app-projects-dropdown #projects-selected').contains(unassigned);
-        cy.get('app-projects-dropdown .dropdown-button').should('not.have.attr', 'disabled');
+        cy.get('app-team-management app-projects-dropdown #projects-selected').contains(unassigned);
+        cy.get('app-team-management app-projects-dropdown .dropdown-button')
+          .should('not.have.attr', 'disabled');
 
         // open projects dropdown
-        cy.get('app-projects-dropdown .dropdown-button').click();
+        cy.get('app-team-management app-projects-dropdown .dropdown-button').click();
 
         // dropdown contains both custom projects, none clicked
-        cy.get('app-projects-dropdown chef-dropdown')
-          .children('chef-checkbox').contains(project1Name);
-        cy.get('app-projects-dropdown chef-dropdown')
-          .children('chef-checkbox').contains(project2Name);
+        cy.get(`app-team-management app-projects-dropdown chef-checkbox[title="${project1Name}"]`)
+          .should('have.attr', 'aria-checked', 'false');
+        cy.get(`app-team-management app-projects-dropdown chef-checkbox[title="${project2Name}"]`)
+          .should('have.attr', 'aria-checked', 'false');
 
         // close projects dropdown
         cy.get('app-projects-dropdown .dropdown-button').click();
@@ -273,7 +277,7 @@ describe('team management', () => {
 
         // save team
         cy.get('[data-cy=save-button]').click();
-        cy.get('app-team-management chef-modal').should('not.be.visible');
+        cy.get('app-team-management app-team-management chef-modal').should('not.be.visible');
         cy.get('chef-notification.info').should('be.visible');
         cy.contains(teamName).should('exist');
         cy.contains(generatedTeamID).should('exist');

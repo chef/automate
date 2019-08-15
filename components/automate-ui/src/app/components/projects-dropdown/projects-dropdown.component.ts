@@ -1,7 +1,6 @@
 import {
   Component, EventEmitter, Input, Output, OnChanges
 } from '@angular/core';
-//import { orderBy, hasIn } from 'lodash/fp';
 
 import { ProjectConstants, Project } from 'app/entities/projects/project.model';
 

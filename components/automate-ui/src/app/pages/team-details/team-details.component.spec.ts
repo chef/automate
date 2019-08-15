@@ -25,6 +25,10 @@ import {
 } from 'app/entities/teams/team.actions';
 import { Team } from 'app/entities/teams/team.model';
 import { TeamDetailsComponent } from './team-details.component';
+import { projectsFilterReducer } from 'app/services/projects-filter/projects-filter.reducer';
+import {
+  projectEntityReducer
+} from 'app/entities/projects/project.reducer';
 
 describe('TeamDetailsComponent', () => {
   let component: TeamDetailsComponent;
@@ -72,6 +76,8 @@ describe('TeamDetailsComponent', () => {
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-subheading' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
+        MockComponent({ selector: 'app-projects-dropdown',
+          inputs: ['projects', 'disabled'], outputs: ['onProjectChecked'] }),
         MockComponent({ selector: 'chef-tab-selector',
           inputs: ['value', 'routerLink', 'fragment']
         }),
@@ -84,7 +90,9 @@ describe('TeamDetailsComponent', () => {
           router: routerReducer,
           teams: teamEntityReducer,
           users: userEntityReducer,
-          policies: policyEntityReducer
+          policies: policyEntityReducer,
+          projects: projectEntityReducer,
+          projectsFilter: projectsFilterReducer
         }, { initialState })
       ]
     }).compileComponents();

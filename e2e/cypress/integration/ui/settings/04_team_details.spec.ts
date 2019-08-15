@@ -139,7 +139,8 @@ describe('team management', () => {
 
         // initial state of dropdown
         cy.get('app-team-details app-projects-dropdown #projects-selected').contains(unassigned);
-        cy.get('app-projects-dropdown .dropdown-button').should('have.attr', 'disabled');
+        cy.get('app-team-details app-projects-dropdown .dropdown-button')
+          .should('have.attr', 'disabled');
 
         cy.get('[data-cy=team-details-name-input]').type('updated name');
         cy.get('[data-cy=team-details-submit-button]').should('not.have.attr', 'aria-disabled');
@@ -200,9 +201,9 @@ describe('team management', () => {
           cy.get('app-team-details app-projects-dropdown .dropdown-button').click();
 
           // dropdown contains both custom projects, one selected already, click the other
-          cy.get(`app-projects-dropdown chef-checkbox[title="${project1Name}"]`)
+          cy.get(`app-team-details app-projects-dropdown chef-checkbox[title="${project1Name}"]`)
             .should('have.attr', 'aria-checked', 'true');
-          cy.get(`app-projects-dropdown chef-checkbox[title="${project2Name}"]`)
+          cy.get(`app-team-details app-projects-dropdown chef-checkbox[title="${project2Name}"]`)
             .should('have.attr', 'aria-checked', 'false').find('chef-icon').click();
           cy.get('app-team-details app-projects-dropdown .dropdown-button').click();
 
@@ -213,9 +214,9 @@ describe('team management', () => {
 
           // de-select project1 and project2
           cy.get('app-team-details app-projects-dropdown .dropdown-button').click();
-          cy.get(`app-projects-dropdown chef-checkbox[title="${project1Name}"]`)
+          cy.get(`app-team-details app-projects-dropdown chef-checkbox[title="${project1Name}"]`)
             .should('have.attr', 'aria-checked', 'true').find('chef-icon').click();
-          cy.get(`app-projects-dropdown chef-checkbox[title="${project2Name}"]`)
+          cy.get(`app-team-details app-projects-dropdown chef-checkbox[title="${project2Name}"]`)
             .should('have.attr', 'aria-checked', 'true').find('chef-icon').click();
           cy.get('app-team-details app-projects-dropdown .dropdown-button').click();
 
