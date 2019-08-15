@@ -6,11 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"runtime/debug"
-
-	"github.com/davecgh/go-spew/spew"
-
-	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/lib/cereal"
 )
@@ -45,7 +40,6 @@ type MultiWorkflowTaskParam struct {
 func marshal(key string, obj interface{}) (json.RawMessage, error) {
 	structFields := []reflect.StructField{}
 	if obj != nil {
-		debug.PrintStack()
 		structFields = append(structFields, reflect.StructField{
 			Name:      "Anonymous",
 			Type:      reflect.TypeOf(obj),
@@ -97,8 +91,6 @@ type enqueueTaskRequest struct {
 }
 
 func (w *workflowInstance) EnqueueTask(taskName string, parameters interface{}, opts ...cereal.TaskEnqueueOpts) error {
-	logrus.Info("Enqueuing task")
-	spew.Dump(parameters)
 	jsonVal, err := marshal(w.key, parameters)
 	if err != nil {
 		return err
@@ -145,7 +137,6 @@ func applyDecision(instance *workflowInstance, decision cereal.Decision) Workflo
 		for _, enq := range instance.enqueuedTasks {
 			err := instance.w.EnqueueTask(enq.taskName, enq.parameters, enq.opts...)
 			if err != nil {
-				logrus.WithError(err).Error("failed to enqueue task")
 				return WorkflowState{
 					IsFinished:     true,
 					Err:            err.Error(),
@@ -319,19 +310,23 @@ func (m *MultiWorkflow) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEven
 		State: make(map[string]WorkflowState),
 	}
 
-	for key, executor := range m.executors {
+	for key, state := range payload.State {
 		var subWorkflowParams json.RawMessage
 		if parameters.WorkflowParams != nil {
 			subWorkflowParams = parameters.WorkflowParams[key]
 		}
-		workflowState, ok := payload.State[key]
+		// Don't remove this copy. the for loop reuses state
+		subWorkflowState := state
+
+		executor, ok := m.executors[key]
 		if !ok {
-			return w.Fail(fmt.Errorf("could not find workflow state for %q", key))
+			return w.Fail(fmt.Errorf("could not find workflow executor for %q", key))
 		}
+
 		instance := &workflowInstance{
 			key:        key,
 			w:          w,
-			lastState:  &workflowState,
+			lastState:  &subWorkflowState,
 			parameters: subWorkflowParams,
 		}
 		decision := executor.OnCancel(instance, ev)

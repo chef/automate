@@ -20,7 +20,7 @@ const (
 	ProjectUpdateUnknownState    = "unknown"
 
 	ProjectUpdateWorkflowName = "ProjectUpdate"
-	ProjectUpdateInstanceName = "Singleton"
+	ProjectUpdateInstanceName = "SingletonV1"
 )
 
 var ProjectUpdateDomainServices = []string{
