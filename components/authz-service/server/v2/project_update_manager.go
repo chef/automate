@@ -3,6 +3,7 @@ package v2
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/chef/automate/lib/cereal"
@@ -52,12 +53,26 @@ func createProjectUpdateID() string {
 	return uuid.String()
 }
 
-func NewWorkflowExecutor(domainServices []string) *multiworkflow.MultiWorkflow {
-	workflowMap := make(map[string]cereal.WorkflowExecutor, len(domainServices))
-	for _, d := range domainServices {
-		workflowMap[d] = project_update_tags.NewWorkflowExecutorForDomainService(d)
-	}
-	return multiworkflow.NewMultiWorkflowExecutor(workflowMap)
+func NewWorkflowExecutor() *multiworkflow.MultiWorkflow {
+	workflowMap := make(map[string]cereal.WorkflowExecutor)
+	lock := sync.Mutex{}
+
+	// The code below allows us to easily add to the ProjectUpdateDomainServices list.
+	// By not preconfiguring our workflow with an exact set of subworkflow executors,
+	// we can generate the workflow executor for the correct domain service easily.
+	// The logic only depends on the name. This means that an instance of authz that
+	// didn't know about a domain service can still drive its workflow.
+	return multiworkflow.NewMultiWorkflowExecutor(func(key string) (cereal.WorkflowExecutor, bool) {
+		lock.Lock()
+		defer lock.Unlock()
+		if workflowExecutor, ok := workflowMap[key]; ok {
+			return workflowExecutor, true
+		}
+		logrus.Infof("creating workflow executor for %q", key)
+		workflowExecutor := project_update_tags.NewWorkflowExecutorForDomainService(key)
+		workflowMap[key] = workflowExecutor
+		return workflowExecutor, true
+	})
 }
 
 type CerealProjectUpdateManager struct {
@@ -68,7 +83,7 @@ type CerealProjectUpdateManager struct {
 }
 
 func RegisterCerealProjectUpdateManager(manager *cereal.Manager) (ProjectUpdateMgr, error) {
-	domainServicesWorkflowExecutor := NewWorkflowExecutor(ProjectUpdateDomainServices)
+	domainServicesWorkflowExecutor := NewWorkflowExecutor()
 
 	if err := manager.RegisterWorkflowExecutor(ProjectUpdateWorkflowName, domainServicesWorkflowExecutor); err != nil {
 		return nil, err
@@ -100,7 +115,7 @@ func (m *CerealProjectUpdateManager) Start() error {
 			ProjectUpdateID: createProjectUpdateID(),
 		}
 	}
-	return multiworkflow.EnqueueWorkflow(context.Background(), m.manager, m.workflowName, m.instanceName, params)
+	return multiworkflow.EnqueueWorkflow(context.Background(), m.manager, m.workflowName, m.instanceName, m.domainServices, params)
 }
 
 func (m *CerealProjectUpdateManager) Failed() bool {
@@ -119,6 +134,7 @@ func (m *CerealProjectUpdateManager) Failed() bool {
 
 	var payload *multiworkflow.MultiWorkflowPayload
 	if instance.IsRunning() {
+		logrus.Info("Running")
 		var err error
 		payload, err = instance.GetPayload()
 		if err != nil {
@@ -126,6 +142,7 @@ func (m *CerealProjectUpdateManager) Failed() bool {
 			return true
 		}
 	} else {
+		logrus.Info("Not running")
 		var err error
 		payload, err = instance.GetResult()
 		if err != nil {
@@ -135,7 +152,7 @@ func (m *CerealProjectUpdateManager) Failed() bool {
 	}
 
 	// OnStart has not run yet
-	if payload == nil {
+	if payload.State == nil {
 		return false
 	}
 
@@ -186,7 +203,7 @@ func (m *CerealProjectUpdateManager) FailureMessage() string {
 	}
 
 	// OnStart has not run yet
-	if payload == nil {
+	if payload.State == nil {
 		return ""
 	}
 

@@ -7,13 +7,15 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/chef/automate/lib/cereal"
 )
 
 var ErrSubworkflowNotFound error = errors.New("subworkflow not found")
 
 type MultiWorkflow struct {
-	executors map[string]cereal.WorkflowExecutor
+	executorForFunc ExecutorFor
 }
 
 type WorkflowState struct {
@@ -30,7 +32,8 @@ type MultiWorkflowPayload struct {
 }
 
 type MultiWorkflowParams struct {
-	WorkflowParams map[string]json.RawMessage
+	SubworkflowKeys []string
+	WorkflowParams  map[string]json.RawMessage
 }
 
 type MultiWorkflowTaskParam struct {
@@ -208,6 +211,7 @@ func (p MultiWorkflowPayload) Finished() bool {
 
 func (m *MultiWorkflow) OnStart(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
 	instances := make(map[string]*workflowInstance)
+	logrus.Info("ONSTART")
 	parameters := MultiWorkflowParams{
 		WorkflowParams: make(map[string]json.RawMessage),
 	}
@@ -215,11 +219,12 @@ func (m *MultiWorkflow) OnStart(w cereal.WorkflowInstance, ev cereal.StartEvent)
 	if err := w.GetParameters(&parameters); err != nil {
 		return w.Fail(err)
 	}
+
 	nextPayload := MultiWorkflowPayload{
 		State: make(map[string]WorkflowState),
 	}
 
-	for key, executor := range m.executors {
+	for _, key := range parameters.SubworkflowKeys {
 		var subWorkflowParams json.RawMessage
 		if parameters.WorkflowParams != nil {
 			subWorkflowParams = parameters.WorkflowParams[key]
@@ -230,6 +235,10 @@ func (m *MultiWorkflow) OnStart(w cereal.WorkflowInstance, ev cereal.StartEvent)
 			parameters: subWorkflowParams,
 		}
 		instances[key] = instance
+		executor, ok := m.executorForFunc(key)
+		if !ok {
+			return w.Fail(fmt.Errorf("could not find workflow executor for %q", key))
+		}
 		decision := executor.OnStart(instance, ev)
 		ns := applyDecision(instance, decision)
 		nextPayload.State[key] = ns
@@ -267,7 +276,7 @@ func (m *MultiWorkflow) OnTaskComplete(w cereal.WorkflowInstance, ev cereal.Task
 
 	if !workflowState.IsFinished {
 		workflowState.CompletedTasks++
-		executor, ok := m.executors[key]
+		executor, ok := m.executorForFunc(key)
 		if !ok {
 			return w.Fail(fmt.Errorf("could not find workflow executor for %q", key))
 		}
@@ -318,7 +327,7 @@ func (m *MultiWorkflow) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEven
 		// Don't remove this copy. the for loop reuses state
 		subWorkflowState := state
 
-		executor, ok := m.executors[key]
+		executor, ok := m.executorForFunc(key)
 		if !ok {
 			return w.Fail(fmt.Errorf("could not find workflow executor for %q", key))
 		}
@@ -339,15 +348,18 @@ func (m *MultiWorkflow) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEven
 	return w.Continue(nextPayload)
 }
 
-func NewMultiWorkflowExecutor(executors map[string]cereal.WorkflowExecutor) *MultiWorkflow {
+type ExecutorFor func(subworkflow string) (cereal.WorkflowExecutor, bool)
+
+func NewMultiWorkflowExecutor(executorForFunc ExecutorFor) *MultiWorkflow {
 	return &MultiWorkflow{
-		executors: executors,
+		executorForFunc: executorForFunc,
 	}
 }
 
-func EnqueueWorkflow(ctx context.Context, m *cereal.Manager, workflowName string, instanceName string, parameters map[string]interface{}) error {
+func EnqueueWorkflow(ctx context.Context, m *cereal.Manager, workflowName string, instanceName string, subworkflows []string, parameters map[string]interface{}) error {
 	transformedParams := MultiWorkflowParams{
-		WorkflowParams: map[string]json.RawMessage{},
+		SubworkflowKeys: subworkflows,
+		WorkflowParams:  map[string]json.RawMessage{},
 	}
 
 	for key, val := range parameters {
