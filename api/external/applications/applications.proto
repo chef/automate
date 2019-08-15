@@ -51,16 +51,6 @@ service ApplicationsService {
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
   };
 
-// FIXME: delete if not needed
-  // rpc GetServicesBySGUniqueFields(ServicesBySGUniqueFieldsReq) returns (ServicesBySGRes) {
-  //   // FIXME: fix the URL; define ServicesBySGUniqueFieldsReq
-  //   option (google.api.http).get = "/beta/applications/service-groups/{service_group_id}";
-  //   option (chef.automate.api.policy).resource = "service_groups";
-  //   option (chef.automate.api.policy).action = "list";
-  //   option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
-  //   option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
-  // }
-
   rpc GetServicesStats(ServicesStatsReq) returns (ServicesStatsRes) {
     option (google.api.http).get = "/beta/applications/stats";
     option (chef.automate.api.policy).resource = "service_groups";

@@ -27,8 +27,6 @@ type Client interface {
 	GetServiceGroupsHealthCounts() (*HealthCounts, error)
 	// @param (id)
 	GetDeployment(int32) (*Deployment, error)
-	// @param (id)
-	GetSupervisor(int32) (*Supervisor, error)
 
 	GetServicesCount() (int32, error)
 	GetServiceGroupsCount() (int32, error)

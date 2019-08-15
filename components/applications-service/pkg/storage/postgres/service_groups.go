@@ -79,9 +79,6 @@ const (
 	groupByPart = `
   GROUP BY s.service_group_id, s.application, s.environment, s.service_group_name, s.service_group_name_suffix ) as sghc
 `
-	// FIXME: remove references
-	joinSupervisor = `
-`
 	selectServiceGroupHealthFilterCRITICAL = `
   WHERE
    health_critical > 0
@@ -167,13 +164,13 @@ func (db *Postgres) GetServiceGroups(
 
 	if statusFilter && needSupervisorTable {
 		// We need to join to the supervisor table is we are filtering by Site
-		selectAllPartsQuery = selectMainQuery + joinSupervisor + whereQuery + groupByPart + statusQuery + paginationSorting
+		selectAllPartsQuery = selectMainQuery + whereQuery + groupByPart + statusQuery + paginationSorting
 	} else if statusFilter {
 		// The status query has to go outside of the inner query because the health count filters need to be calculated
 		// in order to be used in the where clause
 		selectAllPartsQuery = selectMainQuery + whereQuery + groupByPart + statusQuery + paginationSorting
 	} else if needSupervisorTable {
-		selectAllPartsQuery = selectMainQuery + joinSupervisor + whereQuery + groupByPart + paginationSorting
+		selectAllPartsQuery = selectMainQuery + whereQuery + groupByPart + paginationSorting
 	} else {
 		selectAllPartsQuery = selectMainQuery + whereQuery + groupByPart + paginationSorting
 	}
@@ -183,9 +180,6 @@ func (db *Postgres) GetServiceGroups(
 
 	_, err = db.DbMap.Select(&sgHealth, formattedQuery, pageSize, offset)
 	if err != nil {
-		// FIXME: remove
-		fmt.Println(formattedQuery)
-
 		return nil, errors.Wrap(err, "Unable to retrieve service groups from the database")
 	}
 	sgDisplay := make([]*storage.ServiceGroupDisplay, len(sgHealth))
@@ -496,15 +490,4 @@ func inArray(value string, array []string) bool {
 		}
 	}
 	return false
-}
-
-func (db *Postgres) getServiceGroup(id int32) (*serviceGroup, error) {
-	var sg serviceGroup
-	err := db.SelectOne(&sg,
-		"SELECT id, deployment_id, name FROM service_group WHERE id = $1", id)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to retrieve service group from the database")
-	}
-
-	return &sg, nil
 }
