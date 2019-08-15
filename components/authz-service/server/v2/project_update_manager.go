@@ -152,7 +152,7 @@ func (m *CerealProjectUpdateManager) Failed() bool {
 	}
 
 	// OnStart has not run yet
-	if payload.State == nil {
+	if payload == nil || payload.State == nil {
 		return false
 	}
 
@@ -203,7 +203,7 @@ func (m *CerealProjectUpdateManager) FailureMessage() string {
 	}
 
 	// OnStart has not run yet
-	if payload.State == nil {
+	if payload == nil || payload.State == nil {
 		return ""
 	}
 
