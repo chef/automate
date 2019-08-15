@@ -305,7 +305,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   noProjectsUpdated(): boolean {
     return xor(this.team.projects,
       Object.values(this.projects).filter(p => p.checked).map(p => p.id)).length === 0;
-
   }
 
   dropdownDisabled(): boolean {

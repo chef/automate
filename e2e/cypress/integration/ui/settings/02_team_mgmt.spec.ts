@@ -53,6 +53,10 @@ describe('team management', () => {
     cy.restoreStorage();
   });
 
+  beforeEach(() => {
+    cy.restoreStorage();
+  });
+
   afterEach(() => {
     cy.saveStorage();
     cy.cleanupTeamsByDescriptionPrefix(adminToken, cypressPrefix);

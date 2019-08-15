@@ -43,11 +43,14 @@ export class ProjectsFilterService {
     // This is a dummy URL but it must exist in the routing module.
     const reloadUrl = '/reload';
 
+    console.log('before');
     // The router only routes if the route changes.
     // This first switches to somewhere-that-is-not-here
     // then back to here, so the router will do its thing.
+    console.log(currentUrl);
     this.router.navigateByUrl(reloadUrl, { skipLocationChange: true })
       .then(() => this.router.navigateByUrl(currentUrl, { skipLocationChange: true }));
+    console.log('after');
   }
 
   restoreOptions(): ProjectsFilterOption[] {

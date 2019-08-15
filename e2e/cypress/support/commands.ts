@@ -42,7 +42,7 @@ Cypress.Commands.add('applyProjectsFilter', (projectsToFilterOn: string[]) => {
 
   // check all desired checkboxes
   projectsToFilterOn.forEach(proj =>
-    cy.get(`chef-checkbox[title="${proj}"]`).find('chef-icon').click());
+    cy.get(`app-projects-filter chef-checkbox[title="${proj}"]`).find('chef-icon').click());
 
   if (projectsToFilterOn.length === 0) {
     // no changes to apply, close projects filter

@@ -96,27 +96,33 @@ describe('team management', () => {
         cy.get('app-welcome-modal').invoke('hide');
       });
     });
+  });
 
+  beforeEach(() => {
     cy.restoreStorage();
   });
 
-  // it('displays team details for admins team', () => {
-  //   cy.get('chef-breadcrumbs').contains('Teams');
-  //   cy.get('chef-breadcrumbs').contains(teamName);
+  afterEach(() => {
+    cy.saveStorage();
+  });
 
-  //   cy.get('.page-title').contains(teamName);
-  //   cy.contains('Add User');
-  // });
+  it('displays team details for admins team', () => {
+    cy.get('chef-breadcrumbs').contains('Teams');
+    cy.get('chef-breadcrumbs').contains(teamName);
 
-  // context('when the team has users', () => {
-  //   it('displays team users', () => {
-  //     cy.get('chef-option').contains('Users');
-  //     cy.get('app-user-table chef-th').contains('Name');
-  //     cy.get('app-user-table chef-th').contains('Username');
-  //     cy.get('app-user-table chef-td').contains(usernameForUser);
-  //     cy.get('app-user-table chef-td').contains(nameForUser);
-  //   });
-  // });
+    cy.get('.page-title').contains(teamName);
+    cy.contains('Add User');
+  });
+
+  context('when the team has users', () => {
+    it('displays team users', () => {
+      cy.get('chef-option').contains('Users');
+      cy.get('app-user-table chef-th').contains('Name');
+      cy.get('app-user-table chef-th').contains('Username');
+      cy.get('app-user-table chef-td').contains(usernameForUser);
+      cy.get('app-user-table chef-td').contains(nameForUser);
+    });
+  });
 
   describeProjectsEnabled('update team projects (IAM v2.1 only)', () => {
     const dropdownNameUntilEllipsisLen = 25;
@@ -126,18 +132,18 @@ describe('team management', () => {
         cy.applyProjectsFilter([unassigned]);
       });
 
-      // it('cannot access projects dropdown but changing name allows team update submission', () => {
-      //   cy.get('[data-cy=team-details-tab-details]').click();
-      //   cy.get('[data-cy=team-details-name-input]').should('have.value', teamName);
-      //   cy.get('[data-cy=team-details-submit-button]').should('have.attr', 'aria-disabled');
+      it('cannot access projects dropdown but changing name allows team update submission', () => {
+        cy.get('[data-cy=team-details-tab-details]').click();
+        cy.get('[data-cy=team-details-name-input]').should('have.value', teamName);
+        cy.get('[data-cy=team-details-submit-button]').should('have.attr', 'aria-disabled');
 
-      //   // initial state of dropdown
-      //   cy.get('app-team-details app-projects-dropdown #projects-selected').contains(unassigned);
-      //   cy.get('app-projects-dropdown .dropdown-button').should('have.attr', 'disabled');
+        // initial state of dropdown
+        cy.get('app-team-details app-projects-dropdown #projects-selected').contains(unassigned);
+        cy.get('app-projects-dropdown .dropdown-button').should('have.attr', 'disabled');
 
-      //   cy.get('[data-cy=team-details-name-input]').type('updated name');
-      //   cy.get('[data-cy=team-details-submit-button]').should('not.have.attr', 'aria-disabled');
-      // });
+        cy.get('[data-cy=team-details-name-input]').type('updated name');
+        cy.get('[data-cy=team-details-submit-button]').should('not.have.attr', 'aria-disabled');
+      });
     });
 
     context('when the team contains a project', () => {
@@ -169,17 +175,11 @@ describe('team management', () => {
 
       context('when the project filter contains team project and other project', () => {
         beforeEach(() => {
-          cy.route('GET', `/apis/iam/v2beta/projects/${project1ID}`).as('getProjectForTeam');
-
           // TODO (tc): Note that as stands, if you ever update a team to only contain projects
           // not in the project filter -- including (unassigned) -- you'll get an error on save
           // since the project filter is applied to the request to re-fetch the team. Known issue
           // we are going to address in future work.
           cy.applyProjectsFilter([unassigned, project1Name, project2Name]);
-
-          // Wait for the project contained in the team to be fetched. This is necessary
-          // since the element will load before this request does so cypress won't wait.
-          cy.wait('@getProjectForTeam');
         });
 
         it('both are contained in the projects dropdown and the team project is selected,' +
