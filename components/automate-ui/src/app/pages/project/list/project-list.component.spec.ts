@@ -95,15 +95,18 @@ describe('ProjectListComponent', () => {
       projects: [
         {
           id: 'uuid-1', name: 'Default',
-          type: 'CHEF_MANAGED'
+          type: 'CHEF_MANAGED',
+          status: 'NO_RULES'
         },
         {
           id: 'uuid-2', name: 'another-project',
-          type: 'CUSTOM'
+          type: 'CUSTOM',
+          status: 'NO_RULES'
         },
         {
           id: 'uuid-5', name: 'zzz-project',
-          type: 'CUSTOM'
+          type: 'CUSTOM',
+          status: 'NO_RULES'
         }
       ]
     }));
@@ -126,15 +129,18 @@ describe('ProjectListComponent', () => {
         projects: [
           {
             id: 'uuid-1', name: 'Default',
-            type: 'CHEF_MANAGED'
+            type: 'CHEF_MANAGED',
+            status: 'NO_RULES'
           },
           {
             id: 'uuid-2', name: 'another-project',
-            type: 'CUSTOM'
+            type: 'CUSTOM',
+            status: 'NO_RULES'
           },
           {
             id: 'uuid-5', name: 'zzz-project',
-            type: 'CUSTOM'
+            type: 'CUSTOM',
+            status: 'NO_RULES'
           }
         ]
       }));
@@ -181,15 +187,18 @@ describe('ProjectListComponent', () => {
         projects: [
           {
             id: 'uuid-1', name: 'Default',
-            type: 'CHEF_MANAGED'
+            type: 'CHEF_MANAGED',
+            status: 'NO_RULES'
           },
           {
             id: 'uuid-2', name: 'another-project',
-            type: 'CUSTOM'
+            type: 'CUSTOM',
+            status: 'NO_RULES'
           },
           {
             id: 'uuid-5', name: 'zzz-project',
-            type: 'CUSTOM'
+            type: 'CUSTOM',
+            status: 'NO_RULES'
           }
         ]
       }));
@@ -206,15 +215,18 @@ describe('ProjectListComponent', () => {
         projects: [
           {
             id: 'uuid-2', name: 'default',
-            type: 'CUSTOM'
+            type: 'CUSTOM',
+            status: 'NO_RULES'
           },
           {
             id: 'uuid-4', name: 'default-resources',
-            type: 'CUSTOM'
+            type: 'CUSTOM',
+            status: 'NO_RULES'
           },
           {
             id: 'uuid-5', name: 'Default',
-            type: 'CUSTOM'
+            type: 'CUSTOM',
+            status: 'NO_RULES'
           }
         ]
       }));
@@ -231,23 +243,28 @@ describe('ProjectListComponent', () => {
         projects: [
           {
             id: 'uuid-1', name: 'Project01',
-            type: 'CHEF_MANAGED'
+            type: 'CHEF_MANAGED',
+            status: 'NO_RULES'
           },
           {
             id: 'uuid-2', name: 'Project300',
-            type: 'CUSTOM'
+            type: 'CUSTOM',
+            status: 'NO_RULES'
           },
           {
             id: 'uuid-3', name: 'Project3',
-            type: 'CUSTOM'
+            type: 'CUSTOM',
+            status: 'NO_RULES'
           },
           {
             id: 'uuid-4', name: 'Project-2',
-            type: 'CUSTOM'
+            type: 'CUSTOM',
+            status: 'NO_RULES'
           },
           {
             id: 'uuid-6', name: 'project',
-            type: 'CHEF_MANAGED'
+            type: 'CHEF_MANAGED',
+            status: 'NO_RULES'
           }
         ]
       }));

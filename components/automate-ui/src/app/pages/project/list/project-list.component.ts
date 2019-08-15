@@ -194,4 +194,11 @@ export class ProjectListComponent implements OnInit {
   cancelApplyStop() {
     this.closeConfirmApplyStopModal();
   }
+
+  getRulesStatus(project: Project): string {
+    return project.status === 'NO_RULES' ? 'No rules'
+      : project.status === 'EDITS_PENDING' ? 'Edits pending'
+        : project.status === 'RULES_APPLIED' ? 'Applied'
+          : '';
+  }
 }

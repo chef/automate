@@ -20,7 +20,8 @@ describe('ProjectRulesComponent', () => {
   const project: Project = {
     id: 'uuid-1',
     name: 'Default',
-    type: 'CHEF_MANAGED'
+    type: 'CHEF_MANAGED',
+    status: 'NO_RULES'
   };
 
   beforeEach(async(() => {

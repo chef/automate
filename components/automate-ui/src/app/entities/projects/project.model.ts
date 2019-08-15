@@ -1,9 +1,11 @@
 import { IAMType } from '../policies/policy.model';
+import { ProjectStatus } from '../rules/rule.model';
 
 export interface Project {
   id: string;
   name: string;
   type: IAMType;
+  status: ProjectStatus;
 }
 
 export class ProjectConstants {
