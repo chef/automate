@@ -15,16 +15,14 @@
   <chef-click-outside (clickOutside)="closeDropdown()">
     <chef-dropdown [attr.visible]="active">
       <chef-checkbox
-        *ngFor="let project of projects; index as i"
-        [checked]="projectSelected(project)"
-        (change)="updateProjects($event.detail, i)"
+        *ngFor="let project of projectsArray();"
+        [checked]="project.checked"
+        [attr.title]="project.name"
+        (change)="projectChecked($event.detail, project)"
         (keydown.enter)="closeColumnDropdown()"
         (keydown.esc)="closeColumnDropdown()"
         (keydown.arrowup)="moveFocus($event)"
         (keydown.arrowdown)="moveFocus($event)">{{ project['name'] }}</chef-checkbox>
-      <div class="error" *ngIf="showError">
-        At least one item must be selected.
-      </div>
     </chef-dropdown>
   </chef-click-outside>
 </div>

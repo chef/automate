@@ -74,9 +74,9 @@
       </form>
       <div id='projects-container' *ngIf="!isMajorV1 && isMinorV1">
         <app-projects-dropdown
-          [projects]="dropdownProjects"
-          (onSelection)="projectsDropdownAction($event)"
-          [disabled]="dropdownProjects.length === 0 || teamProjectsLeftToFetch.length !== 0">
+          [projects]="projects"
+          (onProjectChecked)="onProjectChecked($event)"
+          [disabled]="dropdownDisabled()">
         </app-projects-dropdown>
         <chef-loading-spinner  size="30" *ngIf="teamProjectsLeftToFetch.length !== 0"></chef-loading-spinner>
       </div>

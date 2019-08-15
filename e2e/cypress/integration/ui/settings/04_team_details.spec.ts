@@ -170,13 +170,15 @@ describe('team management', () => {
       context('when the project filter contains team project and other project', () => {
         beforeEach(() => {
           cy.route('GET', `/apis/iam/v2beta/projects/${project1ID}`).as('getProjectForTeam');
+
           // TODO (tc): Note that as stands, if you ever update a team to only contain projects
           // not in the project filter -- including (unassigned) -- you'll get an error on save
           // since the project filter is applied to the request to re-fetch the team. Known issue
           // we are going to address in future work.
           cy.applyProjectsFilter([unassigned, project1Name, project2Name]);
 
-          // Wait for the project contained in the team to 
+          // Wait for the project contained in the team to be fetched. This is necessary
+          // since the element will load before this request does so cypress won't wait.
           cy.wait('@getProjectForTeam');
         });
 
@@ -198,32 +200,29 @@ describe('team management', () => {
           cy.get('app-team-details app-projects-dropdown .dropdown-button').click();
 
           // dropdown contains both custom projects, one selected already, click the other
-          cy.get('app-projects-dropdown chef-dropdown')
-            .children('chef-checkbox').contains(project1Name)
+          cy.get(`app-projects-dropdown chef-checkbox[title="${project1Name}"]`)
             .should('have.attr', 'aria-checked', 'true');
-          cy.get('app-projects-dropdown chef-dropdown')
-            .children('chef-checkbox').contains(project2Name)
-            .should('not.have.attr', 'aria-checked', 'true').click();
+          cy.get(`app-projects-dropdown chef-checkbox[title="${project2Name}"]`)
+            .should('have.attr', 'aria-checked', 'false').find('chef-icon').click();
+          cy.get('app-team-details app-projects-dropdown .dropdown-button').click();
 
           // save
           cy.get('app-team-details app-projects-dropdown #projects-selected')
             .contains(projectSummary);
-          cy.get('[data-cy=team-details-submit-button]')
-            .should('not.have.attr', 'aria-disabled').click();
+          cy.get('[data-cy=team-details-submit-button]').click();
 
           // de-select project1 and project2
-          cy.get('app-projects-dropdown chef-dropdown')
-          .children('chef-checkbox').contains(project1Name)
-            .should('have.attr', 'aria-checked', 'true').click();
-          cy.get('app-projects-dropdown chef-dropdown')
-            .children('chef-checkbox').contains(project2Name)
-            .should('have.attr', 'aria-checked', 'true').click();
+          cy.get('app-team-details app-projects-dropdown .dropdown-button').click();
+          cy.get(`app-projects-dropdown chef-checkbox[title="${project1Name}"]`)
+            .should('have.attr', 'aria-checked', 'true').find('chef-icon').click();
+          cy.get(`app-projects-dropdown chef-checkbox[title="${project2Name}"]`)
+            .should('have.attr', 'aria-checked', 'true').find('chef-icon').click();
+          cy.get('app-team-details app-projects-dropdown .dropdown-button').click();
 
           // save
           cy.get('app-team-details app-projects-dropdown #projects-selected')
             .contains(unassigned);
-          cy.get('[data-cy=team-details-submit-button]')
-            .should('not.have.attr', 'aria-disabled').click();
+          cy.get('[data-cy=team-details-submit-button]').click();
         });
       });
     });

@@ -1,15 +1,21 @@
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import {
+  Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges
+} from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { hasIn } from 'lodash/fp';
 
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Project } from 'app/entities/projects/project.model';
+import {
+  ProjectChecked, projectCheckedFromProject
+} from 'app/components/projects-dropdown/projects-dropdown.component';
 
 @Component({
   selector: 'app-create-object-modal',
   templateUrl: './create-object-modal.component.html',
   styleUrls: ['./create-object-modal.component.scss']
 })
-export class CreateObjectModalComponent implements OnInit {
+export class CreateObjectModalComponent implements OnInit, OnChanges {
   @Input() visible = false;
   @Input() creating = false;
   @Input() objectNoun: string;
@@ -21,10 +27,11 @@ export class CreateObjectModalComponent implements OnInit {
   @Output() close = new EventEmitter();
   @Output() createClicked = new EventEmitter<Project[]>();
 
+  public projects: { [id: string]: ProjectChecked } = {};
+
   // Whether the edit ID form is open or not.
   public modifyID = false;
   public conflictError = false;
-  private projectsSelected: Project[] = [];
 
   ngOnInit(): void {
     this.conflictErrorEvent.subscribe((isConflict: boolean) => {
@@ -32,6 +39,22 @@ export class CreateObjectModalComponent implements OnInit {
       // Open the ID input on conflict so user can resolve it.
       this.modifyID = true;
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    // if a new list of projects to populate dropdown with is passed in we update the dropdown
+    if (hasIn('assignableProjects.currentValue', changes)) {
+      changes.assignableProjects.currentValue.forEach(proj =>
+        this.projects[proj.id] = projectCheckedFromProject(proj, false));
+    }
+  }
+
+  onProjectChecked(project: ProjectChecked): void {
+    this.projects[project.id] = project;
+  }
+
+  dropdownDisabled(): boolean {
+    return Object.values(this.projects).length === 0;
   }
 
   public handleNameInput(event: KeyboardEvent): void {
@@ -55,14 +78,10 @@ export class CreateObjectModalComponent implements OnInit {
   }
 
   createObject(): void {
-    this.createClicked.emit(this.projectsSelected);
+    this.createClicked.emit(Object.values(this.projects).filter(p => p.checked));
   }
 
   private isNavigationKey(event: KeyboardEvent): boolean {
     return event.key === 'Shift' || event.key === 'Tab';
-  }
-
-  projectsDropdownAction(projects: Project[]): void {
-    this.projectsSelected = projects;
   }
 }

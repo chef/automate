@@ -21,7 +21,7 @@ import { Regex } from 'app/helpers/auth/regex';
 import { HttpStatus } from 'app/types/types';
 import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
-import { Project, ProjectConstants, sortProjectsByName } from 'app/entities/projects/project.model';
+import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 
 @Component({
   selector: 'app-team-management',
@@ -106,13 +106,13 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
 
     this.store.select(assignableProjects)
       .subscribe((assignable: ProjectsFilterOption[]) => {
-        this.dropdownProjects = sortProjectsByName(assignable.map(p => {
+        this.dropdownProjects = assignable.map(p => {
           return <Project>{
             id: p.value,
             name: p.label,
             type: p.type
           };
-        }));
+        });
       });
   }
 

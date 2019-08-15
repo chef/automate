@@ -35,9 +35,6 @@ Cypress.Commands.add('applyProjectsFilter', (projectsToFilterOn: string[]) => {
   cy.get('app-projects-filter chef-dropdown#projects-filter-dropdown')
     .find('chef-checkbox').each(child => {
     // deselect every checkbox
-    console.log('wat');
-    console.log(child);
-    console.log(child.attr('aria-checked') === 'true');
     if (child.attr('aria-checked') === 'true') {
       child.click();
     }

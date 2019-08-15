@@ -1,8 +1,8 @@
-import { Component, OnInit, OnDestroy, ViewChild, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
-import { identity, keyBy, at, xor, indexOf } from 'lodash/fp';
+import { identity, keyBy, at, xor } from 'lodash/fp';
 import { combineLatest, Observable, Subject } from 'rxjs';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 
@@ -36,10 +36,10 @@ import {
   projectEntities
 } from 'app/entities/projects/project.selectors';
 import {
-  ProjectsDropdownComponent
+  ProjectChecked, projectCheckedFromProject
 } from 'app/components/projects-dropdown/projects-dropdown.component';
 
-import { ProjectConstants, Project, sortProjectsByName } from 'app/entities/projects/project.model';
+import { ProjectConstants, Project } from 'app/entities/projects/project.model';
 import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
 
@@ -52,9 +52,7 @@ export type TeamTabName = 'users' | 'details';
   templateUrl: './team-details.component.html',
   styleUrls: ['./team-details.component.scss']
 })
-export class TeamDetailsComponent implements OnInit, OnDestroy, AfterViewChecked {
-  @ViewChild(ProjectsDropdownComponent) projectsDropdownChildComponent !: ProjectsDropdownComponent;
-
+export class TeamDetailsComponent implements OnInit, OnDestroy {
   public updateNameForm: FormGroup;
   // isLoadingTeam represents the initial team load as well as subsequent updates in progress.
   public isLoadingTeam = true;
@@ -75,13 +73,8 @@ export class TeamDetailsComponent implements OnInit, OnDestroy, AfterViewChecked
   public removeText = 'Remove User';
 
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
-  public dropdownProjects: Project[] = [];
+  public projects: { [id: string]: ProjectChecked } = {};
   public teamProjectsLeftToFetch: string[] = [];
-  private projectsSelected: Project[] = [];
-
-  private isMajorVersionLoaded = false;
-  private isMinorVersionLoaded = false;
-  private hasGetProjectsBeenInstantiated = false;
 
   constructor(private store: Store<NgrxStateAtom>,
     public fb: FormBuilder,
@@ -132,7 +125,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy, AfterViewChecked
       .pipe(takeUntil(this.isDestroyed))
       .subscribe((version) => {
         if (version === null) { return; }
-        this.isMinorVersionLoaded = true;
         this.isMinorV1 = version === 'v1';
       });
 
@@ -146,9 +138,8 @@ export class TeamDetailsComponent implements OnInit, OnDestroy, AfterViewChecked
           };
           // we don't want to override values that we fetched
           // that were part of the team already
-          if (indexOf(proj.id, this.dropdownProjects.map(p => p.id)) === -1) {
-            this.dropdownProjects.push(proj);
-            this.dropdownProjects = sortProjectsByName(this.dropdownProjects);
+          if (!this.projects.hasOwnProperty(proj.id)) {
+            this.projects[proj.id] = projectCheckedFromProject(proj, false);
           }
         });
       });
@@ -158,7 +149,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy, AfterViewChecked
       .subscribe((version) => {
         if (version === null) { return; }
         this.isMajorV1 = version === 'v1';
-        this.isMajorVersionLoaded = true;
 
         // Triggered every time the team is updated.
         if (this.isMajorV1) {
@@ -222,22 +212,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy, AfterViewChecked
             }
           });
       });
- }
 
-  // the project query code needs to happen in ngAfterViewChecked because it depends on
-  // a @ChildView which is only for sure instantiated ngAfterViewInit and later, but we also depend
-  // on the versions being fetched, and we can't fetch them in here because they are being used in
-  // project dropdown's ngIf which casues an ExpressionChangedAfterItHasBeenCheckedError.
-  // See this blog for more details:
-  //
-  // https://blog.angular-university.io/angular-debugging/
-  ngAfterViewChecked() {
-  // only run if both versions have been loaded AND the below hasn't been run yet
-  if (this.isMinorVersionLoaded && this.isMajorVersionLoaded
-    && !this.hasGetProjectsBeenInstantiated) {
-    // pretty sure this is a ng bug. ViewChild should never be undefined in ngAfterViewChecked.
-    if (this.projectsDropdownChildComponent === undefined) { return; }
-    this.hasGetProjectsBeenInstantiated = true;
     combineLatest([
       this.store.select(getProjectStatus),
       this.store.select(projectEntities)])
@@ -248,32 +223,17 @@ export class TeamDetailsComponent implements OnInit, OnDestroy, AfterViewChecked
             this.teamProjectsLeftToFetch.forEach((pID) => {
               const project = projectMap[pID];
               if (project !== undefined) {
-                const previousIndex = indexOf(project.id, this.dropdownProjects.map(p => p.id));
-                // project hasn't been inserted yet
-                if (previousIndex === -1) {
-                  this.dropdownProjects.push(project);
-                } else {
-                  // remove original entry and replace with ours
-                  this.dropdownProjects[previousIndex] = project;
-                }
-                this.dropdownProjects = sortProjectsByName(this.dropdownProjects);
-                this.projectsSelected.push(project);
-                // check the project in our projects dropdown. child is null if its ngIf is false
-                // which will happen when we are not on v2.1.
-                if (this.projectsDropdownChildComponent !== null) {
-                  this.projectsDropdownChildComponent.updateSelectedProjects(project, true);
-                }
+                this.projects[project.id] = projectCheckedFromProject(project, true);
                 projectsFound[pID] = true;
               }
             });
 
-            // Remove all projects that have been fetched.
+            // Remove all team projects that have been fetched.
             this.teamProjectsLeftToFetch =
               this.teamProjectsLeftToFetch.filter(pID => projectsFound[pID] === undefined);
           }
       })).subscribe();
-    }
-  }
+ }
 
   ngOnDestroy() {
     this.isDestroyed.next(true);
@@ -314,7 +274,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy, AfterViewChecked
         id: this.team.id,
         name: newName,
         guid: this.team.guid, // to be deprecated after GA
-        projects: this.projectsSelected.map(p => p.id)
+        projects: Object.values(this.projects).filter(p => p.checked).map(p => p.id)
       }));
 
     const pendingSave = new Subject<boolean>();
@@ -338,11 +298,17 @@ export class TeamDetailsComponent implements OnInit, OnDestroy, AfterViewChecked
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
 
-  projectsDropdownAction(projects: Project[]): void {
-    this.projectsSelected = projects;
+  onProjectChecked(project: ProjectChecked): void {
+    this.projects[project.id] = project;
   }
 
   noProjectsUpdated(): boolean {
-    return xor(this.team.projects, this.projectsSelected.map(p => p.id)).length === 0;
+    return xor(this.team.projects,
+      Object.values(this.projects).filter(p => p.checked).map(p => p.id)).length === 0;
+
+  }
+
+  dropdownDisabled(): boolean {
+    return Object.values(this.projects).length === 0 || this.teamProjectsLeftToFetch.length !== 0;
   }
 }
