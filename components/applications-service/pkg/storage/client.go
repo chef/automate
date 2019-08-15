@@ -25,8 +25,6 @@ type Client interface {
 	// @param (filters)
 	GetServicesHealthCounts(map[string][]string) (*HealthCounts, error)
 	GetServiceGroupsHealthCounts() (*HealthCounts, error)
-	// @param (id)
-	GetDeployment(int32) (*Deployment, error)
 
 	GetServicesCount() (int32, error)
 	GetServiceGroupsCount() (int32, error)
