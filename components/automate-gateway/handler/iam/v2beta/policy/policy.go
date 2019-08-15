@@ -14,6 +14,7 @@ import (
 	pb_common "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/common"
 	pb_req "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/request"
 	pb_resp "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/response"
+	rules "github.com/chef/automate/components/automate-gateway/handler/iam/v2beta/rules"
 )
 
 // Server is the server interface
@@ -619,8 +620,9 @@ func domainProjectToAPIProject(p *authz.Project) (*pb_common.Project, error) {
 		return nil, errors.Wrapf(err, "project %q", p.Id)
 	}
 	return &pb_common.Project{
-		Id:   p.Id,
-		Name: p.Name,
-		Type: t,
+		Id:     p.Id,
+		Name:   p.Name,
+		Type:   t,
+		Status: rules.FromInternalRulesStatus(p.Status),
 	}, nil
 }

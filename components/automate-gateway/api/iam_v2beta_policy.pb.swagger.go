@@ -794,8 +794,21 @@ func init() {
         },
         "type": {
           "$ref": "#/definitions/iamv2betaType"
+        },
+        "status": {
+          "$ref": "#/definitions/v2betaProjectRulesStatus"
         }
       }
+    },
+    "v2betaProjectRulesStatus": {
+      "type": "string",
+      "enum": [
+        "PROJECT_RULES_STATUS_UNSET",
+        "RULES_APPLIED",
+        "EDITS_PENDING",
+        "NO_RULES"
+      ],
+      "default": "PROJECT_RULES_STATUS_UNSET"
     },
     "v2betaRemovePolicyMembersReq": {
       "type": "object",
