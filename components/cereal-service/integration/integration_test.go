@@ -9,21 +9,20 @@ import (
 	"testing"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-
-	"github.com/chef/automate/components/cereal-service/pkg/server"
-	"github.com/chef/automate/lib/cereal"
+	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
+	"google.golang.org/grpc"
 
 	grpccereal "github.com/chef/automate/api/interservice/cereal"
+	"github.com/chef/automate/components/cereal-service/pkg/server"
+	"github.com/chef/automate/lib/cereal"
 	libgrpc "github.com/chef/automate/lib/cereal/grpc"
 	cerealintegration "github.com/chef/automate/lib/cereal/integration"
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/platform/pg"
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/suite"
-	"google.golang.org/grpc"
 )
 
 const (
@@ -86,11 +85,12 @@ func TestGrpcPostgres(t *testing.T) {
 	defer g.Close()
 
 	conn, err := grpc.Dial(g.URL, grpc.WithInsecure(), grpc.WithMaxMsgSize(64*1024*1024))
-	if err != nil {
-		panic(err)
-	}
+	require.NoError(t, err)
+
 	grpcBackend := libgrpc.NewGrpcBackendFromConn("test", conn)
 	s := cerealintegration.NewSuiteForBackend(ctx, t, grpcBackend)
 	suite.Run(t, s)
+
 	require.NoError(t, grpcBackend.Close())
+	require.NoError(t, pgBackend.Close())
 }

@@ -7,10 +7,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-
+	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-
 	"google.golang.org/grpc/status"
 
 	grpccereal "github.com/chef/automate/api/interservice/cereal"
@@ -20,13 +21,12 @@ import (
 	libgrpc "github.com/chef/automate/lib/cereal/grpc"
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/grpc/grpctest"
-	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/require"
-	"google.golang.org/grpc"
 )
 
 func TestDomains(t *testing.T) {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	logrus.SetLevel(logrus.DebugLevel)
 	require.NoError(t, runResetDB())
 	pgBackend := postgres.NewPostgresBackend(testDBURL(), postgres.WithTaskPingInterval(3*time.Second))
@@ -37,13 +37,11 @@ func TestDomains(t *testing.T) {
 	grpccereal.RegisterCerealServer(grpcServer, svc)
 	g := grpctest.NewServer(grpcServer)
 	cereal.MaxWakeupInterval = 2 * time.Second
-
+	defer pgBackend.Close()
 	defer g.Close()
 
 	conn, err := grpc.Dial(g.URL, grpc.WithInsecure(), grpc.WithMaxMsgSize(64*1024*1024))
-	if err != nil {
-		panic(err)
-	}
+	require.NoError(t, err)
 
 	t.Run("RPCs fail if domain is missing", func(t *testing.T) {
 		workflowName := "mytestworkflow"
