@@ -99,7 +99,7 @@ func (t *LicenseServer) RequestLicense(ctx context.Context,
 
 	deploymentID, err := t.getDeploymentID(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "couldn't identify the requesting a2 installation")
+		return nil, status.Error(codes.Internal, "couldn't identify the requesting Automate installation")
 	}
 
 	l, err := t.requestLicense(ctx, req, deploymentID, chefAutomateVersion)

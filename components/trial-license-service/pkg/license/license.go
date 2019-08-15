@@ -18,9 +18,11 @@ import (
 	"golang.org/x/net/context/ctxhttp"
 )
 
-const trialLicenseType = "trial"
-const licenseVersion = "1"
-const customerIDVersion = "2"
+const (
+	trialLicenseType  = "trial"
+	licenseVersion    = "1"
+	customerIDVersion = "2"
+)
 
 // ServerError is returned when the license-generation-server returns an error
 // code in the 5xx range
