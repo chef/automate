@@ -18,7 +18,15 @@ const (
 	ProjectUpdateRunningState    = "running"
 	ProjectUpdateNotRunningState = "not_running"
 	ProjectUpdateUnknownState    = "unknown"
+
+	ProjectUpdateWorkflowName = "ProjectUpdate"
+	ProjectUpdateInstanceName = "Singleton"
 )
+
+var ProjectUpdateDomainServices = []string{
+	"ingest",
+	"compliance",
+}
 
 const (
 	minutesWithoutCheckingInFailure = 5
@@ -35,13 +43,13 @@ type ProjectUpdateMgr interface {
 	State() string
 }
 
-func createProjectUpdateID() (string, error) {
+func createProjectUpdateID() string {
 	uuid, err := uuid.NewV4()
 	if err != nil {
-		return "", err
+		return "project-update-id"
 	}
 
-	return uuid.String(), nil
+	return uuid.String()
 }
 
 func NewWorkflowExecutor(domainServices []string) *multiworkflow.MultiWorkflow {
@@ -59,18 +67,18 @@ type CerealProjectUpdateManager struct {
 	domainServices []string
 }
 
-func RegisterCerealProjectUpdateManager(manager *cereal.Manager, workflowName string, instanceName string, domainServices []string) (ProjectUpdateMgr, error) {
-	domainServicesWorkflowExecutor := NewWorkflowExecutor(domainServices)
+func RegisterCerealProjectUpdateManager(manager *cereal.Manager) (ProjectUpdateMgr, error) {
+	domainServicesWorkflowExecutor := NewWorkflowExecutor(ProjectUpdateDomainServices)
 
-	if err := manager.RegisterWorkflowExecutor(workflowName, domainServicesWorkflowExecutor); err != nil {
+	if err := manager.RegisterWorkflowExecutor(ProjectUpdateWorkflowName, domainServicesWorkflowExecutor); err != nil {
 		return nil, err
 	}
 
 	updateManager := &CerealProjectUpdateManager{
 		manager:        manager,
-		workflowName:   workflowName,
-		instanceName:   instanceName,
-		domainServices: domainServices,
+		workflowName:   ProjectUpdateWorkflowName,
+		instanceName:   ProjectUpdateInstanceName,
+		domainServices: ProjectUpdateDomainServices,
 	}
 
 	return updateManager, nil
@@ -89,7 +97,7 @@ func (m *CerealProjectUpdateManager) Start() error {
 
 	for _, svc := range m.domainServices {
 		params[svc] = project_update_tags.DomainProjectUpdateWorkflowParameters{
-			ProjectUpdateID: "project-update-id",
+			ProjectUpdateID: createProjectUpdateID(),
 		}
 	}
 	return multiworkflow.EnqueueWorkflow(context.Background(), m.manager, m.workflowName, m.instanceName, params)
