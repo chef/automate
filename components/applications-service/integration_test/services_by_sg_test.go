@@ -35,7 +35,7 @@ func TestGetServicesBySGErrorServiceGroupNotFound(t *testing.T) {
 	var (
 		ctx     = context.Background()
 		request = &applications.ServicesBySGReq{
-			ServiceGroupId: 999,
+			ServiceGroupId: "this-id-doesnt-exist",
 		}
 		expected = new(applications.ServicesBySGRes)
 	)

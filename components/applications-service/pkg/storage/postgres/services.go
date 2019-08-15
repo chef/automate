@@ -34,58 +34,28 @@ type composedService struct {
 }
 
 const (
-	selectServiceInternal = `
-SELECT id
-  , origin
-  , name
-  , version
-  , release
-  , status
-  , health
-  , group_id
-  , deployment_id
-  , sup_id
-  , channel
-  , package_ident
-  , last_event_occurred_at
-  , previous_health
-  , update_strategy
-  , health_updated_at
-FROM service
-WHERE name = $1
-  AND sup_id IN (
-    SELECT id FROM supervisor
-    WHERE member_id = $2
-  )
-`
 	selectServiceFromUniqueFields = `
 SELECT s.id
   , s.origin AS origin
   , s.name AS name
   , s.version AS version
   , s.release AS release
-  , s.status AS status
+  , s.health_check_message AS status
   , s.health AS health
-  , sg.name AS group
-  , d.app_name AS application
-  , d.environment AS environment
-  , sup.member_id AS sup_member_id
-  , sup.fqdn AS fqdn
+  , s.service_group_name AS group
+  , s.application AS application
+  , s.environment AS environment
+  , s.supervisor_id AS sup_member_id
+  , s.fqdn AS fqdn
   , s.channel as channel
-  , sup.site as site
+  , s.site as site
   , s.last_event_occurred_at as last_event_occurred_at
   , s.previous_health as previous_health
   , s.update_strategy as update_strategy
   , s.health_updated_at as health_updated_at
-FROM service AS s
-LEFT JOIN service_group AS sg
-  ON s.group_id = sg.id
-LEFT JOIN deployment AS d
-  ON s.deployment_id = d.id
-LEFT JOIN supervisor AS sup
-  ON s.sup_id = sup.id
+FROM service_full AS s
 WHERE s.name = $1
-  AND sup.member_id = $2
+  AND s.supervisor_id = $2
 `
 	selectServiceByServiceGroupID = `
 SELECT s.id
@@ -93,26 +63,20 @@ SELECT s.id
   , s.name AS name
   , s.version AS version
   , s.release AS release
-  , s.status AS status
+  , s.health_check_message AS status
   , s.health AS health
-  , sg.name AS group
-  , d.app_name AS application
-  , d.environment AS environment
-  , sup.member_id AS sup_member_id
-  , sup.fqdn AS fqdn
+  , s.service_group_name AS group
+  , s.application AS application
+  , s.environment AS environment
+  , s.supervisor_id AS sup_member_id
+  , s.fqdn AS fqdn
   , s.channel as channel
-  , sup.site as site
+  , s.site as site
   , s.last_event_occurred_at as last_event_occurred_at
   , s.previous_health as previous_health
   , s.update_strategy as update_strategy
   , s.health_updated_at as health_updated_at
-FROM service AS s
-LEFT JOIN service_group AS sg
-  ON s.group_id = sg.id
-LEFT JOIN deployment AS d
-  ON s.deployment_id = d.id
-LEFT JOIN supervisor AS sup
-  ON s.sup_id = sup.id
+FROM service_full AS s
  %s
 ORDER BY %s %s, sup_member_id ASC
 LIMIT $1
@@ -124,32 +88,26 @@ SELECT s.id
   , s.name AS name
   , s.version AS version
   , s.release AS release
-  , s.status AS status
+  , s.health_check_message AS status
   , s.health AS health
-  , sg.name AS group
-  , d.app_name AS application
-  , d.environment AS environment
-  , sup.member_id AS sup_member_id
-  , sup.fqdn AS fqdn
+  , s.service_group_name AS group
+  , s.application AS application
+  , s.environment AS environment
+  , s.supervisor_id AS sup_member_id
+  , s.fqdn AS fqdn
   , s.channel as channel
-  , sup.site as site
+  , s.site as site
   , s.last_event_occurred_at as last_event_occurred_at
   , s.previous_health as previous_health
   , s.health_updated_at as health_updated_at
-FROM service AS s
-LEFT JOIN service_group AS sg
-  ON s.group_id = sg.id
-LEFT JOIN deployment AS d
-  ON s.deployment_id = d.id
-LEFT JOIN supervisor AS sup
-  ON s.sup_id = sup.id
+FROM service_full AS s
 WHERE last_event_occurred_at < now() - ($1 || ' minutes')::interval
 `
 
 	deleteDisconnectedServices = `
 DELETE
-FROM service
-WHERE service.last_event_occurred_at < now() - ($1 || ' minutes')::interval
+FROM service_full
+WHERE service_full.last_event_occurred_at < now() - ($1 || ' minutes')::interval
 `
 
 	selectServicesHealthCounts = `
@@ -158,13 +116,13 @@ SELECT COUNT(*) AS total
   , COUNT(*) FILTER (WHERE s.health = 'UNKNOWN') AS unknown
   , COUNT(*) FILTER (WHERE s.health = 'WARNING') AS warning
   , COUNT(*) FILTER (WHERE s.health = 'OK') AS ok
-FROM service AS s
+FROM service_full AS s
  %s
 `
 
 	selectServicesTotalCount = `
 SELECT count(*)
-  FROM service;
+  FROM service_full;
 `
 )
 
@@ -244,64 +202,15 @@ func (db *Postgres) GetDisconnectedServices(thresholdMinutes int32) ([]*storage.
 // also prevents the need for a second cleanup operation to delete these
 // things.
 func (db *Postgres) DeleteDisconnectedServices(thresholdMinutes int32) ([]*storage.Service, error) {
-
-	tx, err := db.DbMap.Begin()
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to start DB transaction for DeleteDisconnectedServices")
-	}
-
-	// rollback to cancel the transaction if we fail later
-	var completed bool
-	defer func() {
-		if !completed {
-			tx.Rollback() //nolint: errcheck
-		}
-	}()
-
-	// We wish to avoid what the SQL standard specifies "phantom read":
-	// > A transaction re-executes a query returning a set of rows that satisfy a
-	// > search condition and finds that the set of rows satisfying the condition
-	// > has changed due to another recently-committed transaction.
-	// A phantom read would be bad here because we use a "query for a set of rows
-	// that satisfy a search condition" to find service groups, supervisors, and
-	// deployments that we want to delete. To avoid phantom reads in postgres, we
-	// need the "repeatable read" isolation level:
-	// https://www.postgresql.org/docs/9.6/transaction-iso.html
-	//
-	// The standard library sql package lets you pass options to BeginTx() but
-	// gorp doesn't support this so we do it by Exec as a workaround.
-	_, err = tx.Exec(`SET TRANSACTION ISOLATION LEVEL repeatable read`)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to configure DB transaction for DeleteDisconnectedServices")
-	}
-
 	var services []*composedService
-	_, err = tx.Select(&services, selectDisconnectedServices, thresholdMinutes)
+	_, err := db.DbMap.Select(&services, selectDisconnectedServices, thresholdMinutes)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list disconnected services")
 	}
-	_, err = tx.Exec(deleteDisconnectedServices, thresholdMinutes)
+	_, err = db.DbMap.Exec(deleteDisconnectedServices, thresholdMinutes)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to delete disconnected services")
 	}
-	_, err = tx.Exec(deleteSupsWithoutServices)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to cleanup unneeded supervisor records")
-	}
-	_, err = tx.Exec(deleteSvcGroupsWithoutServices)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to cleanup unneeded service group records")
-	}
-	_, err = tx.Exec(deleteDeploymentsWithoutServices)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to cleanup unneeded deployment records")
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to commit transaction deleting disconnected services")
-	}
-	completed = true // don't execute deferred tx.Rollback from above
 
 	return convertComposedServicesToStorage(services), nil
 }
@@ -311,7 +220,7 @@ func (db *Postgres) GetServicesCount() (int32, error) {
 	return int32(count), err
 }
 
-// getServiceFromUniqueFields retrieves a service from the db without the need
+// GetServiceFromUniqueFields retrieves a service from the db without the need
 // of an id, it is based on the unique fields, name and member id
 func (db *Postgres) GetServiceFromUniqueFields(name, member string) (*storage.Service, bool) {
 	if name == "" || member == "" {
@@ -325,18 +234,6 @@ func (db *Postgres) GetServiceFromUniqueFields(name, member string) (*storage.Se
 	}
 
 	return convertComposedServiceToStorage(&svc), true
-}
-
-// getServiceFromUniqueFields is used to ingest/update services internally and it
-// selects a single service from the database with IDs
-func (db *Postgres) getServiceFromUniqueFields(name, member string) (*service, bool) {
-	var svc service
-	err := db.SelectOne(&svc, selectServiceInternal, name, member)
-	if err != nil {
-		return nil, false
-	}
-
-	return &svc, true
 }
 
 // converts an array of composedService to an array of storage.Service
@@ -392,7 +289,7 @@ func buildWhereConstraintsFromFilters(filters map[string][]string) (string, erro
 
 		switch filter {
 		case "service_group_id":
-			WhereConstraints = WhereConstraints + buildORStatementFromValues("group_id", values)
+			WhereConstraints = WhereConstraints + buildORStatementFromValues("service_group_id", values)
 
 		case "health":
 			WhereConstraints = WhereConstraints + buildORStatementFromValues("health", values)

@@ -6,12 +6,8 @@ import (
 )
 
 const (
-	deleteDeploymentsWithoutServices = `
-DELETE FROM deployment WHERE NOT EXISTS (SELECT 1 FROM service WHERE service.deployment_id = deployment.id )
-`
 	selectDeploymentsTotalCount = `
-SELECT count(*)
-  FROM deployment;
+SELECT COUNT(*) FROM (SELECT DISTINCT application, environment FROM service_full) AS d;
 `
 )
 
@@ -37,18 +33,6 @@ func (db *Postgres) getDeployment(id int32) (*deployment, error) {
 	}
 
 	return &d, nil
-}
-
-func (db *Postgres) getDeploymentID(app, env string) (int32, bool) {
-	var id int32
-	err := db.SelectOne(&id,
-		"SELECT id FROM deployment WHERE app_name = $1 AND environment = $2",
-		app, env)
-	if err != nil {
-		return id, false
-	}
-
-	return id, true
 }
 
 func (db *Postgres) GetDeploymentsCount() (int32, error) {

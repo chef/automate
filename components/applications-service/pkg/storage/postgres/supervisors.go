@@ -5,12 +5,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const (
-	deleteSupsWithoutServices = `
-DELETE FROM supervisor WHERE NOT EXISTS (SELECT 1 FROM service WHERE service.sup_id = supervisor.id )
-`
-)
-
+// TODO: delete if unused
 // GetSupervisor returns a supervisor from the database
 func (db *Postgres) GetSupervisor(id int32) (*storage.Supervisor, error) {
 	sup, err := db.getSupervisor(id)
@@ -26,6 +21,7 @@ func (db *Postgres) GetSupervisor(id int32) (*storage.Supervisor, error) {
 	}, nil
 }
 
+// TODO: delete if unused
 func (db *Postgres) getSupervisor(id int32) (*supervisor, error) {
 	var sup supervisor
 	err := db.SelectOne(&sup,
@@ -38,10 +34,11 @@ func (db *Postgres) getSupervisor(id int32) (*supervisor, error) {
 }
 
 func (db *Postgres) GetSupervisorsCount() (int32, error) {
-	count, err := db.DbMap.SelectInt("SELECT count(*) FROM supervisor")
+	count, err := db.DbMap.SelectInt("SELECT COUNT(DISTINCT supervisor_id) FROM service_full;")
 	return int32(count), err
 }
 
+// TODO: delete if unused
 func (db *Postgres) getSupervisorID(member string) (int32, bool) {
 	var sid int32
 	err := db.SelectOne(&sid,

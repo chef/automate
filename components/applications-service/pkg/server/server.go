@@ -150,12 +150,12 @@ func (app *ApplicationsServer) GetServicesBySG(
 		return new(applications.ServicesBySGRes), status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	// In the database we will never have ID=0 and zero is our default value in our
-	// protobuf definition, so if the service group id is zero it means that the user
+	// In the database we will never have ID="" and "" is our default value in our
+	// protobuf definition, so if the service group id is "" it means that the user
 	// didn't specified and this parameter is required, so we will error
-	if request.GetServiceGroupId() == 0 {
+	if request.GetServiceGroupId() == "" {
 		return new(applications.ServicesBySGRes),
-			status.Error(codes.InvalidArgument, "Missing service_group_id parameter. [value > 0]")
+			status.Error(codes.InvalidArgument, "Missing service_group_id parameter. [value cannot be blank]")
 	}
 
 	var (

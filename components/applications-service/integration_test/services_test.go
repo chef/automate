@@ -7,7 +7,6 @@ package integration_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -343,7 +342,7 @@ func TestGetServicesMultiServiceWithServiceGroupIDFilter(t *testing.T) {
 
 		var (
 			ctx     = context.Background()
-			sgID    = fmt.Sprintf("%d", sgList[0].ID)
+			sgID    = sgList[0].ID
 			request = &applications.ServicesReq{
 				Filter: []string{"service_group_id:" + sgID},
 			}
@@ -410,7 +409,7 @@ func TestGetServicesMultiServiceWithHealthAndServiceGroupIdFilter(t *testing.T) 
 
 		var (
 			ctx     = context.Background()
-			sgID    = fmt.Sprintf("%d", sgList[3].ID)
+			sgID    = sgList[3].ID
 			request = &applications.ServicesReq{
 				Filter: []string{
 					"service_group_id:" + sgID,

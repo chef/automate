@@ -110,7 +110,7 @@ func (s *Service) FullReleaseString() string {
 }
 
 type ServiceGroupDisplay struct {
-	ID                   int32
+	ID                   string
 	Name                 string
 	DeploymentID         int32
 	Package              string

@@ -129,6 +129,7 @@ func (s *supervisor) NeedUpdate() bool {
 // serviceGroup struct is the representation of the service_group table inside the db
 type serviceGroup struct {
 	ID           int32     `db:"id"`
+	HashId       string    `db:"hash_id"`
 	Name         string    `db:"name"`
 	NameSuffix   string    `db:"name_suffix"`
 	DeploymentID int32     `db:"deployment_id"`
