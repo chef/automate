@@ -7,7 +7,7 @@ pkg_license=('Chef-MLSA')
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_deps=(
   core/openssl
-  core/nginx
+  core/nginx/1.17.3
   chef/mlsa
   core/bash
 )

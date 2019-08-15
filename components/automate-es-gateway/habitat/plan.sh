@@ -29,7 +29,7 @@ pkg_deps=(
   chef/mlsa
   core/bash
   core/curl # health_check
-  core/nginx
+  core/nginx/1.17.3
   chef/automate-platform-tools
 )
 
