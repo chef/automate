@@ -35,7 +35,7 @@ import (
 func GRPC(ctx context.Context,
 	addr string, l logger.Logger, connFactory *secureconn.Factory,
 	e engine.Engine, migrationsConfig migration.Config,
-	dataMigrationsConfig datamigration.Config) error {
+	dataMigrationsConfig datamigration.Config, cerealAddress string) error {
 
 	grpclog.SetLoggerV2(l)
 	list, err := net.Listen("tcp", addr)
@@ -45,7 +45,7 @@ func GRPC(ctx context.Context,
 	l.Printf("Authz GRPC API listening on %s", addr)
 
 	server, err := NewGRPCServer(ctx, connFactory, l, e, migrationsConfig,
-		dataMigrationsConfig)
+		dataMigrationsConfig, cerealAddress)
 	if err != nil {
 		return err
 	}
@@ -57,7 +57,7 @@ func GRPC(ctx context.Context,
 func NewGRPCServer(ctx context.Context,
 	connFactory *secureconn.Factory, l logger.Logger,
 	e engine.Engine, migrationsConfig migration.Config,
-	dataMigrationsConfig datamigration.Config) (*grpc.Server, error) {
+	dataMigrationsConfig datamigration.Config, cerealAddress string) (*grpc.Server, error) {
 
 	// Note(sr): we're buffering one version struct, as NewPostgresPolicyServer writes
 	// to this before we've got readers
@@ -77,7 +77,7 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "could not initialize v2 policy server")
 	}
 
-	cerealManager, err := createProjectUpdateCerealManager(connFactory)
+	cerealManager, err := createProjectUpdateCerealManager(connFactory, cerealAddress)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not create cereal manager")
 	}
@@ -146,8 +146,8 @@ func NewGRPCServer(ctx context.Context,
 	return g, nil
 }
 
-func createProjectUpdateCerealManager(connFactory *secureconn.Factory) (*cereal.Manager, error) {
-	conn, err := connFactory.Dial("cereal-service", ":10101")
+func createProjectUpdateCerealManager(connFactory *secureconn.Factory, address string) (*cereal.Manager, error) {
+	conn, err := connFactory.Dial("cereal-service", address)
 	if err != nil {
 		return nil, errors.Wrap(err, "error dialing cereal service")
 	}

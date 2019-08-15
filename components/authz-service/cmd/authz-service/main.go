@@ -43,6 +43,7 @@ type config struct {
 	Database           string `mapstructure:"database"`
 	MigrationsPath     string `mapstructure:"migrations-path"`
 	DataMigrationsPath string `mapstructure:"data-migrations-path"`
+	CerealAddress      string `mapstructure:"cereal-address"`
 }
 
 func serve(_ *cobra.Command, args []string) {
@@ -114,7 +115,7 @@ Please pass a config file as the only argument to this command.`))
 
 	// if server.GRPC() returns, it's with an error
 	fail(server.GRPC(ctx, cfg.GRPC, l, connFactory, engine, migrationConfig,
-		dataMigrationConfig))
+		dataMigrationConfig, cfg.CerealAddress))
 }
 
 // fail outputs the error and exits with a non-zero code
