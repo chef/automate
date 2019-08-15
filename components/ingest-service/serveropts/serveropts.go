@@ -34,9 +34,9 @@ type Opts struct {
 	PurgeConvergeHistoryAfterDays int32
 	PurgeActionsAfterDays         int32
 	ConnFactory                   *secureconn.Factory
-	projectUpdateStateFilePath    string
 	NodeManagerAddress            string
 	ChefIngestServerConfig        ChefIngestServerConfig
+	CerealAddress                 string
 }
 
 // SetLogLevel sets the log level for the service

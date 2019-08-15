@@ -167,7 +167,7 @@ func Spawn(opts *serveropts.Opts) error {
 	jobSchedulerServer := server.NewJobSchedulerServer(client, jobManager)
 	ingest.RegisterJobSchedulerServer(grpcServer, jobSchedulerServer)
 
-	projectUpdateManager, err := createProjectUpdateCerealManager(opts.ConnFactory)
+	projectUpdateManager, err := createProjectUpdateCerealManager(opts.ConnFactory, opts.CerealAddress)
 	if err != nil {
 		return err
 	}
@@ -230,8 +230,8 @@ func pgURL(pgURL string, pgDBName string) (string, error) {
 	return pgURL, nil
 }
 
-func createProjectUpdateCerealManager(connFactory *secureconn.Factory) (*cereal.Manager, error) {
-	conn, err := connFactory.Dial("cereal-service", ":10101")
+func createProjectUpdateCerealManager(connFactory *secureconn.Factory, address string) (*cereal.Manager, error) {
+	conn, err := connFactory.Dial("cereal-service", address)
 	if err != nil {
 		return nil, errors.Wrap(err, "error dialing cereal service")
 	}
