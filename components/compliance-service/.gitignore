@@ -20,7 +20,7 @@ debug
 generator-*
 .tool-versions
 jmeter.log
-/generator/report/nodes.yml
+/components/compliance-service/test_data/report/nodes.yml
 smokin/.kitchen
 smokin/Berksfile.lock
 *_pb.rb

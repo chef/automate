@@ -3,7 +3,7 @@ data_collector_token = "REPLACE_ME_VIA_HAB"
 converge_status_json_file = "./components/ingest-service/examples/converge-success-report.json"
 ohai_json_file = "./components/ingest-service/chef-load-data/ohai-data.json"
 log_file = "/tmp/chef-load.log"
-compliance_sample_reports_dir = "./components/compliance-service/generator/report/samples"
+compliance_sample_reports_dir = "./components/compliance-service/test_data/generator/report/samples"
 compliance_status_json_file = "./components/compliance-service/chef-load-data/compliance-status.json"
 ## We use the generate command from chef-load, we don't have to set these options
 ## inside the config file since we will pass them through the command line
