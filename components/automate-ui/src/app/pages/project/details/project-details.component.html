@@ -21,8 +21,8 @@
         </tbody>
       </table>
       <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
-        <chef-option value='rules'>Ingest Rules</chef-option>
-        <chef-option value='details'>Details</chef-option>
+        <chef-option value='rules' data-cy="rules-tab">Ingest Rules</chef-option>
+        <chef-option value='details' data-cy="details-tab">Details</chef-option>
       </chef-tab-selector>
     </chef-page-header>
     <section class="page-body" *ngIf="tabValue === 'details'">
@@ -85,7 +85,7 @@
                 <chef-td class="controls">
                   <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project?.id]">
                     <chef-control-menu>
-                      <chef-option *ngIf="showDeleteRule()" class="delete-rule" (click)="startRuleDelete(rule)">Delete Rule</chef-option>
+                      <chef-option *ngIf="showDeleteRule()" class="delete-rule" (click)="startRuleDelete(rule)" data-cy="delete-rule">Delete Rule</chef-option>
                     </chef-control-menu>
                   </app-authorized>
                 </chef-td>

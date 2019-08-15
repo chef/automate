@@ -50,7 +50,7 @@
                 <chef-td class="controls">
                   <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project.id]">
                     <chef-control-menu>
-                      <chef-option (click)="startProjectDelete(project)">Delete Project</chef-option>
+                      <chef-option (click)="startProjectDelete(project)" data-cy="delete-project">Delete Project</chef-option>
                     </chef-control-menu>
                   </app-authorized>
                 </chef-td>
