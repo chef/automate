@@ -2,7 +2,6 @@ package postgres
 
 import (
 	gosql "database/sql"
-	//"time"
 
 	"github.com/go-gorp/gorp"
 	_ "github.com/lib/pq"
