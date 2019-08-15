@@ -1,0 +1,72 @@
+{
+  "platform": {
+    "name": "debian",
+    "release": "8.11"
+  },
+  "profiles": [
+    {
+      "name": "mylinux-failure-major",
+      "version": "5.4.4",
+      "sha256": "bb7ecfb4f08d2ecdc8f08351d2e5ea93456c127aa751b2741b86f1e5f47614f3",
+      "title": "My Demo Linux major failing profile",
+      "maintainer": "Chef Software, Inc.",
+      "summary": "Demonstrates the use of InSpec Compliance Profile",
+      "license": "Apache 2 license",
+      "copyright": "Chef Software, Inc.",
+      "copyright_email": "support@chef.io",
+      "supports": [
+        {
+          "os-family": "unix"
+        }
+      ],
+      "attributes": [
+
+      ],
+      "groups": [
+        {
+          "id": "controls/failure.rb",
+          "controls": [
+            "Checking /etc/missing5.rb"
+          ]
+        }
+      ],
+      "controls": [
+        {
+          "id": "Checking /etc/missing5.rb",
+          "title": "Check /etc/missing5.rb",
+          "desc": "File test in failure.rb desc",
+          "impact": 0.5,
+          "refs": [
+
+          ],
+          "tags": {
+          },
+          "code": "control 'Checking /etc/missing5.rb' do\n  impact 0.5\n  title \"Check /etc/missing5.rb\"\n  desc \"File test in failure.rb desc\"\n  describe file('/etc/missing5.rb') do\n    it { should be_file }\n  end\nend\n",
+          "source_location": {
+            "line": 2,
+            "ref": "controls/failure.rb"
+          },
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "File /etc/missing5.rb should be file",
+              "run_time": 0.00557,
+              "start_time": "2018-06-27T15:02:21+01:00",
+              "message": "expected `File /etc/missing5.rb.file?` to return true, got false"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "statistics": {
+    "duration": 0.006075
+  },
+  "version": "2.2.20",
+  "node_name": "to_be_generated",
+  "node_uuid": "to_be_generated",
+  "report_uuid": "to_be_generated",
+  "end_time": "to_be_generated",
+  "environment": "to_be_generated",
+  "type": "inspec_report"
+}
