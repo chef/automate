@@ -25,10 +25,6 @@ type Client interface {
 	// @param (filters)
 	GetServicesHealthCounts(map[string][]string) (*HealthCounts, error)
 	GetServiceGroupsHealthCounts() (*HealthCounts, error)
-	// @param (id)
-	GetDeployment(int32) (*Deployment, error)
-	// @param (id)
-	GetSupervisor(int32) (*Supervisor, error)
 
 	GetServicesCount() (int32, error)
 	GetServiceGroupsCount() (int32, error)
@@ -110,7 +106,7 @@ func (s *Service) FullReleaseString() string {
 }
 
 type ServiceGroupDisplay struct {
-	ID                   int32
+	ID                   string
 	Name                 string
 	DeploymentID         int32
 	Package              string

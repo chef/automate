@@ -6,7 +6,6 @@
 package integration_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -37,7 +36,7 @@ func TestStorageGetServiceGroupExist(t *testing.T) {
 	// Get the ID from the service group
 	sgList := suite.GetServiceGroups()
 	if assert.Equal(t, 1, len(sgList), "There should be one service_group in the db") {
-		name, exist := suite.StorageClient.ServiceGroupExists(fmt.Sprintf("%d", sgList[0].ID))
+		name, exist := suite.StorageClient.ServiceGroupExists(sgList[0].ID)
 		assert.True(t, exist)
 		assert.Equal(t, sgList[0].Name, name)
 	}

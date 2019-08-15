@@ -59,9 +59,8 @@ const (
                 WHEN health_unknown  > 0 THEN '2_UNKNOWN'
                 WHEN health_warning  > 0 THEN '3_WARNING'
                 ELSE '4_OK' END ) as health
-    FROM (SELECT  sg.id
-                 ,sg.deployment_id
-                 ,sg.name as name
+    FROM (SELECT  s.service_group_id as id
+                 ,s.service_group_name as name
                  ,COUNT(s.health) FILTER (WHERE s.health = 'OK') AS health_ok
                  ,COUNT(s.health) FILTER (WHERE s.health = 'CRITICAL') AS health_critical
                  ,COUNT(s.health) FILTER (WHERE s.health = 'WARNING') AS health_warning
@@ -69,24 +68,16 @@ const (
                  ,COUNT(s.health) AS health_total
                  ,round((COUNT(s.health) FILTER (WHERE s.health = 'OK')
                        / COUNT(s.health)::float) * 100) as percent_ok
-                 ,(SELECT array_agg(DISTINCT CONCAT (s.package_ident))
-                     FROM service AS s
-                    WHERE s.group_id = sg.id) AS releases
-                 ,d.app_name as app_name
-                 ,d.environment as environment
-                 ,sg.name_suffix as name_suffix
-          FROM service_group AS sg
-          JOIN service AS s
-               ON s.group_id = sg.id
-          JOIN deployment as d
-               ON sg.deployment_id = d.id
+                 ,(SELECT array_agg(DISTINCT CONCAT (s_for_releases.package_ident))
+                     FROM service_full AS s_for_releases
+                     WHERE s_for_releases.service_group_id = s.service_group_id) AS releases
+                 ,s.application as app_name
+                 ,s.environment as environment
+                 ,s.service_group_name_suffix as name_suffix
+          FROM service_full AS s
 `
 	groupByPart = `
-  GROUP BY sg.id, sg.deployment_id, sg.name, d.app_name, d.environment, sg.name_suffix ) as sghc
-`
-	joinSupervisor = `
-  JOIN supervisor AS sup
-    ON s.sup_id = sup.id
+  GROUP BY s.service_group_id, s.application, s.environment, s.service_group_name, s.service_group_name_suffix ) as sghc
 `
 	selectServiceGroupHealthFilterCRITICAL = `
   WHERE
@@ -116,18 +107,13 @@ const (
 	OFFSET $2 `
 
 	selectServiceGroupsTotalCount = `
-SELECT count(*)
-  FROM service_group;
-`
-
-	deleteSvcGroupsWithoutServices = `
-DELETE FROM service_group WHERE NOT EXISTS (SELECT 1 FROM service WHERE service.group_id = service_group.id )
+SELECT COUNT(DISTINCT service_group_id) FROM service_full;
 `
 )
 
 // serviceGroupHealth matches the results from the SELECT GroupHealth Query
 type serviceGroupHealth struct {
-	ID             int32          `db:"id"`
+	ID             string         `db:"id"`
 	Releases       pq.StringArray `db:"releases"`
 	Name           string         `db:"name"`
 	DeploymentID   int32          `db:"deployment_id"`
@@ -149,7 +135,6 @@ type serviceGroupHealth struct {
 	composedReleases []string
 }
 
-// getServiceFromUniqueFields retrieve a service from the db without the need of an id
 func (db *Postgres) GetServiceGroups(
 	sortField string, sortAsc bool,
 	page int32, pageSize int32,
@@ -179,13 +164,13 @@ func (db *Postgres) GetServiceGroups(
 
 	if statusFilter && needSupervisorTable {
 		// We need to join to the supervisor table is we are filtering by Site
-		selectAllPartsQuery = selectMainQuery + joinSupervisor + whereQuery + groupByPart + statusQuery + paginationSorting
+		selectAllPartsQuery = selectMainQuery + whereQuery + groupByPart + statusQuery + paginationSorting
 	} else if statusFilter {
 		// The status query has to go outside of the inner query because the health count filters need to be calculated
 		// in order to be used in the where clause
 		selectAllPartsQuery = selectMainQuery + whereQuery + groupByPart + statusQuery + paginationSorting
 	} else if needSupervisorTable {
-		selectAllPartsQuery = selectMainQuery + joinSupervisor + whereQuery + groupByPart + paginationSorting
+		selectAllPartsQuery = selectMainQuery + whereQuery + groupByPart + paginationSorting
 	} else {
 		selectAllPartsQuery = selectMainQuery + whereQuery + groupByPart + paginationSorting
 	}
@@ -246,19 +231,19 @@ func formatFilters(filters map[string][]string) (string, string, bool, bool, err
 			}
 
 		case "environment", "ENVIRONMENT":
-			selectQuery, err := queryFromFieldFilter("d.environment", values, first)
+			selectQuery, err := queryFromFieldFilter("s.environment", values, first)
 			whereQuery = whereQuery + selectQuery
 			if err != nil {
 				return "", "", false, false, err
 			}
 		case "application", "APPLICATION":
-			selectQuery, err := queryFromFieldFilter("d.app_name", values, first)
+			selectQuery, err := queryFromFieldFilter("s.application", values, first)
 			whereQuery = whereQuery + selectQuery
 			if err != nil {
 				return "", "", false, false, err
 			}
 		case "group", "GROUP":
-			selectQuery, err := queryFromFieldFilter("sg.name_suffix", values, first)
+			selectQuery, err := queryFromFieldFilter("s.service_group_name_suffix", values, first)
 			whereQuery = whereQuery + selectQuery
 			if err != nil {
 				return "", "", false, false, err
@@ -278,7 +263,7 @@ func formatFilters(filters map[string][]string) (string, string, bool, bool, err
 		case "site", "SITE":
 			// If we are filtering by site which is on the sueprvisor table we have to join this table onto our inner query
 			needSupervisorTable = true
-			selectQuery, err := queryFromFieldFilter("sup.site", values, first)
+			selectQuery, err := queryFromFieldFilter("s.site", values, first)
 			whereQuery = whereQuery + selectQuery
 			if err != nil {
 				return "", "", false, false, err
@@ -428,7 +413,7 @@ func (db *Postgres) ServiceGroupExists(id string) (string, bool) {
 		return "", false
 	}
 	var sgName string
-	err := db.SelectOne(&sgName, "SELECT name FROM service_group WHERE id = $1", id)
+	err := db.SelectOne(&sgName, "SELECT service_group_name FROM service_full WHERE service_group_id = $1 LIMIT 1", id)
 	if err != nil {
 		return "", false
 	}
@@ -505,29 +490,4 @@ func inArray(value string, array []string) bool {
 		}
 	}
 	return false
-}
-
-func (db *Postgres) getServiceGroup(id int32) (*serviceGroup, error) {
-	var sg serviceGroup
-	err := db.SelectOne(&sg,
-		"SELECT id, deployment_id, name FROM service_group WHERE id = $1", id)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to retrieve service group from the database")
-	}
-
-	return &sg, nil
-}
-
-func (db *Postgres) getServiceGroupID(name string, deploymentID int32) (int32, bool) {
-	var gid int32
-	err := db.SelectOne(&gid,
-		"SELECT id FROM service_group WHERE name = $1 AND deployment_id = $2",
-		name,
-		deploymentID,
-	)
-	if err != nil {
-		return gid, false
-	}
-
-	return gid, true
 }
