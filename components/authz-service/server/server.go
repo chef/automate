@@ -14,7 +14,6 @@ import (
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 
-	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/lib/cereal"
 	grpccereal "github.com/chef/automate/lib/cereal/grpc"
 	"github.com/chef/automate/lib/grpc/health"
@@ -25,7 +24,6 @@ import (
 	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/api/interservice/authz/common"
 	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
-	"github.com/chef/automate/components/authz-service/config"
 	"github.com/chef/automate/components/authz-service/engine"
 	v1 "github.com/chef/automate/components/authz-service/server/v1"
 	v2 "github.com/chef/automate/components/authz-service/server/v2"
@@ -36,8 +34,8 @@ import (
 // GRPC creates and listens on grpc server.
 func GRPC(ctx context.Context,
 	addr string, l logger.Logger, connFactory *secureconn.Factory,
-	e engine.Engine, migrationsConfig migration.Config, dataMigrationsConfig datamigration.Config,
-	eventServiceAddress string, configFile string) error {
+	e engine.Engine, migrationsConfig migration.Config,
+	dataMigrationsConfig datamigration.Config) error {
 
 	grpclog.SetLoggerV2(l)
 	list, err := net.Listen("tcp", addr)
@@ -47,7 +45,7 @@ func GRPC(ctx context.Context,
 	l.Printf("Authz GRPC API listening on %s", addr)
 
 	server, err := NewGRPCServer(ctx, connFactory, l, e, migrationsConfig,
-		dataMigrationsConfig, eventServiceAddress, configFile)
+		dataMigrationsConfig)
 	if err != nil {
 		return err
 	}
@@ -59,8 +57,7 @@ func GRPC(ctx context.Context,
 func NewGRPCServer(ctx context.Context,
 	connFactory *secureconn.Factory, l logger.Logger,
 	e engine.Engine, migrationsConfig migration.Config,
-	dataMigrationsConfig datamigration.Config,
-	eventServiceAddress string, configFile string) (*grpc.Server, error) {
+	dataMigrationsConfig datamigration.Config) (*grpc.Server, error) {
 
 	// Note(sr): we're buffering one version struct, as NewPostgresPolicyServer writes
 	// to this before we've got readers
@@ -80,18 +77,13 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "could not initialize v2 policy server")
 	}
 
-	configManager, err := config.NewManager(configFile)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not create config manager")
-	}
-
 	cerealManager, err := createProjectUpdateCerealManager(connFactory)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not create cereal manager")
 	}
 
 	v2ProjectsServer, err := v2.NewPostgresProjectsServer(ctx, l, migrationsConfig,
-		dataMigrationsConfig, e, cerealManager, configManager, policyRefresher)
+		dataMigrationsConfig, e, cerealManager, policyRefresher)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 projects server")
 	}
@@ -152,25 +144,6 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "failed to start cereal manager")
 	}
 	return g, nil
-}
-
-func createEventServiceConnection(connFactory *secureconn.Factory,
-	eventServiceAddress string) (automate_event.EventServiceClient, error) {
-	if eventServiceAddress == "" {
-		return nil, errors.New("eventServiceAddress cannot be empty or Dial will get stuck")
-	}
-
-	conn, err := connFactory.Dial("event-service", eventServiceAddress)
-	if err != nil {
-		return nil, errors.Wrap(err, "Could not obtain EventServiceClient; error dialing event service")
-	}
-
-	eventServiceClient := automate_event.NewEventServiceClient(conn)
-	if eventServiceClient == nil {
-		return nil, errors.New("could not obtain NewEventServiceClient")
-	}
-
-	return eventServiceClient, nil
 }
 
 func createProjectUpdateCerealManager(connFactory *secureconn.Factory) (*cereal.Manager, error) {

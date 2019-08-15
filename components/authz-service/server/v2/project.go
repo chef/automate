@@ -19,7 +19,6 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
-	"github.com/chef/automate/components/authz-service/config"
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
@@ -69,7 +68,6 @@ func NewPostgresProjectsServer(
 	dataMigrationsConfig datamigration.Config,
 	e engine.ProjectRulesRetriever,
 	projectUpdateCerealManager *cereal.Manager,
-	configManager *config.Manager,
 	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
 
@@ -194,16 +192,8 @@ func (s *ProjectState) ApplyRulesStart(
 	s.applyRuleMux.Lock()
 	defer s.applyRuleMux.Unlock()
 
-	switch s.ProjectUpdateManager.State() {
-	case config.NotRunningState:
-		break
-	case config.RunningState:
-		return nil, status.Error(codes.FailedPrecondition,
-			"cannot apply rules: apply already in progress")
-	default:
-		return nil, status.Error(codes.Internal,
-			"failed to parse state of rule apply")
-	}
+	// TODO: we don't want to apply staged rules if a workflow is running
+	// it should be part of the workflow
 
 	s.log.Info("apply project rules: START")
 	err := s.store.ApplyStagedRules(ctx)

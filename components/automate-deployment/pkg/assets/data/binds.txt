@@ -2,7 +2,7 @@ applications-service REQUIRED automate-pg-gateway event-service pg-sidecar-servi
 applications-service BINDING_MODE strict
 authn-service REQUIRED authz-service automate-dex automate-pg-gateway pg-sidecar-service teams-service
 authn-service BINDING_MODE strict
-authz-service REQUIRED automate-pg-gateway event-service pg-sidecar-service
+authz-service REQUIRED automate-pg-gateway pg-sidecar-service
 authz-service BINDING_MODE strict
 automate-cs-bookshelf REQUIRED automate-pg-gateway pg-sidecar-service
 automate-cs-bookshelf BINDING_MODE strict
