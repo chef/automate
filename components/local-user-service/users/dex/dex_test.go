@@ -279,6 +279,43 @@ func TestDexUsersAdapter(t *testing.T) {
 			t.Errorf("expected error, got nil")
 		}
 	})
+
+	t.Run("validate user password, not verified", func(t *testing.T) {
+		email := "bob@chef.io"
+		password := "supercalifragilisticexpialidocious"
+
+		ok, err := adp.ValidatePassword(ctx, email, password)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if ok {
+			t.Error("expected not ok, got ok")
+		}
+	})
+	t.Run("validate user password, verified", func(t *testing.T) {
+		email := "alice@chef.io"
+		password := "supercalifragilisticexpialidocious"
+
+		ok, err := adp.ValidatePassword(ctx, email, password)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !ok {
+			t.Error("expected ok, got not ok")
+		}
+	})
+	t.Run("validate user password, not found", func(t *testing.T) {
+		email := "catherine@chef.io"
+		password := "supercalifragilisticexpialidocious"
+
+		ok, err := adp.ValidatePassword(ctx, email, password)
+		if err != nil {
+			t.Error("expected err == nil, got not nil")
+		}
+		if ok {
+			t.Error("expected not ok, got ok")
+		}
+	})
 }
 
 // mock implementations to test against
@@ -324,6 +361,20 @@ func (d *dexAPI) DeletePassword(ctx context.Context, req *api.DeletePasswordReq)
 	}
 	resp := api.DeletePasswordResp{
 		NotFound: notFound,
+	}
+	return &resp, nil
+}
+
+func (d *dexAPI) VerifyPassword(ctx context.Context, req *api.VerifyPasswordReq) (*api.VerifyPasswordResp, error) {
+	notFound := true
+	for _, p := range d.usrs {
+		if p.Email == req.Email {
+			notFound = false
+		}
+	}
+	resp := api.VerifyPasswordResp{
+		NotFound: notFound,
+		Verified: req.Email == "alice@chef.io",
 	}
 	return &resp, nil
 }

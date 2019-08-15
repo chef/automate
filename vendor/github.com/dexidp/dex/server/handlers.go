@@ -200,17 +200,21 @@ func (s *Server) handleAuthorization(w http.ResponseWriter, r *http.Request) {
 	authReq, err := s.parseAuthorizationRequest(r)
 	if err != nil {
 		s.logger.Errorf("Failed to parse authorization request: %v", err)
-		if handler, ok := err.Handle(); ok {
-			// client_id and redirect_uri checked out and we can redirect back to
-			// the client with the error.
-			handler.ServeHTTP(w, r)
-			return
+		status := http.StatusInternalServerError
+
+		// If this is an authErr, let's let it handle the error, or update the HTTP
+		// status code
+		if err, ok := err.(*authErr); ok {
+			if handler, ok := err.Handle(); ok {
+				// client_id and redirect_uri checked out and we can redirect back to
+				// the client with the error.
+				handler.ServeHTTP(w, r)
+				return
+			}
+			status = err.Status()
 		}
 
-		// Otherwise render the error to the user.
-		//
-		// TODO(ericchiang): Should we just always render the error?
-		s.renderError(w, err.Status(), err.Error())
+		s.renderError(w, status, err.Error())
 		return
 	}
 
@@ -220,20 +224,32 @@ func (s *Server) handleAuthorization(w http.ResponseWriter, r *http.Request) {
 	//
 	// See: https://github.com/dexidp/dex/issues/646
 	authReq.Expiry = s.now().Add(s.authRequestsValidFor)
-	if err := s.storage.CreateAuthRequest(authReq); err != nil {
+	if err := s.storage.CreateAuthRequest(*authReq); err != nil {
 		s.logger.Errorf("Failed to create authorization request: %v", err)
 		s.renderError(w, http.StatusInternalServerError, "Failed to connect to the database.")
 		return
 	}
 
-	connectors, e := s.storage.ListConnectors()
-	if e != nil {
-		s.logger.Errorf("Failed to get list of connectors: %v", e)
+	connectors, err := s.storage.ListConnectors()
+	if err != nil {
+		s.logger.Errorf("Failed to get list of connectors: %v", err)
 		s.renderError(w, http.StatusInternalServerError, "Failed to retrieve connector list.")
 		return
 	}
 
-	if len(connectors) == 1 {
+	// Redirect if a client chooses a specific connector_id
+	if authReq.ConnectorID != "" {
+		for _, c := range connectors {
+			if c.ID == authReq.ConnectorID {
+				http.Redirect(w, r, s.absPath("/auth", c.ID)+"?req="+authReq.ID, http.StatusFound)
+				return
+			}
+		}
+		s.tokenErrHelper(w, errInvalidConnectorID, "Connector ID does not match a valid Connector", http.StatusNotFound)
+		return
+	}
+
+	if len(connectors) == 1 && !s.alwaysShowLogin {
 		for _, c := range connectors {
 			// TODO(ericchiang): Make this pass on r.URL.RawQuery and let something latter
 			// on create the auth request.
@@ -401,7 +417,7 @@ func (s *Server) handleConnectorCallback(w http.ResponseWriter, r *http.Request)
 	if err != nil {
 		if err == storage.ErrNotFound {
 			s.logger.Errorf("Invalid 'state' parameter provided: %v", err)
-			s.renderError(w, http.StatusInternalServerError, "Requested resource does not exist.")
+			s.renderError(w, http.StatusBadRequest, "Requested resource does not exist.")
 			return
 		}
 		s.logger.Errorf("Failed to get auth request: %v", err)
