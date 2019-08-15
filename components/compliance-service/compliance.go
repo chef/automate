@@ -161,7 +161,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 
 	s := connFactory.NewServer(tracing.GlobalServerInterceptor())
 
-	cerealManager, err := createProjectUpdateCerealManager(connFactory)
+	cerealManager, err := createProjectUpdateCerealManager(connFactory, conf.CerealConfig.Endpoint)
 	if err != nil {
 		logrus.WithError(err).Fatal("could not create cereal manager")
 	}
@@ -172,6 +172,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	if err := cerealManager.Start(ctx); err != nil {
 		logrus.WithError(err).Fatal("could not start cereal manager")
 	}
+
 	// needs to be the first one, since it creates the es indices
 	ingest.RegisterComplianceIngesterServer(s,
 		ingestserver.NewComplianceIngestServer(ingesticESClient, nodeManagerServiceClient,
@@ -227,8 +228,8 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	logrus.Fatalf("serveGrpc aborting, we have a problem: %s", err.Error())
 }
 
-func createProjectUpdateCerealManager(connFactory *secureconn.Factory) (*cereal.Manager, error) {
-	conn, err := connFactory.Dial("cereal-service", ":10101")
+func createProjectUpdateCerealManager(connFactory *secureconn.Factory, address string) (*cereal.Manager, error) {
+	conn, err := connFactory.Dial("cereal-service", address)
 	if err != nil {
 		return nil, errors.Wrap(err, "error dialing cereal service")
 	}
