@@ -7,7 +7,7 @@ import { hasIn } from 'lodash/fp';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Project } from 'app/entities/projects/project.model';
 import {
-  ProjectChecked, projectCheckedFromProject
+  ProjectChecked
 } from 'app/components/projects-dropdown/projects-dropdown.component';
 
 @Component({
@@ -43,9 +43,10 @@ export class CreateObjectModalComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     // if a new list of projects to populate dropdown with is passed in we update the dropdown
+    const checked = false;
     if (hasIn('assignableProjects.currentValue', changes)) {
       changes.assignableProjects.currentValue.forEach(proj =>
-        this.projects[proj.id] = projectCheckedFromProject(proj, false));
+        this.projects[proj.id] = { ...proj, checked });
     }
   }
 

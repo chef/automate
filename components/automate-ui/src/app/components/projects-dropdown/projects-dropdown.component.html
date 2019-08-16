@@ -15,7 +15,7 @@
   <chef-click-outside (clickOutside)="closeDropdown()">
     <chef-dropdown [attr.visible]="active">
       <chef-checkbox
-        *ngFor="let project of projectsArray();"
+        *ngFor="let project of projectsArray()"
         [checked]="project.checked"
         [attr.title]="project.name"
         (change)="projectChecked($event.detail, project)"

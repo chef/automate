@@ -36,12 +36,13 @@ import {
   projectEntities
 } from 'app/entities/projects/project.selectors';
 import {
-  ProjectChecked, projectCheckedFromProject
+  ProjectChecked
 } from 'app/components/projects-dropdown/projects-dropdown.component';
 
 import { ProjectConstants, Project } from 'app/entities/projects/project.model';
 import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
+import { IAMType } from 'app/entities/policies/policy.model';
 
 const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 
@@ -122,32 +123,34 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       });
 
     this.store.select(iamMinorVersion)
-      .pipe(takeUntil(this.isDestroyed))
+      .pipe(
+        takeUntil(this.isDestroyed),
+        filter(identity)
+      )
       .subscribe((version) => {
-        if (version === null) { return; }
         this.isMinorV1 = version === 'v1';
       });
 
     this.store.select(assignableProjects)
       .subscribe((assignable: ProjectsFilterOption[]) => {
-        assignable.forEach(p => {
-          const proj = <Project>{
-            id: p.value,
-            name: p.label,
-            type: p.type
-          };
+        assignable.forEach(({ value: id, label: name, type: stringType }) => {
+          const type = <IAMType>stringType;
+          const proj: Project = { id, name, type};
           // we don't want to override values that we fetched
           // that were part of the team already
-          if (!this.projects.hasOwnProperty(proj.id)) {
-            this.projects[proj.id] = projectCheckedFromProject(proj, false);
+          if (!this.projects[proj.id]) {
+            const checked = false;
+            this.projects[proj.id] = { ...proj, checked };
           }
         });
       });
 
     this.store.select(iamMajorVersion)
-      .pipe(takeUntil(this.isDestroyed))
+      .pipe(
+        takeUntil(this.isDestroyed),
+        filter(identity)
+        )
       .subscribe((version) => {
-        if (version === null) { return; }
         this.isMajorV1 = version === 'v1';
 
         // Triggered every time the team is updated.
@@ -216,22 +219,21 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     combineLatest([
       this.store.select(getProjectStatus),
       this.store.select(projectEntities)])
-      .pipe(
-        map(([status, projectMap]) => {
-          if (status === EntityStatus.loadingSuccess) {
-            const projectsFound: { [id: string]: boolean } = {};
-            this.teamProjectsLeftToFetch.forEach((pID) => {
-              const project = projectMap[pID];
-              if (project !== undefined) {
-                this.projects[project.id] = projectCheckedFromProject(project, true);
-                projectsFound[pID] = true;
-              }
-            });
+      .pipe(filter(([status, _]) => status === EntityStatus.loadingSuccess),
+        map(([_, projectMap]) => {
+          const projectsFound: { [id: string]: boolean } = {};
+          this.teamProjectsLeftToFetch.forEach(pID => {
+            const project = projectMap[pID];
+            if (project !== undefined) {
+              const checked = true;
+              this.projects[project.id] = { ...project, checked };
+              projectsFound[pID] = true;
+            }
+          });
 
-            // Remove all team projects that have been fetched.
-            this.teamProjectsLeftToFetch =
-              this.teamProjectsLeftToFetch.filter(pID => projectsFound[pID] === undefined);
-          }
+          // Remove all team projects that have been fetched.
+          this.teamProjectsLeftToFetch =
+            this.teamProjectsLeftToFetch.filter(pID => !projectsFound[pID]);
       })).subscribe();
  }
 
@@ -269,10 +271,10 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public updateTeam(): void {
     this.saveSuccessful = false;
     this.saving = true;
-    const newName: string = this.updateNameForm.controls.name.value.trim();
+    const name: string = this.updateNameForm.controls.name.value.trim();
     this.store.dispatch(new UpdateTeam({
         id: this.team.id,
-        name: newName,
+        name: name,
         guid: this.team.guid, // to be deprecated after GA
         projects: Object.values(this.projects).filter(p => p.checked).map(p => p.id)
       }));

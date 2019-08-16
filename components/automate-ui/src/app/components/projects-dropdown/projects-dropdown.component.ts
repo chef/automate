@@ -10,12 +10,6 @@ export interface ProjectChecked extends Project {
   checked: boolean;
 }
 
-export function projectCheckedFromProject(project: Project, checked: boolean): ProjectChecked {
-  const projectChecked = <ProjectChecked>project;
-  projectChecked.checked = checked;
-  return projectChecked;
-}
-
 @Component({
   selector: 'app-projects-dropdown',
   templateUrl: './projects-dropdown.component.html',
@@ -38,7 +32,7 @@ export class ProjectsDropdownComponent implements OnChanges {
   constructor() { }
 
   projectsArray(): ProjectChecked[] {
-    return Object.values(this.projects) ? Object.values(this.projects) : [];
+    return Object.values(this.projects);
   }
 
   ngOnChanges() {
