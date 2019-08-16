@@ -1,8 +1,12 @@
 package pg
 
 import (
+	"bufio"
+	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"os"
 	"path"
 	"strings"
 	"time"
@@ -16,13 +20,13 @@ import (
 
 // PGDumpCmd is the command we will run for pg_dump. This self-test
 // harness replaces this with a stub.
-var PGDumpCmd = []string{"hab", "pkg", "exec", "chef/automate-postgresql", "pg_dump"}
+var PGDumpCmd = []string{"hab", "pkg", "exec", "core/postgresql11-client", "pg_dump"}
 
 // PGRestoreCmd is the command we will run for pg_restore.
-var PGRestoreCmd = []string{"hab", "pkg", "exec", "chef/automate-postgresql", "pg_restore"}
+var PGRestoreCmd = []string{"hab", "pkg", "exec", "core/postgresql11-client", "pg_restore"}
 
 // PSQLCmd is the command we will run for psql.
-var PSQLCmd = []string{"hab", "pkg", "exec", "chef/automate-postgresql", "psql"}
+var PSQLCmd = []string{"hab", "pkg", "exec", "core/postgresql11-client", "psql"}
 
 // DatabaseExporter knows how to export and import a database. See
 // Export and Import for further details.
@@ -37,6 +41,7 @@ type DatabaseExporter struct {
 	Timeout           time.Duration
 	DisableRoleCreate bool
 	UseCustomFormat   bool
+	TempDir           string
 
 	Stdout io.Writer
 	Stdin  io.Reader
@@ -206,6 +211,12 @@ func (db DatabaseExporter) restoreSQLFile(exitOnError bool) error {
 	return nil
 }
 
+func removeFile(filename string) {
+	if err := os.Remove(filename); err != nil {
+		logrus.WithError(err).Errorf("failed to remove %q", filename)
+	}
+}
+
 func (db DatabaseExporter) restoreCustomFile(exitOnError bool) error {
 	pgRestoreCmd := append(PGRestoreCmd, "-Fc", "-d", db.ConnInfo.ConnURI(db.Name))
 
@@ -219,20 +230,81 @@ func (db DatabaseExporter) restoreCustomFile(exitOnError bool) error {
 	}
 
 	source := "stdin"
+	var pgBackupFile string
 	if db.Stdin == nil {
 		source = db.exportFilePath()
-		pgRestoreCmd = append(
-			pgRestoreCmd, source)
+		pgBackupFile = source
+
+	} else {
+		tmpfile, err := ioutil.TempFile(db.TempDir, "pg-restore-db")
+		if err != nil {
+			return errors.Wrap(err, "failed to create db backup buffer file")
+		}
+		defer removeFile(tmpfile.Name())
+		defer tmpfile.Close()
+		pgBackupFile = tmpfile.Name()
+		if _, err := io.Copy(tmpfile, db.Stdin); err != nil {
+			return errors.Wrap(err, "failed to buffer db backup")
+		}
+	}
+	pgListFile, err := ioutil.TempFile(db.TempDir, "pg-restore-list")
+	if err != nil {
+		return errors.Wrap(err, "failed to create pg restore list file")
+	}
+	defer removeFile(pgListFile.Name())
+	defer pgListFile.Close()
+
+	pgListCmd := append(pgRestoreCmd, "--list")
+	stderrListBuff := new(strings.Builder)
+	stdoutListBuffReader, stdoutListBuffWriter := io.Pipe()
+	defer stdoutListBuffReader.Close()
+	defer stdoutListBuffWriter.Close()
+
+	ctx, cancel := context.WithCancel(context.TODO())
+	defer cancel()
+	waitFunc, err := db.CmdExecutor.Start(
+		pgListCmd[0],
+		command.Args(pgListCmd[1:]...),
+		command.Stdout(stdoutListBuffWriter),
+		command.Stderr(stderrListBuff),
+		command.Timeout(db.Timeout),
+		command.Context(ctx))
+	if err != nil {
+		return errors.Wrapf(err, "failed to list SQL dump TOC from %q, stderr: %s", source, stderrListBuff.String())
+	}
+	scanner := bufio.NewScanner(stdoutListBuffReader)
+	for scanner.Scan() {
+		txt := scanner.Text()
+		if !strings.Contains(txt, "2615 2200") {
+			_, err := fmt.Fprintln(pgListFile, txt)
+			if err != nil {
+				return errors.Wrapf(err, "failed to write SQL dump TOC from %q, stderr: %s", source, stderrListBuff.String())
+			}
+		}
 	}
 
+	if err := scanner.Err(); err != nil {
+		return errors.Wrapf(err, "failed to read SQL dump TOC from %q, stderr: %s", source, stderrListBuff.String())
+	}
+
+	if err := waitFunc(); err != nil {
+		return errors.Wrapf(err, "failed to list SQL dump TOC from %q, stderr: %s", source, stderrListBuff.String())
+	}
+
+	if err := pgListFile.Close(); err != nil {
+		return errors.Wrapf(err, "failed to write SQL dump TOC from %q, stderr: %s", source, stderrListBuff.String())
+	}
+
+	pgRestoreCmd = append(
+		pgRestoreCmd, "--use-list", pgListFile.Name(), pgBackupFile)
+
 	stderrBuff := new(strings.Builder)
-	err := db.CmdExecutor.Run(
+	err = db.CmdExecutor.Run(
 		pgRestoreCmd[0],
 		append(db.ConnInfo.PsqlCmdOptions(),
 			command.Args(pgRestoreCmd[1:]...),
 			command.Stderr(stderrBuff),
-			command.Timeout(db.Timeout),
-			command.Stdin(db.Stdin))...)
+			command.Timeout(db.Timeout))...)
 	if err != nil {
 		return errors.Wrapf(err, "failed to import SQL file from %q, stderr: %s", source, stderrBuff.String())
 	}
