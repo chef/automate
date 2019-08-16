@@ -803,37 +803,45 @@ func (s *server) ServiceVersions(ctx context.Context,
 		return nil, ErrorNotConfigured
 	}
 
-	ds := deployment.ServiceFromManifest(s.deployment.CurrentReleaseManifest, deploymentServiceName)
-	services := append(s.deployment.ExpectedServices, ds)
-
-	resp := &api.ServiceVersionsResponse{}
-	resp.Services = make([]*api.ServiceVersion, 0, len(services))
-
 	c := s.target().HabAPIClient()
 	svcList, err := c.ListServices(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Habitat API error: %s", err.Error())
 	}
 
-	for _, svc := range services {
-		v := &api.ServiceVersion{}
-		info, found := habapi.ServiceInfoByName(svcList, svc.Name())
-		if !found {
-			logrus.WithError(err).WithFields(logrus.Fields{
-				"svc_name": svc.Name(),
-			}).Warn("error retrieving version")
+	resp := &api.ServiceVersionsResponse{}
+	resp.Services = make([]*api.ServiceVersion, 0, len(s.deployment.ExpectedServices)+1)
+	for _, svc := range s.deployment.ExpectedServices {
+		v := serviceVersionForService(svcList, svc.Name())
+		if v == nil {
+			logrus.WithField("svc_name", svc.Name()).Warn("no version information")
 			continue
 		}
-
-		v.Name = info.Pkg.Name
-		v.Origin = info.Pkg.Origin
-		v.Release = info.Pkg.Release
-		v.Version = info.Pkg.Version
 
 		resp.Services = append(resp.Services, v)
 	}
 
+	v := serviceVersionForService(svcList, deploymentServiceName)
+	if v == nil {
+		logrus.WithField("svc_name", deploymentServiceName).Warn("no version information")
+	} else {
+		resp.Services = append(resp.Services, v)
+	}
+
 	return resp, nil
+}
+
+func serviceVersionForService(svcList []habapi.ServiceInfo, name string) *api.ServiceVersion {
+	info, found := habapi.ServiceInfoByName(svcList, name)
+	if !found {
+		return nil
+	}
+	return &api.ServiceVersion{
+		Name:    info.Pkg.Name,
+		Origin:  info.Pkg.Origin,
+		Release: info.Pkg.Release,
+		Version: info.Pkg.Version,
+	}
 }
 
 // ensure that all services return a successful status
