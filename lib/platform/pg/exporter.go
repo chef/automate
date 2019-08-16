@@ -217,9 +217,12 @@ func (db DatabaseExporter) restoreSQLFile(exitOnError bool) error {
 }
 
 func removeFile(filename string) {
+	logrus.Infof("removing %q", filename)
+
 	if err := os.Remove(filename); err != nil {
 		logrus.WithError(err).Errorf("failed to remove %q", filename)
 	}
+
 }
 
 func (db DatabaseExporter) restoreCustomFile(exitOnError bool) error {
@@ -281,7 +284,7 @@ func (db DatabaseExporter) restoreCustomFile(exitOnError bool) error {
 		command.Timeout(db.Timeout),
 		command.Context(ctx))
 	if err != nil {
-		return errors.Wrapf(err, "failed to list SQL dump TOC from %q, stderr: %s", source, stderrListBuff.String())
+		return errors.Wrapf(err, "failed to list SQL dump TOC from %q, stderr: %s", pgBackupFile, stderrListBuff.String())
 	}
 	scanner := bufio.NewScanner(pgListFile)
 	for scanner.Scan() {
