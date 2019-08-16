@@ -147,11 +147,14 @@ func main() {
 	}
 }
 
-const defaultDatabaseName = "workflow"
+const (
+	defaultDatabaseName = "workflow"
+	defaultAdminDBName  = "template1"
+)
 
-func defaultConnURIForDatabase(dbname string) string {
-	if os.Getenv("PG_URI") != "" {
-		return os.Getenv("PG_URI")
+func defaultConnURIForDatabase(dbName string) string {
+	if os.Getenv("PG_URL") != "" {
+		return os.Getenv("PG_URL")
 	}
 	connInfo := pg.A2ConnInfo{
 		Host:  "localhost",
@@ -159,7 +162,20 @@ func defaultConnURIForDatabase(dbname string) string {
 		User:  "automate",
 		Certs: pg.A2SuperuserCerts,
 	}
-	return connInfo.ConnURI(dbname)
+	return connInfo.ConnURI(dbName)
+}
+
+func defaultAdminConnURI() string {
+	if os.Getenv("PG_ADMIN_URL") != "" {
+		return os.Getenv("PG_ADMIN_URL")
+	}
+	connInfo := pg.A2ConnInfo{
+		Host:  "localhost",
+		Port:  5432,
+		User:  "automate",
+		Certs: pg.A2SuperuserCerts,
+	}
+	return connInfo.ConnURI(defaultAdminDBName)
 }
 
 func runResetDB(_ *cobra.Command, args []string) error {
@@ -168,7 +184,7 @@ func runResetDB(_ *cobra.Command, args []string) error {
 		dbName = args[0]
 	}
 
-	db, err := sql.Open("postgres", defaultConnURIForDatabase("template1"))
+	db, err := sql.Open("postgres", defaultAdminConnURI())
 	if err != nil {
 		return errors.Wrap(err, "could not initialize db connection")
 	}
@@ -192,7 +208,6 @@ type SimpleTaskParams struct {
 
 func (t *SimpleTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
 	params := SimpleTaskParams{}
-	logrus.Debug("here")
 	if err := task.GetParameters(&params); err != nil {
 		panic(err)
 	}
@@ -275,7 +290,7 @@ func (p *SimpleWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 		"params":     params,
 		"taskParams": taskParams,
 		"taskResult": taskResult,
-	}).Debug("SimpleWorkflow got Task Completed")
+	}).Info("SimpleWorkflow got Task Completed")
 
 	completed := mycount + 1
 	if completed < params.NumTasks {

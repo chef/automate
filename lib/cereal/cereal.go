@@ -503,7 +503,25 @@ type TaskExecutorOpts struct {
 	Workers int
 }
 
+// registeredExecutor is responsible for polling for and executing
+// tasks using the given task executor.
+//
+// Tasks are polled for based on
+//
+// - a time-based internval, and
+// - an in-process notifications that is triggered when we think there
+// might be a task.
+//
+// When either of these tiggers occur, we spawn a new goroutine (the
+// "task worker") provided that we are under the maximum configured
+// workers for this task executor.
+//
+// The task worker will repeatedly dequeue tasks until none are
+// available. To ensure our queue grows in response to load, if a task
+// is found in the queue, another task worker will be spawned.
+//
 type registeredExecutor struct {
+	name     string
 	executor TaskExecutor
 	opts     TaskExecutorOpts
 
@@ -511,9 +529,12 @@ type registeredExecutor struct {
 
 	maxWorkers    int
 	activeWorkers int
-	sync.Mutex    // guards worker count
+	sync.Mutex    // guards activeWorkers
+
+	wg sync.WaitGroup
 }
 
+// DecActiveWorkers decrements the worker count, clamping it at zero.
 func (r *registeredExecutor) DecActiveWorkers() {
 	r.Lock()
 	defer r.Unlock()
@@ -523,6 +544,10 @@ func (r *registeredExecutor) DecActiveWorkers() {
 	}
 }
 
+// IncActiveWorkers increments the active worker count if another
+// worker is allowed. It returns true if the count was incremened and
+// false otherwise. The caller should not start a worker if false is
+// returned.
 func (r *registeredExecutor) IncActiveWorkers() bool {
 	r.Lock()
 	defer r.Unlock()
@@ -535,11 +560,121 @@ func (r *registeredExecutor) IncActiveWorkers() bool {
 	return false
 }
 
+// WakeupPoller will wake up the poller for this
+// registeredExecutor. This is called when a workflow executor
+// enqueue's tasks.
+func (r *registeredExecutor) WakeupPoller() {
+	select {
+	case r.wakeupChan <- struct{}{}:
+	default:
+	}
+}
+
+// StartPoller runs until the given context is cancelled, starting a
+// TaskWorker every interval (or sooner if we've been notified of a
+// change)
+func (r *registeredExecutor) StartPoller(ctx context.Context, b backend.Driver, taskPollInterval time.Duration, workflowWakeupFun func()) {
+	logctx := logrus.WithField("task_name", r.name)
+	logctx.Infof("Starting task poller")
+	for {
+		select {
+		case <-ctx.Done():
+			logctx.WithField("active_workers", r.activeWorkers).Info("Waiting for all task workers to exit")
+			r.wg.Wait()
+			logctx.Info("Exiting task poller")
+			return
+		case <-time.After(taskPollInterval):
+			r.startTaskWorker(ctx, b, workflowWakeupFun)
+		case <-r.wakeupChan:
+			r.startTaskWorker(ctx, b, workflowWakeupFun)
+		}
+	}
+}
+
+// startTaskPoller starts a goroutine that will dequeue new tasks and
+// execute them, exiting when no tasks are available in the queue. If
+// the task poller initially finds a job, it will also start the next
+// task worker.
+func (r *registeredExecutor) startTaskWorker(ctx context.Context, b backend.Driver, workflowWakeupFun func()) {
+	logctx := logrus.WithField("task_name", r.name)
+	if !r.IncActiveWorkers() {
+		logctx.WithFields(logrus.Fields{
+			"max_workers":    r.maxWorkers,
+			"active_workers": r.activeWorkers,
+		}).Warn("Maximum task workers already started")
+		return
+	}
+
+	go func() {
+		r.wg.Add(1)
+		startedNext := false
+		for {
+			t, taskCompleter, err := b.DequeueTask(ctx, r.name)
+			if err != nil {
+				if err != ErrNoTasks {
+					logctx.WithError(err).Error("Failed to dequeue task")
+				}
+				logrus.Info("Worker shutting down")
+				r.DecActiveWorkers()
+				r.wg.Done()
+				return
+			}
+			logctx.Debugf("Dequeued task %s", t.Name)
+
+			if !startedNext {
+				r.startTaskWorker(ctx, b, workflowWakeupFun)
+				startedNext = true
+			}
+
+			runCtx := taskCompleter.Context()
+			var cancel context.CancelFunc
+			if r.opts.Timeout > 0 {
+				runCtx, cancel = context.WithTimeout(runCtx, r.opts.Timeout)
+			} else {
+				runCtx, cancel = context.WithCancel(runCtx)
+			}
+
+			r.runTask(runCtx, t, taskCompleter) // nolint: errcheck
+			cancel()
+			workflowWakeupFun()
+		}
+	}()
+}
+
+func (r *registeredExecutor) runTask(ctx context.Context, t *backend.Task, taskCompleter backend.TaskCompleter) error {
+	logctx := logrus.WithField("task_name", r.name)
+
+	result, err := r.executor.Run(ctx, &task{backendTask: t})
+	if err != nil {
+		err := taskCompleter.Fail(err.Error())
+		if err != nil {
+			logctx.WithError(err).Error("failed to mark task as failed")
+			return err
+		}
+	} else {
+		jsonResults, err := jsonify(result)
+		if err != nil {
+			logctx.WithError(err).Error("could not convert returned results to JSON")
+			if err := taskCompleter.Fail(err.Error()); err != nil {
+				logrus.WithError(err).Error("Failed to fail task completer")
+				return err
+			}
+		}
+		err = taskCompleter.Succeed(jsonResults)
+		if err != nil {
+			logrus.WithError(err).Error("failed to mark task as successful")
+			return err
+		}
+	}
+	return nil
+}
+
 // RegisterTaskExecutor registers a TaskExecutor to execute tasks of type taskName.
 // This is not safe to call concurrently and should be done from only one thread
 // of the process. This must be called before Start.
 func (m *Manager) RegisterTaskExecutor(taskName string, executor TaskExecutor, opts TaskExecutorOpts) error {
 	r := &registeredExecutor{
+		name:       taskName,
 		wakeupChan: make(chan struct{}, 10), // 10 is arbitrary
 		executor:   executor,
 		opts:       opts,
@@ -725,11 +860,7 @@ func (m *Manager) WakeupWorkflowExecutor() {
 
 func (m *Manager) WakeupTaskPollerByTaskName(taskName string) {
 	if e, ok := m.taskExecutors[taskName]; ok {
-		select {
-		case e.wakeupChan <- struct{}{}:
-		default:
-			logrus.Warnf("could not send to wakeup channel: %s", taskName)
-		}
+		e.WakeupPoller()
 	}
 }
 
@@ -750,92 +881,13 @@ func (m *Manager) WakeupTaskPollersByRequests(taskRequests []enqueueTaskRequest)
 }
 
 func (m *Manager) startTaskPollers(ctx context.Context) error {
-	for taskName, exec := range m.taskExecutors {
-		go m.runTaskPoller(ctx, taskName, exec)
-	}
-	return nil
-}
-
-func (m *Manager) runTaskPoller(ctx context.Context, taskName string, exec *registeredExecutor) {
-	logctx := logrus.WithFields(logrus.Fields{
-		"task_name": taskName,
-	})
-	logctx.Infof("Starting task poller for %s", taskName)
-	m.wg.Add(1)
-	for {
-		select {
-		case <-ctx.Done():
-			logctx.Info("exiting task executor")
-			m.wg.Done()
-			return
-		case <-time.After(m.taskPollInterval):
-			m.pollForTasks(ctx, logctx, taskName, exec)
-		case <-exec.wakeupChan:
-			m.pollForTasks(ctx, logctx, taskName, exec)
-		}
-	}
-}
-
-func (m *Manager) pollForTasks(ctx context.Context, logctx logrus.FieldLogger, taskName string, exec *registeredExecutor) {
-	for {
-		if !exec.IncActiveWorkers() {
-			logctx.WithFields(logrus.Fields{
-				"max_workers":    exec.maxWorkers,
-				"active_workers": exec.activeWorkers,
-			}).Debug("No executors available")
-			return
-		}
-
-		t, taskCompleter, err := m.backend.DequeueTask(ctx, taskName)
-		if err != nil {
-			if err != ErrNoTasks {
-				logctx.WithError(err).Error("failed to dequeue task")
-			}
-			exec.DecActiveWorkers()
-			return
-		}
-		logctx.Debugf("Dequeued task %s", t.Name)
+	for _, exec := range m.taskExecutors {
+		e := exec
 		go func() {
-			runCtx := taskCompleter.Context()
-			var cancel context.CancelFunc
-			if exec.opts.Timeout > 0 {
-				runCtx, cancel = context.WithTimeout(runCtx, exec.opts.Timeout)
-			} else {
-				runCtx, cancel = context.WithCancel(runCtx)
-			}
-
-			runTask(runCtx, logctx, exec.executor, t, taskCompleter) // nolint: errcheck
-			cancel()
-
-			exec.DecActiveWorkers()
-			m.WakeupWorkflowExecutor()
-			m.WakeupTaskPollerByTaskName(taskName)
+			m.wg.Add(1)
+			e.StartPoller(ctx, m.backend, m.taskPollInterval, m.WakeupWorkflowExecutor)
+			m.wg.Done()
 		}()
-	}
-}
-
-func runTask(ctx context.Context, logctx logrus.FieldLogger, exec TaskExecutor, t *backend.Task, taskCompleter backend.TaskCompleter) error {
-	result, err := exec.Run(ctx, &task{backendTask: t})
-	if err != nil {
-		err := taskCompleter.Fail(err.Error())
-		if err != nil {
-			logctx.WithError(err).Error("failed to mark task as failed")
-			return err
-		}
-	} else {
-		jsonResults, err := jsonify(result)
-		if err != nil {
-			logctx.WithError(err).Error("could not convert returned results to JSON")
-			if err := taskCompleter.Fail(err.Error()); err != nil {
-				logrus.WithError(err).Error("Failed to fail task completer")
-				return err
-			}
-		}
-		err = taskCompleter.Succeed(jsonResults)
-		if err != nil {
-			logrus.WithError(err).Error("failed to mark task as successful")
-			return err
-		}
 	}
 	return nil
 }
