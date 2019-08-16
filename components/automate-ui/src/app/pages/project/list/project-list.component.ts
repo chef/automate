@@ -212,9 +212,11 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   }
 
   getRulesStatus(project: Project): string {
-    return project.status === 'NO_RULES' ? 'No rules'
-      : project.status === 'EDITS_PENDING' ? 'Edits pending'
-        : project.status === 'RULES_APPLIED' ? 'Applied'
-          : '';
+    switch (project.status) {
+      case 'NO_RULES': return 'No rules';
+      case 'EDITS_PENDING': return 'Edits pending';
+      case 'RULES_APPLIED': return 'Applied';
+      default: return '';
+    }
   }
 }

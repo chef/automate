@@ -71,16 +71,17 @@ export const ruleAttributes: RuleTypeMappedObject = {
 
 export const ruleEntityAdapter: EntityAdapter<Rule> = createEntityAdapter<Rule>();
 
-export const RuleEntityInitialState: RuleEntityState = ruleEntityAdapter.getInitialState({
-  getAttributes: ruleAttributes,
-  getAllStatus: EntityStatus.notLoaded,
-  getStatus: EntityStatus.notLoaded,
-  createStatus: EntityStatus.notLoaded,
-  createError: null,
-  deleteStatus: EntityStatus.notLoaded,
-  updateStatus: EntityStatus.notLoaded,
-  projectRulesStatus: <ProjectStatus>'PROJECT_RULES_STATUS_UNSET'
-});
+export const RuleEntityInitialState: RuleEntityState =
+  ruleEntityAdapter.getInitialState(<RuleEntityState>{
+    getAttributes: ruleAttributes,
+    getAllStatus: EntityStatus.notLoaded,
+    getStatus: EntityStatus.notLoaded,
+    createStatus: EntityStatus.notLoaded,
+    createError: null,
+    deleteStatus: EntityStatus.notLoaded,
+    updateStatus: EntityStatus.notLoaded,
+    projectRulesStatus: 'PROJECT_RULES_STATUS_UNSET'
+  });
 
 export function ruleEntityReducer(
   state: RuleEntityState = RuleEntityInitialState,
