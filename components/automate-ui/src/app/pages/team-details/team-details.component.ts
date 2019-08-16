@@ -48,6 +48,10 @@ const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 
 export type TeamTabName = 'users' | 'details';
 
+export interface ProjectMap {
+  [id: string]: ProjectChecked;
+}
+
 @Component({
   selector: 'app-team-details',
   templateUrl: './team-details.component.html',
@@ -74,7 +78,12 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public removeText = 'Remove User';
 
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
-  public projects: { [id: string]: ProjectChecked } = {};
+  public projects: ProjectMap = {};
+  // keep a list of projects that were in the teams list that are
+  // left to fetch so we can know if we are fully loaded or not.
+  // don't want to enable the projects-dropdown until we have
+  // checked the proper project checkboxes corresponding to projects
+  // already in the team.
   public teamProjectsLeftToFetch: string[] = [];
 
   constructor(private store: Store<NgrxStateAtom>,
@@ -134,9 +143,9 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     this.store.select(assignableProjects)
       .subscribe((assignable: ProjectsFilterOption[]) => {
         assignable.forEach(({ value: id, label: name, type: stringType }) => {
-          const type: IAMType = stringType;
-          const proj: Project = { id, name, type};
-          // we don't want to override values that we fetched
+          const type = <IAMType>stringType;
+          const proj: Project = { id, name, type };
+          // we don't want to override projects that we fetched
           // that were part of the team already
           if (!this.projects[proj.id]) {
             const checked = false;
@@ -216,10 +225,13 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
           });
       });
 
+    // we keep a list of all projects that were left in the team
+    // to know if we are fully loaded yet or not.
     combineLatest([
       this.store.select(getProjectStatus),
       this.store.select(projectEntities)])
-      .pipe(filter(([status, _]: [EntityStatus, ProjectMap]) => status === EntityStatus.loadingSuccess),
+      .pipe(filter(([status, _]: [EntityStatus, ProjectMap]) =>
+          status === EntityStatus.loadingSuccess),
         map(([_, projectMap]) => {
           const projectsFound: { [id: string]: boolean } = {};
           this.teamProjectsLeftToFetch.forEach(pID => {
@@ -300,6 +312,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
 
+  // updates whether the project was checked or unchecked
   onProjectChecked(project: ProjectChecked): void {
     this.projects[project.id] = project;
   }

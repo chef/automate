@@ -6,6 +6,9 @@ import { ProjectConstants, Project } from 'app/entities/projects/project.model';
 
 const { UNASSIGNED_PROJECT_ID } = ProjectConstants;
 
+// Extend the project model with the checked field.
+// This represents whether the project's checkbox is unchecked or not
+// in this component's UI
 export interface ProjectChecked extends Project {
   checked: boolean;
 }
@@ -28,8 +31,6 @@ export class ProjectsDropdownComponent implements OnChanges {
 
   active = false;
   label = UNASSIGNED_PROJECT_ID;
-
-  constructor() { }
 
   projectsArray(): ProjectChecked[] {
     return Object.values(this.projects);

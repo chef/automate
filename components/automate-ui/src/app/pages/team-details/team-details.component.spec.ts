@@ -25,9 +25,13 @@ import {
 } from 'app/entities/teams/team.actions';
 import { Team } from 'app/entities/teams/team.model';
 import { TeamDetailsComponent } from './team-details.component';
-import { projectsFilterReducer } from 'app/services/projects-filter/projects-filter.reducer';
 import {
-  projectEntityReducer
+  projectsFilterReducer,
+  projectsFilterInitialState
+} from 'app/services/projects-filter/projects-filter.reducer';
+import {
+  projectEntityReducer,
+  ProjectEntityInitialState
 } from 'app/entities/projects/project.reducer';
 
 describe('TeamDetailsComponent', () => {
@@ -47,7 +51,9 @@ describe('TeamDetailsComponent', () => {
     },
     users: UserEntityInitialState,
     teams: TeamEntityInitialState,
-    policies: PolicyEntityInitialState
+    policies: PolicyEntityInitialState,
+    projects: ProjectEntityInitialState,
+    projectsFilter: projectsFilterInitialState
   };
 
   beforeEach(async(() => {
