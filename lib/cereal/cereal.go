@@ -605,8 +605,8 @@ func (r *registeredExecutor) startTaskWorker(ctx context.Context, b backend.Driv
 		return
 	}
 
+	r.wg.Add(1)
 	go func() {
-		r.wg.Add(1)
 		startedNext := false
 		for {
 			t, taskCompleter, err := b.DequeueTask(ctx, r.name)
@@ -883,8 +883,8 @@ func (m *Manager) WakeupTaskPollersByRequests(taskRequests []enqueueTaskRequest)
 func (m *Manager) startTaskPollers(ctx context.Context) error {
 	for _, exec := range m.taskExecutors {
 		e := exec
+		m.wg.Add(1)
 		go func() {
-			m.wg.Add(1)
 			e.StartPoller(ctx, m.backend, m.taskPollInterval, m.WakeupWorkflowExecutor)
 			m.wg.Done()
 		}()
