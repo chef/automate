@@ -75,7 +75,7 @@ export class ChefSessionService implements CanActivate {
       if (xhr.status === HTTP_STATUS_OK) {
         this.ingestIDToken(xhr.response.id_token);
       } else if (xhr.status === HTTP_STATUS_UNAUTHORIZED) {
-        this.logout(this.currentPath());
+        this.logout(this.currentPath(), true);
       } else {
         // TODO 2017/12/15 (sr): is there anything we could do that's better than
         // this?
@@ -105,7 +105,7 @@ export class ChefSessionService implements CanActivate {
   // canActivate determines if any of the routes (except signin) can be activated
   canActivate(_route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
     if (!this.hasSession()) {
-      this.logout(state.url);
+      this.logout(state.url, true);
       return false;
     }
     return true;
@@ -146,11 +146,11 @@ export class ChefSessionService implements CanActivate {
     return !isNull(localStorage.getItem(sessionKey));
   }
 
-  logout(url = '/'): void {
+  logout(url: string = '/', refresh: boolean = false): void {
     this.deleteSession();
     // note: url will end up url-encoded in this string (magic)
     let signinURL: string;
-    if (this.user && this.user.id_token) {
+    if (refresh && this.user && this.user.id_token) {
       signinURL = `/session/new?state=${url}&id_token_hint=${this.user.id_token}`;
     } else {
       signinURL = `/session/new?state=${url}`;
