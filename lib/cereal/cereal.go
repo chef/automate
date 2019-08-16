@@ -464,18 +464,18 @@ func NewManager(b backend.Driver, opts ...ManagerOpt) (*Manager, error) {
 	}
 
 	workflowWakeupChan := make(chan struct{}, 5) // 5 is arbitrary
-	var workflowScheduler *WorkflowScheduler
-	if v, ok := b.(backend.SchedulerDriver); ok {
-		workflowScheduler = NewWorkflowScheduler(v, workflowWakeupChan)
-	}
 	m := &Manager{
-		backend:            b,
-		waywardWorkflows:   make(waywardWorkflowList),
-		workflowExecutors:  make(map[string]WorkflowExecutor),
-		taskExecutors:      make(map[string]*registeredExecutor),
-		workflowScheduler:  workflowScheduler,
+		backend:           b,
+		waywardWorkflows:  make(waywardWorkflowList),
+		workflowExecutors: make(map[string]WorkflowExecutor),
+		taskExecutors:     make(map[string]*registeredExecutor),
+
 		taskPollInterval:   defaultTaskPollInterval,
 		workflowWakeupChan: workflowWakeupChan,
+	}
+
+	if v, ok := b.(backend.SchedulerDriver); ok {
+		m.workflowScheduler = NewWorkflowScheduler(v, m.WakeupWorkflowExecutor)
 	}
 
 	for _, o := range opts {

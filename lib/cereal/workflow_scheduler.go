@@ -21,14 +21,14 @@ var (
 )
 
 type WorkflowScheduler struct {
-	backend            backend.SchedulerDriver
-	workflowWakeupChan chan struct{}
+	backend           backend.SchedulerDriver
+	workflowWakeupFun func()
 }
 
-func NewWorkflowScheduler(b backend.SchedulerDriver, c chan struct{}) *WorkflowScheduler {
+func NewWorkflowScheduler(b backend.SchedulerDriver, w func()) *WorkflowScheduler {
 	return &WorkflowScheduler{
-		backend:            b,
-		workflowWakeupChan: c,
+		backend:           b,
+		workflowWakeupFun: w,
 	}
 }
 
@@ -130,10 +130,6 @@ func (w *WorkflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 		return sleepTime, errors.Wrap(err, "could not update scheduled workflow record")
 	}
 
-	select {
-	case w.workflowWakeupChan <- struct{}{}:
-	default:
-	}
-
+	w.workflowWakeupFun()
 	return sleepTime, nil
 }
