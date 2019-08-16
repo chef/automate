@@ -45,7 +45,7 @@ export class CreateObjectModalComponent implements OnInit, OnChanges {
     // if a new list of projects to populate dropdown with is passed in we update the dropdown
     const checked = false;
     if (hasIn('assignableProjects.currentValue', changes)) {
-      changes.assignableProjects.currentValue.forEach(proj =>
+      changes.assignableProjects.currentValue.forEach((proj: Project) =>
         this.projects[proj.id] = { ...proj, checked });
     }
   }
