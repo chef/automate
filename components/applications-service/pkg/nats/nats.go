@@ -19,6 +19,7 @@ const (
 	connectionRetries                      = 5
 	deprecatedNATSStreamHealthCheckChannel = "habitat"
 	natsMessagingHealthcheckSubject        = "habitat.event.healthcheck"
+	natsMessagingSubscribeGroup            = "habitat.event.>"
 	natsMessagingQueueGroup                = "automate"
 )
 

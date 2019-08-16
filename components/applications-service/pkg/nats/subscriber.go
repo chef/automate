@@ -32,7 +32,7 @@ func (nc *NatsClient) Subscribe(eventsCh chan<- []byte) error {
 	if err != nil {
 		return err
 	}
-	_, err = nc.msgConn.QueueSubscribe(natsMessagingHealthcheckSubject, natsMessagingQueueGroup, func(msg *natsc.Msg) {
+	_, err = nc.msgConn.QueueSubscribe(natsMessagingSubscribeGroup, natsMessagingQueueGroup, func(msg *natsc.Msg) {
 		log.WithFields(log.Fields{
 			"protocol":        "nats messaging",
 			"message_data":    string(msg.Data),
