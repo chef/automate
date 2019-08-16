@@ -6,6 +6,7 @@ test_backup_restore=true
 test_diagnostics_filters="~iam-v2"
 
 do_deploy() {
+    do_deploy_default
     log_info "applying dev license"
     chef-automate license apply "$A2_LICENSE"
 }
