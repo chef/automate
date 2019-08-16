@@ -254,49 +254,52 @@ func (db DatabaseExporter) restoreCustomFile(exitOnError bool) error {
 	defer removeFile(pgListFile.Name())
 	defer pgListFile.Close()
 
-	pgListCmd := append(pgRestoreCmd, "--list")
+	pgListModifiedFile, err := ioutil.TempFile(db.TempDir, "pg-restore-list-modified")
+	if err != nil {
+		return errors.Wrap(err, "failed to create pg restore list file")
+	}
+	defer removeFile(pgListModifiedFile.Name())
+	defer pgListFile.Close()
+
+	pgListCmd := append(pgRestoreCmd, "--list", "--file", pgListFile.Name())
 	stderrListBuff := new(strings.Builder)
-	stdoutListBuffReader, stdoutListBuffWriter := io.Pipe()
-	defer stdoutListBuffReader.Close()
-	defer stdoutListBuffWriter.Close()
 
 	ctx, cancel := context.WithCancel(context.TODO())
 	defer cancel()
-	waitFunc, err := db.CmdExecutor.Start(
+	err = db.CmdExecutor.Run(
 		pgListCmd[0],
 		command.Args(pgListCmd[1:]...),
-		command.Stdout(stdoutListBuffWriter),
 		command.Stderr(stderrListBuff),
 		command.Timeout(db.Timeout),
 		command.Context(ctx))
 	if err != nil {
 		return errors.Wrapf(err, "failed to list SQL dump TOC from %q, stderr: %s", source, stderrListBuff.String())
 	}
-	scanner := bufio.NewScanner(stdoutListBuffReader)
+	scanner := bufio.NewScanner(pgListFile)
 	for scanner.Scan() {
 		txt := scanner.Text()
 		if !strings.Contains(txt, "2615 2200") {
-			_, err := fmt.Fprintln(pgListFile, txt)
+			_, err := fmt.Fprintln(pgListModifiedFile, txt)
 			if err != nil {
-				return errors.Wrapf(err, "failed to write SQL dump TOC from %q, stderr: %s", source, stderrListBuff.String())
+				return err
 			}
 		}
 	}
 
 	if err := scanner.Err(); err != nil {
-		return errors.Wrapf(err, "failed to read SQL dump TOC from %q, stderr: %s", source, stderrListBuff.String())
-	}
-
-	if err := waitFunc(); err != nil {
-		return errors.Wrapf(err, "failed to list SQL dump TOC from %q, stderr: %s", source, stderrListBuff.String())
+		return err
 	}
 
 	if err := pgListFile.Close(); err != nil {
-		return errors.Wrapf(err, "failed to write SQL dump TOC from %q, stderr: %s", source, stderrListBuff.String())
+		return err
+	}
+
+	if err := pgListModifiedFile.Close(); err != nil {
+		return err
 	}
 
 	pgRestoreCmd = append(
-		pgRestoreCmd, "--use-list", pgListFile.Name(), pgBackupFile)
+		pgRestoreCmd, "--use-list", pgListModifiedFile.Name(), pgBackupFile)
 
 	stderrBuff := new(strings.Builder)
 	err = db.CmdExecutor.Run(
