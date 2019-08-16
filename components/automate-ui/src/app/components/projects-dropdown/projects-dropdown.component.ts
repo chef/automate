@@ -16,7 +16,7 @@ export interface ProjectChecked extends Project {
   styleUrls: ['./projects-dropdown.component.scss']
 })
 export class ProjectsDropdownComponent implements OnChanges {
-  // The map of ProjectChecked by id. Any checked changes propogated via
+  // The map of ProjectChecked by id. Any checked changes propagated via
   // onProjectChecked. Updates should be applied to parent component state.
   @Input() projects: { [id: string]: ProjectChecked } = {};
 
