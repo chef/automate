@@ -32,7 +32,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.reportLoading = true;
-    const id = this.route.snapshot.params['id'];
+    const id: string = this.route.snapshot.params['id'];
     const filters = this.reportQuery.filters.getValue()
       .concat([{type: {name: 'node_id'}, value: {id}}]);
     this.statsService.getReports(filters, {sort: 'latest_report.end_time', order: 'DESC'})

@@ -30,6 +30,20 @@
           </chef-click-outside>
         </chef-dropdown>
       </div>
+      <div class="copy-dropdown">
+        <chef-button class="dropdown-toggle" secondary (click)="toggleShareDropdown()">
+          <chef-icon>share</chef-icon>
+        </chef-button>
+        <chef-dropdown class="dropdown" [visible]="shareOptsVisible">
+          <chef-click-outside (clickOutside)="hideShareDropdown()" omit="dropdown-toggle">
+            <p>Copy this private URL to share:</p>
+            <div class="copy-input">
+              <input type="text" [value]="shareUrl" readonly />
+              <chef-clipboard [value]="shareUrl"></chef-clipboard>
+            </div>
+          </chef-click-outside>
+        </chef-dropdown>
+      </div>
     </div>
 
     <!--Reporting Summary-->

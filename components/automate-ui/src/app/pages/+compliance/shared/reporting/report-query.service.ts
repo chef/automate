@@ -4,6 +4,17 @@ import { FilterC } from '../../+reporting/types';
 import { find, uniqWith, isEqual } from 'lodash';
 import * as moment from 'moment';
 
+interface FilterItem {
+  value?: {
+    text?: string
+    id?: string
+  };
+  type?: {
+    name: string
+  };
+  start_time?: any;
+  end_time?: any;
+}
 @Injectable()
 export class ReportQueryService {
 
@@ -18,7 +29,7 @@ export class ReportQueryService {
 
   endDate: Date = new Date();
 
-  filters: BehaviorSubject<Array<any>> = new BehaviorSubject([]);
+  filters: BehaviorSubject<Array<FilterItem>> = new BehaviorSubject([]);
 
   intervals: [string, (date: Date) => Date][] = [
     ['Last 10 days', date => moment(date).subtract(10, 'days').toDate()],
@@ -29,18 +40,37 @@ export class ReportQueryService {
 
   interval = 0;
 
+  addFilters(newFilters: FilterItem[]) {
+
+    const startTime: FilterItem = newFilters.find((v: FilterItem) => v.start_time);
+    if (startTime) {
+      this.startDate = startTime.start_time;
+    } else {
+      newFilters = newFilters.concat([
+        {'start_time': this.startDate}
+      ]);
+    }
+
+    const endTime: FilterItem = newFilters.find((v: FilterItem) => v.end_time);
+    if (endTime) {
+      this.endDate = endTime.end_time;
+    } else {
+      newFilters = newFilters.concat([
+        {'end_time': this.endDate}
+      ]);
+    }
+
+    this.filters.next(newFilters);
+  }
+
   addFilter(filter) {
     const filters = this.filters.getValue();
-    if (filter.type.name === 'profile' && filter.value.version ) {
-      // append version to text to ensure we display version of profile
-      filter.value.text = `${filter.value.text}, v${filter.value.version}`;
-    }
 
     const dedupedFilters = this.dedupFilters(filters, filter);
     this.filters.next(dedupedFilters);
   }
 
-  dedupFilters(filters, filter) {
+  dedupFilters(filters: FilterItem[], filter) {
     // this is needed because the node and profile objects are slightly
     // different based on how they were added to the filters list
     const alreadyFilteredCheckID = find(filters, function(f: FilterC) {

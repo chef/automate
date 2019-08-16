@@ -155,7 +155,7 @@ export class ReportingNodesComponent implements OnInit, OnDestroy {
   }
 
   getControls(item) {
-    let filters = this.reportQuery.filters.getValue();
+    let filters: any[] = this.reportQuery.filters.getValue();
 
     this.scanResultsProfileFilter = {
       type: { name: 'profile_id' },

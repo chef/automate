@@ -101,6 +101,8 @@ export class StatsService {
     const formatted = this.formatFilters(filters);
     let body = { filters: formatted };
 
+    console.info('getNodes formatted' + JSON.stringify(formatted));
+
     const {page, perPage} = listParams;
     if (page && perPage) {
       body = Object.assign(body, {page, per_page: perPage});
@@ -286,6 +288,9 @@ export class StatsService {
             type = 'control_name';
             value = filter['value']['text'];
           }
+        } else if (type === 'control_id') {
+          type = 'control';
+          value = filter['value']['text'];
         }
 
         const group = formatted.filter(f => f.type === type)[0];

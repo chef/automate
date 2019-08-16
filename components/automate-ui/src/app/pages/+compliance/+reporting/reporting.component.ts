@@ -1,7 +1,6 @@
 import {
   debounceTime,
   distinctUntilChanged,
-  filter,
   finalize,
   map,
   switchMap,
@@ -13,8 +12,8 @@ import {
   OnInit,
   OnDestroy
 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, of as observableOf } from 'rxjs';
+import { ActivatedRoute, Router, ParamMap } from '@angular/router';
+import { Subject, of as observableOf, Observable } from 'rxjs';
 import * as moment from 'moment';
 import {
   StatsService,
@@ -23,6 +22,9 @@ import {
   ReportQueryService
 } from '../shared/reporting';
 import { saveAs } from 'file-saver';
+import {
+  Chicklet
+} from '../../../types/types';
 
 @Component({
   templateUrl: './reporting.component.html',
@@ -118,6 +120,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
   removeSelectedFilter: {};
 
   downloadOptsVisible = false;
+  shareOptsVisible = false;
   downloadList: Array<string> = [];
   downloadStatusVisible = false;
   downloadInProgress = false;
@@ -137,17 +140,25 @@ export class ReportingComponent implements OnInit, OnDestroy {
     private suggestionsService: SuggestionsService,
     public reportQuery: ReportQueryService,
     public reportData: ReportDataService,
-    route: ActivatedRoute
-  ) {
-    route.queryParams.pipe(
-      takeUntil(this.isDestroyed),
-      filter(params => params['filters']))
-      .subscribe(params => {
-        this.applyParamFilters(params['filters']);
-      });
+    private route: ActivatedRoute
+  ) { }
+
+  private getAllUrlParameters(): Observable<Chicklet[]> {
+    return this.route.queryParamMap.pipe(map((params: ParamMap) => {
+      return params.keys.reduce((list, key) => {
+        const paramValues = params.getAll(key);
+        return list.concat(paramValues.map(value => ({type: key, text: value})));
+      }, []);
+    }));
   }
 
   ngOnInit() {
+    const allUrlParameters$ = this.getAllUrlParameters();
+
+
+    allUrlParameters$.pipe(takeUntil(this.isDestroyed)).subscribe(
+      allUrlParameters => this.applyParamFilters(allUrlParameters));
+
     this.reportQuery.filters.pipe(
       takeUntil(this.isDestroyed))
       .subscribe(filters => {
@@ -200,19 +211,36 @@ export class ReportingComponent implements OnInit, OnDestroy {
     );
   }
 
-  applyParamFilters(filters) {
+  applyParamFilters(filters: Chicklet[]) {
     this.reportQuery.clearFilters();
-    const filterSets = filters.split('+');
-    filterSets.forEach(element => {
-      const arrayFilters = element.split(':');
-      this.reportQuery.addFilter(
-        { type: { name: arrayFilters[0] }, value: { text: arrayFilters[1] } }
-      );
+
+    const c = filters.map((filter) => {
+      if (filter.type === 'end_time') {
+        return { end_time: new Date(filter.text) };
+      } else if ( filter.type === 'start_time' ) {
+        return { start_time: new Date(filter.text) };
+      } else {
+        return { type: { name: filter.type }, value: { text: filter.text } };
+      }
     });
+
+    this.reportQuery.addFilters(c);
   }
 
   toggleDownloadDropdown() {
     this.downloadOptsVisible = !this.downloadOptsVisible;
+  }
+
+  toggleShareDropdown() {
+    this.shareOptsVisible = !this.shareOptsVisible;
+  }
+
+  hideShareDropdown() {
+    this.shareOptsVisible = false;
+  }
+
+  get shareUrl() {
+    return window.location.href;
   }
 
   hideDownloadDropdown() {
@@ -258,7 +286,15 @@ export class ReportingComponent implements OnInit, OnDestroy {
     const { intervals, interval } = this.reportQuery;
     const endDate = event.detail;
     const startDate = intervals[interval][1](endDate);
-    this.reportQuery.setDateRange(startDate, endDate);
+
+    // this.reportQuery.setDateRange(startDate, endDate);
+
+    const queryParams = {...this.route.snapshot.queryParams};
+    queryParams['start_time'] = moment(startDate).startOf('day').format();
+
+    queryParams['end_time'] = moment(endDate).endOf('day').format();
+
+    this.router.navigate([], {queryParams});
   }
 
   onSuggestValues(event) {
@@ -267,7 +303,42 @@ export class ReportingComponent implements OnInit, OnDestroy {
   }
 
   onFilterAdded(event) {
-    this.reportQuery.addFilter(event.detail);
+    const {type, value} = event.detail;
+
+    let filterValue = value.text;
+    let typeName = type.name;
+
+    if (type.name === 'profile') {
+      if ( value.id ) {
+        typeName = 'profile_id';
+        filterValue = value.id;
+      } else {
+        typeName = 'profile_name';
+      }
+    } else if (type.name === 'node') {
+      if ( value.id ) {
+        typeName = 'node_id';
+        filterValue = value.id;
+      } else {
+        typeName = 'node_name';
+      }
+    } else if (type.name === 'control') {
+      if ( value.id ) {
+        typeName = 'control_id';
+        filterValue = value.id;
+      } else {
+        typeName = 'control_name';
+      }
+    }
+
+    const {queryParamMap} = this.route.snapshot;
+    const queryParams = {...this.route.snapshot.queryParams};
+    const existingValues = queryParamMap.getAll(typeName).filter(
+      v => v !== filterValue).concat(filterValue);
+
+    queryParams[typeName] = existingValues;
+
+    this.router.navigate([], {queryParams});
   }
 
   onFilterRemoved(event) {
