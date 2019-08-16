@@ -219,7 +219,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     combineLatest([
       this.store.select(getProjectStatus),
       this.store.select(projectEntities)])
-      .pipe(filter(([status, _]) => status === EntityStatus.loadingSuccess),
+      .pipe(filter(([status, _]: [EntityStatus, ProjectMap]) => status === EntityStatus.loadingSuccess),
         map(([_, projectMap]) => {
           const projectsFound: { [id: string]: boolean } = {};
           this.teamProjectsLeftToFetch.forEach(pID => {
