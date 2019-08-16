@@ -56,9 +56,8 @@ describeIAMV2P1('project management', () => {
     cy.get('#create-button').contains('Create Project').click();
     cy.get('app-create-object-modal chef-modal').should('have.class', 'visible');
 
-    // increase the delay a bit closer to the average typing speed, 200 char/min
-    // and ensure all characters are typed
-    cy.get('[data-cy=create-name]').type(projectName, { delay: 50 });
+    // the `should` will retry the command until the value matches the expected value
+    cy.get('[data-cy=create-name]').type(projectName).should('have.value', projectName);
 
     cy.get('[data-cy=create-id]').should('not.be.visible');
     cy.get('[data-cy=edit-button]').contains('Edit ID').click();
@@ -80,7 +79,7 @@ describeIAMV2P1('project management', () => {
     cy.url().should('include', `/settings/projects/${projectID}/rules`);
     cy.get('chef-page').should('be.visible');
 
-    cy.get('#create-name input').type(ruleName, { delay: 50 });
+    cy.get('#create-name input').type(ruleName).should('have.value', ruleName);
     cy.get('[data-cy=edit-id]').click();
 
     cy.get('#create-id input').should('have.value', ruleID);
@@ -132,7 +131,8 @@ describeIAMV2P1('project management', () => {
     cy.url().should('include', `/settings/projects/${projectID}/rules/${ruleID}`);
     cy.get('chef-page').should('be.visible');
 
-    cy.get('#create-name input').clear().type(updatedRuleName, { delay: 50 });
+    cy.get('#create-name input').clear().type(updatedRuleName)
+      .should('have.value', updatedRuleName);
 
     cy.get('#create-id input').should('have.value', ruleID);
     cy.get('#create-id input').should('be.disabled');
@@ -165,7 +165,8 @@ describeIAMV2P1('project management', () => {
     const updatedProjectName = `updated ${projectName}`;
 
     cy.get('[data-cy=details-tab]').click();
-    cy.get('#update-name').find('input').clear().type(updatedProjectName, { delay: 50 });
+    cy.get('#update-name').find('input').clear().type(updatedProjectName)
+      .should('have.value', updatedProjectName);
     cy.get('chef-button').contains('Save').click();
 
     cy.get('h1.page-title').contains(updatedProjectName);
