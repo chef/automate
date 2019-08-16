@@ -41,7 +41,7 @@ export class CreateObjectModalComponent implements OnInit, OnChanges {
     });
   }
 
-  ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(changes: SimpleChanges): void {
     // if a new list of projects to populate dropdown with is passed in we update the dropdown
     const checked = false;
     if (hasIn('assignableProjects.currentValue', changes)) {
