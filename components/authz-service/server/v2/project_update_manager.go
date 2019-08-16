@@ -6,8 +6,13 @@ import (
 	"sync"
 	"time"
 
+	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/multiworkflow"
+	"github.com/chef/automate/lib/cereal/patterns"
+	"github.com/chef/automate/lib/logger"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
@@ -53,16 +58,17 @@ func createProjectUpdateID() string {
 	return uuid.String()
 }
 
-func NewWorkflowExecutor() *multiworkflow.MultiWorkflow {
+func NewWorkflowExecutor(s storage.Storage, pr PolicyRefresher) *multiworkflow.MultiWorkflow {
 	workflowMap := make(map[string]cereal.WorkflowExecutor)
 	lock := sync.Mutex{}
 
+	applyStagedRulesExecutor := patterns.NewSingleTaskWorkflowExecutor("authz/ApplyStagedRules", true)
 	// The code below allows us to easily add to the ProjectUpdateDomainServices list.
 	// By not preconfiguring our workflow with an exact set of subworkflow executors,
 	// we can generate the workflow executor for the correct domain service easily.
 	// The logic only depends on the name. This means that an instance of authz that
 	// didn't know about a domain service can still drive its workflow.
-	return multiworkflow.NewMultiWorkflowExecutor(func(key string) (cereal.WorkflowExecutor, bool) {
+	domainSvcExecutor := multiworkflow.NewMultiWorkflowExecutor(func(key string) (cereal.WorkflowExecutor, bool) {
 		lock.Lock()
 		defer lock.Unlock()
 		if workflowExecutor, ok := workflowMap[key]; ok {
@@ -73,6 +79,38 @@ func NewWorkflowExecutor() *multiworkflow.MultiWorkflow {
 		workflowMap[key] = workflowExecutor
 		return workflowExecutor, true
 	})
+	// return chainworkflow.NewChainWorkflowExecutor(NewApplyStagedRulesExecutor(), domainSvcExecutor)
+	return domainSvcExecutor
+}
+
+type ApplyStagedRulesTaskExecutor struct {
+	store           storage.Storage
+	policyRefresher PolicyRefresher
+	log             logger.Logger
+}
+
+type ApplyStagedRulesResult struct {
+}
+
+func (s *ApplyStagedRulesTaskExecutor) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
+	s.log.Info("apply project rules starting")
+
+	if err := s.store.ApplyStagedRules(ctx); err != nil {
+		s.log.Warnf("error applying staged projects: %s", err.Error())
+		return nil, status.Errorf(codes.Internal,
+			"error applying staged projects: %s", err.Error())
+	}
+
+	// TODO: If the domain services are reading out of the cache below, that is a problem for multinode.
+	//       this does not force a refresh on all the nodes. We should read this information from the
+	//       database.
+	if err := s.policyRefresher.Refresh(ctx); err != nil {
+		s.log.Warnf("error refreshing policy cache. the rules were updated but the apply was not started, please try again.")
+		return nil, status.Errorf(codes.Internal,
+			"error refreshing policy cache: %s", err.Error())
+	}
+
+	return ApplyStagedRulesResult{}, nil
 }
 
 type CerealProjectUpdateManager struct {
@@ -82,8 +120,8 @@ type CerealProjectUpdateManager struct {
 	domainServices []string
 }
 
-func RegisterCerealProjectUpdateManager(manager *cereal.Manager) (ProjectUpdateMgr, error) {
-	domainServicesWorkflowExecutor := NewWorkflowExecutor()
+func RegisterCerealProjectUpdateManager(manager *cereal.Manager, s storage.Storage, pr PolicyRefresher) (ProjectUpdateMgr, error) {
+	domainServicesWorkflowExecutor := NewWorkflowExecutor(s, pr)
 
 	if err := manager.RegisterWorkflowExecutor(ProjectUpdateWorkflowName, domainServicesWorkflowExecutor); err != nil {
 		return nil, err
