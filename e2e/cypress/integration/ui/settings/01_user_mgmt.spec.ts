@@ -18,6 +18,7 @@ describe('user management', () => {
   const now = Cypress.moment().format('MMDDYYhhmm');
   const name = `cypress test user ${now}`;
   const username = `testing${now}`;
+  const password = 'testing!';
 
   it('can create a user', () => {
     cy.get('app-user-table').should('exist');
@@ -26,17 +27,20 @@ describe('user management', () => {
     cy.get('app-user-table chef-button').contains('Create User').click();
     cy.get('app-user-management chef-modal').should('exist');
 
+    // adding a delay to more closely approximate an average human's type speed (200 char/min)
+    // the `should` will wait until the actual input value matches the expected value
+    // ref: https://github.com/cypress-io/cypress/issues/534
     cy.get('[formcontrolname=fullname]')
-      .focus().type(name);
+      .type(name, { delay: 50 }).should('have.value', name);
 
     cy.get('[formcontrolname=username]')
-      .focus().type(username);
+      .type(username, { delay: 50 }).should('have.value', username);
 
     cy.get('[formcontrolname=password]')
-      .focus().type('chefautomate');
+      .type(password, { delay: 50 }).should('have.value', password);
 
     cy.get('[formcontrolname=confirmPassword]')
-      .focus().type('chefautomate');
+      .type(password, { delay: 50 }).should('have.value', password);
 
     // save new user
     cy.get('[data-cy=save-user]').click();
@@ -51,7 +55,7 @@ describe('user management', () => {
     cy.route('PUT', '**/users/**').as('updateUser');
 
     const updated_name = `${name} updated`;
-    const updated_password = 'chefautomate1';
+    const updated_password = 'testing?';
     cy.contains(name).click();
     cy.get('app-user-details').should('exist');
     cy.get('div.name-column').contains(name).should('exist');
@@ -61,16 +65,16 @@ describe('user management', () => {
 
     cy.get('chef-button.edit-button').click();
     cy.get('[formcontrolname=fullName]').find('input')
-      .clear().focus().type(updated_name);
+      .clear().type(updated_name, { delay: 50 }).should('have.value', updated_name);
 
     cy.get('chef-button.save-button').click();
     cy.wait('@updateUser');
     cy.contains(updated_name).should('exist');
 
     cy.get('[formcontrolname=newPassword]').find('input')
-      .focus().type(updated_password);
+      .type(updated_password, { delay: 50 }).should('have.value', updated_password);
     cy.get('[formcontrolname=confirmPassword]').find('input')
-      .focus().type(updated_password);
+      .type(updated_password, { delay: 50 }).should('have.value', updated_password);
     cy.get('chef-button').contains('Update Password').click({ force: true} );
 
     // success alert displays
@@ -83,16 +87,17 @@ describe('user management', () => {
   it('can delete user', () => {
     cy.route('DELETE', '**/users/**').as('deleteUser');
 
-    cy.get('chef-tbody chef-tr').contains(name).parent().parent()
-      .find('chef-control-menu').as('controlMenu');
+      cy.get('chef-td').contains(name).parent().parent()
+        .find('chef-control-menu').as('controlMenu');
+      // we throw in a should so cypress waits until introspection allows menu to be shown
+      cy.get('@controlMenu').should('be.visible')
+        .click();
+      cy.get('@controlMenu').find('[data-cy=delete]').click({ force: true });
 
-    cy.get('@controlMenu').click().then(($menu) => {
-      $menu.find('[data-cy=delete]').click();
       // confirm in modal
       cy.get('chef-button').contains('Delete User').click();
 
       cy.wait('@deleteUser');
       cy.get('chef-tbody chef-td').contains(username).should('not.exist');
-    });
   });
 });
