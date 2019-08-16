@@ -176,7 +176,9 @@ describeIAMV2P1('project management', () => {
 
     cy.get('chef-td').contains(ruleID).parent()
       .find('chef-control-menu').as('controlMenu');
-    cy.get('@controlMenu').click();
+    // we throw in a should so cypress retries until introspection allows menu to be shown
+    cy.get('@controlMenu').should('be.visible')
+      .click();
     cy.get('@controlMenu').find('[data-cy=delete-rule]').click({force: true});
 
     cy.get('chef-button').contains('Delete Rule').click();
@@ -189,9 +191,9 @@ describeIAMV2P1('project management', () => {
 
     cy.get('chef-td').contains(projectID).parent()
       .find('chef-control-menu').as('controlMenu');
-    cy.get('@controlMenu').click().then(($menu) => {
-      $menu.find('[data-cy=delete-project]').click();
-    });
+    cy.get('@controlMenu').should('be.visible')
+      .click();
+    cy.get('@controlMenu').find('[data-cy=delete-project]').click({ force: true });
 
     cy.get('chef-button').contains('Delete Project').click();
 
