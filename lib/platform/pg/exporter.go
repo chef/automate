@@ -252,6 +252,7 @@ func (db DatabaseExporter) restoreCustomFile(exitOnError bool) error {
 		if _, err := io.Copy(tmpfile, db.Stdin); err != nil {
 			return errors.Wrap(err, "failed to buffer db backup")
 		}
+		tmpfile.Close()
 	}
 	pgListFile, err := ioutil.TempFile(db.TempDir, "pg-restore-list")
 	if err != nil {
@@ -269,7 +270,7 @@ func (db DatabaseExporter) restoreCustomFile(exitOnError bool) error {
 
 	stderrListBuff := new(strings.Builder)
 	pgListCmd := append(clone(PGRestoreCmd), filters...)
-	pgListCmd = append(pgListCmd, "--list", "--file", pgListFile.Name())
+	pgListCmd = append(pgListCmd, "--list", "--file", pgListFile.Name(), pgBackupFile)
 
 	ctx, cancel := context.WithCancel(context.TODO())
 	defer cancel()
