@@ -56,8 +56,11 @@ describeIAMV2P1('project management', () => {
     cy.get('#create-button').contains('Create Project').click();
     cy.get('app-create-object-modal chef-modal').should('have.class', 'visible');
 
-    // the `should` will retry the command until the value matches the expected value
-    cy.get('[data-cy=create-name]').type(projectName).should('have.value', projectName);
+    // we increase the default delay to mimic the average human's typing speed
+    // only need this for input values upon which later test assertions depend
+    // ref: https://github.com/cypress-io/cypress/issues/534
+    cy.get('[data-cy=create-name]')
+      .type(projectName, { delay: 50 }).should('have.value', projectName);
 
     cy.get('[data-cy=create-id]').should('not.be.visible');
     cy.get('[data-cy=edit-button]').contains('Edit ID').click();
@@ -79,7 +82,7 @@ describeIAMV2P1('project management', () => {
     cy.url().should('include', `/settings/projects/${projectID}/rules`);
     cy.get('chef-page').should('be.visible');
 
-    cy.get('#create-name input').type(ruleName).should('have.value', ruleName);
+    cy.get('#create-name input').type(ruleName, { delay: 50 }).should('have.value', ruleName);
     cy.get('[data-cy=edit-id]').click();
 
     cy.get('#create-id input').should('have.value', ruleID);
@@ -131,7 +134,7 @@ describeIAMV2P1('project management', () => {
     cy.url().should('include', `/settings/projects/${projectID}/rules/${ruleID}`);
     cy.get('chef-page').should('be.visible');
 
-    cy.get('#create-name input').clear().type(updatedRuleName)
+    cy.get('#create-name input').clear().type(updatedRuleName, { delay: 50 })
       .should('have.value', updatedRuleName);
 
     cy.get('#create-id input').should('have.value', ruleID);
@@ -165,7 +168,7 @@ describeIAMV2P1('project management', () => {
     const updatedProjectName = `updated ${projectName}`;
 
     cy.get('[data-cy=details-tab]').click();
-    cy.get('#update-name').find('input').clear().type(updatedProjectName)
+    cy.get('#update-name').find('input').clear().type(updatedProjectName, { delay: 50 })
       .should('have.value', updatedProjectName);
     cy.get('chef-button').contains('Save').click();
 
