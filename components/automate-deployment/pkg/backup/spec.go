@@ -256,6 +256,12 @@ func DefaultSpecs(serviceNames []string) []Spec {
 		{
 			Name:          "license-control-service",
 			WriteMetadata: true,
+			SyncDbsV2: []DatabaseDumpOperationV2{
+				{
+					Name: "chef_license_control_service",
+					User: "license-control",
+				},
+			},
 			SyncPaths: []PathCopyOperation{
 				{
 					Name:    "data",
