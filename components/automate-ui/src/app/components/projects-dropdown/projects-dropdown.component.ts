@@ -35,7 +35,7 @@ export class ProjectsDropdownComponent implements OnChanges {
     return Object.values(this.projects);
   }
 
-  ngOnChanges() {
+  ngOnChanges(): void {
     this.updateLabel();
   }
 
