@@ -5,6 +5,11 @@ test_name="backup"
 test_backup_restore=true
 test_diagnostics_filters="~iam-v2"
 
+do_deploy() {
+    log_info "applying dev license"
+    chef-automate license apply "$A2_LICENSE"
+}
+
 do_restore() {
     test_metadata_sha256_mismatch_fails || return 1
     test_missing_checksums_file_fails || return 1
