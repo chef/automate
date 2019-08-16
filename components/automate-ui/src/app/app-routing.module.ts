@@ -38,7 +38,7 @@ import { ProjectListComponent } from './pages/project/list/project-list.componen
 import { ProjectRulesComponent } from './pages/project/rules/project-rules.component';
 import { RolesListComponent } from './pages/roles/list/roles-list.component';
 import { RoleDetailsComponent } from './pages/roles/details/role-details.component';
-import { UIComponent } from 'app/ui.component';
+// import { AppComponent } from 'app/app.component';
 
 // Services
 import { ChefSessionService } from './services/chef-session/chef-session.service';
@@ -54,7 +54,7 @@ import { SettingsLandingComponent } from './pages/settings-landing/settings-land
 const routes: Routes = [
   {
     path: '',
-    component: UIComponent,
+    // component: AppComponent,
     canActivate: [ChefSessionService],
     children: [{
       path: '',

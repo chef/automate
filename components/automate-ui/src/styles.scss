@@ -54,6 +54,21 @@ button.create {
   width: 171px;
 }
 
+.notifications {
+  margin-top: $navigation-height;
+  margin-left: $sidebar-width;
+
+  a {
+    color: $chef-white;
+  }
+}
+
+.license-banner {
+  display: block;
+  position: absolute;
+  width: 100%;
+  margin-top: -70px;
+}
 
 // a11y helpers
 .visually-hidden { /* https://snook.ca/archives/html_and_css/hiding-content-for-accessibility */

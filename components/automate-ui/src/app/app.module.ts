@@ -193,7 +193,7 @@ import { TeamManagementComponent } from './pages/team-management/team-management
 import {
   TelemetryCheckboxComponent
 } from './page-components/telemetry-checkbox/telemetry-checkbox.component';
-import { UIComponent } from 'app/ui.component';
+// import { UIComponent } from 'app/ui.component';
 import { UserDetailsComponent } from './pages/user-details/user-details.component';
 import { UserFormComponent } from './pages/user-management/user-form/user-form.component';
 import { UserManagementComponent } from './pages/user-management/user-management.component';
@@ -262,7 +262,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     TeamDetailsComponent,
     TeamManagementComponent,
     TelemetryCheckboxComponent,
-    UIComponent,
+    // UIComponent,
     UserDetailsComponent,
     UserFormComponent,
     UserTableComponent,
