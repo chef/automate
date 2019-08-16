@@ -576,6 +576,7 @@ func (r *registeredExecutor) WakeupPoller() {
 func (r *registeredExecutor) StartPoller(ctx context.Context, b backend.Driver, taskPollInterval time.Duration, workflowWakeupFun func()) {
 	logctx := logrus.WithField("task_name", r.name)
 	logctx.Infof("Starting task poller")
+	timer := time.NewTimer(taskPollInterval)
 	for {
 		select {
 		case <-ctx.Done():
@@ -583,11 +584,16 @@ func (r *registeredExecutor) StartPoller(ctx context.Context, b backend.Driver, 
 			r.wg.Wait()
 			logctx.Info("Exiting task poller")
 			return
-		case <-time.After(taskPollInterval):
-			r.startTaskWorker(ctx, b, workflowWakeupFun)
+		case <-timer.C:
+			break
 		case <-r.wakeupChan:
-			r.startTaskWorker(ctx, b, workflowWakeupFun)
+			if !timer.Stop() {
+				<-timer.C
+			}
+			break
 		}
+		r.startTaskWorker(ctx, b, workflowWakeupFun)
+		timer.Reset(taskPollInterval)
 	}
 }
 
@@ -607,6 +613,7 @@ func (r *registeredExecutor) startTaskWorker(ctx context.Context, b backend.Driv
 
 	r.wg.Add(1)
 	go func() {
+		logctx.Debug("Working starting")
 		startedNext := false
 		for {
 			t, taskCompleter, err := b.DequeueTask(ctx, r.name)
@@ -614,7 +621,7 @@ func (r *registeredExecutor) startTaskWorker(ctx context.Context, b backend.Driv
 				if err != ErrNoTasks {
 					logctx.WithError(err).Error("Failed to dequeue task")
 				}
-				logrus.Info("Worker shutting down")
+				logctx.Debug("Worker shutting down")
 				r.DecActiveWorkers()
 				r.wg.Done()
 				return
@@ -656,13 +663,13 @@ func (r *registeredExecutor) runTask(ctx context.Context, t *backend.Task, taskC
 		if err != nil {
 			logctx.WithError(err).Error("could not convert returned results to JSON")
 			if err := taskCompleter.Fail(err.Error()); err != nil {
-				logrus.WithError(err).Error("Failed to fail task completer")
+				logctx.WithError(err).Error("Failed to fail task completer")
 				return err
 			}
 		}
 		err = taskCompleter.Succeed(jsonResults)
 		if err != nil {
-			logrus.WithError(err).Error("failed to mark task as successful")
+			logctx.WithError(err).Error("failed to mark task as successful")
 			return err
 		}
 	}
@@ -897,26 +904,27 @@ func (m *Manager) runWorkflowExecutor(ctx context.Context) {
 	for k := range m.workflowExecutors {
 		workflowNames = append(workflowNames, k)
 	}
+
+	timer := time.NewTimer(defaultWorkflowPollInterval)
 	m.wg.Add(1)
 LOOP:
 	for {
+
 		select {
 		case <-ctx.Done():
 			logrus.Info("exiting workflow executor")
 			break LOOP
 		case <-m.workflowWakeupChan:
-			for {
-				if m.processWorkflow(ctx, workflowNames) {
-					break
-				}
+			if !timer.Stop() {
+				<-timer.C
 			}
-		case <-time.After(defaultWorkflowPollInterval):
-			for {
-				if m.processWorkflow(ctx, workflowNames) {
-					break
-				}
-			}
+			break
+		case <-timer.C:
+			break
 		}
+		for !m.processWorkflow(ctx, workflowNames) {
+		}
+		timer.Reset(defaultWorkflowPollInterval)
 	}
 	m.wg.Done()
 }
