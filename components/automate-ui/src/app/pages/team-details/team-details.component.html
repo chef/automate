@@ -4,8 +4,8 @@
   <main>
     <chef-breadcrumbs>
       <chef-breadcrumb [link]="['/settings/teams']">Teams</chef-breadcrumb>
-      <span  *ngIf="isMajorV1">{{ team.id }}</span>
-      <span  *ngIf="!isMajorV1">{{ team.name }}</span>
+      <span *ngIf="isMajorV1">{{ team.id }}</span>
+      <span *ngIf="!isMajorV1">{{ team.name }}</span>
     </chef-breadcrumbs>
 
     <chef-page-header>

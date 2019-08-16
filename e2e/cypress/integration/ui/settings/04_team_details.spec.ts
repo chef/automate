@@ -107,10 +107,16 @@ describe('team management', () => {
   });
 
   it('displays team details for admins team', () => {
+    let title = '';
+    if (iamVersion.match(/v2/)) {
+      title = teamName;
+    } else {
+      title = teamID;
+    }
     cy.get('chef-breadcrumbs').contains('Teams');
-    cy.get('chef-breadcrumbs').contains(teamName);
+    cy.get('chef-breadcrumbs').contains(title);
 
-    cy.get('.page-title').contains(teamName);
+    cy.get('.page-title').contains(title);
     cy.contains('Add User');
   });
 
