@@ -28,6 +28,11 @@ var PGRestoreCmd = []string{"hab", "pkg", "exec", "core/postgresql11-client", "p
 // PSQLCmd is the command we will run for psql.
 var PSQLCmd = []string{"hab", "pkg", "exec", "core/postgresql11-client", "psql"}
 
+// TODO (jaym): fix the actual problem
+func clone(cmd []string) []string {
+	return append([]string(nil), cmd...)
+}
+
 // DatabaseExporter knows how to export and import a database. See
 // Export and Import for further details.
 type DatabaseExporter struct {
@@ -218,13 +223,14 @@ func removeFile(filename string) {
 }
 
 func (db DatabaseExporter) restoreCustomFile(exitOnError bool) error {
-	pgRestoreCmd := append(PGRestoreCmd, "-Fc", "-d", db.ConnInfo.ConnURI(db.Name))
+	filters := []string{"--no-owner", "--no-acl"}
 
+	pgRestoreCmd := append(clone(PGRestoreCmd), "-Fc", "-d", db.ConnInfo.ConnURI(db.Name))
 	if exitOnError {
 		pgRestoreCmd = append(pgRestoreCmd, "-e")
 	}
 
-	pgRestoreCmd = append(pgRestoreCmd, "--no-owner", "--no-acl")
+	pgRestoreCmd = append(pgRestoreCmd, filters...)
 	if db.User != "" {
 		pgRestoreCmd = append(pgRestoreCmd, "--role", db.User)
 	}
@@ -261,8 +267,9 @@ func (db DatabaseExporter) restoreCustomFile(exitOnError bool) error {
 	defer removeFile(pgListModifiedFile.Name())
 	defer pgListFile.Close()
 
-	pgListCmd := append(pgRestoreCmd, "--list", "--file", pgListFile.Name())
 	stderrListBuff := new(strings.Builder)
+	pgListCmd := append(clone(PGRestoreCmd), filters...)
+	pgListCmd = append(pgListCmd, "--list", "--file", pgListFile.Name())
 
 	ctx, cancel := context.WithCancel(context.TODO())
 	defer cancel()
