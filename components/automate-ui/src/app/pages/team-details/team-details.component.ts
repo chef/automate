@@ -134,7 +134,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     this.store.select(assignableProjects)
       .subscribe((assignable: ProjectsFilterOption[]) => {
         assignable.forEach(({ value: id, label: name, type: stringType }) => {
-          const type = <IAMType>stringType;
+          const type: IAMType = stringType;
           const proj: Project = { id, name, type};
           // we don't want to override values that we fetched
           // that were part of the team already
