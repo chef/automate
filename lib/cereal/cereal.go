@@ -508,9 +508,9 @@ type TaskExecutorOpts struct {
 //
 // Tasks are polled for based on
 //
-// - a time-based internval, and
-// - an in-process notifications that is triggered when we think there
-// might be a task.
+// - a time-based interval, and
+// - in-process notifications that are sent when we think there
+// might be a task available.
 //
 // When either of these tiggers occur, we spawn a new goroutine (the
 // "task worker") provided that we are under the maximum configured
@@ -545,7 +545,7 @@ func (r *registeredExecutor) DecActiveWorkers() {
 }
 
 // IncActiveWorkers increments the active worker count if another
-// worker is allowed. It returns true if the count was incremened and
+// worker is allowed. It returns true if the count was incremented and
 // false otherwise. The caller should not start a worker if false is
 // returned.
 func (r *registeredExecutor) IncActiveWorkers() bool {
@@ -562,7 +562,7 @@ func (r *registeredExecutor) IncActiveWorkers() bool {
 
 // WakeupPoller will wake up the poller for this
 // registeredExecutor. This is called when a workflow executor
-// enqueue's tasks.
+// enqueues tasks.
 func (r *registeredExecutor) WakeupPoller() {
 	select {
 	case r.wakeupChan <- struct{}{}:
@@ -572,7 +572,7 @@ func (r *registeredExecutor) WakeupPoller() {
 
 // StartPoller runs until the given context is cancelled, starting a
 // TaskWorker every interval (or sooner if we've been notified of a
-// change)
+// change).
 func (r *registeredExecutor) StartPoller(ctx context.Context, b backend.Driver, taskPollInterval time.Duration, workflowWakeupFun func()) {
 	logctx := logrus.WithField("task_name", r.name)
 	logctx.Infof("Starting task poller")
@@ -591,7 +591,7 @@ func (r *registeredExecutor) StartPoller(ctx context.Context, b backend.Driver, 
 	}
 }
 
-// startTaskPoller starts a goroutine that will dequeue new tasks and
+// startTaskWorker starts a goroutine that will dequeue new tasks and
 // execute them, exiting when no tasks are available in the queue. If
 // the task poller initially finds a job, it will also start the next
 // task worker.
