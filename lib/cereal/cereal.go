@@ -909,7 +909,6 @@ func (m *Manager) runWorkflowExecutor(ctx context.Context) {
 	m.wg.Add(1)
 LOOP:
 	for {
-
 		select {
 		case <-ctx.Done():
 			logrus.Info("exiting workflow executor")
