@@ -126,6 +126,19 @@ SELECT count(*)
 `
 )
 
+var validFilterFields = []string{
+	"origin",
+	"service_name",
+	"version",
+	"channel",
+	"buildstamp",
+	"application",
+	"environment",
+	"site",
+	"service_full",
+	"group_name",
+}
+
 // GetServicesHealthCounts retrieves the health counts from all services in the database.
 // This function accepts a set of filters that can be applied to the SQL query to get the
 // health counts of a subset of the services in the database
@@ -186,23 +199,20 @@ func (db *Postgres) GetServices(
 }
 
 func (db *Postgres) GetServicesDistinctValues(fieldName, queryFragment string) ([]string, error) {
-	var tableName string
-	switch fieldName {
-	case "origin", "service_name", "version", "channel", "buildstamp":
-		tableName = "service"
-	case "application", "environment":
-		tableName = "deployment"
-	case "site":
-		tableName = "supervisor"
-	case "group_name":
-		tableName = "service_group"
-	default:
-		return nil, errors.Errorf("fieldName %q is invalid", fieldName)
+	fieldNameIsValid := false
+	for _, valid := range validFilterFields {
+		if fieldName == valid {
+			fieldNameIsValid = true
+			break
+		}
 	}
+	if !fieldNameIsValid {
+		return nil, errors.Errorf("field name %q is not valid for filtering, valid values are %v", fieldName, validFilterFields)
+	}
+
 	columnName := columnNameForField(fieldName)
-	query := fmt.Sprintf("SELECT DISTINCT %s from %s AS t WHERE t.%s ILIKE $1 ORDER BY %s ASC LIMIT 100;",
+	query := fmt.Sprintf("SELECT DISTINCT %s from service_full AS t WHERE t.%s ILIKE $1 ORDER BY %s ASC LIMIT 100;",
 		columnName,
-		tableName,
 		columnName,
 		columnName,
 	)
@@ -221,9 +231,7 @@ func columnNameForField(fieldName string) string {
 	case "service_name":
 		return "name"
 	case "group_name":
-		return "name_suffix"
-	case "application":
-		return "app_name"
+		return "service_group_name_suffix"
 	case "buildstamp":
 		return "release"
 	default:
