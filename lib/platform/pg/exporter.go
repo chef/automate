@@ -231,7 +231,7 @@ func (db DatabaseExporter) downloadBackup(stream io.Reader) (filename string, cl
 	if err != nil {
 		return "", nil, errors.Wrap(err, "failed to create db backup buffer file")
 	}
-	defer tmpfile.Close()
+	defer tmpfile.Close() // nolint: errcheck
 	if _, err := io.Copy(tmpfile, db.Stdin); err != nil {
 		return "", nil, errors.Wrap(err, "failed to buffer db backup")
 	}
@@ -248,7 +248,7 @@ func (db DatabaseExporter) buildSQLTOC(pgBackupFile string, filters []string) (f
 	if err != nil {
 		return "", nil, errors.Wrap(err, "failed to create pg restore list file")
 	}
-	defer pgListFile.Close()
+	defer pgListFile.Close() // nolint: errcheck
 
 	stderrListBuff := new(strings.Builder)
 	pgListCmd := append(clone(PGRestoreCmd), filters...)
@@ -292,7 +292,11 @@ func (db DatabaseExporter) buildSQLTOC(pgBackupFile string, filters []string) (f
 		return "", nil, errors.Wrapf(err, "failed to list SQL dump TOC from %q, stderr: %s", pgBackupFile, stderrListBuff.String())
 	}
 
-	writer.Close()
+	if err := writer.Close(); err != nil {
+		removeFile(pgListFile.Name())
+		return "", nil, errors.Wrapf(err, "failed to write SQL dump TOC from %q, stderr: %s", pgBackupFile, stderrListBuff.String())
+	}
+
 	if err := <-errChan; err != nil {
 		removeFile(pgListFile.Name())
 		return "", nil, errors.Wrapf(err, "failed to modify SQL dump TOC from %q, stderr: %s", pgBackupFile, stderrListBuff.String())
