@@ -1,7 +1,6 @@
 package pg
 
 import (
-	"bufio"
 	"context"
 	"fmt"
 	"io"
@@ -222,7 +221,51 @@ func removeFile(filename string) {
 	if err := os.Remove(filename); err != nil {
 		logrus.WithError(err).Errorf("failed to remove %q", filename)
 	}
+}
 
+type cleanupFunc func()
+
+func (db DatabaseExporter) downloadBackup(stream io.Reader) (filename string, cleanup cleanupFunc, err error) {
+	tmpfile, err := ioutil.TempFile(db.TempDir, "pg-restore-db")
+	if err != nil {
+		return "", nil, errors.Wrap(err, "failed to create db backup buffer file")
+	}
+	defer tmpfile.Close()
+	if _, err := io.Copy(tmpfile, db.Stdin); err != nil {
+		return "", nil, errors.Wrap(err, "failed to buffer db backup")
+	}
+
+	if err := tmpfile.Close(); err != nil {
+		return "", nil, errors.Wrap(err, "failed to flush db backup")
+	}
+
+	return tmpfile.Name(), func() { removeFile(tmpfile.Name()) }, nil
+}
+
+func (db DatabaseExporter) buildSQLTOC(pgBackupFile string, filters []string) (filename string, cleanup cleanupFunc, err error) {
+	pgListFile, err := ioutil.TempFile(db.TempDir, "pg-restore-list")
+	if err != nil {
+		return "", nil, errors.Wrap(err, "failed to create pg restore list file")
+	}
+	defer pgListFile.Close()
+
+	stderrListBuff := new(strings.Builder)
+	pgListCmd := append(clone(PGRestoreCmd), filters...)
+	pgListCmd = append(pgListCmd, "--list", "--file", pgListFile.Name(), pgBackupFile)
+
+	ctx, cancel := context.WithCancel(context.TODO())
+	defer cancel()
+	err = db.CmdExecutor.Run(
+		pgListCmd[0],
+		command.Args(pgListCmd[1:]...),
+		command.Stderr(stderrListBuff),
+		command.Timeout(db.Timeout),
+		command.Context(ctx))
+	if err != nil {
+		return "", nil, errors.Wrapf(err, "failed to list SQL dump TOC from %q, stderr: %s", pgBackupFile, stderrListBuff.String())
+	}
+
+	return pgListFile.Name(), func() { removeFile(pgListFile.Name()) }, nil
 }
 
 func (db DatabaseExporter) restoreCustomFile(exitOnError bool) error {
@@ -245,72 +288,39 @@ func (db DatabaseExporter) restoreCustomFile(exitOnError bool) error {
 		pgBackupFile = source
 
 	} else {
-		tmpfile, err := ioutil.TempFile(db.TempDir, "pg-restore-db")
+		filename, cleanup, err := db.downloadBackup(db.Stdin)
 		if err != nil {
-			return errors.Wrap(err, "failed to create db backup buffer file")
+			return err
 		}
-		defer removeFile(tmpfile.Name())
-		defer tmpfile.Close()
-		pgBackupFile = tmpfile.Name()
-		if _, err := io.Copy(tmpfile, db.Stdin); err != nil {
-			return errors.Wrap(err, "failed to buffer db backup")
-		}
-		tmpfile.Close()
+		defer cleanup()
+		pgBackupFile = filename
 	}
-	pgListFile, err := ioutil.TempFile(db.TempDir, "pg-restore-list")
-	if err != nil {
-		return errors.Wrap(err, "failed to create pg restore list file")
-	}
-	defer removeFile(pgListFile.Name())
-	defer pgListFile.Close()
 
-	pgListModifiedFile, err := ioutil.TempFile(db.TempDir, "pg-restore-list-modified")
+	pgListModifiedFile, cleanup, err := db.buildSQLTOC(pgBackupFile, filters)
 	if err != nil {
-		return errors.Wrap(err, "failed to create pg restore list file")
+		return err
 	}
-	defer removeFile(pgListModifiedFile.Name())
-	defer pgListFile.Close()
+	defer cleanup()
 
-	stderrListBuff := new(strings.Builder)
-	pgListCmd := append(clone(PGRestoreCmd), filters...)
-	pgListCmd = append(pgListCmd, "--list", "--file", pgListFile.Name(), pgBackupFile)
-
-	ctx, cancel := context.WithCancel(context.TODO())
-	defer cancel()
-	err = db.CmdExecutor.Run(
-		pgListCmd[0],
-		command.Args(pgListCmd[1:]...),
-		command.Stderr(stderrListBuff),
-		command.Timeout(db.Timeout),
-		command.Context(ctx))
-	if err != nil {
-		return errors.Wrapf(err, "failed to list SQL dump TOC from %q, stderr: %s", pgBackupFile, stderrListBuff.String())
-	}
-	scanner := bufio.NewScanner(pgListFile)
-	for scanner.Scan() {
-		txt := scanner.Text()
-		if !strings.Contains(txt, "2615 2200") {
-			_, err := fmt.Fprintln(pgListModifiedFile, txt)
-			if err != nil {
-				return err
+	/*
+		scanner := bufio.NewScanner(pgListFile)
+		for scanner.Scan() {
+			txt := scanner.Text()
+			if !strings.Contains(txt, "2615 2200") {
+				_, err := fmt.Fprintln(pgListModifiedFile, txt)
+				if err != nil {
+					return err
+				}
 			}
 		}
-	}
 
-	if err := scanner.Err(); err != nil {
-		return err
-	}
-
-	if err := pgListFile.Close(); err != nil {
-		return err
-	}
-
-	if err := pgListModifiedFile.Close(); err != nil {
-		return err
-	}
+		if err := scanner.Err(); err != nil {
+			return err
+		}
+	*/
 
 	pgRestoreCmd = append(
-		pgRestoreCmd, "--use-list", pgListModifiedFile.Name(), pgBackupFile)
+		pgRestoreCmd, "--use-list", pgListModifiedFile, pgBackupFile)
 
 	stderrBuff := new(strings.Builder)
 	err = db.CmdExecutor.Run(
