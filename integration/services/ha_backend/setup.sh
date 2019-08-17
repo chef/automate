@@ -63,6 +63,8 @@ systemctl start hab-sup.service
 
 echo "Installing HA Backend Habitat packages"
 channel="unstable"
+version="0.1.150"
+
 PG_PKG_NAME="automate-backend-postgresql"
 postgresql_pkg_ident="chef/$PG_PKG_NAME"
 PGLEADERCHK_PKG_NAME="automate-backend-pgleaderchk"
@@ -73,10 +75,10 @@ elasticsearch_pkg_ident="chef/automate-backend-elasticsearch"
 # TODO: Enabled elasticsidecar when a build of it lands in the depot
 # elasticsidecar_pkg_ident="chef/automate-backend-elasticsidecar"
 
-HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${elasticsearch_pkg_ident}"
-HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${proxy_pkg_ident}"
-HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${pgleaderchk_pkg_ident}"
-HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${postgresql_pkg_ident}"
+HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${elasticsearch_pkg_ident}/${version}"
+HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${proxy_pkg_ident}/${version}"
+HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${pgleaderchk_pkg_ident}/${version}"
+HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${postgresql_pkg_ident}/${version}"
 # TODO: Enabled elasticsidecar when a build of it lands in the depot
 # HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${elasticsidecar_pkg_ident}"
 
