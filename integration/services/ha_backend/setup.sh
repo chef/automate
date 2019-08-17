@@ -70,13 +70,15 @@ pgleaderchk_pkg_ident="chef/$PGLEADERCHK_PKG_NAME"
 proxy_pkg_ident="chef/automate-backend-haproxy"
 ELASTICSEARCH_PKG_NAME="automate-backend-elasticsearch"
 elasticsearch_pkg_ident="chef/automate-backend-elasticsearch"
-elasticsidecar_pkg_ident="chef/automate-backend-elasticsidecar"
+# TODO: Enabled elasticsidecar when a build of it lands in the depot
+# elasticsidecar_pkg_ident="chef/automate-backend-elasticsidecar"
 
 HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${elasticsearch_pkg_ident}"
 HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${proxy_pkg_ident}"
 HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${pgleaderchk_pkg_ident}"
 HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${postgresql_pkg_ident}"
-HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${elasticsidecar_pkg_ident}"
+# TODO: Enabled elasticsidecar when a build of it lands in the depot
+# HAB_LICENSE="accept-no-persist" hab pkg install --channel ${channel} "${elasticsidecar_pkg_ident}"
 
 echo "Copying certs into place"
 hostname=$(hostname)
@@ -141,4 +143,5 @@ HAB_LICENSE="accept-no-persist" hab svc load ${postgresql_pkg_ident} --topology 
 HAB_LICENSE="accept-no-persist" hab svc load ${pgleaderchk_pkg_ident} --topology leader --bind database:"$PG_PKG_NAME".default --binding-mode=relaxed --channel ${channel}
 HAB_LICENSE="accept-no-persist" hab svc load ${proxy_pkg_ident} --topology leader --bind database:"$PG_PKG_NAME".default --bind pgleaderchk:"$PGLEADERCHK_PKG_NAME".default --binding-mode=relaxed --channel ${channel}
 HAB_LICENSE="accept-no-persist" hab svc load ${elasticsearch_pkg_ident} --topology leader --channel ${channel}
-HAB_LICENSE="accept-no-persist" hab svc load ${elasticsidecar_pkg_ident} --topology leader --bind elasticsearch:"$ELASTICSEARCH_PKG_NAME".default --binding-mode=relaxed --channel ${channel}
+# TODO: Enabled elasticsidecar when a build of it lands in the depot
+# HAB_LICENSE="accept-no-persist" hab svc load ${elasticsidecar_pkg_ident} --topology leader --bind elasticsearch:"$ELASTICSEARCH_PKG_NAME".default --binding-mode=relaxed --channel ${channel}
