@@ -1,6 +1,7 @@
 package pg
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"io"
@@ -253,16 +254,48 @@ func (db DatabaseExporter) buildSQLTOC(pgBackupFile string, filters []string) (f
 	pgListCmd := append(clone(PGRestoreCmd), filters...)
 	pgListCmd = append(pgListCmd, "--list", "--file", pgListFile.Name(), pgBackupFile)
 
+	reader, writer := io.Pipe()
 	ctx, cancel := context.WithCancel(context.TODO())
 	defer cancel()
-	err = db.CmdExecutor.Run(
+	waitFunc, err := db.CmdExecutor.Start(
 		pgListCmd[0],
 		command.Args(pgListCmd[1:]...),
 		command.Stderr(stderrListBuff),
+		command.Stdout(writer),
 		command.Timeout(db.Timeout),
 		command.Context(ctx))
 	if err != nil {
 		return "", nil, errors.Wrapf(err, "failed to list SQL dump TOC from %q, stderr: %s", pgBackupFile, stderrListBuff.String())
+	}
+
+	errChan := make(chan error)
+	go func() {
+		defer close(errChan)
+		scanner := bufio.NewScanner(reader)
+		for scanner.Scan() {
+			txt := scanner.Text()
+			if !strings.Contains(txt, "2615 2200") {
+				_, err := fmt.Fprintln(pgListFile, txt)
+				if err != nil {
+					errChan <- err
+				}
+			}
+		}
+
+		if err := scanner.Err(); err != nil {
+			errChan <- err
+		}
+	}()
+
+	if err := waitFunc(); err != nil {
+		removeFile(pgListFile.Name())
+		return "", nil, errors.Wrapf(err, "failed to list SQL dump TOC from %q, stderr: %s", pgBackupFile, stderrListBuff.String())
+	}
+
+	writer.Close()
+	if err := <-errChan; err != nil {
+		removeFile(pgListFile.Name())
+		return "", nil, errors.Wrapf(err, "failed to modify SQL dump TOC from %q, stderr: %s", pgBackupFile, stderrListBuff.String())
 	}
 
 	return pgListFile.Name(), func() { removeFile(pgListFile.Name()) }, nil
