@@ -52,6 +52,7 @@ do_prepare_upgrade() {
 }
 
 do_upgrade() {
+    #shellcheck disable=SC2154
     chef-automate backup restore --debug \
         --airgap-bundle update.aib \
         --no-check-version \
