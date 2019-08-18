@@ -101,7 +101,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
   }
@@ -151,7 +151,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     return some([statusPropertyName, ruleStatus], this.rules);
   }
 
-  saveProject() {
+  saveProject(): void {
     this.saveSuccessful = false;
     this.saving = true;
     this.store.dispatch(new UpdateProject({

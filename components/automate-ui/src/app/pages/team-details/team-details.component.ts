@@ -249,7 +249,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       })).subscribe();
  }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
   }
