@@ -276,10 +276,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     }));
   }
 
-  public keyPressed() {
-    this.saveSuccessful = false;
-  }
-
   public updateTeam(): void {
     this.saveSuccessful = false;
     this.saving = true;
@@ -302,6 +298,9 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
           pendingSave.complete();
           this.saving = false;
           this.saveSuccessful = (state === EntityStatus.loadingSuccess);
+          if (this.saveSuccessful) {
+            this.updateNameForm.markAsPristine();
+          }
         }
       });
   }

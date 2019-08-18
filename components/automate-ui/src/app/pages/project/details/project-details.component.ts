@@ -106,10 +106,6 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  keyPressed() {
-    this.saveSuccessful = false;
-  }
-
   onSelectedTab(event: { target: { value: ProjectTabName } }) {
     this.tabValue = event.target.value;
     // Drop the previous fragment and add the incoming fragment.
@@ -173,6 +169,9 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
           pendingSave.complete();
           this.saving = false;
           this.saveSuccessful = (state === EntityStatus.loadingSuccess);
+          if (this.saveSuccessful) {
+            this.projectForm.markAsPristine();
+          }
         }
       });
   }
