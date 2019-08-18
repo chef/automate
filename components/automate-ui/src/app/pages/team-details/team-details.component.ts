@@ -276,7 +276,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     }));
   }
 
-  public updateTeam(): void {
+  public saveTeam(): void {
     this.saveSuccessful = false;
     this.saving = true;
     const name: string = this.updateNameForm.controls.name.value.trim();

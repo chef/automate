@@ -129,20 +129,20 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     this.passwordForm.reset();
   }
 
-  public updatePassword(): void {
+  public savePassword(): void {
     if (this.isAdminView) {
-      this.updatePasswordForUser();
+      this.savePasswordForUser();
     } else {
-      this.updatePasswordForSelf();
+      this.savePasswordForSelf();
     }
   }
 
-  private updatePasswordForUser(): void {
+  private savePasswordForUser(): void {
     const password = this.passwordForm.get('newPassword').value;
     this.store.dispatch(new UpdateUser({ ...this.user, password }));
   }
 
-  private updatePasswordForSelf(): void {
+  private savePasswordForSelf(): void {
     const password = this.passwordForm.get('newPassword').value;
     const previous_password = this.passwordForm.get('oldPassword').value;
     this.store.dispatch(new UpdateSelf({
@@ -154,7 +154,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     }));
   }
 
-  public updateFullName(): void {
+  public saveFullName(): void {
     const name = this.editForm.get('fullName').value.trim();
     this.store.dispatch(
       this.isAdminView ?

@@ -69,7 +69,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  public saveChange(): void {
+  public saveToken(): void {
     this.saveSuccessful = false;
     this.saveInProgress = true;
     const name: string = this.updateForm.controls.name.value.trim();
