@@ -1,4 +1,4 @@
-import { Directive, OnDestroy, OnInit } from '@angular/core';
+import { Directive, OnDestroy, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { NgControl } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
@@ -6,16 +6,16 @@ import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 @Directive({
   selector: '[formControl],[formControlName]'
 })
-export class FormControlDirective implements OnInit, OnDestroy {
+export class FormControlDirective implements OnInit, OnDestroy, OnChanges {
+  @Input() resetOrigin = false;
 
   constructor(private control: NgControl) {}
 
   private originalValue: any;
+  private isDestroyed$ = new Subject<boolean>();
 
-  private isDestroyed$: Subject<boolean> = new Subject<boolean>();
-
-  ngOnInit() {
-    this.originalValue = this.control.value;
+  ngOnInit(): void {
+    this.setOriginalValue();
 
     this.control.valueChanges
       .pipe(
@@ -29,8 +29,21 @@ export class FormControlDirective implements OnInit, OnDestroy {
       });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.isDestroyed$.next(true);
     this.isDestroyed$.complete();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.resetOrigin) {
+      const resetRequested: boolean = changes.resetOrigin.currentValue;
+      if (resetRequested) {
+        this.setOriginalValue();
+      }
+    }
+  }
+
+  private setOriginalValue(): void {
+    this.originalValue = this.control.value;
   }
 }
