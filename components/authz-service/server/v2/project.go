@@ -113,7 +113,7 @@ func (s *ProjectState) GetProject(ctx context.Context,
 
 func (s *ProjectState) CreateProject(ctx context.Context,
 	req *api.CreateProjectReq) (*api.CreateProjectResp, error) {
-	p, err := storage.NewProject(req.Id, req.Name, storage.Custom, 0)
+	p, err := storage.NewProject(req.Id, req.Name, storage.Custom, storage.NoRules)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument,
 			"creating project with ID %q: %s", req.Id, err.Error())
@@ -145,7 +145,7 @@ func (s *ProjectState) CreateProject(ctx context.Context,
 
 func (s *ProjectState) UpdateProject(ctx context.Context,
 	req *api.UpdateProjectReq) (*api.UpdateProjectResp, error) {
-	p, err := storage.NewProject(req.Id, req.Name, storage.Custom, 0)
+	p, err := storage.NewProject(req.Id, req.Name, storage.Custom, storage.NoRules)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument,
 			"updating project with ID %q: %s", req.Id, err.Error())
