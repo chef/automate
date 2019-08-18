@@ -49,7 +49,7 @@
             <span *ngIf="saving">Saving...</span>
             <span *ngIf="!saving">Save</span>
           </chef-button>
-          <span *ngIf="saveSuccessful" id="save-note">All changes saved.</span>
+          <span id="saved-note" *ngIf="saveSuccessful && !projectForm.dirty">All changes saved.</span>
         </div>
       </form>
     </section>
