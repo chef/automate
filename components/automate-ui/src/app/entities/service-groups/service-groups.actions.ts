@@ -21,7 +21,11 @@ export enum ServiceGroupsActionTypes {
 
   GET_SERVICES_BY_SERVICE_GROUP = 'SERVICE_GROUPS::SERVICES::GET',
   GET_SERVICES_BY_SERVICE_GROUP_SUCCESS = 'SERVICE_GROUPS::SERVICES::GET::SUCCESS',
-  GET_SERVICES_BY_SERVICE_GROUP_FAILURE = 'SERVICE_GROUPS::SERVICES::GET::FAILURE'
+  GET_SERVICES_BY_SERVICE_GROUP_FAILURE = 'SERVICE_GROUPS::SERVICES::GET::FAILURE',
+
+  GET_NODE_SUGGESTIONS = 'GET_NODE_SUGGESTIONS::SERVICES::GET',
+  GET_NODE_SUGGESTIONS_SUCCESS = 'GET_NODE_SUGGESTIONS::SERVICES::SUCCESS',
+  GET_NODE_SUGGESTIONS_FAILURE = 'GET_NODE_SUGGESTIONS:SERVICES::FAILURE'
 }
 
 export class GetServiceGroups implements Action {
@@ -87,6 +91,23 @@ export class GetServicesBySGFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export class GetNodeSuggestions implements Action {
+  readonly type = ServiceGroupsActionTypes.GET_NODE_SUGGESTIONS;
+  constructor(public payload: { type: string, text: string }) {}
+}
+
+export class GetNodeSuggestionsSuccess implements Action {
+  readonly type = ServiceGroupsActionTypes.GET_NODE_SUGGESTIONS_SUCCESS;
+
+  constructor(public payload: { nodeSuggestions: any[] }) {}
+}
+
+export class GetNodeSuggestionsFailure implements Action {
+  readonly type = ServiceGroupsActionTypes.GET_NODE_SUGGESTIONS_FAILURE;
+
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type ServiceGroupsActions =
   | GetServiceGroupsSuccess
   | GetServiceGroupsFailure
@@ -99,4 +120,7 @@ export type ServiceGroupsActions =
   | GetServicesBySG
   | GetServicesBySGSuccess
   | GetServicesBySGFailure
-  | GetServiceGroups;
+  | GetServiceGroups
+  | GetNodeSuggestions
+  | GetNodeSuggestionsSuccess
+  | GetNodeSuggestionsFailure;

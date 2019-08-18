@@ -1,14 +1,19 @@
-import { takeUntil, withLatestFrom, distinctUntilChanged } from 'rxjs/operators';
+import { map, takeUntil, withLatestFrom, distinctUntilChanged } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject, Observable, combineLatest } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Store, createSelector } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Chicklet, RollupServiceStatus, SortDirection } from '../../types/types';
+import { ActivatedRoute, Router, ParamMap } from '@angular/router';
+import {
+  Chicklet,
+  RollupServiceStatus,
+  SearchBarCategoryItem,
+  SortDirection
+} from '../../types/types';
 import { EntityStatus } from '../../entities/entities';
 import {
-  UpdateServiceGroupFilters, UpdateSelectedSG
+  GetNodeSuggestions, UpdateServiceGroupFilters, UpdateSelectedSG
 } from 'app/entities/service-groups/service-groups.actions';
 import {
   ServiceGroup, ServiceGroupFilters, FieldDirection, HealthSummary, ServicesFilters
@@ -20,7 +25,7 @@ import {
   allServiceGroupHealth,
   serviceGroupErrorResp
 } from '../../entities/service-groups/service-groups.selector';
-import { find, includes, get } from 'lodash/fp';
+import { find, filter as fpFilter, pickBy, some, includes, get } from 'lodash/fp';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 @Component({
@@ -63,6 +68,89 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   // Sort field by default
   readonly defaultSortField = 'percent_ok';
 
+  // Should the URL share dropdown be displayed
+  shareDropdownVisible = false;
+
+  // Should the search bar filter bar be displayed
+  filtersVisible = true;
+
+  // autocomplete suggestions
+  nodeSuggestions$: Observable<any[]>;
+
+  // The catagories allowed for searching
+  categoryTypes: SearchBarCategoryItem[] = [
+    {
+      type: 'origin',
+      text: 'Origin',
+      allowWildcards: true
+    },
+    {
+      type: 'service',
+      text: 'Service Name',
+      allowWildcards: true
+    },
+    {
+      type: 'version',
+      text: 'Version',
+      allowWildcards: true
+    },
+    {
+      type: 'channel',
+      text: 'Channel',
+      allowWildcards: true
+    },
+    {
+      type: 'application',
+      text: 'Application',
+      allowWildcards: false,
+      providedValues: [
+        {name: 'ipos', title: 'iPOS', icon: null},
+        {name: 'ikds', title: 'iKDS', icon: null}
+      ]
+    },
+    {
+      type: 'environment',
+      text: 'Environment',
+      allowWildcards: true
+    },
+    {
+      type: 'site',
+      text: 'Site',
+      allowWildcards: true
+    },
+    {
+      type: 'buildstamp',
+      text: 'Build Timestamp',
+      allowWildcards: true
+    },
+    {
+      type: 'group',
+      text: 'Group Name',
+      allowWildcards: true
+    }
+  ];
+
+  // The currently set collection of searchbar filters
+  searchBarFilters$: Observable<Chicklet[]>;
+
+  // The number of currently set searchbar filters
+  numberOfSearchBarFilters$: Observable<number>;
+
+  // The current number of failed nodes with searchbar filters
+  failNodeCount$: Observable<number>;
+
+  // The total number of nodes with searchbar filters
+  totalNodeCount$: Observable<number>;
+
+  // The current number of successful nodes with searchbar filters
+  successNodeCount$: Observable<number>;
+
+  // The current number of missing nodes with searchbar filters
+  missingNodeCount$: Observable<number>;
+
+  // The current number of nodes with searchbar and status filters
+  totalNumberOfNodesWithStatusFilter$: Observable<number>;
+
   private selectedFieldDirection$: Observable<SortDirection>;
   private selectedSortField$: Observable<string>;
   private healthSummary$: Observable<HealthSummary>;
@@ -84,6 +172,12 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
+    const allUrlParameters$ = this.getAllUrlParameters();
+
+    // URL change listener
+    allUrlParameters$.pipe(takeUntil(this.isDestroyed)).subscribe(
+      allUrlParameters => this.updateAllFilters(allUrlParameters));
+
     this.route.queryParamMap.pipe(
       distinctUntilChanged((a, b) => {
         return a.get('status') === b.get('status') &&
@@ -167,11 +261,25 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
     this.currentPage$.pipe(takeUntil(this.isDestroyed))
       .subscribe(currentPage => this.currentPage = currentPage);
+
+    this.nodeSuggestions$ = this.store.select(createSelector(serviceGroupState,
+      (state) => state.nodeSuggestions)).pipe(map((nodeSuggestions: any[]) =>
+      nodeSuggestions.map(item => item.text)));
+
+    this.searchBarFilters$ = allUrlParameters$.pipe(map((chicklets: Chicklet[]) =>
+      chicklets.filter(chicklet => some({'type': chicklet.type}, this.categoryTypes))));
+
+    this.numberOfSearchBarFilters$ = this.searchBarFilters$.pipe(
+      map((chicklets: Chicklet[]) => chicklets.length));
   }
 
   ngOnDestroy() {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  toggleFilters() {
+    this.filtersVisible = !this.filtersVisible;
   }
 
   listParamsChange(queryParams) {
@@ -200,14 +308,80 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     const sortField = this.getSelectedSortField(allParameters);
     const pageField = this.getSelectedPageNumber(allParameters);
     // Here we can add all the filters that the search bar will have
+    const searchBarFilters = fpFilter(chicklet => {
+      return some({'type': chicklet.type}, this.categoryTypes);
+    }, allParameters);
+
     const serviceGroupFilters: ServiceGroupFilters = {
       status: status,
       sortField: sortField,
       sortDirection: sortDirection,
       page: pageField,
-      pageSize: this.pageSize
+      pageSize: this.pageSize,
+      searchBar: searchBarFilters
     };
     this.store.dispatch(new UpdateServiceGroupFilters({filters: serviceGroupFilters}));
+  }
+
+  get shareUrl() {
+    return window.location.href;
+  }
+
+  toggleShareDropdown() {
+    this.shareDropdownVisible = !this.shareDropdownVisible;
+  }
+
+  hideShareDropdown() {
+    this.shareDropdownVisible = false;
+  }
+
+  onSuggestValues(event) {
+    this.store.dispatch(new GetNodeSuggestions( event.detail ));
+  }
+
+  onFilterAdded(event) {
+    const {type, text} = event.detail;
+
+    if (some({type}, this.categoryTypes) ) {
+      const {queryParamMap} = this.route.snapshot;
+      const queryParams = {...this.route.snapshot.queryParams};
+      const values = queryParamMap.getAll(type).filter(value => value !== text).concat(text);
+
+      queryParams[type] = values;
+
+      delete queryParams['page'];
+
+      this.router.navigate([], {queryParams});
+    }
+  }
+
+  onFilterRemoved(event) {
+    const {type, text} = event.detail;
+    const {queryParamMap} = this.route.snapshot;
+    const queryParams = {...this.route.snapshot.queryParams};
+    const values = queryParamMap.getAll(type).filter(value => value !== text);
+
+    if (values.length === 0) {
+      delete queryParams[type];
+    } else {
+      queryParams[type] = values;
+    }
+
+    delete queryParams['page'];
+
+    this.router.navigate([], {queryParams});
+  }
+
+  onFiltersClear(_event) {
+    const queryParams = {...this.route.snapshot.queryParams};
+
+    const filteredParams = pickBy((_value, key) => {
+        return !some({'type': key}, this.categoryTypes);
+      }, queryParams);
+
+    delete filteredParams['page'];
+
+    this.router.navigate([], {queryParams: filteredParams});
   }
 
   public statusFilter(status) {
@@ -345,5 +519,14 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       }, allUrlParameters);
 
     return sortDirection !== undefined && sortDirection.text === 'DESC' ? 'DESC' : 'ASC';
+  }
+
+  private getAllUrlParameters(): Observable<Chicklet[]> {
+    return this.route.queryParamMap.pipe(map((params: ParamMap) => {
+      return params.keys.reduce((list, key) => {
+        const paramValues = params.getAll(key);
+        return list.concat(paramValues.map(value => ({type: key, text: value})));
+      }, []);
+    }));
   }
 }

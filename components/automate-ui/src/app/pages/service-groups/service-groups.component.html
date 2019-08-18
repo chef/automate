@@ -7,6 +7,34 @@
 <chef-page-header>
   <chef-heading>Service Groups</chef-heading>
   <chef-subheading>Service groups are Habitat services ordered by package identifiers and configurations.</chef-subheading>
+  <app-search-bar
+    [numberOfFilters]="numberOfSearchBarFilters$ | async"
+    [categories]="categoryTypes"
+    [dynamicSuggestions]="nodeSuggestions$ | async"
+    (suggestValues)="onSuggestValues($event)"
+    (itemSelected)="onFilterAdded($event)"
+    (filtersButtonClick)="toggleFilters()">
+  </app-search-bar>
+  <div class="copy-dropdown">
+    <chef-button class="dropdown-toggle" secondary (click)="toggleShareDropdown()">
+      <chef-icon>share</chef-icon>
+    </chef-button>
+    <chef-dropdown class="dropdown" [visible]="shareDropdownVisible">
+      <chef-click-outside (clickOutside)="hideShareDropdown()" omit="dropdown-toggle">
+        <p>Copy this private URL to share:</p>
+        <div class="copy-input">
+          <input type="text" [value]="shareUrl" readonly />
+          <chef-clipboard [value]="shareUrl"></chef-clipboard>
+        </div>
+      </chef-click-outside>
+    </chef-dropdown>
+  </div>
+
+  <app-search-bar-filter-bar *ngIf="filtersVisible"
+    [filters]="searchBarFilters$ | async"
+    (filtersCleared)="onFiltersClear($event)"
+    (filterRemoved)="onFilterRemoved($event)">
+  </app-search-bar-filter-bar>
 </chef-page-header>
 <div class="page-body">
   <chef-status-filter-group [value]="selectedStatus">

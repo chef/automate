@@ -1,14 +1,24 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of as observableOf  } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { reduce } from 'lodash/fp';
 import { Injectable } from '@angular/core';
 
 import {
-  ServiceGroupsPayload, ServiceGroupFilters,
+  ServiceGroupsPayload,
+  ServiceGroupFilters,
   HealthSummary,
-  ServicesPayload, ServicesFilters
+  NodeFilter,
+  ServicesPayload,
+  ServicesFilters
 } from './service-groups.model';
 import { environment } from '../../../environments/environment';
 const APPLICATIONS_URL = environment.applications_url;
+const CONFIG_MGMT_URL = environment.config_mgmt_url;
+
+interface RespSuggestion {
+  text: string;
+}
 
 @Injectable()
 export class ServiceGroupsRequests {
@@ -44,6 +54,12 @@ export class ServiceGroupsRequests {
       if (filters.pageSize) {
         params = params.append('pagination.size', filters.pageSize.toString());
       }
+      if (filters.searchBar) {
+        params = reduce((param, pill) => {
+          const filterParam = `${encodeURIComponent(pill.type)}:${encodeURIComponent(pill.text)}`;
+          return param.append('filter', filterParam);
+        }, params, filters.searchBar);
+      }
     }
 
     return params;
@@ -78,5 +94,34 @@ export class ServiceGroupsRequests {
     const url = `${APPLICATIONS_URL}/service_groups_health_counts`;
 
     return this.httpClient.get<HealthSummary>(url);
+  }
+
+  public getSuggestions(type: string, text: string, filters: NodeFilter): Observable<any[]> {
+    if (text && text.length > 0) {
+      const params = this.formatFilters(filters).set('type', type).set('text', text);
+      const url = `${CONFIG_MGMT_URL}/suggestions`;
+
+      return this.httpClient.get<RespSuggestion[]>(url, {params}).pipe(map(
+        (suggestions) => suggestions.filter(s => s && s.text && s.text.length !== 0)));
+    } else {
+      return observableOf([]);
+    }
+  }
+
+  private formatFilters(filters: NodeFilter) {
+    let searchParam = new HttpParams();
+
+    if (filters.searchBar) {
+      searchParam = this.flattenSearchBar(filters.searchBar, searchParam);
+    }
+
+    return searchParam;
+  }
+
+  private flattenSearchBar(filters: object[], searchParam: HttpParams): HttpParams {
+    return reduce((params: HttpParams, filter: { type: string, text: string }) => {
+      const filterParam = `${encodeURIComponent(filter.type)}:${encodeURIComponent(filter.text)}`;
+      return params.append('filter', filterParam);
+    }, searchParam, filters);
   }
 }

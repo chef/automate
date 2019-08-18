@@ -21,6 +21,8 @@ export interface ServiceGroupEntityState {
   servicesHealthSummary: HealthSummary;
   servicesErrorResp: HttpErrorResponse;
   selectedServiceGroupName: string;
+  nodeSuggestions: any[];
+  nodeSuggestionsStatus: EntityStatus;
 }
 
 export const ServiceGroupEntityInitialState: ServiceGroupEntityState = {
@@ -49,7 +51,9 @@ export const ServiceGroupEntityInitialState: ServiceGroupEntityState = {
     unknown: 0
   },
   servicesErrorResp: null,
-  selectedServiceGroupName: undefined
+  selectedServiceGroupName: undefined,
+  nodeSuggestions: [],
+  nodeSuggestionsStatus: EntityStatus.notLoaded
 };
 
 export function serviceGroupEntityReducer(
@@ -106,6 +110,22 @@ export function serviceGroupEntityReducer(
       return pipe(
         set('servicesStatus', EntityStatus.loadingFailure),
         set('servicesErrorResp', action.payload))(state);
+
+    case ServiceGroupsActionTypes.GET_NODE_SUGGESTIONS:
+      return pipe(
+        set('nodeSuggestionsStatus', EntityStatus.loading),
+        set('nodeSuggestions', []))(state);
+
+    case ServiceGroupsActionTypes.GET_NODE_SUGGESTIONS_SUCCESS:
+      return pipe(
+        set('nodeSuggestionsStatus', EntityStatus.loadingSuccess),
+        set('nodeSuggestions', action.payload.nodeSuggestions))(state);
+
+    case ServiceGroupsActionTypes.GET_NODE_SUGGESTIONS_FAILURE:
+      return pipe(
+        set('nodeSuggestions', []),
+        set('nodeSuggestionsStatus', EntityStatus.loadingFailure),
+        set('errorResp', action.payload))(state);
 
     default:
       return state;

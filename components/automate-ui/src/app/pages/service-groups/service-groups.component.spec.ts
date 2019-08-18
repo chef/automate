@@ -237,9 +237,10 @@ describe('ServiceGroupsComponent', () => {
         new UpdateServiceGroupFilters({filters: {
           status: undefined,
           sortField: 'percent_ok',
-          sortDirection: 'ASC',
           page: 1,
-          pageSize: 25
+          pageSize: 25,
+          sortDirection: 'ASC',
+          searchBar: []
         }}));
     }));
 
@@ -255,7 +256,8 @@ describe('ServiceGroupsComponent', () => {
           sortField: 'percent_ok',
           sortDirection: 'ASC',
           page: 1,
-          pageSize: 25
+          pageSize: 25,
+          searchBar: []
         }}));
     }));
 
@@ -270,7 +272,8 @@ describe('ServiceGroupsComponent', () => {
           sortField: 'percent_ok',
           sortDirection: 'ASC',
           page: 1,
-          pageSize: 25
+          pageSize: 25,
+          searchBar: []
         }}));
     }));
 
@@ -285,7 +288,8 @@ describe('ServiceGroupsComponent', () => {
           sortField: 'percent_ok',
           sortDirection: 'ASC',
           page: 1,
-          pageSize: 25
+          pageSize: 25,
+          searchBar: []
         }}));
     }));
 
@@ -300,7 +304,8 @@ describe('ServiceGroupsComponent', () => {
           sortField: 'percent_ok',
           sortDirection: 'ASC',
           page: 1,
-          pageSize: 25
+          pageSize: 25,
+          searchBar: []
         }}));
     }));
   });

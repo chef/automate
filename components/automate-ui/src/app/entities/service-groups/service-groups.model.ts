@@ -1,4 +1,10 @@
-import { RollupServiceStatus, SortDirection  } from '../../types/types';
+import {
+  Chicklet,
+  RollupServiceStatus,
+  RollupCompliance,
+  RollupState,
+  SortDirection
+} from '../../types/types';
 
 export interface HealthSummary {
   total: number;
@@ -41,6 +47,7 @@ export interface ServiceGroupFilters {
   page?: number;
   pageSize?: number;
   status?: RollupServiceStatus;
+  searchBar?: Array<Chicklet>;
   sortField?: string;
   sortDirection?: SortDirection;
 }
@@ -67,4 +74,24 @@ export interface FieldDirection {
   percent_ok: SortDirection;
   environment: SortDirection;
   app_name: SortDirection;
+}
+
+export interface NodeFilter {
+  attribute?: string;
+  compliance?: RollupCompliance;
+  cookbook?: string;
+  environment?: string;
+  node_name?: string;
+  page: number;
+  pageSize: number;
+  recipe?: string;
+  resource_name?: string;
+  role?: string;
+  searchBar?: Array<Chicklet>;
+  sortDirection?: SortDirection;
+  sortField?: string;
+  status?: RollupState;
+  policy_group?: string;
+  policy_name?: string;
+  policy_revision?: string;
 }
