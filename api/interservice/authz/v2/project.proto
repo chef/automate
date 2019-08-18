@@ -12,6 +12,7 @@ message Project {
     string name = 1;
     string id = 2;
     Type type = 3;
+    string status = 4;
 }
 
 message CreateProjectReq {

@@ -360,6 +360,7 @@ func TestListProjects(t *testing.T) {
 		store.Flush()
 	}
 }
+
 func TestListProjectsForIntrospection(t *testing.T) {
 	ctx := context.Background()
 	cl, store, _ := setupProjects(t)
@@ -414,9 +415,10 @@ func addProjectToStore(t *testing.T, store *cache.Cache, id, name string, projTy
 	t.Helper()
 
 	proj := &storage.Project{
-		ID:   id,
-		Name: name,
-		Type: projType,
+		ID:     id,
+		Name:   name,
+		Type:   projType,
+		Status: storage.NoRules.String(),
 	}
 	store.Add(id, proj, 0)
 
@@ -425,9 +427,10 @@ func addProjectToStore(t *testing.T, store *cache.Cache, id, name string, projTy
 		returnType = api.Type_CUSTOM
 	}
 	return api.Project{
-		Id:   id,
-		Name: name,
-		Type: returnType,
+		Id:     id,
+		Name:   name,
+		Type:   returnType,
+		Status: storage.NoRules.String(),
 	}
 }
 

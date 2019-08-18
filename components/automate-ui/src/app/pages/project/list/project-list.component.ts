@@ -1,8 +1,8 @@
-import { Component, EventEmitter, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Observable, Subject } from 'rxjs';
+import { interval as observableInterval,  Observable, Subject } from 'rxjs';
 import { map, takeUntil, filter } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 
@@ -25,7 +25,7 @@ import { HttpStatus } from 'app/types/types';
   templateUrl: './project-list.component.html',
   styleUrls: ['./project-list.component.scss']
 })
-export class ProjectListComponent implements OnInit {
+export class ProjectListComponent implements OnInit, OnDestroy {
   public loading$: Observable<boolean>;
   public iamMajorVersion$: Observable<IAMMajorVersion>;
   public iamMinorVersion$: Observable<IAMMinorVersion>;
@@ -42,6 +42,9 @@ export class ProjectListComponent implements OnInit {
 
   public applyRulesButtonText$: Observable<string>;
   public ApplyRulesStatusState = ApplyRulesStatusState;
+
+  private POLLING_INTERVAL_IN_SECONDS = 10;
+  private isDestroyed = new Subject<boolean>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -82,8 +85,21 @@ export class ProjectListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetProjects());
+    // Get status now; periodic checks are already being done globally so no need to poll further
     this.projects.getApplyRulesStatus();
+
+    // Get projects status now and periodically while on this page
+    this.store.dispatch(new GetProjects());
+    observableInterval(1000 * this.POLLING_INTERVAL_IN_SECONDS).pipe(
+      takeUntil(this.isDestroyed))
+      .subscribe(() => {
+        this.store.dispatch(new GetProjects());
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   public closeDeleteModal(): void {
@@ -193,5 +209,14 @@ export class ProjectListComponent implements OnInit {
 
   cancelApplyStop() {
     this.closeConfirmApplyStopModal();
+  }
+
+  getRulesStatus(project: Project): string {
+    switch (project.status) {
+      case 'NO_RULES': return 'No rules';
+      case 'EDITS_PENDING': return 'Edits pending';
+      case 'RULES_APPLIED': return 'Applied';
+      default: return '';
+    }
   }
 }

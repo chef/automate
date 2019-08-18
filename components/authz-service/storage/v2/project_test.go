@@ -36,7 +36,8 @@ func TestNewProject(t *testing.T) {
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
-			if _, err := storage.NewProject(tc.id, tc.name, tc.typeVal); tc.expectErr != (err != nil) {
+			_, err := storage.NewProject(tc.id, tc.name, tc.typeVal, storage.NoRules)
+			if tc.expectErr != (err != nil) {
 				t.Fail()
 			}
 		})

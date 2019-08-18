@@ -20,7 +20,8 @@ describe('ProjectDetailsComponent', () => {
   const project: Project = {
     id: 'uuid-1',
     name: 'Default',
-    type: 'CHEF_MANAGED'
+    type: 'CHEF_MANAGED',
+    status: 'NO_RULES'
   };
   const rules: Rule[] = [
     {
@@ -125,7 +126,8 @@ describe('ProjectDetailsComponent', () => {
     store.dispatch(new GetProjectSuccess({
       project: {
         id: 'uuid-1', name: 'Default',
-        type: 'CHEF_MANAGED'
+        type: 'CHEF_MANAGED',
+        status: 'NO_RULES'
       }
     }));
 

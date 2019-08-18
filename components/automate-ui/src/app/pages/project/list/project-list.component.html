@@ -45,7 +45,7 @@
                   <a [routerLink]="['/settings/projects', project.id]">{{ project.name }}</a>
                 </chef-td>
                 <chef-td>{{ project.id }}</chef-td>
-                <chef-td>Applied</chef-td>
+                <chef-td>{{ getRulesStatus(project) }}</chef-td>
                 <chef-td>OK</chef-td>
                 <chef-td class="controls">
                   <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project.id]">

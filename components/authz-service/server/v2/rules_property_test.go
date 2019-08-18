@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"math/rand"
 	"reflect"
 	"strings"
 	"testing"
@@ -16,6 +17,7 @@ import (
 	"google.golang.org/grpc/codes"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
+	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/testhelpers"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
@@ -23,6 +25,7 @@ import (
 const (
 	idRegex        = "^[a-z0-9-_]{1,64}$"
 	conditionLimit = 10 // help avoid the grpc limit of 4194304
+	projectLimit   = 6  // system limitation
 )
 
 type projectAndRuleReq struct {
@@ -30,7 +33,7 @@ type projectAndRuleReq struct {
 	rules []api.CreateRuleReq
 }
 
-var createRuleReqGen, createProjectReqGen, createProjectAndRuleGen = getGenerators()
+var createRuleReqGen, createProjectReqGen, createProjectAndRulesGen, createProjectsAndRulesGen = getGenerators()
 
 func TestCreateRuleProperties(t *testing.T) {
 	ctx := context.Background()
@@ -52,7 +55,7 @@ func TestCreateRuleProperties(t *testing.T) {
 				return respRule.Status == "staged" &&
 					ruleMatches(reqs.rules[0], *respRule)
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 
 	properties.Property("creating rules with non-unique IDs is prohibited",
@@ -115,7 +118,7 @@ func TestGetRuleProperties(t *testing.T) {
 				return rStaged.Rule.Status == "staged" &&
 					ruleMatches(reqs.rules[0], *rStaged.Rule)
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 
 	properties.Property("applied rules are reported as applied",
@@ -135,7 +138,7 @@ func TestGetRuleProperties(t *testing.T) {
 				return rApplied.Rule.Status == "applied" &&
 					ruleMatches(reqs.rules[0], *rApplied.Rule)
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 
 	properties.TestingRun(t)
@@ -171,7 +174,7 @@ func TestListRuleProperties(t *testing.T) {
 				return rulesMatch(reqs.rules, resp)
 
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 
 	properties.Property("staged rules are not reported as applied",
@@ -199,7 +202,7 @@ func TestListRuleProperties(t *testing.T) {
 				return len(resp.Rules) == 0
 
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 
 	properties.Property("applied rules are reported as applied",
@@ -229,7 +232,7 @@ func TestListRuleProperties(t *testing.T) {
 				return rulesMatch(reqs.rules, resp)
 
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 
 	properties.TestingRun(t)
@@ -271,7 +274,7 @@ func TestUpdateRuleProperties(t *testing.T) {
 					rStaged.Rule.Status == "staged" &&
 					ruleMatches(updateReq, *rStaged.Rule)
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 
 	properties.Property("updating applied rules become staged",
@@ -313,7 +316,7 @@ func TestUpdateRuleProperties(t *testing.T) {
 					ruleMatches(updateReq, *rStaged.Rule) &&
 					ruleMatches(updateReq, *rFinalApplied.Rule)
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 
 	properties.Property("updating applied and staged rules remain staged",
@@ -363,7 +366,7 @@ func TestUpdateRuleProperties(t *testing.T) {
 					ruleMatches(updateReq2, *rFinalStaged.Rule) &&
 					ruleMatches(updateReq2, *rApplied.Rule)
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 	properties.TestingRun(t)
 }
@@ -395,7 +398,7 @@ func TestDeleteRuleProperties(t *testing.T) {
 
 				return deletedWhenStaged && deletedWhenApplied
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 
 	properties.Property("deleting applied rules marks them for deletion and finalizes deletion upon applying rules",
@@ -422,7 +425,7 @@ func TestDeleteRuleProperties(t *testing.T) {
 
 				return markedforDeletion && fullyDeleted
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
 		))
 
 	properties.Property("deleting applied rules with staged updates marks them for deletion and finalizes deletion upon applying rules",
@@ -460,7 +463,108 @@ func TestDeleteRuleProperties(t *testing.T) {
 
 				return markedforDeletion && fullyDeleted
 			},
-			createProjectAndRuleGen,
+			createProjectAndRulesGen,
+		))
+
+	properties.TestingRun(t)
+}
+
+func TestListProjectProperties(t *testing.T) {
+	ctx := context.Background()
+	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	properties := getGopterParams(seed)
+
+	properties.Property("all staged rules are reported as staged",
+		prop.ForAll(
+			func(reqs projectAndRuleReq) bool {
+				defer testDB.Flush(t)
+
+				_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				reqs.rules, err = createRules(ctx, cl, reqs.rules)
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				resp, err := cl.ListProjects(ctx, &api.ListProjectsReq{})
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				if 1 != len(resp.Projects) {
+					return false
+				}
+				respProject := resp.Projects[0]
+				t.Logf("===> %d rules", len(reqs.rules))
+				return respProject.Id == reqs.CreateProjectReq.Id &&
+					respProject.Name == reqs.CreateProjectReq.Name &&
+					respProject.Type.String() == "CUSTOM" &&
+					respProject.Status == storage.EditsPending.String()
+			},
+			createProjectAndRulesGen,
+		))
+
+	properties.TestingRun(t)
+}
+
+func TestListProjectPropertiesMixingStagedAndApplied(t *testing.T) {
+	ctx := context.Background()
+	cl, testDB, _, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	properties := getGopterParams(seed)
+
+	properties.Property("projects with staged, applied, or no rules are reported",
+		prop.ForAll(
+			func(reqs []projectAndRuleReq) bool {
+				defer testDB.Flush(t)
+				t.Logf("LIST %d PROJECTS ===>", len(reqs))
+				applyPoint := rand.Intn(len(reqs))
+
+				for i, req := range reqs {
+					if applyPoint == i {
+						t.Log("*** applying rules now ***")
+						cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+					}
+					t.Logf("===> project '%s' has %d rules", req.CreateProjectReq.Id, len(req.rules))
+					_, err := cl.CreateProject(ctx, &req.CreateProjectReq)
+					if err != nil {
+						return reportErrorAndYieldFalse(t, err)
+					}
+					req.rules, err = createRules(ctx, cl, req.rules)
+					if err != nil {
+						return reportErrorAndYieldFalse(t, err)
+					}
+				}
+
+				resp, err := cl.ListProjects(ctx, &api.ListProjectsReq{})
+				if err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+
+				if len(reqs) != len(resp.Projects) {
+					return false
+				}
+
+				for i, p := range resp.Projects {
+					if len(reqs[i].rules) == 0 && p.Status != storage.NoRules.String() {
+						return false
+					} else if len(reqs[i].rules) > 0 {
+						if i < applyPoint {
+							if p.Status != storage.Applied.String() {
+								return false
+							}
+						} else {
+							if p.Status != storage.EditsPending.String() {
+								return false
+							}
+						}
+					}
+				}
+				return true
+			},
+			createProjectsAndRulesGen,
 		))
 
 	properties.TestingRun(t)
@@ -474,7 +578,7 @@ func getGopterParams(seed int64) *gopter.Properties {
 	return gopter.NewProperties(params)
 }
 
-func getGenerators() (gopter.Gen, gopter.Gen, gopter.Gen) {
+func getGenerators() (gopter.Gen, gopter.Gen, gopter.Gen, gopter.Gen) {
 	graphicRange := rangetable.Merge(unicode.GraphicRanges...)
 
 	conditionsGenNode := gen.StructPtr(reflect.TypeOf(&api.Condition{}), map[string]gopter.Gen{
@@ -523,12 +627,19 @@ func getGenerators() (gopter.Gen, gopter.Gen, gopter.Gen) {
 		}
 	})
 
+	createRulesReqGen := gopter.CombineGens(
+		gen.SliceOf(createRuleReqGen),
+	).Map(func(values []interface{}) []api.CreateRuleReq {
+		rules := values[0].([]api.CreateRuleReq)
+		return rules
+	})
+
 	createProjectReqGen := gen.Struct(reflect.TypeOf(&api.CreateProjectReq{}), map[string]gopter.Gen{
 		"Id":   gen.RegexMatch(idRegex),
 		"Name": gen.UnicodeString(graphicRange),
 	})
 
-	createProjectAndRuleGen := gopter.CombineGens(
+	createProjectAndRulesGen := gopter.CombineGens(
 		createProjectReqGen, gen.SliceOf(createRuleReqGen),
 	).Map(func(vals []interface{}) projectAndRuleReq {
 		p := vals[0].(api.CreateProjectReq)
@@ -536,17 +647,45 @@ func getGenerators() (gopter.Gen, gopter.Gen, gopter.Gen) {
 		return genStandardProjectAndRules(p, rules)
 	})
 
-	return createRuleReqGen, createProjectReqGen, createProjectAndRuleGen
+	createProjectsAndRulesGen := gopter.CombineGens(
+		gen.SliceOf(createProjectReqGen), gen.SliceOf(createRulesReqGen),
+	).Map(func(vals []interface{}) []projectAndRuleReq {
+
+		projects := vals[0].([]api.CreateProjectReq)
+		projectCount := int(math.Min(projectLimit, float64(len(projects))))
+		rules := vals[1].([][]api.CreateRuleReq)
+		return genStandardProjectsAndRules(projects[0:projectCount], rules)
+	})
+
+	return createRuleReqGen, createProjectReqGen, createProjectAndRulesGen, createProjectsAndRulesGen
 }
 
-func genStandardProjectAndRules(p api.CreateProjectReq, rules []api.CreateRuleReq) projectAndRuleReq {
+func genStandardProjectsAndRules(projects []api.CreateProjectReq, rules [][]api.CreateRuleReq) []projectAndRuleReq {
+	result := make([]projectAndRuleReq, len(projects))
+
+	for i, _ := range projects {
+		// make the ids unique!
+		projects[i].Id = fmt.Sprintf("%s-%d", projects[i].Id, i)
+
+		// We've got a random-length list of projects and a separate random-length list of rule lists,
+		// That variance allows creating projects with no rules here when we happen to have more projects.
+		if i < len(rules) {
+			result[i] = genStandardProjectAndRules(projects[i], rules[i])
+		} else {
+			result[i] = genStandardProjectAndRules(projects[i], []api.CreateRuleReq{})
+		}
+	}
+	return result
+}
+
+func genStandardProjectAndRules(project api.CreateProjectReq, rules []api.CreateRuleReq) projectAndRuleReq {
 	for i, rule := range rules {
 
-		// make the id unique!
-		rules[i].Id = fmt.Sprintf("%s-index-%d", rule.Id, i)
+		// make the ids unique!
+		rules[i].Id = fmt.Sprintf("%s-%s-%d", rule.Id, project.Id, i)
 
 		// tie the rule to a real project
-		rules[i].ProjectId = p.Id
+		rules[i].ProjectId = project.Id
 
 		// constrain condition count even further than the gopter global param
 		var conditions []*api.Condition
@@ -556,7 +695,7 @@ func genStandardProjectAndRules(p api.CreateProjectReq, rules []api.CreateRuleRe
 		rules[i].Conditions = conditions
 	}
 	return projectAndRuleReq{
-		CreateProjectReq: p,
+		CreateProjectReq: project,
 		rules:            rules,
 	}
 }

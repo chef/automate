@@ -4801,159 +4801,80 @@ func TestListProjects(t *testing.T) {
 			require.NoError(t, err)
 			assert.Empty(t, ps)
 		}},
-		{"when two projects (custom and chef-managed) exist, returns them", func(t *testing.T) {
-			ctx := context.Background()
-			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
-			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
-
-			ps, err := store.ListProjects(ctx)
-			require.NoError(t, err)
-			expectedProjects := []*storage.Project{
-				{
-					ID:   "foo",
-					Name: "my foo project",
-					Type: storage.ChefManaged,
-				},
-				{
-					ID:   "bar",
-					Name: "my bar project",
-					Type: storage.Custom,
-				},
-			}
-
-			assert.ElementsMatch(t, expectedProjects, ps)
-		}},
 		{"when multiple projects exist, filter based on projects lists", func(t *testing.T) {
 			ctx := context.Background()
-			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
-			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
+			p1 := insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
+			p2 := insertTestProject(t, db, "bar", "my bar project", storage.Custom)
 			insertTestProject(t, db, "baz", "my baz project", storage.Custom)
-
 			ctx = insertProjectsIntoContext(ctx, []string{"foo", "bar"})
 
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
-			expectedProjects := []*storage.Project{
-				{
-					ID:   "foo",
-					Name: "my foo project",
-					Type: storage.ChefManaged,
-				},
-				{
-					ID:   "bar",
-					Name: "my bar project",
-					Type: storage.Custom,
-				},
-			}
+			expectedProjects := []*storage.Project{&p1, &p2}
 
 			assert.ElementsMatch(t, expectedProjects, ps)
 		}},
-		{"when multiple projects exist, returns everything when no project filter is specified (v2.0 case)", func(t *testing.T) {
+		{"when multiple projects exist, returns everything when empty filter is specified (v2.0 case)", func(t *testing.T) {
 			ctx := context.Background()
 			ctx = insertProjectsIntoContext(ctx, []string{})
-			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
-			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
+			p1 := insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
+			p2 := insertTestProject(t, db, "bar", "my bar project", storage.Custom)
 
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
-			expectedProjects := []*storage.Project{
-				{
-					ID:   "foo",
-					Name: "my foo project",
-					Type: storage.ChefManaged,
-				},
-				{
-					ID:   "bar",
-					Name: "my bar project",
-					Type: storage.Custom,
-				},
-			}
-
-			assert.ElementsMatch(t, expectedProjects, ps)
-		}},
-		{"when multiple projects exist, filter based on projects lists", func(t *testing.T) {
-			ctx := context.Background()
-			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
-			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
-			insertTestProject(t, db, "baz", "my baz project", storage.Custom)
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{"foo", "bar"}, "resource", "action", "pol"))
-
-			ps, err := store.ListProjects(ctx)
-			require.NoError(t, err)
-			expectedProjects := []*storage.Project{
-				{
-					ID:   "foo",
-					Name: "my foo project",
-					Type: storage.ChefManaged,
-				},
-				{
-					ID:   "bar",
-					Name: "my bar project",
-					Type: storage.Custom,
-				},
-			}
+			expectedProjects := []*storage.Project{&p1, &p2}
 
 			assert.ElementsMatch(t, expectedProjects, ps)
 		}},
 		{"when multiple projects exist, returns everything when no project filter is specified (v2.0 case)", func(t *testing.T) {
 			ctx := context.Background()
-			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
-			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
-			insertTestProject(t, db, "baz", "my baz project", storage.Custom)
-
-			ctx = auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-				[]string{}, []string{}, "resource", "action", "pol"))
+			p1 := insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
+			p2 := insertTestProject(t, db, "bar", "my bar project", storage.Custom)
+			p3 := insertTestProject(t, db, "baz", "my baz project", storage.Custom)
 
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
-			expectedProjects := []*storage.Project{
-				{
-					ID:   "foo",
-					Name: "my foo project",
-					Type: storage.ChefManaged,
-				},
-				{
-					ID:   "bar",
-					Name: "my bar project",
-					Type: storage.Custom,
-				},
-				{
-					ID:   "baz",
-					Name: "my baz project",
-					Type: storage.Custom,
-				},
-			}
+			expectedProjects := []*storage.Project{&p1, &p2, &p3}
 
 			assert.ElementsMatch(t, expectedProjects, ps)
 		}},
-		{"when multiple projects exist, returns all projects will * filter passed", func(t *testing.T) {
+		{"when multiple projects exist, returns all projects when * filter passed", func(t *testing.T) {
 			ctx := context.Background()
-			insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
-			insertTestProject(t, db, "bar", "my bar project", storage.Custom)
-			insertTestProject(t, db, "baz", "my baz project", storage.Custom)
-
+			p1 := insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
+			p2 := insertTestProject(t, db, "bar", "my bar project", storage.Custom)
+			p3 := insertTestProject(t, db, "baz", "my baz project", storage.Custom)
 			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
-			expectedProjects := []*storage.Project{
-				{
-					ID:   "foo",
-					Name: "my foo project",
-					Type: storage.ChefManaged,
-				},
-				{
-					ID:   "bar",
-					Name: "my bar project",
-					Type: storage.Custom,
-				},
-				{
-					ID:   "baz",
-					Name: "my baz project",
-					Type: storage.Custom,
-				},
-			}
+			expectedProjects := []*storage.Project{&p1, &p2, &p3}
+
+			assert.ElementsMatch(t, expectedProjects, ps)
+		}},
+		{"returns rule status for projects for none, staged, and applied individually", func(t *testing.T) {
+			ctx := context.Background()
+			p1 := insertTestProjectWithRules(t, db, "foo", "my foo project", storage.ChefManaged, storage.EditsPending)
+			insertStagedRuleWithMultipleConditions(t, db, "staged-rule-1", p1.ID, storage.Node, false)
+			p2 := insertTestProjectWithRules(t, db, "bar", "my bar project", storage.Custom, storage.Applied)
+			insertAppliedRuleWithMultipleConditions(t, db, "staged-rule-2", p2.ID, storage.Node)
+			p3 := insertTestProjectWithRules(t, db, "baz", "my baz project", storage.Custom, storage.NoRules)
+
+			ps, err := store.ListProjects(ctx)
+			require.NoError(t, err)
+			expectedProjects := []*storage.Project{&p1, &p2, &p3}
+
+			assert.ElementsMatch(t, expectedProjects, ps)
+		}},
+		{"returns rule status of staged for project with both staged and applied rules", func(t *testing.T) {
+			ctx := context.Background()
+			p1 := insertTestProjectWithRules(t, db, "foo", "my foo project", storage.ChefManaged, storage.EditsPending)
+			insertStagedRuleWithMultipleConditions(t, db, "staged-rule-1", p1.ID, storage.Node, false)
+			insertAppliedRuleWithMultipleConditions(t, db, "staged-rule-2", p1.ID, storage.Node)
+			insertAppliedRuleWithMultipleConditions(t, db, "staged-rule-3", p1.ID, storage.Node)
+
+			ps, err := store.ListProjects(ctx)
+			require.NoError(t, err)
+			expectedProjects := []*storage.Project{&p1}
 
 			assert.ElementsMatch(t, expectedProjects, ps)
 		}},
@@ -6721,10 +6642,24 @@ func insertTestRole(t *testing.T,
 
 	return role
 }
+func insertTestProject(
+	t *testing.T,
+	db *testhelpers.TestDB,
+	id string,
+	name string,
+	projType storage.Type) storage.Project {
+	return insertTestProjectWithRules(t, db, id, name, projType, storage.NoRules)
+}
 
-func insertTestProject(t *testing.T, db *testhelpers.TestDB, id string, name string, projType storage.Type) storage.Project {
+func insertTestProjectWithRules(
+	t *testing.T,
+	db *testhelpers.TestDB,
+	id string,
+	name string,
+	projType storage.Type,
+	status storage.ProjectRulesStatus) storage.Project {
 	t.Helper()
-	proj, err := storage.NewProject(id, name, projType)
+	proj, err := storage.NewProject(id, name, projType, status)
 	require.NoError(t, err)
 
 	_, err = db.Exec(`INSERT INTO iam_projects (id, name, type) values ($1, $2, $3)`,

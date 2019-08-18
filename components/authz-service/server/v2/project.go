@@ -113,7 +113,7 @@ func (s *ProjectState) GetProject(ctx context.Context,
 
 func (s *ProjectState) CreateProject(ctx context.Context,
 	req *api.CreateProjectReq) (*api.CreateProjectResp, error) {
-	p, err := storage.NewProject(req.Id, req.Name, storage.Custom)
+	p, err := storage.NewProject(req.Id, req.Name, storage.Custom, storage.NoRules)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument,
 			"creating project with ID %q: %s", req.Id, err.Error())
@@ -145,7 +145,7 @@ func (s *ProjectState) CreateProject(ctx context.Context,
 
 func (s *ProjectState) UpdateProject(ctx context.Context,
 	req *api.UpdateProjectReq) (*api.UpdateProjectResp, error) {
-	p, err := storage.NewProject(req.Id, req.Name, storage.Custom)
+	p, err := storage.NewProject(req.Id, req.Name, storage.Custom, storage.NoRules)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument,
 			"updating project with ID %q: %s", req.Id, err.Error())
@@ -556,9 +556,10 @@ func storageCondition(apiCondition *api.Condition) (storage.Condition, error) {
 // nolint: unparam
 func fromStorageProject(p *storage.Project) (*api.Project, error) {
 	return &api.Project{
-		Id:   p.ID,
-		Name: p.Name,
-		Type: typeFromInternal(p.Type),
+		Id:     p.ID,
+		Name:   p.Name,
+		Type:   typeFromInternal(p.Type),
+		Status: p.Status,
 	}, nil
 }
 

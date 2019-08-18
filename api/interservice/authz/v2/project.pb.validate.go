@@ -46,6 +46,8 @@ func (m *Project) Validate() error {
 
 	// no validation rules for Type
 
+	// no validation rules for Status
+
 	return nil
 }
 
