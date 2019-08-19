@@ -343,23 +343,6 @@ func (db DatabaseExporter) restoreCustomFile(exitOnError bool) error {
 	}
 	defer cleanup()
 
-	/*
-		scanner := bufio.NewScanner(pgListFile)
-		for scanner.Scan() {
-			txt := scanner.Text()
-			if !strings.Contains(txt, "2615 2200") {
-				_, err := fmt.Fprintln(pgListModifiedFile, txt)
-				if err != nil {
-					return err
-				}
-			}
-		}
-
-		if err := scanner.Err(); err != nil {
-			return err
-		}
-	*/
-
 	pgRestoreCmd = append(
 		pgRestoreCmd, "--use-list", pgListModifiedFile, pgBackupFile)
 
