@@ -186,6 +186,27 @@ Cypress.Commands.add('cleanupProjectsByIDPrefix', (idToken: string, idPrefix: st
   });
 });
 
+Cypress.Commands.add('cleanupTeamsByDescriptionPrefix', (idToken: string, namePrefix: string) => {
+  cy.request({
+    auth: { bearer: idToken },
+    method: 'GET',
+    url: '/api/v0/auth/teams',
+    failOnStatusCode: false
+  }).then((resp) => {
+    const body = resp.body;
+    for (const team of body.teams) {
+      if (team.description.startsWith(namePrefix)) {
+        cy.request({
+          auth: { bearer: idToken },
+          method: 'DELETE',
+          url: `/api/v0/auth/teams/${team.id}`,
+          failOnStatusCode: false
+        });
+      }
+    }
+  });
+});
+
 
 // helpers
 
@@ -208,25 +229,3 @@ function LoginHelper(username: string) {
     cy.wait('@getAuth');
   });
 }
-
-Cypress.Commands.add('cleanupTeamsByDescriptionPrefix', (idToken: string, namePrefix: string) => {
-  cy.request({
-    auth: { bearer: idToken },
-    method: 'GET',
-    url: '/api/v0/auth/teams',
-    failOnStatusCode: false
-  }).then((resp) => {
-    const body = resp.body;
-    for (const team of body.teams) {
-      if (team.description.startsWith(namePrefix)) {
-        cy.request({
-          auth: { bearer: idToken },
-          method: 'DELETE',
-          url: `/api/v0/auth/teams/${team.id}`,
-          failOnStatusCode: false
-        });
-      }
-    }
-  });
-});
-
