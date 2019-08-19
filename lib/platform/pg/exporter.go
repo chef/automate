@@ -217,7 +217,7 @@ func (db DatabaseExporter) restoreSQLFile(exitOnError bool) error {
 }
 
 func removeFile(filename string) {
-	logrus.Infof("removing %q", filename)
+	logrus.Debugf("removing %q", filename)
 
 	if err := os.Remove(filename); err != nil {
 		logrus.WithError(err).Errorf("failed to remove %q", filename)
