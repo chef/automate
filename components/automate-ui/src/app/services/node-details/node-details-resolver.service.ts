@@ -19,18 +19,18 @@ export class NodeDetailsResolverService implements Resolve<NodeRun> {
         if (nodeRun) {
           return nodeRun;
         } else {
-          // if the node run was not found we assume this node has not runs.
+          // if the node run was not found we assume this node has no runs.
           // Go to node missing runs page
-          this.router.navigate(['/client-runs/' + nodeId + '/missing-runs']);
+          this.router.navigate(['/infrastructure/client-runs/' + nodeId + '/missing-runs']);
           return null;
         }
       }).catch(e => {
         // if the node run was not found we assume this node has no runs.
         // Go to node missing runs page
         if (JSON.stringify(e).indexOf('404') > 0) {
-          this.router.navigate(['/client-runs/' + nodeId + '/missing-runs']);
+          this.router.navigate(['/infrastructure/client-runs/' + nodeId + '/missing-runs']);
         } else {
-          this.router.navigate(['/client-runs']);
+          this.router.navigate(['/infrastructure/client-runs']);
         }
 
         return null;
