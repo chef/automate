@@ -13,6 +13,10 @@ export interface ProjectChecked extends Project {
   checked: boolean;
 }
 
+export interface ProjectCheckedMap {
+  [id: string]: ProjectChecked;
+}
+
 @Component({
   selector: 'app-projects-dropdown',
   templateUrl: './projects-dropdown.component.html',
@@ -21,7 +25,7 @@ export interface ProjectChecked extends Project {
 export class ProjectsDropdownComponent implements OnChanges {
   // The map of ProjectChecked by id. Any checked changes propagated via
   // onProjectChecked. Updates should be applied to parent component state.
-  @Input() projects: { [id: string]: ProjectChecked } = {};
+  @Input() projects: ProjectCheckedMap = {};
 
   // Setting disabled to true means the dropdown will be unusable and will have a grey background
   @Input() disabled = false;
@@ -77,7 +81,7 @@ export class ProjectsDropdownComponent implements OnChanges {
     }
   }
 
-  updateLabel(): void {
+  private updateLabel(): void {
     const checkedProjects = this.projectsArray().filter(p => p.checked);
     switch (checkedProjects.length) {
       case 1: {

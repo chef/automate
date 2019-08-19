@@ -36,7 +36,8 @@ import {
   projectEntities
 } from 'app/entities/projects/project.selectors';
 import {
-  ProjectChecked
+  ProjectChecked,
+  ProjectCheckedMap
 } from 'app/components/projects-dropdown/projects-dropdown.component';
 
 import { ProjectConstants, Project } from 'app/entities/projects/project.model';
@@ -47,10 +48,6 @@ import { IAMType } from 'app/entities/policies/policy.model';
 const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 
 export type TeamTabName = 'users' | 'details';
-
-export interface ProjectMap {
-  [id: string]: ProjectChecked;
-}
 
 @Component({
   selector: 'app-team-details',
@@ -78,7 +75,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public removeText = 'Remove User';
 
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
-  public projects: ProjectMap = {};
+  public projects: ProjectCheckedMap = {};
   // keep a list of projects that were in the teams list that are
   // left to fetch so we can know if we are fully loaded or not.
   // don't want to enable the projects-dropdown until we have
@@ -144,7 +141,10 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       .subscribe((assignable: ProjectsFilterOption[]) => {
         assignable.forEach(({ value: id, label: name, type: stringType }) => {
           const type = <IAMType>stringType;
-          const proj: Project = { id, name, type };
+          // TODO (tc) Don't actually have the status queried in here but
+          // also don't need it for this page. Maybe the status field
+          // should be optional in the project model?
+          const proj: Project = { id, name, type, status: 'NO_RULES' };
           // we don't want to override projects that we fetched
           // that were part of the team already
           if (!this.projects[proj.id]) {
@@ -230,7 +230,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     combineLatest([
       this.store.select(getProjectStatus),
       this.store.select(projectEntities)])
-      .pipe(filter(([status, _]: [EntityStatus, ProjectMap]) =>
+      .pipe(filter(([status, _]: [EntityStatus, ProjectCheckedMap]) =>
           status === EntityStatus.loadingSuccess),
         map(([_, projectMap]) => {
           const projectsFound: { [id: string]: boolean } = {};
@@ -314,7 +314,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
   // updates whether the project was checked or unchecked
   onProjectChecked(project: ProjectChecked): void {
-    this.projects[project.id] = project;
+    this.projects[project.id].checked = project.checked;
   }
 
   noProjectsUpdated(): boolean {

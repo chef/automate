@@ -7,7 +7,8 @@ import { hasIn } from 'lodash/fp';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Project } from 'app/entities/projects/project.model';
 import {
-  ProjectChecked
+  ProjectChecked,
+  ProjectCheckedMap
 } from 'app/components/projects-dropdown/projects-dropdown.component';
 
 @Component({
@@ -27,7 +28,7 @@ export class CreateObjectModalComponent implements OnInit, OnChanges {
   @Output() close = new EventEmitter();
   @Output() createClicked = new EventEmitter<Project[]>();
 
-  public projects: { [id: string]: ProjectChecked } = {};
+  public projects: ProjectCheckedMap = {};
 
   // Whether the edit ID form is open or not.
   public modifyID = false;
@@ -45,13 +46,14 @@ export class CreateObjectModalComponent implements OnInit, OnChanges {
     // if a new list of projects to populate dropdown with is passed in we update the dropdown
     const checked = false;
     if (hasIn('assignableProjects.currentValue', changes)) {
+      this.projects = {};
       changes.assignableProjects.currentValue.forEach((proj: Project) =>
         this.projects[proj.id] = { ...proj, checked });
     }
   }
 
   onProjectChecked(project: ProjectChecked): void {
-    this.projects[project.id] = project;
+    this.projects[project.id].checked = project.checked;
   }
 
   dropdownDisabled(): boolean {
