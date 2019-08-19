@@ -62,7 +62,7 @@ describe('NodeDetailsResolverService', () => {
       spyOn(router, 'navigate');
 
       service.resolve(route, null).then((_nodeRun: NodeRun) => {
-        expect(router.navigate).toHaveBeenCalledWith(['/client-runs/fake-node-id/missing-runs']);
+        expect(router.navigate).toHaveBeenCalledWith(['/infrastructure/client-runs/fake-node-id/missing-runs']);
         done();
       });
 
@@ -78,7 +78,7 @@ describe('NodeDetailsResolverService', () => {
       spyOn(router, 'navigate');
 
       service.resolve(route, null).then((_nodeRun: NodeRun) => {
-        expect(router.navigate).toHaveBeenCalledWith(['/client-runs']);
+        expect(router.navigate).toHaveBeenCalledWith(['/infrastructure/client-runs']);
         done();
       });
     });
@@ -94,7 +94,7 @@ describe('NodeDetailsResolverService', () => {
       spyOn(route.paramMap, 'get').and.callFake(() => 'fake-node-id');
 
       service.resolve(route, null).then((_nodeRun: NodeRun) => {
-        expect(router.navigate).toHaveBeenCalledWith(['/client-runs/fake-node-id/missing-runs']);
+        expect(router.navigate).toHaveBeenCalledWith(['/infrastructure/client-runs/fake-node-id/missing-runs']);
         done();
       });
     });
