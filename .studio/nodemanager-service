@@ -7,5 +7,12 @@ document "nodemanager_scans_integration" <<DOC
 DOC
 function nodemanager_scans_integration() {
   go_test -v "github.com/chef/automate/components/nodemanager-service/tests"
-  go test -v "github.com/chef/automate/components/nodemanager-service/tests/scanjobtests"
+  go_test -v "github.com/chef/automate/components/nodemanager-service/tests/scanjobtests"
+}
+
+document "gcp_scan_integration" <<DOC
+  Runs the nodemanager scan jobs for gcp
+DOC
+function nodemanager_scans_integration_gcp() {
+  go_test -v "github.com/chef/automate/components/nodemanager-service/tests/scanjobtests/gcp"
 }
