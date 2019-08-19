@@ -73,7 +73,7 @@ export class NodeDetailsComponent implements OnInit, OnDestroy {
   updateRunId(newRun: RunInfo): void {
     this.router.navigate(
       [
-        'client-runs', this.nodeId, 'runs', newRun.runId, {end_time: newRun.endTime}
+        'infrastructure/client-runs', this.nodeId, 'runs', newRun.runId, {end_time: newRun.endTime}
       ]
     );
   }
