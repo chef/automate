@@ -80,6 +80,10 @@ func (p *PlatformConnInfo) ConnURI(dbname string) string {
 	return p.info.ConnURI(dbname)
 }
 
+func (p *PlatformConnInfo) String() string {
+	return p.info.String()
+}
+
 func (p *PlatformConnInfo) PsqlCmdOptions() []command.Opt {
 	if p.config.IsExternalPG() {
 		return []command.Opt{
