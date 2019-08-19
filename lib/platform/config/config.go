@@ -118,7 +118,7 @@ func (c *Config) PGSuperUser() (string, error) {
 			return "", errors.Errorf("Unsupported postgres auth mode %s", auth.GetScheme().GetValue())
 		}
 	}
-	return "automate", nil
+	return defaultPGSuperuserName, nil
 }
 
 func (c *Config) GetPGURI(dbname string) (string, error) {
@@ -137,12 +137,12 @@ func (c *Config) GetPGURIForUser(dbname string, user string) (string, error) {
 	return connInfo.ConnURI(dbname), nil
 }
 
-func (c *Config) GetPGConnInfoForSuperuserWithRole(role string) (*PGConnInfo, error) {
+func (c *Config) GetPGConnInfoForSuperuser() (*PGConnInfo, error) {
 	superuser, err := c.PGSuperUser()
 	if err != nil {
 		return nil, err
 	}
-	connInfo, err := c.GetPGConnInfoURI(superuser, WithPGRole(role))
+	connInfo, err := c.GetPGConnInfoURI(superuser)
 	if err != nil {
 		return nil, err
 	}
@@ -162,28 +162,9 @@ func (c *PGConnInfo) String() string {
 	return c.debugStr
 }
 
-type connInfoConfig struct {
-	role string
-}
-type ConnInfoOpts func(c *connInfoConfig)
-
-func WithPGRole(role string) ConnInfoOpts {
-	return func(c *connInfoConfig) {
-		c.role = role
-	}
-}
-
-func (c *Config) GetPGConnInfoURI(user string, opts ...ConnInfoOpts) (*PGConnInfo, error) {
+func (c *Config) GetPGConnInfoURI(user string) (*PGConnInfo, error) {
 	if c.GetPostgresql() == nil {
 		return nil, errors.New("Postgresql config missing")
-	}
-
-	config := connInfoConfig{}
-	for _, o := range opts {
-		o(&config)
-	}
-	if config.role == "" {
-		config.role = user
 	}
 
 	if c.IsExternalPG() {
@@ -218,8 +199,6 @@ func (c *Config) GetPGConnInfoURI(user string, opts ...ConnInfoOpts) (*PGConnInf
 					return nil, errors.Errorf("External postgres password auth missing password")
 				}
 
-				// TODO: what to do about role
-
 				fmtStr := fmt.Sprintf("postgresql://%s:%s@%s:%d/%%s?%s",
 					user, password, c.GetPostgresql().GetIp(), c.GetPostgresql().GetCfg().GetPort(), strings.Join(opts, "&"))
 				debugStr := fmt.Sprintf("postgresql://%s:<redacted>@%s:%d/<database>?%s",
@@ -239,7 +218,6 @@ func (c *Config) GetPGConnInfoURI(user string, opts ...ConnInfoOpts) (*PGConnInf
 		certPath := c.GetService().GetTls().GetCertPath()
 		keyPath := c.GetService().GetTls().GetKeyPath()
 		rootCertPath := c.GetService().GetTls().GetRootCaPath()
-
 		if user == defaultPGSuperuserName {
 			certPath = defaultPGSuperuserCertPath
 			keyPath = defaultPGSuperuserKeyPath
@@ -247,7 +225,7 @@ func (c *Config) GetPGConnInfoURI(user string, opts ...ConnInfoOpts) (*PGConnInf
 		}
 
 		fmtStr := fmt.Sprintf("postgresql://%s@%s:%d/%%s?sslmode=verify-ca&sslcert=%s&sslkey=%s&sslrootcert=%s",
-			config.role, c.GetPostgresql().GetIp(), c.GetPostgresql().GetCfg().GetPort(), certPath, keyPath, rootCertPath)
+			user, c.GetPostgresql().GetIp(), c.GetPostgresql().GetCfg().GetPort(), certPath, keyPath, rootCertPath)
 
 		return &PGConnInfo{
 			debugStr: fmt.Sprintf(fmtStr, "<database>"),

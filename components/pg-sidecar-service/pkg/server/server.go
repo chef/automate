@@ -232,6 +232,12 @@ func (p *PGSidecarServer) CreateExtension(ctx context.Context, req *api.CreateEx
 func (p *PGSidecarServer) DeploySqitch(ctx context.Context, req *api.DeploySqitchReq) (*api.DeploySqitchRes, error) {
 	res := &api.DeploySqitchRes{}
 
+	if !(req.User == "automate" || req.User == "") {
+		return res, status.Errorf(codes.Unimplemented,
+			"DeploySqitch with a user other than 'automate' has not been implemented. (requested user: %s)",
+			req.User)
+	}
+
 	client, err := p.newClient()
 	if err != nil {
 		return res, status.New(codes.FailedPrecondition, err.Error()).Err()

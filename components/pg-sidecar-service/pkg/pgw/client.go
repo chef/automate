@@ -583,7 +583,7 @@ func (client *Client) DeploySqitch(db, dir, user string) error {
 		return err
 	}
 
-	connInfo, err := client.platformConfig.GetPGConnInfoForSuperuserWithRole(user)
+	connInfo, err := client.platformConfig.GetPGConnInfoForSuperuser()
 	if err != nil {
 		return err
 	}
@@ -599,7 +599,7 @@ func (client *Client) DeploySqitch(db, dir, user string) error {
 		sqitchPGURI,
 	)
 
-	environment := pg.PsqlCmdOptionsFromPlatformConfig(client.platfromConfig)
+	environment := pg.SuperuserPsqlCmdOptionsFromPlatformConfig(client.platformConfig)
 	cmdArgs := []command.Opt{
 		sqitchArgs,
 		command.Envvar("TZ", "UTC"),
