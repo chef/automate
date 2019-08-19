@@ -125,6 +125,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   }
 
   private resetForms(): void {
+    this.editForm.reset();
     this.editMode = false;
     this.passwordForm.reset();
   }
