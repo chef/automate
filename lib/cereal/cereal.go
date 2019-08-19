@@ -1029,7 +1029,6 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 				return true
 			}
 		}
-		m.WakeupTaskPollersByRequests(decision.tasks)
 		s.End("enqueue_task")
 		s.Begin("continue")
 		jsonPayload, err := jsonify(decision.payload)
@@ -1044,6 +1043,7 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 			if err != nil {
 				logrus.WithError(err).Error("failed to continue workflow")
 			}
+			m.WakeupTaskPollersByRequests(decision.tasks)
 		}
 		s.End("continue")
 	}
