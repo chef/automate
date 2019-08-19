@@ -2,7 +2,6 @@ package integration
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -12,10 +11,6 @@ import (
 )
 
 type licenseSave struct {
-	LicenseID string `json:"license_id"`
-}
-
-type licenseStatusResp struct {
 	LicenseID string `json:"license_id"`
 }
 
@@ -51,7 +46,9 @@ func CreateLicenseDiagnostic() diagnostics.Diagnostic {
 }
 
 func getLicenseID(tstCtx diagnostics.TestContext) (string, error) {
-	reqPath := fmt.Sprintf("/api/v0/license/status")
+	// We use the telemetry/config API endpoint since it is
+	// available on more versions of Automate.
+	reqPath := "/api/v0/telemetry/config"
 	resp, err := tstCtx.DoLBRequest(reqPath)
 	if err != nil {
 		return "", errors.Wrapf(err, "Failed to GET %s", reqPath)
@@ -65,7 +62,9 @@ func getLicenseID(tstCtx diagnostics.TestContext) (string, error) {
 		return "", errors.Errorf("Failed to GET %s with status code %d", reqPath, resp.StatusCode)
 	}
 
-	respUnmarshalled := licenseStatusResp{}
+	respUnmarshalled := struct {
+		LicenseID string `json:"license_id"`
+	}{}
 	err = json.NewDecoder(resp.Body).Decode(&respUnmarshalled)
 	if err != nil {
 		return "", errors.Wrapf(err, "Failed to decode GET %s", reqPath)
