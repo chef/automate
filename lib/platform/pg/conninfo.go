@@ -59,8 +59,29 @@ var A2SuperuserCerts = TLSCertPaths{
 // NOTE(ssd) 2019-08-19: This is a bit of duplication with code in
 // platform/config to ensure that you can depend on the platform
 // config without pulling in the command class.
-func SuperuserPsqlCmdOptionsFromPlatformConfig(c *platform_config.Config) []command.Opt {
-	if c.IsExternalPG() {
+type PlatformConnInfo struct {
+	config *platform_config.Config
+	info   *platform_config.PGConnInfo
+}
+
+func SuperuserConnInfoFromPlatformConfig(c *platform_config.Config) (*PlatformConnInfo, error) {
+	info, err := c.GetPGConnInfoForSuperuser()
+	if err != nil {
+		return nil, err
+	}
+
+	return &PlatformConnInfo{
+		config: c,
+		info:   info,
+	}, nil
+}
+
+func (p *PlatformConnInfo) ConnURI(dbname string) string {
+	return p.info.ConnURI(dbname)
+}
+
+func (p *PlatformConnInfo) PsqlCmdOptions() []command.Opt {
+	if p.config.IsExternalPG() {
 		return []command.Opt{
 			command.Envvar("PGTZ", "UTC"),
 		}

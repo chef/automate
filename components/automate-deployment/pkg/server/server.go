@@ -54,6 +54,7 @@ import (
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/io/chunks"
 	platform_config "github.com/chef/automate/lib/platform/config"
+	"github.com/chef/automate/lib/platform/pg"
 	"github.com/chef/automate/lib/secrets"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/tls/certs"
@@ -2039,17 +2040,7 @@ func (s *server) reloadBackupRunner() error {
 		},
 	}
 
-	// Get the correct ConnInfo
-	superuser, err := platformConfig.PGSuperUser()
-	if err != nil {
-		return err
-	}
-
-	if superuser == "" {
-		return errors.New("unable to determine superuser")
-	}
-
-	pgConnInfo, err := platformConfig.GetPGConnInfoURI(superuser)
+	pgConnInfo, err := pg.SuperuserConnInfoFromPlatformConfig(&platformConfig)
 	if err != nil {
 		return err
 	}
