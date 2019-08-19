@@ -11,15 +11,19 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/teambition/rrule-go"
+	"google.golang.org/grpc"
 
 	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/cereal/multiworkflow"
+	"github.com/chef/automate/lib/cereal/backend"
+	grpccereal "github.com/chef/automate/lib/cereal/grpc"
+	"github.com/chef/automate/lib/cereal/patterns"
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/platform/pg"
 )
 
 var opts struct {
-	Debug bool
+	Debug    bool
+	Endpoint string
 }
 
 var simpleWorkflowOpts struct {
@@ -31,6 +35,12 @@ var simpleWorkflowOpts struct {
 
 var scheduleOpts struct {
 	Name string
+}
+
+var listInstanceOpts struct {
+	IsRunning    string
+	WorkflowName string
+	InstanceName string
 }
 
 func main() {
@@ -55,6 +65,12 @@ func main() {
 		"d",
 		false,
 		"Enabled debug output")
+	cmd.PersistentFlags().StringVarP(
+		&opts.Endpoint,
+		"endpoint",
+		"e",
+		"",
+		"grpc endpoint")
 
 	simpleWorkflowCmd := &cobra.Command{
 		Use:           "simple-workflow-test",
@@ -112,9 +128,19 @@ func main() {
 		"Name to use for the scheduled workflow",
 	)
 
+	listInstancesCmd := &cobra.Command{
+		Use:  "list-instances",
+		RunE: runListInstances,
+	}
+
+	listInstancesCmd.PersistentFlags().StringVar(&listInstanceOpts.IsRunning, "is-running", "", "true or false")
+	listInstancesCmd.PersistentFlags().StringVar(&listInstanceOpts.WorkflowName, "workflow-name", "", "the name of the workflow")
+	listInstancesCmd.PersistentFlags().StringVar(&listInstanceOpts.InstanceName, "instance-name", "", "the name of the instance")
+
 	cmd.AddCommand(simpleWorkflowCmd)
 	cmd.AddCommand(resetDBCmd)
 	cmd.AddCommand(scheduleCmd)
+	cmd.AddCommand(listInstancesCmd)
 
 	err := cmd.Execute()
 	if err != nil {
@@ -167,12 +193,18 @@ type SimpleTaskParams struct {
 
 func (t *SimpleTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
 	params := SimpleTaskParams{}
+	logrus.Debug("here")
 	if err := task.GetParameters(&params); err != nil {
 		panic(err)
 	}
 	logrus.WithField("id", params.ID).Debug("Running task")
 	if simpleWorkflowOpts.SlowTasks {
-		time.Sleep(time.Duration(23+params.Sleepy) * time.Second)
+		select {
+		case <-time.After(time.Duration(23+params.Sleepy) * time.Second):
+		case <-ctx.Done():
+			logrus.Info("task cancelled")
+			return nil, ctx.Err()
+		}
 	}
 	logrus.Debug("Finished Task")
 	return params.ID, nil
@@ -265,22 +297,41 @@ func (SimpleWorkflow) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEvent)
 	return w.Complete()
 }
 
+func getBackend(dbName string) backend.Driver {
+	if opts.Endpoint != "" {
+		conn, err := grpc.Dial(opts.Endpoint, grpc.WithInsecure(), grpc.WithMaxMsgSize(64*1024*1024))
+		if err != nil {
+			panic(err)
+		}
+		grpcBackend := grpccereal.NewGrpcBackendFromConn("test", conn)
+		return grpcBackend
+	}
+	return postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName))
+}
+
 func runSimpleWorkflow(_ *cobra.Command, args []string) error {
 	dbName := defaultDatabaseName
 	if len(args) > 0 {
 		dbName = args[0]
 	}
 
-	manager, err := cereal.NewManager(postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName)))
+	b := getBackend(dbName)
+	manager, err := cereal.NewManager(b)
 	if err != nil {
 		return err
 	}
 	defer manager.Stop()
 
-	executor := multiworkflow.NewMultiWorkflowExecutor(map[string]cereal.WorkflowExecutor{
-		"supersimple1": &SimpleWorkflow{},
-		"supersimple2": &SimpleWorkflow{},
-	})
+	/*
+		executor := multiworkflow.NewMultiWorkflowExecutor(map[string]cereal.WorkflowExecutor{
+			"supersimple1": &SimpleWorkflow{},
+			"supersimple2": &SimpleWorkflow{},
+		})
+	*/
+	executor, err := patterns.NewChainWorkflowExecutor([]cereal.WorkflowExecutor{&SimpleWorkflow{}, &SimpleWorkflow{}})
+	if err != nil {
+		panic(err)
+	}
 	//manager.RegisterWorkflowExecutor("simple-workflow", &SimpleWorkflow{})
 	manager.RegisterWorkflowExecutor("simple-workflow", executor)
 	manager.RegisterTaskExecutor("simple task", &SimpleTask{}, cereal.TaskExecutorOpts{
@@ -302,10 +353,17 @@ func runSimpleWorkflow(_ *cobra.Command, args []string) error {
 				"simple-workflow", instanceName,
 				&params,
 			)*/
-		err = multiworkflow.EnqueueWorkflow(context.TODO(), manager, "simple-workflow", instanceName, map[string]interface{}{
-			"supersimple1": params,
-			"supersimple2": params2,
-		})
+		/*
+			err = multiworkflow.EnqueueWorkflow(context.TODO(), manager, "simple-workflow", instanceName, map[string]interface{}{
+				"supersimple1": params,
+				"supersimple2": params2,
+			})
+			if err != nil {
+				logrus.WithError(err).Error("Unexpected error enqueueing workflow")
+				return err
+			}
+		*/
+		err = patterns.EnqueueChainWorkflow(context.TODO(), manager, "simple-workflow", instanceName, []interface{}{params, params2})
 		if err != nil {
 			logrus.WithError(err).Error("Unexpected error enqueueing workflow")
 			return err
@@ -366,7 +424,8 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 		dbName = args[0]
 	}
 
-	manager, err := cereal.NewManager(postgres.NewPostgresBackend(defaultConnURIForDatabase(dbName)))
+	b := getBackend(dbName)
+	manager, err := cereal.NewManager(b)
 	if err != nil {
 		return err
 	}
@@ -424,6 +483,52 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 			}).Debug("Found schedule")
 		}
 		time.Sleep(10 * time.Second)
+	}
+
+	return nil
+}
+
+func runListInstances(_ *cobra.Command, args []string) error {
+	dbName := defaultDatabaseName
+	if len(args) > 0 {
+		dbName = args[0]
+	}
+
+	b := getBackend(dbName)
+	if err := b.Init(); err != nil {
+		return err
+	}
+
+	opts := backend.ListWorkflowOpts{}
+	if listInstanceOpts.IsRunning == "true" {
+		m := true
+		opts.IsRunning = &m
+	} else if listInstanceOpts.IsRunning == "false" {
+		m := false
+		opts.IsRunning = &m
+	}
+
+	if listInstanceOpts.InstanceName != "" {
+		opts.InstanceName = &listInstanceOpts.InstanceName
+	}
+
+	if listInstanceOpts.WorkflowName != "" {
+		opts.WorkflowName = &listInstanceOpts.WorkflowName
+	}
+
+	instances, err := b.ListWorkflowInstances(context.Background(), opts)
+	if err != nil {
+		return err
+	}
+	for _, instance := range instances {
+		fmt.Printf("%13s: %s\n", "Workflow Name", instance.WorkflowName)
+		fmt.Printf("%13s: %s\n", "Instance Name", instance.InstanceName)
+		fmt.Printf("%13s: %s\n", "Status", string(instance.Status))
+		fmt.Printf("%13s: %s\n", "Parameters", string(instance.Parameters))
+		fmt.Printf("%13s: %s\n", "Payload", string(instance.Payload))
+		fmt.Printf("%13s: %s\n", "Result", string(instance.Result))
+		fmt.Printf("%13s: %v\n", "Err", instance.Err)
+		fmt.Println("-----------------------------------")
 	}
 
 	return nil
