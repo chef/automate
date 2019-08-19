@@ -53,8 +53,8 @@ var testConnectionUser = "exporter_integration_test_user"
 var testConnectionPassword = "exporter_integration_test_password"
 
 func testSetup(t *testing.T) (string, func()) {
-	originalPSQLCmd := pg.PSQLCmd
-	originalPGDumpCmd := pg.PGDumpCmd
+	originalPSQLCmd := pg.DefaultPSQLCmd
+	originalPGDumpCmd := pg.DefaultPGDumpCmd
 	for _, requiredTool := range []string{"pg_ctl", "initdb", "psql", "pg_isready", "pg_dump"} {
 		path, err := exec.LookPath(requiredTool)
 		if err != nil {
@@ -64,9 +64,9 @@ func testSetup(t *testing.T) (string, func()) {
 
 		switch requiredTool {
 		case "psql":
-			pg.PSQLCmd = []string{path}
+			pg.DefaultPSQLCmd = []string{path}
 		case "pg_dump":
-			pg.PGDumpCmd = []string{path}
+			pg.DefaultPGDumpCmd = []string{path}
 		}
 		t.Logf("Found %s at %s\n", requiredTool, path)
 	}
@@ -100,8 +100,8 @@ func testSetup(t *testing.T) (string, func()) {
 
 	dbDataDir := setupPostgreSQL(t)
 	return exporterDataDir, func() {
-		pg.PGDumpCmd = originalPGDumpCmd
-		pg.PSQLCmd = originalPSQLCmd
+		pg.DefaultPGDumpCmd = originalPGDumpCmd
+		pg.DefaultPSQLCmd = originalPSQLCmd
 		testConnInfo.CleanupPgPassfile()
 		stopPostgreSQL(dbDataDir)
 		os.RemoveAll(dbDataDir)
@@ -110,15 +110,15 @@ func testSetup(t *testing.T) (string, func()) {
 }
 
 func setupPostgreSQL(t *testing.T) string {
-	opts := make([]command.Opt, 0, 2)
 	var pgUser string
+	var userOpt command.Opt
 	if os.Geteuid() == 0 {
 		pgUser = os.Getenv("PG_USER")
 		if pgUser == "" {
 			t.Fatalf("PG_USER is not set and you are running as root. We won't be able to start postgresql.")
 		}
 		t.Logf("Using %s as postgresql user\n", pgUser)
-		opts = append(opts, command.AsUser(pgUser))
+		userOpt = command.AsUser(pgUser)
 	}
 
 	dbDataDir, _ := ioutil.TempDir("", "DatabaseExporterIntegrationDBDir")
@@ -134,11 +134,16 @@ func setupPostgreSQL(t *testing.T) string {
 	}
 
 	logFile := path.Join(dbDataDir, "pg.log")
-	output, err := command.CombinedOutput("initdb", append(opts, command.Args("-D", dbDataDir))...)
+	output, err := command.CombinedOutput("initdb", makeCommandOpts(userOpt, "-D", dbDataDir)...)
 	t.Logf("pg_ctl output: %s\n", output)
 	require.NoError(t, err, "initdb")
 	options := fmt.Sprintf("-h %s -p %d", testConnInfo.Host, testConnInfo.Port)
-	output, err = command.CombinedOutput("pg_ctl", append(opts, command.Args("-D", dbDataDir, "-l", logFile, "-o", options, "start"))...)
+
+	output, err = command.CombinedOutput("pg_ctl", makeCommandOpts(userOpt,
+		"-D", dbDataDir,
+		"-l", logFile,
+		"-o", options,
+		"start")...)
 	t.Logf("pg_ctl output: %s\n", output)
 	require.NoError(t, err, "starting PostgreSQL")
 	err = waitForPG()
@@ -150,11 +155,21 @@ func setupPostgreSQL(t *testing.T) string {
 		t.Fatalf("PG failed to start. Postgresql log content: %s", logContent)
 	}
 
-	output, err = command.CombinedOutput("psql", append(opts, command.Args("-p", PGPortAsStr(), "-c", `CREATE ROLE "exporter_integration_test_user" SUPERUSER LOGIN PASSWORD 'exporter_integration_test_password'`, "postgres"))...)
+	output, err = command.CombinedOutput("psql", makeCommandOpts(userOpt,
+		"-p", PGPortAsStr(),
+		"-c", `CREATE ROLE "exporter_integration_test_user" SUPERUSER LOGIN PASSWORD 'exporter_integration_test_password'`,
+		"postgres")...)
 	t.Logf("create role output: %s", output)
 	require.NoError(t, err, "creating test user")
 
 	return dbDataDir
+}
+
+func makeCommandOpts(userOpt command.Opt, args ...string) []command.Opt {
+	if userOpt != nil {
+		return []command.Opt{userOpt, command.Args(args...)}
+	}
+	return []command.Opt{command.Args(args...)}
 }
 
 func PGPortAsStr() string {

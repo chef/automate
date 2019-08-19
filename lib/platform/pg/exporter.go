@@ -18,19 +18,39 @@ import (
 	"github.com/chef/automate/lib/platform/command"
 )
 
-// PGDumpCmd is the command we will run for pg_dump. This self-test
-// harness replaces this with a stub.
-var PGDumpCmd = []string{"hab", "pkg", "exec", "core/postgresql11-client", "pg_dump"}
+var (
+	// DefaultPGDumpCmd is the command we will run for
+	// pg_dump.This package-level var is provided so a
+	// stub-command can be injected by the tests.
+	DefaultPGDumpCmd = []string{"hab", "pkg", "exec", "core/postgresql11-client", "pg_dump"}
 
-// PGRestoreCmd is the command we will run for pg_restore.
-var PGRestoreCmd = []string{"hab", "pkg", "exec", "core/postgresql11-client", "pg_restore"}
+	// PGRestoreCmd is the command we will run for
+	// pg_restore. This package-level var is provided so a
+	// stub-command can be injected by the tests.
+	DefaultPGRestoreCmd = []string{"hab", "pkg", "exec", "core/postgresql11-client", "pg_restore"}
 
-// PSQLCmd is the command we will run for psql.
-var PSQLCmd = []string{"hab", "pkg", "exec", "core/postgresql11-client", "psql"}
+	// PSQLCmd is the command we will run for psql. This
+	// package-level var is provided so a stub-command can be
+	// injected by the tests.
+	DefaultPSQLCmd = []string{"hab", "pkg", "exec", "core/postgresql11-client", "psql"}
+)
 
-// TODO (jaym): fix the actual problem
-func clone(cmd []string) []string {
-	return append([]string(nil), cmd...)
+func PGDumpCmd() []string {
+	return copySlice(DefaultPGDumpCmd)
+}
+
+func PGRestoreCmd() []string {
+	return copySlice(DefaultPGRestoreCmd)
+}
+
+func PSQLCmd() []string {
+	return copySlice(DefaultPSQLCmd)
+}
+
+func copySlice(src []string) []string {
+	dst := make([]string, len(src))
+	copy(dst, src)
+	return dst
 }
 
 // DatabaseExporter knows how to export and import a database. See
@@ -81,7 +101,7 @@ func (db DatabaseExporter) Exists() (bool, error) {
 // See https://www.postgresql.org/docs/9.6/static/app-pgdump.html for
 // all of the details.
 func (db DatabaseExporter) Export() error {
-	cmd := append(PGDumpCmd,
+	cmd := append(PGDumpCmd(),
 		"--if-exists",
 		"--verbose",
 		"--clean")
@@ -112,7 +132,6 @@ func (db DatabaseExporter) Export() error {
 	}
 
 	cmd = append(cmd, db.ConnInfo.ConnURI(db.Name))
-
 	err := db.CmdExecutor.Run(
 		cmd[0],
 		append(db.ConnInfo.PsqlCmdOptions(),
@@ -184,14 +203,12 @@ func (db DatabaseExporter) Import(exitOnError bool) error {
 }
 
 func (db DatabaseExporter) restoreSQLFile(exitOnError bool) error {
-	psqlCmd := PSQLCmd
+	psqlCmd := PSQLCmd()
 
 	source := "stdin"
 	if db.Stdin == nil {
 		file := db.exportFilePath()
-		psqlCmd = append(
-			psqlCmd,
-			"-f", file)
+		psqlCmd = append(psqlCmd, "-f", file)
 		source = file
 	}
 
@@ -251,7 +268,7 @@ func (db DatabaseExporter) buildSQLTOC(pgBackupFile string, filters []string) (f
 	defer pgListFile.Close() // nolint: errcheck
 
 	stderrListBuff := new(strings.Builder)
-	pgListCmd := append(clone(PGRestoreCmd), filters...)
+	pgListCmd := append(PGRestoreCmd(), filters...)
 	pgListCmd = append(pgListCmd, "--list", pgBackupFile)
 
 	reader, writer := io.Pipe()
@@ -311,7 +328,7 @@ func (db DatabaseExporter) buildSQLTOC(pgBackupFile string, filters []string) (f
 func (db DatabaseExporter) restoreCustomFile(exitOnError bool) error {
 	filters := []string{"--no-owner", "--no-acl"}
 
-	pgRestoreCmd := append(clone(PGRestoreCmd), "-Fc", "-d", db.ConnInfo.ConnURI(db.Name))
+	pgRestoreCmd := append(PGRestoreCmd(), "-Fc", "-d", db.ConnInfo.ConnURI(db.Name))
 	if exitOnError {
 		pgRestoreCmd = append(pgRestoreCmd, "-e")
 	}
