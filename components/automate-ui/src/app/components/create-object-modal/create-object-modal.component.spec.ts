@@ -19,7 +19,8 @@ describe('CreateObjectModalComponent', () => {
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-toolbar' }),
         MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),
-        MockComponent({ selector: 'app-projects-dropdown', inputs: ['projects', 'disabled'] })
+        MockComponent({ selector: 'app-projects-dropdown',
+          inputs: ['projects', 'disabled'], outputs: ['onProjectChecked'] })
       ],
      imports: [
         ReactiveFormsModule

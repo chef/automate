@@ -1,76 +1,66 @@
 import {
-  Component, EventEmitter, OnInit, Input, Output
+  Component, EventEmitter, Input, Output, OnChanges
 } from '@angular/core';
 
-import { orderBy } from 'lodash/fp';
-
-import { Project, ProjectConstants } from 'app/entities/projects/project.model';
+import { ProjectConstants, Project } from 'app/entities/projects/project.model';
 
 const { UNASSIGNED_PROJECT_ID } = ProjectConstants;
+
+// Extend the project model with the checked field.
+// This represents whether the project's checkbox is unchecked or not
+// in this component's UI
+export interface ProjectChecked extends Project {
+  checked: boolean;
+}
+
+export interface ProjectCheckedMap {
+  [id: string]: ProjectChecked;
+}
 
 @Component({
   selector: 'app-projects-dropdown',
   templateUrl: './projects-dropdown.component.html',
   styleUrls: ['./projects-dropdown.component.scss']
 })
-export class ProjectsDropdownComponent implements OnInit {
-
-  // The array of projects that you pass into the component. This array gets updated when a user
-  // makes changes and is emitted to the parent component.
-  @Input() projects:  Array<Project> = [];
-
-  // Setting required to true means the dropdown will show an error if a user tries to close the
-  // dropdown but hasn't selected any projects.
-  @Input() required = false;
+export class ProjectsDropdownComponent implements OnChanges {
+  // The map of ProjectChecked by id. Any checked changes propagated via
+  // onProjectChecked. Updates should be applied to parent component state.
+  @Input() projects: ProjectCheckedMap = {};
 
   // Setting disabled to true means the dropdown will be unusable and will have a grey background
   @Input() disabled = false;
 
-  // Emits the array of projects to the parent component
-  @Output() onSelection = new EventEmitter<Array<Project>>();
+  // Emits a project that changed as a result of a check or uncheck.
+  @Output() onProjectChecked = new EventEmitter<ProjectChecked>();
 
   active = false;
-  showError = false;
   label = UNASSIGNED_PROJECT_ID;
 
-  // Map of projects currently selected
-  selectedProjects = {};
-
-  constructor() {
-    this.projects = this.sortProjectsByName(this.projects);
+  projectsArray(): ProjectChecked[] {
+    return Object.values(this.projects);
   }
 
-  ngOnInit() {}
+  ngOnChanges(): void {
+    this.updateLabel();
+  }
 
   toggleDropdown(event: MouseEvent): void {
     event.stopPropagation();
     if (this.disabled) { return; }
 
-    if (this.active) {
-      this.closeDropdown();
-    } else {
-      this.active = true;
-    }
+    this.active = !this.active;
+  }
+
+  projectChecked(checked: boolean, project: ProjectChecked): void {
+    project.checked = checked;
+    this.updateLabel();
+    this.onProjectChecked.emit(project);
   }
 
   closeDropdown(): void {
-    const isValidSelection = this.validateSelection(this.required);
-
-    if (!isValidSelection) {
-      this.showError = true;
-      return;
-    } else {
-      this.showError = false;
-    }
-
     if (this.active) {
-      this.onSelection.emit(Object.values(this.selectedProjects));
       this.active = false;
     }
-  }
-
-  updateProjects(checked: boolean, index: number): void {
-    this.updateSelectedProjects(this.projects[index], checked);
   }
 
   moveFocus(event: KeyboardEvent): void {
@@ -91,20 +81,11 @@ export class ProjectsDropdownComponent implements OnInit {
     }
   }
 
-  sortProjectsByName(projects: Array<Project>): Array<Project> {
-    return orderBy(['name'], ['asc'], projects);
-  }
-
-  private updateSelectedProjects(project: Project, enabled: boolean): void {
-    if (enabled) {
-      this.selectedProjects[project.id] = project;
-    } else {
-      delete this.selectedProjects[project.id];
-    }
-    const selectedLen = Object.keys(this.selectedProjects).length;
-    switch (selectedLen) {
+  private updateLabel(): void {
+    const checkedProjects = this.projectsArray().filter(p => p.checked);
+    switch (checkedProjects.length) {
       case 1: {
-        const onlyProject = <Project>Object.values(this.selectedProjects)[0];
+        const onlyProject = checkedProjects[0];
         this.label = onlyProject.name;
         break;
       }
@@ -113,13 +94,9 @@ export class ProjectsDropdownComponent implements OnInit {
         break;
       }
       default: {
-        this.label = `${selectedLen} projects`;
+        this.label = `${checkedProjects.length} projects`;
         break;
       }
     }
-  }
-
-  private validateSelection(isRequired): boolean {
-    return !isRequired || (isRequired && Object.keys(this.selectedProjects).length > 0);
   }
 }

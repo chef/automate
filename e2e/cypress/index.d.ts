@@ -6,6 +6,7 @@ declare namespace Cypress {
     logout(): Cypress.Chainable<Object>
     saveStorage(): void
     restoreStorage(): void
+    applyProjectsFilter(projectsToFilterOn: string[]): void
     generateAdminToken(idToken: string): void
     cleanupPoliciesByIDPrefix(idToken: string, idPrefix: string): void
     cleanupProjectsByIDPrefix(idToken: string, idPrefix: string): void

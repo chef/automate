@@ -1,3 +1,5 @@
+import { orderBy } from 'lodash/fp';
+
 import { IAMType } from '../policies/policy.model';
 import { ProjectStatus } from '../rules/rule.model';
 
@@ -6,6 +8,10 @@ export interface Project {
   name: string;
   type: IAMType;
   status: ProjectStatus;
+}
+
+export function sortProjectsByName(projects: Array<Project>): Array<Project> {
+  return orderBy(['name'], ['asc'], projects);
 }
 
 export class ProjectConstants {

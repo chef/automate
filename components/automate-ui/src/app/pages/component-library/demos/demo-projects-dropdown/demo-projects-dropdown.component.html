@@ -4,12 +4,12 @@
 
     <app-projects-dropdown
       [projects]="dropdownProjects"
-      (onSelection)="projectsDropdownAction($event)">
+      (onProjectChecked)="onProjectChecked($event)">
     </app-projects-dropdown>
     <app-projects-dropdown
       [disabled]="true"
       [projects]="dropdownProjects"
-      (onSelection)="projectsDropdownAction($event)">
+      (onProjectChecked)="onProjectChecked($event)">
     </app-projects-dropdown>
   </app-cl-section>
 
@@ -18,7 +18,7 @@
 
     <pre>&lt;app-projects-dropdown
   [projects]="arrayOfProjects"
-  (onSelection)="someFunction($event.detail)"&gt;
+  (onProjectChecked)="someFunction($event)"&gt;
 &lt;/app-projects-dropdown&gt;
 </pre>
   </app-cl-code-section>
@@ -38,30 +38,36 @@ import {{'{'}} Component {{'}'}} from '@angular/core';
 export class DemoProjectsDropdownComponent {{'{'}}
   dropdownProjects = [{{'{'}}
     'name': 'Project 1',
-    'id': 'project-1'
+    'id': 'project-1',
+    'checked': false
   {{'}'}}, {{'{'}}
     'name': 'Project 2',
-    'id': 'project-2'
+    'id': 'project-2',
+    'checked': false
   {{'}'}}, {{'{'}}
     'name': 'Project 3',
-    'id': 'project-3'
+    'id': 'project-3',
+    'checked': false
   {{'}'}}, {{'{'}}
     'name': 'Project 4',
-    'id': 'project-4'
+    'id': 'project-4',
+    'checked': false
   {{'}'}}, {{'{'}}
     'name': 'Project 5',
-    'id': 'project-5'
+    'id': 'project-5',
+    'checked': false
   {{'}'}}, {{'{'}}
     'name':
     `Project 6 Has A Really Ridiculously Long Name and It should Stay on the same line
     Stay on the same line`,
-    'id': 'project-6'
+    'id': 'project-6',
+    'checked': false
 {{'}'}}];
 
 
-  projectsDropdownAction(projects) {{'{'}}
-    console.log('projects:');
-    console.log(projects);
+  onProjectChecked(project) {{'{'}}
+    console.log('this project was checked or unchecked:');
+    console.log(project);
   {{'}'}}
 {{'}'}}
       </pre>
@@ -72,20 +78,18 @@ export class DemoProjectsDropdownComponent {{'{'}}
     <h3>API</h3>
 
     <app-cl-api>
-      <api-prop name="projects" type="Array" required>
-        Array of projects to be passed to the dropdown
+      <api-prop name="projects" type="ProjectCheckedMap" required>
+        The map of ProjectChecked by id. Any checked changes propagated via
+        onProjectChecked. Updates should be applied to parent component state.
       </api-prop>
 
-      <api-prop name="onSelection" type="Function(Array): void" required>
-        Emits the array of projects that has been selected
+      <api-prop name="onProjectChecked" type="Function(ProjectChecked): void" required>
+        Emits an updated project that has been checked or unchecked. Keep projects input
+        up to date in parent.
       </api-prop>
 
       <api-prop name="disabled" type="Boolean" default="false">
         Specify whether the dropdown should be disabled.
-      </api-prop>
-
-      <api-prop name="required" type="Boolean" default="false">
-        Specify whether the dropdown is a required element to fill out.
       </api-prop>
     </app-cl-api>
   </app-cl-section>
