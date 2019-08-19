@@ -252,7 +252,7 @@ func (db DatabaseExporter) buildSQLTOC(pgBackupFile string, filters []string) (f
 
 	stderrListBuff := new(strings.Builder)
 	pgListCmd := append(clone(PGRestoreCmd), filters...)
-	pgListCmd = append(pgListCmd, "--list", "--file", pgListFile.Name(), pgBackupFile)
+	pgListCmd = append(pgListCmd, "--list", pgBackupFile)
 
 	reader, writer := io.Pipe()
 	ctx, cancel := context.WithCancel(context.TODO())
