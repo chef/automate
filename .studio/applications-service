@@ -5,7 +5,6 @@ document "start_applications_service" <<DOC
   Build and start the local applications-service
 DOC
 function start_applications_service() {
-  build components/applications-service
   start_deployment_service
   chef-automate dev deploy-some --with-deps "$(app_service_origin)/applications-service"
 }
