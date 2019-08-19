@@ -270,6 +270,7 @@ func (db DatabaseExporter) buildSQLTOC(pgBackupFile string, filters []string) (f
 
 	errChan := make(chan error)
 	go func() {
+		logrus.Debug("Rewriting SQL dump TOC")
 		defer close(errChan)
 		scanner := bufio.NewScanner(reader)
 		for scanner.Scan() {
