@@ -162,7 +162,7 @@ func main() {
 	if internalNats {
 		client = nats.New(
 			fmt.Sprintf("nats://0.0.0.0:%s", port),
-			"event-service", clientID, "", "habitat",
+			"event-service", clientID, "",
 			certs.TLSConfig{
 				CertPath:       "/hab/svc/applications-service/config/service.crt",
 				KeyPath:        "/hab/svc/applications-service/config/service.key",
