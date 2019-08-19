@@ -2,23 +2,24 @@ import { Component, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Observable, Subject } from 'rxjs';
-import { map, takeUntil, filter } from 'rxjs/operators';
+import { interval as observableInterval,  Observable, Subject } from 'rxjs';
+import { map, takeUntil, filter, withLatestFrom, takeWhile } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
+import { HttpStatus } from 'app/types/types';
 import { loading, EntityStatus } from 'app/entities/entities';
-import { ProjectService } from 'app/entities/projects/project.service';
 import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
 import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
+import { ProjectService } from 'app/entities/projects/project.service';
 import {
   allProjects, getAllStatus, createStatus, createError
 } from 'app/entities/projects/project.selectors';
 import { GetProjects, CreateProject, DeleteProject  } from 'app/entities/projects/project.actions';
 import { Project } from 'app/entities/projects/project.model';
 import { ApplyRulesStatus, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
-import { HttpStatus } from 'app/types/types';
+import { ProjectStatus } from 'app/entities/rules/rule.model';
 
 @Component({
   selector: 'app-project-list',
@@ -26,6 +27,7 @@ import { HttpStatus } from 'app/types/types';
   styleUrls: ['./project-list.component.scss']
 })
 export class ProjectListComponent implements OnInit, OnDestroy {
+  public MAX_PROJECTS = 6;
   public loading$: Observable<boolean>;
   public iamMajorVersion$: Observable<IAMMajorVersion>;
   public iamMinorVersion$: Observable<IAMMinorVersion>;
@@ -36,9 +38,18 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   public createProjectForm: FormGroup;
   public creatingProject = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
-  public MAX_PROJECTS = 6;
   public confirmApplyStartModalVisible = false;
   public confirmApplyStopModalVisible = false;
+
+  // During an update the Project Update Status needs to show "updating..."
+  // for any project whose status is "edits pending" at the moment the update starts.
+  // Very shortly after the update starts, though, the project's live status changes
+  // from "edits pending" to "applied" so we have lost that initial status.
+  // This statusCache, then, remembers those initial status values during the update.
+  private statusCache: {  [id: string]: ProjectStatus; } = {};
+
+  // Governs filling the above cache
+  private applyRulesInProgress = false;
 
   public applyRulesButtonText$: Observable<string>;
   public ApplyRulesStatusState = ApplyRulesStatusState;
@@ -74,6 +85,23 @@ export class ProjectListComponent implements OnInit, OnDestroy {
         }
       })
     );
+
+    this.projects.applyRulesStatus$
+      .subscribe(({ state }: ApplyRulesStatus) => {
+        if (state === ApplyRulesStatusState.NotRunning) {
+          this.applyRulesInProgress = false;
+        }
+      });
+
+    store.select(allProjects).pipe(
+      takeUntil(this.isDestroyed),
+      // do not update this cache while an update is in progress
+      filter(() => !this.applyRulesInProgress)
+    )
+      .subscribe((projectList: Project[]) => {
+        this.statusCache = {};
+        projectList.forEach(p => this.statusCache[p.id] = p.status);
+      });
 
     this.createProjectForm = fb.group({
       // Must stay in sync with error checks in create-object-modal.component.html
@@ -179,6 +207,19 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   confirmApplyStart() {
     this.confirmApplyStartModalVisible = false;
     this.projects.applyRulesStart();
+    this.applyRulesInProgress = true;
+    let start = true;
+    // < 150 is too fast to notice update has started
+    // > 300 is too slow to notice before update has finished
+    observableInterval(250).pipe(
+      withLatestFrom(this.projects.applyRulesStatus$),
+      map(([_, { state }]) => state),
+      takeWhile(state =>
+        start || (state === ApplyRulesStatusState.Running)))
+      .subscribe(() => {
+        this.projects.getApplyRulesStatus();
+        start = false;
+      });
   }
 
   cancelApplyStart() {
@@ -209,5 +250,17 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       case 'RULES_APPLIED': return 'Applied';
       default: return '';
     }
+  }
+
+  getProjectStatus(project: Project): string {
+    const cachedStatus = this.statusCache[project.id];
+    let result: string;
+    if (this.applyRulesInProgress) {
+      result = cachedStatus === 'EDITS_PENDING' ? 'Updating...' : 'OK';
+    } else {
+      result = project.status === 'EDITS_PENDING' ? 'Needs updating' : 'OK';
+    }
+    // console.log(`status[${project.id}] => ${result}`);
+    return result;
   }
 }

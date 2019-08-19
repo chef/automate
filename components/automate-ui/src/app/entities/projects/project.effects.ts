@@ -14,6 +14,7 @@ import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.s
 import { ProjectRequests } from './project.requests';
 
 import {
+  GetProjects,
   GetProjectsSuccess,
   GetProjectsSuccessPayload,
   GetProjectsFailure,
@@ -172,6 +173,7 @@ export class ProjectEffects {
       this.requests.applyRulesStart().pipe(
         switchMap(() => [
           new ApplyRulesStartSuccess(),
+          new GetProjects(),
           new GetApplyRulesStatus()
         ]),
         catchError((error: HttpErrorResponse) =>
@@ -202,7 +204,7 @@ export class ProjectEffects {
     withLatestFrom(this.store.select(iamMajorVersion).pipe(filter(identity))),
     withLatestFrom(this.store.select(iamMinorVersion).pipe(filter(identity))),
     filter(([[_, major], minor]) => {
-      return major === 'v2' && minor === 'v1';
+      return major === 'v2' && minor === 'v1' && major < minor;
     }),
     switchMap(() =>
       this.requests.getApplyRulesStatus().pipe(
