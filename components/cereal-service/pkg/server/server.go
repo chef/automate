@@ -521,7 +521,7 @@ func (s *CerealService) ListWorkflowSchedules(req *cereal.ListWorkflowSchedulesR
 		return err
 	}
 
-	logctx.Info("listing workflows")
+	logctx.Debug("listing workflows")
 	schedules, err := s.backend.ListWorkflowSchedules(out.Context())
 	if err != nil {
 		logctx.WithError(err).Error("failed to list workflow schedules")
@@ -565,7 +565,7 @@ func (s *CerealService) GetWorkflowScheduleByName(ctx context.Context, req *cere
 	if err := validateDomain(req.Domain); err != nil {
 		return nil, err
 	}
-	logctx.Info("getting workflow schedule")
+	logctx.Debug("getting workflow schedule")
 	schedule, err := s.backend.GetWorkflowScheduleByName(ctx, req.InstanceName, namespace(req.Domain, req.WorkflowName))
 	if err != nil {
 		logctx.WithError(err).Error("failed to get workflow schedule")
@@ -685,7 +685,7 @@ func (s *CerealService) GetWorkflowInstanceByName(ctx context.Context, req *cere
 	if err := validateDomain(req.Domain); err != nil {
 		return nil, err
 	}
-	logctx.Info("getting workflow instance")
+	logctx.Debug("getting workflow instance")
 	workflowInstance, err := s.backend.GetWorkflowInstanceByName(ctx, req.GetInstanceName(), namespace(req.GetDomain(), req.GetWorkflowName()))
 	if err != nil {
 		logctx.WithError(err).Error("failed to get workflow instance")
@@ -732,14 +732,14 @@ func (s *CerealService) ListWorkflowInstances(req *cereal.ListWorkflowInstancesR
 		logctx = logctx.WithField("isRunning", isRunning)
 	}
 
-	logctx.Info("listing workflow instances")
+	logctx.Debug("listing workflow instances")
 	instances, err := s.backend.ListWorkflowInstances(resp.Context(), opts)
 	if err != nil {
 		logctx.WithError(err).Error("failed to list workflow instances")
 		return err
 	}
 
-	logctx.Infof("found %d matching instances", len(instances))
+	logctx.Debugf("found %d matching instances", len(instances))
 	for _, instance := range instances {
 		domain, workflowName := unnamespace(instance.WorkflowName)
 		if domain != req.Domain {
