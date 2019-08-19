@@ -19,7 +19,7 @@ import (
 
 	pgs "github.com/chef/automate/api/interservice/pg_sidecar"
 	"github.com/chef/automate/components/pg-sidecar-service/pkg/client"
-	"github.com/chef/automate/lib/platform"
+	platform_config "github.com/chef/automate/lib/platform/config"
 )
 
 var ErrUserRequired = errors.New("user not specified")
@@ -95,9 +95,9 @@ func main() {
 				log.WithError(err).Error("Failed to merge configuration from from")
 			}
 		} else {
-			config, err := platform.ConfigFromEnvironment()
+			config, err := platform_config.ConfigFromEnvironment()
 			if err != nil {
-				if err == platform.ErrNoPlatformEnvironment {
+				if err == platform_config.ErrNoPlatformEnvironment {
 					return
 				}
 				logrus.WithError(err).Fatal("Failed to load platform configuration")

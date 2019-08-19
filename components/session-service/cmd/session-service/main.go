@@ -13,7 +13,7 @@ import (
 	"github.com/chef/automate/components/session-service/oidc"
 	"github.com/chef/automate/components/session-service/server"
 	"github.com/chef/automate/lib/logger"
-	"github.com/chef/automate/lib/platform"
+	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/tls/certs"
 	"github.com/chef/automate/lib/tracing"
 )
@@ -104,7 +104,7 @@ func serve(_ *cobra.Command, args []string) {
 	mustBeADirectory(cfg.MigrationsPath)
 	var urlStr string
 	if cfg.PostgresURL == "" {
-		urlStr, err = platform.PGURIFromEnvironment(cfg.Database)
+		urlStr, err = platform_config.PGURIFromEnvironment(cfg.Database)
 		if err != nil {
 			fail(errors.WithMessage(err, "Failed to get pg uri"))
 		}

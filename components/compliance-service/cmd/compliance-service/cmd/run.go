@@ -2,15 +2,14 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-	"os"
-
 	compliance "github.com/chef/automate/components/compliance-service"
 	"github.com/chef/automate/components/compliance-service/config"
-	"github.com/chef/automate/lib/platform"
+	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/tracing"
 )
 
@@ -69,7 +68,7 @@ var runCmd = &cobra.Command{
 		}
 
 		if conf.Postgres.Database != "" {
-			conf.Postgres.ConnectionString, err = platform.PGURIFromEnvironment(conf.Postgres.Database)
+			conf.Postgres.ConnectionString, err = platform_config.PGURIFromEnvironment(conf.Postgres.Database)
 			if err != nil {
 				logrus.WithError(err).Fatal("Failed to get pg uri from platform config")
 			}

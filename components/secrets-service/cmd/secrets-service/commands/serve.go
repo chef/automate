@@ -8,7 +8,7 @@ import (
 	"github.com/chef/automate/components/secrets-service/config"
 	"github.com/chef/automate/components/secrets-service/grpc"
 	"github.com/chef/automate/lib/grpc/secureconn"
-	"github.com/chef/automate/lib/platform"
+	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/tls/certs"
 )
 
@@ -53,7 +53,7 @@ func configFromViper() (*config.Secrets, error) {
 
 	if cfg.Postgres.ConnectionString == "" {
 		var err error
-		cfg.Postgres.ConnectionString, err = platform.PGURIFromEnvironment(cfg.Database)
+		cfg.Postgres.ConnectionString, err = platform_config.PGURIFromEnvironment(cfg.Database)
 		if err != nil {
 			log.WithError(err).Error("Failed to get pg uri")
 			return nil, err

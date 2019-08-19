@@ -53,7 +53,7 @@ import (
 	usermgmt_client "github.com/chef/automate/components/automate-deployment/pkg/usermgmt/client"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/io/chunks"
-	"github.com/chef/automate/lib/platform"
+	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/secrets"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/tls/certs"
@@ -2018,7 +2018,7 @@ func (s *server) acquireLock(ctx context.Context) error {
 
 func (s *server) reloadBackupRunner() error {
 	// platformConfig knows how to deal with superuser, and external vs internal PG
-	platformConfig := platform.Config{
+	platformConfig := platform_config.Config{
 		Config: &papi.Config{
 			Service: &papi.Config_Service{
 				// NOTE (jaym): The below hack is to allow deployment-service to find the

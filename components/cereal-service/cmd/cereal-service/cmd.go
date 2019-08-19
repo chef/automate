@@ -8,24 +8,19 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/chef/automate/lib/grpc/health"
-
-	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/pkg/errors"
-
-	"github.com/chef/automate/lib/platform"
-
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-
 	"github.com/spf13/viper"
+	"google.golang.org/grpc"
 
 	grpccereal "github.com/chef/automate/api/interservice/cereal"
 	"github.com/chef/automate/components/cereal-service/pkg/server"
 	"github.com/chef/automate/lib/cereal/postgres"
+	"github.com/chef/automate/lib/grpc/health"
+	"github.com/chef/automate/lib/grpc/secureconn"
+	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/tls/certs"
-
-	"google.golang.org/grpc"
 )
 
 const megabyte = 1 << 20
@@ -86,7 +81,7 @@ func initConfig() error {
 
 	if C.Database.URL == "" {
 		var err error
-		C.Database.URL, err = platform.PGURIFromEnvironment("chef_cereal_service")
+		C.Database.URL, err = platform_config.PGURIFromEnvironment("chef_cereal_service")
 		if err != nil {
 			return err
 		}
@@ -94,7 +89,7 @@ func initConfig() error {
 
 	if !C.Service.DisableTLS {
 		if C.TLS.CertPath == "" {
-			platformCfg, err := platform.ConfigFromEnvironment()
+			platformCfg, err := platform_config.ConfigFromEnvironment()
 			if err != nil {
 				return err
 			}

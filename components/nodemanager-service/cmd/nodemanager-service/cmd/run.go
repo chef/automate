@@ -8,7 +8,7 @@ import (
 
 	nodemanager "github.com/chef/automate/components/nodemanager-service"
 	"github.com/chef/automate/components/nodemanager-service/config"
-	"github.com/chef/automate/lib/platform"
+	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/tracing"
 )
 
@@ -54,7 +54,7 @@ var runCmd = &cobra.Command{
 			defer tracing.CloseQuietly(closer)
 		}
 		if conf.Postgres.Database != "" {
-			conf.Postgres.ConnectionString, err = platform.PGURIFromEnvironment(conf.Postgres.Database)
+			conf.Postgres.ConnectionString, err = platform_config.PGURIFromEnvironment(conf.Postgres.Database)
 			if err != nil {
 				logrus.WithError(err).Fatal("Failed to get pg uri")
 			}

@@ -19,7 +19,7 @@ import (
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/io/fileutils"
-	"github.com/chef/automate/lib/platform"
+	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/tracing"
 	"github.com/chef/automate/lib/version"
 )
@@ -32,7 +32,7 @@ func StartGRPC(ctx context.Context, cfg *Config) error {
 		return errors.Wrap(err, "failed to load SSL key/cert files")
 	}
 
-	platformConfig, err := platform.ConfigFromEnvironment()
+	platformConfig, err := platform_config.ConfigFromEnvironment()
 	if err != nil {
 		return errors.Wrap(err, "failed to load platform config")
 	}
@@ -88,7 +88,7 @@ func WithPGSidecarServerConfig(cfg *Config) PGSidecarServerOpt {
 }
 
 // WithPGSidecarServerPlatformConfig sets the platform config used by the server
-func WithPGSidecarServerPlatformConfig(platformConfig *platform.Config) PGSidecarServerOpt {
+func WithPGSidecarServerPlatformConfig(platformConfig *platform_config.Config) PGSidecarServerOpt {
 	return func(svr *PGSidecarServer) {
 		svr.platformConfig = platformConfig
 	}
@@ -113,7 +113,7 @@ type PGSidecarServer struct {
 	cfg            *Config
 	health         *health.Service
 	spr            *pgw.SerialProcedureRunner
-	platformConfig *platform.Config
+	platformConfig *platform_config.Config
 }
 
 // SetPublicSchemaRole applies a role to public and sqitch schemas

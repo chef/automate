@@ -25,7 +25,7 @@ import (
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/postgres"
-	"github.com/chef/automate/lib/platform"
+	platform_config "github.com/chef/automate/lib/platform/config"
 )
 
 // Spawn starts a gRPC Server listening on the provided host and port,
@@ -213,7 +213,7 @@ func Spawn(opts *serveropts.Opts) error {
 func pgURL(pgURL string, pgDBName string) (string, error) {
 	if pgURL == "" {
 		var err error
-		pgURL, err = platform.PGURIFromEnvironment(pgDBName)
+		pgURL, err = platform_config.PGURIFromEnvironment(pgDBName)
 		if err != nil {
 			return "", errors.Wrap(err, "Failed to get pg uri")
 		}
