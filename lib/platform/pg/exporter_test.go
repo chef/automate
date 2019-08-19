@@ -336,26 +336,4 @@ func TestImport(t *testing.T) {
 		require.Error(t, err)
 	})
 
-	t.Run("it uses pg_restore and the custom file format on when UseCustomFormat is set", func(t *testing.T) {
-		exporter, mockExec, mockDB, cleanup := setup(t)
-		defer cleanup()
-		exportFile := path.Join(exporter.DataDir, "test_database.fc")
-		ioutil.WriteFile(exportFile, testExportContent, 0700)
-
-		mockExec.Expect("Run", command.ExpectedCommand{
-			Cmd: "hab",
-			Args: []string{"pkg", "exec", "core/postgresql11-client", "pg_restore", "-Fc", "-d",
-				connURI("test_database"), "-e", "--no-owner", "--no-acl", exportFile,
-			},
-			Env: testExpectedEnv,
-		}).Return(nil)
-
-		mockDB.On("DropDatabase", "test_database").Return(nil)
-		mockDB.On("CreateDatabase", "test_database").Return(nil)
-
-		exporter.UseCustomFormat = true
-
-		err := exporter.Import(true)
-		require.NoError(t, err)
-	})
 }

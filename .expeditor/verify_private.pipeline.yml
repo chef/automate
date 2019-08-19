@@ -575,7 +575,14 @@ steps:
       executor:
         linux:
           privileged: true
-
+  - label: "airgap ow upgrade"
+    command:
+      - integration/run_test integration/tests/airgap_ow_upgrade.sh
+    timeout_in_minutes: 30
+    expeditor:
+      executor:
+        linux:
+          privileged: true
   - label: "airgap backup"
     command:
       - integration/run_test integration/tests/airgap_backup.sh
