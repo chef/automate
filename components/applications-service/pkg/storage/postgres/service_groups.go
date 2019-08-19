@@ -248,9 +248,9 @@ func formatFilters(filters map[string][]string) (string, string, string, bool, e
 		case "origin", "ORIGIN":
 			selectQuery, err := queryFromFieldFilter("s.origin", values, first)
 			whereQuery = whereQuery + selectQuery
-			q, err := queryFromFieldFilter("s_for_releases.origin", values, false)
+			q, err1 := queryFromFieldFilter("s_for_releases.origin", values, false)
 			packageWhereQuery = packageWhereQuery + q
-			if err != nil {
+			if err != nil || err1 != nil {
 				return "", "", "", false, err
 			}
 		case "service", "SERVICE":
@@ -274,9 +274,9 @@ func formatFilters(filters map[string][]string) (string, string, string, bool, e
 		case "version", "VERSION":
 			selectQuery, err := queryFromFieldFilter("s.version", values, first)
 			whereQuery = whereQuery + selectQuery
-			q, err := queryFromFieldFilter("s_for_releases.version", values, false)
+			q, err1 := queryFromFieldFilter("s_for_releases.version", values, false)
 			packageWhereQuery = packageWhereQuery + q
-			if err != nil {
+			if err != nil || err1 != nil {
 				return "", "", "", false, err
 			}
 		case "buildstamp", "BUILDSTAMP":
