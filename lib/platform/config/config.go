@@ -10,7 +10,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/api/config/platform"
-	"github.com/chef/automate/lib/platform/command"
 )
 
 const (
@@ -151,17 +150,12 @@ func (c *Config) GetPGConnInfoForSuperuserWithRole(role string) (*PGConnInfo, er
 }
 
 type PGConnInfo struct {
-	environment []command.Opt
-	fmtStr      string
-	debugStr    string
+	fmtStr   string
+	debugStr string
 }
 
 func (c *PGConnInfo) ConnURI(dbname string) string {
 	return fmt.Sprintf(c.fmtStr, dbname)
-}
-
-func (c *PGConnInfo) PsqlCmdOptions() []command.Opt {
-	return c.environment
 }
 
 func (c *PGConnInfo) String() string {
@@ -234,9 +228,6 @@ func (c *Config) GetPGConnInfoURI(user string, opts ...ConnInfoOpts) (*PGConnInf
 				return &PGConnInfo{
 					debugStr: debugStr,
 					fmtStr:   fmtStr,
-					environment: []command.Opt{
-						command.Envvar("PGTZ", "UTC"),
-					},
 				}, nil
 			default:
 				return nil, errors.Errorf("Unsupported postgres auth mode %s", auth.GetScheme().GetValue())
@@ -258,19 +249,9 @@ func (c *Config) GetPGConnInfoURI(user string, opts ...ConnInfoOpts) (*PGConnInf
 		fmtStr := fmt.Sprintf("postgresql://%s@%s:%d/%%s?sslmode=verify-ca&sslcert=%s&sslkey=%s&sslrootcert=%s",
 			config.role, c.GetPostgresql().GetIp(), c.GetPostgresql().GetCfg().GetPort(), certPath, keyPath, rootCertPath)
 
-		// We need this for sqitch
-		environment := []command.Opt{
-			command.Envvar("PGSSLKEY", keyPath),
-			command.Envvar("PGSSLCERT", certPath),
-			command.Envvar("PGSSLROOTCERT", rootCertPath),
-			command.Envvar("PGSSLMODE", "verify-ca"),
-			command.Envvar("PGTZ", "UTC"),
-		}
-
 		return &PGConnInfo{
-			debugStr:    fmt.Sprintf(fmtStr, "<database>"),
-			fmtStr:      fmtStr,
-			environment: environment}, nil
+			debugStr: fmt.Sprintf(fmtStr, "<database>"),
+			fmtStr:   fmtStr}, nil
 
 	}
 }

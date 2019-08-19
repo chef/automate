@@ -12,8 +12,8 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/lib/io/fileutils"
-	"github.com/chef/automate/lib/platform"
 	"github.com/chef/automate/lib/platform/command"
+	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/platform/pg"
 )
 
@@ -21,7 +21,7 @@ import (
 type Client struct {
 	pg.DB
 	info           pg.ConnInfoURI
-	platformConfig *platform.Config
+	platformConfig *platform_config.Config
 	dbDatabase     string
 	superuser      string
 }
@@ -82,7 +82,7 @@ func WithDb(db string) ClientOpt {
 }
 
 // WithPlatformConfig sets the platform config to use
-func WithPlatformConfig(platformConfig *platform.Config) ClientOpt {
+func WithPlatformConfig(platformConfig *platform_config.Config) ClientOpt {
 	return func(client *Client) {
 		client.platformConfig = platformConfig
 	}
@@ -599,8 +599,7 @@ func (client *Client) DeploySqitch(db, dir, user string) error {
 		sqitchPGURI,
 	)
 
-	environment := connInfo.PsqlCmdOptions()
-
+	environment := pg.PsqlCmdOptionsFromPlatformConfig(client.platfromConfig)
 	cmdArgs := []command.Opt{
 		sqitchArgs,
 		command.Envvar("TZ", "UTC"),

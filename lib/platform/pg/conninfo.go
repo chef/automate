@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/lib/platform/command"
+	platform_config "github.com/chef/automate/lib/platform/config"
 )
 
 type ConnInfoURI interface {
@@ -49,10 +50,41 @@ func TLSCertPathsFromDir(dir string) TLSCertPaths {
 	}
 }
 
-var A2SuperuserCerts = TLSCertPaths{
-	Cert:     "/hab/svc/automate-postgresql/config/server.crt",
-	Key:      "/hab/svc/automate-postgresql/config/server.key",
-	RootCert: "/hab/svc/automate-postgresql/config/root.crt",
+var (
+	A2SuperuserCerts = TLSCertPaths{
+		Cert:     "/hab/svc/automate-postgresql/config/server.crt",
+		Key:      "/hab/svc/automate-postgresql/config/server.key",
+		RootCert: "/hab/svc/automate-postgresql/config/root.crt",
+	}
+
+	defaultPGSuperuserName = "automate"
+)
+
+// NOTE(ssd) 2019-08-19: This is a bit of duplication with code in
+// platform/config to ensure that you can depend on the platform
+// config without pulling in the command class.
+func PsqlCmdOptionsFromPlatformConfig(c platform_config.Config) []command.Opt {
+	if c.IsExternalPG() {
+		return []command.Opt{
+			command.Envvar("PGTZ", "UTC"),
+		}
+	}
+
+	keyPath := c.GetService().GetTls().GetKeyPath()
+	certPath := c.GetService().GetTls().GetCertPath()
+	rootCertPath := c.GetService().GetTls().GetRootCaPath()
+	if user == defaultPGSuperuserName {
+		keyPath = A2SuperuserCerts.Key
+		certPath = A2SuperuserCerts.Cert
+		rootCertPath = A2SuperuserCerts.RootCert
+	}
+	return []command.Opt{
+		command.Envvar("PGSSLKEY", keyPath),
+		command.Envvar("PGSSLCERT", certPath),
+		command.Envvar("PGSSLROOTCERT", rootCertPath),
+		command.Envvar("PGSSLMODE", "verify-ca"),
+		command.Envvar("PGTZ", "UTC"),
+	}
 }
 
 // A2ConnInfo represents the connection information for an Automate 2
