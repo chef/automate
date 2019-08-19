@@ -279,6 +279,7 @@ func (db DatabaseExporter) buildSQLTOC(pgBackupFile string, filters []string) (f
 				if err != nil {
 					errChan <- err
 				}
+				logrus.Debugf("Preserving TOC Entry: %s", txt) // REMOVE ME
 			} else {
 				logrus.Infof("Removing suspected incompatible line from SQL dump TOC: %s", txt)
 			}
