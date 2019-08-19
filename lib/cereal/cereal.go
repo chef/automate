@@ -871,7 +871,7 @@ func (m *Manager) WakeupTaskPollerByTaskName(taskName string) {
 	}
 }
 
-func (m *Manager) WakeupTaskPollersByRequests(taskRequests []enqueueTaskRequest) {
+func (m *Manager) wakeupTaskPollersByRequests(taskRequests []enqueueTaskRequest) {
 	uniqueTaskNames := []string{}
 	markMap := make(map[string]struct{})
 	for _, tr := range taskRequests {
@@ -1043,7 +1043,7 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 			if err != nil {
 				logrus.WithError(err).Error("failed to continue workflow")
 			}
-			m.WakeupTaskPollersByRequests(decision.tasks)
+			m.wakeupTaskPollersByRequests(decision.tasks)
 		}
 		s.End("continue")
 	}
