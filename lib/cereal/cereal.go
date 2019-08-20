@@ -30,6 +30,11 @@ var (
 	ErrTaskLost                 = errors.New("task lost before reporting its status")
 )
 
+const (
+	defaultTaskPollInterval     = 2 * time.Second
+	defaultWorkflowPollInterval = 2 * time.Second
+)
+
 // Schedule represents a recurring workflow.
 // TODO(jaym): we should wrap this in the workflow package and provide a getter
 // for the parameters
@@ -424,21 +429,20 @@ func (w waywardWorkflowList) Filter(workflowNames []string) []string {
 	return out
 }
 
-const defaultTaskPollInterval = 2 * time.Second
-
 // Manager is responsible for for calling WorkflowExecutors and
 // TaskExecutors when they need to be processed, along with managing
 // the scheduling of workflows.
 type Manager struct {
 	workflowExecutors map[string]WorkflowExecutor
-	taskExecutors     map[string]registeredExecutor
+	taskExecutors     map[string]*registeredExecutor
 	waywardWorkflows  waywardWorkflowList
 	workflowScheduler *WorkflowScheduler
 	backend           backend.Driver
 	cancel            context.CancelFunc
 	wg                sync.WaitGroup
 
-	taskPollInterval time.Duration
+	workflowWakeupChan chan struct{}
+	taskPollInterval   time.Duration
 }
 
 // ManagerOpt is an option that can be passed to NewManager.
@@ -459,17 +463,19 @@ func NewManager(b backend.Driver, opts ...ManagerOpt) (*Manager, error) {
 		return nil, err
 	}
 
-	var workflowScheduler *WorkflowScheduler
-	if v, ok := b.(backend.SchedulerDriver); ok {
-		workflowScheduler = NewWorkflowScheduler(v)
-	}
+	workflowWakeupChan := make(chan struct{}, 5) // 5 is arbitrary
 	m := &Manager{
 		backend:           b,
 		waywardWorkflows:  make(waywardWorkflowList),
 		workflowExecutors: make(map[string]WorkflowExecutor),
-		taskExecutors:     make(map[string]registeredExecutor),
-		workflowScheduler: workflowScheduler,
-		taskPollInterval:  defaultTaskPollInterval,
+		taskExecutors:     make(map[string]*registeredExecutor),
+
+		taskPollInterval:   defaultTaskPollInterval,
+		workflowWakeupChan: workflowWakeupChan,
+	}
+
+	if v, ok := b.(backend.SchedulerDriver); ok {
+		m.workflowScheduler = NewWorkflowScheduler(v, m.WakeupWorkflowExecutor)
 	}
 
 	for _, o := range opts {
@@ -497,19 +503,195 @@ type TaskExecutorOpts struct {
 	Workers int
 }
 
+// registeredExecutor is responsible for polling for and executing
+// tasks using the given task executor.
+//
+// Tasks are polled for based on
+//
+// - a time-based interval, and
+// - in-process notifications that are sent when we think there
+// might be a task available.
+//
+// When either of these tiggers occur, we spawn a new goroutine (the
+// "task worker") provided that we are under the maximum configured
+// workers for this task executor.
+//
+// The task worker will repeatedly dequeue tasks until none are
+// available. To ensure our queue grows in response to load, if a task
+// is found in the queue, another task worker will be spawned.
+//
 type registeredExecutor struct {
+	name     string
 	executor TaskExecutor
 	opts     TaskExecutorOpts
+
+	wakeupChan chan struct{}
+
+	maxWorkers    int
+	activeWorkers int
+	sync.Mutex    // guards activeWorkers
+
+	wg sync.WaitGroup
+}
+
+// DecActiveWorkers decrements the worker count, clamping it at zero.
+func (r *registeredExecutor) DecActiveWorkers() {
+	r.Lock()
+	defer r.Unlock()
+
+	if r.activeWorkers > 0 {
+		r.activeWorkers--
+	}
+}
+
+// IncActiveWorkers increments the active worker count if another
+// worker is allowed. It returns true if the count was incremented and
+// false otherwise. The caller should not start a worker if false is
+// returned.
+func (r *registeredExecutor) IncActiveWorkers() bool {
+	r.Lock()
+	defer r.Unlock()
+
+	if r.activeWorkers < r.maxWorkers {
+		r.activeWorkers++
+		return true
+	}
+
+	return false
+}
+
+// WakeupPoller will wake up the poller for this
+// registeredExecutor. This is called when a workflow executor
+// enqueues tasks.
+func (r *registeredExecutor) WakeupPoller() {
+	select {
+	case r.wakeupChan <- struct{}{}:
+	default:
+	}
+}
+
+// StartPoller runs until the given context is cancelled, starting a
+// TaskWorker every interval (or sooner if we've been notified of a
+// change).
+func (r *registeredExecutor) StartPoller(ctx context.Context, b backend.Driver, taskPollInterval time.Duration, workflowWakeupFun func()) {
+	logctx := logrus.WithField("task_name", r.name)
+	logctx.Infof("Starting task poller")
+	timer := time.NewTimer(taskPollInterval)
+	for {
+		select {
+		case <-ctx.Done():
+			logctx.WithField("active_workers", r.activeWorkers).Info("Waiting for all task workers to exit")
+			r.wg.Wait()
+			logctx.Info("Exiting task poller")
+			return
+		case <-timer.C:
+			break
+		case <-r.wakeupChan:
+			if !timer.Stop() {
+				<-timer.C
+			}
+			break
+		}
+		r.startTaskWorker(ctx, b, workflowWakeupFun)
+		timer.Reset(taskPollInterval)
+	}
+}
+
+// startTaskWorker starts a goroutine that will dequeue new tasks and
+// execute them, exiting when no tasks are available in the queue. If
+// the task poller initially finds a job, it will also start the next
+// task worker.
+func (r *registeredExecutor) startTaskWorker(ctx context.Context, b backend.Driver, workflowWakeupFun func()) {
+	logctx := logrus.WithField("task_name", r.name)
+	if !r.IncActiveWorkers() {
+		logctx.WithFields(logrus.Fields{
+			"max_workers":    r.maxWorkers,
+			"active_workers": r.activeWorkers,
+		}).Warn("Maximum task workers already started")
+		return
+	}
+
+	r.wg.Add(1)
+	go func() {
+		logctx.Debug("Working starting")
+		startedNext := false
+		for {
+			t, taskCompleter, err := b.DequeueTask(ctx, r.name)
+			if err != nil {
+				if err != ErrNoTasks {
+					logctx.WithError(err).Error("Failed to dequeue task")
+				}
+				logctx.Debug("Worker shutting down")
+				r.DecActiveWorkers()
+				r.wg.Done()
+				return
+			}
+			logctx.Debugf("Dequeued task %s", t.Name)
+
+			if !startedNext {
+				r.startTaskWorker(ctx, b, workflowWakeupFun)
+				startedNext = true
+			}
+
+			runCtx := taskCompleter.Context()
+			var cancel context.CancelFunc
+			if r.opts.Timeout > 0 {
+				runCtx, cancel = context.WithTimeout(runCtx, r.opts.Timeout)
+			} else {
+				runCtx, cancel = context.WithCancel(runCtx)
+			}
+
+			r.runTask(runCtx, t, taskCompleter) // nolint: errcheck
+			cancel()
+			workflowWakeupFun()
+		}
+	}()
+}
+
+func (r *registeredExecutor) runTask(ctx context.Context, t *backend.Task, taskCompleter backend.TaskCompleter) error {
+	logctx := logrus.WithField("task_name", r.name)
+
+	result, err := r.executor.Run(ctx, &task{backendTask: t})
+	if err != nil {
+		err := taskCompleter.Fail(err.Error())
+		if err != nil {
+			logctx.WithError(err).Error("failed to mark task as failed")
+			return err
+		}
+	} else {
+		jsonResults, err := jsonify(result)
+		if err != nil {
+			logctx.WithError(err).Error("could not convert returned results to JSON")
+			if err := taskCompleter.Fail(err.Error()); err != nil {
+				logctx.WithError(err).Error("Failed to fail task completer")
+				return err
+			}
+		}
+		err = taskCompleter.Succeed(jsonResults)
+		if err != nil {
+			logctx.WithError(err).Error("failed to mark task as successful")
+			return err
+		}
+	}
+	return nil
 }
 
 // RegisterTaskExecutor registers a TaskExecutor to execute tasks of type taskName.
 // This is not safe to call concurrently and should be done from only one thread
 // of the process. This must be called before Start.
 func (m *Manager) RegisterTaskExecutor(taskName string, executor TaskExecutor, opts TaskExecutorOpts) error {
-	m.taskExecutors[taskName] = registeredExecutor{
-		executor: executor,
-		opts:     opts,
+	r := &registeredExecutor{
+		name:       taskName,
+		wakeupChan: make(chan struct{}, 10), // 10 is arbitrary
+		executor:   executor,
+		opts:       opts,
 	}
+	maxWorkers := opts.Workers
+	if maxWorkers == 0 {
+		maxWorkers = 1
+	}
+	r.maxWorkers = maxWorkers
+	m.taskExecutors[taskName] = r
 	return nil
 }
 
@@ -518,7 +700,7 @@ func (m *Manager) RegisterTaskExecutor(taskName string, executor TaskExecutor, o
 func (m *Manager) Start(ctx context.Context) error {
 	ctx, cancel := context.WithCancel(ctx)
 	m.cancel = cancel
-	err := m.startTaskExecutors(ctx)
+	err := m.startTaskPollers(ctx)
 	if err != nil {
 		return err
 	}
@@ -666,84 +848,53 @@ func (m *Manager) EnqueueWorkflow(ctx context.Context, workflowName string,
 		InstanceName: instanceName,
 		Parameters:   paramsData,
 	})
-	return err
-}
-
-func (m *Manager) startTaskExecutors(ctx context.Context) error {
-	for taskName, exec := range m.taskExecutors {
-		workerCount := exec.opts.Workers
-		if workerCount == 0 {
-			workerCount = 1
-		}
-
-		for i := 0; i < workerCount; i++ {
-			go m.runTaskExecutor(ctx, taskName, i, exec.opts.Timeout, exec.executor)
-		}
+	if err != nil {
+		return err
 	}
+
+	m.WakeupWorkflowExecutor()
 	return nil
 }
 
-func (m *Manager) runTaskExecutor(ctx context.Context, taskName string, workerIdx int, timeout time.Duration, exec TaskExecutor) {
-	logctx := logrus.WithFields(logrus.Fields{
-		"worker_name": fmt.Sprintf("%s/%d", taskName, workerIdx),
-	})
-	logctx.Info("Starting task executor")
-	m.wg.Add(1)
-
-LOOP:
-	for {
-		select {
-		case <-ctx.Done():
-			logctx.Info("exiting task executor")
-			break LOOP
-		default:
-		}
-
-		t, taskCompleter, err := m.backend.DequeueTask(ctx, taskName)
-		if err != nil {
-			if err != ErrNoTasks {
-				logctx.WithError(err).Error("failed to dequeue task")
-			}
-			time.Sleep(m.taskPollInterval)
-			continue
-		}
-		logctx.Debugf("Dequeued task %s", t.Name)
-
-		runCtx := taskCompleter.Context()
-		var cancel context.CancelFunc
-		if timeout > 0 {
-			runCtx, cancel = context.WithTimeout(runCtx, timeout)
-		} else {
-			runCtx, cancel = context.WithCancel(runCtx)
-		}
-		runTask(runCtx, logctx, exec, t, taskCompleter) // nolint: errcheck
-		cancel()
+func (m *Manager) WakeupWorkflowExecutor() {
+	select {
+	case m.workflowWakeupChan <- struct{}{}:
+	default:
+		// We don't log here because if we finish 1000 tasks
+		// locally, we don't want the log noise.
 	}
-	m.wg.Done()
 }
 
-func runTask(ctx context.Context, logctx logrus.FieldLogger, exec TaskExecutor, t *backend.Task, taskCompleter backend.TaskCompleter) error {
-	result, err := exec.Run(ctx, &task{backendTask: t})
-	if err != nil {
-		err := taskCompleter.Fail(err.Error())
-		if err != nil {
-			logctx.WithError(err).Error("failed to mark task as failed")
-			return err
+func (m *Manager) WakeupTaskPollerByTaskName(taskName string) {
+	if e, ok := m.taskExecutors[taskName]; ok {
+		e.WakeupPoller()
+	}
+}
+
+func (m *Manager) wakeupTaskPollersByRequests(taskRequests []enqueueTaskRequest) {
+	uniqueTaskNames := []string{}
+	markMap := make(map[string]struct{})
+	for _, tr := range taskRequests {
+		name := tr.backendTask.Name
+		if _, ok := markMap[name]; !ok {
+			markMap[name] = struct{}{}
+			uniqueTaskNames = append(uniqueTaskNames, name)
 		}
-	} else {
-		jsonResults, err := jsonify(result)
-		if err != nil {
-			logctx.WithError(err).Error("could not convert returned results to JSON")
-			if err := taskCompleter.Fail(err.Error()); err != nil {
-				logrus.WithError(err).Error("Failed to fail task completer")
-				return err
-			}
-		}
-		err = taskCompleter.Succeed(jsonResults)
-		if err != nil {
-			logrus.WithError(err).Error("failed to mark task as successful")
-			return err
-		}
+	}
+
+	for _, name := range uniqueTaskNames {
+		m.WakeupTaskPollerByTaskName(name)
+	}
+}
+
+func (m *Manager) startTaskPollers(ctx context.Context) error {
+	for _, exec := range m.taskExecutors {
+		e := exec
+		m.wg.Add(1)
+		go func() {
+			e.StartPoller(ctx, m.backend, m.taskPollInterval, m.WakeupWorkflowExecutor)
+			m.wg.Done()
+		}()
 	}
 	return nil
 }
@@ -753,6 +904,8 @@ func (m *Manager) runWorkflowExecutor(ctx context.Context) {
 	for k := range m.workflowExecutors {
 		workflowNames = append(workflowNames, k)
 	}
+
+	timer := time.NewTimer(defaultWorkflowPollInterval)
 	m.wg.Add(1)
 LOOP:
 	for {
@@ -760,13 +913,17 @@ LOOP:
 		case <-ctx.Done():
 			logrus.Info("exiting workflow executor")
 			break LOOP
-		case <-time.After(2 * time.Second):
-			for {
-				if m.processWorkflow(ctx, workflowNames) {
-					break
-				}
+		case <-m.workflowWakeupChan:
+			if !timer.Stop() {
+				<-timer.C
 			}
+			break
+		case <-timer.C:
+			break
 		}
+		for !m.processWorkflow(ctx, workflowNames) {
+		}
+		timer.Reset(defaultWorkflowPollInterval)
 	}
 	m.wg.Done()
 }
@@ -886,6 +1043,7 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 			if err != nil {
 				logrus.WithError(err).Error("failed to continue workflow")
 			}
+			m.wakeupTaskPollersByRequests(decision.tasks)
 		}
 		s.End("continue")
 	}
