@@ -60,6 +60,17 @@ func (a *Applications) GetServices(
 	return a.client.GetServices(ctx, request)
 }
 
+func (a *Applications) GetServicesDistinctValues(ctx context.Context,
+	request *applications.ServicesDistinctValuesReq) (*applications.ServicesDistinctValuesRes, error) {
+
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.client.GetServicesDistinctValues(ctx, request)
+}
+
 // GetServicesBySG returns a list of services within a service-group
 func (a *Applications) GetServicesBySG(
 	ctx context.Context,

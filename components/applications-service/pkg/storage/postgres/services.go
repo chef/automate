@@ -126,6 +126,19 @@ SELECT count(*)
 `
 )
 
+var validFilterFields = []string{
+	"origin",
+	"service_name",
+	"version",
+	"channel",
+	"buildstamp",
+	"application",
+	"environment",
+	"site",
+	"service_full",
+	"group_name",
+}
+
 // GetServicesHealthCounts retrieves the health counts from all services in the database.
 // This function accepts a set of filters that can be applied to the SQL query to get the
 // health counts of a subset of the services in the database
@@ -183,6 +196,47 @@ func (db *Postgres) GetServices(
 
 	_, err = db.DbMap.Select(&services, formattedQuery, pageSize, offset)
 	return convertComposedServicesToStorage(services), err
+}
+
+func (db *Postgres) GetServicesDistinctValues(fieldName, queryFragment string) ([]string, error) {
+	fieldNameIsValid := false
+	for _, valid := range validFilterFields {
+		if fieldName == valid {
+			fieldNameIsValid = true
+			break
+		}
+	}
+	if !fieldNameIsValid {
+		return nil, errors.Errorf("field name %q is not valid for filtering, valid values are %v", fieldName, validFilterFields)
+	}
+
+	columnName := columnNameForField(fieldName)
+	query := fmt.Sprintf("SELECT DISTINCT %s from service_full AS t WHERE t.%s ILIKE $1 ORDER BY %s ASC LIMIT 100;",
+		columnName,
+		columnName,
+		columnName,
+	)
+	matcher := fmt.Sprintf("%s%%", queryFragment)
+
+	var matches []string
+	_, err := db.DbMap.Select(&matches, query, matcher)
+	if err != nil {
+		return nil, err
+	}
+	return matches, nil
+}
+
+func columnNameForField(fieldName string) string {
+	switch fieldName {
+	case "service_name":
+		return "name"
+	case "group_name":
+		return "service_group_name_suffix"
+	case "buildstamp":
+		return "release"
+	default:
+		return fieldName
+	}
 }
 
 // GetDisconnectedServices returns a list of disconnected services

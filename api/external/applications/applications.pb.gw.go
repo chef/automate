@@ -79,6 +79,26 @@ func request_ApplicationsService_GetServices_0(ctx context.Context, marshaler ru
 }
 
 var (
+	filter_ApplicationsService_GetServicesDistinctValues_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+)
+
+func request_ApplicationsService_GetServicesDistinctValues_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationsServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq ServicesDistinctValuesReq
+	var metadata runtime.ServerMetadata
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ApplicationsService_GetServicesDistinctValues_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.GetServicesDistinctValues(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+var (
 	filter_ApplicationsService_GetServicesBySG_0 = &utilities.DoubleArray{Encoding: map[string]int{"service_group_id": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 )
 
@@ -269,6 +289,26 @@ func RegisterApplicationsServiceHandlerClient(ctx context.Context, mux *runtime.
 
 	})
 
+	mux.Handle("GET", pattern_ApplicationsService_GetServicesDistinctValues_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_ApplicationsService_GetServicesDistinctValues_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ApplicationsService_GetServicesDistinctValues_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("GET", pattern_ApplicationsService_GetServicesBySG_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -379,6 +419,8 @@ var (
 
 	pattern_ApplicationsService_GetServices_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"beta", "applications", "services"}, "", runtime.AssumeColonVerbOpt(true)))
 
+	pattern_ApplicationsService_GetServicesDistinctValues_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"beta", "applications", "services-distinct-values"}, "", runtime.AssumeColonVerbOpt(true)))
+
 	pattern_ApplicationsService_GetServicesBySG_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"beta", "applications", "service-groups", "service_group_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_ApplicationsService_GetServicesStats_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"beta", "applications", "stats"}, "", runtime.AssumeColonVerbOpt(true)))
@@ -396,6 +438,8 @@ var (
 	forward_ApplicationsService_GetServiceGroupsHealthCounts_0 = runtime.ForwardResponseMessage
 
 	forward_ApplicationsService_GetServices_0 = runtime.ForwardResponseMessage
+
+	forward_ApplicationsService_GetServicesDistinctValues_0 = runtime.ForwardResponseMessage
 
 	forward_ApplicationsService_GetServicesBySG_0 = runtime.ForwardResponseMessage
 
