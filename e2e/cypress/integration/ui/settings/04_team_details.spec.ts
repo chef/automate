@@ -145,8 +145,7 @@ describe('team management', () => {
 
         // initial state of dropdown
         cy.get('app-team-details app-projects-dropdown #projects-selected').contains(unassigned);
-        cy.get('app-team-details app-projects-dropdown .dropdown-button')
-          .should('have.attr', 'disabled');
+        cy.get('app-team-details app-projects-dropdown .dropdown-button').should('be.disabled');
 
         cy.get('[data-cy=team-details-name-input]').type('updated name');
         cy.get('[data-cy=team-details-submit-button]').should('not.have.attr', 'aria-disabled');
@@ -201,7 +200,7 @@ describe('team management', () => {
           cy.get('app-team-details app-projects-dropdown #projects-selected')
             .contains(`${project1Name.substring(0, dropdownNameUntilEllipsisLen)}...`);
           cy.get('app-team-details app-projects-dropdown .dropdown-button')
-            .should('not.have.attr', 'disabled');
+            .should('not.be.disabled');
 
           // open projects dropdown
           cy.get('app-team-details app-projects-dropdown .dropdown-button').click();
@@ -219,7 +218,8 @@ describe('team management', () => {
           cy.get('[data-cy=team-details-submit-button]').click();
 
           // de-select project1 and project2
-          cy.get('app-team-details app-projects-dropdown .dropdown-button').click();
+          cy.get('app-team-details app-projects-dropdown .dropdown-button')
+            .should('not.be.disabled').click();
           cy.get(`app-team-details app-projects-dropdown chef-checkbox[title="${project1Name}"]`)
             .should('have.attr', 'aria-checked', 'true').find('chef-icon').click();
           cy.get(`app-team-details app-projects-dropdown chef-checkbox[title="${project2Name}"]`)
