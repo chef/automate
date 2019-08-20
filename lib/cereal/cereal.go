@@ -31,8 +31,8 @@ var (
 )
 
 const (
-	defaultTaskPollInterval     = 2 * time.Second
-	defaultWorkflowPollInterval = 2 * time.Second
+	defaultTaskPollInterval     = 10 * time.Second
+	defaultWorkflowPollInterval = 10 * time.Second
 )
 
 // Schedule represents a recurring workflow.
