@@ -14,15 +14,15 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/chef/automate/api/external/secrets"
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/compliance-service/api/jobs"
 	"github.com/chef/automate/components/compliance-service/dao/pgdb"
-	"github.com/chef/automate/components/compliance-service/ingest/ingest"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/scheduler"
+	"github.com/chef/automate/components/compliance-service/scanner"
 	"github.com/chef/automate/components/event-service/server"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
+	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/secureconn"
@@ -40,36 +40,25 @@ var empty = pb.Empty{}
 
 // New creates a new jobs server
 func New(db *pgdb.DB, connFactory *secureconn.Factory, eventsClient automate_event.EventServiceClient,
-	complianceEndpoint string, secretsEndpoint string, managerEndpoint string, remoteInspecVer string) *Server {
+	managerEndpoint string, cerealManager *cereal.Manager) *Server {
 	conf := &Server{
 		db:           db,
 		connFactory:  connFactory,
 		eventsClient: eventsClient,
 	}
-	conf.getComplianceAndSecretsConnection(connFactory, complianceEndpoint, db, secretsEndpoint, managerEndpoint, remoteInspecVer)
+	conf.getComplianceAndSecretsConnection(connFactory, db, managerEndpoint, cerealManager)
 	return conf
 }
 
 // get the ManagerClient, NodesClient, and IngestClient to be able to set up the scheduler server
 // the scheduler server is used to call the inspec-agent
-func (srv *Server) getComplianceAndSecretsConnection(connectionFactory *secureconn.Factory, complianceEndpoint string, db *pgdb.DB, secretsEndpoint string, managerEndpoint string, remoteInspecVer string) {
-	if complianceEndpoint == "" || managerEndpoint == "" {
+func (srv *Server) getComplianceAndSecretsConnection(
+	connectionFactory *secureconn.Factory, db *pgdb.DB,
+	managerEndpoint string, cerealManager *cereal.Manager) {
+	if managerEndpoint == "" {
 		logrus.Errorf("complianceEndpoint and managerEndpoint cannot be empty or Dial will get stuck")
 		return
 	}
-	// dial compliance (self)
-	conn, err := connectionFactory.Dial("compliance-service", complianceEndpoint)
-	if err != nil {
-		logrus.Errorf("getComplianceAndSecretsConnection, error grpc dialing to compliance %s", err.Error())
-		return
-	}
-	// get ingest client with compliance conn
-	ingestClient := ingest.NewComplianceIngesterClient(conn)
-	if ingestClient == nil {
-		logrus.Errorf("getComplianceAndSecretsConnection got nil for NewComplianceIngesterClient")
-		return
-	}
-
 	// dial manager
 	mgrConn, err := connectionFactory.Dial("nodemanager-service", managerEndpoint)
 	if err != nil {
@@ -89,19 +78,8 @@ func (srv *Server) getComplianceAndSecretsConnection(connectionFactory *secureco
 		return
 	}
 
-	// dial secrets
-	secretsConn, err := connectionFactory.Dial("secrets-service", secretsEndpoint)
-	if err != nil {
-		logrus.Errorf("getComplianceAndSecretsConnection error grpc dialing to secrets service")
-		return
-	}
-	// get secrets client with secrets conn
-	secretsClient := secrets.NewSecretsServiceClient(secretsConn)
-	if secretsClient == nil {
-		logrus.Errorf("getComplianceAndSecretsConnection, could not obtain secrets service client: %s", err)
-		return
-	}
-	srv.schedulerServer = scheduler.New(mgrClient, nodesClient, db, ingestClient, secretsClient, remoteInspecVer)
+	scanner := scanner.New(mgrClient, nodesClient, db)
+	srv.schedulerServer = scheduler.New(scanner, cerealManager)
 }
 
 // GetJobResultByNodeId returns the results row for a given job id and node id

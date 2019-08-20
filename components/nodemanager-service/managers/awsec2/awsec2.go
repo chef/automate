@@ -658,7 +658,7 @@ func NewSSM() *SSM {
 }
 
 func (s *SSM) SendSSMJob(ctx context.Context, job *types.InspecJob, script string, scriptType string) error {
-	*job.NodeStatus = types.StatusRunning
+	job.NodeStatus = types.StatusRunning
 	output, err := s.Send(ctx, job, script, scriptType)
 	if err != nil {
 		if awsErr, ok := err.(awserr.Error); ok {
@@ -669,7 +669,7 @@ func (s *SSM) SendSSMJob(ctx context.Context, job *types.InspecJob, script strin
 			} else {
 				logrus.Errorf("unable to run scan: %s %s", job.SourceID, err.Error())
 			}
-			*job.NodeStatus = types.StatusFailed
+			job.NodeStatus = types.StatusFailed
 			return awsErr
 		}
 	}
@@ -689,7 +689,7 @@ func (s *SSM) SendSSMJob(ctx context.Context, job *types.InspecJob, script strin
 				if awsErr, ok := err.(awserr.Error); ok {
 					if awsErr.Code() != "ThrottlingException" { // not sure why i can't find this one defined somewhere..
 						logrus.Errorf("SendSSMJob unable to get command status: %s", err.Error())
-						*job.NodeStatus = types.StatusFailed
+						job.NodeStatus = types.StatusFailed
 						return awsErr
 					}
 				}
@@ -698,9 +698,9 @@ func (s *SSM) SendSSMJob(ctx context.Context, job *types.InspecJob, script strin
 		// the ssm command will return the exit code of the command script, which we are modifying to accommodate our needs
 		// so success should be successful and failure should be an inspec execution failure (not control failures)
 		if status == "Success" {
-			*job.NodeStatus = types.StatusCompleted
+			job.NodeStatus = types.StatusCompleted
 		} else {
-			*job.NodeStatus = types.StatusFailed
+			job.NodeStatus = types.StatusFailed
 			return fmt.Errorf("aws ssm job id %s for node %s failed with status code %s - details %s", commandID, job.NodeName, status, statusDetails)
 		}
 	}

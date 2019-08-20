@@ -45,6 +45,7 @@ import (
 	ingestserver "github.com/chef/automate/components/compliance-service/ingest/server"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/remote"
+	"github.com/chef/automate/components/compliance-service/inspec-agent/resolver"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/runner"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/scheduler"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
@@ -54,6 +55,8 @@ import (
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	notifications "github.com/chef/automate/components/notifications-client/api"
 	"github.com/chef/automate/components/notifications-client/notifier"
+	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tracing"
 )
@@ -82,14 +85,6 @@ func createESBackend(servConf *config.Compliance) relaxting.ES2Backend {
 func createPGBackend(conf *config.Postgres) (*pgdb.DB, error) {
 	// define the Postgres Scanner backend
 	return pgdb.New(conf)
-}
-
-// hand over the array of job ids to the scheduler to be executed by the inspec-agent
-func runHungJobs(ctx context.Context, scheduledJobsIds []string, schedulerServer *scheduler.Scheduler) {
-	for SERVICE_STATE != serviceStateStarted {
-		time.Sleep(time.Second)
-	}
-	schedulerServer.RunHungJobs(ctx, scheduledJobsIds)
 }
 
 // here we execute migrations, create the es and pg backends, read certs, set up the needed env vars,
@@ -143,7 +138,7 @@ func initBits(ctx context.Context, conf *config.Compliance) (db *pgdb.DB, connFa
 // register all the services, start the grpc server, and call setup
 func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory,
 	esr relaxting.ES2Backend, conf config.Compliance, binding string,
-	statusSrv *statusserver.Server) {
+	statusSrv *statusserver.Server, cerealManager *cereal.Manager) {
 
 	lis, err := net.Listen("tcp", binding)
 	if err != nil {
@@ -174,7 +169,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 			conf.InspecAgent.AutomateFQDN, notifier, authzProjectsClient, eventClient, configManager))
 
 	jobs.RegisterJobsServiceServer(s, jobsserver.New(db, connFactory, eventClient,
-		conf.Service.Endpoint, conf.Secrets.Endpoint, conf.Manager.Endpoint, conf.RemoteInspecVersion))
+		conf.Manager.Endpoint, cerealManager))
 	reporting.RegisterReportingServiceServer(s, reportingserver.New(&esr))
 
 	ps := profilesserver.New(db, &esr, &conf.Profiles, eventClient, statusSrv)
@@ -211,7 +206,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	// `setup` depends on `Serve` because it dials back to the compliance-service itself.
 	// For this to work we launch `Serve` in a goroutine and connect WithBlock to itself and other dependent services from `setup`
 	// A connect timeout is used to ensure error reporting in the event of failures to connect
-	err = setup(ctx, connFactory, conf, esr, db)
+	err = setup(ctx, connFactory, conf, esr, db, cerealManager)
 	if err != nil {
 		logrus.Fatalf("serveGrpc aborting, we have a problem, setup failed: %s", err.Error())
 	}
@@ -372,7 +367,7 @@ func setupDataLifecycleManageableInterface(ctx context.Context, connFactory *sec
 }
 
 func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Compliance,
-	esr relaxting.ES2Backend, db *pgdb.DB) error {
+	esr relaxting.ES2Backend, db *pgdb.DB, cerealManager *cereal.Manager) error {
 	var err error
 	var conn, mgrConn, secretsConn, authConn *grpc.ClientConn
 	timeoutCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
@@ -431,21 +426,23 @@ func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Com
 
 	// set up the scanner, scheduler, and runner servers with needed clients
 	// these are all inspec-agent packages
-	scannerServer := scanner.New(mgrClient, nodesClient, db)
-	schedulerServer := scheduler.New(mgrClient, nodesClient, db, ingestClient, secretsClient, conf.RemoteInspecVersion)
-	runnerServer := runner.New(mgrClient, nodesClient, db, ingestClient, conf.RemoteInspecVersion)
+	scanner := scanner.New(mgrClient, nodesClient, db)
+	resolver := resolver.New(mgrClient, nodesClient, db, secretsClient)
+	err = runner.InitCerealManager(cerealManager, conf.InspecAgent.JobWorkers, ingestClient, scanner, resolver, conf.RemoteInspecVersion)
+	if err != nil {
+		return errors.Wrap(err, "failed to initialize cereal manager")
+	}
+
+	err = cerealManager.Start(ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to start cereal manager")
+	}
+	schedulerServer := scheduler.New(scanner, cerealManager)
 
 	// start polling for jobs with a recurrence schedule that are due to run.
 	// this function will sleep for one minute, then query the db for all jobs
 	// with recurrence and check if it's time to run the job
 	go schedulerServer.PollForJobs(ctx)
-
-	// start the InspecAgent workers.  the workers represent the amount of goroutines
-	// available to execute a scan.  the buffer size represents the maximum amount of jobs
-	// that may get backed up in the agent queue
-	logrus.Infof("compliance service initializing %d job workers with %d job buffer size",
-		conf.InspecAgent.JobWorkers, conf.InspecAgent.JobBufferSize)
-	runnerServer.SetWorkers(conf.InspecAgent.JobWorkers, conf.InspecAgent.JobBufferSize)
 
 	if os.Getenv("RUN_MODE") == "test" {
 		logrus.Infof(`Skipping AUTHN client setup due to RUN_MODE env var being set to "test"`)
@@ -473,24 +470,7 @@ func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Com
 	}
 
 	SERVICE_STATE = serviceStateStarted
-	go checkAndRunHungJobs(ctx, scannerServer, schedulerServer)
 	return nil
-}
-
-func checkAndRunHungJobs(ctx context.Context, scannerServer *scanner.Scanner,
-	schedulerServer *scheduler.Scheduler) {
-	// check for 'abandoned' jobs by querying for jobs with a status of running or scheduled
-	// of type exec that have not been marked for deletion. jobs with a status of running will
-	// be marked as aborted.  only jobs with a status of scheduled will be returned.
-	// this is done b/c the inspec-agent is ephemeral -- if a service restart occurs when the agent
-	// has already been given jobs, it will lose all references to those jobs
-	scheduledJobsIds, err := scannerServer.CheckForHungJobs(ctx)
-	if err != nil {
-		logrus.Errorf("unable to check for abandoned jobs %+v", err)
-	} else {
-		// hand over all 'abandoned' jobs with status scheduled to the scheduler
-		runHungJobs(ctx, scheduledJobsIds, schedulerServer)
-	}
 }
 
 // Serve grpc
@@ -504,7 +484,19 @@ func Serve(conf config.Compliance, grpcBinding string) error {
 		return err
 	}
 	SERVICE_STATE = serviceStateStarting
-	go serveGrpc(ctx, db, connFactory, esr, conf, grpcBinding, statusSrv) // nolint: errcheck
+
+	cerealManager, err := cereal.NewManager(postgres.NewPostgresBackend(conf.Postgres.ConnectionString))
+	if err != nil {
+		return err
+	}
+	defer func() {
+		err := cerealManager.Stop()
+		if err != nil {
+			logrus.WithError(err).Error("could not stop cereal manager")
+		}
+	}()
+
+	go serveGrpc(ctx, db, connFactory, esr, conf, grpcBinding, statusSrv, cerealManager) // nolint: errcheck
 
 	cfg := NewServiceConfig(&conf, connFactory)
 	return cfg.serveCustomRoutes()

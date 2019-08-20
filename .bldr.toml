@@ -492,6 +492,7 @@ paths = [
   "components/nodemanager-service/*",
   "components/notifications-client/*",
   "lib/authz/*",
+  "lib/cereal/*",
   "lib/config/*",
   "lib/db/*",
   "lib/errorutils/*",

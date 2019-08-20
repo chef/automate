@@ -9,85 +9,48 @@ import (
 	"github.com/sirupsen/logrus"
 	rrule "github.com/teambition/rrule-go"
 
-	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/compliance-service/api/jobs"
-	"github.com/chef/automate/components/compliance-service/dao/pgdb"
-	"github.com/chef/automate/components/compliance-service/ingest/ingest"
-	"github.com/chef/automate/components/compliance-service/inspec"
-	"github.com/chef/automate/components/compliance-service/inspec-agent/resolver"
-	"github.com/chef/automate/components/compliance-service/inspec-agent/runner"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/chef/automate/components/compliance-service/scanner"
-	"github.com/chef/automate/components/nodemanager-service/api/manager"
-	"github.com/chef/automate/components/nodemanager-service/api/nodes"
+	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/errorutils"
 )
 
 type Scheduler struct {
-	managerClient  manager.NodeManagerServiceClient
-	nodesClient    nodes.NodesServiceClient
-	db             *pgdb.DB
-	scannerServer  *scanner.Scanner
-	runnerServer   *runner.Runner
-	resolverServer *resolver.Resolver
+	scanner       *scanner.Scanner
+	cerealManager *cereal.Manager
 }
 
-func New(managerClient manager.NodeManagerServiceClient, nodesClient nodes.NodesServiceClient, db *pgdb.DB, ingestClient ingest.ComplianceIngesterClient, secretsClient secrets.SecretsServiceClient, remoteInspecVer string) *Scheduler {
-	logrus.Debugf("setting up the scheduler server with mgrclient %+v and nodesclient %+v and ingestclient %+v and secretsclient %+v", managerClient, nodesClient, ingestClient, secretsClient)
-	// set up the server connections for resolver, runner, and scanner
-	resolverServer := resolver.New(managerClient, nodesClient, db, secretsClient)
-	runnerServer := runner.New(managerClient, nodesClient, db, ingestClient, remoteInspecVer)
-	scannerServer := scanner.New(managerClient, nodesClient, db)
-	return &Scheduler{managerClient, nodesClient, db, scannerServer, runnerServer, resolverServer}
+func New(scanner *scanner.Scanner, cerealManager *cereal.Manager) *Scheduler {
+	return &Scheduler{scanner, cerealManager}
 }
 
 // Run a job. Schedule, resolve, distribute, and execute it.
 func (a *Scheduler) Run(job *jobs.Job) error {
-	// Here we initialize a new context since if we used a passed in context here,
-	// the context eventually gets cancelled and the chain of calls is not completed.
-	ctx := context.Background()
-
 	logrus.Debugf("Processing job: %+v", job)
-	// 1. Schedule
-	jobToRun, err := a.scheduleJob(job)
-	if err != nil {
-		strErr := fmt.Sprintf("Failed to schedule job %s: %s", job.Id, err.Error())
-		logrus.Error(strErr)
-		return errors.New(strErr)
+
+	// If the compliance database says the thing is already running,
+	// we'll try to insert it into cereal once to make sure it is correct
+	// Otherwise, compliance has completed and we're waiting for cereal
+	// to agree
+	shouldRetry := true
+	if job.Status == types.StatusRunning {
+		shouldRetry = false
+		logrus.Warnf("job %q (%q) already running", job.Id, job.Name)
 	}
-	// 2. Resolve
-	if jobToRun != nil {
-		nodeJobs, err := a.resolverServer.ResolveJob(ctx, jobToRun)
+	// If the job has a recurrence, we update the job schedule
+	if job.Recurrence != "" {
+		// Ensure recurrence rule can be parsed
+		_, err := rrule.StrToRRule(job.Recurrence)
 		if err != nil {
-			strErr := fmt.Sprintf("Failed to resolve job %s: %s", job.Id, err.Error())
-			logrus.Error(strErr)
-			return errors.New(strErr)
+			return &errorutils.InvalidError{Msg: fmt.Sprintf("failed to schedule job %q (%q) invalid job recurrence rule: %v",
+				job.Id, job.Name, err)}
 		}
-		// 3. Distribute and Execute
-		err = a.runNodeJobs(ctx, job, nodeJobs)
-	} else {
-		logrus.Debugf("No jobs provided, moving on...")
-	}
-	return nil
-}
-func (a *Scheduler) runNodeJobs(ctx context.Context, job *jobs.Job, nodeJobs []*types.InspecJob) error {
-	if len(nodeJobs) == 0 {
-		now := time.Now()
-		status := types.StatusAborted
-		nodeJob := &types.InspecJob{
-			InspecBaseJob: types.InspecBaseJob{
-				JobID: job.Id,
-			},
-			StartTime:  &now,
-			EndTime:    &now,
-			NodeStatus: &status,
-		}
-		a.scannerServer.UpdateJobStatus(nodeJob.JobID, "failed", nodeJob.StartTime, nodeJob.EndTime)
-		a.scannerServer.UpdateResult(ctx, nodeJob, nil, &inspec.Error{Message: "no nodes found"}, "")
-		return errors.New("no nodes found for job, aborting")
+		a.scanner.UpdateParentJobSchedule(job.Id, job.JobCount, job.Recurrence, job.ScheduledTime)
+		return nil
 	}
 
-	err := a.runnerServer.AddJobs(nodeJobs)
+	err := a.pushWorkflow(job, shouldRetry)
 	if err != nil {
 		strErr := fmt.Sprintf("Unable to add jobs to inspec agent: %s", err.Error())
 		logrus.Error(strErr)
@@ -96,20 +59,24 @@ func (a *Scheduler) runNodeJobs(ctx context.Context, job *jobs.Job, nodeJobs []*
 	return nil
 }
 
-func (a *Scheduler) scheduleJob(job *jobs.Job) (*jobs.Job, error) {
-	// A non-recurrent job should run right away, no need to create child
-	// Just return job so it can be resolved and executed
-	if job.Recurrence == "" {
-		return job, nil
-	}
+func (a *Scheduler) pushWorkflow(job *jobs.Job, retry bool) error {
+	logrus.Debugf("Calling EnqueueWorkflow for scan-job-workflow")
+	ctx, cancel := context.WithTimeout(context.TODO(), 20*time.Second)
+	defer cancel()
 
-	// Ensure recurrence rule can be parsed
-	_, err := rrule.StrToRRule(job.Recurrence)
-	if err != nil {
-		return nil, &errorutils.InvalidError{Msg: fmt.Sprintf("invalid job recurrence rule: %v", err)}
+	for {
+		err := a.cerealManager.EnqueueWorkflow(context.TODO(), "scan-job-workflow", fmt.Sprintf("scan-job-%s", job.Id), job)
+		if err == nil || !retry || err != cereal.ErrWorkflowInstanceExists {
+			return err
+		}
+
+		logrus.WithError(err).Warn("failed to enqueue workflow. retrying")
+		select {
+		case <-ctx.Done():
+			return err
+		case <-time.After(2 * time.Second):
+		}
 	}
-	a.scannerServer.UpdateParentJobSchedule(job.Id, job.JobCount, job.Recurrence, job.ScheduledTime)
-	return nil, nil
 }
 
 // PollForJobs loops every minute looking to create child jobs from recurring due jobs
@@ -121,60 +88,22 @@ func (a *Scheduler) PollForJobs(ctx context.Context) {
 	}
 }
 
-// processDueJobs uses GetDueJobs to query the database for any recurring jobs that are due to be run
-// For every due recurrent job, a child job is created and then the recurrent(parent) job updated
+// processDueJobs uses GetDueJobs to query the database for any
+// recurring jobs that are due to be run. For every due recurrent job,
+// we push that job onto the workflow queue.
 func (a *Scheduler) processDueJobs(ctx context.Context, nowTime time.Time) {
-	dueJobs := a.scannerServer.GetDueJobs(nowTime)
+	dueJobs := a.scanner.GetDueJobs(nowTime)
 	if len(dueJobs) > 0 {
 		logrus.Debugf("processDueJobs, %d recurring jobs are due for running...", len(dueJobs))
 	}
 	for _, job := range dueJobs {
-		job.JobCount++
-		parentJobID := job.Id
-		parentJobCount := job.JobCount
-		parentRecurrence := job.Recurrence
-		parentScheduledTime := job.ScheduledTime
-
-		err := a.handleChildJob(ctx, job)
+		err := a.pushWorkflow(job, false)
 		if err != nil {
-			logrus.Errorf("Error handling child job %q: %v", job.Id, err)
-			return
-		}
-		a.scannerServer.UpdateParentJobSchedule(parentJobID, parentJobCount, parentRecurrence, parentScheduledTime)
-	}
-}
-
-func (a *Scheduler) handleChildJob(ctx context.Context, job *jobs.Job) error {
-	job.Name = fmt.Sprintf("%s - run %d", job.Name, job.JobCount)
-	job.Recurrence = ""
-	childJob, err := a.scannerServer.CreateChildJob(job)
-	if err != nil {
-		return errors.Wrap(err, "Failed to create child job")
-	}
-	nodeJobs, err := a.resolverServer.ResolveJob(ctx, childJob)
-	if err != nil {
-		return errors.Wrap(err, "Failed to resolve job")
-	}
-	err = a.runnerServer.AddJobs(nodeJobs)
-	if err != nil {
-		return errors.Wrap(err, "Failed to hand jobs to workers")
-	}
-	return nil
-}
-
-func (a *Scheduler) RunHungJobs(ctx context.Context, scheduledJobsIds []string) {
-	// send each of the jobs through
-	for _, jobID := range scheduledJobsIds {
-		job, err := a.db.GetJob(jobID)
-		if err != nil {
-			logrus.Errorf("RunHungJobs unable get job info: %v", err)
-			continue
-		}
-
-		err = a.Run(job)
-		if err != nil {
-			logrus.Errorf("RunHungJobs unable to hand job over to inspec agent %v", err)
-			continue
+			if err == cereal.ErrWorkflowInstanceExists {
+				logrus.Infof("Job %q is still/already running", job.Id)
+			} else {
+				logrus.Errorf("Error handling job %q: %v", job.Id, err)
+			}
 		}
 	}
 }
