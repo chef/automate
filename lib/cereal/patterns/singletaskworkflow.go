@@ -25,7 +25,7 @@ func (s *SingleTaskWorkflowExecutor) OnStart(w cereal.WorkflowInstance, ev cerea
 	err := w.GetParameters(&params)
 	if err != nil {
 		logrus.WithError(err).Error("failed to get parameters")
-		w.Complete()
+		return w.Fail(err)
 	}
 
 	if err := w.EnqueueTask(s.taskName, params); err != nil {
