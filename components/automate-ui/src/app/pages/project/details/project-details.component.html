@@ -30,9 +30,9 @@
         <chef-form-field id="update-name">
           <label>
             <span class="label">Name <span aria-hidden="true">*</span></span>
-            <input chefInput formControlName="name" type="text"
+            <input chefInput formControlName="name" type="text" [resetOrigin]="saveSuccessful"
               [attr.disabled]="(isChefManaged || isLoading) ? true : null"
-              (keyup)="keyPressed()" autocomplete="off">
+              autocomplete="off">
           </label>
           <chef-error
             *ngIf="(projectForm.get('name').hasError('required') || projectForm.get('name').hasError('pattern')) && projectForm.get('name').dirty">
@@ -43,13 +43,13 @@
           Name changes are not allowed for the default project.
         </span>
         <div id="button-bar" *ngIf="!isChefManaged">
-          <chef-button [disabled]="isLoading || !projectForm.valid || projectForm.controls['name'].value === project?.name"
+          <chef-button [disabled]="isLoading || !projectForm.valid || !projectForm.dirty"
             primary inline (click)="saveProject()">
             <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
             <span *ngIf="saving">Saving...</span>
             <span *ngIf="!saving">Save</span>
           </chef-button>
-          <span *ngIf="saveSuccessful" id="save-note">All changes saved.</span>
+          <span id="saved-note" *ngIf="saveSuccessful && !projectForm.dirty">All changes saved.</span>
         </div>
       </form>
     </section>

@@ -1527,7 +1527,7 @@ describe('Admin pages', () => {
           const heading = $('chef-heading');
           expect(heading.getText()).toBe('My Project Changed');
           expect(projectSaveButton.getAttribute('disabled')).toBe('true');
-          expect($('app-project-details section #button-bar #save-note').getText())
+          expect($('app-project-details section #button-bar #saved-note').getText())
             .toBe('All changes saved.');
 
           // Type once more
@@ -1535,7 +1535,7 @@ describe('Admin pages', () => {
           expect(projectSaveButton.getAttribute('disabled')).toBeNull();
 
           // Removed save note
-          expect($('app-project-details section #button-bar #save-note').isPresent()).toBeFalsy();
+          expect($('app-project-details section #button-bar #saved-note').isPresent()).toBeFalsy();
         });
       });
     });

@@ -32,26 +32,26 @@
       <form [formGroup]="updateForm">
         <chef-form-field>
           <label>Name <span aria-hidden="true">*</span></label>
-          <input chefInput formControlName="name" type="text" (keyup)="handleChange()" autocomplete="off"/>
+          <input chefInput formControlName="name" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"/>
           <chef-error *ngIf="(nameCtrl.hasError('required') || nameCtrl.hasError('pattern')) && nameCtrl.dirty">
             Name is required.
           </chef-error>
         </chef-form-field>
         <chef-form-field>
           <label>Status <span aria-hidden="true">*</span></label>
-          <chef-radio ngDefaultControl formControlName="status">
+          <chef-radio ngDefaultControl formControlName="status" [resetOrigin]="saveSuccessful">
             <chef-option value="active">Active</chef-option>
             <chef-option value="inactive">Inactive</chef-option>
           </chef-radio>
         </chef-form-field>
       </form>
       <div id="save">
-        <chef-button primary [disabled]="!updateForm.valid || !updateForm.dirty || saveInProgress" (click)="saveChange()">
+        <chef-button primary [disabled]="!updateForm.valid || !updateForm.dirty || saveInProgress" (click)="saveToken()">
           <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
           <span *ngIf="saveInProgress">Saving...</span>
           <span *ngIf="!saveInProgress">Save</span>
         </chef-button>
-        <span id="saved-note" *ngIf="!firstLoad && !updateForm.dirty">All changes saved.</span>
+        <span id="saved-note" *ngIf="saveSuccessful && !updateForm.dirty">All changes saved.</span>
       </div>
     </section>
   </main>

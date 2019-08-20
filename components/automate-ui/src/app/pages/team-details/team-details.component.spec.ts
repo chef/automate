@@ -71,6 +71,7 @@ describe('TeamDetailsComponent', () => {
         }),
         MockComponent({ selector: 'app-user-team-membership-table',
           inputs: ['usersToFilter', 'users$', 'removeText', 'addButtonText'] }),
+        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
         MockComponent({ selector: 'chef-breadcrumb', inputs: ['link'] }),
         MockComponent({ selector: 'chef-breadcrumbs' }),
         MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),

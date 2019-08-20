@@ -65,7 +65,7 @@
       <form [formGroup]="updateNameForm">
         <chef-form-field>
           <label>{{ descriptionOrName | titlecase }} <span aria-hidden="true">*</span></label>
-          <input chefInput formControlName="name" type="text" (keyup)="keyPressed()" autocomplete="off" data-cy="team-details-name-input">
+          <input chefInput formControlName="name" type="text" [resetOrigin]="saveSuccessful" autocomplete="off" data-cy="team-details-name-input">
           <chef-error
             *ngIf="(updateNameForm.get('name').hasError('required') || updateNameForm.get('name').hasError('pattern')) && updateNameForm.get('name').dirty">
             {{ descriptionOrName | titlecase }} is required.
@@ -80,13 +80,13 @@
         </app-projects-dropdown>
         <chef-loading-spinner  size="30" *ngIf="teamProjectsLeftToFetch.length !== 0"></chef-loading-spinner>
       </div>
-      <chef-button [disabled]="isLoadingTeam || teamProjectsLeftToFetch.length !== 0 || !updateNameForm.valid || (updateNameForm.controls['name'].value === team.name && noProjectsUpdated())"
-        primary inline (click)="updateTeam()" data-cy="team-details-submit-button">
+      <chef-button [disabled]="isLoadingTeam || teamProjectsLeftToFetch.length !== 0 || !updateNameForm.valid || (!updateNameForm.dirty && noProjectsUpdated())"
+        primary inline (click)="saveTeam()" data-cy="team-details-submit-button">
         <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
         <span *ngIf="saving">Saving...</span>
         <span *ngIf="!saving">Save</span>
       </chef-button>
-      <span *ngIf="saveSuccessful" id="save-note">All changes saved.</span>
+      <span id="saved-note" *ngIf="saveSuccessful && !updateNameForm.dirty">All changes saved.</span>
     </section>
   </main>
 </div>

@@ -8,7 +8,7 @@ import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
-import { loading } from 'app/entities/entities';
+import { loading, EntityStatus } from 'app/entities/entities';
 import { GetToken, UpdateToken } from 'app/entities/api-tokens/api-token.actions';
 import { apiTokenFromRoute, updateStatus } from 'app/entities/api-tokens/api-token.selectors';
 import { ApiToken } from 'app/entities/api-tokens/api-token.model';
@@ -28,7 +28,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
   public updateForm: FormGroup;
   public saveInProgress = false;
-  public firstLoad = true;
+  public saveSuccessful = false;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -64,23 +64,16 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
   }
 
-  public handleChange(): void {
-    if (this.nameCtrl.value === this.token.name) {
-      this.nameCtrl.markAsPristine();
-    }
-  }
-
-  public saveChange(): void {
-    this.firstLoad = false;
+  public saveToken(): void {
+    this.saveSuccessful = false;
     this.saveInProgress = true;
     const name: string = this.updateForm.controls.name.value.trim();
     const active = <TokenStatus>this.updateForm.controls.status.value === 'active';
-    const status: TokenStatus = active ? 'active' : 'inactive';
     const token: ApiToken = { ...this.token, name, active };
     this.store.dispatch(new UpdateToken({ token }));
 
@@ -94,7 +87,10 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
           pendingSave.next(true);
           pendingSave.complete();
           this.saveInProgress = false;
-          this.updateForm.reset({ name, status });
+          this.saveSuccessful = (state === EntityStatus.loadingSuccess);
+          if (this.saveSuccessful) {
+            this.updateForm.markAsPristine();
+          }
         }
       });
   }

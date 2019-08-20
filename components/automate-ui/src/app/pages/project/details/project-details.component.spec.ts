@@ -92,6 +92,7 @@ describe('ProjectDetailsComponent', () => {
         MockComponent({ selector: 'chef-th' }),
         MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'ng-container', inputs: ['hidden'] }),
+        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
         ProjectDetailsComponent
       ],
       imports: [
