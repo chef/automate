@@ -48,11 +48,12 @@ func NewMemstoreProjectsServer(
 	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
 
-	projectUpdateManager, err := RegisterCerealProjectUpdateManager(projectUpdateCerealManager)
+	s := memstore.New()
+	projectUpdateManager, err := RegisterCerealProjectUpdateManager(projectUpdateCerealManager, l, s, pr)
 	if err != nil {
 		return nil, err
 	}
-	return NewProjectsServer(ctx, l, memstore.New(), e, projectUpdateManager, pr)
+	return NewProjectsServer(ctx, l, s, e, projectUpdateManager, pr)
 }
 
 // NewPostgresProjectsServer instantiates a ProjectsServer using a PG store
@@ -70,7 +71,7 @@ func NewPostgresProjectsServer(
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize v2 store state")
 	}
-	projectUpdateManager, err := RegisterCerealProjectUpdateManager(projectUpdateCerealManager)
+	projectUpdateManager, err := RegisterCerealProjectUpdateManager(projectUpdateCerealManager, l, s, pr)
 	if err != nil {
 		return nil, err
 	}

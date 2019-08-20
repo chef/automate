@@ -27,6 +27,7 @@ const (
 
 	ProjectUpdateWorkflowName = "ProjectUpdate"
 	ProjectUpdateInstanceName = "SingletonV1"
+	ApplyStagedRulesTaskName  = "authz/ApplyStagedRules"
 )
 
 var ProjectUpdateDomainServices = []string{
@@ -58,11 +59,11 @@ func createProjectUpdateID() string {
 	return uuid.String()
 }
 
-func NewWorkflowExecutor(s storage.Storage, pr PolicyRefresher) *multiworkflow.MultiWorkflow {
+func NewWorkflowExecutor() (*patterns.ChainWorkflowExecutor, error) {
 	workflowMap := make(map[string]cereal.WorkflowExecutor)
 	lock := sync.Mutex{}
 
-	applyStagedRulesExecutor := patterns.NewSingleTaskWorkflowExecutor("authz/ApplyStagedRules", true)
+	applyStagedRulesExecutor := patterns.NewSingleTaskWorkflowExecutor(ApplyStagedRulesTaskName, true)
 	// The code below allows us to easily add to the ProjectUpdateDomainServices list.
 	// By not preconfiguring our workflow with an exact set of subworkflow executors,
 	// we can generate the workflow executor for the correct domain service easily.
@@ -79,8 +80,7 @@ func NewWorkflowExecutor(s storage.Storage, pr PolicyRefresher) *multiworkflow.M
 		workflowMap[key] = workflowExecutor
 		return workflowExecutor, true
 	})
-	// return chainworkflow.NewChainWorkflowExecutor(NewApplyStagedRulesExecutor(), domainSvcExecutor)
-	return domainSvcExecutor
+	return patterns.NewChainWorkflowExecutor(applyStagedRulesExecutor, domainSvcExecutor)
 }
 
 type ApplyStagedRulesTaskExecutor struct {
@@ -120,11 +120,24 @@ type CerealProjectUpdateManager struct {
 	domainServices []string
 }
 
-func RegisterCerealProjectUpdateManager(manager *cereal.Manager, s storage.Storage, pr PolicyRefresher) (ProjectUpdateMgr, error) {
-	domainServicesWorkflowExecutor := NewWorkflowExecutor(s, pr)
+func RegisterCerealProjectUpdateManager(manager *cereal.Manager, log logger.Logger, s storage.Storage, pr PolicyRefresher) (ProjectUpdateMgr, error) {
+	domainServicesWorkflowExecutor, err := NewWorkflowExecutor()
+	if err != nil {
+		return nil, err
+	}
 
 	if err := manager.RegisterWorkflowExecutor(ProjectUpdateWorkflowName, domainServicesWorkflowExecutor); err != nil {
 		return nil, err
+	}
+
+	applyStagedRuelsTaskExecutor := &ApplyStagedRulesTaskExecutor{
+		store:           s,
+		policyRefresher: pr,
+		log:             log,
+	}
+	if err := manager.RegisterTaskExecutor(ApplyStagedRulesTaskName, applyStagedRuelsTaskExecutor,
+		cereal.TaskExecutorOpts{Workers: 1}); err != nil {
+
 	}
 
 	updateManager := &CerealProjectUpdateManager{
@@ -156,8 +169,24 @@ func (m *CerealProjectUpdateManager) Start() error {
 	return multiworkflow.EnqueueWorkflow(context.Background(), m.manager, m.workflowName, m.instanceName, m.domainServices, params)
 }
 
+type workflowInstance struct {
+	chain *patterns.ChainWorkflowInstance
+}
+
+func (w *workflowInstance) IsRunning() bool {
+	return false
+}
+func (w *workflowInstance) GetApplyStagedRulesInstance() (cereal.ImmutableWorkflowInstance, error) {
+	return nil, nil
+}
+
+func (m *CerealProjectUpdateManager) getWorkflowInstance() (*workflowInstance, error) {
+	return nil, nil
+}
+
 func (m *CerealProjectUpdateManager) Failed() bool {
-	instance, err := multiworkflow.GetWorkflowInstance(context.Background(), m.manager, m.workflowName, m.instanceName)
+	ctx := context.TODO()
+	chainInstance, err := patterns.GetChainWorkflowInstance(ctx, m.manager, m.workflowName, m.instanceName)
 	if err != nil {
 		if err == cereal.ErrWorkflowInstanceNotFound {
 			return false
@@ -166,15 +195,15 @@ func (m *CerealProjectUpdateManager) Failed() bool {
 		return true
 	}
 
-	if instance.Err() != nil {
+	if chainInstance.Err() != nil {
 		return true
 	}
 
-	var payload *multiworkflow.MultiWorkflowPayload
-	if instance.IsRunning() {
+	var payload *patterns.ChainWorkflowPayload
+	if chainInstance.IsRunning() {
 		logrus.Info("Running")
 		var err error
-		payload, err = instance.GetPayload()
+		payload, err = chainInstance.GetPayload()
 		if err != nil {
 			logrus.WithError(err).Error("failed to get workflow instance payload")
 			return true
@@ -182,7 +211,51 @@ func (m *CerealProjectUpdateManager) Failed() bool {
 	} else {
 		logrus.Info("Not running")
 		var err error
-		payload, err = instance.GetResult()
+		payload, err = chainInstance.GetResult()
+		if err != nil {
+			logrus.WithError(err).Error("failed to get workflow instance payload")
+			return true
+		}
+	}
+
+	for _, state := range payload.State {
+		if state.Err != "" {
+			return true
+		}
+	}
+
+	subworkflowDomains, err := chainInstance.GetSubWorkflow(1)
+	if err != nil {
+		if err == cereal.ErrWorkflowInstanceNotFound {
+			return false
+		}
+		logrus.WithError(err).Error("failed to get subworkflow")
+		return true
+	}
+
+	instance, err := multiworkflow.ToMultiWorkflowInstance(subworkflowDomains)
+	if err != nil {
+		logrus.WithError(err).Error("failed to get workflow instance")
+		return true
+	}
+
+	if instance.Err() != nil {
+		return true
+	}
+
+	var payload1 *multiworkflow.MultiWorkflowPayload
+	if instance.IsRunning() {
+		logrus.Info("Running")
+		var err error
+		payload1, err = instance.GetPayload()
+		if err != nil {
+			logrus.WithError(err).Error("failed to get workflow instance payload")
+			return true
+		}
+	} else {
+		logrus.Info("Not running")
+		var err error
+		payload1, err = instance.GetResult()
 		if err != nil {
 			logrus.WithError(err).Error("failed to get workflow instance payload")
 			return true
@@ -190,7 +263,7 @@ func (m *CerealProjectUpdateManager) Failed() bool {
 	}
 
 	// OnStart has not run yet
-	if payload == nil || payload.State == nil {
+	if payload1 == nil || payload1.State == nil {
 		return false
 	}
 

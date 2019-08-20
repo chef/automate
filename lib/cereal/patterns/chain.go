@@ -142,7 +142,7 @@ func (w *workflowInstance) TotalCompletedTasks() int {
 	return w.lastState.CompletedTasks
 }
 
-func NewChainWorkflowExecutor(executors []cereal.WorkflowExecutor) (*ChainWorkflowExecutor, error) {
+func NewChainWorkflowExecutor(executors ...cereal.WorkflowExecutor) (*ChainWorkflowExecutor, error) {
 	if len(executors) <= 0 {
 		return nil, errors.New("Can't have zero")
 	}
@@ -338,4 +338,136 @@ func (m *ChainWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev cer
 
 func (*ChainWorkflowExecutor) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEvent) cereal.Decision {
 	return w.Complete()
+}
+
+type ChainWorkflowInstance struct {
+	payload   *ChainWorkflowPayload
+	result    *ChainWorkflowPayload
+	params    *ChainWorkflowParams
+	isRunning bool
+	err       error
+}
+
+type immutableWorkflowInstanceImpl struct {
+	params json.RawMessage
+	state  WorkflowState
+}
+
+func (instance *immutableWorkflowInstanceImpl) GetParameters(obj interface{}) error {
+	if len(instance.params) > 0 {
+		return json.Unmarshal(instance.params, obj)
+	}
+	return nil
+}
+
+func (instance *immutableWorkflowInstanceImpl) GetPayload(obj interface{}) error {
+	if instance.state.Err != "" {
+		return errors.New(instance.state.Err)
+	}
+	if len(instance.state.Payload) > 0 {
+		return json.Unmarshal(instance.state.Payload, obj)
+	}
+	return nil
+}
+
+func (instance *immutableWorkflowInstanceImpl) GetResult(obj interface{}) error {
+	if instance.state.Err != "" {
+		return errors.New(instance.state.Err)
+	}
+	if len(instance.state.Result) > 0 {
+		return json.Unmarshal(instance.state.Result, obj)
+	}
+	return nil
+}
+
+func (instance *immutableWorkflowInstanceImpl) IsRunning() bool {
+	return !instance.state.IsFinished
+}
+
+func (instance *immutableWorkflowInstanceImpl) Err() error {
+	if instance.state.Err != "" {
+		return errors.New(instance.state.Err)
+	}
+	return nil
+}
+
+func (instance *ChainWorkflowInstance) GetSubWorkflow(idx int) (cereal.ImmutableWorkflowInstance, error) {
+	payload := instance.payload
+	if !instance.isRunning {
+		payload = instance.result
+	}
+
+	if payload == nil || idx >= len(payload.State) {
+		return nil, cereal.ErrWorkflowInstanceNotFound
+	}
+
+	v := payload.State[idx]
+	var params json.RawMessage
+	if instance.params.WorkflowParams != nil {
+		params = instance.params.WorkflowParams[idx]
+	}
+
+	subWorkflow := &immutableWorkflowInstanceImpl{
+		state:  v,
+		params: params,
+	}
+
+	return subWorkflow, nil
+}
+
+func (instance *ChainWorkflowInstance) GetPayload() (*ChainWorkflowPayload, error) {
+	return instance.payload, nil
+}
+
+func (instance *ChainWorkflowInstance) GetParameters() (*ChainWorkflowParams, error) {
+	return instance.params, nil
+}
+
+func (instance *ChainWorkflowInstance) IsRunning() bool {
+	return instance.isRunning
+}
+
+func (instance *ChainWorkflowInstance) GetResult() (*ChainWorkflowPayload, error) {
+	return instance.result, nil
+}
+
+func (instance *ChainWorkflowInstance) Err() error {
+	return instance.err
+}
+
+func ToChainWorkflowInstance(instance cereal.ImmutableWorkflowInstance) (*ChainWorkflowInstance, error) {
+	chainInstance := ChainWorkflowInstance{}
+	if err := instance.Err(); err != nil {
+		chainInstance.err = err
+	} else {
+		if instance.IsRunning() {
+			payload := &ChainWorkflowPayload{}
+			if err := instance.GetPayload(&payload); err != nil {
+				return nil, err
+			}
+			chainInstance.payload = payload
+		} else {
+			result := &ChainWorkflowPayload{}
+			if err := instance.GetResult(&result); err != nil {
+				return nil, err
+			}
+			chainInstance.result = result
+		}
+	}
+	chainInstance.isRunning = instance.IsRunning()
+
+	params := ChainWorkflowParams{}
+	if err := instance.GetParameters(&params); err != nil {
+		return nil, err
+	}
+	chainInstance.params = &params
+	return &chainInstance, nil
+}
+
+func GetChainWorkflowInstance(ctx context.Context, m *cereal.Manager, workflowName string, instanceName string) (*ChainWorkflowInstance, error) {
+	instance, err := m.GetWorkflowInstanceByName(ctx, instanceName, workflowName)
+	if err != nil {
+		return nil, err
+	}
+	return ToChainWorkflowInstance(instance)
 }

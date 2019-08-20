@@ -472,11 +472,7 @@ func (instance *WorkflowInstance) Err() error {
 	return instance.err
 }
 
-func GetWorkflowInstance(ctx context.Context, m *cereal.Manager, workflowName string, instanceName string) (*WorkflowInstance, error) {
-	instance, err := m.GetWorkflowInstanceByName(ctx, instanceName, workflowName)
-	if err != nil {
-		return nil, err
-	}
+func ToMultiWorkflowInstance(instance cereal.ImmutableWorkflowInstance) (*WorkflowInstance, error) {
 	multiInstance := WorkflowInstance{}
 	if err := instance.Err(); err != nil {
 		multiInstance.err = err
@@ -503,4 +499,12 @@ func GetWorkflowInstance(ctx context.Context, m *cereal.Manager, workflowName st
 	}
 	multiInstance.params = &params
 	return &multiInstance, nil
+}
+
+func GetWorkflowInstance(ctx context.Context, m *cereal.Manager, workflowName string, instanceName string) (*WorkflowInstance, error) {
+	instance, err := m.GetWorkflowInstanceByName(ctx, instanceName, workflowName)
+	if err != nil {
+		return nil, err
+	}
+	return ToMultiWorkflowInstance(instance)
 }
