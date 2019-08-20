@@ -30,6 +30,14 @@ type SchedulerDriver interface {
 	GetNextScheduledWorkflow(ctx context.Context) (*Schedule, error)
 }
 
+// IntervalSuggester is an interface that backends can optionally
+// implement to suggest a default TaskPollInterval and
+// WorkflowPollInterval to the rest of the cereal library.
+type IntervalSuggester interface {
+	DefaultTaskPollInterval() time.Duration
+	DefaultWorkflowPollInterval() time.Duration
+}
+
 type ListWorkflowOpts struct {
 	WorkflowName *string
 	InstanceName *string

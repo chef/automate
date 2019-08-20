@@ -37,6 +37,15 @@ func NewGrpcBackendFromConn(domain string, conn *grpc.ClientConn) *GrpcBackend {
 		client: grpccereal.NewCerealClient(conn),
 	}
 }
+
+func (g *GrpcBackend) DefaultTaskPollInterval() time.Duration {
+	return 10 * time.Second
+}
+
+func (g *GrpcBackend) DefaultWorkflowPollInterval() time.Duration {
+	return 2 * time.Second
+}
+
 func (g *GrpcBackend) EnqueueWorkflow(ctx context.Context, workflow *backend.WorkflowInstance) error {
 	if _, err := g.client.EnqueueWorkflow(ctx, &grpccereal.EnqueueWorkflowRequest{
 		Domain:       g.domain,

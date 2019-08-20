@@ -441,8 +441,9 @@ type Manager struct {
 	cancel            context.CancelFunc
 	wg                sync.WaitGroup
 
-	workflowWakeupChan chan struct{}
-	taskPollInterval   time.Duration
+	workflowWakeupChan   chan struct{}
+	taskPollInterval     time.Duration
+	workflowPollInterval time.Duration
 }
 
 // ManagerOpt is an option that can be passed to NewManager.
@@ -453,6 +454,10 @@ type ManagerOpt func(*Manager)
 // interval for new jobs.
 func WithTaskPollInterval(interval time.Duration) ManagerOpt {
 	return func(m *Manager) { m.taskPollInterval = interval }
+}
+
+func WithWorkflowPollInterval(interval time.Duration) ManagerOpt {
+	return func(m *Manager) { m.workflowPollInterval = interval }
 }
 
 // NewManager creates a new Manager with the given Driver. If
@@ -470,12 +475,18 @@ func NewManager(b backend.Driver, opts ...ManagerOpt) (*Manager, error) {
 		workflowExecutors: make(map[string]WorkflowExecutor),
 		taskExecutors:     make(map[string]*registeredExecutor),
 
-		taskPollInterval:   defaultTaskPollInterval,
-		workflowWakeupChan: workflowWakeupChan,
+		workflowPollInterval: defaultWorkflowPollInterval,
+		taskPollInterval:     defaultTaskPollInterval,
+		workflowWakeupChan:   workflowWakeupChan,
 	}
 
 	if v, ok := b.(backend.SchedulerDriver); ok {
 		m.workflowScheduler = NewWorkflowScheduler(v, m.WakeupWorkflowExecutor)
+	}
+
+	if intervalSuggester, ok := b.(backend.IntervalSuggester); ok {
+		m.taskPollInterval = intervalSuggester.DefaultTaskPollInterval()
+		m.workflowPollInterval = intervalSuggester.DefaultWorkflowPollInterval()
 	}
 
 	for _, o := range opts {
@@ -905,7 +916,7 @@ func (m *Manager) runWorkflowExecutor(ctx context.Context) {
 		workflowNames = append(workflowNames, k)
 	}
 
-	timer := time.NewTimer(defaultWorkflowPollInterval)
+	timer := time.NewTimer(m.workflowPollInterval)
 	m.wg.Add(1)
 LOOP:
 	for {
@@ -923,7 +934,7 @@ LOOP:
 		}
 		for !m.processWorkflow(ctx, workflowNames) {
 		}
-		timer.Reset(defaultWorkflowPollInterval)
+		timer.Reset(m.workflowPollInterval)
 	}
 	m.wg.Done()
 }
