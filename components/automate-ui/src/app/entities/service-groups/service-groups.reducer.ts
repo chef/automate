@@ -111,17 +111,17 @@ export function serviceGroupEntityReducer(
         set('servicesStatus', EntityStatus.loadingFailure),
         set('servicesErrorResp', action.payload))(state);
 
-    case ServiceGroupsActionTypes.GET_NODE_SUGGESTIONS:
+    case ServiceGroupsActionTypes.GET_SERVICE_GROUP_SUGGESTIONS:
       return pipe(
         set('nodeSuggestionsStatus', EntityStatus.loading),
         set('nodeSuggestions', []))(state);
 
-    case ServiceGroupsActionTypes.GET_NODE_SUGGESTIONS_SUCCESS:
+    case ServiceGroupsActionTypes.GET_SERVICE_GROUP_SUGGESTIONS_SUCCESS:
       return pipe(
         set('nodeSuggestionsStatus', EntityStatus.loadingSuccess),
         set('nodeSuggestions', action.payload.nodeSuggestions))(state);
 
-    case ServiceGroupsActionTypes.GET_NODE_SUGGESTIONS_FAILURE:
+    case ServiceGroupsActionTypes.GET_SERVICE_GROUP_SUGGESTIONS_FAILURE:
       return pipe(
         set('nodeSuggestions', []),
         set('nodeSuggestionsStatus', EntityStatus.loadingFailure),

@@ -14,7 +14,7 @@ import {
 } from './service-groups.model';
 import { environment } from '../../../environments/environment';
 const APPLICATIONS_URL = environment.applications_url;
-const CONFIG_MGMT_URL = environment.config_mgmt_url;
+//const CONFIG_MGMT_URL = environment.config_mgmt_url;
 
 interface RespSuggestion {
   text: string;
@@ -99,7 +99,7 @@ export class ServiceGroupsRequests {
   public getSuggestions(type: string, text: string, filters: NodeFilter): Observable<any[]> {
     if (text && text.length > 0) {
       const params = this.formatFilters(filters).set('type', type).set('text', text);
-      const url = `${CONFIG_MGMT_URL}/suggestions`;
+      const url = `${APPLICATIONS_URL}/services-distinct-values`;
 
       return this.httpClient.get<RespSuggestion[]>(url, {params}).pipe(map(
         (suggestions) => suggestions.filter(s => s && s.text && s.text.length !== 0)));

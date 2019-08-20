@@ -13,7 +13,7 @@ import {
 } from '../../types/types';
 import { EntityStatus } from '../../entities/entities';
 import {
-  GetNodeSuggestions, UpdateServiceGroupFilters, UpdateSelectedSG
+  GetServiceGroupSuggestions, UpdateServiceGroupFilters, UpdateSelectedSG
 } from 'app/entities/service-groups/service-groups.actions';
 import {
   ServiceGroup, ServiceGroupFilters, FieldDirection, HealthSummary, ServicesFilters
@@ -336,7 +336,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   }
 
   onSuggestValues(event) {
-    this.store.dispatch(new GetNodeSuggestions( event.detail ));
+    this.store.dispatch(new GetServiceGroupSuggestions( event.detail ));
   }
 
   onFilterAdded(event) {
