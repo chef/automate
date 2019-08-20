@@ -300,6 +300,9 @@ type immutableWorkflowInstanceImpl struct {
 }
 
 func (w *immutableWorkflowInstanceImpl) GetPayload(obj interface{}) error {
+	if w.instance.Err != nil {
+		return w.instance.Err
+	}
 	if w.instance.Payload != nil && len(w.instance.Payload) > 0 {
 		return json.Unmarshal(w.instance.Payload, obj)
 	}
@@ -316,6 +319,9 @@ func (w *immutableWorkflowInstanceImpl) GetParameters(obj interface{}) error {
 func (w *immutableWorkflowInstanceImpl) GetResult(obj interface{}) error {
 	if w.IsRunning() {
 		return ErrWorkflowNotComplete
+	}
+	if w.instance.Err != nil {
+		return w.instance.Err
 	}
 	if w.instance.Result != nil && len(w.instance.Result) > 0 {
 		return json.Unmarshal(w.instance.Result, obj)

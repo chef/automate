@@ -1,6 +1,7 @@
 package patterns
 
 import (
+	"context"
 	"encoding/json"
 
 	"github.com/chef/automate/lib/cereal"
@@ -46,7 +47,7 @@ func (s *SingleTaskWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, e
 
 func (s *SingleTaskWorkflowExecutor) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEvent) cereal.Decision {
 	if s.allowCancel {
-		return w.Complete()
+		return w.Fail(context.Canceled)
 	} else {
 		return w.Continue(nil)
 	}
