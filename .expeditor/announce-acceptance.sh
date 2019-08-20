@@ -12,3 +12,4 @@ Please take your time to fill out the release notes by *EOD WEDNESDAY*: https://
 EOF
 
 post_slack_message "a2-team" "$message"
+post_slack_message "a2-release-coordinate" "$message"
