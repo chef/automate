@@ -2,7 +2,7 @@ import { Component, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { interval as observableInterval,  Observable, Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { map, takeUntil, filter } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 
@@ -43,7 +43,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   public applyRulesButtonText$: Observable<string>;
   public ApplyRulesStatusState = ApplyRulesStatusState;
 
-  private POLLING_INTERVAL_IN_SECONDS = 10;
   private isDestroyed = new Subject<boolean>();
 
   constructor(
@@ -85,16 +84,8 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Get status now; periodic checks are already being done globally so no need to poll further
     this.projects.getApplyRulesStatus();
-
-    // Get projects status now and periodically while on this page
     this.store.dispatch(new GetProjects());
-    observableInterval(1000 * this.POLLING_INTERVAL_IN_SECONDS).pipe(
-      takeUntil(this.isDestroyed))
-      .subscribe(() => {
-        this.store.dispatch(new GetProjects());
-      });
   }
 
   ngOnDestroy(): void {
