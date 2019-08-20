@@ -323,6 +323,8 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   }
 
   dropdownDisabled(): boolean {
-    return Object.values(this.projects).length === 0 || this.teamProjectsLeftToFetch.length !== 0;
+    return Object.values(this.projects).length === 0 ||
+      this.teamProjectsLeftToFetch.length !== 0 ||
+      this.saving;
   }
 }
