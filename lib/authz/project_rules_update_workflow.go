@@ -49,6 +49,7 @@ type StatusParameters struct {
 func (m *DomainProjectUpdateWorkflowExecutor) OnStart(
 	w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
 
+	logrus.Info("OnStart for domain")
 	params := DomainProjectUpdateWorkflowParameters{}
 	if err := w.GetParameters(&params); err != nil {
 		return w.Fail(err)

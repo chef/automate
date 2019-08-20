@@ -92,6 +92,9 @@ type ApplyStagedRulesTaskExecutor struct {
 type ApplyStagedRulesResult struct {
 }
 
+type ApplyStagedRulesParams struct {
+}
+
 func (s *ApplyStagedRulesTaskExecutor) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
 	s.log.Info("apply project rules starting")
 
@@ -166,6 +169,14 @@ func (m *CerealProjectUpdateManager) Start() error {
 			ProjectUpdateID: createProjectUpdateID(),
 		}
 	}
+	multiWorkflowParams, err := multiworkflow.ToMultiWorkfowParameters(m.domainServices, params)
+	if err != nil {
+		return err
+	}
+	return patterns.EnqueueChainWorkflow(context.TODO(), m.manager, m.workflowName, m.instanceName, []interface{}{
+		ApplyStagedRulesParams{},
+		multiWorkflowParams,
+	})
 	return multiworkflow.EnqueueWorkflow(context.Background(), m.manager, m.workflowName, m.instanceName, m.domainServices, params)
 }
 
@@ -173,180 +184,121 @@ type workflowInstance struct {
 	chain *patterns.ChainWorkflowInstance
 }
 
-func (w *workflowInstance) IsRunning() bool {
-	return false
-}
-func (w *workflowInstance) GetApplyStagedRulesInstance() (cereal.ImmutableWorkflowInstance, error) {
-	return nil, nil
+func (w *workflowInstance) FailureMessage() string {
+	if err := w.chain.Err(); err != nil {
+		return err.Error()
+	}
+
+	if instance, err := w.GetApplyStagedRulesInstance(); err != nil {
+		if err == cereal.ErrWorkflowInstanceNotFound {
+			return ""
+		}
+		return err.Error()
+	} else {
+		if err := instance.Err(); err != nil {
+			return err.Error()
+		}
+	}
+
+	if updateDomainServicesInstance, err := w.GetUpdateDomainServicesInstance(); err != nil {
+		if err == cereal.ErrWorkflowInstanceNotFound {
+			return ""
+		}
+		return err.Error()
+	} else {
+		if err := updateDomainServicesInstance.Err(); err != nil {
+			return err.Error()
+		}
+
+		errMsg := ""
+		for _, subworkflowKey := range updateDomainServicesInstance.ListSubWorkflows() {
+			if subworkflowInstance, err := updateDomainServicesInstance.GetSubWorkflow(subworkflowKey); err != nil {
+				if err == cereal.ErrWorkflowInstanceNotFound {
+					continue
+				}
+				errMsg = fmt.Sprintf("%s; %s: %s", errMsg, subworkflowKey, err.Error())
+			} else {
+				if subworkflowInstance.Err() != nil {
+					errMsg = fmt.Sprintf("%s; %s: %s", errMsg, subworkflowKey, subworkflowInstance.Err().Error())
+				}
+			}
+		}
+		return errMsg
+	}
 }
 
-func (m *CerealProjectUpdateManager) getWorkflowInstance() (*workflowInstance, error) {
-	return nil, nil
+func (w *workflowInstance) IsRunning() bool {
+	return w.chain.IsRunning()
+}
+
+func (w *workflowInstance) GetApplyStagedRulesInstance() (cereal.ImmutableWorkflowInstance, error) {
+	return w.chain.GetSubWorkflow(0)
+}
+
+func (w *workflowInstance) GetUpdateDomainServicesInstance() (*multiworkflow.WorkflowInstance, error) {
+	instance, err := w.chain.GetSubWorkflow(1)
+	if err != nil {
+		return nil, err
+	}
+	return multiworkflow.ToMultiWorkflowInstance(instance)
+}
+
+func (m *CerealProjectUpdateManager) getWorkflowInstance(ctx context.Context) (*workflowInstance, error) {
+	chainInstance, err := patterns.GetChainWorkflowInstance(ctx, m.manager, m.workflowName, m.instanceName)
+	if err != nil {
+		return nil, err
+	}
+	return &workflowInstance{chain: chainInstance}, nil
 }
 
 func (m *CerealProjectUpdateManager) Failed() bool {
 	ctx := context.TODO()
-	chainInstance, err := patterns.GetChainWorkflowInstance(ctx, m.manager, m.workflowName, m.instanceName)
+	projectUpdateInstance, err := m.getWorkflowInstance(ctx)
 	if err != nil {
 		if err == cereal.ErrWorkflowInstanceNotFound {
 			return false
 		}
-		logrus.WithError(err).Error("failed to get workflow instance")
 		return true
 	}
-
-	if chainInstance.Err() != nil {
-		return true
-	}
-
-	var payload *patterns.ChainWorkflowPayload
-	if chainInstance.IsRunning() {
-		logrus.Info("Running")
-		var err error
-		payload, err = chainInstance.GetPayload()
-		if err != nil {
-			logrus.WithError(err).Error("failed to get workflow instance payload")
-			return true
-		}
-	} else {
-		logrus.Info("Not running")
-		var err error
-		payload, err = chainInstance.GetResult()
-		if err != nil {
-			logrus.WithError(err).Error("failed to get workflow instance payload")
-			return true
-		}
-	}
-
-	for _, state := range payload.State {
-		if state.Err != "" {
-			return true
-		}
-	}
-
-	subworkflowDomains, err := chainInstance.GetSubWorkflow(1)
-	if err != nil {
-		if err == cereal.ErrWorkflowInstanceNotFound {
-			return false
-		}
-		logrus.WithError(err).Error("failed to get subworkflow")
-		return true
-	}
-
-	instance, err := multiworkflow.ToMultiWorkflowInstance(subworkflowDomains)
-	if err != nil {
-		logrus.WithError(err).Error("failed to get workflow instance")
-		return true
-	}
-
-	if instance.Err() != nil {
-		return true
-	}
-
-	var payload1 *multiworkflow.MultiWorkflowPayload
-	if instance.IsRunning() {
-		logrus.Info("Running")
-		var err error
-		payload1, err = instance.GetPayload()
-		if err != nil {
-			logrus.WithError(err).Error("failed to get workflow instance payload")
-			return true
-		}
-	} else {
-		logrus.Info("Not running")
-		var err error
-		payload1, err = instance.GetResult()
-		if err != nil {
-			logrus.WithError(err).Error("failed to get workflow instance payload")
-			return true
-		}
-	}
-
-	// OnStart has not run yet
-	if payload1 == nil || payload1.State == nil {
-		return false
-	}
-
-	for _, d := range m.domainServices {
-		subWorkflow, err := instance.GetSubWorkflow(d)
-		if err != nil {
-			logrus.Warnf("subworkflow %q not found", d)
-			continue
-		}
-
-		if subWorkflow.Err() != nil {
-			return true
-		}
-	}
-
-	return false
+	return projectUpdateInstance.FailureMessage() != ""
 }
 
 func (m *CerealProjectUpdateManager) FailureMessage() string {
-	instance, err := multiworkflow.GetWorkflowInstance(context.Background(), m.manager, m.workflowName, m.instanceName)
+	ctx := context.TODO()
+	projectUpdateInstance, err := m.getWorkflowInstance(ctx)
 	if err != nil {
 		if err == cereal.ErrWorkflowInstanceNotFound {
 			return ""
 		}
-		logrus.WithError(err).Error("failed to get workflow instance")
 		return err.Error()
 	}
-
-	if instance.Err() != nil {
-		return instance.Err().Error()
-	}
-
-	var payload *multiworkflow.MultiWorkflowPayload
-	if instance.IsRunning() {
-		var err error
-		payload, err = instance.GetPayload()
-		if err != nil {
-			logrus.WithError(err).Error("failed to get workflow instance payload")
-			return err.Error()
-		}
-	} else {
-		var err error
-		payload, err = instance.GetResult()
-		if err != nil {
-			logrus.WithError(err).Error("failed to get workflow instance payload")
-			return err.Error()
-		}
-	}
-
-	// OnStart has not run yet
-	if payload == nil || payload.State == nil {
-		return ""
-	}
-
-	errMsg := ""
-	for _, d := range m.domainServices {
-		subWorkflow, err := instance.GetSubWorkflow(d)
-		if err != nil {
-			logrus.Warnf("subworkflow %q not found", d)
-			continue
-		}
-
-		if subWorkflow.Err() != nil {
-			errMsg = fmt.Sprintf("%s; %s: %s", errMsg, d, subWorkflow.Err().Error())
-		}
-	}
-
-	return errMsg
+	return projectUpdateInstance.FailureMessage()
 }
 
 func (m *CerealProjectUpdateManager) PercentageComplete() float64 {
-	instance, err := multiworkflow.GetWorkflowInstance(context.Background(), m.manager, m.workflowName, m.instanceName)
+	ctx := context.TODO()
+	projectUpdateInstance, err := m.getWorkflowInstance(ctx)
 	if err != nil {
 		return 1.0
 	}
 
-	if !instance.IsRunning() {
+	if !projectUpdateInstance.IsRunning() {
 		return 1.0
 	}
 
 	percentComplete := 0.0
-	for _, d := range m.domainServices {
-		subWorkflow, err := instance.GetSubWorkflow(d)
+	domainServicesUpdateInstance, err := projectUpdateInstance.GetUpdateDomainServicesInstance()
+	if err == cereal.ErrWorkflowInstanceNotFound {
+		return percentComplete
+	}
+
+	domainServices := domainServicesUpdateInstance.ListSubWorkflows()
+	if len(domainServices) == 0 {
+		return 1.0
+	}
+
+	for _, d := range domainServicesUpdateInstance.ListSubWorkflows() {
+		subWorkflow, err := domainServicesUpdateInstance.GetSubWorkflow(d)
 		if err != nil {
 			logrus.WithError(err).Errorf("failed to get subworkflow for %q", d)
 			continue
@@ -357,9 +309,9 @@ func (m *CerealProjectUpdateManager) PercentageComplete() float64 {
 				logrus.WithError(err).Errorf("failed to get payload for %q", d)
 				continue
 			}
-			percentComplete = percentComplete + (float64(payload.MergedJobStatus.PercentageComplete) / float64(len(m.domainServices)))
+			percentComplete = percentComplete + (float64(payload.MergedJobStatus.PercentageComplete) / float64(len(domainServices)))
 		} else {
-			percentComplete = percentComplete + 1.0/float64(len(m.domainServices))
+			percentComplete = percentComplete + 1.0/float64(len(domainServices))
 		}
 	}
 

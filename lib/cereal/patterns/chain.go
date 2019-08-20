@@ -47,7 +47,9 @@ type ChainWorkflowTaskParam struct {
 	XXX_ChainWorkflowIdx int64 `json:"__idx"`
 }
 
-func marshal(idx int64, obj interface{}) (json.RawMessage, error) {
+func marshal(idx int64, obj interface{}) (interface{}, error) {
+	logrus.Infof("marshal idx %d", idx)
+	spew.Dump(obj)
 	structFields := []reflect.StructField{}
 	if obj != nil {
 		structFields = append(structFields, reflect.StructField{
@@ -68,7 +70,9 @@ func marshal(idx int64, obj interface{}) (json.RawMessage, error) {
 		v.Field(0).Set(reflect.ValueOf(obj))
 	}
 	v.FieldByName("ChainWorkflowTaskParam").SetInt(idx)
-	return json.Marshal(v.Interface())
+
+	spew.Dump(v.Interface())
+	return v.Interface(), nil
 }
 
 type workflowInstance struct {
@@ -96,19 +100,19 @@ func (w *workflowInstance) GetParameters(obj interface{}) error {
 
 type enqueueTaskRequest struct {
 	taskName   string
-	parameters json.RawMessage
+	parameters interface{}
 	opts       []cereal.TaskEnqueueOpts
 }
 
 func (w *workflowInstance) EnqueueTask(taskName string, parameters interface{}, opts ...cereal.TaskEnqueueOpts) error {
-	jsonVal, err := marshal(w.idx, parameters)
+	v, err := marshal(w.idx, parameters)
 	if err != nil {
 		return err
 	}
 
 	w.enqueuedTasks = append(w.enqueuedTasks, enqueueTaskRequest{
 		taskName:   taskName,
-		parameters: jsonVal,
+		parameters: v,
 		opts:       opts,
 	})
 	return nil
@@ -278,6 +282,8 @@ func (m *ChainWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev cer
 		return w.Fail(err)
 	}
 
+	spew.Dump(taskParameters)
+
 	payload := ChainWorkflowPayload{}
 	if err := w.GetPayload(&payload); err != nil {
 		return w.Fail(err)
@@ -291,6 +297,8 @@ func (m *ChainWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev cer
 		return w.Continue(payload)
 	}
 
+	spew.Dump(workflowState)
+	logrus.Infof("Delivering to %d", idx)
 	wrappedInstance := &workflowInstance{
 		idx:        idx,
 		w:          w,
@@ -320,12 +328,18 @@ func (m *ChainWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev cer
 				parameters: parameters.WorkflowParams[nextIdx],
 			}
 
+			logrus.Infof("starting %d", nextIdx)
+			spew.Dump(wrappedInstance.parameters)
 			decision := m.executors[nextIdx].OnStart(wrappedInstance, cereal.StartEvent{})
+			spew.Dump(decision)
 			ns := applyDecision(wrappedInstance, decision)
+			spew.Dump(ns)
 			if int64(len(payload.State)) != nextIdx {
 				panic("incorrect length of state")
 			}
 			payload.State = append(payload.State, ns)
+			spew.Dump(payload)
+			// this is wrong if OnStart completes
 			return w.Continue(payload)
 		} else {
 			logrus.Info("NOT FINISHED BUT FAILED")

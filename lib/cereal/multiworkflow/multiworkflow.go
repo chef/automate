@@ -40,7 +40,7 @@ type MultiWorkflowTaskParam struct {
 	XXX_MultiWorkflowKey string `json:"__key"`
 }
 
-func marshal(key string, obj interface{}) (json.RawMessage, error) {
+func marshal(key string, obj interface{}) (interface{}, error) {
 	structFields := []reflect.StructField{}
 	if obj != nil {
 		structFields = append(structFields, reflect.StructField{
@@ -61,7 +61,7 @@ func marshal(key string, obj interface{}) (json.RawMessage, error) {
 		v.Field(0).Set(reflect.ValueOf(obj))
 	}
 	v.FieldByName("MultiWorkflowKey").SetString(key)
-	return json.Marshal(v.Interface())
+	return v.Interface(), nil
 }
 
 type workflowInstance struct {
@@ -89,19 +89,19 @@ func (w *workflowInstance) GetParameters(obj interface{}) error {
 
 type enqueueTaskRequest struct {
 	taskName   string
-	parameters json.RawMessage
+	parameters interface{}
 	opts       []cereal.TaskEnqueueOpts
 }
 
 func (w *workflowInstance) EnqueueTask(taskName string, parameters interface{}, opts ...cereal.TaskEnqueueOpts) error {
-	jsonVal, err := marshal(w.key, parameters)
+	v, err := marshal(w.key, parameters)
 	if err != nil {
 		return err
 	}
 
 	w.enqueuedTasks = append(w.enqueuedTasks, enqueueTaskRequest{
 		taskName:   taskName,
-		parameters: jsonVal,
+		parameters: v,
 		opts:       opts,
 	})
 	return nil
@@ -356,20 +356,26 @@ func NewMultiWorkflowExecutor(executorForFunc ExecutorFor) *MultiWorkflow {
 	}
 }
 
-func EnqueueWorkflow(ctx context.Context, m *cereal.Manager, workflowName string, instanceName string, subworkflows []string, parameters map[string]interface{}) error {
+func ToMultiWorkfowParameters(subworkflows []string, parameters map[string]interface{}) (MultiWorkflowParams, error) {
 	transformedParams := MultiWorkflowParams{
 		SubworkflowKeys: subworkflows,
 		WorkflowParams:  map[string]json.RawMessage{},
 	}
-
 	for key, val := range parameters {
 		transformedVal, err := json.Marshal(val)
 		if err != nil {
-			return err
+			return transformedParams, err
 		}
 		transformedParams.WorkflowParams[key] = transformedVal
 	}
+	return transformedParams, nil
+}
 
+func EnqueueWorkflow(ctx context.Context, m *cereal.Manager, workflowName string, instanceName string, subworkflows []string, parameters map[string]interface{}) error {
+	transformedParams, err := ToMultiWorkfowParameters(subworkflows, parameters)
+	if err != nil {
+		return err
+	}
 	return m.EnqueueWorkflow(ctx, workflowName, instanceName, transformedParams)
 }
 
@@ -432,12 +438,12 @@ func (instance *WorkflowInstance) GetSubWorkflow(workflowName string) (cereal.Im
 
 	// OnStart has not run yet
 	if payload == nil {
-		return nil, ErrSubworkflowNotFound
+		return nil, cereal.ErrWorkflowInstanceNotFound
 	}
 
 	v, ok := payload.State[workflowName]
 	if !ok {
-		return nil, ErrSubworkflowNotFound
+		return nil, cereal.ErrWorkflowInstanceNotFound
 	}
 	var params json.RawMessage
 	if instance.params.WorkflowParams != nil {
@@ -450,6 +456,13 @@ func (instance *WorkflowInstance) GetSubWorkflow(workflowName string) (cereal.Im
 	}
 
 	return subWorkflow, nil
+}
+
+func (instance *WorkflowInstance) ListSubWorkflows() []string {
+	if instance.params == nil {
+		return []string{}
+	}
+	return instance.params.SubworkflowKeys
 }
 
 func (instance *WorkflowInstance) GetPayload() (*MultiWorkflowPayload, error) {
