@@ -109,7 +109,7 @@ func (w *taskCleaner) expireDeadTasks(ctx context.Context, expireOlderThanSecond
 			logrus.Fields{
 				"tid":                tid,
 				"workflowInstanceID": workflowInstanceID,
-			}).Warnf("Expired task")
+			}).Warn("Expired task")
 	}
 	return rows.Err()
 }

@@ -575,7 +575,7 @@ func (r *registeredExecutor) WakeupPoller() {
 // change).
 func (r *registeredExecutor) StartPoller(ctx context.Context, b backend.Driver, taskPollInterval time.Duration, workflowWakeupFun func()) {
 	logctx := logrus.WithField("task_name", r.name)
-	logctx.Infof("Starting task poller")
+	logctx.Info("Starting task poller")
 	timer := time.NewTimer(taskPollInterval)
 	for {
 		select {
