@@ -29,6 +29,14 @@ don't already have `../dev/secrets-env.sh`:
 source ../dev/secrets-env.sh
 ```
 
+If your secrets become out of date, you'll likely need to re-fetch
+`sercrets-env.sh` and re-source. You might get a strange error like
+this if your secrets are out of date:
+
+```
+InvalidCharacterError: Failed to execute 'atob' on 'Window': The string to be decoded is not correctly encoded.
+```
+
 Next, specify the Automate instance you wish to target. This could be
 dev or acceptance; typically start with your local box with this:
 
