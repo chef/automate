@@ -7,12 +7,12 @@ const describeIfIAMV2p1 = Cypress.env('IAM_VERSION') === 'v2.1' ? describe : des
 describeIfIAMV2p1('projects API: applying project', () => {
   const cypressPrefix = 'cypress-test';
   const avengersProject = {
-    id: `${cypressPrefix}-avengers-project-${Cypress.moment().format('MMDDYYhhmm')}`,
+    id: `${cypressPrefix}-project1-${Cypress.moment().format('MMDDYYhhmm')}`,
     name: 'Test Avengers Project'
   };
 
   const xmenProject = {
-    id: `${cypressPrefix}-xmen-project-${Cypress.moment().format('MMDDYYhhmm')}`,
+    id: `${cypressPrefix}-project2-${Cypress.moment().format('MMDDYYhhmm')}`,
     name: 'Test X-men Project'
   };
 

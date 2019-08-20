@@ -31,6 +31,11 @@
     border-color: $chef-primary-bright;
   }
 
+  &[disabled] {
+    background-color: $chef-light-grey;
+    opacity: 0.5;
+  }
+
   .error & {
     border-color: $chef-critical;
     border-radius: $global-radius $global-radius 0 0;

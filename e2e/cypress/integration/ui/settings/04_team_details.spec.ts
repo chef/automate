@@ -1,4 +1,4 @@
-describe('team management', () => {
+describe('team details', () => {
   let adminToken = '';
   const now = Cypress.moment().format('MMDDYYhhmm');
   const cypressPrefix = 'cypress-test';
@@ -140,14 +140,14 @@ describe('team management', () => {
 
       it('cannot access projects dropdown but changing name allows team update submission', () => {
         cy.get('[data-cy=team-details-tab-details]').click();
-        cy.get('[data-cy=team-details-name-input]').should('have.value', teamName);
-        cy.get('[data-cy=team-details-submit-button]').should('have.attr', 'aria-disabled');
 
-        // initial state of dropdown
+        // initial state of page
+        cy.get('[data-cy=team-details-submit-button]').should('have.attr', 'aria-disabled');
         cy.get('app-team-details app-projects-dropdown #projects-selected').contains(unassigned);
         cy.get('app-team-details app-projects-dropdown .dropdown-button').should('be.disabled');
 
-        cy.get('[data-cy=team-details-name-input]').type('updated name');
+        cy.get('[data-cy=team-details-name-input]')
+          .should('have.value', teamName).should('not.be.disabled').type('updated name');
         cy.get('[data-cy=team-details-submit-button]').should('not.have.attr', 'aria-disabled');
       });
     });

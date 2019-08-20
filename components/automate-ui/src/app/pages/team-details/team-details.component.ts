@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
 import { identity, keyBy, at, xor } from 'lodash/fp';
@@ -94,8 +94,12 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       projects: []
     };
     this.updateNameForm = fb.group({
-      // Must stay in sync with error checks in team-details.component.html
-      name: ['Loading...', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+      // Must stay in sync with error checks in team-details.component.html.
+      // Also, initialize the form to disabled and enable after team load
+      // to prevent people from typing before the team is fetched and have their
+      // value overwritten.
+      name: new FormControl({value: 'Loading...', disabled: true},
+        [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)])
     });
 
     combineLatest([
@@ -107,6 +111,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         this.isLoadingTeam =
           (gStatus !== EntityStatus.loadingSuccess) ||
           (uStatus === EntityStatus.loading);
+        this.updateNameForm.controls['name'].enable();
       })
     ).subscribe();
   }
@@ -279,6 +284,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public saveTeam(): void {
     this.saveSuccessful = false;
     this.saving = true;
+    this.updateNameForm.controls['name'].disable();
     const name: string = this.updateNameForm.controls.name.value.trim();
     this.store.dispatch(new UpdateTeam({
         id: this.team.id,
@@ -297,6 +303,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
           pendingSave.next(true);
           pendingSave.complete();
           this.saving = false;
+          this.updateNameForm.controls['name'].enable();
           this.saveSuccessful = (state === EntityStatus.loadingSuccess);
           if (this.saveSuccessful) {
             this.updateNameForm.markAsPristine();
