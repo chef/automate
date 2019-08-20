@@ -14,7 +14,6 @@ import {
 } from './service-groups.model';
 import { environment } from '../../../environments/environment';
 const APPLICATIONS_URL = environment.applications_url;
-//const CONFIG_MGMT_URL = environment.config_mgmt_url;
 
 interface RespSuggestion {
   text: string;
