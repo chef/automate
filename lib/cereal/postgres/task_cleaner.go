@@ -57,26 +57,26 @@ func (w *taskCleaner) Start(ctx context.Context) {
 	w.stop = cancel
 
 	go func() {
-		logrus.Debug("starting task cleaner")
+		logrus.Debug("Starting task cleaner")
 	OUTER:
 		for {
 			select {
 			case <-ctx.Done():
 				break OUTER
 			case <-time.After(w.checkInterval):
-				logrus.Debug("checking for dead tasks")
+				logrus.Debug("Checking for dead tasks")
 				if err := w.expireDeadTasks(ctx, int64(math.Ceil(w.taskTimeout.Seconds()))); err != nil {
-					logrus.WithError(err).Error("failed to run periodic dead-task cleaner")
+					logrus.WithError(err).Error("Failed to run periodic dead-task cleaner")
 				}
 
-				logrus.Debug("cleaning workflow results table")
+				logrus.Debug("Cleaning workflow results table")
 				if err := w.cleanResultsTable(ctx); err != nil {
-					logrus.WithError(err).Error("failed to run periodic workflow-results cleaner")
+					logrus.WithError(err).Error("Failed to run periodic workflow-results cleaner")
 				}
 			}
 		}
 		w.wgStop.Done()
-		logrus.Debug("exiting task cleaner")
+		logrus.Debug("Exiting task cleaner")
 	}()
 }
 
@@ -94,7 +94,7 @@ func (w *taskCleaner) expireDeadTasks(ctx context.Context, expireOlderThanSecond
 
 	defer func() {
 		if err := rows.Close(); err != nil {
-			logrus.WithError(err).Error("failed to close db rows")
+			logrus.WithError(err).Error("Failed to close db rows")
 		}
 	}()
 
@@ -134,7 +134,7 @@ func (w *taskCleaner) cleanResultsTable(ctx context.Context) error {
 	}
 
 	if !locked {
-		logrus.Debug("failed to acquired advisory lock for cleanup task, returning")
+		logrus.Debug("Failed to acquired advisory lock for cleanup task, returning")
 		return tx.Commit()
 	}
 

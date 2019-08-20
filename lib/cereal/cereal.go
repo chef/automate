@@ -248,7 +248,7 @@ func (w *workflowInstanceImpl) EnqueueTask(taskName string, parameters interface
 
 func (w *workflowInstanceImpl) Complete(opts ...CompleteOpts) Decision {
 	if len(w.tasks) > 0 {
-		logrus.Errorf("cannot call EnqueueTask and Complete in same workflow step! failing workflow")
+		logrus.Error("Cannot call EnqueueTask and Complete in same workflow step! failing workflow")
 		return Decision{failed: true, err: errors.New("EnqueueTask and Complete called in same workflow step")}
 	}
 
@@ -655,13 +655,13 @@ func (r *registeredExecutor) runTask(ctx context.Context, t *backend.Task, taskC
 	if err != nil {
 		err := taskCompleter.Fail(err.Error())
 		if err != nil {
-			logctx.WithError(err).Error("failed to mark task as failed")
+			logctx.WithError(err).Error("Failed to mark task as failed")
 			return err
 		}
 	} else {
 		jsonResults, err := jsonify(result)
 		if err != nil {
-			logctx.WithError(err).Error("could not convert returned results to JSON")
+			logctx.WithError(err).Error("Could not convert returned results to JSON")
 			if err := taskCompleter.Fail(err.Error()); err != nil {
 				logctx.WithError(err).Error("Failed to fail task completer")
 				return err
@@ -669,7 +669,7 @@ func (r *registeredExecutor) runTask(ctx context.Context, t *backend.Task, taskC
 		}
 		err = taskCompleter.Succeed(jsonResults)
 		if err != nil {
-			logctx.WithError(err).Error("failed to mark task as successful")
+			logctx.WithError(err).Error("Failed to mark task as successful")
 			return err
 		}
 	}
@@ -718,9 +718,9 @@ func (m *Manager) Stop() error {
 		m.cancel()
 	}
 
-	logrus.Info("waiting for goroutines to stop")
+	logrus.Info("Waiting for goroutines to stop")
 	m.wg.Wait()
-	logrus.Info("goroutines stopped")
+	logrus.Info("Goroutines stopped")
 
 	var err error
 	if m.backend != nil {
@@ -911,7 +911,7 @@ LOOP:
 	for {
 		select {
 		case <-ctx.Done():
-			logrus.Info("exiting workflow executor")
+			logrus.Info("Exiting workflow executor")
 			break LOOP
 		case <-m.workflowWakeupChan:
 			if !timer.Stop() {
@@ -938,7 +938,7 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 	wevt, completer, err := m.backend.DequeueWorkflow(ctx, workflowsToProcess)
 	if err != nil {
 		if err != ErrNoWorkflowInstances {
-			logrus.WithError(err).Error("failed to dequeue workflow!")
+			logrus.WithError(err).Error("Failed to dequeue workflow!")
 		}
 		return true
 	}
@@ -998,7 +998,7 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 
 		err = completer.Fail(decision.err)
 		if err != nil {
-			logctx.WithError(err).Error("failed to complete workflow")
+			logctx.WithError(err).Error("Failed to complete workflow")
 		}
 
 		s.End("failed")
@@ -1011,13 +1011,13 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 		}
 		jsonResult, err := jsonify(decision.result)
 		if err != nil {
-			logctx.WithError(err).Error("failed to jsonify workflow result")
+			logctx.WithError(err).Error("Failed to jsonify workflow result")
 			jsonResult = nil
 		}
 
 		err = completer.Done(jsonResult)
 		if err != nil {
-			logctx.WithError(err).Error("failed to complete workflow")
+			logctx.WithError(err).Error("Failed to complete workflow")
 		}
 		s.End("complete")
 	} else if decision.continuing {
@@ -1025,7 +1025,7 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 		for _, t := range decision.tasks {
 			err := completer.EnqueueTask(&t.backendTask, t.opts)
 			if err != nil {
-				logrus.WithError(err).Error("failed to enqueue task!")
+				logrus.WithError(err).Error("Failed to enqueue task!")
 				return true
 			}
 		}
@@ -1033,15 +1033,15 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 		s.Begin("continue")
 		jsonPayload, err := jsonify(decision.payload)
 		if err != nil {
-			logrus.WithError(err).Error("could not marshal payload to JSON, failing workflow")
+			logrus.WithError(err).Error("Could not marshal payload to JSON, failing workflow")
 			err := completer.Fail(err)
 			if err != nil {
-				logrus.WithError(err).Error("failed to fail workflow after JSON marshal failure")
+				logrus.WithError(err).Error("Failed to fail workflow after JSON marshal failure")
 			}
 		} else {
 			err := completer.Continue(jsonPayload)
 			if err != nil {
-				logrus.WithError(err).Error("failed to continue workflow")
+				logrus.WithError(err).Error("Failed to continue workflow")
 			}
 			m.wakeupTaskPollersByRequests(decision.tasks)
 		}
@@ -1073,7 +1073,7 @@ type statsInfo struct {
 func (s *statsInfo) Begin(label string) {
 	_, ok := s.start[label]
 	if ok {
-		logrus.Warn("statsInfo.Begin on currently running label, ignoring")
+		logrus.Warn("Called statsInfo.Begin on currently running label, ignoring")
 		return
 	}
 
@@ -1083,7 +1083,7 @@ func (s *statsInfo) Begin(label string) {
 func (s *statsInfo) End(label string) {
 	start, ok := s.start[label]
 	if !ok {
-		logrus.Warn("statsInfo.End on label with no start, ignoring")
+		logrus.Warn("Called statsInfo.End on label with no start, ignoring")
 		return
 	}
 
