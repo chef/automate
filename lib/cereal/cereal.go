@@ -31,8 +31,8 @@ var (
 )
 
 const (
-	defaultTaskPollInterval     = 2 * time.Second
-	defaultWorkflowPollInterval = 2 * time.Second
+	defaultTaskPollInterval     = 10 * time.Second
+	defaultWorkflowPollInterval = 10 * time.Second
 )
 
 // Schedule represents a recurring workflow.
@@ -248,7 +248,7 @@ func (w *workflowInstanceImpl) EnqueueTask(taskName string, parameters interface
 
 func (w *workflowInstanceImpl) Complete(opts ...CompleteOpts) Decision {
 	if len(w.tasks) > 0 {
-		logrus.Errorf("cannot call EnqueueTask and Complete in same workflow step! failing workflow")
+		logrus.Error("Cannot call EnqueueTask and Complete in same workflow step! failing workflow")
 		return Decision{failed: true, err: errors.New("EnqueueTask and Complete called in same workflow step")}
 	}
 
@@ -441,8 +441,9 @@ type Manager struct {
 	cancel            context.CancelFunc
 	wg                sync.WaitGroup
 
-	workflowWakeupChan chan struct{}
-	taskPollInterval   time.Duration
+	workflowWakeupChan   chan struct{}
+	taskPollInterval     time.Duration
+	workflowPollInterval time.Duration
 }
 
 // ManagerOpt is an option that can be passed to NewManager.
@@ -453,6 +454,10 @@ type ManagerOpt func(*Manager)
 // interval for new jobs.
 func WithTaskPollInterval(interval time.Duration) ManagerOpt {
 	return func(m *Manager) { m.taskPollInterval = interval }
+}
+
+func WithWorkflowPollInterval(interval time.Duration) ManagerOpt {
+	return func(m *Manager) { m.workflowPollInterval = interval }
 }
 
 // NewManager creates a new Manager with the given Driver. If
@@ -470,12 +475,18 @@ func NewManager(b backend.Driver, opts ...ManagerOpt) (*Manager, error) {
 		workflowExecutors: make(map[string]WorkflowExecutor),
 		taskExecutors:     make(map[string]*registeredExecutor),
 
-		taskPollInterval:   defaultTaskPollInterval,
-		workflowWakeupChan: workflowWakeupChan,
+		workflowPollInterval: defaultWorkflowPollInterval,
+		taskPollInterval:     defaultTaskPollInterval,
+		workflowWakeupChan:   workflowWakeupChan,
 	}
 
 	if v, ok := b.(backend.SchedulerDriver); ok {
 		m.workflowScheduler = NewWorkflowScheduler(v, m.WakeupWorkflowExecutor)
+	}
+
+	if intervalSuggester, ok := b.(backend.IntervalSuggester); ok {
+		m.taskPollInterval = intervalSuggester.DefaultTaskPollInterval()
+		m.workflowPollInterval = intervalSuggester.DefaultWorkflowPollInterval()
 	}
 
 	for _, o := range opts {
@@ -575,7 +586,7 @@ func (r *registeredExecutor) WakeupPoller() {
 // change).
 func (r *registeredExecutor) StartPoller(ctx context.Context, b backend.Driver, taskPollInterval time.Duration, workflowWakeupFun func()) {
 	logctx := logrus.WithField("task_name", r.name)
-	logctx.Infof("Starting task poller")
+	logctx.Info("Starting task poller")
 	timer := time.NewTimer(taskPollInterval)
 	for {
 		select {
@@ -655,13 +666,13 @@ func (r *registeredExecutor) runTask(ctx context.Context, t *backend.Task, taskC
 	if err != nil {
 		err := taskCompleter.Fail(err.Error())
 		if err != nil {
-			logctx.WithError(err).Error("failed to mark task as failed")
+			logctx.WithError(err).Error("Failed to mark task as failed")
 			return err
 		}
 	} else {
 		jsonResults, err := jsonify(result)
 		if err != nil {
-			logctx.WithError(err).Error("could not convert returned results to JSON")
+			logctx.WithError(err).Error("Could not convert returned results to JSON")
 			if err := taskCompleter.Fail(err.Error()); err != nil {
 				logctx.WithError(err).Error("Failed to fail task completer")
 				return err
@@ -669,7 +680,7 @@ func (r *registeredExecutor) runTask(ctx context.Context, t *backend.Task, taskC
 		}
 		err = taskCompleter.Succeed(jsonResults)
 		if err != nil {
-			logctx.WithError(err).Error("failed to mark task as successful")
+			logctx.WithError(err).Error("Failed to mark task as successful")
 			return err
 		}
 	}
@@ -718,9 +729,9 @@ func (m *Manager) Stop() error {
 		m.cancel()
 	}
 
-	logrus.Info("waiting for goroutines to stop")
+	logrus.Info("Waiting for goroutines to stop")
 	m.wg.Wait()
-	logrus.Info("goroutines stopped")
+	logrus.Info("Goroutines stopped")
 
 	var err error
 	if m.backend != nil {
@@ -905,13 +916,13 @@ func (m *Manager) runWorkflowExecutor(ctx context.Context) {
 		workflowNames = append(workflowNames, k)
 	}
 
-	timer := time.NewTimer(defaultWorkflowPollInterval)
+	timer := time.NewTimer(m.workflowPollInterval)
 	m.wg.Add(1)
 LOOP:
 	for {
 		select {
 		case <-ctx.Done():
-			logrus.Info("exiting workflow executor")
+			logrus.Info("Exiting workflow executor")
 			break LOOP
 		case <-m.workflowWakeupChan:
 			if !timer.Stop() {
@@ -923,7 +934,7 @@ LOOP:
 		}
 		for !m.processWorkflow(ctx, workflowNames) {
 		}
-		timer.Reset(defaultWorkflowPollInterval)
+		timer.Reset(m.workflowPollInterval)
 	}
 	m.wg.Done()
 }
@@ -938,7 +949,7 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 	wevt, completer, err := m.backend.DequeueWorkflow(ctx, workflowsToProcess)
 	if err != nil {
 		if err != ErrNoWorkflowInstances {
-			logrus.WithError(err).Error("failed to dequeue workflow!")
+			logrus.WithError(err).Error("Failed to dequeue workflow!")
 		}
 		return true
 	}
@@ -998,7 +1009,7 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 
 		err = completer.Fail(decision.err)
 		if err != nil {
-			logctx.WithError(err).Error("failed to complete workflow")
+			logctx.WithError(err).Error("Failed to complete workflow")
 		}
 
 		s.End("failed")
@@ -1011,13 +1022,13 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 		}
 		jsonResult, err := jsonify(decision.result)
 		if err != nil {
-			logctx.WithError(err).Error("failed to jsonify workflow result")
+			logctx.WithError(err).Error("Failed to jsonify workflow result")
 			jsonResult = nil
 		}
 
 		err = completer.Done(jsonResult)
 		if err != nil {
-			logctx.WithError(err).Error("failed to complete workflow")
+			logctx.WithError(err).Error("Failed to complete workflow")
 		}
 		s.End("complete")
 	} else if decision.continuing {
@@ -1025,7 +1036,7 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 		for _, t := range decision.tasks {
 			err := completer.EnqueueTask(&t.backendTask, t.opts)
 			if err != nil {
-				logrus.WithError(err).Error("failed to enqueue task!")
+				logrus.WithError(err).Error("Failed to enqueue task!")
 				return true
 			}
 		}
@@ -1033,15 +1044,15 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 		s.Begin("continue")
 		jsonPayload, err := jsonify(decision.payload)
 		if err != nil {
-			logrus.WithError(err).Error("could not marshal payload to JSON, failing workflow")
+			logrus.WithError(err).Error("Could not marshal payload to JSON, failing workflow")
 			err := completer.Fail(err)
 			if err != nil {
-				logrus.WithError(err).Error("failed to fail workflow after JSON marshal failure")
+				logrus.WithError(err).Error("Failed to fail workflow after JSON marshal failure")
 			}
 		} else {
 			err := completer.Continue(jsonPayload)
 			if err != nil {
-				logrus.WithError(err).Error("failed to continue workflow")
+				logrus.WithError(err).Error("Failed to continue workflow")
 			}
 			m.wakeupTaskPollersByRequests(decision.tasks)
 		}
@@ -1073,7 +1084,7 @@ type statsInfo struct {
 func (s *statsInfo) Begin(label string) {
 	_, ok := s.start[label]
 	if ok {
-		logrus.Warn("statsInfo.Begin on currently running label, ignoring")
+		logrus.Warn("Called statsInfo.Begin on currently running label, ignoring")
 		return
 	}
 
@@ -1083,7 +1094,7 @@ func (s *statsInfo) Begin(label string) {
 func (s *statsInfo) End(label string) {
 	start, ok := s.start[label]
 	if !ok {
-		logrus.Warn("statsInfo.End on label with no start, ignoring")
+		logrus.Warn("Called statsInfo.End on label with no start, ignoring")
 		return
 	}
 

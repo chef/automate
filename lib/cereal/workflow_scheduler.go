@@ -43,7 +43,7 @@ func (w *WorkflowScheduler) Run(ctx context.Context) {
 		case <-time.After(nextSleep):
 			nextSleep, err = w.scheduleWorkflows(ctx)
 			if err != nil {
-				logrus.WithError(err).Error("failed to schedule workflows")
+				logrus.WithError(err).Error("Failed to schedule workflows")
 			}
 			logrus.Debugf("Recurring workflow scheduler sleep for %fs", nextSleep.Seconds())
 		}
@@ -76,7 +76,7 @@ func (w *WorkflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 				if err2 == ErrNoScheduledWorkflows {
 					return MaxWakeupInterval, err
 				}
-				logrus.WithError(err2).Error("failed to determine next scheduled workflow")
+				logrus.WithError(err2).Error("Failed to determine next scheduled workflow")
 				return MaxWakeupInterval, err
 			}
 			logrus.Debugf("Woke up %fs early for task", time.Until(s.NextDueAt).Seconds())
@@ -92,7 +92,7 @@ func (w *WorkflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 
 	recurrence, err := rrule.StrToRRule(s.Recurrence)
 	if err != nil {
-		logrus.WithError(err).Error("scheduled workflow has invalid recurrence rule, attempting to disable it")
+		logrus.WithError(err).Error("Scheduled workflow has invalid recurrence rule, attempting to disable it")
 		err2 := completer.DisableSchedule(s)
 		if err2 != nil {
 			return MaxWakeupInterval, errors.Wrap(err2, "failed to disable workflow with invalid recurrence rule")
@@ -107,7 +107,7 @@ func (w *WorkflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 	nowUTC := time.Now().UTC()
 	nextDueAt := recurrence.After(nowUTC, true).UTC()
 	if nextDueAt.IsZero() {
-		logrus.Infof("recurrence rule for scheduled workflow %q ends after this run", s.InstanceName)
+		logrus.Infof("Recurrence rule for scheduled workflow %q ends after this run", s.InstanceName)
 		s.Enabled = false
 	}
 

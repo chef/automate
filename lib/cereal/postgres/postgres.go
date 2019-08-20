@@ -51,7 +51,7 @@ WITH res AS (
 )
 -- Select the workflow instance data, giving priority to that coming
 -- from the cereal_workflow_instances table
-SELECT COALESCE(a.id, res.id) id, 
+SELECT COALESCE(a.id, res.id) id,
        COALESCE(a.status, 'completed') status,
        COALESCE(a.instance_name, res.instance_name) instance_name,
 	   COALESCE(a.workflow_name, res.workflow_name) workflow_name,
@@ -73,9 +73,9 @@ WHERE
 	-- or passing in NULL. If a value is given for a column, we make sure the value matches either
 	-- of the cereal_workflow_instances table or the cereal_workflow_results table. Passing in NULL
 	-- for the value reduces down into saying the value in the column matches the value in the column.
-	(a.workflow_name = COALESCE($1, a.workflow_name) OR 
+	(a.workflow_name = COALESCE($1, a.workflow_name) OR
 	res.workflow_name = COALESCE($1, res.workflow_name)) AND
-	(a.instance_name = COALESCE($2, a.instance_name) OR 
+	(a.instance_name = COALESCE($2, a.instance_name) OR
 	res.instance_name = COALESCE($2, res.instance_name)) AND
 	-- We'll select the row if is_running is now specified
 	(($3::boolean IS NULL) OR
@@ -287,9 +287,9 @@ func (pg *PostgresBackend) Init() error {
 func (pg *PostgresBackend) Close() error {
 	if pg.db != nil {
 		pg.cleaner.Stop()
-		logrus.Debug("closing cereal database")
+		logrus.Debug("Closing cereal database")
 		err := pg.db.Close()
-		logrus.WithError(err).Debug("closed cereal database")
+		logrus.WithError(err).Debug("Closed cereal database")
 		return err
 	}
 	return nil
@@ -407,7 +407,7 @@ func (pg *PostgresBackend) GetDueScheduledWorkflow(ctx context.Context) (*backen
 		if err == sql.ErrNoRows {
 			err := tx.Commit()
 			if err != nil {
-				logrus.WithError(err).Warn("failed to commit transaction in GetDueScheduledWorkflows")
+				logrus.WithError(err).Warn("Failed to commit transaction in GetDueScheduledWorkflows")
 			}
 			cancel()
 			return nil, nil, cereal.ErrNoDueWorkflows
@@ -682,7 +682,7 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 		"event_type":    event.Type,
 	})
 
-	logctx.Debug("dequeued workflow")
+	logctx.Debug("Dequeued workflow")
 
 	if event.Instance.Status == backend.WorkflowInstanceStatusStarting && event.Type == backend.WorkflowCancel {
 		defer cancel()
@@ -801,7 +801,7 @@ func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*b
 	tid, task, err := pg.dequeueTask(tx, taskName)
 	if err != nil {
 		if errR := tx.Rollback(); errR != nil {
-			logrus.WithError(errR).Warn("failed to rollback dequeue transaction")
+			logrus.WithError(errR).Warn("Failed to rollback dequeue transaction")
 		}
 		cancel()
 		return nil, nil, err
@@ -845,7 +845,7 @@ func (taskc *PostgresTaskCompleter) Fail(errMsg string) error {
 
 	if err != nil {
 		if isErrTaskLost(err) {
-			logrus.WithField("task_id", taskc.tid).Warn("task not updated")
+			logrus.WithField("task_id", taskc.tid).Warn("Task not updated")
 			return cereal.ErrTaskLost
 		}
 		return errors.Wrapf(err, "failed to mark task %d as failed", taskc.tid)
@@ -870,7 +870,7 @@ func (taskc *PostgresTaskCompleter) Succeed(results []byte) error {
 
 	if err != nil {
 		if isErrTaskLost(err) {
-			logrus.WithField("task_id", taskc.tid).Warn("task not updated")
+			logrus.WithField("task_id", taskc.tid).Warn("Task not updated")
 			return cereal.ErrTaskLost
 		}
 		return errors.Wrapf(err, "failed to mark task %d as successful", taskc.tid)
