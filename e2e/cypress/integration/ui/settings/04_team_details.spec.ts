@@ -1,7 +1,7 @@
 describe('team details', () => {
   let adminToken = '';
   const now = Cypress.moment().format('MMDDYYhhmm');
-  const cypressPrefix = 'cypress-team-details';
+  const cypressPrefix = 'test-team-details';
   const teamName = `${cypressPrefix} team ${now}`;
   const teamID = `${cypressPrefix}-testing-team-custom-id-${now}`;
   const project1ID = `${cypressPrefix}-project1-${now}`;
@@ -104,6 +104,10 @@ describe('team details', () => {
 
   afterEach(() => {
     cy.saveStorage();
+  });
+
+  after(() => {
+    cy.cleanupProjectsByIDPrefix(adminToken, cypressPrefix);
   });
 
   it('displays team details for admins team', () => {

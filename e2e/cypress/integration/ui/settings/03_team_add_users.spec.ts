@@ -1,6 +1,6 @@
 describe('team add users', () => {
   const now = Cypress.moment().format('MMDDYYhhmm');
-  const cypressPrefix = 'cypress-team-add-users';
+  const cypressPrefix = 'test-add-users';
   const nameForUser = cypressPrefix + ' user ' + now;
   const usernameForUser = 'testing-user-' + now;
   const descriptionForTeam = cypressPrefix + ' team ' + now;

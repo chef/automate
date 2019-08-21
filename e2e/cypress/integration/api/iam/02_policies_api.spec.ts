@@ -8,7 +8,7 @@ const describeIfIAMV2 = iamVersion.match(/v2/) ? describe : describe.skip;
 
 describeIfIAMV2('policies API', () => {
   let adminToken = '';
-  const cypressPrefix = 'cypress-policies-api';
+  const cypressPrefix = 'test-policies-api';
   const now = Cypress.moment().format('MMDDYYhhmm');
   const projectID = `${cypressPrefix}-project-${now}`;
 

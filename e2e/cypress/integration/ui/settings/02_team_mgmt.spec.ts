@@ -1,7 +1,7 @@
 describe('team management', () => {
   let adminToken = '';
   const now = Cypress.moment().format('MMDDYYhhmm');
-  const cypressPrefix = 'cypress-team-mgmt';
+  const cypressPrefix = 'test-team-mgmt';
   const teamName = `${cypressPrefix} team ${now}`;
   const customTeamID = `${cypressPrefix}-testing-team-custom-id-${now}`;
   const project1ID = `${cypressPrefix}-project1-${now}`;
@@ -60,6 +60,10 @@ describe('team management', () => {
   afterEach(() => {
     cy.saveStorage();
     cy.cleanupTeamsByDescriptionPrefix(adminToken, cypressPrefix);
+  });
+
+  after(() => {
+    cy.cleanupProjectsByIDPrefix(adminToken, cypressPrefix);
   });
 
   context('no custom initial page state', () => {

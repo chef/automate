@@ -111,7 +111,11 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         this.isLoadingTeam =
           (gStatus !== EntityStatus.loadingSuccess) ||
           (uStatus === EntityStatus.loading);
-        this.updateNameForm.controls['name'].enable();
+        if (this.isLoadingTeam) {
+          this.updateNameForm.controls['name'].disable();
+        } else {
+          this.updateNameForm.controls['name'].enable();
+        }
       })
     ).subscribe();
   }
