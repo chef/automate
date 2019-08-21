@@ -1,0 +1,64 @@
+@startuml
+Title Nominal Rule and Project Status on Projects List Page
+
+concise "User" as USER
+robust "Ingest Rules" as RULES
+robust "Project Update Status" as PROJECTS
+scale 100 as 50 pixels
+
+@0
+USER is Idle
+RULES is "No Rules"
+PROJECTS is OK
+
+@100
+USER is "."
+USER -> RULES: "Add Rule"
+RULES -> PROJECTS
+RULES is "Edits Pending"
+PROJECTS is "Needs Updating"
+
+@+10
+USER is Idle
+
+@300
+USER is "."
+USER -> PROJECTS: "Update Projects"
+PROJECTS is "Updating"
+PROJECTS -> RULES@+20
+
+@+10
+USER is Idle
+
+@+10
+RULES is Applied
+
+@600
+PROJECTS is OK
+
+@900
+USER is "."
+USER -> RULES: "Edit Rule"
+RULES -> PROJECTS
+RULES is "Edits Pending"
+PROJECTS is "Needs Updating"
+
+@+10
+USER is Idle
+
+@1200
+USER is "."
+USER -> PROJECTS: "Update Projects"
+PROJECTS is "Updating"
+PROJECTS -> RULES@+20
+
+@+10
+USER is Idle
+
+@+10
+RULES is Applied
+
+@1400
+PROJECTS is OK
+
+@enduml

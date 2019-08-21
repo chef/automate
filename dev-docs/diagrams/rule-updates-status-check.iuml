@@ -1,0 +1,125 @@
+@startuml
+Title Monitoring the Project Rule Status Updates
+
+robust "Initial Burst" as INITIAL
+robust "Active" as ACTIVE
+robust "Dormant" as DORMANT
+robust "Project Update Status" as PROJECTS
+scale 20000 as 50 pixels
+
+@0
+INITIAL is "Quiescent"
+ACTIVE is "Quiescent"
+DORMANT is "Quiescent"
+PROJECTS is "OK"
+
+@40000
+DORMANT is "Ping"
+@+10
+DORMANT is "Quiescent"
+
+@+60000
+DORMANT is "Ping"
+@+10
+DORMANT is "Quiescent"
+
+@115000
+PROJECTS is "Needs Updating"
+
+@+15000
+PROJECTS is "Updating"
+PROJECTS -> INITIAL: Start
+PROJECTS -> ACTIVE@+5000: Start
+PROJECTS -> DORMANT@+5000: Start
+
+@+250
+INITIAL is "Ping"
+@+10
+INITIAL is "Quiescent"
+
+@+250
+INITIAL is "Ping"
+@+10
+INITIAL is "Quiescent"
+
+@+250
+INITIAL is "Ping"
+@+10
+INITIAL is "Quiescent"
+
+@+250
+INITIAL is "Ping"
+@+10
+INITIAL is "Quiescent"
+
+@+250
+INITIAL is "Ping"
+@+10
+INITIAL is "Quiescent"
+
+@+250
+INITIAL is "Ping"
+@+10
+INITIAL is "Quiescent"
+
+@+250
+INITIAL is "Ping"
+@+10
+INITIAL is "Quiescent"
+
+@+250
+INITIAL is "Ping"
+@+10
+INITIAL is "Quiescent"
+
+@135000
+ACTIVE@+0 <-> @+5000 : {5 sec}
+ACTIVE is "Ping"
+@+10
+ACTIVE is "Quiescent"
+
+@+5000
+ACTIVE is "Ping"
+@+10
+ACTIVE is "Quiescent"
+
+@+5000
+ACTIVE is "Ping"
+@+10
+ACTIVE is "Quiescent"
+
+@+5000
+ACTIVE is "Ping"
+@+10
+ACTIVE is "Quiescent"
+
+@+5000
+ACTIVE is "Ping"
+@+10
+ACTIVE is "Quiescent"
+
+@+5000
+ACTIVE is "Ping"
+@+10
+ACTIVE is "Quiescent"
+PROJECTS is "OK"
+PROJECTS -> ACTIVE: Finish
+PROJECTS -> DORMANT@+30000: Finish
+
+@190000
+DORMANT@+0 <-> @+60000 : {60 sec}
+DORMANT is "Ping"
+@+10
+DORMANT is "Quiescent"
+
+@+60000
+DORMANT is "Ping"
+@+10
+DORMANT is "Quiescent"
+
+@+60000
+DORMANT is "Ping"
+@+10
+DORMANT is "Quiescent"
+
+@enduml
