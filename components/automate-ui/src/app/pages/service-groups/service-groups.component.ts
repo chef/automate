@@ -259,7 +259,8 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       .subscribe(currentPage => this.currentPage = currentPage);
 
     this.serviceGroupsSuggestions$ = this.store.select(createSelector(serviceGroupState,
-      (state) => state.serviceGroupsSuggestions)).pipe(map((serviceGroupsSuggestions: any[]) => serviceGroupsSuggestions));
+      (state) => state.serviceGroupsSuggestions))
+        .pipe(map((serviceGroupsSuggestions: any[]) => serviceGroupsSuggestions));
 
     this.searchBarFilters$ = allUrlParameters$.pipe(map((chicklets: Chicklet[]) =>
       chicklets.filter(chicklet => some({'type': chicklet.type}, this.categoryTypes))));

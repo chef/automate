@@ -94,12 +94,17 @@ export class ServiceGroupsRequests {
     return this.httpClient.get<HealthSummary>(url);
   }
 
-  public getSuggestions(field_name: string, query_fragment: string, filters: ServiceGroupFilters): Observable<any[]> {
-    const params = this.formatFilters(filters).set('field_name', field_name).set('query_fragment', query_fragment);
-    const url = `${APPLICATIONS_URL}/services-distinct-values`;
+  public getSuggestions(
+    field_name: string,
+    query_fragment: string,
+    filters: ServiceGroupFilters): Observable<any[]> {
+      const params = this.formatFilters(filters)
+        .set('field_name', field_name)
+        .set('query_fragment', query_fragment);
+      const url = `${APPLICATIONS_URL}/services-distinct-values`;
 
-    return this.httpClient.get<RespSuggestion>(url, {params}).pipe(map(
-      (suggestions) => suggestions.values));
+      return this.httpClient.get<RespSuggestion>(url, {params}).pipe(map(
+        (suggestions) => suggestions.values));
   }
 
   private formatFilters(filters: ServiceGroupFilters) {

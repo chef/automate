@@ -92,7 +92,8 @@ export class ServiceGroupsEffects {
         return this.requests.getSuggestions(
           getServiceGroupsSuggestions.payload.type, getServiceGroupsSuggestions.payload.text,
           storeState.serviceGroups.filters).pipe(
-        map(serviceGroupsSuggestions => new GetServiceGroupsSuggestionsSuccess({ serviceGroupsSuggestions })),
+        map(serviceGroupsSuggestions =>
+          new GetServiceGroupsSuggestionsSuccess({ serviceGroupsSuggestions })),
         catchError((error) => of(new GetServiceGroupsSuggestionsFailure(error))));
       }));
 }
