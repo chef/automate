@@ -262,7 +262,7 @@ func getNotificationsConnection(connectionFactory *secureconn.Factory,
 	timeoutCtx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 	conn, err := connectionFactory.DialContext(timeoutCtx, "notifications-service",
-		notificationsEndpoint, grpc.WithBlock())
+		notificationsEndpoint)
 	if err != nil {
 		logrus.Fatalf("getNotificationsConnection, error grpc dialing to manager %s", err.Error())
 	}
