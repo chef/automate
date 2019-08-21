@@ -5,7 +5,7 @@ if (Cypress.env('IAM_VERSION') === undefined) {
 const describeIfIAMV2p1 = Cypress.env('IAM_VERSION') === 'v2.1' ? describe : describe.skip;
 
 describeIfIAMV2p1('projects API: applying project', () => {
-  const cypressPrefix = 'cypress-test';
+  const cypressPrefix = 'cypress-projects-api';
   const avengersProject = {
     id: `${cypressPrefix}-project1-${Cypress.moment().format('MMDDYYhhmm')}`,
     name: 'Test Avengers Project'

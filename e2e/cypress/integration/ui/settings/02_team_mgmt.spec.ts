@@ -1,7 +1,7 @@
 describe('team management', () => {
   let adminToken = '';
   const now = Cypress.moment().format('MMDDYYhhmm');
-  const cypressPrefix = 'cypress-test';
+  const cypressPrefix = 'cypress-team-mgmt';
   const teamName = `${cypressPrefix} team ${now}`;
   const customTeamID = `${cypressPrefix}-testing-team-custom-id-${now}`;
   const project1ID = `${cypressPrefix}-project1-${now}`;

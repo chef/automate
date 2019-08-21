@@ -1,7 +1,3 @@
-const cypressPrefix = 'cypress';
-const now = Cypress.moment().format('MMDDYYhhmm');
-const projectID = `${cypressPrefix}-project-${now}`;
-
 // This is to prevent tests from running in wrong
 // CI environments. If local, just always run it.
 let iamVersion = <string><Object>Cypress.env('IAM_VERSION');
@@ -12,6 +8,9 @@ const describeIfIAMV2 = iamVersion.match(/v2/) ? describe : describe.skip;
 
 describeIfIAMV2('policies API', () => {
   let adminToken = '';
+  const cypressPrefix = 'cypress-policies-api';
+  const now = Cypress.moment().format('MMDDYYhhmm');
+  const projectID = `${cypressPrefix}-project-${now}`;
 
   beforeEach(() => {
     cy.adminLogin('/').then(() => {
