@@ -55,6 +55,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     // navigate to node create page:
     // click on scan jobs
     cy.get('.nav-link').contains('Compliance').click();
+    cy.url().should('include', '/compliance/reports/overview');
 
     // add force to avoid waiting on the whole page to load
     cy.get('chef-sidebar-entry').contains('Scan Jobs').click({ force: true });
@@ -125,6 +126,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     // navigate to scan create page
     // click on scan jobs
     cy.get('.nav-link').contains('Compliance').click();
+    cy.url().should('include', '/compliance/reports/overview');
     cy.get('chef-sidebar-entry').contains('Scan Jobs').click({ force: true });
     cy.url().should('include', '/compliance/scan-jobs/jobs');
 
@@ -194,7 +196,8 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     // navigate to node create page:
     // click on scan jobs
     cy.get('.nav-link').contains('Compliance').click();
-    cy.get('chef-sidebar-entry').contains('Scan Jobs').click();
+    cy.url().should('include', '/compliance/reports/overview');
+    cy.get('chef-sidebar-entry').contains('Scan Jobs').click({ force: true });
     cy.url().should('include', '/compliance/scan-jobs/jobs');
 
     // we save the route that will be called when we navigate to the page
@@ -238,7 +241,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     // navigate to scan create page:
     // click on scan jobs
     cy.get('.nav-link').contains('Compliance').click();
-    cy.get('chef-sidebar-entry').contains('Scan Jobs').click();
+    cy.get('chef-sidebar-entry').contains('Scan Jobs').click({ force: true });
     cy.url().should('include', '/compliance/scan-jobs/jobs');
 
     // delete scan job
