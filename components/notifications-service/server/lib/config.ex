@@ -98,6 +98,7 @@ defmodule Notifications.Config do
       fail_if_no_peer_cert: true,
       verify: :verify_peer,
       versions: [:'tlsv1.2'],
+      depth: 32,
     ]]
   end
 
@@ -110,6 +111,7 @@ defmodule Notifications.Config do
       server_name_indication: :disable,
       verify: :verify_peer,
       versions: [:'tlsv1.2'],
+      depth: 32,
     ]]
   end
 
