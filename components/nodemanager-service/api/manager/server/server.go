@@ -193,7 +193,7 @@ func (srv *Server) addManagerAndNodes(ctx context.Context, in *manager.NodeManag
 
 func (srv *Server) addNodes(ctx context.Context, id string, in *manager.NodeManager, acctID string) error {
 	// for the aws-ec2 manager, this will be one node per instance in account
-	// for the aws-api manager, this will be one node per region in account
+	// for the aws-api manager, this will be one node per account
 	// for the azure-api manager, this will be one node per subscription in account
 	// for the gcp-api manager, this will be one node for the project specified in the credentials
 	err := srv.addManagerNodesToDB(ctx, id, in.Name, in.Type, acctID, in.InstanceCredentials, in.CredentialId)
@@ -657,7 +657,7 @@ func (srv *Server) addManagerNodesToDB(ctx context.Context, managerId string, ma
 		}
 		srv.getInstanceStatesAndUpdateDB(ctx, managerId, managerAcctId)
 	case "aws-api":
-		nodeIds, err = srv.addNodeForEachApiRegion(ctx, managerId, managerName, managerAcctId, credential)
+		nodeIds, err = srv.addNodeForAccount(ctx, managerId, managerName, managerAcctId, credential)
 		if err != nil {
 			return errors.Wrapf(err, "addManagerNodesToDb unable to add a node for each api region for manager %s", managerId)
 		}
@@ -720,28 +720,25 @@ func (srv *Server) addNodeForEachEc2Instance(ctx context.Context, managerId stri
 	return nodeIds, nil
 }
 
-func (srv *Server) addNodeForEachApiRegion(ctx context.Context, managerId string, managerName string, managerAcctId string, credential string) ([]string, error) {
+func (srv *Server) addNodeForAccount(ctx context.Context, managerId string, managerName string, managerAcctId string, credential string) ([]string, error) {
 	logrus.Infof("Getting regions for node manager: %+v", managerId)
 	myaws, _, err := managers.GetAWSManagerFromID(ctx, managerId, srv.DB, srv.secretsClient)
 	if err != nil {
-		return nil, fmt.Errorf("addNodeForEachApiRegion; error getting connection %s %s", managerName, err.Error())
+		return nil, fmt.Errorf("addNodeForAccount; error getting connection %s %s", managerName, err.Error())
 	}
 
-	filters := make([]*common.Filter, 0)
-	regions, err := myaws.QueryField(ctx, filters, "regions")
-	if err != nil {
-		return nil, fmt.Errorf("addNodeForEachApiRegion; there was an error listing nodes: %s %s", managerName, err.Error())
-	}
 	acctAlias, err := myaws.GetAccountAlias(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("addNodeForEachApiRegion; unable to get account alias: %s %s", managerName, err.Error())
+		return nil, fmt.Errorf("addNodeForAccount; unable to get account alias: %s %s", managerName, err.Error())
 	}
 	if len(acctAlias) == 0 {
 		// the user may have never set an alias for their account, and that's ok, but we should log it out
-		logrus.Warnf("addNodeForEachApiRegion; no account aliases found for manager: %s", managerName)
+		logrus.Warnf("addNodeForAccount; no account aliases found for manager: %s", managerName)
 	}
-	nodeIds := srv.DB.AddManagerRegionsToDB(regions, managerId, managerAcctId, credential, acctAlias)
-	logrus.Debugf("added %d regions to the db", len(nodeIds))
+	nodeIds, err := srv.DB.AddManagerNodeToDB(managerId, managerAcctId, credential, acctAlias)
+	if err != nil {
+		return nil, err
+	}
 	return nodeIds, nil
 }
 
