@@ -9,11 +9,12 @@ import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { customMatchers } from 'app/testing/custom-matchers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { ProjectService } from 'app/entities/projects/project.service';
 import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
+import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
+import { ProjectService } from 'app/entities/projects/project.service';
 import { GetProjectsSuccess } from 'app/entities/projects/project.actions';
 import { projectEntityReducer } from 'app/entities/projects/project.reducer';
-import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
+import { Project } from 'app/entities/projects/project.model';
 import { ProjectListComponent } from './project-list.component';
 
 describe('ProjectListComponent', () => {
@@ -21,6 +22,25 @@ describe('ProjectListComponent', () => {
   let fixture: ComponentFixture<ProjectListComponent>;
   let element: HTMLElement;
   let projectService: ProjectService;
+  let store: Store<NgrxStateAtom>;
+
+  const projectList: Project[] = [
+      {
+        id: 'uuid-1', name: 'Default',
+        type: 'CHEF_MANAGED',
+        status: 'NO_RULES'
+      },
+      {
+        id: 'uuid-2', name: 'another-project',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
+      },
+      {
+        id: 'uuid-5', name: 'zzz-project',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
+      }
+    ];
 
   beforeEach(async(() => {
 
@@ -87,70 +107,46 @@ describe('ProjectListComponent', () => {
     }).compileComponents();
   }));
 
-  let store: Store<NgrxStateAtom>;
   beforeEach(() => {
-    store = TestBed.get(Store);
-
-    store.dispatch(new GetProjectsSuccess({
-      projects: [
-        {
-          id: 'uuid-1', name: 'Default',
-          type: 'CHEF_MANAGED',
-          status: 'NO_RULES'
-        },
-        {
-          id: 'uuid-2', name: 'another-project',
-          type: 'CUSTOM',
-          status: 'NO_RULES'
-        },
-        {
-          id: 'uuid-5', name: 'zzz-project',
-          type: 'CUSTOM',
-          status: 'NO_RULES'
-        }
-      ]
-    }));
-
-    projectService = TestBed.get(ProjectService);
-
     jasmine.addMatchers(customMatchers);
+    projectService = TestBed.get(ProjectService);
     fixture = TestBed.createComponent(ProjectListComponent);
     component = fixture.componentInstance;
     element = fixture.debugElement.nativeElement;
+    store = TestBed.get(Store);
+
+    component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v2');
+    component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v1');
+    store.dispatch(new GetProjectsSuccess({ projects: projectList }));
     fixture.detectChanges();
   });
 
   describe('when there are no projects', () => {
+    it('displays no projects', () => {
+      store.dispatch(new GetProjectsSuccess({ projects: [] }));
+      component.sortedProjects$.subscribe(results => {
+        expect(results.length).toBe(0);
+      });
+    });
   });
 
   describe('when there are projects', () => {
-    beforeEach(() => {
-      store.dispatch(new GetProjectsSuccess({
-        projects: [
-          {
-            id: 'uuid-1', name: 'Default',
-            type: 'CHEF_MANAGED',
-            status: 'NO_RULES'
-          },
-          {
-            id: 'uuid-2', name: 'another-project',
-            type: 'CUSTOM',
-            status: 'NO_RULES'
-          },
-          {
-            id: 'uuid-5', name: 'zzz-project',
-            type: 'CUSTOM',
-            status: 'NO_RULES'
-          }
-        ]
-      }));
+
+    it('displays project data for v2.1', () => {
+      expect(element).toContainPath('chef-table');
+      component.sortedProjects$.subscribe(results => {
+        expect(results.length).toBe(projectList.length);
+        projectList.forEach(p => {
+          expect(results.some(result => result.id === p.id)).toBe(true);
+        });
+      });
     });
 
-    it('displays project data for v2', () => {
+    it('does not display project data for v2.0', () => {
       component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v2');
-      component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v1');
+      component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v0');
       fixture.detectChanges();
-      expect(element).toContainPath('chef-table');
+      expect(element).not.toContainPath('chef-table');
     });
 
     it('does not display project data for v1', () => {
@@ -160,28 +156,7 @@ describe('ProjectListComponent', () => {
       expect(element).not.toContainPath('chef-table');
     });
 
-    describe('create modal', () => {
-      it('create modal opens upon clicking create button', () => {
-        component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v2');
-        component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v1');
-        fixture.detectChanges();
-        expect(component.createModalVisible).toBe(false);
-        (<HTMLButtonElement>(element.querySelector('[data-cy=create-project]'))).click();
-        expect(component.createModalVisible).toBe(true);
-      });
-
-      it('opening create modal resets name to empty string', () => {
-        component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v2');
-        component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v1');
-        fixture.detectChanges();
-        component.createProjectForm.controls['name'].setValue('any');
-        (<HTMLButtonElement>(element.querySelector('[data-cy=create-project]'))).click();
-        expect(component.createProjectForm.controls['name'].value).toBe(null);
-      });
-    });
-  });
-
-  describe('sortedProject$', () => {
+    describe('sortedProject$', () => {
     it('intermixes capitals and lowercase with lowercase first', () => {
       store.dispatch(new GetProjectsSuccess({
         projects: [
@@ -275,6 +250,21 @@ describe('ProjectListComponent', () => {
         expect(projects[2]).toEqual(jasmine.objectContaining({ name: 'Project01' }));
         expect(projects[3]).toEqual(jasmine.objectContaining({ name: 'Project3' }));
         expect(projects[4]).toEqual(jasmine.objectContaining({ name: 'Project300' }));
+      });
+    });
+  });
+
+  describe('create modal', () => {
+      it('opens upon clicking create button', () => {
+        expect(component.createModalVisible).toBe(false);
+        (<HTMLButtonElement>(element.querySelector('[data-cy=create-project]'))).click();
+        expect(component.createModalVisible).toBe(true);
+      });
+
+      it('resets name to empty string', () => {
+        component.createProjectForm.controls['name'].setValue('any');
+        (<HTMLButtonElement>(element.querySelector('[data-cy=create-project]'))).click();
+        expect(component.createProjectForm.controls['name'].value).toBe(null);
       });
     });
   });
