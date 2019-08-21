@@ -14,10 +14,10 @@
           <h4>{{managerControl.value.name}}</h4>
           <p>
             <span class="available-count">
-              {{availableNodesCountFor(managerControl.value.id) | async | number}} available {{ isAwsApi(managerControl.value.type) ? 'regions' : 'nodes' }}
+              {{availableNodesCountFor(managerControl.value.id) | async | number}} available nodes
             </span>
             <span class="selected-count" *ngIf="managerControl.value.include">
-              {{previewNodesCountFor(managerControl.value.id) | async | number}} selected {{ isAwsApi(managerControl.value.type) ? 'regions' : 'nodes' }}
+              {{previewNodesCountFor(managerControl.value.id) | async | number}} selected nodes
             </span>
           </p>
         </div>

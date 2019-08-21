@@ -128,7 +128,7 @@ export class JobNodesFormComponent {
   }
 
   supportsFilterByRegion(managerType: string): boolean {
-    return ['aws-api', 'aws-ec2', 'azure-vm'].includes(managerType);
+    return ['aws-ec2', 'azure-vm'].includes(managerType);
   }
 
   supportsFilterByTag(managerType: string): boolean {
