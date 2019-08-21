@@ -119,6 +119,7 @@ func (suite *CerealTestSuite) TestWorkflowFailOnUnmarshalableJSON() {
 	defer m.Stop()
 	err := m.EnqueueWorkflow(context.Background(), workflowName, instanceName, nil)
 	suite.Require().NoError(err, "Failed to enqueue workflow")
+	wg.Wait()
 	w, err := m.GetWorkflowInstanceByName(context.Background(), instanceName, workflowName)
 	suite.NoError(err)
 	suite.Error(w.Err())
