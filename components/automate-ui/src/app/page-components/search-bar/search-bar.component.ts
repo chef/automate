@@ -352,7 +352,7 @@ export class SearchBarComponent implements OnChanges {
   requestForSuggestions(c: Chicklet): void {
     this.isLoadingSuggestions = true;
     this.suggestionSearchTermDebounce.next(c);
-    this.suggestValues.emit({ detail: { text: '', type: this.selectedCategoryType.type } });
+    this.suggestValues.emit({ detail: { text: c.text, type: c.type } });
   }
 
   hasStaticSuggestions(): boolean {
