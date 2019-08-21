@@ -110,6 +110,9 @@ nodes = ["https://${ha_backend_container1_ip}:9200", "https://${ha_backend_conta
 enable = true
 location = "fs"
 
+[global.v1.external.elasticsearch.backup.fs]
+path = "/services/ha_backend_backups"
+
 [global.v1.external.elasticsearch.auth]
 scheme = "basic_auth"
 

@@ -57,7 +57,7 @@ do_upgrade() {
     #shellcheck disable=SC2154
     chef-automate backup restore --debug \
         --airgap-bundle update.aib \
-        --patch-config /services/ha_backend.toml
+        --patch-config /services/ha_backend.toml \
         --no-check-version \
         "$test_backup_id"
 }
