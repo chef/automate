@@ -15,7 +15,6 @@ import (
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
-	"github.com/chef/automate/components/compliance-service/utils"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	nodesserver "github.com/chef/automate/components/nodemanager-service/api/nodes/server"
@@ -488,7 +487,7 @@ func (srv *Server) SearchNodes(ctx context.Context, in *manager.NodeQuery) (*man
 	case "azure-vm":
 		return srv.searchAzureNodes(ctx, in)
 	case "aws-api":
-		return srv.searchAwsRegions(ctx, in)
+		return srv.searchGenericNodes(ctx, in.GetQuery().GetFilterMap(), in.NodeManagerId)
 	case "azure-api":
 		return srv.searchAzureSubscriptions(ctx, in)
 	case "gcp-api":
@@ -498,63 +497,6 @@ func (srv *Server) SearchNodes(ctx context.Context, in *manager.NodeQuery) (*man
 	default:
 		return nil, &errorutils.InvalidError{Msg: fmt.Sprintf("Unsupported manager type: %s", mgr.Type)}
 	}
-}
-
-func (srv *Server) searchAwsRegions(ctx context.Context, in *manager.NodeQuery) (*manager.Nodes, error) {
-	myaws, _, err := managers.GetAWSManagerFromID(ctx, in.NodeManagerId, srv.DB, srv.secretsClient)
-	if err != nil {
-		err = errorutils.FormatErrorMsg(err, "")
-		return nil, err
-	}
-
-	var includeFilters []string
-	var excludeFilters []string
-	for _, filter := range in.GetQuery().GetFilterMap() {
-		if filter.Key != "region" {
-			continue
-		}
-
-		for _, val := range filter.Values {
-			val = strings.TrimSuffix(val, "*")
-			if filter.Exclude {
-				excludeFilters = append(excludeFilters, val)
-			} else {
-				includeFilters = append(includeFilters, val)
-			}
-		}
-	}
-
-	if len(includeFilters) > 0 && len(excludeFilters) > 0 {
-		err = &errorutils.InvalidError{Msg: "using include and exclude filters in the same request is unsupported"}
-		return nil, errorutils.FormatErrorMsg(err, "")
-	}
-
-	regions, err := myaws.GetRegions(ctx)
-	if err != nil {
-		err = errorutils.FormatErrorMsg(err, "")
-		return nil, err
-	}
-
-	if len(includeFilters) > 0 {
-		allRegions := regions
-		regions = make([]string, 0)
-
-		for _, filter := range includeFilters {
-			matches := stringutils.SliceFilter(allRegions, func(region string) bool {
-				return strings.HasPrefix(region, filter)
-			})
-			regions = append(regions, matches...)
-		}
-	}
-
-	for _, filter := range excludeFilters {
-		regions = stringutils.SliceFilter(regions, func(region string) bool {
-			return !strings.HasPrefix(region, filter)
-		})
-	}
-
-	regions = utils.UniqueStringSlice(regions)
-	return &manager.Nodes{Total: int32(len(regions)), Nodes: regions}, nil
 }
 
 func (srv *Server) searchAzureSubscriptions(ctx context.Context, in *manager.NodeQuery) (*manager.Nodes, error) {
