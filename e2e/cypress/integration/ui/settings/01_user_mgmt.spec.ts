@@ -16,7 +16,6 @@ describe('user management', () => {
   });
 
   const now = Cypress.moment().format('MMDDYYhhmm');
-  const typeDelay = 50;
   const name = `cypress test user ${now}`;
   const username = `testing${now}`;
   const password = 'testing!';
@@ -28,20 +27,13 @@ describe('user management', () => {
     cy.get('app-user-table chef-button').contains('Create User').click();
     cy.get('app-user-management chef-modal').should('exist');
 
-    // adding a delay to more closely approximate an average human's type speed (200 char/min)
-    // the `should` will wait until the actual input value matches the expected value
-    // ref: https://github.com/cypress-io/cypress/issues/534
-    cy.get('[formcontrolname=fullname]')
-      .type(name, { delay: typeDelay }).should('have.value', name);
+    cy.get('[formcontrolname=fullname]').type(name).should('have.value', name);
 
-    cy.get('[formcontrolname=username]')
-      .type(username, { delay: typeDelay }).should('have.value', username);
+    cy.get('[formcontrolname=username]').type(username).should('have.value', username);
 
-    cy.get('[formcontrolname=password]')
-      .type(password, { delay: typeDelay }).should('have.value', password);
+    cy.get('[formcontrolname=password]').type(password).should('have.value', password);
 
-    cy.get('[formcontrolname=confirmPassword]')
-      .type(password, { delay: typeDelay }).should('have.value', password);
+    cy.get('[formcontrolname=confirmPassword]').type(password).should('have.value', password);
 
     // save new user
     cy.get('[data-cy=save-user]').click();
@@ -65,16 +57,16 @@ describe('user management', () => {
 
     cy.get('app-user-details chef-button.edit-button').click();
     cy.get('[formcontrolname=fullName]').find('input')
-      .clear().type(updated_name, { delay: typeDelay }).should('have.value', updated_name);
+      .clear().type(updated_name).should('have.value', updated_name);
 
     cy.get('app-user-details chef-button.save-button').click();
     cy.wait('@updateUser');
     cy.contains(updated_name).should('exist');
 
     cy.get('[formcontrolname=newPassword]').find('input')
-      .type(updated_password, { delay: typeDelay }).should('have.value', updated_password);
+      .type(updated_password).should('have.value', updated_password);
     cy.get('[formcontrolname=confirmPassword]').find('input')
-      .type(updated_password, { delay: typeDelay }).should('have.value', updated_password);
+      .type(updated_password).should('have.value', updated_password);
     cy.get('app-user-details chef-button').contains('Update Password').click({ force: true} );
 
     // success alert displays
