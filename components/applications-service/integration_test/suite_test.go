@@ -10,6 +10,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/golang/protobuf/proto"
+
 	"github.com/chef/automate/api/external/habitat"
 	"github.com/chef/automate/components/applications-service/pkg/config"
 	"github.com/chef/automate/components/applications-service/pkg/ingester"
@@ -17,8 +19,7 @@ import (
 	"github.com/chef/automate/components/applications-service/pkg/server"
 	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/chef/automate/components/applications-service/pkg/storage/postgres"
-	"github.com/chef/automate/lib/platform"
-	"github.com/golang/protobuf/proto"
+	platform_config "github.com/chef/automate/lib/platform/config"
 )
 
 // Suite helps you manipulate various stages of your tests, it provides common
@@ -44,7 +45,7 @@ type Suite struct {
 // NOTE: (@afiune) This function expects postgres to be already
 // up and running, it should be started from within the studio.
 func NewSuite(database string) *Suite {
-	uri, err := platform.PGURIFromEnvironment(database)
+	uri, err := platform_config.PGURIFromEnvironment(database)
 	if err != nil {
 		fmt.Printf("Failed to get pg uri: %s\n", err)
 		os.Exit(1)
