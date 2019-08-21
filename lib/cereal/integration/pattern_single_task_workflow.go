@@ -5,10 +5,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/chef/automate/lib/cereal/patterns"
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/patterns"
 )
 
 func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowSuccess() {
@@ -43,7 +43,7 @@ func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowSuccess() {
 			patterns.NewSingleTaskWorkflowExecutor(taskName, false),
 		),
 	)
-	defer m.Stop()
+	defer m.Stop() // nolint: errcheck
 	err := m.EnqueueWorkflow(context.Background(), workflowName, instanceName, tp)
 	suite.Require().NoError(err, "Failed to enqueue workflow")
 	wgTask.Wait()
@@ -94,7 +94,7 @@ func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowFail() {
 			patterns.NewSingleTaskWorkflowExecutor(taskName, false),
 		),
 	)
-	defer m.Stop()
+	defer m.Stop() // nolint: errcheck
 	err := m.EnqueueWorkflow(context.Background(), workflowName, instanceName, tp)
 	suite.Require().NoError(err, "Failed to enqueue workflow")
 	wgTask.Wait()
@@ -154,7 +154,7 @@ func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowCancelWhenNotAllowed(
 			patterns.NewSingleTaskWorkflowExecutor(taskName, false),
 		),
 	)
-	defer m.Stop()
+	defer m.Stop() // nolint: errcheck
 	err := m.EnqueueWorkflow(context.Background(), workflowName, instanceName, tp)
 	suite.Require().NoError(err, "Failed to enqueue workflow")
 	wgTaskStart.Wait()
@@ -216,7 +216,7 @@ func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowCancelWhenAllowed() {
 			patterns.NewSingleTaskWorkflowExecutor(taskName, true),
 		),
 	)
-	defer m.Stop()
+	defer m.Stop() // nolint: errcheck
 	err := m.EnqueueWorkflow(context.Background(), workflowName, instanceName, tp)
 	suite.Require().NoError(err, "Failed to enqueue workflow")
 	wgTaskStart.Wait()

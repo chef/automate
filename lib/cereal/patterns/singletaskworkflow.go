@@ -4,10 +4,14 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/chef/automate/lib/cereal"
 	"github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/lib/cereal"
 )
 
+// A SingleTaskWorkflowExecutor handles running a workflow composed of
+// a single task. The workflow enqueues the task and startup. The
+// workflow fails if the task fails.
 type SingleTaskWorkflowExecutor struct {
 	taskName    string
 	allowCancel bool
