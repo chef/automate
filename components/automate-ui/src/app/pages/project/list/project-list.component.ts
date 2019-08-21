@@ -196,16 +196,16 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.createProjectForm.reset();
   }
 
-  openConfirmUpdateStartModal() {
+  public openConfirmUpdateStartModal(): void {
     this.confirmApplyStartModalVisible = true;
   }
 
-  closeConfirmApplyStartModal() {
+  private closeConfirmApplyStartModal(): void {
     this.confirmApplyStartModalVisible = false;
   }
 
-  confirmApplyStart() {
-    this.confirmApplyStartModalVisible = false;
+  public confirmApplyStart(): void {
+    this.closeConfirmApplyStartModal();
     this.projects.applyRulesStart();
     this.applyRulesInProgress = true;
 
@@ -221,28 +221,28 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       });
   }
 
-  cancelApplyStart() {
+  public cancelApplyStart(): void {
     this.closeConfirmApplyStartModal();
   }
 
-  openConfirmUpdateStopModal() {
+  public openConfirmUpdateStopModal(): void {
     this.confirmApplyStopModalVisible = true;
   }
 
-  closeConfirmApplyStopModal() {
+  private closeConfirmApplyStopModal(): void {
     this.confirmApplyStopModalVisible = false;
   }
 
-  confirmApplyStop() {
-    this.confirmApplyStopModalVisible = false;
+  public confirmApplyStop(): void {
+    this.closeConfirmApplyStopModal();
     this.projects.applyRulesStop();
   }
 
-  cancelApplyStop() {
+  public cancelApplyStop(): void {
     this.closeConfirmApplyStopModal();
   }
 
-  getRulesStatus(project: Project): string {
+  public getRulesStatus(project: Project): string {
     switch (project.status) {
       case 'NO_RULES': return 'No rules';
       case 'EDITS_PENDING': return 'Edits pending';
@@ -251,7 +251,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     }
   }
 
-  getProjectStatus(project: Project): string {
+  public getProjectStatus(project: Project): string {
     const cachedStatus = this.statusCache[project.id];
     let result: string;
     if (this.applyRulesInProgress) {
