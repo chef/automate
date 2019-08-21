@@ -2,7 +2,7 @@ import { Base64 } from 'js-base64';
 
 describe('create a manual node ssh scan job and cleanup after', () => {
   before(() => {
-    cy.adminLogin('/');
+    cy.adminLogin('/settings');
   });
   beforeEach(() => {
     // cypress clears local storage between tests
@@ -18,10 +18,6 @@ describe('create a manual node ssh scan job and cleanup after', () => {
   const decoded = Base64.decode(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_KEY'));
 
   it('can create a credential with a username and key', () => {
-    // navigate to credentials create page:
-    // click on settings
-    cy.get('.nav-link').contains('Settings').click();
-
     // we save the route that will be called when we navigate to the page
     // in order to be able to wait for it later
     cy.route('POST', '/api/v0/secrets/search').as('getSecrets');
@@ -41,8 +37,9 @@ describe('create a manual node ssh scan job and cleanup after', () => {
       cy.get('form input[formcontrolname="name"]').first().type(credName);
       cy.get('form input[formcontrolname="username"]').first()
         .type(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_USER'));
-      cy.get('form textarea[formcontrolname="key"]')
-        .type(decoded);
+
+      // we save some time by setting this long string as the value rather than typing it out
+      cy.get('form textarea[formcontrolname="key"]').clear().invoke('val', decoded).trigger('input')
 
       // we save the route that will be called when we navigate to the page
       // in order to be able to wait for it later
