@@ -21,8 +21,8 @@ export interface ServiceGroupEntityState {
   servicesHealthSummary: HealthSummary;
   servicesErrorResp: HttpErrorResponse;
   selectedServiceGroupName: string;
-  nodeSuggestions: any[];
-  nodeSuggestionsStatus: EntityStatus;
+  serviceGroupsSuggestions: any[];
+  serviceGroupsSuggestionsStatus: EntityStatus;
 }
 
 export const ServiceGroupEntityInitialState: ServiceGroupEntityState = {
@@ -52,8 +52,8 @@ export const ServiceGroupEntityInitialState: ServiceGroupEntityState = {
   },
   servicesErrorResp: null,
   selectedServiceGroupName: undefined,
-  nodeSuggestions: [],
-  nodeSuggestionsStatus: EntityStatus.notLoaded
+  serviceGroupsSuggestions: [],
+  serviceGroupsSuggestionsStatus: EntityStatus.notLoaded
 };
 
 export function serviceGroupEntityReducer(
@@ -111,20 +111,20 @@ export function serviceGroupEntityReducer(
         set('servicesStatus', EntityStatus.loadingFailure),
         set('servicesErrorResp', action.payload))(state);
 
-    case ServiceGroupsActionTypes.GET_SERVICE_GROUP_SUGGESTIONS:
+    case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_SUGGESTIONS:
       return pipe(
-        set('nodeSuggestionsStatus', EntityStatus.loading),
-        set('nodeSuggestions', []))(state);
+        set('serviceGroupsSuggestionsStatus', EntityStatus.loading),
+        set('serviceGroupsSuggestions', []))(state);
 
-    case ServiceGroupsActionTypes.GET_SERVICE_GROUP_SUGGESTIONS_SUCCESS:
+    case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_SUGGESTIONS_SUCCESS:
       return pipe(
-        set('nodeSuggestionsStatus', EntityStatus.loadingSuccess),
-        set('nodeSuggestions', action.payload.nodeSuggestions))(state);
+        set('serviceGroupsSuggestionsStatus', EntityStatus.loadingSuccess),
+        set('serviceGroupsSuggestions', action.payload.serviceGroupsSuggestions))(state);
 
-    case ServiceGroupsActionTypes.GET_SERVICE_GROUP_SUGGESTIONS_FAILURE:
+    case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_SUGGESTIONS_FAILURE:
       return pipe(
-        set('nodeSuggestions', []),
-        set('nodeSuggestionsStatus', EntityStatus.loadingFailure),
+        set('serviceGroupsSuggestions', []),
+        set('serviceGroupsSuggestionsStatus', EntityStatus.loadingFailure),
         set('errorResp', action.payload))(state);
 
     default:

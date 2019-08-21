@@ -23,9 +23,9 @@ export enum ServiceGroupsActionTypes {
   GET_SERVICES_BY_SERVICE_GROUP_SUCCESS = 'SERVICE_GROUPS::SERVICES::GET::SUCCESS',
   GET_SERVICES_BY_SERVICE_GROUP_FAILURE = 'SERVICE_GROUPS::SERVICES::GET::FAILURE',
 
-  GET_SERVICE_GROUP_SUGGESTIONS = 'GET_SERVICE_GROUP_SUGGESTIONS::SERVICES::GET',
-  GET_SERVICE_GROUP_SUGGESTIONS_SUCCESS = 'GET_SERVICE_GROUP_SUGGESTIONS::SERVICES::SUCCESS',
-  GET_SERVICE_GROUP_SUGGESTIONS_FAILURE = 'GET_SERVICE_GROUP_SUGGESTIONS:SERVICES::FAILURE'
+  GET_SERVICE_GROUPS_SUGGESTIONS = 'GET_SERVICE_GROUPS_SUGGESTIONS::SERVICES::GET',
+  GET_SERVICE_GROUPS_SUGGESTIONS_SUCCESS = 'GET_SERVICE_GROUPS_SUGGESTIONS::SERVICES::SUCCESS',
+  GET_SERVICE_GROUPS_SUGGESTIONS_FAILURE = 'GET_SERVICE_GROUPS_SUGGESTIONS:SERVICES::FAILURE'
 }
 
 export class GetServiceGroups implements Action {
@@ -91,19 +91,19 @@ export class GetServicesBySGFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
-export class GetServiceGroupSuggestions implements Action {
-  readonly type = ServiceGroupsActionTypes.GET_SERVICE_GROUP_SUGGESTIONS;
+export class GetServiceGroupsSuggestions implements Action {
+  readonly type = ServiceGroupsActionTypes.GET_SERVICE_GROUPS_SUGGESTIONS;
   constructor(public payload: { type: string, text: string }) {}
 }
 
-export class GetServiceGroupSuggestionsSuccess implements Action {
-  readonly type = ServiceGroupsActionTypes.GET_SERVICE_GROUP_SUGGESTIONS_SUCCESS;
+export class GetServiceGroupsSuggestionsSuccess implements Action {
+  readonly type = ServiceGroupsActionTypes.GET_SERVICE_GROUPS_SUGGESTIONS_SUCCESS;
 
-  constructor(public payload: { nodeSuggestions: any[] }) {}
+  constructor(public payload: { serviceGroupsSuggestions: any[] }) {}
 }
 
-export class GetServiceGroupSuggestionsFailure implements Action {
-  readonly type = ServiceGroupsActionTypes.GET_SERVICE_GROUP_SUGGESTIONS_FAILURE;
+export class GetServiceGroupsSuggestionsFailure implements Action {
+  readonly type = ServiceGroupsActionTypes.GET_SERVICE_GROUPS_SUGGESTIONS_FAILURE;
 
   constructor(public payload: HttpErrorResponse) { }
 }
@@ -121,6 +121,6 @@ export type ServiceGroupsActions =
   | GetServicesBySGSuccess
   | GetServicesBySGFailure
   | GetServiceGroups
-  | GetServiceGroupSuggestions
-  | GetServiceGroupSuggestionsSuccess
-  | GetServiceGroupSuggestionsFailure;
+  | GetServiceGroupsSuggestions
+  | GetServiceGroupsSuggestionsSuccess
+  | GetServiceGroupsSuggestionsFailure;

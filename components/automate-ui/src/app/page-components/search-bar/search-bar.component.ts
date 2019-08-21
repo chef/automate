@@ -310,6 +310,8 @@ export class SearchBarComponent implements OnChanges {
       this.suggestions = List<SuggestionItem>(type.providedValues);
       this.suggestionsVisible = true;
       this.isLoadingSuggestions = false;
+    } else {
+      this.suggestValues.emit({ detail: { text: '', type: type.type } });
     }
   }
 
@@ -350,6 +352,7 @@ export class SearchBarComponent implements OnChanges {
   requestForSuggestions(c: Chicklet): void {
     this.isLoadingSuggestions = true;
     this.suggestionSearchTermDebounce.next(c);
+    this.suggestValues.emit({ detail: { text: '', type: this.selectedCategoryType.type } });
   }
 
   hasStaticSuggestions(): boolean {

@@ -22,9 +22,9 @@ import {
   GetServicesBySGFailure,
   GetServiceGroupsSuccess,
   GetServiceGroupsFailure,
-  GetServiceGroupSuggestionsSuccess,
-  GetServiceGroupSuggestionsFailure,
-  GetServiceGroupSuggestions
+  GetServiceGroupsSuggestionsSuccess,
+  GetServiceGroupsSuggestionsFailure,
+  GetServiceGroupsSuggestions
 } from './service-groups.actions';
 import { ServiceGroupsRequests } from './service-groups.requests';
 
@@ -85,14 +85,14 @@ export class ServiceGroupsEffects {
 
   @Effect()
   fetchNodeSuggestions$ = this.actions$.pipe(
-      ofType(ServiceGroupsActionTypes.GET_SERVICE_GROUP_SUGGESTIONS),
+      ofType(ServiceGroupsActionTypes.GET_SERVICE_GROUPS_SUGGESTIONS),
       withLatestFrom(this.store),
       switchMap(([action, storeState]) => {
-        const getNodeSuggestions = action as GetServiceGroupSuggestions;
+        const getServiceGroupsSuggestions = action as GetServiceGroupsSuggestions;
         return this.requests.getSuggestions(
-          getNodeSuggestions.payload.type, getNodeSuggestions.payload.text,
-          storeState.clientRunsEntity.nodeFilter).pipe(
-        map(nodeSuggestions => new GetServiceGroupSuggestionsSuccess({ nodeSuggestions })),
-        catchError((error) => of(new GetServiceGroupSuggestionsFailure(error))));
+          getServiceGroupsSuggestions.payload.type, getServiceGroupsSuggestions.payload.text,
+          storeState.serviceGroups.filters).pipe(
+        map(serviceGroupsSuggestions => new GetServiceGroupsSuggestionsSuccess({ serviceGroupsSuggestions })),
+        catchError((error) => of(new GetServiceGroupsSuggestionsFailure(error))));
       }));
 }

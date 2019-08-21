@@ -10,7 +10,7 @@
   <app-search-bar
     [numberOfFilters]="numberOfSearchBarFilters$ | async"
     [categories]="categoryTypes"
-    [dynamicSuggestions]="nodeSuggestions$ | async"
+    [dynamicSuggestions]="serviceGroupsSuggestions$ | async"
     (suggestValues)="onSuggestValues($event)"
     (itemSelected)="onFilterAdded($event)"
     (filtersButtonClick)="toggleFilters()">

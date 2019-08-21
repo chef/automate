@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of as observableOf  } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { reduce } from 'lodash/fp';
 import { Injectable } from '@angular/core';
@@ -8,7 +8,6 @@ import {
   ServiceGroupsPayload,
   ServiceGroupFilters,
   HealthSummary,
-  NodeFilter,
   ServicesPayload,
   ServicesFilters
 } from './service-groups.model';
@@ -16,7 +15,7 @@ import { environment } from '../../../environments/environment';
 const APPLICATIONS_URL = environment.applications_url;
 
 interface RespSuggestion {
-  text: string;
+  values: string[];
 }
 
 @Injectable()
@@ -95,19 +94,15 @@ export class ServiceGroupsRequests {
     return this.httpClient.get<HealthSummary>(url);
   }
 
-  public getSuggestions(type: string, text: string, filters: NodeFilter): Observable<any[]> {
-    if (text && text.length > 0) {
-      const params = this.formatFilters(filters).set('type', type).set('text', text);
-      const url = `${APPLICATIONS_URL}/services-distinct-values`;
+  public getSuggestions(field_name: string, query_fragment: string, filters: ServiceGroupFilters): Observable<any[]> {
+    const params = this.formatFilters(filters).set('field_name', field_name).set('query_fragment', query_fragment);
+    const url = `${APPLICATIONS_URL}/services-distinct-values`;
 
-      return this.httpClient.get<RespSuggestion[]>(url, {params}).pipe(map(
-        (suggestions) => suggestions.filter(s => s && s.text && s.text.length !== 0)));
-    } else {
-      return observableOf([]);
-    }
+    return this.httpClient.get<RespSuggestion>(url, {params}).pipe(map(
+      (suggestions) => suggestions.values));
   }
 
-  private formatFilters(filters: NodeFilter) {
+  private formatFilters(filters: ServiceGroupFilters) {
     let searchParam = new HttpParams();
 
     if (filters.searchBar) {

@@ -13,7 +13,7 @@ import {
 } from '../../types/types';
 import { EntityStatus } from '../../entities/entities';
 import {
-  GetServiceGroupSuggestions, UpdateServiceGroupFilters, UpdateSelectedSG
+  GetServiceGroupsSuggestions, UpdateServiceGroupFilters, UpdateSelectedSG
 } from 'app/entities/service-groups/service-groups.actions';
 import {
   ServiceGroup, ServiceGroupFilters, FieldDirection, HealthSummary, ServicesFilters
@@ -75,7 +75,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   filtersVisible = true;
 
   // autocomplete suggestions
-  nodeSuggestions$: Observable<any[]>;
+  serviceGroupsSuggestions$: Observable<any[]>;
 
   // The catagories allowed for searching
   categoryTypes: SearchBarCategoryItem[] = [
@@ -85,7 +85,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       allowWildcards: true
     },
     {
-      type: 'service',
+      type: 'service_name',
       text: 'Service Name',
       allowWildcards: true
     },
@@ -102,11 +102,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     {
       type: 'application',
       text: 'Application',
-      allowWildcards: false,
-      providedValues: [
-        {name: 'ipos', title: 'iPOS', icon: null},
-        {name: 'ikds', title: 'iKDS', icon: null}
-      ]
+      allowWildcards: true
     },
     {
       type: 'environment',
@@ -124,7 +120,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       allowWildcards: true
     },
     {
-      type: 'group',
+      type: 'group_name',
       text: 'Group Name',
       allowWildcards: true
     }
@@ -262,9 +258,8 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     this.currentPage$.pipe(takeUntil(this.isDestroyed))
       .subscribe(currentPage => this.currentPage = currentPage);
 
-    this.nodeSuggestions$ = this.store.select(createSelector(serviceGroupState,
-      (state) => state.nodeSuggestions)).pipe(map((nodeSuggestions: any[]) =>
-      nodeSuggestions.map(item => item.text)));
+    this.serviceGroupsSuggestions$ = this.store.select(createSelector(serviceGroupState,
+      (state) => state.serviceGroupsSuggestions)).pipe(map((serviceGroupsSuggestions: any[]) => serviceGroupsSuggestions));
 
     this.searchBarFilters$ = allUrlParameters$.pipe(map((chicklets: Chicklet[]) =>
       chicklets.filter(chicklet => some({'type': chicklet.type}, this.categoryTypes))));
@@ -336,7 +331,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   }
 
   onSuggestValues(event) {
-    this.store.dispatch(new GetServiceGroupSuggestions( event.detail ));
+    this.store.dispatch(new GetServiceGroupsSuggestions( event.detail ));
   }
 
   onFilterAdded(event) {
