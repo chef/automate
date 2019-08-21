@@ -2,13 +2,10 @@ package mgrtesthelpers
 
 import (
 	"context"
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
 
-	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/examples/helpers"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
@@ -110,37 +107,37 @@ func AddAzureManager(ctx context.Context, mgrClient manager.NodeManagerServiceCl
 func AddGCPManager(ctx context.Context, mgrClient manager.NodeManagerServiceClient, mgrType string) (*manager.Ids, error) {
 	// decode our encoded key
 	fmt.Println("length of credentials: ", len(os.Getenv("GOOGLE_CREDS_JSON")))
-	decoded, err := base64.StdEncoding.DecodeString(os.Getenv("GOOGLE_CREDS_JSON"))
-	if err != nil {
-		return nil, err
-	}
-	fmt.Println("length of decoded credentials: ", len(decoded))
-	stringDecoded := string(decoded)
-	first5 := stringDecoded[0:5]
-	fmt.Println("first 5 characters: ", first5)
-	last25 := stringDecoded[len(stringDecoded)-25:]
-	fmt.Println("last 25 characters: ", last25)
+	// decoded, err := base64.StdEncoding.DecodeString(os.Getenv("GOOGLE_CREDS_JSON"))
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// fmt.Println("length of decoded credentials: ", len(decoded))
+	// stringDecoded := string(decoded)
+	// first5 := stringDecoded[0:5]
+	// fmt.Println("first 5 characters: ", first5)
+	// last25 := stringDecoded[len(stringDecoded)-25:]
+	// fmt.Println("last 25 characters: ", last25)
 
-	formatted := strings.ReplaceAll(string(decoded), "\\n", "")
-	newLineForKeyBeg := strings.ReplaceAll(formatted, "KEY-----", "KEY-----\\n")
-	newLineForKeyEnd := strings.ReplaceAll(newLineForKeyBeg, "-----END", "\\n-----END")
+	// formatted := strings.ReplaceAll(string(decoded), "\\n", "")
+	// newLineForKeyBeg := strings.ReplaceAll(formatted, "KEY-----", "KEY-----\\n")
+	// newLineForKeyEnd := strings.ReplaceAll(newLineForKeyBeg, "-----END", "\\n-----END")
 
-	first5 = newLineForKeyEnd[0:5]
-	fmt.Println("first 5 characters: ", first5)
-	last25 = newLineForKeyEnd[len(newLineForKeyEnd)-25:]
-	fmt.Println("last 25 characters: ", last25)
+	// first5 = newLineForKeyEnd[0:5]
+	// fmt.Println("first 5 characters: ", first5)
+	// last25 = newLineForKeyEnd[len(newLineForKeyEnd)-25:]
+	// fmt.Println("last 25 characters: ", last25)
 
-	fmt.Println("LENGTH OF CRED: ", len(newLineForKeyEnd))
-	var gcpCred *secrets.GcpCredential
-	err = json.Unmarshal([]byte(newLineForKeyEnd), &gcpCred)
-	if err != nil {
-		fmt.Print("UNMARSHAL ERROR: ", err)
-	}
+	// fmt.Println("LENGTH OF CRED: ", len(newLineForKeyEnd))
+	// var gcpCred *secrets.GcpCredential
+	// err = json.Unmarshal([]byte(newLineForKeyEnd), &gcpCred)
+	// if err != nil {
+	// 	fmt.Print("UNMARSHAL ERROR: ", err)
+	// }
 	gcpMgr := manager.NodeManager{
 		Name: fmt.Sprintf("my test %s mgr", mgrType),
 		Type: mgrType,
 		CredentialData: []*common.Kv{
-			{Key: "GOOGLE_CREDENTIALS_JSON", Value: newLineForKeyEnd},
+			{Key: "GOOGLE_CREDENTIALS_JSON", Value: os.Getenv("GOOGLE_CREDS_JSON")},
 		},
 	}
 

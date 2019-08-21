@@ -5,11 +5,11 @@
 #
 
 echo "credential length before encoding:"
-echo -n "$HAB_STUDIO_SECRET_GOOGLE_CREDS_JSON" | wc -c
+echo -n "$GOOGLE_CREDS_JSON" | wc -c
 
-encoded_creds=$(base64 <<<"$HAB_STUDIO_SECRET_GOOGLE_CREDS_JSON")
-export HAB_STUDIO_SECRET_GOOGLE_CREDS_JSON=$encoded_creds
+encoded_creds=$(base64 <<<"$GOOGLE_CREDS_JSON")
+export GOOGLE_CREDS_JSON=$encoded_creds
 
 echo "encoded GCP credential"
 echo "credential length after encoding:"
-echo -n "$HAB_STUDIO_SECRET_GOOGLE_CREDS_JSON" | wc -c
+echo -n "$GOOGLE_CREDS_JSON" | wc -c

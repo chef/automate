@@ -189,7 +189,8 @@ steps:
       - sudo scripts/install_inspec.sh
       - sudo scripts/install_golang.sh
       - sudo scripts/install_grpcurl.sh
-      - sudo scripts/base64_gcp_cred.sh
+      - sudo scripts/install_gcc.sh
+      # - sudo scripts/base64_gcp_cred.sh
       - cd components/compliance-service
       - sudo -E  PATH=\$(hab pkg path core/ruby)/bin:\$PATH make test-prep && make run && RUN_MODE='local' go test github.com/chef/automate/components/nodemanager-service/tests/scanjobtests/gcp
     artifact_paths:
