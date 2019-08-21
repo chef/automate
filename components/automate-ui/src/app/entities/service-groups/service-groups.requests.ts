@@ -7,16 +7,13 @@ import { Injectable } from '@angular/core';
 import {
   ServiceGroupsPayload,
   ServiceGroupFilters,
+  ServiceGroupSuggestion,
   HealthSummary,
   ServicesPayload,
   ServicesFilters
 } from './service-groups.model';
 import { environment } from '../../../environments/environment';
 const APPLICATIONS_URL = environment.applications_url;
-
-interface RespSuggestion {
-  values: string[];
-}
 
 @Injectable()
 export class ServiceGroupsRequests {
@@ -103,7 +100,7 @@ export class ServiceGroupsRequests {
         .set('query_fragment', query_fragment);
       const url = `${APPLICATIONS_URL}/services-distinct-values`;
 
-      return this.httpClient.get<RespSuggestion>(url, {params}).pipe(map(
+      return this.httpClient.get<ServiceGroupSuggestion>(url, {params}).pipe(map(
         (suggestions) => suggestions.values));
   }
 

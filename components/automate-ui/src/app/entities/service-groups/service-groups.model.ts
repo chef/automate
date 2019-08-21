@@ -50,6 +50,10 @@ export interface ServiceGroupFilters {
   sortDirection?: SortDirection;
 }
 
+export interface ServiceGroupSuggestion {
+  values: string[];
+}
+
 export interface ServicesFilters {
   service_group_id?: string;
   health: string;
