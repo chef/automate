@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/backend"
 	"github.com/chef/automate/lib/cereal/patterns"
 )
 
@@ -25,7 +26,7 @@ func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowSuccess() {
 	tr := TaskResult{Value: "value"}
 
 	wgTask := sync.WaitGroup{}
-	wgTask.Add(1)
+	wgTask.Add(2)
 
 	m := suite.newManager(
 		WithTaskExecutorF(
@@ -42,12 +43,16 @@ func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowSuccess() {
 			workflowName,
 			patterns.NewSingleTaskWorkflowExecutor(taskName, false),
 		),
+		WithManagerOpts(
+			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+				wgTask.Done()
+			}),
+		),
 	)
 	defer m.Stop() // nolint: errcheck
 	err := m.EnqueueWorkflow(context.Background(), workflowName, instanceName, tp)
 	suite.Require().NoError(err, "Failed to enqueue workflow")
 	wgTask.Wait()
-	time.Sleep(20 * time.Millisecond)
 
 	instance, err := m.GetWorkflowInstanceByName(context.Background(), instanceName, workflowName)
 	suite.Require().NoError(err)
@@ -80,7 +85,7 @@ func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowFail() {
 	errMsg := "i have failed"
 
 	wgTask := sync.WaitGroup{}
-	wgTask.Add(1)
+	wgTask.Add(2)
 
 	m := suite.newManager(
 		WithTaskExecutorF(
@@ -93,12 +98,16 @@ func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowFail() {
 			workflowName,
 			patterns.NewSingleTaskWorkflowExecutor(taskName, false),
 		),
+		WithManagerOpts(
+			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+				wgTask.Done()
+			}),
+		),
 	)
 	defer m.Stop() // nolint: errcheck
 	err := m.EnqueueWorkflow(context.Background(), workflowName, instanceName, tp)
 	suite.Require().NoError(err, "Failed to enqueue workflow")
 	wgTask.Wait()
-	time.Sleep(20 * time.Millisecond)
 
 	instance, err := m.GetWorkflowInstanceByName(context.Background(), instanceName, workflowName)
 	suite.Require().NoError(err)
@@ -130,7 +139,7 @@ func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowCancelWhenNotAllowed(
 	wgTaskStart := sync.WaitGroup{}
 	wgTaskStart.Add(1)
 	wgTaskEnd := sync.WaitGroup{}
-	wgTaskEnd.Add(1)
+	wgTaskEnd.Add(2)
 
 	m := suite.newManager(
 		WithTaskExecutorF(
@@ -153,6 +162,11 @@ func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowCancelWhenNotAllowed(
 			workflowName,
 			patterns.NewSingleTaskWorkflowExecutor(taskName, false),
 		),
+		WithManagerOpts(
+			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+				wgTaskEnd.Done()
+			}),
+		),
 	)
 	defer m.Stop() // nolint: errcheck
 	err := m.EnqueueWorkflow(context.Background(), workflowName, instanceName, tp)
@@ -161,7 +175,6 @@ func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowCancelWhenNotAllowed(
 	err = m.CancelWorkflow(context.Background(), workflowName, instanceName)
 	suite.Require().NoError(err)
 	wgTaskEnd.Wait()
-	time.Sleep(20 * time.Millisecond)
 
 	instance, err := m.GetWorkflowInstanceByName(context.Background(), instanceName, workflowName)
 	suite.Require().NoError(err)
@@ -195,7 +208,7 @@ func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowCancelWhenAllowed() {
 	wgTaskStart := sync.WaitGroup{}
 	wgTaskStart.Add(1)
 	wgTaskEnd := sync.WaitGroup{}
-	wgTaskEnd.Add(1)
+	wgTaskEnd.Add(2)
 
 	m := suite.newManager(
 		WithTaskExecutorF(
@@ -215,6 +228,11 @@ func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowCancelWhenAllowed() {
 			workflowName,
 			patterns.NewSingleTaskWorkflowExecutor(taskName, true),
 		),
+		WithManagerOpts(
+			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+				wgTaskEnd.Done()
+			}),
+		),
 	)
 	defer m.Stop() // nolint: errcheck
 	err := m.EnqueueWorkflow(context.Background(), workflowName, instanceName, tp)
@@ -223,7 +241,6 @@ func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowCancelWhenAllowed() {
 	err = m.CancelWorkflow(context.Background(), workflowName, instanceName)
 	suite.Require().NoError(err)
 	wgTaskEnd.Wait()
-	time.Sleep(20 * time.Millisecond)
 
 	instance, err := m.GetWorkflowInstanceByName(context.Background(), instanceName, workflowName)
 	suite.Require().NoError(err)

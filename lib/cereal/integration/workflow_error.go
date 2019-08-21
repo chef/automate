@@ -4,11 +4,12 @@ package integration
 
 import (
 	"context"
-	"time"
+	"sync"
 
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/backend"
 )
 
 // TestWorkflowFail tests that a call to w.Fail ends the workflow
@@ -17,13 +18,14 @@ func (suite *CerealTestSuite) TestWorkflowFail() {
 	workflowName := randName("failing")
 	instanceName := randName("instance")
 
-	doneChan := make(chan struct{})
+	wg := sync.WaitGroup{}
+	wg.Add(2)
 	m := suite.newManager(
 		WithWorkflowExecutor(
 			workflowName,
 			&workflowExecutorWrapper{
 				onStart: func(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
-					close(doneChan)
+					wg.Done()
 					return w.Fail(errors.New("expected test error"))
 				},
 				onTaskComplete: func(w cereal.WorkflowInstance, ev cereal.TaskCompleteEvent) cereal.Decision {
@@ -31,12 +33,16 @@ func (suite *CerealTestSuite) TestWorkflowFail() {
 				},
 			},
 		),
+		WithManagerOpts(
+			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+				wg.Done()
+			}),
+		),
 	)
 	defer m.Stop()
 	err := m.EnqueueWorkflow(context.Background(), workflowName, instanceName, nil)
 	suite.Require().NoError(err, "Failed to enqueue workflow")
-	<-doneChan
-	time.Sleep(20 * time.Millisecond)
+	wg.Wait()
 	w, err := m.GetWorkflowInstanceByName(context.Background(), instanceName, workflowName)
 	suite.NoError(err)
 	suite.Error(w.Err())
@@ -50,13 +56,14 @@ func (suite *CerealTestSuite) TestWorkflowFailOnBadEnqueue() {
 	workflowName := randName("failing")
 	instanceName := randName("instance")
 
-	doneChan := make(chan struct{})
+	wg := sync.WaitGroup{}
+	wg.Add(2)
 	m := suite.newManager(
 		WithWorkflowExecutor(
 			workflowName,
 			&workflowExecutorWrapper{
 				onStart: func(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
-					defer close(doneChan)
+					wg.Done()
 					w.EnqueueTask("foo", nil)
 					return w.Complete(nil)
 				},
@@ -65,12 +72,16 @@ func (suite *CerealTestSuite) TestWorkflowFailOnBadEnqueue() {
 				},
 			},
 		),
+		WithManagerOpts(
+			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+				wg.Done()
+			}),
+		),
 	)
 	defer m.Stop()
 	err := m.EnqueueWorkflow(context.Background(), workflowName, instanceName, nil)
 	suite.Require().NoError(err, "Failed to enqueue workflow")
-	<-doneChan
-	time.Sleep(20 * time.Millisecond)
+	wg.Wait()
 	w, err := m.GetWorkflowInstanceByName(context.Background(), instanceName, workflowName)
 	suite.NoError(err)
 	suite.Error(w.Err())
@@ -84,26 +95,30 @@ func (suite *CerealTestSuite) TestWorkflowFailOnUnmarshalableJSON() {
 	workflowName := randName("failing")
 	instanceName := randName("instance")
 
-	doneChan := make(chan struct{})
+	wg := sync.WaitGroup{}
+	wg.Add(2)
 	m := suite.newManager(
 		WithWorkflowExecutor(
 			workflowName,
 			&workflowExecutorWrapper{
 				onStart: func(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
-					defer close(doneChan)
-					return w.Continue(doneChan) // channels can't be marshalled
+					wg.Done()
+					return w.Continue(make(chan struct{})) // channels can't be marshalled
 				},
 				onTaskComplete: func(w cereal.WorkflowInstance, ev cereal.TaskCompleteEvent) cereal.Decision {
 					return w.Complete()
 				},
 			},
 		),
+		WithManagerOpts(
+			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+				wg.Done()
+			}),
+		),
 	)
 	defer m.Stop()
 	err := m.EnqueueWorkflow(context.Background(), workflowName, instanceName, nil)
 	suite.Require().NoError(err, "Failed to enqueue workflow")
-	<-doneChan
-	time.Sleep(20 * time.Millisecond)
 	w, err := m.GetWorkflowInstanceByName(context.Background(), instanceName, workflowName)
 	suite.NoError(err)
 	suite.Error(w.Err())

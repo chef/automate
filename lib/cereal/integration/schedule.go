@@ -10,6 +10,7 @@ import (
 	"github.com/teambition/rrule-go"
 
 	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/backend"
 )
 
 func (suite *CerealTestSuite) TestSimpleScheduleWorkflow() {
@@ -18,7 +19,7 @@ func (suite *CerealTestSuite) TestSimpleScheduleWorkflow() {
 	instanceName := randName("instance")
 
 	wgWorkflow := sync.WaitGroup{}
-	wgWorkflow.Add(3)
+	wgWorkflow.Add(4)
 
 	dtStart := time.Now().Add(2 * time.Second)
 	count := 0
@@ -51,6 +52,11 @@ func (suite *CerealTestSuite) TestSimpleScheduleWorkflow() {
 			},
 		),
 		WithNoStart(),
+		WithManagerOpts(
+			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+				wgWorkflow.Done()
+			}),
+		),
 	)
 	defer m.Stop() // nolint: errcheck
 	recurrence, err := rrule.NewRRule(rrule.ROption{
@@ -82,8 +88,6 @@ func (suite *CerealTestSuite) TestSimpleScheduleWorkflow() {
 	err = m.Start(context.Background())
 	suite.Require().NoError(err)
 	wgWorkflow.Wait()
-
-	time.Sleep(20 * time.Millisecond)
 	err = m.Stop()
 	suite.NoError(err)
 }
