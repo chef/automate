@@ -48,8 +48,12 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   // This statusCache, then, remembers those initial status values during the update.
   private statusCache: {  [id: string]: ProjectStatus; } = {};
 
-  // Governs filling the above cache
+  // This flag governs filling the above cache.
+  // The state returned by this.projects.applyRulesStatus$ (Running, NotRunning)
+  // is not available soon enough--we need to know the instant the user starts the update.
   private applyRulesInProgress = false;
+
+  private updateProjectsFailed = false;
 
   public applyRulesButtonText$: Observable<string>;
   public ApplyRulesStatusState = ApplyRulesStatusState;
@@ -87,9 +91,10 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     );
 
     this.projects.applyRulesStatus$
-      .subscribe(({ state }: ApplyRulesStatus) => {
+      .subscribe(({ state, failed }: ApplyRulesStatus) => {
         if (state === ApplyRulesStatusState.NotRunning) {
           this.applyRulesInProgress = false;
+          this.updateProjectsFailed = failed;
         }
       });
 
@@ -257,7 +262,8 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     if (this.applyRulesInProgress) {
       result = cachedStatus === 'EDITS_PENDING' ? 'Updating...' : 'OK';
     } else {
-      result = project.status === 'EDITS_PENDING' ? 'Needs updating' : 'OK';
+      result = project.status === 'EDITS_PENDING' || this.updateProjectsFailed
+        ? 'Needs updating' : 'OK';
     }
     // TODO: check how often this is hit
     return result;

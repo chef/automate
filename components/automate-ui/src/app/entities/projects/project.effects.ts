@@ -189,6 +189,7 @@ export class ProjectEffects {
       this.requests.applyRulesStop().pipe(
         switchMap(() => [
           new ApplyRulesStopSuccess(),
+          new GetProjects(),
           new GetApplyRulesStatus()
         ]),
         catchError((error: HttpErrorResponse) => observableOf(new ApplyRulesStopFailure(error))))));
