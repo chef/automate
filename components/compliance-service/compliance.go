@@ -161,15 +161,15 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 
 	s := connFactory.NewServer(tracing.GlobalServerInterceptor())
 
-	cerealManager, err := createProjectUpdateCerealManager(connFactory, conf.CerealConfig.Endpoint)
+	cerealProjectUpdateManager, err := createProjectUpdateCerealManager(connFactory, conf.CerealConfig.Endpoint)
 	if err != nil {
 		logrus.WithError(err).Fatal("could not create cereal manager")
 	}
-	err = project_update_lib.RegisterTaskExecutors(cerealManager, "compliance", ingesticESClient, authzProjectsClient)
+	err = project_update_lib.RegisterTaskExecutors(cerealProjectUpdateManager, "compliance", ingesticESClient, authzProjectsClient)
 	if err != nil {
 		logrus.WithError(err).Fatal("could not register project update task executors")
 	}
-	if err := cerealManager.Start(ctx); err != nil {
+	if err := cerealProjectUpdateManager.Start(ctx); err != nil {
 		logrus.WithError(err).Fatal("could not start cereal manager")
 	}
 
