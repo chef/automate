@@ -1080,6 +1080,7 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 			if err != nil {
 				logrus.WithError(err).Error("Failed to fail workflow after JSON marshal failure")
 			}
+			m.callOnWorkflowCompleteCallback(wevt)
 		} else {
 			err := completer.Continue(jsonPayload)
 			if err != nil {
