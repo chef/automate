@@ -435,7 +435,12 @@ func (w waywardWorkflowList) Filter(workflowNames []string) []string {
 	return out
 }
 
-// Manager is responsible for for calling WorkflowExecutors and
+// A OnWorkflowCompleteCallback is a function that can be called at
+// the completion of workflows for debugging and testing purposes. The
+// function should not be used for application logic.
+type OnWorkflowCompleteCallback func(*backend.WorkflowEvent)
+
+// Manager is responsible for calling WorkflowExecutors and
 // TaskExecutors when they need to be processed, along with managing
 // the scheduling of workflows.
 type Manager struct {
@@ -450,20 +455,33 @@ type Manager struct {
 	workflowWakeupChan   chan struct{}
 	taskPollInterval     time.Duration
 	workflowPollInterval time.Duration
+
+	onWorkflowCompleteCallback OnWorkflowCompleteCallback
 }
 
 // ManagerOpt is an option that can be passed to NewManager.
 type ManagerOpt func(*Manager)
 
-// WithTaskPollInterval sets the default polling interval for all
+// WithTaskPollInterval sets the polling interval for all
 // TaskExecutor workers. Each worker will poll the database every
 // interval for new jobs.
 func WithTaskPollInterval(interval time.Duration) ManagerOpt {
 	return func(m *Manager) { m.taskPollInterval = interval }
 }
 
+// WithWorkflowPollInterval sets the polling interval for the main
+// workflow processing loop. The loop will wake up at least once every
+// interval to check for new workflow events.
 func WithWorkflowPollInterval(interval time.Duration) ManagerOpt {
 	return func(m *Manager) { m.workflowPollInterval = interval }
+}
+
+// WithOnWorkflowCompleteCallback sets a OnWOrkflowComplete callback
+// that will be called whenever a workflow is finished (i.e. the
+// workflow returns a failure or completion decision).  This is
+// intended for testing and debugging purposes ONLY.
+func WithOnWorkflowCompleteCallback(c OnWorkflowCompleteCallback) ManagerOpt {
+	return func(m *Manager) { m.onWorkflowCompleteCallback = c }
 }
 
 // NewManager creates a new Manager with the given Driver. If
@@ -945,6 +963,12 @@ LOOP:
 	m.wg.Done()
 }
 
+func (m *Manager) callOnWorkflowCompleteCallback(w *backend.WorkflowEvent) {
+	if m.onWorkflowCompleteCallback != nil {
+		m.onWorkflowCompleteCallback(w)
+	}
+}
+
 func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) bool {
 	m.wg.Add(1)
 	defer m.wg.Done()
@@ -1017,8 +1041,8 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 		if err != nil {
 			logctx.WithError(err).Error("Failed to complete workflow")
 		}
-
 		s.End("failed")
+		m.callOnWorkflowCompleteCallback(wevt)
 	} else if decision.complete {
 		s.Begin("complete")
 		if wevt.CompletedTaskCount != wevt.EnqueuedTaskCount {
@@ -1037,6 +1061,7 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 			logctx.WithError(err).Error("Failed to complete workflow")
 		}
 		s.End("complete")
+		m.callOnWorkflowCompleteCallback(wevt)
 	} else if decision.continuing {
 		s.Begin("enqueue_task")
 		for _, t := range decision.tasks {
@@ -1055,6 +1080,7 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 			if err != nil {
 				logrus.WithError(err).Error("Failed to fail workflow after JSON marshal failure")
 			}
+			m.callOnWorkflowCompleteCallback(wevt)
 		} else {
 			err := completer.Continue(jsonPayload)
 			if err != nil {

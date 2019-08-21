@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/backend"
 )
 
 func (suite *CerealTestSuite) TestDelayedTask() {
@@ -16,7 +17,7 @@ func (suite *CerealTestSuite) TestDelayedTask() {
 	instanceName := randName("instance")
 
 	wgTask := sync.WaitGroup{}
-	wgTask.Add(2)
+	wgTask.Add(3)
 
 	expectedTime := time.Now().Add(10 * time.Second)
 	m := suite.newManager(
@@ -45,12 +46,16 @@ func (suite *CerealTestSuite) TestDelayedTask() {
 				},
 			},
 		),
+		WithManagerOpts(
+			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+				wgTask.Done()
+			}),
+		),
 	)
 	defer m.Stop()
 	err := m.EnqueueWorkflow(context.Background(), workflowName, instanceName, nil)
 	suite.Require().NoError(err, "Failed to enqueue workflow")
 	wgTask.Wait()
-	time.Sleep(20 * time.Millisecond)
 	err = m.Stop()
 	suite.NoError(err)
 }
