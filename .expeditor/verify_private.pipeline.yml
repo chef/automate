@@ -784,6 +784,18 @@ steps:
           single-use: true
           privileged: true
 
+  - label: "ha data services migrate"
+    command:
+      - integration/run_test integration/tests/ha_data_services_migrate.sh
+    timeout_in_minutes: 35
+    expeditor:
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+
+
+
   - label: "shellcheck hooks"
     command:
       - integration/run_test integration/tests/shellcheck_rendered_hooks.sh
