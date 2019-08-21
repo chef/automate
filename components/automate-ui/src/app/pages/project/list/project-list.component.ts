@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { interval as observableInterval,  Observable, Subject } from 'rxjs';
-import { map, takeUntil, filter, withLatestFrom, takeWhile } from 'rxjs/operators';
+import { map, takeUntil, filter, take } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -208,17 +208,16 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.confirmApplyStartModalVisible = false;
     this.projects.applyRulesStart();
     this.applyRulesInProgress = true;
-    let start = true;
-    // < 150 is too fast to notice update has started
-    // > 300 is too slow to notice before update has finished
-    observableInterval(250).pipe(
-      withLatestFrom(this.projects.applyRulesStatus$),
-      map(([_, { state }]) => state),
-      takeWhile(state =>
-        start || (state === ApplyRulesStatusState.Running)))
+
+    // Rapid sampling for 3 seconds for more responsive UX.
+    // If the update is still running, the secondary (active) emitter
+    // will check this status at frequent intervals.
+    // Once the update completes, the tertiary (dormant) emitter
+    // will check this status at INfrequent intervals.
+    // (See getActiveApplyRulesStatus$ and getDormantApplyRulesStatus$.)
+    observableInterval(250).pipe(take(12)) // 12 x 250ms => 3 seconds
       .subscribe(() => {
         this.projects.getApplyRulesStatus();
-        start = false;
       });
   }
 
@@ -260,7 +259,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     } else {
       result = project.status === 'EDITS_PENDING' ? 'Needs updating' : 'OK';
     }
-    // console.log(`status[${project.id}] => ${result}`);
+    // TODO: check how often this is hit
     return result;
   }
 }
