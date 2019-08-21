@@ -136,7 +136,11 @@ func (app *ApplicationsServer) GetServiceGroupsHealthCounts(
 	ctx context.Context, request *applications.ServiceGroupsHealthCountsReq,
 ) (*applications.HealthCounts, error) {
 
-	svcsHealthCounts, err := app.storageClient.GetServiceGroupsHealthCounts()
+	filters, err := stringutils.FormatFilters(request.GetFilter())
+	if err != nil {
+		return new(applications.HealthCounts), status.Error(codes.InvalidArgument, err.Error())
+	}
+	svcsHealthCounts, err := app.storageClient.GetServiceGroupsHealthCounts(filters)
 	if err != nil {
 		log.WithError(err).Error("Error retrieving service groups health counts")
 		return nil, status.Error(codes.Internal, err.Error())

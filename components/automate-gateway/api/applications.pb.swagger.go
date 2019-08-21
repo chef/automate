@@ -200,6 +200,18 @@ func init() {
             }
           }
         },
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
         "tags": [
           "ApplicationsService"
         ]
