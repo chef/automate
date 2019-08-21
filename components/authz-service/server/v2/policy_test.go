@@ -2606,21 +2606,23 @@ func TestResetToV1(t *testing.T) {
 	status := ts.status
 
 	cases := map[string]func(*testing.T){
-		"initial migration status: reset keeps pristine status": func(t *testing.T) {
+		"initial migration status eturns AlreadyExists to indicate no-op": func(t *testing.T) {
 			ms, err := status.MigrationStatus(ctx)
 			require.NoError(t, err)
 			assert.Equal(t, storage.Pristine, ms)
 
-			_, err = cl.ResetToV1(ctx, &api_v2.ResetToV1Req{})
-			require.NoError(t, err)
+			resp, err := cl.ResetToV1(ctx, &api_v2.ResetToV1Req{})
+			assert.Nil(t, resp)
+			grpctest.AssertCode(t, codes.AlreadyExists, err)
 
 			ms, err = status.MigrationStatus(ctx)
 			require.NoError(t, err)
 			assert.Equal(t, storage.Pristine, ms)
 		},
-		"resets store to empty state": func(t *testing.T) {
+		"resets store to empty state when on v2.1": func(t *testing.T) {
 			// Note (sr): concrete "storage Reset" assertions don't belong here, we're
 			// merely asserting that the underlying storage's Reset was called at all.
+			require.NoError(t, status.SuccessBeta1(ctx))
 			addSomePoliciesToStore(t, policyStore, prng)
 
 			_, err := cl.ResetToV1(ctx, &api_v2.ResetToV1Req{})

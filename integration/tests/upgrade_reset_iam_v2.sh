@@ -58,7 +58,7 @@ do_test_deploy() {
     fi
 
     log_info "v2 -> v2 (expect failure)"
-    expect_iam_upgrade_output "You have already upgraded to IAM v2." \
+    expect_iam_upgrade_output "You are already using IAM v2." \
         "$(chef-automate iam upgrade-to-v2 2>&1)" || return 1
 
     log_info "v2 -> v2.1"

@@ -648,6 +648,7 @@ func (s *policyServer) ResetToV1(ctx context.Context,
 	}
 	switch ms {
 	case storage.Pristine: // skip
+		return nil, status.Error(codes.AlreadyExists, "already reset")
 	case storage.InProgress:
 		return nil, status.Error(codes.FailedPrecondition, "migration in progress")
 	case storage.Successful, storage.SuccessfulBeta1, storage.Failed:

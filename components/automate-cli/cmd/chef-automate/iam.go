@@ -150,12 +150,7 @@ func init() {
 }
 
 // Note: the indentation is to keep this in line with writer.Body()
-const alreadyMigratedMessage = `You have already upgraded to IAM %s.
-  If you wish to re-run the migration, first run:
-
-      chef-automate iam reset-to-v1
-
-  Then re-run this command.`
+const alreadyMigratedMessage = `You are already using IAM %s.`
 
 type vsn struct {
 	Major policies_common.Version_VersionNumber
@@ -191,7 +186,6 @@ func runIAMUpgradeToV2Cmd(cmd *cobra.Command, args []string) error {
 	} else {
 		writer.Title("Upgrading to IAM v2")
 	}
-
 	if !iamCmdFlags.skipLegacyUpgrade {
 		writer.Println("Migrating v1 policies...")
 	}
@@ -262,7 +256,7 @@ func outputReport(report string) {
 }
 
 func runIAMResetToV1Cmd(cmd *cobra.Command, args []string) error {
-	writer.Title("Reverting to IAM v1 (with pre-upgrade v1 policies)")
+	writer.Title("Resetting to IAM v1.0 (with pre-upgrade v1 policies)...")
 	ctx := context.Background()
 	apiClient, err := apiclient.OpenConnection(ctx)
 	if err != nil {
@@ -276,6 +270,9 @@ func runIAMResetToV1Cmd(cmd *cobra.Command, args []string) error {
 	case codes.FailedPrecondition:
 		return status.Wrap(err, status.IAMResetV1DatabaseError,
 			"Migration to IAMv2 in progress")
+	case codes.AlreadyExists:
+		writer.Failf(alreadyMigratedMessage, "v1.0")
+		return nil
 	default: // something else: fail
 		return status.Wrap(err, status.IAMResetV1DatabaseError,
 			"Failed to reset IAM state to v1")
