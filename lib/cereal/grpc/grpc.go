@@ -20,6 +20,8 @@ import (
 
 var _ backend.Driver = &GrpcBackend{}
 
+var errUnknownMessage = errors.New("Unknown message received")
+
 type GrpcBackend struct {
 	domain string
 	client grpccereal.CerealClient
@@ -86,8 +88,30 @@ func (c *workflowCompleter) EnqueueTask(task *backend.Task, opts backend.TaskEnq
 	return nil
 }
 
-func (c *workflowCompleter) Continue(payload []byte) error {
+func (c *workflowCompleter) finish(err error) error {
 	defer c.s.CloseSend() // nolint: errcheck
+
+	if err != nil {
+		return err
+	}
+
+	if err := c.s.CloseSend(); err != nil {
+		logrus.WithError(err).Error("Failed to continue workflow")
+		return err
+	}
+	committedMsg, err := c.s.Recv()
+	if err != nil {
+		logrus.WithError(err).Error("Did not get committed message")
+		return err
+	}
+	if committedMsg.GetCommitted() == nil {
+		return errUnknownMessage
+	}
+
+	return nil
+}
+
+func (c *workflowCompleter) Continue(payload []byte) error {
 	err := c.s.Send(&grpccereal.DequeueWorkflowRequest{
 		Cmd: &grpccereal.DequeueWorkflowRequest_Continue_{
 			Continue: &grpccereal.DequeueWorkflowRequest_Continue{
@@ -96,19 +120,10 @@ func (c *workflowCompleter) Continue(payload []byte) error {
 			},
 		},
 	})
-	if err != nil {
-		return err
-	}
-	if err := c.s.CloseSend(); err != nil {
-		logrus.WithError(err).Error("Failed to continue workflow")
-		return err
-	}
-	_, _ = c.s.Recv()
-	return nil
+	return c.finish(err)
 }
 
 func (c *workflowCompleter) Fail(errMsg error) error {
-	defer c.s.CloseSend() // nolint: errcheck
 	err := c.s.Send(&grpccereal.DequeueWorkflowRequest{
 		Cmd: &grpccereal.DequeueWorkflowRequest_Fail_{
 			Fail: &grpccereal.DequeueWorkflowRequest_Fail{
@@ -116,19 +131,10 @@ func (c *workflowCompleter) Fail(errMsg error) error {
 			},
 		},
 	})
-	if err != nil {
-		return err
-	}
-	if err := c.s.CloseSend(); err != nil {
-		logrus.WithError(err).Error("Failed to fail workflow")
-		return err
-	}
-	_, _ = c.s.Recv()
-	return nil
+	return c.finish(err)
 }
 
 func (c *workflowCompleter) Done(result []byte) error {
-	defer c.s.CloseSend() // nolint: errcheck
 	err := c.s.Send(&grpccereal.DequeueWorkflowRequest{
 		Cmd: &grpccereal.DequeueWorkflowRequest_Done_{
 			Done: &grpccereal.DequeueWorkflowRequest_Done{
@@ -136,15 +142,7 @@ func (c *workflowCompleter) Done(result []byte) error {
 			},
 		},
 	})
-	if err != nil {
-		return err
-	}
-	if err := c.s.CloseSend(); err != nil {
-		logrus.WithError(err).Error("Failed to complete workflow")
-		return err
-	}
-	_, _ = c.s.Recv()
-	return nil
+	return c.finish(err)
 }
 
 func (c *workflowCompleter) Close() error {
@@ -278,11 +276,10 @@ func (c *taskCompleter) Fail(errMsg string) error {
 	// request.
 	// We must wait to figure out if it was successful
 	err = <-c.doneChan
-	if err == nil || err == io.EOF {
-		return nil
-	} else {
+	if err != nil {
 		return transformErr(err)
 	}
+	return nil
 }
 
 func (c *taskCompleter) Succeed(result []byte) error {
@@ -355,22 +352,24 @@ func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*backen
 	taskCtx, cancel := context.WithCancel(ctx)
 	doneChan := make(chan error, 1)
 	go func() {
-		for {
-			msg, err := s.Recv()
-			if err != nil {
-				logrus.WithError(err).Debug("Received error: canceling task context")
-				cancel()
-				doneChan <- err
-				return
-			}
-			if c := msg.GetCancel(); c != nil {
-				logrus.Debug("Received cancel: canceling task context")
-				cancel()
-				doneChan <- errors.New("canceled")
-				return
-			}
+		// This goroutine will read the next, and what must be the last
+		// message.
+		var errOut error
+		msg, err := s.Recv()
+		if err != nil {
+			logrus.WithError(err).Debug("Received error while waiting for commited message")
+			errOut = err
+		} else if c := msg.GetCancel(); c != nil {
+			logrus.Debug("Received cancel while waiting for commited message")
+			errOut = context.Canceled
+		} else if c := msg.GetCommitted(); c != nil {
+			logrus.Debug("Received comitted")
+			errOut = nil
+		} else {
+			errOut = errUnknownMessage
 		}
-
+		cancel()
+		doneChan <- errOut
 	}()
 	return &backend.Task{
 			Name:       deq.GetTask().GetName(),

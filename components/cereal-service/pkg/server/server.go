@@ -287,6 +287,16 @@ func (s *CerealService) DequeueWorkflow(req cereal.Cereal_DequeueWorkflowServer)
 		return errInvalidMsg
 	}
 
+	err = writeDeqWorkRespMsg(ctx, req, &cereal.DequeueWorkflowResponse{
+		Cmd: &cereal.DequeueWorkflowResponse_Committed_{
+			Committed: &cereal.DequeueWorkflowResponse_Committed{},
+		},
+	})
+	if err != nil {
+		logctx.WithError(err).Error("failed to respond with committed message")
+		return err
+	}
+
 	return nil
 }
 
@@ -469,7 +479,12 @@ func (s *CerealService) DequeueTask(req cereal.Cereal_DequeueTaskServer) error {
 		return errInvalidMsg
 	}
 
-	return nil
+	err = writeDeqTaskRespMsg(ctx, req, &cereal.DequeueTaskResponse{
+		Cmd: &cereal.DequeueTaskResponse_Committed_{
+			Committed: &cereal.DequeueTaskResponse_Committed{},
+		},
+	})
+	return err
 }
 
 func (s *CerealService) CreateWorkflowSchedule(ctx context.Context, req *cereal.CreateWorkflowScheduleRequest) (*cereal.CreateWorkflowScheduleResponse, error) {
