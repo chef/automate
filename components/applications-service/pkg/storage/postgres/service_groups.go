@@ -53,8 +53,6 @@ const (
 	FROM ( `
 	selectServiceGroupsHealthCountsSecond = ` ) AS service_group_health_counts `
 
-	selectServiceGroupHealth = selectServiceGroupHealthFirst + selectServiceGroupHealthSecond
-
 	selectServiceGroupHealthFirst = `
   SELECT *
          ,(CASE WHEN health_critical > 0 THEN '1_CRITICAL'
@@ -203,6 +201,7 @@ func formatQueryFilters(filters map[string][]string, includeStatusFilter bool) (
 		statusQuery         string
 		whereQuery          string
 		selectAllPartsQuery string
+		selectQuery         string
 	)
 	packageWhereQuery := ``
 	first := true
@@ -225,23 +224,15 @@ func formatQueryFilters(filters map[string][]string, includeStatusFilter bool) (
 				}
 			}
 		case "environment", "ENVIRONMENT":
-			selectQuery, err := queryFromFieldFilter("s.environment", values, first)
+			selectQuery, err = queryFromFieldFilter("s.environment", values, first)
 			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return "", err
-			}
+
 		case "application", "APPLICATION":
-			selectQuery, err := queryFromFieldFilter("s.application", values, first)
+			selectQuery, err = queryFromFieldFilter("s.application", values, first)
 			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return "", err
-			}
 		case "group", "GROUP":
-			selectQuery, err := queryFromFieldFilter("s.service_group_name_suffix", values, first)
+			selectQuery, err = queryFromFieldFilter("s.service_group_name_suffix", values, first)
 			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return "", err
-			}
 		case "origin", "ORIGIN":
 			selectQuery, err := queryFromFieldFilter("s.origin", values, first)
 			whereQuery = whereQuery + selectQuery
@@ -251,23 +242,16 @@ func formatQueryFilters(filters map[string][]string, includeStatusFilter bool) (
 				return "", err
 			}
 		case "service", "SERVICE":
-			selectQuery, err := queryFromFieldFilter("s.name", values, first)
+			selectQuery, err = queryFromFieldFilter("s.name", values, first)
 			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return "", err
-			}
+			break
 		case "site", "SITE":
-			selectQuery, err := queryFromFieldFilter("s.site", values, first)
+			selectQuery, err = queryFromFieldFilter("s.site", values, first)
 			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return "", err
-			}
 		case "channel", "CHANNEL":
-			selectQuery, err := queryFromFieldFilter("s.channel", values, first)
+			selectQuery, err = queryFromFieldFilter("s.channel", values, first)
 			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return "", err
-			}
+			break
 		case "version", "VERSION":
 			selectQuery, err := queryFromFieldFilter("s.version", values, first)
 			whereQuery = whereQuery + selectQuery
@@ -277,13 +261,13 @@ func formatQueryFilters(filters map[string][]string, includeStatusFilter bool) (
 				return "", err
 			}
 		case "buildstamp", "BUILDSTAMP":
-			selectQuery, err := queryFromFieldFilter("s.release", values, first)
+			selectQuery, err = queryFromFieldFilter("s.release", values, first)
 			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return "", err
-			}
 		default:
 			return "", errors.Errorf("invalid filter. (%s:%s)", filter, values)
+		}
+		if err != nil {
+			return "", err
 		}
 		if first && filter != "status" && filter != "STATUS" { //If status is first ignore it since it is special and happens outside the inner query.
 			first = false
