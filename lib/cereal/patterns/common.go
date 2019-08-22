@@ -2,9 +2,14 @@ package patterns
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
+	"reflect"
 
 	"github.com/chef/automate/lib/cereal"
 )
+
+var ErrCannotMergeTypes = errors.New("Cannot merge types")
 
 type WorkflowState struct {
 	Payload        json.RawMessage
@@ -15,7 +20,63 @@ type WorkflowState struct {
 	IsFinished     bool
 }
 
-type TaskParameterMetadata struct {
+type TaskParameterMetadata map[string]interface{}
+
+func isEmbeddable(t reflect.Type) bool {
+	fmt.Println(t.String())
+	switch t.Kind() {
+	case reflect.Struct:
+		return true
+	case reflect.Ptr:
+		if t.Elem().Kind() == reflect.Ptr {
+			return false
+		}
+		return isEmbeddable(t.Elem())
+	default:
+		return false
+	}
+}
+
+func merge(a interface{}, b interface{}) (interface{}, error) {
+	structFields := []reflect.StructField{}
+	idx := 0
+	aIdx := 0
+	bIdx := 0
+	if a != nil {
+		if !isEmbeddable(reflect.TypeOf(a)) {
+			return nil, ErrCannotMergeTypes
+		}
+		structFields = append(structFields, reflect.StructField{
+			Name:      "A",
+			Type:      reflect.TypeOf(a),
+			Anonymous: true,
+		})
+		aIdx = idx
+		idx++
+	}
+	if b != nil {
+		if !isEmbeddable(reflect.TypeOf(b)) {
+			return nil, ErrCannotMergeTypes
+		}
+		structFields = append(structFields, reflect.StructField{
+			Name:      "B",
+			Type:      reflect.TypeOf(b),
+			Anonymous: true,
+		})
+		bIdx = idx
+	}
+
+	newType := reflect.StructOf(structFields)
+
+	v := reflect.New(newType).Elem()
+	if a != nil {
+		v.Field(aIdx).Set(reflect.ValueOf(a))
+	}
+	if b != nil {
+		v.Field(bIdx).Set(reflect.ValueOf(b))
+	}
+
+	return v.Interface(), nil
 }
 
 func applyDecision(instance *workflowInstance, decision cereal.Decision) WorkflowState {

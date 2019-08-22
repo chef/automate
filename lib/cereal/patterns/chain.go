@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"reflect"
 
 	"github.com/sirupsen/logrus"
 
@@ -38,36 +37,8 @@ type ChainWorkflowTaskParam struct {
 	XXX_ChainWorkflowIdx int64 `json:"__idx"`
 }
 
-func marshal(idx int64, obj interface{}) (interface{}, error) {
-	logrus.Infof("marshal idx %d", idx)
-	spew.Dump(obj)
-	structFields := []reflect.StructField{}
-	if obj != nil {
-		structFields = append(structFields, reflect.StructField{
-			Name:      "Anonymous",
-			Type:      reflect.TypeOf(obj),
-			Anonymous: true,
-		})
-	}
-	structFields = append(structFields, reflect.StructField{
-		Name: "ChainWorkflowTaskParam",
-		Type: reflect.TypeOf(idx),
-		Tag:  "json:\"__idx\"",
-	})
-	newType := reflect.StructOf(structFields)
-
-	v := reflect.New(newType).Elem()
-	if obj != nil {
-		v.Field(0).Set(reflect.ValueOf(obj))
-	}
-	v.FieldByName("ChainWorkflowTaskParam").SetInt(idx)
-
-	spew.Dump(v.Interface())
-	return v.Interface(), nil
-}
-
 type workflowInstance struct {
-	//idx        int64
+	idx        int64
 	w          cereal.WorkflowInstance
 	lastState  *WorkflowState
 	parameters json.RawMessage
@@ -96,7 +67,7 @@ type enqueueTaskRequest struct {
 }
 
 func (w *workflowInstance) EnqueueTask(taskName string, parameters interface{}, opts ...cereal.TaskEnqueueOpts) error {
-	v, err := marshal(w.idx, parameters)
+	v, err := merge(ChainWorkflowTaskParam{XXX_ChainWorkflowIdx: w.idx}, parameters)
 	if err != nil {
 		return err
 	}
