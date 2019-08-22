@@ -840,6 +840,7 @@ func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*b
 
 	return task, taskc, nil
 }
+
 func (taskc *PostgresTaskCompleter) Context() context.Context {
 	return taskc.ctx
 }

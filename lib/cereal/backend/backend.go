@@ -6,11 +6,11 @@ import (
 )
 
 type Driver interface {
+	TaskDequeuer
+
 	EnqueueWorkflow(ctx context.Context, workflow *WorkflowInstance) error
 	DequeueWorkflow(ctx context.Context, workflowNames []string) (*WorkflowEvent, WorkflowCompleter, error)
 	CancelWorkflow(ctx context.Context, instanceName string, workflowName string) error
-
-	DequeueTask(ctx context.Context, taskName string) (*Task, TaskCompleter, error)
 
 	CreateWorkflowSchedule(ctx context.Context, instanceName string, workflowName string, parameters []byte, enabled bool, recurrence string, nextRunAt time.Time) error
 	ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error)
@@ -23,6 +23,10 @@ type Driver interface {
 
 	Init() error
 	Close() error
+}
+
+type TaskDequeuer interface {
+	DequeueTask(ctx context.Context, taskName string) (*Task, TaskCompleter, error)
 }
 
 type SchedulerDriver interface {

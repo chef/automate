@@ -26,10 +26,11 @@ var opts struct {
 }
 
 var simpleWorkflowOpts struct {
-	DequeueWorkerCount int
-	TaskCount          int
-	SlowTasks          bool
-	NoEnqueue          bool
+	DequeueWorkerCount      int
+	TaskExecutorWorkerCount int
+	TaskCount               int
+	SlowTasks               bool
+	NoEnqueue               bool
 }
 
 var scheduleOpts struct {
@@ -80,10 +81,16 @@ func main() {
 	}
 
 	simpleWorkflowCmd.PersistentFlags().IntVar(
+		&simpleWorkflowOpts.TaskExecutorWorkerCount,
+		"task-executor-count",
+		10,
+		"Number of task executor workers")
+
+	simpleWorkflowCmd.PersistentFlags().IntVar(
 		&simpleWorkflowOpts.DequeueWorkerCount,
 		"dequeue-worker-count",
 		10,
-		"Number of workers to dequeue tasks")
+		"Number of task dequeue workers to allow")
 
 	simpleWorkflowCmd.PersistentFlags().BoolVar(
 		&simpleWorkflowOpts.NoEnqueue,
@@ -330,7 +337,7 @@ func runSimpleWorkflow(_ *cobra.Command, args []string) error {
 	}
 
 	b := getBackend(dbName)
-	manager, err := cereal.NewManager(b)
+	manager, err := cereal.NewManager(b, cereal.WithTaskDequeueWorkers(simpleWorkflowOpts.DequeueWorkerCount))
 	if err != nil {
 		return err
 	}
@@ -338,7 +345,7 @@ func runSimpleWorkflow(_ *cobra.Command, args []string) error {
 
 	manager.RegisterWorkflowExecutor("simple-workflow", &SimpleWorkflow{})
 	manager.RegisterTaskExecutor("simple task", &SimpleTask{}, cereal.TaskExecutorOpts{
-		Workers: simpleWorkflowOpts.DequeueWorkerCount})
+		Workers: simpleWorkflowOpts.TaskExecutorWorkerCount})
 
 	params := SimpleWorkflowParams{
 		simpleWorkflowOpts.TaskCount,
