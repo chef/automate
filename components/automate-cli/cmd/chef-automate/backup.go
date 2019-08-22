@@ -621,6 +621,7 @@ func findLatestComplete(backups []*api.BackupTask) (*api.BackupTask, error) {
 	return parsedBackups[0].task, nil
 }
 
+// nolint: gocyclo
 func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 	if !backupCmdFlags.yes && !backupCmdFlags.skipPreflight {
 		deployed, err := isA2Deployed()
