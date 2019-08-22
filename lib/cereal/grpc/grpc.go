@@ -87,6 +87,7 @@ func (c *workflowCompleter) EnqueueTask(task *backend.Task, opts backend.TaskEnq
 	c.tasks = append(c.tasks, t)
 	return nil
 }
+
 func (c *workflowCompleter) finish(err error) error {
 	defer c.s.CloseSend() // nolint: errcheck
 
