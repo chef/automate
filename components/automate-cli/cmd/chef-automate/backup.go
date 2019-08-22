@@ -57,6 +57,7 @@ var backupCmdFlags = struct {
 	sha256 string
 
 	patchConfigPath string
+	setConfigPath   string
 }{}
 
 func init() {
@@ -98,6 +99,7 @@ func init() {
 	restoreBackupCmd.PersistentFlags().StringVar(&backupCmdFlags.sha256, "sha256", "", "The SHA256 checksum of the backup")
 	restoreBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.restoreWaitTimeout, "wait-timeout", "t", 7200, "How long to wait for a operation to complete before raising an error")
 	restoreBackupCmd.PersistentFlags().StringVar(&backupCmdFlags.patchConfigPath, "patch-config", "", "Path to patch config if required")
+	restoreBackupCmd.PersistentFlags().StringVar(&backupCmdFlags.setConfigPath, "set-config", "", "Path to set config if required")
 
 	deleteBackupCmd.PersistentFlags().BoolVar(&backupDeleteCmdFlags.yes, "yes", false, "Agree to all prompts")
 	deleteBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.deleteWaitTimeout, "wait-timeout", "t", 120, "How long to wait for a operation to complete before raising an error")
@@ -107,6 +109,7 @@ func init() {
 		_ = restoreBackupCmd.PersistentFlags().MarkHidden("hartifacts")
 		_ = restoreBackupCmd.PersistentFlags().MarkHidden("channel")
 		_ = restoreBackupCmd.PersistentFlags().MarkHidden("skip-bootstrap")
+		_ = restoreBackupCmd.PersistentFlags().MarkHidden("set-config")
 	}
 
 	RootCmd.AddCommand(backupCmd)
@@ -704,12 +707,22 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 		)
 	}
 
-	var cfg *dc.AutomateConfig
+	if backupCmdFlags.setConfigPath != "" && backupCmdFlags.patchConfigPath != "" {
+		return status.New(status.ConfigError, "You may not specify both patch-config and set-config")
+	}
 	if backupCmdFlags.patchConfigPath != "" {
-		cfg, err = dc.LoadUserOverrideConfigFile(backupCmdFlags.patchConfigPath)
+		cfg, err := dc.LoadUserOverrideConfigFile(backupCmdFlags.patchConfigPath)
 		if err != nil {
 			return status.Annotate(err, status.ConfigError)
 		}
+		rt.PatchConfig = cfg
+	}
+	if backupCmdFlags.setConfigPath != "" {
+		cfg, err := dc.LoadUserOverrideConfigFile(backupCmdFlags.setConfigPath)
+		if err != nil {
+			return status.Annotate(err, status.ConfigError)
+		}
+		rt.SetConfig = cfg
 	}
 
 	rt.Upgrade = backupCmdFlags.upgrade
@@ -717,7 +730,6 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 	rt.Channel = backupCmdFlags.channel
 	rt.Airgap = backupCmdFlags.airgap != ""
 	rt.Sha256 = backupCmdFlags.sha256
-	rt.PatchConfig = cfg
 
 	if err := locationSpec.ConfigureBackupRestoreTask(rt); err != nil {
 		return status.Annotate(err, status.MarshalError)
