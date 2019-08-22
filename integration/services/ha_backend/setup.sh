@@ -36,7 +36,6 @@ After=network-online.target
 
 [Service]
 Environment=HAB_LICENSE=accept-no-persist
-Environment=RUST_LOG=debug
 Type=simple
 ExecStartPre=-/bin/rm -f /hab/sup/default/LOCK
 ExecStart=/bin/hab sup run --peer-watch-file /services/ha_backend_peers
