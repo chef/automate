@@ -47,6 +47,7 @@ func (suite *CerealTestSuite) TestDelayedTask() {
 			},
 		),
 		WithManagerOpts(
+			cereal.WithTaskPollInterval(2*time.Second),
 			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
 				wgTask.Done()
 			}),
