@@ -37,77 +37,6 @@ type ChainWorkflowTaskParam struct {
 	XXX_ChainWorkflowIdx int64 `json:"__idx"`
 }
 
-type workflowInstance struct {
-	idx        int64
-	w          cereal.WorkflowInstance
-	lastState  *WorkflowState
-	parameters json.RawMessage
-
-	// output
-	enqueuedTasks []enqueueTaskRequest
-}
-
-func (w *workflowInstance) GetPayload(obj interface{}) error {
-	if w.lastState == nil || len(w.lastState.Payload) == 0 {
-		return nil
-	}
-	return json.Unmarshal(w.lastState.Payload, obj)
-}
-func (w *workflowInstance) GetParameters(obj interface{}) error {
-	if len(w.parameters) == 0 {
-		return nil
-	}
-	return json.Unmarshal(w.parameters, obj)
-}
-
-type enqueueTaskRequest struct {
-	taskName   string
-	parameters interface{}
-	opts       []cereal.TaskEnqueueOpts
-}
-
-func (w *workflowInstance) EnqueueTask(taskName string, parameters interface{}, opts ...cereal.TaskEnqueueOpts) error {
-	v, err := merge(ChainWorkflowTaskParam{XXX_ChainWorkflowIdx: w.idx}, parameters)
-	if err != nil {
-		return err
-	}
-
-	w.enqueuedTasks = append(w.enqueuedTasks, enqueueTaskRequest{
-		taskName:   taskName,
-		parameters: v,
-		opts:       opts,
-	})
-	return nil
-}
-func (w *workflowInstance) Continue(payload interface{}) cereal.Decision {
-	return w.w.Continue(payload)
-}
-
-func (w *workflowInstance) Complete(opts ...cereal.CompleteOpts) cereal.Decision {
-	return w.w.Complete(opts...)
-}
-
-func (w *workflowInstance) Fail(err error) cereal.Decision {
-	return w.w.Fail(err)
-}
-
-func (w *workflowInstance) InstanceName() string {
-	return ""
-}
-
-func (w *workflowInstance) TotalEnqueuedTasks() int {
-	if w.lastState == nil {
-		return len(w.enqueuedTasks)
-	}
-	return len(w.enqueuedTasks) + w.lastState.EnqueuedTasks
-}
-func (w *workflowInstance) TotalCompletedTasks() int {
-	if w.lastState == nil {
-		return 0
-	}
-	return w.lastState.CompletedTasks
-}
-
 func NewChainWorkflowExecutor(executors ...cereal.WorkflowExecutor) (*ChainWorkflowExecutor, error) {
 	if len(executors) <= 0 {
 		return nil, errors.New("Can't have zero")
@@ -136,7 +65,9 @@ func (m *ChainWorkflowExecutor) OnStart(w cereal.WorkflowInstance, ev cereal.Sta
 	}
 
 	wrappedInstance := &workflowInstance{
-		idx:        0,
+		attachment: ChainWorkflowTaskParam{
+			XXX_ChainWorkflowIdx: 0,
+		},
 		w:          w,
 		parameters: parameters.WorkflowParams[0],
 	}
@@ -197,7 +128,9 @@ func (m *ChainWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev cer
 	spew.Dump(workflowState)
 	logrus.Infof("Delivering to %d", idx)
 	wrappedInstance := &workflowInstance{
-		idx:        idx,
+		attachment: ChainWorkflowTaskParam{
+			XXX_ChainWorkflowIdx: idx,
+		},
 		w:          w,
 		parameters: parameters.WorkflowParams[idx],
 		lastState:  &workflowState,
@@ -220,7 +153,9 @@ func (m *ChainWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev cer
 		nextIdx := idx + 1
 		if nextIdx < int64(len(m.executors)) {
 			wrappedInstance := &workflowInstance{
-				idx:        nextIdx,
+				attachment: ChainWorkflowTaskParam{
+					XXX_ChainWorkflowIdx: nextIdx,
+				},
 				w:          w,
 				parameters: parameters.WorkflowParams[nextIdx],
 			}
@@ -259,49 +194,6 @@ type ChainWorkflowInstance struct {
 	err       error
 }
 
-type immutableWorkflowInstanceImpl struct {
-	params json.RawMessage
-	state  WorkflowState
-}
-
-func (instance *immutableWorkflowInstanceImpl) GetParameters(obj interface{}) error {
-	if len(instance.params) > 0 {
-		return json.Unmarshal(instance.params, obj)
-	}
-	return nil
-}
-
-func (instance *immutableWorkflowInstanceImpl) GetPayload(obj interface{}) error {
-	if instance.state.Err != "" {
-		return errors.New(instance.state.Err)
-	}
-	if len(instance.state.Payload) > 0 {
-		return json.Unmarshal(instance.state.Payload, obj)
-	}
-	return nil
-}
-
-func (instance *immutableWorkflowInstanceImpl) GetResult(obj interface{}) error {
-	if instance.state.Err != "" {
-		return errors.New(instance.state.Err)
-	}
-	if len(instance.state.Result) > 0 {
-		return json.Unmarshal(instance.state.Result, obj)
-	}
-	return nil
-}
-
-func (instance *immutableWorkflowInstanceImpl) IsRunning() bool {
-	return !instance.state.IsFinished
-}
-
-func (instance *immutableWorkflowInstanceImpl) Err() error {
-	if instance.state.Err != "" {
-		return errors.New(instance.state.Err)
-	}
-	return nil
-}
-
 func (instance *ChainWorkflowInstance) GetSubWorkflow(idx int) (cereal.ImmutableWorkflowInstance, error) {
 	payload := instance.payload
 	if !instance.isRunning {
@@ -318,7 +210,7 @@ func (instance *ChainWorkflowInstance) GetSubWorkflow(idx int) (cereal.Immutable
 		params = instance.params.WorkflowParams[idx]
 	}
 
-	subWorkflow := &immutableWorkflowInstanceImpl{
+	subWorkflow := &immutableWorkflowInstance{
 		state:  v,
 		params: params,
 	}

@@ -20,7 +20,119 @@ type WorkflowState struct {
 	IsFinished     bool
 }
 
-type TaskParameterMetadata map[string]interface{}
+type workflowInstance struct {
+	attachment interface{}
+	w          cereal.WorkflowInstance
+	lastState  *WorkflowState
+	parameters json.RawMessage
+
+	// output
+	enqueuedTasks []enqueueTaskRequest
+}
+
+func (w *workflowInstance) GetPayload(obj interface{}) error {
+	if w.lastState == nil || len(w.lastState.Payload) == 0 {
+		return nil
+	}
+	return json.Unmarshal(w.lastState.Payload, obj)
+}
+func (w *workflowInstance) GetParameters(obj interface{}) error {
+	if len(w.parameters) == 0 {
+		return nil
+	}
+	return json.Unmarshal(w.parameters, obj)
+}
+
+type enqueueTaskRequest struct {
+	taskName   string
+	parameters interface{}
+	opts       []cereal.TaskEnqueueOpts
+}
+
+func (w *workflowInstance) EnqueueTask(taskName string, parameters interface{}, opts ...cereal.TaskEnqueueOpts) error {
+	v, err := merge(parameters, w.attachment)
+	if err != nil {
+		return err
+	}
+
+	w.enqueuedTasks = append(w.enqueuedTasks, enqueueTaskRequest{
+		taskName:   taskName,
+		parameters: v,
+		opts:       opts,
+	})
+	return nil
+}
+func (w *workflowInstance) Continue(payload interface{}) cereal.Decision {
+	return w.w.Continue(payload)
+}
+
+func (w *workflowInstance) Complete(opts ...cereal.CompleteOpts) cereal.Decision {
+	return w.w.Complete(opts...)
+}
+
+func (w *workflowInstance) Fail(err error) cereal.Decision {
+	return w.w.Fail(err)
+}
+
+func (w *workflowInstance) InstanceName() string {
+	return w.w.InstanceName()
+}
+
+func (w *workflowInstance) TotalEnqueuedTasks() int {
+	if w.lastState == nil {
+		return len(w.enqueuedTasks)
+	}
+	return len(w.enqueuedTasks) + w.lastState.EnqueuedTasks
+}
+func (w *workflowInstance) TotalCompletedTasks() int {
+	if w.lastState == nil {
+		return 0
+	}
+	return w.lastState.CompletedTasks
+}
+
+type immutableWorkflowInstance struct {
+	params json.RawMessage
+	state  WorkflowState
+}
+
+func (instance *immutableWorkflowInstance) GetParameters(obj interface{}) error {
+	if len(instance.params) > 0 {
+		return json.Unmarshal(instance.params, obj)
+	}
+	return nil
+}
+
+func (instance *immutableWorkflowInstance) GetPayload(obj interface{}) error {
+	if instance.state.Err != "" {
+		return errors.New(instance.state.Err)
+	}
+	if len(instance.state.Payload) > 0 {
+		return json.Unmarshal(instance.state.Payload, obj)
+	}
+	return nil
+}
+
+func (instance *immutableWorkflowInstance) GetResult(obj interface{}) error {
+	if instance.state.Err != "" {
+		return errors.New(instance.state.Err)
+	}
+	if len(instance.state.Result) > 0 {
+		return json.Unmarshal(instance.state.Result, obj)
+	}
+	return nil
+}
+
+func (instance *immutableWorkflowInstance) IsRunning() bool {
+	return !instance.state.IsFinished
+}
+
+func (instance *immutableWorkflowInstance) Err() error {
+	if instance.state.Err != "" {
+		return errors.New(instance.state.Err)
+	}
+	return nil
+}
 
 func isEmbeddable(t reflect.Type) bool {
 	fmt.Println(t.String())
