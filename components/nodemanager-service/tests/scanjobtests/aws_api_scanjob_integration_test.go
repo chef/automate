@@ -77,10 +77,9 @@ func TestAWSAPIScanJob(t *testing.T) {
 	require.NotZero(t, len(mgrID.Ids))
 
 	// create a job with node manager reference
-	filter := common.Filter{Key: "region", Values: []string{"eu-west-1"}, Exclude: false}
 	mgrFilter := jobs.ManagerFilter{
 		ManagerId: mgrID.GetIds()[0].Id,
-		Filters:   []*common.Filter{&filter},
+		Filters:   []*common.Filter{},
 	}
 	job := jobs.Job{
 		Name:          "my job for aws-api node manager",
