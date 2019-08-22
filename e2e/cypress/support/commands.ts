@@ -36,7 +36,7 @@ Cypress.Commands.add('applyProjectsFilter', (projectsToFilterOn: string[]) => {
     .find('chef-checkbox').each(child => {
     // deselect every checkbox
     if (child.attr('aria-checked') === 'true') {
-      child.click();
+      child.trigger('click');
     }
   });
 
@@ -79,7 +79,7 @@ Cypress.Commands.add('restoreStorage', () => {
   });
 
   cy.server();
-  // mock refresh token call in case it fails
+  // mock refresh token call in case it fails and forces logout
   const user = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
   cy.route({
     method: 'GET',
@@ -89,6 +89,22 @@ Cypress.Commands.add('restoreStorage', () => {
       id_token: user.id_token
     }
   });
+
+  if (Cypress.env('IAM_VERSION') === 'v2.1') {
+    // mock background polling since it's frequent and can interfere with loading wait time
+    cy.route({
+      method: 'GET',
+      url: '**/apply-rules',
+      status: 200,
+      response: {
+        state: 'not_running',
+        estimated_time_complete: '0001-01-01T00:00:00Z',
+        percentage_complete: 1,
+        failed: false,
+        failure_message: ''
+      }
+    });
+  }
 });
 
 Cypress.Commands.add('generateAdminToken', (idToken: string) => {
