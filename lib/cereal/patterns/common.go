@@ -255,3 +255,7 @@ func applyDecision(instance *workflowInstance, decision cereal.Decision) Workflo
 		Err:        "Unknown workflow state",
 	}
 }
+
+func bug(w cereal.WorkflowInstance, msg string) cereal.Decision {
+	return w.Fail(fmt.Errorf("BUG: %s", msg))
+}
