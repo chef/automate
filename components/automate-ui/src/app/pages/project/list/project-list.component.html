@@ -17,7 +17,7 @@
       <ng-container *ngIf="(sortedProjects$ | async)?.length > 0">
         <chef-toolbar>
           <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">
-            <chef-button [disabled]="(sortedProjects$ | async)?.length >= MAX_PROJECTS" id="create-button" primary (click)="openCreateModal()">Create Project</chef-button>
+            <chef-button [disabled]="(sortedProjects$ | async)?.length >= MAX_PROJECTS" data-cy="create-project" primary (click)="openCreateModal()">Create Project</chef-button>
           </app-authorized>
           <app-authorized [allOf]="['/iam/v2beta/apply-rules', 'post']">
             <chef-button secondary [disabled]="(projects.applyRulesStatus$ | async)?.state === ApplyRulesStatusState.Running" id="update-start-button" (click)="openConfirmUpdateStartModal()">
@@ -65,7 +65,7 @@
             <p>Create the first project to get started!</p>
           </div>
           <div class="empty-case-container">
-              <chef-button primary (click)="openCreateModal()">Create Project</chef-button>
+              <chef-button primary data-cy="create-project" (click)="openCreateModal()">Create Project</chef-button>
           </div>
         </app-authorized>
         <app-authorized not [allOf]="['/iam/v2beta/projects', 'post']">

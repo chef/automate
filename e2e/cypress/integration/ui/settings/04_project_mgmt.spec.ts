@@ -38,6 +38,9 @@ describeIAMV2P1('project management', () => {
     cy.saveStorage();
   });
 
+  after(() => {
+    cy.cleanupProjectsByIDPrefix(adminToken, cypressPrefix);
+  });
 
   it('displays a list of projects', () => {
     cy.request({
@@ -54,13 +57,13 @@ describeIAMV2P1('project management', () => {
   });
 
   it('can create a project', () => {
-    cy.get('#create-button').contains('Create Project').click();
+    cy.get('[data-cy=create-project]').contains('Create Project').click();
     cy.get('app-project-list chef-modal').should('have.class', 'visible');
 
-// we increase the default delay to mimic the average human's typing speed
+    // we increase the default delay to mimic the average human's typing speed
     // only need this for input values upon which later test assertions depend
     // ref: https://github.com/cypress-io/cypress/issues/534
-    cy.get('[data-cy=create-name]')
+    cy.get('[data-cy=create-name]').focus()
       .type(projectName, { delay: typeDelay }).should('have.value', projectName);
 
     cy.get('[data-cy=create-id]').should('not.be.visible');
@@ -83,7 +86,7 @@ describeIAMV2P1('project management', () => {
     cy.url().should('include', `/settings/projects/${projectID}/rules`);
     cy.get('app-project-rules chef-page').should('be.visible');
 
-    cy.get('#create-name input').type(ruleName, { delay: typeDelay })
+    cy.get('#create-name input').focus().type(ruleName, { delay: typeDelay })
       .should('have.value', ruleName);
     cy.get('[data-cy=edit-id]').click();
 
@@ -136,7 +139,7 @@ describeIAMV2P1('project management', () => {
     cy.url().should('include', `/settings/projects/${projectID}/rules/${ruleID}`);
     cy.get('app-project-rules chef-page').should('be.visible');
 
-    cy.get('#create-name input').clear().type(updatedRuleName, { delay: typeDelay })
+    cy.get('#create-name input').focus().clear().type(updatedRuleName, { delay: typeDelay })
       .should('have.value', updatedRuleName);
 
     cy.get('#create-id input').should('have.value', ruleID);
@@ -170,7 +173,8 @@ describeIAMV2P1('project management', () => {
     const updatedProjectName = `updated ${projectName}`;
 
     cy.get('[data-cy=details-tab]').click();
-    cy.get('#update-name').find('input').clear().type(updatedProjectName, { delay: typeDelay })
+    cy.get('#update-name').find('input').focus().clear()
+      .type(updatedProjectName, { delay: typeDelay })
       .should('have.value', updatedProjectName);
     cy.get('app-project-details chef-button').contains('Save').click();
 
