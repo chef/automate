@@ -648,7 +648,7 @@ func (r *registeredExecutor) startTaskWorker(ctx context.Context, b backend.Driv
 
 	r.wg.Add(1)
 	go func() {
-		logctx.Debug("Working starting")
+		logctx.Debug("Worker starting")
 		startedNext := false
 		for {
 			t, taskCompleter, err := b.DequeueTask(ctx, r.name)
