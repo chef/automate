@@ -49,4 +49,41 @@ func TestNewUserOverrideConfigFromBackupRestoreTask(t *testing.T) {
 		cfg := NewUserOverrideConfigFromBackupRestoreTask(rt)
 		require.Equal(t, expectedCfg, cfg)
 	})
+	t.Run("with patch config", func(t *testing.T) {
+		rt := NewBackupRestoreTask()
+		rt.S3BackupLocation = &S3BackupLocation{
+			BucketName:   "backup-bucket",
+			BasePath:     "my-org/chef-automate",
+			Endpoint:     "s3-us-east-2.amazonaws.com",
+			AccessKey:    "AKIMYACCESSKEY",
+			SecretKey:    "MYSUPERSECRETKEY",
+			SessionToken: "MYSESSIONTOKEN",
+		}
+		rt.PatchConfig = &dc.AutomateConfig{
+			Global: config.NewGlobalConfig(),
+		}
+		rt.PatchConfig.Global.V1.Log = &config.Log{
+			Level: w.String("debug"),
+		}
+		expectedCfg := &dc.AutomateConfig{Global: config.NewGlobalConfig()}
+		expectedCfg.Global.V1.Backups = &config.Backups{
+			S3: &config.Backups_S3{
+				Bucket: &config.Backups_S3_Bucket{
+					Name:     w.String("backup-bucket"),
+					BasePath: w.String("my-org/chef-automate"),
+					Endpoint: w.String("s3-us-east-2.amazonaws.com"),
+				},
+				Credentials: &config.Backups_S3_AWSCredentials{
+					AccessKey:    w.String("AKIMYACCESSKEY"),
+					SecretKey:    w.String("MYSUPERSECRETKEY"),
+					SessionToken: w.String("MYSESSIONTOKEN"),
+				},
+			},
+		}
+		expectedCfg.Global.V1.Log = &config.Log{
+			Level: w.String("debug"),
+		}
+		cfg := NewUserOverrideConfigFromBackupRestoreTask(rt)
+		require.Equal(t, expectedCfg, cfg)
+	})
 }

@@ -17,6 +17,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
+	dc "github.com/chef/automate/api/config/deployment"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/backup"
@@ -54,6 +55,9 @@ var backupCmdFlags = struct {
 	s3SessionToken string
 
 	sha256 string
+
+	patchConfigPath string
+	setConfigPath   string
 }{}
 
 func init() {
@@ -94,6 +98,8 @@ func init() {
 	restoreBackupCmd.PersistentFlags().BoolVarP(&backupCmdFlags.yes, "yes", "", false, "Agree to all prompts")
 	restoreBackupCmd.PersistentFlags().StringVar(&backupCmdFlags.sha256, "sha256", "", "The SHA256 checksum of the backup")
 	restoreBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.restoreWaitTimeout, "wait-timeout", "t", 7200, "How long to wait for a operation to complete before raising an error")
+	restoreBackupCmd.PersistentFlags().StringVar(&backupCmdFlags.patchConfigPath, "patch-config", "", "Path to patch config if required")
+	restoreBackupCmd.PersistentFlags().StringVar(&backupCmdFlags.setConfigPath, "set-config", "", "Path to set config if required")
 
 	deleteBackupCmd.PersistentFlags().BoolVar(&backupDeleteCmdFlags.yes, "yes", false, "Agree to all prompts")
 	deleteBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.deleteWaitTimeout, "wait-timeout", "t", 120, "How long to wait for a operation to complete before raising an error")
@@ -103,6 +109,7 @@ func init() {
 		_ = restoreBackupCmd.PersistentFlags().MarkHidden("hartifacts")
 		_ = restoreBackupCmd.PersistentFlags().MarkHidden("channel")
 		_ = restoreBackupCmd.PersistentFlags().MarkHidden("skip-bootstrap")
+		_ = restoreBackupCmd.PersistentFlags().MarkHidden("set-config")
 	}
 
 	RootCmd.AddCommand(backupCmd)
@@ -614,6 +621,7 @@ func findLatestComplete(backups []*api.BackupTask) (*api.BackupTask, error) {
 	return parsedBackups[0].task, nil
 }
 
+// nolint: gocyclo
 func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 	if !backupCmdFlags.yes && !backupCmdFlags.skipPreflight {
 		deployed, err := isA2Deployed()
@@ -698,6 +706,24 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 			"Converting %s into a backup ID failed",
 			backupId,
 		)
+	}
+
+	if backupCmdFlags.setConfigPath != "" && backupCmdFlags.patchConfigPath != "" {
+		return status.New(status.ConfigError, "You may not specify both patch-config and set-config")
+	}
+	if backupCmdFlags.patchConfigPath != "" {
+		cfg, err := dc.LoadUserOverrideConfigFile(backupCmdFlags.patchConfigPath)
+		if err != nil {
+			return status.Annotate(err, status.ConfigError)
+		}
+		rt.PatchConfig = cfg
+	}
+	if backupCmdFlags.setConfigPath != "" {
+		cfg, err := dc.LoadUserOverrideConfigFile(backupCmdFlags.setConfigPath)
+		if err != nil {
+			return status.Annotate(err, status.ConfigError)
+		}
+		rt.SetConfig = cfg
 	}
 
 	rt.Upgrade = backupCmdFlags.upgrade

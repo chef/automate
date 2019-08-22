@@ -3,6 +3,8 @@ package server
 import (
 	"context"
 
+	"github.com/chef/automate/api/config/deployment"
+
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/converge"
 	"github.com/chef/automate/components/automate-deployment/pkg/events"
@@ -210,18 +212,25 @@ func (s *server) updateUserOverrideConfigFromRestoreBackupRequest(req *api.Resto
 	// update them before we bootstrap backup-gateway. If we don't do that the
 	// bgw may be configured to use the wrong bucket or credentials.
 
-	reqCfg := api.NewUserOverrideConfigFromBackupRestoreTask(req.GetRestore())
-
-	curCfg, err := s.deployment.GetUserOverrideConfigForPersistence().NewDeepCopy()
-	if err != nil {
-		return status.Error(codes.FailedPrecondition, "Failed to load configuration")
+	var reqCfg *deployment.AutomateConfig
+	var curCfg *deployment.AutomateConfig
+	if req.GetRestore().GetSetConfig() != nil {
+		curCfg = req.GetRestore().GetSetConfig()
+	} else {
+		var err error
+		curCfg, err = s.deployment.GetUserOverrideConfigForPersistence().NewDeepCopy()
+		if err != nil {
+			return status.Error(codes.FailedPrecondition, "Failed to load configuration")
+		}
 	}
 
-	if err = curCfg.OverrideConfigValues(reqCfg); err != nil {
+	reqCfg = api.NewUserOverrideConfigFromBackupRestoreTask(req.GetRestore())
+
+	if err := curCfg.OverrideConfigValues(reqCfg); err != nil {
 		return status.Error(codes.Internal, "Failed to set backup configuration")
 	}
 
-	if err = curCfg.ValidateWithGlobalAndDefaults(); err != nil {
+	if err := curCfg.ValidateWithGlobalAndDefaults(); err != nil {
 		return status.Error(codes.InvalidArgument, err.Error())
 	}
 
