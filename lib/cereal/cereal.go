@@ -569,6 +569,14 @@ type registeredExecutor struct {
 	wg sync.WaitGroup
 }
 
+// GetActiveWorkers returns the worker count. Do not use the returned
+// count for decision making. This is provided for logging only.
+func (r *registeredExecutor) GetActiveWorkers() int {
+	r.Lock()
+	defer r.Unlock()
+	return r.activeWorkers
+}
+
 // DecActiveWorkers decrements the worker count, clamping it at zero.
 func (r *registeredExecutor) DecActiveWorkers() {
 	r.Lock()
@@ -615,7 +623,7 @@ func (r *registeredExecutor) StartPoller(ctx context.Context, b backend.Driver, 
 	for {
 		select {
 		case <-ctx.Done():
-			logctx.WithField("active_workers", r.activeWorkers).Info("Waiting for all task workers to exit")
+			logctx.WithField("active_workers", r.GetActiveWorkers()).Info("Waiting for all task workers to exit")
 			r.wg.Wait()
 			logctx.Info("Exiting task poller")
 			return
@@ -640,8 +648,7 @@ func (r *registeredExecutor) startTaskWorker(ctx context.Context, b backend.Driv
 	logctx := logrus.WithField("task_name", r.name)
 	if !r.IncActiveWorkers() {
 		logctx.WithFields(logrus.Fields{
-			"max_workers":    r.maxWorkers,
-			"active_workers": r.activeWorkers,
+			"max_workers": r.maxWorkers,
 		}).Warn("Maximum task workers already started")
 		return
 	}
