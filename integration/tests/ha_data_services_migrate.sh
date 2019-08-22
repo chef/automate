@@ -52,6 +52,7 @@ do_prepare_upgrade() {
     do_backup_default
     cp -r /var/opt/chef-automate/backups/automate-elasticsearch-data \
         /services/ha_backend_backups/automate-elasticsearch-data
+    chown -R hab:hab /services/ha_backend_backups/automate-elasticsearch-data
     do_prepare_restore_default
 }
 
