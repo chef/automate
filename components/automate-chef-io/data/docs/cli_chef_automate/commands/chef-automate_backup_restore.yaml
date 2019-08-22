@@ -14,6 +14,8 @@ options:
   shorthand: h
   default_value: "false"
   usage: help for restore
+- name: patch-config
+  usage: Path to patch config if required
 - name: sha256
   usage: The SHA256 checksum of the backup
 - name: skip-preflight
