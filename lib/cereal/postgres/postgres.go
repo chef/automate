@@ -17,6 +17,18 @@ import (
 )
 
 const (
+	// defaultMaxIdleConnections is will be used to configure
+	// MaxIdleConnections on the sql.DB object. 4 was chosen
+	// without much analysis. The default is 2. Without any
+	// registered task executors we know we have the following
+	// periodic database accesses:
+	//
+	// - cleanup goroutine
+	// - workflow processing loop
+	// - workflow scheduler loop
+	//
+	defaultMaxIdleConnections = 4
+
 	enqueueTaskQuery   = `SELECT cereal_enqueue_task($1, $2, $3, $4)`
 	dequeueTaskQuery   = `SELECT * FROM cereal_dequeue_task($1)`
 	completeTaskQuery  = `SELECT cereal_complete_task($1, $2, $3, $4)`
@@ -230,6 +242,8 @@ func (pg *PostgresBackend) Init() error {
 		return err
 	}
 	pg.db = db
+
+	pg.db.SetMaxIdleConns(defaultMaxIdleConnections)
 
 	var dbName string
 	err = pg.db.QueryRow("SELECT CURRENT_DATABASE()").Scan(&dbName)
