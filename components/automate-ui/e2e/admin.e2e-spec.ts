@@ -1359,7 +1359,7 @@ describe('Admin pages', () => {
       let createButton;
 
       beforeEach(() => {
-        $('app-project-list #create-button button').click();
+        $('app-project-list [data-cy=create-project] button').click();
         editButton = $('app-create-object-modal #edit-button-object-modal button');
         createButton = $('app-create-object-modal #create-button-object-modal button');
       });
@@ -1652,7 +1652,7 @@ describe('Admin pages', () => {
     });
 
     it('disables the create project button', () => {
-      const createButton = $('app-project-list #create-button');
+      const createButton = $('app-project-list [data-cy=create-project]');
       expect(createButton.getAttribute('disabled')).toBe('true');
     });
   });

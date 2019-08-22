@@ -37,7 +37,7 @@
               Only lowercase letters, numbers, hyphens, and underscores are allowed.
             </chef-error>
             <chef-error *ngIf="conflictError">
-              Rule IDs must be unique--Rule with ID "{{ ruleForm.controls.id.value }}" already exists.
+              Rule IDs must be unique--Rule with ID "{{ ruleForm.get('id').value }}" already exists.
             </chef-error>
           </chef-form-field>
           <small class="help">Rule IDs are unique, permanent, and cannot be changed later.</small>
@@ -45,7 +45,7 @@
         <div *ngIf="!modifyID && !editingRule" id="create-id-static">
           <span class="key-label">Rule ID:&nbsp;</span><span class="key-value">{{ this.ruleForm.value.id }}</span>
           <chef-toolbar>
-            <chef-button tertiary (click)="modifyID=true;">Edit ID</chef-button>
+            <chef-button tertiary (click)="modifyID=true;" data-cy="edit-id">Edit ID</chef-button>
           </chef-toolbar>
         </div>
 
@@ -77,7 +77,7 @@
               <chef-form-field class="attribute-field">
                 <label>
                   <span class="label">{{ getAttributeLabel() }}</span>
-                  <select ngDefaultControl formControlName="attribute">
+                  <select ngDefaultControl formControlName="attribute" data-cy="attribute-dropdown">
                     <option
                       *ngFor="let option of attributes[ruleForm.get('type').value.toLowerCase()]; let i = index"
                       [value]="option.key"
@@ -92,7 +92,7 @@
               <chef-form-field class="attribute-field">
                 <label>
                   <span class="label">Operator</span>
-                  <select ngDefaultControl formControlName="operator">
+                  <select ngDefaultControl formControlName="operator" data-cy="operator-dropdown">
                     <option *ngFor="let operator of operators"
                       [value]="operator.key"
                     >{{ operator.value }}</option>
@@ -106,7 +106,11 @@
               <chef-form-field class="attribute-field">
                 <label>
                   <span class="label">Value</span>
-                  <chef-input ngDefaultControl formControlName="values" [value]="condition.controls.values.value"></chef-input>
+                  <chef-input ngDefaultControl
+                    formControlName="values"
+                    [value]="condition.controls.values.value"
+                    data-cy="rule-value"
+                  ></chef-input>
                 </label>
                 <chef-error
                   *ngIf="(ruleForm.get('conditions').controls[i].get('values').hasError('required') || ruleForm.get('conditions').controls[i].get('values').hasError('pattern')) && ruleForm.get('conditions').controls[i].get('values').dirty"

@@ -166,7 +166,7 @@ describe('ProjectListComponent', () => {
         component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v1');
         fixture.detectChanges();
         expect(component.createModalVisible).toBe(false);
-        (<HTMLButtonElement>(element.querySelector('#create-button'))).click();
+        (<HTMLButtonElement>(element.querySelector('[data-cy=create-project]'))).click();
         expect(component.createModalVisible).toBe(true);
       });
 
@@ -175,7 +175,7 @@ describe('ProjectListComponent', () => {
         component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v1');
         fixture.detectChanges();
         component.createProjectForm.controls['name'].setValue('any');
-        (<HTMLButtonElement>(element.querySelector('#create-button'))).click();
+        (<HTMLButtonElement>(element.querySelector('[data-cy=create-project]'))).click();
         expect(component.createProjectForm.controls['name'].value).toBe(null);
       });
     });
