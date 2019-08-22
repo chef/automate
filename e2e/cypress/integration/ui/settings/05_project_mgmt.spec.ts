@@ -171,8 +171,11 @@ describeIAMV2P1('project management', () => {
 
   it('can update a project name', () => {
     const updatedProjectName = `updated ${projectName}`;
+    cy.route('GET', `/apis/iam/v2beta/projects/${projectID}`).as('getProject');
 
     cy.get('[data-cy=details-tab]').click();
+    cy.wait('@getProject');
+
     cy.get('#update-name').find('input').focus().clear()
       .type(updatedProjectName, { delay: typeDelay })
       .should('have.value', updatedProjectName);
