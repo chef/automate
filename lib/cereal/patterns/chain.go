@@ -159,7 +159,7 @@ func (m *ChainWorkflowExecutor) OnStart(w cereal.WorkflowInstance, ev cereal.Sta
 	}
 
 	decision := m.executors[0].OnStart(wrappedInstance, ev)
-	ns := applyDecision(wrappedInstance, decision)
+	ns := nextState(wrappedInstance, decision)
 	payload := &ChainWorkflowPayload{
 		State: []WorkflowState{ns},
 	}
@@ -219,7 +219,7 @@ func (m *ChainWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev cer
 	}
 
 	decision := m.executors[idx].OnTaskComplete(wrappedInstance, ev)
-	ns := applyDecision(wrappedInstance, decision)
+	ns := nextState(wrappedInstance, decision)
 	payload.State[idx] = ns
 
 	if decision.IsFailed() {
@@ -239,7 +239,7 @@ func (m *ChainWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev cer
 			}
 
 			decision := m.executors[nextIdx].OnStart(wrappedInstance, cereal.StartEvent{})
-			ns := applyDecision(wrappedInstance, decision)
+			ns := nextState(wrappedInstance, decision)
 			if int64(len(payload.State)) != nextIdx {
 				return bug(w, "incorrect length of state")
 			}
@@ -254,6 +254,40 @@ func (m *ChainWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev cer
 	return w.Continue(payload)
 }
 
-func (*ChainWorkflowExecutor) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEvent) cereal.Decision {
-	return w.Complete()
+func (m *ChainWorkflowExecutor) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEvent) cereal.Decision {
+	parameters, err := m.getParameters(w)
+	if err != nil {
+		return w.Fail(err)
+	}
+
+	payload := ChainWorkflowPayload{}
+	if err := w.GetPayload(&payload); err != nil {
+		return w.Fail(err)
+	}
+
+	if len(payload.State) == 0 {
+		return w.Complete(cereal.WithResult(payload))
+	}
+
+	idx := len(payload.State) - 1
+
+	if idx >= len(m.executors) {
+		return bug(w, "idx past number executors")
+	}
+	wrappedInstance := &workflowInstance{
+		attachment: ChainWorkflowTaskParam{
+			XXX_ChainWorkflowIdx: int64(idx),
+		},
+		w:          w,
+		parameters: parameters.WorkflowParams[idx],
+	}
+	decision := m.executors[idx].OnCancel(wrappedInstance, ev)
+	ns := nextState(wrappedInstance, decision)
+	payload.State[idx] = ns
+
+	if decision.IsFailed() || decision.IsComplete() {
+		return w.Complete(cereal.WithResult(payload))
+	} else {
+		return w.Continue(payload)
+	}
 }

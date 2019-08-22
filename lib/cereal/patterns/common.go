@@ -191,7 +191,7 @@ func merge(a interface{}, b interface{}) (interface{}, error) {
 	return v.Interface(), nil
 }
 
-func applyDecision(instance *workflowInstance, decision cereal.Decision) WorkflowState {
+func nextState(instance *workflowInstance, decision cereal.Decision) WorkflowState {
 	if decision.IsContinuing() {
 		for _, enq := range instance.enqueuedTasks {
 			err := instance.w.EnqueueTask(enq.taskName, enq.parameters, enq.opts...)
