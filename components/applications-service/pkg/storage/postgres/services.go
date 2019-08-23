@@ -115,7 +115,7 @@ WHERE service_full.last_event_occurred_at < now() - ($1 || ' minutes')::interval
 	markDisconnectedServices = `
 UPDATE service_full AS s
 SET disconnected = true
-WHERE last_event_occurred_at < now() - ($1 || ' minutes')::interval
+WHERE last_event_occurred_at < now() - ($1 || ' seconds')::interval
   AND disconnected = false
 RETURNING s.id
   , s.origin AS origin
@@ -274,10 +274,10 @@ func (db *Postgres) GetDisconnectedServices(thresholdMinutes int32) ([]*storage.
 	return convertComposedServicesToStorage(services), err
 }
 
-func (db *Postgres) MarkDisconnectedServices(thresholdMinutes int32) ([]*storage.Service, error) {
+func (db *Postgres) MarkDisconnectedServices(thresholdSeconds int32) ([]*storage.Service, error) {
 	var services []*composedService
 
-	_, err := db.DbMap.Select(&services, markDisconnectedServices, thresholdMinutes)
+	_, err := db.DbMap.Select(&services, markDisconnectedServices, thresholdSeconds)
 	if err != nil {
 		return nil, err
 	}

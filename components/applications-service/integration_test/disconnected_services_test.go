@@ -99,7 +99,7 @@ func TestDisconnectedServicesBasicSingleServiceMockedAsDisconnected(t *testing.T
 	suite.IngestService(event)
 
 	t.Run("MarkDisconnectedServices with one disconnected service", func(t *testing.T) {
-		res, err := suite.ApplicationsServer.MarkDisconnectedServices(int32(3))
+		res, err := suite.ApplicationsServer.MarkDisconnectedServices(request.ThresholdMinutes * 60)
 		require.NoError(t, err)
 		assertServicesEqual(t, expected.GetServices(), res)
 	})
@@ -181,7 +181,7 @@ func TestDisconnectedServicesMultiServicesMixedConnectedAndDisconnected(t *testi
 
 	t.Run("MarkDisconnectedServices with mixed connected and not", func(t *testing.T) {
 		// We should only have a single disconnected service back
-		response, err := suite.ApplicationsServer.MarkDisconnectedServices(request.ThresholdMinutes)
+		response, err := suite.ApplicationsServer.MarkDisconnectedServices(request.ThresholdMinutes * 60)
 		require.NoError(t, err)
 		assertServicesEqual(t, expected.GetServices(), response)
 	})
@@ -237,7 +237,7 @@ func TestDisconnectedServicesMultiServicesAllConnected(t *testing.T) {
 
 	t.Run("MarkDisconnectedServices with several connected services", func(t *testing.T) {
 		// We should have no disconnected services
-		response, err := suite.ApplicationsServer.MarkDisconnectedServices(request.ThresholdMinutes)
+		response, err := suite.ApplicationsServer.MarkDisconnectedServices(request.ThresholdMinutes * 60)
 		require.NoError(t, err)
 		assertServicesEqual(t, expected.GetServices(), response)
 	})

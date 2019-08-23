@@ -325,9 +325,8 @@ func (app *ApplicationsServer) DeleteDisconnectedServices(ctx context.Context,
 	}, nil
 }
 
-// TODO: make an API for this so users can run it ad-hoc if need be. Change the return type, etc.
-func (app *ApplicationsServer) MarkDisconnectedServices(thresholdMinutes int32) ([]*applications.Service, error) {
-	svcs, err := app.storageClient.MarkDisconnectedServices(thresholdMinutes)
+func (app *ApplicationsServer) MarkDisconnectedServices(thresholdSeconds int32) ([]*applications.Service, error) {
+	svcs, err := app.storageClient.MarkDisconnectedServices(thresholdSeconds)
 	if err != nil {
 		return nil, err
 	}
