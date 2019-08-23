@@ -293,7 +293,7 @@ func (r *Resolver) handleAwsApiNodesSingleNode(ctx context.Context, m *manager.N
 		accessKeyID, secretKey, _, sessionToken = managers.GetAWSCreds(secret)
 	}
 
-	return []*types.InspecJob{&types.InspecJob{
+	return []*types.InspecJob{{
 		InspecBaseJob: types.InspecBaseJob{
 			JobID:    job.Id,
 			JobName:  job.Name,
