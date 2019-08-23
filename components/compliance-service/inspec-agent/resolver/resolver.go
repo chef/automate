@@ -272,6 +272,9 @@ func (r *Resolver) handleAwsApiNodes(ctx context.Context, m *manager.NodeManager
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
+	if len(dbNodes.Nodes) == 0 {
+		return nil, fmt.Errorf("no nodes found in db for manager %s", m.Name)
+	}
 	if len(dbNodes.Nodes) == 1 {
 		return r.handleAwsApiNodesSingleNode(ctx, m, job, dbNodes.Nodes[0])
 	}
@@ -290,8 +293,7 @@ func (r *Resolver) handleAwsApiNodesSingleNode(ctx context.Context, m *manager.N
 		accessKeyID, secretKey, _, sessionToken = managers.GetAWSCreds(secret)
 	}
 
-	jobArray := []*types.InspecJob{}
-	jobArray = append(jobArray, &types.InspecJob{
+	return []*types.InspecJob{&types.InspecJob{
 		InspecBaseJob: types.InspecBaseJob{
 			JobID:    job.Id,
 			JobName:  job.Name,
@@ -317,9 +319,7 @@ func (r *Resolver) handleAwsApiNodesSingleNode(ctx context.Context, m *manager.N
 		Profiles:        job.Profiles,
 		SourceID:        m.AccountId,
 		SourceAccountID: m.AccountId,
-	})
-
-	return jobArray, nil
+	}}, nil
 }
 
 func (r *Resolver) handleAwsApiNodesMultiNode(ctx context.Context, m *manager.NodeManager, filters []*common.Filter, job *jobs.Job) ([]*types.InspecJob, error) {

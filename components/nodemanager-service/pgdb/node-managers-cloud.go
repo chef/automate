@@ -137,7 +137,7 @@ func (db *DB) AddManagerNodeToDB(managerId string, managerAcctId string, credent
 
 	if err != nil {
 		logrus.Errorf("AddManagerRegionsToDB unable to insert node for %s %v", acctAlias, err)
-		return nodeIds, errors.Wrapf(err, "AddManagerRegionsToDB unable to insert node for %s", acctAlias)
+		return nil, errors.Wrapf(err, "AddManagerRegionsToDB unable to insert node for %s", acctAlias)
 	}
 	nodeIds = append(nodeIds, uuid)
 
