@@ -66,12 +66,12 @@ func (j *JobManager) SetupScheduler() error {
 
 	params := defaultDisconnectedServicesJobParams()
 
-	logCtx := log.WithFields(log.Fields(log.Fields{
+	logCtx := log.WithFields(log.Fields{
 		"scheduleName": DisconnectedServicesScheduleName,
 		"jobName":      DisconnectedServicesJobName,
 		"jobParams":    params,
 		"recurrance":   r,
-	}))
+	})
 
 	err = j.CerealSvc.CreateWorkflowSchedule(
 		DisconnectedServicesScheduleName,
@@ -157,7 +157,9 @@ type markDisconnectedServicesExecutor struct{}
 
 func (m *markDisconnectedServicesExecutor) Run(ctx context.Context, t cereal.Task) (interface{}, error) {
 	var params DisconnectedServicesParamsV0
-	t.GetParameters(&params)
+	if err := t.GetParameters(&params); err != nil {
+		return nil, errors.Wrap(err, "failed to load parameters for disconnected_services job")
+	}
 	fmt.Printf("markDisconnectedServicesExecutor Run() w/ %+v\n", params)
 	return nil, nil
 }

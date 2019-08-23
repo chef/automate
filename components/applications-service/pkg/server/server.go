@@ -288,12 +288,12 @@ func (app *ApplicationsServer) GetServicesStats(ctx context.Context,
 func (app *ApplicationsServer) GetDisconnectedServices(ctx context.Context,
 	request *applications.DisconnectedServicesReq) (*applications.ServicesRes, error) {
 
-	thresholdMinutes := request.GetThresholdMinutes()
-	if thresholdMinutes <= 0 {
+	thresholdSeconds := request.GetThresholdSeconds()
+	if thresholdSeconds <= 0 {
 		return new(applications.ServicesRes),
 			status.Error(codes.InvalidArgument, "threshold must be greater than zero")
 	}
-	services, err := app.storageClient.GetDisconnectedServices(thresholdMinutes)
+	services, err := app.storageClient.GetDisconnectedServices(thresholdSeconds)
 	if err != nil {
 		log.WithError(err).Error("Error retrieving disconnected services")
 		return new(applications.ServicesRes), status.Error(codes.Internal, err.Error())
@@ -308,13 +308,13 @@ func (app *ApplicationsServer) GetDisconnectedServices(ctx context.Context,
 func (app *ApplicationsServer) DeleteDisconnectedServices(ctx context.Context,
 	request *applications.DisconnectedServicesReq) (*applications.ServicesRes, error) {
 
-	thresholdMinutes := request.GetThresholdMinutes()
-	if thresholdMinutes <= 0 {
+	thresholdSeconds := request.GetThresholdSeconds()
+	if thresholdSeconds <= 0 {
 		return new(applications.ServicesRes),
 			status.Error(codes.InvalidArgument, "threshold must be greater than zero")
 	}
 
-	services, err := app.storageClient.DeleteDisconnectedServices(thresholdMinutes)
+	services, err := app.storageClient.DeleteDisconnectedServices(thresholdSeconds)
 	if err != nil {
 		log.WithError(err).Error("Error retrieving disconnected services")
 		return new(applications.ServicesRes), status.Error(codes.Internal, err.Error())

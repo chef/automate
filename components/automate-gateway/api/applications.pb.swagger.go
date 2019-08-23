@@ -57,7 +57,7 @@ func init() {
         },
         "parameters": [
           {
-            "name": "threshold_minutes",
+            "name": "threshold_seconds",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -353,7 +353,7 @@ func init() {
     "applicationsDisconnectedServicesReq": {
       "type": "object",
       "properties": {
-        "threshold_minutes": {
+        "threshold_seconds": {
           "type": "integer",
           "format": "int32"
         }

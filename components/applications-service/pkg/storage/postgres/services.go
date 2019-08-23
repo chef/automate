@@ -103,13 +103,13 @@ SELECT s.id
   , s.health_updated_at as health_updated_at
 	, s.disconnected as disconnected
 FROM service_full AS s
-WHERE last_event_occurred_at < now() - ($1 || ' minutes')::interval
+WHERE last_event_occurred_at < now() - ($1 || ' seconds')::interval
 `
 
 	deleteDisconnectedServices = `
 DELETE
 FROM service_full
-WHERE service_full.last_event_occurred_at < now() - ($1 || ' minutes')::interval
+WHERE service_full.last_event_occurred_at < now() - ($1 || ' seconds')::interval
 `
 
 	markDisconnectedServices = `
@@ -267,10 +267,10 @@ func columnNameForField(fieldName string) string {
 }
 
 // GetDisconnectedServices returns a list of disconnected services
-func (db *Postgres) GetDisconnectedServices(thresholdMinutes int32) ([]*storage.Service, error) {
+func (db *Postgres) GetDisconnectedServices(thresholdSeconds int32) ([]*storage.Service, error) {
 	var services []*composedService
 
-	_, err := db.DbMap.Select(&services, selectDisconnectedServices, thresholdMinutes)
+	_, err := db.DbMap.Select(&services, selectDisconnectedServices, thresholdSeconds)
 	return convertComposedServicesToStorage(services), err
 }
 
@@ -292,13 +292,13 @@ func (db *Postgres) MarkDisconnectedServices(thresholdSeconds int32) ([]*storage
 // services so they shouldn't exist if there are no associated services. This
 // also prevents the need for a second cleanup operation to delete these
 // things.
-func (db *Postgres) DeleteDisconnectedServices(thresholdMinutes int32) ([]*storage.Service, error) {
+func (db *Postgres) DeleteDisconnectedServices(thresholdSeconds int32) ([]*storage.Service, error) {
 	var services []*composedService
-	_, err := db.DbMap.Select(&services, selectDisconnectedServices, thresholdMinutes)
+	_, err := db.DbMap.Select(&services, selectDisconnectedServices, thresholdSeconds)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list disconnected services")
 	}
-	_, err = db.DbMap.Exec(deleteDisconnectedServices, thresholdMinutes)
+	_, err = db.DbMap.Exec(deleteDisconnectedServices, thresholdSeconds)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to delete disconnected services")
 	}

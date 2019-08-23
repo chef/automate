@@ -130,7 +130,8 @@ message ServicesDistinctValuesRes {
 }
 
 message DisconnectedServicesReq {
-  int32 threshold_minutes = 1;
+  reserved 1;
+  int32 threshold_seconds = 2;
 }
 
 message ServicesStatsReq {
