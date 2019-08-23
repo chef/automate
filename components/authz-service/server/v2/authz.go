@@ -12,11 +12,15 @@ import (
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/stringutils"
+	"github.com/pkg/errors"
 
 	"github.com/chef/automate/api/interservice/authz/common"
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
+	"github.com/chef/automate/components/authz-service/projectassignment"
+	storage "github.com/chef/automate/components/authz-service/storage/v2"
+	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
 )
 
 // These do not have to be the same
@@ -26,15 +30,21 @@ type authzServer struct {
 	engine   engine.V2Authorizer
 	vSwitch  *VersionSwitch
 	projects api.ProjectsServer
+	store    storage.Storage
 }
 
-// NewAuthzServer returns a new IAM v2 Authz server.
+// NewauthzServer returns a new IAM v2 Authz server.
 func NewAuthzServer(l logger.Logger, e engine.V2Authorizer, v *VersionSwitch, p api.ProjectsServer) (api.AuthorizationServer, error) {
+	s := postgres.GetInstance()
+	if s == nil {
+		return nil, errors.New("postgres v2 singleton not yet iniitalized for authz server")
+	}
 	return &authzServer{
 		log:      l,
 		engine:   e,
 		vSwitch:  v,
 		projects: p,
+		store:    s,
 	}, nil
 }
 
@@ -101,11 +111,13 @@ func (s *authzServer) ProjectsAuthorized(
 		requestedProjects = allProjects
 	}
 
-	engineResp, err := s.engine.V2ProjectsAuthorized(ctx,
-		engine.Subjects(req.Subjects),
-		engine.Action(req.Action),
-		engine.Resource(req.Resource),
-		engine.ProjectList(requestedProjects...))
+	engineResp, err := s.fetchAuthorizedProjects(
+		ctx,
+		req.Subjects,
+		req.Action,
+		req.Resource,
+		requestedProjects,
+	)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -168,6 +180,54 @@ func (s *authzServer) FilterAuthorizedProjects(
 	return &api.FilterAuthorizedProjectsResp{
 		Projects: projectIDs,
 	}, nil
+}
+
+// TODO (tc) Until projects are transactionally cleaned up from all data everywhere
+// on project delete, this might fail when it shouldn't (aka the project no longer exists
+// that is being removed from some object). Same for fetchAuthorizedProjects below.
+func (s *authzServer) ValidateProjectAssignment(
+	ctx context.Context,
+	req *api.ValidateProjectAssignmentReq) (*api.ValidateProjectAssignmentResp, error) {
+
+	if !s.isBeta2p1() {
+		return nil, errors.New("must be on v2.1 to assign projects")
+	}
+
+	err := s.store.ErrIfMissingProjects(ctx, req.ProjectIds)
+	if err != nil {
+		if _, ok := err.(*projectassignment.ProjectsMissingErr); ok {
+			return nil, status.Error(codes.NotFound, err.Error())
+		}
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	err = projectassignment.ErrIfProjectAssignmentUnauthroized(ctx, s.engine, req.Subjects, req.ProjectIds)
+	if err != nil {
+		if _, ok := err.(*projectassignment.ProjectsUnauthorizedForAssignmentErr); ok {
+			return nil, status.Error(codes.PermissionDenied, err.Error())
+		}
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &api.ValidateProjectAssignmentResp{}, nil
+}
+
+func (s *authzServer) fetchAuthorizedProjects(
+	ctx context.Context,
+	subjects []string,
+	action string,
+	resource string,
+	requestedProjects []string) ([]string, error) {
+	engineResp, err := s.engine.V2ProjectsAuthorized(ctx,
+		engine.Subjects(subjects),
+		engine.Action(action),
+		engine.Resource(resource),
+		engine.ProjectList(requestedProjects...))
+	if err != nil {
+		return nil, err
+	}
+
+	return engineResp, nil
 }
 
 func (s *authzServer) isBeta2p1() bool {

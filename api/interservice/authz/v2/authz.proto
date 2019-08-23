@@ -87,9 +87,22 @@ message FilterAuthorizedProjectsResp {
     repeated string projects = 1;
 }
 
+message ValidateProjectAssignmentReq {
+    repeated string subjects = 1;
+    repeated string project_ids = 2
+      [(validate.rules).repeated = {
+        min_items: 1,
+        unique: true,
+        items: { string: { pattern: "^[a-z0-9()-_]{1,64}$" } }
+      }];
+}
+
+message ValidateProjectAssignmentResp {}
+
 service Authorization {
     rpc IsAuthorized (IsAuthorizedReq) returns (IsAuthorizedResp) {};
     rpc FilterAuthorizedPairs (FilterAuthorizedPairsReq) returns (FilterAuthorizedPairsResp) {};
     rpc FilterAuthorizedProjects (FilterAuthorizedProjectsReq) returns (FilterAuthorizedProjectsResp) {};
     rpc ProjectsAuthorized (ProjectsAuthorizedReq) returns (ProjectsAuthorizedResp) {};
+    rpc ValidateProjectAssignment (ValidateProjectAssignmentReq) returns (ValidateProjectAssignmentResp) {};
 }

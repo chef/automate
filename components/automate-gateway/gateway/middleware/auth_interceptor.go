@@ -151,6 +151,9 @@ func (a *authInterceptor) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 			return nil, err
 		}
 
+		// TODO (tc): We will need the subjects as well now for project assignment
+		// permission checks. Should we just always inject now?
+		//
 		// This lets services opt-in if they want the entire auth context injected.
 		// However, every domain service will need the projects eventually, so we'll
 		// at least always inject project metadata.

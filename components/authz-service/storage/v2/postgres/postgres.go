@@ -4,11 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"sync"
 
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
+	"github.com/chef/automate/components/authz-service/engine"
+	"github.com/chef/automate/components/authz-service/projectassignment"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
@@ -26,23 +29,33 @@ const (
 
 type pg struct {
 	db          *sql.DB
+	engine      engine.Engine
 	logger      logger.Logger
 	dataMigConf datamigration.Config
 	conninfo    string
 }
 
-// New instantiates the postgres storage backend.
-func New(ctx context.Context, l logger.Logger, migConf migration.Config,
-	dataMigConf datamigration.Config) (v2.Storage, error) {
+var singletonInstance *pg
+var once sync.Once
 
-	l.Infof("applying database migrations from %s", migConf.Path)
+// GetInstance returns the signleton instance. Will be nil if not yet initialized.
+func GetInstance() *pg {
+	return singletonInstance
+}
 
-	db, err := postgres.New(ctx, migConf)
-	if err != nil {
-		return nil, err
-	}
+// New instantiates the singleton postgres storage backend.
+// Will only initialize once. Will simply return nil if already initialized.
+func Initialize(ctx context.Context, e engine.Engine, l logger.Logger, migConf migration.Config,
+	dataMigConf datamigration.Config) error {
 
-	return &pg{db: db, logger: l, dataMigConf: dataMigConf, conninfo: migConf.PGURL.String()}, nil
+	var err error
+	once.Do(func() {
+		l.Infof("applying database migrations from %s", migConf.Path)
+		var db *sql.DB
+		db, err = postgres.New(ctx, migConf)
+		singletonInstance = &pg{db: db, engine: e, logger: l, dataMigConf: dataMigConf, conninfo: migConf.PGURL.String()}
+	})
+	return err
 }
 
 type Querier interface {
@@ -637,13 +650,28 @@ func (p *pg) getPolicyMembersWithQuerier(ctx context.Context, id string, q Queri
 /* * * * * * * * * * * * * * * * * *   ROLES   * * * * * * * * * * * * * * * * * * * * */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-func (p *pg) CreateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
+func (p *pg) CreateRole(ctx context.Context, role *v2.Role, checkProjects bool) (*v2.Role, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
 	if err != nil {
 		return nil, p.processError(err)
+	}
+
+	if checkProjects {
+		err = p.errIfMissingProjectsWithQuerier(ctx, tx, role.Projects)
+		if err != nil {
+			return nil, p.processError(err)
+		}
+
+		err = projectassignment.ErrIfProjectAssignmentUnauthroized(ctx,
+			p.engine,
+			auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+			role.Projects)
+		if err != nil {
+			return nil, p.processError(err)
+		}
 	}
 
 	err = p.insertRoleWithQuerier(ctx, role, tx)
@@ -777,7 +805,7 @@ func (p *pg) DeleteRole(ctx context.Context, id string) error {
 	return nil
 }
 
-func (p *pg) UpdateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
+func (p *pg) UpdateRole(ctx context.Context, role *v2.Role, checkProjects bool) (*v2.Role, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -797,6 +825,34 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role) (*v2.Role, error) {
 	}
 	if !doesIntersect {
 		return nil, storage_errors.ErrNotFound
+	}
+
+	if checkProjects {
+		var oldRole v2.Role
+		row := tx.QueryRowContext(ctx, `SELECT query_role($1);`, role.ID)
+		err = row.Scan(&oldRole)
+		if err != nil {
+			return nil, p.processError(err)
+		}
+
+		projectDiff := projectassignment.CalculateProjectDiff(oldRole.Projects, role.Projects)
+
+		// This code largely mirrors ValidateProjectAssignment but we can't call that directly
+		// due to circular dependencies.
+		if len(projectDiff) != 0 {
+			err = p.errIfMissingProjectsWithQuerier(ctx, tx, projectDiff)
+			if err != nil {
+				return nil, p.processError(err)
+			}
+
+			err = projectassignment.ErrIfProjectAssignmentUnauthroized(ctx,
+				p.engine,
+				auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+				projectDiff)
+			if err != nil {
+				return nil, p.processError(err)
+			}
+		}
 	}
 
 	row := tx.QueryRowContext(ctx,
@@ -1434,6 +1490,43 @@ func (p *pg) DeleteProject(ctx context.Context, id string) error {
 	err = p.singleRowResultOrNotFoundErr(res)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ErrIfMissingProjects returns projectassignment.ProjectsMissingErr if there projects missing,
+// otherwise it returns nil.
+func (p *pg) ErrIfMissingProjects(ctx context.Context, projectIDs []string) error {
+	return p.errIfMissingProjectsWithQuerier(ctx, p.db, projectIDs)
+}
+
+func (p *pg) errIfMissingProjectsWithQuerier(ctx context.Context, q Querier, projectIDs []string) error {
+	// Return any input ID that does not exist in the projects table.
+	rows, err := p.db.QueryContext(ctx,
+		`SELECT id FROM unnest($1::text[]) AS input(id)
+			WHERE NOT EXISTS (SELECT * FROM iam_projects p WHERE input.id = p.id);`, pq.Array(projectIDs))
+	if err != nil {
+		return p.processError(err)
+	}
+
+	defer func() {
+		if err := rows.Close(); err != nil {
+			p.logger.Warnf("failed to close db rows: %s", err.Error())
+		}
+	}()
+
+	projectsNotFound := make([]string, 0)
+	for rows.Next() {
+		var projectIDNotFound string
+		if err := rows.Scan(&projectIDNotFound); err != nil {
+			return p.processError(err)
+		}
+		projectsNotFound = append(projectsNotFound, projectIDNotFound)
+	}
+
+	if len(projectsNotFound) != 0 {
+		return projectassignment.NewProjectsMissingErrError(projectsNotFound)
 	}
 
 	return nil

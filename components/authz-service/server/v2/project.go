@@ -22,8 +22,6 @@ import (
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
-	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
-	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/memstore"
 	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
@@ -60,16 +58,14 @@ func NewMemstoreProjectsServer(
 func NewPostgresProjectsServer(
 	ctx context.Context,
 	l logger.Logger,
-	migrationsConfig migration.Config,
-	dataMigrationsConfig datamigration.Config,
 	e engine.ProjectRulesRetriever,
 	projectUpdateCerealManager *cereal.Manager,
 	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
 
-	s, err := postgres.New(ctx, l, migrationsConfig, dataMigrationsConfig)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to initialize v2 store state")
+	s := postgres.GetInstance()
+	if s == nil {
+		return nil, errors.New("postgres v2 singleton not yet iniitalized for projects server")
 	}
 	projectUpdateManager, err := RegisterCerealProjectUpdateManager(projectUpdateCerealManager, l, s, pr)
 	if err != nil {
