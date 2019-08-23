@@ -26,7 +26,7 @@ type Client interface {
 	ServiceGroupExists(string) (string, bool)
 	// @param (filters)
 	GetServicesHealthCounts(map[string][]string) (*HealthCounts, error)
-	GetServiceGroupsHealthCounts() (*HealthCounts, error)
+	GetServiceGroupsHealthCounts(map[string][]string) (*HealthCounts, error)
 
 	GetServicesCount() (int32, error)
 	GetServiceGroupsCount() (int32, error)

@@ -160,7 +160,9 @@ message Service {
   google.protobuf.Timestamp health_updated_at = 20;
 }
 
-message ServiceGroupsHealthCountsReq {}
+message ServiceGroupsHealthCountsReq {
+  repeated string filter = 1;
+}
 message ServiceGroupsReq {
   repeated string filter = 1;
   common.query.Pagination pagination = 2;

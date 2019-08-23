@@ -259,3 +259,51 @@ func TestServiceGroupsHealthCountsOnServiceUpdateAllCritical(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, response, expectedAfterUpdate)
 }
+
+func TestServiceGroupsHealthCountsFilter(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsHealthCountsReq{
+			Filter: []string{"service:myapp"},
+		}
+		expected = &applications.HealthCounts{
+			Total:    int32(1),
+			Ok:       int32(0),
+			Warning:  int32(1),
+			Critical: int32(0),
+			Unknown:  int32(0),
+		}
+		mockHabServicesMatrix = habServicesMatrix()
+	)
+
+	suite.IngestServices(mockHabServicesMatrix)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroupsHealthCounts(ctx, request)
+	assert.Nil(t, err)
+	assert.Equal(t, response, expected)
+}
+
+func TestServiceGroupsHealthCountsStatusFilterIgnored(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsHealthCountsReq{
+			Filter: []string{"status:OK"},
+		}
+		expected = &applications.HealthCounts{
+			Total:    int32(4),
+			Ok:       int32(1),
+			Warning:  int32(1),
+			Critical: int32(1),
+			Unknown:  int32(1),
+		}
+		mockHabServicesMatrix = habServicesMatrix()
+	)
+
+	suite.IngestServices(mockHabServicesMatrix)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroupsHealthCounts(ctx, request)
+	assert.Nil(t, err)
+	assert.Equal(t, response, expected)
+}
