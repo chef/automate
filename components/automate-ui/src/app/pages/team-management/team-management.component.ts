@@ -73,7 +73,8 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
       // Must stay in sync with error checks in create-object-modal.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       id: ['',
-        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]]
+        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]],
+      projects: [[]]
     });
     this.createV1TeamForm = fb.group({
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
@@ -135,15 +136,11 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
     this.store.dispatch(new DeleteTeam(this.teamToDelete));
   }
 
-  public createV2Team(projectsSelected: Project[]): void {
-    let projectsPayload: string[] = [];
-    if (this.isMinorV1) {
-      projectsPayload = projectsSelected.map(p => p.id);
-    }
+  public createV2Team(): void {
     this.createTeamCommon({
       id: this.createTeamForm.controls.id.value,
       name: this.createTeamForm.controls.name.value.trim(),
-      projects: projectsPayload,
+      projects: this.createTeamForm.controls.projects.value,
       guid: null
     });
   }

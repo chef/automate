@@ -54,6 +54,8 @@ export class CreateObjectModalComponent implements OnInit, OnChanges {
 
   onProjectChecked(project: ProjectChecked): void {
     this.projects[project.id].checked = project.checked;
+    let projectsSelected = Object.values(this.projects).filter(p => p.checked);
+    this.createForm.controls.projects.setValue(projectsSelected.map(p => p.id));
   }
 
   dropdownDisabled(): boolean {
@@ -63,8 +65,8 @@ export class CreateObjectModalComponent implements OnInit, OnChanges {
   public handleNameInput(event: KeyboardEvent): void {
     if (!this.modifyID && !this.isNavigationKey(event)) {
       this.conflictError = false;
-      this.createForm.controls['id'].setValue(
-        IdMapper.transform(this.createForm.controls['name'].value.trim()));
+      this.createForm.controls.id.setValue(
+        IdMapper.transform(this.createForm.controls.name.value.trim()));
     }
   }
 
@@ -81,7 +83,7 @@ export class CreateObjectModalComponent implements OnInit, OnChanges {
   }
 
   createObject(): void {
-    this.createClicked.emit(Object.values(this.projects).filter(p => p.checked));
+    this.createClicked.emit();
   }
 
   private isNavigationKey(event: KeyboardEvent): boolean {
