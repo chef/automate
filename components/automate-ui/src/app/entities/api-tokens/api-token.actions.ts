@@ -72,9 +72,14 @@ export class UpdateTokenFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export interface CreateTokenPayload {
+  id: string;
+  name: string;
+  projects: string[];
+}
 export class CreateToken implements Action {
   readonly type = ApiTokenActionTypes.CREATE;
-  constructor(public payload: {id: string, name: string}) { }
+  constructor(public payload: CreateTokenPayload) { }
 }
 
 export class CreateTokenSuccess implements Action {

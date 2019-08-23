@@ -107,8 +107,8 @@ export class ApiTokenEffects {
     this.actions$.pipe(ofType<CreateToken>(ApiTokenActionTypes.CREATE)),
     this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
-      mergeMap(([{ payload: { id, name } }, version]: [CreateToken, IAMMajorVersion]) =>
-        this.requests.create(id, name, version).pipe(
+      mergeMap(([{ payload }, version]: [CreateToken, IAMMajorVersion]) =>
+        this.requests.create(payload, version).pipe(
           map(resp => new CreateTokenSuccess(versionizeToken(resp))),
           catchError((error: HttpErrorResponse) => of(new CreateTokenFailure(error))))));
 
