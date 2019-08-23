@@ -14,6 +14,7 @@ sed -i -r "s|image_sha256: .+|image_sha256: ${EXPEDITOR_SHA256_DIGEST#"sha256:"}
 sed -i -r "s|image_sha256: .+|image_sha256: ${EXPEDITOR_SHA256_DIGEST#"sha256:"}|" .expeditor/verify_private.pipeline.yml
 sed -i -r "s|image_sha256: .+|image_sha256: ${EXPEDITOR_SHA256_DIGEST#"sha256:"}|" .expeditor/nightly.pipeline.yml
 
+git add .expeditor/nightly.pipeline.yml
 git add .expeditor/verify.pipeline.yml
 git add .expeditor/verify_private.pipeline.yml
 
@@ -25,4 +26,5 @@ open_pull_request
 
 # Get back to master and cleanup the leftovers - any changed files left over at the end of this script will get committed to master.
 git checkout -
+git clean -fxd
 git branch -D "$branch"
