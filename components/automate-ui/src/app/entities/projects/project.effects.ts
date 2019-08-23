@@ -45,8 +45,8 @@ import {
 import { applyRulesStatus } from './project.selectors';
 import { ApplyRulesStatusState } from './project.reducer';
 
-const ACTIVE_RULE_STATUS_INTERVAL = 5; // seconds
-const DORMANT_RULE_STATUS_INTERVAL = 60; // seconds
+const ACTIVE_RULE_STATUS_INTERVAL = 5; // seconds between checks while update is in progress
+const DORMANT_RULE_STATUS_INTERVAL = 60; // seconds between checks while update is dormant
 
 @Injectable()
 export class ProjectEffects {
