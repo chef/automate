@@ -30,6 +30,7 @@ type composedService struct {
 	PreviousHealth      string    `db:"previous_health"`
 	UpdateStrategy      string    `db:"update_strategy"`
 	LastEventOccurredAt time.Time `db:"last_event_occurred_at"`
+	Disconnected        bool      `db:"disconnected"`
 	HealthUpdatedAt     time.Time `db:"health_updated_at"`
 }
 
@@ -100,6 +101,7 @@ SELECT s.id
   , s.last_event_occurred_at as last_event_occurred_at
   , s.previous_health as previous_health
   , s.health_updated_at as health_updated_at
+	, s.disconnected as disconnected
 FROM service_full AS s
 WHERE last_event_occurred_at < now() - ($1 || ' minutes')::interval
 `
@@ -108,6 +110,31 @@ WHERE last_event_occurred_at < now() - ($1 || ' minutes')::interval
 DELETE
 FROM service_full
 WHERE service_full.last_event_occurred_at < now() - ($1 || ' minutes')::interval
+`
+
+	markDisconnectedServices = `
+UPDATE service_full AS s
+SET disconnected = true
+WHERE last_event_occurred_at < now() - ($1 || ' minutes')::interval
+  AND disconnected = false
+RETURNING s.id
+  , s.origin AS origin
+  , s.name AS name
+  , s.version AS version
+  , s.release AS release
+  , s.health_check_message AS status
+  , s.health AS health
+  , s.service_group_name AS group
+  , s.application AS application
+  , s.environment AS environment
+  , s.supervisor_id AS sup_member_id
+  , s.fqdn AS fqdn
+  , s.channel as channel
+  , s.site as site
+  , s.last_event_occurred_at as last_event_occurred_at
+  , s.previous_health as previous_health
+  , s.health_updated_at as health_updated_at
+	, s.disconnected as disconnected
 `
 
 	selectServicesHealthCounts = `
@@ -245,6 +272,16 @@ func (db *Postgres) GetDisconnectedServices(thresholdMinutes int32) ([]*storage.
 
 	_, err := db.DbMap.Select(&services, selectDisconnectedServices, thresholdMinutes)
 	return convertComposedServicesToStorage(services), err
+}
+
+func (db *Postgres) MarkDisconnectedServices(thresholdMinutes int32) ([]*storage.Service, error) {
+	var services []*composedService
+
+	_, err := db.DbMap.Select(&services, markDisconnectedServices, thresholdMinutes)
+	if err != nil {
+		return nil, err
+	}
+	return convertComposedServicesToStorage(services), nil
 }
 
 // DeleteDisconnectedServices deletes any service records where the time

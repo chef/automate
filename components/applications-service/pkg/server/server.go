@@ -325,6 +325,15 @@ func (app *ApplicationsServer) DeleteDisconnectedServices(ctx context.Context,
 	}, nil
 }
 
+// TODO: make an API for this so users can run it ad-hoc if need be. Change the return type, etc.
+func (app *ApplicationsServer) MarkDisconnectedServices(thresholdMinutes int32) ([]*applications.Service, error) {
+	svcs, err := app.storageClient.MarkDisconnectedServices(thresholdMinutes)
+	if err != nil {
+		return nil, err
+	}
+	return convertStorageServicesToApplicationsServices(svcs), nil
+}
+
 // Convert storage.Service array to applications.Service array
 func convertStorageServicesToApplicationsServices(svcs []*storage.Service) []*applications.Service {
 	services := make([]*applications.Service, len(svcs))
@@ -344,6 +353,7 @@ func convertStorageServicesToApplicationsServices(svcs []*storage.Service) []*ap
 			PreviousHealthCheck: convertHealthStatusToProto(svc.PreviousHealth),
 			CurrentHealthSince:  timef.IntervalUntilNow(svc.HealthUpdatedAt),
 			HealthUpdatedAt:     convertOrCreateProtoTimestamp(svc.HealthUpdatedAt),
+			Disconnected:        svc.Disconnected,
 		}
 	}
 	return services

@@ -442,6 +442,10 @@ func init() {
         "health_updated_at": {
           "type": "string",
           "format": "date-time"
+        },
+        "disconnected": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
