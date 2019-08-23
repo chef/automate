@@ -144,7 +144,8 @@ describe('team details', () => {
 
       // TODO (tc): for some reason, there is an occational situation where
       // the name change gets typed then overwritten before the save is clicked.
-      // it('cannot access projects dropdown but changing name allows team update submission', () => {
+      // it('cannot access projects dropdown but changing name allows team update submission',
+      //   () => {
       //   cy.get('[data-cy=team-details-tab-details]').click();
 
       //   // initial state of page
