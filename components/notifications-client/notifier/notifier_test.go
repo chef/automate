@@ -1,20 +1,21 @@
 package notifier
 
 import (
+	"context"
 	"io/ioutil"
 	"path"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/chef/automate/api/external/ingest/request"
-	. "github.com/chef/automate/components/notifications-client/api"
-	"github.com/chef/automate/components/notifications-client/builder"
 	"github.com/golang/protobuf/jsonpb"
 	proto "github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
-	context "golang.org/x/net/context"
 	"google.golang.org/grpc"
+
+	"github.com/chef/automate/api/external/ingest/request"
+	. "github.com/chef/automate/components/notifications-client/api"
+	"github.com/chef/automate/components/notifications-client/builder"
 )
 
 const URL = "http://localhost"

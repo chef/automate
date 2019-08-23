@@ -2,15 +2,16 @@ package relaxting
 
 //GetTrendCompliancyNodes - Report #11
 import (
+	"context"
 	"fmt"
 	"sort"
 	"time"
 
-	"github.com/chef/automate/components/compliance-service/api/stats"
-	"github.com/chef/automate/components/compliance-service/reporting/util"
 	elastic "github.com/olivere/elastic"
 	"github.com/pkg/errors"
-	"golang.org/x/net/context"
+
+	"github.com/chef/automate/components/compliance-service/api/stats"
+	"github.com/chef/automate/components/compliance-service/reporting/util"
 )
 
 type TrendBucket struct {

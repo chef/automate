@@ -1,21 +1,18 @@
 package server
 
 import (
+	"context"
 	"fmt"
-
-	tspb "github.com/golang/protobuf/ptypes/timestamp"
-
-	"github.com/golang/protobuf/ptypes"
 
 	"github.com/blang/semver"
 	"github.com/gofrs/uuid"
+	"github.com/golang/protobuf/ptypes"
 	gp "github.com/golang/protobuf/ptypes/empty"
+	tspb "github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/sirupsen/logrus"
-	"golang.org/x/net/context"
+	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-
-	log "github.com/sirupsen/logrus"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"

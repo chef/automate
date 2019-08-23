@@ -1,18 +1,19 @@
 package relaxting
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
 	"github.com/golang/protobuf/ptypes"
 
-	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
-	"github.com/chef/automate/components/compliance-service/reporting"
-	"github.com/chef/automate/lib/errorutils"
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"golang.org/x/net/context"
+
+	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
+	"github.com/chef/automate/components/compliance-service/reporting"
+	"github.com/chef/automate/lib/errorutils"
 )
 
 type ProfileSource struct {

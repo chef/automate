@@ -1,20 +1,20 @@
 package relaxting
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"regexp"
 	"sort"
-
 	"strings"
 
-	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
-	"github.com/chef/automate/lib/errorutils"
 	elastic "github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/schollz/closestmatch"
 	"github.com/sirupsen/logrus"
-	"golang.org/x/net/context"
+
+	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
+	"github.com/chef/automate/lib/errorutils"
 )
 
 // GetSuggestions - Report #12

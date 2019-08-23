@@ -15,7 +15,6 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
-	"golang.org/x/net/context/ctxhttp"
 )
 
 const (
@@ -125,12 +124,12 @@ func (tl *TrialLicense) ID() (string, error) {
 // service for the provided customerName.
 func (f *fetcher) RequestLicense(ctx context.Context, customerName string) (*TrialLicense, error) {
 	licReq := newLicenseRequest(customerName, f.trialDays)
-	postReq, err := f.makeHTTPRequest(licReq)
+	postReq, err := f.makeHTTPRequest(ctx, licReq)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := ctxhttp.Do(ctx, http.DefaultClient, postReq)
+	resp, err := http.DefaultClient.Do(postReq)
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +154,7 @@ func (f *fetcher) RequestLicense(ctx context.Context, customerName string) (*Tri
 	}, nil
 }
 
-func (f *fetcher) makeHTTPRequest(licReq licenseRequest) (*http.Request, error) {
+func (f *fetcher) makeHTTPRequest(ctx context.Context, licReq licenseRequest) (*http.Request, error) {
 	genPath, err := f.licGenURL.Parse("/generate")
 	if err != nil {
 		return nil, errors.Wrap(err, "construct endpoint")
@@ -171,6 +170,7 @@ func (f *fetcher) makeHTTPRequest(licReq licenseRequest) (*http.Request, error) 
 	if err != nil {
 		return nil, err
 	}
+	postReq.WithContext(ctx)
 	postReq.Header.Set("content-type", "application/json")
 	postReq.Header.Set("auth-token", f.apiKey)
 	return postReq, nil

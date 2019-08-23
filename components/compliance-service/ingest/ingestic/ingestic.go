@@ -1,18 +1,18 @@
 package ingestic
 
 import (
+	"context"
+	"fmt"
 	"time"
 
-	"fmt"
+	elastic "github.com/olivere/elastic"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	project_update_lib "github.com/chef/automate/lib/authz"
-	elastic "github.com/olivere/elastic"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-	"golang.org/x/net/context"
 )
 
 type ESClient struct {

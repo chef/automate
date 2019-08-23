@@ -1,10 +1,10 @@
 package server
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/net/context"
 
 	"github.com/chef/automate/lib/grpc/auth_context"
 )

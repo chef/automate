@@ -1,13 +1,12 @@
 package integration_test
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"golang.org/x/net/context"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"

@@ -1,18 +1,18 @@
 package relaxting
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"sort"
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/golang/protobuf/ptypes"
-
-	"io"
-
-	"sort"
+	"github.com/olivere/elastic"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 
 	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
 	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
@@ -23,10 +23,6 @@ import (
 	"github.com/chef/automate/components/compliance-service/utils"
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"
-
-	"github.com/olivere/elastic"
-	"github.com/sirupsen/logrus"
-	"golang.org/x/net/context"
 )
 
 const MaxScrollRecordSize = 10000

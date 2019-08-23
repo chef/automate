@@ -1,12 +1,12 @@
 package tracing
 
 import (
+	"context"
 	"io"
 
 	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
 	opentracing "github.com/opentracing/opentracing-go"
 	jaegercfg "github.com/uber/jaeger-client-go/config"
-	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
 

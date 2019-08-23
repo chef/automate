@@ -1,13 +1,13 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	rrule "github.com/teambition/rrule-go"
-	"golang.org/x/net/context"
 
 	"github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/components/ingest-service/backend"
