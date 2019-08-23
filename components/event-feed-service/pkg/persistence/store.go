@@ -1,10 +1,12 @@
 package persistence
 
 import (
+	"context"
+
+	olivere "github.com/olivere/elastic"
+
 	"github.com/chef/automate/components/event-feed-service/pkg/util"
 	project_update_lib "github.com/chef/automate/lib/authz"
-	olivere "github.com/olivere/elastic"
-	"golang.org/x/net/context"
 )
 
 type FeedStore interface {

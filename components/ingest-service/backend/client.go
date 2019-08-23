@@ -1,10 +1,12 @@
 package backend
 
 import (
+	"context"
+
+	"github.com/olivere/elastic"
+
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	project_update_lib "github.com/chef/automate/lib/authz"
-	"github.com/olivere/elastic"
-	"golang.org/x/net/context"
 )
 
 type Client interface {

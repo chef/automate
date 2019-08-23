@@ -1696,7 +1696,6 @@ paths = [
   "vendor/go.uber.org/zap/buffer/*",
   "vendor/go.uber.org/zap/internal/*",
   "vendor/go.uber.org/zap/zapcore/*",
-  "vendor/golang.org/x/net/*",
   "vendor/golang.org/x/sys/*",
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/grpc/*",

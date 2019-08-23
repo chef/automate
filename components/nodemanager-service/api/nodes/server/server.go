@@ -1,11 +1,14 @@
 package nodes
 
 import (
+	"context"
+	"fmt"
 	"strings"
 
-	"golang.org/x/net/context"
-
-	"fmt"
+	pb "github.com/golang/protobuf/ptypes/empty"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
 
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/compliance-service/secretsint"
@@ -13,11 +16,6 @@ import (
 	"github.com/chef/automate/components/nodemanager-service/mgrtypes"
 	"github.com/chef/automate/components/nodemanager-service/pgdb"
 	"github.com/chef/automate/lib/errorutils"
-	pb "github.com/golang/protobuf/ptypes/empty"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-	"google.golang.org/grpc"
-
 	"github.com/chef/automate/lib/grpc/secureconn"
 )
 

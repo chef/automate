@@ -1,12 +1,13 @@
 package server
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/golang/protobuf/ptypes"
+	tspb "github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
-	"golang.org/x/net/context"
 
 	chef "github.com/chef/automate/api/external/ingest/request"
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
@@ -17,7 +18,6 @@ import (
 	"github.com/chef/automate/components/ingest-service/config"
 	project_update_lib "github.com/chef/automate/lib/authz"
 	event_ids "github.com/chef/automate/lib/event"
-	tspb "github.com/golang/protobuf/ptypes/timestamp"
 )
 
 type AutomateEventHandlerServer struct {
@@ -98,8 +98,8 @@ func (s *AutomateEventHandlerServer) ProjectUpdateStatus(ctx context.Context,
 		time = &tspb.Timestamp{}
 	}
 	return &ingest_api.ProjectUpdateStatusResp{
-		State:                  s.updateManager.State(),
-		PercentageComplete:     float32(s.updateManager.PercentageComplete()),
+		State:                 s.updateManager.State(),
+		PercentageComplete:    float32(s.updateManager.PercentageComplete()),
 		EstimatedTimeComplete: time,
 	}, nil
 }
