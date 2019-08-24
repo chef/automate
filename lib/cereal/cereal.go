@@ -350,6 +350,27 @@ type Decision struct {
 	tasks      []enqueueTaskRequest
 }
 
+func NewCompleteDecision(result interface{}) Decision {
+	return Decision{
+		complete: true,
+		result:   result,
+	}
+}
+
+func NewContinueDecision(payload interface{}) Decision {
+	return Decision{
+		continuing: true,
+		payload:    payload,
+	}
+}
+
+func NewFailDecision(err error) Decision {
+	return Decision{
+		failed: true,
+		err:    err,
+	}
+}
+
 func (d *Decision) IsComplete() bool {
 	return d.complete
 }

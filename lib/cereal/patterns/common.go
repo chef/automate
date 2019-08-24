@@ -135,7 +135,6 @@ func (instance *immutableWorkflowInstance) Err() error {
 }
 
 func isEmbeddable(t reflect.Type) bool {
-	fmt.Println(t.String())
 	switch t.Kind() {
 	case reflect.Struct:
 		return true
@@ -220,39 +219,48 @@ func nextState(instance *workflowInstance, decision cereal.Decision) WorkflowSta
 			EnqueuedTasks:  instance.TotalEnqueuedTasks(),
 			CompletedTasks: instance.TotalCompletedTasks(),
 		}
-	} else if decision.IsFailed() {
-		var err string
-		if decision.Err() == nil {
-			err = "failed"
-		} else {
-			err = decision.Err().Error()
+	} else {
+		if len(instance.enqueuedTasks) > 0 {
+			instance.enqueuedTasks = nil
 		}
-		return WorkflowState{
-			IsFinished: true,
-			Err:        err,
-		}
-	} else if decision.IsComplete() {
-		var result json.RawMessage
-		var err error
-		result, err = json.Marshal(decision.Result())
-		if err != nil {
+		if decision.IsFailed() {
+			var err string
+			if decision.Err() == nil {
+				err = "failed"
+			} else {
+				err = decision.Err().Error()
+			}
 			return WorkflowState{
 				IsFinished:     true,
-				Err:            err.Error(),
+				Err:            err,
+				EnqueuedTasks:  instance.TotalEnqueuedTasks(),
+				CompletedTasks: instance.TotalCompletedTasks(),
+			}
+		} else if decision.IsComplete() {
+			var result json.RawMessage
+			var err error
+			result, err = json.Marshal(decision.Result())
+			if err != nil {
+				return WorkflowState{
+					IsFinished:     true,
+					Err:            err.Error(),
+					EnqueuedTasks:  instance.TotalEnqueuedTasks(),
+					CompletedTasks: instance.TotalCompletedTasks(),
+				}
+			}
+			return WorkflowState{
+				IsFinished:     true,
+				Result:         result,
 				EnqueuedTasks:  instance.TotalEnqueuedTasks(),
 				CompletedTasks: instance.TotalCompletedTasks(),
 			}
 		}
-		return WorkflowState{
-			IsFinished:     true,
-			Result:         result,
-			EnqueuedTasks:  instance.TotalEnqueuedTasks(),
-			CompletedTasks: instance.TotalCompletedTasks(),
-		}
 	}
 	return WorkflowState{
-		IsFinished: true,
-		Err:        "Unknown workflow state",
+		IsFinished:     true,
+		Err:            "Unknown workflow state",
+		EnqueuedTasks:  instance.TotalEnqueuedTasks(),
+		CompletedTasks: instance.TotalCompletedTasks(),
 	}
 }
 

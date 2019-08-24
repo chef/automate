@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/sirupsen/logrus"
-
 	"github.com/chef/automate/lib/cereal"
 )
+
+var ErrIncorrectParameters = errors.New("Incorrect number of parameters given")
+var ErrTaskWorkflowInvalid = errors.New("Could not determine workflow for task")
 
 type ChainWorkflowParams struct {
 	WorkflowParams []json.RawMessage
@@ -16,6 +17,10 @@ type ChainWorkflowParams struct {
 
 type ChainWorkflowPayload struct {
 	State []WorkflowState
+}
+
+func (p *ChainWorkflowPayload) IsValid() bool {
+	return len(p.State) > 0
 }
 
 func (p *ChainWorkflowPayload) Finished() bool {
@@ -42,15 +47,26 @@ func NewChainWorkflowExecutor(executors ...cereal.WorkflowExecutor) (*ChainWorkf
 	return &ChainWorkflowExecutor{executors: executors}, nil
 }
 
-func EnqueueChainWorkflow(ctx context.Context, m *cereal.Manager, workflowName string, instanceName string, parameters []interface{}) error {
+func ToChainWorkflowParameters(parameters []interface{}) (ChainWorkflowParams, error) {
 	params := ChainWorkflowParams{}
+	if len(parameters) == 0 {
+		return params, errors.New("chain workflow parameters empty")
+	}
 	params.WorkflowParams = make([]json.RawMessage, len(parameters))
 	for idx, subWorkflowParams := range parameters {
 		jsonVal, err := json.Marshal(subWorkflowParams)
 		if err != nil {
-			return err
+			return params, err
 		}
 		params.WorkflowParams[idx] = jsonVal
+	}
+	return params, nil
+}
+
+func EnqueueChainWorkflow(ctx context.Context, m *cereal.Manager, workflowName string, instanceName string, parameters []interface{}) error {
+	params, err := ToChainWorkflowParameters(parameters)
+	if err != nil {
+		return err
 	}
 	return m.EnqueueWorkflow(ctx, workflowName, instanceName, &params)
 }
@@ -160,15 +176,19 @@ func (m *ChainWorkflowExecutor) OnStart(w cereal.WorkflowInstance, ev cereal.Sta
 
 	decision := m.executors[0].OnStart(wrappedInstance, ev)
 	ns := nextState(wrappedInstance, decision)
-	payload := &ChainWorkflowPayload{
+	payload := ChainWorkflowPayload{
 		State: []WorkflowState{ns},
 	}
 
-	// TODO (jaym): if the first workflow completes successfully without enqueuing
-	// this logic is wrong and won't run the next thing
-	if payload.Finished() {
+	if decision.IsFailed() {
+		if !ns.IsFinished {
+			return bug(w, "expected next state to be finished")
+		}
 		return w.Complete(cereal.WithResult(payload))
+	} else if decision.IsComplete() {
+		return m.startNext(w, 0, parameters, payload)
 	}
+
 	return w.Continue(payload)
 }
 
@@ -179,7 +199,7 @@ func (m *ChainWorkflowExecutor) getParameters(w cereal.WorkflowInstance) (ChainW
 	}
 
 	if len(m.executors) != len(parameters.WorkflowParams) {
-		return parameters, errors.New("Incorrect length")
+		return parameters, ErrIncorrectParameters
 	}
 	return parameters, nil
 }
@@ -201,6 +221,11 @@ func (m *ChainWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev cer
 	}
 
 	idx := taskParameters.XXX_ChainWorkflowIdx
+
+	if !payload.IsValid() || int(idx) >= len(payload.State) || int(idx) >= len(m.executors) {
+		return w.Fail(ErrTaskWorkflowInvalid)
+	}
+
 	workflowState := payload.State[idx]
 	workflowState.CompletedTasks++
 	payload.State[idx] = workflowState
@@ -208,7 +233,6 @@ func (m *ChainWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev cer
 		return w.Continue(payload)
 	}
 
-	logrus.Infof("Delivering to %d", idx)
 	wrappedInstance := &workflowInstance{
 		attachment: ChainWorkflowTaskParam{
 			XXX_ChainWorkflowIdx: idx,
@@ -228,30 +252,38 @@ func (m *ChainWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev cer
 		}
 		return w.Complete(cereal.WithResult(payload))
 	} else if decision.IsComplete() {
-		nextIdx := idx + 1
-		if nextIdx < int64(len(m.executors)) {
-			wrappedInstance := &workflowInstance{
-				attachment: ChainWorkflowTaskParam{
-					XXX_ChainWorkflowIdx: nextIdx,
-				},
-				w:          w,
-				parameters: parameters.WorkflowParams[nextIdx],
-			}
-
-			decision := m.executors[nextIdx].OnStart(wrappedInstance, cereal.StartEvent{})
-			ns := nextState(wrappedInstance, decision)
-			if int64(len(payload.State)) != nextIdx {
-				return bug(w, "incorrect length of state")
-			}
-			payload.State = append(payload.State, ns)
-			// TODO: this is wrong if OnStart completes
-			return w.Continue(payload)
-		} else {
-			return w.Complete(cereal.WithResult(payload))
-		}
+		return m.startNext(w, idx, parameters, payload)
 	}
 
 	return w.Continue(payload)
+}
+
+func (m *ChainWorkflowExecutor) startNext(w cereal.WorkflowInstance, idx int64, parameters ChainWorkflowParams, payload ChainWorkflowPayload) cereal.Decision {
+	nextIdx := idx + 1
+	if nextIdx < int64(len(m.executors)) {
+		wrappedInstance := &workflowInstance{
+			attachment: ChainWorkflowTaskParam{
+				XXX_ChainWorkflowIdx: nextIdx,
+			},
+			w:          w,
+			parameters: parameters.WorkflowParams[nextIdx],
+		}
+
+		decision := m.executors[nextIdx].OnStart(wrappedInstance, cereal.StartEvent{})
+		ns := nextState(wrappedInstance, decision)
+		if int64(len(payload.State)) != nextIdx {
+			return bug(w, "incorrect length of state")
+		}
+		payload.State = append(payload.State, ns)
+		if decision.IsFailed() {
+			return w.Complete(cereal.WithResult(payload))
+		} else if decision.IsComplete() {
+			return m.startNext(w, nextIdx, parameters, payload)
+		}
+		return w.Continue(payload)
+	} else {
+		return w.Complete(cereal.WithResult(payload))
+	}
 }
 
 func (m *ChainWorkflowExecutor) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEvent) cereal.Decision {
@@ -265,21 +297,21 @@ func (m *ChainWorkflowExecutor) OnCancel(w cereal.WorkflowInstance, ev cereal.Ca
 		return w.Fail(err)
 	}
 
-	if len(payload.State) == 0 {
-		return w.Complete(cereal.WithResult(payload))
-	}
-
 	idx := len(payload.State) - 1
 
-	if idx >= len(m.executors) {
-		return bug(w, "idx past number executors")
+	if !payload.IsValid() || idx >= len(payload.State) || idx >= len(m.executors) {
+		return w.Fail(ErrTaskWorkflowInvalid)
 	}
+
+	workflowState := payload.State[idx]
+
 	wrappedInstance := &workflowInstance{
 		attachment: ChainWorkflowTaskParam{
 			XXX_ChainWorkflowIdx: int64(idx),
 		},
 		w:          w,
 		parameters: parameters.WorkflowParams[idx],
+		lastState:  &workflowState,
 	}
 	decision := m.executors[idx].OnCancel(wrappedInstance, ev)
 	ns := nextState(wrappedInstance, decision)
