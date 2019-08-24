@@ -13,7 +13,7 @@ toc = true
 
 ## About Notifications
 
-Chef Automate notifications uses webhooks to send alerts on Chef client run and InSpec compliance scan failures. You can send notifications to Slack channels, Slack users, or any other service that supports webhook integrations.
+Chef Automate notifications uses webhooks to send alerts on Chef client run and InSpec compliance scan failures. You can send notifications to Slack channels, Slack users, or any other service that supports webhook integrations. Notifications are sent for all failures. To ignore a failure, set `ignore_failure` to true on the resource. 
 
 By default only Admins of Chef Automate may create and manage notifications.
 
