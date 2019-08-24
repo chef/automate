@@ -103,9 +103,9 @@ func (db *DB) AddManagerNodeToDB(managerId string, managerAcctId string, credent
 	var name string
 	uuid := uuid.Must(uuid.NewV4()).String()
 	if len(acctAlias) > 0 {
-		name = acctAlias
+		name = fmt.Sprintf("aws-account-%s", acctAlias)
 	} else {
-		name = managerAcctId
+		name = fmt.Sprintf("aws-account-%s", managerAcctId)
 	}
 	tc := nodes.TargetConfig{
 		Backend: "aws",
