@@ -30,17 +30,17 @@ import {
   RemoveTeamUsers,
   UpdateTeam
 } from 'app/entities/teams/team.actions';
-import { GetProject } from 'app/entities/projects/project.actions';
+import { GetProjects } from 'app/entities/projects/project.actions';
 import {
-  getStatus as getProjectStatus,
-  projectEntities
+  projectEntities,
+  getAllStatus as getAllProjectStatus
 } from 'app/entities/projects/project.selectors';
 import {
   ProjectChecked,
   ProjectCheckedMap
 } from 'app/components/projects-dropdown/projects-dropdown.component';
 
-import { ProjectConstants, Project } from 'app/entities/projects/project.model';
+import { ProjectConstants } from 'app/entities/projects/project.model';
 import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
 import { IAMType } from 'app/entities/policies/policy.model';
@@ -148,19 +148,15 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
     this.store.select(assignableProjects)
       .subscribe((assignable: ProjectsFilterOption[]) => {
-        assignable.forEach(({ value: id, label: name, type: stringType }) => {
-          const type = <IAMType>stringType;
-          // TODO (tc) Don't actually have the status queried in here but
-          // also don't need it for this page. Maybe the status field
-          // should be optional in the project model?
-          const proj: Project = { id, name, type, status: 'NO_RULES' };
-          // we don't want to override projects that we fetched
-          // that were part of the team already
-          if (!this.projects[proj.id]) {
-            const checked = false;
-            this.projects[proj.id] = { ...proj, checked };
-          }
-        });
+        // compiles a list of all available projects
+        assignable
+          // don't override projects that were already part of the team
+          .filter(p => !this.projects[p.value])
+          .forEach(({ value: id, label: name, type: stringType }) => {
+            const type = <IAMType>stringType;
+            // type and status are unused
+            this.projects[id] = { id, name, type, status: 'NO_RULES', checked: false };
+          });
       });
 
     this.store.select(iamMajorVersion)
@@ -237,24 +233,14 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     // we keep a list of all projects that were left in the team
     // to know if we are fully loaded yet or not.
     combineLatest([
-      this.store.select(getProjectStatus),
+      this.store.select(getAllProjectStatus),
       this.store.select(projectEntities)])
-      .pipe(filter(([status, _]: [EntityStatus, ProjectCheckedMap]) =>
-          status === EntityStatus.loadingSuccess),
+      .pipe(filter(([status, projectMap]: [EntityStatus, ProjectCheckedMap]) =>
+        status === EntityStatus.loadingSuccess && Object.keys(projectMap).length > 0),
         map(([_, projectMap]) => {
-          const projectsFound: { [id: string]: boolean } = {};
-          this.teamProjectsLeftToFetch.forEach(pID => {
-            const project = projectMap[pID];
-            if (project !== undefined) {
-              const checked = true;
-              this.projects[project.id] = { ...project, checked };
-              projectsFound[pID] = true;
-            }
+          this.team.projects.forEach(pID => {
+            this.projects[pID] = { ...projectMap[pID], checked: true };
           });
-
-          // Remove all team projects that have been fetched.
-          this.teamProjectsLeftToFetch =
-            this.teamProjectsLeftToFetch.filter(pID => !projectsFound[pID]);
       })).subscribe();
  }
 
@@ -265,13 +251,10 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
   private getTeamDependentData(team: Team): void {
     this.team = team;
-    this.team.projects.forEach(pID => {
-      this.teamProjectsLeftToFetch.push(pID);
-      this.store.dispatch(new GetProject({ id: pID }));
-    });
     this.updateNameForm.controls.name.setValue(this.team.name);
     this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
     this.store.dispatch(new GetUsers());
+    this.store.dispatch(new GetProjects());
   }
 
   toggleUserMembershipView(): void {
