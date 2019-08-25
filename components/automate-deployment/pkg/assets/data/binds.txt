@@ -2,7 +2,7 @@ applications-service REQUIRED automate-pg-gateway event-service pg-sidecar-servi
 applications-service BINDING_MODE strict
 authn-service REQUIRED authz-service automate-dex automate-pg-gateway pg-sidecar-service teams-service
 authn-service BINDING_MODE strict
-authz-service REQUIRED automate-pg-gateway event-service pg-sidecar-service
+authz-service REQUIRED automate-pg-gateway cereal-service pg-sidecar-service
 authz-service BINDING_MODE strict
 automate-cs-bookshelf REQUIRED automate-pg-gateway pg-sidecar-service
 automate-cs-bookshelf BINDING_MODE strict
@@ -38,7 +38,7 @@ automate-workflow-server BINDING_MODE strict
 backup-gateway BINDING_MODE strict
 cereal-service REQUIRED automate-pg-gateway pg-sidecar-service
 cereal-service BINDING_MODE strict
-compliance-service REQUIRED authz-service automate-es-gateway automate-pg-gateway event-service nodemanager-service pg-sidecar-service secrets-service
+compliance-service REQUIRED authz-service automate-es-gateway automate-pg-gateway cereal-service event-service nodemanager-service pg-sidecar-service secrets-service
 compliance-service OPTIONAL authn-service es-sidecar-service notifications-service
 compliance-service BINDING_MODE strict
 config-mgmt-service REQUIRED automate-es-gateway
@@ -55,7 +55,7 @@ event-feed-service BINDING_MODE strict
 event-gateway REQUIRED authn-service authz-service event-service
 event-gateway BINDING_MODE strict
 event-service BINDING_MODE strict
-ingest-service REQUIRED authz-service automate-es-gateway automate-pg-gateway event-service nodemanager-service pg-sidecar-service
+ingest-service REQUIRED authz-service automate-es-gateway automate-pg-gateway cereal-service event-service nodemanager-service pg-sidecar-service
 ingest-service OPTIONAL es-sidecar-service
 ingest-service BINDING_MODE strict
 license-control-service REQUIRED automate-pg-gateway pg-sidecar-service

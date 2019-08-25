@@ -55,7 +55,9 @@ import (
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	notifications "github.com/chef/automate/components/notifications-client/api"
 	"github.com/chef/automate/components/notifications-client/notifier"
+	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/cereal"
+	grpccereal "github.com/chef/automate/lib/cereal/grpc"
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tracing"
@@ -149,10 +151,6 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	if err != nil {
 		logrus.Fatalf("could not connect to elasticsearch: %v", err)
 	}
-	configManager, err := config.NewConfigManager(conf.Service.ConfigFilePath)
-	if err != nil {
-		logrus.Fatalf("could not create config manager: %v", err)
-	}
 
 	eventClient := getEventConnection(connFactory, conf.EventConfig.Endpoint)
 	notifier := getNotificationsConnection(connFactory, conf.Notifications.Target)
@@ -163,10 +161,22 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 
 	s := connFactory.NewServer(tracing.GlobalServerInterceptor())
 
+	cerealProjectUpdateManager, err := createProjectUpdateCerealManager(connFactory, conf.CerealConfig.Endpoint)
+	if err != nil {
+		logrus.WithError(err).Fatal("could not create cereal manager")
+	}
+	err = project_update_lib.RegisterTaskExecutors(cerealProjectUpdateManager, "compliance", ingesticESClient, authzProjectsClient)
+	if err != nil {
+		logrus.WithError(err).Fatal("could not register project update task executors")
+	}
+	if err := cerealProjectUpdateManager.Start(ctx); err != nil {
+		logrus.WithError(err).Fatal("could not start cereal manager")
+	}
+
 	// needs to be the first one, since it creates the es indices
 	ingest.RegisterComplianceIngesterServer(s,
 		ingestserver.NewComplianceIngestServer(ingesticESClient, nodeManagerServiceClient,
-			conf.InspecAgent.AutomateFQDN, notifier, authzProjectsClient, eventClient, configManager))
+			conf.InspecAgent.AutomateFQDN, notifier, authzProjectsClient))
 
 	jobs.RegisterJobsServiceServer(s, jobsserver.New(db, connFactory, eventClient,
 		conf.Manager.Endpoint, cerealManager))
@@ -216,6 +226,22 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 
 	// if we reach this, we've had an issue in Serve()
 	logrus.Fatalf("serveGrpc aborting, we have a problem: %s", err.Error())
+}
+
+func createProjectUpdateCerealManager(connFactory *secureconn.Factory, address string) (*cereal.Manager, error) {
+	conn, err := connFactory.Dial("cereal-service", address)
+	if err != nil {
+		return nil, errors.Wrap(err, "error dialing cereal service")
+	}
+
+	grpcBackend := grpccereal.NewGrpcBackendFromConn("project-update", conn)
+	manager, err := cereal.NewManager(grpcBackend)
+	if err != nil {
+		grpcBackend.Close() // nolint: errcheck
+		return nil, err
+	}
+
+	return manager, nil
 }
 
 func getEventConnection(connectionFactory *secureconn.Factory,

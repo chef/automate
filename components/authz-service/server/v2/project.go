@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/stringutils"
@@ -18,7 +19,6 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
-	"github.com/chef/automate/components/authz-service/config"
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
@@ -27,7 +27,6 @@ import (
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/memstore"
 	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
-	event "github.com/chef/automate/components/event-service/server"
 )
 
 // ProjectState holds the server state for projects
@@ -45,13 +44,16 @@ func NewMemstoreProjectsServer(
 	ctx context.Context,
 	l logger.Logger,
 	e engine.ProjectRulesRetriever,
-	eventServiceClient automate_event.EventServiceClient,
-	configManager *config.Manager,
+	projectUpdateCerealManager *cereal.Manager,
 	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
 
-	projectUpdateManager := NewProjectUpdateManager(eventServiceClient, configManager)
-	return NewProjectsServer(ctx, l, memstore.New(), e, projectUpdateManager, pr)
+	s := memstore.New()
+	projectUpdateManager, err := RegisterCerealProjectUpdateManager(projectUpdateCerealManager, l, s, pr)
+	if err != nil {
+		return nil, err
+	}
+	return NewProjectsServer(ctx, l, s, e, projectUpdateManager, pr)
 }
 
 // NewPostgresProjectsServer instantiates a ProjectsServer using a PG store
@@ -61,8 +63,7 @@ func NewPostgresProjectsServer(
 	migrationsConfig migration.Config,
 	dataMigrationsConfig datamigration.Config,
 	e engine.ProjectRulesRetriever,
-	eventServiceClient automate_event.EventServiceClient,
-	configManager *config.Manager,
+	projectUpdateCerealManager *cereal.Manager,
 	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
 
@@ -70,7 +71,10 @@ func NewPostgresProjectsServer(
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to initialize v2 store state")
 	}
-	projectUpdateManager := NewProjectUpdateManager(eventServiceClient, configManager)
+	projectUpdateManager, err := RegisterCerealProjectUpdateManager(projectUpdateCerealManager, l, s, pr)
+	if err != nil {
+		return nil, err
+	}
 	return NewProjectsServer(ctx, l, s, e, projectUpdateManager, pr)
 }
 
@@ -179,36 +183,8 @@ func (s *ProjectState) ApplyRulesStart(
 	s.applyRuleMux.Lock()
 	defer s.applyRuleMux.Unlock()
 
-	switch s.ProjectUpdateManager.State() {
-	case config.NotRunningState:
-		break
-	case config.RunningState:
-		return nil, status.Error(codes.FailedPrecondition,
-			"cannot apply rules: apply already in progress")
-	default:
-		return nil, status.Error(codes.Internal,
-			"failed to parse state of rule apply")
-	}
-
 	s.log.Info("apply project rules: START")
-	err := s.store.ApplyStagedRules(ctx)
-	if err != nil {
-		s.log.Warnf("error applying staged projects: %s", err.Error())
-		return nil, status.Errorf(codes.Internal,
-			"error applying staged projects: %s", err.Error())
-	}
-
-	// TODO (tc): If we panic between here and manager Start, we will be in a state where the rules
-	// have been updated in the database but Refresh has not been kicked off.
-	// We will be refactoring with workflow to make this safer soon.
-	err = s.policyRefresher.Refresh(ctx)
-	if err != nil {
-		s.log.Warnf("error refreshing policy cache. the rules were updated but the apply was not started, please try again.")
-		return nil, status.Errorf(codes.Internal,
-			"error refreshing policy cache: %s", err.Error())
-	}
-
-	err = s.ProjectUpdateManager.Start()
+	err := s.ProjectUpdateManager.Start()
 	if err != nil {
 		s.log.Warnf("error starting project update. the rules and cache were updated but the apply was not started, please try again.")
 		return nil, status.Errorf(codes.Internal,
@@ -351,17 +327,6 @@ func (s *ProjectState) HandleEvent(ctx context.Context,
 	s.log.Debugf("authz is handling your event %s", req.EventID)
 
 	response := &automate_event.EventResponse{}
-	if req.Type.Name == event.ProjectRulesUpdateStatus {
-		err := s.ProjectUpdateManager.ProcessStatusEvent(req)
-		if err != nil {
-			return response, err
-		}
-	} else if req.Type.Name == event.ProjectRulesUpdateFailed {
-		err := s.ProjectUpdateManager.ProcessFailEvent(req)
-		if err != nil {
-			return response, err
-		}
-	}
 
 	return response, nil
 }

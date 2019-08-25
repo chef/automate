@@ -18,13 +18,15 @@ import (
 	"github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic"
-	"github.com/chef/automate/components/ingest-service/config"
 	"github.com/chef/automate/components/ingest-service/migration"
 	"github.com/chef/automate/components/ingest-service/server"
 	"github.com/chef/automate/components/ingest-service/serveropts"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
+	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/cereal"
+	grpccereal "github.com/chef/automate/lib/cereal/grpc"
 	"github.com/chef/automate/lib/cereal/postgres"
+	"github.com/chef/automate/lib/grpc/secureconn"
 	platform_config "github.com/chef/automate/lib/platform/config"
 )
 
@@ -165,17 +167,24 @@ func Spawn(opts *serveropts.Opts) error {
 	jobSchedulerServer := server.NewJobSchedulerServer(client, jobManager)
 	ingest.RegisterJobSchedulerServer(grpcServer, jobSchedulerServer)
 
-	// TODO(ssd) 2019-05-15: The projectUpdater process still uses
-	// the config manager.
-	configManager, err := config.NewManager(viper.ConfigFileUsed())
+	projectUpdateManager, err := createProjectUpdateCerealManager(opts.ConnFactory, opts.CerealAddress)
 	if err != nil {
 		return err
 	}
-	defer configManager.Close()
+
+	err = project_update_lib.RegisterTaskExecutors(projectUpdateManager, "ingest", client, authzProjectsClient)
+	if err != nil {
+		return err
+	}
+
+	if err := projectUpdateManager.Start(context.Background()); err != nil {
+		return err
+	}
+	defer projectUpdateManager.Stop() // nolint: errcheck
 
 	// EventHandler
 	eventHandlerServer := server.NewAutomateEventHandlerServer(client, *chefIngest,
-		authzProjectsClient, eventServiceClient, configManager)
+		authzProjectsClient, eventServiceClient)
 	ingest.RegisterEventHandlerServer(grpcServer, eventHandlerServer)
 
 	// Data Lifecycle Interface
@@ -219,4 +228,20 @@ func pgURL(pgURL string, pgDBName string) (string, error) {
 		}
 	}
 	return pgURL, nil
+}
+
+func createProjectUpdateCerealManager(connFactory *secureconn.Factory, address string) (*cereal.Manager, error) {
+	conn, err := connFactory.Dial("cereal-service", address)
+	if err != nil {
+		return nil, errors.Wrap(err, "error dialing cereal service")
+	}
+
+	grpcBackend := grpccereal.NewGrpcBackendFromConn("project-update", conn)
+	manager, err := cereal.NewManager(grpcBackend)
+	if err != nil {
+		grpcBackend.Close() // nolint: errcheck
+		return nil, err
+	}
+
+	return manager, nil
 }
