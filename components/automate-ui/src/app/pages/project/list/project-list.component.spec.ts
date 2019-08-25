@@ -9,18 +9,41 @@ import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { customMatchers } from 'app/testing/custom-matchers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { ProjectService } from 'app/entities/projects/project.service';
 import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
-import { GetProjectsSuccess } from 'app/entities/projects/project.actions';
-import { projectEntityReducer } from 'app/entities/projects/project.reducer';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
+import { ProjectService } from 'app/entities/projects/project.service';
+import {
+  GetProjectsSuccess, GetApplyRulesStatusSuccess, GetApplyRulesStatusSuccessPayload
+} from 'app/entities/projects/project.actions';
+import { projectEntityReducer, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
+import { Project } from 'app/entities/projects/project.model';
 import { ProjectListComponent } from './project-list.component';
+import { ProjectStatus } from 'app/entities/rules/rule.model';
 
 describe('ProjectListComponent', () => {
   let component: ProjectListComponent;
   let fixture: ComponentFixture<ProjectListComponent>;
   let element: HTMLElement;
   let projectService: ProjectService;
+  let store: Store<NgrxStateAtom>;
+
+  const projectList: Project[] = [
+      {
+        id: 'uuid-1', name: 'Default',
+        type: 'CHEF_MANAGED',
+        status: 'NO_RULES'
+      },
+      {
+        id: 'uuid-2', name: 'another-project',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
+      },
+      {
+        id: 'uuid-5', name: 'zzz-project',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
+      }
+    ];
 
   beforeEach(async(() => {
 
@@ -87,101 +110,57 @@ describe('ProjectListComponent', () => {
     }).compileComponents();
   }));
 
-  let store: Store<NgrxStateAtom>;
   beforeEach(() => {
-    store = TestBed.get(Store);
-
-    store.dispatch(new GetProjectsSuccess({
-      projects: [
-        {
-          id: 'uuid-1', name: 'Default',
-          type: 'CHEF_MANAGED',
-          status: 'NO_RULES'
-        },
-        {
-          id: 'uuid-2', name: 'another-project',
-          type: 'CUSTOM',
-          status: 'NO_RULES'
-        },
-        {
-          id: 'uuid-5', name: 'zzz-project',
-          type: 'CUSTOM',
-          status: 'NO_RULES'
-        }
-      ]
-    }));
-
-    projectService = TestBed.get(ProjectService);
-
     jasmine.addMatchers(customMatchers);
+    projectService = TestBed.get(ProjectService);
     fixture = TestBed.createComponent(ProjectListComponent);
     component = fixture.componentInstance;
     element = fixture.debugElement.nativeElement;
+    store = TestBed.get(Store);
+
+    component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v2');
+    component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v1');
     fixture.detectChanges();
   });
 
   describe('when there are no projects', () => {
+    it('displays no projects', () => {
+      component.sortedProjects$.subscribe(results => {
+        expect(results.length).toBe(0);
+      });
+    });
   });
 
   describe('when there are projects', () => {
-    beforeEach(() => {
-      store.dispatch(new GetProjectsSuccess({
-        projects: [
-          {
-            id: 'uuid-1', name: 'Default',
-            type: 'CHEF_MANAGED',
-            status: 'NO_RULES'
-          },
-          {
-            id: 'uuid-2', name: 'another-project',
-            type: 'CUSTOM',
-            status: 'NO_RULES'
-          },
-          {
-            id: 'uuid-5', name: 'zzz-project',
-            type: 'CUSTOM',
-            status: 'NO_RULES'
-          }
-        ]
-      }));
-    });
 
-    it('displays project data for v2', () => {
-      component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v2');
-      component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v1');
+    it('displays project data for v2.1', () => {
+      store.dispatch(new GetProjectsSuccess({ projects: projectList }));
       fixture.detectChanges();
       expect(element).toContainPath('chef-table');
+      component.sortedProjects$.subscribe(results => {
+        expect(results.length).toBe(projectList.length);
+        projectList.forEach(p => {
+          expect(results.some(result => result.id === p.id)).toBe(true);
+        });
+      });
+    });
+
+    it('does not display project data for v2.0', () => {
+      component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v2');
+      component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v0');
+      store.dispatch(new GetProjectsSuccess({ projects: projectList }));
+      expect(element).not.toContainPath('chef-table');
     });
 
     it('does not display project data for v1', () => {
       component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v1');
       component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v0');
+      store.dispatch(new GetProjectsSuccess({ projects: projectList }));
       fixture.detectChanges();
       expect(element).not.toContainPath('chef-table');
     });
 
-    describe('create modal', () => {
-      it('create modal opens upon clicking create button', () => {
-        component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v2');
-        component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v1');
-        fixture.detectChanges();
-        expect(component.createModalVisible).toBe(false);
-        (<HTMLButtonElement>(element.querySelector('[data-cy=create-project]'))).click();
-        expect(component.createModalVisible).toBe(true);
-      });
-
-      it('opening create modal resets name to empty string', () => {
-        component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v2');
-        component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v1');
-        fixture.detectChanges();
-        component.createProjectForm.controls['name'].setValue('any');
-        (<HTMLButtonElement>(element.querySelector('[data-cy=create-project]'))).click();
-        expect(component.createProjectForm.controls['name'].value).toBe(null);
-      });
-    });
-  });
-
-  describe('sortedProject$', () => {
+    describe('sortedProject$', () => {
     it('intermixes capitals and lowercase with lowercase first', () => {
       store.dispatch(new GetProjectsSuccess({
         projects: [
@@ -202,6 +181,7 @@ describe('ProjectListComponent', () => {
           }
         ]
       }));
+      fixture.detectChanges();
       component.sortedProjects$.subscribe(projects => {
         expect(projects.length).toBe(3);
         expect(projects[0]).toEqual(jasmine.objectContaining({ name: 'another-project' }));
@@ -230,6 +210,7 @@ describe('ProjectListComponent', () => {
           }
         ]
       }));
+      fixture.detectChanges();
       component.sortedProjects$.subscribe(projects => {
         expect(projects.length).toBe(3);
         expect(projects[0]).toEqual(jasmine.objectContaining({ name: 'default' }));
@@ -268,6 +249,7 @@ describe('ProjectListComponent', () => {
           }
         ]
       }));
+      fixture.detectChanges();
       component.sortedProjects$.subscribe(projects => {
         expect(projects.length).toBe(5);
         expect(projects[0]).toEqual(jasmine.objectContaining({ name: 'project' }));
@@ -275,6 +257,25 @@ describe('ProjectListComponent', () => {
         expect(projects[2]).toEqual(jasmine.objectContaining({ name: 'Project01' }));
         expect(projects[3]).toEqual(jasmine.objectContaining({ name: 'Project3' }));
         expect(projects[4]).toEqual(jasmine.objectContaining({ name: 'Project300' }));
+      });
+    });
+  });
+
+  describe('create modal', () => {
+      it('opens upon clicking create button', () => {
+        store.dispatch(new GetProjectsSuccess({ projects: projectList }));
+        fixture.detectChanges();
+        expect(component.createModalVisible).toBe(false);
+        (<HTMLButtonElement>(element.querySelector('[data-cy=create-project]'))).click();
+        expect(component.createModalVisible).toBe(true);
+      });
+
+      it('resets name to empty string', () => {
+        store.dispatch(new GetProjectsSuccess({ projects: projectList }));
+        fixture.detectChanges();
+        component.createProjectForm.controls['name'].setValue('any');
+        (<HTMLButtonElement>(element.querySelector('[data-cy=create-project]'))).click();
+        expect(component.createProjectForm.controls['name'].value).toBe(null);
       });
     });
   });
@@ -346,4 +347,199 @@ describe('ProjectListComponent', () => {
       expect(projectService.applyRulesStop).toHaveBeenCalled();
     });
   });
+
+  describe('getProjectStatus', () => {
+    let editedProject: Project, noRulesProject: Project, uneditedProject: Project;
+
+    beforeEach(() => {
+      editedProject = genProject('uuid-99', 'EDITS_PENDING');
+      noRulesProject = genProject('uuid-15', 'NO_RULES');
+      uneditedProject = genProject('uuid-111', 'RULES_APPLIED');
+    });
+
+    it('happy path: needs updating -> updating -> OK', () => {
+      store.dispatch(new GetApplyRulesStatusSuccess( // set state
+        genState(ApplyRulesStatusState.NotRunning)));
+      store.dispatch(new GetProjectsSuccess({ // set cache
+        projects: [editedProject]
+      }));
+      expect(component.getProjectStatus(editedProject)).toBe('Needs updating');
+
+      component.confirmApplyStart(); // now start an update
+      store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
+        genState(ApplyRulesStatusState.Running)));
+      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+
+      // later side effect of the update, but project status NOT affected!
+      editedProject.status = 'RULES_APPLIED';
+      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+
+      // update finishes...
+      store.dispatch(new GetApplyRulesStatusSuccess(
+        genState(ApplyRulesStatusState.NotRunning)));
+      // .. and project reflects that all is well!
+      expect(component.getProjectStatus(editedProject)).toBe('OK');
+    });
+
+    it('continues to report "needs updating" if last update failed', () => {
+      store.dispatch(new GetApplyRulesStatusSuccess( // set state
+        genState(ApplyRulesStatusState.NotRunning)));
+      store.dispatch(new GetProjectsSuccess({ // set cache
+        projects: [editedProject]
+      }));
+      expect(component.getProjectStatus(editedProject)).toBe('Needs updating');
+
+      component.confirmApplyStart(); // now start an update
+      store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
+        genState(ApplyRulesStatusState.Running)));
+      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+
+      // later side effect of the update, but project status NOT affected!
+      editedProject.status = 'RULES_APPLIED';
+      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+
+      // update finishes--but this time reporting failure
+      store.dispatch(new GetApplyRulesStatusSuccess(
+        genState(ApplyRulesStatusState.NotRunning, true, false)));
+      // so we go back to this instead of OK
+      expect(component.getProjectStatus(editedProject)).toBe('Needs updating');
+    });
+
+    it('continues to report "needs updating" if last update cancelled', () => {
+      store.dispatch(new GetApplyRulesStatusSuccess( // set state
+        genState(ApplyRulesStatusState.NotRunning)));
+      store.dispatch(new GetProjectsSuccess({ // set cache
+        projects: [editedProject]
+      }));
+      expect(component.getProjectStatus(editedProject)).toBe('Needs updating');
+
+      component.confirmApplyStart(); // now start an update
+      store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
+        genState(ApplyRulesStatusState.Running)));
+      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+
+      // later side effect of the update, but project status NOT affected!
+      editedProject.status = 'RULES_APPLIED';
+      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+
+      // update finishes--but this time reporting cancelled
+      store.dispatch(new GetApplyRulesStatusSuccess(
+        genState(ApplyRulesStatusState.NotRunning, false, true)));
+      // so we go back to this instead of OK
+      expect(component.getProjectStatus(editedProject)).toBe('Needs updating');
+    });
+
+    it('happy path for projects with no edits or no rules', () => {
+      store.dispatch(new GetApplyRulesStatusSuccess( // set state
+        genState(ApplyRulesStatusState.NotRunning)));
+      store.dispatch(new GetProjectsSuccess({ // set cache
+        projects: [uneditedProject, noRulesProject]
+      }));
+      // These are unaffected by Running/NotRunning
+      expect(component.getProjectStatus(uneditedProject)).toBe('OK');
+      expect(component.getProjectStatus(noRulesProject)).toBe('OK');
+
+      component.confirmApplyStart(); // now start an update
+      store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
+        genState(ApplyRulesStatusState.Running)));
+      expect(component.getProjectStatus(uneditedProject)).toBe('OK');
+      expect(component.getProjectStatus(noRulesProject)).toBe('OK');
+
+      // update finishes...
+      store.dispatch(new GetApplyRulesStatusSuccess(
+        genState(ApplyRulesStatusState.NotRunning)));
+      expect(component.getProjectStatus(uneditedProject)).toBe('OK');
+      expect(component.getProjectStatus(noRulesProject)).toBe('OK');
+    });
+
+    it('maps current project status while rules are not being applied', () => {
+      store.dispatch(new GetApplyRulesStatusSuccess( // set state
+        genState(ApplyRulesStatusState.NotRunning)));
+
+      store.dispatch(new GetProjectsSuccess({ // set cache
+        projects: [editedProject, uneditedProject, noRulesProject]
+      }));
+
+      // Result: this uses current value (EDITS_PENDING)
+      expect(component.getProjectStatus(editedProject)).toBe('Needs updating');
+      // But the cached value is the same as the current value!
+      // So is the above a phantom result?
+      // No, because we can affect the answer by changing the current value:
+      editedProject.status = 'NO_RULES';
+      expect(component.getProjectStatus(editedProject)).toBe('OK');
+
+      // These are unaffected by Running/NotRunning
+      expect(component.getProjectStatus(uneditedProject)).toBe('OK');
+      expect(component.getProjectStatus(noRulesProject)).toBe('OK');
+    });
+
+    it('maps cached status while rules are being applied', () => {
+      store.dispatch(new GetApplyRulesStatusSuccess( // set state
+        genState(ApplyRulesStatusState.NotRunning)));
+      store.dispatch(new GetProjectsSuccess({ // set cache
+        projects: [editedProject, uneditedProject, noRulesProject]
+      }));
+      component.confirmApplyStart(); // now start an update
+      store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
+        genState(ApplyRulesStatusState.Running)));
+
+      // Result: this uses cached value (EDITS_PENDING)
+      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+      // But the cached value is the same as the current value!
+      // So is the above a phantom result?
+      // No, because we still get the same answer even if we change the current value:
+      editedProject.status = 'NO_RULES';
+      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+
+      // These are unaffected by Running/NotRunning
+      expect(component.getProjectStatus(uneditedProject)).toBe('OK');
+      expect(component.getProjectStatus(noRulesProject)).toBe('OK');
+    });
+
+    it('does not update cache while rules are being applied', () => {
+      store.dispatch(new GetApplyRulesStatusSuccess( // set state
+        genState(ApplyRulesStatusState.NotRunning)));
+      store.dispatch(new GetProjectsSuccess({ // set cache
+        projects: [editedProject, uneditedProject, noRulesProject]
+      }));
+      component.confirmApplyStart(); // now start an update
+      store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
+        genState(ApplyRulesStatusState.Running)));
+      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+
+      // This would update the cache if we were NotRunning, but does not when Running
+      editedProject.status = 'RULES_APPLIED';
+      store.dispatch(new GetProjectsSuccess({
+        projects: [editedProject, uneditedProject, noRulesProject]
+      }));
+
+      // Result: still uses originally cached value, so Updating rather than OK
+      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+    });
+  });
+
 });
+
+function genProject(id: string, status: ProjectStatus): Project {
+  return {
+    id,
+    status,
+    name: id, // unused
+    type: 'CUSTOM' // unused
+  };
+}
+
+function genState(
+  state: ApplyRulesStatusState,
+  failed = false,
+  cancelled = false
+): GetApplyRulesStatusSuccessPayload {
+  return {
+    state,
+    failed,
+    cancelled,
+    estimated_time_complete: '', // unused
+    percentage_complete: 0.5, // unused
+    failure_message: '' // unused
+  };
+}

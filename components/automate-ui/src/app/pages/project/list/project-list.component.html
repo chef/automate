@@ -17,15 +17,16 @@
       <ng-container *ngIf="(sortedProjects$ | async)?.length > 0">
         <chef-toolbar>
           <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">
-            <chef-button [disabled]="(sortedProjects$ | async)?.length >= MAX_PROJECTS" data-cy="create-project" primary (click)="openCreateModal()">Create Project</chef-button>
+            <chef-button [disabled]="(sortedProjects$ | async)?.length >= MAX_PROJECTS"
+              data-cy="create-project" primary (click)="openCreateModal()">Create Project</chef-button>
           </app-authorized>
           <app-authorized [allOf]="['/iam/v2beta/apply-rules', 'post']">
-            <chef-button secondary [disabled]="(projects.applyRulesStatus$ | async)?.state === ApplyRulesStatusState.Running" id="update-start-button" (click)="openConfirmUpdateStartModal()">
-              {{ applyRulesButtonText$ | async }}
-            </chef-button>
+            <chef-button secondary [disabled]="(projects.applyRulesStatus$ | async)?.state === ApplyRulesStatusState.Running"
+              id="update-start-button" (click)="openConfirmUpdateStartModal()">{{ applyRulesButtonText$ | async }}</chef-button>
           </app-authorized>
           <app-authorized [allOf]="['/iam/v2beta/apply-rules', 'delete']">
-            <chef-button *ngIf="(projects.applyRulesStatus$ | async)?.state === ApplyRulesStatusState.Running" tertiary id="update-stop-button" (click)="openConfirmUpdateStopModal()">Stop Updating Projects</chef-button>
+            <chef-button *ngIf="(projects.applyRulesStatus$ | async)?.state === ApplyRulesStatusState.Running"
+              tertiary id="update-stop-button" (click)="openConfirmUpdateStopModal()">Stop Updating Projects</chef-button>
           </app-authorized>
         </chef-toolbar>
         <app-authorized [allOf]="['/iam/v2beta/projects', 'get']">
@@ -46,7 +47,7 @@
                 </chef-td>
                 <chef-td>{{ project.id }}</chef-td>
                 <chef-td>{{ getRulesStatus(project) }}</chef-td>
-                <chef-td>OK</chef-td>
+                <chef-td>{{ getProjectStatus(project) }}</chef-td>
                 <chef-td class="controls">
                   <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project.id]">
                     <chef-control-menu>
