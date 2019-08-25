@@ -19,7 +19,7 @@ describe('PolicyListComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'app-admin-sidebar' }),
+        MockComponent({ selector: 'app-settings-sidebar' }),
         MockComponent({ selector: 'app-authorized', inputs: ['allOf'] }),
         MockComponent({
           selector: 'app-delete-object-modal',
@@ -63,7 +63,7 @@ describe('PolicyListComponent', () => {
   });
 
   it('contains key elements', () => {
-    expect(element).toContainPath('app-admin-sidebar');
+    expect(element).toContainPath('app-settings-sidebar');
     expect(element).toContainPath('chef-page-header');
   });
 

@@ -6,7 +6,7 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { MatDialogModule, MatSnackBarModule } from '@angular/material';
 
 // Components
-import { AdminSidebarComponent } from './admin-sidebar/admin-sidebar.component';
+import { SettingsSidebarComponent } from './settings-sidebar/settings-sidebar.component';
 import { AuthorizedComponent } from './authorized/authorized.component';
 import { BreadcrumbsComponent } from './breadcrumbs/breadcrumbs.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
@@ -55,7 +55,7 @@ import { TabsComponent } from './tabs/tabs.component';
     MatSnackBarModule,
 
     // Components
-    AdminSidebarComponent,
+    SettingsSidebarComponent,
     AuthorizedComponent,
     BreadcrumbsComponent,
     BreadcrumbComponent,
@@ -82,7 +82,7 @@ import { TabsComponent } from './tabs/tabs.component';
     InputDirective
   ],
   declarations: [
-    AdminSidebarComponent,
+    SettingsSidebarComponent,
     AuthorizedComponent,
     BreadcrumbsComponent,
     BreadcrumbComponent,

@@ -11,11 +11,11 @@ import { SettingsLandingComponent } from 'app/pages/settings-landing/settings-la
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
 import { checkFirstPerm } from 'app/testing/spec-helpers';
-import { AdminSidebarComponent } from './admin-sidebar.component';
+import { SettingsSidebarComponent } from './settings-sidebar.component';
 
-describe('AdminSidebarComponent', () => {
-  let fixture: ComponentFixture<AdminSidebarComponent>;
-  let component: AdminSidebarComponent;
+describe('SettingsSidebarComponent', () => {
+  let fixture: ComponentFixture<SettingsSidebarComponent>;
+  let component: SettingsSidebarComponent;
   let settingsLandingComponent: SettingsLandingComponent;
   let element: DebugElement;
 
@@ -27,7 +27,7 @@ describe('AdminSidebarComponent', () => {
         })
       ],
       declarations: [
-        AdminSidebarComponent,
+        SettingsSidebarComponent,
         SettingsLandingComponent,
         // Note: if we want to match contents, we cannot swallow them: thus we
         // need to provide a template here. <ng-content> mocks these as doing
@@ -48,7 +48,7 @@ describe('AdminSidebarComponent', () => {
       ]
     });
 
-    fixture = TestBed.createComponent(AdminSidebarComponent);
+    fixture = TestBed.createComponent(SettingsSidebarComponent);
     component = fixture.componentInstance;
     settingsLandingComponent =
       TestBed.createComponent(SettingsLandingComponent).componentInstance;

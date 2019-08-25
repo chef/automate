@@ -8,12 +8,12 @@ import { GetIamVersion } from 'app/entities/policies/policy.actions';
 import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
 
 @Component({
-  selector: 'app-admin-sidebar',
-  templateUrl: './admin-sidebar.component.html',
-  styleUrls: ['./admin-sidebar.component.scss']
+  selector: 'app-settings-sidebar',
+  templateUrl: './settings-sidebar.component.html',
+  styleUrls: ['./settings-sidebar.component.scss']
 })
 
-export class AdminSidebarComponent implements OnInit {
+export class SettingsSidebarComponent implements OnInit {
   public iamMajorVersion$: Observable<IAMMajorVersion>;
   public iamMinorVersion$: Observable<IAMMinorVersion>;
 
