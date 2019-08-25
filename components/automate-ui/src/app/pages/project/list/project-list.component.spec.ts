@@ -400,7 +400,31 @@ describe('ProjectListComponent', () => {
 
       // update finishes--but this time reporting failure
       store.dispatch(new GetApplyRulesStatusSuccess(
-        genState(ApplyRulesStatusState.NotRunning, true)));
+        genState(ApplyRulesStatusState.NotRunning, true, false)));
+      // so we go back to this instead of OK
+      expect(component.getProjectStatus(editedProject)).toBe('Needs updating');
+    });
+
+    it('continues to report "needs updating" if last update cancelled', () => {
+      store.dispatch(new GetApplyRulesStatusSuccess( // set state
+        genState(ApplyRulesStatusState.NotRunning)));
+      store.dispatch(new GetProjectsSuccess({ // set cache
+        projects: [editedProject]
+      }));
+      expect(component.getProjectStatus(editedProject)).toBe('Needs updating');
+
+      component.confirmApplyStart(); // now start an update
+      store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
+        genState(ApplyRulesStatusState.Running)));
+      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+
+      // later side effect of the update, but project status NOT affected!
+      editedProject.status = 'RULES_APPLIED';
+      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+
+      // update finishes--but this time reporting cancelled
+      store.dispatch(new GetApplyRulesStatusSuccess(
+        genState(ApplyRulesStatusState.NotRunning, false, true)));
       // so we go back to this instead of OK
       expect(component.getProjectStatus(editedProject)).toBe('Needs updating');
     });
@@ -506,10 +530,14 @@ function genProject(id: string, status: ProjectStatus): Project {
 }
 
 function genState(
-  state: ApplyRulesStatusState, failed = false): GetApplyRulesStatusSuccessPayload {
+  state: ApplyRulesStatusState,
+  failed = false,
+  cancelled = false
+): GetApplyRulesStatusSuccessPayload {
   return {
     state,
     failed,
+    cancelled,
     estimated_time_complete: '', // unused
     percentage_complete: 0.5, // unused
     failure_message: '' // unused

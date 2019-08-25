@@ -54,6 +54,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   private applyRulesInProgress = false;
 
   private updateProjectsFailed = false;
+  private updateProjectsCancelled = false;
 
   public applyRulesButtonText$: Observable<string>;
   public ApplyRulesStatusState = ApplyRulesStatusState;
@@ -91,10 +92,11 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     );
 
     this.projects.applyRulesStatus$
-      .subscribe(({ state, failed }: ApplyRulesStatus) => {
+      .subscribe(({ state, failed, cancelled }: ApplyRulesStatus) => {
         if (state === ApplyRulesStatusState.NotRunning) {
           this.applyRulesInProgress = false;
           this.updateProjectsFailed = failed;
+          this.updateProjectsCancelled = cancelled;
         }
       });
 
@@ -262,7 +264,9 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     if (this.applyRulesInProgress) {
       result = cachedStatus === 'EDITS_PENDING' ? 'Updating...' : 'OK';
     } else {
-      result = project.status === 'EDITS_PENDING' || this.updateProjectsFailed
+      result = project.status === 'EDITS_PENDING'
+        || this.updateProjectsFailed
+        || this.updateProjectsCancelled
         ? 'Needs updating' : 'OK';
     }
     // TODO: check how often this is hit

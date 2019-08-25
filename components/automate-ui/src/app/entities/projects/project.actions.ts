@@ -39,6 +39,7 @@ export interface GetApplyRulesStatusSuccessPayload {
   estimated_time_complete: string;
   percentage_complete: number;
   failed: boolean;
+  cancelled: boolean;
   failure_message: string;
 }
 
