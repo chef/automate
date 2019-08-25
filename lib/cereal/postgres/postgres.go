@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	// defaultMaxIdleConnections is will be used to configure
+	// defaultMaxIdleConnections is used to configure
 	// MaxIdleConnections on the sql.DB object. 4 was chosen
 	// without much analysis. The default is 2. Without any
 	// registered task executors we know we have the following
