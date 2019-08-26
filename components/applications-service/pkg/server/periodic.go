@@ -18,9 +18,8 @@ import (
 	rrule "github.com/teambition/rrule-go"
 )
 
-type JobManager struct {
-	CerealSvc          *cereal.Manager
-	ApplicationsServer *ApplicationsServer
+type JobScheduler struct {
+	CerealSvc *cereal.Manager
 }
 
 type DisconnectedServicesParamsV0 struct {
@@ -35,7 +34,7 @@ const (
 	DisconnectedServicesScheduleName       = "periodic_disconnected_services"
 )
 
-func NewJobManager(applicationsServer *ApplicationsServer, jobCfg *config.Jobs, certs *certs.ServiceCerts) (*JobManager, error) {
+func ConnectToJobsManager(jobCfg *config.Jobs, certs *certs.ServiceCerts) (*cereal.Manager, error) {
 	svcURL := fmt.Sprintf("%s:%d", jobCfg.Host, jobCfg.Port)
 
 	connFactory := secureconn.NewFactory(*certs,
@@ -50,12 +49,15 @@ func NewJobManager(applicationsServer *ApplicationsServer, jobCfg *config.Jobs, 
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create cereal job manager from gRPC connection")
 	}
+	return cerealSvc, nil
+}
 
-	return &JobManager{CerealSvc: cerealSvc, ApplicationsServer: applicationsServer}, nil
+func NewJobScheduler(cerealSvc *cereal.Manager) *JobScheduler {
+	return &JobScheduler{CerealSvc: cerealSvc}
 }
 
 // SetupScheduler ensures all our jobs exist in the cereal service backend.
-func (j *JobManager) SetupScheduler() error {
+func (j *JobScheduler) Setup() error {
 	r, err := rrule.NewRRule(rrule.ROption{
 		Freq:     rrule.SECONDLY,
 		Interval: DisconnectedServicesJobIntervalSeconds,
@@ -93,34 +95,7 @@ func (j *JobManager) SetupScheduler() error {
 	return nil
 }
 
-func (j *JobManager) Start() error {
-	err := j.CerealSvc.RegisterTaskExecutor(
-		DisconnectedServicesJobName,
-		&markDisconnectedServicesExecutor{ApplicationsServer: j.ApplicationsServer},
-		cereal.TaskExecutorOpts{},
-	)
-	if err != nil {
-		return errors.Wrap(err, "failed to register as task exector to mark disconnected services")
-	}
-
-	wfX := patterns.NewSingleTaskWorkflowExecutor(DisconnectedServicesJobName, false)
-	err = j.CerealSvc.RegisterWorkflowExecutor(DisconnectedServicesJobName, wfX)
-	if err != nil {
-		return errors.Wrap(err, "failed to register as workflow exector to mark disconnected services")
-	}
-
-	// TODO: set a timeout
-	ctx := context.Background()
-
-	err = j.CerealSvc.Start(ctx)
-	if err != nil {
-		return errors.Wrap(err, "failed to start workflow/job exector")
-	}
-
-	return nil
-}
-
-func (j *JobManager) UpdateDisconnectedServicesJobParams(ctx context.Context, params *DisconnectedServicesParamsV0) error {
+func (j *JobScheduler) UpdateDisconnectedServicesJobParams(ctx context.Context, params *DisconnectedServicesParamsV0) error {
 	err := j.CerealSvc.UpdateWorkflowScheduleByName(
 		ctx,
 		DisconnectedServicesScheduleName, DisconnectedServicesJobName,
@@ -131,7 +106,7 @@ func (j *JobManager) UpdateDisconnectedServicesJobParams(ctx context.Context, pa
 	return nil
 }
 
-func (j *JobManager) EnableDisconnectedServicesJob(ctx context.Context) error {
+func (j *JobScheduler) EnableDisconnectedServicesJob(ctx context.Context) error {
 	err := j.CerealSvc.UpdateWorkflowScheduleByName(
 		ctx,
 		DisconnectedServicesScheduleName, DisconnectedServicesJobName,
@@ -142,7 +117,7 @@ func (j *JobManager) EnableDisconnectedServicesJob(ctx context.Context) error {
 	return nil
 }
 
-func (j *JobManager) DisableDisconnectedServicesJob(ctx context.Context) error {
+func (j *JobScheduler) DisableDisconnectedServicesJob(ctx context.Context) error {
 	err := j.CerealSvc.UpdateWorkflowScheduleByName(
 		ctx,
 		DisconnectedServicesScheduleName, DisconnectedServicesJobName,
@@ -156,6 +131,33 @@ func (j *JobManager) DisableDisconnectedServicesJob(ctx context.Context) error {
 
 func defaultDisconnectedServicesJobParams() *DisconnectedServicesParamsV0 {
 	return &DisconnectedServicesParamsV0{ThresholdSeconds: 300}
+}
+
+func StartJobRunners(applicationsServer *ApplicationsServer, cerealSvc *cereal.Manager) error {
+	err := cerealSvc.RegisterTaskExecutor(
+		DisconnectedServicesJobName,
+		&markDisconnectedServicesExecutor{ApplicationsServer: applicationsServer},
+		cereal.TaskExecutorOpts{},
+	)
+	if err != nil {
+		return errors.Wrap(err, "failed to register as task exector to mark disconnected services")
+	}
+
+	wfX := patterns.NewSingleTaskWorkflowExecutor(DisconnectedServicesJobName, false)
+	err = cerealSvc.RegisterWorkflowExecutor(DisconnectedServicesJobName, wfX)
+	if err != nil {
+		return errors.Wrap(err, "failed to register as workflow exector to mark disconnected services")
+	}
+
+	// TODO: set a timeout
+	ctx := context.Background()
+
+	err = cerealSvc.Start(ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to start workflow/job exector")
+	}
+
+	return nil
 }
 
 type markDisconnectedServicesExecutor struct {

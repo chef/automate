@@ -35,45 +35,44 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 		Port: 10101,
 	}
 
-	mgr, err := server.NewJobManager(suite.ApplicationsServer, &jobCfg, certs)
+	jobsMgr, err := server.ConnectToJobsManager(&jobCfg, certs)
 	require.NoError(t, err)
-	err = mgr.SetupScheduler()
+
+	scheduler := server.NewJobScheduler(jobsMgr)
+	err = scheduler.Setup()
 	require.NoError(t, err)
 
 	ctx := context.Background()
-	sched, err := mgr.CerealSvc.GetWorkflowScheduleByName(ctx, DisconnectedServicesScheduleName, DisconnectedServicesJobName)
+	sched, err := scheduler.CerealSvc.GetWorkflowScheduleByName(ctx, DisconnectedServicesScheduleName, DisconnectedServicesJobName)
 
 	require.NoError(t, err)
 	assert.Equal(t, "disconnected_services", sched.WorkflowName)
 	assert.True(t, sched.Enabled)
 
-	// err = mgr.Start()
-	// require.NoError(t, err)
-
 	time.Sleep(2 * time.Second)
 
 	t.Run("disable and enable disconnected_services job", func(t *testing.T) {
-		err := mgr.DisableDisconnectedServicesJob(ctx)
+		err := scheduler.DisableDisconnectedServicesJob(ctx)
 		require.NoError(t, err)
 
-		sched, err := mgr.CerealSvc.GetWorkflowScheduleByName(ctx, DisconnectedServicesScheduleName, DisconnectedServicesJobName)
+		sched, err := scheduler.CerealSvc.GetWorkflowScheduleByName(ctx, DisconnectedServicesScheduleName, DisconnectedServicesJobName)
 		require.NoError(t, err)
 		assert.False(t, sched.Enabled)
 
-		err = mgr.EnableDisconnectedServicesJob(ctx)
+		err = scheduler.EnableDisconnectedServicesJob(ctx)
 		require.NoError(t, err)
 
-		sched, err = mgr.CerealSvc.GetWorkflowScheduleByName(ctx, DisconnectedServicesScheduleName, DisconnectedServicesJobName)
+		sched, err = scheduler.CerealSvc.GetWorkflowScheduleByName(ctx, DisconnectedServicesScheduleName, DisconnectedServicesJobName)
 		require.NoError(t, err)
 		assert.True(t, sched.Enabled)
 
 	})
 	t.Run("update disconnected_services job params", func(t *testing.T) {
 		newParams := server.DisconnectedServicesParamsV0{ThresholdSeconds: 23}
-		err := mgr.UpdateDisconnectedServicesJobParams(ctx, &newParams)
+		err := scheduler.UpdateDisconnectedServicesJobParams(ctx, &newParams)
 		require.NoError(t, err)
 
-		sched, err := mgr.CerealSvc.GetWorkflowScheduleByName(ctx, DisconnectedServicesScheduleName, DisconnectedServicesJobName)
+		sched, err := scheduler.CerealSvc.GetWorkflowScheduleByName(ctx, DisconnectedServicesScheduleName, DisconnectedServicesJobName)
 		require.NoError(t, err)
 
 		var returnedParams server.DisconnectedServicesParamsV0
@@ -82,15 +81,20 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 
 		// Update the params again to ensure we didn't accidentally pass the test due to leftover state somewhere:
 		newParams = server.DisconnectedServicesParamsV0{ThresholdSeconds: 42}
-		err = mgr.UpdateDisconnectedServicesJobParams(ctx, &newParams)
+		err = scheduler.UpdateDisconnectedServicesJobParams(ctx, &newParams)
 		require.NoError(t, err)
 
-		sched, err = mgr.CerealSvc.GetWorkflowScheduleByName(ctx, DisconnectedServicesScheduleName, DisconnectedServicesJobName)
+		sched, err = scheduler.CerealSvc.GetWorkflowScheduleByName(ctx, DisconnectedServicesScheduleName, DisconnectedServicesJobName)
 		require.NoError(t, err)
 
-		//9var returnedParams server.DisconnectedServicesParamsV0
 		sched.GetParameters(&returnedParams)
 		assert.Equal(t, 42, returnedParams.ThresholdSeconds)
+	})
+
+	t.Run("running the job runner makes the jobs run", func(t *testing.T) {
+		// TODO:
+		// * update the schedule so it runs every second
+		// * have a way to track number of job runs (prometheus (?))
 	})
 
 }
