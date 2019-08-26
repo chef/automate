@@ -8,15 +8,15 @@ vendor_origin="chef"
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
 # WARNING: Version managed by .expeditor/update_chef_server.sh
-pkg_version="13.0.29"
+pkg_version="13.0.37"
 pkg_deps=(
   chef/mlsa
   core/curl
   core/bundler
   core/ruby
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
-  "${vendor_origin}/chef-server-nginx/13.0.29/20190812180610"
-  "${vendor_origin}/chef-server-ctl/13.0.29/20190812175715"
+  "${vendor_origin}/chef-server-nginx/13.0.37/20190826163407"
+  "${vendor_origin}/chef-server-ctl/13.0.37/20190826162643"
 )
 
 pkg_bin_dirs=(bin)
