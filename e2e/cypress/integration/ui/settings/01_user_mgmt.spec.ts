@@ -25,7 +25,7 @@ describe('user management', () => {
     cy.get('app-user-table').should('exist');
 
     // open modal
-    cy.get('app-user-table chef-button').contains('Create User').click();
+    cy.get('app-user-table chef-button').contains('Create User').should('be.visible').click();
     cy.get('app-user-management chef-modal').should('exist');
 
     // we increase the default delay to mimic the average human's typing speed
@@ -68,8 +68,9 @@ describe('user management', () => {
     cy.get('app-user-details chef-form-field').contains('Confirm New Password').should('exist');
 
     cy.get('app-user-details chef-button.edit-button').click();
-    cy.get('[formcontrolname=fullName]').find('input').should('not.be.disabled')
-      .clear().type(updatedName);
+
+    cy.get('[formcontrolname=fullName]').should('not.be.disabled')
+      .invoke('val', updatedName).trigger('input');
 
     cy.get('app-user-details chef-button.save-button').click();
     cy.wait('@updateUser');
@@ -77,9 +78,9 @@ describe('user management', () => {
 
     // use this method of inputing data into form to simulate copy-pasting
     // to ensure we get the same value in both form inputs
-    cy.get('[formcontrolname=newPassword]').find('input')
+    cy.get('[formcontrolname=newPassword]')
       .invoke('val', updatedPassword).trigger('input');
-    cy.get('[formcontrolname=confirmPassword]').find('input')
+    cy.get('[formcontrolname=confirmPassword]')
       .invoke('val', updatedPassword).trigger('input');
 
     cy.get('app-user-details chef-button').contains('Update Password').click({ force: true} );
