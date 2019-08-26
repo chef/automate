@@ -15,6 +15,7 @@ export class CredentialsListRowComponent {
   credential: Credential | Credential;
   @Output()
   deleteCredential: EventEmitter<Credential> = new EventEmitter<Credential>();
+  public deleteModalVisible = false;
 
   constructor(public credentialsLogic: CredentialsLogic) {
   }
@@ -22,4 +23,13 @@ export class CredentialsListRowComponent {
   getLastModified(lastModifiedDate): string {
     return moment(lastModifiedDate).format('MMMM Do YYYY');
   }
+
+  public startCredentialDelete(): void {
+    this.deleteModalVisible = true;
+  }
+
+  public closeDeleteModal(): void {
+    this.deleteModalVisible = false;
+  }
+
 }
