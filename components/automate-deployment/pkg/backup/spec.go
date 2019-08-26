@@ -181,6 +181,16 @@ func DefaultSpecs(serviceNames []string) []Spec {
 			},
 		},
 		{
+			Name:          "cereal-service",
+			WriteMetadata: true,
+			SyncDbsV2: []DatabaseDumpOperationV2{
+				{
+					Name: "chef_cereal_service",
+					User: "cereal",
+				},
+			},
+		},
+		{
 			Name:          "compliance-service",
 			WriteMetadata: true,
 			// The compliance service no longer writes
