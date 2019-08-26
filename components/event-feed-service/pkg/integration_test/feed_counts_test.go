@@ -162,7 +162,7 @@ func TestFeedCountsCountOnlyFilteredUsers(t *testing.T) {
 			description: "should count only 'User' events",
 			request: event_feed.FeedSummaryRequest{
 				CountCategory: "event-type",
-				Filters:       []string{"requestorName:User"},
+				Filters:       []string{"requestor_name:User"},
 			},
 			expectedCounts: entriesToTypeCounts(filter(entries, func(a *util.FeedEntry) bool {
 				return a.ActorName == "User"
@@ -172,7 +172,7 @@ func TestFeedCountsCountOnlyFilteredUsers(t *testing.T) {
 			description: "should count only 'UI User' actions",
 			request: event_feed.FeedSummaryRequest{
 				CountCategory: "event-type",
-				Filters:       []string{"requestorName:UI User"},
+				Filters:       []string{"requestor_name:UI User"},
 			},
 			expectedCounts: entriesToTypeCounts(filter(entries, func(a *util.FeedEntry) bool {
 				return a.ActorName == "UI User"
@@ -182,7 +182,7 @@ func TestFeedCountsCountOnlyFilteredUsers(t *testing.T) {
 			description: "should count 'User' and 'UI User' actions",
 			request: event_feed.FeedSummaryRequest{
 				CountCategory: "event-type",
-				Filters:       []string{"requestorName:UI User", "requestorName:User"},
+				Filters:       []string{"requestor_name:UI User", "requestor_name:User"},
 			},
 			expectedCounts: entriesToTypeCounts(filter(entries, func(a *util.FeedEntry) bool {
 				return a.ActorName == "UI User" || a.ActorName == "User"
@@ -268,7 +268,7 @@ func TestTaskCountsCountOnlyFilteredUsers(t *testing.T) {
 			description: "should count only 'User' events",
 			request: event_feed.FeedSummaryRequest{
 				CountCategory: "task",
-				Filters:       []string{"requestorName:User"},
+				Filters:       []string{"requestor_name:User"},
 			},
 			expectedCounts: entriesToTaskCounts(filter(entries, func(a *util.FeedEntry) bool {
 				return stringutils.SliceContains(a.Tags, "User")
@@ -278,7 +278,7 @@ func TestTaskCountsCountOnlyFilteredUsers(t *testing.T) {
 			description: "should count only 'UI User' actions",
 			request: event_feed.FeedSummaryRequest{
 				CountCategory: "task",
-				Filters:       []string{"requestorName:UI User"},
+				Filters:       []string{"requestor_name:UI User"},
 			},
 			expectedCounts: entriesToTaskCounts(filter(entries, func(a *util.FeedEntry) bool {
 				return stringutils.SliceContains(a.Tags, "UI User")
@@ -288,7 +288,7 @@ func TestTaskCountsCountOnlyFilteredUsers(t *testing.T) {
 			description: "should count 'User' and 'UI User' actions",
 			request: event_feed.FeedSummaryRequest{
 				CountCategory: "task",
-				Filters:       []string{"requestorName:UI User", "requestorName:User"},
+				Filters:       []string{"requestor_name:UI User", "requestor_name:User"},
 			},
 			expectedCounts: entriesToTaskCounts(filter(entries, func(a *util.FeedEntry) bool {
 				return stringutils.SliceContains(a.Tags, "UI User") || stringutils.SliceContains(a.Tags, "User")

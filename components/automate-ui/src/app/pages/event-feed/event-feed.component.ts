@@ -91,7 +91,7 @@ export class EventFeedComponent implements OnInit, OnDestroy {
         {name: 'policyfile', title: 'Policyfiles', icon: 'add_to_photos'},
         {name: 'profile', title: 'Profiles', icon: 'library_books'},
         {name: 'role', title: 'Roles', icon: 'book'},
-        {name: 'scan_job', title: 'Scan Jobs', icon: 'wifi_tethering'},
+        {name: 'scanjobs', title: 'Scan Jobs', icon: 'wifi_tethering'},
         {name: 'user', title: 'Users', icon: 'person'}
       ]
     }
