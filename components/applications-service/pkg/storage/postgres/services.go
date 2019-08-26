@@ -348,6 +348,21 @@ func buildWhereConstraintsFromFilters(filters map[string][]string) (string, erro
 		case "health":
 			WhereConstraints = WhereConstraints + buildORStatementFromValues("health", values)
 
+		case "origin":
+			WhereConstraints = WhereConstraints + buildORStatementFromValues("origin", values)
+
+		case "channel":
+			WhereConstraints = WhereConstraints + buildORStatementFromValues("channel", values)
+
+		case "site":
+			WhereConstraints = WhereConstraints + buildORStatementFromValues("site", values)
+
+		case "version":
+			WhereConstraints = WhereConstraints + buildORStatementFromValues("version", values)
+
+		case "buildstamp":
+			WhereConstraints = WhereConstraints + buildORStatementFromValues("release", values)
+
 		default:
 			return "", errors.Errorf("invalid filter. (%s:%s)", filter, values)
 		}
