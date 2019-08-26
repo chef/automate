@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
@@ -191,7 +192,51 @@ func (s *ProjectState) ApplyRulesStart(
 			"error starting project update: %s", err.Error())
 	}
 
+	if err := s.waitForApplyStagedRules(ctx, 10*time.Second); err != nil {
+		return nil, err
+	}
+
 	return &api.ApplyRulesStartResp{}, nil
+}
+
+func (s *ProjectState) waitForApplyStagedRules(ctx context.Context, maxWaitTime time.Duration) error {
+	ctx, cancel := context.WithTimeout(ctx, maxWaitTime)
+	defer cancel()
+	s.log.Info("Waiting for ApplyStagedRules")
+	tries := 0
+	startTime := time.Now()
+	for {
+		logctx := s.log.WithField("tries", tries+1).WithField("duration", time.Now().Sub(startTime))
+		st, err := s.ProjectUpdateManager.Status()
+		if err != nil {
+			s.log.WithError(err).Warn("failed to get project update status")
+		} else {
+			stage := st.Stage()
+			switch stage {
+			case ProjectUpdateStageUpdateDomainServices:
+				logctx.Info("Done waiting for ApplyStagedRules")
+				return nil
+			case ProjectUpdateStageApplyStagedRules:
+				// Still applying the staged rules
+				logctx.Debug("Waiting for apply staged rules to run")
+			default:
+				err := status.Errorf(codes.Internal, "Unexpected project update stage %s", stage)
+				logctx.WithError(err).Error("Workflow may not have completed ApplyStagedRules")
+				return err
+			}
+		}
+		sleepTime := time.Duration((5 * (1 << uint(tries)))) * time.Millisecond
+		if sleepTime > time.Second {
+			sleepTime = time.Second
+		}
+		select {
+		case <-ctx.Done():
+			logctx.Error("Timed out waiting for ApplyStagedRules")
+			return status.Errorf(codes.DeadlineExceeded, "Timed out waiting for ApplyStagedRules")
+		case <-time.After(sleepTime):
+		}
+		tries++
+	}
 }
 
 func (s *ProjectState) ApplyRulesCancel(

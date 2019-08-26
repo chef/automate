@@ -20,6 +20,8 @@ import (
 	project_update_tags "github.com/chef/automate/lib/authz"
 )
 
+type ProjectUpdateStage string
+
 const (
 	ProjectUpdateRunningState    = "running"
 	ProjectUpdateNotRunningState = "not_running"
@@ -28,6 +30,10 @@ const (
 	ProjectUpdateWorkflowName = "ProjectUpdate"
 	ProjectUpdateInstanceName = "SingletonV1"
 	ApplyStagedRulesTaskName  = "authz/ApplyStagedRules"
+
+	ProjectUpdateStageApplyStagedRules     ProjectUpdateStage = "apply_staged_rules"
+	ProjectUpdateStageUpdateDomainServices                    = "update_domain_services"
+	ProjectUpdateStageUpdateNone                              = "none"
 )
 
 var ProjectUpdateDomainServices = []string{
@@ -41,6 +47,7 @@ type ProjectUpdateStatus interface {
 	PercentageComplete() float64
 	EstimatedTimeComplete() time.Time
 	State() string
+	Stage() ProjectUpdateStage
 }
 
 type ProjectUpdateMgr interface {
@@ -309,6 +316,13 @@ func (w *workflowInstance) IsRunning() bool {
 	return w.chain.IsRunning()
 }
 
+func (w *workflowInstance) Stage() ProjectUpdateStage {
+	if _, err := w.GetUpdateDomainServicesInstance(); err != nil {
+		return ProjectUpdateStageApplyStagedRules
+	}
+	return ProjectUpdateStageUpdateDomainServices
+}
+
 func (w *workflowInstance) GetApplyStagedRulesInstance() (cereal.ImmutableWorkflowInstance, error) {
 	return w.chain.GetSubWorkflow(0)
 }
@@ -348,6 +362,10 @@ func (*EmptyProjectUpdateStatus) EstimatedTimeComplete() time.Time {
 
 func (*EmptyProjectUpdateStatus) State() string {
 	return ProjectUpdateNotRunningState
+}
+
+func (*EmptyProjectUpdateStatus) Stage() ProjectUpdateStage {
+	return ProjectUpdateStageUpdateNone
 }
 
 func (m *CerealProjectUpdateManager) Status() (ProjectUpdateStatus, error) {
