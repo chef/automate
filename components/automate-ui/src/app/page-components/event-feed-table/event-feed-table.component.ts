@@ -6,7 +6,7 @@ import { ChefEvent, ChefEventCollection, EventFeedFilter, Chicklet } from '../..
 import { EventFeedService } from '../../services/event-feed/event-feed.service';
 import * as moment from 'moment';
 
-const ENTITY_TYPE_TAG = 'entity_type';
+const ENTITY_TYPE_TAG = 'event-type';
 @Component({
   selector: 'app-event-feed-table',
   templateUrl: './event-feed-table.component.html',
