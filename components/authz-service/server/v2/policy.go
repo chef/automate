@@ -647,7 +647,7 @@ func (s *policyServer) ResetToV1(ctx context.Context,
 		return nil, status.Errorf(codes.Internal, "retrieve migration status: %s", err.Error())
 	}
 	switch ms {
-	case storage.Pristine: // skip
+	case storage.Pristine:
 		return nil, status.Error(codes.AlreadyExists, "already reset")
 	case storage.InProgress:
 		return nil, status.Error(codes.FailedPrecondition, "migration in progress")

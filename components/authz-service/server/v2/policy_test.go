@@ -2606,7 +2606,7 @@ func TestResetToV1(t *testing.T) {
 	status := ts.status
 
 	cases := map[string]func(*testing.T){
-		"initial migration status eturns AlreadyExists to indicate no-op": func(t *testing.T) {
+		"initial migration status returns AlreadyExists to indicate no-op": func(t *testing.T) {
 			ms, err := status.MigrationStatus(ctx)
 			require.NoError(t, err)
 			assert.Equal(t, storage.Pristine, ms)

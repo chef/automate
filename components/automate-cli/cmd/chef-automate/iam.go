@@ -150,7 +150,7 @@ func init() {
 }
 
 // Note: the indentation is to keep this in line with writer.Body()
-const alreadyMigratedMessage = `You are already using IAM %s.`
+const alreadyMigratedMessage = "You are already on IAM version %s."
 
 type vsn struct {
 	Major policies_common.Version_VersionNumber
