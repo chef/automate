@@ -1166,21 +1166,44 @@ func (p *pg) GetStagedOrAppliedRule(ctx context.Context, projectID string, ruleI
 	return &rule, nil
 }
 
+func (p *pg) MapAllAppliedRulesToProjects(ctx context.Context) (map[string][]*v2.Rule, error) {
+	rules, err := p.listRulesUsingFunction(ctx, "SELECT query_rules($1)", false)
+	if err != nil {
+		return nil, err
+	}
+
+	// nothing stored while on v1 or v2.0
+	if len(rules) == 0 {
+		return map[string][]*v2.Rule{}, nil
+	}
+
+	projectRules := make(map[string][]*v2.Rule, len(rules))
+	for _, rule := range rules {
+		projectRules[rule.ProjectID] = append(projectRules[rule.ProjectID], rule)
+	}
+
+	return projectRules, nil
+}
+
 func (p *pg) ListRules(ctx context.Context) ([]*v2.Rule, error) {
-	return p.listRulesUsingFunction(ctx, "SELECT query_rules($1)")
+	return p.listRulesUsingFunction(ctx, "SELECT query_rules($1)", true)
 }
 
 func (p *pg) ListStagedAndAppliedRules(ctx context.Context) ([]*v2.Rule, error) {
-	return p.listRulesUsingFunction(ctx, "SELECT query_staged_and_applied_rules($1)")
+	return p.listRulesUsingFunction(ctx, "SELECT query_staged_and_applied_rules($1)", true)
 }
 
-func (p *pg) listRulesUsingFunction(ctx context.Context, query string) ([]*v2.Rule, error) {
+func (p *pg) listRulesUsingFunction(ctx context.Context, query string, filterProjects bool) ([]*v2.Rule, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	projectsFilter, err := projectsListFromContext(ctx)
-	if err != nil {
-		return nil, err
+	projectsFilter := []string{}
+	if filterProjects {
+		var err error
+		projectsFilter, err = projectsListFromContext(ctx)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	var rules []*v2.Rule

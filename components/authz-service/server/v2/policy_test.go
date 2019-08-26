@@ -3114,15 +3114,14 @@ func assertRolesMatch(t *testing.T, storageRole storage.Role, apiRole api_v2.Rol
 }
 
 type testSetup struct {
-	policy         api_v2.PoliciesClient
-	authz          api_v2.AuthorizationClient
-	projects       api_v2.ProjectsClient
-	policyCache    *cache.Cache
-	roleCache      *cache.Cache
-	projectCache   *cache.Cache
-	status         storage.MigrationStatusProvider
-	switcher       *v2.VersionSwitch
-	rulesRetriever engine.ProjectRulesRetriever
+	policy       api_v2.PoliciesClient
+	authz        api_v2.AuthorizationClient
+	projects     api_v2.ProjectsClient
+	policyCache  *cache.Cache
+	roleCache    *cache.Cache
+	projectCache *cache.Cache
+	status       storage.MigrationStatusProvider
+	switcher     *v2.VersionSwitch
 }
 
 func setupV2WithWriter(t *testing.T,
@@ -3151,7 +3150,6 @@ func setupV2WithMigrationState(t *testing.T,
 	authorizer engine.V2Authorizer,
 	writer engine.V2pXWriter,
 	pl storage_v1.PoliciesLister,
-	rulesRetriever engine.ProjectRulesRetriever,
 	vChan chan api_v2.Version,
 	migration func(storage.MigrationStatusProvider) error) testSetup {
 
@@ -3163,9 +3161,6 @@ func setupV2WithMigrationState(t *testing.T,
 
 	if writer == nil {
 		writer = &testEngine{}
-	}
-	if rulesRetriever == nil {
-		rulesRetriever = &testhelpers.TestProjectRulesRetriever{}
 	}
 
 	mem_v2 := memstore_v2.New()

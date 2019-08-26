@@ -20,7 +20,6 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
-	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/memstore"
@@ -31,7 +30,6 @@ import (
 type ProjectState struct {
 	log                  logger.Logger
 	store                storage.Storage
-	engine               engine.ProjectRulesRetriever
 	ProjectUpdateManager ProjectUpdateMgr
 	policyRefresher      PolicyRefresher
 	applyRuleMux         sync.Mutex
@@ -41,7 +39,6 @@ type ProjectState struct {
 func NewMemstoreProjectsServer(
 	ctx context.Context,
 	l logger.Logger,
-	e engine.ProjectRulesRetriever,
 	projectUpdateCerealManager *cereal.Manager,
 	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
@@ -51,14 +48,13 @@ func NewMemstoreProjectsServer(
 	if err != nil {
 		return nil, err
 	}
-	return NewProjectsServer(ctx, l, s, e, projectUpdateManager, pr)
+	return NewProjectsServer(ctx, l, s, projectUpdateManager, pr)
 }
 
 // NewPostgresProjectsServer instantiates a ProjectsServer using a PG store
 func NewPostgresProjectsServer(
 	ctx context.Context,
 	l logger.Logger,
-	e engine.ProjectRulesRetriever,
 	projectUpdateCerealManager *cereal.Manager,
 	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
@@ -71,14 +67,13 @@ func NewPostgresProjectsServer(
 	if err != nil {
 		return nil, err
 	}
-	return NewProjectsServer(ctx, l, s, e, projectUpdateManager, pr)
+	return NewProjectsServer(ctx, l, s, projectUpdateManager, pr)
 }
 
 func NewProjectsServer(
 	ctx context.Context,
 	l logger.Logger,
 	s storage.Storage,
-	e engine.ProjectRulesRetriever,
 	projectUpdateManager ProjectUpdateMgr,
 	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
@@ -86,7 +81,6 @@ func NewProjectsServer(
 	return &ProjectState{
 		log:                  l,
 		store:                s,
-		engine:               e,
 		ProjectUpdateManager: projectUpdateManager,
 		policyRefresher:      pr,
 	}, nil
@@ -342,7 +336,7 @@ func (s *ProjectState) DeleteProject(ctx context.Context,
 func (s *ProjectState) ListRulesForAllProjects(ctx context.Context,
 	req *api.ListRulesForAllProjectsReq) (*api.ListRulesForAllProjectsResp, error) {
 
-	ruleMap, err := s.engine.ListProjectMappings(ctx)
+	ruleMap, err := s.store.MapAllAppliedRulesToProjects(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -351,7 +345,7 @@ func (s *ProjectState) ListRulesForAllProjects(ctx context.Context,
 	for projectID, rules := range ruleMap {
 		apiRules := make([]*api.ProjectRule, len(rules))
 		for i, rule := range rules {
-			r, err := fromStorageRule(&rule)
+			r, err := fromStorageRule(rule)
 			if err != nil {
 				return &api.ListRulesForAllProjectsResp{}, err
 			}

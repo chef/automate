@@ -369,7 +369,7 @@ func (*State) ApplyStagedRules(context.Context) error {
 	return nil
 }
 
-func (*State) FindMissingProjects(ctx context.Context, projectIDs []string) ([]string, error) {
+func (*State) MapAllAppliedRulesToProjects(ctx context.Context) (map[string][]*storage.Rule, error) {
 	// TODO
 	return nil, nil
 }

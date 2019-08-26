@@ -416,26 +416,6 @@ func (s *State) V2FilterAuthorizedProjects(
 	return s.projectsFromResults(rs)
 }
 
-// ListProjectMappings returns a map of all the rules for each projectID.
-func (s *State) ListProjectMappings(ctx context.Context) (map[string][]v2.Rule, error) {
-	items := s.ruleStore.Items()
-	// nothing stored while on v1 or v2.0
-	if len(items) == 0 {
-		return map[string][]v2.Rule{}, nil
-	}
-	projectRules := make(map[string][]v2.Rule, len(items))
-	for project, item := range items {
-		rules, ok := item.Object.([]v2.Rule)
-		if !ok {
-			return nil, errors.New("failed to convert rule list")
-		}
-
-		projectRules[project] = rules
-	}
-
-	return projectRules, nil
-}
-
 func (s *State) evalQuery(
 	ctx context.Context,
 	query ast.Body,

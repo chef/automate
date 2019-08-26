@@ -3240,6 +3240,44 @@ func TestListRules(t *testing.T) {
 		db.Flush(t)
 	}
 }
+
+func TestMapAllAppliedRulesToProjects(t *testing.T) {
+	store, db, _, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
+	defer store.Close()
+	ctx := context.Background()
+	cases := map[string]func(*testing.T){
+		"when no rules or projects exist, returns an empty map": func(t *testing.T) {
+			resp, err := store.MapAllAppliedRulesToProjects(ctx)
+			require.NoError(t, err)
+			assert.Nil(t, resp)
+			assert.Zero(t, len(resp))
+		},
+		"when projects exist without rules, returns an empty map": func(t *testing.T) {
+			insertTestProject(t, db, "project-1", "let's go jigglypuff - topsecret", storage.Custom)
+			resp, err := store.MapAllAppliedRulesToProjects(ctx)
+			require.NoError(t, err)
+			assert.Nil(t, resp)
+			assert.Zero(t, len(resp))
+		},
+		"when projects exist with staged rules only, returns an empty map": func(t *testing.T) {
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			rule3 := insertStagedRuleWithMultipleConditions(t, db, "rule-1", projID, storage.Node, false)
+			rule4 := insertStagedRuleWithMultipleConditions(t, db, "rule-2", projID, storage.Node, false)
+			resp, err := store.MapAllAppliedRulesToProjects(ctx)
+			require.NoError(t, err)
+			assert.Nil(t, resp)
+			assert.Zero(t, len(resp))
+		},
+	}
+
+	for name, test := range cases {
+		t.Run(name, test)
+		db.Flush(t)
+	}
+}
+
 func TestListStagedAndAppliedRules(t *testing.T) {
 	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)

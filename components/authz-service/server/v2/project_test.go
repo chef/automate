@@ -409,7 +409,7 @@ func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cac
 	require.NoError(t, err)
 	projectUpdateManager := testhelpers.NewMockProjectUpdateManager()
 	projectsSrv, err := v2.NewProjectsServer(
-		ctx, l, mem_v2, &testhelpers.TestProjectRulesRetriever{},
+		ctx, l, mem_v2,
 		projectUpdateManager, testhelpers.NewMockPolicyRefresher())
 	require.NoError(t, err)
 
