@@ -46,7 +46,7 @@ describe('user management', () => {
     // save new user
     cy.get('[data-cy=save-user]').click();
     cy.get('app-user-management chef-modal').should('not.be.visible');
-    cy.get('chef-notification.info').should('be.visible');
+    cy.get('chef-notification.info').contains('created a new user').should('be.visible');
 
     cy.get('app-user-table chef-td').contains(username).should('exist');
     cy.get('app-user-table chef-td').contains(name).should('exist');
@@ -56,8 +56,8 @@ describe('user management', () => {
     cy.route('GET', `**/users/${username}`).as('getUser');
     cy.route('PUT', `**/users/${username}`).as('updateUser');
 
-    const updated_name = `${name} updated`;
-    const updated_password = 'testing?';
+    const updatedName = `${name} updated`;
+    const updatedPassword = 'testing?';
 
     cy.contains(name).click();
     cy.wait('@getUser');
@@ -69,23 +69,23 @@ describe('user management', () => {
 
     cy.get('app-user-details chef-button.edit-button').click();
     cy.get('[formcontrolname=fullName]').find('input').should('not.be.disabled')
-      .focus().clear().type(updated_name);
+      .clear().type(updatedName);
 
     cy.get('app-user-details chef-button.save-button').click();
     cy.wait('@updateUser');
+    cy.get('chef-notification.info').contains('updated user').should('be.visible');
 
-    // bug: Cypress sometimes misses the first few characters of the new name due to focus issues
-    // so we test that some change was made to the name, not the exact new name
-    cy.get('app-user-details div.name-column').contains('updated').should('exist');
-
+    // use this method of inputing data into form to simulate copy-pasting
+    // to ensure we get the same value in both form inputs
     cy.get('[formcontrolname=newPassword]').find('input')
-      .focus().type(updated_password, { delay: typeDelay }).should('have.value', updated_password);
+      .invoke('val', updatedPassword).trigger('input');
     cy.get('[formcontrolname=confirmPassword]').find('input')
-      .focus().type(updated_password, { delay: typeDelay }).should('have.value', updated_password);
+      .invoke('val', updatedPassword).trigger('input');
+
     cy.get('app-user-details chef-button').contains('Update Password').click({ force: true} );
 
     // success alert displays
-    cy.get('chef-notification.info').should('be.visible');
+    cy.get('chef-notification.info').contains('updated user').should('be.visible');
   });
 
   it.skip('can delete user', () => {
