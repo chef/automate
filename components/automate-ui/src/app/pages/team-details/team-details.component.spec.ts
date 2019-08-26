@@ -182,22 +182,6 @@ describe('TeamDetailsComponent', () => {
     });
   });
 
-  it('initializes dropdown with all assignable projects, each unchecked', () => {
-    const projectOptionList = [
-      genProjectOption('a-proj'),
-      genProjectOption('b-proj'),
-      genProjectOption('c-proj'),
-      genProjectOption('d-proj')
-    ];
-    store.dispatch(new LoadOptionsSuccess({ fetched: projectOptionList, restored: [] }));
-    projectOptionList.forEach(p => {
-      expect(component.projects[p.value]).toBeTruthy();
-      expect(component.projects[p.value].checked).toEqual(false);
-    });
-    // But team's projects are still empty at this point
-    expect(component.team.projects.length).toEqual(0);
-  });
-
   it('initializes dropdown with those included on the team checked', () => {
     const teamProjects = ['b-proj', 'd-proj'];
     const team: Team = { id: targetId, guid: 'any', name: 'any', projects: teamProjects };

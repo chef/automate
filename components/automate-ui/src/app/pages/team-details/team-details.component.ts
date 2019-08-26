@@ -36,9 +36,12 @@ import {
 } from 'app/components/projects-dropdown/projects-dropdown.component';
 
 import { ProjectConstants } from 'app/entities/projects/project.model';
-import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
+import {
+  assignableProjects,
+  optionsLoadingStatus
+} from 'app/services/projects-filter/projects-filter.selectors';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
-import { IAMType } from 'app/entities/policies/policy.model';
+import { IAMType, IAMMajorVersion } from 'app/entities/policies/policy.model';
 
 const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 
@@ -135,38 +138,39 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         this.isMinorV1 = version === 'v1';
       });
 
-    this.store.select(assignableProjects)
-      .subscribe((assignable: ProjectsFilterOption[]) => {
-        // compiles a list of all available projects
+    combineLatest([
+      this.store.select(assignableProjects),
+      this.store.select(optionsLoadingStatus),
+      this.store.select(v1TeamFromRoute),
+      this.store.select(v2TeamFromRoute),
+      this.store.select(iamMajorVersion)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      map(([assignable, pStatus, v1Team, v2Team, major]:
+        [ProjectsFilterOption[], EntityStatus, Team, Team, IAMMajorVersion]) => {
+        this.isMajorV1 = major === 'v1';
+        return [assignable, pStatus, (this.isMajorV1 ? v1Team : v2Team)];
+      }),
+      filter(([_assignable, pStatus, team]:
+        [ProjectsFilterOption[], EntityStatus, Team]) =>
+        pStatus !== EntityStatus.loading && !!team
+      ),
+      map(([assignable, _pStatus, team]) => {
+        this.team = team;
+
         assignable
-          // don't override projects that were already part of the team
-          .filter(p => !this.projects[p.value])
           .forEach(({ value: id, label: name, type: stringType }) => {
             const type = <IAMType>stringType;
             // type and status are unused
-            this.projects[id] = { id, name, type, status: 'NO_RULES', checked: false };
+            this.projects[id] = {
+              id, name, type, status: 'NO_RULES', checked: this.team.projects.includes(id)
+            };
           });
-      });
-
-    this.store.select(iamMajorVersion)
-      .pipe(
-        takeUntil(this.isDestroyed),
-        filter(identity)
-        )
-      .subscribe((version) => {
-        this.isMajorV1 = version === 'v1';
-
-        // Triggered every time the team is updated.
-        if (this.isMajorV1) {
-          this.store.select(v1TeamFromRoute)
-            .pipe(filter(identity), takeUntil(this.isDestroyed))
-            .subscribe(this.getTeamDependentData.bind(this));
-        } else {
-          this.store.select(v2TeamFromRoute)
-            .pipe(filter(identity), takeUntil(this.isDestroyed))
-            .subscribe(this.getTeamDependentData.bind(this));
-        }
-      });
+        this.updateNameForm.controls.name.setValue(this.team.name);
+        this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
+        this.store.dispatch(new GetUsers());
+      }))
+      .subscribe();
 
     this.sortedUsers$ = <Observable<User[]>>combineLatest([
       this.store.select(allUsers),
@@ -223,21 +227,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
-  }
-
-  private getTeamDependentData(team: Team): void {
-    this.team = team;
-    this.team.projects.forEach(id => {
-      if (this.projects[id]) {
-        this.projects[id].checked = true;
-      } else {
-        // type and status are unused
-        this.projects[id] = { id, name, type: 'CUSTOM', status: 'NO_RULES', checked: true };
-      }
-    });
-    this.updateNameForm.controls.name.setValue(this.team.name);
-    this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
-    this.store.dispatch(new GetUsers());
   }
 
   toggleUserMembershipView(): void {
