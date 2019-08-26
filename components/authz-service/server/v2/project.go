@@ -206,17 +206,22 @@ func (s *ProjectState) ApplyRulesCancel(
 
 func (s *ProjectState) ApplyRulesStatus(
 	context.Context, *api.ApplyRulesStatusReq) (*api.ApplyRulesStatusResp, error) {
-	time, err := ptypes.TimestampProto(s.ProjectUpdateManager.EstimatedTimeComplete())
+	status, err := s.ProjectUpdateManager.Status()
+	if err != nil {
+		return nil, err
+	}
+
+	time, err := ptypes.TimestampProto(status.EstimatedTimeComplete())
 	if err != nil {
 		s.log.Errorf("Could not convert EstimatedTimeComplete to protobuf Timestamp %v", err)
 		time = &tspb.Timestamp{}
 	}
 	return &api.ApplyRulesStatusResp{
-		State:                 s.ProjectUpdateManager.State(),
-		PercentageComplete:    float32(s.ProjectUpdateManager.PercentageComplete()),
+		State:                 status.State(),
+		PercentageComplete:    float32(status.PercentageComplete()),
 		EstimatedTimeComplete: time,
-		Failed:                s.ProjectUpdateManager.Failed(),
-		FailureMessage:        s.ProjectUpdateManager.FailureMessage(),
+		Failed:                status.Failed(),
+		FailureMessage:        status.FailureMessage(),
 	}, nil
 }
 

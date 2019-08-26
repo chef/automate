@@ -3,6 +3,7 @@ package v2
 import (
 	"context"
 	"fmt"
+	"math"
 	"sync"
 	"time"
 
@@ -34,14 +35,18 @@ var ProjectUpdateDomainServices = []string{
 	"compliance",
 }
 
-type ProjectUpdateMgr interface {
-	Cancel() error
-	Start() error
+type ProjectUpdateStatus interface {
 	Failed() bool
 	FailureMessage() string
 	PercentageComplete() float64
 	EstimatedTimeComplete() time.Time
 	State() string
+}
+
+type ProjectUpdateMgr interface {
+	Cancel() error
+	Start() error
+	Status() (ProjectUpdateStatus, error)
 }
 
 func createProjectUpdateID() string {
@@ -177,6 +182,10 @@ type workflowInstance struct {
 	chain *patterns.ChainWorkflowInstance
 }
 
+func (w *workflowInstance) Failed() bool {
+	return w.FailureMessage() != ""
+}
+
 func (w *workflowInstance) FailureMessage() string {
 	if err := w.chain.Err(); err != nil {
 		return err.Error()
@@ -220,67 +229,13 @@ func (w *workflowInstance) FailureMessage() string {
 	}
 }
 
-func (w *workflowInstance) IsRunning() bool {
-	return w.chain.IsRunning()
-}
-
-func (w *workflowInstance) GetApplyStagedRulesInstance() (cereal.ImmutableWorkflowInstance, error) {
-	return w.chain.GetSubWorkflow(0)
-}
-
-func (w *workflowInstance) GetUpdateDomainServicesInstance() (*patterns.ParallelWorkflowInstance, error) {
-	instance, err := w.chain.GetSubWorkflow(1)
-	if err != nil {
-		return nil, err
-	}
-	return patterns.ToParallelWorkflowInstance(instance)
-}
-
-func (m *CerealProjectUpdateManager) getWorkflowInstance(ctx context.Context) (*workflowInstance, error) {
-	chainInstance, err := patterns.GetChainWorkflowInstance(ctx, m.manager, m.workflowName, m.instanceName)
-	if err != nil {
-		return nil, err
-	}
-	return &workflowInstance{chain: chainInstance}, nil
-}
-
-func (m *CerealProjectUpdateManager) Failed() bool {
-	ctx := context.TODO()
-	projectUpdateInstance, err := m.getWorkflowInstance(ctx)
-	if err != nil {
-		if err == cereal.ErrWorkflowInstanceNotFound {
-			return false
-		}
-		return true
-	}
-	return projectUpdateInstance.FailureMessage() != ""
-}
-
-func (m *CerealProjectUpdateManager) FailureMessage() string {
-	ctx := context.TODO()
-	projectUpdateInstance, err := m.getWorkflowInstance(ctx)
-	if err != nil {
-		if err == cereal.ErrWorkflowInstanceNotFound {
-			return ""
-		}
-		return err.Error()
-	}
-	return projectUpdateInstance.FailureMessage()
-}
-
-func (m *CerealProjectUpdateManager) PercentageComplete() float64 {
-	ctx := context.TODO()
-	projectUpdateInstance, err := m.getWorkflowInstance(ctx)
-	if err != nil {
-		return 1.0
-	}
-
-	if !projectUpdateInstance.IsRunning() {
+func (w *workflowInstance) PercentageComplete() float64 {
+	if !w.IsRunning() {
 		return 1.0
 	}
 
 	percentComplete := 0.0
-	domainServicesUpdateInstance, err := projectUpdateInstance.GetUpdateDomainServicesInstance()
+	domainServicesUpdateInstance, err := w.GetUpdateDomainServicesInstance()
 	if err == cereal.ErrWorkflowInstanceNotFound {
 		return percentComplete
 	}
@@ -308,17 +263,21 @@ func (m *CerealProjectUpdateManager) PercentageComplete() float64 {
 		}
 	}
 
-	return percentComplete
+	return math.Min(percentComplete, 1.0)
 }
 
-func (m *CerealProjectUpdateManager) EstimatedTimeComplete() time.Time {
-	instance, err := patterns.GetWorkflowInstance(context.Background(), m.manager, m.workflowName, m.instanceName)
-	if err != nil || !instance.IsRunning() {
+func (w *workflowInstance) EstimatedTimeComplete() time.Time {
+	if !w.IsRunning() {
 		return time.Now()
 	}
+	domainServicesUpdateInstance, err := w.GetUpdateDomainServicesInstance()
+	if err == cereal.ErrWorkflowInstanceNotFound {
+		return time.Now()
+	}
+
 	longestEstimatedTimeComplete := time.Time{}
-	for _, d := range m.domainServices {
-		subWorkflow, err := instance.GetSubWorkflow(d)
+	for _, d := range domainServicesUpdateInstance.ListSubWorkflows() {
+		subWorkflow, err := domainServicesUpdateInstance.GetSubWorkflow(d)
 		if err != nil {
 			logrus.WithError(err).Errorf("failed to get subworkflow for %q", d)
 			continue
@@ -339,18 +298,65 @@ func (m *CerealProjectUpdateManager) EstimatedTimeComplete() time.Time {
 	return longestEstimatedTimeComplete
 }
 
-func (m *CerealProjectUpdateManager) State() string {
-	instance, err := m.manager.GetWorkflowInstanceByName(context.Background(), m.instanceName, m.workflowName)
-	if err == cereal.ErrWorkflowInstanceNotFound {
-		return ProjectUpdateNotRunningState
-	}
-	if err != nil {
-		logrus.WithError(err).Error("failed to get workflow instance")
-		return ProjectUpdateUnknownState
-	}
-	if instance.IsRunning() {
+func (w *workflowInstance) State() string {
+	if w.IsRunning() {
 		return ProjectUpdateRunningState
 	}
-
 	return ProjectUpdateNotRunningState
+}
+
+func (w *workflowInstance) IsRunning() bool {
+	return w.chain.IsRunning()
+}
+
+func (w *workflowInstance) GetApplyStagedRulesInstance() (cereal.ImmutableWorkflowInstance, error) {
+	return w.chain.GetSubWorkflow(0)
+}
+
+func (w *workflowInstance) GetUpdateDomainServicesInstance() (*patterns.ParallelWorkflowInstance, error) {
+	instance, err := w.chain.GetSubWorkflow(1)
+	if err != nil {
+		return nil, err
+	}
+	return patterns.ToParallelWorkflowInstance(instance)
+}
+
+func (m *CerealProjectUpdateManager) getWorkflowInstance(ctx context.Context) (*workflowInstance, error) {
+	chainInstance, err := patterns.GetChainWorkflowInstance(ctx, m.manager, m.workflowName, m.instanceName)
+	if err != nil {
+		return nil, err
+	}
+	return &workflowInstance{chain: chainInstance}, nil
+}
+
+type emptyProjectUpdateStatus struct{}
+
+func (*emptyProjectUpdateStatus) Failed() bool {
+	return false
+}
+func (*emptyProjectUpdateStatus) FailureMessage() string {
+	return ""
+}
+
+func (*emptyProjectUpdateStatus) PercentageComplete() float64 {
+	return 1.0
+}
+
+func (*emptyProjectUpdateStatus) EstimatedTimeComplete() time.Time {
+	return time.Time{}
+}
+
+func (*emptyProjectUpdateStatus) State() string {
+	return ProjectUpdateNotRunningState
+}
+
+func (m *CerealProjectUpdateManager) Status() (ProjectUpdateStatus, error) {
+	projectUpdateInstance, err := m.getWorkflowInstance(context.TODO())
+	if err != nil {
+		if err == cereal.ErrWorkflowInstanceNotFound {
+			return &emptyProjectUpdateStatus{}, nil
+		}
+		return nil, err
+	}
+	return projectUpdateInstance, nil
 }
