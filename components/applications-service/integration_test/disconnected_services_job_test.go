@@ -35,7 +35,7 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 		Port: 10101,
 	}
 
-	mgr, err := server.NewJobManager(&jobCfg, certs)
+	mgr, err := server.NewJobManager(suite.ApplicationsServer, &jobCfg, certs)
 	require.NoError(t, err)
 	err = mgr.SetupScheduler()
 	require.NoError(t, err)

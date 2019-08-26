@@ -19,7 +19,8 @@ import (
 )
 
 type JobManager struct {
-	CerealSvc *cereal.Manager
+	CerealSvc          *cereal.Manager
+	ApplicationsServer *ApplicationsServer
 }
 
 type DisconnectedServicesParamsV0 struct {
@@ -34,7 +35,7 @@ const (
 	DisconnectedServicesScheduleName       = "periodic_disconnected_services"
 )
 
-func NewJobManager(jobCfg *config.Jobs, certs *certs.ServiceCerts) (*JobManager, error) {
+func NewJobManager(applicationsServer *ApplicationsServer, jobCfg *config.Jobs, certs *certs.ServiceCerts) (*JobManager, error) {
 	svcURL := fmt.Sprintf("%s:%d", jobCfg.Host, jobCfg.Port)
 
 	connFactory := secureconn.NewFactory(*certs,
@@ -50,7 +51,7 @@ func NewJobManager(jobCfg *config.Jobs, certs *certs.ServiceCerts) (*JobManager,
 		return nil, errors.Wrap(err, "failed to create cereal job manager from gRPC connection")
 	}
 
-	return &JobManager{CerealSvc: cerealSvc}, nil
+	return &JobManager{CerealSvc: cerealSvc, ApplicationsServer: applicationsServer}, nil
 }
 
 // SetupScheduler ensures all our jobs exist in the cereal service backend.
@@ -93,7 +94,11 @@ func (j *JobManager) SetupScheduler() error {
 }
 
 func (j *JobManager) Start() error {
-	err := j.CerealSvc.RegisterTaskExecutor(DisconnectedServicesJobName, &markDisconnectedServicesExecutor{}, cereal.TaskExecutorOpts{})
+	err := j.CerealSvc.RegisterTaskExecutor(
+		DisconnectedServicesJobName,
+		&markDisconnectedServicesExecutor{ApplicationsServer: j.ApplicationsServer},
+		cereal.TaskExecutorOpts{},
+	)
 	if err != nil {
 		return errors.Wrap(err, "failed to register as task exector to mark disconnected services")
 	}
@@ -153,13 +158,18 @@ func defaultDisconnectedServicesJobParams() *DisconnectedServicesParamsV0 {
 	return &DisconnectedServicesParamsV0{ThresholdSeconds: 300}
 }
 
-type markDisconnectedServicesExecutor struct{}
+type markDisconnectedServicesExecutor struct {
+	ApplicationsServer *ApplicationsServer
+}
 
 func (m *markDisconnectedServicesExecutor) Run(ctx context.Context, t cereal.Task) (interface{}, error) {
 	var params DisconnectedServicesParamsV0
 	if err := t.GetParameters(&params); err != nil {
 		return nil, errors.Wrap(err, "failed to load parameters for disconnected_services job")
 	}
-	fmt.Printf("markDisconnectedServicesExecutor Run() w/ %+v\n", params)
+	_, err := m.ApplicationsServer.MarkDisconnectedServices(int32(params.ThresholdSeconds))
+	if err != nil {
+		return nil, errors.Wrap(err, "failed periodic disconnected_services job")
+	}
 	return nil, nil
 }
