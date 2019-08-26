@@ -24,8 +24,6 @@ import {
   projectEntityReducer,
   ProjectEntityInitialState
 } from 'app/entities/projects/project.reducer';
-import { GetProjects, GetProjectsSuccess } from 'app/entities/projects/project.actions';
-import { Project } from 'app/entities/projects/project.model';
 import {
   userEntityReducer,
   UserEntityInitialState
@@ -179,7 +177,6 @@ describe('TeamDetailsComponent', () => {
       const version: IamVersionResponse = { version: { major: major, minor: 'v0' } };
       store.dispatch(new GetIamVersionSuccess(version));
 
-      expect(store.dispatch).toHaveBeenCalledWith(new GetProjects());
       expect(store.dispatch).toHaveBeenCalledWith(new GetUsers());
       expect(store.dispatch).toHaveBeenCalledWith(new GetTeamUsers({ id: targetId }));
     });
@@ -197,7 +194,7 @@ describe('TeamDetailsComponent', () => {
       expect(component.projects[p.value]).toBeTruthy();
       expect(component.projects[p.value].checked).toEqual(false);
     });
-    // But team's projects are still empty at this point!
+    // But team's projects are still empty at this point
     expect(component.team.projects.length).toEqual(0);
   });
 
@@ -218,23 +215,6 @@ describe('TeamDetailsComponent', () => {
     ];
     store.dispatch(new LoadOptionsSuccess({ fetched: projectOptionList, restored: [] }));
 
-    // That initializes the list for the team projects dropdown, all unchecked
-    expect(Object.keys(component.projects))
-      .toEqual(jasmine.arrayWithExactContents(projectOptionList.map(p => p.value)));
-    Object.keys(component.projects).forEach(id => {
-      expect(component.projects[id].checked).toEqual(false);
-    });
-
-    // Team details initiates GetProjects to fetch a hydrated list of projects
-    const projectList = [
-      genProject('a-proj'),
-      genProject('b-proj'),
-      genProject('c-proj'),
-      genProject('d-proj')
-    ];
-    store.dispatch(new GetProjectsSuccess({ projects: projectList }));
-
-    // And that is used to set checked true for any projects that the team already includes
     projectOptionList.forEach(p => {
       expect(component.projects[p.value].checked).toEqual(teamProjects.includes(p.value));
     });
@@ -341,15 +321,5 @@ describe('TeamDetailsComponent', () => {
       value: value ? value : label
     };
   }
-
-function genProject(id: string): Project {
-  return {
-    id,
-    status: 'NO_RULES', // unused
-    name: id, // unused
-    type: 'CUSTOM' // unused
-  };
-}
-
 
 });

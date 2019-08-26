@@ -30,11 +30,6 @@ import {
   RemoveTeamUsers,
   UpdateTeam
 } from 'app/entities/teams/team.actions';
-import { GetProjects } from 'app/entities/projects/project.actions';
-import {
-  projectEntities,
-  getAllStatus as getAllProjectStatus
-} from 'app/entities/projects/project.selectors';
 import {
   ProjectChecked,
   ProjectCheckedMap
@@ -76,12 +71,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
   public projects: ProjectCheckedMap = {};
-  // keep a list of projects that were in the teams list that are
-  // left to fetch so we can know if we are fully loaded or not.
-  // don't want to enable the projects-dropdown until we have
-  // checked the proper project checkboxes corresponding to projects
-  // already in the team.
-  public teamProjectsLeftToFetch: string[] = [];
 
   constructor(private store: Store<NgrxStateAtom>,
     public fb: FormBuilder,
@@ -229,19 +218,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
             }
           });
       });
-
-    // we keep a list of all projects that were left in the team
-    // to know if we are fully loaded yet or not.
-    combineLatest([
-      this.store.select(getAllProjectStatus),
-      this.store.select(projectEntities)])
-      .pipe(filter(([status, projectMap]: [EntityStatus, ProjectCheckedMap]) =>
-        status === EntityStatus.loadingSuccess && Object.keys(projectMap).length > 0),
-        map(([_, projectMap]) => {
-          this.team.projects.forEach(pID => {
-            this.projects[pID] = { ...projectMap[pID], checked: true };
-          });
-      })).subscribe();
  }
 
   ngOnDestroy(): void {
@@ -251,10 +227,17 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
   private getTeamDependentData(team: Team): void {
     this.team = team;
+    this.team.projects.forEach(id => {
+      if (this.projects[id]) {
+        this.projects[id].checked = true;
+      } else {
+        // type and status are unused
+        this.projects[id] = { id, name, type: 'CUSTOM', status: 'NO_RULES', checked: true };
+      }
+    });
     this.updateNameForm.controls.name.setValue(this.team.name);
     this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
     this.store.dispatch(new GetUsers());
-    this.store.dispatch(new GetProjects());
   }
 
   toggleUserMembershipView(): void {
@@ -316,8 +299,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   }
 
   dropdownDisabled(): boolean {
-    return Object.values(this.projects).length === 0 ||
-      this.teamProjectsLeftToFetch.length !== 0 ||
-      this.saving;
+    return Object.values(this.projects).length === 0 || this.saving;
   }
 }
