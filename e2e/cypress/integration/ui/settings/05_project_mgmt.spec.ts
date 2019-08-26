@@ -176,7 +176,7 @@ describeIAMV2P1('project management', () => {
     cy.get('[data-cy=details-tab]').click();
     cy.wait('@getProject');
 
-    cy.get('#update-name').find('input').focus().clear()
+    cy.get('[data-cy=update-project-name]').focus().clear()
       .type(updatedProjectName, { delay: typeDelay })
       .should('have.value', updatedProjectName);
     cy.get('app-project-details chef-button').contains('Save').click();
@@ -204,8 +204,7 @@ describeIAMV2P1('project management', () => {
 
     cy.get('app-project-list chef-td').contains(projectID).parent()
       .find('chef-control-menu').as('controlMenu');
-    cy.get('@controlMenu').should('be.visible')
-      .click();
+    cy.get('@controlMenu').click({ force: true });
     cy.get('@controlMenu').find('[data-cy=delete-project]').click({ force: true });
 
     cy.get('app-project-list chef-button').contains('Delete Project').click();

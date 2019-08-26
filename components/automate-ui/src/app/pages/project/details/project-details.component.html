@@ -32,7 +32,8 @@
             <span class="label">Name <span aria-hidden="true">*</span></span>
             <input chefInput formControlName="name" type="text" [resetOrigin]="saveSuccessful"
               [attr.disabled]="(isChefManaged || isLoading) ? true : null"
-              autocomplete="off">
+              autocomplete="off"
+              data-cy="update-project-name">
           </label>
           <chef-error
             *ngIf="(projectForm.get('name').hasError('required') || projectForm.get('name').hasError('pattern')) && projectForm.get('name').dirty">
