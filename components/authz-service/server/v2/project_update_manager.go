@@ -329,24 +329,24 @@ func (m *CerealProjectUpdateManager) getWorkflowInstance(ctx context.Context) (*
 	return &workflowInstance{chain: chainInstance}, nil
 }
 
-type emptyProjectUpdateStatus struct{}
+type EmptyProjectUpdateStatus struct{}
 
-func (*emptyProjectUpdateStatus) Failed() bool {
+func (*EmptyProjectUpdateStatus) Failed() bool {
 	return false
 }
-func (*emptyProjectUpdateStatus) FailureMessage() string {
+func (*EmptyProjectUpdateStatus) FailureMessage() string {
 	return ""
 }
 
-func (*emptyProjectUpdateStatus) PercentageComplete() float64 {
+func (*EmptyProjectUpdateStatus) PercentageComplete() float64 {
 	return 1.0
 }
 
-func (*emptyProjectUpdateStatus) EstimatedTimeComplete() time.Time {
+func (*EmptyProjectUpdateStatus) EstimatedTimeComplete() time.Time {
 	return time.Time{}
 }
 
-func (*emptyProjectUpdateStatus) State() string {
+func (*EmptyProjectUpdateStatus) State() string {
 	return ProjectUpdateNotRunningState
 }
 
@@ -354,7 +354,7 @@ func (m *CerealProjectUpdateManager) Status() (ProjectUpdateStatus, error) {
 	projectUpdateInstance, err := m.getWorkflowInstance(context.TODO())
 	if err != nil {
 		if err == cereal.ErrWorkflowInstanceNotFound {
-			return &emptyProjectUpdateStatus{}, nil
+			return &EmptyProjectUpdateStatus{}, nil
 		}
 		return nil, err
 	}
