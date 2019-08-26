@@ -22,10 +22,15 @@ describe('user management', () => {
   const password = 'testing!';
 
   it('can create a user', () => {
+    cy.route('POST', '**/users').as('createUser');
     cy.get('app-user-table').should('exist');
 
     // open modal
-    cy.get('app-user-table chef-button').contains('Create User').should('be.visible').click();
+    cy.get('app-user-table chef-button').contains('Create User').as('createUserBtn')
+      // this line retries until the element is detected as visible by Cypress
+      // ref: https://github.com/cypress-io/cypress/issues/695
+      .invoke('width').should('be.greaterThan', 0)
+    cy.get('@createUserBtn').click();
     cy.get('app-user-management chef-modal').should('exist');
 
     // we increase the default delay to mimic the average human's typing speed
@@ -46,8 +51,10 @@ describe('user management', () => {
     // save new user
     cy.get('[data-cy=save-user]').click();
     cy.get('app-user-management chef-modal').should('not.be.visible');
-    cy.get('chef-notification.info').contains('created a new user').should('be.visible');
+    cy.wait('@createUser');
 
+    cy.get('chef-notification.info').contains('created a new user')
+      .invoke('width').should('be.greaterThan', 0);
     cy.get('app-user-table chef-td').contains(username).should('exist');
     cy.get('app-user-table chef-td').contains(name).should('exist');
   });
@@ -74,7 +81,8 @@ describe('user management', () => {
 
     cy.get('app-user-details chef-button.save-button').click();
     cy.wait('@updateUser');
-    cy.get('chef-notification.info').contains('updated user').should('be.visible');
+    cy.get('chef-notification.info').contains('updated user')
+      .invoke('width').should('be.greaterThan', 0);
 
     // use this method of inputing data into form to simulate copy-pasting
     // to ensure we get the same value in both form inputs
@@ -84,9 +92,10 @@ describe('user management', () => {
       .invoke('val', updatedPassword).trigger('input');
 
     cy.get('app-user-details chef-button').contains('Update Password').click({ force: true} );
+    cy.wait('@updateUser');
 
-    // success alert displays
-    cy.get('chef-notification.info').contains('updated user').should('be.visible');
+    cy.get('chef-notification.info').contains('updated user')
+      .invoke('width').should('be.greaterThan', 0);
   });
 
   it.skip('can delete user', () => {
@@ -98,10 +107,10 @@ describe('user management', () => {
     cy.wait('@getUsers');
 
     cy.get('app-user-table chef-td').contains(username).parent()
-        .find('chef-control-menu').as('controlMenu');
-    // we throw in a should so cypress waits until introspection allows menu to be shown
-    cy.get('@controlMenu').should('be.visible')
-      .click();
+        .find('chef-control-menu').as('controlMenu')
+        // we throw in a should so cypress waits until introspection allows menu to be shown
+        .invoke('width').should('be.greaterThan', 0);
+    cy.get('@controlMenu').click();
     cy.get('@controlMenu').find('[data-cy=delete]').click({ force: true });
 
     // confirm in modal
