@@ -71,14 +71,14 @@ describe('SearchBarComponent', () => {
       });
 
       component.searchBarFilters = [
-        {text: 'cookbook', type: 'entity_type'},
-        {text: 'scan_job', type: 'entity_type'}
+        {text: 'cookbook', type: 'event-type'},
+        {text: 'scan_job', type: 'event-type'}
       ];
 
       component.getGroupedEvents(event);
 
       expect(mockEventFeedService.lastRequestedGetEventFeedFilters.searchBar).toEqual(
-        [{text: 'node', type: 'entity_type'}]);
+        [{text: 'node', type: 'event-type'}]);
       expect(mockEventFeedService.lastRequestedGetEventFeedFilters.collapse).toEqual(false);
       expect(mockEventFeedService.lastRequestedGetEventFeedFilters.task).toEqual(event.task);
       expect(mockEventFeedService.lastRequestedGetEventFeedFilters.requestorName).toEqual(
@@ -113,7 +113,7 @@ describe('SearchBarComponent', () => {
       component.getGroupedEvents(event);
 
       expect(mockEventFeedService.lastRequestedGetEventFeedFilters.searchBar).toEqual(
-        [{text: 'node', type: 'entity_type'}]);
+        [{text: 'node', type: 'event-type'}]);
     });
 
     it('with Chef server and org search bar filters', () => {
@@ -144,7 +144,7 @@ describe('SearchBarComponent', () => {
       expect(searchbar.length).toEqual(3);
       expect(searchbar).toContain({ type: 'organization', text: 'demo'});
       expect(searchbar).toContain({ type: 'chef_server', text: 'chef.example.com'});
-      expect(searchbar).toContain({text: 'node', type: 'entity_type'});
+      expect(searchbar).toContain({text: 'node', type: 'event-type'});
     });
   });
 

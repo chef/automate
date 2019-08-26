@@ -228,7 +228,7 @@ func TestEventFeedFilterEventType(t *testing.T) {
 		totalEntries = 12
 		pageSize     = int32(totalEntries)
 		entries      = []*util.FeedEntry{}
-		eventTypes   = []string{"profiles", "scanjob"}
+		eventTypes   = []string{"profile", "scanjobs"}
 	)
 
 	for i := 0; i < totalEntries; i++ {
@@ -323,6 +323,22 @@ func TestEventFeedFilterEventType(t *testing.T) {
 				Size:    pageSize,
 			},
 			expected: expectedEntries[6:12],
+		},
+		{
+			description: "filter requestor name of 'fred'",
+			request: event_feed.FeedRequest{
+				Filters: []string{"requestor_name:Fred"},
+				Size:    pageSize,
+			},
+			expected: expectedEntries[6:12],
+		},
+		{
+			description: "filter requestor name of 'Violet'",
+			request: event_feed.FeedRequest{
+				Filters: []string{"requestor_name:Violet"},
+				Size:    pageSize,
+			},
+			expected: expectedEntries[0:6],
 		},
 	}
 
