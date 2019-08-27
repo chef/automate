@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"sync/atomic"
 	"time"
 
 	"github.com/chef/automate/components/applications-service/pkg/config"
@@ -129,14 +130,48 @@ func (j *JobScheduler) DisableDisconnectedServicesJob(ctx context.Context) error
 
 }
 
+// RunAllJobsConstantly sets all the jobs to run every 1 second. Intended for
+// use in testing scenarios.
+func (j *JobScheduler) RunAllJobsConstantly(ctx context.Context) error {
+	r, err := rrule.NewRRule(rrule.ROption{
+		Freq:     rrule.SECONDLY,
+		Interval: 1,
+		Dtstart:  time.Now(),
+	})
+	if err != nil {
+		return errors.Wrap(err, "could not construct new recurrence rule")
+	}
+
+	err = j.CerealSvc.UpdateWorkflowScheduleByName(
+		ctx,
+		DisconnectedServicesScheduleName, DisconnectedServicesJobName,
+		cereal.UpdateRecurrence(r))
+	if err != nil {
+		return errors.Wrap(err, "failed to update recurrence of disconnected_services schedule")
+	}
+	return nil
+}
+
 func defaultDisconnectedServicesJobParams() *DisconnectedServicesParamsV0 {
 	return &DisconnectedServicesParamsV0{ThresholdSeconds: 300}
 }
 
-func StartJobRunners(applicationsServer *ApplicationsServer, cerealSvc *cereal.Manager) error {
+type JobRunnerSet struct {
+	MarkDisconnectedServicesExecutor *MarkDisconnectedServicesExecutor
+}
+
+func NewJobRunnerSet(applicationsServer *ApplicationsServer) *JobRunnerSet {
+	return &JobRunnerSet{
+		MarkDisconnectedServicesExecutor: &MarkDisconnectedServicesExecutor{
+			ApplicationsServer: applicationsServer,
+		},
+	}
+}
+
+func (j *JobRunnerSet) Start(cerealSvc *cereal.Manager) error {
 	err := cerealSvc.RegisterTaskExecutor(
 		DisconnectedServicesJobName,
-		&markDisconnectedServicesExecutor{ApplicationsServer: applicationsServer},
+		j.MarkDisconnectedServicesExecutor,
 		cereal.TaskExecutorOpts{},
 	)
 	if err != nil {
@@ -160,18 +195,36 @@ func StartJobRunners(applicationsServer *ApplicationsServer, cerealSvc *cereal.M
 	return nil
 }
 
-type markDisconnectedServicesExecutor struct {
-	ApplicationsServer *ApplicationsServer
+type MarkDisconnectedServicesExecutor struct {
+	ApplicationsServer  *ApplicationsServer
+	totalRuns           int64
+	totalRunsFailed     int64
+	totalRunsSuccessful int64
 }
 
-func (m *markDisconnectedServicesExecutor) Run(ctx context.Context, t cereal.Task) (interface{}, error) {
+func (m *MarkDisconnectedServicesExecutor) Run(ctx context.Context, t cereal.Task) (interface{}, error) {
+	err := m.run(t)
+	atomic.AddInt64(&m.totalRuns, 1)
+	if err != nil {
+		atomic.AddInt64(&m.totalRunsFailed, 1)
+	} else {
+		atomic.AddInt64(&m.totalRunsSuccessful, 1)
+	}
+	return nil, err
+}
+
+func (m *MarkDisconnectedServicesExecutor) run(t cereal.Task) error {
 	var params DisconnectedServicesParamsV0
 	if err := t.GetParameters(&params); err != nil {
-		return nil, errors.Wrap(err, "failed to load parameters for disconnected_services job")
+		return errors.Wrap(err, "failed to load parameters for disconnected_services job")
 	}
 	_, err := m.ApplicationsServer.MarkDisconnectedServices(int32(params.ThresholdSeconds))
 	if err != nil {
-		return nil, errors.Wrap(err, "failed periodic disconnected_services job")
+		return errors.Wrap(err, "failed periodic disconnected_services job")
 	}
-	return nil, nil
+	return nil
+}
+
+func (m *MarkDisconnectedServicesExecutor) TotalRuns() int64 {
+	return atomic.LoadInt64(&m.totalRuns)
 }

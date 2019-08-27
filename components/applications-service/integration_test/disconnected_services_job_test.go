@@ -6,9 +6,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/components/applications-service/pkg/config"
 	"github.com/chef/automate/components/applications-service/pkg/server"
 	certs "github.com/chef/automate/lib/tls/certs"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -92,9 +94,48 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 	})
 
 	t.Run("running the job runner makes the jobs run", func(t *testing.T) {
-		// TODO:
-		// * update the schedule so it runs every second
+		err := scheduler.RunAllJobsConstantly(ctx)
+		require.NoError(t, err)
+
 		// * have a way to track number of job runs (prometheus (?))
+		defer suite.DeleteDataFromStorage()
+
+		event := NewHabitatEvent(
+			withSupervisorId("abcd"),
+			withServiceGroup("postgres.default"),
+			withPackageIdent("core/postgres/0.1.0/20190101121212"),
+			withStrategyAtOnce("testchannel"),
+			withFqdn("mytest.example.com"),
+			withSite("testsite"),
+		)
+
+		// Patch event timestamp to mock an old service message and mack it as disconnected
+		event.EventMetadata.OccurredAt, err = ptypes.TimestampProto(time.Now().Add(-time.Minute * 10))
+		require.NoError(t, err)
+		suite.IngestService(event)
+
+		runners := server.NewJobRunnerSet(suite.ApplicationsServer)
+		err = runners.Start(jobsMgr)
+		require.NoError(t, err)
+
+		runsThusFar := runners.MarkDisconnectedServicesExecutor.TotalRuns()
+		detectedJobRun := false
+		for i := 0; i <= 100; i++ {
+			if runners.MarkDisconnectedServicesExecutor.TotalRuns() > runsThusFar {
+				detectedJobRun = true
+				break
+			}
+			time.Sleep(50 * time.Millisecond)
+		}
+		if !detectedJobRun {
+			assert.Fail(t, "disconnected_services runner didn't run in the alloted time")
+		}
+
+		request := &applications.DisconnectedServicesReq{ThresholdSeconds: 180}
+		response, err := suite.ApplicationsServer.GetDisconnectedServices(ctx, request)
+		require.NoError(t, err)
+		assert.Equal(t, 1, len(response.GetServices()))
+		assert.True(t, response.GetServices()[0].Disconnected)
 	})
 
 }
