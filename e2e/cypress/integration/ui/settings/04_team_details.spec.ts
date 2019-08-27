@@ -142,7 +142,8 @@ describe('team details', () => {
         cy.applyProjectsFilter([unassigned]);
       });
 
-      it('cannot access projects dropdown but changing name allows team update submission', () => {
+      // TODO this test has proven flaky, further investigation needed
+      it.skip('cannot access projects dropdown but can still update name', () => {
         cy.get('[data-cy=team-details-tab-details]').click();
 
         // initial state of page
