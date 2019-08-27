@@ -103,6 +103,7 @@ func (m *DomainProjectUpdateWorkflowExecutor) OnTaskComplete(
 				"Failed to deserialize %s result", m.startProjectTagUpdaterTaskName)
 			return w.Fail(err)
 		}
+		payload.JobIDs = result.JobIDs
 		if err := w.EnqueueTask(
 			m.projectTagUpdaterStatusTaskName,
 			StatusParameters{result.JobIDs}, cereal.StartAfter(m.nextCheck())); err != nil {

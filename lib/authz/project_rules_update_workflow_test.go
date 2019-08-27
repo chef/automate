@@ -120,6 +120,10 @@ func TestWorkflowOnTaskComplete(t *testing.T) {
 				statusParams := StatusParameters{}
 				tasks.Tasks[0].GetParameters(&statusParams)
 				require.Equal(t, jobIDs, statusParams.JobIDs)
+
+				payload := DomainProjectUpdateWorkflowPayload{}
+				continuing.GetPayload(&payload)
+				require.Equal(t, jobIDs, payload.JobIDs)
 			})
 		})
 	})
@@ -271,7 +275,8 @@ func TestWorkflowOnTaskComplete(t *testing.T) {
 				MergedJobStatus: JobStatus{
 					PercentageComplete: 0.5,
 				},
-				JobIDs: jobIDs,
+				JobIDs:   jobIDs,
+				Canceled: true,
 			}
 			instance := cerealtest.
 				NewWorkflowInstance(t, "instanceName").
@@ -324,6 +329,7 @@ func TestWorkflowOnCancel(t *testing.T) {
 
 		payload := DomainProjectUpdateWorkflowPayload{}
 		continuing.GetPayload(&payload)
+		require.True(t, payload.Canceled)
 		require.Equal(t, projectUpdateID, payload.ProjectUpdateID)
 		require.Equal(t, 1, payload.ConsecutiveJobCheckFailures)
 		require.False(t, payload.MergedJobStatus.Completed)
