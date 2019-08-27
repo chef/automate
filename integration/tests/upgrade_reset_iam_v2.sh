@@ -58,7 +58,7 @@ do_test_deploy() {
     fi
 
     log_info "v2 -> v2 (expect failure)"
-    expect_iam_upgrade_output "You are already using IAM v2." \
+    expect_iam_upgrade_output "You are already on IAM version v2." \
         "$(chef-automate iam upgrade-to-v2 2>&1)" || return 1
 
     log_info "v2 -> v2.1"
@@ -82,6 +82,10 @@ do_test_deploy() {
     log_info "v2 -> v1"
     chef-automate iam reset-to-v1 || return 1
     expect_iam_version "IAM v1.0" || return 1
+
+    log_info "v1 -> v1 (expect failure)"
+    expect_iam_upgrade_output "You are already on IAM version v1." \
+        "$(chef-automate iam reset-to-v1 2>&1)" || return 1
 
     do_test_deploy_default
 }
