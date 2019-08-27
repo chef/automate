@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"sort"
 	"strings"
 	"sync"
@@ -32,6 +33,7 @@ var (
 
 const (
 	defaultTaskPollInterval     = 10 * time.Second
+	defaultTaskPollMaxJitter    = 1 * time.Second
 	defaultWorkflowPollInterval = 10 * time.Second
 )
 
@@ -455,6 +457,7 @@ type Manager struct {
 	workflowWakeupChan   chan struct{}
 	taskPollInterval     time.Duration
 	workflowPollInterval time.Duration
+	taskPollMaxJitter    time.Duration
 
 	onWorkflowCompleteCallback OnWorkflowCompleteCallback
 }
@@ -462,9 +465,9 @@ type Manager struct {
 // ManagerOpt is an option that can be passed to NewManager.
 type ManagerOpt func(*Manager)
 
-// WithTaskPollInterval sets the polling interval for all
-// TaskExecutor workers. Each worker will poll the database every
-// interval for new jobs.
+// WithTaskPollInterval sets the polling interval for all TaskExecutor
+// workers. Each worker will poll the database at least every interval
+// for new jobs.
 func WithTaskPollInterval(interval time.Duration) ManagerOpt {
 	return func(m *Manager) { m.taskPollInterval = interval }
 }
@@ -474,6 +477,13 @@ func WithTaskPollInterval(interval time.Duration) ManagerOpt {
 // interval to check for new workflow events.
 func WithWorkflowPollInterval(interval time.Duration) ManagerOpt {
 	return func(m *Manager) { m.workflowPollInterval = interval }
+}
+
+// WithTaskPollIntervalMaxJitter is the maximum amount of time before
+// the configured interval that we can wake up to prevent TaskPollers
+// from always waking up at the same time.
+func WithTaskPollIntervalMaxJitter(jitter time.Duration) ManagerOpt {
+	return func(m *Manager) { m.taskPollMaxJitter = jitter }
 }
 
 // WithOnWorkflowCompleteCallback sets a OnWOrkflowComplete callback
@@ -501,6 +511,7 @@ func NewManager(b backend.Driver, opts ...ManagerOpt) (*Manager, error) {
 
 		workflowPollInterval: defaultWorkflowPollInterval,
 		taskPollInterval:     defaultTaskPollInterval,
+		taskPollMaxJitter:    defaultTaskPollMaxJitter,
 		workflowWakeupChan:   workflowWakeupChan,
 	}
 
@@ -613,13 +624,48 @@ func (r *registeredExecutor) WakeupPoller() {
 	}
 }
 
+// A pollIntervalProvider provides repeated time.Durations that can be
+// used by wait/retry loops.
+type pollIntervalProvider interface {
+	Next() time.Duration
+	String() string
+}
+
+// A jitterDownIntervalProvider is a pollIntervalProvider that will
+// return an interval no larger than the base and no smaller than
+// base-jitter.
+type jitterDownIntervalProvider struct {
+	base      time.Duration
+	maxJitter time.Duration
+}
+
+func newJitterDownIntervalProvider(base time.Duration, maxJitter time.Duration) *jitterDownIntervalProvider {
+	return &jitterDownIntervalProvider{
+		base:      base,
+		maxJitter: maxJitter,
+	}
+}
+
+func (j *jitterDownIntervalProvider) Next() time.Duration {
+	jitter := time.Duration(float64(j.maxJitter.Nanoseconds()) * rand.Float64())
+	return j.base - jitter
+}
+
+func (j *jitterDownIntervalProvider) String() string {
+	return fmt.Sprintf("%s with up to %s of jitter", j.base, j.maxJitter)
+}
+
 // StartPoller runs until the given context is cancelled, starting a
 // TaskWorker every interval (or sooner if we've been notified of a
 // change).
-func (r *registeredExecutor) StartPoller(ctx context.Context, b backend.Driver, taskPollInterval time.Duration, workflowWakeupFun func()) {
-	logctx := logrus.WithField("task_name", r.name)
+func (r *registeredExecutor) StartPoller(ctx context.Context, b backend.Driver, p pollIntervalProvider, workflowWakeupFun func()) {
+	logctx := logrus.WithFields(logrus.Fields{
+		"task_name":     r.name,
+		"poll_interval": p.String(),
+	})
 	logctx.Info("Starting task poller")
-	timer := time.NewTimer(taskPollInterval)
+
+	timer := time.NewTimer(p.Next())
 	for {
 		select {
 		case <-ctx.Done():
@@ -636,7 +682,7 @@ func (r *registeredExecutor) StartPoller(ctx context.Context, b backend.Driver, 
 			break
 		}
 		r.startTaskWorker(ctx, b, workflowWakeupFun)
-		timer.Reset(taskPollInterval)
+		timer.Reset(p.Next())
 	}
 }
 
@@ -930,11 +976,12 @@ func (m *Manager) wakeupTaskPollersByRequests(taskRequests []enqueueTaskRequest)
 }
 
 func (m *Manager) startTaskPollers(ctx context.Context) error {
+	p := newJitterDownIntervalProvider(m.taskPollInterval, m.taskPollMaxJitter)
 	for _, exec := range m.taskExecutors {
 		e := exec
 		m.wg.Add(1)
 		go func() {
-			e.StartPoller(ctx, m.backend, m.taskPollInterval, m.WakeupWorkflowExecutor)
+			e.StartPoller(ctx, m.backend, p, m.WakeupWorkflowExecutor)
 			m.wg.Done()
 		}()
 	}
