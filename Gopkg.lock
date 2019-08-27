@@ -846,7 +846,7 @@
   version = "v6.2.16"
 
 [[projects]]
-  digest = "1:a38c620f603c18e14880033868a91d06959bfea83ad7dac61fec04da81811dbf"
+  digest = "1:2c92a3d315c2605f6cb16ccb05aa14fdf9b375d678badb653cd2e8c54c36d40e"
   name = "github.com/open-policy-agent/opa"
   packages = [
     "ast",
@@ -855,6 +855,7 @@
     "internal/ir",
     "internal/leb128",
     "internal/planner",
+    "internal/version",
     "internal/wasm/constant",
     "internal/wasm/encoding",
     "internal/wasm/instruction",
@@ -868,11 +869,18 @@
     "topdown",
     "topdown/builtins",
     "topdown/copypropagation",
+    "topdown/internal/jwx/buffer",
+    "topdown/internal/jwx/jwa",
+    "topdown/internal/jwx/jwk",
+    "topdown/internal/jwx/jws",
+    "topdown/internal/jwx/jws/sign",
+    "topdown/internal/jwx/jws/verify",
     "types",
     "util",
+    "version",
   ]
   pruneopts = "NUT"
-  revision = "7864d60dd78d748dbce54b569e939f5b0dc07486"
+  revision = "0d70daa545f5a4bf2e6edf3c1b2d635920299bc9"
 
 [[projects]]
   digest = "1:7da29c22bcc5c2ffb308324377dc00b5084650348c2799e573ed226d8cc9faf0"
