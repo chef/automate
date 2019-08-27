@@ -713,18 +713,85 @@ To configure your Chef Automate installation's load balancer, create a TOML file
 
 #### Data Retention
 
-The bulk of Chef Automate's data is stored by the ingest service and the compliance service.
-To configure how long these services store data, create a TOML file that contains the partial configuration below.
-Uncomment and change settings as needed, then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
+The bulk of Chef Automate's data is stored by the ingest, event-feed and compliance services.
+Each service has one or more configurable retention policies that can be individually
+modified using the service's gRPC Purge interface.
 
-```toml
-[ingest.v1.sys.service]
-# purge_converge_history_after_days = 30
-# purge_actions_after_days = 30
+To configure each service's purge policies run the following commands with the
+configuration request tailored to your specific needs. The `recurrence` field can be set
+to any valid recurrence rule [as defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt).
+Any omitted fields will not be updated or overwritten.
 
-[compliance.v1.sys.retention]
-# compliance_report_days = 60
+```bash
+chef-automate dev grpcurl compliance-service -- chef.automate.infra.data_lifecycle.api.Purge.Configure -d '{
+  "enabled":true,
+  "recurrence":"FREQ=DAILY;DTSTART=20190820T221315Z;INTERVAL=1",
+  "policy_update": {
+    "es": [
+      {
+        "disabled": false,
+        "policy_name":"compliance-scans",
+        "older_than_days":"60"
+      },
+      {
+        "disabled": false,
+        "policy_name":"compliance-reports",
+        "older_than_days":"60"
+      }
+    ]
+  }
+}'
+
+chef-automate dev grpcurl ingest-service -- chef.automate.infra.data_lifecycle.api.Purge.Configure -d '{
+  "enabled":true,
+  "recurrence":"FREQ=DAILY;DTSTART=20190820T221315Z;INTERVAL=1",
+  "policy_update": {
+    "es": [
+      {
+        "disabled": false,
+        "policy_name":"converge-history",
+        "older_than_days":"30",
+      },
+      {
+        "disabled": false,
+        "policy_name":"actions",
+        "older_than_days":"30",
+      }
+    ]
+  }
+}'
+
+chef-automate dev grpcurl event-feed-service -- chef.automate.infra.data_lifecycle.api.Purge.Configure -d '{
+  "enabled":true,
+  "recurrence":"FREQ=DAILY;DTSTART=20190820T221315Z;INTERVAL=1",
+  "policy_update": {
+    "es": [
+      {
+        "disabled": false,
+        "policy_name":"feed",
+        "older_than_days":"7",
+      }
+    ]
+  }
+}'
+
 ```
+
+To see existing settings run
+```bash
+chef-automate dev grpcurl event-feed-service -- chef.automate.infra.data_lifecycle.api.Purge.Show
+```
+
+Substitute `event-feed-service` with `ingest-service` or `compliance-service`
+to see each services purge policies.
+
+To immediately run a purge for a service run
+```bash
+chef-automate dev grpcurl event-feed-service -- chef.automate.infra.data_lifecycle.api.Purge.Run
+```
+
+Substitute `event-feed-service` with `ingest-service` or `compliance-service`
+to run each services purge policies.
 
 ### Troubleshooting
 
