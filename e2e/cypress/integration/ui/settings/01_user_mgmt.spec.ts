@@ -52,7 +52,7 @@ describe('user management', () => {
     cy.get('app-user-table chef-td').contains(name).should('exist');
   });
 
-  it('can view and edit user details', () => {
+  it.skip('can view and edit user details', () => {
     cy.route('GET', `**/users/${username}`).as('getUser');
     cy.route('PUT', `**/users/${username}`).as('updateUser');
 
@@ -88,7 +88,7 @@ describe('user management', () => {
     cy.get('chef-notification.info').should('be.visible');
   });
 
-  it('can delete user', () => {
+  it.skip('can delete user', () => {
     cy.route('GET', '**/users').as('getUsers');
     cy.route('DELETE', `**/users/${username}`).as('deleteUser');
 
