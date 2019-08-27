@@ -33,6 +33,7 @@ const (
 
 	ProjectUpdateStageApplyStagedRules     ProjectUpdateStage = "apply_staged_rules"
 	ProjectUpdateStageUpdateDomainServices                    = "update_domain_services"
+	ProjectUpdateStageUpdateDone                              = "done"
 	ProjectUpdateStageUpdateNone                              = "none"
 )
 
@@ -317,6 +318,9 @@ func (w *workflowInstance) IsRunning() bool {
 }
 
 func (w *workflowInstance) Stage() ProjectUpdateStage {
+	if !w.IsRunning() {
+		return ProjectUpdateStageUpdateDone
+	}
 	if _, err := w.GetUpdateDomainServicesInstance(); err != nil {
 		return ProjectUpdateStageApplyStagedRules
 	}

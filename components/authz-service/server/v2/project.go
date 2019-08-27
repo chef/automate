@@ -213,7 +213,7 @@ func (s *ProjectState) waitForApplyStagedRules(ctx context.Context, maxWaitTime 
 		} else {
 			stage := st.Stage()
 			switch stage {
-			case ProjectUpdateStageUpdateDomainServices:
+			case ProjectUpdateStageUpdateDomainServices, ProjectUpdateStageUpdateDone:
 				logctx.Info("Done waiting for ApplyStagedRules")
 				return nil
 			case ProjectUpdateStageApplyStagedRules:
