@@ -24,7 +24,6 @@ import (
 	"github.com/chef/automate/components/authz-service/prng"
 	grpc_server "github.com/chef/automate/components/authz-service/server"
 	server "github.com/chef/automate/components/authz-service/server/v2"
-	v2 "github.com/chef/automate/components/authz-service/server/v2"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	postgres_v1 "github.com/chef/automate/components/authz-service/storage/v1/postgres"
@@ -394,6 +393,6 @@ func (*mockProjectUpdateManager) Start() error {
 	return nil
 }
 
-func (*mockProjectUpdateManager) Status() (v2.ProjectUpdateStatus, error) {
-	return &v2.EmptyProjectUpdateStatus{}, nil
+func (*mockProjectUpdateManager) Status() (server.ProjectUpdateStatus, error) {
+	return &server.EmptyProjectUpdateStatus{}, nil
 }

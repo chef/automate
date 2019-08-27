@@ -21,20 +21,20 @@ import (
 )
 
 type ProjectUpdateStage string
+type ProjectUpdateState string
 
 const (
-	ProjectUpdateRunningState    = "running"
-	ProjectUpdateNotRunningState = "not_running"
-	ProjectUpdateUnknownState    = "unknown"
+	ProjectUpdateRunningState    ProjectUpdateState = "running"
+	ProjectUpdateNotRunningState ProjectUpdateState = "not_running"
 
 	ProjectUpdateWorkflowName = "ProjectUpdate"
 	ProjectUpdateInstanceName = "SingletonV1"
 	ApplyStagedRulesTaskName  = "authz/ApplyStagedRules"
 
 	ProjectUpdateStageApplyStagedRules     ProjectUpdateStage = "apply_staged_rules"
-	ProjectUpdateStageUpdateDomainServices                    = "update_domain_services"
-	ProjectUpdateStageUpdateDone                              = "done"
-	ProjectUpdateStageUpdateNone                              = "none"
+	ProjectUpdateStageUpdateDomainServices ProjectUpdateStage = "update_domain_services"
+	ProjectUpdateStageUpdateDone           ProjectUpdateStage = "done"
+	ProjectUpdateStageUpdateNone           ProjectUpdateStage = "none"
 )
 
 var ProjectUpdateDomainServices = []string{
@@ -47,7 +47,7 @@ type ProjectUpdateStatus interface {
 	FailureMessage() string
 	PercentageComplete() float64
 	EstimatedTimeComplete() time.Time
-	State() string
+	State() ProjectUpdateState
 	Stage() ProjectUpdateStage
 }
 
@@ -306,7 +306,7 @@ func (w *workflowInstance) EstimatedTimeComplete() time.Time {
 	return longestEstimatedTimeComplete
 }
 
-func (w *workflowInstance) State() string {
+func (w *workflowInstance) State() ProjectUpdateState {
 	if w.IsRunning() {
 		return ProjectUpdateRunningState
 	}
@@ -364,7 +364,7 @@ func (*EmptyProjectUpdateStatus) EstimatedTimeComplete() time.Time {
 	return time.Time{}
 }
 
-func (*EmptyProjectUpdateStatus) State() string {
+func (*EmptyProjectUpdateStatus) State() ProjectUpdateState {
 	return ProjectUpdateNotRunningState
 }
 

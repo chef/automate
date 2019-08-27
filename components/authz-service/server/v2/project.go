@@ -232,7 +232,7 @@ func (s *ProjectState) waitForApplyStagedRules(ctx context.Context, maxWaitTime 
 		select {
 		case <-ctx.Done():
 			logctx.Error("Timed out waiting for ApplyStagedRules")
-			return status.Errorf(codes.DeadlineExceeded, "Timed out waiting for ApplyStagedRules")
+			return status.Error(codes.DeadlineExceeded, "Timed out waiting for ApplyStagedRules")
 		case <-time.After(sleepTime):
 		}
 		tries++
@@ -262,7 +262,7 @@ func (s *ProjectState) ApplyRulesStatus(
 		time = &tspb.Timestamp{}
 	}
 	return &api.ApplyRulesStatusResp{
-		State:                 status.State(),
+		State:                 string(status.State()),
 		PercentageComplete:    float32(status.PercentageComplete()),
 		EstimatedTimeComplete: time,
 		Failed:                status.Failed(),
