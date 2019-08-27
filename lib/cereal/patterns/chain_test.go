@@ -1259,6 +1259,7 @@ func TestChainMultipleOnCancel(t *testing.T) {
 
 		require.True(t, payload.Finished())
 		require.Len(t, payload.State, 1)
+		require.True(t, payload.Canceled)
 
 		require.True(t, payload.State[0].IsFinished)
 		require.Equal(t, 1, payload.State[0].EnqueuedTasks)
@@ -1309,6 +1310,7 @@ func TestChainMultipleOnCancel(t *testing.T) {
 
 		require.True(t, payload.Finished())
 		require.Len(t, payload.State, 1)
+		require.True(t, payload.Canceled)
 
 		require.True(t, payload.State[0].IsFinished)
 		require.Equal(t, 1, payload.State[0].EnqueuedTasks)
@@ -1377,6 +1379,7 @@ func TestChainMultipleOnCancel(t *testing.T) {
 
 		require.False(t, payload.Finished())
 		require.Len(t, payload.State, 1)
+		require.True(t, payload.Canceled)
 
 		require.False(t, payload.State[0].IsFinished)
 		require.Equal(t, 2, payload.State[0].EnqueuedTasks)
@@ -1385,5 +1388,119 @@ func TestChainMultipleOnCancel(t *testing.T) {
 		wpayload := TestWorkflowPayload{}
 		require.NoError(t, json.Unmarshal(payload.State[0].Payload, &wpayload))
 		require.Equal(t, workflow1Payload, wpayload)
+	})
+
+	t.Run("stops chain if current subworkflow completes in canceled state", func(t *testing.T) {
+		workflow1Payload := TestWorkflowPayload{
+			PayloadValue: "workflow1Payload",
+		}
+		executor, err := NewChainWorkflowExecutor(
+			cerealtest.NewWorkflowExecutor(
+				nil,
+				func(w cereal.WorkflowInstance, ev cereal.TaskCompleteEvent) cereal.Decision {
+					return w.Complete(cereal.WithResult(workflow1Payload))
+				},
+				nil,
+			),
+			cerealtest.NewWorkflowExecutor(
+				nil,
+				nil,
+				nil,
+			))
+		require.NoError(t, err)
+		params, err := ToChainWorkflowParameters([]interface{}{nil, nil})
+		require.NoError(t, err)
+		currentPayload := ChainWorkflowPayload{
+			Canceled: true,
+			State: []WorkflowState{
+				{
+					IsFinished:    false,
+					EnqueuedTasks: 1,
+				},
+			},
+		}
+		instance := cerealtest.
+			NewWorkflowInstance(t, "instanceName").
+			WithParameters(params).
+			WithPayload(currentPayload)
+
+		taskMetadata := ChainWorkflowTaskParam{
+			XXX_ChainWorkflowIdx: 0,
+		}
+		tr := cerealtest.NewTaskResult(t).WithResult(taskMetadata)
+		ev := cerealtest.NewTaskCompleteEvent("taskName1", tr)
+
+		executor.OnTaskComplete(instance, ev)
+		complete := instance.AssertComplete()
+
+		payload := ChainWorkflowPayload{}
+		complete.GetResult(&payload)
+
+		require.True(t, payload.Finished())
+		require.Len(t, payload.State, 1)
+		require.True(t, payload.Canceled)
+
+		require.True(t, payload.State[0].IsFinished)
+		require.Equal(t, 1, payload.State[0].EnqueuedTasks)
+		require.Equal(t, 1, payload.State[0].CompletedTasks)
+		require.Empty(t, payload.State[0].Err)
+		wpayload := TestWorkflowPayload{}
+		require.NoError(t, json.Unmarshal(payload.State[0].Result, &wpayload))
+		require.Equal(t, workflow1Payload, wpayload)
+	})
+
+	t.Run("stops chain if current subworkflow fails in canceled state", func(t *testing.T) {
+		failureErr := errors.New("fail")
+
+		executor, err := NewChainWorkflowExecutor(
+			cerealtest.NewWorkflowExecutor(
+				nil,
+				func(w cereal.WorkflowInstance, ev cereal.TaskCompleteEvent) cereal.Decision {
+					return w.Fail(failureErr)
+				},
+				nil,
+			),
+			cerealtest.NewWorkflowExecutor(
+				nil,
+				nil,
+				nil,
+			))
+		require.NoError(t, err)
+		params, err := ToChainWorkflowParameters([]interface{}{nil, nil})
+		require.NoError(t, err)
+		currentPayload := ChainWorkflowPayload{
+			Canceled: true,
+			State: []WorkflowState{
+				{
+					IsFinished:    false,
+					EnqueuedTasks: 1,
+				},
+			},
+		}
+		instance := cerealtest.
+			NewWorkflowInstance(t, "instanceName").
+			WithParameters(params).
+			WithPayload(currentPayload)
+
+		taskMetadata := ChainWorkflowTaskParam{
+			XXX_ChainWorkflowIdx: 0,
+		}
+		tr := cerealtest.NewTaskResult(t).WithResult(taskMetadata)
+		ev := cerealtest.NewTaskCompleteEvent("taskName1", tr)
+
+		executor.OnTaskComplete(instance, ev)
+		complete := instance.AssertComplete()
+
+		payload := ChainWorkflowPayload{}
+		complete.GetResult(&payload)
+
+		require.True(t, payload.Finished())
+		require.Len(t, payload.State, 1)
+		require.True(t, payload.Canceled)
+
+		require.True(t, payload.State[0].IsFinished)
+		require.Equal(t, 1, payload.State[0].EnqueuedTasks)
+		require.Equal(t, 1, payload.State[0].CompletedTasks)
+		require.Equal(t, failureErr.Error(), payload.State[0].Err)
 	})
 }
