@@ -67,6 +67,40 @@ func createProjectUpdateID() string {
 }
 
 func NewWorkflowExecutor() (*patterns.ChainWorkflowExecutor, error) {
+	// This funcations creates a WorkflowExecutor out of multiple smaller workflow executors.
+	// First, we want the ApplyStagedRules database commit stuff to run. Then, we want
+	// the domain services to update.
+	// So, that's a chain of [applyStagedRulesExecutor, domainSvcExecutor]
+	// domainSvcExecutor is itself a bunch of smaller workflows that run in parallel. There
+	// is one executor per domain service being updated
+	// applyStagedRulesExecutor is simply an executor that runs ApplyStagedRulesTaskExecutor
+	// An ascii art below describes that it all looks like when it's tied together
+	/*
+	   +--------------------------------------------------+
+	   |                                                  |
+	   |  +------------+       +------------------------+ |
+	   |  |            |       |                        | |
+	   |  | Apply      | Chain | +--------------------+ | |    +-----------------+
+	   |  | Staged     +------>+ |Domain Service      | cereal |Start Update     |
+	   |  | Rules      |       | |Update Workflow     <-+-+---->Update Status    |
+	   |  | Workflow   |       | |(compliance)        | | |    |       compliance|
+	   |  +------------+      P| +--------------------+ | |    +-----------------+
+	   |                      a|                        | |
+	   |                      r| +--------------------+ | |    +-----------------+
+	   |                      a| |Domain Service      | cereal |Start Update     |
+	   |                      l| |Update Workflow     <-+-+---->Update Status    |
+	   |                      l| |(ingest)            | | |    |           ingest|
+	   |                      e| +--------------------+ | |    +-----------------+
+	   |                      l|                        | |
+	   |                       | +--------------------+ | |    +-----------------+
+	   |                       | |Domain Service      | cereal |Start Update     |
+	   |                       | |Update Workflow     <-+-+---->Update Status    |
+	   |                       | |(...)               | | |    |              ...|
+	   |                       | +--------------------+ | |    +-----------------+
+	   |                       +------------------------+ |
+	   |                                     authz-service|
+	   +--------------------------------------------------+
+	*/
 	workflowMap := make(map[string]cereal.WorkflowExecutor)
 	lock := sync.Mutex{}
 
