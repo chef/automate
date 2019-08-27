@@ -79,7 +79,6 @@ func (m *DomainProjectUpdateWorkflowExecutor) OnTaskComplete(
 
 	switch ev.TaskName {
 	case m.cancelUpdateProjectTagsTaskName:
-		payload.Canceled = true
 		if err := ev.Result.Err(); err != nil {
 			return w.Fail(err)
 		}
@@ -154,6 +153,8 @@ func (m *DomainProjectUpdateWorkflowExecutor) OnCancel(
 		logrus.WithError(err).Errorf("Failed to launch %s", m.cancelUpdateProjectTagsTaskName)
 		return w.Fail(err)
 	}
+
+	payload.Canceled = true
 
 	if err := w.EnqueueTask(m.cancelUpdateProjectTagsTaskName, payload); err != nil {
 		return w.Fail(err)
