@@ -35,24 +35,22 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 	assert.Equal(t, "disconnected_services", sched.WorkflowName)
 	assert.True(t, sched.Enabled)
 
-	time.Sleep(2 * time.Second)
-
 	t.Run("disable and enable disconnected_services job", func(t *testing.T) {
 		req := &applications.UpdateDisconnectedServicesConfigReq{Threshold: "5m", Running: false}
 		_, err := suite.ApplicationsServer.UpdateDisconnectedServicesConfig(ctx, req)
 		require.NoError(t, err)
 
-		sched, err := suite.JobScheduler.CerealSvc.GetWorkflowScheduleByName(ctx, DisconnectedServicesScheduleName, DisconnectedServicesJobName)
+		conf, err := suite.ApplicationsServer.GetDisconnectedServicesConfig(ctx, &applications.GetDisconnectedServicesConfigReq{})
 		require.NoError(t, err)
-		assert.False(t, sched.Enabled)
+		assert.False(t, conf.Running)
 
 		req.Running = true
 		_, err = suite.ApplicationsServer.UpdateDisconnectedServicesConfig(ctx, req)
 		require.NoError(t, err)
 
-		sched, err = suite.JobScheduler.CerealSvc.GetWorkflowScheduleByName(ctx, DisconnectedServicesScheduleName, DisconnectedServicesJobName)
+		conf, err = suite.ApplicationsServer.GetDisconnectedServicesConfig(ctx, &applications.GetDisconnectedServicesConfigReq{})
 		require.NoError(t, err)
-		assert.True(t, sched.Enabled)
+		assert.True(t, conf.Running)
 
 	})
 	t.Run("update disconnected_services job params", func(t *testing.T) {
@@ -60,23 +58,18 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 		_, err := suite.ApplicationsServer.UpdateDisconnectedServicesConfig(ctx, req)
 		require.NoError(t, err)
 
-		sched, err := suite.JobScheduler.CerealSvc.GetWorkflowScheduleByName(ctx, DisconnectedServicesScheduleName, DisconnectedServicesJobName)
+		conf, err := suite.ApplicationsServer.GetDisconnectedServicesConfig(ctx, &applications.GetDisconnectedServicesConfigReq{})
 		require.NoError(t, err)
-
-		var returnedParams server.DisconnectedServicesParamsV0
-		sched.GetParameters(&returnedParams)
-		assert.Equal(t, 23, returnedParams.ThresholdSeconds)
+		assert.Equal(t, "23s", conf.Threshold)
 
 		// Update the params again to ensure we didn't accidentally pass the test due to leftover state somewhere:
 		req = &applications.UpdateDisconnectedServicesConfigReq{Threshold: "42s", Running: true}
 		_, err = suite.ApplicationsServer.UpdateDisconnectedServicesConfig(ctx, req)
 		require.NoError(t, err)
 
-		sched, err = suite.JobScheduler.CerealSvc.GetWorkflowScheduleByName(ctx, DisconnectedServicesScheduleName, DisconnectedServicesJobName)
+		conf, err = suite.ApplicationsServer.GetDisconnectedServicesConfig(ctx, &applications.GetDisconnectedServicesConfigReq{})
 		require.NoError(t, err)
-
-		sched.GetParameters(&returnedParams)
-		assert.Equal(t, 42, returnedParams.ThresholdSeconds)
+		assert.Equal(t, "42s", conf.Threshold)
 	})
 
 	t.Run("running the job runner makes the jobs run", func(t *testing.T) {

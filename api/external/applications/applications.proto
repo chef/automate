@@ -87,9 +87,18 @@ service ApplicationsService {
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:delete";
   };
 
+  rpc GetDisconnectedServicesConfig(GetDisconnectedServicesConfigReq) returns (GetDisconnectedServicesConfigRes) {
+    option (google.api.http).get = "/beta/retention/service_groups/disconnected_services/config";
+    // TODO: need new resources/policies for this
+    option (chef.automate.api.policy).resource = "service_groups";
+    option (chef.automate.api.policy).action = "list";
+    option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
+  };
+
   rpc UpdateDisconnectedServicesConfig(UpdateDisconnectedServicesConfigReq) returns (UpdateDisconnectedServicesConfigRes) {
     option (google.api.http) = {
-      post: "/beta/retention/service_groups/config"
+      post: "/beta/retention/service_groups/disconnected_services/config"
       body: "*"
     };
     // TODO: need new resources/policies for this
@@ -154,6 +163,13 @@ message ServicesStatsRes {
   int32 total_services = 2;
   int32 total_supervisors = 3;
   int32 total_deployments = 4;
+}
+
+message GetDisconnectedServicesConfigReq{}
+
+message GetDisconnectedServicesConfigRes{
+  bool running = 1;
+  string threshold = 2;
 }
 
 message UpdateDisconnectedServicesConfigReq {

@@ -21,8 +21,13 @@ type JobScheduler struct {
 	CerealSvc *cereal.Manager
 }
 
+type DisconnectedServicesConfigV0 struct {
+	Enabled bool
+	Params  *DisconnectedServicesParamsV0
+}
+
 type DisconnectedServicesParamsV0 struct {
-	ThresholdSeconds int `mapstructure:"threshold_seconds"`
+	ThresholdDuration string `mapstructure:"threshold_duration"`
 }
 
 const (
@@ -91,6 +96,23 @@ func (j *JobScheduler) Setup() error {
 	return nil
 }
 
+func (j *JobScheduler) GetDisconnectedServicesJobConfig(ctx context.Context) (*DisconnectedServicesConfigV0, error) {
+	sched, err := j.CerealSvc.GetWorkflowScheduleByName(ctx, DisconnectedServicesScheduleName, DisconnectedServicesJobName)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to retrieve schedule and config for disconnected_services job")
+	}
+
+	var returnedParams DisconnectedServicesParamsV0
+	if err := sched.GetParameters(&returnedParams); err != nil {
+		return nil, errors.Wrap(err, "unable to load disconnected_services job parameters")
+	}
+
+	return &DisconnectedServicesConfigV0{
+		Enabled: sched.Enabled,
+		Params:  &returnedParams,
+	}, nil
+}
+
 func (j *JobScheduler) UpdateDisconnectedServicesJobParams(ctx context.Context, params *DisconnectedServicesParamsV0) error {
 	err := j.CerealSvc.UpdateWorkflowScheduleByName(
 		ctx,
@@ -148,7 +170,7 @@ func (j *JobScheduler) RunAllJobsConstantly(ctx context.Context) error {
 }
 
 func defaultDisconnectedServicesJobParams() *DisconnectedServicesParamsV0 {
-	return &DisconnectedServicesParamsV0{ThresholdSeconds: 300}
+	return &DisconnectedServicesParamsV0{ThresholdDuration: "5m"}
 }
 
 type JobRunnerSet struct {
@@ -213,7 +235,11 @@ func (m *MarkDisconnectedServicesExecutor) run(t cereal.Task) error {
 	if err := t.GetParameters(&params); err != nil {
 		return errors.Wrap(err, "failed to load parameters for disconnected_services job")
 	}
-	_, err := m.ApplicationsServer.MarkDisconnectedServices(int32(params.ThresholdSeconds))
+	threshold, err := time.ParseDuration(params.ThresholdDuration)
+	if err != nil {
+		return errors.Wrapf(err, "duration setting %q for disconnected_services in database is invalid", params.ThresholdDuration)
+	}
+	_, err = m.ApplicationsServer.MarkDisconnectedServices(int32(threshold.Seconds()))
 	if err != nil {
 		return errors.Wrap(err, "failed periodic disconnected_services job")
 	}

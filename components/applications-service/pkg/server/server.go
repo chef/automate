@@ -336,6 +336,19 @@ func (app *ApplicationsServer) MarkDisconnectedServices(thresholdSeconds int32) 
 	return convertStorageServicesToApplicationsServices(svcs), nil
 }
 
+func (app *ApplicationsServer) GetDisconnectedServicesConfig(ctx context.Context,
+	req *applications.GetDisconnectedServicesConfigReq) (*applications.GetDisconnectedServicesConfigRes, error) {
+	config, err := app.jobScheduler.GetDisconnectedServicesJobConfig(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to load disconnected_services job configuration")
+	}
+	res := &applications.GetDisconnectedServicesConfigRes{
+		Running:   config.Enabled,
+		Threshold: config.Params.ThresholdDuration,
+	}
+	return res, nil
+}
+
 func (app *ApplicationsServer) UpdateDisconnectedServicesConfig(ctx context.Context,
 	req *applications.UpdateDisconnectedServicesConfigReq) (*applications.UpdateDisconnectedServicesConfigRes, error) {
 
@@ -351,12 +364,11 @@ func (app *ApplicationsServer) UpdateDisconnectedServicesConfig(ctx context.Cont
 		}
 	}
 
-	requestedThreshold, err := time.ParseDuration(req.GetThreshold())
+	_, err := time.ParseDuration(req.GetThreshold())
 	if err != nil {
 		return nil, errors.Wrapf(err, "unable to parse disconnected_services threshold %q", req.GetThreshold())
 	}
-	s := int(requestedThreshold.Seconds())
-	err = app.jobScheduler.UpdateDisconnectedServicesJobParams(ctx, &DisconnectedServicesParamsV0{ThresholdSeconds: s})
+	err = app.jobScheduler.UpdateDisconnectedServicesJobParams(ctx, &DisconnectedServicesParamsV0{ThresholdDuration: req.GetThreshold()})
 	if err != nil {
 		return nil, errors.Wrapf(err, "unable to update disconnected services parameters to %q", req.GetThreshold())
 	}

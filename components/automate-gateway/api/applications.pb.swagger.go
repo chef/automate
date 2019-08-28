@@ -348,7 +348,21 @@ func init() {
         ]
       }
     },
-    "/beta/retention/service_groups/config": {
+    "/beta/retention/service_groups/disconnected_services/config": {
+      "get": {
+        "operationId": "GetDisconnectedServicesConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/applicationsGetDisconnectedServicesConfigRes"
+            }
+          }
+        },
+        "tags": [
+          "ApplicationsService"
+        ]
+      },
       "post": {
         "operationId": "UpdateDisconnectedServicesConfig",
         "responses": {
@@ -382,6 +396,18 @@ func init() {
         "threshold_seconds": {
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "applicationsGetDisconnectedServicesConfigRes": {
+      "type": "object",
+      "properties": {
+        "running": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "threshold": {
+          "type": "string"
         }
       }
     },
