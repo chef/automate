@@ -714,10 +714,10 @@ To configure your Chef Automate installation's load balancer, create a TOML file
 #### Data Retention
 
 The bulk of Chef Automate's data is stored by the ingest, event-feed, and compliance services.
-Each service has one or more purge policies that can be configured using the
-service's gRPC Purge interface.
+The retention policies for each service can be modified using the service's
+gRPC `Purge.Configure` interface.
 
-To configure each service's purge policies run the following commands with the
+To configure each service's retention policies run the following commands with the
 configuration request tailored to your specific needs. The `recurrence` field can be set
 to any valid recurrence rule [as defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt).
 Any omitted fields will not be updated or overwritten.
@@ -777,21 +777,21 @@ chef-automate dev grpcurl event-feed-service -- chef.automate.infra.data_lifecyc
 
 ```
 
-To see existing settings run
+To see the current retention policies for each service use the gRPC `Purge.Show` interface.
 ```bash
 chef-automate dev grpcurl event-feed-service -- chef.automate.infra.data_lifecycle.api.Purge.Show
 ```
 
 Substitute `event-feed-service` with `ingest-service` or `compliance-service`
-to see each service's purge policies.
+to see each service's retention policies.
 
-To immediately run a purge for a service run
+To immediately run a purge for a service use `Purge.Run` interface.
 ```bash
 chef-automate dev grpcurl event-feed-service -- chef.automate.infra.data_lifecycle.api.Purge.Run
 ```
 
 Substitute `event-feed-service` with `ingest-service` or `compliance-service`
-to run each service's purge policies.
+to run each service's retention policies.
 
 ### Troubleshooting
 
