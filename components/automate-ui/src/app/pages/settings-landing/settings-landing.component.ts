@@ -8,7 +8,7 @@ import { RoutePerms } from 'app/components/landing/landing.component';
 })
 export class SettingsLandingComponent {
 
-  // order determined by admin-sidebar template and is vetted by admin-sidebar unit tests
+  // order determined by settings-sidebar template and is vetted by settings-sidebar unit tests
   public routeList: RoutePerms[] = [
     { anyOfCheck: [['/notifications/rules', 'get', '']], route: '/settings/notifications' },
     { anyOfCheck: [['/nodemanagers/search', 'post', '']], route: '/settings/node-integrations' },

@@ -68,7 +68,7 @@ describe('TeamDetailsComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'app-admin-sidebar' }),
+        MockComponent({ selector: 'app-settings-sidebar' }),
         MockComponent({ selector: 'app-user-table',
           inputs: [
             'baseUrl',

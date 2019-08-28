@@ -37,7 +37,7 @@ describe('ProjectRulesComponent', () => {
           inputs: ['allOf', 'not'],
           template: '<ng-content></ng-content>'
         }),
-        MockComponent({ selector: 'app-admin-sidebar' }),
+        MockComponent({ selector: 'app-settings-sidebar' }),
         MockComponent({
           selector: 'app-delete-object-modal',
           inputs: ['visible', 'objectNoun', 'objectName'],

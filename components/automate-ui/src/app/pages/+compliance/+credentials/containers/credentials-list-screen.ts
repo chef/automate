@@ -11,7 +11,7 @@ import { NgrxStateAtom } from '../../../../ngrx.reducers';
 @Component({
   selector: 'app-credentials-list-screen',
   template: `
-    <app-admin-sidebar></app-admin-sidebar>
+    <app-settings-sidebar></app-settings-sidebar>
     <app-credentials-list
       [credentialsList]="credentialsList$ | async"
       (deleteCredential)="handleDeleteCredential($event)"

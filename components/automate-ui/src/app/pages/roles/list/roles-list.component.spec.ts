@@ -21,7 +21,7 @@ describe('RolesListComponent', () => {
         MockComponent({ selector: 'app-authorized',
                         inputs: ['allOf'],
                         template: '<ng-content></ng-content>' }),
-        MockComponent({ selector: 'app-admin-sidebar' }),
+        MockComponent({ selector: 'app-settings-sidebar' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
         MockComponent({ selector: 'chef-page-header' }),
         MockComponent({ selector: 'chef-heading' }),

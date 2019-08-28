@@ -61,7 +61,7 @@ describe('UserDetailsComponent', () => {
         }, { initialState })
       ],
       declarations: [
-        MockComponent({ selector: 'app-admin-sidebar' }),
+        MockComponent({ selector: 'app-settings-sidebar' }),
         MockComponent({ selector: 'app-profile-sidebar' }),
         MockComponent({ selector: 'chef-breadcrumbs' }),
         MockComponent({ selector: 'chef-breadcrumb', inputs: ['link']}),
@@ -173,7 +173,7 @@ describe('UserDetailsComponent', () => {
       });
 
       it('contains the admin sidebar instead of the profile sidebar', () => {
-        expect(element).toContainPath('app-admin-sidebar');
+        expect(element).toContainPath('app-settings-sidebar');
         expect(element).not.toContainPath('app-profile-sidebar');
       });
     });
@@ -192,8 +192,8 @@ describe('UserDetailsComponent', () => {
         expect(element).toContainPath('#password-description');
       });
 
-      it('contains the profile sidebar instead of the admin sidebar', () => {
-        expect(element).not.toContainPath('app-admin-sidebar');
+      it('contains the profile sidebar instead of the settings sidebar', () => {
+        expect(element).not.toContainPath('app-settings-sidebar');
         expect(element).toContainPath('app-profile-sidebar');
       });
     });

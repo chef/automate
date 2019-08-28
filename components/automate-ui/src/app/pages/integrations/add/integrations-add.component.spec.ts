@@ -23,7 +23,7 @@ describe('IntegrationsAddComponent', () => {
         })
       ],
       declarations: [
-        MockComponent({ selector: 'app-admin-sidebar' }),
+        MockComponent({ selector: 'app-settings-sidebar' }),
         IntegrationsAddComponent
       ],
       schemas: [

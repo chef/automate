@@ -3,7 +3,7 @@
   <p>Please contact an administrator for permission.</p>
 </div>
 
-<app-admin-sidebar></app-admin-sidebar>
+<app-settings-sidebar></app-settings-sidebar>
 <div class="container">
   <main>
     <chef-page-header [contrasting-background]="false">
@@ -36,7 +36,7 @@
             <chef-th>Alert Type</chef-th>
             <chef-th aria-hidden="true"></chef-th>
           </chef-tr>
-  
+
           <chef-tr tabindex="0" *ngFor="let rule of rules$ | async |
             slice:(pageSize * (currentPage - 1)):(pageSize * (currentPage - 1)) + pageSize">
             <chef-td class="{{rule.targetType}}">
