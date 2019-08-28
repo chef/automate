@@ -49,9 +49,6 @@ type PartialResult struct {
 }
 
 // Rego returns an object that can be evaluated to produce a query result.
-// If rego.Rego#Prepare was used to create the PartialResult this may lose
-// the pre-parsed/compiled parts of the original Rego object. In those cases
-// using rego.PartialResult#Eval is likely to be more performant.
 func (pr PartialResult) Rego(options ...func(*Rego)) *Rego {
 	options = append(options, Compiler(pr.compiler), Store(pr.store), ParsedQuery(pr.body))
 	return New(options...)
@@ -166,13 +163,17 @@ func EvalParsedUnknowns(unknowns []*ast.Term) EvalOption {
 	}
 }
 
-func (pq preparedQuery) newEvalContext(ctx context.Context, options []EvalOption) (*EvalContext, error) {
+// newEvalContext creates a new EvalContext overlaying any EvalOptions over top
+// the Rego object on the preparedQuery. The returned function should be called
+// once the evaluation is complete to close any transactions that might have
+// been opened.
+func (pq preparedQuery) newEvalContext(ctx context.Context, options []EvalOption) (*EvalContext, func(context.Context), error) {
 	ectx := &EvalContext{
 		hasInput:         false,
 		rawInput:         nil,
 		parsedInput:      nil,
 		metrics:          pq.r.metrics,
-		txn:              pq.r.txn,
+		txn:              nil,
 		instrument:       pq.r.instrument,
 		instrumentation:  pq.r.instrumentation,
 		partialNamespace: pq.r.partialNamespace,
@@ -190,18 +191,23 @@ func (pq preparedQuery) newEvalContext(ctx context.Context, options []EvalOption
 		ectx.instrumentation = topdown.NewInstrumentation(ectx.metrics)
 	}
 
+	// Default to an empty "finish" function
+	finishFunc := func(context.Context) {}
+
 	var err error
 	ectx.disableInlining, err = parseStringsToRefs(pq.r.disableInlining)
 	if err != nil {
-		return nil, err
+		return nil, finishFunc, err
 	}
 
 	if ectx.txn == nil {
 		ectx.txn, err = pq.r.store.NewTransaction(ctx)
 		if err != nil {
-			return nil, err
+			return nil, finishFunc, err
 		}
-		defer pq.r.store.Abort(ctx, ectx.txn)
+		finishFunc = func(ctx context.Context) {
+			pq.r.store.Abort(ctx, ectx.txn)
+		}
 	}
 
 	// If we didn't get an input specified in the Eval options
@@ -219,11 +225,11 @@ func (pq preparedQuery) newEvalContext(ctx context.Context, options []EvalOption
 		}
 		ectx.parsedInput, err = pq.r.parseRawInput(ectx.rawInput, ectx.metrics)
 		if err != nil {
-			return nil, err
+			return nil, finishFunc, err
 		}
 	}
 
-	return ectx, nil
+	return ectx, finishFunc, nil
 }
 
 // PreparedEvalQuery holds the prepared Rego state that has been pre-processed
@@ -235,11 +241,14 @@ type PreparedEvalQuery struct {
 // Eval evaluates this PartialResult's Rego object with additional eval options
 // and returns a ResultSet.
 // If options are provided they will override the original Rego options respective value.
+// The original Rego object transaction will *not* be re-used. A new transaction will be opened
+// if one is not provided with an EvalOption.
 func (pq PreparedEvalQuery) Eval(ctx context.Context, options ...EvalOption) (ResultSet, error) {
-	ectx, err := pq.newEvalContext(ctx, options)
+	ectx, finish, err := pq.newEvalContext(ctx, options)
 	if err != nil {
 		return nil, err
 	}
+	defer finish(ctx)
 
 	ectx.compiledQuery = pq.r.compiledQueries[evalQueryType]
 
@@ -253,11 +262,14 @@ type PreparedPartialQuery struct {
 }
 
 // Partial runs partial evaluation on the prepared query and returns the result.
+// The original Rego object transaction will *not* be re-used. A new transaction will be opened
+// if one is not provided with an EvalOption.
 func (pq PreparedPartialQuery) Partial(ctx context.Context, options ...EvalOption) (*PartialQueries, error) {
-	ectx, err := pq.newEvalContext(ctx, options)
+	ectx, finish, err := pq.newEvalContext(ctx, options)
 	if err != nil {
 		return nil, err
 	}
+	defer finish(ctx)
 
 	ectx.compiledQuery = pq.r.compiledQueries[partialQueryType]
 
@@ -390,6 +402,7 @@ type Rego struct {
 	termVarID        int
 	dump             io.Writer
 	runtime          *ast.Term
+	unsafeBuiltins   map[string]struct{}
 }
 
 // Dump returns an argument that sets the writer to dump debugging information to.
@@ -501,6 +514,21 @@ func Module(filename, input string) func(r *Rego) {
 	}
 }
 
+// ParsedModule returns an argument that adds a parsed Rego module. If a string
+// module with the same filename name is added, it will override the parsed
+// module.
+func ParsedModule(module *ast.Module) func(*Rego) {
+	return func(r *Rego) {
+		var filename string
+		if module.Package.Location != nil {
+			filename = module.Package.Location.File
+		} else {
+			filename = fmt.Sprintf("module_%p.rego", module)
+		}
+		r.parsedModules[filename] = module
+	}
+}
+
 // Compiler returns an argument that sets the Rego compiler.
 func Compiler(c *ast.Compiler) func(r *Rego) {
 	return func(r *Rego) {
@@ -571,10 +599,21 @@ func PrintTrace(w io.Writer, r *Rego) {
 	topdown.PrettyTrace(w, *r.tracebuf)
 }
 
+// UnsafeBuiltins sets the built-in functions to treat as unsafe and not allow.
+// This option is ignored for module compilation if the caller supplies the
+// compiler. This option is always honored for query compilation. Provide an
+// empty (non-nil) map to disable checks on queries.
+func UnsafeBuiltins(unsafeBuiltins map[string]struct{}) func(r *Rego) {
+	return func(r *Rego) {
+		r.unsafeBuiltins = unsafeBuiltins
+	}
+}
+
 // New returns a new Rego object.
 func New(options ...func(r *Rego)) *Rego {
 
 	r := &Rego{
+		parsedModules:   map[string]*ast.Module{},
 		capture:         map[*ast.Expr]ast.Var{},
 		compiledQueries: map[queryType]compiledQuery{},
 	}
@@ -584,7 +623,7 @@ func New(options ...func(r *Rego)) *Rego {
 	}
 
 	if r.compiler == nil {
-		r.compiler = ast.NewCompiler()
+		r.compiler = ast.NewCompiler().WithUnsafeBuiltins(r.unsafeBuiltins)
 	}
 
 	if r.store == nil {
@@ -628,7 +667,7 @@ func (r *Rego) Eval(ctx context.Context) (ResultSet, error) {
 		return nil, err
 	}
 
-	return pq.Eval(ctx)
+	return pq.Eval(ctx, EvalTransaction(r.txn))
 }
 
 // PartialEval has been deprecated and renamed to PartialResult.
@@ -677,7 +716,7 @@ func (r *Rego) Partial(ctx context.Context) (*PartialQueries, error) {
 		return nil, err
 	}
 
-	return pq.Partial(ctx)
+	return pq.Partial(ctx, EvalTransaction(r.txn))
 }
 
 // CompileOption defines a function to set options on Compile calls.
@@ -966,7 +1005,7 @@ func (r *Rego) prepare(ctx context.Context, txn storage.Transaction, qType query
 		return err
 	}
 
-	r.parsedModules, err = r.parseModules(r.metrics)
+	err = r.parseModules(r.metrics)
 	if err != nil {
 		return err
 	}
@@ -986,26 +1025,24 @@ func (r *Rego) prepare(ctx context.Context, txn storage.Transaction, qType query
 	return r.compileAndCacheQuery(qType, r.parsedQuery, r.metrics, extras)
 }
 
-func (r *Rego) parseModules(m metrics.Metrics) (map[string]*ast.Module, error) {
+func (r *Rego) parseModules(m metrics.Metrics) error {
 	m.Timer(metrics.RegoModuleParse).Start()
 	defer m.Timer(metrics.RegoModuleParse).Stop()
 	var errs Errors
-	parsed := map[string]*ast.Module{}
-	if r.parsedModules != nil {
-		parsed = r.parsedModules
-	} else {
-		for _, module := range r.modules {
-			p, err := module.Parse()
-			if err != nil {
-				errs = append(errs, err)
-			}
-			parsed[module.filename] = p
+
+	for _, module := range r.modules {
+		p, err := module.Parse()
+		if err != nil {
+			errs = append(errs, err)
 		}
-		if len(errs) > 0 {
-			return nil, errors.New(errs.Error())
-		}
+		r.parsedModules[module.filename] = p
 	}
-	return parsed, nil
+
+	if len(errs) > 0 {
+		return errors.New(errs.Error())
+	}
+
+	return nil
 }
 
 func (r *Rego) parseInput() (ast.Value, error) {
@@ -1126,7 +1163,9 @@ func (r *Rego) compileQuery(query ast.Body, m metrics.Metrics, extras []extraSta
 		WithPackage(pkg).
 		WithImports(imports)
 
-	qc := r.compiler.QueryCompiler().WithContext(qctx)
+	qc := r.compiler.QueryCompiler().
+		WithContext(qctx).
+		WithUnsafeBuiltins(r.unsafeBuiltins)
 
 	for _, extra := range extras {
 		qc = qc.WithStageAfter(extra.after, extra.stage)
@@ -1247,7 +1286,10 @@ func (r *Rego) partialResult(ctx context.Context, ectx *EvalContext, output *ast
 		r.compiler.Modules[fmt.Sprintf("__partialsupport%d__", i)] = module
 	}
 
+	r.metrics.Timer(metrics.RegoModuleCompile).Start()
 	r.compiler.Compile(r.compiler.Modules)
+	r.metrics.Timer(metrics.RegoModuleCompile).Stop()
+
 	if r.compiler.Failed() {
 		return PartialResult{}, r.compiler.Errors
 	}
