@@ -126,36 +126,6 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 		}
 	}
 
-	//When filtering by controls, we are reducing the array of report ids based on
-	// another query on inspec_report documents where we have control ids
-	if len(filters["control"]) > 0 {
-		esIndex, err := GetEsIndex(filters, false, false)
-		if err != nil {
-			return nil, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to GetEsIndex")
-		}
-		filteredReportIds, err := backend.filterIdsByControl(esIndex, MapValues(nodeReport), filters["control"])
-		if err != nil {
-			return []string{}, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to filter ids by "+
-				"control")
-		}
-		logrus.Debugf("getNodeReportIdsFromTimeseries control filtering, len(nodeReport)=%d, "+
-			"len(filteredNodeIds)=%d\n", len(nodeReport), len(filteredReportIds))
-
-		//flipping map[nodeid][reportid] to map[reportid][nodeid] for quicker lookups, to avoid an expensive O(n^2)
-		// Contains(filteredReportIds, reportId) call
-		reportNode := make(map[string]string, len(nodeReport))
-		for nodeID, reportID := range nodeReport {
-			reportNode[reportID] = nodeID
-		}
-
-		// filtering out the nodes for which the report id is no longer in filteredReportIds
-		filteredNodeReport := make(map[string]string, len(filteredReportIds))
-		for _, reportID := range filteredReportIds {
-			filteredNodeReport[reportNode[reportID]] = reportID
-		}
-		nodeReport = filteredNodeReport
-	}
-
 	reportIds := MapValues(nodeReport)
 
 	logrus.Debugf("getNodeReportIdsFromTimeseries returning %d report ids in %d milliseconds\n",
