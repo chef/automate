@@ -4,7 +4,7 @@ SHELL=bash
 SWAGGER_RESULT_FILE=static/api-docs/all-apis.swagger.json
 SWAGGER_DIR=data/docs/api_chef_automate
 SWAGGER_FILES = $(shell find $(SWAGGER_DIR) -name '*.swagger.json')
-EXPECTED_CONFLICTS=48
+EXPECTED_CONFLICTS=45
 
 themes/chef:
 	git clone https://${GITHUB_TOKEN}@github.com/chef/chef-hugo-theme.git themes/chef
