@@ -57,7 +57,6 @@ import (
 	"github.com/chef/automate/components/notifications-client/notifier"
 	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/cereal"
-	grpccereal "github.com/chef/automate/lib/cereal/grpc"
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tracing"
@@ -234,7 +233,7 @@ func createProjectUpdateCerealManager(connFactory *secureconn.Factory, address s
 		return nil, errors.Wrap(err, "error dialing cereal service")
 	}
 
-	grpcBackend := grpccereal.NewGrpcBackendFromConn("project-update", conn)
+	grpcBackend := project_update_lib.ProjectUpdateBackend(conn)
 	manager, err := cereal.NewManager(grpcBackend)
 	if err != nil {
 		grpcBackend.Close() // nolint: errcheck

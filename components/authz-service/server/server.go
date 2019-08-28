@@ -14,8 +14,8 @@ import (
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 
+	project_update_tags "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/cereal"
-	grpccereal "github.com/chef/automate/lib/cereal/grpc"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
@@ -152,7 +152,7 @@ func createProjectUpdateCerealManager(connFactory *secureconn.Factory, address s
 		return nil, errors.Wrap(err, "error dialing cereal service")
 	}
 
-	grpcBackend := grpccereal.NewGrpcBackendFromConn("project-update", conn)
+	grpcBackend := project_update_tags.ProjectUpdateBackend(conn)
 	manager, err := cereal.NewManager(grpcBackend)
 	if err != nil {
 		grpcBackend.Close() // nolint: errcheck
