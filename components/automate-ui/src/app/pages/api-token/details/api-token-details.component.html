@@ -12,6 +12,7 @@
         <thead>
           <tr class="detail-row">
             <th class="header-column">ID</th>
+            <th class="header-column" *ngIf="!isMajorV1 && isMinorV1">Projects</th>
             <th class="header-column">Date Created</th>
             <th class="header-column">Status</th>
           </tr>
@@ -19,6 +20,17 @@
         <tbody>
           <tr class="detail-row">
             <td class="header-column">{{ token?.id }}</td>
+            <td class="header-column" *ngIf="!isMajorV1 && isMinorV1">
+              <ng-container *ngIf="token?.projects.length === 0">
+                {{ unassigned }}
+              </ng-container>
+              <ng-container *ngIf="token?.projects.length === 1">
+                {{ token.projects[0] }}
+              </ng-container>
+              <ng-container *ngIf="token?.projects.length > 1">
+                {{ token.projects.length }} projects
+              </ng-container>
+            </td>
             <td class="header-column">{{ token?.created_at | datetime:'ddd, MMMM D, YYYY [at] H:mm a' }}</td>
             <td class="header-column">{{ status | capitalize }}</td>
           </tr>
@@ -37,6 +49,11 @@
             Name is required.
           </chef-error>
         </chef-form-field>
+        <div id='projects-container' *ngIf="!isMajorV1 && isMinorV1">
+          <app-projects-dropdown [projects]="projects" (onProjectChecked)="onProjectChecked($event)"
+            [disabled]="dropdownDisabled()">
+          </app-projects-dropdown>
+        </div>
         <chef-form-field>
           <label>Status <span aria-hidden="true">*</span></label>
           <chef-radio ngDefaultControl formControlName="status" [resetOrigin]="saveSuccessful">
