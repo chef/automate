@@ -70,7 +70,7 @@ func (backend ES2Backend) GetSuggestions(typeParam string, filters map[string][]
 	} else {
 		// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
 		for filterType := range filters {
-			if strings.HasPrefix(filterType, "control_tag") {
+			if strings.HasPrefix(filterType, "control_tag:") {
 				useSummaryIndex = false
 				break
 			}
@@ -226,10 +226,6 @@ func (backend ES2Backend) getAggSuggestions(client *elastic.Client, typeParam st
 }
 
 func (backend ES2Backend) getArrayAggSuggestions(client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
-	//here, we base our decision on which index set (det or summary) to use for querying suggestions
-	// the reason this is necessary is in the where a control has already been added to the query and therefore
-	// the query needs to dive down to the control depth.. requiring the detailed indices.
-	// in other words, only use summary here if there are no controls in the filter
 	esIndex, err := GetEsIndex(filters, useSummaryIndex, true)
 	if err != nil {
 		return nil, errors.Wrap(err, "getArrayAggSuggestions unable to get index dates")

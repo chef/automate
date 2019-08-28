@@ -629,7 +629,7 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 
 	// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
 	for filterType := range filters {
-		if strings.HasPrefix(filterType, "control_tag") {
+		if strings.HasPrefix(filterType, "control_tag:") {
 			_, tagKey := leftSplit(filterType, ":")
 			termQuery := backend.newNestedTermQueryFromControlTagsFilter(tagKey, filters[filterType])
 			boolQuery = boolQuery.Must(termQuery)
