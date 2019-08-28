@@ -363,6 +363,18 @@ func buildWhereConstraintsFromFilters(filters map[string][]string) (string, erro
 		case "buildstamp":
 			WhereConstraints = WhereConstraints + buildORStatementFromValues("release", values)
 
+		case "application":
+			WhereConstraints = WhereConstraints + buildORStatementFromValues("application", values)
+
+		case "environment":
+			WhereConstraints = WhereConstraints + buildORStatementFromValues("environment", values)
+
+		case "group":
+			WhereConstraints = WhereConstraints + buildORStatementFromValues("s.service_group_name_suffix", values)
+
+		case "service":
+			WhereConstraints = WhereConstraints + buildORStatementFromValues("name", values)
+
 		default:
 			return "", errors.Errorf("invalid filter. (%s:%s)", filter, values)
 		}
