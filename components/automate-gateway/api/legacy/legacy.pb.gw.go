@@ -38,6 +38,43 @@ func request_LegacyDataCollector_Status_0(ctx context.Context, marshaler runtime
 
 }
 
+func local_request_LegacyDataCollector_Status_0(ctx context.Context, marshaler runtime.Marshaler, server LegacyDataCollectorServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq empty.Empty
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.Status(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+// RegisterLegacyDataCollectorHandlerServer registers the http handlers for service LegacyDataCollector to "mux".
+// UnaryRPC     :call LegacyDataCollectorServer directly.
+// StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
+func RegisterLegacyDataCollectorHandlerServer(ctx context.Context, mux *runtime.ServeMux, server LegacyDataCollectorServer, opts []grpc.DialOption) error {
+
+	mux.Handle("GET", pattern_LegacyDataCollector_Status_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_LegacyDataCollector_Status_0(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_LegacyDataCollector_Status_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	return nil
+}
+
 // RegisterLegacyDataCollectorHandlerFromEndpoint is same as RegisterLegacyDataCollectorHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterLegacyDataCollectorHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
