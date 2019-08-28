@@ -7,43 +7,52 @@ import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store } from '@ngrx/store';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { using } from 'app/testing/spec-helpers';
+import {
+  projectsFilterReducer,
+  projectsFilterInitialState
+} from 'app/services/projects-filter/projects-filter.reducer';
 import {
   policyEntityReducer, PolicyEntityInitialState
 } from 'app/entities/policies/policy.reducer';
+import { GetIamVersionSuccess } from 'app/entities/policies/policy.actions';
+import { IamVersionResponse } from 'app/entities/policies/policy.requests';
+import { IAMMajorVersion } from 'app/entities/policies/policy.model';
+import {
+  projectEntityReducer,
+  ProjectEntityInitialState
+} from 'app/entities/projects/project.reducer';
+import { Project } from 'app/entities/projects/project.model';
+import { GetProjectsSuccess, GetProjects } from 'app/entities/projects/project.actions';
 import {
   userEntityReducer,
   UserEntityInitialState
 } from 'app/entities/users/user.reducer';
-import { GetUsersSuccess } from 'app/entities/users/user.actions';
+import { GetUsersSuccess, GetUsers } from 'app/entities/users/user.actions';
 import {
   teamEntityReducer,
   TeamEntityInitialState
 } from 'app/entities/teams/team.reducer';
 import {
   GetTeamSuccess,
-  GetTeamUsersSuccess
+  GetTeamUsersSuccess,
+  GetTeamUsers
 } from 'app/entities/teams/team.actions';
 import { Team } from 'app/entities/teams/team.model';
 import { TeamDetailsComponent } from './team-details.component';
-import {
-  projectsFilterReducer,
-  projectsFilterInitialState
-} from 'app/services/projects-filter/projects-filter.reducer';
-import {
-  projectEntityReducer,
-  ProjectEntityInitialState
-} from 'app/entities/projects/project.reducer';
 
 describe('TeamDetailsComponent', () => {
   let component: TeamDetailsComponent;
   let fixture: ComponentFixture<TeamDetailsComponent>;
   let router: Router;
+  let store: Store<NgrxStateAtom>;
 
+  const targetId = 'a-team-uuid-01';
   const initialState = {
     router: {
       state: {
-        url: '/settings/teams/a-team-uuid-01',
-        params: { id: 'a-team-uuid-01' },
+        url: `/settings/teams/${targetId}`,
+        params: { id: targetId },
         queryParams: {},
         fragment: ''
       },
@@ -106,15 +115,16 @@ describe('TeamDetailsComponent', () => {
   }));
 
   const someTeam: Team = {
-    id: 'some-team',
+    id: targetId,
     name: 'some team',
-    guid: 'a-team-uuid-01',
+    guid: targetId,
     projects: []
   };
 
   beforeEach(() => {
     router = TestBed.get(Router);
     spyOn(router, 'navigate').and.stub();
+    store = TestBed.get(Store);
 
     fixture = TestBed.createComponent(TeamDetailsComponent);
     component = fixture.componentInstance;
@@ -141,9 +151,7 @@ describe('TeamDetailsComponent', () => {
   });
 
   describe('empty state', () => {
-    let store: Store<NgrxStateAtom>;
     beforeEach(() => {
-      store = TestBed.get(Store);
       store.dispatch(new GetTeamSuccess(someTeam));
       store.dispatch(new GetTeamUsersSuccess({
         user_ids: []
@@ -158,11 +166,45 @@ describe('TeamDetailsComponent', () => {
     });
   });
 
-  describe('sortedUsers$', () => {
-    let store: Store<NgrxStateAtom>;
-    beforeEach(() => {
-      store = TestBed.get(Store);
+  using([
+    [targetId, 'other', 'V2'],
+    ['other', targetId, 'V1']
+  ], function (id: string, guid: string, major: IAMMajorVersion) {
+    it(`initializes with fetching data for ${major} team users and projects`, () => {
+      spyOn(store, 'dispatch').and.callThrough();
+      const team: Team = { id, guid, name: 'any', projects: [] };
+      store.dispatch(new GetTeamSuccess(team));
+      const version: IamVersionResponse = { version: { major: major, minor: 'v0' } };
+      store.dispatch(new GetIamVersionSuccess(version));
+
+      expect(store.dispatch).toHaveBeenCalledWith(new GetUsers());
+      expect(store.dispatch).toHaveBeenCalledWith(new GetTeamUsers({ id: targetId }));
+      expect(store.dispatch).toHaveBeenCalledWith(new GetProjects());
     });
+  });
+
+  it('initializes dropdown with those included on the team checked', () => {
+    const teamProjects = ['b-proj', 'd-proj'];
+    const team: Team = { id: targetId, guid: 'any', name: 'any', projects: teamProjects };
+    store.dispatch(new GetTeamSuccess(team));
+
+    const version: IamVersionResponse = { version: { major: 'v2', minor: 'v1' } };
+    store.dispatch(new GetIamVersionSuccess(version));
+
+    const projectList = [
+      genProject('a-proj'),
+      genProject('b-proj'),
+      genProject('c-proj'),
+      genProject('d-proj')
+    ];
+    store.dispatch(new GetProjectsSuccess({ projects: projectList }));
+
+    projectList.forEach(p => {
+      expect(component.projects[p.id].checked).toEqual(teamProjects.includes(p.id));
+    });
+   });
+
+  describe('sortedUsers$', () => {
 
     it('intermixes capitals and lowercase with lowercase first', () => {
       store.dispatch(new GetTeamUsersSuccess({ user_ids: ['user-id-1', 'user-id-2'] }));
@@ -254,5 +296,13 @@ describe('TeamDetailsComponent', () => {
       });
     });
   });
-});
 
+  function genProject(id: string): Project {
+    return {
+      id,
+      status: 'NO_RULES', // unused
+      name: id, // unused
+      type: 'CUSTOM' // unused
+    };
+  }
+});

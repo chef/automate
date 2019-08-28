@@ -30,20 +30,18 @@ import {
   RemoveTeamUsers,
   UpdateTeam
 } from 'app/entities/teams/team.actions';
-import { GetProject } from 'app/entities/projects/project.actions';
-import {
-  getStatus as getProjectStatus,
-  projectEntities
-} from 'app/entities/projects/project.selectors';
 import {
   ProjectChecked,
   ProjectCheckedMap
 } from 'app/components/projects-dropdown/projects-dropdown.component';
 
+import { GetProjects } from 'app/entities/projects/project.actions';
+import {
+  allProjects,
+  getAllStatus as getAllProjectStatus
+} from 'app/entities/projects/project.selectors';
 import { ProjectConstants, Project } from 'app/entities/projects/project.model';
-import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
-import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
-import { IAMType } from 'app/entities/policies/policy.model';
+import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 
 const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 
@@ -76,12 +74,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
   public projects: ProjectCheckedMap = {};
-  // keep a list of projects that were in the teams list that are
-  // left to fetch so we can know if we are fully loaded or not.
-  // don't want to enable the projects-dropdown until we have
-  // checked the proper project checkboxes corresponding to projects
-  // already in the team.
-  public teamProjectsLeftToFetch: string[] = [];
 
   constructor(private store: Store<NgrxStateAtom>,
     public fb: FormBuilder,
@@ -101,23 +93,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       name: new FormControl({value: 'Loading...', disabled: true},
         [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)])
     });
-
-    combineLatest([
-      this.store.select(getStatus),
-      this.store.select(updateStatus)
-    ]).pipe(
-      takeUntil(this.isDestroyed),
-      map(([gStatus, uStatus]) => {
-        this.isLoadingTeam =
-          (gStatus !== EntityStatus.loadingSuccess) ||
-          (uStatus === EntityStatus.loading);
-        if (this.isLoadingTeam) {
-          this.updateNameForm.controls['name'].disable();
-        } else {
-          this.updateNameForm.controls['name'].enable();
-        }
-      })
-    ).subscribe();
   }
 
   private get teamId(): string {
@@ -138,50 +113,62 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       });
 
     this.store.select(iamMinorVersion)
-      .pipe(
-        takeUntil(this.isDestroyed),
-        filter(identity)
-      )
-      .subscribe((version) => {
-        this.isMinorV1 = version === 'v1';
+      .pipe(takeUntil(this.isDestroyed))
+      .subscribe((minor) => {
+        this.isMinorV1 = minor === 'v1';
       });
 
-    this.store.select(assignableProjects)
-      .subscribe((assignable: ProjectsFilterOption[]) => {
-        assignable.forEach(({ value: id, label: name, type: stringType }) => {
-          const type = <IAMType>stringType;
-          // TODO (tc) Don't actually have the status queried in here but
-          // also don't need it for this page. Maybe the status field
-          // should be optional in the project model?
-          const proj: Project = { id, name, type, status: 'NO_RULES' };
-          // we don't want to override projects that we fetched
-          // that were part of the team already
-          if (!this.projects[proj.id]) {
-            const checked = false;
-            this.projects[proj.id] = { ...proj, checked };
-          }
-        });
-      });
-
-    this.store.select(iamMajorVersion)
-      .pipe(
-        takeUntil(this.isDestroyed),
-        filter(identity)
-        )
-      .subscribe((version) => {
-        this.isMajorV1 = version === 'v1';
-
-        // Triggered every time the team is updated.
-        if (this.isMajorV1) {
-          this.store.select(v1TeamFromRoute)
-            .pipe(filter(identity), takeUntil(this.isDestroyed))
-            .subscribe(this.getTeamDependentData.bind(this));
+    combineLatest([
+      this.store.select(getStatus),
+      this.store.select(updateStatus)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      map(([gStatus, uStatus]) => {
+        this.isLoadingTeam =
+          (gStatus !== EntityStatus.loadingSuccess) ||
+          (uStatus === EntityStatus.loading);
+        if (this.isLoadingTeam) {
+          this.updateNameForm.controls['name'].disable();
         } else {
-          this.store.select(v2TeamFromRoute)
-            .pipe(filter(identity), takeUntil(this.isDestroyed))
-            .subscribe(this.getTeamDependentData.bind(this));
+          this.updateNameForm.controls['name'].enable();
         }
-      });
+      })
+    ).subscribe();
+
+    combineLatest([
+      this.store.select(v1TeamFromRoute),
+      this.store.select(v2TeamFromRoute),
+      this.store.select(iamMajorVersion)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      map(([v1Team, v2Team, major]: [Team, Team, IAMMajorVersion]) => {
+        this.isMajorV1 = major === 'v1';
+        return (this.isMajorV1 ? v1Team : v2Team);
+      }),
+      filter(identity)
+    ).subscribe((team: Team) => {
+      this.team = team;
+      this.updateNameForm.controls.name.setValue(this.team.name);
+      this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
+      this.store.dispatch(new GetUsers());
+      this.store.dispatch(new GetProjects());
+    });
+
+    combineLatest([
+      this.store.select(allProjects),
+      this.store.select(getAllProjectStatus)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(([_, pStatus]: [Project[], EntityStatus]) => pStatus !== EntityStatus.loading),
+      filter(() => !!this.team),
+      map(([allowedProjects, _]) => {
+        allowedProjects
+          .forEach(p => {
+            this.projects[p.id] = { ...p, checked: this.team.projects.includes(p.id)
+            };
+          });
+      }))
+      .subscribe();
 
     this.sortedUsers$ = <Observable<User[]>>combineLatest([
       this.store.select(allUsers),
@@ -233,45 +220,11 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
             }
           });
       });
-
-    // we keep a list of all projects that were left in the team
-    // to know if we are fully loaded yet or not.
-    combineLatest([
-      this.store.select(getProjectStatus),
-      this.store.select(projectEntities)])
-      .pipe(filter(([status, _]: [EntityStatus, ProjectCheckedMap]) =>
-          status === EntityStatus.loadingSuccess),
-        map(([_, projectMap]) => {
-          const projectsFound: { [id: string]: boolean } = {};
-          this.teamProjectsLeftToFetch.forEach(pID => {
-            const project = projectMap[pID];
-            if (project !== undefined) {
-              const checked = true;
-              this.projects[project.id] = { ...project, checked };
-              projectsFound[pID] = true;
-            }
-          });
-
-          // Remove all team projects that have been fetched.
-          this.teamProjectsLeftToFetch =
-            this.teamProjectsLeftToFetch.filter(pID => !projectsFound[pID]);
-      })).subscribe();
  }
 
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
-  }
-
-  private getTeamDependentData(team: Team): void {
-    this.team = team;
-    this.team.projects.forEach(pID => {
-      this.teamProjectsLeftToFetch.push(pID);
-      this.store.dispatch(new GetProject({ id: pID }));
-    });
-    this.updateNameForm.controls.name.setValue(this.team.name);
-    this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
-    this.store.dispatch(new GetUsers());
   }
 
   toggleUserMembershipView(): void {
@@ -285,7 +238,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     }));
   }
 
-  public saveTeam(): void {
+  saveTeam(): void {
     this.saveSuccessful = false;
     this.saving = true;
     this.updateNameForm.controls['name'].disable();
@@ -333,8 +286,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   }
 
   dropdownDisabled(): boolean {
-    return Object.values(this.projects).length === 0 ||
-      this.teamProjectsLeftToFetch.length !== 0 ||
-      this.saving;
+    return Object.values(this.projects).length === 0 || this.saving;
   }
 }
