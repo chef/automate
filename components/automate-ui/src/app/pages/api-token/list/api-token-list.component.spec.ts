@@ -84,10 +84,12 @@ describe('ApiTokenListComponent', () => {
       expect(component.createModalVisible).toBe(true);
     });
 
-    it('opening create modal resets name to empty string', () => {
+    it('opening create modal resets name, id, and projects to empty', () => {
       component.createTokenForm.controls['name'].setValue('any');
       (<HTMLButtonElement>(element.querySelector('#create-button'))).click();
-      expect(component.createTokenForm.controls['name'].value).toBe(null);
+      expect(component.createTokenForm.controls.name.value).toBe(null);
+      expect(component.createTokenForm.controls.id.value).toBe(null);
+      expect(component.createTokenForm.controls.projects.value).toBe(null);
     });
   });
 
