@@ -69,7 +69,7 @@ func (backend ES2Backend) GetSuggestions(typeParam string, filters map[string][]
 		useSummaryIndex = false
 	} else {
 		// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
-		for filterType, _ := range filters {
+		for filterType := range filters {
 			if strings.HasPrefix(filterType, "control_tag") {
 				useSummaryIndex = false
 				break
