@@ -77,7 +77,7 @@ export class ApiTokenListComponent implements OnInit {
       name: ['', Validators.required],
       id: ['',
         [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]],
-      projects: [[]] 
+      projects: [[]]
     });
     this.iamMajorVersion$ = store.pipe(select(iamMajorVersion));
     this.iamMinorVersion$ = store.pipe(select(iamMinorVersion));

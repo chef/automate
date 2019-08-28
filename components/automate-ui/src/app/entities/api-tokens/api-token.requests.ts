@@ -86,7 +86,7 @@ export class ApiTokenRequests {
     switch (version) {
       case 'v2': {
         return this.http.post<TokenPayloadResponse>(`${env.auth_v2_url}/tokens`,
-          { 
+          {
             id: tokenData.id,
             name: tokenData.name,
             active: true,

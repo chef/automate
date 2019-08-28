@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
 import { identity, xor } from 'lodash/fp';
-import { combineLatest, Observable, Subject } from 'rxjs';
+import { combineLatest, Subject } from 'rxjs';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -13,8 +13,8 @@ import { GetToken, UpdateToken } from 'app/entities/api-tokens/api-token.actions
 import { apiTokenFromRoute, updateStatus } from 'app/entities/api-tokens/api-token.selectors';
 import { ApiToken } from 'app/entities/api-tokens/api-token.model';
 import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
-import { IAMType, IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
-import { ProjectConstants } from 'app/entities/projects/project.model';
+import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
+import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 import { GetProjects } from 'app/entities/projects/project.actions';
 import {
   allProjects,
@@ -24,7 +24,6 @@ import {
   ProjectChecked,
   ProjectCheckedMap
 } from 'app/components/projects-dropdown/projects-dropdown.component';
-import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
 
 type TokenStatus = 'active' | 'inactive';
 type TokenTabName = 'details';
@@ -85,8 +84,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(iamMajorVersion),
-      this.store.select(iamMinorVersion)).pipe(
-        takeUntil(this.isDestroyed))
+      this.store.select(iamMinorVersion)]).pipe(takeUntil(this.isDestroyed))
         .subscribe(([major, minor]: [IAMMajorVersion, IAMMinorVersion]) => {
           this.isMajorV1 = major === 'v1';
           this.isMinorV1 = minor === 'v1';
