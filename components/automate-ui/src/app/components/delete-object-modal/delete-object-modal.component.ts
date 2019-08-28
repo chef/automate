@@ -11,6 +11,7 @@ export class DeleteObjectModalComponent {
   @Input() objectNoun: string;
   @Input() objectName: string;
   @Input() moreDetails: string; // additional details after "action cannot be undone"
+  @Input() nodeCredObject: string;
 
   @Output() close = new EventEmitter();
   @Output() deleteClicked = new EventEmitter<User>();

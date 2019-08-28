@@ -1,6 +1,7 @@
 <chef-modal [visible]="visible" (close)="closeEvent()">
-  <h2 slot="title">Delete {{objectNoun | titlecase}}?</h2>
-  <div>
+  <h2 *ngIf="!nodeCredObject" slot="title">Delete {{objectNoun | titlecase}}?</h2>
+  <h2 *ngIf="nodeCredObject" slot="title">Remove Node {{objectNoun | titlecase}}?</h2>
+  <div *ngIf="!nodeCredObject">
     <span *ngIf="moreDetails">
       Deleting {{objectNoun}} {{objectName}} <strong>cannot be undone</strong><br>
       {{moreDetails}}.
@@ -9,10 +10,18 @@
       Deleting {{objectNoun}} {{objectName}} <strong>cannot be undone</strong>.
     </span>
   </div>
+  <div *ngIf="nodeCredObject">
+    <span *ngIf="!moreDetails">
+      Removing node {{objectNoun}} {{objectName}} <strong>cannot be undone</strong>.
+    </span>
+  </div>
 
   <div class="options">
-    <chef-button primary caution (click)="deleteObject()">
+    <chef-button *ngIf="!nodeCredObject" primary caution (click)="deleteObject()">
       Delete {{objectNoun | titlecase}}
+    </chef-button>
+    <chef-button *ngIf="nodeCredObject" primary caution (click)="deleteObject()">
+      Remove {{objectNoun | titlecase}}
     </chef-button>
     <chef-button tertiary (click)="closeEvent()">Cancel</chef-button>
   </div>
