@@ -29,10 +29,10 @@ const (
 	//
 	defaultMaxIdleConnections = 4
 
-	enqueueTaskQuery   = `SELECT cereal_enqueue_task($1, $2, $3, $4)`
-	dequeueTaskQuery   = `SELECT * FROM cereal_dequeue_task($1)`
-	completeTaskQuery  = `SELECT cereal_complete_task($1, $2, $3, $4)`
-	getTaskResultQuery = `SELECT task_name, parameters, status, error, result FROM cereal_task_results WHERE id = $1`
+	enqueueTaskQuery       = `SELECT cereal_enqueue_task($1, $2, $3, $4)`
+	dequeueTaskQuery       = `SELECT * FROM cereal_dequeue_task($1)`
+	completeTaskQuery      = `SELECT cereal_complete_task($1, $2, $3, $4)`
+	consumeTaskResultQuery = `DELETE FROM cereal_task_results WHERE id = $1 RETURNING task_name, parameters, status, error, result`
 
 	enqueueWorkflowQuery  = `SELECT cereal_enqueue_workflow($1, $2, $3)`
 	dequeueWorkflowQuery  = `SELECT * FROM cereal_dequeue_workflow(VARIADIC $1)`
@@ -716,7 +716,7 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 
 	if event.Type == backend.TaskComplete {
 		event.CompletedTaskCount++
-		tr, err := getTaskResult(ctx, tx, taskResultID)
+		tr, err := consumeTaskResult(ctx, tx, taskResultID)
 		if err != nil {
 			cancel()
 			return nil, nil, errors.Wrap(err, "failed to retrieve task result for task complete event")
@@ -730,12 +730,12 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 	return event, workc, nil
 }
 
-func getTaskResult(ctx context.Context, tx *sql.Tx, taskResultID sql.NullInt64) (*backend.TaskResult, error) {
+func consumeTaskResult(ctx context.Context, tx *sql.Tx, taskResultID sql.NullInt64) (*backend.TaskResult, error) {
 	if !taskResultID.Valid {
 		return nil, errors.New("invalid task result id for completed task event")
 	}
 
-	row := tx.QueryRowContext(ctx, getTaskResultQuery, taskResultID.Int64)
+	row := tx.QueryRowContext(ctx, consumeTaskResultQuery, taskResultID.Int64)
 	tr := backend.TaskResult{}
 	err := row.Scan(
 		&tr.TaskName, &tr.Parameters, &tr.Status, &tr.ErrorText, &tr.Result)
