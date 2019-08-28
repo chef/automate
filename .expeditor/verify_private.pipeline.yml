@@ -416,6 +416,7 @@ steps:
     command:
       - integration/run_test integration/tests/cypress_e2e.sh
     timeout_in_minutes: 20
+    soft_fail: true
     expeditor:
       secrets: &cypress_secrets
         A2_LICENSE:
@@ -442,6 +443,7 @@ steps:
     command:
       - IAM=v2 integration/run_test integration/tests/cypress_e2e.sh
     timeout_in_minutes: 20
+    soft_fail: true
     expeditor:
       secrets: *cypress_secrets
       executor:
@@ -452,6 +454,7 @@ steps:
     command:
       - IAM=v2.1 integration/run_test integration/tests/cypress_e2e.sh
     timeout_in_minutes: 20
+    soft_fail: true
     expeditor:
       secrets: *cypress_secrets
       executor:
