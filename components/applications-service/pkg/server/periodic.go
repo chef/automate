@@ -11,8 +11,6 @@ import (
 	cerealRPC "github.com/chef/automate/lib/cereal/grpc"
 	"github.com/chef/automate/lib/cereal/patterns"
 	"github.com/chef/automate/lib/grpc/secureconn"
-	certs "github.com/chef/automate/lib/tls/certs"
-	"github.com/chef/automate/lib/version"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -35,11 +33,8 @@ const (
 	DisconnectedServicesScheduleName       = "periodic_disconnected_services"
 )
 
-func ConnectToJobsManager(jobCfg *config.Jobs, certs *certs.ServiceCerts) (*cereal.Manager, error) {
+func ConnectToJobsManager(jobCfg *config.Jobs, connFactory *secureconn.Factory) (*cereal.Manager, error) {
 	svcURL := fmt.Sprintf("%s:%d", jobCfg.Host, jobCfg.Port)
-
-	connFactory := secureconn.NewFactory(*certs,
-		secureconn.WithVersionInfo(version.Version, version.GitSHA))
 	conn, err := connFactory.Dial(cerealServiceMutualTLSName, svcURL)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to connect to upstream job service %q at %q", cerealServiceMutualTLSName, svcURL)

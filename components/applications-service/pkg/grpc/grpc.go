@@ -26,17 +26,25 @@ func Spawn(c *config.Applications, connFactory *secureconn.Factory) error {
 		return err
 	}
 
-	grpcServer := NewGRPCServer(connFactory, c)
+	jobsMgr, err := server.ConnectToJobsManager(&c.Jobs, connFactory)
+	if err != nil {
+		log.WithError(err).Fatal("Failed to connect to upstream cereal service")
+		return err
+	}
+
+	scheduler := server.NewJobScheduler(jobsMgr)
+
+	grpcServer := NewGRPCServer(scheduler, connFactory, c)
 	return grpcServer.Serve(conn)
 }
 
 // NewGRPCServer returns a server that provides our services:
 // * applications
 // * health
-func NewGRPCServer(connFactory *secureconn.Factory, c *config.Applications) *grpc.Server {
+func NewGRPCServer(scheduler *server.JobScheduler, connFactory *secureconn.Factory, c *config.Applications) *grpc.Server {
 	grpcServer := connFactory.NewServer()
 
-	applicationsServer := server.New(c.GetStorage(), c.GetIngester())
+	applicationsServer := server.New(c.GetStorage(), c.GetIngester(), scheduler)
 	applications.RegisterApplicationsServiceServer(grpcServer, applicationsServer)
 
 	health.RegisterHealthServer(grpcServer, applicationsServer.Health())

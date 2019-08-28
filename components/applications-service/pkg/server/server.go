@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -29,14 +30,16 @@ type ApplicationsServer struct {
 	health         *health.Service
 	storageClient  storage.Client
 	ingesterClient ingester.Client
+	jobScheduler   *JobScheduler
 }
 
 // New creates a new ApplicationsServer instance.
-func New(sc storage.Client, ic ingester.Client) *ApplicationsServer {
+func New(sc storage.Client, ic ingester.Client, j *JobScheduler) *ApplicationsServer {
 	return &ApplicationsServer{
 		health:         health.NewService(),
 		storageClient:  sc,
 		ingesterClient: ic,
+		jobScheduler:   j,
 	}
 }
 
@@ -331,6 +334,34 @@ func (app *ApplicationsServer) MarkDisconnectedServices(thresholdSeconds int32) 
 		return nil, err
 	}
 	return convertStorageServicesToApplicationsServices(svcs), nil
+}
+
+func (app *ApplicationsServer) UpdateDisconnectedServicesConfig(ctx context.Context,
+	req *applications.UpdateDisconnectedServicesConfigReq) (*applications.UpdateDisconnectedServicesConfigRes, error) {
+
+	if req.GetRunning() {
+		err := app.jobScheduler.EnableDisconnectedServicesJob(ctx)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to enable disconnected_services job")
+		}
+	} else {
+		err := app.jobScheduler.DisableDisconnectedServicesJob(ctx)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to disable disconnected_services job")
+		}
+	}
+
+	requestedThreshold, err := time.ParseDuration(req.GetThreshold())
+	if err != nil {
+		return nil, errors.Wrapf(err, "unable to parse disconnected_services threshold %q", req.GetThreshold())
+	}
+	s := int(requestedThreshold.Seconds())
+	err = app.jobScheduler.UpdateDisconnectedServicesJobParams(ctx, &DisconnectedServicesParamsV0{ThresholdSeconds: s})
+	if err != nil {
+		return nil, errors.Wrapf(err, "unable to update disconnected services parameters to %q", req.GetThreshold())
+	}
+
+	return &applications.UpdateDisconnectedServicesConfigRes{}, nil
 }
 
 // Convert storage.Service array to applications.Service array

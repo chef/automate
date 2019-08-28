@@ -54,6 +54,19 @@ func init() {
 	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/DeleteDisconnectedServices", "service_groups", "delete", "POST", "/beta/applications/delete_disconnected_services", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
+	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/UpdateDisconnectedServicesConfig", "service_groups", "delete", "POST", "/beta/retention/service_groups/config", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*UpdateDisconnectedServicesConfigReq); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "threshold":
+					return m.Threshold
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetVersion", "service_info:version", "read", "GET", "/beta/applications/version", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})

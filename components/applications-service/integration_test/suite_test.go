@@ -8,6 +8,7 @@ package integration_test
 import (
 	"fmt"
 	"os"
+	"path"
 	"time"
 
 	"github.com/golang/protobuf/proto"
@@ -19,7 +20,10 @@ import (
 	"github.com/chef/automate/components/applications-service/pkg/server"
 	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/chef/automate/components/applications-service/pkg/storage/postgres"
+	"github.com/chef/automate/lib/grpc/secureconn"
 	platform_config "github.com/chef/automate/lib/platform/config"
+	"github.com/chef/automate/lib/tls/certs"
+	"github.com/chef/automate/lib/version"
 )
 
 // Suite helps you manipulate various stages of your tests, it provides common
@@ -35,6 +39,7 @@ type Suite struct {
 	ApplicationsServer *server.ApplicationsServer
 	Ingester           ingester.Client
 	StorageClient      storage.Client
+	JobScheduler       *server.JobScheduler
 }
 
 // Initialize the test suite
@@ -87,13 +92,38 @@ func NewSuite(database string) *Suite {
 	// Start processing messages as they are sent to the ingest events channel
 	go s.Ingester.Run()
 
+	certs := studioCerts()
+
+	jobCfg := config.Jobs{
+		Host: "localhost",
+		Port: 10101,
+	}
+	connFactory := secureconn.NewFactory(*certs,
+		secureconn.WithVersionInfo(version.Version, version.GitSHA))
+
+	jobsMgr, err := server.ConnectToJobsManager(&jobCfg, connFactory)
+	if err != nil {
+		fmt.Printf("Failed to connect to cereal service using config %+v\n", jobCfg)
+		fmt.Printf("Error: %s\n", err)
+		panic("test setup failed")
+	}
+
+	scheduler := server.NewJobScheduler(jobsMgr)
+	err = scheduler.Setup()
+	if err != nil {
+		fmt.Printf("Failed to setup internal interface to cereal service using config %+v\n", jobCfg)
+		fmt.Printf("Error: %s\n", err)
+		panic("test setup failed")
+	}
+	s.JobScheduler = scheduler
+
 	// A global ApplicationsServer instance to call any rpc function
 	//
 	// From any test you can directly call:
 	// ```
 	// res, err := suite.ApplicationsServer.GetServicesHealthCounts(ctx, &req)
 	// ```
-	s.ApplicationsServer = server.New(s.StorageClient, s.Ingester)
+	s.ApplicationsServer = server.New(s.StorageClient, s.Ingester, scheduler)
 
 	return s
 }
@@ -218,4 +248,20 @@ func (s *Suite) WaitForEventsToProcess(n int64) {
 			os.Exit(1)
 		}
 	}
+}
+
+func studioCerts() *certs.ServiceCerts {
+	conf := certs.TLSConfig{
+		CertPath:       path.Join(habConfigDir, "service.crt"),
+		KeyPath:        path.Join(habConfigDir, "service.key"),
+		RootCACertPath: path.Join(habConfigDir, "root_ca.crt"),
+	}
+	certs, err := conf.ReadCerts()
+	if err != nil {
+		fmt.Printf("Failed to read service certs w/ config %+v\n", conf)
+		fmt.Printf("Error: %s\n", err)
+		panic("test setup failed")
+	}
+
+	return certs
 }

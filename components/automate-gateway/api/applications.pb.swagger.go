@@ -347,6 +347,32 @@ func init() {
           "ApplicationsService"
         ]
       }
+    },
+    "/beta/retention/service_groups/config": {
+      "post": {
+        "operationId": "UpdateDisconnectedServicesConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/applicationsUpdateDisconnectedServicesConfigRes"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/applicationsUpdateDisconnectedServicesConfigReq"
+            }
+          }
+        ],
+        "tags": [
+          "ApplicationsService"
+        ]
+      }
     }
   },
   "definitions": {
@@ -567,6 +593,22 @@ func init() {
           "format": "int32"
         }
       }
+    },
+    "applicationsUpdateDisconnectedServicesConfigReq": {
+      "type": "object",
+      "properties": {
+        "running": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "threshold": {
+          "type": "string",
+          "description": "To match the ingest API at /retention/nodes/missing-nodes/config, we use a\nstring that conforms to golang's time.ParseDuration() function. Internally\nthe service uses an integer number of seconds so partial seconds in the\nthreshold will be trucated."
+        }
+      }
+    },
+    "applicationsUpdateDisconnectedServicesConfigRes": {
+      "type": "object"
     },
     "queryPagination": {
       "type": "object",

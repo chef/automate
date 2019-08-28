@@ -87,6 +87,18 @@ service ApplicationsService {
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:delete";
   };
 
+  rpc UpdateDisconnectedServicesConfig(UpdateDisconnectedServicesConfigReq) returns (UpdateDisconnectedServicesConfigRes) {
+    option (google.api.http) = {
+      post: "/beta/retention/service_groups/config"
+      body: "*"
+    };
+    // TODO: need new resources/policies for this
+    option (chef.automate.api.policy).resource = "service_groups";
+    option (chef.automate.api.policy).action = "delete";
+    option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "applications:serviceGroups:delete";
+  };
+
   rpc GetVersion (common.version.VersionInfoRequest) returns (common.version.VersionInfo) {
     option (google.api.http).get = "/beta/applications/version";
     option (chef.automate.api.policy).resource = "service_info:version";
@@ -143,6 +155,17 @@ message ServicesStatsRes {
   int32 total_supervisors = 3;
   int32 total_deployments = 4;
 }
+
+message UpdateDisconnectedServicesConfigReq {
+  bool running = 1;
+  // To match the ingest API at /retention/nodes/missing-nodes/config, we use a
+  // string that conforms to golang's time.ParseDuration() function. Internally
+  // the service uses an integer number of seconds so partial seconds in the
+  // threshold will be trucated.
+  string threshold = 2;
+}
+
+message UpdateDisconnectedServicesConfigRes {}
 
 message Service {
   string supervisor_id = 1;
