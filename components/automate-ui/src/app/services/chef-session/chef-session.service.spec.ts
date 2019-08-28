@@ -143,7 +143,7 @@ describe('ChefSessionService', () => {
 
       it('does not ingest any token, but calls logout', () => {
         service.refreshSessionCallback(event);
-        expect(service.logout).toHaveBeenCalledWith('/some/path', true);
+        expect(service.logout).toHaveBeenCalledWith();
         expect(service.ingestIDToken).not.toHaveBeenCalled();
       });
     });

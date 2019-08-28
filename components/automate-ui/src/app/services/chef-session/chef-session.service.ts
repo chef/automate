@@ -75,7 +75,7 @@ export class ChefSessionService implements CanActivate {
       if (xhr.status === HTTP_STATUS_OK) {
         this.ingestIDToken(xhr.response.id_token);
       } else if (xhr.status === HTTP_STATUS_UNAUTHORIZED) {
-        this.logout(this.currentPath(), true);
+        this.logout();
       } else {
         // TODO 2017/12/15 (sr): is there anything we could do that's better than
         // this?
