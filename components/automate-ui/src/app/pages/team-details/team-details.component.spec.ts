@@ -10,10 +10,8 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { using } from 'app/testing/spec-helpers';
 import {
   projectsFilterReducer,
-  projectsFilterInitialState,
-  ProjectsFilterOption
+  projectsFilterInitialState
 } from 'app/services/projects-filter/projects-filter.reducer';
-import { LoadOptionsSuccess } from 'app/services/projects-filter/projects-filter.actions';
 import {
   policyEntityReducer, PolicyEntityInitialState
 } from 'app/entities/policies/policy.reducer';
@@ -24,6 +22,8 @@ import {
   projectEntityReducer,
   ProjectEntityInitialState
 } from 'app/entities/projects/project.reducer';
+import { Project } from 'app/entities/projects/project.model';
+import { GetProjectsSuccess, GetProjects } from 'app/entities/projects/project.actions';
 import {
   userEntityReducer,
   UserEntityInitialState
@@ -179,6 +179,7 @@ describe('TeamDetailsComponent', () => {
 
       expect(store.dispatch).toHaveBeenCalledWith(new GetUsers());
       expect(store.dispatch).toHaveBeenCalledWith(new GetTeamUsers({ id: targetId }));
+      expect(store.dispatch).toHaveBeenCalledWith(new GetProjects());
     });
   });
 
@@ -190,17 +191,16 @@ describe('TeamDetailsComponent', () => {
     const version: IamVersionResponse = { version: { major: 'v2', minor: 'v1' } };
     store.dispatch(new GetIamVersionSuccess(version));
 
-    // populate the global project filter (the source for assignable projects)
-    const projectOptionList = [
-      genProjectOption('a-proj'),
-      genProjectOption('b-proj'),
-      genProjectOption('c-proj'),
-      genProjectOption('d-proj')
+    const projectList = [
+      genProject('a-proj'),
+      genProject('b-proj'),
+      genProject('c-proj'),
+      genProject('d-proj')
     ];
-    store.dispatch(new LoadOptionsSuccess({ fetched: projectOptionList, restored: [] }));
+    store.dispatch(new GetProjectsSuccess({ projects: projectList }));
 
-    projectOptionList.forEach(p => {
-      expect(component.projects[p.value].checked).toEqual(teamProjects.includes(p.value));
+    projectList.forEach(p => {
+      expect(component.projects[p.id].checked).toEqual(teamProjects.includes(p.id));
     });
    });
 
@@ -297,13 +297,12 @@ describe('TeamDetailsComponent', () => {
     });
   });
 
-  function genProjectOption(
-    label: string, checked?: boolean, value?: string): ProjectsFilterOption {
-    return <ProjectsFilterOption>{
-      label: label,
-      checked: checked === undefined ? false : checked,
-      value: value ? value : label
+  function genProject(id: string): Project {
+    return {
+      id,
+      status: 'NO_RULES', // unused
+      name: id, // unused
+      type: 'CUSTOM' // unused
     };
   }
-
 });

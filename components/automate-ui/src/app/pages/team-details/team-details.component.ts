@@ -35,13 +35,13 @@ import {
   ProjectCheckedMap
 } from 'app/components/projects-dropdown/projects-dropdown.component';
 
-import { ProjectConstants } from 'app/entities/projects/project.model';
+import { GetProjects } from 'app/entities/projects/project.actions';
 import {
-  assignableProjects,
-  optionsLoadingStatus
-} from 'app/services/projects-filter/projects-filter.selectors';
-import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
-import { IAMType, IAMMajorVersion } from 'app/entities/policies/policy.model';
+  allProjects,
+  getAllStatus as getAllProjectStatus
+} from 'app/entities/projects/project.selectors';
+import { ProjectConstants, Project } from 'app/entities/projects/project.model';
+import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 
 const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 
@@ -93,23 +93,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       name: new FormControl({value: 'Loading...', disabled: true},
         [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)])
     });
-
-    combineLatest([
-      this.store.select(getStatus),
-      this.store.select(updateStatus)
-    ]).pipe(
-      takeUntil(this.isDestroyed),
-      map(([gStatus, uStatus]) => {
-        this.isLoadingTeam =
-          (gStatus !== EntityStatus.loadingSuccess) ||
-          (uStatus === EntityStatus.loading);
-        if (this.isLoadingTeam) {
-          this.updateNameForm.controls['name'].disable();
-        } else {
-          this.updateNameForm.controls['name'].enable();
-        }
-      })
-    ).subscribe();
   }
 
   private get teamId(): string {
@@ -130,45 +113,60 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       });
 
     this.store.select(iamMinorVersion)
-      .pipe(
-        takeUntil(this.isDestroyed),
-        filter(identity)
-      )
-      .subscribe((version) => {
-        this.isMinorV1 = version === 'v1';
+      .pipe(takeUntil(this.isDestroyed))
+      .subscribe((minor) => {
+        this.isMinorV1 = minor === 'v1';
       });
 
     combineLatest([
-      this.store.select(assignableProjects),
-      this.store.select(optionsLoadingStatus),
+      this.store.select(getStatus),
+      this.store.select(updateStatus)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      map(([gStatus, uStatus]) => {
+        this.isLoadingTeam =
+          (gStatus !== EntityStatus.loadingSuccess) ||
+          (uStatus === EntityStatus.loading);
+        if (this.isLoadingTeam) {
+          this.updateNameForm.controls['name'].disable();
+        } else {
+          this.updateNameForm.controls['name'].enable();
+        }
+      })
+    ).subscribe();
+
+    combineLatest([
       this.store.select(v1TeamFromRoute),
       this.store.select(v2TeamFromRoute),
       this.store.select(iamMajorVersion)
     ]).pipe(
       takeUntil(this.isDestroyed),
-      map(([assignable, pStatus, v1Team, v2Team, major]:
-        [ProjectsFilterOption[], EntityStatus, Team, Team, IAMMajorVersion]) => {
+      map(([v1Team, v2Team, major]: [Team, Team, IAMMajorVersion]) => {
         this.isMajorV1 = major === 'v1';
-        return [assignable, pStatus, (this.isMajorV1 ? v1Team : v2Team)];
+        return (this.isMajorV1 ? v1Team : v2Team);
       }),
-      filter(([_assignable, pStatus, team]:
-        [ProjectsFilterOption[], EntityStatus, Team]) =>
-        pStatus !== EntityStatus.loading && !!team
-      ),
-      map(([assignable, _pStatus, team]) => {
-        this.team = team;
+      filter(identity)
+    ).subscribe((team: Team) => {
+      this.team = team;
+      this.updateNameForm.controls.name.setValue(this.team.name);
+      this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
+      this.store.dispatch(new GetUsers());
+      this.store.dispatch(new GetProjects());
+    });
 
-        assignable
-          .forEach(({ value: id, label: name, type: stringType }) => {
-            const type = <IAMType>stringType;
-            // type and status are unused
-            this.projects[id] = {
-              id, name, type, status: 'NO_RULES', checked: this.team.projects.includes(id)
+    combineLatest([
+      this.store.select(allProjects),
+      this.store.select(getAllProjectStatus)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(([_, pStatus]: [Project[], EntityStatus]) => pStatus !== EntityStatus.loading),
+      filter(() => !!this.team),
+      map(([allowedProjects, _]) => {
+        allowedProjects
+          .forEach(p => {
+            this.projects[p.id] = { ...p, checked: this.team.projects.includes(p.id)
             };
           });
-        this.updateNameForm.controls.name.setValue(this.team.name);
-        this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
-        this.store.dispatch(new GetUsers());
       }))
       .subscribe();
 
@@ -240,7 +238,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     }));
   }
 
-  public saveTeam(): void {
+  saveTeam(): void {
     this.saveSuccessful = false;
     this.saving = true;
     this.updateNameForm.controls['name'].disable();
