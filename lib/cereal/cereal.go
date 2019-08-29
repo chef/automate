@@ -721,7 +721,6 @@ func (r *registeredExecutor) StartPoller(ctx context.Context, d backend.TaskDequ
 		"poll_interval": p.String(),
 	})
 	logctx.Info("Starting task poller")
-
 	timer := time.NewTimer(p.Next())
 	for {
 		select {
@@ -794,9 +793,15 @@ func (r *registeredExecutor) startTaskWorker(ctx context.Context, d backend.Task
 }
 
 func (r *registeredExecutor) runTask(ctx context.Context, t *backend.Task, taskCompleter backend.TaskCompleter) error {
-	logctx := logrus.WithField("task_name", r.name)
-
+	startTime := time.Now()
 	result, err := r.executor.Run(ctx, &task{backendTask: t})
+	endTime := time.Now()
+	logctx := logrus.WithFields(logrus.Fields{
+		"task_name":  r.name,
+		"start_time": startTime,
+		"end_time":   endTime,
+		"duration":   endTime.Sub(startTime),
+	})
 	if err != nil {
 		err := taskCompleter.Fail(err.Error())
 		if err != nil {
@@ -818,6 +823,7 @@ func (r *registeredExecutor) runTask(ctx context.Context, t *backend.Task, taskC
 			return err
 		}
 	}
+	logctx.Debug("Task completed successfully")
 	return nil
 }
 
