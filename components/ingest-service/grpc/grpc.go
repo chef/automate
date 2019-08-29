@@ -189,7 +189,7 @@ func Spawn(opts *serveropts.Opts) error {
 	// Data Lifecycle Interface
 	esSidecarConn, err := opts.ConnFactory.Dial("es-sidecar-service", opts.EsSidecarAddress)
 	if err != nil {
-		// This should never happend
+		// This should never happen
 		log.WithError(err).Error("Failed to create ES Sidecar connection")
 		return err
 	}
