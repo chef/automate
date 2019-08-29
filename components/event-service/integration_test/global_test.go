@@ -59,7 +59,6 @@ func doInit() {
 		HandlerEndpoints: config.HandlerConfig{
 			Compliance: "0.0.0.0:10121",
 			CfgIngest:  "0.0.0.0:10122",
-			Authz:      "0.0.0.0:10130",
 			EventFeed:  "0.0.0.0:10134",
 		},
 	}

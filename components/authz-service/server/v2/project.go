@@ -19,7 +19,6 @@ import (
 	tspb "github.com/golang/protobuf/ptypes/timestamp"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
-	automate_event "github.com/chef/automate/api/interservice/event"
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
@@ -370,15 +369,6 @@ func (s *ProjectState) ListRulesForAllProjects(ctx context.Context,
 	return &api.ListRulesForAllProjectsResp{
 		ProjectRules: projects,
 	}, nil
-}
-
-func (s *ProjectState) HandleEvent(ctx context.Context,
-	req *automate_event.EventMsg) (*automate_event.EventResponse, error) {
-	s.log.Debugf("authz is handling your event %s", req.EventID)
-
-	response := &automate_event.EventResponse{}
-
-	return response, nil
 }
 
 func (s *ProjectState) CreateRule(ctx context.Context, req *api.CreateRuleReq) (*api.CreateRuleResp, error) {
