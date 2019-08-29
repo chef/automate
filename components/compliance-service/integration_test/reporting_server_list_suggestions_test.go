@@ -538,6 +538,8 @@ func TestReportingListSuggestionsLargeArrayValues(t *testing.T) {
 }
 
 func TestReportingListSuggestions(t *testing.T) {
+	suite.DeleteAllDocuments()
+
 	reportFileName := "../ingest/examples/compliance-success-tiny-report.json"
 	everythingCtx := contextWithProjects([]string{authzConstants.AllProjectsExternalID})
 
@@ -577,6 +579,9 @@ func TestReportingListSuggestions(t *testing.T) {
 
 		return response != nil && len(response.Reports) == n
 	})
+
+	suite.RefreshComplianceSummaryIndex()
+	suite.RefreshComplianceReportIndex()
 
 	reportsProjects := map[string][]string{
 		"project1": reportIds[1:3],

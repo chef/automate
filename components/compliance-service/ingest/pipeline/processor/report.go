@@ -17,7 +17,7 @@ func ComplianceReport(in <-chan message.Compliance) <-chan message.Compliance {
 	out := make(chan message.Compliance, 100)
 	go func() {
 		for msg := range in {
-			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Info("Processing Compliance Report")
+			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Processing Compliance Report")
 			parsedTime, err := time.Parse(time.RFC3339, msg.Report.EndTime)
 			if err != nil {
 				grpcErr := status.Errorf(codes.Internal, "Unable to Parse end_time: %s", err)
