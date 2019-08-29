@@ -1,0 +1,28 @@
+{
+  "controls": [
+    {
+      "id": "/etc/passwd must exist",
+      "profile_id": "mylinux-success",
+      "profile_sha256": "1de944869a847da87d3774feaacb41829935a2f46b558f7fc34b4da21586ae27",
+      "status": "passed",
+      "code_desc": "File /etc/passwd should be file"
+    },
+    {
+      "id": "/etc/group must exist",
+      "profile_id": "mylinux-success",
+      "profile_sha256": "1de944869a847da87d3774feaacb41829935a2f46b558f7fc34b4da21586ae27",
+      "status": "passed",
+      "code_desc": "File /etc/group should be file"
+    }
+  ],
+  "statistics": {
+    "duration": 0.020215
+  },
+  "version": "2.2.20",
+  "node_name": "to_be_generated",
+  "node_uuid": "to_be_generated",
+  "report_uuid": "to_be_generated",
+  "end_time": "to_be_generated",
+  "environment": "to_be_generated",
+  "type": "inspec_report"
+}
