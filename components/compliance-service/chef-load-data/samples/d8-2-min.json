@@ -1,0 +1,22 @@
+{
+  "controls": [
+    {
+      "id": "Checking /etc/missing5.rb",
+      "profile_id": "mylinux-failure-major",
+      "profile_sha256": "bb7ecfb4f08d2ecdc8f08351d2e5ea93456c127aa751b2741b86f1e5f47614f3",
+      "status": "failed",
+      "code_desc": "File /etc/missing5.rb should be file",
+      "message": "expected `File /etc/missing5.rb.file?` to return true, got false"
+    }
+  ],
+  "statistics": {
+    "duration": 0.006287
+  },
+  "version": "2.2.20",
+  "node_name": "to_be_generated",
+  "node_uuid": "to_be_generated",
+  "report_uuid": "to_be_generated",
+  "end_time": "to_be_generated",
+  "environment": "to_be_generated",
+  "type": "inspec_report"
+}
