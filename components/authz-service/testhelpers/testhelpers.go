@@ -10,12 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
-
-	_struct "github.com/golang/protobuf/ptypes/struct"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
@@ -29,8 +26,6 @@ import (
 	postgres_v1 "github.com/chef/automate/components/authz-service/storage/v1/postgres"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
-	automate_event_type "github.com/chef/automate/components/event-service/server"
-	project_update_tags "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
@@ -326,42 +321,6 @@ func (*mockPolicyRefresher) Refresh(context.Context) error {
 
 func (refresher *mockPolicyRefresher) RefreshAsync() error {
 	return nil
-}
-
-func CreateStatusEventMsg(projectUpdateIDTag string, estimatedTimeCompleteInSec float64,
-	percentageComplete float64, completed bool, producer string) *automate_event.EventMsg {
-	return &automate_event.EventMsg{
-		EventID:   "event-id-2",
-		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdateStatus},
-		Published: ptypes.TimestampNow(),
-		Producer: &automate_event.Producer{
-			ID: producer,
-		},
-		Data: &_struct.Struct{
-			Fields: map[string]*_struct.Value{
-				"Completed": {
-					Kind: &_struct.Value_BoolValue{
-						BoolValue: completed,
-					},
-				},
-				"PercentageComplete": {
-					Kind: &_struct.Value_NumberValue{
-						NumberValue: percentageComplete,
-					},
-				},
-				"EstimatedTimeCompleteInSec": {
-					Kind: &_struct.Value_NumberValue{
-						NumberValue: estimatedTimeCompleteInSec,
-					},
-				},
-				project_update_tags.ProjectUpdateIDTag: {
-					Kind: &_struct.Value_StringValue{
-						StringValue: projectUpdateIDTag,
-					},
-				},
-			},
-		},
-	}
 }
 
 func WaitForWithTimeout(t *testing.T, f func() bool, timeout time.Duration, message string) {
