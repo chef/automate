@@ -86,13 +86,13 @@ func TestNewHandler(t *testing.T) {
 			}
 			require.NotEmpty(t, sessionID, "there is a session ID cookie")
 			data, exists, err := ms.Find(sessionID)
-			require.Nil(t, err)
+			require.NoError(t, err)
 			require.True(t, exists, "there is a stored session")
 			var cookie struct {
 				Data map[string]interface{} `json:"data"`
 			}
 			err = json.Unmarshal(data, &cookie)
-			require.Nil(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, 3, len(cookie.Data), "expecting 3 keys in cookie data")
 
 			aliveStateInCookieData(t, cookie.Data)
@@ -138,13 +138,13 @@ func TestNewHandler(t *testing.T) {
 			assert.NotEqual(t, sessionID, sessionID2, "session ID has changed")
 
 			data, exists, err := ms.Find(sessionID2)
-			require.Nil(t, err)
+			require.NoError(t, err)
 			require.True(t, exists, "there is a stored session")
 			var cookie struct {
 				Data map[string]interface{} `json:"data"`
 			}
 			err = json.Unmarshal(data, &cookie)
-			require.Nil(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, 5, len(cookie.Data), "expecting 5 keys in cookie data")
 
 			// find relay states
@@ -194,7 +194,7 @@ func TestNewHandler(t *testing.T) {
 				Data map[string]interface{} `json:"data"`
 			}
 			err = json.Unmarshal(data, &cookie)
-			require.Nil(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, 4, len(cookie.Data), "expecting 4 keys in cookie data")
 			ru, ok := cookie.Data["redirect_uri"]
 			require.True(t, ok)
@@ -317,8 +317,8 @@ func TestRefreshHandler(t *testing.T) {
 			s.setTestToken(t2, nil)
 
 			sessionData := struct {
-				RT string `json:"refresh_token"` // should equal refreshTokenKey const
-				Alive bool `json:"alive"`
+				RT    string `json:"refresh_token"` // should equal refreshTokenKey const
+				Alive bool   `json:"alive"`
 			}{RT: refreshToken, Alive: true}
 			if err := addSessionDataToStore(ms, sessionID, sessionData, nil); err != nil {
 				t.Fatal(err)
@@ -378,8 +378,8 @@ func TestRefreshHandler(t *testing.T) {
 			s.setTestToken(nil, errors.New("token exchange failed"))
 
 			sessionData := struct {
-				RT string `json:"refresh_token"` // should equal refreshTokenKey const
-				Alive bool `json:"alive"`
+				RT    string `json:"refresh_token"` // should equal refreshTokenKey const
+				Alive bool   `json:"alive"`
 			}{RT: refreshToken, Alive: true}
 			if err := addSessionDataToStore(ms, sessionID, sessionData, nil); err != nil {
 				t.Fatal(err)
@@ -475,14 +475,14 @@ func TestCallbackHandler(t *testing.T) {
 
 			// relay_state was removed from session data
 			data, exists, err := ms.Find(newSessionID)
-			require.Nil(t, err)
+			require.NoError(t, err)
 			require.True(t, exists, "there is a stored session")
 
 			var cookie struct {
 				Data map[string]interface{} `json:"data"`
 			}
 			err = json.Unmarshal(data, &cookie)
-			require.Nil(t, err)
+			require.NoError(t, err)
 
 			// check that there's no relay state whatsoever
 			rs := 0
@@ -600,14 +600,14 @@ func TestCallbackHandler(t *testing.T) {
 
 			// relay_state was removed from session data
 			data, exists, err := ms.Find(newSessionID)
-			require.Nil(t, err)
+			require.NoError(t, err)
 			require.True(t, exists, "there is a stored session")
 
 			var cookie struct {
 				Data map[string]interface{} `json:"data"`
 			}
 			err = json.Unmarshal(data, &cookie)
-			require.Nil(t, err)
+			require.NoError(t, err)
 
 			// check that there's exactly one state pair left
 			assert.Equal(t, 3, len(cookie.Data)) // refresh_token + the other state pair
