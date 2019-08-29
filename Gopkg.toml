@@ -257,6 +257,11 @@ required = [
   name = "github.com/nats-io/go-nats-streaming"
   branch = "master"
 
+# session-service
+[[constraint]]
+  name = "github.com/alexedwards/scs"
+  version = "1.4.1"
+
 # for testing
 [[constraint]]
   name = "github.com/leanovate/gopter"
