@@ -8,6 +8,14 @@ require 'json'
 require 'openssl'
 require 'open3'
 
+module Net
+  class HTTP::Purge < HTTPRequest
+    METHOD='PURGE'
+    REQUEST_HAS_BODY = false
+    RESPONSE_HAS_BODY = true
+  end
+end
+
 BLDR_API_HOST="bldr.habitat.sh"
 BLDR_API_USER_AGENT="Chef Expeditor"
 
@@ -26,6 +34,7 @@ SKIP_PACKAGES = []
 ALLOW_LOCAL_PACKAGES=(ENV["ALLOW_LOCAL_PACKAGES"] == "true")
 LOCAL_PACKAGE_PATH="results/"
 LOCAL_PACKAGE_ORIGIN=ENV["HAB_ORIGIN"] || "chef"
+FASTLY_PURGE=(ENV["EXPEDITOR_GROUP_ID"].to_s != "")
 
 def channel_for_origin(origin)
   case origin
@@ -69,10 +78,16 @@ def get_latest(channel, origin, name)
     return pinned_hab_components[name]
   end
 
+  latest_path = "/v1/depot/channels/#{origin}/#{channel}/pkgs/#{name}/latest"
+
+  if FASTLY_PURGE
+    purge_fastly_path(BLDR_API_HOST, latest_path)
+  end
+
   http = Net::HTTP.new(BLDR_API_HOST, 443)
   http.use_ssl = true
   http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-  req = Net::HTTP::Get.new("/v1/depot/channels/#{origin}/#{channel}/pkgs/#{name}/latest", {'User-Agent' => BLDR_API_USER_AGENT})
+  req = Net::HTTP::Get.new(latest_path, {'User-Agent' => BLDR_API_USER_AGENT})
   response = http.request(req)
   case response
   when Net::HTTPNotFound
@@ -86,6 +101,15 @@ def get_latest(channel, origin, name)
     latest_release = JSON.parse(response.body)
     latest_release["ident"]
   end
+end
+
+def purge_fastly_path(host, url)
+  puts "  Purging #{url} from Fastly"
+  http = Net::HTTP.new(BLDR_API_HOST, 443)
+  http.use_ssl = true
+  http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+  req = Net::HTTP::Purge.new(url)
+  http.request(req)
 end
 
 def get_local_package(origin, name)
