@@ -132,8 +132,14 @@ def get_hab_deps_latest()
   ret
 end
 
-puts "Environment Keys:"
-puts ENV.keys
+puts "Creating release manifest for Automate"
+puts "Important Environment Variables"
+puts "-------------------------------"
+puts "ALLOW_LOCAL_PACKAGES=#{ENV["ALLOW_LOCAL_PACKAGES"]}"
+puts "HAB_ORIGIN=#{ENV["HAB_ORIGIN"]}"
+puts "VERSION=#{ENV["VERSION"]}"
+puts "EXPEDITOR_PKG_IDENTS=#{ENV["EXPEDITOR_PKG_IDENTS"]}"
+puts "-------------------------------"
 
 version = ENV["VERSION"] || DateTime.now.strftime("%Y%m%d%H%M%S")
 filename = ENV["VERSION"] || "manifest"

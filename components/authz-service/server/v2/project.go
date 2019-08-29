@@ -206,7 +206,7 @@ func (s *ProjectState) waitForApplyStagedRules(ctx context.Context, maxWaitTime 
 	tries := 0
 	startTime := time.Now()
 	for {
-		logctx := s.log.WithField("tries", tries+1).WithField("duration", time.Now().Sub(startTime))
+		logctx := s.log.WithField("tries", tries+1).WithField("duration", time.Since(startTime))
 		st, err := s.ProjectUpdateManager.Status()
 		if err != nil {
 			s.log.WithError(err).Warn("failed to get project update status")
