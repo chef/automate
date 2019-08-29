@@ -1216,9 +1216,13 @@ func (s *statsInfo) String() string {
 	}
 	sort.Strings(keys)
 	str := &strings.Builder{}
+	total := 0.0
 	for _, label := range keys {
-		fmt.Fprintf(str, "%s: %f ms; ", label, s.totals[label].Seconds()*1000)
+		ms := s.totals[label].Seconds() * 1000
+		total = total + ms
+		fmt.Fprintf(str, "%s: %f ms; ", label, ms)
 	}
+	fmt.Fprintf(str, "%s: %f ms", "total", total)
 	return str.String()
 }
 
