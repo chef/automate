@@ -140,6 +140,10 @@ puts "HAB_ORIGIN=#{ENV["HAB_ORIGIN"]}"
 puts "VERSION=#{ENV["VERSION"]}"
 puts "EXPEDITOR_PKG_IDENTS=#{ENV["EXPEDITOR_PKG_IDENTS"]}"
 puts "-------------------------------"
+puts "Environment Variable Keys"
+puts "-------------------------------"
+puts "#{ENV.keys}"
+puts "-------------------------------"
 
 version = ENV["VERSION"] || DateTime.now.strftime("%Y%m%d%H%M%S")
 filename = ENV["VERSION"] || "manifest"
