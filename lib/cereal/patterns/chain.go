@@ -8,13 +8,31 @@ import (
 	"github.com/chef/automate/lib/cereal"
 )
 
+/*
+A chain workflow is a workflow that chains together smaller workflows in sequence.
+When one workflow completes, the next one starts. If one fails, the chain is stopped.
+When executed by cereal, the workflows execute under the same workflow instance. This
+allows breaking logic apart in small, concise workflows.
+
+Limitations:
+- Tasks launched by the subworkflows must have struct or nil parameters
+- When a subworkflow completes, enqueued/running tasks will not be canceled
+  until the end of all subworkflows in the chain
+- Results cannot be passed between workflows in the chain
+*/
+
 var ErrIncorrectParameters = errors.New("Incorrect number of parameters given")
 var ErrTaskWorkflowInvalid = errors.New("Could not determine workflow for task")
 
+// ChainWorkflowParams are the parameters the chain workflow expects.
+// It contains an array of parameters, one for each of the subworkflows
+// in the chain.
 type ChainWorkflowParams struct {
 	WorkflowParams []json.RawMessage
 }
 
+// ChainWorkflowPayload is the state of the chain workflow. It contains
+// the state (payload, result, err, etc) of each subworkflow in the chain.
 type ChainWorkflowPayload struct {
 	Canceled bool
 	State    []WorkflowState
@@ -37,6 +55,10 @@ type ChainWorkflowExecutor struct {
 	executors []cereal.WorkflowExecutor
 }
 
+// ChainWorkflowTaskParam is a struct that is appened to any enqueued tasks.
+// This allows us to know which subworkflow to call when the task completes.
+// This also drives the requirement that the task parameters are either a
+// struct or nil.
 type ChainWorkflowTaskParam struct {
 	XXX_ChainWorkflowIdx int64 `json:"__idx"`
 }
