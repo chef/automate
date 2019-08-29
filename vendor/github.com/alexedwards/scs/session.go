@@ -11,9 +11,13 @@ import (
 	"net/http"
 	"sort"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
+
+// sessionName is a custom type for the request context key.
+type sessionName string
 
 // ErrTypeAssertionFailed is returned by operations on session data where the
 // received value could not be type asserted or converted into the required type.
@@ -30,6 +34,20 @@ type Session struct {
 	mu       sync.Mutex
 }
 
+// cookie wraps http.Cookie, adding SameSite support
+type cookie struct {
+	std      *http.Cookie // "stdlib cookie"
+	sameSite string
+}
+
+func (c *cookie) String() string {
+	v := c.std.String()
+	if c.sameSite != "" {
+		v = v + "; SameSite=" + c.sameSite
+	}
+	return v
+}
+
 func newSession(store Store, opts *options) *Session {
 	return &Session{
 		data:     make(map[string]interface{}),
@@ -40,8 +58,8 @@ func newSession(store Store, opts *options) *Session {
 }
 
 func load(r *http.Request, store Store, opts *options) *Session {
-	// Check to see if there is a session already in the request
-	val := r.Context().Value(opts.name)
+	// Check to see if there is an already loaded session in the request context.
+	val := r.Context().Value(sessionName(opts.name))
 	if val != nil {
 		s, ok := val.(*Session)
 		if !ok {
@@ -121,22 +139,45 @@ func (s *Session) write(w http.ResponseWriter) error {
 		}
 	}
 
-	cookie := &http.Cookie{
-		Name:     s.opts.name,
-		Value:    s.token,
-		Path:     s.opts.path,
-		Domain:   s.opts.domain,
-		Secure:   s.opts.secure,
-		HttpOnly: s.opts.httpOnly,
+	cookie := &cookie{
+		std: &http.Cookie{
+			Name:     s.opts.name,
+			Value:    s.token,
+			Path:     s.opts.path,
+			Domain:   s.opts.domain,
+			Secure:   s.opts.secure,
+			HttpOnly: s.opts.httpOnly,
+		},
+		sameSite: s.opts.sameSite,
 	}
 	if s.opts.persist == true {
 		// Round up expiry time to the nearest second.
-		cookie.Expires = time.Unix(expiry.Unix()+1, 0)
-		cookie.MaxAge = int(expiry.Sub(time.Now()).Seconds() + 1)
+		cookie.std.Expires = time.Unix(expiry.Unix()+1, 0)
+		cookie.std.MaxAge = int(expiry.Sub(time.Now()).Seconds() + 1)
 	}
-	http.SetCookie(w, cookie)
+
+	// Overwrite any existing cookie header for the session...
+	var set bool
+	for i, h := range w.Header()["Set-Cookie"] {
+		if strings.HasPrefix(h, fmt.Sprintf("%s=", s.opts.name)) {
+			w.Header()["Set-Cookie"][i] = cookie.String()
+			set = true
+			break
+		}
+	}
+	// Or set a new one if necessary.
+	if !set {
+		w.Header().Add("Set-Cookie", cookie.String())
+	}
 
 	return nil
+}
+
+// Token returns the token value that represents given session data.
+// NOTE: The method returns the empty string if session hasn't yet been written to the store.
+// If you're using the CookieStore this token will change each time the session is modified.
+func (s *Session) Token() string {
+	return s.token
 }
 
 // GetString returns the string value for a given key from the session data. The
@@ -702,12 +743,16 @@ func (s *Session) Destroy(w http.ResponseWriter) error {
 	return nil
 }
 
+// Touch writes the session data in order to update the expiry time when an
+// Idle Timeout has been set. If IdleTimeout is not > 0, then Touch is a no-op.
 func (s *Session) Touch(w http.ResponseWriter) error {
 	if s.loadErr != nil {
 		return s.loadErr
 	}
-
-	return s.write(w)
+	if s.opts.idleTimeout > 0 {
+		return s.write(w)
+	}
+	return nil
 }
 
 func (s *Session) get(key string) (interface{}, bool, error) {

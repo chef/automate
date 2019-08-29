@@ -2,6 +2,7 @@ package scs
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -26,6 +27,7 @@ func NewManager(store Store) *Manager {
 		path:        "/",
 		persist:     false,
 		secure:      false,
+		sameSite:    "",
 	}
 
 	return &Manager{
@@ -97,9 +99,37 @@ func (m *Manager) Secure(b bool) {
 	m.opts.secure = b
 }
 
+// SameSite sets the 'SameSite' attribute on the session cookie. The default value
+// is nil; setting no SameSite attribute. Allowed values are "Lax" and "Strict".
+// Note that "" (empty-string) causes SameSite to NOT be set -- don't confuse this
+// with the cookie's 'SameSite' attribute (without Lax/Strict), which would default
+// to "Strict".
+func (m *Manager) SameSite(s string) {
+	m.opts.sameSite = s
+}
+
 // Load returns the session data for the current request.
 func (m *Manager) Load(r *http.Request) *Session {
 	return load(r, m.store, m.opts)
+}
+
+// LoadFromContext returns session data from a given context.Context object.
+func (m *Manager) LoadFromContext(ctx context.Context) *Session {
+	val := ctx.Value(sessionName(m.opts.name))
+	if val == nil {
+		return &Session{loadErr: fmt.Errorf("scs: value %s not in context", m.opts.name)}
+	}
+
+	s, ok := val.(*Session)
+	if !ok {
+		return &Session{loadErr: fmt.Errorf("scs: can not assert %T to *Session", val)}
+	}
+	return s
+}
+
+// AddToContext adds session data to a given context.Context object.
+func (m *Manager) AddToContext(ctx context.Context, session *Session) context.Context {
+	return context.WithValue(ctx, sessionName(m.opts.name), session)
 }
 
 func NewCookieManager(key string) *Manager {
@@ -108,26 +138,21 @@ func NewCookieManager(key string) *Manager {
 }
 
 func (m *Manager) Multi(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), m.opts.name, m.Load(r))
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
+	return m.Use(next)
 }
 
 func (m *Manager) Use(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		session := m.Load(r)
 
-		if m.opts.idleTimeout > 0 {
-			err := session.Touch(w)
-			if err != nil {
-				log.Println(err)
-				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-				return
-			}
+		err := session.Touch(w)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
 		}
 
-		ctx := context.WithValue(r.Context(), m.opts.name, session)
+		ctx := m.AddToContext(r.Context(), session)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
