@@ -262,7 +262,7 @@ func (backend *ES2Backend) GetReports(from int32, size int32, filters map[string
 						NodeId:    item.NodeID,
 						NodeName:  item.NodeName,
 						EndTime:   timestamp,
-						Ipaddress: *item.IPAddress,
+						Ipaddress: item.IPAddress,
 					}
 
 					var controlSummary reporting.NodeControlSummary
