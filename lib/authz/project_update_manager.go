@@ -19,7 +19,7 @@ type EsClient interface {
 	JobStatus(context.Context, string) (JobStatus, error)
 }
 
-// BackendFromConn takes a connection to cereal-service and returns a cereal backend
+// ProjectUpdateBackend takes a connection to cereal-service and returns a cereal backend
 // with the correct domain for project updates
 func ProjectUpdateBackend(conn *grpc.ClientConn) backend.Driver {
 	return grpccereal.NewGrpcBackendFromConn("project-update", conn)
