@@ -348,6 +348,9 @@ func createServices(s *Suite) {
 	s.ChefIngestServer = server.NewChefIngestServer(s.ingest, s.projectsClient,
 		s.managerServiceClientMock, chefIngestServerConfig)
 
+	s.EventHandlerServer = server.NewAutomateEventHandlerServer(iClient, *s.ChefIngestServer,
+		s.projectsClient, s.eventServiceClientMock)
+
 	// A global JobSchedulerServer instance to call any rpc function
 	//
 	// From any test you can directly call:
