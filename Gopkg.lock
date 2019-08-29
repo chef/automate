@@ -50,7 +50,7 @@
   version = "v1.2.2"
 
 [[projects]]
-  digest = "1:9bb971cde0707689d979882ca7e4e7fb9dc0ad22407eba2d6edfff50b30c3e8a"
+  digest = "1:9017953e03588c23a22baf05ecd0574a86b17adb6b81a3cafa889bb9ec38c03e"
   name = "github.com/alexedwards/scs"
   packages = [
     ".",
@@ -59,8 +59,8 @@
     "stores/pgstore",
   ]
   pruneopts = "NUT"
-  revision = "dbad6751cfac0714e079d0ef9a8bc1d14d52de21"
-  version = "v1.1.0"
+  revision = "cfcbf41460ffe695c7d52159fbff3393c646c8f0"
+  version = "v1.4.1"
 
 [[projects]]
   digest = "1:9752dad5e89cd779096bf2477a4ded16bea7ac62de453c8d6b4bf841d51a8512"
