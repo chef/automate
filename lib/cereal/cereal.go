@@ -454,6 +454,9 @@ type Manager struct {
 	cancel            context.CancelFunc
 	wg                sync.WaitGroup
 
+	taskDequeueWorkers int
+	taskDequeuePool    *taskDequeuePool
+
 	workflowWakeupChan   chan struct{}
 	taskPollInterval     time.Duration
 	workflowPollInterval time.Duration
@@ -486,6 +489,13 @@ func WithTaskPollIntervalMaxJitter(jitter time.Duration) ManagerOpt {
 	return func(m *Manager) { m.taskPollMaxJitter = jitter }
 }
 
+// WithTaskDequeueWorkers sets the number of workers that will be used
+// to dequeue task. This limits the number of concurrent calls being
+// made to the backend.
+func WithTaskDequeueWorkers(count int) ManagerOpt {
+	return func(m *Manager) { m.taskDequeueWorkers = count }
+}
+
 // WithOnWorkflowCompleteCallback sets a OnWOrkflowComplete callback
 // that will be called whenever a workflow is finished (i.e. the
 // workflow returns a failure or completion decision).  This is
@@ -509,6 +519,8 @@ func NewManager(b backend.Driver, opts ...ManagerOpt) (*Manager, error) {
 		workflowExecutors: make(map[string]WorkflowExecutor),
 		taskExecutors:     make(map[string]*registeredExecutor),
 
+		taskDequeueWorkers: 2,
+
 		workflowPollInterval: defaultWorkflowPollInterval,
 		taskPollInterval:     defaultTaskPollInterval,
 		taskPollMaxJitter:    defaultTaskPollMaxJitter,
@@ -527,6 +539,8 @@ func NewManager(b backend.Driver, opts ...ManagerOpt) (*Manager, error) {
 	for _, o := range opts {
 		o(m)
 	}
+
+	m.taskDequeuePool = newTaskDequeuePool(m.taskDequeueWorkers, b)
 
 	return m, nil
 }
@@ -658,7 +672,7 @@ func (j *jitterDownIntervalProvider) String() string {
 // StartPoller runs until the given context is cancelled, starting a
 // TaskWorker every interval (or sooner if we've been notified of a
 // change).
-func (r *registeredExecutor) StartPoller(ctx context.Context, b backend.Driver, p pollIntervalProvider, workflowWakeupFun func()) {
+func (r *registeredExecutor) StartPoller(ctx context.Context, d backend.TaskDequeuer, p pollIntervalProvider, workflowWakeupFun func()) {
 	logctx := logrus.WithFields(logrus.Fields{
 		"task_name":     r.name,
 		"poll_interval": p.String(),
@@ -681,7 +695,7 @@ func (r *registeredExecutor) StartPoller(ctx context.Context, b backend.Driver, 
 			}
 			break
 		}
-		r.startTaskWorker(ctx, b, workflowWakeupFun)
+		r.startTaskWorker(ctx, d, workflowWakeupFun)
 		timer.Reset(p.Next())
 	}
 }
@@ -690,7 +704,7 @@ func (r *registeredExecutor) StartPoller(ctx context.Context, b backend.Driver, 
 // execute them, exiting when no tasks are available in the queue. If
 // the task poller initially finds a job, it will also start the next
 // task worker.
-func (r *registeredExecutor) startTaskWorker(ctx context.Context, b backend.Driver, workflowWakeupFun func()) {
+func (r *registeredExecutor) startTaskWorker(ctx context.Context, d backend.TaskDequeuer, workflowWakeupFun func()) {
 	logctx := logrus.WithField("task_name", r.name)
 	if !r.IncActiveWorkers() {
 		logctx.WithFields(logrus.Fields{
@@ -704,7 +718,7 @@ func (r *registeredExecutor) startTaskWorker(ctx context.Context, b backend.Driv
 		logctx.Debug("Worker starting")
 		startedNext := false
 		for {
-			t, taskCompleter, err := b.DequeueTask(ctx, r.name)
+			t, taskCompleter, err := d.DequeueTask(ctx, r.name)
 			if err != nil {
 				if err != ErrNoTasks {
 					logctx.WithError(err).Error("Failed to dequeue task")
@@ -717,7 +731,7 @@ func (r *registeredExecutor) startTaskWorker(ctx context.Context, b backend.Driv
 			logctx.Debugf("Dequeued task %s", t.Name)
 
 			if !startedNext {
-				r.startTaskWorker(ctx, b, workflowWakeupFun)
+				r.startTaskWorker(ctx, d, workflowWakeupFun)
 				startedNext = true
 			}
 
@@ -793,6 +807,7 @@ func (m *Manager) Start(ctx context.Context) error {
 		return err
 	}
 
+	m.taskDequeuePool.Start(ctx)
 	if m.workflowScheduler != nil {
 		go m.workflowScheduler.Run(ctx)
 	}
@@ -807,6 +822,7 @@ func (m *Manager) Stop() error {
 	}
 
 	logrus.Info("Waiting for goroutines to stop")
+	m.taskDequeuePool.Stop()
 	m.wg.Wait()
 	logrus.Info("Goroutines stopped")
 
@@ -981,7 +997,7 @@ func (m *Manager) startTaskPollers(ctx context.Context) error {
 		e := exec
 		m.wg.Add(1)
 		go func() {
-			e.StartPoller(ctx, m.backend, p, m.WakeupWorkflowExecutor)
+			e.StartPoller(ctx, m.taskDequeuePool, p, m.WakeupWorkflowExecutor)
 			m.wg.Done()
 		}()
 	}
