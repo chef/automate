@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/mitchellh/mapstructure"
+
 	"github.com/chef/automate/lib/cereal"
 )
 
@@ -134,60 +136,67 @@ func (instance *immutableWorkflowInstance) Err() error {
 	return nil
 }
 
-func isEmbeddable(t reflect.Type) bool {
-	switch t.Kind() {
-	case reflect.Struct:
-		return true
-	case reflect.Ptr:
-		if t.Elem().Kind() == reflect.Ptr {
-			return false
-		}
-		return isEmbeddable(t.Elem())
-	default:
-		return false
+func asMapInterface(rawJson json.RawMessage) (map[string]interface{}, error) {
+	var aMap map[string]interface{}
+	if rawJson == nil {
+		return map[string]interface{}{}, nil
 	}
+	if err := json.Unmarshal(rawJson, &aMap); err != nil {
+		return nil, err
+	}
+	return aMap, nil
+}
+
+func isNil(a interface{}) bool {
+	return (reflect.ValueOf(a).Kind() == reflect.Ptr && reflect.ValueOf(a).IsNil())
+}
+
+func decode(input interface{}, output interface{}) error {
+	config := &mapstructure.DecoderConfig{
+		Metadata: nil,
+		Result:   output,
+		TagName:  "json",
+	}
+
+	decoder, err := mapstructure.NewDecoder(config)
+	if err != nil {
+		return err
+	}
+
+	return decoder.Decode(input)
 }
 
 func merge(a interface{}, b interface{}) (interface{}, error) {
-	structFields := []reflect.StructField{}
-	idx := 0
-	aIdx := 0
-	bIdx := 0
-	if a != nil {
-		if !isEmbeddable(reflect.TypeOf(a)) {
-			return nil, ErrCannotMergeTypes
+	v := map[string]interface{}{}
+	if a != nil && !isNil(a) {
+		if rawA, ok := a.(json.RawMessage); ok {
+			var err error
+			a, err = asMapInterface(rawA)
+			if err != nil {
+				return nil, err
+			}
 		}
-		structFields = append(structFields, reflect.StructField{
-			Name:      "A",
-			Type:      reflect.TypeOf(a),
-			Anonymous: true,
-		})
-		aIdx = idx
-		idx++
-	}
-	if b != nil {
-		if !isEmbeddable(reflect.TypeOf(b)) {
-			return nil, ErrCannotMergeTypes
+
+		if err := decode(a, &v); err != nil {
+			return nil, err
 		}
-		structFields = append(structFields, reflect.StructField{
-			Name:      "B",
-			Type:      reflect.TypeOf(b),
-			Anonymous: true,
-		})
-		bIdx = idx
 	}
 
-	newType := reflect.StructOf(structFields)
+	if b != nil && !isNil(b) {
+		if rawB, ok := b.(json.RawMessage); ok {
+			var err error
+			b, err = asMapInterface(rawB)
+			if err != nil {
+				return nil, err
+			}
+		}
 
-	v := reflect.New(newType).Elem()
-	if a != nil {
-		v.Field(aIdx).Set(reflect.ValueOf(a))
-	}
-	if b != nil {
-		v.Field(bIdx).Set(reflect.ValueOf(b))
+		if err := decode(b, &v); err != nil {
+			return nil, err
+		}
 	}
 
-	return v.Interface(), nil
+	return v, nil
 }
 
 func nextState(instance *workflowInstance, decision cereal.Decision) WorkflowState {

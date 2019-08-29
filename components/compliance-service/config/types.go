@@ -32,6 +32,7 @@ type Compliance struct {
 	DataRetention
 	EventConfig
 	Notifications
+	CerealConfig
 }
 
 type Notifications struct {
@@ -121,5 +122,9 @@ type DataRetention struct {
 }
 
 type EventConfig struct {
+	Endpoint string
+}
+
+type CerealConfig struct {
 	Endpoint string
 }
