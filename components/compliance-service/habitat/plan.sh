@@ -24,6 +24,7 @@ pkg_binds=(
   [event-service]="port"
   [authz-service]="port"
   [nodemanager-service]="port"
+  [cereal-service]="port"
 )
 pkg_binds_optional=(
   [es-sidecar-service]="port"

@@ -97,6 +97,9 @@ type taskResult struct {
 }
 
 func (r *taskResult) Get(obj interface{}) error {
+	if r.Err() != nil {
+		return r.Err()
+	}
 	if r.backendResult.Result != nil {
 		return json.Unmarshal(r.backendResult.Result, obj)
 	}

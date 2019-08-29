@@ -3,7 +3,6 @@ package testhelpers
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"net/url"
 	"os"
 	"path"
@@ -11,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -21,7 +19,6 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
-	"github.com/chef/automate/components/authz-service/config"
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/engine/opa"
 	"github.com/chef/automate/components/authz-service/prng"
@@ -41,18 +38,15 @@ import (
 )
 
 type TestFramework struct {
-	Policy                api.PoliciesClient
-	Authz                 api.AuthorizationClient
-	Projects              api.ProjectsClient
-	TestDB                *TestDB
-	Engine                engine.Engine
-	Seed                  int64
-	PolicyRefresher       server.PolicyRefresher
-	ConfigManager         *config.Manager
-	ConfigManagerFilename string
-	GRPC                  *grpctest.Server
-	LatestEvent           *automate_event.EventMsg
-	ProjectUpdateManager  *server.ProjectUpdateManager
+	Policy               api.PoliciesClient
+	Authz                api.AuthorizationClient
+	Projects             api.ProjectsClient
+	TestDB               *TestDB
+	Engine               engine.Engine
+	Seed                 int64
+	PolicyRefresher      server.PolicyRefresher
+	GRPC                 *grpctest.Server
+	ProjectUpdateManager server.ProjectUpdateMgr
 }
 
 type TestDB struct {
@@ -72,11 +66,7 @@ func NewTestFramework(t *testing.T, ctx context.Context) *TestFramework {
 	t.Helper()
 	seed := prng.GenSeed(t)
 
-	eventServiceClient := automate_event.NewMockEventServiceClient(gomock.NewController(t))
 	pg, testDB, _, migrationConfig := SetupTestDB(t)
-	configMgrFilename := fmt.Sprintf("/tmp/.authz-delete-me-%d", time.Now().UTC().Unix())
-	configMgr, err := config.NewManager(configMgrFilename)
-	require.NoError(t, err)
 
 	l, err := logger.NewLogger("text", "error")
 	require.NoError(t, err, "init logger for storage")
@@ -93,7 +83,7 @@ func NewTestFramework(t *testing.T, ctx context.Context) *TestFramework {
 	polSrv, polRefresher, err := server.NewPoliciesServer(ctx, l, pg, opaInstance, pgV1, vSwitch, vChan)
 	require.NoError(t, err)
 
-	projectUpdateManager := server.NewProjectUpdateManager(eventServiceClient, configMgr)
+	projectUpdateManager := NewMockProjectUpdateManager()
 	projectsSrv, err := server.NewProjectsServer(
 		ctx, l, pg, opaInstance, projectUpdateManager, polRefresher)
 	require.NoError(t, err)
@@ -121,24 +111,16 @@ func NewTestFramework(t *testing.T, ctx context.Context) *TestFramework {
 	}
 
 	tf := &TestFramework{
-		Policy:                api.NewPoliciesClient(conn),
-		Authz:                 api.NewAuthorizationClient(conn),
-		Projects:              api.NewProjectsClient(conn),
-		TestDB:                testDB,
-		Engine:                opaInstance,
-		Seed:                  seed,
-		PolicyRefresher:       polRefresher,
-		ConfigManager:         configMgr,
-		ConfigManagerFilename: configMgrFilename,
-		ProjectUpdateManager:  projectUpdateManager,
-		GRPC:                  grpcServ,
+		Policy:               api.NewPoliciesClient(conn),
+		Authz:                api.NewAuthorizationClient(conn),
+		Projects:             api.NewProjectsClient(conn),
+		TestDB:               testDB,
+		Engine:               opaInstance,
+		Seed:                 seed,
+		PolicyRefresher:      polRefresher,
+		ProjectUpdateManager: projectUpdateManager,
+		GRPC:                 grpcServ,
 	}
-
-	eventServiceClient.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
-		func(cxt interface{}, in *automate_event.PublishRequest) (*automate_event.PublishResponse, error) {
-			tf.LatestEvent = in.Msg
-			return &automate_event.PublishResponse{}, nil
-		})
 
 	return tf
 }
@@ -150,9 +132,7 @@ func NewTestFramework(t *testing.T, ctx context.Context) *TestFramework {
 func (tf *TestFramework) Shutdown(t *testing.T, ctx context.Context) {
 	t.Helper()
 	tf.TestDB.Flush(t)
-	tf.ConfigManager.Close()
-	err := os.Remove(tf.ConfigManagerFilename)
-	require.NoError(t, err)
+
 	tf.GRPC.Close()
 	// TODO (tc): Track down and kill literally every goroutine we start, otherwise
 	// this TestFramework's authz instance could write some bad state while the next test is running.
@@ -161,7 +141,7 @@ func (tf *TestFramework) Shutdown(t *testing.T, ctx context.Context) {
 // SetupProjectsAndRulesWithDB is a simplified test framework
 // useful for integration tests with just the DB.
 func SetupProjectsAndRulesWithDB(t *testing.T) (
-	api.ProjectsClient, *TestDB, storage.Storage, *MockEventServiceClient, int64) {
+	api.ProjectsClient, *TestDB, storage.Storage, int64) {
 	t.Helper()
 	ctx := context.Background()
 	seed := prng.GenSeed(t)
@@ -192,8 +172,7 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (
 		t.Fatalf("connecting to grpc endpoint: %s", err)
 	}
 
-	eventServiceClient := &MockEventServiceClient{}
-	return api.NewProjectsClient(conn), testDB, pg, eventServiceClient, seed
+	return api.NewProjectsClient(conn), testDB, pg, seed
 }
 
 func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *prng.Prng, *migration.Config) {
@@ -414,30 +393,6 @@ func (*mockProjectUpdateManager) Start() error {
 	return nil
 }
 
-func (*mockProjectUpdateManager) ProcessFailEvent(eventMessage *automate_event.EventMsg) error {
-	return nil
-}
-
-func (*mockProjectUpdateManager) ProcessStatusEvent(eventMessage *automate_event.EventMsg) error {
-	return nil
-}
-
-func (*mockProjectUpdateManager) Failed() bool {
-	return false // manager.stage.Failed
-}
-
-func (*mockProjectUpdateManager) FailureMessage() string {
-	return "" // manager.stage.FailureMessage
-}
-
-func (*mockProjectUpdateManager) PercentageComplete() float64 {
-	return 0
-}
-
-func (*mockProjectUpdateManager) EstimatedTimeComplete() time.Time {
-	return time.Time{}
-}
-
-func (*mockProjectUpdateManager) State() string {
-	return "not_running" // manager.stage.State
+func (*mockProjectUpdateManager) Status() (server.ProjectUpdateStatus, error) {
+	return &server.EmptyProjectUpdateStatus{}, nil
 }

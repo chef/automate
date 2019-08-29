@@ -158,10 +158,11 @@ func TestAddMetadataToStruct(t *testing.T) {
 
 		for _, i := range invalid {
 			_, err := merge(a, i)
-			require.Equal(t, ErrCannotMergeTypes, err)
+			require.Error(t, err)
 			_, err = merge(i, a)
-			require.Equal(t, ErrCannotMergeTypes, err)
+			require.Error(t, err)
 		}
 
 	})
+
 }

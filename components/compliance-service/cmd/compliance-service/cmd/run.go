@@ -143,4 +143,7 @@ func init() {
 
 	// Event Service Flags
 	runCmd.Flags().StringVar(&conf.EventConfig.Endpoint, "event-endpoint", conf.EventConfig.Endpoint, "Event Service Endpoint")
+
+	// Cereal Service Flags
+	runCmd.Flags().StringVar(&conf.CerealConfig.Endpoint, "cereal-endpoint", conf.CerealConfig.Endpoint, "Cereal Service Endpoint")
 }

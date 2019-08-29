@@ -25,6 +25,9 @@ func (tr *TaskResult) GetParameters(obj interface{}) error {
 }
 
 func (tr *TaskResult) Get(obj interface{}) error {
+	if tr.Err() != nil {
+		return tr.Err()
+	}
 	if len(tr.result) == 0 {
 		return nil
 	}
