@@ -10,6 +10,8 @@ declare namespace Cypress {
     generateAdminToken(idToken: string): void
     cleanupPoliciesByIDPrefix(idToken: string, idPrefix: string): void
     cleanupProjectsByIDPrefix(idToken: string, idPrefix: string): void
+    cleanupRolesByIDPrefix(idToken: string, idPrefix: string): void
+    cleanupTokensByIDPrefix(idToken: string, idPrefix: string): void
     cleanupUsersByNamePrefix(idToken: string, namePrefix: string): void
     cleanupTeamsByDescriptionPrefix(idToken: string, namePrefix: string): void
   }

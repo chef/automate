@@ -1,8 +1,9 @@
+const describeIfIAMV2p1 = Cypress.env('IAM_VERSION') === 'v2.1' ? describe : describe.skip;
+
 if (Cypress.env('IAM_VERSION') === undefined) {
   // assume local env is on IAM v2.0 since that's the default setting
   Cypress.env('IAM_VERSION', 'v2.0');
 }
-const describeIfIAMV2p1 = Cypress.env('IAM_VERSION') === 'v2.1' ? describe : describe.skip;
 
 describeIfIAMV2p1('projects API: applying project', () => {
   const cypressPrefix = 'test-projects-api';

@@ -34,20 +34,6 @@ func ErrIfProjectAssignmentUnauthroized(ctx context.Context, authorizer engine.V
 	return nil
 }
 
-func difference(a, b []string) []string {
-	mb := make(map[string]struct{}, len(b))
-	for _, x := range b {
-		mb[x] = struct{}{}
-	}
-	var diff []string
-	for _, x := range a {
-		if _, found := mb[x]; !found {
-			diff = append(diff, x)
-		}
-	}
-	return diff
-}
-
 // CalculateProjectDiff returns the symmetric difference of oldProjects and newProjects,
 // meaning that any project that is not in the union of oldProjects and newProjects will be returned.
 func CalculateProjectDiff(oldProjects []string, newProjects []string) []string {

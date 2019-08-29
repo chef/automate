@@ -813,6 +813,7 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role, checkProjects bool) 
 	if err != nil {
 		return nil, err
 	}
+	p.logger.Warnf("projects filter: %s", projectsFilter)
 
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
 	if err != nil {
@@ -820,6 +821,7 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role, checkProjects bool) 
 	}
 
 	doesIntersect, err := checkIfRoleIntersectsProjectsFilter(ctx, tx, role.ID, projectsFilter)
+	p.logger.Warnf("doesintersect: %s %s", doesIntersect, err)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -864,11 +866,6 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role, checkProjects bool) 
 		return nil, p.processError(err)
 	}
 
-	// TODO bd: we'll be adding the authorization check in the handler of the gateway
-	// to ensure this prior to beta release
-
-	// bd: for now, the below sql query assumes that all desired project changes are authorized
-	// so all we need to do is replace the existing projects with the desired projects
 	_, err = tx.ExecContext(ctx,
 		"DELETE FROM iam_role_projects WHERE role_id=$1", dbID)
 	if err != nil {
