@@ -545,7 +545,7 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	// These are filter types where we use ElasticSearch Term Queries
 	filterTypes := []string{"environment", "organization", "chef_server", "chef_tags",
 		"policy_group", "policy_name", "status", "node_name", "platform", "role", "recipe",
-		"inspec_version"}
+		"inspec_version", "ipaddress"}
 
 	for _, filterType := range filterTypes {
 		if len(filters[filterType]) > 0 {
@@ -568,12 +568,6 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 
 	if len(filters["node_id"]) > 0 {
 		termQuery := elastic.NewTermsQuery("node_uuid", stringArrayToInterfaceArray(filters["node_id"])...)
-		boolQuery = boolQuery.Must(termQuery)
-	}
-
-	if len(filters["ipaddress"]) > 0 {
-		ipaddresses := strings.Join(filters["ipaddress"], "|")
-		termQuery := elastic.NewTermsQuery("ipaddress", ipaddresses)
 		boolQuery = boolQuery.Must(termQuery)
 	}
 

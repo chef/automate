@@ -92,7 +92,60 @@ func Start(dataFeedConfig *config.DataFeedConfig) {
 	log.Debugf("data-feed-service start")
 
 	serviceClients := initServiceClients(dataFeedConfig)
+	for {
+		now := time.Now()
+		feedStartTime, feedEndTime := getFeedTimes(dataFeedConfig, now)
+		assetRules := getAssetRules(serviceClients)
+		if len(assetRules) == 0 {
+			waitForInterval(dataFeedConfig.ServiceConfig.FeedInterval, feedEndTime, now)
+			continue
+		}
+		// build messages for any nodes which have had a CCR in last window, include last compliance report
+		datafeedMessages := buildDatafeed(serviceClients, dataFeedConfig, feedStartTime, feedEndTime)
+		// build messages for any reports in last window include last CCR and OHAI
+		buildReportFeed(serviceClients, dataFeedConfig, feedStartTime, feedEndTime, datafeedMessages)
+		// get the valus from this ipaddress:datafeedMessage map
+		data := make([]datafeedMessage, 0)
+		for _, value := range datafeedMessages {
+			data = append(data, value)
+		}
+
+		if len(datafeedMessages) == 0 {
+			waitForInterval(dataFeedConfig.ServiceConfig.FeedInterval, feedEndTime, now)
+			continue
+		}
+		for rule := range assetRules {
+			log.Debugf("Rule id %v", assetRules[rule].Id)
+			log.Debugf("Rule Name %v", assetRules[rule].Name)
+			log.Debugf("Rule Event %v", assetRules[rule].Event)
+			log.Debugf("Rule Action %v", assetRules[rule].Action)
+			switch action := assetRules[rule].Action.(type) {
+			case *notifications.Rule_ServiceNowAlert:
+				log.Debugf("Service now alert URL  %v", action.ServiceNowAlert.Url)
+				log.Debugf("Service now alert secret  %v", action.ServiceNowAlert.SecretId)
+				username, password, err := getCredentials(serviceClients, dataFeedConfig, action.ServiceNowAlert.SecretId)
+				if err != nil {
+					log.Errorf("Error retrieving credentials, cannot send asset notification: %v", err)
+					// TODO error handling - need some form of report in automate that indicates when data was sent and if it was successful
+				} else {
+					// build and send notification for this rule
+					notification := datafeedNotification{username: username, password: password, url: action.ServiceNowAlert.Url, data: data}
+					client := NewDataClient()
+					err = send(client, notification)
+					if err != nil {
+						handleSendErr(notification, feedStartTime, feedEndTime, err)
+					}
+				}
+			}
+		}
+
+		waitForInterval(dataFeedConfig.ServiceConfig.FeedInterval, feedEndTime, now)
+	}
+}
+
+func getAssetRules(serviceClients serviceClients) []notifications.Rule {
 	var retry = 0
+	assetRules := make([]notifications.Rule, 0)
 	for {
 		listResponse, err := serviceClients.notifications.ListRules(context.Background(), &notifications.Empty{})
 		if err != nil {
@@ -113,7 +166,6 @@ func Start(dataFeedConfig *config.DataFeedConfig) {
 		// get the rules here - service now rules only
 		log.Debugf("ListRules messages %v", messages)
 
-		assetRules := make([]notifications.Rule, 0)
 		rules := listResponse.Rules
 		for rule := range rules {
 			event := rules[rule].Event
@@ -121,49 +173,9 @@ func Start(dataFeedConfig *config.DataFeedConfig) {
 				assetRules = append(assetRules, *rules[rule])
 			}
 		}
-		now := time.Now()
-		feedStartTime, feedEndTime := getFeedTimes(dataFeedConfig, now)
-		if len(assetRules) > 0 {
-			// build messages for any nodes which have had a CCR in last window, include last compliance report
-			datafeedMessages := buildDatafeed(serviceClients, dataFeedConfig, feedStartTime, feedEndTime)
-			// build messages for any reports in last window include last CCR and OHAI
-			buildReportFeed(serviceClients, dataFeedConfig, feedStartTime, feedEndTime, datafeedMessages)
-			// get the valus from this ipaddress:datafeedMessage map
-			data := make([]datafeedMessage, 0)
-			for _, value := range datafeedMessages {
-				data = append(data, value)
-			}
-
-			if len(datafeedMessages) > 0 {
-				for rule := range assetRules {
-					log.Debugf("Rule id %v", assetRules[rule].Id)
-					log.Debugf("Rule Name %v", assetRules[rule].Name)
-					log.Debugf("Rule Event %v", assetRules[rule].Event)
-					log.Debugf("Rule Action %v", assetRules[rule].Action)
-					switch action := assetRules[rule].Action.(type) {
-					case *notifications.Rule_ServiceNowAlert:
-						log.Debugf("Service now alert URL  %v", action.ServiceNowAlert.Url)
-						log.Debugf("Service now alert secret  %v", action.ServiceNowAlert.SecretId)
-						username, password, err := getCredentials(serviceClients, dataFeedConfig, action.ServiceNowAlert.SecretId)
-						if err != nil {
-							log.Errorf("Error retrieving credentials, cannot send asset notification: %v", err)
-							// TODO error handling - need some form of report in automate that indicates when data was sent and if it was successful
-						} else {
-							// build and send notification for this rule
-							notification := datafeedNotification{username: username, password: password, url: action.ServiceNowAlert.Url, data: data}
-							client := NewDataClient()
-							err = send(client, notification)
-							if err != nil {
-								handleSendErr(notification, feedStartTime, feedEndTime, err)
-							}
-						}
-					}
-				}
-			}
-		}
-
-		waitForInterval(dataFeedConfig.ServiceConfig.FeedInterval, feedEndTime, now)
+		break
 	}
+	return assetRules
 }
 
 func handleSendErr(notification datafeedNotification, startTime time.Time, endTime time.Time, err error) {
