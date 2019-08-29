@@ -8,25 +8,50 @@ import (
 	"github.com/chef/automate/lib/cereal"
 )
 
+/*
+A parallel workflow is a workflow that combines smaller workflows to run
+in parallel. It completes when all subworkflows have completed or failed.
+When executed by cereal, the workflows execute under the same workflow instance.
+This allows breaking logic apart in small, concise workflows. The parallel
+workflow should be used when many things need to happen and they are independent
+of each other.
+
+Limitations:
+- Tasks launched by the subworkflows must have struct or nil parameters
+- When a subworkflow completes, enqueued/running tasks will not be canceled
+  until the end of all subworkflows
+*/
+
+// ParallelWorkflowExecutorFor is a function used to look up the workflow executor for
+// a given subworkflow
 type ParallelWorkflowExecutorFor func(subworkflow string) (cereal.WorkflowExecutor, bool)
 
 type ParallelWorkflowExecutor struct {
 	executorForFunc ParallelWorkflowExecutorFor
 }
 
+// ParallelWorkflowPayload keeps track of the state of all the subworkflows and is the
+// payload and result of the parallel workflow
 type ParallelWorkflowPayload struct {
 	State map[string]WorkflowState
 }
 
+// ParallelWorkflowParams are the parameters for the parallel workflow. It consists of
+// the names of the subworkflows and their parameters.
 type ParallelWorkflowParams struct {
 	SubworkflowKeys []string
 	WorkflowParams  map[string]json.RawMessage
 }
 
+// ParallelWorkflowTaskParam is metadata attached to any enqueued tasks. This allows
+// the parallel workflow to figure out which subworkflow to deliver the task completed
+// event to.
 type ParallelWorkflowTaskParam struct {
 	XXX_ParallelWorkflowKey string `json:"__key"`
 }
 
+// NewParallelWorkflowExecutor creates a parallel workflow executor. The executorForFunc is used to
+// lookup the workflow executor for a given subworkflow
 func NewParallelWorkflowExecutor(executorForFunc ParallelWorkflowExecutorFor) *ParallelWorkflowExecutor {
 	return &ParallelWorkflowExecutor{
 		executorForFunc: executorForFunc,
