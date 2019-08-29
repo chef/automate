@@ -430,6 +430,11 @@ func setupReadProfiles(t *testing.T) *statsServer.Server {
 
 		return response != nil && len(response.Reports) == n
 	})
+
+	suite.RefreshComplianceSummaryIndex()
+	suite.RefreshComplianceReportIndex()
+	suite.RefreshComplianceProfilesIndex()
+
 	reportsProjects := map[string][]string{
 		"project1": reportIds[1:3],
 		"project2": reportIds[2:5],
@@ -442,8 +447,8 @@ func setupReadProfiles(t *testing.T) *statsServer.Server {
 				{
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
-							Values: v,
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Values:    v,
 						},
 					},
 				},
@@ -454,6 +459,8 @@ func setupReadProfiles(t *testing.T) *statsServer.Server {
 	esJobID, err := suite.ingesticESClient.UpdateReportProjectsTags(everythingCtx, projectRules)
 	assert.Nil(t, err)
 	suite.WaitForESJobToComplete(esJobID)
+	suite.RefreshComplianceSummaryIndex()
 	suite.RefreshComplianceReportIndex()
+	suite.RefreshComplianceProfilesIndex()
 	return statsServer
 }

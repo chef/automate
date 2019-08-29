@@ -326,6 +326,10 @@ func (s *Suite) RefreshComplianceSummaryIndex() {
 	s.RefreshIndices(complianceSummaryIndex)
 }
 
+func (s *Suite) RefreshComplianceProfilesIndex() {
+	s.RefreshIndices(mappings.ComplianceProfiles.Index)
+}
+
 // RefreshIndices will refresh the provided ES Index or list of Indices
 //
 // Example 1: To refresh a single index, the node-state index

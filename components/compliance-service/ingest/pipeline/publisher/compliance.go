@@ -75,7 +75,7 @@ func storeCompliance(in <-chan message.Compliance, out chan<- message.Compliance
 func insertInspecSummary(msg message.Compliance, client *ingestic.ESClient) <-chan error {
 	out := make(chan error)
 	go func() {
-		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Info("Ingesting inspec_summary")
+		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Ingesting inspec_summary")
 		start := time.Now()
 		err := client.InsertInspecSummary(msg.Ctx, msg.Report.ReportUuid, msg.Shared.EndTime, msg.InspecSummary)
 		if err != nil {
@@ -93,7 +93,7 @@ func insertInspecSummary(msg message.Compliance, client *ingestic.ESClient) <-ch
 func insertInspecReport(msg message.Compliance, client *ingestic.ESClient) <-chan error {
 	out := make(chan error)
 	go func() {
-		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "node_id": msg.Report.NodeUuid}).Info("Ingesting inspec_report")
+		logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "node_id": msg.Report.NodeUuid}).Debug("Ingesting inspec_report")
 		start := time.Now()
 		err := client.InsertInspecReport(msg.Ctx, msg.Report.ReportUuid, msg.Shared.EndTime, msg.InspecReport)
 		if err != nil {
@@ -114,7 +114,7 @@ func insertInspecProfile(msg message.Compliance, profile *relaxting.ESInspecProf
 		logrus.WithFields(logrus.Fields{
 			"report_id":  msg.Report.ReportUuid,
 			"profile_id": profile.Sha256,
-		}).Info("Ingesting inspec_profile")
+		}).Debug("Ingesting inspec_profile")
 		start := time.Now()
 		profileExists, err := client.ProfileExists(profile.Sha256)
 		if err == nil {
