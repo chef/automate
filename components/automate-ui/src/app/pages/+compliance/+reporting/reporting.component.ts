@@ -25,6 +25,7 @@ import { saveAs } from 'file-saver';
 import {
   Chicklet
 } from '../../../types/types';
+import { pickBy, some } from 'lodash/fp';
 
 @Component({
   templateUrl: './reporting.component.html',
@@ -212,8 +213,6 @@ export class ReportingComponent implements OnInit, OnDestroy {
   }
 
   applyParamFilters(filters: Chicklet[]) {
-    this.reportQuery.clearFilters();
-
     const c = filters.map((filter) => {
       if (filter.type === 'end_time') {
         return { end_time: new Date(filter.text) };
@@ -287,8 +286,6 @@ export class ReportingComponent implements OnInit, OnDestroy {
     const endDate = event.detail;
     const startDate = intervals[interval][1](endDate);
 
-    // this.reportQuery.setDateRange(startDate, endDate);
-
     const queryParams = {...this.route.snapshot.queryParams};
     queryParams['start_time'] = moment(startDate).startOf('day').format();
 
@@ -342,13 +339,29 @@ export class ReportingComponent implements OnInit, OnDestroy {
   }
 
   onFilterRemoved(event) {
-    this.router.navigate([], { queryParams: {} });
-    this.reportQuery.removeFilter(event.detail);
+    const {type, value} = event.detail;
+
+    const {queryParamMap} = this.route.snapshot;
+    const queryParams = {...this.route.snapshot.queryParams};
+    const values = queryParamMap.getAll(type.name).filter(v => v !== value.text);
+
+    if (values.length === 0) {
+      delete queryParams[type.name];
+    } else {
+      queryParams[type.name] = values;
+    }
+
+    this.router.navigate([], {queryParams});
   }
 
   onFiltersClear(_event) {
-    this.reportQuery.clearFilters();
-    this.router.navigate([], { queryParams: { filters: undefined } });
+    const queryParams = {...this.route.snapshot.queryParams};
+
+    const filteredParams = pickBy((_value, key) => {
+        return !some({ 'name': key}, this.availableFilterTypes);
+      }, queryParams);
+
+    this.router.navigate([], {queryParams: filteredParams});
   }
 
   getData(filters) {
