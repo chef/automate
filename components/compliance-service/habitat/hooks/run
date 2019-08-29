@@ -147,6 +147,15 @@ ES_BACKEND="--es-url http://127.0.0.1:{{member.cfg.http-port}}"
 {{/if ~}}
 {{~/eachAlive}}
 
+# Bind to cereal
+{{~#eachAlive bind.cereal-service.members as |cereal-service|}}
+  {{~#if @last}}
+addNoProxy {{cereal-service.sys.ip}}
+CONFIG="$CONFIG --cereal-endpoint {{cereal-service.sys.ip}}:{{cereal-service.cfg.port}}"
+  {{~/if}}
+{{~/eachAlive}}
+
+
 # Postgres
 PG_BACKEND="--postgres-database {{cfg.storage.database}} --migrations-path {{pkg.path}}/migrations"
 

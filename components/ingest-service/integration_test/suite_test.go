@@ -26,7 +26,6 @@ import (
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	iElastic "github.com/chef/automate/components/ingest-service/backend/elastic"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
-	"github.com/chef/automate/components/ingest-service/config"
 	"github.com/chef/automate/components/ingest-service/server"
 	"github.com/chef/automate/components/ingest-service/serveropts"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
@@ -57,7 +56,6 @@ var actionIndexes = fmt.Sprintf("%s-%s", mappings.Actions.Index, "*")
 // * An Elasticsearch client, that you can use to throw ES queries.
 //   => Docs: https://godoc.org/gopkg.in/olivere/elastic.v5
 type Suite struct {
-	ConfigManager            *config.Manager
 	ChefIngestServer         *server.ChefIngestServer
 	JobSchedulerServer       *server.JobSchedulerServer
 	JobManager               *cereal.Manager
@@ -332,15 +330,6 @@ func createServices(s *Suite) {
 	s.ingest = iClient
 
 	// TODO @afiune Modify the time of the jobs
-	configFile := "/tmp/.ingest-service.toml"
-	os.Remove(configFile)
-	s.ConfigManager, err = config.NewManager(configFile)
-	if err != nil {
-		fmt.Printf("Could not create ingest config manager with file %q. %v\n", configFile, err)
-		os.Exit(3)
-	}
-	// TODO Handle the Close() functions
-	//defer ConfigManager.Close()
 
 	chefIngestServerConfig := serveropts.ChefIngestServerConfig{
 		MaxNumberOfBundledActionMsgs: 100,
@@ -358,8 +347,9 @@ func createServices(s *Suite) {
 	// ```
 	s.ChefIngestServer = server.NewChefIngestServer(s.ingest, s.projectsClient,
 		s.managerServiceClientMock, chefIngestServerConfig)
+
 	s.EventHandlerServer = server.NewAutomateEventHandlerServer(iClient, *s.ChefIngestServer,
-		s.projectsClient, s.eventServiceClientMock, s.ConfigManager)
+		s.projectsClient, s.eventServiceClientMock)
 
 	// A global JobSchedulerServer instance to call any rpc function
 	//
