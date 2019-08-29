@@ -14,7 +14,6 @@ import (
 const (
 	COMPLIANCE_INGEST_KEY = "compliance_ingest"
 	CFG_KEY               = "cfgingest"
-	AUTHZ                 = "authz"
 	EVENT_FEED            = "event_feed"
 )
 
@@ -22,17 +21,11 @@ const (
 type EventConfig struct {
 	ServiceConfig     ServiceConfig   `mapstructure:"service"`
 	InternalMessaging Nats            `mapstructure:"internal_messaging"`
-	Auth              Auth            `mapstructure:"auth"`
 	StreamService     StreamService   `mapstructure:"stream_service"`
 	LogConfig         LogConfig       `mapstructure:"log"`
 	TLSConfig         certs.TLSConfig `mapstructure:"tls"`
 	ServiceCerts      *certs.ServiceCerts
 	HandlerEndpoints  HandlerConfig `mapstructure:"handlers"` // use to get an instance of a service's event handler
-}
-
-type Auth struct {
-	AuthnEndpoint string `mapstructure:"authn_endpoint"`
-	AuthzEndpoint string `mapstructure:"authz_endpoint"`
 }
 
 // Nats holds the configuration for the NATs Streaming Server
@@ -62,7 +55,6 @@ type ServiceConfig struct {
 type HandlerConfig struct {
 	Compliance string `mapstructure:"feed"`
 	CfgIngest  string `mapstructure:"cfgingest"`
-	Authz      string `mapstructure:"authz"`
 	EventFeed  string `mapstructure:"event_feed"`
 }
 
@@ -112,7 +104,6 @@ func Configure() (*EventConfig, error) {
 
 	log.Debugf("Compliance handler endpoint: %s", config.HandlerEndpoints.Compliance)
 	log.Debugf("Config ingest handler endpoint: %s", config.HandlerEndpoints.CfgIngest)
-	log.Debugf("Authz handler endpoint: %s", config.HandlerEndpoints.Authz)
 	log.Debugf("Event Feed handler endpoint: %s", config.HandlerEndpoints.EventFeed)
 
 	// Validates that the configuration has a valid host/port

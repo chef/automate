@@ -6,7 +6,6 @@ package v2
 
 import (
 	context "context"
-	event "github.com/chef/automate/api/interservice/event"
 	gomock "github.com/golang/mock/gomock"
 	grpc "google.golang.org/grpc"
 	reflect "reflect"
@@ -153,26 +152,6 @@ func (mr *MockProjectsClientMockRecorder) ListProjectsForIntrospection(ctx, in i
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsForIntrospection", reflect.TypeOf((*MockProjectsClient)(nil).ListProjectsForIntrospection), varargs...)
-}
-
-// HandleEvent mocks base method
-func (m *MockProjectsClient) HandleEvent(ctx context.Context, in *event.EventMsg, opts ...grpc.CallOption) (*event.EventResponse, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, in}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "HandleEvent", varargs...)
-	ret0, _ := ret[0].(*event.EventResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// HandleEvent indicates an expected call of HandleEvent
-func (mr *MockProjectsClientMockRecorder) HandleEvent(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleEvent", reflect.TypeOf((*MockProjectsClient)(nil).HandleEvent), varargs...)
 }
 
 // ApplyRulesStart mocks base method
@@ -486,21 +465,6 @@ func (m *MockProjectsServer) ListProjectsForIntrospection(arg0 context.Context, 
 func (mr *MockProjectsServerMockRecorder) ListProjectsForIntrospection(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListProjectsForIntrospection", reflect.TypeOf((*MockProjectsServer)(nil).ListProjectsForIntrospection), arg0, arg1)
-}
-
-// HandleEvent mocks base method
-func (m *MockProjectsServer) HandleEvent(arg0 context.Context, arg1 *event.EventMsg) (*event.EventResponse, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "HandleEvent", arg0, arg1)
-	ret0, _ := ret[0].(*event.EventResponse)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// HandleEvent indicates an expected call of HandleEvent
-func (mr *MockProjectsServerMockRecorder) HandleEvent(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleEvent", reflect.TypeOf((*MockProjectsServer)(nil).HandleEvent), arg0, arg1)
 }
 
 // ApplyRulesStart mocks base method

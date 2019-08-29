@@ -61,8 +61,6 @@ service Projects {
     rpc ListProjects(ListProjectsReq) returns (ListProjectsResp) {};
     rpc ListProjectsForIntrospection(ListProjectsReq) returns (ListProjectsResp) {};
 
-    rpc HandleEvent(chef.automate.domain.event.api.EventMsg) returns (
-        chef.automate.domain.event.api.EventResponse);
     rpc ApplyRulesStart(ApplyRulesStartReq ) returns (ApplyRulesStartResp) {};
     rpc ApplyRulesCancel(ApplyRulesCancelReq) returns (ApplyRulesCancelResp);
     rpc ApplyRulesStatus(ApplyRulesStatusReq) returns (ApplyRulesStatusResp);
