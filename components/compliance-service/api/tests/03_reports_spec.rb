@@ -54,6 +54,22 @@ describe File.basename(__FILE__) do
         }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
 
+    # Get report ids from a date range if they contain at least one control tagged 'web'
+    actual_data = GRPC reporting, :list_report_ids, Reporting::Query.new(filters: [
+        Reporting::ListFilter.new(type: 'start_time', values: ['2018-02-01T00:00:00Z']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-01T00:00:00Z']),
+        Reporting::ListFilter.new(type: 'control_tag:web', values: []),
+    ])
+    expected_json =
+        {
+            "ids" => ["44024b50-2e0d-42fa-a57c-dddddddddddd",
+                      "bb93e1b2-36d6-439e-ac70-cccccccccc04",
+                      "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
+                      "bb93e1b2-36d6-439e-ac70-cccccccccc09"
+            ]
+        }.to_json
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
+
     # Get all until march 4th up to and including beginning of day
     actual_data = GRPC reporting, :list_report_ids, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T00:00:00Z'])
@@ -410,6 +426,55 @@ describe File.basename(__FILE__) do
             }
         ],
         "total" => 1
+    }.to_json
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
+
+    # Get reports based on control tag filter
+    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
+      Reporting::ListFilter.new(type: 'control_tag:scope', values: ['NGI*'])
+    ])
+    expected_json = {
+        "reports" => [
+          {
+              "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
+              "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
+              "nodeName" => "centos-beta",
+              "endTime" => "2018-03-04T09:18:41Z",
+              "status" => "passed",
+              "controls" => {
+                  "total" => 18,
+                  "passed" => {
+                      "total" => 3
+                  },
+                  "skipped" => {
+                      "total" => 15
+                  },
+                  "failed" => {}
+              }
+          },
+          {
+            "endTime" => "2018-03-04T09:18:43Z",
+            "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
+            "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e222",
+            "nodeName" => "RedHat(2)-beta-nginx(f)-apache(s)-failed",
+            "status" => "failed",
+            "controls" => {
+              "failed" => {
+                "critical" => 1,
+                "major" => 1,
+                "total" => 2
+              },
+              "passed" => {
+                "total" => 1
+              },
+              "skipped" => {
+                "total" => 15
+              },
+              "total" => 18
+            }
+          }
+        ],
+        "total" => 2
     }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
 

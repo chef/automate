@@ -101,7 +101,6 @@ if !ENV['NO_STATS_TREND_TESTS']
               Stats::ListFilter.new(type: "environment", values: ['DevSec Prod Zeta'])
           ]
       )
-      #Bunching the data up as shown below, helps in it's readability. See how the numbers pop out at you?
       expected_data = {
           "trends" => [
               {"reportTime" => "2018-02-08T23:59:59Z"},
@@ -120,6 +119,52 @@ if !ENV['NO_STATS_TREND_TESTS']
           ]
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
+
+
+      # The whole range. For nodes
+      # Filter: control tag with key 'web'
+      # should have zeroes on the bookends, some numbers on 2/9, 3/4 and zeroes in between.
+      actual_data = GRPC stats, :read_trend, Stats::Query.new(
+          type: "nodes",
+          interval: 86400,
+          filters: [
+              Stats::ListFilter.new(type: "start_time", values: ['2018-02-09T00:00:00Z']),
+              Stats::ListFilter.new(type: "end_time", values: ["2018-03-05T#{END_OF_DAY}"]),
+              Stats::ListFilter.new(type: 'control_tag:web', values: [])
+          ]
+      )
+      #Bunching the data up as shown below, helps in it's readability. See how the numbers pop out at you?
+      expected_data = {
+        "trends":[
+          {"reportTime":"2018-02-09T23:59:59Z", "failed":1},
+          {"reportTime":"2018-02-10T23:59:59Z"},
+          {"reportTime":"2018-02-11T23:59:59Z"},
+          {"reportTime":"2018-02-12T23:59:59Z"},
+          {"reportTime":"2018-02-13T23:59:59Z"},
+          {"reportTime":"2018-02-14T23:59:59Z"},
+          {"reportTime":"2018-02-15T23:59:59Z"},
+          {"reportTime":"2018-02-16T23:59:59Z"},
+          {"reportTime":"2018-02-17T23:59:59Z"},
+          {"reportTime":"2018-02-18T23:59:59Z"},
+          {"reportTime":"2018-02-19T23:59:59Z"},
+          {"reportTime":"2018-02-20T23:59:59Z"},
+          {"reportTime":"2018-02-21T23:59:59Z"},
+          {"reportTime":"2018-02-22T23:59:59Z"},
+          {"reportTime":"2018-02-23T23:59:59Z"},
+          {"reportTime":"2018-02-24T23:59:59Z"},
+          {"reportTime":"2018-02-25T23:59:59Z"},
+          {"reportTime":"2018-02-26T23:59:59Z"},
+          {"reportTime":"2018-02-27T23:59:59Z"},
+          {"reportTime":"2018-02-28T23:59:59Z"},
+          {"reportTime":"2018-03-01T23:59:59Z"},
+          {"reportTime":"2018-03-02T23:59:59Z"},
+          {"reportTime":"2018-03-03T23:59:59Z"},
+          {"reportTime":"2018-03-04T23:59:59Z", "passed":1, "failed":1, "skipped":1},
+          {"reportTime":"2018-03-05T23:59:59Z"}
+        ]
+      }.to_json
+      assert_equal(expected_data, actual_data.to_json)
+
 
       # The whole range. for controls
       # Filter: environment="DevSec Prod Zeta"

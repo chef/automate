@@ -126,36 +126,6 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 		}
 	}
 
-	//When filtering by controls, we are reducing the array of report ids based on
-	// another query on inspec_report documents where we have control ids
-	if len(filters["control"]) > 0 {
-		esIndex, err := GetEsIndex(filters, false, false)
-		if err != nil {
-			return nil, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to GetEsIndex")
-		}
-		filteredReportIds, err := backend.filterIdsByControl(esIndex, MapValues(nodeReport), filters["control"])
-		if err != nil {
-			return []string{}, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to filter ids by "+
-				"control")
-		}
-		logrus.Debugf("getNodeReportIdsFromTimeseries control filtering, len(nodeReport)=%d, "+
-			"len(filteredNodeIds)=%d\n", len(nodeReport), len(filteredReportIds))
-
-		//flipping map[nodeid][reportid] to map[reportid][nodeid] for quicker lookups, to avoid an expensive O(n^2)
-		// Contains(filteredReportIds, reportId) call
-		reportNode := make(map[string]string, len(nodeReport))
-		for nodeID, reportID := range nodeReport {
-			reportNode[reportID] = nodeID
-		}
-
-		// filtering out the nodes for which the report id is no longer in filteredReportIds
-		filteredNodeReport := make(map[string]string, len(filteredReportIds))
-		for _, reportID := range filteredReportIds {
-			filteredNodeReport[reportNode[reportID]] = reportID
-		}
-		nodeReport = filteredNodeReport
-	}
-
 	reportIds := MapValues(nodeReport)
 
 	logrus.Debugf("getNodeReportIdsFromTimeseries returning %d report ids in %d milliseconds\n",
@@ -657,6 +627,15 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
+	// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
+	for filterType := range filters {
+		if strings.HasPrefix(filterType, "control_tag:") {
+			_, tagKey := leftSplit(filterType, ":")
+			termQuery := backend.newNestedTermQueryFromControlTagsFilter(tagKey, filters[filterType])
+			boolQuery = boolQuery.Must(termQuery)
+		}
+	}
+
 	return boolQuery
 }
 
@@ -711,17 +690,17 @@ func (backend ES2Backend) newTermQueryFromFilter(ESField string,
 }
 
 func (backend ES2Backend) newNestedTermQueryFromFilter(ESField string, ESFieldPath string,
-	filters []string) *elastic.BoolQuery {
+	filterValues []string) *elastic.BoolQuery {
 	refinedValues := make([]string, 0, 0)
 	filterQuery := elastic.NewBoolQuery()
 
-	for _, value := range filters {
-		if containsWildcardChar(value) {
-			wildQuery := elastic.NewWildcardQuery(ESField, value)
+	for _, filterValue := range filterValues {
+		if containsWildcardChar(filterValue) {
+			wildQuery := elastic.NewWildcardQuery(ESField, filterValue)
 			nestedQuery := elastic.NewNestedQuery(ESFieldPath, wildQuery)
 			filterQuery = filterQuery.Should(nestedQuery)
 		} else {
-			refinedValues = append(refinedValues, value)
+			refinedValues = append(refinedValues, filterValue)
 		}
 	}
 	if len(refinedValues) > 0 {
@@ -731,6 +710,48 @@ func (backend ES2Backend) newNestedTermQueryFromFilter(ESField string, ESFieldPa
 	}
 
 	return filterQuery
+}
+
+// Returns an ElasticSearch nested query to filter reports by control tags
+func (backend ES2Backend) newNestedTermQueryFromControlTagsFilter(tagKey string, tagValues []string) *elastic.NestedQuery {
+	refinedValues := make([]string, 0, 0)
+	ESFieldPath := "profiles.controls.string_tags"
+	ESFieldTagKey := "profiles.controls.string_tags.key.lower"
+	ESFieldTagValues := "profiles.controls.string_tags.values.lower"
+
+	// Add ElasticSearch query filter for the control tag key
+	tagKey = strings.ToLower(tagKey)
+	boolQuery := elastic.NewBoolQuery()
+	if containsWildcardChar(tagKey) {
+		boolQuery.Must(elastic.NewWildcardQuery(ESFieldTagKey, tagKey))
+	} else {
+		boolQuery.Must(elastic.NewTermsQuery(ESFieldTagKey, tagKey))
+	}
+
+	// Add ElasticSearch query filters for the control tag value(s)
+	insideBoolQuery := elastic.NewBoolQuery()
+	insideBool := false
+	for _, tagValue := range tagValues {
+		tagValue = strings.ToLower(tagValue)
+		if containsWildcardChar(tagValue) {
+			insideBoolQuery.Should(elastic.NewWildcardQuery(ESFieldTagValues, tagValue))
+			insideBool = true
+		} else {
+			refinedValues = append(refinedValues, tagValue)
+		}
+	}
+	// Here we handle control tag value(s) without wildcard characters
+	if len(refinedValues) > 0 {
+		termQuery := elastic.NewTermsQuery(ESFieldTagValues, stringArrayToInterfaceArray(refinedValues)...)
+		insideBoolQuery.Should(termQuery)
+		insideBool = true
+	}
+	if insideBool {
+		boolQuery.Must(insideBoolQuery)
+	}
+
+	nestedQuery := elastic.NewNestedQuery(ESFieldPath, boolQuery)
+	return nestedQuery
 }
 
 func containsWildcardChar(value string) bool {

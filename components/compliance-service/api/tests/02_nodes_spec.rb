@@ -1389,5 +1389,78 @@ describe File.basename(__FILE__) do
         Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
     ], sort: 'environment', order: 0, page: 1, per_page: 2)
     assert_equal([14, 15], resp['nodes'].map {|x| x['latest_report']['controls']['skipped']['total']})
+
+    # List all nodes that have a control with a tag key of 'web'
+    resp = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+      Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
+      Reporting::ListFilter.new(type: 'control_tag:web', values: [])
+    ], sort: 'name')
+    assert_equal(['centos-beta', 'RedHat(2)-beta-nginx(f)-apache(s)-failed', 'windows(1)-zeta-apache(s)-skipped'],
+                 resp['nodes'].map {|x| x['name']},
+    )
+
+    # List all nodes that have a control with tag key of 'scope'
+    resp = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+      Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
+      Reporting::ListFilter.new(type: 'control_tag:scope', values: [])
+    ], sort: 'name')
+    assert_equal(['centos-beta', 'RedHat(2)-beta-nginx(f)-apache(s)-failed', 'windows(1)-zeta-apache(s)-skipped'],
+                 resp['nodes'].map {|x| x['name']},
+    )
+
+    # List all nodes that have a control tagged either scope:Apache or scope:missing, case insensitive
+    resp = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+      Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
+      Reporting::ListFilter.new(type: 'control_tag:scope', values: ['Apache', 'missing'])
+    ], sort: 'name')
+    assert_equal(['centos-beta', 'windows(1)-zeta-apache(s)-skipped'],
+                 resp['nodes'].map {|x| x['name']},
+    )
+
+    # List all nodes that have a control tagged either SCOpe:Nginx or SCOpe:missing, case insensitive
+    resp = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+      Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
+      Reporting::ListFilter.new(type: 'control_tag:SCOpe', values: ['Nginx', 'missing'])
+    ], sort: 'name')
+    assert_equal(['centos-beta', 'RedHat(2)-beta-nginx(f)-apache(s)-failed'],
+                 resp['nodes'].map {|x| x['name']},
+    )
+
+    resp = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+      Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
+      Reporting::ListFilter.new(type: 'control_tag:web', values: []),
+      Reporting::ListFilter.new(type: 'control_tag:scope', values: ['Ngi*'])
+    ], sort: 'name')
+    assert_equal(['centos-beta', 'RedHat(2)-beta-nginx(f)-apache(s)-failed'],
+                 resp['nodes'].map {|x| x['name']},
+    )
+
+    resp = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+      Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
+      Reporting::ListFilter.new(type: 'control_tag:scop?', values: ['ap?che'])
+    ], sort: 'name')
+    assert_equal(['centos-beta', 'windows(1)-zeta-apache(s)-skipped'],
+                 resp['nodes'].map {|x| x['name']},
+    )
+
+    # No nodes should be found for missing tag values
+    resp = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+      Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
+      Reporting::ListFilter.new(type: 'control_tag:scope', values: ['missing1', 'missing2'])
+    ], sort: 'name')
+    assert_equal([],resp['nodes'].map {|x| x['name']})
+
+    resp = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+      Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
+      Reporting::ListFilter.new(type: 'control_tag:satisfies', values: ['Apache-1', 'zzzz'])
+    ], sort: 'name')
+    assert_equal(['windows(1)-zeta-apache(s)-skipped'],resp['nodes'].map {|x| x['name']})
+
+    # No nodes should be found for missing tag values
+    resp = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+      Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
+      Reporting::ListFilter.new(type: 'control_tag:missing1', values: ['missing2', 'missing3'])
+    ], sort: 'name')
+    assert_equal([],resp['nodes'].map {|x| x['name']})
   end
 end
