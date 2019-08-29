@@ -210,7 +210,7 @@ func (m *CerealProjectUpdateManager) Start() error {
 			ProjectUpdateID: createProjectUpdateID(),
 		}
 	}
-	domainSvcUpdateWorkflowParams, err := patterns.ToParallelWorkfowParameters(m.domainServices, params)
+	domainSvcUpdateWorkflowParams, err := patterns.ToParallelWorkflowParameters(m.domainServices, params)
 	if err != nil {
 		return err
 	}

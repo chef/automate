@@ -58,7 +58,7 @@ func NewParallelWorkflowExecutor(executorForFunc ParallelWorkflowExecutorFor) *P
 	}
 }
 
-func ToParallelWorkfowParameters(subworkflows []string, parameters map[string]interface{}) (ParallelWorkflowParams, error) {
+func ToParallelWorkflowParameters(subworkflows []string, parameters map[string]interface{}) (ParallelWorkflowParams, error) {
 	transformedParams := ParallelWorkflowParams{
 		SubworkflowKeys: subworkflows,
 		WorkflowParams:  map[string]json.RawMessage{},
@@ -74,7 +74,7 @@ func ToParallelWorkfowParameters(subworkflows []string, parameters map[string]in
 }
 
 func EnqueueParallelWorkflow(ctx context.Context, m *cereal.Manager, workflowName string, instanceName string, subworkflows []string, parameters map[string]interface{}) error {
-	transformedParams, err := ToParallelWorkfowParameters(subworkflows, parameters)
+	transformedParams, err := ToParallelWorkflowParameters(subworkflows, parameters)
 	if err != nil {
 		return err
 	}

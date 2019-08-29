@@ -21,7 +21,7 @@ func fromMap(m map[string]cereal.WorkflowExecutor) ParallelWorkflowExecutorFor {
 func TestParallelWorkflowOnStart(t *testing.T) {
 	t.Run("fails on unknown workflow", func(t *testing.T) {
 		executor := NewParallelWorkflowExecutor(fromMap(nil))
-		params, err := ToParallelWorkfowParameters([]string{"foo", "bar"}, map[string]interface{}{})
+		params, err := ToParallelWorkflowParameters([]string{"foo", "bar"}, map[string]interface{}{})
 		require.NoError(t, err)
 
 		require.NoError(t, err)
@@ -83,7 +83,7 @@ func TestParallelWorkflowOnStart(t *testing.T) {
 			),
 		}
 		executor := NewParallelWorkflowExecutor(fromMap(subworkflows))
-		params, err := ToParallelWorkfowParameters(
+		params, err := ToParallelWorkflowParameters(
 			[]string{"workflow1", "workflow2"},
 			map[string]interface{}{
 				"workflow1": workflow1Params,
@@ -183,7 +183,7 @@ func TestParallelWorkflowOnStart(t *testing.T) {
 			),
 		}
 		executor := NewParallelWorkflowExecutor(fromMap(subworkflows))
-		params, err := ToParallelWorkfowParameters(
+		params, err := ToParallelWorkflowParameters(
 			[]string{"workflow1", "workflow2"},
 			map[string]interface{}{
 				"workflow1": workflow1Params,
@@ -277,7 +277,7 @@ func TestParallelWorkflowOnStart(t *testing.T) {
 			),
 		}
 		executor := NewParallelWorkflowExecutor(fromMap(subworkflows))
-		params, err := ToParallelWorkfowParameters(
+		params, err := ToParallelWorkflowParameters(
 			[]string{"workflow1", "workflow2"},
 			map[string]interface{}{
 				"workflow1": workflow1Params,
@@ -365,7 +365,7 @@ func TestParallelWorkflowOnStart(t *testing.T) {
 			),
 		}
 		executor := NewParallelWorkflowExecutor(fromMap(subworkflows))
-		params, err := ToParallelWorkfowParameters(
+		params, err := ToParallelWorkflowParameters(
 			[]string{"workflow1", "workflow2"},
 			map[string]interface{}{
 				"workflow1": workflow1Params,
@@ -447,7 +447,7 @@ func TestParallelWorkflowOnStart(t *testing.T) {
 			),
 		}
 		executor := NewParallelWorkflowExecutor(fromMap(subworkflows))
-		params, err := ToParallelWorkfowParameters(
+		params, err := ToParallelWorkflowParameters(
 			[]string{"workflow1", "workflow2"},
 			map[string]interface{}{
 				"workflow1": workflow1Params,
@@ -504,7 +504,7 @@ func TestParallelWorkflowOnTaskComplete(t *testing.T) {
 			),
 		}
 		executor := NewParallelWorkflowExecutor(fromMap(subworkflows))
-		params, err := ToParallelWorkfowParameters([]string{"workflow1", "workflow2"}, map[string]interface{}{})
+		params, err := ToParallelWorkflowParameters([]string{"workflow1", "workflow2"}, map[string]interface{}{})
 		require.NoError(t, err)
 
 		payload := ParallelWorkflowPayload{
@@ -541,7 +541,7 @@ func TestParallelWorkflowOnTaskComplete(t *testing.T) {
 			),
 		}
 		executor := NewParallelWorkflowExecutor(fromMap(subworkflows))
-		params, err := ToParallelWorkfowParameters(
+		params, err := ToParallelWorkflowParameters(
 			[]string{"workflow1", "workflow2"},
 			map[string]interface{}{})
 		require.NoError(t, err)
@@ -578,7 +578,7 @@ func TestParallelWorkflowOnTaskComplete(t *testing.T) {
 			),
 		}
 		executor := NewParallelWorkflowExecutor(fromMap(subworkflows))
-		params, err := ToParallelWorkfowParameters(
+		params, err := ToParallelWorkflowParameters(
 			[]string{"workflow1", "workflow2"},
 			map[string]interface{}{})
 		require.NoError(t, err)
@@ -647,7 +647,7 @@ func TestParallelWorkflowOnTaskComplete(t *testing.T) {
 			),
 		}
 		executor := NewParallelWorkflowExecutor(fromMap(subworkflows))
-		params, err := ToParallelWorkfowParameters(
+		params, err := ToParallelWorkflowParameters(
 			[]string{"workflow1", "workflow2"},
 			map[string]interface{}{
 				"workflow2": workflow2Params,
@@ -718,7 +718,7 @@ func TestParallelWorkflowOnTaskComplete(t *testing.T) {
 			),
 		}
 		executor := NewParallelWorkflowExecutor(fromMap(subworkflows))
-		params, err := ToParallelWorkfowParameters(
+		params, err := ToParallelWorkflowParameters(
 			[]string{"workflow1", "workflow2"},
 			map[string]interface{}{})
 		require.NoError(t, err)
@@ -782,7 +782,7 @@ func TestParallelWorkflowOnCancel(t *testing.T) {
 			),
 		}
 		executor := NewParallelWorkflowExecutor(fromMap(subworkflows))
-		params, err := ToParallelWorkfowParameters([]string{"workflow1", "workflow2"}, map[string]interface{}{})
+		params, err := ToParallelWorkflowParameters([]string{"workflow1", "workflow2"}, map[string]interface{}{})
 		require.NoError(t, err)
 
 		payload := ParallelWorkflowPayload{
@@ -814,7 +814,7 @@ func TestParallelWorkflowOnCancel(t *testing.T) {
 			),
 		}
 		executor := NewParallelWorkflowExecutor(fromMap(subworkflows))
-		params, err := ToParallelWorkfowParameters([]string{"workflow1", "workflow2"}, map[string]interface{}{})
+		params, err := ToParallelWorkflowParameters([]string{"workflow1", "workflow2"}, map[string]interface{}{})
 		require.NoError(t, err)
 
 		curPayload := ParallelWorkflowPayload{
@@ -902,7 +902,7 @@ func TestParallelWorkflowOnCancel(t *testing.T) {
 			),
 		}
 		executor := NewParallelWorkflowExecutor(fromMap(subworkflows))
-		params, err := ToParallelWorkfowParameters([]string{"workflow1", "workflow2"}, map[string]interface{}{
+		params, err := ToParallelWorkflowParameters([]string{"workflow1", "workflow2"}, map[string]interface{}{
 			"workflow1": workflow1Params,
 			"workflow2": workflow2Params,
 		})
