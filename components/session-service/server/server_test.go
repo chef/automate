@@ -496,6 +496,60 @@ func TestCallbackHandler(t *testing.T) {
 			assert.Zero(t, rs, "expecting no relay_state keys")
 		},
 
+		`GET /callback?code=X&state=Y with a session cookie when code exchange
+     succeeds without a refresh_token, removes existing refresh_token and redirects to signin`: func(t *testing.T) {
+			code := "randomstringcode"
+			sessionID := "RBUh6l2c2JB3h6gEWAOGt2HHtL4inzSIgk-oNB-51Q"
+			relayState := "relaaay"
+			clientState := "/nodes"
+			oldRefreshToken := "somethingopaque"
+			sessionData := sessionData(relayState, clientState)
+			sessionData["refresh_token"] = oldRefreshToken
+			if err := addSessionDataToStore(ms, sessionID, sessionData, nil); err != nil {
+				t.Fatal(err)
+			}
+
+			newIDToken := "somethingopaqueandnew" // it's a JWT, but we don't care here
+			t1 := oauth2.Token{}                  // no new refresh_token
+			t2 := t1.WithExtra(map[string]interface{}{"id_token": newIDToken})
+			s.setTestToken(t2, nil)
+
+			r := httptest.NewRequest("GET", fmt.Sprintf("/callback?code=%s&state=%s", code, relayState), nil)
+			r.AddCookie(&http.Cookie{Name: "session", Value: sessionID})
+
+			w := httptest.NewRecorder()
+			hdlr.ServeHTTP(w, r)
+			resp := w.Result()
+
+			require.Equal(t, http.StatusSeeOther, resp.StatusCode)
+			require.Contains(t, resp.Header.Get("Location"), fmt.Sprintf("/signin#id_token=%s&state=%s", newIDToken, clientState))
+
+			// this process gives us a new session id, so we just check that the old one
+			// is no more, and find new one
+			hasNoCookieWithSessionID(t, resp, sessionID)
+			hasCookieWithAnySessionID(t, resp)
+			hasCookieWithSecureSessionSettings(t, resp)
+
+			var newSessionID string
+			for _, k := range resp.Cookies() {
+				if k.Name == "session" {
+					newSessionID = k.Value
+				}
+			}
+			require.NotEmpty(t, newSessionID, "there is a new session ID cookie")
+
+			// relay_state was removed from session data
+			data, exists, err := ms.Find(newSessionID)
+			require.NoError(t, err)
+			require.True(t, exists, "there is a stored session")
+
+			var cookie struct {
+				Data map[string]interface{} `json:"data"`
+			}
+			require.NoError(t, json.Unmarshal(data, &cookie), "unmarshal session cookie data")
+			assert.Zero(t, cookie.Data["refresh_token"], "expected no refresh token")
+		},
+
 		`GET /callback?code=X&state=Y with a session cookie and two state pairs when code exchange
      succeeds, stores refresh_token and redirects to signin, removes one relay state, keeps the other`: func(t *testing.T) {
 			code := "randomstringcode"

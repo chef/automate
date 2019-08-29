@@ -264,10 +264,16 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if token.RefreshToken != "" {
-		err = sess.PutString(w, "refresh_token", token.RefreshToken)
-		if err != nil {
+		if err := sess.PutString(w, "refresh_token", token.RefreshToken); err != nil {
 			s.log.Debugf("failed to set session token: %v", err)
 			http.Error(w, "failed to set refresh_token", http.StatusInternalServerError)
+			return
+		}
+	} else { // no refresh_token in the response (for example with SAML)
+		// this removes the value
+		if _, err := sess.PopString(w, "refresh_token"); err != nil {
+			s.log.Debugf("failed to remove refresh_token from session data: %v", err)
+			http.Error(w, "failed to delete refresh_token", http.StatusInternalServerError)
 			return
 		}
 	}
