@@ -113,7 +113,7 @@ type Delivery struct {
 
 // ElasticSearchSidecar specific options
 type ElasticSearchSidecar struct {
-	ESSidecarAddress string
+	Address string
 }
 
 // DataRetention describes data retention policies

@@ -3,7 +3,7 @@
 #shellcheck disable=SC2034
 test_name="airgap_ow_upgrade"
 test_upgrades=true
-test_diagnostics_filters="~iam-v2"
+test_diagnostics_filters="~iam-v2 ~purge" # remove purge until 1219 is in current
 
 
 CURRENT_OLDEST_VERSION=20190501153509

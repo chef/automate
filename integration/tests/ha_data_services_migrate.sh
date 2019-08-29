@@ -3,7 +3,7 @@
 #shellcheck disable=SC2034
 test_name="ha_data_services_migrate"
 test_external_services=(ha_backend)
-test_diagnostics_filters="~iam-v2"
+test_diagnostics_filters="~iam-v2 ~purge"
 test_upgrades=true
 
 CURRENT_OLDEST_VERSION=20190501153509

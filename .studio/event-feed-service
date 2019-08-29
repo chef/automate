@@ -40,3 +40,22 @@ function event_feed_timeline() {
   chef-automate dev grpcurl event-feed-service -- chef.automate.domain.event_feed.api.EventFeedService.GetFeedTimeline -d \
     '{"Timezone": "UTC", "Interval": 24, "Start": "2019-06-25", "End": "2019-06-28"}'
 }
+
+document "event_feed_configure_purge" <<DOC
+  Configures the purge workflow
+DOC
+function event_feed_configure_purge() {
+  chef-automate dev grpcurl event-feed-service -- chef.automate.infra.data_lifecycle.api.Purge.Configure -d "
+  {
+    \"enabled\":true,
+    \"recurrence\":\"FREQ=DAILY;DTSTART=20190820T221315Z;INTERVAL=1\",
+    \"policy_update\": {
+      \"es\": [
+        {
+          \"policy_name\":\"feed\",
+          \"older_than_days\":\"${1}\"
+        }
+      ]
+    }
+  }"
+}

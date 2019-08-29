@@ -14,17 +14,17 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/teambition/rrule-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
 	"github.com/chef/automate/api/external/secrets"
 	auth "github.com/chef/automate/api/interservice/authn"
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
-	dls "github.com/chef/automate/api/interservice/data_lifecycle"
+	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/es_sidecar"
 	"github.com/chef/automate/api/interservice/event"
 	aEvent "github.com/chef/automate/api/interservice/event"
-	dlsserver "github.com/chef/automate/components/compliance-service/api/datalifecycle/server"
 	"github.com/chef/automate/components/compliance-service/api/jobs"
 	jobsserver "github.com/chef/automate/components/compliance-service/api/jobs/server"
 	"github.com/chef/automate/components/compliance-service/api/profiles"
@@ -58,6 +58,7 @@ import (
 	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/postgres"
+	"github.com/chef/automate/lib/datalifecycle/purge"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tracing"
 )
@@ -71,6 +72,11 @@ const (
 )
 
 var SERVICE_STATE serviceState
+
+const (
+	PurgeJobName      = "purge"
+	PurgeScheduleName = "periodic_purge"
+)
 
 func createESBackend(servConf *config.Compliance) relaxting.ES2Backend {
 	// define the ElasticSearch backend config with legacy automate auth
@@ -189,11 +195,11 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	version.RegisterVersionServiceServer(s, versionserver.New())
 	status.RegisterComplianceStatusServer(s, statusSrv)
 
-	dlsManageable, err := setupDataLifecycleManageableInterface(ctx, connFactory, conf)
+	purgeServer, err := setupDataLifecyclePurgeInterface(ctx, connFactory, conf, cerealManager)
 	if err != nil {
-		logrus.Fatalf("serveGrpc aborting, can't setup dlsManageable: %s", err)
+		logrus.Fatalf("serveGrpc aborting, can't setup purge server: %s", err)
 	}
-	dls.RegisterDataLifecycleManageableServer(s, dlsManageable)
+	data_lifecycle.RegisterPurgeServer(s, purgeServer)
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
@@ -358,37 +364,126 @@ func getManagerConnection(connectionFactory *secureconn.Factory,
 	return mgrClient
 }
 
-func setupDataLifecycleManageableInterface(ctx context.Context, connFactory *secureconn.Factory,
-	conf config.Compliance) (*dlsserver.DataLifecycleManageableServer, error) {
-	purgePolicies := []dlsserver.PurgePolicy{}
-	if conf.ComplianceReportDays > 0 {
-		purgePolicies = append(purgePolicies, dlsserver.PurgePolicy{
-			IndexName:          fmt.Sprintf("comp-%s-s", mappings.ComplianceCurrentTimeSeriesIndicesVersion),
-			PurgeOlderThanDays: conf.ComplianceReportDays,
-		})
-		purgePolicies = append(purgePolicies, dlsserver.PurgePolicy{
-			IndexName:          fmt.Sprintf("comp-%s-r", mappings.ComplianceCurrentTimeSeriesIndicesVersion),
-			PurgeOlderThanDays: conf.ComplianceReportDays,
-		})
-	}
+func setupDataLifecyclePurgeInterface(ctx context.Context, connFactory *secureconn.Factory,
+	conf config.Compliance, cerealManager *cereal.Manager) (*purge.Server, error) {
 
-	var err error
-	var esSidecarConn *grpc.ClientConn
-	if os.Getenv("RUN_MODE") == "test" {
-		logrus.Infof(`Skipping ES sidecar-service dial due to RUN_MODE env var being set to "test"`)
-	} else {
-		timeoutCtx, cancel := context.WithTimeout(ctx, 60*time.Second)
-		defer cancel()
-		// Data Lifecycle Interface
-		logrus.Infof("Connecting to %s", conf.ESSidecarAddress)
-		esSidecarConn, err = connFactory.DialContext(timeoutCtx, "es-sidecar-service",
-			conf.ESSidecarAddress, grpc.WithBlock())
-		if err != nil || esSidecarConn == nil {
-			logrus.WithFields(logrus.Fields{"error": err}).Fatal("Failed to create ES Sidecar connection")
-			return nil, err
+	var (
+		compSIndex           = fmt.Sprintf("comp-%s-s", mappings.ComplianceCurrentTimeSeriesIndicesVersion)
+		compSName            = "compliance-scans"
+		compRIndex           = fmt.Sprintf("comp-%s-r", mappings.ComplianceCurrentTimeSeriesIndicesVersion)
+		compRName            = "compliance-reports"
+		defaultPurgePolicies = &purge.Policies{
+			Es: map[string]purge.EsPolicy{
+				compSName: {
+					Name:          compSName,
+					IndexName:     compSIndex,
+					OlderThanDays: conf.ComplianceReportDays,
+				},
+				compRName: {
+					Name:          compRName,
+					IndexName:     compRIndex,
+					OlderThanDays: conf.ComplianceReportDays,
+				},
+			},
+		}
+		err             error
+		esSidecarConn   *grpc.ClientConn
+		esSidecarClient es_sidecar.EsSidecarClient
+		recurrence      *rrule.RRule
+	)
+
+	// Migrate default policy values from the config. The default policies are
+	// only persisted the first time the workflow is created, after which only
+	// new default policies are added and/or existing policies indicies are
+	// updated in case they have been migrated.
+	//
+	// Compliance defaults to -1 when run outside of the deployment-service, which
+	// signaled that it should be disabled. When run with deployment-service it
+	// had a default retention period of 60 days. The configuration has been
+	// deprecated and is no longer valid and the default of 60 has been removed,
+	// making the default value 0. If we have -1 it should be disabled,
+	// if it's set to 0 it should be set at 60, otherwise it should be set at
+	// the user defined value at the time of the initial migration.
+
+	days := conf.ComplianceReportDays
+	switch {
+	case days < 0:
+		for i, p := range defaultPurgePolicies.Es {
+			p.Disabled = true
+			defaultPurgePolicies.Es[i] = p
+		}
+	case days == 0:
+		for i, p := range defaultPurgePolicies.Es {
+			p.OlderThanDays = 60
+			defaultPurgePolicies.Es[i] = p
+		}
+	default:
+		for i, p := range defaultPurgePolicies.Es {
+			p.OlderThanDays = conf.ComplianceReportDays
+			defaultPurgePolicies.Es[i] = p
 		}
 	}
-	return dlsserver.NewDataLifecycleManageableServer(es_sidecar.NewEsSidecarClient(esSidecarConn), purgePolicies), nil
+
+	timeoutCtx, cancel := context.WithTimeout(ctx, 60*time.Second)
+	defer cancel()
+
+	addr := conf.ElasticSearchSidecar.Address
+	logrus.WithField("address", addr).Info("Connecting to Elasticsearch Sidecar")
+	dialOpts := []grpc.DialOption{}
+
+	if os.Getenv("RUN_MODE") == "test" {
+		logrus.Info(`RUN_MODE is set to "test", not requiring block dial to es-sidecar-service`)
+	} else {
+		dialOpts = append(dialOpts, grpc.WithBlock())
+	}
+
+	esSidecarConn, err = connFactory.DialContext(timeoutCtx, "es-sidecar-service",
+		addr, dialOpts...)
+	if err != nil || esSidecarConn == nil {
+		logrus.WithFields(logrus.Fields{"error": err}).Fatal("Failed to create ES Sidecar connection")
+		return nil, err
+	}
+	esSidecarClient = es_sidecar.NewEsSidecarClient(esSidecarConn)
+
+	err = purge.ConfigureManager(
+		cerealManager,
+		PurgeScheduleName,
+		PurgeJobName,
+		purge.WithTaskEsSidecarClient(esSidecarClient),
+	)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to configure %s workflow", PurgeJobName)
+	}
+
+	recurrence, err = rrule.NewRRule(rrule.ROption{
+		Freq:     rrule.DAILY,
+		Interval: 1,
+		Dtstart:  time.Now(),
+	})
+	if err != nil {
+		return nil, errors.Wrapf(err, "could not create recurrence rule for %s", PurgeScheduleName)
+	}
+
+	err = purge.CreateOrUpdatePurgeWorkflow(
+		timeoutCtx,
+		cerealManager,
+		PurgeScheduleName,
+		PurgeJobName,
+		defaultPurgePolicies,
+		true,
+		recurrence,
+	)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create or update purge workflow schedule")
+	}
+
+	return purge.NewServer(
+		cerealManager,
+		PurgeScheduleName,
+		PurgeJobName,
+		defaultPurgePolicies,
+		purge.WithServerEsSidecarClient(esSidecarClient),
+	)
 }
 
 func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Compliance,

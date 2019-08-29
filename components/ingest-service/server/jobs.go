@@ -9,10 +9,12 @@ import (
 	log "github.com/sirupsen/logrus"
 	rrule "github.com/teambition/rrule-go"
 
+	es "github.com/chef/automate/api/interservice/es_sidecar"
 	"github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/config"
 	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/datalifecycle/purge"
 )
 
 const (
@@ -24,7 +26,7 @@ const (
 	MissingNodesForDeletionScheduleName = "periodic_missing_nodes_for_deletion"
 )
 
-func InitializeJobManager(c *cereal.Manager, client backend.Client) error {
+func InitializeJobManager(c *cereal.Manager, client backend.Client, esSidecarClient es.EsSidecarClient) error {
 	err := c.RegisterTaskExecutor(DeleteNodesJobName, &DeleteExpiredMarkedNodesTask{client}, cereal.TaskExecutorOpts{})
 	if err != nil {
 		return err
@@ -43,6 +45,13 @@ func InitializeJobManager(c *cereal.Manager, client backend.Client) error {
 			return errors.Wrapf(err, "failed to register workflow for %q", jobName)
 		}
 	}
+	err = purge.ConfigureManager(
+		c, PurgeScheduleName, PurgeJobName, purge.WithTaskEsSidecarClient(esSidecarClient),
+	)
+	if err != nil {
+		return errors.Wrap(err, "failed to configure purge workflow")
+	}
+
 	return nil
 }
 
@@ -81,7 +90,6 @@ func MigrateJobsSchedule(c *cereal.Manager, oldConfigFile string) error {
 	}
 	return nil
 }
-
 func jobNameToInstanceName(jobName string) string {
 	return fmt.Sprintf("periodic_%s", jobName)
 }
@@ -101,8 +109,7 @@ func (s *SingleTaskWorkflow) OnStart(w cereal.WorkflowInstance, ev cereal.StartE
 	var params string
 	err := w.GetParameters(&params)
 	if err != nil {
-		log.WithError(err).Error("failed to get parameters")
-		w.Complete()
+		return w.Fail(err)
 	}
 
 	w.EnqueueTask(s.taskName, params)

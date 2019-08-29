@@ -175,7 +175,6 @@ out, err, status = Open3.capture3("git show-ref HEAD --hash")
 raise "Failed to get git_sha: exitcode=#{status.exitstatus} stderr=#{err}" if status.exitstatus != 0
 manifest["git_sha"] = out.strip
 
-
 products_meta = File.open("products.meta") do |f|
   JSON.parse(f.read)
 end
@@ -195,6 +194,11 @@ products_meta["packages"].each do |pkg_path|
 
   puts "  Adding package #{pkg_origin}/#{pkg_name}/#{pkg_version}/#{pkg_release}"
   manifest["packages"] << "#{pkg_origin}/#{pkg_name}/#{pkg_version}/#{pkg_release}"
+end
+
+products_meta["deleted_packages"].each do |pkg|
+  puts "  Adding last stable release of deleted package #{pkg}"
+  manifest["packages"] << "#{pkg}"
 end
 
 # Add extra packages to manifest that deployment-service doesn't need to manage

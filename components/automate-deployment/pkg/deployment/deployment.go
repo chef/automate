@@ -323,7 +323,7 @@ func (d *Deployment) UpdateExpectedServicesFromManifest() error {
 	// NOTE(ssd) 2018-07-16: Fix for A1 upgrade bug where services are stuck in
 	// Skip state since they were added post-upgrade.
 	if ContainsAutomateCollection(d.Config.GetDeployment()) {
-		a2ServicesWayBackWhen := map[string]bool{"authn-service": true, "authz-service": true, "automate-cli": true, "automate-dex": true, "automate-elasticsearch": true, "automate-gateway": true, "automate-load-balancer": true, "automate-postgresql": true, "automate-ui": true, "compliance-service": true, "config-mgmt-service": true, "data-lifecycle-service": true, "deployment-service": true, "es-sidecar-service": true, "ingest-service": true, "license-control-service": true, "local-user-service": true, "notifications-service": true, "session-service": true, "teams-service": true}
+		a2ServicesWayBackWhen := map[string]bool{"authn-service": true, "authz-service": true, "automate-cli": true, "automate-dex": true, "automate-elasticsearch": true, "automate-gateway": true, "automate-load-balancer": true, "automate-postgresql": true, "automate-ui": true, "compliance-service": true, "config-mgmt-service": true, "deployment-service": true, "es-sidecar-service": true, "ingest-service": true, "license-control-service": true, "local-user-service": true, "notifications-service": true, "session-service": true, "teams-service": true}
 		diff := make([]string, 0, len(serviceMap))
 		for key := range serviceMap {
 			if _, ok := a2ServicesWayBackWhen[key]; !ok {
@@ -336,6 +336,7 @@ func (d *Deployment) UpdateExpectedServicesFromManifest() error {
 			if found {
 				if serviceMap["automate-gateway"].DeploymentState == Running &&
 					serviceMap[svc].DeploymentState == Skip {
+
 					logrus.Warnf("Detected %s in Skip state with automate-gateway in Running. Applying fix", svc)
 					d.Deployed = true
 					serviceMap[svc].DeploymentState = Running

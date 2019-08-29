@@ -285,7 +285,7 @@ steps:
       - . scripts/verify_setup.sh
       - hab studio run "source scripts/verify_studio_init.sh &&
           start_deployment_service &&
-          chef-automate dev deploy-some chef/data-lifecycle-service --with-deps &&
+          chef-automate dev deploy-some chef/event-feed-service --with-deps &&
           event_feed_integration"
     timeout_in_minutes: 10
     expeditor:
@@ -505,15 +505,6 @@ steps:
         A2_LICENSE:
           path: secret/a2/license
           field: license
-      executor:
-        linux:
-          privileged: true
-
-  - label: "data-lifecycle-service"
-    command:
-      - integration/run_test integration/tests/data_lifecycle.sh
-    timeout_in_minutes: 20
-    expeditor:
       executor:
         linux:
           privileged: true

@@ -50,8 +50,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_EVENT,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
-							Values: []string{"production"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+							Values:    []string{"production"},
 						},
 					},
 				},
@@ -70,8 +70,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
-							Values: []string{"production"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+							Values:    []string{"production"},
 						},
 					},
 				},
@@ -88,8 +88,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
-							Values: []string{"production", "dev"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+							Values:    []string{"production", "dev"},
 						},
 					},
 				},
@@ -107,16 +107,16 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
-							Values: []string{"production"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+							Values:    []string{"production"},
 						},
 					},
 				},
 				{
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
-							Values: []string{"north-side"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Values:    []string{"north-side"},
 						},
 					},
 				},
@@ -134,12 +134,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
-							Values: []string{"production"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+							Values:    []string{"production"},
 						},
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
-							Values: []string{"north-side"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Values:    []string{"north-side"},
 						},
 					},
 				},
@@ -156,8 +156,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
-							Values: []string{"production"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+							Values:    []string{"production"},
 						},
 					},
 				},
@@ -176,8 +176,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
-							Values: []string{"org_1"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Values:    []string{"org_1"},
 						},
 					},
 				},
@@ -194,8 +194,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
-							Values: []string{"org_1"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Values:    []string{"org_1"},
 						},
 					},
 				},
@@ -212,8 +212,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
-							Values: []string{"org_2"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Values:    []string{"org_2"},
 						},
 					},
 				},
@@ -230,8 +230,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
-							Values: []string{"org_1", "org_2"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Values:    []string{"org_1", "org_2"},
 						},
 					},
 				},
@@ -250,8 +250,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
-							Values: []string{"chef_server_1"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+							Values:    []string{"chef_server_1"},
 						},
 					},
 				},
@@ -268,8 +268,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
-							Values: []string{"chef_server_1"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+							Values:    []string{"chef_server_1"},
 						},
 					},
 				},
@@ -286,8 +286,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
-							Values: []string{"chef_server_1"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+							Values:    []string{"chef_server_1"},
 						},
 					},
 				},
@@ -304,8 +304,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
-							Values: []string{"chef_server_1", "chef_server_2"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+							Values:    []string{"chef_server_1", "chef_server_2"},
 						},
 					},
 				},
@@ -324,8 +324,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
-							Values: []string{"area_51"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Values:    []string{"area_51"},
 						},
 					},
 				},
@@ -342,8 +342,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
-							Values: []string{"area_51"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Values:    []string{"area_51"},
 						},
 					},
 				},
@@ -360,8 +360,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
-							Values: []string{"area_51"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Values:    []string{"area_51"},
 						},
 					},
 				},
@@ -369,8 +369,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
-							Values: []string{"area_54"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Values:    []string{"area_54"},
 						},
 					},
 				},
@@ -387,8 +387,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
-							Values: []string{"area_51", "area_54"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Values:    []string{"area_51", "area_54"},
 						},
 					},
 				},
@@ -405,12 +405,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
-							Values: []string{"area_51"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Values:    []string{"area_51"},
 						},
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
-							Values: []string{"area_54"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Values:    []string{"area_54"},
 						},
 					},
 				},
@@ -427,8 +427,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
-							Values: []string{"area_51"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Values:    []string{"area_51"},
 						},
 					},
 				},
@@ -445,8 +445,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
-							Values: []string{"area_51"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Values:    []string{"area_51"},
 						},
 					},
 				},
@@ -463,8 +463,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
-							Values: []string{"area_51", "area_52"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Values:    []string{"area_51", "area_52"},
 						},
 					},
 				},
@@ -482,12 +482,12 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
-							Values: []string{"area_52"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Values:    []string{"area_52"},
 						},
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
-							Values: []string{"production"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+							Values:    []string{"production"},
 						},
 					},
 				},
@@ -507,8 +507,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
-							Values: []string{"area_51"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+							Values:    []string{"area_51"},
 						},
 					},
 				},
@@ -526,8 +526,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
-							Values: []string{"area_51"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+							Values:    []string{"area_51"},
 						},
 					},
 				},
@@ -545,8 +545,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
-							Values: []string{"area_51"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+							Values:    []string{"area_51"},
 						},
 					},
 				},
@@ -563,8 +563,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
-							Values: []string{"area_51"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+							Values:    []string{"area_51"},
 						},
 					},
 				},
@@ -581,8 +581,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
-							Values: []string{"area_51", "area_52"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+							Values:    []string{"area_51", "area_52"},
 						},
 					},
 				},
@@ -599,8 +599,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
-							Values: []string{"area_51", "area_52"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+							Values:    []string{"area_51", "area_52"},
 						},
 					},
 				},
@@ -618,8 +618,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
-							Values: []string{"area_52"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+							Values:    []string{"area_52"},
 						},
 					},
 				},
@@ -627,8 +627,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
-							Values: []string{"org_1"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Values:    []string{"org_1"},
 						},
 					},
 				},
@@ -646,8 +646,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
-							Values: []string{"area_52"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+							Values:    []string{"area_52"},
 						},
 					},
 				},
@@ -655,8 +655,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
-							Values: []string{"org_1"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Values:    []string{"org_1"},
 						},
 					},
 				},
@@ -675,8 +675,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
-							Values: []string{"PolicyGroup"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+							Values:    []string{"PolicyGroup"},
 						},
 					},
 				},
@@ -693,8 +693,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
-							Values: []string{"policygroup"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+							Values:    []string{"policygroup"},
 						},
 					},
 				},
@@ -711,8 +711,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
-							Values: []string{"area_51"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+							Values:    []string{"area_51"},
 						},
 					},
 				},
@@ -729,8 +729,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
-							Values: []string{"area_51", "area_52"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+							Values:    []string{"area_51", "area_52"},
 						},
 					},
 				},
@@ -748,8 +748,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
-							Values: []string{"area_52"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+							Values:    []string{"area_52"},
 						},
 					},
 				},
@@ -757,8 +757,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
-							Values: []string{"org_1"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Values:    []string{"org_1"},
 						},
 					},
 				},
@@ -776,8 +776,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
-							Values: []string{"area_52"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP,
+							Values:    []string{"area_52"},
 						},
 					},
 				},
@@ -785,8 +785,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
-							Values: []string{"org_1"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Values:    []string{"org_1"},
 						},
 					},
 				},
@@ -805,8 +805,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
-							Values: []string{"PolicyName"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+							Values:    []string{"PolicyName"},
 						},
 					},
 				},
@@ -823,8 +823,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
-							Values: []string{"policygroup"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+							Values:    []string{"policygroup"},
 						},
 					},
 				},
@@ -841,8 +841,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
-							Values: []string{"area_51"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+							Values:    []string{"area_51"},
 						},
 					},
 				},
@@ -859,8 +859,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
-							Values: []string{"area_51", "area_52"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+							Values:    []string{"area_51", "area_52"},
 						},
 					},
 				},
@@ -878,8 +878,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
-							Values: []string{"area_52"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+							Values:    []string{"area_52"},
 						},
 					},
 				},
@@ -887,8 +887,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
-							Values: []string{"org_1"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Values:    []string{"org_1"},
 						},
 					},
 				},
@@ -906,8 +906,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
-							Values: []string{"area_52"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+							Values:    []string{"area_52"},
 						},
 					},
 				},
@@ -915,8 +915,8 @@ func TestReportProjectRulesMatching(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_NODE,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
-							Values: []string{"org_1"},
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+							Values:    []string{"org_1"},
 						},
 					},
 				},
@@ -982,8 +982,8 @@ func TestBundlerMatchProjectRule(t *testing.T) {
 				Type: iam_v2.ProjectRuleTypes_NODE,
 				Conditions: []*iam_v2.Condition{
 					{
-						Attribute:   iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
-						Values: []string{environmentsName},
+						Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+						Values:    []string{environmentsName},
 					},
 				},
 			},
@@ -1037,8 +1037,8 @@ func TestBundlerMatchProjectRuleEventRuleType(t *testing.T) {
 				Type: iam_v2.ProjectRuleTypes_EVENT,
 				Conditions: []*iam_v2.Condition{
 					{
-						Attribute:   iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
-						Values: []string{environmentsName},
+						Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+						Values:    []string{environmentsName},
 					},
 				},
 			},
@@ -1095,8 +1095,8 @@ func TestBundlerWithScanJobReport(t *testing.T) {
 				Type: iam_v2.ProjectRuleTypes_NODE,
 				Conditions: []*iam_v2.Condition{
 					{
-						Attribute:   iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
-						Values: []string{environmentsName},
+						Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+						Values:    []string{environmentsName},
 					},
 				},
 			},

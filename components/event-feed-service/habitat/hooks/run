@@ -3,6 +3,7 @@
 set -e
 
 exec 2>&1
+export ZONEINFO={{pkgPathFor "core/glibc"}}/share/zoneinfo
 
 # Call the script to block until user accepts the MLSA via the package's config
 {{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}

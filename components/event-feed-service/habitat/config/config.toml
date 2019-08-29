@@ -26,7 +26,12 @@ url = "http://127.0.0.1:{{member.cfg.http-port}}"
 address = "{{member.sys.ip}}:{{member.cfg.port}}"
 {{~/eachAlive}}
 
-[data_lifecycle]
+[jobs]
 {{~#if cfg.service.purge_event_feed_after_days }}
-purge_event_feed_after_days = {{cfg.service.purge_event_feed_after_days}}
+default_purge_after_days = {{cfg.service.purge_event_feed_after_days}}
 {{~/if}}
+
+[cereal]
+{{~#eachAlive bind.cereal-service.members as |member|}}
+address = "{{member.sys.ip}}:{{member.cfg.port}}"
+{{~/eachAlive}}

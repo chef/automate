@@ -76,7 +76,13 @@ var ProductMetadataJSON = `
     },
     {
       "name": "chef/event-feed-service",
-      "metadata": null
+      "metadata": {
+        "name": "chef/event-feed-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/authz-service",
@@ -217,10 +223,6 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
-      "name": "chef/data-lifecycle-service",
-      "metadata": null
-    },
-    {
       "name": "chef/event-gateway",
       "metadata": null
     },
@@ -344,6 +346,9 @@ var ProductMetadataJSON = `
       "metadata": null
     }
   ],
+  "deleted_packages": [
+    "chef/data-lifecycle-service/0.0.1/20190816162731"
+  ],
   "collections": [
     {
       "name": "core",
@@ -437,7 +442,6 @@ var ProductMetadataJSON = `
         "chef/ingest-service",
         "chef/config-mgmt-service",
         "chef/data-feed-service",
-        "chef/data-lifecycle-service",
         "chef/event-gateway",
         "chef/automate-gateway"
       ],

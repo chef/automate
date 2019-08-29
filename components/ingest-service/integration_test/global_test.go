@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/sirupsen/logrus"
 )
 
 // Global variables
@@ -21,7 +22,7 @@ var (
 
 	// This suite variable will be available for every single test as long as they
 	// belong to the 'integration_test' package.
-	suite = NewGlobalSuite()
+	suite *Suite
 
 	// The configuration file that the Manager config will use inside the test suite
 	cFile = "/tmp/.ingest-service.toml"
@@ -46,6 +47,13 @@ func waitForModificationsToApply() {
 //
 // => Docs: https://golang.org/pkg/testing/#hdr-Main
 func TestMain(m *testing.M) {
+	var err error
+	suite, err = NewGlobalSuite()
+	if err != nil {
+		logrus.WithError(err).Error("failed to initialize test suite")
+		os.Exit(3)
+	}
+
 	// Global Setup hook: Here is where you can initialize anythings you need
 	// for your tests to run, things like; Initialize ES indices, insert
 	// nodes or runs, etc.

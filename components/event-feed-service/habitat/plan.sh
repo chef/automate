@@ -21,6 +21,7 @@ pkg_exposes=(port)
 
 pkg_binds=(
   [automate-es-gateway]="http-port http-host"
+  [cereal-service]="port"
 )
 pkg_binds_optional=(
   [es-sidecar-service]="port"
