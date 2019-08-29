@@ -324,6 +324,15 @@ func request_ApplicationsService_GetDisconnectedServicesConfig_0(ctx context.Con
 
 }
 
+func local_request_ApplicationsService_GetDisconnectedServicesConfig_0(ctx context.Context, marshaler runtime.Marshaler, server ApplicationsServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetDisconnectedServicesConfigReq
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.GetDisconnectedServicesConfig(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 func request_ApplicationsService_UpdateDisconnectedServicesConfig_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationsServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq UpdateDisconnectedServicesConfigReq
 	var metadata runtime.ServerMetadata
@@ -337,6 +346,23 @@ func request_ApplicationsService_UpdateDisconnectedServicesConfig_0(ctx context.
 	}
 
 	msg, err := client.UpdateDisconnectedServicesConfig(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_ApplicationsService_UpdateDisconnectedServicesConfig_0(ctx context.Context, marshaler runtime.Marshaler, server ApplicationsServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq UpdateDisconnectedServicesConfigReq
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := server.UpdateDisconnectedServicesConfig(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -533,7 +559,7 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationsService_GetDisconnectedServicesConfig_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := local_request_ApplicationsService_GetDisconnectedServicesConfig_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -553,7 +579,7 @@ func RegisterApplicationsServiceHandlerServer(ctx context.Context, mux *runtime.
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApplicationsService_UpdateDisconnectedServicesConfig_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := local_request_ApplicationsService_UpdateDisconnectedServicesConfig_0(rctx, inboundMarshaler, server, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -782,6 +808,46 @@ func RegisterApplicationsServiceHandlerClient(ctx context.Context, mux *runtime.
 		}
 
 		forward_ApplicationsService_DeleteDisconnectedServices_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_ApplicationsService_GetDisconnectedServicesConfig_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_ApplicationsService_GetDisconnectedServicesConfig_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ApplicationsService_GetDisconnectedServicesConfig_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_ApplicationsService_UpdateDisconnectedServicesConfig_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_ApplicationsService_UpdateDisconnectedServicesConfig_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ApplicationsService_UpdateDisconnectedServicesConfig_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 

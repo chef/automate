@@ -33,6 +33,10 @@ func Spawn(c *config.Applications, connFactory *secureconn.Factory) error {
 	}
 
 	scheduler := server.NewJobScheduler(jobsMgr)
+	if err := scheduler.Setup(); err != nil {
+		log.WithError(err).Fatal("Failed to configure periodic jobs in upstream cereal service")
+		return err
+	}
 
 	grpcServer := NewGRPCServer(scheduler, connFactory, c)
 	return grpcServer.Serve(conn)
