@@ -46,7 +46,8 @@ func ConnectToJobsManager(jobCfg *config.Jobs, connFactory *secureconn.Factory) 
 	}
 
 	be := cerealRPC.NewGrpcBackendFromConn("applications", conn)
-	cerealSvc, err := cereal.NewManager(be)
+	//cerealSvc, err := cereal.NewManager(be)
+	cerealSvc, err := cereal.NewManager(be, cereal.WithTaskPollInterval(1*time.Second), cereal.WithTaskPollIntervalMaxJitter(100*time.Millisecond))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create cereal job manager from gRPC connection")
 	}
