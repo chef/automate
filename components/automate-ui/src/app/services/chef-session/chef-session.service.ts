@@ -75,7 +75,7 @@ export class ChefSessionService implements CanActivate {
       if (xhr.status === HTTP_STATUS_OK) {
         this.ingestIDToken(xhr.response.id_token);
       } else if (xhr.status === HTTP_STATUS_UNAUTHORIZED) {
-        this.logout(this.currentPath(), true);
+        this.logout();
       } else {
         // TODO 2017/12/15 (sr): is there anything we could do that's better than
         // this?
@@ -126,7 +126,7 @@ export class ChefSessionService implements CanActivate {
   // available for setSessionOrRedirectToLogin() (part of ChefSession's
   // constructor)
   setSession(uuid, fullname, username, id_token: string, groups: Array<string>): void {
-    this.user = <ChefSessionUser>{
+    this.user = {
       uuid,
       fullname,
       username,
@@ -146,11 +146,14 @@ export class ChefSessionService implements CanActivate {
     return !isNull(localStorage.getItem(sessionKey));
   }
 
-  logout(url: string = '/', refresh: boolean = false): void {
+  // url: UI route to go back to when the (next) signin process has succeeded
+  // noHint: for the sign in, don't try to skip the method selection
+  logout(url?: string, noHint?: boolean): void {
     this.deleteSession();
+    url = url || this.currentPath();
     // note: url will end up url-encoded in this string (magic)
     let signinURL: string;
-    if (refresh && this.user && this.user.id_token) {
+    if (!noHint && this.user && this.user.id_token) {
       signinURL = `/session/new?state=${url}&id_token_hint=${this.user.id_token}`;
     } else {
       signinURL = `/session/new?state=${url}`;
@@ -166,6 +169,9 @@ export class ChefSessionService implements CanActivate {
     }
   }
 
+  // TODO(sr) 2019/08/26: I don't think we should use these global variables.
+  // Instead, we should take the information about the currently-viewed page
+  // from the ngrx store.
   currentPath(): string {
     return window.location.pathname;
   }
