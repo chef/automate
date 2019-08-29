@@ -34,8 +34,10 @@ var createRuleReqGen, createProjectReqGen, createProjectAndRulesGen, createProje
 
 func TestCreateRuleProperties(t *testing.T) {
 	ctx := context.Background()
-	cl, testDB, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	cl, testDB, store, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	properties := getGopterParams(seed)
+	defer testDB.CloseDB(t)
+	defer store.Close()
 
 	properties.Property("newly created rules are staged",
 		prop.ForAll(
@@ -92,7 +94,9 @@ func TestCreateRuleProperties(t *testing.T) {
 
 func TestGetRuleProperties(t *testing.T) {
 	ctx := context.Background()
-	cl, testDB, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	cl, testDB, store, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	defer testDB.CloseDB(t)
+	defer store.Close()
 	properties := getGopterParams(seed)
 
 	properties.Property("newly created rules are reported as staged",

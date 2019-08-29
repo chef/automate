@@ -80,7 +80,7 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "could not create cereal manager")
 	}
 
-	policyRefresher, err := v2.NewPolicyRefresher(ctx, l, e)
+	policyRefresher, err := v2.NewPostgresPolicyRefresher(ctx, l, e)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 policy refresher")
 	}
@@ -90,7 +90,7 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "could not initialize v2 projects server")
 	}
 
-	v2AuthzServer, err := v2.NewAuthzServer(l, e, switcher, v2ProjectsServer)
+	v2AuthzServer, err := v2.NewPostgresAuthzServer(l, e, switcher, v2ProjectsServer)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 authz server")
 	}

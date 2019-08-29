@@ -10,7 +10,7 @@ type ProjectsMissingErr struct {
 	projectsMissing []string
 }
 
-func NewProjectsMissingErrError(projectsMissing []string) error {
+func NewProjectsMissingError(projectsMissing []string) error {
 	return &ProjectsMissingErr{projectsMissing: projectsMissing}
 }
 

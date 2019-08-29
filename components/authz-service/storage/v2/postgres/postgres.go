@@ -837,8 +837,6 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role, checkProjects bool) 
 
 		projectDiff := projectassignment.CalculateProjectDiff(oldRole.Projects, role.Projects)
 
-		// This code largely mirrors ValidateProjectAssignment but we can't call that directly
-		// due to circular dependencies.
 		if len(projectDiff) != 0 {
 			err = p.errIfMissingProjectsWithQuerier(ctx, tx, projectDiff)
 			if err != nil {
@@ -1526,7 +1524,7 @@ func (p *pg) errIfMissingProjectsWithQuerier(ctx context.Context, q Querier, pro
 	}
 
 	if len(projectsNotFound) != 0 {
-		return projectassignment.NewProjectsMissingErrError(projectsNotFound)
+		return projectassignment.NewProjectsMissingError(projectsNotFound)
 	}
 
 	return nil
@@ -1589,7 +1587,11 @@ func (p *pg) Reset(ctx context.Context) error {
 }
 
 func (p *pg) Close() error {
-	return errors.Wrap(p.db.Close(), "close database connection")
+	err := errors.Wrap(p.db.Close(), "close database connection")
+	// reset the singleton
+	once = *new(sync.Once)
+	singletonInstance = nil
+	return err
 }
 
 func (p *pg) Pristine(ctx context.Context) error {

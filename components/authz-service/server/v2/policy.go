@@ -489,10 +489,7 @@ func (s *policyServer) UpdateRole(
 		return nil, status.Errorf(codes.InvalidArgument, "parse policy with ID %q: %s", req.Id, err.Error())
 	}
 
-	// need the project diff permissions check to happen in the same transaction
-	// as the update, so we can't leverage ValidateProjectAssignment
 	roleInternal, err := s.store.UpdateRole(ctx, storageRole, s.isBeta2p1())
-
 	switch err {
 	case nil:
 	case storage_errors.ErrConflict:
