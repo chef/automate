@@ -132,6 +132,9 @@ def get_hab_deps_latest()
   ret
 end
 
+puts "Environment Keys:"
+puts ENV.keys
+
 version = ENV["VERSION"] || DateTime.now.strftime("%Y%m%d%H%M%S")
 filename = ENV["VERSION"] || "manifest"
 
