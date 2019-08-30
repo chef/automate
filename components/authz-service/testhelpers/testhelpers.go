@@ -80,8 +80,7 @@ func NewTestFramework(t *testing.T, ctx context.Context) *TestFramework {
 	require.NoError(t, err)
 
 	projectUpdateManager := NewMockProjectUpdateManager()
-	projectsSrv, err := server.NewProjectsServer(
-		ctx, l, pg, opaInstance, projectUpdateManager, polRefresher)
+	projectsSrv, err := server.NewProjectsServer(ctx, l, pg, projectUpdateManager, polRefresher)
 	require.NoError(t, err)
 
 	authzSrv, err := server.NewPostgresAuthzServer(l, opaInstance, vSwitch, projectsSrv)
