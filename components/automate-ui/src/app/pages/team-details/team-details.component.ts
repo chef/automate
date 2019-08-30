@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
-import { identity, keyBy, at, xor } from 'lodash/fp';
+import { isEmpty, identity, keyBy, at, xor } from 'lodash/fp';
 import { combineLatest, Observable, Subject } from 'rxjs';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 
@@ -162,6 +162,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       filter(([_, pStatus]: [Project[], EntityStatus]) => pStatus !== EntityStatus.loading),
       filter(() => !!this.team),
       map(([allowedProjects, _]) => {
+        this.projects = {};
         allowedProjects
           .forEach(p => {
             this.projects[p.id] = { ...p, checked: this.team.projects.includes(p.id)
@@ -281,11 +282,13 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   }
 
   noProjectsUpdated(): boolean {
-    return xor(this.team.projects,
-      Object.values(this.projects).filter(p => p.checked).map(p => p.id)).length === 0;
+    const projectsUpdated = xor(
+      this.team.projects,
+      Object.keys(this.projects).filter(id => this.projects[id].checked));
+    return projectsUpdated.length === 0;
   }
 
   dropdownDisabled(): boolean {
-    return Object.values(this.projects).length === 0 || this.saving;
+    return isEmpty(this.projects) || this.saving;
   }
 }

@@ -81,21 +81,17 @@ export class ApiTokenRequests {
     }
   }
 
-  public create(tokenData: CreateTokenPayload, version: IAMMajorVersion = 'v1'):
+  public create({ id, name, projects }: CreateTokenPayload, version: IAMMajorVersion = 'v1'):
     Observable<ApiTokenV1 | TokenPayloadResponse> {
     switch (version) {
       case 'v2': {
         return this.http.post<TokenPayloadResponse>(`${env.auth_v2_url}/tokens`,
-          {
-            id: tokenData.id,
-            name: tokenData.name,
-            active: true,
-            projects: tokenData.projects
-          });
+          { id, name, projects, active: true }
+        );
       }
       default: {
         return this.http.post<ApiTokenV1>(`${env.auth_url}/tokens`,
-          { id: tokenData.id, description: tokenData.name, active: true });
+          { id, description: name, active: true });
       }
     }
   }

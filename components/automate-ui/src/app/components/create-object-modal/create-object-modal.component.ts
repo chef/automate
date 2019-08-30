@@ -54,8 +54,8 @@ export class CreateObjectModalComponent implements OnInit, OnChanges {
 
   onProjectChecked(project: ProjectChecked): void {
     this.projects[project.id].checked = project.checked;
-    const projectsSelected = Object.values(this.projects).filter(p => p.checked);
-    this.createForm.controls.projects.setValue(projectsSelected.map(p => p.id));
+    const projectsSelected = Object.keys(this.projects).filter(id => this.projects[id].checked);
+    this.createForm.controls.projects.setValue(projectsSelected);
   }
 
   dropdownDisabled(): boolean {

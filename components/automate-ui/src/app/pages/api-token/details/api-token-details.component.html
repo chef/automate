@@ -50,7 +50,9 @@
           </chef-error>
         </chef-form-field>
         <div id='projects-container' *ngIf="!isMajorV1 && isMinorV1">
-          <app-projects-dropdown [projects]="projects" (onProjectChecked)="onProjectChecked($event)"
+          <app-projects-dropdown
+            [projects]="projects"
+            (onProjectChecked)="onProjectChecked($event)"
             [disabled]="dropdownDisabled()">
           </app-projects-dropdown>
         </div>

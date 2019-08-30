@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
-import { identity, xor } from 'lodash/fp';
+import { isEmpty, identity, xor } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 
@@ -98,10 +98,10 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
       filter(([_, pStatus]: [Project[], EntityStatus]) => pStatus !== EntityStatus.loading),
       filter(() => !!this.token),
       map(([allowedProjects, _]) => {
+        this.projects = {};
         allowedProjects
           .forEach(p => {
-            this.projects[p.id] = {
-              ...p, checked: this.token.projects.includes(p.id)
+            this.projects[p.id] = { ...p, checked: this.token.projects.includes(p.id)
             };
           });
       }))
@@ -156,11 +156,13 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
   }
 
   noProjectsUpdated(): boolean {
-    return xor(this.token.projects,
-      Object.values(this.projects).filter(p => p.checked).map(p => p.id)).length === 0;
+    const projectsUpdated = xor(
+      this.token.projects,
+      Object.keys(this.projects).filter(id => this.projects[id].checked));
+    return projectsUpdated.length === 0;
   }
 
   dropdownDisabled(): boolean {
-    return Object.values(this.projects).length === 0 || this.saveInProgress;
+    return isEmpty(this.projects) || this.saveInProgress;
   }
 }
