@@ -1,15 +1,15 @@
 package integration_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
-	"context"
+	"github.com/stretchr/testify/require"
+	"github.com/teambition/rrule-go"
 
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
-	"github.com/stretchr/testify/require"
-	"github.com/teambition/rrule-go"
 )
 
 // TestPurge tests the Purge server
@@ -147,13 +147,13 @@ func TestPurge(t *testing.T) {
 				RemoteHostname:   "chef-server.org",
 				OrganizationName: "org1",
 				Projects:         []string{"org1"},
-				RecordedAt:       time.Now().Add(time.Hour * -8),
+				RecordedAt:       time.Now(), // always today's index
 			},
 			iBackend.InternalChefAction{
 				RemoteHostname:   "chef-server.org",
 				OrganizationName: "org2",
 				Projects:         []string{"org2"},
-				RecordedAt:       time.Now().Add(time.Hour * -16),
+				RecordedAt:       time.Now().Add(time.Hour * -24), // always yesterday's index
 			},
 			iBackend.InternalChefAction{
 				RemoteHostname:   "chef-server.org",
@@ -205,6 +205,6 @@ func TestPurge(t *testing.T) {
 		waitForModificationsToApply()
 		actualActions, err = suite.GetActions(5)
 		require.NoError(t, err)
-		require.Equal(t, 2, len(actualActions), "wrong number of actions retrieved")
+		require.Equal(t, 1, len(actualActions), "wrong number of actions retrieved")
 	})
 }
