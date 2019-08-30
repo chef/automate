@@ -7,7 +7,7 @@ require 'net/http'
 require 'json'
 require 'openssl'
 require 'open3'
-
+require 'logger'
 
 # Packages that are present in products.meta but we wish to
 # exclude from the manifest (probably because they are not yet published to the
@@ -18,6 +18,33 @@ require 'open3'
 SKIP_PACKAGES = []
 
 class PackageQuerier
+  class Ident
+    attr_accessor :origin, :name, :version, :release, :source
+    def initialize(data={})
+      @origin= data["origin"]
+      @name = data["name"]
+      @version = data["version"]
+      @release = data["release"]
+      @source = data["source"] || "unknown source"
+    end
+
+    def ident
+      "#{origin}/#{name}/#{version}/#{release}"
+    end
+
+    def pretty
+      "#{ident} from #{source}"
+    end
+
+    def to_s
+      ident
+    end
+
+    def ==(other)
+      other != nil && ident == other.ident
+    end
+  end
+
   class ChainQuerier
     def initialize(queriers=[])
       @queriers=queriers
@@ -33,6 +60,28 @@ class PackageQuerier
     end
   end
 
+  class LoggedComparisonQuerier
+    def initialize(main_querier, comparison_querier, logger)
+      @main=main_querier
+      @compare=comparison_querier
+      @logger=logger
+    end
+
+    def get_latest(channel, origin, name)
+      ret = @main.get_latest(channel, origin, name)
+      if ret != nil
+        compare_result = @compare.get_latest(channel, origin, name)
+        if compare_result != ret
+          @logger.warn("Found mismatch between sources:")
+          @logger.warn("   #{ret.pretty}")
+          @logger.warn("   #{compare_result.pretty}")
+          @logger.warn("Using #{ret}")
+        end
+      end
+      ret
+    end
+  end
+
   class PinQuerier
     def initialize(pins={})
       @pins = pins
@@ -42,8 +91,10 @@ class PackageQuerier
       ident = @pins[name]
       if ident != nil
         ident["source"] = "pin"
+        Ident.new(ident)
+      else
+        nil
       end
-      ident
     end
   end
 
@@ -83,7 +134,7 @@ class PackageQuerier
       if match_data = /^#{found_origin}-#{desired_name}-(.*)-(\d{14})-x86_64-linux.hart$/.match(hart_name)
         ident["version"] = match_data[1]
         ident["release"] = match_data[2]
-        ident
+        Ident.new(ident)
       else
         raise "Could not parse ident from filename #{hart_name}"
       end
@@ -105,13 +156,14 @@ class PackageQuerier
         if key.start_with?("EXPEDITOR_PKG_IDENTS_")
           ident=ENV[key]
           origin, name, version, release = ident.split("/")
-          idents["#{origin}/#{name}"] = {
-            "origin" => origin,
-            "name" => name,
-            "version" => version,
-            "release" => release,
-            "source" => "expeditor environment"
-          }
+          idents["#{origin}/#{name}"] = Ident.new(
+            {
+              "origin" => origin,
+              "name" => name,
+              "version" => version,
+              "release" => release,
+              "source" => "expeditor environment"
+            })
         end
       end
       idents
@@ -139,7 +191,7 @@ class PackageQuerier
         latest_release = JSON.parse(response.body)
         ident = latest_release["ident"]
         ident["source"] = "Habitat Depot"
-        ident
+        Ident.new(ident)
       end
     end
   end
@@ -149,7 +201,7 @@ def get_hab_deps_latest(package_querier)
   ret = {}
   ["hab", "hab-sup", "hab-launcher"].each do |name|
     d = package_querier.get_latest("stable", "core", name)
-    ret[name] = "#{d["origin"]}/#{d["name"]}/#{d["version"]}/#{d["release"]}"
+    ret[name] = d.ident
   end
   ret
 end
@@ -163,10 +215,9 @@ def channel_for_origin(origin)
   end
 end
 
-def log_added_ident(ident)
-  puts "  Adding package #{ident["origin"]}/#{ident["name"]}/#{ident["version"]}/#{ident["release"]} from #{ident["source"]}"
+def log_added_ident(log, ident)
+  log.info "Adding package #{ident.pretty}"
 end
-
 
 # -- FIXME: PINNED DATABASES - sdelano 2018/07/19 --
 #
@@ -195,7 +246,6 @@ pinned_hab_components = {
 
 pins = pinned_databases.merge(pinned_hab_components)
 
-
 # When true, ALLOW_LOCAL_PACKAGES creates the manifest using locally
 # created hartifacts if it can not otherwise find the package uploaded
 # to the depot.
@@ -211,20 +261,24 @@ filename = if ENV["VERSION"]
              "manifest.json"
            end
 
-puts "Creating release manifest for Automate"
-puts "--------------------------------------"
-puts "Configuration:"
-puts "  use_local_packages=#{use_local_packages}"
-puts "  use_environment_idents=#{use_environment_idents}"
-puts "  local_package_origin=#{local_package_origin}"
-puts "  local_package_directory=#{local_package_directory}"
-puts "  filename=#{filename}"
-puts "  version=#{version}"
-puts "-------------------------------"
+log = Logger.new(STDOUT)
+log.formatter = proc do |severity, datetime, progname, msg|
+  "#{datetime} #{severity}: #{msg}\n"
+end
+log.info "Creating release manifest for Automate"
+log.info "--------------------------------------"
+log.info "Configuration:"
+log.info "  use_local_packages=#{use_local_packages}"
+log.info "  use_environment_idents=#{use_environment_idents}"
+log.info "  local_package_origin=#{local_package_origin}"
+log.info "  local_package_directory=#{local_package_directory}"
+log.info "  filename=#{filename}"
+log.info "  version=#{version}"
+log.info "-------------------------------"
 
 package_queriers = [PackageQuerier::PinQuerier.new(pins)]
 if use_environment_idents
-  package_queriers << PackageQuerier::ExpeditorEnvQuerier.new
+  package_queriers << PackageQuerier::LoggedComparisonQuerier.new(PackageQuerier::ExpeditorEnvQuerier.new, PackageQuerier::DepotQuerier.new, log)
 end
 package_queriers << PackageQuerier::DepotQuerier.new
 # NOTE(ssd) 2019-08-30: This comes after DepotQuerier, becuase we only
@@ -276,16 +330,12 @@ products_meta["packages"].each do |pkg_path|
   pkg_name = package_ident[1]
 
   latest_release = package_querier.get_latest(channel_for_origin(pkg_origin), pkg_origin, pkg_name)
-
-  pkg_version = latest_release["version"]
-  pkg_release = latest_release["release"]
-
-  log_added_ident(latest_release)
-  manifest["packages"] << "#{pkg_origin}/#{pkg_name}/#{pkg_version}/#{pkg_release}"
+  log_added_ident(log, latest_release)
+  manifest["packages"] << latest_release.ident
 end
 
 products_meta["deleted_packages"].each do |pkg|
-  puts "  Adding last stable release of deleted package #{pkg}"
+  log.info "Adding last stable release of deleted package #{pkg}"
   manifest["packages"] << "#{pkg}"
 end
 
@@ -299,11 +349,8 @@ end
   pkg_name = package_ident[1]
 
   latest_release = package_querier.get_latest(channel_for_origin(pkg_origin), pkg_origin, pkg_name)
-
-  pkg_version = latest_release["version"]
-  pkg_release = latest_release["release"]
-  log_added_ident(latest_release)
-  manifest["packages"] << "#{pkg_origin}/#{pkg_name}/#{pkg_version}/#{pkg_release}"
+  log_added_ident(log, latest_release)
+  manifest["packages"] << latest_release.ident
 end
 
 manifest["packages"].uniq!
