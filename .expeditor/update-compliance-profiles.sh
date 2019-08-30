@@ -28,4 +28,5 @@ git commit --message "Bump automate-compliance-profiles"  --message "This pull r
 open_pull_request
 
 git checkout -
+git clean -fxd
 git branch -D "$branch"
