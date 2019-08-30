@@ -133,7 +133,7 @@ steps:
   - label: "applications-service"
     command:
       - . scripts/verify_setup.sh
-      - hab studio run "source scripts/verify_studio_init.sh && start_deployment_service && chef-automate dev deploy-some chef/applications-service --with-deps && applications_integration"
+      - hab studio run "source scripts/verify_studio_init.sh && start_applications_service_deps && applications_integration"
     timeout_in_minutes: 20
     expeditor:
       executor:

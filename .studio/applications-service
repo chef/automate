@@ -2,12 +2,22 @@
 # shellcheck disable=SC2154
 
 document "start_applications_service" <<DOC
-  Build and start the local applications-service
+  Start the applications-service
 DOC
 function start_applications_service() {
   start_deployment_service
   chef-automate dev deploy-some --with-deps "$(app_service_origin)/applications-service"
 }
+
+document "start_applications_service_deps" <<DOC
+  Start the applications service's deps so integration tests can run
+DOC
+function start_applications_service_deps() {
+  start_deployment_service
+  chef-automate dev deploy-some --with-deps "$(app_service_origin)/applications-service"
+  chef-automate dev remove-some "$(app_service_origin)/applications-service"
+}
+
 
 document "applications_list_services" <<DOC
   List all the applications-service services
