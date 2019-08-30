@@ -5,7 +5,6 @@ import (
 	"net"
 
 	log "github.com/sirupsen/logrus"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
 	"github.com/chef/automate/api/external/applications"
@@ -38,14 +37,6 @@ func Spawn(c *config.Applications, connFactory *secureconn.Factory) error {
 		return err
 	}
 
-	grpcServer := NewGRPCServer(scheduler, connFactory, c)
-	return grpcServer.Serve(conn)
-}
-
-// NewGRPCServer returns a server that provides our services:
-// * applications
-// * health
-func NewGRPCServer(scheduler *server.JobScheduler, connFactory *secureconn.Factory, c *config.Applications) *grpc.Server {
 	grpcServer := connFactory.NewServer()
 
 	applicationsServer := server.New(c.GetStorage(), c.GetIngester(), scheduler)
@@ -55,5 +46,11 @@ func NewGRPCServer(scheduler *server.JobScheduler, connFactory *secureconn.Facto
 
 	reflection.Register(grpcServer)
 
-	return grpcServer
+	jobRunners := server.NewJobRunnerSet(applicationsServer)
+	if err := jobRunners.Start(jobsMgr); err != nil {
+		log.WithError(err).Fatal("Failed to start runners for periodic jobs")
+		return err
+	}
+
+	return grpcServer.Serve(conn)
 }
