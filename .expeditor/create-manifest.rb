@@ -56,7 +56,9 @@ class PackageQuerier
     def get_latest(_channel, origin, name)
       ret = get_latest_from_disk(origin, origin, name)
       if ret == nil
-        return get_latest_from_disk(@fallback_origin, origin, name)
+        get_latest_from_disk(@fallback_origin, origin, name)
+      else
+        ret
       end
     end
 
