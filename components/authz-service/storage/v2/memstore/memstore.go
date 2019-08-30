@@ -365,17 +365,14 @@ func (s *State) DeleteRule(ctx context.Context, projectID, ruleID string) error 
 }
 
 func (*State) ApplyStagedRules(context.Context) error {
-	// TODO
 	return nil
 }
 
-func (*State) MapAllAppliedRulesToProjects(ctx context.Context) (map[string][]*storage.Rule, error) {
-	// TODO
+func (*State) FetchAppliedRulesByProjectIDs(ctx context.Context) (map[string][]*storage.Rule, error) {
 	return nil, nil
 }
 
 func (*State) ErrIfMissingProjects(ctx context.Context, projectIDs []string) error {
-	// TODO
 	return nil
 }
 

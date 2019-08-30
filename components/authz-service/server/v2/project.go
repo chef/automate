@@ -331,7 +331,7 @@ func (s *ProjectState) DeleteProject(ctx context.Context,
 func (s *ProjectState) ListRulesForAllProjects(ctx context.Context,
 	req *api.ListRulesForAllProjectsReq) (*api.ListRulesForAllProjectsResp, error) {
 
-	ruleMap, err := s.store.MapAllAppliedRulesToProjects(ctx)
+	ruleMap, err := s.store.FetchAppliedRulesByProjectIDs(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

@@ -1166,7 +1166,7 @@ func (p *pg) GetStagedOrAppliedRule(ctx context.Context, projectID string, ruleI
 	return &rule, nil
 }
 
-func (p *pg) MapAllAppliedRulesToProjects(ctx context.Context) (map[string][]*v2.Rule, error) {
+func (p *pg) FetchAppliedRulesByProjectIDs(ctx context.Context) (map[string][]*v2.Rule, error) {
 	rules, err := p.listRulesUsingFunction(ctx, "SELECT query_rules($1)", false)
 	if err != nil {
 		return nil, err
@@ -1391,11 +1391,6 @@ func (p *pg) ApplyStagedRules(ctx context.Context) error {
 	}
 
 	_, err = tx.ExecContext(ctx, `DELETE FROM iam_staged_project_rules;`)
-	if err != nil {
-		return p.processError(err)
-	}
-
-	err = p.notifyPolicyChange(ctx, tx)
 	if err != nil {
 		return p.processError(err)
 	}

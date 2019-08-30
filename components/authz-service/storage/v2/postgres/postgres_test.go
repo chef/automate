@@ -6499,20 +6499,20 @@ func TestErrIfMissingProjects(t *testing.T) {
 	}
 }
 
-func TestMapAllAppliedRulesToProjects(t *testing.T) {
+func TestFetchAppliedRulesByProjectIDs(t *testing.T) {
 	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
 	cases := map[string]func(*testing.T){
 		"when no rules or projects exist, returns an empty map": func(t *testing.T) {
-			resp, err := store.MapAllAppliedRulesToProjects(ctx)
+			resp, err := store.FetchAppliedRulesByProjectIDs(ctx)
 			require.NoError(t, err)
 			assert.Equal(t, resp, map[string][]*storage.Rule{})
 		},
 		"when a project exists without rules, returns an empty map": func(t *testing.T) {
 			insertTestProject(t, db, "project-1", "let's go jigglypuff - topsecret", storage.Custom)
-			resp, err := store.MapAllAppliedRulesToProjects(ctx)
+			resp, err := store.FetchAppliedRulesByProjectIDs(ctx)
 			require.NoError(t, err)
 			require.Equal(t, resp, map[string][]*storage.Rule{})
 		},
@@ -6521,7 +6521,7 @@ func TestMapAllAppliedRulesToProjects(t *testing.T) {
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 			insertStagedRuleWithMultipleConditions(t, db, "rule-1", projID, storage.Node, false)
 			insertStagedRuleWithMultipleConditions(t, db, "rule-2", projID, storage.Node, false)
-			resp, err := store.MapAllAppliedRulesToProjects(ctx)
+			resp, err := store.FetchAppliedRulesByProjectIDs(ctx)
 			require.NoError(t, err)
 			require.Equal(t, resp, map[string][]*storage.Rule{})
 		},
@@ -6530,7 +6530,7 @@ func TestMapAllAppliedRulesToProjects(t *testing.T) {
 			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
 			rule1 := insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID, storage.Node)
 			rule2 := insertAppliedRuleWithMultipleConditions(t, db, "rule-2", projID, storage.Node)
-			resp, err := store.MapAllAppliedRulesToProjects(ctx)
+			resp, err := store.FetchAppliedRulesByProjectIDs(ctx)
 			require.NoError(t, err)
 			require.Equal(t, 1, len(resp))
 			require.ElementsMatch(t, resp[projID], []*storage.Rule{rule1, rule2})
@@ -6552,7 +6552,7 @@ func TestMapAllAppliedRulesToProjects(t *testing.T) {
 			rule3 := insertAppliedRuleWithMultipleConditions(t, db, "rule-3", projID2, storage.Node)
 			rule4 := insertAppliedRuleWithMultipleConditions(t, db, "rule-4", projID2, storage.Node)
 
-			resp, err := store.MapAllAppliedRulesToProjects(ctx)
+			resp, err := store.FetchAppliedRulesByProjectIDs(ctx)
 			require.NoError(t, err)
 			require.Equal(t, 2, len(resp))
 			require.ElementsMatch(t, resp[projID1], []*storage.Rule{rule1, rule2})

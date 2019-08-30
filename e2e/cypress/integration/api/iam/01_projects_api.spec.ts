@@ -187,7 +187,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
       method: 'POST',
       url: '/apis/iam/v2beta/apply-rules'
     });
-    waitUntilApplyRulesNotRunning(0);
+    waitUntilApplyRulesNotRunning(100);
 
     // confirm rules are applied
     for (const project of [avengersProject, xmenProject]) {
@@ -252,7 +252,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
       method: 'POST',
       url: '/apis/iam/v2beta/apply-rules'
     });
-    waitUntilApplyRulesNotRunning(0);
+    waitUntilApplyRulesNotRunning(100);
 
     cy.request({
       headers: {
@@ -279,7 +279,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
       method: 'POST',
       url: '/apis/iam/v2beta/apply-rules'
     });
-    waitUntilApplyRulesNotRunning(0);
+    waitUntilApplyRulesNotRunning(100);
 
     cy.request({
       headers: {
@@ -357,9 +357,9 @@ function waitUntilApplyRulesNotRunning(attempts: number): void {
     if (response.body.state === 'not_running') {
       return;
     } else {
-      cy.log(`attempt ${attempts} of 100: waiting for apply-rules to be not_running`);
+      cy.log(`${attempts} attempts remaining: waiting for apply-rules to be not_running`);
       cy.wait(1000);
-      waitUntilApplyRulesNotRunning(++attempts);
+      waitUntilApplyRulesNotRunning(--attempts);
     }
   });
 }

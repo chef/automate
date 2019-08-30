@@ -186,16 +186,9 @@ func (refresher *policyRefresher) updateEngineStore(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	ruleMap, err := refresher.getRuleMap(ctx)
-	if err != nil {
-		return err
-	}
 
 	switch {
 	case vsn.Minor == api.Version_V1: // v2.1
-		if err := refresher.engine.SetRules(ctx, ruleMap); err != nil {
-			return err
-		}
 		return refresher.engine.V2p1SetPolicies(ctx, policyMap, roleMap)
 	default: // v2.0 OR v1.0
 		return refresher.engine.V2SetPolicies(ctx, policyMap, roleMap)
@@ -285,24 +278,6 @@ func (refresher *policyRefresher) getIAMVersion(ctx context.Context) (api.Versio
 		vsn = api.Version{Major: api.Version_V1, Minor: api.Version_V0}
 	}
 	return vsn, nil
-}
-
-func (refresher *policyRefresher) getRuleMap(ctx context.Context) (map[string][]storage.Rule, error) {
-	rules, err := refresher.store.ListRules(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	ruleMap := make(map[string][]storage.Rule)
-	for _, r := range rules {
-		if _, ok := ruleMap[r.ProjectID]; !ok {
-			ruleMap[r.ProjectID] = make([]storage.Rule, 0)
-		}
-
-		ruleMap[r.ProjectID] = append(ruleMap[r.ProjectID], *r)
-	}
-
-	return ruleMap, nil
 }
 
 func pretty(vsn api.Version) string {

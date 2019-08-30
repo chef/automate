@@ -14,11 +14,9 @@ import (
 	"github.com/open-policy-agent/opa/storage"
 	"github.com/open-policy-agent/opa/storage/inmem"
 	"github.com/open-policy-agent/opa/topdown"
-	cache "github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/components/authz-service/engine"
-	v2 "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/lib/logger"
 )
 
@@ -28,7 +26,6 @@ type State struct {
 	store             storage.Store
 	v2Store           storage.Store
 	v2p1Store         storage.Store
-	ruleStore         *cache.Cache
 	queries           map[string]ast.Body
 	compiler          *ast.Compiler
 	modules           map[string]*ast.Module
@@ -82,7 +79,6 @@ func New(ctx context.Context, l logger.Logger, opts ...OptFunc) (*State, error) 
 		store:     inmem.New(),
 		v2Store:   inmem.New(),
 		v2p1Store: inmem.New(),
-		ruleStore: cache.New(cache.NoExpiration, -1),
 		queries: map[string]ast.Body{
 			authzQuery:              authzQueryParsed,
 			filteredPairsQuery:      filteredPairsQueryParsed,
@@ -223,11 +219,6 @@ func (s *State) DumpDataV2(ctx context.Context) error {
 
 func (s *State) DumpDataV2p1(ctx context.Context) error {
 	return dumpData(ctx, s.v2p1Store, s.log)
-}
-
-func (s *State) DumpDataRules(ctx context.Context) error {
-	s.log.Infof("data: %#v", s.ruleStore.Items())
-	return nil
 }
 
 func dumpData(ctx context.Context, store storage.Store, l logger.Logger) error {
@@ -510,12 +501,8 @@ func (s *State) SetPolicies(ctx context.Context, policies map[string]interface{}
 	return s.initPartialResult(ctx)
 }
 
-// Spike TODO: Can we have a separate method for just setting the rule mappings?
-// OR does the entire OPA store have to be re-evaluated at once. IF that's true,
-// should we have the same OPA instance in general for rules?
-//
-// V2SetPolicies replaces OPA's data with a new set of policies, roles, and
-// rules, and resets the partial evaluation cache for v2
+// V2SetPolicies replaces OPA's data with a new set of policies, roles
+// and resets the partial evaluation cache for v2
 func (s *State) V2SetPolicies(
 	ctx context.Context, policyMap map[string]interface{},
 	roleMap map[string]interface{}) error {
@@ -527,8 +514,8 @@ func (s *State) V2SetPolicies(
 	return s.initPartialResultV2(ctx)
 }
 
-// V2p1SetPolicies replaces OPA's data with a new set of policies, roles, and
-// rules, and resets the partial evaluation cache for v2.l
+// V2p1SetPolicies replaces OPA's data with a new set of policies, roles
+// and resets the partial evaluation cache for v2.l
 func (s *State) V2p1SetPolicies(
 	ctx context.Context, policyMap map[string]interface{},
 	roleMap map[string]interface{}) error {
@@ -538,18 +525,6 @@ func (s *State) V2p1SetPolicies(
 	})
 
 	return s.initPartialResultV2p1(ctx)
-}
-
-// SetRules replaces OPA's rule cache with an updated rule map
-func (s *State) SetRules(
-	ctx context.Context, ruleMap map[string][]v2.Rule) error {
-	s.ruleStore = cache.New(cache.NoExpiration, -1 /* never run cleanup */)
-	for project, rule := range ruleMap {
-		if err := s.ruleStore.Add(project, rule, cache.NoExpiration); err != nil {
-			return errors.New("failed to add to rule store")
-		}
-	}
-	return nil
 }
 
 // UnexpectedResultExpressionError is returned when one of the result sets
