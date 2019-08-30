@@ -19,5 +19,5 @@ git commit --message "Sync swagger files for Automate docs." --message "This pul
 open_pull_request
 
 git checkout -
-gi clean -fxd
+git clean -fxd
 git branch -D "$branch"
