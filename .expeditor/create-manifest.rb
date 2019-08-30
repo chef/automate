@@ -203,17 +203,21 @@ local_package_directory = "results"
 
 use_environment_idents=(ENV["EXPEDITOR_NAME"].to_s != "")
 version = ENV["VERSION"] || DateTime.now.strftime("%Y%m%d%H%M%S")
-filename = ENV["VERSION"] || "manifest"
+filename = if ENV["VERSION"]
+             "#{ENV["VERSION"]}.json"
+           else
+             "manifest.json"
+           end
 
 puts "Creating release manifest for Automate"
 puts "--------------------------------------"
 puts "Configuration:"
-puts "     use_local_packages=#{use_local_packages}"
-puts " use_environment_idents=#{use_environment_idents}"
-puts "   local_package_origin=#{local_package_origin}"
-puts "local_package_directory=#{local_package_directory}"
-puts "               filename=#{filename}"
-puts "                filenme=#{filename}"
+puts "  use_local_packages=#{use_local_packages}"
+puts "  use_environment_idents=#{use_environment_idents}"
+puts "  local_package_origin=#{local_package_origin}"
+puts "  local_package_directory=#{local_package_directory}"
+puts "  filename=#{filename}"
+puts "  version=#{version}"
 puts "-------------------------------"
 
 package_queriers = [PackageQuerier::PinQuerier.new(pins)]
@@ -305,4 +309,4 @@ manifest["packages"].uniq!
 manifest["packages"].sort!
 
 
-File.open("#{filename}.json", "w") { |file| file.write(JSON.pretty_generate(manifest)) }
+File.open("#{filename}", "w") { |file| file.write(JSON.pretty_generate(manifest)) }
