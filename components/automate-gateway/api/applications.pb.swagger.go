@@ -350,7 +350,7 @@ func init() {
     },
     "/beta/retention/service_groups/disconnected_services/config": {
       "get": {
-        "operationId": "GetDisconnectedServicesConfig",
+        "operationId": "GetDeleteDisconnectedServicesConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -364,12 +364,12 @@ func init() {
         ]
       },
       "post": {
-        "operationId": "UpdateDisconnectedServicesConfig",
+        "operationId": "UpdateDeleteDisconnectedServicesConfig",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/applicationsUpdateDisconnectedServicesConfigRes"
+              "$ref": "#/definitions/applicationsUpdateDeleteDisconnectedServicesConfigRes"
             }
           }
         },
@@ -620,6 +620,9 @@ func init() {
           "format": "int32"
         }
       }
+    },
+    "applicationsUpdateDeleteDisconnectedServicesConfigRes": {
+      "type": "object"
     },
     "applicationsUpdateDisconnectedServicesConfigRes": {
       "type": "object"

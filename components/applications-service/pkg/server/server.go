@@ -376,6 +376,16 @@ func (app *ApplicationsServer) UpdateDisconnectedServicesConfig(ctx context.Cont
 	return &applications.UpdateDisconnectedServicesConfigRes{}, nil
 }
 
+func (app *ApplicationsServer) GetDeleteDisconnectedServicesConfig(ctx context.Context,
+	req *applications.GetDeleteDisconnectedServicesConfigReq) (*applications.PeriodicJobConfig, error) {
+	return nil, nil
+}
+
+func (app *ApplicationsServer) UpdateDeleteDisconnectedServicesConfig(ctx context.Context,
+	req *applications.PeriodicJobConfig) (*applications.UpdateDeleteDisconnectedServicesConfigRes, error) {
+	return nil, nil
+}
+
 // Convert storage.Service array to applications.Service array
 func convertStorageServicesToApplicationsServices(svcs []*storage.Service) []*applications.Service {
 	services := make([]*applications.Service, len(svcs))

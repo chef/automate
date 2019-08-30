@@ -70,6 +70,22 @@ func init() {
 		}
 		return ""
 	})
+	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetDeleteDisconnectedServicesConfig", "applications:serviceGroups", "applications:serviceGroups:list", "GET", "/beta/retention/service_groups/disconnected_services/config", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
+	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/UpdateDeleteDisconnectedServicesConfig", "applications:serviceGroups", "applications:serviceGroups:delete", "POST", "/beta/retention/service_groups/disconnected_services/config", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*PeriodicJobConfig); ok {
+			return policyv2.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "threshold":
+					return m.Threshold
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetVersion", "system:service:version", "system:serviceVersion:get", "GET", "/beta/applications/version", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})

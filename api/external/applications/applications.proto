@@ -108,6 +108,27 @@ service ApplicationsService {
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:delete";
   };
 
+  rpc GetDeleteDisconnectedServicesConfig(GetDeleteDisconnectedServicesConfigReq) returns (PeriodicJobConfig) {
+    option (google.api.http).get = "/beta/retention/service_groups/disconnected_services/config";
+    // TODO: need new resources/policies for this
+    option (chef.automate.api.policy).resource = "service_groups";
+    option (chef.automate.api.policy).action = "list";
+    option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
+  };
+
+  rpc UpdateDeleteDisconnectedServicesConfig(PeriodicJobConfig) returns (UpdateDeleteDisconnectedServicesConfigRes) {
+    option (google.api.http) = {
+      post: "/beta/retention/service_groups/disconnected_services/config"
+      body: "*"
+    };
+    // TODO: need new resources/policies for this
+    option (chef.automate.api.policy).resource = "service_groups";
+    option (chef.automate.api.policy).action = "delete";
+    option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "applications:serviceGroups:delete";
+  };
+
   rpc GetVersion (common.version.VersionInfoRequest) returns (common.version.VersionInfo) {
     option (google.api.http).get = "/beta/applications/version";
     option (chef.automate.api.policy).resource = "service_info:version";
@@ -165,7 +186,6 @@ message ServicesStatsRes {
   int32 total_deployments = 4;
 }
 
-message GetDisconnectedServicesConfigReq{}
 
 message PeriodicJobConfig {
   bool running = 1;
@@ -176,7 +196,11 @@ message PeriodicJobConfig {
   string threshold = 2;
 }
 
+message GetDisconnectedServicesConfigReq{}
 message UpdateDisconnectedServicesConfigRes {}
+
+message GetDeleteDisconnectedServicesConfigReq{}
+message UpdateDeleteDisconnectedServicesConfigRes {}
 
 message Service {
   string supervisor_id = 1;
