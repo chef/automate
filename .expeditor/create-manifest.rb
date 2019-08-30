@@ -85,7 +85,9 @@ class PackageQuerier
       ret = @main.get_latest(channel, origin, name)
       if !ret.nil?
         compare_result = @compare.get_latest(channel, origin, name)
-        if compare_result != ret
+        if compare_result.nil?
+          @logger.warn("#{origin}/#{name} not found in secondary source #{@compare}")
+        elsif compare_result != ret
           @logger.warn("Found mismatch between sources:")
           @logger.warn("   #{ret.pretty}")
           @logger.warn("   #{compare_result.pretty}")
