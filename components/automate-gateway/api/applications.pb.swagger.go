@@ -57,7 +57,7 @@ func init() {
         },
         "parameters": [
           {
-            "name": "threshold_minutes",
+            "name": "threshold_seconds",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -347,15 +347,67 @@ func init() {
           "ApplicationsService"
         ]
       }
+    },
+    "/beta/retention/service_groups/disconnected_services/config": {
+      "get": {
+        "operationId": "GetDisconnectedServicesConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/applicationsGetDisconnectedServicesConfigRes"
+            }
+          }
+        },
+        "tags": [
+          "ApplicationsService"
+        ]
+      },
+      "post": {
+        "operationId": "UpdateDisconnectedServicesConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/applicationsUpdateDisconnectedServicesConfigRes"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/applicationsUpdateDisconnectedServicesConfigReq"
+            }
+          }
+        ],
+        "tags": [
+          "ApplicationsService"
+        ]
+      }
     }
   },
   "definitions": {
     "applicationsDisconnectedServicesReq": {
       "type": "object",
       "properties": {
-        "threshold_minutes": {
+        "threshold_seconds": {
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "applicationsGetDisconnectedServicesConfigRes": {
+      "type": "object",
+      "properties": {
+        "running": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "threshold": {
+          "type": "string"
         }
       }
     },
@@ -442,6 +494,10 @@ func init() {
         "health_updated_at": {
           "type": "string",
           "format": "date-time"
+        },
+        "disconnected": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -563,6 +619,22 @@ func init() {
           "format": "int32"
         }
       }
+    },
+    "applicationsUpdateDisconnectedServicesConfigReq": {
+      "type": "object",
+      "properties": {
+        "running": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "threshold": {
+          "type": "string",
+          "description": "To match the ingest API at /retention/nodes/missing-nodes/config, we use a\nstring that conforms to golang's time.ParseDuration() function. Internally\nthe service uses an integer number of seconds so partial seconds in the\nthreshold will be trucated."
+        }
+      }
+    },
+    "applicationsUpdateDisconnectedServicesConfigRes": {
+      "type": "object"
     },
     "queryPagination": {
       "type": "object",

@@ -15,6 +15,7 @@ type Applications struct {
 	Service          `mapstructure:"service"`
 	Events           `mapstructure:"events"`
 	Postgres         `mapstructure:"postgres"`
+	Jobs             `mapstructure:"jobs"`
 	*certs.TLSConfig `mapstructure:"tls"`
 	storageClient    storage.Client
 	ingesterClient   ingester.Client
@@ -40,6 +41,11 @@ type Postgres struct {
 	URI        string `mapstructure:"uri"`
 	Database   string `mapstructure:"database"`
 	SchemaPath string `mapstructure:"schema_path"`
+}
+
+type Jobs struct {
+	Host string `mapstructure:"host"`
+	Port int    `mapstructure:"port"`
 }
 
 // SetIngester sets the ingester client for the service

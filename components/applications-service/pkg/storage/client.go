@@ -18,6 +18,8 @@ type Client interface {
 	GetDisconnectedServices(int32) ([]*Service, error)
 	// @param (thresholdMinutes)
 	DeleteDisconnectedServices(int32) ([]*Service, error)
+	// @param (thresholdMinutes)
+	MarkDisconnectedServices(int32) ([]*Service, error)
 	// @param (sortField, sortAsc, page, pageSize, filters)
 	GetServiceGroups(string, bool, int32, int32, map[string][]string) ([]*ServiceGroupDisplay, error)
 	// @param (fieldName, queryFragment)
@@ -99,6 +101,7 @@ type Service struct {
 	PreviousHealth      string
 	UpdateStrategy      string
 	LastEventOccurredAt time.Time
+	Disconnected        bool
 	HealthUpdatedAt     time.Time
 }
 

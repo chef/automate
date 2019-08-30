@@ -5,7 +5,6 @@ import (
 	"net"
 
 	log "github.com/sirupsen/logrus"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
 	"github.com/chef/automate/api/external/applications"
@@ -26,22 +25,32 @@ func Spawn(c *config.Applications, connFactory *secureconn.Factory) error {
 		return err
 	}
 
-	grpcServer := NewGRPCServer(connFactory, c)
-	return grpcServer.Serve(conn)
-}
+	jobsMgr, err := server.ConnectToJobsManager(&c.Jobs, connFactory)
+	if err != nil {
+		log.WithError(err).Fatal("Failed to connect to upstream cereal service")
+		return err
+	}
 
-// NewGRPCServer returns a server that provides our services:
-// * applications
-// * health
-func NewGRPCServer(connFactory *secureconn.Factory, c *config.Applications) *grpc.Server {
+	scheduler := server.NewJobScheduler(jobsMgr)
+	if err := scheduler.Setup(); err != nil {
+		log.WithError(err).Fatal("Failed to configure periodic jobs in upstream cereal service")
+		return err
+	}
+
 	grpcServer := connFactory.NewServer()
 
-	applicationsServer := server.New(c.GetStorage(), c.GetIngester())
+	applicationsServer := server.New(c.GetStorage(), c.GetIngester(), scheduler)
 	applications.RegisterApplicationsServiceServer(grpcServer, applicationsServer)
 
 	health.RegisterHealthServer(grpcServer, applicationsServer.Health())
 
 	reflection.Register(grpcServer)
 
-	return grpcServer
+	jobRunners := server.NewJobRunnerSet(applicationsServer)
+	if err := jobRunners.Start(jobsMgr); err != nil {
+		log.WithError(err).Fatal("Failed to start runners for periodic jobs")
+		return err
+	}
+
+	return grpcServer.Serve(conn)
 }

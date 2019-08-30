@@ -96,6 +96,30 @@ func (a *Applications) GetServicesStats(
 	return a.client.GetServicesStats(ctx, request)
 }
 
+func (a *Applications) GetDisconnectedServicesConfig(
+	ctx context.Context,
+	request *applications.GetDisconnectedServicesConfigReq) (*applications.GetDisconnectedServicesConfigRes, error) {
+
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.client.GetDisconnectedServicesConfig(ctx, request)
+}
+
+func (a *Applications) UpdateDisconnectedServicesConfig(
+	ctx context.Context,
+	request *applications.UpdateDisconnectedServicesConfigReq) (*applications.UpdateDisconnectedServicesConfigRes, error) {
+
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.client.UpdateDisconnectedServicesConfig(ctx, request)
+}
+
 func (a *Applications) GetDisconnectedServices(
 	ctx context.Context,
 	request *applications.DisconnectedServicesReq) (*applications.ServicesRes, error) {

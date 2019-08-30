@@ -476,6 +476,10 @@ func assertServicesEqual(t *testing.T, expected, actual []*applications.Service)
 				svc.Site,
 				actual[i].Site,
 				"The site of a service is not the expected one")
+			assert.Equal(t,
+				svc.Disconnected,
+				actual[i].Disconnected,
+				"The `disconnected` value of the service did not match the expected value")
 		}
 	}
 }

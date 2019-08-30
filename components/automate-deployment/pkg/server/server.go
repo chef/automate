@@ -781,7 +781,7 @@ func (s *server) Status(ctx context.Context, d *api.StatusRequest) (*api.StatusR
 	nonSkippedServices = append(nonSkippedServices, deploymentServiceName)
 	for _, svcString := range s.deployment.ServiceNames() {
 		if svc, found := s.deployment.ServiceByName(svcString); found {
-			if svc.DeploymentState != deployment.Skip {
+			if svc.DeploymentState == deployment.Running {
 				nonSkippedServices = append(nonSkippedServices, svcString)
 			}
 		}
