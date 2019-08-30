@@ -19,7 +19,7 @@ func (server *EsSidecarServer) PurgeTimeSeriesIndicesByAge(ctx context.Context, 
 		"id":                     in.GetId(),
 		"index-base-name":        in.GetIndex(),
 		"delete-older-than-days": in.GetOlderThanDays(),
-	}).Debug("purge of time-series index")
+	}).Info("purge of time-series index")
 
 	err := server.es.DeleteTimeSeriesIndicesByAge(ctx, in.GetIndex(), int(in.GetOlderThanDays()))
 	if err != nil {
@@ -46,7 +46,7 @@ func (server *EsSidecarServer) PurgeDocumentsFromIndexByAge(ctx context.Context,
 		"custom-purge-field":     in.GetCustomPurgeField(),
 	}
 
-	log.WithFields(logFields).Debug("Initiating document purge from index")
+	log.WithFields(logFields).Info("Initiating document purge from index")
 	err := server.es.DeleteDocumentsFromIndexByAge(ctx, in.GetIndex(), int(in.GetOlderThanDays()), in.GetCustomPurgeField())
 	if err == nil {
 		log.WithFields(logFields).Info("Document purge completed successfully")
