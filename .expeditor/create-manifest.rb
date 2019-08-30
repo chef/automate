@@ -5,7 +5,7 @@
 # package from one of the following sources:
 #
 # - A set of pins maintained in this file
-# - (optionally) Environement variables set by expeditor
+# - (optionally) Environment variables set by expeditor
 # - The Habitat Depot's dev channel
 # - (optionally) Local files on disk
 #
