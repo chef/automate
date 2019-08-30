@@ -87,7 +87,9 @@ func (es *Elastic) DeleteTimeSeriesIndicesByAge(ctx context.Context, baseName st
 	}
 
 	prefix := baseName + "-"
-	olderThanDate := start.AddDate(0, 0, -olderThanDays)
+	// We add 1 one here because otherwise we would delete an
+	// index that included documents newer than olderThanDays.
+	olderThanDate := start.AddDate(0, 0, -(olderThanDays + 1))
 	for _, indexName := range indices {
 		if strings.HasPrefix(indexName, prefix) {
 			trimmed := strings.TrimPrefix(indexName, prefix)
