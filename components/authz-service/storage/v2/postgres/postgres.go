@@ -665,7 +665,7 @@ func (p *pg) CreateRole(ctx context.Context, role *v2.Role, checkProjects bool) 
 			return nil, p.processError(err)
 		}
 
-		err = projectassignment.ErrIfProjectAssignmentUnauthroized(ctx,
+		err = projectassignment.ErrIfProjectAssignmentUnauthorized(ctx,
 			p.engine,
 			auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
 			role.Projects)
@@ -813,7 +813,6 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role, checkProjects bool) 
 	if err != nil {
 		return nil, err
 	}
-	p.logger.Warnf("projects filter: %s", projectsFilter)
 
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
 	if err != nil {
@@ -821,7 +820,6 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role, checkProjects bool) 
 	}
 
 	doesIntersect, err := checkIfRoleIntersectsProjectsFilter(ctx, tx, role.ID, projectsFilter)
-	p.logger.Warnf("doesintersect: %s %s", doesIntersect, err)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -831,7 +829,10 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role, checkProjects bool) 
 
 	if checkProjects {
 		var oldRole v2.Role
-		row := tx.QueryRowContext(ctx, `SELECT query_role($1);`, role.ID)
+		// get the old role and lock the role for updates (still readable)
+		// until the update completes or the transaction fails so that
+		// the project diff doesn't change under us while we perform permission checks.
+		row := tx.QueryRowContext(ctx, `SELECT query_role($1) FOR UPDATE;`, role.ID)
 		err = row.Scan(&oldRole)
 		if err != nil {
 			return nil, p.processError(err)
@@ -845,7 +846,7 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role, checkProjects bool) 
 				return nil, p.processError(err)
 			}
 
-			err = projectassignment.ErrIfProjectAssignmentUnauthroized(ctx,
+			err = projectassignment.ErrIfProjectAssignmentUnauthorized(ctx,
 				p.engine,
 				auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
 				projectDiff)
@@ -1490,7 +1491,7 @@ func (p *pg) DeleteProject(ctx context.Context, id string) error {
 	return nil
 }
 
-// ErrIfMissingProjects returns projectassignment.ProjectsMissingErr if there projects missing,
+// ErrIfMissingProjects returns projectassignment.ProjectsMissingErr if projects are missing,
 // otherwise it returns nil.
 func (p *pg) ErrIfMissingProjects(ctx context.Context, projectIDs []string) error {
 	return p.errIfMissingProjectsWithQuerier(ctx, p.db, projectIDs)

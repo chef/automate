@@ -37,7 +37,7 @@ type authzServer struct {
 func NewPostgresAuthzServer(l logger.Logger, e engine.V2Authorizer, v *VersionSwitch, p api.ProjectsServer) (api.AuthorizationServer, error) {
 	s := postgres.GetInstance()
 	if s == nil {
-		return nil, errors.New("postgres v2 singleton not yet iniitalized for authz server")
+		return nil, errors.New("postgres v2 singleton not yet initialized for authz server")
 	}
 	return NewAuthzServer(l, e, v, p, s)
 }
@@ -188,9 +188,9 @@ func (s *authzServer) FilterAuthorizedProjects(
 // on project delete, this might fail when it shouldn't (aka the project no longer exists
 // that is being removed from some object), since the project won't be found or authorized
 // for iam:project:assign. We should make cleaning up projects on project delete from IAM
-// objects throughout the system transacitonal.
+// objects throughout the system transactional.
 //
-// ValidateProjectAssignment assess if a set of subjects is authorized to reassign a set
+// ValidateProjectAssignment assesses if a set of subjects is authorized to reassign a set
 // of projects. It will return nil for the error if successful.
 // If unsuccessful it will return an error when:
 //
@@ -216,7 +216,7 @@ func (s *authzServer) ValidateProjectAssignment(
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	err = projectassignment.ErrIfProjectAssignmentUnauthroized(ctx, s.engine, req.Subjects, req.ProjectIds)
+	err = projectassignment.ErrIfProjectAssignmentUnauthorized(ctx, s.engine, req.Subjects, req.ProjectIds)
 	if err != nil {
 		if _, ok := err.(*projectassignment.ProjectsUnauthorizedForAssignmentErr); ok {
 			return nil, status.Error(codes.PermissionDenied, err.Error())

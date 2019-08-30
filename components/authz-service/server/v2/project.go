@@ -65,7 +65,7 @@ func NewPostgresProjectsServer(
 
 	s := postgres.GetInstance()
 	if s == nil {
-		return nil, errors.New("postgres v2 singleton not yet iniitalized for projects server")
+		return nil, errors.New("postgres v2 singleton not yet initialized for projects server")
 	}
 	projectUpdateManager, err := RegisterCerealProjectUpdateManager(projectUpdateCerealManager, l, s, pr)
 	if err != nil {

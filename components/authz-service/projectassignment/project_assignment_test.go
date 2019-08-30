@@ -12,8 +12,14 @@ func TestCalculateProjectDiff(t *testing.T) {
 		desc string
 		f    func(*testing.T)
 	}{
+		{"unassigned case", func(t *testing.T) {
+			assert.ElementsMatch(t, []string{}, CalculateProjectDiff([]string{}, []string{}))
+		}},
 		{"there are only new projects", func(t *testing.T) {
 			assert.ElementsMatch(t, []string{"a", "b"}, CalculateProjectDiff([]string{}, []string{"a", "b"}))
+		}},
+		{"no projects were removed", func(t *testing.T) {
+			assert.ElementsMatch(t, []string{}, CalculateProjectDiff([]string{"a", "b"}, []string{"a", "b"}))
 		}},
 		{"there are only old projects", func(t *testing.T) {
 			assert.ElementsMatch(t, []string{"a", "b"}, CalculateProjectDiff([]string{"a", "b"}, []string{}))

@@ -68,7 +68,7 @@ func NewPostgresPolicyServer(
 
 	s := postgres.GetInstance()
 	if s == nil {
-		return nil, errors.New("postgres v2 singleton not yet iniitalized for policy server")
+		return nil, errors.New("postgres v2 singleton not yet initialized for policy server")
 	}
 	return NewPoliciesServer(ctx, l, pr, s, e, pl, vSwitch, vChan)
 }

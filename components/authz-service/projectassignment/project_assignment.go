@@ -6,7 +6,7 @@ import (
 	"github.com/chef/automate/components/authz-service/engine"
 )
 
-func ErrIfProjectAssignmentUnauthroized(ctx context.Context, authorizer engine.V2Authorizer, subjects, projectIDs []string) error {
+func ErrIfProjectAssignmentUnauthorized(ctx context.Context, authorizer engine.V2Authorizer, subjects, projectIDs []string) error {
 	engineResp, err := authorizer.V2ProjectsAuthorized(ctx,
 		engine.Subjects(subjects),
 		engine.Action("iam:projects:assign"),
@@ -35,7 +35,8 @@ func ErrIfProjectAssignmentUnauthroized(ctx context.Context, authorizer engine.V
 }
 
 // CalculateProjectDiff returns the symmetric difference of oldProjects and newProjects,
-// meaning that any project that is not in the union of oldProjects and newProjects will be returned.
+// meaning that any project that is not in the intersection of oldProjects and newProjects
+// will be returned.
 func CalculateProjectDiff(oldProjects []string, newProjects []string) []string {
 	oldProjectMap := make(map[string]bool, len(oldProjects))
 	for _, oldProj := range oldProjects {
@@ -49,16 +50,14 @@ func CalculateProjectDiff(oldProjects []string, newProjects []string) []string {
 
 	// any projects were removed, put in diff
 	for _, oldProj := range oldProjects {
-		_, inNew := newProjectMap[oldProj]
-		if !inNew {
+		if !newProjectMap[oldProj] {
 			projectDiff = append(projectDiff, oldProj)
 		}
 	}
 
 	// any projects were added, put in diff
 	for _, newProj := range newProjects {
-		_, inOld := oldProjectMap[newProj]
-		if !inOld {
+		if !oldProjectMap[newProj] {
 			projectDiff = append(projectDiff, newProj)
 		}
 	}

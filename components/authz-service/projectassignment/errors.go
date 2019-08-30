@@ -17,9 +17,9 @@ func NewProjectsMissingError(projectsMissing []string) error {
 func (e *ProjectsMissingErr) Error() string {
 	var errorStr string
 	if len(e.projectsMissing) > 1 {
-		errorStr = fmt.Sprintf("You attempted to modify projects for this object but some did not exist: %q", e.projectsMissing)
+		errorStr = fmt.Sprintf("You cannot modify projects for this object because these projects did not exist: %q", e.projectsMissing)
 	} else {
-		errorStr = fmt.Sprintf("You attempted to modify a project for this object but it did not exist: %q", e.projectsMissing)
+		errorStr = fmt.Sprintf("You cannot modify a project for this object because this project did not exist: %q", e.projectsMissing)
 	}
 	return errorStr
 }
@@ -37,9 +37,9 @@ func NewProjectsUnauthorizedForAssignmentError(projectsUnauthorized []string) er
 func (e *ProjectsUnauthorizedForAssignmentErr) Error() string {
 	var errorStr string
 	if len(e.projectsUnauthorized) > 1 {
-		errorStr = fmt.Sprintf("You attempted to modify projects for this object but you are missing iam:projects:assign on some: %q", e.projectsUnauthorized)
+		errorStr = fmt.Sprintf("You cannot modify projects for this object because you are missing iam:projects:assign on these projects: %q", e.projectsUnauthorized)
 	} else {
-		errorStr = fmt.Sprintf("You attempted to modify a project for this object but you are missing iam:projects:assign on it: %q", e.projectsUnauthorized)
+		errorStr = fmt.Sprintf("You cannot modify a project for this object because you are missing iam:projects:assign on this project: %q", e.projectsUnauthorized)
 	}
 	return errorStr
 }

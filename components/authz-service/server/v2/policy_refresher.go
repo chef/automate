@@ -55,7 +55,7 @@ func (m *policyRefresherMessageRefresh) Err() error {
 func NewPostgresPolicyRefresher(ctx context.Context, log logger.Logger, engine engine.V2pXWriter) (PolicyRefresher, error) {
 	store := postgres.GetInstance()
 	if store == nil {
-		return nil, errors.New("postgres v2 singleton not yet iniitalized for policy refresher")
+		return nil, errors.New("postgres v2 singleton not yet initialized for policy refresher")
 	}
 	return NewPolicyRefresher(ctx, log, engine, store)
 }
