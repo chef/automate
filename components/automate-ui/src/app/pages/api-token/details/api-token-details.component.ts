@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
 import { isEmpty, identity, xor } from 'lodash/fp';
-import { combineLatest, Subject } from 'rxjs';
+import { combineLatest, Subject, Observable } from 'rxjs';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -37,13 +37,12 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
   public tabValue: TokenTabName = 'details';
   public token: ApiToken;
   public status: TokenStatus;
-  private isDestroyed: Subject<boolean> = new Subject<boolean>();
+  private isDestroyed = new Subject<boolean>();
   public updateForm: FormGroup;
   public saveInProgress = false;
   public saveSuccessful = false;
 
-  public isMajorV1 = true;
-  public isMinorV1 = false;
+  public atLeastV2p1$: Observable<boolean>;
   public projects: ProjectCheckedMap = {};
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
@@ -82,13 +81,14 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
         this.store.dispatch(new GetToken({ id }));
       });
 
-    combineLatest([
+    this.atLeastV2p1$ = combineLatest([
       this.store.select(iamMajorVersion),
-      this.store.select(iamMinorVersion)]).pipe(takeUntil(this.isDestroyed))
-        .subscribe(([major, minor]: [IAMMajorVersion, IAMMinorVersion]) => {
-          this.isMajorV1 = major === 'v1';
-          this.isMinorV1 = minor === 'v1';
-        });
+      this.store.select(iamMinorVersion)])
+      .pipe(
+        takeUntil(this.isDestroyed),
+        map(([major, minor]: [IAMMajorVersion, IAMMinorVersion]) =>
+          major > 'v2' || (major === 'v2' && minor >= 'v1')
+        ));
 
     combineLatest([
       this.store.select(allProjects),
