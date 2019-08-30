@@ -31,4 +31,5 @@ git commit --message "Bump inspec to $EXPEDITOR_PKG_VERSION/$EXPEDITOR_PKG_RELEA
 open_pull_request
 
 git checkout -
+git clean -fxd
 git branch -D "$branch"
