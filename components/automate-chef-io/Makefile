@@ -3,7 +3,10 @@
 SHELL=bash
 SWAGGER_RESULT_FILE=static/api-docs/all-apis.swagger.json
 SWAGGER_DIR=data/docs/api_chef_automate
-SWAGGER_FILES = $(shell find $(SWAGGER_DIR) -name '*.swagger.json')
+#SWAGGER_FILES=$(shell find $(SWAGGER_DIR) -name '*.swagger.json')
+SWAGGER_FILES=data/docs/api_chef_automate/compliance/reporting/reporting.swagger.json data/docs/api_chef_automate/gateway/gateway.swagger.json
+STATIC_SWAGGER_FILES=$(shell find data/docs/api-static/ -type f | sort -n)
+
 EXPECTED_CONFLICTS=46
 
 themes/chef:
@@ -38,8 +41,11 @@ sync_swagger_files: clean_swagger_files
 
 $(SWAGGER_RESULT_FILE): $(SWAGGER_FILES)
 
+#generate_swagger: $(SWAGGER_RESULT_FILE)
+#	swagger mixin --quiet -c=$(EXPECTED_CONFLICTS) $(SWAGGER_FILES) > $(SWAGGER_RESULT_FILE)
+
 generate_swagger: $(SWAGGER_RESULT_FILE)
-	swagger mixin --quiet -c=$(EXPECTED_CONFLICTS) $(SWAGGER_FILES) > $(SWAGGER_RESULT_FILE)
+	swagger mixin $(STATIC_SWAGGER_FILES) $(SWAGGER_FILES) > $(SWAGGER_RESULT_FILE)
 
 serve: sync generate_swagger
 	hugo server --buildDrafts --noHTTPCache
