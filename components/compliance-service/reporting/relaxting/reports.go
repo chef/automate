@@ -209,7 +209,8 @@ func (backend *ES2Backend) GetReports(from int32, size int32, filters map[string
 		"node_uuid",
 		"node_name",
 		"environment",
-		"end_time")
+		"end_time",
+		"ipaddress")
 
 	if queryInfo.level == ReportLevel {
 		fsc.Include(
@@ -257,10 +258,11 @@ func (backend *ES2Backend) GetReports(from int32, size int32, filters map[string
 					t := item.EndTime.Round(1 * time.Second)
 					timestamp, _ := ptypes.TimestampProto(t)
 					report := reportingapi.Report{
-						Id:       hit.Id,
-						NodeId:   item.NodeID,
-						NodeName: item.NodeName,
-						EndTime:  timestamp,
+						Id:        hit.Id,
+						NodeId:    item.NodeID,
+						NodeName:  item.NodeName,
+						EndTime:   timestamp,
+						Ipaddress: item.IPAddress,
 					}
 
 					var controlSummary reporting.NodeControlSummary
@@ -543,7 +545,7 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	// These are filter types where we use ElasticSearch Term Queries
 	filterTypes := []string{"environment", "organization", "chef_server", "chef_tags",
 		"policy_group", "policy_name", "status", "node_name", "platform", "role", "recipe",
-		"inspec_version"}
+		"inspec_version", "ipaddress"}
 
 	for _, filterType := range filterTypes {
 		if len(filters[filterType]) > 0 {

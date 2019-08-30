@@ -1704,6 +1704,7 @@ paths = [
   "components/automate-gateway/api/authz/*",
   "components/automate-gateway/authz/policy_v2/*",
   "components/automate-grpc/*",
+  "components/compliance-service/*",
   "components/config-mgmt-service/*",
   "components/ingest-service/*",
   "components/notifications-client/*",

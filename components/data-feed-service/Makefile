@@ -21,7 +21,9 @@ proto:
 	cd ../../ && hab studio run 'source .studiorc; compile_go_protobuf_component data-feed-service'
 
 test:
-	GOMAXPROCS=4 go test -v -cover $(GOFILES)
+	mkdir .cover
+	GOMAXPROCS=4 go test -v -covermode=atomic -coverprofile=.cover/cover.out $(GOFILES)
+	go tool cover -html=.cover/cover.out -o .cover/coverage.html
 
 vet:
 	go vet $(GOFILES)
