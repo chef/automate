@@ -3174,7 +3174,11 @@ func setupV2WithMigrationState(t *testing.T,
 	}
 
 	vSwitch := v2.NewSwitch(vChan)
-	polV2, _, err := v2.NewPoliciesServer(ctx, l, mem_v2, writer, pl, vSwitch, vChan)
+
+	polRefresher, err := v2.NewPolicyRefresher(ctx, l, writer, mem_v2)
+	require.NoError(t, err)
+
+	polV2, err := v2.NewPoliciesServer(ctx, l, polRefresher, mem_v2, writer, pl, vSwitch, vChan)
 	require.NoError(t, err)
 
 	require.NoError(t, err)
@@ -3182,7 +3186,7 @@ func setupV2WithMigrationState(t *testing.T,
 		rulesRetriever, testhelpers.NewMockProjectUpdateManager(), testhelpers.NewMockPolicyRefresher())
 	require.NoError(t, err)
 
-	authzV2, err := v2.NewAuthzServer(l, authorizer, vSwitch, projectsSrv)
+	authzV2, err := v2.NewAuthzServer(l, authorizer, vSwitch, projectsSrv, mem_v2)
 	require.NoError(t, err)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")

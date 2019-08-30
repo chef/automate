@@ -202,6 +202,49 @@ Cypress.Commands.add('cleanupProjectsByIDPrefix', (idToken: string, idPrefix: st
   });
 });
 
+Cypress.Commands.add('cleanupRolesByIDPrefix', (idToken: string, idPrefix: string) => {
+  cy.request({
+    auth: { bearer: idToken },
+    method: 'GET',
+    url: '/apis/iam/v2beta/roles',
+    failOnStatusCode: false
+  }).then((resp) => {
+    const body = resp.body;
+    for (const role of body.roles) {
+      if (role.id.startsWith(idPrefix)) {
+        cy.request({
+          auth: { bearer: idToken },
+          method: 'DELETE',
+          url: `/apis/iam/v2beta/roles/${role.id}`,
+          failOnStatusCode: false
+        });
+      }
+    }
+  });
+});
+
+
+Cypress.Commands.add('cleanupTokensByIDPrefix', (idToken: string, idPrefix: string) => {
+  cy.request({
+    auth: { bearer: idToken },
+    method: 'GET',
+    url: '/apis/iam/v2beta/tokens',
+    failOnStatusCode: false
+  }).then((resp) => {
+    const body = resp.body;
+    for (const token of body.tokens) {
+      if (token.id.startsWith(idPrefix)) {
+        cy.request({
+          auth: { bearer: idToken },
+          method: 'DELETE',
+          url: `/apis/iam/v2beta/tokens/${token.id}`,
+          failOnStatusCode: false
+        });
+      }
+    }
+  });
+});
+
 Cypress.Commands.add('cleanupTeamsByDescriptionPrefix', (idToken: string, namePrefix: string) => {
   cy.request({
     auth: { bearer: idToken },

@@ -15,6 +15,7 @@ import (
 
 	v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/prng"
+	"github.com/chef/automate/components/authz-service/projectassignment"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/testhelpers"
@@ -55,7 +56,7 @@ const (
 // make kill_docker_pg
 
 func TestGetPolicy(t *testing.T) {
-	store, db, prngSeed, _ := testhelpers.SetupTestDB(t)
+	store, db, _, prngSeed, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -299,7 +300,7 @@ func TestGetPolicy(t *testing.T) {
 }
 
 func TestListPolicyMembers(t *testing.T) {
-	store, db, prngSeed, _ := testhelpers.SetupTestDB(t)
+	store, db, _, prngSeed, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
@@ -419,7 +420,7 @@ func TestListPolicyMembers(t *testing.T) {
 }
 
 func TestListPolicies(t *testing.T) {
-	store, db, prngSeed, _ := testhelpers.SetupTestDB(t)
+	store, db, _, prngSeed, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -838,7 +839,7 @@ func TestListPolicies(t *testing.T) {
 }
 
 func TestDeletePolicy(t *testing.T) {
-	store, db, prngSeed, _ := testhelpers.SetupTestDB(t)
+	store, db, _, prngSeed, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -1035,7 +1036,7 @@ func TestDeletePolicy(t *testing.T) {
 }
 
 func TestCreatePolicy(t *testing.T) {
-	store, db, prngSeed, _ := testhelpers.SetupTestDB(t)
+	store, db, _, prngSeed, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
@@ -1623,7 +1624,7 @@ func TestCreatePolicy(t *testing.T) {
 }
 
 func TestReplacePolicyMembers(t *testing.T) {
-	store, db, prngSeed, _ := testhelpers.SetupTestDB(t)
+	store, db, _, prngSeed, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -1891,7 +1892,7 @@ func TestReplacePolicyMembers(t *testing.T) {
 }
 
 func TestRemovePolicyMembers(t *testing.T) {
-	store, db, prngSeed, _ := testhelpers.SetupTestDB(t)
+	store, db, _, prngSeed, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -2138,7 +2139,7 @@ func TestRemovePolicyMembers(t *testing.T) {
 }
 
 func TestAddPolicyMembers(t *testing.T) {
-	store, db, prngSeed, _ := testhelpers.SetupTestDB(t)
+	store, db, _, prngSeed, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -2479,7 +2480,7 @@ func TestAddPolicyMembers(t *testing.T) {
 }
 
 func TestUpdatePolicy(t *testing.T) {
-	store, db, prngSeed, _ := testhelpers.SetupTestDB(t)
+	store, db, _, prngSeed, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -3032,7 +3033,7 @@ func TestUpdatePolicy(t *testing.T) {
 }
 
 func TestCreateRule(t *testing.T) {
-	store, db, _, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
@@ -3165,7 +3166,7 @@ func TestCreateRule(t *testing.T) {
 }
 
 func TestListRules(t *testing.T) {
-	store, db, _, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -3240,7 +3241,7 @@ func TestListRules(t *testing.T) {
 	}
 }
 func TestListStagedAndAppliedRules(t *testing.T) {
-	store, db, _, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -3297,7 +3298,7 @@ func TestListStagedAndAppliedRules(t *testing.T) {
 }
 
 func TestListRulesForProject(t *testing.T) {
-	store, db, _, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -3504,7 +3505,7 @@ func TestListRulesForProject(t *testing.T) {
 }
 
 func TestUpdateRule(t *testing.T) {
-	store, db, _, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -3783,7 +3784,7 @@ func TestUpdateRule(t *testing.T) {
 }
 
 func TestGetStagedOrAppliedRule(t *testing.T) {
-	store, db, _, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -3947,7 +3948,7 @@ func TestGetStagedOrAppliedRule(t *testing.T) {
 }
 
 func TestDeleteRule(t *testing.T) {
-	store, db, _, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -4141,7 +4142,7 @@ func TestDeleteRule(t *testing.T) {
 }
 
 func TestApplyStagedRules(t *testing.T) {
-	store, db, _, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 	// No project filter concerns in these tests so safe to re-use context.
@@ -4270,7 +4271,7 @@ func TestApplyStagedRules(t *testing.T) {
 }
 
 func TestCreateProject(t *testing.T) {
-	store, db, _, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
@@ -4376,7 +4377,7 @@ func TestCreateProject(t *testing.T) {
 }
 
 func TestUpdateProject(t *testing.T) {
-	store, db, _, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -4464,7 +4465,7 @@ func TestUpdateProject(t *testing.T) {
 }
 
 func TestGetProject(t *testing.T) {
-	store, db, _, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -4543,7 +4544,7 @@ func TestGetProject(t *testing.T) {
 }
 
 func TestDeleteProject(t *testing.T) {
-	store, db, _, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -4787,7 +4788,7 @@ func TestDeleteProject(t *testing.T) {
 }
 
 func TestListProjects(t *testing.T) {
-	store, db, _, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -4890,7 +4891,7 @@ func TestListProjects(t *testing.T) {
 }
 
 func TestCreateRole(t *testing.T) {
-	store, db, _, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
@@ -4906,7 +4907,7 @@ func TestCreateRole(t *testing.T) {
 				Projects: []string{},
 			}
 			assertPolicyChange(t, store, func() {
-				resp, err := store.CreateRole(ctx, &role)
+				resp, err := store.CreateRole(ctx, &role, false)
 				require.NoError(t, err)
 				require.Equal(t, &role, resp)
 			})
@@ -4922,7 +4923,7 @@ func TestCreateRole(t *testing.T) {
 				Projects: []string{},
 			}
 			assertPolicyChange(t, store, func() {
-				resp, err := store.CreateRole(ctx, &role)
+				resp, err := store.CreateRole(ctx, &role, false)
 				require.NoError(t, err)
 				require.Equal(t, &role, resp)
 			})
@@ -4947,7 +4948,7 @@ func TestCreateRole(t *testing.T) {
 				Projects: []string{"my-id-1"},
 			}
 			assertPolicyChange(t, store, func() {
-				resp, err := store.CreateRole(ctx, &role)
+				resp, err := store.CreateRole(ctx, &role, false)
 				require.NoError(t, err)
 				require.Equal(t, &role, resp)
 			})
@@ -4979,7 +4980,7 @@ func TestCreateRole(t *testing.T) {
 				Projects: []string{project1.ID, project2.ID},
 			}
 			assertPolicyChange(t, store, func() {
-				resp, err := store.CreateRole(ctx, &role)
+				resp, err := store.CreateRole(ctx, &role, false)
 				require.NoError(t, err)
 				require.Equal(t, &role, resp)
 			})
@@ -4995,7 +4996,7 @@ func TestCreateRole(t *testing.T) {
 				Actions: []string{"action1", "action2"},
 			}
 			assertPolicyChange(t, store, func() {
-				resp, err := store.CreateRole(ctx, &role)
+				resp, err := store.CreateRole(ctx, &role, false)
 				require.NoError(t, err)
 				require.Equal(t, &role, resp)
 			})
@@ -5007,7 +5008,7 @@ func TestCreateRole(t *testing.T) {
 				Actions: []string{"action3", "action4"},
 			}
 			assertNoPolicyChange(t, store, func() {
-				resp, err := store.CreateRole(ctx, &role2)
+				resp, err := store.CreateRole(ctx, &role2, false)
 				assert.Error(t, err)
 				assert.Equal(t, storage_errors.ErrConflict, err)
 				assert.Nil(t, resp)
@@ -5022,7 +5023,7 @@ func TestCreateRole(t *testing.T) {
 }
 
 func TestListRoles(t *testing.T) {
-	store, db, _, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -5347,7 +5348,7 @@ func TestListRoles(t *testing.T) {
 }
 
 func TestGetRole(t *testing.T) {
-	store, db, _, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -5559,7 +5560,7 @@ func TestGetRole(t *testing.T) {
 }
 
 func TestReset(t *testing.T) {
-	store, db, _, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
@@ -5602,7 +5603,7 @@ func TestReset(t *testing.T) {
 }
 
 func TestDeleteRole(t *testing.T) {
-	store, db, _, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 
@@ -5895,7 +5896,7 @@ func TestDeleteRole(t *testing.T) {
 }
 
 func TestUpdateRole(t *testing.T) {
-	store, db, _, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 	nonexistingRole := storage.Role{
@@ -5907,7 +5908,7 @@ func TestUpdateRole(t *testing.T) {
 	cases := map[string]func(*testing.T){
 		"returns role not found error with empty database": func(t *testing.T) {
 			ctx := context.Background()
-			role, err := store.UpdateRole(ctx, &nonexistingRole)
+			role, err := store.UpdateRole(ctx, &nonexistingRole, false)
 
 			assert.Nil(t, role)
 			assert.Error(t, err)
@@ -5920,7 +5921,7 @@ func TestUpdateRole(t *testing.T) {
 			insertTestRole(t, db, "my-id-3", "name", []string{"action3"}, []string{})
 			insertTestRole(t, db, "my-id-4", "name", []string{"action4"}, []string{})
 
-			role, err := store.UpdateRole(ctx, &nonexistingRole)
+			role, err := store.UpdateRole(ctx, &nonexistingRole, false)
 
 			assert.Nil(t, role)
 			assert.Error(t, err)
@@ -5936,7 +5937,7 @@ func TestUpdateRole(t *testing.T) {
 				Projects: []string{},
 			}
 
-			updatedRole, err := store.UpdateRole(ctx, &r)
+			updatedRole, err := store.UpdateRole(ctx, &r, false)
 
 			require.NoError(t, err)
 			assert.Equal(t, dbRole.ID, updatedRole.ID)
@@ -5963,7 +5964,7 @@ func TestUpdateRole(t *testing.T) {
 				Projects: []string{project1.ID},
 			}
 
-			updatedRole, err := store.UpdateRole(ctx, &r)
+			updatedRole, err := store.UpdateRole(ctx, &r, false)
 
 			require.NoError(t, err)
 			assert.Equal(t, dbRole.ID, updatedRole.ID)
@@ -6014,7 +6015,7 @@ func TestUpdateRole(t *testing.T) {
 				Projects: []string{project2.ID, project3.ID, project4.ID},
 			}
 
-			updatedRole, err := store.UpdateRole(ctx, &r)
+			updatedRole, err := store.UpdateRole(ctx, &r, false)
 
 			require.NoError(t, err)
 			assert.Equal(t, dbRole.ID, updatedRole.ID)
@@ -6049,7 +6050,7 @@ func TestUpdateRole(t *testing.T) {
 				Projects: []string{},
 			}
 
-			updatedRole, err := store.UpdateRole(ctx, &r)
+			updatedRole, err := store.UpdateRole(ctx, &r, false)
 
 			require.NoError(t, err)
 			assert.Equal(t, dbRole.ID, updatedRole.ID)
@@ -6085,7 +6086,7 @@ func TestUpdateRole(t *testing.T) {
 				Projects: []string{project2.ID},
 			}
 			ctx = insertProjectsIntoContext(ctx, []string{project1.ID})
-			updatedRole, err := store.UpdateRole(ctx, &r)
+			updatedRole, err := store.UpdateRole(ctx, &r, false)
 
 			assert.Nil(t, updatedRole)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
@@ -6125,7 +6126,7 @@ func TestUpdateRole(t *testing.T) {
 				Projects: []string{project2.ID},
 			}
 			ctx = insertProjectsIntoContext(ctx, []string{project2.ID, project1.ID})
-			updatedRole, err := store.UpdateRole(ctx, &r)
+			updatedRole, err := store.UpdateRole(ctx, &r, false)
 
 			require.NoError(t, err)
 			assert.Equal(t, dbRole.ID, updatedRole.ID)
@@ -6153,7 +6154,7 @@ func TestUpdateRole(t *testing.T) {
 				Projects: []string{project1.ID},
 			}
 			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
-			updatedRole, err := store.UpdateRole(ctx, &r)
+			updatedRole, err := store.UpdateRole(ctx, &r, false)
 
 			require.NoError(t, err)
 			assert.Equal(t, dbRole.ID, updatedRole.ID)
@@ -6174,7 +6175,7 @@ func TestUpdateRole(t *testing.T) {
 				Projects: []string{},
 			}
 			ctx = insertProjectsIntoContext(ctx, []string{v2.UnassignedProjectID})
-			updatedRole, err := store.UpdateRole(ctx, &r)
+			updatedRole, err := store.UpdateRole(ctx, &r, false)
 
 			require.NoError(t, err)
 			assert.Equal(t, dbRole.ID, updatedRole.ID)
@@ -6209,7 +6210,7 @@ func TestUpdateRole(t *testing.T) {
 				Projects: []string{project1.ID, project2.ID},
 			}
 
-			updatedRole, err := store.UpdateRole(ctx, &r)
+			updatedRole, err := store.UpdateRole(ctx, &r, false)
 
 			require.NoError(t, err)
 			assert.Equal(t, dbRole.ID, updatedRole.ID)
@@ -6227,7 +6228,7 @@ func TestUpdateRole(t *testing.T) {
 				Actions: dbRole.Actions,
 			}
 
-			updatedRole, err := store.UpdateRole(ctx, &r)
+			updatedRole, err := store.UpdateRole(ctx, &r, false)
 
 			require.NoError(t, err)
 			assert.Equal(t, dbRole.ID, updatedRole.ID)
@@ -6245,7 +6246,7 @@ func TestUpdateRole(t *testing.T) {
 				Actions: []string{"newaction"},
 			}
 
-			updatedRole, err := store.UpdateRole(ctx, &r)
+			updatedRole, err := store.UpdateRole(ctx, &r, false)
 
 			require.NoError(t, err)
 			assert.Equal(t, dbRole.ID, updatedRole.ID)
@@ -6262,7 +6263,7 @@ func TestUpdateRole(t *testing.T) {
 }
 
 func TestMigrationStatusProvider(t *testing.T) {
-	store, db, _, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
@@ -6383,7 +6384,7 @@ func TestMigrationStatusProvider(t *testing.T) {
 }
 
 func TestPurgeSubjectFromPolicies(t *testing.T) {
-	store, db, _, _ := testhelpers.SetupTestDB(t)
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
@@ -6442,6 +6443,48 @@ func TestPurgeSubjectFromPolicies(t *testing.T) {
 
 			assertEmpty(t, db.QueryRow(policyMembersByMemberName, member0.Name))
 			assertOne(t, db.QueryRow(policyMembersByMemberName, member1.Name))
+		}},
+	}
+
+	rand.Shuffle(len(cases), func(i, j int) {
+		cases[i], cases[j] = cases[j], cases[i]
+	})
+
+	for _, test := range cases {
+		t.Run(test.desc, test.f)
+		db.Flush(t)
+	}
+}
+
+func TestErrIfMissingProjects(t *testing.T) {
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
+	defer store.Close()
+	ctx := context.Background()
+
+	cases := []struct {
+		desc string
+		f    func(*testing.T)
+	}{
+		{"when there are no projects, returns ProjectsMissingErr", func(t *testing.T) {
+			err := store.ErrIfMissingProjects(ctx, []string{"missing"})
+			assert.Error(t, err)
+			_, correctError := err.(*projectassignment.ProjectsMissingErr)
+			assert.True(t, correctError)
+		}},
+		{"when some projects don't exist, returns ProjectsMissingErr", func(t *testing.T) {
+			insertTestProject(t, db, "proj0", "test project 0", storage.Custom)
+			insertTestProject(t, db, "proj1", "test project 1", storage.Custom)
+			err := store.ErrIfMissingProjects(ctx, []string{"proj0", "missing"})
+			assert.Error(t, err)
+			_, correctError := err.(*projectassignment.ProjectsMissingErr)
+			assert.True(t, correctError)
+		}},
+		{"when all projects exist, return snil", func(t *testing.T) {
+			insertTestProject(t, db, "proj0", "test project 0", storage.Custom)
+			insertTestProject(t, db, "proj1", "test project 1", storage.Custom)
+			err := store.ErrIfMissingProjects(ctx, []string{"proj0", "proj1"})
+			assert.NoError(t, err)
 		}},
 	}
 

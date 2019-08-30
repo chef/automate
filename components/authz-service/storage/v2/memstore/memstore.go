@@ -369,6 +369,16 @@ func (*State) ApplyStagedRules(context.Context) error {
 	return nil
 }
 
+func (*State) FindMissingProjects(ctx context.Context, projectIDs []string) ([]string, error) {
+	// TODO
+	return nil, nil
+}
+
+func (*State) ErrIfMissingProjects(ctx context.Context, projectIDs []string) error {
+	// TODO
+	return nil
+}
+
 func (s *State) CreateProject(_ context.Context, project *storage.Project) (*storage.Project, error) {
 	if project.Type == storage.Custom {
 		items := s.projects.Items()
@@ -452,7 +462,7 @@ func (s *State) ListProjects(context.Context) ([]*storage.Project, error) {
 	return projects, nil
 }
 
-func (s *State) CreateRole(_ context.Context, role *storage.Role) (*storage.Role, error) {
+func (s *State) CreateRole(_ context.Context, role *storage.Role, checkProjects bool) (*storage.Role, error) {
 	if err := s.roles.Add(role.ID, role, cache.NoExpiration); err != nil {
 		return nil, storage_errors.ErrConflict
 	}
@@ -501,7 +511,7 @@ func (s *State) DeleteRole(ctx context.Context, roleID string) error {
 	return nil
 }
 
-func (s *State) UpdateRole(_ context.Context, r *storage.Role) (*storage.Role, error) {
+func (s *State) UpdateRole(_ context.Context, r *storage.Role, checkProjects bool) (*storage.Role, error) {
 	item, exists := s.roles.Get(r.ID)
 	if !exists {
 		return nil, storage_errors.ErrNotFound

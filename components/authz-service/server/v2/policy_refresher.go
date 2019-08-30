@@ -12,6 +12,7 @@ import (
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
+	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/logger"
 )
@@ -51,8 +52,15 @@ func (m *policyRefresherMessageRefresh) Err() error {
 	return <-m.status
 }
 
-func NewPolicyRefresher(ctx context.Context, log logger.Logger, store storage.Storage,
-	engine engine.V2pXWriter) (PolicyRefresher, error) {
+func NewPostgresPolicyRefresher(ctx context.Context, log logger.Logger, engine engine.V2pXWriter) (PolicyRefresher, error) {
+	store := postgres.GetInstance()
+	if store == nil {
+		return nil, errors.New("postgres v2 singleton not yet initialized for policy refresher")
+	}
+	return NewPolicyRefresher(ctx, log, engine, store)
+}
+
+func NewPolicyRefresher(ctx context.Context, log logger.Logger, engine engine.V2pXWriter, store storage.Storage) (PolicyRefresher, error) {
 	changeNotifier, err := store.GetPolicyChangeNotifier(ctx)
 	if err != nil {
 		return nil, err

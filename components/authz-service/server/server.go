@@ -29,6 +29,7 @@ import (
 	v2 "github.com/chef/automate/components/authz-service/server/v2"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
+	v2_postgres "github.com/chef/automate/components/authz-service/storage/v2/postgres"
 )
 
 // GRPC creates and listens on grpc server.
@@ -69,12 +70,9 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "could not initialize v1 server")
 	}
 
-	// TODO (tc) Refactor how singletons are shared between GRPC servers. Should we also
-	// be sharing a single v2 store / pg instance?
-	v2PolServer, policyRefresher, err := v2.NewPostgresPolicyServer(
-		ctx, l, e, migrationsConfig, dataMigrationsConfig, v1Server.Storage(), switcher, vChan)
+	err = v2_postgres.Initialize(ctx, e, l, migrationsConfig, dataMigrationsConfig)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not initialize v2 policy server")
+		return nil, errors.Wrap(err, "could not initialize v2 postgres singleton")
 	}
 
 	cerealManager, err := createProjectUpdateCerealManager(connFactory, cerealAddress)
@@ -82,15 +80,25 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "could not create cereal manager")
 	}
 
-	v2ProjectsServer, err := v2.NewPostgresProjectsServer(ctx, l, migrationsConfig,
-		dataMigrationsConfig, e, cerealManager, policyRefresher)
+	policyRefresher, err := v2.NewPostgresPolicyRefresher(ctx, l, e)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not initialize v2 policy refresher")
+	}
+
+	v2ProjectsServer, err := v2.NewPostgresProjectsServer(ctx, l, e, cerealManager, policyRefresher)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 projects server")
 	}
 
-	v2AuthzServer, err := v2.NewAuthzServer(l, e, switcher, v2ProjectsServer)
+	v2AuthzServer, err := v2.NewPostgresAuthzServer(l, e, switcher, v2ProjectsServer)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 authz server")
+	}
+
+	v2PolServer, err := v2.NewPostgresPolicyServer(
+		ctx, l, policyRefresher, e, v1Server.Storage(), switcher, vChan)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not initialize v2 policy server")
 	}
 
 	subjectPurgeServer, err := v2.NewSubjectPurgeServer(ctx, l, v1Server, v2PolServer)
