@@ -32,7 +32,6 @@ type ProjectState struct {
 	store                storage.Storage
 	ProjectUpdateManager ProjectUpdateMgr
 	policyRefresher      PolicyRefresher
-	applyRuleMux         sync.Mutex
 }
 
 // NewMemstoreProjectsServer returns an instance of api.ProjectsServer
@@ -165,18 +164,14 @@ func (s *ProjectState) UpdateProject(ctx context.Context,
 
 func (s *ProjectState) ApplyRulesStart(
 	ctx context.Context, _ *api.ApplyRulesStartReq) (*api.ApplyRulesStartResp, error) {
-	// NOTE (tc): Only one call to ApplyRulesStart can happen at a time.
-	// This should be good enough to prevent race conditions for single node,
-	// in conjunction with the table locking that happens in store.ApplyStagedRules.
-	// Can still get into a weird state if we panic, but a re-apply will fix things up.
-	// We will be refactoring for multi-node using workflow tooling in the near future.
-	s.applyRuleMux.Lock()
-	defer s.applyRuleMux.Unlock()
-
 	s.log.Info("apply project rules: START")
 	err := s.ProjectUpdateManager.Start()
 	if err != nil {
 		s.log.Warnf("error starting project update. the rules and cache were updated but the apply was not started, please try again.")
+		if err == cereal.ErrWorkflowInstanceExists {
+			return nil, status.Errorf(codes.FailedPrecondition,
+				"project update already in progress: %s", err.Error())
+		}
 		return nil, status.Errorf(codes.Internal,
 			"error starting project update: %s", err.Error())
 	}
