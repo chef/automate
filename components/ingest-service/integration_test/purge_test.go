@@ -1,15 +1,15 @@
 package integration_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
-	"context"
+	"github.com/stretchr/testify/require"
+	"github.com/teambition/rrule-go"
 
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
-	"github.com/stretchr/testify/require"
-	"github.com/teambition/rrule-go"
 )
 
 // TestPurge tests the Purge server
@@ -147,19 +147,19 @@ func TestPurge(t *testing.T) {
 				RemoteHostname:   "chef-server.org",
 				OrganizationName: "org1",
 				Projects:         []string{"org1"},
-				RecordedAt:       time.Now().Add(time.Hour * -8),
+				RecordedAt:       time.Now(), // today's index
 			},
 			iBackend.InternalChefAction{
 				RemoteHostname:   "chef-server.org",
 				OrganizationName: "org2",
 				Projects:         []string{"org2"},
-				RecordedAt:       time.Now().Add(time.Hour * -16),
+				RecordedAt:       time.Now().Add(time.Hour * -24),
 			},
 			iBackend.InternalChefAction{
 				RemoteHostname:   "chef-server.org",
 				OrganizationName: "org1",
 				Projects:         []string{"org1"},
-				RecordedAt:       time.Now().Add(time.Hour * -32),
+				RecordedAt:       time.Now().Add(time.Hour * -48),
 			},
 			iBackend.InternalChefAction{
 				RemoteHostname:   "chef-server.org",

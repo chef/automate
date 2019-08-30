@@ -4,9 +4,10 @@ import (
 	"context"
 	"time"
 
-	es "github.com/chef/automate/api/interservice/es_sidecar"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+
+	es "github.com/chef/automate/api/interservice/es_sidecar"
 )
 
 // Policies represent the purge policies that are persisted in the workflow
@@ -64,6 +65,9 @@ func (p EsPolicy) Purge(ctx context.Context, esSidecarClient es.EsSidecarClient)
 
 	logctx.Debug("Purging")
 	if req.CustomPurgeField == "" {
+		// We add 1 one here because otherwise we would delete an
+		// index that included documents newer than olderThanDays.
+		req.OlderThanDays = req.OlderThanDays + 1
 		res, err = esSidecarClient.PurgeTimeSeriesIndicesByAge(ctx, req)
 	} else {
 		res, err = esSidecarClient.PurgeDocumentsFromIndexByAge(ctx, req)
