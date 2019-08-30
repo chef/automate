@@ -74,6 +74,7 @@ describe('ApiTokenDetailsComponent', () => {
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-subheading' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
+        MockComponent({ selector: 'app-settings-sidebar' }),
         MockComponent({ selector: 'app-projects-dropdown',
           inputs: ['projects', 'disabled'], outputs: ['onProjectChecked'] }),
         MockComponent({ selector: 'chef-tab-selector',
@@ -96,7 +97,7 @@ describe('ApiTokenDetailsComponent', () => {
     }).compileComponents();
   }));
 
-  let someToken: ApiToken = {
+  const someToken: ApiToken = {
     id: targetId,
     name: 'some token',
     value: 'random',
@@ -126,7 +127,7 @@ describe('ApiTokenDetailsComponent', () => {
     someToken.projects  = ['b-proj', 'd-proj'];
     store.dispatch(new GetTokenSuccess(someToken));
 
-    const version: IamVersionResponse = { version: { major: 'V2', minor: 'V1' } };
+    const version: IamVersionResponse = { version: { major: 'v2', minor: 'v1' } };
     store.dispatch(new GetIamVersionSuccess(version));
     expect(store.dispatch).toHaveBeenCalledWith(new GetProjects());
 
