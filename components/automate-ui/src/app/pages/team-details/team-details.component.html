@@ -79,7 +79,7 @@
           [disabled]="dropdownDisabled()">
         </app-projects-dropdown>
       </div>
-      <chef-button [disabled]="isLoadingTeam || !updateNameForm.valid || (!updateNameForm.dirty && noProjectsUpdated())"
+      <chef-button [disabled]="isLoadingTeam || !updateNameForm.valid || formPristine"
         primary inline (click)="saveTeam()" data-cy="team-details-submit-button">
         <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
         <span *ngIf="saving">Saving...</span>

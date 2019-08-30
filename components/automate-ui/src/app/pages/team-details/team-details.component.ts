@@ -281,11 +281,16 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     this.projects[project.id].checked = project.checked;
   }
 
-  noProjectsUpdated(): boolean {
+  private noProjectsUpdated(): boolean {
     const projectsUpdated = xor(
       this.team.projects,
       Object.keys(this.projects).filter(id => this.projects[id].checked));
     return projectsUpdated.length === 0;
+  }
+
+  // OK to check form itself because project filter is external to the form
+  get formPristine(): boolean {
+    return !this.updateNameForm.dirty && this.noProjectsUpdated();
   }
 
   dropdownDisabled(): boolean {

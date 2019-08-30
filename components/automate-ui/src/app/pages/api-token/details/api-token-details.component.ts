@@ -155,11 +155,22 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
     this.updateForm.controls.projects.markAsDirty();
   }
 
-  noProjectsUpdated(): boolean {
+  private noProjectsUpdated(): boolean {
     const projectsUpdated = xor(
       this.token.projects,
       Object.keys(this.projects).filter(id => this.projects[id].checked));
     return projectsUpdated.length === 0;
+  }
+
+  // Special handling needed due to the projects dropdown being inside the form.
+  // Once the project list changes, the form remains dirty
+  // so cannot check the form's dirty bit.
+  // TODO: Figure a way to make the <app-projects-dropdown> a proper form control
+  // so it can be managed bo FormControlDirective like other form fields.
+  get formPristine(): boolean {
+    return !this.updateForm.controls.name.dirty &&
+      !this.updateForm.controls.status.dirty &&
+      this.noProjectsUpdated();
   }
 
   dropdownDisabled(): boolean {
