@@ -46,7 +46,6 @@ func ConnectToJobsManager(jobCfg *config.Jobs, connFactory *secureconn.Factory) 
 	}
 
 	be := cerealRPC.NewGrpcBackendFromConn("applications", conn)
-	//cerealSvc, err := cereal.NewManager(be)
 	cerealSvc, err := cereal.NewManager(be, cereal.WithTaskPollInterval(1*time.Second), cereal.WithTaskPollIntervalMaxJitter(100*time.Millisecond))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create cereal job manager from gRPC connection")
@@ -221,7 +220,7 @@ type MarkDisconnectedServicesExecutor struct {
 }
 
 func (m *MarkDisconnectedServicesExecutor) Run(ctx context.Context, t cereal.Task) (interface{}, error) {
-	err := m.run(t)
+	err := m.runWithoutStats(t)
 	atomic.AddInt64(&m.totalRuns, 1)
 	if err != nil {
 		atomic.AddInt64(&m.totalRunsFailed, 1)
@@ -231,7 +230,7 @@ func (m *MarkDisconnectedServicesExecutor) Run(ctx context.Context, t cereal.Tas
 	return nil, err
 }
 
-func (m *MarkDisconnectedServicesExecutor) run(t cereal.Task) error {
+func (m *MarkDisconnectedServicesExecutor) runWithoutStats(t cereal.Task) error {
 	var params DisconnectedServicesParamsV0
 	if err := t.GetParameters(&params); err != nil {
 		return errors.Wrap(err, "failed to load parameters for disconnected_services job")

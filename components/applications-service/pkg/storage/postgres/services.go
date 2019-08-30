@@ -134,7 +134,7 @@ RETURNING s.id
   , s.last_event_occurred_at as last_event_occurred_at
   , s.previous_health as previous_health
   , s.health_updated_at as health_updated_at
-	, s.disconnected as disconnected
+  , s.disconnected as disconnected
 `
 
 	selectServicesHealthCounts = `

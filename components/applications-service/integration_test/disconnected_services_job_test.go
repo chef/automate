@@ -12,13 +12,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// CONFIGURE PERIODIC DELETION OF DISCONNECTED SERVICES:
-// * this config lives with the cereal service in the job config or something like that
-// The way it's updated is:
-// (m *Manager) UpdateWorkflowScheduleByName(ctx context.Context,
-// 	instanceName string, workflowName string, opts ...WorkflowScheduleUpdateOpts)
-// need to ensure it exists on startup I guess...
-
 const (
 	DisconnectedServicesJobName      = "disconnected_services"
 	DisconnectedServicesScheduleName = "periodic_disconnected_services"
