@@ -355,7 +355,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/applicationsGetDisconnectedServicesConfigRes"
+              "$ref": "#/definitions/applicationsPeriodicJobConfig"
             }
           }
         },
@@ -379,7 +379,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/applicationsUpdateDisconnectedServicesConfigReq"
+              "$ref": "#/definitions/applicationsPeriodicJobConfig"
             }
           }
         ],
@@ -396,18 +396,6 @@ func init() {
         "threshold_seconds": {
           "type": "integer",
           "format": "int32"
-        }
-      }
-    },
-    "applicationsGetDisconnectedServicesConfigRes": {
-      "type": "object",
-      "properties": {
-        "running": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "threshold": {
-          "type": "string"
         }
       }
     },
@@ -448,6 +436,19 @@ func init() {
       "default": "OK",
       "description": "- NONE: The representation of NO health check status\nTODO @afiune how much effort would be to change\nthe OK enum to be NONE",
       "title": "The HealthStatus enum matches the habitat implementation for health-check status:\n=\u003e https://www.habitat.sh/docs/reference/#health-check"
+    },
+    "applicationsPeriodicJobConfig": {
+      "type": "object",
+      "properties": {
+        "running": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "threshold": {
+          "type": "string",
+          "description": "To match the ingest API at /retention/nodes/missing-nodes/config, we use a\nstring that conforms to golang's time.ParseDuration() function. Internally\nthe service uses an integer number of seconds so partial seconds in the\nthreshold will be trucated."
+        }
+      }
     },
     "applicationsService": {
       "type": "object",
@@ -617,19 +618,6 @@ func init() {
         "total_deployments": {
           "type": "integer",
           "format": "int32"
-        }
-      }
-    },
-    "applicationsUpdateDisconnectedServicesConfigReq": {
-      "type": "object",
-      "properties": {
-        "running": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "threshold": {
-          "type": "string",
-          "description": "To match the ingest API at /retention/nodes/missing-nodes/config, we use a\nstring that conforms to golang's time.ParseDuration() function. Internally\nthe service uses an integer number of seconds so partial seconds in the\nthreshold will be trucated."
         }
       }
     },

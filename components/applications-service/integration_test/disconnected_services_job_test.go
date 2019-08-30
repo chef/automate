@@ -31,7 +31,7 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 	assert.True(t, sched.Enabled)
 
 	t.Run("disable and enable disconnected_services job", func(t *testing.T) {
-		req := &applications.UpdateDisconnectedServicesConfigReq{Threshold: "5m", Running: false}
+		req := &applications.PeriodicJobConfig{Threshold: "5m", Running: false}
 		_, err := suite.ApplicationsServer.UpdateDisconnectedServicesConfig(ctx, req)
 		require.NoError(t, err)
 
@@ -49,7 +49,7 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 
 	})
 	t.Run("update disconnected_services job params", func(t *testing.T) {
-		req := &applications.UpdateDisconnectedServicesConfigReq{Threshold: "23s", Running: true}
+		req := &applications.PeriodicJobConfig{Threshold: "23s", Running: true}
 		_, err := suite.ApplicationsServer.UpdateDisconnectedServicesConfig(ctx, req)
 		require.NoError(t, err)
 
@@ -58,7 +58,7 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 		assert.Equal(t, "23s", conf.Threshold)
 
 		// Update the params again to ensure we didn't accidentally pass the test due to leftover state somewhere:
-		req = &applications.UpdateDisconnectedServicesConfigReq{Threshold: "42s", Running: true}
+		req = &applications.PeriodicJobConfig{Threshold: "42s", Running: true}
 		_, err = suite.ApplicationsServer.UpdateDisconnectedServicesConfig(ctx, req)
 		require.NoError(t, err)
 

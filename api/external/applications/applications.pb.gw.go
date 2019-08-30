@@ -334,7 +334,7 @@ func local_request_ApplicationsService_GetDisconnectedServicesConfig_0(ctx conte
 }
 
 func request_ApplicationsService_UpdateDisconnectedServicesConfig_0(ctx context.Context, marshaler runtime.Marshaler, client ApplicationsServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq UpdateDisconnectedServicesConfigReq
+	var protoReq PeriodicJobConfig
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -351,7 +351,7 @@ func request_ApplicationsService_UpdateDisconnectedServicesConfig_0(ctx context.
 }
 
 func local_request_ApplicationsService_UpdateDisconnectedServicesConfig_0(ctx context.Context, marshaler runtime.Marshaler, server ApplicationsServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq UpdateDisconnectedServicesConfigReq
+	var protoReq PeriodicJobConfig
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)

@@ -337,12 +337,12 @@ func (app *ApplicationsServer) MarkDisconnectedServices(thresholdSeconds int32) 
 }
 
 func (app *ApplicationsServer) GetDisconnectedServicesConfig(ctx context.Context,
-	req *applications.GetDisconnectedServicesConfigReq) (*applications.GetDisconnectedServicesConfigRes, error) {
+	req *applications.GetDisconnectedServicesConfigReq) (*applications.PeriodicJobConfig, error) {
 	config, err := app.jobScheduler.GetDisconnectedServicesJobConfig(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to load disconnected_services job configuration")
 	}
-	res := &applications.GetDisconnectedServicesConfigRes{
+	res := &applications.PeriodicJobConfig{
 		Running:   config.Enabled,
 		Threshold: config.Params.ThresholdDuration,
 	}
@@ -350,7 +350,7 @@ func (app *ApplicationsServer) GetDisconnectedServicesConfig(ctx context.Context
 }
 
 func (app *ApplicationsServer) UpdateDisconnectedServicesConfig(ctx context.Context,
-	req *applications.UpdateDisconnectedServicesConfigReq) (*applications.UpdateDisconnectedServicesConfigRes, error) {
+	req *applications.PeriodicJobConfig) (*applications.UpdateDisconnectedServicesConfigRes, error) {
 
 	if req.GetRunning() {
 		err := app.jobScheduler.EnableDisconnectedServicesJob(ctx)

@@ -58,7 +58,7 @@ func init() {
 		return unexpandedResource
 	})
 	policy.MapMethodTo("/chef.automate.api.applications.ApplicationsService/UpdateDisconnectedServicesConfig", "service_groups", "delete", "POST", "/beta/retention/service_groups/disconnected_services/config", func(unexpandedResource string, input interface{}) string {
-		if m, ok := input.(*UpdateDisconnectedServicesConfigReq); ok {
+		if m, ok := input.(*PeriodicJobConfig); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
 				case "threshold":
