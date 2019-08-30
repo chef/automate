@@ -2,7 +2,6 @@ syntax = "proto3";
 
 import "validate/validate.proto";
 import "api/interservice/authz/v2/type.proto";
-import "api/interservice/event/event.proto";
 import "google/protobuf/timestamp.proto";
 
 package chef.automate.domain.authz.v2;
