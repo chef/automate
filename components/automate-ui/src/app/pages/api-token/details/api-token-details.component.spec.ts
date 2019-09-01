@@ -21,8 +21,6 @@ import {
   policyEntityReducer,
   PolicyEntityInitialState
 } from 'app/entities/policies/policy.reducer';
-import { GetIamVersionSuccess } from 'app/entities/policies/policy.actions';
-import { IamVersionResponse } from 'app/entities/policies/policy.requests';
 import {
   projectEntityReducer,
   ProjectEntityInitialState
@@ -107,6 +105,13 @@ describe('ApiTokenDetailsComponent', () => {
     projects: []
   };
 
+  const projectList = [
+    genProject('a-proj'),
+    genProject('b-proj'),
+    genProject('c-proj'),
+    genProject('d-proj')
+  ];
+
   beforeEach(() => {
     router = TestBed.get(Router);
     spyOn(router, 'navigate').and.stub();
@@ -121,27 +126,62 @@ describe('ApiTokenDetailsComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('fills in token on load', () => {
+    spyOn(store, 'dispatch').and.callThrough();
+    const token = { ...someToken, projects: ['b-proj', 'd-proj']};
+
+    expect(component.token).toEqual(undefined);
+    store.dispatch(new GetTokenSuccess(token));
+    expect(store.dispatch).toHaveBeenCalledWith(new GetProjects());
+    expect(component.token).toEqual(token);
+  });
+
   it('initializes dropdown with those included on the token checked', () => {
     spyOn(store, 'dispatch').and.callThrough();
     const tokenProjects  = ['b-proj', 'd-proj'];
     store.dispatch(new GetTokenSuccess({...someToken, projects: tokenProjects}));
     expect(store.dispatch).toHaveBeenCalledWith(new GetProjects());
 
-    const version: IamVersionResponse = { version: { major: 'v2', minor: 'v1' } };
-    store.dispatch(new GetIamVersionSuccess(version));
-
-    const projectList = [
-      genProject('a-proj'),
-      genProject('b-proj'),
-      genProject('c-proj'),
-      genProject('d-proj')
-    ];
+    expect(Object.keys(component.projects).length).toBe(0);
     store.dispatch(new GetProjectsSuccess({ projects: projectList }));
+    expect(Object.keys(component.projects).length).toBe(projectList.length);
 
     projectList.forEach(p => {
       expect(component.projects[p.id].checked).toEqual(tokenProjects.includes(p.id));
     });
    });
+
+  it('sets projects dirty when an unchecked project is checked', () => {
+    store.dispatch(new GetTokenSuccess(
+      { ...someToken, projects: ['b-proj', 'd-proj']}));
+    store.dispatch(new GetProjectsSuccess({ projects: projectList }));
+
+    expect(component.updateForm.controls.projects.pristine).toEqual(true);
+    component.onProjectChecked({ ...genProject('a-proj'), checked: true });
+    expect(component.updateForm.controls.projects.pristine).toEqual(false);
+  });
+
+  it('sets projects dirty when a checked project is unchecked', () => {
+    store.dispatch(new GetTokenSuccess(
+      { ...someToken, projects: ['b-proj', 'd-proj']}));
+    store.dispatch(new GetProjectsSuccess({ projects: projectList }));
+
+    expect(component.updateForm.controls.projects.pristine).toEqual(true);
+    component.onProjectChecked({ ...genProject('b-proj'), checked: false });
+    expect(component.updateForm.controls.projects.pristine).toEqual(false);
+  });
+
+  it('sets projects back to pristine when project changed back to original value', () => {
+    store.dispatch(new GetTokenSuccess(
+      { ...someToken, projects: ['b-proj', 'd-proj']}));
+    store.dispatch(new GetProjectsSuccess({ projects: projectList }));
+
+    expect(component.updateForm.controls.projects.pristine).toEqual(true);
+    component.onProjectChecked({ ...genProject('a-proj'), checked: true });
+    expect(component.updateForm.controls.projects.pristine).toEqual(false);
+    component.onProjectChecked({ ...genProject('a-proj'), checked: false });
+    expect(component.updateForm.controls.projects.pristine).toEqual(true);
+  });
 
   function genProject(id: string): Project {
     return {
