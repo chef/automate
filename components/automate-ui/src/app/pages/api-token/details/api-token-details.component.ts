@@ -140,11 +140,15 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
   onProjectChecked(project: ProjectChecked): void {
     this.projects[project.id].checked = project.checked;
     const projectsSelected = Object.values(this.projects).filter(p => p.checked);
+    this.updateForm.controls.projects.setValue(projectsSelected.map(p => p.id));
 
     // since the app-projects-dropdown is not a true form input (select)
     // we have to manage the form reactions
-    this.updateForm.controls.projects.setValue(projectsSelected.map(p => p.id));
-    this.updateForm.controls.projects.markAsDirty();
+    if (this.noProjectsUpdated()) {
+      this.updateForm.controls.projects.markAsPristine();
+    } else {
+      this.updateForm.controls.projects.markAsDirty();
+    }
   }
 
   private noProjectsUpdated(): boolean {
@@ -152,17 +156,6 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
       this.token.projects,
       Object.keys(this.projects).filter(id => this.projects[id].checked));
     return projectsUpdated.length === 0;
-  }
-
-  // Special handling needed due to the projects dropdown being inside the form.
-  // Once the project list changes, the form remains dirty
-  // so cannot check the form's dirty bit.
-  // TODO: Figure a way to make the <app-projects-dropdown> a proper form control
-  // so it can be managed bo FormControlDirective like other form fields.
-  get formPristine(): boolean {
-    return !this.updateForm.controls.name.dirty &&
-      !this.updateForm.controls.status.dirty &&
-      this.noProjectsUpdated();
   }
 
   dropdownDisabled(): boolean {

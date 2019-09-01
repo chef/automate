@@ -96,7 +96,8 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       // to prevent people from typing before the team is fetched and have their
       // value overwritten.
       name: new FormControl({value: 'Loading...', disabled: true},
-        [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)])
+        [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]),
+      projects: [[]]
     });
   }
 
@@ -286,6 +287,15 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   // updates whether the project was checked or unchecked
   onProjectChecked(project: ProjectChecked): void {
     this.projects[project.id].checked = project.checked;
+
+    // since the app-projects-dropdown is not a true form input (select)
+    // we have to manage the form reactions
+    if (this.noProjectsUpdated()) {
+      this.updateNameForm.controls.projects.markAsPristine();
+    } else {
+      this.updateNameForm.controls.projects.markAsDirty();
+    }
+
   }
 
   private noProjectsUpdated(): boolean {
@@ -293,11 +303,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       this.team.projects,
       Object.keys(this.projects).filter(id => this.projects[id].checked));
     return projectsUpdated.length === 0;
-  }
-
-  // OK to check form itself because project filter is external to the form
-  get formPristine(): boolean {
-    return !this.updateNameForm.dirty && this.noProjectsUpdated();
   }
 
   dropdownDisabled(): boolean {

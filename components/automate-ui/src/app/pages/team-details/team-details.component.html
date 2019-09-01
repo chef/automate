@@ -71,15 +71,15 @@
             {{ descriptionOrName | titlecase }} is required.
           </chef-error>
         </chef-form-field>
+        <div id='projects-container' *ngIf="atLeastV2p1$ | async">
+          <app-projects-dropdown
+            [projects]="projects"
+            (onProjectChecked)="onProjectChecked($event)"
+            [disabled]="dropdownDisabled()">
+          </app-projects-dropdown>
+        </div>
       </form>
-      <div id='projects-container' *ngIf="atLeastV2p1$ | async">
-        <app-projects-dropdown
-          [projects]="projects"
-          (onProjectChecked)="onProjectChecked($event)"
-          [disabled]="dropdownDisabled()">
-        </app-projects-dropdown>
-      </div>
-      <chef-button [disabled]="isLoadingTeam || !updateNameForm.valid || formPristine"
+      <chef-button [disabled]="isLoadingTeam || !updateNameForm.valid || !updateNameForm.dirty"
         primary inline (click)="saveTeam()" data-cy="team-details-submit-button">
         <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
         <span *ngIf="saving">Saving...</span>
