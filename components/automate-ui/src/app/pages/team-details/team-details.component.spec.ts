@@ -184,9 +184,11 @@ describe('TeamDetailsComponent', () => {
   });
 
   it('initializes dropdown with those included on the team checked', () => {
+    spyOn(store, 'dispatch').and.callThrough();
     const teamProjects = ['b-proj', 'd-proj'];
     const team: Team = { id: targetId, guid: 'any', name: 'any', projects: teamProjects };
     store.dispatch(new GetTeamSuccess(team));
+    expect(store.dispatch).toHaveBeenCalledWith(new GetProjects());
 
     const version: IamVersionResponse = { version: { major: 'v2', minor: 'v1' } };
     store.dispatch(new GetIamVersionSuccess(version));

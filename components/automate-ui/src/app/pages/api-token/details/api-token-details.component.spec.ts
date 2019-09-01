@@ -114,7 +114,6 @@ describe('ApiTokenDetailsComponent', () => {
 
     fixture = TestBed.createComponent(ApiTokenDetailsComponent);
     component = fixture.componentInstance;
-    component.token = someToken;
     fixture.detectChanges();
   });
 
@@ -124,12 +123,12 @@ describe('ApiTokenDetailsComponent', () => {
 
   it('initializes dropdown with those included on the token checked', () => {
     spyOn(store, 'dispatch').and.callThrough();
-    someToken.projects  = ['b-proj', 'd-proj'];
-    store.dispatch(new GetTokenSuccess(someToken));
+    const tokenProjects  = ['b-proj', 'd-proj'];
+    store.dispatch(new GetTokenSuccess({...someToken, projects: tokenProjects}));
+    expect(store.dispatch).toHaveBeenCalledWith(new GetProjects());
 
     const version: IamVersionResponse = { version: { major: 'v2', minor: 'v1' } };
     store.dispatch(new GetIamVersionSuccess(version));
-    expect(store.dispatch).toHaveBeenCalledWith(new GetProjects());
 
     const projectList = [
       genProject('a-proj'),
@@ -140,7 +139,7 @@ describe('ApiTokenDetailsComponent', () => {
     store.dispatch(new GetProjectsSuccess({ projects: projectList }));
 
     projectList.forEach(p => {
-      expect(component.projects[p.id].checked).toEqual(someToken.projects.includes(p.id));
+      expect(component.projects[p.id].checked).toEqual(tokenProjects.includes(p.id));
     });
    });
 
