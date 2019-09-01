@@ -252,12 +252,8 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     this.saving = true;
     this.updateNameForm.controls['name'].disable();
     const name: string = this.updateNameForm.controls.name.value.trim();
-    this.store.dispatch(new UpdateTeam({
-        id: this.team.id,
-        name: name,
-        guid: this.team.guid, // to be deprecated after GA
-        projects: Object.values(this.projects).filter(p => p.checked).map(p => p.id)
-      }));
+    const projects = Object.keys(this.projects).filter(id => this.projects[id].checked);
+    this.store.dispatch(new UpdateTeam({ ...this.team, name, projects }));
 
     const pendingSave = new Subject<boolean>();
     this.store.pipe(

@@ -89,8 +89,8 @@ export class ApiTokenEffects {
     this.actions$.pipe(ofType<UpdateToken>(ApiTokenActionTypes.UPDATE)),
     this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
-      mergeMap(([{ payload: { token } }, version]: [UpdateToken, IAMMajorVersion]) =>
-        this.requests.update(token, version).pipe(
+      mergeMap(([{ payload }, version]: [UpdateToken, IAMMajorVersion]) =>
+        this.requests.update(payload, version).pipe(
           map(resp => new UpdateTokenSuccess(versionizeToken(resp))),
           catchError((error: HttpErrorResponse) => of(new UpdateTokenFailure(error))))));
 

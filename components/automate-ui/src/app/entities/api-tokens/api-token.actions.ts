@@ -59,7 +59,7 @@ export class GetTokenFailure implements Action {
 
 export class UpdateToken implements Action {
   readonly type = ApiTokenActionTypes.UPDATE;
-  constructor(public payload: {token: ApiToken}) { }
+  constructor(public payload: ApiToken) { }
 }
 
 export class UpdateTokenSuccess implements Action {

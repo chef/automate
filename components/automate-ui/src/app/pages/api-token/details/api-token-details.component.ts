@@ -110,9 +110,8 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
     this.saveInProgress = true;
     const name: string = this.updateForm.controls.name.value.trim();
     const active = <TokenStatus>this.updateForm.controls.status.value === 'active';
-    const projects: string[] = this.updateForm.controls.projects.value;
-    const token: ApiToken = { ...this.token, name, active, projects };
-    this.store.dispatch(new UpdateToken({ token }));
+    const projects = Object.keys(this.projects).filter(id => this.projects[id].checked);
+    this.store.dispatch(new UpdateToken({...this.token, name, active, projects }));
 
     const pendingSave = new Subject<boolean>();
     this.store.pipe(
@@ -139,8 +138,6 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
   // updates whether the project was checked or unchecked
   onProjectChecked(project: ProjectChecked): void {
     this.projects[project.id].checked = project.checked;
-    const projectsSelected = Object.values(this.projects).filter(p => p.checked);
-    this.updateForm.controls.projects.setValue(projectsSelected.map(p => p.id));
 
     // since the app-projects-dropdown is not a true form input (select)
     // we have to manage the form reactions
