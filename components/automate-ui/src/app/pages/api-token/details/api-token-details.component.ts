@@ -12,8 +12,7 @@ import { loading, EntityStatus } from 'app/entities/entities';
 import { GetToken, UpdateToken } from 'app/entities/api-tokens/api-token.actions';
 import { apiTokenFromRoute, updateStatus } from 'app/entities/api-tokens/api-token.selectors';
 import { ApiToken } from 'app/entities/api-tokens/api-token.model';
-import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
-import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
+import { atLeastV2p1 } from 'app/entities/policies/policy.selectors';
 import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 import { GetProjects } from 'app/entities/projects/project.actions';
 import {
@@ -60,12 +59,14 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.atLeastV2p1$ = this.store.select(atLeastV2p1);
+
     this.store.pipe(
       select(apiTokenFromRoute),
       filter(identity),
       takeUntil(this.isDestroyed))
-      .subscribe((state) => {
-        this.token = { ...state };
+      .subscribe((token) => {
+        this.token = { ...token };
         this.updateForm.controls.name.setValue(this.token.name);
         this.status = this.token.active ? 'active' : 'inactive';
         this.updateForm.controls.status.setValue(this.status);
@@ -80,15 +81,6 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
       .subscribe((id: string) => {
         this.store.dispatch(new GetToken({ id }));
       });
-
-    this.atLeastV2p1$ = combineLatest([
-      this.store.select(iamMajorVersion),
-      this.store.select(iamMinorVersion)])
-      .pipe(
-        takeUntil(this.isDestroyed),
-        map(([major, minor]: [IAMMajorVersion, IAMMinorVersion]) =>
-          major > 'v2' || (major === 'v2' && minor >= 'v1')
-        ));
 
     combineLatest([
       this.store.select(allProjects),

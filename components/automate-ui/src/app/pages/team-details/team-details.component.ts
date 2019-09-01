@@ -13,7 +13,11 @@ import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
 import { allUsers, userStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
-import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
+import {
+  iamMajorVersion,
+  iamMinorVersion,
+  atLeastV2p1
+} from 'app/entities/policies/policy.selectors';
 import {
   v1TeamFromRoute,
   v2TeamFromRoute,
@@ -72,8 +76,9 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public addButtonText = 'Add Users';
   public removeText = 'Remove User';
 
-  public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
+  public atLeastV2p1$: Observable<boolean>;
   public projects: ProjectCheckedMap = {};
+  public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
   constructor(private store: Store<NgrxStateAtom>,
     public fb: FormBuilder,
@@ -104,6 +109,8 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.atLeastV2p1$ = this.store.select(atLeastV2p1);
+
     this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
       .subscribe((url: string) => {
         this.url = url;
