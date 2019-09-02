@@ -23,12 +23,24 @@ var (
 type WorkflowScheduler struct {
 	backend           backend.SchedulerDriver
 	workflowWakeupFun func()
+	triggerChan       chan struct{}
 }
 
 func NewWorkflowScheduler(b backend.SchedulerDriver, w func()) *WorkflowScheduler {
 	return &WorkflowScheduler{
 		backend:           b,
 		workflowWakeupFun: w,
+		triggerChan:       make(chan struct{}),
+	}
+}
+
+func (w *WorkflowScheduler) Trigger() {
+	if w == nil {
+		return
+	}
+	select {
+	case w.triggerChan <- struct{}{}:
+	default:
 	}
 }
 
@@ -40,6 +52,11 @@ func (w *WorkflowScheduler) Run(ctx context.Context) {
 		case <-ctx.Done():
 			logrus.Info("WorkflowScheduler shutting down")
 			return
+		case <-w.triggerChan:
+			nextSleep, err = w.scheduleWorkflows(ctx)
+			if err != nil {
+				logrus.WithError(err).Error("Failed to schedule workflows")
+			}
 		case <-time.After(nextSleep):
 			nextSleep, err = w.scheduleWorkflows(ctx)
 			if err != nil {
