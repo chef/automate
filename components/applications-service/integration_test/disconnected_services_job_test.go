@@ -95,7 +95,7 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 		logrus.Info("Starting check for job runner")
 		runsThusFar := runners.MarkDisconnectedServicesExecutor.TotalRuns()
 		detectedJobRun := false
-		for i := 0; i <= 1000; i++ {
+		for i := 0; i <= 100; i++ {
 			if runners.MarkDisconnectedServicesExecutor.TotalRuns() > runsThusFar {
 				detectedJobRun = true
 				break

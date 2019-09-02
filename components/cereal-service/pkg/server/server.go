@@ -522,6 +522,7 @@ func (s *CerealService) CreateWorkflowSchedule(ctx context.Context, req *cereal.
 		}
 		return nil, err
 	}
+	s.workflowScheduler.Trigger()
 	return &cereal.CreateWorkflowScheduleResponse{}, nil
 }
 
@@ -686,6 +687,7 @@ func (s *CerealService) UpdateWorkflowScheduleByName(ctx context.Context, req *c
 		}
 		return nil, err
 	}
+	s.workflowScheduler.Trigger()
 	return &cereal.UpdateWorkflowScheduleByNameResponse{}, nil
 }
 
