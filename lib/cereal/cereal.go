@@ -901,8 +901,12 @@ func (m *Manager) CreateWorkflowSchedule(
 	if err != nil {
 		return err
 	}
-	return m.backend.CreateWorkflowSchedule(context.TODO(), instanceName, workflowName,
+	err = m.backend.CreateWorkflowSchedule(context.TODO(), instanceName, workflowName,
 		jsonData, enabled, recurRule.String(), nextRunAt)
+	if err == nil {
+		m.workflowScheduler.Trigger()
+	}
+	return err
 }
 
 // WorkflowScheduleUpdateOpts represents changes that can be made to a scheduled
@@ -952,7 +956,11 @@ func (m *Manager) UpdateWorkflowScheduleByName(ctx context.Context,
 			return err
 		}
 	}
-	return m.backend.UpdateWorkflowScheduleByName(ctx, instanceName, workflowName, o)
+	err := m.backend.UpdateWorkflowScheduleByName(ctx, instanceName, workflowName, o)
+	if err == nil {
+		m.workflowScheduler.Trigger()
+	}
+	return err
 }
 
 // ListWorkflowSchedules list all the scheduled workflows.
