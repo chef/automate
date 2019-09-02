@@ -15,7 +15,7 @@ rm -rf {{pkg.svc_static_path}}/{migrations,data-migrations}
 
 {{~#eachAlive bind.cereal-service.members as |cereal-service|}}
 {{~#if @last}}
-addNoProxy {{event-service.sys.ip}}
+addNoProxy {{cereal-service.sys.ip}}
 {{~/if}}
 {{~/eachAlive}}
 
