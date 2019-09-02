@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/components/applications-service/pkg/server"
 	"github.com/golang/protobuf/ptypes"
@@ -90,9 +92,10 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 		err = runners.Start(suite.JobScheduler.CerealSvc)
 		require.NoError(t, err)
 
+		logrus.Info("Starting check for job runner")
 		runsThusFar := runners.MarkDisconnectedServicesExecutor.TotalRuns()
 		detectedJobRun := false
-		for i := 0; i <= 100; i++ {
+		for i := 0; i <= 1000; i++ {
 			if runners.MarkDisconnectedServicesExecutor.TotalRuns() > runsThusFar {
 				detectedJobRun = true
 				break
