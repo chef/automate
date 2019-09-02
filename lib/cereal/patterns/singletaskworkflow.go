@@ -33,6 +33,7 @@ func (s *SingleTaskWorkflowExecutor) OnStart(w cereal.WorkflowInstance, ev cerea
 	}
 
 	if err := w.EnqueueTask(s.taskName, params); err != nil {
+		logrus.WithError(err).Errorf("failed to enqueue task %s", s.taskName)
 		return w.Fail(err)
 	}
 	return w.Continue(nil)
@@ -41,9 +42,11 @@ func (s *SingleTaskWorkflowExecutor) OnStart(w cereal.WorkflowInstance, ev cerea
 func (s *SingleTaskWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev cereal.TaskCompleteEvent) cereal.Decision {
 	var result json.RawMessage
 	if err := ev.Result.Err(); err != nil {
+		logrus.WithError(err).Error("task failed")
 		return w.Fail(err)
 	}
 	if err := ev.Result.Get(&result); err != nil {
+		logrus.WithError(err).Error("failed to get task result")
 		return w.Fail(err)
 	}
 	return w.Complete(cereal.WithResult(result))
