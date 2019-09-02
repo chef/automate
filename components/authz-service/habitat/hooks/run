@@ -13,7 +13,7 @@ pg-helper create-extension "{{cfg.storage.database}}" "uuid-ossp"
 # cleanup old migration files
 rm -rf {{pkg.svc_static_path}}/{migrations,data-migrations}
 
-{{~#eachAlive bind.event-service.members as |event-service|}}
+{{~#eachAlive bind.cereal-service.members as |cereal-service|}}
 {{~#if @last}}
 addNoProxy {{event-service.sys.ip}}
 {{~/if}}

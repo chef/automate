@@ -113,7 +113,6 @@ CONFIG="$CONFIG --cereal-address {{cereal-service.sys.ip}}:{{cereal-service.cfg.
   {{~/if}}
 {{~/eachAlive}}
 
-
 pg-helper ensure-service-database "$DBNAME"
 
 # Start Ingest Service
