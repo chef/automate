@@ -378,12 +378,42 @@ func (app *ApplicationsServer) UpdateDisconnectedServicesConfig(ctx context.Cont
 
 func (app *ApplicationsServer) GetDeleteDisconnectedServicesConfig(ctx context.Context,
 	req *applications.GetDeleteDisconnectedServicesConfigReq) (*applications.PeriodicJobConfig, error) {
-	return nil, nil
+	config, err := app.jobScheduler.GetDeleteDisconnectedServicesJobConfig(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to load delete_disconnected_services job configuration")
+	}
+	res := &applications.PeriodicJobConfig{
+		Running:   config.Enabled,
+		Threshold: config.Params.ThresholdDuration,
+	}
+	return res, nil
 }
 
 func (app *ApplicationsServer) UpdateDeleteDisconnectedServicesConfig(ctx context.Context,
 	req *applications.PeriodicJobConfig) (*applications.UpdateDeleteDisconnectedServicesConfigRes, error) {
-	return nil, nil
+
+	if req.GetRunning() {
+		err := app.jobScheduler.EnableDeleteDisconnectedServicesJob(ctx)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to enable delete_disconnected_services job")
+		}
+	} else {
+		err := app.jobScheduler.DisableDeleteDisconnectedServicesJob(ctx)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to disable delete_disconnected_services job")
+		}
+	}
+
+	_, err := time.ParseDuration(req.GetThreshold())
+	if err != nil {
+		return nil, errors.Wrapf(err, "unable to parse delete_disconnected_services threshold %q", req.GetThreshold())
+	}
+	err = app.jobScheduler.UpdateDeleteDisconnectedServicesJobParams(ctx, &DisconnectedServicesParamsV0{ThresholdDuration: req.GetThreshold()})
+	if err != nil {
+		return nil, errors.Wrapf(err, "unable to update delete_disconnected_services parameters to %q", req.GetThreshold())
+	}
+
+	return &applications.UpdateDeleteDisconnectedServicesConfigRes{}, nil
 }
 
 // Convert storage.Service array to applications.Service array

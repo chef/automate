@@ -36,6 +36,9 @@ const (
 	DisconnectedServicesJobIntervalSeconds = 60
 	DisconnectedServicesJobName            = "disconnected_services"
 	DisconnectedServicesScheduleName       = "periodic_disconnected_services"
+
+	DeleteDisconnectedServicesJobName      = "delete_disconnected_services"
+	DeleteDisconnectedServicesScheduleName = "periodic_delete_disconnected_services"
 )
 
 func ConnectToJobsManager(jobCfg *config.Jobs, connFactory *secureconn.Factory) (*cereal.Manager, error) {
@@ -142,6 +145,57 @@ func (j *JobScheduler) DisableDisconnectedServicesJob(ctx context.Context) error
 		cereal.UpdateEnabled(false))
 	if err != nil {
 		return errors.Wrap(err, "failed to set disconnected_services job to disabled")
+	}
+	return nil
+
+}
+
+func (j *JobScheduler) GetDeleteDisconnectedServicesJobConfig(ctx context.Context) (*DisconnectedServicesConfigV0, error) {
+	sched, err := j.CerealSvc.GetWorkflowScheduleByName(ctx, DeleteDisconnectedServicesScheduleName, DeleteDisconnectedServicesJobName)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to retrieve schedule and config for delete_disconnected_services job")
+	}
+
+	var returnedParams DisconnectedServicesParamsV0
+	if err := sched.GetParameters(&returnedParams); err != nil {
+		return nil, errors.Wrap(err, "unable to load delete_disconnected_services job parameters")
+	}
+
+	return &DisconnectedServicesConfigV0{
+		Enabled: sched.Enabled,
+		Params:  &returnedParams,
+	}, nil
+}
+
+func (j *JobScheduler) UpdateDeleteDisconnectedServicesJobParams(ctx context.Context, params *DisconnectedServicesParamsV0) error {
+	err := j.CerealSvc.UpdateWorkflowScheduleByName(
+		ctx,
+		DeleteDisconnectedServicesScheduleName, DeleteDisconnectedServicesJobName,
+		cereal.UpdateParameters(params))
+	if err != nil {
+		return errors.Wrap(err, "failed to set delete_disconnected_services job to enabled")
+	}
+	return nil
+}
+
+func (j *JobScheduler) EnableDeleteDisconnectedServicesJob(ctx context.Context) error {
+	err := j.CerealSvc.UpdateWorkflowScheduleByName(
+		ctx,
+		DeleteDisconnectedServicesScheduleName, DeleteDisconnectedServicesJobName,
+		cereal.UpdateEnabled(true))
+	if err != nil {
+		return errors.Wrap(err, "failed to set delete_disconnected_services job to enabled")
+	}
+	return nil
+}
+
+func (j *JobScheduler) DisableDeleteDisconnectedServicesJob(ctx context.Context) error {
+	err := j.CerealSvc.UpdateWorkflowScheduleByName(
+		ctx,
+		DeleteDisconnectedServicesScheduleName, DeleteDisconnectedServicesJobName,
+		cereal.UpdateEnabled(false))
+	if err != nil {
+		return errors.Wrap(err, "failed to set delete_disconnected_services job to disabled")
 	}
 	return nil
 
