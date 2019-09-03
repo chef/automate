@@ -100,7 +100,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
           this.store.dispatch(new GetProject({ id: project_id }));
           this.store.dispatch(new GetRule({
             id: rule_id,
-            project_id: project_id
+            project_id
           }));
         })).subscribe();
 
@@ -145,7 +145,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         // Must stay in sync with error checks in project-rules.component.html
         name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
         id: ['', [Validators.required, Validators.pattern(Regex.patterns.ID),
-        Validators.maxLength(64)]],
+          Validators.maxLength(64)]],
         type: ['', Validators.required],
         conditions: this.fb.array(this.populateConditions())
       });
@@ -155,10 +155,6 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
-  }
-
-  get getConditions() {
-    return this.ruleForm.get('conditions');
   }
 
   getHeading(): string {
