@@ -227,7 +227,7 @@
   version = "v1.1.0"
 
 [[projects]]
-  digest = "1:746dcdabe712f3f748a35d4aba1208bb17212d525b34cb04cc1fdb9c9d6d012c"
+  digest = "1:894f28af0aba942ac18880562ff31742d343cc8d04015d7bf96c1401546936e1"
   name = "github.com/dexidp/dex"
   packages = [
     "api",
@@ -252,8 +252,8 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "aeb2861a40b50b283d3dcd964a421be7780b43b7"
-  version = "v2.18.0"
+  revision = "179cce36efda5343404194ebc292bfbc0dc183c3"
+  version = "v2.19.0"
 
 [[projects]]
   digest = "1:7a6852b35eb5bbc184561443762d225116ae630c26a7c4d90546619f1e7d2ad2"
