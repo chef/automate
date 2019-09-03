@@ -36,10 +36,10 @@ type policyStorage interface {
 	ReplacePolicyMembers(context.Context, string, []Member) ([]Member, error)
 	RemovePolicyMembers(context.Context, string, []Member) ([]Member, error)
 	DeletePolicy(context.Context, string) error
-	CreatePolicy(context.Context, *Policy) (*Policy, error)
+	CreatePolicy(context.Context, *Policy, bool) (*Policy, error)
 	ListPolicies(context.Context) ([]*Policy, error)
 	GetPolicy(context.Context, string) (*Policy, error)
-	UpdatePolicy(context.Context, *Policy) (*Policy, error)
+	UpdatePolicy(context.Context, *Policy, bool) (*Policy, error)
 	ListPolicyMembers(context.Context, string) ([]Member, error)
 	AddPolicyMembers(context.Context, string, []Member) ([]Member, error)
 	ApplyV2DataMigrations(context.Context) error

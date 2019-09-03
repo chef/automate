@@ -53,8 +53,6 @@ describe('roles API', () => {
                 }
             }).then((response) => {
                 nonAdminToken = response.body.token.value;
-                console.log('wat');
-                console.log(nonAdminToken);
             });
 
             cy.request({
