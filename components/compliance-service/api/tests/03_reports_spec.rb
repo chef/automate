@@ -54,6 +54,22 @@ describe File.basename(__FILE__) do
         }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
 
+    # Get report ids from a date range if they contain at least one control tagged 'web'
+    actual_data = GRPC reporting, :list_report_ids, Reporting::Query.new(filters: [
+        Reporting::ListFilter.new(type: 'start_time', values: ['2018-02-01T00:00:00Z']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-01T00:00:00Z']),
+        Reporting::ListFilter.new(type: 'control_tag:web', values: []),
+    ])
+    expected_json =
+        {
+            "ids" => ["44024b50-2e0d-42fa-a57c-dddddddddddd",
+                      "bb93e1b2-36d6-439e-ac70-cccccccccc04",
+                      "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
+                      "bb93e1b2-36d6-439e-ac70-cccccccccc09"
+            ]
+        }.to_json
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
+
     # Get all until march 4th up to and including beginning of day
     actual_data = GRPC reporting, :list_report_ids, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T00:00:00Z'])
@@ -104,6 +120,7 @@ describe File.basename(__FILE__) do
             "reports" => [
                 {
                     "id" => "44024b50-2e0d-42fa-a57c-dddddddddddd",
+                    "ipaddress"=>"192.168.56.33",
                     "nodeId" => "34cbbb4c-c502-4971-b193-00e987b4678c",
                     "nodeName" => "debian(2)-zeta-linux(f)-apache(p)-failed",
                     "endTime" => "2018-02-09T09:18:41Z",
@@ -124,6 +141,7 @@ describe File.basename(__FILE__) do
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
+                    "ipaddress"=>"10.3.4.5",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                     "nodeName" => "centos-beta",
                     "endTime" => "2018-03-04T09:18:41Z",
@@ -141,6 +159,7 @@ describe File.basename(__FILE__) do
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
+                    "ipaddress"=>"8.8.8.1",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e112",
                     "nodeName" => "redhat(2)-alpha-nginx(f)-apache(f)-failed",
                     "endTime" => "2018-03-04T09:18:42Z",
@@ -162,6 +181,7 @@ describe File.basename(__FILE__) do
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
+                    "ipaddress"=>"8.8.8.2",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e111",
                     "nodeName" => "redhat(2)-alpha-nginx(f)-apache(s)-failed",
                     "endTime" => "2018-03-04T09:18:42Z",
@@ -183,6 +203,7 @@ describe File.basename(__FILE__) do
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
+                    "ipaddress"=>"8.8.8.3",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e222",
                     "nodeName" => "RedHat(2)-beta-nginx(f)-apache(s)-failed",
                     "endTime" => "2018-03-04T09:18:43Z",
@@ -219,6 +240,7 @@ describe File.basename(__FILE__) do
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05",
+                    "ipaddress"=>"10.3.4.5",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                     "nodeName" => "centos-beta",
                     "endTime" => "2018-03-05T02:02:02Z",
@@ -236,6 +258,7 @@ describe File.basename(__FILE__) do
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc07",
+                    "ipaddress"=>"10.3.4.5",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                     "nodeName" => "centos-beta",
                     "endTime" => "2018-03-05T07:02:02Z",
@@ -256,6 +279,7 @@ describe File.basename(__FILE__) do
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc08",
+                    "ipaddress"=>"188.38.98.100",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e666",
                     "nodeName" => "ubuntu(1)-alpha-myprofile(s)-skipped",
                     "endTime" => "2018-03-07T03:02:02Z",
@@ -278,6 +302,7 @@ describe File.basename(__FILE__) do
         "reports" => [
             {
                 "id" => "44024b50-2e0d-42fa-a57c-dddddddddddd",
+                "ipaddress"=>"192.168.56.33",
                 "nodeId" => "34cbbb4c-c502-4971-b193-00e987b4678c",
                 "nodeName" => "debian(2)-zeta-linux(f)-apache(p)-failed",
                 "endTime" => "2018-02-09T09:18:41Z",
@@ -298,6 +323,7 @@ describe File.basename(__FILE__) do
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
+                "ipaddress"=>"10.3.4.5",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
                 "endTime" => "2018-03-04T09:18:41Z",
@@ -326,6 +352,7 @@ describe File.basename(__FILE__) do
             "reports" => [
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
+                    "ipaddress"=>"8.8.8.2",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e111",
                     "nodeName" => "redhat(2)-alpha-nginx(f)-apache(s)-failed",
                     "endTime" => "2018-03-04T09:18:42Z",
@@ -347,6 +374,7 @@ describe File.basename(__FILE__) do
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
+                    "ipaddress"=>"8.8.8.3",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e222",
                     "nodeName" => "RedHat(2)-beta-nginx(f)-apache(s)-failed",
                     "endTime" => "2018-03-04T09:18:43Z",
@@ -413,6 +441,57 @@ describe File.basename(__FILE__) do
     }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
 
+    # Get reports based on control tag filter
+    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
+      Reporting::ListFilter.new(type: 'control_tag:scope', values: ['NGI*'])
+    ])
+    expected_json = {
+        "reports" => [
+          {
+              "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
+              "ipaddress" => "10.3.4.5",
+              "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
+              "nodeName" => "centos-beta",
+              "endTime" => "2018-03-04T09:18:41Z",
+              "status" => "passed",
+              "controls" => {
+                  "total" => 18,
+                  "passed" => {
+                      "total" => 3
+                  },
+                  "skipped" => {
+                      "total" => 15
+                  },
+                  "failed" => {}
+              }
+          },
+          {
+            "endTime" => "2018-03-04T09:18:43Z",
+            "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
+            "ipaddress" => "8.8.8.3",
+            "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e222",
+            "nodeName" => "RedHat(2)-beta-nginx(f)-apache(s)-failed",
+            "status" => "failed",
+            "controls" => {
+              "failed" => {
+                "critical" => 1,
+                "major" => 1,
+                "total" => 2
+              },
+              "passed" => {
+                "total" => 1
+              },
+              "skipped" => {
+                "total" => 15
+              },
+              "total" => 18
+            }
+          }
+        ],
+        "total" => 2
+    }.to_json
+    assert_equal_json_sorted(expected_json, actual_data.to_json)
+
     # Get no reports as we find no match
     actual_data = GRPC reporting, :list_reports, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'job_id', values: ['12345678-1234-123e-b12e-22222missing'])
@@ -428,6 +507,7 @@ describe File.basename(__FILE__) do
         "reports" => [
             {
                 "id" => "44024b50-2e0d-42fa-a57c-dddddddddddd",
+                "ipaddress"=>"192.168.56.33",
                 "nodeId" => "34cbbb4c-c502-4971-b193-00e987b4678c",
                 "nodeName" => "debian(2)-zeta-linux(f)-apache(p)-failed",
                 "endTime" => "2018-02-09T09:18:41Z",
@@ -463,6 +543,7 @@ describe File.basename(__FILE__) do
         "reports" => [
             {
                 "id" => "44024b50-2e0d-42fa-a57c-dddddddddddd",
+                "ipaddress"=>"192.168.56.33",
                 "nodeId" => "34cbbb4c-c502-4971-b193-00e987b4678c",
                 "nodeName" => "debian(2)-zeta-linux(f)-apache(p)-failed",
                 "endTime" => "2018-02-09T09:18:41Z",
@@ -502,6 +583,7 @@ describe File.basename(__FILE__) do
         "reports" => [
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
+                "ipaddress"=>"10.3.4.5",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
                 "endTime" => "2018-03-04T09:18:41Z",
@@ -519,6 +601,7 @@ describe File.basename(__FILE__) do
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05",
+                "ipaddress"=>"10.3.4.5",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
                 "endTime" => "2018-03-05T02:02:02Z",
@@ -536,6 +619,7 @@ describe File.basename(__FILE__) do
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc07",
+                "ipaddress"=>"10.3.4.5",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
                 "endTime" => "2018-03-05T07:02:02Z",

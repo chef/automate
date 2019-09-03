@@ -115,7 +115,7 @@ func runApplicationsListDisconnectedServicesCmd(*cobra.Command, []string) error 
 
 	servicesRes, err := apiClient.ApplicationsClient().GetDisconnectedServices(ctx,
 		&applications.DisconnectedServicesReq{
-			ThresholdMinutes: int32(appsCmdFlags.thresholdMinutes),
+			ThresholdSeconds: int32(appsCmdFlags.thresholdMinutes * 60),
 		},
 	)
 	if err != nil {
@@ -173,7 +173,7 @@ func runApplicationsDeleteDisconnectedServicesCmd(*cobra.Command, []string) erro
 			"Failed to create a connection to the API")
 	}
 	req := &applications.DisconnectedServicesReq{
-		ThresholdMinutes: int32(appsCmdFlags.thresholdMinutes),
+		ThresholdSeconds: int32(appsCmdFlags.thresholdMinutes * 60),
 	}
 
 	listRes, err := apiClient.ApplicationsClient().GetDisconnectedServices(ctx, req)

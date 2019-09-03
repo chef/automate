@@ -10,6 +10,20 @@ set -eou pipefail
 OCTOKIT_ACCESS_TOKEN=$GITHUB_TOKEN
 export OCTOKIT_ACCESS_TOKEN
 
+upload_dep_manifest() {
+  if command -v buildkite-agent; then
+    dep_json='/go/src/github.com/chef/automate/a2-dependency-licenses.json'
+
+    if [ -f ${dep_json} ]; then
+      if ! buildkite-agent artifact upload ${dep_json}; then
+        echo "Failed to upload ${dep_json}"
+      fi
+    fi
+  fi
+}
+
+trap upload_dep_manifest EXIT
+
 echo "--- Installing Chef UI Library dependencies"
 pushd components/chef-ui-library
   npm install

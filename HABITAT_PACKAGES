@@ -36,7 +36,6 @@ automate-prometheus components/automate-prometheus
 # automate-ui components/automate-ui
 compliance-service components/compliance-service
 config-mgmt-service components/config-mgmt-service
-data-lifecycle-service components/data-lifecycle-service
 automate-cli components/automate-cli
 deployment-service components/automate-deployment
 es-sidecar-service components/es-sidecar-service

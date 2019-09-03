@@ -2,15 +2,14 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-	"os"
-
 	compliance "github.com/chef/automate/components/compliance-service"
 	"github.com/chef/automate/components/compliance-service/config"
-	"github.com/chef/automate/lib/platform"
+	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/tracing"
 )
 
@@ -35,6 +34,9 @@ var conf = config.Compliance{
 		TmpDir:        os.Getenv("TMPDIR"),
 	},
 	ElasticSearch: config.ElasticSearch{},
+	ElasticSearchSidecar: config.ElasticSearchSidecar{
+		Address: "127.0.0.1:10123",
+	},
 	Profiles: config.Profiles{
 		MarketPath:   "./market",
 		ProfilesPath: "./profiles",
@@ -69,7 +71,7 @@ var runCmd = &cobra.Command{
 		}
 
 		if conf.Postgres.Database != "" {
-			conf.Postgres.ConnectionString, err = platform.PGURIFromEnvironment(conf.Postgres.Database)
+			conf.Postgres.ConnectionString, err = platform_config.PGURIFromEnvironment(conf.Postgres.Database)
 			if err != nil {
 				logrus.WithError(err).Fatal("Failed to get pg uri from platform config")
 			}
@@ -103,7 +105,7 @@ func init() {
 
 	// ElasticSearch Config Flags
 	runCmd.Flags().StringVar(&conf.ElasticSearch.Url, "es-url", conf.ElasticSearch.Url, "ES Url")
-	runCmd.Flags().StringVar(&conf.ESSidecarAddress, "es-sidecar-address", conf.ESSidecarAddress, "ES Sidecar Address")
+	runCmd.Flags().StringVar(&conf.ElasticSearchSidecar.Address, "es-sidecar-address", conf.ElasticSearchSidecar.Address, "ES Sidecar Address")
 
 	// Profiles Config Flags
 	runCmd.Flags().StringVar(&conf.Profiles.MarketPath, "market-path", conf.Profiles.MarketPath, "Market Profiles Path")
@@ -144,4 +146,7 @@ func init() {
 
 	// Event Service Flags
 	runCmd.Flags().StringVar(&conf.EventConfig.Endpoint, "event-endpoint", conf.EventConfig.Endpoint, "Event Service Endpoint")
+
+	// Cereal Service Flags
+	runCmd.Flags().StringVar(&conf.CerealConfig.Endpoint, "cereal-endpoint", conf.CerealConfig.Endpoint, "Cereal Service Endpoint")
 }

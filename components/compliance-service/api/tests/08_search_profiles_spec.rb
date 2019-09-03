@@ -248,6 +248,42 @@ describe File.basename(__FILE__) do
     }.to_json
     assert_equal(expected_data, actual_data.to_json)
 
+    # Get profiles used in reports where control tags scope:apache or scope:nginx are used
+    actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(filters: [
+        Reporting::ListFilter.new(type: 'control_tag:scope', values: ['apache', 'nginx']),
+        Reporting::ListFilter.new(type: "end_time", values: ["2018-03-04T#{END_OF_DAY}"])
+    ])
+    expected_data = {
+        "profiles" => [
+            {
+                "name" => "fake-baseline",
+                "title" => "A fake one",
+                "id" => "41a02797bfea15592ba2748d55929d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                "version" => "2.0.1",
+                "status" => "skipped"
+            },
+            {
+                "name" => "apache-baseline",
+                "title" => "DevSec Apache Baseline",
+                "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                "version" => "2.0.1",
+                "status" => "skipped"
+            },
+            {
+                "name" => "nginx-baseline",
+                "title" => "DevSec Nginx Baseline",
+                "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                "version" => "2.1.0",
+                "status" => "failed"
+            }
+        ],
+        "counts" => {
+            "total" => 3,
+            "failed" => 1,
+            "skipped" => 2
+        }
+    }.to_json
+    assert_equal(expected_data, actual_data.to_json)
 
     # Filter by job_id which exists on this date
     actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(filters: [

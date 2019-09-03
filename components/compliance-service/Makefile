@@ -14,6 +14,7 @@ EVENT_CONFIG_PATH ?= /tmp/event-service.toml
 COMPLIANCE_LOG_PATH ?= /tmp/compliance.log
 ELASTICSEARCH_PORT   ?= 9200
 ELASTICSEARCH_URL     = http://127.0.0.1:$(ELASTICSEARCH_PORT)
+ES_SIDECAR_ADDRESS ?= 127.0.0.1:10123
 TMP_PATH = /tmp
 MARKET_PATH = $(TMP_PATH)/market
 PROFILES_PATH = $(TMP_PATH)/profiles
@@ -41,9 +42,9 @@ SS_SSL_KEY="$(PWD)/../../dev/certs/secrets-service.key"
 SSL_ROOT_CERT="$(PWD)/../../dev/certs/Chef_Automate_FAKE_Dev.crt"
 DEV_CERT_PATHS=--cert $(SSL_CERT) --key $(SSL_KEY) --root-cert $(SSL_ROOT_CERT)
 # RUN_MODE=test is used to disable some bits of the code not used during testing now
-DEBUG_COMMAND = RUN_MODE="test" dlv debug --headless --listen=:59408 --api-version=2 cmd/compliance-service/main.go -- run --port $(PORT) --market-path "$(MARKET_PATH)" --profiles-path "$(PROFILES_PATH)" --es-url "$(ELASTICSEARCH_URL)" --postgres-uri "$(POSTGRES_URI)" --secrets-port $(SS_PORT) --manager-port $(MANAGER_PORT) --event-endpoint $(EVENT_ENDPOINT) --inspec-tmp-dir "$(TMP_PATH)" $(DEV_CERT_PATHS) --log-level "debug" --config /tmp/.compliance-service.toml
-RUN_COMMAND = RUN_MODE="test" go run -ldflags $(LDFLAGS) cmd/compliance-service/main.go run --port $(PORT) --market-path "$(MARKET_PATH)" --profiles-path "$(PROFILES_PATH)" --es-url "$(ELASTICSEARCH_URL)" --postgres-uri "$(POSTGRES_URI)" --secrets-port $(SS_PORT)  --event-endpoint $(EVENT_ENDPOINT)  --manager-port $(MANAGER_PORT) --inspec-tmp-dir "$(TMP_PATH)" $(DEV_CERT_PATHS) --config /tmp/.compliance-service.toml
-RUN_COMMAND_RACECHECK = RUN_MODE="test" go run --race -ldflags $(LDFLAGS) cmd/compliance-service/main.go run --port $(PORT) --market-path "$(MARKET_PATH)" --profiles-path "$(PROFILES_PATH)" --es-url "$(ELASTICSEARCH_URL)" --postgres-uri "$(POSTGRES_URI)" --secrets-port $(SS_PORT)  --manager-port $(MANAGER_PORT) --event-endpoint $(EVENT_ENDPOINT) --inspec-tmp-dir "$(TMP_PATH)" $(DEV_CERT_PATHS) -- log-level "debug" --config /tmp/.compliance-service.toml
+DEBUG_COMMAND = RUN_MODE="test" dlv debug --headless --listen=:59408 --api-version=2 cmd/compliance-service/main.go -- run --port $(PORT) --market-path "$(MARKET_PATH)" --profiles-path "$(PROFILES_PATH)" --es-url "$(ELASTICSEARCH_URL)" --postgres-uri "$(POSTGRES_URI)" --secrets-port $(SS_PORT) --manager-port $(MANAGER_PORT) --event-endpoint $(EVENT_ENDPOINT) --es-sidecar-address $(ES_SIDECAR_ADDRESS) --inspec-tmp-dir "$(TMP_PATH)" $(DEV_CERT_PATHS) --log-level "debug" --config /tmp/.compliance-service.toml
+RUN_COMMAND = RUN_MODE="test" go run -ldflags $(LDFLAGS) cmd/compliance-service/main.go run --port $(PORT) --market-path "$(MARKET_PATH)" --profiles-path "$(PROFILES_PATH)" --es-url "$(ELASTICSEARCH_URL)" --postgres-uri "$(POSTGRES_URI)" --secrets-port $(SS_PORT) --event-endpoint $(EVENT_ENDPOINT) --es-sidecar-address $(ES_SIDECAR_ADDRESS) --manager-port $(MANAGER_PORT) --inspec-tmp-dir "$(TMP_PATH)" $(DEV_CERT_PATHS) --config /tmp/.compliance-service.toml
+RUN_COMMAND_RACECHECK = RUN_MODE="test" go run --race -ldflags $(LDFLAGS) cmd/compliance-service/main.go run --port $(PORT) --market-path "$(MARKET_PATH)" --profiles-path "$(PROFILES_PATH)" --es-url "$(ELASTICSEARCH_URL)" --postgres-uri "$(POSTGRES_URI)" --secrets-port $(SS_PORT)  --manager-port $(MANAGER_PORT) --event-endpoint $(EVENT_ENDPOINT) --es-sidecar-address $(ES_SIDECAR_ADDRESS) --inspec-tmp-dir "$(TMP_PATH)" $(DEV_CERT_PATHS) -- log-level "debug" --config /tmp/.compliance-service.toml
 RUN_COMMAND_INFO = $(RUN_COMMAND) --log-level "info"
 RUN_COMMAND_DEBUG = $(RUN_COMMAND) --log-level "debug"
 TEST_PATH = "$(PWD)/api/tests"

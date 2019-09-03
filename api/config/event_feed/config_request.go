@@ -25,7 +25,6 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Service.Host = w.String("0.0.0.0")
 	c.V1.Sys.Service.Port = w.Int32(10134)
 	c.V1.Sys.Log.Level = w.String("info")
-	c.V1.Sys.Service.PurgeEventFeedAfterDays = w.Int32(7)
 	return c
 }
 
@@ -34,7 +33,20 @@ func DefaultConfigRequest() *ConfigRequest {
 // instance of config.InvalidConfigError that has the missing keys and invalid
 // fields populated.
 func (c *ConfigRequest) Validate() error {
-	return nil
+	err := shared.NewInvalidConfigError()
+
+	if c.GetV1().GetSys().GetService().GetPurgeEventFeedAfterDays() != nil {
+		err.AddDeprecation(
+			"event_feed_service.v1.sys.service.purge_event_feed_after_days",
+			"Configure the event feed data lifecycle with the chef.automate.domain.data_lifecycle.api.Purge gRPC interface",
+		)
+	}
+
+	if err.IsEmpty() {
+		return nil
+	}
+
+	return err
 }
 
 // PrepareSystemConfig returns a system configuration that can be used

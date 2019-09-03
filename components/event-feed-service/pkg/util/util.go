@@ -137,7 +137,7 @@ func ConvertAPIKeyToBackendKey(parameter string) string {
 		return "object_object_type"
 	case "task":
 		return "verb"
-	case "requestorName":
+	case "requestor_name":
 		return "actor_name"
 	default:
 		return parameter

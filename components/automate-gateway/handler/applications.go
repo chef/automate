@@ -60,6 +60,17 @@ func (a *Applications) GetServices(
 	return a.client.GetServices(ctx, request)
 }
 
+func (a *Applications) GetServicesDistinctValues(ctx context.Context,
+	request *applications.ServicesDistinctValuesReq) (*applications.ServicesDistinctValuesRes, error) {
+
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.client.GetServicesDistinctValues(ctx, request)
+}
+
 // GetServicesBySG returns a list of services within a service-group
 func (a *Applications) GetServicesBySG(
 	ctx context.Context,
@@ -83,6 +94,30 @@ func (a *Applications) GetServicesStats(
 	}).Debug("rpc call")
 
 	return a.client.GetServicesStats(ctx, request)
+}
+
+func (a *Applications) GetDisconnectedServicesConfig(
+	ctx context.Context,
+	request *applications.GetDisconnectedServicesConfigReq) (*applications.GetDisconnectedServicesConfigRes, error) {
+
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.client.GetDisconnectedServicesConfig(ctx, request)
+}
+
+func (a *Applications) UpdateDisconnectedServicesConfig(
+	ctx context.Context,
+	request *applications.UpdateDisconnectedServicesConfigReq) (*applications.UpdateDisconnectedServicesConfigRes, error) {
+
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.client.UpdateDisconnectedServicesConfig(ctx, request)
 }
 
 func (a *Applications) GetDisconnectedServices(

@@ -39,7 +39,7 @@ func TestFeedCountsReturnErrorWithWrongParameters(t *testing.T) {
 		date = time.Now()
 	)
 
-	_, err := testSuite.feedServer.GetFeedSummary(ctx, &event_feed.FeedSummaryRequest{
+	_, err := testSuite.feedClient.GetFeedSummary(ctx, &event_feed.FeedSummaryRequest{
 		End:   date.AddDate(0, 0, -6).Unix() * 1000,
 		Start: date.Unix() * 1000,
 	})
@@ -123,7 +123,7 @@ func TestFeedCountsReturnCountOverAThousandActions(t *testing.T) {
 
 	t.Run("Test to see if 1001 actions were counted",
 		func(t *testing.T) {
-			res, err := testSuite.feedServer.GetFeedSummary(ctx, &request)
+			res, err := testSuite.feedClient.GetFeedSummary(ctx, &request)
 			if assert.Nil(t, err) {
 				assert.Equal(t, int64(1001), res.TotalEntries)
 
@@ -162,7 +162,7 @@ func TestFeedCountsCountOnlyFilteredUsers(t *testing.T) {
 			description: "should count only 'User' events",
 			request: event_feed.FeedSummaryRequest{
 				CountCategory: "event-type",
-				Filters:       []string{"requestorName:User"},
+				Filters:       []string{"requestor_name:User"},
 			},
 			expectedCounts: entriesToTypeCounts(filter(entries, func(a *util.FeedEntry) bool {
 				return a.ActorName == "User"
@@ -172,7 +172,7 @@ func TestFeedCountsCountOnlyFilteredUsers(t *testing.T) {
 			description: "should count only 'UI User' actions",
 			request: event_feed.FeedSummaryRequest{
 				CountCategory: "event-type",
-				Filters:       []string{"requestorName:UI User"},
+				Filters:       []string{"requestor_name:UI User"},
 			},
 			expectedCounts: entriesToTypeCounts(filter(entries, func(a *util.FeedEntry) bool {
 				return a.ActorName == "UI User"
@@ -182,7 +182,7 @@ func TestFeedCountsCountOnlyFilteredUsers(t *testing.T) {
 			description: "should count 'User' and 'UI User' actions",
 			request: event_feed.FeedSummaryRequest{
 				CountCategory: "event-type",
-				Filters:       []string{"requestorName:UI User", "requestorName:User"},
+				Filters:       []string{"requestor_name:UI User", "requestor_name:User"},
 			},
 			expectedCounts: entriesToTypeCounts(filter(entries, func(a *util.FeedEntry) bool {
 				return a.ActorName == "UI User" || a.ActorName == "User"
@@ -268,7 +268,7 @@ func TestTaskCountsCountOnlyFilteredUsers(t *testing.T) {
 			description: "should count only 'User' events",
 			request: event_feed.FeedSummaryRequest{
 				CountCategory: "task",
-				Filters:       []string{"requestorName:User"},
+				Filters:       []string{"requestor_name:User"},
 			},
 			expectedCounts: entriesToTaskCounts(filter(entries, func(a *util.FeedEntry) bool {
 				return stringutils.SliceContains(a.Tags, "User")
@@ -278,7 +278,7 @@ func TestTaskCountsCountOnlyFilteredUsers(t *testing.T) {
 			description: "should count only 'UI User' actions",
 			request: event_feed.FeedSummaryRequest{
 				CountCategory: "task",
-				Filters:       []string{"requestorName:UI User"},
+				Filters:       []string{"requestor_name:UI User"},
 			},
 			expectedCounts: entriesToTaskCounts(filter(entries, func(a *util.FeedEntry) bool {
 				return stringutils.SliceContains(a.Tags, "UI User")
@@ -288,7 +288,7 @@ func TestTaskCountsCountOnlyFilteredUsers(t *testing.T) {
 			description: "should count 'User' and 'UI User' actions",
 			request: event_feed.FeedSummaryRequest{
 				CountCategory: "task",
-				Filters:       []string{"requestorName:UI User", "requestorName:User"},
+				Filters:       []string{"requestor_name:UI User", "requestor_name:User"},
 			},
 			expectedCounts: entriesToTaskCounts(filter(entries, func(a *util.FeedEntry) bool {
 				return stringutils.SliceContains(a.Tags, "UI User") || stringutils.SliceContains(a.Tags, "User")
@@ -444,7 +444,7 @@ func runCases(t *testing.T, cases []testCase) {
 	for _, test := range cases {
 		t.Run(fmt.Sprintf("with request '%v' it %s", test.request, test.description),
 			func(t *testing.T) {
-				res, err := testSuite.feedServer.GetFeedSummary(ctx, &test.request)
+				res, err := testSuite.feedClient.GetFeedSummary(ctx, &test.request)
 				if assert.Nil(t, err) {
 					assert.Equal(t, test.expectedCounts.TotalEntries, res.TotalEntries)
 

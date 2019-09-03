@@ -371,7 +371,6 @@ export class ReportingComponent implements OnInit, OnDestroy {
   }
 
   getData(reportQuery: ReportQuery) {
-    if (reportQuery.filters.length === 0) { return; }
     this.reportData.getReportingSummary(reportQuery);
   }
 

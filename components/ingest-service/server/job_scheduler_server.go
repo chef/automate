@@ -2,11 +2,11 @@ package server
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
 	"fmt"
+	"strings"
 	"time"
 
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	rrule "github.com/teambition/rrule-go"
 	"google.golang.org/grpc/codes"
@@ -15,6 +15,7 @@ import (
 	"github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/datalifecycle/purge"
 )
 
 type JobSchedulerServer struct {
@@ -40,38 +41,70 @@ func (server *JobSchedulerServer) GetStatusJobScheduler(ctx context.Context,
 		return &ingest.JobSchedulerStatus{}, status.Error(codes.Internal, err.Error())
 	}
 
-	jobs := make([]*ingest.Job, 0, len(schedules))
+	var (
+		jobs      = []*ingest.Job{}
+		jobStatus = &ingest.JobSchedulerStatus{}
+	)
 	for _, sched := range schedules {
-		every, err := rruleToEvery(sched.Recurrence)
-		if err != nil {
-			return &ingest.JobSchedulerStatus{}, status.Error(codes.Internal, err.Error())
-		}
+		switch sched.WorkflowName {
+		case PurgeJobName:
+			var (
+				purgePolicies purge.Policies
+				job           *ingest.Job
+			)
 
-		var threshold string
-		err = json.Unmarshal(sched.Parameters, &threshold)
-		if err != nil {
-			return &ingest.JobSchedulerStatus{}, status.Error(codes.Internal, err.Error())
-		}
-		j := ingest.Job{
-			Running:   sched.Enabled,
-			Name:      sched.WorkflowName,
-			Every:     every,
-			Threshold: threshold,
-			NextRun:   getTimeString(sched.NextDueAt),
-		}
+			if err = sched.GetParameters(&purgePolicies); err != nil {
+				return jobStatus, status.Error(codes.Internal, err.Error())
+			}
 
-		if sched.LastStart != nil && sched.LastEnd != nil {
-			j.LastRun = getTimeString(*sched.LastStart)
-			j.LastElapsed = sched.LastEnd.Sub(*sched.LastStart).String()
-		}
+			if !sched.Enabled {
+				continue
+			}
 
-		jobs = append(jobs, &j)
+			toJobName := func(index string) string {
+				index = strings.ReplaceAll(index, "-", "_")
+				return fmt.Sprintf("%s_%s", PurgeJobName, index)
+			}
+
+			for _, policy := range purgePolicies.Es {
+				if policy.Disabled {
+					continue
+				}
+
+				job, err = workflowToIngestJob(
+					sched,
+					toJobName(policy.Name),
+					fmt.Sprintf("%dd", policy.OlderThanDays),
+				)
+
+				if err != nil {
+					return jobStatus, status.Error(codes.Internal, err.Error())
+				}
+				jobs = append(jobs, job)
+			}
+		// SingleJobWorkflow's
+		default:
+			var (
+				threshold string
+				job       *ingest.Job
+			)
+
+			if err = sched.GetParameters(&threshold); err != nil {
+				return jobStatus, status.Error(codes.Internal, err.Error())
+			}
+
+			job, err = workflowToIngestJob(sched, sched.WorkflowName, threshold)
+			if err != nil {
+				return jobStatus, status.Error(codes.Internal, err.Error())
+			}
+			jobs = append(jobs, job)
+		}
 	}
 
-	return &ingest.JobSchedulerStatus{
-		Jobs:    jobs,
-		Running: true,
-	}, nil
+	jobStatus.Running = true
+	jobStatus.Jobs = jobs
+
+	return jobStatus, nil
 }
 
 func (server *JobSchedulerServer) runJobNow(ctx context.Context, jobName string) error {
@@ -95,6 +128,32 @@ func (server *JobSchedulerServer) runJobNow(ctx context.Context, jobName string)
 	return err
 }
 
+func workflowToIngestJob(sched *cereal.Schedule, name string, threshold string) (*ingest.Job, error) {
+	every, err := rruleToEvery(sched.Recurrence)
+	if err != nil {
+		return nil, errors.Wrapf(
+			err,
+			"failed to parse recurrence for workflow %s",
+			name,
+		)
+	}
+
+	j := ingest.Job{
+		Running:   sched.Enabled,
+		Name:      name,
+		Every:     every,
+		Threshold: threshold,
+		NextRun:   getTimeString(sched.NextDueAt),
+	}
+
+	if sched.LastStart != nil && sched.LastEnd != nil {
+		j.LastRun = getTimeString(*sched.LastStart)
+		j.LastElapsed = sched.LastEnd.Sub(*sched.LastStart).String()
+	}
+
+	return &j, nil
+}
+
 func getTimeString(dateTime time.Time) string {
 	if dateTime.IsZero() {
 		return ""
@@ -109,6 +168,8 @@ func rruleToEvery(rruleStr string) (string, error) {
 	}
 
 	switch r.OrigOptions.Freq {
+	case rrule.DAILY:
+		return fmt.Sprintf("%dd", r.OrigOptions.Interval), nil
 	case rrule.HOURLY:
 		return fmt.Sprintf("%dh", r.OrigOptions.Interval), nil
 	case rrule.MINUTELY:

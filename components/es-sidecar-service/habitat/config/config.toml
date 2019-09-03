@@ -30,16 +30,6 @@ elasticsearch_url = "http://127.0.0.1:{{gwmember.cfg.http-port}}"
     {{~#if member.cfg.deprecated_external_es}}
 [backups]
   backend = "fs"
-      {{~#if cfg.backups.fs.root_location}}
-[backups.fs]
-  root_location = "{{cfg.backups.fs.root_location}}"
-        {{~#if cfg.backups.fs.max_snapshot_bytes_per_sec}}
-  max_snapshot_bytes_per_sec = "{{cfg.backups.fs.max_snapshot_bytes_per_sec}}"
-        {{~/if}}
-        {{~#if cfg.backups.fs.max_restore_bytes_per_sec}}
-  max_restore_bytes_per_sec = "{{cfg.backups.fs.max_restore_bytes_per_sec}}"
-        {{~/if}}
-      {{~/if}}
     {{else}}
       {{~#if cfg.backups.backend}}
 [backups]
@@ -48,6 +38,18 @@ elasticsearch_url = "http://127.0.0.1:{{gwmember.cfg.http-port}}"
     {{~/if}}
   {{~/if}}
 {{~/eachAlive}}
+
+{{~#if cfg.backups.fs.root_location}}
+[backups.fs]
+  root_location = "{{cfg.backups.fs.root_location}}"
+  {{~#if cfg.backups.fs.max_snapshot_bytes_per_sec}}
+  max_snapshot_bytes_per_sec = "{{cfg.backups.fs.max_snapshot_bytes_per_sec}}"
+  {{~/if}}
+  {{~#if cfg.backups.fs.max_restore_bytes_per_sec}}
+  max_restore_bytes_per_sec = "{{cfg.backups.fs.max_restore_bytes_per_sec}}"
+  {{~/if}}
+{{~/if}}
+
 
 {{~#if cfg.backups.s3.bucket}}
 [backups.s3]

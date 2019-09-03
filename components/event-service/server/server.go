@@ -15,17 +15,13 @@ import (
 // TODO: @gcp move to config pkg
 const (
 	// supported event types
-	ScanJobCreated           = "scanJobCreated"
-	ScanJobUpdated           = "scanJobUpdated"
-	ScanJobDeleted           = "scanJobDeleted"
-	ProfileCreated           = "profileCreated"
-	ProfileUpdated           = "profileUpdate"
-	ProfileDeleted           = "profileDeleted"
-	NodeTerminated           = "nodeTerminated"
-	ProjectRulesUpdate       = "projectRulesUpdate"
-	ProjectRulesUpdateFailed = "projectRulesUpdateFailed"
-	ProjectRulesUpdateStatus = "projectRulesUpdateStatus"
-	ProjectRulesCancelUpdate = "projectRulesCancelUpdate"
+	ScanJobCreated = "scanJobCreated"
+	ScanJobUpdated = "scanJobUpdated"
+	ScanJobDeleted = "scanJobDeleted"
+	ProfileCreated = "profileCreated"
+	ProfileUpdated = "profileUpdate"
+	ProfileDeleted = "profileDeleted"
+	NodeTerminated = "nodeTerminated"
 )
 
 //----------  SERVER  ----------//
@@ -62,10 +58,6 @@ func (s *Server) initRegistry() map[string][]string {
 	registry[ProfileUpdated] = []string{config.EVENT_FEED}
 	registry[ProfileDeleted] = []string{config.EVENT_FEED}
 	registry[NodeTerminated] = []string{config.CFG_KEY}
-	registry[ProjectRulesUpdate] = []string{config.CFG_KEY, config.COMPLIANCE_INGEST_KEY}
-	registry[ProjectRulesUpdateStatus] = []string{config.AUTHZ}
-	registry[ProjectRulesUpdateFailed] = []string{config.AUTHZ}
-	registry[ProjectRulesCancelUpdate] = []string{config.CFG_KEY, config.COMPLIANCE_INGEST_KEY}
 	logrus.Debug("Registry of events to handler types initialized...")
 	return registry
 }

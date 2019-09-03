@@ -10,11 +10,10 @@ func NewConfigRequest() *ConfigRequest {
 	return &ConfigRequest{
 		V1: &ConfigRequest_V1{
 			Sys: &ConfigRequest_V1_System{
-				Mlsa:      &config.Mlsa{},
-				Service:   &ConfigRequest_V1_System_Service{},
-				Logger:    &ConfigRequest_V1_System_Logger{},
-				Retention: &ConfigRequest_V1_System_Retention{},
-				Agent:     &ConfigRequest_V1_System_Agent{},
+				Mlsa:    &config.Mlsa{},
+				Service: &ConfigRequest_V1_System_Service{},
+				Logger:  &ConfigRequest_V1_System_Logger{},
+				Agent:   &ConfigRequest_V1_System_Agent{},
 			},
 			Svc: &ConfigRequest_V1_Service{},
 		},
@@ -28,7 +27,6 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Service.Port = w.Int32(10121)
 	c.V1.Sys.Logger.Level = w.String("info")
 	c.V1.Sys.Logger.Format = w.String("text")
-	c.V1.Sys.Retention.ComplianceReportDays = w.Int32(60)
 	c.V1.Sys.Agent.BufferSize = w.Int32(1000)
 	c.V1.Sys.Agent.Workers = w.Int32(10)
 	// Relying on default.toml to provide the value for RemoteInspecVersion
@@ -41,7 +39,21 @@ func DefaultConfigRequest() *ConfigRequest {
 // instance of config.InvalidConfigError that has the missing keys and invalid
 // fields populated.
 func (c *ConfigRequest) Validate() error {
-	return nil
+	err := config.NewInvalidConfigError()
+
+	ret := c.GetV1().GetSys().GetRetention()
+	if ret != nil {
+		err.AddDeprecation(
+			"compliance.v1.sys.retention",
+			"Configure the retention data lifecycle with the chef.automate.domain.data_lifecycle.api.Purge gRPC interface",
+		)
+	}
+
+	if err.IsEmpty() {
+		return nil
+	}
+
+	return err
 }
 
 // PrepareSystemConfig returns a system configuration that can be used

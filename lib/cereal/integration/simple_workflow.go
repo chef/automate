@@ -5,9 +5,9 @@ package integration
 import (
 	"context"
 	"sync"
-	"time"
 
 	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/backend"
 )
 
 // TestCompleteSimpleWorkflow tests that a workflow the launches a
@@ -24,7 +24,7 @@ func (suite *CerealTestSuite) TestCompleteSimpleWorkflow() {
 	// There will be once task that runs, along
 	// with the TaskCompleted
 	wgTask := sync.WaitGroup{}
-	wgTask.Add(2)
+	wgTask.Add(3)
 
 	m := suite.newManager(
 		WithTaskExecutorF(
@@ -49,12 +49,16 @@ func (suite *CerealTestSuite) TestCompleteSimpleWorkflow() {
 				},
 			},
 		),
+		WithManagerOpts(
+			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+				wgTask.Done()
+			}),
+		),
 	)
 	defer m.Stop()
 	err := m.EnqueueWorkflow(context.Background(), workflowName, instanceName, nil)
 	suite.Require().NoError(err, "Failed to enqueue workflow")
 	wgTask.Wait()
-	time.Sleep(20 * time.Millisecond)
 	err = m.Stop()
 	suite.NoError(err)
 }

@@ -1,4 +1,4 @@
-<app-admin-sidebar></app-admin-sidebar>
+<app-settings-sidebar></app-settings-sidebar>
 <chef-loading-spinner *ngIf="loading$ | async" size='50' fixed></chef-loading-spinner>
 
 <div class="container">
@@ -17,15 +17,16 @@
       <ng-container *ngIf="(sortedProjects$ | async)?.length > 0">
         <chef-toolbar>
           <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">
-            <chef-button [disabled]="(sortedProjects$ | async)?.length >= MAX_PROJECTS" id="create-button" primary (click)="openCreateModal()">Create Project</chef-button>
+            <chef-button [disabled]="(sortedProjects$ | async)?.length >= MAX_PROJECTS"
+              data-cy="create-project" primary (click)="openCreateModal()">Create Project</chef-button>
           </app-authorized>
           <app-authorized [allOf]="['/iam/v2beta/apply-rules', 'post']">
-            <chef-button secondary [disabled]="(projects.applyRulesStatus$ | async)?.state === ApplyRulesStatusState.Running" id="update-start-button" (click)="openConfirmUpdateStartModal()">
-              {{ applyRulesButtonText$ | async }}
-            </chef-button>
+            <chef-button secondary [disabled]="(projects.applyRulesStatus$ | async)?.state === ApplyRulesStatusState.Running"
+              id="update-start-button" (click)="openConfirmUpdateStartModal()">{{ applyRulesButtonText$ | async }}</chef-button>
           </app-authorized>
           <app-authorized [allOf]="['/iam/v2beta/apply-rules', 'delete']">
-            <chef-button *ngIf="(projects.applyRulesStatus$ | async)?.state === ApplyRulesStatusState.Running" tertiary id="update-stop-button" (click)="openConfirmUpdateStopModal()">Stop Updating Projects</chef-button>
+            <chef-button *ngIf="(projects.applyRulesStatus$ | async)?.state === ApplyRulesStatusState.Running"
+              tertiary id="update-stop-button" (click)="openConfirmUpdateStopModal()">Stop Updating Projects</chef-button>
           </app-authorized>
         </chef-toolbar>
         <app-authorized [allOf]="['/iam/v2beta/projects', 'get']">
@@ -45,12 +46,12 @@
                   <a [routerLink]="['/settings/projects', project.id]">{{ project.name }}</a>
                 </chef-td>
                 <chef-td>{{ project.id }}</chef-td>
-                <chef-td>Applied</chef-td>
-                <chef-td>OK</chef-td>
+                <chef-td>{{ getRulesStatus(project) }}</chef-td>
+                <chef-td>{{ getProjectStatus(project) }}</chef-td>
                 <chef-td class="controls">
                   <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project.id]">
                     <chef-control-menu>
-                      <chef-option (click)="startProjectDelete(project)">Delete Project</chef-option>
+                      <chef-option (click)="startProjectDelete(project)" data-cy="delete-project">Delete Project</chef-option>
                     </chef-control-menu>
                   </app-authorized>
                 </chef-td>
@@ -65,7 +66,7 @@
             <p>Create the first project to get started!</p>
           </div>
           <div class="empty-case-container">
-              <chef-button primary (click)="openCreateModal()">Create Project</chef-button>
+              <chef-button primary data-cy="create-project" (click)="openCreateModal()">Create Project</chef-button>
           </div>
         </app-authorized>
         <app-authorized not [allOf]="['/iam/v2beta/projects', 'post']">

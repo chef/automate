@@ -69,7 +69,7 @@ required = [
 
 [[constraint]]
   name = "github.com/grpc-ecosystem/grpc-gateway"
-  version = "1.9.5"
+  version = "1.10.0"
 
 [[constraint]]
   name = "github.com/olivere/elastic"
@@ -81,7 +81,7 @@ required = [
 
 [[constraint]]
   name = "github.com/dexidp/dex"
-  version = "2.18.0"
+  version = "2.19.0"
 
 [[constraint]]
   name = "github.com/coreos/go-oidc"
@@ -202,7 +202,7 @@ required = [
 # more easily.)
 [[constraint]]
   name = "github.com/open-policy-agent/opa"
-  revision = "7864d60dd78d748dbce54b569e939f5b0dc07486"
+  revision = "0d70daa545f5a4bf2e6edf3c1b2d635920299bc9"
 
 [[constraint]]
   name = "github.com/chef/toml"
@@ -256,6 +256,11 @@ required = [
 [[constraint]]
   name = "github.com/nats-io/go-nats-streaming"
   branch = "master"
+
+# session-service
+[[constraint]]
+  name = "github.com/alexedwards/scs"
+  version = "1.4.1"
 
 # for testing
 [[constraint]]

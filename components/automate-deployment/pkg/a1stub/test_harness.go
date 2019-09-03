@@ -177,7 +177,7 @@ func insertStubsInPATH() error {
 	}
 
 	// Inject this to avoid calling hab pkg exec
-	pg.PGDumpCmd = []string{"pg_dump"}
+	pg.DefaultPGDumpCmd = []string{"pg_dump"}
 
 	automateCtlPath, _ := exec.LookPath("automate-ctl")
 	pgDumpPath, _ := exec.LookPath("pg_dump")

@@ -4,12 +4,14 @@ host = "{{cfg.service.host}}"
 {{~else}}
 host = "{{sys.ip}}"
 {{~/if}}
-port = "{{cfg.service.port}}"
+port = {{cfg.service.port}}
 feed_interval = "{{cfg.service.feed_interval}}"
+asset_page_size = {{cfg.service.asset_page_size}}
+reports_page_size = {{cfg.service.reports_page_size}}
 
 [log]
 log_format = "{{cfg.log.format}}"
-log_level = "{{cfg.log.level}}"
+log_level = "debug"
 
 [tls]
 cert_path = "{{pkg.svc_config_path}}/service.crt"
@@ -38,3 +40,9 @@ target = "{{config-mgmt-service.cfg.host}}:{{config-mgmt-service.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
 
+[compliance]
+{{~#eachAlive bind.compliance-service.members as |compliance-service|}}
+{{~#if @last}}
+target = "{{compliance-service.sys.ip}}:{{compliance-service.cfg.port}}"
+{{~/if}}
+{{~/eachAlive}}

@@ -86,7 +86,7 @@
       "controls": [
         {
           "id": "os-01",
-          "code": "control 'os-01' do\n  impact 1.0\n  title 'Trusted hosts login'\n  desc \"Rhosts/hosts.equiv files are a weak implemenation of authentication. Disabling the .rhosts and hosts.equiv support helps to prevent users from subverting the system's normal access control mechanisms of the system.\"\n  describe command('find / -name \\'.rhosts\\'') do\n    its('stdout') { should be_empty }\n  end\n  describe command('find / -name \\'hosts.equiv\\' ') do\n    its('stdout') { should be_empty }\n  end\nend\n",
+          "code": "control 'os-01' do\n  impact 1.0\n  title 'Trusted hosts login'\n  desc \"Rhosts/hosts.equiv files are a weak implemenation of authentication. Disabling the .rhosts and hosts.equiv support helps to prevent users from subverting the system's normal access control mechanisms of the system.\"\n  describe command('find / -name \\'.rhosts\\'') do\n    its('stdout') { should be_empty }\n  end\n  describe command('find / -name \\'hosts.equiv\\' ') do\n    its('stdout') { should be_empty }\n  end\n  tag 'web'\n  tag 'scope': 'OS'\n  tag 'gtitle': 'TitleVal'\n  tag 'satisfies': ['SRG-00006', 'SRG-00007']\n  tag 'stig_id': 'RHEL-07-010050'\n  tag 'cci': ['CCI-000048']\n  tag 'hashhash': { \"bad.one\": [6] }\n  tag 'documentable': false\n  tag 'our_criticality': 8\nend\n  ",
           "desc": "Rhosts/hosts.equiv files are a weak implemenation of authentication. Disabling the .rhosts and hosts.equiv support helps to prevent users from subverting the system's normal access control mechanisms of the system.",
           "descriptions": [
             {
@@ -110,20 +110,20 @@
           },
           "refs": [],
           "tags": {
-            "firewall": null,
-            "gtitle": "SRG-OS-000023-GPOS-00006",
+            "web": null,
+            "scope": "OS",
+            "gtitle": "TitleVal",
             "satisfies": [
-              "SRG-OS-000023-GPOS-00006",
-              "SRG-OS-000024-GPOS-00007"
+              "SRG-00006",
+              "SRG-00007"
             ],
             "stig_id": "RHEL-07-010050",
-            "cci": [
-              "CCI-000048"
-            ],
+            "cci": ["CCI-000048"],
             "hashhash": {
               "bad.one": [6]
             },
-            "documentable": false
+            "documentable": false,
+            "our_criticality": 8
           },
           "results": [
             {
@@ -140,7 +140,7 @@
         },
         {
           "id": "os-02",
-          "code": "control 'os-02' do\n  impact 1.0\n  title 'Check owner and permissions for /etc/shadow'\n  desc 'Check periodically the owner and permissions for /etc/shadow'\n  describe file('/etc/shadow') do\n    it { should exist }\n    it { should be_file }\n    it { should be_owned_by 'root' }\n    its('group') { should eq 'root' }\n    it { should_not be_executable }\n    it { should be_writable.by('owner') }\n    it { should be_readable.by('owner') }\n    it { should_not be_readable.by('group') }\n    it { should_not be_readable.by('other') }\n  end\nend\n",
+          "code": "control 'os-02' do\n  impact 1.0\n  title 'Check owner and permissions for /etc/shadow'\n  desc 'Check periodically the owner and permissions for /etc/shadow'\n  describe file('/etc/shadow') do\n    it { should exist }\n    it { should be_file }\n    it { should be_owned_by 'root' }\n    its('group') { should eq 'root' }\n    it { should_not be_executable }\n    it { should be_writable.by('owner') }\n    it { should be_readable.by('owner') }\n    it { should_not be_readable.by('group') }\n    it { should_not be_readable.by('other') }\n  end\n  tag 'tag1': 'value1'\nend\n",
           "desc": "Check periodically the owner and permissions for /etc/shadow",
           "impact": 1,
           "title": "Check owner and permissions for /etc/shadow",

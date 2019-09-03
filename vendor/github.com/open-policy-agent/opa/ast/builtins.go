@@ -67,8 +67,10 @@ var DefaultBuiltins = [...]*Builtin{
 	ArrayConcat,
 	ArraySlice,
 
-	// Casting
+	// Conversions
 	ToNumber,
+
+	// Casts (DEPRECATED)
 	CastObject,
 	CastNull,
 	CastBoolean,
@@ -123,6 +125,8 @@ var DefaultBuiltins = [...]*Builtin{
 	JWTVerifyES256,
 	JWTVerifyHS256,
 	JWTDecodeVerify,
+	JWTEncodeSignRaw,
+	JWTEncodeSign,
 
 	// Time
 	NowNanos,
@@ -172,6 +176,9 @@ var DefaultBuiltins = [...]*Builtin{
 	// Glob
 	GlobMatch,
 	GlobQuoteMeta,
+
+	// Units
+	UnitsParseBytes,
 }
 
 // BuiltinMap provides a convenient mapping of built-in names to
@@ -522,7 +529,7 @@ var ArraySlice = &Builtin{
 }
 
 /**
- * Casting
+ * Conversions
  */
 
 // ToNumber takes a string, bool, or number value and converts it to a number.
@@ -540,65 +547,6 @@ var ToNumber = &Builtin{
 			),
 		),
 		types.N,
-	),
-}
-
-// CastArray checks the underlying type of the input. If it is array or set, an array
-// containing the values is returned. If it is not an array, an error is thrown.
-var CastArray = &Builtin{
-	Name: "cast_array",
-	Decl: types.NewFunction(
-		types.Args(types.A),
-		types.NewArray(nil, types.A),
-	),
-}
-
-// CastSet checks the underlying type of the input.
-// If it is a set, the set is returned.
-// If it is an array, the array is returned in set form (all duplicates removed)
-// If neither, an error is thrown
-var CastSet = &Builtin{
-	Name: "cast_set",
-	Decl: types.NewFunction(
-		types.Args(types.A),
-		types.NewSet(types.A),
-	),
-}
-
-// CastString returns input if it is a string; if not returns error.
-// For formatting variables, see sprintf
-var CastString = &Builtin{
-	Name: "cast_string",
-	Decl: types.NewFunction(
-		types.Args(types.A),
-		types.S,
-	),
-}
-
-// CastBoolean returns input if it is a boolean; if not returns error.
-var CastBoolean = &Builtin{
-	Name: "cast_boolean",
-	Decl: types.NewFunction(
-		types.Args(types.A),
-		types.B,
-	),
-}
-
-// CastNull returns null if input is null; if not returns error.
-var CastNull = &Builtin{
-	Name: "cast_null",
-	Decl: types.NewFunction(
-		types.Args(types.A),
-		types.NewNull(),
-	),
-}
-
-// CastObject returns the given object if it is null; throws an error otherwise
-var CastObject = &Builtin{
-	Name: "cast_object",
-	Decl: types.NewFunction(
-		types.Args(types.A),
-		types.NewObject(nil, types.NewDynamicProperty(types.A, types.A)),
 	),
 }
 
@@ -634,7 +582,7 @@ var RegexTemplateMatch = &Builtin{
 	),
 }
 
-// RegexSplit splits the input string by the occurences of the given pattern.
+// RegexSplit splits the input string by the occurrences of the given pattern.
 var RegexSplit = &Builtin{
 	Name: "regex.split",
 	Decl: types.NewFunction(
@@ -838,6 +786,18 @@ var Sprintf = &Builtin{
 	),
 }
 
+// UnitsParseBytes converts strings like 10GB, 5K, 4mb, and the like into an
+// integer number of bytes.
+var UnitsParseBytes = &Builtin{
+	Name: "units.parse_bytes",
+	Decl: types.NewFunction(
+		types.Args(
+			types.S,
+		),
+		types.N,
+	),
+}
+
 /**
  * JSON
  */
@@ -1027,6 +987,34 @@ var JWTDecodeVerify = &Builtin{
 			types.NewObject(nil, types.NewDynamicProperty(types.A, types.A)),
 			types.NewObject(nil, types.NewDynamicProperty(types.A, types.A)),
 		}, nil),
+	),
+}
+
+// JWTEncodeSignRaw encodes and optionally sign  a JSON Web Token.
+// Inputs are protected headers, payload, secret
+var JWTEncodeSignRaw = &Builtin{
+	Name: "io.jwt.encode_sign_raw",
+	Decl: types.NewFunction(
+		types.Args(
+			types.S,
+			types.S,
+			types.S,
+		),
+		types.S,
+	),
+}
+
+// JWTEncodeSign encodes and optionally sign  a JSON Web Token.
+// Inputs are protected headers, payload, secret
+var JWTEncodeSign = &Builtin{
+	Name: "io.jwt.encode_sign",
+	Decl: types.NewFunction(
+		types.Args(
+			types.NewObject(nil, types.NewDynamicProperty(types.S, types.A)),
+			types.NewObject(nil, types.NewDynamicProperty(types.S, types.A)),
+			types.NewObject(nil, types.NewDynamicProperty(types.S, types.A)),
+		),
+		types.S,
 	),
 }
 
@@ -1436,6 +1424,65 @@ var NetCIDROverlap = &Builtin{
 			types.S,
 		),
 		types.B,
+	),
+}
+
+// CastArray checks the underlying type of the input. If it is array or set, an array
+// containing the values is returned. If it is not an array, an error is thrown.
+var CastArray = &Builtin{
+	Name: "cast_array",
+	Decl: types.NewFunction(
+		types.Args(types.A),
+		types.NewArray(nil, types.A),
+	),
+}
+
+// CastSet checks the underlying type of the input.
+// If it is a set, the set is returned.
+// If it is an array, the array is returned in set form (all duplicates removed)
+// If neither, an error is thrown
+var CastSet = &Builtin{
+	Name: "cast_set",
+	Decl: types.NewFunction(
+		types.Args(types.A),
+		types.NewSet(types.A),
+	),
+}
+
+// CastString returns input if it is a string; if not returns error.
+// For formatting variables, see sprintf
+var CastString = &Builtin{
+	Name: "cast_string",
+	Decl: types.NewFunction(
+		types.Args(types.A),
+		types.S,
+	),
+}
+
+// CastBoolean returns input if it is a boolean; if not returns error.
+var CastBoolean = &Builtin{
+	Name: "cast_boolean",
+	Decl: types.NewFunction(
+		types.Args(types.A),
+		types.B,
+	),
+}
+
+// CastNull returns null if input is null; if not returns error.
+var CastNull = &Builtin{
+	Name: "cast_null",
+	Decl: types.NewFunction(
+		types.Args(types.A),
+		types.NewNull(),
+	),
+}
+
+// CastObject returns the given object if it is null; throws an error otherwise
+var CastObject = &Builtin{
+	Name: "cast_object",
+	Decl: types.NewFunction(
+		types.Args(types.A),
+		types.NewObject(nil, types.NewDynamicProperty(types.A, types.A)),
 	),
 }
 

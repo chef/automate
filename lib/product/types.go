@@ -63,6 +63,47 @@ func (p PackageName) String() string {
 	return fmt.Sprintf("%s/%s", p.Origin, p.Name)
 }
 
+// DeletedPackage represents a deleted package or service and the last version
+// and release.
+type DeletedPackage struct {
+	// Origin is the habitat origin this package belongs to
+	Origin string
+	// Name is the habitat name of the package
+	Name string
+	// Version is the habitat package version
+	Version string
+	// Release is the habitat build release
+	Release string
+}
+
+func (p *DeletedPackage) UnmarshalText(text []byte) error {
+	parts := strings.Split(string(text), "/")
+	if len(parts) == 4 {
+		p.Origin = parts[0]
+		p.Name = parts[1]
+		p.Version = parts[2]
+		p.Release = parts[3]
+	} else {
+		return errors.Errorf("%s is not a valid deleted package. Must be origin/name/version/release", parts)
+	}
+	return nil
+}
+
+func (p *DeletedPackage) MarshalText() ([]byte, error) {
+	return []byte(fmt.Sprintf("%s/%s/%s/%s", p.Origin, p.Name, p.Version, p.Release)), nil
+}
+
+func (p *DeletedPackage) validate() error {
+	if p.Origin == "" || p.Name == "" || p.Version == "" || p.Release == "" {
+		return errors.New("Invalid deleted package")
+	}
+	return nil
+}
+
+func (p DeletedPackage) String() string {
+	return fmt.Sprintf("%s/%s/%s/%s", p.Origin, p.Name, p.Version, p.Release)
+}
+
 // Collection is a group of services and packages that provide some
 // desired functionality. For example, postgres requires 3 services
 // to fully work in Automate: postgresql, a sidecar, and a tcp
@@ -185,6 +226,7 @@ type Package struct {
 // Metadata is the top level metadata the describes the automate
 // collections and its packages.
 type Metadata struct {
-	Packages    []*Package    `json:"packages"`
-	Collections []*Collection `json:"collections"`
+	Packages        []*Package       `json:"packages"`
+	DeletedPackages []DeletedPackage `json:"deleted_packages"`
+	Collections     []*Collection    `json:"collections"`
 }

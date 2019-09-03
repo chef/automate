@@ -44,7 +44,7 @@
     <figure>
       <label class="interval">
         <span>Showing:</span>
-        <chef-select (change)="onTrendIntervalChange($event)" [value]="reportQuery.interval">
+        <chef-select (change)="onTrendIntervalChange($event)" [value]="interval$ | async">
           <chef-option
             *ngFor="let interval of reportQuery.intervals; index as i"
             [value]="i">

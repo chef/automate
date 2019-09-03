@@ -35,7 +35,7 @@ func NewCerealService(ctx context.Context, b backend.Driver) *CerealService {
 	}
 
 	if v, ok := b.(backend.SchedulerDriver); ok {
-		cs.workflowScheduler = libcereal.NewWorkflowScheduler(v)
+		cs.workflowScheduler = libcereal.NewWorkflowScheduler(v, func() {})
 		go cs.workflowScheduler.Run(ctx)
 	}
 
@@ -287,6 +287,16 @@ func (s *CerealService) DequeueWorkflow(req cereal.Cereal_DequeueWorkflowServer)
 		return errInvalidMsg
 	}
 
+	err = writeDeqWorkRespMsg(ctx, req, &cereal.DequeueWorkflowResponse{
+		Cmd: &cereal.DequeueWorkflowResponse_Committed_{
+			Committed: &cereal.DequeueWorkflowResponse_Committed{},
+		},
+	})
+	if err != nil {
+		logctx.WithError(err).Error("failed to respond with committed message")
+		return err
+	}
+
 	return nil
 }
 
@@ -469,7 +479,12 @@ func (s *CerealService) DequeueTask(req cereal.Cereal_DequeueTaskServer) error {
 		return errInvalidMsg
 	}
 
-	return nil
+	err = writeDeqTaskRespMsg(ctx, req, &cereal.DequeueTaskResponse{
+		Cmd: &cereal.DequeueTaskResponse_Committed_{
+			Committed: &cereal.DequeueTaskResponse_Committed{},
+		},
+	})
+	return err
 }
 
 func (s *CerealService) CreateWorkflowSchedule(ctx context.Context, req *cereal.CreateWorkflowScheduleRequest) (*cereal.CreateWorkflowScheduleResponse, error) {
@@ -507,6 +522,7 @@ func (s *CerealService) CreateWorkflowSchedule(ctx context.Context, req *cereal.
 		}
 		return nil, err
 	}
+	s.workflowScheduler.Trigger()
 	return &cereal.CreateWorkflowScheduleResponse{}, nil
 }
 
@@ -521,7 +537,7 @@ func (s *CerealService) ListWorkflowSchedules(req *cereal.ListWorkflowSchedulesR
 		return err
 	}
 
-	logctx.Info("listing workflows")
+	logctx.Debug("listing workflows")
 	schedules, err := s.backend.ListWorkflowSchedules(out.Context())
 	if err != nil {
 		logctx.WithError(err).Error("failed to list workflow schedules")
@@ -565,7 +581,7 @@ func (s *CerealService) GetWorkflowScheduleByName(ctx context.Context, req *cere
 	if err := validateDomain(req.Domain); err != nil {
 		return nil, err
 	}
-	logctx.Info("getting workflow schedule")
+	logctx.Debug("getting workflow schedule")
 	schedule, err := s.backend.GetWorkflowScheduleByName(ctx, req.InstanceName, namespace(req.Domain, req.WorkflowName))
 	if err != nil {
 		logctx.WithError(err).Error("failed to get workflow schedule")
@@ -671,6 +687,7 @@ func (s *CerealService) UpdateWorkflowScheduleByName(ctx context.Context, req *c
 		}
 		return nil, err
 	}
+	s.workflowScheduler.Trigger()
 	return &cereal.UpdateWorkflowScheduleByNameResponse{}, nil
 }
 
@@ -685,7 +702,7 @@ func (s *CerealService) GetWorkflowInstanceByName(ctx context.Context, req *cere
 	if err := validateDomain(req.Domain); err != nil {
 		return nil, err
 	}
-	logctx.Info("getting workflow instance")
+	logctx.Debug("getting workflow instance")
 	workflowInstance, err := s.backend.GetWorkflowInstanceByName(ctx, req.GetInstanceName(), namespace(req.GetDomain(), req.GetWorkflowName()))
 	if err != nil {
 		logctx.WithError(err).Error("failed to get workflow instance")
@@ -732,14 +749,14 @@ func (s *CerealService) ListWorkflowInstances(req *cereal.ListWorkflowInstancesR
 		logctx = logctx.WithField("isRunning", isRunning)
 	}
 
-	logctx.Info("listing workflow instances")
+	logctx.Debug("listing workflow instances")
 	instances, err := s.backend.ListWorkflowInstances(resp.Context(), opts)
 	if err != nil {
 		logctx.WithError(err).Error("failed to list workflow instances")
 		return err
 	}
 
-	logctx.Infof("found %d matching instances", len(instances))
+	logctx.Debugf("found %d matching instances", len(instances))
 	for _, instance := range instances {
 		domain, workflowName := unnamespace(instance.WorkflowName)
 		if domain != req.Domain {

@@ -3,7 +3,6 @@ package testhelpers
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"net/url"
 	"os"
 	"path"
@@ -11,29 +10,23 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 
-	_struct "github.com/golang/protobuf/ptypes/struct"
-
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
-	"github.com/chef/automate/components/authz-service/config"
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/engine/opa"
 	"github.com/chef/automate/components/authz-service/prng"
 	grpc_server "github.com/chef/automate/components/authz-service/server"
 	server "github.com/chef/automate/components/authz-service/server/v2"
+	v2 "github.com/chef/automate/components/authz-service/server/v2"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	postgres_v1 "github.com/chef/automate/components/authz-service/storage/v1/postgres"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
-	automate_event_type "github.com/chef/automate/components/event-service/server"
-	project_update_tags "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
@@ -41,18 +34,15 @@ import (
 )
 
 type TestFramework struct {
-	Policy                api.PoliciesClient
-	Authz                 api.AuthorizationClient
-	Projects              api.ProjectsClient
-	TestDB                *TestDB
-	Engine                engine.Engine
-	Seed                  int64
-	PolicyRefresher       server.PolicyRefresher
-	ConfigManager         *config.Manager
-	ConfigManagerFilename string
-	GRPC                  *grpctest.Server
-	LatestEvent           *automate_event.EventMsg
-	ProjectUpdateManager  *server.ProjectUpdateManager
+	Policy               api.PoliciesClient
+	Authz                api.AuthorizationClient
+	Projects             api.ProjectsClient
+	TestDB               *TestDB
+	Engine               engine.Engine
+	Seed                 int64
+	PolicyRefresher      server.PolicyRefresher
+	GRPC                 *grpctest.Server
+	ProjectUpdateManager server.ProjectUpdateMgr
 }
 
 type TestDB struct {
@@ -72,11 +62,7 @@ func NewTestFramework(t *testing.T, ctx context.Context) *TestFramework {
 	t.Helper()
 	seed := prng.GenSeed(t)
 
-	eventServiceClient := automate_event.NewMockEventServiceClient(gomock.NewController(t))
-	pg, testDB, _, migrationConfig := SetupTestDB(t)
-	configMgrFilename := fmt.Sprintf("/tmp/.authz-delete-me-%d", time.Now().UTC().Unix())
-	configMgr, err := config.NewManager(configMgrFilename)
-	require.NoError(t, err)
+	pg, testDB, opaInstance, _, migrationConfig := SetupTestDB(t)
 
 	l, err := logger.NewLogger("text", "error")
 	require.NoError(t, err, "init logger for storage")
@@ -84,21 +70,21 @@ func NewTestFramework(t *testing.T, ctx context.Context) *TestFramework {
 	pgV1, err := postgres_v1.New(ctx, l, *migrationConfig)
 	require.NoError(t, err)
 
-	opaInstance, err := opa.New(ctx, l)
-	require.NoError(t, err, "init OPA")
-
 	vChan := make(chan api.Version, 1)
 	vSwitch := server.NewSwitch(vChan)
 
-	polSrv, polRefresher, err := server.NewPoliciesServer(ctx, l, pg, opaInstance, pgV1, vSwitch, vChan)
+	polRefresher, err := v2.NewPostgresPolicyRefresher(ctx, l, opaInstance)
 	require.NoError(t, err)
 
-	projectUpdateManager := server.NewProjectUpdateManager(eventServiceClient, configMgr)
+	polSrv, err := server.NewPoliciesServer(ctx, l, polRefresher, pg, opaInstance, pgV1, vSwitch, vChan)
+	require.NoError(t, err)
+
+	projectUpdateManager := NewMockProjectUpdateManager()
 	projectsSrv, err := server.NewProjectsServer(
 		ctx, l, pg, opaInstance, projectUpdateManager, polRefresher)
 	require.NoError(t, err)
 
-	authzSrv, err := server.NewAuthzServer(l, opaInstance, vSwitch, projectsSrv)
+	authzSrv, err := server.NewPostgresAuthzServer(l, opaInstance, vSwitch, projectsSrv)
 	require.NoError(t, err)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
@@ -121,24 +107,16 @@ func NewTestFramework(t *testing.T, ctx context.Context) *TestFramework {
 	}
 
 	tf := &TestFramework{
-		Policy:                api.NewPoliciesClient(conn),
-		Authz:                 api.NewAuthorizationClient(conn),
-		Projects:              api.NewProjectsClient(conn),
-		TestDB:                testDB,
-		Engine:                opaInstance,
-		Seed:                  seed,
-		PolicyRefresher:       polRefresher,
-		ConfigManager:         configMgr,
-		ConfigManagerFilename: configMgrFilename,
-		ProjectUpdateManager:  projectUpdateManager,
-		GRPC:                  grpcServ,
+		Policy:               api.NewPoliciesClient(conn),
+		Authz:                api.NewAuthorizationClient(conn),
+		Projects:             api.NewProjectsClient(conn),
+		TestDB:               testDB,
+		Engine:               opaInstance,
+		Seed:                 seed,
+		PolicyRefresher:      polRefresher,
+		ProjectUpdateManager: projectUpdateManager,
+		GRPC:                 grpcServ,
 	}
-
-	eventServiceClient.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
-		func(cxt interface{}, in *automate_event.PublishRequest) (*automate_event.PublishResponse, error) {
-			tf.LatestEvent = in.Msg
-			return &automate_event.PublishResponse{}, nil
-		})
 
 	return tf
 }
@@ -150,9 +128,7 @@ func NewTestFramework(t *testing.T, ctx context.Context) *TestFramework {
 func (tf *TestFramework) Shutdown(t *testing.T, ctx context.Context) {
 	t.Helper()
 	tf.TestDB.Flush(t)
-	tf.ConfigManager.Close()
-	err := os.Remove(tf.ConfigManagerFilename)
-	require.NoError(t, err)
+
 	tf.GRPC.Close()
 	// TODO (tc): Track down and kill literally every goroutine we start, otherwise
 	// this TestFramework's authz instance could write some bad state while the next test is running.
@@ -161,12 +137,12 @@ func (tf *TestFramework) Shutdown(t *testing.T, ctx context.Context) {
 // SetupProjectsAndRulesWithDB is a simplified test framework
 // useful for integration tests with just the DB.
 func SetupProjectsAndRulesWithDB(t *testing.T) (
-	api.ProjectsClient, *TestDB, storage.Storage, *MockEventServiceClient, int64) {
+	api.ProjectsClient, *TestDB, storage.Storage, int64) {
 	t.Helper()
 	ctx := context.Background()
 	seed := prng.GenSeed(t)
 
-	pg, testDB, _, _ := SetupTestDB(t)
+	pg, testDB, _, _, _ := SetupTestDB(t)
 
 	l, err := logger.NewLogger("text", "error")
 	require.NoError(t, err, "init logger for storage")
@@ -192,16 +168,18 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (
 		t.Fatalf("connecting to grpc endpoint: %s", err)
 	}
 
-	eventServiceClient := &MockEventServiceClient{}
-	return api.NewProjectsClient(conn), testDB, pg, eventServiceClient, seed
+	return api.NewProjectsClient(conn), testDB, pg, seed
 }
 
-func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *prng.Prng, *migration.Config) {
+func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *opa.State, *prng.Prng, *migration.Config) {
 	t.Helper()
 
 	ctx := context.Background()
 	l, err := logger.NewLogger("text", "error")
 	require.NoError(t, err, "init logger for postgres storage")
+
+	opaInstance, err := opa.New(ctx, l)
+	require.NoError(t, err, "init OPA")
 
 	migrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../storage/postgres/migration/sql")
 	if err != nil {
@@ -227,9 +205,9 @@ func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *prng.Prng, *migration
 	_, err = db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
 	require.NoError(t, err, "error creating extension")
 
-	backend, err := postgres.New(ctx, l, *migrationConfig, datamigration.Config(*dataMigrationConfig))
+	err = postgres.Initialize(ctx, opaInstance, l, *migrationConfig, datamigration.Config(*dataMigrationConfig))
 	require.NoError(t, err)
-	return backend, &TestDB{DB: db}, prng.Seed(t), migrationConfig
+	return postgres.GetInstance(), &TestDB{DB: db}, opaInstance, prng.Seed(t), migrationConfig
 }
 
 func (d *TestDB) Flush(t *testing.T) {
@@ -349,42 +327,6 @@ func (refresher *mockPolicyRefresher) RefreshAsync() error {
 	return nil
 }
 
-func CreateStatusEventMsg(projectUpdateIDTag string, estimatedTimeCompleteInSec float64,
-	percentageComplete float64, completed bool, producer string) *automate_event.EventMsg {
-	return &automate_event.EventMsg{
-		EventID:   "event-id-2",
-		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdateStatus},
-		Published: ptypes.TimestampNow(),
-		Producer: &automate_event.Producer{
-			ID: producer,
-		},
-		Data: &_struct.Struct{
-			Fields: map[string]*_struct.Value{
-				"Completed": {
-					Kind: &_struct.Value_BoolValue{
-						BoolValue: completed,
-					},
-				},
-				"PercentageComplete": {
-					Kind: &_struct.Value_NumberValue{
-						NumberValue: percentageComplete,
-					},
-				},
-				"EstimatedTimeCompleteInSec": {
-					Kind: &_struct.Value_NumberValue{
-						NumberValue: estimatedTimeCompleteInSec,
-					},
-				},
-				project_update_tags.ProjectUpdateIDTag: {
-					Kind: &_struct.Value_StringValue{
-						StringValue: projectUpdateIDTag,
-					},
-				},
-			},
-		},
-	}
-}
-
 func WaitForWithTimeout(t *testing.T, f func() bool, timeout time.Duration, message string) {
 	expired := time.Now().Add(timeout)
 	for {
@@ -414,30 +356,6 @@ func (*mockProjectUpdateManager) Start() error {
 	return nil
 }
 
-func (*mockProjectUpdateManager) ProcessFailEvent(eventMessage *automate_event.EventMsg) error {
-	return nil
-}
-
-func (*mockProjectUpdateManager) ProcessStatusEvent(eventMessage *automate_event.EventMsg) error {
-	return nil
-}
-
-func (*mockProjectUpdateManager) Failed() bool {
-	return false // manager.stage.Failed
-}
-
-func (*mockProjectUpdateManager) FailureMessage() string {
-	return "" // manager.stage.FailureMessage
-}
-
-func (*mockProjectUpdateManager) PercentageComplete() float64 {
-	return 0
-}
-
-func (*mockProjectUpdateManager) EstimatedTimeComplete() time.Time {
-	return time.Time{}
-}
-
-func (*mockProjectUpdateManager) State() string {
-	return "not_running" // manager.stage.State
+func (*mockProjectUpdateManager) Status() (server.ProjectUpdateStatus, error) {
+	return &server.EmptyProjectUpdateStatus{}, nil
 }

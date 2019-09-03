@@ -50,7 +50,7 @@
   version = "v1.2.2"
 
 [[projects]]
-  digest = "1:9bb971cde0707689d979882ca7e4e7fb9dc0ad22407eba2d6edfff50b30c3e8a"
+  digest = "1:9017953e03588c23a22baf05ecd0574a86b17adb6b81a3cafa889bb9ec38c03e"
   name = "github.com/alexedwards/scs"
   packages = [
     ".",
@@ -59,8 +59,8 @@
     "stores/pgstore",
   ]
   pruneopts = "NUT"
-  revision = "dbad6751cfac0714e079d0ef9a8bc1d14d52de21"
-  version = "v1.1.0"
+  revision = "cfcbf41460ffe695c7d52159fbff3393c646c8f0"
+  version = "v1.4.1"
 
 [[projects]]
   digest = "1:9752dad5e89cd779096bf2477a4ded16bea7ac62de453c8d6b4bf841d51a8512"
@@ -227,7 +227,7 @@
   version = "v1.1.0"
 
 [[projects]]
-  digest = "1:746dcdabe712f3f748a35d4aba1208bb17212d525b34cb04cc1fdb9c9d6d012c"
+  digest = "1:894f28af0aba942ac18880562ff31742d343cc8d04015d7bf96c1401546936e1"
   name = "github.com/dexidp/dex"
   packages = [
     "api",
@@ -252,8 +252,8 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "aeb2861a40b50b283d3dcd964a421be7780b43b7"
-  version = "v2.18.0"
+  revision = "179cce36efda5343404194ebc292bfbc0dc183c3"
+  version = "v2.19.0"
 
 [[projects]]
   digest = "1:7a6852b35eb5bbc184561443762d225116ae630c26a7c4d90546619f1e7d2ad2"
@@ -502,7 +502,7 @@
   version = "v1.2.0"
 
 [[projects]]
-  digest = "1:20fdee92b940d438a4b38d7e5eae5e25e390e9480ee6ae756fc6f015b382a345"
+  digest = "1:f29b2462bb7e19eeb7ee762683b520c12cc164ed9ffe3e3c8f7efd183bffc209"
   name = "github.com/grpc-ecosystem/grpc-gateway"
   packages = [
     "codegenerator",
@@ -519,8 +519,8 @@
     "utilities",
   ]
   pruneopts = "T"
-  revision = "ad529a448ba494a88058f9e5be0988713174ac86"
-  version = "v1.9.5"
+  revision = "a9bbe40ed238db18f710b0e3d2970348c8fcec41"
+  version = "v1.10.0"
 
 [[projects]]
   branch = "master"
@@ -846,7 +846,7 @@
   version = "v6.2.16"
 
 [[projects]]
-  digest = "1:a38c620f603c18e14880033868a91d06959bfea83ad7dac61fec04da81811dbf"
+  digest = "1:2c92a3d315c2605f6cb16ccb05aa14fdf9b375d678badb653cd2e8c54c36d40e"
   name = "github.com/open-policy-agent/opa"
   packages = [
     "ast",
@@ -855,6 +855,7 @@
     "internal/ir",
     "internal/leb128",
     "internal/planner",
+    "internal/version",
     "internal/wasm/constant",
     "internal/wasm/encoding",
     "internal/wasm/instruction",
@@ -868,11 +869,18 @@
     "topdown",
     "topdown/builtins",
     "topdown/copypropagation",
+    "topdown/internal/jwx/buffer",
+    "topdown/internal/jwx/jwa",
+    "topdown/internal/jwx/jwk",
+    "topdown/internal/jwx/jws",
+    "topdown/internal/jwx/jws/sign",
+    "topdown/internal/jwx/jws/verify",
     "types",
     "util",
+    "version",
   ]
   pruneopts = "NUT"
-  revision = "7864d60dd78d748dbce54b569e939f5b0dc07486"
+  revision = "0d70daa545f5a4bf2e6edf3c1b2d635920299bc9"
 
 [[projects]]
   digest = "1:7da29c22bcc5c2ffb308324377dc00b5084650348c2799e573ed226d8cc9faf0"
@@ -1594,8 +1602,6 @@
     "golang.org/x/crypto/bcrypt",
     "golang.org/x/crypto/blake2b",
     "golang.org/x/crypto/ssh/terminal",
-    "golang.org/x/net/context",
-    "golang.org/x/net/context/ctxhttp",
     "golang.org/x/oauth2",
     "golang.org/x/oauth2/google",
     "golang.org/x/text/unicode/rangetable",

@@ -53,9 +53,9 @@ type policyStorage interface {
 }
 
 type roleStorage interface {
-	CreateRole(context.Context, *Role) (*Role, error)
+	CreateRole(context.Context, *Role, bool) (*Role, error)
 	DeleteRole(context.Context, string) error
-	UpdateRole(context.Context, *Role) (*Role, error)
+	UpdateRole(context.Context, *Role, bool) (*Role, error)
 	ListRoles(context.Context) ([]*Role, error)
 	GetRole(context.Context, string) (*Role, error)
 }
@@ -66,6 +66,7 @@ type projectStorage interface {
 	GetProject(context.Context, string) (*Project, error)
 	DeleteProject(context.Context, string) error
 	ListProjects(context.Context) ([]*Project, error)
+	ErrIfMissingProjects(context.Context, []string) error
 }
 
 type ruleStorage interface {

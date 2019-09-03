@@ -5,9 +5,9 @@ package integration
 import (
 	"context"
 	"sync"
-	"time"
 
 	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/backend"
 )
 
 // TestCountToNWorkflow launches 2 workflow instances that do
@@ -24,7 +24,7 @@ func (suite *CerealTestSuite) TestCountToNWorkflow() {
 	var instance10Count int
 
 	wgWorkflow := sync.WaitGroup{}
-	wgWorkflow.Add(2)
+	wgWorkflow.Add(4)
 
 	m := suite.newManager(
 		WithTaskExecutorF(
@@ -70,6 +70,11 @@ func (suite *CerealTestSuite) TestCountToNWorkflow() {
 				},
 			},
 		),
+		WithManagerOpts(
+			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+				wgWorkflow.Done()
+			}),
+		),
 	)
 	defer m.Stop()
 	err := m.EnqueueWorkflow(context.Background(), workflowName, instance100Name, 100)
@@ -80,11 +85,6 @@ func (suite *CerealTestSuite) TestCountToNWorkflow() {
 	wgWorkflow.Wait()
 	suite.Equal(100, instance100Count)
 	suite.Equal(10, instance10Count)
-	// We need to sleep here to allow the running workflow to commit its completion.
-	// Otherwise, Stop cancels the context, which prevents any transactions
-	// from commiting.
-	time.Sleep(20 * time.Millisecond)
-
 	w100, err := m.GetWorkflowInstanceByName(context.Background(), instance100Name, workflowName)
 	suite.Require().NoError(err)
 	var total int

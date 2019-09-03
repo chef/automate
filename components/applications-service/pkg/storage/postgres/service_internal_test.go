@@ -59,7 +59,7 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 			filters: map[string][]string{
 				"service_group_id": {"123"},
 			},
-			expected:          "WHERE group_id = '123'",
+			expected:          "WHERE service_group_id = '123'",
 			shouldReturnError: false,
 		},
 		{
@@ -67,7 +67,7 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 			filters: map[string][]string{
 				"service_group_id": {"123", "456"},
 			},
-			expected:          "WHERE group_id = '123' OR group_id = '456'",
+			expected:          "WHERE service_group_id = '123' OR service_group_id = '456'",
 			shouldReturnError: false,
 		},
 		{
@@ -84,7 +84,7 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 				"service_group_id": {"123", "456"},
 				"health":           {"WARNING", "OK"},
 			},
-			expected:          "WHERE group_id = '123' OR group_id = '456' AND health = 'WARNING' OR health = 'OK'",
+			expected:          "WHERE service_group_id = '123' OR service_group_id = '456' AND health = 'WARNING' OR health = 'OK'",
 			shouldReturnError: false,
 		},
 		{

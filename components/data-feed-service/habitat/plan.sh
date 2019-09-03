@@ -26,6 +26,7 @@ pkg_binds=(
   [notifications-service]="port"
   [secrets-service]="port"
   [config-mgmt-service]="port"
+  [compliance-service]="port"
 )
 pkg_bin_dirs=(bin)
 pkg_scaffolding=chef/scaffolding-go

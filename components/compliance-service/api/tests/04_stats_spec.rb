@@ -22,7 +22,7 @@ if !ENV['NO_STATS_TESTS']
       end
 
       ##### Success tests #####
-      # Failure by platform
+      # Failures by platform
       actual_data = GRPC stats, :read_failures, Stats::Query.new(filters: [
         Stats::ListFilter.new(type: "types", values: ["platform"]),
         Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
@@ -125,6 +125,27 @@ if !ENV['NO_STATS_TESTS']
       }
       assert_equal_json_content(expected_data, actual_data)
 
+      # Get both failures by environment and platform with control tag filter
+      actual_data = GRPC stats, :read_failures, Stats::Query.new(filters: [
+        Stats::ListFilter.new(type: "types", values: ["environment", "platform"]),
+        Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
+        Stats::ListFilter.new(type: 'control_tag:web', values: [])
+      ])
+      expected_data = {
+        "platforms" => [
+          {
+            "name" => "redhat",
+            "failures" => 1
+          }
+        ],
+        "environments" => [
+          {
+            "name"=>"DevSec Prod beta",
+            "failures" => 1
+          }
+        ]
+      }
+      assert_equal_json_content(expected_data, actual_data)
 
       # todo - this one is in the deep test: 04_deep_stats_spec.rb::test3::line:57
       # Get failures by profile

@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -29,14 +30,16 @@ type ApplicationsServer struct {
 	health         *health.Service
 	storageClient  storage.Client
 	ingesterClient ingester.Client
+	jobScheduler   *JobScheduler
 }
 
 // New creates a new ApplicationsServer instance.
-func New(sc storage.Client, ic ingester.Client) *ApplicationsServer {
+func New(sc storage.Client, ic ingester.Client, j *JobScheduler) *ApplicationsServer {
 	return &ApplicationsServer{
 		health:         health.NewService(),
 		storageClient:  sc,
 		ingesterClient: ic,
+		jobScheduler:   j,
 	}
 }
 
@@ -120,12 +123,27 @@ func convertHealthStatusToProto(healthStatus string) applications.HealthStatus {
 	}
 }
 
+func (a *ApplicationsServer) GetServicesDistinctValues(ctx context.Context,
+	request *applications.ServicesDistinctValuesReq) (*applications.ServicesDistinctValuesRes, error) {
+
+	values, err := a.storageClient.GetServicesDistinctValues(request.FieldName, request.QueryFragment)
+	if err != nil {
+		return nil, err
+	}
+
+	return &applications.ServicesDistinctValuesRes{Values: values}, nil
+}
+
 // GetServiceGroupsHealthCounts returns the health counts from all service groups
 func (app *ApplicationsServer) GetServiceGroupsHealthCounts(
 	ctx context.Context, request *applications.ServiceGroupsHealthCountsReq,
 ) (*applications.HealthCounts, error) {
 
-	svcsHealthCounts, err := app.storageClient.GetServiceGroupsHealthCounts()
+	filters, err := stringutils.FormatFilters(request.GetFilter())
+	if err != nil {
+		return new(applications.HealthCounts), status.Error(codes.InvalidArgument, err.Error())
+	}
+	svcsHealthCounts, err := app.storageClient.GetServiceGroupsHealthCounts(filters)
 	if err != nil {
 		log.WithError(err).Error("Error retrieving service groups health counts")
 		return nil, status.Error(codes.Internal, err.Error())
@@ -150,12 +168,12 @@ func (app *ApplicationsServer) GetServicesBySG(
 		return new(applications.ServicesBySGRes), status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	// In the database we will never have ID=0 and zero is our default value in our
-	// protobuf definition, so if the service group id is zero it means that the user
+	// In the database we will never have ID="" and "" is our default value in our
+	// protobuf definition, so if the service group id is "" it means that the user
 	// didn't specified and this parameter is required, so we will error
-	if request.GetServiceGroupId() == 0 {
+	if request.GetServiceGroupId() == "" {
 		return new(applications.ServicesBySGRes),
-			status.Error(codes.InvalidArgument, "Missing service_group_id parameter. [value > 0]")
+			status.Error(codes.InvalidArgument, "Missing service_group_id parameter. [value cannot be blank]")
 	}
 
 	var (
@@ -273,12 +291,12 @@ func (app *ApplicationsServer) GetServicesStats(ctx context.Context,
 func (app *ApplicationsServer) GetDisconnectedServices(ctx context.Context,
 	request *applications.DisconnectedServicesReq) (*applications.ServicesRes, error) {
 
-	thresholdMinutes := request.GetThresholdMinutes()
-	if thresholdMinutes <= 0 {
+	thresholdSeconds := request.GetThresholdSeconds()
+	if thresholdSeconds <= 0 {
 		return new(applications.ServicesRes),
 			status.Error(codes.InvalidArgument, "threshold must be greater than zero")
 	}
-	services, err := app.storageClient.GetDisconnectedServices(thresholdMinutes)
+	services, err := app.storageClient.GetDisconnectedServices(thresholdSeconds)
 	if err != nil {
 		log.WithError(err).Error("Error retrieving disconnected services")
 		return new(applications.ServicesRes), status.Error(codes.Internal, err.Error())
@@ -293,13 +311,13 @@ func (app *ApplicationsServer) GetDisconnectedServices(ctx context.Context,
 func (app *ApplicationsServer) DeleteDisconnectedServices(ctx context.Context,
 	request *applications.DisconnectedServicesReq) (*applications.ServicesRes, error) {
 
-	thresholdMinutes := request.GetThresholdMinutes()
-	if thresholdMinutes <= 0 {
+	thresholdSeconds := request.GetThresholdSeconds()
+	if thresholdSeconds <= 0 {
 		return new(applications.ServicesRes),
 			status.Error(codes.InvalidArgument, "threshold must be greater than zero")
 	}
 
-	services, err := app.storageClient.DeleteDisconnectedServices(thresholdMinutes)
+	services, err := app.storageClient.DeleteDisconnectedServices(thresholdSeconds)
 	if err != nil {
 		log.WithError(err).Error("Error retrieving disconnected services")
 		return new(applications.ServicesRes), status.Error(codes.Internal, err.Error())
@@ -308,6 +326,54 @@ func (app *ApplicationsServer) DeleteDisconnectedServices(ctx context.Context,
 	return &applications.ServicesRes{
 		Services: convertStorageServicesToApplicationsServices(services),
 	}, nil
+}
+
+func (app *ApplicationsServer) MarkDisconnectedServices(thresholdSeconds int32) ([]*applications.Service, error) {
+	svcs, err := app.storageClient.MarkDisconnectedServices(thresholdSeconds)
+	if err != nil {
+		return nil, err
+	}
+	return convertStorageServicesToApplicationsServices(svcs), nil
+}
+
+func (app *ApplicationsServer) GetDisconnectedServicesConfig(ctx context.Context,
+	req *applications.GetDisconnectedServicesConfigReq) (*applications.GetDisconnectedServicesConfigRes, error) {
+	config, err := app.jobScheduler.GetDisconnectedServicesJobConfig(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to load disconnected_services job configuration")
+	}
+	res := &applications.GetDisconnectedServicesConfigRes{
+		Running:   config.Enabled,
+		Threshold: config.Params.ThresholdDuration,
+	}
+	return res, nil
+}
+
+func (app *ApplicationsServer) UpdateDisconnectedServicesConfig(ctx context.Context,
+	req *applications.UpdateDisconnectedServicesConfigReq) (*applications.UpdateDisconnectedServicesConfigRes, error) {
+
+	if req.GetRunning() {
+		err := app.jobScheduler.EnableDisconnectedServicesJob(ctx)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to enable disconnected_services job")
+		}
+	} else {
+		err := app.jobScheduler.DisableDisconnectedServicesJob(ctx)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to disable disconnected_services job")
+		}
+	}
+
+	_, err := time.ParseDuration(req.GetThreshold())
+	if err != nil {
+		return nil, errors.Wrapf(err, "unable to parse disconnected_services threshold %q", req.GetThreshold())
+	}
+	err = app.jobScheduler.UpdateDisconnectedServicesJobParams(ctx, &DisconnectedServicesParamsV0{ThresholdDuration: req.GetThreshold()})
+	if err != nil {
+		return nil, errors.Wrapf(err, "unable to update disconnected services parameters to %q", req.GetThreshold())
+	}
+
+	return &applications.UpdateDisconnectedServicesConfigRes{}, nil
 }
 
 // Convert storage.Service array to applications.Service array
@@ -329,6 +395,7 @@ func convertStorageServicesToApplicationsServices(svcs []*storage.Service) []*ap
 			PreviousHealthCheck: convertHealthStatusToProto(svc.PreviousHealth),
 			CurrentHealthSince:  timef.IntervalUntilNow(svc.HealthUpdatedAt),
 			HealthUpdatedAt:     convertOrCreateProtoTimestamp(svc.HealthUpdatedAt),
+			Disconnected:        svc.Disconnected,
 		}
 	}
 	return services

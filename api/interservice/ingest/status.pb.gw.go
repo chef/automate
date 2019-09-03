@@ -37,6 +37,15 @@ func request_IngestStatus_GetHealth_0(ctx context.Context, marshaler runtime.Mar
 
 }
 
+func local_request_IngestStatus_GetHealth_0(ctx context.Context, marshaler runtime.Marshaler, server IngestStatusServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq HealthRequest
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.GetHealth(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 func request_IngestStatus_GetMigrationStatus_0(ctx context.Context, marshaler runtime.Marshaler, client IngestStatusClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq MigrationStatusRequest
 	var metadata runtime.ServerMetadata
@@ -44,6 +53,63 @@ func request_IngestStatus_GetMigrationStatus_0(ctx context.Context, marshaler ru
 	msg, err := client.GetMigrationStatus(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
+}
+
+func local_request_IngestStatus_GetMigrationStatus_0(ctx context.Context, marshaler runtime.Marshaler, server IngestStatusServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq MigrationStatusRequest
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.GetMigrationStatus(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+// RegisterIngestStatusHandlerServer registers the http handlers for service IngestStatus to "mux".
+// UnaryRPC     :call IngestStatusServer directly.
+// StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
+func RegisterIngestStatusHandlerServer(ctx context.Context, mux *runtime.ServeMux, server IngestStatusServer, opts []grpc.DialOption) error {
+
+	mux.Handle("GET", pattern_IngestStatus_GetHealth_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_IngestStatus_GetHealth_0(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_IngestStatus_GetHealth_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_IngestStatus_GetMigrationStatus_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_IngestStatus_GetMigrationStatus_0(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_IngestStatus_GetMigrationStatus_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	return nil
 }
 
 // RegisterIngestStatusHandlerFromEndpoint is same as RegisterIngestStatusHandler but

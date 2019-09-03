@@ -31,6 +31,7 @@ pkg_binds=(
   [automate-pg-gateway]="port"
   [pg-sidecar-service]="port"
   [event-service]="internal_messaging_port cluster_id"
+  [cereal-service]="port"
 )
 pkg_bin_dirs=(bin)
 pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"

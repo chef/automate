@@ -36,10 +36,6 @@ This service is the primary ingress event handler for configuration management r
 
 This service handles InSpec and scan job-related data, including event ingestion and reporting.
 
-### Data Lifecycle Service
-
-This service is responsible for triggering data lifecycle interface methods on other services such as purging old data.
-
 ### Notification Service
 
 This service is responsible for sending notifications based on configured rules in response to events.

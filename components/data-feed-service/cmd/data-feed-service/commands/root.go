@@ -42,7 +42,7 @@ func initConfig() {
 		if err != nil {
 			log.WithFields(log.Fields{
 				"file": viper.ConfigFileUsed(),
-			}).Info("Error reading config file %s", err)
+			}).Errorf("Error reading config file %s", err)
 			return
 		}
 	}

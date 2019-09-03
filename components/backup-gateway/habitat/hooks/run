@@ -43,13 +43,20 @@ exec minio gateway s3 {{cfg.gateway.backup.s3.bucket.endpoint}} \
 
 # Symlink the "backups" bucket to the backup filesystem path
 ln -sTnf "{{cfg.gateway.backup.filesystem.path}}" "{{pkg.svc_data_path}}/backups"
-# Make sure the "backups" bucket and the minioMetaBucket (.minio.sys) are on the
-# same device so that minio can rename files from minioMetaBucket/tmp to the
-# to "backups" bucket.
-mkdir -p "{{cfg.gateway.backup.filesystem.path}}/.tmp"
-# Clean up the old .minio.sys if it exists
-[[ ! -L "{{pkg.svc_data_path}}/.minio.sys" ]] && rm -rf "{{pkg.svc_data_path}}/.minio.sys"
-ln -sTnf "{{cfg.gateway.backup.filesystem.path}}/.tmp" "{{pkg.svc_data_path}}/.minio.sys"
+if [ -w "{{cfg.gateway.backup.filesystem.path}}" ]; then
+  # Make sure the "backups" bucket and the minioMetaBucket (.minio.sys) are on the
+  # same device so that minio can rename files from minioMetaBucket/tmp to the
+  # to "backups" bucket.
+  mkdir -p "{{cfg.gateway.backup.filesystem.path}}/.tmp"
+  # Clean up the old .minio.sys if it exists
+  [[ ! -L "{{pkg.svc_data_path}}/.minio.sys" ]] && rm -rf "{{pkg.svc_data_path}}/.minio.sys"
+  ln -sTnf "{{cfg.gateway.backup.filesystem.path}}/.tmp" "{{pkg.svc_data_path}}/.minio.sys"
+else
+  # In disaster recovery setups where the backup volumes are mounted read-only, 
+  # we must create the (unused) tmp directory somewhere writeable.
+  echo "Starting minio server with read-only backup volume."
+  mkdir -p "{{pkg.svc_data_path}}/.minio.sys"
+fi
 
 exec minio server \
   --config-dir "{{pkg.svc_var_path}}/config" \

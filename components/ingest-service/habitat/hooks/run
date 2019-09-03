@@ -105,6 +105,14 @@ CONFIG="$CONFIG --nodemanager-address {{manager.sys.ip}}:{{manager.cfg.port}}"
   {{~/if}}
 {{~/eachAlive}}
 
+# Bind to cereal if it's available
+{{~#eachAlive bind.cereal-service.members as |cereal-service|}}
+  {{~#if @last}}
+addNoProxy {{cereal-service.sys.ip}}
+CONFIG="$CONFIG --cereal-address {{cereal-service.sys.ip}}:{{cereal-service.cfg.port}}"
+  {{~/if}}
+{{~/eachAlive}}
+
 pg-helper ensure-service-database "$DBNAME"
 
 # Start Ingest Service

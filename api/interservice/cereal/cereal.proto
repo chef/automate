@@ -63,9 +63,11 @@ message DequeueWorkflowResponse {
     WorkflowEvent event = 2;
   }
   message Status { string err = 1; }
+  message Committed {}
   oneof cmd {
     Dequeue dequeue = 1;
     Status status = 2;
+    Committed committed = 3;
   }
 }
 
@@ -106,9 +108,12 @@ message DequeueTaskResponse {
 
   message Cancel { string err = 1; }
 
+  message Committed {}
+
   oneof cmd {
     Dequeue dequeue = 1;
     Cancel cancel = 2;
+    Committed committed = 3;
   }
 }
 

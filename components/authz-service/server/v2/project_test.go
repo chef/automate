@@ -3,7 +3,6 @@ package v2_test
 import (
 	"context"
 	"math/rand"
-	"os"
 	"strconv"
 	"testing"
 
@@ -16,7 +15,6 @@ import (
 	"github.com/chef/automate/lib/logger"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
-	"github.com/chef/automate/components/authz-service/config"
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/prng"
 	grpc_server "github.com/chef/automate/components/authz-service/server"
@@ -37,26 +35,26 @@ func TestUpdateProject(t *testing.T) {
 		f    func(*testing.T)
 	}{
 		{"if the project name is empty, returns 'invalid argument'", func(t *testing.T) {
-			cl, _, _ := setupProjects(t)
+			cl, _ := setupProjects(t)
 			resp, err := cl.UpdateProject(ctx, &api.UpdateProjectReq{Id: "empty-name", Name: ""})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
 		{"if the project id is empty, returns 'invalid argument'", func(t *testing.T) {
-			cl, _, _ := setupProjects(t)
+			cl, _ := setupProjects(t)
 			resp, err := cl.UpdateProject(ctx, &api.UpdateProjectReq{Id: "", Name: "empty-id"})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
 		{"if the project id is invalid, returns 'invalid argument'", func(t *testing.T) {
-			cl, _, _ := setupProjects(t)
+			cl, _ := setupProjects(t)
 			resp, err := cl.UpdateProject(ctx,
 				&api.UpdateProjectReq{Id: "no spaces", Name: "any name"})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
 		{"if the project with that id does not exist, returns 'not found'", func(t *testing.T) {
-			cl, _, _ := setupProjects(t)
+			cl, _ := setupProjects(t)
 			resp, err := cl.UpdateProject(ctx,
 				&api.UpdateProjectReq{Id: "false-project", Name: "my other foo"})
 			grpctest.AssertCode(t, codes.NotFound, err)
@@ -64,7 +62,7 @@ func TestUpdateProject(t *testing.T) {
 		}},
 		{"if the project already exists and update request is valid, project is updated",
 			func(t *testing.T) {
-				cl, store, _ := setupProjects(t)
+				cl, store := setupProjects(t)
 				id, updatedName := "my-foo", "updated name"
 				addProjectToStore(t, store, id, "original name", storage.ChefManaged)
 
@@ -75,48 +73,6 @@ func TestUpdateProject(t *testing.T) {
 				assert.Equal(t, id, resp.Project.GetId())
 				assert.Equal(t, updatedName, resp.Project.GetName())
 				assert.Equal(t, api.Type_CUSTOM, resp.Project.GetType())
-			}},
-		{"when a project is updated an event is NOT published",
-			func(t *testing.T) {
-				cl, store, eventServiceClient := setupProjects(t)
-				numberOfPublishes := eventServiceClient.PublishedEvents
-				id, updatedName := "my-foo", "updated name"
-				addProjectToStore(t, store, id, "original name", storage.ChefManaged)
-
-				_, _ = cl.UpdateProject(ctx, &api.UpdateProjectReq{Id: id, Name: updatedName})
-				assert.Equal(t, numberOfPublishes, eventServiceClient.PublishedEvents)
-			}},
-	}
-
-	rand.Shuffle(len(cases), func(i, j int) {
-		cases[i], cases[j] = cases[j], cases[i]
-	})
-
-	for _, test := range cases {
-		t.Run(test.desc, test.f)
-	}
-}
-
-func TestApplyStart(t *testing.T) {
-	ctx := context.Background()
-
-	cases := []struct {
-		desc string
-		f    func(*testing.T)
-	}{
-		{"when rules are applied an event is published",
-			func(t *testing.T) {
-				cl, store, eventServiceClient := setupProjects(t)
-				numberOfPublishes := eventServiceClient.PublishedEvents
-				addProjectToStore(t, store, "my-foo", "original name", storage.ChefManaged)
-
-				_, err := cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
-				require.Nil(t, err)
-				assert.Equal(t, numberOfPublishes+1, eventServiceClient.PublishedEvents)
-				assert.NotNil(t, eventServiceClient.LastestPublishedEvent.EventID)
-				assert.NotNil(t, eventServiceClient.LastestPublishedEvent.Published)
-				assert.NotNil(t,
-					eventServiceClient.LastestPublishedEvent.Data.Fields["ProjectUpdateID"].GetStringValue())
 			}},
 	}
 
@@ -131,7 +87,7 @@ func TestApplyStart(t *testing.T) {
 
 func TestCreateProject(t *testing.T) {
 	ctx := context.Background()
-	cl, store, _ := setupProjects(t)
+	cl, store := setupProjects(t)
 	cases := []struct {
 		desc string
 		f    func(*testing.T)
@@ -202,7 +158,7 @@ func TestCreateProject(t *testing.T) {
 
 func TestGetProject(t *testing.T) {
 	ctx := context.Background()
-	cl, store, _ := setupProjects(t)
+	cl, store := setupProjects(t)
 	cases := []struct {
 		desc string
 		f    func(*testing.T)
@@ -254,7 +210,7 @@ func TestGetProject(t *testing.T) {
 
 func TestDeleteProject(t *testing.T) {
 	ctx := context.Background()
-	cl, store, _ := setupProjects(t)
+	cl, store := setupProjects(t)
 	cases := []struct {
 		desc string
 		f    func(*testing.T)
@@ -314,7 +270,7 @@ func TestDeleteProject(t *testing.T) {
 
 func TestListProjects(t *testing.T) {
 	ctx := context.Background()
-	cl, store, _ := setupProjects(t)
+	cl, store := setupProjects(t)
 
 	cases := []struct {
 		desc string
@@ -360,9 +316,10 @@ func TestListProjects(t *testing.T) {
 		store.Flush()
 	}
 }
+
 func TestListProjectsForIntrospection(t *testing.T) {
 	ctx := context.Background()
-	cl, store, _ := setupProjects(t)
+	cl, store := setupProjects(t)
 
 	cases := []struct {
 		desc string
@@ -414,9 +371,10 @@ func addProjectToStore(t *testing.T, store *cache.Cache, id, name string, projTy
 	t.Helper()
 
 	proj := &storage.Project{
-		ID:   id,
-		Name: name,
-		Type: projType,
+		ID:     id,
+		Name:   name,
+		Type:   projType,
+		Status: storage.NoRules.String(),
 	}
 	store.Add(id, proj, 0)
 
@@ -425,19 +383,20 @@ func addProjectToStore(t *testing.T, store *cache.Cache, id, name string, projTy
 		returnType = api.Type_CUSTOM
 	}
 	return api.Project{
-		Id:   id,
-		Name: name,
-		Type: returnType,
+		Id:     id,
+		Name:   name,
+		Type:   returnType,
+		Status: storage.NoRules.String(),
 	}
 }
 
-func setupProjects(t *testing.T) (api.ProjectsClient, *cache.Cache, *testhelpers.MockEventServiceClient) {
-	cl, ca, _, mc, _ := setupProjectsAndRules(t)
-	return cl, ca, mc
+func setupProjects(t *testing.T) (api.ProjectsClient, *cache.Cache) {
+	cl, ca, _, _ := setupProjectsAndRules(t)
+	return cl, ca
 }
 
 func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cache.Cache,
-	*testhelpers.MockEventServiceClient, int64) {
+	int64) {
 	t.Helper()
 	ctx := context.Background()
 	seed := prng.GenSeed(t)
@@ -446,12 +405,9 @@ func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cac
 	require.NoError(t, err, "init logger for storage")
 
 	mem_v2 := memstore_v2.New()
-	eventServiceClient := &testhelpers.MockEventServiceClient{}
-	configFile := "/tmp/.authz-delete-me"
-	err = os.Remove(configFile)
-	configMgr, err := config.NewManager(configFile)
+
 	require.NoError(t, err)
-	projectUpdateManager := v2.NewProjectUpdateManager(eventServiceClient, configMgr)
+	projectUpdateManager := testhelpers.NewMockProjectUpdateManager()
 	projectsSrv, err := v2.NewProjectsServer(
 		ctx, l, mem_v2, &testhelpers.TestProjectRulesRetriever{},
 		projectUpdateManager, testhelpers.NewMockPolicyRefresher())
@@ -474,5 +430,5 @@ func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cac
 		t.Fatalf("connecting to grpc endpoint: %s", err)
 	}
 
-	return api.NewProjectsClient(conn), mem_v2.ProjectsCache(), mem_v2.RulesCache(), eventServiceClient, seed
+	return api.NewProjectsClient(conn), mem_v2.ProjectsCache(), mem_v2.RulesCache(), seed
 }

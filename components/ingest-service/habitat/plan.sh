@@ -13,6 +13,7 @@ pkg_binds=(
   # TODO(ssd) 2019-05-02: We could consider making these optional
   [automate-pg-gateway]="port"
   [pg-sidecar-service]="port"
+  [cereal-service]="port"
 )
 
 pkg_binds_optional=(

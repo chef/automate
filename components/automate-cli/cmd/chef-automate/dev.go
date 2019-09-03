@@ -614,14 +614,14 @@ func runPsql(cmd *cobra.Command, args []string) error {
 		pager = "less"
 	}
 
-	psqlArgs := append(pg.PSQLCmd[1:], args...)
+	psqlArgs := append(pg.PSQLCmd(), args...)
 	psqlOpts := append(connInfo.PsqlCmdOptions(),
 		command.Envvar("PAGER", pager),
-		command.Args(psqlArgs...),
+		command.Args(psqlArgs[1:]...),
 		command.Stderr(os.Stderr),
 		command.Stdout(os.Stdout),
 		command.Stdin(os.Stdin))
-	return command.Run(pg.PSQLCmd[0], psqlOpts...)
+	return command.Run(psqlArgs[0], psqlOpts...)
 }
 
 var defaultCfg = &cobra.Command{

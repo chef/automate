@@ -5,7 +5,7 @@ export interface ApiToken {
   active: boolean;
   created_at: string;
   updated_at: string;
-  projects: string[]; // not exposed in the UI atm
+  projects: string[];
 }
 
 export interface ApiTokenV1 {

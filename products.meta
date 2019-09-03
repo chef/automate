@@ -27,7 +27,6 @@
     "chef/config-mgmt-service",
     "chef/deployment-service",
     "chef/data-feed-service",
-    "chef/data-lifecycle-service",
     "chef/event-gateway",
     "chef/automate-gateway",
     "chef/automate-load-balancer",
@@ -40,6 +39,10 @@
     "chef/automate-prometheus",
     "chef/automate-cli",
     "core/rsync"
+  ],
+
+  "deleted_packages": [
+    "chef/data-lifecycle-service/0.0.1/20190816162731"
   ],
 
   "collections": [
@@ -113,7 +116,6 @@
         "chef/ingest-service",
         "chef/config-mgmt-service",
         "chef/data-feed-service",
-        "chef/data-lifecycle-service",
         "chef/event-gateway",
         "chef/automate-gateway"
       ]

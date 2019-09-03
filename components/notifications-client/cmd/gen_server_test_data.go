@@ -1,21 +1,21 @@
 package main
 
 import (
+	"context"
 	"io/ioutil"
 	"os"
 	"strings"
+
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
+	pbtype "github.com/golang/protobuf/ptypes/struct"
+	grpc "google.golang.org/grpc"
 
 	chef "github.com/chef/automate/api/external/ingest/request"
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
 	. "github.com/chef/automate/components/notifications-client/api"
 	"github.com/chef/automate/components/notifications-client/builder"
 	"github.com/chef/automate/components/notifications-client/notifier"
-
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
-	pbtype "github.com/golang/protobuf/ptypes/struct"
-	context "golang.org/x/net/context"
-	grpc "google.golang.org/grpc"
 )
 
 type CaptureClient struct {

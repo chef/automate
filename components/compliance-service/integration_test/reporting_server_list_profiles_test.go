@@ -16,6 +16,8 @@ import (
 )
 
 func TestListProfiles(t *testing.T) {
+	suite.DeleteAllDocuments()
+
 	es2Backend := relaxting.ES2Backend{ESUrl: elasticsearchUrl}
 	server := reportingServer.New(&es2Backend)
 
@@ -51,6 +53,10 @@ func TestListProfiles(t *testing.T) {
 		return response != nil && len(response.Reports) == n
 	})
 
+	suite.RefreshComplianceSummaryIndex()
+	suite.RefreshComplianceReportIndex()
+	suite.RefreshComplianceProfilesIndex()
+
 	reportsProjects := map[string][]string{
 		"project1": reportIds[1:3],
 		"project2": reportIds[2:5],
@@ -79,7 +85,9 @@ func TestListProfiles(t *testing.T) {
 
 	suite.WaitForESJobToComplete(esJobID)
 
+	suite.RefreshComplianceSummaryIndex()
 	suite.RefreshComplianceReportIndex()
+	suite.RefreshComplianceProfilesIndex()
 
 	profileIds := make([]string, len(reportIds))
 	for i := range reportIds {

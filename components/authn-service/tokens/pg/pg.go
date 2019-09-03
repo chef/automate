@@ -11,7 +11,7 @@ import (
 	_ "github.com/lib/pq"
 
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
-	"github.com/chef/automate/lib/platform"
+	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/tls/certs"
 )
 
@@ -37,7 +37,7 @@ func (c *Config) Open(_ *certs.ServiceCerts, logger *zap.Logger) (tokens.Storage
 		}
 		var err error
 
-		c.PGURL, err = platform.PGURIFromEnvironment(c.Database)
+		c.PGURL, err = platform_config.PGURIFromEnvironment(c.Database)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not get pg url")
 		}

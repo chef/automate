@@ -32,6 +32,7 @@ type Compliance struct {
 	DataRetention
 	EventConfig
 	Notifications
+	CerealConfig
 }
 
 type Notifications struct {
@@ -112,7 +113,7 @@ type Delivery struct {
 
 // ElasticSearchSidecar specific options
 type ElasticSearchSidecar struct {
-	ESSidecarAddress string
+	Address string
 }
 
 // DataRetention describes data retention policies
@@ -121,5 +122,9 @@ type DataRetention struct {
 }
 
 type EventConfig struct {
+	Endpoint string
+}
+
+type CerealConfig struct {
 	Endpoint string
 }

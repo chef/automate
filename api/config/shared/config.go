@@ -26,6 +26,7 @@ type PlatformServiceConfigurable interface {
 type InvalidConfigError struct {
 	// Key -> Reason
 	invalidValues map[string]string
+	deprecations  map[string]string
 	missingKeys   []string
 	unknownErrors []error
 }
@@ -38,6 +39,8 @@ type Error interface {
 	InvalidValues() map[string]string
 	AddUnknownError(error)
 	UnknownErrors() []error
+	AddDeprecation(string, string)
+	Deprecations() map[string]string
 	IsEmpty() bool
 }
 
@@ -45,6 +48,7 @@ type Error interface {
 func NewInvalidConfigError() *InvalidConfigError {
 	return &InvalidConfigError{
 		invalidValues: map[string]string{},
+		deprecations:  map[string]string{},
 		missingKeys:   []string{},
 		unknownErrors: []error{},
 	}
@@ -77,8 +81,17 @@ func (e *InvalidConfigError) UnknownErrors() []error {
 	return e.unknownErrors
 }
 
+// AddDeprecation takes an invalid key and a correction message
+func (e *InvalidConfigError) AddDeprecation(k, m string) {
+	e.deprecations[k] = m
+}
+
+func (e *InvalidConfigError) Deprecations() map[string]string {
+	return e.deprecations
+}
+
 func (e *InvalidConfigError) IsEmpty() bool {
-	return len(e.MissingKeys()) == 0 && len(e.InvalidValues()) == 0 && len(e.UnknownErrors()) == 0
+	return len(e.MissingKeys()) == 0 && len(e.InvalidValues()) == 0 && len(e.UnknownErrors()) == 0 && len(e.Deprecations()) == 0
 }
 
 // Error returns the error message as a string.
@@ -93,6 +106,11 @@ func (e *InvalidConfigError) Error() string {
 	for key, reason := range e.InvalidValues() {
 		// nolint errcheck
 		msg.WriteString(fmt.Sprintf("\nConfiguration key '%s' has invalid value: %s\n", key, reason))
+	}
+
+	for key, remedy := range e.Deprecations() {
+		// nolint errcheck
+		msg.WriteString(fmt.Sprintf("\nConfiguration key '%s' has been deprecated and is no longer allowed. %s\n", key, remedy))
 	}
 
 	for _, err := range e.UnknownErrors() {
@@ -124,6 +142,10 @@ func Validate(vs ...error) error {
 
 		for _, v := range err.MissingKeys() {
 			cfgErr.AddMissingKey(v)
+		}
+
+		for k, v := range err.Deprecations() {
+			cfgErr.AddDeprecation(k, v)
 		}
 	}
 

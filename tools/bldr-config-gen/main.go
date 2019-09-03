@@ -201,9 +201,11 @@ func getGoDepInfo(path string) (GoDepInfo, error) {
 			case "api":
 				end = 6
 			case "lib":
-				// We want to avoid rebuilds so we don't depend
-				// on the entire lib directory
-				end = 5
+				if len(parts) > 4 && parts[4] == "platform" {
+					end = 6
+				} else {
+					end = 5
+				}
 			case "vendor":
 				if len(parts) > 4 && parts[4] == "google.golang.org" {
 					end = 6

@@ -7,14 +7,8 @@ import (
 	"time"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
-	automate_event "github.com/chef/automate/api/interservice/event"
-	automate_event_type "github.com/chef/automate/components/event-service/server"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
-	project_update_tags "github.com/chef/automate/lib/authz"
-	"github.com/golang/mock/gomock"
-	"github.com/golang/protobuf/ptypes"
-	_struct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -488,8 +482,8 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
-									Values: []string{"org1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Values:    []string{"org1"},
 								},
 							},
 						},
@@ -516,16 +510,16 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
-									Values: []string{"chef-server2.org"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+									Values:    []string{"chef-server2.org"},
 								},
 							},
 						},
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
-									Values: []string{"org1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Values:    []string{"org1"},
 								},
 							},
 						},
@@ -553,8 +547,8 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
-									Values: []string{"area_51"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Values:    []string{"area_51"},
 								},
 							},
 						},
@@ -580,8 +574,8 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
-									Values: []string{"area_52"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Values:    []string{"area_52"},
 								},
 							},
 						},
@@ -1325,8 +1319,8 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
-									Values: []string{"Prod"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+									Values:    []string{"Prod"},
 								},
 							},
 						},
@@ -1352,8 +1346,8 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
-									Values: []string{"prod", "dev"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+									Values:    []string{"prod", "dev"},
 								},
 							},
 						},
@@ -1380,16 +1374,16 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
-									Values: []string{"prod"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+									Values:    []string{"prod"},
 								},
 							},
 						},
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
-									Values: []string{"org1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Values:    []string{"org1"},
 								},
 							},
 						},
@@ -1416,16 +1410,16 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
-									Values: []string{"dev"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+									Values:    []string{"dev"},
 								},
 							},
 						},
 						&iam_v2.ProjectRule{
 							Conditions: []*iam_v2.Condition{
 								&iam_v2.Condition{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
-									Values: []string{"org1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Values:    []string{"org1"},
 								},
 							},
 						},
@@ -1512,174 +1506,5 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 
 				suite.DeleteAllDocuments()
 			})
-	}
-}
-
-func TestErrorWhenProjectUpdateIDNotSent(t *testing.T) {
-	event := &automate_event.EventMsg{
-		EventID:   "any",
-		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
-		Published: ptypes.TimestampNow(),
-	}
-
-	_, err := suite.EventHandlerServer.HandleEvent(context.Background(), event)
-	assert.Error(t, err)
-
-	event = &automate_event.EventMsg{
-		EventID:   "any",
-		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
-		Published: ptypes.TimestampNow(),
-		Data: &_struct.Struct{
-			Fields: map[string]*_struct.Value{},
-		},
-	}
-	assert.Error(t, err)
-
-	event = &automate_event.EventMsg{
-		EventID:   "any",
-		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
-		Published: ptypes.TimestampNow(),
-		Data: &_struct.Struct{
-			Fields: map[string]*_struct.Value{
-				project_update_tags.ProjectUpdateIDTag: &_struct.Value{
-					Kind: &_struct.Value_StringValue{
-						StringValue: "",
-					},
-				},
-			},
-		},
-	}
-	assert.Error(t, err)
-}
-
-func TestStartProjectUpdateWhenIDIsSent(t *testing.T) {
-	var eventsSent []*automate_event.EventMsg
-	localSuite := NewLocalSuite(t)
-	defer localSuite.GlobalTeardown()
-	localSuite.eventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
-		func(ctx context.Context, in *automate_event.PublishRequest) (*automate_event.PublishResponse, error) {
-			eventsSent = append(eventsSent, in.Msg)
-			return &automate_event.PublishResponse{}, nil
-		})
-	localSuite.projectsClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).AnyTimes().Return(
-		&iam_v2.ListRulesForAllProjectsResp{}, nil)
-
-	event := &automate_event.EventMsg{
-		EventID:   "any",
-		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
-		Published: ptypes.TimestampNow(),
-		Data: &_struct.Struct{
-			Fields: map[string]*_struct.Value{
-				project_update_tags.ProjectUpdateIDTag: &_struct.Value{
-					Kind: &_struct.Value_StringValue{
-						StringValue: "TestNoErrorWhenProjectUpdateIDIsSent",
-					},
-				},
-			},
-		},
-	}
-
-	_, err := localSuite.EventHandlerServer.HandleEvent(context.Background(), event)
-	assert.NoError(t, err)
-
-	complete := false
-	// Wait for job to complete
-	for !complete {
-		time.Sleep(time.Millisecond * 100)
-
-		for _, event := range eventsSent {
-			assert.Equal(t, event.Type.Name, automate_event_type.ProjectRulesUpdateStatus)
-			if event.Data.Fields["Completed"].GetBoolValue() {
-				complete = true
-			}
-		}
-	}
-}
-
-func TestTwoUpdateSameTimeFailureEvent(t *testing.T) {
-	var eventsSent []*automate_event.EventMsg
-	localSuite := NewLocalSuite(t)
-	defer localSuite.GlobalTeardown()
-	localSuite.eventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
-		func(ctx context.Context, in *automate_event.PublishRequest) (*automate_event.PublishResponse, error) {
-			eventsSent = append(eventsSent, in.Msg)
-			return &automate_event.PublishResponse{}, nil
-		})
-	localSuite.projectsClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).AnyTimes().Return(
-		&iam_v2.ListRulesForAllProjectsResp{}, nil)
-
-	event1 := &automate_event.EventMsg{
-		EventID:   "1",
-		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
-		Published: ptypes.TimestampNow(),
-		Data: &_struct.Struct{
-			Fields: map[string]*_struct.Value{
-				project_update_tags.ProjectUpdateIDTag: &_struct.Value{
-					Kind: &_struct.Value_StringValue{
-						StringValue: "one",
-					},
-				},
-			},
-		},
-	}
-
-	_, err := localSuite.EventHandlerServer.HandleEvent(context.Background(), event1)
-	assert.NoError(t, err)
-	for _, event := range eventsSent {
-		assert.Equal(t, event.Type.Name, automate_event_type.ProjectRulesUpdateStatus)
-	}
-
-	event2 := &automate_event.EventMsg{
-		EventID:   "2",
-		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
-		Published: ptypes.TimestampNow(),
-		Data: &_struct.Struct{
-			Fields: map[string]*_struct.Value{
-				project_update_tags.ProjectUpdateIDTag: &_struct.Value{
-					Kind: &_struct.Value_StringValue{
-						StringValue: "two",
-					},
-				},
-			},
-		},
-	}
-
-	_, err = localSuite.EventHandlerServer.HandleEvent(context.Background(), event2)
-	assert.NoError(t, err)
-	timeout := time.Now().Add(time.Second * 3)
-	for {
-		found := false
-		for _, event := range eventsSent {
-			if automate_event_type.ProjectRulesUpdateFailed == event.Type.Name {
-				assert.True(t, len(event.Data.Fields["message"].GetStringValue()) > 0)
-				assert.Equal(t, "two", event.Data.Fields[project_update_tags.ProjectUpdateIDTag].GetStringValue())
-				found = true
-				break
-			}
-		}
-		if found {
-			break
-		}
-
-		if timeout.Before(time.Now()) {
-			assert.Fail(t, "Did not get the Failed event")
-			break
-		}
-		time.Sleep(time.Millisecond * 10)
-	}
-
-	// Wait for job to complete
-	for {
-		time.Sleep(time.Millisecond * 100)
-		found := false
-		for _, event := range eventsSent {
-			if event.Data.Fields["Completed"].GetBoolValue() {
-				found = true
-				break
-			}
-		}
-		if found {
-			break
-		}
 	}
 }

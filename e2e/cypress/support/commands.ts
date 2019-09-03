@@ -27,6 +27,32 @@ Cypress.Commands.add('logout', () => {
   return cy.url().should('include', '/dex/auth');
 });
 
+// applyProjectsFilter will deselect any selected projects from the filter,
+// check any projects by NAME (not id) passed -- if any -- and apply any changes.
+// if there are no resulting changes to apply, it will simply click out of the filter.
+Cypress.Commands.add('applyProjectsFilter', (projectsToFilterOn: string[]) => {
+  cy.get('app-projects-filter button#projects-filter-button').click();
+  cy.get('app-projects-filter chef-dropdown#projects-filter-dropdown')
+    .find('chef-checkbox').each(child => {
+    // deselect every checkbox
+    if (child.attr('aria-checked') === 'true') {
+      child.trigger('click');
+    }
+  });
+
+  // check all desired checkboxes
+  projectsToFilterOn.forEach(proj =>
+    cy.get(`app-projects-filter chef-checkbox[title="${proj}"]`).find('chef-icon').click());
+
+  if (projectsToFilterOn.length === 0) {
+    // no changes to apply, close projects filter
+    cy.get('app-projects-filter button#projects-filter-button').click();
+  } else {
+    // apply projects filter
+    cy.get('app-projects-filter chef-button#projects-filter-apply-changes').click();
+  }
+});
+
 interface MemoryMap {
   [key: string]: any;
 }
@@ -53,7 +79,7 @@ Cypress.Commands.add('restoreStorage', () => {
   });
 
   cy.server();
-  // mock refresh token call in case it fails
+  // mock refresh token call in case it fails and forces logout
   const user = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
   cy.route({
     method: 'GET',
@@ -63,6 +89,22 @@ Cypress.Commands.add('restoreStorage', () => {
       id_token: user.id_token
     }
   });
+
+  if (Cypress.env('IAM_VERSION') === 'v2.1') {
+    // mock background polling since it's frequent and can interfere with loading wait time
+    cy.route({
+      method: 'GET',
+      url: '**/apply-rules',
+      status: 200,
+      response: {
+        state: 'not_running',
+        estimated_time_complete: '0001-01-01T00:00:00Z',
+        percentage_complete: 1,
+        failed: false,
+        failure_message: ''
+      }
+    });
+  }
 });
 
 Cypress.Commands.add('generateAdminToken', (idToken: string) => {
@@ -160,28 +202,48 @@ Cypress.Commands.add('cleanupProjectsByIDPrefix', (idToken: string, idPrefix: st
   });
 });
 
-
-// helpers
-
-function LoginHelper(username: string) {
-  cy.url().should('include', '/dex/auth/local');
-  cy.server();
-  cy.route('POST', '/api/v0/auth/introspect_some').as('getAuth');
-
-  // login
-  cy.get('#login').type(username);
-  cy.get('#password').type('chefautomate');
-
-  cy.get('[type=submit]').click().then(() => {
-    expect(localStorage.getItem('chef-automate-user')).to.contain(username);
-
-    // close welcome modal if present
-    cy.get('app-welcome-modal').invoke('hide');
-    cy.saveStorage();
-
-    cy.wait('@getAuth');
+Cypress.Commands.add('cleanupRolesByIDPrefix', (idToken: string, idPrefix: string) => {
+  cy.request({
+    auth: { bearer: idToken },
+    method: 'GET',
+    url: '/apis/iam/v2beta/roles',
+    failOnStatusCode: false
+  }).then((resp) => {
+    const body = resp.body;
+    for (const role of body.roles) {
+      if (role.id.startsWith(idPrefix)) {
+        cy.request({
+          auth: { bearer: idToken },
+          method: 'DELETE',
+          url: `/apis/iam/v2beta/roles/${role.id}`,
+          failOnStatusCode: false
+        });
+      }
+    }
   });
-}
+});
+
+
+Cypress.Commands.add('cleanupTokensByIDPrefix', (idToken: string, idPrefix: string) => {
+  cy.request({
+    auth: { bearer: idToken },
+    method: 'GET',
+    url: '/apis/iam/v2beta/tokens',
+    failOnStatusCode: false
+  }).then((resp) => {
+    const body = resp.body;
+    for (const token of body.tokens) {
+      if (token.id.startsWith(idPrefix)) {
+        cy.request({
+          auth: { bearer: idToken },
+          method: 'DELETE',
+          url: `/apis/iam/v2beta/tokens/${token.id}`,
+          failOnStatusCode: false
+        });
+      }
+    }
+  });
+});
 
 Cypress.Commands.add('cleanupTeamsByDescriptionPrefix', (idToken: string, namePrefix: string) => {
   cy.request({
@@ -204,3 +266,25 @@ Cypress.Commands.add('cleanupTeamsByDescriptionPrefix', (idToken: string, namePr
   });
 });
 
+
+// helpers
+
+function LoginHelper(username: string) {
+  cy.url().should('include', '/dex/auth/local');
+  cy.server();
+  cy.route('POST', '/api/v0/auth/introspect_some').as('getAuth');
+
+  // login
+  cy.get('#login').type(username);
+  cy.get('#password').type('chefautomate');
+
+  cy.get('[type=submit]').click().then(() => {
+    expect(localStorage.getItem('chef-automate-user')).to.contain(username);
+
+    // close welcome modal if present
+    cy.get('app-welcome-modal').invoke('hide');
+    cy.saveStorage();
+
+    cy.wait('@getAuth');
+  });
+}

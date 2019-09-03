@@ -46,7 +46,6 @@ var goodV1Manifest = `
     "chef/automate-ui/2.0.0/20180206223720",
     "chef/compliance-service/1.11.1/20180207071420",
     "chef/config-mgmt-service/0.1.0/20180207071747",
-    "chef/data-lifecycle-service/0.0.1/20180205110506",
     "chef/deployment-service/0.1.0/20180207071918",
     "chef/es-sidecar-service/1.0.0/20180207072056",
     "chef/ingest-service/0.1.0/20180207072223",
@@ -79,7 +78,6 @@ var goodA2Manifest = `
     "chef/automate-ui/2.0.0/20180716210152",
     "chef/compliance-service/1.11.1/20180716190030",
     "chef/config-mgmt-service/0.1.0/20180716152448",
-    "chef/data-lifecycle-service/0.0.1/20180716152617",
     "chef/deployment-service/0.1.0/20180716191519",
     "chef/es-sidecar-service/1.0.0/20180716152743",
     "chef/ingest-service/0.1.0/20180716152903",
@@ -133,7 +131,7 @@ func TestManifestFromBytes(t *testing.T) {
 		manifest, err := parser.ManifestFromBytes([]byte(goodA2Manifest))
 		require.NoError(t, err)
 
-		assert.Equal(t, 30, len(manifest.Packages))
+		assert.Equal(t, 29, len(manifest.Packages))
 		assert.Equal(t, 2, len(manifest.HartOverrides))
 		assert.Equal(t, "20180716213113", manifest.Build)
 		assert.Equal(t, "844b78fb80ca19c6a555de34d24e3e9b5a56ce06", manifest.BuildSHA)

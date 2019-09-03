@@ -24,6 +24,7 @@ type workflowExecutor struct {
 type managerOpt struct {
 	TaskExecutors     []taskExecutor
 	WorkflowExecutors []workflowExecutor
+	ManagerOpts       []cereal.ManagerOpt
 	NoStart           bool
 }
 type managerOptFunc func(*managerOpt)
@@ -43,6 +44,12 @@ func WithTaskExecutor(name string, executor cereal.TaskExecutor) managerOptFunc 
 			Name:     name,
 			Executor: executor,
 		})
+	}
+}
+
+func WithManagerOpts(opts ...cereal.ManagerOpt) managerOptFunc {
+	return func(o *managerOpt) {
+		o.ManagerOpts = append(o.ManagerOpts, opts...)
 	}
 }
 
@@ -104,7 +111,7 @@ func NewSuiteForBackend(ctx context.Context, t *testing.T, d backend.Driver) *Ce
 			for _, f := range opts {
 				f(&o)
 			}
-			m, err := cereal.NewManager(d)
+			m, err := cereal.NewManager(d, o.ManagerOpts...)
 			require.NoError(t, err)
 			for _, w := range o.WorkflowExecutors {
 				err := m.RegisterWorkflowExecutor(w.Name, w.Executor)

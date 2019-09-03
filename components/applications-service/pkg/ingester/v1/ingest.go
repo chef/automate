@@ -89,8 +89,7 @@ func (i *Ingester) Run() {
 			err := proto.Unmarshal(eventBytes, &habMsg)
 			if err != nil {
 				log.WithFields(log.Fields{
-					"data":    string(eventBytes),
-					"subject": i.natsClient.Subject(),
+					"data": string(eventBytes),
 				}).Error("Unknown message, dropping")
 				continue
 			}

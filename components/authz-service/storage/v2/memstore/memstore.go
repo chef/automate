@@ -10,7 +10,6 @@ import (
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
-	v2 "github.com/chef/automate/components/authz-service/storage/v2"
 )
 
 type State struct {
@@ -237,7 +236,7 @@ func (s *State) GetPolicyChangeID(_ context.Context) (string, error) {
 	return string(atomic.LoadInt64(&s.policyChangeID)), nil
 }
 
-func (s *State) GetPolicyChangeNotifier(ctx context.Context) (v2.PolicyChangeNotifier, error) {
+func (s *State) GetPolicyChangeNotifier(ctx context.Context) (storage.PolicyChangeNotifier, error) {
 	notifier := s.changeManager.register()
 	return notifier, nil
 }
@@ -342,12 +341,12 @@ func (s *State) ListRulesForProject(_ context.Context, projectID string) ([]*sto
 		}
 	}
 
-	rulesStatus := v2.Applied
+	rulesStatus := storage.Applied
 	if len(rules) == 0 {
-		rulesStatus = v2.NoRules
+		rulesStatus = storage.NoRules
 	}
 	if anyStagedRules {
-		rulesStatus = v2.EditsPending
+		rulesStatus = storage.EditsPending
 	}
 
 	return rules, rulesStatus, nil
@@ -366,6 +365,16 @@ func (s *State) DeleteRule(ctx context.Context, projectID, ruleID string) error 
 }
 
 func (*State) ApplyStagedRules(context.Context) error {
+	// TODO
+	return nil
+}
+
+func (*State) FindMissingProjects(ctx context.Context, projectIDs []string) ([]string, error) {
+	// TODO
+	return nil, nil
+}
+
+func (*State) ErrIfMissingProjects(ctx context.Context, projectIDs []string) error {
 	// TODO
 	return nil
 }
@@ -453,7 +462,7 @@ func (s *State) ListProjects(context.Context) ([]*storage.Project, error) {
 	return projects, nil
 }
 
-func (s *State) CreateRole(_ context.Context, role *storage.Role) (*storage.Role, error) {
+func (s *State) CreateRole(_ context.Context, role *storage.Role, checkProjects bool) (*storage.Role, error) {
 	if err := s.roles.Add(role.ID, role, cache.NoExpiration); err != nil {
 		return nil, storage_errors.ErrConflict
 	}
@@ -502,7 +511,7 @@ func (s *State) DeleteRole(ctx context.Context, roleID string) error {
 	return nil
 }
 
-func (s *State) UpdateRole(_ context.Context, r *storage.Role) (*storage.Role, error) {
+func (s *State) UpdateRole(_ context.Context, r *storage.Role, checkProjects bool) (*storage.Role, error) {
 	item, exists := s.roles.Get(r.ID)
 	if !exists {
 		return nil, storage_errors.ErrNotFound

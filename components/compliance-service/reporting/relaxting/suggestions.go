@@ -1,20 +1,20 @@
 package relaxting
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"regexp"
 	"sort"
-
 	"strings"
 
-	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
-	"github.com/chef/automate/lib/errorutils"
 	elastic "github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/schollz/closestmatch"
 	"github.com/sirupsen/logrus"
-	"golang.org/x/net/context"
+
+	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
+	"github.com/chef/automate/lib/errorutils"
 )
 
 // GetSuggestions - Report #12
@@ -60,15 +60,32 @@ func (backend ES2Backend) GetSuggestions(typeParam string, filters map[string][]
 		filters[typeParam] = []string{}
 	}
 
+	//here, we base our decision on which index set (det or summary) to use for querying suggestions
+	// the reason this is necessary is in the where a control has already been added to the query and therefore
+	// the query needs to dive down to the control depth.. requiring the detailed indices.
+	// in other words, only use summary here if there are no 'control' or 'control_tag' filters
+	useSummaryIndex := true
+	if len(filters["control"]) > 0 {
+		useSummaryIndex = false
+	} else {
+		// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
+		for filterType := range filters {
+			if strings.HasPrefix(filterType, "control_tag:") {
+				useSummaryIndex = false
+				break
+			}
+		}
+	}
+
 	suggs := make([]*reportingapi.Suggestion, 0)
 	if typeParam == "profile" {
-		suggs, err = backend.getProfileSuggestions(client, typeParam, target, text, size, filters)
+		suggs, err = backend.getProfileSuggestions(client, typeParam, target, text, size, filters, useSummaryIndex)
 	} else if typeParam == "control" {
 		suggs, err = backend.getControlSuggestions(client, typeParam, target, text, size, filters)
 	} else if suggestionFieldArray(typeParam) {
-		suggs, err = backend.getArrayAggSuggestions(client, typeParam, target, text, size, filters)
+		suggs, err = backend.getArrayAggSuggestions(client, typeParam, target, text, size, filters, useSummaryIndex)
 	} else {
-		suggs, err = backend.getAggSuggestions(client, typeParam, target, text, size, filters)
+		suggs, err = backend.getAggSuggestions(client, typeParam, target, text, size, filters, useSummaryIndex)
 	}
 
 	if err != nil {
@@ -105,12 +122,8 @@ func suggestionFieldArray(field string) bool {
 	}
 }
 
-func (backend ES2Backend) getAggSuggestions(client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string) ([]*reportingapi.Suggestion, error) {
-	//here, we base our decision on which index set (det or summary) to use for querying suggestions
-	// the reason this is necessary is in the where a control has already been added to the query and therefore
-	// the query needs to dive down to the control depth.. requiring the detailed indices.
-	// in other words, only use summary here if there are no controls in the filter
-	esIndex, err := GetEsIndex(filters, len(filters["control"]) == 0, true)
+func (backend ES2Backend) getAggSuggestions(client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
+	esIndex, err := GetEsIndex(filters, useSummaryIndex, true)
 	if err != nil {
 		return nil, errors.Wrap(err, "getAggSuggestions unable to get index dates")
 	}
@@ -212,12 +225,8 @@ func (backend ES2Backend) getAggSuggestions(client *elastic.Client, typeParam st
 	return suggs, nil
 }
 
-func (backend ES2Backend) getArrayAggSuggestions(client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string) ([]*reportingapi.Suggestion, error) {
-	//here, we base our decision on which index set (det or summary) to use for querying suggestions
-	// the reason this is necessary is in the where a control has already been added to the query and therefore
-	// the query needs to dive down to the control depth.. requiring the detailed indices.
-	// in other words, only use summary here if there are no controls in the filter
-	esIndex, err := GetEsIndex(filters, len(filters["control"]) == 0, true)
+func (backend ES2Backend) getArrayAggSuggestions(client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
+	esIndex, err := GetEsIndex(filters, useSummaryIndex, true)
 	if err != nil {
 		return nil, errors.Wrap(err, "getArrayAggSuggestions unable to get index dates")
 	}
@@ -294,10 +303,10 @@ func (backend ES2Backend) getArrayAggSuggestions(client *elastic.Client, typePar
 	return finalSuggs, nil
 }
 
-func (backend ES2Backend) getProfileSuggestions(client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string) ([]*reportingapi.Suggestion, error) {
+func (backend ES2Backend) getProfileSuggestions(client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
 	//the reason we may use summary index here is because we always throw away the current profile filter when
 	// getting a suggestion for profile.. if we didn't then we'd only ever see the filter that's in our filter!
-	esIndex, err := GetEsIndex(filters, len(filters["control"]) == 0, true)
+	esIndex, err := GetEsIndex(filters, useSummaryIndex, true)
 	if err != nil {
 		return nil, errors.Wrap(err, "getProfileSuggestions unable to get index dates")
 	}

@@ -69,28 +69,38 @@ describe command("chef-automate status") do
     STDERR.puts "--------------------------------------------------"
   end
 
-  # NOTE: This list was up-to-date as of 2018-07-23
+  # NOTE: This list was up-to-date as of 2019-08-14
   %w{
-      automate-postgresql
-      automate-elasticsearch
-      automate-ui
-      authz-service
-      es-sidecar-service
-      automate-dex
-      teams-service
-      authn-service
-      notifications-service
-      compliance-service
-      license-control-service
-      local-user-service
-      session-service
-      ingest-service
-      config-mgmt-service
-      deployment-service
-      data-lifecycle-service
-      secrets-service
-      automate-gateway
-      automate-load-balancer
+    deployment-service
+    backup-gateway
+    automate-postgresql
+    automate-pg-gateway
+    automate-elasticsearch
+    automate-es-gateway
+    automate-ui
+    pg-sidecar-service
+    cereal-service
+    event-service
+    es-sidecar-service
+    event-feed-service
+    authz-service
+    automate-dex
+    teams-service
+    authn-service
+    secrets-service
+    applications-service
+    notifications-service
+    nodemanager-service
+    compliance-service
+    license-control-service
+    local-user-service
+    session-service
+    ingest-service
+    config-mgmt-service
+    data-feed-service
+    event-gateway
+    automate-gateway
+    automate-load-balancer
   }.each do |service_name|
     its('stdout') { should match /#{service_name}.* ok/ }
   end

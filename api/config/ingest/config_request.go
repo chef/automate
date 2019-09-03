@@ -24,8 +24,6 @@ func DefaultConfigRequest() *ConfigRequest {
 	c := NewConfigRequest()
 	c.V1.Sys.Service.Host = w.String("0.0.0.0")
 	c.V1.Sys.Service.Port = w.Int32(10122)
-	c.V1.Sys.Service.PurgeConvergeHistoryAfterDays = w.Int32(30)
-	c.V1.Sys.Service.PurgeActionsAfterDays = w.Int32(30)
 	c.V1.Sys.Service.MaxNumberOfBundledRunMsgs = w.Int32(2500)
 	c.V1.Sys.Service.MaxNumberOfBundledActionMsgs = w.Int32(10000)
 	c.V1.Sys.Service.NumberOfRunMsgsTransformers = w.Int32(9)
@@ -41,7 +39,27 @@ func DefaultConfigRequest() *ConfigRequest {
 // instance of config.InvalidConfigError that has the missing keys and invalid
 // fields populated.
 func (c *ConfigRequest) Validate() error {
-	return nil
+	err := ac.NewInvalidConfigError()
+
+	if c.GetV1().GetSys().GetService().GetPurgeConvergeHistoryAfterDays() != nil {
+		err.AddDeprecation(
+			"ingest.v1.sys.service.purge_converge_history_after_days",
+			"Configure the converge history data lifecycle with the chef.automate.domain.data_lifecycle.api.Purge gRPC interface",
+		)
+	}
+
+	if c.GetV1().GetSys().GetService().GetPurgeActionsAfterDays() != nil {
+		err.AddDeprecation(
+			"ingest.v1.sys.service.purge_actions_after_days",
+			"Configure the converge history data lifecycle with the chef.automate.domain.data_lifecycle.api.Purge gRPC interface",
+		)
+	}
+
+	if err.IsEmpty() {
+		return nil
+	}
+
+	return err
 }
 
 // PrepareSystemConfig returns a system configuration that can be used

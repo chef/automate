@@ -1,12 +1,12 @@
 package status
 
 import (
+	"context"
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
 	pb "github.com/golang/protobuf/ptypes/empty"
 	"github.com/sirupsen/logrus"
-	"golang.org/x/net/context"
 
 	"github.com/chef/automate/components/compliance-service/api/status"
 )

@@ -115,14 +115,14 @@ CONFIG="$CONFIG --event-endpoint {{event.sys.ip}}:{{event.cfg.port}}"
 {{~/eachAlive}}
 
 # get nodemanager binding, used for getting nodes and nodemanager info
- {{~#eachAlive bind.nodemanager-service.members as |manager|}}
- {{~#if @last}}
- addNoProxy {{manager.sys.ip}}
- CONFIG="$CONFIG --manager-host {{manager.sys.ip}} --manager-port {{manager.cfg.port}}"
- {{~/if}}
- {{~/eachAlive}}
+{{~#eachAlive bind.nodemanager-service.members as |manager|}}
+{{~#if @last}}
+addNoProxy {{manager.sys.ip}}
+CONFIG="$CONFIG --manager-host {{manager.sys.ip}} --manager-port {{manager.cfg.port}}"
+{{~/if}}
+{{~/eachAlive}}
 
- # Create the compliance config file
+# Create the compliance config file
 CONFIG="$CONFIG --config {{pkg.svc_data_path}}/.compliance-service.toml"
 
 # Listen to what our gossip protocol whispers
@@ -145,6 +145,14 @@ ES_BACKEND="--es-url http://{{member.sys.ip}}:{{member.cfg.http-port}}"
 {{else}}
 ES_BACKEND="--es-url http://127.0.0.1:{{member.cfg.http-port}}"
 {{/if ~}}
+{{~/eachAlive}}
+
+# Bind to cereal
+{{~#eachAlive bind.cereal-service.members as |cereal-service|}}
+  {{~#if @last}}
+addNoProxy {{cereal-service.sys.ip}}
+CONFIG="$CONFIG --cereal-endpoint {{cereal-service.sys.ip}}:{{cereal-service.cfg.port}}"
+  {{~/if}}
 {{~/eachAlive}}
 
 # Postgres

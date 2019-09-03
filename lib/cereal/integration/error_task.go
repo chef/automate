@@ -5,11 +5,11 @@ package integration
 import (
 	"context"
 	"sync"
-	"time"
 
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/backend"
 )
 
 func (suite *CerealTestSuite) TestErroredTask() {
@@ -18,7 +18,7 @@ func (suite *CerealTestSuite) TestErroredTask() {
 	instanceName := randName("instance")
 
 	wgTask := sync.WaitGroup{}
-	wgTask.Add(1)
+	wgTask.Add(2)
 
 	testErr := errors.New("errored")
 
@@ -45,12 +45,17 @@ func (suite *CerealTestSuite) TestErroredTask() {
 				},
 			},
 		),
+
+		WithManagerOpts(
+			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+				wgTask.Done()
+			}),
+		),
 	)
 	defer m.Stop()
 	err := m.EnqueueWorkflow(context.Background(), workflowName, instanceName, nil)
 	suite.Require().NoError(err, "Failed to enqueue workflow")
 	wgTask.Wait()
-	time.Sleep(20 * time.Millisecond)
 	err = m.Stop()
 	suite.NoError(err)
 }

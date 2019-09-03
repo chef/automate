@@ -38,6 +38,15 @@ func request_Deployment_GetVersion_0(ctx context.Context, marshaler runtime.Mars
 
 }
 
+func local_request_Deployment_GetVersion_0(ctx context.Context, marshaler runtime.Marshaler, server DeploymentServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq empty.Empty
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.GetVersion(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 func request_Deployment_ServiceVersions_0(ctx context.Context, marshaler runtime.Marshaler, client DeploymentClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq ServiceVersionsRequest
 	var metadata runtime.ServerMetadata
@@ -45,6 +54,63 @@ func request_Deployment_ServiceVersions_0(ctx context.Context, marshaler runtime
 	msg, err := client.ServiceVersions(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
+}
+
+func local_request_Deployment_ServiceVersions_0(ctx context.Context, marshaler runtime.Marshaler, server DeploymentServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq ServiceVersionsRequest
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.ServiceVersions(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+// RegisterDeploymentHandlerServer registers the http handlers for service Deployment to "mux".
+// UnaryRPC     :call DeploymentServer directly.
+// StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
+func RegisterDeploymentHandlerServer(ctx context.Context, mux *runtime.ServeMux, server DeploymentServer, opts []grpc.DialOption) error {
+
+	mux.Handle("GET", pattern_Deployment_GetVersion_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_Deployment_GetVersion_0(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_Deployment_GetVersion_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_Deployment_ServiceVersions_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_Deployment_ServiceVersions_0(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_Deployment_ServiceVersions_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	return nil
 }
 
 // RegisterDeploymentHandlerFromEndpoint is same as RegisterDeploymentHandler but

@@ -1,11 +1,11 @@
 package relaxting
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
-	"golang.org/x/net/context"
 
 	"github.com/chef/automate/components/compliance-service/api/stats"
 	"github.com/chef/automate/lib/errorutils"

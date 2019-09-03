@@ -1,6 +1,6 @@
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, map } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
 import {
   StatsService,
   ReportQueryService,
@@ -62,6 +62,7 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
   profileBubbleLoading = false;
 
   tooltipText = 'Failed Nodes';
+  interval$: Observable<number>;
 
   // Used to notify all subscriptions to unsubscribe
   // http://stackoverflow.com/a/41177163/319074
@@ -79,6 +80,9 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
     this.reportQuery.state.pipe(
       takeUntil(this.isDestroyed))
       .subscribe(this.getData.bind(this));
+
+    this.interval$ = this.reportQuery.state.pipe(map((reportQuery: ReportQuery) =>
+      reportQuery.interval));
   }
 
   ngOnDestroy() {

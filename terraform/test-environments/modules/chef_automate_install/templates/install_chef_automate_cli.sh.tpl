@@ -30,7 +30,7 @@ deploy() {
     if [[ "${airgapped}" == "true" ]]; then
         rm -f /tmp/automate.aib
     fi
-
+    configure_retention
 }
 
 redeploy() {
@@ -38,6 +38,7 @@ redeploy() {
     cp /tmp/chef-automate-config.toml /etc/chef-automate/config.toml
     chmod a+rx /var/opt
     chef-automate deploy /etc/chef-automate/config.toml --accept-terms-and-mlsa --skip-preflight
+    configure_retention
 }
 
 install_automate_cmd() {
@@ -84,6 +85,40 @@ hardened_security_inspec_scan() {
     if [[ $exit_status -ne 0 && $exit_status -ne 101 ]]; then
         exit $exit_status
     fi
+}
+
+configure_retention() {
+  chef-automate dev grpcurl ingest-service -- chef.automate.infra.data_lifecycle.api.Purge.Configure -d '{
+    "recurrence":"FREQ=DAILY;DTSTART=20190820T174501Z;INTERVAL=1",
+    "policy_update": {
+      "es": [
+        {
+          "policy_name":"converge-history",
+          "older_than_days":"${retention_older_than_days}"
+        },
+        {
+          "policy_name":"actions",
+          "older_than_days":"${retention_older_than_days}"
+        }
+      ]
+    }
+  }'
+
+  chef-automate dev grpcurl compliance-service -- chef.automate.infra.data_lifecycle.api.Purge.Configure -d '{
+    "recurrence":"FREQ=DAILY;DTSTART=20190820T174501Z;INTERVAL=1",
+    "policy_update": {
+      "es": [
+        {
+          "policy_name":"compliance-scans",
+          "older_than_days":"${retention_older_than_days}"
+        },
+        {
+          "policy_name":"compliance-reports",
+          "older_than_days":"${retention_older_than_days}"
+        }
+      ]
+    }
+  }'
 }
 
 if [[ "${airgapped}" == "false" ]]; then

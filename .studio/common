@@ -53,7 +53,7 @@ function compile_go_protobuf_component() {
 
   local proto_script="$path/scripts/grpc.sh"
   if [ -x "$proto_script" ]; then
-      compile_go_protobuf "$proto_script"
+      compile_go_protobuf "$proto_script" || return $?
   else
       error "$proto_script doesn't exist or is not executable!"
       case $path in

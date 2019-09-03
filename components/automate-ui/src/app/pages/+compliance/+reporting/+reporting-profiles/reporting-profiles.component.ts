@@ -91,7 +91,6 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
   }
 
   getData(reportQuery: ReportQuery) {
-    if (reportQuery.filters.length === 0) { return; }
     const params = this.reportData.profilesListParams;
     this.reportData.getReportingProfilesList(reportQuery, params);
   }

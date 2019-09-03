@@ -10,7 +10,6 @@ import (
 	"net/url"
 
 	"github.com/pkg/errors"
-	"golang.org/x/net/context/ctxhttp"
 )
 
 // Client is the interface fulfilled by a trial-license-service client
@@ -74,9 +73,14 @@ func (c *client) RequestTrialLicense(ctx context.Context,
 		return "", errors.Wrap(err, "marshal request body")
 	}
 
-	resp, err := ctxhttp.Post(ctx,
-		nil, // use http.DefaultClient
-		c.endpoint.String(), "application/json", bytes.NewReader(reqBody))
+	req, err := http.NewRequest("POST", c.endpoint.String(), bytes.NewReader(reqBody))
+	if err != nil {
+		return "", errors.Wrap(err, "send trial license request")
+	}
+	req.WithContext(ctx)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return "", errors.Wrap(err, "send trial license request")
 	}

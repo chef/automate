@@ -14,6 +14,8 @@ import (
 	pb_common "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/common"
 	pb_req "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/request"
 	pb_resp "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/response"
+	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
+	rules "github.com/chef/automate/components/automate-gateway/handler/iam/v2beta/rules"
 )
 
 // Server is the server interface
@@ -22,6 +24,11 @@ type Server struct {
 	projects authz.ProjectsClient
 	authz    authz.AuthorizationClient
 }
+
+// asserts that we satisfy the correct interface here -- it's a safeguard
+var _ middleware.AuthContextReader = (*Server)(nil)
+
+func (*Server) AuthContextRead() {}
 
 // NewServer creates a server with its client.
 func NewServer(
@@ -619,8 +626,9 @@ func domainProjectToAPIProject(p *authz.Project) (*pb_common.Project, error) {
 		return nil, errors.Wrapf(err, "project %q", p.Id)
 	}
 	return &pb_common.Project{
-		Id:   p.Id,
-		Name: p.Name,
-		Type: t,
+		Id:     p.Id,
+		Name:   p.Name,
+		Type:   t,
+		Status: rules.FromInternalRulesStatus(p.Status),
 	}, nil
 }

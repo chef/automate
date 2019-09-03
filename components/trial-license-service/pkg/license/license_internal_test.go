@@ -2,6 +2,7 @@ package license
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"net/url"
@@ -30,7 +31,7 @@ func TestMakeHTTPRequest(t *testing.T) {
 		licenseVersion:    "2",
 		apiKey:            "sesame5",
 	}
-	licReq, err := f.makeHTTPRequest(licenseRequest{Customer: "ACME Inc", Type: "trial"})
+	licReq, err := f.makeHTTPRequest(context.Background(), licenseRequest{Customer: "ACME Inc", Type: "trial"})
 	assert.NoError(t, err)
 
 	assert.Equal(t, "application/json", licReq.Header.Get("content-type"))

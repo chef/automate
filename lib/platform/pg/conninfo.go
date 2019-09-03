@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/lib/platform/command"
+	platform_config "github.com/chef/automate/lib/platform/config"
 )
 
 type ConnInfoURI interface {
@@ -53,6 +54,49 @@ var A2SuperuserCerts = TLSCertPaths{
 	Cert:     "/hab/svc/automate-postgresql/config/server.crt",
 	Key:      "/hab/svc/automate-postgresql/config/server.key",
 	RootCert: "/hab/svc/automate-postgresql/config/root.crt",
+}
+
+// NOTE(ssd) 2019-08-19: This is a bit of duplication with code in
+// platform/config to ensure that you can depend on the platform
+// config without pulling in the command class.
+type PlatformConnInfo struct {
+	config *platform_config.Config
+	info   *platform_config.PGConnInfo
+}
+
+func SuperuserConnInfoFromPlatformConfig(c *platform_config.Config) (*PlatformConnInfo, error) {
+	info, err := c.GetPGConnInfoForSuperuser()
+	if err != nil {
+		return nil, err
+	}
+
+	return &PlatformConnInfo{
+		config: c,
+		info:   info,
+	}, nil
+}
+
+func (p *PlatformConnInfo) ConnURI(dbname string) string {
+	return p.info.ConnURI(dbname)
+}
+
+func (p *PlatformConnInfo) String() string {
+	return p.info.String()
+}
+
+func (p *PlatformConnInfo) PsqlCmdOptions() []command.Opt {
+	if p.config.IsExternalPG() {
+		return []command.Opt{
+			command.Envvar("PGTZ", "UTC"),
+		}
+	}
+	return []command.Opt{
+		command.Envvar("PGSSLKEY", A2SuperuserCerts.Key),
+		command.Envvar("PGSSLCERT", A2SuperuserCerts.Cert),
+		command.Envvar("PGSSLROOTCERT", A2SuperuserCerts.RootCert),
+		command.Envvar("PGSSLMODE", "verify-ca"),
+		command.Envvar("PGTZ", "UTC"),
+	}
 }
 
 // A2ConnInfo represents the connection information for an Automate 2

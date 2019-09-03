@@ -28,8 +28,13 @@ message ConfigRequest {
 			message Service {
 				google.protobuf.StringValue host = 1;
 				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10122, protocol: "grpc" } ];
-				google.protobuf.Int32Value purge_converge_history_after_days = 3;
-				google.protobuf.Int32Value purge_actions_after_days = 4;
+				// NOTE: purge actions are no longer configurable via config
+				// and are now managed with gRPC endpoints. They are not
+				// reserved so we can migrate the initial values from config to
+				// to the purge cereal workflows.
+				// Setting these values is prevented in the Validate() callback.
+				google.protobuf.Int32Value purge_converge_history_after_days = 3 [deprecated = true];
+				google.protobuf.Int32Value purge_actions_after_days = 4 [deprecated = true];
 				reserved 5;
 				google.protobuf.Int32Value max_number_of_bundled_run_msgs = 6;
 				google.protobuf.Int32Value max_number_of_bundled_action_msgs = 7;

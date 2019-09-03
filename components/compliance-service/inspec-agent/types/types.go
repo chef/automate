@@ -60,7 +60,7 @@ type InspecJob struct {
 	StartTime           *time.Time          `json:"start_time,omitempty"`
 	EndTime             *time.Time          `json:"end_time,omitempty"`
 	TargetConfig        inspec.TargetConfig `json:"target_config,omitempty"`
-	NodeStatus          *string             `json:"node_status,omitempty"`
+	NodeStatus          string              `json:"node_status,omitempty"`
 	SourceID            string              `json:"source_id,omitempty"`
 	SourceAccountID     string              `json:"account_id,omitempty"`
 	SSM                 bool                `json:"ssm,omitempty"`
@@ -70,6 +70,7 @@ type InspecJob struct {
 	InternalProfiles    []string            `json:"internal_profiles,omitempty"`
 	MachineIdentifier   string              `json:"machine_identifier,omitempty"`
 	Tags                []*common.Kv        `json:"kv,omitempty"`
+	ParentJobID         string              `json:"parent_job_id,omitempty"`
 }
 
 // WorkerStats describe the state of all inspec job workers to be used for analysis purposes

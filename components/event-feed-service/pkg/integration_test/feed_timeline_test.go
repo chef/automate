@@ -49,7 +49,7 @@ func TestEventStringsNormalRequest(t *testing.T) {
 		Timezone: timezone,
 	}
 
-	feedTimeline, err := testSuite.feedServer.GetFeedTimeline(ctx, request)
+	feedTimeline, err := testSuite.feedClient.GetFeedTimeline(ctx, request)
 
 	assert.Nil(t, err)
 
@@ -194,7 +194,7 @@ func TestEventStringsFilterEventType(t *testing.T) {
 	for _, test := range cases {
 		t.Run(fmt.Sprintf("with request '%v' it %s", test.request, test.description),
 			func(t *testing.T) {
-				res, err := testSuite.feedServer.GetFeedTimeline(ctx, &test.request)
+				res, err := testSuite.feedClient.GetFeedTimeline(ctx, &test.request)
 				if assert.Nil(t, err) {
 					for _, line := range res.ActionLines {
 						if line.Action == verb {
@@ -244,7 +244,7 @@ func TestEventStringsDayZoneActionsRequest(t *testing.T) {
 		Timezone: timezone,
 	}
 
-	feedTimeline, err := testSuite.feedServer.GetFeedTimeline(ctx, request)
+	feedTimeline, err := testSuite.feedClient.GetFeedTimeline(ctx, request)
 
 	assert.Nil(t, err)
 
@@ -269,7 +269,7 @@ func TestEventStringsIncorrectHoursBetween(t *testing.T) {
 		t.Run(fmt.Sprintf("with parameters hours between=%d it should return an error",
 			bucketSize), func(t *testing.T) {
 
-			_, err := testSuite.feedServer.GetFeedTimeline(ctx, &event_feed.FeedTimelineRequest{
+			_, err := testSuite.feedClient.GetFeedTimeline(ctx, &event_feed.FeedTimelineRequest{
 				Start:    "2018-01-01",
 				End:      "2018-01-06",
 				Interval: int32(bucketSize),
@@ -313,7 +313,7 @@ func TestEventStringsVaryingBucketsSizeRequest(t *testing.T) {
 			Timezone: timezone,
 		}
 
-		feedTimeline, err := testSuite.feedServer.GetFeedTimeline(ctx, request)
+		feedTimeline, err := testSuite.feedClient.GetFeedTimeline(ctx, request)
 
 		assert.Nil(t, err)
 		totalItems := 0
@@ -352,7 +352,7 @@ func TestEventStringsVaryingBucketsSizeNoActionsRequest(t *testing.T) {
 			Timezone: timezone,
 		}
 
-		feedTimeline, err := testSuite.feedServer.GetFeedTimeline(ctx, request)
+		feedTimeline, err := testSuite.feedClient.GetFeedTimeline(ctx, request)
 
 		assert.Nil(t, err)
 		totalItems := 0
@@ -464,7 +464,7 @@ func TestEventStringsThreeDayThreeActionsRequest(t *testing.T) {
 		Timezone: timezone,
 	}
 
-	feedTimeline, err := testSuite.feedServer.GetFeedTimeline(ctx, request)
+	feedTimeline, err := testSuite.feedClient.GetFeedTimeline(ctx, request)
 
 	assert.Nil(t, err)
 
@@ -606,7 +606,7 @@ func TestEventStringsThreeDayThreeActionsInNewYorkRequest(t *testing.T) {
 		Timezone: timezone,
 	}
 
-	feedTimeline, err := testSuite.feedServer.GetFeedTimeline(ctx, request)
+	feedTimeline, err := testSuite.feedClient.GetFeedTimeline(ctx, request)
 
 	assert.Nil(t, err)
 
@@ -682,7 +682,7 @@ func TestEventStringsDayOneActionsOutsideOfRequest(t *testing.T) {
 		Timezone: timezone,
 	}
 
-	feedTimeline, err := testSuite.feedServer.GetFeedTimeline(ctx, request)
+	feedTimeline, err := testSuite.feedClient.GetFeedTimeline(ctx, request)
 
 	assert.Nil(t, err)
 
@@ -728,7 +728,7 @@ func TestEventStringsDayRequest(t *testing.T) {
 		Timezone: timezone,
 	}
 
-	feedTimeline, err := testSuite.feedServer.GetFeedTimeline(ctx, request)
+	feedTimeline, err := testSuite.feedClient.GetFeedTimeline(ctx, request)
 
 	assert.Nil(t, err)
 
@@ -766,7 +766,7 @@ func TestEventStringsIncorrectTimezone(t *testing.T) {
 		t.Run(fmt.Sprintf("with parameters timezone=%s it should return an error",
 			test.Timezone), func(t *testing.T) {
 
-			_, err := testSuite.feedServer.GetFeedTimeline(ctx, &test)
+			_, err := testSuite.feedClient.GetFeedTimeline(ctx, &test)
 
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		})
@@ -849,7 +849,7 @@ func TestEventStringsIncorrectTimes(t *testing.T) {
 		t.Run(fmt.Sprintf("with parameters start=%s end=%s it should return an error",
 			test.Start, test.End), func(t *testing.T) {
 
-			_, err := testSuite.feedServer.GetFeedTimeline(ctx, &test)
+			_, err := testSuite.feedClient.GetFeedTimeline(ctx, &test)
 
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		})
@@ -1226,7 +1226,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 		Timezone: timezone,
 	}
 
-	feedTimeline, err := testSuite.feedServer.GetFeedTimeline(ctx, request)
+	feedTimeline, err := testSuite.feedClient.GetFeedTimeline(ctx, request)
 
 	assert.Nil(t, err)
 	totalItems := 0

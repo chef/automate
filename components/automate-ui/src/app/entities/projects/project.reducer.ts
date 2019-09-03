@@ -16,6 +16,7 @@ export interface ApplyRulesStatus {
   estimatedTimeComplete: string;
   percentageComplete: number;
   failed: boolean;
+  cancelled: boolean;
   failureMessage: string;
 }
 
@@ -44,6 +45,7 @@ const initialApplyRulesStatus: ApplyRulesStatus = {
   estimatedTimeComplete: '0001-01-01T00:00:00Z',
   percentageComplete: 0,
   failed: false,
+  cancelled: false,
   failureMessage: ''
 };
 
