@@ -9,7 +9,7 @@
 
     <div class="reporting-header">
       <app-reporting-searchbar
-        [date]="reportQuery.endDate"
+        [date]="endDate$ | async"
         [filters]="getSelectedFilters()"
         [filterTypes]="availableFilterTypes"
         [filterValues]="availableFilterValues"

@@ -19,7 +19,8 @@ import {
   StatsService,
   SuggestionsService,
   ReportDataService,
-  ReportQueryService
+  ReportQueryService,
+  ReportQuery
 } from '../shared/reporting';
 import { saveAs } from 'file-saver';
 import {
@@ -126,6 +127,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
   downloadStatusVisible = false;
   downloadInProgress = false;
   downloadFailed = false;
+  endDate$: Observable<Date>;
 
   showSummary = false;
 
@@ -156,16 +158,18 @@ export class ReportingComponent implements OnInit, OnDestroy {
   ngOnInit() {
     const allUrlParameters$ = this.getAllUrlParameters();
 
+    this.endDate$ = this.reportQuery.state.pipe(map((reportQuery: ReportQuery) =>
+      reportQuery.endDate));
 
     allUrlParameters$.pipe(takeUntil(this.isDestroyed)).subscribe(
       allUrlParameters => this.applyParamFilters(allUrlParameters));
 
-    this.reportQuery.filters.pipe(
+    this.reportQuery.state.pipe(
       takeUntil(this.isDestroyed))
-      .subscribe(filters => {
+      .subscribe(reportQuery => {
         this.reportData.nodesListParams.page = 1;
         this.reportData.profilesListParams.page = 1;
-        this.getData(filters);
+        this.getData(reportQuery);
       });
 
     this.suggestionSearchTerms.pipe(
@@ -174,12 +178,12 @@ export class ReportingComponent implements OnInit, OnDestroy {
       // ignore new term if same as previous term
       distinctUntilChanged(),
       // include currently selected report filters
-      withLatestFrom(this.reportQuery.filters),
+      withLatestFrom(this.reportQuery.state),
       // switch to new search observable each time the term changes
-      switchMap(([terms, filters]) => {
+      switchMap(([terms, reportQuery]) => {
         const { type, text } = terms;
         if (text && text.length > 0) {
-          return this.getSuggestions(type, text, filters);
+          return this.getSuggestions(type, text, reportQuery);
         }
         return observableOf([]);
       }),
@@ -212,18 +216,22 @@ export class ReportingComponent implements OnInit, OnDestroy {
     );
   }
 
-  applyParamFilters(filters: Chicklet[]) {
-    const c = filters.map((filter) => {
+  applyParamFilters(urlFilters: Chicklet[]) {
+    const reportQuery = this.reportQuery.getReportQuery();
+    reportQuery.filters = [];
+    urlFilters.forEach( (filter: Chicklet) => {
       if (filter.type === 'end_time') {
-        return { end_time: new Date(filter.text) };
+        reportQuery.endDate = new Date(filter.text);
       } else if ( filter.type === 'start_time' ) {
-        return { start_time: new Date(filter.text) };
+        reportQuery.startDate = new Date(filter.text);
+      } else if ( filter.type === 'date_interval' ) {
+        reportQuery.interval = parseInt(filter.text, 10);
       } else {
-        return { type: { name: filter.type }, value: { text: filter.text } };
+        reportQuery.filters.push({ type: { name: filter.type }, value: { text: filter.text } });
       }
     });
 
-    this.reportQuery.addFilters(c);
+    this.reportQuery.setState(reportQuery);
   }
 
   toggleDownloadDropdown() {
@@ -249,8 +257,8 @@ export class ReportingComponent implements OnInit, OnDestroy {
   onDownloadOptPressed(format) {
     this.downloadOptsVisible = false;
 
-    const filters = this.reportQuery.filters.getValue();
-    const filename = `${moment(this.reportQuery.endDate).format('YYYY-M-D')}.${format}`;
+    const reportQuery = this.reportQuery.getReportQuery();
+    const filename = `${moment(reportQuery.endDate).format('YYYY-M-D')}.${format}`;
 
     const onComplete = () => this.downloadInProgress = false;
     const onError = _e => this.downloadFailed = true;
@@ -264,7 +272,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
     this.downloadList = [filename];
     this.showDownloadStatus();
-    this.statsService.downloadReport(format, filters).pipe(
+    this.statsService.downloadReport(format, reportQuery).pipe(
       finalize(onComplete))
       .subscribe(onNext, onError);
   }
@@ -282,13 +290,11 @@ export class ReportingComponent implements OnInit, OnDestroy {
   }
 
   onEndDateChanged(event) {
-    const { intervals, interval } = this.reportQuery;
     const endDate = event.detail;
-    const startDate = intervals[interval][1](endDate);
+    const startDate = this.reportQuery.findTimeIntervalStartDate(endDate);
 
     const queryParams = {...this.route.snapshot.queryParams};
     queryParams['start_time'] = moment(startDate).startOf('day').format();
-
     queryParams['end_time'] = moment(endDate).endOf('day').format();
 
     this.router.navigate([], {queryParams});
@@ -364,14 +370,13 @@ export class ReportingComponent implements OnInit, OnDestroy {
     this.router.navigate([], {queryParams: filteredParams});
   }
 
-  getData(filters) {
-    if (filters.length === 0) { return; }
-    this.reportData.getReportingSummary(filters);
+  getData(reportQuery: ReportQuery) {
+    if (reportQuery.filters.length === 0) { return; }
+    this.reportData.getReportingSummary(reportQuery);
   }
 
   getSelectedFilters() {
-    return this.reportQuery.filters.getValue()
-      .filter(f => !f['end_time'] && !f['start_time']);
+    return this.reportQuery.getReportQuery().filters;
   }
 
   toggleSummary() {

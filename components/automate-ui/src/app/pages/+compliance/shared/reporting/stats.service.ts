@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import * as moment from 'moment';
 import { omitBy, isNil } from 'lodash';
 import { environment } from '../../../../../environments/environment';
+import { ReportQuery } from './report-query.service';
 
 const CC_API_URL = environment.compliance_url;
 
@@ -20,74 +21,74 @@ export class StatsService {
     private httpClient: HttpClient
   ) {}
 
-  getFailures(types: Array<string>, filters): Observable<any> {
+  getFailures(types: Array<string>, reportQuery: ReportQuery): Observable<any> {
     const url = `${CC_API_URL}/reporting/stats/failures`;
-    const formatted = this.formatFilters(filters);
+    const formatted = this.formatFilters(reportQuery);
     formatted.push({ type: 'types', values: types });
     const body = { filters: formatted };
 
     return this.httpClient.post<any>(url, body);
   }
 
-  getNodeSummary(filters): Observable<any> {
+  getNodeSummary(reportQuery: ReportQuery): Observable<any> {
     const url = `${CC_API_URL}/reporting/stats/summary`;
-    const formatted = this.formatFilters(filters);
+    const formatted = this.formatFilters(reportQuery);
     const body = { type: 'nodes', filters: formatted };
 
     return this.httpClient.post<any>(url, body).pipe(
       map(({ node_summary }) => node_summary));
   }
 
-  getControlsSummary(filters): Observable<any> {
+  getControlsSummary(reportQuery: ReportQuery): Observable<any> {
     const url = `${CC_API_URL}/reporting/stats/summary`;
-    const formatted = this.formatFilters(filters);
+    const formatted = this.formatFilters(reportQuery);
     const body = { type: 'controls', filters: formatted };
 
     return this.httpClient.post<any>(url, body).pipe(
       map(({ controls_summary }) => controls_summary));
   }
 
-  getNodeTrend(filters) {
+  getNodeTrend(reportQuery: ReportQuery) {
     const url = `${CC_API_URL}/reporting/stats/trend`;
     const interval = 86400;
 
-    const formatted = this.formatFilters(filters);
+    const formatted = this.formatFilters(reportQuery);
     const body = {type: 'nodes', interval, filters: formatted};
 
     return this.httpClient.post<any>(url, body).pipe(
       map(({ trends }) => trends));
   }
 
-  getControlsTrend(filters) {
+  getControlsTrend(reportQuery: ReportQuery) {
     const url = `${CC_API_URL}/reporting/stats/trend`;
     const interval = 86400;
 
-    const formatted = this.formatFilters(filters);
+    const formatted = this.formatFilters(reportQuery);
     const body = {type: 'controls', interval, filters: formatted};
 
     return this.httpClient.post<any>(url, body).pipe(
       map(({ trends }) => trends));
   }
 
-  getSummary(filters: any[]) {
+  getSummary(reportQuery: ReportQuery) {
     const url = `${CC_API_URL}/reporting/stats/summary`;
-    const body = { filters: this.formatFilters(filters) };
+    const body = { filters: this.formatFilters(reportQuery) };
 
     return this.httpClient.post<any>(url, body).pipe(
       map(({ report_summary }) => report_summary));
   }
 
-  getProfileResultsSummary(id: string, filters) {
+  getProfileResultsSummary(id: string, reportQuery: ReportQuery) {
     const url = `${CC_API_URL}/reporting/stats/profiles`;
-    const body = {type: 'summary', id, filters: this.formatFilters(filters)};
+    const body = {type: 'summary', id, filters: this.formatFilters(reportQuery)};
 
     return this.httpClient.post<any>(url, body).pipe(
       map(({ profile_summary }) => profile_summary));
   }
 
-  getProfileResults(id: string, filters) {
+  getProfileResults(id: string, reportQuery: ReportQuery) {
     const url = `${CC_API_URL}/reporting/stats/profiles`;
-    const body = {type: 'controls', id, filters: this.formatFilters(filters)};
+    const body = {type: 'controls', id, filters: this.formatFilters(reportQuery)};
 
     return this.httpClient.post<any>(url, body).pipe(
       map(({ control_stats }) => control_stats.map(c => {
@@ -95,13 +96,11 @@ export class StatsService {
       })));
   }
 
-  getNodes(filters: any[], listParams: any): Observable<any> {
+  getNodes(reportQuery: ReportQuery, listParams: any): Observable<any> {
     const url = `${CC_API_URL}/reporting/nodes/search`;
 
-    const formatted = this.formatFilters(filters);
+    const formatted = this.formatFilters(reportQuery);
     let body = { filters: formatted };
-
-    console.info('getNodes formatted' + JSON.stringify(formatted));
 
     const {page, perPage} = listParams;
     if (page && perPage) {
@@ -118,10 +117,10 @@ export class StatsService {
         ({total, total_failed, total_passed, total_skipped, items: nodes})));
   }
 
-  getProfiles(filters: any[], listParams: any): Observable<any> {
+  getProfiles(reportQuery: ReportQuery, listParams: any): Observable<any> {
     const url = `${CC_API_URL}/reporting/profiles`;
 
-    const formatted = this.formatFilters(filters);
+    const formatted = this.formatFilters(reportQuery);
     let body = { filters: formatted };
 
     const {page, perPage} = listParams;
@@ -138,10 +137,10 @@ export class StatsService {
       map(({ profiles, counts: { total }}) => ({total, items: profiles})));
   }
 
-  getStatsProfiles(filters: any[], listParams: any): Observable<any> {
+  getStatsProfiles(reportQuery: ReportQuery, listParams: any): Observable<any> {
     const url = `${CC_API_URL}/reporting/stats/profiles`;
 
-    const formatted = this.formatFilters(filters);
+    const formatted = this.formatFilters(reportQuery);
     let body = { filters: formatted };
 
     const {page, perPage} = listParams;
@@ -160,9 +159,9 @@ export class StatsService {
       }));
   }
 
-  getReports(filters: any[], listParams: any): Observable<any> {
+  getReports(reportQuery: ReportQuery, listParams: any): Observable<any> {
     const url = `${CC_API_URL}/reporting/reports`;
-    const formatted = this.formatFilters(filters);
+    const formatted = this.formatFilters(reportQuery);
     let body = { filters: formatted };
 
     const {sort, order} = listParams;
@@ -174,30 +173,20 @@ export class StatsService {
       map(({ reports }) => reports));
   }
 
-  downloadReport(format: string, filters: any[]): Observable<string> {
+  downloadReport(format: string, reportQuery: ReportQuery): Observable<string> {
     const url = `${CC_API_URL}/reporting/export`;
+
     // for export, we want to send the start_time as the beg of day of end time
     // so we find the endtime in the filters, and then set start time to beg of that day
-    const filtersCopy = this.setStartTimeToBegDayEndTime(filters);
+    reportQuery.startDate = moment(reportQuery.endDate).startOf('day').toDate();
 
-    const body = { type: format, filters: this.formatFilters(filtersCopy) };
+    const body = { type: format, filters: this.formatFilters(reportQuery) };
     return this.httpClient.post(url, body, { responseType: 'text' });
   }
 
-  setStartTimeToBegDayEndTime(filters) {
-    const endtime = filters.find(filter => filter['end_time']);
-    const filtersCopy = filters.map(filter => {
-      if (filter['start_time']) {
-        filter['start_time'] = moment(endtime['end_time']).startOf('day');
-      }
-      return filter;
-    });
-    return filtersCopy;
-  }
-
-  getSingleReport(reportID: string, filters: any[]): Observable<any> {
+  getSingleReport(reportID: string, reportQuery: ReportQuery): Observable<any> {
     const url = `${CC_API_URL}/reporting/reports/id/${reportID}`;
-    const formatted = this.formatFilters(filters);
+    const formatted = this.formatFilters(reportQuery);
     const body = { filters: formatted };
 
     return this.httpClient.post<any>(url, body).pipe(
@@ -233,28 +222,8 @@ export class StatsService {
     return filters;
   }
 
-  formatFilters(filters) {
-    return filters.reduce((formatted, filter) => {
-      if (filter['end_time'] || filter['start_time']) {
-        const type = Object.keys(filter)[0];
-        const now = moment();
-        let value = moment(filter[type])
-          .set({
-            hour: now.get('hour'),
-            minute: now.get('minute'),
-            second: now.get('second')
-          })
-          .utc();
-
-        if (type === 'end_time') {
-          value = value.endOf('day');
-        } else {
-          value = value.startOf('day');
-        }
-
-        const values = [value.format()];
-        formatted.push({type, values});
-      } else {
+  formatFilters(reportQuery: ReportQuery) {
+    const apiFilters = reportQuery.filters.reduce((formatted, filter) => {
         let type = filter['type']['name'];
         let value = filter['value']['id'] || filter['value']['text'];
         if (type === 'profile') {
@@ -300,8 +269,33 @@ export class StatsService {
         } else {
           formatted.push({type, values: [value]});
         }
-      }
       return formatted;
     }, []);
+
+    if (reportQuery.startDate) {
+      const now = moment();
+      const value = moment(reportQuery.startDate)
+        .set({
+          hour: now.get('hour'),
+          minute: now.get('minute'),
+          second: now.get('second')
+        }).utc().startOf('day');
+
+      apiFilters.push({type: 'start_time', values: [value.format()]});
+    }
+
+    if (reportQuery.endDate) {
+      const now = moment();
+      const value = moment(reportQuery.endDate)
+        .set({
+          hour: now.get('hour'),
+          minute: now.get('minute'),
+          second: now.get('second')
+        }).utc().endOf('day');
+
+      apiFilters.push({type: 'end_time', values: [value.format()]});
+    }
+
+    return apiFilters;
   }
 }

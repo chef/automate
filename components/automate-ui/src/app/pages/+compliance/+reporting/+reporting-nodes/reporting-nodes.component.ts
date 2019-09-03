@@ -3,9 +3,13 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { groupBy } from 'lodash';
 import * as moment from 'moment';
-import { Filter } from '../types';
+import { FilterC } from '../types';
 import { paginationOverride } from '../shared';
-import { StatsService, ReportQueryService, ReportDataService } from '../../shared/reporting';
+import {
+  StatsService,
+  ReportQueryService,
+  ReportDataService,
+  ReportQuery } from '../../shared/reporting';
 
 @Component({
   selector: 'app-reporting-nodes',
@@ -14,8 +18,8 @@ import { StatsService, ReportQueryService, ReportDataService } from '../../share
 })
 export class ReportingNodesComponent implements OnInit, OnDestroy {
   displayScanResultsSidebar = false;
-  scanResultsNodeFilter: Filter;
-  scanResultsProfileFilter: Filter;
+  scanResultsNodeFilter: FilterC;
+  scanResultsProfileFilter: FilterC;
   layerOneData: any = {};
   layerTwoData: any = {};
   control: any = {};
@@ -33,7 +37,7 @@ export class ReportingNodesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.reportQuery.filters.pipe(
+    this.reportQuery.state.pipe(
       takeUntil(this.isDestroyed))
       .subscribe(this.getData.bind(this));
   }
@@ -58,13 +62,13 @@ export class ReportingNodesComponent implements OnInit, OnDestroy {
   }
 
   onNodesListPageChanged(event) {
-    const filters = this.reportQuery.filters.getValue();
+    const reportQuery = this.reportQuery.getReportQuery();
     this.reportData.nodesListParams.page = event;
-    this.getData(filters);
+    this.getData(reportQuery);
   }
 
   onNodesListSortToggled(event) {
-    const filters = this.reportQuery.filters.getValue();
+    const reportQuery = this.reportQuery.getReportQuery();
     let {sort, order} = event.detail;
     if (order === 'none') {
       sort = undefined;
@@ -72,7 +76,7 @@ export class ReportingNodesComponent implements OnInit, OnDestroy {
     }
     this.reportData.nodesListParams.sort = sort;
     this.reportData.nodesListParams.order = order;
-    this.getData(filters);
+    this.getData(reportQuery);
   }
 
   displayControlTitleOrId(title, id) {
@@ -87,8 +91,8 @@ export class ReportingNodesComponent implements OnInit, OnDestroy {
     return sortKey === sort ? order : 'none';
   }
 
-  filterFor(node) {
-    return this.reportQuery.filters.getValue().filter(f => {
+  filterFor(node): FilterC {
+    return this.reportQuery.getReportQuery().filters.filter(f => {
       return f.type && f.type.name === 'node_id' && f.value.id === node.id;
     })[0];
   }
@@ -115,8 +119,8 @@ export class ReportingNodesComponent implements OnInit, OnDestroy {
 
   // scan results component data
   displayScanResults(node) {
-    const filters = this.reportQuery.filters.getValue();
-    this.getProfilesForNode(filters, paginationOverride, node);
+    const reportQuery = this.reportQuery.getReportQuery();
+    this.getProfilesForNode(reportQuery, paginationOverride, node);
     this.displayScanResultsSidebar = true;
     this.scanResultsPane = 0;
   }
@@ -125,13 +129,13 @@ export class ReportingNodesComponent implements OnInit, OnDestroy {
     this.displayScanResultsSidebar = false;
   }
 
-  getProfilesForNode(filters: any[], listParams: any, node) {
-    const nodeFilter = {type: {name: 'node_id'}, value: node};
+  getProfilesForNode(reportQuery: ReportQuery, listParams: any, node) {
+    const nodeFilter: FilterC = {type: {name: 'node_id'}, value: { text: node.name, id: node.id}};
 
-    filters = [nodeFilter].concat(filters);
+    reportQuery.filters = [nodeFilter].concat(reportQuery.filters);
     this.scanResultsNodeFilter = nodeFilter;
 
-    this.statsService.getStatsProfiles(filters, listParams).pipe(
+    this.statsService.getStatsProfiles(reportQuery, listParams).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(data => {
         const profiles = this.addProfileStatus(data);
@@ -155,21 +159,22 @@ export class ReportingNodesComponent implements OnInit, OnDestroy {
   }
 
   getControls(item) {
-    let filters: any[] = this.reportQuery.filters.getValue();
+    const reportQuery = this.reportQuery.getReportQuery();
 
     this.scanResultsProfileFilter = {
       type: { name: 'profile_id' },
       value: { text: item.id}
     };
 
-    filters = [this.scanResultsNodeFilter, this.scanResultsProfileFilter].concat(filters);
+    reportQuery.filters = [this.scanResultsNodeFilter, this.scanResultsProfileFilter].concat(
+      reportQuery.filters);
 
-    this.statsService.getReports(filters, {sort: 'latest_report.end_time', order: 'DESC'}).pipe(
+    this.statsService.getReports(reportQuery, {sort: 'latest_report.end_time', order: 'DESC'}).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(data => {
         const reportID = data[0].id;
         // get single report with all filters
-        this.getFilteredSingleReport(reportID, filters, item);
+        this.getFilteredSingleReport(reportID, reportQuery, item);
       });
   }
 

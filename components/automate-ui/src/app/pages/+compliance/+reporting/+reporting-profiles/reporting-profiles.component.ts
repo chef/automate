@@ -2,9 +2,10 @@ import { takeUntil } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { groupBy } from 'lodash';
-import { Filter } from '../types';
+import { FilterC } from '../types';
 import { paginationOverride } from '../shared';
-import { StatsService, ReportQueryService, ReportDataService } from '../../shared/reporting';
+import { StatsService, ReportQueryService, ReportDataService,
+  ReportQuery } from '../../shared/reporting';
 import { ChefSessionService } from '../../../../services/chef-session/chef-session.service';
 import * as moment from 'moment';
 
@@ -16,8 +17,8 @@ import * as moment from 'moment';
 export class ReportingProfilesComponent implements OnInit, OnDestroy {
   user: String;
   displayScanResultsSidebar = false;
-  scanResultsNodeFilter: Filter;
-  scanResultsProfileFilter: Filter;
+  scanResultsNodeFilter: FilterC;
+  scanResultsProfileFilter: FilterC;
   layerOneData: any = {};
   layerTwoData: any = {};
   control: any = {};
@@ -36,7 +37,7 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.user = this.chefSessionService.username;
-    this.reportQuery.filters.pipe(
+    this.reportQuery.state.pipe(
       takeUntil(this.isDestroyed))
       .subscribe(this.getData.bind(this));
   }
@@ -47,13 +48,13 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
   }
 
   onProfilesListPageChanged(event) {
-    const filters = this.reportQuery.filters.getValue();
+    const reportQuery = this.reportQuery.getReportQuery();
     this.reportData.profilesListParams.page = event;
-    this.getData(filters);
+    this.getData(reportQuery);
   }
 
   onProfilesListSortToggled(event) {
-    const filters = this.reportQuery.filters.getValue();
+    const reportQuery = this.reportQuery.getReportQuery();
     let {sort, order} = event.detail;
     if (order === 'none') {
       sort = undefined;
@@ -61,7 +62,7 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
     }
     this.reportData.profilesListParams.sort = sort;
     this.reportData.profilesListParams.order = order;
-    this.getData(filters);
+    this.getData(reportQuery);
   }
 
   orderFor(sortKey) {
@@ -70,7 +71,7 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
   }
 
   filterFor(profile) {
-    return this.reportQuery.filters.getValue().filter(f => {
+    return this.reportQuery.getReportQuery().filters.filter(f => {
       return f.type && f.type.name === 'profile' && f.value.id === profile.id;
     })[0];
   }
@@ -89,15 +90,15 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
     this.reportQuery.removeFilter(filter);
   }
 
-  getData(filters) {
-    if (filters.length === 0) { return; }
+  getData(reportQuery: ReportQuery) {
+    if (reportQuery.filters.length === 0) { return; }
     const params = this.reportData.profilesListParams;
-    this.reportData.getReportingProfilesList(filters, params);
+    this.reportData.getReportingProfilesList(reportQuery, params);
   }
 
   displayScanResults(profile) {
-    const filters = this.reportQuery.filters.getValue();
-    this.getNodesForProfile(filters, paginationOverride, profile);
+    const reportQuery = this.reportQuery.getReportQuery();
+    this.getNodesForProfile(reportQuery, paginationOverride, profile);
     this.displayScanResultsSidebar = true;
     this.scanResultsPane = 0;
   }
@@ -106,9 +107,10 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
     this.displayScanResultsSidebar = false;
   }
 
-  getNodesForProfile(filters: any[], listParams: any, profile) {
-    const profileFilter = {type: {name: 'profile_id'}, value: profile};
-    filters = [profileFilter].concat(filters);
+  getNodesForProfile(reportQuery: ReportQuery, listParams: any, profile) {
+    const profileFilter: FilterC = {type: {name: 'profile_id'},
+      value: {text: profile.name, id: profile.id}};
+    reportQuery.filters = [profileFilter].concat(reportQuery.filters);
 
     this.scanResultsProfileFilter = {
       type: { name: 'profile_id' },
@@ -116,7 +118,7 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
     };
     listParams['sort'] = 'latest_report.end_time';
     listParams['order'] = 'desc';
-    this.statsService.getNodes(filters, listParams).pipe(
+    this.statsService.getNodes(reportQuery, listParams).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(data => {
         const nodes = data.items.map(node => {
@@ -128,20 +130,21 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
   }
 
   getControls(item) {
-    let filters: any[] = this.reportQuery.filters.getValue();
+    const reportQuery: ReportQuery = this.reportQuery.getReportQuery();
     this.scanResultsNodeFilter = {
       type: {name: 'node_id'},
       value: {id: item.id}
     };
-    filters = [this.scanResultsNodeFilter, this.scanResultsProfileFilter].concat(filters);
+    reportQuery.filters = [this.scanResultsNodeFilter,
+      this.scanResultsProfileFilter].concat(reportQuery.filters);
 
-    this.statsService.getReports(filters, {sort: 'latest_report.end_time', order: 'DESC'}).pipe(
+    this.statsService.getReports(reportQuery, {sort: 'latest_report.end_time', order: 'DESC'}).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(data => {
         // get report ID and set profile filter value if not already set
         const reportID = data[0].id;
         // get single report with all filters
-        this.getFilteredSingleReport(reportID, filters, item);
+        this.getFilteredSingleReport(reportID, reportQuery, item);
       });
   }
 

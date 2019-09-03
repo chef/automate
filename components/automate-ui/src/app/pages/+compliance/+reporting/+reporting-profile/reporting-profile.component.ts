@@ -7,7 +7,7 @@ import { map, takeUntil } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { StatsService } from '../../shared/reporting/stats.service';
-import { ReportQueryService } from '../../shared/reporting/report-query.service';
+import { ReportQueryService, ReportQuery } from '../../shared/reporting/report-query.service';
 import { ScanResultsService } from '../../shared/reporting/scan-results.service';
 import { paginationOverride } from '../shared';
 import * as moment from 'moment';
@@ -39,21 +39,21 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
     this.showLoadingIcon = true;
 
     const id = this.route.snapshot.params['id'];
-    this.fetchProfile(id, this.reportQuery.filters.getValue()).pipe(
+    this.fetchProfile(id, this.reportQuery.getReportQuery()).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(this.onFetchedProfile.bind(this));
 
     observableCombineLatest([
-        this.reportQuery.filters,
+        this.reportQuery.state,
         this.scanResults.params
       ]).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(this.onFilterParamsChange.bind(this));
   }
 
-  fetchProfile(id, filters) {
-    const getProfile = this.statsService.getProfileResultsSummary(id, filters);
-    const getControlsForProfile = this.statsService.getProfileResults(id, filters);
+  fetchProfile(id, reportQuery: ReportQuery) {
+    const getProfile = this.statsService.getProfileResultsSummary(id, reportQuery);
+    const getControlsForProfile = this.statsService.getProfileResults(id, reportQuery);
     return observableForkJoin([
       getProfile,
       getControlsForProfile

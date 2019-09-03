@@ -1,76 +1,70 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import * as moment from 'moment';
 import { FilterC } from '../../+reporting/types';
 import { find, uniqWith, isEqual } from 'lodash';
-import * as moment from 'moment';
 
-interface FilterItem {
-  value?: {
-    text?: string
-    id?: string
-  };
-  type?: {
-    name: string
-  };
-  start_time?: any;
-  end_time?: any;
+export interface ReportQuery {
+  startDate: Date;
+  endDate: Date;
+  interval: number;
+  filters: FilterC[];
 }
+
+interface TimeIntervals {
+  name: string;
+  findStartDate: (endDate: Date) => Date;
+}
+
 @Injectable()
 export class ReportQueryService {
 
-  constructor() {
-    const {intervals, interval} = this;
-    const endDate = new Date();
-    const startDate = intervals[interval][1](endDate);
-    this.setDateRange(startDate, endDate);
-  }
-
-  startDate: Date = moment().subtract(10, 'days').toDate();
-
-  endDate: Date = new Date();
-
-  filters: BehaviorSubject<Array<FilterItem>> = new BehaviorSubject([]);
-
-  intervals: [string, (date: Date) => Date][] = [
-    ['Last 10 days', date => moment(date).subtract(10, 'days').toDate()],
-    ['Last month', date => moment(date).subtract(1, 'months').toDate()],
-    ['Last 3 months', date => moment(date).subtract(3, 'months').toDate()],
-    ['Last year', date => moment(date).subtract(1, 'years').toDate()]
+  intervals: TimeIntervals[] = [
+    { name: 'Last 10 days', findStartDate: (endDate: Date): Date =>
+      moment(endDate).subtract(10, 'days').toDate()},
+    { name: 'Last month', findStartDate: (endDate: Date): Date =>
+      moment(endDate).subtract(1, 'months').toDate()},
+    { name: 'Last 3 months', findStartDate: (endDate: Date): Date =>
+      moment(endDate).subtract(3, 'months').toDate()},
+    { name: 'Last year', findStartDate: (endDate: Date): Date =>
+      moment(endDate).subtract(1, 'years').toDate()}
   ];
 
-  interval = 0;
+  state: BehaviorSubject<ReportQuery> = new BehaviorSubject(this.initialReportQueryState());
 
-  addFilters(newFilters: FilterItem[]) {
-
-    const startTime: FilterItem = newFilters.find((v: FilterItem) => v.start_time);
-    if (startTime) {
-      this.startDate = startTime.start_time;
-    } else {
-      newFilters = newFilters.concat([
-        {'start_time': this.startDate}
-      ]);
-    }
-
-    const endTime: FilterItem = newFilters.find((v: FilterItem) => v.end_time);
-    if (endTime) {
-      this.endDate = endTime.end_time;
-    } else {
-      newFilters = newFilters.concat([
-        {'end_time': this.endDate}
-      ]);
-    }
-
-    this.filters.next(newFilters);
+  private initialReportQueryState() {
+    return {
+      startDate: moment().subtract(10, 'days').toDate(),
+      endDate: new Date(),
+      interval: 0,
+      filters: []
+    };
   }
 
-  addFilter(filter) {
-    const filters = this.filters.getValue();
-
-    const dedupedFilters = this.dedupFilters(filters, filter);
-    this.filters.next(dedupedFilters);
+  getReportQuery(): ReportQuery {
+    return this.state.getValue();
   }
 
-  dedupFilters(filters: FilterItem[], filter) {
+  setState(newState: ReportQuery) {
+    this.state.next(newState);
+  }
+
+  addFilter(filter: FilterC) {
+    const currentState = this.getReportQuery();
+
+    currentState.filters = this.dedupFilters(currentState.filters, filter);
+
+    this.state.next(currentState);
+  }
+
+  removeFilter(filter: FilterC) {
+    const currentState = this.getReportQuery();
+    currentState.filters.splice(currentState.filters.indexOf(filter), 1);
+
+    this.state.next(currentState);
+  }
+
+  dedupFilters(filters: FilterC[], filter: FilterC) {
     // this is needed because the node and profile objects are slightly
     // different based on how they were added to the filters list
     const alreadyFilteredCheckID = find(filters, function(f: FilterC) {
@@ -88,26 +82,35 @@ export class ReportQueryService {
     return uniqWith(filters, isEqual);
   }
 
-  setDateRange(startDate, endDate) {
-    this.startDate = startDate;
-    this.endDate = endDate;
-    const filters = this.filters.getValue()
-      .filter(f => !f['end_time'] && !f['start_time'])
-      .concat([
-        {'start_time': startDate},
-        {'end_time': endDate}
-      ]);
-    this.filters.next(filters);
+  setFilters(newFilters: FilterC[]) {
+    const currentState = this.getReportQuery();
+
+    currentState.filters = newFilters;
+
+    this.state.next(currentState);
   }
 
-  removeFilter(filter) {
-    const filters = this.filters.getValue();
-    filters.splice(filters.indexOf(filter), 1);
-    this.filters.next(filters);
+  setDateRange(startDate: Date, endDate: Date) {
+    const currentState = this.getReportQuery();
+
+    currentState.startDate = startDate;
+    currentState.endDate = endDate;
+
+    this.state.next(currentState);
   }
 
-  clearFilters() {
-    const filters = this.filters.getValue().filter(f => f['end_time'] || f['start_time']);
-    this.filters.next(filters);
+  findTimeIntervalStartDate(interval: number): Date {
+    const currentState = this.getReportQuery();
+
+    return this.intervals[interval].findStartDate(currentState.endDate);
+  }
+
+  setInterval(newInterval: number) {
+    const currentState = this.getReportQuery();
+
+    currentState.interval = newInterval;
+    currentState.startDate = this.intervals[newInterval].findStartDate(currentState.endDate);
+
+    this.state.next(currentState);
   }
 }

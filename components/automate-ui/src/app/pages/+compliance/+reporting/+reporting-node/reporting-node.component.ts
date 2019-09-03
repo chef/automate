@@ -33,12 +33,13 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.reportLoading = true;
     const id: string = this.route.snapshot.params['id'];
-    const filters = this.reportQuery.filters.getValue()
-      .concat([{type: {name: 'node_id'}, value: {id}}]);
-    this.statsService.getReports(filters, {sort: 'latest_report.end_time', order: 'DESC'})
+    const reportQuery = this.reportQuery.getReportQuery();
+    reportQuery.filters = reportQuery.filters.concat([{type: {name: 'node_id'}, value: {id}}]);
+
+    this.statsService.getReports(reportQuery, {sort: 'latest_report.end_time', order: 'DESC'})
       .subscribe(reports => {
         this.reports = reports;
-        this.statsService.getSingleReport(reports[0].id, filters)
+        this.statsService.getSingleReport(reports[0].id, reportQuery)
           .subscribe(data => {
             this.reportLoading = false;
             this.activeReport = Object.assign(reports[0], data);
@@ -53,8 +54,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
 
   onReportItemClick(_event, report) {
     this.reportLoading = true;
-    const filters = this.reportQuery.filters.getValue();
-    this.statsService.getSingleReport(report.id, filters)
+    this.statsService.getSingleReport(report.id, this.reportQuery.getReportQuery())
       .subscribe(data => {
         this.reportLoading = false;
         this.activeReport = Object.assign(report, data);
