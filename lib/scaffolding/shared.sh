@@ -46,7 +46,7 @@ export A2_SVC_PATH="{{pkg.svc_path}}"
 
 . ${pkg_prefix}/libexec/shell/*.sh
 
-addNoProxy "{{sys.ip}"
+addNoProxy "{{sys.ip}}"
 
 chmod 0600 {{pkg.svc_config_path}}/service.crt
 chmod 0600 {{pkg.svc_config_path}}/service.key
