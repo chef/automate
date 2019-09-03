@@ -7,12 +7,13 @@ import (
 	"sync"
 	"time"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/patterns"
 	"github.com/chef/automate/lib/logger"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
@@ -44,6 +45,7 @@ var ProjectUpdateDomainServices = []string{
 
 type ProjectUpdateStatus interface {
 	Failed() bool
+	Cancelled() bool
 	FailureMessage() string
 	PercentageComplete() float64
 	EstimatedTimeComplete() time.Time
@@ -228,6 +230,10 @@ func (w *workflowInstance) Failed() bool {
 	return w.FailureMessage() != ""
 }
 
+func (w *workflowInstance) Cancelled() bool {
+	return w.chain.IsCanceled()
+}
+
 func (w *workflowInstance) FailureMessage() string {
 	if err := w.chain.Err(); err != nil {
 		return err.Error()
@@ -386,6 +392,11 @@ type EmptyProjectUpdateStatus struct{}
 func (*EmptyProjectUpdateStatus) Failed() bool {
 	return false
 }
+
+func (*EmptyProjectUpdateStatus) Cancelled() bool {
+	return false
+}
+
 func (*EmptyProjectUpdateStatus) FailureMessage() string {
 	return ""
 }

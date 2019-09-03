@@ -178,6 +178,16 @@ func (instance *ChainWorkflowInstance) IsRunning() bool {
 	return instance.isRunning
 }
 
+func (instance *ChainWorkflowInstance) IsCanceled() bool {
+	if instance.payload != nil {
+		return instance.payload.Canceled
+	} else if instance.result != nil {
+		return instance.result.Canceled
+	} else {
+		return false
+	}
+}
+
 func (instance *ChainWorkflowInstance) GetResult() (*ChainWorkflowPayload, error) {
 	return instance.result, instance.err
 }
