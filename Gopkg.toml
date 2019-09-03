@@ -105,10 +105,6 @@ required = [
 
 [[constraint]]
   branch = "master"
-  name = "golang.org/x/net"
-
-[[constraint]]
-  branch = "master"
   name = "go.uber.org/zap"
 
 [[constraint]]
