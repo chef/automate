@@ -83,12 +83,10 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         takeUntil(this.isDestroyed)
       ).subscribe(([gStatus, uStatus, gpStatus]) => {
         const routeId = this.route.snapshot.paramMap.get('ruleid');
-        this.isLoading =
-          routeId
-          ? (gStatus !== EntityStatus.loadingSuccess) ||
-            (uStatus === EntityStatus.loading) ||
-            (gpStatus !== EntityStatus.loadingSuccess)
-          : false;
+        this.isLoading = routeId &&
+          (gStatus !== EntityStatus.loadingSuccess) ||
+          (uStatus === EntityStatus.loading) ||
+          (gpStatus !== EntityStatus.loadingSuccess);
         });
 
       combineLatest([
