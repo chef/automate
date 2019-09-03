@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
-import { map, takeUntil, pluck, filter } from 'rxjs/operators';
+import { takeUntil, pluck, filter } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -80,48 +80,46 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         this.store.select(updateStatus),
         this.store.select(getProjectStatus)
       ]).pipe(
-        takeUntil(this.isDestroyed),
-        map(([gStatus, uStatus, gpStatus]) => {
-          const routeId = this.route.snapshot.paramMap.get('ruleid');
-          this.isLoading =
-            routeId
-            ? (gStatus !== EntityStatus.loadingSuccess) ||
-              (uStatus === EntityStatus.loading) ||
-              (gpStatus !== EntityStatus.loadingSuccess)
-            : false;
-        })).subscribe();
+        takeUntil(this.isDestroyed)
+      ).subscribe(([gStatus, uStatus, gpStatus]) => {
+        const routeId = this.route.snapshot.paramMap.get('ruleid');
+        this.isLoading =
+          routeId
+          ? (gStatus !== EntityStatus.loadingSuccess) ||
+            (uStatus === EntityStatus.loading) ||
+            (gpStatus !== EntityStatus.loadingSuccess)
+          : false;
+        });
 
       combineLatest([
         this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
         this.store.select(routeParams).pipe(pluck('ruleid'), filter(identity))
       ]).pipe(
-        takeUntil(this.isDestroyed),
-        map(([project_id, rule_id]: string[]) => {
-          this.store.dispatch(new GetProject({ id: project_id }));
-          this.store.dispatch(new GetRule({
-            id: rule_id,
-            project_id
-          }));
-        })).subscribe();
+        takeUntil(this.isDestroyed)
+      ).subscribe(([project_id, rule_id]: string[]) => {
+        this.store.dispatch(new GetProject({ id: project_id }));
+        this.store.dispatch(new GetRule({
+          id: rule_id,
+          project_id
+        }));
+      });
 
       this.store.select(projectFromRoute).pipe(
         filter(identity),
-        takeUntil(this.isDestroyed),
-        map((state) => {
-          this.project = { ...state };
-        })
-      ).subscribe();
+        takeUntil(this.isDestroyed)
+      ).subscribe(project => {
+          this.project = project;
+      });
 
       this.store.select(ruleFromRoute).pipe(
         filter(identity),
-        takeUntil(this.isDestroyed),
-        map((state) => {
-          this.rule = { ...state };
+        takeUntil(this.isDestroyed)
+      ).subscribe(rule => {
+          this.rule = rule;
           this.editingRule = true;
-        })
-        ).subscribe();
+      });
 
-      this.store.select(getRuleAttributes).subscribe((attributes) => {
+      this.store.select(getRuleAttributes).subscribe(attributes => {
         this.attributes = attributes;
       });
   }
