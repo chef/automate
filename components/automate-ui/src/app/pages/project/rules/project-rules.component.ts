@@ -43,7 +43,6 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   public ruleId: string;
   public ruleForm: FormGroup;
   public rule: Rule = <Rule>{};
-  public conditions: FormGroup[];
   public isLoading = true;
   public saving = false;
   public attributes: RuleTypeMappedObject;
@@ -155,7 +154,9 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  get getConditions() { return this.ruleForm.get('conditions'); }
+  get getConditions() {
+    return this.ruleForm.get('conditions');
+  }
 
   getHeading(): string {
     return `${this.project.name}: ` + (this.ruleForm.value.name.trim() || 'Rule');
@@ -205,19 +206,17 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   }
 
   private populateConditions(): FormGroup[] {
-    this.conditions = [];
+    let conditions: FormGroup[];
 
     if (this.rule.conditions && this.rule.conditions.length !== 0) {
-      this.rule.conditions.forEach(c => {
-        this.conditions.push(
-          // Convert values array to display string
-          this.createCondition(c.attribute, c.operator, c.values.join(', ')));
-      });
+      conditions = this.rule.conditions.map(c =>
+        // Convert values array to display string
+        this.createCondition(c.attribute, c.operator, c.values.join(', ')));
     } else {
-      this.conditions.push(this.createCondition());
+      conditions = [this.createCondition()];
     }
 
-    return this.conditions;
+    return conditions;
   }
 
   private createRule(): void {
@@ -244,7 +243,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
           // Convert values string to storage format
         values: c.operator === equals_op
           ? [c.values.trim()]
-          : c.values.split(/,/).map((v: string) => v.trim())
+          : c.values.split(',').map((v: string) => v.trim())
       });
     });
     return {
@@ -275,20 +274,20 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
             if (state === EntityStatus.loadingSuccess) {
               this.closePage();
             } else if (state === EntityStatus.loadingFailure) {
-            const pendingCreateError = new Subject<boolean>();
-            this.store.select(createError).pipe(
-              filter(identity),
-              takeUntil(pendingCreateError))
-              .subscribe((error) => {
-                pendingCreateError.next(true);
-                pendingCreateError.complete();
-                if (error.status === HttpStatus.CONFLICT) {
-                  this.conflictErrorEvent.emit(true);
-                } else {
-                  // Close on any error other than conflict and display in banner.
-                  this.closePage();
-                }
-            });
+              const pendingCreateError = new Subject<boolean>();
+              this.store.select(createError).pipe(
+                filter(identity),
+                takeUntil(pendingCreateError))
+                .subscribe((error) => {
+                  pendingCreateError.next(true);
+                  pendingCreateError.complete();
+                  if (error.status === HttpStatus.CONFLICT) {
+                    this.conflictErrorEvent.emit(true);
+                  } else {
+                    // Close on any error other than conflict and display in banner.
+                    this.closePage();
+                  }
+              });
             }
           }
         });
