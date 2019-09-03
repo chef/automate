@@ -2,6 +2,8 @@
   "paths": {
     "/compliance/reporting/export": {
       "get": {
+        "summary": "Export reports",
+        "description": "Stream reports in CSV or JSON format",
         "operationId": "Export",
         "responses": {
           "200": {
@@ -22,7 +24,7 @@
           }
         ],
         "tags": [
-          "ReportingService"
+          "Compliance Reporting Export"
         ]
       }
     }

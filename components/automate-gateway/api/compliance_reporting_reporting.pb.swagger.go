@@ -47,6 +47,8 @@ func init() {
     },
     "/compliance/reporting/nodes/id/{id}": {
       "get": {
+        "summary": "Fetch a node",
+        "description": "Fetch a specific node by id",
         "operationId": "ReadNode",
         "responses": {
           "200": {
@@ -66,12 +68,14 @@ func init() {
           }
         ],
         "tags": [
-          "ReportingService"
+          "Compliance Reporting Nodes"
         ]
       }
     },
     "/compliance/reporting/nodes/search": {
       "post": {
+        "summary": "List nodes",
+        "description": "List all nodes optionally using filters",
         "operationId": "ListNodes",
         "responses": {
           "200": {
@@ -92,12 +96,14 @@ func init() {
           }
         ],
         "tags": [
-          "ReportingService"
+          "Compliance Reporting Nodes"
         ]
       }
     },
     "/compliance/reporting/profiles": {
       "post": {
+        "summary": "List profiles",
+        "description": "List all profiles optionally using filters",
         "operationId": "ListProfiles",
         "responses": {
           "200": {
@@ -118,12 +124,14 @@ func init() {
           }
         ],
         "tags": [
-          "ReportingService"
+          "Compliance Reporting Profiles"
         ]
       }
     },
     "/compliance/reporting/report-ids": {
       "post": {
+        "summary": "List report IDs",
+        "description": "List all report IDs optionally using filters",
         "operationId": "ListReportIds",
         "responses": {
           "200": {
@@ -144,12 +152,14 @@ func init() {
           }
         ],
         "tags": [
-          "ReportingService"
+          "Compliance Reporting Report IDs"
         ]
       }
     },
     "/compliance/reporting/reports": {
       "post": {
+        "summary": "List reports",
+        "description": "List all reports optionally using filters",
         "operationId": "ListReports",
         "responses": {
           "200": {
@@ -170,12 +180,14 @@ func init() {
           }
         ],
         "tags": [
-          "ReportingService"
+          "Compliance Reporting Reports"
         ]
       }
     },
     "/compliance/reporting/reports/id/{id}": {
       "post": {
+        "summary": "Fetch a report",
+        "description": "Fetch a specific report by id",
         "operationId": "ReadReport",
         "responses": {
           "200": {
@@ -203,12 +215,14 @@ func init() {
           }
         ],
         "tags": [
-          "ReportingService"
+          "Compliance Reporting Reports"
         ]
       }
     },
     "/compliance/reporting/suggestions": {
       "post": {
+        "summary": "List suggestions",
+        "description": "Get suggestions for compliance reporting resources based on matching text substrings",
         "operationId": "ListSuggestions",
         "responses": {
           "200": {
@@ -229,7 +243,7 @@ func init() {
           }
         ],
         "tags": [
-          "ReportingService"
+          "Compliance Reporting Suggestions"
         ]
       }
     },
