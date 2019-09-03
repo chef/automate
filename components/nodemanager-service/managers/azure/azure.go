@@ -756,20 +756,20 @@ func sendCommand(ctx context.Context, job *types.InspecJob, script string, scrip
 }
 
 func (creds *Creds) SendRunCommandJob(ctx context.Context, job *types.InspecJob, script string, scriptType string) error {
-	*job.NodeStatus = types.StatusRunning
+	job.NodeStatus = types.StatusRunning
 	client := compute.NewVirtualMachinesClient(job.TargetConfig.SubscriptionId)
 	client.Authorizer = getAuthorizer(creds.Token)
 	future, err := sendCommand(ctx, job, script, scriptType, client)
 	if err != nil {
-		*job.NodeStatus = types.StatusFailed
+		job.NodeStatus = types.StatusFailed
 		return errors.Wrap(err, fmt.Sprintf("unable to run scan: %s %s", job.NodeName, job.MachineIdentifier))
 	}
 	err = future.WaitForCompletionRef(ctx, client.Client)
 	if err != nil {
-		*job.NodeStatus = types.StatusFailed
+		job.NodeStatus = types.StatusFailed
 		return errors.Wrap(err, "unable to get command status")
 	}
 	logrus.Infof("azure run command job for node %s status %s", job.NodeName, future.Status())
-	*job.NodeStatus = types.StatusCompleted
+	job.NodeStatus = types.StatusCompleted
 	return nil
 }

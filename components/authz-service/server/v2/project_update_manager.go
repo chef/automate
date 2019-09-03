@@ -3,523 +3,416 @@ package v2
 import (
 	"context"
 	"fmt"
+	"math"
+	"sync"
 	"time"
 
-	"github.com/gofrs/uuid"
-	"github.com/golang/protobuf/ptypes"
-	_struct "github.com/golang/protobuf/ptypes/struct"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-	log "github.com/sirupsen/logrus"
+	storage "github.com/chef/automate/components/authz-service/storage/v2"
+	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/patterns"
+	"github.com/chef/automate/lib/logger"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
-	automate_event "github.com/chef/automate/api/interservice/event"
-	"github.com/chef/automate/components/authz-service/config"
-	automate_event_type "github.com/chef/automate/components/event-service/server"
+	"github.com/gofrs/uuid"
+	"github.com/sirupsen/logrus"
+
 	project_update_tags "github.com/chef/automate/lib/authz"
 )
 
-// Failure cases
-// * No status event for 5 minutes
-// * Domain service sends failure message
-
-// Recovery
-// * Domain service was down during start
-// * Authz service restarts
+type ProjectUpdateStage string
+type ProjectUpdateState string
 
 const (
-	minutesWithoutCheckingInFailure = 5
-	sleepTimeBetweenStatusChecksSec = 5
+	ProjectUpdateRunningState    ProjectUpdateState = "running"
+	ProjectUpdateNotRunningState ProjectUpdateState = "not_running"
+
+	ProjectUpdateWorkflowName = "ProjectUpdate"
+	ProjectUpdateInstanceName = "SingletonV1"
+	ApplyStagedRulesTaskName  = "authz/ApplyStagedRules"
+
+	ProjectUpdateStageApplyStagedRules     ProjectUpdateStage = "apply_staged_rules"
+	ProjectUpdateStageUpdateDomainServices ProjectUpdateStage = "update_domain_services"
+	ProjectUpdateStageUpdateDone           ProjectUpdateStage = "done"
+	ProjectUpdateStageUpdateNone           ProjectUpdateStage = "none"
 )
 
-type update struct {
-	fun  func(config.ProjectUpdateStage) (config.ProjectUpdateStage, error)
-	errc chan error
+var ProjectUpdateDomainServices = []string{
+	"ingest",
+	"compliance",
+}
+
+type ProjectUpdateStatus interface {
+	Failed() bool
+	FailureMessage() string
+	PercentageComplete() float64
+	EstimatedTimeComplete() time.Time
+	State() ProjectUpdateState
+	Stage() ProjectUpdateStage
 }
 
 type ProjectUpdateMgr interface {
 	Cancel() error
 	Start() error
-	ProcessFailEvent(eventMessage *automate_event.EventMsg) error
-	ProcessStatusEvent(eventMessage *automate_event.EventMsg) error
-	Failed() bool
-	FailureMessage() string
-	PercentageComplete() float64
-	EstimatedTimeComplete() time.Time
-	State() string
+	Status() (ProjectUpdateStatus, error)
 }
 
-// ProjectUpdateManager - project update manager
-type ProjectUpdateManager struct {
-	stage              config.ProjectUpdateStage
-	eventServiceClient automate_event.EventServiceClient
-	configManager      *config.Manager
-	updateQueue        chan<- update
-}
-
-// NewProjectUpdateManager - create a new project update manager
-func NewProjectUpdateManager(
-	eventServiceClient automate_event.EventServiceClient,
-	configManager *config.Manager) *ProjectUpdateManager {
-	updateQueue := make(chan update, 100)
-	manager := &ProjectUpdateManager{
-		stage:              configManager.GetProjectUpdateStage(),
-		eventServiceClient: eventServiceClient,
-		configManager:      configManager,
-		updateQueue:        updateQueue,
-	}
-
-	go manager.stageUpdater(updateQueue)
-
-	manager.resumePreviousState()
-
-	return manager
-}
-
-// Cancel - stop or cancel domain service project update processes
-// Action
-func (manager *ProjectUpdateManager) Cancel() error {
-	return manager.updateStage(func(stage config.ProjectUpdateStage) (config.ProjectUpdateStage, error) {
-		switch stage.State {
-		case config.NotRunningState:
-			// do nothing job is not running
-		case config.RunningState:
-			logrus.Debugf("Cancelling project update for ID %q", manager.stage.ProjectUpdateID)
-			err := manager.sendCancelProjectUpdateEvent()
-			if err != nil {
-				return stage, err
-			}
-		default:
-			// error state not found
-			return stage, errors.New(fmt.Sprintf(
-				"Internal error state %q eventID %q", manager.stage.State, manager.stage.ProjectUpdateID))
-		}
-
-		return stage, nil
-	})
-}
-
-// Start - start the domain services project update processes
-// Action
-func (manager *ProjectUpdateManager) Start() error {
-	return manager.updateStage(func(stage config.ProjectUpdateStage) (config.ProjectUpdateStage, error) {
-		switch stage.State {
-		case config.NotRunningState:
-			projectUpdateID, err := createProjectUpdateID()
-			if err != nil {
-				return stage, err
-			}
-
-			err = manager.sendProjectUpdateStartEvent(projectUpdateID)
-			if err != nil {
-				return stage, err
-			}
-
-			return stage.StartRunning(projectUpdateID), nil
-		case config.RunningState:
-			return stage, errors.New(fmt.Sprintf(
-				"Can not start another project update %q is running", stage.ProjectUpdateID))
-		default:
-			// error state not found
-			return stage, errors.New(fmt.Sprintf(
-				"Internal error state %q eventID %q", stage.State, stage.ProjectUpdateID))
-		}
-	})
-}
-
-// ProcessFailEvent - react to a domain service failed event
-// Action
-func (manager *ProjectUpdateManager) ProcessFailEvent(eventMessage *automate_event.EventMsg) error {
-	return manager.updateStage(func(stage config.ProjectUpdateStage) (config.ProjectUpdateStage, error) {
-		switch stage.State {
-		case config.NotRunningState:
-		case config.RunningState:
-			if eventMessage.Producer == nil || eventMessage.Producer.ID == "" {
-				return stage, errors.New("Producer ID was not provided in status message")
-			}
-			fromProducer := eventMessage.Producer.ID
-			projectUpdateID, err := getProjectUpdateID(eventMessage)
-			if err != nil {
-				return stage, err
-			}
-			if stage.ProjectUpdateID != projectUpdateID {
-				// projectUpdateID does not match currently running update; ignore
-				return stage, nil
-			}
-
-			domainServiceIndex, err := stage.FindDomainServiceIndex(fromProducer)
-			if err != nil {
-				return stage, err
-			}
-
-			failureMessage := getFailureMessage(eventMessage)
-
-			log.Infof("Fail message from producer %q projectUpdateID %q failureMessage: %s",
-				fromProducer, projectUpdateID, failureMessage)
-
-			stage.DomainServices[domainServiceIndex].FailureMessage = failureMessage
-			stage.DomainServices[domainServiceIndex].Failed = true
-			stage.DomainServices[domainServiceIndex].LastUpdate = time.Now()
-			err = manager.sendCancelProjectUpdateEvent()
-			if err != nil {
-				return stage, err
-			}
-		default:
-		}
-
-		return manager.checkedDomainServices(stage)
-	})
-}
-
-// ProcessStatusEvent - record the status update from the domain service.
-// Action
-func (manager *ProjectUpdateManager) ProcessStatusEvent(
-	eventMessage *automate_event.EventMsg) error {
-	return manager.updateStage(func(stage config.ProjectUpdateStage) (config.ProjectUpdateStage, error) {
-		switch stage.State {
-		case config.NotRunningState:
-		case config.RunningState:
-			if eventMessage.Producer == nil || eventMessage.Producer.ID == "" {
-				return stage, errors.New("Producer was not provided in status message")
-			}
-			fromProducer := eventMessage.Producer.ID
-			projectUpdateID, err := getProjectUpdateID(eventMessage)
-			if err != nil {
-				return stage, err
-			}
-
-			if stage.ProjectUpdateID != projectUpdateID {
-				// projectUpdateID does not match currently running update; ignore
-				return stage, nil
-			}
-
-			percentageComplete, err := getPercentageComplete(eventMessage)
-			if err != nil {
-				return stage, err
-			}
-
-			estimatedTimeComplete, err := getEstimatedTimeCompleteInSec(eventMessage)
-			if err != nil {
-				return stage, err
-			}
-
-			completed, err := getCompleted(eventMessage)
-			if err != nil {
-				return stage, err
-			}
-
-			log.Debugf("Status message from producer: %q projectUpdateID: %q percentageComplete: %f "+
-				"estimatedTimeComplete: %v completed: %t",
-				fromProducer, projectUpdateID, percentageComplete, estimatedTimeComplete, completed)
-
-			domainServiceIndex, err := stage.FindDomainServiceIndex(fromProducer)
-			if err != nil {
-				return stage, err
-			}
-
-			stage.DomainServices[domainServiceIndex].Complete = completed
-			stage.DomainServices[domainServiceIndex].EstimatedTimeComplete = estimatedTimeComplete
-			stage.DomainServices[domainServiceIndex].PercentageComplete = percentageComplete
-			stage.DomainServices[domainServiceIndex].LastUpdate = time.Now()
-		default:
-		}
-
-		return manager.checkedDomainServices(stage)
-	})
-}
-
-// Failed - did the last update attempt fail
-// Read State
-func (manager *ProjectUpdateManager) Failed() bool {
-	return manager.stage.Failed
-}
-
-// FailureMessage - detailed descriptions of the failure
-// Read State
-func (manager *ProjectUpdateManager) FailureMessage() string {
-	return manager.stage.FailureMessage
-}
-
-// PercentageComplete - percentage of the job that is complete
-// The percentage complete of the job that is going to run the longest is returned
-// Read State
-func (manager *ProjectUpdateManager) PercentageComplete() float64 {
-	switch manager.stage.State {
-	case config.NotRunningState:
-	case config.RunningState:
-		if !manager.Failed() {
-			longestDomainService := config.ProjectUpdateDomainService{
-				PercentageComplete:    1.0,
-				EstimatedTimeComplete: time.Time{},
-			}
-			for _, ds := range manager.stage.DomainServices {
-				if !ds.Complete && ds.EstimatedTimeComplete.After(longestDomainService.EstimatedTimeComplete) {
-					longestDomainService = ds
-				}
-			}
-			return longestDomainService.PercentageComplete
-		}
-	default:
-	}
-
-	return 1.0
-}
-
-// EstimatedTimeComplete - the estimated date and time of completion of the longest running job
-// Read State
-func (manager *ProjectUpdateManager) EstimatedTimeComplete() time.Time {
-	switch manager.stage.State {
-	case config.NotRunningState:
-	case config.RunningState:
-		longestEstimatedTimeComplete := time.Time{}
-		if !manager.Failed() {
-			for _, ds := range manager.stage.DomainServices {
-				if !ds.Complete && ds.EstimatedTimeComplete.After(longestEstimatedTimeComplete) {
-					longestEstimatedTimeComplete = ds.EstimatedTimeComplete
-				}
-			}
-		}
-		return longestEstimatedTimeComplete
-	default:
-	}
-
-	return time.Time{}
-}
-
-// State - The current state of the manager. either running or not running
-// Read State
-func (manager *ProjectUpdateManager) State() string {
-	return manager.stage.State
-}
-
-// Watching the domain services complete the update process.
-// A domain service is complete when:
-// * send a failure event
-// * sends a complete status event
-// * does not send status for 5 minutes
-func (manager *ProjectUpdateManager) waitingForJobToComplete() {
-	for manager.stage.State == config.RunningState {
-		time.Sleep(time.Second * sleepTimeBetweenStatusChecksSec)
-		err := manager.updateStage(
-			func(stage config.ProjectUpdateStage) (config.ProjectUpdateStage, error) {
-				return manager.checkedDomainServices(stage)
-			})
-		if err != nil {
-			log.Errorf("checked Domain Services. %v", err)
-		}
-	}
-}
-
-func (manager *ProjectUpdateManager) checkedDomainServices(
-	stage config.ProjectUpdateStage) (config.ProjectUpdateStage, error) {
-	oldestDomainServiceUpdateTime := stage.OldestDomainServiceUpdateTime()
-	if stage.AreDomainServicesComplete() {
-		stage = stage.StopRunning()
-	} else if stage.HasFailedDomainService() {
-		failureMessage := ""
-		for _, ds := range stage.DomainServices {
-			if ds.Failed {
-				if failureMessage != "" {
-					failureMessage = fmt.Sprintf("%s; %s: %s",
-						failureMessage, ds.Name, ds.FailureMessage)
-				} else {
-					failureMessage = fmt.Sprintf("%s: %s", ds.Name, ds.FailureMessage)
-				}
-			}
-		}
-		stage.Failed = true
-		stage.FailureMessage = failureMessage
-		stage = stage.StopRunning()
-	} else if oldestDomainServiceUpdateTime.Before(
-		time.Now().Add((-1) * time.Minute * minutesWithoutCheckingInFailure)) {
-		stage.Failed = true
-		stage.FailureMessage = fmt.Sprintf("A domain service has not check in for over %d minutes",
-			minutesWithoutCheckingInFailure)
-
-		stage = stage.StopRunning()
-	} else if oldestDomainServiceUpdateTime.Before(time.Now().Add((-1) * time.Minute)) {
-		// This domain service as not checked in within a minute
-		// Send another start event
-		log.Debug("Resending project update start event")
-		err := manager.sendProjectUpdateStartEvent(stage.ProjectUpdateID)
-		if err != nil {
-			log.Errorf("Starting Project Update for domain resources. %v", err)
-		}
-	}
-
-	return stage, nil
-}
-
-func (manager *ProjectUpdateManager) resumePreviousState() {
-	// The LastUpdate field is stale and could have missed recent updates, updating it gives the
-	// domain services time to send status updates
-	for _, ds := range manager.stage.DomainServices {
-		ds.LastUpdate = time.Now()
-	}
-
-	if manager.stage.State == config.RunningState {
-		go manager.waitingForJobToComplete()
-	}
-}
-
-// This function and the stageUpdater function allow the stage data to be accessed by a single thread. This
-// prevents race conditions.
-// The updateFunc function is placed in the updateQueue channel and ran in the order they are added.
-// This allows only one thread to change the stage data.
-// This also allows the code in the updateFunc function to be ran fully without any of the stage data
-// changing.
-func (manager *ProjectUpdateManager) updateStage(
-	updateFunc func(config.ProjectUpdateStage) (config.ProjectUpdateStage, error)) error {
-	errc := make(chan error)
-	manager.updateQueue <- update{fun: updateFunc, errc: errc}
-
-	// Wait for the function to run
-	err := <-errc
-	close(errc)
-	return err
-}
-
-// stageUpdater - runs one update function at a time with the current stage data.
-// creating a copy of the stage data to prevent the data in slices from being updated.
-func (manager *ProjectUpdateManager) stageUpdater(updateQueue <-chan update) {
-	for update := range updateQueue {
-		updatedStage, err := update.fun(manager.stage.Copy())
-		if err != nil {
-			update.errc <- err
-			continue
-		}
-
-		oldStage := manager.stage.Copy()
-		if !updatedStage.Equal(oldStage) {
-			err := manager.configManager.UpdateProjectUpdateStage(updatedStage)
-			if err != nil {
-				log.Errorf("Failure updating project update state %v", err)
-				update.errc <- err
-				continue
-			}
-
-			manager.stage = updatedStage
-			manager.stageUpdateEvent(oldStage, updatedStage)
-		}
-
-		update.errc <- nil
-	}
-}
-
-// When the stage state is updated to running start the waitingForJobToComplete function
-func (manager *ProjectUpdateManager) stageUpdateEvent(oldStage config.ProjectUpdateStage,
-	newStage config.ProjectUpdateStage) {
-	if oldStage.State == config.NotRunningState && newStage.State == config.RunningState {
-		go manager.waitingForJobToComplete()
-	}
-}
-
-// Publish a project update event with the event-service
-func (manager *ProjectUpdateManager) sendProjectUpdateStartEvent(projectUpdateID string) error {
-	return sendProjectUpdateEvent(projectUpdateID,
-		automate_event_type.ProjectRulesUpdate, manager.eventServiceClient)
-}
-
-// Publish a cancel project update event with the event service
-func (manager *ProjectUpdateManager) sendCancelProjectUpdateEvent() error {
-	return sendProjectUpdateEvent(manager.stage.ProjectUpdateID,
-		automate_event_type.ProjectRulesCancelUpdate, manager.eventServiceClient)
-}
-
-func sendProjectUpdateEvent(projectUpdateID string, eventType string,
-	eventServiceClient automate_event.EventServiceClient) error {
-	eventUUID := createEventUUID()
-
-	event := &automate_event.EventMsg{
-		EventID:   eventUUID,
-		Published: ptypes.TimestampNow(),
-		Type:      &automate_event.EventType{Name: eventType},
-		Data: &_struct.Struct{
-			Fields: map[string]*_struct.Value{
-				project_update_tags.ProjectUpdateIDTag: {
-					Kind: &_struct.Value_StringValue{
-						StringValue: projectUpdateID,
-					},
-				},
-			},
-		},
-	}
-
-	pubReq := automate_event.PublishRequest{Msg: event}
-	_, err := eventServiceClient.Publish(context.Background(), &pubReq)
-
-	return err
-}
-
-func createProjectUpdateID() (string, error) {
+func createProjectUpdateID() string {
 	uuid, err := uuid.NewV4()
 	if err != nil {
-		return "", err
-	}
-
-	return uuid.String(), nil
-}
-
-// TODO move the creation of Event ID to the event service
-func createEventUUID() string {
-	uuid, err := uuid.NewV4()
-	if err != nil {
-		logrus.Errorf("Failed to create UUID %v", err)
-		// Using a default UUID if the creation of the UUID fails
-		return "39bffcd3-4325-4d18-bff5-5bd4410949ba"
+		return "project-update-id"
 	}
 
 	return uuid.String()
 }
 
-// Get the Project Update ID out of the event Data fields
-func getProjectUpdateID(event *automate_event.EventMsg) (string, error) {
-	fieldName := project_update_tags.ProjectUpdateIDTag
-	if event.Data != nil && event.Data.Fields != nil && event.Data.Fields[fieldName] != nil &&
-		event.Data.Fields[fieldName].GetStringValue() != "" {
-		return event.Data.Fields[fieldName].GetStringValue(), nil
-	}
+func NewWorkflowExecutor() (*patterns.ChainWorkflowExecutor, error) {
+	// This funcations creates a WorkflowExecutor out of multiple smaller workflow executors.
+	// First, we want the ApplyStagedRules database commit stuff to run. Then, we want
+	// the domain services to update.
+	// So, that's a chain of [applyStagedRulesExecutor, domainSvcExecutor]
+	// domainSvcExecutor is itself a bunch of smaller workflows that run in parallel. There
+	// is one executor per domain service being updated
+	// applyStagedRulesExecutor is simply an executor that runs ApplyStagedRulesTaskExecutor
+	// An ascii art below describes that it all looks like when it's tied together
+	/*
+	   +--------------------------------------------------+
+	   |                                                  |
+	   |  +------------+       +------------------------+ |
+	   |  |            |       |                        | |
+	   |  | Apply      | Chain | +--------------------+ | |    +-----------------+
+	   |  | Staged     +------>+ |Domain Service      | cereal |Start Update     |
+	   |  | Rules      |       | |Update Workflow     <-+-+---->Update Status    |
+	   |  | Workflow   |       | |(compliance)        | | |    |       compliance|
+	   |  +------------+      P| +--------------------+ | |    +-----------------+
+	   |                      a|                        | |
+	   |                      r| +--------------------+ | |    +-----------------+
+	   |                      a| |Domain Service      | cereal |Start Update     |
+	   |                      l| |Update Workflow     <-+-+---->Update Status    |
+	   |                      l| |(ingest)            | | |    |           ingest|
+	   |                      e| +--------------------+ | |    +-----------------+
+	   |                      l|                        | |
+	   |                       | +--------------------+ | |    +-----------------+
+	   |                       | |Domain Service      | cereal |Start Update     |
+	   |                       | |Update Workflow     <-+-+---->Update Status    |
+	   |                       | |(...)               | | |    |              ...|
+	   |                       | +--------------------+ | |    +-----------------+
+	   |                       +------------------------+ |
+	   |                                     authz-service|
+	   +--------------------------------------------------+
+	*/
+	workflowMap := make(map[string]cereal.WorkflowExecutor)
+	lock := sync.Mutex{}
 
-	return "", fmt.Errorf("Event message sent without a %s field eventID: %q",
-		fieldName, event.EventID)
+	applyStagedRulesExecutor := patterns.NewSingleTaskWorkflowExecutor(ApplyStagedRulesTaskName, true)
+	// The code below allows us to easily add to the ProjectUpdateDomainServices list.
+	// By not preconfiguring our workflow with an exact set of subworkflow executors,
+	// we can generate the workflow executor for the correct domain service easily.
+	// The logic only depends on the name. This means that an instance of authz that
+	// didn't know about a domain service can still drive its workflow.
+	domainSvcExecutor := patterns.NewParallelWorkflowExecutor(func(key string) (cereal.WorkflowExecutor, bool) {
+		lock.Lock()
+		defer lock.Unlock()
+		if workflowExecutor, ok := workflowMap[key]; ok {
+			return workflowExecutor, true
+		}
+		logrus.Infof("creating workflow executor for %q", key)
+		workflowExecutor := project_update_tags.NewWorkflowExecutorForDomainService(key)
+		workflowMap[key] = workflowExecutor
+		return workflowExecutor, true
+	})
+	return patterns.NewChainWorkflowExecutor(applyStagedRulesExecutor, domainSvcExecutor)
 }
 
-func getFailureMessage(event *automate_event.EventMsg) string {
-	fieldName := "message"
-	if event.Data != nil && event.Data.Fields != nil && event.Data.Fields[fieldName] != nil &&
-		event.Data.Fields[fieldName].GetStringValue() != "" {
-		return event.Data.Fields[fieldName].GetStringValue()
+type ApplyStagedRulesTaskExecutor struct {
+	store           storage.Storage
+	policyRefresher PolicyRefresher
+	log             logger.Logger
+}
+
+type ApplyStagedRulesResult struct {
+}
+
+type ApplyStagedRulesParams struct {
+}
+
+func (s *ApplyStagedRulesTaskExecutor) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
+	s.log.Info("apply project rules starting")
+
+	if err := s.store.ApplyStagedRules(ctx); err != nil {
+		s.log.Warnf("error applying staged projects: %s", err.Error())
+		return nil, status.Errorf(codes.Internal,
+			"error applying staged projects: %s", err.Error())
 	}
 
+	// TODO: If the domain services are reading out of the cache below, that is a problem for multinode.
+	//       this does not force a refresh on all the nodes. We should read this information from the
+	//       database.
+	if err := s.policyRefresher.Refresh(ctx); err != nil {
+		s.log.Warnf("error refreshing policy cache. the rules were updated but the apply was not started, please try again.")
+		return nil, status.Errorf(codes.Internal,
+			"error refreshing policy cache: %s", err.Error())
+	}
+
+	return ApplyStagedRulesResult{}, nil
+}
+
+type CerealProjectUpdateManager struct {
+	manager        *cereal.Manager
+	workflowName   string
+	instanceName   string
+	domainServices []string
+}
+
+func RegisterCerealProjectUpdateManager(manager *cereal.Manager, log logger.Logger, s storage.Storage, pr PolicyRefresher) (ProjectUpdateMgr, error) {
+	domainServicesWorkflowExecutor, err := NewWorkflowExecutor()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := manager.RegisterWorkflowExecutor(ProjectUpdateWorkflowName, domainServicesWorkflowExecutor); err != nil {
+		return nil, err
+	}
+
+	applyStagedRuelsTaskExecutor := &ApplyStagedRulesTaskExecutor{
+		store:           s,
+		policyRefresher: pr,
+		log:             log,
+	}
+	if err := manager.RegisterTaskExecutor(ApplyStagedRulesTaskName, applyStagedRuelsTaskExecutor,
+		cereal.TaskExecutorOpts{Workers: 1}); err != nil {
+
+	}
+
+	updateManager := &CerealProjectUpdateManager{
+		manager:        manager,
+		workflowName:   ProjectUpdateWorkflowName,
+		instanceName:   ProjectUpdateInstanceName,
+		domainServices: ProjectUpdateDomainServices,
+	}
+
+	return updateManager, nil
+}
+
+func (m *CerealProjectUpdateManager) Cancel() error {
+	err := m.manager.CancelWorkflow(context.Background(), m.workflowName, m.instanceName)
+	if err == cereal.ErrWorkflowInstanceNotFound {
+		return nil
+	}
+	return err
+}
+
+func (m *CerealProjectUpdateManager) Start() error {
+	params := map[string]interface{}{}
+
+	for _, svc := range m.domainServices {
+		params[svc] = project_update_tags.DomainProjectUpdateWorkflowParameters{
+			ProjectUpdateID: createProjectUpdateID(),
+		}
+	}
+	domainSvcUpdateWorkflowParams, err := patterns.ToParallelWorkflowParameters(m.domainServices, params)
+	if err != nil {
+		return err
+	}
+	return patterns.EnqueueChainWorkflow(context.TODO(), m.manager, m.workflowName, m.instanceName, []interface{}{
+		ApplyStagedRulesParams{},
+		domainSvcUpdateWorkflowParams,
+	})
+}
+
+type workflowInstance struct {
+	chain *patterns.ChainWorkflowInstance
+}
+
+func (w *workflowInstance) Failed() bool {
+	return w.FailureMessage() != ""
+}
+
+func (w *workflowInstance) FailureMessage() string {
+	if err := w.chain.Err(); err != nil {
+		return err.Error()
+	}
+
+	if instance, err := w.GetApplyStagedRulesInstance(); err != nil {
+		if err == cereal.ErrWorkflowInstanceNotFound {
+			return ""
+		}
+		return err.Error()
+	} else {
+		if err := instance.Err(); err != nil {
+			return err.Error()
+		}
+	}
+
+	if updateDomainServicesInstance, err := w.GetUpdateDomainServicesInstance(); err != nil {
+		if err == cereal.ErrWorkflowInstanceNotFound {
+			return ""
+		}
+		return err.Error()
+	} else {
+		if err := updateDomainServicesInstance.Err(); err != nil {
+			return err.Error()
+		}
+
+		errMsg := ""
+		for _, subworkflowKey := range updateDomainServicesInstance.ListSubWorkflows() {
+			if subworkflowInstance, err := updateDomainServicesInstance.GetSubWorkflow(subworkflowKey); err != nil {
+				if err == cereal.ErrWorkflowInstanceNotFound {
+					continue
+				}
+				errMsg = fmt.Sprintf("%s; %s: %s", errMsg, subworkflowKey, err.Error())
+			} else {
+				if subworkflowInstance.Err() != nil {
+					errMsg = fmt.Sprintf("%s; %s: %s", errMsg, subworkflowKey, subworkflowInstance.Err().Error())
+				}
+			}
+		}
+		return errMsg
+	}
+}
+
+func (w *workflowInstance) PercentageComplete() float64 {
+	if !w.IsRunning() {
+		return 1.0
+	}
+
+	percentComplete := 0.0
+	domainServicesUpdateInstance, err := w.GetUpdateDomainServicesInstance()
+	if err == cereal.ErrWorkflowInstanceNotFound {
+		return percentComplete
+	}
+
+	domainServices := domainServicesUpdateInstance.ListSubWorkflows()
+	if len(domainServices) == 0 {
+		return 1.0
+	}
+
+	for _, d := range domainServicesUpdateInstance.ListSubWorkflows() {
+		subWorkflow, err := domainServicesUpdateInstance.GetSubWorkflow(d)
+		if err != nil {
+			logrus.WithError(err).Errorf("failed to get subworkflow for %q", d)
+			continue
+		}
+		payload := project_update_tags.DomainProjectUpdateWorkflowPayload{}
+		if subWorkflow.IsRunning() {
+			if err := subWorkflow.GetPayload(&payload); err != nil {
+				logrus.WithError(err).Errorf("failed to get payload for %q", d)
+				continue
+			}
+			percentComplete = percentComplete + (float64(payload.MergedJobStatus.PercentageComplete) / float64(len(domainServices)))
+		} else {
+			percentComplete = percentComplete + 1.0/float64(len(domainServices))
+		}
+	}
+
+	return math.Min(percentComplete, 1.0)
+}
+
+func (w *workflowInstance) EstimatedTimeComplete() time.Time {
+	if !w.IsRunning() {
+		return time.Now()
+	}
+	domainServicesUpdateInstance, err := w.GetUpdateDomainServicesInstance()
+	if err == cereal.ErrWorkflowInstanceNotFound {
+		return time.Now()
+	}
+
+	longestEstimatedTimeComplete := time.Time{}
+	for _, d := range domainServicesUpdateInstance.ListSubWorkflows() {
+		subWorkflow, err := domainServicesUpdateInstance.GetSubWorkflow(d)
+		if err != nil {
+			logrus.WithError(err).Errorf("failed to get subworkflow for %q", d)
+			continue
+		}
+		payload := project_update_tags.DomainProjectUpdateWorkflowPayload{}
+		if subWorkflow.IsRunning() {
+			if err := subWorkflow.GetPayload(&payload); err != nil {
+				logrus.WithError(err).Errorf("failed to get payload for %q", d)
+				continue
+			}
+			estimatedTime := time.Unix(payload.MergedJobStatus.EstimatedEndTimeInSec, 0)
+			if estimatedTime.After(longestEstimatedTimeComplete) {
+				longestEstimatedTimeComplete = estimatedTime
+			}
+		}
+	}
+
+	return longestEstimatedTimeComplete
+}
+
+func (w *workflowInstance) State() ProjectUpdateState {
+	if w.IsRunning() {
+		return ProjectUpdateRunningState
+	}
+	return ProjectUpdateNotRunningState
+}
+
+func (w *workflowInstance) IsRunning() bool {
+	return w.chain.IsRunning()
+}
+
+func (w *workflowInstance) Stage() ProjectUpdateStage {
+	if !w.IsRunning() {
+		return ProjectUpdateStageUpdateDone
+	}
+	if _, err := w.GetUpdateDomainServicesInstance(); err != nil {
+		return ProjectUpdateStageApplyStagedRules
+	}
+	return ProjectUpdateStageUpdateDomainServices
+}
+
+func (w *workflowInstance) GetApplyStagedRulesInstance() (cereal.ImmutableWorkflowInstance, error) {
+	return w.chain.GetSubWorkflow(0)
+}
+
+func (w *workflowInstance) GetUpdateDomainServicesInstance() (*patterns.ParallelWorkflowInstance, error) {
+	instance, err := w.chain.GetSubWorkflow(1)
+	if err != nil {
+		return nil, err
+	}
+	return patterns.ToParallelWorkflowInstance(instance)
+}
+
+func (m *CerealProjectUpdateManager) getWorkflowInstance(ctx context.Context) (*workflowInstance, error) {
+	chainInstance, err := patterns.GetChainWorkflowInstance(ctx, m.manager, m.workflowName, m.instanceName)
+	if err != nil {
+		return nil, err
+	}
+	return &workflowInstance{chain: chainInstance}, nil
+}
+
+type EmptyProjectUpdateStatus struct{}
+
+func (*EmptyProjectUpdateStatus) Failed() bool {
+	return false
+}
+func (*EmptyProjectUpdateStatus) FailureMessage() string {
 	return ""
 }
 
-func getCompleted(event *automate_event.EventMsg) (bool, error) {
-	fieldName := "Completed"
-	if event.Data != nil && event.Data.Fields != nil && event.Data.Fields[fieldName] != nil {
-		return event.Data.Fields[fieldName].GetBoolValue(), nil
-	}
-
-	return false, fmt.Errorf("Event message sent without a %s field eventID: %q",
-		fieldName, event.EventID)
+func (*EmptyProjectUpdateStatus) PercentageComplete() float64 {
+	return 1.0
 }
 
-func getPercentageComplete(event *automate_event.EventMsg) (float64, error) {
-	fieldName := "PercentageComplete"
-	if event.Data != nil && event.Data.Fields != nil && event.Data.Fields[fieldName] != nil {
-		return event.Data.Fields[fieldName].GetNumberValue(), nil
-	}
-
-	return 0.0, fmt.Errorf("Event message sent without a %s field eventID: %q",
-		fieldName, event.EventID)
+func (*EmptyProjectUpdateStatus) EstimatedTimeComplete() time.Time {
+	return time.Time{}
 }
 
-func getEstimatedTimeCompleteInSec(event *automate_event.EventMsg) (time.Time, error) {
-	fieldName := "EstimatedTimeCompleteInSec"
-	if event.Data != nil && event.Data.Fields != nil && event.Data.Fields[fieldName] != nil {
-		estimatedTimeCompleteInSec := int64(event.Data.Fields[fieldName].GetNumberValue())
-		return time.Unix(estimatedTimeCompleteInSec, 0), nil
-	}
+func (*EmptyProjectUpdateStatus) State() ProjectUpdateState {
+	return ProjectUpdateNotRunningState
+}
 
-	return time.Time{}, fmt.Errorf("Event message sent without a %s field eventID: %q",
-		fieldName, event.EventID)
+func (*EmptyProjectUpdateStatus) Stage() ProjectUpdateStage {
+	return ProjectUpdateStageUpdateNone
+}
+
+func (m *CerealProjectUpdateManager) Status() (ProjectUpdateStatus, error) {
+	projectUpdateInstance, err := m.getWorkflowInstance(context.TODO())
+	if err != nil {
+		if err == cereal.ErrWorkflowInstanceNotFound {
+			return &EmptyProjectUpdateStatus{}, nil
+		}
+		return nil, err
+	}
+	return projectUpdateInstance, nil
 }

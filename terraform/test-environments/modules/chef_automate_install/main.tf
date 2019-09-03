@@ -27,18 +27,19 @@ data "template_file" "install_chef_automate_cli" {
   template = "${file("${path.module}/templates/install_chef_automate_cli.sh.tpl")}"
 
   vars {
-    admin_password         = "${var.admin_password}"
-    airgapped              = "${var.airgapped}"
-    channel                = "${var.channel}"
-    chef_server_admin_name = "${var.chef_server_admin_name}"
-    chef_server_org        = "${var.chef_server_org}"
-    create_admin_token     = "${var.create_admin_token}"
-    enable_chef_server     = "${var.enable_chef_server}"
-    iam_version            = "${var.iam_version}"
-    enable_workflow        = "${var.enable_workflow}"
-    hardened_security      = "${var.hardened_security}"
-    upgrade                = "${var.upgrade}"
-    workflow_enterprise    = "${var.workflow_enterprise}"
+    admin_password            = "${var.admin_password}"
+    airgapped                 = "${var.airgapped}"
+    channel                   = "${var.channel}"
+    chef_server_admin_name    = "${var.chef_server_admin_name}"
+    chef_server_org           = "${var.chef_server_org}"
+    create_admin_token        = "${var.create_admin_token}"
+    enable_chef_server        = "${var.enable_chef_server}"
+    iam_version               = "${var.iam_version}"
+    enable_workflow           = "${var.enable_workflow}"
+    hardened_security         = "${var.hardened_security}"
+    retention_older_than_days = "${var.enable_cloudwatch_metrics == "true" ? 60 : 10}"
+    upgrade                   = "${var.upgrade}"
+    workflow_enterprise       = "${var.workflow_enterprise}"
   }
 }
 
@@ -263,16 +264,6 @@ EOF
   url = "https://telemetry-acceptance.chef.io"
 
 ${var.saml == "true" ? local.saml_config : ""}
-
-[ingest.v1.sys.service]
-  purge_converge_history_after_days = ${var.enable_cloudwatch_metrics == "true" ? 60 : 10}
-  purge_actions_after_days = ${var.enable_cloudwatch_metrics == "true" ? 60 : 10}
-
-[compliance.v1.sys.retention]
-  compliance_report_days = ${var.enable_cloudwatch_metrics == "true" ? 60 : 10}
-
-[data_lifecycle.v1.sys.service]
-  daily_run_at = "17:45:00"
 
 [elasticsearch.v1.sys.runtime]
   heapsize = "${var.enable_cloudwatch_metrics == "true" ? "16g" : "2g"}"

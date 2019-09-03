@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/chef/automate/lib/io/fileutils"
-	"github.com/chef/automate/lib/platform"
+	platform_config "github.com/chef/automate/lib/platform/config"
 )
 
 type Opts struct {
@@ -57,7 +57,7 @@ func newCmd() *cobra.Command {
 type UserData map[string]interface{}
 
 type TemplateData struct {
-	Platform *platform.Config
+	Platform *platform_config.Config
 	Cfg      UserData
 }
 
@@ -68,7 +68,7 @@ func renderTemplate(cmd *cobra.Command, args []string) error {
 		logrus.SetLevel(logrus.InfoLevel)
 	}
 
-	platformConfig, err := platform.ConfigFromEnvironment()
+	platformConfig, err := platform_config.ConfigFromEnvironment()
 	if err != nil {
 		return err
 	}

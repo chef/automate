@@ -277,3 +277,26 @@ DOC
 function ingest_grpcurl_get() {
   chef-automate dev grpcurl ingest-service -- "$@"
 }
+
+document "ingest_grpcurl_configure_purge" <<DOC
+  Configures the purge workflow
+DOC
+function ingest_grpcurl_configure_purge() {
+  chef-automate dev grpcurl ingest-service -- chef.automate.infra.data_lifecycle.api.Purge.Configure -d "
+  {
+    \"enabled\":true,
+    \"recurrence\":\"FREQ=DAILY;DTSTART=20190820T221315Z;INTERVAL=1\",
+    \"policy_update\": {
+      \"es\": [
+        {
+          \"policy_name\":\"converge-history\",
+          \"older_than_days\":\"${1}\"
+        },
+        {
+          \"policy_name\":\"actions\",
+          \"older_than_days\":\"${1}\"
+        }
+      ]
+    }
+  }"
+}

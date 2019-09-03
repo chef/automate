@@ -168,6 +168,7 @@ type (
 		Args     Args      `json:"args,omitempty"`
 		Key      *Term     `json:"key,omitempty"`
 		Value    *Term     `json:"value,omitempty"`
+		Assign   bool      `json:"assign,omitempty"`
 	}
 
 	// Args represents zero or more arguments to a rule.
@@ -590,6 +591,11 @@ func (head *Head) Compare(other *Head) int {
 	} else if other == nil {
 		return 1
 	}
+	if head.Assign && !other.Assign {
+		return -1
+	} else if !head.Assign && other.Assign {
+		return 1
+	}
 	if cmp := Compare(head.Args, other.Args); cmp != 0 {
 		return cmp
 	}
@@ -626,7 +632,11 @@ func (head *Head) String() string {
 		buf = append(buf, head.Name.String())
 	}
 	if head.Value != nil {
-		buf = append(buf, "=")
+		if head.Assign {
+			buf = append(buf, ":=")
+		} else {
+			buf = append(buf, "=")
+		}
 		buf = append(buf, head.Value.String())
 	}
 	return strings.Join(buf, " ")
@@ -990,20 +1000,12 @@ func (expr *Expr) NoWith() *Expr {
 
 // IsEquality returns true if this is an equality expression.
 func (expr *Expr) IsEquality() bool {
-	terms, ok := expr.Terms.([]*Term)
-	if !ok {
-		return false
-	}
-	return terms[0].Value.Compare(Equality.Ref()) == 0
+	return isglobalbuiltin(expr, Var(Equality.Name))
 }
 
 // IsAssignment returns true if this an assignment expression.
 func (expr *Expr) IsAssignment() bool {
-	terms, ok := expr.Terms.([]*Term)
-	if !ok {
-		return false
-	}
-	return terms[0].Value.Compare(Assign.Ref()) == 0
+	return isglobalbuiltin(expr, Var(Assign.Name))
 }
 
 // IsCall returns true if this expression calls a function.
@@ -1306,4 +1308,24 @@ func (s ruleSlice) Len() int           { return len(s) }
 // has a valid number of arguments.
 func validEqAssignArgCount(expr *Expr) bool {
 	return len(expr.Operands()) == 2
+}
+
+// this function checks if the expr refers to a non-namespaced (global) built-in
+// function like eq, gt, plus, etc.
+func isglobalbuiltin(expr *Expr, name Var) bool {
+	terms, ok := expr.Terms.([]*Term)
+	if !ok {
+		return false
+	}
+
+	// NOTE(tsandall): do not use Term#Equal or Value#Compare to avoid
+	// allocation here.
+	ref, ok := terms[0].Value.(Ref)
+	if !ok || len(ref) != 1 {
+		return false
+	} else if head, ok := ref[0].Value.(Var); !ok {
+		return false
+	} else {
+		return head.Equal(name)
+	}
 }

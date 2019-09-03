@@ -4,6 +4,7 @@ import (
 	api "github.com/chef/automate/api/config/deployment"
 	config "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
+	"github.com/sirupsen/logrus"
 )
 
 // NewUserOverrideConfigFromBackupRestoreTask takes a BackupRestoreTask and
@@ -16,6 +17,9 @@ func NewUserOverrideConfigFromBackupRestoreTask(req *BackupRestoreTask) *api.Aut
 	if req == nil {
 		return cfg
 	}
+	if req.PatchConfig != nil {
+		cfg = req.PatchConfig
+	}
 
 	reqS3 := req.GetS3BackupLocation()
 	if reqS3.GetBucketName() == "" {
@@ -27,13 +31,27 @@ func NewUserOverrideConfigFromBackupRestoreTask(req *BackupRestoreTask) *api.Aut
 
 	// We're in S3 mode so we need to populate the config with any options
 	// that are in the req.
-	cfg.Global = config.NewGlobalConfig()
-	cfg.Global.V1.Backups = &config.Backups{
-		S3: &config.Backups_S3{
-			Credentials: &config.Backups_S3_AWSCredentials{},
-			Bucket:      &config.Backups_S3_Bucket{},
-		},
+	if cfg.GetGlobal().GetV1() == nil {
+		cfg.Global = config.NewGlobalConfig()
 	}
+
+	if cfg.Global.V1.Backups == nil {
+		cfg.Global.V1.Backups = &config.Backups{}
+	}
+
+	if cfg.Global.V1.Backups.GetS3() != nil {
+		// We can't use the config from the override config because it might
+		// be different than where you told us the backup lives. We need to
+		// configure automate to use the backup location where the backup lives
+		// in order to restore (mostly because of the way ES works)
+		logrus.Warn("Ignoring s3 config from restore override config in favor of user-specified backup location")
+	}
+
+	cfg.Global.V1.Backups.S3 = &config.Backups_S3{
+		Credentials: &config.Backups_S3_AWSCredentials{},
+		Bucket:      &config.Backups_S3_Bucket{},
+	}
+
 	creds := cfg.GetGlobal().GetV1().GetBackups().GetS3().GetCredentials()
 	bucket := cfg.GetGlobal().GetV1().GetBackups().GetS3().GetBucket()
 

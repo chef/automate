@@ -1,0 +1,41 @@
+@startuml
+Title Cancelling Project Update Effect on Projects List Page
+
+concise "User" as USER
+robust "Ingest Rules" as RULES
+robust "Project Update Status" as PROJECTS
+scale 100 as 50 pixels
+
+@0
+USER is Idle
+RULES is "Applied"
+PROJECTS is OK
+
+@100
+USER is "."
+USER -> RULES: "Edit Rule"
+RULES -> PROJECTS
+RULES is "Edits Pending"
+PROJECTS is "Needs Updating"
+
+@+10
+USER is Idle
+
+@400
+USER is "."
+USER -> PROJECTS: "Update Projects"
+PROJECTS -> RULES@+20
+PROJECTS is "Updating"
+
+@+10
+USER is Idle
+
+@+10
+RULES is "Applied"
+
+@900
+USER is "."
+USER -> PROJECTS: "Cancel"
+PROJECTS is "Needs Updating"
+
+@enduml

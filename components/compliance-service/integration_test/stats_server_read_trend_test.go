@@ -76,8 +76,8 @@ func TestReadTrend(t *testing.T) {
 					Type: iam_v2.ProjectRuleTypes_EVENT,
 					Conditions: []*iam_v2.Condition{
 						{
-							Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
-							Values: v,
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+							Values:    v,
 						},
 					},
 				},

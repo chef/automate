@@ -39,7 +39,7 @@ build_all = (ENV["BUILDKITE_BRANCH"] || "").include?("verify-rebuild-all") || EN
 # on us, we could end up missing a required dependency.
 #
 changed_packages = Hash.new
-changed_package_files = Hash.new
+changed_packages_reasons = Hash.new
 hab_deps = Hash.new
 
 config.each do |pkg_name, metadata|
@@ -53,19 +53,26 @@ config.each do |pkg_name, metadata|
   if build_all
     changed_packages[pkg_name] = metadata["plan_path"]
   else
-    files = changed_files.select do |file|
-          Array(metadata["paths"]).any? { |glob| File.fnmatch(glob, file) }
-        end
-    unless files.empty?
+    globs = Array(metadata["paths"]).select do |glob|
+      changed_files.any? { |file| File.fnmatch(glob, file) }
+    end
+    unless globs.empty?
       changed_packages[pkg_name] = metadata["plan_path"]
-      changed_package_files[pkg_name] = files
+      changed_packages_reasons[pkg_name] = globs
     end
   end
 end
 
 hab_deps.each do |pkg, deps|
   deps.each do |d|
-    changed_packages[pkg] = config[pkg]["plan_path"] if changed_packages[d]
+    if changed_packages[d]
+      changed_packages[pkg] = config[pkg]["plan_path"]
+      if changed_packages_reasons[pkg]
+        changed_packages_reasons[pkg] << "Depends on #{d}"
+      else
+        changed_packages_reasons[pkg] = ["Depends on #{d}"]
+      end
+    end
   end
 end
 
@@ -73,10 +80,10 @@ hab_deps.tsort.each do |p|
   puts changed_packages[p] if changed_packages[p]
 end
 
-changed_package_files.each do |p, files|
+changed_packages_reasons.each do |p, reasons|
   STDERR.puts "<details><summary>#{p}</summary>\n\n"
-  files.each do |file|
-    STDERR.puts "  - #{file}"
+  reasons.each do |reason|
+    STDERR.puts "  - #{reason}"
   end
   STDERR.puts "</details>"
 end

@@ -30,7 +30,7 @@ const (
 	// 4) Determines the overall status of the service group
 
 	// TODO: Update this query once we understand better the deploying status
-	selectServiceGroupsHealthCounts = `
+	selectServiceGroupsHealthCountsFirst = `
   SELECT COUNT(*) AS total
   ,COUNT(*) FILTER (
              WHERE health_critical > 0
@@ -50,43 +50,36 @@ const (
                AND health_warning  = 0
                AND health_unknown  = 0
        ) AS ok
-  FROM ( ` + selectServiceGroupHealth + groupByPart + ` ) AS service_group_health_counts
-`
+	FROM ( `
+	selectServiceGroupsHealthCountsSecond = ` ) AS service_group_health_counts `
 
-	selectServiceGroupHealth = `
+	selectServiceGroupHealthFirst = `
   SELECT *
          ,(CASE WHEN health_critical > 0 THEN '1_CRITICAL'
                 WHEN health_unknown  > 0 THEN '2_UNKNOWN'
                 WHEN health_warning  > 0 THEN '3_WARNING'
                 ELSE '4_OK' END ) as health
-    FROM (SELECT  sg.id
-                 ,sg.deployment_id
-                 ,sg.name as name
-                 ,COUNT(s.health) FILTER (WHERE s.health = 'OK') AS health_ok
-                 ,COUNT(s.health) FILTER (WHERE s.health = 'CRITICAL') AS health_critical
-                 ,COUNT(s.health) FILTER (WHERE s.health = 'WARNING') AS health_warning
-                 ,COUNT(s.health) FILTER (WHERE s.health = 'UNKNOWN') AS health_unknown
-                 ,COUNT(s.health) AS health_total
-                 ,round((COUNT(s.health) FILTER (WHERE s.health = 'OK')
-                       / COUNT(s.health)::float) * 100) as percent_ok
-                 ,(SELECT array_agg(DISTINCT CONCAT (s.package_ident))
-                     FROM service AS s
-                    WHERE s.group_id = sg.id) AS releases
-                 ,d.app_name as app_name
-                 ,d.environment as environment
-                 ,sg.name_suffix as name_suffix
-          FROM service_group AS sg
-          JOIN service AS s
-               ON s.group_id = sg.id
-          JOIN deployment as d
-               ON sg.deployment_id = d.id
+          ,(SELECT array_agg(DISTINCT CONCAT (s_for_releases.package_ident))
+                FROM service_full AS s_for_releases
+                WHERE s_for_releases.service_group_id = sghc.id `
+
+	selectServiceGroupHealthSecond = `) AS releases
+    FROM (SELECT  s.service_group_id as id
+      ,s.service_group_name as name
+      ,COUNT(s.health) FILTER (WHERE s.health = 'OK') AS health_ok
+      ,COUNT(s.health) FILTER (WHERE s.health = 'CRITICAL') AS health_critical
+      ,COUNT(s.health) FILTER (WHERE s.health = 'WARNING') AS health_warning
+      ,COUNT(s.health) FILTER (WHERE s.health = 'UNKNOWN') AS health_unknown
+      ,COUNT(s.health) AS health_total
+      ,round((COUNT(s.health) FILTER (WHERE s.health = 'OK')
+            / COUNT(s.health)::float) * 100) as percent_ok
+      ,s.application as app_name
+      ,s.environment as environment
+      ,s.service_group_name_suffix as name_suffix
+    FROM service_full AS s
 `
 	groupByPart = `
-  GROUP BY sg.id, sg.deployment_id, sg.name, d.app_name, d.environment, sg.name_suffix ) as sghc
-`
-	joinSupervisor = `
-  JOIN supervisor AS sup
-    ON s.sup_id = sup.id
+  GROUP BY s.service_group_id, s.application, s.environment, s.service_group_name, s.service_group_name_suffix ) as sghc
 `
 	selectServiceGroupHealthFilterCRITICAL = `
   WHERE
@@ -113,21 +106,16 @@ const (
 	paginationSorting = `
   ORDER BY %s
   LIMIT $1
-	OFFSET $2 `
+  OFFSET $2 `
 
 	selectServiceGroupsTotalCount = `
-SELECT count(*)
-  FROM service_group;
-`
-
-	deleteSvcGroupsWithoutServices = `
-DELETE FROM service_group WHERE NOT EXISTS (SELECT 1 FROM service WHERE service.group_id = service_group.id )
+SELECT COUNT(DISTINCT service_group_id) FROM service_full;
 `
 )
 
 // serviceGroupHealth matches the results from the SELECT GroupHealth Query
 type serviceGroupHealth struct {
-	ID             int32          `db:"id"`
+	ID             string         `db:"id"`
 	Releases       pq.StringArray `db:"releases"`
 	Name           string         `db:"name"`
 	DeploymentID   int32          `db:"deployment_id"`
@@ -149,7 +137,6 @@ type serviceGroupHealth struct {
 	composedReleases []string
 }
 
-// getServiceFromUniqueFields retrieve a service from the db without the need of an id
 func (db *Postgres) GetServiceGroups(
 	sortField string, sortAsc bool,
 	page int32, pageSize int32,
@@ -159,11 +146,9 @@ func (db *Postgres) GetServiceGroups(
 	page = page - 1
 	offset := pageSize * page
 	var (
-		sgHealth            []*serviceGroupHealth
-		selectMainQuery     string = selectServiceGroupHealth
-		sortOrder           string
-		err                 error
-		selectAllPartsQuery string
+		sgHealth  []*serviceGroupHealth
+		sortOrder string
+		err       error
 	)
 
 	if sortAsc {
@@ -172,26 +157,14 @@ func (db *Postgres) GetServiceGroups(
 		sortOrder = "DESC"
 	}
 
-	whereQuery, statusQuery, statusFilter, needSupervisorTable, err := formatFilters(filters)
+	whereQuery, err := formatQueryFilters(filters, true)
 	if err != nil {
 		return nil, err
 	}
-
-	if statusFilter && needSupervisorTable {
-		// We need to join to the supervisor table is we are filtering by Site
-		selectAllPartsQuery = selectMainQuery + joinSupervisor + whereQuery + groupByPart + statusQuery + paginationSorting
-	} else if statusFilter {
-		// The status query has to go outside of the inner query because the health count filters need to be calculated
-		// in order to be used in the where clause
-		selectAllPartsQuery = selectMainQuery + whereQuery + groupByPart + statusQuery + paginationSorting
-	} else if needSupervisorTable {
-		selectAllPartsQuery = selectMainQuery + joinSupervisor + whereQuery + groupByPart + paginationSorting
-	} else {
-		selectAllPartsQuery = selectMainQuery + whereQuery + groupByPart + paginationSorting
-	}
+	whereQuery = whereQuery + paginationSorting
 
 	// Formatting our Query with sort field and sort order
-	formattedQuery := fmt.Sprintf(selectAllPartsQuery, formatSortFields(sortField, sortOrder))
+	formattedQuery := fmt.Sprintf(whereQuery, formatSortFields(sortField, sortOrder))
 
 	_, err = db.DbMap.Select(&sgHealth, formattedQuery, pageSize, offset)
 	if err != nil {
@@ -222,15 +195,17 @@ func (db *Postgres) GetServiceGroups(
 	return sgDisplay, nil
 }
 
-func formatFilters(filters map[string][]string) (string, string, bool, bool, error) {
+func formatQueryFilters(filters map[string][]string, includeStatusFilter bool) (string, error) {
 	var (
-		err         error
-		statusQuery string
-		whereQuery  string
+		err                 error
+		statusQuery         string
+		whereQuery          string
+		selectAllPartsQuery string
+		selectQuery         string
 	)
+	packageWhereQuery := ``
 	first := true
 	statusFilter := false
-	needSupervisorTable := false
 	for filter, values := range filters {
 		if len(values) == 0 {
 			continue
@@ -239,77 +214,73 @@ func formatFilters(filters map[string][]string) (string, string, bool, bool, err
 		case "status", "STATUS":
 			// @afiune What if the user specify more than one Status Filter?
 			// status=["ok", "critical"]
-			statusFilter = true
-			statusQuery, err = queryFromStatusFilter(values[0])
-			if err != nil {
-				return "", "", false, false, err
+			if includeStatusFilter {
+				// We do not want to include the status filter for the health counts
+				// because we want the counts of all statuses (statii? statera? I leave this for the linguists)
+				statusFilter = true
+				statusQuery, err = queryFromStatusFilter(values[0])
+				if err != nil {
+					return "", err
+				}
 			}
-
 		case "environment", "ENVIRONMENT":
-			selectQuery, err := queryFromFieldFilter("d.environment", values, first)
+			selectQuery, err = queryFromFieldFilter("s.environment", values, first)
 			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return "", "", false, false, err
-			}
+
 		case "application", "APPLICATION":
-			selectQuery, err := queryFromFieldFilter("d.app_name", values, first)
+			selectQuery, err = queryFromFieldFilter("s.application", values, first)
 			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return "", "", false, false, err
-			}
 		case "group", "GROUP":
-			selectQuery, err := queryFromFieldFilter("sg.name_suffix", values, first)
+			selectQuery, err = queryFromFieldFilter("s.service_group_name_suffix", values, first)
 			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return "", "", false, false, err
-			}
 		case "origin", "ORIGIN":
 			selectQuery, err := queryFromFieldFilter("s.origin", values, first)
 			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return "", "", false, false, err
+			q, err1 := queryFromFieldFilter("s_for_releases.origin", values, false)
+			packageWhereQuery = packageWhereQuery + q
+			if err != nil || err1 != nil {
+				return "", err
 			}
 		case "service", "SERVICE":
-			selectQuery, err := queryFromFieldFilter("s.name", values, first)
+			selectQuery, err = queryFromFieldFilter("s.name", values, first)
 			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return "", "", false, false, err
-			}
+			break
 		case "site", "SITE":
-			// If we are filtering by site which is on the sueprvisor table we have to join this table onto our inner query
-			needSupervisorTable = true
-			selectQuery, err := queryFromFieldFilter("sup.site", values, first)
+			selectQuery, err = queryFromFieldFilter("s.site", values, first)
 			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return "", "", false, false, err
-			}
 		case "channel", "CHANNEL":
-			selectQuery, err := queryFromFieldFilter("s.channel", values, first)
+			selectQuery, err = queryFromFieldFilter("s.channel", values, first)
 			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return "", "", false, false, err
-			}
+			break
 		case "version", "VERSION":
 			selectQuery, err := queryFromFieldFilter("s.version", values, first)
 			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return "", "", false, false, err
+			q, err1 := queryFromFieldFilter("s_for_releases.version", values, false)
+			packageWhereQuery = packageWhereQuery + q
+			if err != nil || err1 != nil {
+				return "", err
 			}
 		case "buildstamp", "BUILDSTAMP":
-			selectQuery, err := queryFromFieldFilter("s.release", values, first)
+			selectQuery, err = queryFromFieldFilter("s.release", values, first)
 			whereQuery = whereQuery + selectQuery
-			if err != nil {
-				return "", "", false, false, err
-			}
 		default:
-			return "", "", false, false, errors.Errorf("invalid filter. (%s:%s)", filter, values)
+			return "", errors.Errorf("invalid filter. (%s:%s)", filter, values)
 		}
-		if first {
+		if err != nil {
+			return "", err
+		}
+		if first && filter != "status" && filter != "STATUS" { //If status is first ignore it since it is special and happens outside the inner query.
 			first = false
 		}
-
 	}
-	return whereQuery, statusQuery, statusFilter, needSupervisorTable, nil
+	if statusFilter {
+		// The status query has to go outside of the inner query because the health count filters need to be calculated
+		// in order to be used in the where clause
+		selectAllPartsQuery = selectServiceGroupHealthFirst + packageWhereQuery + selectServiceGroupHealthSecond + whereQuery + groupByPart + statusQuery
+	} else {
+		selectAllPartsQuery = selectServiceGroupHealthFirst + packageWhereQuery + selectServiceGroupHealthSecond + whereQuery + groupByPart
+	}
+	return selectAllPartsQuery, nil
 }
 
 func (db *Postgres) GetServiceGroupsCount() (int32, error) {
@@ -412,9 +383,14 @@ func (sgh *serviceGroupHealth) breakReleases() {
 }
 
 // GetServiceGroupsHealthCounts retrieves the health counts from all service groups in the database
-func (db *Postgres) GetServiceGroupsHealthCounts() (*storage.HealthCounts, error) {
+func (db *Postgres) GetServiceGroupsHealthCounts(filters map[string][]string) (*storage.HealthCounts, error) {
 	var sgHealthCounts storage.HealthCounts
-	err := db.SelectOne(&sgHealthCounts, selectServiceGroupsHealthCounts)
+	selectInnerQuery, err := formatQueryFilters(filters, false)
+	if err != nil {
+		return nil, err
+	}
+	selectQuery := selectServiceGroupsHealthCountsFirst + selectInnerQuery + selectServiceGroupsHealthCountsSecond
+	err = db.SelectOne(&sgHealthCounts, selectQuery)
 	if err != nil {
 		return nil, err
 	}
@@ -428,7 +404,7 @@ func (db *Postgres) ServiceGroupExists(id string) (string, bool) {
 		return "", false
 	}
 	var sgName string
-	err := db.SelectOne(&sgName, "SELECT name FROM service_group WHERE id = $1", id)
+	err := db.SelectOne(&sgName, "SELECT service_group_name FROM service_full WHERE service_group_id = $1 LIMIT 1", id)
 	if err != nil {
 		return "", false
 	}
@@ -505,29 +481,4 @@ func inArray(value string, array []string) bool {
 		}
 	}
 	return false
-}
-
-func (db *Postgres) getServiceGroup(id int32) (*serviceGroup, error) {
-	var sg serviceGroup
-	err := db.SelectOne(&sg,
-		"SELECT id, deployment_id, name FROM service_group WHERE id = $1", id)
-	if err != nil {
-		return nil, errors.Wrap(err, "unable to retrieve service group from the database")
-	}
-
-	return &sg, nil
-}
-
-func (db *Postgres) getServiceGroupID(name string, deploymentID int32) (int32, bool) {
-	var gid int32
-	err := db.SelectOne(&gid,
-		"SELECT id FROM service_group WHERE name = $1 AND deployment_id = $2",
-		name,
-		deploymentID,
-	)
-	if err != nil {
-		return gid, false
-	}
-
-	return gid, true
 }

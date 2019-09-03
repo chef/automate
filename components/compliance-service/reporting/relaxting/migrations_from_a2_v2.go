@@ -1,19 +1,20 @@
 package relaxting
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
 
-	"github.com/chef/automate/components/compliance-service/reporting"
-	"github.com/chef/automate/components/compliance-service/reporting/util"
 	"github.com/golang/protobuf/jsonpb"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"golang.org/x/net/context"
+
+	"github.com/chef/automate/components/compliance-service/reporting"
+	"github.com/chef/automate/components/compliance-service/reporting/util"
 )
 
 const (

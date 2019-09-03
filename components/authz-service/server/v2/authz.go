@@ -12,11 +12,15 @@ import (
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/stringutils"
+	"github.com/pkg/errors"
 
 	"github.com/chef/automate/api/interservice/authz/common"
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
+	"github.com/chef/automate/components/authz-service/projectassignment"
+	storage "github.com/chef/automate/components/authz-service/storage/v2"
+	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
 )
 
 // These do not have to be the same
@@ -26,15 +30,25 @@ type authzServer struct {
 	engine   engine.V2Authorizer
 	vSwitch  *VersionSwitch
 	projects api.ProjectsServer
+	store    storage.Storage
 }
 
-// NewAuthzServer returns a new IAM v2 Authz server.
-func NewAuthzServer(l logger.Logger, e engine.V2Authorizer, v *VersionSwitch, p api.ProjectsServer) (api.AuthorizationServer, error) {
+// NewPostgresAuthzServer returns a new IAM v2 Authz server.
+func NewPostgresAuthzServer(l logger.Logger, e engine.V2Authorizer, v *VersionSwitch, p api.ProjectsServer) (api.AuthorizationServer, error) {
+	s := postgres.GetInstance()
+	if s == nil {
+		return nil, errors.New("postgres v2 singleton not yet initialized for authz server")
+	}
+	return NewAuthzServer(l, e, v, p, s)
+}
+
+func NewAuthzServer(l logger.Logger, e engine.V2Authorizer, v *VersionSwitch, p api.ProjectsServer, s storage.Storage) (api.AuthorizationServer, error) {
 	return &authzServer{
 		log:      l,
 		engine:   e,
 		vSwitch:  v,
 		projects: p,
+		store:    s,
 	}, nil
 }
 
@@ -168,6 +182,49 @@ func (s *authzServer) FilterAuthorizedProjects(
 	return &api.FilterAuthorizedProjectsResp{
 		Projects: projectIDs,
 	}, nil
+}
+
+// TODO (tc) Until projects are transactionally cleaned up from all data everywhere
+// on project delete, this might fail when it shouldn't (aka the project no longer exists
+// that is being removed from some object), since the project won't be found or authorized
+// for iam:project:assign. We should make cleaning up projects on project delete from IAM
+// objects throughout the system transactional.
+//
+// ValidateProjectAssignment assesses if a set of subjects is authorized to reassign a set
+// of projects. It will return nil for the error if successful.
+// If unsuccessful it will return an error when:
+//
+// 1) One or more of the projects passed do not actual exist (returns NotFound).
+// 2) The set of subjects was not authorized on one or more of the projects (returns PermissionsDenied).
+//
+// ValidateProjectAssignment is only used externally to authz-service to avoid circular dependency issues.
+// When checking project assignment permissions internally, the relevant bits of this function are used
+// directly in the v2/postgres.go code.
+func (s *authzServer) ValidateProjectAssignment(
+	ctx context.Context,
+	req *api.ValidateProjectAssignmentReq) (*api.ValidateProjectAssignmentResp, error) {
+
+	if !s.isBeta2p1() {
+		return nil, errors.New("must be on v2.1 to assign projects")
+	}
+
+	err := s.store.ErrIfMissingProjects(ctx, req.ProjectIds)
+	if err != nil {
+		if _, ok := err.(*projectassignment.ProjectsMissingErr); ok {
+			return nil, status.Error(codes.NotFound, err.Error())
+		}
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	err = projectassignment.ErrIfProjectAssignmentUnauthorized(ctx, s.engine, req.Subjects, req.ProjectIds)
+	if err != nil {
+		if _, ok := err.(*projectassignment.ProjectsUnauthorizedForAssignmentErr); ok {
+			return nil, status.Error(codes.PermissionDenied, err.Error())
+		}
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &api.ValidateProjectAssignmentResp{}, nil
 }
 
 func (s *authzServer) isBeta2p1() bool {

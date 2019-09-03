@@ -185,6 +185,7 @@ func habNatsUser() *natsd.User {
 					"_STAN.discover.event-service.*",
 					"_STAN.pub.*.habitat",
 					"_STAN.close.*",
+					"habitat.event.*",
 				},
 			},
 			Subscribe: &natsd.SubjectPermission{

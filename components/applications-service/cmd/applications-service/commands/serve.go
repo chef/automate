@@ -15,7 +15,7 @@ import (
 	ingest "github.com/chef/automate/components/applications-service/pkg/ingester/v1"
 	"github.com/chef/automate/components/applications-service/pkg/storage/postgres"
 	"github.com/chef/automate/lib/grpc/secureconn"
-	"github.com/chef/automate/lib/platform"
+	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/tls/certs"
 	"github.com/chef/automate/lib/version"
 )
@@ -79,7 +79,7 @@ func configFromViper() (*config.Applications, error) {
 
 	if cfg.Postgres.URI == "" {
 		var err error
-		cfg.Postgres.URI, err = platform.PGURIFromEnvironment(cfg.Postgres.Database)
+		cfg.Postgres.URI, err = platform_config.PGURIFromEnvironment(cfg.Postgres.Database)
 		if err != nil {
 			log.WithError(err).Error("Failed to get pg uri")
 			return nil, err

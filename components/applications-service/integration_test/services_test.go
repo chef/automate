@@ -7,13 +7,13 @@ package integration_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/common/query"
+	"github.com/chef/automate/api/external/habitat"
 )
 
 func TestGetServicesBasic(t *testing.T) {
@@ -343,7 +343,7 @@ func TestGetServicesMultiServiceWithServiceGroupIDFilter(t *testing.T) {
 
 		var (
 			ctx     = context.Background()
-			sgID    = fmt.Sprintf("%d", sgList[0].ID)
+			sgID    = sgList[0].ID
 			request = &applications.ServicesReq{
 				Filter: []string{"service_group_id:" + sgID},
 			}
@@ -410,7 +410,7 @@ func TestGetServicesMultiServiceWithHealthAndServiceGroupIdFilter(t *testing.T) 
 
 		var (
 			ctx     = context.Background()
-			sgID    = fmt.Sprintf("%d", sgList[3].ID)
+			sgID    = sgList[3].ID
 			request = &applications.ServicesReq{
 				Filter: []string{
 					"service_group_id:" + sgID,
@@ -427,6 +427,492 @@ func TestGetServicesMultiServiceWithHealthAndServiceGroupIdFilter(t *testing.T) 
 						HealthCheck:  applications.HealthStatus_UNKNOWN,
 						Application:  a, Environment: e, Fqdn: "temp.example.com",
 						Channel: c, UpdateStrategy: none, Site: s,
+					},
+				},
+			}
+		)
+		response, err := suite.ApplicationsServer.GetServices(ctx, request)
+		assert.Nil(t, err)
+		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+	}
+}
+
+func TestGetServicesMultiServiceWithOriginAndServiceGroupIdFilter(t *testing.T) {
+	// Same service group, different origins
+	mockHabServices := []*habitat.HealthCheckEvent{
+		NewHabitatEvent(
+			withSupervisorId("sup2"),
+			withServiceGroup("a.test"),
+			withPackageIdent("core/a/0.1.0/20190101121212"),
+			withHealth("UNKNOWN"),
+			withApplication("a_app"),
+			withEnvironment("a_env"),
+		),
+		NewHabitatEvent(
+			withSupervisorId("sup3"),
+			withServiceGroup("a.test"),
+			withPackageIdent("chef/a/0.1.0/00000000000000"),
+			withHealth("OK"),
+			withApplication("a_app"),
+			withEnvironment("a_env"),
+		),
+	}
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	// Get the ID from the service group
+	sgList := suite.GetServiceGroups()
+	if assert.Equal(t, 1, len(sgList), "There should be one service_group in the db") {
+
+		var (
+			ctx     = context.Background()
+			sgID    = sgList[0].ID
+			request = &applications.ServicesReq{
+				Filter: []string{
+					"service_group_id:" + sgID,
+					"origin:chef",
+				},
+			}
+			expected = &applications.ServicesRes{
+				Services: []*applications.Service{
+					{
+						SupervisorId:   "sup3",
+						Group:          "a.test",
+						Release:        "chef/a/0.1.0/00000000000000",
+						HealthCheck:    applications.HealthStatus_OK,
+						Application:    "a_app",
+						Environment:    "a_env",
+						UpdateStrategy: none,
+						Site:           s,
+					},
+				},
+			}
+		)
+		response, err := suite.ApplicationsServer.GetServices(ctx, request)
+		assert.Nil(t, err)
+		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+	}
+}
+
+func TestGetServicesMultiServiceWithSiteAndServiceGroupIdFilter(t *testing.T) {
+	// Same service group, different sites
+	mockHabServices := []*habitat.HealthCheckEvent{
+		NewHabitatEvent(
+			withSupervisorId("sup2"),
+			withServiceGroup("a.test"),
+			withPackageIdent("chef/a/0.1.0/20190101121212"),
+			withHealth("UNKNOWN"),
+			withApplication("a_app"),
+			withEnvironment("a_env"),
+			withSite("chernobyl"),
+		),
+		NewHabitatEvent(
+			withSupervisorId("sup3"),
+			withServiceGroup("a.test"),
+			withPackageIdent("chef/a/0.1.0/00000000000000"),
+			withHealth("OK"),
+			withApplication("a_app"),
+			withEnvironment("a_env"),
+			withSite("fukushima"),
+		),
+	}
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	// Get the ID from the service group
+	sgList := suite.GetServiceGroups()
+	if assert.Equal(t, 1, len(sgList), "There should be one service_group in the db") {
+
+		var (
+			ctx     = context.Background()
+			sgID    = sgList[0].ID
+			request = &applications.ServicesReq{
+				Filter: []string{
+					"service_group_id:" + sgID,
+					"site:fukushima",
+				},
+			}
+			expected = &applications.ServicesRes{
+				Services: []*applications.Service{
+					{
+						SupervisorId:   "sup3",
+						Group:          "a.test",
+						Release:        "chef/a/0.1.0/00000000000000",
+						HealthCheck:    applications.HealthStatus_OK,
+						Application:    "a_app",
+						Environment:    "a_env",
+						UpdateStrategy: none,
+						Site:           "fukushima",
+					},
+				},
+			}
+		)
+		response, err := suite.ApplicationsServer.GetServices(ctx, request)
+		assert.Nil(t, err)
+		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+	}
+}
+
+func TestGetServicesMultiServiceWithChannelAndServiceGroupIdFilter(t *testing.T) {
+	// Same service group, different channels
+	mockHabServices := []*habitat.HealthCheckEvent{
+		NewHabitatEvent(
+			withSupervisorId("sup2"),
+			withServiceGroup("a.test"),
+			withPackageIdent("chef/a/0.1.0/20190101121212"),
+			withHealth("UNKNOWN"),
+			withApplication("a_app"),
+			withEnvironment("a_env"),
+			withStrategyAtOnce("Q13"),
+		),
+		NewHabitatEvent(
+			withSupervisorId("sup3"),
+			withServiceGroup("a.test"),
+			withPackageIdent("chef/a/0.1.0/00000000000000"),
+			withHealth("OK"),
+			withApplication("a_app"),
+			withEnvironment("a_env"),
+			withStrategyAtOnce("fox"),
+		),
+	}
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	// Get the ID from the service group
+	sgList := suite.GetServiceGroups()
+	if assert.Equal(t, 1, len(sgList), "There should be one service_group in the db") {
+
+		var (
+			ctx     = context.Background()
+			sgID    = sgList[0].ID
+			request = &applications.ServicesReq{
+				Filter: []string{
+					"service_group_id:" + sgID,
+					"channel:fox",
+				},
+			}
+			expected = &applications.ServicesRes{
+				Services: []*applications.Service{
+					{
+						SupervisorId:   "sup3",
+						Group:          "a.test",
+						Release:        "chef/a/0.1.0/00000000000000",
+						HealthCheck:    applications.HealthStatus_OK,
+						Application:    "a_app",
+						Environment:    "a_env",
+						UpdateStrategy: "AT-ONCE",
+						Site:           s,
+						Channel:        "fox",
+					},
+				},
+			}
+		)
+		response, err := suite.ApplicationsServer.GetServices(ctx, request)
+		assert.Nil(t, err)
+		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+	}
+}
+
+func TestGetServicesMultiServiceWithVersionAndServiceGroupIdFilter(t *testing.T) {
+	// Same service group, different versions
+	mockHabServices := []*habitat.HealthCheckEvent{
+		NewHabitatEvent(
+			withSupervisorId("sup2"),
+			withServiceGroup("a.test"),
+			withPackageIdent("chef/a/0.2.2/20190101121212"),
+			withHealth("UNKNOWN"),
+			withApplication("a_app"),
+			withEnvironment("a_env"),
+		),
+		NewHabitatEvent(
+			withSupervisorId("sup3"),
+			withServiceGroup("a.test"),
+			withPackageIdent("chef/a/0.1.0/00000000000000"),
+			withHealth("OK"),
+			withApplication("a_app"),
+			withEnvironment("a_env"),
+		),
+	}
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	// Get the ID from the service group
+	sgList := suite.GetServiceGroups()
+	if assert.Equal(t, 1, len(sgList), "There should be one service_group in the db") {
+
+		var (
+			ctx     = context.Background()
+			sgID    = sgList[0].ID
+			request = &applications.ServicesReq{
+				Filter: []string{
+					"service_group_id:" + sgID,
+					"version:0.2.2",
+				},
+			}
+			expected = &applications.ServicesRes{
+				Services: []*applications.Service{
+					{
+						SupervisorId:   "sup2",
+						Group:          "a.test",
+						Release:        "chef/a/0.2.2/20190101121212",
+						HealthCheck:    applications.HealthStatus_UNKNOWN,
+						Application:    "a_app",
+						Environment:    "a_env",
+						UpdateStrategy: none,
+						Site:           s,
+					},
+				},
+			}
+		)
+		response, err := suite.ApplicationsServer.GetServices(ctx, request)
+		assert.Nil(t, err)
+		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+	}
+}
+
+func TestGetServicesMultiServiceWithBuildstampAndServiceGroupIdFilter(t *testing.T) {
+	// Same service group, different buildstamps
+	mockHabServices := []*habitat.HealthCheckEvent{
+		NewHabitatEvent(
+			withSupervisorId("sup2"),
+			withServiceGroup("a.test"),
+			withPackageIdent("chef/a/0.1.0/20190101121212"),
+			withHealth("UNKNOWN"),
+			withApplication("a_app"),
+			withEnvironment("a_env"),
+		),
+		NewHabitatEvent(
+			withSupervisorId("sup3"),
+			withServiceGroup("a.test"),
+			withPackageIdent("chef/a/0.1.0/00000000000000"),
+			withHealth("OK"),
+			withApplication("a_app"),
+			withEnvironment("a_env"),
+		),
+	}
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	// Get the ID from the service group
+	sgList := suite.GetServiceGroups()
+	if assert.Equal(t, 1, len(sgList), "There should be one service_group in the db") {
+
+		var (
+			ctx     = context.Background()
+			sgID    = sgList[0].ID
+			request = &applications.ServicesReq{
+				Filter: []string{
+					"service_group_id:" + sgID,
+					"buildstamp:20190101121212",
+				},
+			}
+			expected = &applications.ServicesRes{
+				Services: []*applications.Service{
+					{
+						SupervisorId:   "sup2",
+						Group:          "a.test",
+						Release:        "chef/a/0.1.0/20190101121212",
+						HealthCheck:    applications.HealthStatus_UNKNOWN,
+						Application:    "a_app",
+						Environment:    "a_env",
+						UpdateStrategy: none,
+						Site:           s,
+					},
+				},
+			}
+		)
+		response, err := suite.ApplicationsServer.GetServices(ctx, request)
+		assert.Nil(t, err)
+		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+	}
+}
+
+func TestGetServicesMultiServiceWithEnvironmentAndServiceGroupIdFilter(t *testing.T) {
+	// Same service group
+	mockHabServices := []*habitat.HealthCheckEvent{
+		NewHabitatEvent(
+			withSupervisorId("sup2"),
+			withServiceGroup("a.test"),
+			withPackageIdent("chef/a/0.1.0/20190101121212"),
+			withHealth("UNKNOWN"),
+			withApplication("a_app"),
+			withEnvironment("a_env"),
+		),
+	}
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	// Get the ID from the service group
+	sgList := suite.GetServiceGroups()
+	if assert.Equal(t, 1, len(sgList), "There should be one service_group in the db") {
+
+		var (
+			ctx     = context.Background()
+			sgID    = sgList[0].ID
+			request = &applications.ServicesReq{
+				Filter: []string{
+					"service_group_id:" + sgID,
+					"environment:a_env",
+				},
+			}
+			expected = &applications.ServicesRes{
+				Services: []*applications.Service{
+					{
+						SupervisorId:   "sup2",
+						Group:          "a.test",
+						Release:        "chef/a/0.1.0/20190101121212",
+						HealthCheck:    applications.HealthStatus_UNKNOWN,
+						Application:    "a_app",
+						Environment:    "a_env",
+						UpdateStrategy: none,
+						Site:           s,
+					},
+				},
+			}
+		)
+		response, err := suite.ApplicationsServer.GetServices(ctx, request)
+		assert.Nil(t, err)
+		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+	}
+}
+
+func TestGetServicesMultiServiceWithApplicationAndServiceGroupIdFilter(t *testing.T) {
+	// Same service group
+	mockHabServices := []*habitat.HealthCheckEvent{
+		NewHabitatEvent(
+			withSupervisorId("sup2"),
+			withServiceGroup("a.test"),
+			withPackageIdent("chef/a/0.1.0/20190101121212"),
+			withHealth("UNKNOWN"),
+			withApplication("a_app"),
+			withEnvironment("a_env"),
+		),
+	}
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	// Get the ID from the service group
+	sgList := suite.GetServiceGroups()
+	if assert.Equal(t, 1, len(sgList), "There should be one service_group in the db") {
+
+		var (
+			ctx     = context.Background()
+			sgID    = sgList[0].ID
+			request = &applications.ServicesReq{
+				Filter: []string{
+					"service_group_id:" + sgID,
+					"application:a_app",
+				},
+			}
+			expected = &applications.ServicesRes{
+				Services: []*applications.Service{
+					{
+						SupervisorId:   "sup2",
+						Group:          "a.test",
+						Release:        "chef/a/0.1.0/20190101121212",
+						HealthCheck:    applications.HealthStatus_UNKNOWN,
+						Application:    "a_app",
+						Environment:    "a_env",
+						UpdateStrategy: none,
+						Site:           s,
+					},
+				},
+			}
+		)
+		response, err := suite.ApplicationsServer.GetServices(ctx, request)
+		assert.Nil(t, err)
+		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+	}
+}
+
+func TestGetServicesMultiServiceWithGroupNameAndServiceGroupIdFilter(t *testing.T) {
+	// Same service group
+	mockHabServices := []*habitat.HealthCheckEvent{
+		NewHabitatEvent(
+			withSupervisorId("sup2"),
+			withServiceGroup("a.test"),
+			withPackageIdent("chef/a/0.1.0/20190101121212"),
+			withHealth("UNKNOWN"),
+			withApplication("a_app"),
+			withEnvironment("a_env"),
+		),
+	}
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	// Get the ID from the service group
+	sgList := suite.GetServiceGroups()
+	if assert.Equal(t, 1, len(sgList), "There should be one service_group in the db") {
+
+		var (
+			ctx     = context.Background()
+			sgID    = sgList[0].ID
+			request = &applications.ServicesReq{
+				Filter: []string{
+					"service_group_id:" + sgID,
+					"group:test",
+				},
+			}
+			expected = &applications.ServicesRes{
+				Services: []*applications.Service{
+					{
+						SupervisorId:   "sup2",
+						Group:          "a.test",
+						Release:        "chef/a/0.1.0/20190101121212",
+						HealthCheck:    applications.HealthStatus_UNKNOWN,
+						Application:    "a_app",
+						Environment:    "a_env",
+						UpdateStrategy: none,
+						Site:           s,
+					},
+				},
+			}
+		)
+		response, err := suite.ApplicationsServer.GetServices(ctx, request)
+		assert.Nil(t, err)
+		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+	}
+}
+
+func TestGetServicesMultiServiceWithServiceNameAndServiceGroupIdFilter(t *testing.T) {
+	// Same service group
+	mockHabServices := []*habitat.HealthCheckEvent{
+		NewHabitatEvent(
+			withSupervisorId("sup2"),
+			withServiceGroup("a.test"),
+			withPackageIdent("chef/a/0.1.0/20190101121212"),
+			withHealth("UNKNOWN"),
+			withApplication("a_app"),
+			withEnvironment("a_env"),
+		),
+	}
+	suite.IngestServices(mockHabServices)
+	defer suite.DeleteDataFromStorage()
+
+	// Get the ID from the service group
+	sgList := suite.GetServiceGroups()
+	if assert.Equal(t, 1, len(sgList), "There should be one service_group in the db") {
+
+		var (
+			ctx     = context.Background()
+			sgID    = sgList[0].ID
+			request = &applications.ServicesReq{
+				Filter: []string{
+					"service_group_id:" + sgID,
+					"service:a",
+				},
+			}
+			expected = &applications.ServicesRes{
+				Services: []*applications.Service{
+					{
+						SupervisorId:   "sup2",
+						Group:          "a.test",
+						Release:        "chef/a/0.1.0/20190101121212",
+						HealthCheck:    applications.HealthStatus_UNKNOWN,
+						Application:    "a_app",
+						Environment:    "a_env",
+						UpdateStrategy: none,
+						Site:           s,
 					},
 				},
 			}

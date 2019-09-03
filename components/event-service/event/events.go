@@ -9,7 +9,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
-	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	api "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/api/interservice/ingest"
@@ -154,22 +153,10 @@ func (svc Events) getClient(handlerType string) (EventHandlerClient, error) {
 			return nil, errors.New("CallHandler could not obtain NewComplianceIngesterClient")
 		}
 		return complianceIngesterClient, nil
-	case config.AUTHZ:
-		conn, err := svc.connFactory.DialContext(timeoutCtx, "authz-service", svc.cfg.HandlerEndpoints.Authz, grpc.WithBlock())
-		if err != nil {
-			logrus.Errorf("Event service could not get event handler client; error grpc dialing authz handler %s", err.Error())
-			return nil, err
-		}
-		authzProjectsClient := iam_v2.NewProjectsClient(conn)
-		if authzProjectsClient == nil {
-			logrus.Errorf("CallHandler could not obtain NewProjectsClient")
-			return nil, errors.New("CallHandler could not obtain NewProjectsClient")
-		}
-		return authzProjectsClient, nil
 	case config.EVENT_FEED:
 		conn, err := svc.connFactory.DialContext(timeoutCtx, "event-feed-service", svc.cfg.HandlerEndpoints.EventFeed, grpc.WithBlock())
 		if err != nil {
-			logrus.Errorf("Event service could not get event handler client; error grpc dialing authz handler %s", err.Error())
+			logrus.Errorf("Event service could not get event handler client; error grpc dialing event feed handler %s", err.Error())
 			return nil, err
 		}
 		eventFeedClient := event_feed.NewEventFeedServiceClient(conn)

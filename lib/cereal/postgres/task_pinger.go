@@ -51,9 +51,10 @@ func (w *taskPinger) Start(ctx context.Context, onTaskLost func()) {
 		logctx := logrus.WithFields(logrus.Fields{
 			"taskID": w.taskID,
 		})
+		logctx.Debug("Starting taskPinger")
 	OUTER:
 		for {
-			logctx.Debug("pinging task")
+
 			select {
 			case <-ctx.Done():
 				break OUTER
@@ -66,8 +67,7 @@ func (w *taskPinger) Start(ctx context.Context, onTaskLost func()) {
 			}
 		}
 		w.wgStop.Done()
-		logctx.Debug("done pinging")
-
+		logctx.Debug("Exiting taskPinger")
 	}()
 }
 
@@ -75,10 +75,10 @@ func (w *taskPinger) ping(ctx context.Context) (shouldExit bool, err error) {
 	logctx := logrus.WithFields(logrus.Fields{
 		"taskID": w.taskID,
 	})
-	logctx.Debug("checkin for task")
+	logctx.Debug("Pinging task")
 	_, err = w.db.ExecContext(ctx, "SELECT cereal_ping_task($1)", w.taskID)
 	if err != nil {
-		logctx.WithError(err).Error("failed to update task check-in time")
+		logctx.WithError(err).Error("Failed to ping task")
 		if isErrTaskLost(err) {
 			return true, nil
 		}

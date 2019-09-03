@@ -150,18 +150,18 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     }
   }
 
-  get getConditions() { return this.ruleForm.get('conditions'); }
-
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
   }
 
-  getHeading() {
+  get getConditions() { return this.ruleForm.get('conditions'); }
+
+  getHeading(): string {
     return `${this.project.name}: ` + (this.ruleForm.value.name.trim() || 'Rule');
   }
 
-  getAttributeLabel() {
+  getAttributeLabel(): string {
     // Important for this to be all lower case for screen readers!
     // (All uppercase is typically read as an acronym.)
     return `${this.ruleForm.get('type').value.toLowerCase()} attribute`;
@@ -171,11 +171,11 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     return ['/settings', 'projects', this.project.id];
   }
 
-  closePage() {
+  closePage(): void {
     this.router.navigate(this.backRoute());
   }
 
-  createCondition(attribute = '', operator = '', values = ''): FormGroup {
+  private createCondition(attribute = '', operator = '', values = ''): FormGroup {
     return this.fb.group({
       // Must stay in sync with error checks in project-rules.component.html
       attribute: [attribute, Validators.required],
@@ -189,7 +189,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     conditions.push(this.createCondition());
   }
 
-  deleteCondition(index: number) {
+  deleteCondition(index: number): void {
     const conditions = this.ruleForm.get('conditions') as FormArray;
     conditions.removeAt(index);
   }
@@ -204,7 +204,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     return conditions.length > 1;
   }
 
-  populateConditions() {
+  private populateConditions(): FormGroup[] {
     this.conditions = [];
 
     if (this.rule.conditions && this.rule.conditions.length !== 0) {
@@ -220,14 +220,14 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     return this.conditions;
   }
 
-  createRule() {
+  private createRule(): void {
     this.store.dispatch(
       new CreateRule({
         rule: this.convertToRule()
       }));
   }
 
-  updateRule() {
+  private updateRule(): void {
     const updatedRule = this.convertToRule();
     this.store.dispatch(new UpdateRule({ rule: updatedRule }));
     this.store.dispatch(new GetRulesForProject({ project_id: this.rule.project_id }));
@@ -258,10 +258,10 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   }
 
   // TODO: Leveraged much from ID section of create-object-modal... make a shared component...?
-  saveRule() {
+  saveRule(): void {
     if (this.ruleForm.valid) {
       this.saving = true;
-      this.rule.id ? this.updateRule() : this.createRule(); // TODO
+      this.rule.id ? this.updateRule() : this.createRule();
       const selector = this.rule.id ? updateStatus : createStatus;
       const pendingSave = new Subject<boolean>();
       this.store.select(selector).pipe(
@@ -301,10 +301,6 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
       this.ruleForm.controls.id.setValue(
         IdMapper.transform(this.ruleForm.controls.name.value.trim()));
     }
-
-    if (this.editingRule) {
-      this.ruleForm.markAsDirty();
-    }
   }
 
   handleIDInput(event: KeyboardEvent): void {
@@ -312,14 +308,6 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
       return;
     }
     this.conflictError = false;
-  }
-
-  handleConditionChange(): void {
-    if (this.editingRule) {
-      // changes on the condition forms do not bubble up to the ruleForm
-      // so we explicitly set it to dirty here
-      this.ruleForm.markAsDirty();
-    }
   }
 
   private isNavigationKey(event: KeyboardEvent): boolean {

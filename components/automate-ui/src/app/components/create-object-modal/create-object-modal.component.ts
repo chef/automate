@@ -1,14 +1,22 @@
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import {
+  Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges
+} from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { hasIn } from 'lodash/fp';
+
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Project } from 'app/entities/projects/project.model';
+import {
+  ProjectChecked,
+  ProjectCheckedMap
+} from 'app/components/projects-dropdown/projects-dropdown.component';
 
 @Component({
   selector: 'app-create-object-modal',
   templateUrl: './create-object-modal.component.html',
   styleUrls: ['./create-object-modal.component.scss']
 })
-export class CreateObjectModalComponent implements OnInit {
+export class CreateObjectModalComponent implements OnInit, OnChanges {
   @Input() visible = false;
   @Input() creating = false;
   @Input() objectNoun: string;
@@ -20,10 +28,11 @@ export class CreateObjectModalComponent implements OnInit {
   @Output() close = new EventEmitter();
   @Output() createClicked = new EventEmitter<Project[]>();
 
+  public projects: ProjectCheckedMap = {};
+
   // Whether the edit ID form is open or not.
   public modifyID = false;
   public conflictError = false;
-  private projectsSelected: Project[] = [];
 
   ngOnInit(): void {
     this.conflictErrorEvent.subscribe((isConflict: boolean) => {
@@ -33,11 +42,31 @@ export class CreateObjectModalComponent implements OnInit {
     });
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    // if a new list of projects to populate dropdown with is passed in we update the dropdown
+    const checked = false;
+    if (hasIn('assignableProjects.currentValue', changes)) {
+      this.projects = {};
+      changes.assignableProjects.currentValue.forEach((proj: Project) =>
+        this.projects[proj.id] = { ...proj, checked });
+    }
+  }
+
+  onProjectChecked(project: ProjectChecked): void {
+    this.projects[project.id].checked = project.checked;
+    const projectsSelected = Object.keys(this.projects).filter(id => this.projects[id].checked);
+    this.createForm.controls.projects.setValue(projectsSelected);
+  }
+
+  dropdownDisabled(): boolean {
+    return Object.values(this.projects).length === 0;
+  }
+
   public handleNameInput(event: KeyboardEvent): void {
     if (!this.modifyID && !this.isNavigationKey(event)) {
       this.conflictError = false;
-      this.createForm.controls['id'].setValue(
-        IdMapper.transform(this.createForm.controls['name'].value.trim()));
+      this.createForm.controls.id.setValue(
+        IdMapper.transform(this.createForm.controls.name.value.trim()));
     }
   }
 
@@ -54,14 +83,10 @@ export class CreateObjectModalComponent implements OnInit {
   }
 
   createObject(): void {
-    this.createClicked.emit(this.projectsSelected);
+    this.createClicked.emit();
   }
 
   private isNavigationKey(event: KeyboardEvent): boolean {
     return event.key === 'Shift' || event.key === 'Tab';
-  }
-
-  projectsDropdownAction(projects) {
-    this.projectsSelected = projects;
   }
 }

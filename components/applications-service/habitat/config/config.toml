@@ -22,6 +22,14 @@ cluster_id = "{{events.cfg.cluster_id}}"
 database = "{{cfg.storage.database}}"
 schema_path = "{{pkg.path}}/schema"
 
+[jobs]
+{{~#eachAlive bind.cereal-service.members as |cereal|}}
+{{~#if @last}}
+host = "{{cereal.sys.ip}}"
+port = {{cereal.cfg.port}}
+{{~/if}}
+{{~/eachAlive}}
+
 [tls]
 cert_path = "{{pkg.svc_config_path}}/service.crt"
 key_path = "{{pkg.svc_config_path}}/service.key"

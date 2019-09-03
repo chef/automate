@@ -20,7 +20,8 @@ describe('ProjectDetailsComponent', () => {
   const project: Project = {
     id: 'uuid-1',
     name: 'Default',
-    type: 'CHEF_MANAGED'
+    type: 'CHEF_MANAGED',
+    status: 'NO_RULES'
   };
   const rules: Rule[] = [
     {
@@ -66,7 +67,7 @@ describe('ProjectDetailsComponent', () => {
           inputs: ['allOf', 'not'],
           template: '<ng-content></ng-content>'
         }),
-        MockComponent({ selector: 'app-admin-sidebar' }),
+        MockComponent({ selector: 'app-settings-sidebar' }),
         MockComponent({
           selector: 'app-delete-object-modal',
           inputs: ['visible', 'objectNoun', 'objectName'],
@@ -91,6 +92,7 @@ describe('ProjectDetailsComponent', () => {
         MockComponent({ selector: 'chef-th' }),
         MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'ng-container', inputs: ['hidden'] }),
+        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
         ProjectDetailsComponent
       ],
       imports: [
@@ -125,7 +127,8 @@ describe('ProjectDetailsComponent', () => {
     store.dispatch(new GetProjectSuccess({
       project: {
         id: 'uuid-1', name: 'Default',
-        type: 'CHEF_MANAGED'
+        type: 'CHEF_MANAGED',
+        status: 'NO_RULES'
       }
     }));
 

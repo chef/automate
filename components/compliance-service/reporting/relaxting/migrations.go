@@ -1,19 +1,16 @@
 package relaxting
 
 import (
-	"io"
-	"time"
-
-	"fmt"
-
+	"context"
 	"encoding/json"
-
+	"fmt"
+	"io"
 	"strings"
+	"time"
 
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"golang.org/x/net/context"
 
 	statusserver "github.com/chef/automate/components/compliance-service/api/status/server"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"

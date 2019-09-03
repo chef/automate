@@ -16,7 +16,6 @@ import "api/config/cfgmgmt/config_request.proto";
 import "api/config/compliance/config_request.proto";
 import "api/config/shared/global.proto";
 import "api/config/cs_nginx/config_request.proto";
-import "api/config/data_lifecycle/config_request.proto";
 import "api/config/deployment/config_request.proto";
 import "api/config/dex/config_request.proto";
 import "api/config/elasticsearch/config_request.proto";
@@ -46,6 +45,7 @@ import "api/config/cereal/config_request.proto";
 
 message AutomateConfig {
 	reserved 26; // automate-blob-store
+	reserved 20; // data-lifecycle-service
 
 	chef.automate.infra.config.GlobalConfig global = 19;
 	chef.automate.domain.authn.ConfigRequest auth_n = 1;
@@ -67,7 +67,6 @@ message AutomateConfig {
 	chef.automate.domain.session.ConfigRequest session = 17;
 	chef.automate.domain.teams.ConfigRequest teams = 18;
 	chef.automate.ui.ConfigRequest u_i = 9;
-	chef.automate.domain.data_lifecycle.ConfigRequest data_lifecycle = 20;
 	chef.automate.domain.secrets.ConfigRequest secrets = 21;
 	chef.automate.infra.backup_gateway.ConfigRequest backup_gateway = 29;
 	chef.automate.infra.pg_sidecar.ConfigRequest pg_sidecar = 35;

@@ -150,6 +150,17 @@ describe File.basename(__FILE__) do
     )
     assert_suggestions_text(["DevSec Prod Alpha", "DevSec Prod beta", "DevSec Prod Zeta"], actual_data)
 
+    # suggest nodes, when we have control_tag and time filters
+    actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
+      type: 'node',
+      text: 'Beta',
+      filters: [
+        Reporting::ListFilter.new(type: 'start_time', values: ['2018-02-28T23:59:59Z']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
+        Reporting::ListFilter.new(type: 'control_tag:scope', values: ['nginx'])
+      ]
+    )
+    assert_suggestions_text(["RedHat(2)-beta-nginx(f)-apache(s)-failed", "centos-beta"], actual_data)
 
     # suggest roles with valid filters
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(

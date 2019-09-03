@@ -19,7 +19,7 @@ import (
 
 	pgs "github.com/chef/automate/api/interservice/pg_sidecar"
 	"github.com/chef/automate/components/pg-sidecar-service/pkg/client"
-	"github.com/chef/automate/lib/platform"
+	platform_config "github.com/chef/automate/lib/platform/config"
 )
 
 var ErrUserRequired = errors.New("user not specified")
@@ -32,7 +32,6 @@ type HelperOpts struct {
 	Migrate    MigrateTablesOpts         `mapstructure:"migrate"`
 	AlterRole  *pgs.AlterRoleReq_Options `mapstructure:"alter_role"`
 	DropTables *pgs.DropTablesReq        `mapstructure:"drop_tables"`
-	Sqitch     SqitchOpts                `mapstructure:"sqitch"`
 }
 
 // MigrateTablesOpts are the migration specific options
@@ -55,11 +54,6 @@ type ClientOpts struct {
 	TLSCertPath   string `mapstructure:"tls_cert_path"`
 	TLSKeyPath    string `mapstructure:"tls_key_path"`
 	TLSRootCAPath string `mapstructure:"tls_root_ca_path"`
-}
-
-// SqitchOpts are the sqitch specific options
-type SqitchOpts struct {
-	User string `mapstructure:"user"`
 }
 
 var opts = HelperOpts{
@@ -95,9 +89,9 @@ func main() {
 				log.WithError(err).Error("Failed to merge configuration from from")
 			}
 		} else {
-			config, err := platform.ConfigFromEnvironment()
+			config, err := platform_config.ConfigFromEnvironment()
 			if err != nil {
-				if err == platform.ErrNoPlatformEnvironment {
+				if err == platform_config.ErrNoPlatformEnvironment {
 					return
 				}
 				logrus.WithError(err).Fatal("Failed to load platform configuration")
@@ -269,12 +263,6 @@ func newCmd() *cobra.Command {
 		RunE:  sqitchDeploy,
 		Args:  cobra.ExactArgs(2),
 	}
-
-	sqitchDeployCmd.Flags().StringVarP(
-		&opts.Sqitch.User,
-		"user", "i", "automate",
-		"User to connect with when running sqitch",
-	)
 
 	fixPermsCmd := &cobra.Command{
 		Use:   "fix-permissions DBNAME [ROLENAME]",
@@ -471,7 +459,7 @@ func sqitchDeploy(_ *cobra.Command, args []string) error {
 	_, err = pgsClient.DeploySqitch(ctx, &pgs.DeploySqitchReq{
 		Db:   args[0],
 		Dir:  args[1],
-		User: opts.Sqitch.User,
+		User: "automate",
 	})
 
 	return err

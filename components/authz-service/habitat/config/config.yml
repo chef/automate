@@ -12,10 +12,8 @@ database: {{cfg.storage.database}}
 migrations-path: {{pkg.path}}/migrations
 data-migrations-path: {{pkg.path}}/data-migrations
 
-{{~#eachAlive bind.event-service.members as |event-service|}}
+{{~#eachAlive bind.cereal-service.members as |cereal-service|}}
   {{~#if @last}}
-event-address: {{event-service.sys.ip}}:{{event-service.cfg.port}}
+cereal-address: {{cereal-service.sys.ip}}:{{cereal-service.cfg.port}}
   {{~/if}}
 {{~/eachAlive}}
-
-config: {{pkg.svc_data_path}}/.authz-service.toml

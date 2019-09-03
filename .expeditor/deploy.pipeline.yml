@@ -28,6 +28,7 @@ steps:
 
   - label: ":cypress:"
     command: .expeditor/buildkite/cypress.sh
+    soft_fail: true
     retry:
       automatic:
         limit: 1

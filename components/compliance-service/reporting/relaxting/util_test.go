@@ -53,6 +53,16 @@ func TestRightSplit(t *testing.T) {
 	assert.Equal(t, "ng", right)
 }
 
+func TestLeftSplit(t *testing.T) {
+	left, right := leftSplit("something", "|")
+	assert.Equal(t, "something", left)
+	assert.Equal(t, "", right)
+
+	left, right = leftSplit("some|thi|ng", "|")
+	assert.Equal(t, "some", left)
+	assert.Equal(t, "thi|ng", right)
+}
+
 func TestRemove(t *testing.T) {
 	arr := []string{"item1", "item2"}
 	Remove(&arr, 1)

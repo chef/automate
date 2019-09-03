@@ -20,5 +20,10 @@ source {{pkg.svc_config_path}}/init_backup
 # that shared secrets are stored in.
 secrets-helper init
 
+export TMPDIR="{{pkg.svc_var_path}}/tmp" 
+if [[ ! -e "$TMPDIR" ]]; then
+  mkdir -p "$TMPDIR"
+fi
+
 # Start our server
 exec deployment-service serve {{pkg.svc_config_path}}/config.toml

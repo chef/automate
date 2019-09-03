@@ -3,6 +3,8 @@ syntax = "proto3";
 package chef.automate.api.iam.v2beta;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/common";
 
+import "components/automate-gateway/api/iam/v2beta/common/rules.proto";
+
 enum Type {
     CHEF_MANAGED = 0;
     CUSTOM = 1;
@@ -48,6 +50,7 @@ message Project {
     string name = 1;
     string id = 2;
     Type type = 3;
+    ProjectRulesStatus status = 4;
 }
 
 // passed to UpgradeToV2 to set version

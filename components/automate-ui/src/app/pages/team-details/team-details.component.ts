@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
-import { identity, keyBy, at } from 'lodash/fp';
+import { isEmpty, identity, keyBy, at, xor } from 'lodash/fp';
 import { combineLatest, Observable, Subject } from 'rxjs';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 
@@ -13,7 +13,11 @@ import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
 import { allUsers, userStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
-import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
+import {
+  iamMajorVersion,
+  iamMinorVersion,
+  atLeastV2p1
+} from 'app/entities/policies/policy.selectors';
 import {
   v1TeamFromRoute,
   v2TeamFromRoute,
@@ -30,7 +34,18 @@ import {
   RemoveTeamUsers,
   UpdateTeam
 } from 'app/entities/teams/team.actions';
-import { ProjectConstants } from 'app/entities/projects/project.model';
+import {
+  ProjectChecked,
+  ProjectCheckedMap
+} from 'app/components/projects-dropdown/projects-dropdown.component';
+
+import { GetProjects } from 'app/entities/projects/project.actions';
+import {
+  allProjects,
+  getAllStatus as getAllProjectStatus
+} from 'app/entities/projects/project.selectors';
+import { ProjectConstants, Project } from 'app/entities/projects/project.model';
+import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 
 const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 
@@ -43,8 +58,8 @@ export type TeamTabName = 'users' | 'details';
 })
 export class TeamDetailsComponent implements OnInit, OnDestroy {
   public updateNameForm: FormGroup;
-  // isLoading represents the initial load as well as subsequent updates in progress.
-  public isLoading = true;
+  // isLoadingTeam represents the initial team load as well as subsequent updates in progress.
+  public isLoadingTeam = true;
   public saving = false;
   public saveSuccessful = false;
   public tabValue: TeamTabName = 'users';
@@ -61,6 +76,9 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public addButtonText = 'Add Users';
   public removeText = 'Remove User';
 
+  public atLeastV2p1$: Observable<boolean>;
+  public projectsEnabled: boolean;
+  public projects: ProjectCheckedMap = {};
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
   constructor(private store: Store<NgrxStateAtom>,
@@ -74,21 +92,20 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       projects: []
     };
     this.updateNameForm = fb.group({
-      // Must stay in sync with error checks in team-details.component.html
-      name: ['Loading...', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+      // Must stay in sync with error checks in team-details.component.html.
+      // Also, initialize the form to disabled and enable after team load
+      // to prevent people from typing before the team is fetched and have their
+      // value overwritten.
+      name: new FormControl({value: 'Loading...', disabled: true},
+        [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]),
+      projects: [[]]
     });
-
-    combineLatest([
-      this.store.select(getStatus),
-      this.store.select(updateStatus)
-    ]).pipe(
-      takeUntil(this.isDestroyed),
-      map(([gStatus, uStatus]) => {
-        this.isLoading =
-          (gStatus !== EntityStatus.loadingSuccess) ||
-          (uStatus === EntityStatus.loading);
-      })
-    ).subscribe();
+    this.store.pipe(
+      select(atLeastV2p1),
+      takeUntil(this.isDestroyed))
+      .subscribe(projectsEnabled => {
+        this.projectsEnabled = projectsEnabled;
+      });
   }
 
   private get teamId(): string {
@@ -100,6 +117,8 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.atLeastV2p1$ = this.store.select(atLeastV2p1);
+
     this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
       .subscribe((url: string) => {
         this.url = url;
@@ -107,30 +126,67 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         // goes to #users if (1) explicit #users, (2) no fragment, or (3) invalid fragment
         this.tabValue = (fragment === 'details') ? 'details' : 'users';
       });
-    this.store.select(iamMajorVersion)
-      .pipe(takeUntil(this.isDestroyed))
-      .subscribe((version) => {
-        if (version === null) { return; }
-        this.isMajorV1 = version === 'v1';
-
-        // Triggered every time the team is updated.
-        if (this.isMajorV1) {
-          this.store.select(v1TeamFromRoute)
-            .pipe(filter(identity), takeUntil(this.isDestroyed))
-            .subscribe(this.getUsersForTeam.bind(this));
-        } else {
-          this.store.select(v2TeamFromRoute)
-            .pipe(filter(identity), takeUntil(this.isDestroyed))
-            .subscribe(this.getUsersForTeam.bind(this));
-        }
-      });
 
     this.store.select(iamMinorVersion)
       .pipe(takeUntil(this.isDestroyed))
-      .subscribe((version) => {
-        if (version === null) { return; }
-        this.isMinorV1 = version === 'v1';
+      .subscribe((minor) => {
+        this.isMinorV1 = minor === 'v1';
       });
+
+    combineLatest([
+      this.store.select(getStatus),
+      this.store.select(updateStatus)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      map(([gStatus, uStatus]) => {
+        this.isLoadingTeam =
+          (gStatus !== EntityStatus.loadingSuccess) ||
+          (uStatus === EntityStatus.loading);
+        if (this.isLoadingTeam) {
+          this.updateNameForm.controls['name'].disable();
+        } else {
+          this.updateNameForm.controls['name'].enable();
+        }
+      })
+    ).subscribe();
+
+    combineLatest([
+      this.store.select(v1TeamFromRoute),
+      this.store.select(v2TeamFromRoute),
+      this.store.select(iamMajorVersion)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      map(([v1Team, v2Team, major]: [Team, Team, IAMMajorVersion]) => {
+        this.isMajorV1 = major === 'v1';
+        return (this.isMajorV1 ? v1Team : v2Team);
+      }),
+      filter(identity)
+    ).subscribe((team: Team) => {
+      this.team = team;
+      this.updateNameForm.controls.name.setValue(this.team.name);
+      this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
+      this.store.dispatch(new GetUsers());
+      if (this.projectsEnabled) {
+        this.store.dispatch(new GetProjects());
+      }
+    });
+
+    combineLatest([
+      this.store.select(allProjects),
+      this.store.select(getAllProjectStatus)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(([_, pStatus]: [Project[], EntityStatus]) => pStatus !== EntityStatus.loading),
+      filter(() => !!this.team),
+      map(([allowedProjects, _]) => {
+        this.projects = {};
+        allowedProjects
+          .forEach(p => {
+            this.projects[p.id] = { ...p, checked: this.team.projects.includes(p.id)
+            };
+          });
+      }))
+      .subscribe();
 
     this.sortedUsers$ = <Observable<User[]>>combineLatest([
       this.store.select(allUsers),
@@ -184,16 +240,9 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       });
  }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
-  }
-
-  private getUsersForTeam(team: Team) {
-    this.team = team;
-    this.updateNameForm.controls.name.setValue(this.team.name);
-    this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
-    this.store.dispatch(new GetUsers());
   }
 
   toggleUserMembershipView(): void {
@@ -207,15 +256,13 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     }));
   }
 
-  public keyPressed() {
-    this.saveSuccessful = false;
-  }
-
-  public saveNameChange(): void {
+  saveTeam(): void {
     this.saveSuccessful = false;
     this.saving = true;
+    this.updateNameForm.controls['name'].disable();
     const name: string = this.updateNameForm.controls.name.value.trim();
-    this.store.dispatch(new UpdateTeam({ ...this.team, name }));
+    const projects = Object.keys(this.projects).filter(id => this.projects[id].checked);
+    this.store.dispatch(new UpdateTeam({ ...this.team, name, projects }));
 
     const pendingSave = new Subject<boolean>();
     this.store.pipe(
@@ -227,7 +274,11 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
           pendingSave.next(true);
           pendingSave.complete();
           this.saving = false;
+          this.updateNameForm.controls['name'].enable();
           this.saveSuccessful = (state === EntityStatus.loadingSuccess);
+          if (this.saveSuccessful) {
+            this.updateNameForm.markAsPristine();
+          }
         }
       });
   }
@@ -236,5 +287,30 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     this.tabValue = event.target.value;
     // Drop the previous fragment and add the incoming fragment.
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
+  }
+
+  // updates whether the project was checked or unchecked
+  onProjectChecked(project: ProjectChecked): void {
+    this.projects[project.id].checked = project.checked;
+
+    // since the app-projects-dropdown is not a true form input (select)
+    // we have to manage the form reactions
+    if (this.noProjectsUpdated()) {
+      this.updateNameForm.controls.projects.markAsPristine();
+    } else {
+      this.updateNameForm.controls.projects.markAsDirty();
+    }
+
+  }
+
+  private noProjectsUpdated(): boolean {
+    const projectsUpdated = xor(
+      this.team.projects,
+      Object.keys(this.projects).filter(id => this.projects[id].checked));
+    return projectsUpdated.length === 0;
+  }
+
+  dropdownDisabled(): boolean {
+    return isEmpty(this.projects) || this.saving;
   }
 }

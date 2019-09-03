@@ -15,9 +15,8 @@ import (
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
+	"github.com/chef/automate/components/authz-service/projectassignment"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
-	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
-	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	storage_v1 "github.com/chef/automate/components/authz-service/storage/v1"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	v2 "github.com/chef/automate/components/authz-service/storage/v2"
@@ -48,46 +47,42 @@ type PolicyServer interface {
 func NewMemstorePolicyServer(
 	ctx context.Context,
 	l logger.Logger,
+	pr PolicyRefresher,
 	e engine.V2pXWriter,
 	pl storage_v1.PoliciesLister,
 	vSwitch *VersionSwitch,
-	vChan chan api.Version) (PolicyServer, PolicyRefresher, error) {
+	vChan chan api.Version) (PolicyServer, error) {
 
-	return NewPoliciesServer(ctx, l, memstore.New(), e, pl, vSwitch, vChan)
+	return NewPoliciesServer(ctx, l, pr, memstore.New(), e, pl, vSwitch, vChan)
 }
 
 // NewPostgresPolicyServer instantiates a server.Server that connects to a postgres backend
 func NewPostgresPolicyServer(
 	ctx context.Context,
 	l logger.Logger,
+	pr PolicyRefresher,
 	e engine.V2pXWriter,
-	migrationsConfig migration.Config,
-	dataMigrationsConfig datamigration.Config,
 	pl storage_v1.PoliciesLister,
 	vSwitch *VersionSwitch,
-	vChan chan api.Version) (PolicyServer, PolicyRefresher, error) {
+	vChan chan api.Version) (PolicyServer, error) {
 
-	s, err := postgres.New(ctx, l, migrationsConfig, dataMigrationsConfig)
-	if err != nil {
-		return nil, nil, errors.Wrap(err, "failed to initialize v2 store state")
+	s := postgres.GetInstance()
+	if s == nil {
+		return nil, errors.New("postgres v2 singleton not yet initialized for policy server")
 	}
-	return NewPoliciesServer(ctx, l, s, e, pl, vSwitch, vChan)
+	return NewPoliciesServer(ctx, l, pr, s, e, pl, vSwitch, vChan)
 }
 
 // NewPoliciesServer returns a new IAM v2 Policy server.
 func NewPoliciesServer(
 	ctx context.Context,
 	l logger.Logger,
+	pr PolicyRefresher,
 	s storage.Storage,
 	e engine.V2pXWriter,
 	pl storage_v1.PoliciesLister,
 	vSwitch *VersionSwitch,
-	vChan chan api.Version) (PolicyServer, PolicyRefresher, error) {
-
-	policyRefresher, err := NewPolicyRefresher(ctx, l, s, e)
-	if err != nil {
-		return nil, nil, errors.Wrap(err, "start policy refresher")
-	}
+	vChan chan api.Version) (PolicyServer, error) {
 
 	srv := &policyServer{
 		log:             l,
@@ -96,7 +91,7 @@ func NewPoliciesServer(
 		v1:              pl,
 		vSwitch:         vSwitch,
 		vChan:           vChan,
-		policyRefresher: policyRefresher,
+		policyRefresher: pr,
 	}
 
 	// If we *could* transition to failure, it means we had an in-progress state
@@ -108,7 +103,7 @@ func NewPoliciesServer(
 	// check migration status
 	ms, err := srv.store.MigrationStatus(ctx)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "retrieve migration status from storage")
+		return nil, errors.Wrap(err, "retrieve migration status from storage")
 	}
 	var v api.Version
 	switch ms {
@@ -123,16 +118,16 @@ func NewPoliciesServer(
 
 	if v.Major == api.Version_V2 {
 		if err := srv.store.ApplyV2DataMigrations(ctx); err != nil {
-			return nil, nil, errors.Wrap(err, "error migrating v2 data")
+			return nil, errors.Wrap(err, "error migrating v2 data")
 		}
 	}
 
 	// now that the data is all set, attempt to feed it into OPA:
 	if err := srv.updateEngineStore(ctx); err != nil {
-		return nil, nil, errors.Wrapf(err, "initialize engine storage (%v)", v)
+		return nil, errors.Wrapf(err, "initialize engine storage (%v)", v)
 	}
 
-	return srv, policyRefresher, nil
+	return srv, nil
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -404,15 +399,20 @@ func (s *policyServer) CreateRole(
 		return nil, status.Errorf(codes.InvalidArgument, "error parsing role %q: %s", req.Id, err.Error())
 	}
 
-	returnRole, err := s.store.CreateRole(ctx, storageRole)
+	returnRole, err := s.store.CreateRole(ctx, storageRole, s.isBeta2p1())
+
 	switch err {
-	case nil: // continue
+	case nil:
 	case storage_errors.ErrConflict:
 		return nil, status.Errorf(codes.AlreadyExists, "role with id %q already exists", req.Id)
 	default:
 		switch err.(type) {
 		case *storage_errors.ForeignKeyError:
 			return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		case *projectassignment.ProjectsMissingErr:
+			return nil, status.Errorf(codes.NotFound, err.Error())
+		case *projectassignment.ProjectsUnauthorizedForAssignmentErr:
+			return nil, status.Errorf(codes.PermissionDenied, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal, "creating role %q: %s", req.Id, err.Error())
 	}
@@ -489,15 +489,21 @@ func (s *policyServer) UpdateRole(
 		return nil, status.Errorf(codes.InvalidArgument, "parse policy with ID %q: %s", req.Id, err.Error())
 	}
 
-	roleInternal, err := s.store.UpdateRole(ctx, storageRole)
-	if err != nil {
-		switch err {
-		case storage_errors.ErrConflict:
-			return nil, status.Errorf(codes.AlreadyExists, "role with name %q already exists", req.Name)
-		case storage_errors.ErrNotFound:
-			return nil, status.Errorf(codes.NotFound, "no role with ID %q found", req.Id)
+	roleInternal, err := s.store.UpdateRole(ctx, storageRole, s.isBeta2p1())
+	switch err {
+	case nil:
+	case storage_errors.ErrConflict:
+		return nil, status.Errorf(codes.AlreadyExists, "role with name %q already exists", req.Name)
+	case storage_errors.ErrNotFound:
+		return nil, status.Errorf(codes.NotFound, "no role with ID %q found", req.Id)
+	default:
+		switch err.(type) {
+		case *projectassignment.ProjectsMissingErr:
+			return nil, status.Errorf(codes.NotFound, err.Error())
+		case *projectassignment.ProjectsUnauthorizedForAssignmentErr:
+			return nil, status.Errorf(codes.PermissionDenied, err.Error())
 		}
-		return nil, err
+		return nil, status.Errorf(codes.Internal, "creating role %q: %s", req.Id, err.Error())
 	}
 
 	return roleFromInternal(roleInternal)
@@ -541,7 +547,7 @@ func (s *policyServer) MigrateToV2(ctx context.Context,
 	}
 
 	for _, role := range storage.DefaultRoles() {
-		if _, err := s.store.CreateRole(ctx, &role); err != nil {
+		if _, err := s.store.CreateRole(ctx, &role, false); err != nil {
 			return nil, status.Errorf(codes.Internal, "reset to default roles: %s", err.Error())
 		}
 	}
@@ -647,7 +653,8 @@ func (s *policyServer) ResetToV1(ctx context.Context,
 		return nil, status.Errorf(codes.Internal, "retrieve migration status: %s", err.Error())
 	}
 	switch ms {
-	case storage.Pristine: // skip
+	case storage.Pristine:
+		return nil, status.Error(codes.AlreadyExists, "already reset")
 	case storage.InProgress:
 		return nil, status.Error(codes.FailedPrecondition, "migration in progress")
 	case storage.Successful, storage.SuccessfulBeta1, storage.Failed:

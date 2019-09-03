@@ -1,4 +1,4 @@
-<app-admin-sidebar></app-admin-sidebar>
+<app-settings-sidebar></app-settings-sidebar>
 <chef-loading-spinner *ngIf="loading$ | async" size='50' fixed></chef-loading-spinner>
 
 <div class="container token-container">
@@ -14,6 +14,8 @@
       [conflictErrorEvent]="conflictErrorEvent"
       objectNoun="token"
       [createForm]="createTokenForm"
+      [showProjectsDropdown]="!isMajorV1 && isMinorV1"
+      [assignableProjects]="dropdownProjects"
       (close)="closeCreateModal()"
       (createClicked)="createToken()">
     </app-create-object-modal>
@@ -43,6 +45,7 @@
             <chef-tr>
               <chef-th>Name</chef-th>
               <chef-th *ngIf="(iamMajorVersion$ | async) !== 'v1'">ID</chef-th>
+              <chef-th *ngIf="!isMajorV1 && isMinorV1">Projects</chef-th>
               <chef-th>Created Date</chef-th>
               <chef-th>Status</chef-th>
               <chef-th class="controls"></chef-th>
@@ -54,6 +57,11 @@
                 <a [routerLink]="['/settings/tokens', token.id]">{{ token.name }}</a>
               </chef-td>
               <chef-td *ngIf="(iamMajorVersion$ | async) !== 'v1'">{{ token.id }}</chef-td>
+              <chef-td *ngIf="!isMajorV1 && isMinorV1" class="projects-column">
+                <span *ngIf="token.projects.length === 0">{{ unassigned }}</span>
+                <span *ngIf="token.projects.length === 1">{{ token.projects[0] }}</span>
+                <span *ngIf="token.projects.length > 1">{{ token.projects.length }} projects</span>
+              </chef-td>
               <chef-td>{{ token.created_at | datetime:'ddd, MMMM D, YYYY [at] H:mm a' }}</chef-td>
               <chef-td>
                 <ng-container *ngIf="token.active">Active</ng-container>

@@ -12,20 +12,22 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
-	dls "github.com/chef/automate/api/interservice/data_lifecycle"
+	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/es_sidecar"
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic"
-	"github.com/chef/automate/components/ingest-service/config"
 	"github.com/chef/automate/components/ingest-service/migration"
 	"github.com/chef/automate/components/ingest-service/server"
 	"github.com/chef/automate/components/ingest-service/serveropts"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
+	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/postgres"
-	"github.com/chef/automate/lib/platform"
+	"github.com/chef/automate/lib/datalifecycle/purge"
+	"github.com/chef/automate/lib/grpc/secureconn"
+	platform_config "github.com/chef/automate/lib/platform/config"
 )
 
 // Spawn starts a gRPC Server listening on the provided host and port,
@@ -57,7 +59,7 @@ func Spawn(opts *serveropts.Opts) error {
 		uri        = fmt.Sprintf("%s:%d", opts.Host, opts.Port)
 	)
 
-	log.WithFields(log.Fields{"uri": uri}).Info("Starting gRPC Server")
+	log.WithField("uri", uri).Info("Starting gRPC Server")
 	conn, err := net.Listen("tcp", uri)
 	if err != nil {
 		log.WithError(err).Error("TCP listen failed")
@@ -135,74 +137,88 @@ func Spawn(opts *serveropts.Opts) error {
 	// Pass the chef ingest server to give status about the pipelines
 	ingestStatus.SetChefIngestServer(chefIngest)
 
+	// JobSchedulerServer
 	pgURL, err := pgURL(opts.PGURL, opts.PGDatabase)
 	if err != nil {
 		log.WithError(err).Fatal("could not get PG URL")
+		return err
 	}
 
 	jobManager, err := cereal.NewManager(postgres.NewPostgresBackend(pgURL))
 	if err != nil {
 		logrus.WithError(err).Fatal("could not create job manager")
+		return err
 	}
 	defer jobManager.Stop()
 
-	err = server.InitializeJobManager(jobManager, client)
+	esSidecarConn, err := opts.ConnFactory.Dial("es-sidecar-service", opts.EsSidecarAddress)
+	if err != nil {
+		log.WithError(err).Error("Failed to create connection to es-sidecar-service")
+		return err
+	}
+	defer esSidecarConn.Close()
+	esSidecarClient := es_sidecar.NewEsSidecarClient(esSidecarConn)
+
+	err = server.InitializeJobManager(jobManager, client, esSidecarClient)
 	if err != nil {
 		logrus.WithError(err).Fatal("could not initialize job manager")
+		return err
 	}
 
 	err = server.MigrateJobsSchedule(jobManager, viper.ConfigFileUsed())
 	if err != nil {
 		logrus.WithError(err).Fatal("could not migrate old job schedules")
+		return err
+	}
+
+	err = server.ConfigurePurge(jobManager, opts)
+	if err != nil {
+		logrus.WithError(err).Fatal("could not configure purge policies")
+		return err
 	}
 
 	err = jobManager.Start(context.Background())
 	if err != nil {
 		logrus.WithError(err).Fatal("could not start job manager")
+		return err
 	}
 
-	// JobSchedulerServer
 	jobSchedulerServer := server.NewJobSchedulerServer(client, jobManager)
 	ingest.RegisterJobSchedulerServer(grpcServer, jobSchedulerServer)
 
-	// TODO(ssd) 2019-05-15: The projectUpdater process still uses
-	// the config manager.
-	configManager, err := config.NewManager(viper.ConfigFileUsed())
+	purgeServer, err := purge.NewServer(
+		jobManager,
+		server.PurgeScheduleName,
+		server.PurgeJobName,
+		server.DefaultPurgePolicies,
+		purge.WithServerEsSidecarClient(esSidecarClient),
+	)
+	if err != nil {
+		logrus.WithError(err).Fatal("could not start start purge server")
+		return err
+	}
+
+	data_lifecycle.RegisterPurgeServer(grpcServer, purgeServer)
+
+	projectUpdateManager, err := createProjectUpdateCerealManager(opts.ConnFactory, opts.CerealAddress)
 	if err != nil {
 		return err
 	}
-	defer configManager.Close()
+
+	err = project_update_lib.RegisterTaskExecutors(projectUpdateManager, "ingest", client, authzProjectsClient)
+	if err != nil {
+		return err
+	}
+
+	if err := projectUpdateManager.Start(context.Background()); err != nil {
+		return err
+	}
+	defer projectUpdateManager.Stop() // nolint: errcheck
 
 	// EventHandler
 	eventHandlerServer := server.NewAutomateEventHandlerServer(client, *chefIngest,
-		authzProjectsClient, eventServiceClient, configManager)
+		authzProjectsClient, eventServiceClient)
 	ingest.RegisterEventHandlerServer(grpcServer, eventHandlerServer)
-
-	// Data Lifecycle Interface
-	esSidecarConn, err := opts.ConnFactory.Dial("es-sidecar-service", opts.EsSidecarAddress)
-	if err != nil {
-		// This should never happend
-		log.WithError(err).Error("Failed to create ES Sidecar connection")
-		return err
-	}
-	defer esSidecarConn.Close()
-
-	purgePolicies := []server.PurgePolicy{}
-	if opts.PurgeConvergeHistoryAfterDays >= 0 {
-		purgePolicies = append(purgePolicies, server.PurgePolicy{
-			IndexName:          "converge-history",
-			PurgeOlderThanDays: opts.PurgeConvergeHistoryAfterDays,
-		})
-	}
-
-	if opts.PurgeActionsAfterDays >= 0 {
-		purgePolicies = append(purgePolicies, server.PurgePolicy{
-			IndexName:          "actions",
-			PurgeOlderThanDays: opts.PurgeActionsAfterDays,
-		})
-	}
-	dataLifecycleServer := server.NewDataLifecycleManageableServer(es_sidecar.NewEsSidecarClient(esSidecarConn), purgePolicies)
-	dls.RegisterDataLifecycleManageableServer(grpcServer, dataLifecycleServer)
 
 	// Register reflection service on gRPC server.
 	reflection.Register(grpcServer)
@@ -213,10 +229,26 @@ func Spawn(opts *serveropts.Opts) error {
 func pgURL(pgURL string, pgDBName string) (string, error) {
 	if pgURL == "" {
 		var err error
-		pgURL, err = platform.PGURIFromEnvironment(pgDBName)
+		pgURL, err = platform_config.PGURIFromEnvironment(pgDBName)
 		if err != nil {
 			return "", errors.Wrap(err, "Failed to get pg uri")
 		}
 	}
 	return pgURL, nil
+}
+
+func createProjectUpdateCerealManager(connFactory *secureconn.Factory, address string) (*cereal.Manager, error) {
+	conn, err := connFactory.Dial("cereal-service", address)
+	if err != nil {
+		return nil, errors.Wrap(err, "error dialing cereal service")
+	}
+
+	grpcBackend := project_update_lib.ProjectUpdateBackend(conn)
+	manager, err := cereal.NewManager(grpcBackend)
+	if err != nil {
+		grpcBackend.Close() // nolint: errcheck
+		return nil, err
+	}
+
+	return manager, nil
 }

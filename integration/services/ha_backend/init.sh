@@ -110,6 +110,9 @@ nodes = ["https://${ha_backend_container1_ip}:9200", "https://${ha_backend_conta
 enable = true
 location = "fs"
 
+[global.v1.external.elasticsearch.backup.fs]
+path = "/services/ha_backend_backups"
+
 [global.v1.external.elasticsearch.auth]
 scheme = "basic_auth"
 
@@ -144,10 +147,22 @@ password = "thisisapassword"
 enable = true
 DOC
 
-    echo "Validating odfe connectivity"
-    sleep 45
-    curl -u admin:admin --cacert "${certdir}/MyRootCA.pem" --key "${certdir}/odfe-admin.key" --cert "${certdir}/odfe-admin.pem" --resolve "chefnode:9200:${ha_backend_container1_ip}" "https://chefnode:9200"
-    curl -u admin:admin --cacert "${certdir}/MyRootCA.pem" --key "${certdir}/odfe-admin.key" --cert "${certdir}/odfe-admin.pem" --resolve "chefnode:9200:${ha_backend_container2_ip}" "https://chefnode:9200"
+    for try in {1..8}; do
+        echo "Testing odfe connectivity (attempt ${try})"
+
+        errcode=0
+        curl --connect-timeout 15 --max-time 15 -u admin:admin --cacert "${certdir}/MyRootCA.pem" --key "${certdir}/odfe-admin.key" --cert "${certdir}/odfe-admin.pem" --resolve "chefnode:9200:${ha_backend_container1_ip}" "https://chefnode:9200" &&
+        curl --connect-timeout 15 --max-time 15 -u admin:admin --cacert "${certdir}/MyRootCA.pem" --key "${certdir}/odfe-admin.key" --cert "${certdir}/odfe-admin.pem" --resolve "chefnode:9200:${ha_backend_container2_ip}" "https://chefnode:9200" || errcode=${?}
+        if [ ${errcode} -eq 0 ]; then
+            break
+        else
+            if [ ${try} -eq 8 ]; then
+                echo "Failed to validate odfe connectivity"
+                return 1
+            fi
+            sleep 15
+        fi
+    done
 }
 
 ha_backend_dump_logs() {

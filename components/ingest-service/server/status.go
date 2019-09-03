@@ -6,14 +6,15 @@
 package server
 
 import (
+	"context"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/migration"
 	"github.com/chef/automate/components/ingest-service/pipeline/processor"
-	log "github.com/sirupsen/logrus"
-	"golang.org/x/net/context"
 )
 
 type IngestStatus struct {

@@ -18,6 +18,7 @@ describe File.basename(__FILE__) do
         "reports" => [
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
+                "ipaddress"=>"10.3.4.5",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
                 "endTime" => "2018-03-04T09:18:41Z",
@@ -33,6 +34,7 @@ describe File.basename(__FILE__) do
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
+                "ipaddress"=>"8.8.8.1",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e112",
                 "nodeName" => "redhat(2)-alpha-nginx(f)-apache(f)-failed",
                 "endTime" => "2018-03-04T09:18:42Z",
@@ -51,6 +53,7 @@ describe File.basename(__FILE__) do
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
+                "ipaddress"=>"8.8.8.2",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e111",
                 "nodeName" => "redhat(2)-alpha-nginx(f)-apache(s)-failed",
                 "endTime" => "2018-03-04T09:18:42Z",
@@ -66,6 +69,7 @@ describe File.basename(__FILE__) do
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
+                "ipaddress"=>"8.8.8.3",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e222",
                 "nodeName" => "RedHat(2)-beta-nginx(f)-apache(s)-failed",
                 "endTime" => "2018-03-04T09:18:43Z",
@@ -96,6 +100,7 @@ describe File.basename(__FILE__) do
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05",
+                "ipaddress"=>"10.3.4.5",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
                 "endTime" => "2018-03-05T02:02:02Z",
@@ -111,6 +116,7 @@ describe File.basename(__FILE__) do
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc07",
+                "ipaddress"=>"10.3.4.5",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
                 "endTime" => "2018-03-05T07:02:02Z",
@@ -142,6 +148,7 @@ describe File.basename(__FILE__) do
         "reports": [
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
+                "ipaddress"=>"10.3.4.5",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
                 "endTime" => "2018-03-04T09:18:41Z",
@@ -157,6 +164,7 @@ describe File.basename(__FILE__) do
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
+                "ipaddress"=>"8.8.8.1",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e112",
                 "nodeName" => "redhat(2)-alpha-nginx(f)-apache(f)-failed",
                 "endTime" => "2018-03-04T09:18:42Z",
@@ -186,6 +194,7 @@ describe File.basename(__FILE__) do
         "reports" => [
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
+                "ipaddress"=>"8.8.8.2",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e111",
                 "nodeName" => "redhat(2)-alpha-nginx(f)-apache(s)-failed",
                 "endTime" => "2018-03-04T09:18:42Z",
@@ -201,6 +210,7 @@ describe File.basename(__FILE__) do
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
+                "ipaddress"=>"8.8.8.3",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e222",
                 "nodeName" => "RedHat(2)-beta-nginx(f)-apache(s)-failed",
                 "endTime" => "2018-03-04T09:18:43Z",
@@ -229,6 +239,7 @@ describe File.basename(__FILE__) do
         "reports" => [
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
+                "ipaddress"=>"8.8.8.2",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e111",
                 "nodeName" => "redhat(2)-alpha-nginx(f)-apache(s)-failed",
                 "endTime" => "2018-03-04T09:18:42Z",
@@ -244,6 +255,7 @@ describe File.basename(__FILE__) do
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
+                "ipaddress"=>"8.8.8.3",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e222",
                 "nodeName" => "RedHat(2)-beta-nginx(f)-apache(s)-failed",
                 "endTime" => "2018-03-04T09:18:43Z",
@@ -271,6 +283,7 @@ describe File.basename(__FILE__) do
         "reports" => [
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
+                "ipaddress"=>"10.3.4.5",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
                 "endTime" => "2018-03-04T09:18:41Z",
@@ -288,6 +301,7 @@ describe File.basename(__FILE__) do
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05",
+                "ipaddress"=>"10.3.4.5",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
                 "endTime" => "2018-03-05T02:02:02Z",
@@ -305,6 +319,7 @@ describe File.basename(__FILE__) do
             },
             {
                 "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc07",
+                "ipaddress"=>"10.3.4.5",
                 "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                 "nodeName" => "centos-beta",
                 "endTime" => "2018-03-05T07:02:02Z",
@@ -341,6 +356,7 @@ describe File.basename(__FILE__) do
             "reports" => [
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
+                    "ipaddress"=>"10.3.4.5",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                     "nodeName" => "centos-beta",
                     "endTime" => "2018-03-04T09:18:41Z",
@@ -356,6 +372,7 @@ describe File.basename(__FILE__) do
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
+                    "ipaddress"=>"8.8.8.1",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e112",
                     "nodeName" => "redhat(2)-alpha-nginx(f)-apache(f)-failed",
                     "endTime" => "2018-03-04T09:18:42Z",
@@ -371,6 +388,7 @@ describe File.basename(__FILE__) do
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
+                    "ipaddress"=>"8.8.8.2",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e111",
                     "nodeName" => "redhat(2)-alpha-nginx(f)-apache(s)-failed",
                     "endTime" => "2018-03-04T09:18:42Z",
@@ -386,6 +404,7 @@ describe File.basename(__FILE__) do
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
+                    "ipaddress"=>"8.8.8.3",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e222",
                     "nodeName" => "RedHat(2)-beta-nginx(f)-apache(s)-failed",
                     "endTime" => "2018-03-04T09:18:43Z",
@@ -416,6 +435,7 @@ describe File.basename(__FILE__) do
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05",
+                    "ipaddress"=>"10.3.4.5",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                     "nodeName" => "centos-beta",
                     "endTime" => "2018-03-05T02:02:02Z",
@@ -431,6 +451,7 @@ describe File.basename(__FILE__) do
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc07",
+                    "ipaddress"=>"10.3.4.5",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                     "nodeName" => "centos-beta",
                     "endTime" => "2018-03-05T07:02:02Z",
@@ -459,6 +480,7 @@ describe File.basename(__FILE__) do
             "reports" => [
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04",
+                    "ipaddress"=>"10.3.4.5",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                     "nodeName" => "centos-beta",
                     "endTime" => "2018-03-04T09:18:41Z",
@@ -474,6 +496,7 @@ describe File.basename(__FILE__) do
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10",
+                    "ipaddress"=>"8.8.8.1",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e112",
                     "nodeName" => "redhat(2)-alpha-nginx(f)-apache(f)-failed",
                     "endTime" => "2018-03-04T09:18:42Z",
@@ -490,6 +513,7 @@ describe File.basename(__FILE__) do
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06",
+                    "ipaddress"=>"8.8.8.2",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e111",
                     "nodeName" => "redhat(2)-alpha-nginx(f)-apache(s)-failed",
                     "endTime" => "2018-03-04T09:18:42Z",
@@ -505,6 +529,7 @@ describe File.basename(__FILE__) do
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09",
+                    "ipaddress"=>"8.8.8.3",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e222",
                     "nodeName" => "RedHat(2)-beta-nginx(f)-apache(s)-failed",
                     "endTime" => "2018-03-04T09:18:43Z",
@@ -535,6 +560,7 @@ describe File.basename(__FILE__) do
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05",
+                    "ipaddress"=>"10.3.4.5",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                     "nodeName" => "centos-beta",
                     "endTime" => "2018-03-05T02:02:02Z",
@@ -550,6 +576,7 @@ describe File.basename(__FILE__) do
                 },
                 {
                     "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc07",
+                    "ipaddress"=>"10.3.4.5",
                     "nodeId" => "9b9f4e51-b049-4b10-9555-10578916e149",
                     "nodeName" => "centos-beta",
                     "endTime" => "2018-03-05T07:02:02Z",

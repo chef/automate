@@ -81,7 +81,7 @@ defmodule Notifications.Config do
 
   def db_options do
     cond do
-      sqerl_no_ssl?() -> 
+      sqerl_no_ssl?() ->
         [ssl: false]
       sqerl_no_ssl_auth?() ->
         [ssl: true, ssl_opts: Keyword.get(ssl_options_no_auth(), :ssl)]
@@ -98,6 +98,7 @@ defmodule Notifications.Config do
       fail_if_no_peer_cert: true,
       verify: :verify_peer,
       versions: [:'tlsv1.2'],
+      depth: 32,
     ]]
   end
 
@@ -110,6 +111,7 @@ defmodule Notifications.Config do
       server_name_indication: :disable,
       verify: :verify_peer,
       versions: [:'tlsv1.2'],
+      depth: 32,
     ]]
   end
 

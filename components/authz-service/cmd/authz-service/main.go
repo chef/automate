@@ -16,7 +16,7 @@ import (
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
-	"github.com/chef/automate/lib/platform"
+	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/tls/certs"
 	"github.com/chef/automate/lib/tracing"
 )
@@ -43,8 +43,7 @@ type config struct {
 	Database           string `mapstructure:"database"`
 	MigrationsPath     string `mapstructure:"migrations-path"`
 	DataMigrationsPath string `mapstructure:"data-migrations-path"`
-	EventAddress       string `mapstructure:"event-address"`
-	ConfigFile         string `mapstructure:"config"`
+	CerealAddress      string `mapstructure:"cereal-address"`
 }
 
 func serve(_ *cobra.Command, args []string) {
@@ -64,7 +63,7 @@ Please pass a config file as the only argument to this command.`))
 
 	if cfg.PGURL == "" {
 		var err error
-		cfg.PGURL, err = platform.PGURIFromEnvironment(cfg.Database)
+		cfg.PGURL, err = platform_config.PGURIFromEnvironment(cfg.Database)
 		if err != nil {
 			fail(errors.Wrap(err, "Failed to get pg uri"))
 		}
@@ -116,7 +115,7 @@ Please pass a config file as the only argument to this command.`))
 
 	// if server.GRPC() returns, it's with an error
 	fail(server.GRPC(ctx, cfg.GRPC, l, connFactory, engine, migrationConfig,
-		dataMigrationConfig, cfg.EventAddress, cfg.ConfigFile))
+		dataMigrationConfig, cfg.CerealAddress))
 }
 
 // fail outputs the error and exits with a non-zero code

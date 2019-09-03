@@ -33,6 +33,11 @@ type productsmeta struct {
 	// Packages is a list of the root level packages/services that will
 	// make up a release of automate.
 	Packages []PackageName `json:"packages"`
+
+	// DeletedPackages are old automate services or packages that are no
+	// longer included in the repository.
+	DeletedPackages []DeletedPackage `json:"deleted_packages"`
+
 	// Collections is a list of collections that automate is broken down
 	// into. Some of these are deployable by the user.
 	Collections []*Collection `json:"collections"`
@@ -148,7 +153,8 @@ func Parse(repoRootPath string) (*Metadata, error) {
 	}
 
 	return &Metadata{
-		Packages:    packages,
-		Collections: metadata.Collections,
+		Packages:        packages,
+		DeletedPackages: metadata.DeletedPackages,
+		Collections:     metadata.Collections,
 	}, nil
 }

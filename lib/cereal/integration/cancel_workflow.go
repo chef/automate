@@ -59,7 +59,7 @@ func (suite *CerealTestSuite) TestCancelWorkflow() {
 	suite.Require().NoError(err, "Failed to enqueue workflow")
 	wgWorkflowStart.Wait()
 	wgTaskStart.Wait()
-	logrus.Debug("canceling workflow")
+	logrus.Debug("Canceling workflow")
 	err = m.CancelWorkflow(context.Background(), workflowName, instanceName)
 	suite.Require().NoError(err, "Failed to cancel workflow")
 	wgTaskDone.Wait()

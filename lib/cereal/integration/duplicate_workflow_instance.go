@@ -5,9 +5,9 @@ package integration
 import (
 	"context"
 	"sync"
-	"time"
 
 	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/backend"
 )
 
 // TestEnqueueDuplicateWorkflowInstance tries the enqueue the same workflow
@@ -18,7 +18,7 @@ func (suite *CerealTestSuite) TestEnqueueDuplicateWorkflowInstance() {
 	instanceName := randName("instance")
 
 	wgTask := sync.WaitGroup{}
-	wgTask.Add(1)
+	wgTask.Add(2)
 
 	// wgBarrier is used to block the completion of the task.
 	// This allows us to make sure there is a running workflow
@@ -47,6 +47,11 @@ func (suite *CerealTestSuite) TestEnqueueDuplicateWorkflowInstance() {
 				},
 			},
 		),
+		WithManagerOpts(
+			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+				wgTask.Done()
+			}),
+		),
 	)
 	defer m.Stop()
 	err := m.EnqueueWorkflow(context.Background(), workflowName, instanceName, nil)
@@ -55,7 +60,6 @@ func (suite *CerealTestSuite) TestEnqueueDuplicateWorkflowInstance() {
 	suite.Assert().Equal(cereal.ErrWorkflowInstanceExists, err)
 	wgBarrier.Done()
 	wgTask.Wait()
-	time.Sleep(20 * time.Millisecond)
 	err = m.Stop()
 	suite.NoError(err)
 }

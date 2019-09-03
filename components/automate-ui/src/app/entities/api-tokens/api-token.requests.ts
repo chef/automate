@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { environment as env } from 'environments/environment';
 import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import { ApiToken, ApiTokenV1, isApiTokenV1, ensureApiTokenV2 } from './api-token.model';
-import { GetAllTokensSuccessPayload } from './api-token.actions';
+import { CreateTokenPayload, GetAllTokensSuccessPayload } from './api-token.actions';
 
 export interface TokenPayloadResponse {
   token: ApiToken;
@@ -81,12 +81,13 @@ export class ApiTokenRequests {
     }
   }
 
-  public create(id: string, name: string, version: IAMMajorVersion = 'v1'):
+  public create({ id, name, projects }: CreateTokenPayload, version: IAMMajorVersion = 'v1'):
     Observable<ApiTokenV1 | TokenPayloadResponse> {
     switch (version) {
       case 'v2': {
         return this.http.post<TokenPayloadResponse>(`${env.auth_v2_url}/tokens`,
-          { id, name, active: true });
+          { id, name, projects, active: true }
+        );
       }
       default: {
         return this.http.post<ApiTokenV1>(`${env.auth_url}/tokens`,

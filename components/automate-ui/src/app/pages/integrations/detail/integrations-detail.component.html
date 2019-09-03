@@ -1,4 +1,4 @@
-<app-admin-sidebar></app-admin-sidebar>
+<app-settings-sidebar></app-settings-sidebar>
 <div class="container" *ngIf="(managerDetail$ | async) as managerDetail">
   <main *ngIf="managerDetail.manager">
     <chef-breadcrumbs>
@@ -40,8 +40,8 @@
           routerLink="/compliance/scanner/nodes/add">
           Add Nodes
         </chef-button>
-        <chef-button primary caution 
-          [disabled]="!hasSelectedNodes()" 
+        <chef-button primary caution
+          [disabled]="!hasSelectedNodes()"
           (click)="deleteNodes()">
           Remove Nodes
         </chef-button>

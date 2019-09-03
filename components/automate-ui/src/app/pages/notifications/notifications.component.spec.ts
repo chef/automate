@@ -71,7 +71,7 @@ describe('NotificationsComponent', () => {
       ],
       declarations: [
         NotificationsComponent,
-        MockComponent({ selector: 'app-admin-sidebar'})
+        MockComponent({ selector: 'app-settings-sidebar'})
       ],
       providers: [
         { provide: MatDialog, useClass: MockMdDialog },

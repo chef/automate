@@ -6,11 +6,11 @@ import (
 )
 
 type Driver interface {
+	TaskDequeuer
+
 	EnqueueWorkflow(ctx context.Context, workflow *WorkflowInstance) error
 	DequeueWorkflow(ctx context.Context, workflowNames []string) (*WorkflowEvent, WorkflowCompleter, error)
 	CancelWorkflow(ctx context.Context, instanceName string, workflowName string) error
-
-	DequeueTask(ctx context.Context, taskName string) (*Task, TaskCompleter, error)
 
 	CreateWorkflowSchedule(ctx context.Context, instanceName string, workflowName string, parameters []byte, enabled bool, recurrence string, nextRunAt time.Time) error
 	ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error)
@@ -25,9 +25,21 @@ type Driver interface {
 	Close() error
 }
 
+type TaskDequeuer interface {
+	DequeueTask(ctx context.Context, taskName string) (*Task, TaskCompleter, error)
+}
+
 type SchedulerDriver interface {
 	GetDueScheduledWorkflow(ctx context.Context) (*Schedule, ScheduledWorkflowCompleter, error)
 	GetNextScheduledWorkflow(ctx context.Context) (*Schedule, error)
+}
+
+// IntervalSuggester is an interface that backends can optionally
+// implement to suggest a default TaskPollInterval and
+// WorkflowPollInterval to the rest of the cereal library.
+type IntervalSuggester interface {
+	DefaultTaskPollInterval() time.Duration
+	DefaultWorkflowPollInterval() time.Duration
 }
 
 type ListWorkflowOpts struct {

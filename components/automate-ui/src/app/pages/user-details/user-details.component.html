@@ -1,4 +1,4 @@
-<app-admin-sidebar *ngIf="isAdminView"> </app-admin-sidebar>
+<app-settings-sidebar *ngIf="isAdminView"> </app-settings-sidebar>
 <app-profile-sidebar *ngIf="!isAdminView"> </app-profile-sidebar>
 
 <div class="container">
@@ -50,7 +50,7 @@
             </chef-button>
           </ng-container>
           <ng-container *ngIf="editMode">
-            <chef-button primary class="save-button" (click)="updateFullName()">
+            <chef-button primary class="save-button" [disabled]="!editForm.valid || !editForm.dirty" (click)="saveFullName()">
               <span>Save</span>
             </chef-button>
             <chef-button tertiary (click)="setEditMode(false)">Cancel</chef-button>
@@ -99,7 +99,7 @@
             Passwords must match.
           </chef-error>
         </chef-form-field>
-        <chef-button [disabled]="!passwordForm.valid" class="update-password-button" primary (click)="updatePassword()">
+        <chef-button [disabled]="!passwordForm.valid" class="update-password-button" primary (click)="savePassword()">
           <span>Update Password</span>
         </chef-button>
       </form>

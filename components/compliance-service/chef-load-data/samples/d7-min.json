@@ -1,0 +1,140 @@
+{
+  "controls": [
+    {
+      "id": "apache-01",
+      "profile_id": "apache-baseline",
+      "profile_sha256": "3e1310b071dc4d706263e9d07083e10a92b4b69e4a36cffa1eda7eaecc09969a",
+      "status": "skipped",
+      "code_desc": "Operating System Detection",
+      "skip_message": "Skipped control due to only_if condition.",
+      "resource": "Operating System Detection"
+    },
+    {
+      "id": "apache-02",
+      "profile_id": "apache-baseline",
+      "profile_sha256": "3e1310b071dc4d706263e9d07083e10a92b4b69e4a36cffa1eda7eaecc09969a",
+      "status": "skipped",
+      "code_desc": "Operating System Detection",
+      "skip_message": "Skipped control due to only_if condition.",
+      "resource": "Operating System Detection"
+    },
+    {
+      "id": "apache-03",
+      "profile_id": "apache-baseline",
+      "profile_sha256": "3e1310b071dc4d706263e9d07083e10a92b4b69e4a36cffa1eda7eaecc09969a",
+      "status": "skipped",
+      "code_desc": "Operating System Detection",
+      "skip_message": "Skipped control due to only_if condition.",
+      "resource": "Operating System Detection"
+    },
+    {
+      "id": "apache-04",
+      "profile_id": "apache-baseline",
+      "profile_sha256": "3e1310b071dc4d706263e9d07083e10a92b4b69e4a36cffa1eda7eaecc09969a",
+      "status": "skipped",
+      "code_desc": "Operating System Detection",
+      "skip_message": "Skipped control due to only_if condition.",
+      "resource": "Operating System Detection"
+    },
+    {
+      "id": "apache-05",
+      "profile_id": "apache-baseline",
+      "profile_sha256": "3e1310b071dc4d706263e9d07083e10a92b4b69e4a36cffa1eda7eaecc09969a",
+      "status": "skipped",
+      "code_desc": "Operating System Detection",
+      "skip_message": "Skipped control due to only_if condition.",
+      "resource": "Operating System Detection"
+    },
+    {
+      "id": "apache-06",
+      "profile_id": "apache-baseline",
+      "profile_sha256": "3e1310b071dc4d706263e9d07083e10a92b4b69e4a36cffa1eda7eaecc09969a",
+      "status": "skipped",
+      "code_desc": "Operating System Detection",
+      "skip_message": "Skipped control due to only_if condition.",
+      "resource": "Operating System Detection"
+    },
+    {
+      "id": "apache-07",
+      "profile_id": "apache-baseline",
+      "profile_sha256": "3e1310b071dc4d706263e9d07083e10a92b4b69e4a36cffa1eda7eaecc09969a",
+      "status": "skipped",
+      "code_desc": "Operating System Detection",
+      "skip_message": "Skipped control due to only_if condition.",
+      "resource": "Operating System Detection"
+    },
+    {
+      "id": "apache-08",
+      "profile_id": "apache-baseline",
+      "profile_sha256": "3e1310b071dc4d706263e9d07083e10a92b4b69e4a36cffa1eda7eaecc09969a",
+      "status": "skipped",
+      "code_desc": "Operating System Detection",
+      "skip_message": "Skipped control due to only_if condition.",
+      "resource": "Operating System Detection"
+    },
+    {
+      "id": "apache-09",
+      "profile_id": "apache-baseline",
+      "profile_sha256": "3e1310b071dc4d706263e9d07083e10a92b4b69e4a36cffa1eda7eaecc09969a",
+      "status": "skipped",
+      "code_desc": "Operating System Detection",
+      "skip_message": "Skipped control due to only_if condition.",
+      "resource": "Operating System Detection"
+    },
+    {
+      "id": "apache-10",
+      "profile_id": "apache-baseline",
+      "profile_sha256": "3e1310b071dc4d706263e9d07083e10a92b4b69e4a36cffa1eda7eaecc09969a",
+      "status": "skipped",
+      "code_desc": "Operating System Detection",
+      "skip_message": "Skipped control due to only_if condition.",
+      "resource": "Operating System Detection"
+    },
+    {
+      "id": "apache-11",
+      "profile_id": "apache-baseline",
+      "profile_sha256": "3e1310b071dc4d706263e9d07083e10a92b4b69e4a36cffa1eda7eaecc09969a",
+      "status": "skipped",
+      "code_desc": "Operating System Detection",
+      "skip_message": "Skipped control due to only_if condition.",
+      "resource": "Operating System Detection"
+    },
+    {
+      "id": "apache-12",
+      "profile_id": "apache-baseline",
+      "profile_sha256": "3e1310b071dc4d706263e9d07083e10a92b4b69e4a36cffa1eda7eaecc09969a",
+      "status": "skipped",
+      "code_desc": "Operating System Detection",
+      "skip_message": "Skipped control due to only_if condition.",
+      "resource": "Operating System Detection"
+    },
+    {
+      "id": "apache-13",
+      "profile_id": "apache-baseline",
+      "profile_sha256": "3e1310b071dc4d706263e9d07083e10a92b4b69e4a36cffa1eda7eaecc09969a",
+      "status": "skipped",
+      "code_desc": "Operating System Detection",
+      "skip_message": "Skipped control due to only_if condition.",
+      "resource": "Operating System Detection"
+    },
+    {
+      "id": "apache-14",
+      "profile_id": "apache-baseline",
+      "profile_sha256": "3e1310b071dc4d706263e9d07083e10a92b4b69e4a36cffa1eda7eaecc09969a",
+      "status": "skipped",
+      "code_desc": "Operating System Detection",
+      "skip_message": "Skipped control due to only_if condition.",
+      "resource": "Operating System Detection"
+    }
+  ],
+  "statistics": {
+    "duration": 0.001262
+  },
+  "version": "2.2.20",
+  "node_name": "to_be_generated",
+  "node_uuid": "to_be_generated",
+  "report_uuid": "to_be_generated",
+  "end_time": "to_be_generated",
+  "environment": "to_be_generated",
+  "type": "inspec_report"
+}

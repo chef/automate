@@ -1,12 +1,13 @@
 package relaxting
 
 import (
+	"context"
 	"fmt"
 	"time"
 
-	"github.com/chef/automate/components/compliance-service/reporting/util"
 	"github.com/pkg/errors"
-	"golang.org/x/net/context"
+
+	"github.com/chef/automate/components/compliance-service/reporting/util"
 )
 
 const (

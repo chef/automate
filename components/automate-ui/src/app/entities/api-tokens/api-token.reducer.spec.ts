@@ -112,7 +112,8 @@ describe('apiTokenStatusEntityReducer', () => {
     describe('CREATE', () => {
       const action = new CreateToken({
           name: faker.lorem.words(),
-          id: faker.lorem.words()
+          id: faker.lorem.words(),
+          projects: []
         });
 
       it('sets status to loading', () => {

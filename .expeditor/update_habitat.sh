@@ -39,5 +39,6 @@ if [[ "$NO_GIT" != "true" ]]; then
 
     # Get back to master and cleanup the leftovers - any changed files left over at the end of this script will get committed to master.
     git checkout -
+    git clean -fxd
     git branch -D "$branch"
 fi

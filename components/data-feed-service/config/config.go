@@ -25,6 +25,7 @@ type DataFeedConfig struct {
 	NotificationsConfig NotificationsConfig `mapstructure:"notifications"`
 	SecretsConfig       SecretsConfig       `mapstructure:"secrets"`
 	CfgmgmtConfig       CfgmgmtConfig       `mapstructure:"cfgmgmt"`
+	ComplianceConfig    ComplianceConfig    `mapstructure:"compliance"`
 	ServiceCerts        *certs.ServiceCerts
 }
 
@@ -34,9 +35,11 @@ type LogConfig struct {
 }
 
 type ServiceConfig struct {
-	Host         string        `mapstructure:"host"`
-	Port         uint16        `mapstructure:"port"`
-	FeedInterval time.Duration `mapstructure:"feed_interval"`
+	Host            string        `mapstructure:"host"`
+	Port            uint16        `mapstructure:"port"`
+	FeedInterval    time.Duration `mapstructure:"feed_interval"`
+	AssetPageSize   int32         `mapstructure:"asset_page_size"`
+	ReportsPageSize int32         `mapstructure:"reports_page_size"`
 }
 
 type NotificationsConfig struct {
@@ -51,10 +54,9 @@ type CfgmgmtConfig struct {
 	Target string `mapstructure:"target"`
 }
 
-//type HandlerConfig struct {
-//	Feed      string `mapstructure:"feed"`
-//	CfgIngest string `mapstructure:"cfgingest"`
-//}
+type ComplianceConfig struct {
+	Target string `mapstructure:"target"`
+}
 
 // ListenAddress is the address where gRPC server will bind and listen
 func (c *DataFeedConfig) ListenAddress() string {

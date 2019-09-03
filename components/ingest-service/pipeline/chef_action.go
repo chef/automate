@@ -1,15 +1,16 @@
 package pipeline
 
 import (
+	"context"
+
+	log "github.com/sirupsen/logrus"
+
 	chef "github.com/chef/automate/api/external/ingest/request"
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
-
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
 	"github.com/chef/automate/components/ingest-service/pipeline/processor"
 	"github.com/chef/automate/components/ingest-service/pipeline/publisher"
-	log "github.com/sirupsen/logrus"
-	"golang.org/x/net/context"
 )
 
 // ChefActionPipeline pipeline to process Chef actions from client or server

@@ -49,7 +49,8 @@ control 'iam-v2-global-projects-filter-1' do
           expect(resp.parsed_response_body[:projects]).to include(
             { id: p[:id],
               name: p[:name],
-              type: p[:id] == UNASSIGNED_PROJECT_ID ? "CHEF_MANAGED" : "CUSTOM"
+              type: p[:id] == UNASSIGNED_PROJECT_ID ? "CHEF_MANAGED" : "CUSTOM",
+              status: "NO_RULES"
             })
         end
       end
@@ -118,7 +119,8 @@ control 'iam-v2-global-projects-filter-1' do
           expected_projects.map { |p|
             { id: p[:id],
               name: p[:name],
-              type: "CUSTOM"
+              type: "CUSTOM",
+              status: "NO_RULES"
             }}
         )
       end

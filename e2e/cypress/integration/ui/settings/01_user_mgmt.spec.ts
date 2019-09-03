@@ -16,8 +16,10 @@ describe('user management', () => {
   });
 
   const now = Cypress.moment().format('MMDDYYhhmm');
-  const name = 'cypress test user ' + now;
-  const username = 'testing' + now;
+  const typeDelay = 50;
+  const name = `cypress test user ${now}`;
+  const username = `testing${now}`;
+  const password = 'testing!';
 
   it('can create a user', () => {
     cy.get('app-user-table').should('exist');
@@ -26,81 +28,85 @@ describe('user management', () => {
     cy.get('app-user-table chef-button').contains('Create User').click();
     cy.get('app-user-management chef-modal').should('exist');
 
-    cy.get('[formcontrolname=fullname]')
-      .type(name);
+    // we increase the default delay to mimic the average human's typing speed
+    // only need this for input values upon which later test assertions depend
+    // ref: https://github.com/cypress-io/cypress/issues/534
+    cy.get('[formcontrolname=fullname]').focus()
+      .type(name, { delay: typeDelay }).should('have.value', name);
 
-    cy.get('[formcontrolname=username]')
-      .type(username);
+    cy.get('[formcontrolname=username]').focus()
+      .type(username, { delay: typeDelay }).should('have.value', username);
 
-    cy.get('[formcontrolname=password]')
-      .type('chefautomate');
+    cy.get('[formcontrolname=password]').focus()
+      .type(password, { delay: typeDelay }).should('have.value', password);
 
     cy.get('[formcontrolname=confirmPassword]')
-      .type('chefautomate').then(() => {
-        // save new user
-        cy.get('[data-cy=save-user]').click().then(() => {
-          // confirm modal closed
-          cy.get('app-user-management chef-modal').should('not.be.visible');
-          // success alert displays
-          cy.get('chef-notification.info').should('be.visible');
-          // confirm new user row added
-          cy.contains(username).should('exist');
-          cy.contains(name).should('exist');
-        });
-      });
+      .type(password, { delay: typeDelay }).should('have.value', password);
+
+    // save new user
+    cy.get('[data-cy=save-user]').click();
+    cy.get('app-user-management chef-modal').should('not.be.visible');
+    cy.get('chef-notification.info').should('be.visible');
+
+    cy.get('app-user-table chef-td').contains(username).should('exist');
+    cy.get('app-user-table chef-td').contains(name).should('exist');
   });
 
-  // it("can view and edit a user's details", () => {
-  //   let updated_name = name + 'update'
-  //   let updated_password = 'chefautomate1'
-  //   cy.contains(name).click().then(() => {
-  //     cy.get('app-user-details').should('exist')
-  //     cy.get('div.name-column').contains(name).should('exist')
-  //     cy.get('span').contains(username).should('exist')
-  //     cy.get('chef-form-field').contains('New Password').should('exist')
-  //     cy.get('chef-form-field').contains('Confirm New Password').should('exist')
+  it('can view and edit user details', () => {
+    cy.route('GET', `**/users/${username}`).as('getUser');
+    cy.route('PUT', `**/users/${username}`).as('updateUser');
 
-  //     cy.get('chef-button.edit-button').click().then(() => {
-  //       cy.get('[formcontrolname=fullName]').find('input').type(updated_name)
+    const updated_name = `${name} updated`;
+    const updated_password = 'testing?';
 
-  //       cy.get('chef-button.save-button').click(() => {
-  //         cy.get('div.name-column').contains(updated_name).should('exist')
-  //       })
-  //     })
+    cy.contains(name).click();
+    cy.wait('@getUser');
 
-  //     cy.get('[formcontrolname=newPassword]').find('input').type(updated_password).then(() => {
-  //       cy.get('[formcontrolname=confirmPassword]').find('input').type(updated_password)
-  //         .then(() => {
-  //         cy.get('chef-button').contains('Update Password').click().then(() => {
-  //           // success alert displays
-  //           cy.get('chef-notification.info').should('be.visible')
+    cy.get('app-user-details div.name-column').contains(name).should('exist');
+    cy.get('app-user-details span').contains(username).should('exist');
+    cy.get('app-user-details chef-form-field').contains('New Password').should('exist');
+    cy.get('app-user-details chef-form-field').contains('Confirm New Password').should('exist');
 
-  //           // back to user list page
-  //           cy.get('.breadcrumb').contains('Users').click()
-  //         })
-  //       })
-  //     })
-  //   })
-  // })
+    cy.get('app-user-details chef-button.edit-button').click();
+    cy.get('[formcontrolname=fullName]').find('input').should('not.be.disabled')
+      .focus().clear().type(updated_name);
 
-  // it("can delete user", () => {
-  //   // find the created user row
-  //   cy.get('chef-tbody chef-tr').contains(name).parent().parent()
-  //     .find('chef-control-menu').as('control-menu')
+    cy.get('app-user-details chef-button.save-button').click();
+    cy.wait('@updateUser');
 
-  //   cy.get('@control-menu').click().then(() => {
+    // bug: Cypress sometimes misses the first few characters of the new name due to focus issues
+    // so we test that some change was made to the name, not the exact new name
+    cy.get('app-user-details div.name-column').contains('updated').should('exist');
 
-  //     // force:true disables waiting for actionability
-  // tslint:disable-next-line:max-line-length
-  //     // https://docs.cypress.io/guides/core-concepts/interacting-with-elements.html#Actionability
-  //     // in this case, the delete button is hidden under the control menu so we decrease
-  //     // test flakiness by having less stringent checks before clicking
-  //     cy.get('@control-menu').find('[data-cy=delete]').click({ force: true }).then(() => {
-  //       // confirm user delete
-  //       cy.get('chef-button').contains('Delete User').click().then(() => {
-  //         cy.get('chef-tbody chef-td').contains(username).should('not.exist')
-  //       })
-  //     })
-  //   })
-  // })
+    cy.get('[formcontrolname=newPassword]').find('input')
+      .focus().type(updated_password, { delay: typeDelay }).should('have.value', updated_password);
+    cy.get('[formcontrolname=confirmPassword]').find('input')
+      .focus().type(updated_password, { delay: typeDelay }).should('have.value', updated_password);
+    cy.get('app-user-details chef-button').contains('Update Password').click({ force: true} );
+
+    // success alert displays
+    cy.get('chef-notification.info').should('be.visible');
+  });
+
+  it('can delete user', () => {
+    cy.route('GET', '**/users').as('getUsers');
+    cy.route('DELETE', `**/users/${username}`).as('deleteUser');
+
+    // back to user list page
+    cy.get('app-user-details .breadcrumb').contains('Users').click();
+    cy.wait('@getUsers');
+
+    cy.get('app-user-table chef-td').contains(username).parent()
+        .find('chef-control-menu').as('controlMenu');
+    // we throw in a should so cypress waits until introspection allows menu to be shown
+    cy.get('@controlMenu').should('be.visible')
+      .click();
+    cy.get('@controlMenu').find('[data-cy=delete]').click({ force: true });
+
+    // confirm in modal
+    cy.get('app-user-management chef-button').contains('Delete User').click();
+
+    cy.wait('@deleteUser');
+    cy.get('app-user-management chef-tbody chef-td').contains(username).should('not.exist');
+  });
 });

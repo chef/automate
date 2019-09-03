@@ -75,3 +75,26 @@ function auto_go_update_compliance_service() {
         go_update_compliance_service
   done
 }
+
+document "compliance_configure_purge" <<DOC
+  Configures the purge workflow
+DOC
+function compliance_configure_purge() {
+  chef-automate dev grpcurl compliance-service -- chef.automate.infra.data_lifecycle.api.Purge.Configure -d "
+  {
+    \"enabled\":true,
+    \"recurrence\":\"FREQ=DAILY;DTSTART=20190820T221315Z;INTERVAL=1\",
+    \"policy_update\": {
+      \"es\": [
+        {
+          \"policy_name\":\"compliance-scans\",
+          \"older_than_days\":\"${1}\"
+        },
+        {
+          \"policy_name\":\"compliance-reports\",
+          \"older_than_days\":\"${1}\"
+        }
+      ]
+    }
+  }"
+}

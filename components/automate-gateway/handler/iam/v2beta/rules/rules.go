@@ -111,7 +111,7 @@ func (s *Server) ListRulesForProject(ctx context.Context, req *pb_req.ListRulesF
 
 	return &pb_resp.ListRulesForProjectResp{
 		Rules:  rules,
-		Status: fromInternalRulesStatus(resp.Status),
+		Status: FromInternalRulesStatus(resp.Status),
 	}, nil
 }
 
@@ -308,7 +308,7 @@ func fromInternalStatus(internalStatus string) pb_common.RuleStatus {
 	}
 }
 
-func fromInternalRulesStatus(internalRulesStatus string) pb_common.ProjectRulesStatus {
+func FromInternalRulesStatus(internalRulesStatus string) pb_common.ProjectRulesStatus {
 	switch internalRulesStatus {
 	case "applied":
 		return pb_common.ProjectRulesStatus_RULES_APPLIED

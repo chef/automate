@@ -850,3 +850,171 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = FilterAuthorizedProjectsRespValidationError{}
+
+// Validate checks the field values on ValidateProjectAssignmentReq with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ValidateProjectAssignmentReq) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if len(m.GetProjectIds()) < 1 {
+		return ValidateProjectAssignmentReqValidationError{
+			field:  "ProjectIds",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
+
+	_ValidateProjectAssignmentReq_ProjectIds_Unique := make(map[string]struct{}, len(m.GetProjectIds()))
+
+	for idx, item := range m.GetProjectIds() {
+		_, _ = idx, item
+
+		if _, exists := _ValidateProjectAssignmentReq_ProjectIds_Unique[item]; exists {
+			return ValidateProjectAssignmentReqValidationError{
+				field:  fmt.Sprintf("ProjectIds[%v]", idx),
+				reason: "repeated value must contain unique items",
+			}
+		} else {
+			_ValidateProjectAssignmentReq_ProjectIds_Unique[item] = struct{}{}
+		}
+
+		if !_ValidateProjectAssignmentReq_ProjectIds_Pattern.MatchString(item) {
+			return ValidateProjectAssignmentReqValidationError{
+				field:  fmt.Sprintf("ProjectIds[%v]", idx),
+				reason: "value does not match regex pattern \"^[a-z0-9()-_]{1,64}$\"",
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// ValidateProjectAssignmentReqValidationError is the validation error returned
+// by ValidateProjectAssignmentReq.Validate if the designated constraints
+// aren't met.
+type ValidateProjectAssignmentReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ValidateProjectAssignmentReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ValidateProjectAssignmentReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ValidateProjectAssignmentReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ValidateProjectAssignmentReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ValidateProjectAssignmentReqValidationError) ErrorName() string {
+	return "ValidateProjectAssignmentReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ValidateProjectAssignmentReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sValidateProjectAssignmentReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ValidateProjectAssignmentReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ValidateProjectAssignmentReqValidationError{}
+
+var _ValidateProjectAssignmentReq_ProjectIds_Pattern = regexp.MustCompile("^[a-z0-9()-_]{1,64}$")
+
+// Validate checks the field values on ValidateProjectAssignmentResp with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ValidateProjectAssignmentResp) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// ValidateProjectAssignmentRespValidationError is the validation error
+// returned by ValidateProjectAssignmentResp.Validate if the designated
+// constraints aren't met.
+type ValidateProjectAssignmentRespValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ValidateProjectAssignmentRespValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ValidateProjectAssignmentRespValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ValidateProjectAssignmentRespValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ValidateProjectAssignmentRespValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ValidateProjectAssignmentRespValidationError) ErrorName() string {
+	return "ValidateProjectAssignmentRespValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ValidateProjectAssignmentRespValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sValidateProjectAssignmentResp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ValidateProjectAssignmentRespValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ValidateProjectAssignmentRespValidationError{}

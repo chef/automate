@@ -18,17 +18,17 @@ type Client interface {
 	GetDisconnectedServices(int32) ([]*Service, error)
 	// @param (thresholdMinutes)
 	DeleteDisconnectedServices(int32) ([]*Service, error)
+	// @param (thresholdMinutes)
+	MarkDisconnectedServices(int32) ([]*Service, error)
 	// @param (sortField, sortAsc, page, pageSize, filters)
 	GetServiceGroups(string, bool, int32, int32, map[string][]string) ([]*ServiceGroupDisplay, error)
+	// @param (fieldName, queryFragment)
+	GetServicesDistinctValues(string, string) ([]string, error)
 	// @param (id)
 	ServiceGroupExists(string) (string, bool)
 	// @param (filters)
 	GetServicesHealthCounts(map[string][]string) (*HealthCounts, error)
-	GetServiceGroupsHealthCounts() (*HealthCounts, error)
-	// @param (id)
-	GetDeployment(int32) (*Deployment, error)
-	// @param (id)
-	GetSupervisor(int32) (*Supervisor, error)
+	GetServiceGroupsHealthCounts(map[string][]string) (*HealthCounts, error)
 
 	GetServicesCount() (int32, error)
 	GetServiceGroupsCount() (int32, error)
@@ -101,6 +101,7 @@ type Service struct {
 	PreviousHealth      string
 	UpdateStrategy      string
 	LastEventOccurredAt time.Time
+	Disconnected        bool
 	HealthUpdatedAt     time.Time
 }
 
@@ -110,7 +111,7 @@ func (s *Service) FullReleaseString() string {
 }
 
 type ServiceGroupDisplay struct {
-	ID                   int32
+	ID                   string
 	Name                 string
 	DeploymentID         int32
 	Package              string

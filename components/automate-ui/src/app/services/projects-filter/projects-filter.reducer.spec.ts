@@ -6,8 +6,7 @@ import {
   ProjectsFilterState,
   projectsFilterInitialState,
   projectsFilterReducer,
-  ProjectsFilterOption,
-  ProjectsFilterOptionTuple
+  ProjectsFilterOption
 } from './projects-filter.reducer';
 import { LoadOptions, LoadOptionsSuccess } from './projects-filter.actions';
 
@@ -114,7 +113,7 @@ describe('projectsFilterReducer', () => {
 
       it('returns no values when no fetched values and no restored values', () => {
         const action = new LoadOptionsSuccess(
-          <ProjectsFilterOptionTuple>{
+          {
             fetched: [],
             restored: []
           });
@@ -126,7 +125,7 @@ describe('projectsFilterReducer', () => {
 
       it('returns no values when restored values but no fetched values', () => {
         const action = new LoadOptionsSuccess(
-          <ProjectsFilterOptionTuple>{
+          {
             fetched: [],
             restored: [
               genProject('a-proj', false),
@@ -142,7 +141,7 @@ describe('projectsFilterReducer', () => {
 
       it('returns all fetched values when no restored values', () => {
         const action = new LoadOptionsSuccess(
-          <ProjectsFilterOptionTuple>{
+          {
             fetched: [
               genProject('zz-proj'),
               genProject('c-proj', true),
@@ -150,7 +149,7 @@ describe('projectsFilterReducer', () => {
               genProject('a-proj', true),
               genProject('b-proj')
             ],
-            restored: {}
+            restored: []
           });
 
         const { options } = projectsFilterReducer(initialState, action);
@@ -166,7 +165,7 @@ describe('projectsFilterReducer', () => {
 
       it('includes all fetched options even if not in restored', () => {
         const action = new LoadOptionsSuccess(
-          <ProjectsFilterOptionTuple>{
+          {
             fetched: [
               genProject('a-proj'),
               genProject('b-proj'),
@@ -185,7 +184,7 @@ describe('projectsFilterReducer', () => {
 
       it('skips restored options that are not included in fetched', () => {
         const action = new LoadOptionsSuccess(
-          <ProjectsFilterOptionTuple>{
+          {
             fetched: [
               genProject('a-proj'),
               genProject('b-proj')
@@ -204,7 +203,7 @@ describe('projectsFilterReducer', () => {
 
       it('uses stored checked values when present', () => {
         const action = new LoadOptionsSuccess(
-          <ProjectsFilterOptionTuple>{
+          {
             fetched: [
               genProject('a-proj', true),
               genProject('b-proj'),
@@ -693,13 +692,13 @@ describe('projectsFilterReducer', () => {
     // Then generate the fetched list as the same thing with checked false for all projects.
     if (projects.filter(p => p.checked === true)) {
       return new LoadOptionsSuccess(
-        <ProjectsFilterOptionTuple>{
+        {
           fetched: projects.map(p => Object.assign({}, p, { checked: false })),
           restored: projects
         });
     }
     // Otherwise, we don't care about the restored list.
     return new LoadOptionsSuccess(
-      <ProjectsFilterOptionTuple>{ fetched: projects, restored: {} });
+      { fetched: projects, restored: [] });
   }
 });

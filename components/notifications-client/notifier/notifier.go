@@ -1,10 +1,12 @@
 package notifier
 
 import (
-	"github.com/chef/automate/components/notifications-client/api"
+	"context"
+
 	log "github.com/sirupsen/logrus"
-	context "golang.org/x/net/context"
 	"google.golang.org/grpc"
+
+	"github.com/chef/automate/components/notifications-client/api"
 )
 
 type notifierOptions struct {

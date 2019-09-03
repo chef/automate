@@ -171,14 +171,19 @@ func (s *server) GatherLogs(ctx context.Context, req *api.GatherLogsRequest,
 		Certs: pg.A2SuperuserCerts,
 	}
 	connectionURI := connInfo.ConnURI("template1")
-	pcmd := pg.PSQLCmd[0]
-	activityArgs := append(pg.PSQLCmd[1:], connectionURI, "-c", "SELECT CURRENT_TIMESTAMP; SELECT * FROM pg_stat_activity;")
+
+	pcmd := pg.PSQLCmd()[0]
+
+	activityArgs := pg.PSQLCmd()[1:]
+	activityArgs = append(activityArgs, connectionURI, "-c", "SELECT CURRENT_TIMESTAMP; SELECT * FROM pg_stat_activity;")
 	g.AddCommand("pg_stat_activity", pcmd, activityArgs...)
 
-	sqitchArgs := append(pg.PSQLCmd[1:], connectionURI, "-c", "SELECT * FROM sqitch.tags;")
+	sqitchArgs := pg.PSQLCmd()[1:]
+	sqitchArgs = append(sqitchArgs, connectionURI, "-c", "SELECT * FROM sqitch.tags;")
 	g.AddCommand("sqitch_tags", pcmd, sqitchArgs...)
 
-	tokenArgs := append(pg.PSQLCmd[1:], connInfo.ConnURI("chef_authn_service"),
+	tokenArgs := pg.PSQLCmd()[1:]
+	tokenArgs = append(tokenArgs, connInfo.ConnURI("chef_authn_service"),
 		"-c", "SELECT active, count(*) FROM chef_authn_tokens GROUP BY active;")
 	g.AddCommand("api_tokens", pcmd, tokenArgs...)
 

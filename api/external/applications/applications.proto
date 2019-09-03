@@ -35,8 +35,17 @@ service ApplicationsService {
     option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
   };
+
   rpc GetServices(ServicesReq) returns (ServicesRes) {
     option (google.api.http).get = "/beta/applications/services";
+    option (chef.automate.api.policy).resource = "service_groups";
+    option (chef.automate.api.policy).action = "list";
+    option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
+  };
+
+  rpc GetServicesDistinctValues(ServicesDistinctValuesReq) returns (ServicesDistinctValuesRes) {
+    option (google.api.http).get = "/beta/applications/services-distinct-values";
     option (chef.automate.api.policy).resource = "service_groups";
     option (chef.automate.api.policy).action = "list";
     option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
@@ -78,6 +87,27 @@ service ApplicationsService {
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:delete";
   };
 
+  rpc GetDisconnectedServicesConfig(GetDisconnectedServicesConfigReq) returns (GetDisconnectedServicesConfigRes) {
+    option (google.api.http).get = "/beta/retention/service_groups/disconnected_services/config";
+    // TODO: need new resources/policies for this
+    option (chef.automate.api.policy).resource = "service_groups";
+    option (chef.automate.api.policy).action = "list";
+    option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
+  };
+
+  rpc UpdateDisconnectedServicesConfig(UpdateDisconnectedServicesConfigReq) returns (UpdateDisconnectedServicesConfigRes) {
+    option (google.api.http) = {
+      post: "/beta/retention/service_groups/disconnected_services/config"
+      body: "*"
+    };
+    // TODO: need new resources/policies for this
+    option (chef.automate.api.policy).resource = "service_groups";
+    option (chef.automate.api.policy).action = "delete";
+    option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "applications:serviceGroups:delete";
+  };
+
   rpc GetVersion (common.version.VersionInfoRequest) returns (common.version.VersionInfo) {
     option (google.api.http).get = "/beta/applications/version";
     option (chef.automate.api.policy).resource = "service_info:version";
@@ -93,8 +123,14 @@ message ServicesReq {
   common.query.Sorting sorting = 3;
 }
 
+message ServicesDistinctValuesReq {
+  string field_name = 1;
+  string query_fragment = 2;
+  repeated string filter = 3;
+}
+
 message ServicesBySGReq {
-  int32 service_group_id = 1;
+  string service_group_id = 1;
   common.query.Pagination pagination = 2;
   common.query.Sorting sorting = 3;
   string health = 4;
@@ -110,8 +146,13 @@ message ServicesRes {
   repeated Service services = 1;
 }
 
+message ServicesDistinctValuesRes {
+  repeated string values = 1;
+}
+
 message DisconnectedServicesReq {
-  int32 threshold_minutes = 1;
+  reserved 1;
+  int32 threshold_seconds = 2;
 }
 
 message ServicesStatsReq {
@@ -123,6 +164,24 @@ message ServicesStatsRes {
   int32 total_supervisors = 3;
   int32 total_deployments = 4;
 }
+
+message GetDisconnectedServicesConfigReq{}
+
+message GetDisconnectedServicesConfigRes{
+  bool running = 1;
+  string threshold = 2;
+}
+
+message UpdateDisconnectedServicesConfigReq {
+  bool running = 1;
+  // To match the ingest API at /retention/nodes/missing-nodes/config, we use a
+  // string that conforms to golang's time.ParseDuration() function. Internally
+  // the service uses an integer number of seconds so partial seconds in the
+  // threshold will be trucated.
+  string threshold = 2;
+}
+
+message UpdateDisconnectedServicesConfigRes {}
 
 message Service {
   string supervisor_id = 1;
@@ -139,9 +198,12 @@ message Service {
   HealthStatus previous_health_check = 18;
   string current_health_since = 19;
   google.protobuf.Timestamp health_updated_at = 20;
+  bool disconnected = 21;
 }
 
-message ServiceGroupsHealthCountsReq {}
+message ServiceGroupsHealthCountsReq {
+  repeated string filter = 1;
+}
 message ServiceGroupsReq {
   repeated string filter = 1;
   common.query.Pagination pagination = 2;

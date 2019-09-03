@@ -1,8 +1,9 @@
 package version
 
 import (
+	"context"
+
 	pb "github.com/golang/protobuf/ptypes/empty"
-	"golang.org/x/net/context"
 
 	ver_api "github.com/chef/automate/components/compliance-service/api/version"
 	"github.com/chef/automate/components/compliance-service/config"

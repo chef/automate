@@ -9,15 +9,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
-	automate_event "github.com/chef/automate/api/interservice/event"
-	automate_event_type "github.com/chef/automate/components/event-service/server"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
-	project_update_tags "github.com/chef/automate/lib/authz"
-	"github.com/golang/mock/gomock"
-	"github.com/golang/protobuf/ptypes"
-	_struct "github.com/golang/protobuf/ptypes/struct"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
@@ -112,8 +105,8 @@ func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
-									Values: []string{"chef-server.org"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+									Values:    []string{"chef-server.org"},
 								},
 							},
 						},
@@ -134,8 +127,8 @@ func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
-									Values: []string{"chef-server.org"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+									Values:    []string{"chef-server.org"},
 								},
 							},
 						},
@@ -156,8 +149,8 @@ func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
-									Values: []string{"chef-server.org"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+									Values:    []string{"chef-server.org"},
 								},
 							},
 						},
@@ -178,8 +171,8 @@ func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
-									Values: []string{"chef-server.org", "chef-server2.org"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+									Values:    []string{"chef-server.org", "chef-server2.org"},
 								},
 							},
 						},
@@ -201,16 +194,16 @@ func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
-									Values: []string{"chef-server.org"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+									Values:    []string{"chef-server.org"},
 								},
 							},
 						},
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
-									Values: []string{"org1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Values:    []string{"org1"},
 								},
 							},
 						},
@@ -232,16 +225,16 @@ func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
-									Values: []string{"chef-server2.org"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+									Values:    []string{"chef-server2.org"},
 								},
 							},
 						},
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
-									Values: []string{"org1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Values:    []string{"org1"},
 								},
 							},
 						},
@@ -263,12 +256,12 @@ func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
 						{
 							Conditions: []*iam_v2.Condition{
 								{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
-									Values: []string{"chef-server2.org"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
+									Values:    []string{"chef-server2.org"},
 								},
 								{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
-									Values: []string{"org1"},
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
+									Values:    []string{"org1"},
 								},
 							},
 						},
@@ -343,96 +336,4 @@ func TestProjectUpdateActionsPainlessElasticsearchScript(t *testing.T) {
 				require.ElementsMatch(t, test.projectIDs, actualAction.Projects)
 			})
 	}
-}
-
-// Test if action are being updated when a project update is ran.
-//
-// Add action with default project tag
-// run update
-// test if the action project tag was update
-func TestProjectUpdateRunsOnActions(t *testing.T) {
-
-	projectID := "1e27fff8-c78b-4f11-9a2a-ae993a642c83"
-	updatedProjectTag := "project9"
-	var eventsSent []*automate_event.EventMsg
-	localSuite := NewLocalSuite(t)
-	defer localSuite.GlobalTeardown()
-
-	localSuite.eventServiceClientMock.EXPECT().Publish(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
-		func(ctx context.Context, in *automate_event.PublishRequest) (*automate_event.PublishResponse, error) {
-			eventsSent = append(eventsSent, in.Msg)
-			return &automate_event.PublishResponse{}, nil
-		})
-	localSuite.projectsClient.EXPECT().ListRulesForAllProjects(gomock.Any(), gomock.Any()).AnyTimes().Return(
-		&iam_v2.ListRulesForAllProjectsResp{
-			ProjectRules: map[string]*iam_v2.ProjectRules{
-				updatedProjectTag: {
-					Rules: []*iam_v2.ProjectRule{
-						{
-							Type: iam_v2.ProjectRuleTypes_EVENT,
-							Conditions: []*iam_v2.Condition{
-								{
-									Attribute:   iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
-									Values: []string{"org1"},
-								},
-							},
-						},
-					},
-				},
-			},
-		}, nil)
-
-	// Add action with default project tag
-	actions := []iBackend.InternalChefAction{
-		{
-			OrganizationName: "org1",
-			Projects:         []string{"old_tag"},
-			RecordedAt:       time.Now(),
-		},
-	}
-	suite.IngestActions(actions)
-	defer suite.DeleteAllDocuments()
-
-	event := &automate_event.EventMsg{
-		EventID:   "5462ebf6-3b5b-40f8-b308-fda4745ce49f",
-		Type:      &automate_event.EventType{Name: automate_event_type.ProjectRulesUpdate},
-		Published: ptypes.TimestampNow(),
-		Data: &_struct.Struct{
-			Fields: map[string]*_struct.Value{
-				project_update_tags.ProjectUpdateIDTag: {
-					Kind: &_struct.Value_StringValue{
-						StringValue: projectID,
-					},
-				},
-			},
-		},
-	}
-
-	// run update
-	_, err := localSuite.EventHandlerServer.HandleEvent(context.Background(), event)
-	assert.NoError(t, err)
-
-	complete := false
-	// Wait for job to complete
-	for !complete {
-		time.Sleep(time.Millisecond * 100)
-
-		for _, event := range eventsSent {
-			assert.Equal(t, event.Type.Name, automate_event_type.ProjectRulesUpdateStatus)
-			if event.Data.Fields["Completed"].GetBoolValue() {
-				complete = true
-			}
-		}
-	}
-
-	suite.RefreshIndices(suite.Indices()...)
-
-	// Test if the action was updated
-	actualActions, err := suite.GetActions(100)
-	require.Nil(t, err)
-	require.Equal(t, 1, len(actualActions), "wrong number of actions retrieved")
-
-	actualAction := actualActions[0]
-
-	require.ElementsMatch(t, []string{updatedProjectTag}, actualAction.Projects)
 }

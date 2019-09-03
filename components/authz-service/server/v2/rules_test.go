@@ -20,7 +20,7 @@ const staged = "staged"
 
 func TestCreateRule(t *testing.T) {
 	ctx := context.Background()
-	cl, projects, rules, _, _ := setupProjectsAndRules(t)
+	cl, projects, rules, _ := setupProjectsAndRules(t)
 
 	// it's cumbersome to set this up, so we re-use it in a few of the following
 	// cases
@@ -183,7 +183,7 @@ func TestCreateRule(t *testing.T) {
 
 func TestUpdateRule(t *testing.T) {
 	ctx := context.Background()
-	cl, _, store, _, _ := setupProjectsAndRules(t)
+	cl, _, store, _ := setupProjectsAndRules(t)
 	apiConditions := []*api.Condition{
 		{
 			Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
@@ -452,7 +452,7 @@ func TestUpdateRule(t *testing.T) {
 
 func TestGetRule(t *testing.T) {
 	ctx := context.Background()
-	cl, projects, rules, _, _ := setupProjectsAndRules(t)
+	cl, projects, rules, _ := setupProjectsAndRules(t)
 	apiConditions := []*api.Condition{
 		{
 			Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
@@ -529,7 +529,7 @@ func TestGetRule(t *testing.T) {
 
 func TestListRules(t *testing.T) {
 	ctx := context.Background()
-	cl, _, store, _, _ := setupProjectsAndRules(t)
+	cl, _, store, _ := setupProjectsAndRules(t)
 	apiConditions1 := []*api.Condition{
 		{
 			Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
@@ -610,7 +610,7 @@ func TestListRules(t *testing.T) {
 
 func TestListRulesForProject(t *testing.T) {
 	ctx := context.Background()
-	cl, projects, rules, _, _ := setupProjectsAndRules(t)
+	cl, projects, rules, _ := setupProjectsAndRules(t)
 	storageConditions1 := []storage.Condition{
 		{
 			Attribute: storage.Organization,
@@ -746,7 +746,7 @@ func TestListRulesForProject(t *testing.T) {
 
 func TestDeleteRule(t *testing.T) {
 	ctx := context.Background()
-	cl, projects, rules, _, _ := setupProjectsAndRules(t)
+	cl, projects, rules, _ := setupProjectsAndRules(t)
 	storageConditions1 := []storage.Condition{
 		{
 			Attribute: storage.Organization,

@@ -6,7 +6,6 @@ package v2
 import (
 	"context"
 
-	event "github.com/chef/automate/api/interservice/event"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -36,7 +35,6 @@ type ProjectsServerMock struct {
 	DeleteProjectFunc                func(context.Context, *DeleteProjectReq) (*DeleteProjectResp, error)
 	ListProjectsFunc                 func(context.Context, *ListProjectsReq) (*ListProjectsResp, error)
 	ListProjectsForIntrospectionFunc func(context.Context, *ListProjectsReq) (*ListProjectsResp, error)
-	HandleEventFunc                  func(context.Context, *event.EventMsg) (*event.EventResponse, error)
 	ApplyRulesStartFunc              func(context.Context, *ApplyRulesStartReq) (*ApplyRulesStartResp, error)
 	ApplyRulesCancelFunc             func(context.Context, *ApplyRulesCancelReq) (*ApplyRulesCancelResp, error)
 	ApplyRulesStatusFunc             func(context.Context, *ApplyRulesStatusReq) (*ApplyRulesStatusResp, error)
@@ -119,18 +117,6 @@ func (m *ProjectsServerMock) ListProjectsForIntrospection(ctx context.Context, r
 		return f(ctx, req)
 	}
 	return nil, status.Error(codes.Internal, "mock: 'ListProjectsForIntrospection' not implemented")
-}
-
-func (m *ProjectsServerMock) HandleEvent(ctx context.Context, req *event.EventMsg) (*event.EventResponse, error) {
-	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
-		if err := msg.Validate(); err != nil {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if f := m.HandleEventFunc; f != nil {
-		return f(ctx, req)
-	}
-	return nil, status.Error(codes.Internal, "mock: 'HandleEvent' not implemented")
 }
 
 func (m *ProjectsServerMock) ApplyRulesStart(ctx context.Context, req *ApplyRulesStartReq) (*ApplyRulesStartResp, error) {
@@ -261,7 +247,6 @@ func (m *ProjectsServerMock) Reset() {
 	m.DeleteProjectFunc = nil
 	m.ListProjectsFunc = nil
 	m.ListProjectsForIntrospectionFunc = nil
-	m.HandleEventFunc = nil
 	m.ApplyRulesStartFunc = nil
 	m.ApplyRulesCancelFunc = nil
 	m.ApplyRulesStatusFunc = nil

@@ -27,7 +27,12 @@ message ConfigRequest {
 			Profiles profiles = 4;
 			Storage storage = 5;
 			Logger logger = 6;
-			Retention retention = 7;
+			// NOTE: retention is no longer configurable via config and is now
+			// managed with gRPC endpoints. The field is not reserved so we can
+			// migrate the initial values from config to to the purge cereal
+			// workflows.
+			// Setting retention values is prevented in the Validate() callback.
+			Retention retention = 7 [deprecated=true];
 			reserved 8;
 			reserved 9;
 			Agent agent = 10;
@@ -53,7 +58,7 @@ message ConfigRequest {
 				google.protobuf.StringValue level = 2;
 			}
 
-			message Retention {
+			message Retention { // deprecated
 				google.protobuf.Int32Value compliance_report_days = 1;
 			}
 

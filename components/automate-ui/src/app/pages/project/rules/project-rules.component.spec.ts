@@ -20,7 +20,8 @@ describe('ProjectRulesComponent', () => {
   const project: Project = {
     id: 'uuid-1',
     name: 'Default',
-    type: 'CHEF_MANAGED'
+    type: 'CHEF_MANAGED',
+    status: 'NO_RULES'
   };
 
   beforeEach(async(() => {
@@ -36,7 +37,7 @@ describe('ProjectRulesComponent', () => {
           inputs: ['allOf', 'not'],
           template: '<ng-content></ng-content>'
         }),
-        MockComponent({ selector: 'app-admin-sidebar' }),
+        MockComponent({ selector: 'app-settings-sidebar' }),
         MockComponent({
           selector: 'app-delete-object-modal',
           inputs: ['visible', 'objectNoun', 'objectName'],

@@ -37,11 +37,29 @@ func request_JobScheduler_GetStatusJobScheduler_0(ctx context.Context, marshaler
 
 }
 
+func local_request_JobScheduler_GetStatusJobScheduler_0(ctx context.Context, marshaler runtime.Marshaler, server JobSchedulerServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq JobSchedulerStatusRequest
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.GetStatusJobScheduler(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 func request_JobScheduler_MarkNodesMissing_0(ctx context.Context, marshaler runtime.Marshaler, client JobSchedulerClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq MarkNodesMissingRequest
 	var metadata runtime.ServerMetadata
 
 	msg, err := client.MarkNodesMissing(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_JobScheduler_MarkNodesMissing_0(ctx context.Context, marshaler runtime.Marshaler, server JobSchedulerServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq MarkNodesMissingRequest
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.MarkNodesMissing(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -66,11 +84,33 @@ func request_JobScheduler_ConfigureNodesMissingScheduler_0(ctx context.Context, 
 
 }
 
+func local_request_JobScheduler_ConfigureNodesMissingScheduler_0(ctx context.Context, marshaler runtime.Marshaler, server JobSchedulerServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq JobSettings
+	var metadata runtime.ServerMetadata
+
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_JobScheduler_ConfigureNodesMissingScheduler_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := server.ConfigureNodesMissingScheduler(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 func request_JobScheduler_StartNodesMissingScheduler_0(ctx context.Context, marshaler runtime.Marshaler, client JobSchedulerClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq StartNodesMissingSchedulerRequest
 	var metadata runtime.ServerMetadata
 
 	msg, err := client.StartNodesMissingScheduler(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_JobScheduler_StartNodesMissingScheduler_0(ctx context.Context, marshaler runtime.Marshaler, server JobSchedulerServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq StartNodesMissingSchedulerRequest
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.StartNodesMissingScheduler(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -84,11 +124,29 @@ func request_JobScheduler_StopNodesMissingScheduler_0(ctx context.Context, marsh
 
 }
 
+func local_request_JobScheduler_StopNodesMissingScheduler_0(ctx context.Context, marshaler runtime.Marshaler, server JobSchedulerServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq StopNodesMissingSchedulerRequest
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.StopNodesMissingScheduler(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 func request_JobScheduler_DeleteMarkedNodes_0(ctx context.Context, marshaler runtime.Marshaler, client JobSchedulerClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq DeleteMarkedNodesRequest
 	var metadata runtime.ServerMetadata
 
 	msg, err := client.DeleteMarkedNodes(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_JobScheduler_DeleteMarkedNodes_0(ctx context.Context, marshaler runtime.Marshaler, server JobSchedulerServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq DeleteMarkedNodesRequest
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.DeleteMarkedNodes(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -102,11 +160,29 @@ func request_JobScheduler_StartDeleteNodesScheduler_0(ctx context.Context, marsh
 
 }
 
+func local_request_JobScheduler_StartDeleteNodesScheduler_0(ctx context.Context, marshaler runtime.Marshaler, server JobSchedulerServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq StartDeleteNodesSchedulerRequest
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.StartDeleteNodesScheduler(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 func request_JobScheduler_StopDeleteNodesScheduler_0(ctx context.Context, marshaler runtime.Marshaler, client JobSchedulerClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq StopDeleteNodesSchedulerRequest
 	var metadata runtime.ServerMetadata
 
 	msg, err := client.StopDeleteNodesScheduler(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_JobScheduler_StopDeleteNodesScheduler_0(ctx context.Context, marshaler runtime.Marshaler, server JobSchedulerServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq StopDeleteNodesSchedulerRequest
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.StopDeleteNodesScheduler(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -129,6 +205,207 @@ func request_JobScheduler_ConfigureDeleteNodesScheduler_0(ctx context.Context, m
 	msg, err := client.ConfigureDeleteNodesScheduler(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
+}
+
+func local_request_JobScheduler_ConfigureDeleteNodesScheduler_0(ctx context.Context, marshaler runtime.Marshaler, server JobSchedulerServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq JobSettings
+	var metadata runtime.ServerMetadata
+
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_JobScheduler_ConfigureDeleteNodesScheduler_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := server.ConfigureDeleteNodesScheduler(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+// RegisterJobSchedulerHandlerServer registers the http handlers for service JobScheduler to "mux".
+// UnaryRPC     :call JobSchedulerServer directly.
+// StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
+func RegisterJobSchedulerHandlerServer(ctx context.Context, mux *runtime.ServeMux, server JobSchedulerServer, opts []grpc.DialOption) error {
+
+	mux.Handle("GET", pattern_JobScheduler_GetStatusJobScheduler_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_JobScheduler_GetStatusJobScheduler_0(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_JobScheduler_GetStatusJobScheduler_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_JobScheduler_MarkNodesMissing_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_JobScheduler_MarkNodesMissing_0(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_JobScheduler_MarkNodesMissing_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_JobScheduler_ConfigureNodesMissingScheduler_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_JobScheduler_ConfigureNodesMissingScheduler_0(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_JobScheduler_ConfigureNodesMissingScheduler_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_JobScheduler_StartNodesMissingScheduler_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_JobScheduler_StartNodesMissingScheduler_0(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_JobScheduler_StartNodesMissingScheduler_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_JobScheduler_StopNodesMissingScheduler_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_JobScheduler_StopNodesMissingScheduler_0(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_JobScheduler_StopNodesMissingScheduler_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_JobScheduler_DeleteMarkedNodes_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_JobScheduler_DeleteMarkedNodes_0(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_JobScheduler_DeleteMarkedNodes_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_JobScheduler_StartDeleteNodesScheduler_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_JobScheduler_StartDeleteNodesScheduler_0(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_JobScheduler_StartDeleteNodesScheduler_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_JobScheduler_StopDeleteNodesScheduler_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_JobScheduler_StopDeleteNodesScheduler_0(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_JobScheduler_StopDeleteNodesScheduler_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_JobScheduler_ConfigureDeleteNodesScheduler_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_JobScheduler_ConfigureDeleteNodesScheduler_0(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_JobScheduler_ConfigureDeleteNodesScheduler_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	return nil
 }
 
 // RegisterJobSchedulerHandlerFromEndpoint is same as RegisterJobSchedulerHandler but

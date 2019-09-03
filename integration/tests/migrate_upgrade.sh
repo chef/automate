@@ -6,7 +6,7 @@ test_container_name="a1-migration.test"
 test_upgrades=true
 test_upgrade_strategy="none"
 test_diagnostics_pre_upgrade_filters="~skip-for-deep-upgrade"
-test_diagnostics_filters="~iam-v2"
+test_diagnostics_filters="~iam-v2 ~purge"
 
 # The version deployed here has a bug where it's possible for it to
 # serve a CLI that is incomplete. We can't go back in time and fix it,

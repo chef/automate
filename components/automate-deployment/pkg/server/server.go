@@ -53,7 +53,8 @@ import (
 	usermgmt_client "github.com/chef/automate/components/automate-deployment/pkg/usermgmt/client"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/io/chunks"
-	"github.com/chef/automate/lib/platform"
+	platform_config "github.com/chef/automate/lib/platform/config"
+	"github.com/chef/automate/lib/platform/pg"
 	"github.com/chef/automate/lib/secrets"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/tls/certs"
@@ -780,7 +781,7 @@ func (s *server) Status(ctx context.Context, d *api.StatusRequest) (*api.StatusR
 	nonSkippedServices = append(nonSkippedServices, deploymentServiceName)
 	for _, svcString := range s.deployment.ServiceNames() {
 		if svc, found := s.deployment.ServiceByName(svcString); found {
-			if svc.DeploymentState != deployment.Skip {
+			if svc.DeploymentState == deployment.Running {
 				nonSkippedServices = append(nonSkippedServices, svcString)
 			}
 		}
@@ -803,37 +804,45 @@ func (s *server) ServiceVersions(ctx context.Context,
 		return nil, ErrorNotConfigured
 	}
 
-	ds := deployment.ServiceFromManifest(s.deployment.CurrentReleaseManifest, deploymentServiceName)
-	services := append(s.deployment.ExpectedServices, ds)
-
-	resp := &api.ServiceVersionsResponse{}
-	resp.Services = make([]*api.ServiceVersion, 0, len(services))
-
 	c := s.target().HabAPIClient()
 	svcList, err := c.ListServices(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Habitat API error: %s", err.Error())
 	}
 
-	for _, svc := range services {
-		v := &api.ServiceVersion{}
-		info, found := habapi.ServiceInfoByName(svcList, svc.Name())
-		if !found {
-			logrus.WithError(err).WithFields(logrus.Fields{
-				"svc_name": svc.Name(),
-			}).Warn("error retrieving version")
+	resp := &api.ServiceVersionsResponse{}
+	resp.Services = make([]*api.ServiceVersion, 0, len(s.deployment.ExpectedServices)+1)
+	for _, svc := range s.deployment.ExpectedServices {
+		v := serviceVersionForService(svcList, svc.Name())
+		if v == nil {
+			logrus.WithField("svc_name", svc.Name()).Warn("no version information")
 			continue
 		}
-
-		v.Name = info.Pkg.Name
-		v.Origin = info.Pkg.Origin
-		v.Release = info.Pkg.Release
-		v.Version = info.Pkg.Version
 
 		resp.Services = append(resp.Services, v)
 	}
 
+	v := serviceVersionForService(svcList, deploymentServiceName)
+	if v == nil {
+		logrus.WithField("svc_name", deploymentServiceName).Warn("no version information")
+	} else {
+		resp.Services = append(resp.Services, v)
+	}
+
 	return resp, nil
+}
+
+func serviceVersionForService(svcList []habapi.ServiceInfo, name string) *api.ServiceVersion {
+	info, found := habapi.ServiceInfoByName(svcList, name)
+	if !found {
+		return nil
+	}
+	return &api.ServiceVersion{
+		Name:    info.Pkg.Name,
+		Origin:  info.Pkg.Origin,
+		Release: info.Pkg.Release,
+		Version: info.Pkg.Version,
+	}
 }
 
 // ensure that all services return a successful status
@@ -1097,6 +1106,8 @@ func periodicConverger(s *server, grpcServer *grpc.Server) func() {
 			return
 		}
 
+		logrus.Debug("Starting periodic converge")
+
 		restartRequired, err := s.periodicCertCheck()
 		if err != nil {
 			logrus.WithError(err).Warn("Periodic certificate authority validity check failed")
@@ -1113,6 +1124,8 @@ func periodicConverger(s *server, grpcServer *grpc.Server) func() {
 		if err != nil {
 			logrus.WithError(err).Error("Periodic converge failed")
 		}
+
+		logrus.Debug("Periodic converge complete")
 	}
 }
 
@@ -1221,18 +1234,18 @@ func (s *server) convergeDeployment() error {
 			"next_manifest":    nextVersion,
 		})
 		if nextVersion > currentVersion {
-			logctx.Info("Starting periodic converge with UPDATED manifest")
+			logctx.Info("Starting converge with UPDATED manifest")
 		} else if nextVersion < currentVersion {
 			// We should not see this because of the current implementation of
 			// nextManifest()
-			logctx.Warn("Starting periodic converge with DOWNGRADED manifest")
+			logctx.Warn("Starting converge with DOWNGRADED manifest")
 		} else {
-			logctx.Debug("Starting periodic converge")
+			logctx.Debug("Starting converge")
 		}
 	} else {
 		logrus.WithFields(logrus.Fields{
 			"next_manifest": nextManifest.Version(),
-		}).Info("Starting periodic converge with NEW manifest")
+		}).Info("Starting converge with NEW manifest")
 	}
 
 	s.deployment.CurrentReleaseManifest = nextManifest
@@ -1249,7 +1262,6 @@ func (s *server) convergeDeployment() error {
 			logrus.WithError(err).Error("Failed to converge")
 		}
 	}
-	logrus.Debug("Periodic converge complete")
 	return eDeploy.err
 }
 
@@ -2010,7 +2022,7 @@ func (s *server) acquireLock(ctx context.Context) error {
 
 func (s *server) reloadBackupRunner() error {
 	// platformConfig knows how to deal with superuser, and external vs internal PG
-	platformConfig := platform.Config{
+	platformConfig := platform_config.Config{
 		Config: &papi.Config{
 			Service: &papi.Config_Service{
 				// NOTE (jaym): The below hack is to allow deployment-service to find the
@@ -2031,17 +2043,7 @@ func (s *server) reloadBackupRunner() error {
 		},
 	}
 
-	// Get the correct ConnInfo
-	superuser, err := platformConfig.PGSuperUser()
-	if err != nil {
-		return err
-	}
-
-	if superuser == "" {
-		return errors.New("unable to determine superuser")
-	}
-
-	pgConnInfo, err := platformConfig.GetPGConnInfoURI(superuser)
+	pgConnInfo, err := pg.SuperuserConnInfoFromPlatformConfig(&platformConfig)
 	if err != nil {
 		return err
 	}

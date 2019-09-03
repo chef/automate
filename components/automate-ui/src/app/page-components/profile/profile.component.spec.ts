@@ -149,7 +149,7 @@ describe('ProfileComponent', () => {
 
       const link = element.query(By.css('button.logout'));
       link.triggerEventHandler('click', {});
-      expect(chefSessionService.logout).toHaveBeenCalled();
+      expect(chefSessionService.logout).toHaveBeenCalledWith('/', true);
     });
   });
 

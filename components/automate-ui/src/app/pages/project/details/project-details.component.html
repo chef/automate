@@ -1,4 +1,4 @@
-<app-admin-sidebar></app-admin-sidebar>
+<app-settings-sidebar></app-settings-sidebar>
 
 <div class="container">
   <main>
@@ -21,8 +21,8 @@
         </tbody>
       </table>
       <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
-        <chef-option value='rules'>Ingest Rules</chef-option>
-        <chef-option value='details'>Details</chef-option>
+        <chef-option value='rules' data-cy="rules-tab">Ingest Rules</chef-option>
+        <chef-option value='details' data-cy="details-tab">Details</chef-option>
       </chef-tab-selector>
     </chef-page-header>
     <section class="page-body" *ngIf="tabValue === 'details'">
@@ -30,9 +30,10 @@
         <chef-form-field id="update-name">
           <label>
             <span class="label">Name <span aria-hidden="true">*</span></span>
-            <input chefInput formControlName="name" type="text"
+            <input chefInput formControlName="name" type="text" [resetOrigin]="saveSuccessful"
               [attr.disabled]="(isChefManaged || isLoading) ? true : null"
-              (keyup)="keyPressed()" autocomplete="off">
+              autocomplete="off"
+              data-cy="update-project-name">
           </label>
           <chef-error
             *ngIf="(projectForm.get('name').hasError('required') || projectForm.get('name').hasError('pattern')) && projectForm.get('name').dirty">
@@ -43,13 +44,13 @@
           Name changes are not allowed for the default project.
         </span>
         <div id="button-bar" *ngIf="!isChefManaged">
-          <chef-button [disabled]="isLoading || !projectForm.valid || projectForm.controls['name'].value === project?.name"
+          <chef-button [disabled]="isLoading || !projectForm.valid || !projectForm.dirty"
             primary inline (click)="saveProject()">
             <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
             <span *ngIf="saving">Saving...</span>
             <span *ngIf="!saving">Save</span>
           </chef-button>
-          <span *ngIf="saveSuccessful" id="save-note">All changes saved.</span>
+          <span id="saved-note" *ngIf="saveSuccessful && !projectForm.dirty">All changes saved.</span>
         </div>
       </form>
     </section>
@@ -85,7 +86,7 @@
                 <chef-td class="controls">
                   <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project?.id]">
                     <chef-control-menu>
-                      <chef-option *ngIf="showDeleteRule()" class="delete-rule" (click)="startRuleDelete(rule)">Delete Rule</chef-option>
+                      <chef-option *ngIf="showDeleteRule()" class="delete-rule" (click)="startRuleDelete(rule)" data-cy="delete-rule">Delete Rule</chef-option>
                     </chef-control-menu>
                   </app-authorized>
                 </chef-td>

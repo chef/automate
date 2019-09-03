@@ -11,24 +11,21 @@ import (
 	"fmt"
 	"time"
 
-	uuid "github.com/chef/automate/lib/uuid4"
-	"github.com/pkg/errors"
-
-	"github.com/chef/automate/components/nodemanager-service/api/manager"
-	"github.com/chef/automate/components/nodemanager-service/api/nodes"
-
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
-	rrule "github.com/teambition/rrule-go"
-
 	_ "github.com/lib/pq"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	rrule "github.com/teambition/rrule-go"
 
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/api/jobs"
 	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
+	"github.com/chef/automate/components/nodemanager-service/api/manager"
+	"github.com/chef/automate/components/nodemanager-service/api/nodes"
+	uuid "github.com/chef/automate/lib/uuid4"
 )
 
 type Scanner struct {
@@ -166,7 +163,7 @@ func (s *Scanner) GetDueJobs(nowTime time.Time) []*jobs.Job {
 	if len(sqlIds) > 0 {
 		logrus.Debugf("GetDueJobs, these are the ready jobs job_ids %v", sqlIds)
 	}
-	// get each job, update parent job and create child job
+	// get each job, update parent job
 	for _, id := range sqlIds {
 		job, err := s.DB.GetJob(id)
 		if err != nil {
@@ -188,12 +185,12 @@ func (s *Scanner) UpdateNode(ctx context.Context, job *types.InspecJob, detectIn
 		logrus.Errorf("UpdateNode unable to parse job end time")
 		endTimeTimestamp = ptypes.TimestampNow()
 	}
-	logrus.Debugf("UpdateNode %s with status %s", job.NodeID, *job.NodeStatus)
+	logrus.Debugf("UpdateNode %s with status %s", job.NodeID, job.NodeStatus)
 	_, err = s.nodesClient.UpdateNodeDetectInfo(ctx, &nodes.NodeDetectJobInfo{
 		NodeId:          job.NodeID,
 		PlatformName:    detectInfo.OSName,
 		PlatformRelease: detectInfo.OSRelease,
-		NodeStatus:      *job.NodeStatus,
+		NodeStatus:      job.NodeStatus,
 		JobEndTime:      endTimeTimestamp,
 		JobId:           job.JobID,
 		JobType:         job.JobType,
@@ -241,12 +238,12 @@ func (s *Scanner) UpdateResult(ctx context.Context, job *types.InspecJob, output
 		JobID:     job.JobID,
 		NodeID:    job.NodeID,
 		ReportID:  reportID,
-		Status:    *job.NodeStatus,
+		Status:    job.NodeStatus,
 		StartTime: *job.StartTime,
 		EndTime:   *job.EndTime,
 	}
 
-	if *job.NodeStatus == types.StatusFailed || *job.NodeStatus == types.StatusAborted {
+	if job.NodeStatus == types.StatusFailed || job.NodeStatus == types.StatusAborted {
 		if inspecErr != nil {
 			result.Result = inspecErr.Message
 		}
@@ -372,6 +369,8 @@ func (s *Scanner) UpdateParentJobSchedule(jobId string, jobCount int32, recurren
 func (s *Scanner) CreateChildJob(job *jobs.Job) (*jobs.Job, error) {
 	// create a child job with parent job id association
 	childJob := job
+	job.Name = fmt.Sprintf("%s - run %d", job.Name, job.JobCount)
+	childJob.Recurrence = ""
 	childJob.ParentId = job.Id
 	childJob.JobCount = 0
 
@@ -386,65 +385,4 @@ func (s *Scanner) CreateChildJob(job *jobs.Job) (*jobs.Job, error) {
 	childJob.Id = id
 
 	return childJob, nil
-}
-
-func (s *Scanner) CheckForHungJobs(ctx context.Context) ([]string, error) {
-	var id, status string
-	var scheduledJobsIds, runningJobsIds []string
-
-	rows, err := s.DB.Query(`SELECT
-	j.id, j.status
-	FROM jobs j
-	WHERE (status = 'running' OR status = 'scheduled') AND type = 'exec' AND parent_id = '' AND recurrence = '' AND deleted=FALSE;`)
-
-	if err != nil {
-		return []string{}, errors.Wrap(err, "CheckForHungJobs encountered an error querying the database")
-	}
-	defer rows.Close() // nolint: errcheck
-	for rows.Next() {
-		err := rows.Scan(&id, &status)
-		if err != nil {
-			logrus.Error(err)
-			continue
-		}
-		if status == "running" {
-			runningJobsIds = append(runningJobsIds, id)
-		} else if status == "scheduled" {
-			scheduledJobsIds = append(scheduledJobsIds, id)
-		}
-	}
-	err = rows.Err()
-	if err != nil {
-		return []string{}, errors.Wrap(err, "CheckForHungJobs encountered an error querying the database")
-	}
-
-	// set all running jobs to aborted with error msg about services restarting
-	now := time.Now()
-	for _, runningJobID := range runningJobsIds {
-		trx, err := s.DB.Begin()
-		if err != nil {
-			return []string{}, errors.Wrap(err, "CheckForHungJobs encountered an error initiating the transaction")
-		}
-		_, err = trx.Exec(`UPDATE jobs SET status = 'failed', end_time = COALESCE($1, end_time) WHERE id = $2;`, now, runningJobID)
-		if err != nil {
-			return []string{}, errors.Wrap(err, "CheckForHungJobs encountered an error updating jobs in the database")
-		}
-		result := pgdb.ResultsRow{
-			JobID:   runningJobID,
-			Status:  "failed",
-			Result:  "job aborted due to service restart",
-			EndTime: now,
-		}
-
-		err = trx.Insert(&result)
-		if err != nil {
-			return []string{}, errors.Wrap(err, "CheckForHungJobs encountered an error inserting into the database")
-		}
-		err = trx.Commit()
-		if err != nil {
-			return []string{}, errors.Wrap(err, "CheckForHungJobs encountered an error commiting transaction to the database")
-		}
-	}
-	// return the ids of all the scheduled jobs
-	return scheduledJobsIds, nil
 }

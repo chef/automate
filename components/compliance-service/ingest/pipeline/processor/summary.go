@@ -79,7 +79,7 @@ func ComplianceSummary(in <-chan message.Compliance) <-chan message.Compliance {
 	out := make(chan message.Compliance, 100)
 	go func() {
 		for msg := range in {
-			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Info("Processing Compliance Summary")
+			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Processing Compliance Summary")
 			msg.InspecSummary = &relaxting.ESInSpecSummary{
 				NodeID:           msg.Report.NodeUuid,
 				NodeName:         msg.Report.NodeName,

@@ -43,7 +43,7 @@ describe('HttpClientAuthInterceptor', () => {
       // so our logic shouldn't depend on it.
       httpRequest.flush('response', { status: 401, statusText: 'OK' });
 
-      expect(chefSession.logout).toHaveBeenCalled();
+      expect(chefSession.logout).toHaveBeenCalledWith();
     });
   });
 

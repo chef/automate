@@ -17,7 +17,7 @@ import (
 	"github.com/chef/automate/components/teams-service/storage/postgres/migration"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
-	"github.com/chef/automate/lib/platform"
+	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/tls/certs"
 	"github.com/chef/automate/lib/tracing"
 	"github.com/chef/automate/lib/version"
@@ -77,7 +77,7 @@ Please pass a config file as the only argument to this command.`))
 
 	if cfg.PGURL == "" {
 		var err error
-		cfg.PGURL, err = platform.PGURIFromEnvironment(cfg.Database)
+		cfg.PGURL, err = platform_config.PGURIFromEnvironment(cfg.Database)
 		if err != nil {
 			fail(errors.Wrap(err, "Failed to get pg uri"))
 		}

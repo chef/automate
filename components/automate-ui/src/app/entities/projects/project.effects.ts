@@ -2,9 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Store } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { interval as observableInterval, of as observableOf } from 'rxjs';
+import { interval as observableInterval, of as observableOf, Observable } from 'rxjs';
 import { catchError, mergeMap, map, filter, switchMap, withLatestFrom } from 'rxjs/operators';
-import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { HttpStatus } from 'app/types/types';
@@ -14,6 +13,7 @@ import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.s
 import { ProjectRequests } from './project.requests';
 
 import {
+  GetProjects,
   GetProjectsSuccess,
   GetProjectsSuccessPayload,
   GetProjectsFailure,
@@ -39,10 +39,14 @@ import {
   GetApplyRulesStatusSuccess,
   GetApplyRulesStatusFailure,
   ProjectSuccessPayload,
-  ProjectActionTypes
+  ProjectActionTypes,
+  ProjectActions
 } from './project.actions';
+import { applyRulesStatus } from './project.selectors';
+import { ApplyRulesStatusState } from './project.reducer';
 
-const POLLING_INTERVAL_IN_SECONDS = 5;
+const ACTIVE_RULE_STATUS_INTERVAL = 5; // seconds between checks while update is in progress
+const DORMANT_RULE_STATUS_INTERVAL = 60; // seconds between checks while update is dormant
 
 @Injectable()
 export class ProjectEffects {
@@ -172,6 +176,7 @@ export class ProjectEffects {
       this.requests.applyRulesStart().pipe(
         switchMap(() => [
           new ApplyRulesStartSuccess(),
+          new GetProjects(),
           new GetApplyRulesStatus()
         ]),
         catchError((error: HttpErrorResponse) =>
@@ -184,6 +189,7 @@ export class ProjectEffects {
       this.requests.applyRulesStop().pipe(
         switchMap(() => [
           new ApplyRulesStopSuccess(),
+          new GetProjects(),
           new GetApplyRulesStatus()
         ]),
         catchError((error: HttpErrorResponse) => observableOf(new ApplyRulesStopFailure(error))))));
@@ -191,23 +197,33 @@ export class ProjectEffects {
   @Effect()
   getApplyRulesStatus$ = this.actions$.pipe(
     ofType<GetApplyRulesStatus>(ProjectActionTypes.GET_APPLY_RULES_STATUS),
-    mergeMap(() =>
-      this.requests.getApplyRulesStatus().pipe(
-        map((resp) => new GetApplyRulesStatusSuccess(resp)),
-        catchError((error: HttpErrorResponse) =>
-          observableOf(new GetApplyRulesStatusFailure(error))))));
+    switchMap(this.getRulesStatus$()));
 
   @Effect()
-  getLatestApplyRulesStatus$ = observableInterval(1000 * POLLING_INTERVAL_IN_SECONDS).pipe(
-    withLatestFrom(this.store.select(iamMajorVersion).pipe(filter(identity))),
-    withLatestFrom(this.store.select(iamMinorVersion).pipe(filter(identity))),
-    filter(([[_, major], minor]) => {
-      return major === 'v2' && minor === 'v1';
-    }),
-    switchMap(() =>
-      this.requests.getApplyRulesStatus().pipe(
-        map((resp) => new GetApplyRulesStatusSuccess(resp)),
-        catchError((error: HttpErrorResponse) =>
-          observableOf(new GetApplyRulesStatusFailure(error))))));
-}
+  getActiveApplyRulesStatus$ = observableInterval(1000 * ACTIVE_RULE_STATUS_INTERVAL).pipe(
+    withLatestFrom(this.store.select(iamMajorVersion)),
+    withLatestFrom(this.store.select(iamMinorVersion)),
+    withLatestFrom(this.store.select(applyRulesStatus)),
+    filter(([[[_, major], minor], { state }]) =>
+      major === 'v2' && minor === 'v1' && state === ApplyRulesStatusState.Running
+    ),
+    switchMap(this.getRulesStatus$()));
 
+  @Effect()
+  getDormantApplyRulesStatus$ = observableInterval(1000 * DORMANT_RULE_STATUS_INTERVAL).pipe(
+    withLatestFrom(this.store.select(iamMajorVersion)),
+    withLatestFrom(this.store.select(iamMinorVersion)),
+    withLatestFrom(this.store.select(applyRulesStatus)),
+    filter(([[[_, major], minor], { state }]) =>
+      major === 'v2' && minor === 'v1' && state === ApplyRulesStatusState.NotRunning
+    ),
+    switchMap(this.getRulesStatus$()));
+
+  private getRulesStatus$(): () => Observable<ProjectActions> {
+    return () => this.requests.getApplyRulesStatus().pipe(
+      map((resp) => new GetApplyRulesStatusSuccess(resp)),
+      catchError((error: HttpErrorResponse) =>
+        observableOf(new GetApplyRulesStatusFailure(error))));
+  }
+
+}

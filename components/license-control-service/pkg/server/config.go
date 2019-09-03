@@ -11,7 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
-	"github.com/chef/automate/lib/platform"
+	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/tls/certs"
 )
 
@@ -75,7 +75,7 @@ func ConfigFromViper() (*Config, error) {
 	config.ServiceCerts = serviceCerts
 
 	if config.PGURL == "" {
-		config.PGURL, err = platform.PGURIFromEnvironment(config.Database)
+		config.PGURL, err = platform_config.PGURIFromEnvironment(config.Database)
 		if err != nil {
 			return config, errors.Wrap(err, "failed to get pg url")
 		}

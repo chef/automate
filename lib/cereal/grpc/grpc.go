@@ -6,23 +6,21 @@ import (
 	"io"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/wrappers"
-
 	"github.com/golang/protobuf/ptypes"
-
-	"github.com/chef/automate/lib/cereal"
+	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/sirupsen/logrus"
-
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-
 	"google.golang.org/grpc/status"
 
 	grpccereal "github.com/chef/automate/api/interservice/cereal"
+	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/backend"
 )
 
 var _ backend.Driver = &GrpcBackend{}
+
+var errUnknownMessage = errors.New("Unknown message received")
 
 type GrpcBackend struct {
 	domain string
@@ -41,6 +39,15 @@ func NewGrpcBackendFromConn(domain string, conn *grpc.ClientConn) *GrpcBackend {
 		client: grpccereal.NewCerealClient(conn),
 	}
 }
+
+func (g *GrpcBackend) DefaultTaskPollInterval() time.Duration {
+	return 10 * time.Second
+}
+
+func (g *GrpcBackend) DefaultWorkflowPollInterval() time.Duration {
+	return 2 * time.Second
+}
+
 func (g *GrpcBackend) EnqueueWorkflow(ctx context.Context, workflow *backend.WorkflowInstance) error {
 	if _, err := g.client.EnqueueWorkflow(ctx, &grpccereal.EnqueueWorkflowRequest{
 		Domain:       g.domain,
@@ -81,8 +88,30 @@ func (c *workflowCompleter) EnqueueTask(task *backend.Task, opts backend.TaskEnq
 	return nil
 }
 
-func (c *workflowCompleter) Continue(payload []byte) error {
+func (c *workflowCompleter) finish(err error) error {
 	defer c.s.CloseSend() // nolint: errcheck
+
+	if err != nil {
+		return err
+	}
+
+	if err := c.s.CloseSend(); err != nil {
+		logrus.WithError(err).Error("Failed to continue workflow")
+		return err
+	}
+	committedMsg, err := c.s.Recv()
+	if err != nil {
+		logrus.WithError(err).Error("Did not get committed message")
+		return err
+	}
+	if committedMsg.GetCommitted() == nil {
+		return errUnknownMessage
+	}
+
+	return nil
+}
+
+func (c *workflowCompleter) Continue(payload []byte) error {
 	err := c.s.Send(&grpccereal.DequeueWorkflowRequest{
 		Cmd: &grpccereal.DequeueWorkflowRequest_Continue_{
 			Continue: &grpccereal.DequeueWorkflowRequest_Continue{
@@ -91,19 +120,10 @@ func (c *workflowCompleter) Continue(payload []byte) error {
 			},
 		},
 	})
-	if err != nil {
-		return err
-	}
-	if err := c.s.CloseSend(); err != nil {
-		logrus.WithError(err).Error("failed to continue workflow")
-		return err
-	}
-	_, _ = c.s.Recv()
-	return nil
+	return c.finish(err)
 }
 
 func (c *workflowCompleter) Fail(errMsg error) error {
-	defer c.s.CloseSend() // nolint: errcheck
 	err := c.s.Send(&grpccereal.DequeueWorkflowRequest{
 		Cmd: &grpccereal.DequeueWorkflowRequest_Fail_{
 			Fail: &grpccereal.DequeueWorkflowRequest_Fail{
@@ -111,19 +131,10 @@ func (c *workflowCompleter) Fail(errMsg error) error {
 			},
 		},
 	})
-	if err != nil {
-		return err
-	}
-	if err := c.s.CloseSend(); err != nil {
-		logrus.WithError(err).Error("failed to fail workflow")
-		return err
-	}
-	_, _ = c.s.Recv()
-	return nil
+	return c.finish(err)
 }
 
 func (c *workflowCompleter) Done(result []byte) error {
-	defer c.s.CloseSend() // nolint: errcheck
 	err := c.s.Send(&grpccereal.DequeueWorkflowRequest{
 		Cmd: &grpccereal.DequeueWorkflowRequest_Done_{
 			Done: &grpccereal.DequeueWorkflowRequest_Done{
@@ -131,15 +142,7 @@ func (c *workflowCompleter) Done(result []byte) error {
 			},
 		},
 	})
-	if err != nil {
-		return err
-	}
-	if err := c.s.CloseSend(); err != nil {
-		logrus.WithError(err).Error("failed to complete workflow")
-		return err
-	}
-	_, _ = c.s.Recv()
-	return nil
+	return c.finish(err)
 }
 
 func (c *workflowCompleter) Close() error {
@@ -273,11 +276,10 @@ func (c *taskCompleter) Fail(errMsg string) error {
 	// request.
 	// We must wait to figure out if it was successful
 	err = <-c.doneChan
-	if err == nil || err == io.EOF {
-		return nil
-	} else {
+	if err != nil {
 		return transformErr(err)
 	}
+	return nil
 }
 
 func (c *taskCompleter) Succeed(result []byte) error {
@@ -350,22 +352,24 @@ func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*backen
 	taskCtx, cancel := context.WithCancel(ctx)
 	doneChan := make(chan error, 1)
 	go func() {
-		for {
-			msg, err := s.Recv()
-			if err != nil {
-				logrus.WithError(err).Debug("received error: canceling task context")
-				cancel()
-				doneChan <- err
-				return
-			}
-			if c := msg.GetCancel(); c != nil {
-				logrus.Debug("received cancel: canceling task context")
-				cancel()
-				doneChan <- errors.New("canceled")
-				return
-			}
+		// This goroutine will read the next, and what must be the last
+		// message.
+		var errOut error
+		msg, err := s.Recv()
+		if err != nil {
+			logrus.WithError(err).Debug("Received error while waiting for commited message")
+			errOut = err
+		} else if c := msg.GetCancel(); c != nil {
+			logrus.Debug("Received cancel while waiting for commited message")
+			errOut = context.Canceled
+		} else if c := msg.GetCommitted(); c != nil {
+			logrus.Debug("Received comitted")
+			errOut = nil
+		} else {
+			errOut = errUnknownMessage
 		}
-
+		cancel()
+		doneChan <- errOut
 	}()
 	return &backend.Task{
 			Name:       deq.GetTask().GetName(),
@@ -447,7 +451,7 @@ func (g *GrpcBackend) GetWorkflowScheduleByName(ctx context.Context, instanceNam
 		return nil, err
 	}
 	if resp.Schedule == nil {
-		logrus.Error("missing schedule")
+		logrus.Error("Missing schedule")
 		return nil, cereal.ErrWorkflowScheduleNotFound
 	}
 	return grpcSchedToBackend(resp.Schedule), nil
@@ -464,7 +468,7 @@ func grpcSchedToBackend(grpcSched *grpccereal.Schedule) *backend.Schedule {
 	if grpcSched.NextDueAt != nil {
 		ts, err := ptypes.Timestamp(grpcSched.NextDueAt)
 		if err != nil {
-			logrus.WithError(err).Warn("could not decode NextDueAt timestamp")
+			logrus.WithError(err).Warn("Could not decode NextDueAt timestamp")
 		}
 		schedule.NextDueAt = ts
 	}
@@ -472,7 +476,7 @@ func grpcSchedToBackend(grpcSched *grpccereal.Schedule) *backend.Schedule {
 	if grpcSched.LastEnqueuedAt != nil {
 		ts, err := ptypes.Timestamp(grpcSched.LastEnqueuedAt)
 		if err != nil {
-			logrus.WithError(err).Warn("could not decode LastEnqueuedAt timestamp")
+			logrus.WithError(err).Warn("Could not decode LastEnqueuedAt timestamp")
 		} else {
 			schedule.LastEnqueuedAt = ts
 		}
@@ -481,7 +485,7 @@ func grpcSchedToBackend(grpcSched *grpccereal.Schedule) *backend.Schedule {
 	if grpcSched.LastStart != nil {
 		ts, err := ptypes.Timestamp(grpcSched.LastStart)
 		if err != nil {
-			logrus.WithError(err).Warn("could not decode LastStart timestamp")
+			logrus.WithError(err).Warn("Could not decode LastStart timestamp")
 		} else {
 			schedule.LastStart = &ts
 		}
@@ -490,7 +494,7 @@ func grpcSchedToBackend(grpcSched *grpccereal.Schedule) *backend.Schedule {
 	if grpcSched.LastEnd != nil {
 		ts, err := ptypes.Timestamp(grpcSched.LastEnd)
 		if err != nil {
-			logrus.WithError(err).Warn("could not decode LastEnd timestamp")
+			logrus.WithError(err).Warn("Could not decode LastEnd timestamp")
 		} else {
 			schedule.LastEnd = &ts
 		}
@@ -556,7 +560,7 @@ func (g *GrpcBackend) GetWorkflowInstanceByName(ctx context.Context, instanceNam
 		return nil, err
 	}
 	if resp.WorkflowInstance == nil {
-		logrus.Error("missing workflow instance")
+		logrus.Error("Missing workflow instance")
 		return nil, cereal.ErrWorkflowInstanceNotFound
 	}
 	backendInstance := grpcWorkflowInstanceToBackend(resp.WorkflowInstance)
@@ -600,7 +604,7 @@ func (g *GrpcBackend) ListWorkflowInstances(ctx context.Context, opts backend.Li
 			return nil, err
 		}
 		if instance.WorkflowInstance == nil {
-			logrus.Error("received nil workflow instance")
+			logrus.Error("Received nil workflow instance")
 		}
 		backendInstance := grpcWorkflowInstanceToBackend(instance.WorkflowInstance)
 		instances = append(instances, &backendInstance)

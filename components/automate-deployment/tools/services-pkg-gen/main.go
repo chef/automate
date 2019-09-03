@@ -94,8 +94,9 @@ func main() {
 	removeDeploymentServiceFromCollections(metadata.Collections)
 
 	outStruct := product.Metadata{
-		Packages:    metadata.Packages,
-		Collections: metadata.Collections,
+		Packages:        metadata.Packages,
+		DeletedPackages: metadata.DeletedPackages,
+		Collections:     metadata.Collections,
 	}
 
 	encoder := json.NewEncoder(os.Stdout)

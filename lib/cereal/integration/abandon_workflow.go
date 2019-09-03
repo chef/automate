@@ -7,8 +7,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/chef/automate/lib/cereal"
 	"github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/lib/cereal"
 )
 
 func (suite *CerealTestSuite) TestCompleteWorkflowWithPendingWorkflowEvents() {
@@ -50,7 +51,7 @@ func (suite *CerealTestSuite) TestCompleteWorkflowWithPendingWorkflowEvents() {
 	suite.Require().NoError(err, "Failed to enqueue workflow")
 	wgTask.Wait()
 	time.Sleep(2 * time.Second) // Sleep a little to make sure task complete doesn't get called multiple times
-	logrus.Info("calling stop")
+	logrus.Info("Calling stop")
 	err = m.Stop()
 	suite.NoError(err)
 }

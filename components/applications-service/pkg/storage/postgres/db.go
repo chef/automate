@@ -2,7 +2,6 @@ package postgres
 
 import (
 	gosql "database/sql"
-	"time"
 
 	"github.com/go-gorp/gorp"
 	_ "github.com/lib/pq"
@@ -77,70 +76,5 @@ func (db *Postgres) initDB() error {
 		return errors.Wrapf(err, "Unable to create database schema. [path:%s]", db.SchemaPath)
 	}
 
-	// Add the tables to the database mappings
-	db.AddTableWithName(deployment{}, "deployment").SetKeys(true, "id")
-	db.AddTableWithName(supervisor{}, "supervisor").SetKeys(true, "id")
-	db.AddTableWithName(serviceGroup{}, "service_group").SetKeys(true, "id")
-	db.AddTableWithName(service{}, "service").SetKeys(true, "id")
-
-	//return db.CreateTablesIfNotExists() // I don't think we can ensure the foreign keys
 	return nil
-}
-
-// service struct is the representation of the service table inside the db
-type service struct {
-	ID                  int32     `db:"id"`
-	Origin              string    `db:"origin"`
-	Name                string    `db:"name"`
-	Version             string    `db:"version"`
-	Release             string    `db:"release"`
-	Status              string    `db:"status"`
-	Health              string    `db:"health"`
-	GroupID             int32     `db:"group_id"`
-	DeploymentID        int32     `db:"deployment_id"`
-	SupID               int32     `db:"sup_id"`
-	Channel             string    `db:"channel"`
-	FullPkgIdent        string    `db:"package_ident"`
-	PreviousHealth      string    `db:"previous_health"`
-	UpdateStrategy      string    `db:"update_strategy"`
-	LastEventOccurredAt time.Time `db:"last_event_occurred_at"`
-	HealthUpdatedAt     time.Time `db:"health_updated_at"`
-	CreatedAt           time.Time `db:"-"`
-	UpdatedAt           time.Time `db:"-"`
-}
-
-// supervisor struct is the representation of the supervisor table inside the db
-type supervisor struct {
-	ID        int32     `db:"id"`
-	MemberID  string    `db:"member_id"`
-	Fqdn      string    `db:"fqdn"`
-	Site      string    `db:"site"`
-	CreatedAt time.Time `db:"-"`
-	UpdatedAt time.Time `db:"-"`
-
-	// (internal) use it to know if the supervisor needs an update or not
-	needUpdate bool `db:"-"`
-}
-
-func (s *supervisor) NeedUpdate() bool {
-	return s.needUpdate
-}
-
-// serviceGroup struct is the representation of the service_group table inside the db
-type serviceGroup struct {
-	ID           int32     `db:"id"`
-	Name         string    `db:"name"`
-	NameSuffix   string    `db:"name_suffix"`
-	DeploymentID int32     `db:"deployment_id"`
-	CreatedAt    time.Time `db:"-"`
-	UpdatedAt    time.Time `db:"-"`
-}
-
-// deployment struct is the representation of the deployment table inside the db
-type deployment struct {
-	ID          int32     `db:"id"`
-	AppName     string    `db:"app_name"`
-	Environment string    `db:"environment"`
-	CreatedAt   time.Time `db:"-"`
-	UpdatedAt   time.Time `db:"-"`
 }

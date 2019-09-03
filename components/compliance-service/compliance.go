@@ -14,17 +14,17 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/teambition/rrule-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
 	"github.com/chef/automate/api/external/secrets"
 	auth "github.com/chef/automate/api/interservice/authn"
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
-	dls "github.com/chef/automate/api/interservice/data_lifecycle"
+	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/es_sidecar"
 	"github.com/chef/automate/api/interservice/event"
 	aEvent "github.com/chef/automate/api/interservice/event"
-	dlsserver "github.com/chef/automate/components/compliance-service/api/datalifecycle/server"
 	"github.com/chef/automate/components/compliance-service/api/jobs"
 	jobsserver "github.com/chef/automate/components/compliance-service/api/jobs/server"
 	"github.com/chef/automate/components/compliance-service/api/profiles"
@@ -45,6 +45,7 @@ import (
 	ingestserver "github.com/chef/automate/components/compliance-service/ingest/server"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/remote"
+	"github.com/chef/automate/components/compliance-service/inspec-agent/resolver"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/runner"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/scheduler"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
@@ -54,6 +55,10 @@ import (
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	notifications "github.com/chef/automate/components/notifications-client/api"
 	"github.com/chef/automate/components/notifications-client/notifier"
+	project_update_lib "github.com/chef/automate/lib/authz"
+	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/postgres"
+	"github.com/chef/automate/lib/datalifecycle/purge"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tracing"
 )
@@ -67,6 +72,11 @@ const (
 )
 
 var SERVICE_STATE serviceState
+
+const (
+	PurgeJobName      = "purge"
+	PurgeScheduleName = "periodic_purge"
+)
 
 func createESBackend(servConf *config.Compliance) relaxting.ES2Backend {
 	// define the ElasticSearch backend config with legacy automate auth
@@ -82,14 +92,6 @@ func createESBackend(servConf *config.Compliance) relaxting.ES2Backend {
 func createPGBackend(conf *config.Postgres) (*pgdb.DB, error) {
 	// define the Postgres Scanner backend
 	return pgdb.New(conf)
-}
-
-// hand over the array of job ids to the scheduler to be executed by the inspec-agent
-func runHungJobs(ctx context.Context, scheduledJobsIds []string, schedulerServer *scheduler.Scheduler) {
-	for SERVICE_STATE != serviceStateStarted {
-		time.Sleep(time.Second)
-	}
-	schedulerServer.RunHungJobs(ctx, scheduledJobsIds)
 }
 
 // here we execute migrations, create the es and pg backends, read certs, set up the needed env vars,
@@ -143,7 +145,7 @@ func initBits(ctx context.Context, conf *config.Compliance) (db *pgdb.DB, connFa
 // register all the services, start the grpc server, and call setup
 func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory,
 	esr relaxting.ES2Backend, conf config.Compliance, binding string,
-	statusSrv *statusserver.Server) {
+	statusSrv *statusserver.Server, cerealManager *cereal.Manager) {
 
 	lis, err := net.Listen("tcp", binding)
 	if err != nil {
@@ -153,10 +155,6 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	esClient, err := esr.ES2Client()
 	if err != nil {
 		logrus.Fatalf("could not connect to elasticsearch: %v", err)
-	}
-	configManager, err := config.NewConfigManager(conf.Service.ConfigFilePath)
-	if err != nil {
-		logrus.Fatalf("could not create config manager: %v", err)
 	}
 
 	eventClient := getEventConnection(connFactory, conf.EventConfig.Endpoint)
@@ -168,13 +166,25 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 
 	s := connFactory.NewServer(tracing.GlobalServerInterceptor())
 
+	cerealProjectUpdateManager, err := createProjectUpdateCerealManager(connFactory, conf.CerealConfig.Endpoint)
+	if err != nil {
+		logrus.WithError(err).Fatal("could not create cereal manager")
+	}
+	err = project_update_lib.RegisterTaskExecutors(cerealProjectUpdateManager, "compliance", ingesticESClient, authzProjectsClient)
+	if err != nil {
+		logrus.WithError(err).Fatal("could not register project update task executors")
+	}
+	if err := cerealProjectUpdateManager.Start(ctx); err != nil {
+		logrus.WithError(err).Fatal("could not start cereal manager")
+	}
+
 	// needs to be the first one, since it creates the es indices
 	ingest.RegisterComplianceIngesterServer(s,
 		ingestserver.NewComplianceIngestServer(ingesticESClient, nodeManagerServiceClient,
-			conf.InspecAgent.AutomateFQDN, notifier, authzProjectsClient, eventClient, configManager))
+			conf.InspecAgent.AutomateFQDN, notifier, authzProjectsClient))
 
 	jobs.RegisterJobsServiceServer(s, jobsserver.New(db, connFactory, eventClient,
-		conf.Service.Endpoint, conf.Secrets.Endpoint, conf.Manager.Endpoint, conf.RemoteInspecVersion))
+		conf.Manager.Endpoint, cerealManager))
 	reporting.RegisterReportingServiceServer(s, reportingserver.New(&esr))
 
 	ps := profilesserver.New(db, &esr, &conf.Profiles, eventClient, statusSrv)
@@ -185,11 +195,11 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	version.RegisterVersionServiceServer(s, versionserver.New())
 	status.RegisterComplianceStatusServer(s, statusSrv)
 
-	dlsManageable, err := setupDataLifecycleManageableInterface(ctx, connFactory, conf)
+	purgeServer, err := setupDataLifecyclePurgeInterface(ctx, connFactory, conf, cerealManager)
 	if err != nil {
-		logrus.Fatalf("serveGrpc aborting, can't setup dlsManageable: %s", err)
+		logrus.Fatalf("serveGrpc aborting, can't setup purge server: %s", err)
 	}
-	dls.RegisterDataLifecycleManageableServer(s, dlsManageable)
+	data_lifecycle.RegisterPurgeServer(s, purgeServer)
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
@@ -211,7 +221,7 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	// `setup` depends on `Serve` because it dials back to the compliance-service itself.
 	// For this to work we launch `Serve` in a goroutine and connect WithBlock to itself and other dependent services from `setup`
 	// A connect timeout is used to ensure error reporting in the event of failures to connect
-	err = setup(ctx, connFactory, conf, esr, db)
+	err = setup(ctx, connFactory, conf, esr, db, cerealManager)
 	if err != nil {
 		logrus.Fatalf("serveGrpc aborting, we have a problem, setup failed: %s", err.Error())
 	}
@@ -221,6 +231,22 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 
 	// if we reach this, we've had an issue in Serve()
 	logrus.Fatalf("serveGrpc aborting, we have a problem: %s", err.Error())
+}
+
+func createProjectUpdateCerealManager(connFactory *secureconn.Factory, address string) (*cereal.Manager, error) {
+	conn, err := connFactory.Dial("cereal-service", address)
+	if err != nil {
+		return nil, errors.Wrap(err, "error dialing cereal service")
+	}
+
+	grpcBackend := project_update_lib.ProjectUpdateBackend(conn)
+	manager, err := cereal.NewManager(grpcBackend)
+	if err != nil {
+		grpcBackend.Close() // nolint: errcheck
+		return nil, err
+	}
+
+	return manager, nil
 }
 
 func getEventConnection(connectionFactory *secureconn.Factory,
@@ -338,41 +364,130 @@ func getManagerConnection(connectionFactory *secureconn.Factory,
 	return mgrClient
 }
 
-func setupDataLifecycleManageableInterface(ctx context.Context, connFactory *secureconn.Factory,
-	conf config.Compliance) (*dlsserver.DataLifecycleManageableServer, error) {
-	purgePolicies := []dlsserver.PurgePolicy{}
-	if conf.ComplianceReportDays > 0 {
-		purgePolicies = append(purgePolicies, dlsserver.PurgePolicy{
-			IndexName:          fmt.Sprintf("comp-%s-s", mappings.ComplianceCurrentTimeSeriesIndicesVersion),
-			PurgeOlderThanDays: conf.ComplianceReportDays,
-		})
-		purgePolicies = append(purgePolicies, dlsserver.PurgePolicy{
-			IndexName:          fmt.Sprintf("comp-%s-r", mappings.ComplianceCurrentTimeSeriesIndicesVersion),
-			PurgeOlderThanDays: conf.ComplianceReportDays,
-		})
-	}
+func setupDataLifecyclePurgeInterface(ctx context.Context, connFactory *secureconn.Factory,
+	conf config.Compliance, cerealManager *cereal.Manager) (*purge.Server, error) {
 
-	var err error
-	var esSidecarConn *grpc.ClientConn
-	if os.Getenv("RUN_MODE") == "test" {
-		logrus.Infof(`Skipping ES sidecar-service dial due to RUN_MODE env var being set to "test"`)
-	} else {
-		timeoutCtx, cancel := context.WithTimeout(ctx, 60*time.Second)
-		defer cancel()
-		// Data Lifecycle Interface
-		logrus.Infof("Connecting to %s", conf.ESSidecarAddress)
-		esSidecarConn, err = connFactory.DialContext(timeoutCtx, "es-sidecar-service",
-			conf.ESSidecarAddress, grpc.WithBlock())
-		if err != nil || esSidecarConn == nil {
-			logrus.WithFields(logrus.Fields{"error": err}).Fatal("Failed to create ES Sidecar connection")
-			return nil, err
+	var (
+		compSIndex           = fmt.Sprintf("comp-%s-s", mappings.ComplianceCurrentTimeSeriesIndicesVersion)
+		compSName            = "compliance-scans"
+		compRIndex           = fmt.Sprintf("comp-%s-r", mappings.ComplianceCurrentTimeSeriesIndicesVersion)
+		compRName            = "compliance-reports"
+		defaultPurgePolicies = &purge.Policies{
+			Es: map[string]purge.EsPolicy{
+				compSName: {
+					Name:          compSName,
+					IndexName:     compSIndex,
+					OlderThanDays: conf.ComplianceReportDays,
+				},
+				compRName: {
+					Name:          compRName,
+					IndexName:     compRIndex,
+					OlderThanDays: conf.ComplianceReportDays,
+				},
+			},
+		}
+		err             error
+		esSidecarConn   *grpc.ClientConn
+		esSidecarClient es_sidecar.EsSidecarClient
+		recurrence      *rrule.RRule
+	)
+
+	// Migrate default policy values from the config. The default policies are
+	// only persisted the first time the workflow is created, after which only
+	// new default policies are added and/or existing policies indicies are
+	// updated in case they have been migrated.
+	//
+	// Compliance defaults to -1 when run outside of the deployment-service, which
+	// signaled that it should be disabled. When run with deployment-service it
+	// had a default retention period of 60 days. The configuration has been
+	// deprecated and is no longer valid and the default of 60 has been removed,
+	// making the default value 0. If we have -1 it should be disabled,
+	// if it's set to 0 it should be set at 60, otherwise it should be set at
+	// the user defined value at the time of the initial migration.
+
+	days := conf.ComplianceReportDays
+	switch {
+	case days < 0:
+		for i, p := range defaultPurgePolicies.Es {
+			p.Disabled = true
+			defaultPurgePolicies.Es[i] = p
+		}
+	case days == 0:
+		for i, p := range defaultPurgePolicies.Es {
+			p.OlderThanDays = 60
+			defaultPurgePolicies.Es[i] = p
+		}
+	default:
+		for i, p := range defaultPurgePolicies.Es {
+			p.OlderThanDays = conf.ComplianceReportDays
+			defaultPurgePolicies.Es[i] = p
 		}
 	}
-	return dlsserver.NewDataLifecycleManageableServer(es_sidecar.NewEsSidecarClient(esSidecarConn), purgePolicies), nil
+
+	timeoutCtx, cancel := context.WithTimeout(ctx, 60*time.Second)
+	defer cancel()
+
+	addr := conf.ElasticSearchSidecar.Address
+	logrus.WithField("address", addr).Info("Connecting to Elasticsearch Sidecar")
+	dialOpts := []grpc.DialOption{}
+
+	if os.Getenv("RUN_MODE") == "test" {
+		logrus.Info(`RUN_MODE is set to "test", not requiring block dial to es-sidecar-service`)
+	} else {
+		dialOpts = append(dialOpts, grpc.WithBlock())
+	}
+
+	esSidecarConn, err = connFactory.DialContext(timeoutCtx, "es-sidecar-service",
+		addr, dialOpts...)
+	if err != nil || esSidecarConn == nil {
+		logrus.WithFields(logrus.Fields{"error": err}).Fatal("Failed to create ES Sidecar connection")
+		return nil, err
+	}
+	esSidecarClient = es_sidecar.NewEsSidecarClient(esSidecarConn)
+
+	err = purge.ConfigureManager(
+		cerealManager,
+		PurgeScheduleName,
+		PurgeJobName,
+		purge.WithTaskEsSidecarClient(esSidecarClient),
+	)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to configure %s workflow", PurgeJobName)
+	}
+
+	recurrence, err = rrule.NewRRule(rrule.ROption{
+		Freq:     rrule.DAILY,
+		Interval: 1,
+		Dtstart:  time.Now(),
+	})
+	if err != nil {
+		return nil, errors.Wrapf(err, "could not create recurrence rule for %s", PurgeScheduleName)
+	}
+
+	err = purge.CreateOrUpdatePurgeWorkflow(
+		timeoutCtx,
+		cerealManager,
+		PurgeScheduleName,
+		PurgeJobName,
+		defaultPurgePolicies,
+		true,
+		recurrence,
+	)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create or update purge workflow schedule")
+	}
+
+	return purge.NewServer(
+		cerealManager,
+		PurgeScheduleName,
+		PurgeJobName,
+		defaultPurgePolicies,
+		purge.WithServerEsSidecarClient(esSidecarClient),
+	)
 }
 
 func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Compliance,
-	esr relaxting.ES2Backend, db *pgdb.DB) error {
+	esr relaxting.ES2Backend, db *pgdb.DB, cerealManager *cereal.Manager) error {
 	var err error
 	var conn, mgrConn, secretsConn, authConn *grpc.ClientConn
 	timeoutCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
@@ -431,21 +546,23 @@ func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Com
 
 	// set up the scanner, scheduler, and runner servers with needed clients
 	// these are all inspec-agent packages
-	scannerServer := scanner.New(mgrClient, nodesClient, db)
-	schedulerServer := scheduler.New(mgrClient, nodesClient, db, ingestClient, secretsClient, conf.RemoteInspecVersion)
-	runnerServer := runner.New(mgrClient, nodesClient, db, ingestClient, conf.RemoteInspecVersion)
+	scanner := scanner.New(mgrClient, nodesClient, db)
+	resolver := resolver.New(mgrClient, nodesClient, db, secretsClient)
+	err = runner.InitCerealManager(cerealManager, conf.InspecAgent.JobWorkers, ingestClient, scanner, resolver, conf.RemoteInspecVersion)
+	if err != nil {
+		return errors.Wrap(err, "failed to initialize cereal manager")
+	}
+
+	err = cerealManager.Start(ctx)
+	if err != nil {
+		return errors.Wrap(err, "failed to start cereal manager")
+	}
+	schedulerServer := scheduler.New(scanner, cerealManager)
 
 	// start polling for jobs with a recurrence schedule that are due to run.
 	// this function will sleep for one minute, then query the db for all jobs
 	// with recurrence and check if it's time to run the job
 	go schedulerServer.PollForJobs(ctx)
-
-	// start the InspecAgent workers.  the workers represent the amount of goroutines
-	// available to execute a scan.  the buffer size represents the maximum amount of jobs
-	// that may get backed up in the agent queue
-	logrus.Infof("compliance service initializing %d job workers with %d job buffer size",
-		conf.InspecAgent.JobWorkers, conf.InspecAgent.JobBufferSize)
-	runnerServer.SetWorkers(conf.InspecAgent.JobWorkers, conf.InspecAgent.JobBufferSize)
 
 	if os.Getenv("RUN_MODE") == "test" {
 		logrus.Infof(`Skipping AUTHN client setup due to RUN_MODE env var being set to "test"`)
@@ -473,24 +590,7 @@ func setup(ctx context.Context, connFactory *secureconn.Factory, conf config.Com
 	}
 
 	SERVICE_STATE = serviceStateStarted
-	go checkAndRunHungJobs(ctx, scannerServer, schedulerServer)
 	return nil
-}
-
-func checkAndRunHungJobs(ctx context.Context, scannerServer *scanner.Scanner,
-	schedulerServer *scheduler.Scheduler) {
-	// check for 'abandoned' jobs by querying for jobs with a status of running or scheduled
-	// of type exec that have not been marked for deletion. jobs with a status of running will
-	// be marked as aborted.  only jobs with a status of scheduled will be returned.
-	// this is done b/c the inspec-agent is ephemeral -- if a service restart occurs when the agent
-	// has already been given jobs, it will lose all references to those jobs
-	scheduledJobsIds, err := scannerServer.CheckForHungJobs(ctx)
-	if err != nil {
-		logrus.Errorf("unable to check for abandoned jobs %+v", err)
-	} else {
-		// hand over all 'abandoned' jobs with status scheduled to the scheduler
-		runHungJobs(ctx, scheduledJobsIds, schedulerServer)
-	}
 }
 
 // Serve grpc
@@ -504,7 +604,19 @@ func Serve(conf config.Compliance, grpcBinding string) error {
 		return err
 	}
 	SERVICE_STATE = serviceStateStarting
-	go serveGrpc(ctx, db, connFactory, esr, conf, grpcBinding, statusSrv) // nolint: errcheck
+
+	cerealManager, err := cereal.NewManager(postgres.NewPostgresBackend(conf.Postgres.ConnectionString))
+	if err != nil {
+		return err
+	}
+	defer func() {
+		err := cerealManager.Stop()
+		if err != nil {
+			logrus.WithError(err).Error("could not stop cereal manager")
+		}
+	}()
+
+	go serveGrpc(ctx, db, connFactory, esr, conf, grpcBinding, statusSrv, cerealManager) // nolint: errcheck
 
 	cfg := NewServiceConfig(&conf, connFactory)
 	return cfg.serveCustomRoutes()

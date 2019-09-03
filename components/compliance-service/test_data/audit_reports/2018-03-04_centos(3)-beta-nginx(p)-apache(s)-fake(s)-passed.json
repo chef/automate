@@ -67,8 +67,11 @@
           "desc": "The NGINX worker processes should run as non-privileged user. In case of compromise of the process, an attacker has full access to the system.",
           "impact": 1,
           "refs": [],
-          "tags": {},
-          "code": "control 'nginx-01' do\n  impact 1.0\n  title 'Running worker process as non-privileged user'\n  desc 'The NGINX worker processes should run as non-privileged user. In case of compromise of the process, an attacker has full access to the system.'\n  describe user(nginx_lib.valid_users) do\n    it { should exist }\n  end\n  describe parse_config_file(nginx_conf, options) do\n    its('user') { should eq nginx_lib.valid_users }\n  end\n\n  describe parse_config_file(nginx_conf, options) do\n    its('group') { should_not eq 'root' }\n  end\nend\n",
+          "tags": {
+            "web": null,
+            "scope": "NginX"
+          },
+          "code": "control 'nginx-01' do\n  impact 1.0\n  title 'Running worker process as non-privileged user'\n  desc 'The NGINX worker processes should run as non-privileged user. In case of compromise of the process, an attacker has full access to the system.'\n  describe user(nginx_lib.valid_users) do\n    it { should exist }\n  end\n  describe parse_config_file(nginx_conf, options) do\n    its('user') { should eq nginx_lib.valid_users }\n  end\n\n  describe parse_config_file(nginx_conf, options) do\n    its('group') { should_not eq 'root' }\n  end\n  tag 'web'\n  tag 'scope': 'NginX'\nend\n",
           "source_location": {
             "line": 99,
             "ref": "nginx-baseline-master/controls/nginx_spec.rb"
@@ -163,7 +166,7 @@
       "controls": [
         {
           "id": "apache-03",
-          "code": "control 'apache-03' do\n  title 'Apache should start max. 1 root-task'\n  desc 'The Apache service in its own non-privileged account. If the web server process runs with administrative privileges, an attack who obtains control over the apache process may control the entire system.'\n  total_tasks = command(\"ps aux | grep #{apache.service} | grep -v grep | grep root | wc -l | tr -d [:space:]\").stdout.to_i\n  describe total_tasks do\n    it { should eq 1 }\n  end\nend\n",
+          "code": "control 'apache-03' do\n  title 'Apache should start max. 1 root-task'\n  desc 'The Apache service in its own non-privileged account. If the web server process runs with administrative privileges, an attack who obtains control over the apache process may control the entire system.'\n  total_tasks = command(\"ps aux | grep #{apache.service} | grep -v grep | grep root | wc -l | tr -d [:space:]\").stdout.to_i\n  describe total_tasks do\n    it { should eq 1 }\n  end\n  tag 'web'\n  tag 'scope': 'Apache'\nend\n",
           "desc": "The Apache service in its own non-privileged account. If the web server process runs with administrative privileges, an attack who obtains control over the apache process may control the entire system.",
           "impact": 0.5,
           "title": "Apache should start max. 1 root-task",
@@ -172,7 +175,10 @@
             "line": 49
           },
           "refs": [],
-          "tags": {},
+          "tags": {
+            "web": null,
+            "scope": "Apache"
+          },
           "results": [
             {
               "status": "skipped",

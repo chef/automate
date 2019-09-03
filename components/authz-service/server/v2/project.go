@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/stringutils"
@@ -17,17 +19,12 @@ import (
 	tspb "github.com/golang/protobuf/ptypes/timestamp"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
-	automate_event "github.com/chef/automate/api/interservice/event"
-	"github.com/chef/automate/components/authz-service/config"
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
-	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
-	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/memstore"
 	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
-	event "github.com/chef/automate/components/event-service/server"
 )
 
 // ProjectState holds the server state for projects
@@ -45,32 +42,35 @@ func NewMemstoreProjectsServer(
 	ctx context.Context,
 	l logger.Logger,
 	e engine.ProjectRulesRetriever,
-	eventServiceClient automate_event.EventServiceClient,
-	configManager *config.Manager,
+	projectUpdateCerealManager *cereal.Manager,
 	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
 
-	projectUpdateManager := NewProjectUpdateManager(eventServiceClient, configManager)
-	return NewProjectsServer(ctx, l, memstore.New(), e, projectUpdateManager, pr)
+	s := memstore.New()
+	projectUpdateManager, err := RegisterCerealProjectUpdateManager(projectUpdateCerealManager, l, s, pr)
+	if err != nil {
+		return nil, err
+	}
+	return NewProjectsServer(ctx, l, s, e, projectUpdateManager, pr)
 }
 
 // NewPostgresProjectsServer instantiates a ProjectsServer using a PG store
 func NewPostgresProjectsServer(
 	ctx context.Context,
 	l logger.Logger,
-	migrationsConfig migration.Config,
-	dataMigrationsConfig datamigration.Config,
 	e engine.ProjectRulesRetriever,
-	eventServiceClient automate_event.EventServiceClient,
-	configManager *config.Manager,
+	projectUpdateCerealManager *cereal.Manager,
 	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
 
-	s, err := postgres.New(ctx, l, migrationsConfig, dataMigrationsConfig)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to initialize v2 store state")
+	s := postgres.GetInstance()
+	if s == nil {
+		return nil, errors.New("postgres v2 singleton not yet initialized for projects server")
 	}
-	projectUpdateManager := NewProjectUpdateManager(eventServiceClient, configManager)
+	projectUpdateManager, err := RegisterCerealProjectUpdateManager(projectUpdateCerealManager, l, s, pr)
+	if err != nil {
+		return nil, err
+	}
 	return NewProjectsServer(ctx, l, s, e, projectUpdateManager, pr)
 }
 
@@ -113,7 +113,7 @@ func (s *ProjectState) GetProject(ctx context.Context,
 
 func (s *ProjectState) CreateProject(ctx context.Context,
 	req *api.CreateProjectReq) (*api.CreateProjectResp, error) {
-	p, err := storage.NewProject(req.Id, req.Name, storage.Custom)
+	p, err := storage.NewProject(req.Id, req.Name, storage.Custom, storage.NoRules)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument,
 			"creating project with ID %q: %s", req.Id, err.Error())
@@ -145,7 +145,7 @@ func (s *ProjectState) CreateProject(ctx context.Context,
 
 func (s *ProjectState) UpdateProject(ctx context.Context,
 	req *api.UpdateProjectReq) (*api.UpdateProjectResp, error) {
-	p, err := storage.NewProject(req.Id, req.Name, storage.Custom)
+	p, err := storage.NewProject(req.Id, req.Name, storage.Custom, storage.NoRules)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument,
 			"updating project with ID %q: %s", req.Id, err.Error())
@@ -179,43 +179,59 @@ func (s *ProjectState) ApplyRulesStart(
 	s.applyRuleMux.Lock()
 	defer s.applyRuleMux.Unlock()
 
-	switch s.ProjectUpdateManager.State() {
-	case config.NotRunningState:
-		break
-	case config.RunningState:
-		return nil, status.Error(codes.FailedPrecondition,
-			"cannot apply rules: apply already in progress")
-	default:
-		return nil, status.Error(codes.Internal,
-			"failed to parse state of rule apply")
-	}
-
 	s.log.Info("apply project rules: START")
-	err := s.store.ApplyStagedRules(ctx)
-	if err != nil {
-		s.log.Warnf("error applying staged projects: %s", err.Error())
-		return nil, status.Errorf(codes.Internal,
-			"error applying staged projects: %s", err.Error())
-	}
-
-	// TODO (tc): If we panic between here and manager Start, we will be in a state where the rules
-	// have been updated in the database but Refresh has not been kicked off.
-	// We will be refactoring with workflow to make this safer soon.
-	err = s.policyRefresher.Refresh(ctx)
-	if err != nil {
-		s.log.Warnf("error refreshing policy cache. the rules were updated but the apply was not started, please try again.")
-		return nil, status.Errorf(codes.Internal,
-			"error refreshing policy cache: %s", err.Error())
-	}
-
-	err = s.ProjectUpdateManager.Start()
+	err := s.ProjectUpdateManager.Start()
 	if err != nil {
 		s.log.Warnf("error starting project update. the rules and cache were updated but the apply was not started, please try again.")
 		return nil, status.Errorf(codes.Internal,
 			"error starting project update: %s", err.Error())
 	}
 
+	if err := s.waitForApplyStagedRules(ctx, 10*time.Second); err != nil {
+		return nil, err
+	}
+
 	return &api.ApplyRulesStartResp{}, nil
+}
+
+func (s *ProjectState) waitForApplyStagedRules(ctx context.Context, maxWaitTime time.Duration) error {
+	ctx, cancel := context.WithTimeout(ctx, maxWaitTime)
+	defer cancel()
+	s.log.Info("Waiting for ApplyStagedRules")
+	tries := 0
+	startTime := time.Now()
+	for {
+		logctx := s.log.WithField("tries", tries+1).WithField("duration", time.Since(startTime))
+		st, err := s.ProjectUpdateManager.Status()
+		if err != nil {
+			s.log.WithError(err).Warn("failed to get project update status")
+		} else {
+			stage := st.Stage()
+			switch stage {
+			case ProjectUpdateStageUpdateDomainServices, ProjectUpdateStageUpdateDone:
+				logctx.Info("Done waiting for ApplyStagedRules")
+				return nil
+			case ProjectUpdateStageApplyStagedRules:
+				// Still applying the staged rules
+				logctx.Debug("Waiting for apply staged rules to run")
+			default:
+				err := status.Errorf(codes.Internal, "Unexpected project update stage %s", stage)
+				logctx.WithError(err).Error("Workflow may not have completed ApplyStagedRules")
+				return err
+			}
+		}
+		sleepTime := time.Duration((5 * (1 << uint(tries)))) * time.Millisecond
+		if sleepTime > time.Second {
+			sleepTime = time.Second
+		}
+		select {
+		case <-ctx.Done():
+			logctx.Error("Timed out waiting for ApplyStagedRules")
+			return status.Error(codes.DeadlineExceeded, "Timed out waiting for ApplyStagedRules")
+		case <-time.After(sleepTime):
+		}
+		tries++
+	}
 }
 
 func (s *ProjectState) ApplyRulesCancel(
@@ -230,17 +246,22 @@ func (s *ProjectState) ApplyRulesCancel(
 
 func (s *ProjectState) ApplyRulesStatus(
 	context.Context, *api.ApplyRulesStatusReq) (*api.ApplyRulesStatusResp, error) {
-	time, err := ptypes.TimestampProto(s.ProjectUpdateManager.EstimatedTimeComplete())
+	status, err := s.ProjectUpdateManager.Status()
+	if err != nil {
+		return nil, err
+	}
+
+	time, err := ptypes.TimestampProto(status.EstimatedTimeComplete())
 	if err != nil {
 		s.log.Errorf("Could not convert EstimatedTimeComplete to protobuf Timestamp %v", err)
 		time = &tspb.Timestamp{}
 	}
 	return &api.ApplyRulesStatusResp{
-		State:                 s.ProjectUpdateManager.State(),
-		PercentageComplete:    float32(s.ProjectUpdateManager.PercentageComplete()),
+		State:                 string(status.State()),
+		PercentageComplete:    float32(status.PercentageComplete()),
 		EstimatedTimeComplete: time,
-		Failed:                s.ProjectUpdateManager.Failed(),
-		FailureMessage:        s.ProjectUpdateManager.FailureMessage(),
+		Failed:                status.Failed(),
+		FailureMessage:        status.FailureMessage(),
 	}, nil
 }
 
@@ -344,26 +365,6 @@ func (s *ProjectState) ListRulesForAllProjects(ctx context.Context,
 	return &api.ListRulesForAllProjectsResp{
 		ProjectRules: projects,
 	}, nil
-}
-
-func (s *ProjectState) HandleEvent(ctx context.Context,
-	req *automate_event.EventMsg) (*automate_event.EventResponse, error) {
-	s.log.Debugf("authz is handling your event %s", req.EventID)
-
-	response := &automate_event.EventResponse{}
-	if req.Type.Name == event.ProjectRulesUpdateStatus {
-		err := s.ProjectUpdateManager.ProcessStatusEvent(req)
-		if err != nil {
-			return response, err
-		}
-	} else if req.Type.Name == event.ProjectRulesUpdateFailed {
-		err := s.ProjectUpdateManager.ProcessFailEvent(req)
-		if err != nil {
-			return response, err
-		}
-	}
-
-	return response, nil
 }
 
 func (s *ProjectState) CreateRule(ctx context.Context, req *api.CreateRuleReq) (*api.CreateRuleResp, error) {
@@ -556,9 +557,10 @@ func storageCondition(apiCondition *api.Condition) (storage.Condition, error) {
 // nolint: unparam
 func fromStorageProject(p *storage.Project) (*api.Project, error) {
 	return &api.Project{
-		Id:   p.ID,
-		Name: p.Name,
-		Type: typeFromInternal(p.Type),
+		Id:     p.ID,
+		Name:   p.Name,
+		Type:   typeFromInternal(p.Type),
+		Status: p.Status,
 	}, nil
 }
 

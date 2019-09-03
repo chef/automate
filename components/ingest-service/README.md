@@ -111,10 +111,12 @@ The following code snippet illustrates the use of the GRPC Service
 package main
 
 import (
-	log "github.com/sirupsen/logrus"
-	pb "github.com/chef/automate/api/interservice/ingest"
-	"golang.org/x/net/context"
+	"context"
+
 	"google.golang.org/grpc"
+	log "github.com/sirupsen/logrus"
+
+	pb "github.com/chef/automate/api/interservice/ingest"
 )
 
 func main() {

@@ -80,7 +80,7 @@ export function teamEntityReducer(state: TeamEntityState = TeamEntityInitialStat
       return set(
         'getStatus',
         EntityStatus.loadingSuccess,
-        teamEntityAdapter.addOne(action.payload, state)
+        teamEntityAdapter.upsertOne(action.payload, state)
       ) as TeamEntityState;
     }
 

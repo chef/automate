@@ -1,13 +1,12 @@
 package integration_test
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"golang.org/x/net/context"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
@@ -539,6 +538,8 @@ func TestReportingListSuggestionsLargeArrayValues(t *testing.T) {
 }
 
 func TestReportingListSuggestions(t *testing.T) {
+	suite.DeleteAllDocuments()
+
 	reportFileName := "../ingest/examples/compliance-success-tiny-report.json"
 	everythingCtx := contextWithProjects([]string{authzConstants.AllProjectsExternalID})
 
@@ -578,6 +579,9 @@ func TestReportingListSuggestions(t *testing.T) {
 
 		return response != nil && len(response.Reports) == n
 	})
+
+	suite.RefreshComplianceSummaryIndex()
+	suite.RefreshComplianceReportIndex()
 
 	reportsProjects := map[string][]string{
 		"project1": reportIds[1:3],

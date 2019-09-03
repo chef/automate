@@ -9,6 +9,8 @@ import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { apiTokenEntityReducer } from 'app/entities/api-tokens/api-token.reducer';
 import { GetAllTokensSuccess } from 'app/entities/api-tokens/api-token.actions';
 import { ApiTokenListComponent } from './api-token-list.component';
+import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
+import { projectsFilterReducer } from 'app/services/projects-filter/projects-filter.reducer';
 
 describe('ApiTokenListComponent', () => {
   let component: ApiTokenListComponent;
@@ -22,12 +24,14 @@ describe('ApiTokenListComponent', () => {
         RouterTestingModule,
         ChefPipesModule,
         StoreModule.forRoot({
-          apiTokens: apiTokenEntityReducer
+          apiTokens: apiTokenEntityReducer,
+          policies: policyEntityReducer,
+          projectsFilter: projectsFilterReducer
         })
       ],
       declarations: [
         ApiTokenListComponent,
-        MockComponent({ selector: 'app-admin-sidebar' }),
+        MockComponent({ selector: 'app-settings-sidebar' }),
         MockComponent({
           selector: 'chef-toolbar',
           template: '<ng-content></ng-content>'
@@ -40,8 +44,9 @@ describe('ApiTokenListComponent', () => {
                         outputs: ['close', 'deleteClicked'] }),
         MockComponent({ selector: 'app-create-object-modal',
                         inputs: ['creating', 'createForm',
-                                 'visible', 'objectNoun', 'conflictErrorEvent'],
-                        outputs: ['close', 'deleteClicked'] }),
+                                 'visible', 'objectNoun', 'conflictErrorEvent',
+                                 'showProjectsDropdown', 'assignableProjects'],
+                        outputs: ['close', 'createClicked'] }),
         MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
         MockComponent({ selector: 'chef-clipboard', inputs: ['value'] }),
         MockComponent({ selector: 'chef-control-menu' }),
@@ -79,10 +84,12 @@ describe('ApiTokenListComponent', () => {
       expect(component.createModalVisible).toBe(true);
     });
 
-    it('opening create modal resets name to empty string', () => {
+    it('opening create modal resets name, id, and projects to empty', () => {
       component.createTokenForm.controls['name'].setValue('any');
       (<HTMLButtonElement>(element.querySelector('#create-button'))).click();
-      expect(component.createTokenForm.controls['name'].value).toBe(null);
+      expect(component.createTokenForm.controls.name.value).toBe(null);
+      expect(component.createTokenForm.controls.id.value).toBe(null);
+      expect(component.createTokenForm.controls.projects.value).toBe(null);
     });
   });
 

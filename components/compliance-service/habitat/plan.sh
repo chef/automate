@@ -24,13 +24,14 @@ pkg_binds=(
   [event-service]="port"
   [authz-service]="port"
   [nodemanager-service]="port"
+  [cereal-service]="port"
 )
 pkg_binds_optional=(
   [es-sidecar-service]="port"
   [authn-service]="port"
   [notifications-service]="port"
 )
-inspec_release="chef/inspec/4.7.24/20190725222329"
+inspec_release="chef/inspec/4.16.0/20190829191134"
 pkg_deps=(
   core/bash
   core/glibc
@@ -50,7 +51,7 @@ else
     # WARNING: chef/automate-compliance-profiles is managed by Expeditor
     # See .expeditor/update-compliance-profiles.sh for details
     pkg_deps+=(
-        chef/automate-compliance-profiles/1.0.0/20190813143917
+        chef/automate-compliance-profiles/1.0.0/20190902131636
     )
 fi
 
