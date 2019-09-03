@@ -34,7 +34,8 @@
       objectNoun="team"
       [objectName]="isMajorV1 ? teamToDelete?.id : teamToDelete?.name"
       (close)="closeDeleteModal()"
-      (deleteClicked)="deleteTeam()">
+      (deleteClicked)="deleteTeam()"
+      ObjectAction="Delete">
     </app-delete-object-modal>
 
     <div class="page-body">
