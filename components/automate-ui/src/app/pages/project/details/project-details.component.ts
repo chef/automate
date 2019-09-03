@@ -17,7 +17,7 @@ import { Project } from 'app/entities/projects/project.model';
 import { GetProject, UpdateProject } from 'app/entities/projects/project.actions';
 import { GetRulesForProject, DeleteRule } from 'app/entities/rules/rule.actions';
 import { Rule, RuleStatus } from 'app/entities/rules/rule.model';
-import { allRules } from 'app/entities/rules/rule.selectors';
+import { allRules, getAllStatus } from 'app/entities/rules/rule.selectors';
 
 export type ProjectTabName = 'rules' | 'details';
 
@@ -69,13 +69,15 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(getStatus),
-      this.store.select(updateStatus)
+      this.store.select(updateStatus),
+      this.store.select(getAllStatus)
     ]).pipe(
       takeUntil(this.isDestroyed),
-      map(([gStatus, uStatus]) => {
+      map(([getProjectStatus, updateStatus, getRulesStatus]) => {
         this.isLoading =
-          (gStatus !== EntityStatus.loadingSuccess) ||
-          (uStatus === EntityStatus.loading);
+          (getProjectStatus !== EntityStatus.loadingSuccess) ||
+          (updateStatus === EntityStatus.loading) ||
+          (getRulesStatus !== EntityStatus.loadingSuccess);
       })
     ).subscribe();
 
@@ -113,11 +115,11 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   }
 
   showFirstRuleMessage(): boolean {
-    return this.rules.length === 0;
+    return !this.isLoading && this.rules.length === 0;
   }
 
   showRulesTable(): boolean {
-    return this.rules.length > 0;
+    return !this.isLoading && this.rules.length > 0;
   }
 
   closeDeleteModal(): void {
