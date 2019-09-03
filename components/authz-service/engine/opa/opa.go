@@ -501,7 +501,7 @@ func (s *State) SetPolicies(ctx context.Context, policies map[string]interface{}
 	return s.initPartialResult(ctx)
 }
 
-// V2SetPolicies replaces OPA's data with a new set of policies, roles
+// V2SetPolicies replaces OPA's data with a new set of policies and roles
 // and resets the partial evaluation cache for v2
 func (s *State) V2SetPolicies(
 	ctx context.Context, policyMap map[string]interface{},
@@ -514,7 +514,7 @@ func (s *State) V2SetPolicies(
 	return s.initPartialResultV2(ctx)
 }
 
-// V2p1SetPolicies replaces OPA's data with a new set of policies, roles
+// V2p1SetPolicies replaces OPA's data with a new set of policies and roles
 // and resets the partial evaluation cache for v2.l
 func (s *State) V2p1SetPolicies(
 	ctx context.Context, policyMap map[string]interface{},

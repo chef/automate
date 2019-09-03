@@ -1172,11 +1172,6 @@ func (p *pg) FetchAppliedRulesByProjectIDs(ctx context.Context) (map[string][]*v
 		return nil, err
 	}
 
-	// nothing stored while on v1 or v2.0
-	if len(rules) == 0 {
-		return map[string][]*v2.Rule{}, nil
-	}
-
 	projectRules := make(map[string][]*v2.Rule, len(rules))
 	for _, rule := range rules {
 		projectRules[rule.ProjectID] = append(projectRules[rule.ProjectID], rule)

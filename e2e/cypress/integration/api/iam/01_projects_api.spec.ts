@@ -347,7 +347,7 @@ function cleanupTestProjects(id_token: string): void {
 }
 
 function waitUntilApplyRulesNotRunning(attempts: number): void {
-  if (attempts > 100) {
+  if (attempts === -1) {
     throw new Error('apply-rules never finished');
   }
   cy.request({
