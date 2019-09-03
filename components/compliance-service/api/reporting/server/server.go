@@ -306,15 +306,15 @@ func csvExport(stream reporting.ReportingService_ExportServer) exportHandler {
 // ListNodes returns a list of nodes based on query
 func (srv *Server) ListNodes(ctx context.Context, in *reporting.Query) (*reporting.Nodes, error) {
 	formattedFilters := formatFilters(in.Filters)
-	var platform_sort_field = "platform.name.lower"
-	if len(formattedFilters["platform"]) == 1 {
-		platform_sort_field = "platform.release.lower"
-	}
+	// var platform_sort_field = "platform.name.lower"
+	// if len(formattedFilters["platform"]) == 1 {
+	// 	platform_sort_field = "platform.release.lower"
+	// }
 	var nodes reporting.Nodes
 	var SORT_FIELDS = map[string]string{
 		"name":                                   "node_name.lower",
 		"environment":                            "environment.lower",
-		"platform":                               platform_sort_field,
+		"platform":                               "platform.full",
 		"status":                                 "status",
 		"latest_report.status":                   "status",
 		"latest_report.end_time":                 "end_time",
