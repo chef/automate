@@ -2,8 +2,6 @@ package engine
 
 import (
 	"context"
-
-	v2 "github.com/chef/automate/components/authz-service/storage/v2"
 )
 
 // Engine abstracts different decision engines.
@@ -21,7 +19,6 @@ type Engine interface {
 	// collect them here instead of introducing a V2Engine interface.
 	V2Authorizer
 	V2pXWriter
-	ProjectRulesRetriever
 }
 
 type V2pXWriter interface {
@@ -79,11 +76,6 @@ type V2Writer interface {
 
 type V2p1Writer interface {
 	V2p1SetPolicies(context.Context, map[string]interface{}, map[string]interface{}) error
-	SetRules(context.Context, map[string][]v2.Rule) error
-}
-
-type ProjectRulesRetriever interface {
-	ListProjectMappings(context.Context) (map[string][]v2.Rule, error)
 }
 
 // Subjects contains the requestor and all the teams they're a member of.

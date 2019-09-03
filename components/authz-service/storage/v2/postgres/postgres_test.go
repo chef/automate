@@ -3240,6 +3240,7 @@ func TestListRules(t *testing.T) {
 		db.Flush(t)
 	}
 }
+
 func TestListStagedAndAppliedRules(t *testing.T) {
 	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
@@ -6494,6 +6495,73 @@ func TestErrIfMissingProjects(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.desc, test.f)
+		db.Flush(t)
+	}
+}
+
+func TestFetchAppliedRulesByProjectIDs(t *testing.T) {
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
+	defer store.Close()
+	ctx := context.Background()
+	cases := map[string]func(*testing.T){
+		"when no rules or projects exist, returns an empty map": func(t *testing.T) {
+			resp, err := store.FetchAppliedRulesByProjectIDs(ctx)
+			require.NoError(t, err)
+			assert.Equal(t, resp, map[string][]*storage.Rule{})
+		},
+		"when a project exists without rules, returns an empty map": func(t *testing.T) {
+			insertTestProject(t, db, "project-1", "let's go jigglypuff - topsecret", storage.Custom)
+			resp, err := store.FetchAppliedRulesByProjectIDs(ctx)
+			require.NoError(t, err)
+			require.Equal(t, resp, map[string][]*storage.Rule{})
+		},
+		"when a project exists with staged rules only, returns an empty map": func(t *testing.T) {
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			insertStagedRuleWithMultipleConditions(t, db, "rule-1", projID, storage.Node, false)
+			insertStagedRuleWithMultipleConditions(t, db, "rule-2", projID, storage.Node, false)
+			resp, err := store.FetchAppliedRulesByProjectIDs(ctx)
+			require.NoError(t, err)
+			require.Equal(t, resp, map[string][]*storage.Rule{})
+		},
+		"when a project exists with applied rules only, returns a map of applied rules": func(t *testing.T) {
+			projID := "project-1"
+			insertTestProject(t, db, projID, "let's go jigglypuff - topsecret", storage.Custom)
+			rule1 := insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID, storage.Node)
+			rule2 := insertAppliedRuleWithMultipleConditions(t, db, "rule-2", projID, storage.Node)
+			resp, err := store.FetchAppliedRulesByProjectIDs(ctx)
+			require.NoError(t, err)
+			require.Equal(t, 1, len(resp))
+			require.ElementsMatch(t, resp[projID], []*storage.Rule{rule1, rule2})
+		},
+		"when multiple projects exists with staged and applied rules, returns a map of applied rules": func(t *testing.T) {
+			projID1 := "project-1"
+			insertTestProject(t, db, projID1, "let's go jigglypuff", storage.Custom)
+			insertStagedRuleWithMultipleConditions(t, db, "rule-1", projID1, storage.Node, false)
+			insertStagedRuleWithMultipleConditions(t, db, "rule-2", projID1, storage.Node, false)
+			insertStagedRuleWithMultipleConditions(t, db, "staged-only", projID1, storage.Node, false)
+			rule1 := insertAppliedRuleWithMultipleConditions(t, db, "rule-1", projID1, storage.Node)
+			rule2 := insertAppliedRuleWithMultipleConditions(t, db, "rule-2", projID1, storage.Node)
+
+			projID2 := "project-2"
+			insertTestProject(t, db, projID2, "let's go pikachu", storage.Custom)
+			insertStagedRuleWithMultipleConditions(t, db, "rule-3", projID2, storage.Node, false)
+			insertStagedRuleWithMultipleConditions(t, db, "rule-4", projID2, storage.Node, false)
+			insertStagedRuleWithMultipleConditions(t, db, "staged-only-2", projID2, storage.Node, false)
+			rule3 := insertAppliedRuleWithMultipleConditions(t, db, "rule-3", projID2, storage.Node)
+			rule4 := insertAppliedRuleWithMultipleConditions(t, db, "rule-4", projID2, storage.Node)
+
+			resp, err := store.FetchAppliedRulesByProjectIDs(ctx)
+			require.NoError(t, err)
+			require.Equal(t, 2, len(resp))
+			require.ElementsMatch(t, resp[projID1], []*storage.Rule{rule1, rule2})
+			require.ElementsMatch(t, resp[projID2], []*storage.Rule{rule3, rule4})
+		},
+	}
+
+	for name, test := range cases {
+		t.Run(name, test)
 		db.Flush(t)
 	}
 }

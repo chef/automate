@@ -3,11 +3,12 @@ package processor
 import (
 	"context"
 
+	log "github.com/sirupsen/logrus"
+
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
 	"github.com/chef/automate/lib/stringutils"
-	log "github.com/sirupsen/logrus"
 )
 
 // BuildRunProjectTagger - Build a project tagger for CCRs

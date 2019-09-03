@@ -80,8 +80,7 @@ func NewTestFramework(t *testing.T, ctx context.Context) *TestFramework {
 	require.NoError(t, err)
 
 	projectUpdateManager := NewMockProjectUpdateManager()
-	projectsSrv, err := server.NewProjectsServer(
-		ctx, l, pg, opaInstance, projectUpdateManager, polRefresher)
+	projectsSrv, err := server.NewProjectsServer(ctx, l, pg, projectUpdateManager, polRefresher)
 	require.NoError(t, err)
 
 	authzSrv, err := server.NewPostgresAuthzServer(l, opaInstance, vSwitch, projectsSrv)
@@ -148,7 +147,7 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (
 	require.NoError(t, err, "init logger for storage")
 	projectUpdateManager := NewMockProjectUpdateManager()
 	projectsSrv, err := server.NewProjectsServer(
-		ctx, l, pg, &TestProjectRulesRetriever{}, projectUpdateManager, NewMockPolicyRefresher())
+		ctx, l, pg, projectUpdateManager, NewMockPolicyRefresher())
 	require.NoError(t, err)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
@@ -303,14 +302,6 @@ func (t *MockEventServiceClient) Stop(ctx context.Context,
 	in *automate_event.StopRequest,
 	opts ...grpc.CallOption) (*automate_event.StopResponse, error) {
 	return &automate_event.StopResponse{}, nil
-}
-
-// TODO More testing
-type TestProjectRulesRetriever struct{}
-
-func (t *TestProjectRulesRetriever) ListProjectMappings(
-	context.Context) (map[string][]storage.Rule, error) {
-	return make(map[string][]storage.Rule, 0), nil
 }
 
 type mockPolicyRefresher struct{}

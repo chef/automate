@@ -3114,27 +3114,26 @@ func assertRolesMatch(t *testing.T, storageRole storage.Role, apiRole api_v2.Rol
 }
 
 type testSetup struct {
-	policy         api_v2.PoliciesClient
-	authz          api_v2.AuthorizationClient
-	projects       api_v2.ProjectsClient
-	policyCache    *cache.Cache
-	roleCache      *cache.Cache
-	projectCache   *cache.Cache
-	status         storage.MigrationStatusProvider
-	switcher       *v2.VersionSwitch
-	rulesRetriever engine.ProjectRulesRetriever
+	policy       api_v2.PoliciesClient
+	authz        api_v2.AuthorizationClient
+	projects     api_v2.ProjectsClient
+	policyCache  *cache.Cache
+	roleCache    *cache.Cache
+	projectCache *cache.Cache
+	status       storage.MigrationStatusProvider
+	switcher     *v2.VersionSwitch
 }
 
 func setupV2WithWriter(t *testing.T,
 	writer engine.V2pXWriter) testSetup {
-	return setupV2WithMigrationState(t, nil, writer, nil, nil, make(chan api_v2.Version, 1),
+	return setupV2WithMigrationState(t, nil, writer, nil, make(chan api_v2.Version, 1),
 		// Returning MigrationStatus of "Success" means we've migrated successfully to IAM v2
 		func(s storage.MigrationStatusProvider) error { return s.Success(context.Background()) })
 }
 
 func setupV2p1WithWriter(t *testing.T,
 	writer engine.V2pXWriter) testSetup {
-	return setupV2WithMigrationState(t, nil, writer, nil, nil, make(chan api_v2.Version, 1),
+	return setupV2WithMigrationState(t, nil, writer, nil, make(chan api_v2.Version, 1),
 		// Returning MigrationStatus of "SuccessBeta2.1" means we've migrated successfully to IAM v2.1
 		func(s storage.MigrationStatusProvider) error { return s.SuccessBeta1(context.Background()) })
 }
@@ -3144,14 +3143,13 @@ func setupV2(t *testing.T,
 	writer engine.V2pXWriter,
 	pl storage_v1.PoliciesLister,
 	vChan chan api_v2.Version) testSetup {
-	return setupV2WithMigrationState(t, authorizer, writer, pl, nil, vChan, nil)
+	return setupV2WithMigrationState(t, authorizer, writer, pl, vChan, nil)
 }
 
 func setupV2WithMigrationState(t *testing.T,
 	authorizer engine.V2Authorizer,
 	writer engine.V2pXWriter,
 	pl storage_v1.PoliciesLister,
-	rulesRetriever engine.ProjectRulesRetriever,
 	vChan chan api_v2.Version,
 	migration func(storage.MigrationStatusProvider) error) testSetup {
 
@@ -3163,9 +3161,6 @@ func setupV2WithMigrationState(t *testing.T,
 
 	if writer == nil {
 		writer = &testEngine{}
-	}
-	if rulesRetriever == nil {
-		rulesRetriever = &testhelpers.TestProjectRulesRetriever{}
 	}
 
 	mem_v2 := memstore_v2.New()
@@ -3182,8 +3177,7 @@ func setupV2WithMigrationState(t *testing.T,
 	require.NoError(t, err)
 
 	require.NoError(t, err)
-	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2,
-		rulesRetriever, testhelpers.NewMockProjectUpdateManager(), testhelpers.NewMockPolicyRefresher())
+	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2, testhelpers.NewMockProjectUpdateManager(), testhelpers.NewMockPolicyRefresher())
 	require.NoError(t, err)
 
 	authzV2, err := v2.NewAuthzServer(l, authorizer, vSwitch, projectsSrv, mem_v2)
@@ -3215,15 +3209,14 @@ func setupV2WithMigrationState(t *testing.T,
 	}
 
 	return testSetup{
-		policy:         api_v2.NewPoliciesClient(conn),
-		authz:          api_v2.NewAuthorizationClient(conn),
-		projects:       api_v2.NewProjectsClient(conn),
-		policyCache:    mem_v2.PoliciesCache(),
-		roleCache:      mem_v2.RolesCache(),
-		projectCache:   mem_v2.ProjectsCache(),
-		status:         mem_v2,
-		switcher:       vSwitch,
-		rulesRetriever: rulesRetriever,
+		policy:       api_v2.NewPoliciesClient(conn),
+		authz:        api_v2.NewAuthorizationClient(conn),
+		projects:     api_v2.NewProjectsClient(conn),
+		policyCache:  mem_v2.PoliciesCache(),
+		roleCache:    mem_v2.RolesCache(),
+		projectCache: mem_v2.ProjectsCache(),
+		status:       mem_v2,
+		switcher:     vSwitch,
 	}
 }
 

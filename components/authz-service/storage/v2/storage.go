@@ -78,6 +78,7 @@ type ruleStorage interface {
 	DeleteRule(ctx context.Context, projectID string, ruleID string) error
 	ListRulesForProject(context.Context, string) ([]*Rule, ProjectRulesStatus, error)
 	ApplyStagedRules(context.Context) error
+	FetchAppliedRulesByProjectIDs(context.Context) (map[string][]*Rule, error)
 }
 
 type MigrationStatusProvider interface {

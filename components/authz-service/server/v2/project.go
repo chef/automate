@@ -20,7 +20,6 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
-	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/memstore"
@@ -31,17 +30,14 @@ import (
 type ProjectState struct {
 	log                  logger.Logger
 	store                storage.Storage
-	engine               engine.ProjectRulesRetriever
 	ProjectUpdateManager ProjectUpdateMgr
 	policyRefresher      PolicyRefresher
-	applyRuleMux         sync.Mutex
 }
 
 // NewMemstoreProjectsServer returns an instance of api.ProjectsServer
 func NewMemstoreProjectsServer(
 	ctx context.Context,
 	l logger.Logger,
-	e engine.ProjectRulesRetriever,
 	projectUpdateCerealManager *cereal.Manager,
 	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
@@ -51,14 +47,13 @@ func NewMemstoreProjectsServer(
 	if err != nil {
 		return nil, err
 	}
-	return NewProjectsServer(ctx, l, s, e, projectUpdateManager, pr)
+	return NewProjectsServer(ctx, l, s, projectUpdateManager, pr)
 }
 
 // NewPostgresProjectsServer instantiates a ProjectsServer using a PG store
 func NewPostgresProjectsServer(
 	ctx context.Context,
 	l logger.Logger,
-	e engine.ProjectRulesRetriever,
 	projectUpdateCerealManager *cereal.Manager,
 	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
@@ -71,14 +66,13 @@ func NewPostgresProjectsServer(
 	if err != nil {
 		return nil, err
 	}
-	return NewProjectsServer(ctx, l, s, e, projectUpdateManager, pr)
+	return NewProjectsServer(ctx, l, s, projectUpdateManager, pr)
 }
 
 func NewProjectsServer(
 	ctx context.Context,
 	l logger.Logger,
 	s storage.Storage,
-	e engine.ProjectRulesRetriever,
 	projectUpdateManager ProjectUpdateMgr,
 	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
@@ -86,7 +80,6 @@ func NewProjectsServer(
 	return &ProjectState{
 		log:                  l,
 		store:                s,
-		engine:               e,
 		ProjectUpdateManager: projectUpdateManager,
 		policyRefresher:      pr,
 	}, nil
@@ -171,18 +164,14 @@ func (s *ProjectState) UpdateProject(ctx context.Context,
 
 func (s *ProjectState) ApplyRulesStart(
 	ctx context.Context, _ *api.ApplyRulesStartReq) (*api.ApplyRulesStartResp, error) {
-	// NOTE (tc): Only one call to ApplyRulesStart can happen at a time.
-	// This should be good enough to prevent race conditions for single node,
-	// in conjunction with the table locking that happens in store.ApplyStagedRules.
-	// Can still get into a weird state if we panic, but a re-apply will fix things up.
-	// We will be refactoring for multi-node using workflow tooling in the near future.
-	s.applyRuleMux.Lock()
-	defer s.applyRuleMux.Unlock()
-
 	s.log.Info("apply project rules: START")
 	err := s.ProjectUpdateManager.Start()
 	if err != nil {
 		s.log.Warnf("error starting project update. the rules and cache were updated but the apply was not started, please try again.")
+		if err == cereal.ErrWorkflowInstanceExists {
+			return nil, status.Errorf(codes.FailedPrecondition,
+				"project update already in progress: %s", err.Error())
+		}
 		return nil, status.Errorf(codes.Internal,
 			"error starting project update: %s", err.Error())
 	}
@@ -342,7 +331,7 @@ func (s *ProjectState) DeleteProject(ctx context.Context,
 func (s *ProjectState) ListRulesForAllProjects(ctx context.Context,
 	req *api.ListRulesForAllProjectsReq) (*api.ListRulesForAllProjectsResp, error) {
 
-	ruleMap, err := s.engine.ListProjectMappings(ctx)
+	ruleMap, err := s.store.FetchAppliedRulesByProjectIDs(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -351,7 +340,7 @@ func (s *ProjectState) ListRulesForAllProjects(ctx context.Context,
 	for projectID, rules := range ruleMap {
 		apiRules := make([]*api.ProjectRule, len(rules))
 		for i, rule := range rules {
-			r, err := fromStorageRule(&rule)
+			r, err := fromStorageRule(rule)
 			if err != nil {
 				return &api.ListRulesForAllProjectsResp{}, err
 			}

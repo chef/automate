@@ -187,9 +187,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
       method: 'POST',
       url: '/apis/iam/v2beta/apply-rules'
     });
-    // adding a wait here instead of a request poll since the apply status
-    // does not have precise enough timing for such a small data set
-    cy.wait(5000);
+    waitUntilApplyRulesNotRunning(100);
 
     // confirm rules are applied
     for (const project of [avengersProject, xmenProject]) {
@@ -254,7 +252,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
       method: 'POST',
       url: '/apis/iam/v2beta/apply-rules'
     });
-    cy.wait(5000);
+    waitUntilApplyRulesNotRunning(100);
 
     cy.request({
       headers: {
@@ -281,7 +279,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
       method: 'POST',
       url: '/apis/iam/v2beta/apply-rules'
     });
-    cy.wait(5000);
+    waitUntilApplyRulesNotRunning(100);
 
     cy.request({
       headers: {
@@ -344,6 +342,24 @@ function cleanupTestProjects(id_token: string): void {
           failOnStatusCode: false
         });
       }
+    }
+  });
+}
+
+function waitUntilApplyRulesNotRunning(attempts: number): void {
+  if (attempts === -1) {
+    throw new Error('apply-rules never finished');
+  }
+  cy.request({
+    headers: { 'api-token': Cypress.env('adminTokenValue') },
+    url: '/apis/iam/v2beta/apply-rules'
+  }).then((response) => {
+    if (response.body.state === 'not_running') {
+      return;
+    } else {
+      cy.log(`${attempts} attempts remaining: waiting for apply-rules to be not_running`);
+      cy.wait(1000);
+      waitUntilApplyRulesNotRunning(--attempts);
     }
   });
 }

@@ -85,7 +85,7 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "could not initialize v2 policy refresher")
 	}
 
-	v2ProjectsServer, err := v2.NewPostgresProjectsServer(ctx, l, e, cerealManager, policyRefresher)
+	v2ProjectsServer, err := v2.NewPostgresProjectsServer(ctx, l, cerealManager, policyRefresher)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 projects server")
 	}
