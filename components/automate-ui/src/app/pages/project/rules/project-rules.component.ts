@@ -193,6 +193,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   deleteCondition(index: number): void {
     const conditions = this.ruleForm.get('conditions') as FormArray;
     conditions.removeAt(index);
+    this.ruleForm.markAsDirty();
   }
 
   showAndLabel(i: number): boolean {
