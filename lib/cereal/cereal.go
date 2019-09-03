@@ -749,9 +749,11 @@ func (r *registeredExecutor) StartPoller(ctx context.Context, d backend.TaskDequ
 func (r *registeredExecutor) startTaskWorker(ctx context.Context, d backend.TaskDequeuer, workflowWakeupFun func()) {
 	logctx := logrus.WithField("task_name", r.name)
 	if !r.IncActiveWorkers() {
-		logctx.WithFields(logrus.Fields{
-			"max_workers": r.maxWorkers,
-		}).Warn("Maximum task workers already started")
+		if r.maxWorkers > 1 {
+			logctx.WithFields(logrus.Fields{
+				"max_workers": r.maxWorkers,
+			}).Warn("Maximum task workers already started")
+		}
 		return
 	}
 
