@@ -21,6 +21,7 @@ type Nodemanager struct {
 	Manager
 	Secrets
 	EventConfig
+	Cereal
 }
 
 // Secrets service specific config options
@@ -46,5 +47,9 @@ type Postgres struct {
 }
 
 type EventConfig struct {
+	Endpoint string
+}
+
+type Cereal struct {
 	Endpoint string
 }

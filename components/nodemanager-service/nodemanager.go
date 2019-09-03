@@ -7,7 +7,9 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	rrule "github.com/teambition/rrule-go"
 
+	"github.com/chef/automate/api/external/secrets"
 	secretsapi "github.com/chef/automate/api/external/secrets"
 	eventsapi "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/compliance-service/utils/logging"
@@ -20,11 +22,15 @@ import (
 	"github.com/chef/automate/components/nodemanager-service/pgdb"
 	"github.com/chef/automate/components/nodemanager-service/polling"
 
+	"github.com/chef/automate/lib/cereal"
+	grpccereal "github.com/chef/automate/lib/cereal/grpc"
+	"github.com/chef/automate/lib/cereal/patterns"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/version"
 
 	"github.com/chef/automate/lib/tracing"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -55,6 +61,32 @@ func Serve(conf config.Nodemanager, grpcBinding string) error {
 	SERVICE_STATE = serviceStateStarting
 
 	return serve(ctx, &conf, connFactory)
+}
+
+const (
+	Awsec2PollingJobName        = "awsec2_polling"
+	Awsec2PollingScheduleName   = "awsec2_polling_schedule"
+	AzurevmPollingJobName       = "azurevm_polling"
+	AzurevmPollingScheduleName  = "azurevm_polling_schedule"
+	ManagersPollingJobName      = "managers_polling"
+	ManagersPollingScheduleName = "managers_polling_schedule"
+)
+
+// types
+type CheckAWSNodesTask struct {
+	db            *pgdb.DB
+	secretsClient secrets.SecretsServiceClient
+	eventsClient  eventsapi.EventServiceClient
+}
+
+type CheckAzureNodesTask struct {
+	db            *pgdb.DB
+	secretsClient secrets.SecretsServiceClient
+}
+
+type CheckManagersTask struct {
+	db            *pgdb.DB
+	secretsClient secrets.SecretsServiceClient
 }
 
 func serve(ctx context.Context, config *config.Nodemanager, connFactory *secureconn.Factory) error {
@@ -103,14 +135,117 @@ func serve(ctx context.Context, config *config.Nodemanager, connFactory *securec
 	if eventClient == nil {
 		return fmt.Errorf("nodemanager setup, could not obtain automate events service client")
 	}
-	// start polling for node mgrs, passing along the secrets client and event client
-	// this function will call each of the manager polling functions that check the
-	// state of nodes at the configured intervals
-	polling.StartThePolls(ctx, config.Manager, db, secretsClient, eventClient)
 
-	// create Automate node manager to handle manually added nodes. all manually created
-	// nodes are assigned to the Automate node manager
-	log.Debug("creating Automate node manager")
+	// Set the cereal service client
+	log.Infof("nodemanager setup, getting a cereal service client %s", config.Cereal.Endpoint)
+	cerealConn, err := connFactory.DialContext(timeoutCtx, "cereal-service", config.Cereal.Endpoint, grpc.WithBlock())
+	if err != nil {
+		err = errors.New("nodemanager setup, error grpc dialing to cereal-service aborting...")
+		return err
+	}
+	// LATER: look at whatever Dan did for picking the domain
+	cerealBackend := grpccereal.NewGrpcBackendFromConn("nodemanager", cerealConn)
+
+	// Set up a cereal manager for managing polling.
+	jobManager, err := cereal.NewManager(cerealBackend)
+	if err != nil {
+		log.Errorf("could not create job manager: %s", err)
+	}
+	defer jobManager.Stop() //nolint:errcheck
+
+	// Prelude to initializing the job manager: register task executors for the nodemanger polling jobs
+	err = jobManager.RegisterTaskExecutor(Awsec2PollingJobName,
+		&CheckAWSNodesTask{db: db, secretsClient: secretsClient, eventsClient: eventClient},
+		cereal.TaskExecutorOpts{})
+	if err != nil {
+		return err
+	}
+
+	err = jobManager.RegisterTaskExecutor(AzurevmPollingJobName,
+		&CheckAzureNodesTask{db: db, secretsClient: secretsClient}, cereal.TaskExecutorOpts{})
+	if err != nil {
+		return err
+	}
+
+	err = jobManager.RegisterTaskExecutor(ManagersPollingJobName,
+		&CheckManagersTask{db: db, secretsClient: secretsClient}, cereal.TaskExecutorOpts{})
+	if err != nil {
+		return err
+	}
+
+	// Prelude to initializing the job manager: register workflow executors to run tasks
+	for _, jobName := range []string{Awsec2PollingJobName, AzurevmPollingJobName, ManagersPollingJobName} {
+		err = jobManager.RegisterWorkflowExecutor(jobName, patterns.NewSingleTaskWorkflowExecutor(jobName, false))
+		if err != nil {
+			return errors.Wrapf(err, "failed to register workflow for %q", jobName)
+		}
+	}
+
+	// Prelude to initializing the job manager: create rrules for schedule
+	// Right now, this is migration only -- doesn't handle config change.
+	awsPollInterval := config.Manager.AwsEc2PollIntervalMinutes
+	rule, err := rrule.NewRRule(rrule.ROption{
+		Freq:     rrule.MINUTELY,
+		Interval: awsPollInterval,
+		Dtstart:  time.Now(),
+	})
+	if err != nil {
+		return errors.Wrapf(err, "Could not create recurrence rule for polling workflow %s", "PollAWSEC2InstanceState")
+	}
+
+	azurePollInterval := config.Manager.AzureVMPollIntervalMinutes
+	azureRule, err := rrule.NewRRule(rrule.ROption{
+		Freq:     rrule.MINUTELY,
+		Interval: azurePollInterval,
+		Dtstart:  time.Now(),
+	})
+	if err != nil {
+		return errors.Wrapf(err, "Could not create recurrence rule for polling workflow %s", "PollAzureInstanceState")
+	}
+
+	managersPollInterval := 120
+	managersRule, err := rrule.NewRRule(rrule.ROption{
+		Freq:     rrule.MINUTELY,
+		Interval: managersPollInterval,
+		Dtstart:  time.Now(),
+	})
+	if err != nil {
+		return errors.Wrapf(err, "Could not create recurrence rule for polling workflow %s", "PollManagersInstanceState")
+	}
+
+	err = jobManager.CreateWorkflowSchedule("Singleton", "PollAWSEC2InstanceState", nil, true, rule)
+	if err != nil {
+		if err == cereal.ErrWorkflowScheduleExists {
+			log.Info("nodemanager polling workflow schedule already exists, not migrating")
+		} else {
+			return errors.Wrapf(err, "Could not continue creating workflow schedule")
+		}
+	}
+
+	err = jobManager.CreateWorkflowSchedule("Singleton", "PollAzureInstanceState", nil, true, azureRule)
+	if err != nil {
+		if err == cereal.ErrWorkflowScheduleExists {
+			log.Info("nodemanager polling workflow schedule already exists, not migrating")
+		} else {
+			return errors.Wrapf(err, "Could not continue creating workflow schedule")
+		}
+	}
+
+	err = jobManager.CreateWorkflowSchedule("Singleton", "PollManagersInstanceState", nil, true, managersRule)
+	if err != nil {
+		if err == cereal.ErrWorkflowScheduleExists {
+			log.Info("nodemanager polling workflow schedule already exists, not migrating")
+		} else {
+			return errors.Wrapf(err, "Could not continue creating workflow schedule")
+		}
+	}
+
+	// The cereal manager has been initialized and can (finally) be started.
+	err = jobManager.Start(context.Background())
+	if err != nil {
+		logrus.WithError(err).Fatal("could not start job manager")
+	}
+
 	_, err = managers.CreateManualNodeManager(db)
 	if err != nil {
 		err = errors.Wrap(err, "Couldn't create Automate manager")
@@ -118,6 +253,18 @@ func serve(ctx context.Context, config *config.Nodemanager, connFactory *securec
 	}
 	SERVICE_STATE = serviceStateStarted
 	return grpcServer.Serve(conn)
+}
+
+func (t *CheckAWSNodesTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
+	return nil, polling.QueryAwsEc2InstanceStates(ctx, t.db, t.secretsClient, t.eventsClient)
+}
+
+func (t *CheckAzureNodesTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
+	return nil, polling.QueryAzureVMInstanceStates(ctx, t.db, t.secretsClient)
+}
+
+func (t *CheckManagersTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
+	return nil, polling.CheckManagersStatuses(ctx, t.db, t.secretsClient)
 }
 
 func newGRPCServer(db *pgdb.DB, connFactory *secureconn.Factory, config *config.Nodemanager) *grpc.Server {
