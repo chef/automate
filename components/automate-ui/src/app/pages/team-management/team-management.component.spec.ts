@@ -199,7 +199,7 @@ describe('TeamManagementComponent', () => {
       component.openCreateModal();
       component.createTeamForm.controls['name'].setValue(team.name);
       component.createTeamForm.controls['id'].setValue(team.id);
-      component.createV2Team([]);
+      component.createV2Team();
 
       store.dispatch(new CreateTeamSuccess(team));
 

@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
-import { identity, keyBy, at, xor } from 'lodash/fp';
+import { isEmpty, identity, keyBy, at, xor } from 'lodash/fp';
 import { combineLatest, Observable, Subject } from 'rxjs';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 
@@ -13,7 +13,11 @@ import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
 import { allUsers, userStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
-import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
+import {
+  iamMajorVersion,
+  iamMinorVersion,
+  atLeastV2p1
+} from 'app/entities/policies/policy.selectors';
 import {
   v1TeamFromRoute,
   v2TeamFromRoute,
@@ -72,8 +76,10 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public addButtonText = 'Add Users';
   public removeText = 'Remove User';
 
-  public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
+  public atLeastV2p1$: Observable<boolean>;
+  public projectsEnabled: boolean;
   public projects: ProjectCheckedMap = {};
+  public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
   constructor(private store: Store<NgrxStateAtom>,
     public fb: FormBuilder,
@@ -91,8 +97,15 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       // to prevent people from typing before the team is fetched and have their
       // value overwritten.
       name: new FormControl({value: 'Loading...', disabled: true},
-        [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)])
+        [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]),
+      projects: [[]]
     });
+    this.store.pipe(
+      select(atLeastV2p1),
+      takeUntil(this.isDestroyed))
+      .subscribe(projectsEnabled => {
+        this.projectsEnabled = projectsEnabled;
+      });
   }
 
   private get teamId(): string {
@@ -104,6 +117,8 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.atLeastV2p1$ = this.store.select(atLeastV2p1);
+
     this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
       .subscribe((url: string) => {
         this.url = url;
@@ -151,7 +166,9 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       this.updateNameForm.controls.name.setValue(this.team.name);
       this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
       this.store.dispatch(new GetUsers());
-      this.store.dispatch(new GetProjects());
+      if (this.projectsEnabled) {
+        this.store.dispatch(new GetProjects());
+      }
     });
 
     combineLatest([
@@ -162,6 +179,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       filter(([_, pStatus]: [Project[], EntityStatus]) => pStatus !== EntityStatus.loading),
       filter(() => !!this.team),
       map(([allowedProjects, _]) => {
+        this.projects = {};
         allowedProjects
           .forEach(p => {
             this.projects[p.id] = { ...p, checked: this.team.projects.includes(p.id)
@@ -243,12 +261,8 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     this.saving = true;
     this.updateNameForm.controls['name'].disable();
     const name: string = this.updateNameForm.controls.name.value.trim();
-    this.store.dispatch(new UpdateTeam({
-        id: this.team.id,
-        name: name,
-        guid: this.team.guid, // to be deprecated after GA
-        projects: Object.values(this.projects).filter(p => p.checked).map(p => p.id)
-      }));
+    const projects = Object.keys(this.projects).filter(id => this.projects[id].checked);
+    this.store.dispatch(new UpdateTeam({ ...this.team, name, projects }));
 
     const pendingSave = new Subject<boolean>();
     this.store.pipe(
@@ -278,14 +292,25 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   // updates whether the project was checked or unchecked
   onProjectChecked(project: ProjectChecked): void {
     this.projects[project.id].checked = project.checked;
+
+    // since the app-projects-dropdown is not a true form input (select)
+    // we have to manage the form reactions
+    if (this.noProjectsUpdated()) {
+      this.updateNameForm.controls.projects.markAsPristine();
+    } else {
+      this.updateNameForm.controls.projects.markAsDirty();
+    }
+
   }
 
-  noProjectsUpdated(): boolean {
-    return xor(this.team.projects,
-      Object.values(this.projects).filter(p => p.checked).map(p => p.id)).length === 0;
+  private noProjectsUpdated(): boolean {
+    const projectsUpdated = xor(
+      this.team.projects,
+      Object.keys(this.projects).filter(id => this.projects[id].checked));
+    return projectsUpdated.length === 0;
   }
 
   dropdownDisabled(): boolean {
-    return Object.values(this.projects).length === 0 || this.saving;
+    return isEmpty(this.projects) || this.saving;
   }
 }

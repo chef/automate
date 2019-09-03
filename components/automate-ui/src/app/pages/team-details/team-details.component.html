@@ -16,14 +16,14 @@
           <tr class="detail-row">
             <th *ngIf="isMajorV1" class="id-column">Description</th>
             <th *ngIf="!isMajorV1" class="id-column">ID</th>
-            <th *ngIf="!isMajorV1 && isMinorV1" class="projects-column">Projects</th>
+            <th *ngIf="projectsEnabled" class="projects-column">Projects</th>
           </tr>
         </thead>
         <tbody>
           <tr class="detail-row">
             <td *ngIf="isMajorV1" class="id-column">{{ team.name }}</td>
             <td *ngIf="!isMajorV1" class="id-column">{{ team.id }}</td>
-            <td class="projects-column" *ngIf="!isMajorV1 && isMinorV1" data-cy="team-details-projects">
+            <td class="projects-column" *ngIf="projectsEnabled" data-cy="team-details-projects">
               <ng-container *ngIf="team.projects.length === 0">
                   {{ unassigned }}
               </ng-container>
@@ -71,15 +71,15 @@
             {{ descriptionOrName | titlecase }} is required.
           </chef-error>
         </chef-form-field>
+        <div id='projects-container' *ngIf="projectsEnabled">
+          <app-projects-dropdown
+            [projects]="projects"
+            (onProjectChecked)="onProjectChecked($event)"
+            [disabled]="dropdownDisabled()">
+          </app-projects-dropdown>
+        </div>
       </form>
-      <div id='projects-container' *ngIf="!isMajorV1 && isMinorV1">
-        <app-projects-dropdown
-          [projects]="projects"
-          (onProjectChecked)="onProjectChecked($event)"
-          [disabled]="dropdownDisabled()">
-        </app-projects-dropdown>
-      </div>
-      <chef-button [disabled]="isLoadingTeam || !updateNameForm.valid || (!updateNameForm.dirty && noProjectsUpdated())"
+      <chef-button [disabled]="isLoadingTeam || !updateNameForm.valid || !updateNameForm.dirty"
         primary inline (click)="saveTeam()" data-cy="team-details-submit-button">
         <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
         <span *ngIf="saving">Saving...</span>
