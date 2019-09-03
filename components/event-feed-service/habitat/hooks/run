@@ -14,5 +14,9 @@ addNoProxy {{member.sys.ip}}
 {{~/if}}
 {{~/eachAlive}}
 
+{{#eachAlive bind.cereal-service.members as |cereal|}}
+addNoProxy {{cereal.sys.ip}}
+{{~/eachAlive}}
+
 # Start our service
 exec event-feed-service serve --config {{pkg.svc_config_path}}/config.toml
