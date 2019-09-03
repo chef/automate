@@ -32,12 +32,6 @@ map(select(
          (.id != "security_headers" or .port != "10161") and
          (.id != "security_headers" or .port != "10200") and
 
-         # TODO Submit PR to dexip/dex to improve ciphersuite defaults
-         (.id != "cipherlist_AVERAGE" or (.port != "10116" and .port != "10117")) and
-         (.id != "cipherlist_3DES_IDEA" or (.port != "10116" and .port != "10117")) and
-         (.id != "SWEET32" or (.port != "10116" and .port != "10117")) and
-         (.id != "LUCKY13" or (.port != "10116" and .port != "10117")) and
-
          # automate-cs erlang-services
          # TODO: erlang services use common prime
          (.id != "LOGJAM-common_primes" or (.port != "10201" and .port != "10202" and .port != "10203")) and
