@@ -39,10 +39,13 @@ interface KVCondition {
   styleUrls: ['./project-rules.component.scss']
 })
 export class ProjectRulesComponent implements OnInit, OnDestroy {
-  public project: Project = <Project>{};
   public ruleId: string;
   public ruleForm: FormGroup;
+
+  // FIXME: either make properties optional in interface, or provide them on initialization:
+  public project: Project = <Project>{};
   public rule: Rule = <Rule>{};
+
   public isLoading = true;
   public saving = false;
   public attributes: RuleTypeMappedObject;
@@ -238,7 +241,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     // This constant ensures type safety
     const equals_op: ConditionOperator = 'EQUALS';
     this.ruleForm.controls.conditions.value.forEach(c => {
-      conditions.push(<Condition>{
+      conditions.push({
         attribute: c.attribute,
         operator: c.operator,
           // Convert values string to storage format
