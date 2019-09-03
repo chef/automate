@@ -111,7 +111,7 @@
           "refs": [],
           "tags": {
             "web": null,
-            "scope": "OS",
+            "scope": "apalache",
             "gtitle": "TitleVal",
             "satisfies": [
               "SRG-00006",

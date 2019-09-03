@@ -27,19 +27,21 @@ func (backend ES2Backend) GetSuggestions(typeParam string, filters map[string][]
 	}
 
 	var SUGGESTIONS_TYPES = map[string]string{
-		"environment":    "environment",
-		"platform":       "platform.name",
-		"node":           "node_name",
-		"role":           "roles",
-		"recipe":         "recipes",
-		"profile":        "profiles.title",
-		"control":        "profiles.controls.title",
-		"organization":   "organization_name",
-		"chef_server":    "source_fqdn",
-		"chef_tags":      "chef_tags",
-		"policy_group":   "policy_group",
-		"policy_name":    "policy_name",
-		"inspec_version": "version",
+		"environment":       "environment",
+		"platform":          "platform.name",
+		"node":              "node_name",
+		"role":              "roles",
+		"recipe":            "recipes",
+		"profile":           "profiles.title",
+		"control":           "profiles.controls.title",
+		"organization":      "organization_name",
+		"chef_server":       "source_fqdn",
+		"chef_tags":         "chef_tags",
+		"policy_group":      "policy_group",
+		"policy_name":       "policy_name",
+		"inspec_version":    "version",
+		"control_tag_key":   "profiles.controls.string_tags.key",
+		"control_tag_value": "profiles.controls.string_tags.values",
 	}
 
 	target, ok := SUGGESTIONS_TYPES[typeParam]
@@ -67,13 +69,15 @@ func (backend ES2Backend) GetSuggestions(typeParam string, filters map[string][]
 	useSummaryIndex := true
 	if len(filters["control"]) > 0 {
 		useSummaryIndex = false
-	} else {
-		// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
-		for filterType := range filters {
-			if strings.HasPrefix(filterType, "control_tag:") {
-				useSummaryIndex = false
-				break
-			}
+	}
+
+	controlTagFilterKey := ""
+	// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
+	for filterType := range filters {
+		if strings.HasPrefix(filterType, "control_tag:") {
+			_, controlTagFilterKey = leftSplit(filterType, ":")
+			useSummaryIndex = false
+			break
 		}
 	}
 
@@ -82,6 +86,8 @@ func (backend ES2Backend) GetSuggestions(typeParam string, filters map[string][]
 		suggs, err = backend.getProfileSuggestions(client, typeParam, target, text, size, filters, useSummaryIndex)
 	} else if typeParam == "control" {
 		suggs, err = backend.getControlSuggestions(client, typeParam, target, text, size, filters)
+	} else if typeParam == "control_tag_key" || typeParam == "control_tag_value" {
+		suggs, err = backend.getControlTagsSuggestions(client, typeParam, target, text, controlTagFilterKey, size, filters, false)
 	} else if suggestionFieldArray(typeParam) {
 		suggs, err = backend.getArrayAggSuggestions(client, typeParam, target, text, size, filters, useSummaryIndex)
 	} else {
@@ -278,10 +284,6 @@ func (backend ES2Backend) getArrayAggSuggestions(client *elastic.Client, typePar
 			suggs = append(suggs, string(bucket.KeyNumber))
 		}
 	}
-	//// Sample search sent to ElasticSearch when suggesting roles:
-	//{
-	//	"query": {
-	//		"bool": {
 
 	// When matching array fields, elasticsearch returns the entire array with the score at the array level. We love arrays because they are small and work really well for filtering.
 	// Once aggregated to get rid of duplicates, the final scoring is done on doc_count, which is irrelevant for suggestion type matching.
@@ -458,8 +460,6 @@ func (backend ES2Backend) getControlSuggestions(client *elastic.Client, typePara
 			"hits.hits.inner_hits").
 		Do(context.Background())
 
-	// {code}
-
 	if err != nil {
 		logrus.Error("getControlSuggestions search failed")
 		return nil, err
@@ -500,6 +500,167 @@ func (backend ES2Backend) getControlSuggestions(client *elastic.Client, typePara
 		}
 	}
 	return suggs, nil
+}
+
+func (backend ES2Backend) getControlTagsSuggestions(client *elastic.Client, typeParam string, target string, text string, controlTagFilterKey string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
+	if typeParam == "control_tag_value" && controlTagFilterKey == "" {
+		return nil, errors.New("'control_tag' filter is required for 'control_tag_value' suggestions")
+	}
+	esIndex, err := GetEsIndex(filters, useSummaryIndex, true)
+	if err != nil {
+		return nil, errors.Wrap(err, "getControlTagsSuggestions unable to get index dates")
+	}
+	boolQuery := backend.getFiltersQuery(filters, true)
+	text = strings.ToLower(text)
+
+	var finalInnerQuery elastic.Query
+	if len(text) >= 2 {
+		finalInnerBoolQuery := elastic.NewBoolQuery()
+		finalInnerBoolQuery.Must(elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("or"))
+		finalInnerBoolQuery.Should(elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("and"))
+		finalInnerBoolQuery.Should(elastic.NewTermQuery(fmt.Sprintf("%s.lower", target), text).Boost(100))
+		finalInnerBoolQuery.Should(elastic.NewPrefixQuery(fmt.Sprintf("%s.lower", target), text).Boost(100))
+		finalInnerQuery = finalInnerBoolQuery
+	} else {
+		finalInnerQuery = elastic.NewExistsQuery(target)
+	}
+
+	outerBoolQuery := elastic.NewBoolQuery()
+	nestedBoolQuery := outerBoolQuery.Must(elastic.NewNestedQuery("profiles.controls.string_tags", finalInnerQuery))
+
+	hit := elastic.NewInnerHit().Size(20)
+	boolQuery = boolQuery.Must(elastic.NewNestedQuery("profiles.controls", nestedBoolQuery).InnerHit(hit))
+
+	searchSource := elastic.NewSearchSource().
+		Query(boolQuery).
+		FetchSource(false).
+		Size(size * 50) // Multiplying size to ensure that same profile with multiple versions is not limiting our suggestions to a lower number
+		// ^ Because we can't sort by max_score of the inner hits: https://discuss.elastic.co/t/nested-objects-hits-inner-hits-and-sorting/32565
+
+	source, err := searchSource.Source()
+	if err != nil {
+		return nil, errors.Wrap(err, "getControlTagsSuggestions unable to get Source")
+	}
+
+	LogQueryPartMin(esIndex, source, "getControlTagsSuggestions query")
+
+	searchResult, err := client.Search().
+		SearchSource(searchSource).
+		Index(esIndex).
+		FilterPath(
+			"took",
+			"hits.total",
+			"hits.hits._id",
+			"hits.hits._score",
+			"hits.hits.inner_hits").
+		Do(context.Background())
+
+	if err != nil {
+		logrus.Error("getControlTagsSuggestions search failed")
+		return nil, err
+	}
+
+	logrus.Debugf("Search query took %d milliseconds\n", searchResult.TookInMillis)
+
+	type ControlSourceTags struct {
+		ID         string                            `json:"id"`
+		StringTags []ESInSpecReportControlStringTags `json:"string_tags"`
+	}
+	type ControlTagsScore struct {
+		Score      float32
+		StringTags []ESInSpecReportControlStringTags
+	}
+
+	// Using this array to aggregate the unsorted suggestions from the response
+	foundControlTags := make([]ControlTagsScore, 0)
+	if searchResult != nil {
+		for _, hit := range searchResult.Hits.Hits {
+			if hit != nil {
+				for _, inner_hit := range hit.InnerHits {
+					if inner_hit != nil {
+						for _, hit2 := range inner_hit.Hits.Hits {
+							var c ControlSourceTags
+							if hit2.Source != nil {
+								err := json.Unmarshal(*hit2.Source, &c)
+								if err == nil && c.ID != "" {
+									foundControlTags = append(foundControlTags, ControlTagsScore{
+										float32(*hit2.Score),
+										c.StringTags,
+									})
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	sort.Slice(foundControlTags, func(i, j int) bool {
+		return foundControlTags[i].Score > foundControlTags[j].Score
+	})
+
+	// Map the found tag suggestions to remove duplications
+	scoredTagSuggs := make(map[string]*float32)
+	for _, item := range foundControlTags {
+		matches := make([]string, 0)
+		// If the suggestion is for control tag key, we need to find the one that
+		// was the closest match from all the tag keys the control might have
+		if typeParam == "control_tag_key" {
+			for _, controlTag := range item.StringTags {
+				matches = append(matches, controlTag.Key)
+			}
+		}
+
+		// If the suggestion is for control tag values, we need to find the tag that matches the
+		// tag key and then find the closest match from all the values of that tag
+		if typeParam == "control_tag_value" {
+			for _, controlTag := range item.StringTags {
+				if controlTag.Key == controlTagFilterKey {
+					matches = append(matches, controlTag.Values...)
+				}
+			}
+		}
+
+		// Find the best engram match from the array of texts
+		bestMatch := findBestArrayMatch(text, matches)
+		for _, match := range bestMatch {
+			bestMatchScore := item.Score
+			if scoredTagSuggs[match] == nil || *scoredTagSuggs[match] < item.Score {
+				scoredTagSuggs[match] = &bestMatchScore
+			}
+		}
+	}
+
+	suggs := make([]*reportingapi.Suggestion, 0)
+	for mSugg, mScore := range scoredTagSuggs {
+		suggs = append(suggs, &reportingapi.Suggestion{
+			Text:  mSugg,
+			Score: *mScore,
+		})
+	}
+
+	return suggs, nil
+}
+
+func findBestArrayMatch(text string, arr []string) []string {
+	if len(text) < 2 {
+		return arr
+	}
+	matchArr := make([]string, 0)
+	if len(arr) == 0 {
+		return matchArr
+	} else if len(arr) > 1 {
+		// Choose a set of bag sizes, more is more accurate but slower
+		bagSizes := []int{2, 3}
+		// Create a closestmatch object
+		cm := closestmatch.New(arr, bagSizes)
+		arr = cm.ClosestN(text, 1)
+		if len(arr) == 0 {
+			return matchArr
+		}
+	}
+	matchArr = append(matchArr, arr[0])
+	return matchArr
 }
 
 // For the string "Apache Linux" ".*apache.*|.*linux.*" will be returned.

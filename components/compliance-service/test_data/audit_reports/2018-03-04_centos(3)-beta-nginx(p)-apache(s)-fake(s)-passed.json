@@ -190,7 +190,7 @@
         },
         {
           "id": "apache-01",
-          "code": "control 'apache-01' do\n  impact 1.0\n  title 'Apache should be running'\n  desc 'Apache should be running.'\n  describe service(apache.service) do\n    it { should be_installed }\n    it { should be_running }\n  end\nend\n",
+          "code": "control 'apache-01' do\n  impact 1.0\n  title 'Apache should be running'\n  desc 'Apache should be running.'\n  describe service(apache.service) do\n    it { should be_installed }\n    it { should be_running }\n  end\n  tag 'scoop': 'icecream'\nend\n",
           "desc": "Apache should be running.",
           "impact": 1,
           "title": "Apache should be running",
@@ -199,7 +199,9 @@
             "line": 29
           },
           "refs": [],
-          "tags": {},
+          "tags": {
+            "scoop": "icecream"
+          },
           "results": [
             {
               "status": "skipped",
@@ -211,7 +213,7 @@
         },
         {
           "id": "apache-02",
-          "code": "control 'apache-02' do\n  impact 1.0\n  title 'Apache should be enabled'\n  desc 'Configure apache service to be automatically started at boot time'\n  only_if { os[:family] != 'ubuntu' && os[:release] != '16.04' } || only_if { os[:family] != 'debian' && os[:release] != '8' }\n  describe service(apache.service) do\n    it { should be_enabled }\n  end\nend\n",
+          "code": "control 'apache-02' do\n  impact 1.0\n  title 'Apache should be enabled'\n  desc 'Configure apache service to be automatically started at boot time'\n  only_if { os[:family] != 'ubuntu' && os[:release] != '16.04' } || only_if { os[:family] != 'debian' && os[:release] != '8' }\n  describe service(apache.service) do\n    it { should be_enabled }\n  end\n  tag 'Scoops': 'icey gelato'\nend\n",
           "desc": "Configure apache service to be automatically started at boot time",
           "impact": 1,
           "title": "Apache should be enabled",
@@ -220,7 +222,9 @@
             "line": 39
           },
           "refs": [],
-          "tags": {},
+          "tags": {
+            "Scoops": "ices gelato"
+          },
           "results": [
             {
               "status": "skipped",
@@ -232,7 +236,7 @@
         },
         {
           "id": "apache-04",
-          "code": "control 'apache-04' do\n  impact 1.0\n  title 'Check Apache config folder owner, group and permissions.'\n  desc 'The Apache config folder should owned and grouped by root, be writable, readable and executable by owner. It should be readable, executable by group and not readable, not writeable by others.'\n  describe file(apache.conf_dir) do\n    it { should be_owned_by 'root' }\n    it { should be_grouped_into 'root' }\n    it { should be_readable.by('owner') }\n    it { should be_writable.by('owner') }\n    it { should be_executable.by('owner') }\n    it { should be_readable.by('group') }\n    it { should_not be_writable.by('group') }\n    it { should be_executable.by('group') }\n    it { should_not be_readable.by('others') }\n    it { should_not be_writable.by('others') }\n    it { should be_executable.by('others') }\n  end\nend\n",
+          "code": "control 'apache-04' do\n  impact 1.0\n  title 'Check Apache config folder owner, group and permissions.'\n  desc 'The Apache config folder should owned and grouped by root, be writable, readable and executable by owner. It should be readable, executable by group and not readable, not writeable by others.'\n  describe file(apache.conf_dir) do\n    it { should be_owned_by 'root' }\n    it { should be_grouped_into 'root' }\n    it { should be_readable.by('owner') }\n    it { should be_writable.by('owner') }\n    it { should be_executable.by('owner') }\n    it { should be_readable.by('group') }\n    it { should_not be_writable.by('group') }\n    it { should be_executable.by('group') }\n    it { should_not be_readable.by('others') }\n    it { should_not be_writable.by('others') }\n    it { should be_executable.by('others') }\n  end\n  tag 'scoop': 'hot icetea'\nend\n",
           "desc": "The Apache config folder should owned and grouped by root, be writable, readable and executable by owner. It should be readable, executable by group and not readable, not writeable by others.",
           "impact": 1,
           "title": "Check Apache config folder owner, group and permissions.",
@@ -241,7 +245,9 @@
             "line": 58
           },
           "refs": [],
-          "tags": {},
+          "tags": {
+            "scoop": "italian gelato"
+          },
           "results": [
             {
               "status": "skipped",

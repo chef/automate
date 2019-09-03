@@ -1437,7 +1437,7 @@ describe File.basename(__FILE__) do
 
     resp = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
       Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
-      Reporting::ListFilter.new(type: 'control_tag:scop?', values: ['ap?che'])
+      Reporting::ListFilter.new(type: 'control_tag:scope', values: ['ap?che'])
     ], sort: 'name')
     assert_equal(['centos-beta', 'windows(1)-zeta-apache(s)-skipped'],
                  resp['nodes'].map {|x| x['name']},
