@@ -16,14 +16,14 @@
           <tr class="detail-row">
             <th *ngIf="isMajorV1" class="id-column">Description</th>
             <th *ngIf="!isMajorV1" class="id-column">ID</th>
-            <th *ngIf="atLeastV2p1$ | async" class="projects-column">Projects</th>
+            <th *ngIf="projectsEnabled" class="projects-column">Projects</th>
           </tr>
         </thead>
         <tbody>
           <tr class="detail-row">
             <td *ngIf="isMajorV1" class="id-column">{{ team.name }}</td>
             <td *ngIf="!isMajorV1" class="id-column">{{ team.id }}</td>
-            <td class="projects-column" *ngIf="atLeastV2p1$ | async" data-cy="team-details-projects">
+            <td class="projects-column" *ngIf="projectsEnabled" data-cy="team-details-projects">
               <ng-container *ngIf="team.projects.length === 0">
                   {{ unassigned }}
               </ng-container>
@@ -71,7 +71,7 @@
             {{ descriptionOrName | titlecase }} is required.
           </chef-error>
         </chef-form-field>
-        <div id='projects-container' *ngIf="atLeastV2p1$ | async">
+        <div id='projects-container' *ngIf="projectsEnabled">
           <app-projects-dropdown
             [projects]="projects"
             (onProjectChecked)="onProjectChecked($event)"

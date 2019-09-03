@@ -12,7 +12,7 @@
         <thead>
           <tr class="detail-row">
             <th class="header-column">ID</th>
-            <th class="header-column" *ngIf="atLeastV2p1$ | async">Projects</th>
+            <th class="header-column" *ngIf="projectsEnabled">Projects</th>
             <th class="header-column">Date Created</th>
             <th class="header-column">Status</th>
           </tr>
@@ -20,7 +20,7 @@
         <tbody>
           <tr class="detail-row">
             <td class="header-column">{{ token?.id }}</td>
-            <td class="header-column" *ngIf="atLeastV2p1$ | async">
+            <td class="header-column" *ngIf="projectsEnabled">
               <ng-container *ngIf="token?.projects.length === 0">
                 {{ unassigned }}
               </ng-container>
@@ -49,7 +49,7 @@
             Name is required.
           </chef-error>
         </chef-form-field>
-        <div id='projects-container' *ngIf="atLeastV2p1$ | async">
+        <div id='projects-container' *ngIf="projectsEnabled">
           <app-projects-dropdown
             [projects]="projects"
             (onProjectChecked)="onProjectChecked($event)"

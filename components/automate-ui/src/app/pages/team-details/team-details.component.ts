@@ -77,6 +77,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public removeText = 'Remove User';
 
   public atLeastV2p1$: Observable<boolean>;
+  public projectsEnabled: boolean;
   public projects: ProjectCheckedMap = {};
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
@@ -99,6 +100,12 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]),
       projects: [[]]
     });
+    this.store.pipe(
+      select(atLeastV2p1),
+      takeUntil(this.isDestroyed))
+      .subscribe(projectsEnabled => {
+        this.projectsEnabled = projectsEnabled;
+      });
   }
 
   private get teamId(): string {
@@ -159,7 +166,9 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       this.updateNameForm.controls.name.setValue(this.team.name);
       this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
       this.store.dispatch(new GetUsers());
-      this.store.dispatch(new GetProjects());
+      if (this.projectsEnabled) {
+        this.store.dispatch(new GetProjects());
+      }
     });
 
     combineLatest([

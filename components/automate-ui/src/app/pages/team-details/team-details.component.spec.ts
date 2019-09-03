@@ -17,7 +17,7 @@ import {
 } from 'app/entities/policies/policy.reducer';
 import { GetIamVersionSuccess } from 'app/entities/policies/policy.actions';
 import { IamVersionResponse } from 'app/entities/policies/policy.requests';
-import { IAMMajorVersion } from 'app/entities/policies/policy.model';
+import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
 import {
   projectEntityReducer,
   ProjectEntityInitialState
@@ -167,10 +167,10 @@ describe('TeamDetailsComponent', () => {
   });
 
   using([
-    [targetId, 'other', 'V2'],
-    ['other', targetId, 'V1']
+    [targetId, 'other', 'v2'],
+    ['other', targetId, 'v1']
   ], function (id: string, guid: string, major: IAMMajorVersion) {
-    it(`initializes with fetching data for ${major} team users and projects`, () => {
+    it(`handles team users for ${major}`, () => {
       spyOn(store, 'dispatch').and.callThrough();
       const team: Team = { id, guid, name: 'any', projects: [] };
       store.dispatch(new GetTeamSuccess(team));
@@ -179,19 +179,33 @@ describe('TeamDetailsComponent', () => {
 
       expect(store.dispatch).toHaveBeenCalledWith(new GetUsers());
       expect(store.dispatch).toHaveBeenCalledWith(new GetTeamUsers({ id: targetId }));
-      expect(store.dispatch).toHaveBeenCalledWith(new GetProjects());
     });
   });
 
+  using([
+    ['v2', 'v0'],
+    ['v1', 'v0']
+  ], function (major: IAMMajorVersion, minor: IAMMinorVersion) {
+    it('does not fetch projects for unsupported IAM versions', () => {
+      spyOn(store, 'dispatch').and.callThrough();
+      const team: Team = { id: 'any', guid: 'any', name: 'any', projects: [] };
+      store.dispatch(new GetTeamSuccess(team));
+      const version: IamVersionResponse = { version: { major, minor } };
+      store.dispatch(new GetIamVersionSuccess(version));
+
+      expect(store.dispatch).not.toHaveBeenCalledWith(new GetProjects());
+    });
+  });
+
+
   it('initializes dropdown with those included on the team checked', () => {
     spyOn(store, 'dispatch').and.callThrough();
+    const version: IamVersionResponse = { version: { major: 'v2', minor: 'v1' } };
+    store.dispatch(new GetIamVersionSuccess(version));
     const teamProjects = ['b-proj', 'd-proj'];
     const team: Team = { id: targetId, guid: 'any', name: 'any', projects: teamProjects };
     store.dispatch(new GetTeamSuccess(team));
     expect(store.dispatch).toHaveBeenCalledWith(new GetProjects());
-
-    const version: IamVersionResponse = { version: { major: 'v2', minor: 'v1' } };
-    store.dispatch(new GetIamVersionSuccess(version));
 
     const projectList = [
       genProject('a-proj'),

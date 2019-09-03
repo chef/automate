@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
 import { isEmpty, identity, xor } from 'lodash/fp';
-import { combineLatest, Subject, Observable } from 'rxjs';
+import { combineLatest, Subject } from 'rxjs';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -41,7 +41,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
   public saveInProgress = false;
   public saveSuccessful = false;
 
-  public atLeastV2p1$: Observable<boolean>;
+  public projectsEnabled: boolean;
   public projects: ProjectCheckedMap = {};
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
@@ -56,11 +56,15 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
       status: [initialStatus],
       projects: [[]]
     });
+    this.store.pipe(
+      select(atLeastV2p1),
+      takeUntil(this.isDestroyed))
+      .subscribe(projectsEnabled => {
+        this.projectsEnabled = projectsEnabled;
+      });
   }
 
   ngOnInit(): void {
-    this.atLeastV2p1$ = this.store.select(atLeastV2p1);
-
     this.store.pipe(
       select(apiTokenFromRoute),
       filter(identity),
@@ -70,7 +74,9 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
         this.updateForm.controls.name.setValue(this.token.name);
         this.status = this.token.active ? 'active' : 'inactive';
         this.updateForm.controls.status.setValue(this.status);
-        this.store.dispatch(new GetProjects());
+        if (this.projectsEnabled) {
+          this.store.dispatch(new GetProjects());
+        }
       });
 
     this.store.pipe(
