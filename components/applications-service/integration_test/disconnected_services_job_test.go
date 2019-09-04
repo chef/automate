@@ -78,7 +78,7 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 			withSite("testsite"),
 		)
 
-		// Patch event timestamp to mock an old service message and mack it as disconnected
+		// Patch event timestamp to mock an old service message and mark it as disconnected
 		event.EventMetadata.OccurredAt, err = ptypes.TimestampProto(time.Now().Add(-time.Minute * 10))
 		require.NoError(t, err)
 		suite.IngestService(event)
@@ -135,6 +135,70 @@ func TestPeriodicDeleteDisconnectedServices(t *testing.T) {
 		conf, err = suite.ApplicationsServer.GetDeleteDisconnectedServicesConfig(ctx, &applications.GetDeleteDisconnectedServicesConfigReq{})
 		require.NoError(t, err)
 		assert.True(t, conf.Running)
+	})
+
+	t.Run("update delete_disconnected_services job params", func(t *testing.T) {
+		req := &applications.PeriodicJobConfig{Threshold: "23s", Running: true}
+		_, err := suite.ApplicationsServer.UpdateDeleteDisconnectedServicesConfig(ctx, req)
+		require.NoError(t, err)
+
+		conf, err := suite.ApplicationsServer.GetDeleteDisconnectedServicesConfig(ctx, &applications.GetDeleteDisconnectedServicesConfigReq{})
+		require.NoError(t, err)
+		assert.Equal(t, "23s", conf.Threshold)
+
+		// Update the params again to ensure we didn't accidentally pass the test due to leftover state somewhere:
+		req = &applications.PeriodicJobConfig{Threshold: "42s", Running: true}
+		_, err = suite.ApplicationsServer.UpdateDeleteDisconnectedServicesConfig(ctx, req)
+		require.NoError(t, err)
+
+		conf, err = suite.ApplicationsServer.GetDeleteDisconnectedServicesConfig(ctx, &applications.GetDeleteDisconnectedServicesConfigReq{})
+		require.NoError(t, err)
+		assert.Equal(t, "42s", conf.Threshold)
+	})
+
+	t.Run("running the job runner makes the jobs run", func(t *testing.T) {
+		err := suite.JobScheduler.RunAllJobsConstantly(ctx)
+		require.NoError(t, err)
+
+		// * have a way to track number of job runs (prometheus (?))
+		defer suite.DeleteDataFromStorage()
+
+		event := NewHabitatEvent(
+			withSupervisorId("abcd"),
+			withServiceGroup("postgres.default"),
+			withPackageIdent("core/postgres/0.1.0/20190101121212"),
+			withStrategyAtOnce("testchannel"),
+			withFqdn("mytest.example.com"),
+			withSite("testsite"),
+		)
+
+		// Patch event timestamp to mock an old service message which we'll delete for being disconnected
+		event.EventMetadata.OccurredAt, err = ptypes.TimestampProto(time.Now().Add(-time.Hour * 24 * 8))
+		require.NoError(t, err)
+		suite.IngestService(event)
+
+		runners := server.NewJobRunnerSet(suite.ApplicationsServer)
+		err = runners.Start(suite.JobScheduler.CerealSvc)
+		require.NoError(t, err)
+
+		logrus.Info("Starting check for job runner")
+		runsThusFar := runners.DeleteDisconnectedServicesExecutor.TotalRuns()
+		detectedJobRun := false
+		for i := 0; i <= 100; i++ {
+			if runners.DeleteDisconnectedServicesExecutor.TotalRuns() > runsThusFar {
+				detectedJobRun = true
+				break
+			}
+			time.Sleep(50 * time.Millisecond)
+		}
+		if !detectedJobRun {
+			assert.Fail(t, "disconnected_services runner didn't run in the alloted time")
+		}
+
+		request := &applications.DisconnectedServicesReq{ThresholdSeconds: 180}
+		response, err := suite.ApplicationsServer.GetDisconnectedServices(ctx, request)
+		require.NoError(t, err)
+		assert.Equal(t, 0, len(response.GetServices()))
 	})
 
 }

@@ -6,11 +6,13 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/components/applications-service/pkg/config"
 	"github.com/chef/automate/lib/cereal"
 	cerealRPC "github.com/chef/automate/lib/cereal/grpc"
 	"github.com/chef/automate/lib/cereal/patterns"
 	"github.com/chef/automate/lib/grpc/secureconn"
+	"github.com/chef/automate/lib/simpledatemath"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -255,6 +257,14 @@ func (j *JobScheduler) RunAllJobsConstantly(ctx context.Context) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to update recurrence of disconnected_services schedule")
 	}
+
+	err = j.CerealSvc.UpdateWorkflowScheduleByName(
+		ctx,
+		DeleteDisconnectedServicesScheduleName, DeleteDisconnectedServicesJobName,
+		cereal.UpdateRecurrence(r))
+	if err != nil {
+		return errors.Wrap(err, "failed to update recurrence of delete_disconnected_services schedule")
+	}
 	return nil
 }
 
@@ -267,12 +277,16 @@ func defaultDeleteDisconnectedServicesJobParams() *DisconnectedServicesParamsV0 
 }
 
 type JobRunnerSet struct {
-	MarkDisconnectedServicesExecutor *MarkDisconnectedServicesExecutor
+	MarkDisconnectedServicesExecutor   *MarkDisconnectedServicesExecutor
+	DeleteDisconnectedServicesExecutor *DeleteDisconnectedServicesExecutor
 }
 
 func NewJobRunnerSet(applicationsServer *ApplicationsServer) *JobRunnerSet {
 	return &JobRunnerSet{
 		MarkDisconnectedServicesExecutor: &MarkDisconnectedServicesExecutor{
+			ApplicationsServer: applicationsServer,
+		},
+		DeleteDisconnectedServicesExecutor: &DeleteDisconnectedServicesExecutor{
 			ApplicationsServer: applicationsServer,
 		},
 	}
@@ -290,6 +304,18 @@ func (j *JobRunnerSet) Start(cerealSvc *cereal.Manager) error {
 
 	wfX := patterns.NewSingleTaskWorkflowExecutor(DisconnectedServicesJobName, false)
 	err = cerealSvc.RegisterWorkflowExecutor(DisconnectedServicesJobName, wfX)
+	if err != nil {
+		return errors.Wrap(err, "failed to register as workflow exector to mark disconnected services")
+	}
+
+	err = cerealSvc.RegisterTaskExecutor(
+		DeleteDisconnectedServicesJobName,
+		j.DeleteDisconnectedServicesExecutor,
+		cereal.TaskExecutorOpts{},
+	)
+
+	wfX = patterns.NewSingleTaskWorkflowExecutor(DeleteDisconnectedServicesJobName, false)
+	err = cerealSvc.RegisterWorkflowExecutor(DeleteDisconnectedServicesJobName, wfX)
 	if err != nil {
 		return errors.Wrap(err, "failed to register as workflow exector to mark disconnected services")
 	}
@@ -328,7 +354,7 @@ func (m *MarkDisconnectedServicesExecutor) runWithoutStats(t cereal.Task) error 
 	if err := t.GetParameters(&params); err != nil {
 		return errors.Wrap(err, "failed to load parameters for disconnected_services job")
 	}
-	threshold, err := time.ParseDuration(params.ThresholdDuration)
+	threshold, err := simpledatemath.Parse(params.ThresholdDuration)
 	if err != nil {
 		return errors.Wrapf(err, "duration setting %q for disconnected_services in database is invalid", params.ThresholdDuration)
 	}
@@ -341,4 +367,47 @@ func (m *MarkDisconnectedServicesExecutor) runWithoutStats(t cereal.Task) error 
 
 func (m *MarkDisconnectedServicesExecutor) TotalRuns() int64 {
 	return atomic.LoadInt64(&m.totalRuns)
+}
+
+type DeleteDisconnectedServicesExecutor struct {
+	ApplicationsServer  *ApplicationsServer
+	totalRuns           int64
+	totalRunsFailed     int64
+	totalRunsSuccessful int64
+}
+
+func (d *DeleteDisconnectedServicesExecutor) Run(ctx context.Context, t cereal.Task) (interface{}, error) {
+	logCtx := log.WithFields(log.Fields{"task_name": DeleteDisconnectedServicesJobName})
+	err := d.runWithoutStats(ctx, t)
+	atomic.AddInt64(&d.totalRuns, 1)
+	if err != nil {
+		logCtx.WithError(err).Error("periodic task failed")
+		atomic.AddInt64(&d.totalRunsFailed, 1)
+	} else {
+		logCtx.Info("periodic task succeeded")
+		atomic.AddInt64(&d.totalRunsSuccessful, 1)
+	}
+	return nil, err
+}
+
+func (d *DeleteDisconnectedServicesExecutor) runWithoutStats(ctx context.Context, t cereal.Task) error {
+	var params DisconnectedServicesParamsV0
+	if err := t.GetParameters(&params); err != nil {
+		return errors.Wrap(err, "failed to load parameters for disconnected_services job")
+	}
+	threshold, err := simpledatemath.Parse(params.ThresholdDuration)
+	if err != nil {
+		return errors.Wrapf(err, "duration setting %q for disconnected_services in database is invalid", params.ThresholdDuration)
+	}
+
+	req := applications.DisconnectedServicesReq{
+		ThresholdSeconds: int32(threshold.Seconds()),
+	}
+
+	_, err = d.ApplicationsServer.DeleteDisconnectedServices(ctx, &req)
+	return err
+}
+
+func (d *DeleteDisconnectedServicesExecutor) TotalRuns() int64 {
+	return atomic.LoadInt64(&d.totalRuns)
 }
