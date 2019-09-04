@@ -44,22 +44,4 @@ func TestParseDateMath(t *testing.T) {
 	parseInvalidExpression(t, "100000000000000000000h", `simpledatemath: duration expression integer is too large "100000000000000000000h"`)
 	parseInvalidExpression(t, "123456789!$/(", `simpledatemath: duration expression "123456789!$/(" has an invalid or unsupported unit "!$/("`)
 	parseInvalidExpression(t, "40mm", `simpledatemath: duration expression "40mm" has an invalid or unsupported unit "mm"`)
-	// 	{
-	// 		value:   "1.5d",
-	// 		withErr: "invalid time unit: '1.5d'",
-	// 	},
-
-	// for _, test := range cases {
-	// 	t.Run(, func(t *testing.T) {
-	// 		result := validateDateMath(test.value)
-	// 		if test.shouldErr {
-	// 			if assert.NotNil(t, result) {
-	// 				assert.Equal(t, test.withErr, result.Error())
-	// 			}
-	// 		} else {
-	// 			assert.Nil(t, result)
-	// 		}
-	// 	})
-	// }
-
 }
