@@ -1054,7 +1054,7 @@ func TestCreatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.CreatePolicy(ctx, &pol)
+				resp, err := store.CreatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -1076,7 +1076,7 @@ func TestCreatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.CreatePolicy(ctx, &pol)
+				resp, err := store.CreatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -1106,13 +1106,47 @@ func TestCreatePolicy(t *testing.T) {
 				Statements: []storage.Statement{statement},
 			}
 
-			resp, err := store.CreatePolicy(ctx, &pol)
+			resp, err := store.CreatePolicy(ctx, &pol, false)
 			require.Error(t, err)
 			assert.Nil(t, resp)
 
 			_, ok := err.(*storage_errors.ForeignKeyError)
 			assert.True(t, ok, "expected foreign key error")
 			assert.Equal(t, "role not found: "+role, err.Error())
+
+			assertEmpty(t, db.QueryRow(policyWithID, polID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
+			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
+			assertEmpty(t, db.QueryRow(membersCount))
+		},
+		"policy that contains a non-existent project returns ProjectsMissingError": func(t *testing.T) {
+			polID := genSimpleID(t, prngSeed)
+			name, typeVal := "toBeCreated", storage.Custom
+
+			resources, actions := []string{"iam:users"}, []string{"iam:users:create", "iam:users:delete"}
+			member := genMember(t, "user:local:albertine")
+			statement := storage.Statement{
+				Effect:    storage.Deny,
+				Resources: resources,
+				Actions:   actions,
+			}
+
+			pol := storage.Policy{
+				ID:         polID,
+				Name:       name,
+				Members:    []storage.Member{member},
+				Type:       typeVal,
+				Statements: []storage.Statement{statement},
+				Projects:   []string{"notfound"},
+			}
+
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.CreatePolicy(ctx, &pol, true)
+				assert.Error(t, err)
+				_, correctError := err.(*projectassignment.ProjectsMissingError)
+				assert.True(t, correctError)
+				assert.Empty(t, resp)
+			})
 
 			assertEmpty(t, db.QueryRow(policyWithID, polID))
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements`))
@@ -1140,7 +1174,7 @@ func TestCreatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.CreatePolicy(ctx, &pol)
+				resp, err := store.CreatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -1177,7 +1211,7 @@ func TestCreatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.CreatePolicy(ctx, &pol)
+				resp, err := store.CreatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -1214,7 +1248,7 @@ func TestCreatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.CreatePolicy(ctx, &pol)
+				resp, err := store.CreatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -1247,7 +1281,7 @@ func TestCreatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.CreatePolicy(ctx, &pol)
+				resp, err := store.CreatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -1283,7 +1317,7 @@ func TestCreatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.CreatePolicy(ctx, &pol)
+				resp, err := store.CreatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -1315,7 +1349,7 @@ func TestCreatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.CreatePolicy(ctx, &pol)
+				resp, err := store.CreatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -1350,7 +1384,7 @@ func TestCreatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.CreatePolicy(ctx, &pol)
+				resp, err := store.CreatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.NotNil(t, resp)
 			})
@@ -1381,7 +1415,7 @@ func TestCreatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.CreatePolicy(ctx, &pol)
+				resp, err := store.CreatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -1423,7 +1457,7 @@ func TestCreatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.CreatePolicy(ctx, &pol)
+				resp, err := store.CreatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -1468,7 +1502,7 @@ func TestCreatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1)`, projID))
 
 			assertNoPolicyChange(t, store, func() {
-				resp, err := store.CreatePolicy(ctx, &pol)
+				resp, err := store.CreatePolicy(ctx, &pol, false)
 				require.Error(t, err)
 				assert.Nil(t, resp)
 			})
@@ -1486,7 +1520,7 @@ func TestCreatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.CreatePolicy(ctx, &pol)
+				resp, err := store.CreatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -1513,7 +1547,7 @@ func TestCreatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.CreatePolicy(ctx, &pol)
+				resp, err := store.CreatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -1542,7 +1576,7 @@ func TestCreatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.CreatePolicy(ctx, &pol)
+				resp, err := store.CreatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -1570,7 +1604,7 @@ func TestCreatePolicy(t *testing.T) {
 			}
 
 			assertNoPolicyChange(t, store, func() {
-				resp, err := store.CreatePolicy(ctx, &pol)
+				resp, err := store.CreatePolicy(ctx, &pol, false)
 				require.Error(t, err)
 				assert.Nil(t, resp)
 				_, ok := err.(*storage_errors.ForeignKeyError)
@@ -1601,7 +1635,7 @@ func TestCreatePolicy(t *testing.T) {
 			}
 
 			assertNoPolicyChange(t, store, func() {
-				resp, err := store.CreatePolicy(ctx, &pol)
+				resp, err := store.CreatePolicy(ctx, &pol, false)
 				require.Error(t, err)
 				assert.Nil(t, resp)
 				_, ok := err.(*storage_errors.ForeignKeyError)
@@ -2497,7 +2531,7 @@ func TestUpdatePolicy(t *testing.T) {
 				Members: []storage.Member{member},
 			}
 			assertNoPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol)
+				resp, err := store.UpdatePolicy(ctx, &pol, false)
 				assert.Error(t, err)
 				assert.Equal(t, storage_errors.ErrNotFound, err)
 				assert.Nil(t, resp)
@@ -2520,7 +2554,7 @@ func TestUpdatePolicy(t *testing.T) {
 				Members: []storage.Member{member},
 			}
 			assertNoPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol)
+				resp, err := store.UpdatePolicy(ctx, &pol, false)
 				assert.Error(t, err)
 				assert.Equal(t, storage_errors.ErrNotFound, err)
 				assert.Nil(t, resp)
@@ -2541,7 +2575,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol)
+				resp, err := store.UpdatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -2550,6 +2584,33 @@ func TestUpdatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
 			assertOne(t, db.QueryRow(policyMembersByPolicyID, polID))
 			assertOne(t, db.QueryRow(membersCount))
+		},
+		"policy that updates the project diff to contain a nonexisting project returns ProjectsMissingError": func(t *testing.T) {
+			ctx := context.Background()
+			initPolName := "testpolicy"
+			polID := insertTestPolicy(t, db, initPolName)
+			insertTestPolicyMember(t, db, polID, "user:local:albertine")
+
+			newPolName, typeVal := "new-name", storage.Custom
+			member := genMember(t, "user:local:albertine")
+			pol := storage.Policy{
+				ID:       polID,
+				Name:     newPolName,
+				Type:     typeVal,
+				Members:  []storage.Member{member},
+				Projects: []string{"notfound"},
+			}
+
+			assertNoPolicyChange(t, store, func() {
+				resp, err := store.UpdatePolicy(ctx, &pol, true)
+				assert.Error(t, err)
+				assert.Empty(t, resp)
+				_, correctError := err.(*projectassignment.ProjectsMissingError)
+				assert.True(t, correctError)
+			})
+
+			assertOne(t, db.QueryRow(policyFull, polID, initPolName, typeVal.String()))
+			assertEmpty(t, db.QueryRow(policyFull, polID, newPolName, typeVal.String()))
 		},
 		"policy with no statements, changing the type": func(t *testing.T) {
 			ctx := context.Background()
@@ -2567,7 +2628,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol)
+				resp, err := store.UpdatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -2604,7 +2665,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol)
+				resp, err := store.UpdatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -2643,7 +2704,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol)
+				resp, err := store.UpdatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -2689,7 +2750,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol)
+				resp, err := store.UpdatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -2734,7 +2795,7 @@ func TestUpdatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1)`, projID))
 
 			assertNoPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol)
+				resp, err := store.UpdatePolicy(ctx, &pol, false)
 				require.Error(t, err)
 				assert.Nil(t, resp)
 			})
@@ -2765,7 +2826,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol)
+				resp, err := store.UpdatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.ElementsMatch(t, []string{projID}, resp.Projects)
 			})
@@ -2793,7 +2854,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol)
+				resp, err := store.UpdatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.ElementsMatch(t, expProjs, resp.Projects)
 			})
@@ -2827,7 +2888,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol)
+				resp, err := store.UpdatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, expProjs, resp.Projects)
 			})
@@ -2860,7 +2921,7 @@ func TestUpdatePolicy(t *testing.T) {
 
 			expProjs := []string{projID2}
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol)
+				resp, err := store.UpdatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.ElementsMatch(t, expProjs, resp.Projects)
 			})
@@ -2893,7 +2954,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol)
+				resp, err := store.UpdatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, expProjs, resp.Projects)
 			})
@@ -2923,7 +2984,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			assertNoPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol)
+				resp, err := store.UpdatePolicy(ctx, &pol, false)
 				assert.Error(t, err)
 				assert.Nil(t, resp)
 			})
@@ -2950,7 +3011,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 			ctx = insertProjectsIntoContext(ctx, []string{projID1})
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol)
+				resp, err := store.UpdatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -2972,7 +3033,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol)
+				resp, err := store.UpdatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -2992,7 +3053,7 @@ func TestUpdatePolicy(t *testing.T) {
 			projID1 := "team-rocket"
 			ctx = insertProjectsIntoContext(ctx, []string{projID1, v2.UnassignedProjectID})
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol)
+				resp, err := store.UpdatePolicy(ctx, &pol, false)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -3017,7 +3078,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 			ctx = insertProjectsIntoContext(ctx, []string{projID2, v2.UnassignedProjectID})
 			assertNoPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol)
+				resp, err := store.UpdatePolicy(ctx, &pol, false)
 				assert.Nil(t, resp)
 				assert.Equal(t, storage_errors.ErrNotFound, err)
 			})
@@ -6457,7 +6518,7 @@ func TestPurgeSubjectFromPolicies(t *testing.T) {
 	}
 }
 
-func TestErrIfMissingProjects(t *testing.T) {
+func TestEnsureNoProjectsMissing(t *testing.T) {
 	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
@@ -6467,24 +6528,24 @@ func TestErrIfMissingProjects(t *testing.T) {
 		desc string
 		f    func(*testing.T)
 	}{
-		{"when there are no projects, returns ProjectsMissingErr", func(t *testing.T) {
-			err := store.ErrIfMissingProjects(ctx, []string{"missing"})
+		{"when there are no projects, returns ProjectsMissingError", func(t *testing.T) {
+			err := store.EnsureNoProjectsMissing(ctx, []string{"missing"})
 			assert.Error(t, err)
-			_, correctError := err.(*projectassignment.ProjectsMissingErr)
+			_, correctError := err.(*projectassignment.ProjectsMissingError)
 			assert.True(t, correctError)
 		}},
-		{"when some projects don't exist, returns ProjectsMissingErr", func(t *testing.T) {
+		{"when some projects don't exist, returns ProjectsMissingError", func(t *testing.T) {
 			insertTestProject(t, db, "proj0", "test project 0", storage.Custom)
 			insertTestProject(t, db, "proj1", "test project 1", storage.Custom)
-			err := store.ErrIfMissingProjects(ctx, []string{"proj0", "missing"})
+			err := store.EnsureNoProjectsMissing(ctx, []string{"proj0", "missing"})
 			assert.Error(t, err)
-			_, correctError := err.(*projectassignment.ProjectsMissingErr)
+			_, correctError := err.(*projectassignment.ProjectsMissingError)
 			assert.True(t, correctError)
 		}},
 		{"when all projects exist, return snil", func(t *testing.T) {
 			insertTestProject(t, db, "proj0", "test project 0", storage.Custom)
 			insertTestProject(t, db, "proj1", "test project 1", storage.Custom)
-			err := store.ErrIfMissingProjects(ctx, []string{"proj0", "proj1"})
+			err := store.EnsureNoProjectsMissing(ctx, []string{"proj0", "proj1"})
 			assert.NoError(t, err)
 		}},
 	}

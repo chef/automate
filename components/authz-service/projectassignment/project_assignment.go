@@ -6,7 +6,7 @@ import (
 	"github.com/chef/automate/components/authz-service/engine"
 )
 
-func ErrIfProjectAssignmentUnauthorized(ctx context.Context, authorizer engine.V2Authorizer, subjects, projectIDs []string) error {
+func EnsureProjectAssignmentAuthorized(ctx context.Context, authorizer engine.V2Authorizer, subjects, projectIDs []string) error {
 	engineResp, err := authorizer.V2ProjectsAuthorized(ctx,
 		engine.Subjects(subjects),
 		engine.Action("iam:projects:assign"),

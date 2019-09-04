@@ -154,18 +154,24 @@ func (s *policyServer) CreatePolicy(
 			"error parsing policy %q: %s", req.Id, err.Error())
 	}
 
-	returnPol, err := s.store.CreatePolicy(ctx, &pol)
+	returnPol, err := s.store.CreatePolicy(ctx, &pol, s.isBeta2p1())
 	switch err {
 	case nil: // continue
 	case storage_errors.ErrConflict:
 		return nil, status.Errorf(codes.AlreadyExists,
 			"policy with id %q already exists", req.Id)
 	default:
-		if err, ok := err.(*storage_errors.ForeignKeyError); ok {
+		switch err.(type) {
+		case *projectassignment.ProjectsMissingError:
+			return nil, status.Error(codes.NotFound, err.Error())
+		case *projectassignment.ProjectsUnauthorizedForAssignmentErr:
+			return nil, status.Errorf(codes.PermissionDenied, err.Error())
+		case *storage_errors.ForeignKeyError:
 			return nil, status.Error(codes.InvalidArgument, err.Error())
+		default:
+			return nil, status.Errorf(codes.Internal,
+				"creating policy %q: %s", req.Id, err.Error())
 		}
-		return nil, status.Errorf(codes.Internal,
-			"creating policy %q: %s", req.Id, err.Error())
 	}
 
 	return policyFromInternal(returnPol)
@@ -260,7 +266,7 @@ func (s *policyServer) UpdatePolicy(
 		return nil, status.Errorf(codes.InvalidArgument, "parse policy with ID %q: %s", req.Id, err.Error())
 	}
 
-	polInternal, err := s.store.UpdatePolicy(ctx, &storagePolicy)
+	polInternal, err := s.store.UpdatePolicy(ctx, &storagePolicy, s.isBeta2p1())
 	if err != nil {
 		switch err {
 		case storage_errors.ErrConflict:
@@ -268,10 +274,17 @@ func (s *policyServer) UpdatePolicy(
 		case storage_errors.ErrNotFound:
 			return nil, status.Errorf(codes.NotFound, "no policy with ID %q found", req.Id)
 		default:
-			if err, ok := err.(*storage_errors.ForeignKeyError); ok {
+			switch err.(type) {
+			case *projectassignment.ProjectsMissingError:
+				return nil, status.Errorf(codes.NotFound, err.Error())
+			case *projectassignment.ProjectsUnauthorizedForAssignmentErr:
+				return nil, status.Errorf(codes.PermissionDenied, err.Error())
+			case *storage_errors.ForeignKeyError:
 				return nil, status.Error(codes.InvalidArgument, err.Error())
+			default:
+				return nil, status.Errorf(codes.Internal,
+					"updating policy %q: %s", req.Id, err.Error())
 			}
-			return nil, err
 		}
 	}
 
@@ -409,7 +422,7 @@ func (s *policyServer) CreateRole(
 		switch err.(type) {
 		case *storage_errors.ForeignKeyError:
 			return nil, status.Errorf(codes.InvalidArgument, err.Error())
-		case *projectassignment.ProjectsMissingErr:
+		case *projectassignment.ProjectsMissingError:
 			return nil, status.Errorf(codes.NotFound, err.Error())
 		case *projectassignment.ProjectsUnauthorizedForAssignmentErr:
 			return nil, status.Errorf(codes.PermissionDenied, err.Error())
@@ -498,7 +511,7 @@ func (s *policyServer) UpdateRole(
 		return nil, status.Errorf(codes.NotFound, "no role with ID %q found", req.Id)
 	default:
 		switch err.(type) {
-		case *projectassignment.ProjectsMissingErr:
+		case *projectassignment.ProjectsMissingError:
 			return nil, status.Errorf(codes.NotFound, err.Error())
 		case *projectassignment.ProjectsUnauthorizedForAssignmentErr:
 			return nil, status.Errorf(codes.PermissionDenied, err.Error())
@@ -553,7 +566,7 @@ func (s *policyServer) MigrateToV2(ctx context.Context,
 	}
 
 	for _, pol := range defaultPolicies {
-		if _, err := s.store.CreatePolicy(ctx, &pol); err != nil {
+		if _, err := s.store.CreatePolicy(ctx, &pol, false); err != nil {
 			return nil, status.Errorf(codes.Internal, "reset to default policies: %s", err.Error())
 		}
 	}

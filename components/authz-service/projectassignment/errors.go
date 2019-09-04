@@ -4,17 +4,17 @@ import (
 	"fmt"
 )
 
-// ProjectsMissingErr occurs when some of the projects in the project diff
+// ProjectsMissingError occurs when some of the projects in the project diff
 // did not exist.
-type ProjectsMissingErr struct {
+type ProjectsMissingError struct {
 	projectsMissing []string
 }
 
-func NewProjectsMissingError(projectsMissing []string) error {
-	return &ProjectsMissingErr{projectsMissing: projectsMissing}
+func NewProjectsMissingErroror(projectsMissing []string) error {
+	return &ProjectsMissingError{projectsMissing: projectsMissing}
 }
 
-func (e *ProjectsMissingErr) Error() string {
+func (e *ProjectsMissingError) Error() string {
 	var errorStr string
 	if len(e.projectsMissing) > 1 {
 		errorStr = fmt.Sprintf("You cannot modify projects for this object because these projects did not exist: %q", e.projectsMissing)

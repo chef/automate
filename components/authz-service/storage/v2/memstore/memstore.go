@@ -41,7 +41,7 @@ func (s *State) bumpPolicyVersion() {
 	s.changeManager.notifyChange()
 }
 
-func (s *State) CreatePolicy(_ context.Context, inputPol *storage.Policy) (*storage.Policy, error) {
+func (s *State) CreatePolicy(_ context.Context, inputPol *storage.Policy, checkProjects bool) (*storage.Policy, error) {
 	for _, item := range s.policies.Items() {
 		if pol, ok := item.Object.(*storage.Policy); ok &&
 			(pol.ID == inputPol.ID) {
@@ -147,7 +147,7 @@ func (s *State) AddPolicyMembers(
 	return pol.Members, nil
 }
 
-func (s *State) UpdatePolicy(_ context.Context, p *storage.Policy) (*storage.Policy, error) {
+func (s *State) UpdatePolicy(_ context.Context, p *storage.Policy, checkProjects bool) (*storage.Policy, error) {
 	item, exists := s.policies.Get(p.ID)
 	if !exists {
 		return nil, storage_errors.ErrNotFound
@@ -372,7 +372,7 @@ func (*State) FetchAppliedRulesByProjectIDs(ctx context.Context) (map[string][]*
 	return nil, nil
 }
 
-func (*State) ErrIfMissingProjects(ctx context.Context, projectIDs []string) error {
+func (*State) EnsureNoProjectsMissing(ctx context.Context, projectIDs []string) error {
 	return nil
 }
 

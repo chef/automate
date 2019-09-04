@@ -69,7 +69,7 @@ type Querier interface {
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 // CreatePolicy stores a new policy and its statements in postgres and returns the final policy.
-func (p *pg) CreatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, error) {
+func (p *pg) CreatePolicy(ctx context.Context, pol *v2.Policy, checkProjects bool) (*v2.Policy, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -83,6 +83,21 @@ func (p *pg) CreatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
 	if err != nil {
 		return nil, p.processError(err)
+	}
+
+	if checkProjects {
+		err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, pol.Projects)
+		if err != nil {
+			return nil, p.processError(err)
+		}
+
+		err = projectassignment.EnsureProjectAssignmentAuthorized(ctx,
+			p.engine,
+			auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+			pol.Projects)
+		if err != nil {
+			return nil, p.processError(err)
+		}
 	}
 
 	err = p.insertPolicyWithQuerier(ctx, pol, tx)
@@ -187,7 +202,7 @@ func (p *pg) ListPolicies(ctx context.Context) ([]*v2.Policy, error) {
 }
 
 func (p *pg) GetPolicy(ctx context.Context, id string) (*v2.Policy, error) {
-	pol, err := p.queryPolicy(ctx, id, p.db)
+	pol, err := p.queryPolicy(ctx, id, p.db, false)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -205,7 +220,7 @@ func (p *pg) DeletePolicy(ctx context.Context, id string) error {
 	}
 
 	// Project filtering handled in here
-	_, err = p.queryPolicy(ctx, id, tx)
+	_, err = p.queryPolicy(ctx, id, tx, false)
 	if err != nil {
 		return p.processError(err)
 	}
@@ -231,7 +246,7 @@ func (p *pg) DeletePolicy(ctx context.Context, id string) error {
 	return nil
 }
 
-func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, error) {
+func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy, checkProjects bool) (*v2.Policy, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -241,9 +256,30 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 	}
 
 	// Project filtering handled in here. We'll return a 404 right away if we can't find
-	// the policy via ID as filtered by projects.
-	if _, err = p.queryPolicy(ctx, pol.ID, tx); err != nil {
+	// the policy via ID as filtered by projects. Also locks relevant rows if in v2.1 mode
+	// so we can check project assignment permissions without them being changed under us.
+	oldPolicy, err := p.queryPolicy(ctx, pol.ID, tx, checkProjects)
+	if err != nil {
 		return nil, p.processError(err)
+	}
+
+	if checkProjects {
+		projectDiff := projectassignment.CalculateProjectDiff(oldPolicy.Projects, pol.Projects)
+
+		if len(projectDiff) != 0 {
+			err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, projectDiff)
+			if err != nil {
+				return nil, p.processError(err)
+			}
+
+			err = projectassignment.EnsureProjectAssignmentAuthorized(ctx,
+				p.engine,
+				auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+				projectDiff)
+			if err != nil {
+				return nil, p.processError(err)
+			}
+		}
 	}
 
 	// Since we are forcing users to update the entire policy, we should delete
@@ -388,18 +424,23 @@ func (p *pg) notifyPolicyChange(ctx context.Context, q Querier) error {
 	return err
 }
 
-// queryPolicy returns a policy based on id or an error.
-func (p *pg) queryPolicy(ctx context.Context, id string, q Querier) (*v2.Policy, error) {
+// queryPolicy returns a policy based on id or an error. Can optionally lock for updates.
+func (p *pg) queryPolicy(ctx context.Context, id string, q Querier, selectForUpdate bool) (*v2.Policy, error) {
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	var pol v2.Policy
-	if err := q.QueryRowContext(ctx, "SELECT query_policy($1, $2)", id, pq.Array(projectsFilter)).
+	query := "SELECT query_policy($1, $2)"
+	if selectForUpdate {
+		query = "SELECT query_policy($1, $2) FOR UPDATE"
+	}
+	if err := q.QueryRowContext(ctx, query, id, pq.Array(projectsFilter)).
 		Scan(&pol); err != nil {
 		return nil, err
 	}
+
 	return &pol, nil
 }
 
@@ -418,7 +459,7 @@ func (p *pg) ListPolicyMembers(ctx context.Context, id string) ([]v2.Member, err
 
 	// Project filtering handled in here. We'll return a 404 here right away if
 	// we can't find the policy via ID as filtered by projects.
-	_, err = p.queryPolicy(ctx, id, tx)
+	_, err = p.queryPolicy(ctx, id, tx, false)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -447,7 +488,7 @@ func (p *pg) AddPolicyMembers(ctx context.Context, id string, members []v2.Membe
 
 	// Project filtering handled in here. We'll return a 404 right away if we can't find
 	// the policy via ID as filtered by projects.
-	_, err = p.queryPolicy(ctx, id, tx)
+	_, err = p.queryPolicy(ctx, id, tx, false)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -487,7 +528,7 @@ func (p *pg) ReplacePolicyMembers(ctx context.Context, policyID string, members 
 
 	// Project filtering handled in here. We'll return a 404 right away if we can't find
 	// the policy via ID as filtered by projects.
-	_, err = p.queryPolicy(ctx, policyID, tx)
+	_, err = p.queryPolicy(ctx, policyID, tx, false)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -531,7 +572,7 @@ func (p *pg) RemovePolicyMembers(ctx context.Context,
 
 	// Project filtering handled in here. We'll return a 404 right away if we can't find
 	// the policy via ID as filtered by projects.
-	_, err = p.queryPolicy(ctx, policyID, tx)
+	_, err = p.queryPolicy(ctx, policyID, tx, false)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -660,12 +701,12 @@ func (p *pg) CreateRole(ctx context.Context, role *v2.Role, checkProjects bool) 
 	}
 
 	if checkProjects {
-		err = p.errIfMissingProjectsWithQuerier(ctx, tx, role.Projects)
+		err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, role.Projects)
 		if err != nil {
 			return nil, p.processError(err)
 		}
 
-		err = projectassignment.ErrIfProjectAssignmentUnauthorized(ctx,
+		err = projectassignment.EnsureProjectAssignmentAuthorized(ctx,
 			p.engine,
 			auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
 			role.Projects)
@@ -841,12 +882,12 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role, checkProjects bool) 
 		projectDiff := projectassignment.CalculateProjectDiff(oldRole.Projects, role.Projects)
 
 		if len(projectDiff) != 0 {
-			err = p.errIfMissingProjectsWithQuerier(ctx, tx, projectDiff)
+			err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, projectDiff)
 			if err != nil {
 				return nil, p.processError(err)
 			}
 
-			err = projectassignment.ErrIfProjectAssignmentUnauthorized(ctx,
+			err = projectassignment.EnsureProjectAssignmentAuthorized(ctx,
 				p.engine,
 				auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
 				projectDiff)
@@ -1504,13 +1545,13 @@ func (p *pg) DeleteProject(ctx context.Context, id string) error {
 	return nil
 }
 
-// ErrIfMissingProjects returns projectassignment.ProjectsMissingErr if projects are missing,
+// EnsureNoProjectsMissing returns projectassignment.ProjectsMissingError if projects are missing,
 // otherwise it returns nil.
-func (p *pg) ErrIfMissingProjects(ctx context.Context, projectIDs []string) error {
-	return p.errIfMissingProjectsWithQuerier(ctx, p.db, projectIDs)
+func (p *pg) EnsureNoProjectsMissing(ctx context.Context, projectIDs []string) error {
+	return p.ensureNoProjectsMissingWithQuerier(ctx, p.db, projectIDs)
 }
 
-func (p *pg) errIfMissingProjectsWithQuerier(ctx context.Context, q Querier, projectIDs []string) error {
+func (p *pg) ensureNoProjectsMissingWithQuerier(ctx context.Context, q Querier, projectIDs []string) error {
 	// Return any input ID that does not exist in the projects table.
 	rows, err := p.db.QueryContext(ctx,
 		`SELECT id FROM unnest($1::text[]) AS input(id)
@@ -1535,7 +1576,7 @@ func (p *pg) errIfMissingProjectsWithQuerier(ctx context.Context, q Querier, pro
 	}
 
 	if len(projectsNotFound) != 0 {
-		return projectassignment.NewProjectsMissingError(projectsNotFound)
+		return projectassignment.NewProjectsMissingErroror(projectsNotFound)
 	}
 
 	return nil
