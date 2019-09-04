@@ -5,28 +5,29 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/event_feed"
-	"github.com/chef/automate/components/event-feed-service/pkg/errors"
+	e "github.com/chef/automate/components/event-feed-service/pkg/errors"
+	"github.com/chef/automate/components/event-feed-service/pkg/feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
-	"github.com/chef/automate/components/event-feed-service/pkg/util"
 	"github.com/chef/automate/lib/grpc/health"
 )
 
 // EventFeedServer is the interface to this component.
 type EventFeedServer struct {
 	health      *health.Service
-	feedService *Feeds
+	feedService *FeedService
 }
 
 // New creates a new EventFeedServer instance.
 func New(feedStore persistence.FeedStore) *EventFeedServer {
 	return &EventFeedServer{
 		health:      health.NewService(),
-		feedService: NewFeeds(feedStore),
+		feedService: NewFeedService(feedStore),
 	}
 }
 
@@ -39,22 +40,25 @@ func (eventFeedServer *EventFeedServer) Health() *health.Service {
 // TODO: @gcp consistent behavior on err w/r/t returning either empty result set or nil
 func (eventFeedServer *EventFeedServer) GetFeed(ctx context.Context,
 	request *event_feed.FeedRequest) (*event_feed.FeedResponse, error) {
-	var feedEntries []*util.FeedEntry
-	var hits int64
-	var err error
+	var (
+		feedEntries []*feed.FeedEntry
+		hits        int64
+		err         error
+	)
 
-	log.WithFields(log.Fields{
+	logctx := log.WithFields(log.Fields{
 		"request": request.String(),
-		"func":    "GetFeed",
-	}).Debug("rpc call")
+		"rpc":     "GetFeed",
+	})
 
 	if feedEntries, hits, err = eventFeedServer.feedService.GetFeed(request); err != nil {
-		log.Warnf("Couldn't get feed entries; error: %v", err)
+		logctx.WithError(err).Warn("failed to get feed")
 		return nil, err
 	}
 
 	fe, err := FromInternalFormatToList(feedEntries)
 	if err != nil {
+		logctx.WithError(err).Warn("failed to format feed entries")
 		return nil, err
 	}
 
@@ -66,21 +70,24 @@ func (eventFeedServer *EventFeedServer) GetFeed(ctx context.Context,
 
 func (eventFeedServer *EventFeedServer) GetFeedSummary(ctx context.Context,
 	request *event_feed.FeedSummaryRequest) (*event_feed.FeedSummaryResponse, error) {
-	log.WithFields(log.Fields{
+
+	logctx := log.WithFields(log.Fields{
 		"request": request.String(),
-		"func":    "GetFeedSummary",
-	}).Debug("rpc call")
+		"rpc":     "GetFeedSummary",
+	})
 
 	// Date Range
-	startTime, endTime, err := util.ValidateMillisecondDateRange(request.Start, request.End)
+	startTime, endTime, err := feed.ValidateMillisecondDateRange(request.Start, request.End)
 	if err != nil {
-		return &event_feed.FeedSummaryResponse{}, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
+		logctx.WithError(err).Warn("failed to validate date range")
+		return &event_feed.FeedSummaryResponse{}, e.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 
 	fs, err := eventFeedServer.feedService.GetFeedSummary(request.CountCategory, request.Filters,
 		startTime, endTime)
 	if err != nil {
-		return &event_feed.FeedSummaryResponse{}, errors.GrpcErrorFromErr(codes.Internal, err)
+		logctx.WithError(err).Warn("failed to get feed summary")
+		return &event_feed.FeedSummaryResponse{}, e.GrpcErrorFromErr(codes.Internal, err)
 	}
 
 	// from internal to external feed summary format
@@ -99,10 +106,10 @@ func (eventFeedServer *EventFeedServer) GetFeedSummary(ctx context.Context,
 // ----------------------------------------------------------------------------
 func (eventFeedServer *EventFeedServer) GetFeedTimeline(ctx context.Context,
 	request *event_feed.FeedTimelineRequest) (*event_feed.FeedTimelineResponse, error) {
-	log.WithFields(log.Fields{
+	logctx := log.WithFields(log.Fields{
 		"request": request.String(),
-		"func":    "GetFeedTimeline",
-	}).Debug("rpc call")
+		"rpc":     "GetFeedTimeline",
+	})
 
 	var (
 		actionsMap  = []string{"create", "update", "delete"}
@@ -111,7 +118,8 @@ func (eventFeedServer *EventFeedServer) GetFeedTimeline(ctx context.Context,
 
 	err := validateFeedTimelineRequest(request)
 	if err != nil {
-		return &event_feed.FeedTimelineResponse{}, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
+		logctx.WithError(err).Warn("failed to validate request")
+		return &event_feed.FeedTimelineResponse{}, e.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 
 	// Create three lines, one for each action
@@ -119,7 +127,8 @@ func (eventFeedServer *EventFeedServer) GetFeedTimeline(ctx context.Context,
 		actionLine, err := eventFeedServer.feedService.GetActionLine(request.Filters, request.Start,
 			request.End, request.Timezone, int(request.Interval), action)
 		if err != nil {
-			return &event_feed.FeedTimelineResponse{}, errors.GrpcErrorFromErr(codes.Internal, err)
+			logctx.WithError(err).Warn("failed to get action line")
+			return &event_feed.FeedTimelineResponse{}, e.GrpcErrorFromErr(codes.Internal, err)
 		}
 		actionLines[i] = fromInternalFormatActionLine(actionLine)
 	}
@@ -134,20 +143,20 @@ func (eventFeedServer *EventFeedServer) GetFeedTimeline(ctx context.Context,
 
 func (eventFeedServer *EventFeedServer) HandleEvent(ctx context.Context,
 	request *automate_event.EventMsg) (*automate_event.EventResponse, error) {
-	log.WithFields(log.Fields{
+	logctx := log.WithFields(log.Fields{
 		"request": request.String(),
-		"func":    "HandleEvent",
-	}).Debug("rpc call")
+		"rpc":     "HandleEvent",
+	})
 
 	response, err := eventFeedServer.feedService.HandleEvent(request)
 	if err != nil {
-		log.Warnf("Feed service couldn't handle event: %s", err)
+		logctx.WithError(err).Warn("failed to handle event")
 		return response, err
 	}
 	return response, nil
 }
 
-func FromInternalFormatToList(entries []*util.FeedEntry) ([]*event_feed.FeedEntry, error) {
+func FromInternalFormatToList(entries []*feed.FeedEntry) ([]*event_feed.FeedEntry, error) {
 	tl := make([]*event_feed.FeedEntry, len(entries))
 
 	for i, entry := range entries {
@@ -164,51 +173,41 @@ func FromInternalFormatToList(entries []*util.FeedEntry) ([]*event_feed.FeedEntr
 func validateFeedTimelineRequest(req *event_feed.FeedTimelineRequest) error {
 	// Validate Timezone
 	if req.Timezone == "" {
-		return errors.GrpcError(codes.InvalidArgument, "A timezone must be provided")
+		return e.GrpcError(codes.InvalidArgument, "A timezone must be provided")
 	}
 
 	_, err := time.LoadLocation(req.Timezone)
 	if err != nil {
-		return errors.GrpcErrorFromErr(codes.InvalidArgument, err)
+		return e.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 
 	// Validate Interval
 	if req.Interval <= 0 || req.Interval > 24 {
-		return errors.GrpcError(codes.InvalidArgument,
+		return e.GrpcError(codes.InvalidArgument,
 			"Time interval must be greater than 0 and less than or equal to 24 hours")
 	}
 
 	if 24%req.Interval != 0 {
-		return errors.GrpcError(codes.InvalidArgument, "24 must be divisible by time interval")
+		return e.GrpcError(codes.InvalidArgument, "24 must be divisible by time interval")
 	}
 
 	// Validate Date Range
-	if !util.ValidateDateRange(req.Start, req.End) {
-		return errors.GrpcError(codes.InvalidArgument, "Invalid start/end time. (format: YYYY-MM-DD)")
+	if !feed.ValidateDateRange(req.Start, req.End) {
+		return e.GrpcError(codes.InvalidArgument, "Invalid start/end time. (format: YYYY-MM-DD)")
 	}
 
 	return nil
 }
 
-func fromInternalFormat(entry *util.FeedEntry) (*event_feed.FeedEntry, error) {
+func fromInternalFormat(entry *feed.FeedEntry) (*event_feed.FeedEntry, error) {
 	pubTs, err := ptypes.TimestampProto(entry.Published)
 	if err != nil {
-		log.WithFields(log.Fields{
-			"func":      "fromInternalFormat",
-			"err":       err,
-			"timestamp": entry.Published.String(),
-		}).Warn("Unable to translate source event publish time to timestamp proto")
-		return nil, err
+		return nil, errors.Wrapf(err, "invalid published timestamp: %s", entry.Published.String())
 	}
 
 	createTs, err := ptypes.TimestampProto(entry.Created)
 	if err != nil {
-		log.WithFields(log.Fields{
-			"func":      "fromInternalFormat",
-			"err":       err,
-			"timestamp": entry.Created.String(),
-		}).Warn("Unable to translate source event publish time to timestamp proto")
-		return nil, err
+		return nil, errors.Wrapf(err, "invalid created timestamp: %s", entry.Created.String())
 	}
 
 	return &event_feed.FeedEntry{
@@ -243,7 +242,7 @@ func fromInternalFormat(entry *util.FeedEntry) (*event_feed.FeedEntry, error) {
 	}, nil
 }
 
-func fromInternalFormatSummary(s *util.FeedSummary) *event_feed.FeedSummaryResponse {
+func fromInternalFormatSummary(s *feed.FeedSummary) *event_feed.FeedSummaryResponse {
 	totalEntries := int64(0)
 	counts := make([]*event_feed.EntryCount, 0, len(s.Counts))
 	for k, v := range s.Counts {
@@ -254,7 +253,7 @@ func fromInternalFormatSummary(s *util.FeedSummary) *event_feed.FeedSummaryRespo
 	return &event_feed.FeedSummaryResponse{TotalEntries: totalEntries, EntryCounts: counts}
 }
 
-func fromInternalFormatActionLine(line *util.ActionLine) *event_feed.ActionLine {
+func fromInternalFormatActionLine(line *feed.ActionLine) *event_feed.ActionLine {
 	// for the given action line, convert counts data in each time slot to external (gRPC) format
 	timeslots := make([]*event_feed.Timeslot, len(line.Timeslots))
 	for i, slot := range line.Timeslots {

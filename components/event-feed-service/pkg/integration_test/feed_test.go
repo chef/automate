@@ -18,9 +18,9 @@ import (
 	event_server "github.com/chef/automate/components/event-service/server"
 
 	"github.com/chef/automate/api/interservice/event_feed"
+	"github.com/chef/automate/components/event-feed-service/pkg/feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
 	"github.com/chef/automate/components/event-feed-service/pkg/server"
-	"github.com/chef/automate/components/event-feed-service/pkg/util"
 
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
@@ -97,7 +97,7 @@ func TestEventFeedReturnOnlyEventsWithinDateRange(t *testing.T) {
 		totalEntries = 10
 		pageSize     = int32(totalEntries)
 		startDate    = time.Now().UTC()
-		entries      = []*util.FeedEntry{}
+		entries      = []*feed.FeedEntry{}
 	)
 
 	for i := 0; i < totalEntries; i++ {
@@ -107,7 +107,7 @@ func TestEventFeedReturnOnlyEventsWithinDateRange(t *testing.T) {
 			created   = published
 		)
 
-		data := util.FeedEntry{
+		data := feed.FeedEntry{
 			ID:                 uuid.Must(uuid.NewV4()).String(),
 			ProducerID:         "urn:mycompany:user:violet",
 			ProducerName:       "Violet",
@@ -227,7 +227,7 @@ func TestEventFeedFilterEventType(t *testing.T) {
 		ctx          = context.Background()
 		totalEntries = 12
 		pageSize     = int32(totalEntries)
-		entries      = []*util.FeedEntry{}
+		entries      = []*feed.FeedEntry{}
 		eventTypes   = []string{"profile", "scanjobs"}
 	)
 
@@ -254,7 +254,7 @@ func TestEventFeedFilterEventType(t *testing.T) {
 			objectName = "Profile"
 		}
 
-		data := util.FeedEntry{
+		data := feed.FeedEntry{
 			ID:                 uuid.Must(uuid.NewV4()).String(),
 			ProducerID:         userURN,
 			ProducerName:       name,

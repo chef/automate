@@ -34,3 +34,17 @@ func IndexOf(haystack []string, needle string) (int, error) {
 	}
 	return -1, ErrNotFound
 }
+
+// SliceReject takes a slice of strings and a string to removed a returns a slice
+// with any matching reject strings removed.
+func SliceReject(haystack []string, needle string) []string {
+	res := []string{}
+
+	for _, hay := range haystack {
+		if hay != needle {
+			res = append(res, hay)
+		}
+	}
+
+	return res
+}

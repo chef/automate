@@ -14,8 +14,8 @@ import (
 	"strconv"
 
 	"github.com/chef/automate/api/interservice/event_feed"
+	"github.com/chef/automate/components/event-feed-service/pkg/feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
-	"github.com/chef/automate/components/event-feed-service/pkg/util"
 
 	event_server "github.com/chef/automate/components/event-service/server"
 	"github.com/chef/automate/lib/grpc/grpctest"
@@ -76,7 +76,7 @@ func TestEventStringsFilterEventType(t *testing.T) {
 		startDate    = time.Now().AddDate(0, 0, -3)
 		endDate      = time.Now()
 		verb         = "create"
-		entries      = []*util.FeedEntry{}
+		entries      = []*feed.FeedEntry{}
 		entityTypes  = []string{"profile", "scanjobs"}
 		users        = []string{"jonesy", "admin", "evie", "maddie", "tommy", "georgie"}
 	)
@@ -101,7 +101,7 @@ func TestEventStringsFilterEventType(t *testing.T) {
 
 		tags = append(tags, user, eventType)
 
-		entry := util.FeedEntry{
+		entry := feed.FeedEntry{
 			ID:                 id,
 			ProducerID:         "producerId",
 			ProducerName:       "producerName",
@@ -381,7 +381,7 @@ func TestEventStringsThreeDayThreeActionsRequest(t *testing.T) {
 	endDate = time.Date(endDate.Year(), endDate.Month(), endDate.Day(),
 		12, 30, 0, 0, endDate.Location())
 
-	entries := []*util.FeedEntry{
+	entries := []*feed.FeedEntry{
 		{
 			ID:                 newUUID(),
 			ProducerID:         "producerId",
@@ -523,7 +523,7 @@ func TestEventStringsThreeDayThreeActionsInNewYorkRequest(t *testing.T) {
 	endDate = time.Date(endDate.Year(), endDate.Month(), endDate.Day(),
 		17, 30, 0, 0, endDate.Location())
 
-	entries := []*util.FeedEntry{
+	entries := []*feed.FeedEntry{
 		{
 			ID:                 newUUID(),
 			ProducerID:         "producerId",
@@ -964,7 +964,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 	endDate = time.Date(endDate.Year(), endDate.Month(), endDate.Day(),
 		12, 30, 0, 0, endDate.Location())
 
-	entries := []*util.FeedEntry{
+	entries := []*feed.FeedEntry{
 		// delete - two different entity types
 		{
 			ID:                 newUUID(),

@@ -3,7 +3,7 @@
 //  Copyright:: Copyright 2018, Chef Software Inc.
 //
 
-package util
+package feed
 
 import (
 	"encoding/json"
@@ -41,13 +41,13 @@ type FeedSummaryQuery struct {
 	Filters        map[string][]string
 }
 
-// a feed timeline has multiple lines, one per action (verb)
+// a ActionLine feed timeline has multiple lines, one per action (verb)
 type ActionLine struct {
 	Action    string
 	Timeslots []Timeslot
 }
 
-// a timeline has multiple timeslots
+// a Timeslot has multiple timeslots
 type Timeslot struct {
 	EntryCounts []EntryCount
 }
@@ -86,7 +86,7 @@ func (network *FeedConsumerNetwork) ToString() string {
 		logrus.Warn("Couldn't convert feed consumer network struct to byte array")
 		return ""
 	}
-	return BytesToString(bytes)
+	return bytesToString(bytes)
 }
 
 type FeedEntry struct {
@@ -122,10 +122,10 @@ func (f *FeedEntry) ToString() string {
 		logrus.Warn("Couldn't convert feed entry struct to byte array")
 		return ""
 	}
-	return BytesToString(bytes)
+	return bytesToString(bytes)
 }
 
-func BytesToString(data []byte) string {
+func bytesToString(data []byte) string {
 	return string(data[:])
 }
 
@@ -289,15 +289,6 @@ func ValidatePagingCursorTime(before int64, after int64, cursor string, end int6
 	}
 
 	return cursorTime, ascending, nil
-}
-
-func Remove(s []string, r string) []string {
-	for i, v := range s {
-		if v == r {
-			return append(s[:i], s[i+1:]...)
-		}
-	}
-	return s
 }
 
 func StringArrayToInterfaceArray(array []string) []interface{} {

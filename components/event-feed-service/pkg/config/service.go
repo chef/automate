@@ -38,9 +38,9 @@ type Cereal struct {
 	Address string `mapstructure:"address"`
 }
 
-// Jobs contains the default settings for the jobs scheduler. In many cases
-// these are only applied when the job workflows are created, after which they
-// are managed through gRPC requests and not config.
+// Jobs contains the default settings for the jobs scheduler. This is only applied
+// when the job workflows are created, after which they are managed through the
+// Purge gRPC Configure request, not the config.
 type Jobs struct {
 	DefaultPurgeAfterDays int `mapstructure:"default_purge_after_days"`
 }
@@ -51,13 +51,12 @@ func (s *Service) SetLogLevel() {
 		return
 	}
 
-	log.WithFields(log.Fields{
-		"level": s.LogLevel,
-	}).Info("Setting log level")
+	logctx := log.WithField("level", s.LogLevel)
+	logctx.Info("Setting log level")
 
 	level, err := log.ParseLevel(s.LogLevel)
 	if err != nil {
-		log.WithField("level", s.LogLevel).WithError(err).Error("Using default level 'info'")
+		logctx.WithError(err).Warn("invalid log level, falling back to level 'info'")
 		return
 	}
 
