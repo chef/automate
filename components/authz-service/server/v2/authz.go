@@ -208,15 +208,15 @@ func (s *authzServer) ValidateProjectAssignment(
 		return nil, errors.New("must be on v2.1 to assign projects")
 	}
 
-	err := s.store.ErrIfMissingProjects(ctx, req.ProjectIds)
+	err := s.store.EnsureNoProjectsMissing(ctx, req.ProjectIds)
 	if err != nil {
-		if _, ok := err.(*projectassignment.ProjectsMissingErr); ok {
+		if _, ok := err.(*projectassignment.ProjectsMissingError); ok {
 			return nil, status.Error(codes.NotFound, err.Error())
 		}
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	err = projectassignment.ErrIfProjectAssignmentUnauthorized(ctx, s.engine, req.Subjects, req.ProjectIds)
+	err = projectassignment.EnsureProjectAssignmentAuthorized(ctx, s.engine, req.Subjects, req.ProjectIds)
 	if err != nil {
 		if _, ok := err.(*projectassignment.ProjectsUnauthorizedForAssignmentErr); ok {
 			return nil, status.Error(codes.PermissionDenied, err.Error())

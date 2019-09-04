@@ -1119,7 +1119,7 @@ func TestCreatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
 			assertEmpty(t, db.QueryRow(membersCount))
 		},
-		"policy that contains a non-existent project returns ProjectsMissingErr": func(t *testing.T) {
+		"policy that contains a non-existent project returns ProjectsMissingError": func(t *testing.T) {
 			polID := genSimpleID(t, prngSeed)
 			name, typeVal := "toBeCreated", storage.Custom
 
@@ -1143,7 +1143,7 @@ func TestCreatePolicy(t *testing.T) {
 			assertNoPolicyChange(t, store, func() {
 				resp, err := store.CreatePolicy(ctx, &pol, true)
 				assert.Error(t, err)
-				_, correctError := err.(*projectassignment.ProjectsMissingErr)
+				_, correctError := err.(*projectassignment.ProjectsMissingError)
 				assert.True(t, correctError)
 				assert.Empty(t, resp)
 			})
@@ -2585,7 +2585,7 @@ func TestUpdatePolicy(t *testing.T) {
 			assertOne(t, db.QueryRow(policyMembersByPolicyID, polID))
 			assertOne(t, db.QueryRow(membersCount))
 		},
-		"policy that updates the project diff to contain a nonexisting project returns ProjectsMissingErr": func(t *testing.T) {
+		"policy that updates the project diff to contain a nonexisting project returns ProjectsMissingError": func(t *testing.T) {
 			ctx := context.Background()
 			initPolName := "testpolicy"
 			polID := insertTestPolicy(t, db, initPolName)
@@ -2605,7 +2605,7 @@ func TestUpdatePolicy(t *testing.T) {
 				resp, err := store.UpdatePolicy(ctx, &pol, true)
 				assert.Error(t, err)
 				assert.Empty(t, resp)
-				_, correctError := err.(*projectassignment.ProjectsMissingErr)
+				_, correctError := err.(*projectassignment.ProjectsMissingError)
 				assert.True(t, correctError)
 			})
 
@@ -6518,7 +6518,7 @@ func TestPurgeSubjectFromPolicies(t *testing.T) {
 	}
 }
 
-func TestErrIfMissingProjects(t *testing.T) {
+func TestEnsureNoProjectsMissing(t *testing.T) {
 	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
@@ -6528,24 +6528,24 @@ func TestErrIfMissingProjects(t *testing.T) {
 		desc string
 		f    func(*testing.T)
 	}{
-		{"when there are no projects, returns ProjectsMissingErr", func(t *testing.T) {
-			err := store.ErrIfMissingProjects(ctx, []string{"missing"})
+		{"when there are no projects, returns ProjectsMissingError", func(t *testing.T) {
+			err := store.EnsureNoProjectsMissing(ctx, []string{"missing"})
 			assert.Error(t, err)
-			_, correctError := err.(*projectassignment.ProjectsMissingErr)
+			_, correctError := err.(*projectassignment.ProjectsMissingError)
 			assert.True(t, correctError)
 		}},
-		{"when some projects don't exist, returns ProjectsMissingErr", func(t *testing.T) {
+		{"when some projects don't exist, returns ProjectsMissingError", func(t *testing.T) {
 			insertTestProject(t, db, "proj0", "test project 0", storage.Custom)
 			insertTestProject(t, db, "proj1", "test project 1", storage.Custom)
-			err := store.ErrIfMissingProjects(ctx, []string{"proj0", "missing"})
+			err := store.EnsureNoProjectsMissing(ctx, []string{"proj0", "missing"})
 			assert.Error(t, err)
-			_, correctError := err.(*projectassignment.ProjectsMissingErr)
+			_, correctError := err.(*projectassignment.ProjectsMissingError)
 			assert.True(t, correctError)
 		}},
 		{"when all projects exist, return snil", func(t *testing.T) {
 			insertTestProject(t, db, "proj0", "test project 0", storage.Custom)
 			insertTestProject(t, db, "proj1", "test project 1", storage.Custom)
-			err := store.ErrIfMissingProjects(ctx, []string{"proj0", "proj1"})
+			err := store.EnsureNoProjectsMissing(ctx, []string{"proj0", "proj1"})
 			assert.NoError(t, err)
 		}},
 	}

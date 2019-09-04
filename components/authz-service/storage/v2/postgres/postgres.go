@@ -86,12 +86,12 @@ func (p *pg) CreatePolicy(ctx context.Context, pol *v2.Policy, checkProjects boo
 	}
 
 	if checkProjects {
-		err = p.errIfMissingProjectsWithQuerier(ctx, tx, pol.Projects)
+		err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, pol.Projects)
 		if err != nil {
 			return nil, p.processError(err)
 		}
 
-		err = projectassignment.ErrIfProjectAssignmentUnauthorized(ctx,
+		err = projectassignment.EnsureProjectAssignmentAuthorized(ctx,
 			p.engine,
 			auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
 			pol.Projects)
@@ -267,12 +267,12 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy, checkProjects boo
 		projectDiff := projectassignment.CalculateProjectDiff(oldPolicy.Projects, pol.Projects)
 
 		if len(projectDiff) != 0 {
-			err = p.errIfMissingProjectsWithQuerier(ctx, tx, projectDiff)
+			err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, projectDiff)
 			if err != nil {
 				return nil, p.processError(err)
 			}
 
-			err = projectassignment.ErrIfProjectAssignmentUnauthorized(ctx,
+			err = projectassignment.EnsureProjectAssignmentAuthorized(ctx,
 				p.engine,
 				auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
 				projectDiff)
@@ -701,12 +701,12 @@ func (p *pg) CreateRole(ctx context.Context, role *v2.Role, checkProjects bool) 
 	}
 
 	if checkProjects {
-		err = p.errIfMissingProjectsWithQuerier(ctx, tx, role.Projects)
+		err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, role.Projects)
 		if err != nil {
 			return nil, p.processError(err)
 		}
 
-		err = projectassignment.ErrIfProjectAssignmentUnauthorized(ctx,
+		err = projectassignment.EnsureProjectAssignmentAuthorized(ctx,
 			p.engine,
 			auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
 			role.Projects)
@@ -882,12 +882,12 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role, checkProjects bool) 
 		projectDiff := projectassignment.CalculateProjectDiff(oldRole.Projects, role.Projects)
 
 		if len(projectDiff) != 0 {
-			err = p.errIfMissingProjectsWithQuerier(ctx, tx, projectDiff)
+			err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, projectDiff)
 			if err != nil {
 				return nil, p.processError(err)
 			}
 
-			err = projectassignment.ErrIfProjectAssignmentUnauthorized(ctx,
+			err = projectassignment.EnsureProjectAssignmentAuthorized(ctx,
 				p.engine,
 				auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
 				projectDiff)
@@ -1545,13 +1545,13 @@ func (p *pg) DeleteProject(ctx context.Context, id string) error {
 	return nil
 }
 
-// ErrIfMissingProjects returns projectassignment.ProjectsMissingErr if projects are missing,
+// EnsureNoProjectsMissing returns projectassignment.ProjectsMissingError if projects are missing,
 // otherwise it returns nil.
-func (p *pg) ErrIfMissingProjects(ctx context.Context, projectIDs []string) error {
-	return p.errIfMissingProjectsWithQuerier(ctx, p.db, projectIDs)
+func (p *pg) EnsureNoProjectsMissing(ctx context.Context, projectIDs []string) error {
+	return p.ensureNoProjectsMissingWithQuerier(ctx, p.db, projectIDs)
 }
 
-func (p *pg) errIfMissingProjectsWithQuerier(ctx context.Context, q Querier, projectIDs []string) error {
+func (p *pg) ensureNoProjectsMissingWithQuerier(ctx context.Context, q Querier, projectIDs []string) error {
 	// Return any input ID that does not exist in the projects table.
 	rows, err := p.db.QueryContext(ctx,
 		`SELECT id FROM unnest($1::text[]) AS input(id)
@@ -1576,7 +1576,7 @@ func (p *pg) errIfMissingProjectsWithQuerier(ctx context.Context, q Querier, pro
 	}
 
 	if len(projectsNotFound) != 0 {
-		return projectassignment.NewProjectsMissingError(projectsNotFound)
+		return projectassignment.NewProjectsMissingErroror(projectsNotFound)
 	}
 
 	return nil

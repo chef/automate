@@ -66,7 +66,7 @@ type projectStorage interface {
 	GetProject(context.Context, string) (*Project, error)
 	DeleteProject(context.Context, string) error
 	ListProjects(context.Context) ([]*Project, error)
-	ErrIfMissingProjects(context.Context, []string) error
+	EnsureNoProjectsMissing(context.Context, []string) error
 }
 
 type ruleStorage interface {

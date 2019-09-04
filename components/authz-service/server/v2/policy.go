@@ -162,7 +162,7 @@ func (s *policyServer) CreatePolicy(
 			"policy with id %q already exists", req.Id)
 	default:
 		switch err.(type) {
-		case *projectassignment.ProjectsMissingErr:
+		case *projectassignment.ProjectsMissingError:
 			return nil, status.Error(codes.NotFound, err.Error())
 		case *projectassignment.ProjectsUnauthorizedForAssignmentErr:
 			return nil, status.Errorf(codes.PermissionDenied, err.Error())
@@ -275,7 +275,7 @@ func (s *policyServer) UpdatePolicy(
 			return nil, status.Errorf(codes.NotFound, "no policy with ID %q found", req.Id)
 		default:
 			switch err.(type) {
-			case *projectassignment.ProjectsMissingErr:
+			case *projectassignment.ProjectsMissingError:
 				return nil, status.Errorf(codes.NotFound, err.Error())
 			case *projectassignment.ProjectsUnauthorizedForAssignmentErr:
 				return nil, status.Errorf(codes.PermissionDenied, err.Error())
@@ -422,7 +422,7 @@ func (s *policyServer) CreateRole(
 		switch err.(type) {
 		case *storage_errors.ForeignKeyError:
 			return nil, status.Errorf(codes.InvalidArgument, err.Error())
-		case *projectassignment.ProjectsMissingErr:
+		case *projectassignment.ProjectsMissingError:
 			return nil, status.Errorf(codes.NotFound, err.Error())
 		case *projectassignment.ProjectsUnauthorizedForAssignmentErr:
 			return nil, status.Errorf(codes.PermissionDenied, err.Error())
@@ -511,7 +511,7 @@ func (s *policyServer) UpdateRole(
 		return nil, status.Errorf(codes.NotFound, "no role with ID %q found", req.Id)
 	default:
 		switch err.(type) {
-		case *projectassignment.ProjectsMissingErr:
+		case *projectassignment.ProjectsMissingError:
 			return nil, status.Errorf(codes.NotFound, err.Error())
 		case *projectassignment.ProjectsUnauthorizedForAssignmentErr:
 			return nil, status.Errorf(codes.PermissionDenied, err.Error())

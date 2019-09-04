@@ -372,7 +372,7 @@ func (*State) FetchAppliedRulesByProjectIDs(ctx context.Context) (map[string][]*
 	return nil, nil
 }
 
-func (*State) ErrIfMissingProjects(ctx context.Context, projectIDs []string) error {
+func (*State) EnsureNoProjectsMissing(ctx context.Context, projectIDs []string) error {
 	return nil
 }
 
