@@ -15,7 +15,6 @@ import (
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
-	"github.com/chef/automate/components/compliance-service/utils"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	nodesserver "github.com/chef/automate/components/nodemanager-service/api/nodes/server"
@@ -193,7 +192,7 @@ func (srv *Server) addManagerAndNodes(ctx context.Context, in *manager.NodeManag
 
 func (srv *Server) addNodes(ctx context.Context, id string, in *manager.NodeManager, acctID string) error {
 	// for the aws-ec2 manager, this will be one node per instance in account
-	// for the aws-api manager, this will be one node per region in account
+	// for the aws-api manager, this will be one node per account
 	// for the azure-api manager, this will be one node per subscription in account
 	// for the gcp-api manager, this will be one node for the project specified in the credentials
 	err := srv.addManagerNodesToDB(ctx, id, in.Name, in.Type, acctID, in.InstanceCredentials, in.CredentialId)
@@ -488,7 +487,7 @@ func (srv *Server) SearchNodes(ctx context.Context, in *manager.NodeQuery) (*man
 	case "azure-vm":
 		return srv.searchAzureNodes(ctx, in)
 	case "aws-api":
-		return srv.searchAwsRegions(ctx, in)
+		return srv.searchGenericNodes(ctx, in.GetQuery().GetFilterMap(), in.NodeManagerId)
 	case "azure-api":
 		return srv.searchAzureSubscriptions(ctx, in)
 	case "gcp-api":
@@ -498,63 +497,6 @@ func (srv *Server) SearchNodes(ctx context.Context, in *manager.NodeQuery) (*man
 	default:
 		return nil, &errorutils.InvalidError{Msg: fmt.Sprintf("Unsupported manager type: %s", mgr.Type)}
 	}
-}
-
-func (srv *Server) searchAwsRegions(ctx context.Context, in *manager.NodeQuery) (*manager.Nodes, error) {
-	myaws, _, err := managers.GetAWSManagerFromID(ctx, in.NodeManagerId, srv.DB, srv.secretsClient)
-	if err != nil {
-		err = errorutils.FormatErrorMsg(err, "")
-		return nil, err
-	}
-
-	var includeFilters []string
-	var excludeFilters []string
-	for _, filter := range in.GetQuery().GetFilterMap() {
-		if filter.Key != "region" {
-			continue
-		}
-
-		for _, val := range filter.Values {
-			val = strings.TrimSuffix(val, "*")
-			if filter.Exclude {
-				excludeFilters = append(excludeFilters, val)
-			} else {
-				includeFilters = append(includeFilters, val)
-			}
-		}
-	}
-
-	if len(includeFilters) > 0 && len(excludeFilters) > 0 {
-		err = &errorutils.InvalidError{Msg: "using include and exclude filters in the same request is unsupported"}
-		return nil, errorutils.FormatErrorMsg(err, "")
-	}
-
-	regions, err := myaws.GetRegions(ctx)
-	if err != nil {
-		err = errorutils.FormatErrorMsg(err, "")
-		return nil, err
-	}
-
-	if len(includeFilters) > 0 {
-		allRegions := regions
-		regions = make([]string, 0)
-
-		for _, filter := range includeFilters {
-			matches := stringutils.SliceFilter(allRegions, func(region string) bool {
-				return strings.HasPrefix(region, filter)
-			})
-			regions = append(regions, matches...)
-		}
-	}
-
-	for _, filter := range excludeFilters {
-		regions = stringutils.SliceFilter(regions, func(region string) bool {
-			return !strings.HasPrefix(region, filter)
-		})
-	}
-
-	regions = utils.UniqueStringSlice(regions)
-	return &manager.Nodes{Total: int32(len(regions)), Nodes: regions}, nil
 }
 
 func (srv *Server) searchAzureSubscriptions(ctx context.Context, in *manager.NodeQuery) (*manager.Nodes, error) {
@@ -657,7 +599,7 @@ func (srv *Server) addManagerNodesToDB(ctx context.Context, managerId string, ma
 		}
 		srv.getInstanceStatesAndUpdateDB(ctx, managerId, managerAcctId)
 	case "aws-api":
-		nodeIds, err = srv.addNodeForEachApiRegion(ctx, managerId, managerName, managerAcctId, credential)
+		nodeIds, err = srv.addNodeForAccount(ctx, managerId, managerName, managerAcctId, credential)
 		if err != nil {
 			return errors.Wrapf(err, "addManagerNodesToDb unable to add a node for each api region for manager %s", managerId)
 		}
@@ -720,28 +662,25 @@ func (srv *Server) addNodeForEachEc2Instance(ctx context.Context, managerId stri
 	return nodeIds, nil
 }
 
-func (srv *Server) addNodeForEachApiRegion(ctx context.Context, managerId string, managerName string, managerAcctId string, credential string) ([]string, error) {
+func (srv *Server) addNodeForAccount(ctx context.Context, managerId string, managerName string, managerAcctId string, credential string) ([]string, error) {
 	logrus.Infof("Getting regions for node manager: %+v", managerId)
 	myaws, _, err := managers.GetAWSManagerFromID(ctx, managerId, srv.DB, srv.secretsClient)
 	if err != nil {
-		return nil, fmt.Errorf("addNodeForEachApiRegion; error getting connection %s %s", managerName, err.Error())
+		return nil, fmt.Errorf("addNodeForAccount; error getting connection %s %s", managerName, err.Error())
 	}
 
-	filters := make([]*common.Filter, 0)
-	regions, err := myaws.QueryField(ctx, filters, "regions")
-	if err != nil {
-		return nil, fmt.Errorf("addNodeForEachApiRegion; there was an error listing nodes: %s %s", managerName, err.Error())
-	}
 	acctAlias, err := myaws.GetAccountAlias(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("addNodeForEachApiRegion; unable to get account alias: %s %s", managerName, err.Error())
+		return nil, fmt.Errorf("addNodeForAccount; unable to get account alias: %s %s", managerName, err.Error())
 	}
 	if len(acctAlias) == 0 {
 		// the user may have never set an alias for their account, and that's ok, but we should log it out
-		logrus.Warnf("addNodeForEachApiRegion; no account aliases found for manager: %s", managerName)
+		logrus.Warnf("addNodeForAccount; no account aliases found for manager: %s", managerName)
 	}
-	nodeIds := srv.DB.AddManagerRegionsToDB(regions, managerId, managerAcctId, credential, acctAlias)
-	logrus.Debugf("added %d regions to the db", len(nodeIds))
+	nodeIds, err := srv.DB.AddManagerNodeToDB(managerId, managerAcctId, credential, acctAlias)
+	if err != nil {
+		return nil, err
+	}
 	return nodeIds, nil
 }
 

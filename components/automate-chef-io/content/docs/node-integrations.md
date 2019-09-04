@@ -54,8 +54,6 @@ Chef Automate's Node Manager discovers EC2 instances by:
 
 ### Create a Scan Job Targeting Your AWS Account Configuration
 
-Filter the regions for the scan job by specifying regions to include or exclude.
-
 ![Chef Automate Create AWS-API Scan Job](/images/docs/create-aws-api-scanjob.png)
 
 ### AWS API Scanning Endpoints

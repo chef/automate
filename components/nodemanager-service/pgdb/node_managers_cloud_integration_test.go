@@ -2,7 +2,6 @@ package pgdb_test
 
 import (
 	"context"
-	"strings"
 	"testing"
 
 	"github.com/chef/automate/components/compliance-service/api/common"
@@ -201,7 +200,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestAddManagerSubscriptionsToDBAddsThe
 	suite.Equal(1, len(ids))
 }
 
-func (suite *NodeManagersAndNodesDBSuite) TestAddManagerRegionsToDBAddsTheRegionsWithCorrectInfo() {
+func (suite *NodeManagersAndNodesDBSuite) TestAddManagerNodeToDBAddsANodeWithCorrectInfo() {
 	// TODO @afiune Mock the secrets-service
 	secretId := "12345678901234567890123456789012"
 	mgr := manager.NodeManager{Name: "tester", Type: "azure-api", CredentialId: secretId}
@@ -210,10 +209,11 @@ func (suite *NodeManagersAndNodesDBSuite) TestAddManagerRegionsToDBAddsTheRegion
 		suite.FailNow(err.Error())
 	}
 
-	// we add two regions, expect two nodes
-	regions := []string{"eu-west-1", "us-east-2"}
-	nodeIds := suite.Database.AddManagerRegionsToDB(regions, mgrId, "242403433", secretId, "account alias")
-	suite.Equal(2, len(nodeIds))
+	nodeIds, err := suite.Database.AddManagerNodeToDB(mgrId, "242403433", secretId, "account alias")
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal(1, len(nodeIds))
 
 	// expect node to have backend of aws and correct region
 	ids, err := suite.Database.GetNodeSecretIds(ctx, nodeIds[0])
@@ -524,7 +524,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestAddManagerSubscriptionsToDBResetsM
 	suite.Equal("azure-api", n.Manager)
 }
 
-func (suite *NodeManagersAndNodesDBSuite) TestAddManagerRegionsToDBResetsManagerFieldOfNodes() {
+func (suite *NodeManagersAndNodesDBSuite) TestAddManagerNodeToDBResetsManagerFieldOfNodes() {
 	// TODO @afiune Mock the secrets-service
 	secretId := "12345678901234567890123456789012"
 	mgr := manager.NodeManager{Name: "tester", Type: "azure-api", CredentialId: secretId}
@@ -533,8 +533,10 @@ func (suite *NodeManagersAndNodesDBSuite) TestAddManagerRegionsToDBResetsManager
 		suite.FailNow(err.Error())
 	}
 
-	regions := []string{"eu-west-1"}
-	nodeIds := suite.Database.AddManagerRegionsToDB(regions, mgrId, "242403433", secretId, "account alias")
+	nodeIds, err := suite.Database.AddManagerNodeToDB(mgrId, "242403433", secretId, "account alias")
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
 	suite.Equal(1, len(nodeIds))
 
 	n, err := suite.Database.GetNode(ctx, nodeIds[0])
@@ -559,18 +561,54 @@ func (suite *NodeManagersAndNodesDBSuite) TestAddManagerRegionsToDBResetsManager
 		suite.FailNow(err.Error())
 	}
 
-	nodeIds = suite.Database.AddManagerRegionsToDB(regions, mgrId, "242403433", secretId, "account alias")
+	nodeIds, err = suite.Database.AddManagerNodeToDB(mgrId, "242403433", secretId, "account alias")
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
 
 	n, err = suite.Database.GetNode(ctx, nodeIds[0])
 	if err != nil {
 		suite.FailNow(err.Error())
 	}
-	name := strings.Split(n.Name, ":")
-	suite.Equal("account alias", name[0])
-	suite.Equal("eu-west-1", name[1])
+	suite.Equal("aws-account-account alias", n.Name)
 	suite.Equal("aws-api", n.Manager)
 }
 
+func (suite *NodeManagersAndNodesDBSuite) TestAddManagerNodeToDBName() {
+	secretId := "12345678901234567890123456789012"
+	mgr := manager.NodeManager{Name: "tester", Type: "azure-api", CredentialId: secretId}
+	mgrId, err := suite.Database.AddNodeManager(&mgr, "12345678")
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+
+	nodeIds, err := suite.Database.AddManagerNodeToDB(mgrId, "242403433", secretId, "")
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal(1, len(nodeIds))
+
+	n, err := suite.Database.GetNode(ctx, nodeIds[0])
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+
+	suite.Equal("aws-account-242403433", n.Name)
+
+	nodeIds, err = suite.Database.AddManagerNodeToDB(mgrId, "242403433", secretId, "a cool alias")
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal(1, len(nodeIds))
+
+	n, err = suite.Database.GetNode(ctx, nodeIds[0])
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+
+	suite.Equal("aws-account-a cool alias", n.Name)
+
+}
 func (suite *NodeManagersAndNodesDBSuite) TestRemoveStaleNodeAssociationsUpdatesOrphanNodes() {
 	mgr := manager.NodeManager{Name: "tester", Type: "aws-ec2"}
 	mgrId, err := suite.Database.AddNodeManager(&mgr, "12345678")

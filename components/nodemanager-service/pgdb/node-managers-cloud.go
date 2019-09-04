@@ -98,51 +98,50 @@ func (db *DB) AddManagerSubscriptionsToDB(subs []*manager.ManagerNode, managerId
 	return nodeIds
 }
 
-func (db *DB) AddManagerRegionsToDB(regions []string, managerId string, managerAcctId string, credential string, acctAlias string) []string {
+func (db *DB) AddManagerNodeToDB(managerId string, managerAcctId string, credential string, acctAlias string) ([]string, error) {
 	nodeIds := make([]string, 0)
-	for _, item := range regions {
-		var name string
-		uuid := uuid.Must(uuid.NewV4()).String()
-		if len(acctAlias) > 0 {
-			name = fmt.Sprintf("%s:%s", acctAlias, item)
-		} else {
-			name = item
-		}
-		tc := nodes.TargetConfig{
-			Backend: "aws",
-			Region:  item,
-		}
-		jsonTc, err := json.Marshal(tc)
-		if err != nil {
-			logrus.Errorf("AddManagerRegionsToDB unable to marshal target_config info for region %s", item)
-			jsonTc = make([]byte, 0)
-		}
-		sourceID := item
-
-		err = Transact(db, func(tx *DBTrans) error {
-			uuid, err = tx.SelectStr(sqlInsertManagerNode, uuid, "aws-api", sourceID, jsonTc, name, item, managerAcctId)
-			if err != nil {
-				return errors.Wrapf(err, "AddManagerRegionsToDB unable to insert region %s", item)
-			}
-			// add credential to nodes_secrets table
-			err = tx.nodeSecret(uuid, []string{credential})
-			if err != nil {
-				return errors.Wrap(err, "AddManagerRegionsToDB unable to insert node_secret")
-			}
-			_, err = tx.Exec(sqlInsertNodeManagerNode, managerId, uuid)
-			if err != nil {
-				return errors.Wrapf(err, "AddManagerRegionsToDB unable to insert node_managers_nodes manager_id: %s node_id: %s", managerId, uuid)
-			}
-			return nil
-		})
-
-		if err != nil {
-			logrus.Errorf("AddManagerRegionsToDB unable to insert region %s %v", item, err)
-			continue
-		}
-		nodeIds = append(nodeIds, uuid)
+	var name string
+	uuid := uuid.Must(uuid.NewV4()).String()
+	if len(acctAlias) > 0 {
+		name = fmt.Sprintf("aws-account-%s", acctAlias)
+	} else {
+		name = fmt.Sprintf("aws-account-%s", managerAcctId)
 	}
-	return nodeIds
+	tc := nodes.TargetConfig{
+		Backend: "aws",
+		Region:  "us-east-1",
+	}
+	jsonTc, err := json.Marshal(tc)
+	if err != nil {
+		logrus.Errorf("AddManagerNodeToDB unable to marshal target_config info for account %s", acctAlias)
+		jsonTc = make([]byte, 0)
+	}
+	sourceID := managerAcctId
+
+	err = Transact(db, func(tx *DBTrans) error {
+		uuid, err = tx.SelectStr(sqlInsertManagerNode, uuid, "aws-api", sourceID, jsonTc, name, acctAlias, managerAcctId)
+		if err != nil {
+			return errors.Wrapf(err, "AddManagerNodeToDB unable to insert node for account %s", acctAlias)
+		}
+		// add credential to nodes_secrets table
+		err = tx.nodeSecret(uuid, []string{credential})
+		if err != nil {
+			return errors.Wrap(err, "AddManagerNodeToDB unable to insert node_secret")
+		}
+		_, err = tx.Exec(sqlInsertNodeManagerNode, managerId, uuid)
+		if err != nil {
+			return errors.Wrapf(err, "AddManagerNodeToDB unable to insert node_managers_nodes manager_id: %s node_id: %s", managerId, uuid)
+		}
+		return nil
+	})
+
+	if err != nil {
+		logrus.Errorf("AddManagerRegionsToDB unable to insert node for %s %v", acctAlias, err)
+		return nil, errors.Wrapf(err, "AddManagerRegionsToDB unable to insert node for %s", acctAlias)
+	}
+	nodeIds = append(nodeIds, uuid)
+
+	return nodeIds, nil
 }
 
 // Adds gcp-api node that corresponds to a gcp node manager

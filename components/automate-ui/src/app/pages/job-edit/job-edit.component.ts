@@ -233,7 +233,6 @@ export class JobEditComponent implements OnDestroy {
               break;
             }
             case ('aws-ec2'):
-            case ('aws-api'):
             case ('azure-vm'):
             case ('azure-api'): {
               this.store.dispatch(new ManagerSearchFields({managerId, field: 'regions'}));

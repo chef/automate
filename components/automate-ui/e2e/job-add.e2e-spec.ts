@@ -86,9 +86,7 @@ describe('Job Add', () => {
       .any()
       .reply(200, JSON.stringify({
         nodes: [
-          'aws-api-node-1',
-          'aws-api-node-2',
-          'aws-api-node-3'
+          'aws-api-node-1'
         ],
         total: 3
       }));
@@ -345,11 +343,6 @@ describe('Job Add', () => {
           manager.$('input[type="checkbox"]').click();
         });
 
-        it('has fields for filtering by region', () => {
-          const regionFields = manager.$('fieldset.filter-regions');
-          expect(regionFields.isDisplayed()).toBe(true);
-        });
-
         it('has a preview list of nodes', () => {
           const list = manager.$('.manager-nodes-preview');
           const listItems = list.$$('chef-tr');
@@ -358,9 +351,7 @@ describe('Job Add', () => {
 
           expect(list.isDisplayed()).toBe(true);
           expect(listItems.map(el => el.getText())).toEqual([
-            'aws-api-node-1',
-            'aws-api-node-2',
-            'aws-api-node-3'
+            'aws-api-node-1'
           ]);
         });
       });

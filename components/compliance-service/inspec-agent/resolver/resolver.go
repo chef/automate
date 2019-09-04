@@ -259,6 +259,70 @@ func handleRegionFilters(filters []*common.Filter, regions []string) ([]string, 
 }
 
 func (r *Resolver) handleAwsApiNodes(ctx context.Context, m *manager.NodeManager, filters []*common.Filter, job *jobs.Job) ([]*types.InspecJob, error) {
+	// we have upgraded our logic to be able to work with mult-region scanning, meaning any new integrations
+	// created will only create one node per account (instead of one per region)
+	// the following logic checks to see if more than one node is associated with the account in our db
+	// if it is, we follow the "old path"
+	// if it is not, we follow a "new path" where we just prepare the one node for scanning
+	var nmFilter = []*common.Filter{
+		{Key: "manager_id", Exclude: false, Values: []string{m.Id}},
+	}
+
+	dbNodes, err := r.nodesClient.List(ctx, &nodes.Query{PerPage: 1000000, Filters: nmFilter})
+	if err != nil {
+		return nil, errorutils.FormatErrorMsg(err, "")
+	}
+	if len(dbNodes.Nodes) == 0 {
+		return nil, fmt.Errorf("no nodes found in db for manager %s", m.Name)
+	}
+	if len(dbNodes.Nodes) == 1 {
+		return r.handleAwsApiNodesSingleNode(ctx, m, job, dbNodes.Nodes[0])
+	}
+	return r.handleAwsApiNodesMultiNode(ctx, m, filters, job)
+}
+
+func (r *Resolver) handleAwsApiNodesSingleNode(ctx context.Context, m *manager.NodeManager, job *jobs.Job, node *nodes.Node) ([]*types.InspecJob, error) {
+	var err error
+	var secret *secrets.Secret
+	var accessKeyID, secretKey, sessionToken string
+	if len(m.CredentialId) > 0 {
+		secret, err = r.secretsClient.Read(ctx, &secrets.Id{Id: m.CredentialId})
+		if err != nil {
+			return nil, fmt.Errorf("unable to fetch credential id:%s %s", m.CredentialId, err.Error())
+		}
+		accessKeyID, secretKey, _, sessionToken = managers.GetAWSCreds(secret)
+	}
+
+	return []*types.InspecJob{{
+		InspecBaseJob: types.InspecBaseJob{
+			JobID:    job.Id,
+			JobName:  job.Name,
+			NodeEnv:  "aws-api",
+			NodeName: node.Name,
+			JobType:  job.Type,
+			Status:   job.Status,
+			NodeID:   node.Id,
+		},
+		Timeout: job.Timeout,
+		Retries: job.Retries,
+		TargetConfig: inspec.TargetConfig{
+			TargetBaseConfig: inspec.TargetBaseConfig{
+				Backend: "aws",
+				Region:  "us-east-1",
+			},
+			Secrets: inspec.Secrets{
+				AwsUser:         accessKeyID,
+				AwsPassword:     secretKey,
+				AwsSessionToken: sessionToken,
+			},
+		},
+		Profiles:        job.Profiles,
+		SourceID:        m.AccountId,
+		SourceAccountID: m.AccountId,
+	}}, nil
+}
+
+func (r *Resolver) handleAwsApiNodesMultiNode(ctx context.Context, m *manager.NodeManager, filters []*common.Filter, job *jobs.Job) ([]*types.InspecJob, error) {
 	nodeCollections := make(map[string]managerRegions)
 	regions, acctAlias, err := r.queryRegions(ctx, m.Id, filters)
 	if err != nil {
