@@ -10,7 +10,7 @@
     <div class="reporting-header">
       <app-reporting-searchbar
         [date]="endDate$ | async"
-        [filters]="getSelectedFilters()"
+        [filters]="filters$ | async"
         [filterTypes]="availableFilterTypes"
         [filterValues]="availableFilterValues"
         (suggestValues)="onSuggestValues($event)"

@@ -27,6 +27,7 @@ import {
   Chicklet
 } from '../../../types/types';
 import { pickBy, some } from 'lodash/fp';
+import { FilterC } from './types';
 
 @Component({
   templateUrl: './reporting.component.html',
@@ -128,6 +129,8 @@ export class ReportingComponent implements OnInit, OnDestroy {
   downloadInProgress = false;
   downloadFailed = false;
   endDate$: Observable<Date>;
+  filters$: Observable<FilterC[]>;
+  idToTitle: Map<string, string> = new Map<string, string>();
 
   showSummary = false;
 
@@ -188,8 +191,19 @@ export class ReportingComponent implements OnInit, OnDestroy {
         return observableOf([]);
       }),
       takeUntil(this.isDestroyed)
-    )
-      .subscribe(suggestions => this.availableFilterValues = suggestions.filter(e => e.text));
+    ).subscribe(suggestions => this.availableFilterValues = suggestions.filter(e => e.text));
+
+    this.filters$ = this.reportQuery.state.pipe(map((reportQuery: ReportQuery) =>
+      reportQuery.filters.map(filter => {
+        filter.value.id = filter.value.text;
+        if (['profile_id', 'node_id', 'control_id'].indexOf(filter.type.name) >= 0) {
+          const name = this.getFilterTitle(filter.type.name, filter.value.id);
+          if (name !== undefined) {
+            filter.value.text = name;
+          }
+        }
+        return filter;
+      })));
   }
 
   ngOnDestroy() {
@@ -315,6 +329,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
       if ( value.id ) {
         typeName = 'profile_id';
         filterValue = value.id;
+        this.setFilterTitle(typeName, value.id, value.title);
       } else {
         typeName = 'profile_name';
       }
@@ -322,6 +337,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
       if ( value.id ) {
         typeName = 'node_id';
         filterValue = value.id;
+        this.setFilterTitle(typeName, value.id, value.title);
       } else {
         typeName = 'node_name';
       }
@@ -329,6 +345,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
       if ( value.id ) {
         typeName = 'control_id';
         filterValue = value.id;
+        this.setFilterTitle(typeName, value.id, value.title);
       } else {
         typeName = 'control_name';
       }
@@ -349,7 +366,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
     const {queryParamMap} = this.route.snapshot;
     const queryParams = {...this.route.snapshot.queryParams};
-    const values = queryParamMap.getAll(type.name).filter(v => v !== value.text);
+    const values = queryParamMap.getAll(type.name).filter(v => v !== value.id);
 
     if (values.length === 0) {
       delete queryParams[type.name];
@@ -406,5 +423,13 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
   formatDate(timestamp) {
     return moment(timestamp).format('MMMM Do[,] YYYY');
+  }
+
+  setFilterTitle(type: string, id: string, title: string) {
+    this.idToTitle.set(type + '-' + id, title);
+  }
+
+  getFilterTitle(type: string, id: string): string {
+    return this.idToTitle.get(type + '-' + id);
   }
 }

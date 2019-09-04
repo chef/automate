@@ -48,7 +48,7 @@
           <chef-option
             *ngFor="let interval of reportQuery.intervals; index as i"
             [value]="i">
-            {{interval[0]}}
+            {{interval.name}}
           </chef-option>
         </chef-select>
         <chef-loading-spinner *ngIf="nodeTrendLoading" size="16"></chef-loading-spinner>
