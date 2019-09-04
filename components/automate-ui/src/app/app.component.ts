@@ -15,8 +15,7 @@ import { LicenseApplyReason } from 'app/page-components/license-apply/license-ap
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  // styleUrls: ['./ui.component.scss']
+  templateUrl: './app.component.html'
 })
 export class AppComponent implements OnInit {
   // Feature Flags
