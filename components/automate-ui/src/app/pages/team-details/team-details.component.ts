@@ -138,11 +138,11 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       this.store.select(getUsersStatus)
     ]).pipe(
       takeUntil(this.isDestroyed)
-    ).subscribe(([gStatus, uStatus, getUsersStatus]) => {
+    ).subscribe(([gStatus, uStatus, usersStatus]) => {
       this.isLoadingTeam =
         (gStatus !== EntityStatus.loadingSuccess) ||
         (uStatus === EntityStatus.loading) ||
-        (getUsersStatus === EntityStatus.loading);
+        (usersStatus === EntityStatus.loading);
       if (this.isLoadingTeam) {
         this.updateNameForm.controls['name'].disable();
       } else {
@@ -192,14 +192,17 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       this.store.select(userStatus),
       this.store.select(teamUsers),
       this.store.select(getUsersStatus)]).pipe(
-        takeUntil(this.isDestroyed), 
-        filter(([_allUsers, uStatus, _teamUsers, tuStatus]: [User[], EntityStatus, string[], EntityStatus]) =>
-          uStatus === EntityStatus.loadingSuccess || tuStatus === EntityStatus.loadingSuccess
-        ),
+        takeUntil(this.isDestroyed),
+        filter(([_allUsers, uStatus, _teamUsers, tuStatus]:
+          [User[], EntityStatus, string[], EntityStatus]) => {
+            return uStatus === EntityStatus.loadingSuccess ||
+              tuStatus === EntityStatus.loadingSuccess;
+        }),
         filter(() => !!this.team),
-        map(([allUsers, _uStatus, teamUserIds, _tuStatus]: [User[], EntityStatus, string[], EntityStatus]) => {
-          return at(teamUserIds, keyBy('membership_id', allUsers))
-            .filter(userRecord => userRecord !== undefined)
+        map(([users, _uStatus, teamUserIds, _tuStatus]:
+          [User[], EntityStatus, string[], EntityStatus]) => {
+            return at(teamUserIds, keyBy('membership_id', users))
+              .filter(userRecord => userRecord !== undefined);
         })).subscribe((users: User[]) => {
           users.sort(
             (a, b) => {
@@ -209,7 +212,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
               return a.name.localeCompare(b.name, undefined, opts) ||
                 a.name.localeCompare(b.name, undefined, { numeric: true }) ||
                 a.id.localeCompare(b.id, undefined, opts);
-            })
+            });
           this.users = users;
         });
 

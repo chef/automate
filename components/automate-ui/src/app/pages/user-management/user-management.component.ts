@@ -68,7 +68,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       this.store.select(userStatus)
     ]).pipe(
       takeUntil(this.isDestroyed),
-      filter(([_, uStatus]: [User[], EntityStatus]) => 
+      filter(([_, uStatus]: [User[], EntityStatus]) =>
         uStatus === EntityStatus.loadingSuccess
       ),
       map(([users, _]: [User[], EntityStatus]) => {
@@ -84,7 +84,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
             return a.name.localeCompare(b.name, undefined, opts) ||
               a.name.localeCompare(b.name, undefined, { numeric: true}) ||
               a.id.localeCompare(b.id, undefined, opts);
-          })
+          });
         this.users = users;
       })).subscribe();
   }
@@ -139,10 +139,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   }
 
   public showEmptyStateMessage(): boolean {
-    this.loading$.subscribe((loading) => {
-      return !loading || this.users.length === 0;
-    })
-
+    this.loading$.subscribe((loadingStatus: boolean) => {
+      return !loadingStatus || this.users.length === 0;
+    });
     return false;
   }
 }

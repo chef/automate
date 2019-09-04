@@ -73,11 +73,11 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
       this.store.select(getAllStatus)
     ]).pipe(
       takeUntil(this.isDestroyed)
-    ).subscribe(([getProjectStatus, updateStatus, getRulesStatus]) => {
+    ).subscribe(([getProjectSt, updateSt, getRulesSt]) => {
         this.isLoading =
-          (getProjectStatus !== EntityStatus.loadingSuccess) ||
-          (updateStatus === EntityStatus.loading) ||
-          (getRulesStatus !== EntityStatus.loadingSuccess);
+          (getProjectSt !== EntityStatus.loadingSuccess) ||
+          (updateSt === EntityStatus.loading) ||
+          (getRulesSt !== EntityStatus.loadingSuccess);
       });
 
     this.store.select(projectFromRoute).pipe(

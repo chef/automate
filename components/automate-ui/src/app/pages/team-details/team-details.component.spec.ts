@@ -300,7 +300,7 @@ describe('TeamDetailsComponent', () => {
       expect(component.users[4]).toEqual(jasmine.objectContaining({ id: 'Alice300' }));
     });
   });
-  
+
   function genProject(id: string): Project {
     return {
       id,
