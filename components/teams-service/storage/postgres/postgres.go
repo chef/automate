@@ -7,6 +7,8 @@ import (
 	"github.com/lib/pq" // adapter for database/sql
 	"github.com/pkg/errors"
 
+	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/components/authz-service/projectassignment"
 	"github.com/chef/automate/components/teams-service/storage"
 	"github.com/chef/automate/components/teams-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/teams-service/storage/postgres/migration"
@@ -28,6 +30,7 @@ type postgres struct {
 	db                  *sql.DB
 	logger              logger.Logger
 	dataMigrationConfig datamigration.Config
+	authzClient         authz_v2.AuthorizationClient
 }
 
 type querier interface {
@@ -36,7 +39,8 @@ type querier interface {
 
 // New instantiates and returns a postgres storage implementation
 func New(logger logger.Logger, migrationConfig migration.Config,
-	dataMigrationConfig datamigration.Config, isAuthZV2 bool) (storage.Storage, error) {
+	dataMigrationConfig datamigration.Config, isAuthZV2 bool,
+	authzClient authz_v2.AuthorizationClient) (storage.Storage, error) {
 
 	if err := migrationConfig.Migrate(); err != nil {
 		return nil, errors.Wrap(err, "database migrations")
@@ -53,7 +57,7 @@ func New(logger logger.Logger, migrationConfig migration.Config,
 		return nil, errors.Wrap(err, "initialize database")
 	}
 
-	return &postgres{db, logger, dataMigrationConfig}, nil
+	return &postgres{db, logger, dataMigrationConfig, authzClient}, nil
 }
 
 func initPostgresDB(pgURL string) (*sql.DB, error) {
@@ -88,6 +92,16 @@ func (p *postgres) StoreTeamWithProjects(ctx context.Context,
 	// ensure we do not pass null projects to db and break the "not null" constraint
 	if len(projects) == 0 {
 		projects = []string{}
+	} else {
+		// will only return an error if authz is in v2.1 mode
+		_, err := p.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
+			Subjects:   auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+			ProjectIds: projects,
+		})
+		if err != nil {
+			// return error unaltered because it's already a GRPC status code
+			return storage.Team{}, err
+		}
 	}
 	var team storage.Team
 	err := p.db.QueryRowContext(ctx,
@@ -179,26 +193,62 @@ func (p *postgres) EditTeam(ctx context.Context, team storage.Team) (storage.Tea
 
 // EditTeamByName edits the team's description and projects by name
 func (p *postgres) EditTeamByName(ctx context.Context,
-	teamName string, teamDescription string, teamProjects []string) (storage.Team, error) {
+	teamName string, teamDescription string, newProjects []string) (storage.Team, error) {
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	if newProjects == nil {
+		newProjects = []string{}
+	}
+
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return storage.Team{}, p.processError(err)
+	}
 
 	projectsFilter, err := ProjectsListFromContext(ctx)
 	if err != nil {
 		return storage.Team{}, p.processError(err)
 	}
 
-	var t storage.Team
-	if teamProjects == nil {
-		teamProjects = []string{}
+	var oldProjects []string
+	err = tx.QueryRowContext(ctx,
+		`SELECT t.projects FROM teams t
+		WHERE t.name = $1 AND projects_match(t.projects, $2::TEXT[])
+		FOR UPDATE;`,
+		teamName, pq.Array(projectsFilter)).
+		Scan(pq.Array(&oldProjects))
+	if err != nil {
+		return storage.Team{}, p.processError(err)
 	}
 
-	err = p.db.QueryRowContext(ctx,
+	projectDiff := projectassignment.CalculateProjectDiff(oldProjects, newProjects)
+	if len(projectDiff) != 0 {
+		// will only return an error if authz is in v2.1 mode
+		_, err := p.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
+			Subjects:   auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+			ProjectIds: projectDiff,
+		})
+		if err != nil {
+			// return error unaltered because it's already a GRPC status code
+			return storage.Team{}, err
+		}
+	}
+
+	var t storage.Team
+	err = tx.QueryRowContext(ctx,
 		`UPDATE teams t
 		SET description = $2, projects = $3, updated_at = now()
 		WHERE t.name = $1 AND projects_match(t.projects, $4::TEXT[])
 		RETURNING id, name, projects, description, created_at, updated_at;`,
-		teamName, teamDescription, pq.Array(teamProjects), pq.Array(projectsFilter)).
+		teamName, teamDescription, pq.Array(newProjects), pq.Array(projectsFilter)).
 		Scan(&t.ID, &t.Name, pq.Array(&t.Projects), &t.Description, &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
+		return storage.Team{}, p.processError(err)
+	}
+
+	if err := tx.Commit(); err != nil {
 		return storage.Team{}, p.processError(err)
 	}
 

@@ -1558,6 +1558,7 @@ paths = [
   "api/external/common/*",
   "api/interservice/authz/*",
   "api/interservice/teams/*",
+  "components/authz-service/*",
   "components/automate-gateway/api/authz/*",
   "components/automate-gateway/authz/policy_v2/*",
   "components/automate-grpc/*",

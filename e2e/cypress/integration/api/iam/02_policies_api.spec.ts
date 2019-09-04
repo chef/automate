@@ -1,10 +1,4 @@
-// This is to prevent tests from running in wrong
-// CI environments. If local, just always run it.
-let iamVersion = <string><Object>Cypress.env('IAM_VERSION');
-if (iamVersion === undefined) {
-  iamVersion = 'v2.0';
-}
-const describeIfIAMV2 = iamVersion.match(/v2/) ? describe : describe.skip;
+import { describeIfIAMV2, describeIfIAMV2p1 } from '../../constants';
 
 describeIfIAMV2('policies API', () => {
   let adminToken = '';
@@ -23,15 +17,13 @@ describeIfIAMV2('policies API', () => {
       id: `${cypressPrefix}-project2-${now}`,
       name: 'Test Project 2'
   };
-  const describeIfIAMV2p1 = Cypress.env('IAM_VERSION') === 'v2.1' ? describe : describe.skip;
 
   before(() => {
     cy.adminLogin('/').then(() => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
       adminToken = admin.id_token;
       defaultAdminReq.auth.bearer = adminToken;
-      cy.cleanupPoliciesByIDPrefix(adminToken, cypressPrefix);
-      cy.cleanupProjectsByIDPrefix(adminToken, cypressPrefix);
+      cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['policies', 'projects']);
 
       for (const project of [project1, project2]) {
         cy.request({
@@ -45,17 +37,16 @@ describeIfIAMV2('policies API', () => {
   });
 
   after(() => {
-    cy.cleanupPoliciesByIDPrefix(adminToken, cypressPrefix);
-    cy.cleanupProjectsByIDPrefix(adminToken, cypressPrefix);
+    cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['policies', 'projects']);
   });
 
   describe('POST /apis/iam/v2beta/policies', () => {
     beforeEach(() => {
-      cy.cleanupPoliciesByIDPrefix(adminToken, cypressPrefix);
+      cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['policies']);
     });
 
     afterEach(() => {
-      cy.cleanupPoliciesByIDPrefix(adminToken, cypressPrefix);
+      cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['policies']);
     });
 
     it('returns 400 when there are no statements',  () => {
@@ -76,11 +67,11 @@ describeIfIAMV2('policies API', () => {
 
   describe('PUT /apis/iam/v2beta/policies', () => {
     beforeEach(() => {
-      cy.cleanupPoliciesByIDPrefix(adminToken, cypressPrefix);
+      cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['policies']);
     });
 
     afterEach(() => {
-      cy.cleanupPoliciesByIDPrefix(adminToken, cypressPrefix);
+      cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['policies']);
     });
 
     const policyID = `${cypressPrefix}-policy-${now}`;
@@ -168,9 +159,8 @@ describeIfIAMV2('policies API', () => {
     });
 
     after(() => {
-      cy.cleanupProjectsByIDPrefix(adminToken, cypressPrefix);
-      cy.cleanupPoliciesByIDPrefix(adminToken, cypressPrefix);
-      cy.cleanupTokensByIDPrefix(adminToken, cypressPrefix);
+      cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix,
+          ['projects', 'policies', 'tokens']);
     });
 
     beforeEach(() => {
@@ -266,7 +256,6 @@ describeIfIAMV2('policies API', () => {
 
     describe('PUT /apis/iam/v2beta/policies', () => {
       it('admin can update a policy with no projects to have projects', () => {
-        console.log(policyWithProjects(policyID, [], statementProjects));
         cy.request({ ...defaultAdminReq,
             method: 'POST',
             body: policyWithProjects(policyID, [], statementProjects)

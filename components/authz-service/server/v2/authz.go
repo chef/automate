@@ -204,8 +204,11 @@ func (s *authzServer) ValidateProjectAssignment(
 	ctx context.Context,
 	req *api.ValidateProjectAssignmentReq) (*api.ValidateProjectAssignmentResp, error) {
 
+	// If we aren't on v2.1, just return success. Other services shouldn't
+	// have to know and we shouldn't return failure for v2.0. We need to reset
+	// all of their projects on upgrade to v2.1 to be safe anyway.
 	if !s.isBeta2p1() {
-		return nil, errors.New("must be on v2.1 to assign projects")
+		return &api.ValidateProjectAssignmentResp{}, nil
 	}
 
 	err := s.store.EnsureNoProjectsMissing(ctx, req.ProjectIds)

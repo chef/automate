@@ -12,12 +12,16 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/teams-service/storage"
 	"github.com/chef/automate/components/teams-service/storage/memstore"
 	"github.com/chef/automate/components/teams-service/storage/postgres"
 	"github.com/chef/automate/components/teams-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/teams-service/test"
+	"github.com/chef/automate/lib/grpc/grpctest"
+	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/tls/test/helpers"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
 
@@ -80,7 +84,21 @@ func TestStorage(t *testing.T) {
 		require.NoError(t, err)
 		adapters["memstore"] = mem
 	} else {
-		adp, err := postgres.New(l, *migrationConfig, *(*datamigration.Config)(dataMigrationConfig), true)
+		authzCerts := helpers.LoadDevCerts(t, "authz-service")
+		authzConnFactory := secureconn.NewFactory(*authzCerts)
+		grpcAuthz := authzConnFactory.NewServer()
+
+		mockV2Authz := authz_v2.NewAuthorizationServerMock()
+		mockV2Authz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
+		authz_v2.RegisterAuthorizationServer(grpcAuthz, mockV2Authz)
+
+		authzServer := grpctest.NewServer(grpcAuthz)
+		authzConn, err := authzConnFactory.Dial("authz-service", authzServer.URL)
+		require.NoError(t, err)
+
+		authzV2AuthorizationClient := authz_v2.NewAuthorizationClient(authzConn)
+
+		adp, err := postgres.New(l, *migrationConfig, *(*datamigration.Config)(dataMigrationConfig), true, authzV2AuthorizationClient)
 		require.NoError(t, err)
 		adapters["postgres"] = adp
 
@@ -487,4 +505,9 @@ func testStoreTeamConflict(ctx context.Context, t *testing.T, s storage.Storage)
 	teams, err := s.GetTeams(ctx)
 	require.NoError(t, err, "failed to read back teams")
 	assert.Equal(t, 1+len(storage.NonDeletableTeams), len(teams))
+}
+
+func defaultValidateProjectAssignmentFunc(context.Context,
+	*authz_v2.ValidateProjectAssignmentReq) (*authz_v2.ValidateProjectAssignmentResp, error) {
+	return &authz_v2.ValidateProjectAssignmentResp{}, nil
 }

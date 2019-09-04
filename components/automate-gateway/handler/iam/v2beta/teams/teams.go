@@ -9,11 +9,17 @@ import (
 	gwcommon "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/common"
 	gwreq "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/request"
 	gwres "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/response"
+	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
 )
 
 type Server struct {
 	client teams.TeamsV2Client
 }
+
+// asserts that we satisfy the correct interface here -- it's a safeguard
+var _ middleware.AuthContextReader = (*Server)(nil)
+
+func (*Server) AuthContextRead() {}
 
 func NewServer(client teams.TeamsV2Client) *Server {
 	return &Server{

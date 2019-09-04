@@ -1,3 +1,5 @@
+import { describeIfIAMV2, describeIfIAMV2p1 } from '../../constants';
+
 describe('team management', () => {
   let adminToken = '';
   const now = Cypress.moment().format('MMDDYYhhmm');
@@ -11,21 +13,11 @@ describe('team management', () => {
   const generatedTeamID = teamName.split(' ').join('-');
   const unassigned = '(unassigned)';
 
-  let iamVersion = <string><Object>Cypress.env('IAM_VERSION');
-  // assume 2.0 if not in CI. if you wish something different start cypress with
-  // IAM_VERSION set to what you are testing.
-  if (iamVersion === undefined) {
-    iamVersion = 'v2.0';
-  }
-
-  const describeIAMV2 = iamVersion.match(/v2/) ? describe : describe.skip;
-  const describeProjectsEnabled = iamVersion === 'v2.1' ? describe : describe.skip;
-
   before(() => {
     cy.adminLogin('/settings/teams').then(() => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
       adminToken = admin.id_token;
-      cy.cleanupProjectsByIDPrefix(adminToken, cypressPrefix);
+      cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['projects']);
       cy.cleanupTeamsByDescriptionPrefix(adminToken, cypressPrefix);
       cy.request({
         auth: { bearer: adminToken },
@@ -63,7 +55,7 @@ describe('team management', () => {
   });
 
   after(() => {
-    cy.cleanupProjectsByIDPrefix(adminToken, cypressPrefix);
+    cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['projects']);
   });
 
   context('no custom initial page state', () => {
@@ -98,7 +90,7 @@ describe('team management', () => {
       });
     });
 
-    describeIAMV2('team create modal (IAM v2.x)', () => {
+    describeIfIAMV2('team create modal (IAM v2.x)', () => {
       it('can create a team with a default ID', () => {
         cy.get('[data-cy=team-create-button]').contains('Create Team').click();
         cy.get('app-team-management chef-modal').should('exist');
@@ -137,7 +129,7 @@ describe('team management', () => {
     });
   });
 
-  describeProjectsEnabled('team create modal with projects (IAM v2.1 only)', () => {
+  describeIfIAMV2p1('team create modal with projects (IAM v2.1 only)', () => {
     const dropdownNameUntilEllipsisLen = 25;
 
     context('when only the unassigned project is selected', () => {
@@ -177,7 +169,7 @@ describe('team management', () => {
       });
 
       after(() => {
-        cy.cleanupProjectsByIDPrefix(adminToken, cypressPrefix);
+        cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['projects']);
       });
 
       afterEach(() => {

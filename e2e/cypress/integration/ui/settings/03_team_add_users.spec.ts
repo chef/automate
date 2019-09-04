@@ -1,3 +1,5 @@
+import { iamVersion } from '../../constants';
+
 describe('team add users', () => {
   const now = Cypress.moment().format('MMDDYYhhmm');
   const cypressPrefix = 'test-add-users';
@@ -8,7 +10,6 @@ describe('team add users', () => {
   let teamID = '';
   let adminToken = '';
   let teamUIRouteIdentifier = '';
-  let iamVersion = '';
 
   before(() => {
     cy.adminLogin('/settings/teams').then(() => {
@@ -40,20 +41,11 @@ describe('team add users', () => {
         }
       }).then((resp) => {
         teamID = resp.body.team.id;
-
-        cy.get('chef-sidebar')
-        .invoke('attr', 'major-version')
-        .then((obj: Cypress.ObjectLike) => {
-          // Cypress.ObjectLike can't be casted to a string directly,
-          // so must convert to Object type (common to all JS objects) first
-          iamVersion = <string><Object>obj;
-
-          if (iamVersion === 'v2') {
-            teamUIRouteIdentifier = nameForTeam;
-          } else {
-            teamUIRouteIdentifier = teamID;
-          }
-        });
+        if (iamVersion.match(/v2/)) {
+          teamUIRouteIdentifier = nameForTeam;
+        } else {
+          teamUIRouteIdentifier = teamID;
+        }
       });
 
     });
@@ -62,7 +54,7 @@ describe('team add users', () => {
   beforeEach(() => {
     cy.restoreStorage();
 
-    if (iamVersion === 'v2') {
+    if (iamVersion.match(/v2/)) {
       cy.route('GET', `/apis/iam/v2beta/teams/${nameForTeam}`).as('getTeam');
       cy.route('GET', `/apis/iam/v2beta/teams/${nameForTeam}/users`).as('getTeamUsers');
       cy.route('GET', '/apis/iam/v2beta/users').as('getUsers');

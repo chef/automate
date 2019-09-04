@@ -62,6 +62,10 @@ func (s *Server) CreateTeam(ctx context.Context,
 	var team storage.Team
 	var err error
 	if team, err = s.service.Storage.StoreTeamWithProjects(ctx, req.Id, req.Name, req.Projects); err != nil {
+		// if the error is already a GRPC status code, return that directly.
+		if _, ok := status.FromError(err); ok {
+			return nil, err
+		}
 		if err == storage.ErrConflict {
 			return nil, status.Errorf(codes.AlreadyExists, "team with ID %q already exists", req.Id)
 		}
@@ -108,6 +112,10 @@ func (s *Server) UpdateTeam(ctx context.Context, req *teams.UpdateTeamReq) (*tea
 	// name is really the ID in V2 terms. We'll refactor at GA when V1 is removed.
 	team, err := s.service.Storage.EditTeamByName(ctx, req.Id, req.Name, req.Projects)
 	if err != nil {
+		// if the error is already a GRPC status code, return that directly.
+		if _, ok := status.FromError(err); ok {
+			return nil, err
+		}
 		return nil, service.ParseStorageError(err, req.Id, "team")
 	}
 
