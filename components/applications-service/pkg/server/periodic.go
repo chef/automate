@@ -37,8 +37,9 @@ const (
 	DisconnectedServicesJobName            = "disconnected_services"
 	DisconnectedServicesScheduleName       = "periodic_disconnected_services"
 
-	DeleteDisconnectedServicesJobName      = "delete_disconnected_services"
-	DeleteDisconnectedServicesScheduleName = "periodic_delete_disconnected_services"
+	DeleteDisconnectedServicesJobIntervalDays = 1
+	DeleteDisconnectedServicesJobName         = "delete_disconnected_services"
+	DeleteDisconnectedServicesScheduleName    = "periodic_delete_disconnected_services"
 )
 
 func ConnectToJobsManager(jobCfg *config.Jobs, connFactory *secureconn.Factory) (*cereal.Manager, error) {
@@ -71,21 +72,55 @@ func (j *JobScheduler) Setup() error {
 		return errors.Wrap(err, "failed to create job scheduler configuration")
 	}
 
-	params := defaultDisconnectedServicesJobParams()
-
-	logCtx := log.WithFields(log.Fields{
-		"scheduleName": DisconnectedServicesScheduleName,
-		"jobName":      DisconnectedServicesJobName,
-		"jobParams":    params,
-		"recurrance":   r,
-	})
-
-	err = j.CerealSvc.CreateWorkflowSchedule(
+	err = j.createWorkflowIfMissing(
 		DisconnectedServicesScheduleName,
 		DisconnectedServicesJobName,
 		defaultDisconnectedServicesJobParams(),
-		true,
 		r,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	r, err = rrule.NewRRule(rrule.ROption{
+		Freq:     rrule.DAILY,
+		Interval: DeleteDisconnectedServicesJobIntervalDays,
+		Dtstart:  time.Now(),
+	})
+	if err != nil {
+		return errors.Wrap(err, "failed to create job scheduler configuration")
+	}
+
+	err = j.createWorkflowIfMissing(
+		DeleteDisconnectedServicesScheduleName,
+		DeleteDisconnectedServicesJobName,
+		defaultDeleteDisconnectedServicesJobParams(),
+		r,
+	)
+
+	return nil
+}
+
+func (j *JobScheduler) createWorkflowIfMissing(
+	scheduleName string,
+	jobName string,
+	jobParams interface{},
+	recurrence *rrule.RRule,
+) error {
+	logCtx := log.WithFields(log.Fields{
+		"scheduleName": scheduleName,
+		"jobName":      jobName,
+		"jobParams":    jobParams,
+		"recurrence":   recurrence,
+	})
+
+	err := j.CerealSvc.CreateWorkflowSchedule(
+		scheduleName,
+		jobName,
+		jobParams,
+		true,
+		recurrence,
 	)
 	if err == cereal.ErrWorkflowScheduleExists {
 		logCtx.Debug("workflow already created")
@@ -225,6 +260,10 @@ func (j *JobScheduler) RunAllJobsConstantly(ctx context.Context) error {
 
 func defaultDisconnectedServicesJobParams() *DisconnectedServicesParamsV0 {
 	return &DisconnectedServicesParamsV0{ThresholdDuration: "5m"}
+}
+
+func defaultDeleteDisconnectedServicesJobParams() *DisconnectedServicesParamsV0 {
+	return &DisconnectedServicesParamsV0{ThresholdDuration: "7d"}
 }
 
 type JobRunnerSet struct {

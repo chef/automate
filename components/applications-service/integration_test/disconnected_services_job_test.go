@@ -14,17 +14,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const (
-	DisconnectedServicesJobName      = "disconnected_services"
-	DisconnectedServicesScheduleName = "periodic_disconnected_services"
-)
-
 const habConfigDir = "/hab/svc/applications-service/config"
 
 func TestPeriodicDisconnectedServices(t *testing.T) {
 
 	ctx := context.Background()
-	sched, err := suite.JobScheduler.CerealSvc.GetWorkflowScheduleByName(ctx, DisconnectedServicesScheduleName, DisconnectedServicesJobName)
+	sched, err := suite.JobScheduler.CerealSvc.GetWorkflowScheduleByName(ctx, server.DisconnectedServicesScheduleName, server.DisconnectedServicesJobName)
 
 	require.NoError(t, err)
 	assert.Equal(t, "disconnected_services", sched.WorkflowName)
@@ -111,6 +106,35 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, 1, len(response.GetServices()))
 		assert.True(t, response.GetServices()[0].Disconnected)
+	})
+
+}
+
+func TestPeriodicDeleteDisconnectedServices(t *testing.T) {
+
+	ctx := context.Background()
+	sched, err := suite.JobScheduler.CerealSvc.GetWorkflowScheduleByName(ctx, server.DeleteDisconnectedServicesScheduleName, server.DeleteDisconnectedServicesJobName)
+
+	require.NoError(t, err)
+	assert.Equal(t, "delete_disconnected_services", sched.WorkflowName)
+	assert.True(t, sched.Enabled)
+
+	t.Run("disable and enable delete_disconnected_services job", func(t *testing.T) {
+		req := &applications.PeriodicJobConfig{Threshold: "7d", Running: false}
+		_, err := suite.ApplicationsServer.UpdateDeleteDisconnectedServicesConfig(ctx, req)
+		require.NoError(t, err)
+
+		conf, err := suite.ApplicationsServer.GetDeleteDisconnectedServicesConfig(ctx, &applications.GetDeleteDisconnectedServicesConfigReq{})
+		require.NoError(t, err)
+		assert.False(t, conf.Running)
+
+		req.Running = true
+		_, err = suite.ApplicationsServer.UpdateDeleteDisconnectedServicesConfig(ctx, req)
+		require.NoError(t, err)
+
+		conf, err = suite.ApplicationsServer.GetDeleteDisconnectedServicesConfig(ctx, &applications.GetDeleteDisconnectedServicesConfigReq{})
+		require.NoError(t, err)
+		assert.True(t, conf.Running)
 	})
 
 }
