@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { Observable ,  Subject } from 'rxjs';
-import { takeUntil, map } from 'rxjs/operators';
+import { Observable ,  Subject, combineLatest } from 'rxjs';
+import { takeUntil, map, filter } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
@@ -36,8 +36,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
   // Inputs to app-user-table
-  public sortedUsers$: Observable<User[]>;
-  public addButtonText = 'Create User';
+  public users: User[] = [];
   public removeText = 'Delete User';
   public baseUrl = '/auth/users';
 
@@ -47,21 +46,6 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   ) {
     this.userStatus$ = store.select(userStatus);
     this.loading$ = store.select(userStatus).pipe(map(loading));
-    // Note: the `undefined` is the locale to use for comparison. According to
-    // MDN, in Swedish, 'ä' comes after 'z', while in German, it's after 'a':
-    // tslint:disable-next-line:max-line-length
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare
-    this.sortedUsers$ = store.select(allUsers).pipe(
-      map((users: User[]) => users.sort(
-        (a, b) => {
-          // See https://stackoverflow.com/a/38641281 for these options
-          const opts = { numeric: true, sensitivity: 'base' };
-          // sort by name then by username
-          return a.name.localeCompare(b.name, undefined, opts) ||
-            a.name.localeCompare(b.name, undefined, { numeric: true}) ||
-            a.id.localeCompare(b.id, undefined, opts);
-        }
-      )));
 
     this.createUserForm = fb.group({
       // Must stay in sync with error checks in user-form.component.html
@@ -79,6 +63,30 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.store.dispatch(new GetUsers());
+    combineLatest([
+      this.store.select(allUsers),
+      this.store.select(userStatus)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(([_, uStatus]: [User[], EntityStatus]) => 
+        uStatus === EntityStatus.loadingSuccess
+      ),
+      map(([users, _]: [User[], EntityStatus]) => {
+        users.sort(
+          (a, b) => {
+            // Note: the `undefined` is the locale to use for comparison. According to
+            // MDN, in Swedish, 'ä' comes after 'z', while in German, it's after 'a':
+            // tslint:disable-next-line:max-line-length
+            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare
+            // See https://stackoverflow.com/a/38641281 for these options
+            const opts = { numeric: true, sensitivity: 'base' };
+            // sort by name then by username
+            return a.name.localeCompare(b.name, undefined, opts) ||
+              a.name.localeCompare(b.name, undefined, { numeric: true}) ||
+              a.id.localeCompare(b.id, undefined, opts);
+          })
+        this.users = users;
+      })).subscribe();
   }
 
   ngOnDestroy() {
@@ -128,5 +136,13 @@ export class UserManagementComponent implements OnInit, OnDestroy {
           this.closeCreateModal();
         }
     });
+  }
+
+  public showEmptyStateMessage(): boolean {
+    this.loading$.subscribe((loading) => {
+      return !loading || this.users.length === 0;
+    })
+
+    return false;
   }
 }

@@ -35,12 +35,24 @@
     </chef-modal>
 
     <section class="page-body">
+      <ng-container *ngIf="showEmptyStateMessage()">
+        <div class="empty-state">
+          <p>Add some users to get started!</p>
+        </div>
+        <chef-toolbar>
+          <div class='empty-state'>
+            <chef-button primary (click)="openCreateModal()"> Create User
+            </chef-button>
+          </div>
+        </chef-toolbar>
+      </ng-container>
+      <chef-toolbar>
+        <chef-button primary (click)="openCreateModal()"> Create User </chef-button>
+      </chef-toolbar>
       <app-user-table
-        [addButtonText]="addButtonText"
         [removeText]="removeText"
-        [users$]="sortedUsers$"
+        [users]="users"
         [baseUrl]="baseUrl"
-        (addClicked)="openCreateModal()"
         (removeClicked)="startUserDelete($event)">
     </app-user-table>
     </section>
