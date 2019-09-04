@@ -348,7 +348,7 @@ func init() {
         ]
       }
     },
-    "/beta/retention/service_groups/disconnected_services/config": {
+    "/beta/retention/service_groups/delete_disconnected_services/config": {
       "get": {
         "operationId": "GetDeleteDisconnectedServicesConfig",
         "responses": {
@@ -370,6 +370,46 @@ func init() {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/applicationsUpdateDeleteDisconnectedServicesConfigRes"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/applicationsPeriodicJobConfig"
+            }
+          }
+        ],
+        "tags": [
+          "ApplicationsService"
+        ]
+      }
+    },
+    "/beta/retention/service_groups/disconnected_services/config": {
+      "get": {
+        "operationId": "GetDisconnectedServicesConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/applicationsPeriodicJobConfig"
+            }
+          }
+        },
+        "tags": [
+          "ApplicationsService"
+        ]
+      },
+      "post": {
+        "operationId": "UpdateDisconnectedServicesConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/applicationsUpdateDisconnectedServicesConfigRes"
             }
           }
         },

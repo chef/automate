@@ -109,7 +109,7 @@ service ApplicationsService {
   };
 
   rpc GetDeleteDisconnectedServicesConfig(GetDeleteDisconnectedServicesConfigReq) returns (PeriodicJobConfig) {
-    option (google.api.http).get = "/beta/retention/service_groups/disconnected_services/config";
+    option (google.api.http).get = "/beta/retention/service_groups/delete_disconnected_services/config";
     // TODO: need new resources/policies for this
     option (chef.automate.api.policy).resource = "service_groups";
     option (chef.automate.api.policy).action = "list";
@@ -119,7 +119,7 @@ service ApplicationsService {
 
   rpc UpdateDeleteDisconnectedServicesConfig(PeriodicJobConfig) returns (UpdateDeleteDisconnectedServicesConfigRes) {
     option (google.api.http) = {
-      post: "/beta/retention/service_groups/disconnected_services/config"
+      post: "/beta/retention/service_groups/delete_disconnected_services/config"
       body: "*"
     };
     // TODO: need new resources/policies for this

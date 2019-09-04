@@ -1027,9 +1027,9 @@ var (
 
 	pattern_ApplicationsService_UpdateDisconnectedServicesConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"beta", "retention", "service_groups", "disconnected_services", "config"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationsService_GetDeleteDisconnectedServicesConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"beta", "retention", "service_groups", "disconnected_services", "config"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationsService_GetDeleteDisconnectedServicesConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"beta", "retention", "service_groups", "delete_disconnected_services", "config"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_ApplicationsService_UpdateDeleteDisconnectedServicesConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"beta", "retention", "service_groups", "disconnected_services", "config"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_ApplicationsService_UpdateDeleteDisconnectedServicesConfig_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"beta", "retention", "service_groups", "delete_disconnected_services", "config"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_ApplicationsService_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"beta", "applications", "version"}, "", runtime.AssumeColonVerbOpt(true)))
 )
