@@ -1,4 +1,5 @@
 <app-settings-sidebar></app-settings-sidebar>
+<chef-loading-spinner *ngIf="isLoadingTeam" size='50' fixed></chef-loading-spinner>
 
 <div class="container">
   <main>
@@ -44,22 +45,32 @@
       </chef-tab-selector>
     </chef-page-header>
     <section class="page-body" *ngIf="team.id && (tabValue === 'users')">
-      <div id="users-list">
-        <div>
-          <!-- TODO remove [overridePermissionsCheck]=true once the UI is able to check specific objects
-          since the path to permission on here is /auth/teams/:id/users we'll have to show everything for now. -->
-          <app-user-table
-            [addButtonText]="addButtonText"
-            [removeText]="removeText"
-            [users$]="sortedUsers$"
-            [addButtonEnabled]=true
-            [baseUrl]="'/auth/users/' + team.id"
-            [overridePermissionsCheck]=true
-            (addClicked)="toggleUserMembershipView()"
-            (removeClicked)="removeUser($event)">
-          </app-user-table>
+      <ng-container *ngIf="showEmptyStateMessage()">
+          <div class="empty-state">
+            <p>Add some users to get started!</p>
+            <chef-toolbar>
+              <chef-button primary (click)="toggleUserMembershipView()"> Add Users </chef-button>
+            </chef-toolbar>
+          </div>
+      </ng-container>
+      <ng-container *ngIf="showUsersTable()">
+        <div id="users-list">
+          <chef-toolbar>
+            <chef-button primary (click)="toggleUserMembershipView()"> Add Users </chef-button>
+          </chef-toolbar>
+          <div>
+            <!-- TODO remove [overridePermissionsCheck]=true once the UI is able to check specific objects
+            since the path to permission on here is /auth/teams/:id/users we'll have to show everything for now. -->
+            <app-user-table
+              [removeText]="removeText"
+              [users]="users"
+              [baseUrl]="'/auth/users/' + team.id"
+              [overridePermissionsCheck]=true
+              (removeClicked)="removeUser($event)">
+            </app-user-table>
+          </div>
         </div>
-      </div>
+      </ng-container>
     </section>
     <section class="page-body" *ngIf="tabValue === 'details'">
       <form [formGroup]="updateNameForm">

@@ -70,10 +70,10 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public isMajorV1 = true;
   public isMinorV1 = false;
 
-  public sortedUsers$: Observable<User[]>;
+  // public sortedUsers$: Observable<User[]>;
+  public users: User[] = [];
   private isDestroyed = new Subject<boolean>();
 
-  public addButtonText = 'Add Users';
   public removeText = 'Remove User';
 
   public atLeastV2p1$: Observable<boolean>;
@@ -135,13 +135,15 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(getStatus),
-      this.store.select(updateStatus)
+      this.store.select(updateStatus),
+      this.store.select(getUsersStatus)
     ]).pipe(
       takeUntil(this.isDestroyed),
-      map(([gStatus, uStatus]) => {
+      map(([gStatus, uStatus, getUsersStatus]) => {
         this.isLoadingTeam =
           (gStatus !== EntityStatus.loadingSuccess) ||
-          (uStatus === EntityStatus.loading);
+          (uStatus === EntityStatus.loading) ||
+          (getUsersStatus === EntityStatus.loading);
         if (this.isLoadingTeam) {
           this.updateNameForm.controls['name'].disable();
         } else {
@@ -188,33 +190,32 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       }))
       .subscribe();
 
-    this.sortedUsers$ = <Observable<User[]>>combineLatest([
+    combineLatest([
       this.store.select(allUsers),
       this.store.select(userStatus),
       this.store.select(teamUsers),
-      this.store.select(getUsersStatus)])
-      .pipe(
-        map(([users, uStatus, tUsers, tStatus]: [User[], EntityStatus, string[], EntityStatus]) => {
-          if (uStatus !== EntityStatus.loadingSuccess ||
-            tStatus !== EntityStatus.loadingSuccess) {
-            return [];
-          }
-          // Map UUID membership to user records and remove any entries that don't
-          // map to user records.
-          return at(tUsers, keyBy('membership_id', users))
-            .filter(userRecord => userRecord !== undefined);
+      this.store.select(getUsersStatus)]).pipe(
+        takeUntil(this.isDestroyed), 
+        filter(([_allUsers, uStatus, _teamUsers, tuStatus]: [User[], EntityStatus, string[], EntityStatus]) =>
+          uStatus === EntityStatus.loadingSuccess || tuStatus === EntityStatus.loadingSuccess
+        ),
+        filter(() => !!this.team),
+        map(([allUsers, _uStatus, teamUserIds, _tuStatus]: [User[], EntityStatus, string[], EntityStatus]) => {
+          return at(teamUserIds, keyBy('membership_id', allUsers))
+            .filter(userRecord => userRecord !== undefined)
         }),
-        map((users: User[]) => users.sort(
-          (a, b) => {
-            // See https://stackoverflow.com/a/38641281 for these options
-            const opts = { numeric: true, sensitivity: 'base' };
-            // sort by name then by id
-            return a.name.localeCompare(b.name, undefined, opts) ||
-              a.name.localeCompare(b.name, undefined, { numeric: true }) ||
-              a.id.localeCompare(b.id, undefined, opts);
-            })),
-        takeUntil(this.isDestroyed)
-      );
+        map((users: User[]) => {
+          users.sort(
+            (a, b) => {
+              // See https://stackoverflow.com/a/38641281 for these options
+              const opts = { numeric: true, sensitivity: 'base' };
+              // sort by name then by id
+              return a.name.localeCompare(b.name, undefined, opts) ||
+                a.name.localeCompare(b.name, undefined, { numeric: true }) ||
+                a.id.localeCompare(b.id, undefined, opts);
+            })
+          this.users = users;
+        })).subscribe();
 
     // If, however, the user browses directly to /settings/teams/ID, the store
     // will not contain the team data, so we fetch it.
@@ -243,6 +244,16 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  showUsersTable(): boolean {
+    return !this.isLoadingTeam && this.users.length > 0;
+    // return !this.isLoadingTeam;
+  }
+
+  showEmptyStateMessage(): boolean {
+    return !this.isLoadingTeam && this.users.length === 0;
+    // return !this.isLoadingTeam;
   }
 
   toggleUserMembershipView(): void {
