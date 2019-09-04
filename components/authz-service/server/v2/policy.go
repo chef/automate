@@ -163,7 +163,7 @@ func (s *policyServer) CreatePolicy(
 	default:
 		switch err.(type) {
 		case *projectassignment.ProjectsMissingErr:
-			return nil, status.Errorf(codes.NotFound, err.Error())
+			return nil, status.Error(codes.NotFound, err.Error())
 		case *projectassignment.ProjectsUnauthorizedForAssignmentErr:
 			return nil, status.Errorf(codes.PermissionDenied, err.Error())
 		case *storage_errors.ForeignKeyError:
