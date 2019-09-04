@@ -4,6 +4,10 @@ export type RuleStatus = 'APPLIED' | 'STAGED';
 export type RuleType = 'NODE' | 'EVENT';
 export type ConditionOperator = 'MEMBER_OF' | 'EQUALS';
 
+export function isConditionOperator(s: string): s is ConditionOperator {
+    return s === 'MEMBER_OF' || s === 'EQUALS';
+}
+
 interface KVPair {
   key: string;
   value: string;

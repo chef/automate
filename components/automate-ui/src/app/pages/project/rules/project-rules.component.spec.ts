@@ -162,6 +162,15 @@ describe('ProjectRulesComponent', () => {
       expect(conditionCount).toBe(2);
     });
 
+    it('upon deleting a condition the form is marked "dirty"', () => {
+      component.addCondition();
+      const conditionCount = component.ruleForm.get('conditions').value.length;
+      expect(conditionCount).toBe(2);
+      component.ruleForm.markAsPristine(); // for testing purposes
+      component.deleteCondition(0);
+      expect(component.ruleForm.dirty).toBe(true);
+    });
+
     it('form should be invalid', () => {
       expect(component.ruleForm.valid).toBeFalsy();
     });

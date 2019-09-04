@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
-import { map, takeUntil, pluck, filter } from 'rxjs/operators';
+import { takeUntil, pluck, filter } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -13,7 +13,7 @@ import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Regex } from 'app/helpers/auth/regex';
 import { EntityStatus, loading } from 'app/entities/entities';
 import {
-  Rule, RuleTypeMappedObject, Condition, ConditionOperator
+  Rule, RuleTypeMappedObject, Condition, ConditionOperator, isConditionOperator
 } from 'app/entities/rules/rule.model';
 import {
   GetRule, GetRulesForProject, CreateRule, UpdateRule
@@ -39,11 +39,13 @@ interface KVCondition {
   styleUrls: ['./project-rules.component.scss']
 })
 export class ProjectRulesComponent implements OnInit, OnDestroy {
-  public project: Project = <Project>{};
   public ruleId: string;
   public ruleForm: FormGroup;
+
+  // FIXME: either make properties optional in interface, or provide them on initialization:
+  public project: Project = <Project>{};
   public rule: Rule = <Rule>{};
-  public conditions: FormGroup[];
+
   public isLoading = true;
   public saving = false;
   public attributes: RuleTypeMappedObject;
@@ -78,48 +80,44 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         this.store.select(updateStatus),
         this.store.select(getProjectStatus)
       ]).pipe(
-        takeUntil(this.isDestroyed),
-        map(([gStatus, uStatus, gpStatus]) => {
-          const routeId = this.route.snapshot.paramMap.get('ruleid');
-          this.isLoading =
-            routeId
-            ? (gStatus !== EntityStatus.loadingSuccess) ||
-              (uStatus === EntityStatus.loading) ||
-              (gpStatus !== EntityStatus.loadingSuccess)
-            : false;
-        })).subscribe();
+        takeUntil(this.isDestroyed)
+      ).subscribe(([gStatus, uStatus, gpStatus]) => {
+        const routeId = this.route.snapshot.paramMap.get('ruleid');
+        this.isLoading = routeId &&
+          (gStatus !== EntityStatus.loadingSuccess) ||
+          (uStatus === EntityStatus.loading) ||
+          (gpStatus !== EntityStatus.loadingSuccess);
+        });
 
       combineLatest([
         this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
         this.store.select(routeParams).pipe(pluck('ruleid'), filter(identity))
       ]).pipe(
-        takeUntil(this.isDestroyed),
-        map(([project_id, rule_id]: string[]) => {
-          this.store.dispatch(new GetProject({ id: project_id }));
-          this.store.dispatch(new GetRule({
-            id: rule_id,
-            project_id: project_id
-          }));
-        })).subscribe();
+        takeUntil(this.isDestroyed)
+      ).subscribe(([project_id, rule_id]: string[]) => {
+        this.store.dispatch(new GetProject({ id: project_id }));
+        this.store.dispatch(new GetRule({
+          id: rule_id,
+          project_id
+        }));
+      });
 
       this.store.select(projectFromRoute).pipe(
         filter(identity),
-        takeUntil(this.isDestroyed),
-        map((state) => {
-          this.project = { ...state };
-        })
-      ).subscribe();
+        takeUntil(this.isDestroyed)
+      ).subscribe(project => {
+          this.project = project;
+      });
 
       this.store.select(ruleFromRoute).pipe(
         filter(identity),
-        takeUntil(this.isDestroyed),
-        map((state) => {
-          this.rule = { ...state };
+        takeUntil(this.isDestroyed)
+      ).subscribe(rule => {
+          this.rule = rule;
           this.editingRule = true;
-        })
-        ).subscribe();
+      });
 
-      this.store.select(getRuleAttributes).subscribe((attributes) => {
+      this.store.select(getRuleAttributes).subscribe(attributes => {
         this.attributes = attributes;
       });
   }
@@ -143,7 +141,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         // Must stay in sync with error checks in project-rules.component.html
         name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
         id: ['', [Validators.required, Validators.pattern(Regex.patterns.ID),
-        Validators.maxLength(64)]],
+          Validators.maxLength(64)]],
         type: ['', Validators.required],
         conditions: this.fb.array(this.populateConditions())
       });
@@ -154,8 +152,6 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
   }
-
-  get getConditions() { return this.ruleForm.get('conditions'); }
 
   getHeading(): string {
     return `${this.project.name}: ` + (this.ruleForm.value.name.trim() || 'Rule');
@@ -192,6 +188,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   deleteCondition(index: number): void {
     const conditions = this.ruleForm.get('conditions') as FormArray;
     conditions.removeAt(index);
+    this.ruleForm.markAsDirty();
   }
 
   showAndLabel(i: number): boolean {
@@ -205,19 +202,17 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   }
 
   private populateConditions(): FormGroup[] {
-    this.conditions = [];
+    let conditions: FormGroup[];
 
     if (this.rule.conditions && this.rule.conditions.length !== 0) {
-      this.rule.conditions.forEach(c => {
-        this.conditions.push(
-          // Convert values array to display string
-          this.createCondition(c.attribute, c.operator, c.values.join(', ')));
-      });
+      conditions = this.rule.conditions.map(c =>
+        // Convert values array to display string
+        this.createCondition(c.attribute, c.operator, c.values.join(', ')));
     } else {
-      this.conditions.push(this.createCondition());
+      conditions = [this.createCondition()];
     }
 
-    return this.conditions;
+    return conditions;
   }
 
   private createRule(): void {
@@ -234,19 +229,19 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   }
 
   convertToRule(): Rule {
-    const conditions: Condition[] = [];
-    // This constant ensures type safety
-    const equals_op: ConditionOperator = 'EQUALS';
-    this.ruleForm.controls.conditions.value.forEach(c => {
-      conditions.push(<Condition>{
-        attribute: c.attribute,
-        operator: c.operator,
-          // Convert values string to storage format
-        values: c.operator === equals_op
-          ? [c.values.trim()]
-          : c.values.split(/,/).map((v: string) => v.trim())
+    const conditions: Condition[] = this.ruleForm.controls.conditions.value.map(
+      (c: {attribute: string, values: string, operator: string}) => {
+        // Note(sr): the 'default' here should never happen -- but what should we do? Skip?
+        const op = isConditionOperator(c.operator) ? c.operator : 'EQUALS';
+        return {
+          attribute: c.attribute,
+          operator: op,
+            // Convert values string to storage format
+          values: op === 'EQUALS'
+            ? [c.values.trim()]
+            : c.values.split(',').map(v => v.trim())
+        };
       });
-    });
     return {
       project_id: this.project.id,
       id: this.ruleForm.controls.id.value,
@@ -275,20 +270,20 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
             if (state === EntityStatus.loadingSuccess) {
               this.closePage();
             } else if (state === EntityStatus.loadingFailure) {
-            const pendingCreateError = new Subject<boolean>();
-            this.store.select(createError).pipe(
-              filter(identity),
-              takeUntil(pendingCreateError))
-              .subscribe((error) => {
-                pendingCreateError.next(true);
-                pendingCreateError.complete();
-                if (error.status === HttpStatus.CONFLICT) {
-                  this.conflictErrorEvent.emit(true);
-                } else {
-                  // Close on any error other than conflict and display in banner.
-                  this.closePage();
-                }
-            });
+              const pendingCreateError = new Subject<boolean>();
+              this.store.select(createError).pipe(
+                filter(identity),
+                takeUntil(pendingCreateError))
+                .subscribe((error) => {
+                  pendingCreateError.next(true);
+                  pendingCreateError.complete();
+                  if (error.status === HttpStatus.CONFLICT) {
+                    this.conflictErrorEvent.emit(true);
+                  } else {
+                    // Close on any error other than conflict and display in banner.
+                    this.closePage();
+                  }
+              });
             }
           }
         });
