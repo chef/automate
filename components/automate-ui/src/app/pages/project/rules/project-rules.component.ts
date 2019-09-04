@@ -13,7 +13,7 @@ import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Regex } from 'app/helpers/auth/regex';
 import { EntityStatus, loading } from 'app/entities/entities';
 import {
-  Rule, RuleTypeMappedObject, Condition, ConditionOperator
+  Rule, RuleTypeMappedObject, Condition, ConditionOperator, isConditionOperator
 } from 'app/entities/rules/rule.model';
 import {
   GetRule, GetRulesForProject, CreateRule, UpdateRule
@@ -230,14 +230,18 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
 
   convertToRule(): Rule {
     const conditions: Condition[] = this.ruleForm.controls.conditions.value.map(
-      (c: {attribute: string, values: string, operator: string}) => ({
-        attribute: c.attribute,
-        operator: c.operator,
-          // Convert values string to storage format
-        values: <ConditionOperator>c.operator === 'EQUALS'
-          ? [c.values.trim()]
-          : c.values.split(',').map(v => v.trim())
-      }));
+      (c: {attribute: string, values: string, operator: string}) => {
+        // Note(sr): the 'default' here should never happen -- but what should we do? Skip?
+        const op = isConditionOperator(c.operator) ? c.operator : 'EQUALS';
+        return {
+          attribute: c.attribute,
+          operator: op,
+            // Convert values string to storage format
+          values: op === 'EQUALS'
+            ? [c.values.trim()]
+            : c.values.split(',').map(v => v.trim())
+        };
+      });
     return {
       project_id: this.project.id,
       id: this.ruleForm.controls.id.value,
