@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
@@ -55,10 +56,7 @@ func Configure() (*EventGatewayConfig, error) {
 
 	// Unmarshal the viper config into the server Config
 	if err := viper.Unmarshal(config); err != nil {
-		log.WithFields(log.Fields{
-			"err": err,
-		}).Error("Failed to unmarshal config options to server config")
-		return config, err
+		return config, errors.Wrap(err, "failed to unmarshal config options to server config")
 	}
 
 	// Set log level
@@ -67,15 +65,11 @@ func Configure() (*EventGatewayConfig, error) {
 	// Fix any relative paths that might be in the config file
 	config.TLSConfig.FixupRelativeTLSPaths(viper.ConfigFileUsed())
 	serviceCerts, err := config.TLSConfig.ReadCerts()
-
 	if err != nil {
-		log.WithFields(log.Fields{
-			"err": err.Error(),
-		}).Error("Failed to load x509 key pair and/or root CA certificate")
-		return config, err
+		return config, errors.Wrap(err, "failed to read TLS certs")
 	}
 	config.ServiceCerts = serviceCerts
-	log.Debugf("EVENT SERVICE CONFIG: %+v", config)
+	log.WithField("config", config).Debug("event-gateway config")
 	return config, nil
 }
 
@@ -87,7 +81,7 @@ func (c *EventGatewayConfig) SetLogLevel() {
 
 	level, err := log.ParseLevel(c.LogConfig.LogLevel)
 	if err != nil {
-		log.WithField("level", c.LogConfig.LogLevel).WithError(err).Error("Using default level 'info'")
+		log.WithError(err).Warn("invalid log level, falling back to level 'info'")
 		return
 	}
 
