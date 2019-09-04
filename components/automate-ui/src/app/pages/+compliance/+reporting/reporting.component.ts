@@ -26,7 +26,7 @@ import { saveAs } from 'file-saver';
 import {
   Chicklet
 } from '../../../types/types';
-import { pickBy, some } from 'lodash/fp';
+import { pickBy } from 'lodash/fp';
 import { FilterC } from './types';
 
 @Component({
@@ -365,7 +365,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     const queryParams = {...this.route.snapshot.queryParams};
 
     const filteredParams = pickBy((_value, key) => {
-        return !some({ 'name': key}, this.availableFilterTypes);
+        return this.allowedURLFilterTypes.indexOf(key) < 0;
       }, queryParams);
 
     this.router.navigate([], {queryParams: filteredParams});
