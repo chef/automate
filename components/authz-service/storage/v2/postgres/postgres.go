@@ -256,7 +256,7 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy, checkProjects boo
 	}
 
 	// Project filtering handled in here. We'll return a 404 right away if we can't find
-	// the policy via ID as filtered by projects. Also selects for update if in v2.1 mode
+	// the policy via ID as filtered by projects. Also locks relevant rows if in v2.1 mode
 	// so we can check project assignment permissions without them being changed under us.
 	oldPolicy, err := p.queryPolicy(ctx, pol.ID, tx, checkProjects)
 	if err != nil {
