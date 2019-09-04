@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
-import { filter, map, pluck, takeUntil } from 'rxjs/operators';
+import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity, some } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -72,19 +72,18 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
       this.store.select(updateStatus),
       this.store.select(getAllStatus)
     ]).pipe(
-      takeUntil(this.isDestroyed),
-      map(([getProjectStatus, updateStatus, getRulesStatus]) => {
+      takeUntil(this.isDestroyed)
+    ).subscribe(([getProjectStatus, updateStatus, getRulesStatus]) => {
         this.isLoading =
           (getProjectStatus !== EntityStatus.loadingSuccess) ||
           (updateStatus === EntityStatus.loading) ||
           (getRulesStatus !== EntityStatus.loadingSuccess);
-      })
-    ).subscribe();
+      });
 
     this.store.select(projectFromRoute).pipe(
       filter(identity),
-      takeUntil(this.isDestroyed),
-      map((state) => {
+      takeUntil(this.isDestroyed)
+      ).subscribe((state) => {
         this.project = <Project>Object.assign({}, state);
         this.store.dispatch(new GetRulesForProject({ project_id: this.project.id }));
         this.store.select(allRules).subscribe((rules) => {
@@ -92,7 +91,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
         });
         this.isChefManaged = this.project.type === 'CHEF_MANAGED';
         this.projectForm.controls['name'].setValue(this.project.name);
-      })).subscribe();
+      });
 
     this.store.select(routeParams).pipe(
       pluck('id'),

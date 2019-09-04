@@ -70,7 +70,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public isMajorV1 = true;
   public isMinorV1 = false;
 
-  // public sortedUsers$: Observable<User[]>;
   public users: User[] = [];
   private isDestroyed = new Subject<boolean>();
 
@@ -138,19 +137,18 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       this.store.select(updateStatus),
       this.store.select(getUsersStatus)
     ]).pipe(
-      takeUntil(this.isDestroyed),
-      map(([gStatus, uStatus, getUsersStatus]) => {
-        this.isLoadingTeam =
-          (gStatus !== EntityStatus.loadingSuccess) ||
-          (uStatus === EntityStatus.loading) ||
-          (getUsersStatus === EntityStatus.loading);
-        if (this.isLoadingTeam) {
-          this.updateNameForm.controls['name'].disable();
-        } else {
-          this.updateNameForm.controls['name'].enable();
-        }
-      })
-    ).subscribe();
+      takeUntil(this.isDestroyed)
+    ).subscribe(([gStatus, uStatus, getUsersStatus]) => {
+      this.isLoadingTeam =
+        (gStatus !== EntityStatus.loadingSuccess) ||
+        (uStatus === EntityStatus.loading) ||
+        (getUsersStatus === EntityStatus.loading);
+      if (this.isLoadingTeam) {
+        this.updateNameForm.controls['name'].disable();
+      } else {
+        this.updateNameForm.controls['name'].enable();
+      }
+    });
 
     combineLatest([
       this.store.select(v1TeamFromRoute),
@@ -164,14 +162,14 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       }),
       filter(identity)
     ).subscribe((team: Team) => {
-      this.team = team;
-      this.updateNameForm.controls.name.setValue(this.team.name);
-      this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
-      this.store.dispatch(new GetUsers());
-      if (this.projectsEnabled) {
-        this.store.dispatch(new GetProjects());
-      }
-    });
+        this.team = team;
+        this.updateNameForm.controls.name.setValue(this.team.name);
+        this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
+        this.store.dispatch(new GetUsers());
+        if (this.projectsEnabled) {
+          this.store.dispatch(new GetProjects());
+        }
+      });
 
     combineLatest([
       this.store.select(allProjects),
@@ -179,16 +177,15 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     ]).pipe(
       takeUntil(this.isDestroyed),
       filter(([_, pStatus]: [Project[], EntityStatus]) => pStatus !== EntityStatus.loading),
-      filter(() => !!this.team),
-      map(([allowedProjects, _]) => {
+      filter(() => !!this.team)
+    ).subscribe(([allowedProjects, _]) => {
         this.projects = {};
         allowedProjects
           .forEach(p => {
             this.projects[p.id] = { ...p, checked: this.team.projects.includes(p.id)
             };
           });
-      }))
-      .subscribe();
+      });
 
     combineLatest([
       this.store.select(allUsers),
@@ -203,8 +200,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         map(([allUsers, _uStatus, teamUserIds, _tuStatus]: [User[], EntityStatus, string[], EntityStatus]) => {
           return at(teamUserIds, keyBy('membership_id', allUsers))
             .filter(userRecord => userRecord !== undefined)
-        }),
-        map((users: User[]) => {
+        })).subscribe((users: User[]) => {
           users.sort(
             (a, b) => {
               // See https://stackoverflow.com/a/38641281 for these options
@@ -215,7 +211,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
                 a.id.localeCompare(b.id, undefined, opts);
             })
           this.users = users;
-        })).subscribe();
+        });
 
     // If, however, the user browses directly to /settings/teams/ID, the store
     // will not contain the team data, so we fetch it.
