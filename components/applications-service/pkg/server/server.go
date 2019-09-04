@@ -20,6 +20,7 @@ import (
 	"github.com/chef/automate/components/applications-service/pkg/params"
 	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/chef/automate/lib/grpc/health"
+	"github.com/chef/automate/lib/simpledatemath"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/timef"
 	"github.com/chef/automate/lib/version"
@@ -364,7 +365,7 @@ func (app *ApplicationsServer) UpdateDisconnectedServicesConfig(ctx context.Cont
 		}
 	}
 
-	_, err := time.ParseDuration(req.GetThreshold())
+	err := simpledatemath.Validate(req.GetThreshold())
 	if err != nil {
 		return nil, errors.Wrapf(err, "unable to parse disconnected_services threshold %q", req.GetThreshold())
 	}
@@ -404,7 +405,7 @@ func (app *ApplicationsServer) UpdateDeleteDisconnectedServicesConfig(ctx contex
 		}
 	}
 
-	_, err := time.ParseDuration(req.GetThreshold())
+	err := simpledatemath.Validate(req.GetThreshold())
 	if err != nil {
 		return nil, errors.Wrapf(err, "unable to parse delete_disconnected_services threshold %q", req.GetThreshold())
 	}
