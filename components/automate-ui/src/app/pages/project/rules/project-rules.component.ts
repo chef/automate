@@ -229,16 +229,14 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   }
 
   convertToRule(): Rule {
-    // This constant ensures type safety
-    const equals_op: ConditionOperator = 'EQUALS';
     const conditions: Condition[] = this.ruleForm.controls.conditions.value.map(
       (c: {attribute: string, values: string, operator: string}) => ({
         attribute: c.attribute,
         operator: c.operator,
           // Convert values string to storage format
-        values: c.operator === equals_op
+        values: <ConditionOperator>c.operator === 'EQUALS'
           ? [c.values.trim()]
-          : c.values.split(',').map((v: string) => v.trim())
+          : c.values.split(',').map(v => v.trim())
       }));
     return {
       project_id: this.project.id,
