@@ -70,9 +70,8 @@ func fieldsEqual(aval, bval interface{}) bool {
 		if !ok {
 			return false
 		}
-		if !MessagesEqual(apm, bpm) {
-			return false
-		}
+		return MessagesEqual(apm, bpm)
+
 	} else {
 		switch arv.Kind() {
 		case reflect.Ptr:
@@ -83,50 +82,22 @@ func fieldsEqual(aval, bval interface{}) bool {
 				return false
 			}
 			bpm := bval.(proto.Message) // we know it will succeed because we know a and b have same type
-			if !MessagesEqual(apm, bpm) {
-				return false
-			}
+			return MessagesEqual(apm, bpm)
 
 		case reflect.Map:
-			if !mapsEqual(arv, brv) {
-				return false
-			}
+			return mapsEqual(arv, brv)
 
 		case reflect.Slice:
 			if arv.Type() == typeOfBytes {
-				if !bytes.Equal(aval.([]byte), bval.([]byte)) {
-					return false
-				}
+				return bytes.Equal(aval.([]byte), bval.([]byte))
 			} else {
-				if !slicesEqual(arv, brv) {
-					return false
-				}
+				return slicesEqual(arv, brv)
 			}
 
 		default:
-			if aval != bval {
-				return false
-			}
+			return aval == bval
 		}
 	}
-	return true
-}
-
-func mapsEqual(a, b reflect.Value) bool {
-	if a.Len() != b.Len() {
-		return false
-	}
-	for _, k := range a.MapKeys() {
-		av := a.MapIndex(k)
-		bv := b.MapIndex(k)
-		if !bv.IsValid() {
-			return false
-		}
-		if !fieldsEqual(av.Interface(), bv.Interface()) {
-			return false
-		}
-	}
-	return true
 }
 
 func slicesEqual(a, b reflect.Value) bool {
@@ -162,7 +133,7 @@ func MessagesEqual(a, b proto.Message) bool {
 		if err != nil {
 			return false
 		}
-		db = newMessageWithMessageFactory(md, da.mf)
+		db = NewMessageWithMessageFactory(md, da.mf)
 		if db.ConvertFrom(b) != nil {
 			return false
 		}
@@ -172,7 +143,7 @@ func MessagesEqual(a, b proto.Message) bool {
 		if err != nil {
 			return false
 		}
-		da = newMessageWithMessageFactory(md, db.mf)
+		da = NewMessageWithMessageFactory(md, db.mf)
 		if da.ConvertFrom(a) != nil {
 			return false
 		}

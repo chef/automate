@@ -12,42 +12,62 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 
+	"github.com/jhump/protoreflect/codec"
 	"github.com/jhump/protoreflect/desc"
 )
 
-var UnknownTagNumberError = errors.New("Unknown tag number")
-var UnknownFieldNameError = errors.New("Unknown field name")
-var FieldIsNotMapError = errors.New("Field is not a map type")
-var FieldIsNotRepeatedError = errors.New("Field is not repeated")
-var IndexOutOfRangeError = errors.New("Index is out of range")
-var NumericOverflowError = errors.New("Numeric value is out of range")
+// ErrUnknownTagNumber is an error that is returned when an operation refers
+// to an unknown tag number.
+var ErrUnknownTagNumber = errors.New("unknown tag number")
+
+// UnknownTagNumberError is the same as ErrUnknownTagNumber.
+// Deprecated: use ErrUnknownTagNumber
+var UnknownTagNumberError = ErrUnknownTagNumber
+
+// ErrUnknownFieldName is an error that is returned when an operation refers
+// to an unknown field name.
+var ErrUnknownFieldName = errors.New("unknown field name")
+
+// UnknownFieldNameError is the same as ErrUnknownFieldName.
+// Deprecated: use ErrUnknownFieldName
+var UnknownFieldNameError = ErrUnknownFieldName
+
+// ErrFieldIsNotMap is an error that is returned when map-related operations
+// are attempted with fields that are not maps.
+var ErrFieldIsNotMap = errors.New("field is not a map type")
+
+// FieldIsNotMapError is the same as ErrFieldIsNotMap.
+// Deprecated: use ErrFieldIsNotMap
+var FieldIsNotMapError = ErrFieldIsNotMap
+
+// ErrFieldIsNotRepeated is an error that is returned when repeated field
+// operations are attempted with fields that are not repeated.
+var ErrFieldIsNotRepeated = errors.New("field is not repeated")
+
+// FieldIsNotRepeatedError is the same as ErrFieldIsNotRepeated.
+// Deprecated: use ErrFieldIsNotRepeated
+var FieldIsNotRepeatedError = ErrFieldIsNotRepeated
+
+// ErrIndexOutOfRange is an error that is returned when an invalid index is
+// provided when access a single element of a repeated field.
+var ErrIndexOutOfRange = errors.New("index is out of range")
+
+// IndexOutOfRangeError is the same as ErrIndexOutOfRange.
+// Deprecated: use ErrIndexOutOfRange
+var IndexOutOfRangeError = ErrIndexOutOfRange
+
+// ErrNumericOverflow is an error returned by operations that encounter a
+// numeric value that is too large, for example de-serializing a value into an
+// int32 field when the value is larger that can fit into a 32-bit value.
+var ErrNumericOverflow = errors.New("numeric value is out of range")
+
+// NumericOverflowError is the same as ErrNumericOverflow.
+// Deprecated: use ErrNumericOverflow
+var NumericOverflowError = ErrNumericOverflow
 
 var typeOfProtoMessage = reflect.TypeOf((*proto.Message)(nil)).Elem()
 var typeOfDynamicMessage = reflect.TypeOf((*Message)(nil))
 var typeOfBytes = reflect.TypeOf(([]byte)(nil))
-
-var varintTypes = map[descriptor.FieldDescriptorProto_Type]bool{}
-var fixed32Types = map[descriptor.FieldDescriptorProto_Type]bool{}
-var fixed64Types = map[descriptor.FieldDescriptorProto_Type]bool{}
-
-func init() {
-	varintTypes[descriptor.FieldDescriptorProto_TYPE_BOOL] = true
-	varintTypes[descriptor.FieldDescriptorProto_TYPE_INT32] = true
-	varintTypes[descriptor.FieldDescriptorProto_TYPE_INT64] = true
-	varintTypes[descriptor.FieldDescriptorProto_TYPE_UINT32] = true
-	varintTypes[descriptor.FieldDescriptorProto_TYPE_UINT64] = true
-	varintTypes[descriptor.FieldDescriptorProto_TYPE_SINT32] = true
-	varintTypes[descriptor.FieldDescriptorProto_TYPE_SINT64] = true
-	varintTypes[descriptor.FieldDescriptorProto_TYPE_ENUM] = true
-
-	fixed32Types[descriptor.FieldDescriptorProto_TYPE_FIXED32] = true
-	fixed32Types[descriptor.FieldDescriptorProto_TYPE_SFIXED32] = true
-	fixed32Types[descriptor.FieldDescriptorProto_TYPE_FLOAT] = true
-
-	fixed64Types[descriptor.FieldDescriptorProto_TYPE_FIXED64] = true
-	fixed64Types[descriptor.FieldDescriptorProto_TYPE_SFIXED64] = true
-	fixed64Types[descriptor.FieldDescriptorProto_TYPE_DOUBLE] = true
-}
 
 // Message is a dynamic protobuf message. Instead of a generated struct,
 // like most protobuf messages, this is a map of field number to values and
@@ -83,10 +103,22 @@ type UnknownField struct {
 // instantiate any nested message fields and no extension fields will be parsed. To
 // use a custom MessageFactory or ExtensionRegistry, use MessageFactory.NewMessage.
 func NewMessage(md *desc.MessageDescriptor) *Message {
-	return newMessageWithMessageFactory(md, nil)
+	return NewMessageWithMessageFactory(md, nil)
 }
 
-func newMessageWithMessageFactory(md *desc.MessageDescriptor, mf *MessageFactory) *Message {
+// NewMessageWithExtensionRegistry creates a new dynamic message for the type
+// represented by the given message descriptor. During de-serialization, the given
+// ExtensionRegistry is used to parse extension fields and nested messages will be
+// instantiated using dynamic.NewMessageFactoryWithExtensionRegistry(er).
+func NewMessageWithExtensionRegistry(md *desc.MessageDescriptor, er *ExtensionRegistry) *Message {
+	mf := NewMessageFactoryWithExtensionRegistry(er)
+	return NewMessageWithMessageFactory(md, mf)
+}
+
+// NewMessageWithMessageFactory creates a new dynamic message for the type
+// represented by the given message descriptor. During de-serialization, the given
+// MessageFactory is used to instantiate nested messages.
+func NewMessageWithMessageFactory(md *desc.MessageDescriptor, mf *MessageFactory) *Message {
 	var er *ExtensionRegistry
 	if mf != nil {
 		er = mf.er
@@ -98,10 +130,47 @@ func newMessageWithMessageFactory(md *desc.MessageDescriptor, mf *MessageFactory
 	}
 }
 
+// AsDynamicMessage converts the given message to a dynamic message. If the
+// given message is dynamic, it is returned. Otherwise, a dynamic message is
+// created using NewMessage.
+func AsDynamicMessage(msg proto.Message) (*Message, error) {
+	return AsDynamicMessageWithMessageFactory(msg, nil)
+}
+
+// AsDynamicMessageWithExtensionRegistry converts the given message to a dynamic
+// message. If the given message is dynamic, it is returned. Otherwise, a
+// dynamic message is created using NewMessageWithExtensionRegistry.
+func AsDynamicMessageWithExtensionRegistry(msg proto.Message, er *ExtensionRegistry) (*Message, error) {
+	mf := NewMessageFactoryWithExtensionRegistry(er)
+	return AsDynamicMessageWithMessageFactory(msg, mf)
+}
+
+// AsDynamicMessageWithMessageFactory converts the given message to a dynamic
+// message. If the given message is dynamic, it is returned. Otherwise, a
+// dynamic message is created using NewMessageWithMessageFactory.
+func AsDynamicMessageWithMessageFactory(msg proto.Message, mf *MessageFactory) (*Message, error) {
+	if dm, ok := msg.(*Message); ok {
+		return dm, nil
+	}
+	md, err := desc.LoadMessageDescriptorForMessage(msg)
+	if err != nil {
+		return nil, err
+	}
+	dm := NewMessageWithMessageFactory(md, mf)
+	err = dm.mergeFrom(msg)
+	if err != nil {
+		return nil, err
+	}
+	return dm, nil
+}
+
+// GetMessageDescriptor returns a descriptor for this message's type.
 func (m *Message) GetMessageDescriptor() *desc.MessageDescriptor {
 	return m.md
 }
 
+// GetKnownFields returns a slice of descriptors for all known fields. The
+// fields will not be in any defined order.
 func (m *Message) GetKnownFields() []*desc.FieldDescriptor {
 	if len(m.extraFields) == 0 {
 		return m.md.GetFields()
@@ -116,6 +185,8 @@ func (m *Message) GetKnownFields() []*desc.FieldDescriptor {
 	return flds
 }
 
+// GetKnownExtensions returns a slice of descriptors for all extensions known by
+// the message's extension registry. The fields will not be in any defined order.
 func (m *Message) GetKnownExtensions() []*desc.FieldDescriptor {
 	if !m.md.IsExtendable() {
 		return nil
@@ -129,6 +200,8 @@ func (m *Message) GetKnownExtensions() []*desc.FieldDescriptor {
 	return exts
 }
 
+// GetUnknownFields returns a slice of tag numbers for all unknown fields that
+// this message contains. The tags will not be in any defined order.
 func (m *Message) GetUnknownFields() []int32 {
 	flds := make([]int32, 0, len(m.unknownFields))
 	for tag := range m.unknownFields {
@@ -137,24 +210,29 @@ func (m *Message) GetUnknownFields() []int32 {
 	return flds
 }
 
+// Descriptor returns the serialized form of the file descriptor in which the
+// message was defined and a path to the message type therein. This mimics the
+// method of the same name on message types generated by protoc.
 func (m *Message) Descriptor() ([]byte, []int) {
 	// get encoded file descriptor
 	b, err := proto.Marshal(m.md.GetFile().AsProto())
 	if err != nil {
-		panic(fmt.Sprintf("Failed to get encoded descriptor for %s", m.md.GetFile().GetName()))
+		panic(fmt.Sprintf("failed to get encoded descriptor for %s: %v", m.md.GetFile().GetName(), err))
 	}
 	var zippedBytes bytes.Buffer
 	w := gzip.NewWriter(&zippedBytes)
-	_, err = w.Write(b)
-	if err != nil {
-		panic(fmt.Sprintf("Failed to get encoded descriptor for %s", m.md.GetFile().GetName()))
+	if _, err := w.Write(b); err != nil {
+		panic(fmt.Sprintf("failed to get encoded descriptor for %s: %v", m.md.GetFile().GetName(), err))
+	}
+	if err := w.Close(); err != nil {
+		panic(fmt.Sprintf("failed to get an encoded descriptor for %s: %v", m.md.GetFile().GetName(), err))
 	}
 
 	// and path to message
 	path := []int{}
 	var d desc.Descriptor
 	name := m.md.GetFullyQualifiedName()
-	for d = m.md; d != nil; d = d.GetParent() {
+	for d = m.md.GetParent(); d != nil; name, d = d.GetFullyQualifiedName(), d.GetParent() {
 		found := false
 		switch d := d.(type) {
 		case (*desc.FileDescriptor):
@@ -173,12 +251,12 @@ func (m *Message) Descriptor() ([]byte, []int) {
 			}
 		}
 		if !found {
-			panic(fmt.Sprintf("Failed to get descriptor path for %s", m.md.GetFullyQualifiedName()))
+			panic(fmt.Sprintf("failed to compute descriptor path for %s", m.md.GetFullyQualifiedName()))
 		}
 	}
 	// reverse the path
 	i := 0
-	j := len(path)
+	j := len(path) - 1
 	for i < j {
 		path[i], path[j] = path[j], path[i]
 		i++
@@ -188,10 +266,16 @@ func (m *Message) Descriptor() ([]byte, []int) {
 	return zippedBytes.Bytes(), path
 }
 
+// XXX_MessageName returns the fully qualified name of this message's type. This
+// allows dynamic messages to be used with proto.MessageName.
 func (m *Message) XXX_MessageName() string {
 	return m.md.GetFullyQualifiedName()
 }
 
+// FindFieldDescriptor returns a field descriptor for the given tag number. This
+// searches known fields in the descriptor, known fields discovered during calls
+// to GetField or SetField, and extension fields known by the message's extension
+// registry. It returns nil if the tag is unknown.
 func (m *Message) FindFieldDescriptor(tagNumber int32) *desc.FieldDescriptor {
 	fd := m.md.FindFieldByNumber(tagNumber)
 	if fd != nil {
@@ -204,6 +288,12 @@ func (m *Message) FindFieldDescriptor(tagNumber int32) *desc.FieldDescriptor {
 	return m.extraFields[tagNumber]
 }
 
+// FindFieldDescriptorByName returns a field descriptor for the given field
+// name. This searches known fields in the descriptor, known fields discovered
+// during calls to GetField or SetField, and extension fields known by the
+// message's extension registry. It returns nil if the name is unknown. If the
+// given name refers to an extension, it should be fully qualified and may be
+// optionally enclosed in parentheses or brackets.
 func (m *Message) FindFieldDescriptorByName(name string) *desc.FieldDescriptor {
 	if name == "" {
 		return nil
@@ -243,6 +333,12 @@ func (m *Message) FindFieldDescriptorByName(name string) *desc.FieldDescriptor {
 	return nil
 }
 
+// FindFieldDescriptorByJSONName returns a field descriptor for the given JSON
+// name. This searches known fields in the descriptor, known fields discovered
+// during calls to GetField or SetField, and extension fields known by the
+// message's extension registry. If no field matches the given JSON name, it
+// will fall back to searching field names (e.g. FindFieldDescriptorByName). If
+// this also yields no match, nil is returned.
 func (m *Message) FindFieldDescriptorByJSONName(name string) *desc.FieldDescriptor {
 	if name == "" {
 		return nil
@@ -284,15 +380,21 @@ func (m *Message) FindFieldDescriptorByJSONName(name string) *desc.FieldDescript
 }
 
 func (m *Message) checkField(fd *desc.FieldDescriptor) error {
-	if fd.GetOwner().GetFullyQualifiedName() != m.md.GetFullyQualifiedName() {
-		return fmt.Errorf("Given field, %s, is for wrong message type: %s; expecting %s", fd.GetName(), fd.GetOwner().GetFullyQualifiedName(), m.md.GetFullyQualifiedName())
+	return checkField(fd, m.md)
+}
+
+func checkField(fd *desc.FieldDescriptor, md *desc.MessageDescriptor) error {
+	if fd.GetOwner().GetFullyQualifiedName() != md.GetFullyQualifiedName() {
+		return fmt.Errorf("given field, %s, is for wrong message type: %s; expecting %s", fd.GetName(), fd.GetOwner().GetFullyQualifiedName(), md.GetFullyQualifiedName())
 	}
-	if fd.IsExtension() && !m.md.IsExtension(fd.GetNumber()) {
-		return fmt.Errorf("Given field, %s, is an extension but is not in message extension range: %v", fd.GetFullyQualifiedName(), m.md.GetExtensionRanges())
+	if fd.IsExtension() && !md.IsExtension(fd.GetNumber()) {
+		return fmt.Errorf("given field, %s, is an extension but is not in message extension range: %v", fd.GetFullyQualifiedName(), md.GetExtensionRanges())
 	}
 	return nil
 }
 
+// GetField returns the value for the given field descriptor. It panics if an
+// error is encountered. See TryGetField.
 func (m *Message) GetField(fd *desc.FieldDescriptor) interface{} {
 	if v, err := m.TryGetField(fd); err != nil {
 		panic(err.Error())
@@ -301,6 +403,54 @@ func (m *Message) GetField(fd *desc.FieldDescriptor) interface{} {
 	}
 }
 
+// TryGetField returns the value for the given field descriptor. An error is
+// returned if the given field descriptor does not belong to the right message
+// type.
+//
+// The Go type of the returned value, for scalar fields, is the same as protoc
+// would generate for the field (in a non-dynamic message). The table below
+// lists the scalar types and the corresponding Go types.
+//  +-------------------------+-----------+
+//  |       Declared Type     |  Go Type  |
+//  +-------------------------+-----------+
+//  | int32, sint32, sfixed32 | int32     |
+//  | int64, sint64, sfixed64 | int64     |
+//  | uint32, fixed32         | uint32    |
+//  | uint64, fixed64         | uint64    |
+//  | float                   | float32   |
+//  | double                  | double32  |
+//  | bool                    | bool      |
+//  | string                  | string    |
+//  | bytes                   | []byte    |
+//  +-------------------------+-----------+
+//
+// Values for enum fields will always be int32 values. You can use the enum
+// descriptor associated with the field to lookup value names with those values.
+// Values for message type fields may be an instance of the generated type *or*
+// may be another *dynamic.Message that represents the type.
+//
+// If the given field is a map field, the returned type will be
+// map[interface{}]interface{}. The actual concrete types of keys and values is
+// as described above. If the given field is a (non-map) repeated field, the
+// returned type is always []interface{}; the type of the actual elements is as
+// described above.
+//
+// If this message has no value for the given field, its default value is
+// returned. If the message is defined in a file with "proto3" syntax, the
+// default is always the zero value for the field. The default value for map and
+// repeated fields is a nil map or slice (respectively). For field's whose types
+// is a message, the default value is an empty message for "proto2" syntax or a
+// nil message for "proto3" syntax. Note that the in the latter case, a non-nil
+// interface with a nil pointer is returned, not a nil interface. Also note that
+// whether the returned value is an empty message or nil depends on if *this*
+// message was defined as "proto3" syntax, not the message type referred to by
+// the field's type.
+//
+// If the given field descriptor is not known (e.g. not present in the message
+// descriptor) but corresponds to an unknown field, the unknown value will be
+// parsed and become known. The parsed value will be returned, or an error will
+// be returned if the unknown value cannot be parsed according to the field
+// descriptor's type information.
 func (m *Message) TryGetField(fd *desc.FieldDescriptor) (interface{}, error) {
 	if err := m.checkField(fd); err != nil {
 		return nil, err
@@ -308,6 +458,8 @@ func (m *Message) TryGetField(fd *desc.FieldDescriptor) (interface{}, error) {
 	return m.getField(fd)
 }
 
+// GetFieldByName returns the value for the field with the given name. It panics
+// if an error is encountered. See TryGetFieldByName.
 func (m *Message) GetFieldByName(name string) interface{} {
 	if v, err := m.TryGetFieldByName(name); err != nil {
 		panic(err.Error())
@@ -316,6 +468,13 @@ func (m *Message) GetFieldByName(name string) interface{} {
 	}
 }
 
+// TryGetFieldByName returns the value for the field with the given name. An
+// error is returned if the given name is unknown. If the given name refers to
+// an extension field, it should be fully qualified and optionally enclosed in
+// parenthesis or brackets.
+//
+// If this message has no value for the given field, its default value is
+// returned. (See TryGetField for more info on types and default field values.)
 func (m *Message) TryGetFieldByName(name string) (interface{}, error) {
 	fd := m.FindFieldDescriptorByName(name)
 	if fd == nil {
@@ -324,6 +483,8 @@ func (m *Message) TryGetFieldByName(name string) (interface{}, error) {
 	return m.getField(fd)
 }
 
+// GetFieldByNumber returns the value for the field with the given tag number.
+// It panics if an error is encountered. See TryGetFieldByNumber.
 func (m *Message) GetFieldByNumber(tagNumber int) interface{} {
 	if v, err := m.TryGetFieldByNumber(tagNumber); err != nil {
 		panic(err.Error())
@@ -332,6 +493,11 @@ func (m *Message) GetFieldByNumber(tagNumber int) interface{} {
 	}
 }
 
+// TryGetFieldByNumber returns the value for the field with the given tag
+// number. An error is returned if the given tag is unknown.
+//
+// If this message has no value for the given field, its default value is
+// returned. (See TryGetField for more info on types and default field values.)
 func (m *Message) TryGetFieldByNumber(tagNumber int) (interface{}, error) {
 	fd := m.FindFieldDescriptor(int32(tagNumber))
 	if fd == nil {
@@ -350,7 +516,8 @@ func (m *Message) doGetField(fd *desc.FieldDescriptor, nilIfAbsent bool) (interf
 		var err error
 		if res, err = m.parseUnknownField(fd); err != nil {
 			return nil, err
-		} else if res == nil {
+		}
+		if res == nil {
 			if nilIfAbsent {
 				return nil, nil
 			} else {
@@ -361,6 +528,12 @@ func (m *Message) doGetField(fd *desc.FieldDescriptor, nilIfAbsent bool) (interf
 				// GetDefaultValue only returns nil for message types
 				md := fd.GetMessageType()
 				if md.IsProto3() {
+					// try to return a proper nil pointer
+					msgType := proto.MessageType(md.GetFullyQualifiedName())
+					if msgType != nil && msgType.Implements(typeOfProtoMessage) {
+						return reflect.Zero(msgType).Interface().(proto.Message), nil
+					}
+					// fallback to nil dynamic message pointer
 					return (*Message)(nil), nil
 				} else {
 					// for proto2, return default instance of message
@@ -388,6 +561,11 @@ func (m *Message) doGetField(fd *desc.FieldDescriptor, nilIfAbsent bool) (interf
 	return res, nil
 }
 
+// HasField returns true if this message has a value for the given field. If the
+// given field is not valid (e.g. belongs to a different message type), false is
+// returned. If this message is defined in a file with "proto3" syntax, this
+// will return false even if a field was explicitly assigned its zero value (the
+// zero values for a field are intentionally indistinguishable from absent).
 func (m *Message) HasField(fd *desc.FieldDescriptor) bool {
 	if err := m.checkField(fd); err != nil {
 		return false
@@ -395,6 +573,8 @@ func (m *Message) HasField(fd *desc.FieldDescriptor) bool {
 	return m.HasFieldNumber(int(fd.GetNumber()))
 }
 
+// HasFieldName returns true if this message has a value for a field with the
+// given name. If the given name is unknown, this returns false.
 func (m *Message) HasFieldName(name string) bool {
 	fd := m.FindFieldDescriptorByName(name)
 	if fd == nil {
@@ -403,6 +583,8 @@ func (m *Message) HasFieldName(name string) bool {
 	return m.HasFieldNumber(int(fd.GetNumber()))
 }
 
+// HasFieldNumber returns true if this message has a value for a field with the
+// given tag number. If the given tag is unknown, this returns false.
 func (m *Message) HasFieldNumber(tagNumber int) bool {
 	if _, ok := m.values[int32(tagNumber)]; ok {
 		return true
@@ -411,12 +593,45 @@ func (m *Message) HasFieldNumber(tagNumber int) bool {
 	return ok
 }
 
+// SetField sets the value for the given field descriptor to the given value. It
+// panics if an error is encountered. See TrySetField.
 func (m *Message) SetField(fd *desc.FieldDescriptor, val interface{}) {
 	if err := m.TrySetField(fd, val); err != nil {
 		panic(err.Error())
 	}
 }
 
+// TrySetField sets the value for the given field descriptor to the given value.
+// An error is returned if the given field descriptor does not belong to the
+// right message type or if the given value is not a correct/compatible type for
+// the given field.
+//
+// The Go type expected for a field  is the same as TryGetField would return for
+// the field. So message values can be supplied as either the correct generated
+// message type or as a *dynamic.Message.
+//
+// Since it is cumbersome to work with dynamic messages, some concessions are
+// made to simplify usage regarding types:
+//
+//  1. If a numeric type is provided that can be converted *without loss or
+//     overflow*, it is accepted. This allows for setting int64 fields using int
+//     or int32 values. Similarly for uint64 with uint and uint32 values and for
+//     float64 fields with float32 values.
+//  2. The value can be a named type, as long as its underlying type is correct.
+//  3. Map and repeated fields can be set using any kind of concrete map or
+//     slice type, as long as the values within are all of the correct type. So
+//     a field defined as a 'map<string, int32>` can be set using a
+//     map[string]int32, a map[string]interface{}, or even a
+//     map[interface{}]interface{}.
+//  4. Finally, dynamic code that chooses to not treat maps as a special-case
+//     find that they can set map fields using a slice where each element is a
+//     message that matches the implicit map-entry field message type.
+//
+// If the given field descriptor is not known (e.g. not present in the message
+// descriptor) it will become known. Subsequent operations using tag numbers or
+// names will be able to resolve the newly-known type. If the message has a
+// value for the unknown value, it is cleared, replaced by the given known
+// value.
 func (m *Message) TrySetField(fd *desc.FieldDescriptor, val interface{}) error {
 	if err := m.checkField(fd); err != nil {
 		return err
@@ -424,12 +639,21 @@ func (m *Message) TrySetField(fd *desc.FieldDescriptor, val interface{}) error {
 	return m.setField(fd, val)
 }
 
+// SetFieldByName sets the value for the field with the given name to the given
+// value. It panics if an error is encountered. See TrySetFieldByName.
 func (m *Message) SetFieldByName(name string, val interface{}) {
 	if err := m.TrySetFieldByName(name, val); err != nil {
 		panic(err.Error())
 	}
 }
 
+// TrySetFieldByName sets the value for the field with the given name to the
+// given value. An error is returned if the given name is unknown or if the
+// given value has an incorrect type. If the given name refers to an extension
+// field, it should be fully qualified and optionally enclosed in parenthesis or
+// brackets.
+//
+// (See TrySetField for more info on types.)
 func (m *Message) TrySetFieldByName(name string, val interface{}) error {
 	fd := m.FindFieldDescriptorByName(name)
 	if fd == nil {
@@ -438,12 +662,20 @@ func (m *Message) TrySetFieldByName(name string, val interface{}) error {
 	return m.setField(fd, val)
 }
 
+// SetFieldByNumber sets the value for the field with the given tag number to
+// the given value. It panics if an error is encountered. See
+// TrySetFieldByNumber.
 func (m *Message) SetFieldByNumber(tagNumber int, val interface{}) {
 	if err := m.TrySetFieldByNumber(tagNumber, val); err != nil {
 		panic(err.Error())
 	}
 }
 
+// TrySetFieldByNumber sets the value for the field with the given tag number to
+// the given value. An error is returned if the given tag is unknown or if the
+// given value has an incorrect type.
+//
+// (See TrySetField for more info on types.)
 func (m *Message) TrySetFieldByNumber(tagNumber int, val interface{}) error {
 	fd := m.FindFieldDescriptor(int32(tagNumber))
 	if fd == nil {
@@ -462,41 +694,40 @@ func (m *Message) setField(fd *desc.FieldDescriptor, val interface{}) error {
 }
 
 func (m *Message) internalSetField(fd *desc.FieldDescriptor, val interface{}) {
-	if m.md.IsProto3() {
+	if fd.IsRepeated() {
+		// Unset fields and zero-length fields are indistinguishable, in both
+		// proto2 and proto3 syntax
+		if reflect.ValueOf(val).Len() == 0 {
+			if m.values != nil {
+				delete(m.values, fd.GetNumber())
+			}
+			return
+		}
+	} else if m.md.IsProto3() && fd.GetOneOf() == nil {
 		// proto3 considers fields that are set to their zero value as unset
-		if fd.IsRepeated() {
-			// can't use == comparison below for map and slices, so just test length
-			// (zero length is same as default)
-			if reflect.ValueOf(val).Len() == 0 {
-				if m.values != nil {
-					delete(m.values, fd.GetNumber())
-				}
-				return
-			}
-		} else {
+		// (we already handled repeated fields above)
+		var equal bool
+		if b, ok := val.([]byte); ok {
 			// can't compare slices, so we have to special-case []byte values
-			var equal bool
-			if b, ok := val.([]byte); ok {
-				equal = ok && bytes.Equal(b, fd.GetDefaultValue().([]byte))
-			} else {
-				defVal := fd.GetDefaultValue()
-				equal = defVal == val
-				if !equal && defVal == nil {
-					// above just checks if value is the nil interface,
-					// but we should also test if the given value is a
-					// nil pointer
-					rv := reflect.ValueOf(val)
-					if rv.Kind() == reflect.Ptr && rv.IsNil() {
-						equal = true
-					}
+			equal = ok && bytes.Equal(b, fd.GetDefaultValue().([]byte))
+		} else {
+			defVal := fd.GetDefaultValue()
+			equal = defVal == val
+			if !equal && defVal == nil {
+				// above just checks if value is the nil interface,
+				// but we should also test if the given value is a
+				// nil pointer
+				rv := reflect.ValueOf(val)
+				if rv.Kind() == reflect.Ptr && rv.IsNil() {
+					equal = true
 				}
 			}
-			if equal {
-				if m.values != nil {
-					delete(m.values, fd.GetNumber())
-				}
-				return
+		}
+		if equal {
+			if m.values != nil {
+				delete(m.values, fd.GetNumber())
 			}
+			return
 		}
 	}
 	if m.values == nil {
@@ -529,12 +760,16 @@ func (m *Message) addField(fd *desc.FieldDescriptor) {
 	m.extraFields[fd.GetNumber()] = fd
 }
 
+// ClearField removes any value for the given field. It panics if an error is
+// encountered. See TryClearField.
 func (m *Message) ClearField(fd *desc.FieldDescriptor) {
 	if err := m.TryClearField(fd); err != nil {
 		panic(err.Error())
 	}
 }
 
+// TryClearField removes any value for the given field. An error is returned if
+// the given field descriptor does not belong to the right message type.
 func (m *Message) TryClearField(fd *desc.FieldDescriptor) error {
 	if err := m.checkField(fd); err != nil {
 		return err
@@ -543,12 +778,18 @@ func (m *Message) TryClearField(fd *desc.FieldDescriptor) error {
 	return nil
 }
 
+// ClearFieldByName removes any value for the field with the given name. It
+// panics if an error is encountered. See TryClearFieldByName.
 func (m *Message) ClearFieldByName(name string) {
 	if err := m.TryClearFieldByName(name); err != nil {
 		panic(err.Error())
 	}
 }
 
+// TryClearFieldByName removes any value for the field with the given name. An
+// error is returned if the given name is unknown. If the given name refers to
+// an extension field, it should be fully qualified and optionally enclosed in
+// parenthesis or brackets.
 func (m *Message) TryClearFieldByName(name string) error {
 	fd := m.FindFieldDescriptorByName(name)
 	if fd == nil {
@@ -558,12 +799,16 @@ func (m *Message) TryClearFieldByName(name string) error {
 	return nil
 }
 
+// ClearFieldByNumber removes any value for the field with the given tag number.
+// It panics if an error is encountered. See TryClearFieldByNumber.
 func (m *Message) ClearFieldByNumber(tagNumber int) {
 	if err := m.TryClearFieldByNumber(tagNumber); err != nil {
 		panic(err.Error())
 	}
 }
 
+// TryClearFieldByNumber removes any value for the field with the given tag
+// number. An error is returned if the given tag is unknown.
 func (m *Message) TryClearFieldByNumber(tagNumber int) error {
 	fd := m.FindFieldDescriptor(int32(tagNumber))
 	if fd == nil {
@@ -574,11 +819,23 @@ func (m *Message) TryClearFieldByNumber(tagNumber int) error {
 }
 
 func (m *Message) clearField(fd *desc.FieldDescriptor) {
+	// clear value
 	if m.values != nil {
 		delete(m.values, fd.GetNumber())
 	}
+	// also clear any unknown fields
+	if m.unknownFields != nil {
+		delete(m.unknownFields, fd.GetNumber())
+	}
+	// and add this field if it was previously unknown
+	if existing := m.FindFieldDescriptor(fd.GetNumber()); existing == nil {
+		m.addField(fd)
+	}
 }
 
+// GetOneOfField returns which of the given one-of's fields is set and the
+// corresponding value. It panics if an error is encountered. See
+// TryGetOneOfField.
 func (m *Message) GetOneOfField(od *desc.OneOfDescriptor) (*desc.FieldDescriptor, interface{}) {
 	if fd, val, err := m.TryGetOneOfField(od); err != nil {
 		panic(err.Error())
@@ -587,9 +844,20 @@ func (m *Message) GetOneOfField(od *desc.OneOfDescriptor) (*desc.FieldDescriptor
 	}
 }
 
+// TryGetOneOfField returns which of the given one-of's fields is set and the
+// corresponding value. An error is returned if the given one-of belongs to the
+// wrong message type. If the given one-of has no field set, this method will
+// return nil, nil.
+//
+// The type of the value, if one is set, is the same as would be returned by
+// TryGetField using the returned field descriptor.
+//
+// Like with TryGetField, if the given one-of contains any fields that are not
+// known (e.g. not present in this message's descriptor), they will become known
+// and any unknown value will be parsed (and become a known value on success).
 func (m *Message) TryGetOneOfField(od *desc.OneOfDescriptor) (*desc.FieldDescriptor, interface{}, error) {
 	if od.GetOwner().GetFullyQualifiedName() != m.md.GetFullyQualifiedName() {
-		return nil, nil, fmt.Errorf("Given one-of, %s, is for wrong message type: %s; expecting %s", od.GetName(), od.GetOwner().GetFullyQualifiedName(), m.md.GetFullyQualifiedName())
+		return nil, nil, fmt.Errorf("given one-of, %s, is for wrong message type: %s; expecting %s", od.GetName(), od.GetOwner().GetFullyQualifiedName(), m.md.GetFullyQualifiedName())
 	}
 	for _, fd := range od.GetChoices() {
 		val, err := m.doGetField(fd, true)
@@ -603,6 +871,29 @@ func (m *Message) TryGetOneOfField(od *desc.OneOfDescriptor) (*desc.FieldDescrip
 	return nil, nil, nil
 }
 
+// ClearOneOfField removes any value for any of the given one-of's fields. It
+// panics if an error is encountered. See TryClearOneOfField.
+func (m *Message) ClearOneOfField(od *desc.OneOfDescriptor) {
+	if err := m.TryClearOneOfField(od); err != nil {
+		panic(err.Error())
+	}
+}
+
+// TryClearOneOfField removes any value for any of the given one-of's fields. An
+// error is returned if the given one-of descriptor does not belong to the right
+// message type.
+func (m *Message) TryClearOneOfField(od *desc.OneOfDescriptor) error {
+	if od.GetOwner().GetFullyQualifiedName() != m.md.GetFullyQualifiedName() {
+		return fmt.Errorf("given one-of, %s, is for wrong message type: %s; expecting %s", od.GetName(), od.GetOwner().GetFullyQualifiedName(), m.md.GetFullyQualifiedName())
+	}
+	for _, fd := range od.GetChoices() {
+		m.clearField(fd)
+	}
+	return nil
+}
+
+// GetMapField returns the value for the given map field descriptor and given
+// key. It panics if an error is encountered. See TryGetMapField.
 func (m *Message) GetMapField(fd *desc.FieldDescriptor, key interface{}) interface{} {
 	if v, err := m.TryGetMapField(fd, key); err != nil {
 		panic(err.Error())
@@ -611,6 +902,19 @@ func (m *Message) GetMapField(fd *desc.FieldDescriptor, key interface{}) interfa
 	}
 }
 
+// TryGetMapField returns the value for the given map field descriptor and given
+// key. An error is returned if the given field descriptor does not belong to
+// the right message type or if it is not a map field.
+//
+// If the map field does not contain the requested key, this method returns
+// nil, nil. The Go type of the value returned mirrors the type that protoc
+// would generate for the field. (See TryGetField for more details on types).
+//
+// If the given field descriptor is not known (e.g. not present in the message
+// descriptor) but corresponds to an unknown field, the unknown value will be
+// parsed and become known. The parsed value will be searched for the requested
+// key and any value returned. An error will be returned if the unknown value
+// cannot be parsed according to the field descriptor's type information.
 func (m *Message) TryGetMapField(fd *desc.FieldDescriptor, key interface{}) (interface{}, error) {
 	if err := m.checkField(fd); err != nil {
 		return nil, err
@@ -618,6 +922,8 @@ func (m *Message) TryGetMapField(fd *desc.FieldDescriptor, key interface{}) (int
 	return m.getMapField(fd, key)
 }
 
+// GetMapFieldByName returns the value for the map field with the given name and
+// given key. It panics if an error is encountered. See TryGetMapFieldByName.
 func (m *Message) GetMapFieldByName(name string, key interface{}) interface{} {
 	if v, err := m.TryGetMapFieldByName(name, key); err != nil {
 		panic(err.Error())
@@ -626,6 +932,14 @@ func (m *Message) GetMapFieldByName(name string, key interface{}) interface{} {
 	}
 }
 
+// TryGetMapFieldByName returns the value for the map field with the given name
+// and given key. An error is returned if the given name is unknown or if it
+// names a field that is not a map field.
+//
+// If this message has no value for the given field or the value has no value
+// for the requested key, then this method returns nil, nil.
+//
+// (See TryGetField for more info on types.)
 func (m *Message) TryGetMapFieldByName(name string, key interface{}) (interface{}, error) {
 	fd := m.FindFieldDescriptorByName(name)
 	if fd == nil {
@@ -634,6 +948,9 @@ func (m *Message) TryGetMapFieldByName(name string, key interface{}) (interface{
 	return m.getMapField(fd, key)
 }
 
+// GetMapFieldByNumber returns the value for the map field with the given tag
+// number and given key. It panics if an error is encountered. See
+// TryGetMapFieldByNumber.
 func (m *Message) GetMapFieldByNumber(tagNumber int, key interface{}) interface{} {
 	if v, err := m.TryGetMapFieldByNumber(tagNumber, key); err != nil {
 		panic(err.Error())
@@ -642,6 +959,14 @@ func (m *Message) GetMapFieldByNumber(tagNumber int, key interface{}) interface{
 	}
 }
 
+// TryGetMapFieldByNumber returns the value for the map field with the given tag
+// number and given key. An error is returned if the given tag is unknown or if
+// it indicates a field that is not a map field.
+//
+// If this message has no value for the given field or the value has no value
+// for the requested key, then this method returns nil, nil.
+//
+// (See TryGetField for more info on types.)
 func (m *Message) TryGetMapFieldByNumber(tagNumber int, key interface{}) (interface{}, error) {
 	fd := m.FindFieldDescriptor(int32(tagNumber))
 	if fd == nil {
@@ -670,12 +995,138 @@ func (m *Message) getMapField(fd *desc.FieldDescriptor, key interface{}) (interf
 	return mp.(map[interface{}]interface{})[ki], nil
 }
 
+// ForEachMapFieldEntry executes the given function for each entry in the map
+// value for the given field descriptor. It stops iteration if the function
+// returns false. It panics if an error is encountered. See
+// TryForEachMapFieldEntry.
+func (m *Message) ForEachMapFieldEntry(fd *desc.FieldDescriptor, fn func(key, val interface{}) bool) {
+	if err := m.TryForEachMapFieldEntry(fd, fn); err != nil {
+		panic(err.Error())
+	}
+}
+
+// TryForEachMapFieldEntry executes the given function for each entry in the map
+// value for the given field descriptor. An error is returned if the given field
+// descriptor does not belong to the right message type or if it is not a  map
+// field.
+//
+// Iteration ends either when all entries have been examined or when the given
+// function returns false. So the function is expected to return true for normal
+// iteration and false to break out. If this message has no value for the given
+// field, it returns without invoking the given function.
+//
+// The Go type of the key and value supplied to the function mirrors the type
+// that protoc would generate for the field. (See TryGetField for more details
+// on types).
+//
+// If the given field descriptor is not known (e.g. not present in the message
+// descriptor) but corresponds to an unknown field, the unknown value will be
+// parsed and become known. The parsed value will be searched for the requested
+// key and any value returned. An error will be returned if the unknown value
+// cannot be parsed according to the field descriptor's type information.
+func (m *Message) TryForEachMapFieldEntry(fd *desc.FieldDescriptor, fn func(key, val interface{}) bool) error {
+	if err := m.checkField(fd); err != nil {
+		return err
+	}
+	return m.forEachMapFieldEntry(fd, fn)
+}
+
+// ForEachMapFieldEntryByName executes the given function for each entry in the
+// map value for the field with the given name. It stops iteration if the
+// function returns false. It panics if an error is encountered. See
+// TryForEachMapFieldEntryByName.
+func (m *Message) ForEachMapFieldEntryByName(name string, fn func(key, val interface{}) bool) {
+	if err := m.TryForEachMapFieldEntryByName(name, fn); err != nil {
+		panic(err.Error())
+	}
+}
+
+// TryForEachMapFieldEntryByName executes the given function for each entry in
+// the map value for the field with the given name. It stops iteration if the
+// function returns false. An error is returned if the given name is unknown or
+// if it names a field that is not a map field.
+//
+// If this message has no value for the given field, it returns without ever
+// invoking the given function.
+//
+// (See TryGetField for more info on types supplied to the function.)
+func (m *Message) TryForEachMapFieldEntryByName(name string, fn func(key, val interface{}) bool) error {
+	fd := m.FindFieldDescriptorByName(name)
+	if fd == nil {
+		return UnknownFieldNameError
+	}
+	return m.forEachMapFieldEntry(fd, fn)
+}
+
+// ForEachMapFieldEntryByNumber executes the given function for each entry in
+// the map value for the field with the given tag number. It stops iteration if
+// the function returns false. It panics if an error is encountered. See
+// TryForEachMapFieldEntryByNumber.
+func (m *Message) ForEachMapFieldEntryByNumber(tagNumber int, fn func(key, val interface{}) bool) {
+	if err := m.TryForEachMapFieldEntryByNumber(tagNumber, fn); err != nil {
+		panic(err.Error())
+	}
+}
+
+// TryForEachMapFieldEntryByNumber executes the given function for each entry in
+// the map value for the field with the given tag number. It stops iteration if
+// the function returns false. An error is returned if the given tag is unknown
+// or if it indicates a field that is not a map field.
+//
+// If this message has no value for the given field, it returns without ever
+// invoking the given function.
+//
+// (See TryGetField for more info on types supplied to the function.)
+func (m *Message) TryForEachMapFieldEntryByNumber(tagNumber int, fn func(key, val interface{}) bool) error {
+	fd := m.FindFieldDescriptor(int32(tagNumber))
+	if fd == nil {
+		return UnknownTagNumberError
+	}
+	return m.forEachMapFieldEntry(fd, fn)
+}
+
+func (m *Message) forEachMapFieldEntry(fd *desc.FieldDescriptor, fn func(key, val interface{}) bool) error {
+	if !fd.IsMap() {
+		return FieldIsNotMapError
+	}
+	mp := m.values[fd.GetNumber()]
+	if mp == nil {
+		if mp, err := m.parseUnknownField(fd); err != nil {
+			return err
+		} else if mp == nil {
+			return nil
+		}
+	}
+	for k, v := range mp.(map[interface{}]interface{}) {
+		if !fn(k, v) {
+			break
+		}
+	}
+	return nil
+}
+
+// PutMapField sets the value for the given map field descriptor and given key
+// to the given value. It panics if an error is encountered. See TryPutMapField.
 func (m *Message) PutMapField(fd *desc.FieldDescriptor, key interface{}, val interface{}) {
 	if err := m.TryPutMapField(fd, key, val); err != nil {
 		panic(err.Error())
 	}
 }
 
+// TryPutMapField sets the value for the given map field descriptor and given
+// key to the given value. An error is returned if the given field descriptor
+// does not belong to the right message type, if the given field is not a map
+// field, or if the given value is not a correct/compatible type for the given
+// field.
+//
+// The Go type expected for a field  is the same as required by TrySetField for
+// a field with the same type as the map's value type.
+//
+// If the given field descriptor is not known (e.g. not present in the message
+// descriptor) it will become known. Subsequent operations using tag numbers or
+// names will be able to resolve the newly-known type. If the message has a
+// value for the unknown value, it is cleared, replaced by the given known
+// value.
 func (m *Message) TryPutMapField(fd *desc.FieldDescriptor, key interface{}, val interface{}) error {
 	if err := m.checkField(fd); err != nil {
 		return err
@@ -683,12 +1134,21 @@ func (m *Message) TryPutMapField(fd *desc.FieldDescriptor, key interface{}, val 
 	return m.putMapField(fd, key, val)
 }
 
+// PutMapFieldByName sets the value for the map field with the given name and
+// given key to the given value. It panics if an error is encountered. See
+// TryPutMapFieldByName.
 func (m *Message) PutMapFieldByName(name string, key interface{}, val interface{}) {
 	if err := m.TryPutMapFieldByName(name, key, val); err != nil {
 		panic(err.Error())
 	}
 }
 
+// TryPutMapFieldByName sets the value for the map field with the given name and
+// the given key to the given value. An error is returned if the given name is
+// unknown, if it names a field that is not a map, or if the given value has an
+// incorrect type.
+//
+// (See TrySetField for more info on types.)
 func (m *Message) TryPutMapFieldByName(name string, key interface{}, val interface{}) error {
 	fd := m.FindFieldDescriptorByName(name)
 	if fd == nil {
@@ -697,12 +1157,21 @@ func (m *Message) TryPutMapFieldByName(name string, key interface{}, val interfa
 	return m.putMapField(fd, key, val)
 }
 
+// PutMapFieldByNumber sets the value for the map field with the given tag
+// number and given key to the given value. It panics if an error is
+// encountered. See TryPutMapFieldByNumber.
 func (m *Message) PutMapFieldByNumber(tagNumber int, key interface{}, val interface{}) {
 	if err := m.TryPutMapFieldByNumber(tagNumber, key, val); err != nil {
 		panic(err.Error())
 	}
 }
 
+// TryPutMapFieldByNumber sets the value for the map field with the given tag
+// number and the given key to the given value. An error is returned if the
+// given tag is unknown, if it indicates a field that is not a map, or if the
+// given value has an incorrect type.
+//
+// (See TrySetField for more info on types.)
 func (m *Message) TryPutMapFieldByNumber(tagNumber int, key interface{}, val interface{}) error {
 	fd := m.FindFieldDescriptor(int32(tagNumber))
 	if fd == nil {
@@ -730,7 +1199,6 @@ func (m *Message) putMapField(fd *desc.FieldDescriptor, key interface{}, val int
 		if mp, err = m.parseUnknownField(fd); err != nil {
 			return err
 		} else if mp == nil {
-			mp = map[interface{}]interface{}{}
 			m.internalSetField(fd, map[interface{}]interface{}{ki: vi})
 			return nil
 		}
@@ -739,12 +1207,25 @@ func (m *Message) putMapField(fd *desc.FieldDescriptor, key interface{}, val int
 	return nil
 }
 
+// RemoveMapField changes the value for the given field descriptor by removing
+// any value associated with the given key. It panics if an error is
+// encountered. See TryRemoveMapField.
 func (m *Message) RemoveMapField(fd *desc.FieldDescriptor, key interface{}) {
 	if err := m.TryRemoveMapField(fd, key); err != nil {
 		panic(err.Error())
 	}
 }
 
+// TryRemoveMapField changes the value for the given field descriptor by
+// removing any value associated with the given key. An error is returned if the
+// given field descriptor does not belong to the right message type or if the
+// given field is not a map field.
+//
+// If the given field descriptor is not known (e.g. not present in the message
+// descriptor) it will become known. Subsequent operations using tag numbers or
+// names will be able to resolve the newly-known type. If the message has a
+// value for the unknown value, it is parsed and any value for the given key
+// removed.
 func (m *Message) TryRemoveMapField(fd *desc.FieldDescriptor, key interface{}) error {
 	if err := m.checkField(fd); err != nil {
 		return err
@@ -752,12 +1233,18 @@ func (m *Message) TryRemoveMapField(fd *desc.FieldDescriptor, key interface{}) e
 	return m.removeMapField(fd, key)
 }
 
+// RemoveMapFieldByName changes the value for the field with the given name by
+// removing any value associated with the given key. It panics if an error is
+// encountered. See TryRemoveMapFieldByName.
 func (m *Message) RemoveMapFieldByName(name string, key interface{}) {
 	if err := m.TryRemoveMapFieldByName(name, key); err != nil {
 		panic(err.Error())
 	}
 }
 
+// TryRemoveMapFieldByName changes the value for the field with the given name
+// by removing any value associated with the given key. An error is returned if
+// the given name is unknown or if it names a field that is not a map.
 func (m *Message) TryRemoveMapFieldByName(name string, key interface{}) error {
 	fd := m.FindFieldDescriptorByName(name)
 	if fd == nil {
@@ -766,12 +1253,19 @@ func (m *Message) TryRemoveMapFieldByName(name string, key interface{}) error {
 	return m.removeMapField(fd, key)
 }
 
+// RemoveMapFieldByNumber changes the value for the field with the given tag
+// number by removing any value associated with the given key. It panics if an
+// error is encountered. See TryRemoveMapFieldByNumber.
 func (m *Message) RemoveMapFieldByNumber(tagNumber int, key interface{}) {
 	if err := m.TryRemoveMapFieldByNumber(tagNumber, key); err != nil {
 		panic(err.Error())
 	}
 }
 
+// TryRemoveMapFieldByNumber changes the value for the field with the given tag
+// number by removing any value associated with the given key. An error is
+// returned if the given tag is unknown or if it indicates a field that is not
+// a map.
 func (m *Message) TryRemoveMapFieldByNumber(tagNumber int, key interface{}) error {
 	fd := m.FindFieldDescriptor(int32(tagNumber))
 	if fd == nil {
@@ -805,6 +1299,8 @@ func (m *Message) removeMapField(fd *desc.FieldDescriptor, key interface{}) erro
 	return nil
 }
 
+// FieldLength returns the number of elements in this message for the given
+// field descriptor. It panics if an error is encountered. See TryFieldLength.
 func (m *Message) FieldLength(fd *desc.FieldDescriptor) int {
 	l, err := m.TryFieldLength(fd)
 	if err != nil {
@@ -813,14 +1309,20 @@ func (m *Message) FieldLength(fd *desc.FieldDescriptor) int {
 	return l
 }
 
-func (m *Message) FieldLengthByNumber(tagNumber int32) int {
-	l, err := m.TryFieldLengthByNumber(tagNumber)
-	if err != nil {
-		panic(err.Error())
+// TryFieldLength returns the number of elements in this message for the given
+// field descriptor. An error is returned if the given field descriptor does not
+// belong to the right message type or if it is neither a map field nor a
+// repeated field.
+func (m *Message) TryFieldLength(fd *desc.FieldDescriptor) (int, error) {
+	if err := m.checkField(fd); err != nil {
+		return 0, err
 	}
-	return l
+	return m.fieldLength(fd)
 }
 
+// FieldLengthByName returns the number of elements in this message for the
+// field with the given name. It panics if an error is encountered. See
+// TryFieldLengthByName.
 func (m *Message) FieldLengthByName(name string) int {
 	l, err := m.TryFieldLengthByName(name)
 	if err != nil {
@@ -829,25 +1331,35 @@ func (m *Message) FieldLengthByName(name string) int {
 	return l
 }
 
-func (m *Message) TryFieldLength(fd *desc.FieldDescriptor) (int, error) {
-	if err := m.checkField(fd); err != nil {
-		return 0, err
-	}
-	return m.fieldLength(fd)
-}
-
-func (m *Message) TryFieldLengthByNumber(tagNumber int32) (int, error) {
-	fd := m.FindFieldDescriptor(int32(tagNumber))
-	if fd == nil {
-		return 0, UnknownTagNumberError
-	}
-	return m.fieldLength(fd)
-}
-
+// TryFieldLengthByName returns the number of elements in this message for the
+// field with the given name. An error is returned if the given name is unknown
+// or if the named field is neither a map field nor a repeated field.
 func (m *Message) TryFieldLengthByName(name string) (int, error) {
 	fd := m.FindFieldDescriptorByName(name)
 	if fd == nil {
 		return 0, UnknownFieldNameError
+	}
+	return m.fieldLength(fd)
+}
+
+// FieldLengthByNumber returns the number of elements in this message for the
+// field with the given tag number. It panics if an error is encountered. See
+// TryFieldLengthByNumber.
+func (m *Message) FieldLengthByNumber(tagNumber int32) int {
+	l, err := m.TryFieldLengthByNumber(tagNumber)
+	if err != nil {
+		panic(err.Error())
+	}
+	return l
+}
+
+// TryFieldLengthByNumber returns the number of elements in this message for the
+// field with the given tag number. An error is returned if the given tag is
+// unknown or if the named field is neither a map field nor a repeated field.
+func (m *Message) TryFieldLengthByNumber(tagNumber int32) (int, error) {
+	fd := m.FindFieldDescriptor(int32(tagNumber))
+	if fd == nil {
+		return 0, UnknownTagNumberError
 	}
 	return m.fieldLength(fd)
 }
@@ -873,6 +1385,9 @@ func (m *Message) fieldLength(fd *desc.FieldDescriptor) (int, error) {
 	return 0, nil
 }
 
+// GetRepeatedField returns the value for the given repeated field descriptor at
+// the given index. It panics if an error is encountered. See
+// TryGetRepeatedField.
 func (m *Message) GetRepeatedField(fd *desc.FieldDescriptor, index int) interface{} {
 	if v, err := m.TryGetRepeatedField(fd, index); err != nil {
 		panic(err.Error())
@@ -881,6 +1396,22 @@ func (m *Message) GetRepeatedField(fd *desc.FieldDescriptor, index int) interfac
 	}
 }
 
+// TryGetRepeatedField returns the value for the given repeated field descriptor
+// at the given index. An error is returned if the given field descriptor does
+// not belong to the right message type, if it is not a repeated field, or if
+// the given index is out of range (less than zero or greater than or equal to
+// the length of the repeated field). Also, even though map fields technically
+// are repeated fields, if the given field is a map field an error will result:
+// map representation does not lend itself to random access by index.
+//
+// The Go type of the value returned mirrors the type that protoc would generate
+// for the field's element type. (See TryGetField for more details on types).
+//
+// If the given field descriptor is not known (e.g. not present in the message
+// descriptor) but corresponds to an unknown field, the unknown value will be
+// parsed and become known. The value at the given index in the parsed value
+// will be returned. An error will be returned if the unknown value cannot be
+// parsed according to the field descriptor's type information.
 func (m *Message) TryGetRepeatedField(fd *desc.FieldDescriptor, index int) (interface{}, error) {
 	if index < 0 {
 		return nil, IndexOutOfRangeError
@@ -891,6 +1422,9 @@ func (m *Message) TryGetRepeatedField(fd *desc.FieldDescriptor, index int) (inte
 	return m.getRepeatedField(fd, index)
 }
 
+// GetRepeatedFieldByName returns the value for the repeated field with the
+// given name at the given index. It panics if an error is encountered. See
+// TryGetRepeatedFieldByName.
 func (m *Message) GetRepeatedFieldByName(name string, index int) interface{} {
 	if v, err := m.TryGetRepeatedFieldByName(name, index); err != nil {
 		panic(err.Error())
@@ -899,6 +1433,13 @@ func (m *Message) GetRepeatedFieldByName(name string, index int) interface{} {
 	}
 }
 
+// TryGetRepeatedFieldByName returns the value for the repeated field with the
+// given name at the given index. An error is returned if the given name is
+// unknown, if it names a field that is not a repeated field (or is a map
+// field), or if the given index is out of range (less than zero or greater
+// than or equal to the length of the repeated field).
+//
+// (See TryGetField for more info on types.)
 func (m *Message) TryGetRepeatedFieldByName(name string, index int) (interface{}, error) {
 	if index < 0 {
 		return nil, IndexOutOfRangeError
@@ -910,6 +1451,9 @@ func (m *Message) TryGetRepeatedFieldByName(name string, index int) (interface{}
 	return m.getRepeatedField(fd, index)
 }
 
+// GetRepeatedFieldByNumber returns the value for the repeated field with the
+// given tag number at the given index. It panics if an error is encountered.
+// See TryGetRepeatedFieldByNumber.
 func (m *Message) GetRepeatedFieldByNumber(tagNumber int, index int) interface{} {
 	if v, err := m.TryGetRepeatedFieldByNumber(tagNumber, index); err != nil {
 		panic(err.Error())
@@ -918,6 +1462,13 @@ func (m *Message) GetRepeatedFieldByNumber(tagNumber int, index int) interface{}
 	}
 }
 
+// TryGetRepeatedFieldByNumber returns the value for the repeated field with the
+// given tag number at the given index. An error is returned if the given tag is
+// unknown, if it indicates a field that is not a repeated field (or is a map
+// field), or if the given index is out of range (less than zero or greater than
+// or equal to the length of the repeated field).
+//
+// (See TryGetField for more info on types.)
 func (m *Message) TryGetRepeatedFieldByNumber(tagNumber int, index int) (interface{}, error) {
 	if index < 0 {
 		return nil, IndexOutOfRangeError
@@ -949,12 +1500,29 @@ func (m *Message) getRepeatedField(fd *desc.FieldDescriptor, index int) (interfa
 	return res[index], nil
 }
 
+// AddRepeatedField appends the given value to the given repeated field. It
+// panics if an error is encountered. See TryAddRepeatedField.
 func (m *Message) AddRepeatedField(fd *desc.FieldDescriptor, val interface{}) {
 	if err := m.TryAddRepeatedField(fd, val); err != nil {
 		panic(err.Error())
 	}
 }
 
+// TryAddRepeatedField appends the given value to the given repeated field. An
+// error is returned if the given field descriptor does not belong to the right
+// message type, if the given field is not repeated, or if the given value is
+// not a correct/compatible type for the given field. If the given field is a
+// map field, the call will succeed if the given value is an instance of the
+// map's entry message type.
+//
+// The Go type expected for a field  is the same as required by TrySetField for
+// a non-repeated field of the same type.
+//
+// If the given field descriptor is not known (e.g. not present in the message
+// descriptor) it will become known. Subsequent operations using tag numbers or
+// names will be able to resolve the newly-known type. If the message has a
+// value for the unknown value, it is parsed and the given value is appended to
+// it.
 func (m *Message) TryAddRepeatedField(fd *desc.FieldDescriptor, val interface{}) error {
 	if err := m.checkField(fd); err != nil {
 		return err
@@ -962,12 +1530,21 @@ func (m *Message) TryAddRepeatedField(fd *desc.FieldDescriptor, val interface{})
 	return m.addRepeatedField(fd, val)
 }
 
+// AddRepeatedFieldByName appends the given value to the repeated field with the
+// given name. It panics if an error is encountered. See
+// TryAddRepeatedFieldByName.
 func (m *Message) AddRepeatedFieldByName(name string, val interface{}) {
 	if err := m.TryAddRepeatedFieldByName(name, val); err != nil {
 		panic(err.Error())
 	}
 }
 
+// TryAddRepeatedFieldByName appends the given value to the repeated field with
+// the given name. An error is returned if the given name is unknown, if it
+// names a field that is not repeated, or if the given value has an incorrect
+// type.
+//
+// (See TrySetField for more info on types.)
 func (m *Message) TryAddRepeatedFieldByName(name string, val interface{}) error {
 	fd := m.FindFieldDescriptorByName(name)
 	if fd == nil {
@@ -976,12 +1553,21 @@ func (m *Message) TryAddRepeatedFieldByName(name string, val interface{}) error 
 	return m.addRepeatedField(fd, val)
 }
 
+// AddRepeatedFieldByNumber appends the given value to the repeated field with
+// the given tag number. It panics if an error is encountered. See
+// TryAddRepeatedFieldByNumber.
 func (m *Message) AddRepeatedFieldByNumber(tagNumber int, val interface{}) {
 	if err := m.TryAddRepeatedFieldByNumber(tagNumber, val); err != nil {
 		panic(err.Error())
 	}
 }
 
+// TryAddRepeatedFieldByNumber appends the given value to the repeated field
+// with the given tag number. An error is returned if the given tag is unknown,
+// if it indicates a field that is not repeated, or if the given value has an
+// incorrect type.
+//
+// (See TrySetField for more info on types.)
 func (m *Message) TryAddRepeatedFieldByNumber(tagNumber int, val interface{}) error {
 	fd := m.FindFieldDescriptor(int32(tagNumber))
 	if fd == nil {
@@ -1003,7 +1589,7 @@ func (m *Message) addRepeatedField(fd *desc.FieldDescriptor, val interface{}) er
 		// We're lenient. Just as we allow setting a map field to a slice of entry messages, we also allow
 		// adding entries one at a time (as if the field were a normal repeated field).
 		msg := val.(proto.Message)
-		dm, err := asDynamicMessage(msg, fd.GetMessageType())
+		dm, err := asDynamicMessage(msg, fd.GetMessageType(), m.mf)
 		if err != nil {
 			return err
 		}
@@ -1032,12 +1618,31 @@ func (m *Message) addRepeatedField(fd *desc.FieldDescriptor, val interface{}) er
 	return nil
 }
 
+// SetRepeatedField sets the value for the given repeated field descriptor and
+// given index to the given value. It panics if an error is encountered. See
+// SetRepeatedField.
 func (m *Message) SetRepeatedField(fd *desc.FieldDescriptor, index int, val interface{}) {
 	if err := m.TrySetRepeatedField(fd, index, val); err != nil {
 		panic(err.Error())
 	}
 }
 
+// TrySetRepeatedField sets the value for the given repeated field descriptor
+// and given index to the given value. An error is returned if the given field
+// descriptor does not belong to the right message type, if the given field is
+// not repeated, or if the given value is not a correct/compatible type for the
+// given field. Also, even though map fields technically are repeated fields, if
+// the given field is a map field an error will result: map representation does
+// not lend itself to random access by index.
+//
+// The Go type expected for a field  is the same as required by TrySetField for
+// a non-repeated field of the same type.
+//
+// If the given field descriptor is not known (e.g. not present in the message
+// descriptor) it will become known. Subsequent operations using tag numbers or
+// names will be able to resolve the newly-known type. If the message has a
+// value for the unknown value, it is parsed and the element at the given index
+// is replaced with the given value.
 func (m *Message) TrySetRepeatedField(fd *desc.FieldDescriptor, index int, val interface{}) error {
 	if index < 0 {
 		return IndexOutOfRangeError
@@ -1048,12 +1653,21 @@ func (m *Message) TrySetRepeatedField(fd *desc.FieldDescriptor, index int, val i
 	return m.setRepeatedField(fd, index, val)
 }
 
+// SetRepeatedFieldByName sets the value for the repeated field with the given
+// name and given index to the given value. It panics if an error is
+// encountered. See TrySetRepeatedFieldByName.
 func (m *Message) SetRepeatedFieldByName(name string, index int, val interface{}) {
 	if err := m.TrySetRepeatedFieldByName(name, index, val); err != nil {
 		panic(err.Error())
 	}
 }
 
+// TrySetRepeatedFieldByName sets the value for the repeated field with the
+// given name and the given index to the given value. An error is returned if
+// the given name is unknown, if it names a field that is not repeated (or is a
+// map field), or if the given value has an incorrect type.
+//
+// (See TrySetField for more info on types.)
 func (m *Message) TrySetRepeatedFieldByName(name string, index int, val interface{}) error {
 	if index < 0 {
 		return IndexOutOfRangeError
@@ -1065,12 +1679,21 @@ func (m *Message) TrySetRepeatedFieldByName(name string, index int, val interfac
 	return m.setRepeatedField(fd, index, val)
 }
 
+// SetRepeatedFieldByNumber sets the value for the repeated field with the given
+// tag number and given index to the given value. It panics if an error is
+// encountered. See TrySetRepeatedFieldByNumber.
 func (m *Message) SetRepeatedFieldByNumber(tagNumber int, index int, val interface{}) {
 	if err := m.TrySetRepeatedFieldByNumber(tagNumber, index, val); err != nil {
 		panic(err.Error())
 	}
 }
 
+// TrySetRepeatedFieldByNumber sets the value for the repeated field with the
+// given tag number and the given index to the given value. An error is returned
+// if the given tag is unknown, if it indicates a field that is not repeated (or
+// is a map field), or if the given value has an incorrect type.
+//
+// (See TrySetField for more info on types.)
 func (m *Message) TrySetRepeatedFieldByNumber(tagNumber int, index int, val interface{}) error {
 	if index < 0 {
 		return IndexOutOfRangeError
@@ -1106,6 +1729,8 @@ func (m *Message) setRepeatedField(fd *desc.FieldDescriptor, index int, val inte
 	return nil
 }
 
+// GetUnknownField gets the value(s) for the given unknown tag number. If this
+// message has no unknown fields with the given tag, nil is returned.
 func (m *Message) GetUnknownField(tagNumber int32) []UnknownField {
 	if u, ok := m.unknownFields[tagNumber]; ok {
 		return u
@@ -1129,9 +1754,9 @@ func (m *Message) parseUnknownField(fd *desc.FieldDescriptor) (interface{}, erro
 	for _, unk := range unks {
 		var val interface{}
 		if unk.Encoding == proto.WireBytes || unk.Encoding == proto.WireStartGroup {
-			val, err = unmarshalLengthDelimitedField(fd, unk.Contents, m.mf)
+			val, err = codec.DecodeLengthDelimitedField(fd, unk.Contents, m.mf)
 		} else {
-			val, err = unmarshalSimpleField(fd, unk.Value)
+			val, err = codec.DecodeScalarField(fd, unk.Value)
 		}
 		if err != nil {
 			return nil, err
@@ -1172,40 +1797,15 @@ func validFieldValue(fd *desc.FieldDescriptor, val interface{}) (interface{}, er
 
 func validFieldValueForRv(fd *desc.FieldDescriptor, val reflect.Value) (interface{}, error) {
 	if fd.IsMap() && val.Kind() == reflect.Map {
-		// make a defensive copy while we check the contents
-		// (also converts to map[interface{}]interface{} if it's some other type)
-		keyField := fd.GetMessageType().GetFields()[0]
-		valField := fd.GetMessageType().GetFields()[1]
-		m := map[interface{}]interface{}{}
-		for _, k := range val.MapKeys() {
-			if k.Kind() == reflect.Interface {
-				// unwrap it
-				k = reflect.ValueOf(k.Interface())
-			}
-			kk, err := validFieldValueForRv(keyField, k)
-			if err != nil {
-				return nil, err
-			}
-			v := val.MapIndex(k)
-			if v.Kind() == reflect.Interface {
-				// unwrap it
-				v = reflect.ValueOf(v.Interface())
-			}
-			vv, err := validFieldValueForRv(valField, v)
-			if err != nil {
-				return nil, err
-			}
-			m[kk] = vv
-		}
-		return m, nil
+		return validFieldValueForMapField(fd, val)
 	}
 
 	if fd.IsRepeated() { // this will also catch map fields where given value was not a map
 		if val.Kind() != reflect.Array && val.Kind() != reflect.Slice {
 			if fd.IsMap() {
-				return nil, fmt.Errorf("Value for map field must be a map; instead was %v", val.Type())
+				return nil, fmt.Errorf("value for map field must be a map; instead was %v", val.Type())
 			} else {
-				return nil, fmt.Errorf("Value for repeated field must be a slice; instead was %v", val.Type())
+				return nil, fmt.Errorf("value for repeated field must be a slice; instead was %v", val.Type())
 			}
 		}
 
@@ -1218,7 +1818,7 @@ func validFieldValueForRv(fd *desc.FieldDescriptor, val reflect.Value) (interfac
 					return nil, err
 				}
 				msg := e.(proto.Message)
-				dm, err := asDynamicMessage(msg, fd.GetMessageType())
+				dm, err := asDynamicMessage(msg, fd.GetMessageType(), nil)
 				if err != nil {
 					return nil, err
 				}
@@ -1256,11 +1856,11 @@ func validFieldValueForRv(fd *desc.FieldDescriptor, val reflect.Value) (interfac
 	return validElementFieldValueForRv(fd, val)
 }
 
-func asDynamicMessage(m proto.Message, md *desc.MessageDescriptor) (*Message, error) {
+func asDynamicMessage(m proto.Message, md *desc.MessageDescriptor, mf *MessageFactory) (*Message, error) {
 	if dm, ok := m.(*Message); ok {
 		return dm, nil
 	}
-	dm := NewMessage(md)
+	dm := NewMessageWithMessageFactory(md, mf)
 	if err := dm.mergeFrom(m); err != nil {
 		return nil, err
 	}
@@ -1273,41 +1873,44 @@ func validElementFieldValue(fd *desc.FieldDescriptor, val interface{}) (interfac
 
 func validElementFieldValueForRv(fd *desc.FieldDescriptor, val reflect.Value) (interface{}, error) {
 	t := fd.GetType()
-	typeName := strings.ToLower(t.String())
+	if !val.IsValid() {
+		return nil, typeError(fd, nil)
+	}
+
 	switch t {
 	case descriptor.FieldDescriptorProto_TYPE_SFIXED32,
 		descriptor.FieldDescriptorProto_TYPE_INT32,
 		descriptor.FieldDescriptorProto_TYPE_SINT32,
 		descriptor.FieldDescriptorProto_TYPE_ENUM:
-		return toInt32(reflect.Indirect(val), typeName, fd.GetFullyQualifiedName())
+		return toInt32(reflect.Indirect(val), fd)
 
 	case descriptor.FieldDescriptorProto_TYPE_SFIXED64,
 		descriptor.FieldDescriptorProto_TYPE_INT64,
 		descriptor.FieldDescriptorProto_TYPE_SINT64:
-		return toInt64(reflect.Indirect(val), typeName, fd.GetFullyQualifiedName())
+		return toInt64(reflect.Indirect(val), fd)
 
 	case descriptor.FieldDescriptorProto_TYPE_FIXED32,
 		descriptor.FieldDescriptorProto_TYPE_UINT32:
-		return toUint32(reflect.Indirect(val), typeName, fd.GetFullyQualifiedName())
+		return toUint32(reflect.Indirect(val), fd)
 
 	case descriptor.FieldDescriptorProto_TYPE_FIXED64,
 		descriptor.FieldDescriptorProto_TYPE_UINT64:
-		return toUint64(reflect.Indirect(val), typeName, fd.GetFullyQualifiedName())
+		return toUint64(reflect.Indirect(val), fd)
 
 	case descriptor.FieldDescriptorProto_TYPE_FLOAT:
-		return toFloat32(reflect.Indirect(val), typeName, fd.GetFullyQualifiedName())
+		return toFloat32(reflect.Indirect(val), fd)
 
 	case descriptor.FieldDescriptorProto_TYPE_DOUBLE:
-		return toFloat64(reflect.Indirect(val), typeName, fd.GetFullyQualifiedName())
+		return toFloat64(reflect.Indirect(val), fd)
 
 	case descriptor.FieldDescriptorProto_TYPE_BOOL:
-		return toBool(reflect.Indirect(val), typeName, fd.GetFullyQualifiedName())
+		return toBool(reflect.Indirect(val), fd)
 
 	case descriptor.FieldDescriptorProto_TYPE_BYTES:
-		return toBytes(reflect.Indirect(val), typeName, fd.GetFullyQualifiedName())
+		return toBytes(reflect.Indirect(val), fd)
 
 	case descriptor.FieldDescriptorProto_TYPE_STRING:
-		return toString(reflect.Indirect(val), typeName, fd.GetFullyQualifiedName())
+		return toString(reflect.Indirect(val), fd)
 
 	case descriptor.FieldDescriptorProto_TYPE_MESSAGE,
 		descriptor.FieldDescriptorProto_TYPE_GROUP:
@@ -1332,67 +1935,77 @@ func validElementFieldValueForRv(fd *desc.FieldDescriptor, val reflect.Value) (i
 	}
 }
 
-func toInt32(v reflect.Value, what string, fieldName string) (int32, error) {
+func toInt32(v reflect.Value, fd *desc.FieldDescriptor) (int32, error) {
 	if v.Kind() == reflect.Int32 {
 		return int32(v.Int()), nil
 	}
-	return 0, fmt.Errorf("%s field %s is not compatible with value of type %v", what, fieldName, v.Type())
+	return 0, typeError(fd, v.Type())
 }
 
-func toUint32(v reflect.Value, what string, fieldName string) (uint32, error) {
+func toUint32(v reflect.Value, fd *desc.FieldDescriptor) (uint32, error) {
 	if v.Kind() == reflect.Uint32 {
 		return uint32(v.Uint()), nil
 	}
-	return 0, fmt.Errorf("%s field %s is not compatible with value of type %v", what, fieldName, v.Type())
+	return 0, typeError(fd, v.Type())
 }
 
-func toFloat32(v reflect.Value, what string, fieldName string) (float32, error) {
+func toFloat32(v reflect.Value, fd *desc.FieldDescriptor) (float32, error) {
 	if v.Kind() == reflect.Float32 {
 		return float32(v.Float()), nil
 	}
-	return 0, fmt.Errorf("%s field %s is not compatible with value of type %v", what, fieldName, v.Type())
+	return 0, typeError(fd, v.Type())
 }
 
-func toInt64(v reflect.Value, what string, fieldName string) (int64, error) {
+func toInt64(v reflect.Value, fd *desc.FieldDescriptor) (int64, error) {
 	if v.Kind() == reflect.Int64 || v.Kind() == reflect.Int || v.Kind() == reflect.Int32 {
 		return v.Int(), nil
 	}
-	return 0, fmt.Errorf("%s field %s is not compatible with value of type %v", what, fieldName, v.Type())
+	return 0, typeError(fd, v.Type())
 }
 
-func toUint64(v reflect.Value, what string, fieldName string) (uint64, error) {
+func toUint64(v reflect.Value, fd *desc.FieldDescriptor) (uint64, error) {
 	if v.Kind() == reflect.Uint64 || v.Kind() == reflect.Uint || v.Kind() == reflect.Uint32 {
 		return v.Uint(), nil
 	}
-	return 0, fmt.Errorf("%s field %s is not compatible with value of type %v", what, fieldName, v.Type())
+	return 0, typeError(fd, v.Type())
 }
 
-func toFloat64(v reflect.Value, what string, fieldName string) (float64, error) {
+func toFloat64(v reflect.Value, fd *desc.FieldDescriptor) (float64, error) {
 	if v.Kind() == reflect.Float64 || v.Kind() == reflect.Float32 {
 		return v.Float(), nil
 	}
-	return 0, fmt.Errorf("%s field %s is not compatible with value of type %v", what, fieldName, v.Type())
+	return 0, typeError(fd, v.Type())
 }
 
-func toBool(v reflect.Value, what string, fieldName string) (bool, error) {
+func toBool(v reflect.Value, fd *desc.FieldDescriptor) (bool, error) {
 	if v.Kind() == reflect.Bool {
 		return v.Bool(), nil
 	}
-	return false, fmt.Errorf("%s field %s is not compatible with value of type %v", what, fieldName, v.Type())
+	return false, typeError(fd, v.Type())
 }
 
-func toBytes(v reflect.Value, what string, fieldName string) ([]byte, error) {
+func toBytes(v reflect.Value, fd *desc.FieldDescriptor) ([]byte, error) {
 	if v.Kind() == reflect.Slice && v.Type().Elem().Kind() == reflect.Uint8 {
 		return v.Bytes(), nil
 	}
-	return nil, fmt.Errorf("%s field %s is not compatible with value of type %v", what, fieldName, v.Type())
+	return nil, typeError(fd, v.Type())
 }
 
-func toString(v reflect.Value, what string, fieldName string) (string, error) {
+func toString(v reflect.Value, fd *desc.FieldDescriptor) (string, error) {
 	if v.Kind() == reflect.String {
 		return v.String(), nil
 	}
-	return "", fmt.Errorf("%s field %s is not compatible with value of type %v", what, fieldName, v.Type())
+	return "", typeError(fd, v.Type())
+}
+
+func typeError(fd *desc.FieldDescriptor, t reflect.Type) error {
+	return fmt.Errorf(
+		"%s field %s is not compatible with value of type %v",
+		getTypeString(fd), fd.GetFullyQualifiedName(), t)
+}
+
+func getTypeString(fd *desc.FieldDescriptor) string {
+	return strings.ToLower(fd.GetType().String())
 }
 
 func asMessage(v reflect.Value, fieldName string) (proto.Message, error) {
@@ -1404,12 +2017,18 @@ func asMessage(v reflect.Value, fieldName string) (proto.Message, error) {
 	return v.Interface().(proto.Message), nil
 }
 
+// Reset resets this message to an empty message. It removes all values set in
+// the message.
 func (m *Message) Reset() {
-	m.values = nil
-	m.extraFields = nil
-	m.unknownFields = nil
+	for k := range m.values {
+		delete(m.values, k)
+	}
+	for k := range m.unknownFields {
+		delete(m.unknownFields, k)
+	}
 }
 
+// String returns this message rendered in compact text format.
 func (m *Message) String() string {
 	b, err := m.MarshalText()
 	if err != nil {
@@ -1418,9 +2037,14 @@ func (m *Message) String() string {
 	return string(b)
 }
 
+// ProtoMessage is present to satisfy the proto.Message interface.
 func (m *Message) ProtoMessage() {
 }
 
+// ConvertTo converts this dynamic message into the given message. This is
+// shorthand for resetting then merging:
+//   target.Reset()
+//   m.MergeInto(target)
 func (m *Message) ConvertTo(target proto.Message) error {
 	if err := m.checkType(target); err != nil {
 		return err
@@ -1430,6 +2054,10 @@ func (m *Message) ConvertTo(target proto.Message) error {
 	return m.mergeInto(target)
 }
 
+// ConvertFrom converts the given message into this dynamic message. This is
+// shorthand for resetting then merging:
+//   m.Reset()
+//   m.MergeFrom(target)
 func (m *Message) ConvertFrom(target proto.Message) error {
 	if err := m.checkType(target); err != nil {
 		return err
@@ -1439,6 +2067,15 @@ func (m *Message) ConvertFrom(target proto.Message) error {
 	return m.mergeFrom(target)
 }
 
+// MergeInto merges this dynamic message into the given message. All field
+// values in this message will be set on the given message. For map fields,
+// entries are added to the given message (if the given message has existing
+// values for like keys, they are overwritten). For slice fields, elements are
+// added.
+//
+// If the given message has a different set of known fields, it is possible for
+// some known fields in this message to be represented as unknown fields in the
+// given message after merging, and vice versa.
 func (m *Message) MergeInto(target proto.Message) error {
 	if err := m.checkType(target); err != nil {
 		return err
@@ -1446,21 +2083,64 @@ func (m *Message) MergeInto(target proto.Message) error {
 	return m.mergeInto(target)
 }
 
-func (m *Message) MergeFrom(target proto.Message) error {
-	if err := m.checkType(target); err != nil {
+// MergeFrom merges the given message into this dynamic message. All field
+// values in the given message will be set on this message. For map fields,
+// entries are added to this message (if this message has existing values for
+// like keys, they are overwritten). For slice fields, elements are added.
+//
+// If the given message has a different set of known fields, it is possible for
+// some known fields in that message to be represented as unknown fields in this
+// message after merging, and vice versa.
+func (m *Message) MergeFrom(source proto.Message) error {
+	if err := m.checkType(source); err != nil {
 		return err
 	}
-	return m.mergeFrom(target)
+	return m.mergeFrom(source)
+}
+
+// Merge implements the proto.Merger interface so that dynamic messages are
+// compatible with the proto.Merge function. It delegates to MergeFrom but will
+// panic on error as the proto.Merger interface doesn't allow for returning an
+// error.
+//
+// Unlike nearly all other methods, this method can work if this message's type
+// is not defined (such as instantiating the message without using NewMessage).
+// This is strictly so that dynamic message's are compatible with the
+// proto.Clone function, which instantiates a new message via reflection (thus
+// its message descriptor will not be set) and than calls Merge.
+func (m *Message) Merge(source proto.Message) {
+	if m.md == nil {
+		// To support proto.Clone, initialize the descriptor from the source.
+		if dm, ok := source.(*Message); ok {
+			m.md = dm.md
+			// also make sure the clone uses the same message factory and
+			// extensions and also knows about the same extra fields (if any)
+			m.mf = dm.mf
+			m.er = dm.er
+			m.extraFields = dm.extraFields
+		} else if md, err := desc.LoadMessageDescriptorForMessage(source); err != nil {
+			panic(err.Error())
+		} else {
+			m.md = md
+		}
+	}
+
+	if err := m.MergeFrom(source); err != nil {
+		panic(err.Error())
+	}
 }
 
 func (m *Message) checkType(target proto.Message) error {
-	if dm, ok := target.(*Message); ok && dm.md.GetFullyQualifiedName() != m.md.GetFullyQualifiedName() {
-		return fmt.Errorf("Given message has wrong type: %q; expecting %q", dm.md.GetFullyQualifiedName(), m.md.GetFullyQualifiedName())
+	if dm, ok := target.(*Message); ok {
+		if dm.md.GetFullyQualifiedName() != m.md.GetFullyQualifiedName() {
+			return fmt.Errorf("given message has wrong type: %q; expecting %q", dm.md.GetFullyQualifiedName(), m.md.GetFullyQualifiedName())
+		}
+		return nil
 	}
 
 	msgName := proto.MessageName(target)
 	if msgName != m.md.GetFullyQualifiedName() {
-		return fmt.Errorf("Given message has wrong type: %q; expecting %q", msgName, m.md.GetFullyQualifiedName())
+		return fmt.Errorf("given message has wrong type: %q; expecting %q", msgName, m.md.GetFullyQualifiedName())
 	}
 	return nil
 }
@@ -1504,7 +2184,7 @@ func (m *Message) mergeInto(pm proto.Message) error {
 		ft := f.Type()
 		val := reflect.ValueOf(v)
 		if !canConvert(val, ft) {
-			return fmt.Errorf("Cannot convert %v to %v", val.Type(), ft)
+			return fmt.Errorf("cannot convert %v to %v", val.Type(), ft)
 		}
 	}
 	// check one-of fields
@@ -1520,12 +2200,12 @@ func (m *Message) mergeInto(pm proto.Message) error {
 		}
 		stf, ok := oop.Type.Elem().FieldByName(prop.Name)
 		if !ok {
-			return fmt.Errorf("One-of field indicates struct field name %s, but type %v has no such field", prop.Name, oop.Type.Elem())
+			return fmt.Errorf("one-of field indicates struct field name %s, but type %v has no such field", prop.Name, oop.Type.Elem())
 		}
 		ft := stf.Type
 		val := reflect.ValueOf(v)
 		if !canConvert(val, ft) {
-			return fmt.Errorf("Cannot convert %v to %v", val.Type(), ft)
+			return fmt.Errorf("cannot convert %v to %v", val.Type(), ft)
 		}
 	}
 	// and check extensions, too
@@ -1540,7 +2220,7 @@ func (m *Message) mergeInto(pm proto.Message) error {
 		ft := reflect.TypeOf(ext.ExtensionType)
 		val := reflect.ValueOf(v)
 		if !canConvert(val, ft) {
-			return fmt.Errorf("Cannot convert %v to %v", val.Type(), ft)
+			return fmt.Errorf("cannot convert %v to %v", val.Type(), ft)
 		}
 	}
 
@@ -1551,7 +2231,9 @@ func (m *Message) mergeInto(pm proto.Message) error {
 			continue
 		}
 		f := target.FieldByName(prop.Name)
-		mergeVal(reflect.ValueOf(v), f)
+		if err := mergeVal(reflect.ValueOf(v), f); err != nil {
+			return err
+		}
 	}
 	// merge one-ofs
 	for _, oop := range structProps.OneofTypes {
@@ -1563,7 +2245,9 @@ func (m *Message) mergeInto(pm proto.Message) error {
 		}
 		oov := reflect.New(oop.Type.Elem())
 		f := oov.Elem().FieldByName(prop.Name)
-		mergeVal(reflect.ValueOf(v), f)
+		if err := mergeVal(reflect.ValueOf(v), f); err != nil {
+			return err
+		}
 		target.Field(oop.Field).Set(oov)
 	}
 	// merge extensions, too
@@ -1573,7 +2257,9 @@ func (m *Message) mergeInto(pm proto.Message) error {
 			continue
 		}
 		e := reflect.New(reflect.TypeOf(ext.ExtensionType)).Elem()
-		mergeVal(reflect.ValueOf(v), e)
+		if err := mergeVal(reflect.ValueOf(v), e); err != nil {
+			return err
+		}
 		if err := proto.SetExtension(pm, ext, e.Interface()); err != nil {
 			// shouldn't happen since we already checked that the extension type was compatible above
 			return err
@@ -1583,14 +2269,15 @@ func (m *Message) mergeInto(pm proto.Message) error {
 	// if we have fields that the given message doesn't know about, add to its unknown fields
 	if len(unknownTags) > 0 {
 		ub := u.Interface().([]byte)
-		var b codedBuffer
+		var b codec.Buffer
+		b.SetDeterministic(defaultDeterminism)
 		for tag := range unknownTags {
 			fd := m.FindFieldDescriptor(tag)
-			if err := marshalField(tag, fd, m.values[tag], &b); err != nil {
+			if err := b.EncodeFieldValue(fd, m.values[tag]); err != nil {
 				return err
 			}
 		}
-		ub = append(ub, b.buf...)
+		ub = append(ub, b.Bytes()...)
 		u.Set(reflect.ValueOf(ub))
 	}
 
@@ -1598,9 +2285,9 @@ func (m *Message) mergeInto(pm proto.Message) error {
 	// (this will append to its unknown fields if not known; if somehow the given message recognizes
 	// a field even though the dynamic message did not, it will get correctly unmarshalled)
 	if unknownTags != nil && len(m.unknownFields) > 0 {
-		var b codedBuffer
-		m.marshalUnknownFields(&b)
-		proto.UnmarshalMerge(b.buf, pm)
+		var b codec.Buffer
+		_ = m.marshalUnknownFields(&b)
+		_ = proto.UnmarshalMerge(b.Bytes(), pm)
 	}
 
 	return nil
@@ -1634,17 +2321,7 @@ func canConvert(src reflect.Value, target reflect.Type) bool {
 		if srcType.Kind() != reflect.Map {
 			return false
 		}
-		kt := target.Key()
-		vt := target.Elem()
-		for _, k := range src.MapKeys() {
-			if !canConvert(k, kt) {
-				return false
-			}
-			if !canConvert(src.MapIndex(k), vt) {
-				return false
-			}
-		}
-		return true
+		return canConvertMap(src, target)
 	} else if srcType == typeOfDynamicMessage && target.Implements(typeOfProtoMessage) {
 		z := reflect.Zero(target).Interface()
 		msgType := proto.MessageName(z.(proto.Message))
@@ -1654,7 +2331,7 @@ func canConvert(src reflect.Value, target reflect.Type) bool {
 	}
 }
 
-func mergeVal(src, target reflect.Value) {
+func mergeVal(src, target reflect.Value) error {
 	if src.Kind() == reflect.Interface && !src.IsNil() {
 		src = src.Elem()
 	}
@@ -1691,47 +2368,25 @@ func mergeVal(src, target reflect.Value) {
 			if dest.Kind() == reflect.Ptr {
 				dest.Set(reflect.New(dest.Type().Elem()))
 			}
-			mergeVal(src.Index(i), dest)
+			if err := mergeVal(src.Index(i), dest); err != nil {
+				return err
+			}
 		}
 	} else if targetType.Kind() == reflect.Map {
-		tkt := targetType.Key()
-		tvt := targetType.Elem()
-		for _, k := range src.MapKeys() {
-			v := src.MapIndex(k)
-			skt := k.Type()
-			svt := v.Type()
-			var nk, nv reflect.Value
-			if tkt == skt {
-				nk = k
-			} else if tkt.Kind() == reflect.Ptr && tkt.Elem() == skt {
-				nk = k.Addr()
-			} else {
-				nk = reflect.New(tkt).Elem()
-				mergeVal(k, nk)
-			}
-			if tvt == svt {
-				nv = v
-			} else if tvt.Kind() == reflect.Ptr && tvt.Elem() == svt {
-				nv = v.Addr()
-			} else {
-				nv = reflect.New(tvt).Elem()
-				mergeVal(v, nv)
-			}
-			if target.IsNil() {
-				target.Set(reflect.MakeMap(targetType))
-			}
-			target.SetMapIndex(nk, nv)
-		}
+		return mergeMapVal(src, target, targetType)
 	} else if srcType == typeOfDynamicMessage && targetType.Implements(typeOfProtoMessage) {
 		dm := src.Interface().(*Message)
 		if target.IsNil() {
 			target.Set(reflect.New(targetType.Elem()))
 		}
 		m := target.Interface().(proto.Message)
-		dm.mergeInto(m)
+		if err := dm.mergeInto(m); err != nil {
+			return err
+		}
 	} else {
-		panic(fmt.Sprintf("Cannot convert %v to %v", srcType, targetType))
+		return fmt.Errorf("cannot convert %v to %v", srcType, targetType)
 	}
+	return nil
 }
 
 func (m *Message) mergeFrom(pm proto.Message) error {
@@ -1760,7 +2415,7 @@ func (m *Message) mergeFrom(pm proto.Message) error {
 	values := map[*desc.FieldDescriptor]interface{}{}
 	props := proto.GetProperties(reflect.TypeOf(pm).Elem())
 	if props == nil {
-		return fmt.Errorf("Could not determine message properties to merge for %v", reflect.TypeOf(pm).Elem())
+		return fmt.Errorf("could not determine message properties to merge for %v", reflect.TypeOf(pm).Elem())
 	}
 
 	// regular fields
@@ -1778,7 +2433,7 @@ func (m *Message) mergeFrom(pm proto.Message) error {
 			}
 			fd = md.FindFieldByNumber(int32(prop.Tag))
 			if fd == nil {
-				return fmt.Errorf("Message descriptor %q did not contain field for tag %d (%q)", md.GetFullyQualifiedName(), prop.Tag, prop.Name)
+				return fmt.Errorf("message descriptor %q did not contain field for tag %d (%q)", md.GetFullyQualifiedName(), prop.Tag, prop.Name)
 			}
 		}
 		rv := src.FieldByName(prop.Name)
@@ -1794,13 +2449,13 @@ func (m *Message) mergeFrom(pm proto.Message) error {
 
 	// one-of fields
 	for _, oop := range props.OneofTypes {
-		oov := src.Field(oop.Field)
-		if oov.Type() != oop.Type {
+		oov := src.Field(oop.Field).Elem()
+		if !oov.IsValid() || oov.Type() != oop.Type {
 			// this field is unset (in other words, one-of message field is not currently set to this option)
 			continue
 		}
 		prop := oop.Prop
-		rv := oov.FieldByName(prop.Name)
+		rv := oov.Elem().FieldByName(prop.Name)
 		fd := m.FindFieldDescriptor(int32(prop.Tag))
 		if fd == nil {
 			// Our descriptor has different fields than this message object. So
@@ -1811,7 +2466,7 @@ func (m *Message) mergeFrom(pm proto.Message) error {
 			}
 			fd = md.FindFieldByNumber(int32(prop.Tag))
 			if fd == nil {
-				return fmt.Errorf("Message descriptor %q did not contain field for tag %d (%q in one-of %q)", md.GetFullyQualifiedName(), prop.Tag, prop.Name, src.Type().Field(oop.Field).Name)
+				return fmt.Errorf("message descriptor %q did not contain field for tag %d (%q in one-of %q)", md.GetFullyQualifiedName(), prop.Tag, prop.Name, src.Type().Field(oop.Field).Name)
 			}
 		}
 		if v, err := validFieldValueForRv(fd, rv); err != nil {
@@ -1823,14 +2478,17 @@ func (m *Message) mergeFrom(pm proto.Message) error {
 
 	// extension fields
 	rexts, _ := proto.ExtensionDescs(pm)
-	hasUnknownExtensions := false
+	var unknownExtensions []byte
 	for _, ed := range rexts {
-		if ed.Name == "" {
-			hasUnknownExtensions = true
-			continue
-		}
 		v, _ := proto.GetExtension(pm, ed)
 		if v == nil {
+			continue
+		}
+		if ed.ExtensionType == nil {
+			extBytes, _ := v.([]byte)
+			if len(extBytes) > 0 {
+				unknownExtensions = append(unknownExtensions, extBytes...)
+			}
 			continue
 		}
 		fd := m.er.FindExtension(m.md.GetFullyQualifiedName(), ed.Field)
@@ -1855,49 +2513,15 @@ func (m *Message) mergeFrom(pm proto.Message) error {
 	u := src.FieldByName("XXX_unrecognized")
 	if u.IsValid() && u.Type() == typeOfBytes {
 		// ignore any error returned: pulling in unknown fields is best-effort
-		m.UnmarshalMerge(u.Interface().([]byte))
+		_ = m.UnmarshalMerge(u.Interface().([]byte))
 	}
 
 	// lastly, also extract any unknown extensions the message may have (unknown extensions
 	// are stored with other extensions, not in the XXX_unrecognized field, so we have to do
 	// more than just the step above...)
-	if hasUnknownExtensions {
-		// TODO: this is very inefficient. this could be much cleaner if the proto library
-		// provided access to unknown extensions (https://github.com/golang/protobuf/issues/385)
-
-		// We are going to make a copy of the message and then clear out all known fields.
-		// When done, we can marshal the copy to bytes, and it will only have unrecognized
-		// extensions. We then unmarshal that into the dynamic message.
-		clone := proto.Clone(pm)
-		cloneRv := reflect.ValueOf(clone).Elem()
-		for _, prop := range props.Prop {
-			if prop.Tag == 0 {
-				continue // one-of or special field (handled below)
-			}
-			// clear out the field
-			rv := cloneRv.FieldByName(prop.Name)
-			rv.Set(reflect.Zero(rv.Type()))
-		}
-		for _, oop := range props.OneofTypes {
-			// clear out the one-of field
-			oov := cloneRv.Field(oop.Field)
-			oov.Set(reflect.Zero(oov.Type()))
-		}
-		for _, ed := range rexts {
-			if ed.Name == "" {
-				continue
-			}
-			proto.ClearExtension(clone, ed)
-		}
-		if u.IsValid() && u.Type() == typeOfBytes {
-			// if it had an unrecognized field, remove values from our copy
-			cloneRv.FieldByName("XXX_unrecognized").Set(reflect.ValueOf(([]byte)(nil)))
-		}
-		bb, err := proto.Marshal(clone)
+	if len(unknownExtensions) > 0 {
 		// pulling in unknown fields is best-effort, so we just ignore errors
-		if err == nil && len(bb) > 0 {
-			m.UnmarshalMerge(bb)
-		}
+		_ = m.UnmarshalMerge(unknownExtensions)
 	}
 	return nil
 }

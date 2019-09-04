@@ -17,7 +17,7 @@ type runeReader struct {
 	err    error
 }
 
-func (rr *runeReader) ReadRune() (r rune, size int, err error) {
+func (rr *runeReader) readRune() (r rune, size int, err error) {
 	if rr.err != nil {
 		return 0, 0, rr.err
 	}
@@ -33,21 +33,19 @@ func (rr *runeReader) ReadRune() (r rune, size int, err error) {
 	return r, sz, err
 }
 
-func (rr *runeReader) UnreadRune(r rune) {
+func (rr *runeReader) unreadRune(r rune) {
 	rr.unread = append(rr.unread, r)
 }
 
 func lexError(l protoLexer, pos *SourcePos, err string) {
 	pl := l.(*protoLex)
-	if pl.err == nil {
-		pl.err = ErrorWithSourcePos{Underlying: errors.New(err), Pos: pos}
-	}
+	_ = pl.errs.handleError(ErrorWithSourcePos{Underlying: errors.New(err), Pos: pos})
 }
 
 type protoLex struct {
 	filename string
 	input    *runeReader
-	err      error
+	errs     *errorHandler
 	res      *fileNode
 
 	lineNo int
@@ -55,10 +53,23 @@ type protoLex struct {
 	offset int
 
 	prevSym terminalNode
+
+	prevLineNo int
+	prevColNo  int
+	prevOffset int
+	comments   []comment
 }
 
-func newLexer(in io.Reader) *protoLex {
-	return &protoLex{input: &runeReader{rr: bufio.NewReader(in)}}
+func newTestLexer(in io.Reader) *protoLex {
+	return newLexer(in, "test.proto", newErrorHandler(nil))
+}
+
+func newLexer(in io.Reader, filename string, errs *errorHandler) *protoLex {
+	return &protoLex{
+		input:    &runeReader{rr: bufio.NewReader(in)},
+		filename: filename,
+		errs:     errs,
+	}
 }
 
 var keywords = map[string]int{
@@ -106,12 +117,31 @@ var keywords = map[string]int{
 	"returns":    _RETURNS,
 }
 
-func (l *protoLex) cur() *SourcePos {
-	return &SourcePos{
+func (l *protoLex) cur() SourcePos {
+	return SourcePos{
 		Filename: l.filename,
 		Offset:   l.offset,
 		Line:     l.lineNo + 1,
 		Col:      l.colNo + 1,
+	}
+}
+
+func (l *protoLex) adjustPos(consumedChars ...rune) {
+	for _, c := range consumedChars {
+		switch c {
+		case '\n':
+			// new line, back to first column
+			l.colNo = 0
+			l.lineNo++
+		case '\r':
+			// no adjustment
+		case '\t':
+			// advance to next tab stop
+			mod := l.colNo % 8
+			l.colNo += 8 - mod
+		default:
+			l.colNo++
+		}
 	}
 }
 
@@ -128,188 +158,64 @@ func (l *protoLex) prev() *SourcePos {
 }
 
 func (l *protoLex) Lex(lval *protoSymType) int {
-	if l.err != nil {
-		// if we are already in a failed state, bail
-		lval.err = l.err
-		return _ERROR
+	if l.errs.err != nil {
+		// if error reporter already returned non-nil error,
+		// we can skip the rest of the input
+		return 0
 	}
 
-	prevLineNo := l.lineNo
-	prevColNo := l.colNo
-	prevOffset := l.offset
-	var comments []*comment
-
-	pos := func() posRange {
-		return posRange{
-			start: &SourcePos{
-				Filename: l.filename,
-				Offset:   prevOffset,
-				Line:     prevLineNo + 1,
-				Col:      prevColNo + 1,
-			},
-			end: l.cur(),
-		}
-	}
-	basic := func() basicNode {
-		return basicNode{
-			posRange: pos(),
-			leading:  comments,
-		}
-	}
-	setPrev := func(n terminalNode) {
-		nStart := n.start().Line
-		if _, ok := n.(*basicNode); ok {
-			// if the node is a simple rune, don't attribute comments to it
-			// HACK: adjusting the start line makes leading comments appear
-			// detached so logic below will naturally associated trailing
-			// comment to previous symbol
-			nStart += 2
-		}
-		if l.prevSym != nil && len(n.leadingComments()) > 0 && l.prevSym.end().Line < nStart {
-			// we may need to re-attribute the first comment to
-			// instead be previous node's trailing comment
-			prevEnd := l.prevSym.end().Line
-			comments := n.leadingComments()
-			c := comments[0]
-			commentStart := c.start.Line
-			if commentStart == prevEnd {
-				// comment is on same line as previous symbol
-				n.popLeadingComment()
-				l.prevSym.pushTrailingComment(c)
-			} else if commentStart == prevEnd+1 {
-				// comment is right after previous symbol; see if it is detached
-				// and if so re-attribute
-				singleLineStyle := strings.HasPrefix(c.text, "//")
-				line := c.end.Line
-				groupEnd := -1
-				for i := 1; i < len(comments); i++ {
-					c := comments[i]
-					newGroup := false
-					if !singleLineStyle || c.start.Line > line+1 {
-						// we've found a gap between comments, which means the
-						// previous comments were detached
-						newGroup = true
-					} else {
-						line = c.end.Line
-						singleLineStyle = strings.HasPrefix(comments[i].text, "//")
-						if !singleLineStyle {
-							// we've found a switch from // comments to /*
-							// consider that a new group which means the
-							// previous comments were detached
-							newGroup = true
-						}
-					}
-					if newGroup {
-						groupEnd = i
-						break
-					}
-				}
-
-				if groupEnd == -1 {
-					// just one group of comments; we'll mark it as a trailing
-					// comment if it immediately follows previous symbol and is
-					// detached from current symbol
-					c1 := comments[0]
-					c2 := comments[len(comments)-1]
-					if c1.start.Line <= prevEnd+1 && c2.end.Line < nStart-1 {
-						groupEnd = len(comments)
-					}
-				}
-
-				for i := 0; i < groupEnd; i++ {
-					l.prevSym.pushTrailingComment(n.popLeadingComment())
-				}
-			}
-		}
-
-		l.prevSym = n
-	}
-	setString := func(val string) {
-		lval.str = &stringLiteralNode{basicNode: basic(), val: val}
-		setPrev(lval.str)
-	}
-	setIdent := func(val string, kind identKind) {
-		lval.id = &identNode{basicNode: basic(), val: val, kind: kind}
-		setPrev(lval.id)
-	}
-	setInt := func(val uint64) {
-		lval.ui = &intLiteralNode{basicNode: basic(), val: val}
-		setPrev(lval.ui)
-	}
-	setFloat := func(val float64) {
-		b := basic()
-		lval.f = &floatLiteralNode{val: val}
-		lval.f.setRange(&b, &b)
-		setPrev(lval.f)
-	}
-	setRune := func() {
-		b := basic()
-		lval.b = &b
-		setPrev(lval.b)
-	}
-	setError := func(err error) {
-		lval.err = err
-		l.err = err
-	}
+	l.prevLineNo = l.lineNo
+	l.prevColNo = l.colNo
+	l.prevOffset = l.offset
+	l.comments = nil
 
 	for {
-		c, n, err := l.input.ReadRune()
+		c, n, err := l.input.readRune()
 		if err == io.EOF {
 			// we're not actually returning a rune, but this will associate
 			// accumulated comments as a trailing comment on last symbol
 			// (if appropriate)
-			setRune()
+			l.setRune(lval)
 			return 0
 		} else if err != nil {
-			setError(err)
+			// we don't call setError because we don't want it wrapped
+			// with a source position because it's I/O, not syntax
+			lval.err = err
+			_ = l.errs.handleError(err)
 			return _ERROR
 		}
 
-		prevLineNo = l.lineNo
-		prevColNo = l.colNo
-		prevOffset = l.offset
+		l.prevLineNo = l.lineNo
+		l.prevColNo = l.colNo
+		l.prevOffset = l.offset
 
 		l.offset += n
-		if c == '\n' {
-			l.colNo = 0
-			l.lineNo++
-			continue
-		} else if c == '\r' {
-			continue
-		}
-		l.colNo++
-		if c == ' ' || c == '\t' {
+		l.adjustPos(c)
+		if strings.ContainsRune("\n\r\t ", c) {
 			continue
 		}
 
 		if c == '.' {
-			// tokens that start with a dot include type names and decimal literals
-			cn, _, err := l.input.ReadRune()
+			// decimal literals could start with a dot
+			cn, _, err := l.input.readRune()
 			if err != nil {
-				setRune()
+				l.setRune(lval)
 				return int(c)
 			}
-			if cn == '_' || (cn >= 'a' && cn <= 'z') || (cn >= 'A' && cn <= 'Z') {
-				l.colNo++
-				token := []rune{c, cn}
-				token = l.readIdentifier(token)
-				setIdent(string(token), identTypeName)
-				return _TYPENAME
-			}
 			if cn >= '0' && cn <= '9' {
-				l.colNo++
+				l.adjustPos(cn)
 				token := []rune{c, cn}
 				token = l.readNumber(token, false, true)
 				f, err := strconv.ParseFloat(string(token), 64)
 				if err != nil {
-					setError(err)
+					l.setError(lval, err)
 					return _ERROR
 				}
-				setFloat(f)
+				l.setFloat(lval, f)
 				return _FLOAT_LIT
 			}
-			l.input.UnreadRune(cn)
-			setRune()
+			l.input.unreadRune(cn)
+			l.setRune(lval)
 			return int(c)
 		}
 
@@ -318,52 +224,48 @@ func (l *protoLex) Lex(lval *protoSymType) int {
 			token := []rune{c}
 			token = l.readIdentifier(token)
 			str := string(token)
-			if strings.Contains(str, ".") {
-				setIdent(str, identQualified)
-				return _FQNAME
-			}
 			if t, ok := keywords[str]; ok {
-				setIdent(str, identSimpleName)
+				l.setIdent(lval, str)
 				return t
 			}
-			setIdent(str, identSimpleName)
+			l.setIdent(lval, str)
 			return _NAME
 		}
 
 		if c >= '0' && c <= '9' {
 			// integer or float literal
 			if c == '0' {
-				cn, _, err := l.input.ReadRune()
+				cn, _, err := l.input.readRune()
 				if err != nil {
-					setInt(0)
+					l.setInt(lval, 0)
 					return _INT_LIT
 				}
 				if cn == 'x' || cn == 'X' {
-					cnn, _, err := l.input.ReadRune()
+					cnn, _, err := l.input.readRune()
 					if err != nil {
-						l.input.UnreadRune(cn)
-						setInt(0)
+						l.input.unreadRune(cn)
+						l.setInt(lval, 0)
 						return _INT_LIT
 					}
 					if (cnn >= '0' && cnn <= '9') || (cnn >= 'a' && cnn <= 'f') || (cnn >= 'A' && cnn <= 'F') {
 						// hexadecimal!
-						l.colNo += 2
+						l.adjustPos(cn, cnn)
 						token := []rune{cnn}
 						token = l.readHexNumber(token)
 						ui, err := strconv.ParseUint(string(token), 16, 64)
 						if err != nil {
-							setError(err)
+							l.setError(lval, err)
 							return _ERROR
 						}
-						setInt(ui)
+						l.setInt(lval, ui)
 						return _INT_LIT
 					}
-					l.input.UnreadRune(cnn)
-					l.input.UnreadRune(cn)
-					setInt(0)
+					l.input.unreadRune(cnn)
+					l.input.unreadRune(cn)
+					l.setInt(lval, 0)
 					return _INT_LIT
 				} else {
-					l.input.UnreadRune(cn)
+					l.input.unreadRune(cn)
 				}
 			}
 			token := []rune{c}
@@ -373,19 +275,19 @@ func (l *protoLex) Lex(lval *protoSymType) int {
 				// floating point!
 				f, err := strconv.ParseFloat(numstr, 64)
 				if err != nil {
-					setError(err)
+					l.setError(lval, err)
 					return _ERROR
 				}
-				setFloat(f)
+				l.setFloat(lval, f)
 				return _FLOAT_LIT
 			}
 			// integer! (decimal or octal)
 			ui, err := strconv.ParseUint(numstr, 0, 64)
 			if err != nil {
-				setError(err)
+				l.setError(lval, err)
 				return _ERROR
 			}
-			setInt(ui)
+			l.setInt(lval, ui)
 			return _INT_LIT
 		}
 
@@ -393,117 +295,223 @@ func (l *protoLex) Lex(lval *protoSymType) int {
 			// string literal
 			str, err := l.readStringLiteral(c)
 			if err != nil {
-				setError(err)
+				l.setError(lval, err)
 				return _ERROR
 			}
-			setString(str)
+			l.setString(lval, str)
 			return _STRING_LIT
 		}
 
 		if c == '/' {
 			// comment
-			cn, _, err := l.input.ReadRune()
+			cn, _, err := l.input.readRune()
 			if err != nil {
-				setRune()
+				l.setRune(lval)
 				return int(c)
 			}
 			if cn == '/' {
-				l.colNo++
+				l.adjustPos(cn)
 				hitNewline, txt := l.skipToEndOfLineComment()
-				commentPos := pos()
+				commentPos := l.posRange()
 				commentPos.end.Col++
 				if hitNewline {
-					l.colNo = 0
-					l.lineNo++
+					// we don't do this inside of skipToEndOfLineComment
+					// because we want to know the length of previous
+					// line for calculation above
+					l.adjustPos('\n')
 				}
-				comments = append(comments, &comment{posRange: commentPos, text: txt})
+				l.comments = append(l.comments, comment{posRange: commentPos, text: txt})
 				continue
 			}
 			if cn == '*' {
-				l.colNo++
+				l.adjustPos(cn)
 				if txt, ok := l.skipToEndOfBlockComment(); !ok {
-					setError(errors.New("block comment never terminates, unexpected EOF"))
+					l.setError(lval, errors.New("block comment never terminates, unexpected EOF"))
 					return _ERROR
 				} else {
-					comments = append(comments, &comment{posRange: pos(), text: txt})
+					l.comments = append(l.comments, comment{posRange: l.posRange(), text: txt})
 				}
 				continue
 			}
-			l.input.UnreadRune(cn)
+			l.input.unreadRune(cn)
 		}
 
-		setRune()
+		l.setRune(lval)
 		return int(c)
 	}
+}
+
+func (l *protoLex) posRange() posRange {
+	return posRange{
+		start: SourcePos{
+			Filename: l.filename,
+			Offset:   l.prevOffset,
+			Line:     l.prevLineNo + 1,
+			Col:      l.prevColNo + 1,
+		},
+		end: l.cur(),
+	}
+}
+
+func (l *protoLex) newBasicNode() basicNode {
+	return basicNode{
+		posRange: l.posRange(),
+		leading:  l.comments,
+	}
+}
+
+func (l *protoLex) setPrev(n terminalNode) {
+	nStart := n.start().Line
+	if _, ok := n.(*basicNode); ok {
+		// if the node is a simple rune, don't attribute comments to it
+		// HACK: adjusting the start line makes leading comments appear
+		// detached so logic below will naturally associated trailing
+		// comment to previous symbol
+		nStart += 2
+	}
+	if l.prevSym != nil && len(n.leadingComments()) > 0 && l.prevSym.end().Line < nStart {
+		// we may need to re-attribute the first comment to
+		// instead be previous node's trailing comment
+		prevEnd := l.prevSym.end().Line
+		comments := n.leadingComments()
+		c := comments[0]
+		commentStart := c.start.Line
+		if commentStart == prevEnd {
+			// comment is on same line as previous symbol
+			n.popLeadingComment()
+			l.prevSym.pushTrailingComment(c)
+		} else if commentStart == prevEnd+1 {
+			// comment is right after previous symbol; see if it is detached
+			// and if so re-attribute
+			singleLineStyle := strings.HasPrefix(c.text, "//")
+			line := c.end.Line
+			groupEnd := -1
+			for i := 1; i < len(comments); i++ {
+				c := comments[i]
+				newGroup := false
+				if !singleLineStyle || c.start.Line > line+1 {
+					// we've found a gap between comments, which means the
+					// previous comments were detached
+					newGroup = true
+				} else {
+					line = c.end.Line
+					singleLineStyle = strings.HasPrefix(comments[i].text, "//")
+					if !singleLineStyle {
+						// we've found a switch from // comments to /*
+						// consider that a new group which means the
+						// previous comments were detached
+						newGroup = true
+					}
+				}
+				if newGroup {
+					groupEnd = i
+					break
+				}
+			}
+
+			if groupEnd == -1 {
+				// just one group of comments; we'll mark it as a trailing
+				// comment if it immediately follows previous symbol and is
+				// detached from current symbol
+				c1 := comments[0]
+				c2 := comments[len(comments)-1]
+				if c1.start.Line <= prevEnd+1 && c2.end.Line < nStart-1 {
+					groupEnd = len(comments)
+				}
+			}
+
+			for i := 0; i < groupEnd; i++ {
+				l.prevSym.pushTrailingComment(n.popLeadingComment())
+			}
+		}
+	}
+
+	l.prevSym = n
+}
+
+func (l *protoLex) setString(lval *protoSymType, val string) {
+	lval.s = &stringLiteralNode{basicNode: l.newBasicNode(), val: val}
+	l.setPrev(lval.s)
+}
+
+func (l *protoLex) setIdent(lval *protoSymType, val string) {
+	lval.id = &identNode{basicNode: l.newBasicNode(), val: val}
+	l.setPrev(lval.id)
+}
+
+func (l *protoLex) setInt(lval *protoSymType, val uint64) {
+	lval.i = &intLiteralNode{basicNode: l.newBasicNode(), val: val}
+	l.setPrev(lval.i)
+}
+
+func (l *protoLex) setFloat(lval *protoSymType, val float64) {
+	lval.f = &floatLiteralNode{basicNode: l.newBasicNode(), val: val}
+	l.setPrev(lval.f)
+}
+
+func (l *protoLex) setRune(lval *protoSymType) {
+	b := l.newBasicNode()
+	lval.b = &b
+	l.setPrev(lval.b)
+}
+
+func (l *protoLex) setError(lval *protoSymType, err error) {
+	lval.err = l.addSourceError(err)
 }
 
 func (l *protoLex) readNumber(sofar []rune, allowDot bool, allowExp bool) []rune {
 	token := sofar
 	for {
-		c, _, err := l.input.ReadRune()
+		c, _, err := l.input.readRune()
 		if err != nil {
 			break
 		}
 		if c == '.' {
 			if !allowDot {
-				l.input.UnreadRune(c)
+				l.input.unreadRune(c)
 				break
 			}
 			allowDot = false
-			cn, _, err := l.input.ReadRune()
-			if err != nil {
-				l.input.UnreadRune(c)
-				break
-			}
-			if cn < '0' || cn > '9' {
-				l.input.UnreadRune(cn)
-				l.input.UnreadRune(c)
-				break
-			}
-			l.colNo++
-			token = append(token, c)
-			c = cn
 		} else if c == 'e' || c == 'E' {
 			if !allowExp {
-				l.input.UnreadRune(c)
+				l.input.unreadRune(c)
 				break
 			}
 			allowExp = false
-			cn, _, err := l.input.ReadRune()
+			cn, _, err := l.input.readRune()
 			if err != nil {
-				l.input.UnreadRune(c)
+				l.input.unreadRune(c)
 				break
 			}
 			if cn == '-' || cn == '+' {
-				cnn, _, err := l.input.ReadRune()
+				cnn, _, err := l.input.readRune()
 				if err != nil {
-					l.input.UnreadRune(cn)
-					l.input.UnreadRune(c)
+					l.input.unreadRune(cn)
+					l.input.unreadRune(c)
 					break
 				}
 				if cnn < '0' || cnn > '9' {
-					l.input.UnreadRune(cnn)
-					l.input.UnreadRune(cn)
-					l.input.UnreadRune(c)
+					l.input.unreadRune(cnn)
+					l.input.unreadRune(cn)
+					l.input.unreadRune(c)
 					break
 				}
-				l.colNo++
+				l.adjustPos(c)
 				token = append(token, c)
-				c = cn
-				cn = cnn
+				c, cn = cn, cnn
 			} else if cn < '0' || cn > '9' {
-				l.input.UnreadRune(cn)
-				l.input.UnreadRune(c)
+				l.input.unreadRune(cn)
+				l.input.unreadRune(c)
 				break
 			}
-			l.colNo++
+			l.adjustPos(c)
 			token = append(token, c)
 			c = cn
 		} else if c < '0' || c > '9' {
-			l.input.UnreadRune(c)
+			l.input.unreadRune(c)
 			break
 		}
-		l.colNo++
+		l.adjustPos(c)
 		token = append(token, c)
 	}
 	return token
@@ -512,15 +520,15 @@ func (l *protoLex) readNumber(sofar []rune, allowDot bool, allowExp bool) []rune
 func (l *protoLex) readHexNumber(sofar []rune) []rune {
 	token := sofar
 	for {
-		c, _, err := l.input.ReadRune()
+		c, _, err := l.input.readRune()
 		if err != nil {
 			break
 		}
 		if (c < 'a' || c > 'f') && (c < 'A' || c > 'F') && (c < '0' || c > '9') {
-			l.input.UnreadRune(c)
+			l.input.unreadRune(c)
 			break
 		}
-		l.colNo++
+		l.adjustPos(c)
 		token = append(token, c)
 	}
 	return token
@@ -529,29 +537,15 @@ func (l *protoLex) readHexNumber(sofar []rune) []rune {
 func (l *protoLex) readIdentifier(sofar []rune) []rune {
 	token := sofar
 	for {
-		c, _, err := l.input.ReadRune()
+		c, _, err := l.input.readRune()
 		if err != nil {
 			break
 		}
-		if c == '.' {
-			cn, _, err := l.input.ReadRune()
-			if err != nil {
-				l.input.UnreadRune(c)
-				break
-			}
-			if cn != '_' && (cn < 'a' || cn > 'z') && (cn < 'A' || cn > 'Z') {
-				l.input.UnreadRune(cn)
-				l.input.UnreadRune(c)
-				break
-			}
-			l.colNo++
-			token = append(token, c)
-			c = cn
-		} else if c != '_' && (c < 'a' || c > 'z') && (c < 'A' || c > 'Z') && (c < '0' || c > '9') {
-			l.input.UnreadRune(c)
+		if c != '_' && (c < 'a' || c > 'z') && (c < 'A' || c > 'Z') && (c < '0' || c > '9') {
+			l.input.unreadRune(c)
 			break
 		}
-		l.colNo++
+		l.adjustPos(c)
 		token = append(token, c)
 	}
 	return token
@@ -560,7 +554,7 @@ func (l *protoLex) readIdentifier(sofar []rune) []rune {
 func (l *protoLex) readStringLiteral(quote rune) (string, error) {
 	var buf bytes.Buffer
 	for {
-		c, _, err := l.input.ReadRune()
+		c, _, err := l.input.readRune()
 		if err != nil {
 			if err == io.EOF {
 				err = io.ErrUnexpectedEOF
@@ -568,11 +562,9 @@ func (l *protoLex) readStringLiteral(quote rune) (string, error) {
 			return "", err
 		}
 		if c == '\n' {
-			l.colNo = 0
-			l.lineNo++
 			return "", errors.New("encountered end-of-line before end of string literal")
 		}
-		l.colNo++
+		l.adjustPos(c)
 		if c == quote {
 			break
 		}
@@ -581,28 +573,28 @@ func (l *protoLex) readStringLiteral(quote rune) (string, error) {
 		}
 		if c == '\\' {
 			// escape sequence
-			c, _, err = l.input.ReadRune()
+			c, _, err = l.input.readRune()
 			if err != nil {
 				return "", err
 			}
-			l.colNo++
+			l.adjustPos(c)
 			if c == 'x' || c == 'X' {
 				// hex escape
-				c, _, err := l.input.ReadRune()
+				c, _, err := l.input.readRune()
 				if err != nil {
 					return "", err
 				}
-				l.colNo++
-				c2, _, err := l.input.ReadRune()
+				l.adjustPos(c)
+				c2, _, err := l.input.readRune()
 				if err != nil {
 					return "", err
 				}
 				var hex string
 				if (c2 < '0' || c2 > '9') && (c2 < 'a' || c2 > 'f') && (c2 < 'A' || c2 > 'F') {
-					l.input.UnreadRune(c2)
+					l.input.unreadRune(c2)
 					hex = string(c)
 				} else {
-					l.colNo++
+					l.adjustPos(c2)
 					hex = string([]rune{c, c2})
 				}
 				i, err := strconv.ParseInt(hex, 16, 32)
@@ -613,25 +605,25 @@ func (l *protoLex) readStringLiteral(quote rune) (string, error) {
 
 			} else if c >= '0' && c <= '7' {
 				// octal escape
-				c2, _, err := l.input.ReadRune()
+				c2, _, err := l.input.readRune()
 				if err != nil {
 					return "", err
 				}
 				var octal string
 				if c2 < '0' || c2 > '7' {
-					l.input.UnreadRune(c2)
+					l.input.unreadRune(c2)
 					octal = string(c)
 				} else {
-					l.colNo++
-					c3, _, err := l.input.ReadRune()
+					l.adjustPos(c2)
+					c3, _, err := l.input.readRune()
 					if err != nil {
 						return "", err
 					}
 					if c3 < '0' || c3 > '7' {
-						l.input.UnreadRune(c3)
+						l.input.unreadRune(c3)
 						octal = string([]rune{c, c2})
 					} else {
-						l.colNo++
+						l.adjustPos(c3)
 						octal = string([]rune{c, c2, c3})
 					}
 				}
@@ -648,11 +640,11 @@ func (l *protoLex) readStringLiteral(quote rune) (string, error) {
 				// short unicode escape
 				u := make([]rune, 4)
 				for i := range u {
-					c, _, err := l.input.ReadRune()
+					c, _, err := l.input.readRune()
 					if err != nil {
 						return "", err
 					}
-					l.colNo++
+					l.adjustPos(c)
 					u[i] = c
 				}
 				i, err := strconv.ParseInt(string(u), 16, 32)
@@ -665,11 +657,11 @@ func (l *protoLex) readStringLiteral(quote rune) (string, error) {
 				// long unicode escape
 				u := make([]rune, 8)
 				for i := range u {
-					c, _, err := l.input.ReadRune()
+					c, _, err := l.input.readRune()
 					if err != nil {
 						return "", err
 					}
-					l.colNo++
+					l.adjustPos(c)
 					u[i] = c
 				}
 				i, err := strconv.ParseInt(string(u), 16, 32)
@@ -716,14 +708,14 @@ func (l *protoLex) readStringLiteral(quote rune) (string, error) {
 func (l *protoLex) skipToEndOfLineComment() (bool, string) {
 	txt := []rune{'/', '/'}
 	for {
-		c, _, err := l.input.ReadRune()
+		c, _, err := l.input.readRune()
 		if err != nil {
 			return false, string(txt)
 		}
 		if c == '\n' {
-			return true, string(txt)
+			return true, string(append(txt, '\n'))
 		}
-		l.colNo++
+		l.adjustPos(c)
 		txt = append(txt, c)
 	}
 }
@@ -731,34 +723,36 @@ func (l *protoLex) skipToEndOfLineComment() (bool, string) {
 func (l *protoLex) skipToEndOfBlockComment() (string, bool) {
 	txt := []rune{'/', '*'}
 	for {
-		c, _, err := l.input.ReadRune()
+		c, _, err := l.input.readRune()
 		if err != nil {
 			return "", false
 		}
-		if c == '\n' {
-			l.colNo = 0
-			l.lineNo++
-		} else {
-			l.colNo++
-		}
+		l.adjustPos(c)
 		txt = append(txt, c)
 		if c == '*' {
-			c, _, err := l.input.ReadRune()
+			c, _, err := l.input.readRune()
 			if err != nil {
 				return "", false
 			}
 			if c == '/' {
-				l.colNo++
+				l.adjustPos(c)
 				txt = append(txt, c)
 				return string(txt), true
 			}
-			l.input.UnreadRune(c)
+			l.input.unreadRune(c)
 		}
 	}
 }
 
-func (l *protoLex) Error(s string) {
-	if l.err == nil {
-		l.err = ErrorWithSourcePos{Underlying: errors.New(s), Pos: l.prevSym.start()}
+func (l *protoLex) addSourceError(err error) ErrorWithPos {
+	ewp, ok := err.(ErrorWithPos)
+	if !ok {
+		ewp = ErrorWithSourcePos{Pos: l.prev(), Underlying: err}
 	}
+	_ = l.errs.handleError(ewp)
+	return ewp
+}
+
+func (l *protoLex) Error(s string) {
+	_ = l.addSourceError(errors.New(s))
 }

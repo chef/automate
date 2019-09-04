@@ -2,20 +2,16 @@ package desc
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
-	"reflect"
 	"sort"
 	"strconv"
 	"strings"
-	"sync"
 	"unicode/utf8"
 
 	"github.com/golang/protobuf/proto"
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
 
-	. "github.com/jhump/protoreflect/desc/internal"
-	"github.com/jhump/protoreflect/internal"
+	"github.com/jhump/protoreflect/desc/internal"
 )
 
 // Descriptor is the common interface implemented by all descriptor objects.
@@ -48,6 +44,8 @@ type Descriptor interface {
 	AsProto() proto.Message
 }
 
+type sourceInfoRecomputeFunc = internal.SourceInfoComputeFunc
+
 // FileDescriptor describes a proto source file.
 type FileDescriptor struct {
 	proto      *dpb.FileDescriptorProto
@@ -61,162 +59,12 @@ type FileDescriptor struct {
 	services   []*ServiceDescriptor
 	fieldIndex map[string]map[int32]*FieldDescriptor
 	isProto3   bool
+	sourceInfo internal.SourceInfoMap
+	sourceInfoRecomputeFunc
 }
 
-// CreateFileDescriptor instantiates a new file descriptor for the given descriptor proto.
-// The file's direct dependencies must be provided. If the given dependencies do not include
-// all of the file's dependencies or if the contents of the descriptors are internally
-// inconsistent (e.g. contain unresolvable symbols) then an error is returned.
-func CreateFileDescriptor(fd *dpb.FileDescriptorProto, deps ...*FileDescriptor) (*FileDescriptor, error) {
-	ret := &FileDescriptor{proto: fd, symbols: map[string]Descriptor{}, fieldIndex: map[string]map[int32]*FieldDescriptor{}}
-	pkg := fd.GetPackage()
-
-	// populate references to file descriptor dependencies
-	files := map[string]*FileDescriptor{}
-	for _, f := range deps {
-		files[f.proto.GetName()] = f
-	}
-	ret.deps = make([]*FileDescriptor, len(fd.GetDependency()))
-	for i, d := range fd.GetDependency() {
-		ret.deps[i] = files[d]
-		if ret.deps[i] == nil {
-			return nil, fmt.Errorf("Given dependencies did not include %q", d)
-		}
-	}
-	ret.publicDeps = make([]*FileDescriptor, len(fd.GetPublicDependency()))
-	for i, pd := range fd.GetPublicDependency() {
-		ret.publicDeps[i] = ret.deps[pd]
-	}
-	ret.weakDeps = make([]*FileDescriptor, len(fd.GetWeakDependency()))
-	for i, wd := range fd.GetWeakDependency() {
-		ret.weakDeps[i] = ret.deps[wd]
-	}
-	ret.isProto3 = fd.GetSyntax() == "proto3"
-
-	// populate all tables of child descriptors
-	for _, m := range fd.GetMessageType() {
-		md, n := createMessageDescriptor(ret, ret, pkg, m, ret.symbols)
-		ret.symbols[n] = md
-		ret.messages = append(ret.messages, md)
-	}
-	for _, e := range fd.GetEnumType() {
-		ed, n := createEnumDescriptor(ret, ret, pkg, e, ret.symbols)
-		ret.symbols[n] = ed
-		ret.enums = append(ret.enums, ed)
-	}
-	for _, ex := range fd.GetExtension() {
-		exd, n := createFieldDescriptor(ret, ret, pkg, ex)
-		ret.symbols[n] = exd
-		ret.extensions = append(ret.extensions, exd)
-	}
-	for _, s := range fd.GetService() {
-		sd, n := createServiceDescriptor(ret, pkg, s, ret.symbols)
-		ret.symbols[n] = sd
-		ret.services = append(ret.services, sd)
-	}
-	sourceCodeInfo := CreateSourceInfoMap(fd)
-
-	// now we can resolve all type references and source code info
-	scopes := []scope{fileScope(ret)}
-	path := make([]int32, 1, 8)
-	path[0] = File_messagesTag
-	for i, md := range ret.messages {
-		if err := md.resolve(append(path, int32(i)), sourceCodeInfo, scopes); err != nil {
-			return nil, err
-		}
-	}
-	path[0] = File_enumsTag
-	for i, ed := range ret.enums {
-		ed.resolve(append(path, int32(i)), sourceCodeInfo)
-	}
-	path[0] = File_extensionsTag
-	for i, exd := range ret.extensions {
-		if err := exd.resolve(append(path, int32(i)), sourceCodeInfo, scopes); err != nil {
-			return nil, err
-		}
-	}
-	path[0] = File_servicesTag
-	for i, sd := range ret.services {
-		if err := sd.resolve(append(path, int32(i)), sourceCodeInfo, scopes); err != nil {
-			return nil, err
-		}
-	}
-
-	return ret, nil
-}
-
-// CreateFileDescriptors constructs a set of descriptors, one for each of the
-// given descriptor protos. The given set of descriptor protos must include all
-// transitive dependencies for every file.
-func CreateFileDescriptors(fds []*dpb.FileDescriptorProto) (map[string]*FileDescriptor, error) {
-	if len(fds) == 0 {
-		return nil, nil
-	}
-	files := map[string]*dpb.FileDescriptorProto{}
-	resolved := map[string]*FileDescriptor{}
-	var name string
-	for _, fd := range fds {
-		name = fd.GetName()
-		files[name] = fd
-	}
-	for _, fd := range fds {
-		_, err := createFromSet(fd.GetName(), nil, files, resolved)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return resolved, nil
-}
-
-// CreateFileDescriptorFromSet creates a descriptor from the given file descriptor set. The
-// set's *last* file will be the returned descriptor. The set's remaining files must comprise
-// the full set of transitive dependencies of that last file. This is the same format and
-// order used by protoc when emitting a FileDescriptorSet file with an invocation like so:
-//    protoc --descriptor_set_out=./test.protoset --include_imports -I. test.proto
-func CreateFileDescriptorFromSet(fds *dpb.FileDescriptorSet) (*FileDescriptor, error) {
-	files := fds.GetFile()
-	if len(files) == 0 {
-		return nil, errors.New("file descriptor set is empty")
-	}
-	resolved, err := CreateFileDescriptors(files)
-	if err != nil {
-		return nil, err
-	}
-	lastFilename := files[len(files)-1].GetName()
-	return resolved[lastFilename], nil
-}
-
-// createFromSet creates a descriptor for the given filename. It recursively
-// creates descriptors for the given file's dependencies.
-func createFromSet(filename string, seen []string, files map[string]*dpb.FileDescriptorProto, resolved map[string]*FileDescriptor) (*FileDescriptor, error) {
-	for _, s := range seen {
-		if filename == s {
-			return nil, fmt.Errorf("cycle in imports: %s", strings.Join(append(seen, filename), " -> "))
-		}
-	}
-	seen = append(seen, filename)
-
-	if d, ok := resolved[filename]; ok {
-		return d, nil
-	}
-	fdp := files[filename]
-	if fdp == nil {
-		return nil, fmt.Errorf("file descriptor set missing a dependency: %s", filename)
-	}
-	deps := make([]*FileDescriptor, len(fdp.GetDependency()))
-	for i, depName := range fdp.GetDependency() {
-		if dep, err := createFromSet(depName, seen, files, resolved); err != nil {
-			return nil, err
-		} else {
-			deps[i] = dep
-		}
-	}
-	d, err := CreateFileDescriptor(fdp, deps...)
-	if err != nil {
-		return nil, err
-	}
-	resolved[filename] = d
-	return d, nil
+func (fd *FileDescriptor) recomputeSourceInfo() {
+	internal.PopulateSourceInfoMap(fd.proto, fd.sourceInfo)
 }
 
 func (fd *FileDescriptor) registerField(field *FieldDescriptor) {
@@ -228,46 +76,67 @@ func (fd *FileDescriptor) registerField(field *FieldDescriptor) {
 	fields[field.GetNumber()] = field
 }
 
+// GetName returns the name of the file, as it was given to the protoc invocation
+// to compile it, possibly including path (relative to a directory in the proto
+// import path).
 func (fd *FileDescriptor) GetName() string {
 	return fd.proto.GetName()
 }
 
+// GetFullyQualifiedName returns the name of the file, same as GetName. It is
+// present to satisfy the Descriptor interface.
 func (fd *FileDescriptor) GetFullyQualifiedName() string {
 	return fd.proto.GetName()
 }
 
+// GetPackage returns the name of the package declared in the file.
 func (fd *FileDescriptor) GetPackage() string {
 	return fd.proto.GetPackage()
 }
 
+// GetParent always returns nil: files are the root of descriptor hierarchies.
+// Is it present to satisfy the Descriptor interface.
 func (fd *FileDescriptor) GetParent() Descriptor {
 	return nil
 }
 
+// GetFile returns the receiver, which is a file descriptor. This is present
+// to satisfy the Descriptor interface.
 func (fd *FileDescriptor) GetFile() *FileDescriptor {
 	return fd
 }
 
+// GetOptions returns the file's options. Most usages will be more interested
+// in GetFileOptions, which has a concrete return type. This generic version
+// is present to satisfy the Descriptor interface.
 func (fd *FileDescriptor) GetOptions() proto.Message {
 	return fd.proto.GetOptions()
 }
 
+// GetFileOptions returns the file's options.
 func (fd *FileDescriptor) GetFileOptions() *dpb.FileOptions {
 	return fd.proto.GetOptions()
 }
 
+// GetSourceInfo returns nil for files. It is present to satisfy the Descriptor
+// interface.
 func (fd *FileDescriptor) GetSourceInfo() *dpb.SourceCodeInfo_Location {
 	return nil
 }
 
+// AsProto returns the underlying descriptor proto. Most usages will be more
+// interested in AsFileDescriptorProto, which has a concrete return type. This
+// generic version is present to satisfy the Descriptor interface.
 func (fd *FileDescriptor) AsProto() proto.Message {
 	return fd.proto
 }
 
+// AsFileDescriptorProto returns the underlying descriptor proto.
 func (fd *FileDescriptor) AsFileDescriptorProto() *dpb.FileDescriptorProto {
 	return fd.proto
 }
 
+// String returns the underlying descriptor proto, in compact text format.
 func (fd *FileDescriptor) String() string {
 	return fd.proto.String()
 }
@@ -319,6 +188,9 @@ func (fd *FileDescriptor) GetServices() []*ServiceDescriptor {
 // element with the given fully-qualified symbol name. If no such element
 // exists then this method returns nil.
 func (fd *FileDescriptor) FindSymbol(symbol string) Descriptor {
+	if symbol[0] == '.' {
+		symbol = symbol[1:]
+	}
 	return fd.symbols[symbol]
 }
 
@@ -374,20 +246,20 @@ func (fd *FileDescriptor) FindExtensionByName(extName string) *FieldDescriptor {
 
 // MessageDescriptor describes a protocol buffer message.
 type MessageDescriptor struct {
-	proto      *dpb.DescriptorProto
-	parent     Descriptor
-	file       *FileDescriptor
-	fields     []*FieldDescriptor
-	nested     []*MessageDescriptor
-	enums      []*EnumDescriptor
-	extensions []*FieldDescriptor
-	oneOfs     []*OneOfDescriptor
-	extRanges  extRanges
-	fqn        string
-	sourceInfo *dpb.SourceCodeInfo_Location
-	jsonNames  jsonNameMap
-	isProto3   bool
-	isMapEntry bool
+	proto          *dpb.DescriptorProto
+	parent         Descriptor
+	file           *FileDescriptor
+	fields         []*FieldDescriptor
+	nested         []*MessageDescriptor
+	enums          []*EnumDescriptor
+	extensions     []*FieldDescriptor
+	oneOfs         []*OneOfDescriptor
+	extRanges      extRanges
+	fqn            string
+	sourceInfoPath []int32
+	jsonNames      jsonNameMap
+	isProto3       bool
+	isMapEntry     bool
 }
 
 func createMessageDescriptor(fd *FileDescriptor, parent Descriptor, enclosing string, md *dpb.DescriptorProto, symbols map[string]Descriptor) (*MessageDescriptor, string) {
@@ -422,7 +294,9 @@ func createMessageDescriptor(fd *FileDescriptor, parent Descriptor, enclosing st
 		// proto.ExtensionRange is inclusive (and that's how extension ranges are defined in code).
 		// but protoc converts range to exclusive end in descriptor, so we must convert back
 		end := r.GetEnd() - 1
-		ret.extRanges = append(ret.extRanges, proto.ExtensionRange{r.GetStart(), end})
+		ret.extRanges = append(ret.extRanges, proto.ExtensionRange{
+			Start: r.GetStart(),
+			End:   end})
 	}
 	sort.Sort(ret.extRanges)
 	ret.isProto3 = fd.isProto3
@@ -434,74 +308,96 @@ func createMessageDescriptor(fd *FileDescriptor, parent Descriptor, enclosing st
 	return ret, msgName
 }
 
-func (md *MessageDescriptor) resolve(path []int32, sourceCodeInfo SourceInfoMap, scopes []scope) error {
-	md.sourceInfo = sourceCodeInfo.Get(path)
-	path = append(path, Message_nestedMessagesTag)
+func (md *MessageDescriptor) resolve(path []int32, scopes []scope) error {
+	md.sourceInfoPath = append([]int32(nil), path...) // defensive copy
+	path = append(path, internal.Message_nestedMessagesTag)
 	scopes = append(scopes, messageScope(md))
 	for i, nmd := range md.nested {
-		if err := nmd.resolve(append(path, int32(i)), sourceCodeInfo, scopes); err != nil {
+		if err := nmd.resolve(append(path, int32(i)), scopes); err != nil {
 			return err
 		}
 	}
-	path[len(path)-1] = Message_enumsTag
+	path[len(path)-1] = internal.Message_enumsTag
 	for i, ed := range md.enums {
-		ed.resolve(append(path, int32(i)), sourceCodeInfo)
+		ed.resolve(append(path, int32(i)))
 	}
-	path[len(path)-1] = Message_fieldsTag
+	path[len(path)-1] = internal.Message_fieldsTag
 	for i, fld := range md.fields {
-		if err := fld.resolve(append(path, int32(i)), sourceCodeInfo, scopes); err != nil {
+		if err := fld.resolve(append(path, int32(i)), scopes); err != nil {
 			return err
 		}
 	}
-	path[len(path)-1] = Message_extensionsTag
+	path[len(path)-1] = internal.Message_extensionsTag
 	for i, exd := range md.extensions {
-		if err := exd.resolve(append(path, int32(i)), sourceCodeInfo, scopes); err != nil {
+		if err := exd.resolve(append(path, int32(i)), scopes); err != nil {
 			return err
 		}
 	}
-	path[len(path)-1] = Message_oneOfsTag
+	path[len(path)-1] = internal.Message_oneOfsTag
 	for i, od := range md.oneOfs {
-		od.resolve(append(path, int32(i)), sourceCodeInfo)
+		od.resolve(append(path, int32(i)))
 	}
 	return nil
 }
 
+// GetName returns the simple (unqualified) name of the message.
 func (md *MessageDescriptor) GetName() string {
 	return md.proto.GetName()
 }
 
+// GetFullyQualifiedName returns the fully qualified name of the message. This
+// includes the package name (if there is one) as well as the names of any
+// enclosing messages.
 func (md *MessageDescriptor) GetFullyQualifiedName() string {
 	return md.fqn
 }
 
+// GetParent returns the message's enclosing descriptor. For top-level messages,
+// this will be a file descriptor. Otherwise it will be the descriptor for the
+// enclosing message.
 func (md *MessageDescriptor) GetParent() Descriptor {
 	return md.parent
 }
 
+// GetFile returns the descriptor for the file in which this message is defined.
 func (md *MessageDescriptor) GetFile() *FileDescriptor {
 	return md.file
 }
 
+// GetOptions returns the message's options. Most usages will be more interested
+// in GetMessageOptions, which has a concrete return type. This generic version
+// is present to satisfy the Descriptor interface.
 func (md *MessageDescriptor) GetOptions() proto.Message {
 	return md.proto.GetOptions()
 }
 
+// GetMessageOptions returns the message's options.
 func (md *MessageDescriptor) GetMessageOptions() *dpb.MessageOptions {
 	return md.proto.GetOptions()
 }
 
+// GetSourceInfo returns source info for the message, if present in the
+// descriptor. Not all descriptors will contain source info. If non-nil, the
+// returned info contains information about the location in the file where the
+// message was defined and also contains comments associated with the message
+// definition.
 func (md *MessageDescriptor) GetSourceInfo() *dpb.SourceCodeInfo_Location {
-	return md.sourceInfo
+	return md.file.sourceInfo.Get(md.sourceInfoPath)
 }
 
+// AsProto returns the underlying descriptor proto. Most usages will be more
+// interested in AsDescriptorProto, which has a concrete return type. This
+// generic version is present to satisfy the Descriptor interface.
 func (md *MessageDescriptor) AsProto() proto.Message {
 	return md.proto
 }
 
+// AsDescriptorProto returns the underlying descriptor proto.
 func (md *MessageDescriptor) AsDescriptorProto() *dpb.DescriptorProto {
 	return md.proto
 }
 
+// String returns the underlying descriptor proto, in compact text format.
 func (md *MessageDescriptor) String() string {
 	return md.proto.String()
 }
@@ -614,17 +510,17 @@ func (md *MessageDescriptor) FindFieldByNumber(tagNumber int32) *FieldDescriptor
 
 // FieldDescriptor describes a field of a protocol buffer message.
 type FieldDescriptor struct {
-	proto      *dpb.FieldDescriptorProto
-	parent     Descriptor
-	owner      *MessageDescriptor
-	file       *FileDescriptor
-	oneOf      *OneOfDescriptor
-	msgType    *MessageDescriptor
-	enumType   *EnumDescriptor
-	fqn        string
-	sourceInfo *dpb.SourceCodeInfo_Location
-	def        memoizedDefault
-	isMap      bool
+	proto          *dpb.FieldDescriptorProto
+	parent         Descriptor
+	owner          *MessageDescriptor
+	file           *FileDescriptor
+	oneOf          *OneOfDescriptor
+	msgType        *MessageDescriptor
+	enumType       *EnumDescriptor
+	fqn            string
+	sourceInfoPath []int32
+	def            memoizedDefault
+	isMap          bool
 }
 
 func createFieldDescriptor(fd *FileDescriptor, parent Descriptor, enclosing string, fld *dpb.FieldDescriptorProto) (*FieldDescriptor, string) {
@@ -637,11 +533,11 @@ func createFieldDescriptor(fd *FileDescriptor, parent Descriptor, enclosing stri
 	return ret, fldName
 }
 
-func (fd *FieldDescriptor) resolve(path []int32, sourceCodeInfo SourceInfoMap, scopes []scope) error {
+func (fd *FieldDescriptor) resolve(path []int32, scopes []scope) error {
 	if fd.proto.OneofIndex != nil && fd.oneOf == nil {
-		return fmt.Errorf("Could not link field %s to one-of index %d", fd.fqn, *fd.proto.OneofIndex)
+		return fmt.Errorf("could not link field %s to one-of index %d", fd.fqn, *fd.proto.OneofIndex)
 	}
-	fd.sourceInfo = sourceCodeInfo.Get(path)
+	fd.sourceInfoPath = append([]int32(nil), path...) // defensive copy
 	if fd.proto.GetType() == dpb.FieldDescriptorProto_TYPE_ENUM {
 		if desc, err := resolve(fd.file, fd.proto.GetTypeName(), scopes); err != nil {
 			return err
@@ -916,6 +812,7 @@ func matchPrefix(s string, limit int, fn func(byte) bool) int {
 	return i
 }
 
+// GetName returns the name of the field.
 func (fd *FieldDescriptor) GetName() string {
 	return fd.proto.GetName()
 }
@@ -925,42 +822,74 @@ func (fd *FieldDescriptor) GetNumber() int32 {
 	return fd.proto.GetNumber()
 }
 
+// GetFullyQualifiedName returns the fully qualified name of the field. Unlike
+// GetName, this includes fully qualified name of the enclosing message for
+// regular fields.
+//
+// For extension fields, this includes the package (if there is one) as well as
+// any enclosing messages. The package and/or enclosing messages are for where
+// the extension is defined, not the message it extends.
+//
+// If this field is part of a one-of, the fully qualified name does *not*
+// include the name of the one-of, only of the enclosing message.
 func (fd *FieldDescriptor) GetFullyQualifiedName() string {
 	return fd.fqn
 }
 
+// GetParent returns the fields's enclosing descriptor. For normal
+// (non-extension) fields, this is the enclosing message. For extensions, this
+// is the descriptor in which the extension is defined, not the message that is
+// extended. The parent for an extension may be a file descriptor or a message,
+// depending on where the extension is defined.
 func (fd *FieldDescriptor) GetParent() Descriptor {
 	return fd.parent
 }
 
+// GetFile returns the descriptor for the file in which this field is defined.
 func (fd *FieldDescriptor) GetFile() *FileDescriptor {
 	return fd.file
 }
 
+// GetOptions returns the field's options. Most usages will be more interested
+// in GetFieldOptions, which has a concrete return type. This generic version
+// is present to satisfy the Descriptor interface.
 func (fd *FieldDescriptor) GetOptions() proto.Message {
 	return fd.proto.GetOptions()
 }
 
+// GetFieldOptions returns the field's options.
 func (fd *FieldDescriptor) GetFieldOptions() *dpb.FieldOptions {
 	return fd.proto.GetOptions()
 }
 
+// GetSourceInfo returns source info for the field, if present in the
+// descriptor. Not all descriptors will contain source info. If non-nil, the
+// returned info contains information about the location in the file where the
+// field was defined and also contains comments associated with the field
+// definition.
 func (fd *FieldDescriptor) GetSourceInfo() *dpb.SourceCodeInfo_Location {
-	return fd.sourceInfo
+	return fd.file.sourceInfo.Get(fd.sourceInfoPath)
 }
 
+// AsProto returns the underlying descriptor proto. Most usages will be more
+// interested in AsFieldDescriptorProto, which has a concrete return type. This
+// generic version is present to satisfy the Descriptor interface.
 func (fd *FieldDescriptor) AsProto() proto.Message {
 	return fd.proto
 }
 
+// AsFieldDescriptorProto returns the underlying descriptor proto.
 func (fd *FieldDescriptor) AsFieldDescriptorProto() *dpb.FieldDescriptorProto {
 	return fd.proto
 }
 
+// String returns the underlying descriptor proto, in compact text format.
 func (fd *FieldDescriptor) String() string {
 	return fd.proto.String()
 }
 
+// GetJSONName returns the name of the field as referenced in the message's JSON
+// format.
 func (fd *FieldDescriptor) GetJSONName() string {
 	if jsonName := fd.proto.GetJsonName(); jsonName != "" {
 		return jsonName
@@ -968,8 +897,25 @@ func (fd *FieldDescriptor) GetJSONName() string {
 	return fd.proto.GetName()
 }
 
+// GetFullyQualifiedJSONName returns the JSON format name (same as GetJSONName),
+// but includes the fully qualified name of the enclosing message.
+//
+// If the field is an extension, it will return the package name (if there is
+// one) as well as the names of any enclosing messages. The package and/or
+// enclosing messages are for where the extension is defined, not the message it
+// extends.
 func (fd *FieldDescriptor) GetFullyQualifiedJSONName() string {
-	return fmt.Sprintf("%s.%s", fd.GetParent().GetFullyQualifiedName(), fd.GetJSONName())
+	parent := fd.GetParent()
+	switch parent := parent.(type) {
+	case *FileDescriptor:
+		pkg := parent.GetPackage()
+		if pkg == "" {
+			return fd.GetJSONName()
+		}
+		return fmt.Sprintf("%s.%s", pkg, fd.GetJSONName())
+	default:
+		return fmt.Sprintf("%s.%s", parent.GetFullyQualifiedName(), fd.GetJSONName())
+	}
 }
 
 // GetOwner returns the message type that this field belongs to. If this is a normal
@@ -1061,46 +1007,32 @@ func (fd *FieldDescriptor) GetEnumType() *EnumDescriptor {
 // Otherwise, it returns the declared default value for the field or a zero value, if no
 // default is declared or if the file is proto3. The type of said return value corresponds
 // to the type of the field:
-//   |-------------------------|
-//   | Declared Type | Go Type |
-//   |---------------+---------|
-//   | int32         |         |
-//   | sint32        | int32   |
-//   | sfixed32      |         |
-//   |---------------+---------|
-//   | uint32        | uint32  |
-//   | fixed32       |         |
-//   |---------------+---------|
-//   | int64         |         |
-//   | sint64        | int64   |
-//   | sfixed64      |         |
-//   |---------------+---------|
-//   | uint64        | uint64  |
-//   | fixed64       |         |
-//   |---------------+---------|
-//   | float         | float32 |
-//   |---------------+---------|
-//   | double        | float64 |
-//   |---------------+---------|
-//   | bool          | bool    |
-//   |---------------+---------|
-//   | bytes         | []byte  |
-//   |---------------+---------|
-//   | string        | string  |
-//   |-------------------------|
+//  +-------------------------+-----------+
+//  |       Declared Type     |  Go Type  |
+//  +-------------------------+-----------+
+//  | int32, sint32, sfixed32 | int32     |
+//  | int64, sint64, sfixed64 | int64     |
+//  | uint32, fixed32         | uint32    |
+//  | uint64, fixed64         | uint64    |
+//  | float                   | float32   |
+//  | double                  | double32  |
+//  | bool                    | bool      |
+//  | string                  | string    |
+//  | bytes                   | []byte    |
+//  +-------------------------+-----------+
 func (fd *FieldDescriptor) GetDefaultValue() interface{} {
 	return fd.getDefaultValue()
 }
 
 // EnumDescriptor describes an enum declared in a proto file.
 type EnumDescriptor struct {
-	proto       *dpb.EnumDescriptorProto
-	parent      Descriptor
-	file        *FileDescriptor
-	values      []*EnumValueDescriptor
-	valuesByNum sortedValues
-	fqn         string
-	sourceInfo  *dpb.SourceCodeInfo_Location
+	proto          *dpb.EnumDescriptorProto
+	parent         Descriptor
+	file           *FileDescriptor
+	values         []*EnumValueDescriptor
+	valuesByNum    sortedValues
+	fqn            string
+	sourceInfoPath []int32
 }
 
 func createEnumDescriptor(fd *FileDescriptor, parent Descriptor, enclosing string, ed *dpb.EnumDescriptorProto, symbols map[string]Descriptor) (*EnumDescriptor, string) {
@@ -1133,50 +1065,72 @@ func (sv sortedValues) Swap(i, j int) {
 	sv[i], sv[j] = sv[j], sv[i]
 }
 
-func (ed *EnumDescriptor) resolve(path []int32, sourceCodeInfo SourceInfoMap) {
-	ed.sourceInfo = sourceCodeInfo.Get(path)
-	path = append(path, Enum_valuesTag)
+func (ed *EnumDescriptor) resolve(path []int32) {
+	ed.sourceInfoPath = append([]int32(nil), path...) // defensive copy
+	path = append(path, internal.Enum_valuesTag)
 	for i, evd := range ed.values {
-		evd.resolve(append(path, int32(i)), sourceCodeInfo)
+		evd.resolve(append(path, int32(i)))
 	}
 }
 
+// GetName returns the simple (unqualified) name of the enum type.
 func (ed *EnumDescriptor) GetName() string {
 	return ed.proto.GetName()
 }
 
+// GetFullyQualifiedName returns the fully qualified name of the enum type.
+// This includes the package name (if there is one) as well as the names of any
+// enclosing messages.
 func (ed *EnumDescriptor) GetFullyQualifiedName() string {
 	return ed.fqn
 }
 
+// GetParent returns the enum type's enclosing descriptor. For top-level enums,
+// this will be a file descriptor. Otherwise it will be the descriptor for the
+// enclosing message.
 func (ed *EnumDescriptor) GetParent() Descriptor {
 	return ed.parent
 }
 
+// GetFile returns the descriptor for the file in which this enum is defined.
 func (ed *EnumDescriptor) GetFile() *FileDescriptor {
 	return ed.file
 }
 
+// GetOptions returns the enum type's options. Most usages will be more
+// interested in GetEnumOptions, which has a concrete return type. This generic
+// version is present to satisfy the Descriptor interface.
 func (ed *EnumDescriptor) GetOptions() proto.Message {
 	return ed.proto.GetOptions()
 }
 
+// GetEnumOptions returns the enum type's options.
 func (ed *EnumDescriptor) GetEnumOptions() *dpb.EnumOptions {
 	return ed.proto.GetOptions()
 }
 
+// GetSourceInfo returns source info for the enum type, if present in the
+// descriptor. Not all descriptors will contain source info. If non-nil, the
+// returned info contains information about the location in the file where the
+// enum type was defined and also contains comments associated with the enum
+// definition.
 func (ed *EnumDescriptor) GetSourceInfo() *dpb.SourceCodeInfo_Location {
-	return ed.sourceInfo
+	return ed.file.sourceInfo.Get(ed.sourceInfoPath)
 }
 
+// AsProto returns the underlying descriptor proto. Most usages will be more
+// interested in AsEnumDescriptorProto, which has a concrete return type. This
+// generic version is present to satisfy the Descriptor interface.
 func (ed *EnumDescriptor) AsProto() proto.Message {
 	return ed.proto
 }
 
+// AsEnumDescriptorProto returns the underlying descriptor proto.
 func (ed *EnumDescriptor) AsEnumDescriptorProto() *dpb.EnumDescriptorProto {
 	return ed.proto
 }
 
+// String returns the underlying descriptor proto, in compact text format.
 func (ed *EnumDescriptor) String() string {
 	return ed.proto.String()
 }
@@ -1213,11 +1167,11 @@ func (ed *EnumDescriptor) FindValueByNumber(num int32) *EnumValueDescriptor {
 
 // EnumValueDescriptor describes an allowed value of an enum declared in a proto file.
 type EnumValueDescriptor struct {
-	proto      *dpb.EnumValueDescriptorProto
-	parent     *EnumDescriptor
-	file       *FileDescriptor
-	fqn        string
-	sourceInfo *dpb.SourceCodeInfo_Location
+	proto          *dpb.EnumValueDescriptorProto
+	parent         *EnumDescriptor
+	file           *FileDescriptor
+	fqn            string
+	sourceInfoPath []int32
 }
 
 func createEnumValueDescriptor(fd *FileDescriptor, parent *EnumDescriptor, enclosing string, evd *dpb.EnumValueDescriptorProto) (*EnumValueDescriptor, string) {
@@ -1225,10 +1179,11 @@ func createEnumValueDescriptor(fd *FileDescriptor, parent *EnumDescriptor, enclo
 	return &EnumValueDescriptor{proto: evd, parent: parent, file: fd, fqn: valName}, valName
 }
 
-func (vd *EnumValueDescriptor) resolve(path []int32, sourceCodeInfo SourceInfoMap) {
-	vd.sourceInfo = sourceCodeInfo.Get(path)
+func (vd *EnumValueDescriptor) resolve(path []int32) {
+	vd.sourceInfoPath = append([]int32(nil), path...) // defensive copy
 }
 
+// GetName returns the name of the enum value.
 func (vd *EnumValueDescriptor) GetName() string {
 	return vd.proto.GetName()
 }
@@ -1238,10 +1193,15 @@ func (vd *EnumValueDescriptor) GetNumber() int32 {
 	return vd.proto.GetNumber()
 }
 
+// GetFullyQualifiedName returns the fully qualified name of the enum value.
+// Unlike GetName, this includes fully qualified name of the enclosing enum.
 func (vd *EnumValueDescriptor) GetFullyQualifiedName() string {
 	return vd.fqn
 }
 
+// GetParent returns the descriptor for the enum in which this enum value is
+// defined. Most usages will prefer to use GetEnum, which has a concrete return
+// type. This more generic method is present to satisfy the Descriptor interface.
 func (vd *EnumValueDescriptor) GetParent() Descriptor {
 	return vd.parent
 }
@@ -1251,41 +1211,57 @@ func (vd *EnumValueDescriptor) GetEnum() *EnumDescriptor {
 	return vd.parent
 }
 
+// GetFile returns the descriptor for the file in which this enum value is
+// defined.
 func (vd *EnumValueDescriptor) GetFile() *FileDescriptor {
 	return vd.file
 }
 
+// GetOptions returns the enum value's options. Most usages will be more
+// interested in GetEnumValueOptions, which has a concrete return type. This
+// generic version is present to satisfy the Descriptor interface.
 func (vd *EnumValueDescriptor) GetOptions() proto.Message {
 	return vd.proto.GetOptions()
 }
 
+// GetEnumValueOptions returns the enum value's options.
 func (vd *EnumValueDescriptor) GetEnumValueOptions() *dpb.EnumValueOptions {
 	return vd.proto.GetOptions()
 }
 
+// GetSourceInfo returns source info for the enum value, if present in the
+// descriptor. Not all descriptors will contain source info. If non-nil, the
+// returned info contains information about the location in the file where the
+// enum value was defined and also contains comments associated with the enum
+// value definition.
 func (vd *EnumValueDescriptor) GetSourceInfo() *dpb.SourceCodeInfo_Location {
-	return vd.sourceInfo
+	return vd.file.sourceInfo.Get(vd.sourceInfoPath)
 }
 
+// AsProto returns the underlying descriptor proto. Most usages will be more
+// interested in AsEnumValueDescriptorProto, which has a concrete return type.
+// This generic version is present to satisfy the Descriptor interface.
 func (vd *EnumValueDescriptor) AsProto() proto.Message {
 	return vd.proto
 }
 
+// AsEnumValueDescriptorProto returns the underlying descriptor proto.
 func (vd *EnumValueDescriptor) AsEnumValueDescriptorProto() *dpb.EnumValueDescriptorProto {
 	return vd.proto
 }
 
+// String returns the underlying descriptor proto, in compact text format.
 func (vd *EnumValueDescriptor) String() string {
 	return vd.proto.String()
 }
 
 // ServiceDescriptor describes an RPC service declared in a proto file.
 type ServiceDescriptor struct {
-	proto      *dpb.ServiceDescriptorProto
-	file       *FileDescriptor
-	methods    []*MethodDescriptor
-	fqn        string
-	sourceInfo *dpb.SourceCodeInfo_Location
+	proto          *dpb.ServiceDescriptorProto
+	file           *FileDescriptor
+	methods        []*MethodDescriptor
+	fqn            string
+	sourceInfoPath []int32
 }
 
 func createServiceDescriptor(fd *FileDescriptor, enclosing string, sd *dpb.ServiceDescriptorProto, symbols map[string]Descriptor) (*ServiceDescriptor, string) {
@@ -1299,53 +1275,74 @@ func createServiceDescriptor(fd *FileDescriptor, enclosing string, sd *dpb.Servi
 	return ret, serviceName
 }
 
-func (sd *ServiceDescriptor) resolve(path []int32, sourceCodeInfo SourceInfoMap, scopes []scope) error {
-	sd.sourceInfo = sourceCodeInfo.Get(path)
-	path = append(path, Service_methodsTag)
+func (sd *ServiceDescriptor) resolve(path []int32, scopes []scope) error {
+	sd.sourceInfoPath = append([]int32(nil), path...) // defensive copy
+	path = append(path, internal.Service_methodsTag)
 	for i, md := range sd.methods {
-		if err := md.resolve(append(path, int32(i)), sourceCodeInfo, scopes); err != nil {
+		if err := md.resolve(append(path, int32(i)), scopes); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
+// GetName returns the simple (unqualified) name of the service.
 func (sd *ServiceDescriptor) GetName() string {
 	return sd.proto.GetName()
 }
 
+// GetFullyQualifiedName returns the fully qualified name of the service. This
+// includes the package name (if there is one).
 func (sd *ServiceDescriptor) GetFullyQualifiedName() string {
 	return sd.fqn
 }
 
+// GetParent returns the descriptor for the file in which this service is
+// defined. Most usages will prefer to use GetFile, which has a concrete return
+// type. This more generic method is present to satisfy the Descriptor interface.
 func (sd *ServiceDescriptor) GetParent() Descriptor {
 	return sd.file
 }
 
+// GetFile returns the descriptor for the file in which this service is defined.
 func (sd *ServiceDescriptor) GetFile() *FileDescriptor {
 	return sd.file
 }
 
+// GetOptions returns the service's options. Most usages will be more interested
+// in GetServiceOptions, which has a concrete return type. This generic version
+// is present to satisfy the Descriptor interface.
 func (sd *ServiceDescriptor) GetOptions() proto.Message {
 	return sd.proto.GetOptions()
 }
 
+// GetServiceOptions returns the service's options.
 func (sd *ServiceDescriptor) GetServiceOptions() *dpb.ServiceOptions {
 	return sd.proto.GetOptions()
 }
 
+// GetSourceInfo returns source info for the service, if present in the
+// descriptor. Not all descriptors will contain source info. If non-nil, the
+// returned info contains information about the location in the file where the
+// service was defined and also contains comments associated with the service
+// definition.
 func (sd *ServiceDescriptor) GetSourceInfo() *dpb.SourceCodeInfo_Location {
-	return sd.sourceInfo
+	return sd.file.sourceInfo.Get(sd.sourceInfoPath)
 }
 
+// AsProto returns the underlying descriptor proto. Most usages will be more
+// interested in AsServiceDescriptorProto, which has a concrete return type.
+// This generic version is present to satisfy the Descriptor interface.
 func (sd *ServiceDescriptor) AsProto() proto.Message {
 	return sd.proto
 }
 
+// AsServiceDescriptorProto returns the underlying descriptor proto.
 func (sd *ServiceDescriptor) AsServiceDescriptorProto() *dpb.ServiceDescriptorProto {
 	return sd.proto
 }
 
+// String returns the underlying descriptor proto, in compact text format.
 func (sd *ServiceDescriptor) String() string {
 	return sd.proto.String()
 }
@@ -1368,13 +1365,13 @@ func (sd *ServiceDescriptor) FindMethodByName(name string) *MethodDescriptor {
 
 // MethodDescriptor describes an RPC method declared in a proto file.
 type MethodDescriptor struct {
-	proto      *dpb.MethodDescriptorProto
-	parent     *ServiceDescriptor
-	file       *FileDescriptor
-	inType     *MessageDescriptor
-	outType    *MessageDescriptor
-	fqn        string
-	sourceInfo *dpb.SourceCodeInfo_Location
+	proto          *dpb.MethodDescriptorProto
+	parent         *ServiceDescriptor
+	file           *FileDescriptor
+	inType         *MessageDescriptor
+	outType        *MessageDescriptor
+	fqn            string
+	sourceInfoPath []int32
 }
 
 func createMethodDescriptor(fd *FileDescriptor, parent *ServiceDescriptor, enclosing string, md *dpb.MethodDescriptorProto) (*MethodDescriptor, string) {
@@ -1383,8 +1380,8 @@ func createMethodDescriptor(fd *FileDescriptor, parent *ServiceDescriptor, enclo
 	return &MethodDescriptor{proto: md, parent: parent, file: fd, fqn: methodName}, methodName
 }
 
-func (md *MethodDescriptor) resolve(path []int32, sourceCodeInfo SourceInfoMap, scopes []scope) error {
-	md.sourceInfo = sourceCodeInfo.Get(path)
+func (md *MethodDescriptor) resolve(path []int32, scopes []scope) error {
+	md.sourceInfoPath = append([]int32(nil), path...) // defensive copy
 	if desc, err := resolve(md.file, md.proto.GetInputType(), scopes); err != nil {
 		return err
 	} else {
@@ -1398,14 +1395,21 @@ func (md *MethodDescriptor) resolve(path []int32, sourceCodeInfo SourceInfoMap, 
 	return nil
 }
 
+// GetName returns the name of the method.
 func (md *MethodDescriptor) GetName() string {
 	return md.proto.GetName()
 }
 
+// GetFullyQualifiedName returns the fully qualified name of the method. Unlike
+// GetName, this includes fully qualified name of the enclosing service.
 func (md *MethodDescriptor) GetFullyQualifiedName() string {
 	return md.fqn
 }
 
+// GetParent returns the descriptor for the service in which this method is
+// defined. Most usages will prefer to use GetService, which has a concrete
+// return type. This more generic method is present to satisfy the Descriptor
+// interface.
 func (md *MethodDescriptor) GetParent() Descriptor {
 	return md.parent
 }
@@ -1415,30 +1419,45 @@ func (md *MethodDescriptor) GetService() *ServiceDescriptor {
 	return md.parent
 }
 
+// GetFile returns the descriptor for the file in which this method is defined.
 func (md *MethodDescriptor) GetFile() *FileDescriptor {
 	return md.file
 }
 
+// GetOptions returns the method's options. Most usages will be more interested
+// in GetMethodOptions, which has a concrete return type. This generic version
+// is present to satisfy the Descriptor interface.
 func (md *MethodDescriptor) GetOptions() proto.Message {
 	return md.proto.GetOptions()
 }
 
+// GetMethodOptions returns the method's options.
 func (md *MethodDescriptor) GetMethodOptions() *dpb.MethodOptions {
 	return md.proto.GetOptions()
 }
 
+// GetSourceInfo returns source info for the method, if present in the
+// descriptor. Not all descriptors will contain source info. If non-nil, the
+// returned info contains information about the location in the file where the
+// method was defined and also contains comments associated with the method
+// definition.
 func (md *MethodDescriptor) GetSourceInfo() *dpb.SourceCodeInfo_Location {
-	return md.sourceInfo
+	return md.file.sourceInfo.Get(md.sourceInfoPath)
 }
 
+// AsProto returns the underlying descriptor proto. Most usages will be more
+// interested in AsMethodDescriptorProto, which has a concrete return type. This
+// generic version is present to satisfy the Descriptor interface.
 func (md *MethodDescriptor) AsProto() proto.Message {
 	return md.proto
 }
 
+// AsMethodDescriptorProto returns the underlying descriptor proto.
 func (md *MethodDescriptor) AsMethodDescriptorProto() *dpb.MethodDescriptorProto {
 	return md.proto
 }
 
+// String returns the underlying descriptor proto, in compact text format.
 func (md *MethodDescriptor) String() string {
 	return md.proto.String()
 }
@@ -1465,12 +1484,12 @@ func (md *MethodDescriptor) GetOutputType() *MessageDescriptor {
 
 // OneOfDescriptor describes a one-of field set declared in a protocol buffer message.
 type OneOfDescriptor struct {
-	proto      *dpb.OneofDescriptorProto
-	parent     *MessageDescriptor
-	file       *FileDescriptor
-	choices    []*FieldDescriptor
-	fqn        string
-	sourceInfo *dpb.SourceCodeInfo_Location
+	proto          *dpb.OneofDescriptorProto
+	parent         *MessageDescriptor
+	file           *FileDescriptor
+	choices        []*FieldDescriptor
+	fqn            string
+	sourceInfoPath []int32
 }
 
 func createOneOfDescriptor(fd *FileDescriptor, parent *MessageDescriptor, index int, enclosing string, od *dpb.OneofDescriptorProto) (*OneOfDescriptor, string) {
@@ -1486,18 +1505,25 @@ func createOneOfDescriptor(fd *FileDescriptor, parent *MessageDescriptor, index 
 	return ret, oneOfName
 }
 
-func (od *OneOfDescriptor) resolve(path []int32, sourceCodeInfo SourceInfoMap) {
-	od.sourceInfo = sourceCodeInfo.Get(path)
+func (od *OneOfDescriptor) resolve(path []int32) {
+	od.sourceInfoPath = append([]int32(nil), path...) // defensive copy
 }
 
+// GetName returns the name of the one-of.
 func (od *OneOfDescriptor) GetName() string {
 	return od.proto.GetName()
 }
 
+// GetFullyQualifiedName returns the fully qualified name of the one-of. Unlike
+// GetName, this includes fully qualified name of the enclosing message.
 func (od *OneOfDescriptor) GetFullyQualifiedName() string {
 	return od.fqn
 }
 
+// GetParent returns the descriptor for the message in which this one-of is
+// defined. Most usages will prefer to use GetOwner, which has a concrete
+// return type. This more generic method is present to satisfy the Descriptor
+// interface.
 func (od *OneOfDescriptor) GetParent() Descriptor {
 	return od.parent
 }
@@ -1507,30 +1533,45 @@ func (od *OneOfDescriptor) GetOwner() *MessageDescriptor {
 	return od.parent
 }
 
+// GetFile returns the descriptor for the file in which this one-fof is defined.
 func (od *OneOfDescriptor) GetFile() *FileDescriptor {
 	return od.file
 }
 
+// GetOptions returns the one-of's options. Most usages will be more interested
+// in GetOneOfOptions, which has a concrete return type. This generic version
+// is present to satisfy the Descriptor interface.
 func (od *OneOfDescriptor) GetOptions() proto.Message {
 	return od.proto.GetOptions()
 }
 
+// GetOneOfOptions returns the one-of's options.
 func (od *OneOfDescriptor) GetOneOfOptions() *dpb.OneofOptions {
 	return od.proto.GetOptions()
 }
 
+// GetSourceInfo returns source info for the one-of, if present in the
+// descriptor. Not all descriptors will contain source info. If non-nil, the
+// returned info contains information about the location in the file where the
+// one-of was defined and also contains comments associated with the one-of
+// definition.
 func (od *OneOfDescriptor) GetSourceInfo() *dpb.SourceCodeInfo_Location {
-	return od.sourceInfo
+	return od.file.sourceInfo.Get(od.sourceInfoPath)
 }
 
+// AsProto returns the underlying descriptor proto. Most usages will be more
+// interested in AsOneofDescriptorProto, which has a concrete return type. This
+// generic version is present to satisfy the Descriptor interface.
 func (od *OneOfDescriptor) AsProto() proto.Message {
 	return od.proto
 }
 
+// AsOneofDescriptorProto returns the underlying descriptor proto.
 func (od *OneOfDescriptor) AsOneofDescriptorProto() *dpb.OneofDescriptorProto {
 	return od.proto
 }
 
+// String returns the underlying descriptor proto, in compact text format.
 func (od *OneOfDescriptor) String() string {
 	return od.proto.String()
 }
@@ -1541,20 +1582,6 @@ func (od *OneOfDescriptor) GetChoices() []*FieldDescriptor {
 	return od.choices
 }
 
-func pathAsKey(path []int32) string {
-	var b bytes.Buffer
-	first := true
-	for _, i := range path {
-		if first {
-			first = false
-		} else {
-			b.WriteByte(',')
-		}
-		fmt.Fprintf(&b, "%d", i)
-	}
-	return string(b.Bytes())
-}
-
 // scope represents a lexical scope in a proto file in which messages and enums
 // can be declared.
 type scope func(string) Descriptor
@@ -1563,7 +1590,7 @@ func fileScope(fd *FileDescriptor) scope {
 	// we search symbols in this file, but also symbols in other files that have
 	// the same package as this file or a "parent" package (in protobuf,
 	// packages are a hierarchy like C++ namespaces)
-	prefixes := CreatePrefixList(fd.proto.GetPackage())
+	prefixes := internal.CreatePrefixList(fd.proto.GetPackage())
 	return func(name string) Descriptor {
 		for _, prefix := range prefixes {
 			n := merge(prefix, name)
@@ -1603,7 +1630,7 @@ func resolve(fd *FileDescriptor, name string, scopes []scope) (Descriptor, error
 			}
 		}
 	}
-	return nil, fmt.Errorf("File %q included an unresolvable reference to %q", fd.proto.GetName(), name)
+	return nil, fmt.Errorf("file %q included an unresolvable reference to %q", fd.proto.GetName(), name)
 }
 
 func findSymbol(fd *FileDescriptor, name string, public bool) Descriptor {
@@ -1636,292 +1663,4 @@ func merge(a, b string) string {
 	} else {
 		return a + "." + b
 	}
-}
-
-var (
-	cacheMu       sync.RWMutex
-	filesCache    = map[string]*FileDescriptor{}
-	messagesCache = map[string]*MessageDescriptor{}
-	enumCache     = map[reflect.Type]*EnumDescriptor{}
-)
-
-// LoadFileDescriptor creates a file descriptor using the bytes returned by
-// proto.FileDescriptor. Descriptors are cached so that they do not need to be
-// re-processed if the same file is fetched again later.
-func LoadFileDescriptor(file string) (*FileDescriptor, error) {
-	f := getFileFromCache(file)
-	if f != nil {
-		return f, nil
-	}
-	cacheMu.Lock()
-	defer cacheMu.Unlock()
-	return loadFileDescriptorLocked(file)
-}
-
-func loadFileDescriptorLocked(file string) (*FileDescriptor, error) {
-	f := filesCache[file]
-	if f != nil {
-		return f, nil
-	}
-	fd, err := internal.LoadFileDescriptor(file)
-	if err != nil {
-		return nil, err
-	}
-
-	f, err = toFileDescriptorLocked(fd)
-	if err != nil {
-		return nil, err
-	}
-	putCacheLocked(file, f)
-	return f, nil
-}
-
-func toFileDescriptorLocked(fd *dpb.FileDescriptorProto) (*FileDescriptor, error) {
-	deps := make([]*FileDescriptor, len(fd.GetDependency()))
-	for i, dep := range fd.GetDependency() {
-		var err error
-		deps[i], err = loadFileDescriptorLocked(dep)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return CreateFileDescriptor(fd, deps...)
-}
-
-func getFileFromCache(file string) *FileDescriptor {
-	cacheMu.RLock()
-	defer cacheMu.RUnlock()
-	return filesCache[file]
-}
-
-func putCacheLocked(filename string, fd *FileDescriptor) {
-	filesCache[filename] = fd
-	putMessageCacheLocked(fd.messages)
-}
-
-func putMessageCacheLocked(mds []*MessageDescriptor) {
-	for _, md := range mds {
-		messagesCache[md.fqn] = md
-		putMessageCacheLocked(md.nested)
-	}
-}
-
-// interface implemented by generated messages, which all have a Descriptor() method in
-// addition to the methods of proto.Message
-type protoMessage interface {
-	proto.Message
-	Descriptor() ([]byte, []int)
-}
-
-// LoadMessageDescriptor loads descriptor using the encoded descriptor proto returned by
-// Message.Descriptor() for the given message type. If the given type is not recognized,
-// then a nil descriptor is returned.
-func LoadMessageDescriptor(message string) (*MessageDescriptor, error) {
-	m := getMessageFromCache(message)
-	if m != nil {
-		return m, nil
-	}
-
-	pt := proto.MessageType(message)
-	if pt == nil {
-		return nil, nil
-	}
-	msg, err := messageFromType(pt)
-	if err != nil {
-		return nil, err
-	}
-
-	cacheMu.Lock()
-	defer cacheMu.Unlock()
-	return loadMessageDescriptorForTypeLocked(message, msg)
-}
-
-// LoadMessageDescriptorForType loads descriptor using the encoded descriptor proto returned
-// by message.Descriptor() for the given message type. If the given type is not recognized,
-// then a nil descriptor is returned.
-func LoadMessageDescriptorForType(messageType reflect.Type) (*MessageDescriptor, error) {
-	m, err := messageFromType(messageType)
-	if err != nil {
-		return nil, err
-	}
-	return LoadMessageDescriptorForMessage(m)
-}
-
-// LoadMessageDescriptorForMessage loads descriptor using the encoded descriptor proto
-// returned by message.Descriptor(). If the given type is not recognized, then a nil
-// descriptor is returned.
-func LoadMessageDescriptorForMessage(message proto.Message) (*MessageDescriptor, error) {
-	name := proto.MessageName(message)
-	if name == "" {
-		return nil, nil
-	}
-	m := getMessageFromCache(name)
-	if m != nil {
-		return m, nil
-	}
-
-	cacheMu.Lock()
-	defer cacheMu.Unlock()
-	return loadMessageDescriptorForTypeLocked(name, message.(protoMessage))
-}
-
-func messageFromType(mt reflect.Type) (protoMessage, error) {
-	if mt.Kind() != reflect.Ptr {
-		mt = reflect.PtrTo(mt)
-	}
-	m, ok := reflect.Zero(mt).Interface().(protoMessage)
-	if !ok {
-		return nil, fmt.Errorf("failed to create message from type: %v", mt)
-	}
-	return m, nil
-}
-
-func loadMessageDescriptorForTypeLocked(name string, message protoMessage) (*MessageDescriptor, error) {
-	m := messagesCache[name]
-	if m != nil {
-		return m, nil
-	}
-
-	fdb, _ := message.Descriptor()
-	fd, err := internal.DecodeFileDescriptor(name, fdb)
-	if err != nil {
-		return nil, err
-	}
-
-	f, err := toFileDescriptorLocked(fd)
-	if err != nil {
-		return nil, err
-	}
-	putCacheLocked(fd.GetName(), f)
-	return f.FindSymbol(name).(*MessageDescriptor), nil
-}
-
-func getMessageFromCache(message string) *MessageDescriptor {
-	cacheMu.RLock()
-	defer cacheMu.RUnlock()
-	return messagesCache[message]
-}
-
-// interface implemented by all generated enums
-type protoEnum interface {
-	EnumDescriptor() ([]byte, []int)
-}
-
-// NB: There is no LoadEnumDescriptor that takes a fully-qualified enum name because
-// it is not useful since protoc-gen-go does not expose the name anywhere in generated
-// code or register it in a way that is it accessible for reflection code. This also
-// means we have to cache enum descriptors differently -- we can only cache them as
-// they are requested, as opposed to caching all enum types whenever a file descriptor
-// is cached. This is because we need to know the generated type of the enums, and we
-// don't know that at the time of caching file descriptors.
-
-// LoadEnumDescriptorForType loads descriptor using the encoded descriptor proto returned
-// by enum.EnumDescriptor() for the given enum type.
-func LoadEnumDescriptorForType(enumType reflect.Type) (*EnumDescriptor, error) {
-	// we cache descriptors using non-pointer type
-	if enumType.Kind() == reflect.Ptr {
-		enumType = enumType.Elem()
-	}
-	e := getEnumFromCache(enumType)
-	if e != nil {
-		return e, nil
-	}
-	enum, err := enumFromType(enumType)
-	if err != nil {
-		return nil, err
-	}
-
-	cacheMu.Lock()
-	defer cacheMu.Unlock()
-	return loadEnumDescriptorForTypeLocked(enumType, enum)
-}
-
-// LoadEnumDescriptorForEnum loads descriptor using the encoded descriptor proto
-// returned by enum.EnumDescriptor().
-func LoadEnumDescriptorForEnum(enum protoEnum) (*EnumDescriptor, error) {
-	et := reflect.TypeOf(enum)
-	// we cache descriptors using non-pointer type
-	if et.Kind() == reflect.Ptr {
-		et = et.Elem()
-		enum = reflect.Zero(et).Interface().(protoEnum)
-	}
-	e := getEnumFromCache(et)
-	if e != nil {
-		return e, nil
-	}
-
-	cacheMu.Lock()
-	defer cacheMu.Unlock()
-	return loadEnumDescriptorForTypeLocked(et, enum)
-}
-
-func enumFromType(et reflect.Type) (protoEnum, error) {
-	if et.Kind() != reflect.Int32 {
-		et = reflect.PtrTo(et)
-	}
-	e, ok := reflect.Zero(et).Interface().(protoEnum)
-	if !ok {
-		return nil, fmt.Errorf("failed to create enum from type: %v", et)
-	}
-	return e, nil
-}
-
-func loadEnumDescriptorForTypeLocked(et reflect.Type, enum protoEnum) (*EnumDescriptor, error) {
-	e := enumCache[et]
-	if e != nil {
-		return e, nil
-	}
-
-	fdb, path := enum.EnumDescriptor()
-	name := fmt.Sprintf("%v", et)
-	fd, err := internal.DecodeFileDescriptor(name, fdb)
-	if err != nil {
-		return nil, err
-	}
-	// see if we already have cached "rich" descriptor
-	f, ok := filesCache[fd.GetName()]
-	if !ok {
-		f, err = toFileDescriptorLocked(fd)
-		if err != nil {
-			return nil, err
-		}
-		putCacheLocked(fd.GetName(), f)
-	}
-
-	ed := findEnum(f, path)
-	enumCache[et] = ed
-	return ed, nil
-}
-
-func getEnumFromCache(et reflect.Type) *EnumDescriptor {
-	cacheMu.RLock()
-	defer cacheMu.RUnlock()
-	return enumCache[et]
-}
-
-func findEnum(fd *FileDescriptor, path []int) *EnumDescriptor {
-	if len(path) == 1 {
-		return fd.GetEnumTypes()[path[0]]
-	}
-	md := fd.GetMessageTypes()[path[0]]
-	for _, i := range path[1 : len(path)-1] {
-		md = md.GetNestedMessageTypes()[i]
-	}
-	return md.GetNestedEnumTypes()[path[len(path)-1]]
-}
-
-// LoadFieldDescriptorForExtension loads the field descriptor that corresponds to the given
-// extension description.
-func LoadFieldDescriptorForExtension(ext *proto.ExtensionDesc) (*FieldDescriptor, error) {
-	file, err := LoadFileDescriptor(ext.Filename)
-	if err != nil {
-		return nil, err
-	}
-	field, ok := file.FindSymbol(ext.Name).(*FieldDescriptor)
-	// make sure descriptor agrees with attributes of the ExtensionDesc
-	if !ok || !field.IsExtension() || field.GetOwner().GetFullyQualifiedName() != proto.MessageName(ext.ExtendedType) ||
-		field.GetNumber() != ext.Field {
-		return nil, fmt.Errorf("File descriptor contained unexpected object with name %s:", ext.Name)
-	}
-	return field, nil
 }

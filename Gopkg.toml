@@ -207,7 +207,7 @@ required = [
 # automate-grpc
 [[constraint]]
   name = "github.com/jhump/protoreflect"
-  branch = "master"
+  version = "1.5.0"
 
 [[constraint]]
   branch = "master"

@@ -2,6 +2,7 @@ package protoparse
 
 import (
 	dpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
+	// link in packages that include the standard protos included with protoc
 	_ "github.com/golang/protobuf/protoc-gen-go/plugin"
 	_ "github.com/golang/protobuf/ptypes/any"
 	_ "github.com/golang/protobuf/ptypes/duration"
@@ -41,8 +42,9 @@ func init() {
 	standardImports = map[string]*dpb.FileDescriptorProto{}
 	for _, fn := range standardFilenames {
 		fd, err := internal.LoadFileDescriptor(fn)
-		if err == nil {
-			standardImports[fn] = fd
+		if err != nil {
+			panic(err.Error())
 		}
+		standardImports[fn] = fd
 	}
 }
