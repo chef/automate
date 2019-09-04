@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"os/exec"
 	"strings"
 	"time"
@@ -79,12 +80,12 @@ func run(_ *cobra.Command, args []string) error {
 
 	habPath, err := exec.LookPath("hab")
 	if err != nil {
-		errors.Wrap(err, "could not find hab in path")
+		return errors.Wrap(err, "could not find hab in path")
 	}
 
 	habVer, err := command.Output("hab", command.Args("--version"))
 	if err != nil {
-		errors.Wrap(err, "could not get hab version")
+		return errors.Wrap(err, "could not get hab version")
 	}
 
 	logrus.Info("Starting reproduction attempt for habitat/habitat#6252")
@@ -149,7 +150,7 @@ func tryCommand(log *logrus.Entry, t target.Target, habPkg *habpkg.HabPkg, doneC
 		log.Warnf("POSSIBLE REPRODUCTION! hab command running for more than %s, stopping other threads and waiting", warnThreshold)
 		close(doneChan)
 		<-commandDoneChan
-		log.Warn("FALSE ALARM :(")
+		log.Warn("hab exited")
 		timer.Stop()
 	}
 }
@@ -157,7 +158,11 @@ func tryCommand(log *logrus.Entry, t target.Target, habPkg *habpkg.HabPkg, doneC
 func runCommand(log *logrus.Entry, t target.Target, habPkg *habpkg.HabPkg) chan struct{} {
 	doneChan := make(chan struct{})
 	go func() {
-		_, err := t.IsInstalled(habPkg)
+		// NOTE(ssd) 2019-09-04: The default timeout is now 1
+		// minute, so this will always get killed. But since
+		// we only need this tool to verify the fix now, it's
+		// fine.
+		_, err := t.IsInstalled(context.Background(), habPkg)
 		if err != nil {
 			log.WithError(err).Error("IsInstalled failed!")
 		}
