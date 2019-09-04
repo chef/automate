@@ -55,7 +55,7 @@ type ChainWorkflowExecutor struct {
 	executors []cereal.WorkflowExecutor
 }
 
-// ChainWorkflowTaskParam is a struct that is appened to any enqueued tasks.
+// ChainWorkflowTaskParam is a struct that is appended to any enqueued tasks.
 // This allows us to know which subworkflow to call when the task completes.
 // This also drives the requirement that the task parameters are either a
 // struct or nil.

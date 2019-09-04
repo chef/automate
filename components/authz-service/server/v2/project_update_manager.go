@@ -176,12 +176,12 @@ func RegisterCerealProjectUpdateManager(manager *cereal.Manager, log logger.Logg
 		return nil, err
 	}
 
-	applyStagedRuelsTaskExecutor := &ApplyStagedRulesTaskExecutor{
+	applyStagedRulesTaskExecutor := &ApplyStagedRulesTaskExecutor{
 		store:           s,
 		policyRefresher: pr,
 		log:             log,
 	}
-	if err := manager.RegisterTaskExecutor(ApplyStagedRulesTaskName, applyStagedRuelsTaskExecutor,
+	if err := manager.RegisterTaskExecutor(ApplyStagedRulesTaskName, applyStagedRulesTaskExecutor,
 		cereal.TaskExecutorOpts{Workers: 1}); err != nil {
 
 	}
