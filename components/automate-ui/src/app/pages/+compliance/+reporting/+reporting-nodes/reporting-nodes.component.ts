@@ -10,6 +10,7 @@ import {
   ReportQueryService,
   ReportDataService,
   ReportQuery } from '../../shared/reporting';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-reporting-nodes',
@@ -33,7 +34,9 @@ export class ReportingNodesComponent implements OnInit, OnDestroy {
   constructor(
     private statsService: StatsService,
     public reportQuery: ReportQueryService,
-    public reportData: ReportDataService
+    public reportData: ReportDataService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
@@ -102,13 +105,35 @@ export class ReportingNodesComponent implements OnInit, OnDestroy {
   }
 
   addFilter(node) {
-    const filter = {type: {name: 'node_id'}, value: {...node, text: node.name}};
-    this.reportQuery.addFilter(filter);
+    const typeName = 'node_id';
+
+    this.reportQuery.setFilterTitle(typeName, node.id, node.name);
+
+    const {queryParamMap} = this.route.snapshot;
+    const queryParams = {...this.route.snapshot.queryParams};
+    const existingValues = queryParamMap.getAll(typeName).filter(
+      v => v !== node.id).concat(node.id);
+
+    queryParams[typeName] = existingValues;
+
+    this.router.navigate([], {queryParams});
   }
 
   removeFilter(node) {
     const filter = this.filterFor(node);
-    this.reportQuery.removeFilter(filter);
+    const typeName = filter.type.name;
+
+    const {queryParamMap} = this.route.snapshot;
+    const queryParams = {...this.route.snapshot.queryParams};
+    const values = queryParamMap.getAll(typeName).filter(v => v !== filter.value.id);
+
+    if (values.length === 0) {
+      delete queryParams[typeName];
+    } else {
+      queryParams[typeName] = values;
+    }
+
+    this.router.navigate([], {queryParams});
   }
 
   getData(filters) {

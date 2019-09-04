@@ -8,6 +8,7 @@ import { StatsService, ReportQueryService, ReportDataService,
   ReportQuery } from '../../shared/reporting';
 import { ChefSessionService } from '../../../../services/chef-session/chef-session.service';
 import * as moment from 'moment';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-reporting-profiles',
@@ -32,7 +33,9 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
     private statsService: StatsService,
     private chefSessionService: ChefSessionService,
     public reportQuery: ReportQueryService,
-    public reportData: ReportDataService
+    public reportData: ReportDataService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
@@ -72,7 +75,7 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
 
   filterFor(profile) {
     return this.reportQuery.getReportQuery().filters.filter(f => {
-      return f.type && f.type.name === 'profile' && f.value.id === profile.id;
+      return f.type && f.type.name === 'profile_id' && f.value.id === profile.id;
     })[0];
   }
 
@@ -81,13 +84,36 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
   }
 
   addFilter(profile) {
-    const filter = {type: {name: 'profile'}, value: {...profile, text: profile.name}};
-    this.reportQuery.addFilter(filter);
+    const typeName = 'profile_id';
+    const title = `${profile.title}, v${profile.version}`;
+
+    this.reportQuery.setFilterTitle(typeName, profile.id, title);
+
+    const {queryParamMap} = this.route.snapshot;
+    const queryParams = {...this.route.snapshot.queryParams};
+    const existingValues = queryParamMap.getAll(typeName).filter(
+      v => v !== profile.id).concat(profile.id);
+
+    queryParams[typeName] = existingValues;
+
+    this.router.navigate([], {queryParams});
   }
 
   removeFilter(profile) {
     const filter = this.filterFor(profile);
-    this.reportQuery.removeFilter(filter);
+    const typeName = filter.type.name;
+
+    const {queryParamMap} = this.route.snapshot;
+    const queryParams = {...this.route.snapshot.queryParams};
+    const values = queryParamMap.getAll(typeName).filter(v => v !== filter.value.id);
+
+    if (values.length === 0) {
+      delete queryParams[typeName];
+    } else {
+      queryParams[typeName] = values;
+    }
+
+    this.router.navigate([], {queryParams});
   }
 
   getData(reportQuery: ReportQuery) {

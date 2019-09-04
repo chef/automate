@@ -215,7 +215,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
       reportQuery.filters.map(filter => {
         filter.value.id = filter.value.text;
         if (['profile_id', 'node_id', 'control_id'].indexOf(filter.type.name) >= 0) {
-          const name = this.getFilterTitle(filter.type.name, filter.value.id);
+          const name = this.reportQuery.getFilterTitle(filter.type.name, filter.value.id);
           if (name !== undefined) {
             filter.value.text = name;
           }
@@ -313,7 +313,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
       if ( value.id ) {
         typeName = 'profile_id';
         filterValue = value.id;
-        this.setFilterTitle(typeName, value.id, value.title);
+        this.reportQuery.setFilterTitle(typeName, value.id, value.title);
       } else {
         typeName = 'profile_name';
       }
@@ -321,7 +321,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
       if ( value.id ) {
         typeName = 'node_id';
         filterValue = value.id;
-        this.setFilterTitle(typeName, value.id, value.title);
+        this.reportQuery.setFilterTitle(typeName, value.id, value.title);
       } else {
         typeName = 'node_name';
       }
@@ -329,7 +329,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
       if ( value.id ) {
         typeName = 'control_id';
         filterValue = value.id;
-        this.setFilterTitle(typeName, value.id, value.title);
+        this.reportQuery.setFilterTitle(typeName, value.id, value.title);
       } else {
         typeName = 'control_name';
       }
@@ -403,14 +403,6 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
   formatDate(timestamp) {
     return moment(timestamp).format('MMMM Do[,] YYYY');
-  }
-
-  setFilterTitle(type: string, id: string, title: string) {
-    this.idToTitle.set(type + '-' + id, title);
-  }
-
-  getFilterTitle(type: string, id: string): string {
-    return this.idToTitle.get(type + '-' + id);
   }
 
   getSuggestions(type: string, text: string, filters: ReportQuery) {

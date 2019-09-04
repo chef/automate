@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import * as moment from 'moment';
 import { FilterC } from '../../+reporting/types';
-import { find, uniqWith, isEqual } from 'lodash';
 
 export interface ReportQuery {
   startDate: Date;
@@ -30,6 +29,8 @@ export class ReportQueryService {
       moment(endDate).subtract(1, 'years').toDate()}
   ];
 
+  private idToTitle: Map<string, string> = new Map<string, string>();
+
   state: BehaviorSubject<ReportQuery> = new BehaviorSubject(this.initialReportQueryState());
 
   private initialReportQueryState() {
@@ -50,66 +51,15 @@ export class ReportQueryService {
     this.state.next(newState);
   }
 
-  addFilter(filter: FilterC) {
-    const currentState = this.getReportQuery();
-
-    currentState.filters = this.dedupFilters(currentState.filters, filter);
-
-    this.state.next(currentState);
-  }
-
-  removeFilter(filter: FilterC) {
-    const currentState = this.getReportQuery();
-    currentState.filters.splice(currentState.filters.indexOf(filter), 1);
-
-    this.state.next(currentState);
-  }
-
-  dedupFilters(filters: FilterC[], filter: FilterC) {
-    // this is needed because the node and profile objects are slightly
-    // different based on how they were added to the filters list
-    const alreadyFilteredCheckID = find(filters, function(f: FilterC) {
-      if (filter.type.name === 'profile' || filter.type.name === 'node') {
-        if (f.value) {
-          return f.type.name === filter.type.name &&
-            f.value.id === filter.value.id;
-        }
-      }
-    });
-    if (alreadyFilteredCheckID === undefined) {
-      filters.push(filter);
-    }
-
-    return uniqWith(filters, isEqual);
-  }
-
-  setFilters(newFilters: FilterC[]) {
-    const currentState = this.getReportQuery();
-
-    currentState.filters = newFilters;
-
-    this.state.next(currentState);
-  }
-
-  setDateRange(startDate: Date, endDate: Date) {
-    const currentState = this.getReportQuery();
-
-    currentState.startDate = startDate;
-    currentState.endDate = endDate;
-
-    this.state.next(currentState);
-  }
-
   findTimeIntervalStartDate(interval: number, endDate: Date): Date {
     return this.intervals[interval].findStartDate(endDate);
   }
 
-  setInterval(newInterval: number) {
-    const currentState = this.getReportQuery();
+  setFilterTitle(type: string, id: string, title: string) {
+    this.idToTitle.set(type + '-' + id, title);
+  }
 
-    currentState.interval = newInterval;
-    currentState.startDate = this.intervals[newInterval].findStartDate(currentState.endDate);
-
-    this.state.next(currentState);
+  getFilterTitle(type: string, id: string): string {
+    return this.idToTitle.get(type + '-' + id);
   }
 }
