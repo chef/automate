@@ -7,7 +7,6 @@ import {
   ReportDataService,
   ReportQuery
 } from '../../shared/reporting';
-import * as moment from 'moment';
 import { ActivatedRoute, Router } from '@angular/router';
 
 type Tab = 'Node Status' | 'Profile Status';
@@ -97,11 +96,12 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
 
   onTrendIntervalChange(event) {
     const interval = event.target.value;
-    const startDate = this.reportQuery.findTimeIntervalStartDate(interval);
-
     const queryParams = {...this.route.snapshot.queryParams};
-    queryParams['date_interval'] = interval;
-    queryParams['start_time'] = moment(startDate).startOf('day').format();
+    if (interval === '0' ) {
+      delete queryParams['date_interval'];
+    } else {
+      queryParams['date_interval'] = interval;
+    }
 
     this.router.navigate([], {queryParams});
   }

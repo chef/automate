@@ -33,9 +33,10 @@ export class ReportQueryService {
   state: BehaviorSubject<ReportQuery> = new BehaviorSubject(this.initialReportQueryState());
 
   private initialReportQueryState() {
+    const endDate = moment().utc().startOf('day').add(12, 'hours').toDate();
     return {
-      startDate: moment().subtract(10, 'days').toDate(),
-      endDate: new Date(),
+      startDate: this.findTimeIntervalStartDate(0, endDate),
+      endDate: endDate,
       interval: 0,
       filters: []
     };
@@ -99,10 +100,8 @@ export class ReportQueryService {
     this.state.next(currentState);
   }
 
-  findTimeIntervalStartDate(interval: number): Date {
-    const currentState = this.getReportQuery();
-
-    return this.intervals[interval].findStartDate(currentState.endDate);
+  findTimeIntervalStartDate(interval: number, endDate: Date): Date {
+    return this.intervals[interval].findStartDate(endDate);
   }
 
   setInterval(newInterval: number) {

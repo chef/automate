@@ -35,6 +35,24 @@ import { FilterC } from './types';
   providers: [SuggestionsService]
 })
 export class ReportingComponent implements OnInit, OnDestroy {
+  allowedURLFilterTypes = [
+    'chef_server',
+    'chef_tags',
+    'control_id',
+    'control_name',
+    'environment',
+    'inspec_version',
+    'node_id',
+    'node_name',
+    'organization',
+    'platform',
+    'policy_group',
+    'profile_id',
+    'profile_name',
+    'recipe',
+    'role'
+  ];
+
   // Query search bar
   availableFilterTypes = [
     {
@@ -211,43 +229,6 @@ export class ReportingComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  getSuggestions(type, text, filters) {
-    return this.suggestionsService.getSuggestions(type.replace('_id', ''), text, filters).pipe(
-      map(data => {
-        return data.map(item => {
-          let title;
-          // if the item has a version (as in the case of a profile), append
-          // the version to the text so the user knows the version
-          if (item.version) {
-            title = `${item.text}, v${item.version}`;
-          } else {
-            title = item.text;
-          }
-          return Object.assign(item, { title: title });
-        });
-      }),
-      takeUntil(this.isDestroyed)
-    );
-  }
-
-  applyParamFilters(urlFilters: Chicklet[]) {
-    const reportQuery = this.reportQuery.getReportQuery();
-    reportQuery.filters = [];
-    urlFilters.forEach( (filter: Chicklet) => {
-      if (filter.type === 'end_time') {
-        reportQuery.endDate = new Date(filter.text);
-      } else if ( filter.type === 'start_time' ) {
-        reportQuery.startDate = new Date(filter.text);
-      } else if ( filter.type === 'date_interval' ) {
-        reportQuery.interval = parseInt(filter.text, 10);
-      } else {
-        reportQuery.filters.push({ type: { name: filter.type }, value: { text: filter.text } });
-      }
-    });
-
-    this.reportQuery.setState(reportQuery);
-  }
-
   toggleDownloadDropdown() {
     this.downloadOptsVisible = !this.downloadOptsVisible;
   }
@@ -305,11 +286,14 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
   onEndDateChanged(event) {
     const endDate = event.detail;
-    const startDate = this.reportQuery.findTimeIntervalStartDate(endDate);
 
     const queryParams = {...this.route.snapshot.queryParams};
-    queryParams['start_time'] = moment(startDate).startOf('day').format();
-    queryParams['end_time'] = moment(endDate).endOf('day').format();
+
+    if (moment().utc().format('YYYY-MM-DD') === moment(endDate).format('YYYY-MM-DD')) {
+      delete queryParams['end_time'];
+    } else {
+      queryParams['end_time'] = moment(endDate).format('YYYY-MM-DD');
+    }
 
     this.router.navigate([], {queryParams});
   }
@@ -391,10 +375,6 @@ export class ReportingComponent implements OnInit, OnDestroy {
     this.reportData.getReportingSummary(reportQuery);
   }
 
-  getSelectedFilters() {
-    return this.reportQuery.getReportQuery().filters;
-  }
-
   toggleSummary() {
     this.showSummary = !this.showSummary;
   }
@@ -431,5 +411,79 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
   getFilterTitle(type: string, id: string): string {
     return this.idToTitle.get(type + '-' + id);
+  }
+
+  getSuggestions(type: string, text: string, filters: ReportQuery) {
+    return this.suggestionsService.getSuggestions(type.replace('_id', ''), text, filters).pipe(
+      map(data => {
+        return data.map(item => {
+          let title;
+          // if the item has a version (as in the case of a profile), append
+          // the version to the text so the user knows the version
+          if (item.version) {
+            title = `${item.text}, v${item.version}`;
+          } else {
+            title = item.text;
+          }
+          return Object.assign(item, { title: title });
+        });
+      }),
+      takeUntil(this.isDestroyed)
+    );
+  }
+
+  applyParamFilters(urlFilters: Chicklet[]) {
+    const reportQuery = this.reportQuery.getReportQuery();
+
+    reportQuery.filters = urlFilters.filter(
+      (urlParm: Chicklet) => this.allowedURLFilterTypes.indexOf(urlParm.type) >= 0)
+      .map((urlParm: Chicklet) => {
+        return { type: { name: urlParm.type }, value: { text: urlParm.text } };
+      });
+
+    reportQuery.interval = this.getDateInterval(urlFilters);
+    reportQuery.endDate = this.getEndDate(urlFilters);
+    reportQuery.startDate = this.reportQuery.findTimeIntervalStartDate(
+      reportQuery.interval, reportQuery.endDate);
+
+    this.reportQuery.setState(reportQuery);
+  }
+
+  getEndDate(urlFilters: Chicklet[]): Date {
+    const foundFilter = urlFilters.find( (filter: Chicklet) => filter.type === 'end_time');
+
+    if (foundFilter !== undefined) {
+      const endDate = moment(foundFilter.text, 'YYYY-MM-DD');
+      if (endDate.isValid()) {
+        return endDate.utc().startOf('day').add(12, 'hours').toDate();
+      } else {
+        const queryParams = {...this.route.snapshot.queryParams};
+        delete queryParams['end_time'];
+
+        this.router.navigate([], {queryParams});
+      }
+    }
+    return moment().utc().startOf('day').add(12, 'hours').toDate();
+  }
+
+  getDateInterval(urlFilters: Chicklet[]): number {
+    const foundFilter = urlFilters.find( (filter: Chicklet) => filter.type === 'date_interval');
+
+    if (foundFilter === undefined) {
+      return 0;
+    } else {
+      const dateInterval = parseInt(foundFilter.text, 10);
+      if ( !isNaN(dateInterval) && dateInterval >= 0 &&
+        dateInterval < this.reportQuery.intervals.length ) {
+        return dateInterval;
+      } else {
+        const queryParams = {...this.route.snapshot.queryParams};
+        delete queryParams['date_interval'];
+
+        this.router.navigate([], {queryParams});
+      }
+    }
+
+    return 0;
   }
 }
