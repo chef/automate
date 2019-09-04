@@ -79,7 +79,7 @@ describe('TeamDetailsComponent', () => {
             'overridePermissionsCheck']
         }),
         MockComponent({ selector: 'app-user-team-membership-table',
-          inputs: ['usersToFilter', 'users$', 'removeText', 'addButtonText'] }),
+          inputs: ['usersToFilter', 'users', 'removeText', 'addButtonText'] }),
         MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
         MockComponent({ selector: 'chef-breadcrumb', inputs: ['link'] }),
         MockComponent({ selector: 'chef-breadcrumbs' }),
@@ -160,9 +160,7 @@ describe('TeamDetailsComponent', () => {
     });
 
     it('users array should be empty', () => {
-      component.sortedUsers$.subscribe((users) => {
-        expect(users.length).toBe(0);
-      });
+      component.users.length.toEqual(0);
     });
   });
 
@@ -220,7 +218,7 @@ describe('TeamDetailsComponent', () => {
     });
    });
 
-  describe('sortedUsers$', () => {
+  describe('users', () => {
 
     it('intermixes capitals and lowercase with lowercase first', () => {
       store.dispatch(new GetTeamUsersSuccess({ user_ids: ['user-id-1', 'user-id-2'] }));
@@ -228,11 +226,9 @@ describe('TeamDetailsComponent', () => {
         { membership_id: 'user-id-1', name: 'Alice', id: 'alice1' },
         { membership_id: 'user-id-2', name: 'alice', id: 'alice2' }
       ]}));
-      component.sortedUsers$.subscribe(users => {
-        expect(users.length).toBe(2);
-        expect(users[0]).toEqual(jasmine.objectContaining({ name: 'alice' }));
-        expect(users[1]).toEqual(jasmine.objectContaining({ name: 'Alice' }));
-      });
+      expect(component.users.length).toEqual(2);
+      expect(component.users[0]).toEqual(jasmine.objectContaining({ name: 'alice' }));
+      expect(component.users[1]).toEqual(jasmine.objectContaining({ name: 'Alice' }));
     });
 
     it('sorts by whole string before case', () => {
@@ -244,12 +240,10 @@ describe('TeamDetailsComponent', () => {
         { membership_id: 'user-id-20', name: 'alice', id: 'alice2' },
         { membership_id: 'user-id-2', name: 'Alice', id: 'alice3' }
       ]}));
-      component.sortedUsers$.subscribe(users => {
-        expect(users.length).toBe(3);
-        expect(users[0]).toEqual(jasmine.objectContaining({ name: 'alice' }));
-        expect(users[1]).toEqual(jasmine.objectContaining({ name: 'Alice' }));
-        expect(users[2]).toEqual(jasmine.objectContaining({ name: 'alice in wonderland' }));
-      });
+      expect(component.users.length).toEqual(3);
+      expect(component.users[0]).toEqual(jasmine.objectContaining({ name: 'alice' }));
+      expect(component.users[1]).toEqual(jasmine.objectContaining({ name: 'Alice' }));
+      expect(component.users[2]).toEqual(jasmine.objectContaining({ name: 'alice in wonderland' }));
     });
 
     it('sorts by name then by username', () => {
@@ -261,15 +255,13 @@ describe('TeamDetailsComponent', () => {
        { membership_id: 'user-id-1', name: 'Alice in Wonderland', id: 'alice' },
        { membership_id: 'user-id-20', name: 'alice', id: 'the-other-alice' }
      ]}));
-     component.sortedUsers$.subscribe(users => {
-       expect(users.length).toBe(4);
-       expect(users[0]).toEqual(jasmine.objectContaining({ name: 'alice' }));
-       expect(users[1]).toEqual(jasmine.objectContaining({ name: 'Alice in Wonderland' }));
-       expect(users[2]).toEqual(
-         jasmine.objectContaining({ name: 'Bob', id: 'builder2000' }));
-       expect(users[3]).toEqual(
-         jasmine.objectContaining({ name: 'Bob', id: 'builder2001' }));
-     });
+      expect(component.users.length).toEqual(4);
+      expect(component.users[0]).toEqual(jasmine.objectContaining({ name: 'alice' }));
+      expect(component.users[1]).toEqual(jasmine.objectContaining({ name: 'Alice in Wonderland' }));
+      expect(component.users[2]).toEqual(
+        jasmine.objectContaining({ name: 'Bob', id: 'builder2000' }));
+      expect(component.users[3]).toEqual(
+        jasmine.objectContaining({ name: 'Bob', id: 'builder2001' }));
     });
 
     it('uses natural ordering in name', () => {
@@ -282,14 +274,12 @@ describe('TeamDetailsComponent', () => {
         { membership_id: 'user-id-4', name: 'Alice-2', id: 'alice4' },
         { membership_id: 'user-id-5', name: 'alice', id: 'alice5' }
       ]}));
-      component.sortedUsers$.subscribe(users => {
-        expect(users.length).toBe(5);
-        expect(users[0]).toEqual(jasmine.objectContaining({ name: 'alice' }));
-        expect(users[1]).toEqual(jasmine.objectContaining({ name: 'Alice-2' }));
-        expect(users[2]).toEqual(jasmine.objectContaining({ name: 'Alice01' }));
-        expect(users[3]).toEqual(jasmine.objectContaining({ name: 'Alice3' }));
-        expect(users[4]).toEqual(jasmine.objectContaining({ name: 'Alice300' }));
-      });
+      expect(component.users.length).toEqual(5);
+      expect(component.users[0]).toEqual(jasmine.objectContaining({ name: 'alice' }));
+      expect(component.users[1]).toEqual(jasmine.objectContaining({ name: 'Alice-2' }));
+      expect(component.users[2]).toEqual(jasmine.objectContaining({ name: 'Alice01' }));
+      expect(component.users[3]).toEqual(jasmine.objectContaining({ name: 'Alice3' }));
+      expect(component.users[4]).toEqual(jasmine.objectContaining({ name: 'Alice300' }));
     });
 
     it('uses natural ordering in username', () => {
@@ -302,17 +292,15 @@ describe('TeamDetailsComponent', () => {
         { membership_id: 'user-id-4', name: 'Alice', id: 'Alice-2' },
         { membership_id: 'user-id-5', name: 'Alice', id: 'alice' }
       ]}));
-      component.sortedUsers$.subscribe(users => {
-        expect(users.length).toBe(5);
-        expect(users[0]).toEqual(jasmine.objectContaining({ id: 'alice' }));
-        expect(users[1]).toEqual(jasmine.objectContaining({ id: 'Alice-2' }));
-        expect(users[2]).toEqual(jasmine.objectContaining({ id: 'Alice01' }));
-        expect(users[3]).toEqual(jasmine.objectContaining({ id: 'Alice3' }));
-        expect(users[4]).toEqual(jasmine.objectContaining({ id: 'Alice300' }));
-      });
+      expect(component.users.length).toEqual(5);
+      expect(component.users[0]).toEqual(jasmine.objectContaining({ id: 'alice' }));
+      expect(component.users[1]).toEqual(jasmine.objectContaining({ id: 'Alice-2' }));
+      expect(component.users[2]).toEqual(jasmine.objectContaining({ id: 'Alice01' }));
+      expect(component.users[3]).toEqual(jasmine.objectContaining({ id: 'Alice3' }));
+      expect(component.users[4]).toEqual(jasmine.objectContaining({ id: 'Alice300' }));
     });
   });
-
+  
   function genProject(id: string): Project {
     return {
       id,
