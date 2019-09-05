@@ -98,222 +98,217 @@ describe('teams API', () => {
     });
 
     describe('POST /apis/iam/v2beta/teams', () => {
-      it('admin can create a new team with no projects', () => {
-        cy.request({ ...defaultAdminReq,
-            method: 'POST',
-            body: teamWithProjects(teamID, [])
-        }).then((response) => {
-            expect(response.body.team.projects).to.have.length(0);
+      context('both superadmin and project1 admin can', () => {
+        const scenarios = [
+          {req: defaultNonAdminReq, id: 'project-1-admin'},
+          {req: defaultAdminReq, id: 'superadmin'}
+        ];
+
+        scenarios.forEach((scenario) => {
+          it(`${scenario.id} can create a new team with no projects`, () => {
+            cy.request({ ...scenario.req,
+                method: 'POST',
+                body: teamWithProjects(teamID, [])
+            }).then((response) => {
+                expect(response.body.team.projects).to.have.length(0);
+            });
+          });
+
+          it(`${scenario.id} cannot create a team with a project that does not exist (404)`, () => {
+            cy.request({ ...scenario.req,
+                method: 'POST',
+                failOnStatusCode: false,
+                body: teamWithProjects(teamID, [project1.id, project2.id, 'notfound'])
+            }).then((response) => {
+                expect(response.status).to.equal(404);
+            });
+          });
+
+          it(`${scenario.id} can create a team with project1`, () => {
+            cy.request({ ...scenario.req,
+                method: 'POST',
+                body: teamWithProjects(teamID, [project1.id])
+            }).then((response) => {
+                expect(response.body.team.projects).to.have.length(1);
+            });
+          });
         });
       });
 
-      it('admin can create a new team with multiple projects', () => {
-        cy.request({ ...defaultAdminReq,
-            method: 'POST',
-            body: teamWithProjects(teamID, [project1.id, project2.id])
-        }).then((response) => {
-            expect(response.body.team.projects).to.have.length(2);
+      context('superadmin', () => {
+        it('can create a new team with projects other than project1', () => {
+          cy.request({ ...defaultAdminReq,
+              method: 'POST',
+              body: teamWithProjects(teamID, [project1.id, project2.id])
+          }).then((response) => {
+              expect(response.body.team.projects).to.have.length(2);
+          });
         });
       });
 
-      it('admin gets a 404 when it attempts to create ' +
-         'a team with a project that does not exist', () => {
-        cy.request({ ...defaultAdminReq,
-            method: 'POST',
-            failOnStatusCode: false,
-            body: teamWithProjects(teamID, [project1.id, project2.id, 'notfound'])
-        }).then((response) => {
-            expect(response.status).to.equal(404);
-        });
-      });
-
-      it('non-admin with project1 assignment access can create a new team ' +
-      'with no projects', () => {
-        cy.request({ ...defaultNonAdminReq,
-            method: 'POST',
-            body: teamWithProjects(teamID, [])
-        }).then((response) => {
-            expect(response.body.team.projects).to.have.length(0);
-        });
-      });
-
-      it('non-admin with project1 assignment access can create ' +
-      'a new team with project1', () => {
-        cy.request({ ...defaultNonAdminReq,
-            method: 'POST',
-            body: teamWithProjects(teamID, [project1.id])
-        }).then((response) => {
-            expect(response.body.team.projects).to.have.length(1);
-        });
-      });
-
-      it('non-admin with project1 assignment access gets a 404 when it attempts to create ' +
-      'a team with a project that does not exist', () => {
-        cy.request({ ...defaultNonAdminReq,
-            method: 'POST',
-            failOnStatusCode: false,
-            body: teamWithProjects(teamID,
-              [project1.id, project2.id, 'notfound'])
-        }).then((response) => {
-            expect(response.status).to.equal(404);
-        });
-      });
-
-      it('non-admin with project1 assignment access cannot create ' +
-      'a new team with other projects (403)', () => {
-        cy.request({ ...defaultNonAdminReq,
-            method: 'POST',
-            failOnStatusCode: false,
-            body: teamWithProjects(teamID, [project1.id, project2.id])
-        }).then((response) => {
-            expect(response.status).to.equal(403);
+      context('project1 admin', () => {
+        it('cannot create a team with projects other than project1 (403)', () => {
+          cy.request({ ...defaultNonAdminReq,
+              method: 'POST',
+              failOnStatusCode: false,
+              body: teamWithProjects(teamID, [project1.id, project2.id])
+          }).then((response) => {
+              expect(response.status).to.equal(403);
+          });
         });
       });
     });
 
     describe('PUT /apis/iam/v2beta/teams', () => {
-      it('admin can update a team with no projects to have projects', () => {
-        cy.request({ ...defaultAdminReq,
-            method: 'POST',
-            body: teamWithProjects(teamID, [])
-        }).then((response) => {
-            expect(response.body.team.projects).to.have.length(0);
-        });
+      context('both superadmin and project1 admin can', () => {
+        const scenarios = [
+          {req: defaultNonAdminReq, id: 'project-1-admin'},
+          {req: defaultAdminReq, id: 'superadmin'}
+        ];
 
-        cy.request({ ...defaultAdminReq,
-            method: 'PUT',
-            url: `/apis/iam/v2beta/teams/${teamID}`,
-            body: teamWithProjects(teamID, [project1.id, project2.id])
-        }).then((response) => {
-            expect(response.body.team.projects).to.have.length(2);
-        });
-      });
+        scenarios.forEach((scenario) => {
+          it(`${scenario.id} can update a team with no projects to have project1`, () => {
+            cy.request({ ...defaultAdminReq,
+                method: 'POST',
+                body: teamWithProjects(teamID, [])
+            }).then((response) => {
+                expect(response.body.team.projects).to.have.length(0);
+            });
 
-      it('admin can update a team with projects to have no projects', () => {
-        cy.request({ ...defaultAdminReq,
-            method: 'POST',
-            body: teamWithProjects(teamID, [project1.id, project2.id])
-        }).then((response) => {
-            expect(response.body.team.projects).to.have.length(2);
-        });
+            cy.request({ ...scenario.req,
+                method: 'PUT',
+                url: `/apis/iam/v2beta/teams/${teamID}`,
+                body: teamWithProjects(teamID, [project1.id])
+            }).then((response) => {
+                expect(response.body.team.projects).to.have.length(1);
+            });
+          });
 
-        cy.request({ ...defaultAdminReq,
-            method: 'PUT',
-            url: `/apis/iam/v2beta/teams/${teamID}`,
-            body: teamWithProjects(teamID, [])
-        }).then((response) => {
-            expect(response.body.team.projects).to.have.length(0);
-        });
-      });
+          it(`${scenario.id} can update a team to remove project1`, () => {
+            cy.request({ ...defaultAdminReq,
+                method: 'POST',
+                body: teamWithProjects(teamID, [project1.id, project2.id])
+            }).then((response) => {
+                expect(response.body.team.projects).to.have.length(2);
+            });
 
-      it('admin cannot update a team to have projects that do not exist', () => {
-        cy.request({ ...defaultAdminReq,
-            method: 'POST',
-            body: teamWithProjects(teamID, [])
-        }).then((response) => {
-            expect(response.body.team.projects).to.have.length(0);
-        });
+            cy.request({ ...scenario.req,
+                method: 'PUT',
+                url: `/apis/iam/v2beta/teams/${teamID}`,
+                body: teamWithProjects(teamID, [project2.id])
+            }).then((response) => {
+                expect(response.body.team.projects).to.have.length(1);
+            });
+          });
 
-        cy.request({ ...defaultAdminReq,
-            method: 'PUT',
-            url: `/apis/iam/v2beta/teams/${teamID}`,
-            failOnStatusCode: false,
-            body: teamWithProjects(teamID, [project1.id, 'notfound'])
-        }).then((response) => {
-            expect(response.status).to.equal(404);
-        });
-      });
+          it(`${scenario.id} can update a team to remove project1`, () => {
+            cy.request({ ...defaultAdminReq,
+                method: 'POST',
+                body: teamWithProjects(teamID, [project1.id])
+            }).then((response) => {
+                expect(response.body.team.projects).to.have.length(1);
+            });
 
-      it('non-admin with project1 assignment access can update ' +
-      'a team with no projects to have project1', () => {
-        cy.request({ ...defaultAdminReq,
-            method: 'POST',
-            body: teamWithProjects(teamID, [])
-        }).then((response) => {
-            expect(response.body.team.projects).to.have.length(0);
-        });
+            cy.request({ ...scenario.req,
+                method: 'PUT',
+                url: `/apis/iam/v2beta/teams/${teamID}`,
+                body: teamWithProjects(teamID, [])
+            }).then((response) => {
+                expect(response.body.team.projects).to.have.length(0);
+            });
+          });
 
-        cy.request({ ...defaultNonAdminReq,
-            method: 'PUT',
-            url: `/apis/iam/v2beta/teams/${teamID}`,
-            body: teamWithProjects(teamID, [project1.id])
-        }).then((response) => {
-            expect(response.body.team.projects).to.have.length(1);
-        });
-      });
+          it(`${scenario.id} cannot update a team to have projects that do not exist (404)`, () => {
+            cy.request({ ...defaultAdminReq,
+                method: 'POST',
+                body: teamWithProjects(teamID, [])
+            }).then((response) => {
+                expect(response.body.team.projects).to.have.length(0);
+            });
 
-      it('non-admin with project1 assignment access can update ' +
-      'a team to remove project1', () => {
-        cy.request({ ...defaultAdminReq,
-            method: 'POST',
-            body: teamWithProjects(teamID, [project1.id])
-        }).then((response) => {
-            expect(response.body.team.projects).to.have.length(1);
-        });
-
-        cy.request({ ...defaultNonAdminReq,
-            method: 'PUT',
-            url: `/apis/iam/v2beta/teams/${teamID}`,
-            body: teamWithProjects(teamID, [])
-        }).then((response) => {
-            expect(response.body.team.projects).to.have.length(0);
+            cy.request({ ...scenario.req,
+                method: 'PUT',
+                url: `/apis/iam/v2beta/teams/${teamID}`,
+                failOnStatusCode: false,
+                body: teamWithProjects(teamID, [project1.id, 'notfound'])
+            }).then((response) => {
+                expect(response.status).to.equal(404);
+            });
+          });
         });
       });
 
-      it('non-admin with project1 assignment access gets a 404 ' +
-      'when updating a team to have non-existent teams', () => {
-        cy.request({ ...defaultAdminReq,
-            method: 'POST',
-            body: teamWithProjects(teamID, [])
-        }).then((response) => {
-            expect(response.body.team.projects).to.have.length(0);
+      context('superadmin', () => {
+        it('can update a team with no projects to have projects other than project1', () => {
+          cy.request({ ...defaultAdminReq,
+              method: 'POST',
+              body: teamWithProjects(teamID, [])
+          }).then((response) => {
+              expect(response.body.team.projects).to.have.length(0);
+          });
+
+          cy.request({ ...defaultAdminReq,
+              method: 'PUT',
+              url: `/apis/iam/v2beta/teams/${teamID}`,
+              body: teamWithProjects(teamID, [project1.id, project2.id])
+          }).then((response) => {
+              expect(response.body.team.projects).to.have.length(2);
+          });
         });
 
-        cy.request({ ...defaultNonAdminReq,
-            method: 'PUT',
-            url: `/apis/iam/v2beta/teams/${teamID}`,
-            failOnStatusCode: false,
-            body: teamWithProjects(teamID, [project1.id, 'notfound'])
-        }).then((response) => {
-            expect(response.status).to.equal(404);
-        });
-      });
+        it('can update a team with projects other than project1 to have no projects', () => {
+          cy.request({ ...defaultAdminReq,
+              method: 'POST',
+              body: teamWithProjects(teamID, [project1.id, project2.id])
+          }).then((response) => {
+              expect(response.body.team.projects).to.have.length(2);
+          });
 
-      it('non-admin with project1 assignment access cannot update ' +
-      'a team with no projects to have other projects', () => {
-        cy.request({ ...defaultAdminReq,
-            method: 'POST',
-            body: teamWithProjects(teamID, [])
-        }).then((response) => {
-            expect(response.body.team.projects).to.have.length(0);
-        });
-
-        cy.request({ ...defaultNonAdminReq,
-            method: 'PUT',
-            url: `/apis/iam/v2beta/teams/${teamID}`,
-            failOnStatusCode: false,
-            body: teamWithProjects(teamID, [project1.id, project2.id])
-        }).then((response) => {
-            expect(response.status).to.equal(403);
+          cy.request({ ...defaultAdminReq,
+              method: 'PUT',
+              url: `/apis/iam/v2beta/teams/${teamID}`,
+              body: teamWithProjects(teamID, [])
+          }).then((response) => {
+              expect(response.body.team.projects).to.have.length(0);
+          });
         });
       });
 
-      it('non-admin with project1 assignment access cannot update ' +
-      'a team to remove other projects', () => {
-        cy.request({ ...defaultAdminReq,
-            method: 'POST',
-            body: teamWithProjects(teamID, [project1.id, project2.id])
-        }).then((response) => {
-            expect(response.body.team.projects).to.have.length(2);
+      context('project1 admin', () => {
+        it('cannot update a team to add projects other than project1 (403)', () => {
+          cy.request({ ...defaultAdminReq,
+              method: 'POST',
+              body: teamWithProjects(teamID, [])
+          }).then((response) => {
+              expect(response.body.team.projects).to.have.length(0);
+          });
+
+          cy.request({ ...defaultNonAdminReq,
+              method: 'PUT',
+              url: `/apis/iam/v2beta/teams/${teamID}`,
+              failOnStatusCode: false,
+              body: teamWithProjects(teamID, [project1.id, project2.id])
+          }).then((response) => {
+              expect(response.status).to.equal(403);
+          });
         });
 
-        cy.request({ ...defaultNonAdminReq,
-            method: 'PUT',
-            url: `/apis/iam/v2beta/teams/${teamID}`,
-            failOnStatusCode: false,
-            body: teamWithProjects(teamID, [project1.id])
-        }).then((response) => {
-            expect(response.status).to.equal(403);
+        it('cannot update a team to remove projects other than project1 (403)', () => {
+          cy.request({ ...defaultAdminReq,
+              method: 'POST',
+              body: teamWithProjects(teamID, [project1.id, project2.id])
+          }).then((response) => {
+              expect(response.body.team.projects).to.have.length(2);
+          });
+
+          cy.request({ ...defaultNonAdminReq,
+              method: 'PUT',
+              url: `/apis/iam/v2beta/teams/${teamID}`,
+              failOnStatusCode: false,
+              body: teamWithProjects(teamID, [project1.id])
+          }).then((response) => {
+              expect(response.status).to.equal(403);
+          });
         });
       });
     });
