@@ -11,7 +11,7 @@ import (
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
 	ingest_api "github.com/chef/automate/api/interservice/ingest"
-	"github.com/chef/automate/components/event-service/server"
+	event "github.com/chef/automate/components/event-service/config"
 	"github.com/chef/automate/components/ingest-service/backend"
 )
 
@@ -34,7 +34,7 @@ func (s *AutomateEventHandlerServer) HandleEvent(ctx context.Context,
 	req *automate_event.EventMsg) (*automate_event.EventResponse, error) {
 	logrus.Debugf("ingest-service is handling your event %s", req.EventID)
 	response := &automate_event.EventResponse{}
-	if req.Type.Name == server.NodeTerminated {
+	if req.Type.Name == event.NodeTerminatedEventName {
 		instanceID := req.Object.ID
 		// It is very likely that there is only one instanceId to nodeId
 		// just in case this is not true we will handle it

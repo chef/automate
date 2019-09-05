@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	aEvent "github.com/chef/automate/api/interservice/event"
-	"github.com/chef/automate/components/event-service/server"
+	event "github.com/chef/automate/components/event-service/config"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
 )
@@ -20,7 +20,7 @@ func TestMarkForDeleteNodeTerminated(t *testing.T) {
 		instanceID = "instanceid"
 		event      = &aEvent.EventMsg{
 			EventID: uuid.Must(uuid.NewV4()).String(),
-			Type:    &aEvent.EventType{Name: server.NodeTerminated},
+			Type:    &aEvent.EventType{Name: event.NodeTerminatedEventName},
 			Producer: &aEvent.Producer{
 				ID:           "urn:chef:compliance:mgrpolling",
 				ProducerName: "Node Manager Polling",

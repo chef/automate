@@ -17,7 +17,7 @@ import (
 	"github.com/chef/automate/components/event-feed-service/pkg/feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
 
-	event_server "github.com/chef/automate/components/event-service/server"
+	event "github.com/chef/automate/components/event-service/config"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
 
@@ -94,9 +94,9 @@ func TestEventStringsFilterEventType(t *testing.T) {
 		)
 
 		if entityType == "scanjobs" {
-			eventType = event_server.ScanJobCreated
+			eventType = event.ScanJobCreatedEventName
 		} else {
-			eventType = event_server.ProfileCreated
+			eventType = event.ProfileCreatedEventName
 		}
 
 		tags = append(tags, user, eventType)
@@ -389,7 +389,7 @@ func TestEventStringsThreeDayThreeActionsRequest(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          event_server.ProfileDeleted,
+			EventType:          event.ProfileDeletedEventName,
 			Tags:               []string{"profile", "delete"},
 			Published:          endDate,
 			ActorID:            "actorId",
@@ -411,7 +411,7 @@ func TestEventStringsThreeDayThreeActionsRequest(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          event_server.ScanJobUpdated,
+			EventType:          event.ScanJobUpdatedEventName,
 			Tags:               []string{"scanjobs", "update"},
 			Published:          endDate.AddDate(0, 0, -1),
 			ActorID:            "actorId",
@@ -433,7 +433,7 @@ func TestEventStringsThreeDayThreeActionsRequest(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          event_server.ProfileCreated,
+			EventType:          event.ProfileCreatedEventName,
 			Tags:               []string{"profile", "create"},
 			Published:          endDate.AddDate(0, 0, -2),
 			ActorID:            "actorId",
@@ -531,7 +531,7 @@ func TestEventStringsThreeDayThreeActionsInNewYorkRequest(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          event_server.ProfileDeleted,
+			EventType:          event.ProfileDeletedEventName,
 			Tags:               []string{"profile", "delete"},
 			Published:          endDate,
 			ActorID:            "actorId",
@@ -553,7 +553,7 @@ func TestEventStringsThreeDayThreeActionsInNewYorkRequest(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          event_server.ScanJobUpdated,
+			EventType:          event.ScanJobUpdatedEventName,
 			Tags:               []string{"scanjobs", "update"},
 			Published:          endDate.AddDate(0, 0, -1),
 			ActorID:            "actorId",
@@ -575,7 +575,7 @@ func TestEventStringsThreeDayThreeActionsInNewYorkRequest(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          event_server.ProfileCreated,
+			EventType:          event.ProfileCreatedEventName,
 			Tags:               []string{"profile", "create"},
 			Published:          endDate.AddDate(0, 0, -2),
 			ActorID:            "actorId",
@@ -973,7 +973,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          event_server.ProfileDeleted,
+			EventType:          event.ProfileDeletedEventName,
 			Tags:               []string{"profile", "delete"},
 			Published:          endDate,
 			ActorID:            "actorId",
@@ -995,7 +995,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          event_server.ScanJobDeleted,
+			EventType:          event.ScanJobDeletedEventName,
 			Tags:               []string{"scanjobs", "delete"},
 			Published:          endDate,
 			ActorID:            "actorId",
@@ -1018,7 +1018,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          event_server.ScanJobUpdated,
+			EventType:          event.ScanJobUpdatedEventName,
 			Tags:               []string{"scanjobs", "update"},
 			Published:          endDate.AddDate(0, 0, -1),
 			ActorID:            "actorId",
@@ -1040,7 +1040,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          event_server.ScanJobUpdated,
+			EventType:          event.ScanJobUpdatedEventName,
 			Tags:               []string{"scanjobs", "update"},
 			Published:          endDate.AddDate(0, 0, -1),
 			ActorID:            "actorId",
@@ -1062,7 +1062,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          event_server.ScanJobUpdated,
+			EventType:          event.ScanJobUpdatedEventName,
 			Tags:               []string{"scanjobs", "update"},
 			Published:          endDate.AddDate(0, 0, -1),
 			ActorID:            "actorId",
@@ -1084,7 +1084,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          event_server.ScanJobUpdated,
+			EventType:          event.ScanJobUpdatedEventName,
 			Tags:               []string{"scanjobs", "update"},
 			Published:          endDate.AddDate(0, 0, -1),
 			ActorID:            "actorId",
@@ -1106,7 +1106,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          event_server.ScanJobUpdated,
+			EventType:          event.ScanJobUpdatedEventName,
 			Tags:               []string{"scanjobs", "update"},
 			Published:          endDate.AddDate(0, 0, -1),
 			ActorID:            "actorId",
@@ -1129,7 +1129,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          event_server.ProfileCreated,
+			EventType:          event.ProfileCreatedEventName,
 			Tags:               []string{"profile", "create"},
 			Published:          endDate.AddDate(0, 0, -2),
 			ActorID:            "actorId",
@@ -1151,7 +1151,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          event_server.ProfileCreated,
+			EventType:          event.ProfileCreatedEventName,
 			Tags:               []string{"profile", "create"},
 			Published:          endDate.AddDate(0, 0, -2),
 			ActorID:            "actorId",
@@ -1173,7 +1173,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          event_server.ScanJobCreated,
+			EventType:          event.ScanJobCreatedEventName,
 			Tags:               []string{"scanjobs", "create"},
 			Published:          endDate.AddDate(0, 0, -2),
 			ActorID:            "actorId",
@@ -1195,7 +1195,7 @@ func TestEventStringsMultipleEventTypesAndCounts(t *testing.T) {
 			ProducerObjectType: "producerType",
 			ProducerTags:       []string{"producerTags"},
 			FeedType:           "event",
-			EventType:          event_server.ScanJobCreated,
+			EventType:          event.ScanJobCreatedEventName,
 			Tags:               []string{"scanjobs", "create"},
 			Published:          endDate.AddDate(0, 0, -2),
 			ActorID:            "actorId",

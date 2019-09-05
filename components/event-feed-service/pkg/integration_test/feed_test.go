@@ -15,7 +15,7 @@ import (
 	google_protobuf "github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/stretchr/testify/assert"
 
-	event_server "github.com/chef/automate/components/event-service/server"
+	event "github.com/chef/automate/components/event-service/config"
 
 	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/feed"
@@ -114,7 +114,7 @@ func TestEventFeedReturnOnlyEventsWithinDateRange(t *testing.T) {
 			ProducerObjectType: "user",
 			ProducerTags:       []string{"mycompany", "engineering department", "compliance team"},
 			FeedType:           "event",
-			EventType:          event_server.ScanJobUpdated,
+			EventType:          event.ScanJobUpdatedEventName,
 			Tags:               []string{"mygroup", "compliance", "scan"},
 			Published:          published,
 			ActorID:            "urn:mycompany:user:violet",
@@ -235,7 +235,7 @@ func TestEventFeedFilterEventType(t *testing.T) {
 		var (
 			name             = "Fred"
 			userURN          = "urn:mycompany:user:fred"
-			eventType        = event_server.ScanJobUpdated
+			eventType        = event.ScanJobUpdatedEventName
 			tags             = []string{"org_1", "compliance", eventTypes[1]}
 			verb             = "update"
 			objectID         = "urn:chef:compliance:scan-job"
@@ -246,7 +246,7 @@ func TestEventFeedFilterEventType(t *testing.T) {
 		if i > 5 {
 			name = "Violet"
 			userURN = "urn:mycompany:user:violet"
-			eventType = event_server.ProfileCreated
+			eventType = event.ProfileCreatedEventName
 			tags = []string{"org_2", "compliance", eventTypes[0]}
 			verb = "create"
 			objectID = "urn:chef:compliance:profile"

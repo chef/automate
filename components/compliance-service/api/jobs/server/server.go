@@ -19,7 +19,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/scheduler"
 	"github.com/chef/automate/components/compliance-service/scanner"
-	"github.com/chef/automate/components/event-service/server"
+	event "github.com/chef/automate/components/event-service/config"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	"github.com/chef/automate/lib/cereal"
@@ -118,7 +118,7 @@ func (srv *Server) Create(ctx context.Context, in *jobs.Job) (*jobs.Id, error) {
 	if in.Type == "exec" {
 		// fire scan job created event
 		user := getUserValFromCtx(ctx)
-		go srv.fireEvent(server.ScanJobCreated, in, nil, user)
+		go srv.fireEvent(event.ScanJobCreatedEventName, in, nil, user)
 	}
 
 	return &jobs.Id{Id: sID}, nil
@@ -160,7 +160,7 @@ func (srv *Server) Update(ctx context.Context, in *jobs.Job) (*pb.Empty, error) 
 
 	// fire scan job updated event
 	user := getUserValFromCtx(ctx)
-	go srv.fireEvent(server.ScanJobUpdated, in, nil, user)
+	go srv.fireEvent(event.ScanJobUpdatedEventName, in, nil, user)
 
 	return &empty, nil
 }
@@ -184,7 +184,7 @@ func (srv *Server) Delete(ctx context.Context, in *jobs.Id) (*pb.Empty, error) {
 	// fire scan job deleted event
 	user := getUserValFromCtx(ctx)
 	job := jobs.Job{Name: name}
-	go srv.fireEvent(server.ScanJobDeleted, &job, in, user)
+	go srv.fireEvent(event.ScanJobDeletedEventName, &job, in, user)
 
 	return &empty, nil
 }
@@ -271,22 +271,22 @@ func (srv *Server) newEventMsg(eventType string, in *jobs.Job, id *jobs.Id, user
 
 	switch eventType {
 
-	case server.ScanJobCreated:
+	case event.ScanJobCreatedEventName:
 		userVal = user
 		verbVal = "create"
-		tagsVal = []string{"scanjobs", user, "create", "compliance", server.ScanJobCreated}
+		tagsVal = []string{"scanjobs", user, "create", "compliance", event.ScanJobCreatedEventName}
 		nameVal = in.Name
 
-	case server.ScanJobUpdated:
+	case event.ScanJobUpdatedEventName:
 		userVal = user
 		verbVal = "update"
-		tagsVal = []string{"scanjobs", user, "update", "compliance", server.ScanJobUpdated}
+		tagsVal = []string{"scanjobs", user, "update", "compliance", event.ScanJobUpdatedEventName}
 		nameVal = in.Name
 
-	case server.ScanJobDeleted:
+	case event.ScanJobDeletedEventName:
 		userVal = user
 		verbVal = "delete"
-		tagsVal = []string{"scanjobs", user, "delete", "compliance", server.ScanJobDeleted}
+		tagsVal = []string{"scanjobs", user, "delete", "compliance", event.ScanJobDeletedEventName}
 		nameVal = in.Name
 
 	default:

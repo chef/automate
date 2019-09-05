@@ -23,7 +23,7 @@ import (
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
 	"github.com/chef/automate/lib/grpc/grpctest"
 
-	"github.com/chef/automate/components/event-service/server"
+	event "github.com/chef/automate/components/event-service/config"
 	"github.com/chef/automate/lib/stringutils"
 )
 
@@ -334,11 +334,11 @@ func createEntries(startDate time.Time, amountToCreate int, timeDiff int) []*fee
 
 			switch verb {
 			case "create":
-				eventType = server.ScanJobCreated
+				eventType = event.ScanJobCreatedEventName
 			case "update":
-				eventType = server.ScanJobUpdated
+				eventType = event.ScanJobUpdatedEventName
 			case "delete":
-				eventType = server.ScanJobDeleted
+				eventType = event.ScanJobDeletedEventName
 			}
 
 		} else {
@@ -346,9 +346,9 @@ func createEntries(startDate time.Time, amountToCreate int, timeDiff int) []*fee
 
 			switch verb {
 			case "create":
-				eventType = server.ProfileCreated
+				eventType = event.ProfileCreatedEventName
 			case "delete":
-				eventType = server.ProfileDeleted
+				eventType = event.ProfileDeletedEventName
 			}
 		}
 
