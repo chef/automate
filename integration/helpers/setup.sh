@@ -23,6 +23,22 @@ EOF
     systemctl start requestbin
 }
 
+start_loadbalancer() {
+    export GOBIN="/go/bin"
+    go install ./integration/helpers/loadbalancer/
+    cat > /etc/systemd/system/loadbalancer.service <<EOF
+[Unit]
+Description=Load Balancer
+
+[Service]
+ExecStart=/go/bin/loadbalancer $(pwd)/$test_config_path $@
+
+[Install]
+WantedBy=default.target
+EOF
+    systemctl start loadbalancer.service
+}
+
 start_external_elasticsearch() {
     curl -o elasticsearch.rpm https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.2.2.rpm
     rpm --install elasticsearch.rpm
