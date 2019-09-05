@@ -84,7 +84,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
       filter(identity),
       takeUntil(this.isDestroyed)
       ).subscribe((state) => {
-        this.project = <Project>Object.assign({}, state);
+        this.project = { ...state };
         this.store.dispatch(new GetRulesForProject({ project_id: this.project.id }));
         this.store.select(allRules).subscribe((rules) => {
           this.rules = rules;
