@@ -1,17 +1,12 @@
 <chef-modal [visible]="visible" (close)="closeEvent()">
   <h2 slot="title">{{ObjectAction}} {{objectNoun | titlecase}}?</h2>
-  <div *ngIf="!nodeCredObject">
+  <div>
     <span *ngIf="moreDetails">
-      Deleting {{objectNoun}} {{objectName}} <strong>cannot be undone</strong><br>
+      {{ ObjectAction | continuous }} {{objectNoun}} {{objectName}} <strong>cannot be undone</strong><br>
       {{moreDetails}}.
     </span>
     <span *ngIf="!moreDetails">
-      Deleting {{objectNoun}} {{objectName}} <strong>cannot be undone</strong>.
-    </span>
-  </div>
-  <div *ngIf="nodeCredObject">
-    <span *ngIf="!moreDetails">
-      Removing node {{objectNoun}} {{objectName}} <strong>cannot be undone</strong>.
+      {{ ObjectAction | continuous }} {{objectNoun}} {{objectName}} <strong>cannot be undone</strong>.
     </span>
   </div>
 

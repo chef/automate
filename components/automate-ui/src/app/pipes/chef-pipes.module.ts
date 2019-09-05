@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 
 import { CapitalizePipe } from './capitalize.pipe';
+import { ContinuousPipe } from './continuous.pipe';
 import { ChefStatusIconPipe } from './chef-status-icon.pipe';
 import { DatetimePipe } from './datetime.pipe';
 import { DefinedOrDefaultPipe } from './defined-or-default.pipe';
@@ -16,6 +17,7 @@ import { TimeFromNowPipe } from './time-from-now.pipe';
 @NgModule({
   declarations: [
     CapitalizePipe,
+    ContinuousPipe,
     ChefStatusIconPipe,
     DatetimePipe,
     DefinedOrDefaultPipe,
@@ -30,6 +32,7 @@ import { TimeFromNowPipe } from './time-from-now.pipe';
   ],
   exports: [
     CapitalizePipe,
+    ContinuousPipe,
     ChefStatusIconPipe,
     DatetimePipe,
     DefinedOrDefaultPipe,

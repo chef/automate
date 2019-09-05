@@ -37,6 +37,7 @@ import { SidebarNoShadeComponent } from './sidebar-no-shade/sidebar-no-shade.com
 import { SidebarEntryComponent } from './sidebar-entry/sidebar-entry.component';
 import { TabComponent } from './tab/tab.component';
 import { TabsComponent } from './tabs/tabs.component';
+import { ChefPipesModule } from '../pipes/chef-pipes.module'
 
 @NgModule({
   imports: [
@@ -44,6 +45,7 @@ import { TabsComponent } from './tabs/tabs.component';
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
+    ChefPipesModule,
 
     // Angular Material
     MatDialogModule,
