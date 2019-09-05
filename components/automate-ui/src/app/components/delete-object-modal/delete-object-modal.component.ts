@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { User } from 'app/entities/users/user.model';
-import { ContinuousPipe } from '../../pipes/continuous.pipe'
+import { ContinuousPipe } from '../../pipes/continuous.pipe';
 
 @Component({
   selector: 'app-delete-object-modal',

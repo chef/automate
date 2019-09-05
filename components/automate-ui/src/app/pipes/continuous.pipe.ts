@@ -6,9 +6,9 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class ContinuousPipe implements PipeTransform {
 
   transform(value: string): string {
-    const lastIndex = value.length - 1
+    const lastIndex = (value.length - 1);
     if (value) {
-      if (value.charAt(lastIndex) == 'e') {
+      if (value.charAt(lastIndex) === 'e') {
         return value.slice(0, lastIndex) + 'ing';
       } else {
         return value + 'ing';
