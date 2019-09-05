@@ -72,7 +72,7 @@ describe('Admin pages', () => {
     });
 
     it('displays create user button', () => {
-      const addButton = $('app-user-table chef-button');
+      const addButton = $('.page-body chef-button');
       expect(addButton.getText()).toBe('Create User');
     });
 
@@ -1460,6 +1460,16 @@ describe('Admin pages', () => {
             }
           }
         ));
+
+      fakeServer()
+      .get('/apis/iam/v2beta/projects/my-project/rules')
+      .many()
+      .reply(200, JSON.stringify(
+        {
+          rules: [],
+          status: 'NO_RULES'
+        }
+      ));
 
       browser.waitForAngularEnabled(false);
       browser.get('/settings/projects/my-project');
