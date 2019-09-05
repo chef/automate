@@ -4,6 +4,10 @@ set -e
 # variables will be replaced with strings at rendering time.  Those
 # are not shell variables.
 
+# suppress progress bars for 'hab pkg install', they're littering the build
+# output
+HAB_NONINTERACTIVE=true
+
 automate_deployed() {
     [[ -f /hab/user/deployment-service/config/user.toml ]]
 }
@@ -205,7 +209,7 @@ if [[ "${enable_chef_server}" == "true" ]]; then
   fi
   hab pkg binlink chef/chef-dk berks
 
-  cat << EOH > /tmp/.berks.config.json
+  cat <<EOH > /tmp/.berks.config.json
 {
   "chef": {
     "chef_server_url":        "https://localhost/organizations/${chef_server_org}",
@@ -218,7 +222,7 @@ if [[ "${enable_chef_server}" == "true" ]]; then
 }
 EOH
 
-  cat << EOH > /tmp/.Berksfile
+  cat <<EOH > /tmp/.Berksfile
 source "https://supermarket.chef.io"
 cookbook "audit"
 EOH
