@@ -35,13 +35,13 @@ type DisconnectedServicesParamsV0 struct {
 const (
 	cerealServiceMutualTLSName = "cereal-service"
 
-	DisconnectedServicesJobIntervalSeconds = 60
-	DisconnectedServicesJobName            = "disconnected_services"
-	DisconnectedServicesScheduleName       = "periodic_disconnected_services"
+	DefaultJobIntervalSeconds = 60
 
-	DeleteDisconnectedServicesJobIntervalDays = 1
-	DeleteDisconnectedServicesJobName         = "delete_disconnected_services"
-	DeleteDisconnectedServicesScheduleName    = "periodic_delete_disconnected_services"
+	DisconnectedServicesJobName      = "disconnected_services"
+	DisconnectedServicesScheduleName = "periodic_disconnected_services"
+
+	DeleteDisconnectedServicesJobName      = "delete_disconnected_services"
+	DeleteDisconnectedServicesScheduleName = "periodic_delete_disconnected_services"
 )
 
 func ConnectToJobsManager(jobCfg *config.Jobs, connFactory *secureconn.Factory) (*cereal.Manager, error) {
@@ -67,7 +67,7 @@ func NewJobScheduler(cerealSvc *cereal.Manager) *JobScheduler {
 func (j *JobScheduler) Setup() error {
 	r, err := rrule.NewRRule(rrule.ROption{
 		Freq:     rrule.SECONDLY,
-		Interval: DisconnectedServicesJobIntervalSeconds,
+		Interval: DefaultJobIntervalSeconds,
 		Dtstart:  time.Now(),
 	})
 	if err != nil {
@@ -88,8 +88,8 @@ func (j *JobScheduler) Setup() error {
 	// FIXME: this is probably ok for a default but then we need to figure out
 	// how to update this when the threshold is set lower.
 	r, err = rrule.NewRRule(rrule.ROption{
-		Freq:     rrule.DAILY,
-		Interval: DeleteDisconnectedServicesJobIntervalDays,
+		Freq:     rrule.SECONDLY,
+		Interval: DefaultJobIntervalSeconds,
 		Dtstart:  time.Now(),
 	})
 	if err != nil {
@@ -104,6 +104,19 @@ func (j *JobScheduler) Setup() error {
 	)
 
 	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (j *JobScheduler) ResetParams() error {
+	ctx := context.Background()
+
+	if err := j.UpdateDisconnectedServicesJobParams(ctx, defaultDisconnectedServicesJobParams()); err != nil {
+		return err
+	}
+	if err := j.UpdateDeleteDisconnectedServicesJobParams(ctx, defaultDeleteDisconnectedServicesJobParams()); err != nil {
 		return err
 	}
 
@@ -218,6 +231,7 @@ func (j *JobScheduler) UpdateDeleteDisconnectedServicesJobParams(ctx context.Con
 	if err != nil {
 		return errors.Wrap(err, "failed to set delete_disconnected_services job to enabled")
 	}
+	log.WithFields(log.Fields{"new_params": params}).Info("Updated delete_disconnected_services params")
 	return nil
 }
 
@@ -387,20 +401,18 @@ type DeleteDisconnectedServicesExecutor struct {
 }
 
 func (d *DeleteDisconnectedServicesExecutor) Run(ctx context.Context, t cereal.Task) (interface{}, error) {
-	logCtx := log.WithFields(log.Fields{"task_name": DeleteDisconnectedServicesJobName})
 	err := d.runWithoutStats(ctx, t)
 	atomic.AddInt64(&d.totalRuns, 1)
 	if err != nil {
-		logCtx.WithError(err).Error("periodic task failed")
 		atomic.AddInt64(&d.totalRunsFailed, 1)
 	} else {
-		logCtx.Info("periodic task succeeded")
 		atomic.AddInt64(&d.totalRunsSuccessful, 1)
 	}
 	return nil, err
 }
 
 func (d *DeleteDisconnectedServicesExecutor) runWithoutStats(ctx context.Context, t cereal.Task) error {
+	logCtx := log.WithFields(log.Fields{"task_name": DeleteDisconnectedServicesJobName})
 	var params DisconnectedServicesParamsV0
 	if err := t.GetParameters(&params); err != nil {
 		return errors.Wrap(err, "failed to load parameters for disconnected_services job")
@@ -409,12 +421,18 @@ func (d *DeleteDisconnectedServicesExecutor) runWithoutStats(ctx context.Context
 	if err != nil {
 		return errors.Wrapf(err, "duration setting %q for disconnected_services in database is invalid", params.ThresholdDuration)
 	}
+	logCtx = logCtx.WithFields(log.Fields{"threshold_duration": threshold})
 
 	req := applications.DisconnectedServicesReq{
 		ThresholdSeconds: int32(threshold.Seconds()),
 	}
 
-	_, err = d.ApplicationsServer.DeleteDisconnectedServices(ctx, &req)
+	svcRemovedRes, err := d.ApplicationsServer.DeleteDisconnectedServices(ctx, &req)
+	if err != nil {
+		logCtx.Error("periodic task failed")
+	}
+
+	logCtx.WithFields(log.Fields{"svcs_removed": len(svcRemovedRes.Services)}).Info("periodic task succeeded")
 	return err
 }
 
