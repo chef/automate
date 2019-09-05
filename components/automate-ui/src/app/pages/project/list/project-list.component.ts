@@ -20,6 +20,7 @@ import { GetProjects, CreateProject, DeleteProject  } from 'app/entities/project
 import { Project } from 'app/entities/projects/project.model';
 import { ApplyRulesStatus, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
 import { ProjectStatus } from 'app/entities/rules/rule.model';
+import { LoadOptions } from 'app/services/projects-filter/projects-filter.actions';
 
 @Component({
   selector: 'app-project-list',
@@ -165,6 +166,9 @@ export class ProjectListComponent implements OnInit, OnDestroy {
           pendingCreate.complete();
           this.creatingProject = false;
           if (state === EntityStatus.loadingSuccess) {
+            // This is issued periodically from projects-filter.effects.ts; we do it now
+            // so the user doesn't have to wait.
+            this.store.dispatch(new LoadOptions());
             this.closeCreateModal();
             this.router.navigate(['/settings', 'projects', project.id]);
           }
