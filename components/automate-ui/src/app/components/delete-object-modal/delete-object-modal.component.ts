@@ -12,7 +12,7 @@ export class DeleteObjectModalComponent extends ContinuousPipe {
   @Input() objectNoun: string;
   @Input() objectName: string;
   @Input() moreDetails: string; // additional details after "action cannot be undone"
-  @Input() ObjectAction: string;
+  @Input() objectAction: string;
 
   @Output() close = new EventEmitter();
   @Output() deleteClicked = new EventEmitter<User>();
