@@ -105,11 +105,9 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed),
       // do not update this cache while an update is in progress
       filter(() => !this.applyRulesInProgress)
-    )
-      .subscribe((projectList: Project[]) => {
-        this.statusCache = {};
-        projectList.forEach(p => this.statusCache[p.id] = p.status);
-      });
+    ).subscribe((projectList: Project[]) => {
+      this.statusCache = projectList.reduce((m, p) => m[p.id] = p.status, {});
+    });
 
     this.createProjectForm = fb.group({
       // Must stay in sync with error checks in create-object-modal.component.html
@@ -182,8 +180,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
                 pendingCreateError.complete();
                 if (error.status === HttpStatus.CONFLICT) {
                   this.conflictErrorEvent.emit(true);
-                // Close the modal on any error other than conflict and display in banner.
-                } else {
+                } else { // Close the modal on any error other than conflict and display in banner.
                   this.closeCreateModal();
                 }
             });

@@ -8,7 +8,7 @@ import { catchError, mergeMap, map, tap, withLatestFrom, filter } from 'rxjs/ope
 
 import { atLeastV2p1 } from 'app/entities/policies/policy.selectors';
 import { Project } from 'app/entities/projects/project.model';
-import { ProjectsFilterOption, ProjectsFilterOptionTuple } from './projects-filter.reducer';
+import { ProjectsFilterOption } from './projects-filter.reducer';
 import { ProjectsFilterService } from './projects-filter.service';
 import { ProjectsFilterRequests, AuthorizedProjectsResponse } from './projects-filter.requests';
 import {
@@ -53,9 +53,9 @@ export class ProjectsFilterEffects {
       map((fetched: AuthorizedProjectsResponse) => {
         const converted = this.convertResponse(fetched.projects);
         const restored = this.projectsFilter.restoreOptions() || [];
-        return new LoadOptionsSuccess(<ProjectsFilterOptionTuple>{
+        return new LoadOptionsSuccess({
           fetched: converted,
-          restored: restored
+          restored
         });
       }),
       catchError((error: HttpErrorResponse) => observableOf(new LoadOptionsFailure(error))));
@@ -63,12 +63,12 @@ export class ProjectsFilterEffects {
 
   private convertResponse(authorizedProjects: Project[]): ProjectsFilterOption[] {
     return authorizedProjects.map(
-      project => <ProjectsFilterOption>{
+      project => ({
         label: project.name,
         value: project.id,
-        type:  project.type,
+        type: project.type,
         checked: false
-      });
+      }));
   }
 }
 
