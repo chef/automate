@@ -85,6 +85,8 @@ func (j *JobScheduler) Setup() error {
 		return err
 	}
 
+	// FIXME: this is probably ok for a default but then we need to figure out
+	// how to update this when the threshold is set lower.
 	r, err = rrule.NewRRule(rrule.ROption{
 		Freq:     rrule.DAILY,
 		Interval: DeleteDisconnectedServicesJobIntervalDays,
@@ -100,6 +102,10 @@ func (j *JobScheduler) Setup() error {
 		defaultDeleteDisconnectedServicesJobParams(),
 		r,
 	)
+
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -313,6 +319,10 @@ func (j *JobRunnerSet) Start(cerealSvc *cereal.Manager) error {
 		j.DeleteDisconnectedServicesExecutor,
 		cereal.TaskExecutorOpts{},
 	)
+
+	if err != nil {
+		return errors.Wrap(err, "failed to register as task exector to delete disconnected services")
+	}
 
 	wfX = patterns.NewSingleTaskWorkflowExecutor(DeleteDisconnectedServicesJobName, false)
 	err = cerealSvc.RegisterWorkflowExecutor(DeleteDisconnectedServicesJobName, wfX)
