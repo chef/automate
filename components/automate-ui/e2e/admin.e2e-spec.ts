@@ -1666,39 +1666,4 @@ describe('Admin pages', () => {
       expect(createButton.getAttribute('disabled')).toBe('true');
     });
   });
-
-  describe('Project details (Chef-managed)', () => {
-    beforeEach(() => {
-      fakeServer()
-        .get('/apis/iam/v2beta/projects/default')
-        .many()
-        .reply(200, JSON.stringify(
-          {
-            project: {
-              id: 'default',
-              name: 'Default Project',
-              type: 'CHEF_MANAGED'
-            }
-          }
-        ));
-
-      browser.waitForAngularEnabled(false);
-      browser.get('/settings/projects/default');
-    });
-
-    describe('Chef-managed project details', () => {
-      it('the input is disabled, the save button is hidden, and the no changes allowed ' +
-        'span is displayed', () => {
-        const detailsLink = $('#chef-option2');
-        detailsLink.click();
-        const projectSaveButton = $('app-project-details section #button-bar button');
-        const projectNameInput = $('app-project-details section form chef-form-field input');
-        const projectNoChangesSpan = $('app-project-details section form #changes-not-allowed');
-        expect(projectSaveButton.isPresent()).toBeFalsy();
-        expect(projectNameInput.getAttribute('disabled')).toBeTruthy();
-        expect(projectNoChangesSpan.getText())
-          .toBe('Name changes are not allowed for the default project.');
-      });
-    });
-  });
 });
