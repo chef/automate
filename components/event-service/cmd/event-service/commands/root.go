@@ -15,7 +15,6 @@ var RootCmd = &cobra.Command{
 }
 
 func init() {
-	log.Debug("root.go init() ->")
 	cobra.OnInitialize(initConfig)
 
 	// make config accessible from all commands
@@ -23,29 +22,25 @@ func init() {
 
 	RootCmd.AddCommand(newServeCmd())
 	RootCmd.AddCommand(newSendTestCmd())
-
-	log.Debug("end root.go init() ->")
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	log.Debug("root.go initConfig() ->")
 	// read in environment variables that match
 	viper.SetEnvPrefix("event-service")
 	viper.AutomaticEnv()
 
 	// set the config file if it's given
-	log.Infof("Config file is %s", cfgFile)
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
 
+		logctx := log.WithField("config_file", cfgFile)
 		err := viper.ReadInConfig()
 		if err != nil {
-			log.WithError(err).WithFields(log.Fields{
-				"file": viper.ConfigFileUsed(),
-			}).Info("Error reading config file")
+			logctx.WithError(err).Error("failed to read configuration")
 			return
 		}
+
+		logctx.Info("Loaded configuration")
 	}
-	log.Debug("end root.go initConfig() ->")
 }

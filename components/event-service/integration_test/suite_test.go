@@ -10,7 +10,7 @@ import (
 	olivere "github.com/olivere/elastic"
 
 	api "github.com/chef/automate/api/interservice/event"
-	"github.com/chef/automate/components/event-service/server"
+	"github.com/chef/automate/components/event-service/config"
 )
 
 type Suite struct {
@@ -62,7 +62,7 @@ func (s *Suite) createEvents(amountToCreate int) []*api.EventMsg {
 	for i := 0; i < amountToCreate; i++ {
 		event := &api.EventMsg{
 			EventID: uuid.Must(uuid.NewV4()).String(),
-			Type:    &api.EventType{Name: server.ScanJobCreated},
+			Type:    &api.EventType{Name: config.ScanJobCreatedEventName},
 			Producer: &api.Producer{
 				ID:           "urn:chef:compliance:scan-component",
 				ProducerName: "Scanner",

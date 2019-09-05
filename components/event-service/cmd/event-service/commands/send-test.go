@@ -5,11 +5,11 @@ import (
 	"crypto/x509"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"time"
 
 	natsc "github.com/nats-io/go-nats"
 	streamc "github.com/nats-io/go-nats-streaming"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -21,14 +21,14 @@ var selfTestFlags = struct {
 // TODO FIXME: move the guts into a different package
 func newSendTestCmd() *cobra.Command {
 	c := &cobra.Command{
-		Use:    "self-test",
-		Short:  "Send test message to messaging server",
-		Hidden: true,
-		Run: func(cmd *cobra.Command, args []string) {
+		Use:          "self-test",
+		Short:        "Send test message to messaging server",
+		Hidden:       true,
+		SilenceUsage: true,
+		RunE: func(cmd *cobra.Command, args []string) error {
 
 			if selfTestFlags.token == "" {
-				fmt.Println("This command requires a valid token to connect to the external NATS endpoint")
-				os.Exit(1)
+				return errors.New("This command requires a valid token to connect to the external NATS endpoint")
 			}
 
 			clusterID := "event-service"
@@ -37,8 +37,7 @@ func newSendTestCmd() *cobra.Command {
 
 			externalNATS, err := natsc.Connect(externalURL)
 			if err != nil {
-				log.Errorf("failed to connect to NATS server %s", err)
-				os.Exit(1)
+				return errors.Wrap(err, "failed to connect to NATS server")
 			}
 			defer externalNATS.Close()
 
@@ -46,21 +45,18 @@ func newSendTestCmd() *cobra.Command {
 
 			mTLSKeyPair, err := tls.LoadX509KeyPair("/hab/svc/event-service/config/service.crt", "/hab/svc/event-service/config/service.key")
 			if err != nil {
-				log.Errorf("failed to load client cert and key: %s", err)
-				os.Exit(1)
+				return errors.Wrap(err, "failed to load client cert and key")
 			}
 
 			automateRootCA := x509.NewCertPool()
 			f := "/hab/svc/event-service/config/root_ca.crt"
 			rootPEM, err := ioutil.ReadFile(f)
 			if err != nil || rootPEM == nil {
-				log.Errorf("error loading or parsing rootCA file: %v", err)
-				os.Exit(1)
+				return errors.Wrap(err, "error loading or parsing rootCA file")
 			}
 			ok := automateRootCA.AppendCertsFromPEM(rootPEM)
 			if !ok {
-				log.Errorf("failed to parse root certificate from %q", f)
-				os.Exit(1)
+				return errors.Wrapf(err, "failed to parse root certificate from %q", f)
 			}
 
 			mTLSConfig := &tls.Config{
@@ -72,8 +68,7 @@ func newSendTestCmd() *cobra.Command {
 
 			internalNATS, err := natsc.Connect(internalURL, natsc.Secure(mTLSConfig))
 			if err != nil {
-				log.Errorf("failed to connect to NATS server %+v \n", err)
-				os.Exit(1)
+				return errors.Wrap(err, "failed to connect to NATS server")
 			}
 			defer internalNATS.Close()
 
@@ -109,15 +104,13 @@ func newSendTestCmd() *cobra.Command {
 
 			ncExternal, err := streamc.Connect(clusterID, "cli-test-external-pub", streamc.NatsConn(externalNATS))
 			if err != nil {
-				log.Errorf("failed to connect to NATS Streaming server %+v \n", err)
-				os.Exit(1)
+				return errors.Wrap(err, "failed to connect to NATS Streaming server")
 			}
 			defer ncExternal.Close()
 
 			ncInternal, err := streamc.Connect(clusterID, "cli-test-internal-sub", streamc.NatsConn(internalNATS))
 			if err != nil {
-				log.Errorf("failed to connect to NATS Streaming server %+v \n", err)
-				os.Exit(1)
+				return errors.Wrap(err, "failed to connect to NATS Streaming server")
 			}
 			defer ncInternal.Close()
 
@@ -133,6 +126,8 @@ func newSendTestCmd() *cobra.Command {
 			ncExternal.Publish("event-service-self-test-streaming", []byte(message)) // does not return until an ack has been received from NATS Streaming
 
 			time.Sleep(1 * time.Second) // wait for the messages to come in
+
+			return nil
 		},
 	}
 

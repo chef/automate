@@ -9,7 +9,8 @@ import (
 	"github.com/chef/automate/components/event-service/nats"
 	"github.com/chef/automate/components/event-service/server"
 	"github.com/chef/automate/lib/tracing"
-	log "github.com/sirupsen/logrus"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -17,18 +18,25 @@ func newServeCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "serve",
 		Short: "Start the event gRPC server",
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
+			logctx := logrus.WithField("config_file", cfgFile)
 
 			cfg, err := config.Configure()
 			if err != nil {
-				log.WithError(err).Fatal("Failed to configure event-service server")
+				return errors.Wrap(err, "failed to configure event-service")
 			}
+
 			uri := fmt.Sprintf("%s:%d", cfg.ServiceConfig.Host, cfg.ServiceConfig.Port)
-			log.WithFields(log.Fields{"uri": uri}).Info("Starting Event Service...")
+			logctx = logctx.WithFields(logrus.Fields{
+				"log_level": cfg.LogConfig.LogLevel,
+				"uri":       uri,
+			})
+
+			logctx.Info("Starting event-service")
 
 			closer, err := tracing.NewGlobalTracer("event-service")
 			if err != nil {
-				log.WithError(err).Warn("Failed to start tracer for event-service")
+				errors.Wrap(err, "failed to start tracer for event-service")
 			}
 			if closer != nil {
 				defer tracing.CloseQuietly(closer)
@@ -40,13 +48,12 @@ func newServeCmd() *cobra.Command {
 				go func() {
 					err := nats.Spawn(cfg)
 					if err != nil {
-						log.Fatalf("failed starting NATS: %+v", err)
+						logrus.WithError(err).Error("failed to start NATS")
 					}
 				}()
 			}
 
-			server.StartGRPC(context.Background(), cfg)
+			return server.StartGRPC(context.Background(), cfg)
 		},
 	}
-
 }

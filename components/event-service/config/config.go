@@ -6,15 +6,23 @@ import (
 	"path"
 
 	"github.com/chef/automate/lib/tls/certs"
+	"github.com/pkg/errors"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 const (
-	COMPLIANCE_INGEST_KEY = "compliance_ingest"
-	CFG_KEY               = "cfgingest"
-	EVENT_FEED            = "event_feed"
+	ComplianceEventName     = "compliance_ingest"
+	ConfigMgmtEventName     = "cfgingest"
+	EventFeedEventName      = "event_feed"
+	ScanJobCreatedEventName = "scanJobCreated"
+	ScanJobUpdatedEventName = "scanJobUpdated"
+	ScanJobDeletedEventName = "scanJobDeleted"
+	ProfileCreatedEventName = "profileCreated"
+	ProfileUpdatedEventName = "profileUpdate"
+	ProfileDeletedEventName = "profileDeleted"
+	NodeTerminatedEventName = "nodeTerminated"
 )
 
 // Configuration for the Event Service
@@ -69,13 +77,9 @@ func (c *EventConfig) SetLogLevel() {
 		return
 	}
 
-	log.WithFields(log.Fields{
-		"level": c.LogConfig.LogLevel,
-	}).Info("Setting log level...")
-
 	level, err := log.ParseLevel(c.LogConfig.LogLevel)
 	if err != nil {
-		log.WithField("level", c.LogConfig.LogLevel).WithError(err).Error("Using default level 'info'")
+		log.WithField("level", c.LogConfig.LogLevel).WithError(err).Error("invalid log level, falling back to level 'info'")
 		return
 	}
 
@@ -91,28 +95,23 @@ func (c *EventConfig) GetCerts() *certs.ServiceCerts {
 // the root command's initConfig(). Settings are parsed by
 // Viper into the EventConfig struct.
 func Configure() (*EventConfig, error) {
-	log.Debug("config.go Configure() ->")
 	config := &EventConfig{}
 
 	// Unmarshal the viper config into the server Config
 	if err := viper.Unmarshal(config); err != nil {
-		log.WithFields(log.Fields{
-			"err": err,
-		}).Error("Failed to unmarshal config options to server config")
-		return config, err
+		return config, errors.Wrap(err, "failed to unmarshal config options to server config")
 	}
 
-	log.Debugf("Compliance handler endpoint: %s", config.HandlerEndpoints.Compliance)
-	log.Debugf("Config ingest handler endpoint: %s", config.HandlerEndpoints.CfgIngest)
-	log.Debugf("Event Feed handler endpoint: %s", config.HandlerEndpoints.EventFeed)
+	log.WithFields(log.Fields{
+		"compliance": config.HandlerEndpoints.Compliance,
+		"ingest":     config.HandlerEndpoints.CfgIngest,
+		"event_feed": config.HandlerEndpoints.EventFeed,
+	}).Debug("using endpoints")
 
 	// Validates that the configuration has a valid host/port
 	_, err := url.ParseRequestURI(path.Join("http://", config.ListenAddress()))
 	if err != nil {
-		log.WithFields(log.Fields{
-			"err": err,
-		}).Error(fmt.Sprintf("Listen adddress '%s' is not valid. Please check the 'host' and 'port' configuration", config.ListenAddress()))
-		return config, err
+		return config, errors.Wrapf(err, "failed to parse listen address: %s", config.ListenAddress())
 	}
 	// Set log level
 	config.SetLogLevel()
@@ -120,16 +119,12 @@ func Configure() (*EventConfig, error) {
 	// Fix any relative paths that might be in the config file
 	config.TLSConfig.FixupRelativeTLSPaths(viper.ConfigFileUsed())
 	serviceCerts, err := config.TLSConfig.ReadCerts()
-
 	if err != nil {
-		log.WithFields(log.Fields{
-			"err": err.Error(),
-		}).Error("Failed to load x509 key pair and/or root CA certificate")
-		return config, err
+		return config, errors.Wrap(err, "failed to load TLS certs")
 	}
-	config.ServiceCerts = serviceCerts
-	log.Debugf("EVENT SERVICE CONFIG: %+v", config)
 
-	log.Debug("end config.go Configure() ->")
+	config.ServiceCerts = serviceCerts
+	log.WithField("config", config).Debug("event-service config")
+
 	return config, nil
 }
