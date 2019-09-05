@@ -106,7 +106,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       // do not update this cache while an update is in progress
       filter(() => !this.applyRulesInProgress)
     ).subscribe((projectList: Project[]) => {
-      this.statusCache = projectList.reduce((m, p) => m[p.id] = p.status, {});
+      this.statusCache = projectList.reduce((m, p) => ({ ...m, [p.id]: p.status }), {});
     });
 
     this.createProjectForm = fb.group({
