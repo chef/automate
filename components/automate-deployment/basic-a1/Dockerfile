@@ -3,6 +3,8 @@ MAINTAINER Chef Software <ryan@chef.io>
 
 ENV DEBIAN_FRONTEND noninteractive
 
+RUN sed -i 's/archive.ubuntu.com/us-west-2.ec2.archive.ubuntu.com/' /etc/apt/sources.list
+
 # These lines are copy-pasta from the devchef/chefdk Dockerfile. We can't use
 # that image b/c we need systemd in order to install/upgrade to a2
 RUN apt-get update && apt-get install -y wget curl ssh build-essential && \
