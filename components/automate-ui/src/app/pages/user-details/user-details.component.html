@@ -9,7 +9,7 @@
       [objectName]="user.name"
       (close)="closeDeleteConfirmationModal()"
       (deleteClicked)="deleteUser()"
-      ObjectAction="Delete">
+      objectAction="Delete">
     </app-delete-object-modal>
     <chef-breadcrumbs *ngIf="isAdminView">
       <chef-breadcrumb [link]="['/settings/users']">Users</chef-breadcrumb>

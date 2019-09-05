@@ -1,18 +1,18 @@
 <chef-modal [visible]="visible" (close)="closeEvent()">
-  <h2 slot="title">{{ObjectAction}} {{objectNoun | titlecase}}?</h2>
+  <h2 slot="title">{{objectAction}} {{objectNoun | titlecase}}?</h2>
   <div>
     <span *ngIf="moreDetails">
-      {{ ObjectAction | continuous }} {{objectNoun}} {{objectName}} <strong>cannot be undone</strong><br>
+      {{ objectAction | continuous }} {{objectNoun}} {{objectName}} <strong>cannot be undone</strong><br>
       {{moreDetails}}.
     </span>
     <span *ngIf="!moreDetails">
-      {{ ObjectAction | continuous }} {{objectNoun}} {{objectName}} <strong>cannot be undone</strong>.
+      {{ objectAction | continuous }} {{objectNoun}} {{objectName}} <strong>cannot be undone</strong>.
     </span>
   </div>
 
   <div class="options">
     <chef-button primary caution (click)="deleteObject()">
-      {{ObjectAction}} {{objectNoun | titlecase}}
+      {{objectAction}} {{objectNoun | titlecase}}
     </chef-button>
     <chef-button tertiary (click)="closeEvent()">Cancel</chef-button>
   </div>
