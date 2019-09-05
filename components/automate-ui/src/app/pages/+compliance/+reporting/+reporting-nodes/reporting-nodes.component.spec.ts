@@ -88,7 +88,7 @@ describe('ReportingNodesComponent', () => {
 
   describe('onNodesListPageChanged()', () => {
     it('calls getData with applied filters', () => {
-      const filters = reportQuery.filters.getValue();
+      const filters = reportQuery.getReportQuery().filters;
       spyOn(component, 'getData');
 
       component.onNodesListPageChanged({detail: { value: 2}});
@@ -99,7 +99,7 @@ describe('ReportingNodesComponent', () => {
 
   describe('onNodesListSortToggled()', () => {
     it('calls getData with applied filters', () => {
-      const filters = reportQuery.filters.getValue();
+      const filters = reportQuery.getReportQuery().filters;
       spyOn(component, 'getData');
 
       component.onNodesListSortToggled({detail: {sort: 'name', order: 'asc'}});
