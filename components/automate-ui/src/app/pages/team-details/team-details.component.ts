@@ -194,11 +194,12 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       this.store.select(getUsersStatus)]).pipe(
         takeUntil(this.isDestroyed),
         filter(([_allUsers, uStatus, _teamUsers, tuStatus]:
-          [User[], EntityStatus, string[], EntityStatus]) => {
-            return uStatus === EntityStatus.loadingSuccess ||
-              tuStatus === EntityStatus.loadingSuccess;
-        }),
+          [User[], EntityStatus, string[], EntityStatus]) =>
+            uStatus === EntityStatus.loadingSuccess &&
+            tuStatus === EntityStatus.loadingSuccess),
         filter(() => !!this.team),
+        // Map UUID membership to user records and remove any entries that don't
+        // map to user records.
         map(([users, _uStatus, teamUserIds, _tuStatus]:
           [User[], EntityStatus, string[], EntityStatus]) => {
             return at(teamUserIds, keyBy('membership_id', users))
@@ -247,12 +248,10 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
   showUsersTable(): boolean {
     return !this.isLoadingTeam && this.users.length > 0;
-    // return !this.isLoadingTeam;
   }
 
   showEmptyStateMessage(): boolean {
     return !this.isLoadingTeam && this.users.length === 0;
-    // return !this.isLoadingTeam;
   }
 
   toggleUserMembershipView(): void {

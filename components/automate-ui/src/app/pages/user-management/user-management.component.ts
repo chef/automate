@@ -2,12 +2,12 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Observable ,  Subject, combineLatest } from 'rxjs';
-import { takeUntil, map, filter } from 'rxjs/operators';
+import { takeUntil, filter } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { ChefValidators } from 'app/helpers/auth/validator';
-import { EntityStatus, loading } from 'app/entities/entities';
+import { EntityStatus } from 'app/entities/entities';
 import { allUsers, userStatus } from 'app/entities/users/user.selectors';
 import {
   CreateUser, DeleteUser, GetUsers, CreateUserPayload
@@ -28,11 +28,10 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   public deleteModalVisible = false;
   public createModalVisible = false;
-
+  public isLoading = true;
   public userToDelete: User;
 
   public userStatus$: Observable<EntityStatus>;
-  public loading$: Observable<boolean>;
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
   // Inputs to app-user-table
@@ -45,7 +44,6 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     fb: FormBuilder
   ) {
     this.userStatus$ = store.select(userStatus);
-    this.loading$ = store.select(userStatus).pipe(map(loading));
 
     this.createUserForm = fb.group({
       // Must stay in sync with error checks in user-form.component.html
@@ -70,8 +68,8 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed),
       filter(([_, uStatus]: [User[], EntityStatus]) =>
         uStatus === EntityStatus.loadingSuccess
-      ),
-      map(([users, _]: [User[], EntityStatus]) => {
+      )).subscribe(([users, uStatus]: [User[], EntityStatus]) => {
+        this.isLoading = uStatus === EntityStatus.loading;
         users.sort(
           (a, b) => {
             // Note: the `undefined` is the locale to use for comparison. According to
@@ -86,7 +84,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
               a.id.localeCompare(b.id, undefined, opts);
           });
         this.users = users;
-      })).subscribe();
+      });
   }
 
   ngOnDestroy() {
@@ -132,16 +130,18 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.userStatus$.pipe(
       takeUntil(this.isDestroyed))
       .subscribe((status) => {
-        if (status !== EntityStatus.loading) {
+        this.isLoading = status === EntityStatus.loading;
+        if (!this.isLoading) {
           this.closeCreateModal();
         }
     });
   }
 
   public showEmptyStateMessage(): boolean {
-    this.loading$.subscribe((loadingStatus: boolean) => {
-      return !loadingStatus || this.users.length === 0;
-    });
-    return false;
+    return !this.isLoading && this.users.length === 0;
+  }
+
+  public showUsersTable(): boolean {
+    return !this.isLoading && this.users.length > 0;
   }
 }

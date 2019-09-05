@@ -39,22 +39,19 @@
         <div class="empty-state">
           <p>Add some users to get started!</p>
         </div>
-        <chef-toolbar>
-          <div class='empty-state'>
-            <chef-button primary (click)="openCreateModal()"> Create User
-            </chef-button>
-          </div>
-        </chef-toolbar>
       </ng-container>
       <chef-toolbar>
-        <chef-button primary (click)="openCreateModal()"> Create User </chef-button>
+        <div [ngClass]="showEmptyStateMessage() ? 'empty-state' : ''">
+          <chef-button primary (click)="openCreateModal()"> Create User </chef-button>
+        </div>
       </chef-toolbar>
-      <app-user-table
+      <app-user-table 
+        *ngIf="showUsersTable()"
         [removeText]="removeText"
         [users]="users"
         [baseUrl]="baseUrl"
         (removeClicked)="startUserDelete($event)">
-    </app-user-table>
+      </app-user-table>
     </section>
   </main>
 </div>
