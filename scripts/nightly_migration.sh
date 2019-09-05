@@ -26,19 +26,31 @@ dump_logs() {
     exit $errcode
 }
 
+log_section_start() {
+    echo "--- [$(date -u)] $*"
+}
+
 if [[ -n "$A1_LICENSE" ]]; then
     echo -e "$A1_LICENSE" | base64 --decode > components/automate-deployment/a1-migration/delivery.license
 fi
 
 cd components/automate-deployment
 trap dump_logs EXIT
+
+log_section_start "Setting up A1 migration host"
 sudo make a1-migration-host-setup
+log_section_start "Building Docker containers"
 make a1-migration-build
+log_section_start "Installing automate-cli"
 curl -O https://packages.chef.io/files/dev/latest/chef-automate-cli/chef-automate_linux_amd64.zip
 unzip -o chef-automate_linux_amd64.zip -d a1-migration
+log_section_start "Starting Automate 1"
 make a1-migration-up
 sleep 20 # TODO: Do we really need this sleep?
+log_section_start "Loading Sample Data"
 make a1-migration-load-sample-data
+log_section_start "Migrating to Automate 2"
 HARTIFACT_DIR="/a2/results" make a1-migration-migrate
+log_section_start "Testing Automate 2"
 # Password for a1-migration-data-full/0.0.1/20190530183952
 A1_BUILDER_PASSWORD='KfK1LU/nGzk6J8BmnD+G3GwPn9+TqD5VGwQ=' AUTOMATE_API_DEFAULT_PASSWORD='WThqQgjnI6vAhi3TEVoM7GntWBI1HvJMREQ=' make a1-migration-test
