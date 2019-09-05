@@ -11,6 +11,8 @@ import { GetProjectSuccess } from 'app/entities/projects/project.actions';
 import { projectEntityReducer } from 'app/entities/projects/project.reducer';
 import { Project } from 'app/entities/projects/project.model';
 import { Rule } from 'app/entities/rules/rule.model';
+import { ruleEntityReducer } from 'app/entities/rules/rule.reducer';
+import { GetRulesSuccess } from 'app/entities/rules/rule.actions';
 import { ProjectDetailsComponent } from './project-details.component';
 
 describe('ProjectDetailsComponent', () => {
@@ -111,7 +113,8 @@ describe('ProjectDetailsComponent', () => {
             previousRoute: {},
             navigationId: 0
           }),
-          projects: projectEntityReducer
+          projects: projectEntityReducer,
+          rules: ruleEntityReducer
         })
       ],
       providers: [
@@ -130,6 +133,11 @@ describe('ProjectDetailsComponent', () => {
         type: 'CHEF_MANAGED',
         status: 'NO_RULES'
       }
+    }));
+
+    store.dispatch(new GetRulesSuccess({
+      rules: [],
+      status: 'NO_RULES'
     }));
 
     fixture = TestBed.createComponent(ProjectDetailsComponent);
