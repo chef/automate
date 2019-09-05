@@ -3,6 +3,8 @@ set -e
 # NOTE: This is a terraform template. The ${upgrade} and ${channel}
 # variables will be replaced with strings at rendering time.  Those
 # are not shell variables.
+export HAB_NONINTERACTIVE="true"
+export HAB_NOCOLORING="true"
 
 automate_deployed() {
     [[ -f /hab/user/deployment-service/config/user.toml ]]
