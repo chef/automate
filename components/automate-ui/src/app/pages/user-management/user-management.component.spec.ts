@@ -27,6 +27,7 @@ describe('UserManagementComponent', () => {
         MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-subheading' }),
+        MockComponent({ selector: 'chef-toolbar' }),
         MockComponent({ selector: 'app-delete-object-modal',
                         inputs: ['default', 'visible', 'objectNoun', 'objectName'],
                         outputs: ['close', 'deleteClicked'] }),

@@ -72,7 +72,7 @@ describe('TeamDetailsComponent', () => {
         MockComponent({ selector: 'app-user-table',
           inputs: [
             'baseUrl',
-            'users$',
+            'users',
             'removeText',
             'addButtonText',
             'addButtonEnabled',
@@ -91,6 +91,7 @@ describe('TeamDetailsComponent', () => {
         MockComponent({ selector: 'chef-option' }),
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-subheading' }),
+        MockComponent({ selector: 'chef-toolbar' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
         MockComponent({ selector: 'app-projects-dropdown',
           inputs: ['projects', 'disabled'], outputs: ['onProjectChecked'] }),
@@ -160,7 +161,7 @@ describe('TeamDetailsComponent', () => {
     });
 
     it('users array should be empty', () => {
-      component.users.length.toEqual(0);
+      expect(component.users.length).toEqual(0);
     });
   });
 
