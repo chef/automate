@@ -259,7 +259,11 @@ export class StatsService {
           }
         } else if (type === 'control_id') {
           type = 'control';
-          value = filter['value']['text'];
+          if ( filter['value']['id'] ) {
+            value = filter['value']['id'];
+          } else {
+            value = filter['value']['text'];
+          }
         }
 
         const group = formatted.filter(f => f.type === type)[0];
