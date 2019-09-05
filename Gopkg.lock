@@ -606,10 +606,10 @@
   version = "v1.0.2"
 
 [[projects]]
-  branch = "master"
-  digest = "1:ad0d1d6bbbff216b56d0aa2e64cae03add5925773838bccbb268fa5494712897"
+  digest = "1:874748844b8b79d8997b7aae57be558faf2fb1546279a795655980392a37a8cc"
   name = "github.com/jhump/protoreflect"
   packages = [
+    "codec",
     "desc",
     "desc/internal",
     "desc/protoparse",
@@ -619,7 +619,8 @@
     "internal",
   ]
   pruneopts = "NUT"
-  revision = "cc4400ed5be75c897955f2b15a9f95cacea62f46"
+  revision = "c67d679c9f863957281faba646d790dbab6cf3b3"
+  version = "v1.5.0"
 
 [[projects]]
   digest = "1:ac6d01547ec4f7f673311b4663909269bfb8249952de3279799289467837c3cc"

@@ -64,7 +64,7 @@ func (f *MessageFactory) NewMessage(md *desc.MessageDescriptor) proto.Message {
 	if m := ktr.CreateIfKnown(md.GetFullyQualifiedName()); m != nil {
 		return m
 	}
-	return newMessageWithMessageFactory(md, f)
+	return NewMessageWithMessageFactory(md, f)
 }
 
 // NewDynamicMessage creates a new empty dynamic message that corresponds to the given
@@ -75,7 +75,7 @@ func (f *MessageFactory) NewMessage(md *desc.MessageDescriptor) proto.Message {
 // this factory when creating other messages, like during de-serialization of fields
 // that are themselves message types.
 func (f *MessageFactory) NewDynamicMessage(md *desc.MessageDescriptor) *Message {
-	return newMessageWithMessageFactory(md, f)
+	return NewMessageWithMessageFactory(md, f)
 }
 
 // GetKnownTypeRegistry returns the known type registry that this factory uses to
@@ -147,6 +147,21 @@ func (r *KnownTypeRegistry) AddKnownType(kts ...proto.Message) {
 // CreateIfKnown will construct an instance of the given message if it is a known type.
 // If the given name is unknown, nil is returned.
 func (r *KnownTypeRegistry) CreateIfKnown(messageName string) proto.Message {
+	msgType := r.GetKnownType(messageName)
+	if msgType == nil {
+		return nil
+	}
+
+	if msgType.Kind() == reflect.Ptr {
+		return reflect.New(msgType.Elem()).Interface().(proto.Message)
+	} else {
+		return reflect.New(msgType).Elem().Interface().(proto.Message)
+	}
+}
+
+// GetKnownType will return the reflect.Type for the given message name if it is
+// known. If it is not known, nil is returned.
+func (r *KnownTypeRegistry) GetKnownType(messageName string) reflect.Type {
 	var msgType reflect.Type
 	if r == nil {
 		// a nil registry behaves the same as zero value instance: only know of well-known types
@@ -170,13 +185,5 @@ func (r *KnownTypeRegistry) CreateIfKnown(messageName string) proto.Message {
 		}
 	}
 
-	if msgType == nil {
-		return nil
-	}
-
-	if msgType.Kind() == reflect.Ptr {
-		return reflect.New(msgType.Elem()).Interface().(proto.Message)
-	} else {
-		return reflect.New(msgType).Elem().Interface().(proto.Message)
-	}
+	return msgType
 }

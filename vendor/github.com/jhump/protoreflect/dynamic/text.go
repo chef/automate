@@ -17,9 +17,16 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 
+	"github.com/jhump/protoreflect/codec"
 	"github.com/jhump/protoreflect/desc"
 )
 
+// MarshalText serializes this message to bytes in the standard text format,
+// returning an error if the operation fails. The resulting bytes will be a
+// valid UTF8 string.
+//
+// This method uses a compact form: no newlines, and spaces between field
+// identifiers and values are elided.
 func (m *Message) MarshalText() ([]byte, error) {
 	var b indentBuffer
 	b.indentCount = -1 // no indentation
@@ -29,6 +36,12 @@ func (m *Message) MarshalText() ([]byte, error) {
 	return b.Bytes(), nil
 }
 
+// MarshalTextIndent serializes this message to bytes in the standard text
+// format, returning an error if the operation fails. The resulting bytes will
+// be a valid UTF8 string.
+//
+// This method uses a "pretty-printed" form, with each field on its own line and
+// spaces between field identifiers and values.
 func (m *Message) MarshalTextIndent() ([]byte, error) {
 	var b indentBuffer
 	b.indent = "  " // TODO: option for indent?
@@ -39,6 +52,7 @@ func (m *Message) MarshalTextIndent() ([]byte, error) {
 }
 
 func (m *Message) marshalText(b *indentBuffer) error {
+	// TODO: option for emitting extended Any format?
 	first := true
 	// first the known fields
 	for _, tag := range m.knownFieldTags() {
@@ -111,7 +125,7 @@ func (m *Message) marshalText(b *indentBuffer) error {
 				if err != nil {
 					return err
 				}
-				in := newCodedBuffer(uf.Contents)
+				in := codec.NewBuffer(uf.Contents)
 				err = marshalUnknownGroupText(b, in, true)
 				if err != nil {
 					return err
@@ -347,17 +361,17 @@ func writeString(b *indentBuffer, s string) error {
 	return b.WriteByte('"')
 }
 
-func marshalUnknownGroupText(b *indentBuffer, in *codedBuffer, topLevel bool) error {
+func marshalUnknownGroupText(b *indentBuffer, in *codec.Buffer, topLevel bool) error {
 	first := true
 	for {
-		if in.eof() {
+		if in.EOF() {
 			if topLevel {
 				return nil
 			}
 			// this is a nested message: we are expecting an end-group tag, not EOF!
 			return io.ErrUnexpectedEOF
 		}
-		tag, wireType, err := in.decodeTagAndWireType()
+		tag, wireType, err := in.DecodeTagAndWireType()
 		if err != nil {
 			return err
 		}
@@ -400,7 +414,7 @@ func marshalUnknownGroupText(b *indentBuffer, in *codedBuffer, topLevel bool) er
 				return err
 			}
 			if wireType == proto.WireBytes {
-				contents, err := in.decodeRawBytes(false)
+				contents, err := in.DecodeRawBytes(false)
 				if err != nil {
 					return err
 				}
@@ -412,11 +426,11 @@ func marshalUnknownGroupText(b *indentBuffer, in *codedBuffer, topLevel bool) er
 				var v uint64
 				switch wireType {
 				case proto.WireVarint:
-					v, err = in.decodeVarint()
+					v, err = in.DecodeVarint()
 				case proto.WireFixed32:
-					v, err = in.decodeFixed32()
+					v, err = in.DecodeFixed32()
 				case proto.WireFixed64:
-					v, err = in.decodeFixed64()
+					v, err = in.DecodeFixed64()
 				default:
 					return proto.ErrInternalBadWireType
 				}
@@ -430,9 +444,12 @@ func marshalUnknownGroupText(b *indentBuffer, in *codedBuffer, topLevel bool) er
 			}
 		}
 	}
-	return nil
 }
 
+// UnmarshalText de-serializes the message that is present, in text format, in
+// the given bytes into this message. It first resets the current message. It
+// returns an error if the given bytes do not contain a valid encoding of this
+// message type in the standard text format
 func (m *Message) UnmarshalText(text []byte) error {
 	m.Reset()
 	if err := m.UnmarshalMergeText(text); err != nil {
@@ -441,6 +458,10 @@ func (m *Message) UnmarshalText(text []byte) error {
 	return m.Validate()
 }
 
+// UnmarshalMergeText de-serializes the message that is present, in text format,
+// in the given bytes into this message. Unlike UnmarshalText, it does not first
+// reset the message, instead merging the data in the given bytes into the
+// existing data in this message.
 func (m *Message) UnmarshalMergeText(text []byte) error {
 	return m.unmarshalText(newReader(text), tokenEOF)
 }
@@ -454,8 +475,8 @@ func (m *Message) unmarshalText(tr *txtReader, end tokenType) error {
 		if tok.tokTyp == tokenEOF {
 			return io.ErrUnexpectedEOF
 		}
-
 		var fd *desc.FieldDescriptor
+		var extendedAnyType *desc.MessageDescriptor
 		if tok.tokTyp == tokenInt {
 			// tag number (indicates unknown field)
 			tag, err := strconv.ParseInt(tok.val.(string), 10, 32)
@@ -481,8 +502,8 @@ func (m *Message) unmarshalText(tr *txtReader, end tokenType) error {
 					return textError(tok, "Expecting a colon ':' or brace '{'; instead got %q", tok.txt)
 				}
 				tok = tr.peek()
-				if tok.tokTyp == tokenComma {
-					tr.next() // consume tok
+				if tok.tokTyp.IsSep() {
+					tr.next() // consume separator
 				}
 				continue
 			}
@@ -501,8 +522,28 @@ func (m *Message) unmarshalText(tr *txtReader, end tokenType) error {
 					}
 				}
 				if fd == nil {
-					// TODO: add a flag to just ignore unrecognized field names
-					return textError(tok, "%q is not a recognized field name of %q", fieldName, m.md.GetFullyQualifiedName())
+					// maybe this is an extended Any
+					if m.md.GetFullyQualifiedName() == "google.protobuf.Any" && fieldName[0] == '[' && strings.Contains(fieldName, "/") {
+						// strip surrounding "[" and "]" and extract type name from URL
+						typeUrl := fieldName[1 : len(fieldName)-1]
+						mname := typeUrl
+						if slash := strings.LastIndex(mname, "/"); slash >= 0 {
+							mname = mname[slash+1:]
+						}
+						// TODO: add a way to weave an AnyResolver to this point
+						extendedAnyType = findMessageDescriptor(mname, m.md.GetFile())
+						if extendedAnyType == nil {
+							return textError(tok, "could not parse Any with unknown type URL %q", fieldName)
+						}
+						// field 1 is "type_url"
+						typeUrlField := m.md.FindFieldByNumber(1)
+						if err := m.TrySetField(typeUrlField, typeUrl); err != nil {
+							return err
+						}
+					} else {
+						// TODO: add a flag to just ignore unrecognized field names
+						return textError(tok, "%q is not a recognized field name of %q", fieldName, m.md.GetFullyQualifiedName())
+					}
 				}
 			}
 		}
@@ -510,13 +551,41 @@ func (m *Message) unmarshalText(tr *txtReader, end tokenType) error {
 		if tok.tokTyp == tokenEOF {
 			return io.ErrUnexpectedEOF
 		}
-		if fd.GetType() == descriptor.FieldDescriptorProto_TYPE_GROUP {
-			if tok.tokTyp != tokenOpenBrace {
-				return textError(tok, "Expecting a brace '{'; instead got %q", tok.txt)
+		if extendedAnyType != nil {
+			// consume optional colon; make sure this is a "start message" token
+			if tok.tokTyp == tokenColon {
+				tok = tr.next()
+				if tok.tokTyp == tokenEOF {
+					return io.ErrUnexpectedEOF
+				}
 			}
+			if tok.tokTyp.EndToken() == tokenError {
+				return textError(tok, "Expecting a '<' or '{'; instead got %q", tok.txt)
+			}
+
 			// TODO: use mf.NewMessage and, if not a dynamic message, use proto.UnmarshalText to unmarshal it
-			g := newMessageWithMessageFactory(fd.GetMessageType(), m.mf)
-			if err := g.unmarshalText(tr, tokenCloseBrace); err != nil {
+			g := m.mf.NewDynamicMessage(extendedAnyType)
+			if err := g.unmarshalText(tr, tok.tokTyp.EndToken()); err != nil {
+				return err
+			}
+			// now we marshal the message to bytes and store in the Any
+			b, err := g.Marshal()
+			if err != nil {
+				return err
+			}
+			// field 2 is "value"
+			anyValueField := m.md.FindFieldByNumber(2)
+			if err := m.TrySetField(anyValueField, b); err != nil {
+				return err
+			}
+
+		} else if (fd.GetType() == descriptor.FieldDescriptorProto_TYPE_GROUP ||
+			fd.GetType() == descriptor.FieldDescriptorProto_TYPE_MESSAGE) &&
+			tok.tokTyp.EndToken() != tokenError {
+
+			// TODO: use mf.NewMessage and, if not a dynamic message, use proto.UnmarshalText to unmarshal it
+			g := m.mf.NewDynamicMessage(fd.GetMessageType())
+			if err := g.unmarshalText(tr, tok.tokTyp.EndToken()); err != nil {
 				return err
 			}
 			if fd.IsRepeated() {
@@ -537,10 +606,38 @@ func (m *Message) unmarshalText(tr *txtReader, end tokenType) error {
 			}
 		}
 		tok = tr.peek()
-		if tok.tokTyp == tokenComma {
-			tr.next() // consume tok
+		if tok.tokTyp.IsSep() {
+			tr.next() // consume separator
 		}
 	}
+}
+func findMessageDescriptor(name string, fd *desc.FileDescriptor) *desc.MessageDescriptor {
+	md := findMessageInTransitiveDeps(name, fd, map[*desc.FileDescriptor]struct{}{})
+	if md == nil {
+		// couldn't find it; see if we have this message linked in
+		md, _ = desc.LoadMessageDescriptor(name)
+	}
+	return md
+}
+
+func findMessageInTransitiveDeps(name string, fd *desc.FileDescriptor, seen map[*desc.FileDescriptor]struct{}) *desc.MessageDescriptor {
+	if _, ok := seen[fd]; ok {
+		// already checked this file
+		return nil
+	}
+	seen[fd] = struct{}{}
+	md := fd.FindMessage(name)
+	if md != nil {
+		return md
+	}
+	// not in this file so recursively search its deps
+	for _, dep := range fd.GetDependencies() {
+		md = findMessageInTransitiveDeps(name, dep, seen)
+		if md != nil {
+			return md
+		}
+	}
+	// couldn't find it
 	return nil
 }
 
@@ -551,7 +648,7 @@ func textError(tok *token, format string, args ...interface{}) error {
 	} else {
 		msg = fmt.Sprintf(format, args...)
 	}
-	return fmt.Errorf("Line %d, col %d: %s", tok.pos.Line, tok.pos.Column, msg)
+	return fmt.Errorf("line %d, col %d: %s", tok.pos.Line, tok.pos.Column, msg)
 }
 
 type setFunction func(*Message, *desc.FieldDescriptor, interface{}) error
@@ -574,8 +671,8 @@ func (m *Message) unmarshalFieldValueText(fd *desc.FieldDescriptor, tr *txtReade
 			if tok.tokTyp == tokenCloseBracket {
 				tr.next() // consume tok
 				return nil
-			} else if tok.tokTyp == tokenComma {
-				tr.next() // consume tok
+			} else if tok.tokTyp.IsSep() {
+				tr.next() // consume separator
 			}
 		}
 	}
@@ -610,24 +707,58 @@ func (m *Message) unmarshalFieldElementText(fd *desc.FieldDescriptor, tr *txtRea
 		}
 		expected = "string value"
 	case descriptor.FieldDescriptorProto_TYPE_FLOAT:
-		if tok.tokTyp == tokenFloat {
+		switch tok.tokTyp {
+		case tokenFloat:
 			return set(m, fd, float32(tok.val.(float64)))
-		} else if tok.tokTyp == tokenInt {
+		case tokenInt:
 			if f, err := strconv.ParseFloat(tok.val.(string), 32); err != nil {
 				return err
 			} else {
 				return set(m, fd, float32(f))
 			}
+		case tokenIdent:
+			ident := strings.ToLower(tok.val.(string))
+			if ident == "inf" {
+				return set(m, fd, float32(math.Inf(1)))
+			} else if ident == "nan" {
+				return set(m, fd, float32(math.NaN()))
+			}
+		case tokenMinus:
+			peeked := tr.peek()
+			if peeked.tokTyp == tokenIdent {
+				ident := strings.ToLower(peeked.val.(string))
+				if ident == "inf" {
+					tr.next() // consume peeked token
+					return set(m, fd, float32(math.Inf(-1)))
+				}
+			}
 		}
 		expected = "float value"
 	case descriptor.FieldDescriptorProto_TYPE_DOUBLE:
-		if tok.tokTyp == tokenFloat {
+		switch tok.tokTyp {
+		case tokenFloat:
 			return set(m, fd, tok.val)
-		} else if tok.tokTyp == tokenInt {
+		case tokenInt:
 			if f, err := strconv.ParseFloat(tok.val.(string), 64); err != nil {
 				return err
 			} else {
 				return set(m, fd, f)
+			}
+		case tokenIdent:
+			ident := strings.ToLower(tok.val.(string))
+			if ident == "inf" {
+				return set(m, fd, math.Inf(1))
+			} else if ident == "nan" {
+				return set(m, fd, math.NaN())
+			}
+		case tokenMinus:
+			peeked := tr.peek()
+			if peeked.tokTyp == tokenIdent {
+				ident := strings.ToLower(peeked.val.(string))
+				if ident == "inf" {
+					tr.next() // consume peeked token
+					return set(m, fd, math.Inf(-1))
+				}
 			}
 		}
 		expected = "float value"
@@ -688,16 +819,19 @@ func (m *Message) unmarshalFieldElementText(fd *desc.FieldDescriptor, tr *txtRea
 			}
 		}
 		expected = fmt.Sprintf("enum %s value", fd.GetEnumType().GetFullyQualifiedName())
-	case descriptor.FieldDescriptorProto_TYPE_MESSAGE:
-		if tok.tokTyp == tokenOpenAngle {
-			dm := newMessageWithMessageFactory(fd.GetMessageType(), m.mf)
-			if err := dm.unmarshalText(tr, tokenCloseAngle); err != nil {
+	case descriptor.FieldDescriptorProto_TYPE_MESSAGE,
+		descriptor.FieldDescriptorProto_TYPE_GROUP:
+
+		endTok := tok.tokTyp.EndToken()
+		if endTok != tokenError {
+			dm := m.mf.NewDynamicMessage(fd.GetMessageType())
+			if err := dm.unmarshalText(tr, endTok); err != nil {
 				return err
 			}
 			// TODO: ideally we would use mf.NewMessage and, if not a dynamic message, use
-			// jsonpb to unmarshal it. But the text parser isn't particularly amenable to that
-			// so we instead convert a dynamic message to a generated one if the known-type
-			// registry knows about the generated type...
+			// proto package to unmarshal it. But the text parser isn't particularly amenable
+			// to that, so we instead convert a dynamic message to a generated one if the
+			// known-type registry knows about the generated type...
 			var ktr *KnownTypeRegistry
 			if m.mf != nil {
 				ktr = m.mf.ktr
@@ -717,7 +851,7 @@ func (m *Message) unmarshalFieldElementText(fd *desc.FieldDescriptor, tr *txtRea
 
 	// if we get here, token was wrong type; create error message
 	var article string
-	if strings.Index("aieou", expected[0:1]) != -1 {
+	if strings.Contains("aieou", expected[0:1]) {
 		article = "an"
 	} else {
 		article = "a"
@@ -738,21 +872,26 @@ func unmarshalFieldNameText(tr *txtReader, tok *token) (string, error) {
 			closeChar = "close paren ')'"
 		}
 		// must be followed by an identifier
-		tok = tr.next()
-		if tok.tokTyp == tokenEOF {
-			return "", io.ErrUnexpectedEOF
-		} else if tok.tokTyp != tokenIdent {
-			return "", textError(tok, "Expecting an identifier; instead got %q", tok.txt)
+		idents := make([]string, 0, 1)
+		for {
+			tok = tr.next()
+			if tok.tokTyp == tokenEOF {
+				return "", io.ErrUnexpectedEOF
+			} else if tok.tokTyp != tokenIdent {
+				return "", textError(tok, "Expecting an identifier; instead got %q", tok.txt)
+			}
+			idents = append(idents, tok.val.(string))
+			// and then close bracket/paren, or "/" to keep adding URL elements to name
+			tok = tr.next()
+			if tok.tokTyp == tokenEOF {
+				return "", io.ErrUnexpectedEOF
+			} else if tok.tokTyp == closeType {
+				break
+			} else if tok.tokTyp != tokenSlash {
+				return "", textError(tok, "Expecting a %s; instead got %q", closeChar, tok.txt)
+			}
 		}
-		ident := tok.val.(string)
-		// and then close bracket/paren
-		tok = tr.next()
-		if tok.tokTyp == tokenEOF {
-			return "", io.ErrUnexpectedEOF
-		} else if tok.tokTyp != closeType {
-			return "", textError(tok, "Expecting a %s; instead got %q", closeChar, tok.txt)
-		}
-		return "[" + ident + "]", nil
+		return "[" + strings.Join(idents, "/") + "]", nil
 	} else if tok.tokTyp == tokenIdent {
 		// normal field name
 		return tok.val.(string), nil
@@ -785,9 +924,10 @@ func skipFieldValueText(tr *txtReader) error {
 			if tok.tokTyp == tokenCloseBracket {
 				tr.next() // consume tok
 				return nil
-			} else if tok.tokTyp == tokenComma {
-				tr.next() // consume tok
+			} else if tok.tokTyp.IsSep() {
+				tr.next() // consume separator
 			}
+
 		}
 	}
 	return skipFieldElementText(tr)
@@ -840,8 +980,8 @@ func skipMessageText(tr *txtReader, isGroup bool) error {
 		}
 
 		tok = tr.peek()
-		if tok.tokTyp == tokenComma {
-			tr.next() // consume comma
+		if tok.tokTyp.IsSep() {
+			tr.next() // consume separator
 		}
 	}
 }
@@ -857,6 +997,7 @@ const (
 	tokenFloat
 	tokenColon
 	tokenComma
+	tokenSemiColon
 	tokenOpenBrace
 	tokenCloseBrace
 	tokenOpenBracket
@@ -865,7 +1006,24 @@ const (
 	tokenCloseAngle
 	tokenOpenParen
 	tokenCloseParen
+	tokenSlash
+	tokenMinus
 )
+
+func (t tokenType) IsSep() bool {
+	return t == tokenComma || t == tokenSemiColon
+}
+
+func (t tokenType) EndToken() tokenType {
+	switch t {
+	case tokenOpenAngle:
+		return tokenCloseAngle
+	case tokenOpenBrace:
+		return tokenCloseBrace
+	default:
+		return tokenError
+	}
+}
 
 type token struct {
 	tokTyp tokenType
@@ -878,7 +1036,6 @@ type txtReader struct {
 	scanner    scanner.Scanner
 	peeked     token
 	havePeeked bool
-	err        error
 }
 
 func newReader(text []byte) *txtReader {
@@ -940,7 +1097,10 @@ func (p *txtReader) processToken(t rune, text string, pos scanner.Position) erro
 		}
 	case '-': // unary minus, for negative ints and floats
 		ch := p.scanner.Peek()
-		if ch >= '0' && ch <= '9' {
+		if ch < '0' || ch > '9' {
+			p.peeked.tokTyp = tokenMinus
+			p.peeked.val = '-'
+		} else {
 			t := p.scanner.Scan()
 			if t == scanner.EOF {
 				return io.ErrUnexpectedEOF
@@ -960,7 +1120,7 @@ func (p *txtReader) processToken(t rune, text string, pos scanner.Position) erro
 				p.peeked.val = text // can't parse the number because we don't know if it's signed or unsigned
 			} else {
 				p.peeked.pos = p.scanner.Position
-				return fmt.Errorf("Expecting an int or float but got %q", p.scanner.TokenText())
+				return fmt.Errorf("expecting an int or float but got %q", p.scanner.TokenText())
 			}
 		}
 	case ':':
@@ -969,6 +1129,9 @@ func (p *txtReader) processToken(t rune, text string, pos scanner.Position) erro
 	case ',':
 		p.peeked.tokTyp = tokenComma
 		p.peeked.val = ','
+	case ';':
+		p.peeked.tokTyp = tokenSemiColon
+		p.peeked.val = ';'
 	case '{':
 		p.peeked.tokTyp = tokenOpenBrace
 		p.peeked.val = '{'
@@ -993,8 +1156,12 @@ func (p *txtReader) processToken(t rune, text string, pos scanner.Position) erro
 	case ')':
 		p.peeked.tokTyp = tokenCloseParen
 		p.peeked.val = ')'
+	case '/':
+		// only allowed to separate URL components in expanded Any format
+		p.peeked.tokTyp = tokenSlash
+		p.peeked.val = '/'
 	default:
-		return fmt.Errorf("Invalid character: %c", t)
+		return fmt.Errorf("invalid character: %c", t)
 	}
 	return nil
 }

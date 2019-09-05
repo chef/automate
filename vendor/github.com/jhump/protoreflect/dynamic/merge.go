@@ -9,9 +9,11 @@ import (
 	"github.com/jhump/protoreflect/desc"
 )
 
-// Merge merges the given source message into the given destination message. Use this instead of proto.Merge
-// when one or both of the messages might be a dynamic message. If there is a problem merging the messages,
-// such as the two messages having different types, then this method will panic (just as proto.Merges does).
+// Merge merges the given source message into the given destination message. Use
+// use this instead of proto.Merge when one or both of the messages might be a
+// a dynamic message. If there is a problem merging the messages, such as the
+// two messages having different types, then this method will panic (just as
+// proto.Merges does).
 func Merge(dst, src proto.Message) {
 	if dm, ok := dst.(*Message); ok {
 		if err := dm.MergeFrom(src); err != nil {
@@ -26,6 +28,10 @@ func Merge(dst, src proto.Message) {
 	}
 }
 
+// TryMerge merges the given source message into the given destination message.
+// You can use this instead of proto.Merge when one or both of the messages
+// might be a dynamic message. Unlike proto.Merge, this method will return an
+// error on failure instead of panic'ing.
 func TryMerge(dst, src proto.Message) error {
 	if dm, ok := dst.(*Message); ok {
 		if err := dm.MergeFrom(src); err != nil {
@@ -55,19 +61,7 @@ func mergeField(m *Message, fd *desc.FieldDescriptor, val interface{}) error {
 	rv := reflect.ValueOf(val)
 
 	if fd.IsMap() && rv.Kind() == reflect.Map {
-		for _, k := range rv.MapKeys() {
-			if k.Kind() == reflect.Interface && !k.IsNil() {
-				k = k.Elem()
-			}
-			v := rv.MapIndex(k)
-			if v.Kind() == reflect.Interface && !v.IsNil() {
-				v = v.Elem()
-			}
-			if err := m.putMapField(fd, k.Interface(), v.Interface()); err != nil {
-				return err
-			}
-		}
-		return nil
+		return mergeMapField(m, fd, rv)
 	}
 
 	if fd.IsRepeated() && rv.Kind() == reflect.Slice && rv.Type() != typeOfBytes {
