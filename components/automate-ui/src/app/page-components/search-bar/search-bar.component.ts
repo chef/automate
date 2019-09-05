@@ -12,7 +12,7 @@ import {
 import { Subject, Observable, of as observableOf } from 'rxjs';
 import { List } from 'immutable';
 import { clamp, compact, isEmpty } from 'lodash';
-import { SearchBarCategoryItem, Chicklet, SuggestionItem } from '../../types/types';
+import { SearchBarCategoryItem, Chicklet, SuggestionItem } from 'app/types/types';
 import {
   debounceTime, switchMap, distinctUntilChanged
 } from 'rxjs/operators';

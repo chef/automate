@@ -1,8 +1,10 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 import {
-  ServiceGroupsPayload, ServicesPayload,
-  ServicesFilters, HealthSummary
+  ServiceGroupsHealthSummary,
+  ServiceGroupsPayload,
+  GroupServicesPayload,
+  GroupServicesFilters
 } from './service-groups.model';
 
 export enum ServiceGroupsActionTypes {
@@ -45,7 +47,7 @@ export class GetServiceGroupsFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
-export class UpdateServiceGroupFilters implements Action {
+export class UpdateServiceGroupsFilters implements Action {
   readonly type = ServiceGroupsActionTypes.UPDATE_SERVICE_GROUPS_FILTER;
 
   constructor(public payload: {filters} ) {}
@@ -59,7 +61,7 @@ export class GetServiceGroupsCounts implements Action {
 export class GetServiceGroupsCountsSuccess implements Action {
   readonly type = ServiceGroupsActionTypes.GET_SERVICE_GROUPS_COUNTS_SUCCESS;
 
-  constructor(public payload: HealthSummary) {}
+  constructor(public payload: ServiceGroupsHealthSummary) {}
 }
 
 export class GetServiceGroupsCountsFailure implements Action {
@@ -71,7 +73,7 @@ export class GetServiceGroupsCountsFailure implements Action {
 export class UpdateSelectedSG implements Action {
   readonly type = ServiceGroupsActionTypes.UPDATE_SELECTED_SERVICE_GROUP;
 
-  constructor(public payload: ServicesFilters) {}
+  constructor(public payload: GroupServicesFilters) {}
 }
 
 export class GetServicesBySG implements Action {
@@ -82,7 +84,7 @@ export class GetServicesBySG implements Action {
 export class GetServicesBySGSuccess implements Action {
   readonly type = ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP_SUCCESS;
 
-  constructor(public payload: ServicesPayload ) {}
+  constructor(public payload: GroupServicesPayload ) {}
 }
 
 export class GetServicesBySGFailure implements Action {
@@ -111,7 +113,7 @@ export class GetServiceGroupsSuggestionsFailure implements Action {
 export type ServiceGroupsActions =
   | GetServiceGroupsSuccess
   | GetServiceGroupsFailure
-  | UpdateServiceGroupFilters
+  | UpdateServiceGroupsFilters
   | GetServiceGroups
   | GetServiceGroupsCounts
   | GetServiceGroupsCountsSuccess

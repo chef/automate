@@ -10,20 +10,25 @@ import {
   RollupServiceStatus,
   SearchBarCategoryItem,
   SortDirection
-} from '../../types/types';
-import { EntityStatus } from '../../entities/entities';
+} from 'app/types/types';
+import { EntityStatus } from 'app/entities/entities';
 import {
-  GetServiceGroupsSuggestions, UpdateServiceGroupFilters, UpdateSelectedSG
+  GetServiceGroupsSuggestions, UpdateServiceGroupsFilters, UpdateSelectedSG
 } from 'app/entities/service-groups/service-groups.actions';
 import {
-  ServiceGroup, ServiceGroupFilters, FieldDirection, HealthSummary, ServicesFilters
+  ServiceGroup,
+  ServiceGroupsFilters,
+  ServiceGroupsSuggestions,
+  FieldDirection,
+  ServiceGroupsHealthSummary,
+  GroupServicesFilters
 } from '../../entities/service-groups/service-groups.model';
 import {
-  serviceGroupStatus,
-  allServiceGroups,
-  serviceGroupState,
-  allServiceGroupHealth,
-  serviceGroupErrorResp
+  serviceGroupsStatus,
+  serviceGroupsList,
+  serviceGroupsState,
+  serviceGroupsHealth,
+  serviceGroupsError
 } from '../../entities/service-groups/service-groups.selector';
 import { find, filter as fpFilter, pickBy, some, includes, get } from 'lodash/fp';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
@@ -35,10 +40,10 @@ import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 })
 
 export class ServiceGroupsComponent implements OnInit, OnDestroy {
-  public serviceGroups$: Observable<ServiceGroup[]>;
+  public serviceGroupsList$: Observable<ServiceGroup[]>;
   public serviceGroupStatus$: Observable<EntityStatus>;
   public serviceGroupError$: Observable<HttpErrorResponse>;
-  public sgHealthSummary: HealthSummary;
+  public sgHealthSummary: ServiceGroupsHealthSummary;
 
   // The selected service-group id that will be sent to the services-sidebar
   public selectedServiceGroupId: string;
@@ -71,13 +76,13 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   // Should the URL share dropdown be displayed
   shareDropdownVisible = false;
 
-  // Should the search bar filter bar be displayed
+  // Should the search bar filter be displayed
   filtersVisible = true;
 
   // autocomplete suggestions
-  serviceGroupsSuggestions$: Observable<any[]>;
+  serviceGroupsSuggestions$: Observable<string[]>;
 
-  // The catagories allowed for searching
+  // The categories allowed for searching
   categoryTypes: SearchBarCategoryItem[] = [
     {
       type: 'origin',
@@ -149,7 +154,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
   private selectedFieldDirection$: Observable<SortDirection>;
   private selectedSortField$: Observable<string>;
-  private healthSummary$: Observable<HealthSummary>;
+  private healthSummary$: Observable<ServiceGroupsHealthSummary>;
   private currentPage$: Observable<number>;
   public currentFieldDirection: SortDirection;
   public currentSortField: string;
@@ -192,15 +197,15 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
                  a.get('sgPage') === b.get('sgPage');
         })
       ),
-      this.store.select(allServiceGroups)
-      ])
+      this.store.select(serviceGroupsList)
+    ])
     .pipe(takeUntil(this.isDestroyed))
     .subscribe(([queryParams]) => this.detailParamsChange(queryParams));
 
-    this.serviceGroupStatus$ = this.store.select(serviceGroupStatus);
-    this.serviceGroupError$ = this.store.select(serviceGroupErrorResp);
-    this.serviceGroups$ = this.store.select(allServiceGroups);
-    this.serviceGroups$.pipe(
+    this.serviceGroupStatus$ = this.store.select(serviceGroupsStatus);
+    this.serviceGroupError$ = this.store.select(serviceGroupsError);
+    this.serviceGroupsList$ = this.store.select(serviceGroupsList);
+    this.serviceGroupsList$.pipe(
       withLatestFrom(this.route.queryParamMap),
       takeUntil(this.isDestroyed)
     )
@@ -213,8 +218,8 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.selectedStatus$ = this.store.select(createSelector(serviceGroupState,
-      (state) => state.filters.status));
+    this.selectedStatus$ = this.store.select(createSelector(serviceGroupsState,
+      (serviceGroups) => serviceGroups.filters.status));
     this.selectedStatus$.pipe(takeUntil(this.isDestroyed)).subscribe((status) => {
       // This code enables pagination of service groups correctly, when the user selects
       // a Health Filter, we adjust the total number of service groups
@@ -231,7 +236,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       });
     });
 
-    this.healthSummary$ = this.store.select(allServiceGroupHealth);
+    this.healthSummary$ = this.store.select(serviceGroupsHealth);
     this.healthSummary$.pipe(takeUntil(this.isDestroyed))
       .subscribe((sgHealthSummary) => {
         this.sgHealthSummary = sgHealthSummary;
@@ -240,27 +245,28 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       });
 
 
-    this.selectedFieldDirection$ = this.store.select(createSelector(serviceGroupState,
-      (state) => state.filters.sortDirection));
+    this.selectedFieldDirection$ = this.store.select(createSelector(serviceGroupsState,
+      (serviceGroups) => serviceGroups.filters.sortDirection));
 
     this.selectedFieldDirection$.pipe(takeUntil(this.isDestroyed))
       .subscribe(currentFieldDirection => this.currentFieldDirection = currentFieldDirection);
 
-    this.selectedSortField$ = this.store.select(createSelector(serviceGroupState,
-      (state) => state.filters.sortField));
+    this.selectedSortField$ = this.store.select(createSelector(serviceGroupsState,
+      (serviceGroups) => serviceGroups.filters.sortField));
 
     this.selectedSortField$.pipe(takeUntil(this.isDestroyed)).subscribe(currentSortField =>
       this.currentSortField = currentSortField);
 
-    this.currentPage$ = this.store.select(createSelector(serviceGroupState,
-      (state) => state.filters.page));
+    this.currentPage$ = this.store.select(createSelector(serviceGroupsState,
+      (serviceGroups) => serviceGroups.filters.page));
 
     this.currentPage$.pipe(takeUntil(this.isDestroyed))
       .subscribe(currentPage => this.currentPage = currentPage);
 
-    this.serviceGroupsSuggestions$ = this.store.select(createSelector(serviceGroupState,
-      (state) => state.serviceGroupsSuggestions))
-        .pipe(map((serviceGroupsSuggestions: any[]) => serviceGroupsSuggestions));
+    this.serviceGroupsSuggestions$ = this.store.select(createSelector(serviceGroupsState,
+      (serviceGroups) => serviceGroups.suggestions.values))
+        .pipe(map((serviceGroupsSuggestions:
+          ServiceGroupsSuggestions[]) => serviceGroupsSuggestions));
 
     this.searchBarFilters$ = allUrlParameters$.pipe(map((chicklets: Chicklet[]) =>
       chicklets.filter(chicklet => some({'type': chicklet.type}, this.categoryTypes))));
@@ -288,7 +294,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   detailParamsChange(queryParams) {
     const sgId = queryParams.get('sgId');
     if (sgId) {
-      const servicesFilters: ServicesFilters = {
+      const servicesFilters: GroupServicesFilters = {
         service_group_id: sgId,
         page: parseInt(queryParams.get('sgPage'), 10) || 1,
         pageSize: parseInt(queryParams.get('sgPageSize'), 10) || 25,
@@ -308,7 +314,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       return some({'type': chicklet.type}, this.categoryTypes);
     }, allParameters);
 
-    const serviceGroupFilters: ServiceGroupFilters = {
+    const serviceGroupFilters: ServiceGroupsFilters = {
       status: status,
       sortField: sortField,
       sortDirection: sortDirection,
@@ -316,26 +322,26 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       pageSize: this.pageSize,
       searchBar: searchBarFilters
     };
-    this.store.dispatch(new UpdateServiceGroupFilters({filters: serviceGroupFilters}));
+    this.store.dispatch(new UpdateServiceGroupsFilters({filters: serviceGroupFilters}));
   }
 
-  get shareUrl() {
+  get shareUrl(): string {
     return window.location.href;
   }
 
-  toggleShareDropdown() {
+  toggleShareDropdown(): void {
     this.shareDropdownVisible = !this.shareDropdownVisible;
   }
 
-  hideShareDropdown() {
+  hideShareDropdown(): void {
     this.shareDropdownVisible = false;
   }
 
-  onSuggestValues(event) {
+  onSuggestValues(event: CustomEvent): void {
     this.store.dispatch(new GetServiceGroupsSuggestions( event.detail ));
   }
 
-  onFilterAdded(event) {
+  onFilterAdded(event: CustomEvent): void {
     const {type, text} = event.detail;
 
     if (some({type}, this.categoryTypes) ) {
@@ -351,7 +357,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     }
   }
 
-  onFilterRemoved(event) {
+  onFilterRemoved(event: CustomEvent): void {
     const {type, text} = event.detail;
     const {queryParamMap} = this.route.snapshot;
     const queryParams = {...this.route.snapshot.queryParams};
@@ -368,7 +374,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     this.router.navigate([], {queryParams});
   }
 
-  onFiltersClear(_event) {
+  onFiltersClear(_event: CustomEvent): void {
     const queryParams = {...this.route.snapshot.queryParams};
 
     const filteredParams = pickBy((_value, key) => {
@@ -380,7 +386,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     this.router.navigate([], {queryParams: filteredParams});
   }
 
-  public statusFilter(status) {
+  public statusFilter(status: string): void {
     const queryParams = {...this.route.snapshot.queryParams};
     if ( includes(status, this.allowedStatus) ) {
       queryParams['status'] = [status];
@@ -398,7 +404,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     this.router.navigate([], {queryParams});
   }
 
-  public onServiceGroupSelect(event: Event, id: string) {
+  public onServiceGroupSelect(event: Event, id: string): void {
     event.preventDefault();
 
     const queryParams = { ...this.route.snapshot.queryParams };
@@ -408,7 +414,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     this.router.navigate([], { queryParams });
   }
 
-  public updateServicesSidebar(servicesFilters: ServicesFilters) {
+  public updateServicesSidebar(servicesFilters: GroupServicesFilters): void {
     this.selectedServiceGroupId = servicesFilters.service_group_id;
     this.store.dispatch(new UpdateSelectedSG(servicesFilters));
     document.querySelector<HTMLElement>('app-services-sidebar').focus();
@@ -437,7 +443,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     return undefined;
   }
 
-  onPageChange(pageNumber: number) {
+  onPageChange(pageNumber: number): void {
     const queryParams = { ...this.route.snapshot.queryParams, page: pageNumber };
     const totalPages = Math.ceil(this.totalServiceGroups / this.pageSize) || 1;
     this.telemetryService.track('applicationsPageChange',
@@ -453,7 +459,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     this.router.navigate([], { queryParams });
   }
 
-  onToggleSort(field: string) {
+  onToggleSort(field: string): void {
     if (this.currentSortField === field) {
       const fieldDirection = this.currentFieldDirection === 'ASC' ? 'DESC' : 'ASC';
       this.onUpdateSort({field: field, fieldDirection: fieldDirection});

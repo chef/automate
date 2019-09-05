@@ -6,9 +6,9 @@ import { StoreModule, Store } from '@ngrx/store';
 import { ServiceGroupsComponent  } from './service-groups.component';
 import { ServiceStatusIconPipe } from '../../pipes/service-status-icon.pipe';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { serviceGroupEntityReducer } from 'app/entities/service-groups/service-groups.reducer';
+import { serviceGroupsEntityReducer } from 'app/entities/service-groups/service-groups.reducer';
 import {
-  UpdateServiceGroupFilters,
+  UpdateServiceGroupsFilters,
   GetServiceGroupsCountsSuccess
 } from 'app/entities/service-groups/service-groups.actions';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
@@ -34,7 +34,7 @@ describe('ServiceGroupsComponent', () => {
       providers: [  { provide: TelemetryService, useClass: MockTelemetryService }],
       imports: [
         StoreModule.forRoot({
-          serviceGroups: serviceGroupEntityReducer
+          serviceGroups: serviceGroupsEntityReducer
         }),
         RouterTestingModule
       ],
@@ -72,7 +72,7 @@ describe('ServiceGroupsComponent', () => {
 
       describe('and OK status filter update', () => {
         beforeEach(() => {
-          ngrxStore.dispatch(new UpdateServiceGroupFilters({filters: {status: 'ok'}}));
+          ngrxStore.dispatch(new UpdateServiceGroupsFilters({filters: {status: 'ok'}}));
         });
 
         it('should update the total number of service groups and selected status', fakeAsync(() => {
@@ -234,7 +234,7 @@ describe('ServiceGroupsComponent', () => {
       component.updateAllFilters([]);
 
       expect(component.store.dispatch).toHaveBeenCalledWith(
-        new UpdateServiceGroupFilters({filters: {
+        new UpdateServiceGroupsFilters({filters: {
           status: undefined,
           sortField: 'percent_ok',
           page: 1,
@@ -251,7 +251,7 @@ describe('ServiceGroupsComponent', () => {
       component.updateAllFilters([{type: 'not-used', text: 'bob'}]);
 
       expect(component.store.dispatch).toHaveBeenCalledWith(
-        new UpdateServiceGroupFilters({filters: {
+        new UpdateServiceGroupsFilters({filters: {
           status: undefined,
           sortField: 'percent_ok',
           sortDirection: 'ASC',
@@ -267,7 +267,7 @@ describe('ServiceGroupsComponent', () => {
       component.updateAllFilters([{type: 'status', text: 'ok'}]);
 
       expect(component.store.dispatch).toHaveBeenCalledWith(
-        new UpdateServiceGroupFilters({filters: {
+        new UpdateServiceGroupsFilters({filters: {
           status: 'ok',
           sortField: 'percent_ok',
           sortDirection: 'ASC',
@@ -283,7 +283,7 @@ describe('ServiceGroupsComponent', () => {
       component.updateAllFilters([{type: 'status', text: 'wrong'}]);
 
       expect(component.store.dispatch).toHaveBeenCalledWith(
-        new UpdateServiceGroupFilters({filters: {
+        new UpdateServiceGroupsFilters({filters: {
           status: undefined,
           sortField: 'percent_ok',
           sortDirection: 'ASC',
@@ -299,7 +299,7 @@ describe('ServiceGroupsComponent', () => {
       component.updateAllFilters([{type: 'page', text: '-2'}]);
 
       expect(component.store.dispatch).toHaveBeenCalledWith(
-        new UpdateServiceGroupFilters({filters: {
+        new UpdateServiceGroupsFilters({filters: {
           status: undefined,
           sortField: 'percent_ok',
           sortDirection: 'ASC',

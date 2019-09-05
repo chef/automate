@@ -53,8 +53,8 @@ import { ProjectEntityState, projectEntityReducer } from './entities/projects/pr
 import { RoleEntityState, roleEntityReducer } from './entities/roles/role.reducer';
 import { RuleEntityState, ruleEntityReducer } from './entities/rules/rule.reducer';
 import {
-  ServiceGroupEntityState,
-  serviceGroupEntityReducer
+  ServiceGroupsEntityState,
+  serviceGroupsEntityReducer
 } from './entities/service-groups/service-groups.reducer';
 import { TeamEntityState, teamEntityReducer } from './entities/teams/team.reducer';
 import { UserEntityState, userEntityReducer } from './entities/users/user.reducer';
@@ -90,7 +90,7 @@ export interface NgrxStateAtom {
   projects: ProjectEntityState;
   roles: RoleEntityState;
   rules: RuleEntityState;
-  serviceGroups: ServiceGroupEntityState;
+  serviceGroups: ServiceGroupsEntityState;
   teams: TeamEntityState;
   userperms: PermEntityState;
   users: UserEntityState;
@@ -183,7 +183,7 @@ export const ngrxReducers = {
   projects: projectEntityReducer,
   roles: roleEntityReducer,
   rules: ruleEntityReducer,
-  serviceGroups: serviceGroupEntityReducer,
+  serviceGroups: serviceGroupsEntityReducer,
   teams: teamEntityReducer,
   userperms: permEntityReducer,
   users: userEntityReducer

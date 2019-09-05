@@ -1,46 +1,46 @@
 <chef-notification
-  *ngIf="(servicesStatus$ | async) === 'loadingFailure'"
+  *ngIf="(serviceGroupsStatus$ | async) === 'loadingFailure'"
   [type]="'error'"
   [timeout]="10">
-  {{ (servicesError$ | async).status }}: {{ (servicesError$ | async).error.message }}
+  {{ (serviceGroupsError$ | async).status }}: {{ (serviceGroupsError$ | async).error.message }}
 </chef-notification>
 <div id="services-panel" class="services-panel">
   <chef-page-header>
     <chef-heading>
       <chef-icon>grain</chef-icon>
       Services in
-      <span *ngIf="serviceGroupId">{{ serviceGroupName$ | async }}</span>
-      <span *ngIf="!serviceGroupId">Group</span>
+      <span *ngIf="serviceGroupsId">{{ serviceGroupsName$ | async }}</span>
+      <span *ngIf="!serviceGroupsId">Group</span>
     </chef-heading>
     <chef-subheading>All services running in a service group.</chef-subheading>
   </chef-page-header>
-  <div *ngIf="serviceGroupId && (servicesStatus$ | async) === 'loadingSuccess'">
+  <div *ngIf="serviceGroupsId && (serviceGroupsStatus$ | async) === 'loadingSuccess'">
     <div class="status-filter-bar">
       <chef-status-filter-group [value]="selectedHealth" lean>
         <chef-option class="filter general" value="total" (click)="updateHealthFilter('total')" selected>
           <chef-icon class="filter-icon">grain</chef-icon>
           <div class="filter-label">Total</div>
-          <div class="filter-total">{{ servicesHealthSummary.total }}</div>
+          <div class="filter-total">{{ serviceGroupsHealthSummary.total }}</div>
         </chef-option>
         <chef-option class="filter critical" value='critical' (click)="updateHealthFilter('critical')">
           <chef-icon class="filter-icon">warning</chef-icon>
           <div class="filter-label">Critical</div>
-          <div class="filter-total">{{ servicesHealthSummary.critical }}</div>
+          <div class="filter-total">{{ serviceGroupsHealthSummary.critical }}</div>
         </chef-option>
         <chef-option class="filter warning" value='warning' (click)="updateHealthFilter('warning')">
           <chef-icon class="filter-icon">error</chef-icon>
           <div class="filter-label">Warning</div>
-          <div class="filter-total">{{ servicesHealthSummary.warning }}</div>
+          <div class="filter-total">{{ serviceGroupsHealthSummary.warning }}</div>
         </chef-option>
         <chef-option class="filter success" value='ok' (click)="updateHealthFilter('ok')">
           <chef-icon class="filter-icon">check_circle</chef-icon>
           <div class="filter-label">OK</div>
-          <div class="filter-total">{{ servicesHealthSummary.ok }}</div>
+          <div class="filter-total">{{ serviceGroupsHealthSummary.ok }}</div>
         </chef-option>
         <chef-option class="filter unknown" value='unknown' (click)="updateHealthFilter('unknown')">
           <chef-icon class="filter-icon">help</chef-icon>
           <div class="filter-label">Unknown</div>
-          <div class="filter-total">{{ servicesHealthSummary.unknown }}</div>
+          <div class="filter-total">{{ serviceGroupsHealthSummary.unknown }}</div>
         </chef-option>
       </chef-status-filter-group>
     </div>
@@ -87,19 +87,19 @@
   </div>
 
   <!-- Loading State: Displayed only when the services are loading -->
-  <div class="no-services" *ngIf="(servicesStatus$ | async) === 'loading'">
+  <div class="no-services" *ngIf="(serviceGroupsStatus$ | async) === 'loading'">
     <chef-loading-spinner size='50'></chef-loading-spinner>
     <h3>Loading services...</h3>
   </div>
 
   <!-- LoadingFailure State: Displayed only when the services status has a failure -->
-  <div class="no-services" *ngIf="(servicesStatus$ | async) === 'loadingFailure'">
+  <div class="no-services" *ngIf="(serviceGroupsStatus$ | async) === 'loadingFailure'">
     <chef-loading-spinner size='50'></chef-loading-spinner>
     <h3>Loading services...</h3>
   </div>
 
   <!-- NotLoaded State: Displayed only when there are no service-groups and therefore, NO ID -->
-  <div class="no-services" *ngIf="(servicesStatus$ | async) === 'notLoaded'">
+  <div class="no-services" *ngIf="(serviceGroupsStatus$ | async) === 'notLoaded'">
     Add service groups to see more service details
   </div>
 </div>

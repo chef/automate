@@ -6,11 +6,21 @@ import { Injectable } from '@angular/core';
 import { Actions, ofType, Effect } from '@ngrx/effects';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { ServiceGroupsPayload,
-  HealthSummary,
-  ServicesPayload
-      } from './service-groups.model';
-import { ServiceGroupEntityState } from './service-groups.reducer';
+import { ServiceGroupsRequests } from './service-groups.requests';
+
+import {
+  ServiceGroupsPayload,
+  ServiceGroupsHealthSummary,
+  ServiceGroupsFilters,
+  GroupServicesFilters,
+  GroupServicesPayload
+} from './service-groups.model';
+
+import {
+  serviceGroupsFilters,
+  selectedServiceGroupFilters
+} from './service-groups.selector';
+
 import {
   ServiceGroupsActionTypes,
   GetServiceGroups,
@@ -26,7 +36,6 @@ import {
   GetServiceGroupsSuggestionsFailure,
   GetServiceGroupsSuggestions
 } from './service-groups.actions';
-import { ServiceGroupsRequests } from './service-groups.requests';
 
 @Injectable()
 export class ServiceGroupsEffects {
@@ -39,10 +48,9 @@ export class ServiceGroupsEffects {
   @Effect()
   getServiceGroups$ = this.actions$.pipe(
     ofType(ServiceGroupsActionTypes.GET_SERVICE_GROUPS),
-    withLatestFrom(this.store),
-    switchMap(([_action, storeState]) => {
-      const serviceGroupsState: ServiceGroupEntityState = storeState.serviceGroups;
-      return this.requests.fetchServiceGroups(serviceGroupsState.filters).pipe(
+    withLatestFrom(this.store.select(serviceGroupsFilters)),
+    switchMap(([_action, filters]: [any, ServiceGroupsFilters]) => {
+      return this.requests.fetchServiceGroups(filters).pipe(
         map((payload: ServiceGroupsPayload) => new GetServiceGroupsSuccess(payload)),
         catchError((error: HttpErrorResponse) => of(new GetServiceGroupsFailure(error)))
       );
@@ -59,13 +67,13 @@ export class ServiceGroupsEffects {
       withLatestFrom(this.store),
       switchMap(([_action]) => {
         return this.requests.fetchServiceGroupHealth().pipe(
-        map((payload: HealthSummary) => new GetServiceGroupsCountsSuccess(payload)),
+        map((payload: ServiceGroupsHealthSummary) => new GetServiceGroupsCountsSuccess(payload)),
         catchError((error: HttpErrorResponse) => of(new GetServiceGroupsCountsFailure(error)))
       );
       }));
 
   @Effect()
-  updateSelectedServiceGroup$ = this.actions$.pipe(
+  updateSelectedServiceGroups$ = this.actions$.pipe(
     ofType(ServiceGroupsActionTypes.UPDATE_SELECTED_SERVICE_GROUP),
     mergeMap(() => [
       new GetServicesBySG()
@@ -74,11 +82,10 @@ export class ServiceGroupsEffects {
   @Effect()
   getServicesBySG$ = this.actions$.pipe(
     ofType(ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP),
-    withLatestFrom(this.store),
-    switchMap(([_action, storeState]) => {
-      const serviceGroupsState: ServiceGroupEntityState = storeState.serviceGroups;
-      return this.requests.fetchServicesBySG(serviceGroupsState.servicesFilters).pipe(
-        map((payload: ServicesPayload) => new GetServicesBySGSuccess(payload)),
+    withLatestFrom(this.store.select(selectedServiceGroupFilters)),
+    switchMap(([_action, filters]: [any, GroupServicesFilters]) => {
+      return this.requests.fetchServicesBySG(filters).pipe(
+        map((payload: GroupServicesPayload) => new GetServicesBySGSuccess(payload)),
         catchError((error: HttpErrorResponse) => of(new GetServicesBySGFailure(error)))
       );
     }));
@@ -86,12 +93,12 @@ export class ServiceGroupsEffects {
   @Effect()
   fetchNodeSuggestions$ = this.actions$.pipe(
       ofType(ServiceGroupsActionTypes.GET_SERVICE_GROUPS_SUGGESTIONS),
-      withLatestFrom(this.store),
-      switchMap(([action, storeState]) => {
-        const getServiceGroupsSuggestions = action as GetServiceGroupsSuggestions;
+      withLatestFrom(this.store.select(serviceGroupsFilters)),
+      switchMap(([getServiceGroupsSuggestions, filters]:
+        [GetServiceGroupsSuggestions, ServiceGroupsFilters]) => {
         return this.requests.getSuggestions(
           getServiceGroupsSuggestions.payload.type, getServiceGroupsSuggestions.payload.text,
-          storeState.serviceGroups.filters).pipe(
+          filters).pipe(
         map(serviceGroupsSuggestions =>
           new GetServiceGroupsSuggestionsSuccess({ serviceGroupsSuggestions })),
         catchError((error) => of(new GetServiceGroupsSuggestionsFailure(error))));
