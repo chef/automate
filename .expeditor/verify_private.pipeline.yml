@@ -378,7 +378,7 @@ steps:
     command:
       - . scripts/verify_setup.sh
       - hab studio run "source scripts/verify_studio_init.sh && start_deployment_service && chef-automate dev deployinate && event_gateway_integration"
-    timeout_in_minutes: 10
+    timeout_in_minutes: 15
     expeditor:
       executor:
         docker:
