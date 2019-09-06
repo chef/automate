@@ -8,11 +8,14 @@ package integration_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/common/query"
 	"github.com/chef/automate/api/external/habitat"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestServiceGroupsBasic(t *testing.T) {
@@ -122,6 +125,7 @@ func TestServiceGroupsMultiService(t *testing.T) {
 						Total:   1,
 						Unknown: 1,
 					},
+					DisconnectedCount: 1,
 				},
 				{
 					Name:             "postgres.default",
@@ -137,6 +141,7 @@ func TestServiceGroupsMultiService(t *testing.T) {
 						Critical: 1,
 						Unknown:  1,
 					},
+					DisconnectedCount: 3,
 				},
 				{
 					Name:             "myapp.default",
@@ -151,6 +156,7 @@ func TestServiceGroupsMultiService(t *testing.T) {
 						Ok:      2,
 						Warning: 1,
 					},
+					DisconnectedCount: 3,
 				},
 				{
 					Name:             "redis.default",
@@ -164,14 +170,24 @@ func TestServiceGroupsMultiService(t *testing.T) {
 						Total: 3,
 						Ok:    3,
 					},
+					DisconnectedCount: 3,
 				},
 			},
 		}
 		mockHabServicesMatrix = habServicesMatrix()
 	)
 
+	for _, s := range mockHabServicesMatrix {
+		var err error
+		s.EventMetadata.OccurredAt, err = ptypes.TimestampProto(time.Now().Add(-time.Minute * 30))
+		require.NoError(t, err)
+	}
+
 	suite.IngestServices(mockHabServicesMatrix)
 	defer suite.DeleteDataFromStorage()
+
+	_, err := suite.ApplicationsServer.MarkDisconnectedServices(300)
+	require.NoError(t, err)
 
 	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
 	assert.Nil(t, err)

@@ -121,6 +121,7 @@ type ServiceGroupDisplay struct {
 	ServicesHealthCounts HealthCounts
 	Application          string
 	Environment          string
+	DisconnectedCount    int32
 }
 
 type Supervisor struct {

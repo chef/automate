@@ -102,6 +102,7 @@ func (a *ApplicationsServer) GetServiceGroups(ctx context.Context,
 				Critical: sg.ServicesHealthCounts.Critical,
 				Unknown:  sg.ServicesHealthCounts.Unknown,
 			},
+			DisconnectedCount: sg.DisconnectedCount,
 		}
 	}
 

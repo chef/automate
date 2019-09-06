@@ -249,6 +249,8 @@ message ServiceGroup {
   // Combination of the origin and package name in a single string like:
   // Example: core/redis
   string package = 9;
+
+  int32 disconnected_count = 10;
 }
 
 message HealthCounts {

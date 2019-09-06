@@ -287,6 +287,10 @@ func assertServiceGroupsEqual(t *testing.T, expected, actual *applications.Servi
 				expected.ServiceGroups[i].Environment,
 				actual.ServiceGroups[i].Environment,
 				"The service_group environment is not the expected one")
+			assert.Equal(t,
+				expected.ServiceGroups[i].DisconnectedCount,
+				actual.ServiceGroups[i].DisconnectedCount,
+				"The number of disconnected services didn't match the expected value")
 		}
 	}
 }

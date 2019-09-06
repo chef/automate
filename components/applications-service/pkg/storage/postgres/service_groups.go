@@ -76,6 +76,7 @@ const (
       ,s.application as app_name
       ,s.environment as environment
       ,s.service_group_name_suffix as name_suffix
+			,COUNT(s.disconnected) FILTER (WHERE s.disconnected = 'true') AS disconnected_count
     FROM service_full AS s
 `
 	groupByPart = `
@@ -129,7 +130,8 @@ type serviceGroupHealth struct {
 	Application    string         `db:"app_name"`
 	Environment    string         `db:"environment"`
 	//We are not returning this just using it for filters
-	NameSuffix string `db:"name_suffix"`
+	NameSuffix        string `db:"name_suffix"`
+	DisconnectedCount int32  `db:"disconnected_count"`
 
 	// These fields are not mapped to any database field,
 	// they are here just to help us internally
@@ -189,6 +191,7 @@ func (db *Postgres) GetServiceGroups(
 				Unknown:  sgh.HealthUnknown,
 				Total:    sgh.HealthTotal,
 			},
+			DisconnectedCount: sgh.DisconnectedCount,
 		}
 	}
 
