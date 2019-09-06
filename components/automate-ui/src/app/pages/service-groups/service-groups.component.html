@@ -64,7 +64,7 @@
       <div class="filter-total">{{ sgHealthSummary["unknown"] }}</div>
     </chef-option>
   </chef-status-filter-group>
-  <chef-table class="service-group-list" *ngIf="(serviceGroupStatus$ | async) === 'loadingSuccess' && (serviceGroupsList$ | async).length !== 0">
+  <chef-table class="service-group-list" *ngIf="(serviceGroupsStatus$ | async) === 'loadingSuccess' && (serviceGroupsList$ | async).length !== 0">
     <chef-thead>
         <chef-tr>
           <chef-th class="health sort" (click)="onToggleSort('percent_ok')">

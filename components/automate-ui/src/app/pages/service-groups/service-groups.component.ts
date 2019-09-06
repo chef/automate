@@ -41,8 +41,8 @@ import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 
 export class ServiceGroupsComponent implements OnInit, OnDestroy {
   public serviceGroupsList$: Observable<ServiceGroup[]>;
-  public serviceGroupStatus$: Observable<EntityStatus>;
-  public serviceGroupError$: Observable<HttpErrorResponse>;
+  public serviceGroupsStatus$: Observable<EntityStatus>;
+  public serviceGroupsError$: Observable<HttpErrorResponse>;
   public sgHealthSummary: ServiceGroupsHealthSummary;
 
   // The selected service-group id that will be sent to the services-sidebar
@@ -202,8 +202,8 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     .pipe(takeUntil(this.isDestroyed))
     .subscribe(([queryParams]) => this.detailParamsChange(queryParams));
 
-    this.serviceGroupStatus$ = this.store.select(serviceGroupsStatus);
-    this.serviceGroupError$ = this.store.select(serviceGroupsError);
+    this.serviceGroupsStatus$ = this.store.select(serviceGroupsStatus);
+    this.serviceGroupsError$ = this.store.select(serviceGroupsError);
     this.serviceGroupsList$ = this.store.select(serviceGroupsList);
     this.serviceGroupsList$.pipe(
       withLatestFrom(this.route.queryParamMap),
