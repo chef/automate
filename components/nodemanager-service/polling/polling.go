@@ -19,7 +19,6 @@ import (
 )
 
 func CheckManagersStatuses(ctx context.Context, db *pgdb.DB, secretsClient secrets.SecretsServiceClient) error {
-	logrus.Info("YZL: running CheckManagerStatuses")
 	// get all managers
 	// note: we really don't expect anyone to have more than 100 nodemanagers, so this is ok for now
 	allManagers, _, err := db.GetNodeManagers("", 0, 1, 100, []*common.Filter{})
@@ -68,7 +67,6 @@ func handleManagerStatusError(db *pgdb.DB, mgr *manager.NodeManager, err error) 
 }
 
 func QueryAwsEc2InstanceStates(ctx context.Context, db *pgdb.DB, secretsClient secrets.SecretsServiceClient, eventsClient aEvent.EventServiceClient) error {
-	logrus.Infof("YZL: running QueryAwsEcsInstanceStates")
 	logrus.Infof("processing aws-ec2 instances due for status check...")
 
 	// get all aws-ec2 manager ids
@@ -114,7 +112,6 @@ func QueryAwsEc2InstanceStates(ctx context.Context, db *pgdb.DB, secretsClient s
 }
 
 func QueryAzureVMInstanceStates(ctx context.Context, db *pgdb.DB, secretsClient secrets.SecretsServiceClient) error {
-	logrus.Infof("YZL: running QueryAzureVMInstanceStates")
 	logrus.Infof("processing azure-vm instances due for status check...")
 
 	// get all azure-vm manager ids
