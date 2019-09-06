@@ -260,7 +260,9 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   public getProjectStatus(project: Project): string {
     const cachedStatus = this.statusCache[project.id];
     let result: string;
-    if (this.applyRulesInProgress) {
+    if (project.status === 'NO_RULES') {
+      result = 'OK';
+    } else if (this.applyRulesInProgress) {
       result = cachedStatus === 'EDITS_PENDING' ? 'Updating...' : 'OK';
     } else {
       result = project.status === 'EDITS_PENDING'

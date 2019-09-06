@@ -346,99 +346,161 @@ describe('ProjectListComponent', () => {
       uneditedProject = genProject('uuid-111', 'RULES_APPLIED');
     });
 
-    it('happy path: needs updating -> updating -> OK', () => {
-      store.dispatch(new GetApplyRulesStatusSuccess( // set state
-        genState(ApplyRulesStatusState.NotRunning)));
-      store.dispatch(new GetProjectsSuccess({ // set cache
-        projects: [editedProject]
-      }));
-      expect(component.getProjectStatus(editedProject)).toBe('Needs updating');
+    describe('for project with edits pending', () => {
+      it('happy path: needs updating -> updating -> OK', () => {
+        store.dispatch(new GetApplyRulesStatusSuccess( // set state
+          genState(ApplyRulesStatusState.NotRunning)));
+        store.dispatch(new GetProjectsSuccess({ // set cache
+          projects: [editedProject]
+        }));
+        expect(component.getProjectStatus(editedProject)).toBe('Needs updating');
 
-      component.confirmApplyStart(); // now start an update
-      store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
-        genState(ApplyRulesStatusState.Running)));
-      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+        component.confirmApplyStart(); // now start an update
+        store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
+          genState(ApplyRulesStatusState.Running)));
+        expect(component.getProjectStatus(editedProject)).toBe('Updating...');
 
-      // later side effect of the update, but project status NOT affected!
-      editedProject.status = 'RULES_APPLIED';
-      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+        // later side effect of the update, but project status NOT affected!
+        editedProject.status = 'RULES_APPLIED';
+        expect(component.getProjectStatus(editedProject)).toBe('Updating...');
 
-      // update finishes...
-      store.dispatch(new GetApplyRulesStatusSuccess(
-        genState(ApplyRulesStatusState.NotRunning)));
-      // .. and project reflects that all is well!
-      expect(component.getProjectStatus(editedProject)).toBe('OK');
+        // update finishes...
+        store.dispatch(new GetApplyRulesStatusSuccess(
+          genState(ApplyRulesStatusState.NotRunning)));
+        // .. and project reflects that all is well!
+        expect(component.getProjectStatus(editedProject)).toBe('OK');
+      });
+
+      it('continues to report "needs updating" if last update failed', () => {
+        store.dispatch(new GetApplyRulesStatusSuccess( // set state
+          genState(ApplyRulesStatusState.NotRunning)));
+        store.dispatch(new GetProjectsSuccess({ // set cache
+          projects: [editedProject]
+        }));
+        expect(component.getProjectStatus(editedProject)).toBe('Needs updating');
+
+        component.confirmApplyStart(); // now start an update
+        store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
+          genState(ApplyRulesStatusState.Running)));
+        expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+
+        // later side effect of the update, but project status NOT affected!
+        editedProject.status = 'RULES_APPLIED';
+        expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+
+        // update finishes--but this time reporting failure
+        store.dispatch(new GetApplyRulesStatusSuccess(
+          genState(ApplyRulesStatusState.NotRunning, true, false)));
+        // so we go back to this instead of OK
+        expect(component.getProjectStatus(editedProject)).toBe('Needs updating');
+      });
+
+      it('continues to report "needs updating" if last update cancelled', () => {
+        store.dispatch(new GetApplyRulesStatusSuccess( // set state
+          genState(ApplyRulesStatusState.NotRunning)));
+        store.dispatch(new GetProjectsSuccess({ // set cache
+          projects: [editedProject]
+        }));
+        expect(component.getProjectStatus(editedProject)).toBe('Needs updating');
+
+        component.confirmApplyStart(); // now start an update
+        store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
+          genState(ApplyRulesStatusState.Running)));
+        expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+
+        // later side effect of the update, but project status NOT affected!
+        editedProject.status = 'RULES_APPLIED';
+        expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+
+        // update finishes--but this time reporting cancelled
+        store.dispatch(new GetApplyRulesStatusSuccess(
+          genState(ApplyRulesStatusState.NotRunning, false, true)));
+        // so we go back to this instead of OK
+        expect(component.getProjectStatus(editedProject)).toBe('Needs updating');
+      });
     });
 
-    it('continues to report "needs updating" if last update failed', () => {
-      store.dispatch(new GetApplyRulesStatusSuccess( // set state
-        genState(ApplyRulesStatusState.NotRunning)));
-      store.dispatch(new GetProjectsSuccess({ // set cache
-        projects: [editedProject]
-      }));
-      expect(component.getProjectStatus(editedProject)).toBe('Needs updating');
+    describe('for project with NO edits pending', () => {
+      it('happy path is for status to remain a constant OK', () => {
+        store.dispatch(new GetApplyRulesStatusSuccess( // set state
+          genState(ApplyRulesStatusState.NotRunning)));
+        store.dispatch(new GetProjectsSuccess({ // set cache
+          projects: [uneditedProject, noRulesProject]
+        }));
+        // These are unaffected by Running/NotRunning
+        expect(component.getProjectStatus(uneditedProject)).toBe('OK');
+        expect(component.getProjectStatus(noRulesProject)).toBe('OK');
 
-      component.confirmApplyStart(); // now start an update
-      store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
-        genState(ApplyRulesStatusState.Running)));
-      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+        component.confirmApplyStart(); // now start an update
+        store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
+          genState(ApplyRulesStatusState.Running)));
+        expect(component.getProjectStatus(uneditedProject)).toBe('OK');
+        expect(component.getProjectStatus(noRulesProject)).toBe('OK');
 
-      // later side effect of the update, but project status NOT affected!
-      editedProject.status = 'RULES_APPLIED';
-      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+        // update finishes...
+        store.dispatch(new GetApplyRulesStatusSuccess(
+          genState(ApplyRulesStatusState.NotRunning)));
+        expect(component.getProjectStatus(uneditedProject)).toBe('OK');
+        expect(component.getProjectStatus(noRulesProject)).toBe('OK');
+      });
 
-      // update finishes--but this time reporting failure
-      store.dispatch(new GetApplyRulesStatusSuccess(
-        genState(ApplyRulesStatusState.NotRunning, true, false)));
-      // so we go back to this instead of OK
-      expect(component.getProjectStatus(editedProject)).toBe('Needs updating');
-    });
+      it('continues to report OK if last update failed', () => {
+        store.dispatch(new GetApplyRulesStatusSuccess( // set state
+          genState(ApplyRulesStatusState.NotRunning)));
+        store.dispatch(new GetProjectsSuccess({ // set cache
+          projects: [uneditedProject, noRulesProject]
+        }));
+        expect(component.getProjectStatus(uneditedProject)).toBe('OK');
+        expect(component.getProjectStatus(noRulesProject)).toBe('OK');
 
-    it('continues to report "needs updating" if last update cancelled', () => {
-      store.dispatch(new GetApplyRulesStatusSuccess( // set state
-        genState(ApplyRulesStatusState.NotRunning)));
-      store.dispatch(new GetProjectsSuccess({ // set cache
-        projects: [editedProject]
-      }));
-      expect(component.getProjectStatus(editedProject)).toBe('Needs updating');
+        component.confirmApplyStart(); // now start an update
+        store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
+          genState(ApplyRulesStatusState.Running)));
+        expect(component.getProjectStatus(uneditedProject)).toBe('OK');
+        expect(component.getProjectStatus(noRulesProject)).toBe('OK');
 
-      component.confirmApplyStart(); // now start an update
-      store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
-        genState(ApplyRulesStatusState.Running)));
-      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+        // update finishes...
+        store.dispatch(new GetApplyRulesStatusSuccess(
+          genState(ApplyRulesStatusState.NotRunning)));
+        expect(component.getProjectStatus(uneditedProject)).toBe('OK');
+        expect(component.getProjectStatus(noRulesProject)).toBe('OK');
 
-      // later side effect of the update, but project status NOT affected!
-      editedProject.status = 'RULES_APPLIED';
-      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+        // update finishes--but this time reporting failure
+        store.dispatch(new GetApplyRulesStatusSuccess(
+          genState(ApplyRulesStatusState.NotRunning, true, false)));
+        // should still show OK
+        expect(component.getProjectStatus(noRulesProject)).toBe('OK');
+        // TODO: Uncomment once issue #1368 is resolved
+        // expect(component.getProjectStatus(uneditedProject)).toBe('OK');
+      });
 
-      // update finishes--but this time reporting cancelled
-      store.dispatch(new GetApplyRulesStatusSuccess(
-        genState(ApplyRulesStatusState.NotRunning, false, true)));
-      // so we go back to this instead of OK
-      expect(component.getProjectStatus(editedProject)).toBe('Needs updating');
-    });
+      it('continues to report OK if last update cancelled', () => {
+        store.dispatch(new GetApplyRulesStatusSuccess( // set state
+          genState(ApplyRulesStatusState.NotRunning)));
+        store.dispatch(new GetProjectsSuccess({ // set cache
+          projects: [editedProject]
+        }));
+        expect(component.getProjectStatus(uneditedProject)).toBe('OK');
+        expect(component.getProjectStatus(noRulesProject)).toBe('OK');
 
-    it('happy path for projects with no edits or no rules', () => {
-      store.dispatch(new GetApplyRulesStatusSuccess( // set state
-        genState(ApplyRulesStatusState.NotRunning)));
-      store.dispatch(new GetProjectsSuccess({ // set cache
-        projects: [uneditedProject, noRulesProject]
-      }));
-      // These are unaffected by Running/NotRunning
-      expect(component.getProjectStatus(uneditedProject)).toBe('OK');
-      expect(component.getProjectStatus(noRulesProject)).toBe('OK');
+        component.confirmApplyStart(); // now start an update
+        store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
+          genState(ApplyRulesStatusState.Running)));
+        expect(component.getProjectStatus(uneditedProject)).toBe('OK');
+        expect(component.getProjectStatus(noRulesProject)).toBe('OK');
 
-      component.confirmApplyStart(); // now start an update
-      store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
-        genState(ApplyRulesStatusState.Running)));
-      expect(component.getProjectStatus(uneditedProject)).toBe('OK');
-      expect(component.getProjectStatus(noRulesProject)).toBe('OK');
+        // later side effect of the update, but project status NOT affected!
+        editedProject.status = 'RULES_APPLIED';
+        expect(component.getProjectStatus(editedProject)).toBe('Updating...');
 
-      // update finishes...
-      store.dispatch(new GetApplyRulesStatusSuccess(
-        genState(ApplyRulesStatusState.NotRunning)));
-      expect(component.getProjectStatus(uneditedProject)).toBe('OK');
-      expect(component.getProjectStatus(noRulesProject)).toBe('OK');
+        // update finishes--but this time reporting cancelled
+        store.dispatch(new GetApplyRulesStatusSuccess(
+          genState(ApplyRulesStatusState.NotRunning, false, true)));
+        // should still show OK
+        expect(component.getProjectStatus(noRulesProject)).toBe('OK');
+        // TODO: Uncomment once issue #1368 is resolved
+        // expect(component.getProjectStatus(uneditedProject)).toBe('OK');
+      });
     });
 
     it('maps current project status while rules are not being applied', () => {
