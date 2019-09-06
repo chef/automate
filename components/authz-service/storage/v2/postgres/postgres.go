@@ -11,7 +11,6 @@ import (
 
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
-	"github.com/chef/automate/components/authz-service/projectassignment"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
@@ -19,6 +18,7 @@ import (
 	v2 "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/projectassignment"
 )
 
 // These must match what SQL function query_rule_table_associations returns.

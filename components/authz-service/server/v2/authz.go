@@ -18,9 +18,9 @@ import (
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
-	"github.com/chef/automate/components/authz-service/projectassignment"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
+	"github.com/chef/automate/lib/projectassignment"
 )
 
 // These do not have to be the same

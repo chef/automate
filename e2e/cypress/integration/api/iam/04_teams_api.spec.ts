@@ -25,15 +25,6 @@ describe('teams API', () => {
       defaultAdminReq.auth.bearer = adminToken;
       cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix,
         ['policies', 'projects', 'teams']);
-
-      for (const project of [project1, project2]) {
-        cy.request({
-            auth: { bearer: adminToken },
-            method: 'POST',
-            url: '/apis/iam/v2beta/projects',
-            body: project
-        });
-      }
     });
   });
 
@@ -51,8 +42,21 @@ describe('teams API', () => {
       method: 'POST',
       url: '/apis/iam/v2beta/teams'
     };
+    const scenarios = [
+      {req: defaultNonAdminReq, id: 'project-1-admin'},
+      {req: defaultAdminReq, id: 'superadmin'}
+    ];
 
     before(() => {
+      for (const project of [project1, project2]) {
+        cy.request({
+            auth: { bearer: adminToken },
+            method: 'POST',
+            url: '/apis/iam/v2beta/projects',
+            body: project
+        });
+      }
+
       cy.request({ ...defaultAdminReq,
         method: 'POST',
         url: '/apis/iam/v2beta/tokens',
@@ -98,12 +102,7 @@ describe('teams API', () => {
     });
 
     describe('POST /apis/iam/v2beta/teams', () => {
-      context('both superadmin and project1 admin can', () => {
-        const scenarios = [
-          {req: defaultNonAdminReq, id: 'project-1-admin'},
-          {req: defaultAdminReq, id: 'superadmin'}
-        ];
-
+      context('both superadmin and project1 admin', () => {
         scenarios.forEach((scenario) => {
           it(`${scenario.id} can create a new team with no projects`, () => {
             cy.request({ ...scenario.req,
@@ -160,12 +159,7 @@ describe('teams API', () => {
     });
 
     describe('PUT /apis/iam/v2beta/teams', () => {
-      context('both superadmin and project1 admin can', () => {
-        const scenarios = [
-          {req: defaultNonAdminReq, id: 'project-1-admin'},
-          {req: defaultAdminReq, id: 'superadmin'}
-        ];
-
+      context('both superadmin and project1 admin', () => {
         scenarios.forEach((scenario) => {
           it(`${scenario.id} can update a team with no projects to have project1`, () => {
             cy.request({ ...defaultAdminReq,
@@ -317,8 +311,8 @@ describe('teams API', () => {
 
 function teamWithProjects(id: string, projects: string[]): any {
   return {
-    id: id,
-    name: 'fun name',
-    projects: projects
+    id,
+    projects,
+    name: 'fun name'
   };
 }

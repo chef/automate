@@ -8,12 +8,12 @@ import (
 	"github.com/pkg/errors"
 
 	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
-	"github.com/chef/automate/components/authz-service/projectassignment"
 	"github.com/chef/automate/components/teams-service/storage"
 	"github.com/chef/automate/components/teams-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/teams-service/storage/postgres/migration"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/projectassignment"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
 
@@ -193,13 +193,13 @@ func (p *postgres) EditTeam(ctx context.Context, team storage.Team) (storage.Tea
 
 // EditTeamByName edits the team's description and projects by name
 func (p *postgres) EditTeamByName(ctx context.Context,
-	teamName string, teamDescription string, newProjects []string) (storage.Team, error) {
+	teamName string, teamDescription string, updatedProjects []string) (storage.Team, error) {
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	if newProjects == nil {
-		newProjects = []string{}
+	if updatedProjects == nil {
+		updatedProjects = []string{}
 	}
 
 	tx, err := p.db.BeginTx(ctx, nil)
@@ -214,8 +214,8 @@ func (p *postgres) EditTeamByName(ctx context.Context,
 
 	var oldProjects []string
 	err = tx.QueryRowContext(ctx,
-		`SELECT t.projects FROM teams t
-		WHERE t.name = $1 AND projects_match(t.projects, $2::TEXT[])
+		`SELECT projects FROM teams
+		WHERE name = $1 AND projects_match(projects, $2::TEXT[])
 		FOR UPDATE;`,
 		teamName, pq.Array(projectsFilter)).
 		Scan(pq.Array(&oldProjects))
@@ -223,7 +223,7 @@ func (p *postgres) EditTeamByName(ctx context.Context,
 		return storage.Team{}, p.processError(err)
 	}
 
-	projectDiff := projectassignment.CalculateProjectDiff(oldProjects, newProjects)
+	projectDiff := projectassignment.CalculateProjectDiff(oldProjects, updatedProjects)
 	if len(projectDiff) != 0 {
 		// will only return an error if authz is in v2.1 mode
 		_, err := p.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
@@ -242,7 +242,7 @@ func (p *postgres) EditTeamByName(ctx context.Context,
 		SET description = $2, projects = $3, updated_at = now()
 		WHERE t.name = $1 AND projects_match(t.projects, $4::TEXT[])
 		RETURNING id, name, projects, description, created_at, updated_at;`,
-		teamName, teamDescription, pq.Array(newProjects), pq.Array(projectsFilter)).
+		teamName, teamDescription, pq.Array(updatedProjects), pq.Array(projectsFilter)).
 		Scan(&t.ID, &t.Name, pq.Array(&t.Projects), &t.Description, &t.CreatedAt, &t.UpdatedAt)
 	if err != nil {
 		return storage.Team{}, p.processError(err)

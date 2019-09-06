@@ -140,27 +140,27 @@ Cypress.Commands.add('generateAdminToken', (idToken: string) => {
 });
 
 Cypress.Commands.add('cleanupV2IAMObjectsByIDPrefixes',
-  (idToken: string, idPrefix: string, objectPlurals: string[]) => {
+  (idToken: string, idPrefix: string, iamObjects: string[]) => {
 
-  objectPlurals.forEach((objectPlural) => {
-    cleanupV2IAMObjectByIDPrefix(idToken, idPrefix, objectPlural);
+  iamObjects.forEach((iamObject) => {
+    cleanupV2IAMObjectByIDPrefix(idToken, idPrefix, iamObject);
   });
 });
 
 function cleanupV2IAMObjectByIDPrefix(
-  idToken: string, idPrefix: string, objectPlural: string): void {
+  idToken: string, idPrefix: string, iamObject: string): void {
 
   cy.request({
     auth: { bearer: idToken },
     method: 'GET',
-    url: `/apis/iam/v2beta/${objectPlural}`
+    url: `/apis/iam/v2beta/${iamObject}`
   }).then((resp) => {
-    for (const object of resp.body[objectPlural]) {
+    for (const object of resp.body[iamObject]) {
       if (object.id.startsWith(idPrefix)) {
         cy.request({
           auth: { bearer: idToken },
           method: 'DELETE',
-          url: `/apis/iam/v2beta/${objectPlural}/${object.id}`
+          url: `/apis/iam/v2beta/${iamObject}/${object.id}`
         });
       }
     }
