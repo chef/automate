@@ -1,4 +1,5 @@
 import { Base64 } from 'js-base64';
+import { itFlaky } from '../../constants';
 
 describe('create a manual node ssh scan job and cleanup after', () => {
   before(() => {
@@ -17,7 +18,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
   const jobName = 'job ' + nowTime;
   const decoded = Base64.decode(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_KEY'));
 
-  it('can create a credential with a username and key', () => {
+  itFlaky('can create a credential with a username and key', () => {
     // we save the route that will be called when we navigate to the page
     // in order to be able to wait for it later
     cy.route('POST', '/api/v0/secrets/search').as('getSecrets');
@@ -51,7 +52,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     cy.contains(credName).should('exist');
   });
 
-  it('can create a node and attach a credential', () => {
+  itFlaky('can create a node and attach a credential', () => {
     // navigate to node create page:
     // click on scan jobs
     cy.get('.nav-link').contains('Compliance').click();
@@ -96,7 +97,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
       cy.contains(nodePrefix).should('exist');
   });
 
-  it('can install a profile', () => {
+  itFlaky('can install a profile', () => {
     // we save the route that will be called when we navigate to the page
     // in order to be able to wait for it later
     cy.route('POST', '/api/v0/compliance/profiles/search').as('getProfiles');
@@ -122,7 +123,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     cy.contains('CIS Amazon Linux 2 Benchmark Level 1').should('exist');
   });
 
-  it('can create a scan job with a reccurence schedule', () => {
+  itFlaky('can create a scan job with a reccurence schedule', () => {
     // navigate to scan create page
     // click on scan jobs
     cy.get('.nav-link').contains('Compliance').click();
@@ -172,7 +173,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     cy.url().should('include', '/scans');
   });
 
-  it('can delete the created credential', () => {
+  itFlaky('can delete the created credential', () => {
     // we save the route that will be called when we navigate to the page
     // in order to be able to wait for it later
     cy.route('POST', '/api/v0/secrets/search').as('getSecrets');
@@ -192,7 +193,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     });
   });
 
-  it('can delete the created node', () => {
+  itFlaky('can delete the created node', () => {
     // navigate to node create page:
     // click on scan jobs
     cy.get('.nav-link').contains('Compliance').click();
@@ -215,7 +216,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     cy.contains(nodePrefix).parent().find('chef-button[label="delete"]').click();
   });
 
-  it('can delete the created profile', () => {
+  itFlaky('can delete the created profile', () => {
     // navigate to asset store
     cy.get('.nav-link').contains('Compliance').click();
     cy.get('chef-sidebar-entry').contains('Profiles').click({ force: true });
@@ -233,7 +234,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     });
   });
 
-  it('can delete the created scan job', () => {
+  itFlaky('can delete the created scan job', () => {
     // save the route for the delete request so that we can ensure the
     // response is returned
     cy.route('DELETE', '/api/v0/compliance/scanner/jobs/id/**').as('deleteScanJob');

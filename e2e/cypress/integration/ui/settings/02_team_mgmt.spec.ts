@@ -1,4 +1,4 @@
-import { describeIfIAMV2, describeIfIAMV2p1 } from '../../constants';
+import { describeIfIAMV2, describeIfIAMV2p1, itFlaky } from '../../constants';
 
 describe('team management', () => {
   let adminToken = '';
@@ -172,7 +172,7 @@ describe('team management', () => {
         cy.cleanupTeamsByDescriptionPrefix(adminToken, cypressPrefix);
       });
 
-      it('can create a team with multiple projects', () => {
+      itFlaky('can create a team with multiple projects', () => {
         const projectSummary = '2 projects';
         cy.get('[data-cy=team-create-button]').contains('Create Team').click();
         cy.get('app-team-management chef-modal').should('exist');

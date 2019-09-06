@@ -1,3 +1,5 @@
+import { itFlaky } from '../../constants';
+
 describe('user management', () => {
   before(() => {
     cy.adminLogin('/settings/users').then(() => {
@@ -52,7 +54,7 @@ describe('user management', () => {
     cy.get('app-user-table chef-td').contains(name).should('exist');
   });
 
-  it('can view and edit user details', () => {
+  itFlaky('can view and edit user details', () => {
     cy.route('GET', `**/users/${username}`).as('getUser');
     cy.route('PUT', `**/users/${username}`).as('updateUser');
 
@@ -88,7 +90,8 @@ describe('user management', () => {
     cy.get('chef-notification.info').should('be.visible');
   });
 
-  it('can delete user', () => {
+  // this test isn't flaky but depends on the flaky one
+  itFlaky('can delete user', () => {
     cy.route('GET', '**/users').as('getUsers');
     cy.route('DELETE', `**/users/${username}`).as('deleteUser');
 
