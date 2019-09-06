@@ -112,7 +112,8 @@ Please pass a config file as the only argument to this command.`))
 		fail(errors.Wrapf(err, "failed to dial authz-service at (%s)", cfg.AuthzAddress))
 	}
 	authzClient := authz.NewSubjectPurgeClient(authzConn)
-	authzV2Client := authz_v2.NewPoliciesClient(authzConn)
+	authzV2PoliciesClient := authz_v2.NewPoliciesClient(authzConn)
+	authzV2AuthorizationClient := authz_v2.NewAuthorizationClient(authzConn)
 
 	mustBeADirectory(cfg.MigrationsPath)
 	mustBeADirectory(cfg.DataMigrationsPath)
@@ -136,7 +137,8 @@ Please pass a config file as the only argument to this command.`))
 	}
 
 	service, err := service.NewPostgresService(l, connFactory,
-		migrationConfig, dataMigrationConfig, authzClient, authzV2Client)
+		migrationConfig, dataMigrationConfig,
+		authzClient, authzV2PoliciesClient, authzV2AuthorizationClient)
 	if err != nil {
 		fail(errors.Wrap(err, "could not initialize storage"))
 	}

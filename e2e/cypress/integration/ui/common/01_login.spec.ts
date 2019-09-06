@@ -1,5 +1,3 @@
-// CYPRESS_BASE_URL environment variable must be set
-
 if (Cypress.env('SKIP_SSO')) {
   describe('SSO', () => {
     it.skip('is disabled');

@@ -1,18 +1,11 @@
+import { describeIfIAMV2p1 } from '../../constants';
 interface Project {
   id: string;
   name: string;
   type: string;
 }
 
-// assume 2.0 if not in CI. if you wish something different start cypress with
-// IAM_VERSION set to what you are testing.
-if (Cypress.env('IAM_VERSION') === undefined) {
-  Cypress.env('IAM_VERSION', 'v2.0');
-}
-
-const describeIAMV2P1 = Cypress.env('IAM_VERSION') === 'v2.1' ? describe : describe.skip;
-
-describeIAMV2P1('project management', () => {
+describeIfIAMV2p1('project management', () => {
   let adminToken = '';
   const now = Cypress.moment().format('MMDDYYhhmm');
   const typeDelay = 50;
@@ -26,7 +19,7 @@ describeIAMV2P1('project management', () => {
     cy.adminLogin('/settings/projects').then(() => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
       adminToken = admin.id_token;
-      cy.cleanupProjectsByIDPrefix(adminToken, cypressPrefix);
+      cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['projects']);
     });
   });
 
@@ -39,7 +32,7 @@ describeIAMV2P1('project management', () => {
   });
 
   after(() => {
-    cy.cleanupProjectsByIDPrefix(adminToken, cypressPrefix);
+    cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['projects']);
   });
 
   it('displays a list of projects', () => {

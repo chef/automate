@@ -8,10 +8,7 @@ declare namespace Cypress {
     restoreStorage(): void
     applyProjectsFilter(projectsToFilterOn: string[]): void
     generateAdminToken(idToken: string): void
-    cleanupPoliciesByIDPrefix(idToken: string, idPrefix: string): void
-    cleanupProjectsByIDPrefix(idToken: string, idPrefix: string): void
-    cleanupRolesByIDPrefix(idToken: string, idPrefix: string): void
-    cleanupTokensByIDPrefix(idToken: string, idPrefix: string): void
+    cleanupV2IAMObjectsByIDPrefixes(idToken: string, idPrefix: string, objectPlurals: string[]): void
     cleanupUsersByNamePrefix(idToken: string, namePrefix: string): void
     cleanupTeamsByDescriptionPrefix(idToken: string, namePrefix: string): void
   }

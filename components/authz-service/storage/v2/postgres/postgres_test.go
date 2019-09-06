@@ -15,7 +15,7 @@ import (
 
 	v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/prng"
-	"github.com/chef/automate/components/authz-service/projectassignment"
+	"github.com/chef/automate/lib/projectassignment"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/testhelpers"

@@ -15,13 +15,13 @@ import (
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
-	"github.com/chef/automate/components/authz-service/projectassignment"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	storage_v1 "github.com/chef/automate/components/authz-service/storage/v1"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	v2 "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/memstore"
 	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
+	"github.com/chef/automate/lib/projectassignment"
 )
 
 // policyServer is the server state for policies

@@ -1,3 +1,5 @@
+import { describeIfIAMV2p1, iamVersion } from '../../constants';
+
 describe('team details', () => {
   let adminToken = '';
   const now = Cypress.moment().format('MMDDYYhhmm');
@@ -14,23 +16,13 @@ describe('team details', () => {
   const usernameForUser = cypressPrefix + 'testing-user-' + now;
   let userMembershipID = '';
 
-  let iamVersion = <string><Object>Cypress.env('IAM_VERSION');
-  // assume 2.0 if not in CI. if you wish something different start cypress with
-  // IAM_VERSION set to what you are testing.
-  if (iamVersion === undefined) {
-    iamVersion = 'v2.0';
-  }
-
-  const describeIAMV2 = iamVersion.match(/v2/) ? describe : describe.skip;
-  const describeProjectsEnabled = iamVersion === 'v2.1' ? describe : describe.skip;
-
   before(() => {
     cy.adminLogin('/').then(() => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
       adminToken = admin.id_token;
 
       cy.cleanupUsersByNamePrefix(adminToken, cypressPrefix);
-      cy.cleanupProjectsByIDPrefix(adminToken, cypressPrefix);
+      cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['projects']);
       cy.cleanupTeamsByDescriptionPrefix(adminToken, cypressPrefix);
 
       cy.request({
@@ -107,7 +99,7 @@ describe('team details', () => {
   });
 
   after(() => {
-    cy.cleanupProjectsByIDPrefix(adminToken, cypressPrefix);
+    cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['projects']);
   });
 
   it('displays team details for admins team', () => {
@@ -134,7 +126,7 @@ describe('team details', () => {
     });
   });
 
-  describeProjectsEnabled('update team projects (IAM v2.1 only)', () => {
+  describeIfIAMV2p1('update team projects (IAM v2.1 only)', () => {
     const dropdownNameUntilEllipsisLen = 25;
 
     context('when only the unassigned project is selected', () => {

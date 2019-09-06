@@ -1,13 +1,10 @@
-if (Cypress.env('IAM_VERSION') === undefined) {
-    // assume local env is on IAM v2.0 since that's the default setting
-    Cypress.env('IAM_VERSION', 'v2.0');
-}
+import { describeIfIAMV2p1 } from '../../constants';
+
 describe('roles API', () => {
     const cypressPrefix = 'test-roles-api';
     let adminIdToken = '';
     let nonAdminToken = '';
     const nonAdminTokenID = `${cypressPrefix}-nonadmin-token`;
-    const describeIfIAMV2p1 = Cypress.env('IAM_VERSION') === 'v2.1' ? describe : describe.skip;
     before(() => {
         cy.adminLogin('/').then(() => {
             adminIdToken = JSON.parse(
@@ -29,10 +26,8 @@ describe('roles API', () => {
         const roleID = `${cypressPrefix}-role1`;
 
         before(() => {
-            cy.cleanupProjectsByIDPrefix(adminIdToken, cypressPrefix);
-            cy.cleanupRolesByIDPrefix(adminIdToken, cypressPrefix);
-            cy.cleanupPoliciesByIDPrefix(adminIdToken, cypressPrefix);
-            cy.cleanupTokensByIDPrefix(adminIdToken, cypressPrefix);
+            cy.cleanupV2IAMObjectsByIDPrefixes(adminIdToken, cypressPrefix,
+                ['projects', 'roles', 'policies', 'tokens']);
             for (const project of [project1, project2]) {
                 cy.request({
                     auth: { bearer: adminIdToken },
@@ -81,14 +76,12 @@ describe('roles API', () => {
         });
 
         after(() => {
-            cy.cleanupProjectsByIDPrefix(adminIdToken, cypressPrefix);
-            cy.cleanupRolesByIDPrefix(adminIdToken, cypressPrefix);
-            cy.cleanupPoliciesByIDPrefix(adminIdToken, cypressPrefix);
-            cy.cleanupTokensByIDPrefix(adminIdToken, cypressPrefix);
+            cy.cleanupV2IAMObjectsByIDPrefixes(adminIdToken, cypressPrefix,
+                ['projects', 'roles', 'policies', 'tokens']);
         });
 
         afterEach(() => {
-            cy.cleanupRolesByIDPrefix(adminIdToken, cypressPrefix);
+            cy.cleanupV2IAMObjectsByIDPrefixes(adminIdToken, cypressPrefix, ['roles']);
         });
 
         describe('POST /apis/iam/v2beta/roles', () => {

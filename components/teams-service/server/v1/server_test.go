@@ -1056,23 +1056,29 @@ func setupTeamsService(ctx context.Context,
 	mockCommon.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
 	authz.RegisterSubjectPurgeServer(grpcAuthz, mockCommon)
 
-	mockV2 := authz_v2.NewPoliciesServerMock()
-	mockV2.GetPolicyVersionFunc = defaultGetPolicyVersionFunc
-	authz_v2.RegisterPoliciesServer(grpcAuthz, mockV2)
+	mockV2Policies := authz_v2.NewPoliciesServerMock()
+	mockV2Policies.GetPolicyVersionFunc = defaultGetPolicyVersionFunc
+	authz_v2.RegisterPoliciesServer(grpcAuthz, mockV2Policies)
+
+	mockV2Authz := authz_v2.NewAuthorizationServerMock()
+	mockV2Authz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
+	authz_v2.RegisterAuthorizationServer(grpcAuthz, mockV2Authz)
 
 	authzServer := grpctest.NewServer(grpcAuthz)
 	authzConn, err := authzConnFactory.Dial("authz-service", authzServer.URL)
 	require.NoError(t, err)
 
 	authzClient := authz.NewSubjectPurgeClient(authzConn)
-	authzV2Client := authz_v2.NewPoliciesClient(authzConn)
+	authzV2PoliciesClient := authz_v2.NewPoliciesClient(authzConn)
+	authzV2AuthorizationClient := authz_v2.NewAuthorizationClient(authzConn)
 
 	var serviceRef *service.Service
 	if migrationConfig == nil {
 		serviceRef, err = service.NewInMemoryService(l, connFactory, authzClient)
 	} else {
 		serviceRef, err = service.NewPostgresService(l, connFactory,
-			*migrationConfig, *dataMigrationConfig, authzClient, authzV2Client)
+			*migrationConfig, *dataMigrationConfig, authzClient,
+			authzV2PoliciesClient, authzV2AuthorizationClient)
 	}
 	if err != nil {
 		t.Fatalf("could not create server: %s", err)
@@ -1105,6 +1111,11 @@ func resetState(ctx context.Context, t *testing.T, serv *service.Service) {
 func defaultMockPurgeFunc(context.Context,
 	*authz.PurgeSubjectFromPoliciesReq) (*authz.PurgeSubjectFromPoliciesResp, error) {
 	return &authz.PurgeSubjectFromPoliciesResp{}, nil
+}
+
+func defaultValidateProjectAssignmentFunc(context.Context,
+	*authz_v2.ValidateProjectAssignmentReq) (*authz_v2.ValidateProjectAssignmentResp, error) {
+	return &authz_v2.ValidateProjectAssignmentResp{}, nil
 }
 
 func defaultGetPolicyVersionFunc(context.Context,

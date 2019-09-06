@@ -139,26 +139,33 @@ Cypress.Commands.add('generateAdminToken', (idToken: string) => {
   });
 });
 
-Cypress.Commands.add('cleanupPoliciesByIDPrefix', (idToken: string, idPrefix: string) => {
+Cypress.Commands.add('cleanupV2IAMObjectsByIDPrefixes',
+  (idToken: string, idPrefix: string, iamObjects: string[]) => {
+
+  iamObjects.forEach((iamObject) => {
+    cleanupV2IAMObjectByIDPrefix(idToken, idPrefix, iamObject);
+  });
+});
+
+function cleanupV2IAMObjectByIDPrefix(
+  idToken: string, idPrefix: string, iamObject: string): void {
+
   cy.request({
     auth: { bearer: idToken },
     method: 'GET',
-    url: '/apis/iam/v2beta/policies',
-    failOnStatusCode: false
+    url: `/apis/iam/v2beta/${iamObject}`
   }).then((resp) => {
-    const body = resp.body;
-    for (const policy of body.policies) {
-      if (policy.id.startsWith(idPrefix)) {
+    for (const object of resp.body[iamObject]) {
+      if (object.id.startsWith(idPrefix)) {
         cy.request({
           auth: { bearer: idToken },
           method: 'DELETE',
-          url: `/apis/iam/v2beta/policies/${policy.id}`,
-          failOnStatusCode: false
+          url: `/apis/iam/v2beta/${iamObject}/${object.id}`
         });
       }
     }
   });
-});
+}
 
 Cypress.Commands.add('cleanupUsersByNamePrefix', (idToken: string, namePrefix: string) => {
   cy.request({
@@ -174,70 +181,6 @@ Cypress.Commands.add('cleanupUsersByNamePrefix', (idToken: string, namePrefix: s
           auth: { bearer: idToken },
           method: 'DELETE',
           url: `/api/v0/auth/users/${user.username}`,
-          failOnStatusCode: false
-        });
-      }
-    }
-  });
-});
-
-Cypress.Commands.add('cleanupProjectsByIDPrefix', (idToken: string, idPrefix: string) => {
-  cy.request({
-    auth: { bearer: idToken },
-    method: 'GET',
-    url: '/apis/iam/v2beta/projects',
-    failOnStatusCode: false
-  }).then((resp) => {
-    const body = resp.body;
-    for (const project of body.projects) {
-      if (project.id.startsWith(idPrefix)) {
-        cy.request({
-          auth: { bearer: idToken },
-          method: 'DELETE',
-          url: `/apis/iam/v2beta/projects/${project.id}`,
-          failOnStatusCode: false
-        });
-      }
-    }
-  });
-});
-
-Cypress.Commands.add('cleanupRolesByIDPrefix', (idToken: string, idPrefix: string) => {
-  cy.request({
-    auth: { bearer: idToken },
-    method: 'GET',
-    url: '/apis/iam/v2beta/roles',
-    failOnStatusCode: false
-  }).then((resp) => {
-    const body = resp.body;
-    for (const role of body.roles) {
-      if (role.id.startsWith(idPrefix)) {
-        cy.request({
-          auth: { bearer: idToken },
-          method: 'DELETE',
-          url: `/apis/iam/v2beta/roles/${role.id}`,
-          failOnStatusCode: false
-        });
-      }
-    }
-  });
-});
-
-
-Cypress.Commands.add('cleanupTokensByIDPrefix', (idToken: string, idPrefix: string) => {
-  cy.request({
-    auth: { bearer: idToken },
-    method: 'GET',
-    url: '/apis/iam/v2beta/tokens',
-    failOnStatusCode: false
-  }).then((resp) => {
-    const body = resp.body;
-    for (const token of body.tokens) {
-      if (token.id.startsWith(idPrefix)) {
-        cy.request({
-          auth: { bearer: idToken },
-          method: 'DELETE',
-          url: `/apis/iam/v2beta/tokens/${token.id}`,
           failOnStatusCode: false
         });
       }
@@ -265,7 +208,6 @@ Cypress.Commands.add('cleanupTeamsByDescriptionPrefix', (idToken: string, namePr
     }
   });
 });
-
 
 // helpers
 
