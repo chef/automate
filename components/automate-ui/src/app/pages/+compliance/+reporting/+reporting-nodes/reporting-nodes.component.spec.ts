@@ -14,7 +14,7 @@ class MockTelemetryService {
 describe('ReportingNodesComponent', () => {
   let fixture: ComponentFixture<ReportingNodesComponent>;
   let component: ReportingNodesComponent;
-  let reportQuery: ReportQueryService;
+  let reportQueryService: ReportQueryService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -38,7 +38,7 @@ describe('ReportingNodesComponent', () => {
 
     fixture = TestBed.createComponent(ReportingNodesComponent);
     component = fixture.componentInstance;
-    reportQuery = TestBed.get(ReportQueryService);
+    reportQueryService = TestBed.get(ReportQueryService);
   });
 
   describe('addProfileStatus', () => {
@@ -88,23 +88,23 @@ describe('ReportingNodesComponent', () => {
 
   describe('onNodesListPageChanged()', () => {
     it('calls getData with applied filters', () => {
-      const filters = reportQuery.getReportQuery().filters;
+      const reportQuery = reportQueryService.getReportQuery();
       spyOn(component, 'getData');
 
       component.onNodesListPageChanged({detail: { value: 2}});
 
-      expect(component.getData).toHaveBeenCalledWith(filters);
+      expect(component.getData).toHaveBeenCalledWith(reportQuery);
     });
   });
 
   describe('onNodesListSortToggled()', () => {
     it('calls getData with applied filters', () => {
-      const filters = reportQuery.getReportQuery().filters;
+      const reportQuery = reportQueryService.getReportQuery();
       spyOn(component, 'getData');
 
       component.onNodesListSortToggled({detail: {sort: 'name', order: 'asc'}});
 
-      expect(component.getData).toHaveBeenCalledWith(filters);
+      expect(component.getData).toHaveBeenCalledWith(reportQuery);
     });
   });
 });

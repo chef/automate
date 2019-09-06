@@ -180,7 +180,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     const allUrlParameters$ = this.getAllUrlParameters();
 
     this.endDate$ = this.reportQuery.state.pipe(map((reportQuery: ReportQuery) =>
-      reportQuery.endDate));
+      reportQuery.endDate.toDate()));
 
     allUrlParameters$.pipe(takeUntil(this.isDestroyed)).subscribe(
       allUrlParameters => this.applyParamFilters(allUrlParameters));
@@ -405,8 +405,8 @@ export class ReportingComponent implements OnInit, OnDestroy {
     return moment(timestamp).format('MMMM Do[,] YYYY');
   }
 
-  getSuggestions(type: string, text: string, filters: ReportQuery) {
-    return this.suggestionsService.getSuggestions(type.replace('_id', ''), text, filters).pipe(
+  getSuggestions(type: string, text: string, reportQuery: ReportQuery) {
+    return this.suggestionsService.getSuggestions(type.replace('_id', ''), text, reportQuery).pipe(
       map(data => {
         return data.map(item => {
           let title;
@@ -441,13 +441,13 @@ export class ReportingComponent implements OnInit, OnDestroy {
     this.reportQuery.setState(reportQuery);
   }
 
-  getEndDate(urlFilters: Chicklet[]): Date {
+  getEndDate(urlFilters: Chicklet[]): moment.Moment {
     const foundFilter = urlFilters.find( (filter: Chicklet) => filter.type === 'end_time');
 
     if (foundFilter !== undefined) {
       const endDate = moment(foundFilter.text, 'YYYY-MM-DD');
       if (endDate.isValid()) {
-        return endDate.utc().startOf('day').add(12, 'hours').toDate();
+        return endDate.utc().startOf('day').add(12, 'hours');
       } else {
         const queryParams = {...this.route.snapshot.queryParams};
         delete queryParams['end_time'];
@@ -455,7 +455,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
         this.router.navigate([], {queryParams});
       }
     }
-    return moment().utc().startOf('day').add(12, 'hours').toDate();
+    return moment().utc().startOf('day').add(12, 'hours');
   }
 
   getDateInterval(urlFilters: Chicklet[]): number {

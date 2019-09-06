@@ -9,6 +9,7 @@ import { ReportingOverviewComponent } from './reporting-overview.component';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { StatsService, ReportQueryService, ReportDataService } from '../../shared/reporting';
 import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
+import { ReportQuery } from '../../shared/reporting';
 
 class MockTelemetryService {
   track() { }
@@ -53,19 +54,21 @@ describe('ReportingOverviewComponent', () => {
   });
 
   describe('getData()', () => {
-    const filters = [
-      {'start_time': '2017-01-31T00:00:00Z'},
-      {'end_time': '2017-02-31T00:00:00Z'},
-      {'type': 'Node', 'value': '1231'},
-      {'type': 'Platform', 'value': 'ubuntu'}
-    ];
+    const endDate = moment().utc().startOf('day').add(12, 'hours');
+    const reportQuery: ReportQuery = {
+      startDate: moment(endDate).subtract(10, 'days'),
+      endDate: endDate,
+      interval: 0,
+      filters: [ {type: { name: 'node'}, value: { id: '1231'}},
+          {type: { name: 'platform'}, value: { text: 'ubuntu'}} ]
+    };
 
     describe('when selected tab is "Node Status"', () => {
       it('gets node status data', () => {
         spyOn(component, 'getNodeStatusData');
         component.selectedButtonTab = 'Node Status';
-        component.getData(filters);
-        expect(component.getNodeStatusData).toHaveBeenCalledWith(filters);
+        component.getData(reportQuery);
+        expect(component.getNodeStatusData).toHaveBeenCalledWith(reportQuery);
       });
     });
 
@@ -73,48 +76,48 @@ describe('ReportingOverviewComponent', () => {
       it('gets profile status data', () => {
         spyOn(component, 'getProfileStatusData');
         component.selectedButtonTab = 'Profile Status';
-        component.getData(filters);
-        expect(component.getProfileStatusData).toHaveBeenCalledWith(filters);
+        component.getData(reportQuery);
+        expect(component.getProfileStatusData).toHaveBeenCalledWith(reportQuery);
       });
     });
 
     describe('getNodeStatusData()', () => {
       it('gets node status failure data', () => {
         spyOn(component, 'getNodeStatusFailures');
-        component.getNodeStatusData(filters);
-        expect(component.getNodeStatusFailures).toHaveBeenCalledWith(filters);
+        component.getNodeStatusData(reportQuery);
+        expect(component.getNodeStatusFailures).toHaveBeenCalledWith(reportQuery);
       });
 
       it('gets node status summary data', () => {
         spyOn(component, 'getNodeSummary');
-        component.getNodeStatusData(filters);
-        expect(component.getNodeSummary).toHaveBeenCalledWith(filters);
+        component.getNodeStatusData(reportQuery);
+        expect(component.getNodeSummary).toHaveBeenCalledWith(reportQuery);
       });
 
       it('gets node status trend data', () => {
         spyOn(component, 'getNodeTrend');
-        component.getNodeStatusData(filters);
-        expect(component.getNodeTrend).toHaveBeenCalledWith(filters);
+        component.getNodeStatusData(reportQuery);
+        expect(component.getNodeTrend).toHaveBeenCalledWith(reportQuery);
       });
     });
 
     describe('getProfileStatusData()', () => {
       it('gets profile status failure data', () => {
         spyOn(component, 'getProfileStatusFailures');
-        component.getProfileStatusData(filters);
-        expect(component.getProfileStatusFailures).toHaveBeenCalledWith(filters);
+        component.getProfileStatusData(reportQuery);
+        expect(component.getProfileStatusFailures).toHaveBeenCalledWith(reportQuery);
       });
 
       it('gets profile status summary data', () => {
         spyOn(component, 'getControlsSummary');
-        component.getProfileStatusData(filters);
-        expect(component.getControlsSummary).toHaveBeenCalledWith(filters);
+        component.getProfileStatusData(reportQuery);
+        expect(component.getControlsSummary).toHaveBeenCalledWith(reportQuery);
       });
 
       it('gets profile status trend data', () => {
         spyOn(component, 'getControlsTrend');
-        component.getProfileStatusData(filters);
-        expect(component.getControlsTrend).toHaveBeenCalledWith(filters);
+        component.getProfileStatusData(reportQuery);
+        expect(component.getControlsTrend).toHaveBeenCalledWith(reportQuery);
       });
     });
 
@@ -127,12 +130,12 @@ describe('ReportingOverviewComponent', () => {
       });
 
       it('sets the value for bubblePlatformFailures', () => {
-        component.getNodeStatusFailures(filters);
+        component.getNodeStatusFailures(reportQuery);
         expect(component.bubblePlatformFailures).toEqual([{'name': 'centos', 'failures': 5}]);
       });
 
       it('sets the value for bubbleEnvironmentFailures', () => {
-        component.getNodeStatusFailures(filters);
+        component.getNodeStatusFailures(reportQuery);
         expect(component.bubbleEnvFailures).toEqual([{'name': 'DevSec Prod Alpha', 'failures': 2}]);
       });
     });
@@ -150,7 +153,7 @@ describe('ReportingOverviewComponent', () => {
       });
 
       it('sets the value for nodeRadialData', () => {
-        component.getNodeSummary(filters);
+        component.getNodeSummary(reportQuery);
         expect(component.nodeRadialData).toEqual({
           'failed': 4,
           'passed': 10,
@@ -175,7 +178,7 @@ describe('ReportingOverviewComponent', () => {
       });
 
       it('sets the value for nodeTrendData', () => {
-        component.getNodeTrend(filters);
+        component.getNodeTrend(reportQuery);
         expect(component.nodeTrendData).toEqual([
           {
             'report_time': '2017-03-05T00:00:00+0000',
@@ -196,12 +199,12 @@ describe('ReportingOverviewComponent', () => {
       });
 
       it('sets the value for bubbleProfileFailures', () => {
-        component.getProfileStatusFailures(filters);
+        component.getProfileStatusFailures(reportQuery);
         expect(component.bubbleProfileFailures).toEqual([{'name': 'SSH Baseline', 'failures': 3}]);
       });
 
       it('sets the value for bubbleControlFailures', () => {
-        component.getProfileStatusFailures(filters);
+        component.getProfileStatusFailures(reportQuery);
         expect(component.bubbleControlFailures).toEqual([{'name': 'ssh-03', 'failures': 1}]);
       });
     });
@@ -219,7 +222,7 @@ describe('ReportingOverviewComponent', () => {
       });
 
       it('sets the value for profileRadialData', () => {
-        component.getControlsSummary(filters);
+        component.getControlsSummary(reportQuery);
         expect(component.profileRadialData).toEqual({
           'failed': 9,
           'passed': 1,
@@ -244,7 +247,7 @@ describe('ReportingOverviewComponent', () => {
       });
 
       it('sets the value for profileTrendData', () => {
-        component.getControlsTrend(filters);
+        component.getControlsTrend(reportQuery);
         expect(component.profileTrendData).toEqual([
           {
             'report_time': '2017-03-05T00:00:00+0000',
@@ -259,10 +262,17 @@ describe('ReportingOverviewComponent', () => {
 
   describe('getNodeTrend()', () => {
     const dateRange = { start: moment().toDate(), end: moment().toDate() };
-    const filters = [
-      {'end_time': '2017-01-31T00:00:00Z'},
-      {'type': 'Node', 'value': '1231'}
-    ];
+    // const filters = [
+    //   {'end_time': '2017-01-31T00:00:00Z'},
+    //   {'type': 'Node', 'value': '1231'}
+    // ];
+    const endDate = moment('2017-01-31T00:00:00Z').utc();
+    const reportQuery: ReportQuery = {
+      startDate: moment(endDate).subtract(10, 'days'),
+      endDate: endDate,
+      interval: 0,
+      filters: [ {type: { name: 'node'}, value: { id: '1231'}}]
+    };
     const data = [
       {
         'report_time': dateRange.end,
@@ -278,19 +288,22 @@ describe('ReportingOverviewComponent', () => {
 
     it('queries data from stats service', () => {
       fixture.detectChanges();
-      component.getNodeTrend(filters);
+      component.getNodeTrend(reportQuery);
 
-      expect(statsService.getNodeTrend).toHaveBeenCalledWith(filters);
+      expect(statsService.getNodeTrend).toHaveBeenCalledWith(reportQuery);
       expect(component.nodeTrendData).toEqual(data);
     });
   });
 
   describe('getControlsTrend()', () => {
     const dateRange = { start: moment().toDate(), end: moment().toDate() };
-    const filters = [
-      {'end_time': '2017-01-31T00:00:00Z'},
-      {'type': 'Node', 'value': '1231'}
-    ];
+    const endDate = moment('2017-01-31T00:00:00Z').utc();
+    const reportQuery: ReportQuery = {
+      startDate: moment(endDate).subtract(10, 'days'),
+      endDate: endDate,
+      interval: 0,
+      filters: [ {type: { name: 'node'}, value: { id: '1231'}}]
+    };
     const data = [
       {
         'report_time': dateRange.end,
@@ -305,9 +318,9 @@ describe('ReportingOverviewComponent', () => {
     });
 
     it('queries data from stats service', () => {
-      component.getControlsTrend(filters);
+      component.getControlsTrend(reportQuery);
 
-      expect(statsService.getControlsTrend).toHaveBeenCalledWith(filters);
+      expect(statsService.getControlsTrend).toHaveBeenCalledWith(reportQuery);
       expect(component.profileTrendData).toEqual(data);
     });
   });

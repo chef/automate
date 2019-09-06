@@ -4,29 +4,29 @@ import * as moment from 'moment';
 import { FilterC } from '../../+reporting/types';
 
 export interface ReportQuery {
-  startDate: Date;
-  endDate: Date;
+  startDate: moment.Moment;
+  endDate: moment.Moment;
   interval: number;
   filters: FilterC[];
 }
 
 interface TimeIntervals {
   name: string;
-  findStartDate: (endDate: Date) => Date;
+  findStartDate: (endDate: moment.Moment) => moment.Moment;
 }
 
 @Injectable()
 export class ReportQueryService {
 
   intervals: TimeIntervals[] = [
-    { name: 'Last 10 days', findStartDate: (endDate: Date): Date =>
-      moment(endDate).subtract(10, 'days').toDate()},
-    { name: 'Last month', findStartDate: (endDate: Date): Date =>
-      moment(endDate).subtract(1, 'months').toDate()},
-    { name: 'Last 3 months', findStartDate: (endDate: Date): Date =>
-      moment(endDate).subtract(3, 'months').toDate()},
-    { name: 'Last year', findStartDate: (endDate: Date): Date =>
-      moment(endDate).subtract(1, 'years').toDate()}
+    { name: 'Last 10 days', findStartDate: (endDate: moment.Moment): moment.Moment =>
+      moment(endDate).subtract(10, 'days')},
+    { name: 'Last month', findStartDate: (endDate: moment.Moment): moment.Moment =>
+      moment(endDate).subtract(1, 'months')},
+    { name: 'Last 3 months', findStartDate: (endDate: moment.Moment): moment.Moment =>
+      moment(endDate).subtract(3, 'months')},
+    { name: 'Last year', findStartDate: (endDate: moment.Moment): moment.Moment =>
+      moment(endDate).subtract(1, 'years')}
   ];
 
   private idToTitle: Map<string, string> = new Map<string, string>();
@@ -34,7 +34,7 @@ export class ReportQueryService {
   state: BehaviorSubject<ReportQuery> = new BehaviorSubject(this.initialReportQueryState());
 
   private initialReportQueryState() {
-    const endDate = moment().utc().startOf('day').add(12, 'hours').toDate();
+    const endDate = moment().utc().startOf('day').add(12, 'hours');
     return {
       startDate: this.findTimeIntervalStartDate(0, endDate),
       endDate: endDate,
@@ -51,7 +51,7 @@ export class ReportQueryService {
     this.state.next(newState);
   }
 
-  findTimeIntervalStartDate(interval: number, endDate: Date): Date {
+  findTimeIntervalStartDate(interval: number, endDate: moment.Moment): moment.Moment {
     return this.intervals[interval].findStartDate(endDate);
   }
 

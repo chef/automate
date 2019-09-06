@@ -178,7 +178,7 @@ export class StatsService {
 
     // for export, we want to send the start_time as the beg of day of end time
     // so we find the endtime in the filters, and then set start time to beg of that day
-    reportQuery.startDate = moment(reportQuery.endDate).startOf('day').toDate();
+    reportQuery.startDate = moment(reportQuery.endDate).startOf('day');
 
     const body = { type: format, filters: this.formatFilters(reportQuery) };
     return this.httpClient.post(url, body, { responseType: 'text' });
@@ -278,7 +278,7 @@ export class StatsService {
 
     if (reportQuery.startDate) {
       const now = moment();
-      const value = moment(reportQuery.startDate)
+      const value = reportQuery.startDate
         .set({
           hour: now.get('hour'),
           minute: now.get('minute'),
@@ -290,7 +290,7 @@ export class StatsService {
 
     if (reportQuery.endDate) {
       const now = moment();
-      const value = moment(reportQuery.endDate)
+      const value = reportQuery.endDate
         .set({
           hour: now.get('hour'),
           minute: now.get('minute'),

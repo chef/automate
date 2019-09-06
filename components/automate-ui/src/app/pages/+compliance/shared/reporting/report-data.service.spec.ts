@@ -4,6 +4,8 @@ import { of as observableOf } from 'rxjs';
 import { StatsService } from './stats.service';
 import { ReportDataService } from './report-data.service';
 import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
+import { ReportQuery } from './report-query.service';
+import * as moment from 'moment';
 
 class MockTelemetryService {
   track() { }
@@ -60,26 +62,38 @@ describe('ReportDataService', () => {
 
   describe('getReportingSummary()', () => {
     it('fetches reporting summary data', () => {
-      const filters = [];
+      const endDate = moment().utc().startOf('day').add(12, 'hours');
+      const reportQuery: ReportQuery = {
+        startDate: moment(endDate).subtract(10, 'days'),
+        endDate: endDate,
+        interval: 0,
+        filters: [ ]
+      };
       const data = {stats: {}};
       spyOn(statsService, 'getSummary').and.returnValue(observableOf(data));
 
-      service.getReportingSummary(filters);
+      service.getReportingSummary(reportQuery);
 
-      expect(statsService.getSummary).toHaveBeenCalledWith(filters);
+      expect(statsService.getSummary).toHaveBeenCalledWith(reportQuery);
     });
   });
 
   describe('getReportingNodesList()', () => {
     it('fetches nodes data', () => {
-      const filters = [];
+      const endDate = moment().utc().startOf('day').add(12, 'hours');
+      const reportQuery: ReportQuery = {
+        startDate: moment(endDate).subtract(10, 'days'),
+        endDate: endDate,
+        interval: 0,
+        filters: [ ]
+      };
       const params = {};
       const data = [];
       spyOn(statsService, 'getNodes').and.returnValue(observableOf(data));
 
-      service.getReportingNodesList(filters, params);
+      service.getReportingNodesList(reportQuery, params);
 
-      expect(statsService.getNodes).toHaveBeenCalledWith(filters, params);
+      expect(statsService.getNodes).toHaveBeenCalledWith(reportQuery, params);
     });
     it('sets nodesListLoading to false', () => {
       expect(service.nodesListLoading).toEqual(true);
@@ -88,14 +102,20 @@ describe('ReportDataService', () => {
 
   describe('getReportingProfilesList()', () => {
     it('fetches profiles data', () => {
-      const filters = [];
+      const endDate = moment().utc().startOf('day').add(12, 'hours');
+      const reportQuery: ReportQuery = {
+        startDate: moment(endDate).subtract(10, 'days'),
+        endDate: endDate,
+        interval: 0,
+        filters: [ ]
+      };
       const params = {};
       const data = [];
       spyOn(statsService, 'getProfiles').and.returnValue(observableOf(data));
 
-      service.getReportingProfilesList(filters, params);
+      service.getReportingProfilesList(reportQuery, params);
 
-      expect(statsService.getProfiles).toHaveBeenCalledWith(filters, params);
+      expect(statsService.getProfiles).toHaveBeenCalledWith(reportQuery, params);
     });
     it('sets nodesListLoading to false', () => {
       expect(service.profilesListLoading).toEqual(true);
