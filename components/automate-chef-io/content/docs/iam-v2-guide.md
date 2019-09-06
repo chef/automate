@@ -131,20 +131,6 @@ First, write a statement that **allows** access to the _get_, _list_, and _updat
     },
 ```
 
-Next, write a statement that **denies** access to the _create_ and _delete_ actions:
-
-```json
-    {
-      "effect": "DENY",
-      "actions": [
-        "iam:users:create",
-        "iam:teams:create",
-        "iam:users:delete",
-        "iam:teams:delete"
-      ]
-    }
-```
-
 The complete policy should look like:
 
 ```json
@@ -165,15 +151,6 @@ The complete policy should look like:
         "iam:teams:update",
         "iam:teams:list",
         "iam:teams:get"
-      ]
-    },
-    {
-      "effect": "DENY",
-      "actions": [
-        "iam:users:create",
-        "iam:teams:create",
-        "iam:users:delete",
-        "iam:teams:delete"
       ]
     }
   ]
