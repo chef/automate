@@ -341,7 +341,9 @@ func (app *ApplicationsServer) GetDisconnectedServicesConfig(ctx context.Context
 	req *applications.GetDisconnectedServicesConfigReq) (*applications.PeriodicJobConfig, error) {
 	config, err := app.jobScheduler.GetDisconnectedServicesJobConfig(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to load disconnected_services job configuration")
+		err = errors.Wrap(err, "failed to load disconnected_services job configuration")
+		log.WithError(err).Error()
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 	res := &applications.PeriodicJobConfig{
 		Running:   config.Enabled,
@@ -356,22 +358,30 @@ func (app *ApplicationsServer) UpdateDisconnectedServicesConfig(ctx context.Cont
 	if req.GetRunning() {
 		err := app.jobScheduler.EnableDisconnectedServicesJob(ctx)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to enable disconnected_services job")
+			err = errors.Wrap(err, "failed to enable disconnected_services job")
+			log.WithError(err).Error()
+			return nil, status.Error(codes.Internal, err.Error())
 		}
 	} else {
 		err := app.jobScheduler.DisableDisconnectedServicesJob(ctx)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to disable disconnected_services job")
+			err = errors.Wrap(err, "failed to disable disconnected_services job")
+			log.WithError(err).Error()
+			return nil, status.Error(codes.Internal, err.Error())
 		}
 	}
 
 	err := simpledatemath.Validate(req.GetThreshold())
 	if err != nil {
-		return nil, errors.Wrapf(err, "unable to parse disconnected_services threshold %q", req.GetThreshold())
+		err = errors.Wrapf(err, "unable to parse disconnected_services threshold %q", req.GetThreshold())
+		log.WithError(err).Error()
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 	err = app.jobScheduler.UpdateDisconnectedServicesJobParams(ctx, &DisconnectedServicesParamsV0{ThresholdDuration: req.GetThreshold()})
 	if err != nil {
-		return nil, errors.Wrapf(err, "unable to update disconnected services parameters to %q", req.GetThreshold())
+		err = errors.Wrapf(err, "unable to update disconnected services parameters to %q", req.GetThreshold())
+		log.WithError(err).Error()
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &applications.UpdateDisconnectedServicesConfigRes{}, nil
@@ -381,7 +391,9 @@ func (app *ApplicationsServer) GetDeleteDisconnectedServicesConfig(ctx context.C
 	req *applications.GetDeleteDisconnectedServicesConfigReq) (*applications.PeriodicJobConfig, error) {
 	config, err := app.jobScheduler.GetDeleteDisconnectedServicesJobConfig(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to load delete_disconnected_services job configuration")
+		err = errors.Wrap(err, "failed to load delete_disconnected_services job configuration")
+		log.WithError(err).Error()
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 	res := &applications.PeriodicJobConfig{
 		Running:   config.Enabled,
@@ -396,22 +408,30 @@ func (app *ApplicationsServer) UpdateDeleteDisconnectedServicesConfig(ctx contex
 	if req.GetRunning() {
 		err := app.jobScheduler.EnableDeleteDisconnectedServicesJob(ctx)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to enable delete_disconnected_services job")
+			err = errors.Wrap(err, "failed to enable delete_disconnected_services job")
+			log.WithError(err).Error()
+			return nil, status.Error(codes.Internal, err.Error())
 		}
 	} else {
 		err := app.jobScheduler.DisableDeleteDisconnectedServicesJob(ctx)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to disable delete_disconnected_services job")
+			err = errors.Wrap(err, "failed to disable delete_disconnected_services job")
+			log.WithError(err).Error()
+			return nil, status.Error(codes.Internal, err.Error())
 		}
 	}
 
 	err := simpledatemath.Validate(req.GetThreshold())
 	if err != nil {
-		return nil, errors.Wrapf(err, "unable to parse delete_disconnected_services threshold %q", req.GetThreshold())
+		err = errors.Wrapf(err, "unable to parse delete_disconnected_services threshold %q", req.GetThreshold())
+		log.WithError(err).Error()
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 	err = app.jobScheduler.UpdateDeleteDisconnectedServicesJobParams(ctx, &DisconnectedServicesParamsV0{ThresholdDuration: req.GetThreshold()})
 	if err != nil {
-		return nil, errors.Wrapf(err, "unable to update delete_disconnected_services parameters to %q", req.GetThreshold())
+		err = errors.Wrapf(err, "unable to update delete_disconnected_services parameters to %q", req.GetThreshold())
+		log.WithError(err).Error()
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &applications.UpdateDeleteDisconnectedServicesConfigRes{}, nil
