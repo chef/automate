@@ -17,6 +17,15 @@ jq() {
     hab pkg exec core/jq-static jq "$@"
 }
 
+do_prepare_deploy() {
+    do_prepare_deploy_default
+
+    mkdir /etc/systemd/system/chef-automate.service.d
+    cat > /etc/systemd/system/chef-automate.service.d/custom.conf <<EOF
+[Service]
+Environment=CHEF_AUTOMATE_SKIP_MANIFEST_VERIFICATION=true
+EOF
+}
 
 do_deploy() {
     set_test_manifest "current.json"

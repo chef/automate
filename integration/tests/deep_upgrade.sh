@@ -29,6 +29,16 @@ do_create_config() {
     log_info "Deferring configuration creation until do_deploy"
 }
 
+do_prepare_deploy() {
+    do_prepare_deploy_default
+
+    mkdir /etc/systemd/system/chef-automate.service.d
+    cat > /etc/systemd/system/chef-automate.service.d/custom.conf <<EOF
+[Service]
+Environment=CHEF_AUTOMATE_SKIP_MANIFEST_VERIFICATION=true
+EOF
+}
+
 do_deploy() {
     #shellcheck disable=SC2154
     cp "$DEEP_UPGRADE_PATH" "$test_manifest_path"
