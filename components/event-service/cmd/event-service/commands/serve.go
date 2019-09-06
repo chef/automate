@@ -23,7 +23,7 @@ func newServeCmd() *cobra.Command {
 
 			cfg, err := config.Configure()
 			if err != nil {
-				return errors.Wrap(err, "failed to configure event-service")
+				return errors.Wrap(err, "configuring event-service")
 			}
 
 			uri := fmt.Sprintf("%s:%d", cfg.ServiceConfig.Host, cfg.ServiceConfig.Port)
@@ -36,7 +36,7 @@ func newServeCmd() *cobra.Command {
 
 			closer, err := tracing.NewGlobalTracer("event-service")
 			if err != nil {
-				errors.Wrap(err, "failed to start tracer for event-service")
+				errors.Wrap(err, "starting tracer for event-service")
 			}
 			if closer != nil {
 				defer tracing.CloseQuietly(closer)
@@ -48,7 +48,7 @@ func newServeCmd() *cobra.Command {
 				go func() {
 					err := nats.Spawn(cfg)
 					if err != nil {
-						logrus.WithError(err).Error("failed to start NATS")
+						logrus.WithError(err).Error("starting NATS")
 					}
 				}()
 			}

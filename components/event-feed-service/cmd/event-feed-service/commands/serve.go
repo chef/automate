@@ -25,14 +25,14 @@ var serveCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		conf, err := configFromViper()
 		if err != nil {
-			return errors.Wrap(err, "failed to load config")
+			return errors.Wrap(err, "loading config")
 		}
 
 		conf.Service.SetLogLevel()
 
 		tlsOpts, err := conf.ReadCerts()
 		if err != nil {
-			return errors.Wrap(err, "failed to read TLS certs")
+			return errors.Wrap(err, "reading TLS certs")
 		}
 
 		connFactory := secureconn.NewFactory(*tlsOpts)
@@ -47,7 +47,7 @@ func configFromViper() (*config.EventFeed, error) {
 	if err := viper.Unmarshal(cfg); err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
-		}).Fatal("Failed to marshal config options to server config")
+		}).Fatal("marshaling config options to server config")
 	}
 	cfg.FixupRelativeTLSPaths(viper.ConfigFileUsed())
 

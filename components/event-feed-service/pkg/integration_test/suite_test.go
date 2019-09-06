@@ -51,7 +51,7 @@ func NewSuite(url string) (*Suite, error) {
 		olivere.SetSniff(false),
 	)
 	if err != nil {
-		return nil, errors.Wrapf(err, "could not connect to elasticsearch (%s)", url)
+		return nil, errors.Wrapf(err, "connecting to elasticsearch (%s)", url)
 	}
 	s.esClient = esClient
 	s.indices = []string{persistence.IndexNameFeeds}
@@ -60,17 +60,17 @@ func NewSuite(url string) (*Suite, error) {
 	s.feedBackend = persistence.NewFeedStore(esClient)
 	err = s.feedBackend.InitializeStore(context.Background())
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to initialize feed store backend")
+		return nil, errors.Wrap(err, "initializing feed store backend")
 	}
 
 	factory, err := secureConnFactoryHab()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to load hab grpc conn factory")
+		return nil, errors.Wrap(err, "loading hab grpc conn factory")
 	}
 
 	feedClient, purgeClient, cleanup, err := initClients(factory)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to initialize gRPC clients")
+		return nil, errors.Wrap(err, "initializing gRPC clients")
 	}
 	s.feedClient = feedClient
 	s.purgeClient = purgeClient
@@ -199,7 +199,7 @@ func initClients(connFactory *secureconn.Factory) (event_feed.EventFeedServiceCl
 func secureConnFactoryHab() (*secureconn.Factory, error) {
 	certs, err := loadCertsHab()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to load event-feed-service TLS certs")
+		return nil, errors.Wrap(err, "loading event-feed-service TLS certs")
 	}
 
 	return secureconn.NewFactory(*certs), nil

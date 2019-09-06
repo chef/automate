@@ -36,7 +36,7 @@ func TestMain(m *testing.M) {
 	var err error
 	testSuite, err = NewSuite(elasticsearchUrl)
 	if err != nil {
-		log.WithError(err).Error("failed to initialize test suite")
+		log.WithError(err).Error("initializing test suite")
 		os.Exit(3)
 	}
 

@@ -45,13 +45,13 @@ func GenerateHealthCheckCredentials(c *config.EventGatewayConfig) error {
 	b := make([]byte, PRNCount)
 	_, err := rand.Read(b)
 	if err != nil {
-		return errors.Wrap(err, "failed reading random data to generate healthcheck credentials")
+		return errors.Wrap(err, "reading random data to generate healthcheck credentials")
 	}
 	hcToken := fmt.Sprintf("%s%s", HealthCheckTokenPrefix, base64.URLEncoding.EncodeToString(b))
 
 	err = ioutil.WriteFile(c.Service.HealthCheckCredentialsFile, []byte(hcToken), 0600)
 	if err != nil {
-		return errors.Wrapf(err, "failed to write healthcheck credentials to %q", c.Service.HealthCheckCredentialsFile)
+		return errors.Wrapf(err, "writing healthcheck credentials to %q", c.Service.HealthCheckCredentialsFile)
 	}
 
 	return nil
@@ -60,7 +60,7 @@ func GenerateHealthCheckCredentials(c *config.EventGatewayConfig) error {
 func ReadHealthCheckCredentials(c *config.EventGatewayConfig) (string, error) {
 	data, err := ioutil.ReadFile(c.Service.HealthCheckCredentialsFile)
 	if err != nil {
-		return "", errors.Wrapf(err, "failed to read healthcheck credentials from %q", c.Service.HealthCheckCredentialsFile)
+		return "", errors.Wrapf(err, "reading healthcheck credentials from %q", c.Service.HealthCheckCredentialsFile)
 	}
 	return string(data), nil
 }
@@ -293,7 +293,7 @@ func (a *automateAuthenticator) tryAuthzV2(ctx context.Context, subjects []strin
 		if status.Convert(err).Code() == codes.FailedPrecondition {
 			return err, true
 		}
-		return errors.Wrapf(err, "error authorizing action %q on resource %q for subjects %q", actionV2, resourceV2, subjects), false
+		return errors.Wrapf(err, "authorizing action %q on resource %q for subjects %q", actionV2, resourceV2, subjects), false
 	}
 	if !resp.GetAuthorized() {
 		return errors.Errorf("unauthorized action %q on resource %q for subjects %q", actionV2, resourceV2, subjects), false
@@ -312,7 +312,7 @@ func (a *automateAuthenticator) tryAuthzV1(ctx context.Context, subjects []strin
 		if status.Convert(err).Code() == codes.FailedPrecondition {
 			return errors.Wrap(err, "IAMv1 not available, try IAMv2"), true
 		}
-		log.WithError(err).Error("error authorizing request")
+		log.WithError(err).Error("unauthorized")
 		return errors.Wrapf(err, "error authorizing action %q on resource %q for subjects %q", actionV1, resourceV1, subjects), false
 	}
 	if resp.GetAuthorized() {

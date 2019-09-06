@@ -99,7 +99,7 @@ func Configure() (*EventConfig, error) {
 
 	// Unmarshal the viper config into the server Config
 	if err := viper.Unmarshal(config); err != nil {
-		return config, errors.Wrap(err, "failed to unmarshal config options to server config")
+		return config, errors.Wrap(err, "unmarshaling config options to server config")
 	}
 
 	log.WithFields(log.Fields{
@@ -111,7 +111,7 @@ func Configure() (*EventConfig, error) {
 	// Validates that the configuration has a valid host/port
 	_, err := url.ParseRequestURI(path.Join("http://", config.ListenAddress()))
 	if err != nil {
-		return config, errors.Wrapf(err, "failed to parse listen address: %s", config.ListenAddress())
+		return config, errors.Wrapf(err, "parsing listen address: %s", config.ListenAddress())
 	}
 	// Set log level
 	config.SetLogLevel()
@@ -120,7 +120,7 @@ func Configure() (*EventConfig, error) {
 	config.TLSConfig.FixupRelativeTLSPaths(viper.ConfigFileUsed())
 	serviceCerts, err := config.TLSConfig.ReadCerts()
 	if err != nil {
-		return config, errors.Wrap(err, "failed to load TLS certs")
+		return config, errors.Wrap(err, "loading TLS certs")
 	}
 
 	config.ServiceCerts = serviceCerts

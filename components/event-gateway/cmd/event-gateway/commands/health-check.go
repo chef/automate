@@ -18,7 +18,7 @@ func newHealthCheckCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := config.Configure()
 			if err != nil {
-				return errors.Wrap(err, "failed to read event-gateway configuration")
+				return errors.Wrap(err, "reading event-gateway configuration")
 			}
 
 			if debug {
@@ -33,7 +33,7 @@ func newHealthCheckCommand() *cobra.Command {
 
 			err = nats.ConnectivityCheck(cfg)
 			if err != nil {
-				return errors.Wrap(err, "failed connectivity check")
+				return errors.Wrap(err, "checking connectivity")
 			}
 
 			return nil

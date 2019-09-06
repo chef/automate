@@ -35,7 +35,7 @@ func Spawn(c *config.EventFeed, connFactory *secureconn.Factory) error {
 	log.WithField("uri", uri).Info("Starting event-feed-service gRPC Server")
 	conn, err := net.Listen("tcp", uri)
 	if err != nil {
-		return errors.Wrap(err, "failed to start TCP listener")
+		return errors.Wrap(err, "starting TCP listener")
 	}
 
 	esClient, err := elastic.NewClient(
@@ -43,7 +43,7 @@ func Spawn(c *config.EventFeed, connFactory *secureconn.Factory) error {
 		elastic.SetSniff(false),
 	)
 	if err != nil {
-		return errors.Wrapf(err, "failed to connect to elasticsearch (%s)", c.ElasticSearchURL)
+		return errors.Wrapf(err, "connecting to elasticsearch (%s)", c.ElasticSearchURL)
 	}
 
 	feedStore := persistence.NewFeedStore(esClient)
@@ -52,7 +52,7 @@ func Spawn(c *config.EventFeed, connFactory *secureconn.Factory) error {
 
 	err = migrator.InitializeStore()
 	if err != nil {
-		return errors.Wrap(err, "failed initializing elasticsearch")
+		return errors.Wrap(err, "initializing elasticsearch")
 	}
 
 	timeoutCtx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
@@ -62,7 +62,7 @@ func Spawn(c *config.EventFeed, connFactory *secureconn.Factory) error {
 		timeoutCtx, "es-sidecar-service", c.ESSidecarAddress, libgrpc.WithBlock(),
 	)
 	if err != nil {
-		return errors.Wrap(err, "failed to initialize es-sidecar-service backend connection")
+		return errors.Wrap(err, "initializing es-sidecar-service backend connection")
 	}
 	defer esSidecarConn.Close() //nolint errcheck
 
@@ -73,14 +73,14 @@ func Spawn(c *config.EventFeed, connFactory *secureconn.Factory) error {
 		libgrpc.WithBlock(), libgrpc.WithMaxMsgSize(64*1024*1024),
 	)
 	if err != nil {
-		return errors.Wrap(err, "failed to initialize cereal-service backend connection")
+		return errors.Wrap(err, "initializing cereal-service backend connection")
 	}
 	defer cerealConn.Close() // nolint errcheck
 	cerealBackend := cereal_grpc.NewGrpcBackendFromConn("event-feed-service", cerealConn)
 
 	jobManager, cleanup, err := newJobManager(c, esSidecarClient, cerealBackend)
 	if err != nil {
-		return errors.Wrap(err, "failed initializing job manager")
+		return errors.Wrap(err, "initializing job manager")
 	}
 	defer cleanup()
 
@@ -92,7 +92,7 @@ func Spawn(c *config.EventFeed, connFactory *secureconn.Factory) error {
 		purge.WithServerEsSidecarClient(esSidecarClient),
 	)
 	if err != nil {
-		return errors.Wrap(err, "failed initializing purge server")
+		return errors.Wrap(err, "initializing purge server")
 	}
 
 	grpcServer := newGRPCServer(connFactory, c, feedStore, purgeServer)
@@ -137,7 +137,7 @@ func newJobManager(
 
 	jobManager, err := cereal.NewManager(cerealBackend)
 	if err != nil {
-		return man, cleanup, errors.Wrap(err, "failed to create job manager")
+		return man, cleanup, errors.Wrap(err, "creating job manager")
 	}
 
 	err = purge.ConfigureManager(
@@ -147,17 +147,17 @@ func newJobManager(
 		purge.WithTaskEsSidecarClient(esSidecarClient),
 	)
 	if err != nil {
-		return man, cleanup, errors.Wrap(err, "failed to configure purge workflow")
+		return man, cleanup, errors.Wrap(err, "configuring purge workflow")
 	}
 
 	err = server.ConfigureJobManager(jobManager, c)
 	if err != nil {
-		return man, cleanup, errors.Wrap(err, "failed to migrate purge policies")
+		return man, cleanup, errors.Wrap(err, "migrating purge policies")
 	}
 
 	err = jobManager.Start(context.Background())
 	if err != nil {
-		return man, cleanup, errors.Wrap(err, "failed to start job manager")
+		return man, cleanup, errors.Wrap(err, "starting job manager")
 	}
 
 	cleanup = func() {

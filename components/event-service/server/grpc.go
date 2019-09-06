@@ -46,7 +46,7 @@ func StartGRPC(ctx context.Context, config *config.EventConfig) error {
 	// Create our listener channel
 	listener, err := net.Listen("tcp", config.ListenAddress())
 	if err != nil {
-		return errors.Wrapf(err, "failed to create tcp listener on address: %s", config.ListenAddress())
+		return errors.Wrapf(err, "creating TCP listener on address: %s", config.ListenAddress())
 	}
 
 	return g.Serve(listener)

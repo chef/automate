@@ -109,7 +109,7 @@ func (efs ElasticFeedStore) CreateFeedEntry(entry *feed.FeedEntry) (bool, error)
 
 	// if the index doesn't exist, return an error
 	if !exists {
-		return false, errors.Wrapf(err, "failed to create feed entry because index %s does not exist", IndexNameFeeds)
+		return false, errors.Wrapf(err, "creating feed entry because index %s does not exist", IndexNameFeeds)
 	}
 
 	logrus.Debug("Adding new document to index...")
@@ -122,7 +122,7 @@ func (efs ElasticFeedStore) CreateFeedEntry(entry *feed.FeedEntry) (bool, error)
 		Do(ctx)
 
 	if err != nil {
-		return false, errors.Wrapf(err, "failed to create feed entry")
+		return false, errors.Wrapf(err, "creating feed entry")
 	}
 
 	logrus.Debugf("Indexed feed entry %s to index %s, type %s", put1.Id, put1.Index, put1.Type)
@@ -137,7 +137,7 @@ func (efs ElasticFeedStore) GetFeed(query *feed.FeedQuery) ([]*feed.FeedEntry, i
 		return nil, 0, err
 	}
 	if !exists {
-		return nil, 0, errors.Errorf("failed to get feed because index %s does not exist", IndexNameFeeds)
+		return nil, 0, errors.Errorf("getting feed because index %s does not exist", IndexNameFeeds)
 	}
 
 	var mainQuery = newBoolQueryFromFilters(query.Filters)
@@ -161,14 +161,14 @@ func (efs ElasticFeedStore) GetFeed(query *feed.FeedQuery) ([]*feed.FeedEntry, i
 
 	searchResult, err := searchService.Do(context.Background())
 	if err != nil {
-		return nil, 0, errors.Wrap(err, "failed attempting to retrieving feed entries")
+		return nil, 0, errors.Wrap(err, "retrieving feed entries")
 	}
 
 	entries := make([]*feed.FeedEntry, 0, len(searchResult.Hits.Hits))
 	for _, hit := range searchResult.Hits.Hits {
 		entry := new(feed.FeedEntry)
 		if err := json.Unmarshal(*hit.Source, entry); err != nil {
-			return nil, 0, errors.Wrapf(err, "failed to unmarshall feed entry for object %s", hit.Source)
+			return nil, 0, errors.Wrapf(err, "unmarshaling feed entry for object %s", hit.Source)
 		}
 		entries = append(entries, entry)
 	}
@@ -182,7 +182,7 @@ func (efs ElasticFeedStore) GetFeedSummary(query *feed.FeedSummaryQuery) (map[st
 		return nil, err
 	}
 	if !exists {
-		return nil, errors.Errorf("failed to get feed because index %s does not exist", IndexNameFeeds)
+		return nil, errors.Errorf("getting feed because index %s does not exist", IndexNameFeeds)
 	}
 
 	counts, err := efs.getCounts(query)
@@ -208,7 +208,7 @@ func (efs ElasticFeedStore) getCounts(query *feed.FeedSummaryQuery) (map[string]
 
 	buckets, err := efs.getAggregationBucket(mainQuery, IndexNameFeeds, query.CountsCategory)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to search for counts")
+		return nil, errors.Wrap(err, "searching for counts")
 	}
 
 	for _, bucket := range buckets {
@@ -334,7 +334,7 @@ func (efs ElasticFeedStore) getAggregationBucket(boolQuery *olivere.BoolQuery, i
 
 	// Return an error if the search was not successful
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to search for aggregation")
+		return nil, errors.Wrap(err, "searching for aggregation")
 	}
 
 	if searchResult.TotalHits() == 0 {
@@ -359,13 +359,13 @@ func (efs ElasticFeedStore) getAggregationBucket(boolQuery *olivere.BoolQuery, i
 	// First aggregation `searchTerm`
 	statusResult, found := searchResult.Aggregations.Terms(searchTerm)
 	if !found {
-		return nil, feedErrors.NewBackendError("Aggregation term '%s' not found", searchTerm)
+		return nil, feedErrors.NewBackendError("aggregation term '%s' not found", searchTerm)
 	}
 
 	// Second aggregation `status_counts` (tag)
 	statusCounts, found := statusResult.Aggregations.Terms(aggregationTerm)
 	if !found {
-		return nil, feedErrors.NewBackendError("Aggregation term '%s' not found", aggregationTerm)
+		return nil, feedErrors.NewBackendError("aggregation term '%s' not found", aggregationTerm)
 	}
 
 	return statusCounts.Buckets, nil
@@ -375,7 +375,7 @@ func (efs *ElasticFeedStore) indexExists(name string) (bool, error) {
 	// if feed index doesn't exist yet, return false
 	exists, err := efs.client.IndexExists(name).Do(context.Background())
 	if err != nil {
-		return false, errors.Wrapf(err, "unable to determine if index %s exists", name)
+		return false, errors.Wrapf(err, "determining index '%s' existence", name)
 	}
 
 	return exists, nil
@@ -498,7 +498,7 @@ func (efs ElasticFeedStore) GetActionLine(filters []string, startDate string, en
 	ss := olivere.NewSearchSource().Query(mainQuery).Aggregation(dateHistoTag, bucketHist)
 	src, err := ss.Source()
 	if err != nil {
-		return &feed.ActionLine{}, errors.Wrapf(err, "failed to obtain search source for action %s", action)
+		return &feed.ActionLine{}, errors.Wrapf(err, "obtaining search source for action %s", action)
 	}
 
 	data, _ := json.Marshal(src)
@@ -532,7 +532,7 @@ func (efs ElasticFeedStore) GetActionLine(filters []string, startDate string, en
 	for index, bucket := range dateHistoRes.Buckets {
 		item, found := bucket.Aggregations.Terms(eventTypeItems)
 		if !found {
-			return &feed.ActionLine{}, feedErrors.NewBackendError("Item '%s' not found", eventTypeItems)
+			return &feed.ActionLine{}, feedErrors.NewBackendError("item '%s' not found", eventTypeItems)
 		}
 
 		if len(item.Buckets) > 0 {
@@ -590,7 +590,7 @@ func (efs ElasticFeedStore) createStore(ctx context.Context, indexName string, m
 	_, err := efs.client.CreateIndex(indexName).Body(mapping).Do(ctx)
 
 	if err != nil {
-		return errors.Wrapf(err, "failed to create index %s", indexName)
+		return errors.Wrapf(err, "creating index %s", indexName)
 	}
 
 	return nil
@@ -600,7 +600,7 @@ func (efs ElasticFeedStore) updateMapping(ctx context.Context, esMap Mapping) er
 	_, err := efs.client.PutMapping().Index(esMap.Index).Type(esMap.Type).BodyString(esMap.Properties).Do(ctx)
 
 	if err != nil {
-		return errors.Wrapf(err, "failed to update index mappings for %s", esMap.Index)
+		return errors.Wrapf(err, "updating index mappings for %s", esMap.Index)
 	}
 
 	return nil
@@ -610,7 +610,7 @@ func (efs ElasticFeedStore) storeExists(ctx context.Context, indexName string) (
 	exists, err := efs.client.IndexExists().Index([]string{indexName}).Do(ctx)
 
 	if err != nil {
-		return exists, errors.Wrapf(err, "unable to determine if index %s exists", indexName)
+		return exists, errors.Wrapf(err, "determining index '%s' existence", indexName)
 	}
 
 	return exists, nil

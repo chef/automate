@@ -24,7 +24,7 @@ func newServeCmd() *cobra.Command {
 
 			cfg, err := config.Configure()
 			if err != nil {
-				return errors.Wrap(err, "failed to configure event-gateway")
+				return errors.Wrap(err, "configuring event-gateway")
 			}
 
 			uri := fmt.Sprintf("nats://%s:%d", cfg.Service.Host, cfg.Service.Port)
@@ -37,7 +37,7 @@ func newServeCmd() *cobra.Command {
 
 			closer, err := tracing.NewGlobalTracer("event-gateway")
 			if err != nil {
-				return errors.Wrap(err, "failed to start tracer for event-gateway")
+				return errors.Wrap(err, "starting tracer for event-gateway")
 			}
 			if closer != nil {
 				defer tracing.CloseQuietly(closer)
@@ -54,7 +54,7 @@ func newServeCmd() *cobra.Command {
 
 			err = nats.GenerateHealthCheckCredentials(cfg)
 			if err != nil {
-				return errors.Wrap(err, "failed to setup credentials for health-check")
+				return errors.Wrap(err, "setting up health-check credentials")
 			}
 
 			return nats.Spawn(cfg)

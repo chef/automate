@@ -52,13 +52,13 @@ func (eventFeedServer *EventFeedServer) GetFeed(ctx context.Context,
 	})
 
 	if feedEntries, hits, err = eventFeedServer.feedService.GetFeed(request); err != nil {
-		logctx.WithError(err).Warn("failed to get feed")
+		logctx.WithError(err).Warn("getting feed")
 		return nil, err
 	}
 
 	fe, err := FromInternalFormatToList(feedEntries)
 	if err != nil {
-		logctx.WithError(err).Warn("failed to format feed entries")
+		logctx.WithError(err).Warn("formating feed entries")
 		return nil, err
 	}
 
@@ -79,14 +79,14 @@ func (eventFeedServer *EventFeedServer) GetFeedSummary(ctx context.Context,
 	// Date Range
 	startTime, endTime, err := feed.ValidateMillisecondDateRange(request.Start, request.End)
 	if err != nil {
-		logctx.WithError(err).Warn("failed to validate date range")
+		logctx.WithError(err).Warn("validating date range")
 		return &event_feed.FeedSummaryResponse{}, e.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 
 	fs, err := eventFeedServer.feedService.GetFeedSummary(request.CountCategory, request.Filters,
 		startTime, endTime)
 	if err != nil {
-		logctx.WithError(err).Warn("failed to get feed summary")
+		logctx.WithError(err).Warn("getting feed summary")
 		return &event_feed.FeedSummaryResponse{}, e.GrpcErrorFromErr(codes.Internal, err)
 	}
 
@@ -118,7 +118,7 @@ func (eventFeedServer *EventFeedServer) GetFeedTimeline(ctx context.Context,
 
 	err := validateFeedTimelineRequest(request)
 	if err != nil {
-		logctx.WithError(err).Warn("failed to validate request")
+		logctx.WithError(err).Warn("validating request")
 		return &event_feed.FeedTimelineResponse{}, e.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 
@@ -127,7 +127,7 @@ func (eventFeedServer *EventFeedServer) GetFeedTimeline(ctx context.Context,
 		actionLine, err := eventFeedServer.feedService.GetActionLine(request.Filters, request.Start,
 			request.End, request.Timezone, int(request.Interval), action)
 		if err != nil {
-			logctx.WithError(err).Warn("failed to get action line")
+			logctx.WithError(err).Warn("getting action line")
 			return &event_feed.FeedTimelineResponse{}, e.GrpcErrorFromErr(codes.Internal, err)
 		}
 		actionLines[i] = fromInternalFormatActionLine(actionLine)
@@ -148,9 +148,11 @@ func (eventFeedServer *EventFeedServer) HandleEvent(ctx context.Context,
 		"rpc":     "HandleEvent",
 	})
 
+	logctx.Debug("handling event")
+
 	response, err := eventFeedServer.feedService.HandleEvent(request)
 	if err != nil {
-		logctx.WithError(err).Warn("failed to handle event")
+		logctx.WithError(err).Warn("handling event")
 		return response, err
 	}
 	return response, nil
@@ -173,7 +175,7 @@ func FromInternalFormatToList(entries []*feed.FeedEntry) ([]*event_feed.FeedEntr
 func validateFeedTimelineRequest(req *event_feed.FeedTimelineRequest) error {
 	// Validate Timezone
 	if req.Timezone == "" {
-		return e.GrpcError(codes.InvalidArgument, "A timezone must be provided")
+		return e.GrpcError(codes.InvalidArgument, "timezone must be provided")
 	}
 
 	_, err := time.LoadLocation(req.Timezone)
@@ -184,16 +186,16 @@ func validateFeedTimelineRequest(req *event_feed.FeedTimelineRequest) error {
 	// Validate Interval
 	if req.Interval <= 0 || req.Interval > 24 {
 		return e.GrpcError(codes.InvalidArgument,
-			"Time interval must be greater than 0 and less than or equal to 24 hours")
+			"time interval must be greater than 0 and less than or equal to 24 hours")
 	}
 
 	if 24%req.Interval != 0 {
-		return e.GrpcError(codes.InvalidArgument, "24 must be divisible by time interval")
+		return e.GrpcError(codes.InvalidArgument, "time interval must devide 24")
 	}
 
 	// Validate Date Range
 	if !feed.ValidateDateRange(req.Start, req.End) {
-		return e.GrpcError(codes.InvalidArgument, "Invalid start/end time. (format: YYYY-MM-DD)")
+		return e.GrpcError(codes.InvalidArgument, "invalid start/end time. (format: YYYY-MM-DD)")
 	}
 
 	return nil

@@ -5,8 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"errors"
-
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
@@ -52,9 +51,9 @@ func (e eventHandler) HandleEvent(msg *api.EventMsg) {
 	response, err := e.client.HandleEvent(context.Background(), msg)
 
 	if err != nil {
-		logrus.Warnf("Client event handler returned an error... event won't be handled %s", err.Error())
+		logrus.WithError(err).Warnf("handling event")
 	} else {
-		logrus.Debugf("Event handler returned with status %s", response)
+		logrus.WithField("status", response).Debugf("handled event")
 	}
 }
 
@@ -127,7 +126,7 @@ func (svc *EventService) Start(r Registry) error {
 					logrus.Debugf("Processing event %v", event)
 					eventHandlers, err := svc.getHandlers(event)
 					if err != nil {
-						logrus.WithError(err).WithField("event", event).Error("failed to get event handlers for event")
+						logrus.WithError(err).WithField("event", event).Error("getting event handlers for event")
 						break
 					}
 
@@ -166,41 +165,35 @@ func (svc *EventService) getClient(handlerType string) (EventHandlerClient, erro
 	case config.ConfigMgmtEventName:
 		conn, err := svc.connFactory.DialContext(timeoutCtx, "ingest-service", svc.cfg.HandlerEndpoints.CfgIngest, grpc.WithBlock())
 		if err != nil {
-			logrus.Errorf("Event service could not get event handler client; error grpc dialing ingest-service's event handler %s", err.Error())
-			return nil, err
+			return nil, errors.Wrap(err, "dialing ingest-service handler client")
 		}
 		ingestClient := ingest.NewEventHandlerClient(conn)
 		if ingestClient == nil {
-			logrus.Errorf("CallHandler could not obtain NewEventHandlerClient")
-			return nil, errors.New("CallHandler could not obtain NewEventHandlerClient")
+			return nil, errors.New("invalid ingest-service event handler client")
 		}
 		return ingestClient, nil
 	case config.ComplianceEventName:
 		conn, err := svc.connFactory.DialContext(timeoutCtx, "compliance-service", svc.cfg.HandlerEndpoints.Compliance, grpc.WithBlock())
 		if err != nil {
-			logrus.Errorf("Event service could not get event handler client; error grpc dialing compliance ingest's event handler %s", err.Error())
-			return nil, err
+			return nil, errors.Wrap(err, "dialing compliance-service handler client")
 		}
 		complianceIngesterClient := compliance_ingest.NewComplianceIngesterClient(conn)
 		if complianceIngesterClient == nil {
-			logrus.Errorf("CallHandler could not obtain NewComplianceIngesterClient")
-			return nil, errors.New("CallHandler could not obtain NewComplianceIngesterClient")
+			return nil, errors.New("invalid compliance-service event handler client")
 		}
 		return complianceIngesterClient, nil
 	case config.EventFeedEventName:
 		conn, err := svc.connFactory.DialContext(timeoutCtx, "event-feed-service", svc.cfg.HandlerEndpoints.EventFeed, grpc.WithBlock())
 		if err != nil {
-			logrus.Errorf("Event service could not get event handler client; error grpc dialing event feed handler %s", err.Error())
-			return nil, err
+			return nil, errors.Wrap(err, "dialing event-feed-service handler client")
 		}
 		eventFeedClient := event_feed.NewEventFeedServiceClient(conn)
 		if eventFeedClient == nil {
-			logrus.Errorf("CallHandler could not obtain NewFeedServiceClient")
-			return nil, errors.New("CallHandler could not obtain NewFeedServiceClient")
+			return nil, errors.New("invalid event-feed-service event handler client")
 		}
 		return eventFeedClient, nil
 	default:
-		return nil, errors.New("can't find client event handler for unrecognized event handler type")
+		return nil, errors.Errorf("invalid handler type: '%s'", handlerType)
 	}
 }
 
@@ -225,7 +218,7 @@ func (svc *EventService) getHandlers(e *api.EventMsg) ([]EventHandler, error) {
 			}
 		}
 	} else {
-		logrus.Warnf("Unable to find event handler for '%s' event", e.GetType().GetName())
+		return eventHandlers, errors.Errorf("no registered handler for event type '%s'", e.GetType().GetName())
 	}
 	return eventHandlers, nil
 }

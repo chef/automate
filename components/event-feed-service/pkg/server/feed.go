@@ -41,7 +41,7 @@ func (f *FeedService) GetFeed(req *event_feed.FeedRequest) ([]*feed.FeedEntry, i
 
 	if req.Size <= 0 {
 		return nil, 0, e.GrpcError(codes.InvalidArgument,
-			"The page size must be greater than 0")
+			"page size must be greater than 0")
 	}
 
 	filters, err := feed.FormatFilters(req.Filters)
@@ -87,7 +87,7 @@ func (f *FeedService) GetFeedSummary(countCategory string, filters []string,
 	}
 	counts, err := f.store.GetFeedSummary(&fq)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get feed summary from persistence store")
+		return nil, errors.Wrap(err, "getting feed summary from persistence store")
 	}
 
 	return &feed.FeedSummary{Counts: counts}, nil
@@ -101,7 +101,7 @@ func (f *FeedService) GetActionLine(filters []string, startDate string, endDate 
 	filters = stringutils.SliceReject(filters, action)
 	line, err := f.store.GetActionLine(filters, startDate, endDate, timezone, interval, action)
 	if err != nil {
-		return &feed.ActionLine{}, errors.Wrap(err, "failed to get timeline from persistence store")
+		return &feed.ActionLine{}, errors.Wrap(err, "getting timeline from persistence store")
 	}
 
 	return line, nil
@@ -143,7 +143,7 @@ func (f *FeedService) HandleEvent(req *api.EventMsg) (*api.EventResponse, error)
 
 	success, err := f.store.CreateFeedEntry(&feedEntry)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create feed entry in persistence store")
+		return nil, errors.Wrap(err, "creating feed entry in persistence store")
 	}
 
 	return &api.EventResponse{Success: success}, nil

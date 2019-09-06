@@ -33,7 +33,7 @@ func WithNATSFrontEndCerts(c *config.EventGatewayConfig) NATSdConfigurator {
 		for _, cert := range c.FrontendTLS {
 			keyPair, err := tls.LoadX509KeyPair(cert.CertPath, cert.KeyPath)
 			if err != nil {
-				return errors.Wrapf(err, "Failed to load cert/key pair %+v", cert)
+				return errors.Wrap(err, "loading TLS certs")
 			}
 			keyPairs = append(keyPairs, keyPair)
 		}
@@ -180,13 +180,13 @@ func ServerWithNATSConfig(opts ...NATSdConfigurator) (*natsd.Server, error) {
 	for _, n := range opts {
 		err := n(nopts)
 		if err != nil {
-			return nil, errors.Wrap(err, "Failed configuring automate integrations for NATS")
+			return nil, errors.Wrap(err, "configuring automate integrations for NATS")
 		}
 	}
 
 	ns, err := natsd.NewServer(nopts)
 	if err != nil {
-		return nil, errors.Wrapf(err, "NATS server options failed validation for opts %+v", nopts)
+		return nil, errors.Wrapf(err, "validating NATS server opts %+v", nopts)
 	}
 
 	// NATS won't log at all if we don't make it configure its logger
@@ -208,7 +208,7 @@ func mTLSConf(c *config.EventGatewayConfig) (*tls.Config, error) {
 
 	natsTLSConf, err := natsd.GenTLSConfig(natsTLSOpts)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to configure NATS TLS options")
+		return nil, errors.Wrap(err, "configuring NATS TLS options")
 	}
 
 	natsTLSConf.RootCAs = natsTLSConf.ClientCAs

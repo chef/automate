@@ -56,7 +56,7 @@ func Configure() (*EventGatewayConfig, error) {
 
 	// Unmarshal the viper config into the server Config
 	if err := viper.Unmarshal(config); err != nil {
-		return config, errors.Wrap(err, "failed to unmarshal config options to server config")
+		return config, errors.Wrap(err, "unmarshaling config options to server config")
 	}
 
 	// Set log level
@@ -66,7 +66,7 @@ func Configure() (*EventGatewayConfig, error) {
 	config.TLSConfig.FixupRelativeTLSPaths(viper.ConfigFileUsed())
 	serviceCerts, err := config.TLSConfig.ReadCerts()
 	if err != nil {
-		return config, errors.Wrap(err, "failed to read TLS certs")
+		return config, errors.Wrap(err, "reading TLS certs")
 	}
 	config.ServiceCerts = serviceCerts
 	log.WithField("config", config).Debug("event-gateway config")

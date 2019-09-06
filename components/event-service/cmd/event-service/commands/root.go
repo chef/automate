@@ -37,7 +37,7 @@ func initConfig() {
 		logctx := log.WithField("config_file", cfgFile)
 		err := viper.ReadInConfig()
 		if err != nil {
-			logctx.WithError(err).Error("failed to read configuration")
+			logctx.WithError(err).Error("reading configuration")
 			return
 		}
 
