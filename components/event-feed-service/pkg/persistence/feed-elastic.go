@@ -3,7 +3,6 @@ package persistence
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"math"
 	"strconv"
 	"time"
@@ -13,7 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	feedErrors "github.com/chef/automate/components/event-feed-service/pkg/errors"
-	"github.com/chef/automate/components/event-feed-service/pkg/util"
+	"github.com/chef/automate/components/event-feed-service/pkg/feed"
 	project_update_lib "github.com/chef/automate/lib/authz"
 )
 
@@ -35,7 +34,7 @@ type ElasticFeedStore struct {
 }
 
 // InitializeStore runs the necessary initialization processes to make elasticsearch usable
-// in particular it creates the indexes and aliases for documents to be added
+// by creating the indices and aliases for documents to be added
 func (efs ElasticFeedStore) InitializeStore(ctx context.Context) error {
 	if !efs.initialized {
 		err := efs.createOrUpdateStore(ctx, Feeds)
@@ -99,21 +98,18 @@ func (efs ElasticFeedStore) JobStatus(ctx context.Context, jobID string) (projec
 	}, nil
 }
 
-func (efs ElasticFeedStore) CreateFeedEntry(entry *util.FeedEntry) (bool, error) {
+func (efs ElasticFeedStore) CreateFeedEntry(entry *feed.FeedEntry) (bool, error) {
 	ctx := context.Background()
 
 	logrus.Debug("Checking for index...")
 	exists, err := efs.client.IndexExists(IndexNameFeeds).Do(ctx)
-
 	if err != nil {
-		logrus.Warn("Could not create feed entry; error determining whether or not Elasticsearch index exists")
 		return false, err
 	}
 
 	// if the index doesn't exist, return an error
 	if !exists {
-		logrus.Warn("Could not create feed entry; Elasticsearch feeds index does not exist")
-		return false, err
+		return false, errors.Wrapf(err, "creating feed entry because index %s does not exist", IndexNameFeeds)
 	}
 
 	logrus.Debug("Adding new document to index...")
@@ -126,8 +122,7 @@ func (efs ElasticFeedStore) CreateFeedEntry(entry *util.FeedEntry) (bool, error)
 		Do(ctx)
 
 	if err != nil {
-		logrus.Warn("Could not create feed entry; Elasticsearch index create operation not acknowledged")
-		return false, err
+		return false, errors.Wrapf(err, "creating feed entry")
 	}
 
 	logrus.Debugf("Indexed feed entry %s to index %s, type %s", put1.Id, put1.Index, put1.Type)
@@ -136,14 +131,13 @@ func (efs ElasticFeedStore) CreateFeedEntry(entry *util.FeedEntry) (bool, error)
 }
 
 // GetFeed - get event feed entries with the provided query constraints
-func (efs ElasticFeedStore) GetFeed(query *util.FeedQuery) ([]*util.FeedEntry, int64, error) {
+func (efs ElasticFeedStore) GetFeed(query *feed.FeedQuery) ([]*feed.FeedEntry, int64, error) {
 	exists, err := efs.indexExists(IndexNameFeeds)
 	if err != nil {
-		logrus.Warnf("Could not get feed; error: %+v", err)
 		return nil, 0, err
 	}
 	if !exists {
-		panic(fmt.Sprintf("index %q is missing in Elasticsearch", IndexNameFeeds))
+		return nil, 0, errors.Errorf("getting feed because index %s does not exist", IndexNameFeeds)
 	}
 
 	var mainQuery = newBoolQueryFromFilters(query.Filters)
@@ -167,16 +161,14 @@ func (efs ElasticFeedStore) GetFeed(query *util.FeedQuery) ([]*util.FeedEntry, i
 
 	searchResult, err := searchService.Do(context.Background())
 	if err != nil {
-		logrus.WithFields(logrus.Fields{"error": err}).Error("Error retrieving feed entries")
-		return nil, 0, err
+		return nil, 0, errors.Wrap(err, "retrieving feed entries")
 	}
 
-	entries := make([]*util.FeedEntry, 0, len(searchResult.Hits.Hits))
+	entries := make([]*feed.FeedEntry, 0, len(searchResult.Hits.Hits))
 	for _, hit := range searchResult.Hits.Hits {
-		entry := new(util.FeedEntry)
+		entry := new(feed.FeedEntry)
 		if err := json.Unmarshal(*hit.Source, entry); err != nil {
-			logrus.WithFields(logrus.Fields{"error": err, "object": hit.Source}).Error("Error unmarshalling the feed entry object(s)")
-			return nil, 0, err
+			return nil, 0, errors.Wrapf(err, "unmarshaling feed entry for object %s", hit.Source)
 		}
 		entries = append(entries, entry)
 	}
@@ -184,26 +176,24 @@ func (efs ElasticFeedStore) GetFeed(query *util.FeedQuery) ([]*util.FeedEntry, i
 	return entries, searchResult.Hits.TotalHits, nil
 }
 
-func (efs ElasticFeedStore) GetFeedSummary(query *util.FeedSummaryQuery) (map[string]int64, error) {
+func (efs ElasticFeedStore) GetFeedSummary(query *feed.FeedSummaryQuery) (map[string]int64, error) {
 	exists, err := efs.indexExists(IndexNameFeeds)
 	if err != nil {
-		logrus.WithError(err).Warn("Could not get feed summary; error determining whether or not Elasticsearch index exists")
 		return nil, err
 	}
 	if !exists {
-		panic(fmt.Sprintf("index %q is missing in Elasticsearch", IndexNameFeeds))
+		return nil, errors.Errorf("getting feed because index %s does not exist", IndexNameFeeds)
 	}
 
 	counts, err := efs.getCounts(query)
 	if err != nil {
-		logrus.WithError(err).Warn("Could not get feed summary; Elasticsearch query error.")
 		return nil, err
 	}
 
 	return counts, nil
 }
 
-func (efs ElasticFeedStore) getCounts(query *util.FeedSummaryQuery) (map[string]int64, error) {
+func (efs ElasticFeedStore) getCounts(query *feed.FeedSummaryQuery) (map[string]int64, error) {
 	// E.g.,
 	// scanjobs: 57
 	// profile:  66
@@ -217,10 +207,8 @@ func (efs ElasticFeedStore) getCounts(query *util.FeedSummaryQuery) (map[string]
 	}
 
 	buckets, err := efs.getAggregationBucket(mainQuery, IndexNameFeeds, query.CountsCategory)
-
-	// Return an error if the search was not successful
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "searching for counts")
 	}
 
 	for _, bucket := range buckets {
@@ -346,8 +334,7 @@ func (efs ElasticFeedStore) getAggregationBucket(boolQuery *olivere.BoolQuery, i
 
 	// Return an error if the search was not successful
 	if err != nil {
-		logrus.WithFields(logrus.Fields{"error": err}).Errorf("Error searching for aggregation")
-		return nil, err
+		return nil, errors.Wrap(err, "searching for aggregation")
 	}
 
 	if searchResult.TotalHits() == 0 {
@@ -372,13 +359,13 @@ func (efs ElasticFeedStore) getAggregationBucket(boolQuery *olivere.BoolQuery, i
 	// First aggregation `searchTerm`
 	statusResult, found := searchResult.Aggregations.Terms(searchTerm)
 	if !found {
-		return nil, feedErrors.NewBackendError("Aggregation term '%s' not found", searchTerm)
+		return nil, feedErrors.NewBackendError("aggregation term '%s' not found", searchTerm)
 	}
 
 	// Second aggregation `status_counts` (tag)
 	statusCounts, found := statusResult.Aggregations.Terms(aggregationTerm)
 	if !found {
-		return nil, feedErrors.NewBackendError("Aggregation term '%s' not found", aggregationTerm)
+		return nil, feedErrors.NewBackendError("aggregation term '%s' not found", aggregationTerm)
 	}
 
 	return statusCounts.Buckets, nil
@@ -388,14 +375,10 @@ func (efs *ElasticFeedStore) indexExists(name string) (bool, error) {
 	// if feed index doesn't exist yet, return false
 	exists, err := efs.client.IndexExists(name).Do(context.Background())
 	if err != nil {
-		logrus.Warnf("Error determining whether or not Elasticsearch index %s exists: %+v", name, err)
-		return false, err
+		return false, errors.Wrapf(err, "determining index '%s' existence", name)
 	}
-	if !exists {
-		logrus.Warnf("No index %s found... no feed entries have been created yet.", name)
-		return false, nil
-	}
-	return true, nil
+
+	return exists, nil
 }
 
 // GetActionLine event_type filters
@@ -457,20 +440,18 @@ func (efs *ElasticFeedStore) indexExists(name string) (bool, error) {
 // interval - 24 must be divisible by this number
 // For example 1, 2, 3, 4, 6, 8, 12, and 24 are valid. Where
 // 5, 7, 9, 10, 11, and 13 are not valid values.
-func (efs ElasticFeedStore) GetActionLine(filters []string, startDate string, endDate string, timezone string, interval int, action string) (*util.ActionLine, error) {
+func (efs ElasticFeedStore) GetActionLine(filters []string, startDate string, endDate string, timezone string, interval int, action string) (*feed.ActionLine, error) {
 	exists, err := efs.indexExists(IndexNameFeeds)
 	if err != nil {
-		logrus.Warnf("Could not get feed; error: %+v", err)
-		return &util.ActionLine{}, err
+		return &feed.ActionLine{}, err
 	}
 	if !exists {
-		logrus.Warnf("Could not get feed timeline; index %s does not exist", IndexNameFeeds)
-		return &util.ActionLine{}, feedErrors.NewBackendError("Could not get feed timeline; index %s does not exist", IndexNameFeeds)
+		return &feed.ActionLine{}, feedErrors.NewBackendError("timeline index %s does not exist", IndexNameFeeds)
 	}
 
-	formattedFilters, err := util.FormatFilters(filters)
+	formattedFilters, err := feed.FormatFilters(filters)
 	if err != nil {
-		return &util.ActionLine{}, err
+		return &feed.ActionLine{}, err
 	}
 
 	var (
@@ -483,17 +464,17 @@ func (efs ElasticFeedStore) GetActionLine(filters []string, startDate string, en
 
 	loc, err := time.LoadLocation(timezone)
 	if err != nil {
-		return &util.ActionLine{}, err
+		return &feed.ActionLine{}, err
 	}
 
 	startTime, err := efs.createStartTime(startDate, loc)
 	if err != nil {
-		return &util.ActionLine{}, err
+		return &feed.ActionLine{}, err
 	}
 
 	endTime, err := efs.createEndTime(endDate, loc)
 	if err != nil {
-		return &util.ActionLine{}, err
+		return &feed.ActionLine{}, err
 	}
 
 	mainQuery = mainQuery.Must(olivere.NewTermQuery("verb", action))
@@ -517,18 +498,20 @@ func (efs ElasticFeedStore) GetActionLine(filters []string, startDate string, en
 	ss := olivere.NewSearchSource().Query(mainQuery).Aggregation(dateHistoTag, bucketHist)
 	src, err := ss.Source()
 	if err != nil {
-		logrus.Warnf("Can't get feed timeline; error obtaining search source for action %s: %+v", action, err)
-		return &util.ActionLine{}, err
+		return &feed.ActionLine{}, errors.Wrapf(err, "obtaining search source for action %s", action)
 	}
 
 	data, _ := json.Marshal(src)
-	logrus.Debugf("Feed timeline for action %s query string is: %s", action, string(data))
+	logrus.WithFields(logrus.Fields{
+		"action":       action,
+		"query_string": string(data),
+	}).Debugf("getting action line")
 
 	// Use ss in search
 	searchResult, err := efs.client.Search().SearchSource(ss).Index(IndexNameFeeds).Do(context.Background())
 
 	if err != nil {
-		return &util.ActionLine{}, err
+		return &feed.ActionLine{}, err
 	}
 
 	dateHistoRes, found := searchResult.Aggregations.DateHistogram(dateHistoTag)
@@ -539,21 +522,21 @@ func (efs ElasticFeedStore) GetActionLine(filters []string, startDate string, en
 		duration := endTime.Sub(startTime)
 		numberOfBuckets := int(math.Ceil(duration.Hours())) / interval
 
-		return &util.ActionLine{
+		return &feed.ActionLine{
 			Action:    action,
-			Timeslots: make([]util.Timeslot, numberOfBuckets),
+			Timeslots: make([]feed.Timeslot, numberOfBuckets),
 		}, nil
 	}
 
-	timeslots := make([]util.Timeslot, len(dateHistoRes.Buckets))
+	timeslots := make([]feed.Timeslot, len(dateHistoRes.Buckets))
 	for index, bucket := range dateHistoRes.Buckets {
 		item, found := bucket.Aggregations.Terms(eventTypeItems)
 		if !found {
-			return &util.ActionLine{}, feedErrors.NewBackendError("Item '%s' not found", eventTypeItems)
+			return &feed.ActionLine{}, feedErrors.NewBackendError("item '%s' not found", eventTypeItems)
 		}
 
 		if len(item.Buckets) > 0 {
-			timeslots[index].EntryCounts = make([]util.EntryCount, len(item.Buckets))
+			timeslots[index].EntryCounts = make([]feed.EntryCount, len(item.Buckets))
 			for c, buc := range item.Buckets {
 				timeslots[index].EntryCounts[c].Category = buc.Key.(string)
 				timeslots[index].EntryCounts[c].Count = buc.DocCount
@@ -561,7 +544,7 @@ func (efs ElasticFeedStore) GetActionLine(filters []string, startDate string, en
 		}
 	}
 
-	return &util.ActionLine{
+	return &feed.ActionLine{
 		Action:    action,
 		Timeslots: timeslots,
 	}, nil
@@ -590,42 +573,47 @@ func (efs ElasticFeedStore) createEndTime(endDate string, loc *time.Location) (t
 }
 
 func (efs ElasticFeedStore) createOrUpdateStore(ctx context.Context, esMap Mapping) error {
-	indexName := esMap.Index
-	if !efs.storeExists(ctx, indexName) {
-		indexError := efs.createStore(ctx, indexName, esMap.Mapping)
-		if indexError != nil {
-			return errors.Errorf("Error creating index %s with error: %s", indexName, indexError.Error())
-		}
-	} else {
-		// Ensure we have the latest mapping registered.
-		indexError := efs.updateMapping(ctx, esMap)
-		if indexError != nil {
-			return errors.Errorf("Error creating index %s with error: %s", indexName, indexError.Error())
-		}
+	exists, err := efs.storeExists(ctx, esMap.Index)
+	if err != nil {
+		return err
 	}
 
-	return nil
+	if !exists {
+		return efs.createStore(ctx, esMap.Index, esMap.Mapping)
+	}
+
+	// Ensure we have the latest mapping registered.
+	return efs.updateMapping(ctx, esMap)
 }
 
 func (efs ElasticFeedStore) createStore(ctx context.Context, indexName string, mapping string) error {
 	_, err := efs.client.CreateIndex(indexName).Body(mapping).Do(ctx)
 
-	return err
+	if err != nil {
+		return errors.Wrapf(err, "creating index %s", indexName)
+	}
+
+	return nil
 }
 
 func (efs ElasticFeedStore) updateMapping(ctx context.Context, esMap Mapping) error {
 	_, err := efs.client.PutMapping().Index(esMap.Index).Type(esMap.Type).BodyString(esMap.Properties).Do(ctx)
-	return err
+
+	if err != nil {
+		return errors.Wrapf(err, "updating index mappings for %s", esMap.Index)
+	}
+
+	return nil
 }
 
-func (efs ElasticFeedStore) storeExists(ctx context.Context, indexName string) bool {
+func (efs ElasticFeedStore) storeExists(ctx context.Context, indexName string) (bool, error) {
 	exists, err := efs.client.IndexExists().Index([]string{indexName}).Do(ctx)
 
 	if err != nil {
-		logrus.Errorf("Error checking if index %s exists with error %s", indexName, err.Error())
+		return exists, errors.Wrapf(err, "determining index '%s' existence", indexName)
 	}
 
-	return exists
+	return exists, nil
 }
 
 func getPercentageComplete(status interface{}) float64 {

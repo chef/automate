@@ -2,10 +2,10 @@ package event
 
 import (
 	"context"
+	"sync"
 	"time"
 
-	"errors"
-
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
@@ -51,9 +51,9 @@ func (e eventHandler) HandleEvent(msg *api.EventMsg) {
 	response, err := e.client.HandleEvent(context.Background(), msg)
 
 	if err != nil {
-		logrus.Warnf("Client event handler returned an error... event won't be handled %s", err.Error())
+		logrus.WithError(err).Warnf("handling event")
 	} else {
-		logrus.Debugf("Event handler returned with status %s", response)
+		logrus.WithField("status", response).Debugf("handled event")
 	}
 }
 
@@ -65,112 +65,139 @@ func (e eventHandler) GetClient() EventHandlerClient {
 	return e.client
 }
 
+type Registry map[string][]string
+
 //----------  EVENTS  ----------//
 
-// Type Events is responsible for event publishing and processing. Currently, it has a
+// Type EventService is responsible for event publishing and processing. Currently, it has a
 // hard-coded map of events to event handlers. When an event is published,
-// Events gets the event off its input channel and matches the event with the correct handler
+// EventService gets the event off its input channel and matches the event with the correct handler
 // function. Handler functions are started in their own goroutines.
-type Events struct {
-	in          chan *api.EventMsg
-	registry    map[string][]string
-	handlers    map[string]EventHandler // maps an event to an array of pointers to handlers
-	cfg         *config.EventConfig
-	connFactory *secureconn.Factory
+type EventService struct {
+	in                    chan *api.EventMsg
+	registry              Registry
+	handlers              map[string]EventHandler // maps an event to an array of pointers to handlers
+	cfg                   *config.EventConfig
+	connFactory           *secureconn.Factory
+	eventProcessorStarted bool
+	eventProcessorDone    chan struct{}
+	sync.Mutex
 }
 
-func NewEvents(cfg *config.EventConfig, cf *secureconn.Factory) *Events {
-	return &Events{
-		in:          make(chan *api.EventMsg, cfg.ServiceConfig.EventLimit),
-		handlers:    make(map[string]EventHandler),
-		cfg:         cfg,
-		connFactory: cf,
+func NewEventService(cfg *config.EventConfig, cf *secureconn.Factory) *EventService {
+	return &EventService{
+		in:                 make(chan *api.EventMsg, cfg.ServiceConfig.EventLimit),
+		handlers:           make(map[string]EventHandler),
+		cfg:                cfg,
+		connFactory:        cf,
+		eventProcessorDone: make(chan struct{}, 1),
+		Mutex:              sync.Mutex{},
 	}
 }
 
-// Listen for events on the input channel until event-service is terminated.
-func (svc Events) Start(r map[string][]string) {
-	logrus.Debug("Starting event listener loop...")
-
+// Start the event processor that listens on the in channel and fires off
+// event handlers for each event received.
+func (svc *EventService) Start(r Registry) error {
 	if r == nil {
-		logrus.Fatalf("Event Service not started... no event handlers in registry")
-		return
+		return errors.New("a registry is required to start event handlers")
 	}
-
 	svc.registry = r
 
-	for event := range svc.in {
-		logrus.Debugf("Processing event %v", event)
-		eventHandlers, err := svc.getHandlers(event)
-		if err != nil {
-			logrus.Warnf("could not get handlers for event %s: %+v", event.GetType().GetName(), err)
-			break
+	if !svc.eventProcessorStarted {
+		processEvents := func() {
+			logrus.Info("Starting event processor")
+			svc.Lock()
+			svc.eventProcessorStarted = true
+			svc.Unlock()
+
+			for {
+				select {
+				case <-svc.eventProcessorDone:
+					logrus.Info("Stopping event processor")
+					svc.Lock()
+					svc.eventProcessorStarted = false
+					svc.Unlock()
+					return
+				default:
+				}
+
+				select {
+				case event := <-svc.in:
+					logrus.Debugf("Processing event %v", event)
+					eventHandlers, err := svc.getHandlers(event)
+					if err != nil {
+						logrus.WithError(err).WithField("event", event).Error("getting event handlers for event")
+						break
+					}
+
+					for _, eventHandler := range eventHandlers {
+						go eventHandler.HandleEvent(event)
+					}
+				// If there are no incoming events break out every 500 seconds
+				// to check if we've received the done signal.
+				case <-time.After(5000 * time.Millisecond):
+				}
+			}
 		}
 
-		for _, eventHandler := range eventHandlers {
-			go eventHandler.HandleEvent(event)
-		}
+		go processEvents()
 	}
+
+	return nil
 }
 
 // Other services call publish on the event service api in order to notify the rest
 // of the system of an event. Services should fire events in their own goroutines so
 // that they are not blocked if the event input queue is full.
-func (svc Events) Publish(event *api.EventMsg) {
+func (svc *EventService) Publish(event *api.EventMsg) {
 	svc.in <- event
 	logrus.Debugf("Published event %s", event.EventID)
 }
 
 // Should return a CallStatus?
-func (svc Events) getClient(handlerType string) (EventHandlerClient, error) {
+func (svc *EventService) getClient(handlerType string) (EventHandlerClient, error) {
 
 	ctx := context.Background()
 	timeoutCtx, cancel := context.WithTimeout(ctx, clientTimeout)
 	defer cancel()
 
 	switch handlerType {
-	case config.CFG_KEY:
+	case config.ConfigMgmtEventName:
 		conn, err := svc.connFactory.DialContext(timeoutCtx, "ingest-service", svc.cfg.HandlerEndpoints.CfgIngest, grpc.WithBlock())
 		if err != nil {
-			logrus.Errorf("Event service could not get event handler client; error grpc dialing ingest-service's event handler %s", err.Error())
-			return nil, err
+			return nil, errors.Wrap(err, "dialing ingest-service handler client")
 		}
 		ingestClient := ingest.NewEventHandlerClient(conn)
 		if ingestClient == nil {
-			logrus.Errorf("CallHandler could not obtain NewEventHandlerClient")
-			return nil, errors.New("CallHandler could not obtain NewEventHandlerClient")
+			return nil, errors.New("invalid ingest-service event handler client")
 		}
 		return ingestClient, nil
-	case config.COMPLIANCE_INGEST_KEY:
+	case config.ComplianceEventName:
 		conn, err := svc.connFactory.DialContext(timeoutCtx, "compliance-service", svc.cfg.HandlerEndpoints.Compliance, grpc.WithBlock())
 		if err != nil {
-			logrus.Errorf("Event service could not get event handler client; error grpc dialing compliance ingest's event handler %s", err.Error())
-			return nil, err
+			return nil, errors.Wrap(err, "dialing compliance-service handler client")
 		}
 		complianceIngesterClient := compliance_ingest.NewComplianceIngesterClient(conn)
 		if complianceIngesterClient == nil {
-			logrus.Errorf("CallHandler could not obtain NewComplianceIngesterClient")
-			return nil, errors.New("CallHandler could not obtain NewComplianceIngesterClient")
+			return nil, errors.New("invalid compliance-service event handler client")
 		}
 		return complianceIngesterClient, nil
-	case config.EVENT_FEED:
+	case config.EventFeedEventName:
 		conn, err := svc.connFactory.DialContext(timeoutCtx, "event-feed-service", svc.cfg.HandlerEndpoints.EventFeed, grpc.WithBlock())
 		if err != nil {
-			logrus.Errorf("Event service could not get event handler client; error grpc dialing event feed handler %s", err.Error())
-			return nil, err
+			return nil, errors.Wrap(err, "dialing event-feed-service handler client")
 		}
 		eventFeedClient := event_feed.NewEventFeedServiceClient(conn)
 		if eventFeedClient == nil {
-			logrus.Errorf("CallHandler could not obtain NewFeedServiceClient")
-			return nil, errors.New("CallHandler could not obtain NewFeedServiceClient")
+			return nil, errors.New("invalid event-feed-service event handler client")
 		}
 		return eventFeedClient, nil
 	default:
-		return nil, errors.New("can't find client event handler for unrecognized event handler type")
+		return nil, errors.Errorf("invalid handler type: '%s'", handlerType)
 	}
 }
 
-func (svc Events) getHandlers(e *api.EventMsg) ([]EventHandler, error) {
+func (svc *EventService) getHandlers(e *api.EventMsg) ([]EventHandler, error) {
 
 	var eventHandlers []EventHandler
 
@@ -191,9 +218,30 @@ func (svc Events) getHandlers(e *api.EventMsg) ([]EventHandler, error) {
 			}
 		}
 	} else {
-		logrus.Warnf("Unable to find event handler for '%s' event", e.GetType().GetName())
+		return eventHandlers, errors.Errorf("no registered handler for event type '%s'", e.GetType().GetName())
 	}
 	return eventHandlers, nil
 }
 
-func (svc Events) Stop() {}
+func (svc *EventService) Stop(ctx context.Context) error {
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	default:
+	}
+
+	if svc.eventProcessorStarted {
+		svc.eventProcessorDone <- struct{}{}
+	}
+
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-time.After(5 * time.Millisecond):
+			if !svc.eventProcessorStarted {
+				return nil
+			}
+		}
+	}
+}

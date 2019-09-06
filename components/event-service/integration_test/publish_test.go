@@ -17,7 +17,7 @@ import (
 	api "github.com/chef/automate/api/interservice/event"
 	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
-	"github.com/chef/automate/components/event-service/server"
+	"github.com/chef/automate/components/event-service/config"
 )
 
 var (
@@ -40,7 +40,7 @@ func TestPublish(t *testing.T) {
 
 	event := api.EventMsg{
 		EventID: uuid.Must(uuid.NewV4()).String(),
-		Type:    &api.EventType{Name: server.ScanJobCreated},
+		Type:    &api.EventType{Name: config.ScanJobCreatedEventName},
 		Producer: &api.Producer{
 			ID:           "urn:chef:compliance:scan-component",
 			ProducerName: "Scanner",
@@ -156,7 +156,7 @@ func TestPublish(t *testing.T) {
 func TestPublishNodeTerminated(t *testing.T) {
 	event := api.EventMsg{
 		EventID: uuid.Must(uuid.NewV4()).String(),
-		Type:    &api.EventType{Name: server.NodeTerminated},
+		Type:    &api.EventType{Name: config.NodeTerminatedEventName},
 		Producer: &api.Producer{
 			ID:           "urn:chef:compliance:mgrpolling",
 			ProducerName: "Node Manager Polling",

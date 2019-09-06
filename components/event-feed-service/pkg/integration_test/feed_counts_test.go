@@ -19,11 +19,11 @@ import (
 	"google.golang.org/grpc/codes"
 
 	"github.com/chef/automate/api/interservice/event_feed"
+	"github.com/chef/automate/components/event-feed-service/pkg/feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
-	"github.com/chef/automate/components/event-feed-service/pkg/util"
 	"github.com/chef/automate/lib/grpc/grpctest"
 
-	"github.com/chef/automate/components/event-service/server"
+	event "github.com/chef/automate/components/event-service/config"
 	"github.com/chef/automate/lib/stringutils"
 )
 
@@ -164,7 +164,7 @@ func TestFeedCountsCountOnlyFilteredUsers(t *testing.T) {
 				CountCategory: "event-type",
 				Filters:       []string{"requestor_name:User"},
 			},
-			expectedCounts: entriesToTypeCounts(filter(entries, func(a *util.FeedEntry) bool {
+			expectedCounts: entriesToTypeCounts(filter(entries, func(a *feed.FeedEntry) bool {
 				return a.ActorName == "User"
 			})),
 		},
@@ -174,7 +174,7 @@ func TestFeedCountsCountOnlyFilteredUsers(t *testing.T) {
 				CountCategory: "event-type",
 				Filters:       []string{"requestor_name:UI User"},
 			},
-			expectedCounts: entriesToTypeCounts(filter(entries, func(a *util.FeedEntry) bool {
+			expectedCounts: entriesToTypeCounts(filter(entries, func(a *feed.FeedEntry) bool {
 				return a.ActorName == "UI User"
 			})),
 		},
@@ -184,7 +184,7 @@ func TestFeedCountsCountOnlyFilteredUsers(t *testing.T) {
 				CountCategory: "event-type",
 				Filters:       []string{"requestor_name:UI User", "requestor_name:User"},
 			},
-			expectedCounts: entriesToTypeCounts(filter(entries, func(a *util.FeedEntry) bool {
+			expectedCounts: entriesToTypeCounts(filter(entries, func(a *feed.FeedEntry) bool {
 				return a.ActorName == "UI User" || a.ActorName == "User"
 			})),
 		},
@@ -270,7 +270,7 @@ func TestTaskCountsCountOnlyFilteredUsers(t *testing.T) {
 				CountCategory: "task",
 				Filters:       []string{"requestor_name:User"},
 			},
-			expectedCounts: entriesToTaskCounts(filter(entries, func(a *util.FeedEntry) bool {
+			expectedCounts: entriesToTaskCounts(filter(entries, func(a *feed.FeedEntry) bool {
 				return stringutils.SliceContains(a.Tags, "User")
 			})),
 		},
@@ -280,7 +280,7 @@ func TestTaskCountsCountOnlyFilteredUsers(t *testing.T) {
 				CountCategory: "task",
 				Filters:       []string{"requestor_name:UI User"},
 			},
-			expectedCounts: entriesToTaskCounts(filter(entries, func(a *util.FeedEntry) bool {
+			expectedCounts: entriesToTaskCounts(filter(entries, func(a *feed.FeedEntry) bool {
 				return stringutils.SliceContains(a.Tags, "UI User")
 			})),
 		},
@@ -290,7 +290,7 @@ func TestTaskCountsCountOnlyFilteredUsers(t *testing.T) {
 				CountCategory: "task",
 				Filters:       []string{"requestor_name:UI User", "requestor_name:User"},
 			},
-			expectedCounts: entriesToTaskCounts(filter(entries, func(a *util.FeedEntry) bool {
+			expectedCounts: entriesToTaskCounts(filter(entries, func(a *feed.FeedEntry) bool {
 				return stringutils.SliceContains(a.Tags, "UI User") || stringutils.SliceContains(a.Tags, "User")
 			})),
 		},
@@ -300,8 +300,8 @@ func TestTaskCountsCountOnlyFilteredUsers(t *testing.T) {
 	runCases(t, cases)
 }
 
-func filter(entries []*util.FeedEntry, f func(*util.FeedEntry) bool) []*util.FeedEntry {
-	filteredEntries := make([]*util.FeedEntry, 0)
+func filter(entries []*feed.FeedEntry, f func(*feed.FeedEntry) bool) []*feed.FeedEntry {
+	filteredEntries := make([]*feed.FeedEntry, 0)
 	for _, entry := range entries {
 		if f(entry) {
 			filteredEntries = append(filteredEntries, entry)
@@ -310,9 +310,9 @@ func filter(entries []*util.FeedEntry, f func(*util.FeedEntry) bool) []*util.Fee
 	return filteredEntries
 }
 
-func createEntries(startDate time.Time, amountToCreate int, timeDiff int) []*util.FeedEntry {
+func createEntries(startDate time.Time, amountToCreate int, timeDiff int) []*feed.FeedEntry {
 	var (
-		entries     = []*util.FeedEntry{}
+		entries     = []*feed.FeedEntry{}
 		entityTypes = []string{"profile", "scanjobs"}
 		verbs       = []string{"create", "update", "delete"}
 	)
@@ -334,11 +334,11 @@ func createEntries(startDate time.Time, amountToCreate int, timeDiff int) []*uti
 
 			switch verb {
 			case "create":
-				eventType = server.ScanJobCreated
+				eventType = event.ScanJobCreatedEventName
 			case "update":
-				eventType = server.ScanJobUpdated
+				eventType = event.ScanJobUpdatedEventName
 			case "delete":
-				eventType = server.ScanJobDeleted
+				eventType = event.ScanJobDeletedEventName
 			}
 
 		} else {
@@ -346,15 +346,15 @@ func createEntries(startDate time.Time, amountToCreate int, timeDiff int) []*uti
 
 			switch verb {
 			case "create":
-				eventType = server.ProfileCreated
+				eventType = event.ProfileCreatedEventName
 			case "delete":
-				eventType = server.ProfileDeleted
+				eventType = event.ProfileDeletedEventName
 			}
 		}
 
 		tags = append(tags, user, eventType)
 
-		entry := util.FeedEntry{
+		entry := feed.FeedEntry{
 			ID:                 id,
 			ProducerID:         "producerId",
 			ProducerName:       "producerName",
@@ -381,7 +381,7 @@ func createEntries(startDate time.Time, amountToCreate int, timeDiff int) []*uti
 	return entries
 }
 
-func entriesToTypeCounts(entries []*util.FeedEntry) *event_feed.FeedSummaryResponse {
+func entriesToTypeCounts(entries []*feed.FeedEntry) *event_feed.FeedSummaryResponse {
 	typeCounts := map[string]int{}
 
 	for _, entry := range entries {
@@ -410,7 +410,7 @@ func entriesToTypeCounts(entries []*util.FeedEntry) *event_feed.FeedSummaryRespo
 	}
 }
 
-func entriesToTaskCounts(entries []*util.FeedEntry) *event_feed.FeedSummaryResponse {
+func entriesToTaskCounts(entries []*feed.FeedEntry) *event_feed.FeedSummaryResponse {
 	taskCounts := map[string]int{}
 
 	for _, entry := range entries {

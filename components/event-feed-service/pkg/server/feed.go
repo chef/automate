@@ -5,48 +5,51 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 
 	api "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/event_feed"
-	"github.com/chef/automate/components/event-feed-service/pkg/errors"
+	e "github.com/chef/automate/components/event-feed-service/pkg/errors"
+	"github.com/chef/automate/components/event-feed-service/pkg/feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
-	"github.com/chef/automate/components/event-feed-service/pkg/util"
+	"github.com/chef/automate/lib/stringutils"
 )
 
-type Feeds struct {
+type FeedService struct {
 	store persistence.FeedStore
 }
 
-func NewFeeds(feedStore persistence.FeedStore) *Feeds {
-	return &Feeds{store: feedStore}
+func NewFeedService(feedStore persistence.FeedStore) *FeedService {
+	return &FeedService{store: feedStore}
 }
 
-func (f *Feeds) GetFeed(req *event_feed.FeedRequest) ([]*util.FeedEntry, int64, error) {
+func (f *FeedService) GetFeed(req *event_feed.FeedRequest) ([]*feed.FeedEntry, int64, error) {
+
 	// Date Range
-	startTime, endTime, err := util.ValidateMillisecondDateRange(req.Start, req.End)
+	startTime, endTime, err := feed.ValidateMillisecondDateRange(req.Start, req.End)
 	if err != nil {
-		return nil, 0, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
+		return nil, 0, e.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 
 	// Paging Parameters
-	cursorTime, ascending, err := util.ValidatePagingCursorTime(req.Before, req.After, req.Cursor, req.End)
+	cursorTime, ascending, err := feed.ValidatePagingCursorTime(req.Before, req.After, req.Cursor, req.End)
 	if err != nil {
-		return nil, 0, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
+		return nil, 0, e.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 
 	if req.Size <= 0 {
-		return nil, 0, errors.GrpcError(codes.InvalidArgument,
-			"The page size must be greater than 0")
+		return nil, 0, e.GrpcError(codes.InvalidArgument,
+			"page size must be greater than 0")
 	}
 
-	filters, err := util.FormatFilters(req.Filters)
+	filters, err := feed.FormatFilters(req.Filters)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	fq := util.FeedQuery{
+	fq := feed.FeedQuery{
 		UserID:     req.UserID,
 		Size:       int(req.Size),
 		Start:      startTime.UTC(),
@@ -59,24 +62,24 @@ func (f *Feeds) GetFeed(req *event_feed.FeedRequest) ([]*util.FeedEntry, int64, 
 
 	resp, hits, err := f.store.GetFeed(&fq)
 	if err != nil {
-		return nil, 0, errors.GrpcErrorFromErr(codes.Internal, err)
+		return nil, 0, e.GrpcErrorFromErr(codes.Internal, err)
 	}
 	return resp, hits, nil
 }
 
-func (f *Feeds) GetFeedSummary(countCategory string, filters []string,
-	start time.Time, end time.Time) (*util.FeedSummary, error) {
+func (f *FeedService) GetFeedSummary(countCategory string, filters []string,
+	start time.Time, end time.Time) (*feed.FeedSummary, error) {
 
 	// remove count category from the filters array
-	filters = util.Remove(filters, countCategory)
+	filters = stringutils.SliceReject(filters, countCategory)
 
-	mapFilters, err := util.FormatFilters(filters)
+	mapFilters, err := feed.FormatFilters(filters)
 	if err != nil {
 		return nil, err
 	}
 
-	fq := util.FeedSummaryQuery{
-		CountsCategory: util.ConvertAPIKeyToBackendKey(countCategory),
+	fq := feed.FeedSummaryQuery{
+		CountsCategory: feed.ConvertAPIKeyToBackendKey(countCategory),
 		Buckets:        false,
 		Start:          start,
 		End:            end,
@@ -84,23 +87,21 @@ func (f *Feeds) GetFeedSummary(countCategory string, filters []string,
 	}
 	counts, err := f.store.GetFeedSummary(&fq)
 	if err != nil {
-		logrus.Warnf("Could not get feed summary; error: %+v", err)
-		return nil, err
+		return nil, errors.Wrap(err, "getting feed summary from persistence store")
 	}
 
-	return &util.FeedSummary{Counts: counts}, nil
+	return &feed.FeedSummary{Counts: counts}, nil
 }
 
 // interval = time span for which to collect activity entries in hours
-func (f *Feeds) GetActionLine(filters []string, startDate string, endDate string, timezone string, interval int, action string) (*util.ActionLine, error) {
+func (f *FeedService) GetActionLine(filters []string, startDate string, endDate string, timezone string, interval int, action string) (*feed.ActionLine, error) {
 
 	// remove action (aka "task") from the filters array...
 	// we're already filtering lines by action
-	filters = util.Remove(filters, action)
+	filters = stringutils.SliceReject(filters, action)
 	line, err := f.store.GetActionLine(filters, startDate, endDate, timezone, interval, action)
 	if err != nil {
-		logrus.Warnf("Could not get feed timeline; error: %+v", err)
-		return &util.ActionLine{}, err
+		return &feed.ActionLine{}, errors.Wrap(err, "getting timeline from persistence store")
 	}
 
 	return line, nil
@@ -108,16 +109,16 @@ func (f *Feeds) GetActionLine(filters []string, startDate string, endDate string
 
 // Going forward, we'll need to maintain a map of event types to feed type(s). Since the
 // only events we support currently map to the "event" feed type, we're hard-coding the feed type below.
-func (f *Feeds) HandleEvent(req *api.EventMsg) (*api.EventResponse, error) {
+func (f *FeedService) HandleEvent(req *api.EventMsg) (*api.EventResponse, error) {
 	logrus.Debug("automate-feed is handling your event...")
 
 	publishedAt, err := ptypes.Timestamp(req.Published)
 	if err != nil {
-		return nil, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
+		return nil, e.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 
 	// translate event message into feed entry
-	feedEntry := util.FeedEntry{
+	feedEntry := feed.FeedEntry{
 		ID:                 uuid.Must(uuid.NewV4()).String(),
 		ProducerID:         req.Producer.ID,
 		ProducerName:       req.Producer.ProducerName,
@@ -141,15 +142,9 @@ func (f *Feeds) HandleEvent(req *api.EventMsg) (*api.EventResponse, error) {
 	}
 
 	success, err := f.store.CreateFeedEntry(&feedEntry)
-	logrus.Debugf("Event was successfully handled: %t", success)
-	res := api.EventResponse{Success: success}
-
 	if err != nil {
-		logrus.Warn("Event was not handled... error creating feed entry")
-		return &res, err
+		return nil, errors.Wrap(err, "creating feed entry in persistence store")
 	}
 
-	logrus.Debug("automate-feed has finished handling your event...")
-
-	return &res, nil
+	return &api.EventResponse{Success: success}, nil
 }

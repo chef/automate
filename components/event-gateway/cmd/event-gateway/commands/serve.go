@@ -2,9 +2,12 @@ package commands
 
 import (
 	"fmt"
-	"time"
+	"os"
+	"os/signal"
+	"syscall"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	"github.com/chef/automate/components/event-gateway/pkg/config"
@@ -16,23 +19,25 @@ func newServeCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "serve",
 		Short: "Start the event-gateway (NATS) server",
-		Run: func(cmd *cobra.Command, args []string) {
-			// set the config file if it's given
-			log.Infof("Config file is %q", cfgFile)
+		RunE: func(cmd *cobra.Command, args []string) error {
+			logctx := logrus.WithField("config_file", cfgFile)
 
 			cfg, err := config.Configure()
-			log.WithFields(log.Fields{
-				"level": cfg.LogConfig.LogLevel,
-			}).Info("log level set")
 			if err != nil {
-				log.WithError(err).Fatal("Failed to configure event-gateway server")
+				return errors.Wrap(err, "configuring event-gateway")
 			}
+
 			uri := fmt.Sprintf("nats://%s:%d", cfg.Service.Host, cfg.Service.Port)
-			log.WithFields(log.Fields{"uri": uri}).Info("Starting Event Gateway...")
+			logctx = logctx.WithFields(logrus.Fields{
+				"log_level": cfg.LogConfig.LogLevel,
+				"uri":       uri,
+			})
+
+			logctx.Info("Starting event-gateway")
 
 			closer, err := tracing.NewGlobalTracer("event-gateway")
 			if err != nil {
-				log.WithError(err).Warn("Failed to start tracer for event-gateway")
+				return errors.Wrap(err, "starting tracer for event-gateway")
 			}
 			if closer != nil {
 				defer tracing.CloseQuietly(closer)
@@ -40,21 +45,19 @@ func newServeCmd() *cobra.Command {
 
 			// Start a NATs Server only if the feature was enabled through the config
 			if !cfg.Service.Enabled {
-				for {
-					time.Sleep(1 * time.Minute)
-				}
+				ch := make(chan os.Signal, 1)
+				signal.Notify(ch, syscall.SIGTERM, syscall.SIGINT)
+				sig := <-ch
+				logctx.WithField("signal", sig).Info("Exiting")
+				return nil
 			}
 
 			err = nats.GenerateHealthCheckCredentials(cfg)
 			if err != nil {
-				log.Fatalf("failed to setup credentials for health-check: %s", err)
+				return errors.Wrap(err, "setting up health-check credentials")
 			}
 
-			err = nats.Spawn(cfg)
-			if err != nil {
-				log.Fatalf("failed starting NATS: %+v", err)
-			}
+			return nats.Spawn(cfg)
 		},
 	}
-
 }

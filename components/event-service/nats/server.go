@@ -41,7 +41,7 @@ func (m *multiEmbeddedServer) runInGoroutine(f func() error) {
 
 func (m *multiEmbeddedServer) waitForErrors() error {
 	err := <-m.errchan
-	log.Errorf("Shutting down all embedded servers due to error %q", err)
+	log.WithError(err).Error("shutting down embedded server")
 	for _, s := range m.servers {
 		s.Shutdown()
 	}
@@ -75,7 +75,7 @@ func mTLSConfFor(c *config.EventConfig, service string) *tls.Config {
 
 	natsTLSConf, err := natsd.GenTLSConfig(natsTLSOpts)
 	if err != nil {
-		log.Fatalf("failed to configure NATS TLS options: %s", err)
+		log.WithError(err).Error("configuring NATS TLS options")
 	}
 
 	natsTLSConf.RootCAs = natsTLSConf.ClientCAs
@@ -91,7 +91,7 @@ func spawnNatsInternalServer(c *config.EventConfig, m *multiEmbeddedServer) erro
 
 	ns, err := natsd.NewServer(nopts)
 	if err != nil {
-		return errors.Wrapf(err, "NATS server options failed validation for opts %+v", nopts)
+		return errors.Wrapf(err, "validating NATS server opts '%+v'", nopts)
 	}
 	// NATS won't log at all if we don't make it configure its logger
 	ns.ConfigureLogger()
@@ -109,7 +109,7 @@ func spawnNatsInternalServer(c *config.EventConfig, m *multiEmbeddedServer) erro
 
 	// Wait for it to be able to accept connections
 	if !ns.ReadyForConnections(10 * time.Second) {
-		return errors.Errorf("not able to start NATS server %+v", ns)
+		return errors.Errorf("starting NATS server %+v", ns)
 	}
 	return nil
 }

@@ -5,7 +5,7 @@ import (
 
 	olivere "github.com/olivere/elastic"
 
-	"github.com/chef/automate/components/event-feed-service/pkg/util"
+	"github.com/chef/automate/components/event-feed-service/pkg/feed"
 	project_update_lib "github.com/chef/automate/lib/authz"
 )
 
@@ -20,10 +20,10 @@ type FeedStore interface {
 	ReindexFeedsToLatest(context.Context, string) (string, error)
 	// @param (context)
 	InitializeStore(context.Context) error
-	CreateFeedEntry(entry *util.FeedEntry) (bool, error)
-	GetFeed(query *util.FeedQuery) ([]*util.FeedEntry, int64, error)
-	GetFeedSummary(query *util.FeedSummaryQuery) (map[string]int64, error)
-	GetActionLine(filters []string, startDate string, endDate string, timezone string, interval int, action string) (*util.ActionLine, error)
+	CreateFeedEntry(entry *feed.FeedEntry) (bool, error)
+	GetFeed(query *feed.FeedQuery) ([]*feed.FeedEntry, int64, error)
+	GetFeedSummary(query *feed.FeedSummaryQuery) (map[string]int64, error)
+	GetActionLine(filters []string, startDate string, endDate string, timezone string, interval int, action string) (*feed.ActionLine, error)
 }
 
 func NewFeedStore(esClient *olivere.Client) FeedStore {

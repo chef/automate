@@ -15,12 +15,12 @@ import (
 	google_protobuf "github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/stretchr/testify/assert"
 
-	event_server "github.com/chef/automate/components/event-service/server"
+	event "github.com/chef/automate/components/event-service/config"
 
 	"github.com/chef/automate/api/interservice/event_feed"
+	"github.com/chef/automate/components/event-feed-service/pkg/feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
 	"github.com/chef/automate/components/event-feed-service/pkg/server"
-	"github.com/chef/automate/components/event-feed-service/pkg/util"
 
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
@@ -97,7 +97,7 @@ func TestEventFeedReturnOnlyEventsWithinDateRange(t *testing.T) {
 		totalEntries = 10
 		pageSize     = int32(totalEntries)
 		startDate    = time.Now().UTC()
-		entries      = []*util.FeedEntry{}
+		entries      = []*feed.FeedEntry{}
 	)
 
 	for i := 0; i < totalEntries; i++ {
@@ -107,14 +107,14 @@ func TestEventFeedReturnOnlyEventsWithinDateRange(t *testing.T) {
 			created   = published
 		)
 
-		data := util.FeedEntry{
+		data := feed.FeedEntry{
 			ID:                 uuid.Must(uuid.NewV4()).String(),
 			ProducerID:         "urn:mycompany:user:violet",
 			ProducerName:       "Violet",
 			ProducerObjectType: "user",
 			ProducerTags:       []string{"mycompany", "engineering department", "compliance team"},
 			FeedType:           "event",
-			EventType:          event_server.ScanJobUpdated,
+			EventType:          event.ScanJobUpdatedEventName,
 			Tags:               []string{"mygroup", "compliance", "scan"},
 			Published:          published,
 			ActorID:            "urn:mycompany:user:violet",
@@ -227,7 +227,7 @@ func TestEventFeedFilterEventType(t *testing.T) {
 		ctx          = context.Background()
 		totalEntries = 12
 		pageSize     = int32(totalEntries)
-		entries      = []*util.FeedEntry{}
+		entries      = []*feed.FeedEntry{}
 		eventTypes   = []string{"profile", "scanjobs"}
 	)
 
@@ -235,7 +235,7 @@ func TestEventFeedFilterEventType(t *testing.T) {
 		var (
 			name             = "Fred"
 			userURN          = "urn:mycompany:user:fred"
-			eventType        = event_server.ScanJobUpdated
+			eventType        = event.ScanJobUpdatedEventName
 			tags             = []string{"org_1", "compliance", eventTypes[1]}
 			verb             = "update"
 			objectID         = "urn:chef:compliance:scan-job"
@@ -246,7 +246,7 @@ func TestEventFeedFilterEventType(t *testing.T) {
 		if i > 5 {
 			name = "Violet"
 			userURN = "urn:mycompany:user:violet"
-			eventType = event_server.ProfileCreated
+			eventType = event.ProfileCreatedEventName
 			tags = []string{"org_2", "compliance", eventTypes[0]}
 			verb = "create"
 			objectID = "urn:chef:compliance:profile"
@@ -254,7 +254,7 @@ func TestEventFeedFilterEventType(t *testing.T) {
 			objectName = "Profile"
 		}
 
-		data := util.FeedEntry{
+		data := feed.FeedEntry{
 			ID:                 uuid.Must(uuid.NewV4()).String(),
 			ProducerID:         userURN,
 			ProducerName:       name,

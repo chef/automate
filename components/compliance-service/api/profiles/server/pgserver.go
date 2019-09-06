@@ -23,7 +23,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/profiles/market"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	"github.com/chef/automate/components/compliance-service/reporting/util"
-	"github.com/chef/automate/components/event-service/server"
+	event "github.com/chef/automate/components/event-service/config"
 )
 
 // PGProfileServer implements the profile store GRPC interface
@@ -120,7 +120,7 @@ func (srv *PGProfileServer) storeProfile(owner string, cacheFile string) (inspec
 	}
 
 	// fire profile created event
-	go srv.fireEvent(server.ProfileCreated, owner, esInfo.Name, esInfo.Version)
+	go srv.fireEvent(event.ProfileCreatedEventName, owner, esInfo.Name, esInfo.Version)
 
 	return inspecCheckResult, nil
 }
@@ -171,7 +171,7 @@ func (srv *PGProfileServer) Create(stream profiles.ProfilesService_CreateServer)
 		}
 
 		// fire profile created event
-		go srv.fireEvent(server.ProfileCreated, in.Owner, in.Meta.Name, in.Meta.Version)
+		go srv.fireEvent(event.ProfileCreatedEventName, in.Owner, in.Meta.Name, in.Meta.Version)
 
 		// send an empty result, since it is not relevant for marketplace installation
 		res := &profiles.CheckResult{}
@@ -277,7 +277,7 @@ func (srv *PGProfileServer) Delete(ctx context.Context, in *profiles.ProfileDeta
 		return nil, status.Error(codes.NotFound, "we could not delete the requested profile")
 	}
 	// fire profile deleted event
-	go srv.fireEvent(server.ProfileDeleted, in.Owner, in.Name, in.Version)
+	go srv.fireEvent(event.ProfileDeletedEventName, in.Owner, in.Name, in.Version)
 	return &pb.Empty{}, nil
 }
 
@@ -348,13 +348,13 @@ func (srv *PGProfileServer) newEventMsg(eventType string, owner string, name str
 
 	switch eventType {
 
-	case server.ProfileCreated:
+	case event.ProfileCreatedEventName:
 		verbVal = "create"
-		tagsVal = []string{"profile", userVal, "create", "compliance", server.ProfileCreated}
+		tagsVal = []string{"profile", userVal, "create", "compliance", event.ProfileCreatedEventName}
 
-	case server.ProfileDeleted:
+	case event.ProfileDeletedEventName:
 		verbVal = "delete"
-		tagsVal = []string{"profile", userVal, "delete", "compliance", server.ProfileDeleted}
+		tagsVal = []string{"profile", userVal, "delete", "compliance", event.ProfileDeletedEventName}
 
 	default:
 		logrus.Warnf("Could not generate event message for profile %s; unknown event type %s", nameVal, eventType)

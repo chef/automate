@@ -19,7 +19,7 @@ func ConnectivityCheck(c *config.EventGatewayConfig) error {
 
 	token, err := ReadHealthCheckCredentials(c)
 	if err != nil {
-		return errors.Wrap(err, "could not read credentials for healthcheck")
+		return errors.Wrap(err, "reading credentials for healthcheck")
 	}
 
 	natsURL := fmt.Sprintf("nats://%s@localhost:4222", token)
@@ -37,7 +37,7 @@ func ConnectivityCheck(c *config.EventGatewayConfig) error {
 	log.WithFields(log.Fields{"url": natsURL}).Debug("connecting to event gateway")
 	conn, err := natsc.Connect(natsURL, opts...)
 	if err != nil {
-		return errors.Wrapf(err, "failed to connect to NATS server %q", natsURL)
+		return errors.Wrapf(err, "connecting to NATS server %q", natsURL)
 	}
 	defer conn.Close()
 
@@ -46,7 +46,7 @@ func ConnectivityCheck(c *config.EventGatewayConfig) error {
 	b := make([]byte, 20)
 	_, err = rand.Read(b)
 	if err != nil {
-		return errors.Wrap(err, "failed to generate random topic name for healthcheck")
+		return errors.Wrap(err, "generating random topic name for healthcheck")
 	}
 
 	slug := hex.EncodeToString(b)
@@ -69,7 +69,7 @@ func ConnectivityCheck(c *config.EventGatewayConfig) error {
 	reply, err := conn.RequestWithContext(ctx, topicName, []byte(slug))
 
 	if err != nil {
-		return errors.Wrap(err, "failed to publish message and receive reply within timeout")
+		return errors.Wrap(err, "publishing message and receive reply within timeout")
 	}
 
 	log.WithFields(log.Fields{"data": string(reply.Data), "expected": slug}).Debug("received reply from event gateway")

@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -21,25 +22,23 @@ type Config struct {
 var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "Launches Event Feed services",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		conf, err := configFromViper()
 		if err != nil {
-			log.WithFields(log.Fields{
-				"error": err.Error(),
-			}).Fatal("Failed to load config")
+			return errors.Wrap(err, "loading config")
 		}
+
 		conf.Service.SetLogLevel()
+
 		tlsOpts, err := conf.ReadCerts()
 		if err != nil {
-			log.WithError(err).Fatal("Failed to load SSL key/cert files")
+			return errors.Wrap(err, "reading TLS certs")
 		}
+
 		connFactory := secureconn.NewFactory(*tlsOpts)
 		log.Info("Starting Event Feed Service")
 
-		err = grpc.Spawn(conf, connFactory)
-		if err != nil {
-			log.WithError(err).Fatal("gRPC server failed")
-		}
+		return grpc.Spawn(conf, connFactory)
 	},
 }
 
@@ -48,7 +47,7 @@ func configFromViper() (*config.EventFeed, error) {
 	if err := viper.Unmarshal(cfg); err != nil {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
-		}).Fatal("Failed to marshal config options to server config")
+		}).Fatal("marshaling config options to server config")
 	}
 	cfg.FixupRelativeTLSPaths(viper.ConfigFileUsed())
 

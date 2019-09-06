@@ -38,9 +38,10 @@ func initConfig() {
 
 		err := viper.ReadInConfig()
 		if err != nil {
-			log.WithError(err).WithFields(log.Fields{
-				"file": viper.ConfigFileUsed(),
-			}).Info("Error reading config file")
+			log.WithFields(log.Fields{
+				"error": err,
+				"file":  viper.ConfigFileUsed(),
+			}).Info("reading config file")
 			return
 		}
 	}

@@ -1,9 +1,11 @@
 package stringutils_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/chef/automate/lib/stringutils"
 )
@@ -65,4 +67,22 @@ func TestIndexOf(t *testing.T) {
 	i, err = stringutils.IndexOf([]string{"item1", "item2", "item3"}, "item3")
 	assert.NoError(t, err)
 	assert.Equal(t, 2, i)
+}
+
+func TestSliceReject(t *testing.T) {
+	cases := []struct {
+		in       []string
+		reject   string
+		expected []string
+	}{
+		{[]string{"no", "matches"}, "something", []string{"no", "matches"}},
+		{[]string{"one", "match"}, "one", []string{"match"}},
+		{[]string{"two", "two", "matches"}, "two", []string{"matches"}},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("in: %v, reject:%s", test.in, test.reject), func(t *testing.T) {
+			require.EqualValues(t, test.expected, stringutils.SliceReject(test.in, test.reject))
+		})
+	}
 }

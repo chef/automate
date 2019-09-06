@@ -21,7 +21,7 @@ var RootCmd = &cobra.Command{
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {
 		log.Error(err)
-		os.Exit(-1)
+		os.Exit(1)
 	}
 }
 
@@ -63,7 +63,7 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		log.WithFields(log.Fields{"file": viper.ConfigFileUsed()}).Info("Using config file")
+		log.WithField("file", viper.ConfigFileUsed()).Info("Using config file")
 	}
 
 	// Override our config with any matching environment variables

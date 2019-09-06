@@ -12,7 +12,7 @@ import (
 	"github.com/chef/automate/api/external/secrets"
 	aEvent "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/compliance-service/api/common"
-	"github.com/chef/automate/components/event-service/server"
+	event "github.com/chef/automate/components/event-service/config"
 
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/config"
@@ -119,7 +119,7 @@ func queryAwsEc2InstanceStates(ctx context.Context, db *pgdb.DB, interval time.D
 			// this prevents us from sending out events continuously about already terminated nodes.
 			updated, err := db.UpdateOrInsertInstanceSourceStateInDb(inst, mgrId, nodeManager.AccountId, "aws-ec2")
 			if inst.State == "terminated" && updated {
-				fireEvent(server.NodeTerminated, inst.ID, eventsClient)
+				fireEvent(event.NodeTerminatedEventName, inst.ID, eventsClient)
 			}
 			if err != nil {
 				logrus.Errorf("queryAwsEc2InstanceStates unable to update db with state %s", err.Error())
@@ -188,7 +188,7 @@ func fireEvent(eventType string, instanceID string, eventsClient aEvent.EventSer
 
 func newEventMsg(eventType string, instanceID string) *aEvent.EventMsg {
 
-	tagsVal := []string{"node", "nodemanager", "terminate", "compliance", server.NodeTerminated}
+	tagsVal := []string{"node", "nodemanager", "terminate", "compliance", event.NodeTerminatedEventName}
 
 	return &aEvent.EventMsg{
 		EventID: uuid.Must(uuid.NewV4()).String(),
