@@ -68,7 +68,7 @@ func (j *JobScheduler) Setup() error {
 	r, err := rrule.NewRRule(rrule.ROption{
 		Freq:     rrule.SECONDLY,
 		Interval: DefaultJobIntervalSeconds,
-		Dtstart:  time.Now(),
+		Dtstart:  time.Now().UTC(),
 	})
 	if err != nil {
 		return errors.Wrap(err, "failed to create job scheduler configuration")
@@ -85,12 +85,10 @@ func (j *JobScheduler) Setup() error {
 		return err
 	}
 
-	// FIXME: this is probably ok for a default but then we need to figure out
-	// how to update this when the threshold is set lower.
 	r, err = rrule.NewRRule(rrule.ROption{
 		Freq:     rrule.SECONDLY,
 		Interval: DefaultJobIntervalSeconds,
-		Dtstart:  time.Now(),
+		Dtstart:  time.Now().UTC(),
 	})
 	if err != nil {
 		return errors.Wrap(err, "failed to create job scheduler configuration")
@@ -429,11 +427,12 @@ func (d *DeleteDisconnectedServicesExecutor) runWithoutStats(ctx context.Context
 
 	svcRemovedRes, err := d.ApplicationsServer.DeleteDisconnectedServices(ctx, &req)
 	if err != nil {
-		logCtx.Error("periodic task failed")
+		logCtx.WithError(err).Error("periodic delete_disconnected_services failed")
+		return err
 	}
 
 	logCtx.WithFields(log.Fields{"svcs_removed": len(svcRemovedRes.Services)}).Info("periodic task succeeded")
-	return err
+	return nil
 }
 
 func (d *DeleteDisconnectedServicesExecutor) TotalRuns() int64 {
