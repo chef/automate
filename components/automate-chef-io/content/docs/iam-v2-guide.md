@@ -114,8 +114,8 @@ Let's further assume you want user `Bob` as well as anyone on team `gamma` to be
   ],
 ```
 
-Next, you'll specify the permissions themselves, which in IAM v2 are the `statements`, declared as an array.
-First, write a statement that **allows** access to the _get_, _list_, and _update_ actions for _users_ and _teams_:
+Next, you'll specify the permissions themselves--which in IAM v2 are the `statements`-- declared as an array.
+We only need a single statement in this case, though, providing access to the _get_, _list_, and _update_ actions for _users_ and _teams_:
 
 ```json
     {
@@ -129,20 +129,6 @@ First, write a statement that **allows** access to the _get_, _list_, and _updat
         "iam:teams:get"
       ]
     },
-```
-
-Next, write a statement that **denies** access to the _create_ and _delete_ actions:
-
-```json
-    {
-      "effect": "DENY",
-      "actions": [
-        "iam:users:create",
-        "iam:teams:create",
-        "iam:users:delete",
-        "iam:teams:delete"
-      ]
-    }
 ```
 
 The complete policy should look like:
@@ -165,15 +151,6 @@ The complete policy should look like:
         "iam:teams:update",
         "iam:teams:list",
         "iam:teams:get"
-      ]
-    },
-    {
-      "effect": "DENY",
-      "actions": [
-        "iam:users:create",
-        "iam:teams:create",
-        "iam:users:delete",
-        "iam:teams:delete"
       ]
     }
   ]
