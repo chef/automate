@@ -73,6 +73,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public users: User[] = [];
   private isDestroyed = new Subject<boolean>();
 
+  public addButtonText = 'Add User';
   public removeText = 'Remove User';
 
   public atLeastV2p1$: Observable<boolean>;

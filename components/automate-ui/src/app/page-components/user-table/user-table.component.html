@@ -1,33 +1,48 @@
 <app-authorized [allOf]="getPermissionsPath" [overrideVisible]="overridePermissionsCheck">
-  <chef-table>
-    <chef-thead>
-      <chef-tr>
-        <chef-th class="name-column">Name</chef-th>
-        <chef-th class="username-column">Username</chef-th>
-        <chef-th class="garbage-column"></chef-th>
-      </chef-tr>
-    </chef-thead>
-    <chef-tbody>
-      <chef-tr *ngFor="let user of users">
-        <chef-td class="name-column">
-          <a [routerLink]="['/settings', 'users', user.id]">{{ user.name }}</a>
-        </chef-td>
-        <chef-td class="username-column">
-          {{ user.id }}
-        </chef-td>
-        <chef-td class="garbage-column">
-          <!-- TODO (tc) We do not yet have a way of checking permissions on a specific object.
-          Also the shape of the team membership API isn't restful so we'll have to figure
-          out something else here anyway -->
-          <!-- <app-authorized
-            [allOf]="generateDeletePermissionsPath(user)"
-            [overrideVisible]="overridePermissionsCheck"> -->
-          <chef-control-menu>
-            <chef-option data-cy="delete" (click)="removeClicked.emit(user)">{{ removeText }}</chef-option>
-          </chef-control-menu>
-          <!-- </app-authorized> -->
-        </chef-td>
-      </chef-tr>
-    </chef-tbody>
-  </chef-table>
+  <ng-container *ngIf="showEmptyMessage">
+    <div class="empty-state">
+      <p>Add some users to get started!</p>
+    </div>
+  </ng-container>
+  <chef-toolbar>
+    <app-authorized [allOf]="createPermissionsPath" [overrideVisible]="overridePermissionsCheck">
+      <div *ngIf="showEmptyMessage || showTable" [ngClass]="showEmptyMessage ? 'empty-state' : ''">
+        <chef-button primary [disabled]="!addButtonEnabled" (click)="addClicked.emit($event)"> {{ addButtonText }}
+        </chef-button>
+      </div>
+    </app-authorized>
+  </chef-toolbar>
+  <ng-container *ngIf="showTable">
+    <chef-table>
+      <chef-thead>
+        <chef-tr>
+          <chef-th class="name-column">Name</chef-th>
+          <chef-th class="username-column">Username</chef-th>
+          <chef-th class="garbage-column"></chef-th>
+        </chef-tr>
+      </chef-thead>
+      <chef-tbody>
+        <chef-tr *ngFor="let user of users">
+          <chef-td class="name-column">
+            <a [routerLink]="['/settings', 'users', user.id]">{{ user.name }}</a>
+          </chef-td>
+          <chef-td class="username-column">
+            {{ user.id }}
+          </chef-td>
+          <chef-td class="garbage-column">
+            <!-- TODO (tc) We do not yet have a way of checking permissions on a specific object.
+            Also the shape of the team membership API isn't restful so we'll have to figure
+            out something else here anyway -->
+            <!-- <app-authorized
+              [allOf]="generateDeletePermissionsPath(user)"
+              [overrideVisible]="overridePermissionsCheck"> -->
+            <chef-control-menu>
+              <chef-option data-cy="delete" (click)="removeClicked.emit(user)">{{ removeText }}</chef-option>
+            </chef-control-menu>
+            <!-- </app-authorized> -->
+          </chef-td>
+        </chef-tr>
+      </chef-tbody>
+    </chef-table>
+  </ng-container>
 </app-authorized>

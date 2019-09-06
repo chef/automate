@@ -36,6 +36,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   // Inputs to app-user-table
   public users: User[] = [];
+  public addButtonText = 'Create User';
   public removeText = 'Delete User';
   public baseUrl = '/auth/users';
 

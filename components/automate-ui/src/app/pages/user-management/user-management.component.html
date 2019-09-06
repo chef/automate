@@ -1,5 +1,5 @@
 <app-settings-sidebar></app-settings-sidebar>
-<chef-loading-spinner *ngIf="loading$ | async" size='50' fixed></chef-loading-spinner>
+<chef-loading-spinner *ngIf="isLoading" size='50' fixed></chef-loading-spinner>
 
 <div class="container">
   <main>
@@ -24,7 +24,7 @@
         <app-user-form [createUserForm]="createUserForm"></app-user-form>
         <div class="line"></div>
         <div class="options">
-        <chef-button *ngIf="!(loading$ | async)" primary class="create" (click)="handleCreateUser()"
+        <chef-button primary class="create" (click)="handleCreateUser()"
         [disabled]="!createUserForm.valid" tabindex="2" data-cy="save-user">
           <chef-icon>save</chef-icon>
           <span>Save and Close</span>
@@ -35,21 +35,14 @@
     </chef-modal>
 
     <section class="page-body">
-      <ng-container *ngIf="showEmptyStateMessage()">
-        <div class="empty-state">
-          <p>Add some users to get started!</p>
-        </div>
-      </ng-container>
-      <chef-toolbar>
-        <div [ngClass]="showEmptyStateMessage() ? 'empty-state' : ''">
-          <chef-button primary (click)="openCreateModal()"> Create User </chef-button>
-        </div>
-      </chef-toolbar>
       <app-user-table 
-        *ngIf="showUsersTable()"
+        [addButtonText]="addButtonText"
         [removeText]="removeText"
         [users]="users"
         [baseUrl]="baseUrl"
+        [showTable]="showUsersTable()"
+        [showEmptyMessage]="showEmptyStateMessage()"
+        (addClicked)="openCreateModal()"
         (removeClicked)="startUserDelete($event)">
       </app-user-table>
     </section>
