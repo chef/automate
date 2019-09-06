@@ -539,6 +539,13 @@ func init() {
         "disconnected": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "last_event_occurred_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "last_event_since": {
+          "type": "string"
         }
       }
     },

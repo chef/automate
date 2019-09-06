@@ -458,6 +458,8 @@ func convertStorageServicesToApplicationsServices(svcs []*storage.Service) []*ap
 			CurrentHealthSince:  timef.IntervalUntilNow(svc.HealthUpdatedAt),
 			HealthUpdatedAt:     convertOrCreateProtoTimestamp(svc.HealthUpdatedAt),
 			Disconnected:        svc.Disconnected,
+			LastEventOccurredAt: convertOrCreateProtoTimestamp(svc.LastEventOccurredAt),
+			LastEventSince:      timef.IntervalUntilNow(svc.LastEventOccurredAt),
 		}
 	}
 	return services

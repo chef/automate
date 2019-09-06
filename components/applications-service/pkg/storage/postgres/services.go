@@ -54,6 +54,7 @@ SELECT s.id
   , s.previous_health as previous_health
   , s.update_strategy as update_strategy
   , s.health_updated_at as health_updated_at
+	, s.disconnected as disconnected
 FROM service_full AS s
 WHERE s.name = $1
   AND s.supervisor_id = $2
@@ -77,6 +78,7 @@ SELECT s.id
   , s.previous_health as previous_health
   , s.update_strategy as update_strategy
   , s.health_updated_at as health_updated_at
+	, s.disconnected as disconnected
 FROM service_full AS s
  %s
 ORDER BY %s %s, sup_member_id ASC

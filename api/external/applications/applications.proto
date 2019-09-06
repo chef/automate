@@ -218,6 +218,8 @@ message Service {
   string current_health_since = 19;
   google.protobuf.Timestamp health_updated_at = 20;
   bool disconnected = 21;
+  google.protobuf.Timestamp last_event_occurred_at = 22;
+  string last_event_since = 23;
 }
 
 message ServiceGroupsHealthCountsReq {
