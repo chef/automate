@@ -51,6 +51,7 @@ func TestGetServiceGroupsOneOk(t *testing.T) {
 						Critical: 0,
 						Unknown:  0,
 					},
+					DisconnectedCount: 0,
 				},
 			},
 		}
@@ -89,6 +90,7 @@ func TestGetServiceGroupsOneCritical(t *testing.T) {
 						Critical: 1,
 						Unknown:  0,
 					},
+					DisconnectedCount: 0,
 				},
 			},
 		}
@@ -125,7 +127,7 @@ func TestServiceGroupsMultiService(t *testing.T) {
 						Total:   1,
 						Unknown: 1,
 					},
-					DisconnectedCount: 1,
+					DisconnectedCount: 0,
 				},
 				{
 					Name:             "postgres.default",
@@ -141,7 +143,7 @@ func TestServiceGroupsMultiService(t *testing.T) {
 						Critical: 1,
 						Unknown:  1,
 					},
-					DisconnectedCount: 3,
+					DisconnectedCount: 0,
 				},
 				{
 					Name:             "myapp.default",
@@ -156,7 +158,7 @@ func TestServiceGroupsMultiService(t *testing.T) {
 						Ok:      2,
 						Warning: 1,
 					},
-					DisconnectedCount: 3,
+					DisconnectedCount: 0,
 				},
 				{
 					Name:             "redis.default",
@@ -170,24 +172,15 @@ func TestServiceGroupsMultiService(t *testing.T) {
 						Total: 3,
 						Ok:    3,
 					},
-					DisconnectedCount: 3,
+					DisconnectedCount: 0,
 				},
 			},
 		}
 		mockHabServicesMatrix = habServicesMatrix()
 	)
 
-	for _, s := range mockHabServicesMatrix {
-		var err error
-		s.EventMetadata.OccurredAt, err = ptypes.TimestampProto(time.Now().Add(-time.Minute * 30))
-		require.NoError(t, err)
-	}
-
 	suite.IngestServices(mockHabServicesMatrix)
 	defer suite.DeleteDataFromStorage()
-
-	_, err := suite.ApplicationsServer.MarkDisconnectedServices(300)
-	require.NoError(t, err)
 
 	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
 	assert.Nil(t, err)
@@ -216,6 +209,7 @@ func TestGetServiceGroupsOneWarning(t *testing.T) {
 						Critical: 0,
 						Unknown:  0,
 					},
+					DisconnectedCount: 0,
 				},
 			},
 		}
@@ -256,6 +250,7 @@ func TestGetServiceGroupsOneUnknown(t *testing.T) {
 						Critical: 0,
 						Unknown:  1,
 					},
+					DisconnectedCount: 0,
 				},
 			},
 		}
@@ -295,6 +290,7 @@ func TestGetServiceGroupsOneEach(t *testing.T) {
 						Critical: 1,
 						Unknown:  1,
 					},
+					DisconnectedCount: 0,
 				},
 			},
 		}
@@ -331,6 +327,81 @@ func TestGetServiceGroupsOneEach(t *testing.T) {
 	assert.Nil(t, err)
 
 	assertServiceGroupsEqual(t, expected, response)
+}
+
+func TestServiceGroupsDisconnectedCounts(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = new(applications.ServiceGroupsReq)
+	)
+
+	t.Run("Disconnected counts are correct when no services are disconnected", func(t *testing.T) {
+		mockHabServicesMatrix := habServicesMatrix()
+
+		suite.IngestServices(mockHabServicesMatrix)
+		defer suite.DeleteDataFromStorage()
+
+		_, err := suite.ApplicationsServer.MarkDisconnectedServices(300)
+		require.NoError(t, err)
+
+		response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+		assert.NoError(t, err)
+
+		assert.Equal(t, 4, len(response.ServiceGroups))
+		assert.Equal(t, int32(0), response.ServiceGroups[0].DisconnectedCount)
+		assert.Equal(t, int32(0), response.ServiceGroups[1].DisconnectedCount)
+		assert.Equal(t, int32(0), response.ServiceGroups[2].DisconnectedCount)
+		assert.Equal(t, int32(0), response.ServiceGroups[3].DisconnectedCount)
+	})
+	t.Run("Disconnected counts are correct when all services are disconnected", func(t *testing.T) {
+		mockHabServicesMatrix := habServicesMatrix()
+
+		for _, s := range mockHabServicesMatrix {
+			var err error
+			s.EventMetadata.OccurredAt, err = ptypes.TimestampProto(time.Now().Add(-time.Minute * 30))
+			require.NoError(t, err)
+		}
+
+		suite.IngestServices(mockHabServicesMatrix)
+		defer suite.DeleteDataFromStorage()
+
+		_, err := suite.ApplicationsServer.MarkDisconnectedServices(300)
+		require.NoError(t, err)
+
+		response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+		assert.NoError(t, err)
+
+		assert.Equal(t, 4, len(response.ServiceGroups))
+		assert.Equal(t, int32(1), response.ServiceGroups[0].DisconnectedCount)
+		assert.Equal(t, int32(3), response.ServiceGroups[1].DisconnectedCount)
+		assert.Equal(t, int32(3), response.ServiceGroups[2].DisconnectedCount)
+		assert.Equal(t, int32(3), response.ServiceGroups[3].DisconnectedCount)
+	})
+	t.Run("Disconnected counts are correct when some services are disconnected", func(t *testing.T) {
+		mockHabServicesMatrix := habServicesMatrix()
+
+		for _, i := range []int{0, 4, 7, 9} {
+			var err error
+			s := mockHabServicesMatrix[i]
+			s.EventMetadata.OccurredAt, err = ptypes.TimestampProto(time.Now().Add(-time.Minute * 30))
+			require.NoError(t, err)
+		}
+
+		suite.IngestServices(mockHabServicesMatrix)
+		defer suite.DeleteDataFromStorage()
+
+		_, err := suite.ApplicationsServer.MarkDisconnectedServices(300)
+		require.NoError(t, err)
+
+		response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+		assert.NoError(t, err)
+		assert.Equal(t, 4, len(response.ServiceGroups))
+		assert.Equal(t, int32(1), response.ServiceGroups[0].DisconnectedCount)
+		assert.Equal(t, int32(1), response.ServiceGroups[1].DisconnectedCount)
+		assert.Equal(t, int32(1), response.ServiceGroups[2].DisconnectedCount)
+		assert.Equal(t, int32(1), response.ServiceGroups[3].DisconnectedCount)
+	})
+
 }
 
 func TestGetServiceGroupsInvalidPageNumberReturnsDefaultPageValues(t *testing.T) {
@@ -428,6 +499,7 @@ func TestGetServiceGroupsMultiplePagesAndFilters(t *testing.T) {
 					Application:          a,
 					Environment:          e,
 					ServicesHealthCounts: &applications.HealthCounts{Total: 1, Ok: 1},
+					DisconnectedCount:    0,
 				},
 			},
 		}
@@ -458,6 +530,7 @@ func TestGetServiceGroupsSingleServiceWithMultiplePackages(t *testing.T) {
 						Total: 3,
 						Ok:    3,
 					},
+					DisconnectedCount: 0,
 				},
 			},
 		}
@@ -505,6 +578,7 @@ func TestGetServiceGroupsSingleServiceWithMultipleReleases(t *testing.T) {
 						Total: 2,
 						Ok:    2,
 					},
+					DisconnectedCount: 0,
 				},
 			},
 		}
