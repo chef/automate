@@ -98,7 +98,7 @@ func (a *Applications) GetServicesStats(
 
 func (a *Applications) GetDisconnectedServicesConfig(
 	ctx context.Context,
-	request *applications.GetDisconnectedServicesConfigReq) (*applications.GetDisconnectedServicesConfigRes, error) {
+	request *applications.GetDisconnectedServicesConfigReq) (*applications.PeriodicJobConfig, error) {
 
 	log.WithFields(log.Fields{
 		"request": request.String(),
@@ -110,7 +110,7 @@ func (a *Applications) GetDisconnectedServicesConfig(
 
 func (a *Applications) UpdateDisconnectedServicesConfig(
 	ctx context.Context,
-	request *applications.UpdateDisconnectedServicesConfigReq) (*applications.UpdateDisconnectedServicesConfigRes, error) {
+	request *applications.PeriodicJobConfig) (*applications.UpdateDisconnectedServicesConfigRes, error) {
 
 	log.WithFields(log.Fields{
 		"request": request.String(),
@@ -118,6 +118,30 @@ func (a *Applications) UpdateDisconnectedServicesConfig(
 	}).Debug("rpc call")
 
 	return a.client.UpdateDisconnectedServicesConfig(ctx, request)
+}
+
+func (a *Applications) GetDeleteDisconnectedServicesConfig(
+	ctx context.Context,
+	request *applications.GetDeleteDisconnectedServicesConfigReq) (*applications.PeriodicJobConfig, error) {
+
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.client.GetDeleteDisconnectedServicesConfig(ctx, request)
+}
+
+func (a *Applications) UpdateDeleteDisconnectedServicesConfig(
+	ctx context.Context,
+	request *applications.PeriodicJobConfig) (*applications.UpdateDeleteDisconnectedServicesConfigRes, error) {
+
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.client.UpdateDeleteDisconnectedServicesConfig(ctx, request)
 }
 
 func (a *Applications) GetDisconnectedServices(

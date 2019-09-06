@@ -87,7 +87,7 @@ service ApplicationsService {
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:delete";
   };
 
-  rpc GetDisconnectedServicesConfig(GetDisconnectedServicesConfigReq) returns (GetDisconnectedServicesConfigRes) {
+  rpc GetDisconnectedServicesConfig(GetDisconnectedServicesConfigReq) returns (PeriodicJobConfig) {
     option (google.api.http).get = "/beta/retention/service_groups/disconnected_services/config";
     // TODO: need new resources/policies for this
     option (chef.automate.api.policy).resource = "service_groups";
@@ -96,9 +96,30 @@ service ApplicationsService {
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
   };
 
-  rpc UpdateDisconnectedServicesConfig(UpdateDisconnectedServicesConfigReq) returns (UpdateDisconnectedServicesConfigRes) {
+  rpc UpdateDisconnectedServicesConfig(PeriodicJobConfig) returns (UpdateDisconnectedServicesConfigRes) {
     option (google.api.http) = {
       post: "/beta/retention/service_groups/disconnected_services/config"
+      body: "*"
+    };
+    // TODO: need new resources/policies for this
+    option (chef.automate.api.policy).resource = "service_groups";
+    option (chef.automate.api.policy).action = "delete";
+    option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "applications:serviceGroups:delete";
+  };
+
+  rpc GetDeleteDisconnectedServicesConfig(GetDeleteDisconnectedServicesConfigReq) returns (PeriodicJobConfig) {
+    option (google.api.http).get = "/beta/retention/service_groups/delete_disconnected_services/config";
+    // TODO: need new resources/policies for this
+    option (chef.automate.api.policy).resource = "service_groups";
+    option (chef.automate.api.policy).action = "list";
+    option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
+  };
+
+  rpc UpdateDeleteDisconnectedServicesConfig(PeriodicJobConfig) returns (UpdateDeleteDisconnectedServicesConfigRes) {
+    option (google.api.http) = {
+      post: "/beta/retention/service_groups/delete_disconnected_services/config"
       body: "*"
     };
     // TODO: need new resources/policies for this
@@ -165,14 +186,8 @@ message ServicesStatsRes {
   int32 total_deployments = 4;
 }
 
-message GetDisconnectedServicesConfigReq{}
 
-message GetDisconnectedServicesConfigRes{
-  bool running = 1;
-  string threshold = 2;
-}
-
-message UpdateDisconnectedServicesConfigReq {
+message PeriodicJobConfig {
   bool running = 1;
   // To match the ingest API at /retention/nodes/missing-nodes/config, we use a
   // string that conforms to golang's time.ParseDuration() function. Internally
@@ -181,7 +196,11 @@ message UpdateDisconnectedServicesConfigReq {
   string threshold = 2;
 }
 
+message GetDisconnectedServicesConfigReq{}
 message UpdateDisconnectedServicesConfigRes {}
+
+message GetDeleteDisconnectedServicesConfigReq{}
+message UpdateDeleteDisconnectedServicesConfigRes {}
 
 message Service {
   string supervisor_id = 1;

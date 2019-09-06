@@ -1078,6 +1078,7 @@ paths = [
   "lib/pgutils/*",
   "lib/platform/config/*",
   "lib/proxy/*",
+  "lib/simpledatemath/*",
   "lib/stringutils/*",
   "lib/timef/*",
   "lib/tls/*",
