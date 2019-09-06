@@ -317,13 +317,13 @@ func (j *JobRunnerSet) Start(cerealSvc *cereal.Manager) error {
 		cereal.TaskExecutorOpts{},
 	)
 	if err != nil {
-		return errors.Wrap(err, "failed to register as task exector to mark disconnected services")
+		return errors.Wrap(err, "failed to register as task executor to mark disconnected services")
 	}
 
 	wfX := patterns.NewSingleTaskWorkflowExecutor(DisconnectedServicesJobName, false)
 	err = cerealSvc.RegisterWorkflowExecutor(DisconnectedServicesJobName, wfX)
 	if err != nil {
-		return errors.Wrap(err, "failed to register as workflow exector to mark disconnected services")
+		return errors.Wrap(err, "failed to register as workflow executor to mark disconnected services")
 	}
 
 	err = cerealSvc.RegisterTaskExecutor(
@@ -333,13 +333,13 @@ func (j *JobRunnerSet) Start(cerealSvc *cereal.Manager) error {
 	)
 
 	if err != nil {
-		return errors.Wrap(err, "failed to register as task exector to delete disconnected services")
+		return errors.Wrap(err, "failed to register as task executor to delete disconnected services")
 	}
 
 	wfX = patterns.NewSingleTaskWorkflowExecutor(DeleteDisconnectedServicesJobName, false)
 	err = cerealSvc.RegisterWorkflowExecutor(DeleteDisconnectedServicesJobName, wfX)
 	if err != nil {
-		return errors.Wrap(err, "failed to register as workflow exector to mark disconnected services")
+		return errors.Wrap(err, "failed to register as workflow executor to mark disconnected services")
 	}
 
 	// TODO: set a timeout
@@ -347,7 +347,7 @@ func (j *JobRunnerSet) Start(cerealSvc *cereal.Manager) error {
 
 	err = cerealSvc.Start(ctx)
 	if err != nil {
-		return errors.Wrap(err, "failed to start workflow/job exector")
+		return errors.Wrap(err, "failed to start workflow/job executor")
 	}
 
 	return nil
