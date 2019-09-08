@@ -3,8 +3,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { iamMinorVersion, iamMajorVersion } from 'app/entities/policies/policy.selectors';
-import { IAMMinorVersion, IAMMajorVersion } from 'app/entities/policies/policy.model';
+import { atLeastV2p1 } from 'app/entities/policies/policy.selectors';
 
 @Component({
   selector: 'app-navbar',
@@ -14,8 +13,7 @@ import { IAMMinorVersion, IAMMajorVersion } from 'app/entities/policies/policy.m
 
 export class NavbarComponent implements OnInit {
   public applicationsFeatureFlagOn: boolean;
-  public iamMajorVersion$: Observable<IAMMajorVersion>;
-  public iamMinorVersion$: Observable<IAMMinorVersion>;
+  public projectsEnabled$: Observable<boolean>;
 
   constructor(
     private featureFlagsService: FeatureFlagsService,
@@ -28,7 +26,6 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit() {
     this.applicationsFeatureFlagOn = this.featureFlagsService.getFeatureStatus('applications');
-    this.iamMajorVersion$ = this.store.select(iamMajorVersion);
-    this.iamMinorVersion$ = this.store.select(iamMinorVersion);
+    this.projectsEnabled$ = this.store.select(atLeastV2p1);
   }
 }

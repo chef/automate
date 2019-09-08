@@ -10,7 +10,6 @@ import {
   PolicyEntityInitialState,
   policyEntityReducer
 } from 'app/entities/policies/policy.reducer';
-import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
 
 describe('NavbarComponent', () => {
   let component: NavbarComponent;
@@ -73,8 +72,7 @@ describe('NavbarComponent', () => {
 
   describe('when IAM v2.1 is enabled', () => {
     beforeEach(() => {
-      component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v2');
-      component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v1');
+      component.projectsEnabled$ = observableOf(true);
       fixture.detectChanges();
     });
 

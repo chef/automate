@@ -40,7 +40,7 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
   public team: Team;
   public users: User[] = [];
   private mapOfUsersToFilter: HashMapOfUsers = {};
-  private isV1 = true;
+  private isMajorV1 = true;
   private isDestroyed = new Subject<boolean>();
   public addingUsers = false;
   private usersToAdd: { [id: string]: User } = {};
@@ -58,9 +58,9 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.isDestroyed))
       .subscribe((version) => {
         if (version === null) { return; }
-        this.isV1 = version === 'v1';
+        this.isMajorV1 = version === 'v1';
 
-        if (this.isV1) {
+        if (this.isMajorV1) {
           this.store.select(v1TeamFromRoute)
             .pipe(filter(identity), takeUntil(this.isDestroyed))
             .subscribe(this.getUsersForTeam.bind(this));
@@ -226,6 +226,6 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
   }
 
   private get teamId(): string {
-    return this.isV1 ? this.team.guid : this.team.id;
+    return this.isMajorV1 ? this.team.guid : this.team.id;
   }
 }

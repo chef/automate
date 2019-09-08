@@ -4,12 +4,11 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store } from '@ngrx/store';
-import { of as observableOf } from 'rxjs';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { HttpStatus } from 'app/types/types';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
-import { IAMMajorVersion } from 'app/entities/policies/policy.model';
+import { projectsFilterReducer } from 'app/services/projects-filter/projects-filter.reducer';
 import { teamEntityReducer } from 'app/entities/teams/team.reducer';
 import { Team } from 'app/entities/teams/team.model';
 import {
@@ -18,7 +17,6 @@ import {
   CreateTeamFailure,
   DeleteTeamSuccess
 } from 'app/entities/teams/team.actions';
-import { projectsFilterReducer } from 'app/services/projects-filter/projects-filter.reducer';
 import { TeamManagementComponent } from './team-management.component';
 
 describe('TeamManagementComponent', () => {
@@ -101,7 +99,7 @@ describe('TeamManagementComponent', () => {
 
     beforeEach(() => {
       store = TestBed.get(Store);
-      component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v1');
+      component.isMajorV1 = true;
     });
 
     it('openCreateModal on v1 opens v1 modal', () => {
@@ -179,7 +177,6 @@ describe('TeamManagementComponent', () => {
     beforeEach(() => {
       store = TestBed.get(Store);
       component.isMajorV1 = false;
-      fixture.detectChanges();
     });
 
     it('openCreateModal on v2 opens v2 modal', () => {

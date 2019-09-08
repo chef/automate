@@ -27,15 +27,15 @@
     </app-authorized>
 
     <div *ngIf="(iamMajorVersion$ | async) !== 'v1'">
-      <div class="group" *ngIf="policies.visible || roles.visible || (projects.visible && (iamMinorVersion$ | async) === 'v1')">Access Management</div>
+      <div class="group" *ngIf="policies.visible || roles.visible || (projects && projects.visible)">Access Management</div>
       <app-authorized #policies [allOf]="['/iam/v2beta/policies', 'get']">
         <chef-sidebar-entry route="/settings/policies" icon="security">Policies</chef-sidebar-entry>
       </app-authorized>
       <app-authorized #roles [allOf]="['/iam/v2beta/roles', 'get']">
         <chef-sidebar-entry route="/settings/roles" icon="assignment_ind">Roles</chef-sidebar-entry>
       </app-authorized>
-      <app-authorized #projects [allOf]="['/iam/v2beta/projects', 'get']">
-        <chef-sidebar-entry *ngIf="(iamMinorVersion$ | async) === 'v1'" route="/settings/projects" icon="work">Projects</chef-sidebar-entry>
+      <app-authorized #projects [allOf]="['/iam/v2beta/projects', 'get']" *ngIf="projectsEnabled$ | async">
+        <chef-sidebar-entry route="/settings/projects" icon="work">Projects</chef-sidebar-entry>
       </app-authorized>
     </div>
   </div>

@@ -9,7 +9,7 @@ import { using } from 'app/testing/spec-helpers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { SettingsLandingComponent } from 'app/pages/settings-landing/settings-landing.component';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
-import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
+import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import { checkFirstPerm } from 'app/testing/spec-helpers';
 import { SettingsSidebarComponent } from './settings-sidebar.component';
 
@@ -64,46 +64,53 @@ describe('SettingsSidebarComponent', () => {
   describe('IAM v2', () => {
     beforeEach(() => {
       component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v2');
-      component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v1');
     });
 
-    it('shows all links consistent with settings-landing', () => {
-      fixture.detectChanges();
-      const links = element.nativeElement
-        .querySelectorAll('div.nav-items chef-sidebar-entry');
-      expect(links.length).toBe(settingsLandingComponent.routeList.length);
+    using([
+      [false, 9, 'v2'],
+      [true, 10, 'v2.1']
+    ], function (projectsEnabled: boolean, linkCount: number, versionName: string) {
+
+      it(`shows all links consistent with settings-landing for ${versionName}`, () => {
+        component.projectsEnabled$ = observableOf(projectsEnabled);
+        fixture.detectChanges();
+        const links = element.nativeElement
+          .querySelectorAll('div.nav-items chef-sidebar-entry');
+        expect(links.length).toBe(linkCount);
+      });
+
+      it(`has route order consistent with settings-landing for ${versionName}`, () => {
+        component.projectsEnabled$ = observableOf(projectsEnabled);
+        fixture.detectChanges();
+        const links = element.nativeElement
+          .querySelectorAll('div.nav-items chef-sidebar-entry');
+        for (let i = 0; i < links.length; i++) {
+          expect(links[i].getAttribute('route'))
+            .toBe(settingsLandingComponent.routeList[i].route);
+        }
+      });
+
+      it(`has paths consistent with settings-landing for ${versionName}`, () => {
+        component.projectsEnabled$ = observableOf(projectsEnabled);
+        fixture.detectChanges();
+        const elements = Array
+          .from<HTMLElement>(
+            element.nativeElement.querySelectorAll('div.nav-items app-authorized'))
+          .filter(elem =>
+            elem.firstElementChild && elem.firstElementChild.tagName === 'CHEF-SIDEBAR-ENTRY');
+
+        for (let i = 0; i < elements.length; i++) {
+          checkFirstPerm(
+            'anyOf',
+            elements[i].getAttribute('ng-reflect-any-of'),
+            settingsLandingComponent.routeList[i].anyOfCheck);
+          checkFirstPerm(
+            'allOf',
+            elements[i].getAttribute('ng-reflect-all-of'),
+            settingsLandingComponent.routeList[i].allOfCheck);
+        }
+      });
     });
-
-    it('has route order consistent with settings-landing', () => {
-      fixture.detectChanges();
-      const links = element.nativeElement
-        .querySelectorAll('div.nav-items chef-sidebar-entry');
-      for (let i = 0; i < settingsLandingComponent.routeList.length; i++) {
-        expect(links[i].getAttribute('route'))
-          .toBe(settingsLandingComponent.routeList[i].route);
-      }
-    });
-
-   it('has paths consistent with settings-landing', () => {
-     fixture.detectChanges();
-     const elements = Array
-       .from<HTMLElement>(
-         element.nativeElement.querySelectorAll('div.nav-items app-authorized'))
-       .filter(elem =>
-         elem.firstElementChild && elem.firstElementChild.tagName === 'CHEF-SIDEBAR-ENTRY');
-
-     expect(elements.length).toBe(settingsLandingComponent.routeList.length);
-     for (let i = 0; i < settingsLandingComponent.routeList.length; i++) {
-       checkFirstPerm(
-         'anyOf',
-         elements[i].getAttribute('ng-reflect-any-of'),
-         settingsLandingComponent.routeList[i].anyOfCheck);
-       checkFirstPerm(
-         'allOf',
-         elements[i].getAttribute('ng-reflect-all-of'),
-         settingsLandingComponent.routeList[i].allOfCheck);
-     }
-   });
   });
 
   describe('IAM v1', () => {

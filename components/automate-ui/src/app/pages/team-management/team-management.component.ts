@@ -7,8 +7,11 @@ import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { loading, EntityStatus } from 'app/entities/entities';
-import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
-import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
+import {
+  iamMajorVersion,
+  iamMinorVersion,
+  atLeastV2p1
+} from 'app/entities/policies/policy.selectors';
 import {
   createError,
   createStatus,
@@ -38,8 +41,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   public createV1TeamModalVisible = false;
   public creatingTeam = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
-  public iamMajorVersion$: Observable<IAMMajorVersion>;
-  public iamMinorVersion$: Observable<IAMMinorVersion>;
+  public projectsEnabled$: Observable<boolean>;
   public isMajorV1 = true;
   public isMinorV1 = false;
   public dropdownProjects: Project[] = [];
@@ -65,8 +67,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
         }
       )),
       takeUntil(this.isDestroyed));
-    this.iamMajorVersion$ = store.select(iamMajorVersion);
-    this.iamMinorVersion$ = store.select(iamMinorVersion);
+    this.projectsEnabled$ = store.select(atLeastV2p1);
     this.createTeamForm = fb.group({
       // Must stay in sync with error checks in create-object-modal.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
@@ -89,19 +90,17 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.store.dispatch(new GetTeams());
 
-    this.iamMajorVersion$
+    this.store.select(iamMajorVersion)
       .pipe(takeUntil(this.isDestroyed))
       .subscribe((majorVersion) => {
-        if (majorVersion === null) { return; }
-          this.isMajorV1 = majorVersion === 'v1';
-        });
+        this.isMajorV1 = majorVersion === 'v1';
+      });
 
-    this.iamMinorVersion$
+    this.store.select(iamMinorVersion)
       .pipe(takeUntil(this.isDestroyed))
       .subscribe((minorVersion) => {
-        if (minorVersion === null) { return; }
-          this.isMinorV1 = minorVersion === 'v1';
-        });
+        this.isMinorV1 = minorVersion === 'v1';
+      });
 
     this.store.select(assignableProjects)
       .subscribe((assignable: ProjectsFilterOption[]) => {

@@ -76,7 +76,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public addButtonText = 'Add User';
   public removeText = 'Remove User';
 
-  public atLeastV2p1$: Observable<boolean>;
   public projectsEnabled: boolean;
   public projects: ProjectCheckedMap = {};
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
@@ -117,8 +116,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.atLeastV2p1$ = this.store.select(atLeastV2p1);
-
     this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
       .subscribe((url: string) => {
         this.url = url;

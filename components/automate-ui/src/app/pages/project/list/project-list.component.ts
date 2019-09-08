@@ -9,8 +9,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { HttpStatus } from 'app/types/types';
 import { loading, EntityStatus } from 'app/entities/entities';
-import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
-import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
+import { atLeastV2p1 } from 'app/entities/policies/policy.selectors';
 import { ProjectService } from 'app/entities/projects/project.service';
 import {
   allProjects, getAllStatus, createStatus, createError
@@ -29,8 +28,7 @@ import { LoadOptions } from 'app/services/projects-filter/projects-filter.action
 export class ProjectListComponent implements OnInit, OnDestroy {
   public MAX_PROJECTS = 6;
   public loading$: Observable<boolean>;
-  public iamMajorVersion$: Observable<IAMMajorVersion>;
-  public iamMinorVersion$: Observable<IAMMinorVersion>;
+  public projectsEnabled$: Observable<boolean>;
   public sortedProjects$: Observable<Project[]>;
   public projectToDelete: Project;
   public deleteModalVisible = false;
@@ -76,8 +74,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
         }
       )));
 
-    this.iamMajorVersion$ = store.select(iamMajorVersion);
-    this.iamMinorVersion$ = store.select(iamMinorVersion);
+    this.projectsEnabled$ = store.select(atLeastV2p1);
 
     this.applyRulesButtonText$ = this.projects.applyRulesStatus$.pipe(
       map(({ state, percentageComplete }: ApplyRulesStatus) => {
