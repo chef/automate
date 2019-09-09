@@ -67,6 +67,7 @@ func (suite *CerealTestSuite) TestSimpleScheduleWorkflow() {
 	suite.Require().NoError(err)
 
 	err = m.CreateWorkflowSchedule(
+		context.Background(),
 		instanceName,
 		workflowName,
 		"testparams",
@@ -119,6 +120,7 @@ func (suite *CerealTestSuite) TestScheduleUpdates() {
 	suite.Require().NoError(err)
 
 	err = m.CreateWorkflowSchedule(
+		context.Background(),
 		instanceName,
 		workflowName,
 		"testparams",
@@ -169,6 +171,7 @@ func (suite *CerealTestSuite) TestCreateExpiredSchedule() {
 	suite.Require().NoError(err)
 
 	err = m.CreateWorkflowSchedule(
+		context.Background(),
 		instanceName,
 		workflowName,
 		"testparams",
@@ -224,6 +227,7 @@ func (suite *CerealTestSuite) TestExpiringSchedule() {
 	suite.Require().NoError(err)
 
 	err = m.CreateWorkflowSchedule(
+		context.Background(),
 		instanceName,
 		workflowName,
 		"testparams",

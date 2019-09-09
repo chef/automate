@@ -165,7 +165,7 @@ func Spawn(opts *serveropts.Opts) error {
 		return err
 	}
 
-	err = server.MigrateJobsSchedule(jobManager, viper.ConfigFileUsed())
+	err = server.MigrateJobsSchedule(context.Background(), jobManager, viper.ConfigFileUsed())
 	if err != nil {
 		logrus.WithError(err).Fatal("could not migrate old job schedules")
 		return err

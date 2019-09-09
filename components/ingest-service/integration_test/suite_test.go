@@ -394,7 +394,7 @@ func createServices(s *Suite) error {
 		return errors.Wrap(err, "could not initialize job manager")
 	}
 
-	err = server.MigrateJobsSchedule(jobManager, viper.ConfigFileUsed())
+	err = server.MigrateJobsSchedule(context.Background(), jobManager, viper.ConfigFileUsed())
 	if err != nil {
 		return errors.Wrap(err, "could not migrate old job schedules")
 	}
