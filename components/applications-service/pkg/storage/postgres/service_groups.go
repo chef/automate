@@ -76,7 +76,7 @@ const (
       ,s.application as app_name
       ,s.environment as environment
       ,s.service_group_name_suffix as name_suffix
-			,COUNT(s.disconnected) FILTER (WHERE s.disconnected = 'true') AS disconnected_count
+      ,COUNT(s.disconnected) FILTER (WHERE s.disconnected) AS disconnected_count
     FROM service_full AS s
 `
 	groupByPart = `
