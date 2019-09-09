@@ -55,7 +55,7 @@ func InitializeJobManager(c *cereal.Manager, client backend.Client, esSidecarCli
 	return nil
 }
 
-func MigrateJobsSchedule(c *cereal.Manager, oldConfigFile string) error {
+func MigrateJobsSchedule(ctx context.Context, c *cereal.Manager, oldConfigFile string) error {
 	jc, err := config.OldJobConfigFromFile(oldConfigFile)
 	if err != nil {
 		log.WithError(err).Warn("failed to read old job config from disk, defaults will be used")
@@ -81,7 +81,7 @@ func MigrateJobsSchedule(c *cereal.Manager, oldConfigFile string) error {
 			return errors.Wrap(err, "could not create recurrence rule for job configuration")
 		}
 
-		err = c.CreateWorkflowSchedule(scheduleName, name, config.Threshold, config.Running, r)
+		err = c.CreateWorkflowSchedule(ctx, scheduleName, name, config.Threshold, config.Running, r)
 		if err == cereal.ErrWorkflowScheduleExists {
 			log.Infof("Schedule for %s already exists, not migrating", scheduleName)
 		} else if err != nil {

@@ -3,10 +3,11 @@ package purge
 import (
 	"context"
 
-	es "github.com/chef/automate/api/interservice/es_sidecar"
-	"github.com/chef/automate/lib/cereal"
 	"github.com/pkg/errors"
 	"github.com/teambition/rrule-go"
+
+	es "github.com/chef/automate/api/interservice/es_sidecar"
+	"github.com/chef/automate/lib/cereal"
 )
 
 // ConfigureManager registers the purge workflow schedule and job with purge
@@ -42,6 +43,7 @@ func CreateOrUpdatePurgeWorkflow(
 	recurrence *rrule.RRule) error {
 
 	err := man.CreateWorkflowSchedule(
+		ctx,
 		scheduleName,
 		jobName,
 		defaultPolicies,

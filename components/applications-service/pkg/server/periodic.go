@@ -75,6 +75,7 @@ func (j *JobScheduler) Setup() error {
 	}
 
 	err = j.createWorkflowIfMissing(
+		context.Background(),
 		DisconnectedServicesScheduleName,
 		DisconnectedServicesJobName,
 		defaultDisconnectedServicesJobParams(),
@@ -95,6 +96,7 @@ func (j *JobScheduler) Setup() error {
 	}
 
 	err = j.createWorkflowIfMissing(
+		context.Background(),
 		DeleteDisconnectedServicesScheduleName,
 		DeleteDisconnectedServicesJobName,
 		defaultDeleteDisconnectedServicesJobParams(),
@@ -122,6 +124,7 @@ func (j *JobScheduler) ResetParams() error {
 }
 
 func (j *JobScheduler) createWorkflowIfMissing(
+	ctx context.Context,
 	scheduleName string,
 	jobName string,
 	jobParams interface{},
@@ -135,6 +138,7 @@ func (j *JobScheduler) createWorkflowIfMissing(
 	})
 
 	err := j.CerealSvc.CreateWorkflowSchedule(
+		ctx,
 		scheduleName,
 		jobName,
 		jobParams,

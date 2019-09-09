@@ -367,6 +367,7 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 	}
 
 	err = manager.CreateWorkflowSchedule(
+		context.Background(),
 		scheduleName, "schedule-test", nil, true, recRule)
 	if err != nil {
 		if err == cereal.ErrWorkflowScheduleExists {

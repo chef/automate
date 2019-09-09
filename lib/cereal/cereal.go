@@ -889,6 +889,7 @@ func (m *Manager) Stop() error {
 // rule provided. The first run will happen during when the recurrence is first
 // due from Now.
 func (m *Manager) CreateWorkflowSchedule(
+	ctx context.Context,
 	instanceName string,
 	workflowName string,
 	parameters interface{},
@@ -903,7 +904,7 @@ func (m *Manager) CreateWorkflowSchedule(
 	if err != nil {
 		return err
 	}
-	err = m.backend.CreateWorkflowSchedule(context.TODO(), instanceName, workflowName,
+	err = m.backend.CreateWorkflowSchedule(ctx, instanceName, workflowName,
 		jsonData, enabled, recurRule.String(), nextRunAt)
 	if err == nil {
 		m.workflowScheduler.Trigger()
