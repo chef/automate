@@ -22,10 +22,10 @@ WantedBy=default.target
 EOF
     systemctl start requestbin
 }
-
 start_loadbalancer() {
     export GOBIN="/go/bin"
     go install ./integration/helpers/loadbalancer/
+    #shellcheck disable=SC2154
     cat > /etc/systemd/system/loadbalancer.service <<EOF
 [Unit]
 Description=Load Balancer

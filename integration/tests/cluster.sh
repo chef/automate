@@ -71,7 +71,7 @@ do_deploy() {
             --bootstrap-bundle bootstrap.abb \
             --accept-terms-and-mlsa
 
-    start_loadbalancer $frontend1_ip $frontend2_ip
+    start_loadbalancer "$frontend1_ip" "$frontend2_ip"
 
     start_ssh_node
 }
