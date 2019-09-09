@@ -18,10 +18,9 @@ func TestNewGatherer(t *testing.T) {
 
 	stagingDir := "/data"
 	tempDir := stagingDir + "/bundle"
-	binPaths := map[string]string{}
 	someTime, _ := time.Parse(time.RFC3339, "2018-02-05T23:20:12Z")
 
-	g := NewGatherer(stagingDir, tempDir, "example.com", binPaths, someTime)
+	g := NewGatherer(stagingDir, tempDir, "example.com", someTime)
 
 	assert.Equal(
 		"/data/bundle",

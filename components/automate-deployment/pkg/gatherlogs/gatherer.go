@@ -19,23 +19,21 @@ const DefaultLogLines = 500000
 
 // Gatherer defines values used in the log/data collection process
 type Gatherer struct {
-	archiveRoot    string            // top level of the resulting archive file
-	targetDir      string            // directory we collect data into
-	bundleFileName string            // the filename for our compressed archive file
-	bundleFilePath string            // full path to the archive file
-	fqdn           string            // fqdn of the host gather-logs is running on
-	binPaths       map[string]string // names, paths to binaries we'll use
+	archiveRoot    string // top level of the resulting archive file
+	targetDir      string // directory we collect data into
+	bundleFileName string // the filename for our compressed archive file
+	bundleFilePath string // full path to the archive file
+	fqdn           string // fqdn of the host gather-logs is running on
 	operations     []executer
 }
 
 // NewGatherer returns an initialized Gatherer
-func NewGatherer(stagingDir, archiveRoot, fqdn string, binPaths map[string]string, now time.Time) *Gatherer {
+func NewGatherer(stagingDir, archiveRoot, fqdn string, now time.Time) *Gatherer {
 	timestamp := nameFromTime(now)
 
 	g := &Gatherer{
 		archiveRoot:    archiveRoot,
 		fqdn:           fqdn,
-		binPaths:       binPaths,
 		bundleFileName: fmt.Sprintf("%s-%s.tar.gz", fqdn, timestamp),
 	}
 
@@ -65,7 +63,7 @@ func (g *Gatherer) CreateBundleDir() error {
 
 // FindFilesToCopy find files under a given path
 func (g *Gatherer) FindFilesToCopy(path, name string) []string {
-	out, err := command.CombinedOutput(g.binPaths["find"],
+	out, err := command.CombinedOutput("find",
 		command.Args(path, "-name", name))
 	if err != nil {
 		log.WithError(err).Warn("Failed to execute find.")
@@ -114,13 +112,12 @@ func (g *Gatherer) CreateBundleFile() (BundleInfo, error) {
 		g.fqdn,
 	)
 
-	out, err := command.CombinedOutput(g.binPaths["tar"], tarArgs)
+	out, err := command.CombinedOutput("tar", tarArgs)
 	if err != nil {
 		log.WithFields(
 			log.Fields{
 				"error":      err,
 				"archive":    g.bundleFilePath,
-				"tar":        g.binPaths["tar"],
 				"tar_output": out,
 			},
 		).Error("Failed to create archive")
@@ -164,7 +161,6 @@ func (g *Gatherer) AddURL(name, url string) {
 // AddCopy adds a copy operation for a given path
 func (g *Gatherer) AddCopy(srcPath string) {
 	g.addOperation(&Copy{
-		CpPath:   g.binPaths["cp"],
 		SrcPath:  srcPath,
 		DestPath: g.targetDir,
 	})

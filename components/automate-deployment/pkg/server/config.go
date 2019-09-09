@@ -13,9 +13,6 @@ type Config struct {
 	LogLevel                 string `mapstructure:"log_level"`
 	LogFormat                string `mapstructure:"log_format"`
 	StagingDir               string `mapstructure:"staging_dir"`
-	TarPath                  string `mapstructure:"tar_path"`
-	FindPath                 string `mapstructure:"find_path"`
-	CoreutilsPath            string `mapstructure:"coreutils_path"`
 	ConvergeIntervalSecs     uint32 `mapstructure:"converge_interval_secs"`
 	ConvergeDisableFile      string `mapstructure:"converge_disable_file"`
 	EnsureStatusTimeoutSecs  uint32 `mapstructure:"ensure_status_timeout_secs"`
