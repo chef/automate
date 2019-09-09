@@ -15,13 +15,13 @@ describe('ResourcesComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        ChefComponentsModule
+        ChefComponentsModule,
+        SelectedStatusPipe
       ],
       declarations: [
         DeltaViewerComponent,
         ResourcesComponent,
         ResourceItemComponent,
-        SelectedStatusPipe,
         ChefStatusIconPipe,
         MockComponent({selector: 'chef-icon'})
       ],
