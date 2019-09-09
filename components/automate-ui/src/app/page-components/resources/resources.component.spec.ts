@@ -6,7 +6,6 @@ import { NodeDetailsService } from '../../services/node-details/node-details.ser
 import { DeltaViewerComponent } from '../delta-viewer/delta-viewer.component';
 import { ResourcesComponent } from './resources.component';
 import { ResourceItemComponent } from '../resource-item/resource-item.component';
-import { ChefStatusIconPipe } from '../../pipes/chef-status-icon.pipe';
 import { ChefPipesModule } from '../../pipes/chef-pipes.module';
 
 describe('ResourcesComponent', () => {
@@ -22,7 +21,6 @@ describe('ResourcesComponent', () => {
         DeltaViewerComponent,
         ResourcesComponent,
         ResourceItemComponent,
-        ChefStatusIconPipe,
         MockComponent({selector: 'chef-icon'})
       ],
       providers: [
