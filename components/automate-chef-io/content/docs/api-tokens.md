@@ -59,7 +59,7 @@ If you already [created an Admin API token]({{< relref "#creating-an-admin-api-t
 You can give it a description to denote its use:
 
 ```bash
-curl -s -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"description":"My shiny new token"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/tokens | jq .id
+curl -s -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"description":"My shiny new token"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/tokens | jq .id
 ```
 
 ## Creating an Admin API Token
@@ -77,15 +77,15 @@ To create an admin token and immediately store it in an environment variable for
 easy access, you can instead run:
 
 ```bash
-export TOK=`chef-automate admin-token`
-echo $TOK
+export TOKEN=`chef-automate admin-token`
+echo $TOKEN
 ```
 
 Once you have an Admin API token, you can use it to make requests by passing it in the `api-token`
 header:
 
 ```bash
-curl -s -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/api/v0/auth/policies -v
+curl -s -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/auth/policies -v
 ```
 
 If you have Admin level access to the API, you can retrieve your token at any time by going to
@@ -111,10 +111,10 @@ including the administrative token.
 compliance resource.
 
 1. [Get an Admin API token]({{< relref "#creating-an-admin-api-token" >}}) and save it in the
-   environment variable `$TOK`:
+   environment variable `$TOKEN`:
 
    ```bash
-   export TOK=<your_admin_api_token>
+   export TOKEN=<your_admin_api_token>
    ```
 
 2. [Create a standard API token]({{< relref "#creating-a-standard-api-token" >}}) to permission.
@@ -124,6 +124,6 @@ compliance resource.
 4. Create policies to permit that client to read `compliance:*`. For more information, see [policies]({{< relref "authorization-overview.md" >}}).
 
    ```bash
-   export TOK=<your_admin_api_token>
-   curl -s -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"subjects":["token:95aef20b-0a4e-4698-bd69-ce2cf44c2e35"], "action":"read", "resource":"compliance:*"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/policies?pretty
+   export TOKEN=<your_admin_api_token>
+   curl -s -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"subjects":["token:95aef20b-0a4e-4698-bd69-ce2cf44c2e35"], "action":"read", "resource":"compliance:*"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/policies?pretty
    ```

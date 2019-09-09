@@ -43,7 +43,7 @@ Before you follow these instructions, we recommend you install the JSON processo
 To interact with the user API using cURL, fetch an admin API token available from the `chef-automate` CLI, and set it to a usable variable:
 
 ```bash
-export TOK=`chef-automate admin-token`
+export TOKEN=`chef-automate admin-token`
 ```
 
 #### Create a User
@@ -52,7 +52,7 @@ To create a Chef Automate user, you'll need a name, username, and password.
 The username must be unique.
 
 ```bash
-curl -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"name":"Your Name", "username":"username001rulez", "password":"password"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/users?pretty
+curl -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"name":"Your Name", "username":"username001rulez", "password":"password"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/users?pretty
 ```
 
 #### Fetching Users
@@ -61,19 +61,19 @@ You can fetch a single user by username. Keep in mind that certain characters
 in a username (such as a space) may need to be escaped in the URL.
 
 ```bash
-curl -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/api/v0/auth/users/username001rulez?pretty
+curl -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/auth/users/username001rulez?pretty
 ```
 
 More generally, here is the format showing a `{username}` placeholder:
 
 ```bash
-curl -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/api/v0/auth/users/{username}?pretty
+curl -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/auth/users/{username}?pretty
 ```
 
 You can also fetch a list of all users by omitting the final username segment of the URL:
 
 ```bash
-curl -H "api-token: $TOK" https://{{< example_fqdn "automate" >}}/api/v0/auth/users?pretty
+curl -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/auth/users?pretty
 ```
 
 #### Updating Users
@@ -84,14 +84,14 @@ Then, also in the payload, you must specify the full name--_even if you do not w
 Finally, include the password in the payload, but only if you do want to change it.
 
 ```bash
-curl -X PUT -H "api-token: $TOK" -H "Content-Type: application/json" -d '{"name":"Revised Full Name", "id": "userID", "password": "another_pwd"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/users/{username}?pretty
+curl -X PUT -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"name":"Revised Full Name", "id": "userID", "password": "another_pwd"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/users/{username}?pretty
 ```
 
 A non-admin user is also able to change their own password through the UI.
 For completeness, here is the API call to perform the same action.
 
 ```bash
-curl -X PUT -H "api-token: $TOK" -H "Content-Type: application/json" -XPUT -d'{"id":"userID","name":"Revised Full Name","username":"username001rulez","password":"another_pwd","previous_password":"password"}' https://{{< example_fqdn "automate" >}}/api/v0/users/{username}?pretty
+curl -X PUT -H "api-token: $TOKEN" -H "Content-Type: application/json" -XPUT -d'{"id":"userID","name":"Revised Full Name","username":"username001rulez","password":"another_pwd","previous_password":"password"}' https://{{< example_fqdn "automate" >}}/api/v0/users/{username}?pretty
 ```
 
 ### Deleting Users
@@ -99,7 +99,7 @@ curl -X PUT -H "api-token: $TOK" -H "Content-Type: application/json" -XPUT -d'{"
 To delete a user, supply the `username`:
 
 ```bash
-curl -X DELETE -H "api-token: $TOK" -H "Content-Type: application/json" https://{{< example_fqdn "automate" >}}/api/v0/auth/users/{username}?pretty
+curl -X DELETE -H "api-token: $TOKEN" -H "Content-Type: application/json" https://{{< example_fqdn "automate" >}}/api/v0/auth/users/{username}?pretty
 ```
 
 ### User Self-Maintenance
