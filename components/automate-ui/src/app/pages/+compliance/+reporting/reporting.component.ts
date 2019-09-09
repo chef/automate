@@ -149,7 +149,6 @@ export class ReportingComponent implements OnInit, OnDestroy {
   downloadFailed = false;
   endDate$: Observable<Date>;
   filters$: Observable<FilterC[]>;
-  idToTitle: Map<string, string> = new Map<string, string>();
 
   showSummary = false;
 

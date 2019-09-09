@@ -262,10 +262,6 @@ describe('ReportingOverviewComponent', () => {
 
   describe('getNodeTrend()', () => {
     const dateRange = { start: moment().toDate(), end: moment().toDate() };
-    // const filters = [
-    //   {'end_time': '2017-01-31T00:00:00Z'},
-    //   {'type': 'Node', 'value': '1231'}
-    // ];
     const endDate = moment('2017-01-31T00:00:00Z').utc();
     const reportQuery: ReportQuery = {
       startDate: moment(endDate).subtract(10, 'days'),
