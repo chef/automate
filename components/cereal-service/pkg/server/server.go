@@ -207,7 +207,7 @@ func (s *CerealService) DequeueWorkflow(req cereal.Cereal_DequeueWorkflowServer)
 		"workflow_status": evt.Instance.Status,
 		"event_type":      evt.Type,
 	})
-	logctx.Info("workflow dequeued")
+	logctx.Debug("workflow dequeued")
 
 	var taskResult *cereal.TaskResult
 	if evt.TaskResult != nil {
@@ -246,7 +246,7 @@ func (s *CerealService) DequeueWorkflow(req cereal.Cereal_DequeueWorkflowServer)
 		return err
 	}
 	if done := msg.GetDone(); done != nil {
-		logctx.Info("completing workflow instance")
+		logctx.Debug("completing workflow instance")
 		if err := completer.Done(done.GetResult()); err != nil {
 			return err
 		}
@@ -273,12 +273,12 @@ func (s *CerealService) DequeueWorkflow(req cereal.Cereal_DequeueWorkflowServer)
 				return err
 			}
 		}
-		logctx.WithField("enqueued_tasks", len(cont.GetTasks())).Info("continuing workflow instance")
+		logctx.WithField("enqueued_tasks", len(cont.GetTasks())).Debug("continuing workflow instance")
 		if err := completer.Continue(cont.GetPayload()); err != nil {
 			return err
 		}
 	} else if fail := msg.GetFail(); fail != nil {
-		logctx.Info("failing workflow instance")
+		logctx.Debug("failing workflow instance")
 		if err := completer.Fail(errors.New(fail.Err)); err != nil {
 			return err
 		}
@@ -419,7 +419,7 @@ func (s *CerealService) DequeueTask(req cereal.Cereal_DequeueTaskServer) error {
 		return err
 	}
 
-	logctx.Info("dequeued task")
+	logctx.Debug("dequeued task")
 	_, task.Name = unnamespace(task.Name)
 	err = writeDeqTaskRespMsg(ctx, req, &cereal.DequeueTaskResponse{
 		Cmd: &cereal.DequeueTaskResponse_Dequeue_{
@@ -457,7 +457,7 @@ func (s *CerealService) DequeueTask(req cereal.Cereal_DequeueTaskServer) error {
 	}
 
 	if fail := msg.GetFail(); fail != nil {
-		logctx.Info("failing task")
+		logctx.Debug("failing task")
 		if err := completer.Fail(fail.GetError()); err != nil {
 			logctx.WithError(err).Error("failed to fail task")
 			if err == libcereal.ErrTaskLost {
@@ -466,7 +466,7 @@ func (s *CerealService) DequeueTask(req cereal.Cereal_DequeueTaskServer) error {
 			return err
 		}
 	} else if succeed := msg.GetSucceed(); succeed != nil {
-		logctx.Info("succeeding task")
+		logctx.Debug("succeeding task")
 		if err := completer.Succeed(succeed.GetResult()); err != nil {
 			logrus.WithError(err).Error("failed to succeed task")
 			if err == libcereal.ErrTaskLost {

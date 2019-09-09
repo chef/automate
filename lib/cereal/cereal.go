@@ -1163,7 +1163,7 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 		if wevt.CompletedTaskCount != wevt.EnqueuedTaskCount {
 			logctx.WithError(decision.err).Warn("Workflow failed with pending tasks")
 		} else {
-			logctx.WithError(decision.err).Info("Workflow complete with error")
+			logctx.WithError(decision.err).Debug("Workflow complete with error")
 		}
 
 		err = completer.Fail(decision.err)
@@ -1177,7 +1177,7 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 		if wevt.CompletedTaskCount != wevt.EnqueuedTaskCount {
 			logctx.Warn("Workflow complete with pending tasks")
 		} else {
-			logctx.Info("Completing workflow")
+			logctx.Debug("Completing workflow")
 		}
 		jsonResult, err := jsonify(decision.result)
 		if err != nil {

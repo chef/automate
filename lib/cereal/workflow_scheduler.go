@@ -124,7 +124,7 @@ func (w *WorkflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 	nowUTC := time.Now().UTC()
 	nextDueAt := recurrence.After(nowUTC, true).UTC()
 	if nextDueAt.IsZero() {
-		logrus.Infof("Recurrence rule for scheduled workflow %q ends after this run", s.InstanceName)
+		logrus.Infof("Recurrence rule for scheduled workflow %q ends after this run, disabling schedule", s.InstanceName)
 		s.Enabled = false
 	}
 
@@ -132,7 +132,7 @@ func (w *WorkflowScheduler) scheduleWorkflow(ctx context.Context) (time.Duration
 	s.NextDueAt = nextDueAt
 	s.LastEnqueuedAt = nowUTC
 
-	logrus.Infof("Starting scheduled workflow %q", s.InstanceName)
+	logrus.Debugf("Starting scheduled workflow %q", s.InstanceName)
 	err = completer.EnqueueAndUpdateScheduledWorkflow(s)
 	if err != nil {
 		if err == ErrWorkflowInstanceExists {
