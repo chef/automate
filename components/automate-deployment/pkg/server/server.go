@@ -179,7 +179,7 @@ func (s *server) Deploy(ctx context.Context,
 	}
 
 	sender := s.newEventSender()
-	task, err := s.doDeploySome(s.deployment.ServiceNames(), sender, true)
+	task, err := s.doDeploySome(s.deployment.ServiceNames(), sender, true, request.UsedBootstrapBundle)
 	if err != nil {
 		return nil, err
 	}
@@ -219,7 +219,7 @@ func (s *server) StartNonDataServices(ctx context.Context,
 		}
 	}
 
-	task, err := s.doDeploySome(svcsToStart, sender, true)
+	task, err := s.doDeploySome(svcsToStart, sender, true, request.UsedBootstrapBundle)
 	if err != nil {
 		return nil, err
 	}
@@ -241,7 +241,7 @@ func (s *server) DeployDataServices(ctx context.Context,
 		}
 	}
 
-	task, err := s.doDeploySome(dataServices, sender, false)
+	task, err := s.doDeploySome(dataServices, sender, false, false)
 	if err != nil {
 		return nil, err
 	}
@@ -498,7 +498,7 @@ func (s *errDeployer) ensureCerts() {
 
 func (s *server) doDeploySome(serviceNames []string,
 	sender events.EventSender,
-	isDeployed bool) (*converge.Task, error) {
+	isDeployed bool, usedBootstrapBundle bool) (*converge.Task, error) {
 
 	s.deployment.Lock()
 	defer s.deployment.Unlock()
@@ -532,8 +532,10 @@ func (s *server) doDeploySome(serviceNames []string,
 		// NOTE(ssd) 2018-01-25: We don't use the timeout from
 		// the request because a deploy outlives the request
 		eDeploy.ensureStatus(context.Background(), serviceNames, s.ensureStatusTimeout)
-		eDeploy.maybeCreateInitialUser(serviceNames)
-		eDeploy.maybeApplyLicense(serviceNames)
+		if !usedBootstrapBundle {
+			eDeploy.maybeCreateInitialUser(serviceNames)
+			eDeploy.maybeApplyLicense(serviceNames)
+		}
 
 		completionMsg := api.CompleteOk
 		logMsg := "OK"
@@ -641,7 +643,7 @@ func (s *server) DeploySome(ctx context.Context,
 		return nil, err
 	}
 
-	task, err := s.doDeploySome(servicesToDeploy, sender, true)
+	task, err := s.doDeploySome(servicesToDeploy, sender, true, req.UsedBootstrapBundle)
 	if err != nil {
 		return nil, err
 	}

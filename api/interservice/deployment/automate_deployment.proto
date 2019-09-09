@@ -140,6 +140,7 @@ message ConfigureDeploymentResponse {
 
 message DeployRequest {
 	repeated string services = 1;
+	bool used_bootstrap_bundle = 2;
 }
 
 message DeployResponse {

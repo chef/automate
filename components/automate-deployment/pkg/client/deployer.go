@@ -1547,7 +1547,7 @@ func (d *deployer) saveDeploymentCreds() {
 
 	// We don't need to write out any credentials if automate is not deployed.
 	// As an example, if we've deployed only chef-server
-	if !deployment.ContainsAutomateCollection(d.mergedCfg.GetDeployment()) {
+	if !deployment.ContainsAutomateCollection(d.mergedCfg.GetDeployment()) && d.bootstrapBundlePath == "" {
 		return
 	}
 
@@ -1647,7 +1647,9 @@ func (d *deployer) deployAll() {
 	}
 
 	d.writer.Title("Starting deploy")
-	resp, err := d.client.Deploy(d.ctx, &api.DeployRequest{})
+	resp, err := d.client.Deploy(d.ctx, &api.DeployRequest{
+		UsedBootstrapBundle: d.bootstrapBundlePath != "",
+	})
 	if err != nil {
 		d.err = status.Annotate(err, status.DeployError)
 		return
