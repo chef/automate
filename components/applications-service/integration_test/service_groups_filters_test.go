@@ -928,3 +928,177 @@ func TestServiceGroupsFilterPartSGVersionOrigin(t *testing.T) {
 	assert.Nil(t, err)
 	assertServiceGroupsEqual(t, expected, response)
 }
+
+func TestServiceGroupsFilterEnvironmentWildcard(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"environment:a*"},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "a.default",
+					Package:          "core/a",
+					Release:          "0.1.0/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+			},
+		}
+		mockHabServicesMatrix = habServicesABCD()
+	)
+
+	suite.IngestServices(mockHabServicesMatrix)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
+}
+
+// Single letter wildcard
+func TestServiceGroupsFilterEnvironmentQuestion(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"environment:a_?nv"},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "a.default",
+					Package:          "core/a",
+					Release:          "0.1.0/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+			},
+		}
+		mockHabServicesMatrix = habServicesABCD()
+	)
+
+	suite.IngestServices(mockHabServicesMatrix)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
+}
+
+// Wild card in one field and not wild card in another
+func TestServiceGroupsFilterEnAppWildAndNot(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"environment:a*", "application:a_app"},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "a.default",
+					Package:          "core/a",
+					Release:          "0.1.0/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+			},
+		}
+		mockHabServicesMatrix = habServicesABCD()
+	)
+
+	suite.IngestServices(mockHabServicesMatrix)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
+}
+
+// Same field has one wildcard and one not wild card
+func TestServiceGroupsFilterEnvWildAndNot(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"environment:a*", "environment:a_env"},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "a.default",
+					Package:          "core/a",
+					Release:          "0.1.0/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+			},
+		}
+		mockHabServicesMatrix = habServicesABCD()
+	)
+
+	suite.IngestServices(mockHabServicesMatrix)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
+}
+
+//Two wild cards in different fields
+func TestServiceGroupsFilterDoubleWild(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsReq{
+			Filter: []string{"environment:a*", "application:a*"},
+		}
+		expected = &applications.ServiceGroups{
+			ServiceGroups: []*applications.ServiceGroup{
+				{
+					Name:             "a.default",
+					Package:          "core/a",
+					Release:          "0.1.0/20190101121212",
+					Status:           applications.HealthStatus_UNKNOWN,
+					HealthPercentage: 0,
+					Application:      "a_app",
+					Environment:      "a_env",
+					ServicesHealthCounts: &applications.HealthCounts{
+						Total:   1,
+						Unknown: 1,
+					},
+				},
+			},
+		}
+		mockHabServicesMatrix = habServicesABCD()
+	)
+
+	suite.IngestServices(mockHabServicesMatrix)
+	defer suite.DeleteDataFromStorage()
+
+	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
+	assert.Nil(t, err)
+	assertServiceGroupsEqual(t, expected, response)
+}

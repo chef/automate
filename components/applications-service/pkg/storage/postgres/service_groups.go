@@ -161,12 +161,11 @@ func (db *Postgres) GetServiceGroups(
 	if err != nil {
 		return nil, err
 	}
-	whereQuery = whereQuery + paginationSorting
-
 	// Formatting our Query with sort field and sort order
-	formattedQuery := fmt.Sprintf(whereQuery, formatSortFields(sortField, sortOrder))
+	formattedSortQuery := fmt.Sprintf(paginationSorting, formatSortFields(sortField, sortOrder))
+	whereQuery = whereQuery + formattedSortQuery
 
-	_, err = db.DbMap.Select(&sgHealth, formattedQuery, pageSize, offset)
+	_, err = db.DbMap.Select(&sgHealth, whereQuery, pageSize, offset)
 	if err != nil {
 		return nil, errors.Wrap(err, "Unable to retrieve service groups from the database")
 	}
@@ -429,11 +428,17 @@ func queryFromStatusFilter(text string) (string, error) {
 }
 
 func queryFromFieldFilter(field string, arr []string, first bool) (string, error) {
-	var condition string
+	var (
+		condition    string
+		preCondition string
+		wildcard     string
+	)
+	isCondition := false
+	isWildcard := false
 	if first {
-		condition = ` WHERE `
+		preCondition = ` WHERE `
 	} else { // not first, add on an AND before IN part
-		condition = ` AND `
+		preCondition = ` AND `
 	}
 	if !pgutils.IsSqlSafe(field) {
 		return "", &errorutils.InvalidError{Msg: fmt.Sprintf("Unsupported character found in field: %s", field)}
@@ -441,15 +446,35 @@ func queryFromFieldFilter(field string, arr []string, first bool) (string, error
 	condition = condition + fmt.Sprintf(" %s IN (", field)
 	if len(arr) > 0 {
 		for index, item := range arr {
-			condition += fmt.Sprintf("'%s'", pgutils.EscapeLiteralForPG(item))
-			if index < len(arr)-1 {
-				condition += ","
+			if strings.ContainsAny(item, "?*") {
+				//Replace all * with % and all ? with _ for PG Formatting
+				pgWild := strings.Replace(item, "*", "%", -1)
+				pgWild = strings.Replace(pgWild, "?", "_", -1)
+				wildcard = fmt.Sprintf("%s LIKE '%s'", field, pgutils.EscapeLiteralForPG(pgWild))
+				isWildcard = true
+			} else {
+				isCondition = true
+				condition += fmt.Sprintf("'%s'", pgutils.EscapeLiteralForPG(item))
+				if index < len(arr)-1 {
+					condition += ","
+				}
 			}
 		}
 	} else {
-		condition += "''"
+		return "", nil
 	}
-	return condition + ")", nil
+
+	if isCondition && !isWildcard {
+		return preCondition + " " + condition + ")", nil
+	} else if !isCondition && isWildcard {
+		//Add parenthesis to logically group wildcards together
+		return preCondition + " " + wildcard + " ", nil
+	} else if isCondition && isWildcard {
+		//Add parenthesis to logically group IN statement with OR'ed wildcard LIKE statements
+		return preCondition + " ( " + condition + ") OR " + wildcard + " )", nil
+	} // else !isCondition && !isWildcard (how would this happen?)
+	return "", nil
+
 }
 
 // formatSortFields returns a customized ORDER BY statement from the provided sort field,
