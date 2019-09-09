@@ -1,6 +1,33 @@
-import { RollupServiceStatus, SortDirection  } from '../../types/types';
+import { HttpErrorResponse } from '@angular/common/http';
+import { EntityStatus } from 'app/entities/entities';
+import {
+  Chicklet,
+  RollupServiceStatus,
+  SortDirection
+} from 'app/types/types';
 
-export interface HealthSummary {
+export interface ServiceGroup {
+  id: string;
+  name: string;
+  package: string;
+  release: string;
+  status: string;
+  health_percentage: boolean;
+  services_health_counts: ServiceGroupsHealthSummary;
+  applications: string;
+  environment: string;
+}
+
+export interface ServiceGroupsFilters {
+  page?: number;
+  pageSize?: number;
+  status?: RollupServiceStatus;
+  searchBar?: Array<Chicklet>;
+  sortField?: string;
+  sortDirection?: SortDirection;
+}
+
+export interface ServiceGroupsHealthSummary {
   total: number;
   ok: number;
   warning: number;
@@ -8,7 +35,29 @@ export interface HealthSummary {
   unknown: number;
 }
 
-export interface Service {
+export interface ServiceGroupsSuggestions {
+  values: string[];
+  status: EntityStatus;
+}
+
+export interface ServiceGroupsPayload {
+  service_groups: ServiceGroup[];
+}
+
+export interface SelectedServiceGroup {
+  name: string;
+  services: GroupServices;
+}
+
+export interface GroupServices {
+  list: GroupService[];
+  filters: GroupServicesFilters;
+  status: EntityStatus;
+  error: HttpErrorResponse;
+  healthSummary: ServiceGroupsHealthSummary;
+}
+
+export interface GroupService {
   supervisor_id: string;
   release: string;
   group: string;
@@ -25,43 +74,20 @@ export interface Service {
   health_updated_at: Date;
 }
 
-export interface ServiceGroup {
-  id: string;
-  name: string;
-  package: string;
-  release: string;
-  status: string;
-  health_percentage: boolean;
-  services_health_counts: HealthSummary;
-  applications: string;
-  environment: string;
-}
-
-export interface ServiceGroupFilters {
+export interface GroupServicesFilters {
+  service_group_id?: string;
+  health?: string;
   page?: number;
   pageSize?: number;
-  status?: RollupServiceStatus;
-  sortField?: string;
-  sortDirection?: SortDirection;
 }
 
-export interface ServicesFilters {
-  service_group_id?: string;
-  health: string;
-  page: number;
-  pageSize?: number;
-}
-
-export interface ServicesPayload {
+export interface GroupServicesPayload {
   group: string;
-  services: Service[];
-  services_health_counts: HealthSummary;
+  services: GroupService[];
+  services_health_counts: ServiceGroupsHealthSummary;
 }
 
-export interface ServiceGroupsPayload {
-  service_groups: ServiceGroup[];
-}
-
+// Not used within file
 export interface FieldDirection {
   name: SortDirection;
   percent_ok: SortDirection;

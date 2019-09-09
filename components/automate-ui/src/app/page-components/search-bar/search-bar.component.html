@@ -25,13 +25,13 @@
       </chef-button>
     </div>
   </div>
-  <div *ngIf="suggestionsVisible && selectedCategoryType && (search_box.value.length > 0 || hasStaticSuggestions())"
+  <div *ngIf="suggestionsVisible && selectedCategoryType"
     class="input-dropdown suggestions">
     <ul>
       <li *ngIf="isLoadingSuggestions" class="suggestion-status">
           Loading...
       </li>
-      <li *ngIf="!isLoadingSuggestions && suggestions.isEmpty()"
+      <li *ngIf="!isLoadingSuggestions && suggestions.isEmpty() && search_box.value.length > 0"
         class="suggestion-status">
         No matching results found
       </li>

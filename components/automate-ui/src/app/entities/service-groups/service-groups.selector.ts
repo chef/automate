@@ -1,35 +1,76 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
 
-import { ServiceGroupEntityState } from './service-groups.reducer';
+import { ServiceGroupsEntityState } from './service-groups.reducer';
 
-export const serviceGroupState = createFeatureSelector<ServiceGroupEntityState>('serviceGroups');
+export const serviceGroupsState = createFeatureSelector<ServiceGroupsEntityState>('serviceGroups');
 
-export const serviceGroupStatus = createSelector(
-  serviceGroupState,
-  (state) => state.status
+export const serviceGroupsError = createSelector(
+  serviceGroupsState,
+  (serviceGroups) => serviceGroups.error
 );
 
-export const servicesStatus = createSelector(
-  serviceGroupState,
-  (state) => state.servicesStatus
+export const serviceGroupsFilters = createSelector(
+  serviceGroupsState,
+  (serviceGroups) => serviceGroups.filters
 );
 
-export const allServiceGroups = createSelector(
-  serviceGroupState,
-  (state) => state.serviceGroups
+export const serviceGroupsHealth = createSelector(
+  serviceGroupsState,
+  (serviceGroups) => serviceGroups.healthSummary
 );
 
-export const allServiceGroupHealth = createSelector(
-  serviceGroupState,
-  (state) => state.serviceGroupHealthCounts
+export const serviceGroupsList = createSelector(
+  serviceGroupsState,
+  (serviceGroups) => serviceGroups.list
 );
 
-export const serviceGroupErrorResp = createSelector(
-  serviceGroupState,
-  (state) => state.errorResp
+export const serviceGroupsStatus = createSelector(
+  serviceGroupsState,
+  (serviceGroups) => serviceGroups.status
 );
 
-export const servicesErrorResp = createSelector(
-  serviceGroupState,
-  (state) => state.servicesErrorResp
+export const serviceGroupsSuggestions = createSelector(
+  serviceGroupsState,
+  (serviceGroups) => serviceGroups.suggestions
+);
+
+export const selectedServiceGroup = createSelector(
+  serviceGroupsState,
+  (serviceGroups) => serviceGroups.selectedGroup
+);
+
+
+export const selectedServiceGroupName = createSelector(
+  serviceGroupsState,
+  (serviceGroups) => serviceGroups.selectedGroup.name
+);
+
+export const selectedServiceGroupServices = createSelector(
+  serviceGroupsState,
+  (serviceGroups) => serviceGroups.selectedGroup.services
+);
+
+export const selectedServiceGroupList = createSelector(
+  serviceGroupsState,
+  (serviceGroups) => serviceGroups.selectedGroup.services.list
+);
+
+export const selectedServiceGroupError = createSelector(
+  serviceGroupsState,
+  (serviceGroups) => serviceGroups.selectedGroup.services.error
+);
+
+export const selectedServiceGroupFilters = createSelector(
+  serviceGroupsState,
+  (serviceGroups) => serviceGroups.selectedGroup.services.filters
+);
+
+export const selectedServiceGroupHealth = createSelector(
+  serviceGroupsState,
+  (serviceGroups) => serviceGroups.selectedGroup.services.healthSummary
+);
+
+export const selectedServiceGroupStatus = createSelector(
+  serviceGroupsState,
+  (serviceGroups) => serviceGroups.selectedGroup.services.status
 );
