@@ -181,111 +181,46 @@ func serve(ctx context.Context, config *config.Nodemanager, connFactory *securec
 		}
 	}
 
-	// SOON: Make all of *waves hands* less repetitive.
-	// Prelude to initializing the manager: create rrules for schedule
-	// Right now, this is migration only -- doesn't handle config change.
-	awsPollInterval := config.Manager.AwsEc2PollIntervalMinutes
-	rule, err := rrule.NewRRule(rrule.ROption{
-		Freq:     rrule.MINUTELY,
-		Interval: awsPollInterval,
-		Dtstart:  time.Now(),
-	})
-	if err != nil {
-		return errors.Wrapf(err, "Could not create recurrence rule for nodemanager workflow %s", Awsec2PollingJobName)
-	}
+	kindsOfChecks := [3]string{"aws", "azure", "manager"}
+	var pollInterval int
+	var jobName string
+	var scheduleName string
 
-	azurePollInterval := config.Manager.AzureVMPollIntervalMinutes
-	azureRule, err := rrule.NewRRule(rrule.ROption{
-		Freq:     rrule.MINUTELY,
-		Interval: azurePollInterval,
-		Dtstart:  time.Now(),
-	})
-	if err != nil {
-		return errors.Wrapf(err, "Could not create recurrence rule for nodemanager workflow %s", AzurevmPollingJobName)
-	}
-
-	// managersPollInterval := 120
-	// poll faster for debugging
-	managersPollInterval := 1
-	managersRule, err := rrule.NewRRule(rrule.ROption{
-		Freq:     rrule.MINUTELY,
-		Interval: managersPollInterval,
-		Dtstart:  time.Now(),
-	})
-	if err != nil {
-		return errors.Wrapf(err, "Could not create recurrence rule for nodemanager workflow %s", ManagersPollingJobName)
-	}
-
-	err = cerealManager.CreateWorkflowSchedule(Awsec2PollingScheduleName, Awsec2PollingJobName, nil, true, rule)
-	if err != nil {
-		if err == cereal.ErrWorkflowScheduleExists {
-			log.Infof("nodemanager workflow schedule %s already exists, not migrating", Awsec2PollingScheduleName)
-			// If the schedule exists, make sure the rrule is up-to-date.
-			schedule, err := cerealManager.GetWorkflowScheduleByName(ctx, Awsec2PollingScheduleName, Awsec2PollingJobName)
-			if err != nil {
-				return errors.Wrapf(err, "failed to get scheduled workflow %s from cereal manager", Awsec2PollingScheduleName)
-			}
-			scheduledRule, err := schedule.GetRRule()
-			if err != nil {
-				return errors.Wrapf(err, "unable to get rrule for scheduled workflow %s", Awsec2PollingScheduleName)
-			}
-			if scheduledRule != rule {
-				err = cerealManager.UpdateWorkflowScheduleByName(context.Background(), Awsec2PollingScheduleName, Awsec2PollingJobName, cereal.UpdateRecurrence(rule))
-				if err != nil {
-					return errors.Wrapf(err, "unable to update recurrence rule for scheduled workflow %s", Awsec2PollingScheduleName)
-				}
-			}
-		} else {
-			return errors.Wrapf(err, "Could not continue creating workflow schedule %s", Awsec2PollingScheduleName)
+	// Prelude to initializing the cereal manager: set up recurrence rules and schedules.
+	for _, k := range kindsOfChecks {
+		switch checkType := k; checkType {
+		case "aws":
+			pollInterval = config.AwsEc2PollIntervalMinutes
+			jobName = Awsec2PollingJobName
+			scheduleName = Awsec2PollingScheduleName
+		case "azure":
+			pollInterval = config.AzureVMPollIntervalMinutes
+			jobName = AzurevmPollingJobName
+			scheduleName = AzurevmPollingScheduleName
+		case "manager":
+			// The default for the manager check is *not* set in the config. 120 was the default in the pre-cereal code.
+			pollInterval = 120
+			jobName = ManagersPollingJobName
+			scheduleName = ManagersPollingScheduleName
+		default:
 		}
-	}
 
-	err = cerealManager.CreateWorkflowSchedule(AzurevmPollingScheduleName, AzurevmPollingJobName, nil, true, azureRule)
-	if err != nil {
-		if err == cereal.ErrWorkflowScheduleExists {
-			log.Infof("nodemanager workflow schedule %s already exists, not migrating", AzurevmPollingScheduleName)
-			// If the schedule exists, make sure the rrule is up-to-date.
-			schedule, err := cerealManager.GetWorkflowScheduleByName(ctx, AzurevmPollingScheduleName, AzurevmPollingJobName)
-			if err != nil {
-				return errors.Wrapf(err, "failed to get scheduled workflow %s from cereal manager", AzurevmPollingScheduleName)
-			}
-			scheduledRule, err := schedule.GetRRule()
-			if err != nil {
-				return errors.Wrapf(err, "unable to get rrule for scheduled workflow %s", AzurevmPollingScheduleName)
-			}
-			if scheduledRule != rule {
-				err = cerealManager.UpdateWorkflowScheduleByName(context.Background(), AzurevmPollingScheduleName, AzurevmPollingJobName, cereal.UpdateRecurrence(rule))
-				if err != nil {
-					return errors.Wrapf(err, "unable to update recurrence rule for scheduled workflow %s", AzurevmPollingScheduleName)
-				}
-			}
-		} else {
-			return errors.Wrapf(err, "Could not continue creating workflow schedule %s", AzurevmPollingScheduleName)
+		// Create rrule.
+		rule, err := rrule.NewRRule(rrule.ROption{
+			Freq:     rrule.MINUTELY,
+			Interval: pollInterval,
+			Dtstart:  time.Now(),
+		})
+		if err != nil {
+			return errors.Wrapf(err, "Could not create recurrence rule for nodemanager workflow %s", Awsec2PollingJobName)
 		}
-	}
 
-	err = cerealManager.CreateWorkflowSchedule(ManagersPollingScheduleName, ManagersPollingJobName, nil, true, managersRule)
-	if err != nil {
-		if err == cereal.ErrWorkflowScheduleExists {
-			log.Infof("nodemanager workflow schedule %s already exists, not migrating", ManagersPollingScheduleName)
-			// If the schedule exists, make sure the rrule is up-to-date.
-			schedule, err := cerealManager.GetWorkflowScheduleByName(ctx, ManagersPollingScheduleName, ManagersPollingJobName)
-			if err != nil {
-				return errors.Wrapf(err, "failed to get scheduled workflow %s from cereal manager", ManagersPollingScheduleName)
-			}
-			scheduledRule, err := schedule.GetRRule()
-			if err != nil {
-				return errors.Wrapf(err, "unable to get rrule for scheduled workflow %s", ManagersPollingScheduleName)
-			}
-			if scheduledRule != rule {
-				err = cerealManager.UpdateWorkflowScheduleByName(context.Background(), ManagersPollingScheduleName, ManagersPollingJobName, cereal.UpdateRecurrence(rule))
-				if err != nil {
-					return errors.Wrapf(err, "unable to update recurrence rule for scheduled workflow %s", ManagersPollingScheduleName)
-				}
-			}
-		} else {
-			return errors.Wrapf(err, "Could not continue creating workflow schedule %s", ManagersPollingJobName)
+		// Set up workflow schedule.
+		err = createOrUpdateWorkflowSchedule(cerealManager, scheduleName, jobName, rule)
+		if err != nil {
+			return err
 		}
+
 	}
 
 	// The cereal manager has been initialized and can (finally) be started.
@@ -327,4 +262,31 @@ func newGRPCServer(db *pgdb.DB, connFactory *secureconn.Factory, config *config.
 	reflection.Register(s)
 
 	return s
+}
+
+func createOrUpdateWorkflowSchedule(cerealManager *cereal.Manager, scheduleName string, jobName string, rule *rrule.RRule) error {
+	err := cerealManager.CreateWorkflowSchedule(context.Background(), scheduleName, jobName, nil, true, rule)
+	if err != nil {
+		if err == cereal.ErrWorkflowScheduleExists {
+			log.Infof("nodemanager workflow schedule %s already exists, not migrating", scheduleName)
+			// If the schedule exists, make sure the rrule is up-to-date.
+			schedule, err := cerealManager.GetWorkflowScheduleByName(context.Background(), scheduleName, jobName)
+			if err != nil {
+				return errors.Wrapf(err, "failed to get scheduled workflow %s from cereal manager", scheduleName)
+			}
+			scheduledRule, err := schedule.GetRRule()
+			if err != nil {
+				return errors.Wrapf(err, "unable to get rrule for scheduled workflow %s", scheduleName)
+			}
+			if scheduledRule != rule {
+				err = cerealManager.UpdateWorkflowScheduleByName(context.Background(), scheduleName, jobName, cereal.UpdateRecurrence(rule))
+				if err != nil {
+					return errors.Wrapf(err, "unable to update recurrence rule for scheduled workflow %s", scheduleName)
+				}
+			}
+		} else {
+			return errors.Wrapf(err, "Could not continue creating workflow schedule %s", scheduleName)
+		}
+	}
+	return nil
 }
