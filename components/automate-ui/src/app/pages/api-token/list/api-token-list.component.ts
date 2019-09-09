@@ -1,6 +1,5 @@
 import { Component, EventEmitter, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
 import { filter, takeUntil, map } from 'rxjs/operators';
@@ -54,7 +53,6 @@ export class ApiTokenListComponent implements OnInit {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private router: Router,
     fb: FormBuilder) {
     this.loading$ = store.pipe(select(apiTokenStatus), map(loading));
     this.sortedApiTokens$ = store.pipe(
@@ -147,7 +145,6 @@ export class ApiTokenListComponent implements OnInit {
           this.creatingToken = false;
           if (state === EntityStatus.loadingSuccess) {
             this.closeCreateModal();
-            this.router.navigate(['/settings', 'tokens', tok.id]);
           }
           if (state === EntityStatus.loadingFailure) {
             const pendingCreateError = new Subject<boolean>();
