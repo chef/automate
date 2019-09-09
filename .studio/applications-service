@@ -250,20 +250,22 @@ function applications_populate_database() {
   install_if_missing core/util-linux uuidgen
 
   for _ in $(seq 1 12); do
-    applications_publish_supervisor_message --name nginx --group "kansas-prod"\
+    applications_publish_supervisor_message --name nginx --group "default"\
       --origin custom --version "1.0.1" --release "20190115184823" --health 2\
-      --sup-id "$(uuidgen)" --site "testsite" --channel "stable"
+      --sup-id "$(uuidgen)" --site "testsite" --channel "stable" \
+      --application "bldr-cache" --environment "qa"
   done
 
   for _ in $(seq 1 11); do
-    applications_publish_supervisor_message --name "billing-svc" --group "kansas-prod"\
+    applications_publish_supervisor_message --name "billing-svc" --group "default"\
       --origin custom --version "1.3.4" --release "20190115182382" --health 2\
-      --sup-id "$(uuidgen)" --site "testsite" --channel "stable"
+      --sup-id "$(uuidgen)" --site "testsite" --channel "stable" \
+      --application "billing-backend" --environment "qa"
   done
 
   # 40 Critical
   for _ in $(seq 1 40); do
-    applications_publish_supervisor_message --name nginx --group dev\
+    applications_publish_supervisor_message --name nginx --group default \
       --origin custom --version "2.0.0" --release "20190115189976" --health 2\
       --sup-id "$(uuidgen)" --site "testsite" --channel "unstable"
   done
@@ -282,7 +284,7 @@ function applications_populate_database() {
   done
   # 10 OK
   for _ in $(seq 41 50); do
-    applications_publish_supervisor_message --name redis --group default\
+    applications_publish_supervisor_message --name redis --group default \
       --origin custom --version "1.0.1" --release "20190115189830" --health 0\
       --sup-id "$(uuidgen)" --site "default" --channel "stable"
   done
@@ -309,37 +311,75 @@ function applications_populate_database() {
     --sup-id "$(uuidgen)" --site "testsite" --channel "stable"
 
   # Acceptance Unknown
-  applications_publish_supervisor_message --name "sample-app" --group "acceptance"\
-    --origin custom --version "0.0.1" --health 3 --sup-id "$(uuidgen)"
+  applications_publish_supervisor_message --name "sample-app" --group "default"\
+    --origin custom --version "0.0.1" --health 3 --sup-id "$(uuidgen)" \
+    --application "sample-app" --environment "acceptance"
 
-  # postgres.japan-prod
   for _ in $(seq 1 120); do
-    applications_publish_supervisor_message --name "postgres" --group "japan-prod"\
+    applications_publish_supervisor_message --name "mobile-api-frontend" --group "default"\
       --origin custom --version "2.3" --release "20190115184823" --health 0\
-      --sup-id "$(uuidgen)"
+      --sup-id "$(uuidgen)" \
+      --site "jp" --application "mobile-app-api" --environment "production"
   done
 
-  # postgres.us-west1-prod (different supervisors than the postgres db above)
   for _ in $(seq 121 130); do
-    applications_publish_supervisor_message --name "postgres" --group "us-west1-prod"\
+    applications_publish_supervisor_message --name "mobile-api-frontend" --group "default"\
       --origin custom --version "1.9.2" --release "20190115181111" --health 0\
-      --sup-id "$(uuidgen)"
+      --sup-id "$(uuidgen)" \
+      --site "us-west-1" --application "mobile-app-api" --environment "production"
   done
+
+  applications_publish_supervisor_message --name "mobile-api-photos" --group "default"\
+    --origin custom --version "2.0.5" --release "20190115181118" --health 0\
+    --sup-id "$(uuidgen)" \
+    --site "us-west-1" --application "mobile-app-api" --environment "production"
+
+  applications_publish_supervisor_message --name "mobile-api-database" --group "default"\
+    --origin custom --version "2.0.8" --release "20190115181199" --health 0\
+    --sup-id "$(uuidgen)" \
+    --site "us-west-1" --application "mobile-app-api" --environment "production"
+
+  applications_publish_supervisor_message --name "mobile-api-auth" --group "default"\
+    --origin custom --version "2.0.8" --release "20190115181192" --health 0\
+    --sup-id "$(uuidgen)" \
+    --site "us-west-1" --application "mobile-app-api" --environment "production"
+
+  applications_publish_supervisor_message --name "mobile-api-frontend" --group "default"\
+    --origin custom --version "1.9.2" --release "20190115181111" --health 0\
+    --sup-id "$(uuidgen)" \
+    --site "us-west-1" --application "mobile-app-api" --environment "qa"
+
+  applications_publish_supervisor_message --name "mobile-api-photos" --group "default"\
+    --origin custom --version "2.0.5" --release "20190115181118" --health 0\
+    --sup-id "$(uuidgen)" \
+    --site "us-west-1" --application "mobile-app-api" --environment "qa"
+
+  applications_publish_supervisor_message --name "mobile-api-database" --group "default"\
+    --origin custom --version "2.0.8" --release "20190115181199" --health 0\
+    --sup-id "$(uuidgen)" \
+    --site "us-west-1" --application "mobile-app-api" --environment "qa"
+
+  applications_publish_supervisor_message --name "mobile-api-auth" --group "default"\
+    --origin custom --version "2.0.8" --release "20190115181192" --health 2\
+    --sup-id "$(uuidgen)" \
+    --site "us-west-1" --application "mobile-app-api" --environment "qa"
 
   ##
   # Service groups with a larger set of health statuses. This excercises some
   # filtering cases, such as whether a service group with 1 service in critical
   # and 1 warning shows up when filtering for warning.
   for health_code in $(seq 0 3); do
-    applications_publish_supervisor_message --name "pos-terminal" --group "us-east-1" \
+    applications_publish_supervisor_message --name "pos-terminal" --group "default" \
       --origin custom --version "2.3.4" --release "20190115181111" --health "$health_code" \
-      --sup-id "$(uuidgen)"
+      --sup-id "$(uuidgen)" \
+      --application "pos" --environment "production-us-east" --site "ny-123"
   done
 
   for health_code in 0 1 3 ; do
     applications_publish_supervisor_message --name "pos-terminal" --group "us-east-2" \
       --origin custom --version "2.3.4" --release "20190115181111" --health "$health_code" \
-      --sup-id "$(uuidgen)"
+      --sup-id "$(uuidgen)" \
+      --application "pos" --environment "production-us-east" --site "ny-789"
   done
 
   # We have a custom visual treatment when application, environment, or channel
@@ -364,8 +404,9 @@ function applications_populate_database() {
   # update this part of the code if we modify the stuff above. So we just make
   # 26 here and pagination will always happen.
   for i in $(seq 26); do
-    applications_publish_supervisor_message --name "example$i" --group "acceptance"\
-      --origin custom --version "0.0.1" --health 0 --sup-id "$(uuidgen)"
+    applications_publish_supervisor_message --name "example$i" --group "default"\
+      --origin mycorp --version "0.0.1" --health 0 --sup-id "$(uuidgen)" \
+      --application "microservice-app" --environment "qa" --site "cloud-oregon"
   done
 }
 
