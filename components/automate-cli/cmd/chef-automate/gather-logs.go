@@ -435,11 +435,10 @@ func runGatherLogsLocalCmd(outfileOverride string, logLines uint64) error {
 	g.AddCommand("hab_sup_status", "hab", "sup", "status")
 	if logLines > 0 {
 		logLinesStr := strconv.FormatUint(logLines, 10)
-		g.AddCommand("journalctl_chef-automate", "journalctl", "--utc", "-u", "chef-automate", "-n", logLinesStr)
+		g.AddCommand("journalctl_chef-automate", "journalctl", "--utc", "-u", "chef-automate", "-u", "hab-sup", "-n", logLinesStr)
 	} else {
-		g.AddCommand("journalctl_chef-automate", "journalctl", "--utc", "-u", "chef-automate")
+		g.AddCommand("journalctl_chef-automate", "journalctl", "--utc", "-u", "chef-automate", "-u", "hab-sup")
 	}
-	g.AddCommand("journalctl_chef-automate", "journalctl", "--utc", "-u", "chef-automate")
 
 	// hab version info
 	g.AddCommand("hab_version", "hab", "--version")
