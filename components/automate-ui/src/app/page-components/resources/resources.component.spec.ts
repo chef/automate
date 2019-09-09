@@ -6,8 +6,8 @@ import { NodeDetailsService } from '../../services/node-details/node-details.ser
 import { DeltaViewerComponent } from '../delta-viewer/delta-viewer.component';
 import { ResourcesComponent } from './resources.component';
 import { ResourceItemComponent } from '../resource-item/resource-item.component';
-import { SelectedStatusPipe } from '../../pipes/selected-status.pipe';
 import { ChefStatusIconPipe } from '../../pipes/chef-status-icon.pipe';
+import { ChefPipesModule } from '../../pipes/chef-pipes.module';
 
 describe('ResourcesComponent', () => {
   let fixture, component, element;
@@ -16,7 +16,7 @@ describe('ResourcesComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         ChefComponentsModule,
-        SelectedStatusPipe
+        ChefPipesModule
       ],
       declarations: [
         DeltaViewerComponent,
