@@ -305,14 +305,14 @@ const routes: Routes = [
     pathMatch: 'prefix',
     redirectTo: 'settings/node-credentials'
   },
-  { // ued by projects-filter.service.ts
+  { // used by projects-filter.service.ts
     path: 'reload',
     children: []
   },
   // END Deprecated routes.
   { // everything unknown goes to client runs
     path: '**',
-    redirectTo: 'infrastructure/client-runs'
+    redirectTo: 'dashboards/event-feed'
   }
 ];
 
