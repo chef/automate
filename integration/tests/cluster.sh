@@ -8,6 +8,7 @@ source integration/services/common.sh
 
 _frontend1_container_name="$(service_container_name "cluster1")"
 _frontend2_container_name="$(service_container_name "cluster2")"
+_ssh_node_container_name="$(service_container_name "ssh_node")"
 
 do_setup() {
     do_setup_default
@@ -22,6 +23,10 @@ do_create_config() {
     #shellcheck disable=SC2154
     cat /services/ha_backend.toml >> "$test_config_path"
 
+}
+
+start_ssh_node() {
+    docker_run "${_ssh_node_container_name}" chefes/ssh-target-ubuntu1804:latest
 }
 
 do_deploy() {
@@ -67,7 +72,10 @@ do_deploy() {
             --accept-terms-and-mlsa
 
     start_loadbalancer $frontend1_ip $frontend2_ip
+
+    start_ssh_node
 }
+
 
 do_test_deploy() {
     :
