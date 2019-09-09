@@ -54,10 +54,10 @@ func init() {
 	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/DeleteDisconnectedServices", "applications:serviceGroups", "applications:serviceGroups:delete", "POST", "/beta/applications/delete_disconnected_services", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetDisconnectedServicesConfig", "applications:serviceGroups", "applications:serviceGroups:list", "GET", "/beta/retention/service_groups/disconnected_services/config", func(unexpandedResource string, input interface{}) string {
+	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetDisconnectedServicesConfig", "retention:serviceGroups", "retention:serviceGroups:get", "GET", "/beta/retention/service_groups/disconnected_services/config", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/UpdateDisconnectedServicesConfig", "applications:serviceGroups", "applications:serviceGroups:delete", "POST", "/beta/retention/service_groups/disconnected_services/config", func(unexpandedResource string, input interface{}) string {
+	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/UpdateDisconnectedServicesConfig", "retention:serviceGroups", "retention:serviceGroups:update", "POST", "/beta/retention/service_groups/disconnected_services/config", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*PeriodicMandatoryJobConfig); ok {
 			return policyv2.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -70,10 +70,10 @@ func init() {
 		}
 		return ""
 	})
-	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetDeleteDisconnectedServicesConfig", "applications:serviceGroups", "applications:serviceGroups:list", "GET", "/beta/retention/service_groups/delete_disconnected_services/config", func(unexpandedResource string, input interface{}) string {
+	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetDeleteDisconnectedServicesConfig", "retention:serviceGroups", "retention:serviceGroups:get", "GET", "/beta/retention/service_groups/delete_disconnected_services/config", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/UpdateDeleteDisconnectedServicesConfig", "applications:serviceGroups", "applications:serviceGroups:delete", "POST", "/beta/retention/service_groups/delete_disconnected_services/config", func(unexpandedResource string, input interface{}) string {
+	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/UpdateDeleteDisconnectedServicesConfig", "retention:serviceGroups", "retention:serviceGroups:update", "POST", "/beta/retention/service_groups/delete_disconnected_services/config", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*PeriodicJobConfig); ok {
 			return policyv2.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {

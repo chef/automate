@@ -89,11 +89,11 @@ service ApplicationsService {
 
   rpc GetDisconnectedServicesConfig(GetDisconnectedServicesConfigReq) returns (PeriodicMandatoryJobConfig) {
     option (google.api.http).get = "/beta/retention/service_groups/disconnected_services/config";
-    // TODO: need new resources/policies for this
-    option (chef.automate.api.policy).resource = "service_groups";
-    option (chef.automate.api.policy).action = "list";
-    option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
-    option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
+
+    option (chef.automate.api.policy).resource = "service_groups:scheduler:disconnected_services";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "retention:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "retention:serviceGroups:get";
   };
 
   rpc UpdateDisconnectedServicesConfig(PeriodicMandatoryJobConfig) returns (UpdateDisconnectedServicesConfigRes) {
@@ -101,20 +101,20 @@ service ApplicationsService {
       post: "/beta/retention/service_groups/disconnected_services/config"
       body: "*"
     };
-    // TODO: need new resources/policies for this
-    option (chef.automate.api.policy).resource = "service_groups";
-    option (chef.automate.api.policy).action = "delete";
-    option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
-    option (chef.automate.api.iam.policy).action = "applications:serviceGroups:delete";
+
+    option (chef.automate.api.policy).resource = "service_groups:scheduler:disconnected_services";
+    option (chef.automate.api.policy).action = "configure";
+    option (chef.automate.api.iam.policy).resource = "retention:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "retention:serviceGroups:update";
   };
 
   rpc GetDeleteDisconnectedServicesConfig(GetDeleteDisconnectedServicesConfigReq) returns (PeriodicJobConfig) {
     option (google.api.http).get = "/beta/retention/service_groups/delete_disconnected_services/config";
-    // TODO: need new resources/policies for this
-    option (chef.automate.api.policy).resource = "service_groups";
-    option (chef.automate.api.policy).action = "list";
-    option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
-    option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
+
+    option (chef.automate.api.policy).resource = "service_groups:scheduler:delete_disconnected_services";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "retention:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "retention:serviceGroups:get";
   };
 
   rpc UpdateDeleteDisconnectedServicesConfig(PeriodicJobConfig) returns (UpdateDeleteDisconnectedServicesConfigRes) {
@@ -122,11 +122,11 @@ service ApplicationsService {
       post: "/beta/retention/service_groups/delete_disconnected_services/config"
       body: "*"
     };
-    // TODO: need new resources/policies for this
-    option (chef.automate.api.policy).resource = "service_groups";
-    option (chef.automate.api.policy).action = "delete";
-    option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
-    option (chef.automate.api.iam.policy).action = "applications:serviceGroups:delete";
+
+    option (chef.automate.api.policy).resource = "service_groups:scheduler:delete_disconnected_services";
+    option (chef.automate.api.policy).action = "configure";
+    option (chef.automate.api.iam.policy).resource = "retention:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "retention:serviceGroups:update";
   };
 
   rpc GetVersion (common.version.VersionInfoRequest) returns (common.version.VersionInfo) {
