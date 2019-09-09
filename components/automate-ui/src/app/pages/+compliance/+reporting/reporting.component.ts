@@ -42,6 +42,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     'control_name',
     'environment',
     'inspec_version',
+    'job_id',
     'node_id',
     'node_name',
     'organization',

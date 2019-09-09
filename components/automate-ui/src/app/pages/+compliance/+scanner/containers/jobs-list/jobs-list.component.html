@@ -42,7 +42,7 @@
       <chef-td>
         <chef-button secondary
           *ngIf="job.status === 'completed' && job.recurrence === ''"
-          (click)="viewReport(job.id)">
+          (click)="viewReport(job.id, job.end_time)">
           Report
         </chef-button>
         <chef-button secondary caution
