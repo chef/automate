@@ -68,9 +68,8 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     ]).pipe(
       takeUntil(this.isDestroyed),
       filter(([_, uStatus]: [User[], EntityStatus]) =>
-        uStatus === EntityStatus.loadingSuccess
-      )).subscribe(([users, uStatus]: [User[], EntityStatus]) => {
-        this.isLoading = uStatus === EntityStatus.loading;
+        this.isLoading = uStatus === EntityStatus.loading
+      )).subscribe(([users, _]: [User[], EntityStatus]) => {
         users.sort(
           (a, b) => {
             // Note: the `undefined` is the locale to use for comparison. According to
@@ -131,8 +130,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.userStatus$.pipe(
       takeUntil(this.isDestroyed))
       .subscribe((status) => {
-        this.isLoading = status === EntityStatus.loading;
-        if (!this.isLoading) {
+        if (status !== EntityStatus.loading) {
           this.closeCreateModal();
         }
     });

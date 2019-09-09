@@ -25,9 +25,11 @@
         <div class="line"></div>
         <div class="options">
         <chef-button primary class="create" (click)="handleCreateUser()"
-        [disabled]="!createUserForm.valid" tabindex="2" data-cy="save-user">
-          <chef-icon>save</chef-icon>
-          <span>Save and Close</span>
+          [disabled]="!createUserForm.valid" tabindex="2" data-cy="save-user">
+          <chef-icon *ngIf="!isLoading">save</chef-icon>
+          <span *ngIf="!isLoading">Save and Close </span>
+          <chef-loading-spinner *ngIf="isLoading"></chef-loading-spinner>
+          <span *ngIf="isLoading">Saving...</span>
         </chef-button>
         <chef-button type="reset" tertiary id="cancel" (click)="closeCreateModal()" tabindex="-1">Cancel</chef-button>
         </div>
