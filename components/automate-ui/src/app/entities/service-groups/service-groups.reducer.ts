@@ -1,59 +1,65 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import { set, pipe } from 'lodash/fp';
 import { EntityStatus } from '../entities';
 import { ServiceGroupsActionTypes, ServiceGroupsActions } from './service-groups.actions';
-import { set, pipe } from 'lodash/fp';
 
 import {
-  ServiceGroup, ServiceGroupFilters,
-  Service, ServicesFilters,
-  HealthSummary
+  ServiceGroup,
+  ServiceGroupsFilters,
+  ServiceGroupsHealthSummary,
+  ServiceGroupsSuggestions,
+  SelectedServiceGroup
 } from './service-groups.model';
 
-export interface ServiceGroupEntityState {
-  serviceGroups: ServiceGroup[];
-  serviceGroupHealthCounts: HealthSummary;
+export interface ServiceGroupsEntityState {
+  error: HttpErrorResponse;
+  filters: ServiceGroupsFilters;
+  healthSummary: ServiceGroupsHealthSummary;
+  list: ServiceGroup[];
+  selectedGroup: SelectedServiceGroup;
   status: EntityStatus;
-  filters: ServiceGroupFilters;
-  servicesStatus: EntityStatus;
-  errorResp: HttpErrorResponse;
-  servicesFilters: ServicesFilters;
-  servicesList: Service[];
-  servicesHealthSummary: HealthSummary;
-  servicesErrorResp: HttpErrorResponse;
-  selectedServiceGroupName: string;
+  suggestions: ServiceGroupsSuggestions;
 }
 
-export const ServiceGroupEntityInitialState: ServiceGroupEntityState = {
-  serviceGroups: [],
-  serviceGroupHealthCounts: {
+export const ServiceGroupEntityInitialState: ServiceGroupsEntityState = {
+  error: null,
+  filters: {},
+  healthSummary: {
     total: 0,
     ok: 0,
     warning: 0,
     critical: 0,
     unknown: 0
+  },
+  list: [],
+  selectedGroup: {
+    name: undefined,
+    services: {
+      error: null,
+      filters: {
+        page: 1,
+        health: 'total'
+      },
+      healthSummary: {
+        total: 0,
+        ok: 0,
+        warning: 0,
+        critical: 0,
+        unknown: 0
+      },
+      list: [],
+      status: EntityStatus.notLoaded
+    }
   },
   status: EntityStatus.notLoaded,
-  filters: { },
-  servicesStatus: EntityStatus.notLoaded,
-  errorResp: null,
-  servicesFilters: {
-    page: 1,
-    health: 'total'
-  },
-  servicesList: [],
-  servicesHealthSummary: {
-    total: 0,
-    ok: 0,
-    warning: 0,
-    critical: 0,
-    unknown: 0
-  },
-  servicesErrorResp: null,
-  selectedServiceGroupName: undefined
+  suggestions: {
+    values: [],
+    status: EntityStatus.notLoaded
+  }
 };
 
-export function serviceGroupEntityReducer(
-  state: ServiceGroupEntityState = ServiceGroupEntityInitialState,
+export function serviceGroupsEntityReducer(
+  state: ServiceGroupsEntityState = ServiceGroupEntityInitialState,
   action: ServiceGroupsActions) {
 
   switch (action.type) {
@@ -64,12 +70,12 @@ export function serviceGroupEntityReducer(
     case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_SUCCESS:
       return pipe(
         set('status', EntityStatus.loadingSuccess),
-        set('serviceGroups', action.payload.service_groups))(state);
+        set('list', action.payload.service_groups))(state);
 
     case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_FAILURE:
       return pipe(
         set('status', EntityStatus.loadingFailure),
-        set('errorResp', action.payload))(state);
+        set('error', action.payload))(state);
 
     case ServiceGroupsActionTypes.UPDATE_SERVICE_GROUPS_FILTER: {
       const {filters: filters} = action.payload;
@@ -82,30 +88,46 @@ export function serviceGroupEntityReducer(
     case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_COUNTS_SUCCESS:
       return pipe(
         set('status', EntityStatus.loadingSuccess),
-        set('serviceGroupHealthCounts', action.payload))(state);
+        set('healthSummary', action.payload))(state);
 
     case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_COUNTS_FAILURE:
       return pipe(
         set('status', EntityStatus.loadingFailure),
-        set('errorResp', action.payload))(state);
+        set('error', action.payload))(state);
 
     case ServiceGroupsActionTypes.UPDATE_SELECTED_SERVICE_GROUP:
-      return set('servicesFilters', action.payload, state);
+      return set('selectedGroup.services.filters', action.payload, state);
 
     case ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP:
-      return set('servicesStatus', EntityStatus.loading, state);
+      return set('selectedGroup.services.status', EntityStatus.loading, state);
 
     case ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP_SUCCESS:
       return pipe(
-        set('selectedServiceGroupName', action.payload.group),
-        set('servicesStatus', EntityStatus.loadingSuccess),
-        set('servicesHealthSummary', action.payload.services_health_counts),
-        set('servicesList', action.payload.services))(state);
+        set('selectedGroup.name', action.payload.group),
+        set('selectedGroup.services.status', EntityStatus.loadingSuccess),
+        set('selectedGroup.services.healthSummary', action.payload.services_health_counts),
+        set('selectedGroup.services.list', action.payload.services))(state);
 
     case ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP_FAILURE:
       return pipe(
-        set('servicesStatus', EntityStatus.loadingFailure),
-        set('servicesErrorResp', action.payload))(state);
+        set('selectedGroup.services.status', EntityStatus.loadingFailure),
+        set('selectedGroup.services.error', action.payload))(state);
+
+    case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_SUGGESTIONS:
+      return pipe(
+        set('suggestions.status', EntityStatus.loading),
+        set('suggestions.values', []))(state);
+
+    case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_SUGGESTIONS_SUCCESS:
+      return pipe(
+        set('suggestions.status', EntityStatus.loadingSuccess),
+        set('suggestions.values', action.payload.serviceGroupsSuggestions))(state);
+
+    case ServiceGroupsActionTypes.GET_SERVICE_GROUPS_SUGGESTIONS_FAILURE:
+      return pipe(
+        set('suggestions.values', []),
+        set('suggestions.status', EntityStatus.loadingFailure),
+        set('error', action.payload))(state);
 
     default:
       return state;

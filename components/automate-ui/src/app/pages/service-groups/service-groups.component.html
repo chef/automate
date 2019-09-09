@@ -1,12 +1,40 @@
 <chef-notification
-  *ngIf="(serviceGroupStatus$ | async) === 'loadingFailure'"
+  *ngIf="(serviceGroupsStatus$ | async) === 'loadingFailure'"
   [type]="'error'"
   [timeout]="10">
-  {{ (serviceGroupError$ | async).status }}: {{ (serviceGroupError$ | async).error.message }}
+  {{ (serviceGroupsError$ | async).status }}: {{ (serviceGroupsError$ | async).error.message }}
 </chef-notification>
 <chef-page-header>
   <chef-heading>Service Groups</chef-heading>
   <chef-subheading>Service groups are Habitat services ordered by package identifiers and configurations.</chef-subheading>
+  <app-search-bar
+    [numberOfFilters]="numberOfSearchBarFilters$ | async"
+    [categories]="categoryTypes"
+    [dynamicSuggestions]="serviceGroupsSuggestions$ | async"
+    (suggestValues)="onSuggestValues($event)"
+    (itemSelected)="onFilterAdded($event)"
+    (filtersButtonClick)="toggleFilters()">
+  </app-search-bar>
+  <div class="copy-dropdown">
+    <chef-button class="dropdown-toggle" secondary (click)="toggleShareDropdown()">
+      <chef-icon>share</chef-icon>
+    </chef-button>
+    <chef-dropdown class="dropdown" [visible]="shareDropdownVisible">
+      <chef-click-outside (clickOutside)="hideShareDropdown()" omit="dropdown-toggle">
+        <p>Copy this private URL to share:</p>
+        <div class="copy-input">
+          <input type="text" [value]="shareUrl" readonly />
+          <chef-clipboard [value]="shareUrl"></chef-clipboard>
+        </div>
+      </chef-click-outside>
+    </chef-dropdown>
+  </div>
+
+  <app-search-bar-filter-bar *ngIf="filtersVisible"
+    [filters]="searchBarFilters$ | async"
+    (filtersCleared)="onFiltersClear($event)"
+    (filterRemoved)="onFilterRemoved($event)">
+  </app-search-bar-filter-bar>
 </chef-page-header>
 <div class="page-body">
   <chef-status-filter-group [value]="selectedStatus">
@@ -36,7 +64,7 @@
       <div class="filter-total">{{ sgHealthSummary["unknown"] }}</div>
     </chef-option>
   </chef-status-filter-group>
-  <chef-table class="service-group-list" *ngIf="(serviceGroupStatus$ | async) === 'loadingSuccess' && (serviceGroups$ | async).length !== 0">
+  <chef-table class="service-group-list" *ngIf="(serviceGroupsStatus$ | async) === 'loadingSuccess' && (serviceGroupsList$ | async).length !== 0">
     <chef-thead>
         <chef-tr>
           <chef-th class="health sort" (click)="onToggleSort('percent_ok')">
@@ -62,68 +90,68 @@
     <chef-tbody>
       <chef-tr
         tabindex="0"
-        class="{{serviceGroup.status}} sg-row"
-        [ngClass]="{'selected': (selectedServiceGroupId === serviceGroup.id)}"
-        (click)="onServiceGroupSelect($event, serviceGroup.id)"
-        (keydown.space)="onServiceGroupSelect($event, serviceGroup.id)"
-        (keydown.enter)="onServiceGroupSelect($event, serviceGroup.id)"
-        *ngFor="let serviceGroup of serviceGroups$ | async">
-        <chef-td class="{{serviceGroup.status}} health">
+        class="{{serviceGroups.status}} sg-row"
+        [ngClass]="{'selected': (selectedServiceGroupId === serviceGroups.id)}"
+        (click)="onServiceGroupSelect($event, serviceGroups.id)"
+        (keydown.space)="onServiceGroupSelect($event, serviceGroups.id)"
+        (keydown.enter)="onServiceGroupSelect($event, serviceGroups.id)"
+        *ngFor="let serviceGroups of serviceGroupsList$ | async">
+        <chef-td class="{{serviceGroups.status}} health">
           <div class="chart-container">
             <chef-radial-chart>
               <span slot="innerText">
                 <span class="percent">
-                  <span class="value">{{ serviceGroup.health_percentage }}</span>%
+                  <span class="value">{{ serviceGroups.health_percentage }}</span>%
                 </span>
               </span>
-              <chef-data-point value="{{ serviceGroup.services_health_counts.critical }}" class="critical">
-                {{ serviceGroup.services_health_counts.critical }} Critical
+              <chef-data-point value="{{ serviceGroups.services_health_counts.critical }}" class="critical">
+                {{ serviceGroups.services_health_counts.critical }} Critical
               </chef-data-point>
-              <chef-data-point value="{{ serviceGroup.services_health_counts.warning }}" class="warning">
-                {{ serviceGroup.services_health_counts.warning }} Warning
+              <chef-data-point value="{{ serviceGroups.services_health_counts.warning }}" class="warning">
+                {{ serviceGroups.services_health_counts.warning }} Warning
               </chef-data-point>
-              <chef-data-point value="{{ serviceGroup.services_health_counts.ok }}" class="ok">
-                {{ serviceGroup.services_health_counts.ok }} Ok
+              <chef-data-point value="{{ serviceGroups.services_health_counts.ok }}" class="ok">
+                {{ serviceGroups.services_health_counts.ok }} Ok
               </chef-data-point>
-              <chef-data-point value="{{ serviceGroup.services_health_counts.unknown }}" class="unknown">
-                {{ serviceGroup.services_health_counts.unknown }} Unknown
+              <chef-data-point value="{{ serviceGroups.services_health_counts.unknown }}" class="unknown">
+                {{ serviceGroups.services_health_counts.unknown }} Unknown
               </chef-data-point>
             </chef-radial-chart>
           </div>
-          <chef-icon class="{{serviceGroup.status}}">{{ serviceGroup.status | serviceStatusIcon }}</chef-icon>
+          <chef-icon class="{{serviceGroups.status}}">{{ serviceGroups.status | serviceStatusIcon }}</chef-icon>
         </chef-td>
         <chef-td class="service-group">
-          <div>{{ serviceGroup.name }}</div>
+          <div>{{ serviceGroups.name }}</div>
           <div>
-            <b>{{ serviceGroup.services_health_counts.ok }} of {{ serviceGroup.services_health_counts.total }}</b>
+            <b>{{ serviceGroups.services_health_counts.ok }} of {{ serviceGroups.services_health_counts.total }}</b>
              OK
           </div>
         </chef-td>
         <chef-td class="package-name">
-          {{ serviceGroup.package }}
+          {{ serviceGroups.package }}
         </chef-td>
         <chef-td class="release">
-          {{ serviceGroup.release }}
+          {{ serviceGroups.release }}
         </chef-td>
         <chef-td class="env">
           <!-- if environment is empty, display a badge -->
           <chef-badge no-data warning
             id="warning-env-tooltip"
-            *ngIf="serviceGroup.environment === ''"
+            *ngIf="serviceGroups.environment === ''"
             [tooltip]="tooltipMessageFor('env')">NO ENV</chef-badge>
 
           <!-- else, display the environment name -->
-          <div *ngIf="serviceGroup.environment !== ''">{{ serviceGroup.environment }}</div>
+          <div *ngIf="serviceGroups.environment !== ''">{{ serviceGroups.environment }}</div>
         </chef-td>
         <chef-td class="app">
           <!-- if application is empty, display a badge -->
           <chef-badge no-data warning
             id="warning-app-tooltip"
-            *ngIf="serviceGroup.application === ''"
+            *ngIf="serviceGroups.application === ''"
             [tooltip]="tooltipMessageFor('app')">NO APP</chef-badge>
 
           <!-- else, display the application name -->
-          <div *ngIf="serviceGroup.application !== ''">{{ serviceGroup.application }}</div>
+          <div *ngIf="serviceGroups.application !== ''">{{ serviceGroups.application }}</div>
         </chef-td>
       </chef-tr>
     </chef-tbody>
@@ -136,13 +164,13 @@
   </app-page-picker>
 
   <!-- Loading State: Displayed only when the main status is loading -->
-  <div class="empty-status" *ngIf="(serviceGroupStatus$ | async) === 'loading'">
+  <div class="empty-status" *ngIf="(serviceGroupsStatus$ | async) === 'loading'">
     <chef-loading-spinner size='50'></chef-loading-spinner>
     <h3>Loading service groups...</h3>
   </div>
 
   <!-- LoadingFailure State: Displayed only when the main status is a failure -->
-  <div class="empty-status" *ngIf="(serviceGroupStatus$ | async) === 'loadingFailure'">
+  <div class="empty-status" *ngIf="(serviceGroupsStatus$ | async) === 'loadingFailure'">
     <chef-loading-spinner size='50'></chef-loading-spinner>
     <h3>Loading service groups...</h3>
   </div>
@@ -152,16 +180,16 @@
     a success; that is, that the request to the backend was made successfully and the returned
     response is empty, when there are NO service-groups to display.
   -->
-  <div class="empty-status" *ngIf="(serviceGroupStatus$ | async) === 'loadingSuccess' && sgHealthSummary.total === 0">
+  <div class="empty-status" *ngIf="(serviceGroupsStatus$ | async) === 'loadingSuccess' && sgHealthSummary.total === 0">
     <h3>Add service groups</h3>
     <p>Contact your account representative to find out more about adding service groups.</p>
   </div>
-  <div class="empty-status" *ngIf="(serviceGroupStatus$ | async) === 'loadingSuccess' && sgHealthSummary.total !== 0 && (serviceGroups$ | async).length === 0">
+  <div class="empty-status" *ngIf="(serviceGroupsStatus$ | async) === 'loadingSuccess' && sgHealthSummary.total !== 0 && (serviceGroupsList$ | async).length === 0">
     <h3>None of the service groups returned {{ selectedStatus$ | async }}</h3>
   </div>
 </div>
 <app-services-sidebar
   tabindex="0"
-  [serviceGroupId]="selectedServiceGroupId"
+  [serviceGroupsId]="selectedServiceGroupId"
   class="services-sidebar-container">
 </app-services-sidebar>

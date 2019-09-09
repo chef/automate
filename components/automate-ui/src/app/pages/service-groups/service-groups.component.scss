@@ -8,6 +8,59 @@
 
 chef-page-header {
   margin-right: 450px;
+
+  chef-subheading {
+    margin-bottom: 32px;
+  }
+}
+
+app-search-bar {
+  display: inline-block;
+  width: calc(100% - 63px);
+}
+
+.copy-dropdown {
+  position: relative;
+  float: right;
+
+  .dropdown-toggle {
+    @include base-box-shadow();
+    margin: 0;
+    width: 47px;
+    height: 47px;
+
+    chef-icon {
+      position: relative;
+      top: -1px;
+      right: 1px;
+    }
+  }
+
+  .dropdown {
+    right: 0;
+  }
+
+  chef-click-outside {
+    display: block;
+    padding: 1em 0 1em 1em;
+
+    p {
+      margin-bottom: 0.5em;
+    }
+  }
+
+  .copy-input {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    input {
+      padding: 1em;
+      width: 300px;
+      border-radius: $global-radius;
+      border: 1px solid $chef-grey;
+    }
+  }
 }
 
 chef-alert {

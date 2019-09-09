@@ -12,7 +12,7 @@ import {
 import { Subject, Observable, of as observableOf } from 'rxjs';
 import { List } from 'immutable';
 import { clamp, compact, isEmpty } from 'lodash';
-import { SearchBarCategoryItem, Chicklet, SuggestionItem } from '../../types/types';
+import { SearchBarCategoryItem, Chicklet, SuggestionItem } from 'app/types/types';
 import {
   debounceTime, switchMap, distinctUntilChanged
 } from 'rxjs/operators';
@@ -310,6 +310,8 @@ export class SearchBarComponent implements OnChanges {
       this.suggestions = List<SuggestionItem>(type.providedValues);
       this.suggestionsVisible = true;
       this.isLoadingSuggestions = false;
+    } else {
+      this.suggestValues.emit({ detail: { text: '', type: type.type } });
     }
   }
 
@@ -350,6 +352,7 @@ export class SearchBarComponent implements OnChanges {
   requestForSuggestions(c: Chicklet): void {
     this.isLoadingSuggestions = true;
     this.suggestionSearchTermDebounce.next(c);
+    this.suggestValues.emit({ detail: { text: c.text, type: c.type } });
   }
 
   hasStaticSuggestions(): boolean {

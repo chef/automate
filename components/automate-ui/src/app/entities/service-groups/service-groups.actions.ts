@@ -1,8 +1,10 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 import {
-  ServiceGroupsPayload, ServicesPayload,
-  ServicesFilters, HealthSummary
+  ServiceGroupsHealthSummary,
+  ServiceGroupsPayload,
+  GroupServicesPayload,
+  GroupServicesFilters
 } from './service-groups.model';
 
 export enum ServiceGroupsActionTypes {
@@ -21,7 +23,11 @@ export enum ServiceGroupsActionTypes {
 
   GET_SERVICES_BY_SERVICE_GROUP = 'SERVICE_GROUPS::SERVICES::GET',
   GET_SERVICES_BY_SERVICE_GROUP_SUCCESS = 'SERVICE_GROUPS::SERVICES::GET::SUCCESS',
-  GET_SERVICES_BY_SERVICE_GROUP_FAILURE = 'SERVICE_GROUPS::SERVICES::GET::FAILURE'
+  GET_SERVICES_BY_SERVICE_GROUP_FAILURE = 'SERVICE_GROUPS::SERVICES::GET::FAILURE',
+
+  GET_SERVICE_GROUPS_SUGGESTIONS = 'SERVICE_GROUPS_SUGGESTIONS::SERVICES::GET',
+  GET_SERVICE_GROUPS_SUGGESTIONS_SUCCESS = 'SERVICE_GROUPS_SUGGESTIONS::SERVICES::SUCCESS',
+  GET_SERVICE_GROUPS_SUGGESTIONS_FAILURE = 'SERVICE_GROUPS_SUGGESTIONS:SERVICES::FAILURE'
 }
 
 export class GetServiceGroups implements Action {
@@ -41,7 +47,7 @@ export class GetServiceGroupsFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
-export class UpdateServiceGroupFilters implements Action {
+export class UpdateServiceGroupsFilters implements Action {
   readonly type = ServiceGroupsActionTypes.UPDATE_SERVICE_GROUPS_FILTER;
 
   constructor(public payload: {filters} ) {}
@@ -55,7 +61,7 @@ export class GetServiceGroupsCounts implements Action {
 export class GetServiceGroupsCountsSuccess implements Action {
   readonly type = ServiceGroupsActionTypes.GET_SERVICE_GROUPS_COUNTS_SUCCESS;
 
-  constructor(public payload: HealthSummary) {}
+  constructor(public payload: ServiceGroupsHealthSummary) {}
 }
 
 export class GetServiceGroupsCountsFailure implements Action {
@@ -67,7 +73,7 @@ export class GetServiceGroupsCountsFailure implements Action {
 export class UpdateSelectedSG implements Action {
   readonly type = ServiceGroupsActionTypes.UPDATE_SELECTED_SERVICE_GROUP;
 
-  constructor(public payload: ServicesFilters) {}
+  constructor(public payload: GroupServicesFilters) {}
 }
 
 export class GetServicesBySG implements Action {
@@ -78,7 +84,7 @@ export class GetServicesBySG implements Action {
 export class GetServicesBySGSuccess implements Action {
   readonly type = ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP_SUCCESS;
 
-  constructor(public payload: ServicesPayload ) {}
+  constructor(public payload: GroupServicesPayload ) {}
 }
 
 export class GetServicesBySGFailure implements Action {
@@ -87,10 +93,27 @@ export class GetServicesBySGFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export class GetServiceGroupsSuggestions implements Action {
+  readonly type = ServiceGroupsActionTypes.GET_SERVICE_GROUPS_SUGGESTIONS;
+  constructor(public payload: { type: string, text: string }) {}
+}
+
+export class GetServiceGroupsSuggestionsSuccess implements Action {
+  readonly type = ServiceGroupsActionTypes.GET_SERVICE_GROUPS_SUGGESTIONS_SUCCESS;
+
+  constructor(public payload: { serviceGroupsSuggestions: any[] }) {}
+}
+
+export class GetServiceGroupsSuggestionsFailure implements Action {
+  readonly type = ServiceGroupsActionTypes.GET_SERVICE_GROUPS_SUGGESTIONS_FAILURE;
+
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type ServiceGroupsActions =
   | GetServiceGroupsSuccess
   | GetServiceGroupsFailure
-  | UpdateServiceGroupFilters
+  | UpdateServiceGroupsFilters
   | GetServiceGroups
   | GetServiceGroupsCounts
   | GetServiceGroupsCountsSuccess
@@ -99,4 +122,7 @@ export type ServiceGroupsActions =
   | GetServicesBySG
   | GetServicesBySGSuccess
   | GetServicesBySGFailure
-  | GetServiceGroups;
+  | GetServiceGroups
+  | GetServiceGroupsSuggestions
+  | GetServiceGroupsSuggestionsSuccess
+  | GetServiceGroupsSuggestionsFailure;
