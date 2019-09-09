@@ -87,7 +87,7 @@ service ApplicationsService {
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:delete";
   };
 
-  rpc GetDisconnectedServicesConfig(GetDisconnectedServicesConfigReq) returns (PeriodicJobConfig) {
+  rpc GetDisconnectedServicesConfig(GetDisconnectedServicesConfigReq) returns (PeriodicMandatoryJobConfig) {
     option (google.api.http).get = "/beta/retention/service_groups/disconnected_services/config";
     // TODO: need new resources/policies for this
     option (chef.automate.api.policy).resource = "service_groups";
@@ -96,7 +96,7 @@ service ApplicationsService {
     option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
   };
 
-  rpc UpdateDisconnectedServicesConfig(PeriodicJobConfig) returns (UpdateDisconnectedServicesConfigRes) {
+  rpc UpdateDisconnectedServicesConfig(PeriodicMandatoryJobConfig) returns (UpdateDisconnectedServicesConfigRes) {
     option (google.api.http) = {
       post: "/beta/retention/service_groups/disconnected_services/config"
       body: "*"
@@ -190,10 +190,18 @@ message ServicesStatsRes {
 message PeriodicJobConfig {
   bool running = 1;
   // To match the ingest API at /retention/nodes/missing-nodes/config, we use a
-  // string that conforms to golang's time.ParseDuration() function. Internally
-  // the service uses an integer number of seconds so partial seconds in the
-  // threshold will be trucated.
+  // string format that is a subset of elasticsearch's date math. See the
+  // simpledatemath package under lib/ for more details
   string threshold = 2;
+}
+
+// it's like a PeriodicJobConfig but the user isn't allowed to change whether
+// or not the job runs
+message PeriodicMandatoryJobConfig {
+  // To match the ingest API at /retention/nodes/missing-nodes/config, we use a
+  // string format that is a subset of elasticsearch's date math. See the
+  // simpledatemath package under lib/ for more details
+  string threshold = 1;
 }
 
 message GetDisconnectedServicesConfigReq{}

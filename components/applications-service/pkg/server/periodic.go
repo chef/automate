@@ -185,29 +185,6 @@ func (j *JobScheduler) UpdateDisconnectedServicesJobParams(ctx context.Context, 
 	return nil
 }
 
-func (j *JobScheduler) EnableDisconnectedServicesJob(ctx context.Context) error {
-	err := j.CerealSvc.UpdateWorkflowScheduleByName(
-		ctx,
-		DisconnectedServicesScheduleName, DisconnectedServicesJobName,
-		cereal.UpdateEnabled(true))
-	if err != nil {
-		return errors.Wrap(err, "failed to set disconnected_services job to enabled")
-	}
-	return nil
-}
-
-func (j *JobScheduler) DisableDisconnectedServicesJob(ctx context.Context) error {
-	err := j.CerealSvc.UpdateWorkflowScheduleByName(
-		ctx,
-		DisconnectedServicesScheduleName, DisconnectedServicesJobName,
-		cereal.UpdateEnabled(false))
-	if err != nil {
-		return errors.Wrap(err, "failed to set disconnected_services job to disabled")
-	}
-	return nil
-
-}
-
 func (j *JobScheduler) GetDeleteDisconnectedServicesJobConfig(ctx context.Context) (*DisconnectedServicesConfigV0, error) {
 	sched, err := j.CerealSvc.GetWorkflowScheduleByName(ctx, DeleteDisconnectedServicesScheduleName, DeleteDisconnectedServicesJobName)
 	if err != nil {

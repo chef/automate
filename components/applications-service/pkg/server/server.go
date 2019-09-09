@@ -339,38 +339,21 @@ func (app *ApplicationsServer) MarkDisconnectedServices(thresholdSeconds int32) 
 }
 
 func (app *ApplicationsServer) GetDisconnectedServicesConfig(ctx context.Context,
-	req *applications.GetDisconnectedServicesConfigReq) (*applications.PeriodicJobConfig, error) {
+	req *applications.GetDisconnectedServicesConfigReq) (*applications.PeriodicMandatoryJobConfig, error) {
 	config, err := app.jobScheduler.GetDisconnectedServicesJobConfig(ctx)
 	if err != nil {
 		err = errors.Wrap(err, "failed to load disconnected_services job configuration")
 		log.WithError(err).Error()
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	res := &applications.PeriodicJobConfig{
-		Running:   config.Enabled,
+	res := &applications.PeriodicMandatoryJobConfig{
 		Threshold: config.Params.ThresholdDuration,
 	}
 	return res, nil
 }
 
 func (app *ApplicationsServer) UpdateDisconnectedServicesConfig(ctx context.Context,
-	req *applications.PeriodicJobConfig) (*applications.UpdateDisconnectedServicesConfigRes, error) {
-
-	if req.GetRunning() {
-		err := app.jobScheduler.EnableDisconnectedServicesJob(ctx)
-		if err != nil {
-			err = errors.Wrap(err, "failed to enable disconnected_services job")
-			log.WithError(err).Error()
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-	} else {
-		err := app.jobScheduler.DisableDisconnectedServicesJob(ctx)
-		if err != nil {
-			err = errors.Wrap(err, "failed to disable disconnected_services job")
-			log.WithError(err).Error()
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-	}
+	req *applications.PeriodicMandatoryJobConfig) (*applications.UpdateDisconnectedServicesConfigRes, error) {
 
 	err := simpledatemath.Validate(req.GetThreshold())
 	if err != nil {
