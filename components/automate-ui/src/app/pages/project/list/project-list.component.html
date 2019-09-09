@@ -96,7 +96,8 @@
       [objectName]="projectToDelete?.id"
       [moreDetails]="inUseMessage()"
       (close)="closeDeleteModal()"
-      (deleteClicked)="deleteProject()">
+      (deleteClicked)="deleteProject()"
+      objectAction="Delete">
     </app-delete-object-modal>
 
     <app-confirm-apply-start-modal

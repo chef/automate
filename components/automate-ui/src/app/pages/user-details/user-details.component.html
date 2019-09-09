@@ -8,7 +8,8 @@
       objectNoun="user"
       [objectName]="user.name"
       (close)="closeDeleteConfirmationModal()"
-      (deleteClicked)="deleteUser()">
+      (deleteClicked)="deleteUser()"
+      objectAction="Delete">
     </app-delete-object-modal>
     <chef-breadcrumbs *ngIf="isAdminView">
       <chef-breadcrumb [link]="['/settings/users']">Users</chef-breadcrumb>
