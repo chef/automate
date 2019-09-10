@@ -32,6 +32,20 @@ func NewReportingHandler(reportingClient reportingService.ReportingServiceClient
 	}
 }
 
+// should cover /control-items
+func (a *Reporting) ListControlItems(ctx context.Context, in *reporting.Query) (*reporting.ControlItems, error) {
+	inDomain := &reportingService.Query{}
+	out := &reporting.ControlItems{}
+	f := func() (proto.Message, error) {
+		return a.client.ListControlItems(ctx, inDomain)
+	}
+	err := protobuf.CallDomainService(in, inDomain, f, out)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // should cover /reports
 func (a *Reporting) ListReports(ctx context.Context, in *reporting.Query) (*reporting.Reports, error) {
 	inDomain := &reportingService.Query{}

@@ -18,6 +18,33 @@ func init() {
     "application/json"
   ],
   "paths": {
+    "/compliance/reporting/control-items": {
+      "post": {
+        "summary": "should cover /control-items\nThis api is useful for getting a limited list of control items for latest runs.  It also honors all reporting filters",
+        "operationId": "ListControlItems",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ControlItems"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
     "/compliance/reporting/nodes/id/{id}": {
       "get": {
         "operationId": "ReadNode",
@@ -321,6 +348,42 @@ func init() {
           "type": "object",
           "additionalProperties": {
             "type": "string"
+          }
+        }
+      }
+    },
+    "v1ControlItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "profile": {
+          "$ref": "#/definitions/v1ProfileMin"
+        },
+        "impact": {
+          "type": "number",
+          "format": "float"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "control_summary": {
+          "$ref": "#/definitions/v1ControlSummary"
+        }
+      }
+    },
+    "v1ControlItems": {
+      "type": "object",
+      "properties": {
+        "control_item": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ControlItem"
           }
         }
       }

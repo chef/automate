@@ -48,6 +48,22 @@ service ReportingService {
    			action: "compliance:reportids:list"
    		};
    	};
+	// should cover /control-items
+	// This api is useful for getting a limited list of control items for latest runs.  It also honors all reporting filters
+	rpc ListControlItems(Query) returns (ControlItems) {
+		option (google.api.http) = {
+   			post: "/compliance/reporting/control-items"
+   			body: "*"
+   		};
+		option (chef.automate.api.policy) = {
+   			resource: "compliance:reporting:controls-items"
+   			action: "search"
+   		};
+		option (chef.automate.api.iam.policy) = {
+   			resource: "compliance:reporting:control-items"
+   			action: "compliance:controlItems:list"
+   		};
+	};
 	// should cover /reports/:reportid
 	rpc ReadReport(Query) returns (Report) {
 		option (google.api.http) = {
@@ -144,6 +160,19 @@ service ReportingService {
 			action: "compliance:reportingLicenseUsage:list"
 		};
 	};
+}
+
+message ControlItem {
+	string id =1;
+	string title=2;
+	ProfileMin profile = 3;
+	float impact = 4;
+	google.protobuf.Timestamp end_time = 5;
+	ControlSummary control_summary = 6;
+}
+
+message ControlItems {
+	repeated ControlItem control_item = 1;
 }
 
 message TimeQuery {

@@ -174,6 +174,30 @@ func (srv *Server) ListProfiles(ctx context.Context, in *reporting.Query) (*repo
 	return &profileMins, nil
 }
 
+// ListControls returns a list of contolListItems based on query
+func (srv *Server) ListControlItems(ctx context.Context, in *reporting.Query) (*reporting.ControlItems, error) {
+	var controlListItems *reporting.ControlItems
+	var SORT_FIELDS = map[string]string{
+		"name": "name.lower",
+	}
+	from, perPage, sort, asc, err := validatePaginationAndSorting(in, SORT_FIELDS, "title")
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	formattedFilters := formatFilters(in.Filters)
+	formattedFilters, err = filterByProjects(ctx, formattedFilters)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	controlListItems, err = srv.es.GetControlListItems(from, perPage, formattedFilters, SORT_FIELDS[sort], asc)
+	if err != nil {
+		return nil, errorutils.FormatErrorMsg(err, "")
+	}
+	return controlListItems, nil
+}
+
 type exportHandler func(*reporting.Report) error
 
 // Export streams a json or csv export
