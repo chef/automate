@@ -575,21 +575,24 @@ func (backend ES2Backend) getControlTagsSuggestions(client *elastic.Client, type
 	foundControlTags := make([]ControlTagsScore, 0)
 	if searchResult != nil {
 		for _, hit := range searchResult.Hits.Hits {
-			if hit != nil {
-				for _, inner_hit := range hit.InnerHits {
-					if inner_hit != nil {
-						for _, hit2 := range inner_hit.Hits.Hits {
-							var c ControlSourceTags
-							if hit2.Source != nil {
-								err := json.Unmarshal(*hit2.Source, &c)
-								if err == nil && c.ID != "" {
-									foundControlTags = append(foundControlTags, ControlTagsScore{
-										float32(*hit2.Score),
-										c.StringTags,
-									})
-								}
-							}
-						}
+			if hit == nil {
+				continue
+			}
+			for _, inner_hit := range hit.InnerHits {
+				if inner_hit == nil {
+					continue
+				}
+				for _, hit2 := range inner_hit.Hits.Hits {
+					if hit2.Source == nil {
+						continue
+					}
+					var c ControlSourceTags
+					err := json.Unmarshal(*hit2.Source, &c)
+					if err == nil && c.ID != "" {
+						foundControlTags = append(foundControlTags, ControlTagsScore{
+							float32(*hit2.Score),
+							c.StringTags,
+						})
 					}
 				}
 			}
