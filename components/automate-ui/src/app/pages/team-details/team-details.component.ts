@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms'
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
 import { isEmpty, identity, keyBy, at, xor } from 'lodash/fp';
-import { combineLatest, Observable, Subject } from 'rxjs';
+import { combineLatest, Subject } from 'rxjs';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
