@@ -7,9 +7,13 @@ package integration_test
 
 import (
 	"context"
+	"strings"
 	"testing"
+	"time"
 
+	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/common/query"
@@ -77,6 +81,7 @@ func TestGetServicesSingleService(t *testing.T) {
 						Channel:        "testchannel",
 						UpdateStrategy: "AT-ONCE",
 						Site:           "testsite",
+						Disconnected:   false,
 					},
 				},
 			}
@@ -107,6 +112,7 @@ func TestGetServicesMultiService(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_CRITICAL,
 					Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
 					Channel: c, UpdateStrategy: none, Site: s,
+					Disconnected: false,
 				},
 				{
 					SupervisorId: "sup2",
@@ -116,6 +122,7 @@ func TestGetServicesMultiService(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
 					Application:  a, Environment: e, Fqdn: "test-1.example.com",
 					Channel: c, UpdateStrategy: none, Site: s,
+					Disconnected: false,
 				},
 				{
 					SupervisorId: "sup3",
@@ -125,6 +132,7 @@ func TestGetServicesMultiService(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
 					Application:  a, Environment: e, Fqdn: "temp.example.com",
 					Channel: c, UpdateStrategy: none, Site: s,
+					Disconnected: false,
 				},
 				{
 					SupervisorId: "sup1",
@@ -134,6 +142,7 @@ func TestGetServicesMultiService(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_WARNING,
 					Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
 					Channel: c, UpdateStrategy: none, Site: s,
+					Disconnected: false,
 				},
 				{
 					SupervisorId: "sup1",
@@ -143,6 +152,7 @@ func TestGetServicesMultiService(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
 					Channel: c, UpdateStrategy: none, Site: s,
+					Disconnected: false,
 				},
 				{
 					SupervisorId: "sup4",
@@ -152,6 +162,7 @@ func TestGetServicesMultiService(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "test-2.example.com",
 					Channel: c, UpdateStrategy: none, Site: s,
+					Disconnected: false,
 				},
 			},
 		}
@@ -160,6 +171,49 @@ func TestGetServicesMultiService(t *testing.T) {
 	response, err := suite.ApplicationsServer.GetServices(ctx, request)
 	assert.Nil(t, err)
 	assertServicesEqual(t, expected.GetServices(), response.GetServices())
+}
+
+func TestGetServicesWithDisconnectedServices(t *testing.T) {
+	inputSvcs := habServicesMatrixAllHealthStatusDifferent()
+
+	// Sending the timestamp roundtrip through the app to postgres and back
+	// removes some resolution which makes the timestamps not compare exactly.
+	// Rounding the time we send to an even number of seconds fixes the issue.
+	eventTime := time.Now().Add(-time.Minute * 30).Round(time.Second)
+
+	for _, s := range inputSvcs {
+		var err error
+		s.EventMetadata.OccurredAt, err = ptypes.TimestampProto(eventTime)
+		require.NoError(t, err)
+	}
+
+	suite.IngestServices(inputSvcs)
+	defer suite.DeleteDataFromStorage()
+
+	_, err := suite.ApplicationsServer.MarkDisconnectedServices(300)
+	require.NoError(t, err)
+
+	ctx := context.Background()
+	req := &applications.ServicesReq{}
+	res, err := suite.ApplicationsServer.GetServices(ctx, req)
+	assert.NoError(t, err)
+
+	assert.Equal(t, 6, len(res.Services))
+	for _, s := range res.Services {
+		assert.True(t, s.Disconnected, "expected the service to be marked as disconnected")
+		expectedTime, err := ptypes.TimestampProto(eventTime)
+		require.NoError(t, err)
+		assert.Equal(t, expectedTime, s.LastEventOccurredAt)
+		// Ideally we could do:
+		//   assert.Equal(t, "30 minutes", s.LastEventSince)
+		// but we _usually_ get something like "29 minutes, 59 seconds" because we
+		// rounded the eventTime. Regardless, we are happy if the string says 29 or
+		// 30 minutes.
+		durationStringCorrect := strings.Contains(s.LastEventSince, "30 minutes") || strings.Contains(s.LastEventSince, "29 minutes")
+		if !durationStringCorrect {
+			assert.Failf(t, "LastEventSince field in service didn't contain expected message", "value was: %q", s.LastEventSince)
+		}
+	}
 }
 
 func TestGetServicesMultiServicaSortDESC(t *testing.T) {
@@ -186,6 +240,7 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
 					Channel: c, UpdateStrategy: none, Site: s,
+					Disconnected: false,
 				},
 				{
 					SupervisorId: "sup4",
@@ -195,6 +250,7 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_OK,
 					Application:  a, Environment: e, Fqdn: "test-2.example.com",
 					Channel: c, UpdateStrategy: none, Site: s,
+					Disconnected: false,
 				},
 				{
 					SupervisorId: "sup1",
@@ -204,6 +260,7 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_WARNING,
 					Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
 					Channel: c, UpdateStrategy: none, Site: s,
+					Disconnected: false,
 				},
 				{
 					SupervisorId: "sup2",
@@ -213,6 +270,7 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
 					Application:  a, Environment: e, Fqdn: "test-1.example.com",
 					Channel: c, UpdateStrategy: none, Site: s,
+					Disconnected: false,
 				},
 				{
 					SupervisorId: "sup3",
@@ -222,6 +280,7 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
 					Application:  a, Environment: e, Fqdn: "temp.example.com",
 					Channel: c, UpdateStrategy: none, Site: s,
+					Disconnected: false,
 				},
 				{
 					SupervisorId: "sup1",
@@ -231,6 +290,7 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_CRITICAL,
 					Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
 					Channel: c, UpdateStrategy: none, Site: s,
+					Disconnected: false,
 				},
 			},
 		}
@@ -263,6 +323,7 @@ func TestGetServicesMultiServicaPagination(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_UNKNOWN,
 					Application:  a, Environment: e, Fqdn: "test-1.example.com",
 					Channel: c, UpdateStrategy: none, Site: s,
+					Disconnected: false,
 				},
 			},
 		}
@@ -323,6 +384,7 @@ func TestGetServicesMultiServicePaginationAndSorting(t *testing.T) {
 					HealthCheck:  applications.HealthStatus_WARNING,
 					Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
 					Channel: c, UpdateStrategy: none, Site: s,
+					Disconnected: false,
 				},
 			},
 		}
@@ -357,6 +419,7 @@ func TestGetServicesMultiServiceWithServiceGroupIDFilter(t *testing.T) {
 						HealthCheck:  applications.HealthStatus_WARNING,
 						Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
 						Channel: c, UpdateStrategy: none, Site: s,
+						Disconnected: false,
 					},
 				},
 			}
@@ -390,6 +453,7 @@ func TestGetServicesMultiServiceWithHealthFilter(t *testing.T) {
 						HealthCheck:  applications.HealthStatus_WARNING,
 						Application:  a, Environment: e, Fqdn: "myapp-us.example.com",
 						Channel: c, UpdateStrategy: none, Site: s,
+						Disconnected: false,
 					},
 				},
 			}
@@ -427,6 +491,7 @@ func TestGetServicesMultiServiceWithHealthAndServiceGroupIdFilter(t *testing.T) 
 						HealthCheck:  applications.HealthStatus_UNKNOWN,
 						Application:  a, Environment: e, Fqdn: "temp.example.com",
 						Channel: c, UpdateStrategy: none, Site: s,
+						Disconnected: false,
 					},
 				},
 			}
@@ -484,6 +549,7 @@ func TestGetServicesMultiServiceWithOriginAndServiceGroupIdFilter(t *testing.T) 
 						Environment:    "a_env",
 						UpdateStrategy: none,
 						Site:           s,
+						Disconnected:   false,
 					},
 				},
 			}
@@ -543,6 +609,7 @@ func TestGetServicesMultiServiceWithSiteAndServiceGroupIdFilter(t *testing.T) {
 						Environment:    "a_env",
 						UpdateStrategy: none,
 						Site:           "fukushima",
+						Disconnected:   false,
 					},
 				},
 			}
@@ -603,6 +670,7 @@ func TestGetServicesMultiServiceWithChannelAndServiceGroupIdFilter(t *testing.T)
 						UpdateStrategy: "AT-ONCE",
 						Site:           s,
 						Channel:        "fox",
+						Disconnected:   false,
 					},
 				},
 			}
@@ -660,6 +728,7 @@ func TestGetServicesMultiServiceWithVersionAndServiceGroupIdFilter(t *testing.T)
 						Environment:    "a_env",
 						UpdateStrategy: none,
 						Site:           s,
+						Disconnected:   false,
 					},
 				},
 			}
@@ -766,6 +835,7 @@ func TestGetServicesMultiServiceWithEnvironmentAndServiceGroupIdFilter(t *testin
 						Environment:    "a_env",
 						UpdateStrategy: none,
 						Site:           s,
+						Disconnected:   false,
 					},
 				},
 			}
@@ -815,6 +885,7 @@ func TestGetServicesMultiServiceWithApplicationAndServiceGroupIdFilter(t *testin
 						Environment:    "a_env",
 						UpdateStrategy: none,
 						Site:           s,
+						Disconnected:   false,
 					},
 				},
 			}
@@ -864,6 +935,7 @@ func TestGetServicesMultiServiceWithGroupNameAndServiceGroupIdFilter(t *testing.
 						Environment:    "a_env",
 						UpdateStrategy: none,
 						Site:           s,
+						Disconnected:   false,
 					},
 				},
 			}
@@ -913,6 +985,7 @@ func TestGetServicesMultiServiceWithServiceNameAndServiceGroupIdFilter(t *testin
 						Environment:    "a_env",
 						UpdateStrategy: none,
 						Site:           s,
+						Disconnected:   false,
 					},
 				},
 			}

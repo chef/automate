@@ -102,6 +102,7 @@ func (a *ApplicationsServer) GetServiceGroups(ctx context.Context,
 				Critical: sg.ServicesHealthCounts.Critical,
 				Unknown:  sg.ServicesHealthCounts.Unknown,
 			},
+			DisconnectedCount: sg.DisconnectedCount,
 		}
 	}
 
@@ -457,6 +458,8 @@ func convertStorageServicesToApplicationsServices(svcs []*storage.Service) []*ap
 			CurrentHealthSince:  timef.IntervalUntilNow(svc.HealthUpdatedAt),
 			HealthUpdatedAt:     convertOrCreateProtoTimestamp(svc.HealthUpdatedAt),
 			Disconnected:        svc.Disconnected,
+			LastEventOccurredAt: convertOrCreateProtoTimestamp(svc.LastEventOccurredAt),
+			LastEventSince:      timef.IntervalUntilNow(svc.LastEventOccurredAt),
 		}
 	}
 	return services
