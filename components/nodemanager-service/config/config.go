@@ -52,4 +52,5 @@ type EventConfig struct {
 
 type Cereal struct {
 	Endpoint string
+	Skip     bool
 }
