@@ -70,6 +70,11 @@ describeIfIAMV2p1('project management', () => {
     cy.contains(projectName).should('exist');
     cy.contains(projectID).should('exist');
 
+    cy.url().should('include', '/settings/projects');
+  });
+
+  it('can open the new project\'s details page', () => {
+    cy.get('[data-cy=project-details]').contains(projectName).click();
     cy.url().should('include', `/settings/projects/${projectID}`);
   });
 
@@ -157,7 +162,7 @@ describeIfIAMV2p1('project management', () => {
     cy.get('app-project-rules #right-buttons button').contains('Save Rule').click();
     cy.get('app-project-rules chef-page').should('not.be.visible');
 
-    cy.url().should('include', `/settings/projects/${projectID}`);
+    cy.url().should('include', '/settings/projects');
     cy.get('app-project-details chef-td').contains(updatedRuleName);
     cy.get('app-project-details chef-td').contains('2 conditions');
   });

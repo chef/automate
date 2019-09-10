@@ -104,7 +104,6 @@ describe('team management', () => {
         cy.get('chef-notification.info').should('be.visible');
         cy.contains(teamName).should('exist');
         cy.contains(generatedTeamID).should('exist');
-        cy.go('back');
       });
 
       it('can create a team with a custom ID', () => {
@@ -123,8 +122,6 @@ describe('team management', () => {
         cy.get('chef-notification.info').should('be.visible');
         cy.contains(teamName).should('exist');
         cy.contains(customTeamID).should('exist');
-        cy.contains(generatedTeamID).should('not.exist');
-        cy.go('back');
       });
     });
   });
@@ -156,8 +153,7 @@ describe('team management', () => {
         cy.get('chef-notification.info').should('be.visible');
         cy.contains(teamName).should('exist');
         cy.contains(generatedTeamID).should('exist');
-        cy.get('[data-cy=team-details-projects]').contains(unassigned);
-        cy.go('back');
+        cy.contains(unassigned).should('exist');
       });
     });
 
@@ -208,8 +204,7 @@ describe('team management', () => {
         cy.get('chef-notification.info').should('be.visible');
         cy.contains(teamName).should('exist');
         cy.contains(generatedTeamID).should('exist');
-        cy.get('[data-cy=team-details-projects]').contains(projectSummary);
-        cy.go('back');
+        cy.contains(projectSummary).should('exist');
       });
 
       it('can create a team with one project selected', () => {
@@ -243,8 +238,7 @@ describe('team management', () => {
         cy.get('chef-notification.info').should('be.visible');
         cy.contains(teamName).should('exist');
         cy.contains(generatedTeamID).should('exist');
-        cy.get('[data-cy=team-details-projects]').contains(project2ID);
-        cy.go('back');
+        cy.contains(project2ID).should('exist');
       });
 
       it('can create a team with no projects selected (unassigned)', () => {
@@ -277,8 +271,7 @@ describe('team management', () => {
         cy.get('chef-notification.info').should('be.visible');
         cy.contains(teamName).should('exist');
         cy.contains(generatedTeamID).should('exist');
-        cy.get('[data-cy=team-details-projects]').contains(unassigned);
-        cy.go('back');
+        cy.contains(unassigned).should('exist');
       });
     });
   });
