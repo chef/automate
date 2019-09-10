@@ -13,10 +13,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/authn-service/constants"
 	"github.com/chef/automate/components/authn-service/tokens/pg"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
 	"github.com/chef/automate/lib/grpc/auth_context"
+	"github.com/chef/automate/lib/grpc/grpctest"
+	"github.com/chef/automate/lib/grpc/secureconn"
+	"github.com/chef/automate/lib/tls/test/helpers"
 )
 
 func setup(t *testing.T) (tokens.Storage, *sql.DB) {
@@ -51,7 +55,15 @@ func setup(t *testing.T) (tokens.Storage, *sql.DB) {
 		t.Skipf("start pg container and set PG_URL to run")
 	}
 
-	backend, err := pgCfg.Open(nil, l)
+	authzCerts := helpers.LoadDevCerts(t, "authz-service")
+	authzConnFactory := secureconn.NewFactory(*authzCerts)
+	grpcAuthz := authzConnFactory.NewServer()
+	authzServer := grpctest.NewServer(grpcAuthz)
+	authzConn, err := authzConnFactory.Dial("authz-service", authzServer.URL)
+	require.NoError(t, err)
+	authzV2Client := authz_v2.NewAuthorizationClient(authzConn)
+
+	backend, err := pgCfg.Open(nil, l, authzV2Client)
 	require.NoError(t, err)
 
 	db := openDB(t)
@@ -470,6 +482,10 @@ func TestCreateToken(t *testing.T) {
 			assert.WithinDuration(time.Now(), tok.Created, time.Second)
 			assert.WithinDuration(time.Now(), tok.Updated, time.Second)
 			assert.Equal(project_ids, tok.Projects)
+		},
+		"when one not-found project passed": func(t *testing.T) {
+		},
+		"when user is not-permitted to assign one project passed": func(t *testing.T) {
 		},
 	}
 

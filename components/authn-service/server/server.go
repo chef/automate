@@ -14,6 +14,7 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authn"
 	authz "github.com/chef/automate/api/interservice/authz/common"
+	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	teams "github.com/chef/automate/api/interservice/teams/v1"
 	"github.com/chef/automate/components/authn-service/authenticator"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
@@ -43,13 +44,14 @@ type Server struct {
 	// Map of authenticator IDs to authenticators.
 	// Note: dex wraps this with a ResourceVersion, but that is due to storing
 	// connectors in the database -- we don't do this
-	authenticators map[string]authenticator.Authenticator
-	token          tokens.Storage
-	logger         *zap.Logger
-	connFactory    *secureconn.Factory
-	teamsClient    teams.TeamsV1Client
-	authzClient    authz.SubjectPurgeClient
-	health         *health.Service
+	authenticators     map[string]authenticator.Authenticator
+	token              tokens.Storage
+	logger             *zap.Logger
+	connFactory        *secureconn.Factory
+	teamsClient        teams.TeamsV1Client
+	authzSubjectClient authz.SubjectPurgeClient
+	authzV2Client      authz_v2.AuthorizationClient
+	health             *health.Service
 }
 
 // NewServer constructs a server from the provided config.
@@ -122,17 +124,6 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		authenticators[authnID] = authn
 	}
 
-	var ts tokens.Storage
-	var err error
-	if c.Token != nil {
-		ts, err = c.Token.Open(c.ServiceCerts, c.Logger)
-		if err != nil {
-			return nil, errors.Wrap(err, "initialize tokens adapter")
-		}
-	} else {
-		c.Logger.Debug("no tokens adapter defined")
-	}
-
 	teamsConn, err := factory.Dial("teams-service", c.TeamsAddress)
 	if err != nil {
 		return nil, errors.Wrapf(err, "dial teams-service (%s)", c.TeamsAddress)
@@ -141,6 +132,17 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 	authzConn, err := factory.Dial("authz-service", c.AuthzAddress)
 	if err != nil {
 		return nil, errors.Wrapf(err, "dial authz-service (%s)", c.AuthzAddress)
+	}
+
+	var ts tokens.Storage
+	var err error
+	if c.Token != nil {
+		ts, err = c.Token.Open(c.ServiceCerts, c.Logger, authz_v2.AuthorizationClient)
+		if err != nil {
+			return nil, errors.Wrap(err, "initialize tokens adapter")
+		}
+	} else {
+		c.Logger.Debug("no tokens adapter defined")
 	}
 
 	// Add the legacy data collector token as a secret if it was defined in the config.
@@ -160,13 +162,14 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 	}
 
 	s := &Server{
-		authzClient:    authz.NewSubjectPurgeClient(authzConn),
-		authenticators: authenticators,
-		logger:         c.Logger,
-		token:          ts,
-		connFactory:    factory,
-		teamsClient:    teams.NewTeamsV1Client(teamsConn),
-		health:         health.NewService(),
+		authzSubjectClient: authz.NewSubjectPurgeClient(authzConn),
+		authzV2Client:      authz_v2.NewAuthorizationClient(authzConn),
+		authenticators:     authenticators,
+		logger:             c.Logger,
+		token:              ts,
+		connFactory:        factory,
+		teamsClient:        teams.NewTeamsV1Client(teamsConn),
+		health:             health.NewService(),
 	}
 
 	// make grpc-go log through zap
