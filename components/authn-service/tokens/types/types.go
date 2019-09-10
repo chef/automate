@@ -6,6 +6,7 @@ import (
 
 	"go.uber.org/zap"
 
+	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/lib/tls/certs"
 )
 
@@ -44,7 +45,7 @@ type Resetter interface {
 
 // TokenConfig is a configuration that can open a storage adapter
 type TokenConfig interface {
-	Open(*certs.ServiceCerts, *zap.Logger) (Storage, error)
+	Open(*certs.ServiceCerts, *zap.Logger, authz_v2.AuthorizationClient) (Storage, error)
 }
 
 // NotFoundError is the error returned when the token wasn't found, to discern this

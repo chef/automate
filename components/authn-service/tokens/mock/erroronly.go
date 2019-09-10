@@ -5,6 +5,7 @@ import (
 
 	"go.uber.org/zap"
 
+	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/pkg/errors"
 
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
@@ -22,7 +23,7 @@ type state struct {
 }
 
 // Open is for instantiating the error-only mock adapter
-func (cfg *ErrorOnlyConfig) Open(_ *certs.ServiceCerts, logger *zap.Logger) (tokens.Storage, error) {
+func (cfg *ErrorOnlyConfig) Open(_ *certs.ServiceCerts, logger *zap.Logger, _ authz_v2.AuthorizationClient) (tokens.Storage, error) {
 	return &state{err: errors.New(cfg.Msg)}, nil
 }
 

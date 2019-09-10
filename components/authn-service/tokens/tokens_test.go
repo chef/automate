@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
+	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/authn-service/constants"
 	"github.com/chef/automate/components/authn-service/tokens/mock"
 	"github.com/chef/automate/components/authn-service/tokens/pg"
@@ -22,6 +23,9 @@ import (
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
 	tutil "github.com/chef/automate/components/authn-service/tokens/util"
 	"github.com/chef/automate/lib/grpc/auth_context"
+	"github.com/chef/automate/lib/grpc/grpctest"
+	"github.com/chef/automate/lib/grpc/secureconn"
+	"github.com/chef/automate/lib/tls/test/helpers"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
 
@@ -56,6 +60,17 @@ func TestToken(t *testing.T) {
 		"pg":   &pgCfg,
 	}
 
+	authzCerts := helpers.LoadDevCerts(t, "authz-service")
+	authzConnFactory := secureconn.NewFactory(*authzCerts)
+	grpcAuthz := authzConnFactory.NewServer()
+	mockV2Authz := authz_v2.NewAuthorizationServerMock()
+	mockV2Authz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
+	authz_v2.RegisterAuthorizationServer(grpcAuthz, mockV2Authz)
+	authzServer := grpctest.NewServer(grpcAuthz)
+	authzConn, err := authzConnFactory.Dial("authz-service", authzServer.URL)
+	require.NoError(t, err)
+	authzV2Client := authz_v2.NewAuthorizationClient(authzConn)
+
 	// Note: because the pg adapter doesn't let us set the stage so easily,
 	//       these overlap a bit: most _create_ 1+ tokens first
 	//       (any failures in these "setup creates" are triggering a test failure,
@@ -86,7 +101,7 @@ func TestToken(t *testing.T) {
 				// TODO 2017/09/02 sr: this is pretty inefficient, we'll run the pg
 				//  migrations for each and every test case. Since the overall
 				//  performance still isn't that bad, I'll leave it at that for now.
-				adp, err := adpCfg.Open(nil, logger)
+				adp, err := adpCfg.Open(nil, logger, authzV2Client)
 				if err != nil {
 					// The logic to determine if we want to ignore this PG connection
 					// failure is as follows:
@@ -296,4 +311,9 @@ func testUpdateTokenNotFound(ctx context.Context, t *testing.T, ta tokens.Storag
 func insertProjectsIntoNewContext(projects []string) context.Context {
 	return auth_context.NewOutgoingProjectsContext(auth_context.NewContext(context.Background(),
 		[]string{}, projects, "resource", "action", "pol"))
+}
+
+func defaultValidateProjectAssignmentFunc(context.Context,
+	*authz_v2.ValidateProjectAssignmentReq) (*authz_v2.ValidateProjectAssignmentResp, error) {
+	return &authz_v2.ValidateProjectAssignmentResp{}, nil
 }
