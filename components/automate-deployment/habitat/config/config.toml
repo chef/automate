@@ -2,11 +2,6 @@ listen_address = "{{cfg.service.listen_address}}"
 port = {{cfg.service.port}}
 log_level = "{{cfg.log.level}}"
 
-# Gather-Logs
-tar_path       = "{{pkgPathFor "core/tar"}}/bin/tar"
-find_path      = "{{pkgPathFor "core/findutils"}}/bin/find"
-coreutils_path = "{{pkgPathFor "core/coreutils"}}/bin"
-
 {{#if cfg.gather_logs.staging_dir ~}}
 staging_dir = "{{cfg.gather_logs.staging_dir}}"
 {{/if ~}}

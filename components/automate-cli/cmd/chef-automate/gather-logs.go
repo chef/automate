@@ -35,15 +35,6 @@ const (
 	defaultNginxConfPath       = "/hab/svc/automate-load-balancer/config/nginx.conf"
 )
 
-// TODO: Consider having this generated from a config or dynamically
-// in some other way. These are the correct binpaths for
-// enterprise-linux
-var binPaths = map[string]string{
-	"cp":   "/bin/cp",
-	"find": "/bin/find",
-	"tar":  "/bin/tar",
-}
-
 func newGatherLogsCmd() *cobra.Command {
 	gatherLogsCmd := &cobra.Command{
 		Use:   "gather-logs [/path/to/log/bundle.tar.gz]",
@@ -293,7 +284,6 @@ causing a significant increase in disk I/O and inode usage of the filesystem for
 		capturePath,
 		archiveRoot,
 		"chef-automate-local-data-capture",
-		binPaths,
 		time.Now(),
 	)
 
@@ -417,7 +407,6 @@ func runGatherLogsLocalCmd(outfileOverride string, logLines uint64) error {
 		stagingDir,
 		archiveRoot,
 		"chef-automate-local-fallback",
-		binPaths,
 		time.Now(),
 	)
 

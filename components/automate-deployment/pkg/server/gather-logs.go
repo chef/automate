@@ -42,21 +42,11 @@ func (s *server) GatherLogs(ctx context.Context, req *api.GatherLogsRequest,
 	// clean up our staging area
 	defer os.RemoveAll(archiveRoot)
 
-	// binPaths defined where we can find the executables required for our log
-	// gathering operations, rather than relying on PATH
-	// TODO: make this s.serverConfig.BinPaths
-	binPaths := map[string]string{
-		"cp":   path.Join(s.serverConfig.CoreutilsPath, "cp"),
-		"find": s.serverConfig.FindPath,
-		"tar":  s.serverConfig.TarPath,
-	}
-
 	// initialize log gathering configuration
 	g := gatherlogs.NewGatherer(
 		stagingDir,
 		archiveRoot,
 		s.deployment.Config.Global.V1.Fqdn.Value,
-		binPaths,
 		time.Now(),
 	)
 	if err = g.CreateBundleDir(); err != nil {

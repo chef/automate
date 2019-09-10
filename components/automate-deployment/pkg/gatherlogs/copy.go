@@ -8,7 +8,6 @@ import (
 
 // Copy holds the fetching data
 type Copy struct {
-	CpPath   string
 	SrcPath  string
 	DestPath string
 }
@@ -22,7 +21,7 @@ func (c *Copy) execute() error {
 		c.DestPath,
 	)
 
-	out, err := command.CombinedOutput(c.CpPath, copyArgs)
+	out, err := command.CombinedOutput("cp", copyArgs)
 	if err != nil {
 		log.WithFields(
 			log.Fields{
