@@ -1,6 +1,5 @@
 import { Component, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { interval as observableInterval,  Observable, Subject } from 'rxjs';
 import { map, takeUntil, filter, take } from 'rxjs/operators';
@@ -64,7 +63,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private router: Router,
     public projects: ProjectService,
     fb: FormBuilder
   ) {
@@ -168,7 +166,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
             // so the user doesn't have to wait.
             this.store.dispatch(new LoadOptions());
             this.closeCreateModal();
-            this.router.navigate(['/settings', 'projects', project.id]);
           }
           if (state === EntityStatus.loadingFailure) {
             const pendingCreateError = new Subject<boolean>();

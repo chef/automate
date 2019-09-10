@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { Validators, FormGroup, FormBuilder } from '@angular/forms';
-import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
 import { map, filter, takeUntil } from 'rxjs/operators';
@@ -50,7 +49,6 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
 
  constructor(
     private store: Store<NgrxStateAtom>,
-    private router: Router,
     fb: FormBuilder
     ) {
     this.loading$ = store.select(getAllStatus).pipe(map(loading));
@@ -170,10 +168,6 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
           this.creatingTeam = false;
           if (state === EntityStatus.loadingSuccess) {
             this.closeCreateModal();
-            if (this.isMajorV1) {
-              this.router.navigate(['/settings', 'teams', team.name]);
-            }
-            this.router.navigate(['/settings', 'teams', team.id]);
           }
           if (state === EntityStatus.loadingFailure) {
             const pendingCreateError = new Subject<boolean>();
@@ -186,8 +180,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
                 pendingCreateError.complete();
                 if (error.status === HttpStatus.CONFLICT) {
                   this.conflictErrorEvent.emit(true);
-                // Close the modal on any error other than conflict and display in banner.
-                } else {
+                } else { // Close the modal on any error other than conflict and display in banner.
                   this.closeCreateModal();
                 }
             });

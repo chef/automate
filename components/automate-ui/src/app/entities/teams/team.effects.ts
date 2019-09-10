@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { combineLatest, of as observableOf } from 'rxjs';
@@ -49,7 +48,6 @@ export class TeamEffects {
   constructor(
     private actions$: Actions,
     private requests: TeamRequests,
-    private router: Router,
     private store$: Store<NgrxStateAtom>
   ) { }
 
@@ -130,19 +128,12 @@ export class TeamEffects {
           catchError((error) => observableOf(new CreateTeamFailure(error))))));
 
   @Effect()
-  createTeamSuccess$ = combineLatest([
-    this.actions$.pipe(ofType<CreateTeamSuccess>(TeamActionTypes.CREATE_SUCCESS)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity))])
-    .pipe(
-      map(([{ payload }, version]: [CreateTeamSuccess, IAMMajorVersion]) => {
-        // Drop the user on the newly created team page.
-        const id = version === 'v1' ? payload.guid : payload.id;
-        this.router.navigate(['admin', 'teams', id]);
-        return new CreateNotification({
-          type: Type.info,
-          message: 'Created a new team.'
-        });
-      }));
+  createTeamSuccess$ = this.actions$.pipe(
+    ofType<CreateTeamSuccess>(TeamActionTypes.CREATE_SUCCESS),
+    map(() => new CreateNotification({
+      type: Type.info,
+      message: 'Created a new team.'
+    })));
 
   @Effect()
   createTeamFailure$ = this.actions$.pipe(

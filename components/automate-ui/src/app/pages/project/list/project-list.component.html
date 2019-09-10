@@ -43,7 +43,7 @@
             <chef-tbody>
               <chef-tr *ngFor="let project of sortedProjects$ | async">
                 <chef-td>
-                  <a [routerLink]="['/settings/projects', project.id]">{{ project.name }}</a>
+                  <a [routerLink]="['/settings/projects', project.id]" data-cy="project-details">{{ project.name }}</a>
                 </chef-td>
                 <chef-td>{{ project.id }}</chef-td>
                 <chef-td>{{ getRulesStatus(project) }}</chef-td>

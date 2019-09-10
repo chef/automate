@@ -1,6 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MockComponent } from 'ng2-mock-component';
@@ -25,7 +24,6 @@ import { TeamManagementComponent } from './team-management.component';
 describe('TeamManagementComponent', () => {
   let component: TeamManagementComponent;
   let fixture: ComponentFixture<TeamManagementComponent>;
-  let router: Router;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -83,9 +81,6 @@ describe('TeamManagementComponent', () => {
   }));
 
   beforeEach(() => {
-    router = TestBed.get(Router);
-    spyOn(router, 'navigate').and.stub();
-
     fixture = TestBed.createComponent(TeamManagementComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
