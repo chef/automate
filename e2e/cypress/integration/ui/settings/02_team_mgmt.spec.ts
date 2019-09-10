@@ -91,7 +91,7 @@ describe('team management', () => {
     });
 
     describeIfIAMV2('team create modal (IAM v2.x)', () => {
-      it('can create a team with a default ID', () => {
+      itFlaky('can create a team with a default ID', () => {
         cy.get('[data-cy=team-create-button]').contains('Create Team').click();
         cy.get('app-team-management chef-modal').should('exist');
 
@@ -106,7 +106,7 @@ describe('team management', () => {
         cy.contains(generatedTeamID).should('exist');
       });
 
-      it('can create a team with a custom ID', () => {
+      itFlaky('can create a team with a custom ID', () => {
         cy.get('[data-cy=team-create-button]').contains('Create Team').click();
         cy.get('app-team-management chef-modal').should('exist');
 

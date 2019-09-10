@@ -465,7 +465,7 @@ steps:
 
   - label: ":cypress: IAMv1"
     command:
-      - integration/run_test integration/tests/cypress_e2e.sh
+      - IAM=v1.0 integration/run_test integration/tests/cypress_e2e.sh
     timeout_in_minutes: 20
     expeditor:
       secrets: &cypress_secrets
