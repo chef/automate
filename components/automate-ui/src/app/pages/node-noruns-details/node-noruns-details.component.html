@@ -5,16 +5,21 @@
         <div class="node-noruns-details-container">
           <chef-breadcrumbs>
             <chef-breadcrumb [link]="['/client-runs']">Client runs</chef-breadcrumb>
-            Node {{ nodeId }}
+            Node {{ node.name }}
           </chef-breadcrumbs>
 
             <div class="run-container">
                 <chef-page-header>
-                    <chef-heading>Node {{nodeId }}</chef-heading>
+                    <chef-heading>Node {{node.name }}</chef-heading>
                     <chef-alert type="error">
                         There is no client run data available for this node.
                     </chef-alert>
                     <dl class="metadata">
+                        <dt class="heading">
+                            Node ID
+                        </dt>
+                        <dd class="content">{{node.id}}</dd>
+
                         <dt class="heading">
                             Uptime
                         </dt>
