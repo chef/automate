@@ -195,7 +195,9 @@ describeIfIAMV2p1('project management', () => {
 
     cy.get('app-project-details chef-button').contains('Delete Rule').click();
 
-    cy.get('app-project-details chef-tbody chef-td').contains(ruleID).should('not.exist');
+    // since this is a cypress custom project, we know this is the only rule.
+    // the empty UI should show up so entire table will be missing.
+    cy.get('app-project-details chef-tbody').should('not.exist');
   });
 
   it('can delete a project', () => {
@@ -208,8 +210,23 @@ describeIfIAMV2p1('project management', () => {
 
     cy.get('app-project-list chef-button').contains('Delete Project').click();
 
-    // empty UI should show up so entire table will be missing
-    cy.get('app-project-list chef-tbody').should('not.exist');
+    // Once we get this notification we know the network call to delete succeeded,
+    // so now we can check if there are other projects or not.
+    cy.get('chef-notification.info').contains(`Deleted project ${projectID}`);
+    cy.request({
+      auth: { bearer: adminToken },
+      method: 'GET',
+      url: '/apis/iam/v2beta/projects'
+    }).then((response) => {
+      expect(response.status).to.equal(200);
+      // no projects are left so we shouldn't render the table at all
+      if (response.body.projects.length === 0) {
+        cy.get('app-project-list chef-tbody').should('not.exist');
+      // otherwise, check that the projectID is no longer in the table
+      } else {
+        cy.get('app-project-list chef-tbody chef-td').contains(projectID).should('not.exist');
+      }
+    });
   });
 
   it('can create a project with a custom ID', () => {
