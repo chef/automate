@@ -148,7 +148,7 @@ describe('team add users', () => {
     cy.get('chef-tbody chef-td a').contains('Local Administrator');
 
     // navigate back to add users and see empty page and message
-    cy.get('chef-toolbar chef-button').contains('Add Users').click();
+    cy.get('chef-toolbar chef-button').contains('Add User').click();
     cy.url().should('eq',
     `${Cypress.config().baseUrl}/settings/teams/${teamUIRouteIdentifier}/add-users`);
     cy.get('chef-table').should('not.exist');

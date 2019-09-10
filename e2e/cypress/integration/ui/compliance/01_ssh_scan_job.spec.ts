@@ -18,7 +18,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
   const jobName = 'job ' + nowTime;
   const decoded = Base64.decode(Cypress.env('AUTOMATE_ACCEPTANCE_TARGET_KEY'));
 
-  itFlaky('can create a credential with a username and key', () => {
+  it('can create a credential with a username and key', () => {
     // we save the route that will be called when we navigate to the page
     // in order to be able to wait for it later
     cy.route('POST', '/api/v0/secrets/search').as('getSecrets');
@@ -52,7 +52,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     cy.contains(credName).should('exist');
   });
 
-  itFlaky('can create a node and attach a credential', () => {
+  it('can create a node and attach a credential', () => {
     // navigate to node create page:
     // click on scan jobs
     cy.get('.nav-link').contains('Compliance').click();

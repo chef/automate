@@ -79,7 +79,7 @@ describeIfIAMV2p1('project management', () => {
     cy.url().should('include', `/settings/projects/${projectID}`);
   });
 
-  itFlaky('can create a rule for the new project', () => {
+  it('can create a rule for the new project', () => {
     cy.get('app-project-details app-authorized button').contains('Create Rule').click();
 
     cy.url().should('include', `/settings/projects/${projectID}/rules`);
@@ -119,7 +119,7 @@ describeIfIAMV2p1('project management', () => {
     cy.get('app-project-details chef-td').contains(ruleID);
   });
 
-  itFlaky('displays a list of rules for a project', () => {
+  it('displays a list of rules for a project', () => {
     ['Name', 'ID', 'Resource Type', 'Conditions', 'Edits'].forEach((header) => {
       cy.get('app-project-details chef-th').contains(header);
     });
@@ -131,7 +131,7 @@ describeIfIAMV2p1('project management', () => {
     cy.get('app-project-details chef-td').contains('Edits pending');
   });
 
-  itFlaky('can update a project rule', () => {
+  it('can update a project rule', () => {
     const updatedRuleName = `updated ${ruleName}`;
     cy.get('app-project-details a').contains(ruleName).click();
 
@@ -168,7 +168,7 @@ describeIfIAMV2p1('project management', () => {
     cy.get('app-project-details chef-td').contains('2 conditions');
   });
 
-  itFlaky('can update a project name', () => {
+  it('can update a project name', () => {
     const updatedProjectName = `updated ${projectName}`;
     cy.route('GET', `/apis/iam/v2beta/projects/${projectID}`).as('getProject');
 
@@ -183,7 +183,7 @@ describeIfIAMV2p1('project management', () => {
     cy.get('app-project-details h1.page-title').contains(updatedProjectName);
   });
 
-  itFlaky('can delete a project rule', () => {
+  it('can delete a project rule', () => {
     cy.get('[data-cy=rules-tab]').click();
 
     cy.get('app-project-details chef-td').contains(ruleID).parent()
@@ -200,6 +200,7 @@ describeIfIAMV2p1('project management', () => {
     cy.get('app-project-details chef-tbody').should('not.exist');
   });
 
+  // sometimes the deleted successfully notification isn't showing up
   itFlaky('can delete a project', () => {
     cy.get('.breadcrumb').click();
 
@@ -229,7 +230,10 @@ describeIfIAMV2p1('project management', () => {
     });
   });
 
-  it('can create a project with a custom ID', () => {
+  // these tests are currently interdependent so mark as flaky until the above isn't
+  itFlaky('can create a project with a custom ID', () => {
+    cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['projects']);
+
     cy.get('[data-cy=create-project]').contains('Create Project').click();
     cy.get('app-project-list chef-modal').should('have.class', 'visible');
 
