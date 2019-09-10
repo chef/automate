@@ -4,15 +4,13 @@ tests = false
 
 [issues]
 exclude-use-default = false
-exclude = [
-  "not declared by package utf8",
-  "unicode/utf8/utf8.go",
-]
 
 [linters]
 enable-all = true
 disable = [
+  "bodyclose",
   "dupl",
+  "funlen",
   "goconst",
   "maligned",
   "megacheck",
