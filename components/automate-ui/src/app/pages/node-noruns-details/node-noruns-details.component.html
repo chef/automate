@@ -1,22 +1,25 @@
-<app-server-org-filter-sidebar>
-    <chef-sidebar-entry route="/client-runs" icon="storage">Node State</chef-sidebar-entry>
-</app-server-org-filter-sidebar>
+<app-client-runs-sidebar></app-client-runs-sidebar>
 
 <div class="container">
     <main>
         <div class="node-noruns-details-container">
           <chef-breadcrumbs>
             <chef-breadcrumb [link]="['/client-runs']">Client runs</chef-breadcrumb>
-            Node {{ nodeId }}
+            Node {{ node.name }}
           </chef-breadcrumbs>
 
             <div class="run-container">
                 <chef-page-header>
-                    <chef-heading>Node {{nodeId }}</chef-heading>
+                    <chef-heading>Node {{node.name }}</chef-heading>
                     <chef-alert type="error">
                         There is no client run data available for this node.
                     </chef-alert>
                     <dl class="metadata">
+                        <dt class="heading">
+                            Node ID
+                        </dt>
+                        <dd class="content">{{node.id}}</dd>
+
                         <dt class="heading">
                             Uptime
                         </dt>
