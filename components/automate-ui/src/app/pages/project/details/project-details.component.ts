@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
-import { filter, map, pluck, takeUntil } from 'rxjs/operators';
+import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity, some } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -17,7 +17,7 @@ import { Project } from 'app/entities/projects/project.model';
 import { GetProject, UpdateProject } from 'app/entities/projects/project.actions';
 import { GetRulesForProject, DeleteRule } from 'app/entities/rules/rule.actions';
 import { Rule, RuleStatus } from 'app/entities/rules/rule.model';
-import { allRules } from 'app/entities/rules/rule.selectors';
+import { allRules, getAllStatus } from 'app/entities/rules/rule.selectors';
 
 export type ProjectTabName = 'rules' | 'details';
 
@@ -69,28 +69,29 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(getStatus),
-      this.store.select(updateStatus)
+      this.store.select(updateStatus),
+      this.store.select(getAllStatus)
     ]).pipe(
-      takeUntil(this.isDestroyed),
-      map(([gStatus, uStatus]) => {
+      takeUntil(this.isDestroyed)
+    ).subscribe(([getProjectSt, updateSt, getRulesSt]) => {
         this.isLoading =
-          (gStatus !== EntityStatus.loadingSuccess) ||
-          (uStatus === EntityStatus.loading);
-      })
-    ).subscribe();
+          (getProjectSt !== EntityStatus.loadingSuccess) ||
+          (updateSt === EntityStatus.loading) ||
+          (getRulesSt !== EntityStatus.loadingSuccess);
+      });
 
     this.store.select(projectFromRoute).pipe(
       filter(identity),
-      takeUntil(this.isDestroyed),
-      map((state) => {
-        this.project = <Project>Object.assign({}, state);
+      takeUntil(this.isDestroyed)
+      ).subscribe((state) => {
+        this.project = { ...state };
         this.store.dispatch(new GetRulesForProject({ project_id: this.project.id }));
         this.store.select(allRules).subscribe((rules) => {
           this.rules = rules;
         });
         this.isChefManaged = this.project.type === 'CHEF_MANAGED';
         this.projectForm.controls['name'].setValue(this.project.name);
-      })).subscribe();
+      });
 
     this.store.select(routeParams).pipe(
       pluck('id'),
@@ -113,11 +114,11 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   }
 
   showFirstRuleMessage(): boolean {
-    return this.rules.length === 0;
+    return !this.isLoading && this.rules.length === 0;
   }
 
   showRulesTable(): boolean {
-    return this.rules.length > 0;
+    return !this.isLoading && this.rules.length > 0;
   }
 
   closeDeleteModal(): void {

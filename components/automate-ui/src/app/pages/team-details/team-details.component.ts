@@ -70,10 +70,10 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public isMajorV1 = true;
   public isMinorV1 = false;
 
-  public sortedUsers$: Observable<User[]>;
+  public users: User[] = [];
   private isDestroyed = new Subject<boolean>();
 
-  public addButtonText = 'Add Users';
+  public addButtonText = 'Add User';
   public removeText = 'Remove User';
 
   public atLeastV2p1$: Observable<boolean>;
@@ -135,20 +135,21 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(getStatus),
-      this.store.select(updateStatus)
+      this.store.select(updateStatus),
+      this.store.select(getUsersStatus)
     ]).pipe(
-      takeUntil(this.isDestroyed),
-      map(([gStatus, uStatus]) => {
-        this.isLoadingTeam =
-          (gStatus !== EntityStatus.loadingSuccess) ||
-          (uStatus === EntityStatus.loading);
-        if (this.isLoadingTeam) {
-          this.updateNameForm.controls['name'].disable();
-        } else {
-          this.updateNameForm.controls['name'].enable();
-        }
-      })
-    ).subscribe();
+      takeUntil(this.isDestroyed)
+    ).subscribe(([gStatus, uStatus, usersStatus]) => {
+      this.isLoadingTeam =
+        (gStatus !== EntityStatus.loadingSuccess) ||
+        (uStatus === EntityStatus.loading) ||
+        (usersStatus === EntityStatus.loading);
+      if (this.isLoadingTeam) {
+        this.updateNameForm.controls['name'].disable();
+      } else {
+        this.updateNameForm.controls['name'].enable();
+      }
+    });
 
     combineLatest([
       this.store.select(v1TeamFromRoute),
@@ -162,14 +163,14 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       }),
       filter(identity)
     ).subscribe((team: Team) => {
-      this.team = team;
-      this.updateNameForm.controls.name.setValue(this.team.name);
-      this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
-      this.store.dispatch(new GetUsers());
-      if (this.projectsEnabled) {
-        this.store.dispatch(new GetProjects());
-      }
-    });
+        this.team = team;
+        this.updateNameForm.controls.name.setValue(this.team.name);
+        this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
+        this.store.dispatch(new GetUsers());
+        if (this.projectsEnabled) {
+          this.store.dispatch(new GetProjects());
+        }
+      });
 
     combineLatest([
       this.store.select(allProjects),
@@ -177,44 +178,45 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     ]).pipe(
       takeUntil(this.isDestroyed),
       filter(([_, pStatus]: [Project[], EntityStatus]) => pStatus !== EntityStatus.loading),
-      filter(() => !!this.team),
-      map(([allowedProjects, _]) => {
+      filter(() => !!this.team)
+    ).subscribe(([allowedProjects, _]) => {
         this.projects = {};
         allowedProjects
           .forEach(p => {
             this.projects[p.id] = { ...p, checked: this.team.projects.includes(p.id)
             };
           });
-      }))
-      .subscribe();
+      });
 
-    this.sortedUsers$ = <Observable<User[]>>combineLatest([
+    combineLatest([
       this.store.select(allUsers),
       this.store.select(userStatus),
       this.store.select(teamUsers),
-      this.store.select(getUsersStatus)])
-      .pipe(
-        map(([users, uStatus, tUsers, tStatus]: [User[], EntityStatus, string[], EntityStatus]) => {
-          if (uStatus !== EntityStatus.loadingSuccess ||
-            tStatus !== EntityStatus.loadingSuccess) {
-            return [];
-          }
-          // Map UUID membership to user records and remove any entries that don't
-          // map to user records.
-          return at(tUsers, keyBy('membership_id', users))
-            .filter(userRecord => userRecord !== undefined);
-        }),
-        map((users: User[]) => users.sort(
-          (a, b) => {
-            // See https://stackoverflow.com/a/38641281 for these options
-            const opts = { numeric: true, sensitivity: 'base' };
-            // sort by name then by id
-            return a.name.localeCompare(b.name, undefined, opts) ||
-              a.name.localeCompare(b.name, undefined, { numeric: true }) ||
-              a.id.localeCompare(b.id, undefined, opts);
-            })),
-        takeUntil(this.isDestroyed)
-      );
+      this.store.select(getUsersStatus)]).pipe(
+        takeUntil(this.isDestroyed),
+        filter(([_allUsers, uStatus, _teamUsers, tuStatus]:
+          [User[], EntityStatus, string[], EntityStatus]) =>
+            uStatus === EntityStatus.loadingSuccess &&
+            tuStatus === EntityStatus.loadingSuccess),
+        filter(() => !!this.team),
+        // Map UUID membership to user records and remove any entries that don't
+        // map to user records.
+        map(([users, _uStatus, teamUserIds, _tuStatus]:
+          [User[], EntityStatus, string[], EntityStatus]) => {
+            return at(teamUserIds, keyBy('membership_id', users))
+              .filter(userRecord => userRecord !== undefined);
+        })).subscribe((users: User[]) => {
+          users.sort(
+            (a, b) => {
+              // See https://stackoverflow.com/a/38641281 for these options
+              const opts = { numeric: true, sensitivity: 'base' };
+              // sort by name then by id
+              return a.name.localeCompare(b.name, undefined, opts) ||
+                a.name.localeCompare(b.name, undefined, { numeric: true }) ||
+                a.id.localeCompare(b.id, undefined, opts);
+            });
+          this.users = users;
+        });
 
     // If, however, the user browses directly to /settings/teams/ID, the store
     // will not contain the team data, so we fetch it.
@@ -243,6 +245,14 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  showUsersTable(): boolean {
+    return !this.isLoadingTeam && this.users.length > 0;
+  }
+
+  showEmptyStateMessage(): boolean {
+    return !this.isLoadingTeam && this.users.length === 0;
   }
 
   toggleUserMembershipView(): void {

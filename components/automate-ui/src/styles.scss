@@ -158,6 +158,7 @@ html.no-smil {
 // Global loading modifier class to accomodate for our navigation
 chef-loading-spinner[fixed] {
   top: $navigation-height;
+  left: $sidebar-width;
 }
 
 input {
