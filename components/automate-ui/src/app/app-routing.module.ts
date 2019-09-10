@@ -310,7 +310,7 @@ const routes: Routes = [
     children: []
   },
   // END Deprecated routes.
-  { // everything unknown goes to client runs
+  {
     path: '**',
     redirectTo: 'dashboards/event-feed'
   }
