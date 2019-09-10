@@ -183,9 +183,8 @@ func (instance *ChainWorkflowInstance) IsCanceled() bool {
 		return instance.payload.Canceled
 	} else if instance.result != nil {
 		return instance.result.Canceled
-	} else {
-		return false
 	}
+	return false
 }
 
 func (instance *ChainWorkflowInstance) GetResult() (*ChainWorkflowPayload, error) {
