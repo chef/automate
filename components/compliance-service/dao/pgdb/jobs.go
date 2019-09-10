@@ -735,7 +735,7 @@ func (db *DB) GetJob(id string) (*jobs.Job, error) {
 
 	newJob, err = fromDBSelectJob(&job)
 	if err != nil {
-		return &newJob, errors.Wrap(err, "GetJob error transalting job from db struct")
+		return &newJob, errors.Wrap(err, "GetJob error translating job from db struct")
 	}
 	return &newJob, nil
 }

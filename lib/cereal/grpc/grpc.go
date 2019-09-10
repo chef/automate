@@ -357,13 +357,13 @@ func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*backen
 		var errOut error
 		msg, err := s.Recv()
 		if err != nil {
-			logrus.WithError(err).Debug("Received error while waiting for commited message")
+			logrus.WithError(err).Debug("Received error while waiting for committed message")
 			errOut = err
 		} else if c := msg.GetCancel(); c != nil {
-			logrus.Debug("Received cancel while waiting for commited message")
+			logrus.Debug("Received cancel while waiting for committed message")
 			errOut = context.Canceled
 		} else if c := msg.GetCommitted(); c != nil {
-			logrus.Debug("Received comitted")
+			logrus.Debug("Received committed")
 			errOut = nil
 		} else {
 			errOut = errUnknownMessage

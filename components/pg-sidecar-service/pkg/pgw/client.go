@@ -312,7 +312,7 @@ func (client *Client) CreateDB(db, role string) error {
 func (client *Client) CreateExtension(ext string) error {
 	var err error
 	log := client.log().WithFields(logrus.Fields{
-		"action": "create_extention",
+		"action": "create_extension",
 		"ext":    ext,
 	})
 

@@ -347,7 +347,7 @@ func (r *Runner) ListBackups(ctx context.Context) ([]*api.BackupTask, error) {
 		// to keep track of backups
 		if prefixStr != ".incomplete" && prefixStr != es.RepoBaseName && prefixStr != ".tmp" {
 			t := r.backupTaskFromSharedPrefix(prefixStr)
-			state := api.BackupTask_IN_PROGRESS
+			state := api.BackupTask_IN_PROGRESS // nolint:ineffassign
 
 			reader, err := bucket.NewReader(ctx, path.Join(prefixStr, ".status"), &NoOpObjectVerifier{})
 			if err != nil {

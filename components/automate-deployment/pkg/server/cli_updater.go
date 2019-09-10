@@ -107,7 +107,7 @@ func (s *server) GetCLIExecutable(d *api.GetCLIExecutableRequest, stream api.Dep
 	})
 	_, err = io.CopyBuffer(writer, f, buffer)
 	if err != nil {
-		logctx.WithError(err).Error("error transfering executable")
+		logctx.WithError(err).Error("error transferring executable")
 	}
 	return err
 }
