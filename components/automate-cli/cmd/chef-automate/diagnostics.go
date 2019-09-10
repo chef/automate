@@ -3,6 +3,7 @@ package main
 import (
 	"net/url"
 	"os"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -104,7 +105,7 @@ func runDiagnosticsRunCmd(cmd *cobra.Command, args []string) error {
 	} else {
 		tstContext = diagnostics.NewTestContext(dsClient,
 			diagnostics.WithLBURL(*lbURL),
-			diagnostics.WithAdminToken(diagnosticsRunCmdOpts.adminToken))
+			diagnostics.WithAdminToken(strings.TrimSpace(diagnosticsRunCmdOpts.adminToken)))
 	}
 
 	r := runner.New(

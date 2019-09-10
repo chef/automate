@@ -57,7 +57,7 @@ do_deploy() {
             --accept-terms-and-mlsa
 
     docker exec -t "$_frontend1_container_name" \
-        "$cli_bin" iam upgrade-to-v2 --beta2.1
+        "$cli_bin" iam upgrade-to-v2
 
     docker exec -t "$_frontend1_container_name" \
         "$cli_bin" bootstrap bundle create -o bootstrap.abb
@@ -78,5 +78,14 @@ do_deploy() {
 
 
 do_test_deploy() {
-    :
+    local admin_token
+    admin_token=$(docker exec -t "$_frontend1_container_name" \
+        "$cli_bin" iam token create --admin "diagnostics-test-$RANDOM")
+
+    docker exec -t "$_frontend1_container_name" \
+        "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam-v1"
+
+
+    docker exec -t "$_frontend2_container_name" \
+        "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam-v1"
 }
