@@ -12,7 +12,7 @@ export HAB_ORIGIN=${HAB_ORIGIN:-chef}
 # Bring studio-common to life
 RECOMMENDED_HAB_VERSION="0.77.0"
 
-GOLANGCILINTVERSION=1.16.0
+GOLANGCILINTVERSION=1.18.0
 
 # shellcheck disable=1090
 if [ -d "${STUDIO_COMMON:-}" ]; then

@@ -217,7 +217,7 @@ func convertA2v2SummaryDocToLatest(src *ESInSpecSummaryA2v2) (*ESInSpecSummary, 
 			profileTitle = profilesMetaMap[profileId].Title
 			profileVersion = profilesMetaMap[profileId].Version
 		} else {
-			return nil, fmt.Errorf("convertA2v2SummaryDocToLatest aborts convertion due to missing profile %s", profileId)
+			return nil, fmt.Errorf("convertA2v2SummaryDocToLatest aborts conversion due to missing profile %s", profileId)
 		}
 		profileStatus := srcProfileSum.Status
 		if profileStatus == "" || profileStatus == "loaded" {
@@ -289,7 +289,7 @@ func convertA2v2ReportDocToLatest(src *ESInSpecReportA2v2, dstSum *ESInSpecSumma
 				profileStatus = profilesStatusMap[srcProfileMin.SHA256]
 			}
 		} else {
-			return nil, fmt.Errorf("convertA2v2ReportDocToLatest aborts convertion due to missing profile %s", srcProfileMin.SHA256)
+			return nil, fmt.Errorf("convertA2v2ReportDocToLatest aborts conversion due to missing profile %s", srcProfileMin.SHA256)
 		}
 		dstRep.Profiles[i] = ESInSpecReportProfile{
 			Profile:      fmt.Sprintf("%s|%s", srcProfileMin.Name, srcProfileMin.SHA256),
