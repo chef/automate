@@ -6,11 +6,15 @@ interface Project {
 }
 
 describeIfIAMV2p1('project management', () => {
+  // we increase the default delay to mimic the average human's typing speed
+  // only need this for input values upon which later test assertions depend
+  // ref: https://github.com/cypress-io/cypress/issues/534
+  const typeDelay = 50;
   let adminToken = '';
   const now = Cypress.moment().format('MMDDYYhhmm');
-  const typeDelay = 50;
   const cypressPrefix = 'cypress-test';
   const projectID = `${cypressPrefix}-project1-${now}`;
+  const customProjectID = `${cypressPrefix}-customproject-${now}`;
   const projectName = `${cypressPrefix} project1 ${now}`;
   const ruleID = `${cypressPrefix}-rule-${now}`;
   const ruleName = `${cypressPrefix} rule ${now}`;
@@ -49,13 +53,10 @@ describeIfIAMV2p1('project management', () => {
     });
   });
 
-  it('can create a project', () => {
+  it('can create a project without adding a custom ID', () => {
     cy.get('[data-cy=create-project]').contains('Create Project').click();
     cy.get('app-project-list chef-modal').should('have.class', 'visible');
 
-    // we increase the default delay to mimic the average human's typing speed
-    // only need this for input values upon which later test assertions depend
-    // ref: https://github.com/cypress-io/cypress/issues/534
     cy.get('[data-cy=create-name]').focus()
       .type(projectName, { delay: typeDelay }).should('have.value', projectName);
 
@@ -207,6 +208,30 @@ describeIfIAMV2p1('project management', () => {
 
     cy.get('app-project-list chef-button').contains('Delete Project').click();
 
-    cy.get('app-project-list chef-tbody chef-td').contains(projectID).should('not.exist');
+    // empty UI should show up so entire table will be missing
+    cy.get('app-project-list chef-tbody').should('not.exist');
+  });
+
+  it('can create a project with a custom ID', () => {
+    cy.get('[data-cy=create-project]').contains('Create Project').click();
+    cy.get('app-project-list chef-modal').should('have.class', 'visible');
+
+    cy.get('[data-cy=create-name]').focus()
+      .type(projectName, { delay: typeDelay }).should('have.value', projectName);
+
+    cy.get('[data-cy=create-id]').should('not.be.visible');
+    cy.get('[data-cy=edit-button]').contains('Edit ID').click();
+    cy.get('[data-cy=id-label]').should('not.be.visible');
+
+    cy.get('[data-cy=create-id]').should('be.visible').clear()
+      .type(customProjectID, { delay: typeDelay }).should('have.value', customProjectID);
+
+    cy.get('[data-cy=save-button]').click();
+    cy.get('app-project-list chef-modal').should('not.be.visible');
+    cy.get('chef-notification.info').should('be.visible');
+    cy.contains(projectName).should('exist');
+    cy.contains(customProjectID).should('exist');
+
+    cy.url().should('include', '/settings/projects');
   });
 });
