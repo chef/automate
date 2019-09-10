@@ -190,7 +190,7 @@ func validateFeedTimelineRequest(req *event_feed.FeedTimelineRequest) error {
 	}
 
 	if 24%req.Interval != 0 {
-		return e.GrpcError(codes.InvalidArgument, "time interval must devide 24")
+		return e.GrpcError(codes.InvalidArgument, "time interval must divide 24")
 	}
 
 	// Validate Date Range
