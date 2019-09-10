@@ -9,7 +9,7 @@ describe File.basename(__FILE__) do
     Reporting::ReportingService;
   end
 
-  it "errors" do
+  it "errors without control_tag filter" do
     assert_grpc_error("'control_tag' filter is required for 'control_tag_value' suggestions", 2) do
       GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
         type: 'control_tag_value',
@@ -18,8 +18,7 @@ describe File.basename(__FILE__) do
     end
   end
 
-  it "works" do
-    # suggest control tag keys
+  it "suggests control tag keys matching 'scope'" do
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'control_tag_key',
       text: 'scope',
@@ -35,8 +34,9 @@ describe File.basename(__FILE__) do
       "Scoops"
     ]
     assert_suggestions_text(expected, actual_data)
+  end
 
-    # suggest control tag keys
+  it "suggests control tag keys with a size of 2" do
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'control_tag_key',
       text: 'scope',
@@ -51,8 +51,9 @@ describe File.basename(__FILE__) do
       "scoop"
     ]
     assert_suggestions_text(expected, actual_data)
+  end
 
-    # suggest control tag keys
+  it "suggests control tag keys matching 'Scoo'" do
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'control_tag_key',
       text: 'Scoo',
@@ -68,7 +69,9 @@ describe File.basename(__FILE__) do
       "scope"
     ]
     assert_suggestions_text(expected, actual_data)
+  end
 
+  it "suggests control tag keys without text" do
     # suggest control tag keys without text given
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'control_tag_key',
@@ -80,7 +83,23 @@ describe File.basename(__FILE__) do
     )
     expected = [ "cci", "gtitle", "satisfies", "scoop", "Scoops", "scope", "stig_id", "tag1", "web" ]
     assert_suggestions_text(expected, actual_data)
+  end
 
+  it "suggests control tag keys with platform filter" do
+    # suggest control tag keys without text given
+    actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
+      type: 'control_tag_key',
+      filters: [
+        Reporting::ListFilter.new(type: 'start_time', values: ['2018-02-01T23:59:59Z']),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
+        Reporting::ListFilter.new(type: 'platform', values: ['centos', 'windows'])
+      ]
+    )
+    expected = ["satisfies", "scoop", "Scoops", "scope", "web"]
+    assert_suggestions_text(expected, actual_data)
+  end
+
+  it "suggests control tag values without text" do
     # suggest control tag values with a tag key filter without text
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'control_tag_value',
@@ -93,7 +112,9 @@ describe File.basename(__FILE__) do
     )
     expected = [ "Apache", "apalache", "NginX" ]
     assert_suggestions_text(expected, actual_data)
+  end
 
+  it "suggests control tag values without text and size of 5" do
     # suggest control tag values with tag key filter without text
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'control_tag_value',
@@ -106,7 +127,9 @@ describe File.basename(__FILE__) do
     )
     expected = [ "apache-1", "apache-2", "NGX-1", "NGX-2", "SRG-00006" ]
     assert_suggestions_text(expected, actual_data)
+  end
 
+  it "suggests control tag values matching apaCH" do
     # suggest control tag values with a tag key filter without text
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'control_tag_value',
@@ -119,7 +142,9 @@ describe File.basename(__FILE__) do
     )
     expected = [ "Apache", "apalache" ]
     assert_suggestions_text(expected, actual_data)
+  end
 
+  it "suggests control tag values with missing key" do
     # suggest control tag values with a missing tag key filter
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'control_tag_value',
