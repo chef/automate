@@ -231,7 +231,7 @@ func (w *workflowInstance) Failed() bool {
 }
 
 func (w *workflowInstance) Cancelled() bool {
-	return w.chain.IsCanceled()
+	return w.chain.IsCancelled()
 }
 
 func (w *workflowInstance) FailureMessage() string {
