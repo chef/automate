@@ -16,8 +16,8 @@ import {
 } from 'app/entities/projects/project.actions';
 import { projectEntityReducer, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
 import { Project } from 'app/entities/projects/project.model';
-import { ProjectListComponent } from './project-list.component';
 import { ProjectStatus } from 'app/entities/rules/rule.model';
+import { ProjectListComponent } from './project-list.component';
 
 describe('ProjectListComponent', () => {
   let component: ProjectListComponent;
@@ -75,7 +75,7 @@ describe('ProjectListComponent', () => {
         }),
         MockComponent({
           selector: 'app-confirm-apply-stop-modal',
-          inputs: ['visible', 'applyRulesStatus'],
+          inputs: ['visible', 'applyRulesStatus', 'stopRulesInProgress'],
           outputs: ['confirm', 'cancel']
         }),
         MockComponent({ selector: 'chef-control-menu' }),
@@ -271,11 +271,9 @@ describe('ProjectListComponent', () => {
 
   describe('when update-start-confirmation modal emits a cancellation', () => {
     it('hides the modal', () => {
-      component.confirmApplyStartModalVisible = true;
-      fixture.detectChanges();
+      component.openConfirmUpdateStartModal();
 
       component.cancelApplyStart();
-      fixture.detectChanges();
 
       expect(component.confirmApplyStartModalVisible).toEqual(false);
     });
@@ -284,32 +282,24 @@ describe('ProjectListComponent', () => {
   describe('when update-start-confirmation modal emits a confirmation', () => {
     beforeEach(() => {
       spyOn(projectService, 'applyRulesStart');
-      component.confirmApplyStartModalVisible = true;
-      fixture.detectChanges();
+      component.openConfirmUpdateStartModal();
+      component.confirmApplyStart();
     });
 
     it('hides the modal', () => {
-      component.confirmApplyStart();
-      fixture.detectChanges();
-
       expect(component.confirmApplyStartModalVisible).toEqual(false);
     });
 
     it('has the projectService start the rule updates', () => {
-      component.confirmApplyStart();
-      fixture.detectChanges();
-
       expect(projectService.applyRulesStart).toHaveBeenCalled();
     });
   });
 
   describe('when update-stop-confirmation modal emits a cancellation', () => {
     it('hides the modal', () => {
-      component.confirmApplyStopModalVisible = true;
-      fixture.detectChanges();
+      component.openConfirmUpdateStopModal();
 
       component.cancelApplyStop();
-      fixture.detectChanges();
 
       expect(component.confirmApplyStopModalVisible).toEqual(false);
     });
@@ -318,22 +308,24 @@ describe('ProjectListComponent', () => {
   describe('when update-stop-confirmation modal emits a confirmation', () => {
     beforeEach(() => {
       spyOn(projectService, 'applyRulesStop');
-      component.confirmApplyStopModalVisible = true;
-      fixture.detectChanges();
+      component.confirmApplyStart(); // start the update
+      component.openConfirmUpdateStopModal();
+      component.confirmApplyStop(); // emit the confirmation
     });
 
-    it('hides the modal', () => {
-      component.confirmApplyStop();
-      fixture.detectChanges();
+    it('keeps the modal open', () => {
 
-      expect(component.confirmApplyStopModalVisible).toEqual(false);
+      expect(component.confirmApplyStopModalVisible).toEqual(true);
     });
 
     it('has the projectService stop the rule updates', () => {
-      component.confirmApplyStop();
-      fixture.detectChanges();
-
       expect(projectService.applyRulesStop).toHaveBeenCalled();
+    });
+
+    it('waits until stopping the update completes then closes the modal', () => {
+      store.dispatch(new GetApplyRulesStatusSuccess(
+        genState(ApplyRulesStatusState.NotRunning)));
+      expect(component.confirmApplyStopModalVisible).toEqual(false);
     });
   });
 
@@ -344,6 +336,71 @@ describe('ProjectListComponent', () => {
       editedProject = genProject('uuid-99', 'EDITS_PENDING');
       noRulesProject = genProject('uuid-15', 'NO_RULES');
       uneditedProject = genProject('uuid-111', 'RULES_APPLIED');
+    });
+
+    it('maps current project status while rules are not being applied', () => {
+      store.dispatch(new GetApplyRulesStatusSuccess( // set state
+        genState(ApplyRulesStatusState.NotRunning)));
+
+      store.dispatch(new GetProjectsSuccess({ // set cache
+        projects: [editedProject, uneditedProject, noRulesProject]
+      }));
+
+      // Result: this uses current value (EDITS_PENDING)
+      expect(component.getProjectStatus(editedProject)).toBe('Needs updating');
+      // But the cached value is the same as the current value at this point!
+      // So is the above a phantom result?
+      // No, because we can affect the answer by changing the current value:
+      editedProject.status = 'RULES_APPLIED';
+      expect(component.getProjectStatus(editedProject)).toBe('OK');
+
+      // These are unaffected by Running/NotRunning
+      expect(component.getProjectStatus(uneditedProject)).toBe('OK');
+      expect(component.getProjectStatus(noRulesProject)).toBe('OK');
+    });
+
+    it('maps cached status while rules are being applied', () => {
+      store.dispatch(new GetApplyRulesStatusSuccess( // set state
+        genState(ApplyRulesStatusState.NotRunning)));
+      store.dispatch(new GetProjectsSuccess({ // set cache
+        projects: [editedProject, uneditedProject, noRulesProject]
+      }));
+      component.confirmApplyStart(); // now start an update
+      store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
+        genState(ApplyRulesStatusState.Running)));
+
+      // Result: this uses cached value (EDITS_PENDING)
+      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+      // But the cached value is the same as the current value at this point!
+      // So is the above a phantom result?
+      // No, because we still get the same answer even if we change the current value:
+      editedProject.status = 'RULES_APPLIED';
+      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+
+      // These are unaffected by Running/NotRunning
+      expect(component.getProjectStatus(uneditedProject)).toBe('OK');
+      expect(component.getProjectStatus(noRulesProject)).toBe('OK');
+    });
+
+    it('does not update cache while rules are being applied', () => {
+      store.dispatch(new GetApplyRulesStatusSuccess( // set state
+        genState(ApplyRulesStatusState.NotRunning)));
+      store.dispatch(new GetProjectsSuccess({ // set cache
+        projects: [editedProject, uneditedProject, noRulesProject]
+      }));
+      component.confirmApplyStart(); // now start an update
+      store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
+        genState(ApplyRulesStatusState.Running)));
+      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
+
+      // This would update the cache if we were NotRunning, but does not when Running
+      editedProject.status = 'RULES_APPLIED';
+      store.dispatch(new GetProjectsSuccess({
+        projects: [editedProject, uneditedProject, noRulesProject]
+      }));
+
+      // Result: still uses originally cached value, so Updating rather than OK
+      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
     });
 
     describe('for project with edits pending', () => {
@@ -478,7 +535,7 @@ describe('ProjectListComponent', () => {
         store.dispatch(new GetApplyRulesStatusSuccess( // set state
           genState(ApplyRulesStatusState.NotRunning)));
         store.dispatch(new GetProjectsSuccess({ // set cache
-          projects: [editedProject]
+          projects: [uneditedProject, noRulesProject]
         }));
         expect(component.getProjectStatus(uneditedProject)).toBe('OK');
         expect(component.getProjectStatus(noRulesProject)).toBe('OK');
@@ -488,10 +545,6 @@ describe('ProjectListComponent', () => {
           genState(ApplyRulesStatusState.Running)));
         expect(component.getProjectStatus(uneditedProject)).toBe('OK');
         expect(component.getProjectStatus(noRulesProject)).toBe('OK');
-
-        // later side effect of the update, but project status NOT affected!
-        editedProject.status = 'RULES_APPLIED';
-        expect(component.getProjectStatus(editedProject)).toBe('Updating...');
 
         // update finishes--but this time reporting cancelled
         store.dispatch(new GetApplyRulesStatusSuccess(
@@ -503,70 +556,6 @@ describe('ProjectListComponent', () => {
       });
     });
 
-    it('maps current project status while rules are not being applied', () => {
-      store.dispatch(new GetApplyRulesStatusSuccess( // set state
-        genState(ApplyRulesStatusState.NotRunning)));
-
-      store.dispatch(new GetProjectsSuccess({ // set cache
-        projects: [editedProject, uneditedProject, noRulesProject]
-      }));
-
-      // Result: this uses current value (EDITS_PENDING)
-      expect(component.getProjectStatus(editedProject)).toBe('Needs updating');
-      // But the cached value is the same as the current value!
-      // So is the above a phantom result?
-      // No, because we can affect the answer by changing the current value:
-      editedProject.status = 'NO_RULES';
-      expect(component.getProjectStatus(editedProject)).toBe('OK');
-
-      // These are unaffected by Running/NotRunning
-      expect(component.getProjectStatus(uneditedProject)).toBe('OK');
-      expect(component.getProjectStatus(noRulesProject)).toBe('OK');
-    });
-
-    it('maps cached status while rules are being applied', () => {
-      store.dispatch(new GetApplyRulesStatusSuccess( // set state
-        genState(ApplyRulesStatusState.NotRunning)));
-      store.dispatch(new GetProjectsSuccess({ // set cache
-        projects: [editedProject, uneditedProject, noRulesProject]
-      }));
-      component.confirmApplyStart(); // now start an update
-      store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
-        genState(ApplyRulesStatusState.Running)));
-
-      // Result: this uses cached value (EDITS_PENDING)
-      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
-      // But the cached value is the same as the current value!
-      // So is the above a phantom result?
-      // No, because we still get the same answer even if we change the current value:
-      editedProject.status = 'NO_RULES';
-      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
-
-      // These are unaffected by Running/NotRunning
-      expect(component.getProjectStatus(uneditedProject)).toBe('OK');
-      expect(component.getProjectStatus(noRulesProject)).toBe('OK');
-    });
-
-    it('does not update cache while rules are being applied', () => {
-      store.dispatch(new GetApplyRulesStatusSuccess( // set state
-        genState(ApplyRulesStatusState.NotRunning)));
-      store.dispatch(new GetProjectsSuccess({ // set cache
-        projects: [editedProject, uneditedProject, noRulesProject]
-      }));
-      component.confirmApplyStart(); // now start an update
-      store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
-        genState(ApplyRulesStatusState.Running)));
-      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
-
-      // This would update the cache if we were NotRunning, but does not when Running
-      editedProject.status = 'RULES_APPLIED';
-      store.dispatch(new GetProjectsSuccess({
-        projects: [editedProject, uneditedProject, noRulesProject]
-      }));
-
-      // Result: still uses originally cached value, so Updating rather than OK
-      expect(component.getProjectStatus(editedProject)).toBe('Updating...');
-    });
   });
 
 });

@@ -88,10 +88,17 @@ describe('ConfirmApplyStopModalComponent', () => {
     });
   });
 
-  it('displays a confirm-button', () => {
-    const button = fixture.nativeElement.querySelector('#confirm-button');
-    expect(button).not.toBeNull();
-    expect(button.textContent.trim()).toEqual('Stop Updating Projects');
+  using([
+    [true, 'Stopping Project Update...', 'in progress'],
+    [false, 'Stop Updating Projects', 'not in progress']
+  ], (inProgress: boolean, buttonText: string, description: string) => {
+    it(`displays a confirm-button when cancel is ${description}`, () => {
+      component.updateButtonText(inProgress);
+      fixture.detectChanges();
+      const button = fixture.nativeElement.querySelector('#confirm-button');
+      expect(button).not.toBeNull();
+      expect(button.textContent.trim()).toEqual(buttonText);
+    });
   });
 
   describe('when confirm-button is clicked', () => {

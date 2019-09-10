@@ -56,6 +56,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
 
   private updateProjectsFailed = false;
   private updateProjectsCancelled = false;
+  public cancelRulesInProgress = false;
 
   public applyRulesButtonText$: Observable<string>;
   public ApplyRulesStatusState = ApplyRulesStatusState;
@@ -94,6 +95,10 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.projects.applyRulesStatus$
       .subscribe(({ state, failed, cancelled }: ApplyRulesStatus) => {
         if (state === ApplyRulesStatusState.NotRunning) {
+          if (this.applyRulesInProgress) {
+            this.cancelRulesInProgress = false;
+            this.closeConfirmApplyStopModal();
+          }
           this.applyRulesInProgress = false;
           this.updateProjectsFailed = failed;
           this.updateProjectsCancelled = cancelled;
@@ -240,7 +245,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   }
 
   public confirmApplyStop(): void {
-    this.closeConfirmApplyStopModal();
+    this.cancelRulesInProgress = true;
     this.projects.applyRulesStop();
   }
 
