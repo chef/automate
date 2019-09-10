@@ -88,4 +88,6 @@ do_test_deploy() {
 
     docker exec -t "$_frontend2_container_name" \
         "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam-v1"
+
+    "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam-v1" "~purge" "~cli" "~grpc" "~deployment"
 }

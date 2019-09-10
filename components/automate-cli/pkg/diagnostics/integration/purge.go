@@ -19,7 +19,7 @@ import (
 func EventFeedPurgeDiagnostic() diagnostics.Diagnostic {
 	return diagnostics.Diagnostic{
 		Name: "event-feed-purge",
-		Tags: diagnostics.Tags{"event-feed", "purge"},
+		Tags: diagnostics.Tags{"event-feed", "purge", "grpc"},
 		Generate: func(t diagnostics.TestContext) error {
 			client, cleanup, err := newPurgeClientFor("event-feed-service")
 			if err != nil {
