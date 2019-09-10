@@ -65,7 +65,7 @@ func (s *Server) Serve(grpcEndpoint, http1Endpoint string) error {
 	if err != nil {
 		return err
 	}
-	server := s.NewGRPCServer(s.authzClient)
+	server := s.NewGRPCServer(s.authzSubjectClient, s.authzV2Client)
 
 	opts := []runtime.ServeMuxOption{
 		runtime.WithIncomingHeaderMatcher(headerMatcher),
@@ -134,10 +134,11 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		return nil, errors.Wrapf(err, "dial authz-service (%s)", c.AuthzAddress)
 	}
 
+	authzV2Client := authz_v2.NewAuthorizationClient(authzConn)
+
 	var ts tokens.Storage
-	var err error
 	if c.Token != nil {
-		ts, err = c.Token.Open(c.ServiceCerts, c.Logger, authz_v2.AuthorizationClient)
+		ts, err = c.Token.Open(c.ServiceCerts, c.Logger, authzV2Client)
 		if err != nil {
 			return nil, errors.Wrap(err, "initialize tokens adapter")
 		}
@@ -163,7 +164,7 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 
 	s := &Server{
 		authzSubjectClient: authz.NewSubjectPurgeClient(authzConn),
-		authzV2Client:      authz_v2.NewAuthorizationClient(authzConn),
+		authzV2Client:      authzV2Client,
 		authenticators:     authenticators,
 		logger:             c.Logger,
 		token:              ts,
