@@ -153,8 +153,27 @@ describeIfIAMV2p1('projects API: applying project', () => {
   });
 
   it('new rules get applied to nodes', () => {
+    // initially no rules
+    for (const project of [avengersProject, xmenProject]) {
+      cy.request({
+        headers: { 'api-token': Cypress.env('adminTokenValue') },
+        method: 'GET',
+        url: `/apis/iam/v2beta/projects/${project.id}/rules`
+      }).then((response) => {
+        expect(response.body.rules).to.have.length(0);
+      });
+
+      cy.request({
+        headers: { 'api-token': Cypress.env('adminTokenValue') },
+        method: 'GET',
+        url: `/apis/iam/v2beta/projects/${project.id}`
+      }).then((response) => {
+        expect(response.body.project.status).to.equal('NO_RULES');
+      });
+    }
 
     for (const rule of [avengersRule, xmenRule]) {
+
       cy.request({
         headers: { 'api-token': Cypress.env('adminTokenValue') },
         method: 'POST',
@@ -174,6 +193,14 @@ describeIfIAMV2p1('projects API: applying project', () => {
         for (const rule of response.body.rules) {
           expect(rule).to.have.property('status', 'STAGED');
         }
+      });
+
+      cy.request({
+        headers: { 'api-token': Cypress.env('adminTokenValue') },
+        method: 'GET',
+        url: `/apis/iam/v2beta/projects/${project.id}`
+      }).then((response) => {
+        expect(response.body.project.status).to.equal('EDITS_PENDING');
       });
     }
 
@@ -195,6 +222,14 @@ describeIfIAMV2p1('projects API: applying project', () => {
         for (const rule of response.body.rules) {
           expect(rule).to.have.property('status', 'APPLIED');
         }
+      });
+
+      cy.request({
+        headers: { 'api-token': Cypress.env('adminTokenValue') },
+        method: 'GET',
+        url: `/apis/iam/v2beta/projects/${project.id}`
+      }).then((response) => {
+        expect(response.body.project.status).to.equal('RULES_APPLIED');
       });
     }
 
@@ -237,9 +272,25 @@ describeIfIAMV2p1('projects API: applying project', () => {
 
     cy.request({
       headers: { 'api-token': Cypress.env('adminTokenValue') },
+      method: 'GET',
+      url: `/apis/iam/v2beta/projects/${avengersProject.id}`
+    }).then((response) => {
+      expect(response.body.project.status).to.equal('RULES_APPLIED');
+    });
+
+    cy.request({
+      headers: { 'api-token': Cypress.env('adminTokenValue') },
       method: 'PUT',
       url: `/apis/iam/v2beta/projects/${avengersRule.project_id}/rules/${avengersRule.id}`,
       body: updatedAvengersRule
+    });
+
+    cy.request({
+      headers: { 'api-token': Cypress.env('adminTokenValue') },
+      method: 'GET',
+      url: `/apis/iam/v2beta/projects/${avengersProject.id}`
+    }).then((response) => {
+      expect(response.body.project.status).to.equal('EDITS_PENDING');
     });
 
     cy.request({
@@ -259,9 +310,25 @@ describeIfIAMV2p1('projects API: applying project', () => {
     }).then((response) => {
       expect(response.body).to.have.length(4);
     });
+
+    cy.request({
+      headers: { 'api-token': Cypress.env('adminTokenValue') },
+      method: 'GET',
+      url: `/apis/iam/v2beta/projects/${avengersProject.id}`
+    }).then((response) => {
+      expect(response.body.project.status).to.equal('RULES_APPLIED');
+    });
   });
 
   it('deleted rules get applied to nodes', () => {
+
+    cy.request({
+      headers: { 'api-token': Cypress.env('adminTokenValue') },
+      method: 'GET',
+      url: `/apis/iam/v2beta/projects/${avengersProject.id}`
+    }).then((response) => {
+      expect(response.body.project.status).to.equal('RULES_APPLIED');
+    });
 
     cy.request({
       headers: { 'api-token': Cypress.env('adminTokenValue') },
@@ -271,10 +338,26 @@ describeIfIAMV2p1('projects API: applying project', () => {
 
     cy.request({
       headers: { 'api-token': Cypress.env('adminTokenValue') },
+      method: 'GET',
+      url: `/apis/iam/v2beta/projects/${avengersProject.id}`
+    }).then((response) => {
+      expect(response.body.project.status).to.equal('EDITS_PENDING');
+    });
+
+    cy.request({
+      headers: { 'api-token': Cypress.env('adminTokenValue') },
       method: 'POST',
       url: '/apis/iam/v2beta/apply-rules'
     });
     waitUntilApplyRulesNotRunning(100);
+
+    cy.request({
+      headers: { 'api-token': Cypress.env('adminTokenValue') },
+      method: 'GET',
+      url: `/apis/iam/v2beta/projects/${avengersProject.id}`
+    }).then((response) => {
+      expect(response.body.project.status).to.equal('NO_RULES');
+    });
 
     cy.request({
       headers: {
