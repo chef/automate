@@ -24,8 +24,7 @@ func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, 
 	client, err := backend.ES2Client()
 	size := int(size32)
 	if err != nil {
-		logrus.Error("Cannot connect to ElasticSearch")
-		return nil, err
+		return nil, errors.Wrap(err, "GetSuggestions cannot connect to ElasticSearch")
 	}
 
 	var SUGGESTIONS_TYPES = map[string]string{
@@ -191,8 +190,7 @@ func (backend ES2Backend) getAggSuggestions(ctx context.Context, client *elastic
 		Do(ctx)
 
 	if err != nil {
-		logrus.Error("getAggSuggestions search failed")
-		return nil, err
+		return nil, errors.Wrap(err, "getAggSuggestions search failed")
 	}
 
 	LogQueryPartMin(esIndex, searchResult, "getAggSuggestions - searchResult")
@@ -268,8 +266,7 @@ func (backend ES2Backend) getArrayAggSuggestions(ctx context.Context, client *el
 		Do(ctx)
 
 	if err != nil {
-		logrus.Error("getArrayAggSuggestions search failed")
-		return nil, err
+		return nil, errors.Wrap(err, "getArrayAggSuggestions search failed")
 	}
 
 	LogQueryPartMin(esIndex, searchResult, "getArrayAggSuggestions - searchResult")
@@ -357,8 +354,7 @@ func (backend ES2Backend) getProfileSuggestions(ctx context.Context, client *ela
 		Do(ctx)
 
 	if err != nil {
-		logrus.Error("getProfileSuggestions search failed")
-		return nil, err
+		return nil, errors.Wrap(err, "getProfileSuggestions search failed")
 	}
 
 	logrus.Debugf("Search query took %d milliseconds\n", searchResult.TookInMillis)
@@ -454,8 +450,7 @@ func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *ela
 		Do(ctx)
 
 	if err != nil {
-		logrus.Error("getControlSuggestions search failed")
-		return nil, err
+		return nil, errors.Wrap(err, "getControlSuggestions search failed")
 	}
 
 	logrus.Debugf("Search query took %d milliseconds\n", searchResult.TookInMillis)
@@ -485,7 +480,7 @@ func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *ela
 										addedControls[c.ID] = true
 									}
 								} else {
-									logrus.Errorf("Invalid control (%+v) found in report %s", c, hit2.Id)
+									logrus.Errorf("getControlSuggestions: Invalid control (%+v) found in report %s", c, hit2.Id)
 								}
 							}
 						}
@@ -551,8 +546,7 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 		Do(ctx)
 
 	if err != nil {
-		logrus.Error("getControlTagsSuggestions search failed")
-		return nil, err
+		return nil, errors.Wrap(err, "getControlTagsSuggestions search failed")
 	}
 
 	logrus.Debugf("Search query took %d milliseconds\n", searchResult.TookInMillis)
@@ -589,7 +583,7 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 							c.StringTags,
 						})
 					} else {
-						logrus.Errorf("Invalid control (%+v) found in report %s", c, hit2.Id)
+						logrus.Errorf("getControlTagsSuggestions: Invalid control (%+v) found in report %s", c, hit2.Id)
 					}
 				}
 			}
