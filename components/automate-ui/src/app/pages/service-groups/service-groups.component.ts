@@ -90,7 +90,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       allowWildcards: true
     },
     {
-      type: 'service_name',
+      type: 'service',
       text: 'Service Name',
       allowWildcards: true
     },
@@ -125,7 +125,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       allowWildcards: true
     },
     {
-      type: 'group_name',
+      type: 'group',
       text: 'Group Name',
       allowWildcards: true
     }
@@ -294,11 +294,20 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   detailParamsChange(queryParams) {
     const sgId = queryParams.get('sgId');
     if (sgId) {
+      const searchBarFilters = [];
+      const paramKeys = Object.keys(queryParams.params);
+      paramKeys.forEach((key: string) => {
+        if (some({'type': key}, this.categoryTypes)) {
+          searchBarFilters.push({ type: key, text: queryParams.params[key] });
+        }
+      });
+
       const servicesFilters: GroupServicesFilters = {
         service_group_id: sgId,
         page: parseInt(queryParams.get('sgPage'), 10) || 1,
         pageSize: parseInt(queryParams.get('sgPageSize'), 10) || 25,
-        health: queryParams.get('sgStatus') || 'total'
+        health: queryParams.get('sgStatus') || 'total',
+        searchBar: searchBarFilters
       };
       this.updateServicesSidebar(servicesFilters);
     }
