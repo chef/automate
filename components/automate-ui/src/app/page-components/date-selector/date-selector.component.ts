@@ -37,15 +37,17 @@ export class DateSelectorComponent implements OnInit {
     this.inSelection = date;
   }
 
-  apply() {
+  apply(event) {
     this.selectedDate = this.inSelection;
     this.select.emit(this.selectedDate);
     this.dropdownOpen = false;
+    event.stopPropagation();
   }
 
-  cancel() {
+  cancel(event) {
     this.inSelection = this.selectedDate;
     this.dropdownOpen = false;
+    event.stopPropagation();
   }
 }
 
