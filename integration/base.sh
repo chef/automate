@@ -90,10 +90,6 @@ do_setup() {
 }
 
 do_setup_default() {
-    if [ ${#test_deploy_inspec_profiles[@]} -ne 0 ] || [ ${#test_upgrade_inspec_profiles[@]} -ne 0 ]; then
-        install_chefdk "stable"
-    fi
-
     umask 077
     echo "umask 077" >> /etc/profile
     # this is needed for the preflight checks to pass
