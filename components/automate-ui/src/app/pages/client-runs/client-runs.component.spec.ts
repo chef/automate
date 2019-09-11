@@ -10,6 +10,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { Router } from '@angular/router';
 import { UpdateNodeFilters } from '../../entities/client-runs/client-runs.actions';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
+import { EntityStatus } from '../../entities/entities';
 
 class MockTelemetryService {
   track() { }
@@ -76,6 +77,70 @@ describe('ClientRunsComponent', () => {
         (type1, type2) => (type1 < type2 ? -1 : 1));
 
       expect(expectedTypeText).toEqual(typeText, 'Filter Types are not sorted');
+    });
+  });
+
+  describe('isNotFirstPage', () => {
+    it('No page parameter', () => {
+      expect(component.isNotFirstPage([])).toBeFalsy();
+    });
+
+    it('has page parameter', () => {
+      expect(component.isNotFirstPage([{type: 'page', text: '2'}])).toBeTruthy();
+    });
+  });
+
+  describe('isCurrentPageEmpty', () => {
+    const node =     {
+        id: '56343c09-e968-43b3-b896-edd7cca03fbd',
+        name: 'A-non-architecto',
+        fqdn: 'A-non-architecto.bergnaum.co',
+        checkin: null,
+        uptime_seconds: 17112079,
+        environment: 'test',
+        platform: 'solaris',
+        policy_group: '',
+        organization: '',
+        source_fqdn: '',
+        status: 'failure',
+        latestRunId: '22efcb97-ae0d-4ece-b284-51bc73b2c6cc',
+        hasRuns: true,
+        lastCcrReceived: new Date(),
+        deprecationsCount: 0,
+        chefVersion: '12.6.0'
+      };
+
+    it('no nodes, loaded successfully', () => {
+      expect(component.isCurrentPageEmpty([], EntityStatus.loadingSuccess)).toBeTruthy();
+    });
+
+    it('no nodes, load failure', () => {
+      expect(component.isCurrentPageEmpty([], EntityStatus.loadingFailure)).toBeFalsy();
+    });
+
+    it('no nodes, loading', () => {
+      expect(component.isCurrentPageEmpty([], EntityStatus.loading)).toBeFalsy();
+    });
+
+    it('no nodes, not loaded', () => {
+      expect(component.isCurrentPageEmpty([], EntityStatus.notLoaded)).toBeFalsy();
+    });
+
+    it('some nodes, loaded successfully', () => {
+
+      expect(component.isCurrentPageEmpty([node], EntityStatus.loadingSuccess)).toBeFalsy();
+    });
+
+    it('some nodes, load failure', () => {
+      expect(component.isCurrentPageEmpty([node], EntityStatus.loadingFailure)).toBeFalsy();
+    });
+
+    it('some nodes, loading', () => {
+      expect(component.isCurrentPageEmpty([node], EntityStatus.loading)).toBeFalsy();
+    });
+
+    it('some nodes, not loaded', () => {
+      expect(component.isCurrentPageEmpty([node], EntityStatus.notLoaded)).toBeFalsy();
     });
   });
 

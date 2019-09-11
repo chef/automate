@@ -331,6 +331,26 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
 
     this.loadedStatus$ = this.store.select(clientRunsLoading);
 
+
+    // When zero nodes are loaded successfully and we are not on the 1 page
+    // automatically change to the first page.
+    combineLatest([
+      this.nodes$, this.loadedStatus$, allUrlParameters$])
+      .pipe(
+        map(([nodes, loadedStatus, allUrlParameters]:
+          [Node[], EntityStatus, Chicklet[]]) =>
+            this.isCurrentPageEmpty(nodes, loadedStatus) &&
+            this.isNotFirstPage(allUrlParameters)
+        )).subscribe((noNodesLoadedWithPageSet: boolean) => {
+          if ( noNodesLoadedWithPageSet ) {
+            const queryParams = {...this.route.snapshot.queryParams};
+
+            // removing the URL page parameter the nodes are moved back to the first page
+            delete queryParams['page'];
+            this.router.navigate([], {queryParams});
+          }
+        });
+
       // We want to report total nodes to telemetry, but only when there are no
     // filters. This way we can see how many nodes a customer has connected to
     // automate in total.
@@ -356,7 +376,6 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
       }
     ], []);
   }
-
 
   hideNotification() {
     this.notificationVisible = false;
@@ -553,6 +572,15 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
     };
 
     this.store.dispatch(new UpdateNodeFilters({filters: nodeFilters}));
+  }
+
+  isCurrentPageEmpty(nodes: Node[], loadedStatus: EntityStatus): boolean {
+    return loadedStatus === EntityStatus.loadingSuccess && nodes.length === 0;
+  }
+
+  // If there is a page parameter in the URL the first page is not selected.
+  isNotFirstPage(allUrlParameters: Chicklet[]): boolean {
+    return allUrlParameters.some((parameter: Chicklet) => parameter.type === 'page');
   }
 
   private getSelectedPageNumber(allUrlParameters: Chicklet[]): number {
