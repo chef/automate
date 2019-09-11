@@ -66,7 +66,7 @@
         <div id="condition-section" *ngIf="ruleForm.get('type').value">
           <div class="label">Conditions</div>
           <small>All conditions must be true for the rule to be true.</small>
-          <chef-button primary (click)="addCondition()">Add Condition</chef-button>
+          <chef-button secondary (click)="addCondition()">Add Condition</chef-button>
 
           <div id="condition-list" formArrayName="conditions">
 
