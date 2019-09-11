@@ -186,6 +186,9 @@ service ReportingService {
 			resource: "system:service:version"
 			action: "system:serviceVersion:get"
 		};
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "hidden";
+		};
 	};
 
 	rpc LicenseUsageNodes(TimeQuery) returns (Reports) {
@@ -196,6 +199,9 @@ service ReportingService {
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:licenseusage"
 			action: "compliance:reportingLicenseUsage:list"
+		};
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "hidden";
 		};
 	};
 }

@@ -45,7 +45,9 @@ $(SWAGGER_RESULT_FILE): $(SWAGGER_FILES)
 #	swagger mixin --quiet -c=$(EXPECTED_CONFLICTS) $(SWAGGER_FILES) > $(SWAGGER_RESULT_FILE)
 
 generate_swagger: $(SWAGGER_RESULT_FILE)
-	swagger mixin $(STATIC_SWAGGER_FILES) $(SWAGGER_FILES) > $(SWAGGER_RESULT_FILE)
+	swagger mixin $(STATIC_SWAGGER_FILES) $(SWAGGER_FILES) | \
+		jq '.paths = (.paths | with_entries( select( all( .value[].tags[]; . != "hidden") ) ) )' \
+		> $(SWAGGER_RESULT_FILE)
 
 serve: sync generate_swagger
 	hugo server --buildDrafts --noHTTPCache

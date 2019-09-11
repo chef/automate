@@ -259,7 +259,7 @@ func init() {
           }
         },
         "tags": [
-          "ReportingService"
+          "hidden"
         ]
       }
     }
