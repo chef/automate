@@ -13,6 +13,7 @@ import { Subject, Observable, of as observableOf } from 'rxjs';
 import {
   debounceTime, switchMap, distinctUntilChanged
 } from 'rxjs/operators';
+import { FilterC } from '../types';
 
 @Component({
   selector: 'app-reporting-searchbar',
@@ -21,7 +22,7 @@ import {
 })
 export class ReportingSearchbarComponent implements OnInit {
   @Input() date = new Date();
-  @Input() filters = [];
+  @Input() filters: FilterC[] = [];
   @Input() filterTypes = [];
   @Input() filterValues = [];
 

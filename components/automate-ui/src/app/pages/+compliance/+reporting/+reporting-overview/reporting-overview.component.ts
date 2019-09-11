@@ -1,11 +1,13 @@
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, map } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
 import {
   StatsService,
   ReportQueryService,
-  ReportDataService
+  ReportDataService,
+  ReportQuery
 } from '../../shared/reporting';
+import { ActivatedRoute, Router } from '@angular/router';
 
 type Tab = 'Node Status' | 'Profile Status';
 
@@ -59,6 +61,7 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
   profileBubbleLoading = false;
 
   tooltipText = 'Failed Nodes';
+  interval$: Observable<number>;
 
   // Used to notify all subscriptions to unsubscribe
   // http://stackoverflow.com/a/41177163/319074
@@ -67,13 +70,18 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
   constructor(
     private statsService: StatsService,
     public reportQuery: ReportQueryService,
-    public reportData: ReportDataService
+    public reportData: ReportDataService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit() {
-    this.reportQuery.filters.pipe(
+    this.reportQuery.state.pipe(
       takeUntil(this.isDestroyed))
       .subscribe(this.getData.bind(this));
+
+    this.interval$ = this.reportQuery.state.pipe(map((reportQuery: ReportQuery) =>
+      reportQuery.interval));
   }
 
   ngOnDestroy() {
@@ -83,41 +91,44 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
 
   onSelectedTab(event) {
     this.selectedButtonTab = event.target.value;
-    this.getData(this.reportQuery.filters.getValue());
+    this.getData(this.reportQuery.getReportQuery());
   }
 
   onTrendIntervalChange(event) {
     const interval = event.target.value;
-    const {intervals, endDate} = this.reportQuery;
-    const startDate = intervals[interval][1](endDate);
-    this.reportQuery.interval = interval;
-    this.reportQuery.setDateRange(startDate, endDate);
+    const queryParams = {...this.route.snapshot.queryParams};
+    if (interval === '0' ) {
+      delete queryParams['date_interval'];
+    } else {
+      queryParams['date_interval'] = interval;
+    }
+
+    this.router.navigate([], {queryParams});
   }
 
-  getData(filters) {
-    if (filters.length === 0) { return; }
+  getData(reportQuery: ReportQuery) {
     if (this.selectedButtonTab === 'Node Status') {
-      this.getNodeStatusData(filters);
+      this.getNodeStatusData(reportQuery);
     } else {
-      this.getProfileStatusData(filters);
+      this.getProfileStatusData(reportQuery);
     }
   }
 
-  getNodeStatusData(filters) {
-    this.getNodeStatusFailures(filters);
-    this.getNodeSummary(filters);
-    this.getNodeTrend(filters);
+  getNodeStatusData(reportQuery: ReportQuery) {
+    this.getNodeStatusFailures(reportQuery);
+    this.getNodeSummary(reportQuery);
+    this.getNodeTrend(reportQuery);
   }
 
-  getProfileStatusData(filters) {
-    this.getProfileStatusFailures(filters);
-    this.getControlsSummary(filters);
-    this.getControlsTrend(filters);
+  getProfileStatusData(reportQuery: ReportQuery) {
+    this.getProfileStatusFailures(reportQuery);
+    this.getControlsSummary(reportQuery);
+    this.getControlsTrend(reportQuery);
   }
 
-  getNodeStatusFailures(filters) {
+  getNodeStatusFailures(reportQuery: ReportQuery) {
     this.nodeBubbleLoading = true;
-    this.statsService.getFailures(['platform', 'environment'], filters).pipe(
+    this.statsService.getFailures(['platform', 'environment'], reportQuery).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(data => {
         this.bubblePlatformFailures = data['platforms'];
@@ -130,9 +141,9 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
       });
   }
 
-  getProfileStatusFailures(filters) {
+  getProfileStatusFailures(reportQuery: ReportQuery) {
     this.profileBubbleLoading = true;
-    this.statsService.getFailures(['profile', 'control'], filters).pipe(
+    this.statsService.getFailures(['profile', 'control'], reportQuery).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(data => {
         this.bubbleProfileFailures = data['profiles'];
@@ -145,9 +156,9 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
       });
   }
 
-  getNodeTrend(filters) {
+  getNodeTrend(reportQuery: ReportQuery) {
     this.nodeTrendLoading = true;
-    this.statsService.getNodeTrend(filters).pipe(
+    this.statsService.getNodeTrend(reportQuery).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(data => {
         this.nodeTrendLoading = false;
@@ -155,9 +166,9 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
     });
   }
 
-  getControlsTrend(filters) {
+  getControlsTrend(reportQuery: ReportQuery) {
     this.profileTrendLoading = true;
-    this.statsService.getControlsTrend(filters).pipe(
+    this.statsService.getControlsTrend(reportQuery).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(data => {
         this.profileTrendLoading = false;
@@ -165,9 +176,9 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
       });
   }
 
-  getNodeSummary(filters) {
+  getNodeSummary(reportQuery: ReportQuery) {
     this.nodeRadialLoading = true;
-    this.statsService.getNodeSummary(filters).pipe(
+    this.statsService.getNodeSummary(reportQuery).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(data => {
         this.nodeRadialLoading = false;
@@ -176,9 +187,9 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
       });
   }
 
-  getControlsSummary(filters) {
+  getControlsSummary(reportQuery: ReportQuery) {
     this.profileRadialLoading = true;
-    this.statsService.getControlsSummary(filters).pipe(
+    this.statsService.getControlsSummary(reportQuery).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(data => {
         this.profileRadialLoading = false;

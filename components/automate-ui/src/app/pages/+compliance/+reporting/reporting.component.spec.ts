@@ -2,7 +2,7 @@ import { CUSTOM_ELEMENTS_SCHEMA, DebugElement } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { CookieModule } from 'ngx-cookie';
 import { Observable, of as observableOf } from 'rxjs';
@@ -13,9 +13,11 @@ import {
   StatsService,
   SuggestionsService,
   ReportQueryService,
-  ReportDataService
+  ReportDataService,
+  ReportQuery
 } from '../shared/reporting';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
+import * as moment from 'moment';
 
 class MockTelemetryService {
   track() { }
@@ -28,6 +30,7 @@ describe('ReportingComponent', () => {
   let suggestionsService: SuggestionsService;
   let reportQueryService: ReportQueryService;
   let router: Router;
+  let route: ActivatedRoute;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -57,6 +60,7 @@ describe('ReportingComponent', () => {
     suggestionsService = element.injector.get(SuggestionsService);
     reportQueryService = element.injector.get(ReportQueryService);
     router = TestBed.get(Router);
+    route = TestBed.get(ActivatedRoute);
   });
 
   it('displays tabs', () => {
@@ -102,11 +106,11 @@ describe('ReportingComponent', () => {
 
   describe('onEndDateChanged', () => {
     it('sets date range on report query', () => {
-      spyOn(reportQueryService, 'setDateRange');
+      spyOn(router, 'navigate');
       const endDate = new Date();
       const event = {detail: endDate};
       component.onEndDateChanged(event);
-      expect(reportQueryService.setDateRange).toHaveBeenCalled();
+      expect(router.navigate).toHaveBeenCalled();
     });
   });
 
@@ -115,12 +119,17 @@ describe('ReportingComponent', () => {
       it('sets the title to text, version values to display to the user', () => {
         const type = 'profile';
         const text = 'dev';
-        const filters = [];
+        const reportQuery: ReportQuery = {
+          endDate: moment(0).utc().startOf('day'),
+          startDate: moment(0).utc().startOf('day'),
+          interval: 0,
+          filters: []
+        };
         spyOn(suggestionsService, 'getSuggestions').and.returnValue(observableOf([
           {text: 'dev sec baseline', version: '2.0'}
         ]));
 
-        component.getSuggestions(type, text, filters).subscribe(values => {
+        component.getSuggestions(type, text, reportQuery).subscribe(values => {
           expect(values).toEqual([
             {text: 'dev sec baseline', version: '2.0', title: 'dev sec baseline, v2.0'}
           ]);
@@ -131,12 +140,17 @@ describe('ReportingComponent', () => {
       it('sets the title to the text value', () => {
         const type = 'node';
         const text = 'tea';
-        const filters = [];
+        const reportQuery: ReportQuery = {
+          endDate: moment(0).utc().startOf('day'),
+          startDate: moment(0).utc().startOf('day'),
+          interval: 0,
+          filters: []
+        };
         spyOn(suggestionsService, 'getSuggestions').and.returnValue(observableOf([
           {text: 'teal-spohn'}
         ]));
 
-        component.getSuggestions(type, text, filters).subscribe(values => {
+        component.getSuggestions(type, text, reportQuery).subscribe(values => {
           expect(values).toEqual([
             {text: 'teal-spohn', title: 'teal-spohn'}
           ]);
@@ -146,11 +160,15 @@ describe('ReportingComponent', () => {
   });
 
   describe('getData()', () => {
-    const filters = [
-      {'end_time': '2323'},
-      {'type': 'Node', 'value': '1231'},
-      {'type': 'Platform', 'value': 'ubuntu'}
-    ];
+    const reportQuery: ReportQuery = {
+      endDate: moment(0).utc().startOf('day'),
+      startDate: moment(0).utc().startOf('day'),
+      interval: 0,
+      filters: [
+        {type: {name: 'Node'}, value: { id: '1231' }},
+        {type: {name: 'Platform'}, value: { id: 'ubuntu'}}
+      ]
+    };
     const reportingSummaryData = {
       'duration': 49258.00239,
       'start_date': '2017-06-22T00:21:21Z',
@@ -165,7 +183,7 @@ describe('ReportingComponent', () => {
 
     beforeEach(() => {
       spyOn(statsService, 'getSummary').and.returnValue(observableOf(reportingSummaryData));
-      component.getData(filters);
+      component.getData(reportQuery);
     });
 
     it('sets the value for reportingSummary', () => {
@@ -199,51 +217,233 @@ describe('ReportingComponent', () => {
 
   describe('applyParamFilters()', () => {
     it('parses multiple filters', () => {
-      spyOn(reportQueryService, 'addFilter');
-      component.applyParamFilters('job_uuid:123+job_uuid:456');
-      expect(reportQueryService.addFilter).toHaveBeenCalledWith(
-        {type: {name: 'job_uuid'}, value: {text: '123'} }
-      );
-      expect(reportQueryService.addFilter).toHaveBeenCalledWith(
-        {type: {name: 'job_uuid'}, value: {text: '456'} }
-      );
+      spyOn(reportQueryService, 'setState');
+      const endDate = moment().utc().startOf('day').add(12, 'hours');
+      const reportQuery: ReportQuery = {
+        startDate: moment(endDate).subtract(10, 'days'),
+        endDate: endDate,
+        interval: 0,
+        filters: [
+          {type: {name: 'chef_tags'}, value: { text: '123' }},
+          {type: {name: 'chef_tags'}, value: { text: '456'}}
+        ]
+      };
+      component.applyParamFilters([
+        {type: 'chef_tags', text: '123'},
+        {type: 'chef_tags', text: '456'}]);
+      expect(reportQueryService.setState).toHaveBeenCalledWith(reportQuery);
     });
 
     it('parses single filters', () => {
-      spyOn(reportQueryService, 'addFilter');
-      component.applyParamFilters('job_uuid:123');
-      expect(reportQueryService.addFilter).toHaveBeenCalledWith(
-        {type: {name: 'job_uuid'}, value: {text: '123'} }
+      spyOn(reportQueryService, 'setState');
+      const endDate = moment().utc().startOf('day').add(12, 'hours');
+      const reportQuery: ReportQuery = {
+        startDate: moment(endDate).subtract(10, 'days'),
+        endDate: endDate,
+        interval: 0,
+        filters: [
+          {type: {name: 'chef_tags'}, value: { text: '123' }}
+        ]
+      };
+
+      component.applyParamFilters([{type: 'chef_tags', text: '123'}]);
+      expect(reportQueryService.setState).toHaveBeenCalledWith(
+        reportQuery
+      );
+    });
+
+    it('parse end date', () => {
+      spyOn(reportQueryService, 'setState');
+      // end date of three days ago end_time=2019-09-05
+      const endDate = moment('2019-09-05', 'YYYY-MM-DD').utc().
+        startOf('day').add(12, 'hours');
+      const interval = 0;
+      const startDate = reportQueryService.findTimeIntervalStartDate(interval, endDate);
+
+      const reportQuery: ReportQuery = {
+        startDate: startDate,
+        endDate: endDate,
+        interval: interval,
+        filters: [
+          {type: {name: 'chef_tags'}, value: { text: '123' }}
+        ]
+      };
+
+      component.applyParamFilters([
+        {type: 'chef_tags', text: '123'},
+        {type: 'end_time', text: '2019-09-05'}]);
+      expect(reportQueryService.setState).toHaveBeenCalledWith(
+        reportQuery
+      );
+    });
+
+    it('parse bad end date', () => {
+      spyOn(reportQueryService, 'setState');
+      // end date of three days ago end_time=2019-09-05
+      const endDate = moment().utc().startOf('day').add(12, 'hours');
+      const interval = 0;
+      const startDate = reportQueryService.findTimeIntervalStartDate(interval, endDate);
+
+      const reportQuery: ReportQuery = {
+        startDate: startDate,
+        endDate: endDate,
+        interval: interval,
+        filters: [
+          {type: {name: 'chef_tags'}, value: { text: '123' }}
+        ]
+      };
+
+      component.applyParamFilters([
+        {type: 'chef_tags', text: '123'},
+        {type: 'end_time', text: 'bad-date'}]);
+      expect(reportQueryService.setState).toHaveBeenCalledWith(
+        reportQuery
+      );
+    });
+
+    it('parse interval', () => {
+      spyOn(reportQueryService, 'setState');
+      const endDate = moment().utc().startOf('day').add(12, 'hours');
+      const interval = 2;
+      const startDate = reportQueryService.findTimeIntervalStartDate(interval, endDate);
+
+      const reportQuery: ReportQuery = {
+        startDate: startDate,
+        endDate: endDate,
+        interval: interval,
+        filters: [
+          {type: {name: 'chef_tags'}, value: { text: '123' }}
+        ]
+      };
+
+      component.applyParamFilters([
+        {type: 'chef_tags', text: '123'},
+        {type: 'date_interval', text: '2'}]);
+      expect(reportQueryService.setState).toHaveBeenCalledWith(
+        reportQuery
+      );
+    });
+
+    it('parse bad interval', () => {
+      spyOn(reportQueryService, 'setState');
+      const endDate = moment().utc().startOf('day').add(12, 'hours');
+      const interval = 0;
+      const startDate = reportQueryService.findTimeIntervalStartDate(interval, endDate);
+
+      const reportQuery: ReportQuery = {
+        startDate: startDate,
+        endDate: endDate,
+        interval: interval,
+        filters: [
+          {type: {name: 'chef_tags'}, value: { text: '123' }}
+        ]
+      };
+
+      component.applyParamFilters([
+        {type: 'chef_tags', text: '123'},
+        {type: 'date_interval', text: 'bad-number'}]);
+      expect(reportQueryService.setState).toHaveBeenCalledWith(
+        reportQuery
+      );
+    });
+
+    it('parse invaild interval 1', () => {
+      spyOn(reportQueryService, 'setState');
+      const endDate = moment().utc().startOf('day').add(12, 'hours');
+      const interval = 0;
+      const startDate = reportQueryService.findTimeIntervalStartDate(interval, endDate);
+
+      const reportQuery: ReportQuery = {
+        startDate: startDate,
+        endDate: endDate,
+        interval: interval,
+        filters: [
+          {type: {name: 'chef_tags'}, value: { text: '123' }}
+        ]
+      };
+
+      component.applyParamFilters([
+        {type: 'chef_tags', text: '123'},
+        {type: 'date_interval', text: '-1'}]);
+      expect(reportQueryService.setState).toHaveBeenCalledWith(
+        reportQuery
+      );
+    });
+
+    it('parse invaild interval 2', () => {
+      spyOn(reportQueryService, 'setState');
+      const endDate = moment().utc().startOf('day').add(12, 'hours');
+      const interval = 0;
+      const startDate = reportQueryService.findTimeIntervalStartDate(interval, endDate);
+
+      const reportQuery: ReportQuery = {
+        startDate: startDate,
+        endDate: endDate,
+        interval: interval,
+        filters: [
+          {type: {name: 'chef_tags'}, value: { text: '123' }}
+        ]
+      };
+
+      component.applyParamFilters([
+        {type: 'chef_tags', text: '123'},
+        {type: 'date_interval', text: '10'}]);
+      expect(reportQueryService.setState).toHaveBeenCalledWith(
+        reportQuery
       );
     });
   });
 
   describe('onFiltersClear()', () => {
-    it('clears report filters', () => {
-      spyOn(reportQueryService, 'clearFilters');
-      component.onFiltersClear({});
-      expect(reportQueryService.clearFilters).toHaveBeenCalled();
-    });
-
-    it('updates filter query params', () => {
+    it('with no filters', () => {
       spyOn(router, 'navigate');
       component.onFiltersClear({});
-      expect(router.navigate).toHaveBeenCalledWith([], {queryParams: {filters: undefined}});
+      expect(router.navigate).toHaveBeenCalledWith([], {queryParams: { }});
+    });
+
+    it('with one filter', () => {
+      // Add an environment filter to the URL
+      const queryParams = {...route.snapshot.queryParams};
+      queryParams['environment'] = ['dev'];
+      route.snapshot.queryParams = queryParams;
+
+      spyOn(router, 'navigate');
+
+      component.onFiltersClear({});
+
+      // Ensure the environment filter is removed from the URL
+      expect(router.navigate).toHaveBeenCalledWith([], {queryParams: { }});
+    });
+
+    it('with multiple filters', () => {
+      // Add environment and organization filters to the URL
+      const queryParams = {...route.snapshot.queryParams};
+      queryParams['environment'] = ['dev'];
+      queryParams['organization'] = ['org1'];
+      route.snapshot.queryParams = queryParams;
+
+      spyOn(router, 'navigate');
+
+      component.onFiltersClear({});
+
+      // Ensure all the filters are removed from the URL
+      expect(router.navigate).toHaveBeenCalledWith([], {queryParams: { }});
+    });
+
+    it('with URL parameters that should not be removed', () => {
+      // Add environment and end_time filters to the URL
+      const queryParams = {...route.snapshot.queryParams};
+      queryParams['environment'] = ['dev'];
+      queryParams['end_time'] = ['2019-09-05'];
+      route.snapshot.queryParams = queryParams;
+
+      spyOn(router, 'navigate');
+
+      component.onFiltersClear({});
+
+      // Ensure only the environment filter is removed and the end_time filter remains in the URL
+      expect(router.navigate).toHaveBeenCalledWith([],
+        {queryParams: { end_time: [ '2019-09-05' ] }});
     });
   });
-
-  // Does not work in PhantomJS...
-  //
-  // describe('when filter-value-input event is fired', () => {
-  //   fit('fetches suggestions for current input value', () => {
-  //     spyOn(suggestionsService, 'getSuggestions').and.returnValue(observableOf([]));
-
-  //     let type = 'environment';
-  //     let text = 'foo';
-  //     let querySearch = element.query(By.css('query-search')).nativeElement;
-  //     querySearch.fire('filter-value-input', {type, text});
-
-  //     expect(suggestionsService.getSuggestions).toHaveBeenCalledWith(type, text);
-  //   });
-  // });
 });

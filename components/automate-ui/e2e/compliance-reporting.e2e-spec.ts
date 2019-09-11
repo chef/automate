@@ -36,7 +36,7 @@ describe('Compliance Reporting', () => {
       const id = '98675307-7523-465d-b98d-81022e7a64b0';
 
       it('sets job_id filter', () => {
-        browser.get(`/compliance/reporting?filters=job_id:${id}`);
+        browser.get(`/compliance/reporting/overview?job_id=${id}`);
 
         expect(filterButtons.count()).toEqual(1);
         expect(filterButtons.first().getText()).toContain(`job_id: ${id}`);
@@ -44,13 +44,13 @@ describe('Compliance Reporting', () => {
 
       describe('clicking job_id filter', () => {
         it('removes job_id filter', () => {
-          browser.get(`/compliance/reporting?filters=job_id:${id}`);
+          browser.get(`/compliance/reporting/overview?job_id=${id}`);
 
           expect(filterButtons.count()).toEqual(1);
           filterButtons.first().click();
 
           expect(filterButtons.count()).toEqual(0);
-          expect(browser.getCurrentUrl()).not.toContain(`job_id:${id}`);
+          expect(browser.getCurrentUrl()).not.toContain(`job_id=${id}`);
         });
       });
     });

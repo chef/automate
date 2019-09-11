@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { remove } from 'lodash';
 import { StatsService } from './stats.service';
 import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
+import { ReportQuery } from './report-query.service';
 
 interface ReportingSummary {
   stats: {
@@ -47,8 +48,8 @@ export class ReportDataService {
     private telemetryService: TelemetryService
   ) {}
 
-  getReportingSummary(filters) {
-    this.statsService.getSummary(filters)
+  getReportingSummary(reportQuery: ReportQuery) {
+    this.statsService.getSummary(reportQuery)
       .subscribe(data => {
         this.reportingSummaryEmpty = this.isAllZeros(data.stats);
         this.reportingSummary = data;
@@ -56,14 +57,15 @@ export class ReportDataService {
         // We will also report filters so that we know when these counts are constrained.
         if (data !== null) {
           const summaryStats = data.stats;
-          this.telemetryService.track('complianceCountsWithFilters', {summaryStats, filters});
+          this.telemetryService.track('complianceCountsWithFilters',
+            {summaryStats, filters: reportQuery.filters});
         }
       });
   }
 
-  getReportingNodesList(filters: any[], listParams: any) {
+  getReportingNodesList(reportQuery: ReportQuery, listParams: any) {
     this.nodesListLoading = true;
-    this.statsService.getNodes(filters, listParams)
+    this.statsService.getNodes(reportQuery, listParams)
       .subscribe(data => {
         this.nodesListLoading = false;
         this.nodesListEmpty = this.isEmpty(data.items);
@@ -71,9 +73,9 @@ export class ReportDataService {
       });
   }
 
-  getReportingProfilesList(filters: any[], listParams: any) {
+  getReportingProfilesList(reportQuery: ReportQuery, listParams: any) {
     this.profilesListLoading = true;
-    this.statsService.getProfiles(filters, listParams)
+    this.statsService.getProfiles(reportQuery, listParams)
       .subscribe(data => {
         this.profilesListLoading = false;
         this.profilesListEmpty = this.isEmpty(data.items);

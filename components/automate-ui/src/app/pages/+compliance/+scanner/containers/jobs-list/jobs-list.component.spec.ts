@@ -2,6 +2,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { Router } from '@angular/router';
 import { StoreModule } from '@ngrx/store';
 import * as moment from 'moment';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
@@ -11,6 +12,7 @@ import { JobsListComponent } from './jobs-list.component';
 describe('JobsListComponent', () => {
   let fixture: ComponentFixture<JobsListComponent>;
   let component: JobsListComponent;
+  let router: Router;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -30,6 +32,7 @@ describe('JobsListComponent', () => {
 
     fixture = TestBed.createComponent(JobsListComponent);
     component = fixture.componentInstance;
+    router = TestBed.get(Router);
   });
 
   describe('timeFromNow()', () => {
@@ -63,6 +66,30 @@ describe('JobsListComponent', () => {
         const job = { recurrence: 'DTSTART=20180511T095200Z' };
         expect(component.isJobReport(job)).toEqual(false);
       });
+    });
+  });
+
+  describe('viewReport()', () => {
+    it('correct end date and job ID', () => {
+      spyOn(router, 'navigate');
+      const time = '2018-01-01T00:00:00.000Z';
+      component.viewReport('fake_id', time);
+      expect(router.navigate).toHaveBeenCalledWith(['/compliance', 'reports', 'overview'],
+        {queryParams: {job_id: 'fake_id', end_time: moment(time).format('YYYY-MM-DD')}});
+    });
+
+    it('null end date', () => {
+      spyOn(router, 'navigate');
+      component.viewReport('fake_id', null);
+      expect(router.navigate).toHaveBeenCalledWith(['/compliance', 'reports', 'overview'],
+        {queryParams: {job_id: 'fake_id'}});
+    });
+
+    it('beginning of time end date', () => {
+      spyOn(router, 'navigate');
+      component.viewReport('fake_id', new Date(0));
+      expect(router.navigate).toHaveBeenCalledWith(['/compliance', 'reports', 'overview'],
+        {queryParams: {job_id: 'fake_id'}});
     });
   });
 });

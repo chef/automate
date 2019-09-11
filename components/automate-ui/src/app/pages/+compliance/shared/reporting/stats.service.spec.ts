@@ -5,6 +5,7 @@ import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { StatsService } from './stats.service';
 import * as moment from 'moment';
 import { environment } from '../../../../../environments/environment';
+import { ReportQuery } from './report-query.service';
 
 const COMPLIANCE_URL = environment.compliance_url;
 
@@ -33,7 +34,13 @@ describe('StatsService', () => {
 
   describe('getNodes()', () => {
     it('fetches nodes data with filters', () => {
-      const filters = [{type: {name: 'platform'}, value: {text: 'centos'}}];
+      const endDate = moment().utc().startOf('day').add(12, 'hours');
+      const reportQuery: ReportQuery = {
+        startDate: moment(endDate).subtract(10, 'days'),
+        endDate: endDate,
+        interval: 0,
+        filters: [{type: {name: 'platform'}, value: {text: 'centos'}}]
+      };
       const listParams = {perPage: 10, page: 1};
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/nodes/search`;
@@ -50,7 +57,7 @@ describe('StatsService', () => {
         total_skipped: expectedTotalSkipped
       };
 
-      service.getNodes(filters, listParams).subscribe(data => {
+      service.getNodes(reportQuery, listParams).subscribe(data => {
         expect(data).toEqual({
           total: expectedTotal,
           items: expectedItems,
@@ -70,7 +77,13 @@ describe('StatsService', () => {
 
   describe('getProfiles()', () => {
     it('fetches profiles data', () => {
-      const filters = [{type: {name: 'profile'}, value: {id: '456'}}];
+      const endDate = moment().utc().startOf('day').add(12, 'hours');
+      const reportQuery: ReportQuery = {
+        startDate: moment(endDate).subtract(10, 'days'),
+        endDate: endDate,
+        interval: 0,
+        filters: [{type: {name: 'profile'}, value: {id: '456'}}]
+      };
       const listParams = {perPage: 10, page: 1};
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/profiles`;
@@ -78,7 +91,7 @@ describe('StatsService', () => {
       const expectedItems = [{}, {}];
       const mockResp = { profiles: expectedItems, counts: { total: expectedTotal }};
 
-      service.getProfiles(filters, listParams).subscribe(data => {
+      service.getProfiles(reportQuery, listParams).subscribe(data => {
         expect(data).toEqual({total: expectedTotal, items: expectedItems});
       });
 
@@ -92,13 +105,19 @@ describe('StatsService', () => {
 
   describe('getNodeSummary()', () => {
     it('fetches node summary data', () => {
-      const filters = [{type: {name: 'profile'}, value: {id: '456'}}];
+      const endDate = moment().utc().startOf('day').add(12, 'hours');
+      const reportQuery: ReportQuery = {
+        startDate: moment(endDate).subtract(10, 'days'),
+        endDate: endDate,
+        interval: 0,
+        filters: [{type: {name: 'profile'}, value: {id: '456'}}]
+      };
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/stats/summary`;
       const expectedData = {};
       const mockResp = {node_summary: expectedData};
 
-      service.getNodeSummary(filters).subscribe(data => {
+      service.getNodeSummary(reportQuery).subscribe(data => {
         expect(data).toEqual(expectedData);
       });
 
@@ -112,13 +131,19 @@ describe('StatsService', () => {
 
   describe('getControlsSummary()', () => {
     it('fetches controls summary data', () => {
-      const filters = [{type: {name: 'profile'}, value: {id: '456'}}];
+      const endDate = moment().utc().startOf('day').add(12, 'hours');
+      const reportQuery: ReportQuery = {
+        startDate: moment(endDate).subtract(10, 'days'),
+        endDate: endDate,
+        interval: 0,
+        filters: [{type: {name: 'profile'}, value: {id: '456'}}]
+      };
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/stats/summary`;
       const expectedData = {};
       const mockResp = {controls_summary: expectedData};
 
-      service.getControlsSummary(filters).subscribe(data => {
+      service.getControlsSummary(reportQuery).subscribe(data => {
         expect(data).toEqual(expectedData);
       });
 
@@ -132,70 +157,187 @@ describe('StatsService', () => {
 
   describe('formatFilters()', () => {
     it('returns the correct filter params', () => {
-      expect(service.formatFilters([
-        {type: {name: 'profile'}, value: {id: '123'}},
-        {type: {name: 'profile'}, value: {id: '456'}},
-        {type: {name: 'node'}, value: {id: '1223'}},
-        {type: {name: 'platform'}, value: {text: 'centos'}},
-        {type: {name: 'environment'}, value: {text: 'Dev Sec'}},
-        {'end_time': moment('2017-11-15T23:59:59Z').utcOffset(0)},
-        {'start_time': moment('2017-11-14T00:00:00Z').utcOffset(0)}
-      ])).toEqual([
+      const reportQuery: ReportQuery = {
+        startDate: moment('2017-11-14T00:00:00Z').utc(),
+        endDate: moment('2017-11-15T23:59:59Z').utc(),
+        interval: 0,
+        filters: [
+          {type: {name: 'profile'}, value: {id: '123'}},
+          {type: {name: 'profile'}, value: {id: '456'}},
+          {type: {name: 'node'}, value: {id: '1223'}},
+          {type: {name: 'platform'}, value: {text: 'centos'}},
+          {type: {name: 'environment'}, value: {text: 'Dev Sec'}}]
+      };
+
+      const expectedUrlFilters = [
         {type: 'profile_id', values: ['123', '456']},
         {type: 'node_id', values: ['1223']},
         {type: 'platform', values: ['centos']},
         {type: 'environment', values: ['Dev Sec']},
         {type: 'end_time', values: ['2017-11-15T23:59:59Z']},
         {type: 'start_time', values: ['2017-11-14T00:00:00Z']}
-      ]);
+      ];
+
+      const actualUrlFilters = service.formatFilters(reportQuery);
+
+      expect(actualUrlFilters.length).toBe(expectedUrlFilters.length);
+      actualUrlFilters.forEach(actual => expect(expectedUrlFilters).toContain(actual));
+      expectedUrlFilters.forEach(expectedUrlFilter =>
+        expect(actualUrlFilters).toContain(expectedUrlFilter));
     });
 
     it('returns profile_name not profile_id', () => {
-      expect(service.formatFilters([
-        {type: {name: 'profile'}, value: {text: '123'}}
-      ])).toEqual([
-        {type: 'profile_name', values: ['123']}
-      ]);
+      const reportQuery: ReportQuery = {
+        startDate: moment('2017-11-14T00:00:00Z').utc(),
+        endDate: moment('2017-11-15T23:59:59Z').utc(),
+        interval: 0,
+        filters: [{type: {name: 'profile'}, value: {text: '123'}}]
+      };
+
+      const expectedUrlFilters = [
+        {type: 'profile_name', values: ['123']},
+        {type: 'end_time', values: ['2017-11-15T23:59:59Z']},
+        {type: 'start_time', values: ['2017-11-14T00:00:00Z']}
+      ];
+
+      const actualUrlFilters = service.formatFilters(reportQuery);
+
+      expect(actualUrlFilters.length).toBe(expectedUrlFilters.length);
+      actualUrlFilters.forEach(actual => expect(expectedUrlFilters).toContain(actual));
+      expectedUrlFilters.forEach(expectedUrlFilter =>
+        expect(actualUrlFilters).toContain(expectedUrlFilter));
     });
 
     it('returns profile_id not profile_name, when there is no value id', () => {
-      expect(service.formatFilters([
-        {type: {name: 'profile'}, value: {id: '123', text: '456'}}
-      ])).toEqual([
-        {type: 'profile_id', values: ['123']}
-      ]);
+      const reportQuery: ReportQuery = {
+        startDate: moment('2017-11-14T00:00:00Z').utc(),
+        endDate: moment('2017-11-15T23:59:59Z').utc(),
+        interval: 0,
+        filters: [{type: {name: 'profile'}, value: {id: '123', text: '456'}}]
+      };
+
+      const expectedUrlFilters = [
+        {type: 'profile_id', values: ['123']},
+        {type: 'end_time', values: ['2017-11-15T23:59:59Z']},
+        {type: 'start_time', values: ['2017-11-14T00:00:00Z']}
+      ];
+
+      const actualUrlFilters = service.formatFilters(reportQuery);
+
+      expect(actualUrlFilters.length).toBe(expectedUrlFilters.length);
+      actualUrlFilters.forEach(actual => expect(expectedUrlFilters).toContain(actual));
+      expectedUrlFilters.forEach(expectedUrlFilter =>
+        expect(actualUrlFilters).toContain(expectedUrlFilter));
     });
 
     it('returns node_name not node_id', () => {
-      expect(service.formatFilters([
-        {type: {name: 'node'}, value: {text: '123'}}
-      ])).toEqual([
-        {type: 'node_name', values: ['123']}
-      ]);
+      const reportQuery: ReportQuery = {
+        startDate: moment('2017-11-14T00:00:00Z').utc(),
+        endDate: moment('2017-11-15T23:59:59Z').utc(),
+        interval: 0,
+        filters: [{type: {name: 'node'}, value: {text: '123'}}]
+      };
+
+      const expectedUrlFilters = [
+        {type: 'node_name', values: ['123']},
+        {type: 'end_time', values: ['2017-11-15T23:59:59Z']},
+        {type: 'start_time', values: ['2017-11-14T00:00:00Z']}
+      ];
+
+      const actualUrlFilters = service.formatFilters(reportQuery);
+
+      expect(actualUrlFilters.length).toBe(expectedUrlFilters.length);
+      actualUrlFilters.forEach(actual => expect(expectedUrlFilters).toContain(actual));
+      expectedUrlFilters.forEach(expectedUrlFilter =>
+        expect(actualUrlFilters).toContain(expectedUrlFilter));
     });
 
     it('returns node_id not node_name, when there is no value id', () => {
-      expect(service.formatFilters([
-        {type: {name: 'node'}, value: {id: '123', text: '456'}}
-      ])).toEqual([
-        {type: 'node_id', values: ['123']}
-      ]);
+      const reportQuery: ReportQuery = {
+        startDate: moment('2017-11-14T00:00:00Z').utc(),
+        endDate: moment('2017-11-15T23:59:59Z').utc(),
+        interval: 0,
+        filters: [{type: {name: 'node'}, value: {id: '123', text: '456'}}]
+      };
+
+      const expectedUrlFilters = [
+        {type: 'node_id', values: ['123']},
+        {type: 'end_time', values: ['2017-11-15T23:59:59Z']},
+        {type: 'start_time', values: ['2017-11-14T00:00:00Z']}
+      ];
+
+      const actualUrlFilters = service.formatFilters(reportQuery);
+
+      expect(actualUrlFilters.length).toBe(expectedUrlFilters.length);
+      actualUrlFilters.forEach(actual => expect(expectedUrlFilters).toContain(actual));
+      expectedUrlFilters.forEach(expectedUrlFilter =>
+        expect(actualUrlFilters).toContain(expectedUrlFilter));
     });
 
     it('returns control_name not control', () => {
-      expect(service.formatFilters([
-        {type: {name: 'control'}, value: {text: '123'}}
-      ])).toEqual([
-        {type: 'control_name', values: ['123']}
-      ]);
+      const reportQuery: ReportQuery = {
+        startDate: moment('2017-11-14T00:00:00Z').utc(),
+        endDate: moment('2017-11-15T23:59:59Z').utc(),
+        interval: 0,
+        filters: [{type: {name: 'control'}, value: {text: '123'}}]
+      };
+
+      const expectedUrlFilters = [
+        {type: 'control_name', values: ['123']},
+        {type: 'end_time', values: ['2017-11-15T23:59:59Z']},
+        {type: 'start_time', values: ['2017-11-14T00:00:00Z']}
+      ];
+
+      const actualUrlFilters = service.formatFilters(reportQuery);
+
+      expect(actualUrlFilters.length).toBe(expectedUrlFilters.length);
+      actualUrlFilters.forEach(actual => expect(expectedUrlFilters).toContain(actual));
+      expectedUrlFilters.forEach(expectedUrlFilter =>
+        expect(actualUrlFilters).toContain(expectedUrlFilter));
     });
 
     it('returns control not control_name, when there is no value id', () => {
-      expect(service.formatFilters([
-        {type: {name: 'control'}, value: {id: '123', text: '456'}}
-      ])).toEqual([
-        {type: 'control', values: ['123']}
-      ]);
+      const reportQuery: ReportQuery = {
+        startDate: moment('2017-11-14T00:00:00Z').utc(),
+        endDate: moment('2017-11-15T23:59:59Z').utc(),
+        interval: 0,
+        filters: [{type: {name: 'control'}, value: {id: '123', text: '456'}}]
+      };
+
+      const expectedUrlFilters = [
+        {type: 'control', values: ['123']},
+        {type: 'end_time', values: ['2017-11-15T23:59:59Z']},
+        {type: 'start_time', values: ['2017-11-14T00:00:00Z']}
+      ];
+
+      const actualUrlFilters = service.formatFilters(reportQuery);
+
+      expect(actualUrlFilters.length).toBe(expectedUrlFilters.length);
+      actualUrlFilters.forEach(actual => expect(expectedUrlFilters).toContain(actual));
+      expectedUrlFilters.forEach(expectedUrlFilter =>
+        expect(actualUrlFilters).toContain(expectedUrlFilter));
+    });
+
+    it('control_id type return value id before text', () => {
+      const reportQuery: ReportQuery = {
+        startDate: moment('2017-11-14T00:00:00Z').utc(),
+        endDate: moment('2017-11-15T23:59:59Z').utc(),
+        interval: 0,
+        filters: [{type: {name: 'control_id'}, value: {id: '123', text: '456'}}]
+      };
+
+      const expectedUrlFilters = [
+        {type: 'control', values: ['123']},
+        {type: 'end_time', values: ['2017-11-15T23:59:59Z']},
+        {type: 'start_time', values: ['2017-11-14T00:00:00Z']}
+      ];
+
+      const actualUrlFilters = service.formatFilters(reportQuery);
+
+      expect(actualUrlFilters.length).toBe(expectedUrlFilters.length);
+      actualUrlFilters.forEach(actual => expect(expectedUrlFilters).toContain(actual));
+      expectedUrlFilters.forEach(expectedUrlFilter =>
+        expect(actualUrlFilters).toContain(expectedUrlFilter));
     });
   });
 
@@ -216,12 +358,17 @@ describe('StatsService', () => {
   describe('getFailures()', () => {
     it('fetches failures', () => {
       const types = ['platform', 'environment'];
-      const filters = [{type: {name: 'profile'}, value: {id: '456'}}];
+      const reportQuery: ReportQuery = {
+        startDate: moment('2017-11-14T00:00:00Z').utc(),
+        endDate: moment('2017-11-15T23:59:59Z').utc(),
+        interval: 0,
+        filters: [{type: {name: 'profile'}, value: {id: '456'}}]
+      };
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/stats/failures`;
       const expectedData = [{'platform': [], 'environment': []}];
 
-      service.getFailures(types, filters).subscribe(failures => {
+      service.getFailures(types, reportQuery).subscribe(failures => {
         expect(failures).toEqual(expectedData);
       });
 
@@ -238,10 +385,14 @@ describe('StatsService', () => {
       const endDate = moment('2017-01-31T00:00:00Z').utcOffset(0);
       const startDate = moment('2017-01-01T00:00:00Z').utcOffset(0);
       const filters = [
-        {type: {name: 'platform'}, value: {text: 'centos'}},
-        {'start_time': startDate},
-        {'end_time': endDate}
+        {type: {name: 'platform'}, value: {text: 'centos'}}
       ];
+      const reportQuery: ReportQuery = {
+        startDate: endDate,
+        endDate: startDate,
+        interval: 0,
+        filters: filters
+      };
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/stats/trend`;
       const expectedResponse = [{
@@ -251,7 +402,7 @@ describe('StatsService', () => {
       }];
       const mockResp = {trends: expectedResponse};
 
-      service.getNodeTrend(filters).subscribe(data => {
+      service.getNodeTrend(reportQuery).subscribe(data => {
         expect(data).toEqual(expectedResponse);
       });
 
@@ -268,10 +419,14 @@ describe('StatsService', () => {
       const endDate = moment('2017-01-31T00:00:00-04:00').utcOffset(-240);
       const startDate = moment('2017-01-01T00:00:00+04:00').utcOffset(240);
       const filters = [
-        {type: {name: 'platform'}, value: {text: 'centos'}},
-        {'start_time': startDate},
-        {'end_time': endDate}
+        {type: {name: 'platform'}, value: {text: 'centos'}}
       ];
+      const reportQuery: ReportQuery = {
+        startDate: endDate,
+        endDate: startDate,
+        interval: 0,
+        filters: filters
+      };
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/stats/trend`;
       const expectedResponse = [{
@@ -282,7 +437,7 @@ describe('StatsService', () => {
       }];
       const mockResp = {trends: expectedResponse};
 
-      service.getControlsTrend(filters).subscribe(data => {
+      service.getControlsTrend(reportQuery).subscribe(data => {
         expect(data).toEqual(expectedResponse);
       });
 
@@ -296,13 +451,21 @@ describe('StatsService', () => {
 
   describe('getSummary()', () => {
     it('fetches profiles data', () => {
+      const endDate = moment('2017-01-31T00:00:00Z').utcOffset(0);
+      const startDate = moment('2017-01-01T00:00:00Z').utcOffset(0);
       const filters = [{type: {name: 'profile'}, value: {id: '456'}}];
+      const reportQuery: ReportQuery = {
+        startDate: endDate,
+        endDate: startDate,
+        interval: 0,
+        filters: filters
+      };
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/stats/summary`;
       const expectedData = {};
       const mockResp = {report_summary: expectedData};
 
-      service.getSummary(filters).subscribe(data => {
+      service.getSummary(reportQuery).subscribe(data => {
         expect(data).toEqual(expectedData);
       });
 
@@ -316,14 +479,23 @@ describe('StatsService', () => {
 
   describe('getReports()', () => {
     it('fetches an array of reports', () => {
+      const endDate = moment('2017-01-31T00:00:00Z').utcOffset(0);
+      const startDate = moment('2017-01-01T00:00:00Z').utcOffset(0);
       const filters = [{type: {name: 'profile'}, value: {id: '456'}}];
+      const reportQuery: ReportQuery = {
+        startDate: endDate,
+        endDate: startDate,
+        interval: 0,
+        filters: filters
+      };
+
       const params = {sort: 'end_time', order: 'ASC'};
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/reports`;
       const expectedData = [];
       const mockResp = {reports: expectedData};
 
-      service.getReports(filters, params).subscribe(data => {
+      service.getReports(reportQuery, params).subscribe(data => {
         expect(data).toEqual(expectedData);
       });
 
@@ -338,12 +510,20 @@ describe('StatsService', () => {
   describe('getProfileResultsSummary()', () => {
     it('fetches a profile', () => {
       const profileID = '987483729';
+      const endDate = moment('2017-01-31T00:00:00Z').utcOffset(0);
+      const startDate = moment('2017-01-01T00:00:00Z').utcOffset(0);
       const filters = [{type: {name: 'profile_name'}, value: {text: 'ssh-baseline'}}];
+      const reportQuery: ReportQuery = {
+        startDate: endDate,
+        endDate: startDate,
+        interval: 0,
+        filters: filters
+      };
       const expectedUrl = `${COMPLIANCE_URL}/reporting/stats/profiles`;
       const expectedData = {};
       const mockResp = {profile_summary: expectedData};
 
-      service.getProfileResultsSummary(profileID, filters).subscribe(data => {
+      service.getProfileResultsSummary(profileID, reportQuery).subscribe(data => {
         expect(data).toEqual(expectedData);
       });
 
@@ -358,12 +538,20 @@ describe('StatsService', () => {
   describe('getSingleReport()', () => {
     it('fetches a report', () => {
       const reportID = '987483729';
+      const endDate = moment('2017-01-31T00:00:00Z').utcOffset(0);
+      const startDate = moment('2017-01-01T00:00:00Z').utcOffset(0);
       const filters = [{type: {name: 'profile_name'}, value: {text: 'ssh-baseline'}}];
+      const reportQuery: ReportQuery = {
+        startDate: endDate,
+        endDate: startDate,
+        interval: 0,
+        filters: filters
+      };
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/reports/id/${reportID}`;
       const expectedData = {profiles: []};
 
-      service.getSingleReport(reportID, filters).subscribe(data => {
+      service.getSingleReport(reportID, reportQuery).subscribe(data => {
         expect(data).toEqual(expectedData);
       });
 
@@ -378,12 +566,20 @@ describe('StatsService', () => {
   describe('getProfileResults()', () => {
     it('fetches a profile', () => {
       const profileID = '987483729';
+      const endDate = moment('2017-01-31T00:00:00Z').utcOffset(0);
+      const startDate = moment('2017-01-01T00:00:00Z').utcOffset(0);
       const filters = [{type: {name: 'profile_name'}, value: {text: 'ssh-baseline'}}];
+      const reportQuery: ReportQuery = {
+        startDate: endDate,
+        endDate: startDate,
+        interval: 0,
+        filters: filters
+      };
       const expectedUrl = `${COMPLIANCE_URL}/reporting/stats/profiles`;
       const expectedData = [];
       const mockResp = {control_stats: expectedData};
 
-      service.getProfileResults(profileID, filters).subscribe(data => {
+      service.getProfileResults(profileID, reportQuery).subscribe(data => {
         expect(data).toEqual(expectedData);
       });
 
@@ -399,10 +595,18 @@ describe('StatsService', () => {
     it('fetches a report export as text', done => {
       const url = `${COMPLIANCE_URL}/reporting/export`;
       const type = 'csv';
+      const endDate = moment('2017-01-31T00:00:00Z').utcOffset(0);
+      const startDate = moment('2017-01-01T00:00:00Z').utcOffset(0);
       const filters = [];
+      const reportQuery: ReportQuery = {
+        startDate: endDate,
+        endDate: startDate,
+        interval: 0,
+        filters: filters
+      };
       const text = 'report';
 
-      service.downloadReport(type, filters).subscribe(data => {
+      service.downloadReport(type, reportQuery).subscribe(data => {
         expect(data).toEqual(text);
         done();
       });
@@ -410,21 +614,9 @@ describe('StatsService', () => {
       const req = httpTestingController.expectOne(url);
       expect(req.request.method).toEqual('POST');
       expect(req.request.responseType).toEqual('text');
-      expect(req.request.body).toEqual({type, filters});
+      expect(req.request.body).toEqual({type, filters: service.formatFilters(reportQuery)});
 
       req.flush(text);
-    });
-  });
-
-  describe('setStartTimeToBegDayEndTime()', () => {
-    it('sets start time to beg of day of end time date', () => {
-      expect(service.setStartTimeToBegDayEndTime([
-        { 'end_time': moment('2017-11-15T23:59:59Z').utcOffset(0) },
-        { 'start_time': moment().format('YYYY-MM-DDTHH:mm:ssZ') }
-      ])).toEqual([
-        { 'end_time': moment('2017-11-15T23:59:59Z').utcOffset(0) },
-        { 'start_time': moment('2017-11-15T23:59:59Z').utcOffset(0).startOf('day') }
-      ]);
     });
   });
 });

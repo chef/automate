@@ -112,9 +112,17 @@ export class JobsListComponent implements OnInit, OnDestroy {
     return moment(time).fromNow();
   }
 
-  viewReport(jobID) {
-    const filters = 'job_id:' + jobID;
-    this.router.navigate(['/compliance', 'reports', 'overview'], {queryParams: {filters}});
+  viewReport(jobID: string, endDate) {
+    // `null` dates from API are currently sent as "beginning of time"
+    if (!endDate || moment(endDate).isBefore('2000-01-01T00:00:00.000Z')) {
+      this.router.navigate(['/compliance', 'reports', 'overview'],
+        {queryParams: {job_id: jobID}});
+    } else {
+      const endDateString = moment(endDate).format('YYYY-MM-DD');
+
+      this.router.navigate(['/compliance', 'reports', 'overview'],
+        {queryParams: {job_id: jobID, end_time: endDateString}});
+    }
   }
 
   promptDeleteJob(job) {

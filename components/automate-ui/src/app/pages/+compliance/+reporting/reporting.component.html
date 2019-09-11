@@ -9,8 +9,8 @@
 
     <div class="reporting-header">
       <app-reporting-searchbar
-        [date]="reportQuery.endDate"
-        [filters]="getSelectedFilters()"
+        [date]="endDate$ | async"
+        [filters]="filters$ | async"
         [filterTypes]="availableFilterTypes"
         [filterValues]="availableFilterValues"
         (suggestValues)="onSuggestValues($event)"
@@ -27,6 +27,20 @@
           <chef-click-outside (clickOutside)="hideDownloadDropdown()" omit="dropdown-toggle">
             <chef-button tertiary (click)="onDownloadOptPressed('json')">Download JSON</chef-button>
             <chef-button tertiary (click)="onDownloadOptPressed('csv')">Download CSV</chef-button>
+          </chef-click-outside>
+        </chef-dropdown>
+      </div>
+      <div class="copy-dropdown">
+        <chef-button class="dropdown-toggle" secondary (click)="toggleShareDropdown()">
+          <chef-icon>share</chef-icon>
+        </chef-button>
+        <chef-dropdown class="dropdown" [visible]="shareOptsVisible">
+          <chef-click-outside (clickOutside)="hideShareDropdown()" omit="dropdown-toggle">
+            <p>Copy this private URL to share:</p>
+            <div class="copy-input">
+              <input type="text" [value]="shareUrl" readonly />
+              <chef-clipboard [value]="shareUrl"></chef-clipboard>
+            </div>
           </chef-click-outside>
         </chef-dropdown>
       </div>
