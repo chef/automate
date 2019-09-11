@@ -9,7 +9,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { HttpStatus } from 'app/types/types';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
-import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
+import { atLeastV2p1 } from 'app/entities/policies/policy.selectors';
 import { ProjectRequests } from './project.requests';
 
 import {
@@ -201,21 +201,19 @@ export class ProjectEffects {
 
   @Effect()
   getActiveApplyRulesStatus$ = observableInterval(1000 * ACTIVE_RULE_STATUS_INTERVAL).pipe(
-    withLatestFrom(this.store.select(iamMajorVersion)),
-    withLatestFrom(this.store.select(iamMinorVersion)),
+    withLatestFrom(this.store.select(atLeastV2p1)),
     withLatestFrom(this.store.select(applyRulesStatus)),
-    filter(([[[_, major], minor], { state }]) =>
-      major === 'v2' && minor === 'v1' && state === ApplyRulesStatusState.Running
+    filter(([[_, projectsEnabled], { state }]) =>
+      projectsEnabled && state === ApplyRulesStatusState.Running
     ),
     switchMap(this.getRulesStatus$()));
 
   @Effect()
   getDormantApplyRulesStatus$ = observableInterval(1000 * DORMANT_RULE_STATUS_INTERVAL).pipe(
-    withLatestFrom(this.store.select(iamMajorVersion)),
-    withLatestFrom(this.store.select(iamMinorVersion)),
+    withLatestFrom(this.store.select(atLeastV2p1)),
     withLatestFrom(this.store.select(applyRulesStatus)),
-    filter(([[[_, major], minor], { state }]) =>
-      major === 'v2' && minor === 'v1' && state === ApplyRulesStatusState.NotRunning
+    filter(([[_, projectsEnabled], { state }]) =>
+      projectsEnabled && state === ApplyRulesStatusState.NotRunning
     ),
     switchMap(this.getRulesStatus$()));
 

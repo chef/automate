@@ -9,7 +9,6 @@ import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { customMatchers } from 'app/testing/custom-matchers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import { ProjectService } from 'app/entities/projects/project.service';
 import {
@@ -118,8 +117,7 @@ describe('ProjectListComponent', () => {
     element = fixture.debugElement.nativeElement;
     store = TestBed.get(Store);
 
-    component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v2');
-    component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v1');
+    component.projectsEnabled$ = observableOf(true);
     fixture.detectChanges();
   });
 
@@ -145,22 +143,13 @@ describe('ProjectListComponent', () => {
       });
     });
 
-    it('does not display project data for v2.0', () => {
-      component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v2');
-      component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v0');
+    it('does not display project data for less than v2.1', () => {
+      component.projectsEnabled$ = observableOf(false);
       store.dispatch(new GetProjectsSuccess({ projects: projectList }));
       expect(element).not.toContainPath('chef-table');
     });
 
-    it('does not display project data for v1', () => {
-      component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v1');
-      component.iamMinorVersion$ = observableOf(<IAMMinorVersion>'v0');
-      store.dispatch(new GetProjectsSuccess({ projects: projectList }));
-      fixture.detectChanges();
-      expect(element).not.toContainPath('chef-table');
-    });
-
-    describe('sortedProject$', () => {
+     describe('sortedProject$', () => {
     it('intermixes capitals and lowercase with lowercase first', () => {
       store.dispatch(new GetProjectsSuccess({
         projects: [

@@ -20,8 +20,8 @@ import {
 } from 'app/entities/api-tokens/api-token.actions';
 import { CreateToken } from 'app/entities/api-tokens/api-token.actions';
 import { saveStatus, saveError } from 'app/entities/api-tokens/api-token.selectors';
-import { iamMajorVersion, iamMinorVersion } from 'app/entities/policies/policy.selectors';
-import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
+import { iamMajorVersion, atLeastV2p1  } from 'app/entities/policies/policy.selectors';
+import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
 import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
@@ -43,18 +43,18 @@ export class ApiTokenListComponent implements OnInit {
   public conflictErrorEvent = new EventEmitter<boolean>();
 
   public iamMajorVersion$: Observable<IAMMajorVersion>;
-  public iamMinorVersion$: Observable<IAMMinorVersion>;
-  public isMajorV1 = true;
-  public isMinorV1 = false;
+  public projectsEnabled$: Observable<boolean>;
   public dropdownProjects: Project[] = [];
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
-
-  private isDestroyed = new Subject<boolean>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
     fb: FormBuilder) {
     this.loading$ = store.pipe(select(apiTokenStatus), map(loading));
+    this.iamMajorVersion$ = store.pipe(select(iamMajorVersion));
+    this.projectsEnabled$ = store.select(atLeastV2p1);
+    this.apiTokenCount$ = store.select(totalApiTokens);
+
     this.sortedApiTokens$ = store.pipe(
       select(allApiTokens),
       map(tokens => tokens.sort(
@@ -68,7 +68,6 @@ export class ApiTokenListComponent implements OnInit {
             || a.name.localeCompare(b.name, undefined, {numeric: true});
         }
       )));
-    this.apiTokenCount$ = store.pipe(select(totalApiTokens));
 
     this.createTokenForm = fb.group({
       // Must stay in sync with error checks in create-object-modal.component.html
@@ -77,26 +76,10 @@ export class ApiTokenListComponent implements OnInit {
         [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]],
       projects: [[]]
     });
-    this.iamMajorVersion$ = store.pipe(select(iamMajorVersion));
-    this.iamMinorVersion$ = store.pipe(select(iamMinorVersion));
   }
 
   ngOnInit() {
     this.store.dispatch(new GetAllTokens());
-
-    this.iamMajorVersion$
-      .pipe(takeUntil(this.isDestroyed))
-      .subscribe((majorVersion) => {
-        if (majorVersion === null) { return; }
-        this.isMajorV1 = majorVersion === 'v1';
-      });
-
-    this.iamMinorVersion$
-      .pipe(takeUntil(this.isDestroyed))
-      .subscribe((minorVersion) => {
-        if (minorVersion === null) { return; }
-        this.isMinorV1 = minorVersion === 'v1';
-      });
 
     this.store.select(assignableProjects)
       .subscribe((assignable: ProjectsFilterOption[]) => {

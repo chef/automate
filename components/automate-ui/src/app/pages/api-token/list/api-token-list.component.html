@@ -14,7 +14,7 @@
       [conflictErrorEvent]="conflictErrorEvent"
       objectNoun="token"
       [createForm]="createTokenForm"
-      [showProjectsDropdown]="!isMajorV1 && isMinorV1"
+      [showProjectsDropdown]="projectsEnabled$ | async"
       [assignableProjects]="dropdownProjects"
       (close)="closeCreateModal()"
       (createClicked)="createToken()">
@@ -46,7 +46,7 @@
             <chef-tr>
               <chef-th>Name</chef-th>
               <chef-th *ngIf="(iamMajorVersion$ | async) !== 'v1'">ID</chef-th>
-              <chef-th *ngIf="!isMajorV1 && isMinorV1">Projects</chef-th>
+              <chef-th *ngIf="projectsEnabled$ | async">Projects</chef-th>
               <chef-th>Created Date</chef-th>
               <chef-th>Status</chef-th>
               <chef-th class="controls"></chef-th>
@@ -58,7 +58,7 @@
                 <a [routerLink]="['/settings/tokens', token.id]">{{ token.name }}</a>
               </chef-td>
               <chef-td *ngIf="(iamMajorVersion$ | async) !== 'v1'">{{ token.id }}</chef-td>
-              <chef-td *ngIf="!isMajorV1 && isMinorV1" class="projects-column">
+              <chef-td *ngIf="projectsEnabled$ | async" class="projects-column">
                 <span *ngIf="token.projects.length === 0">{{ unassigned }}</span>
                 <span *ngIf="token.projects.length === 1">{{ token.projects[0] }}</span>
                 <span *ngIf="token.projects.length > 1">{{ token.projects.length }} projects</span>

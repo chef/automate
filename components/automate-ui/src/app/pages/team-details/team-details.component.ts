@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms'
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
 import { isEmpty, identity, keyBy, at, xor } from 'lodash/fp';
-import { combineLatest, Observable, Subject } from 'rxjs';
+import { combineLatest, Subject } from 'rxjs';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -13,11 +13,7 @@ import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
 import { allUsers, userStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
-import {
-  iamMajorVersion,
-  iamMinorVersion,
-  atLeastV2p1
-} from 'app/entities/policies/policy.selectors';
+import { iamMajorVersion, atLeastV2p1 } from 'app/entities/policies/policy.selectors';
 import {
   v1TeamFromRoute,
   v2TeamFromRoute,
@@ -68,7 +64,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
   public team: Team;
   public isMajorV1 = true;
-  public isMinorV1 = false;
 
   public users: User[] = [];
   private isDestroyed = new Subject<boolean>();
@@ -76,7 +71,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public addButtonText = 'Add User';
   public removeText = 'Remove User';
 
-  public atLeastV2p1$: Observable<boolean>;
   public projectsEnabled: boolean;
   public projects: ProjectCheckedMap = {};
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
@@ -117,20 +111,12 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.atLeastV2p1$ = this.store.select(atLeastV2p1);
-
     this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
       .subscribe((url: string) => {
         this.url = url;
         const [, fragment] = url.split('#');
         // goes to #users if (1) explicit #users, (2) no fragment, or (3) invalid fragment
         this.tabValue = (fragment === 'details') ? 'details' : 'users';
-      });
-
-    this.store.select(iamMinorVersion)
-      .pipe(takeUntil(this.isDestroyed))
-      .subscribe((minor) => {
-        this.isMinorV1 = minor === 'v1';
       });
 
     combineLatest([

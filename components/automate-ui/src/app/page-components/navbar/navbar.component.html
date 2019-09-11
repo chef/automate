@@ -28,9 +28,7 @@
       </div>
     </div>
     <div class="right-nav" role="menubar">
-      <app-projects-filter
-        *ngIf="(iamMajorVersion$ | async) === 'v2' && (iamMinorVersion$ | async) === 'v1'">
-      </app-projects-filter>
+      <app-projects-filter *ngIf="projectsEnabled$ | async"></app-projects-filter>
       <app-profile></app-profile>
     </div>
   </nav>

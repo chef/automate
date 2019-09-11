@@ -23,7 +23,7 @@
       [conflictErrorEvent]="conflictErrorEvent"
       objectNoun="team"
       [createForm]="createTeamForm"
-      [showProjectsDropdown]="!isMajorV1 && isMinorV1"
+      [showProjectsDropdown]="projectsEnabled$ | async"
       [assignableProjects]="dropdownProjects"
       (close)="closeCreateModal()"
       (createClicked)="createV2Team()">
@@ -57,7 +57,7 @@
                     <span *ngIf="isMajorV1">Description</span>
                     <span *ngIf="!isMajorV1">ID</span>
                   </chef-th>
-                  <chef-th *ngIf="!isMajorV1 && isMinorV1" class="projects-column">
+                  <chef-th *ngIf="projectsEnabled$ | async" class="projects-column">
                     <span>Projects</span>
                   </chef-th>
                   <chef-th class="button-column"></chef-th>
@@ -74,7 +74,7 @@
                     <span *ngIf="isMajorV1">{{ team.name }}</span>
                     <span *ngIf="!isMajorV1">{{ team.id }}</span>
                   </chef-td>
-                  <chef-td *ngIf="!isMajorV1 && isMinorV1" class="projects-column">
+                  <chef-td *ngIf="projectsEnabled$ | async" class="projects-column">
                     <span *ngIf="team.projects.length === 0">{{ unassigned }}</span>
                     <span *ngIf="team.projects.length === 1">{{ team.projects[0] }}</span>
                     <span *ngIf="team.projects.length > 1">{{ team.projects.length }} projects</span>
