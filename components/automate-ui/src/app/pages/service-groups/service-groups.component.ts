@@ -296,7 +296,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     if (sgId) {
       const paramKeys = Object.keys(queryParams.params);
 
-      const searchBarFilters = paramKeys.filter((key: string) => 
+      const searchBarFilters = paramKeys.filter((key: string) =>
           some({'type': key}, this.categoryTypes)
         ).map((key: string) => ({ type: key, text: queryParams.params[key] }));
 
@@ -307,7 +307,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
         health: queryParams.get('sgStatus') || 'total',
         searchBar: searchBarFilters
       };
-      
+
       this.updateServicesSidebar(servicesFilters);
     }
   }
