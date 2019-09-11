@@ -53,7 +53,11 @@
         </chef-select>
         <chef-loading-spinner *ngIf="nodeTrendLoading" size="16"></chef-loading-spinner>
       </label>
-      <app-overview-trend [data]="nodeTrendData" type="nodes"></app-overview-trend>
+      <app-overview-trend 
+        [data]="nodeTrendData" 
+        (dateSelected)="onDateChanged($event)"
+        type="nodes">
+      </app-overview-trend>
       <figcaption>Node Status Over Time</figcaption>
     </figure>
   </div>
@@ -141,7 +145,11 @@
         </chef-select>
         <chef-loading-spinner *ngIf="profileTrendLoading" size="16"></chef-loading-spinner>
       </label>
-      <app-overview-trend [data]="profileTrendData" type="controls"></app-overview-trend>
+      <app-overview-trend 
+        [data]="profileTrendData" 
+        type="controls"
+        (dateSelected)="onDateChanged($event)">
+      </app-overview-trend>
       <figcaption>Control Status Over Time</figcaption>
     </figure>
   </div>

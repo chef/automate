@@ -5,6 +5,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { CookieModule } from 'ngx-cookie';
 import { of as observableOf } from 'rxjs';
 import * as moment from 'moment';
+import { Router } from '@angular/router';
 import { ReportingOverviewComponent } from './reporting-overview.component';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { StatsService, ReportQueryService, ReportDataService } from '../../shared/reporting';
@@ -19,6 +20,7 @@ describe('ReportingOverviewComponent', () => {
   let component: ReportingOverviewComponent;
   let element: DebugElement;
   let statsService: StatsService;
+  let router: Router;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -44,12 +46,40 @@ describe('ReportingOverviewComponent', () => {
     component = fixture.componentInstance;
     element = fixture.debugElement;
     statsService = element.injector.get(StatsService);
+    router = TestBed.get(Router);
   });
 
   describe('ngOnInit()', () => {
     it('sets the default selection to "Node Status"', () => {
       component.ngOnInit();
       expect(component.selectedButtonTab).toBe('Node Status');
+    });
+  });
+
+  describe('onDateChanged()', () => {
+    it('valid date', () => {
+      spyOn(router, 'navigate');
+
+      component.onDateChanged(moment('2019-09-05', 'YYYY-MM-DD'));
+
+      expect(router.navigate).toHaveBeenCalledWith([],
+        {queryParams: { end_time: '2019-09-05' }});
+    });
+
+    it('invalid date', () => {
+      spyOn(router, 'navigate');
+
+      component.onDateChanged('lkjasdl');
+
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+
+    it('null date', () => {
+      spyOn(router, 'navigate');
+
+      component.onDateChanged(null);
+
+      expect(router.navigate).not.toHaveBeenCalled();
     });
   });
 
