@@ -187,6 +187,9 @@ func (app *ApplicationsServer) GetServicesBySG(
 		sgStringID     = fmt.Sprint(request.GetServiceGroupId())
 	)
 
+	// Adds the service group ID to the filters
+	filters["service_group_id"] = []string{sgStringID}
+
 	// Get the HealthCounts for every single service that belongs to the provided service-group id
 	// NOTE: @afiune We do not add the 'health' filter here that will alter the result of the services
 	// HealthCounts and as we mentioned earlier, we want all services from the provided service-group id
@@ -195,8 +198,6 @@ func (app *ApplicationsServer) GetServicesBySG(
 		log.WithError(err).Error("Error retrieving services health counts by service_group(s)")
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	// Adds the service group ID to the filters
-	filters["service_group_id"] = []string{sgStringID}
 
 	// Adds the health filter if any was specified and converts the string to be uppercases
 	if len(request.GetHealth()) != 0 {
