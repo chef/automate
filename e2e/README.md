@@ -95,6 +95,16 @@ Possible values are `"v1.0"`, `"v2.0"`, and `"v2.1"`.
 
 Your dev environment's IAM version MUST match the value of CYPRESS_IAM_VERSION for the tests to pass locally.
 
+### Running Flaky Tests
+
+There are some known flaky tests we are trying to debug. By default, they do not run. If you wish to run them:
+
+```
+CYPRESS_RUN_FLAKY=true npm run cypress:run
+```
+
+The tests are marked as flaky by the `itFlaky` descriptor instead of the `it` descriptor.
+
 ## Running Cypress pipeline tests
 
 As part of our [deploy

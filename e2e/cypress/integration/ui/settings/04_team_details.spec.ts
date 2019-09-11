@@ -1,4 +1,4 @@
-import { describeIfIAMV2p1, iamVersion } from '../../constants';
+import { describeIfIAMV2p1, iamVersion, itFlaky } from '../../constants';
 
 describe('team details', () => {
   let adminToken = '';
@@ -184,7 +184,7 @@ describe('team details', () => {
           cy.applyProjectsFilter([unassigned, project1Name, project2Name]);
         });
 
-        it('both are contained in the projects dropdown and the team project is selected,' +
+        itFlaky('both are contained in the projects dropdown and the team project is selected,' +
               'and both can be added or removed', () => {
           const projectSummary = '2 projects';
 
