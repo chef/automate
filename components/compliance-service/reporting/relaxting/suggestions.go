@@ -20,7 +20,7 @@ import (
 )
 
 // GetSuggestions - Report #12
-func (backend ES2Backend) GetSuggestions(typeParam string, filters map[string][]string, text string, size32 int32) ([]*reportingapi.Suggestion, error) {
+func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, filters map[string][]string, text string, size32 int32) ([]*reportingapi.Suggestion, error) {
 	client, err := backend.ES2Client()
 	size := int(size32)
 	if err != nil {
@@ -85,15 +85,15 @@ func (backend ES2Backend) GetSuggestions(typeParam string, filters map[string][]
 
 	suggs := make([]*reportingapi.Suggestion, 0)
 	if typeParam == "profile" {
-		suggs, err = backend.getProfileSuggestions(client, typeParam, target, text, size, filters, useSummaryIndex)
+		suggs, err = backend.getProfileSuggestions(ctx, client, typeParam, target, text, size, filters, useSummaryIndex)
 	} else if typeParam == "control" {
-		suggs, err = backend.getControlSuggestions(client, typeParam, target, text, size, filters)
+		suggs, err = backend.getControlSuggestions(ctx, client, typeParam, target, text, size, filters)
 	} else if typeParam == "control_tag_key" || typeParam == "control_tag_value" {
-		suggs, err = backend.getControlTagsSuggestions(client, typeParam, target, text, controlTagFilterKey, size, filters, false)
+		suggs, err = backend.getControlTagsSuggestions(ctx, client, typeParam, target, text, controlTagFilterKey, size, filters, false)
 	} else if suggestionFieldArray(typeParam) {
-		suggs, err = backend.getArrayAggSuggestions(client, typeParam, target, text, size, filters, useSummaryIndex)
+		suggs, err = backend.getArrayAggSuggestions(ctx, client, typeParam, target, text, size, filters, useSummaryIndex)
 	} else {
-		suggs, err = backend.getAggSuggestions(client, typeParam, target, text, size, filters, useSummaryIndex)
+		suggs, err = backend.getAggSuggestions(ctx, client, typeParam, target, text, size, filters, useSummaryIndex)
 	}
 
 	if err != nil {
@@ -130,7 +130,7 @@ func suggestionFieldArray(field string) bool {
 	}
 }
 
-func (backend ES2Backend) getAggSuggestions(client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
+func (backend ES2Backend) getAggSuggestions(ctx context.Context, client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
 	esIndex, err := GetEsIndex(filters, useSummaryIndex, true)
 	if err != nil {
 		return nil, errors.Wrap(err, "getAggSuggestions unable to get index dates")
@@ -188,7 +188,7 @@ func (backend ES2Backend) getAggSuggestions(client *elastic.Client, typeParam st
 			"aggregations.myagg.buckets.key",
 			"aggregations.myagg.buckets.mytophit.hits.hits._source",
 			"aggregations.myagg.buckets.mymaxscore.value").
-		Do(context.Background())
+		Do(ctx)
 
 	if err != nil {
 		logrus.Error("getAggSuggestions search failed")
@@ -233,7 +233,7 @@ func (backend ES2Backend) getAggSuggestions(client *elastic.Client, typeParam st
 	return suggs, nil
 }
 
-func (backend ES2Backend) getArrayAggSuggestions(client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
+func (backend ES2Backend) getArrayAggSuggestions(ctx context.Context, client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
 	esIndex, err := GetEsIndex(filters, useSummaryIndex, true)
 	if err != nil {
 		return nil, errors.Wrap(err, "getArrayAggSuggestions unable to get index dates")
@@ -269,7 +269,7 @@ func (backend ES2Backend) getArrayAggSuggestions(client *elastic.Client, typePar
 			"took",
 			"hits.total",
 			"aggregations.myagg.buckets.key").
-		Do(context.Background())
+		Do(ctx)
 
 	if err != nil {
 		logrus.Error("getArrayAggSuggestions search failed")
@@ -307,7 +307,7 @@ func (backend ES2Backend) getArrayAggSuggestions(client *elastic.Client, typePar
 	return finalSuggs, nil
 }
 
-func (backend ES2Backend) getProfileSuggestions(client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
+func (backend ES2Backend) getProfileSuggestions(ctx context.Context, client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
 	//the reason we may use summary index here is because we always throw away the current profile filter when
 	// getting a suggestion for profile.. if we didn't then we'd only ever see the filter that's in our filter!
 	esIndex, err := GetEsIndex(filters, useSummaryIndex, true)
@@ -358,7 +358,7 @@ func (backend ES2Backend) getProfileSuggestions(client *elastic.Client, typePara
 			"hits.hits.inner_hits.profiles.hits.hits._source.title",
 			"hits.hits.inner_hits.profiles.hits.hits._source.version",
 			"hits.hits.inner_hits.profiles.hits.hits._score").
-		Do(context.Background())
+		Do(ctx)
 
 	//// Sample search sent to ElasticSearch when suggesting controls:
 	//{
@@ -409,7 +409,7 @@ func (backend ES2Backend) getProfileSuggestions(client *elastic.Client, typePara
 	return suggs, nil
 }
 
-func (backend ES2Backend) getControlSuggestions(client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string) ([]*reportingapi.Suggestion, error) {
+func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string) ([]*reportingapi.Suggestion, error) {
 	esIndex, err := GetEsIndex(filters, false, true)
 	if err != nil {
 		return nil, errors.Wrap(err, "getControlSuggestions unable to get index dates")
@@ -460,7 +460,7 @@ func (backend ES2Backend) getControlSuggestions(client *elastic.Client, typePara
 			"hits.hits._id",
 			"hits.hits._score",
 			"hits.hits.inner_hits").
-		Do(context.Background())
+		Do(ctx)
 
 	if err != nil {
 		logrus.Error("getControlSuggestions search failed")
@@ -504,7 +504,7 @@ func (backend ES2Backend) getControlSuggestions(client *elastic.Client, typePara
 	return suggs, nil
 }
 
-func (backend ES2Backend) getControlTagsSuggestions(client *elastic.Client, typeParam string, target string, text string, controlTagFilterKey string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
+func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client *elastic.Client, typeParam string, target string, text string, controlTagFilterKey string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
 	if typeParam == "control_tag_value" && controlTagFilterKey == "" {
 		return nil, status.Error(codes.InvalidArgument, "'control_tag' filter is required for 'control_tag_value' suggestions")
 	}
@@ -555,7 +555,7 @@ func (backend ES2Backend) getControlTagsSuggestions(client *elastic.Client, type
 			"hits.hits._id",
 			"hits.hits._score",
 			"hits.hits.inner_hits").
-		Do(context.Background())
+		Do(ctx)
 
 	if err != nil {
 		logrus.Error("getControlTagsSuggestions search failed")
