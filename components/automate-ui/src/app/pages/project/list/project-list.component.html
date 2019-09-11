@@ -10,7 +10,7 @@
       </chef-subheading>
     </chef-page-header>
     <section *ngIf="!(projectsEnabled$ | async)" class="page-body">
-      Projects are only available when using IAM v2.1 or higher.
+      Currently, you are using IAM {{ iamMajorVersion$ | async }}. Projects are only available with IAM v2.1 or higher.
     </section>
 
     <section *ngIf="projectsEnabled$ | async" class="page-body">
