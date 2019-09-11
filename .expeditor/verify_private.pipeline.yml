@@ -829,8 +829,6 @@ steps:
           single-use: true
           privileged: true
 
-
-
   - label: "shellcheck hooks"
     command:
       - integration/run_test integration/tests/shellcheck_rendered_hooks.sh
@@ -838,4 +836,14 @@ steps:
     expeditor:
       executor:
         linux:
+          privileged: true
+
+  - label: "ha cluster"
+    command:
+      - integration/run_test integration/tests/cluster.sh
+    timeout_in_minutes: 35
+    expeditor:
+      executor:
+        linux:
+          single-use: true
           privileged: true

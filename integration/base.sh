@@ -12,8 +12,8 @@ test_backup_restore=false
 test_channel="dev"
 test_upgrade_strategy="none"
 # shellcheck disable=SC2034
-test_build_slug="$RANDOM-$RANDOM"
-test_container_name="automate-${test_build_slug}"
+test_build_slug="${test_build_slug:-"$RANDOM-$RANDOM"}"
+test_container_name="${test_container_name:-"automate-${test_build_slug}"}"
 test_loadbalancer_url="https://localhost"
 test_notifications_endpoint="http://localhost:15555"
 test_deploy_inspec_profiles=()
@@ -365,7 +365,7 @@ __run_test() {
     log_info "Loading test definition"
     source "$1"
 
-    log_info "Running test $test_name"
+    log_info "Running test $test_name on $test_container_name"
 
     log_section_start "Step do_setup"
     do_setup

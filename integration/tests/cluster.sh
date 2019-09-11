@@ -16,6 +16,9 @@ do_setup() {
     echo "Installing docker"
     hab pkg install --binlink core/docker
     echo "Installed docker"
+    echo "Installing inspec"
+    hab pkg install --binlink chef/inspec
+    echo "Installed inspec"
 }
 
 do_create_config() {
@@ -78,6 +81,18 @@ do_deploy() {
 
 
 do_test_deploy() {
+    local test_container_ip frontend1_ip frontend2_ip
+
+    #shellcheck disable=SC2154
+    test_container_ip=$(container_ip "$test_container_name")
+    frontend1_ip=$(container_ip "$_frontend1_container_name")
+    frontend2_ip=$(container_ip "$_frontend2_container_name")
+
+    export ELASTICSEARCH_URL="http://$frontend1_ip:10144"
+    test_notifications_endpoint="http://$test_container_ip:15555"
+
+    run_inspec_tests "${A2_ROOT_DIR}" "a2-iam-v2-integration"
+
     local admin_token
     admin_token=$(docker exec -t "$_frontend1_container_name" \
         "$cli_bin" iam token create --admin "diagnostics-test-$RANDOM")

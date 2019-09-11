@@ -11,6 +11,8 @@ control 'auth-1' do
 
   describe "POST /auth/tokens" do
 
+
+
     it "returns a token ID and value" do
       response = automate_api_request("/api/v0/auth/tokens",
                    http_method: 'POST',
@@ -27,26 +29,33 @@ control 'auth-1' do
     end
 
     it "allows you to specify the ID and returns a 409 on conflict" do
-      response = automate_api_request("/api/v0/auth/tokens",
-                   http_method: 'POST',
-                   request_body: {
-                     id: 'test-token',
-                     description: 'we specified the id',
-                     active: true
-                   }.to_json)
+      require "securerandom"
+      token_id = SecureRandom.hex[0..6].to_s
+
+      response = automate_api_request(
+        "/api/v0/auth/tokens",
+        http_method: "POST",
+          request_body: {
+            id: token_id,
+            description: "we specified the id",
+            active: true,
+          }.to_json
+      )
       expect(response.http_status).to eq 200
-      [:value, :id, :description, :created, :updated].each do |key|
+      %i{value id description created updated}.each do |key|
         expect(response.parsed_response_body.keys).to include key
-        expect(response.parsed_response_body[key]).not_to eq ''
+        expect(response.parsed_response_body[key]).not_to eq ""
       end
 
-      response2 = automate_api_request("/api/v0/auth/tokens",
-                    http_method: 'POST',
-                    request_body: {
-                      id: 'test-token',
-                      description: 'this will conflict',
-                      active: true
-                    }.to_json)
+      response2 = automate_api_request(
+        "/api/v0/auth/tokens",
+        http_method: "POST",
+        request_body: {
+          id: token_id,
+          description: "this will conflict",
+          active: true,
+        }.to_json
+      )
       expect(response2.http_status).to eq 409
     end
   end

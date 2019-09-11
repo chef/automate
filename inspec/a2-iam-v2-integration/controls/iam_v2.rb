@@ -560,7 +560,7 @@ EOF
       resp = automate_api_request("/apis/iam/v2beta/tokens",
         http_method: 'POST',
         request_body: {
-          id: 'project-is-required-will-not-be-created',
+          id: "project-missing-token-#{Time.now.utc.to_i}",
           name: "inspec test token create missing projects",
           projects: []
         }.to_json
