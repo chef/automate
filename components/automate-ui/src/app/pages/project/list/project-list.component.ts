@@ -82,6 +82,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.projectsEnabled$ = store.select(atLeastV2p1);
 
     this.applyRulesButtonText$ = this.projects.applyRulesStatus$.pipe(
+      filter(() => !this.cancelRulesInProgress),
       map(({ state, percentageComplete }: ApplyRulesStatus) => {
         switch (state) {
           case ApplyRulesStatusState.NotRunning:

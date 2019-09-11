@@ -32,6 +32,9 @@ export class ConfirmApplyStopModalComponent implements OnChanges {
   }
 
   public updateProgress(applyRulesStatus: ApplyRulesStatus): void {
+    if (this.stopRulesInProgress) {
+      return;
+    }
     const { percentageComplete, estimatedTimeComplete } = applyRulesStatus;
     const now = moment();
     const etc = moment(estimatedTimeComplete);
