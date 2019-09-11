@@ -56,6 +56,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
 
   private updateProjectsFailed = false;
   private updateProjectsCancelled = false;
+  public cancelRulesInProgress = false;
 
   public applyRulesButtonText$: Observable<string>;
   public ApplyRulesStatusState = ApplyRulesStatusState;
@@ -81,6 +82,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.projectsEnabled$ = store.select(atLeastV2p1);
 
     this.applyRulesButtonText$ = this.projects.applyRulesStatus$.pipe(
+      filter(() => !this.cancelRulesInProgress),
       map(({ state, percentageComplete }: ApplyRulesStatus) => {
         switch (state) {
           case ApplyRulesStatusState.NotRunning:
@@ -94,6 +96,10 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.projects.applyRulesStatus$
       .subscribe(({ state, failed, cancelled }: ApplyRulesStatus) => {
         if (state === ApplyRulesStatusState.NotRunning) {
+          if (this.applyRulesInProgress) {
+            this.cancelRulesInProgress = false;
+            this.closeConfirmApplyStopModal();
+          }
           this.applyRulesInProgress = false;
           this.updateProjectsFailed = failed;
           this.updateProjectsCancelled = cancelled;
@@ -240,7 +246,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   }
 
   public confirmApplyStop(): void {
-    this.closeConfirmApplyStopModal();
+    this.cancelRulesInProgress = true;
     this.projects.applyRulesStop();
   }
 
@@ -260,7 +266,9 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   public getProjectStatus(project: Project): string {
     const cachedStatus = this.statusCache[project.id];
     let result: string;
-    if (this.applyRulesInProgress) {
+    if (project.status === 'NO_RULES') {
+      result = 'OK';
+    } else if (this.applyRulesInProgress) {
       result = cachedStatus === 'EDITS_PENDING' ? 'Updating...' : 'OK';
     } else {
       result = project.status === 'EDITS_PENDING'

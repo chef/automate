@@ -1259,7 +1259,7 @@ func TestChainMultipleOnCancel(t *testing.T) {
 
 		require.True(t, payload.Finished())
 		require.Len(t, payload.State, 1)
-		require.True(t, payload.Canceled)
+		require.True(t, payload.Cancelled)
 
 		require.True(t, payload.State[0].IsFinished)
 		require.Equal(t, 1, payload.State[0].EnqueuedTasks)
@@ -1310,7 +1310,7 @@ func TestChainMultipleOnCancel(t *testing.T) {
 
 		require.True(t, payload.Finished())
 		require.Len(t, payload.State, 1)
-		require.True(t, payload.Canceled)
+		require.True(t, payload.Cancelled)
 
 		require.True(t, payload.State[0].IsFinished)
 		require.Equal(t, 1, payload.State[0].EnqueuedTasks)
@@ -1379,7 +1379,7 @@ func TestChainMultipleOnCancel(t *testing.T) {
 
 		require.False(t, payload.Finished())
 		require.Len(t, payload.State, 1)
-		require.True(t, payload.Canceled)
+		require.True(t, payload.Cancelled)
 
 		require.False(t, payload.State[0].IsFinished)
 		require.Equal(t, 2, payload.State[0].EnqueuedTasks)
@@ -1390,7 +1390,7 @@ func TestChainMultipleOnCancel(t *testing.T) {
 		require.Equal(t, workflow1Payload, wpayload)
 	})
 
-	t.Run("stops chain if current subworkflow completes in canceled state", func(t *testing.T) {
+	t.Run("stops chain if current subworkflow completes in cancelled state", func(t *testing.T) {
 		workflow1Payload := TestWorkflowPayload{
 			PayloadValue: "workflow1Payload",
 		}
@@ -1411,7 +1411,7 @@ func TestChainMultipleOnCancel(t *testing.T) {
 		params, err := ToChainWorkflowParameters([]interface{}{nil, nil})
 		require.NoError(t, err)
 		currentPayload := ChainWorkflowPayload{
-			Canceled: true,
+			Cancelled: true,
 			State: []WorkflowState{
 				{
 					IsFinished:    false,
@@ -1438,7 +1438,7 @@ func TestChainMultipleOnCancel(t *testing.T) {
 
 		require.True(t, payload.Finished())
 		require.Len(t, payload.State, 1)
-		require.True(t, payload.Canceled)
+		require.True(t, payload.Cancelled)
 
 		require.True(t, payload.State[0].IsFinished)
 		require.Equal(t, 1, payload.State[0].EnqueuedTasks)
@@ -1449,7 +1449,7 @@ func TestChainMultipleOnCancel(t *testing.T) {
 		require.Equal(t, workflow1Payload, wpayload)
 	})
 
-	t.Run("stops chain if current subworkflow fails in canceled state", func(t *testing.T) {
+	t.Run("stops chain if current subworkflow fails in cancelled state", func(t *testing.T) {
 		failureErr := errors.New("fail")
 
 		executor, err := NewChainWorkflowExecutor(
@@ -1469,7 +1469,7 @@ func TestChainMultipleOnCancel(t *testing.T) {
 		params, err := ToChainWorkflowParameters([]interface{}{nil, nil})
 		require.NoError(t, err)
 		currentPayload := ChainWorkflowPayload{
-			Canceled: true,
+			Cancelled: true,
 			State: []WorkflowState{
 				{
 					IsFinished:    false,
@@ -1496,7 +1496,7 @@ func TestChainMultipleOnCancel(t *testing.T) {
 
 		require.True(t, payload.Finished())
 		require.Len(t, payload.State, 1)
-		require.True(t, payload.Canceled)
+		require.True(t, payload.Cancelled)
 
 		require.True(t, payload.State[0].IsFinished)
 		require.Equal(t, 1, payload.State[0].EnqueuedTasks)

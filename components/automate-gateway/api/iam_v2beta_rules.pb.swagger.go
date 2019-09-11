@@ -240,6 +240,10 @@ func init() {
         },
         "failure_message": {
           "type": "string"
+        },
+        "cancelled": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },

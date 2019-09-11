@@ -91,6 +91,7 @@ message ApplyRulesStatusResp {
     float percentage_complete = 3;
     bool failed = 4;
     string failure_message = 5;
+    bool cancelled = 6;
 }
 
 message ListRulesForAllProjectsReq {}

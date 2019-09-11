@@ -7,15 +7,16 @@ import (
 	"sync"
 	"time"
 
+	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
+	uuid "github.com/chef/automate/lib/uuid4"
+
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/patterns"
 	"github.com/chef/automate/lib/logger"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
-	"github.com/gofrs/uuid"
-	"github.com/sirupsen/logrus"
 
 	project_update_tags "github.com/chef/automate/lib/authz"
 )
@@ -44,6 +45,7 @@ var ProjectUpdateDomainServices = []string{
 
 type ProjectUpdateStatus interface {
 	Failed() bool
+	Cancelled() bool
 	FailureMessage() string
 	PercentageComplete() float64
 	EstimatedTimeComplete() time.Time
@@ -174,12 +176,12 @@ func RegisterCerealProjectUpdateManager(manager *cereal.Manager, log logger.Logg
 		return nil, err
 	}
 
-	applyStagedRuelsTaskExecutor := &ApplyStagedRulesTaskExecutor{
+	applyStagedRulesTaskExecutor := &ApplyStagedRulesTaskExecutor{
 		store:           s,
 		policyRefresher: pr,
 		log:             log,
 	}
-	if err := manager.RegisterTaskExecutor(ApplyStagedRulesTaskName, applyStagedRuelsTaskExecutor,
+	if err := manager.RegisterTaskExecutor(ApplyStagedRulesTaskName, applyStagedRulesTaskExecutor,
 		cereal.TaskExecutorOpts{Workers: 1}); err != nil {
 
 	}
@@ -226,6 +228,10 @@ type workflowInstance struct {
 
 func (w *workflowInstance) Failed() bool {
 	return w.FailureMessage() != ""
+}
+
+func (w *workflowInstance) Cancelled() bool {
+	return w.chain.IsCancelled()
 }
 
 func (w *workflowInstance) FailureMessage() string {
@@ -386,6 +392,11 @@ type EmptyProjectUpdateStatus struct{}
 func (*EmptyProjectUpdateStatus) Failed() bool {
 	return false
 }
+
+func (*EmptyProjectUpdateStatus) Cancelled() bool {
+	return false
+}
+
 func (*EmptyProjectUpdateStatus) FailureMessage() string {
 	return ""
 }

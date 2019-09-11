@@ -155,6 +155,7 @@ func (s *Server) ApplyRulesStatus(ctx context.Context,
 		Failed:                resp.Failed,
 		FailureMessage:        resp.FailureMessage,
 		State:                 resp.State,
+		Cancelled:             resp.Cancelled,
 	}, nil
 }
 

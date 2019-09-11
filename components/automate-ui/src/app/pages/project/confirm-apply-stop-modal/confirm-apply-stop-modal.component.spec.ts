@@ -86,12 +86,47 @@ describe('ConfirmApplyStopModalComponent', () => {
         expect(component.progressSuffixText).toEqual(progressSuffixText);
       });
     });
+
+    it('does not update percentage once update is cancelled', () => {
+      component.updateProgress({ ...component.applyRulesStatus, percentageComplete: 0.1 });
+      expect(component.progressPrefixText).toContain('10%');
+      component.updateProgress({ ...component.applyRulesStatus, percentageComplete: 0.2 });
+      expect(component.progressPrefixText).toContain('20%');
+
+      component.stopRulesInProgress = true;
+
+      component.updateProgress({ ...component.applyRulesStatus, percentageComplete: 0.3 });
+      expect(component.progressPrefixText).toContain('20%');
+    });
+
+    it('does not update time once update is cancelled', () => {
+      jasmine.clock().mockDate(new Date(NOW));
+      component.updateProgress(
+        { ...component.applyRulesStatus, estimatedTimeComplete: '2019-01-01T12:30:45Z' });
+      expect(component.progressSuffixText).toContain('12:30:45');
+      component.updateProgress(
+        { ...component.applyRulesStatus, estimatedTimeComplete: '2019-01-01T11:30:45Z' });
+      expect(component.progressSuffixText).toContain('11:30:45');
+
+      component.stopRulesInProgress = true;
+
+      component.updateProgress(
+        { ...component.applyRulesStatus, estimatedTimeComplete: '2019-01-01T09:30:45Z' });
+      expect(component.progressSuffixText).toContain('11:30:45');
+    });
   });
 
-  it('displays a confirm-button', () => {
-    const button = fixture.nativeElement.querySelector('#confirm-button');
-    expect(button).not.toBeNull();
-    expect(button.textContent.trim()).toEqual('Stop Updating Projects');
+  using([
+    [true, 'Stopping Project Update...', 'in progress'],
+    [false, 'Stop Updating Projects', 'not in progress']
+  ], (inProgress: boolean, buttonText: string, description: string) => {
+    it(`displays a confirm-button when cancel is ${description}`, () => {
+      component.stopRulesInProgress = inProgress;
+      fixture.detectChanges();
+      const button = fixture.nativeElement.querySelector('#confirm-button');
+      expect(button).not.toBeNull();
+      expect(button.textContent.trim()).toEqual(buttonText);
+    });
   });
 
   describe('when confirm-button is clicked', () => {

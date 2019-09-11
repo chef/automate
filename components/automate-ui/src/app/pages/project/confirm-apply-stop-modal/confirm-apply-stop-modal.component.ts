@@ -13,6 +13,8 @@ export class ConfirmApplyStopModalComponent implements OnChanges {
 
   @Input() applyRulesStatus: ApplyRulesStatus;
 
+  @Input() stopRulesInProgress: boolean;
+
   @Output() confirm: EventEmitter<void> = new EventEmitter();
 
   @Output() cancel: EventEmitter<void> = new EventEmitter();
@@ -23,11 +25,16 @@ export class ConfirmApplyStopModalComponent implements OnChanges {
 
   public progressSuffixText: string;
 
+  public stopRulesButtonText: string;
+
   ngOnChanges() {
     this.updateProgress(this.applyRulesStatus);
   }
 
   public updateProgress(applyRulesStatus: ApplyRulesStatus): void {
+    if (this.stopRulesInProgress) {
+      return;
+    }
     const { percentageComplete, estimatedTimeComplete } = applyRulesStatus;
     const now = moment();
     const etc = moment(estimatedTimeComplete);

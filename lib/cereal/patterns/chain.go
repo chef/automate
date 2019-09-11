@@ -16,7 +16,7 @@ allows breaking logic apart in small, concise workflows.
 
 Limitations:
 - Tasks launched by the subworkflows must have struct or nil parameters
-- When a subworkflow completes, enqueued/running tasks will not be canceled
+- When a subworkflow completes, enqueued/running tasks will not be cancelled
   until the end of all subworkflows in the chain
 - Results cannot be passed between workflows in the chain
 */
@@ -34,8 +34,8 @@ type ChainWorkflowParams struct {
 // ChainWorkflowPayload is the state of the chain workflow. It contains
 // the state (payload, result, err, etc) of each subworkflow in the chain.
 type ChainWorkflowPayload struct {
-	Canceled bool
-	State    []WorkflowState
+	Cancelled bool
+	State     []WorkflowState
 }
 
 func (p *ChainWorkflowPayload) IsValid() bool {
@@ -55,7 +55,7 @@ type ChainWorkflowExecutor struct {
 	executors []cereal.WorkflowExecutor
 }
 
-// ChainWorkflowTaskParam is a struct that is appened to any enqueued tasks.
+// ChainWorkflowTaskParam is a struct that is appended to any enqueued tasks.
 // This allows us to know which subworkflow to call when the task completes.
 // This also drives the requirement that the task parameters are either a
 // struct or nil.
@@ -178,6 +178,15 @@ func (instance *ChainWorkflowInstance) IsRunning() bool {
 	return instance.isRunning
 }
 
+func (instance *ChainWorkflowInstance) IsCancelled() bool {
+	if instance.payload != nil {
+		return instance.payload.Cancelled
+	} else if instance.result != nil {
+		return instance.result.Cancelled
+	}
+	return false
+}
+
 func (instance *ChainWorkflowInstance) GetResult() (*ChainWorkflowPayload, error) {
 	return instance.result, instance.err
 }
@@ -285,8 +294,8 @@ func (m *ChainWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev cer
 }
 
 func (m *ChainWorkflowExecutor) startNext(w cereal.WorkflowInstance, idx int64, parameters ChainWorkflowParams, payload ChainWorkflowPayload) cereal.Decision {
-	// The chain will stop when canceled
-	if payload.Canceled {
+	// The chain will stop when cancelled
+	if payload.Cancelled {
 		return w.Complete(cereal.WithResult(payload))
 	}
 	nextIdx := idx + 1
@@ -326,7 +335,7 @@ func (m *ChainWorkflowExecutor) OnCancel(w cereal.WorkflowInstance, ev cereal.Ca
 	if err := w.GetPayload(&payload); err != nil {
 		return w.Fail(err)
 	}
-	payload.Canceled = true
+	payload.Cancelled = true
 	idx := len(payload.State) - 1
 
 	if !payload.IsValid() || idx >= len(payload.State) || idx >= len(m.executors) {

@@ -251,6 +251,7 @@ func (s *ProjectState) ApplyRulesStatus(
 		EstimatedTimeComplete: time,
 		Failed:                status.Failed(),
 		FailureMessage:        status.FailureMessage(),
+		Cancelled:             status.Cancelled(),
 	}, nil
 }
 

@@ -26,6 +26,7 @@
           </app-authorized>
           <app-authorized [allOf]="['/iam/v2beta/apply-rules', 'delete']">
             <chef-button *ngIf="(projects.applyRulesStatus$ | async)?.state === ApplyRulesStatusState.Running"
+              [disabled]="cancelRulesInProgress"
               tertiary id="update-stop-button" (click)="openConfirmUpdateStopModal()">Stop Updating Projects</chef-button>
           </app-authorized>
         </chef-toolbar>
@@ -109,6 +110,7 @@
     <app-confirm-apply-stop-modal
       [visible]="confirmApplyStopModalVisible"
       [applyRulesStatus]="projects.applyRulesStatus$ | async"
+      [stopRulesInProgress]="cancelRulesInProgress"
       (confirm)="confirmApplyStop()"
       (cancel)="cancelApplyStop()">
     </app-confirm-apply-stop-modal>

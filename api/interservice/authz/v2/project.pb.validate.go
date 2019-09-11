@@ -1207,6 +1207,8 @@ func (m *ApplyRulesStatusResp) Validate() error {
 
 	// no validation rules for FailureMessage
 
+	// no validation rules for Cancelled
+
 	return nil
 }
 
