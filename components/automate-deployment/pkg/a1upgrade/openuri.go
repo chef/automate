@@ -17,7 +17,7 @@ func OpenURI(uri string) (io.ReadCloser, error) {
 		filepath := strings.TrimPrefix(uri, "file://")
 		return os.Open(filepath)
 	} else if strings.HasPrefix(uri, "http://") || strings.HasPrefix(uri, "https://") {
-		resp, err := http.Get(uri)
+		resp, err := http.Get(uri) // nolint: bodyclose
 		if err != nil {
 			return nil, err
 		}
@@ -36,6 +36,6 @@ func ReadURI(uri string) ([]byte, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to open uri")
 	}
-	defer reader.Close()
+	defer reader.Close() // nolint: errcheck
 	return ioutil.ReadAll(reader)
 }

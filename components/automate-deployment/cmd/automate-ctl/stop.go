@@ -37,7 +37,7 @@ func automateCtlStop(cmd *cobra.Command, args []string) {
 	tlsConfig := &tls.Config{InsecureSkipVerify: true}
 	tr := &http.Transport{TLSClientConfig: tlsConfig}
 	client := &http.Client{Transport: tr}
-	_, err := client.Get("https://localhost/th-ctl/stop")
+	_, err := client.Get("https://localhost/th-ctl/stop") // nolint: bodyclose
 	if err != nil {
 		fmt.Printf("automate-ctl stop TEST HARNESS ERROR %s\n", err.Error())
 		os.Exit(10)
