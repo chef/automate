@@ -41,6 +41,10 @@ var conf = config.Nodemanager{
 	EventConfig: config.EventConfig{
 		Endpoint: "127.0.0.1:10132",
 	},
+	Cereal: config.Cereal{
+		Endpoint: "127.0.0.1:10101",
+		Skip:     false,
+	},
 }
 
 // runCmd represents the run command
@@ -96,4 +100,7 @@ func init() {
 	// Event Service Flags
 	runCmd.Flags().StringVar(&conf.EventConfig.Endpoint, "event-endpoint", conf.EventConfig.Endpoint, "Event Service Endpoint")
 
+	// Cereal Service Flags
+	runCmd.Flags().StringVar(&conf.Cereal.Endpoint, "cereal-endpoint", conf.Cereal.Endpoint, "Cereal Service Endpoint")
+	runCmd.Flags().BoolVar(&conf.Cereal.Skip, "skip-cereal", conf.Cereal.Skip, "Do not require a running Cereal Service (test only)")
 }

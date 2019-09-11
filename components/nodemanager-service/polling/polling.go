@@ -3,7 +3,6 @@ package polling
 import (
 	"context"
 	"strings"
-	"time"
 
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes"
@@ -15,31 +14,17 @@ import (
 	event "github.com/chef/automate/components/event-service/config"
 
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
-	"github.com/chef/automate/components/nodemanager-service/config"
 	"github.com/chef/automate/components/nodemanager-service/managers"
 	"github.com/chef/automate/components/nodemanager-service/pgdb"
 )
 
-func StartThePolls(ctx context.Context, mgrConf config.Manager, db *pgdb.DB, secretsClient secrets.SecretsServiceClient, eventsClient aEvent.EventServiceClient) {
-	go PollAwsEc2InstanceState(ctx, mgrConf.AwsEc2PollIntervalMinutes, db, secretsClient, eventsClient)
-	go PollAzureVMInstanceState(ctx, mgrConf.AzureVMPollIntervalMinutes, db, secretsClient)
-	go PollManagersStatus(ctx, db, secretsClient)
-}
-
-func PollManagersStatus(ctx context.Context, db *pgdb.DB, secretsClient secrets.SecretsServiceClient) {
-	for {
-		time.Sleep(120 * time.Minute)
-		go checkManagersStatuses(ctx, db, secretsClient)
-	}
-}
-
-func checkManagersStatuses(ctx context.Context, db *pgdb.DB, secretsClient secrets.SecretsServiceClient) {
+func CheckManagersStatuses(ctx context.Context, db *pgdb.DB, secretsClient secrets.SecretsServiceClient) error {
 	// get all managers
 	// note: we really don't expect anyone to have more than 100 nodemanagers, so this is ok for now
 	allManagers, _, err := db.GetNodeManagers("", 0, 1, 100, []*common.Filter{})
 	if err != nil {
 		logrus.Errorf("checkManagersStatuses unable to check for node managers %s", err.Error())
-		return
+		return err
 	}
 	// do a dry run connection on all aws and azure managers to ensure creds are still good
 	for _, mgr := range allManagers {
@@ -47,52 +32,48 @@ func checkManagersStatuses(ctx context.Context, db *pgdb.DB, secretsClient secre
 			myaws, err := managers.GetAWSManagerFromCredential(ctx, mgr.CredentialId, db, secretsClient)
 			if err != nil {
 				logrus.Error(err)
-				return
+				return err
 			}
 			err = myaws.TestConnectivity(ctx)
-			handleManagerStatusError(db, mgr, err)
+			return handleManagerStatusError(db, mgr, err)
 		}
 		if strings.HasPrefix(mgr.Type, "azure") {
 			myazure, err := managers.GetAzureManagerFromCredential(ctx, mgr.CredentialId, db, secretsClient)
 			if err != nil {
 				logrus.Error(err)
-				return
+				return err
 			}
 			err = myazure.TestConnectivity(ctx)
-			handleManagerStatusError(db, mgr, err)
+			return handleManagerStatusError(db, mgr, err)
 		}
 	}
+	return nil
 }
 
-func handleManagerStatusError(db *pgdb.DB, mgr *manager.NodeManager, err error) {
+func handleManagerStatusError(db *pgdb.DB, mgr *manager.NodeManager, err error) error {
 	// if they are not successful, update manager status to be "unreachable"
 	if err != nil {
 		logrus.Errorf("updating manager %s with status unreachable due to error: %s", mgr.Name, err.Error())
 		err := db.UpdateManagerStatus(mgr.Id, "unreachable")
 		if err != nil {
 			logrus.Errorf("unable to update manager status: %s", err.Error())
+			return err
 		}
 	} else {
 		logrus.Infof("Connection check successful for manager: %s", mgr.Name)
+		return nil
 	}
+	return nil
 }
 
-func PollAwsEc2InstanceState(ctx context.Context, pollInterval int, db *pgdb.DB, secretsClient secrets.SecretsServiceClient, eventsClient aEvent.EventServiceClient) {
-	interval := time.Minute * time.Duration(pollInterval)
-	for {
-		time.Sleep(interval)
-		go queryAwsEc2InstanceStates(ctx, db, interval, secretsClient, eventsClient)
-	}
-}
-
-func queryAwsEc2InstanceStates(ctx context.Context, db *pgdb.DB, interval time.Duration, secretsClient secrets.SecretsServiceClient, eventsClient aEvent.EventServiceClient) {
+func QueryAwsEc2InstanceStates(ctx context.Context, db *pgdb.DB, secretsClient secrets.SecretsServiceClient, eventsClient aEvent.EventServiceClient) error {
 	logrus.Infof("processing aws-ec2 instances due for status check...")
 
 	// get all aws-ec2 manager ids
 	mgrIds, err := db.GetAllManagersByType("aws-ec2")
 	if err != nil {
 		logrus.Errorf("queryAwsEc2InstanceStates unable to get node manager ids %s", err.Error())
-		return
+		return err
 	}
 	if len(mgrIds) == 0 {
 		logrus.Info("no aws-ec2 managers found")
@@ -104,13 +85,13 @@ func queryAwsEc2InstanceStates(ctx context.Context, db *pgdb.DB, interval time.D
 		instanceStatesResp, err := managers.GetStateInfoByManager(ctx, mgrId, db, "aws-ec2", secretsClient)
 		if err != nil {
 			logrus.Errorf("queryAwsEc2InstanceStates unable to get state information for instances %s", err.Error())
-			return
+			return err
 		}
 		// get the account id, a unique identifier
 		nodeManager, err := db.GetNodeManager(mgrId)
 		if err != nil {
 			logrus.Errorf("queryAwsEc2InstanceStates unable to retrieve manager %s", err.Error())
-			return
+			return err
 		}
 		// update each instance's source_state; if source_state != running, update status=unreachable
 		for _, inst := range instanceStatesResp {
@@ -123,28 +104,21 @@ func queryAwsEc2InstanceStates(ctx context.Context, db *pgdb.DB, interval time.D
 			}
 			if err != nil {
 				logrus.Errorf("queryAwsEc2InstanceStates unable to update db with state %s", err.Error())
-				return
+				return err
 			}
 		}
 	}
+	return nil
 }
 
-func PollAzureVMInstanceState(ctx context.Context, pollInterval int, db *pgdb.DB, secretsClient secrets.SecretsServiceClient) {
-	interval := time.Minute * time.Duration(pollInterval)
-	for {
-		time.Sleep(interval)
-		go queryAzureVMInstanceStates(ctx, db, interval, secretsClient)
-	}
-}
-
-func queryAzureVMInstanceStates(ctx context.Context, db *pgdb.DB, interval time.Duration, secretsClient secrets.SecretsServiceClient) {
+func QueryAzureVMInstanceStates(ctx context.Context, db *pgdb.DB, secretsClient secrets.SecretsServiceClient) error {
 	logrus.Infof("processing azure-vm instances due for status check...")
 
 	// get all azure-vm manager ids
 	mgrIds, err := db.GetAllManagersByType("azure-vm")
 	if err != nil {
 		logrus.Errorf("queryAzureVMInstanceStates unable to get node manager ids %s", err.Error())
-		return
+		return err
 	}
 	if len(mgrIds) == 0 {
 		logrus.Info("no azure-vm managers found")
@@ -156,23 +130,24 @@ func queryAzureVMInstanceStates(ctx context.Context, db *pgdb.DB, interval time.
 		instanceStatesResp, err := managers.GetStateInfoByManager(ctx, mgrId, db, "azure-vm", secretsClient)
 		if err != nil {
 			logrus.Errorf("queryAzureVMInstanceStates unable to get state information for instances %s", err.Error())
-			return
+			return err
 		}
 		// get the account id, a unique identifier
 		nodeManager, err := db.GetNodeManager(mgrId)
 		if err != nil {
 			logrus.Errorf("queryAzureVMInstanceStates unable to retrieve manager %s", err.Error())
-			return
+			return err
 		}
 		// update each instance's source_state; if source_state != running, update status=unreachable
 		for _, inst := range instanceStatesResp {
 			_, err := db.UpdateOrInsertInstanceSourceStateInDb(inst, mgrId, nodeManager.AccountId, "azure-vm")
 			if err != nil {
 				logrus.Errorf("queryAzureVMInstanceStates unable to update db with state %s", err.Error())
-				return
+				return err
 			}
 		}
 	}
+	return nil
 }
 
 func fireEvent(eventType string, instanceID string, eventsClient aEvent.EventServiceClient) {

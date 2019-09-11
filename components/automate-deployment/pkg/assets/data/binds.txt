@@ -60,7 +60,7 @@ license-control-service REQUIRED automate-pg-gateway pg-sidecar-service
 license-control-service BINDING_MODE strict
 local-user-service REQUIRED authz-service automate-dex teams-service
 local-user-service BINDING_MODE strict
-nodemanager-service REQUIRED automate-pg-gateway event-service pg-sidecar-service secrets-service
+nodemanager-service REQUIRED automate-pg-gateway cereal-service event-service pg-sidecar-service secrets-service
 nodemanager-service BINDING_MODE strict
 notifications-service REQUIRED automate-pg-gateway pg-sidecar-service secrets-service
 notifications-service BINDING_MODE strict
