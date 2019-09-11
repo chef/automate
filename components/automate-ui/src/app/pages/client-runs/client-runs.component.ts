@@ -580,7 +580,7 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
 
   // If there is a page parameter in the URL the first page is not selected.
   isNotFirstPage(allUrlParameters: Chicklet[]): boolean {
-    return allUrlParameters.findIndex((parm: Chicklet) => parm.type === 'page') >= 0;
+    return allUrlParameters.some((parm: Chicklet) => parm.type === 'page');
   }
 
   private getSelectedPageNumber(allUrlParameters: Chicklet[]): number {
