@@ -12,9 +12,11 @@ import (
 	"github.com/pkg/errors"
 	"github.com/schollz/closestmatch"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/status"
 
 	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
 	"github.com/chef/automate/lib/errorutils"
+	"google.golang.org/grpc/codes"
 )
 
 // GetSuggestions - Report #12
@@ -504,7 +506,7 @@ func (backend ES2Backend) getControlSuggestions(client *elastic.Client, typePara
 
 func (backend ES2Backend) getControlTagsSuggestions(client *elastic.Client, typeParam string, target string, text string, controlTagFilterKey string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
 	if typeParam == "control_tag_value" && controlTagFilterKey == "" {
-		return nil, errors.New("'control_tag' filter is required for 'control_tag_value' suggestions")
+		return nil, status.Error(codes.InvalidArgument, "'control_tag' filter is required for 'control_tag_value' suggestions")
 	}
 	esIndex, err := GetEsIndex(filters, useSummaryIndex, true)
 	if err != nil {
