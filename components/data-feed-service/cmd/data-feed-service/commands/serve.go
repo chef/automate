@@ -3,20 +3,22 @@ package commands
 import (
 	"context"
 
-	"github.com/chef/automate/components/data-feed-service/config"
-	"github.com/chef/automate/components/data-feed-service/server"
-	"github.com/chef/automate/lib/tracing"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+
+	"github.com/chef/automate/components/data-feed-service/config"
+	"github.com/chef/automate/components/data-feed-service/server"
+	"github.com/chef/automate/components/data-feed-service/service"
+	"github.com/chef/automate/lib/grpc/secureconn"
+	"github.com/chef/automate/lib/tracing"
 )
 
 var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "Start the data feed gRPC server",
-	Run: func(cmd *cobra.Command, args []string) {
-		log.Debug("serve.go serveCmd ->")
-		log.Info("Starting Data Feed Service...")
-
+	RunE: func(cmd *cobra.Command, args []string) error {
+		log.Info("Starting Data Feed Service")
 		closer, err := tracing.NewGlobalTracer("data-feed-service")
 		if err != nil {
 			log.WithError(err).Warn("Failed to start tracer for data-feed-service")
@@ -27,14 +29,21 @@ var serveCmd = &cobra.Command{
 
 		cfg, err := config.Configure()
 		if err != nil {
-			log.WithError(err).Fatal("Failed to configure data-feed-service server")
+			return errors.Wrap(err, "failed to configure data-feed-service")
 		}
 
-		err = server.StartGRPC(context.Background(), cfg)
+		connFactory := secureconn.NewFactory(*cfg.ServiceCerts)
+
+		err = service.Start(cfg, connFactory)
 		if err != nil {
-			log.Fatalf("Failed to start GRPC server: %v", err)
+			return errors.Wrap(err, "failed to start service")
 		}
 
-		log.Debug("end serve.go serveCmd ->")
+		err = server.StartGRPC(context.Background(), cfg, connFactory)
+		if err != nil {
+			return errors.Wrap(err, "failed to start GRPC server")
+		}
+
+		return nil
 	},
 }

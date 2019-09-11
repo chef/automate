@@ -26,6 +26,7 @@ type DataFeedConfig struct {
 	SecretsConfig       SecretsConfig       `mapstructure:"secrets"`
 	CfgmgmtConfig       CfgmgmtConfig       `mapstructure:"cfgmgmt"`
 	ComplianceConfig    ComplianceConfig    `mapstructure:"compliance"`
+	CerealConfig        CerealConfig        `mapstructure:"cereal"`
 	ServiceCerts        *certs.ServiceCerts
 }
 
@@ -40,6 +41,10 @@ type ServiceConfig struct {
 	FeedInterval    time.Duration `mapstructure:"feed_interval"`
 	AssetPageSize   int32         `mapstructure:"asset_page_size"`
 	ReportsPageSize int32         `mapstructure:"reports_page_size"`
+}
+
+type CerealConfig struct {
+	Target string `mapstructure:"target"`
 }
 
 type NotificationsConfig struct {
