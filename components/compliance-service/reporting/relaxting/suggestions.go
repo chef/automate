@@ -194,10 +194,6 @@ func (backend ES2Backend) getAggSuggestions(ctx context.Context, client *elastic
 		logrus.Error("getAggSuggestions search failed")
 		return nil, err
 	}
-	// Sample search sent to ElasticSearch for a node_name suggestion
-	//{
-	//	"aggregations": {
-	//		"myagg": {
 
 	LogQueryPartMin(esIndex, searchResult, "getAggSuggestions - searchResult")
 	logrus.Debugf("Search query took %d milliseconds\n", searchResult.TookInMillis)
@@ -359,11 +355,6 @@ func (backend ES2Backend) getProfileSuggestions(ctx context.Context, client *ela
 			"hits.hits.inner_hits.profiles.hits.hits._source.version",
 			"hits.hits.inner_hits.profiles.hits.hits._score").
 		Do(ctx)
-
-	//// Sample search sent to ElasticSearch when suggesting controls:
-	//{
-	//	"_source": false,
-	//...
 
 	if err != nil {
 		logrus.Error("getProfileSuggestions search failed")
@@ -630,7 +621,7 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 			}
 		}
 
-		// Find the best engram match from the array of texts
+		// Find the best engram match from the array of matches
 		bestMatch := findBestArrayMatch(text, matches)
 		for _, match := range bestMatch {
 			bestMatchScore := item.Score
@@ -640,12 +631,14 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 		}
 	}
 
-	suggs := make([]*reportingapi.Suggestion, 0)
+	suggs := make([]*reportingapi.Suggestion, len(scoredTagSuggs))
+	i := 0
 	for mSugg, mScore := range scoredTagSuggs {
-		suggs = append(suggs, &reportingapi.Suggestion{
+		suggs[i] = &reportingapi.Suggestion{
 			Text:  mSugg,
 			Score: *mScore,
-		})
+		}
+		i++
 	}
 
 	return suggs, nil
