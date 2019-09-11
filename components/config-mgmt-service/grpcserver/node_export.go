@@ -260,7 +260,7 @@ func nodeToDisplayNode(node backend.Node) displayNode {
 		Source:             node.Source,
 		Status:             node.Status,
 		TotalResourceCount: node.TotalResourceCount,
-		Tags:               node.Tags,
+		Tags:               node.ChefTags,
 		ResourceNames:      node.ResourceNames,
 		Recipes:            node.Recipes,
 		Cookbooks:          node.Cookbooks,

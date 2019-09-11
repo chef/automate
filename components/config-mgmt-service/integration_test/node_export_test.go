@@ -25,6 +25,81 @@ import (
 	"time"
 )
 
+func TestNodeExportMissingTags(t *testing.T) {
+	esClient := elastic.New(elasticsearchUrl)
+	c := config.New(esClient)
+	server := grpcserver.NewCfgMgmtServer(c)
+
+	lis := bufconn.Listen(1024 * 1024)
+	s := grpc.NewServer()
+	api.RegisterCfgMgmtServer(s, server)
+
+	go func() {
+		if err := s.Serve(lis); err != nil {
+			t.Fatalf("Server exited with error: %v", err)
+		}
+	}()
+
+	dialer := func(string, time.Duration) (net.Conn, error) { return lis.Dial() }
+
+	conn, err := grpc.DialContext(context.Background(), "bufnet", grpc.WithDialer(dialer), grpc.WithInsecure())
+	defer conn.Close()
+	require.NoError(t, err)
+
+	client := api.NewCfgMgmtClient(conn)
+
+	nodes := []iBackend.Node{
+		{
+			NodeInfo: iBackend.NodeInfo{
+				NodeName: "1",
+				ChefTags: []string{"a", "b", "c"},
+			},
+		},
+	}
+
+	// Adding required node data
+	for index := range nodes {
+		nodes[index].Exists = true
+		nodes[index].NodeInfo.EntityUuid = newUUID()
+	}
+
+	// Add nodes with projects
+	suite.IngestNodes(nodes)
+	defer suite.DeleteAllDocuments()
+
+	response, err := client.NodeExport(context.Background(), &request.NodeExport{
+		OutputType: "json",
+	})
+
+	assert.NoError(t, err)
+	require.NotNil(t, response)
+
+	data := make([]byte, 0)
+	for {
+		tdata, err := response.Recv()
+		if err != nil && err == io.EOF {
+			data = append(data, tdata.GetContent()...)
+			break
+		}
+
+		require.NoError(t, err)
+		data = append(data, tdata.GetContent()...)
+	}
+
+	nodeData := make([][]string, 0)
+	jsonparser.ArrayEach(data, func(node []byte, _ jsonparser.ValueType, _ int, err error) {
+		require.NoError(t, err)
+		tags := []string{}
+		jsonparser.ArrayEach(node, func(tag []byte, _ jsonparser.ValueType, _ int, err error) {
+			tags = append(tags, string(tag))
+		}, "tags")
+		nodeData = append(nodeData, tags)
+	})
+
+	assert.Equal(t, 1, len(nodeData))
+	assert.ElementsMatch(t, []string{"a", "b", "c"}, nodeData[0])
+}
+
 func TestNodeExportProjectFilters(t *testing.T) {
 	esClient := elastic.New(elasticsearchUrl)
 	c := config.New(esClient)
