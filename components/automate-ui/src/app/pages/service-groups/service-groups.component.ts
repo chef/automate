@@ -294,13 +294,11 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   detailParamsChange(queryParams) {
     const sgId = queryParams.get('sgId');
     if (sgId) {
-      const searchBarFilters = [];
       const paramKeys = Object.keys(queryParams.params);
-      paramKeys.forEach((key: string) => {
-        if (some({'type': key}, this.categoryTypes)) {
-          searchBarFilters.push({ type: key, text: queryParams.params[key] });
-        }
-      });
+
+      const searchBarFilters = paramKeys.filter((key: string) => 
+          some({'type': key}, this.categoryTypes)
+        ).map((key: string) => ({ type: key, text: queryParams.params[key] }));
 
       const servicesFilters: GroupServicesFilters = {
         service_group_id: sgId,
@@ -309,6 +307,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
         health: queryParams.get('sgStatus') || 'total',
         searchBar: searchBarFilters
       };
+      
       this.updateServicesSidebar(servicesFilters);
     }
   }

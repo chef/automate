@@ -67,9 +67,9 @@ export class ServiceGroupsEffects {
       withLatestFrom(this.store.select(serviceGroupsFilters)),
       switchMap(([_action, filters]: [any, ServiceGroupsFilters]) => {
         return this.requests.fetchServiceGroupHealth(filters).pipe(
-        map((payload: ServiceGroupsHealthSummary) => new GetServiceGroupsCountsSuccess(payload)),
-        catchError((error: HttpErrorResponse) => of(new GetServiceGroupsCountsFailure(error)))
-      );
+          map((payload: ServiceGroupsHealthSummary) => new GetServiceGroupsCountsSuccess(payload)),
+          catchError((error: HttpErrorResponse) => of(new GetServiceGroupsCountsFailure(error)))
+        );
       }));
 
   @Effect()
