@@ -2,12 +2,14 @@ package postgres
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/components/applications-service/pkg/storage"
+	"github.com/chef/automate/lib/pgutils"
 )
 
 // composedService is a more user friendly and clear representation of a service.
@@ -451,7 +453,13 @@ func buildORStatementFromValues(field string, values []string) string {
 			ORConstraint = ORConstraint + " OR"
 		}
 
-		ORConstraint = ORConstraint + fmt.Sprintf(" %s = '%s'", field, value)
+		if strings.ContainsAny(value, "?*") { // Wild cards detected, lookout!
+			pgWild := strings.Replace(value, "*", "%", -1)
+			pgWild = strings.Replace(pgWild, "?", "_", -1)
+			ORConstraint = ORConstraint + fmt.Sprintf(" %s LIKE '%s'", field, pgutils.EscapeLiteralForPG(pgWild))
+		} else {
+			ORConstraint = ORConstraint + fmt.Sprintf(" %s = '%s'", field, pgutils.EscapeLiteralForPG(value))
+		}
 		secondStatement = true
 	}
 
