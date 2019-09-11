@@ -24,7 +24,7 @@ func TestOpenURI(t *testing.T) {
 		err = f.Close()
 		require.NoError(t, err)
 
-		reader, err := OpenURI(f.Name())
+		reader, err := openURI(f.Name())
 		require.NoError(t, err)
 		defer reader.Close()
 
@@ -43,7 +43,7 @@ func TestOpenURI(t *testing.T) {
 		err = f.Close()
 		require.NoError(t, err)
 
-		reader, err := OpenURI(fmt.Sprintf("file://%s", f.Name()))
+		reader, err := openURI(fmt.Sprintf("file://%s", f.Name()))
 		require.NoError(t, err)
 		defer reader.Close()
 
@@ -56,7 +56,7 @@ func TestOpenURI(t *testing.T) {
 			w.Write([]byte("test-string"))
 		}))
 		defer ts.Close()
-		reader, err := OpenURI(ts.URL)
+		reader, err := openURI(ts.URL)
 		require.NoError(t, err)
 		defer reader.Close()
 
