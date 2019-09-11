@@ -83,7 +83,7 @@
                 Report Date
                 <chef-tooltip for="report-date-label">Latest information available for everything at this date.</chef-tooltip>
               </chef-th>
-              <chef-td>{{ reportQuery.endDate | date: 'longDate' }}</chef-td>
+              <chef-td>{{ endDate$ | async | date: 'longDate' }}</chef-td>
             </chef-tr>
             <chef-tr>
               <chef-th>
