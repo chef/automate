@@ -493,6 +493,8 @@ func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *ela
 										suggs = append(suggs, &oneSugg)
 										addedControls[c.ID] = true
 									}
+								} else {
+									logrus.Errorf("Invalid control (%+v) found in report %s", c, hit2.Id)
 								}
 							}
 						}
@@ -590,11 +592,13 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 					}
 					var c ControlSourceTags
 					err := json.Unmarshal(*hit2.Source, &c)
-					if err == nil && c.ID != "" {
+					if err == nil && len(c.StringTags) > 0 {
 						foundControlTags = append(foundControlTags, ControlTagsScore{
 							float32(*hit2.Score),
 							c.StringTags,
 						})
+					} else {
+						logrus.Errorf("Invalid control (%+v) found in report %s", c, hit2.Id)
 					}
 				}
 			}
