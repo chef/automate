@@ -4,6 +4,7 @@ set -e
 
 echo "Listing stuff"
 ls -lah /services
+
 echo "Doing sysctl stuff"
 cat > /etc/sysctl.d/00-chef.conf <<EOF
 vm.swappiness=10
@@ -11,12 +12,19 @@ vm.max_map_count=262144
 vm.dirty_ratio=20
 vm.dirty_background_ratio=30
 vm.dirty_expire_centisecs=30000
-net.ipv4.ip_local_port_range=1024 65024 net.ipv4.tcp_max_syn_backlog=60000
-net.ipv4.tcp_tw_reuse=1
 net.core.somaxconn=1024
 EOF
 
 sysctl -p /etc/sysctl.d/00-chef.conf
+
+if [[ -d "/proc/net/ipv4" ]]; then
+    cat > /etc/sysctl.d/01-ipv4.conf <<EOF
+net.ipv4.ip_local_port_range=1024 65024
+net.ipv4.tcp_max_syn_backlog=60000
+net.ipv4.tcp_tw_reuse=1
+EOF
+    sysctl -p /etc/sysctl.d/01-ipv4.conf
+fi
 
 cat > /etc/security/limits.d/20-nproc.conf<<EOF
 *   soft  nproc     65536
