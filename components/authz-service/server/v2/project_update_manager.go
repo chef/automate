@@ -7,16 +7,16 @@ import (
 	"sync"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	uuid "github.com/chef/automate/lib/uuid4"
 
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/patterns"
 	"github.com/chef/automate/lib/logger"
-
-	"github.com/gofrs/uuid"
-	"github.com/sirupsen/logrus"
 
 	project_update_tags "github.com/chef/automate/lib/authz"
 )

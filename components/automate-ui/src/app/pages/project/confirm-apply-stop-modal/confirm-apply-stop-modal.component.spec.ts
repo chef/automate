@@ -93,7 +93,7 @@ describe('ConfirmApplyStopModalComponent', () => {
     [false, 'Stop Updating Projects', 'not in progress']
   ], (inProgress: boolean, buttonText: string, description: string) => {
     it(`displays a confirm-button when cancel is ${description}`, () => {
-      component.updateButtonText(inProgress);
+      component.stopRulesInProgress = inProgress;
       fixture.detectChanges();
       const button = fixture.nativeElement.querySelector('#confirm-button');
       expect(button).not.toBeNull();

@@ -29,7 +29,6 @@ export class ConfirmApplyStopModalComponent implements OnChanges {
 
   ngOnChanges() {
     this.updateProgress(this.applyRulesStatus);
-    this.updateButtonText(this.stopRulesInProgress);
   }
 
   public updateProgress(applyRulesStatus: ApplyRulesStatus): void {
@@ -46,11 +45,5 @@ export class ConfirmApplyStopModalComponent implements OnChanges {
     this.progressValue = percentageComplete;
     this.progressPrefixText = `${Math.floor(percentageComplete * 100)}% complete`;
     this.progressSuffixText = `${durCountdown} until finished`;
-  }
-
-  public updateButtonText(inProgress: boolean): void {
-    this.stopRulesButtonText = inProgress
-      ? 'Stopping Project Update...'
-      : 'Stop Updating Projects';
   }
 }

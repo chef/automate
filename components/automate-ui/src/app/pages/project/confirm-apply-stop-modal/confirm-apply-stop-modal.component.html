@@ -12,7 +12,7 @@
       <chef-button id="confirm-button" primary caution (click)="confirm.emit()"
         [disabled]="stopRulesInProgress">
         <chef-loading-spinner *ngIf="stopRulesInProgress"></chef-loading-spinner>
-        {{ stopRulesButtonText }}
+        {{ stopRulesInProgress ? 'Stopping Project Update...' : 'Stop Updating Projects' }}
       </chef-button>
       <chef-button id="cancel-button" tertiary (click)="cancel.emit()" [disabled]="stopRulesInProgress">
         Cancel
