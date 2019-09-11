@@ -98,7 +98,7 @@ func (a *Applications) GetServicesStats(
 
 func (a *Applications) GetDisconnectedServicesConfig(
 	ctx context.Context,
-	request *applications.GetDisconnectedServicesConfigReq) (*applications.PeriodicJobConfig, error) {
+	request *applications.GetDisconnectedServicesConfigReq) (*applications.PeriodicMandatoryJobConfig, error) {
 
 	log.WithFields(log.Fields{
 		"request": request.String(),
@@ -110,7 +110,7 @@ func (a *Applications) GetDisconnectedServicesConfig(
 
 func (a *Applications) UpdateDisconnectedServicesConfig(
 	ctx context.Context,
-	request *applications.PeriodicJobConfig) (*applications.UpdateDisconnectedServicesConfigRes, error) {
+	request *applications.PeriodicMandatoryJobConfig) (*applications.UpdateDisconnectedServicesConfigRes, error) {
 
 	log.WithFields(log.Fields{
 		"request": request.String(),

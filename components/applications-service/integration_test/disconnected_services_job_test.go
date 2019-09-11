@@ -36,28 +36,10 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 		assert.True(t, sched.Enabled)
 	})
 
-	t.Run("disable and enable disconnected_services job", func(t *testing.T) {
-		req := &applications.PeriodicJobConfig{Threshold: "5m", Running: false}
-		_, err := suite.ApplicationsServer.UpdateDisconnectedServicesConfig(ctx, req)
-		require.NoError(t, err)
-
-		conf, err := suite.ApplicationsServer.GetDisconnectedServicesConfig(ctx, &applications.GetDisconnectedServicesConfigReq{})
-		require.NoError(t, err)
-		assert.False(t, conf.Running)
-
-		req.Running = true
-		_, err = suite.ApplicationsServer.UpdateDisconnectedServicesConfig(ctx, req)
-		require.NoError(t, err)
-
-		conf, err = suite.ApplicationsServer.GetDisconnectedServicesConfig(ctx, &applications.GetDisconnectedServicesConfigReq{})
-		require.NoError(t, err)
-		assert.True(t, conf.Running)
-
-	})
 	t.Run("update disconnected_services job params", func(t *testing.T) {
 		defer suite.JobScheduler.ResetParams()
 
-		req := &applications.PeriodicJobConfig{Threshold: "23s", Running: true}
+		req := &applications.PeriodicMandatoryJobConfig{Threshold: "23s"}
 		_, err := suite.ApplicationsServer.UpdateDisconnectedServicesConfig(ctx, req)
 		require.NoError(t, err)
 
@@ -66,7 +48,7 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 		assert.Equal(t, "23s", conf.Threshold)
 
 		// Update the params again to ensure we didn't accidentally pass the test due to leftover state somewhere:
-		req = &applications.PeriodicJobConfig{Threshold: "42s", Running: true}
+		req = &applications.PeriodicMandatoryJobConfig{Threshold: "42s"}
 		_, err = suite.ApplicationsServer.UpdateDisconnectedServicesConfig(ctx, req)
 		require.NoError(t, err)
 
