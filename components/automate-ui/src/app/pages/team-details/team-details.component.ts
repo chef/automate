@@ -13,11 +13,7 @@ import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
 import { allUsers, userStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
-import {
-  iamMajorVersion,
-  iamMinorVersion,
-  atLeastV2p1
-} from 'app/entities/policies/policy.selectors';
+import { iamMajorVersion, atLeastV2p1 } from 'app/entities/policies/policy.selectors';
 import {
   v1TeamFromRoute,
   v2TeamFromRoute,
@@ -68,7 +64,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
   public team: Team;
   public isMajorV1 = true;
-  public isMinorV1 = false;
 
   public users: User[] = [];
   private isDestroyed = new Subject<boolean>();
@@ -122,12 +117,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         const [, fragment] = url.split('#');
         // goes to #users if (1) explicit #users, (2) no fragment, or (3) invalid fragment
         this.tabValue = (fragment === 'details') ? 'details' : 'users';
-      });
-
-    this.store.select(iamMinorVersion)
-      .pipe(takeUntil(this.isDestroyed))
-      .subscribe((minor) => {
-        this.isMinorV1 = minor === 'v1';
       });
 
     combineLatest([

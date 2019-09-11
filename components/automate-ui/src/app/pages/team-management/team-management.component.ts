@@ -7,11 +7,7 @@ import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { loading, EntityStatus } from 'app/entities/entities';
-import {
-  iamMajorVersion,
-  iamMinorVersion,
-  atLeastV2p1
-} from 'app/entities/policies/policy.selectors';
+import { iamMajorVersion, atLeastV2p1 } from 'app/entities/policies/policy.selectors';
 import {
   createError,
   createStatus,
@@ -43,7 +39,6 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   public conflictErrorEvent = new EventEmitter<boolean>();
   public projectsEnabled$: Observable<boolean>;
   public isMajorV1 = true;
-  public isMinorV1 = false;
   public dropdownProjects: Project[] = [];
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
@@ -94,12 +89,6 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.isDestroyed))
       .subscribe((majorVersion) => {
         this.isMajorV1 = majorVersion === 'v1';
-      });
-
-    this.store.select(iamMinorVersion)
-      .pipe(takeUntil(this.isDestroyed))
-      .subscribe((minorVersion) => {
-        this.isMinorV1 = minorVersion === 'v1';
       });
 
     this.store.select(assignableProjects)
