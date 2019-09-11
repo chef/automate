@@ -169,6 +169,10 @@ func (app *ApplicationsServer) GetServicesBySG(
 	if err != nil {
 		return new(applications.ServicesBySGRes), status.Error(codes.InvalidArgument, err.Error())
 	}
+	filters, err := stringutils.FormatFilters(request.GetFilter())
+	if err != nil {
+		return new(applications.ServicesBySGRes), status.Error(codes.InvalidArgument, err.Error())
+	}
 
 	// In the database we will never have ID="" and "" is our default value in our
 	// protobuf definition, so if the service group id is "" it means that the user
@@ -181,9 +185,6 @@ func (app *ApplicationsServer) GetServicesBySG(
 	var (
 		page, pageSize = params.GetPageParams(request.GetPagination())
 		sgStringID     = fmt.Sprint(request.GetServiceGroupId())
-		filters        = map[string][]string{
-			"service_group_id": {sgStringID},
-		}
 	)
 
 	// Get the HealthCounts for every single service that belongs to the provided service-group id
@@ -194,6 +195,8 @@ func (app *ApplicationsServer) GetServicesBySG(
 		log.WithError(err).Error("Error retrieving services health counts by service_group(s)")
 		return nil, status.Error(codes.Internal, err.Error())
 	}
+	// Adds the service group ID to the filters
+	filters["service_group_id"] = []string{sgStringID}
 
 	// Adds the health filter if any was specified and converts the string to be uppercases
 	if len(request.GetHealth()) != 0 {

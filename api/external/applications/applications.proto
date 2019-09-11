@@ -155,6 +155,7 @@ message ServicesBySGReq {
   common.query.Pagination pagination = 2;
   common.query.Sorting sorting = 3;
   string health = 4;
+  repeated string filter = 5;
 }
 
 message ServicesBySGRes {
