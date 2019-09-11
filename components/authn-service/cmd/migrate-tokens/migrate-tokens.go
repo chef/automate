@@ -111,7 +111,7 @@ func writeTokensToClients(tokens []*token) int {
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("x-data-collector-token", *authToken)
 
-		_, err = client.Do(req)
+		_, err = client.Do(req) // nolint:bodyclose
 		if err != nil {
 			fmt.Printf("\tFAILED to write token %s, error: %v\n", t.Description, err)
 		} else {
