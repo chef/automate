@@ -21,10 +21,14 @@ hab_curl() {
 
 # Note: the inspec tests assert that a viewer or operator user is able
 # to retrieve the license status -- so we just add one.
+# Thes inspec tests also test some applications APIs that require the backend
+# for the feature to be enabled
 do_deploy() {
     do_deploy_default
     log_info "applying dev license"
     chef-automate license apply "$A2_LICENSE"
+
+    chef-automate applications enable
 }
 
 do_test_deploy() {
