@@ -199,7 +199,6 @@ func (r *Runner) Run() error {
 					skip, msg, err := diagnostic.Skip(r.tstContext)
 					if err != nil {
 						r.reporter.ReportVerifySkipErrored(diagnostic.Name, fmt.Sprintf("%+v", err))
-						failed = true
 						errs = append(errs, err)
 						continue
 					}
@@ -229,7 +228,6 @@ func (r *Runner) Run() error {
 				skip, msg, err := diagnostic.Skip(r.tstContext)
 				if err != nil {
 					r.reporter.ReportCleanupSkipErrored(diagnostic.Name, fmt.Sprintf("%+v", err))
-					failed = true
 					errs = append(errs, err)
 					continue
 				}

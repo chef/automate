@@ -23,7 +23,7 @@ type Diagnostic struct {
 	Verify   func(VerificationTestContext)
 	Cleanup  func(TestContext) error
 	// Skip allows skipping diagnostics based on some condition
-	Skip     func(TestContext) (bool, string, error)
+	Skip func(TestContext) (bool, string, error)
 }
 
 // MatchesFilters determines if a set of TagFilters matches the diagnostic

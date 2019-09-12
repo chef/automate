@@ -113,7 +113,6 @@ func TestRunnerSkippedAtRuntimeBecauseCheckFailed(t *testing.T) {
 	assert.False(t, cleanupCalled)
 }
 
-
 func TestRunnerAllStepsSkippable(t *testing.T) {
 	r := runner.New(
 		runner.WithDiagnostics(
