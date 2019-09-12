@@ -5010,12 +5010,55 @@ func TestListProjects(t *testing.T) {
 			expectedProjects := []*storage.Project{&p1, &p2, &p3}
 			assert.ElementsMatch(t, expectedProjects, ps)
 		}},
-		{"returns rule status of staged for project with both staged and applied rules", func(t *testing.T) {
+		{"returns rule status of 'edits-pending' for project with both staged and applied rules", func(t *testing.T) {
 			ctx := context.Background()
 			p1 := insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
 			insertStagedRuleWithMultipleConditions(t, db, "staged-rule-1", p1.ID, storage.Node, false)
-			insertAppliedRuleWithMultipleConditions(t, db, "staged-rule-2", p1.ID, storage.Node)
-			insertAppliedRuleWithMultipleConditions(t, db, "staged-rule-3", p1.ID, storage.Node)
+			insertAppliedRuleWithMultipleConditions(t, db, "applied-rule-1", p1.ID, storage.Node)
+			insertAppliedRuleWithMultipleConditions(t, db, "applied-rule-2", p1.ID, storage.Node)
+
+			ps, err := store.ListProjects(ctx)
+			require.NoError(t, err)
+
+			p1.Status = storage.EditsPending.String()
+			expectedProjects := []*storage.Project{&p1}
+			assert.ElementsMatch(t, expectedProjects, ps)
+		}},
+		{"returns rule status of 'edits-pending' for project with staged new rules, staged deletes, and applied rules", func(t *testing.T) {
+			ctx := context.Background()
+			p1 := insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
+			insertStagedRuleWithMultipleConditions(t, db, "staged-rule-1", p1.ID, storage.Node, false)
+			insertStagedRuleWithMultipleConditions(t, db, "rule-1", p1.ID, storage.Node, true)
+			insertAppliedRuleWithMultipleConditions(t, db, "rule-1", p1.ID, storage.Node)
+			insertAppliedRuleWithMultipleConditions(t, db, "applied-rule-2", p1.ID, storage.Node)
+
+			ps, err := store.ListProjects(ctx)
+			require.NoError(t, err)
+
+			p1.Status = storage.EditsPending.String()
+			expectedProjects := []*storage.Project{&p1}
+			assert.ElementsMatch(t, expectedProjects, ps)
+		}},
+		{"returns rule status of 'edits-pending' for project with both staged deletes applied rules", func(t *testing.T) {
+			ctx := context.Background()
+			p1 := insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
+			insertStagedRuleWithMultipleConditions(t, db, "rule-1", p1.ID, storage.Node, true)
+			insertStagedRuleWithMultipleConditions(t, db, "rule-2", p1.ID, storage.Node, true)
+			insertAppliedRuleWithMultipleConditions(t, db, "rule-1", p1.ID, storage.Node)
+			insertAppliedRuleWithMultipleConditions(t, db, "rule-2", p1.ID, storage.Node)
+
+			ps, err := store.ListProjects(ctx)
+			require.NoError(t, err)
+
+			p1.Status = storage.EditsPending.String()
+			expectedProjects := []*storage.Project{&p1}
+			assert.ElementsMatch(t, expectedProjects, ps)
+		}},
+		{"returns rule status of 'edits-pending' for project with staged deletes", func(t *testing.T) {
+			ctx := context.Background()
+			p1 := insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
+			insertStagedRuleWithMultipleConditions(t, db, "rule-1", p1.ID, storage.Node, true)
+			insertStagedRuleWithMultipleConditions(t, db, "rule-2", p1.ID, storage.Node, true)
 
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
