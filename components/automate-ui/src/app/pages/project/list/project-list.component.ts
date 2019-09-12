@@ -112,7 +112,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed)
     ).subscribe((projectList: Project[]) => {
       this.projectsHaveStagedChanges =
-        projectList.filter(p => p.status === 'EDITS_PENDING').length > 0;
+        projectList.some(p => p.status === 'EDITS_PENDING');
     });
 
     this.createProjectForm = fb.group({
