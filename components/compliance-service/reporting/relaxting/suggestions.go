@@ -625,14 +625,12 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 		}
 	}
 
-	suggs := make([]*reportingapi.Suggestion, len(scoredTagSuggs))
-	i := 0
+	suggs := make([]*reportingapi.Suggestion, 0, len(scoredTagSuggs))
 	for mSugg, mScore := range scoredTagSuggs {
-		suggs[i] = &reportingapi.Suggestion{
+		suggs = append(suggs, &reportingapi.Suggestion{
 			Text:  mSugg,
 			Score: *mScore,
-		}
-		i++
+		})
 	}
 
 	return suggs, nil
