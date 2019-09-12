@@ -46,7 +46,7 @@ func (s *server) UpgradeStatus(ctx context.Context, _ *api.UpgradeStatusRequest)
 	response.LatestAvailableVersion = latestManifest.Version()
 	response.DesiredVersion = desiredManifest.Version()
 	response.IsAirgapped = airgap.AirgapInUse()
-	response.IsConvergeDisable = s.convergeDisabled()
+	response.IsConvergeDisable = (s.convergeLoop != nil && !s.convergeLoop.IsRunning()) || s.convergeDisabled()
 
 	if s.deployment.CurrentReleaseManifest == nil {
 		response.CurrentVersion = ""
