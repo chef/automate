@@ -2,14 +2,8 @@
 
 .sidebar-no-shade {
   display: block;
-  position: fixed;
-  top: $sidebar-top;
-  bottom: 0;
-  left: 0;
-  z-index: 101;
-  overflow-x: hidden;
-  overflow-y: auto;
   width: $sidebar-width;
+  height: 100vh;
   background-color: #FFF;
   border-right: 1px solid #DFE3E5;
 

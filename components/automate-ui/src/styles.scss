@@ -5,13 +5,38 @@
 @import "styles/chef-theme";
 
 .container {
-  margin-left: $sidebar-width;
-  position: relative;
+  // position: relative;
+  width: 100%;
+  // height: 100vh;
 
   main {
     padding-left: 0;
     padding-right: 0;
   }
+}
+app-event-feed,
+app-notifications,
+app-client-runs,
+app-integrations,
+app-integrations-detail,
+.applications-container,
+app-credentials-list-screen,
+app-compliance-landing,
+app-profiles-overview,
+app-profile-details,
+app-roles-list,
+app-role-details,
+app-policy-list,
+app-policy-details,
+app-team-list,
+app-team-details,
+app-team-management,
+app-user-details,
+app-user-management,
+app-api-tokens,
+app-api-token-details {
+  display: flex;
+  height: 100vh;
 }
 
 @media screen and (max-width: 769px) {
@@ -53,7 +78,6 @@ button.create {
   height: 33px;
   width: 171px;
 }
-
 
 // a11y helpers
 .visually-hidden { /* https://snook.ca/archives/html_and_css/hiding-content-for-accessibility */

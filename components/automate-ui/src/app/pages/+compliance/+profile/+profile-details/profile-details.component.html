@@ -31,7 +31,7 @@
       Failed to install profile. Please try again later.
     </chef-notification>
 
-    <ng-container *ngIf="!showLoadingIcon">
+    <ng-container class="applications-container" *ngIf="!showLoadingIcon">
       <chef-page-header>
         <chef-heading>{{ profile.title }}</chef-heading>
         <chef-subheading>{{ profile.summary }}</chef-subheading>
