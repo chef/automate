@@ -593,7 +593,6 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 		return foundControlTags[i].Score > foundControlTags[j].Score
 	})
 
-	// Map the found tag suggestions to remove duplications
 	scoredTagSuggs := make(map[string]float32)
 	for _, item := range foundControlTags {
 		matches := make([]string, 0)
@@ -615,12 +614,17 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 			}
 		}
 
-		// Find the best engram match from the array of matches
-		bestMatch := findBestArrayMatch(text, matches)
-		for _, match := range bestMatch {
-			bestMatchScore := item.Score
-			if scoredTagSuggs[match] < item.Score {
-				scoredTagSuggs[match] = bestMatchScore
+		// scoredTagSuggs maps the found tag suggestions to remove duplicates
+		// We don't offer suggestions for less than two characters
+		if len(text) < 2 {
+			for _, match := range matches {
+				scoredTagSuggs[match] = item.Score
+			}
+		} else {
+			// Find the best engram match from the array of matches
+			bestMatch := findBestArrayMatch(text, matches)
+			if bestMatch != "" {
+				scoredTagSuggs[bestMatch] = item.Score
 			}
 		}
 	}
@@ -636,13 +640,10 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 	return suggs, nil
 }
 
-func findBestArrayMatch(text string, arr []string) []string {
-	if len(text) < 2 {
-		return arr
-	}
-	matchArr := make([]string, 0)
+// Finds the closest engram match for `text` in `arr`
+func findBestArrayMatch(text string, arr []string) string {
 	if len(arr) == 0 {
-		return matchArr
+		return ""
 	} else if len(arr) > 1 {
 		// Choose a set of bag sizes, more is more accurate but slower
 		bagSizes := []int{2, 3}
@@ -650,11 +651,10 @@ func findBestArrayMatch(text string, arr []string) []string {
 		cm := closestmatch.New(arr, bagSizes)
 		arr = cm.ClosestN(text, 1)
 		if len(arr) == 0 {
-			return matchArr
+			return ""
 		}
 	}
-	matchArr = append(matchArr, arr[0])
-	return matchArr
+	return arr[0]
 }
 
 // For the string "Apache Linux" ".*apache.*|.*linux.*" will be returned.
