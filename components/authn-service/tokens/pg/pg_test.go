@@ -483,9 +483,9 @@ func TestCreateToken(t *testing.T) {
 			assert.WithinDuration(time.Now(), tok.Updated, time.Second)
 			assert.Equal(project_ids, tok.Projects)
 		},
-		"when one not-found project passed": func(t *testing.T) {
+		"when passed valid project": func(t *testing.T) {
 		},
-		"when user is not-permitted to assign one project passed": func(t *testing.T) {
+		"when passed invalid project": func(t *testing.T) {
 		},
 	}
 

@@ -10,7 +10,7 @@ func EnsureProjectAssignmentAuthorized(ctx context.Context, authorizer engine.V2
 	engineResp, err := authorizer.V2ProjectsAuthorized(ctx,
 		engine.Subjects(subjects),
 		engine.Action("iam:projects:assign"),
-		engine.Resource("*"), // TODO (tc): Should this be iam:projects or something?
+		engine.Resource("*"),
 		engine.ProjectList(projectIDs...))
 	if err != nil {
 		return err
