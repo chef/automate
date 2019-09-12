@@ -229,9 +229,12 @@ func CreateCfgmgmtCCRDiagnostic() diagnostics.Diagnostic {
 						NodeID: entity.EntityUUID,
 					}),
 				)
-
 				if err != nil {
-					errs = append(errs, errors.Wrapf(err, "Failed to delete %s", err))
+					errs = append(errs, errors.Wrapf(err, "delete node %s", entity.EntityUUID))
+					continue
+				}
+				if err := resp.Body.Close(); err != nil {
+					errs = append(errs, errors.Wrapf(err, "close body of node delete request for  %s", entity.EntityUUID))
 					continue
 				}
 

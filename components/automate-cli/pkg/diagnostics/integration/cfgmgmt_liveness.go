@@ -168,14 +168,17 @@ func CreateCfgmgmtLivenessDiagnostic() diagnostics.Diagnostic {
 						NodeID: entity.EntityUUID,
 					}),
 				)
-
 				if err != nil {
-					errs = append(errs, errors.Wrapf(err, "Failed to delete %s", err))
+					errs = append(errs, errors.Wrapf(err, "delete node %s", entity.EntityUUID))
+					continue
+				}
+				if err := resp.Body.Close(); err != nil {
+					errs = append(errs, errors.Wrapf(err, "close body of node delete request for  %s", entity.EntityUUID))
 					continue
 				}
 
 				if resp.StatusCode != 200 {
-					errs = append(errs, errors.Errorf("Failed to delete %s. Got status code %d", reqPath, resp.StatusCode))
+					errs = append(errs, errors.Errorf("Failed to delete %s: status code %d (not 200)", reqPath, resp.StatusCode))
 					fmt.Printf("%+v\n", errs)
 				}
 			}

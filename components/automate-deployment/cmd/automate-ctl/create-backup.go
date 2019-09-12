@@ -56,7 +56,7 @@ func automateCtlCreateBackup(cmd *cobra.Command, args []string) {
 	tlsConfig := &tls.Config{InsecureSkipVerify: true}
 	tr := &http.Transport{TLSClientConfig: tlsConfig}
 	client := &http.Client{Transport: tr}
-	_, err := client.Get("https://localhost/th-createbackup")
+	_, err := client.Get("https://localhost/th-createbackup") // nolint: bodyclose
 	if err != nil {
 		fmt.Printf("automate-ctl create-backup TEST HARNESS ERROR %s\n", err.Error())
 		os.Exit(10)

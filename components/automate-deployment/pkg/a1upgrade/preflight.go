@@ -295,6 +295,7 @@ support@chef.io for assistance.
 		p.addFailure("existing install reports unhealthy status", details, errPreflightCheckFailed)
 		return
 	}
+	defer resp.Body.Close() // nolint: errcheck
 
 	p.printOk("existing install is healthy")
 }
