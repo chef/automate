@@ -51,7 +51,7 @@ func (r *defaultReporter) ReportGenerateSkip(componentName string, msg string) {
 }
 func (r *defaultReporter) ReportGenerateSkipErrored(componentName string, msg string) {
 	r.s.Stop()
-	fmt.Printf("[✗] Failed skipping for %s\n", componentName)
+	fmt.Printf("[✗] Failed skipping generate for %s\n", componentName)
 	fmt.Printf("%s\n", formatMessage(msg))
 }
 func (r *defaultReporter) ReportGenerateStart(componentName string) {
@@ -76,7 +76,7 @@ func (r *defaultReporter) ReportVerifySkip(componentName string, msg string) {
 }
 func (r *defaultReporter) ReportVerifySkipErrored(componentName string, msg string) {
 	r.s.Stop()
-	fmt.Printf("[✗] Failed skipping for %s\n", componentName)
+	fmt.Printf("[✗] Failed skipping verify for %s\n", componentName)
 	fmt.Printf("%s\n", formatMessage(msg))
 }
 func (r *defaultReporter) ReportVerifyStart(componentName string) {
@@ -107,7 +107,7 @@ func (r *defaultReporter) ReportCleanupSkip(componentName string, msg string) {
 }
 func (r *defaultReporter) ReportCleanupSkipErrored(componentName string, msg string) {
 	r.s.Stop()
-	fmt.Printf("[✗] Failed skipping for %s\n", componentName)
+	fmt.Printf("[✗] Failed skipping cleanup for %s\n", componentName)
 	fmt.Printf("%s\n", formatMessage(msg))
 }
 func (r *defaultReporter) ReportCleanupStart(componentName string) {
