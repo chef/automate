@@ -15,11 +15,11 @@ import (
 
 	v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/prng"
-	"github.com/chef/automate/lib/projectassignment"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/testhelpers"
 	"github.com/chef/automate/lib/grpc/auth_context"
+	"github.com/chef/automate/lib/projectassignment"
 )
 
 const (
@@ -4341,9 +4341,10 @@ func TestCreateProject(t *testing.T) {
 	cases := map[string]func(*testing.T){
 		"successfully creates custom project": func(t *testing.T) {
 			project := storage.Project{
-				ID:   "my-id-1",
-				Name: "name1",
-				Type: storage.Custom,
+				ID:     "my-id-1",
+				Name:   "name1",
+				Type:   storage.Custom,
+				Status: storage.NoRules.String(),
 			}
 			resp, err := store.CreateProject(ctx, &project)
 			require.NoError(t, err)
@@ -4353,9 +4354,10 @@ func TestCreateProject(t *testing.T) {
 		},
 		"successfully creates chef-managed project": func(t *testing.T) {
 			project := storage.Project{
-				ID:   "my-id-1",
-				Name: "name1",
-				Type: storage.ChefManaged,
+				ID:     "my-id-1",
+				Name:   "name1",
+				Type:   storage.ChefManaged,
+				Status: storage.NoRules.String(),
 			}
 			resp, err := store.CreateProject(ctx, &project)
 			require.NoError(t, err)
@@ -4366,9 +4368,10 @@ func TestCreateProject(t *testing.T) {
 		"does not create project with duplicate ID": func(t *testing.T) {
 			projectID := "my-id-1"
 			projectOriginal := storage.Project{
-				ID:   projectID,
-				Name: "name1",
-				Type: storage.Custom,
+				ID:     projectID,
+				Name:   "name1",
+				Type:   storage.Custom,
+				Status: storage.NoRules.String(),
 			}
 			resp, err := store.CreateProject(ctx, &projectOriginal)
 			require.NoError(t, err)
@@ -4388,9 +4391,10 @@ func TestCreateProject(t *testing.T) {
 			for i := 1; i <= v2.MaxProjects; i++ {
 				projectID := "my-id-" + strconv.Itoa(i)
 				project := storage.Project{
-					ID:   projectID,
-					Name: "name-" + strconv.Itoa(i),
-					Type: storage.Custom,
+					ID:     projectID,
+					Name:   "name-" + strconv.Itoa(i),
+					Type:   storage.Custom,
+					Status: storage.NoRules.String(),
 				}
 				resp, err := store.CreateProject(ctx, &project)
 				require.NoError(t, err)
@@ -4399,9 +4403,10 @@ func TestCreateProject(t *testing.T) {
 
 			oneProjectTooManyID := "my-id-" + strconv.Itoa(v2.MaxProjects+1)
 			oneProjectTooMany := storage.Project{
-				ID:   oneProjectTooManyID,
-				Name: "Something Else",
-				Type: storage.Custom,
+				ID:     oneProjectTooManyID,
+				Name:   "Something Else",
+				Type:   storage.Custom,
+				Status: storage.NoRules.String(),
 			}
 			resp, err := store.CreateProject(ctx, &oneProjectTooMany)
 			assert.Nil(t, resp)
@@ -4411,9 +4416,10 @@ func TestCreateProject(t *testing.T) {
 			for i := 1; i <= v2.MaxProjects; i++ {
 				projectID := "my-id-" + strconv.Itoa(i)
 				project := storage.Project{
-					ID:   projectID,
-					Name: "name-" + strconv.Itoa(i),
-					Type: storage.Custom,
+					ID:     projectID,
+					Name:   "name-" + strconv.Itoa(i),
+					Type:   storage.Custom,
+					Status: storage.NoRules.String(),
 				}
 				resp, err := store.CreateProject(ctx, &project)
 				require.NoError(t, err)
@@ -4422,9 +4428,10 @@ func TestCreateProject(t *testing.T) {
 
 			chefManagedProjectID := "my-id-" + strconv.Itoa(v2.MaxProjects+1)
 			chefManagedProject := storage.Project{
-				ID:   chefManagedProjectID,
-				Name: "Something Else",
-				Type: storage.ChefManaged,
+				ID:     chefManagedProjectID,
+				Name:   "Something Else",
+				Type:   storage.ChefManaged,
+				Status: storage.NoRules.String(),
 			}
 			resp, err := store.CreateProject(ctx, &chefManagedProject)
 			require.NoError(t, err)
@@ -4449,9 +4456,10 @@ func TestUpdateProject(t *testing.T) {
 			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
 
 			project := storage.Project{
-				ID:   "foo",
-				Name: "updated-name",
-				Type: storage.Custom,
+				ID:     "foo",
+				Name:   "updated-name",
+				Type:   storage.Custom,
+				Status: storage.NoRules.String(),
 			}
 			resp, err := store.UpdateProject(ctx, &project)
 			require.NoError(t, err)
@@ -4464,9 +4472,10 @@ func TestUpdateProject(t *testing.T) {
 			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
 
 			project := storage.Project{
-				ID:   "foo",
-				Name: "updated-name",
-				Type: storage.Custom,
+				ID:     "foo",
+				Name:   "updated-name",
+				Type:   storage.Custom,
+				Status: storage.NoRules.String(),
 			}
 			ctx = insertProjectsIntoContext(ctx, []string{"foo", "bar"})
 			resp, err := store.UpdateProject(ctx, &project)
@@ -4480,9 +4489,10 @@ func TestUpdateProject(t *testing.T) {
 			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
 
 			project := storage.Project{
-				ID:   "foo",
-				Name: "updated-name",
-				Type: storage.Custom,
+				ID:     "foo",
+				Name:   "updated-name",
+				Type:   storage.Custom,
+				Status: storage.NoRules.String(),
 			}
 			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 
@@ -4495,9 +4505,10 @@ func TestUpdateProject(t *testing.T) {
 		"returns ErrNotFound if it doesn't exist": func(t *testing.T) {
 			ctx := context.Background()
 			project := storage.Project{
-				ID:   "not-found",
-				Name: "name1",
-				Type: storage.Custom,
+				ID:     "not-found",
+				Name:   "name1",
+				Type:   storage.Custom,
+				Status: storage.NoRules.String(),
 			}
 			resp, err := store.UpdateProject(ctx, &project)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
@@ -4508,9 +4519,10 @@ func TestUpdateProject(t *testing.T) {
 			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
 
 			project := storage.Project{
-				ID:   "foo",
-				Name: "updated-name",
-				Type: storage.Custom,
+				ID:     "foo",
+				Name:   "updated-name",
+				Type:   storage.Custom,
+				Status: storage.NoRules.String(),
 			}
 			ctx = insertProjectsIntoContext(ctx, []string{"wrong", "projects"})
 
@@ -4548,13 +4560,14 @@ func TestGetProject(t *testing.T) {
 			p, err := store.GetProject(ctx, "foo")
 			require.NoError(t, err)
 			expectedProject := storage.Project{
-				ID:   "foo",
-				Name: "my foo project",
-				Type: storage.ChefManaged,
+				ID:     "foo",
+				Name:   "my foo project",
+				Type:   storage.ChefManaged,
+				Status: storage.NoRules.String(),
 			}
 			assert.Equal(t, &expectedProject, p)
 		}},
-		{"when a custom project exists, returns that project", func(t *testing.T) {
+		{"when a custom project exists with no rules, returns that project", func(t *testing.T) {
 			ctx := context.Background()
 			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
 
@@ -4563,11 +4576,76 @@ func TestGetProject(t *testing.T) {
 			p, err := store.GetProject(ctx, "foo")
 			require.NoError(t, err)
 			expectedProject := storage.Project{
-				ID:   "foo",
-				Name: "my foo project",
-				Type: storage.Custom,
+				ID:     "foo",
+				Name:   "my foo project",
+				Type:   storage.Custom,
+				Status: storage.NoRules.String(),
 			}
 			assert.Equal(t, &expectedProject, p)
+		}},
+		{"when a custom project exists with only staged rules, status is edits-pending", func(t *testing.T) {
+			ctx := context.Background()
+			p := insertTestProject(t, db, "foo", "my foo project", storage.Custom)
+			insertStagedRuleWithMultipleConditions(t, db, "staged-rule-1", p.ID, storage.Node, false)
+			insertStagedRuleWithMultipleConditions(t, db, "staged-rule-2", p.ID, storage.Node, false)
+
+			resp, err := store.GetProject(ctx, p.ID)
+			require.NoError(t, err)
+
+			p.Status = storage.EditsPending.String()
+			assert.Equal(t, &p, resp)
+		}},
+		{"when a custom project exists with only applied rules, status is applied", func(t *testing.T) {
+			ctx := context.Background()
+			p := insertTestProject(t, db, "foo", "my foo project", storage.Custom)
+			insertAppliedRuleWithMultipleConditions(t, db, "applied-rule-1", p.ID, storage.Node)
+			insertAppliedRuleWithMultipleConditions(t, db, "applied-rule-2", p.ID, storage.Node)
+
+			resp, err := store.GetProject(ctx, p.ID)
+			require.NoError(t, err)
+
+			p.Status = storage.Applied.String()
+			assert.Equal(t, &p, resp)
+		}},
+		{"when a custom project exists with staged and applied rules (including some deleted rules), status is edits-pending", func(t *testing.T) {
+			ctx := context.Background()
+			p := insertTestProject(t, db, "foo", "my foo project", storage.Custom)
+			insertStagedRuleWithMultipleConditions(t, db, "staged-rule-1", p.ID, storage.Node, false)
+			insertStagedRuleWithMultipleConditions(t, db, "staged-rule-2", p.ID, storage.Node, true)
+			insertAppliedRuleWithMultipleConditions(t, db, "applied-rule-1", p.ID, storage.Node)
+			insertAppliedRuleWithMultipleConditions(t, db, "applied-rule-2", p.ID, storage.Node)
+
+			resp, err := store.GetProject(ctx, p.ID)
+			require.NoError(t, err)
+
+			p.Status = storage.EditsPending.String()
+			assert.Equal(t, &p, resp)
+		}},
+		{"when a custom project exists with deleted rules and applied rules, status is edits-pending", func(t *testing.T) {
+			ctx := context.Background()
+			p := insertTestProject(t, db, "foo", "my foo project", storage.Custom)
+			insertStagedRuleWithMultipleConditions(t, db, "staged-rule-1", p.ID, storage.Node, true)
+			insertStagedRuleWithMultipleConditions(t, db, "staged-rule-2", p.ID, storage.Node, true)
+			insertAppliedRuleWithMultipleConditions(t, db, "applied-rule-1", p.ID, storage.Node)
+			insertAppliedRuleWithMultipleConditions(t, db, "applied-rule-2", p.ID, storage.Node)
+
+			resp, err := store.GetProject(ctx, p.ID)
+			require.NoError(t, err)
+
+			p.Status = storage.EditsPending.String()
+			assert.Equal(t, &p, resp)
+		}},
+		{"when a custom project exists with only deleted rules, status is edits-pending", func(t *testing.T) {
+			ctx := context.Background()
+			p := insertTestProject(t, db, "foo", "my foo project", storage.Custom)
+			insertStagedRuleWithMultipleConditions(t, db, "staged-rule-1", p.ID, storage.Node, true)
+			insertStagedRuleWithMultipleConditions(t, db, "staged-rule-2", p.ID, storage.Node, true)
+
+			resp, err := store.GetProject(ctx, p.ID)
+			require.NoError(t, err)
+
+			p.Status = storage.EditsPending.String()
+			assert.Equal(t, &p, resp)
 		}},
 		{"when a custom project exists with a project filter of *, returns that project", func(t *testing.T) {
 			ctx := context.Background()
@@ -4578,9 +4656,10 @@ func TestGetProject(t *testing.T) {
 			p, err := store.GetProject(ctx, "foo")
 			require.NoError(t, err)
 			expectedProject := storage.Project{
-				ID:   "foo",
-				Name: "my foo project",
-				Type: storage.Custom,
+				ID:     "foo",
+				Name:   "my foo project",
+				Type:   storage.Custom,
+				Status: storage.NoRules.String(),
 			}
 			assert.Equal(t, &expectedProject, p)
 		}},
@@ -4916,29 +4995,33 @@ func TestListProjects(t *testing.T) {
 		}},
 		{"returns rule status for projects for none, staged, and applied individually", func(t *testing.T) {
 			ctx := context.Background()
-			p1 := insertTestProjectWithRules(t, db, "foo", "my foo project", storage.ChefManaged, storage.EditsPending)
+			p1 := insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
 			insertStagedRuleWithMultipleConditions(t, db, "staged-rule-1", p1.ID, storage.Node, false)
-			p2 := insertTestProjectWithRules(t, db, "bar", "my bar project", storage.Custom, storage.Applied)
+			p2 := insertTestProject(t, db, "bar", "my bar project", storage.Custom)
 			insertAppliedRuleWithMultipleConditions(t, db, "staged-rule-2", p2.ID, storage.Node)
-			p3 := insertTestProjectWithRules(t, db, "baz", "my baz project", storage.Custom, storage.NoRules)
+			p3 := insertTestProject(t, db, "baz", "my baz project", storage.Custom)
 
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
-			expectedProjects := []*storage.Project{&p1, &p2, &p3}
 
+			p1.Status = storage.EditsPending.String()
+			p2.Status = storage.Applied.String()
+			p3.Status = storage.NoRules.String()
+			expectedProjects := []*storage.Project{&p1, &p2, &p3}
 			assert.ElementsMatch(t, expectedProjects, ps)
 		}},
 		{"returns rule status of staged for project with both staged and applied rules", func(t *testing.T) {
 			ctx := context.Background()
-			p1 := insertTestProjectWithRules(t, db, "foo", "my foo project", storage.ChefManaged, storage.EditsPending)
+			p1 := insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
 			insertStagedRuleWithMultipleConditions(t, db, "staged-rule-1", p1.ID, storage.Node, false)
 			insertAppliedRuleWithMultipleConditions(t, db, "staged-rule-2", p1.ID, storage.Node)
 			insertAppliedRuleWithMultipleConditions(t, db, "staged-rule-3", p1.ID, storage.Node)
 
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
-			expectedProjects := []*storage.Project{&p1}
 
+			p1.Status = storage.EditsPending.String()
+			expectedProjects := []*storage.Project{&p1}
 			assert.ElementsMatch(t, expectedProjects, ps)
 		}},
 	}
@@ -6542,7 +6625,7 @@ func TestEnsureNoProjectsMissing(t *testing.T) {
 			_, correctError := err.(*projectassignment.ProjectsMissingError)
 			assert.True(t, correctError)
 		}},
-		{"when all projects exist, return snil", func(t *testing.T) {
+		{"when all projects exist, return nil", func(t *testing.T) {
 			insertTestProject(t, db, "proj0", "test project 0", storage.Custom)
 			insertTestProject(t, db, "proj1", "test project 1", storage.Custom)
 			err := store.EnsureNoProjectsMissing(ctx, []string{"proj0", "proj1"})
@@ -6820,24 +6903,14 @@ func insertTestProject(
 	id string,
 	name string,
 	projType storage.Type) storage.Project {
-	return insertTestProjectWithRules(t, db, id, name, projType, storage.NoRules)
-}
-
-func insertTestProjectWithRules(
-	t *testing.T,
-	db *testhelpers.TestDB,
-	id string,
-	name string,
-	projType storage.Type,
-	status storage.ProjectRulesStatus) storage.Project {
 	t.Helper()
-	proj, err := storage.NewProject(id, name, projType, status)
+	// the status is not actually used. we are only using NewProject for the id
+	// and name validation and to have a storage.Project object to return.
+	proj, err := storage.NewProject(id, name, projType, storage.NoRules)
 	require.NoError(t, err)
 
-	_, err = db.Exec(`INSERT INTO iam_projects (id, name, type) values ($1, $2, $3)`,
-		proj.ID, proj.Name, projType.String())
+	_, err = db.Exec(`INSERT INTO iam_projects (id, name, type) values ($1, $2, $3)`, id, name, projType.String())
 	require.NoError(t, err)
-
 	return proj
 }
 
