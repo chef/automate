@@ -12,8 +12,10 @@ var cfgFile string
 
 // RootCmd is the command runner.
 var RootCmd = &cobra.Command{
-	Use:   "event-feed-service",
-	Short: "Chef Automate Event Feed Service",
+	Use:           "event-feed-service",
+	Short:         "Chef Automate Event Feed Service",
+	SilenceUsage:  true,
+	SilenceErrors: true,
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.
