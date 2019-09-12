@@ -3,7 +3,6 @@
 #shellcheck disable=SC2034
 test_name="ha_data_services"
 test_external_services=(ha_backend)
-test_diagnostics_filters="~purge" # remove purge until 1219 is in current
 test_backup_restore=true
 
 do_deploy() {

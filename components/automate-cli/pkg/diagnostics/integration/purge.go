@@ -19,7 +19,7 @@ import (
 func EventFeedPurgeDiagnostic() diagnostics.Diagnostic {
 	return diagnostics.Diagnostic{
 		Name: "event-feed-purge",
-		Tags: diagnostics.Tags{"event-feed", "purge", "grpc"},
+		Tags: diagnostics.Tags{"event-feed", "purge", "grpc", "skip-for-deep-upgrade"},
 		Generate: func(t diagnostics.TestContext) error {
 			client, cleanup, err := newPurgeClientFor("event-feed-service")
 			if err != nil {
@@ -108,7 +108,7 @@ func EventFeedPurgeDiagnostic() diagnostics.Diagnostic {
 func CompliancePurgeDiagnostic() diagnostics.Diagnostic {
 	return diagnostics.Diagnostic{
 		Name: "compliance-purge",
-		Tags: diagnostics.Tags{"compliance", "purge"},
+		Tags: diagnostics.Tags{"compliance", "purge", "skip-for-deep-upgrade"},
 		Generate: func(t diagnostics.TestContext) error {
 			client, cleanup, err := newPurgeClientFor("compliance-service")
 			if err != nil {
@@ -202,7 +202,7 @@ func CompliancePurgeDiagnostic() diagnostics.Diagnostic {
 func IngestPurgeDiagnostic() diagnostics.Diagnostic {
 	return diagnostics.Diagnostic{
 		Name: "ingest-purge",
-		Tags: diagnostics.Tags{"ingest", "purge"},
+		Tags: diagnostics.Tags{"ingest", "purge", "skip-for-deep-upgrade"},
 		Generate: func(t diagnostics.TestContext) error {
 			client, cleanup, err := newPurgeClientFor("ingest-service")
 			if err != nil {
