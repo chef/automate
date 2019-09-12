@@ -25,7 +25,7 @@ import (
 	"time"
 )
 
-func TestNodeExportMissingTags(t *testing.T) {
+func TestNodeExportIncludesChefTags(t *testing.T) {
 	esClient := elastic.New(elasticsearchUrl)
 	c := config.New(esClient)
 	server := grpcserver.NewCfgMgmtServer(c)
@@ -96,7 +96,7 @@ func TestNodeExportMissingTags(t *testing.T) {
 		nodeData = append(nodeData, tags)
 	})
 
-	assert.Equal(t, 1, len(nodeData))
+	require.Equal(t, 1, len(nodeData))
 	assert.ElementsMatch(t, []string{"a", "b", "c"}, nodeData[0])
 }
 
