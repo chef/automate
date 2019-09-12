@@ -263,6 +263,9 @@ EOF
 [license_control.v1.sys.telemetry]
   url = "https://telemetry-acceptance.chef.io"
 
+[postgresql.v1.sys.pg]
+  max_connections = 128
+
 ${var.saml == "true" ? local.saml_config : ""}
 
 [elasticsearch.v1.sys.runtime]
