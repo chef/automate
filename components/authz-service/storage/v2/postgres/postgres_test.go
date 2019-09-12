@@ -4567,7 +4567,7 @@ func TestGetProject(t *testing.T) {
 			}
 			assert.Equal(t, &expectedProject, p)
 		}},
-		{"when a custom project exists, returns that project", func(t *testing.T) {
+		{"when a custom project exists with no rules, returns that project", func(t *testing.T) {
 			ctx := context.Background()
 			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
 
@@ -4628,6 +4628,18 @@ func TestGetProject(t *testing.T) {
 			insertStagedRuleWithMultipleConditions(t, db, "staged-rule-2", p.ID, storage.Node, true)
 			insertAppliedRuleWithMultipleConditions(t, db, "applied-rule-1", p.ID, storage.Node)
 			insertAppliedRuleWithMultipleConditions(t, db, "applied-rule-2", p.ID, storage.Node)
+
+			resp, err := store.GetProject(ctx, p.ID)
+			require.NoError(t, err)
+
+			p.Status = storage.EditsPending.String()
+			assert.Equal(t, &p, resp)
+		}},
+		{"when a custom project exists with only deleted rules, status is edits-pending", func(t *testing.T) {
+			ctx := context.Background()
+			p := insertTestProject(t, db, "foo", "my foo project", storage.Custom)
+			insertStagedRuleWithMultipleConditions(t, db, "staged-rule-1", p.ID, storage.Node, true)
+			insertStagedRuleWithMultipleConditions(t, db, "staged-rule-2", p.ID, storage.Node, true)
 
 			resp, err := store.GetProject(ctx, p.ID)
 			require.NoError(t, err)
@@ -6613,7 +6625,7 @@ func TestEnsureNoProjectsMissing(t *testing.T) {
 			_, correctError := err.(*projectassignment.ProjectsMissingError)
 			assert.True(t, correctError)
 		}},
-		{"when all projects exist, return snil", func(t *testing.T) {
+		{"when all projects exist, return nil", func(t *testing.T) {
 			insertTestProject(t, db, "proj0", "test project 0", storage.Custom)
 			insertTestProject(t, db, "proj1", "test project 1", storage.Custom)
 			err := store.EnsureNoProjectsMissing(ctx, []string{"proj0", "proj1"})
