@@ -594,7 +594,7 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 	})
 
 	// Map the found tag suggestions to remove duplications
-	scoredTagSuggs := make(map[string]*float32)
+	scoredTagSuggs := make(map[string]float32)
 	for _, item := range foundControlTags {
 		matches := make([]string, 0)
 		// If the suggestion is for control tag key, we need to find the one that
@@ -619,8 +619,8 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 		bestMatch := findBestArrayMatch(text, matches)
 		for _, match := range bestMatch {
 			bestMatchScore := item.Score
-			if scoredTagSuggs[match] == nil || *scoredTagSuggs[match] < item.Score {
-				scoredTagSuggs[match] = &bestMatchScore
+			if scoredTagSuggs[match] < item.Score {
+				scoredTagSuggs[match] = bestMatchScore
 			}
 		}
 	}
@@ -629,7 +629,7 @@ func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client 
 	for mSugg, mScore := range scoredTagSuggs {
 		suggs = append(suggs, &reportingapi.Suggestion{
 			Text:  mSugg,
-			Score: *mScore,
+			Score: mScore,
 		})
 	}
 
