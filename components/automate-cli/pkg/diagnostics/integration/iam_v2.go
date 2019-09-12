@@ -55,6 +55,19 @@ func CreateIAMV2Diagnostic() diagnostics.Diagnostic {
 	return diagnostics.Diagnostic{
 		Name: "iam-v2",
 		Tags: diagnostics.Tags{"auth", "iam-v2", "skip-for-deep-upgrade"},
+		Skip: func(tstCtx diagnostics.TestContext) (bool, string, error) {
+			vsn := struct {
+				Version struct{ Major, Minor string }
+			}{}
+			err := MustJSONDecodeSuccess(tstCtx.DoLBRequest("/apis/iam/v2beta/policy_version")).WithValue(&vsn)
+			if err != nil {
+				return false, "", err
+			}
+			if vsn.Version.Major != "V2" {
+				return true, "requires IAM v2", nil
+			}
+			return false, "", nil
+		},
 		Generate: func(tstCtx diagnostics.TestContext) error {
 			tstCtx.SetValue("iam-v2-policy-id", save{PolicyID: policyID, RoleID: roleID})
 			err := MustJSONDecodeSuccess(
