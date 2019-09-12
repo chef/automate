@@ -293,6 +293,7 @@ func (w *workflowInstance) PercentageComplete() float64 {
 		return 1.0
 	}
 
+	longestEstimatedTimeComplete := time.Time{}
 	for _, d := range domainServicesUpdateInstance.ListSubWorkflows() {
 		subWorkflow, err := domainServicesUpdateInstance.GetSubWorkflow(d)
 		if err != nil {
@@ -305,9 +306,13 @@ func (w *workflowInstance) PercentageComplete() float64 {
 				logrus.WithError(err).Errorf("failed to get payload for %q", d)
 				continue
 			}
-			percentComplete = percentComplete + (float64(payload.MergedJobStatus.PercentageComplete) / float64(len(domainServices)))
-		} else {
-			percentComplete = percentComplete + 1.0/float64(len(domainServices))
+
+			if !payload.MergedJobStatus.Completed {
+				estimatedTime := time.Unix(payload.MergedJobStatus.EstimatedEndTimeInSec, 0)
+				if estimatedTime.After(longestEstimatedTimeComplete) {
+					percentComplete = float64(payload.MergedJobStatus.PercentageComplete)
+				}
+			}
 		}
 	}
 
