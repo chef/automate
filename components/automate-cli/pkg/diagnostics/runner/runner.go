@@ -164,9 +164,21 @@ func (r *Runner) Run() error {
 			if diagnostic.Generate == nil {
 				continue
 			}
+			if diagnostic.Skip != nil {
+				skip, msg, err := diagnostic.Skip(r.tstContext)
+				if err != nil {
+					r.reporter.ReportGenerateSkipErrored(diagnostic.Name, fmt.Sprintf("%+v", err))
+					failed = true
+					errs = append(errs, err)
+					continue
+				}
+				if skip {
+					r.reporter.ReportGenerateSkip(diagnostic.Name, msg)
+					continue
+				}
+			}
 			r.reporter.ReportGenerateStart(diagnostic.Name)
 			err := diagnostic.Generate(r.tstContext)
-
 			if err != nil {
 				r.reporter.ReportGenerateErrored(diagnostic.Name, fmt.Sprintf("%+v", err))
 				failed = true
@@ -182,6 +194,19 @@ func (r *Runner) Run() error {
 			for _, diagnostic := range r.registeredDiagnostics {
 				if diagnostic.Verify == nil {
 					continue
+				}
+				if diagnostic.Skip != nil {
+					skip, msg, err := diagnostic.Skip(r.tstContext)
+					if err != nil {
+						r.reporter.ReportVerifySkipErrored(diagnostic.Name, fmt.Sprintf("%+v", err))
+						failed = true
+						errs = append(errs, err)
+						continue
+					}
+					if skip {
+						r.reporter.ReportVerifySkip(diagnostic.Name, msg)
+						continue
+					}
 				}
 				vctx := toVerifiableContext(r.tstContext, diagnostic.Name, r.reporter)
 				r.reporter.ReportVerifyStart(diagnostic.Name)
@@ -199,6 +224,19 @@ func (r *Runner) Run() error {
 		for _, diagnostic := range r.registeredDiagnostics {
 			if diagnostic.Cleanup == nil {
 				continue
+			}
+			if diagnostic.Skip != nil {
+				skip, msg, err := diagnostic.Skip(r.tstContext)
+				if err != nil {
+					r.reporter.ReportCleanupSkipErrored(diagnostic.Name, fmt.Sprintf("%+v", err))
+					failed = true
+					errs = append(errs, err)
+					continue
+				}
+				if skip {
+					r.reporter.ReportCleanupSkip(diagnostic.Name, msg)
+					continue
+				}
 			}
 			r.reporter.ReportCleanupStart(diagnostic.Name)
 			err := diagnostic.Cleanup(r.tstContext)

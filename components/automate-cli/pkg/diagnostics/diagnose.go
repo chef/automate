@@ -22,6 +22,8 @@ type Diagnostic struct {
 	Generate func(TestContext) error
 	Verify   func(VerificationTestContext)
 	Cleanup  func(TestContext) error
+	// Skip allows skipping diagnostics based on some condition
+	Skip     func(TestContext) (bool, string, error)
 }
 
 // MatchesFilters determines if a set of TagFilters matches the diagnostic
