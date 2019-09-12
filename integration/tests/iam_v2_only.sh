@@ -19,16 +19,35 @@ hab_curl() {
     hab pkg exec core/curl curl "$@"
 }
 
+# The inspec tests also test some applications APIs that require the backend
+# for the feature to be enabled -- we do this via config to avoid a race between
+# the config having been applied, and the services restarted accordingly, and
+# the actual test execution.
+do_create_config() {
+    do_create_config_default
+    #shellcheck disable=SC2154
+    cat <<EOF >>"$test_config_path"
+# Gateway service configuration.
+[gateway.v1.sys.service]
+enable_apps_feature = true
+# event-service configuration.
+[event_service.v1.sys.service]
+enable_nats_feature = true
+# event-gateway
+[event_gateway.v1.sys.service]
+enable_nats_feature = true
+# applications-service
+[applications.v1.sys.service]
+enable_nats_feature = true
+EOF
+}
+
 # Note: the inspec tests assert that a viewer or operator user is able
 # to retrieve the license status -- so we just add one.
-# Thes inspec tests also test some applications APIs that require the backend
-# for the feature to be enabled
 do_deploy() {
     do_deploy_default
     log_info "applying dev license"
     chef-automate license apply "$A2_LICENSE"
-
-    chef-automate applications enable
 }
 
 do_test_deploy() {
