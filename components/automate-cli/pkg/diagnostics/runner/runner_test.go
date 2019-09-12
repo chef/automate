@@ -43,6 +43,76 @@ func TestRunnerHappyPath(t *testing.T) {
 	assert.True(t, cleanupCalled)
 }
 
+func TestRunnerSkippedAtRuntime(t *testing.T) {
+	generateCalled := false
+	verifyCalled := false
+	cleanupCalled := false
+
+	r := runner.New(
+		runner.WithDiagnostics(
+			diagnostics.Diagnostic{
+				Name: "test",
+				Skip: func(diagnostics.TestContext) (bool, string, error) {
+					return true, "skipped", nil
+				},
+				Generate: func(diagnostics.TestContext) error {
+					generateCalled = true
+					return nil
+				},
+				Verify: func(tstContext diagnostics.VerificationTestContext) {
+					verifyCalled = true
+					require.Equal(tstContext, "good", "good")
+				},
+				Cleanup: func(diagnostics.TestContext) error {
+					cleanupCalled = true
+					return nil
+				},
+			},
+		),
+	)
+
+	err := r.Run()
+	assert.NoError(t, err)
+	assert.False(t, generateCalled)
+	assert.False(t, verifyCalled)
+	assert.False(t, cleanupCalled)
+}
+
+func TestRunnerSkippedAtRuntimeBecauseCheckFailed(t *testing.T) {
+	generateCalled := false
+	verifyCalled := false
+	cleanupCalled := false
+
+	r := runner.New(
+		runner.WithDiagnostics(
+			diagnostics.Diagnostic{
+				Name: "test",
+				Skip: func(diagnostics.TestContext) (bool, string, error) {
+					return false, "", errors.New("boohoo")
+				},
+				Generate: func(diagnostics.TestContext) error {
+					generateCalled = true
+					return nil
+				},
+				Verify: func(tstContext diagnostics.VerificationTestContext) {
+					verifyCalled = true
+					require.Equal(tstContext, "good", "good")
+				},
+				Cleanup: func(diagnostics.TestContext) error {
+					cleanupCalled = true
+					return nil
+				},
+			},
+		),
+	)
+
+	err := r.Run()
+	assert.Error(t, err)
+	assert.False(t, generateCalled)
+	assert.False(t, verifyCalled)
+	assert.False(t, cleanupCalled)
+}
+
 func TestRunnerAllStepsSkippable(t *testing.T) {
 	r := runner.New(
 		runner.WithDiagnostics(

@@ -3,7 +3,6 @@
 #shellcheck disable=SC2034
 test_name="chef-server-backup"
 test_backup_restore=true
-test_diagnostics_filters="~iam-v2"
 
 #shellcheck source=.studio/chef-server-collection
 source .studio/chef-server-collection
