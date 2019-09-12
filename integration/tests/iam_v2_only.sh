@@ -26,7 +26,7 @@ hab_curl() {
 do_create_config() {
     do_create_config_default
     #shellcheck disable=SC2154
-    cat <EOF >>"$test_config_path"
+    cat <<EOF >>"$test_config_path"
 # Gateway service configuration.
 [gateway.v1.sys.service]
 enable_apps_feature = true
