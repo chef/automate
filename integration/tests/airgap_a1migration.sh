@@ -5,7 +5,6 @@ test_name="airgap_a1_migration"
 test_container_name="a1-migration.test"
 test_upgrade_strategy="none"
 test_deploy_inspec_profiles=(a2-migrate-from-v1-integration)
-test_diagnostics_filters="~iam-v2"
 
 # Note: this matches the hashes in a1stub/server.go,
 #       $2a$12$SWA2q.A2Pe8PzNw.i7DcruoIoq.Lgvz0G7O07.V21I077PveSkGy6

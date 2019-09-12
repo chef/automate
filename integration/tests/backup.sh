@@ -3,7 +3,6 @@
 #shellcheck disable=SC2034
 test_name="backup"
 test_backup_restore=true
-test_diagnostics_filters="~iam-v2"
 
 do_deploy() {
     do_deploy_default
