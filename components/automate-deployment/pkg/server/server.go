@@ -1520,6 +1520,9 @@ func (s *server) target() target.Target {
 // convergeDisabled will return true if the server configured disable
 // sentinel file exists.
 func (s *server) convergeDisabled() bool {
+	if !s.convergeLoop.IsRunning() {
+		return true
+	}
 	_, err := os.Stat(s.serverConfig.ConvergeDisableFile)
 
 	return err == nil

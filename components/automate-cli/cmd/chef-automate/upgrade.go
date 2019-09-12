@@ -39,7 +39,12 @@ var upgradeStatusCmd = &cobra.Command{
 	Args:  cobra.MaximumNArgs(0),
 }
 
-var a1RunningMsg = "You have a running Chef Automate v1 installation. Did you mean to type `chef-automate upgrade-from-v1` (alias for: `chef-automate migrate-from-v1`)?"
+const a1RunningMsg = "You have a running Chef Automate v1 installation. Did you mean to type `chef-automate upgrade-from-v1` (alias for: `chef-automate migrate-from-v1`)?"
+const convergeDisabledWarning = `Converge is disabled. This will prevent Automate from upgrading.
+
+To fix this, delete the file "/hab/svc/deployment-service/data/converge_disable".
+Otherwise, you may need to run "chef-automate dev start-converge".
+`
 
 func runUpgradeCmd(cmd *cobra.Command, args []string) error {
 	a1IsRunning, err := isA1Running()
@@ -121,6 +126,10 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 		)
 	}
 
+	if resp.IsConvergeDisable {
+		writer.Warn(convergeDisabledWarning)
+	}
+
 	// TODO(ssd) 2018-09-17: This API response was built around
 	// the world where we didn't /know/ that an upgrade was
 	// happening or not. Now we should "just know" and the API
@@ -131,19 +140,37 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 	case api.UpgradeStatusResponse_IDLE:
 		switch {
 		case resp.CurrentVersion != "" && resp.CurrentVersion < resp.LatestAvailableVersion:
-			writer.Printf("Automate is out-of-date (current version: %s; latest available: %s)\n",
-				resp.CurrentVersion, resp.LatestAvailableVersion)
+			writer.Printf("Automate is out-of-date (current version: %s; latest available: %s; airgapped: %v)\n",
+				resp.CurrentVersion, resp.LatestAvailableVersion, resp.IsAirgapped)
 		case resp.CurrentVersion != "":
-			writer.Printf("Automate is up-to-date (%s)\n", resp.CurrentVersion)
+			if resp.IsAirgapped {
+				writer.Printf("Automate is up-to-date with airgap bundle (%s)\n", resp.CurrentVersion)
+
+			} else {
+				writer.Printf("Automate is up-to-date (%s)\n", resp.CurrentVersion)
+			}
 		default:
-			writer.Printf("Automate is up-to-date (%s)\n", resp.LatestAvailableVersion)
+			if resp.IsAirgapped {
+				writer.Printf("Automate is up-to-date with airgap bundle %s\n", resp.LatestAvailableVersion)
+
+			} else {
+				writer.Printf("Automate is up-to-date (%s)\n", resp.LatestAvailableVersion)
+			}
 		}
 	case api.UpgradeStatusResponse_UPGRADING:
 		// Leaving the leading newlines in place to emphasize multi-line output.
 		if resp.DesiredVersion != "" {
-			writer.Titlef("Automate is upgrading to %s", resp.DesiredVersion)
+			if resp.IsAirgapped {
+				writer.Titlef("Automate is upgrading to airgap bundle %s", resp.DesiredVersion)
+			} else {
+				writer.Titlef("Automate is upgrading to %s", resp.DesiredVersion)
+			}
 		} else {
-			writer.Titlef("Automate is upgrading to %s", resp.LatestAvailableVersion)
+			if resp.IsAirgapped {
+				writer.Titlef("Automate is upgrading to airgap bundle %s", resp.LatestAvailableVersion)
+			} else {
+				writer.Titlef("Automate is upgrading to %s", resp.LatestAvailableVersion)
+			}
 		}
 
 		writer.Title("Services requiring changes:")

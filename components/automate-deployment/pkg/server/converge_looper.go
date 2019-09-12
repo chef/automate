@@ -66,6 +66,13 @@ func (l *Looper) Stop() {
 	close(l.quitChan)
 }
 
+func (l *Looper) IsRunning() bool {
+	// We should lock here, however this function is called from
+	// the function runLoop runs. It's probably fine to lock, but
+	// I decided it wasn't worth it.
+	return l.running
+}
+
 func (l *Looper) runLoop(quitChan chan struct{}) {
 	timer := time.NewTimer(0)
 	defer timer.Stop()
