@@ -22,7 +22,7 @@
           </app-authorized>
           <app-authorized [allOf]="['/iam/v2beta/apply-rules', 'post']">
             <chef-button secondary [disabled]="!projectsHaveStagedChanges || (projects.applyRulesStatus$ | async)?.state === ApplyRulesStatusState.Running"
-              id="update-start-button" (click)="openConfirmUpdateStartModal()">{{ updateButtonLabel() }}</chef-button>
+              id="update-start-button" (click)="openConfirmUpdateStartModal()">{{ getButtonText() }}</chef-button>
           </app-authorized>
           <app-authorized [allOf]="['/iam/v2beta/apply-rules', 'delete']">
             <chef-button *ngIf="(projects.applyRulesStatus$ | async)?.state === ApplyRulesStatusState.Running"

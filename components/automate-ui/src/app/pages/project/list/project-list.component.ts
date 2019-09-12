@@ -94,11 +94,11 @@ export class ProjectListComponent implements OnInit, OnDestroy {
             this.closeConfirmApplyStopModal();
           }
           this.applyRulesInProgress = false;
-          this.updateProjectsFailed = failed;
-          this.updateProjectsCancelled = cancelled;
-          if (!this.cancelRulesInProgress) {
-            this.percentageComplete = percentageComplete;
-          }
+        }
+        this.updateProjectsFailed = failed;
+        this.updateProjectsCancelled = cancelled;
+        if (!this.cancelRulesInProgress) {
+          this.percentageComplete = percentageComplete;
         }
       });
 
@@ -108,13 +108,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       filter(() => !this.applyRulesInProgress)
     ).subscribe((projectList: Project[]) => {
       this.statusCache = projectList.reduce((m, p) => ({ ...m, [p.id]: p.status }), {});
-    });
-
-    store.select(allProjects).pipe(
-      takeUntil(this.isDestroyed)
-    ).subscribe((projectList: Project[]) => {
-      this.projectsHaveStagedChanges =
-        projectList.some(p => p.status === 'EDITS_PENDING');
+      this.projectsHaveStagedChanges = projectList.some(p => p.status === 'EDITS_PENDING');
     });
 
     this.createProjectForm = fb.group({
@@ -154,14 +148,14 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     return '';
   }
 
-  updateButtonLabel(): string {
+  getButtonText(): string {
     if (this.applyRulesInProgress) {
       return `Updating Projects ${Math.round(this.percentageComplete * 100)}%...`;
     }
     if (this.projectsHaveStagedChanges) {
       return 'Update Projects';
     }
-    return 'Projects Up-to-date';
+    return 'Projects Up-To-Date';
   }
 
   public createProject(): void {

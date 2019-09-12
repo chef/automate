@@ -558,7 +558,7 @@ describe('ProjectListComponent', () => {
 
   });
 
-  describe('updateButtonLabel', () => {
+  describe('getButtonText', () => {
     it('labels the button "Update Projects" when at least one project is edited', () => {
       const editedProject = genProject('uuid-99', 'EDITS_PENDING');
       const uneditedProject1 = genProject('uuid-111', 'RULES_APPLIED');
@@ -567,17 +567,17 @@ describe('ProjectListComponent', () => {
         projects: [uneditedProject1, editedProject, uneditedProject2]
       }));
 
-      expect(component.updateButtonLabel()).toEqual('Update Projects');
+      expect(component.getButtonText()).toEqual('Update Projects');
     });
 
-    it('labels the button "Projects Up-to-Date" when no projects are edited', () => {
+    it('labels the button "Projects Up-To-Date" when no projects are edited', () => {
       const uneditedProject1 = genProject('uuid-111', 'RULES_APPLIED');
       const uneditedProject2 = genProject('uuid-112', 'RULES_APPLIED');
       store.dispatch(new GetProjectsSuccess({
         projects: [uneditedProject1, uneditedProject2]
       }));
 
-      expect(component.updateButtonLabel()).toEqual('Projects Up-to-date');
+      expect(component.getButtonText()).toEqual('Projects Up-To-Date');
     });
 
     it('labels the button with percentage only during an update', () => {
@@ -585,17 +585,17 @@ describe('ProjectListComponent', () => {
       store.dispatch(new GetProjectsSuccess({
         projects: [editedProject]
       }));
-      expect(component.updateButtonLabel()).toEqual('Update Projects');
+      expect(component.getButtonText()).toEqual('Update Projects');
 
       component.confirmApplyStart(); // start the update
       store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
         genState(ApplyRulesStatusState.Running)));
 
-      expect(component.updateButtonLabel()).toEqual('Updating Projects 50%...');
+      expect(component.getButtonText()).toEqual('Updating Projects 50%...');
 
       store.dispatch(new GetApplyRulesStatusSuccess(
         genState(ApplyRulesStatusState.NotRunning)));
-      expect(component.updateButtonLabel()).not.toEqual('Updating Projects 50%...');
+      expect(component.getButtonText()).not.toEqual('Updating Projects 50%...');
     });
   });
 });
