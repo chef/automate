@@ -134,14 +134,14 @@ func (a *adapter) UpdateToken(ctx context.Context,
 
 	// TODO why are we doing this? What if they want to delete the description?
 	if description != "" {
-		row = a.db.QueryRowContext(ctx,
+		row = tx.QueryRowContext(ctx,
 			`UPDATE chef_authn_tokens cat
 			SET active=$2, description=$3, project_ids=$4, updated=NOW() 
 			WHERE id=$1 AND projects_match(cat.project_ids, $5::TEXT[])
 			RETURNING id, description, value, active, project_ids, created, updated`,
 			id, active, description, pq.Array(updatedProjects), pq.Array(projectsFilter))
 	} else {
-		row = a.db.QueryRowContext(ctx,
+		row = tx.QueryRowContext(ctx,
 			`UPDATE chef_authn_tokens cat
 			SET active=$2, project_ids=$3, updated=NOW()
 			WHERE id=$1 AND projects_match(cat.project_ids, $4::TEXT[])
