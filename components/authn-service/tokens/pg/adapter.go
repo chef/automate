@@ -112,7 +112,7 @@ func (a *adapter) UpdateToken(ctx context.Context,
 	var row *sql.Row
 	err = tx.QueryRowContext(ctx,
 		`SELECT project_ids FROM chef_authn_tokens
-		WHERE id=$1 AND projects_match(project_ids, $5::TEXT[])
+		WHERE id=$1 AND projects_match(project_ids, $2::TEXT[])
 		FOR UPDATE;`,
 		id, pq.Array(projectsFilter)).Scan(pq.Array(&originalProjects))
 	if err != nil {
