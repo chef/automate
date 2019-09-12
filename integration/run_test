@@ -39,6 +39,8 @@ docker_run_args=(
         "--env" "CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_HOST"
         "--env" "CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_USER"
         "--env" "CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_KEY"
+        "--env" "test_container_name=${test_container_name}"
+        "--env" "test_build_slug=${test_build_slug}"
         "--hostname" "$test_container_name"
         "--interactive"
         "--name" "$test_container_name"

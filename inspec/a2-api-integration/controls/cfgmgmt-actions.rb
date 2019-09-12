@@ -7,6 +7,32 @@ control 'config-mgmt-action-1' do
   title 'Submit config-mgmt actions fixture data'
   desc 'Verifies that we can submit action data to the legacy data-collector'
 
+  describe "prepare" do
+    let(:elasticsearch_url) do
+      ENV["ELASTICSEARCH_URL"] || "http://localhost:10144"
+    end
+
+    # Our tests rely on absolute counts for actions. The actions fixtures that are
+    # ingested are all timestamped between between 3/26/18 - 3/29/18.
+    # If those indices exist from a prior run they'll mess up the counts, therefore
+    # we'll purge them before we begin.
+    it "cleanup old actions-2018.03.2{6..9} if they exist" do
+      res = inspec.http("#{elasticsearch_url}/_all", method: "GET")
+      res.status
+      JSON.parse(res.body).keys.each do |index|
+        if index =~ /actions\-2018\.03\.2[6-9]/
+          res = inspec.http(
+            "#{elasticsearch_url}/#{index}/_delete_by_query",
+            method: "POST",
+            headers: { "Content-Type" => "application/json" },
+            data: { "query" => { "match_all" => {} } }.to_json
+          )
+          res.status
+        end
+      end
+    end
+  end
+
   %w(
     bag_create
     bag_delete
@@ -32,7 +58,7 @@ control 'config-mgmt-action-1' do
         automate_api_request(
           '/data-collector/v0',
           http_method: 'POST',
-          request_body: inspec.profile.file("fixtures/converge/actions/#{action}.json") 
+          request_body: inspec.profile.file("fixtures/converge/actions/#{action}.json")
         )
       end
 
@@ -83,7 +109,7 @@ control 'config-mgmt-action-2' do
     describe 'return all bag type events' do
       it 'should return 2 event' do
         expect(api_request.http_status).to eq 200
-        
+
         expect(api_request.parsed_response_body[:total_events]).to eq '2'
       end
     end
@@ -119,7 +145,7 @@ control 'config-mgmt-action-2' do
     shared_examples "string requests tests" do
       it 'should return 3 strings and the correct number of buckets' do
         expect(api_request.http_status).to eq 200
-        
+
         expect(api_request.parsed_response_body[:strings].length).to eq 3
 
         create_string = api_request.parsed_response_body[:strings].detect {|string| string[:event_action] == 'create'}
@@ -142,7 +168,7 @@ control 'config-mgmt-action-2' do
         expect(api_request.http_status).to eq 200
 
         create_string = api_request.parsed_response_body[:strings].detect {|string| string[:event_action] == 'create'}
-        
+
         #bucket 2018/03/26T00:00-2018/03/26T11:59
         expect(create_string[:collection][0][:events_count].length).to eq 0
 
@@ -184,7 +210,7 @@ control 'config-mgmt-action-2' do
         )
 
         delete_string = api_request.parsed_response_body[:strings].detect {|string| string[:event_action] == 'delete'}
-        
+
         #bucket 2018/03/26T00:00-2018/03/26T11:59
         expect(delete_string[:collection][0][:events_count].length).to eq 1
         expect(delete_string[:collection][0][:events_count]).to include(
@@ -218,7 +244,7 @@ control 'config-mgmt-action-2' do
 
 
         update_string = api_request.parsed_response_body[:strings].detect {|string| string[:event_action] == 'update'}
-        
+
         #bucket 2018/03/26T00:00-2018/03/26T11:59
         expect(update_string[:collection][0][:events_count].length).to eq 0
 
@@ -259,7 +285,7 @@ control 'config-mgmt-action-2' do
       include_examples "string requests tests"
     end
 
-    [ 
+    [
       { start_date:  '2018-03-09', end_date: '2018-03-15'}, # US start of daylight saving
       { start_date:  '2017-11-01', end_date: '2017-11-07'}, # US end of daylight saving
       { start_date:  '2018-03-23', end_date: '2018-03-29'}, # Europe start of daylight saving
