@@ -96,7 +96,9 @@ export class ProjectListComponent implements OnInit, OnDestroy {
           this.applyRulesInProgress = false;
           this.updateProjectsFailed = failed;
           this.updateProjectsCancelled = cancelled;
-          this.percentageComplete = percentageComplete;
+          if (!this.cancelRulesInProgress) {
+            this.percentageComplete = percentageComplete;
+          }
         }
       });
 
