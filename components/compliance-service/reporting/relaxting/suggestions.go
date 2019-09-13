@@ -12,34 +12,37 @@ import (
 	"github.com/pkg/errors"
 	"github.com/schollz/closestmatch"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/status"
 
 	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
 	"github.com/chef/automate/lib/errorutils"
+	"google.golang.org/grpc/codes"
 )
 
 // GetSuggestions - Report #12
-func (backend ES2Backend) GetSuggestions(typeParam string, filters map[string][]string, text string, size32 int32) ([]*reportingapi.Suggestion, error) {
+func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, filters map[string][]string, text string, size32 int32) ([]*reportingapi.Suggestion, error) {
 	client, err := backend.ES2Client()
 	size := int(size32)
 	if err != nil {
-		logrus.Error("Cannot connect to ElasticSearch")
-		return nil, err
+		return nil, errors.Wrap(err, "GetSuggestions cannot connect to ElasticSearch")
 	}
 
 	var SUGGESTIONS_TYPES = map[string]string{
-		"environment":    "environment",
-		"platform":       "platform.name",
-		"node":           "node_name",
-		"role":           "roles",
-		"recipe":         "recipes",
-		"profile":        "profiles.title",
-		"control":        "profiles.controls.title",
-		"organization":   "organization_name",
-		"chef_server":    "source_fqdn",
-		"chef_tags":      "chef_tags",
-		"policy_group":   "policy_group",
-		"policy_name":    "policy_name",
-		"inspec_version": "version",
+		"environment":       "environment",
+		"platform":          "platform.name",
+		"node":              "node_name",
+		"role":              "roles",
+		"recipe":            "recipes",
+		"profile":           "profiles.title",
+		"control":           "profiles.controls.title",
+		"organization":      "organization_name",
+		"chef_server":       "source_fqdn",
+		"chef_tags":         "chef_tags",
+		"policy_group":      "policy_group",
+		"policy_name":       "policy_name",
+		"inspec_version":    "version",
+		"control_tag_key":   "profiles.controls.string_tags.key",
+		"control_tag_value": "profiles.controls.string_tags.values",
 	}
 
 	target, ok := SUGGESTIONS_TYPES[typeParam]
@@ -67,25 +70,29 @@ func (backend ES2Backend) GetSuggestions(typeParam string, filters map[string][]
 	useSummaryIndex := true
 	if len(filters["control"]) > 0 {
 		useSummaryIndex = false
-	} else {
-		// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
-		for filterType := range filters {
-			if strings.HasPrefix(filterType, "control_tag:") {
-				useSummaryIndex = false
-				break
-			}
+	}
+
+	controlTagFilterKey := ""
+	// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
+	for filterType := range filters {
+		if strings.HasPrefix(filterType, "control_tag:") {
+			_, controlTagFilterKey = leftSplit(filterType, ":")
+			useSummaryIndex = false
+			break
 		}
 	}
 
 	suggs := make([]*reportingapi.Suggestion, 0)
 	if typeParam == "profile" {
-		suggs, err = backend.getProfileSuggestions(client, typeParam, target, text, size, filters, useSummaryIndex)
+		suggs, err = backend.getProfileSuggestions(ctx, client, typeParam, target, text, size, filters, useSummaryIndex)
 	} else if typeParam == "control" {
-		suggs, err = backend.getControlSuggestions(client, typeParam, target, text, size, filters)
+		suggs, err = backend.getControlSuggestions(ctx, client, typeParam, target, text, size, filters)
+	} else if typeParam == "control_tag_key" || typeParam == "control_tag_value" {
+		suggs, err = backend.getControlTagsSuggestions(ctx, client, typeParam, target, text, controlTagFilterKey, size, filters, false)
 	} else if suggestionFieldArray(typeParam) {
-		suggs, err = backend.getArrayAggSuggestions(client, typeParam, target, text, size, filters, useSummaryIndex)
+		suggs, err = backend.getArrayAggSuggestions(ctx, client, typeParam, target, text, size, filters, useSummaryIndex)
 	} else {
-		suggs, err = backend.getAggSuggestions(client, typeParam, target, text, size, filters, useSummaryIndex)
+		suggs, err = backend.getAggSuggestions(ctx, client, typeParam, target, text, size, filters, useSummaryIndex)
 	}
 
 	if err != nil {
@@ -122,7 +129,7 @@ func suggestionFieldArray(field string) bool {
 	}
 }
 
-func (backend ES2Backend) getAggSuggestions(client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
+func (backend ES2Backend) getAggSuggestions(ctx context.Context, client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
 	esIndex, err := GetEsIndex(filters, useSummaryIndex, true)
 	if err != nil {
 		return nil, errors.Wrap(err, "getAggSuggestions unable to get index dates")
@@ -180,16 +187,11 @@ func (backend ES2Backend) getAggSuggestions(client *elastic.Client, typeParam st
 			"aggregations.myagg.buckets.key",
 			"aggregations.myagg.buckets.mytophit.hits.hits._source",
 			"aggregations.myagg.buckets.mymaxscore.value").
-		Do(context.Background())
+		Do(ctx)
 
 	if err != nil {
-		logrus.Error("getAggSuggestions search failed")
-		return nil, err
+		return nil, errors.Wrap(err, "getAggSuggestions search failed")
 	}
-	// Sample search sent to ElasticSearch for a node_name suggestion
-	//{
-	//	"aggregations": {
-	//		"myagg": {
 
 	LogQueryPartMin(esIndex, searchResult, "getAggSuggestions - searchResult")
 	logrus.Debugf("Search query took %d milliseconds\n", searchResult.TookInMillis)
@@ -225,7 +227,7 @@ func (backend ES2Backend) getAggSuggestions(client *elastic.Client, typeParam st
 	return suggs, nil
 }
 
-func (backend ES2Backend) getArrayAggSuggestions(client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
+func (backend ES2Backend) getArrayAggSuggestions(ctx context.Context, client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
 	esIndex, err := GetEsIndex(filters, useSummaryIndex, true)
 	if err != nil {
 		return nil, errors.Wrap(err, "getArrayAggSuggestions unable to get index dates")
@@ -261,11 +263,10 @@ func (backend ES2Backend) getArrayAggSuggestions(client *elastic.Client, typePar
 			"took",
 			"hits.total",
 			"aggregations.myagg.buckets.key").
-		Do(context.Background())
+		Do(ctx)
 
 	if err != nil {
-		logrus.Error("getArrayAggSuggestions search failed")
-		return nil, err
+		return nil, errors.Wrap(err, "getArrayAggSuggestions search failed")
 	}
 
 	LogQueryPartMin(esIndex, searchResult, "getArrayAggSuggestions - searchResult")
@@ -278,10 +279,6 @@ func (backend ES2Backend) getArrayAggSuggestions(client *elastic.Client, typePar
 			suggs = append(suggs, string(bucket.KeyNumber))
 		}
 	}
-	//// Sample search sent to ElasticSearch when suggesting roles:
-	//{
-	//	"query": {
-	//		"bool": {
 
 	// When matching array fields, elasticsearch returns the entire array with the score at the array level. We love arrays because they are small and work really well for filtering.
 	// Once aggregated to get rid of duplicates, the final scoring is done on doc_count, which is irrelevant for suggestion type matching.
@@ -303,7 +300,7 @@ func (backend ES2Backend) getArrayAggSuggestions(client *elastic.Client, typePar
 	return finalSuggs, nil
 }
 
-func (backend ES2Backend) getProfileSuggestions(client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
+func (backend ES2Backend) getProfileSuggestions(ctx context.Context, client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
 	//the reason we may use summary index here is because we always throw away the current profile filter when
 	// getting a suggestion for profile.. if we didn't then we'd only ever see the filter that's in our filter!
 	esIndex, err := GetEsIndex(filters, useSummaryIndex, true)
@@ -354,16 +351,10 @@ func (backend ES2Backend) getProfileSuggestions(client *elastic.Client, typePara
 			"hits.hits.inner_hits.profiles.hits.hits._source.title",
 			"hits.hits.inner_hits.profiles.hits.hits._source.version",
 			"hits.hits.inner_hits.profiles.hits.hits._score").
-		Do(context.Background())
-
-	//// Sample search sent to ElasticSearch when suggesting controls:
-	//{
-	//	"_source": false,
-	//...
+		Do(ctx)
 
 	if err != nil {
-		logrus.Error("getProfileSuggestions search failed")
-		return nil, err
+		return nil, errors.Wrap(err, "getProfileSuggestions search failed")
 	}
 
 	logrus.Debugf("Search query took %d milliseconds\n", searchResult.TookInMillis)
@@ -405,7 +396,7 @@ func (backend ES2Backend) getProfileSuggestions(client *elastic.Client, typePara
 	return suggs, nil
 }
 
-func (backend ES2Backend) getControlSuggestions(client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string) ([]*reportingapi.Suggestion, error) {
+func (backend ES2Backend) getControlSuggestions(ctx context.Context, client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string) ([]*reportingapi.Suggestion, error) {
 	esIndex, err := GetEsIndex(filters, false, true)
 	if err != nil {
 		return nil, errors.Wrap(err, "getControlSuggestions unable to get index dates")
@@ -456,13 +447,10 @@ func (backend ES2Backend) getControlSuggestions(client *elastic.Client, typePara
 			"hits.hits._id",
 			"hits.hits._score",
 			"hits.hits.inner_hits").
-		Do(context.Background())
-
-	// {code}
+		Do(ctx)
 
 	if err != nil {
-		logrus.Error("getControlSuggestions search failed")
-		return nil, err
+		return nil, errors.Wrap(err, "getControlSuggestions search failed")
 	}
 
 	logrus.Debugf("Search query took %d milliseconds\n", searchResult.TookInMillis)
@@ -491,6 +479,8 @@ func (backend ES2Backend) getControlSuggestions(client *elastic.Client, typePara
 										suggs = append(suggs, &oneSugg)
 										addedControls[c.ID] = true
 									}
+								} else {
+									logrus.Errorf("getControlSuggestions: Invalid control (%+v) found in report %s", c, hit2.Id)
 								}
 							}
 						}
@@ -500,6 +490,171 @@ func (backend ES2Backend) getControlSuggestions(client *elastic.Client, typePara
 		}
 	}
 	return suggs, nil
+}
+
+func (backend ES2Backend) getControlTagsSuggestions(ctx context.Context, client *elastic.Client, typeParam string, target string, text string, controlTagFilterKey string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
+	if typeParam == "control_tag_value" && controlTagFilterKey == "" {
+		return nil, status.Error(codes.InvalidArgument, "'control_tag' filter is required for 'control_tag_value' suggestions")
+	}
+	esIndex, err := GetEsIndex(filters, useSummaryIndex, true)
+	if err != nil {
+		return nil, errors.Wrap(err, "getControlTagsSuggestions unable to get index dates")
+	}
+	boolQuery := backend.getFiltersQuery(filters, true)
+	text = strings.ToLower(text)
+
+	var finalInnerQuery elastic.Query
+	if len(text) >= 2 {
+		finalInnerBoolQuery := elastic.NewBoolQuery()
+		finalInnerBoolQuery.Must(elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("or"))
+		finalInnerBoolQuery.Should(elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("and"))
+		finalInnerBoolQuery.Should(elastic.NewTermQuery(fmt.Sprintf("%s.lower", target), text).Boost(100))
+		finalInnerBoolQuery.Should(elastic.NewPrefixQuery(fmt.Sprintf("%s.lower", target), text).Boost(100))
+		finalInnerQuery = finalInnerBoolQuery
+	} else {
+		finalInnerQuery = elastic.NewExistsQuery(target)
+	}
+
+	outerBoolQuery := elastic.NewBoolQuery()
+	nestedBoolQuery := outerBoolQuery.Must(elastic.NewNestedQuery("profiles.controls.string_tags", finalInnerQuery))
+
+	hit := elastic.NewInnerHit().Size(20)
+	boolQuery = boolQuery.Must(elastic.NewNestedQuery("profiles.controls", nestedBoolQuery).InnerHit(hit))
+
+	searchSource := elastic.NewSearchSource().
+		Query(boolQuery).
+		FetchSource(false).
+		Size(size * 50) // Multiplying size to ensure that same profile with multiple versions is not limiting our suggestions to a lower number
+		// ^ Because we can't sort by max_score of the inner hits: https://discuss.elastic.co/t/nested-objects-hits-inner-hits-and-sorting/32565
+
+	source, err := searchSource.Source()
+	if err != nil {
+		return nil, errors.Wrap(err, "getControlTagsSuggestions unable to get Source")
+	}
+
+	LogQueryPartMin(esIndex, source, "getControlTagsSuggestions query")
+
+	searchResult, err := client.Search().
+		SearchSource(searchSource).
+		Index(esIndex).
+		FilterPath(
+			"took",
+			"hits.total",
+			"hits.hits._id",
+			"hits.hits._score",
+			"hits.hits.inner_hits").
+		Do(ctx)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "getControlTagsSuggestions search failed")
+	}
+
+	logrus.Debugf("Search query took %d milliseconds\n", searchResult.TookInMillis)
+
+	type ControlSourceTags struct {
+		ID         string                            `json:"id"`
+		StringTags []ESInSpecReportControlStringTags `json:"string_tags"`
+	}
+	type ControlTagsScore struct {
+		Score      float32
+		StringTags []ESInSpecReportControlStringTags
+	}
+
+	// Using this array to aggregate the unsorted suggestions from the response
+	foundControlTags := make([]ControlTagsScore, 0)
+	if searchResult != nil {
+		for _, hit := range searchResult.Hits.Hits {
+			if hit == nil {
+				continue
+			}
+			for _, inner_hit := range hit.InnerHits {
+				if inner_hit == nil {
+					continue
+				}
+				for _, hit2 := range inner_hit.Hits.Hits {
+					if hit2.Source == nil {
+						continue
+					}
+					var c ControlSourceTags
+					err := json.Unmarshal(*hit2.Source, &c)
+					if err == nil && len(c.StringTags) > 0 {
+						foundControlTags = append(foundControlTags, ControlTagsScore{
+							float32(*hit2.Score),
+							c.StringTags,
+						})
+					} else {
+						logrus.Errorf("getControlTagsSuggestions: Invalid control (%+v) found in report %s", c, hit2.Id)
+					}
+				}
+			}
+		}
+	}
+	sort.Slice(foundControlTags, func(i, j int) bool {
+		return foundControlTags[i].Score > foundControlTags[j].Score
+	})
+
+	scoredTagSuggs := make(map[string]float32)
+	for _, item := range foundControlTags {
+		matches := make([]string, 0)
+		// If the suggestion is for control tag key, we need to find the one that
+		// was the closest match from all the tag keys the control might have
+		if typeParam == "control_tag_key" {
+			for _, controlTag := range item.StringTags {
+				matches = append(matches, controlTag.Key)
+			}
+		}
+
+		// If the suggestion is for control tag values, we need to find the tag that matches the
+		// tag key and then find the closest match from all the values of that tag
+		if typeParam == "control_tag_value" {
+			for _, controlTag := range item.StringTags {
+				if controlTag.Key == controlTagFilterKey {
+					matches = append(matches, controlTag.Values...)
+				}
+			}
+		}
+
+		// scoredTagSuggs maps the found tag suggestions to remove duplicates
+		// We don't offer suggestions for less than two characters
+		if len(text) < 2 {
+			for _, match := range matches {
+				scoredTagSuggs[match] = item.Score
+			}
+		} else {
+			// Find the best engram match from the array of matches
+			bestMatch := findBestArrayMatch(text, matches)
+			if bestMatch != "" {
+				scoredTagSuggs[bestMatch] = item.Score
+			}
+		}
+	}
+
+	suggs := make([]*reportingapi.Suggestion, 0, len(scoredTagSuggs))
+	for mSugg, mScore := range scoredTagSuggs {
+		suggs = append(suggs, &reportingapi.Suggestion{
+			Text:  mSugg,
+			Score: mScore,
+		})
+	}
+
+	return suggs, nil
+}
+
+// Finds the closest engram match for `text` in `arr`
+func findBestArrayMatch(text string, arr []string) string {
+	if len(arr) == 0 {
+		return ""
+	} else if len(arr) > 1 {
+		// Choose a set of bag sizes, more is more accurate but slower
+		bagSizes := []int{2, 3}
+		// Create a closestmatch object
+		cm := closestmatch.New(arr, bagSizes)
+		arr = cm.ClosestN(text, 1)
+		if len(arr) == 0 {
+			return ""
+		}
+	}
+	return arr[0]
 }
 
 // For the string "Apache Linux" ".*apache.*|.*linux.*" will be returned.
