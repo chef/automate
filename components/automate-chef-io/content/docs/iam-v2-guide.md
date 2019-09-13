@@ -15,6 +15,10 @@ After upgrading to IAM v2, you'll add members to Chef-managed v2 policies, delet
 
 ## Upgrade to IAM v2
 
+{{< info >}}
+To get the best possible IAM v2 experience, Chef Automate should be running the latest version before upgrading to IAM v2.
+{{< /info >}}
+
 Perform the upgrade to IAM v2 with `chef-automate iam upgrade-to-v2`; the response should look something like:
 
 ```terminal
