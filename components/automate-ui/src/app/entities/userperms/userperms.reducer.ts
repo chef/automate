@@ -51,7 +51,9 @@ export function permEntityReducer(
       // toPairs converts each endpoint in the payload from
       // { <path>: <perms_map> } to [<path>, <perms_map> ].
       const allPairs = toPairs(action.payload);
-      const allPerms = permIndexer(allPairs);
+      // combine with what we already have so as not to erase parameterized endpoints
+      // that are not included here.
+      const allPerms = defaults(state.byId, permIndexer(allPairs));
 
       return pipe(
         set('lastTimeFetchAll', new Date()),
