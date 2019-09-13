@@ -1,8 +1,12 @@
 import {
-  Component, EventEmitter, Input, Output, OnChanges
-} from '@angular/core';
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  OnChanges
+} from "@angular/core";
 
-import { ProjectConstants, Project } from 'app/entities/projects/project.model';
+import { ProjectConstants, Project } from "app/entities/projects/project.model";
 
 const { UNASSIGNED_PROJECT_ID } = ProjectConstants;
 
@@ -18,9 +22,9 @@ export interface ProjectCheckedMap {
 }
 
 @Component({
-  selector: 'app-projects-dropdown',
-  templateUrl: './projects-dropdown.component.html',
-  styleUrls: ['./projects-dropdown.component.scss']
+  selector: "app-projects-dropdown",
+  templateUrl: "./projects-dropdown.component.html",
+  styleUrls: ["./projects-dropdown.component.scss"]
 })
 export class ProjectsDropdownComponent implements OnChanges {
   // The map of ProjectChecked by id. Any checked changes propagated via
@@ -37,7 +41,19 @@ export class ProjectsDropdownComponent implements OnChanges {
   label = UNASSIGNED_PROJECT_ID;
 
   projectsArray(): ProjectChecked[] {
-    return Object.values(this.projects);
+    let sortedProjects = Object.values(this.projects);
+    // WIP
+    // reference: MDN Intl.Collator
+    // and See https://stackoverflow.com/a/38641281 from policy-list.component
+
+    const opts = {
+      numeric: true,
+      sensitivity: "base"
+    };
+    sortedProjects.sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, opts)
+    );
+    return sortedProjects;
   }
 
   ngOnChanges(): void {
@@ -46,7 +62,9 @@ export class ProjectsDropdownComponent implements OnChanges {
 
   toggleDropdown(event: MouseEvent): void {
     event.stopPropagation();
-    if (this.disabled) { return; }
+    if (this.disabled) {
+      return;
+    }
 
     this.active = !this.active;
   }
@@ -68,13 +86,13 @@ export class ProjectsDropdownComponent implements OnChanges {
     let nextElement: HTMLElement;
 
     const targetElement = <Element>event.target;
-    if (event.key === 'ArrowUp') {
+    if (event.key === "ArrowUp") {
       nextElement = <HTMLElement>targetElement.previousElementSibling;
-    } else if (event.key === 'ArrowDown') {
+    } else if (event.key === "ArrowDown") {
       nextElement = <HTMLElement>targetElement.nextElementSibling;
     }
 
-    if (nextElement == null)  {
+    if (nextElement == null) {
       return;
     } else {
       nextElement.focus();
