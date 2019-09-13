@@ -145,14 +145,12 @@ func statusUpgradeCmd(cmd *cobra.Command, args []string) error {
 		case resp.CurrentVersion != "":
 			if resp.IsAirgapped {
 				writer.Printf("Automate is up-to-date with airgap bundle (%s)\n", resp.CurrentVersion)
-
 			} else {
 				writer.Printf("Automate is up-to-date (%s)\n", resp.CurrentVersion)
 			}
 		default:
 			if resp.IsAirgapped {
 				writer.Printf("Automate is up-to-date with airgap bundle %s\n", resp.LatestAvailableVersion)
-
 			} else {
 				writer.Printf("Automate is up-to-date (%s)\n", resp.LatestAvailableVersion)
 			}

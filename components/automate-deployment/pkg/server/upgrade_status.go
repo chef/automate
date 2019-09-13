@@ -3,11 +3,10 @@ package server
 import (
 	"context"
 
-	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
-
 	"github.com/pkg/errors"
 
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
 	"github.com/chef/automate/components/automate-deployment/pkg/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/habapi"
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
