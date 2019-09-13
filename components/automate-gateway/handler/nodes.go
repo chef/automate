@@ -5,15 +5,16 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/golang/protobuf/proto"
+	gp "github.com/golang/protobuf/ptypes/empty"
+	"github.com/sirupsen/logrus"
+
 	"github.com/chef/automate/components/automate-gateway/api/nodes"
 	"github.com/chef/automate/components/automate-gateway/protobuf"
 	jobsService "github.com/chef/automate/components/compliance-service/api/jobs"
 	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	nodesService "github.com/chef/automate/components/nodemanager-service/api/nodes"
-	"github.com/golang/protobuf/proto"
-	gp "github.com/golang/protobuf/ptypes/empty"
-	"github.com/sirupsen/logrus"
 )
 
 type Nodes struct {
@@ -56,7 +57,7 @@ func (a *Nodes) Create(ctx context.Context, in *nodes.Node) (*nodes.Id, error) {
 		return nil, err
 	}
 	if autoDetect {
-		a.runDetectJob(ctx, in.Id)
+		a.runDetectJob(ctx, out.Id)
 	}
 	return out, nil
 }
