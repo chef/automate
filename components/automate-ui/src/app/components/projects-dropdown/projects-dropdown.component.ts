@@ -50,6 +50,8 @@ export class ProjectsDropdownComponent implements OnChanges {
       numeric: true,
       sensitivity: "base"
     };
+
+    // look at https://github.com/chef/a2/pull/4434 for "stable sort" example
     sortedProjects.sort((a, b) =>
       a.name.localeCompare(b.name, undefined, opts)
     );
