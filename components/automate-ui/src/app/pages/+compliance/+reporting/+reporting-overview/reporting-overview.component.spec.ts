@@ -5,6 +5,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { CookieModule } from 'ngx-cookie';
 import { of as observableOf } from 'rxjs';
 import * as moment from 'moment';
+import { Router } from '@angular/router';
 import { ReportingOverviewComponent } from './reporting-overview.component';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { StatsService, ReportQueryService, ReportDataService } from '../../shared/reporting';
@@ -19,6 +20,7 @@ describe('ReportingOverviewComponent', () => {
   let component: ReportingOverviewComponent;
   let element: DebugElement;
   let statsService: StatsService;
+  let router: Router;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -44,6 +46,7 @@ describe('ReportingOverviewComponent', () => {
     component = fixture.componentInstance;
     element = fixture.debugElement;
     statsService = element.injector.get(StatsService);
+    router = TestBed.get(Router);
   });
 
   describe('ngOnInit()', () => {
@@ -257,6 +260,114 @@ describe('ReportingOverviewComponent', () => {
           }
         ]);
       });
+    });
+  });
+
+  describe('onPlatformChanged()', () => {
+    it('valid item', () => {
+      spyOn(router, 'navigate');
+
+      component.onPlatformChanged({name: 'ubuntu'});
+
+      expect(router.navigate).toHaveBeenCalledWith(['/compliance', 'reports', 'nodes'],
+        {queryParams: { platform: ['ubuntu'] }});
+    });
+
+    it('invalid item', () => {
+      spyOn(router, 'navigate');
+
+      component.onPlatformChanged({name: ''});
+
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+
+    it('null item', () => {
+      spyOn(router, 'navigate');
+
+      component.onPlatformChanged(null);
+
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('onEnvironmentChanged()', () => {
+    it('valid item', () => {
+      spyOn(router, 'navigate');
+
+      component.onEnvironmentChanged({name: 'dev'});
+
+      expect(router.navigate).toHaveBeenCalledWith(['/compliance', 'reports', 'nodes'],
+        {queryParams: { environment: ['dev'] }});
+    });
+
+    it('invalid item', () => {
+      spyOn(router, 'navigate');
+
+      component.onEnvironmentChanged({name: ''});
+
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+
+    it('null item', () => {
+      spyOn(router, 'navigate');
+
+      component.onEnvironmentChanged(null);
+
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('onProfileChanged()', () => {
+    it('valid item', () => {
+      spyOn(router, 'navigate');
+
+      component.onProfileChanged({id: 'id-1234'});
+
+      expect(router.navigate).toHaveBeenCalledWith(['/compliance', 'reports', 'nodes'],
+        {queryParams: { profile_id: ['id-1234'] }});
+    });
+
+    it('invalid item', () => {
+      spyOn(router, 'navigate');
+
+      component.onProfileChanged({name: ''});
+
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+
+    it('null item', () => {
+      spyOn(router, 'navigate');
+
+      component.onProfileChanged(null);
+
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('onControlChanged()', () => {
+    it('valid item', () => {
+      spyOn(router, 'navigate');
+
+      component.onControlChanged({name: 'id-1234'});
+
+      expect(router.navigate).toHaveBeenCalledWith(['/compliance', 'reports', 'nodes'],
+        {queryParams: { control_id: ['id-1234'] }});
+    });
+
+    it('invalid item', () => {
+      spyOn(router, 'navigate');
+
+      component.onControlChanged({name: ''});
+
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+
+    it('null item', () => {
+      spyOn(router, 'navigate');
+
+      component.onControlChanged(null);
+
+      expect(router.navigate).not.toHaveBeenCalled();
     });
   });
 
