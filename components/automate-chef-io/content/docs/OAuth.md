@@ -40,7 +40,7 @@ bldr_client_secret = "<your Habitat Builder Oauth2 Client Secret>"
 You'll need to add Automate's TLS certificate to Builder's list of accepted certificates
 in addition to these configuration changes.
 Locate Automate's default self-signed certificate by running `cat /hab/svc/automate-load-balancer/data/{{< example_fqdn "automate" >}}.cert`
-You can copy this default certificate then add it to your Builder instance's list of accepted certs.
+You can copy this default certificate, and then add it to your Builder instance's list of accepted certs.
 
 ```text
 -----BEGIN CERTIFICATE-----
