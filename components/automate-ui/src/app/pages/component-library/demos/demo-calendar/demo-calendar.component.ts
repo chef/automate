@@ -16,6 +16,6 @@ export class DemoCalendarComponent {
   }
 
   handleDaySelect(day) {
-    this.date.date(day);
+    this.date = day.clone();
   }
 }

@@ -61,5 +61,11 @@ $day-size: $size * 2.75;
 
   &.i {
     color: $chef-grey;
+    cursor: pointer;
+  }
+
+  &.i:hover {
+    background-color: $chef-primary-bright;
+    color: $chef-white;
   }
 }

@@ -406,7 +406,7 @@ export class ReportingSearchbarComponent implements OnInit {
   }
 
   onDaySelect(day) {
-    this.visibleDate.setDate(day);
+    this.visibleDate = day.toDate();
     this.dateChanged.emit({ detail: new Date(this.visibleDate) });
   }
 

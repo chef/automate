@@ -11,7 +11,7 @@
   <span class="column-header" *ngFor="let name of weekdays">
     {{ name }}
   </span>
-  <span (click)="onDayClick(day[1])" [ngClass]="[ 'day', day[0] ]" *ngFor="let day of days; trackBy: trackBy">
-    {{ day[1] }}
+  <span (click)="onDayClick(day)" [ngClass]="[ 'day', day[0] ]" *ngFor="let day of days; trackBy: trackBy">
+    {{ day[1].date() }}
   </span>
 </div>

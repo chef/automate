@@ -25,7 +25,7 @@ export class CalendarComponent {
 
   @Output() onNextMonth: EventEmitter<[number, number]> = new EventEmitter();
   @Output() onPrevMonth: EventEmitter<[number, number]> = new EventEmitter();
-  @Output() onDaySelect: EventEmitter<number> = new EventEmitter();
+  @Output() onDaySelect: EventEmitter<m.Moment> = new EventEmitter();
 
   constructor() {
     this.month = this.date.month().toString();
@@ -81,9 +81,9 @@ export class CalendarComponent {
     const sy = this.selected.year();
     const today = m().month() === this.date.month() ? m().date() : null;
     const selected = (vm === sm && vy === sy) ? this.selected.date() : null;
-    const tag = (marker) => (d) => [marker, d];
-    const tagActive = (d) => {
-      switch (d) {
+    const tag = (marker) => (d: m.Moment) => [marker, d];
+    const tagActive = (d: m.Moment) => {
+      switch (d.date()) {
       case selected:
         return tag('a s')(d);
       case today:
@@ -107,34 +107,42 @@ export class CalendarComponent {
   // When the first of the month is on any day other than the first
   // day of the week, we need to fill in those extra days. This
   // method returns the last few days of the previous month.
-  private daysBefore(): number[] {
-    const daysInLastMonth = this
+  private daysBefore(): m.Moment[] {
+    const lastMonth = this
       .date
       .clone()
-      .subtract(1, 'month')
-      .daysInMonth();
+      .subtract(1, 'month');
+
+    const daysInLastMonth = lastMonth.daysInMonth();
     const firstDay = this
       .date
       .clone()
       .date(1)
       .day();
 
-    return rangeRight(daysInLastMonth, daysInLastMonth - firstDay);
+    return rangeRight(daysInLastMonth, daysInLastMonth - firstDay).map(
+      (day: number) => lastMonth.clone().date(day));
   }
 
   // Returns the range of dates during the month
-  private daysDuring(): number[] {
+  private daysDuring(): m.Moment[] {
     const daysInThisMonth = this
       .date
       .daysInMonth();
 
-    return range(1, daysInThisMonth + 1);
+    return range(1, daysInThisMonth + 1).map((day: number) => this.date.clone().date(day));
   }
 
   // Returns the first few days of the next month to fill out
   // the rest of the week.
-  private daysAfter(): number[] {
-    return range(1, 8 - ((this.daysBefore().length + this.daysDuring().length) % 7 || 7));
+  private daysAfter(): m.Moment[] {
+    const nextMonth = this
+      .date
+      .clone()
+      .add(1, 'month');
+
+    return range(1, 8 - ((this.daysBefore().length + this.daysDuring().length) % 7 || 7)).map(
+      (day: number) => nextMonth.clone().date(day));
   }
 
   public onNextMonthClick() {
@@ -148,7 +156,7 @@ export class CalendarComponent {
   }
 
   public onDayClick(day) {
-    this.onDaySelect.emit(day);
+    this.onDaySelect.emit(day[1].clone());
   }
 
   trackBy(index, _item) {
