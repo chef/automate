@@ -847,12 +847,16 @@
   version = "v6.2.16"
 
 [[projects]]
-  digest = "1:2c92a3d315c2605f6cb16ccb05aa14fdf9b375d678badb653cd2e8c54c36d40e"
+  digest = "1:2e9a0991621e2376b1cceb29d1b2524554a4b8eef815dae51d891fdd71f217d6"
   name = "github.com/open-policy-agent/opa"
   packages = [
     "ast",
+    "bundle",
     "internal/compiler/wasm",
     "internal/compiler/wasm/opa",
+    "internal/file",
+    "internal/file/archive",
+    "internal/file/url",
     "internal/ir",
     "internal/leb128",
     "internal/planner",
@@ -863,6 +867,7 @@
     "internal/wasm/module",
     "internal/wasm/opcode",
     "internal/wasm/types",
+    "loader",
     "metrics",
     "rego",
     "storage",
@@ -881,7 +886,8 @@
     "version",
   ]
   pruneopts = "NUT"
-  revision = "0d70daa545f5a4bf2e6edf3c1b2d635920299bc9"
+  revision = "8d1cc7e7e9cf019e1e9fd114d61b14dc82460e80"
+  version = "v0.14.0"
 
 [[projects]]
   digest = "1:7da29c22bcc5c2ffb308324377dc00b5084650348c2799e573ed226d8cc9faf0"
