@@ -114,63 +114,6 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
     }
   }
 
-  onPlatformChanged(platformItem) {
-    const typeName = 'platform';
-    if (platformItem && platformItem.name) {
-      const {queryParamMap} = this.route.snapshot;
-      const queryParams = {...this.route.snapshot.queryParams};
-      const existingValues = queryParamMap.getAll(typeName).filter(
-        v => v !== platformItem.name).concat(platformItem.name);
-
-      queryParams[typeName] = existingValues;
-
-      this.router.navigate(['/compliance', 'reports', 'nodes'], {queryParams});
-    }
-  }
-
-  onEnvironmentChanged(environmentItem) {
-    const typeName = 'environment';
-    if (environmentItem && environmentItem.name) {
-      const {queryParamMap} = this.route.snapshot;
-      const queryParams = {...this.route.snapshot.queryParams};
-      const existingValues = queryParamMap.getAll(typeName).filter(
-        v => v !== environmentItem.name).concat(environmentItem.name);
-
-      queryParams[typeName] = existingValues;
-
-      this.router.navigate(['/compliance', 'reports', 'nodes'], {queryParams});
-    }
-  }
-
-  onProfileChanged(profileItem) {
-    const typeName = 'profile_id';
-    if (profileItem && profileItem.id) {
-      const {queryParamMap} = this.route.snapshot;
-      const queryParams = {...this.route.snapshot.queryParams};
-      const existingValues = queryParamMap.getAll(typeName).filter(
-        v => v !== profileItem.id).concat(profileItem.id);
-
-      this.reportQuery.setFilterTitle(typeName, profileItem.id, profileItem.name);
-      queryParams[typeName] = existingValues;
-
-      this.router.navigate(['/compliance', 'reports', 'nodes'], {queryParams});
-    }
-  }
-
-  onControlChanged(controlItem) {
-    const typeName = 'control_id';
-    if (controlItem && controlItem.name) {
-      const {queryParamMap} = this.route.snapshot;
-      const queryParams = {...this.route.snapshot.queryParams};
-      const existingValues = queryParamMap.getAll(typeName).filter(
-        v => v !== controlItem.name).concat(controlItem.name);
-
-      queryParams[typeName] = existingValues;
-
-      this.router.navigate(['/compliance', 'reports', 'nodes'], {queryParams});
-    }
-  }
-
   getNodeStatusData(reportQuery: ReportQuery) {
     this.getNodeStatusFailures(reportQuery);
     this.getNodeSummary(reportQuery);

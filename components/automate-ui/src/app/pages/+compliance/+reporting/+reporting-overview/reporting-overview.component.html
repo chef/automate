@@ -68,8 +68,7 @@
         </div>
         <app-overview-failures
           *ngIf="!nodeBubbleLoading && !platformBubbleEmpty"
-          [data]="bubblePlatformFailures"
-          (itemSelected)="onPlatformChanged($event)">
+          [data]="bubblePlatformFailures">
         </app-overview-failures>
       </div>
       <figcaption>Top Platform Failures</figcaption>
@@ -84,8 +83,7 @@
         </div>
         <app-overview-failures
           *ngIf="!nodeBubbleLoading && !envBubbleEmpty"
-          [data]="bubbleEnvFailures"
-          (itemSelected)="onEnvironmentChanged($event)">
+          [data]="bubbleEnvFailures">
         </app-overview-failures>
       </div>
       <figcaption>Top Environment Failures</figcaption>
@@ -158,8 +156,7 @@
         </div>
         <app-overview-failures
           *ngIf="!profileBubbleLoading && !profileBubbleEmpty"
-          [data]="bubbleProfileFailures"
-          (itemSelected)="onProfileChanged($event)">
+          [data]="bubbleProfileFailures">
         </app-overview-failures>
       </div>
       <figcaption>Top Profile Failures</figcaption>
@@ -174,8 +171,7 @@
         </div>
         <app-overview-failures
           *ngIf="!profileBubbleLoading && !controlBubbleEmpty"
-          [data]="bubbleControlFailures"
-          (itemSelected)="onControlChanged($event)">
+          [data]="bubbleControlFailures">
         </app-overview-failures>
       </div>
       <figcaption>Top Control Failures</figcaption>
