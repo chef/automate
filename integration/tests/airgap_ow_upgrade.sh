@@ -3,8 +3,7 @@
 #shellcheck disable=SC2034
 test_name="airgap_ow_upgrade"
 test_upgrades=true
-test_diagnostics_filters="~purge" # remove purge until 1219 is in current
-
+test_diagnostics_filters="~purge"
 
 CURRENT_OLDEST_VERSION=20190501153509
 OLD_MANIFEST_DIR="${A2_ROOT_DIR}/components/automate-deployment/testdata/old_manifests/"
