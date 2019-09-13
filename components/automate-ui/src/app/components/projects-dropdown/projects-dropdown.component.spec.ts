@@ -24,15 +24,21 @@ describe("ProjectsDropdownComponent", () => {
     expect(component).toBeTruthy();
   });
 
-  describe("projectsArray()", () => {
-    // might need a before each here
-    it("it returns an object naturally ordered by name", () => {
+  describe("#projectsArray", () => {
+    it("#projectsArray returns an object naturally ordered by name", () => {
       // tslint:disable-next-line: no-unused-expression
-      let projects: [
+      let unsortedProjects: [
         {
           checked: false;
           id: "123abc";
           name: "123abc";
+          status: "NO_RULES";
+          type: "CUSTOM";
+        },
+        {
+          checked: false;
+          id: "project-6";
+          name: "project-6";
           status: "NO_RULES";
           type: "CUSTOM";
         },
@@ -56,16 +62,12 @@ describe("ProjectsDropdownComponent", () => {
           name: "abc123";
           status: "NO_RULES";
           type: "CUSTOM";
-        },
-        {
-          checked: false;
-          id: "project-6";
-          name: "project-6";
-          status: "NO_RULES";
-          type: "CUSTOM";
         }
       ];
       // usage and expects go here
+      const dropdownComponent = new ProjectsDropdownComponent();
+      dropdownComponent.projects = { inputObj: unsortedProjects };
+      expect(dropdownComponent.projectsArray().length).toBe(1);
     });
   });
 });
