@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/automate-deployment/pkg/airgap"
 	"github.com/chef/automate/components/automate-deployment/pkg/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/habapi"
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
@@ -43,6 +44,8 @@ func (s *server) UpgradeStatus(ctx context.Context, _ *api.UpgradeStatusRequest)
 
 	response.LatestAvailableVersion = latestManifest.Version()
 	response.DesiredVersion = desiredManifest.Version()
+	response.IsAirgapped = airgap.AirgapInUse()
+	response.IsConvergeDisable = (s.convergeLoop != nil && !s.convergeLoop.IsRunning()) || s.convergeDisabled()
 
 	if s.deployment.CurrentReleaseManifest == nil {
 		response.CurrentVersion = ""

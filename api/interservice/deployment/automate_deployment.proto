@@ -198,6 +198,11 @@ message UpgradeStatusResponse {
 	// current_version is the manifest in use by the deployment
 	// right now.
 	string current_version = 6;
+	// is_airgapped is true if the deployment is in airgap mode
+	bool is_airgapped = 7;
+	// is_converge_disable is true if converging has been disabled.
+	// This will prevent things from upgrading
+	bool is_converge_disable = 8;
 
 	enum UpgradeState {
 		// UNKNOWN indicates that we were not able to
