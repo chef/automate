@@ -40,7 +40,7 @@ func InitCerealManager(m *cereal.Manager, workerCount int, ingestClient ingest.C
 
 	err = m.RegisterTaskExecutor("create-child", &CreateChildTask{
 		scanner,
-	}, cereal.TaskExecutorOpts{Workers: 1})
+	}, cereal.TaskExecutorOpts{Workers: workerCount})
 	if err != nil {
 		return err
 	}
@@ -49,7 +49,7 @@ func InitCerealManager(m *cereal.Manager, workerCount int, ingestClient ingest.C
 		remoteInspecVersion,
 		scanner,
 		resolver,
-	}, cereal.TaskExecutorOpts{Workers: 1})
+	}, cereal.TaskExecutorOpts{Workers: workerCount})
 	if err != nil {
 		return err
 	}
@@ -64,7 +64,7 @@ func InitCerealManager(m *cereal.Manager, workerCount int, ingestClient ingest.C
 
 	return m.RegisterTaskExecutor("scan-job-summary", &InspecJobSummaryTask{
 		scanner,
-	}, cereal.TaskExecutorOpts{Workers: 1})
+	}, cereal.TaskExecutorOpts{Workers: workerCount})
 }
 
 type LostJob struct {
