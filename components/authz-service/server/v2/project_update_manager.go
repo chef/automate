@@ -407,9 +407,10 @@ func (m *CerealProjectUpdateManager) Status() (ProjectUpdateStatus, error) {
 
 // Find the longest estimate that is in the future. If no estimate is found return zero time.Time{}
 func findLongestEstimatedTime(estimatedTimes []time.Time) time.Time {
+	now := time.Now()
 	longestEstimatedTimeComplete := time.Time{}
 	for _, estimatedTime := range estimatedTimes {
-		if estimatedTime.After(time.Now()) && estimatedTime.After(longestEstimatedTimeComplete) {
+		if estimatedTime.After(now) && estimatedTime.After(longestEstimatedTimeComplete) {
 			longestEstimatedTimeComplete = estimatedTime
 		}
 	}
@@ -423,7 +424,7 @@ func (w *workflowInstance) collectAllDomainServiceEstimates() []time.Time {
 		return estimates
 	}
 	domainServicesUpdateInstance, err := w.GetUpdateDomainServicesInstance()
-	if err == cereal.ErrWorkflowInstanceNotFound {
+	if err != nil {
 		return estimates
 	}
 
@@ -439,8 +440,10 @@ func (w *workflowInstance) collectAllDomainServiceEstimates() []time.Time {
 				logrus.WithError(err).Errorf("failed to get payload for %q", d)
 				continue
 			}
-			estimatedTime := time.Unix(payload.MergedJobStatus.EstimatedEndTimeInSec, 0)
-			estimates = append(estimates, estimatedTime)
+			if payload.MergedJobStatus.EstimatedEndTimeInSec != 0 {
+				estimatedTime := time.Unix(payload.MergedJobStatus.EstimatedEndTimeInSec, 0)
+				estimates = append(estimates, estimatedTime)
+			}
 		}
 	}
 
