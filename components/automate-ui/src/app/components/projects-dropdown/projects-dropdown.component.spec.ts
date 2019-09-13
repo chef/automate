@@ -1,18 +1,17 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
 
-import { ProjectsDropdownComponent } from './projects-dropdown.component';
+import { ProjectsDropdownComponent } from "./projects-dropdown.component";
 
-describe('ProjectsDropdownComponent', () => {
+describe("ProjectsDropdownComponent", () => {
   let component: ProjectsDropdownComponent;
   let fixture: ComponentFixture<ProjectsDropdownComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ProjectsDropdownComponent ],
-      schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
-    })
-    .compileComponents();
+      declarations: [ProjectsDropdownComponent],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -21,7 +20,52 @@ describe('ProjectsDropdownComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
+  });
+
+  describe("projectsArray()", () => {
+    // might need a before each here
+    it("it returns an object naturally ordered by name", () => {
+      // tslint:disable-next-line: no-unused-expression
+      let projects: [
+        {
+          checked: false;
+          id: "123abc";
+          name: "123abc";
+          status: "NO_RULES";
+          type: "CUSTOM";
+        },
+        {
+          checked: false;
+          id: "12345zero";
+          name: "12345zero";
+          status: "NO_RULES";
+          type: "CUSTOM";
+        },
+        {
+          checked: false;
+          id: "123xyz";
+          name: "123xyz";
+          status: "NO_RULES";
+          type: "CUSTOM";
+        },
+        {
+          checked: false;
+          id: "abc123";
+          name: "abc123";
+          status: "NO_RULES";
+          type: "CUSTOM";
+        },
+        {
+          checked: false;
+          id: "project-6";
+          name: "project-6";
+          status: "NO_RULES";
+          type: "CUSTOM";
+        }
+      ];
+      // usage and expects go here
+    });
   });
 });
