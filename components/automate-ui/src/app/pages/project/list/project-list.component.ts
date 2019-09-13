@@ -54,6 +54,11 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   // is not available soon enough--we need to know the instant the user starts the update.
   private applyRulesInProgress = false;
 
+  // True if there are any rules that have a status of 'EDITS_PENDING'.
+  private projectsHaveStagedChanges = false;
+
+  private percentageComplete = 0;
+
   private updateProjectsFailed = false;
   private updateProjectsCancelled = false;
   public cancelRulesInProgress = false;
@@ -81,28 +86,19 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.iamMajorVersion$ = store.select(iamMajorVersion);
     this.projectsEnabled$ = store.select(atLeastV2p1);
 
-    this.applyRulesButtonText$ = this.projects.applyRulesStatus$.pipe(
-      filter(() => !this.cancelRulesInProgress),
-      map(({ state, percentageComplete }: ApplyRulesStatus) => {
-        switch (state) {
-          case ApplyRulesStatusState.NotRunning:
-            return 'Update Projects';
-          case ApplyRulesStatusState.Running:
-            return `Updating Projects ${Math.round(percentageComplete * 100)}%...`;
-        }
-      })
-    );
-
     this.projects.applyRulesStatus$
-      .subscribe(({ state, failed, cancelled }: ApplyRulesStatus) => {
+      .subscribe(({ state, failed, cancelled, percentageComplete }: ApplyRulesStatus) => {
         if (state === ApplyRulesStatusState.NotRunning) {
           if (this.applyRulesInProgress) {
             this.cancelRulesInProgress = false;
             this.closeConfirmApplyStopModal();
           }
           this.applyRulesInProgress = false;
-          this.updateProjectsFailed = failed;
-          this.updateProjectsCancelled = cancelled;
+        }
+        this.updateProjectsFailed = failed;
+        this.updateProjectsCancelled = cancelled;
+        if (!this.cancelRulesInProgress) {
+          this.percentageComplete = percentageComplete;
         }
       });
 
@@ -112,6 +108,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       filter(() => !this.applyRulesInProgress)
     ).subscribe((projectList: Project[]) => {
       this.statusCache = projectList.reduce((m, p) => ({ ...m, [p.id]: p.status }), {});
+      this.projectsHaveStagedChanges = projectList.some(p => p.status === 'EDITS_PENDING');
     });
 
     this.createProjectForm = fb.group({
@@ -149,6 +146,16 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   // Note: This will be dealt with later, right now, we don't check if it's used
   public inUseMessage(): string {
     return '';
+  }
+
+  getButtonText(): string {
+    if (this.applyRulesInProgress) {
+      return `Updating Projects ${Math.round(this.percentageComplete * 100)}%...`;
+    }
+    if (this.projectsHaveStagedChanges) {
+      return 'Update Projects';
+    }
+    return 'Projects Up-To-Date';
   }
 
   public createProject(): void {
