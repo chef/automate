@@ -23,12 +23,14 @@ export interface PermEntityState {
   readonly byId: IndexedEntities<UserPermEntity>;
   readonly allIds: string[];
   readonly status: Status;
+  readonly lastTimeFetchAll: Date;
 }
 
 const initialState: PermEntityState = {
   byId: {},
   allIds: [],
-  status: Status.notLoaded
+  status: Status.notLoaded,
+  lastTimeFetchAll: new Date(0)
 };
 
 export function permEntityReducer(
@@ -52,6 +54,7 @@ export function permEntityReducer(
       const allPerms = permIndexer(allPairs);
 
       return pipe(
+        set('lastTimeFetchAll', new Date()),
         set('status', Status.loadingSuccess),
         set('byId', allPerms),
         set('allIds', keys(allPerms))
