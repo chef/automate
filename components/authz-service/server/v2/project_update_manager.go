@@ -320,35 +320,7 @@ func (w *workflowInstance) PercentageComplete() float64 {
 }
 
 func (w *workflowInstance) EstimatedTimeComplete() time.Time {
-	if !w.IsRunning() {
-		return time.Now()
-	}
-	domainServicesUpdateInstance, err := w.GetUpdateDomainServicesInstance()
-	if err == cereal.ErrWorkflowInstanceNotFound {
-		return time.Now()
-	}
-
-	longestEstimatedTimeComplete := time.Time{}
-	for _, d := range domainServicesUpdateInstance.ListSubWorkflows() {
-		subWorkflow, err := domainServicesUpdateInstance.GetSubWorkflow(d)
-		if err != nil {
-			logrus.WithError(err).Errorf("failed to get subworkflow for %q", d)
-			continue
-		}
-		payload := project_update_tags.DomainProjectUpdateWorkflowPayload{}
-		if subWorkflow.IsRunning() {
-			if err := subWorkflow.GetPayload(&payload); err != nil {
-				logrus.WithError(err).Errorf("failed to get payload for %q", d)
-				continue
-			}
-			estimatedTime := time.Unix(payload.MergedJobStatus.EstimatedEndTimeInSec, 0)
-			if estimatedTime.After(longestEstimatedTimeComplete) {
-				longestEstimatedTimeComplete = estimatedTime
-			}
-		}
-	}
-
-	return longestEstimatedTimeComplete
+	return findLongestEstimatedTime(w.collectAllDomainServiceEstimates())
 }
 
 func (w *workflowInstance) State() ProjectUpdateState {
@@ -431,4 +403,49 @@ func (m *CerealProjectUpdateManager) Status() (ProjectUpdateStatus, error) {
 		return nil, err
 	}
 	return projectUpdateInstance, nil
+}
+
+// Find the longest estimate that is in the future. If no estimate is found return zero time.Time{}
+func findLongestEstimatedTime(estimatedTimes []time.Time) time.Time {
+	now := time.Now()
+	longestEstimatedTimeComplete := time.Time{}
+	for _, estimatedTime := range estimatedTimes {
+		if estimatedTime.After(now) && estimatedTime.After(longestEstimatedTimeComplete) {
+			longestEstimatedTimeComplete = estimatedTime
+		}
+	}
+
+	return longestEstimatedTimeComplete
+}
+
+func (w *workflowInstance) collectAllDomainServiceEstimates() []time.Time {
+	estimates := make([]time.Time, 0)
+	if !w.IsRunning() {
+		return estimates
+	}
+	domainServicesUpdateInstance, err := w.GetUpdateDomainServicesInstance()
+	if err != nil {
+		return estimates
+	}
+
+	for _, d := range domainServicesUpdateInstance.ListSubWorkflows() {
+		subWorkflow, err := domainServicesUpdateInstance.GetSubWorkflow(d)
+		if err != nil {
+			logrus.WithError(err).Errorf("failed to get subworkflow for %q", d)
+			continue
+		}
+		payload := project_update_tags.DomainProjectUpdateWorkflowPayload{}
+		if subWorkflow.IsRunning() {
+			if err := subWorkflow.GetPayload(&payload); err != nil {
+				logrus.WithError(err).Errorf("failed to get payload for %q", d)
+				continue
+			}
+			if payload.MergedJobStatus.EstimatedEndTimeInSec != 0 {
+				estimatedTime := time.Unix(payload.MergedJobStatus.EstimatedEndTimeInSec, 0)
+				estimates = append(estimates, estimatedTime)
+			}
+		}
+	}
+
+	return estimates
 }
