@@ -52,7 +52,7 @@ export class UIComponent implements OnInit {
     // ActivationEnd specifically needs to be here in the constructor to catch early events.
     this.router.events.pipe(
       filter(event => event instanceof ActivationEnd)
-    ).subscribe((event: any) => {
+    ).subscribe((event: ActivationEnd) => {
       this.renderNavbar = typeof event.snapshot.data.hideNavBar !== 'undefined'
         ? !event.snapshot.data.hideNavBar
         : this.renderNavbar;
@@ -62,7 +62,7 @@ export class UIComponent implements OnInit {
   ngOnInit(): void {
     this.router.events.pipe(
         filter(event => event instanceof ActivationStart)
-    ).subscribe((event: any) => this.renderNavbar = !event.snapshot.data.hideNavBar);
+    ).subscribe((event: ActivationStart) => this.renderNavbar = !event.snapshot.data.hideNavBar);
 
     this.router.events.pipe(
         filter(event => event instanceof NavigationEnd)
