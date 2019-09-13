@@ -57,6 +57,12 @@ export class ReportingComponent implements OnInit, OnDestroy {
   // Query search bar
   availableFilterTypes = [
     {
+      'name': 'organization',
+      'title': 'Chef Organization',
+      'description': 'Add the organization to filter this report to a specific organization',
+      'placeholder': 'Organization'
+    },
+    {
       'name': 'chef_server',
       'title': 'Chef Server',
       'description': '',
@@ -64,9 +70,9 @@ export class ReportingComponent implements OnInit, OnDestroy {
     },
     {
       'name': 'chef_tags',
-      'title': 'Chef Tags',
+      'title': 'Chef Tag',
       'description': '',
-      'placeholder': 'Chef Tags'
+      'placeholder': 'Chef Tag'
     },
     {
       'name': 'control',
@@ -91,12 +97,6 @@ export class ReportingComponent implements OnInit, OnDestroy {
       'title': 'Node Name',
       'description': 'Add the node name to filter this report against a specific node',
       'placeholder': 'Node Name'
-    },
-    {
-      'name': 'organization',
-      'title': 'Organization',
-      'description': 'Add the organization to filter this report to a specific organization',
-      'placeholder': 'Organization'
     },
     {
       'name': 'platform',
