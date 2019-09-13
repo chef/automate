@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivationStart, ActivationEnd, Router } from '@angular/router';
+import { ActivationStart, ActivationEnd, Router, NavigationEnd } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -12,6 +12,7 @@ import { notificationState } from 'app/entities/notifications/notification.selec
 import { Notification } from 'app/entities/notifications/notification.model';
 import { DeleteNotification } from 'app/entities/notifications/notification.actions';
 import { LicenseApplyReason } from 'app/page-components/license-apply/license-apply.component';
+import { GetAllUserPerms } from './entities/userperms/userperms.actions';
 
 @Component({
   selector: 'app-ui',
@@ -62,6 +63,13 @@ export class UIComponent implements OnInit {
     this.router.events.pipe(
         filter(event => event instanceof ActivationStart)
     ).subscribe((event: any) => this.renderNavbar = !event.snapshot.data.hideNavBar);
+
+    this.router.events.pipe(
+        filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => this.store.dispatch(new GetAllUserPerms()));
+
+    // Initial call
+    this.store.dispatch(new GetAllUserPerms());
 
     // Initial calls for polled events
     this.store.dispatch(new GetIamVersion());
