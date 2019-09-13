@@ -162,7 +162,7 @@ ca_contents = "<your ca contents>" # optional
 # group_display_name_attr = "displayName"
 ```
 
-### Extended LDAP Settings
+## Extended LDAP Settings
 
 For those who do not use Microsoft AD or require greater control over their configuration,
 Chef Automate has the following customizable LDAP configuration settings:
@@ -215,7 +215,7 @@ user_id_attr
 user_display_name_attr
 : "your user display name attribute"
 
-#### Example Extended LDAP config.toml
+### Example Extended LDAP config.toml
 
 ```toml
 [dex.v1.sys.connectors.ldap]
