@@ -631,8 +631,9 @@ Uncomment and change settings as needed, then run `chef-automate config patch </
 
 To configure PostgreSQL for your Chef Automate installation, create a TOML file that contains the partial configuration below. Uncomment and change settings as needed, with the following caveats:
 
-* Chef Automate currently does not support use of an external Postgres database
-* Chef Automate uses TLS mutual authentication to communicate with its Postgres database
+* These configuration settings affect only the Automate-deployed PostgreSQL database. They
+ do not affect an [externally-deployed PostgreSQL database]({{< relref "install.md#configuring-an-external-postgresql-database" >}}).
+* Chef Automate uses TLS mutual authentication to communicate with its PostgreSQL database.
 
 Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
