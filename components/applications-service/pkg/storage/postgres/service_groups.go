@@ -83,22 +83,18 @@ const (
   GROUP BY s.service_group_id, s.application, s.environment, s.service_group_name, s.service_group_name_suffix ) as sghc
 `
 	selectServiceGroupHealthFilterCRITICAL = `
-  WHERE
    health_critical > 0
 `
 	selectServiceGroupHealthFilterUNKNOWN = `
-  WHERE
    health_unknown  > 0
    AND health_critical = 0
 `
 	selectServiceGroupHealthFilterWARNING = `
-  WHERE
    health_warning  > 0
    AND health_critical = 0
    AND health_unknown  = 0
 `
 	selectServiceGroupHealthFilterOK = `
-  WHERE
    health_ok > 0
    AND health_critical = 0
    AND health_warning  = 0
@@ -200,29 +196,33 @@ func (db *Postgres) GetServiceGroups(
 func formatQueryFilters(filters map[string][]string, includeStatusFilter bool) (string, error) {
 	var (
 		err                 error
-		statusQuery         string
 		whereQuery          string
 		selectAllPartsQuery string
 		selectQuery         string
+		statusFilters       []string
 	)
 	packageWhereQuery := ``
 	first := true
-	statusFilter := false
 	for filter, values := range filters {
 		if len(values) == 0 {
 			continue
 		}
 		switch filter {
 		case "status", "STATUS":
-			// @afiune What if the user specify more than one Status Filter?
-			// status=["ok", "critical"]
 			if includeStatusFilter {
 				// We do not want to include the status filter for the health counts
 				// because we want the counts of all statuses (statii? statera? I leave this for the linguists)
-				statusFilter = true
-				statusQuery, err = queryFromStatusFilter(values[0])
+				filter, err := queryFromStatusFilter(values[0])
 				if err != nil {
 					return "", err
+				}
+				statusFilters = append(statusFilters, filter)
+			}
+		case "connectedStatus", "CONNECTEDSTATUS":
+			if includeStatusFilter {
+				// query parameter `connectedStatus=disconnected` in the URL
+				if values[0] == "disconnected" {
+					statusFilters = append(statusFilters, "disconnected_count > 0")
 				}
 			}
 		case "environment", "ENVIRONMENT":
@@ -275,13 +275,14 @@ func formatQueryFilters(filters map[string][]string, includeStatusFilter bool) (
 			first = false
 		}
 	}
-	if statusFilter {
-		// The status query has to go outside of the inner query because the health count filters need to be calculated
-		// in order to be used in the where clause
-		selectAllPartsQuery = selectServiceGroupHealthFirst + packageWhereQuery + selectServiceGroupHealthSecond + whereQuery + groupByPart + statusQuery
-	} else {
-		selectAllPartsQuery = selectServiceGroupHealthFirst + packageWhereQuery + selectServiceGroupHealthSecond + whereQuery + groupByPart
+	statusFilterSQL := ""
+	if len(statusFilters) > 0 {
+		statusFilterSQL = fmt.Sprintf("WHERE %s", strings.Join(statusFilters, " AND "))
 	}
+
+	// The status query has to go outside of the inner query because the health count filters need to be calculated
+	// in order to be used in the where clause
+	selectAllPartsQuery = selectServiceGroupHealthFirst + packageWhereQuery + selectServiceGroupHealthSecond + whereQuery + groupByPart + statusFilterSQL
 	return selectAllPartsQuery, nil
 }
 
