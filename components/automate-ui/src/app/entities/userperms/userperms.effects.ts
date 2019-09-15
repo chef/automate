@@ -3,7 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Store } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import {
-  debounceTime,
+  throttleTime,
   mergeMap,
   map,
   catchError,
@@ -38,12 +38,11 @@ export class UserPermEffects {
     private store: Store<NgrxStateAtom>
   ) { }
 
+  private freshLimitInMilliseconds = 30000;
   @Effect()
   fetchAllPerms$ = this.actions$.pipe(
     ofType(UserPermsTypes.GET_ALL),
-    debounceTime(20), // each request of this type is a true duplicate so debounce them
-    withLatestFrom(this.store.select(getlastFetchTime)),
-    filter(([_action, lastTime]) => this.stale(lastTime)),
+    throttleTime(this.freshLimitInMilliseconds),
     switchMap(() => {
       return this.requests.fetchAll().pipe(
         map((resp: UserPermsResponsePayload) => new GetAllUserPermsSuccess(resp.endpoints)),
