@@ -38,7 +38,13 @@ export function permEntityReducer(
 
   switch (action.type) {
 
-    case UserPermsTypes.GET_ALL:
+    case UserPermsTypes.GET_ALL: {
+      return pipe(
+        set('lastTimeFetchAll', new Date()),
+        set('status', Status.loading)
+      )(state) as PermEntityState;
+    }
+
     case UserPermsTypes.GET_SOME: {
       return set('status', Status.loading, state) as PermEntityState;
     }
@@ -56,7 +62,6 @@ export function permEntityReducer(
       const allPerms = defaults(state.byId, permIndexer(allPairs));
 
       return pipe(
-        set('lastTimeFetchAll', new Date()),
         set('status', Status.loadingSuccess),
         set('byId', allPerms),
         set('allIds', keys(allPerms))

@@ -38,7 +38,14 @@ export class UserPermEffects {
     private store: Store<NgrxStateAtom>
   ) { }
 
+  // the target limit
   private freshLimitInMilliseconds = 30000;
+
+  // to account for a flurry of IntrospectSome calls almost concurrent
+  // with our IntrospectAll call--this will happen frequently!--just
+  // extend the fresh limit by a nudge for the IntrospectSome calls
+  private freshLimitPlusANudge = 33000;
+
   @Effect()
   fetchAllPerms$ = this.actions$.pipe(
     ofType(UserPermsTypes.GET_ALL),
@@ -66,9 +73,7 @@ export class UserPermEffects {
       map((resp: UserPermsResponsePayload) => new GetUserParamPermsSuccess(resp.endpoints)),
       catchError((error: HttpErrorResponse) => of(new GetUserParamPermsFailure(error))))));
 
-  private freshLimitInSeconds = 30;
-
   private stale(lastTime: Date): boolean {
-    return moment().diff(moment(lastTime), 'seconds') > this.freshLimitInSeconds;
+    return moment().diff(moment(lastTime)) > this.freshLimitPlusANudge;
   }
 }
