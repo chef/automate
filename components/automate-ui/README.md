@@ -27,16 +27,16 @@ _Contents of this file:_
 1. node. We currently use node 10.15.2, but the current version number is always
    present in the **.nvmrc** file. Use [NVM](https://github.com/nvm-sh/nvm) to install node.
 
-1. npm. We currently use npm 6.4.1 which ships with node 10.15.2 so no additional
+2. npm. We currently use npm 6.4.1 which ships with node 10.15.2 so no additional
    installation should be necessary.
 
-1. [direnv](https://direnv.net/). This can be installed with `brew install direnv`. With this installed, once you enter the project directory you'll be
+3. [direnv](https://direnv.net/). This can be installed with `brew install direnv`. With this installed, once you enter the project directory you'll be
    prompted to run `direnv allow`.
 
-1. To ensure you're using the correct version of node, run `nvm use` from `/automate-ui`
+4. To ensure you're using the correct version of node, run `nvm use` from `/automate-ui`
    and install the correct version if necessary.
 
-1. Once everything is setup correctly you should be able to `npm install` without
+5. Once everything is setup correctly you should be able to `npm install` without
    any permission errors.
 
 Having a Github token in `.netrc` allows some command line utilities (including
