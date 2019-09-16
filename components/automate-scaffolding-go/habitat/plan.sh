@@ -1,5 +1,5 @@
 pkg_name=automate-scaffolding-go
-pkg_origin=core
+pkg_origin=chef
 pkg_description="Scaffolding for Automate Go Applications internally at Chef Software Inc."
 pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_version="0.1.0"
