@@ -66,24 +66,19 @@ describe('ProjectsDropdownComponent', () => {
 
       // assign unsorted projects for the component to use
       component.projects = unsortedProjects;
+      const sortedProjects = component
+        .projectsArray()
+        .map(project => project.name);
 
       // expect sorted outcomes here
-      expect(component.projectsArray().length).toBe(5);
-      expect(component.projectsArray()[0]).toEqual(
-        jasmine.objectContaining({ name: '123abc' })
-      );
-      expect(component.projectsArray()[1]).toEqual(
-        jasmine.objectContaining({ name: '123xyz' })
-      );
-      expect(component.projectsArray()[2]).toEqual(
-        jasmine.objectContaining({ name: '12345zero' })
-      );
-      expect(component.projectsArray()[3]).toEqual(
-        jasmine.objectContaining({ name: 'abc123' })
-      );
-      expect(component.projectsArray()[4]).toEqual(
-        jasmine.objectContaining({ name: 'project-6' })
-      );
+      expect(sortedProjects.length).toBe(5);
+      expect(sortedProjects).toEqual([
+        '123abc',
+        '123xyz',
+        '12345zero',
+        'abc123',
+        'project-6'
+      ]);
     });
   });
 });
