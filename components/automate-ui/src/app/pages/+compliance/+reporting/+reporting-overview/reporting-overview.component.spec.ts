@@ -57,6 +57,14 @@ describe('ReportingOverviewComponent', () => {
   });
 
   describe('onDateChanged()', () => {
+    it('change to todays date', () => {
+      spyOn(router, 'navigate');
+
+      component.onDateChanged(moment().utc());
+
+      expect(router.navigate).toHaveBeenCalledWith([], {queryParams: {}});
+    });
+
     it('valid date', () => {
       spyOn(router, 'navigate');
 
