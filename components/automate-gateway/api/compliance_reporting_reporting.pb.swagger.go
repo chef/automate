@@ -18,9 +18,9 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/compliance/reporting/control-items": {
+    "/compliance/reporting/controls": {
       "post": {
-        "summary": "should cover /control-items\nThis api is useful for getting a limited list of control items for latest runs.  It also honors all reporting filters",
+        "summary": "should cover /controls\nThis api is useful for getting a limited list of control items for latest runs.  It also honors all reporting filters",
         "operationId": "ListControlItems",
         "responses": {
           "200": {

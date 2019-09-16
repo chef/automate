@@ -606,7 +606,7 @@ func (backend *ES2Backend) GetControlListItems(from int32, perPage int32, filter
 
 	source, err := searchSource.Source()
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("%s unable to get Source", myName))
+		return nil, errors.Wrapf(err, "%s unable to get Source", myName)
 	}
 	LogQueryPartMin(esIndex, source, fmt.Sprintf("%s query", myName))
 
@@ -627,14 +627,16 @@ func (backend *ES2Backend) GetControlListItems(from int32, perPage int32, filter
 			if controlBuckets, found := filteredControls.Aggregations.Terms("control"); found && len(controlBuckets.Buckets) > 0 {
 				for _, controlBucket := range controlBuckets.Buckets {
 					contListItem := reportingapi.ControlItem{}
-					contListItem.Id = controlBucket.Key.(string)
+					id, ok := controlBucket.Key.(string)
+					if !ok {
+						logrus.Errorf("could not convert the value of controlBucket: %v, to a string!", controlBucket)
+					}
+					contListItem.Id = id
 					controlSummary := &reportingapi.ControlSummary{
 						Passed:  &reportingapi.Total{},
 						Skipped: &reportingapi.Total{},
 						Failed:  &reportingapi.Failed{},
 					}
-
-					profileMin := &reportingapi.ProfileMin{}
 
 					if aggResult, found := controlBucket.Aggregations.Terms("title"); found {
 						//there can only be one
@@ -657,6 +659,7 @@ func (backend *ES2Backend) GetControlListItems(from int32, perPage int32, filter
 						controlSummary.Total = int32(impactBucket.DocCount)
 					}
 
+					profileMin := &reportingapi.ProfileMin{}
 					if profileResult, found := controlBucket.Aggregations.ReverseNested("profile"); found {
 						if result, found := profileResult.Terms("sha"); found &&
 							len(result.Buckets) > 0 {
@@ -680,6 +683,7 @@ func (backend *ES2Backend) GetControlListItems(from int32, perPage int32, filter
 							profileMin.Version = string(name)
 						}
 					}
+					contListItem.Profile = profileMin
 
 					if endTimeResult, found := controlBucket.Aggregations.ReverseNested("end_time"); found {
 						if result, found := endTimeResult.Terms("most_recent_report"); found &&
@@ -701,8 +705,6 @@ func (backend *ES2Backend) GetControlListItems(from int32, perPage int32, filter
 							}
 						}
 					}
-
-					contListItem.Profile = profileMin
 
 					if passed, found := controlBucket.Aggregations.Filter("passed"); found {
 						controlSummary.Passed.Total = int32(passed.DocCount)

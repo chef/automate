@@ -40,7 +40,7 @@ func init() {
 		}
 		return ""
 	})
-	policyv2.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/ListControlItems", "compliance:reporting:control-items", "compliance:controlItems:list", "POST", "/compliance/reporting/control-items", func(unexpandedResource string, input interface{}) string {
+	policyv2.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/ListControlItems", "compliance:reporting:control", "compliance:controlItems:list", "POST", "/compliance/reporting/controls", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*Query); ok {
 			return policyv2.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {

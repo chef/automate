@@ -48,19 +48,19 @@ service ReportingService {
    			action: "compliance:reportids:list"
    		};
    	};
-	// should cover /control-items
+	// should cover /controls
 	// This api is useful for getting a limited list of control items for latest runs.  It also honors all reporting filters
 	rpc ListControlItems(Query) returns (ControlItems) {
 		option (google.api.http) = {
-   			post: "/compliance/reporting/control-items"
+   			post: "/compliance/reporting/controls"
    			body: "*"
    		};
 		option (chef.automate.api.policy) = {
-   			resource: "compliance:reporting:controls-items"
+   			resource: "compliance:reporting:controls"
    			action: "search"
    		};
 		option (chef.automate.api.iam.policy) = {
-   			resource: "compliance:reporting:control-items"
+   			resource: "compliance:reporting:control"
    			action: "compliance:controlItems:list"
    		};
 	};
