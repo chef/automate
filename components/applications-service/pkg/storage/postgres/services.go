@@ -177,7 +177,7 @@ var validFilterFields = []string{
 func (db *Postgres) GetServicesHealthCounts(filters map[string][]string) (*storage.HealthCounts, error) {
 	var (
 		sHealthCounts         storage.HealthCounts
-		WhereConstraints, err = buildWhereConstraintsFromFilters(filters)
+		WhereConstraints, err = buildWhereConstraintsFromFilters(filters, true)
 	)
 	if err != nil {
 		return nil, err
@@ -208,7 +208,7 @@ func (db *Postgres) GetServices(
 		services              []*composedService
 		offset                = pageSize * page
 		sortOrder             = "ASC"
-		WhereConstraints, err = buildWhereConstraintsFromFilters(filters)
+		WhereConstraints, err = buildWhereConstraintsFromFilters(filters, true)
 	)
 
 	if err != nil {
@@ -230,7 +230,13 @@ func (db *Postgres) GetServices(
 	return convertComposedServicesToStorage(services), err
 }
 
-func (db *Postgres) GetServicesDistinctValues(fieldName, queryFragment string) ([]string, error) {
+func (db *Postgres) GetServicesDistinctValues(fieldName, queryFragment string, filters map[string][]string) ([]string, error) {
+	// Pass false for first because first is the query fragment, not filters
+	whereConstraints, err := buildWhereConstraintsFromFilters(filters, false)
+	if err != nil {
+		return nil, err
+	}
+
 	fieldNameIsValid := false
 	for _, valid := range validFilterFields {
 		if fieldName == valid {
@@ -243,15 +249,18 @@ func (db *Postgres) GetServicesDistinctValues(fieldName, queryFragment string) (
 	}
 
 	columnName := columnNameForField(fieldName)
-	query := fmt.Sprintf("SELECT DISTINCT %s from service_full AS t WHERE t.%s ILIKE $1 ORDER BY %s ASC LIMIT 100;",
-		columnName,
+	queryFirst := fmt.Sprintf("SELECT DISTINCT %s from service_full AS t WHERE t.%s ILIKE $1 ",
 		columnName,
 		columnName,
 	)
+	querySecond := fmt.Sprintf(" ORDER BY %s ASC LIMIT 100;",
+		columnName,
+	)
+	query := queryFirst + whereConstraints + querySecond
 	matcher := fmt.Sprintf("%s%%", queryFragment)
 
 	var matches []string
-	_, err := db.DbMap.Select(&matches, query, matcher)
+	_, err = db.DbMap.Select(&matches, query, matcher)
 	if err != nil {
 		return nil, err
 	}
@@ -365,14 +374,16 @@ func convertComposedServiceToStorage(svc *composedService) *storage.Service {
 //      AND health = 'CRITICAL'     OR health = 'UNKNOWN'
 //      AND environment = 'production'
 //
-func buildWhereConstraintsFromFilters(filters map[string][]string) (string, error) {
+func buildWhereConstraintsFromFilters(filters map[string][]string, first bool) (string, error) {
 	var (
-		firstStatement   = true
+		firstStatement   = first
 		WhereConstraints = ""
 	)
 
 	for filter, values := range filters {
-		if len(values) == 0 {
+		if len(values) == 0 || filter == "status" || filter == "STATUS" {
+			// We ignore the status field should it be passed since it is often lumped in with the other filters
+			// It does not apply to the services or the suggestions we want because it is a service-group level concept.
 			continue
 		}
 
