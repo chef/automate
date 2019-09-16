@@ -77,7 +77,7 @@ describe('ReportingComponent', () => {
   it('getEndDate', () => {
     const expectedDate = moment('20191023GMT+00:00', 'YYYYMMDDZ').startOf('day').add(12, 'hours');
     const beforeEndDate = component.getEndDate([{type: 'end_time', text: '2019-10-23'}]);
-    expect(expectedDate).toEqual(beforeEndDate);
+    expect(expectedDate.hours()).toEqual(beforeEndDate.hours());
   });
 
   describe('sets availableFilterTypes', () => {
@@ -259,31 +259,6 @@ describe('ReportingComponent', () => {
       };
 
       component.applyParamFilters([{type: 'chef_tags', text: '123'}]);
-      expect(reportQueryService.setState).toHaveBeenCalledWith(
-        reportQuery
-      );
-    });
-
-    it('parse end date', () => {
-      spyOn(reportQueryService, 'setState');
-      // end date of three days ago end_time=2019-09-05
-      const endDate = moment('2019-09-05', 'YYYY-MM-DD').utc().
-        startOf('day').add(12, 'hours');
-      const interval = 0;
-      const startDate = reportQueryService.findTimeIntervalStartDate(interval, endDate);
-
-      const reportQuery: ReportQuery = {
-        startDate: startDate,
-        endDate: endDate,
-        interval: interval,
-        filters: [
-          {type: {name: 'chef_tags'}, value: { text: '123' }}
-        ]
-      };
-
-      component.applyParamFilters([
-        {type: 'chef_tags', text: '123'},
-        {type: 'end_time', text: '2019-09-05'}]);
       expect(reportQueryService.setState).toHaveBeenCalledWith(
         reportQuery
       );
