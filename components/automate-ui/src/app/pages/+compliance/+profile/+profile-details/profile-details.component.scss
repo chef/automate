@@ -1,9 +1,15 @@
-@import "~styles/variables";
+@import '~styles/variables';
 
 chef-loading-spinner {
   display: block;
   margin: 100px auto;
   width: 100px;
+}
+
+chef-page-header {
+  chef-subheading {
+    max-width: 610px;
+  }
 }
 
 .metadata {
@@ -94,7 +100,7 @@ chef-loading-spinner {
 #delete-modal {
   text-align: center;
 
-  [slot=title] {
+  [slot='title'] {
     font-weight: bold;
     margin-top: 1em;
     padding-bottom: 12px;
