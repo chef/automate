@@ -1,9 +1,9 @@
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
-import { CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
-import { ProjectsDropdownComponent } from "./projects-dropdown.component";
+import { ProjectsDropdownComponent } from './projects-dropdown.component';
 
-describe("ProjectsDropdownComponent", () => {
+describe('ProjectsDropdownComponent', () => {
   let component: ProjectsDropdownComponent;
   let fixture: ComponentFixture<ProjectsDropdownComponent>;
 
@@ -20,47 +20,47 @@ describe("ProjectsDropdownComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  describe("#projectsArray", () => {
-    it("#projectsArray returns an object naturally ordered by name", () => {
+  describe('#projectsArray', () => {
+    it('#projectsArray returns an object naturally ordered by name', () => {
       const unsortedProjects: {} = [
         {
           checked: false,
-          id: "123abc",
-          name: "123abc",
-          status: "NO_RULES",
-          type: "CUSTOM"
+          id: '123abc',
+          name: '123abc',
+          status: 'NO_RULES',
+          type: 'CUSTOM'
         },
         {
           checked: false,
-          id: "project-6",
-          name: "project-6",
-          status: "NO_RULES",
-          type: "CUSTOM"
+          id: 'project-6',
+          name: 'project-6',
+          status: 'NO_RULES',
+          type: 'CUSTOM'
         },
         {
           checked: false,
-          id: "12345zero",
-          name: "12345zero",
-          status: "NO_RULES",
-          type: "CUSTOM"
+          id: '12345zero',
+          name: '12345zero',
+          status: 'NO_RULES',
+          type: 'CUSTOM'
         },
         {
           checked: false,
-          id: "123xyz",
-          name: "123xyz",
-          status: "NO_RULES",
-          type: "CUSTOM"
+          id: '123xyz',
+          name: '123xyz',
+          status: 'NO_RULES',
+          type: 'CUSTOM'
         },
         {
           checked: false,
-          id: "abc123",
-          name: "abc123",
-          status: "NO_RULES",
-          type: "CUSTOM"
+          id: 'abc123',
+          name: 'abc123',
+          status: 'NO_RULES',
+          type: 'CUSTOM'
         }
       ];
       // build the component
@@ -68,22 +68,22 @@ describe("ProjectsDropdownComponent", () => {
       // assign unsorted projects for the component to use
       dropdownComponent.projects = unsortedProjects;
 
-      //expect sorted outcomes here
+      // expect sorted outcomes here
       expect(dropdownComponent.projectsArray().length).toBe(5);
       expect(dropdownComponent.projectsArray()[0]).toEqual(
-        jasmine.objectContaining({ name: "123abc" })
+        jasmine.objectContaining({ name: '123abc' })
       );
       expect(dropdownComponent.projectsArray()[1]).toEqual(
-        jasmine.objectContaining({ name: "123xyz" })
+        jasmine.objectContaining({ name: '123xyz' })
       );
       expect(dropdownComponent.projectsArray()[2]).toEqual(
-        jasmine.objectContaining({ name: "12345zero" })
+        jasmine.objectContaining({ name: '12345zero' })
       );
       expect(dropdownComponent.projectsArray()[3]).toEqual(
-        jasmine.objectContaining({ name: "abc123" })
+        jasmine.objectContaining({ name: 'abc123' })
       );
       expect(dropdownComponent.projectsArray()[4]).toEqual(
-        jasmine.objectContaining({ name: "project-6" })
+        jasmine.objectContaining({ name: 'project-6' })
       );
     });
   });

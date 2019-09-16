@@ -4,9 +4,9 @@ import {
   Input,
   Output,
   OnChanges
-} from "@angular/core";
+} from '@angular/core';
 
-import { ProjectConstants, Project } from "app/entities/projects/project.model";
+import { ProjectConstants, Project } from 'app/entities/projects/project.model';
 
 const { UNASSIGNED_PROJECT_ID } = ProjectConstants;
 
@@ -22,9 +22,9 @@ export interface ProjectCheckedMap {
 }
 
 @Component({
-  selector: "app-projects-dropdown",
-  templateUrl: "./projects-dropdown.component.html",
-  styleUrls: ["./projects-dropdown.component.scss"]
+  selector: 'app-projects-dropdown',
+  templateUrl: './projects-dropdown.component.html',
+  styleUrls: ['./projects-dropdown.component.scss']
 })
 export class ProjectsDropdownComponent implements OnChanges {
   // The map of ProjectChecked by id. Any checked changes propagated via
@@ -45,7 +45,7 @@ export class ProjectsDropdownComponent implements OnChanges {
 
     const opts = {
       numeric: true,
-      sensitivity: "base"
+      sensitivity: 'base'
     };
 
     // per @msorens https://github.com/chef/a2/pull/4434
@@ -89,9 +89,9 @@ export class ProjectsDropdownComponent implements OnChanges {
     let nextElement: HTMLElement;
 
     const targetElement = <Element>event.target;
-    if (event.key === "ArrowUp") {
+    if (event.key === 'ArrowUp') {
       nextElement = <HTMLElement>targetElement.previousElementSibling;
-    } else if (event.key === "ArrowDown") {
+    } else if (event.key === 'ArrowDown') {
       nextElement = <HTMLElement>targetElement.nextElementSibling;
     }
 
