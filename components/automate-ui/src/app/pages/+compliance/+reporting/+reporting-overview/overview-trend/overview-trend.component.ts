@@ -1,13 +1,13 @@
 import {
   Component,
   ElementRef,
+  EventEmitter,
   Inject,
   Input,
   Output,
   OnChanges,
   OnDestroy,
-  ViewChild,
-  EventEmitter
+  ViewChild
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import * as d3 from 'd3';
