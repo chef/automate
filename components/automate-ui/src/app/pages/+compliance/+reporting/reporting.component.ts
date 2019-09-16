@@ -180,7 +180,8 @@ export class ReportingComponent implements OnInit, OnDestroy {
     const allUrlParameters$ = this.getAllUrlParameters();
 
     this.endDate$ = this.reportQuery.state.pipe(map((reportQuery: ReportQuery) =>
-      reportQuery.endDate.toDate()));
+      new Date(reportQuery.endDate.year(), reportQuery.endDate.month(),
+      reportQuery.endDate.date())));
 
     allUrlParameters$.pipe(takeUntil(this.isDestroyed)).subscribe(
       allUrlParameters => this.applyParamFilters(allUrlParameters));
@@ -253,7 +254,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     this.downloadOptsVisible = false;
 
     const reportQuery = this.reportQuery.getReportQuery();
-    const filename = `${moment(reportQuery.endDate).format('YYYY-M-D')}.${format}`;
+    const filename = `${reportQuery.endDate.format('YYYY-M-D')}.${format}`;
 
     const onComplete = () => this.downloadInProgress = false;
     const onError = _e => this.downloadFailed = true;
@@ -445,7 +446,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     const foundFilter = urlFilters.find( (filter: Chicklet) => filter.type === 'end_time');
 
     if (foundFilter !== undefined) {
-      const endDate = moment(foundFilter.text, 'YYYY-MM-DD');
+      const endDate = moment(foundFilter.text + 'GMT+00:00', 'YYYY-MM-DDZ');
       if (endDate.isValid()) {
         return endDate.utc().startOf('day').add(12, 'hours');
       } else {
