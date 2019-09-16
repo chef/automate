@@ -14,7 +14,6 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authn"
 	authz "github.com/chef/automate/api/interservice/authz/common"
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/tracing"
@@ -23,12 +22,12 @@ import (
 type tokenAPI struct {
 	ts                 tokens.Storage
 	authzSubjectClient authz.SubjectPurgeClient
-	authzV2Client      authz_v2.AuthorizationClient
+	pv                 tokens.ProjectValidator
 }
 
 // NewGRPCServer returns a server that provides our services: token
 // and authentication requests.
-func (s *Server) NewGRPCServer(authzSubjectClient authz.SubjectPurgeClient, authzV2Client authz_v2.AuthorizationClient) *grpc.Server {
+func (s *Server) NewGRPCServer(authzSubjectClient authz.SubjectPurgeClient, pv tokens.ProjectValidator) *grpc.Server {
 	g := s.connFactory.NewServer(
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
@@ -37,7 +36,7 @@ func (s *Server) NewGRPCServer(authzSubjectClient authz.SubjectPurgeClient, auth
 			),
 		),
 	)
-	api.RegisterTokensMgmtServer(g, newTokenAPI(s.token, authzSubjectClient, authzV2Client))
+	api.RegisterTokensMgmtServer(g, newTokenAPI(s.token, authzSubjectClient, pv))
 	health.RegisterHealthServer(g, s.health)
 	api.RegisterAuthenticationServer(g, s)
 	reflection.Register(g)
@@ -61,11 +60,11 @@ func inputValidationInterceptor() grpc.UnaryServerInterceptor {
 	}
 }
 
-func newTokenAPI(ts tokens.Storage, authzSubjectClient authz.SubjectPurgeClient, authzV2Client authz_v2.AuthorizationClient) api.TokensMgmtServer {
+func newTokenAPI(ts tokens.Storage, authzSubjectClient authz.SubjectPurgeClient, pv tokens.ProjectValidator) api.TokensMgmtServer {
 	return &tokenAPI{
 		ts:                 ts,
 		authzSubjectClient: authzSubjectClient,
-		authzV2Client:      authzV2Client,
+		pv:                 pv,
 	}
 }
 

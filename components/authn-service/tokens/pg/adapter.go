@@ -62,13 +62,11 @@ func (a *adapter) insertToken(ctx context.Context,
 	if projects == nil {
 		projects = []string{}
 	} else {
-		_, err := a.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
+		_, err := a.validator.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
 			Subjects:   auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
 			ProjectIds: projects,
 		})
 		if err != nil {
-			// TODO verify/decide if this is what we want
-			// return error unaltered because it's already a GRPC status code
 			return nil, err
 		}
 	}
@@ -121,13 +119,11 @@ func (a *adapter) UpdateToken(ctx context.Context,
 
 	projectDiff := projectassignment.CalculateProjectDiff(originalProjects, updatedProjects)
 	if len(projectDiff) != 0 {
-		_, err := a.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
+		_, err := a.validator.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
 			Subjects:   auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
 			ProjectIds: projectDiff,
 		})
 		if err != nil {
-			// TODO verify/decide if this is what we want
-			// return error unaltered because it's already a GRPC status code
 			return nil, err
 		}
 	}

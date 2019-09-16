@@ -8,7 +8,6 @@ import (
 	"go.uber.org/zap"
 
 	// adapter for database/sql
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
 	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/tls/certs"
@@ -27,14 +26,14 @@ type Config struct {
 
 // adapter carries the adapter's state
 type adapter struct {
-	db          *sql.DB
-	logger      *zap.Logger
-	authzClient authz_v2.AuthorizationClient
+	db        *sql.DB
+	logger    *zap.Logger
+	validator tokens.ProjectValidator
 }
 
 // Open returns a storage adapter based on the config.
 func (c *Config) Open(_ *certs.ServiceCerts, logger *zap.Logger,
-	authzClient authz_v2.AuthorizationClient) (tokens.Storage, error) {
+	pv tokens.ProjectValidator) (tokens.Storage, error) {
 	if c.PGURL == "" {
 		if c.Database == "" {
 			return nil, errors.New("either pg_url or database must be provided")
@@ -59,7 +58,7 @@ func (c *Config) Open(_ *certs.ServiceCerts, logger *zap.Logger,
 		return nil, errors.Wrap(err, "failed to setup database schema")
 	}
 
-	return &adapter{db: db, logger: logger, authzClient: authzClient}, nil
+	return &adapter{db: db, logger: logger, validator: pv}, nil
 }
 
 func (c *Config) initPostgresDB(pgURL *url.URL) (*sql.DB, error) {

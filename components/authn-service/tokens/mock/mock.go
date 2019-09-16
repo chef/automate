@@ -9,7 +9,6 @@ import (
 
 	"go.uber.org/zap"
 
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/authn-service/constants"
 	pg "github.com/chef/automate/components/authn-service/tokens/pg"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
@@ -29,7 +28,7 @@ type mock struct {
 
 // Open initializes the mock adapter
 func (cfg *Config) Open(_ *certs.ServiceCerts, logger *zap.Logger,
-	_ authz_v2.AuthorizationClient) (tokens.Storage, error) {
+	_ tokens.ProjectValidator) (tokens.Storage, error) {
 	return &mock{tokens: cfg.Tokens}, nil
 }
 
