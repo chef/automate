@@ -68,6 +68,18 @@ describe('ReportingComponent', () => {
     expect(qe).not.toBeNull();
   });
 
+  it('convertMomentToDateWithoutTimezone', () => {
+    const dateBefore = moment('20191023-2300', 'YYYYMMDD-HHMM');
+    const dateAfter = component.convertMomentToDateWithoutTimezone(dateBefore);
+    expect(dateBefore.hour()).toEqual(dateAfter.getHours());
+  });
+
+  it('getEndDate', () => {
+    const expectedDate = moment('20191023GMT+00:00', 'YYYYMMDDZ').startOf('day').add(12, 'hours');
+    const beforeEndDate = component.getEndDate([{type: 'end_time', text: '2019-10-23'}]);
+    expect(expectedDate).toEqual(beforeEndDate);
+  });
+
   describe('sets availableFilterTypes', () => {
     it('to include profile, platform, environment, node, and control', () => {
       const availableFilterTypesNames = component.availableFilterTypes.map( type => type.name);
