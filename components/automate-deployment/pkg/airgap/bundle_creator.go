@@ -23,7 +23,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"math"
 	"net/http"
 	"os"
 	"path"
@@ -499,8 +498,7 @@ func (creator *InstallBundleCreator) withRetry(f retriableFunc) error {
 		if creator.retryDelay >= 0 {
 			nextRetryDelay = time.Second * time.Duration(creator.retryDelay)
 		} else {
-			sleep := math.Pow(2.0, float64(try))
-			nextRetryDelay = time.Second * time.Duration(sleep)
+			nextRetryDelay = time.Second * time.Duration(1<<uint(try))
 		}
 
 		err = f(try, retryInfo{
