@@ -63,7 +63,7 @@ aws s3 cp "$VERSION.json.sha256sum" s3://chef-automate-artifacts/dev/latest/auto
 # Upload the chef-automate CLI
 #
 echo "Uploading automate-cli"
-if [[ -n "$EXPEDITOR_PKG_IDENTS_AUTOMATECLIX86_64LINUX" ]]; then
+if [[ -n "${EXPEDITOR_PKG_IDENTS_AUTOMATECLIX86_64LINUX:-""}" ]]; then
     automate_cli_ident="$EXPEDITOR_PKG_IDENTS_AUTOMATECLIX86_64LINUX"
     echo "Installing automate-cli version found in Expeditor environment: $automate_cli_ident"
     hab pkg install "$automate_cli_ident"
