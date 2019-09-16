@@ -8,6 +8,7 @@ import {
   ReportQuery
 } from '../../shared/reporting';
 import { ActivatedRoute, Router } from '@angular/router';
+import { union } from 'lodash/fp';
 
 type Tab = 'Node Status' | 'Profile Status';
 
@@ -115,59 +116,28 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
   }
 
   onPlatformChanged(platformItem) {
-    const typeName = 'platform';
     if (platformItem && platformItem.name) {
-      const {queryParamMap} = this.route.snapshot;
-      const queryParams = {...this.route.snapshot.queryParams};
-      const existingValues = queryParamMap.getAll(typeName).filter(
-        v => v !== platformItem.name).concat(platformItem.name);
-
-      queryParams[typeName] = existingValues;
-
-      this.router.navigate(['/compliance', 'reports', 'nodes'], {queryParams});
+      this.updateUrlWithFilter(platformItem.name, 'platform');
     }
   }
 
   onEnvironmentChanged(environmentItem) {
-    const typeName = 'environment';
     if (environmentItem && environmentItem.name) {
-      const {queryParamMap} = this.route.snapshot;
-      const queryParams = {...this.route.snapshot.queryParams};
-      const existingValues = queryParamMap.getAll(typeName).filter(
-        v => v !== environmentItem.name).concat(environmentItem.name);
-
-      queryParams[typeName] = existingValues;
-
-      this.router.navigate(['/compliance', 'reports', 'nodes'], {queryParams});
+      this.updateUrlWithFilter(environmentItem.name, 'environment');
     }
   }
 
   onProfileChanged(profileItem) {
     const typeName = 'profile_id';
     if (profileItem && profileItem.id) {
-      const {queryParamMap} = this.route.snapshot;
-      const queryParams = {...this.route.snapshot.queryParams};
-      const existingValues = queryParamMap.getAll(typeName).filter(
-        v => v !== profileItem.id).concat(profileItem.id);
-
       this.reportQuery.setFilterTitle(typeName, profileItem.id, profileItem.name);
-      queryParams[typeName] = existingValues;
-
-      this.router.navigate(['/compliance', 'reports', 'nodes'], {queryParams});
+      this.updateUrlWithFilter(profileItem.id, typeName);
     }
   }
 
   onControlChanged(controlItem) {
-    const typeName = 'control_id';
     if (controlItem && controlItem.name) {
-      const {queryParamMap} = this.route.snapshot;
-      const queryParams = {...this.route.snapshot.queryParams};
-      const existingValues = queryParamMap.getAll(typeName).filter(
-        v => v !== controlItem.name).concat(controlItem.name);
-
-      queryParams[typeName] = existingValues;
-
-      this.router.navigate(['/compliance', 'reports', 'nodes'], {queryParams});
+      this.updateUrlWithFilter(controlItem.name, 'control_id');
     }
   }
 
@@ -275,5 +245,15 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
       major: data.majors,
       minor: data.minors
     };
+  }
+
+  private updateUrlWithFilter(value: string, typeName: string) {
+    const {queryParamMap} = this.route.snapshot;
+    const queryParams = {...this.route.snapshot.queryParams};
+    const existingValues = union([value], queryParamMap.getAll(typeName));
+
+    queryParams[typeName] = existingValues;
+
+    this.router.navigate(['/compliance', 'reports', 'nodes'], {queryParams});
   }
 }
