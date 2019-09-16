@@ -8,8 +8,8 @@
 api_port = 9611
 audit_max_events = 100
 ca_cert_chain_depth = 2
-db_pool_init_count = 20
-db_pool_max_count = 100
+db_pool_init_count = 10
+db_pool_max_count = 20
 default_search="""(recipes:delivery_builder OR recipes:delivery_builder\\\\:\\\\:default
                   OR recipes:delivery_build OR recipes:delivery_build\\\\:\\\\:default
                   OR tags:delivery-build-node)"""
