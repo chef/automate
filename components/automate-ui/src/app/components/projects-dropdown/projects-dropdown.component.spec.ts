@@ -69,10 +69,12 @@ describe("ProjectsDropdownComponent", () => {
           type: "CUSTOM"
         }
       ];
-      // usage and expects go here
+      // build the component
       const dropdownComponent = new ProjectsDropdownComponent();
+      // assign unsorted projects for the component to use
       dropdownComponent.projects = unsortedProjects;
 
+      //expect sorted outcomes here
       expect(dropdownComponent.projectsArray().length).toBe(5);
       expect(dropdownComponent.projectsArray()[0]).toEqual(
         jasmine.objectContaining({ name: "123abc" })
@@ -81,13 +83,13 @@ describe("ProjectsDropdownComponent", () => {
         jasmine.objectContaining({ name: "123xyz" })
       );
       expect(dropdownComponent.projectsArray()[2]).toEqual(
-        jasmine.objectContaining({ name: "123xyz" })
+        jasmine.objectContaining({ name: "12345zero" })
       );
       expect(dropdownComponent.projectsArray()[3]).toEqual(
-        jasmine.objectContaining({ name: "123xyz" })
+        jasmine.objectContaining({ name: "abc123" })
       );
       expect(dropdownComponent.projectsArray()[4]).toEqual(
-        jasmine.objectContaining({ name: "123xyz" })
+        jasmine.objectContaining({ name: "project-6" })
       );
     });
   });
