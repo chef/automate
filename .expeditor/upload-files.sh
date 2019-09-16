@@ -62,12 +62,22 @@ aws s3 cp "$VERSION.json.sha256sum" s3://chef-automate-artifacts/dev/latest/auto
 #
 # Upload the chef-automate CLI
 #
-
-hab pkg install --channel dev chef/automate-cli
+echo "Uploading automate-cli"
+if [[ -n "$EXPEDITOR_PKG_IDENTS_AUTOMATECLIX86_64LINUX" ]]; then
+    automate_cli_ident="$EXPEDITOR_PKG_IDENTS_AUTOMATECLIX86_64LINUX"
+    echo "Installing automate-cli version found in Expeditor environment: $automate_cli_ident"
+    hab pkg install "$automate_cli_ident"
+    automate_cli_path="/hab/pkgs/${automate_cli_ident}/"
+else
+    echo "Installing automate-cli from dev Habitat Depot channel"
+    hab pkg install --channel dev chef/automate-cli
+    automate_cli_path="$(hab pkg path chef/automate-cli)"
+    echo "Found $automate_cli_path"
+fi
 
 tmpdir=$(mktemp -d)
 pushd "${tmpdir}"
-  zip -j "chef-automate_linux_amd64.zip" "$(hab pkg path chef/automate-cli)/static/linux/chef-automate"
+  zip -j "chef-automate_linux_amd64.zip" "${automate_cli_path}/static/linux/chef-automate"
 
   gpg --armor --digest-algo sha256 --default-key 2940ABA983EF826A --output "chef-automate_linux_amd64.zip.asc" --detach-sign "chef-automate_linux_amd64.zip"
   sha256sum "chef-automate_linux_amd64.zip" > "chef-automate_linux_amd64.zip.sha256sum"
