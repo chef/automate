@@ -277,25 +277,13 @@ export class StatsService {
     }, []);
 
     if (reportQuery.startDate) {
-      const now = moment();
-      const value = reportQuery.startDate.clone()
-        .set({
-          hour: now.get('hour'),
-          minute: now.get('minute'),
-          second: now.get('second')
-        }).utc().startOf('day');
+      const value = reportQuery.startDate.clone().utc().startOf('day');
 
       apiFilters.push({type: 'start_time', values: [value.format()]});
     }
 
     if (reportQuery.endDate) {
-      const now = moment();
-      const value = reportQuery.endDate.clone()
-        .set({
-          hour: now.get('hour'),
-          minute: now.get('minute'),
-          second: now.get('second')
-        }).utc().endOf('day');
+      const value = reportQuery.endDate.clone().utc().endOf('day');
       apiFilters.push({type: 'end_time', values: [value.format()]});
     }
 
