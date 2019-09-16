@@ -27,6 +27,7 @@ func newTaskPinger(db *sql.DB, taskID int64, pingInterval time.Duration) *taskPi
 		taskID:       taskID,
 		db:           db,
 		pingInterval: pingInterval,
+		sg:           cereal.NewStartGuard("Start(ctx, onTaskLost) called more than once on postgres.taskPinger!"),
 	}
 	return pinger
 }
