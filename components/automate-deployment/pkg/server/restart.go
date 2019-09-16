@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"errors"
-	"math"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -102,7 +101,7 @@ func (s *server) waitForDown(services []string) error {
 	ctx := context.Background()
 	for i := 0; i <= 5; i++ {
 		logrus.WithField("try", i).Info("Waiting for services to go down")
-		backoff := time.Duration(math.Pow(float64(2), float64(i)))
+		backoff := time.Duration(1 << uint(i))
 		time.Sleep(backoff * time.Second)
 
 		deployed, err := s.target().DeployedServices(ctx)
