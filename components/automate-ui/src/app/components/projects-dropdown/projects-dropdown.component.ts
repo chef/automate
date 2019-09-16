@@ -41,19 +41,20 @@ export class ProjectsDropdownComponent implements OnChanges {
   label = UNASSIGNED_PROJECT_ID;
 
   projectsArray(): ProjectChecked[] {
-    let sortedProjects = Object.values(this.projects);
-    // WIP
-    // reference: MDN Intl.Collator
-    // and See https://stackoverflow.com/a/38641281 from policy-list.component
+    const sortedProjects = Object.values(this.projects);
 
     const opts = {
       numeric: true,
       sensitivity: "base"
     };
 
-    // look at https://github.com/chef/a2/pull/4434 for "stable sort" example
-    sortedProjects.sort((a, b) =>
-      a.name.localeCompare(b.name, undefined, opts)
+    // per @msorens https://github.com/chef/a2/pull/4434
+    // Sort by name then by cased-name, since no other field is useful as a secondary sort;
+    // this ensures stable sort with respect to case, so 'a' always comes before 'A'.
+    sortedProjects.sort(
+      (a, b) =>
+        a.name.localeCompare(b.name, undefined, opts) ||
+        a.name.localeCompare(b.name, undefined, { numeric: true })
     );
     return sortedProjects;
   }

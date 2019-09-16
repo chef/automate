@@ -26,13 +26,7 @@ describe("ProjectsDropdownComponent", () => {
 
   describe("#projectsArray", () => {
     it("#projectsArray returns an object naturally ordered by name", () => {
-      const unsortedProjects: {
-        checked: boolean;
-        id: string;
-        name: string;
-        status: string;
-        type: string;
-      }[] = [
+      const unsortedProjects: {} = [
         {
           checked: false,
           id: "123abc",
