@@ -1,4 +1,4 @@
-#!{{pkgPathFor "core/bash"}}/bin/bash -ex
+#!{{pkgPathFor "core/bash"}}/bin/bash -e
 
 source {{pkg.svc_config_path}}/render-certs.sh
 
