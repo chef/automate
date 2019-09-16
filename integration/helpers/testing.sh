@@ -43,3 +43,12 @@ verify_packages() {
     chef-automate dev verify-packages
     log_info "Done verifying all Habitat Packages"
 }
+
+no_panic_check() {
+    log_info "Checking for Go panics in the logs"
+    if journalctl -u chef-automate | grep 'panic: ';then
+        log_error "Found possible panic in the logs!"
+        log_error "See uploaded logs for details."
+        return 1
+    fi
+}
