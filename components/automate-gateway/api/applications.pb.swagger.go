@@ -471,6 +471,10 @@ func init() {
         "unknown": {
           "type": "integer",
           "format": "int32"
+        },
+        "disconnected": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },

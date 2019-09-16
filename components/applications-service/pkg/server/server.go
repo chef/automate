@@ -152,11 +152,12 @@ func (app *ApplicationsServer) GetServiceGroupsHealthCounts(
 	}
 
 	return &applications.HealthCounts{
-		Total:    svcsHealthCounts.Total,
-		Ok:       svcsHealthCounts.Ok,
-		Warning:  svcsHealthCounts.Warning,
-		Critical: svcsHealthCounts.Critical,
-		Unknown:  svcsHealthCounts.Unknown,
+		Total:        svcsHealthCounts.Total,
+		Ok:           svcsHealthCounts.Ok,
+		Warning:      svcsHealthCounts.Warning,
+		Critical:     svcsHealthCounts.Critical,
+		Unknown:      svcsHealthCounts.Unknown,
+		Disconnected: svcsHealthCounts.Disconnected,
 	}, nil
 }
 
