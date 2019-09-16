@@ -23,12 +23,14 @@ export interface PermEntityState {
   readonly byId: IndexedEntities<UserPermEntity>;
   readonly allIds: string[];
   readonly status: Status;
+  readonly lastTimeFetchAll: Date;
 }
 
 const initialState: PermEntityState = {
   byId: {},
   allIds: [],
-  status: Status.notLoaded
+  status: Status.notLoaded,
+  lastTimeFetchAll: new Date(0)
 };
 
 export function permEntityReducer(
@@ -36,7 +38,13 @@ export function permEntityReducer(
 
   switch (action.type) {
 
-    case UserPermsTypes.GET_ALL:
+    case UserPermsTypes.GET_ALL: {
+      return pipe(
+        set('lastTimeFetchAll', new Date()),
+        set('status', Status.loading)
+      )(state) as PermEntityState;
+    }
+
     case UserPermsTypes.GET_SOME: {
       return set('status', Status.loading, state) as PermEntityState;
     }
@@ -49,7 +57,9 @@ export function permEntityReducer(
       // toPairs converts each endpoint in the payload from
       // { <path>: <perms_map> } to [<path>, <perms_map> ].
       const allPairs = toPairs(action.payload);
-      const allPerms = permIndexer(allPairs);
+      // combine with what we already have so as not to erase parameterized endpoints
+      // that are not included here.
+      const allPerms = defaults(state.byId, permIndexer(allPairs));
 
       return pipe(
         set('status', Status.loadingSuccess),
