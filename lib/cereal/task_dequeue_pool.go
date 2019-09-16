@@ -18,7 +18,7 @@ type taskDequeuePool struct {
 	ctx     context.Context
 	cancel  context.CancelFunc
 	wg      sync.WaitGroup
-	wgStart sync.WaitGroup
+	sg      StartGuard
 }
 
 type taskDequeueReq struct {
@@ -38,13 +38,13 @@ func newTaskDequeuePool(size int, dequeuer backend.TaskDequeuer) *taskDequeuePoo
 		size:     size,
 		dequeuer: dequeuer,
 		reqChan:  make(chan taskDequeueReq),
+		sg:       NewStartGuard("Start(ctx) called more than once on taskDequeuePool"),
 	}
-	p.wgStart.Add(1)
 	return p
 }
 
 func (d *taskDequeuePool) Start(ctx context.Context) {
-	d.wgStart.Done() // panic if start is called twice
+	d.sg.Started() // panic if start is called twice
 
 	ctx, cancel := context.WithCancel(ctx)
 	d.ctx = ctx
