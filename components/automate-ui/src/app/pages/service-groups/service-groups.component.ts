@@ -18,7 +18,6 @@ import {
 import {
   ServiceGroup,
   ServiceGroupsFilters,
-  ServiceGroupsSuggestions,
   FieldDirection,
   ServiceGroupsHealthSummary,
   GroupServicesFilters
@@ -291,8 +290,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
     this.serviceGroupsSuggestions$ = this.store.select(createSelector(serviceGroupsState,
       (serviceGroups) => serviceGroups.suggestions.values))
-        .pipe(map((serviceGroupsSuggestions:
-          ServiceGroupsSuggestions[]) => serviceGroupsSuggestions));
+        .pipe(map(serviceGroupsSuggestions => serviceGroupsSuggestions));
 
     this.searchBarFilters$ = allUrlParameters$.pipe(map((chicklets: Chicklet[]) =>
       chicklets.filter(chicklet => some({'type': chicklet.type}, this.categoryTypes))));
