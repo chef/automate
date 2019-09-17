@@ -10,6 +10,15 @@ chef-page-header {
   chef-subheading {
     max-width: 610px;
   }
+  // unable to modify slot content from chef-page-header.scss or here?
+  .header-buttons {
+    @media (min-width: 1024px) {
+      margin: 0;
+      position: absolute;
+      top: 55px;
+      right: 35px;
+    }
+  }
 }
 
 .metadata {
