@@ -3,7 +3,7 @@ import { ChefSorters } from './sorter';
 
 fdescribe('normalSort', () => {
 
-    const inputObject: object[] = [
+    const inputObject: {} = [
         { checked: false, id: 'B', name: '123abc', status: 'NO_RULES', type: 'CUSTOM'},
         { checked: false, id: '3', name: 'project-6', status: 'NO_RULES', type: 'CUSTOM'},
         { checked: false, id: 'a', name: '12345zero', status: 'NO_RULES', type: 'CUSTOM'},
