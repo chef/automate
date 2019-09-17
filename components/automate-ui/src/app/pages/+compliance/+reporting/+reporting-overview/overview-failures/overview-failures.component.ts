@@ -1,4 +1,5 @@
-import { Component, Inject, Input, OnChanges, OnDestroy, ViewChild } from '@angular/core';
+import { Component, Inject, Input, Output, OnChanges,
+  OnDestroy, ViewChild, EventEmitter } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import * as d3 from 'd3';
 
@@ -22,6 +23,8 @@ export class OverviewFailuresComponent implements OnChanges, OnDestroy {
   @Input() vbWidth = 400;
 
   @Input() vbHeight = 300;
+
+  @Output() itemSelected: EventEmitter<any> = new EventEmitter<any>();
 
   @ViewChild('svg') svg;
 
@@ -85,6 +88,10 @@ export class OverviewFailuresComponent implements OnChanges, OnDestroy {
       d3.selectAll(ns).transition()
         .style('opacity', 1);
     };
+
+    enter.on('click', (node) => {
+      this.itemSelected.next(node.data);
+    });
 
     enter
       .attr('class', 'bubble');

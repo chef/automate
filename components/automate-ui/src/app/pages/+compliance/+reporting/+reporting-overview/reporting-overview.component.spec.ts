@@ -298,6 +298,114 @@ describe('ReportingOverviewComponent', () => {
     });
   });
 
+  describe('onPlatformChanged()', () => {
+    it('valid item', () => {
+      spyOn(router, 'navigate');
+
+      component.onPlatformChanged({name: 'ubuntu'});
+
+      expect(router.navigate).toHaveBeenCalledWith(['/compliance', 'reports', 'nodes'],
+        {queryParams: { platform: ['ubuntu'] }});
+    });
+
+    it('invalid item', () => {
+      spyOn(router, 'navigate');
+
+      component.onPlatformChanged({name: ''});
+
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+
+    it('null item', () => {
+      spyOn(router, 'navigate');
+
+      component.onPlatformChanged(null);
+
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('onEnvironmentChanged()', () => {
+    it('valid item', () => {
+      spyOn(router, 'navigate');
+
+      component.onEnvironmentChanged({name: 'dev'});
+
+      expect(router.navigate).toHaveBeenCalledWith(['/compliance', 'reports', 'nodes'],
+        {queryParams: { environment: ['dev'] }});
+    });
+
+    it('invalid item', () => {
+      spyOn(router, 'navigate');
+
+      component.onEnvironmentChanged({name: ''});
+
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+
+    it('null item', () => {
+      spyOn(router, 'navigate');
+
+      component.onEnvironmentChanged(null);
+
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('onProfileChanged()', () => {
+    it('valid item', () => {
+      spyOn(router, 'navigate');
+
+      component.onProfileChanged({id: 'id-1234'});
+
+      expect(router.navigate).toHaveBeenCalledWith(['/compliance', 'reports', 'nodes'],
+        {queryParams: { profile_id: ['id-1234'] }});
+    });
+
+    it('invalid item', () => {
+      spyOn(router, 'navigate');
+
+      component.onProfileChanged({name: ''});
+
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+
+    it('null item', () => {
+      spyOn(router, 'navigate');
+
+      component.onProfileChanged(null);
+
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('onControlChanged()', () => {
+    it('valid item', () => {
+      spyOn(router, 'navigate');
+
+      component.onControlChanged({name: 'id-1234'});
+
+      expect(router.navigate).toHaveBeenCalledWith(['/compliance', 'reports', 'nodes'],
+        {queryParams: { control_id: ['id-1234'] }});
+    });
+
+    it('invalid item', () => {
+      spyOn(router, 'navigate');
+
+      component.onControlChanged({name: ''});
+
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+
+    it('null item', () => {
+      spyOn(router, 'navigate');
+
+      component.onControlChanged(null);
+
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+  });
+
   describe('getNodeTrend()', () => {
     const dateRange = { start: moment().toDate(), end: moment().toDate() };
     const endDate = moment('2017-01-31T00:00:00Z').utc();

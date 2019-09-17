@@ -8,6 +8,7 @@ import {
   ReportQuery
 } from '../../shared/reporting';
 import { ActivatedRoute, Router } from '@angular/router';
+import { union } from 'lodash/fp';
 import * as moment from 'moment';
 
 type Tab = 'Node Status' | 'Profile Status';
@@ -112,6 +113,32 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
       this.getNodeStatusData(reportQuery);
     } else {
       this.getProfileStatusData(reportQuery);
+    }
+  }
+
+  onPlatformChanged(platformItem) {
+    if (platformItem && platformItem.name) {
+      this.updateUrlWithFilter(platformItem.name, 'platform');
+    }
+  }
+
+  onEnvironmentChanged(environmentItem) {
+    if (environmentItem && environmentItem.name) {
+      this.updateUrlWithFilter(environmentItem.name, 'environment');
+    }
+  }
+
+  onProfileChanged(profileItem) {
+    const typeName = 'profile_id';
+    if (profileItem && profileItem.id) {
+      this.reportQuery.setFilterTitle(typeName, profileItem.id, profileItem.name);
+      this.updateUrlWithFilter(profileItem.id, typeName);
+    }
+  }
+
+  onControlChanged(controlItem) {
+    if (controlItem && controlItem.name) {
+      this.updateUrlWithFilter(controlItem.name, 'control_id');
     }
   }
 
@@ -233,5 +260,15 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
       major: data.majors,
       minor: data.minors
     };
+  }
+
+  private updateUrlWithFilter(value: string, typeName: string) {
+    const {queryParamMap} = this.route.snapshot;
+    const queryParams = {...this.route.snapshot.queryParams};
+    const existingValues = union([value], queryParamMap.getAll(typeName));
+
+    queryParams[typeName] = existingValues;
+
+    this.router.navigate(['/compliance', 'reports', 'nodes'], {queryParams});
   }
 }
