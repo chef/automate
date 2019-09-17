@@ -29,13 +29,12 @@ var startManagerOpts struct {
 	TaskExecutorCount     int
 	DequeueWorkerCount    int
 	SkipScheduleExecutors bool
-	SkipSimpleExecutors   bool
+	SkipEchoExecutors     bool
 }
 
 var enqueueWorkflowOpts struct {
 	Name      string
 	TaskCount int
-	SlowTasks bool
 }
 
 var scheduleOpts struct {
@@ -79,18 +78,12 @@ func main() {
 		"grpc endpoint")
 
 	enqueueWorkflowCmd := &cobra.Command{
-		Use:           "enqueue-simple-workflow",
-		Short:         "Enqueue an instance of SimpleWorkflow",
+		Use:           "enqueue-echo-workflow",
+		Short:         "Enqueue an instance of EchoWorkflow",
 		SilenceUsage:  true,
 		SilenceErrors: true,
-		RunE:          enqueueSimpleWorkflow,
+		RunE:          enqueueEchoWorkflow,
 	}
-
-	enqueueWorkflowCmd.PersistentFlags().BoolVar(
-		&enqueueWorkflowOpts.SlowTasks,
-		"slow-tasks",
-		false,
-		"If true, tasks sleep for 400 seconds")
 
 	enqueueWorkflowCmd.PersistentFlags().StringVar(
 		&enqueueWorkflowOpts.Name,
@@ -101,7 +94,7 @@ func main() {
 	enqueueWorkflowCmd.PersistentFlags().IntVar(
 		&enqueueWorkflowOpts.TaskCount,
 		"task-count",
-		10000,
+		20,
 		"Number of tasks to enqueue")
 
 	startManagerCmd := &cobra.Command{
@@ -131,10 +124,10 @@ func main() {
 		"Skip registering the schedule-test-workflow and schedule-test-task executors")
 
 	startManagerCmd.PersistentFlags().BoolVar(
-		&startManagerOpts.SkipSimpleExecutors,
-		"skip-simple-executors",
+		&startManagerOpts.SkipEchoExecutors,
+		"skip-echo-executors",
 		false,
-		"Skip registering the simple-workflow and simple-task executors")
+		"Skip registering the echo-workflow and echo-task executors")
 
 	resetDBCmd := &cobra.Command{
 		Use:           "reset-db DATABASE",
@@ -252,17 +245,19 @@ func getBackend() backend.Driver {
 	return postgres.NewPostgresBackend(defaultConnURIForDatabase())
 }
 
-var simpleWorkflowStartTime *time.Time
+var echoWorkflowStartTime *time.Time
 
 func startManager(_ *cobra.Command, args []string) error {
 	b := getBackend()
 	manager, err := cereal.NewManager(b, cereal.WithOnWorkflowCompleteCallback(
 		func(w *backend.WorkflowEvent) {
-			if w.Instance.WorkflowName == "simple-workflow" && simpleWorkflowStartTime != nil {
-				logrus.Infof("simple workflow total runtime: %s", time.Since(*simpleWorkflowStartTime))
+			if w.Instance.WorkflowName == "echo-workflow" && echoWorkflowStartTime != nil {
+				logrus.Infof("echo workflow total runtime: %s", time.Since(*echoWorkflowStartTime))
 			}
 		}),
 		cereal.WithTaskDequeueWorkers(startManagerOpts.DequeueWorkerCount),
+		cereal.WithTaskPollInterval(1*time.Second),
+		cereal.WithWorkflowPollInterval(1*time.Second),
 	)
 	if err != nil {
 		return err
@@ -282,12 +277,12 @@ func startManager(_ *cobra.Command, args []string) error {
 		}
 	}
 
-	if !startManagerOpts.SkipSimpleExecutors {
-		err = manager.RegisterWorkflowExecutor("simple-workflow", &SimpleWorkflow{})
+	if !startManagerOpts.SkipEchoExecutors {
+		err = manager.RegisterWorkflowExecutor("echo-workflow", &EchoWorkflow{})
 		if err != nil {
 			return err
 		}
-		err = manager.RegisterTaskExecutor("simple task", &SimpleTask{}, cereal.TaskExecutorOpts{
+		err = manager.RegisterTaskExecutor("echo-task", &EchoTask{}, cereal.TaskExecutorOpts{
 			Workers: startManagerOpts.TaskExecutorCount,
 		})
 		if err != nil {
@@ -306,10 +301,10 @@ func startManager(_ *cobra.Command, args []string) error {
 	}
 }
 
-func enqueueSimpleWorkflow(_ *cobra.Command, args []string) error {
+func enqueueEchoWorkflow(_ *cobra.Command, args []string) error {
 	var instanceName string
 	if enqueueWorkflowOpts.Name == "" {
-		instanceName = fmt.Sprintf("simple-workflow-%s", time.Now())
+		instanceName = fmt.Sprintf("echo-workflow-%s", time.Now())
 	} else {
 		instanceName = enqueueWorkflowOpts.Name
 	}
@@ -321,13 +316,12 @@ func enqueueSimpleWorkflow(_ *cobra.Command, args []string) error {
 	}
 	defer manager.Stop() // nolint: errcheck
 
-	params := SimpleWorkflowParams{
-		NumTasks:  enqueueWorkflowOpts.TaskCount,
-		SlowTasks: enqueueWorkflowOpts.SlowTasks,
+	params := EchoWorkflowParameters{
+		Count: enqueueWorkflowOpts.TaskCount,
 	}
 
 	err = manager.EnqueueWorkflow(context.TODO(),
-		"simple-workflow", instanceName, &params)
+		"echo-workflow", instanceName, &params)
 	if err != nil {
 		logrus.WithError(err).Error("Unexpected error enqueueing workflow")
 		return err
@@ -429,123 +423,6 @@ func runListInstances(_ *cobra.Command, args []string) error {
 	}
 
 	return nil
-}
-
-type SimpleTask struct{}
-
-type SimpleTaskParams struct {
-	ID        string
-	SlowTasks bool
-	Sleepy    int
-}
-
-func (t *SimpleTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
-	params := SimpleTaskParams{}
-	if err := task.GetParameters(&params); err != nil {
-		return nil, errors.Wrap(err, "could not get task parameters")
-	}
-
-	logrus.WithField("id", params.ID).Debug("Running task")
-	if params.SlowTasks {
-		select {
-		case <-time.After(time.Duration(23+params.Sleepy) * time.Second):
-		case <-ctx.Done():
-			logrus.Info("task cancelled")
-			return nil, ctx.Err()
-		}
-	}
-	logrus.Debug("Finished Task")
-	return params.ID, nil
-}
-
-type SimpleWorkflow struct{}
-
-type SimpleWorkflowParams struct {
-	NumTasks  int
-	SlowTasks bool
-}
-
-type SimpleWorkflowPayload struct {
-	Counter   int
-	StartTime time.Time
-}
-
-func (p *SimpleWorkflow) OnStart(w cereal.WorkflowInstance,
-	ev cereal.StartEvent) cereal.Decision {
-
-	logrus.Info("SimpleWorkflow got OnStart")
-	params := SimpleWorkflowParams{}
-	err := w.GetParameters(&params)
-	if err != nil {
-		return w.Fail(errors.Wrap(err, "could not decode workflow parameters"))
-	}
-	if params.NumTasks == 0 {
-		logrus.Error("Got no tasks to do")
-		return w.Complete()
-	}
-
-	for i := 0; i < params.NumTasks; i++ {
-		err = w.EnqueueTask("simple task", &SimpleTaskParams{ID: fmt.Sprintf("asdf: %d", i), Sleepy: i * 2, SlowTasks: params.SlowTasks})
-		if err != nil {
-			return w.Fail(errors.Wrap(err, "could not enqueue task"))
-		}
-	}
-
-	return w.Continue(&SimpleWorkflowPayload{
-		Counter:   0,
-		StartTime: time.Now(),
-	})
-}
-
-func (p *SimpleWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
-	ev cereal.TaskCompleteEvent) cereal.Decision {
-	if err := ev.Result.Err(); err != nil {
-		return w.Fail(errors.Wrap(err, "task failed"))
-	}
-
-	payload := SimpleWorkflowPayload{}
-	if err := w.GetPayload(&payload); err != nil {
-		return w.Fail(errors.Wrap(err, "could not decode payload"))
-	}
-	if simpleWorkflowStartTime == nil {
-		simpleWorkflowStartTime = &payload.StartTime
-	}
-
-	params := SimpleWorkflowParams{}
-	if err := w.GetParameters(&params); err != nil {
-		return w.Fail(errors.Wrap(err, "could not decode workflow parameters"))
-	}
-
-	taskParams := SimpleWorkflowParams{}
-	if err := ev.Result.GetParameters(&taskParams); err != nil {
-		return w.Fail(errors.Wrap(err, "could not decode task parameters"))
-	}
-
-	taskResult := ""
-	if err := ev.Result.Get(&taskResult); err != nil {
-		return w.Fail(errors.Wrap(err, "could not decode task result"))
-	}
-
-	logrus.WithFields(logrus.Fields{
-		"task_name":  ev.TaskName,
-		"enqueued":   w.TotalEnqueuedTasks(),
-		"completed":  w.TotalCompletedTasks(),
-		"payload":    payload,
-		"params":     params,
-		"taskParams": taskParams,
-		"taskResult": taskResult,
-	}).Info("SimpleWorkflow got Task Completed")
-
-	payload.Counter = payload.Counter + 1
-	if payload.Counter < params.NumTasks {
-		return w.Continue(&payload)
-	}
-	logrus.Info("SimpleWorkflow marking itself as complete")
-	return w.Complete()
-}
-
-func (SimpleWorkflow) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEvent) cereal.Decision {
-	return w.Complete()
 }
 
 type ScheduleTestTask struct{}
