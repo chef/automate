@@ -9,6 +9,7 @@ import {
 } from '../../shared/reporting';
 import { ActivatedRoute, Router } from '@angular/router';
 import { union } from 'lodash/fp';
+import * as moment from 'moment';
 
 type Tab = 'Node Status' | 'Profile Status';
 
@@ -138,6 +139,20 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
   onControlChanged(controlItem) {
     if (controlItem && controlItem.name) {
       this.updateUrlWithFilter(controlItem.name, 'control_id');
+    }
+  }
+
+  onDateChanged(endDate) {
+    const queryParams = {...this.route.snapshot.queryParams};
+    const endDateMoment = moment(endDate);
+    if (endDate && endDateMoment.isValid()) {
+      if (moment().utc().format('YYYY-MM-DD') === endDateMoment.format('YYYY-MM-DD')) {
+        delete queryParams['end_time'];
+      } else {
+        queryParams['end_time'] = endDateMoment.format('YYYY-MM-DD');
+      }
+
+      this.router.navigate([], {queryParams});
     }
   }
 

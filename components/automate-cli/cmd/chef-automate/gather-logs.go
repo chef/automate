@@ -24,9 +24,8 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 	"github.com/chef/automate/components/automate-deployment/pkg/gatherlogs"
-	"github.com/chef/automate/lib/platform/command"
-
 	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/platform/command"
 )
 
 const (

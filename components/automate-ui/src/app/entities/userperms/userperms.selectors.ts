@@ -21,3 +21,8 @@ export const loadStatus = createSelector(
   userpermsState,
   get('status')
 );
+
+export const getlastFetchTime = createSelector(
+  userpermsState,
+  (state) => state.lastTimeFetchAll
+);

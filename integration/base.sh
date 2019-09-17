@@ -201,6 +201,7 @@ do_test_deploy_default() {
     fi
 
     run_inspec_tests "$A2_ROOT_DIR" "${test_deploy_inspec_profiles[@]}"
+    no_panic_check
 }
 
 do_prepare_upgrade() {
@@ -231,6 +232,7 @@ do_test_upgrade_default() {
     fi
 
     run_inspec_tests "$A2_ROOT_DIR" "${test_upgrade_inspec_profiles[@]}"
+    no_panic_check
 }
 
 do_backup() {

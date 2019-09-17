@@ -16,13 +16,7 @@ describe('Admin pages', () => {
         }));
 
       fakeServer()
-        .post('/api/v0/auth/introspect_some', JSON.stringify(
-          {
-            paths: [
-              '/auth/users'
-            ]
-          }
-        ))
+        .get('/api/v0/auth/introspect')
         .many()
         .reply(200, JSON.stringify(
           {
@@ -128,14 +122,7 @@ describe('Admin pages', () => {
 
       beforeEach(() => {
         fakeServer()
-          .post('/api/v0/auth/introspect_some', JSON.stringify(
-            {
-              paths: [
-                '/iam/v2beta/tokens',
-                '/auth/tokens'
-              ]
-            }
-          ))
+          .get('/api/v0/auth/introspect')
           .many()
           .reply(200, JSON.stringify(
             {
@@ -150,7 +137,7 @@ describe('Admin pages', () => {
               }
             }
           ));
-        // TODO: protect DELETE and TOGGLE, add mock introspect_some responses here
+        // TODO: protect DELETE and TOGGLE, add mock introspect responses here
 
         fakeServer()
           .get('/apis/iam/v2beta/tokens')
@@ -349,14 +336,7 @@ describe('Admin pages', () => {
 
       beforeEach(() => {
         fakeServer()
-          .post('/api/v0/auth/introspect_some', JSON.stringify(
-            {
-              paths: [
-                '/iam/v2beta/tokens',
-                '/auth/tokens'
-              ]
-            }
-          ))
+          .get('/api/v0/auth/introspect')
           .many()
           .reply(200, JSON.stringify(
             {
@@ -544,13 +524,7 @@ describe('Admin pages', () => {
   describe('Policies list', () => {
     beforeEach(() => {
       fakeServer()
-        .post('/api/v0/auth/introspect_some', JSON.stringify(
-          {
-            paths: [
-              '/iam/v2beta/policies'
-            ]
-          }
-        ))
+        .get('/api/v0/auth/introspect')
         .many()
         .reply(200, JSON.stringify(
           {
@@ -1007,13 +981,7 @@ describe('Admin pages', () => {
   describe('Roles list', () => {
     beforeEach(() => {
       fakeServer()
-        .post('/api/v0/auth/introspect_some', JSON.stringify(
-          {
-            paths: [
-              '/iam/v2beta/roles'
-            ]
-          }
-        ))
+        .get('/api/v0/auth/introspect')
         .many()
         .reply(200, JSON.stringify(
           {
@@ -1151,13 +1119,7 @@ describe('Admin pages', () => {
   describe('Projects list', () => {
     beforeEach(() => {
       fakeServer()
-        .post('/api/v0/auth/introspect_some', JSON.stringify(
-          {
-            paths: [
-              '/iam/v2beta/projects'
-            ]
-          }
-        ))
+        .get('/api/v0/auth/introspect')
         .many()
         .reply(200, JSON.stringify(
           {
@@ -1464,13 +1426,7 @@ describe('Admin pages', () => {
   describe('projects list when the max of 6 projects is reached', () => {
     beforeEach(() => {
       fakeServer()
-      .post('/api/v0/auth/introspect_some', JSON.stringify(
-        {
-          paths: [
-            '/iam/v2beta/projects'
-          ]
-        }
-      ))
+      .get('/api/v0/auth/introspect')
       .many()
       .reply(200, JSON.stringify(
         {

@@ -46,6 +46,7 @@ type eval struct {
 	targetStack     *refStack
 	tracers         []Tracer
 	instr           *Instrumentation
+	builtins        map[string]*Builtin
 	builtinCache    builtins.Cache
 	virtualCache    *virtualCache
 	saveSet         *saveSet
@@ -65,6 +66,22 @@ func (e *eval) Run(iter evalIterator) error {
 		e.traceRedo(e.query)
 		return err
 	})
+}
+
+func (e *eval) builtinFunc(name string) (*ast.Builtin, BuiltinFunc, bool) {
+	decl, ok := ast.BuiltinMap[name]
+	if !ok {
+		bi, ok := e.builtins[name]
+		if ok {
+			return bi.Decl, bi.Func, true
+		}
+	} else {
+		f, ok := builtinFunctions[name]
+		if ok {
+			return decl, f, true
+		}
+	}
+	return nil, nil, false
 }
 
 func (e *eval) closure(query ast.Body) *eval {
@@ -508,8 +525,8 @@ func (e *eval) evalCall(terms []*ast.Term, iter unifyIterator) error {
 		return eval.eval(iter)
 	}
 
-	bi := ast.BuiltinMap[ref.String()]
-	if bi == nil {
+	bi, f, ok := e.builtinFunc(ref.String())
+	if !ok {
 		return unsupportedBuiltinErr(e.query[e.index].Location)
 	}
 
@@ -537,17 +554,13 @@ func (e *eval) evalCall(terms []*ast.Term, iter unifyIterator) error {
 		}
 	}
 
-	f := builtinFunctions[bi.Name]
-	if f == nil {
-		return unsupportedBuiltinErr(e.query[e.index].Location)
-	}
-
 	var parentID uint64
 	if e.parent != nil {
 		parentID = e.parent.queryID
 	}
 
 	bctx := BuiltinContext{
+		Context:  e.ctx,
 		Runtime:  e.runtime,
 		Cache:    e.builtinCache,
 		Location: e.query[e.index].Location,
@@ -665,6 +678,10 @@ func (e *eval) biunifyObjectsRec(a, b ast.Object, b1, b2 *bindings, iter unifyIt
 }
 
 func (e *eval) biunifyValues(a, b *ast.Term, b1, b2 *bindings, iter unifyIterator) error {
+	// Try to evaluate refs and comprehensions. If partial evaluation is
+	// enabled, then skip evaluation (and save the expression) if the term is
+	// in the save set. Currently, comprehensions are not evaluated during
+	// partial eval. This could be improved in the future.
 
 	var saveA, saveB bool
 
@@ -672,37 +689,31 @@ func (e *eval) biunifyValues(a, b *ast.Term, b1, b2 *bindings, iter unifyIterato
 		saveA = e.saveSet.ContainsRecursive(a, b1)
 	} else {
 		saveA = e.saveSet.Contains(a, b1)
+		if !saveA {
+			if _, refA := a.Value.(ast.Ref); refA {
+				return e.biunifyRef(a, b, b1, b2, iter)
+			}
+		}
 	}
 
 	if _, ok := b.Value.(ast.Set); ok {
 		saveB = e.saveSet.ContainsRecursive(b, b2)
 	} else {
 		saveB = e.saveSet.Contains(b, b2)
+		if !saveB {
+			if _, refB := b.Value.(ast.Ref); refB {
+				return e.biunifyRef(b, a, b2, b1, iter)
+			}
+		}
 	}
-
-	_, refA := a.Value.(ast.Ref)
-	_, refB := b.Value.(ast.Ref)
-
-	// Try to evaluate refs and comprehensions. If partial evaluation is
-	// enabled, then skip evaluation (and save the expression) if the term is
-	// in the save set. Currently, comprehensions are not evaluated during
-	// partial eval. This could be improved in the future.
-	if refA && !saveA {
-		return e.biunifyRef(a, b, b1, b2, iter)
-	} else if refB && !saveB {
-		return e.biunifyRef(b, a, b2, b1, iter)
-	}
-
-	compA := ast.IsComprehension(a.Value)
-	compB := ast.IsComprehension(b.Value)
 
 	if saveA || saveB {
 		return e.saveUnify(a, b, b1, b2, iter)
 	}
 
-	if compA {
+	if ast.IsComprehension(a.Value) {
 		return e.biunifyComprehension(a, b, b1, b2, false, iter)
-	} else if compB {
+	} else if ast.IsComprehension(b.Value) {
 		return e.biunifyComprehension(b, a, b2, b1, true, iter)
 	}
 

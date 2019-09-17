@@ -3,7 +3,11 @@ package compliance
 import (
 	"context"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
+	gp "github.com/golang/protobuf/ptypes/empty"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 
 	version "github.com/chef/automate/api/external/common/version"
 	"github.com/chef/automate/components/automate-gateway/api/compliance/reporting"
@@ -12,10 +16,6 @@ import (
 	jobsService "github.com/chef/automate/components/compliance-service/api/jobs"
 	reportingService "github.com/chef/automate/components/compliance-service/api/reporting"
 	versionService "github.com/chef/automate/components/compliance-service/api/version"
-	"github.com/golang/protobuf/proto"
-	gp "github.com/golang/protobuf/ptypes/empty"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type Reporting struct {
@@ -197,7 +197,7 @@ func (a *Reporting) LicenseUsageNodes(ctx context.Context, in *reporting.TimeQue
 		// append the nodesListNoAPIScans found from this job to the total reports
 		reports = append(reports, nodesListNoAPIScans...)
 	}
-	logrus.Infof("found license usage nodes %+v", reports)
+	logrus.Debugf("found license usage nodes %+v", reports)
 	return &reporting.Reports{Reports: reports, Total: int32(len(reports))}, nil
 }
 

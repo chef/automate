@@ -56,6 +56,41 @@ describe('ReportingOverviewComponent', () => {
     });
   });
 
+  describe('onDateChanged()', () => {
+    it('change to todays date', () => {
+      spyOn(router, 'navigate');
+
+      component.onDateChanged(moment().utc());
+
+      expect(router.navigate).toHaveBeenCalledWith([], {queryParams: {}});
+    });
+
+    it('valid date', () => {
+      spyOn(router, 'navigate');
+
+      component.onDateChanged(moment('2019-09-05', 'YYYY-MM-DD'));
+
+      expect(router.navigate).toHaveBeenCalledWith([],
+        {queryParams: { end_time: '2019-09-05' }});
+    });
+
+    it('invalid date', () => {
+      spyOn(router, 'navigate');
+
+      component.onDateChanged('lkjasdl');
+
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+
+    it('null date', () => {
+      spyOn(router, 'navigate');
+
+      component.onDateChanged(null);
+
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+  });
+
   describe('getData()', () => {
     const endDate = moment().utc().startOf('day').add(12, 'hours');
     const reportQuery: ReportQuery = {

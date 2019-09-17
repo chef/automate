@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivationStart, ActivationEnd, Router } from '@angular/router';
+import { ActivationStart, ActivationEnd, Router, NavigationEnd } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -12,6 +12,7 @@ import { notificationState } from 'app/entities/notifications/notification.selec
 import { Notification } from 'app/entities/notifications/notification.model';
 import { DeleteNotification } from 'app/entities/notifications/notification.actions';
 import { LicenseApplyReason } from 'app/page-components/license-apply/license-apply.component';
+import { GetAllUserPerms } from './entities/userperms/userperms.actions';
 
 @Component({
   selector: 'app-ui',
@@ -51,7 +52,7 @@ export class UIComponent implements OnInit {
     // ActivationEnd specifically needs to be here in the constructor to catch early events.
     this.router.events.pipe(
       filter(event => event instanceof ActivationEnd)
-    ).subscribe((event: any) => {
+    ).subscribe((event: ActivationEnd) => {
       this.renderNavbar = typeof event.snapshot.data.hideNavBar !== 'undefined'
         ? !event.snapshot.data.hideNavBar
         : this.renderNavbar;
@@ -61,7 +62,14 @@ export class UIComponent implements OnInit {
   ngOnInit(): void {
     this.router.events.pipe(
         filter(event => event instanceof ActivationStart)
-    ).subscribe((event: any) => this.renderNavbar = !event.snapshot.data.hideNavBar);
+    ).subscribe((event: ActivationStart) => this.renderNavbar = !event.snapshot.data.hideNavBar);
+
+    this.router.events.pipe(
+        filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => this.store.dispatch(new GetAllUserPerms()));
+
+    // Initial call
+    this.store.dispatch(new GetAllUserPerms());
 
     // Initial calls for polled events
     this.store.dispatch(new GetIamVersion());

@@ -214,7 +214,7 @@ Cypress.Commands.add('cleanupTeamsByDescriptionPrefix', (idToken: string, namePr
 function LoginHelper(username: string) {
   cy.url().should('include', '/dex/auth/local');
   cy.server();
-  cy.route('POST', '/api/v0/auth/introspect_some').as('getAuth');
+  cy.route('POST', '/api/v0/auth/introspect').as('getAuth');
 
   // login
   cy.get('#login').type(username);
