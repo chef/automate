@@ -16,8 +16,8 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/authn"
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	authz "github.com/chef/automate/api/interservice/authz/common"
+	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	tokenauthn "github.com/chef/automate/components/authn-service/authenticator/tokens"
 	"github.com/chef/automate/components/authn-service/constants"
 	"github.com/chef/automate/components/authn-service/server"
@@ -135,7 +135,7 @@ func TestChefClientAuthn(t *testing.T) {
 
 			// set up a token to authenticate with
 			{
-				resp, err := tokenClient.CreateToken(ctx, &authn.CreateTokenReq{Active: true, Description: "mytoken", Projects: []string{"default"}})
+				resp, err := tokenClient.CreateToken(ctx, &authn.CreateTokenReq{Active: true, Description: "mytoken", Projects: []string{}})
 				if err != nil {
 					t.Fatalf("create token request: %s", err)
 				}
@@ -182,7 +182,7 @@ func TestChefClientAuthn(t *testing.T) {
 
 			// update active: disable token
 			{
-				_, err := tokenClient.UpdateToken(ctx, &authn.UpdateTokenReq{Id: myTokenID, Active: false, Projects: []string{"default"}})
+				_, err := tokenClient.UpdateToken(ctx, &authn.UpdateTokenReq{Id: myTokenID, Active: false, Projects: []string{}})
 				if err != nil {
 					t.Fatalf("update token: %s", err)
 				}
@@ -221,6 +221,8 @@ func newAuthzMock(t *testing.T) (authz.SubjectPurgeClient, authz_v2.Authorizatio
 	certs := helpers.LoadDevCerts(t, "authz-service")
 	connFactory := secureconn.NewFactory(*certs)
 	g := connFactory.NewServer()
+	mockV2Authz := authz_v2.NewAuthorizationServerMock()
+	mockV2Authz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
 	mockCommon := authz.NewSubjectPurgeServerMock()
 	mockCommon.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
 	authz.RegisterSubjectPurgeServer(g, mockCommon)
