@@ -1,7 +1,7 @@
 
 export class ChefSorters {
 
-    public static normalSort(input: object[]): object[] {
+    public static normalSort(input: Array<Thing>, propName: string): Array<Thing> {
         const sortedObject = Object.values(input);
 
         const opts = {
@@ -12,14 +12,14 @@ export class ChefSorters {
         // per @msorens https://github.com/chef/a2/pull/4434
         // Sort by name then by cased-name, since no other field is useful as a secondary sort;
         // this ensures stable sort with respect to case, so 'a' always comes before 'A'.
-        sortedObject.sort(
-            (a, b) =>
-                a.name.localeCompare(b.name, undefined, opts) ||
-                a.name.localeCompare(b.name, undefined, { numeric: true })
-        );
 
-        console.log("**********")
-        console.log(sortedObject)
+        // propComparator function idea from Dave Newton
+        // https://stackoverflow.com/questions
+        const propComparator = (propName) =>
+            (a, b) => a[propName].localeCompare(b[propName], undefined, opts) ||
+                      a[propName].localeCompare(b.name, undefined, { numeric: true });
+
+        sortedObject.sort(propComparator(propName));
 
         return sortedObject;
     }
