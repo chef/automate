@@ -51,3 +51,6 @@ func (s *state) GetTokenIDWithValue(context.Context, string) (string, error) {
 func (s *state) GetTokens(context.Context) ([]*tokens.Token, error) {
 	return nil, s.err
 }
+func (s *state) PurgeProject(context.Context, string) error {
+	return s.err
+}

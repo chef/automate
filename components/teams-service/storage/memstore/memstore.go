@@ -314,6 +314,20 @@ func (m *memstore) UpgradeToV2(ctx context.Context) error {
 	return nil
 }
 
+func (m *memstore) PurgeProject(ctx context.Context, projectID string) error {
+	for _, team := range m.teams {
+		for i, v := range team.Projects {
+			if v == projectID {
+				team.Projects = append(team.Projects[:i], team.Projects[i+1:]...)
+				break
+			}
+		}
+		m.teams[team.ID] = team
+		m.teamsV2[team.Name] = team
+	}
+	return nil
+}
+
 // keeps in-memory team safe
 func copyTeam(team storage.Team) storage.Team {
 	copyTeam := storage.Team{

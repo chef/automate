@@ -481,6 +481,15 @@ func (p *postgres) GetTeamsForUser(ctx context.Context, userID string) ([]storag
 	return teams, nil
 }
 
+// PurgeProject removes a project from every team it exists in
+func (p *postgres) PurgeProject(ctx context.Context, projectID string) error {
+	_, err := p.db.ExecContext(ctx, "UPDATE teams SET projects=array_remove(projects, $1)", projectID)
+	if err != nil {
+		return p.processError(err)
+	}
+	return nil
+}
+
 func (p *postgres) touchTeam(ctx context.Context, q querier, teamID uuid.UUID) (storage.Team, error) {
 	var t storage.Team
 	err := q.QueryRowContext(ctx,
