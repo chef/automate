@@ -530,7 +530,7 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 	return report, errorutils.ProcessNotFound(nil, reportId)
 }
 
-func (backend *ES2Backend) GetControlListItems(from int32, perPage int32, filters map[string][]string,
+func (backend *ES2Backend) GetControlListItems(ctx context.Context, from int32, perPage int32, filters map[string][]string,
 	sort string, asc bool) (*reportingapi.ControlItems, error) {
 
 	contListItems := make([]*reportingapi.ControlItem, 0)
@@ -596,13 +596,16 @@ func (backend *ES2Backend) GetControlListItems(from int32, perPage int32, filter
 
 	//todo handle passed in regex too
 	filteredControls := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().Must(elastic.NewRegexpQuery("profiles.controls.id", ".*")))
-
 	filteredControls.SubAggregation("control", controlTermsAgg)
-
 	controlsAgg := elastic.NewNestedAggregation().Path("profiles.controls")
 	controlsAgg.SubAggregation("filtered_controls", filteredControls)
 
-	searchSource.Aggregation("controls", controlsAgg)
+	filteredProfiles := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().Must(elastic.NewRegexpQuery("profiles.sha256", ".*")))
+	filteredProfiles.SubAggregation("controls", controlsAgg)
+	outterMostProfilesAgg := elastic.NewNestedAggregation().Path("profiles")
+	outterMostProfilesAgg.SubAggregation("filtered_profiles", filteredProfiles)
+
+	searchSource.Aggregation("profiles", outterMostProfilesAgg)
 
 	source, err := searchSource.Source()
 	if err != nil {
@@ -613,7 +616,7 @@ func (backend *ES2Backend) GetControlListItems(from int32, perPage int32, filter
 	searchResult, err := client.Search().
 		SearchSource(searchSource).
 		Index(esIndex).
-		Do(context.Background())
+		Do(ctx)
 
 	if err != nil {
 		logrus.Error("getProfileSuggestions search failed")
@@ -622,113 +625,117 @@ func (backend *ES2Backend) GetControlListItems(from int32, perPage int32, filter
 
 	logrus.Debugf("Search query took %d milliseconds\n", searchResult.TookInMillis)
 
-	if outerControlsAggResult, found := searchResult.Aggregations.Nested("controls"); found {
-		if filteredControls, found := outerControlsAggResult.Aggregations.Filter("filtered_controls"); found {
-			if controlBuckets, found := filteredControls.Aggregations.Terms("control"); found && len(controlBuckets.Buckets) > 0 {
-				for _, controlBucket := range controlBuckets.Buckets {
-					contListItem := reportingapi.ControlItem{}
-					id, ok := controlBucket.Key.(string)
-					if !ok {
-						logrus.Errorf("could not convert the value of controlBucket: %v, to a string!", controlBucket)
-					}
-					contListItem.Id = id
-					controlSummary := &reportingapi.ControlSummary{
-						Passed:  &reportingapi.Total{},
-						Skipped: &reportingapi.Total{},
-						Failed:  &reportingapi.Failed{},
-					}
-
-					if aggResult, found := controlBucket.Aggregations.Terms("title"); found {
-						//there can only be one
-						bucket := aggResult.Buckets[0]
-						title, ok := bucket.Key.(string)
-						if !ok {
-							logrus.Errorf("could not convert the value of title: %v, to a string!", bucket)
-						}
-						contListItem.Title = title
-					}
-
-					if impactAggResult, found := controlBucket.Aggregations.Terms("impact"); found {
-						//there can only be one
-						impactBucket := impactAggResult.Buckets[0]
-						impactAsNumber, ok := impactBucket.Key.(float64)
-						if !ok {
-							logrus.Errorf("could not convert the value of impact: %v, to a float!", impactBucket)
-						}
-						contListItem.Impact = float32(impactAsNumber)
-						controlSummary.Total = int32(impactBucket.DocCount)
-					}
-
-					profileMin := &reportingapi.ProfileMin{}
-					if profileResult, found := controlBucket.Aggregations.ReverseNested("profile"); found {
-						if result, found := profileResult.Terms("sha"); found &&
-							len(result.Buckets) > 0 {
-
-							sha := result.Buckets[0]
-							name := sha.KeyNumber
-							profileMin.Id = string(name)
-						}
-						if result, found := profileResult.Terms("title"); found &&
-							len(result.Buckets) > 0 {
-
-							title := result.Buckets[0]
-							name := title.KeyNumber
-							profileMin.Title = string(name)
-						}
-						if result, found := profileResult.Terms("version"); found &&
-							len(result.Buckets) > 0 {
-
-							version := result.Buckets[0]
-							name := version.KeyNumber
-							profileMin.Version = string(name)
-						}
-					}
-					contListItem.Profile = profileMin
-
-					if endTimeResult, found := controlBucket.Aggregations.ReverseNested("end_time"); found {
-						if result, found := endTimeResult.Terms("most_recent_report"); found &&
-							len(result.Buckets) > 0 {
-
-							endTime := result.Buckets[0]
-							name := endTime.KeyAsString
-
-							endTimeAsTime, err := time.Parse(time.RFC3339, *name)
-							if err != nil {
-								return nil, errors.Wrapf(err, "%s time error: ", name)
+	if outerProfilesAggResult, found := searchResult.Aggregations.Nested("profiles"); found {
+		if outerFilteredProfiles, found := outerProfilesAggResult.Aggregations.Filter("filtered_profiles"); found {
+			if outerControlsAggResult, found := outerFilteredProfiles.Aggregations.Nested("controls"); found {
+				if filteredControls, found := outerControlsAggResult.Aggregations.Filter("filtered_controls"); found {
+					if controlBuckets, found := filteredControls.Aggregations.Terms("control"); found && len(controlBuckets.Buckets) > 0 {
+						for _, controlBucket := range controlBuckets.Buckets {
+							contListItem := reportingapi.ControlItem{}
+							id, ok := controlBucket.Key.(string)
+							if !ok {
+								logrus.Errorf("could not convert the value of controlBucket: %v, to a string!", controlBucket)
+							}
+							contListItem.Id = id
+							controlSummary := &reportingapi.ControlSummary{
+								Passed:  &reportingapi.Total{},
+								Skipped: &reportingapi.Total{},
+								Failed:  &reportingapi.Failed{},
 							}
 
-							timestamp, err := ptypes.TimestampProto(endTimeAsTime)
-							if err != nil {
-								return nil, errors.Wrapf(err, "%s time error: ", name)
-							} else {
-								contListItem.EndTime = timestamp
+							if aggResult, found := controlBucket.Aggregations.Terms("title"); found {
+								//there can only be one
+								bucket := aggResult.Buckets[0]
+								title, ok := bucket.Key.(string)
+								if !ok {
+									logrus.Errorf("could not convert the value of title: %v, to a string!", bucket)
+								}
+								contListItem.Title = title
 							}
+
+							if impactAggResult, found := controlBucket.Aggregations.Terms("impact"); found {
+								//there can only be one
+								impactBucket := impactAggResult.Buckets[0]
+								impactAsNumber, ok := impactBucket.Key.(float64)
+								if !ok {
+									logrus.Errorf("could not convert the value of impact: %v, to a float!", impactBucket)
+								}
+								contListItem.Impact = float32(impactAsNumber)
+								controlSummary.Total = int32(impactBucket.DocCount)
+							}
+
+							profileMin := &reportingapi.ProfileMin{}
+							if profileResult, found := controlBucket.Aggregations.ReverseNested("profile"); found {
+								if result, found := profileResult.Terms("sha"); found &&
+									len(result.Buckets) > 0 {
+
+									sha := result.Buckets[0]
+									name := sha.KeyNumber
+									profileMin.Id = string(name)
+								}
+								if result, found := profileResult.Terms("title"); found &&
+									len(result.Buckets) > 0 {
+
+									title := result.Buckets[0]
+									name := title.KeyNumber
+									profileMin.Title = string(name)
+								}
+								if result, found := profileResult.Terms("version"); found &&
+									len(result.Buckets) > 0 {
+
+									version := result.Buckets[0]
+									name := version.KeyNumber
+									profileMin.Version = string(name)
+								}
+							}
+							contListItem.Profile = profileMin
+
+							if endTimeResult, found := controlBucket.Aggregations.ReverseNested("end_time"); found {
+								if result, found := endTimeResult.Terms("most_recent_report"); found &&
+									len(result.Buckets) > 0 {
+
+									endTime := result.Buckets[0]
+									name := endTime.KeyAsString
+
+									endTimeAsTime, err := time.Parse(time.RFC3339, *name)
+									if err != nil {
+										return nil, errors.Wrapf(err, "%s time error: ", name)
+									}
+
+									timestamp, err := ptypes.TimestampProto(endTimeAsTime)
+									if err != nil {
+										return nil, errors.Wrapf(err, "%s time error: ", name)
+									} else {
+										contListItem.EndTime = timestamp
+									}
+								}
+							}
+
+							if passed, found := controlBucket.Aggregations.Filter("passed"); found {
+								controlSummary.Passed.Total = int32(passed.DocCount)
+							}
+
+							if skipped, found := controlBucket.Aggregations.Filter("skipped"); found {
+								controlSummary.Skipped.Total = int32(skipped.DocCount)
+							}
+
+							if failed, found := controlBucket.Aggregations.Filter("failed"); found {
+								total := int32(failed.DocCount)
+								controlSummary.Failed.Total = total
+								if contListItem.Impact < 0.4 {
+									controlSummary.Failed.Minor = total
+								} else if contListItem.Impact < 0.7 {
+									controlSummary.Failed.Major = total
+								} else {
+									controlSummary.Failed.Critical = total
+								}
+							}
+
+							contListItem.ControlSummary = controlSummary
+
+							contListItems = append(contListItems, &contListItem)
 						}
 					}
-
-					if passed, found := controlBucket.Aggregations.Filter("passed"); found {
-						controlSummary.Passed.Total = int32(passed.DocCount)
-					}
-
-					if skipped, found := controlBucket.Aggregations.Filter("skipped"); found {
-						controlSummary.Skipped.Total = int32(skipped.DocCount)
-					}
-
-					if failed, found := controlBucket.Aggregations.Filter("failed"); found {
-						total := int32(failed.DocCount)
-						controlSummary.Failed.Total = total
-						if contListItem.Impact < 0.4 {
-							controlSummary.Failed.Minor = total
-						} else if contListItem.Impact < 0.7 {
-							controlSummary.Failed.Major = total
-						} else {
-							controlSummary.Failed.Critical = total
-						}
-					}
-
-					contListItem.ControlSummary = controlSummary
-
-					contListItems = append(contListItems, &contListItem)
 				}
 			}
 		}

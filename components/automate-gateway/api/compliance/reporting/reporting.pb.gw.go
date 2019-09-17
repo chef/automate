@@ -98,7 +98,7 @@ func local_request_ReportingService_ListReportIds_0(ctx context.Context, marshal
 }
 
 func request_ReportingService_ListControlItems_0(ctx context.Context, marshaler runtime.Marshaler, client ReportingServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq Query
+	var protoReq ControlItemRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -115,7 +115,7 @@ func request_ReportingService_ListControlItems_0(ctx context.Context, marshaler 
 }
 
 func local_request_ReportingService_ListControlItems_0(ctx context.Context, marshaler runtime.Marshaler, server ReportingServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq Query
+	var protoReq ControlItemRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)

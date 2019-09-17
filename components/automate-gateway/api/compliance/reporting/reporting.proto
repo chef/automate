@@ -50,7 +50,7 @@ service ReportingService {
    	};
 	// should cover /controls
 	// This api is useful for getting a limited list of control items for latest runs.  It also honors all reporting filters
-	rpc ListControlItems(Query) returns (ControlItems) {
+	rpc ListControlItems(ControlItemRequest) returns (ControlItems) {
 		option (google.api.http) = {
    			post: "/compliance/reporting/controls"
    			body: "*"
@@ -160,6 +160,13 @@ service ReportingService {
 			action: "compliance:reportingLicenseUsage:list"
 		};
 	};
+}
+
+message ControlItemRequest {
+	string type = 1;
+	string text = 2;
+	int32 size = 3;
+	repeated ListFilter filters = 4;
 }
 
 message ControlItem {

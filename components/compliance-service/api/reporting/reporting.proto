@@ -15,7 +15,7 @@ service ReportingService {
 	rpc Export(Query) returns (stream ExportData) {};
 	rpc ReadNode(Id) returns (Node) {};
 	rpc ListNodes(Query) returns (Nodes) {};
-	rpc ListControlItems(Query) returns (ControlItems) {};
+	rpc ListControlItems(ControlItemRequest) returns (ControlItems) {};
 }
 message ExportData {
 	bytes content = 1;
@@ -63,6 +63,13 @@ message ControlItem {
 	float impact = 4;
 	google.protobuf.Timestamp end_time = 5;
 	ControlSummary control_summary = 6;
+}
+
+message ControlItemRequest {
+	string type = 1;
+	string text = 2;
+	int32 size = 3;
+	repeated ListFilter filters = 4;
 }
 
 message ControlItems {

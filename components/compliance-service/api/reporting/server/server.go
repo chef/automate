@@ -191,7 +191,7 @@ func (srv *Server) ListControlItems(ctx context.Context, in *reporting.Query) (*
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	controlListItems, err = srv.es.GetControlListItems(from, perPage, formattedFilters, SORT_FIELDS[sort], asc)
+	controlListItems, err = srv.es.GetControlListItems(ctx, from, perPage, formattedFilters, SORT_FIELDS[sort], asc)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}

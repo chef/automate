@@ -36,7 +36,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1Query"
+              "$ref": "#/definitions/v1ControlItemRequest"
             }
           }
         ],
@@ -374,6 +374,27 @@ func init() {
         },
         "control_summary": {
           "$ref": "#/definitions/v1ControlSummary"
+        }
+      }
+    },
+    "v1ControlItemRequest": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ListFilter"
+          }
         }
       }
     },
