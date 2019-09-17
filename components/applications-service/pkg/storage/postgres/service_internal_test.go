@@ -39,7 +39,7 @@ func TestConvertComposedServicesToStorage(t *testing.T) {
 
 func TestBuildWhereConstraintsFromFiltersNoFilterReturnsEmptyString(t *testing.T) {
 	expected := ""
-	actual, err := buildWhereConstraintsFromFilters(nil)
+	actual, err := buildWhereConstraintsFromFilters(nil, true)
 	assert.Nil(t, err)
 	assert.Equal(t, expected, actual)
 }
@@ -137,7 +137,7 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.message, func(t *testing.T) {
-			actual, err := buildWhereConstraintsFromFilters(test.filters)
+			actual, err := buildWhereConstraintsFromFilters(test.filters, true)
 
 			if test.shouldReturnError {
 				assert.NotNil(t, err)
