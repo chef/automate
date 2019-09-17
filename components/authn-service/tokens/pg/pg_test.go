@@ -58,6 +58,9 @@ func setup(t *testing.T) (tokens.Storage, *sql.DB) {
 	authzCerts := helpers.LoadDevCerts(t, "authz-service")
 	authzConnFactory := secureconn.NewFactory(*authzCerts)
 	grpcAuthz := authzConnFactory.NewServer()
+	mockV2Authz := authz_v2.NewAuthorizationServerMock()
+	mockV2Authz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
+	authz_v2.RegisterAuthorizationServer(grpcAuthz, mockV2Authz)
 	authzServer := grpctest.NewServer(grpcAuthz)
 	authzConn, err := authzConnFactory.Dial("authz-service", authzServer.URL)
 	require.NoError(t, err)
@@ -70,6 +73,11 @@ func setup(t *testing.T) (tokens.Storage, *sql.DB) {
 	reset(t, db)
 
 	return backend, db
+}
+
+func defaultValidateProjectAssignmentFunc(context.Context,
+	*authz_v2.ValidateProjectAssignmentReq) (*authz_v2.ValidateProjectAssignmentResp, error) {
+	return &authz_v2.ValidateProjectAssignmentResp{}, nil
 }
 
 func initializePG() (*pg.Config, error) {
