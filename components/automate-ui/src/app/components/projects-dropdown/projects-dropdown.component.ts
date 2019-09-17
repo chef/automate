@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnChanges} from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges } from '@angular/core';
 
 import { ProjectConstants, Project } from 'app/entities/projects/project.model';
 
