@@ -255,6 +255,40 @@ func TestDistinctValuesFiltersApplied(t *testing.T) {
 	scenarioForFieldWithFilter(t, "buildstamp", []string{"environment:aaa-environment"})
 
 	t.Run("distinct values filtering for field version ignores status filter", func(t *testing.T) {
+		fieldName := "environment"
+
+		expectedValueAAA := "aaa-environment"
+		expectedValueAAB := "aab-environment"
+		expectedValueABB := "abb-environment"
+
+		queryFragment := ""
+		actual := getDistinctValues(t, fieldName, queryFragment, []string{"environment:abb-environment"})
+		expected := []string{
+			expectedValueAAA,
+			expectedValueAAB,
+			expectedValueABB,
+		}
+		assert.Equalf(t, expected, actual, "GetServicesDistinctValues for %q with queryFragment %q", fieldName, queryFragment)
+
+		queryFragment = "a"
+		actual = getDistinctValues(t, fieldName, queryFragment, []string{"environment:abb-environment"})
+		expected = []string{
+			expectedValueAAA,
+			expectedValueAAB,
+			expectedValueABB,
+		}
+		assert.Equalf(t, expected, actual, "GetServicesDistinctValues for %q with queryFragment %q", fieldName, queryFragment)
+
+		queryFragment = "aa"
+		actual = getDistinctValues(t, fieldName, queryFragment, []string{"environment:abb-environment"})
+		expected = []string{
+			expectedValueAAA,
+			expectedValueAAB,
+		}
+		assert.Equalf(t, expected, actual, "GetServicesDistinctValues for %q with queryFragment %q", fieldName, queryFragment)
+	})
+
+	t.Run("distinct values filtering for field environment ignores environment filter", func(t *testing.T) {
 		fieldName := "version"
 
 		expectedValueAAA := "1.0.0"
