@@ -10,6 +10,7 @@ import (
 
 	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/chef/automate/lib/pgutils"
+	"github.com/chef/automate/lib/platform/pg"
 )
 
 // composedService is a more user friendly and clear representation of a service.
@@ -177,7 +178,7 @@ var validFilterFields = []string{
 func (db *Postgres) GetServicesHealthCounts(filters map[string][]string) (*storage.HealthCounts, error) {
 	var (
 		sHealthCounts         storage.HealthCounts
-		WhereConstraints, err = buildWhereConstraintsFromFilters(filters, true)
+		WhereConstraints, err = buildWhereConstraintsFromFilters(filters, "WHERE")
 	)
 	if err != nil {
 		return nil, err
@@ -208,7 +209,7 @@ func (db *Postgres) GetServices(
 		services              []*composedService
 		offset                = pageSize * page
 		sortOrder             = "ASC"
-		WhereConstraints, err = buildWhereConstraintsFromFilters(filters, true)
+		WhereConstraints, err = buildWhereConstraintsFromFilters(filters, "WHERE")
 	)
 
 	if err != nil {
@@ -231,8 +232,8 @@ func (db *Postgres) GetServices(
 }
 
 func (db *Postgres) GetServicesDistinctValues(fieldName, queryFragment string, filters map[string][]string) ([]string, error) {
-	// Pass false for first because first is the query fragment, not filters
-	whereConstraints, err := buildWhereConstraintsFromFilters(filters, false)
+	// Pass "AND" for firstKeyword because we build the WHERE with the query fragment
+	whereConstraints, err := buildWhereConstraintsFromFilters(filters, "AND")
 	if err != nil {
 		return nil, err
 	}
@@ -248,16 +249,15 @@ func (db *Postgres) GetServicesDistinctValues(fieldName, queryFragment string, f
 		return nil, errors.Errorf("field name %q is not valid for filtering, valid values are %v", fieldName, validFilterFields)
 	}
 
-	columnName := columnNameForField(fieldName)
-	queryFirst := fmt.Sprintf("SELECT DISTINCT %s from service_full AS t WHERE t.%s ILIKE $1 ",
-		columnName,
+	columnName := pg.QuoteIdentifier(columnNameForField(fieldName))
+	queryFirst := fmt.Sprintf("SELECT DISTINCT %[1]s from service_full AS t WHERE t.%[1]s ILIKE $1 ",
 		columnName,
 	)
 	querySecond := fmt.Sprintf(" ORDER BY %s ASC LIMIT 100;",
 		columnName,
 	)
 	query := queryFirst + whereConstraints + querySecond
-	matcher := fmt.Sprintf("%s%%", queryFragment)
+	matcher := fmt.Sprintf("%s%%", pgutils.EscapeLiteralForPG(queryFragment))
 
 	var matches []string
 	_, err = db.DbMap.Select(&matches, query, matcher)
@@ -374,9 +374,11 @@ func convertComposedServiceToStorage(svc *composedService) *storage.Service {
 //      AND health = 'CRITICAL'     OR health = 'UNKNOWN'
 //      AND environment = 'production'
 //
-func buildWhereConstraintsFromFilters(filters map[string][]string, first bool) (string, error) {
+// firstKeyword is added so you can build onto existing constraints that already have a 'WHERE' keyword declared
+// to build onto existing constraints pass in an 'AND' keyword or 'OR' depending on your use case.
+func buildWhereConstraintsFromFilters(filters map[string][]string, firstKeyword string) (string, error) {
 	var (
-		firstStatement   = first
+		firstStatement   = true
 		WhereConstraints = ""
 	)
 
@@ -387,8 +389,8 @@ func buildWhereConstraintsFromFilters(filters map[string][]string, first bool) (
 			continue
 		}
 
-		if firstStatement {
-			WhereConstraints = "WHERE"
+		if firstStatement { // Let the calling function determine if this starts with WHERE or AND
+			WhereConstraints = firstKeyword
 			firstStatement = false
 		} else {
 			WhereConstraints = WhereConstraints + " AND"
