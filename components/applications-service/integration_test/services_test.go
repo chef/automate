@@ -174,6 +174,8 @@ func TestGetServicesMultiService(t *testing.T) {
 }
 
 func TestGetServicesWithDisconnectedServices(t *testing.T) {
+	ctx := context.Background()
+
 	inputSvcs := habServicesMatrixAllHealthStatusDifferent()
 
 	// Sending the timestamp roundtrip through the app to postgres and back
@@ -190,15 +192,23 @@ func TestGetServicesWithDisconnectedServices(t *testing.T) {
 	suite.IngestServices(inputSvcs)
 	defer suite.DeleteDataFromStorage()
 
-	_, err := suite.ApplicationsServer.MarkDisconnectedServices(300)
+	// The services should not count as disconnected until we request to mark
+	// them disconnected
+	reqDisconnectedOnly := &applications.ServicesReq{
+		Filter: []string{"disconnectedStatus:disconnected"},
+	}
+	res, err := suite.ApplicationsServer.GetServices(ctx, reqDisconnectedOnly)
+	assert.NoError(t, err)
+	assert.Len(t, res.Services, 0)
+
+	_, err = suite.ApplicationsServer.MarkDisconnectedServices(300)
 	require.NoError(t, err)
 
-	ctx := context.Background()
 	req := &applications.ServicesReq{}
-	res, err := suite.ApplicationsServer.GetServices(ctx, req)
+	res, err = suite.ApplicationsServer.GetServices(ctx, req)
 	assert.NoError(t, err)
 
-	assert.Equal(t, 6, len(res.Services))
+	assert.Len(t, res.Services, 6)
 	for _, s := range res.Services {
 		assert.True(t, s.Disconnected, "expected the service to be marked as disconnected")
 		expectedTime, err := ptypes.TimestampProto(eventTime)
@@ -214,6 +224,10 @@ func TestGetServicesWithDisconnectedServices(t *testing.T) {
 			assert.Failf(t, "LastEventSince field in service didn't contain expected message", "value was: %q", s.LastEventSince)
 		}
 	}
+
+	res2, err := suite.ApplicationsServer.GetServices(ctx, reqDisconnectedOnly)
+	assert.NoError(t, err)
+	assert.Len(t, res2.Services, 6)
 }
 
 func TestGetServicesMultiServicaSortDESC(t *testing.T) {

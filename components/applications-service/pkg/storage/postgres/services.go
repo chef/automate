@@ -416,6 +416,12 @@ func buildWhereConstraintsFromFilters(filters map[string][]string) (string, erro
 		case "service":
 			WhereConstraints = WhereConstraints + buildORStatementFromValues("name", values)
 
+		case "disconnectedStatus":
+			// FIXME: fail on other values?
+			if values[0] == "disconnected" {
+				WhereConstraints = WhereConstraints + " disconnected"
+			}
+
 		default:
 			return "", errors.Errorf("invalid filter. (%s:%s)", filter, values)
 		}
