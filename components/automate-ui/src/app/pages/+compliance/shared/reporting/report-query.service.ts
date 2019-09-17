@@ -20,13 +20,13 @@ export class ReportQueryService {
 
   intervals: TimeIntervals[] = [
     { name: 'Last 10 days', findStartDate: (endDate: moment.Moment): moment.Moment =>
-      moment(endDate).subtract(10, 'days')},
+      endDate.clone().subtract(10, 'days')},
     { name: 'Last month', findStartDate: (endDate: moment.Moment): moment.Moment =>
-      moment(endDate).subtract(1, 'months')},
+      endDate.clone().subtract(1, 'months')},
     { name: 'Last 3 months', findStartDate: (endDate: moment.Moment): moment.Moment =>
-      moment(endDate).subtract(3, 'months')},
+      endDate.clone().subtract(3, 'months')},
     { name: 'Last year', findStartDate: (endDate: moment.Moment): moment.Moment =>
-      moment(endDate).subtract(1, 'years')}
+      endDate.clone().subtract(1, 'years')}
   ];
 
   private idToTitle: Map<string, string> = new Map<string, string>();
@@ -44,7 +44,13 @@ export class ReportQueryService {
   }
 
   getReportQuery(): ReportQuery {
-    return this.state.getValue();
+    const reportQuery = this.state.getValue();
+    return {
+      startDate: reportQuery.startDate.clone(),
+      endDate: reportQuery.endDate.clone(),
+      interval: reportQuery.interval,
+      filters: [...reportQuery.filters]
+    };
   }
 
   setState(newState: ReportQuery) {
@@ -52,7 +58,7 @@ export class ReportQueryService {
   }
 
   findTimeIntervalStartDate(interval: number, endDate: moment.Moment): moment.Moment {
-    return this.intervals[interval].findStartDate(endDate);
+    return this.intervals[interval].findStartDate(endDate.clone());
   }
 
   setFilterTitle(type: string, id: string, title: string) {

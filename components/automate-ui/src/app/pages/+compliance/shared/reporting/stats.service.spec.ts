@@ -186,6 +186,22 @@ describe('StatsService', () => {
         expect(actualUrlFilters).toContain(expectedUrlFilter));
     });
 
+    it('start and end date not modified', () => {
+      const reportQuery: ReportQuery = {
+        startDate: moment('2017-11-14T00:00:00Z').utc(),
+        endDate: moment('2017-11-15T23:59:59Z').utc(),
+        interval: 0,
+        filters: []
+      };
+      const startDateBefore = reportQuery.startDate.clone();
+      const endDateBefore = reportQuery.endDate.clone();
+
+      service.formatFilters(reportQuery);
+
+      expect(startDateBefore).toEqual(reportQuery.startDate);
+      expect(endDateBefore).toEqual(reportQuery.endDate);
+    });
+
     it('returns profile_name not profile_id', () => {
       const reportQuery: ReportQuery = {
         startDate: moment('2017-11-14T00:00:00Z').utc(),
