@@ -1,7 +1,7 @@
 
 import { ChefSorters } from './sorter';
 
-fdescribe('normalSort', () => {
+describe('normalSort', () => {
 
     const inputObject: {} = [
         { checked: false, id: 'B', name: '123abc', status: 'NO_RULES', type: 'CUSTOM'},
