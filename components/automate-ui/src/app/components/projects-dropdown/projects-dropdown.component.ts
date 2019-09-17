@@ -4,6 +4,8 @@ import {
 
 import { ProjectConstants, Project } from 'app/entities/projects/project.model';
 
+import { ChefSorters } from 'app/helpers/auth/sorter';
+
 const { UNASSIGNED_PROJECT_ID } = ProjectConstants;
 
 // Extend the project model with the checked field.
@@ -37,7 +39,7 @@ export class ProjectsDropdownComponent implements OnChanges {
   label = UNASSIGNED_PROJECT_ID;
 
   projectsArray(): ProjectChecked[] {
-    return Object.values(this.projects);
+    return ChefSorters.normalSort(this.projects, 'name');
   }
 
   ngOnChanges(): void {
