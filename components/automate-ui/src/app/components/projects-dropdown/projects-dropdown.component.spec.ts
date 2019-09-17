@@ -24,8 +24,8 @@ describe('ProjectsDropdownComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('#projectsArray', () => {
-    it('#projectsArray returns an object naturally ordered by name', () => {
+  describe('projectsArray', () => {
+    it('returns an object naturally ordered by name', () => {
       const unsortedProjects: {} = [
         {
           checked: false,
