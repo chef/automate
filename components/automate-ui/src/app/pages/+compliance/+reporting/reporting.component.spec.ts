@@ -18,6 +18,7 @@ import {
 } from '../shared/reporting';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 import * as moment from 'moment';
+import { using } from 'app/testing/spec-helpers';
 
 class MockTelemetryService {
   track() { }
@@ -68,13 +69,19 @@ describe('ReportingComponent', () => {
     expect(qe).not.toBeNull();
   });
 
-  it('convertMomentToDateWithoutTimezone', () => {
-    const dateBefore = moment('20191023-2300', 'YYYYMMDD-HHMM');
-    const dateAfter = component.convertMomentToDateWithoutTimezone(dateBefore);
-    expect(dateBefore.hour()).toEqual(dateAfter.getHours());
+  using([
+    ['23', 'an hour before end of day'],
+    ['00', 'exactly end of day'],
+    ['01', 'an hour after end of day']
+  ], function (hour: string, description: string) {
+    it(`maps hour correctly without timezone for ${description}`, () => {
+      const dateBefore = moment(`20191023-${hour}00`, 'YYYYMMDD-HHMM');
+      const dateAfter = component.convertMomentToDateWithoutTimezone(dateBefore);
+      expect(dateBefore.hour()).toEqual(dateAfter.getHours());
+    });
   });
 
-  it('getEndDate', () => {
+  it('extracting end time from the URL', () => {
     const expectedDate = moment('20191023GMT+00:00', 'YYYYMMDDZ').startOf('day').add(12, 'hours');
     const beforeEndDate = component.getEndDate([{type: 'end_time', text: '2019-10-23'}]);
     expect(expectedDate.hours()).toEqual(beforeEndDate.hours());

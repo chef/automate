@@ -49,7 +49,7 @@ export class ReportQueryService {
       startDate: reportQuery.startDate.clone(),
       endDate: reportQuery.endDate.clone(),
       interval: reportQuery.interval,
-      filters: Object.assign([], reportQuery.filters)
+      filters: [...reportQuery.filters]
     };
   }
 
