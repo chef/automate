@@ -137,7 +137,7 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.message, func(t *testing.T) {
-			actual, err := buildWhereConstraintsFromFilters(test.filters, "WHERE)
+			actual, err := buildWhereConstraintsFromFilters(test.filters, "WHERE")
 
 			if test.shouldReturnError {
 				assert.NotNil(t, err)
