@@ -143,7 +143,7 @@ const defaultRouterState = {
 
 export function routerReducer(state = defaultRouterState, action) {
   switch (action.type) {
-    case 'ROUTER_NAVIGATION':
+    case router.ROUTER_NAVIGATION:
       const newRouterState =
         set('previousRoute', get('state', state), router.routerReducer(state, action));
       return newRouterState;
