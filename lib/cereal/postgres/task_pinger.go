@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/lib/cereal"
 )
 
 const defaultPingDuration = 15 * time.Second
@@ -14,8 +16,8 @@ const defaultPingDuration = 15 * time.Second
 type taskPinger struct {
 	taskID       int64
 	db           *sql.DB
-	wgStart      sync.WaitGroup
-	wgStop       sync.WaitGroup
+	wg           sync.WaitGroup
+	sg           cereal.StartGuard
 	stop         context.CancelFunc
 	pingInterval time.Duration
 }
@@ -25,8 +27,8 @@ func newTaskPinger(db *sql.DB, taskID int64, pingInterval time.Duration) *taskPi
 		taskID:       taskID,
 		db:           db,
 		pingInterval: pingInterval,
+		sg:           cereal.NewStartGuard("Start(ctx, onTaskLost) called more than once on postgres.taskPinger!"),
 	}
-	pinger.wgStart.Add(1)
 	return pinger
 }
 
@@ -37,10 +39,10 @@ func newTaskPinger(db *sql.DB, taskID int64, pingInterval time.Duration) *taskPi
 func (w *taskPinger) Start(ctx context.Context, onTaskLost func()) {
 	// Make sure this function is only called once. A second call will
 	// cause this to panic
-	w.wgStart.Done()
+	w.sg.Started()
 
-	// The wgStop will be used to wait for the goroutine to exit
-	w.wgStop.Add(1)
+	// The wg will be used to wait for the goroutine to exit
+	w.wg.Add(1)
 
 	// Create a cancelable context that we can stop from Stop
 	ctx, cancel := context.WithCancel(ctx)
@@ -66,7 +68,7 @@ func (w *taskPinger) Start(ctx context.Context, onTaskLost func()) {
 				}
 			}
 		}
-		w.wgStop.Done()
+		w.wg.Done()
 		logctx.Debug("Exiting taskPinger")
 	}()
 }
@@ -90,5 +92,5 @@ func (w *taskPinger) ping(ctx context.Context) (shouldExit bool, err error) {
 
 func (w *taskPinger) Stop() {
 	w.stop()
-	w.wgStop.Wait()
+	w.wg.Wait()
 }

@@ -496,6 +496,7 @@ type Manager struct {
 	backend           backend.Driver
 	cancel            context.CancelFunc
 	wg                sync.WaitGroup
+	sg                StartGuard
 
 	taskDequeueWorkers int
 	taskDequeuePool    *taskDequeuePool
@@ -568,6 +569,7 @@ func NewManager(b backend.Driver, opts ...ManagerOpt) (*Manager, error) {
 		taskPollInterval:     defaultTaskPollInterval,
 		taskPollMaxJitter:    defaultTaskPollMaxJitter,
 		workflowWakeupChan:   workflowWakeupChan,
+		sg:                   NewStartGuard("Start(ctx) called more than once on cereal.Manager!"),
 	}
 
 	if v, ok := b.(backend.SchedulerDriver); ok {
@@ -851,6 +853,7 @@ func (m *Manager) RegisterTaskExecutor(taskName string, executor TaskExecutor, o
 // Start starts the Manager. No workflows, tasks, or schedules will be
 // processed before Start is called. This should only be called once.
 func (m *Manager) Start(ctx context.Context) error {
+	m.sg.Started() // panics if called more than once
 	ctx, cancel := context.WithCancel(ctx)
 	m.cancel = cancel
 	err := m.startTaskPollers(ctx)

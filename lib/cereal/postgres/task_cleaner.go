@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/lib/cereal"
 )
 
 const (
@@ -16,10 +18,10 @@ const (
 )
 
 type taskCleaner struct {
-	db      *sql.DB
-	wgStart sync.WaitGroup
-	wgStop  sync.WaitGroup
-	stop    context.CancelFunc
+	db   *sql.DB
+	wg   sync.WaitGroup
+	sg   cereal.StartGuard
+	stop context.CancelFunc
 
 	checkInterval time.Duration
 	taskTimeout   time.Duration
@@ -40,18 +42,18 @@ func newTaskCleaner(db *sql.DB) *taskCleaner {
 		taskTimeout:                   300 * time.Second,
 		maxWorkflowResults:            defaultMaxWorkflowResults,
 		workflowResultsDeletionMargin: defaultWorkflowResultsDeletionMargin,
+		sg:                            cereal.NewStartGuard("Start(ctx) called more than once on postgres.taskCleaner()!"),
 	}
-	cleaner.wgStart.Add(1)
 	return cleaner
 }
 
 func (w *taskCleaner) Start(ctx context.Context) {
 	// Make sure this function is only called once. A second call will
 	// cause this to panic
-	w.wgStart.Done()
+	w.sg.Started()
 
-	// The wgStop will be used to wait for the goroutine to exit
-	w.wgStop.Add(1)
+	// The wg will be used to wait for the goroutine to exit
+	w.wg.Add(1)
 
 	ctx, cancel := context.WithCancel(ctx)
 	w.stop = cancel
@@ -75,14 +77,14 @@ func (w *taskCleaner) Start(ctx context.Context) {
 				}
 			}
 		}
-		w.wgStop.Done()
+		w.wg.Done()
 		logrus.Debug("Exiting task cleaner")
 	}()
 }
 
 func (w *taskCleaner) Stop() {
 	w.stop()
-	w.wgStop.Wait()
+	w.wg.Wait()
 }
 
 func (w *taskCleaner) expireDeadTasks(ctx context.Context, expireOlderThanSeconds int64) error {
