@@ -22,7 +22,7 @@ describe('normalSort', () => {
         const idOutput = ChefSorters.normalSort(inputObject, 'id')
                                     .map(p => p.id);
 
-        expect(nameOutput).toBe(sortedNames);
-        expect(idOutput).toBe(sortedIds);
+        expect(nameOutput).toEqual(sortedNames);
+        expect(idOutput).toEqual(sortedIds);
     });
 });
