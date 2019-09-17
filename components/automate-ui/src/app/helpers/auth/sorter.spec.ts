@@ -1,5 +1,5 @@
 
-
+import { ChefSorters } from './sorter';
 
 describe('normalSort', () => {
 
@@ -12,7 +12,7 @@ describe('normalSort', () => {
       ];
 
     const outputByName: {} = [
-        
+
     ]
 
     it('returns a normally sorted array by chosen property', () => {
