@@ -35,23 +35,25 @@
       <chef-page-header>
         <chef-heading>{{ profile.title }}</chef-heading>
         <chef-subheading>{{ profile.summary }}</chef-subheading>
-        <div slot="header-buttons">
-          <ng-container *ngIf="!isInstalled">
-            <chef-button secondary caution id="install-btn" (click)="installProfile(profile)">
-              <chef-icon>get_app</chef-icon>
-              <span>Get</span>
+        <div class="header-buttons-container">
+          <div slot="header-buttons">
+            <ng-container *ngIf="!isInstalled">
+              <chef-button secondary caution id="install-btn" (click)="installProfile(profile)">
+                <chef-icon>get_app</chef-icon>
+                <span>Get</span>
+              </chef-button>
+            </ng-container>
+            <ng-container *ngIf="isInstalled">
+              <chef-button secondary caution id="uninstall-btn" (click)="showDeleteModal()">
+                <chef-icon>delete</chef-icon>
+                <span>Remove</span>
+              </chef-button>
+            </ng-container>
+            <chef-button secondary id="download-btn" (click)="downloadProfile(profile)">
+              <chef-icon>cloud_download</chef-icon>
+              <span>Download</span>
             </chef-button>
-          </ng-container>
-          <ng-container *ngIf="isInstalled">
-            <chef-button secondary caution id="uninstall-btn" (click)="showDeleteModal()">
-              <chef-icon>delete</chef-icon>
-              <span>Remove</span>
-            </chef-button>
-          </ng-container>
-          <chef-button secondary id="download-btn" (click)="downloadProfile(profile)">
-            <chef-icon>cloud_download</chef-icon>
-            <span>Download</span>
-          </chef-button>
+          </div>
         </div>
       </chef-page-header>
 
