@@ -60,7 +60,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
       'name': 'organization',
       'title': 'Chef Organization',
       'description': 'Add the organization to filter this report to a specific organization',
-      'placeholder': 'Organization'
+      'placeholder': 'Chef Organization'
     },
     {
       'name': 'chef_server',
