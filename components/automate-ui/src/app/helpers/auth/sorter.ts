@@ -1,7 +1,7 @@
 
 export class ChefSorters {
 
-    public static normalSort(input: Array<Thing>, propName: string): Array<Thing> {
+    public static normalSort(input: object, property: string): Array<any> {
         const sortedObject = Object.values(input);
 
         const opts = {
@@ -19,7 +19,7 @@ export class ChefSorters {
             (a, b) => a[propName].localeCompare(b[propName], undefined, opts) ||
                       a[propName].localeCompare(b.name, undefined, { numeric: true });
 
-        sortedObject.sort(propComparator(propName));
+        sortedObject.sort(propComparator(property));
 
         return sortedObject;
     }
