@@ -13,6 +13,13 @@ import { DOCUMENT } from '@angular/common';
 import * as d3 from 'd3';
 import * as moment from 'moment';
 
+export interface TrendData {
+  report_time: Date;
+  failed: number;
+  passed: number;
+  skipped: number;
+}
+
 @Component({
   selector: 'app-overview-trend',
   templateUrl: './overview-trend.component.html',
@@ -27,7 +34,7 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
 
   @Input() data = [];
 
-  @Output() dateSelected: EventEmitter<moment.Moment> = new EventEmitter<moment.Moment>();
+  @Output() dateSelected: EventEmitter<string> = new EventEmitter<string>();
 
   @Input() type: 'nodes' | 'controls';
 
@@ -41,15 +48,15 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
     return `0 0 ${this.vbWidth} ${this.vbHeight}`;
   }
 
-  get trendData() {
+  get trendData(): TrendData[] {
     return this.data.map(d => {
-      return { ...d, report_time: new Date(d.report_time) };
+      return { ...d, report_time: this.createUtcDate(d.report_time) };
     });
   }
 
   get domainX() {
-    const min = d3.min(this.trendData, d => d.report_time);
-    const max = d3.max(this.trendData, d => d.report_time);
+    const min = d3.min(this.trendData, (d: TrendData) => d.report_time);
+    const max = d3.max(this.trendData, (d: TrendData) => d.report_time);
     return [min, max];
   }
 
@@ -67,7 +74,7 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
 
   get domainY() {
     const min = 0;
-    const max = d3.max(this.trendData, d => d3.max([d.failed, d.passed, d.skipped]));
+    const max = d3.max(this.trendData, (d: TrendData) => d3.max([d.failed, d.passed, d.skipped]));
     return [min, max];
   }
 
@@ -97,12 +104,12 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
 
   get dotsSelection() {
     return this.svgSelection.selectAll('.dot-group')
-      .data(this.trendData, d => d.report_time.getTime());
+      .data(this.trendData, (d: TrendData) => d.report_time.getTime());
   }
 
   get tipsSelection() {
     return d3.select(this.document.body).selectAll('.dot-group-tip')
-      .data(this.trendData, d => d.report_time.getTime());
+      .data(this.trendData, (d: TrendData) => d.report_time.getTime());
   }
 
   get linesSelection() {
@@ -212,7 +219,7 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
       .attr('class', 'dot-group-bg');
 
     enter.on('click', (line) => {
-      this.dateSelected.next(moment(line.report_time));
+      this.dateSelected.next(moment(line.report_time).format('YYYY-MM-DD'));
     });
 
     update.select('.dot-group-tick')
@@ -286,5 +293,15 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
     });
 
     exit.remove();
+  }
+
+  createUtcDate(time: string): Date {
+    const utcDate = moment(time).utc();
+    if (utcDate.isValid) {
+      return new Date(utcDate.year(), utcDate.month(), utcDate.date());
+    } else {
+      console.error('Not a valid date ' + time);
+      return new Date();
+    }
   }
 }
