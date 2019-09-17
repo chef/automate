@@ -28,7 +28,9 @@ import {
   serviceGroupsList,
   serviceGroupsState,
   serviceGroupsHealth,
-  serviceGroupsError
+  serviceGroupsError,
+  selectedServiceGroupList,
+  selectedServiceGroupStatus
 } from '../../entities/service-groups/service-groups.selector';
 import { find, filter as fpFilter, pickBy, some, includes, get } from 'lodash/fp';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
@@ -44,6 +46,9 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   public serviceGroupsStatus$: Observable<EntityStatus>;
   public serviceGroupsError$: Observable<HttpErrorResponse>;
   public sgHealthSummary: ServiceGroupsHealthSummary;
+
+  // Selected sarch bar filters
+  public selectedSearchBarFilters = [];
 
   // The selected service-group id that will be sent to the services-sidebar
   public selectedServiceGroupId: string;
@@ -177,7 +182,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
     // URL change listener
     allUrlParameters$.pipe(takeUntil(this.isDestroyed)).subscribe(
-      allUrlParameters => this.updateAllFilters(allUrlParameters));
+      allUrlParameters => this.listParamsChange(allUrlParameters));
 
     this.route.queryParamMap.pipe(
       distinctUntilChanged((a, b) => {
@@ -215,6 +220,27 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
         this.router.navigate([], { queryParams: { sgId }, queryParamsHandling: 'merge' });
       } else {
         this.selectedServiceGroupId = null;
+      }
+    });
+
+    // If selected service group sidebar is null when
+    // filter is applied, select the first service group
+    // This is temp, file will be refactored in story PR 1292
+    this.store.select(serviceGroupsStatus).subscribe((sgStatus) => {
+      if (sgStatus === 'loadingSuccess') {
+        this.store.select(selectedServiceGroupStatus).subscribe((sSgStatus) => {
+          if (sSgStatus === 'loadingSuccess') {
+            this.serviceGroupsList$.subscribe((serviceGroups) => {
+              if (serviceGroups.length > 0) {
+                this.store.select(selectedServiceGroupList).subscribe((list) => {
+                  if (list.length === 0) {
+                    this.onServiceGroupSelect(null, serviceGroups[0].id);
+                  }
+                });
+              }
+            });
+          }
+        });
       }
     });
 
@@ -285,27 +311,28 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   }
 
   listParamsChange(queryParams) {
-    const allParameters = queryParams.keys.reduce((list, key) => {
+    const allParameters = queryParams.params ? this.formatParameters(queryParams) : queryParams;
+    this.selectedSearchBarFilters = fpFilter(chicklet => {
+      return some({'type': chicklet.type}, this.categoryTypes);
+    }, allParameters);
+    this.updateAllFilters(allParameters);
+  }
+
+  formatParameters(queryParams): Chicklet[] {
+    return queryParams.keys.reduce((list, key) => {
       return list.concat(queryParams.getAll(key).map(value => ({ type: key, text: value })));
     }, []);
-    this.updateAllFilters(allParameters);
   }
 
   detailParamsChange(queryParams) {
     const sgId = queryParams.get('sgId');
     if (sgId) {
-      const paramKeys = Object.keys(queryParams.params);
-
-      const searchBarFilters = paramKeys.filter((key: string) =>
-          some({'type': key}, this.categoryTypes)
-        ).map((key: string) => ({ type: key, text: queryParams.params[key] }));
-
       const servicesFilters: GroupServicesFilters = {
         service_group_id: sgId,
         page: parseInt(queryParams.get('sgPage'), 10) || 1,
         pageSize: parseInt(queryParams.get('sgPageSize'), 10) || 25,
         health: queryParams.get('sgStatus') || 'total',
-        searchBar: searchBarFilters
+        searchBar: this.selectedSearchBarFilters
       };
 
       this.updateServicesSidebar(servicesFilters);
@@ -317,10 +344,6 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     const sortDirection = this.getSortDirection(allParameters);
     const sortField = this.getSelectedSortField(allParameters);
     const pageField = this.getSelectedPageNumber(allParameters);
-    // Here we can add all the filters that the search bar will have
-    const searchBarFilters = fpFilter(chicklet => {
-      return some({'type': chicklet.type}, this.categoryTypes);
-    }, allParameters);
 
     const serviceGroupFilters: ServiceGroupsFilters = {
       status: status,
@@ -328,7 +351,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       sortDirection: sortDirection,
       page: pageField,
       pageSize: this.pageSize,
-      searchBar: searchBarFilters
+      searchBar: this.selectedSearchBarFilters
     };
     this.store.dispatch(new UpdateServiceGroupsFilters({filters: serviceGroupFilters}));
   }
@@ -413,7 +436,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   }
 
   public onServiceGroupSelect(event: Event, id: string): void {
-    event.preventDefault();
+    if (event) { event.preventDefault(); }
 
     const queryParams = { ...this.route.snapshot.queryParams };
     queryParams['sgId'] = id;
