@@ -559,6 +559,16 @@ describe('ProjectListComponent', () => {
   });
 
   describe('getButtonText', () => {
+    it('labels the button "Projects Up-To-Date" when no projects are edited', () => {
+      const uneditedProject1 = genProject('uuid-111', 'RULES_APPLIED');
+      const uneditedProject2 = genProject('uuid-112', 'RULES_APPLIED');
+      store.dispatch(new GetProjectsSuccess({
+        projects: [uneditedProject1, uneditedProject2]
+      }));
+
+      expect(component.getButtonText()).toEqual('Projects Up-To-Date');
+    });
+
     it('labels the button "Update Projects" when at least one project is edited', () => {
       const editedProject = genProject('uuid-99', 'EDITS_PENDING');
       const uneditedProject1 = genProject('uuid-111', 'RULES_APPLIED');
@@ -570,32 +580,26 @@ describe('ProjectListComponent', () => {
       expect(component.getButtonText()).toEqual('Update Projects');
     });
 
-    it('labels the button "Projects Up-To-Date" when no projects are edited', () => {
-      const uneditedProject1 = genProject('uuid-111', 'RULES_APPLIED');
-      const uneditedProject2 = genProject('uuid-112', 'RULES_APPLIED');
-      store.dispatch(new GetProjectsSuccess({
-        projects: [uneditedProject1, uneditedProject2]
-      }));
-
-      expect(component.getButtonText()).toEqual('Projects Up-To-Date');
-    });
-
-    it('labels the button with percentage only during an update', () => {
-      const editedProject = genProject('uuid-99', 'EDITS_PENDING');
-      store.dispatch(new GetProjectsSuccess({
-        projects: [editedProject]
-      }));
-      expect(component.getButtonText()).toEqual('Update Projects');
-
+    it('labels the button with percentage during an update', () => {
       component.confirmApplyStart(); // start the update
       store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
         genState(ApplyRulesStatusState.Running)));
 
       expect(component.getButtonText()).toEqual('Updating Projects 50%...');
+    });
 
+    it('labels the button "Update Projects" if update has failed', () => {
       store.dispatch(new GetApplyRulesStatusSuccess(
-        genState(ApplyRulesStatusState.NotRunning)));
-      expect(component.getButtonText()).not.toEqual('Updating Projects 50%...');
+        genState(ApplyRulesStatusState.NotRunning, true, false)));
+
+      expect(component.getButtonText()).toEqual('Update Projects');
+    });
+
+    it('labels the button "Update Projects" if update was cancelled', () => {
+      store.dispatch(new GetApplyRulesStatusSuccess(
+        genState(ApplyRulesStatusState.NotRunning, false, true)));
+
+      expect(component.getButtonText()).toEqual('Update Projects');
     });
   });
 

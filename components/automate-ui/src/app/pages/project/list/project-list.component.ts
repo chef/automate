@@ -281,7 +281,9 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     if (this.applyRulesInProgress) {
       return `Updating Projects ${Math.round(this.percentageComplete * 100)}%...`;
     }
-    if (this.projectsHaveStagedChanges) {
+    if (this.projectsHaveStagedChanges
+      || this.updateProjectsCancelled
+      || this.updateProjectsFailed) {
       return 'Update Projects';
     }
     return 'Projects Up-To-Date';
