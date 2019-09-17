@@ -8,33 +8,22 @@ import (
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/patterns"
 	"github.com/chef/automate/lib/logger"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"github.com/sirupsen/logrus"
 
-	project_domain_purge "github.com/chef/automate/lib/authz"
+	"github.com/chef/automate/lib/authz/project_purge_workflow"
 )
 
 const (
-	PurgeProjectWorkflowName = "PurgeProject"
-	// TODO does this need to be different from project manager?
-	PurgeProjectInstanceName       = "SingletonV1"
+	PurgeProjectWorkflowName       = "PurgeProject"
 	MoveProjectToGraveyardTaskName = "authz/MoveProjectToGraveyard"
 )
 
-type ProjectPurgerStatus interface {
-	// Failed() bool
-	// Cancelled() bool
-	// FailureMessage() string
-	// PercentageComplete() float64
-	// EstimatedTimeComplete() time.Time
-	// State() ProjectUpdateState
-	// Stage() ProjectUpdateStage
+type ProjectPurger interface {
+	Start(string) error
+	Status(string) (ProjectPurgerStatus, error)
 }
 
-type ProjectPurger interface {
-	Cancel() error
-	Start() error
-	Status() (ProjectPurgerStatus, error)
+type ProjectPurgerStatus struct {
 }
 
 var ProjectPurgeDomainServices = []string{
@@ -55,46 +44,23 @@ func NewWorkflowExecutor() (*patterns.ChainWorkflowExecutor, error) {
 	workflowMap := make(map[string]cereal.WorkflowExecutor)
 	lock := sync.Mutex{}
 
-	// TODO should this be cancelable?
 	moveProjectToGraveyardExecutor :=
-		patterns.NewSingleTaskWorkflowExecutor(MoveProjectToGraveyardTaskName, true)
+		patterns.NewSingleTaskWorkflowExecutor(MoveProjectToGraveyardTaskName, false)
 
-	// TODO
+	domainSvcExecutor := patterns.NewParallelWorkflowExecutor(func(key string) (cereal.WorkflowExecutor, bool) {
+		lock.Lock()
+		defer lock.Unlock()
+		if workflowExecutor, ok := workflowMap[key]; ok {
+			return workflowExecutor, true
+		}
+		logrus.Infof("creating workflow executor for %q", key)
+		workflowExecutor := project_purge_workflow.NewWorkflowExecutorForDomainService(key)
+		workflowMap[key] = workflowExecutor
+		return workflowExecutor, true
+	})
 
+	// TODO remove project from graveyard
 	return nil, nil
-}
-
-type MoveProjectToGraveyardTaskExecutor struct {
-	store           storage.Storage
-	policyRefresher PolicyRefresher
-	log             logger.Logger
-}
-
-type MoveProjectToGraveyardResult struct {
-}
-
-type MoveProjectToGraveyardParams struct {
-}
-
-func (s *MoveProjectToGraveyardTaskExecutor) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
-	s.log.Info("apply project rules starting")
-
-	if err := s.store.MoveProjectToGraveyard(ctx); err != nil {
-		s.log.Warnf("error applying staged projects: %s", err.Error())
-		return nil, status.Errorf(codes.Internal,
-			"error applying staged projects: %s", err.Error())
-	}
-
-	// TODO: If the domain services are reading out of the cache below, that is a problem for multinode.
-	//       this does not force a refresh on all the nodes. We should read this information from the
-	//       database.
-	if err := s.policyRefresher.Refresh(ctx); err != nil {
-		s.log.Warnf("error refreshing policy cache. the rules were updated but the apply was not started, please try again.")
-		return nil, status.Errorf(codes.Internal,
-			"error refreshing policy cache: %s", err.Error())
-	}
-
-	return MoveProjectToGraveyardResult{}, nil
 }
 
 type CerealProjectPurger struct {
@@ -120,13 +86,11 @@ func RegisterCerealProjectUpdateManager(manager *cereal.Manager, log logger.Logg
 	}
 	if err := manager.RegisterTaskExecutor(ApplyStagedRulesTaskName, applyStagedRulesTaskExecutor,
 		cereal.TaskExecutorOpts{Workers: 1}); err != nil {
-
 	}
 
 	purgeManager := &CerealProjectPurger{
 		manager:        manager,
 		workflowName:   PurgeProjectWorkflowName,
-		instanceName:   PurgeProjectInstanceName,
 		domainServices: ProjectPurgeDomainServices,
 	}
 
@@ -141,21 +105,56 @@ func (m *CerealProjectPurger) Cancel() error {
 	return err
 }
 
-func (m *CerealProjectPurger) Start() error {
+func (m *CerealProjectPurger) Start(projectID string) error {
 	params := map[string]interface{}{}
 
 	for _, svc := range m.domainServices {
 		params[svc] = project_domain_purge.DomainProjectPurgeWorkflowParameters{
-			ProjectUpdateID: createProjectUpdateID(),
-			ProjectID:       "project1", // TODO how to pass this in?
+			ProjectID: projectID,
 		}
 	}
 	domainSvcUpdateWorkflowParams, err := patterns.ToParallelWorkflowParameters(m.domainServices, params)
 	if err != nil {
 		return err
 	}
-	return patterns.EnqueueChainWorkflow(context.TODO(), m.manager, m.workflowName, m.instanceName, []interface{}{
-		MoveProjectToGraveyardParams{},
+	if err := patterns.EnqueueChainWorkflow(context.TODO(), m.manager, m.workflowName, projectID, []interface{}{
+		MoveProjectToGraveyardParams{
+			ProjectID: projectID,
+		},
 		domainSvcUpdateWorkflowParams,
-	})
+	}); err != nil {
+		return err
+	}
+
+	// TODO wait for first serial workflow to return
+}
+
+type MoveProjectToGraveyardTaskExecutor struct {
+	store storage.Storage
+	log   logger.Logger
+}
+
+type MoveProjectToGraveyardResult struct {
+}
+
+type MoveProjectToGraveyardParams struct {
+	ProjectID string
+}
+
+func (s *MoveProjectToGraveyardTaskExecutor) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
+	params := MoveProjectToGraveyardParams{}
+	if err := w.GetParameters(&params); err != nil {
+		// TODO wrap
+		return nil, err
+	}
+
+	s.log.Infof("stargin project purge for id %q", params.ProjectID)
+
+	// if err := s.store.MoveProjectToGraveyard(ctx); err != nil {
+	// 	s.log.Warnf("error applying staged projects: %s", err.Error())
+	// 	return nil, status.Errorf(codes.Internal,
+	// 		"error applying staged projects: %s", err.Error())
+	// }
+
+	return MoveProjectToGraveyardResult{}, nil
 }
