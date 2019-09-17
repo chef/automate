@@ -138,6 +138,14 @@ To do so, follow these steps.
 1. Run `.expeditor/buildkite/cypress.sh` to start running the tests
    against all the selected `CHANNEL` environments.
 
+## Cypress Selector Scope
+
+In general, we follow the [cypress best practices](https://docs.cypress.io/guides/references/best-practices.html#Selecting-Elements)
+around selecting elements, mainly using `data-cy` to select elements specifically.
+However, be careful when using `data-cy` in a shared stencil or angular component.
+If you use it in a shared component that shows up more than once on the page,
+unexpected results might occur.
+
 ## Helpful Links
 
 [Best Practices Talk by Founder Brian
