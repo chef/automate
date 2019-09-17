@@ -483,7 +483,6 @@ func (p *postgres) GetTeamsForUser(ctx context.Context, userID string) ([]storag
 
 // PurgeProject removes a project from every team it exists in
 func (p *postgres) PurgeProject(ctx context.Context, projectID string) error {
-	p.logger.Warnf("IN TEAMS IN TEAMS IN TEAMS IN TEAMS IN TEAMS IN TEAMS IN TEAMS IN TEAMS %q", projectID)
 	_, err := p.db.ExecContext(ctx, "UPDATE teams SET projects=array_remove(projects, $1)", projectID)
 	if err != nil {
 		return p.processError(err)
