@@ -8,6 +8,7 @@ import {
   ReportQuery
 } from '../../shared/reporting';
 import { ActivatedRoute, Router } from '@angular/router';
+import * as moment from 'moment';
 
 type Tab = 'Node Status' | 'Profile Status';
 
@@ -111,6 +112,20 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
       this.getNodeStatusData(reportQuery);
     } else {
       this.getProfileStatusData(reportQuery);
+    }
+  }
+
+  onDateChanged(endDate) {
+    const queryParams = {...this.route.snapshot.queryParams};
+    const endDateMoment = moment(endDate);
+    if (endDate && endDateMoment.isValid()) {
+      if (moment().utc().format('YYYY-MM-DD') === endDateMoment.format('YYYY-MM-DD')) {
+        delete queryParams['end_time'];
+      } else {
+        queryParams['end_time'] = endDateMoment.format('YYYY-MM-DD');
+      }
+
+      this.router.navigate([], {queryParams});
     }
   }
 

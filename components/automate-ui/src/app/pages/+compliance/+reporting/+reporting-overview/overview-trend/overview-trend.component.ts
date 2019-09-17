@@ -1,14 +1,17 @@
 import {
   Component,
   ElementRef,
+  EventEmitter,
   Inject,
   Input,
+  Output,
   OnChanges,
   OnDestroy,
   ViewChild
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import * as d3 from 'd3';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-overview-trend',
@@ -23,6 +26,8 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
   ) {}
 
   @Input() data = [];
+
+  @Output() dateSelected: EventEmitter<moment.Moment> = new EventEmitter<moment.Moment>();
 
   @Input() type: 'nodes' | 'controls';
 
@@ -205,6 +210,10 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
 
     enter.append('rect')
       .attr('class', 'dot-group-bg');
+
+    enter.on('click', (line) => {
+      this.dateSelected.next(moment(line.report_time));
+    });
 
     update.select('.dot-group-tick')
       .attr('x1', d => this.scaleX(d.report_time))
