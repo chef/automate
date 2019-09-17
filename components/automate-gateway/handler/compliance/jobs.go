@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/chef/automate/components/automate-gateway/api/compliance/scanner/jobs"
-	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
 	"github.com/chef/automate/components/automate-gateway/protobuf"
 	jobsService "github.com/chef/automate/components/compliance-service/api/jobs"
 	"github.com/golang/protobuf/proto"
@@ -14,11 +13,6 @@ import (
 type Jobs struct {
 	client jobsService.JobsServiceClient
 }
-
-// asserts that we satisfy the correct interface here -- it's a safeguard
-var _ middleware.AuthContextReader = (*Jobs)(nil)
-
-func (*Jobs) AuthContextRead() {}
 
 func NewJobsHandler(jobsClient jobsService.JobsServiceClient) *Jobs {
 	return &Jobs{
