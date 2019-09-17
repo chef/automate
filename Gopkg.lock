@@ -1214,18 +1214,25 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:826537175f56bba37b1dd99505344b6b1854d142b49988340f3b8b7b597776ff"
+  digest = "1:b3880723fa23b61388cb34ebf380a64c6cc9a56491bc08e2ac59585f4a767d3e"
   name = "golang.org/x/crypto"
   packages = [
     "bcrypt",
     "blake2b",
     "blowfish",
+    "cast5",
     "chacha20poly1305",
     "ed25519",
     "ed25519/internal/edwards25519",
     "internal/chacha20",
     "internal/subtle",
     "nacl/secretbox",
+    "openpgp",
+    "openpgp/armor",
+    "openpgp/elgamal",
+    "openpgp/errors",
+    "openpgp/packet",
+    "openpgp/s2k",
     "pkcs12",
     "pkcs12/internal/rc2",
     "poly1305",
@@ -1608,6 +1615,7 @@
     "go.uber.org/zap/zapcore",
     "golang.org/x/crypto/bcrypt",
     "golang.org/x/crypto/blake2b",
+    "golang.org/x/crypto/openpgp",
     "golang.org/x/crypto/ssh/terminal",
     "golang.org/x/oauth2",
     "golang.org/x/oauth2/google",

@@ -862,6 +862,7 @@ paths = [
   "vendor/github.com/uber/jaeger-lib/*",
   "vendor/go.uber.org/atomic/*",
   "vendor/go.uber.org/multierr/*",
+  "vendor/golang.org/x/crypto/*",
   "vendor/golang.org/x/net/*",
   "vendor/golang.org/x/sys/*",
   "vendor/golang.org/x/text/*",
