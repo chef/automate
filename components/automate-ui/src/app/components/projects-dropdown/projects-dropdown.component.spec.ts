@@ -9,8 +9,8 @@ describe('ProjectsDropdownComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ProjectsDropdownComponent],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+      declarations: [ ProjectsDropdownComponent ],
+      schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     }).compileComponents();
   }));
 
@@ -72,13 +72,7 @@ describe('ProjectsDropdownComponent', () => {
 
       // expect sorted outcomes here
       expect(sortedProjects.length).toBe(5);
-      expect(sortedProjects).toEqual([
-        '123abc',
-        '123xyz',
-        '12345zero',
-        'abc123',
-        'project-6'
-      ]);
+      expect(sortedProjects).toEqual(['123abc', '123xyz', '12345zero', 'abc123', 'project-6']);
     });
   });
 });
