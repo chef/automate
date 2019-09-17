@@ -11,7 +11,8 @@ describe('ProjectsDropdownComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ ProjectsDropdownComponent ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
-    }).compileComponents();
+    })
+    .compileComponents();
   }));
 
   beforeEach(() => {
