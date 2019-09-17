@@ -25,7 +25,7 @@ export class CalendarComponent {
 
   @Output() onNextMonth: EventEmitter<[number, number]> = new EventEmitter();
   @Output() onPrevMonth: EventEmitter<[number, number]> = new EventEmitter();
-  @Output() onDaySelect: EventEmitter<m.Moment> = new EventEmitter();
+  @Output() onDaySelect: EventEmitter<string> = new EventEmitter();
 
   constructor() {
     this.month = this.date.month().toString();
@@ -156,7 +156,7 @@ export class CalendarComponent {
   }
 
   public onDayClick(day) {
-    this.onDaySelect.emit(day[1].clone());
+    this.onDaySelect.emit(day[1].format('YYYY-MM-DD'));
   }
 
   trackBy(index, _item) {

@@ -1,7 +1,6 @@
 import { Component, DebugElement, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import * as moment from 'moment';
 
 import { CalendarComponent } from './calendar.component';
 
@@ -121,12 +120,6 @@ describe('CalendarComponent', () => {
       const inactiveDays = calendarDateEl.queryAll(By.css('.day.i'));
 
       expect(inactiveDays.length).toBe(7);
-    });
-
-    it('displays the correct number of inactive days', () => {
-      const d = moment('2017-02-21');
-
-      expect(d.date()).toEqual(21);
     });
 
     it('selects the correct day', () => {
