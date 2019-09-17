@@ -99,7 +99,7 @@ a, button:not(.dropdown-toggle) {
   top: 8px;
 }
 
-// .version:after {
-//   content: '\A';
-//   white-space: pre;
-// }
+.version,
+.build {
+  line-height: 24px;
+}
