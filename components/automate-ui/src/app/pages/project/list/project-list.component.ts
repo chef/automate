@@ -148,16 +148,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     return '';
   }
 
-  getButtonText(): string {
-    if (this.applyRulesInProgress) {
-      return `Updating Projects ${Math.round(this.percentageComplete * 100)}%...`;
-    }
-    if (this.projectsHaveStagedChanges) {
-      return 'Update Projects';
-    }
-    return 'Projects Up-To-Date';
-  }
-
   public createProject(): void {
     this.creatingProject = true;
     const project = {
@@ -286,4 +276,22 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     // TODO: check how often this is hit
     return result;
   }
+
+  public getButtonText(): string {
+    if (this.applyRulesInProgress) {
+      return `Updating Projects ${Math.round(this.percentageComplete * 100)}%...`;
+    }
+    if (this.projectsHaveStagedChanges) {
+      return 'Update Projects';
+    }
+    return 'Projects Up-To-Date';
+  }
+
+  public isDisabled(): boolean {
+    return this.applyRulesInProgress ||
+      (!this.projectsHaveStagedChanges
+        && !this.updateProjectsCancelled
+        && !this.updateProjectsFailed);
+  }
+
 }
