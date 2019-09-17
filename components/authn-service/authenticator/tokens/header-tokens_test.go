@@ -99,7 +99,7 @@ func TestTokenAuthWithBackend(t *testing.T) {
 					},
 				},
 			}
-			authn, err := cfg.Open(u, nil, logger, nil)
+			authn, err := cfg.Open(u, nil, logger)
 			if err != nil {
 				t.Fatal(err)
 			}

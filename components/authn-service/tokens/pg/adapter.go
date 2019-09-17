@@ -61,7 +61,8 @@ func (a *adapter) insertToken(ctx context.Context,
 	// ensure we do not pass null projects to db and break the not null constraint
 	if projects == nil {
 		projects = []string{}
-	} else {
+	}
+	if len(projects) > 0 {
 		_, err := a.validator.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
 			Subjects:   auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
 			ProjectIds: projects,

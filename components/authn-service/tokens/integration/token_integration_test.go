@@ -16,6 +16,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/authn"
+	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	authz "github.com/chef/automate/api/interservice/authz/common"
 	tokenauthn "github.com/chef/automate/components/authn-service/authenticator/tokens"
 	"github.com/chef/automate/components/authn-service/constants"
@@ -102,12 +103,12 @@ func TestChefClientAuthn(t *testing.T) {
 		t.Fatalf("opening connector: %s", err)
 	}
 
-	authzClient, close := newAuthzMock(t)
+	subjectPurgeClient, authorizationClient, close := newAuthzMock(t)
 	defer close()
 
 	// start services: local mgmt REST interface, and proxy service, and
 	// authenticate endpoint
-	g := grpctest.NewServer(serv.NewGRPCServer(authzClient))
+	g := grpctest.NewServer(serv.NewGRPCServer(subjectPurgeClient, authorizationClient))
 	defer g.Close()
 
 	connFactory := secureconn.NewFactory(*serviceCerts)
@@ -215,7 +216,7 @@ func TestChefClientAuthn(t *testing.T) {
 	}
 }
 
-func newAuthzMock(t *testing.T) (authz.SubjectPurgeClient, func()) {
+func newAuthzMock(t *testing.T) (authz.SubjectPurgeClient, authz_v2.AuthorizationClient, func()) {
 	t.Helper()
 	certs := helpers.LoadDevCerts(t, "authz-service")
 	connFactory := secureconn.NewFactory(*certs)
@@ -227,10 +228,15 @@ func newAuthzMock(t *testing.T) (authz.SubjectPurgeClient, func()) {
 	conn, err := connFactory.Dial("authz-service", authzServer.URL)
 	require.NoError(t, err)
 
-	return authz.NewSubjectPurgeClient(conn), authzServer.Close
+	return authz.NewSubjectPurgeClient(conn), authz_v2.NewAuthorizationClient(conn), authzServer.Close
 }
 
 func defaultMockPurgeFunc(context.Context,
 	*authz.PurgeSubjectFromPoliciesReq) (*authz.PurgeSubjectFromPoliciesResp, error) {
 	return &authz.PurgeSubjectFromPoliciesResp{}, nil
+}
+
+func defaultValidateProjectAssignmentFunc(context.Context,
+	*authz_v2.ValidateProjectAssignmentReq) (*authz_v2.ValidateProjectAssignmentResp, error) {
+	return &authz_v2.ValidateProjectAssignmentResp{}, nil
 }

@@ -25,5 +25,5 @@ func TestReflectionIsPossible(t *testing.T) {
 	serv, err := server.NewServer(context.Background(), config)
 	require.NoError(t, err)
 
-	grpctest.AssertReflection(t, serv.NewGRPCServer(nil))
+	grpctest.AssertReflection(t, serv.NewGRPCServer(nil, nil))
 }

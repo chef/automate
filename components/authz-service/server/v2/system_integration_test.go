@@ -59,6 +59,8 @@ func TestIntegrationSystemPolicies(t *testing.T) {
 	}
 }
 
+// bug: this test passes contingent on the above test being run
+// issue seems to be related to context metadata
 func TestIntegrationValidateProjectAssignment(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -69,10 +71,6 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 	user := "user:local:alice"
 	authorizedProjectId := "authorized-project"
 	unauthorizedProjectId := "project-not-authorized"
-	// _, err := ts.TestDB.ExecContext(ctx, "INSERT INTO iam_projects (id, name, type) VALUES ($1, $2, $3)", authorizedProjectId, "Project Authorized", v2.Custom.String())
-	// require.NoError(t, err)
-	// _, err = ts.TestDB.ExecContext(ctx, "INSERT INTO iam_projects (id, name, type) VALUES ($1, $2, $3)", unauthorizedProjectId, "Project Unauthorized", v2.Custom.String())
-	// require.NoError(t, err)
 
 	_, err := ts.Projects.CreateProject(ctx, &api_v2.CreateProjectReq{
 		Id:   authorizedProjectId,
@@ -104,19 +102,6 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 	// force sync refresh
 	err = ts.PolicyRefresher.Refresh(ctx)
 	require.NoError(t, err)
-
-	// pol := map[string]interface{}{
-	// 	"members": engine.Subject(user),
-	// 	"statements": map[string]interface{}{
-	// 		"statement-id-0": map[string]interface{}{
-	// 			"actions":   []string{"*"},
-	// 			"resources": []string{"*"},
-	// 			"effect":    "allow",
-	// 			"projects":  engine.ProjectList(authorizedProjectId),
-	// 		},
-	// 	},
-	// }
-	// require.NoError(t, ts.Engine.V2p1SetPolicies(ctx, pol, nil))
 
 	cases := map[string]func(*testing.T){
 		"when passed one unauthorized project": func(t *testing.T) {
@@ -169,6 +154,8 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 	ts.TestDB.Flush(t)
 }
 
+// bug: this test passes contingent on the first test being run
+// issue seems to be related to context metadata
 func TestIntegrationFilterAuthorizedProjectsWithSystemPolicies(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

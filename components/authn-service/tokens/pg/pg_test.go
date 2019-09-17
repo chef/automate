@@ -483,10 +483,6 @@ func TestCreateToken(t *testing.T) {
 			assert.WithinDuration(time.Now(), tok.Updated, time.Second)
 			assert.Equal(project_ids, tok.Projects)
 		},
-		"when passed valid project": func(t *testing.T) {
-		},
-		"when passed invalid project": func(t *testing.T) {
-		},
 	}
 
 	for name, test := range cases {
