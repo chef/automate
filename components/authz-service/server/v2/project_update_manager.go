@@ -62,10 +62,10 @@ type ProjectUpdateMgr interface {
 	Status() (ProjectUpdateStatus, error)
 }
 
-func createProjectUpdateID() string {
+func createProjectPurgeID() string {
 	uuid, err := uuid.NewV4()
 	if err != nil {
-		return "project-update-id"
+		return "project-purge-id"
 	}
 
 	return uuid.String()
@@ -212,7 +212,7 @@ func (m *CerealProjectUpdateManager) Start() error {
 
 	for _, svc := range m.domainServices {
 		params[svc] = project_update_tags.DomainProjectUpdateWorkflowParameters{
-			ProjectUpdateID: createProjectUpdateID(),
+			ProjectPurgeID: createProjectPurgeID()
 		}
 	}
 	domainSvcUpdateWorkflowParams, err := patterns.ToParallelWorkflowParameters(m.domainServices, params)
