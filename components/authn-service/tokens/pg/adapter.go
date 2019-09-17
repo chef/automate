@@ -88,9 +88,6 @@ func (a *adapter) insertToken(ctx context.Context,
 func (a *adapter) UpdateToken(ctx context.Context,
 	id, description string, active bool, updatedProjects []string) (*tokens.Token, error) {
 
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
 	tx, err := a.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, processSQLError(err, "get projects transaction")
