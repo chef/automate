@@ -64,12 +64,12 @@ export class ServiceGroupsEffects {
   @Effect()
   getServiceGroupsCounts$ = this.actions$.pipe(
       ofType(ServiceGroupsActionTypes.GET_SERVICE_GROUPS_COUNTS),
-      withLatestFrom(this.store),
-      switchMap(([_action]) => {
-        return this.requests.fetchServiceGroupHealth().pipe(
-        map((payload: ServiceGroupsHealthSummary) => new GetServiceGroupsCountsSuccess(payload)),
-        catchError((error: HttpErrorResponse) => of(new GetServiceGroupsCountsFailure(error)))
-      );
+      withLatestFrom(this.store.select(serviceGroupsFilters)),
+      switchMap(([_action, filters]: [any, ServiceGroupsFilters]) => {
+        return this.requests.fetchServiceGroupHealth(filters).pipe(
+          map((payload: ServiceGroupsHealthSummary) => new GetServiceGroupsCountsSuccess(payload)),
+          catchError((error: HttpErrorResponse) => of(new GetServiceGroupsCountsFailure(error)))
+        );
       }));
 
   @Effect()

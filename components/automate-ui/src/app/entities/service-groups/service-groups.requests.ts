@@ -81,21 +81,32 @@ export class ServiceGroupsRequests {
         params = params.append('pagination.page', filters.page.toString());
         params = params.append('pagination.size', filters.pageSize.toString());
       }
+      if (filters.searchBar) {
+        params = reduce((param, pill) => {
+          const filterParam = `${encodeURIComponent(pill.type)}:${encodeURIComponent(pill.text)}`;
+          return param.append('filter', filterParam);
+        }, params, filters.searchBar);
+      }
     }
 
     return params;
   }
 
-  public fetchServiceGroupHealth(): Observable<ServiceGroupsHealthSummary> {
-    const url = `${APPLICATIONS_URL}/service_groups_health_counts`;
+  public fetchServiceGroupHealth(filters: ServiceGroupsFilters):
+    Observable<ServiceGroupsHealthSummary> {
+      const url = `${APPLICATIONS_URL}/service_groups_health_counts`;
+      const params = this.formatFilters(filters);
 
-    return this.httpClient.get<ServiceGroupsHealthSummary>(url);
+      return this.httpClient.get<ServiceGroupsHealthSummary>(url, {params});
   }
 
   public getSuggestions(
     fieldName: string,
     queryFragment: string,
     filters: ServiceGroupsFilters): Observable<any[]> {
+      // This api requires different filter names for group and service, should it?
+      fieldName = fieldName === 'group' ? 'group_name' : fieldName;
+      fieldName = fieldName === 'service' ? 'service_name' : fieldName;
       const params = this.formatFilters(filters)
         .set('field_name', fieldName)
         .set('query_fragment', queryFragment);

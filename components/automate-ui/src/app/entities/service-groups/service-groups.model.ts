@@ -79,6 +79,7 @@ export interface GroupServicesFilters {
   health?: string;
   page?: number;
   pageSize?: number;
+  searchBar?: Array<Chicklet>;
 }
 
 export interface GroupServicesPayload {
