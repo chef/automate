@@ -36,10 +36,14 @@ export const createError = createSelector(
   (state) => state.createError
 );
 
-
 export const updateStatus = createSelector(
   ruleState,
   (state) => state.updateStatus
+);
+
+export const deleteStatus = createSelector(
+  ruleState,
+  (state) => state.deleteStatus
 );
 
 export const ruleFromRoute = createSelector(
