@@ -40,7 +40,7 @@ export class ProjectsDropdownComponent implements OnChanges {
 
   projectsArray(): ProjectChecked[] {
     const unsortedProjects = Object.values(this.projects);
-    return ChefSorters.normalSort(unsortedProjects, 'name');
+    return ChefSorters.naturalSort(unsortedProjects, 'name');
   }
 
   ngOnChanges(): void {
