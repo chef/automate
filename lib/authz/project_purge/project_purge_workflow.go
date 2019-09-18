@@ -70,10 +70,11 @@ func (m *DomainProjectPurgeWorkflowExecutor) OnTaskComplete(
 			// TODO Log errToLog
 			payload.ConsecutiveJobCheckFailures++
 			if err := w.EnqueueTask(
-				m.startPurgeProjectTaskName, nil, cereal.StartAfter(
-					m.nextCheck(payload.ConsecutiveJobCheckFailures))); err != nil {
+				m.startPurgeProjectTaskName, DomainProjectPurgeTaskParams{ProjectID: params.ProjectID},
+				cereal.StartAfter(m.nextCheck(payload.ConsecutiveJobCheckFailures))); err != nil {
 				return w.Fail(err)
 			}
+			return w.Continue(payload)
 		}
 		return w.Complete()
 	default:
@@ -121,11 +122,10 @@ func (m *DomainProjectPurgeTask) Run(
 func (m *DomainProjectPurgeTask) startProjectTagUpdater(ctx context.Context, projectID string) error {
 	logrus.Info("starting project purges")
 
-	// TODO Need to get projectID
-	// err := m.purgeClient.PurgeProject(ctx, params.ProjectID)
-	// if err != nil {
-	// 	return errors.Wrap(err, "Failed to launch purge project client")
-	// }
+	err := m.purgeClient.PurgeProject(ctx, projectID)
+	if err != nil {
+		return errors.Wrap(err, "failed to launch purge project client")
+	}
 
 	return nil
 }

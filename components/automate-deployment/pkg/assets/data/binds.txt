@@ -70,6 +70,6 @@ secrets-service REQUIRED automate-pg-gateway pg-sidecar-service
 secrets-service BINDING_MODE strict
 session-service REQUIRED automate-dex automate-pg-gateway pg-sidecar-service
 session-service BINDING_MODE strict
-teams-service REQUIRED authz-service automate-pg-gateway pg-sidecar-service
+teams-service REQUIRED authz-service automate-pg-gateway cereal-service pg-sidecar-service
 teams-service BINDING_MODE strict
 trial-license-service BINDING_MODE strict
