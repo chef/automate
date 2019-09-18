@@ -8,11 +8,8 @@ export class ChefSorters {
         // propComparator function idea from Dave Newton
         // https://stackoverflow.com/questions
         const propComparator = (propName) =>
-            (a, b) => a[propName].localeCompare(b[propName], undefined, {
-                numeric: true,
-                sensitivity: 'base'
-            }) ||
-                a[propName].localeCompare(b[propName], undefined, { numeric: true });
+            (a, b) => a[propName].localeCompare(b[propName], undefined, opts) ||
+                      a[propName].localeCompare(b[propName], undefined, { numeric: true });
 
         const sortedArray = input.sort(propComparator(property));
 
