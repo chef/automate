@@ -39,7 +39,8 @@ export class ProjectsDropdownComponent implements OnChanges {
   label = UNASSIGNED_PROJECT_ID;
 
   projectsArray(): ProjectChecked[] {
-    return ChefSorters.normalSort(this.projects, 'name');
+    const unsortedProjects = Object.values(this.projects);
+    return ChefSorters.normalSort(unsortedProjects, 'name');
   }
 
   ngOnChanges(): void {

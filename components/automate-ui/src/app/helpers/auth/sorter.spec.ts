@@ -3,7 +3,7 @@ import { ChefSorters } from './sorter';
 
 describe('normalSort', () => {
 
-    const inputObject1: {} = [
+    let inputObject1: {} = [
         { checked: false, id: 'B', name: '123abc', status: 'NO_RULES', type: 'CUSTOM'},
         { checked: false, id: '3', name: 'project-6', status: 'NO_RULES', type: 'CUSTOM'},
         { checked: false, id: 'a', name: '12345zero', status: 'NO_RULES', type: 'CUSTOM'},
@@ -11,7 +11,7 @@ describe('normalSort', () => {
         { checked: false, id: 'abc123', name: 'abc123', status: 'NO_RULES', type: 'CUSTOM'}
       ];
 
-    const inputObject2: {} = [
+    let inputObject2: {} = [
         { checked: false, id: 'a', name: 'one', status: 'NO_RULES', type: 'CUSTOM' },
         { checked: false, id: 'A', name: 'two', status: 'NO_RULES', type: 'CUSTOM' },
         { checked: false, id: '123', name: 'three', status: 'NO_RULES', type: 'CUSTOM' },
@@ -26,12 +26,14 @@ describe('normalSort', () => {
 
 
     it('returns a normally sorted array by chosen property', () => {
+        inputObject1 = Object.values(inputObject1);
         const nameOutput = ChefSorters.normalSort(inputObject1, 'name')
                                       .map(p => p.name);
 
         const idOutput = ChefSorters.normalSort(inputObject1, 'id')
                                     .map(p => p.id);
 
+        inputObject2 = Object.values(inputObject2);
         const idOutput2 = ChefSorters.normalSort(inputObject2, 'id' )
                                      .map(p => p.id);
 
@@ -40,6 +42,6 @@ describe('normalSort', () => {
 
         // inputObject2
         expect(idOutput2).toEqual(sortedIds2);
-        
+
     });
 });
