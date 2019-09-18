@@ -50,6 +50,9 @@ const (
                AND health_warning  = 0
                AND health_unknown  = 0
        ) AS ok
+  ,COUNT(*) FILTER (
+             WHERE disconnected_count > 0
+       ) AS disconnected
 	FROM ( `
 	selectServiceGroupsHealthCountsSecond = ` ) AS service_group_health_counts `
 

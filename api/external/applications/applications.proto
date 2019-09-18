@@ -270,6 +270,7 @@ message HealthCounts {
   int32 warning = 3;
   int32 critical = 4;
   int32 unknown = 5;
+  int32 disconnected = 6;
 }
 
 // The package identifier of a service is unique and is the combination

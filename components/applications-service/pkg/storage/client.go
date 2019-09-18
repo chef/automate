@@ -138,9 +138,10 @@ type Deployment struct {
 }
 
 type HealthCounts struct {
-	Total    int32
-	Ok       int32
-	Warning  int32
-	Critical int32
-	Unknown  int32
+	Total        int32
+	Ok           int32
+	Warning      int32
+	Critical     int32
+	Unknown      int32
+	Disconnected int32
 }

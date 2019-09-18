@@ -8,10 +8,13 @@ package integration_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/habitat"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestServiceGroupsHealthCountsBasic(t *testing.T) {
@@ -81,11 +84,12 @@ func TestServiceGroupsHealthCountsOnServiceUpdateAllOk(t *testing.T) {
 		ctx      = context.Background()
 		request  = new(applications.ServiceGroupsHealthCountsReq)
 		expected = &applications.HealthCounts{
-			Total:    int32(4),
-			Ok:       int32(1),
-			Warning:  int32(1),
-			Critical: int32(1),
-			Unknown:  int32(1),
+			Total:        int32(4),
+			Ok:           int32(1),
+			Warning:      int32(1),
+			Critical:     int32(1),
+			Unknown:      int32(1),
+			Disconnected: int32(0),
 		}
 		mockHabServicesMatrix = habServicesMatrix()
 	)
@@ -122,11 +126,12 @@ func TestServiceGroupsHealthCountsOnServiceUpdateAllOk(t *testing.T) {
 			),
 		}
 		expectedAfterUpdate = &applications.HealthCounts{
-			Total:    int32(4),
-			Ok:       int32(4),
-			Warning:  int32(0),
-			Critical: int32(0),
-			Unknown:  int32(0),
+			Total:        int32(4),
+			Ok:           int32(4),
+			Warning:      int32(0),
+			Critical:     int32(0),
+			Unknown:      int32(0),
+			Disconnected: int32(0),
 		}
 	)
 
@@ -142,11 +147,12 @@ func TestServiceGroupsHealthCountsOnServiceUpdateAllWarning(t *testing.T) {
 		ctx      = context.Background()
 		request  = new(applications.ServiceGroupsHealthCountsReq)
 		expected = &applications.HealthCounts{
-			Total:    int32(4),
-			Ok:       int32(1),
-			Warning:  int32(1),
-			Critical: int32(1),
-			Unknown:  int32(1),
+			Total:        int32(4),
+			Ok:           int32(1),
+			Warning:      int32(1),
+			Critical:     int32(1),
+			Unknown:      int32(1),
+			Disconnected: int32(0),
 		}
 		mockHabServicesMatrix = habServicesMatrix()
 	)
@@ -186,11 +192,12 @@ func TestServiceGroupsHealthCountsOnServiceUpdateAllWarning(t *testing.T) {
 			),
 		}
 		expectedAfterUpdate = &applications.HealthCounts{
-			Total:    int32(4),
-			Ok:       int32(0),
-			Warning:  int32(4),
-			Critical: int32(0),
-			Unknown:  int32(0),
+			Total:        int32(4),
+			Ok:           int32(0),
+			Warning:      int32(4),
+			Critical:     int32(0),
+			Unknown:      int32(0),
+			Disconnected: int32(0),
 		}
 	)
 
@@ -206,11 +213,12 @@ func TestServiceGroupsHealthCountsOnServiceUpdateAllCritical(t *testing.T) {
 		ctx      = context.Background()
 		request  = new(applications.ServiceGroupsHealthCountsReq)
 		expected = &applications.HealthCounts{
-			Total:    int32(4),
-			Ok:       int32(1),
-			Warning:  int32(1),
-			Critical: int32(1),
-			Unknown:  int32(1),
+			Total:        int32(4),
+			Ok:           int32(1),
+			Warning:      int32(1),
+			Critical:     int32(1),
+			Unknown:      int32(1),
+			Disconnected: int32(0),
 		}
 		mockHabServicesMatrix = habServicesMatrix()
 	)
@@ -245,11 +253,12 @@ func TestServiceGroupsHealthCountsOnServiceUpdateAllCritical(t *testing.T) {
 			),
 		}
 		expectedAfterUpdate = &applications.HealthCounts{
-			Total:    int32(4),
-			Ok:       int32(0),
-			Warning:  int32(0),
-			Critical: int32(4),
-			Unknown:  int32(0),
+			Total:        int32(4),
+			Ok:           int32(0),
+			Warning:      int32(0),
+			Critical:     int32(4),
+			Unknown:      int32(0),
+			Disconnected: int32(0),
 		}
 	)
 
@@ -260,6 +269,41 @@ func TestServiceGroupsHealthCountsOnServiceUpdateAllCritical(t *testing.T) {
 	assert.Equal(t, response, expectedAfterUpdate)
 }
 
+func TestServiceGroupsHealthCountsAllDisconnected(t *testing.T) {
+	var (
+		ctx     = context.Background()
+		request = &applications.ServiceGroupsHealthCountsReq{
+			Filter: []string{"service:myapp"},
+		}
+		expected = &applications.HealthCounts{
+			Total:        int32(1),
+			Ok:           int32(0),
+			Warning:      int32(1),
+			Critical:     int32(0),
+			Unknown:      int32(0),
+			Disconnected: int32(1),
+		}
+		mockHabServicesMatrix = habServicesMatrix()
+	)
+
+	for _, s := range mockHabServicesMatrix {
+		var err error
+		s.EventMetadata.OccurredAt, err = ptypes.TimestampProto(time.Now().Add(-time.Minute * 30))
+		require.NoError(t, err)
+	}
+
+	suite.IngestServices(mockHabServicesMatrix)
+	defer suite.DeleteDataFromStorage()
+
+	_, err := suite.ApplicationsServer.MarkDisconnectedServices(300)
+	require.NoError(t, err)
+
+	response, err := suite.ApplicationsServer.GetServiceGroupsHealthCounts(ctx, request)
+	assert.Nil(t, err)
+	assert.Equal(t, expected, response)
+
+}
+
 func TestServiceGroupsHealthCountsFilter(t *testing.T) {
 	var (
 		ctx     = context.Background()
@@ -267,11 +311,12 @@ func TestServiceGroupsHealthCountsFilter(t *testing.T) {
 			Filter: []string{"service:myapp"},
 		}
 		expected = &applications.HealthCounts{
-			Total:    int32(1),
-			Ok:       int32(0),
-			Warning:  int32(1),
-			Critical: int32(0),
-			Unknown:  int32(0),
+			Total:        int32(1),
+			Ok:           int32(0),
+			Warning:      int32(1),
+			Critical:     int32(0),
+			Unknown:      int32(0),
+			Disconnected: int32(0),
 		}
 		mockHabServicesMatrix = habServicesMatrix()
 	)
@@ -291,11 +336,12 @@ func TestServiceGroupsHealthCountsStatusFilterIgnored(t *testing.T) {
 			Filter: []string{"status:OK"},
 		}
 		expected = &applications.HealthCounts{
-			Total:    int32(4),
-			Ok:       int32(1),
-			Warning:  int32(1),
-			Critical: int32(1),
-			Unknown:  int32(1),
+			Total:        int32(4),
+			Ok:           int32(1),
+			Warning:      int32(1),
+			Critical:     int32(1),
+			Unknown:      int32(1),
+			Disconnected: int32(0),
 		}
 		mockHabServicesMatrix = habServicesMatrix()
 	)
