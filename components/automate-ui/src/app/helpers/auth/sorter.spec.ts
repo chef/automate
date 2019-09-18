@@ -21,24 +21,25 @@ describe('normalSort', () => {
 
     const sortedNames: string[] = ['123abc', '123xyz', '12345zero', 'abc123', 'project-6'];
     const sortedIds: string[] = ['1', '3', 'a', 'abc123', 'B'];
-
     const sortedIds2: string[] = ['123', '1234', 'a', 'A', 'abc123' ];
 
 
     it('returns a normally sorted array by chosen property', () => {
+        // related to inputObject1
         inputObject1 = Object.values(inputObject1);
         const nameOutput = ChefSorters.normalSort(inputObject1, 'name')
                                       .map(p => p.name);
 
         const idOutput = ChefSorters.normalSort(inputObject1, 'id')
                                     .map(p => p.id);
+        
+        expect(nameOutput).toEqual(sortedNames);
+        expect(idOutput).toEqual(sortedIds);
 
+        // related to inputObject2
         inputObject2 = Object.values(inputObject2);
         const idOutput2 = ChefSorters.normalSort(inputObject2, 'id' )
                                      .map(p => p.id);
-
-        expect(nameOutput).toEqual(sortedNames);
-        expect(idOutput).toEqual(sortedIds);
 
         // inputObject2
         expect(idOutput2).toEqual(sortedIds2);

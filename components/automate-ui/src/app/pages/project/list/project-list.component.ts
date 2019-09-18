@@ -21,6 +21,7 @@ import { Project } from 'app/entities/projects/project.model';
 import { ApplyRulesStatus, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
 import { ProjectStatus } from 'app/entities/rules/rule.model';
 import { LoadOptions } from 'app/services/projects-filter/projects-filter.actions';
+import { ChefSorters } from 'app/helpers/auth/sorter';
 
 @Component({
   selector: 'app-project-list',
@@ -75,13 +76,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   ) {
     this.loading$ = store.select(getAllStatus).pipe(map(loading));
     this.sortedProjects$ = store.select(allProjects).pipe(
-      map((unsorted: Project[]) => unsorted.sort(
-        (a, b) => {
-          const opts = { numeric: true, sensitivity: 'base' };
-          return a.name.localeCompare(b.name, undefined, opts)
-            || a.name.localeCompare(b.name, undefined, { numeric: true });
-        }
-      )));
+      map((unsorted: Project[]) => ChefSorters.normalSort(unsorted, 'name')));
 
     this.iamMajorVersion$ = store.select(iamMajorVersion);
     this.projectsEnabled$ = store.select(atLeastV2p1);
