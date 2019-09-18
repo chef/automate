@@ -221,11 +221,12 @@ func (app *ApplicationsServer) GetServicesBySG(
 		Group:    sgName,
 		Services: convertStorageServicesToApplicationsServices(services),
 		ServicesHealthCounts: &applications.HealthCounts{
-			Total:    svcsHealthCounts.Total,
-			Ok:       svcsHealthCounts.Ok,
-			Warning:  svcsHealthCounts.Warning,
-			Critical: svcsHealthCounts.Critical,
-			Unknown:  svcsHealthCounts.Unknown,
+			Total:        svcsHealthCounts.Total,
+			Ok:           svcsHealthCounts.Ok,
+			Warning:      svcsHealthCounts.Warning,
+			Critical:     svcsHealthCounts.Critical,
+			Unknown:      svcsHealthCounts.Unknown,
+			Disconnected: svcsHealthCounts.Disconnected,
 		},
 	}, nil
 }

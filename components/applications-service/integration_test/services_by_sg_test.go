@@ -9,10 +9,13 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/common/query"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetServicesBySGErrorRequestMustHaveAServiceGroupID(t *testing.T) {
@@ -110,7 +113,8 @@ func TestGetServicesBySGSingleService(t *testing.T) {
 }
 
 func TestGetServicesBySGWithPaginationParameter(t *testing.T) {
-	suite.IngestServices(habServicesMatrix())
+	svcsForIngest := habServicesMatrix()
+	suite.IngestServices(svcsForIngest)
 	defer suite.DeleteDataFromStorage()
 
 	// Get the ID of the service-groups
@@ -149,6 +153,37 @@ func TestGetServicesBySGWithPaginationParameter(t *testing.T) {
 		assert.Equal(t, expected.GetServicesHealthCounts(), response.GetServicesHealthCounts())
 		assertServicesEqual(t, expected.GetServices(), response.GetServices())
 	}
+}
+
+func TestGetServicesBySGWithDisconnected(t *testing.T) {
+	ctx := context.Background()
+
+	svcsForIngest := habServicesMatrix()
+	eventTimestamp, err := ptypes.TimestampProto(time.Now().Add(-time.Minute * 30))
+	require.NoError(t, err)
+
+	for _, s := range svcsForIngest {
+		s.EventMetadata.OccurredAt = eventTimestamp
+	}
+
+	suite.IngestServices(svcsForIngest)
+	defer suite.DeleteDataFromStorage()
+	_, err = suite.ApplicationsServer.MarkDisconnectedServices(300)
+	require.NoError(t, err)
+
+	// Get the ID of the service-groups
+	sgList := suite.GetServiceGroups()
+	require.Len(t, sgList, 4)
+
+	request := &applications.ServicesBySGReq{
+		ServiceGroupId: sgList[0].ID,
+	}
+
+	response, err := suite.ApplicationsServer.GetServicesBySG(ctx, request)
+	assert.NoError(t, err)
+
+	expectedHealthCounts := &applications.HealthCounts{Total: 3, Ok: 2, Warning: 1, Disconnected: 3}
+	assert.Equal(t, expectedHealthCounts, response.GetServicesHealthCounts())
 }
 
 func TestGetServicesBySGMultiService(t *testing.T) {

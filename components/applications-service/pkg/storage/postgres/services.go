@@ -147,6 +147,7 @@ SELECT COUNT(*) AS total
   , COUNT(*) FILTER (WHERE s.health = 'UNKNOWN') AS unknown
   , COUNT(*) FILTER (WHERE s.health = 'WARNING') AS warning
   , COUNT(*) FILTER (WHERE s.health = 'OK') AS ok
+  , COUNT(*) FILTER (WHERE s.disconnected ) AS disconnected
 FROM service_full AS s
  %s
 `
