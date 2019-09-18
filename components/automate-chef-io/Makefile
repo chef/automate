@@ -7,7 +7,7 @@ SWAGGER_FILES = $(shell find $(SWAGGER_DIR) -name '*.swagger.json')
 EXPECTED_CONFLICTS=45
 
 themes/chef:
-	git clone https://${GITHUB_TOKEN}@github.com/chef/chef-hugo-theme.git themes/chef
+	git clone https://github.com/chef/chef-hugo-theme.git themes/chef
 
 clean:
 	rm -rf site/themes/chef
