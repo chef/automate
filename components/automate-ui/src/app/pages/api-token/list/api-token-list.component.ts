@@ -58,7 +58,7 @@ export class ApiTokenListComponent implements OnInit {
 
     this.sortedApiTokens$ = store.pipe(
       select(allApiTokens),
-      map(tokens => ChefSorters.normalSort(tokens, 'name')));
+      map(tokens => ChefSorters.naturalSort(tokens, 'name')));
 
     this.createTokenForm = fb.group({
       // Must stay in sync with error checks in create-object-modal.component.html

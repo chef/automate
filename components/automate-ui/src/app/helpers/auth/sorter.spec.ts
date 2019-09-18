@@ -1,7 +1,7 @@
 
 import { ChefSorters } from './sorter';
 
-describe('normalSort', () => {
+describe('naturalSort', () => {
 
     let inputObject1: {} = [
         { checked: false, id: 'B', name: '123abc', status: 'NO_RULES', type: 'CUSTOM'},
@@ -27,10 +27,10 @@ describe('normalSort', () => {
     it('returns a normally sorted array by chosen property', () => {
         // related to inputObject1
         inputObject1 = Object.values(inputObject1);
-        const nameOutput = ChefSorters.normalSort(inputObject1, 'name')
+        const nameOutput = ChefSorters.naturalSort(inputObject1, 'name')
                                       .map(p => p.name);
 
-        const idOutput = ChefSorters.normalSort(inputObject1, 'id')
+        const idOutput = ChefSorters.naturalSort(inputObject1, 'id')
                                     .map(p => p.id);
         
         expect(nameOutput).toEqual(sortedNames);
@@ -38,7 +38,7 @@ describe('normalSort', () => {
 
         // related to inputObject2
         inputObject2 = Object.values(inputObject2);
-        const idOutput2 = ChefSorters.normalSort(inputObject2, 'id' )
+        const idOutput2 = ChefSorters.naturalSort(inputObject2, 'id' )
                                      .map(p => p.id);
 
         // inputObject2

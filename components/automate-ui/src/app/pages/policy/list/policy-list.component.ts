@@ -29,7 +29,7 @@ export class PolicyListComponent implements OnInit {
     this.loading$ = store.pipe(select(getAllStatus), map(loading));
     this.sortedPolicies$ = store.pipe(
       select(allPolicies),
-      map(policies => ChefSorters.normalSort(policies, 'name')));
+      map(policies => ChefSorters.naturalSort(policies, 'name')));
 
     this.iamMajorVersion$ = store.pipe(select(iamMajorVersion));
   }

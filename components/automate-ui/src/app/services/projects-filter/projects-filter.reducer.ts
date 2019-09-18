@@ -6,6 +6,7 @@ import {
   ProjectsFilterActions,
   ProjectsFilterActionTypes
 } from './projects-filter.actions';
+import { ChefSorters } from 'app/helpers/auth/sorter';
 
 const {
   UNASSIGNED_PROJECT_ID,
@@ -174,12 +175,9 @@ function mergeOptions(
 function sortOptions(options: ProjectsFilterOption[]): ProjectsFilterOption[] {
   // Sort all except unassigned, which should always be last
   const sorted = options
-    .filter(o => o.value !== UNASSIGNED_PROJECT_ID)
-    .sort((a, b) => {
-      const opts = { numeric: true, sensitivity: 'base' };
-      return a.label.localeCompare(b.label, undefined, opts)
-        || a.label.localeCompare(b.label, undefined, { numeric: true });
-    });
+    .filter(o => o.value !== UNASSIGNED_PROJECT_ID);
+  // Sort filtered group by natural sort
+  ChefSorters.naturalSort(sorted, 'label');
 
   const unassignedProject = find(['value', UNASSIGNED_PROJECT_ID], options);
   if (unassignedProject) {

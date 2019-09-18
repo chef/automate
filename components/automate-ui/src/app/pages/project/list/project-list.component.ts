@@ -76,7 +76,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   ) {
     this.loading$ = store.select(getAllStatus).pipe(map(loading));
     this.sortedProjects$ = store.select(allProjects).pipe(
-      map((unsorted: Project[]) => ChefSorters.normalSort(unsorted, 'name')));
+      map((unsorted: Project[]) => ChefSorters.naturalSort(unsorted, 'name')));
 
     this.iamMajorVersion$ = store.select(iamMajorVersion);
     this.projectsEnabled$ = store.select(atLeastV2p1);

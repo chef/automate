@@ -1,10 +1,10 @@
 
 export class ChefSorters {
 
-    // normalSort takes in an Object and returns an Array of Objects
+    // naturalSort takes in an Object and returns an Array of Objects
     // sorted by the property chosen.
 
-    public static normalSort(input: Array<any>, property: string): Array<any> {
+    public static naturalSort(input: Array<any>, property: string): Array<any> {
         // per @msorens https://github.com/chef/a2/pull/4434
         // Stable sort so 'a' always comes before 'A'.
 
