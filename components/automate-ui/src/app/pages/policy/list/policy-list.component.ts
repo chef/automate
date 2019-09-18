@@ -9,6 +9,7 @@ import { DeletePolicy, GetPolicies } from 'app/entities/policies/policy.actions'
 import { allPolicies, getAllStatus, iamMajorVersion } from 'app/entities/policies/policy.selectors';
 import { Policy } from 'app/entities/policies/policy.model';
 import { IAMMajorVersion } from 'app/entities/policies/policy.model';
+import { ChefSorters } from 'app/helpers/auth/sorter';
 
 @Component({
   selector: 'app-policy-list',
@@ -28,16 +29,7 @@ export class PolicyListComponent implements OnInit {
     this.loading$ = store.pipe(select(getAllStatus), map(loading));
     this.sortedPolicies$ = store.pipe(
       select(allPolicies),
-      map(policies => policies.sort(
-        (a, b) => {
-          // See https://stackoverflow.com/a/38641281 for these options
-          const opts = { numeric: true, sensitivity: 'base' };
-          // Sort by name then by cased-name, since no other field is useful as a secondary sort;
-          // this ensures stable sort with respect to case, so 'a' always comes before 'A'.
-          return a.name.localeCompare(b.name, undefined, opts)
-            || a.name.localeCompare(b.name, undefined, {numeric: true});
-        }
-      )));
+      map(policies => ChefSorters.normalSort(policies, 'name')));
 
     this.iamMajorVersion$ = store.pipe(select(iamMajorVersion));
   }
