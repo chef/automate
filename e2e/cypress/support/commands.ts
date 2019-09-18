@@ -149,7 +149,6 @@ Cypress.Commands.add('cleanupV2IAMObjectsByIDPrefixes',
 
 function cleanupV2IAMObjectByIDPrefix(
   idToken: string, idPrefix: string, iamObject: string): void {
-
   cy.request({
     auth: { bearer: idToken },
     method: 'GET',
@@ -161,6 +160,8 @@ function cleanupV2IAMObjectByIDPrefix(
           auth: { bearer: idToken },
           method: 'DELETE',
           url: `/apis/iam/v2beta/${iamObject}/${object.id}`
+        }).then((deleteResp) => {
+          expect([200, 404]).to.include(deleteResp.status);
         });
       }
     }
