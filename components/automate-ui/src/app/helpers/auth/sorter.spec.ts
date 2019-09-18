@@ -3,7 +3,7 @@ import { ChefSorters } from './sorter';
 
 describe('naturalSort', () => {
 
-    let inputObject1: {} = [
+    const inputObject1: any[] = [
         { checked: false, id: 'B', name: '123abc', status: 'NO_RULES', type: 'CUSTOM'},
         { checked: false, id: '3', name: 'project-6', status: 'NO_RULES', type: 'CUSTOM'},
         { checked: false, id: 'a', name: '12345zero', status: 'NO_RULES', type: 'CUSTOM'},
@@ -11,7 +11,7 @@ describe('naturalSort', () => {
         { checked: false, id: 'abc123', name: 'abc123', status: 'NO_RULES', type: 'CUSTOM'}
       ];
 
-    let inputObject2: {} = [
+    const inputObject2: any[] = [
         { checked: false, id: 'a', name: 'one', status: 'NO_RULES', type: 'CUSTOM' },
         { checked: false, id: 'A', name: 'two', status: 'NO_RULES', type: 'CUSTOM' },
         { checked: false, id: '123', name: 'three', status: 'NO_RULES', type: 'CUSTOM' },
@@ -26,18 +26,16 @@ describe('naturalSort', () => {
 
     it('returns a normally sorted array by chosen property', () => {
         // related to inputObject1
-        inputObject1 = Object.values(inputObject1);
         const nameOutput = ChefSorters.naturalSort(inputObject1, 'name')
                                       .map(p => p.name);
 
         const idOutput = ChefSorters.naturalSort(inputObject1, 'id')
                                     .map(p => p.id);
-        
+
         expect(nameOutput).toEqual(sortedNames);
         expect(idOutput).toEqual(sortedIds);
 
         // related to inputObject2
-        inputObject2 = Object.values(inputObject2);
         const idOutput2 = ChefSorters.naturalSort(inputObject2, 'id' )
                                      .map(p => p.id);
 
