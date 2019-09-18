@@ -4,6 +4,8 @@ describeIfIAMV2p1('assigning projects', () => {
   let adminIdToken = '';
   let apiToken = '';
 
+  const modifyError = 'cannot modify a project for this object';
+
   // TODO iterate over these resources on each test pass
   // const resources = ['tokens', 'teams', 'policies', 'roles'];
 
@@ -15,7 +17,8 @@ describeIfIAMV2p1('assigning projects', () => {
   };
 
   const notFoundProjectId = 'not-found-project';
-  const authorizedProjectId = `${cypressPrefix}-authorized-project`;
+  const authorizedProject1 = `${cypressPrefix}-authorized-project-1`;
+  const authorizedProject2 = `${cypressPrefix}-authorized-project-2`;
   const unauthorizedProjectId = `${cypressPrefix}-unauthorized-project`;
   const policyId = `${cypressPrefix}-policy`;
   const tokenId = `${cypressPrefix}-token`;
@@ -27,15 +30,18 @@ describeIfIAMV2p1('assigning projects', () => {
       // TODO cleanup everything in resources + projects
       cy.cleanupV2IAMObjectsByIDPrefixes(adminIdToken, cypressPrefix, ['projects', 'tokens']);
 
-      for (const id of [unauthorizedProjectId, authorizedProjectId]) {
+      for (const id of [unauthorizedProjectId, authorizedProject1, authorizedProject2]) {
         cy.request({
           auth: { bearer: adminIdToken },
           method: 'POST',
           url: '/apis/iam/v2beta/projects',
+          failOnStatusCode: false,
           body: {
             id: id,
             name: id
           }
+        }).then((resp) => {
+          expect([200, 409]).to.include(resp.status);
         });
       }
 
@@ -55,6 +61,7 @@ describeIfIAMV2p1('assigning projects', () => {
         auth: { bearer: adminIdToken },
         method: 'POST',
         url: '/apis/iam/v2beta/policies',
+        failOnStatusCode: false,
         body: {
           id: policyId,
           name: policyId,
@@ -66,11 +73,14 @@ describeIfIAMV2p1('assigning projects', () => {
               effect: 'ALLOW',
               actions: ['*'],
               projects: [
-                authorizedProjectId
+                authorizedProject1,
+                authorizedProject2
               ]
             }
           ]
         }
+      }).then((resp) => {
+        expect([200, 409]).to.include(resp.status);
       });
     });
   });
@@ -87,27 +97,28 @@ describeIfIAMV2p1('assigning projects', () => {
         headers: { 'api-token': apiToken },
         method: 'POST',
         url: `/apis/iam/v2beta/${token}`,
-        body: {id: `${token}-id`, name: `${token}Name`, projects: [authorizedProjectId]}
+        body: {id: resource.id, name: resource.name, projects: [authorizedProject1]}
       }).then((resp) => {
         assert.equal(resp.status, 200);
         assert.isUndefined(resp.body.error);
-        assert.equal(resp.body.token.projects, [authorizedProjectId]);
+        assert.deepEqual(resp.body.token.projects, [authorizedProject1]);
       });
     });
 
-    it(`when updating ${token}, successfully modifies membership for an existing
-        authorized project`, () => {
-        // deleting authorized project
-    cy.request({
-      headers: { 'api-token': apiToken },
-      method: 'PUT',
-      url: `/apis/iam/v2beta/${token}/${token}-id`,
-      body: {name: `${token}UpdatedName`, projects: []}
-    }).then((resp) => {
-      assert.equal(resp.status, 200);
-      assert.isUndefined(resp.body.error);
-      assert.equal(resp.body.token.projects, []);
-    });
+    it(`when updating ${token}, successfully assigns an existing authorized project`, () => {
+      cy.request({
+        headers: { 'api-token': apiToken },
+        method: 'PUT',
+        url: `/apis/iam/v2beta/${token}/${resource.id}`,
+        body: {
+          name: `${resource.name} UpdatedName`,
+          projects: [authorizedProject1, authorizedProject2]
+        }
+      }).then((resp) => {
+        assert.equal(resp.status, 200);
+        assert.isUndefined(resp.body.error);
+        assert.deepEqual(resp.body.token.projects, [authorizedProject1, authorizedProject2]);
+      });
     });
 
     it(`when creating ${token}, fails to assign a non-existing project`, () => {
@@ -115,11 +126,11 @@ describeIfIAMV2p1('assigning projects', () => {
           headers: { 'api-token': apiToken },
           method: 'POST',
           url: `/apis/iam/v2beta/${token}`,
-          body: {id: `${token}-2-id`, name: `${token}Name`, projects: [notFoundProjectId]}
+          failOnStatusCode: false,
+          body: { id: `${resource.id}-2`, name: resource.name, projects: [notFoundProjectId]}
         }).then((resp) => {
           assert.equal(resp.status, 404);
-          assert.exists(resp.body.error);
-          assert.isUndefined(resp.body);
+          expect(resp.body.error).to.have.string(modifyError);
         });
     });
 
@@ -127,12 +138,12 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': apiToken },
         method: 'PUT',
-        url: `/apis/iam/v2beta/${token}/${token}-id`,
-        body: {name: `${token}Name`, projects: [unauthorizedProjectId]}
+        url: `/apis/iam/v2beta/${token}/${resource.id}`,
+        failOnStatusCode: false,
+        body: { name: `${resource.name} UpdatedName`, projects: [notFoundProjectId]}
       }).then((resp) => {
-          assert.equal(resp.status, 404);
-          assert.exists(resp.body.error);
-          assert.isUndefined(resp.body);
+        assert.equal(resp.status, 404);
+        expect(resp.body.error).to.have.string(modifyError);
       });
     });
 
@@ -141,11 +152,11 @@ describeIfIAMV2p1('assigning projects', () => {
         headers: { 'api-token': apiToken },
         method: 'POST',
         url: `/apis/iam/v2beta/${token}`,
-        body: {id: `${token}-unauth-id`, name: `${token}Name`, projects: [unauthorizedProjectId]}
+        failOnStatusCode: false,
+        body: { id: `${resource.id}-unauth`, name: resource.name, projects: [unauthorizedProjectId]}
       }).then((resp) => {
-          assert.equal(resp.status, 403);
-          assert.exists(resp.body.error);
-          assert.isUndefined(resp.body);
+        assert.equal(resp.status, 403);
+        expect(resp.body.error).to.have.string(modifyError);
       });
     });
 
@@ -153,12 +164,12 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': apiToken },
         method: 'PUT',
-        url: `/apis/iam/v2beta/${token}/${token}-id`,
-        body: {name: `${token}Name`, projects: [unauthorizedProjectId]}
+        url: `/apis/iam/v2beta/${token}/${resource.id}`,
+        failOnStatusCode: false,
+        body: {name: `${resource.name} UpdatedName`, projects: [unauthorizedProjectId]}
       }).then((resp) => {
-          assert.equal(resp.status, 403);
-          assert.exists(resp.body.error);
-          assert.isUndefined(resp.body);
+        assert.equal(resp.status, 403);
+        expect(resp.body.error).to.have.string(modifyError);
       });
     });
   });
