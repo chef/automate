@@ -25,6 +25,7 @@ import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
 import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
+import { ChefSorters } from 'app/helpers/auth/sorter';
 
 @Component({
   selector: 'app-api-tokens',
@@ -57,17 +58,7 @@ export class ApiTokenListComponent implements OnInit {
 
     this.sortedApiTokens$ = store.pipe(
       select(allApiTokens),
-      map(tokens => tokens.sort(
-        (a, b) => {
-          // See https://stackoverflow.com/a/38641281 for these options
-          const opts = { numeric: true, sensitivity: 'base' };
-          // Sort by name then by cased-name, since no other field
-          // is useful as a secondary sort; this ensures stable sort with
-          // respect to case, so 'a' always comes before 'A'.
-          return a.name.localeCompare(b.name, undefined, opts)
-            || a.name.localeCompare(b.name, undefined, {numeric: true});
-        }
-      )));
+      map(tokens => ChefSorters.normalSort(tokens, 'name')));
 
     this.createTokenForm = fb.group({
       // Must stay in sync with error checks in create-object-modal.component.html
