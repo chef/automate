@@ -530,8 +530,8 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 	return report, errorutils.ProcessNotFound(nil, reportId)
 }
 
-func (backend *ES2Backend) GetControlListItems(ctx context.Context, from int32, perPage int32, filters map[string][]string,
-	sort string, asc bool) (*reportingapi.ControlItems, error) {
+func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[string][]string,
+	size int32) (*reportingapi.ControlItems, error) {
 
 	contListItems := make([]*reportingapi.ControlItem, 0)
 	myName := "GetControlListItems"
@@ -559,7 +559,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, from int32, 
 		Size(1)
 
 	controlTermsAgg := elastic.NewTermsAggregation().Field("profiles.controls.id").
-		Size(100).
+		Size(int(size)).
 		Order("_key", true)
 
 	controlTermsAgg.SubAggregation("impact",

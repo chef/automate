@@ -380,9 +380,6 @@ func init() {
     "v1ControlItemRequest": {
       "type": "object",
       "properties": {
-        "type": {
-          "type": "string"
-        },
         "text": {
           "type": "string"
         },

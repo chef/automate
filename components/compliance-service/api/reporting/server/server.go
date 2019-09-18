@@ -175,23 +175,19 @@ func (srv *Server) ListProfiles(ctx context.Context, in *reporting.Query) (*repo
 }
 
 // ListControls returns a list of contolListItems based on query
-func (srv *Server) ListControlItems(ctx context.Context, in *reporting.Query) (*reporting.ControlItems, error) {
+func (srv *Server) ListControlItems(ctx context.Context, in *reporting.ControlItemRequest) (*reporting.ControlItems, error) {
 	var controlListItems *reporting.ControlItems
-	var SORT_FIELDS = map[string]string{
-		"name": "name.lower",
-	}
-	from, perPage, sort, asc, err := validatePaginationAndSorting(in, SORT_FIELDS, "title")
-	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+	if in.Size == 0 {
+		in.Size = 1000
 	}
 
 	formattedFilters := formatFilters(in.Filters)
-	formattedFilters, err = filterByProjects(ctx, formattedFilters)
+	formattedFilters, err := filterByProjects(ctx, formattedFilters)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 
-	controlListItems, err = srv.es.GetControlListItems(ctx, from, perPage, formattedFilters, SORT_FIELDS[sort], asc)
+	controlListItems, err = srv.es.GetControlListItems(ctx, formattedFilters, in.Size)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}

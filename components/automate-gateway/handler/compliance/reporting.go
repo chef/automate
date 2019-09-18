@@ -33,8 +33,8 @@ func NewReportingHandler(reportingClient reportingService.ReportingServiceClient
 }
 
 // should cover /control-items
-func (a *Reporting) ListControlItems(ctx context.Context, in *reporting.Query) (*reporting.ControlItems, error) {
-	inDomain := &reportingService.Query{}
+func (a *Reporting) ListControlItems(ctx context.Context, in *reporting.ControlItemRequest) (*reporting.ControlItems, error) {
+	inDomain := &reportingService.ControlItemRequest{}
 	out := &reporting.ControlItems{}
 	f := func() (proto.Message, error) {
 		return a.client.ListControlItems(ctx, inDomain)

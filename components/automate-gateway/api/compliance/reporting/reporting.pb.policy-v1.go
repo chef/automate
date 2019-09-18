@@ -44,8 +44,6 @@ func init() {
 		if m, ok := input.(*ControlItemRequest); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
-				case "type":
-					return m.Type
 				case "text":
 					return m.Text
 				default:
