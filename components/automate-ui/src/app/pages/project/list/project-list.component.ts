@@ -287,7 +287,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       || this.updateProjectsFailed) {
       return 'Update Projects';
     }
-    return 'Projects Up-To-Date';
+    return 'Projects Up-to-Date';
   }
 
   public isDisabled(): boolean {

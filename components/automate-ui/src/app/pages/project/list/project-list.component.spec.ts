@@ -559,14 +559,14 @@ describe('ProjectListComponent', () => {
   });
 
   describe('getButtonText', () => {
-    it('labels the button "Projects Up-To-Date" when no projects are edited', () => {
+    it('labels the button "Projects Up-to-Date" when no projects are edited', () => {
       const uneditedProject1 = genProject('uuid-111', 'RULES_APPLIED');
       const uneditedProject2 = genProject('uuid-112', 'RULES_APPLIED');
       store.dispatch(new GetProjectsSuccess({
         projects: [uneditedProject1, uneditedProject2]
       }));
 
-      expect(component.getButtonText()).toEqual('Projects Up-To-Date');
+      expect(component.getButtonText()).toEqual('Projects Up-to-Date');
     });
 
     it('labels the button "Update Projects" when at least one project is edited', () => {
