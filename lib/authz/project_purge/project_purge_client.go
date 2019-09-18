@@ -1,4 +1,4 @@
-package authz
+package project_purge
 
 import (
 	"context"

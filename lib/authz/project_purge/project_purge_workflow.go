@@ -1,4 +1,4 @@
-package authz
+package project_purge
 
 import (
 	"context"
@@ -105,21 +105,27 @@ type DomainProjectPurgeTaskParams struct {
 
 func (m *DomainProjectPurgeTask) Run(
 	ctx context.Context, task cereal.Task) (interface{}, error) {
-	err := m.startProjectTagUpdater(ctx)
+	params := DomainProjectPurgeTaskParams{}
+	if err := task.GetParameters(&params); err != nil {
+		// TODO wrap
+		return nil, err
+	}
+
+	err := m.startProjectTagUpdater(ctx, params.ProjectID)
 	if err != nil {
 		return nil, err
 	}
 	return nil, nil
 }
 
-func (m *DomainProjectPurgeTask) startProjectTagUpdater(ctx context.Context) error {
+func (m *DomainProjectPurgeTask) startProjectTagUpdater(ctx context.Context, projectID string) error {
 	logrus.Info("starting project purges")
 
 	// TODO Need to get projectID
-	err := m.purgeClient.PurgeProject(ctx, "project1")
-	if err != nil {
-		return errors.Wrap(err, "Failed to launch purge project client")
-	}
+	// err := m.purgeClient.PurgeProject(ctx, params.ProjectID)
+	// if err != nil {
+	// 	return errors.Wrap(err, "Failed to launch purge project client")
+	// }
 
 	return nil
 }

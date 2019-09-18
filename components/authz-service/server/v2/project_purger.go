@@ -8,23 +8,26 @@ import (
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/patterns"
 	"github.com/chef/automate/lib/logger"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	"github.com/chef/automate/lib/authz/project_purge_workflow"
+	"github.com/chef/automate/lib/authz/project_purge"
 )
 
 const (
-	PurgeProjectWorkflowName       = "PurgeProject"
-	MoveProjectToGraveyardTaskName = "authz/MoveProjectToGraveyard"
+	PurgeProjectWorkflowName           = "authz/PurgeProject"
+	MoveProjectToGraveyardTaskName     = "authz/MoveProjectToGraveyard"
+	DeleteProjectFromDomainTaskName    = "authz/DeleteProjectFromDomain"
+	DeleteProjectFromGraveyardTaskName = "authz/DeleteProjectFromGraveyard"
 )
 
 type ProjectPurger interface {
 	Start(string) error
-	Status(string) (ProjectPurgerStatus, error)
+	// Status(string) (ProjectPurgerStatus, error)
 }
 
-type ProjectPurgerStatus struct {
-}
+// type ProjectPurgerStatus struct {
+// }
 
 var ProjectPurgeDomainServices = []string{
 	"teams",
@@ -40,7 +43,7 @@ var ProjectPurgeDomainServices = []string{
 // Parallel workflows 2: purge project from domain services
 //
 // Serial workflow 3: delete project from graveyard
-func NewWorkflowExecutor() (*patterns.ChainWorkflowExecutor, error) {
+func NewProjectPurgerWorkflowExecutor() (*patterns.ChainWorkflowExecutor, error) {
 	workflowMap := make(map[string]cereal.WorkflowExecutor)
 	lock := sync.Mutex{}
 
@@ -54,13 +57,15 @@ func NewWorkflowExecutor() (*patterns.ChainWorkflowExecutor, error) {
 			return workflowExecutor, true
 		}
 		logrus.Infof("creating workflow executor for %q", key)
-		workflowExecutor := project_purge_workflow.NewWorkflowExecutorForDomainService(key)
+		workflowExecutor := project_purge.NewWorkflowExecutorForDomainService(key)
 		workflowMap[key] = workflowExecutor
 		return workflowExecutor, true
 	})
 
-	// TODO remove project from graveyard
-	return nil, nil
+	deleteProjectFromGraveyardExecutor :=
+		patterns.NewSingleTaskWorkflowExecutor(DeleteProjectFromGraveyardTaskName, false)
+
+	return patterns.NewChainWorkflowExecutor(moveProjectToGraveyardExecutor, domainSvcExecutor, deleteProjectFromGraveyardExecutor)
 }
 
 type CerealProjectPurger struct {
@@ -70,13 +75,13 @@ type CerealProjectPurger struct {
 	domainServices []string
 }
 
-func RegisterCerealProjectUpdateManager(manager *cereal.Manager, log logger.Logger, s storage.Storage) (ProjectPurger, error) {
-	domainServicesWorkflowExecutor, err := NewWorkflowExecutor()
+func RegisterCerealProjectPurger(manager *cereal.Manager, log logger.Logger, s storage.Storage) (ProjectPurger, error) {
+	domainServicesWorkflowExecutor, err := NewProjectPurgerWorkflowExecutor()
 	if err != nil {
 		return nil, err
 	}
 
-	if err := manager.RegisterWorkflowExecutor(MoveProjectToGraveyardTaskName, domainServicesWorkflowExecutor); err != nil {
+	if err := manager.RegisterWorkflowExecutor(PurgeProjectWorkflowName, domainServicesWorkflowExecutor); err != nil {
 		return nil, err
 	}
 
@@ -84,7 +89,15 @@ func RegisterCerealProjectUpdateManager(manager *cereal.Manager, log logger.Logg
 		store: s,
 		log:   log,
 	}
-	if err := manager.RegisterTaskExecutor(ApplyStagedRulesTaskName, applyStagedRulesTaskExecutor,
+	if err := manager.RegisterTaskExecutor(MoveProjectToGraveyardTaskName, moveProjectToGraveyardTaskExecutor,
+		cereal.TaskExecutorOpts{Workers: 1}); err != nil {
+	}
+
+	deleteProjectFromGraveyardTaskExecutor := &DeleteProjectFromGraveyardTaskExecutor{
+		store: s,
+		log:   log,
+	}
+	if err := manager.RegisterTaskExecutor(DeleteProjectFromGraveyardTaskName, deleteProjectFromGraveyardTaskExecutor,
 		cereal.TaskExecutorOpts{Workers: 1}); err != nil {
 	}
 
@@ -97,36 +110,32 @@ func RegisterCerealProjectUpdateManager(manager *cereal.Manager, log logger.Logg
 	return purgeManager, nil
 }
 
-func (m *CerealProjectPurger) Cancel() error {
-	err := m.manager.CancelWorkflow(context.Background(), m.workflowName, m.instanceName)
-	if err == cereal.ErrWorkflowInstanceNotFound {
-		return nil
-	}
-	return err
-}
-
 func (m *CerealProjectPurger) Start(projectID string) error {
 	params := map[string]interface{}{}
 
 	for _, svc := range m.domainServices {
-		params[svc] = project_domain_purge.DomainProjectPurgeWorkflowParameters{
+		params[svc] = project_purge.DomainProjectPurgeWorkflowParameters{
 			ProjectID: projectID,
 		}
 	}
+
 	domainSvcUpdateWorkflowParams, err := patterns.ToParallelWorkflowParameters(m.domainServices, params)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "marshall parallel workflow params")
 	}
 	if err := patterns.EnqueueChainWorkflow(context.TODO(), m.manager, m.workflowName, projectID, []interface{}{
 		MoveProjectToGraveyardParams{
 			ProjectID: projectID,
 		},
 		domainSvcUpdateWorkflowParams,
+		DeleteProjectFromGraveyardParams{
+			ProjectID: projectID,
+		},
 	}); err != nil {
-		return err
+		return errors.Wrap(err, "enqueue chain workflow for project purge")
 	}
 
-	// TODO wait for first serial workflow to return
+	return nil
 }
 
 type MoveProjectToGraveyardTaskExecutor struct {
@@ -143,18 +152,57 @@ type MoveProjectToGraveyardParams struct {
 
 func (s *MoveProjectToGraveyardTaskExecutor) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
 	params := MoveProjectToGraveyardParams{}
-	if err := w.GetParameters(&params); err != nil {
-		// TODO wrap
-		return nil, err
+	if err := task.GetParameters(&params); err != nil {
+		return nil, errors.Wrap(err, "unmarshall move to graveyard params")
 	}
 
-	s.log.Infof("stargin project purge for id %q", params.ProjectID)
+	s.log.Infof("starting project move to graveyard for id %q", params.ProjectID)
 
-	// if err := s.store.MoveProjectToGraveyard(ctx); err != nil {
-	// 	s.log.Warnf("error applying staged projects: %s", err.Error())
+	// err := s.store.MoveProjectToGraveyard(ctx, req.Id)
+	// switch err {
+	// case nil:
+	// 	return &api.DeleteProjectResp{}, nil
+	// case storage_errors.ErrNotFound:
+	// 	return nil, status.Errorf(codes.NotFound, "no project with ID %q found", req.Id)
+	// default: // some other error
 	// 	return nil, status.Errorf(codes.Internal,
-	// 		"error applying staged projects: %s", err.Error())
+	// 		"error deleting project with ID %q: %s", req.Id, err.Error())
 	// }
 
 	return MoveProjectToGraveyardResult{}, nil
+}
+
+type DeleteProjectFromGraveyardTaskExecutor struct {
+	store storage.Storage
+	log   logger.Logger
+}
+
+type DeleteProjectFromGraveyardResult struct {
+}
+
+type DeleteProjectFromGraveyardParams struct {
+	ProjectID string
+}
+
+func (s *DeleteProjectFromGraveyardTaskExecutor) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
+	params := DeleteProjectFromGraveyardParams{}
+	if err := task.GetParameters(&params); err != nil {
+		// TODO wrap
+		return nil, errors.Wrap(err, "unmarshall delete from graveyard params")
+	}
+
+	s.log.Infof("starting project delete from graveyard for id %q", params.ProjectID)
+
+	// err := s.store.MoveProjectToGraveyard(ctx, req.Id)
+	// switch err {
+	// case nil:
+	// 	return &api.DeleteProjectResp{}, nil
+	// case storage_errors.ErrNotFound:
+	// 	return nil, status.Errorf(codes.NotFound, "no project with ID %q found", req.Id)
+	// default: // some other error
+	// 	return nil, status.Errorf(codes.Internal,
+	// 		"error deleting project with ID %q: %s", req.Id, err.Error())
+	// }
+
+	return DeleteProjectFromGraveyardResult{}, nil
 }

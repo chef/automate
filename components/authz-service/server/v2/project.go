@@ -31,6 +31,7 @@ type ProjectState struct {
 	log                  logger.Logger
 	store                storage.Storage
 	ProjectUpdateManager ProjectUpdateMgr
+	ProjectPurger        ProjectPurger
 	policyRefresher      PolicyRefresher
 }
 
@@ -47,7 +48,11 @@ func NewMemstoreProjectsServer(
 	if err != nil {
 		return nil, err
 	}
-	return NewProjectsServer(ctx, l, s, projectUpdateManager, pr)
+	projectPurger, err := RegisterCerealProjectPurger(projectUpdateCerealManager, l, s)
+	if err != nil {
+		return nil, err
+	}
+	return NewProjectsServer(ctx, l, s, projectUpdateManager, projectPurger, pr)
 }
 
 // NewPostgresProjectsServer instantiates a ProjectsServer using a PG store
@@ -66,7 +71,11 @@ func NewPostgresProjectsServer(
 	if err != nil {
 		return nil, err
 	}
-	return NewProjectsServer(ctx, l, s, projectUpdateManager, pr)
+	projectPurger, err := RegisterCerealProjectPurger(projectUpdateCerealManager, l, s)
+	if err != nil {
+		return nil, err
+	}
+	return NewProjectsServer(ctx, l, s, projectUpdateManager, projectPurger, pr)
 }
 
 func NewProjectsServer(
@@ -74,6 +83,7 @@ func NewProjectsServer(
 	l logger.Logger,
 	s storage.Storage,
 	projectUpdateManager ProjectUpdateMgr,
+	projectPurger ProjectPurger,
 	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
 
@@ -81,6 +91,7 @@ func NewProjectsServer(
 		log:                  l,
 		store:                s,
 		ProjectUpdateManager: projectUpdateManager,
+		ProjectPurger:        projectPurger,
 		policyRefresher:      pr,
 	}, nil
 }
@@ -317,16 +328,30 @@ func (s *ProjectState) ListProjectsForIntrospection(
 
 func (s *ProjectState) DeleteProject(ctx context.Context,
 	req *api.DeleteProjectReq) (*api.DeleteProjectResp, error) {
-	err := s.store.DeleteProject(ctx, req.Id)
-	switch err {
-	case nil:
-		return &api.DeleteProjectResp{}, nil
-	case storage_errors.ErrNotFound:
-		return nil, status.Errorf(codes.NotFound, "no project with ID %q found", req.Id)
-	default: // some other error
-		return nil, status.Errorf(codes.Internal,
-			"error deleting project with ID %q: %s", req.Id, err.Error())
+
+	s.log.Info("server purge: START")
+	err := s.ProjectPurger.Start(req.Id)
+	if err != nil {
+		return nil, err
 	}
+	// s.log.Info("apply project rules: START")
+	// err := s.ProjectUpdateManager.Start()
+	// if err != nil {
+	// 	s.log.Warnf("error starting project update. the rules and cache were updated but the apply was not started, please try again.")
+	// 	if err == cereal.ErrWorkflowInstanceExists {
+	// 		return nil, status.Errorf(codes.FailedPrecondition,
+	// 			"project update already in progress: %s", err.Error())
+	// 	}
+	// 	return nil, status.Errorf(codes.Internal,
+	// 		"error starting project update: %s", err.Error())
+	// }
+
+	// if err := s.waitForApplyStagedRules(ctx, 10*time.Second); err != nil {
+	// 	return nil, err
+	// }
+
+	// }
+	return &api.DeleteProjectResp{}, nil
 }
 
 func (s *ProjectState) ListRulesForAllProjects(ctx context.Context,
@@ -500,6 +525,7 @@ func (s *ProjectState) ListRulesForProject(ctx context.Context, req *api.ListRul
 }
 
 func (s *ProjectState) DeleteRule(ctx context.Context, req *api.DeleteRuleReq) (*api.DeleteRuleResp, error) {
+
 	err := s.store.DeleteRule(ctx, req.ProjectId, req.Id)
 	switch err {
 	case nil:
