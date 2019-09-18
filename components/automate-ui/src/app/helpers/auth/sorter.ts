@@ -1,8 +1,8 @@
 
 export class ChefSorters {
 
-    // naturalSort takes in an Object and returns an Array of Objects
-    // sorted by the property chosen.
+    // naturalSort takes in an Array of Objects and returns an Array of Objects
+    // sorted 'naturally' by the property chosen.
 
     public static naturalSort(input: Array<any>, property: string): Array<any> {
         // per @msorens https://github.com/chef/a2/pull/4434
