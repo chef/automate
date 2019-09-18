@@ -55,6 +55,7 @@ describe('ProjectRulesComponent', () => {
         MockComponent({ selector: 'chef-input', inputs: ['value'] }),
         MockComponent({ selector: 'chef-error'}),
         MockComponent({ selector: 'chef-loading-spinner' }),
+        MockComponent({ selector: 'chef-select' }),
         MockComponent({ selector: 'chef-option' }),
         MockComponent({ selector: 'chef-page',
           inputs: [
