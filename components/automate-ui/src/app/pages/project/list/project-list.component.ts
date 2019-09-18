@@ -103,11 +103,12 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       });
 
     store.select(allProjects).pipe(
-      takeUntil(this.isDestroyed),
-      // do not update this cache while an update is in progress
-      filter(() => !this.applyRulesInProgress)
+      takeUntil(this.isDestroyed)
     ).subscribe((projectList: Project[]) => {
-      this.statusCache = projectList.reduce((m, p) => ({ ...m, [p.id]: p.status }), {});
+      if (!this.applyRulesInProgress) {
+        // do not update this cache while an update is in progress
+        this.statusCache = projectList.reduce((m, p) => ({ ...m, [p.id]: p.status }), {});
+      }
       this.projectsHaveStagedChanges = projectList.some(p => p.status === 'EDITS_PENDING');
     });
 
