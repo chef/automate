@@ -20,7 +20,7 @@ export class ChefSorters {
         // https://stackoverflow.com/questions
         const propComparator = (propName) =>
             (a, b) => a[propName].localeCompare(b[propName], undefined, opts) ||
-                      a[propName].localeCompare(b.name, undefined, { numeric: true });
+                      a[propName].localeCompare(b[propName], undefined, { numeric: true });
 
         sortedArray.sort(propComparator(property));
 
