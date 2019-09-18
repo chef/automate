@@ -8,10 +8,13 @@ package integration_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/habitat"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestServiceGroupsMultiServiceFilterStatusOk(t *testing.T) {
@@ -151,6 +154,102 @@ func TestServiceGroupsMultiServiceFilterStatusUnknown(t *testing.T) {
 	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, request)
 	assert.Nil(t, err)
 	assertServiceGroupsEqual(t, expected, response)
+}
+
+func TestDisconnectedStatusFilter(t *testing.T) {
+	ctx := context.Background()
+	oldEventTime, err := ptypes.TimestampProto(time.Now().Add(-time.Hour * 24))
+
+	t.Run("when no services are disconnected the response is an empty set", func(t *testing.T) {
+		suite.IngestServices(habServicesMatrix())
+		defer suite.DeleteDataFromStorage()
+		req := &applications.ServiceGroupsReq{
+			Filter: []string{"connectedStatus:disconnected"},
+		}
+		response, err := suite.ApplicationsServer.GetServiceGroups(ctx, req)
+		assert.Nil(t, err)
+		assert.Len(t, response.ServiceGroups, 0)
+	})
+	t.Run("when all services are disconnected, all service groups are returned", func(t *testing.T) {
+		servicesToIngest := habServicesMatrix()
+		require.NoError(t, err)
+
+		for _, e := range servicesToIngest {
+			e.EventMetadata.OccurredAt = oldEventTime
+		}
+		suite.IngestServices(servicesToIngest)
+		defer suite.DeleteDataFromStorage()
+		_, err = suite.ApplicationsServer.MarkDisconnectedServices(300)
+		require.NoError(t, err)
+
+		req := &applications.ServiceGroupsReq{
+			Filter: []string{"connectedStatus:disconnected"},
+		}
+		response, err := suite.ApplicationsServer.GetServiceGroups(ctx, req)
+		assert.Nil(t, err)
+		assert.Len(t, response.ServiceGroups, 4)
+	})
+	t.Run("when all service groups have some disconnected services all service groups are returned", func(t *testing.T) {
+		servicesToIngest := habServicesMatrix()
+		require.NoError(t, err)
+
+		for _, i := range []int{0, 4, 7, 9} {
+			s := servicesToIngest[i]
+			s.EventMetadata.OccurredAt = oldEventTime
+		}
+		suite.IngestServices(servicesToIngest)
+		defer suite.DeleteDataFromStorage()
+		_, err = suite.ApplicationsServer.MarkDisconnectedServices(300)
+		require.NoError(t, err)
+
+		req := &applications.ServiceGroupsReq{
+			Filter: []string{"connectedStatus:disconnected"},
+		}
+		response, err := suite.ApplicationsServer.GetServiceGroups(ctx, req)
+		assert.Nil(t, err)
+		assert.Len(t, response.ServiceGroups, 4)
+	})
+	t.Run("when some service groups have disconnected services only those service groups are returned", func(t *testing.T) {
+		servicesToIngest := habServicesMatrix()
+		require.NoError(t, err)
+
+		for _, i := range []int{0, 4} {
+			s := servicesToIngest[i]
+			s.EventMetadata.OccurredAt = oldEventTime
+		}
+		suite.IngestServices(servicesToIngest)
+		defer suite.DeleteDataFromStorage()
+		_, err = suite.ApplicationsServer.MarkDisconnectedServices(300)
+		require.NoError(t, err)
+
+		req := &applications.ServiceGroupsReq{
+			Filter: []string{"connectedStatus:disconnected"},
+		}
+		response, err := suite.ApplicationsServer.GetServiceGroups(ctx, req)
+		assert.Nil(t, err)
+		assert.Len(t, response.ServiceGroups, 2)
+	})
+	t.Run("when a status filter and disconnected status filter are both applied and a service group meets both criteria", func(t *testing.T) {
+		servicesToIngest := habServicesMatrix()
+		require.NoError(t, err)
+
+		for _, i := range []int{0, 4, 7, 9} {
+			s := servicesToIngest[i]
+			s.EventMetadata.OccurredAt = oldEventTime
+		}
+		suite.IngestServices(servicesToIngest)
+		defer suite.DeleteDataFromStorage()
+		_, err = suite.ApplicationsServer.MarkDisconnectedServices(300)
+		require.NoError(t, err)
+
+		req := &applications.ServiceGroupsReq{
+			Filter: []string{"connectedStatus:disconnected", "status:critical"},
+		}
+		response, err := suite.ApplicationsServer.GetServiceGroups(ctx, req)
+		assert.Nil(t, err)
+		assert.Len(t, response.ServiceGroups, 1)
+	})
+
 }
 
 func TestServiceGroupsFilterStatusWrongParameter(t *testing.T) {
