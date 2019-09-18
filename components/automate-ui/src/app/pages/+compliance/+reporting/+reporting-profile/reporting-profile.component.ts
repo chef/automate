@@ -11,6 +11,7 @@ import { ReportQueryService, ReportQuery } from '../../shared/reporting/report-q
 import { ScanResultsService } from '../../shared/reporting/scan-results.service';
 import { paginationOverride } from '../shared';
 import * as moment from 'moment';
+import { FilterC } from '../../+reporting/types';
 
 @Component({
   selector: 'app-reporting-profile',
@@ -48,7 +49,8 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
         this.scanResults.params
       ]).pipe(
       takeUntil(this.isDestroyed))
-      .subscribe(this.onFilterParamsChange.bind(this));
+      .subscribe(([filters, params]: [ReportQuery, any]) =>
+        this.onFilterParamsChange(filters, params));
   }
 
   fetchProfile(id, reportQuery: ReportQuery) {
@@ -74,11 +76,11 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
     this.showLoadingIcon = false;
   }
 
-  onFilterParamsChange([filters, params]) {
+  onFilterParamsChange(reportQuery: ReportQuery, params: any) {
     const {nodeId, profileId, controlId} = params;
     if (!nodeId && profileId) {
       this.scanResults.showControlDetail = false;
-      this.getNodes(filters, params).pipe(
+      this.getNodes(reportQuery, params).pipe(
         takeUntil(this.isDestroyed))
         .subscribe(nodes => {
           this.scanResults.showNodesList = true;
@@ -89,7 +91,7 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
     if (nodeId && profileId && controlId) {
       this.scanResults.showNodesList = false;
 
-      this.getControl(filters, params).pipe(
+      this.getControl(reportQuery, params).pipe(
         takeUntil(this.isDestroyed))
         .subscribe((control) => {
           this.scanResults.control = control;
@@ -126,14 +128,14 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
     this.openControls = {};
   }
 
-  getNodes(filters, params): Observable<Array<any>> {
-    const profileFilter = {type: { name: 'profile_id' } , value: { text: params.profileId}};
-    const controlFilter = {type: { name: 'control_id' } , value: { text: params.controlId}};
-    filters = [profileFilter, controlFilter].concat(filters);
+  getNodes(reportQuery: ReportQuery, params: any): Observable<Array<any>> {
+    const profileFilter: FilterC = {type: { name: 'profile_id' }, value: { text: params.profileId}};
+    const controlFilter: FilterC = {type: { name: 'control_id' }, value: { text: params.controlId}};
+    reportQuery.filters = [profileFilter, controlFilter].concat(reportQuery.filters);
     params = paginationOverride;
     params['sort'] = 'latest_report.end_time';
     params['order'] = 'desc';
-    return this.statsService.getNodes(filters, params).pipe(
+    return this.statsService.getNodes(reportQuery, params).pipe(
       map(data => {
         return data.items.map(node => {
           node.status = node.latest_report.status;
@@ -142,11 +144,11 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
       }));
   }
 
-  getControl(filters, params): Observable<any> {
+  getControl(reportQuery: ReportQuery, params: any): Observable<any> {
     const {node} = this.scanResults;
     const reportId = node.latest_report.id;
 
-    return this.statsService.getSingleReport(reportId, filters).pipe(
+    return this.statsService.getSingleReport(reportId, reportQuery).pipe(
       takeUntil(this.isDestroyed),
       map(report => {
         const {controls} = report.profiles[0];
