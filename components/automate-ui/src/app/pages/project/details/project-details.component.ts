@@ -109,12 +109,10 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
 
     // if a rule gets deleted, we need to refresh the project status
     this.store.select(deleteRuleStatus).pipe(
-      filter(() => this.id !== undefined),
+      filter(status => this.id !== undefined && status === EntityStatus.loadingSuccess),
       takeUntil(this.isDestroyed))
-      .subscribe((status) => {
-        if (status === EntityStatus.loadingSuccess) {
-          this.store.dispatch(new GetProject({ id: this.id }));
-        }
+      .subscribe(() => {
+        this.store.dispatch(new GetProject({ id: this.id }));
       });
   }
 
@@ -129,7 +127,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
 
-  showFirstRuleMessage(): boolean {
+  showNoRulesMessage(): boolean {
     return !this.isLoading && this.rules.length === 0;
   }
 
