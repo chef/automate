@@ -153,6 +153,18 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
+  public patchResourceValue(form, event) {
+    form.controls['type'].setValue(event.target.value);
+  }
+
+  public patchAttributeValue(form, event, i) {
+    form.controls.conditions.controls[i].controls['attribute'].setValue(event.target.value);
+  }
+
+  public patchOperatorValue(form, event, i) {
+    form.controls.conditions.controls[i].controls['operator'].setValue(event.target.value);
+  }
+
   getHeading(): string {
     return `${this.project.name}: ` + (this.ruleForm.value.name.trim() || 'Rule');
   }

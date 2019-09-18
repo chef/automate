@@ -97,6 +97,7 @@ chef-page {
       position: relative;
       vertical-align: top;
       width: 27%;
+      margin-right: 2%;
 
       .label {
         color: $chef-dark-grey;
@@ -108,7 +109,28 @@ chef-page {
       chef-select,
       chef-input {
         min-width: 0;
-        width: 95%;
+        width: 100%;
+      }
+    }
+
+    &.operator-field {
+      display: inline-block;
+      position: relative;
+      vertical-align: top;
+      width: 18%;
+      margin-right: 2%;
+
+      .label {
+        color: $chef-dark-grey;
+        text-transform: uppercase;
+        font-size: 12px;
+        font-weight: 200;
+      }
+
+      chef-select,
+      chef-input {
+        min-width: 0;
+        width: 100%;
       }
     }
   }
@@ -137,5 +159,5 @@ chef-page {
       }
     }
   }
-
 }
+
