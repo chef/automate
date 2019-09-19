@@ -159,6 +159,13 @@ describeIfIAMV2p1('projects API: applying project', () => {
     });
   });
 
+  beforeEach(() => {
+    cy.restoreStorage();
+  });
+  afterEach(() => {
+    cy.saveStorage();
+  });
+
   after(() => {
     cy.cleanupV2IAMObjectsByIDPrefixes(adminIdToken, cypressPrefix, ['projects']);
   });
@@ -481,6 +488,79 @@ describeIfIAMV2p1('projects API: applying project', () => {
       expect(response.body).to.have.length(2);
     });
   });
+
+  const attributeValuesMap = new Map([
+    ['CHEF_SERVER', 'chef-server-dev.test'],
+    ['ENVIRONMENT', '_default'],
+    ['CHEF_ROLE', 'web'],
+    ['CHEF_TAG', 'test_tag'],
+    ['CHEF_POLICY_GROUP', 'test_group'],
+    ['CHEF_POLICY_NAME', 'test_name']
+    // leave out CHEF_ORGANIZATION since it's tested above
+  ]);
+
+  for (const [attribute, value] of attributeValuesMap) {
+    const targetNodeId = 'f6a5c33f-bef5-433b-815e-a8f6e69e6b1b';
+
+    it(`ingest rule with attribute ${attribute} gets applied to node`, () => {
+      const rule = {
+        id: 'rule-2',
+        name: 'rule 2',
+        type: 'NODE',
+        project_id: avengersProject.id,
+        conditions: [
+          {
+            attribute: attribute,
+            operator: 'EQUALS',
+            values: [value]
+          }
+        ]
+      };
+      // create rule with attribute value
+      cy.request({
+        headers: { 'api-token': Cypress.env('adminTokenValue') },
+        method: 'POST',
+        url: `/apis/iam/v2beta/projects/${rule.project_id}/rules`,
+        body: rule
+      });
+
+      // apply rules
+      cy.request({
+        headers: { 'api-token': Cypress.env('adminTokenValue') },
+        method: 'POST',
+        url: '/apis/iam/v2beta/apply-rules'
+      });
+      waitUntilApplyRulesNotRunning(100);
+
+      // see filter works
+      cy.request({
+        headers: {
+          'api-token': Cypress.env('adminTokenValue'),
+          projects: avengersProject.id
+        },
+        method: 'GET',
+        url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
+      }).then((response) => {
+        expect(response.body).to.have.length(1);
+        expect(response.body[0].id).to.equal(targetNodeId);
+      });
+
+      // delete rule
+      cy.request({
+        headers: { 'api-token': Cypress.env('adminTokenValue') },
+        method: 'DELETE',
+        url: `/apis/iam/v2beta/projects/${avengersRule.project_id}/rules/${rule.id}`
+      });
+
+      // apply rules to reset node to unassigned
+      cy.request({
+        headers: { 'api-token': Cypress.env('adminTokenValue') },
+        method: 'POST',
+        url: '/apis/iam/v2beta/apply-rules'
+      });
+      waitUntilApplyRulesNotRunning(100);
+    });
+  }
 });
 
 function waitForNodes(idToken: string, totalNodes: number, maxRetries: number) {

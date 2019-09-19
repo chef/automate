@@ -37,7 +37,7 @@
   "message_version": "1.1.0",
   "message_type": "run_converge",
   "node": {
-    "name": "chef-client-dev.test",
+    "name": "testing_projects",
     "chef_environment": "_default",
     "json_class": "Chef::Node",
     "automatic": {
@@ -5077,7 +5077,7 @@
         "timezone": "UTC"
       },
       "chef_guid": "f6a5c33f-bef5-433b-815e-a8f6e69e6b1b",
-      "name": "chef-client-dev.test",
+      "name": "testing_projects",
       "chef_environment": "_default",
       "recipes": [
         "chef-client",
@@ -5184,7 +5184,7 @@
       }
     },
     "normal": {
-      "tags": []
+      "tags": [ "test_tag" ]
     },
     "chef_type": "node",
     "default": {
@@ -6013,8 +6013,8 @@
   "run_list": [
     "role[web]"
   ],
-  "policy_name": null,
-  "policy_group": null,
+  "policy_name": "test_name",
+  "policy_group": "test_group",
   "start_time": "2018-09-13T20:43:01Z",
   "end_time": "2018-09-13T20:43:01Z",
   "source": "chef_client",
