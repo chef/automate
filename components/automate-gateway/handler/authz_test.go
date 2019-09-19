@@ -47,16 +47,6 @@ func TestIntrospectAllV1(t *testing.T) {
 		authzResp *authz.FilterAuthorizedPairsResp
 		expected  map[string]*response.MethodsAllowed
 	}{
-		"empty response": {
-			&authz.FilterAuthorizedPairsResp{},
-			map[string]*response.MethodsAllowed{},
-		},
-		"one response pair, unmapped": {
-			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "foo:thing", Action: "foo:ing"},
-			}},
-			map[string]*response.MethodsAllowed{},
-		},
 		"one response pair, mapped": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
 				{Resource: "auth:policies", Action: "create"},
@@ -94,7 +84,10 @@ func TestIntrospectAllV1(t *testing.T) {
 			resp, err := hdlr.IntrospectAll(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp)
-			assert.Equal(t, tc.expected, resp.Endpoints)
+			for key, value := range tc.expected {
+				assert.Contains(t, resp.Endpoints, key)
+				assert.Equal(t, value, resp.Endpoints[key])
+			}
 		})
 		reset()
 	}
@@ -112,16 +105,6 @@ func TestIntrospectAllV2(t *testing.T) {
 		authzResp *authz_v2.FilterAuthorizedPairsResp
 		expected  map[string]*response.MethodsAllowed
 	}{
-		"empty response": {
-			&authz_v2.FilterAuthorizedPairsResp{},
-			map[string]*response.MethodsAllowed{},
-		},
-		"one response pair, unmapped": {
-			&authz_v2.FilterAuthorizedPairsResp{Pairs: []*authz_v2.Pair{
-				{Resource: "foo:thing", Action: "foo:ing"},
-			}},
-			map[string]*response.MethodsAllowed{},
-		},
 		"one response pair, mapped": {
 			&authz_v2.FilterAuthorizedPairsResp{Pairs: []*authz_v2.Pair{
 				{Resource: "iam:policies", Action: "iam:policies:create"},
@@ -159,7 +142,10 @@ func TestIntrospectAllV2(t *testing.T) {
 			resp, err := hdlr.IntrospectAll(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp)
-			assert.Equal(t, tc.expected, resp.Endpoints)
+			for key, value := range tc.expected {
+				assert.Contains(t, resp.Endpoints, key)
+				assert.Equal(t, value, resp.Endpoints[key])
+			}
 		})
 		reset()
 	}
