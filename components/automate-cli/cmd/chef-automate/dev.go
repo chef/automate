@@ -84,6 +84,7 @@ func init() {
 	devCmd.AddCommand(newEnablePrometheusCmd())
 	devCmd.AddCommand(newDisablePrometheusCmd())
 	devCmd.AddCommand(newCreateIAMDevUsersCmd())
+	devCmd.AddCommand(newCerealCmd())
 	RootCmd.AddCommand(devCmd)
 }
 
