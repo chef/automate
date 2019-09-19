@@ -405,8 +405,8 @@ export class ReportingSearchbarComponent implements OnInit {
     this.visibleDate.setFullYear(year);
   }
 
-  onDaySelect(day) {
-    this.visibleDate.setDate(day);
+  onDaySelect(date) {
+    this.visibleDate = new Date(date);
     this.dateChanged.emit({ detail: new Date(this.visibleDate) });
   }
 

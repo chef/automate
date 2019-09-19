@@ -15,7 +15,7 @@ export class DemoCalendarComponent {
     this.date.year(year);
   }
 
-  handleDaySelect(day) {
-    this.date.date(day);
+  handleDaySelect(date) {
+    this.date = moment(date);
   }
 }
