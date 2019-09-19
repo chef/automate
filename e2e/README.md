@@ -49,15 +49,15 @@ according to your targeted Automate instance's IAM version.
 
 ```bash
 export CYPRESS_IAM_VERSION=v1
-export CYPRESS_ADMIN_TOKEN=`chef-automate admin-token`
+export CYPRESS_ADMIN_TOKEN=`chef-automate admin-token` # or copy an admin token from the UI or CLI
 
 # or
 export CYPRESS_IAM_VERSION=v2
-export CYPRESS_ADMIN_TOKEN=`chef-automate iam token create TEST --admin`
+export CYPRESS_ADMIN_TOKEN=`chef-automate iam token create TEST --admin` # or copy an admin token from the UI or CLI
 
 # or
 export CYPRESS_IAM_VERSION=v2.1
-export CYPRESS_ADMIN_TOKEN=`chef-automate iam token create TEST --admin`
+export CYPRESS_ADMIN_TOKEN=`chef-automate iam token create TEST --admin` # or copy an admin token from the UI or CLI
 ```
 
 If you are developing Cypress tests, you'll want to open the Cypress
