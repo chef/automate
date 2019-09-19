@@ -1,6 +1,4 @@
-import {
-  Component, EventEmitter, Input, Output, OnChanges
-} from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges } from '@angular/core';
 
 import { ProjectConstants, Project } from 'app/entities/projects/project.model';
 
@@ -37,7 +35,22 @@ export class ProjectsDropdownComponent implements OnChanges {
   label = UNASSIGNED_PROJECT_ID;
 
   projectsArray(): ProjectChecked[] {
-    return Object.values(this.projects);
+    const sortedProjects = Object.values(this.projects);
+
+    const opts = {
+      numeric: true,
+      sensitivity: 'base'
+    };
+
+    // per @msorens https://github.com/chef/a2/pull/4434
+    // Sort by name then by cased-name, since no other field is useful as a secondary sort;
+    // this ensures stable sort with respect to case, so 'a' always comes before 'A'.
+    sortedProjects.sort(
+      (a, b) =>
+        a.name.localeCompare(b.name, undefined, opts) ||
+        a.name.localeCompare(b.name, undefined, { numeric: true })
+    );
+    return sortedProjects;
   }
 
   ngOnChanges(): void {
@@ -46,7 +59,9 @@ export class ProjectsDropdownComponent implements OnChanges {
 
   toggleDropdown(event: MouseEvent): void {
     event.stopPropagation();
-    if (this.disabled) { return; }
+    if (this.disabled) {
+      return;
+    }
 
     this.active = !this.active;
   }
@@ -74,7 +89,7 @@ export class ProjectsDropdownComponent implements OnChanges {
       nextElement = <HTMLElement>targetElement.nextElementSibling;
     }
 
-    if (nextElement == null)  {
+    if (nextElement == null) {
       return;
     } else {
       nextElement.focus();
