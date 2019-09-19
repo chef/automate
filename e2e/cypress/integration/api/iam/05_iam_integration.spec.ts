@@ -4,7 +4,7 @@ describeIfIAMV2p1('assigning projects', () => {
   let adminIdToken = '';
   let apiToken = '';
 
-  const modifyError = 'cannot modify a project for this object';
+  const modifyError = 'cannot modify projects for this object';
   const cypressPrefix = 'iam-integration';
   const resource = {
     id: `${cypressPrefix}-${Cypress.moment().format('MMDDYYhhmm')}`,
