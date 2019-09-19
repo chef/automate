@@ -1,6 +1,6 @@
 <chef-page
   subheading="Resources that match the type and all conditions are included in the project."
-  confirm-btn-text="Save Rule"
+  [attr.confirm-btn-text]="getConfirmBtnText()"
   [attr.heading]="getHeading()"
   [attr.disable-confirm]="!ruleForm.valid || !ruleForm.dirty"
   [attr.page-loading]="isLoading"
