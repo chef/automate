@@ -1522,6 +1522,14 @@ func (p *pg) GetProject(ctx context.Context, id string) (*v2.Project, error) {
 }
 
 func (p *pg) DeleteProject(ctx context.Context, id string) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return p.processError(err)
+	}
+
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return err
@@ -1529,7 +1537,7 @@ func (p *pg) DeleteProject(ctx context.Context, id string) error {
 
 	// Delete project if ID found AND intersection between projects and projectsFilter,
 	// unless the projectsFilter is empty (v2.0 case).
-	res, err := p.db.ExecContext(ctx,
+	res, err := tx.ExecContext(ctx,
 		`DELETE FROM iam_projects WHERE id=$1 AND (array_length($2::TEXT[], 1) IS NULL OR id=ANY($2));`,
 		id, pq.Array(projectsFilter),
 	)
@@ -1540,6 +1548,18 @@ func (p *pg) DeleteProject(ctx context.Context, id string) error {
 	err = p.singleRowResultOrNotFoundErr(res)
 	if err != nil {
 		return err
+	}
+
+	// insert project into graveyard
+	_, err = tx.ExecContext(ctx,
+		`INSERT INTO iam_projects_graveyard (id) VALUES ($1)`, id)
+	if err != nil {
+		return p.processError(err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return storage_errors.NewTxCommitError(err)
 	}
 
 	return nil

@@ -4,12 +4,15 @@ import (
 	"context"
 	"sync"
 
+	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/patterns"
 	"github.com/chef/automate/lib/logger"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/lib/authz/project_purge"
 )
@@ -23,15 +26,12 @@ const (
 
 type ProjectPurger interface {
 	Start(string) error
-	// Status(string) (ProjectPurgerStatus, error)
+	GraveyardingCompleted(string) (bool, error)
 }
-
-// type ProjectPurgerStatus struct {
-// }
 
 var ProjectPurgeDomainServices = []string{
 	"teams",
-	// "tokens",
+	// "authn",
 }
 
 // This workflow executor follows the pattern described in project_update_manager.go
@@ -138,6 +138,45 @@ func (m *CerealProjectPurger) Start(projectID string) error {
 	return nil
 }
 
+// TODO errors from run not getting bubbgled up
+func (m *CerealProjectPurger) GraveyardingCompleted(projectID string) (bool, error) {
+	logrus.Warnf("111111111111111")
+	instance, err := patterns.GetChainWorkflowInstance(context.TODO(), m.manager, m.workflowName, projectID)
+	if err != nil {
+		if err == cereal.ErrWorkflowInstanceNotFound {
+			logrus.Warnf("2222222222222222")
+			return true, nil
+		}
+		logrus.Warnf("3333333333333333")
+		return false, errors.Wrap(err, "failed to fetch instance")
+	}
+	logrus.Warnf("44444444444")
+
+	subinstance, err := instance.GetSubWorkflow(0)
+	if err != nil {
+		logrus.Warnf("555555555555")
+
+		if err == cereal.ErrWorkflowInstanceNotFound {
+			logrus.Warnf("6666666666666666666")
+
+			return true, nil
+		}
+		logrus.Warnf("777777777777777")
+
+		return false, errors.Wrap(err, "failed to fetch subinstance")
+	}
+
+	if subinstance.IsRunning() {
+		logrus.Warnf("88888888888888888888")
+
+		return false, nil
+	} else {
+		logrus.Warnf("9999999999999999999")
+
+		return true, subinstance.Err()
+	}
+}
+
 type MoveProjectToGraveyardTaskExecutor struct {
 	store storage.Storage
 	log   logger.Logger
@@ -158,18 +197,16 @@ func (s *MoveProjectToGraveyardTaskExecutor) Run(ctx context.Context, task cerea
 
 	s.log.Infof("starting project move to graveyard for id %q", params.ProjectID)
 
-	// err := s.store.MoveProjectToGraveyard(ctx, req.Id)
-	// switch err {
-	// case nil:
-	// 	return &api.DeleteProjectResp{}, nil
-	// case storage_errors.ErrNotFound:
-	// 	return nil, status.Errorf(codes.NotFound, "no project with ID %q found", req.Id)
-	// default: // some other error
-	// 	return nil, status.Errorf(codes.Internal,
-	// 		"error deleting project with ID %q: %s", req.Id, err.Error())
-	// }
-
-	return MoveProjectToGraveyardResult{}, nil
+	err := s.store.DeleteProject(ctx, params.ProjectID)
+	switch err {
+	case nil:
+		return &MoveProjectToGraveyardResult{}, nil
+	case storage_errors.ErrNotFound:
+		return nil, status.Errorf(codes.NotFound, "no project with ID %q found", params.ProjectID)
+	default: // some other error
+		return nil, status.Errorf(codes.Internal,
+			"error deleting project with ID %q: %s", params.ProjectID, err.Error())
+	}
 }
 
 type DeleteProjectFromGraveyardTaskExecutor struct {

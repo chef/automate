@@ -332,26 +332,51 @@ func (s *ProjectState) DeleteProject(ctx context.Context,
 	s.log.Info("server purge: START")
 	err := s.ProjectPurger.Start(req.Id)
 	if err != nil {
+		if err == cereal.ErrWorkflowInstanceExists {
+			return nil, status.Errorf(codes.FailedPrecondition,
+				"project deletion already in progress for project with id %q: %s", req.Id, err.Error())
+		}
+		return nil, status.Errorf(codes.Internal,
+			"error starting project deletion for project with id %q: %s", req.Id, err.Error())
+	}
+
+	if err := s.waitForProjectToBeGraveyarded(ctx, 10*time.Second, req.Id); err != nil {
 		return nil, err
 	}
-	// s.log.Info("apply project rules: START")
-	// err := s.ProjectUpdateManager.Start()
-	// if err != nil {
-	// 	s.log.Warnf("error starting project update. the rules and cache were updated but the apply was not started, please try again.")
-	// 	if err == cereal.ErrWorkflowInstanceExists {
-	// 		return nil, status.Errorf(codes.FailedPrecondition,
-	// 			"project update already in progress: %s", err.Error())
-	// 	}
-	// 	return nil, status.Errorf(codes.Internal,
-	// 		"error starting project update: %s", err.Error())
-	// }
 
-	// if err := s.waitForApplyStagedRules(ctx, 10*time.Second); err != nil {
-	// 	return nil, err
-	// }
-
-	// }
 	return &api.DeleteProjectResp{}, nil
+}
+
+func (s *ProjectState) waitForProjectToBeGraveyarded(ctx context.Context, maxWaitTime time.Duration, projectID string) error {
+	ctx, cancel := context.WithTimeout(ctx, maxWaitTime)
+	defer cancel()
+	s.log.Info("Waiting for GraveyardingCompleted status")
+	tries := 0
+	startTime := time.Now()
+	for {
+		logctx := s.log.WithField("tries", tries+1).WithField("duration", time.Since(startTime))
+		completed, err := s.ProjectPurger.GraveyardingCompleted(projectID)
+		// if completed we return the final error
+		if completed {
+			return err
+		}
+
+		// if not completed and we get an error, it's unexpected, try again
+		if err != nil {
+			s.log.WithError(err).Warn("failed to get GraveyardingCompleted status")
+		}
+		sleepTime := time.Duration((5 * (1 << uint(tries)))) * time.Millisecond
+		if sleepTime > time.Second {
+			sleepTime = time.Second
+		}
+		select {
+		case <-ctx.Done():
+			logctx.Error("Timed out waiting for GraveyardingCompleted")
+			return status.Error(codes.DeadlineExceeded, "Timed out waiting for GraveyardingCompleted")
+		case <-time.After(sleepTime):
+		}
+		tries++
+	}
 }
 
 func (s *ProjectState) ListRulesForAllProjects(ctx context.Context,
