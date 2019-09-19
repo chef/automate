@@ -118,11 +118,9 @@ func (a *AuthzServer) IntrospectAll(
 	mapByResourceAndActionV1 := pairs.InvertMapNonParameterized(methodsInfoV1)
 	mapByResourceAndActionV2 := pairs.InvertMapNonParameterized(methodsInfoV2)
 
-	// Extra work of hydrating not needed for IntrospectAll; already does that.
 	endpointMap, err := a.getAllowedMap(ctx,
 		mapByResourceAndActionV1, mapByResourceAndActionV2,
-		methodsInfoV1, methodsInfoV2,
-		false)
+		methodsInfoV1, methodsInfoV2)
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +153,7 @@ func (a *AuthzServer) IntrospectSome(
 
 	endpointMap, err := a.getAllowedMap(ctx,
 		mapByResourceAndActionV1, mapByResourceAndActionV2,
-		methodsInfoV1, methodsInfoV2, true)
+		methodsInfoV1, methodsInfoV2)
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +193,7 @@ func (a *AuthzServer) Introspect(
 
 	endpointMap, err := a.getAllowedMap(ctx,
 		mapByResourceAndActionV1, mapByResourceAndActionV2,
-		methodsInfoV1, methodsInfoV2, true)
+		methodsInfoV1, methodsInfoV2)
 	if err != nil {
 		return nil, err
 	}
@@ -296,8 +294,7 @@ func reportBadPaths(log *logrus.Entry, lookupHash map[string]bool) {
 func (a *AuthzServer) getAllowedMap(
 	ctx context.Context,
 	mapByResourceAndActionV1, mapByResourceAndActionV2 map[pairs.Pair][]string,
-	methodsInfoV1, methodsInfoV2 map[string]pairs.Info,
-	fullyHydrate bool) (map[string]*gwAuthzRes.MethodsAllowed, error) {
+	methodsInfoV1, methodsInfoV2 map[string]pairs.Info) (map[string]*gwAuthzRes.MethodsAllowed, error) {
 
 	log := ctxlogrus.Extract(ctx)
 
@@ -312,7 +309,7 @@ func (a *AuthzServer) getAllowedMap(
 		return nil, err
 	}
 	endpointMap, err := pairs.GetEndpointMapFromResponse(
-		resp.Pairs, resp.MethodsInfo, resp.MapByResourceAndAction, fullyHydrate)
+		resp.Pairs, resp.MethodsInfo, resp.MapByResourceAndAction, true)
 	if err != nil {
 		log.WithError(err).Debug("Error on pairs.GetEndpointMapFromResponse")
 		return nil, err

@@ -8,13 +8,13 @@ import {
   map,
   catchError,
   withLatestFrom,
-  switchMap,
-  filter
+  switchMap
 } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { of, Observable } from 'rxjs';
 import * as moment from 'moment';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { IndexedEntities } from 'app/entities/entities';
 import {
   UserPermsTypes,
   GetAllUserPermsSuccess,
@@ -25,10 +25,12 @@ import {
   UserPermsResponsePayload,
   GetUserParamPerms,
   GetUserParamPermsSuccess,
-  GetUserParamPermsFailure
+  GetUserParamPermsFailure,
+  UserPermsActions
 } from './userperms.actions';
 import { UserPermsRequests } from './userperms.requests';
-import { getlastFetchTime } from './userperms.selectors';
+import { getlastFetchTime, allPerms } from './userperms.selectors';
+import { UserPermEntity } from './userperms.entity';
 
 @Injectable()
 export class UserPermEffects {
@@ -60,11 +62,22 @@ export class UserPermEffects {
   fetchSomePerms$ = this.actions$.pipe(
     ofType(UserPermsTypes.GET_SOME),
     withLatestFrom(this.store.select(getlastFetchTime)),
-    filter(([_action, lastTime]) => this.stale(lastTime)),
-    mergeMap(
-      ([action, _]: [GetSomeUserPerms, Date]) => this.requests.fetchSome(action.payload).pipe(
-      map((resp: UserPermsResponsePayload) => new GetSomeUserPermsSuccess(resp.endpoints)),
-      catchError((error: HttpErrorResponse) => of(new GetSomeUserPermsFailure(error))))));
+    withLatestFrom(this.store.select(allPerms)),
+    switchMap(
+      ([[action, lastTime], list]: [[GetSomeUserPerms, Date], IndexedEntities<UserPermEntity>]) => {
+        let obs: Observable<UserPermsActions>;
+        const isFresh = !!list && !this.stale(lastTime);
+        if (isFresh) {
+          // TODO: This works, but it has extraneous 'id' property in the payload.
+          // Should strip that from each entry in the list.
+          obs = of(new GetSomeUserPermsSuccess(list));
+        } else {
+          this.requests.fetchSome(action.payload).pipe(
+            map((resp: UserPermsResponsePayload) => new GetSomeUserPermsSuccess(resp.endpoints)),
+            catchError((error: HttpErrorResponse) => of(new GetSomeUserPermsFailure(error))));
+        }
+        return obs;
+      }));
 
   @Effect()
   fetchParameterizedPerms$ = this.actions$.pipe(
