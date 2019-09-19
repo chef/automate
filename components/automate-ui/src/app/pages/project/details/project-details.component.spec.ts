@@ -23,7 +23,7 @@ describe('ProjectDetailsComponent', () => {
     id: 'uuid-1',
     name: 'Default',
     type: 'CHEF_MANAGED',
-    status: 'NO_RULES'
+    status: 'EDITS_PENDING'
   };
   const rules: Rule[] = [
     {
@@ -167,7 +167,7 @@ describe('ProjectDetailsComponent', () => {
     });
 
     it('displays create-your-first-rule message', () => {
-      expect(component.showFirstRuleMessage()).toBeTruthy();
+      expect(component.showNoRulesMessage()).toBeTruthy();
     });
   });
 
@@ -193,11 +193,11 @@ describe('ProjectDetailsComponent', () => {
     });
 
     it('does not display create-your-first-rule message', () => {
-      expect(component.showFirstRuleMessage()).toBeFalsy();
+      expect(component.showNoRulesMessage()).toBeFalsy();
     });
 
     it('shows a link back to project when a rule has edits pending', () => {
-      expect(component.showProjectLink()).toBeTruthy();
+      expect(component.project.status === 'EDITS_PENDING').toBeTruthy();
     });
 
     it('enables delete-rule button when a rule has edits pending', () => {

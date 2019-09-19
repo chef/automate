@@ -61,7 +61,7 @@
           <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">
             <chef-button [routerLink]="['/settings', 'projects', project?.id, 'rules']" id="create-button" primary>Create Rule</chef-button>
           </app-authorized>
-          <small *ngIf="showProjectLink()">Edits pending, update <a [routerLink]="['/settings/projects']">projects</a> to apply edits.</small>
+          <small *ngIf="project?.status === 'EDITS_PENDING'">Edits are pending: update <a [routerLink]="['/settings/projects']">projects</a> to apply edits.</small>
         </chef-toolbar>
         <app-authorized [allOf]="['/iam/v2beta/projects', 'get']">
           <chef-table id="project-rules-table">
@@ -96,13 +96,14 @@
           </chef-table>
         </app-authorized>
       </ng-container>
-      <ng-container *ngIf="showFirstRuleMessage()">
+      <ng-container *ngIf="showNoRulesMessage()">
         <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">
           <div class="empty-case-container">
-            <p>Create the first ingest rule to get started!</p>
-          </div>
-          <div class="empty-case-container">
-              <chef-button primary [routerLink]="['/settings', 'projects', project?.id, 'rules']">Create Rule</chef-button>
+            <small class="empty-case-entry" *ngIf="project?.status === 'EDITS_PENDING'">
+              Edits are pending: update <a [routerLink]="['/settings/projects']">projects</a> to apply edits.
+            </small>
+            <p class="empty-case-entry">Create the first ingest rule to get started!</p>
+            <chef-button primary [routerLink]="['/settings', 'projects', project?.id, 'rules']" class="empty-case-entry">Create Rule</chef-button>
           </div>
         </app-authorized>
       </ng-container>

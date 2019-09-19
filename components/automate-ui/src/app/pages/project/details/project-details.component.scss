@@ -107,17 +107,18 @@ chef-table {
 }
 
 .empty-case-container {
-  display: flex;
+  margin-top: 42px;
+  //display: flex;
   justify-content: center;
+  //flex-direction: column;
+  text-align: center;
 
-  p {
-    margin-top: 42px;
-    font-size: 18px;
+  .empty-case-entry {
+    margin-top: 18px;
     margin-bottom: 0;
-    text-align: center;
   }
 
-  chef-button {
-    margin-top: 18px;
+  p {
+    font-size: 18px;
   }
 }

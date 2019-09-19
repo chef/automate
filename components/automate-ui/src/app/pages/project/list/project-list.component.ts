@@ -103,11 +103,12 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       });
 
     store.select(allProjects).pipe(
-      takeUntil(this.isDestroyed),
-      // do not update this cache while an update is in progress
-      filter(() => !this.applyRulesInProgress)
+      takeUntil(this.isDestroyed)
     ).subscribe((projectList: Project[]) => {
-      this.statusCache = projectList.reduce((m, p) => ({ ...m, [p.id]: p.status }), {});
+      if (!this.applyRulesInProgress) {
+        // do not update this cache while an update is in progress
+        this.statusCache = projectList.reduce((m, p) => ({ ...m, [p.id]: p.status }), {});
+      }
       this.projectsHaveStagedChanges = projectList.some(p => p.status === 'EDITS_PENDING');
     });
 
@@ -146,16 +147,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   // Note: This will be dealt with later, right now, we don't check if it's used
   public inUseMessage(): string {
     return '';
-  }
-
-  getButtonText(): string {
-    if (this.applyRulesInProgress) {
-      return `Updating Projects ${Math.round(this.percentageComplete * 100)}%...`;
-    }
-    if (this.projectsHaveStagedChanges) {
-      return 'Update Projects';
-    }
-    return 'Projects Up-To-Date';
   }
 
   public createProject(): void {
@@ -286,4 +277,24 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     // TODO: check how often this is hit
     return result;
   }
+
+  public getButtonText(): string {
+    if (this.applyRulesInProgress) {
+      return `Updating Projects ${Math.round(this.percentageComplete * 100)}%...`;
+    }
+    if (this.projectsHaveStagedChanges
+      || this.updateProjectsCancelled
+      || this.updateProjectsFailed) {
+      return 'Update Projects';
+    }
+    return 'Projects Up-to-Date';
+  }
+
+  public isDisabled(): boolean {
+    return this.applyRulesInProgress ||
+      (!this.projectsHaveStagedChanges
+        && !this.updateProjectsCancelled
+        && !this.updateProjectsFailed);
+  }
+
 }

@@ -27,10 +27,10 @@ With the plugin installed, this TOC will update automatically when you save the 
 
 ## Requirements
 
-1. node. We currently use node 8.9.4, but the current version number is always
-   present in the **.nvmrc** file. Use [NVM](https://github.com/creationix/nvm) to install node.
+1. node. We currently use node 10.15.2, but the current version number is always
+   present in the **.nvmrc** file. Use [NVM](https://github.com/nvm-sh/nvm) to install node.
 
-1. npm. We currently use npm 5.6.0 which ships with node 8.9.4 so no additional
+1. npm. We currently use npm 6.4.1 which ships with node 10.15.2 so no additional
    installation should be necessary.
 
 1. [direnv](https://direnv.net/). This can be installed with `brew install

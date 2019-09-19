@@ -21,7 +21,7 @@
               data-cy="create-project" primary (click)="openCreateModal()">Create Project</chef-button>
           </app-authorized>
           <app-authorized [allOf]="['/iam/v2beta/apply-rules', 'post']">
-            <chef-button secondary [disabled]="!projectsHaveStagedChanges || (projects.applyRulesStatus$ | async)?.state === ApplyRulesStatusState.Running"
+            <chef-button secondary [disabled]="isDisabled()"
               id="update-start-button" (click)="openConfirmUpdateStartModal()">{{ getButtonText() }}</chef-button>
           </app-authorized>
           <app-authorized [allOf]="['/iam/v2beta/apply-rules', 'delete']">

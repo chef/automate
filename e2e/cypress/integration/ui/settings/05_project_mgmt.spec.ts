@@ -43,7 +43,7 @@ describeIfIAMV2p1('project management', () => {
 
   it('has a disabled button when there are no rules', () => {
     cy.get('app-project-list chef-button#update-start-button')
-      .contains('Projects Up-To-Date').should('have.attr', 'disabled');
+      .contains('Projects Up-to-Date').should('have.attr', 'disabled');
   });
 
   it('displays a list of projects', () => {
@@ -88,6 +88,7 @@ describeIfIAMV2p1('project management', () => {
 
   // something is occasionally resetting the projects filter to (unassigned)
   itFlaky('can create a rule for the new project', () => {
+    cy.get('app-project-details').contains('Edits are pending').should('not.exist');
     cy.get('app-project-details app-authorized button').contains('Create Rule').click();
 
     cy.url().should('include', `/settings/projects/${projectID}/rules`);
@@ -125,6 +126,7 @@ describeIfIAMV2p1('project management', () => {
 
     cy.url().should('include', `/settings/projects/${projectID}`);
     cy.get('app-project-details chef-td').contains(ruleID);
+    cy.get('app-project-details').contains('Edits are pending');
   });
 
   itFlaky('displays a list of rules for a project', () => {
@@ -140,6 +142,7 @@ describeIfIAMV2p1('project management', () => {
   });
 
   itFlaky('can update a project rule', () => {
+    cy.get('app-project-details').contains('Edits are pending');
     const updatedRuleName = `updated ${ruleName}`;
     cy.get('app-project-details a').contains(ruleName).click();
 
@@ -174,6 +177,7 @@ describeIfIAMV2p1('project management', () => {
     cy.url().should('include', '/settings/projects');
     cy.get('app-project-details chef-td').contains(updatedRuleName);
     cy.get('app-project-details chef-td').contains('2 conditions');
+    cy.get('app-project-details').contains('Edits are pending');
   });
 
   itFlaky('can update a project name', () => {
@@ -192,6 +196,7 @@ describeIfIAMV2p1('project management', () => {
   });
 
   itFlaky('can delete a project rule', () => {
+    cy.get('app-project-details').contains('Edits are pending');
     cy.get('[data-cy=rules-tab]').click();
 
     cy.get('app-project-details chef-td').contains(ruleID).parent()
@@ -206,6 +211,7 @@ describeIfIAMV2p1('project management', () => {
     // since this is a cypress custom project, we know this is the only rule.
     // the empty UI should show up so entire table will be missing.
     cy.get('app-project-details chef-tbody').should('not.exist');
+    cy.get('app-project-details').contains('Edits are pending').should('not.exist');
   });
 
   // sometimes the deleted successfully notification isn't showing up

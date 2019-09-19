@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
-import { identity, some } from 'lodash/fp';
+import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams, routeURL } from 'app/route.selectors';
@@ -16,8 +16,12 @@ import {
 import { Project } from 'app/entities/projects/project.model';
 import { GetProject, UpdateProject } from 'app/entities/projects/project.actions';
 import { GetRulesForProject, DeleteRule } from 'app/entities/rules/rule.actions';
-import { Rule, RuleStatus } from 'app/entities/rules/rule.model';
-import { allRules, getAllStatus } from 'app/entities/rules/rule.selectors';
+import { Rule } from 'app/entities/rules/rule.model';
+import {
+  allRules,
+  getAllStatus,
+  deleteStatus as deleteRuleStatus
+} from 'app/entities/rules/rule.selectors';
 
 export type ProjectTabName = 'rules' | 'details';
 
@@ -44,6 +48,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   public isLoading = true;
   public saving = false;
   private isDestroyed = new Subject<boolean>();
+  private id: string;
 
   constructor(
     private fb: FormBuilder,
@@ -98,7 +103,16 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
       filter(identity),
       takeUntil(this.isDestroyed))
       .subscribe((id: string) => {
+        this.id = id;
         this.store.dispatch(new GetProject({ id }));
+      });
+
+    // if a rule gets deleted, we need to refresh the project status
+    this.store.select(deleteRuleStatus).pipe(
+      filter(status => this.id !== undefined && status === EntityStatus.loadingSuccess),
+      takeUntil(this.isDestroyed))
+      .subscribe(() => {
+        this.store.dispatch(new GetProject({ id: this.id }));
       });
   }
 
@@ -113,7 +127,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
 
-  showFirstRuleMessage(): boolean {
+  showNoRulesMessage(): boolean {
     return !this.isLoading && this.rules.length === 0;
   }
 
@@ -144,12 +158,6 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
 
   showDeleteRule(): boolean {
     return true; // TODO: return false when *project* status is "updating..."
-  }
-
-  showProjectLink(): boolean {
-    const statusPropertyName = 'status';
-    const ruleStatus: RuleStatus = 'STAGED';
-    return some([statusPropertyName, ruleStatus], this.rules);
   }
 
   saveProject(): void {

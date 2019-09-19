@@ -79,7 +79,7 @@ export function projectEntityReducer(
 
     case ProjectActionTypes.GET_SUCCESS:
       return set(GET_STATUS, EntityStatus.loadingSuccess,
-        projectEntityAdapter.addOne(action.payload.project, state));
+        projectEntityAdapter.upsertOne(action.payload.project, state));
 
     case ProjectActionTypes.GET_FAILURE:
       return set(GET_STATUS, EntityStatus.loadingFailure, state);

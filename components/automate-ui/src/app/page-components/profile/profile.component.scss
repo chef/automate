@@ -82,6 +82,11 @@ a, button:not(.dropdown-toggle) {
   &:first-child {
     border-bottom: 1px solid $chef-grey;
   }
+
+  .version,
+  .build {
+    line-height: 24px;
+  }
 }
 
 .dropdown-display-name {
@@ -97,9 +102,4 @@ a, button:not(.dropdown-toggle) {
   position: absolute;
   right: 16px;
   top: 8px;
-}
-
-.version:after {
-  content: '\A';
-  white-space: pre;
 }
