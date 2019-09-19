@@ -64,6 +64,14 @@ func newCerealCmd() *cobra.Command {
 	listWorkflowInstancesCmd.PersistentFlags().StringVar(&listCerealWorkflowInstanceOpts.InstanceName, "instance-name", "", "the name of the instance")
 	workflowCmd.AddCommand(listWorkflowInstancesCmd)
 
+	cancelWorkflowInstancesCmd := &cobra.Command{
+		Use:   "cancel workflow_name instance_name",
+		Short: "cancel the workflow instances",
+		Args:  cobra.ExactArgs(2),
+		RunE:  runCerealCancelWorkflowInstances,
+	}
+	workflowCmd.AddCommand(cancelWorkflowInstancesCmd)
+
 	schedulesCmd := &cobra.Command{
 		Use:   "schedule",
 		Short: "scheduler helpers",
@@ -119,6 +127,14 @@ func runCerealListWorkflowInstances(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
+}
+
+func runCerealCancelWorkflowInstances(cmd *cobra.Command, args []string) error {
+	b := getCerealBackend()
+	if err := b.Init(); err != nil {
+		return err
+	}
+	return b.CancelWorkflow(context.Background(), args[1], args[0])
 }
 
 func runCerealListSchedules(cmd *cobra.Command, args []string) error {
