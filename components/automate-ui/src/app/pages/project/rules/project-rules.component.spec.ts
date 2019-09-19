@@ -254,5 +254,14 @@ describe('ProjectRulesComponent', () => {
       component.addCondition();
       expect(component.showDelete()).toBeTruthy();
     });
+
+    it('should show "Save Rule" Button by default', () => {
+      expect(component.getConfirmBtnText()).toEqual('Save Rule');
+    });
+
+    it('should show "Saving Rules" Button when saving', () => {
+      component.saving = true;
+      expect(component.getConfirmBtnText()).toEqual('Saving Rule...');
+    });
   });
 });
