@@ -5,9 +5,11 @@ import { ReportingProfileComponent } from '../+reporting-profile/reporting-profi
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { CookieModule } from 'ngx-cookie';
-import { StatsService, ReportQueryService, ScanResultsService } from '../../shared/reporting';
+import { StatsService, ReportQueryService,
+  ScanResultsService, ReportQuery } from '../../shared/reporting';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { of as observableOf } from 'rxjs';
+import * as moment from 'moment';
 
 describe('ReportingProfileComponent', () => {
   let fixture, component, element, statsService;
@@ -58,12 +60,27 @@ describe('ReportingProfileComponent', () => {
   describe('getNodes', () => {
     it('calls statsService.getNodes with the paginationOverride value', () => {
       spyOn(statsService, 'getNodes').and.returnValue(observableOf({items: []}));
-      component.getNodes([], {profileId: '123', controlId: '321'});
-      expect(statsService.getNodes).toHaveBeenCalledWith(
-        [
+      const endDate = moment().utc().startOf('day').add(12, 'hours');
+      const reportQuery: ReportQuery = {
+        startDate: moment(endDate).subtract(10, 'days'),
+        endDate: endDate,
+        interval: 0,
+        filters: [ ]
+      };
+      component.getNodes(reportQuery, {profileId: '123', controlId: '321'});
+
+      const expectedReportQuery: ReportQuery = {
+        startDate: moment(endDate).subtract(10, 'days'),
+        endDate: endDate,
+        interval: 0,
+        filters: [
           {type: { name: 'profile_id' }, value: { text: '123'} },
           {type: { name: 'control_id' }, value: { text: '321'} }
-        ],
+        ]
+      };
+
+      expect(statsService.getNodes).toHaveBeenCalledWith(
+        expectedReportQuery,
         { perPage: 1000, page: 1, sort: 'latest_report.end_time', order: 'desc' });
     });
   });
