@@ -57,8 +57,10 @@ steps:
       HAB_STUDIO_SUP: false
       HAB_NONINTERACTIVE: true
     expeditor:
-      accounts:
-        - github
+      secrets:
+        HAB_STUDIO_SECRET_GITHUB_APP_TOKEN:
+          account: github
+          field: token
       executor:
         linux:
           privileged: true

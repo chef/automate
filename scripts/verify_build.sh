@@ -49,13 +49,6 @@ else
     buildkite-agent annotate --style "info" "This change rebuilds no components."
 fi
 
-if [[ "$changed_components_details" =~ "automate-chef-io" ]]; then
-    buildkite-agent annotate --style "warning" --context docs-warning <<EOF
-This change modifies automate-chef.io. The automate-chef-io Habitat
-package currently cannot be built in Buildkite and will be skipped.
-EOF
-fi
-
 mapfile -t modified_sql_files < <(git diff --name-status "$(./scripts/git_difference_expression.rb)" |\
                                     awk '!/datamigration/ && /^[RMD][0-9]*.*\.sql$/ { print $2 }')
 if [[ ${#modified_sql_files[@]} -ne 0 ]]; then
@@ -68,9 +61,6 @@ fi
 # Build all habitat packages that have changed
 build_commands=""
 for component in "${changed_components[@]}"; do
-    if [[ "$component" = "components/automate-chef-io" ]]; then
-        continue
-    fi
     component_build="echo \"--- [\$(date -u)] build $component\"; build $component"
     build_commands="${build_commands} $component_build;"
 done
