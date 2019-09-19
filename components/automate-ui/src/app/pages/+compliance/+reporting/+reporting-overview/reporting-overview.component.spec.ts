@@ -305,7 +305,7 @@ describe('ReportingOverviewComponent', () => {
       component.onPlatformChanged({name: 'ubuntu'});
 
       expect(router.navigate).toHaveBeenCalledWith(['/compliance', 'reports', 'nodes'],
-        {queryParams: { platform: ['ubuntu'] }});
+        {queryParams: { platform: ['ubuntu*'] }});
     });
 
     it('invalid item', () => {
