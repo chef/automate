@@ -147,6 +147,7 @@ SELECT COUNT(*) AS total
   , COUNT(*) FILTER (WHERE s.health = 'UNKNOWN') AS unknown
   , COUNT(*) FILTER (WHERE s.health = 'WARNING') AS warning
   , COUNT(*) FILTER (WHERE s.health = 'OK') AS ok
+  , COUNT(*) FILTER (WHERE s.disconnected ) AS disconnected
 FROM service_full AS s
  %s
 `
@@ -415,6 +416,12 @@ func buildWhereConstraintsFromFilters(filters map[string][]string) (string, erro
 
 		case "service":
 			WhereConstraints = WhereConstraints + buildORStatementFromValues("name", values)
+
+		case "disconnectedStatus":
+			// FIXME: fail on other values?
+			if values[0] == "disconnected" {
+				WhereConstraints = WhereConstraints + " disconnected"
+			}
 
 		default:
 			return "", errors.Errorf("invalid filter. (%s:%s)", filter, values)
