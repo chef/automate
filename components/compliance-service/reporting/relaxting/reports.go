@@ -651,7 +651,7 @@ func (backend ES2Backend) getESFieldName(filterType string) string {
 	case "organization":
 		ESFieldName = "organization_name.lower"
 	case "platform":
-		ESFieldName = "platform.name.lower"
+		ESFieldName = "platform.full.lower"
 	case "recipe":
 		ESFieldName = "recipes.lower"
 	case "role":

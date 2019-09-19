@@ -29,7 +29,7 @@ func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, 
 
 	var SUGGESTIONS_TYPES = map[string]string{
 		"environment":       "environment",
-		"platform":          "platform.name",
+		"platform":          "platform.full",
 		"node":              "node_name",
 		"role":              "roles",
 		"recipe":            "recipes",

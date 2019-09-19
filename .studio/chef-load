@@ -95,6 +95,25 @@ function chef_load_compliance_scans() {
   return $EXIT_CODE;
 }
 
+document "chef_load_compliance_nodes" <<DOC
+  This is a convenience function for the 'chef_load_compliance_scans' function. 
+  This function has only the number of nodes as a parameter. Each node will have a daily 
+  report for the last 10 days.
+
+  Example: Load 100 nodes
+  -----------------------
+  chef_load_compliance_nodes 100
+DOC
+function chef_load_compliance_nodes() {
+  local nodes=${1:-50}
+
+  local total=$((nodes * 10))
+
+  echo "running: 'chef_load_compliance_scans -N$nodes -D10 -M1 -T$total'"
+
+  chef_load_compliance_scans -N$nodes -D10 -M1 -T$total
+}
+
 # Generate config-mgmt chef nodes (CCRs)
 document "chef_load_nodes" <<DOC
   Load the provided number of nodes to Chef Automate. (depends on automate-gateway & ingest-service)
