@@ -34,6 +34,10 @@ var (
 	// ErrChangeTypeForRule indicates that an update operation attempted to change
 	// the type for a rule, which is not allowed.
 	ErrChangeTypeForRule = errors.New("cannot change rule type")
+
+	// ErrProjectInGraveyard indicates that an attempt was made to create a project with
+	// and ID that is currently in ima_project_graveyard
+	ErrProjectInGraveyard = errors.New("cannot create project with ID that is currently being deleted")
 )
 
 // TxCommitError occurs when the database attempts to commit a transaction and

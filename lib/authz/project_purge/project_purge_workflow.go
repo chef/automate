@@ -3,7 +3,6 @@ package project_purge
 import (
 	"context"
 	"fmt"
-	"math"
 	"time"
 
 	"github.com/pkg/errors"
@@ -17,8 +16,6 @@ const (
 	maxBackoffDuration        = time.Minute
 )
 
-var ErrNoJobIDs = errors.New("0 Job IDs returned")
-
 type DomainProjectPurgeWorkflowExecutor struct {
 	startPurgeProjectTaskName string
 }
@@ -28,7 +25,6 @@ type DomainProjectPurgeWorkflowParameters struct {
 }
 
 type DomainProjectPurgeWorkflowPayload struct {
-	JobIDs                      []string
 	ConsecutiveJobCheckFailures int
 }
 
@@ -67,7 +63,7 @@ func (m *DomainProjectPurgeWorkflowExecutor) OnTaskComplete(
 	switch ev.TaskName {
 	case m.startPurgeProjectTaskName:
 		if errToLog := ev.Result.Err(); errToLog != nil {
-			// TODO Log errToLog
+			logrus.WithError(errToLog).Error("failed to purge project, retrying")
 			payload.ConsecutiveJobCheckFailures++
 			if err := w.EnqueueTask(
 				m.startPurgeProjectTaskName, DomainProjectPurgeTaskParams{ProjectID: params.ProjectID},
@@ -88,12 +84,7 @@ func (m *DomainProjectPurgeWorkflowExecutor) OnCancel(
 }
 
 func (m *DomainProjectPurgeWorkflowExecutor) nextCheck(numberOfFailures int) time.Time {
-	// use exponential backoff per retry of numberOfFailure^2 up until a max.
-	nextDuration := (time.Second * time.Duration(math.Pow(float64(numberOfFailures), 2.0)))
-	if nextDuration > maxBackoffDuration {
-		nextDuration = maxBackoffDuration
-	}
-	return time.Now().Add(nextDuration)
+	return ExponentialNextCheck(numberOfFailures)
 }
 
 type DomainProjectPurgeTask struct {
@@ -108,8 +99,7 @@ func (m *DomainProjectPurgeTask) Run(
 	ctx context.Context, task cereal.Task) (interface{}, error) {
 	params := DomainProjectPurgeTaskParams{}
 	if err := task.GetParameters(&params); err != nil {
-		// TODO wrap
-		return nil, err
+		return nil, errors.Wrap(err, "unmarshall purge project params")
 	}
 
 	err := m.startProjectTagUpdater(ctx, params.ProjectID)

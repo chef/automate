@@ -1464,6 +1464,19 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 		}
 	}
 
+	row := tx.QueryRowContext(ctx, "SELECT EXISTS(SELECT 1 FROM iam_projects_graveyard WHERE id=$1)", project.ID)
+	var existsInGraveyard bool
+	if err := row.Scan(&existsInGraveyard); err != nil {
+		err = p.processError(err)
+		// failed with an unexpected error
+		if err != storage_errors.ErrNotFound {
+			return nil, err
+		}
+	}
+	if existsInGraveyard {
+		return nil, storage_errors.ErrProjectInGraveyard
+	}
+
 	if err := p.insertProjectWithQuerier(ctx, project, tx); err != nil {
 		return nil, p.processError(err)
 	}
@@ -1560,6 +1573,18 @@ func (p *pg) DeleteProject(ctx context.Context, id string) error {
 	err = tx.Commit()
 	if err != nil {
 		return storage_errors.NewTxCommitError(err)
+	}
+
+	return nil
+}
+
+func (p *pg) RemoveProjectFromGraveyard(ctx context.Context, id string) error {
+	// TODO remove
+	p.logger.Warnf("IN POSTGRES REMOVING ID %q", id)
+	_, err := p.db.ExecContext(ctx, `DELETE FROM iam_projects_graveyard WHERE id=$1;`, id)
+	if err != nil {
+		p.logger.Warnf("IN POSTGRES REMOVING ID HAS ERROR %q", err.Error())
+		return p.processError(err)
 	}
 
 	return nil

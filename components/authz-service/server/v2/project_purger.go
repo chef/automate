@@ -3,6 +3,7 @@ package v2
 import (
 	"context"
 	"sync"
+	"time"
 
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
@@ -18,10 +19,11 @@ import (
 )
 
 const (
-	PurgeProjectWorkflowName           = "authz/PurgeProject"
-	MoveProjectToGraveyardTaskName     = "authz/MoveProjectToGraveyard"
-	DeleteProjectFromDomainTaskName    = "authz/DeleteProjectFromDomain"
-	DeleteProjectFromGraveyardTaskName = "authz/DeleteProjectFromGraveyard"
+	PurgeProjectWorkflowName                = "authz/PurgeProject"
+	MoveProjectToGraveyardTaskName          = "authz/MoveProjectToGraveyard"
+	DeleteProjectFromDomainTaskName         = "authz/DeleteProjectFromDomain"
+	DeleteProjectFromGraveyardTaskName      = "authz/DeleteProjectFromGraveyard"
+	StartDeleteProjectFromGraveyardTaskName = "authz/StartDeleteProjectFromGraveyard"
 )
 
 type ProjectPurger interface {
@@ -63,7 +65,7 @@ func NewProjectPurgerWorkflowExecutor() (*patterns.ChainWorkflowExecutor, error)
 	})
 
 	deleteProjectFromGraveyardExecutor :=
-		patterns.NewSingleTaskWorkflowExecutor(DeleteProjectFromGraveyardTaskName, false)
+		NewMoveProjectToGraveyardWorkflowExecutor()
 
 	return patterns.NewChainWorkflowExecutor(moveProjectToGraveyardExecutor, domainSvcExecutor, deleteProjectFromGraveyardExecutor)
 }
@@ -97,7 +99,7 @@ func RegisterCerealProjectPurger(manager *cereal.Manager, log logger.Logger, s s
 		store: s,
 		log:   log,
 	}
-	if err := manager.RegisterTaskExecutor(DeleteProjectFromGraveyardTaskName, deleteProjectFromGraveyardTaskExecutor,
+	if err := manager.RegisterTaskExecutor(StartDeleteProjectFromGraveyardTaskName, deleteProjectFromGraveyardTaskExecutor,
 		cereal.TaskExecutorOpts{Workers: 1}); err != nil {
 	}
 
@@ -128,7 +130,7 @@ func (m *CerealProjectPurger) Start(projectID string) error {
 			ProjectID: projectID,
 		},
 		domainSvcUpdateWorkflowParams,
-		DeleteProjectFromGraveyardParams{
+		MoveProjectToGraveyardWorkflowExecutorParams{
 			ProjectID: projectID,
 		},
 	}); err != nil {
@@ -138,43 +140,115 @@ func (m *CerealProjectPurger) Start(projectID string) error {
 	return nil
 }
 
-// TODO errors from run not getting bubbgled up
 func (m *CerealProjectPurger) GraveyardingCompleted(projectID string) (bool, error) {
-	logrus.Warnf("111111111111111")
 	instance, err := patterns.GetChainWorkflowInstance(context.TODO(), m.manager, m.workflowName, projectID)
 	if err != nil {
 		if err == cereal.ErrWorkflowInstanceNotFound {
-			logrus.Warnf("2222222222222222")
 			return true, nil
 		}
-		logrus.Warnf("3333333333333333")
 		return false, errors.Wrap(err, "failed to fetch instance")
 	}
-	logrus.Warnf("44444444444")
 
 	subinstance, err := instance.GetSubWorkflow(0)
 	if err != nil {
-		logrus.Warnf("555555555555")
-
 		if err == cereal.ErrWorkflowInstanceNotFound {
-			logrus.Warnf("6666666666666666666")
-
-			return true, nil
+			return false, nil
 		}
-		logrus.Warnf("777777777777777")
-
 		return false, errors.Wrap(err, "failed to fetch subinstance")
 	}
 
 	if subinstance.IsRunning() {
-		logrus.Warnf("88888888888888888888")
-
 		return false, nil
-	} else {
-		logrus.Warnf("9999999999999999999")
-
-		return true, subinstance.Err()
 	}
+	result := MoveProjectToGraveyardResult{}
+	if err := subinstance.GetResult(&result); err != nil {
+		return true, status.Errorf(codes.Internal,
+			"unmarshall move to graveyard result for project with ID ID %q: %s", projectID, err.Error())
+	}
+	switch result.Code {
+	case codes.OK:
+		return true, nil
+	case codes.NotFound:
+		return true, status.Errorf(codes.NotFound, "no project with ID %q found", projectID)
+	default:
+		return true, status.Errorf(codes.Internal,
+			"error graveyarding project with ID %q", projectID)
+	}
+}
+
+// MoveProjectToGraveyardWorkflowExecutor is based on the SingleTaskWorkflowExecutor
+// with infinite retry after exponential backoff.
+type MoveProjectToGraveyardWorkflowExecutor struct {
+}
+
+type MoveProjectToGraveyardWorkflowExecutorParams struct {
+	ProjectID string
+}
+
+type MoveProjectToGraveyardWorkflowExecutorPayload struct {
+	ConsecutiveJobCheckFailures int
+}
+
+func NewMoveProjectToGraveyardWorkflowExecutor() *MoveProjectToGraveyardWorkflowExecutor {
+	return &MoveProjectToGraveyardWorkflowExecutor{}
+}
+
+func (s *MoveProjectToGraveyardWorkflowExecutor) OnStart(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
+	// TODO remove
+
+	var params MoveProjectToGraveyardWorkflowExecutorParams
+	err := w.GetParameters(&params)
+	if err != nil {
+		logrus.WithError(err).Error("failed to get move to graveyard parameters")
+		return w.Fail(err)
+	}
+
+	logrus.Warnf("STARTING MOVE PROJECT TO GRAVEYARD WIHT ID %q", params.ProjectID)
+
+	if err := w.EnqueueTask(StartDeleteProjectFromGraveyardTaskName, MoveProjectToGraveyardParams{ProjectID: params.ProjectID}); err != nil {
+		logrus.WithError(err).Errorf("failed to enqueue move to graveyard task %s", StartDeleteProjectFromGraveyardTaskName)
+		return w.Fail(err)
+	}
+	return w.Continue(nil)
+}
+
+func (s *MoveProjectToGraveyardWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev cereal.TaskCompleteEvent) cereal.Decision {
+	payload := MoveProjectToGraveyardWorkflowExecutorPayload{}
+	if err := w.GetPayload(&payload); err != nil {
+		logrus.WithError(err).Error("Failed to deserialize delete project from graveyard payload")
+		return w.Fail(err)
+	}
+
+	params := MoveProjectToGraveyardWorkflowExecutorParams{}
+	if err := w.GetParameters(&params); err != nil {
+		return w.Fail(err)
+	}
+
+	switch ev.TaskName {
+	case StartDeleteProjectFromGraveyardTaskName:
+		if errToLog := ev.Result.Err(); errToLog != nil {
+			// TODO Log errToLog
+			payload.ConsecutiveJobCheckFailures++
+			if err := w.EnqueueTask(
+				StartDeleteProjectFromGraveyardTaskName, MoveProjectToGraveyardParams{ProjectID: params.ProjectID},
+				cereal.StartAfter(s.nextCheck(payload.ConsecutiveJobCheckFailures))); err != nil {
+				return w.Fail(err)
+			}
+			return w.Continue(payload)
+		}
+		return w.Complete()
+	default:
+		return w.Fail(errors.Errorf("Unknown task type %q", ev.TaskName))
+	}
+}
+
+func (m *MoveProjectToGraveyardWorkflowExecutor) nextCheck(numberOfFailures int) time.Time {
+	return project_purge.ExponentialNextCheck(numberOfFailures)
+}
+
+func (s *MoveProjectToGraveyardWorkflowExecutor) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEvent) cereal.Decision {
+	return w.Fail(errors.New("force cancel move project to graveyard"))
+
 }
 
 type MoveProjectToGraveyardTaskExecutor struct {
@@ -183,6 +257,7 @@ type MoveProjectToGraveyardTaskExecutor struct {
 }
 
 type MoveProjectToGraveyardResult struct {
+	Code codes.Code
 }
 
 type MoveProjectToGraveyardParams struct {
@@ -200,12 +275,11 @@ func (s *MoveProjectToGraveyardTaskExecutor) Run(ctx context.Context, task cerea
 	err := s.store.DeleteProject(ctx, params.ProjectID)
 	switch err {
 	case nil:
-		return &MoveProjectToGraveyardResult{}, nil
+		return &MoveProjectToGraveyardResult{Code: codes.OK}, nil
 	case storage_errors.ErrNotFound:
-		return nil, status.Errorf(codes.NotFound, "no project with ID %q found", params.ProjectID)
-	default: // some other error
-		return nil, status.Errorf(codes.Internal,
-			"error deleting project with ID %q: %s", params.ProjectID, err.Error())
+		return &MoveProjectToGraveyardResult{Code: codes.NotFound}, nil
+	default:
+		return &MoveProjectToGraveyardResult{Code: codes.Internal}, nil
 	}
 }
 
@@ -224,22 +298,10 @@ type DeleteProjectFromGraveyardParams struct {
 func (s *DeleteProjectFromGraveyardTaskExecutor) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
 	params := DeleteProjectFromGraveyardParams{}
 	if err := task.GetParameters(&params); err != nil {
-		// TODO wrap
 		return nil, errors.Wrap(err, "unmarshall delete from graveyard params")
 	}
 
 	s.log.Infof("starting project delete from graveyard for id %q", params.ProjectID)
 
-	// err := s.store.MoveProjectToGraveyard(ctx, req.Id)
-	// switch err {
-	// case nil:
-	// 	return &api.DeleteProjectResp{}, nil
-	// case storage_errors.ErrNotFound:
-	// 	return nil, status.Errorf(codes.NotFound, "no project with ID %q found", req.Id)
-	// default: // some other error
-	// 	return nil, status.Errorf(codes.Internal,
-	// 		"error deleting project with ID %q: %s", req.Id, err.Error())
-	// }
-
-	return DeleteProjectFromGraveyardResult{}, nil
+	return DeleteProjectFromGraveyardResult{}, s.store.RemoveProjectFromGraveyard(ctx, params.ProjectID)
 }

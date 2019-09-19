@@ -127,6 +127,8 @@ func (s *ProjectState) CreateProject(ctx context.Context,
 	case nil: // continue
 	case storage_errors.ErrConflict:
 		return nil, status.Errorf(codes.AlreadyExists, "project with ID %q already exists", req.Id)
+	case storage_errors.ErrProjectInGraveyard:
+		return nil, status.Errorf(codes.AlreadyExists, "project with ID %q is in the process of being deleted, try again later", req.Id)
 	case storage_errors.ErrMaxProjectsExceeded:
 		return nil, status.Errorf(codes.FailedPrecondition,
 			"max of %d projects allowed while IAM v2 Beta", constants_v2.MaxProjects)

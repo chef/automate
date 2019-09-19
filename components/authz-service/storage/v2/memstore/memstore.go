@@ -445,6 +445,10 @@ func (s *State) DeleteProject(ctx context.Context, id string) error {
 	return nil
 }
 
+func (s *State) RemoveProjectFromGraveyard(context.Context, string) error {
+	return nil
+}
+
 func (s *State) ListProjects(context.Context) ([]*storage.Project, error) {
 	items := s.projects.Items()
 	projects := make([]*storage.Project, 0, len(items))
