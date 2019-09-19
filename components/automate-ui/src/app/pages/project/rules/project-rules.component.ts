@@ -266,7 +266,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
           if (!loading(state)) {
             pendingSave.next(true);
             pendingSave.complete();
-            // this.saving = false;
+            this.saving = false;
             if (state === EntityStatus.loadingSuccess) {
               this.closePage();
             } else if (state === EntityStatus.loadingFailure) {
