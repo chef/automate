@@ -59,7 +59,7 @@ func TestIntegrationSystemPolicies(t *testing.T) {
 	}
 }
 
-// bug: this test passes contingent on the above test being run
+// bug: this test passes contingent on the above test being run.
 // issue seems to be related to context metadata
 func TestIntegrationValidateProjectAssignment(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
