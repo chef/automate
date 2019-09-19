@@ -3,3 +3,4 @@ export const describeIfIAMV2 = iamVersion.match(/v2/) ? describe : describe.skip
 export const describeIfIAMV2p1 = iamVersion === 'v2.1' ? describe : describe.skip;
 export const runFlaky: boolean = Cypress.env('RUN_FLAKY') || false;
 export const itFlaky = runFlaky ? it : it.skip;
+export const adminToken: string = Cypress.env('ADMIN_TOKEN');

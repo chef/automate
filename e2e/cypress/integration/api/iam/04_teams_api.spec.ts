@@ -1,9 +1,8 @@
-import { describeIfIAMV2p1 } from '../../constants';
+import { describeIfIAMV2p1, adminToken } from '../../constants';
 
 describe('teams API', () => {
-  let adminToken = '';
   const defaultAdminReq = {
-    auth: { bearer: adminToken },
+    headers: { 'api-token': adminToken },
     method: 'GET',
     url: '/apis/iam/v2beta/teams'
   };
@@ -19,18 +18,11 @@ describe('teams API', () => {
   };
 
   before(() => {
-    cy.adminLogin('/').then(() => {
-      const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
-      adminToken = admin.id_token;
-      defaultAdminReq.auth.bearer = adminToken;
-      cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix,
-        ['policies', 'projects', 'teams']);
-    });
+    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['policies', 'projects', 'teams']);
   });
 
   after(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix,
-      ['policies', 'projects', 'teams']);
+    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['policies', 'projects', 'teams']);
   });
 
   describeIfIAMV2p1('project assignment enforcement', () => {
@@ -50,7 +42,7 @@ describe('teams API', () => {
     before(() => {
       for (const project of [project1, project2]) {
         cy.request({
-            auth: { bearer: adminToken },
+            headers: { 'api-token': adminToken },
             method: 'POST',
             url: '/apis/iam/v2beta/projects',
             body: project
@@ -94,11 +86,11 @@ describe('teams API', () => {
     });
 
     beforeEach(() => {
-      cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['teams']);
+      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['teams']);
     });
 
     afterEach(() => {
-      cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['teams']);
+      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['teams']);
     });
 
     describe('POST /apis/iam/v2beta/teams', () => {

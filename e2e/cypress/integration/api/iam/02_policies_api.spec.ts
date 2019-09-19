@@ -1,9 +1,8 @@
-import { describeIfIAMV2, describeIfIAMV2p1 } from '../../constants';
+import { describeIfIAMV2, describeIfIAMV2p1, adminToken } from '../../constants';
 
 describeIfIAMV2('policies API', () => {
-  let adminToken = '';
   const defaultAdminReq = {
-    auth: { bearer: adminToken },
+    headers: { 'api-token': adminToken },
     method: 'GET',
     url: '/apis/iam/v2beta/policies'
   };
@@ -19,34 +18,29 @@ describeIfIAMV2('policies API', () => {
   };
 
   before(() => {
-    cy.adminLogin('/').then(() => {
-      const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
-      adminToken = admin.id_token;
-      defaultAdminReq.auth.bearer = adminToken;
-      cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['policies', 'projects']);
+    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['policies', 'projects']);
 
-      for (const project of [project1, project2]) {
-        cy.request({
-            auth: { bearer: adminToken },
-            method: 'POST',
-            url: '/apis/iam/v2beta/projects',
-            body: project
-        });
-      }
-    });
+    for (const project of [project1, project2]) {
+      cy.request({
+          headers: { 'api-token': adminToken },
+          method: 'POST',
+          url: '/apis/iam/v2beta/projects',
+          body: project
+      });
+    }
   });
 
   after(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['policies', 'projects']);
+    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['policies', 'projects']);
   });
 
   describe('POST /apis/iam/v2beta/policies', () => {
     beforeEach(() => {
-      cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['policies']);
+      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['policies']);
     });
 
     afterEach(() => {
-      cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['policies']);
+      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['policies']);
     });
 
     it('returns 400 when there are no statements',  () => {
@@ -67,11 +61,11 @@ describeIfIAMV2('policies API', () => {
 
   describe('PUT /apis/iam/v2beta/policies', () => {
     beforeEach(() => {
-      cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['policies']);
+      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['policies']);
     });
 
     afterEach(() => {
-      cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['policies']);
+      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['policies']);
     });
 
     const policyID = `${cypressPrefix}-policy-${now}`;
@@ -159,7 +153,7 @@ describeIfIAMV2('policies API', () => {
     });
 
     after(() => {
-      cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix,
+      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix,
           ['projects', 'policies', 'tokens']);
     });
 
