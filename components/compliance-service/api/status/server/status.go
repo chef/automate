@@ -17,13 +17,14 @@ const (
 	MigrationLabelESa2v1 = "ElasticSearch_A2_v1"
 	MigrationLabelESa2v2 = "ElasticSearch_A2_v2"
 	MigrationLabelESa2v3 = "ElasticSearch_A2_v3"
+	MigrationLabelESa2v4 = "ElasticSearch_A2_v4"
 	MigrationLabelPG     = "PostgreSQL"
 	MigrationLabelPRO    = "Profiles"
 	//MigrationLabelFEEDS = "ElasticSearch_Feeds_1"
 )
 
-const maxMigrations = 6        // Total migrations should match the number of constants above
-const totalMigrationSteps = 26 // Max number of migration LogEntry items we can have across all migrations
+const maxMigrations = 7        // Total migrations should match the number of constants above
+const totalMigrationSteps = 28 // Max number of migration LogEntry items we can have across all migrations
 
 // Special message sent by the services to flag the end of a migration either failed or successful
 const MigrationFailedMsg = "FAILED"
