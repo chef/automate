@@ -164,7 +164,7 @@ Please pass a config file as the only argument to this command.`))
 
 	err = manager.Start(context.Background())
 	if err != nil {
-		fail(errors.Wrap(err, "could not initialize storage"))
+		fail(errors.Wrap(err, "could not start project update manager"))
 	}
 	defer manager.Stop()
 

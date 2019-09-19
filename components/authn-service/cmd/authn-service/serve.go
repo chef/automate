@@ -14,8 +14,13 @@ import (
 	"go.uber.org/zap/zapcore"
 
 	"github.com/chef/automate/components/authn-service/server"
+	"github.com/chef/automate/lib/authz"
+	"github.com/chef/automate/lib/authz/project_purge"
+	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/tracing"
+	"github.com/chef/automate/lib/version"
 )
 
 func commandServe() *cobra.Command {
@@ -109,6 +114,27 @@ func serve(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("missing address for authz service")
 	}
 
+	if c.CerealAddress == "" {
+		return fmt.Errorf("missing address for cereal service")
+	}
+
+	factory := secureconn.NewFactory(*serviceCerts, secureconn.WithVersionInfo(
+		version.Version,
+		version.GitSHA,
+	))
+
+	cerealConn, err := factory.Dial("cereal-service", c.CerealAddress)
+	if err != nil {
+		return errors.Wrapf(err, "dial cereal-service (%s)", c.CerealAddress)
+	}
+
+	grpcBackend := authz.ProjectUpdateBackend(cerealConn)
+	manager, err := cereal.NewManager(grpcBackend)
+	if err != nil {
+		grpcBackend.Close() // nolint: errcheck
+		return errors.Wrap(err, "error starting project update backend")
+	}
+
 	serverConfig := server.Config{
 		Upstream:                 upstream,
 		Logger:                   logger,
@@ -125,6 +151,11 @@ func serve(cmd *cobra.Command, args []string) error {
 		return errors.Wrap(err, "failed to initialize server")
 	}
 
+	err = project_purge.RegisterTaskExecutors(manager, "teams", serv.Token)
+	if err != nil {
+		return errors.Wrap(err, "failed to register project purge task executor")
+	}
+
 	if c.GRPC == "" {
 		return fmt.Errorf("GRPC endpoint not configured")
 	}
@@ -135,6 +166,13 @@ func serve(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return errors.Wrapf(err, "grpc endpoint listening on %s failed", c.GRPC)
 	}
+
+	err = manager.Start(context.Background())
+	if err != nil {
+		return errors.Wrap(err, "could not start project update manager")
+	}
+	defer manager.Stop()
+
 	return nil
 }
 
