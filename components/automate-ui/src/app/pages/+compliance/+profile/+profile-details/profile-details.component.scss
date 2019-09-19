@@ -1,4 +1,4 @@
-@import '~styles/variables';
+@import "~styles/variables";
 
 chef-loading-spinner {
   display: block;
@@ -108,7 +108,7 @@ chef-page-header {
 #delete-modal {
   text-align: center;
 
-  [slot='title'] {
+  [slot=title] {
     font-weight: bold;
     margin-top: 1em;
     padding-bottom: 12px;
