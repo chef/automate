@@ -1,7 +1,6 @@
 import { describeIfIAMV2, describeIfIAMV2p1, itFlaky } from '../../constants';
 
 describe('team management', () => {
-  let adminToken = '';
   const now = Cypress.moment().format('MMDDYYhhmm');
   const cypressPrefix = 'test-team-mgmt';
   const teamName = `${cypressPrefix} team ${now}`;
@@ -16,11 +15,10 @@ describe('team management', () => {
   before(() => {
     cy.adminLogin('/settings/teams').then(() => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
-      adminToken = admin.id_token;
-      cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['projects']);
-      cy.cleanupTeamsByDescriptionPrefix(adminToken, cypressPrefix);
+      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
+      cy.cleanupTeamsByDescriptionPrefix(cypressPrefix);
       cy.request({
-        auth: { bearer: adminToken },
+        auth: { bearer: admin.id_token },
         method: 'POST',
         url: '/apis/iam/v2beta/projects',
         body: {
@@ -29,7 +27,7 @@ describe('team management', () => {
         }
       });
       cy.request({
-        auth: { bearer: adminToken },
+        auth: { bearer: admin.id_token },
         method: 'POST',
         url: '/apis/iam/v2beta/projects',
         body: {
@@ -51,11 +49,11 @@ describe('team management', () => {
 
   afterEach(() => {
     cy.saveStorage();
-    cy.cleanupTeamsByDescriptionPrefix(adminToken, cypressPrefix);
+    cy.cleanupTeamsByDescriptionPrefix(cypressPrefix);
   });
 
   after(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['projects']);
+    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
   });
 
   context('no custom initial page state', () => {
@@ -165,11 +163,11 @@ describe('team management', () => {
       });
 
       after(() => {
-        cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['projects']);
+        cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
       });
 
       afterEach(() => {
-        cy.cleanupTeamsByDescriptionPrefix(adminToken, cypressPrefix);
+        cy.cleanupTeamsByDescriptionPrefix(cypressPrefix);
       });
 
       itFlaky('can create a team with multiple projects', () => {
