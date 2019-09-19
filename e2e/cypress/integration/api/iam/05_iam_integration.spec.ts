@@ -88,6 +88,10 @@ describeIfIAMV2p1('assigning projects', () => {
 
   // iterate over iam resources
   iamResourcesToTest.forEach((iamResources: string) => {
+    // TODO Roles api requires `actions`, so we're including it every time.
+    // We should use a function (or a hash of resource: body)
+    // For now, better to test it with some ugliness
+
     // get the singular form of the resource for json
     const iamResource = `${iamResources}`.slice(0, -1);
 

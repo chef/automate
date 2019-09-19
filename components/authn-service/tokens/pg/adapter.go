@@ -126,7 +126,6 @@ func (a *adapter) UpdateToken(ctx context.Context,
 		}
 	}
 
-	// TODO why are we doing this? What if they want to delete the description?
 	if description != "" {
 		row = tx.QueryRowContext(ctx,
 			`UPDATE chef_authn_tokens cat
