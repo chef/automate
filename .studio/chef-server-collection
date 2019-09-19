@@ -84,7 +84,7 @@ EOH
   cat << EOH > ${chef_server_berksfile_path}
 source "https://supermarket.chef.io"
 
-cookbook "audit"
+cookbook "audit", git: "https://github.com/stevendanna/audit.git", branch: "ssd/chef-server-auth"
 EOH
 
   cat << EOH > $chef_server_first_boot_json_path
