@@ -44,7 +44,7 @@ type Resetter interface {
 	Reset(context.Context) error
 }
 
-// ProjectValidator is the more limited interface for authz-service
+// ProjectValidator is a more limited interface for authz-service
 type ProjectValidator interface {
 	ValidateProjectAssignment(context.Context, *authz_v2.ValidateProjectAssignmentReq, ...grpc.CallOption) (*authz_v2.ValidateProjectAssignmentResp, error)
 }
