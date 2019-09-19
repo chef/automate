@@ -1,4 +1,4 @@
-import { describeIfIAMV2p1, adminToken } from '../../constants';
+import { describeIfIAMV2p1, adminApiToken } from '../../constants';
 
 describeIfIAMV2p1('projects API: applying project', () => {
   const cypressPrefix = 'test-projects-api';
@@ -59,7 +59,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
     cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
 
     cy.request({
-      headers: { 'api-token': adminToken },
+      headers: { 'api-token': adminApiToken },
       method: 'POST',
       url: 'api/v0/ingest/events/chef/node-multiple-deletes',
       body: {
@@ -75,7 +75,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
 
     for (const project of [avengersProject, xmenProject]) {
       cy.request({
-        headers: { 'api-token': adminToken },
+        headers: { 'api-token': adminApiToken },
         method: 'POST',
         url: '/apis/iam/v2beta/projects',
         body: project
@@ -85,7 +85,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
     let totalNodes = 0;
     cy.request({
       headers: {
-        'api-token': adminToken,
+        'api-token': adminApiToken,
         projects: '(unassigned)'
       },
       method: 'GET',
@@ -100,7 +100,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
           cy.fixture('converge/xmen2.json').then(node4 => {
             for (const node of [node1, node2, node3, node4]) {
               cy.request({
-                headers: { 'api-token': adminToken },
+                headers: { 'api-token': adminApiToken },
                 method: 'POST',
                 url: '/data-collector/v0',
                 body: node
@@ -117,7 +117,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
     // confirm nodes are unassigned
     cy.request({
       headers: {
-        'api-token': adminToken,
+        'api-token': adminApiToken,
         projects: '(unassigned)'
       },
       method: 'GET',
@@ -128,7 +128,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
 
     cy.request({
       headers: {
-        'api-token': adminToken,
+        'api-token': adminApiToken,
         projects: avengersProject.id
       },
       method: 'GET',
@@ -139,7 +139,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
 
     cy.request({
       headers: {
-        'api-token': adminToken,
+        'api-token': adminApiToken,
         projects: xmenProject.id
       },
       method: 'GET',
@@ -157,7 +157,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
     // initially no rules
     for (const project of [avengersProject, xmenProject]) {
       cy.request({
-        headers: { 'api-token': adminToken },
+        headers: { 'api-token': adminApiToken },
         method: 'GET',
         url: `/apis/iam/v2beta/projects/${project.id}/rules`
       }).then((response) => {
@@ -165,7 +165,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
       });
 
       cy.request({
-        headers: { 'api-token': adminToken },
+        headers: { 'api-token': adminApiToken },
         method: 'GET',
         url: `/apis/iam/v2beta/projects/${project.id}`
       }).then((response) => {
@@ -174,7 +174,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
     }
 
     cy.request({
-      headers: { 'api-token': adminToken },
+      headers: { 'api-token': adminApiToken },
       method: 'GET',
       url: '/apis/iam/v2beta/projects'
     }).then((response) => {
@@ -185,7 +185,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
 
     for (const rule of [avengersRule, xmenRule]) {
       cy.request({
-        headers: { 'api-token': adminToken },
+        headers: { 'api-token': adminApiToken },
         method: 'POST',
         url: `/apis/iam/v2beta/projects/${rule.project_id}/rules`,
         body: rule
@@ -195,7 +195,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
     // confirm rules are staged
     for (const project of [avengersProject, xmenProject]) {
       cy.request({
-        headers: { 'api-token': adminToken },
+        headers: { 'api-token': adminApiToken },
         method: 'GET',
         url: `/apis/iam/v2beta/projects/${project.id}/rules`
       }).then((response) => {
@@ -206,7 +206,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
       });
 
       cy.request({
-        headers: { 'api-token': adminToken },
+        headers: { 'api-token': adminApiToken },
         method: 'GET',
         url: `/apis/iam/v2beta/projects/${project.id}`
       }).then((response) => {
@@ -215,7 +215,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
     }
 
     cy.request({
-      headers: { 'api-token': adminToken },
+      headers: { 'api-token': adminApiToken },
       method: 'GET',
       url: '/apis/iam/v2beta/projects'
     }).then((response) => {
@@ -225,7 +225,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
     });
 
     cy.request({
-      headers: { 'api-token': adminToken },
+      headers: { 'api-token': adminApiToken },
       method: 'POST',
       url: '/apis/iam/v2beta/apply-rules'
     });
@@ -234,7 +234,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
     // confirm rules are applied
     for (const project of [avengersProject, xmenProject]) {
       cy.request({
-        headers: { 'api-token': adminToken },
+        headers: { 'api-token': adminApiToken },
         method: 'GET',
         url: `/apis/iam/v2beta/projects/${project.id}/rules`
       }).then((response) => {
@@ -245,7 +245,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
       });
 
       cy.request({
-        headers: { 'api-token': adminToken },
+        headers: { 'api-token': adminApiToken },
         method: 'GET',
         url: `/apis/iam/v2beta/projects/${project.id}`
       }).then((response) => {
@@ -254,7 +254,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
     }
 
     cy.request({
-      headers: { 'api-token': adminToken },
+      headers: { 'api-token': adminApiToken },
       method: 'GET',
       url: '/apis/iam/v2beta/projects'
     }).then((response) => {
@@ -266,7 +266,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
     // confirm nodes are assigned to projects correctly
     cy.request({
       headers: {
-        'api-token': adminToken,
+        'api-token': adminApiToken,
         projects: avengersProject.id
       },
       method: 'GET',
@@ -277,7 +277,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
 
     cy.request({
       headers: {
-        'api-token': adminToken,
+        'api-token': adminApiToken,
         projects: xmenProject.id
       },
       method: 'GET',
@@ -301,7 +301,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
     ];
 
     cy.request({
-      headers: { 'api-token': adminToken },
+      headers: { 'api-token': adminApiToken },
       method: 'GET',
       url: `/apis/iam/v2beta/projects/${avengersProject.id}`
     }).then((response) => {
@@ -309,7 +309,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
     });
 
     cy.request({
-      headers: { 'api-token': adminToken },
+      headers: { 'api-token': adminApiToken },
       method: 'GET',
       url: '/apis/iam/v2beta/projects'
     }).then((response) => {
@@ -319,14 +319,14 @@ describeIfIAMV2p1('projects API: applying project', () => {
     });
 
     cy.request({
-      headers: { 'api-token': adminToken },
+      headers: { 'api-token': adminApiToken },
       method: 'PUT',
       url: `/apis/iam/v2beta/projects/${avengersRule.project_id}/rules/${avengersRule.id}`,
       body: updatedAvengersRule
     });
 
     cy.request({
-      headers: { 'api-token': adminToken },
+      headers: { 'api-token': adminApiToken },
       method: 'GET',
       url: `/apis/iam/v2beta/projects/${avengersProject.id}`
     }).then((response) => {
@@ -334,7 +334,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
     });
 
     cy.request({
-      headers: { 'api-token': adminToken },
+      headers: { 'api-token': adminApiToken },
       method: 'GET',
       url: '/apis/iam/v2beta/projects'
     }).then((response) => {
@@ -344,7 +344,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
     });
 
     cy.request({
-      headers: { 'api-token': adminToken },
+      headers: { 'api-token': adminApiToken },
       method: 'POST',
       url: '/apis/iam/v2beta/apply-rules'
     });
@@ -352,7 +352,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
 
     cy.request({
       headers: {
-        'api-token': adminToken,
+        'api-token': adminApiToken,
         projects: avengersProject.id
       },
       method: 'GET',
@@ -362,7 +362,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
     });
 
     cy.request({
-      headers: { 'api-token': adminToken },
+      headers: { 'api-token': adminApiToken },
       method: 'GET',
       url: `/apis/iam/v2beta/projects/${avengersProject.id}`
     }).then((response) => {
@@ -370,7 +370,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
     });
 
     cy.request({
-      headers: { 'api-token': adminToken },
+      headers: { 'api-token': adminApiToken },
       method: 'GET',
       url: '/apis/iam/v2beta/projects'
     }).then((response) => {
@@ -383,7 +383,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
   it('deleted rules get applied to nodes', () => {
 
     cy.request({
-      headers: { 'api-token': adminToken },
+      headers: { 'api-token': adminApiToken },
       method: 'GET',
       url: `/apis/iam/v2beta/projects/${avengersProject.id}`
     }).then((response) => {
@@ -391,7 +391,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
     });
 
     cy.request({
-      headers: { 'api-token': adminToken },
+      headers: { 'api-token': adminApiToken },
       method: 'GET',
       url: '/apis/iam/v2beta/projects'
     }).then((response) => {
@@ -401,13 +401,13 @@ describeIfIAMV2p1('projects API: applying project', () => {
     });
 
     cy.request({
-      headers: { 'api-token': adminToken },
+      headers: { 'api-token': adminApiToken },
       method: 'DELETE',
       url: `/apis/iam/v2beta/projects/${avengersRule.project_id}/rules/${avengersRule.id}`
     });
 
     cy.request({
-      headers: { 'api-token': adminToken },
+      headers: { 'api-token': adminApiToken },
       method: 'GET',
       url: `/apis/iam/v2beta/projects/${avengersProject.id}`
     }).then((response) => {
@@ -415,7 +415,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
     });
 
     cy.request({
-      headers: { 'api-token': adminToken },
+      headers: { 'api-token': adminApiToken },
       method: 'GET',
       url: '/apis/iam/v2beta/projects'
     }).then((response) => {
@@ -425,14 +425,14 @@ describeIfIAMV2p1('projects API: applying project', () => {
     });
 
     cy.request({
-      headers: { 'api-token': adminToken },
+      headers: { 'api-token': adminApiToken },
       method: 'POST',
       url: '/apis/iam/v2beta/apply-rules'
     });
     waitUntilApplyRulesNotRunning(100);
 
     cy.request({
-      headers: { 'api-token': adminToken },
+      headers: { 'api-token': adminApiToken },
       method: 'GET',
       url: `/apis/iam/v2beta/projects/${avengersProject.id}`
     }).then((response) => {
@@ -440,7 +440,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
     });
 
     cy.request({
-      headers: { 'api-token': adminToken },
+      headers: { 'api-token': adminApiToken },
       method: 'GET',
       url: '/apis/iam/v2beta/projects'
     }).then((response) => {
@@ -451,7 +451,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
 
     cy.request({
       headers: {
-        'api-token': adminToken,
+        'api-token': adminApiToken,
         projects: avengersProject.id
       },
       method: 'GET',
@@ -462,7 +462,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
 
     cy.request({
       headers: {
-        'api-token': adminToken,
+        'api-token': adminApiToken,
         projects: '(unassigned)'
       },
       method: 'GET',
@@ -501,7 +501,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
       };
       // create rule with attribute value
       cy.request({
-        headers: { 'api-token': adminToken },
+        headers: { 'api-token': adminApiToken },
         method: 'POST',
         url: `/apis/iam/v2beta/projects/${rule.project_id}/rules`,
         body: rule
@@ -509,7 +509,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
 
       // apply rules
       cy.request({
-        headers: { 'api-token': adminToken },
+        headers: { 'api-token': adminApiToken },
         method: 'POST',
         url: '/apis/iam/v2beta/apply-rules'
       });
@@ -518,7 +518,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
       // see filter works
       cy.request({
         headers: {
-          'api-token': adminToken,
+          'api-token': adminApiToken,
           projects: avengersProject.id
         },
         method: 'GET',
@@ -530,14 +530,14 @@ describeIfIAMV2p1('projects API: applying project', () => {
 
       // delete rule
       cy.request({
-        headers: { 'api-token': adminToken },
+        headers: { 'api-token': adminApiToken },
         method: 'DELETE',
         url: `/apis/iam/v2beta/projects/${avengersRule.project_id}/rules/${rule.id}`
       });
 
       // apply rules to reset node to unassigned
       cy.request({
-        headers: { 'api-token': adminToken },
+        headers: { 'api-token': adminApiToken },
         method: 'POST',
         url: '/apis/iam/v2beta/apply-rules'
       });
@@ -549,7 +549,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
 function waitForNodes(totalNodes: number, maxRetries: number) {
   cy
     .request({
-      headers: { 'api-token': adminToken },
+      headers: { 'api-token': adminApiToken },
       method: 'GET',
       url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
     })
@@ -571,7 +571,7 @@ function waitUntilApplyRulesNotRunning(attempts: number): void {
     throw new Error('apply-rules never finished');
   }
   cy.request({
-    headers: { 'api-token': adminToken },
+    headers: { 'api-token': adminApiToken },
     url: '/apis/iam/v2beta/apply-rules'
   }).then((response) => {
     if (response.body.state === 'not_running') {

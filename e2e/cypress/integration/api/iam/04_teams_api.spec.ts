@@ -1,8 +1,8 @@
-import { describeIfIAMV2p1, adminToken } from '../../constants';
+import { describeIfIAMV2p1, adminApiToken } from '../../constants';
 
 describe('teams API', () => {
   const defaultAdminReq = {
-    headers: { 'api-token': adminToken },
+    headers: { 'api-token': adminApiToken },
     method: 'GET',
     url: '/apis/iam/v2beta/teams'
   };
@@ -42,7 +42,7 @@ describe('teams API', () => {
     before(() => {
       for (const project of [project1, project2]) {
         cy.request({
-            headers: { 'api-token': adminToken },
+            headers: { 'api-token': adminApiToken },
             method: 'POST',
             url: '/apis/iam/v2beta/projects',
             body: project
