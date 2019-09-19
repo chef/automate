@@ -43,7 +43,7 @@ describeIfIAMV2p1('project management', () => {
 
   it('has a disabled button when there are no rules', () => {
     cy.get('app-project-list chef-button#update-start-button')
-      .contains('Projects Up-To-Date').should('have.attr', 'disabled');
+      .contains('Projects Up-to-Date').should('have.attr', 'disabled');
   });
 
   it('displays a list of projects', () => {
