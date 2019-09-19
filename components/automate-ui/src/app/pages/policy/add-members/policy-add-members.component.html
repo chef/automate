@@ -12,13 +12,31 @@
   (confirm)="addMembers()"
   (close)="closePage()">
     <div *ngIf="!loading">
+      <!--  -->
+      <!--  -->
+      <!--  -->
       <chef-modal label="member-expression-label" class="member-expression-modal" [visible]="modalVisible" (close)="closeModal()">
         <h2>Add Member Expression</h2>
         <div id="left-align">
           <form [formGroup]="expressionForm">
             <chef-form-field>
-              <label>Member expression *</label>
-              <input chefInput formControlName="expression" type="text" (keyup)="resetErrors()" autocomplete="off">
+
+              <div id="type-input-container">
+                <label>Type *</label>
+                <input chefInput formControlName="expression" type="text" (keyup)="resetErrors()" autocomplete="off">
+              </div>
+
+              <div id="identity-input-container">
+                <label>Identity Provider *</label>
+                <input chefInput formControlName="expression" type="text" (keyup)="resetErrors()" autocomplete="off">
+              </div>
+
+              <div id="name-input-container">
+                <label>Name *</label>
+                <input chefInput formControlName="expression" type="text" (keyup)="resetErrors()" autocomplete="off">
+                <span>Wildcards (*) are allowed.</span>
+              </div>
+
               <chef-error *ngIf="unparsableMember">Invalid member expression.</chef-error>
               <chef-error *ngIf="duplicateMember">Member expression already in table.</chef-error>
               <chef-error *ngIf="alreadyPolicyMember">Member already in policy.</chef-error>
@@ -35,6 +53,9 @@
           <chef-button tertiary (click)="closeModal()">Cancel</chef-button>
         </div>
       </chef-modal>
+      <!--  -->
+      <!--  -->
+      <!--  -->
       <div id="no-members-container" *ngIf="sortedMembersAvailable.length === 0">
         <h3>Create more local users or local teams first, or add a member expression.</h3>
         <chef-button
