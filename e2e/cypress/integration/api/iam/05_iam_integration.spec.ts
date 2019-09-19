@@ -38,7 +38,7 @@ describeIfIAMV2p1('assigning projects', () => {
             name: id
           }
         }).then((resp) => {
-          expect([200, 409]).to.include(resp.status);
+          expect(resp.status).to.be.oneOf([200, 409]);
         });
       }
 
