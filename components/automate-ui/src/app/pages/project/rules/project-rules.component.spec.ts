@@ -3,6 +3,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
+import { DebugElement } from '@angular/core';
 
 import { using } from 'app/testing/spec-helpers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
@@ -255,13 +256,18 @@ describe('ProjectRulesComponent', () => {
       expect(component.showDelete()).toBeTruthy();
     });
 
-    it('should show "Save Rule" Button by default', () => {
-      expect(component.getConfirmBtnText()).toEqual('Save Rule');
+    fit('should show "Save Rule" Button by default', () => {
+      const componentDebug: DebugElement = fixture.debugElement;
+      const componentHtml: HTMLElement = componentDebug.nativeElement;
+      const confirmButton = componentHtml.querySelector('#right-buttons button:first-child');
+      expect(confirmButton.textContent).toEqual('Save Rule');
     });
 
-    it('should show "Saving Rules" Button when saving', () => {
-      component.saving = true;
-      expect(component.getConfirmBtnText()).toEqual('Saving Rule...');
+    fit('should show "Saving Rules" Button when saving', () => {
+      const componentDebug: DebugElement = fixture.debugElement;
+      const componentHtml: HTMLElement = componentDebug.nativeElement;
+      const confirmButton = componentHtml.querySelector('#right-buttons button:first-child');
+      expect(confirmButton.textContent).toEqual('Saving Rule...');
     });
   });
 });
