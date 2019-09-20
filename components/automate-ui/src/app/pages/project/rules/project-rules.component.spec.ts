@@ -257,17 +257,15 @@ describe('ProjectRulesComponent', () => {
     });
 
     fit('should show "Save Rule" Button by default', () => {
-      const componentDebug: DebugElement = fixture.debugElement;
-      const componentHtml: HTMLElement = componentDebug.nativeElement;
-      const confirmButton = componentHtml.querySelector('#right-buttons button:first-child');
-      expect(confirmButton.textContent).toEqual('Save Rule');
+      const componentDebug: DebugElement = fixture.debugElement.nativeElement;
+      const confirmButton = componentDebug.querySelector('#right-buttons button:first-child');
+      expect(confirmButton).toContain('Save Rule');
     });
 
     fit('should show "Saving Rules" Button when saving', () => {
-      const componentDebug: DebugElement = fixture.debugElement;
-      const componentHtml: HTMLElement = componentDebug.nativeElement;
-      const confirmButton = componentHtml.querySelector('#right-buttons button:first-child');
-      expect(confirmButton.textContent).toEqual('Saving Rule...');
+      const componentDebug: DebugElement = fixture.debugElement.nativeElement;
+      const confirmButton = componentDebug.querySelector('#right-buttons button:first-child');
+      expect(confirmButton).toContain('Saving Rule...');
     });
   });
 });

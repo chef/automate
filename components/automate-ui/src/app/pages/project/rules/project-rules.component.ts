@@ -290,10 +290,6 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     }
   }
 
-  getConfirmBtnText(): string {
-    return this.saving ? 'Saving Rule...' : 'Save Rule';
-  }
-
   public handleNameInput(event: KeyboardEvent): void {
     if (!this.modifyID && !this.isNavigationKey(event) && !this.editingRule) {
       this.conflictError = false;
