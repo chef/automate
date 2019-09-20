@@ -14,7 +14,7 @@ do_deploy() {
     do_deploy_default
     log_info "applying dev license"
     chef-automate license apply "$A2_LICENSE"
-    local timestamp=$(date +"%m-%d-%y-%H-%M")
+    timestamp=$(date +"%m-%d-%y-%H-%M")
 
     case $IAM in
         v1)
@@ -34,7 +34,7 @@ do_deploy() {
             fi
 
             log_info "generating admin token"
-            if ! token=$(chef-automate iam token create $timestamp-tok --admin); then
+            if ! token=$(chef-automate iam token create "$timestamp-tok" --admin); then
                 log_error "Non-zero exit code, output:"
                 log_error "$token"
                 return 1
@@ -49,7 +49,7 @@ do_deploy() {
             fi
 
             log_info "generating admin token"
-            if ! token=$(chef-automate iam token create $timestamp-tok --admin); then
+            if ! token=$(chef-automate iam token create "$timestamp-tok" --admin); then
                 log_error "Non-zero exit code, output:"
                 log_error "$token"
                 return 1

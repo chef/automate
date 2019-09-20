@@ -25,7 +25,7 @@ do
           return 1
         fi
       else 
-        if ! token=$(chef-automate iam token create $timestamp-tok --admin); then
+        if ! token=$(chef-automate iam token create "$timestamp-tok" --admin); then
           echo "Non-zero exit code, output:"
           echo "$token"
           return 1
