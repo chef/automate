@@ -35,9 +35,7 @@ const expectPageToBeAccessible = function(done) {
 };
 
 // Navigates protractor's browser to the desired URL then runs an a11y test.
-const expectUrlToBeAccessible = function(url, done) {
+export const expectUrlToBeAccessible = function(url, done) {
   browser.get(url);
   expectPageToBeAccessible(done);
 };
-
-module.exports = { expectUrlToBeAccessible };
