@@ -747,12 +747,21 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 		if keys, found := tags.Terms("key"); found && len(keys.Buckets) > 0 {
 			for _, key := range keys.Buckets {
 				stringTag := &reportingapi.StringTag{}
-				stringTag.Key = *key.KeyAsString
+				tagKey, ok := key.Key.(string)
+				stringTag.Key = tagKey
+				if !ok {
+					logrus.Errorf("could not convert the value of tag key: %v, to a string!", key)
+				}
 				if values, ok := key.Aggregations.Terms("values"); ok && len(values.Buckets) > 0 {
 					valuesArray := make([]string, 0)
 					for _, value := range values.Buckets {
-						valuesArray = append(valuesArray, *value.KeyAsString)
+						tagValue, ok := value.Key.(string)
+						if !ok {
+							logrus.Errorf("could not convert the value of tag value: %v, to a string!", key)
+						}
+						valuesArray = append(valuesArray, tagValue)
 					}
+					stringTag.Values = valuesArray
 				}
 				stringTags = append(stringTags, stringTag)
 			}
