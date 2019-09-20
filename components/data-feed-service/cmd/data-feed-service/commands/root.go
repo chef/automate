@@ -46,5 +46,6 @@ func initConfig() {
 			return
 		}
 	}
+
 	log.Debug("end root.go initConfig() ->")
 }

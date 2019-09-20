@@ -61,6 +61,11 @@ defmodule Notifications.Data.Migrator.Migrations do
        queries: [
         "UPDATE rules SET critical_controls_only=FALSE;"]
      },
+     %{description: "DELETE rules with event='Assets'",
+       queries: [
+         "DELETE from rules where event = 'Assets'"
+       ]
+     }
     ]
   end
 

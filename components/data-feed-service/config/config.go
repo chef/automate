@@ -6,8 +6,8 @@ import (
 	"path"
 	"time"
 
+	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/tls/certs"
-
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -19,15 +19,15 @@ import (
 
 // Configuration for the Data Feed Service
 type DataFeedConfig struct {
-	ServiceConfig       ServiceConfig       `mapstructure:"service"`
-	LogConfig           LogConfig           `mapstructure:"log"`
-	TLSConfig           certs.TLSConfig     `mapstructure:"tls"`
-	NotificationsConfig NotificationsConfig `mapstructure:"notifications"`
-	SecretsConfig       SecretsConfig       `mapstructure:"secrets"`
-	CfgmgmtConfig       CfgmgmtConfig       `mapstructure:"cfgmgmt"`
-	ComplianceConfig    ComplianceConfig    `mapstructure:"compliance"`
-	CerealConfig        CerealConfig        `mapstructure:"cereal"`
-	ServiceCerts        *certs.ServiceCerts
+	ServiceConfig    ServiceConfig    `mapstructure:"service"`
+	LogConfig        LogConfig        `mapstructure:"log"`
+	TLSConfig        certs.TLSConfig  `mapstructure:"tls"`
+	SecretsConfig    SecretsConfig    `mapstructure:"secrets"`
+	CfgmgmtConfig    CfgmgmtConfig    `mapstructure:"cfgmgmt"`
+	ComplianceConfig ComplianceConfig `mapstructure:"compliance"`
+	CerealConfig     CerealConfig     `mapstructure:"cereal"`
+	PostgresConfig   PostgresConfig   `mapstructure:"postgres"`
+	ServiceCerts     *certs.ServiceCerts
 }
 
 type LogConfig struct {
@@ -43,11 +43,13 @@ type ServiceConfig struct {
 	ReportsPageSize int32         `mapstructure:"reports_page_size"`
 }
 
-type CerealConfig struct {
-	Target string `mapstructure:"target"`
+type PostgresConfig struct {
+	ConnectionString string `mapstructure:"uri"`
+	Database         string `mapstructure:"database"`
+	MigrationsPath   string `mapstructure:"migrations_path"`
 }
 
-type NotificationsConfig struct {
+type CerealConfig struct {
 	Target string `mapstructure:"target"`
 }
 
@@ -129,6 +131,17 @@ func Configure() (*DataFeedConfig, error) {
 		return config, err
 	}
 	config.ServiceCerts = serviceCerts
+
+	if config.PostgresConfig.ConnectionString == "" {
+		var err error
+		log.Infof("Database %s", config.PostgresConfig.Database)
+		config.PostgresConfig.ConnectionString, err = platform_config.PGURIFromEnvironment(config.PostgresConfig.Database)
+		log.Infof("Database connection string %s", config.PostgresConfig.ConnectionString)
+		if err != nil {
+			log.WithError(err).Error("Failed to get pg uri")
+			return nil, err
+		}
+	}
 	log.Debugf("DATA FEED SERVICE CONFIG: %+v", config)
 	log.Debug("end config.go Configure() ->")
 	return config, nil

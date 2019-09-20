@@ -23,6 +23,7 @@ export const environment = {
   gateway_url: '/api/v0',
   elasticsearch_url: '/api/v0/elasticsearch',
   notifier_url: '/api/v0/notifications',
+  data_feed_url: '/api/v0/datafeed',
   visibility_url: '/api/v0/visibility',
   license_id: '00000000-0000-0000-0000-000000000000',
   install_id: '00000000-0000-0000-0000-000000000000',

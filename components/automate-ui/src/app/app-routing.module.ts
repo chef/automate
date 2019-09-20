@@ -17,6 +17,8 @@ import { JobEditComponent } from './pages/job-edit/job-edit.component';
 import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { NotificationFormComponent } from './pages/notification-form/notification-form.component';
+import { DatafeedComponent } from './pages/data-feed/data-feed.component';
+import { DatafeedFormComponent } from './pages/data-feed-form/data-feed-form.component';
 import { SigninComponent } from './pages/signin/signin.component';
 import { TeamAddUsersComponent } from './pages/team-add-users/team-add-users.component';
 import { TeamDetailsComponent } from './pages/team-details/team-details.component';
@@ -183,6 +185,23 @@ const routes: Routes = [
               component: NotificationFormComponent
             }
           ]
+        },
+        {
+          path: 'data-feed',
+          children: [
+            {
+              path: '',
+              component: DatafeedComponent
+            },
+            {
+              path: 'form',
+              component: DatafeedFormComponent
+            },
+            {
+              path: 'form/:id',
+              component: DatafeedFormComponent
+            }
+          ]
         }
       ]
     },
@@ -302,6 +321,11 @@ const routes: Routes = [
     path: 'notifications',
     pathMatch: 'prefix',
     redirectTo: 'settings/notifications'
+  },
+  {
+    path: 'data-feed',
+    pathMatch: 'prefix',
+    redirectTo: 'settings/data-feed'
   },
   {
     path: 'compliance/credentials',

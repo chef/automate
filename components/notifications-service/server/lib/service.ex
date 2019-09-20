@@ -73,7 +73,7 @@ defmodule Notifications.Service do
 
   @spec add_rule(Notifications.Rule, GRPC.Server.Stream.t) :: Notifications.RuleAddResponse
   def add_rule(%Notifications.Rule{} = rule, _stream) do
-    Logger.info fn() -> "Adding new rule #{rule.name} #{rule.event}" end
+    Logger.debug fn() -> "Adding new rule #{rule.name} #{rule.event}" end
     case Validator.validate_rule(rule, :add) do
       {:error, reasons} ->
         response_for(:validation_error, RuleAddResponse, reasons)

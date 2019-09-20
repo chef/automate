@@ -20,6 +20,7 @@ import (
 	// PB-generated imports
 	pb_apps "github.com/chef/automate/api/external/applications"
 	pb_cfgmgmt "github.com/chef/automate/api/external/cfgmgmt"
+	pb_data_feed "github.com/chef/automate/api/external/data_feed"
 	pb_ingest "github.com/chef/automate/api/external/ingest"
 	pb_secrets "github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/authn"
@@ -270,6 +271,12 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	// Reflection to be able to make grpcurl calls
 	reflection.Register(grpcServer)
 
+	datafeedClient, err := clients.DatafeedClient()
+	if err != nil {
+		return errors.Wrap(err, "create client for secret service")
+	}
+	pb_data_feed.RegisterDatafeedServiceServer(grpcServer, handler.NewDatafeedHandler(datafeedClient))
+
 	return nil
 }
 
@@ -304,6 +311,7 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 		"teams-service":        pb_teams.RegisterTeamsHandlerFromEndpoint,
 		"node manager":         pb_nodes_manager.RegisterNodeManagerServiceHandlerFromEndpoint,
 		"telemetry":            pb_telemetry.RegisterTelemetryHandlerFromEndpoint,
+		"data-feed":            pb_data_feed.RegisterDatafeedServiceHandlerFromEndpoint,
 	})
 }
 

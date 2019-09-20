@@ -33,6 +33,7 @@ pkg_binds_optional=(
   [secrets-service]="port"
   [event-service]="port"
   [nodemanager-service]="port"
+  [data-feed-service]="port"
 )
 pkg_exposes=(port)
 pkg_bin_dirs=(bin)

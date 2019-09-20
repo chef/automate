@@ -23,11 +23,12 @@ pkg_exposes=(
   port
 )
 pkg_binds=(
-  [notifications-service]="port"
   [secrets-service]="port"
   [config-mgmt-service]="port"
   [compliance-service]="port"
   [cereal-service]="port"
+  [automate-pg-gateway]="port"
+  [pg-sidecar-service]="port"
 )
 
 pkg_bin_dirs=(bin)
@@ -51,4 +52,13 @@ do_prepare() {
   GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/automate/lib/version.BuildTime=${pkg_release}"
   export GO_LDFLAGS
   build_line "Setting GO_LDFLAGS=${GO_LDFLAGS}"
+}
+
+do_install() {
+  # Go scaffolding install callback
+  scaffolding_go_install
+
+  build_line "Copying migration files"
+  mkdir "${pkg_prefix}/migrations"
+  cp -r dao/migration/sql/* "${pkg_prefix}/migrations"
 }

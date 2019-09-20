@@ -51,6 +51,7 @@ describe('SettingsSidebarComponent', () => {
 
     fixture = TestBed.createComponent(SettingsSidebarComponent);
     component = fixture.componentInstance;
+    component.featureFlagOn = true;
     settingsLandingComponent =
       TestBed.createComponent(SettingsLandingComponent).componentInstance;
     element = fixture.debugElement;
@@ -68,8 +69,8 @@ describe('SettingsSidebarComponent', () => {
     });
 
     using([
-      [false, 9, 'v2'],
-      [true, 10, 'v2.1']
+      [false, 10, 'v2'],
+      [true, 11, 'v2.1']
     ], function (projectsEnabled: boolean, linkCount: number, versionName: string) {
 
       it(`shows all links consistent with settings-landing for ${versionName}`, () => {
@@ -119,21 +120,22 @@ describe('SettingsSidebarComponent', () => {
       component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v1');
     });
 
-    it('shows 7 links', () => {
+    it('shows 8 links', () => {
       fixture.detectChanges();
       const links = element.nativeElement
         .querySelectorAll('div.nav-items chef-sidebar-entry');
-      expect(links.length).toBe(7);
+      expect(links.length).toBe(8);
     });
 
     using([
       ['Notifications', '/settings/notifications', 0],
-      ['Node Integrations', '/settings/node-integrations', 1],
-      ['Node Credentials', '/settings/node-credentials', 2],
-      ['Node Lifecycle', '/settings/node-lifecycle', 3],
-      ['Users', '/settings/users', 4],
-      ['Teams', '/settings/teams', 5],
-      ['API Tokens', '/settings/tokens', 6]
+      ['Data feeds', '/settings/data-feed', 1],
+      ['Node Integrations', '/settings/node-integrations', 2],
+      ['Node Credentials', '/settings/node-credentials', 3],
+      ['Node Lifecycle', '/settings/node-lifecycle', 4],
+      ['Users', '/settings/users', 5],
+      ['Teams', '/settings/teams', 6],
+      ['API Tokens', '/settings/tokens', 7]
     ], (label: string, path: string, position: number) => {
       it(`displays the ${label} navigation link`, () => {
         fixture.detectChanges();

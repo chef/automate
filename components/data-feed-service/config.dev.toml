@@ -14,14 +14,6 @@ root_ca_path = "../../dev/certs/Chef_Automate_Dev.crt"
 format = "text"
 level = "debug"
 
-[notifications]
-{{~#eachAlive bind.notifications-service.members as |notifications-service|}}
-{{~#if @last}}
-target = "{{notifications-service.cfg.host}}:{{notifications-service.cfg.port}}"
-{{~/if}}
-{{~/eachAlive}}
-
-
 [secrets]
 {{~#eachAlive bind.secrets-service.members as |secrets-service|}}
 {{~#if @last}}
@@ -42,3 +34,4 @@ target = "{{config-mgmt-service.cfg.host}}:{{config-mgmt-service.cfg.port}}"
 target = "{{compliance-service.cfg.host}}:{{compliance-service.cfg.port}}"
 {{~/if}}
 {{~/eachAlive}}
+

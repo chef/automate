@@ -32,7 +32,6 @@ message Rule {
     CCRSuccess = 1;
     ComplianceFailure = 2;
     ComplianceSuccess = 3;
-    Assets = 4;
   }
   string id = 1;
   string name = 2;

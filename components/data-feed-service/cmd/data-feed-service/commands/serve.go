@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/chef/automate/components/data-feed-service/config"
+	"github.com/chef/automate/components/data-feed-service/dao"
 	"github.com/chef/automate/components/data-feed-service/server"
 	"github.com/chef/automate/components/data-feed-service/service"
 	"github.com/chef/automate/lib/grpc/secureconn"
@@ -34,12 +35,19 @@ var serveCmd = &cobra.Command{
 
 		connFactory := secureconn.NewFactory(*cfg.ServiceCerts)
 
-		err = service.Start(cfg, connFactory)
+		// create backend
+		db, err := dao.New(&cfg.PostgresConfig)
+		if err != nil {
+			log.WithFields(log.Fields{"error": err}).Fatal("Creating postgres connection")
+			return errors.Wrap(err, "failed to configure database")
+		}
+
+		err = service.Start(cfg, connFactory, db)
 		if err != nil {
 			return errors.Wrap(err, "failed to start service")
 		}
 
-		err = server.StartGRPC(context.Background(), cfg, connFactory)
+		err = server.StartGRPC(context.Background(), cfg, connFactory, db)
 		if err != nil {
 			return errors.Wrap(err, "failed to start GRPC server")
 		}

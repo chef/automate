@@ -21,7 +21,7 @@ import (
 	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	"github.com/chef/automate/components/compliance-service/api/reporting"
 	"github.com/chef/automate/components/data-feed-service/config"
-	notifications "github.com/chef/automate/components/notifications-client/api"
+	"github.com/chef/automate/components/data-feed-service/dao"
 	"github.com/chef/automate/lib/cereal"
 	grpccereal "github.com/chef/automate/lib/cereal/grpc"
 	"github.com/chef/automate/lib/cereal/patterns"
@@ -61,7 +61,8 @@ type NotificationSender interface {
 	sendNotification(notification datafeedNotification) error
 }
 
-func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factory) error {
+func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factory, db *dao.DB) error {
+	log.Info("Starting data-feed-service")
 	conn, err := connFactory.Dial("cereal-service", dataFeedConfig.CerealConfig.Target)
 	if err != nil {
 		return err
@@ -73,7 +74,7 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 		return err
 	}
 
-	dataFeedPollTask, err := NewDataFeedPollTask(dataFeedConfig, connFactory)
+	dataFeedPollTask, err := NewDataFeedPollTask(dataFeedConfig, connFactory, db)
 	if err != nil {
 		return err
 	}
@@ -124,10 +125,10 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 }
 
 type DataFeedPollTask struct {
-	notifications notifications.NotificationsClient
-	cfgMgmt       cfgmgmt.CfgMgmtClient
-	secrets       secrets.SecretsServiceClient
-	reporting     reporting.ReportingServiceClient
+	cfgMgmt   cfgmgmt.CfgMgmtClient
+	secrets   secrets.SecretsServiceClient
+	reporting reporting.ReportingServiceClient
+	db        *dao.DB
 }
 
 type DataFeedPollTaskParams struct {
@@ -136,11 +137,7 @@ type DataFeedPollTaskParams struct {
 	FeedInterval    time.Duration
 }
 
-func NewDataFeedPollTask(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factory) (*DataFeedPollTask, error) {
-	notifConn, err := connFactory.Dial("notifications-service", dataFeedConfig.NotificationsConfig.Target)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not connect to notifications-service")
-	}
+func NewDataFeedPollTask(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factory, db *dao.DB) (*DataFeedPollTask, error) {
 
 	cfgMgmtConn, err := connFactory.Dial("config-mgmt-service", dataFeedConfig.CfgmgmtConfig.Target)
 	if err != nil {
@@ -158,10 +155,10 @@ func NewDataFeedPollTask(dataFeedConfig *config.DataFeedConfig, connFactory *sec
 	}
 
 	return &DataFeedPollTask{
-		notifications: notifications.NewNotificationsClient(notifConn),
-		secrets:       secrets.NewSecretsServiceClient(secretsConn),
-		reporting:     reporting.NewReportingServiceClient(complianceConn),
-		cfgMgmt:       cfgmgmt.NewCfgMgmtClient(cfgMgmtConn),
+		secrets:   secrets.NewSecretsServiceClient(secretsConn),
+		reporting: reporting.NewReportingServiceClient(complianceConn),
+		cfgMgmt:   cfgmgmt.NewCfgMgmtClient(cfgMgmtConn),
+		db:        db,
 	}, nil
 }
 
@@ -174,8 +171,12 @@ func (d *DataFeedPollTask) Run(ctx context.Context, task cereal.Task) (interface
 
 	now := time.Now()
 	feedStartTime, feedEndTime := getFeedTimes(params.FeedInterval, now)
-	assetRules := d.getAssetRules(ctx)
-	if len(assetRules) == 0 {
+	destinations, err := d.getDestinations()
+
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get destinations from db")
+	}
+	if len(destinations) == 0 {
 		return nil, nil
 	}
 	// build messages for any nodes which have had a CCR in last window, include last compliance report
@@ -191,66 +192,33 @@ func (d *DataFeedPollTask) Run(ctx context.Context, task cereal.Task) (interface
 	if len(datafeedMessages) == 0 {
 		return nil, nil
 	}
-	for rule := range assetRules {
-		log.Debugf("Rule id %v", assetRules[rule].Id)
-		log.Debugf("Rule Name %v", assetRules[rule].Name)
-		log.Debugf("Rule Event %v", assetRules[rule].Event)
-		log.Debugf("Rule Action %v", assetRules[rule].Action)
-		switch action := assetRules[rule].Action.(type) {
-		case *notifications.Rule_ServiceNowAlert:
-			log.Debugf("Service now alert URL  %v", action.ServiceNowAlert.Url)
-			log.Debugf("Service now alert secret  %v", action.ServiceNowAlert.SecretId)
-			username, password, err := getCredentials(ctx, d.secrets, action.ServiceNowAlert.SecretId)
+	for destination := range destinations {
+		log.Debugf("Destination name %v", destinations[destination].Name)
+		log.Debugf("Destination url %v", destinations[destination].URL)
+		log.Debugf("Destination secret %v", destinations[destination].Secret)
+
+		username, password, err := GetCredentials(ctx, d.secrets, destinations[destination].Secret)
+
+		if err != nil {
+			log.Errorf("Error retrieving credentials, cannot send asset notification: %v", err)
+			// TODO error handling - need some form of report in automate that indicates when data was sent and if it was successful
+		} else {
+			// build and send notification for this rule
+			notification := datafeedNotification{username: username, password: password, url: destinations[destination].URL, data: data}
+
+			client := NewDataClient()
+			err = send(client, notification)
 			if err != nil {
-				log.Errorf("Error retrieving credentials, cannot send asset notification: %v", err)
-				// TODO error handling - need some form of report in automate that indicates when data was sent and if it was successful
-			} else {
-				// build and send notification for this rule
-				notification := datafeedNotification{username: username, password: password, url: action.ServiceNowAlert.Url, data: data}
-				client := NewDataClient()
-				err = send(client, notification)
-				if err != nil {
-					handleSendErr(notification, feedStartTime, feedEndTime, err)
-				}
+				handleSendErr(notification, feedStartTime, feedEndTime, err)
 			}
 		}
 	}
+
 	return nil, nil
 }
 
-func (d *DataFeedPollTask) getAssetRules(ctx context.Context) []notifications.Rule {
-	var retry = 0
-	assetRules := make([]notifications.Rule, 0)
-	for {
-		listResponse, err := d.notifications.ListRules(ctx, &notifications.Empty{})
-		if err != nil {
-			// this is currently inadequate, retry period must be calculated so it does not overlap with the interval
-			// bring the service down if we can't get a response in 50 seconds since the smallest interval we allow is 1 minute
-			if retry == 5 {
-				log.Fatalf("Error calling list rules on notifications-service attempt %v: %v", retry, err)
-			}
-			log.Errorf("Error calling list rules on notifications-service attempt %v: %v", retry, err)
-			retry++
-			wait, _ := time.ParseDuration("10s")
-			time.Sleep(wait)
-			continue
-		}
-		responseCode := listResponse.Code
-		log.Debugf("ListRules responseCode %v", responseCode)
-		messages := listResponse.Messages
-		// get the rules here - service now rules only
-		log.Debugf("ListRules messages %v", messages)
-
-		rules := listResponse.Rules
-		for rule := range rules {
-			event := rules[rule].Event
-			if event == notifications.Rule_Assets {
-				assetRules = append(assetRules, *rules[rule])
-			}
-		}
-		break
-	}
-	return assetRules
+func (d *DataFeedPollTask) getDestinations() ([]dao.Destination, error) {
+	return d.db.ListDBDestinations()
 }
 
 func handleSendErr(notification datafeedNotification, startTime time.Time, endTime time.Time, err error) {
@@ -293,7 +261,7 @@ func getFeedEndTime(feedInterval time.Duration, now time.Time) time.Time {
 	return feedEndTime
 }
 
-func getCredentials(ctx context.Context, client secrets.SecretsServiceClient, secretID string) (string, string, error) {
+func GetCredentials(ctx context.Context, client secrets.SecretsServiceClient, secretID string) (string, string, error) {
 	secret, err := client.Read(ctx, &secrets.Id{Id: secretID})
 	if err != nil {
 		return "", "", err
@@ -357,6 +325,10 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 	}
 	if response.StatusCode != http.StatusCreated {
 		return errors.New(response.Status)
+	}
+	err = response.Body.Close()
+	if err != nil {
+		log.Warnf("Error clsoing response body %v", err)
 	}
 	return nil
 }

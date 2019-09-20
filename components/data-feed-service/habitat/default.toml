@@ -16,3 +16,7 @@ accept = false
 [log]
 format = "text"
 level = "info"
+
+[storage]
+database = "data_feed_service"
+user = "data-feed"
