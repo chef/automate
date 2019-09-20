@@ -10,6 +10,7 @@ control 'iam-v2-roles-1' do
 
   VIEWER_USERNAME = 'viewer'
   EDITOR_USERNAME = 'editor'
+  PROJECT_ADMIN_USERNAME = 'project-admin'
 
   describe 'migrated legacy v1 policies' do
     it 'legacy policies can be deleted' do
@@ -25,8 +26,31 @@ control 'iam-v2-roles-1' do
     end
   end
 
-  describe 'viewer and editor access' do
-    [ VIEWER_USERNAME, EDITOR_USERNAME ].each do |username|
+  describe 'viewer, editor, project-admin access' do
+    before(:all) do
+      # viewer and editor users are generated automatically
+      # but we need to manually create our test project admin
+      create_user_request = automate_api_request(
+        '/apis/iam/v2beta/users',
+        http_method: 'POST',
+        request_body: {
+          id: PROJECT_ADMIN_USERNAME,
+          name: PROJECT_ADMIN_USERNAME,
+          password: ENV['AUTOMATE_API_DEFAULT_PASSWORD'] || 'chefautomate',
+        }
+      )
+      expect(create_user_request.http_status).to eq 200
+    end
+
+    after(:all) do
+      delete_user_request = automate_api_request(
+        "/apis/iam/v2beta/users/#{PROJECT_ADMIN_USERNAME}",
+        http_method: 'DELETE'
+      )
+      expect(delete_user_request.http_status).to eq 200
+    end
+
+    [VIEWER_USERNAME, EDITOR_USERNAME, PROJECT_ADMIN_USERNAME].each do |username|
       it "user #{username} exists" do
         user_read_request = automate_api_request("/apis/iam/v2beta/users/#{username}")
         expect(user_read_request.http_status).to eq 200
@@ -59,24 +83,16 @@ control 'iam-v2-roles-1' do
         ],
       }.each do |method, urls|
         urls.each do |url|
-          it "#{method} #{url} does not return 403 for viewer user" do
-            expect(
-              automate_api_request(
-                "/api/v0/compliance/#{url}",
-                http_method: method,
-                user: VIEWER_USERNAME,
-              ).http_status
-            ).not_to eq 403
-          end
-
-          it "#{method} #{url} does not return 403 for editor user" do
-            expect(
-              automate_api_request(
-                "/api/v0/compliance/#{url}",
-                http_method: method,
-                user: EDITOR_USERNAME,
-              ).http_status
-            ).not_to eq 403
+          [VIEWER_USERNAME, EDITOR_USERNAME, PROJECT_ADMIN_USERNAME].each do |user|
+            it "#{method} #{url} does not return 403 for #{user}" do
+              expect(
+                automate_api_request(
+                  "/api/v0/compliance/#{url}",
+                  http_method: method,
+                  user: user,
+                ).http_status
+              ).not_to eq 403
+            end
           end
         end
       end
@@ -100,7 +116,7 @@ control 'iam-v2-roles-1' do
         ],
       }.each do |method, urls|
         urls.each do |url|
-          it "#{method} #{url} returns 403 for viewer user" do
+          it "#{method} #{url} returns 403 for viewer" do
             expect(
               automate_api_request(
                 "/api/v0/compliance/#{url}",
@@ -111,32 +127,36 @@ control 'iam-v2-roles-1' do
             ).to eq 403
           end
 
-          it "#{method} #{url} does not return 403 for editor user" do
-            expect(
-              automate_api_request(
-                "/api/v0/compliance/#{url}",
-                http_method: method,
-                user: EDITOR_USERNAME,
-              ).http_status
-            ).not_to eq 403
+          [EDITOR_USERNAME, PROJECT_ADMIN_USERNAME].each do |user|
+            it "#{method} #{url} does not return 403 for #{user}" do
+              expect(
+                automate_api_request(
+                  "/api/v0/compliance/#{url}",
+                  http_method: method,
+                  user: EDITOR_USERNAME,
+                ).http_status
+              ).not_to eq 403
+            end
           end
         end
       end
+    end
 
-      describe 'handcrafted profile upload handler' do
-        it 'POST profiles?owner=OWNER returns 403 for viewer user' do
-          expect(
-            automate_api_request(
-              '/api/v0/compliance/profiles?owner=OWNER}',
-              request_headers: { 'Content-type': 'application/json' },
-              request_body: { name: 'NAME', version: 'VER' }.to_json,
-              http_method: 'POST',
-              user: VIEWER_USERNAME,
-            ).http_status
-          ).to eq 403
-        end
+    describe 'handcrafted profile upload handler' do
+      it 'POST profiles?owner=OWNER returns 403 for viewer' do
+        expect(
+          automate_api_request(
+            '/api/v0/compliance/profiles?owner=OWNER}',
+            request_headers: { 'Content-type': 'application/json' },
+            request_body: { name: 'NAME', version: 'VER' }.to_json,
+            http_method: 'POST',
+            user: VIEWER_USERNAME,
+          ).http_status
+        ).to eq 403
+      end
 
-        it 'POST profiles?owner=OWNER does not return 403 for editor user' do
+      [EDITOR_USERNAME, PROJECT_ADMIN_USERNAME].each do |user|
+        it "POST profiles?owner=OWNER does not return 403 for #{user}" do
           expect(
             automate_api_request(
               '/api/v0/compliance/profiles?owner=OWNER',
@@ -148,7 +168,6 @@ control 'iam-v2-roles-1' do
           ).not_to eq 403
         end
       end
-
     end
 
     describe 'reading node manager data' do
@@ -159,8 +178,8 @@ control 'iam-v2-roles-1' do
         ),
       }.each do |method, urls|
         urls.each do |url|
-          [ EDITOR_USERNAME, VIEWER_USERNAME ].each do |user|
-            it "#{method} #{url} does not return 403 for #{user} user" do
+          [VIEWER_USERNAME, EDITOR_USERNAME, PROJECT_ADMIN_USERNAME].each do |user|
+            it "#{method} #{url} does not return 403 for #{user}" do
               status =  automate_api_request(
                 "/api/v0/#{url}",
                 http_method: method,
@@ -191,7 +210,7 @@ control 'iam-v2-roles-1' do
         ),
       }.each do |method, urls|
         urls.each do |url|
-          it "#{method} #{url} returns 403 for viewer user" do
+          it "#{method} #{url} returns 403 for viewer" do
             expect(
               automate_api_request(
                 "/api/v0/#{url}",
@@ -201,14 +220,16 @@ control 'iam-v2-roles-1' do
             ).to eq 403
           end
 
-          it "#{method} #{url} does not return 403 for editor user" do
-            expect(
-              automate_api_request(
-                "/api/v0/#{url}",
-                http_method: method,
-                user: EDITOR_USERNAME,
-              ).http_status
-            ).not_to eq 403
+          [EDITOR_USERNAME, PROJECT_ADMIN_USERNAME].each do |user|
+            it "#{method} #{url} does not return 403 for #{user}" do
+              expect(
+                automate_api_request(
+                  "/api/v0/#{url}",
+                  http_method: method,
+                  user: EDITOR_USERNAME,
+                ).http_status
+              ).not_to eq 403
+            end
           end
         end
       end
@@ -229,8 +250,8 @@ control 'iam-v2-roles-1' do
         ),
       }.each do |method, urls|
         urls.each do |url|
-          [ EDITOR_USERNAME, VIEWER_USERNAME ].each do |user|
-            it "#{method} #{url} does not return 403 for #{user} user" do
+          [VIEWER_USERNAME, EDITOR_USERNAME, PROJECT_ADMIN_USERNAME].each do |user|
+            it "#{method} #{url} does not return 403 for #{user}" do
               status =  automate_api_request(
                 "/api/v0/cfgmgmt/#{url}",
                 http_method: method,
@@ -256,8 +277,8 @@ control 'iam-v2-roles-1' do
         ),
       }.each do |method, urls|
         urls.each do |url|
-          [ EDITOR_USERNAME, VIEWER_USERNAME ].each do |user|
-            it "#{method} #{url} does not return 403 for #{user} user" do
+          [VIEWER_USERNAME, EDITOR_USERNAME, PROJECT_ADMIN_USERNAME].each do |user|
+            it "#{method} #{url} does not return 403 for #{user}" do
               expect(
                 automate_api_request(
                   "/api/v0/#{url}",
@@ -288,8 +309,8 @@ control 'iam-v2-roles-1' do
         ),
       }.each do |method, urls|
         urls.each do |url|
-          [ EDITOR_USERNAME, VIEWER_USERNAME ].each do |user|
-            it "#{method} #{url} does not return 403 for #{user} user" do
+          [VIEWER_USERNAME, EDITOR_USERNAME, PROJECT_ADMIN_USERNAME].each do |user|
+            it "#{method} #{url} does not return 403 for #{user}" do
               status = automate_api_request(
                 "/api/v0/#{url}",
                 http_method: method,
@@ -314,8 +335,8 @@ control 'iam-v2-roles-1' do
         )
       }.each do |method, urls|
         urls.each do |url|
-          [ EDITOR_USERNAME, VIEWER_USERNAME ].each do |user|
-            it "#{method} #{url} does not return 403 for #{user} user" do
+          [VIEWER_USERNAME, EDITOR_USERNAME, PROJECT_ADMIN_USERNAME].each do |user|
+            it "#{method} #{url} does not return 403 for #{user}" do
               expect(
                 automate_api_request(
                   "/api/v0/#{url}",
@@ -343,7 +364,7 @@ control 'iam-v2-roles-1' do
         ),
       }.each do |method, urls|
         urls.each do |url|
-          it "#{method} #{url} returns 403 for viewer user" do
+          it "#{method} #{url} returns 403 for viewer" do
             expect(
               automate_api_request(
                 "/api/v0/#{url}",
@@ -353,14 +374,16 @@ control 'iam-v2-roles-1' do
             ).to eq 403
           end
 
-          it "#{method} #{url} does not return 403 for editor user" do
-            expect(
-              automate_api_request(
-                "/api/v0/#{url}",
-                http_method: method,
-                user: EDITOR_USERNAME,
-              ).http_status
-            ).not_to eq 403
+          [EDITOR_USERNAME, PROJECT_ADMIN_USERNAME].each do |user|
+            it "#{method} #{url} does not return 403 for #{user}" do
+              expect(
+                automate_api_request(
+                  "/api/v0/#{url}",
+                  http_method: method,
+                  user: EDITOR_USERNAME,
+                ).http_status
+              ).not_to eq 403
+            end
           end
         end
       end
@@ -376,8 +399,8 @@ control 'iam-v2-roles-1' do
         ),
       }.each do |method, urls|
         urls.each do |url|
-          [ EDITOR_USERNAME, VIEWER_USERNAME ].each do |user|
-            it "#{method} #{url} does not return 403 for #{user} user" do
+          [VIEWER_USERNAME, EDITOR_USERNAME, PROJECT_ADMIN_USERNAME].each do |user|
+            it "#{method} #{url} does not return 403 for #{user}" do
               expect(
                 automate_api_request(
                   "/api/v0/#{url}",
@@ -399,7 +422,7 @@ control 'iam-v2-roles-1' do
         ),
       }.each do |method, urls|
         urls.each do |url|
-          it "#{method} #{url} returns 403 for viewer user" do
+          it "#{method} #{url} returns 403 for viewer" do
             expect(
               automate_api_request(
                 "/api/v0/license/#{url}",
@@ -409,29 +432,76 @@ control 'iam-v2-roles-1' do
             ).to eq 403
           end
 
-          it "#{method} #{url} does not return 403 for editor user" do
-            expect(
-              automate_api_request(
-                "/api/v0/license/#{url}",
-                http_method: method,
-                user: EDITOR_USERNAME,
-              ).http_status
-            ).not_to eq 403
+          [EDITOR_USERNAME, PROJECT_ADMIN_USERNAME].each do |user|
+            it "#{method} #{url} does not return 403 for editor user" do
+              expect(
+                automate_api_request(
+                  "/api/v0/license/#{url}",
+                  http_method: method,
+                  user: EDITOR_USERNAME,
+                ).http_status
+              ).not_to eq 403
+            end
           end
         end
       end
     end
 
-    describe "reading and modifying IAM data" do
+    describe "reading IAM data" do
       {
         'GET': %w(
           /apis/iam/v2beta/users
           /apis/iam/v2beta/teams
-          /apis/iam/v2beta/tokens
           /apis/iam/v2beta/users/username
           /apis/iam/v2beta/teams/some-team-id
+        ),
+      }.each do |method, urls|
+        urls.each do |url|
+          [ EDITOR_USERNAME, VIEWER_USERNAME ].each do |user|
+            it "#{method} #{url} returns 403 for #{user} user" do
+              expect(
+                automate_api_request(url,
+                  http_method: method,
+                  user: user,
+                ).http_status
+              ).to eq 403
+            end
+          end
+
+          it "#{method} #{url} does not return 403 for project-admin" do
+              expect(
+                automate_api_request(url,
+                  http_method: method,
+                  user: user,
+                ).http_status
+              ).to eq 403
+            end
+        end
+      end
+
+      {
+        'GET': %w(
+          /apis/iam/v2beta/tokens
           /apis/iam/v2beta/tokens/some-token-id
         ),
+      }.each do |method, urls|
+        urls.each do |url|
+          [ EDITOR_USERNAME, VIEWER_USERNAME, PROJECT_ADMIN_USERNAME ].each do |user|
+            it "#{method} #{url} returns 403 for #{user}" do
+              expect(
+                automate_api_request(url,
+                  http_method: method,
+                  user: user,
+                ).http_status
+              ).to eq 403
+            end
+          end
+        end
+      end
+    end
+
+    describe "modifying IAM data" do
+      {
         'DELETE': %w(
           /apis/iam/v2beta/users/username
           /apis/iam/v2beta/teams/some-team-id
@@ -449,8 +519,8 @@ control 'iam-v2-roles-1' do
         ),
       }.each do |method, urls|
         urls.each do |url|
-          [ EDITOR_USERNAME, VIEWER_USERNAME ].each do |user|
-            it "#{method} #{url} returns 403 for #{user} user" do
+          [ EDITOR_USERNAME, VIEWER_USERNAME, PROJECT_ADMIN_USERNAME ].each do |user|
+            it "#{method} #{url} returns 403 for #{user}" do
               expect(
                 automate_api_request(url,
                   http_method: method,
@@ -462,7 +532,39 @@ control 'iam-v2-roles-1' do
         end
       end
 
-    [ EDITOR_USERNAME, VIEWER_USERNAME ].each do |user|
+      {
+        'GET': %w(
+          /apis/iam/v2beta/teams/some-team-id/users
+        ),
+        'POST': %w(
+          /apis/iam/v2beta/teams/some-team-id/users:add
+          /apis/iam/v2beta/teams/some-team-id/users:remove
+        ),
+      }.each do |method, urls|
+        urls.each do |url|
+          [EDITOR_USERNAME, VIEWER_USERNAME].each do |user|
+            it "#{method} #{url} returns 403 for #{user}" do
+              expect(
+                automate_api_request(url,
+                  http_method: method,
+                  user: user,
+                ).http_status
+              ).to eq 403
+            end
+          end
+
+          it "#{method} #{url} does not return 403 for project-admin" do
+            expect(
+              automate_api_request(url,
+                http_method: method,
+                user: user,
+              ).http_status
+            ).not_to eq 403
+          end
+        end
+      end
+
+    [ EDITOR_USERNAME, VIEWER_USERNAME, PROJECT_ADMIN_USERNAME ].each do |user|
       it "a #{user} can see their own user record" do
         expect(
           automate_api_request(
@@ -501,8 +603,8 @@ control 'iam-v2-roles-1' do
       )
     }.each do |method, urls|
       urls.each do |url|
-        [ EDITOR_USERNAME, VIEWER_USERNAME ].each do |user|
-          it "#{method} #{url} returns 200 for #{user} user" do
+        [ EDITOR_USERNAME, VIEWER_USERNAME, PROJECT_ADMIN_USERNAME ].each do |user|
+          it "#{method} #{url} does not return 403 for #{user}" do
             expect(
               automate_api_request(
                 "/apis/iam/v2beta/#{url}",
@@ -521,7 +623,6 @@ control 'iam-v2-roles-1' do
           roles
           policies/some-policy-id
           roles/some-role-id
-          policies/some-policy-id/members
         ),
         'DELETE': %w(
           policies/some-policy-id
@@ -531,19 +632,16 @@ control 'iam-v2-roles-1' do
         'PUT': %w(
           policies/some-policy-id
           roles/some-role-id
-          policies/some-policy-id/members
           projects/some-project-id
         ),
         'POST': %w(
           policies
           roles
           projects
-          policies/some-policy-id/members:add
-          policies/some-policy-id/members:remove
         ),
       }.each do |method, urls|
         urls.each do |url|
-          [ EDITOR_USERNAME, VIEWER_USERNAME ].each do |user|
+          [ EDITOR_USERNAME, VIEWER_USERNAME, PROJECT_ADMIN_USERNAME].each do |user|
             it "#{method} #{url} returns 403 for #{user} user" do
               expect(
                 automate_api_request(
@@ -556,6 +654,43 @@ control 'iam-v2-roles-1' do
           end
         end
       end
+
+      {
+        'GET': %w(
+          policies/some-policy-id/members
+        ),
+        'PUT': %w(
+          policies/some-policy-id/members
+        ),
+        'POST': %w(
+          policies/some-policy-id/members:add
+          policies/some-policy-id/members:remove
+        ),
+      }.each do |method, urls|
+        urls.each do |url|
+          [ EDITOR_USERNAME, VIEWER_USERNAME ].each do |user|
+            it "#{method} #{url} returns 403 for #{user}" do
+              expect(
+                automate_api_request(
+                  "/apis/iam/v2beta/#{url}",
+                  http_method: method,
+                  user: user,
+                ).http_status
+              ).to eq 403
+            end
+          end
+
+          it "#{method} #{url} does not return 403 for project-admin" do
+            expect(
+              automate_api_request(
+                "/apis/iam/v2beta/#{url}",
+                http_method: method,
+                user: user,
+              ).http_status
+            ).not_to eq 403
+          end
+        end
+      end     
     end
 
     describe "reading and modifying scheduler settings" do
@@ -570,8 +705,8 @@ control 'iam-v2-roles-1' do
         ),
       }.each do |method, urls|
         urls.each do |url|
-          [ EDITOR_USERNAME, VIEWER_USERNAME ].each do |user|
-            it "#{method} #{url} returns 403 for #{user} user" do
+          [ EDITOR_USERNAME, VIEWER_USERNAME, PROJECT_ADMIN_USERNAME ].each do |user|
+            it "#{method} #{url} returns 403 for #{user}" do
               expect(
                 automate_api_request(
                   "/api/v0/retention/nodes/#{url}",
@@ -595,9 +730,9 @@ control 'iam-v2-roles-1' do
         ),
       }.each do |method, urls|
         urls.each do |url|
-          [ EDITOR_USERNAME, VIEWER_USERNAME ].each do |user|
+          [ EDITOR_USERNAME, VIEWER_USERNAME, PROJECT_ADMIN_USERNAME ].each do |user|
             path = "/apis/beta/retention/service_groups/#{url}"
-            it "#{method} #{path} returns 403 for #{user} user" do
+            it "#{method} #{path} returns 403 for #{user}" do
               expect(
                 automate_api_request(
                   path,
@@ -626,8 +761,8 @@ control 'iam-v2-roles-1' do
         ),
       }.each do |method, urls|
         urls.each do |url|
-          [ EDITOR_USERNAME, VIEWER_USERNAME ].each do |user|
-            it "#{method} #{url} returns 403 for #{user} user" do
+          [ EDITOR_USERNAME, VIEWER_USERNAME, PROJECT_ADMIN_USERNAME ].each do |user|
+            it "#{method} #{url} returns 403 for #{user}" do
               expect(
                 automate_api_request(
                   "/api/v0/notifications/#{url}",
@@ -640,6 +775,5 @@ control 'iam-v2-roles-1' do
         end
       end
     end
-
   end
 end
