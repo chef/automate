@@ -2,6 +2,9 @@
 
 set -eu
 
+docker ps || true
+free -m
+
 # We've now seen cases where origin/master on the build hosts can get
 # out of date. This causes us to build components unnecessarily.
 # Fetching it here hopefully will prevent this situation.
