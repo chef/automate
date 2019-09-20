@@ -79,7 +79,7 @@ EOF
     "editor",
     "viewer",
     "ingest",
-    "project-admin",
+    "project-owner",
     "iam-members-viewer"
   ]
 

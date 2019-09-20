@@ -1,5 +1,7 @@
 UPDATE iam_roles
     SET
+        id = 'project-owner',
+        name = 'Project Owner',
         actions = '{
           infra:*,
           compliance:*,
@@ -22,5 +24,3 @@ UPDATE iam_roles
           }'
     WHERE
         id = 'project-admin';
-
-COMMIT;
