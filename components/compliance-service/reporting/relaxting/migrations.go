@@ -155,7 +155,7 @@ func RunMigrations(backend ES2Backend, statusSrv *statusserver.Server) error {
 		return errMsg
 	}
 
-	// Migrates A2 version 1 indices to version 2
+	// Migrates A2 version 1 indices to the current version
 	a2V1Indices := A2V1ElasticSearchIndices{backend: &backend}
 	err = backend.migrate(a2V1Indices, statusSrv, statusserver.MigrationLabelESa2v1)
 	if err != nil {
@@ -165,7 +165,7 @@ func RunMigrations(backend ES2Backend, statusSrv *statusserver.Server) error {
 		return errMsg
 	}
 
-	// Migrates A2 version 2 indices to version 3
+	// Migrates A2 version 2 indices to the current version
 	a2V2Indices := A2V2ElasticSearchIndices{backend: &backend}
 	err = backend.migrate(a2V2Indices, statusSrv, statusserver.MigrationLabelESa2v2)
 	if err != nil {
@@ -175,7 +175,7 @@ func RunMigrations(backend ES2Backend, statusSrv *statusserver.Server) error {
 		return errMsg
 	}
 
-	// Migrates A2 version 3 indices to version 4
+	// Migrates A2 version 3 indices to the current version
 	a2V3Indices := A2V3ElasticSearchIndices{backend: &backend}
 	err = backend.migrate(a2V3Indices, statusSrv, statusserver.MigrationLabelESa2v3)
 	if err != nil {
@@ -185,7 +185,7 @@ func RunMigrations(backend ES2Backend, statusSrv *statusserver.Server) error {
 		return errMsg
 	}
 
-	// Migrates A2 version 4 indices to version 5
+	// Migrates A2 version 4 indices to the current version
 	a2V4Indices := A2V4ElasticSearchIndices{backend: &backend}
 	err = backend.migrate(a2V4Indices, statusSrv, statusserver.MigrationLabelESa2v4)
 	if err != nil {

@@ -544,8 +544,8 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 
 	// These are filter types where we use ElasticSearch Term Queries
 	filterTypes := []string{"environment", "organization", "chef_server", "chef_tags",
-		"policy_group", "policy_name", "status", "node_name", "platform", "role", "recipe",
-		"inspec_version", "ipaddress"}
+		"policy_group", "policy_name", "status", "node_name", "platform", "platform_with_version",
+		"role", "recipe", "inspec_version", "ipaddress"}
 
 	for _, filterType := range filterTypes {
 		if len(filters[filterType]) > 0 {
@@ -651,6 +651,8 @@ func (backend ES2Backend) getESFieldName(filterType string) string {
 	case "organization":
 		ESFieldName = "organization_name.lower"
 	case "platform":
+		ESFieldName = "platform.name.lower"
+	case "platform_with_version":
 		ESFieldName = "platform.full.lower"
 	case "recipe":
 		ESFieldName = "recipes.lower"

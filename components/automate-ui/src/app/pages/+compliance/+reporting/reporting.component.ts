@@ -46,7 +46,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     'node_id',
     'node_name',
     'organization',
-    'platform',
+    'platform_with_version',
     'policy_group',
     'profile_id',
     'profile_name',
@@ -99,7 +99,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
       'placeholder': 'Node Name'
     },
     {
-      'name': 'platform',
+      'name': 'platform_with_version',
       'title': 'Platform',
       'description': 'Add the name to filter this report to a specific platform',
       'placeholder': 'Name'
