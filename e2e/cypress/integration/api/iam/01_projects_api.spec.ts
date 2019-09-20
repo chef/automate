@@ -472,6 +472,7 @@ describeIfIAMV2p1('projects API: applying project', () => {
     });
   });
 
+  // must correspond to enum type in automate-gateway/.../common/rules.proto
   const attributeValuesMap = new Map([
     ['CHEF_SERVER', 'chef-server-dev.test'],
     ['ENVIRONMENT', '_default'],
@@ -533,6 +534,8 @@ describeIfIAMV2p1('projects API: applying project', () => {
         headers: { 'api-token': adminApiToken },
         method: 'DELETE',
         url: `/apis/iam/v2beta/projects/${avengersRule.project_id}/rules/${rule.id}`
+      }).then((response) => {
+        expect(response.status).to.equal(200);
       });
 
       // apply rules to reset node to unassigned
@@ -540,6 +543,8 @@ describeIfIAMV2p1('projects API: applying project', () => {
         headers: { 'api-token': adminApiToken },
         method: 'POST',
         url: '/apis/iam/v2beta/apply-rules'
+      }).then((response) => {
+        expect(response.status).to.equal(200);
       });
       waitUntilApplyRulesNotRunning(100);
     });
