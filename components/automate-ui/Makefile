@@ -34,8 +34,6 @@ lint-html:
 
 lint-typescript:
 	npm run lint
-	@echo "⚠️  The warning 'select is deprecated' is no longer true as of 7.0 \
-	so it is suppressed from the output: see https://github.com/ngrx/platform/pull/1361."
 
 pr-ready: unit-all-browsers lint e2e
 

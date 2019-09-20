@@ -37,6 +37,8 @@ describe('NodeDetailsComponent', () => {
         spyOn(eventService.showModal$, 'subscribe')
           .and.returnValue(new BehaviorSubject<boolean>(false));
         component.ngOnInit();
+        // Next line complains "subscribe is deprecated" -- but this usage is OK!
+        // tslint:disable-next-line
         expect(eventService.showModal$.subscribe).toHaveBeenCalled();
       });
     });
