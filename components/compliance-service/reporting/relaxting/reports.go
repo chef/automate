@@ -532,9 +532,9 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 
 func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[string][]string,
 	size int32) (*reportingapi.ControlItems, error) {
+	myName := "GetControlListItems"
 
 	contListItems := make([]*reportingapi.ControlItem, 0)
-	myName := "GetControlListItems"
 
 	client, err := backend.ES2Client()
 	if err != nil {
@@ -561,6 +561,13 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 	controlTermsAgg := elastic.NewTermsAggregation().Field("profiles.controls.id").
 		Size(int(size)).
 		Order("_key", true)
+
+	controlTermsAgg.SubAggregation("tags", elastic.NewNestedAggregation().
+		Path("profiles.controls.string_tags").
+		SubAggregation("key", elastic.NewTermsAggregation().
+			Field("profiles.controls.string_tags.key").
+			SubAggregation("values", elastic.NewTermsAggregation().
+				Field("profiles.controls.string_tags.values"))))
 
 	controlTermsAgg.SubAggregation("impact",
 		elastic.NewTermsAggregation().Field("profiles.controls.impact").Size(1))
@@ -594,13 +601,49 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 
 	controlTermsAgg.SubAggregation("profile", profileInfoAgg)
 
-	//todo handle passed in regex too
-	filteredControls := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().Must(elastic.NewRegexpQuery("profiles.controls.id", ".*")))
+	controlsQuery := &elastic.BoolQuery{}
+	// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
+	for filterType := range filters {
+		if strings.HasPrefix(filterType, "control_tag:") {
+			_, tagKey := leftSplit(filterType, ":")
+			termQuery := backend.newNestedTermQueryFromControlTagsFilter(tagKey, filters[filterType])
+			controlsQuery = controlsQuery.Must(termQuery)
+		}
+	}
+	if len(filters["control_status"]) > 0 {
+		controlStatusQuery := backend.newTermQueryFromFilter("profiles.controls.status", filters["control_status"])
+		controlsQuery = controlsQuery.Must(controlStatusQuery)
+		logrus.Infof("controls status query %v", controlStatusQuery)
+	}
+	if len(filters["control_name"]) > 0 {
+		controlTitlesQuery := backend.newTermQueryFromFilter("profiles.controls.title.lower", filters["control_name"])
+		controlsQuery = controlsQuery.Should(controlTitlesQuery)
+		logrus.Infof("controls name query %v", controlTitlesQuery)
+	}
+	if len(filters["control"]) > 0 {
+		controlIdsQuery := backend.newTermQueryFromFilter("profiles.controls.id", filters["control"])
+		controlsQuery = controlsQuery.Should(controlIdsQuery)
+		logrus.Infof("controls ids query %v", controlIdsQuery)
+	}
+
+	filteredControls := elastic.NewFilterAggregation().Filter(controlsQuery)
 	filteredControls.SubAggregation("control", controlTermsAgg)
 	controlsAgg := elastic.NewNestedAggregation().Path("profiles.controls")
 	controlsAgg.SubAggregation("filtered_controls", filteredControls)
 
-	filteredProfiles := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().Must(elastic.NewRegexpQuery("profiles.sha256", ".*")))
+	profilesQuery := &elastic.BoolQuery{}
+	if len(filters["profile_name"]) > 0 {
+		profileTitlesQuery := backend.newTermQueryFromFilter("profiles.title.lower", filters["profile_name"])
+		profilesQuery = profilesQuery.Should(profileTitlesQuery)
+		logrus.Infof("profiles name query %v", profileTitlesQuery)
+	}
+
+	if len(filters["profile_id"]) > 0 {
+		profilesShaQuery := backend.newTermQueryFromFilter("profiles.sha256", filters["profile_id"])
+		profilesQuery = profilesQuery.Should(profilesShaQuery)
+	}
+
+	filteredProfiles := elastic.NewFilterAggregation().Filter(profilesQuery)
 	filteredProfiles.SubAggregation("controls", controlsAgg)
 	outterMostProfilesAgg := elastic.NewNestedAggregation().Path("profiles")
 	outterMostProfilesAgg.SubAggregation("filtered_profiles", filteredProfiles)
@@ -619,7 +662,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		Do(ctx)
 
 	if err != nil {
-		logrus.Error("getProfileSuggestions search failed")
+		logrus.Errorf("%s search failed", myName)
 		return nil, err
 	}
 
@@ -680,33 +723,45 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 	}
 	profileMin := &reportingapi.ProfileMin{}
 	if profileResult, found := controlBucket.Aggregations.ReverseNested("profile"); found {
-		if result, found := profileResult.Terms("sha"); found &&
-			len(result.Buckets) > 0 {
-
+		if result, found := profileResult.Terms("sha"); found && len(result.Buckets) > 0 {
 			sha := result.Buckets[0]
 			name := sha.KeyNumber
 			profileMin.Id = string(name)
 		}
-		if result, found := profileResult.Terms("title"); found &&
-			len(result.Buckets) > 0 {
-
+		if result, found := profileResult.Terms("title"); found && len(result.Buckets) > 0 {
 			title := result.Buckets[0]
 			name := title.KeyNumber
 			profileMin.Title = string(name)
 		}
-		if result, found := profileResult.Terms("version"); found &&
-			len(result.Buckets) > 0 {
-
+		if result, found := profileResult.Terms("version"); found && len(result.Buckets) > 0 {
 			version := result.Buckets[0]
 			name := version.KeyNumber
 			profileMin.Version = string(name)
 		}
 	}
 	contListItem.Profile = profileMin
-	if endTimeResult, found := controlBucket.Aggregations.ReverseNested("end_time"); found {
-		if result, found := endTimeResult.Terms("most_recent_report"); found &&
-			len(result.Buckets) > 0 {
 
+	//add that stringtags
+	stringTags := make([]*reportingapi.StringTag, 0)
+	if tags, found := controlBucket.Aggregations.Nested("tags"); found {
+		if keys, found := tags.Terms("key"); found && len(keys.Buckets) > 0 {
+			for _, key := range keys.Buckets {
+				stringTag := &reportingapi.StringTag{}
+				stringTag.Key = *key.KeyAsString
+				if values, ok := key.Aggregations.Terms("values"); ok && len(values.Buckets) > 0 {
+					valuesArray := make([]string, 0)
+					for _, value := range values.Buckets {
+						valuesArray = append(valuesArray, *value.KeyAsString)
+					}
+				}
+				stringTags = append(stringTags, stringTag)
+			}
+		}
+	}
+	contListItem.StringTags = stringTags
+
+	if endTimeResult, found := controlBucket.Aggregations.ReverseNested("end_time"); found {
+		if result, found := endTimeResult.Terms("most_recent_report"); found && len(result.Buckets) > 0 {
 			endTime := result.Buckets[0]
 			name := endTime.KeyAsString
 

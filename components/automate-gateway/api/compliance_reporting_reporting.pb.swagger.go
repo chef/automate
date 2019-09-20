@@ -374,6 +374,12 @@ func init() {
         },
         "control_summary": {
           "$ref": "#/definitions/v1ControlSummary"
+        },
+        "string_tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1StringTag"
+          }
         }
       }
     },
@@ -946,6 +952,20 @@ func init() {
         "duration": {
           "type": "number",
           "format": "float"
+        }
+      }
+    },
+    "v1StringTag": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

@@ -168,6 +168,11 @@ message ControlItemRequest {
 	repeated ListFilter filters = 3;
 }
 
+message StringTag {
+	string key = 1;
+	repeated string values = 2;
+}
+
 message ControlItem {
 	string id =1;
 	string title=2;
@@ -175,6 +180,7 @@ message ControlItem {
 	float impact = 4;
 	google.protobuf.Timestamp end_time = 5;
 	ControlSummary control_summary = 6;
+	repeated StringTag string_tags = 7;
 }
 
 message ControlItems {
