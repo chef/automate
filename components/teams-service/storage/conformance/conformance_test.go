@@ -54,6 +54,11 @@ func TestStorage(t *testing.T) {
 		testGetTeamsForUser,
 		testGetTeamByName,
 		testGetTeamByNameNotFound,
+		testPurgeProjectUnassigned,
+		testPurgeProjectOnlyProjectToPurge,
+		testPurgeProjectOtherProjectsExcludingOneToPurge,
+		testPurgeProjectOtherProjectsIncludingOneToPurge,
+		testPurgeProjectUniversal,
 	}
 
 	// lazy way to randomize tests
@@ -505,6 +510,124 @@ func testStoreTeamConflict(ctx context.Context, t *testing.T, s storage.Storage)
 	teams, err := s.GetTeams(ctx)
 	require.NoError(t, err, "failed to read back teams")
 	assert.Equal(t, 1+len(storage.NonDeletableTeams), len(teams))
+}
+
+func testPurgeProjectUnassigned(ctx context.Context, t *testing.T, s storage.Storage) {
+	name := "unassigned"
+	description := "Test Token Description"
+	projectToPurge := "projectToPurge"
+	projects := []string{}
+	resp, err := s.StoreTeamWithProjects(ctx, name, description, projects)
+	assert.NoError(t, err, "failed to store team")
+	assert.ElementsMatch(t, projects, resp.Projects)
+
+	err = s.PurgeProject(ctx, projectToPurge)
+	assert.NoError(t, err, "failed to purge project")
+
+	purgeCheck, err := s.GetTeamByName(ctx, name)
+	assert.NoError(t, err, "failed to get team")
+	assert.ElementsMatch(t, []string{}, purgeCheck.Projects)
+}
+
+func testPurgeProjectOnlyProjectToPurge(ctx context.Context, t *testing.T, s storage.Storage) {
+	name := "projectToPurge_only"
+	description := "Test Token Description"
+	projectToPurge := "projectToPurge"
+	projects := []string{projectToPurge}
+	resp, err := s.StoreTeamWithProjects(ctx, name, description, projects)
+	assert.NoError(t, err, "failed to store team")
+	assert.ElementsMatch(t, projects, resp.Projects)
+
+	err = s.PurgeProject(ctx, projectToPurge)
+	assert.NoError(t, err, "failed to purge project")
+
+	purgeCheck, err := s.GetTeamByName(ctx, name)
+	assert.NoError(t, err, "failed to get team")
+	assert.ElementsMatch(t, []string{}, purgeCheck.Projects)
+}
+
+func testPurgeProjectOtherProjectsExcludingOneToPurge(ctx context.Context, t *testing.T, s storage.Storage) {
+	name := "other_projects"
+	description := "Test Token Description"
+	projectToPurge := "projectToPurge"
+	projects := []string{"otherproject", "otherproject2"}
+	resp, err := s.StoreTeamWithProjects(ctx, name, description, projects)
+	assert.NoError(t, err, "failed to store team")
+	assert.ElementsMatch(t, projects, resp.Projects)
+
+	err = s.PurgeProject(ctx, projectToPurge)
+	assert.NoError(t, err, "failed to purge project")
+
+	purgeCheck, err := s.GetTeamByName(ctx, name)
+	assert.NoError(t, err, "failed to get team")
+	assert.ElementsMatch(t, projects, purgeCheck.Projects)
+}
+
+func testPurgeProjectOtherProjectsIncludingOneToPurge(ctx context.Context, t *testing.T, s storage.Storage) {
+	name := "projectToPurge_and_others"
+	description := "Test Token Description"
+	projectToPurge := "projectToPurge"
+	projects := []string{"otherproject", projectToPurge, "otherproject2"}
+	resp, err := s.StoreTeamWithProjects(ctx, name, description, projects)
+	assert.NoError(t, err, "failed to store team")
+	assert.ElementsMatch(t, projects, resp.Projects)
+
+	err = s.PurgeProject(ctx, projectToPurge)
+	assert.NoError(t, err, "failed to purge project")
+
+	purgeCheck, err := s.GetTeamByName(ctx, name)
+	assert.NoError(t, err, "failed to get team")
+	assert.ElementsMatch(t, []string{"otherproject", "otherproject2"}, purgeCheck.Projects)
+}
+
+func testPurgeProjectUniversal(ctx context.Context, t *testing.T, s storage.Storage) {
+	description := "Test Team Description"
+	projectToPurge := "projectToPurge"
+
+	name1 := "other_projects"
+	projects1 := []string{"otherproject", "otherproject2"}
+	resp1, err := s.StoreTeamWithProjects(ctx, name1, description, projects1)
+	assert.NoError(t, err, "failed to store team1")
+	assert.ElementsMatch(t, projects1, resp1.Projects)
+
+	name2 := "unassigned"
+	projects2 := []string{}
+	resp2, err := s.StoreTeamWithProjects(ctx, name2, description, projects2)
+	assert.NoError(t, err, "failed to store team2")
+	assert.ElementsMatch(t, projects2, resp2.Projects)
+
+	name3 := "projectToPurge_and_others"
+	projects3 := []string{"otherproject", projectToPurge, "otherproject2"}
+	resp3, err := s.StoreTeamWithProjects(ctx, name3, description, projects3)
+	assert.NoError(t, err, "failed to store team3")
+	assert.ElementsMatch(t, projects3, resp3.Projects)
+
+	name4 := "projectToPurge_only"
+	projects4 := []string{projectToPurge}
+	resp4, err := s.StoreTeamWithProjects(ctx, name4, description, projects4)
+	assert.NoError(t, err, "failed to store team4")
+	assert.ElementsMatch(t, projects4, resp4.Projects)
+
+	err = s.PurgeProject(ctx, projectToPurge)
+	assert.NoError(t, err, "failed to purge project")
+
+	// unchanged projects
+	purgeCheck1, err := s.GetTeamByName(ctx, name1)
+	assert.NoError(t, err)
+	assert.ElementsMatch(t, projects1, purgeCheck1.Projects)
+
+	purgeCheck2, err := s.GetTeamByName(ctx, name2)
+	assert.NoError(t, err)
+	assert.ElementsMatch(t, projects2, purgeCheck2.Projects)
+
+	// project removed
+	purgeCheck3, err := s.GetTeamByName(ctx, name3)
+	assert.NoError(t, err)
+	assert.ElementsMatch(t, []string{"otherproject", "otherproject2"}, purgeCheck3.Projects)
+
+	purgeCheck4, err := s.GetTeamByName(ctx, name4)
+	assert.NoError(t, err)
+	assert.ElementsMatch(t, []string{}, purgeCheck4.Projects)
 }
 
 func defaultValidateProjectAssignmentFunc(context.Context,

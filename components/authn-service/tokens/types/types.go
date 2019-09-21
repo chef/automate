@@ -34,6 +34,7 @@ type Storage interface {
 	GetToken(context.Context, string) (*Token, error)
 	GetTokenIDWithValue(ctx context.Context, value string) (string, error)
 	GetTokens(context.Context) ([]*Token, error)
+	PurgeProject(context.Context, string) error
 }
 
 // Resetter allows resetting the adapter to factory settings (e.g. deletes all

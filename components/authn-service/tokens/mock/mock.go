@@ -127,6 +127,22 @@ func (m *mock) DeleteToken(ctx context.Context, id string) error {
 	return nil
 }
 
+func (m *mock) PurgeProject(ctx context.Context, projectID string) error {
+	for _, tok := range m.tokens {
+		for i, v := range tok.Projects {
+			if v == projectID {
+				tok.Projects = append(tok.Projects[:i], tok.Projects[i+1:]...)
+				break
+			}
+		}
+		_, err := m.UpdateToken(ctx, tok.ID, tok.Description, tok.Active, tok.Projects)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (m *mock) UpdateToken(ctx context.Context,
 	id, description string,
 	active bool,
