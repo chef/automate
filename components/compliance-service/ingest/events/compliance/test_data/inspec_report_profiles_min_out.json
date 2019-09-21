@@ -2,6 +2,7 @@
   {
     "name": "profile1",
     "title": "Profile1 title",
+    "Full": "Profile1 title, v1.1.1",
     "profile": "profile1|d2dcf9bf37feec01b31d743fbee6965f55218f730512e21308260c840f4f6654",
     "version": "1.1.1",
     "sha256": "d2dcf9bf37feec01b31d743fbee6965f55218f730512e21308260c840f4f6654",
@@ -106,6 +107,7 @@
     "title": "",
     "profile": "profile2|9490b16f32922b284a82a36d4f111e1474fcd9b53c4689f77de7ef68a1664487",
     "version": "2.2.2",
+    "Full": ", v2.2.2",
     "sha256": "9490b16f32922b284a82a36d4f111e1474fcd9b53c4689f77de7ef68a1664487",
     "controls": [
       {

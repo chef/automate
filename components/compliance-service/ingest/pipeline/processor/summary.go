@@ -51,6 +51,7 @@ func ComplianceShared(in <-chan message.Compliance) <-chan message.Compliance {
 					SHA256:       profile.Sha256,
 					Title:        profile.Title,
 					Version:      profile.Version,
+					Full:         fmt.Sprintf("%s, v%s", profile.Title, profile.Version),
 					Status:       profileStatus,
 					ControlsSums: sum,
 				})

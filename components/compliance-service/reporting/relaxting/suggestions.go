@@ -44,6 +44,7 @@ func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, 
 		"inspec_version":        "version",
 		"control_tag_key":       "profiles.controls.string_tags.key",
 		"control_tag_value":     "profiles.controls.string_tags.values",
+		"profile_with_version":  "profiles.full",
 	}
 
 	target, ok := SUGGESTIONS_TYPES[typeParam]
@@ -59,7 +60,15 @@ func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, 
 			filters["node_name"] = []string{}
 		}
 	case "profile":
-		filters["profile_id"] = []string{}
+		{
+			filters["profile_id"] = []string{}
+			filters["profile_with_version"] = []string{}
+		}
+	case "profile_with_version":
+		{
+			filters["profile_id"] = []string{}
+			filters["profile_with_version"] = []string{}
+		}
 	default:
 		filters[typeParam] = []string{}
 	}
@@ -86,6 +95,8 @@ func (backend ES2Backend) GetSuggestions(ctx context.Context, typeParam string, 
 	suggs := make([]*reportingapi.Suggestion, 0)
 	if typeParam == "profile" {
 		suggs, err = backend.getProfileSuggestions(ctx, client, typeParam, target, text, size, filters, useSummaryIndex)
+	} else if typeParam == "profile_with_version" {
+		suggs, err = backend.getProfileWithVersionSuggestions(ctx, client, typeParam, target, text, size, filters, useSummaryIndex)
 	} else if typeParam == "control" {
 		suggs, err = backend.getControlSuggestions(ctx, client, typeParam, target, text, size, filters)
 	} else if typeParam == "control_tag_key" || typeParam == "control_tag_value" {
@@ -299,6 +310,106 @@ func (backend ES2Backend) getArrayAggSuggestions(ctx context.Context, client *el
 	}
 
 	return finalSuggs, nil
+}
+
+func (backend ES2Backend) getProfileWithVersionSuggestions(ctx context.Context,
+	client *elastic.Client, typeParam string, target string, text string, size int,
+	filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {
+	//the reason we may use summary index here is because we always throw away the current profile filter when
+	// getting a suggestion for profile.. if we didn't then we'd only ever see the filter that's in our filter!
+	esIndex, err := GetEsIndex(filters, useSummaryIndex, true)
+	if err != nil {
+		return nil, errors.Wrap(err, "getProfileSuggestions unable to get index dates")
+	}
+
+	boolQuery := backend.getFiltersQuery(filters, true)
+	lowerText := strings.ToLower(text)
+
+	var innerQuery elastic.Query
+	if len(text) >= 2 {
+		innerBoolQuery := elastic.NewBoolQuery()
+		innerBoolQuery.Must(elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("or"))
+		innerBoolQuery.Should(elastic.NewMatchQuery(fmt.Sprintf("%s.engram", target), text).Operator("and"))
+		innerBoolQuery.Should(elastic.NewTermQuery(fmt.Sprintf("%s.lower", target), lowerText).Boost(100))
+		innerBoolQuery.Should(elastic.NewPrefixQuery(fmt.Sprintf("%s.lower", target), lowerText).Boost(100))
+		innerQuery = innerBoolQuery
+	} else {
+		innerQuery = elastic.NewExistsQuery(target)
+	}
+
+	hit := elastic.NewInnerHit().Size(size)
+	boolQuery = boolQuery.Must(elastic.NewNestedQuery("profiles", innerQuery).InnerHit(hit))
+
+	searchSource := elastic.NewSearchSource().
+		Query(boolQuery).
+		FetchSource(false).
+		Size(size * 50) // Multiplying size to ensure that same profile with multiple versions is not limiting our suggestions to a lower number
+		// ^ Because we can't sort by max_score of the inner hits: https://discuss.elastic.co/t/nested-objects-hits-inner-hits-and-sorting/32565
+
+	source, err := searchSource.Source()
+	if err != nil {
+		return nil, errors.Wrap(err, "getProfileSuggestions unable to get Source")
+	}
+
+	LogQueryPartMin(esIndex, source, "getProfileSuggestions query")
+
+	searchResult, err := client.Search().
+		SearchSource(searchSource).
+		Index(esIndex).
+		FilterPath(
+			"took",
+			"hits.total",
+			"hits.hits._id",
+			"hits.hits._score",
+			"hits.hits.inner_hits.profiles.hits.hits._source.sha256",
+			"hits.hits.inner_hits.profiles.hits.hits._source.title",
+			"hits.hits.inner_hits.profiles.hits.hits._source.version",
+			"hits.hits.inner_hits.profiles.hits.hits._source.full",
+			"hits.hits.inner_hits.profiles.hits.hits._score").
+		Do(ctx)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "getProfileSuggestions search failed")
+	}
+
+	logrus.Debugf("Search query took %d milliseconds\n", searchResult.TookInMillis)
+
+	type ProfileSource struct {
+		Sha256  string `json:"sha256"`
+		Title   string `json:"title"`
+		Version string `json:"version"`
+		Full    string `json:"full"`
+	}
+
+	// Using this to avoid duplicate controls in the suggestions
+	addedProfiles := make(map[string]bool)
+
+	suggs := make([]*reportingapi.Suggestion, 0)
+	if searchResult != nil {
+		for _, hit := range searchResult.Hits.Hits {
+			if hit != nil {
+				for _, inner_hit := range hit.InnerHits {
+					if inner_hit != nil {
+						for _, hit2 := range inner_hit.Hits.Hits {
+							var c ProfileSource
+							if hit2.Source != nil {
+								err := json.Unmarshal(*hit2.Source, &c)
+								if err == nil {
+									if !addedProfiles[c.Sha256] {
+										oneSugg := reportingapi.Suggestion{Id: c.Sha256, Text: c.Full, Version: c.Version, Score: float32(*hit2.Score)}
+										suggs = append(suggs, &oneSugg)
+										addedProfiles[c.Sha256] = true
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return suggs, nil
 }
 
 func (backend ES2Backend) getProfileSuggestions(ctx context.Context, client *elastic.Client, typeParam string, target string, text string, size int, filters map[string][]string, useSummaryIndex bool) ([]*reportingapi.Suggestion, error) {

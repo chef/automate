@@ -93,8 +93,8 @@ describe('ReportingComponent', () => {
 
       const expected = [
         'chef_server', 'chef_tags', 'control', 'environment', 'node', 'organization',
-        'platform_with_version', 'policy_group', 'policy_name', 'profile', 'recipe', 'role',
-        'inspec_version'];
+        'platform_with_version', 'policy_group', 'policy_name', 'profile_with_version',
+        'recipe', 'role', 'inspec_version'];
 
       expect(expected.sort()).toEqual(availableFilterTypesNames.sort());
     });
@@ -137,7 +137,7 @@ describe('ReportingComponent', () => {
   describe('getSuggestions()', () => {
     describe('when the item has a version', () => {
       it('sets the title to text, version values to display to the user', () => {
-        const type = 'profile';
+        const type = 'profile_with_version';
         const text = 'dev';
         const reportQuery: ReportQuery = {
           endDate: moment(0).utc().startOf('day'),
@@ -146,12 +146,12 @@ describe('ReportingComponent', () => {
           filters: []
         };
         spyOn(suggestionsService, 'getSuggestions').and.returnValue(observableOf([
-          {text: 'dev sec baseline', version: '2.0'}
+          {text: 'dev sec baseline, v2.0', version: '2.0'}
         ]));
 
         component.getSuggestions(type, text, reportQuery).subscribe(values => {
           expect(values).toEqual([
-            {text: 'dev sec baseline', version: '2.0', title: 'dev sec baseline, v2.0'}
+            {text: 'dev sec baseline, v2.0', version: '2.0', title: 'dev sec baseline, v2.0'}
           ]);
         });
       });

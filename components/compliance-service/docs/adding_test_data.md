@@ -2,7 +2,7 @@
 
 from hab studio:
 
-`chef_load_compliance_scans -N20`
+`chef_load_compliance_nodes`
 
 # Adding nodes to populate the nodes and scan jobs pages
 

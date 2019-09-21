@@ -84,6 +84,7 @@ type ESInSpecSummaryProfile struct {
 	Name         string                       `json:"name"`
 	Title        string                       `json:"title"`
 	Version      string                       `json:"version"`
+	Full         string                       `json:"full"`
 	SHA256       string                       `json:"sha256"`
 	ControlsSums reporting.NodeControlSummary `json:"controls_sums"`
 }
@@ -115,6 +116,7 @@ type ESInSpecReportProfile struct {
 	Name         string                       `json:"name"`
 	Title        string                       `json:"title"`
 	Profile      string                       `json:"profile"`
+	Full         string                       `json:"full"`
 	Version      string                       `json:"version"`
 	Namespace    string                       `json:"namespace,omitempty"`
 	SHA256       string                       `json:"sha256"`

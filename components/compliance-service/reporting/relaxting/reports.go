@@ -566,6 +566,11 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
+	if len(filters["profile_with_version"]) > 0 {
+		termQuery := backend.newNestedTermQueryFromFilter("profiles.full.lower", "profiles", filters["profile_with_version"])
+		boolQuery = boolQuery.Must(termQuery)
+	}
+
 	if len(filters["node_id"]) > 0 {
 		termQuery := elastic.NewTermsQuery("node_uuid", stringArrayToInterfaceArray(filters["node_id"])...)
 		boolQuery = boolQuery.Must(termQuery)
