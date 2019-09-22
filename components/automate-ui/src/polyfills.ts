@@ -18,7 +18,7 @@
 * BROWSER POLYFILLS
 */
 
-import 'core-js/es7/array';
+import 'core-js/es/array';
 
 /** Required for the path library */
 import * as process from 'process';
@@ -27,7 +27,7 @@ import * as process from 'process';
 import 'classlist.js';  // Run `npm install --save classlist.js`.
 
 /** Evergreen browsers require these. **/
-import 'core-js/es6/reflect';
+import 'core-js/es/reflect';
 
 /**
  * Required to support Web Animations `@angular/animation`.
