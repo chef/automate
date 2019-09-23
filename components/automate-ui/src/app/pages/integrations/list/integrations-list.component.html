@@ -51,7 +51,7 @@
               <a class="link" [routerLink]="['/settings/node-integrations', manager.id]">{{ manager.name }}</a>
             </chef-td>
             <chef-td>{{ manager.type }}</chef-td>
-            <chef-td class="column-date">{{ manager.date_added | datetime:'ddd, MMMM D, YYYY [at] H:mm a' }}</chef-td>
+            <chef-td class="column-date">{{ manager.date_added | datetime:'ddd, DD MMM YYYY HH:mm:ss [UTC]' }}</chef-td>
             <chef-td>{{ manager.status }}</chef-td>
             <chef-td class="controls">
               <chef-control-menu>
