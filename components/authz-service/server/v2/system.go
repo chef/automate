@@ -145,7 +145,7 @@ func SystemPolicies() []*storage.Policy {
 					"iam:roles:" + constants.EditorRoleID,
 					"iam:roles:" + constants.ViewerRoleID,
 					"iam:roles:" + constants.IngestRoleID,
-					"iam:roles:" + constants.ProjectAdminRoleID,
+					"iam:roles:" + constants.ProjectOwnerRoleID,
 					"iam:roles:" + constants.IAMMembersViewerRoleID,
 				},
 				Projects: []string{constants.AllProjectsID},

@@ -208,7 +208,7 @@
             "iam:roles:editor",
             "iam:roles:viewer",
             "iam:roles:ingest",
-            "iam:roles:project-admin",
+            "iam:roles:project-owner",
             "iam:roles:iam-members-viewer"
           ]
         },
@@ -494,7 +494,7 @@
         "*"
       ]
     },
-    "project-admin": {
+    "project-owner": {
       "actions": [
         "infra:*",
         "compliance:*",
