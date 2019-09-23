@@ -23,7 +23,7 @@ type Client interface {
 	// @param (sortField, sortAsc, page, pageSize, filters)
 	GetServiceGroups(string, bool, int32, int32, map[string][]string) ([]*ServiceGroupDisplay, error)
 	// @param (fieldName, queryFragment)
-	GetServicesDistinctValues(string, string) ([]string, error)
+	GetServicesDistinctValues(string, string, map[string][]string) ([]string, error)
 	// @param (id)
 	ServiceGroupExists(string) (string, bool)
 	// @param (filters)
