@@ -4,7 +4,7 @@
 #
 
 module "cd_infrastructure" {
-  source      = "git@github.com:chef/es-terraform.git//modules/cd_common_infrastructure"
+  source      = "https://github.com/chef/es-terraform.git//modules/cd_common_infrastructure"
   environment = "${var.environment}"
 }
 

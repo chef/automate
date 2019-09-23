@@ -4,7 +4,7 @@
 # This S3-hosted website is a quick dashboard that can be used to quickly see the available instances.
 
 module "dashboard" {
-  source    = "git@github.com:chef/es-terraform.git//modules/cd_s3_website"
+  source    = "https://github.com/chef/es-terraform.git//modules/cd_s3_website"
   subdomain = "a2-${var.dns_suffix}"
 
   # Metadata
@@ -32,7 +32,7 @@ resource "null_resource" "dashboard_deploy" {
 # Use to host the chef-ui-library documentation
 
 module "ui_library_website" {
-  source    = "git@github.com:chef/es-terraform.git//modules/cd_s3_website"
+  source    = "https://github.com/chef/es-terraform.git//modules/cd_s3_website"
   subdomain = "ui-library"
 
   # Metadata
@@ -49,7 +49,7 @@ module "ui_library_website" {
 # Use to host code coverage reports for master
 
 module "a2_code_coverage_website" {
-  source    = "git@github.com:chef/es-terraform.git//modules/cd_s3_website"
+  source    = "https://github.com/chef/es-terraform.git//modules/cd_s3_website"
   subdomain = "a2-code-coverage"
 
   # Metadata
