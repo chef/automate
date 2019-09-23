@@ -1,5 +1,5 @@
 module "cd_infrastructure" {
-  source      = "git@github.com:chef/es-terraform.git//modules/cd_common_infrastructure"
+  source      = "https://github.com/chef/es-terraform.git//modules/cd_common_infrastructure"
   environment = "delivered"
 }
 
@@ -17,7 +17,7 @@ data "external" "latest_hab_pkg" {
 }
 
 module "automate_www_site_hugo" {
-  source    = "git@github.com:chef/es-terraform.git//modules/cd_hab_hugo_static_site"
+  source    = "https://github.com/chef/es-terraform.git//modules/cd_hab_hugo_static_site"
   subdomain = "a2-docs-${var.dns_suffix}"
 
   pkg_ident   = "${data.external.latest_hab_pkg.result.pkg_ident}"

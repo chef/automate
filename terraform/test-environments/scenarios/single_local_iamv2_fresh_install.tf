@@ -3,7 +3,7 @@
 #
 
 module "single_local_iamv2_fresh_install" {
-  source = "git@github.com:chef/es-terraform.git//modules/cd_instance_v2"
+  source = "https://github.com/chef/es-terraform.git//modules/cd_instance_v2"
 
   # DNS components ( a2-iamv2-local-fresh-install-{{channel}}.cd.chef.co )
   subdomain        = "a2-iamv2-local-fresh-install"
