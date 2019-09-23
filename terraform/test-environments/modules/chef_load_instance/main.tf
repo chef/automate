@@ -28,7 +28,7 @@ data "template_file" "chef_load_toml" {
 }
 
 module "chef_load_cd_base" {
-  source = "https://github.com/chef/es-terraform.git//modules/cd_base"
+  source = "github.com/chef/es-terraform//modules/cd_base"
 
   instance_count = "${var.instance_count}"
   instance_id    = "${var.instance_id}"
