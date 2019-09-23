@@ -3,10 +3,7 @@ import { itFlaky } from '../../constants';
 describe('user management', () => {
   before(() => {
     cy.adminLogin('/settings/users').then(() => {
-
-      // clean up leftover users in case of previous test failures
-      const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
-      cy.cleanupUsersByNamePrefix(admin.id_token, 'cypress test user ');
+      cy.cleanupUsersByNamePrefix('cypress test user ');
     });
   });
 

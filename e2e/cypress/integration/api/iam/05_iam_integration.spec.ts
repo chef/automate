@@ -25,7 +25,7 @@ describeIfIAMV2p1('assigning projects', () => {
       adminIdToken = JSON.parse(<string>localStorage.getItem('chef-automate-user')).id_token;
 
       // TODO cleanup everything in resources + projects
-      cy.cleanupV2IAMObjectsByIDPrefixes(adminIdToken, cypressPrefix, objectsToCleanUp);
+      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
 
       for (const id of [unauthorizedProjectId, authorizedProject1, authorizedProject2]) {
         cy.request({
@@ -83,7 +83,7 @@ describeIfIAMV2p1('assigning projects', () => {
   });
 
   after(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(adminIdToken, cypressPrefix, objectsToCleanUp);
+    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
   });
 
   // iterate over iam resources

@@ -107,57 +107,24 @@ Cypress.Commands.add('restoreStorage', () => {
   }
 });
 
-Cypress.Commands.add('generateAdminToken', (idToken: string) => {
-  const adminTokenObj = {
-    id: 'cypress-api-test-admin-token',
-    name: 'cypress-api-test-admin-token'
-  };
-
-  // cleanup token from previous test
-  cy.request({
-    auth: { bearer: idToken },
-    method: 'DELETE',
-    url: '/apis/iam/v2beta/tokens/cypress-api-test-admin-token',
-    failOnStatusCode: false
-  });
-
-  cy.request({
-    auth: { bearer: idToken },
-    method: 'POST',
-    url: '/apis/iam/v2beta/tokens',
-    body: adminTokenObj
-  }).then((response: Cypress.ObjectLike) => {
-    Cypress.env('adminTokenValue', response.body.token.value);
-  });
-  cy.request({
-    auth: { bearer: idToken },
-    method: 'POST',
-    url: '/apis/iam/v2beta/policies/administrator-access/members:add',
-    body: {
-      members: [`token:${adminTokenObj.id}`]
-    }
-  });
-});
-
 Cypress.Commands.add('cleanupV2IAMObjectsByIDPrefixes',
-  (idToken: string, idPrefix: string, iamObjects: string[]) => {
+  (idPrefix: string, iamObjects: string[]) => {
 
   iamObjects.forEach((iamObject) => {
-    cleanupV2IAMObjectByIDPrefix(idToken, idPrefix, iamObject);
+    cleanupV2IAMObjectByIDPrefix(idPrefix, iamObject);
   });
 });
 
-function cleanupV2IAMObjectByIDPrefix(
-  idToken: string, idPrefix: string, iamObject: string): void {
+function cleanupV2IAMObjectByIDPrefix(idPrefix: string, iamObject: string): void {
   cy.request({
-    auth: { bearer: idToken },
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
     method: 'GET',
     url: `/apis/iam/v2beta/${iamObject}`
   }).then((resp) => {
     for (const object of resp.body[iamObject]) {
       if (object.id.startsWith(idPrefix)) {
         cy.request({
-          auth: { bearer: idToken },
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'DELETE',
           url: `/apis/iam/v2beta/${iamObject}/${object.id}`
         }).then((deleteResp) => {
@@ -168,9 +135,9 @@ function cleanupV2IAMObjectByIDPrefix(
   });
 }
 
-Cypress.Commands.add('cleanupUsersByNamePrefix', (idToken: string, namePrefix: string) => {
+Cypress.Commands.add('cleanupUsersByNamePrefix', (namePrefix: string) => {
   cy.request({
-    auth: { bearer: idToken },
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
     method: 'GET',
     url: '/api/v0/auth/users',
     failOnStatusCode: false
@@ -179,7 +146,7 @@ Cypress.Commands.add('cleanupUsersByNamePrefix', (idToken: string, namePrefix: s
     for (const user of body.users) {
       if (user.name.startsWith(namePrefix)) {
         cy.request({
-          auth: { bearer: idToken },
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'DELETE',
           url: `/api/v0/auth/users/${user.username}`,
           failOnStatusCode: false
@@ -189,9 +156,9 @@ Cypress.Commands.add('cleanupUsersByNamePrefix', (idToken: string, namePrefix: s
   });
 });
 
-Cypress.Commands.add('cleanupTeamsByDescriptionPrefix', (idToken: string, namePrefix: string) => {
+Cypress.Commands.add('cleanupTeamsByDescriptionPrefix', (namePrefix: string) => {
   cy.request({
-    auth: { bearer: idToken },
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
     method: 'GET',
     url: '/api/v0/auth/teams',
     failOnStatusCode: false
@@ -200,7 +167,7 @@ Cypress.Commands.add('cleanupTeamsByDescriptionPrefix', (idToken: string, namePr
     for (const team of body.teams) {
       if (team.description.startsWith(namePrefix)) {
         cy.request({
-          auth: { bearer: idToken },
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'DELETE',
           url: `/api/v0/auth/teams/${team.id}`,
           failOnStatusCode: false

@@ -4845,9 +4845,7 @@
     },
     "normal": {
       "tags": [
-        "chefdk",
-        "slave",
-        "tester"
+        "chefdk"
       ],
       "omnibus": {
         "build_user": "jenkins",

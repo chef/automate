@@ -10,7 +10,7 @@ describeIfIAMV2p1('project management', () => {
   // only need this for input values upon which later test assertions depend
   // ref: https://github.com/cypress-io/cypress/issues/534
   const typeDelay = 50;
-  let adminToken = '';
+  let adminIdToken = '';
   const now = Cypress.moment().format('MMDDYYhhmm');
   const cypressPrefix = 'cypress-test';
   const projectID = `${cypressPrefix}-project1-${now}`;
@@ -22,8 +22,8 @@ describeIfIAMV2p1('project management', () => {
   before(() => {
     cy.adminLogin('/settings/projects').then(() => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
-      adminToken = admin.id_token;
-      cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['projects']);
+      adminIdToken = admin.id_token;
+      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
         // Set the projects filter to all projects
         cy.applyProjectsFilter([]);
     });
@@ -38,7 +38,7 @@ describeIfIAMV2p1('project management', () => {
   });
 
   after(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['projects']);
+    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
   });
 
   it('has a disabled button when there are no rules', () => {
@@ -48,7 +48,7 @@ describeIfIAMV2p1('project management', () => {
 
   it('displays a list of projects', () => {
     cy.request({
-      auth: { bearer: adminToken },
+      auth: { bearer: adminIdToken },
       method: 'GET',
       url: '/apis/iam/v2beta/projects'
     }).then((response) => {
@@ -229,7 +229,7 @@ describeIfIAMV2p1('project management', () => {
     // so now we can check if there are other projects or not.
     cy.get('chef-notification.info').contains(`Deleted project ${projectID}`);
     cy.request({
-      auth: { bearer: adminToken },
+      auth: { bearer: adminIdToken },
       method: 'GET',
       url: '/apis/iam/v2beta/projects'
     }).then((response) => {
@@ -246,7 +246,7 @@ describeIfIAMV2p1('project management', () => {
 
   // these tests are currently interdependent so mark as flaky until the above isn't
   itFlaky('can create a project with a custom ID', () => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['projects']);
+    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
 
     cy.get('[data-cy=create-project]').contains('Create Project').click();
     cy.get('app-project-list chef-modal').should('have.class', 'visible');

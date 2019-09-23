@@ -8,20 +8,20 @@ describe('team add users', () => {
   const descriptionForTeam = cypressPrefix + ' team ' + now;
   const nameForTeam = 'testing-team-' + now;
   let teamID = '';
-  let adminToken = '';
+  let adminIdToken = '';
   let teamUIRouteIdentifier = '';
 
   before(() => {
     cy.adminLogin('/settings/teams').then(() => {
       // clean up leftover teams in case of previous test failures
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
-      adminToken = admin.id_token;
-      cy.cleanupUsersByNamePrefix(adminToken, cypressPrefix);
-      cy.cleanupTeamsByDescriptionPrefix(adminToken, cypressPrefix);
+      adminIdToken = admin.id_token;
+      cy.cleanupUsersByNamePrefix(cypressPrefix);
+      cy.cleanupTeamsByDescriptionPrefix(cypressPrefix);
 
       // create custom user and team
       cy.request({
-        auth: { bearer: adminToken },
+        auth: { bearer: adminIdToken },
         method: 'POST',
         url: '/api/v0/auth/users',
         body: {
@@ -32,7 +32,7 @@ describe('team add users', () => {
       });
 
       cy.request({
-        auth: { bearer: adminToken },
+        auth: { bearer: adminIdToken },
         method: 'POST',
         url: '/api/v0/auth/teams',
         body: {
@@ -73,8 +73,8 @@ describe('team add users', () => {
   });
 
   after(() => {
-    cy.cleanupUsersByNamePrefix(adminToken, cypressPrefix);
-    cy.cleanupTeamsByDescriptionPrefix(adminToken, cypressPrefix);
+    cy.cleanupUsersByNamePrefix(cypressPrefix);
+    cy.cleanupTeamsByDescriptionPrefix(cypressPrefix);
   });
 
   it('when the x is clicked, it returns to the team details page', () => {
@@ -115,12 +115,12 @@ describe('team add users', () => {
 
     // remove user from team
     cy.request({
-      auth: { bearer: adminToken },
+      auth: { bearer: adminIdToken },
       method: 'GET',
       url: `/api/v0/auth/users/${usernameForUser}`
     }).then((resp) => {
       cy.request({
-        auth: { bearer: adminToken },
+        auth: { bearer: adminIdToken },
         method: 'PUT',
         url: `/api/v0/auth/teams/${teamID}/users`,
         body: {

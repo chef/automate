@@ -1,16 +1,9 @@
-import { describeIfIAMV2p1 } from '../../constants';
+import { describeIfIAMV2p1, adminApiToken } from '../../constants';
 
 describe('roles API', () => {
     const cypressPrefix = 'test-roles-api';
-    let adminIdToken = '';
     let nonAdminToken = '';
     const nonAdminTokenID = `${cypressPrefix}-nonadmin-token`;
-    before(() => {
-        cy.adminLogin('/').then(() => {
-            adminIdToken = JSON.parse(
-                <string>localStorage.getItem('chef-automate-user')).id_token;
-        });
-    });
 
     describeIfIAMV2p1('project assignment enforcement', () => {
         const project1 = {
@@ -26,11 +19,11 @@ describe('roles API', () => {
         const roleID = `${cypressPrefix}-role1`;
 
         before(() => {
-            cy.cleanupV2IAMObjectsByIDPrefixes(adminIdToken, cypressPrefix,
+            cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix,
                 ['projects', 'roles', 'policies', 'tokens']);
             for (const project of [project1, project2]) {
                 cy.request({
-                    auth: { bearer: adminIdToken },
+                    headers: { 'api-token': adminApiToken },
                     method: 'POST',
                     url: '/apis/iam/v2beta/projects',
                     body: project
@@ -38,7 +31,7 @@ describe('roles API', () => {
             }
 
             cy.request({
-                auth: { bearer: adminIdToken },
+                headers: { 'api-token': adminApiToken },
                 method: 'POST',
                 url: '/apis/iam/v2beta/tokens',
                 body: {
@@ -51,7 +44,7 @@ describe('roles API', () => {
             });
 
             cy.request({
-                auth: { bearer: adminIdToken },
+                headers: { 'api-token': adminApiToken },
                 method: 'POST',
                 url: '/apis/iam/v2beta/policies',
                 body: {
@@ -76,18 +69,18 @@ describe('roles API', () => {
         });
 
         after(() => {
-            cy.cleanupV2IAMObjectsByIDPrefixes(adminIdToken, cypressPrefix,
+            cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix,
                 ['projects', 'roles', 'policies', 'tokens']);
         });
 
         afterEach(() => {
-            cy.cleanupV2IAMObjectsByIDPrefixes(adminIdToken, cypressPrefix, ['roles']);
+            cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['roles']);
         });
 
         describe('POST /apis/iam/v2beta/roles', () => {
             it('admin can create a new role with no projects', () => {
                 cy.request({
-                    auth: { bearer: adminIdToken },
+                    headers: { 'api-token': adminApiToken },
                     method: 'POST',
                     url: '/apis/iam/v2beta/roles',
                     body: {
@@ -103,7 +96,7 @@ describe('roles API', () => {
 
             it('admin can create a new role with multiple projects', () => {
                 cy.request({
-                    auth: { bearer: adminIdToken },
+                    headers: { 'api-token': adminApiToken },
                     method: 'POST',
                     url: '/apis/iam/v2beta/roles',
                     body: {
@@ -120,7 +113,7 @@ describe('roles API', () => {
             it('admin gets a 404 when it attempts to create ' +
                'a role with a project that does not exist', () => {
                 cy.request({
-                    auth: { bearer: adminIdToken },
+                    headers: { 'api-token': adminApiToken },
                     method: 'POST',
                     url: '/apis/iam/v2beta/roles',
                     failOnStatusCode: false,
@@ -209,7 +202,7 @@ describe('roles API', () => {
         describe('PUT /apis/iam/v2beta/roles', () => {
             it('admin can update a role with no projects to have projects', () => {
                 cy.request({
-                    auth: { bearer: adminIdToken },
+                    headers: { 'api-token': adminApiToken },
                     method: 'POST',
                     url: '/apis/iam/v2beta/roles',
                     body: {
@@ -223,7 +216,7 @@ describe('roles API', () => {
                 });
 
                 cy.request({
-                    auth: { bearer: adminIdToken },
+                    headers: { 'api-token': adminApiToken },
                     method: 'PUT',
                     url: `/apis/iam/v2beta/roles/${roleID}`,
                     body: {
@@ -238,7 +231,7 @@ describe('roles API', () => {
 
             it('admin can update a role with projects to have no projects', () => {
                 cy.request({
-                    auth: { bearer: adminIdToken },
+                    headers: { 'api-token': adminApiToken },
                     method: 'POST',
                     url: '/apis/iam/v2beta/roles',
                     body: {
@@ -252,7 +245,7 @@ describe('roles API', () => {
                 });
 
                 cy.request({
-                    auth: { bearer: adminIdToken },
+                    headers: { 'api-token': adminApiToken },
                     method: 'PUT',
                     url: `/apis/iam/v2beta/roles/${roleID}`,
                     body: {
@@ -267,7 +260,7 @@ describe('roles API', () => {
 
             it('admin cannot update a role to have projects that do not exist', () => {
                 cy.request({
-                    auth: { bearer: adminIdToken },
+                    headers: { 'api-token': adminApiToken },
                     method: 'POST',
                     url: '/apis/iam/v2beta/roles',
                     body: {
@@ -281,7 +274,7 @@ describe('roles API', () => {
                 });
 
                 cy.request({
-                    auth: { bearer: adminIdToken },
+                    headers: { 'api-token': adminApiToken },
                     method: 'PUT',
                     url: `/apis/iam/v2beta/roles/${roleID}`,
                     failOnStatusCode: false,
@@ -298,7 +291,7 @@ describe('roles API', () => {
             it('non-admin with project1 assignment access can update ' +
             'a role with no projects to have project1', () => {
                 cy.request({
-                    auth: { bearer: adminIdToken },
+                    headers: { 'api-token': adminApiToken },
                     method: 'POST',
                     url: '/apis/iam/v2beta/roles',
                     body: {
@@ -328,7 +321,7 @@ describe('roles API', () => {
             it('non-admin with project1 assignment access can update ' +
             'a role to remove project1', () => {
                 cy.request({
-                    auth: { bearer: adminIdToken },
+                    headers: { 'api-token': adminApiToken },
                     method: 'POST',
                     url: '/apis/iam/v2beta/roles',
                     body: {
@@ -358,7 +351,7 @@ describe('roles API', () => {
             it('non-admin with project1 assignment access gets a 404 ' +
             'when updating a role to have non-existent roles', () => {
                 cy.request({
-                    auth: { bearer: adminIdToken },
+                    headers: { 'api-token': adminApiToken },
                     method: 'POST',
                     url: '/apis/iam/v2beta/roles',
                     body: {
@@ -389,7 +382,7 @@ describe('roles API', () => {
             it('non-admin with project1 assignment access cannot update ' +
             'a role with no projects to have other projects', () => {
                 cy.request({
-                    auth: { bearer: adminIdToken },
+                    headers: { 'api-token': adminApiToken },
                     method: 'POST',
                     url: '/apis/iam/v2beta/roles',
                     body: {
@@ -420,7 +413,7 @@ describe('roles API', () => {
             it('non-admin with project1 assignment access cannot update ' +
             'a role to remove other projects', () => {
                 cy.request({
-                    auth: { bearer: adminIdToken },
+                    headers: { 'api-token': adminApiToken },
                     method: 'POST',
                     url: '/apis/iam/v2beta/roles',
                     body: {
