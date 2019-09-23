@@ -21,7 +21,7 @@ export class CredentialsListRowComponent {
   }
 
   getLastModified(lastModifiedDate): string {
-    return moment(lastModifiedDate).format('MMMM Do YYYY');
+    return moment(lastModifiedDate).format('ddd, DD MMM YYYY HH: mm:ss [UTC]');
   }
 
   public startCredentialDelete(): void {
