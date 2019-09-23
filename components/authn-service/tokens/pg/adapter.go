@@ -8,9 +8,11 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
+	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
 	tutil "github.com/chef/automate/components/authn-service/tokens/util"
 	"github.com/chef/automate/lib/grpc/auth_context"
+	"github.com/chef/automate/lib/projectassignment"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
 
@@ -69,6 +71,16 @@ func (a *adapter) insertToken(ctx context.Context,
 	if projects == nil {
 		projects = []string{}
 	}
+	if len(projects) > 0 {
+		_, err := a.validator.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
+			Subjects:   auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+			ProjectIds: projects,
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	err := a.db.QueryRowContext(ctx,
 		`INSERT INTO chef_authn_tokens(id, description, value, active, project_ids, created, updated)
 		VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
@@ -83,7 +95,13 @@ func (a *adapter) insertToken(ctx context.Context,
 }
 
 func (a *adapter) UpdateToken(ctx context.Context,
-	id, description string, active bool, projects []string) (*tokens.Token, error) {
+	id, description string, active bool, updatedProjects []string) (*tokens.Token, error) {
+
+	tx, err := a.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, processSQLError(err, "get projects transaction")
+	}
+
 	projectsFilter, err := ProjectsListFromContext(ctx)
 	if err != nil {
 		return nil, processSQLError(err, "get projects filter for tokens")
@@ -91,28 +109,54 @@ func (a *adapter) UpdateToken(ctx context.Context,
 	t := tokens.Token{}
 
 	// ensure we do not pass null projects to db
-	if projects == nil {
-		projects = []string{}
+	if updatedProjects == nil {
+		updatedProjects = []string{}
 	}
+
+	var originalProjects []string
 	var row *sql.Row
+	err = tx.QueryRowContext(ctx,
+		`SELECT project_ids FROM chef_authn_tokens
+		WHERE id=$1 AND projects_match(project_ids, $2::TEXT[])
+		FOR UPDATE;`,
+		id, pq.Array(projectsFilter)).Scan(pq.Array(&originalProjects))
+	if err != nil {
+		return nil, processSQLError(err, "fetch projects for update")
+	}
+
+	projectDiff := projectassignment.CalculateProjectDiff(originalProjects, updatedProjects)
+	if len(projectDiff) != 0 {
+		_, err := a.validator.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
+			Subjects:   auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+			ProjectIds: projectDiff,
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	if description != "" {
-		row = a.db.QueryRowContext(ctx,
+		row = tx.QueryRowContext(ctx,
 			`UPDATE chef_authn_tokens cat
 			SET active=$2, description=$3, project_ids=$4, updated=NOW() 
 			WHERE id=$1 AND projects_match(cat.project_ids, $5::TEXT[])
 			RETURNING id, description, value, active, project_ids, created, updated`,
-			id, active, description, pq.Array(projects), pq.Array(projectsFilter))
+			id, active, description, pq.Array(updatedProjects), pq.Array(projectsFilter))
 	} else {
-		row = a.db.QueryRowContext(ctx,
+		row = tx.QueryRowContext(ctx,
 			`UPDATE chef_authn_tokens cat
 			SET active=$2, project_ids=$3, updated=NOW()
 			WHERE id=$1 AND projects_match(cat.project_ids, $4::TEXT[])
 			RETURNING id, description, value, active, project_ids, created, updated`,
-			id, active, pq.Array(projects), pq.Array(projectsFilter))
+			id, active, pq.Array(updatedProjects), pq.Array(projectsFilter))
 	}
 	err = row.Scan(
 		&t.ID, &t.Description, &t.Value, &t.Active, pq.Array(&t.Projects), &t.Created, &t.Updated)
 	if err != nil {
+		return nil, processSQLError(err, "update token")
+	}
+
+	if err := tx.Commit(); err != nil {
 		return nil, processSQLError(err, "update token")
 	}
 	return &t, nil

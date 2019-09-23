@@ -12,6 +12,6 @@ import (
 
 type Config struct{}
 
-func (*Config) Open(_ *certs.ServiceCerts, _ *zap.Logger) (tokens.Storage, error) {
+func (*Config) Open(_ *certs.ServiceCerts, _ *zap.Logger, _ tokens.ProjectValidator) (tokens.Storage, error) {
 	return nil, errors.New("mock storage not included in production build")
 }

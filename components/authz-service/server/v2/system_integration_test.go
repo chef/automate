@@ -8,9 +8,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/codes"
 
 	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/authz-service/testhelpers"
+	"github.com/chef/automate/lib/grpc/grpctest"
 )
 
 // In these tests, we assert that our default policies are in place, and do
@@ -57,6 +59,139 @@ func TestIntegrationSystemPolicies(t *testing.T) {
 	}
 }
 
+// bug: this test passes contingent on the above test being run.
+// issue seems to be related to context metadata
+func TestIntegrationValidateProjectAssignment(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	ts := setupWithOPAV2p1(t)
+	defer ts.Shutdown(t, ctx)
+	cl := ts.Authz
+
+	user := "user:local:alice"
+	authorizedProjectId := "authorized-project"
+	unauthorizedProjectId := "project-not-authorized"
+	unauthorizedProjectId2 := "project-not-authorized-2"
+	notFoundProjectId := "not-found"
+
+	_, err := ts.Projects.CreateProject(ctx, &api_v2.CreateProjectReq{
+		Id:   authorizedProjectId,
+		Name: "Project Authorized",
+	})
+	require.NoError(t, err)
+
+	_, err = ts.Projects.CreateProject(ctx, &api_v2.CreateProjectReq{
+		Id:   unauthorizedProjectId,
+		Name: "Project Unauthorized",
+	})
+	require.NoError(t, err)
+
+	_, err = ts.Projects.CreateProject(ctx, &api_v2.CreateProjectReq{
+		Id:   unauthorizedProjectId2,
+		Name: "Project Unauthorized 2",
+	})
+	require.NoError(t, err)
+
+	statement := api_v2.Statement{
+		Effect:    api_v2.Statement_ALLOW,
+		Resources: []string{"*"},
+		Actions:   []string{"iam:projects:assign"},
+		Projects:  []string{authorizedProjectId},
+	}
+	req := api_v2.CreatePolicyReq{
+		Id:         "policy-2",
+		Name:       "my favorite policy",
+		Members:    []string{user},
+		Statements: []*api_v2.Statement{&statement},
+	}
+	_, err = ts.Policy.CreatePolicy(ctx, &req)
+	require.NoError(t, err)
+
+	// force sync refresh to load new policies
+	err = ts.PolicyRefresher.Refresh(ctx)
+	require.NoError(t, err)
+
+	// if any projects are non-existed, NotFound is returned.
+	// avoids a potentially expensive authz call.
+	cases := map[string]func(*testing.T){
+		"when passed one unauthorized project": func(t *testing.T) {
+			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
+				Subjects:   []string{user},
+				ProjectIds: []string{unauthorizedProjectId},
+			})
+			grpctest.AssertCode(t, codes.PermissionDenied, err)
+			assert.Contains(t, err.Error(), unauthorizedProjectId)
+		},
+		"when passed one non-existent project": func(t *testing.T) {
+			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
+				Subjects:   []string{user},
+				ProjectIds: []string{notFoundProjectId},
+			})
+			grpctest.AssertCode(t, codes.NotFound, err)
+			assert.Contains(t, err.Error(), notFoundProjectId)
+		},
+		"when passed two non-existent projects and one unauthorized": func(t *testing.T) {
+			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
+				Subjects:   []string{user},
+				ProjectIds: []string{notFoundProjectId, "also-not-found"},
+			})
+			grpctest.AssertCode(t, codes.NotFound, err)
+			assert.Contains(t, err.Error(), notFoundProjectId, "also-not-found")
+			assert.NotContains(t, err.Error(), unauthorizedProjectId)
+		},
+		"when passed one authorized and one non-existent project": func(t *testing.T) {
+			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
+				Subjects:   []string{user},
+				ProjectIds: []string{authorizedProjectId, notFoundProjectId},
+			})
+			grpctest.AssertCode(t, codes.NotFound, err)
+			assert.Contains(t, err.Error(), notFoundProjectId)
+			assert.NotContains(t, err.Error(), authorizedProjectId)
+		},
+		"when passed one unauthorized project and one non-existent project": func(t *testing.T) {
+			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
+				Subjects:   []string{user},
+				ProjectIds: []string{unauthorizedProjectId, notFoundProjectId},
+			})
+			grpctest.AssertCode(t, codes.NotFound, err)
+			assert.Contains(t, err.Error(), notFoundProjectId)
+			assert.NotContains(t, err.Error(), unauthorizedProjectId)
+		},
+		"when passed one unauthorized project and one authorized project": func(t *testing.T) {
+			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
+				Subjects:   []string{user},
+				ProjectIds: []string{unauthorizedProjectId, authorizedProjectId},
+			})
+			grpctest.AssertCode(t, codes.PermissionDenied, err)
+			assert.Contains(t, err.Error(), unauthorizedProjectId)
+			assert.NotContains(t, err.Error(), authorizedProjectId)
+		},
+		"when passed two unauthorized projects and one authorized project": func(t *testing.T) {
+			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
+				Subjects:   []string{user},
+				ProjectIds: []string{unauthorizedProjectId, authorizedProjectId},
+			})
+			grpctest.AssertCode(t, codes.PermissionDenied, err)
+			assert.Contains(t, err.Error(), unauthorizedProjectId, unauthorizedProjectId2)
+			assert.NotContains(t, err.Error(), authorizedProjectId)
+		},
+		"when passed one authorized project": func(t *testing.T) {
+			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
+				Subjects:   []string{user},
+				ProjectIds: []string{authorizedProjectId},
+			})
+			assert.NoError(t, err)
+		},
+	}
+
+	for desc, test := range cases {
+		t.Run(desc, test)
+	}
+	ts.TestDB.Flush(t)
+}
+
+// bug: this test passes contingent on the first test being run
+// issue seems to be related to context metadata
 func TestIntegrationFilterAuthorizedProjectsWithSystemPolicies(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

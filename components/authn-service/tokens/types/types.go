@@ -5,7 +5,9 @@ import (
 	"time"
 
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
 
+	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/lib/tls/certs"
 )
 
@@ -43,9 +45,14 @@ type Resetter interface {
 	Reset(context.Context) error
 }
 
+// ProjectValidator is a more limited interface for authz-service
+type ProjectValidator interface {
+	ValidateProjectAssignment(context.Context, *authz_v2.ValidateProjectAssignmentReq, ...grpc.CallOption) (*authz_v2.ValidateProjectAssignmentResp, error)
+}
+
 // TokenConfig is a configuration that can open a storage adapter
 type TokenConfig interface {
-	Open(*certs.ServiceCerts, *zap.Logger) (Storage, error)
+	Open(*certs.ServiceCerts, *zap.Logger, ProjectValidator) (Storage, error)
 }
 
 // NotFoundError is the error returned when the token wasn't found, to discern this

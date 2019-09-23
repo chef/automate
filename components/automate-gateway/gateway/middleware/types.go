@@ -11,12 +11,6 @@ type AuthorizationInterceptor interface {
 	StreamServerInterceptor() grpc.StreamServerInterceptor
 }
 
-// AuthContextReader is used to signal that a domain-services is interested in
-// the middelware's auth context.
-type AuthContextReader interface {
-	AuthContextRead()
-}
-
 type DeploymentCertAuthOnly interface {
 	MustUseDeploymentCertAuth()
 }

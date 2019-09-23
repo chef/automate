@@ -151,18 +151,11 @@ func (a *authInterceptor) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 			return nil, err
 		}
 
-		// TODO (tc): We will need the subjects as well now for project assignment
-		// permission checks. Should we just always inject now?
-		//
-		// This lets services opt-in if they want the entire auth context injected.
-		// However, every domain service will need the projects eventually, so we'll
-		// at least always inject project metadata.
-		if _, ok := info.Server.(AuthContextReader); ok {
-			log.Debugf("injecting auth context for method %q to downstream", info.FullMethod)
-			ctx = auth_context.NewOutgoingContext(ctx)
-		} else {
-			ctx = auth_context.NewOutgoingProjectsContext(ctx)
-		}
+		// pass on all auth metadata to domain services
+		// services can use that metadata in authz-related decisions
+		// like allowing project assignment
+		log.Debugf("injecting auth context for method %q to downstream", info.FullMethod)
+		ctx = auth_context.NewOutgoingContext(ctx)
 
 		return handler(ctx, req)
 	}

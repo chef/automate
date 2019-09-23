@@ -27,7 +27,8 @@ type mock struct {
 }
 
 // Open initializes the mock adapter
-func (cfg *Config) Open(_ *certs.ServiceCerts, logger *zap.Logger) (tokens.Storage, error) {
+func (cfg *Config) Open(_ *certs.ServiceCerts, logger *zap.Logger,
+	_ tokens.ProjectValidator) (tokens.Storage, error) {
 	return &mock{tokens: cfg.Tokens}, nil
 }
 

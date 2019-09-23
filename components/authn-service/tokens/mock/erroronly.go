@@ -22,7 +22,7 @@ type state struct {
 }
 
 // Open is for instantiating the error-only mock adapter
-func (cfg *ErrorOnlyConfig) Open(_ *certs.ServiceCerts, logger *zap.Logger) (tokens.Storage, error) {
+func (cfg *ErrorOnlyConfig) Open(_ *certs.ServiceCerts, logger *zap.Logger, _ tokens.ProjectValidator) (tokens.Storage, error) {
 	return &state{err: errors.New(cfg.Msg)}, nil
 }
 
