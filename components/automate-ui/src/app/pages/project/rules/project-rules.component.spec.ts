@@ -254,5 +254,19 @@ describe('ProjectRulesComponent', () => {
       component.addCondition();
       expect(component.showDelete()).toBeTruthy();
     });
+
+    it('should show "Save Rule" Button by default', () => {
+      const element = fixture.nativeElement;
+      const confirmBtnText = element.querySelector('chef-page').getAttribute('confirm-btn-text');
+      expect(confirmBtnText).toEqual('Save Rule');
+    });
+
+    it('should show "Saving Rules" Button when saving', () => {
+      component.saving = true;
+      fixture.detectChanges();
+      const element = fixture.nativeElement;
+      const confirmBtnText = element.querySelector('chef-page').getAttribute('confirm-btn-text');
+      expect(confirmBtnText).toEqual('Saving Rule...');
+    });
   });
 });
