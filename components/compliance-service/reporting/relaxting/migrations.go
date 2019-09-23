@@ -60,9 +60,7 @@ func BulkInsertComplianceSummaryDocs(client *elastic.Client, ctx context.Context
 	}
 	// Bulk add the summary documents to the compliance timeseries index using the specified report id as document id
 	bulkRequest := client.Bulk()
-	//logrus.Infof("!!! BulkInsertComplianceSummaryDocs in with len(docsArray) = %d", len(docsArray))
 	for _, doc := range docsArray {
-		//logrus.Infof("!!! => inserting in index %s, mapping %s, _id %s", index, mappings.DocType, doc.ReportID)
 		bulkRequest = bulkRequest.Add(elastic.NewBulkIndexRequest().Index(index).Type(mappings.DocType).Id(doc.ReportID).Doc(doc))
 	}
 	approxBytes := bulkRequest.EstimatedSizeInBytes()

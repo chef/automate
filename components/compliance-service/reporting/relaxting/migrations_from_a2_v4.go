@@ -11,10 +11,17 @@ import (
 const (
 	a2V4IndexPrefix    = "comp-4-"
 	a2V4SumIndexPrefix = a2V4IndexPrefix + "s-"
+	profileFullScript  = `
+		for (int i = 0; i < ctx._source.profiles.length; ++i) {
+			ctx._source.profiles[i].full = ctx._source.profiles[i].title + ', v' + ctx._source.profiles[i].version;
+		}
+	`
 )
 
-// This migration allows report and summary indexes' platform.full field to have
-// wildcard matching and suggestions
+// Migration adds
+// * updates the platform.full field to have wildcard matching and suggestions
+// * creates a new profiles.full field with wildcard matching and suggestions
+
 type A2V4ElasticSearchIndices struct {
 	backend *ES2Backend
 }
@@ -36,14 +43,14 @@ func (migratable A2V4ElasticSearchIndices) migrateTimeSeries(dateToMigrate time.
 
 	src := fmt.Sprintf("%ss-%s", a2V4IndexPrefix, dateToMigrateAsString)
 	dest := fmt.Sprintf("%s%s", CompDailySumIndexPrefix, dateToMigrateAsString)
-	_, err := migratable.backend.reindex(src, dest, noScript, "_doc")
+	_, err := migratable.backend.reindex(src, dest, profileFullScript, "_doc")
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("%s unable to reindex %s", src, myName))
 	}
 
 	src = fmt.Sprintf("%sr-%s", a2V4IndexPrefix, dateToMigrateAsString)
 	dest = fmt.Sprintf("%s%s", CompDailyRepIndexPrefix, dateToMigrateAsString)
-	_, err = migratable.backend.reindex(src, dest, noScript, "_doc")
+	_, err = migratable.backend.reindex(src, dest, profileFullScript, "_doc")
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("%s unable to reindex %s", src, myName))
 	}
