@@ -766,7 +766,7 @@ steps:
       - /tmp/compliance.log
     env:
       TEST: "64_A2V4_migration_spec.rb"
-      A2V3_DATA: true
+      A2V4_DATA: true
       ES_VER: 6
       LANG: en_US.UTF-8
     timeout_in_minutes: 20
