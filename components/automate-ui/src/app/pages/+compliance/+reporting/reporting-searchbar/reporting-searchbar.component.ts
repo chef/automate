@@ -14,6 +14,9 @@ import {
   debounceTime, switchMap, distinctUntilChanged
 } from 'rxjs/operators';
 import { FilterC } from '../types';
+import {
+  ReportQueryService
+} from '../../shared/reporting';
 
 @Component({
   selector: 'app-reporting-searchbar',
@@ -51,7 +54,7 @@ export class ReportingSearchbarComponent implements OnInit {
   inputText = '';
   delayForNoSuggestions = false;
 
-  constructor(private renderer: Renderer2) {
+  constructor(public reportQuery: ReportQueryService, private renderer: Renderer2) {
     // This is needed because focus is lost when clicking items.
     this.suggestionsVisibleStream.pipe(
       // wait 0.2 seconds after each lost and gain focus
@@ -71,9 +74,7 @@ export class ReportingSearchbarComponent implements OnInit {
       // ignore new term if same as previous term
       distinctUntilChanged()
     ).subscribe((c: any) => {
-      if (c.text && c.text.length > 0) {
-        this.suggestValues.emit({ detail: c});
-      }
+      this.suggestValues.emit({ detail: c});
       this.isLoadingSuggestions = true;
       setTimeout(() => {
         this.isLoadingSuggestions = false;
@@ -308,22 +309,27 @@ export class ReportingSearchbarComponent implements OnInit {
     setTimeout(() => this.renderer.selectRootElement('#valInput').focus(), 10);
   }
 
-  valueClick(value: string, event: Event) {
+  valueClick(value: any, event: Event) {
     const type = this.selectedType;
-    this.ClearAll();
-    this.filterAdded.emit({
-      detail: {
-        type: type,
-        value: value
-      }
-    });
-
     event.stopPropagation();
-    this.showKeyInput();
-    this.inputText = '';
-    this.keyInput.nativeElement.value = '';
-    setTimeout(() => { this.renderer.selectRootElement('#keyInput').focus(); }, 10);
-    this.suggestionsVisibleStream.next(false);
+    this.suggestionsVisible = false;
+    if (type.name === 'control_tag_key') {
+      this.onControlTagKeyValueClick(value);
+    } else {
+      this.ClearAll();
+      this.filterAdded.emit({
+        detail: {
+          type: type,
+          value: value
+        }
+      });
+
+      this.showKeyInput();
+      this.inputText = '';
+      this.keyInput.nativeElement.value = '';
+      setTimeout(() => { this.renderer.selectRootElement('#keyInput').focus(); }, 10);
+      this.suggestionsVisibleStream.next(false);
+    }
   }
 
   onKeyChange(e) {
@@ -356,12 +362,10 @@ export class ReportingSearchbarComponent implements OnInit {
     const type = this.selectedType.name;
     const text = e.target.value;
     this.clearSuggestions();
-    if (text.length > 0) {
-      this.requestForSuggestions({
-        text: text,
-        type: type
-      });
-    }
+    this.requestForSuggestions({
+      text: text,
+      type: type
+    });
     this.suggestionsVisibleStream.next(true);
   }
 
@@ -432,7 +436,10 @@ export class ReportingSearchbarComponent implements OnInit {
   }
 
   requestForSuggestions(c: any): void {
-    this.suggestionSearchTermDebounce.next(c);
+    if (c.type) {
+      c.type = this.formatType(c.type);
+      this.suggestionSearchTermDebounce.next(c);
+    }
   }
 
   // hide value input and show key input
@@ -446,4 +453,30 @@ export class ReportingSearchbarComponent implements OnInit {
     this.keyInputVisible = false;
     this.valInputVisible = true;
   }
+
+  formatType(type: any) {
+    // format the type value when control tag key is selected.
+    return type.search('control_tag:') === 0 ? 'control_tag_value' : type;
+  }
+
+  // When value is clicked for the control tag key
+  onControlTagKeyValueClick(value: any) {
+    const reportQuery = this.reportQuery.getReportQuery();
+    const type = this.selectedType;
+    type.name = `control_tag:${value.text}`;
+    type.title = `Control Tag | ${value.text}`;
+    type.placeholder = 'Enter Control Tag Values...';
+    reportQuery.filters.push({
+      type: type,
+      value: {text: undefined }
+    });
+    this.reportQuery.setState(reportQuery);
+    this.clearSuggestions();
+    this.requestForSuggestions({
+      type: 'control_tag_value',
+      text: ''
+    });
+    this.suggestionsVisibleStream.next(true);
+  }
+
 }
