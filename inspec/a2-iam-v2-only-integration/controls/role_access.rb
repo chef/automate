@@ -456,7 +456,7 @@ control 'iam-v2-roles-1' do
           end
 
           [EDITOR_USERNAME, PROJECT_OWNER_USERNAME].each do |user|
-            it "#{method} #{url} does not return 403 for editor user" do
+            it "#{method} #{url} does not return 403 for editor" do
               expect(
                 automate_api_request(
                   "/api/v0/license/#{url}",
@@ -481,7 +481,7 @@ control 'iam-v2-roles-1' do
       }.each do |method, urls|
         urls.each do |url|
           [ EDITOR_USERNAME, VIEWER_USERNAME ].each do |user|
-            it "#{method} #{url} returns 403 for #{user} user" do
+            it "#{method} #{url} returns 403 for #{user}" do
               expect(
                 automate_api_request(url,
                   http_method: method,
@@ -663,7 +663,7 @@ control 'iam-v2-roles-1' do
       }.each do |method, urls|
         urls.each do |url|
           [ EDITOR_USERNAME, VIEWER_USERNAME, PROJECT_OWNER_USERNAME].each do |user|
-            it "#{method} #{url} returns 403 for #{user} user" do
+            it "#{method} #{url} returns 403 for #{user}" do
               expect(
                 automate_api_request(
                   "/apis/iam/v2beta/#{url}",
