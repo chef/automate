@@ -70,3 +70,4 @@
 - [`68_add_status_to_projects.up.sql`](68_add_status_to_projects.up.sql)
 - [`69_add_status_to_get_project.up.sql`](69_add_status_to_get_project.up.sql)
 - [`70_fix_status_for_list_projects.up.sql`](70_fix_status_for_list_projects.up.sql)
+- [`71_sync_query_projects_with_query_project.up.sql`](71_sync_query_projects_with_query_project.up.sql)
