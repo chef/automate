@@ -69,7 +69,8 @@ describe('LicenseLockoutComponent', () => {
       expect(component.licenseExpired).toBeFalsy();
       expect(component.fetchStatusInternalError).toBeFalsy();
       // Note using moment formatting so this unit test will still pass outside the US!
-      expect(component.expirationDate).toEqual(futureDate.format('l'));
+      expect(component.expirationDate).toEqual(futureDate
+                                      .format('ddd, DD MMM YYYY HH:mm:ss [UTC]'));
     });
 
     // this test is failing in wallaby with "Expression has changed after it was checked"
