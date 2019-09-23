@@ -66,11 +66,19 @@ func newCerealCmd() *cobra.Command {
 
 	cancelWorkflowInstancesCmd := &cobra.Command{
 		Use:   "cancel workflow_name instance_name",
-		Short: "cancel the workflow instances",
+		Short: "cancel the workflow instance",
 		Args:  cobra.ExactArgs(2),
-		RunE:  runCerealCancelWorkflowInstances,
+		RunE:  runCerealCancelWorkflowInstance,
 	}
 	workflowCmd.AddCommand(cancelWorkflowInstancesCmd)
+
+	killWorkflowInstancesCmd := &cobra.Command{
+		Use:   "kill workflow_name instance_name",
+		Short: "kill the workflow instance",
+		Args:  cobra.ExactArgs(2),
+		RunE:  runCerealKillWorkflowInstance,
+	}
+	workflowCmd.AddCommand(killWorkflowInstancesCmd)
 
 	schedulesCmd := &cobra.Command{
 		Use:   "schedule",
@@ -129,12 +137,20 @@ func runCerealListWorkflowInstances(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func runCerealCancelWorkflowInstances(cmd *cobra.Command, args []string) error {
+func runCerealCancelWorkflowInstance(cmd *cobra.Command, args []string) error {
 	b := getCerealBackend()
 	if err := b.Init(); err != nil {
 		return err
 	}
 	return b.CancelWorkflow(context.Background(), args[1], args[0])
+}
+
+func runCerealKillWorkflowInstance(cmd *cobra.Command, args []string) error {
+	b := getCerealBackend()
+	if err := b.Init(); err != nil {
+		return err
+	}
+	return b.KillWorkflow(context.Background(), args[1], args[0])
 }
 
 func runCerealListSchedules(cmd *cobra.Command, args []string) error {

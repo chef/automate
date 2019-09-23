@@ -323,6 +323,29 @@ func (s *CerealService) CancelWorkflow(ctx context.Context, req *cereal.CancelWo
 	return &cereal.CancelWorkflowResponse{}, nil
 }
 
+func (s *CerealService) KillWorkflow(ctx context.Context, req *cereal.KillWorkflowRequest) (*cereal.KillWorkflowResponse, error) {
+	logctx := logrus.WithFields(logrus.Fields{
+		"id":            generateRequestID(),
+		"method":        "KillWorkflow",
+		"domain":        req.Domain,
+		"workflow_name": req.WorkflowName,
+		"instance_name": req.InstanceName,
+	})
+	if err := validateDomain(req.Domain); err != nil {
+		return nil, err
+	}
+	logctx.Info("kill workflow")
+	err := s.backend.KillWorkflow(ctx, req.InstanceName, namespace(req.Domain, req.WorkflowName))
+	if err != nil {
+		logctx.WithError(err).Error("failed to cancel workflow")
+		if err == libcereal.ErrWorkflowInstanceNotFound {
+			return nil, status.Error(codes.NotFound, err.Error())
+		}
+		return nil, err
+	}
+	return &cereal.KillWorkflowResponse{}, nil
+}
+
 func readDeqTaskReqMsg(ctx context.Context, s cereal.Cereal_DequeueTaskServer) (*cereal.DequeueTaskRequest, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()

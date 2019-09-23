@@ -37,6 +37,7 @@ const (
 	enqueueWorkflowQuery  = `SELECT cereal_enqueue_workflow($1, $2, $3)`
 	dequeueWorkflowQuery  = `SELECT * FROM cereal_dequeue_workflow(VARIADIC $1)`
 	cancelWorkflowQuery   = `SELECT cereal_cancel_workflow($1, $2)`
+	killWorkflowQuery     = `SELECT cereal_kill_workflow($1, $2, $3)`
 	completeWorkflowQuery = `SELECT cereal_complete_workflow($1, $2)`
 	failWorkflowQuery     = `SELECT cereal_fail_workflow($1, $2)`
 	continueWorkflowQuery = `SELECT cereal_continue_workflow($1, $2, $3, $4, $5)`
@@ -762,6 +763,22 @@ func (pg *PostgresBackend) CancelWorkflow(ctx context.Context, instanceName stri
 
 	if err := row.Scan(&updated); err != nil {
 		return errors.Wrap(err, "failed to cancel workflow")
+	}
+
+	if !updated.Bool {
+		return cereal.ErrWorkflowInstanceNotFound
+	}
+
+	return nil
+}
+
+func (pg *PostgresBackend) KillWorkflow(ctx context.Context, instanceName string, workflowName string) error {
+	row := pg.db.QueryRowContext(ctx, killWorkflowQuery, instanceName, workflowName, "killed")
+
+	var updated sql.NullBool
+
+	if err := row.Scan(&updated); err != nil {
+		return errors.Wrap(err, "failed to kill workflow")
 	}
 
 	if !updated.Bool {
