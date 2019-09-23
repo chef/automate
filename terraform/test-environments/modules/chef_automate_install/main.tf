@@ -44,7 +44,7 @@ data "template_file" "install_chef_automate_cli" {
 }
 
 module "chef_baseline" {
-  source = "https://github.com/chef/es-terraform.git//modules/cd_base"
+  source = "github.com/chef/es-terraform//modules/cd_base"
 
   instance_id   = "${var.instance_id}"
   instance_fqdn = "${var.instance_fqdn}"
