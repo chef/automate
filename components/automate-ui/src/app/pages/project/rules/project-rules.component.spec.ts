@@ -3,7 +3,6 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
-import { DebugElement } from '@angular/core';
 
 import { using } from 'app/testing/spec-helpers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
@@ -256,16 +255,18 @@ describe('ProjectRulesComponent', () => {
       expect(component.showDelete()).toBeTruthy();
     });
 
-    fit('should show "Save Rule" Button by default', () => {
-      const componentDebug: DebugElement = fixture.debugElement.nativeElement;
-      const confirmButton = componentDebug.querySelector('#right-buttons button:first-child');
-      expect(confirmButton).toContain('Save Rule');
+    it('should show "Save Rule" Button by default', () => {
+      const element = fixture.nativeElement;
+      const confirmBtnText = element.querySelector('chef-page').getAttribute('confirm-btn-text');
+      expect(confirmBtnText).toEqual('Save Rule');
     });
 
-    fit('should show "Saving Rules" Button when saving', () => {
-      const componentDebug: DebugElement = fixture.debugElement.nativeElement;
-      const confirmButton = componentDebug.querySelector('#right-buttons button:first-child');
-      expect(confirmButton).toContain('Saving Rule...');
+    it('should show "Saving Rules" Button when saving', () => {
+      component.saving = true;
+      fixture.detectChanges();
+      const element = fixture.nativeElement;
+      const confirmBtnText = element.querySelector('chef-page').getAttribute('confirm-btn-text');
+      expect(confirmBtnText).toEqual('Saving Rule...');
     });
   });
 });
