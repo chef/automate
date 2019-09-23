@@ -471,9 +471,16 @@ func (c *AutomateConfig) RedactedCopy() (*AutomateConfig, error) {
 	return copy, nil
 }
 
-// Redact removes sensitive values or stuff we just don't want users to see
+// Redact removes sensitive or deprecated values from the configuration
 func (c *AutomateConfig) Redact() {
+	// sensitive
 	c.Deployment.V1.Svc.AdminUser = nil
+
+	// deprecated
+	c.Compliance.V1.Sys.Retention = nil
+	c.EventFeedService.V1.Sys.Service.PurgeEventFeedAfterDays = nil
+	c.Ingest.V1.Sys.Service.PurgeActionsAfterDays = nil
+	c.Ingest.V1.Sys.Service.PurgeConvergeHistoryAfterDays = nil
 }
 
 // MarshalToTOMLFile marshals the AutomateConfig to a TOML representation and

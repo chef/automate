@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/chef/automate/api/config/compliance"
 	es "github.com/chef/automate/api/config/elasticsearch"
 	config "github.com/chef/automate/api/config/shared"
 	"github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config/api/a2conf"
@@ -328,6 +329,23 @@ func TestCorrectlyAnnotated(t *testing.T) {
 			assert.Fail(t, "service is not correctly annotated", "%s is not correctly annotated", f.Name)
 		}
 	}
+}
+
+func TestDeprecatedRedaction(t *testing.T) {
+	cfg := NewAutomateConfig()
+	cfg.Compliance.V1.Sys.Retention = &compliance.ConfigRequest_V1_System_Retention{
+		ComplianceReportDays: w.Int32(1),
+	}
+	cfg.EventFeedService.V1.Sys.Service.PurgeEventFeedAfterDays = w.Int32(2)
+	cfg.Ingest.V1.Sys.Service.PurgeActionsAfterDays = w.Int32(3)
+	cfg.Ingest.V1.Sys.Service.PurgeConvergeHistoryAfterDays = w.Int32(4)
+
+	cfg.Redact()
+
+	require.Nil(t, cfg.Compliance.V1.Sys.Retention, "compliance retention not redacted")
+	require.Nil(t, cfg.EventFeedService.V1.Sys.Service.PurgeEventFeedAfterDays, "event feed purge after days not redacted")
+	require.Nil(t, cfg.Ingest.V1.Sys.Service.PurgeActionsAfterDays, "ingest purge action after days not redacted")
+	require.Nil(t, cfg.Ingest.V1.Sys.Service.PurgeConvergeHistoryAfterDays, "purge converge history after days not redacted")
 }
 
 func validTLSCredentialForTest() *shared.FrontendTLSCredential {
