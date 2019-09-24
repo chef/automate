@@ -11,6 +11,7 @@ import {
 } from '../../../entities/managers/manager.selectors';
 import { DeleteManager } from '../../../entities/managers/manager.actions';
 import { routeParams } from '../../../route.selectors';
+import { DateTime } from '../../../helpers/datetime/datetime';
 
 @Component({
   selector: 'app-integrations',
@@ -23,6 +24,8 @@ export class IntegrationsListComponent {
   public automateManager$: Observable<Manager>;
   private sort: string;
   private order: string;
+
+  public readonly RFC2822 = DateTime.RFC2822;
 
   constructor(
     private store: Store<NgrxStateAtom>,
