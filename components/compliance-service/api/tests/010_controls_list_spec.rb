@@ -13,7 +13,7 @@ describe File.basename(__FILE__) do
     actual_data = GRPC reporting, :list_control_items, Reporting::ControlItemRequest.new(
         filters: []
     )
-    control_item_array = actual_data['control_item']
+    control_item_array = actual_data['control_items']
     assert_equal(63, control_item_array.size)
   end
 
@@ -25,7 +25,7 @@ describe File.basename(__FILE__) do
         ],
         size: 10
     )
-    control_item_array = actual_data['control_item']
+    control_item_array = actual_data['control_items']
     assert_equal('apache-01', control_item_array[0]['id'])
     assert_equal('DevSec Apache Baseline', control_item_array[0]['profile']['title'])
     assert_equal(10, control_item_array.size)
@@ -58,14 +58,7 @@ describe File.basename(__FILE__) do
                         "total" => 6
                     },
                     "failed" => {}
-                },
-                "stringTags" =>
-                    [
-                        {
-                            "key" => "scoop",
-                            "values" => ["icecream"]
-                        }
-                    ]
+                }
             },
             {
                 "id" => "apache-02",
@@ -87,17 +80,11 @@ describe File.basename(__FILE__) do
                         "total" => 1,
                         "critical" => 1
                     }
-                },
-                "stringTags" => [
-                    {
-                        "key" => "Scoops",
-                        "values" => ["ices gelato"]
-                    }
-                ]
+                }
             }
         ]
     }
-    control_item_array = actual_data['control_item']
+    control_item_array = actual_data['control_items']
     assert_equal(2, control_item_array.size)
     assert_equal_json_content(expected_data, actual_data)
   end
@@ -130,14 +117,7 @@ describe File.basename(__FILE__) do
                         "total" => 6
                     },
                     "failed" => {}
-                },
-                "stringTags" =>
-                    [
-                        {
-                            "key" => "scoop",
-                            "values" => ["icecream"]
-                        }
-                    ]
+                }
             },
             {
                 "id" => "apache-02",
@@ -156,18 +136,12 @@ describe File.basename(__FILE__) do
                         "total" => 5
                     },
                     "failed" => {}
-                },
-                "stringTags" => [
-                    {
-                        "key" => "Scoops",
-                        "values" => ["ices gelato"]
-                    }
-                ]
+                }
             }
         ]
     }
 
-    control_item_array = actual_data['control_item']
+    control_item_array = actual_data['control_items']
     assert_equal(2, control_item_array.size)
     assert_equal_json_content(expected_data, actual_data)
   end
@@ -222,30 +196,12 @@ describe File.basename(__FILE__) do
                         "total" => 2,
                         "critical" => 2
                     }
-                },
-                "stringTags" => [
-                    {
-                        "key" => "satisfies",
-                        "values" => [
-                            "NGX-1",
-                            "NGX-2"
-                        ]
-                    },
-                    {
-                        "key" => "scope",
-                        "values" => [
-                            "NginX"
-                        ]
-                    },
-                    {
-                        "key" => "web"
-                    }
-                ]
+                }
             }
         ]
     }
 
-    control_item_array = actual_data['control_item']
+    control_item_array = actual_data['control_items']
     assert_equal(2, control_item_array.size)
     assert_equal_json_content(expected_data, actual_data)
   end
@@ -280,25 +236,7 @@ describe File.basename(__FILE__) do
                         "total" => 1,
                         "critical" => 1
                     }
-                },
-                "stringTags" => [
-                    {
-                        "key" => "satisfies",
-                        "values" => [
-                            "NGX-1",
-                            "NGX-2"
-                        ]
-                    },
-                    {
-                        "key" => "scope",
-                        "values" => [
-                            "NginX"
-                        ]
-                    },
-                    {
-                        "key" => "web"
-                    }
-                ]
+                }
             },
             {
                 "id" => "os-01",
@@ -317,47 +255,11 @@ describe File.basename(__FILE__) do
                     },
                     "skipped" => {},
                     "failed" => {}
-                },
-                "stringTags" => [
-                    {
-                        "key" => "cci",
-                        "values" => [
-                            "CCI-000048"
-                        ]
-                    },
-                    {
-                        "key" => "gtitle",
-                        "values" => [
-                            "TitleVal"
-                        ]
-                    },
-                    {
-                        "key" => "satisfies",
-                        "values" => [
-                            "SRG-00006",
-                            "SRG-00007"
-                        ]
-                    },
-                    {
-                        "key" => "scope",
-                        "values" => [
-                            "apalache"
-                        ]
-                    },
-                    {
-                        "key" => "stig_id",
-                        "values" => [
-                            "RHEL-07-010050"
-                        ]
-                    },
-                    {
-                        "key" => "web"
-                    }
-                ]
+                }
             }
         ]
     }
-    control_item_array = actual_data['control_item']
+    control_item_array = actual_data['control_items']
     assert_equal(2, control_item_array.size)
     assert_equal_json_content(expected_data, actual_data)
   end
@@ -391,13 +293,7 @@ describe File.basename(__FILE__) do
                 "total"=>1
               },
               "failed" => {}
-            },
-            "stringTags" => [
-              {
-                "key" => "scoop",
-                "values" => [ "icecream" ]
-              }
-            ]
+            }
           }
         ]
       }
@@ -414,7 +310,7 @@ describe File.basename(__FILE__) do
         ],
         size: 1000
     )
-    control_item_array = actual_data['control_item']
+    control_item_array = actual_data['control_items']
     assert_equal(14, control_item_array.size)
   end
 end

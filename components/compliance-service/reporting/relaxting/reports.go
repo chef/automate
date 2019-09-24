@@ -741,15 +741,6 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 	}
 	contListItem.Profile = profileMin
 
-	//add that stringtags
-	stringTags := make([]*reportingapi.StringTag, 0)
-	if tags, found := controlBucket.Aggregations.Nested("tags"); found {
-		if keys, found := tags.Terms("key"); found && len(keys.Buckets) > 0 {
-			stringTags = backend.getStringTags(keys, stringTags)
-		}
-	}
-	contListItem.StringTags = stringTags
-
 	if endTimeResult, found := controlBucket.Aggregations.ReverseNested("end_time"); found {
 		if result, found := endTimeResult.Terms("most_recent_report"); found && len(result.Buckets) > 0 {
 			endTime := result.Buckets[0]
