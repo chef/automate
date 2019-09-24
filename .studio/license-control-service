@@ -25,13 +25,9 @@ document "remove_dev_license" <<DOC
   This removes the dev-license that is usually applied when running
   'chef-automate dev deployinate'.
 
-  It removes the license file on disk then kills the running license-control-service
-  so that it'll come back up and find its license gone.
-
   This command is meant to be used for verifying changes related to the trial
   license lockout and license apply modals.
 DOC
 function remove_dev_license {
-  install_if_missing core/procps-ng pkill
-  rm /hab/svc/license-control-service/data/license_token.jwt && pkill -f license-control-service
+  chef-automate dev psql chef_license_control_service -- -c "UPDATE licenses SET active=NULL"
 }
