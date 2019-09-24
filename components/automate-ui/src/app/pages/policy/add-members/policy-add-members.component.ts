@@ -30,6 +30,7 @@ import {
 } from 'app/entities/users/user.actions';
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
+import { ChefSorters } from 'app/helpers/auth/sorter';
 
 @Component({
   selector: 'app-policy-add-members',
@@ -252,16 +253,8 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   }
 
   membersMapAvailableToSortedToArray(): Member[] {
-    return Object.values(this.membersAvailableMap)
-      .sort(
-        (a, b) => {
-          // See https://stackoverflow.com/a/38641281 for these options
-          const opts = { numeric: true, sensitivity: 'base' };
-          // sort by displayName then by name
-          return a.displayName.localeCompare(b.displayName, undefined, opts) ||
-            a.displayName.localeCompare(b.displayName, undefined, { numeric: true }) ||
-            a.name.localeCompare(b.name, undefined, opts);
-        });
+    const sortedMembers = Object.values(this.membersAvailableMap);
+    return ChefSorters.naturalSort(sortedMembers, ['displayName', 'name']);
   }
 
   membersToAddValues(): Member[] {
