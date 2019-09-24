@@ -12,6 +12,7 @@ import {
 } from '../../../entities/managers/manager.selectors';
 import { DeleteManager } from '../../../entities/managers/manager.actions';
 import { routeParams } from '../../../route.selectors';
+import { DateTime } from '../../../helpers/datetime/datetime';
 
 @Component({
   selector: 'app-integrations',
