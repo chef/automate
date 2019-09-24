@@ -14,13 +14,29 @@ do_deploy() {
     do_deploy_default
     log_info "applying dev license"
     chef-automate license apply "$A2_LICENSE"
+    timestamp=$(date +"%m-%d-%y-%H-%M")
 
     case $IAM in
+        v1)
+            log_info "generating admin token"
+            if ! token=$(chef-automate admin-token); then
+                log_error "Non-zero exit code, output:"
+                log_error "$token"
+                return 1
+            fi
+            ;;
         v2)
             log_info "run chef-automate iam upgrade-to-v2 --skip-policy-migration"
             if ! output=$(chef-automate iam upgrade-to-v2 --skip-policy-migration); then
                 log_error "Non-zero exit code, output:"
                 log_error "$output"
+                return 1
+            fi
+
+            log_info "generating admin token"
+            if ! token=$(chef-automate iam token create "$timestamp-tok" --admin); then
+                log_error "Non-zero exit code, output:"
+                log_error "$token"
                 return 1
             fi
             ;;
@@ -31,10 +47,18 @@ do_deploy() {
                 log_error "$output"
                 return 1
             fi
+
+            log_info "generating admin token"
+            if ! token=$(chef-automate iam token create "$timestamp-tok" --admin); then
+                log_error "Non-zero exit code, output:"
+                log_error "$token"
+                return 1
+            fi
             ;;
     esac
 
     export CYPRESS_IAM_VERSION=$IAM
+    export CYPRESS_ADMIN_TOKEN=$token
 
     log_info "fixing dns resolution for '${CONTAINER_HOSTNAME}'"
     echo "127.0.0.1 ${CONTAINER_HOSTNAME}" >> /etc/hosts

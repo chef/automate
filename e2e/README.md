@@ -33,7 +33,7 @@ If your secrets become out of date, you'll likely need to re-fetch
 `sercrets-env.sh` and re-source. You might get a strange error like
 this if your secrets are out of date:
 
-```
+```bash
 InvalidCharacterError: Failed to execute 'atob' on 'Window': The string to be decoded is not correctly encoded.
 ```
 
@@ -42,6 +42,22 @@ dev or acceptance; typically start with your local box with this:
 
 ```bash
 export CYPRESS_BASE_URL=https://a2-dev.test
+```
+
+Most Cypress tests also expect the following IAM-related environment variables. Set them
+according to your targeted Automate instance's IAM version.
+
+```bash
+export CYPRESS_IAM_VERSION=v1
+export CYPRESS_ADMIN_TOKEN=`chef-automate admin-token` # or copy an admin token from the UI or CLI
+
+# or
+export CYPRESS_IAM_VERSION=v2
+export CYPRESS_ADMIN_TOKEN=`chef-automate iam token create TEST --admin` # or copy an admin token from the UI or CLI
+
+# or
+export CYPRESS_IAM_VERSION=v2.1
+export CYPRESS_ADMIN_TOKEN=`chef-automate iam token create TEST --admin` # or copy an admin token from the UI or CLI
 ```
 
 If you are developing Cypress tests, you'll want to open the Cypress
@@ -91,7 +107,7 @@ To target those specific sets of tests set that environment variable when starti
 CYPRESS_IAM_VERSION="v2.1" npm run cypress:run
 ```
 
-Possible values are `"v1.0"`, `"v2.0"`, and `"v2.1"`.
+Possible values are `"v1"`, `"v2"`, and `"v2.1"`.
 
 Your dev environment's IAM version MUST match the value of CYPRESS_IAM_VERSION for the tests to pass locally.
 
@@ -99,7 +115,7 @@ Your dev environment's IAM version MUST match the value of CYPRESS_IAM_VERSION f
 
 There are some known flaky tests we are trying to debug. By default, they do not run. If you wish to run them:
 
-```
+```bash
 CYPRESS_RUN_FLAKY=true npm run cypress:run
 ```
 

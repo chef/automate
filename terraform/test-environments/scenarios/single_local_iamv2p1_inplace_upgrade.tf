@@ -3,7 +3,7 @@
 #
 
 module "single_local_iamv2p1_inplace_upgrade" {
-  source = "git@github.com:chef/es-terraform.git//modules/cd_instance_v2"
+  source = "github.com/chef/es-terraform//modules/cd_instance_v2"
 
   # DNS components ( a2-iamv2p1-local-inplace-upgrade-{{channel}}.cd.chef.co )
   subdomain        = "a2-iamv2p1-local-inplace-upgrade"

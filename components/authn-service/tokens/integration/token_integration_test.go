@@ -17,6 +17,7 @@ import (
 
 	"github.com/chef/automate/api/interservice/authn"
 	authz "github.com/chef/automate/api/interservice/authz/common"
+	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	tokenauthn "github.com/chef/automate/components/authn-service/authenticator/tokens"
 	"github.com/chef/automate/components/authn-service/constants"
 	"github.com/chef/automate/components/authn-service/server"
@@ -102,12 +103,12 @@ func TestChefClientAuthn(t *testing.T) {
 		t.Fatalf("opening connector: %s", err)
 	}
 
-	authzClient, close := newAuthzMock(t)
+	subjectPurgeClient, authorizationClient, close := newAuthzMock(t)
 	defer close()
 
 	// start services: local mgmt REST interface, and proxy service, and
 	// authenticate endpoint
-	g := grpctest.NewServer(serv.NewGRPCServer(authzClient))
+	g := grpctest.NewServer(serv.NewGRPCServer(subjectPurgeClient, authorizationClient))
 	defer g.Close()
 
 	connFactory := secureconn.NewFactory(*serviceCerts)
@@ -134,7 +135,7 @@ func TestChefClientAuthn(t *testing.T) {
 
 			// set up a token to authenticate with
 			{
-				resp, err := tokenClient.CreateToken(ctx, &authn.CreateTokenReq{Active: true, Description: "mytoken", Projects: []string{"default"}})
+				resp, err := tokenClient.CreateToken(ctx, &authn.CreateTokenReq{Active: true, Description: "mytoken", Projects: []string{}})
 				if err != nil {
 					t.Fatalf("create token request: %s", err)
 				}
@@ -181,7 +182,7 @@ func TestChefClientAuthn(t *testing.T) {
 
 			// update active: disable token
 			{
-				_, err := tokenClient.UpdateToken(ctx, &authn.UpdateTokenReq{Id: myTokenID, Active: false, Projects: []string{"default"}})
+				_, err := tokenClient.UpdateToken(ctx, &authn.UpdateTokenReq{Id: myTokenID, Active: false, Projects: []string{}})
 				if err != nil {
 					t.Fatalf("update token: %s", err)
 				}
@@ -215,11 +216,13 @@ func TestChefClientAuthn(t *testing.T) {
 	}
 }
 
-func newAuthzMock(t *testing.T) (authz.SubjectPurgeClient, func()) {
+func newAuthzMock(t *testing.T) (authz.SubjectPurgeClient, authz_v2.AuthorizationClient, func()) {
 	t.Helper()
 	certs := helpers.LoadDevCerts(t, "authz-service")
 	connFactory := secureconn.NewFactory(*certs)
 	g := connFactory.NewServer()
+	mockV2Authz := authz_v2.NewAuthorizationServerMock()
+	mockV2Authz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
 	mockCommon := authz.NewSubjectPurgeServerMock()
 	mockCommon.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
 	authz.RegisterSubjectPurgeServer(g, mockCommon)
@@ -227,10 +230,15 @@ func newAuthzMock(t *testing.T) (authz.SubjectPurgeClient, func()) {
 	conn, err := connFactory.Dial("authz-service", authzServer.URL)
 	require.NoError(t, err)
 
-	return authz.NewSubjectPurgeClient(conn), authzServer.Close
+	return authz.NewSubjectPurgeClient(conn), authz_v2.NewAuthorizationClient(conn), authzServer.Close
 }
 
 func defaultMockPurgeFunc(context.Context,
 	*authz.PurgeSubjectFromPoliciesReq) (*authz.PurgeSubjectFromPoliciesResp, error) {
 	return &authz.PurgeSubjectFromPoliciesResp{}, nil
+}
+
+func defaultValidateProjectAssignmentFunc(context.Context,
+	*authz_v2.ValidateProjectAssignmentReq) (*authz_v2.ValidateProjectAssignmentResp, error) {
+	return &authz_v2.ValidateProjectAssignmentResp{}, nil
 }

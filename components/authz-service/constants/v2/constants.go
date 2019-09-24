@@ -37,7 +37,7 @@ const (
 	EditorRoleID           = "editor"
 	ViewerRoleID           = "viewer"
 	IngestRoleID           = "ingest"
-	ProjectAdminRoleID     = "project-admin"
+	ProjectOwnerRoleID     = "project-owner"
 	IAMMembersViewerRoleID = "iam-members-viewer"
 )
 

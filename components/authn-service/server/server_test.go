@@ -81,7 +81,7 @@ func TestFetchLocalTeamsInAuthenticate(t *testing.T) {
 	srv, serviceCerts, err := newTestServer(ctx, t, nil, authenticatorConfigs, teams.URL)
 	require.Nil(t, err)
 
-	authn := grpctest.NewServer(srv.NewGRPCServer(nil))
+	authn := grpctest.NewServer(srv.NewGRPCServer(nil, nil))
 	defer authn.Close()
 	factory := secureconn.NewFactory(*serviceCerts)
 	conn, err := factory.Dial("authn-service", authn.URL)
@@ -155,7 +155,7 @@ func TestTeamsLookupForLocalUsersInAuthenticate(t *testing.T) {
 
 	srv, serviceCerts, err := newTestServer(ctx, t, nil, authenticatorConfigs, teams.URL)
 	require.Nil(t, err)
-	authn := grpctest.NewServer(srv.NewGRPCServer(nil))
+	authn := grpctest.NewServer(srv.NewGRPCServer(nil, nil))
 	defer authn.Close()
 
 	factory := secureconn.NewFactory(*serviceCerts)
@@ -260,7 +260,7 @@ func TestNoTeamsLookupForNonLocalUsersInAuthenticate(t *testing.T) {
 
 	srv, serviceCerts, err := newTestServer(ctx, t, nil, authenticatorConfigs, teams.URL)
 	require.Nil(t, err)
-	authn := grpctest.NewServer(srv.NewGRPCServer(nil))
+	authn := grpctest.NewServer(srv.NewGRPCServer(nil, nil))
 	defer authn.Close()
 
 	factory := secureconn.NewFactory(*serviceCerts)

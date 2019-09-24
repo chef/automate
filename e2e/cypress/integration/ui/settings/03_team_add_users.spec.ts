@@ -1,4 +1,4 @@
-import { iamVersion } from '../../constants';
+import { iamVersion, itFlaky } from '../../constants';
 
 describe('team add users', () => {
   const now = Cypress.moment().format('MMDDYYhhmm');
@@ -8,20 +8,20 @@ describe('team add users', () => {
   const descriptionForTeam = cypressPrefix + ' team ' + now;
   const nameForTeam = 'testing-team-' + now;
   let teamID = '';
-  let adminToken = '';
+  let adminIdToken = '';
   let teamUIRouteIdentifier = '';
 
   before(() => {
     cy.adminLogin('/settings/teams').then(() => {
       // clean up leftover teams in case of previous test failures
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
-      adminToken = admin.id_token;
-      cy.cleanupUsersByNamePrefix(adminToken, cypressPrefix);
-      cy.cleanupTeamsByDescriptionPrefix(adminToken, cypressPrefix);
+      adminIdToken = admin.id_token;
+      cy.cleanupUsersByNamePrefix(cypressPrefix);
+      cy.cleanupTeamsByDescriptionPrefix(cypressPrefix);
 
       // create custom user and team
       cy.request({
-        auth: { bearer: adminToken },
+        auth: { bearer: adminIdToken },
         method: 'POST',
         url: '/api/v0/auth/users',
         body: {
@@ -32,7 +32,7 @@ describe('team add users', () => {
       });
 
       cy.request({
-        auth: { bearer: adminToken },
+        auth: { bearer: adminIdToken },
         method: 'POST',
         url: '/api/v0/auth/teams',
         body: {
@@ -64,6 +64,9 @@ describe('team add users', () => {
       cy.route('GET', '/api/v0/auth/users').as('getUsers');
     }
 
+    // TODO move this to the before block so it only happens once
+    // since everytime we `visit` a new url instead of navigating via nav buttons
+    // the whole app has to reload, slowing down the test and causing timeouts
     cy.visit(`/settings/teams/${teamUIRouteIdentifier}/add-users`);
     cy.wait(['@getTeam', '@getTeamUsers', '@getUsers']);
   });
@@ -73,21 +76,21 @@ describe('team add users', () => {
   });
 
   after(() => {
-    cy.cleanupUsersByNamePrefix(adminToken, cypressPrefix);
-    cy.cleanupTeamsByDescriptionPrefix(adminToken, cypressPrefix);
+    cy.cleanupUsersByNamePrefix(cypressPrefix);
+    cy.cleanupTeamsByDescriptionPrefix(cypressPrefix);
   });
 
-  it('when the x is clicked, it returns to the team details page', () => {
+  itFlaky('when the x is clicked, it returns to the team details page', () => {
     cy.get('chef-page chef-button.close-button').click();
     cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamUIRouteIdentifier}`);
   });
 
-  it('when the cancel button is clicked, it returns to the team details page', () => {
+  itFlaky('when the cancel button is clicked, it returns to the team details page', () => {
     cy.get('#page-footer #right-buttons chef-button').last().click();
     cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamUIRouteIdentifier}`);
   });
 
-  it('navigates to the team users add page', () => {
+  itFlaky('navigates to the team users add page', () => {
     cy.get('chef-page-header h1').contains(`Add Users to ${descriptionForTeam}`);
 
     cy.get('chef-tbody chef-tr').contains('chef-tr', usernameForUser)
@@ -100,7 +103,7 @@ describe('team add users', () => {
     cy.get('#page-footer #right-buttons chef-button ng-container').first().contains('Add User');
   });
 
-  it('adds a single user', () => {
+  itFlaky('adds a single user', () => {
     cy.get('chef-tbody').contains('chef-tr', usernameForUser)
       .find('chef-checkbox').click();
     cy.get('#users-selected').contains('1 user selected');
@@ -115,12 +118,12 @@ describe('team add users', () => {
 
     // remove user from team
     cy.request({
-      auth: { bearer: adminToken },
+      auth: { bearer: adminIdToken },
       method: 'GET',
       url: `/api/v0/auth/users/${usernameForUser}`
     }).then((resp) => {
       cy.request({
-        auth: { bearer: adminToken },
+        auth: { bearer: adminIdToken },
         method: 'PUT',
         url: `/api/v0/auth/teams/${teamID}/users`,
         body: {
@@ -130,7 +133,7 @@ describe('team add users', () => {
     });
   });
 
-  it('adds all users then sees empty message on attempting to add more users', () => {
+  itFlaky('adds all users then sees empty message on attempting to add more users', () => {
     // Note: we add one user, and there always is an admin user. So,
     // we don't need to care for singular texts here ("Add 1 user" etc).
     cy.get('chef-tbody').find('chef-tr').then(rows => {

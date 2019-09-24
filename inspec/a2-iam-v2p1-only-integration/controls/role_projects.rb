@@ -19,7 +19,7 @@ control 'iam-v2-projects-1' do
     "editor",
     "viewer",
     "ingest",
-    "project-admin",
+    "project-owner",
     "iam-members-viewer"
   ]
 

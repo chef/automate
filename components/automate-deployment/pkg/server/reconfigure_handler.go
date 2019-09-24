@@ -2,10 +2,12 @@ package server
 
 import (
 	"os"
+	"time"
 
-	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+
+	dc "github.com/chef/automate/api/config/deployment"
 )
 
 func (s *server) ReconfigureHandler(ch chan os.Signal, grpcServer *grpc.Server) {
@@ -24,9 +26,18 @@ func (s *server) ReconfigureHandler(ch chan os.Signal, grpcServer *grpc.Server) 
 			grpcServer.GracefulStop()
 			os.Exit(0)
 		}
-		err := s.target().UnsetDeploymentServiceReconfigurePending()
-		if err != nil {
-			logrus.Error("Failed to unset reconfigure-pending sentinel on deployment-service")
+
+		for {
+			err := s.converger.ReconfigureDone(nil)
+			if err != nil {
+				// TODO(ssd) 2019-04-19: This should
+				// be very rare (never?) but should we
+				// limit retries anyway?
+				logrus.Error("converger did not accept ReconfigureDone message, retrying in 10ms")
+				time.Sleep(10 * time.Millisecond)
+			} else {
+				break
+			}
 		}
 	}
 }

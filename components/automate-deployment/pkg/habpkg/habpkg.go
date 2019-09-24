@@ -2,6 +2,7 @@ package habpkg
 
 import (
 	"fmt"
+	"path"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -164,6 +165,13 @@ func Ident(p VersionedPackage) string {
 	}
 
 	return base
+}
+
+const defaultPkgPath = "/hab/pkgs"
+
+// PathFor returns the expected on-disk path for a given packages
+func PathFor(p VersionedPackage) string {
+	return path.Join(defaultPkgPath, Ident(p))
 }
 
 // IsFullyQualified returns true if both version and release are specified

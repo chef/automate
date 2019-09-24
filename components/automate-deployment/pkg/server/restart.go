@@ -10,7 +10,6 @@ import (
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/converge"
 	"github.com/chef/automate/components/automate-deployment/pkg/deployment"
-	"github.com/chef/automate/components/automate-deployment/pkg/depot"
 	"github.com/chef/automate/components/automate-deployment/pkg/target"
 )
 
@@ -55,14 +54,25 @@ func (s *server) restartServices() (string, error) {
 	defer s.convergeLoop.Start()
 
 	logger := newConvergeLoopLogger()
-	desiredStateStopped, servicesGoingDown := s.buildStopDesiredState()
-	err = s.converger.Converge(0, taskStop, desiredStateStopped, logger)
+	err = s.converger.StopServices(taskStop, s.target(), logger)
 	if err != nil {
 		return "", err
 	}
 
 	<-taskStop.C
 
+	// TODO(ssd) 2019-04-19: This is a bit odd to just have to
+	// know what the StopServices call is going to shut down...
+	servicesGoingDown := []string{}
+	for _, svc := range s.deployment.ExpectedServices {
+		if svc.DeploymentState == deployment.Running && svc.Name() != deploymentServiceName {
+			logrus.WithFields(logrus.Fields{
+				"name":  svc.Name(),
+				"state": svc.DeploymentState,
+			}).Info("Expecting service to be down")
+			servicesGoingDown = append(servicesGoingDown, svc.Name())
+		}
+	}
 	// Habitat operates asynchronously. As a result, services may
 	// still be up after our stop task returns. waitForDown checks
 	// the actual service state of the services.
@@ -126,31 +136,4 @@ func allDown(services []string, deployed map[string]target.DeployedService) bool
 		}
 	}
 	return true
-}
-
-func (s *server) buildStopDesiredState() (converge.DesiredState, []string) {
-	topology := make(converge.Topology)
-	topology[s.target()] = []converge.Service{
-		{
-			Name:          deploymentServiceName,
-			ConvergeState: converge.Skip(),
-		},
-	}
-
-	servicesGoingDown := []string{}
-	for _, svc := range s.deployment.ExpectedServices {
-		if svc.DeploymentState == deployment.Running && svc.Name() != deploymentServiceName {
-			logrus.WithFields(logrus.Fields{
-				"name":  svc.Name(),
-				"state": svc.DeploymentState,
-			}).Info("Expecting service to be down")
-			servicesGoingDown = append(servicesGoingDown, svc.Name())
-		}
-	}
-
-	return converge.NewDesiredState(topology,
-			converge.NewSkipSupervisorState(),
-			s.deployment.CurrentReleaseManifest.ListPackages(),
-			depot.DisabledGC),
-		servicesGoingDown
 }

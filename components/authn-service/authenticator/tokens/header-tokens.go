@@ -65,7 +65,7 @@ func NewHeaderTokenAuthenticator(headers []string, ts types.Storage, logger *zap
 func (c *HeaderTokenConfig) Open(u *url.URL, serviceCerts *certs.ServiceCerts,
 	logger *zap.Logger) (authenticator.Authenticator, error) {
 
-	ts, err := c.Storage.Config.Open(serviceCerts, logger)
+	ts, err := c.Storage.Config.Open(serviceCerts, logger, nil)
 	if err != nil {
 		return nil, err
 	}

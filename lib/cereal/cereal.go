@@ -1233,6 +1233,11 @@ func (m *Manager) CancelWorkflow(ctx context.Context, workflowName string,
 	return m.backend.CancelWorkflow(ctx, instanceName, workflowName)
 }
 
+func (m *Manager) KillWorkflow(ctx context.Context, workflowName string,
+	instanceName string) error {
+	return m.backend.KillWorkflow(ctx, instanceName, workflowName)
+}
+
 // TODO(ssd) 2019-05-17: Replace me with prometheus
 func newStatsInfo() *statsInfo {
 	return &statsInfo{

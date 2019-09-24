@@ -39,12 +39,10 @@ AWS:
 _Note: to add an ec2 integration for aws, change type from "aws-api" to "aws-ec2"_
 
 Azure:
-- turn on the integration by typing 'beta' into your browser and enabling it
 - search for 'Compliance Azure Creds' in LastPass
 - use these credentials to create your Azure integrations
 
 GCP:
-- turn on the integration by typing 'beta' into your browser and enabling it
 - search for 'GCP creds (compliance)' in LastPass
 - use these credentials to create your GCP integration
 

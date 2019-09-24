@@ -125,12 +125,33 @@ describe('ReportingComponent', () => {
   });
 
   describe('onEndDateChanged', () => {
-    it('sets date range on report query', () => {
+    it('no date set when today is selected with date object', () => {
       spyOn(router, 'navigate');
       const endDate = new Date();
       const event = {detail: endDate};
       component.onEndDateChanged(event);
-      expect(router.navigate).toHaveBeenCalled();
+      expect(router.navigate).toHaveBeenCalledWith([], {queryParams: { }});
+    });
+
+    it('no date set when today is selected with string', () => {
+      spyOn(router, 'navigate');
+      const event = {detail: moment().utc().format('YYYY-MM-DD')};
+      component.onEndDateChanged(event);
+      expect(router.navigate).toHaveBeenCalledWith([], {queryParams: { }});
+    });
+
+    it('specific string date', () => {
+      spyOn(router, 'navigate');
+      const event = {detail: '2019-10-23'};
+      component.onEndDateChanged(event);
+      expect(router.navigate).toHaveBeenCalledWith([], {queryParams: { end_time: '2019-10-23'}});
+    });
+
+    it('specific date object', () => {
+      spyOn(router, 'navigate');
+      const event = {detail: new Date('2019-10-23')};
+      component.onEndDateChanged(event);
+      expect(router.navigate).toHaveBeenCalledWith([], {queryParams: { end_time: '2019-10-23'}});
     });
   });
 

@@ -2,8 +2,11 @@ package target
 
 import (
 	"context"
+	"os"
 	"strings"
 	"time"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
 	"github.com/chef/automate/lib/platform/command"
@@ -105,6 +108,52 @@ func NewHabCmd(c command.Executor, offlineMode bool) HabCmd {
 	}
 }
 
+func devDebugOutputOnTimeout(ctx context.Context) {
+	if os.Getenv("CHEF_DEV_ENVIRONMENT") != "true" {
+		return
+	}
+
+	go func() {
+		<-ctx.Done()
+		// If Done is not yet closed, Err returns nil.
+		// If Done is closed, Err returns a non-nil error explaining why:
+		// Canceled if the context was canceled
+		// or DeadlineExceeded if the context's deadline passed.
+		// After Err returns a non-nil error, successive calls to Err return the same error.
+		err := ctx.Err()
+		switch err {
+		case context.Canceled:
+			return // this is the happy case
+		case context.DeadlineExceeded:
+			devPrintHungHabDebug()
+		case nil:
+			return // should not happen
+		default:
+			logrus.Errorf("Unknown error return from ctx.Err(): %s", err.Error())
+		}
+	}()
+}
+
+func devPrintHungHabDebug() {
+	logrus.Error("DEVELOPMENT INFO: HABITAT COMMAND TIMEOUT")
+	logrus.Error("DEVELOPMENT INFO: ps auxww")
+	err := command.Run("ps",
+		command.Args("auxww"),
+		command.Stdout(os.Stdout),
+		command.Stderr(os.Stderr))
+	if err != nil {
+		logrus.WithError(err).Error("failed to run ps during devPrintHungHabDebug")
+	}
+	logrus.Error("DEVELOPMENT INFO: free -m")
+	err = command.Run("free",
+		command.Args("-m"),
+		command.Stdout(os.Stdout),
+		command.Stderr(os.Stderr))
+	if err != nil {
+		logrus.WithError(err).Error("failed to run free during devPrintHungHabDebug")
+	}
+}
+
 // Install installs the given Installable. If the install fails an
 // error is returned.
 //
@@ -115,6 +164,7 @@ func (c *habCmd) InstallPackage(ctx context.Context, pkg habpkg.Installable, cha
 	opts := standardHabOptions()
 	ctx, cancel := context.WithTimeout(ctx, HabTimeoutInstallPackage)
 	defer cancel()
+	devDebugOutputOnTimeout(ctx)
 
 	if c.offlineMode {
 		args = append(args, "--offline")
@@ -134,6 +184,7 @@ func (c *habCmd) IsInstalled(ctx context.Context, pkg habpkg.VersionedPackage) (
 	args := command.Args("pkg", "path", habpkg.Ident(pkg))
 	ctx, cancel := context.WithTimeout(ctx, HabTimeoutIsInstalled)
 	defer cancel()
+	devDebugOutputOnTimeout(ctx)
 
 	cmdOpts := append(standardHabOptions(), command.Context(ctx), args)
 
@@ -150,6 +201,7 @@ func (c *habCmd) BinlinkPackage(ctx context.Context, pkg habpkg.VersionedPackage
 	args := command.Args("pkg", "binlink", "--force", habpkg.Ident(pkg), exe)
 	ctx, cancel := context.WithTimeout(ctx, HabTimeoutDefault)
 	defer cancel()
+	devDebugOutputOnTimeout(ctx)
 
 	cmdOpts := append(standardHabOptions(), command.Context(ctx), args)
 
@@ -164,6 +216,7 @@ func (c *habCmd) LoadService(ctx context.Context, svc habpkg.VersionedPackage, o
 
 	ctx, cancel := context.WithTimeout(ctx, HabTimeoutDefault)
 	defer cancel()
+	devDebugOutputOnTimeout(ctx)
 
 	cmdOpts := append(standardHabOptions(), command.Context(ctx), command.Args(args...))
 
@@ -174,6 +227,7 @@ func (c *habCmd) UnloadService(ctx context.Context, svc habpkg.VersionedPackage)
 	args := command.Args("svc", "unload", habpkg.ShortIdent(svc))
 	ctx, cancel := context.WithTimeout(ctx, HabTimeoutDefault)
 	defer cancel()
+	devDebugOutputOnTimeout(ctx)
 
 	cmdOpts := append(standardHabOptions(), command.Context(ctx), args)
 	output, err := c.executor.CombinedOutput("hab", cmdOpts...)
@@ -195,6 +249,7 @@ func (c *habCmd) StartService(ctx context.Context, svc habpkg.VersionedPackage) 
 	args := command.Args("svc", "start", habpkg.ShortIdent(svc))
 	ctx, cancel := context.WithTimeout(ctx, HabTimeoutDefault)
 	defer cancel()
+	devDebugOutputOnTimeout(ctx)
 
 	cmdOpts := append(standardHabOptions(), command.Context(ctx), args)
 
@@ -205,6 +260,7 @@ func (c *habCmd) StopService(ctx context.Context, svc habpkg.VersionedPackage) (
 	args := command.Args("svc", "stop", habpkg.ShortIdent(svc))
 	ctx, cancel := context.WithTimeout(ctx, HabTimeoutDefault)
 	defer cancel()
+	devDebugOutputOnTimeout(ctx)
 
 	cmdOpts := append(standardHabOptions(), command.Context(ctx), args)
 

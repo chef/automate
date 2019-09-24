@@ -27,7 +27,8 @@ type mock struct {
 }
 
 // Open initializes the mock adapter
-func (cfg *Config) Open(_ *certs.ServiceCerts, logger *zap.Logger) (tokens.Storage, error) {
+func (cfg *Config) Open(_ *certs.ServiceCerts, logger *zap.Logger,
+	_ tokens.ProjectValidator) (tokens.Storage, error) {
 	return &mock{tokens: cfg.Tokens}, nil
 }
 
@@ -123,6 +124,22 @@ func (m *mock) DeleteToken(ctx context.Context, id string) error {
 	m.tokens = newTokens
 	if !found {
 		return &tokens.NotFoundError{}
+	}
+	return nil
+}
+
+func (m *mock) PurgeProject(ctx context.Context, projectID string) error {
+	for _, tok := range m.tokens {
+		for i, v := range tok.Projects {
+			if v == projectID {
+				tok.Projects = append(tok.Projects[:i], tok.Projects[i+1:]...)
+				break
+			}
+		}
+		_, err := m.UpdateToken(ctx, tok.ID, tok.Description, tok.Active, tok.Projects)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

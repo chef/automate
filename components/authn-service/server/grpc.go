@@ -20,13 +20,14 @@ import (
 )
 
 type tokenAPI struct {
-	ts          tokens.Storage
-	authzClient authz.SubjectPurgeClient
+	ts                 tokens.Storage
+	authzSubjectClient authz.SubjectPurgeClient
+	pv                 tokens.ProjectValidator
 }
 
 // NewGRPCServer returns a server that provides our services: token
 // and authentication requests.
-func (s *Server) NewGRPCServer(authzClient authz.SubjectPurgeClient) *grpc.Server {
+func (s *Server) NewGRPCServer(authzSubjectClient authz.SubjectPurgeClient, pv tokens.ProjectValidator) *grpc.Server {
 	g := s.connFactory.NewServer(
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
@@ -35,7 +36,7 @@ func (s *Server) NewGRPCServer(authzClient authz.SubjectPurgeClient) *grpc.Serve
 			),
 		),
 	)
-	api.RegisterTokensMgmtServer(g, newTokenAPI(s.token, authzClient))
+	api.RegisterTokensMgmtServer(g, newTokenAPI(s.token, authzSubjectClient, pv))
 	health.RegisterHealthServer(g, s.health)
 	api.RegisterAuthenticationServer(g, s)
 	reflection.Register(g)
@@ -59,16 +60,21 @@ func inputValidationInterceptor() grpc.UnaryServerInterceptor {
 	}
 }
 
-func newTokenAPI(ts tokens.Storage, authzClient authz.SubjectPurgeClient) api.TokensMgmtServer {
+func newTokenAPI(ts tokens.Storage, authzSubjectClient authz.SubjectPurgeClient, pv tokens.ProjectValidator) api.TokensMgmtServer {
 	return &tokenAPI{
-		ts:          ts,
-		authzClient: authzClient,
+		ts:                 ts,
+		authzSubjectClient: authzSubjectClient,
+		pv:                 pv,
 	}
 }
 
 func (a *tokenAPI) CreateToken(ctx context.Context, req *api.CreateTokenReq) (*api.Token, error) {
 	t, err := a.ts.CreateToken(ctx, req.Id, req.Description, req.Active, req.Projects)
 	if err != nil {
+		// if the error is already a GRPC status code, return that directly.
+		if _, ok := status.FromError(err); ok {
+			return nil, err
+		}
 		if _, ok := err.(*tokens.ConflictError); ok {
 			return nil, status.Error(codes.AlreadyExists, err.Error())
 		}
@@ -82,6 +88,10 @@ func (a *tokenAPI) CreateTokenWithValue(
 	ctx context.Context, req *api.CreateTokenWithValueReq) (*api.Token, error) {
 	t, err := a.ts.CreateTokenWithValue(ctx, req.Id, req.Value, req.Description, req.Active, req.Projects)
 	if err != nil {
+		// if the error is already a GRPC status code, return that directly.
+		if _, ok := status.FromError(err); ok {
+			return nil, err
+		}
 		if _, ok := err.(*tokens.ConflictError); ok {
 			return nil, status.Error(codes.AlreadyExists, err.Error())
 		}
@@ -114,7 +124,7 @@ func (a *tokenAPI) DeleteToken(ctx context.Context, req *api.DeleteTokenReq) (*a
 	}
 
 	tokenSubject := "token:" + id
-	_, err = a.authzClient.PurgeSubjectFromPolicies(ctx, &authz.PurgeSubjectFromPoliciesReq{
+	_, err = a.authzSubjectClient.PurgeSubjectFromPolicies(ctx, &authz.PurgeSubjectFromPoliciesReq{
 		Subject: tokenSubject,
 	})
 	if err != nil {
@@ -143,6 +153,10 @@ func (a *tokenAPI) GetTokens(ctx context.Context, req *api.GetTokensReq) (*api.T
 func (a *tokenAPI) UpdateToken(ctx context.Context, req *api.UpdateTokenReq) (*api.Token, error) {
 	t, err := a.ts.UpdateToken(ctx, req.Id, req.Description, req.Active, req.Projects)
 	if err != nil {
+		// if the error is already a GRPC status code, return that directly.
+		if _, ok := status.FromError(err); ok {
+			return nil, err
+		}
 		if _, ok := errors.Cause(err).(*tokens.NotFoundError); ok {
 			return nil, status.Error(codes.NotFound, err.Error())
 		}

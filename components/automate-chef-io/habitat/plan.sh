@@ -12,9 +12,9 @@ pkg_build_deps=(
 )
 
 do_build() {
-  download_file "https://github.com/go-swagger/go-swagger/releases/download/v0.19.0/swagger_linux_amd64" \
+  download_file "https://github.com/go-swagger/go-swagger/releases/download/v0.20.1/swagger_linux_amd64" \
     "$CACHE_PATH/swagger" \
-    "9a5dd86578a93d0e829f3607e12b8e6567fd0b5dc9ad805e1097978f30e060e2"
+    "c69da2ff7a58ee05b4fc63dbb29764cb027a97e0eaae316e1d56f586188d92b3"
   chmod +x "$CACHE_PATH/swagger"
   export PATH="$PATH:$CACHE_PATH"
 

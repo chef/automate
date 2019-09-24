@@ -14,11 +14,20 @@ A new static website for Automate is based on [Hugo](https://gohugo.io), the Go-
     brew install hugo
     ```
 
-1. [Install go-swagger](https://goswagger.io/install.html). If you're using homebrew:
+1. [Install go-swagger](https://goswagger.io/install.html). The currently supported version is 0.20.1. If you're using homebrew:
 
     ```
     brew tap go-swagger/go-swagger
     brew install go-swagger
+    ```
+
+    If everything is up to date you should see output like this when running `swagger version`:
+
+    ```
+    $ swagger version
+    version: v0.20.1
+    commit: 9004771f77bedabb792a48dc846ba7fc800398a0
+
     ```
 
 ### Development

@@ -187,7 +187,7 @@ func (s *authzServer) FilterAuthorizedProjects(
 // TODO (tc) Until projects are transactionally cleaned up from all data everywhere
 // on project delete, this might fail when it shouldn't (aka the project no longer exists
 // that is being removed from some object), since the project won't be found or authorized
-// for iam:project:assign. We should make cleaning up projects on project delete from IAM
+// for iam:projects:assign. We should make cleaning up projects on project delete from IAM
 // objects throughout the system transactional.
 //
 // ValidateProjectAssignment assesses if a set of subjects is authorized to reassign a set

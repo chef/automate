@@ -3,7 +3,7 @@
 #
 
 module "performance_test_single_local_inplace_upgrade" {
-  source = "git@github.com:chef/es-terraform.git//modules/cd_instance_v2"
+  source = "github.com/chef/es-terraform//modules/cd_instance_v2"
 
   # DNS components ( a2-perf-test-single-local-inplace-upgrade-{{channel}}.cd.chef.co )
   subdomain        = "a2-perf-test-single-local-inplace-upgrade"
@@ -63,7 +63,7 @@ resource "aws_ebs_volume" "habitat_volume" {
 }
 
 module "attach_habitat_volume" {
-  source = "git@github.com:chef/es-terraform.git//modules/attach_ebs_volume"
+  source = "github.com/chef/es-terraform//modules/attach_ebs_volume"
 
   actual_device_name = "/dev/nvme1n1"
   ec2_device_name    = "/dev/xvdh"
@@ -114,7 +114,7 @@ locals {
 }
 
 module "performance_test_chef_load" {
-  source = "git@github.com:chef/es-terraform.git//modules/cd_instance_v2"
+  source = "github.com/chef/es-terraform//modules/cd_instance_v2"
 
   instance_count = "${local.performance_test_chef_load_count}"
 

@@ -128,7 +128,12 @@ func convertHealthStatusToProto(healthStatus string) applications.HealthStatus {
 func (a *ApplicationsServer) GetServicesDistinctValues(ctx context.Context,
 	request *applications.ServicesDistinctValuesReq) (*applications.ServicesDistinctValuesRes, error) {
 
-	values, err := a.storageClient.GetServicesDistinctValues(request.FieldName, request.QueryFragment)
+	filters, err := stringutils.FormatFilters(request.GetFilter())
+	if err != nil {
+		return new(applications.ServicesDistinctValuesRes), status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	values, err := a.storageClient.GetServicesDistinctValues(request.FieldName, request.QueryFragment, filters)
 	if err != nil {
 		return nil, err
 	}

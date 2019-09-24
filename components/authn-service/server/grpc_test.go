@@ -18,6 +18,7 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authn"
 	authz "github.com/chef/automate/api/interservice/authz/common"
+	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	tokenMock "github.com/chef/automate/components/authn-service/tokens/mock"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
 	"github.com/chef/automate/lib/grpc/grpctest"
@@ -86,9 +87,10 @@ func newTestGRPCServer(ctx context.Context,
 	authzServer := grpctest.NewServer(grpcAuthz)
 	authzConn, err := authzConnFactory.Dial("authz-service", authzServer.URL)
 	require.NoError(t, err)
-	commonClient := authz.NewSubjectPurgeClient(authzConn)
+	authzSubjectClient := authz.NewSubjectPurgeClient(authzConn)
+	authzV2Client := authz_v2.NewAuthorizationClient(authzConn)
 
-	authnServer := grpctest.NewServer(serv.NewGRPCServer(commonClient))
+	authnServer := grpctest.NewServer(serv.NewGRPCServer(authzSubjectClient, authzV2Client))
 
 	connFactory := secureconn.NewFactory(*serviceCerts)
 	conn, err := connFactory.Dial("authn-service", authnServer.URL)

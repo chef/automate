@@ -13,10 +13,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/authn-service/constants"
 	"github.com/chef/automate/components/authn-service/tokens/pg"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
 	"github.com/chef/automate/lib/grpc/auth_context"
+	"github.com/chef/automate/lib/grpc/grpctest"
+	"github.com/chef/automate/lib/grpc/secureconn"
+	"github.com/chef/automate/lib/tls/test/helpers"
 )
 
 func setup(t *testing.T) (tokens.Storage, *sql.DB) {
@@ -51,13 +55,29 @@ func setup(t *testing.T) (tokens.Storage, *sql.DB) {
 		t.Skipf("start pg container and set PG_URL to run")
 	}
 
-	backend, err := pgCfg.Open(nil, l)
+	authzCerts := helpers.LoadDevCerts(t, "authz-service")
+	authzConnFactory := secureconn.NewFactory(*authzCerts)
+	grpcAuthz := authzConnFactory.NewServer()
+	mockV2Authz := authz_v2.NewAuthorizationServerMock()
+	mockV2Authz.ValidateProjectAssignmentFunc = defaultValidateProjectAssignmentFunc
+	authz_v2.RegisterAuthorizationServer(grpcAuthz, mockV2Authz)
+	authzServer := grpctest.NewServer(grpcAuthz)
+	authzConn, err := authzConnFactory.Dial("authz-service", authzServer.URL)
+	require.NoError(t, err)
+	authzV2Client := authz_v2.NewAuthorizationClient(authzConn)
+
+	backend, err := pgCfg.Open(nil, l, authzV2Client)
 	require.NoError(t, err)
 
 	db := openDB(t)
 	reset(t, db)
 
 	return backend, db
+}
+
+func defaultValidateProjectAssignmentFunc(context.Context,
+	*authz_v2.ValidateProjectAssignmentReq) (*authz_v2.ValidateProjectAssignmentResp, error) {
+	return &authz_v2.ValidateProjectAssignmentResp{}, nil
 }
 
 func initializePG() (*pg.Config, error) {
@@ -470,6 +490,124 @@ func TestCreateToken(t *testing.T) {
 			assert.WithinDuration(time.Now(), tok.Created, time.Second)
 			assert.WithinDuration(time.Now(), tok.Updated, time.Second)
 			assert.Equal(project_ids, tok.Projects)
+		},
+	}
+
+	for name, test := range cases {
+		reset(t, db)
+		t.Run(name, test)
+	}
+}
+
+func TestPurgeProject(t *testing.T) {
+	ctx := context.Background()
+	store, db := setup(t)
+	assert := assert.New(t)
+	description := "Test Token Description"
+	projectToPurge := "projectToPurge"
+
+	cases := map[string]func(*testing.T){
+		"when the token is unassigned, the token remains unassigned": func(t *testing.T) {
+			id := "unassigned"
+			projects := []string{}
+			resp, err := store.CreateToken(ctx, id, description, true, projects)
+			assert.NoError(err, "failed to store token")
+			assert.ElementsMatch(projects, resp.Projects)
+
+			err = store.PurgeProject(ctx, projectToPurge)
+			assert.NoError(err, "failed to purge project")
+
+			purgeCheck, err := store.GetToken(ctx, id)
+			assert.NoError(err, "failed to get token")
+			assert.ElementsMatch([]string{}, purgeCheck.Projects)
+		},
+		"when the token only has the project to purge, the token becomes unassigned": func(t *testing.T) {
+			id := "projectToPurge_only"
+			projects := []string{projectToPurge}
+			resp, err := store.CreateToken(ctx, id, description, true, projects)
+			assert.NoError(err, "failed to store token")
+			assert.ElementsMatch(projects, resp.Projects)
+
+			err = store.PurgeProject(ctx, projectToPurge)
+			assert.NoError(err, "failed to purge project")
+
+			purgeCheck, err := store.GetToken(ctx, id)
+			assert.NoError(err, "failed to get token")
+			assert.ElementsMatch([]string{}, purgeCheck.Projects)
+		},
+		"when the token only has projects other than the one to purge, the token's projects do not change": func(t *testing.T) {
+			id := "other_projects"
+			projects := []string{"otherproject", "otherproject2"}
+			resp, err := store.CreateToken(ctx, id, description, true, projects)
+			assert.NoError(err, "failed to store token")
+			assert.ElementsMatch(projects, resp.Projects)
+
+			err = store.PurgeProject(ctx, projectToPurge)
+			assert.NoError(err, "failed to purge project")
+
+			purgeCheck, err := store.GetToken(ctx, id)
+			assert.NoError(err, "failed to get token")
+			assert.ElementsMatch(projects, purgeCheck.Projects)
+		},
+		"when the token has multiple projects including the one to purge, only that project is removed from the token": func(t *testing.T) {
+			id := "projectToPurge_and_others"
+			projects := []string{"otherproject", projectToPurge, "otherproject2"}
+			resp, err := store.CreateToken(ctx, id, description, true, projects)
+			assert.NoError(err, "failed to store token")
+			assert.ElementsMatch(projects, resp.Projects)
+
+			err = store.PurgeProject(ctx, projectToPurge)
+			assert.NoError(err, "failed to purge project")
+
+			purgeCheck, err := store.GetToken(ctx, id)
+			assert.NoError(err, "failed to get token")
+			assert.ElementsMatch([]string{"otherproject", "otherproject2"}, purgeCheck.Projects)
+		},
+		"when there are mulitple tokens, some with, some without the project to purge": func(t *testing.T) {
+			id1 := "other_projects"
+			projects1 := []string{"otherproject", "otherproject2"}
+			resp1, err := store.CreateToken(ctx, id1, description, true, projects1)
+			assert.NoError(err, "failed to store token1")
+			assert.ElementsMatch(projects1, resp1.Projects)
+
+			id2 := "unassigned"
+			projects2 := []string{}
+			resp2, err := store.CreateToken(ctx, id2, description, true, projects2)
+			assert.NoError(err, "failed to store token2")
+			assert.ElementsMatch(projects2, resp2.Projects)
+
+			id3 := "projectToPurge_and_others"
+			projects3 := []string{"otherproject", projectToPurge, "otherproject2"}
+			resp3, err := store.CreateToken(ctx, id3, description, true, projects3)
+			assert.NoError(err, "failed to store token3")
+			assert.ElementsMatch(projects3, resp3.Projects)
+
+			id4 := "projectToPurge_only"
+			projects4 := []string{projectToPurge}
+			resp4, err := store.CreateToken(ctx, id4, description, true, projects4)
+			assert.NoError(err, "failed to store token4")
+			assert.ElementsMatch(projects4, resp4.Projects)
+
+			err = store.PurgeProject(ctx, projectToPurge)
+			assert.NoError(err, "failed to purge project")
+
+			// unchanged projects
+			purgeCheck1, err := store.GetToken(ctx, id1)
+			assert.NoError(err, "failed to get token1")
+			assert.ElementsMatch(projects1, purgeCheck1.Projects)
+
+			purgeCheck2, err := store.GetToken(ctx, id2)
+			assert.NoError(err, "failed to get token2")
+			assert.ElementsMatch(projects2, purgeCheck2.Projects)
+
+			// project removed
+			purgeCheck3, err := store.GetToken(ctx, id3)
+			assert.NoError(err, "failed to get token3")
+			assert.ElementsMatch([]string{"otherproject", "otherproject2"}, purgeCheck3.Projects)
+
+			purgeCheck4, err := store.GetToken(ctx, id4)
+			assert.NoError(err, "failed to get token4")
+			assert.ElementsMatch([]string{}, purgeCheck4.Projects)
 		},
 	}
 

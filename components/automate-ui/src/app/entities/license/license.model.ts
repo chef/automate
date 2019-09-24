@@ -54,5 +54,6 @@ export interface RequestLicenseResponse {
 export function parsedExpirationDate(license: LicenseStatus): string {
   // Use short form, localized date (momentjs.com/docs/#localized-formats) to render date.
   // At the time of writing, Angular's date pipe is *not* locale-aware.
-  return moment(license.licensed_period.end).format('l');
+  // e.g., Wed, 03 Jul 2019 17:08:53 UTC
+  return moment(license.licensed_period.end).format('ddd, DD MMM YYYY HH:mm:ss [UTC]');
 }

@@ -1,7 +1,7 @@
 import { describeIfIAMV2p1, iamVersion, itFlaky } from '../../constants';
 
 describe('team details', () => {
-  let adminToken = '';
+  let adminIdToken = '';
   const now = Cypress.moment().format('MMDDYYhhmm');
   const cypressPrefix = 'test-team-details';
   const teamName = `${cypressPrefix} team ${now}`;
@@ -19,14 +19,14 @@ describe('team details', () => {
   before(() => {
     cy.adminLogin('/').then(() => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
-      adminToken = admin.id_token;
+      adminIdToken = admin.id_token;
 
-      cy.cleanupUsersByNamePrefix(adminToken, cypressPrefix);
-      cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['projects']);
-      cy.cleanupTeamsByDescriptionPrefix(adminToken, cypressPrefix);
+      cy.cleanupUsersByNamePrefix(cypressPrefix);
+      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
+      cy.cleanupTeamsByDescriptionPrefix(cypressPrefix);
 
       cy.request({
-        auth: { bearer: adminToken },
+        auth: { bearer: adminIdToken },
         method: 'POST',
         url: '/api/v0/auth/users',
         body: {
@@ -39,7 +39,7 @@ describe('team details', () => {
       });
 
       cy.request({
-        auth: { bearer: adminToken },
+        auth: { bearer: adminIdToken },
         method: 'POST',
         url: '/apis/iam/v2beta/projects',
         body: {
@@ -49,7 +49,7 @@ describe('team details', () => {
       });
 
       cy.request({
-        auth: { bearer: adminToken },
+        auth: { bearer: adminIdToken },
         method: 'POST',
         url: '/apis/iam/v2beta/projects',
         body: {
@@ -59,7 +59,7 @@ describe('team details', () => {
       });
 
       cy.request({
-        auth: { bearer: adminToken },
+        auth: { bearer: adminIdToken },
         method: 'POST',
         url: '/api/v0/auth/teams',
         body: {
@@ -76,7 +76,7 @@ describe('team details', () => {
         }
 
         cy.request({
-          auth: { bearer: adminToken },
+          auth: { bearer: adminIdToken },
           method: 'POST',
           url: `/apis/iam/v2beta/teams/${teamID}/users:add`,
           body: {
@@ -99,7 +99,7 @@ describe('team details', () => {
   });
 
   after(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(adminToken, cypressPrefix, ['projects']);
+    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
   });
 
   it('displays team details for admins team', () => {
@@ -151,7 +151,7 @@ describe('team details', () => {
     context('when the team contains a project', () => {
       beforeEach(() => {
         cy.request({
-          auth: { bearer: adminToken },
+          auth: { bearer: adminIdToken },
           method: 'PUT',
           url: `/apis/iam/v2beta/teams/${teamUIRouteIdentifier}`,
           body: {
@@ -165,7 +165,7 @@ describe('team details', () => {
 
       afterEach(() => {
         cy.request({
-          auth: { bearer: adminToken },
+          auth: { bearer: adminIdToken },
           method: 'PUT',
           url: `/apis/iam/v2beta/teams/${teamUIRouteIdentifier}`,
           body: {
