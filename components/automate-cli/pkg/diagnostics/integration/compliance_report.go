@@ -113,16 +113,13 @@ func CreateComplianceReportDiagnostic() diagnostics.Diagnostic {
 		Generate: func(tstCtx diagnostics.TestContext) error {
 			// Make sure we cover multiple days
 			now := time.Now().UTC()
-			days := []time.Time{
-				now,
-				now.AddDate(0, 0, -1),
-				now.AddDate(0, 0, -2),
-			}
+
 			save := complianceReportSave{
 				CreatedEntities: []complianceReportEntity{},
 			}
 
-			for _, day := range days {
+			for i := 0; i <= 120; i++ {
+				day := now.AddDate(0, 0, -1*i)
 				nodeUUID := uuid.Must(uuid.NewV4()).String()
 				reportUUID := uuid.Must(uuid.NewV4()).String()
 				jobUUID := uuid.Must(uuid.NewV4()).String()
