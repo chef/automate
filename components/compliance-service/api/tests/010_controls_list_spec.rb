@@ -9,15 +9,6 @@ describe File.basename(__FILE__) do
     Reporting::ReportingService;
   end
 
-  # it "no filters gets them all filter" do
-  #   assert_grpc_error("rpc error: code = InvalidArgument desc = 'control_tag' filter is required for 'control_tag_value' suggestions", 2) do
-  #     GRPC reporting, :list_control_items, Reporting::ControlItemRequest.new(
-  #       filters: []
-  #     )
-  #   end
-  #   assert_equal(36, node_id2.size)
-  # end
-
   it "no filters gets them all filter" do
     actual_data = GRPC reporting, :list_control_items, Reporting::ControlItemRequest.new(
         filters: []
