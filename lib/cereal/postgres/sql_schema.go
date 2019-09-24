@@ -375,4 +375,23 @@ COMMIT;
 ALTER TYPE cereal_workflow_instance_status ADD VALUE 'completed';
 `,
 	},
+	{
+		desc: "force kill workflow",
+		upSQL: `
+CREATE OR REPLACE FUNCTION cereal_kill_workflow(_instance_name TEXT, _workflow_name TEXT,  _error TEXT)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    w cereal_workflow_instances%rowtype;
+BEGIN
+    FOR w IN
+        SELECT id FROM cereal_workflow_instances WHERE instance_name = _instance_name AND workflow_name = _workflow_name FOR UPDATE
+    LOOP
+        PERFORM cereal_fail_workflow(w.id, _error);
+    END LOOP;
+    RETURN FOUND;
+END
+$$;`,
+	},
 }

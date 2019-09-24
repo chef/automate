@@ -11,6 +11,7 @@ type Driver interface {
 	EnqueueWorkflow(ctx context.Context, workflow *WorkflowInstance) error
 	DequeueWorkflow(ctx context.Context, workflowNames []string) (*WorkflowEvent, WorkflowCompleter, error)
 	CancelWorkflow(ctx context.Context, instanceName string, workflowName string) error
+	KillWorkflow(ctx context.Context, instanceName string, workflowName string) error
 
 	CreateWorkflowSchedule(ctx context.Context, instanceName string, workflowName string, parameters []byte, enabled bool, recurrence string, nextRunAt time.Time) error
 	ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error)

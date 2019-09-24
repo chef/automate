@@ -238,6 +238,23 @@ func (g *GrpcBackend) CancelWorkflow(ctx context.Context, instanceName string, w
 	return nil
 }
 
+func (g *GrpcBackend) KillWorkflow(ctx context.Context, instanceName string, workflowName string) error {
+	_, err := g.client.KillWorkflow(ctx, &grpccereal.KillWorkflowRequest{
+		Domain:       g.domain,
+		InstanceName: instanceName,
+		WorkflowName: workflowName,
+	})
+	if err != nil {
+		if st, ok := status.FromError(err); ok {
+			if st.Code() == codes.NotFound {
+				return cereal.ErrWorkflowInstanceNotFound
+			}
+		}
+		return err
+	}
+	return nil
+}
+
 type taskCompleter struct {
 	s        grpccereal.Cereal_DequeueTaskClient
 	ctx      context.Context
