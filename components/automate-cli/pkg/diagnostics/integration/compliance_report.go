@@ -118,7 +118,9 @@ func CreateComplianceReportDiagnostic() diagnostics.Diagnostic {
 				CreatedEntities: []complianceReportEntity{},
 			}
 
-			for i := 0; i <= 120; i++ {
+			days := tstCtx.GetOption("compliance-report.days").GetInt(3)
+
+			for i := 0; i < days; i++ {
 				day := now.AddDate(0, 0, -1*i)
 				nodeUUID := uuid.Must(uuid.NewV4()).String()
 				reportUUID := uuid.Must(uuid.NewV4()).String()
