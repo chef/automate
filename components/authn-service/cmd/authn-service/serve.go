@@ -151,7 +151,7 @@ func serve(cmd *cobra.Command, args []string) error {
 		return errors.Wrap(err, "failed to initialize server")
 	}
 
-	err = project_purge.RegisterTaskExecutors(manager, "teams", serv.Token)
+	err = project_purge.RegisterTaskExecutors(manager, "tokens", serv.TokenStorage)
 	if err != nil {
 		return errors.Wrap(err, "failed to register project purge task executor")
 	}
