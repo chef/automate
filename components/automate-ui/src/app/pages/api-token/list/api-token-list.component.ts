@@ -25,6 +25,7 @@ import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
 import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
+import { DateTime } from 'app/helpers/datetime/datetime';
 
 @Component({
   selector: 'app-api-tokens',
@@ -46,6 +47,7 @@ export class ApiTokenListComponent implements OnInit {
   public projectsEnabled$: Observable<boolean>;
   public dropdownProjects: Project[] = [];
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
+  public readonly RFC2822 = DateTime.RFC2822;
 
   constructor(
     private store: Store<NgrxStateAtom>,
