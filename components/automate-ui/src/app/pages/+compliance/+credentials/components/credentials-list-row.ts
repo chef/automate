@@ -23,10 +23,15 @@ export class CredentialsListRowComponent {
 
   getLastModified(lastModifiedDate): string {
 <<<<<<< HEAD
+<<<<<<< HEAD
     return moment(lastModifiedDate).format(DateTime.RFC2822);
 =======
     return moment(lastModifiedDate).format('ddd, DD MMM YYYY HH: mm:ss [UTC]');
 >>>>>>> Update time/date format of node credentials last modified column
+=======
+    console.log(DateTime.RFC2822);
+    return moment(lastModifiedDate).format(DateTime.RFC2822);
+>>>>>>> Exporting RFC2822 from helper file
   }
 
   public startCredentialDelete(): void {
