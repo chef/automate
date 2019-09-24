@@ -1,3 +1,3 @@
 export class DateTime {
-    public static readonly RFC2822 = 'ddd, DD MMM YYYY HH:mm:ss [UTC]';
+    public static readonly RFC2822: string = 'ddd, DD MMM YYYY HH:mm:ss [UTC]';
 }
