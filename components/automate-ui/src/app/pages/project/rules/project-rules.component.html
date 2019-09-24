@@ -52,7 +52,7 @@
           <label>
             <span class="label">Resource Type <span aria-hidden="true">*</span></span>
             <chef-select id="create-type-dropdown" ngDefaultControl formControlName="type" (change)="patchResourceValue(ruleForm, $event)">
-              <chef-option>Select Resource Type</chef-option>
+              <chef-option *ngIf="selectResourceChefOption">Select...</chef-option>
               <chef-option value='NODE'>Node</chef-option>
               <chef-option value='EVENT'>Event</chef-option>
             </chef-select>
@@ -66,7 +66,7 @@
         <div id="condition-section" *ngIf="ruleForm.get('type').value">
           <div class="label">Conditions</div>
           <small>All conditions must be true for the rule to be true.</small>
-          <chef-button secondary (click)="addCondition()">Add Condition</chef-button>
+          <chef-button primary (click)="addCondition()">Add Condition</chef-button>
 
           <div id="condition-list" formArrayName="conditions">
 
@@ -78,9 +78,9 @@
                 <label>
                   <span class="label">{{ getAttributeLabel() }}</span>
                   <chef-select ngDefaultControl formControlName="attribute" data-cy="attribute-dropdown" (change)="patchAttributeValue(ruleForm, $event, i)">
-                    <chef-option>Select {{ getAttributeLabel() }}</chef-option>
+                    <chef-option *ngIf="selectAttributeChefOption && currentRuleIndex !== i">Select...</chef-option>
                     <chef-option *ngFor="let option of attributes[ruleForm.get('type').value.toLowerCase()]; let i = index"
-                    [value]="option.key">{{ option.value }}</chef-option>
+                    value="option.key">{{ option.value }}</chef-option>
                   </chef-select>
                 </label>
                 <chef-error
@@ -92,8 +92,8 @@
                 <label>
                   <span class="label">Operator</span>
                   <chef-select ngDefaultControl formControlName="operator" data-cy="operator-dropdown" (change)="patchOperatorValue(ruleForm, $event, i)">
-                    <chef-option>Select Operator</chef-option>
-                    <chef-option *ngFor="let operator of operators" [value]="operator.key">{{ operator.value }}</chef-option>
+                      <chef-option *ngIf="selectOperatorChefOption && currentRuleIndex !== i">Select...</chef-option>
+                    <chef-option *ngFor="let operator of operators" value="operator.key">{{ operator.value }}</chef-option>
                   </chef-select>
                 </label>
                 <chef-error

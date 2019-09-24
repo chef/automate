@@ -41,6 +41,10 @@ interface KVCondition {
 export class ProjectRulesComponent implements OnInit, OnDestroy {
   public ruleId: string;
   public ruleForm: FormGroup;
+  public selectResourceChefOption: boolean = true;
+  public selectAttributeChefOption: boolean = true;
+  public selectOperatorChefOption: boolean = true;
+  public currentRuleIndex: number;
 
   // FIXME: either make properties optional in interface, or provide them on initialization:
   public project: Project = <Project>{};
@@ -155,14 +159,19 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
 
   public patchResourceValue(form, event) {
     form.controls['type'].setValue(event.target.value);
+    this.selectResourceChefOption = false;
   }
 
   public patchAttributeValue(form, event, i) {
+    this.currentRuleIndex = i;
     form.controls.conditions.controls[i].controls['attribute'].setValue(event.target.value);
+    this.selectAttributeChefOption = false;
   }
 
   public patchOperatorValue(form, event, i) {
+    this.currentRuleIndex = i;
     form.controls.conditions.controls[i].controls['operator'].setValue(event.target.value);
+    this.selectOperatorChefOption = false;
   }
 
   getHeading(): string {
@@ -193,6 +202,8 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   }
 
   addCondition(): void {
+    this.selectAttributeChefOption = true;
+    this.selectOperatorChefOption = true;
     const conditions = this.ruleForm.get('conditions') as FormArray;
     conditions.push(this.createCondition());
   }
