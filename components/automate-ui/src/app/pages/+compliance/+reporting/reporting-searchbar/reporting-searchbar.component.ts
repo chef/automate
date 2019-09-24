@@ -14,6 +14,7 @@ import {
   debounceTime, switchMap, distinctUntilChanged
 } from 'rxjs/operators';
 import { FilterC } from '../types';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-reporting-searchbar',
@@ -21,7 +22,7 @@ import { FilterC } from '../types';
   styleUrls: ['./reporting-searchbar.component.scss']
 })
 export class ReportingSearchbarComponent implements OnInit {
-  @Input() date = new Date();
+  @Input() date = moment().utc();
   @Input() filters: FilterC[] = [];
   @Input() filterTypes = [];
   @Input() filterValues = [];
@@ -45,7 +46,7 @@ export class ReportingSearchbarComponent implements OnInit {
   filtersVisible = true;
   suggestionsVisible = false;
   isLoadingSuggestions = false;
-  visibleDate;
+  visibleDate: moment.Moment;
   selectedType;
   highlightedIndex = -1;
   inputText = '';
@@ -86,7 +87,7 @@ export class ReportingSearchbarComponent implements OnInit {
 
   ngOnInit() {
     this.isLoadingSuggestions = false;
-    this.visibleDate = new Date(this.date);
+    this.visibleDate = moment.utc(this.date);
     this.filterTypesCategories = JSON.parse(JSON.stringify(this.filterTypes));
   }
 
@@ -400,13 +401,18 @@ export class ReportingSearchbarComponent implements OnInit {
     this.filterRemoved.emit({ detail: filter });
   }
 
+  // month - month with January 0 and December 11
+  // year - 4 digit year (2019)
   onMonthSelect([month, year]) {
-    this.visibleDate.setMonth(month);
-    this.visibleDate.setFullYear(year);
+    this.visibleDate.month(month);
+    this.visibleDate.year(year);
   }
 
   onDaySelect(date: string) {
-    this.visibleDate = new Date(date);
+    const m = moment.utc(date);
+    this.visibleDate.date(m.date());
+    this.visibleDate.month(m.month());
+    this.visibleDate.year(m.year());
     this.dateChanged.emit({ detail: date });
   }
 
