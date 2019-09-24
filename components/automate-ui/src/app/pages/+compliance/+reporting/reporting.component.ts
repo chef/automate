@@ -76,16 +76,16 @@ export class ReportingComponent implements OnInit, OnDestroy {
       'placeholder': 'Chef Tag'
     },
     {
-      'name': 'control',
-      'title': 'Controls',
-      'description': 'Add the title to filter this report against a control',
-      'placeholder': 'Title'
-    },
-    {
       'name': 'control_tag_key',
       'title': 'Control Tag',
       'description': '',
       'placeholder': 'Control Tag'
+    },
+    {
+      'name': 'control',
+      'title': 'Controls',
+      'description': 'Add the title to filter this report against a control',
+      'placeholder': 'Title'
     },
     {
       'name': 'environment',
