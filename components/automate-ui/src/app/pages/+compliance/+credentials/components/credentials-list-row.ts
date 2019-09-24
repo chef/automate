@@ -22,10 +22,6 @@ export class CredentialsListRowComponent {
   }
 
   getLastModified(lastModifiedDate): string {
-<<<<<<< HEAD
-=======
-    console.log(DateTime.RFC2822);
->>>>>>> Exporting RFC2822 from helper file
     return moment(lastModifiedDate).format(DateTime.RFC2822);
   }
 
