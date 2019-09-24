@@ -80,7 +80,7 @@ func NewTestFramework(t *testing.T, ctx context.Context) *TestFramework {
 	require.NoError(t, err)
 
 	projectUpdateManager := NewMockProjectUpdateManager()
-	projectsSrv, err := server.NewProjectsServer(ctx, l, pg, projectUpdateManager, polRefresher)
+	projectsSrv, err := server.NewProjectsServer(ctx, l, pg, projectUpdateManager, NewMockProjectPurger(true), polRefresher)
 	require.NoError(t, err)
 
 	authzSrv, err := server.NewPostgresAuthzServer(l, opaInstance, vSwitch, projectsSrv)
@@ -147,7 +147,7 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (
 	require.NoError(t, err, "init logger for storage")
 	projectUpdateManager := NewMockProjectUpdateManager()
 	projectsSrv, err := server.NewProjectsServer(
-		ctx, l, pg, projectUpdateManager, NewMockPolicyRefresher())
+		ctx, l, pg, projectUpdateManager, NewMockProjectPurger(true), NewMockPolicyRefresher())
 	require.NoError(t, err)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
@@ -349,4 +349,20 @@ func (*mockProjectUpdateManager) Start() error {
 
 func (*mockProjectUpdateManager) Status() (server.ProjectUpdateStatus, error) {
 	return &server.EmptyProjectUpdateStatus{}, nil
+}
+
+type mockProjectPurger struct {
+	GraveyardingComplete bool
+}
+
+func NewMockProjectPurger(gyComplete bool) *mockProjectPurger {
+	return &mockProjectPurger{GraveyardingComplete: gyComplete}
+}
+
+func (m *mockProjectPurger) GraveyardingCompleted(string) (bool, error) {
+	return m.GraveyardingComplete, nil
+}
+
+func (*mockProjectPurger) Start(string) error {
+	return nil
 }

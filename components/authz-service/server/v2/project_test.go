@@ -410,9 +410,8 @@ func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cac
 	projectUpdateManager := testhelpers.NewMockProjectUpdateManager()
 	projectsSrv, err := v2.NewProjectsServer(
 		ctx, l, mem_v2,
-		projectUpdateManager, testhelpers.NewMockPolicyRefresher())
+		projectUpdateManager, testhelpers.NewMockProjectPurger(true), testhelpers.NewMockPolicyRefresher())
 	require.NoError(t, err)
-
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
 	connFactory := secureconn.NewFactory(*serviceCerts)
 

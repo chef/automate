@@ -171,7 +171,7 @@ func serve(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return errors.Wrap(err, "could not start project update manager")
 	}
-	defer manager.Stop()
+	defer manager.Stop() // nolint: errcheck
 
 	return nil
 }

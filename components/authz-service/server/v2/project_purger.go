@@ -73,7 +73,6 @@ func NewProjectPurgerWorkflowExecutor() (*patterns.ChainWorkflowExecutor, error)
 type CerealProjectPurger struct {
 	manager        *cereal.Manager
 	workflowName   string
-	instanceName   string
 	domainServices []string
 }
 
@@ -203,7 +202,7 @@ func (s *MoveProjectToGraveyardWorkflowExecutor) OnStart(w cereal.WorkflowInstan
 		return w.Fail(err)
 	}
 
-	logrus.Warnf("STARTING MOVE PROJECT TO GRAVEYARD WIHT ID %q", params.ProjectID)
+	logrus.Warnf("STARTING MOVE PROJECT TO GRAVEYARD WITH ID %q", params.ProjectID)
 
 	if err := w.EnqueueTask(StartDeleteProjectFromGraveyardTaskName, MoveProjectToGraveyardParams{ProjectID: params.ProjectID}); err != nil {
 		logrus.WithError(err).Errorf("failed to enqueue move to graveyard task %s", StartDeleteProjectFromGraveyardTaskName)

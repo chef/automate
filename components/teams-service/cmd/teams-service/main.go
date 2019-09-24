@@ -166,7 +166,7 @@ Please pass a config file as the only argument to this command.`))
 	if err != nil {
 		fail(errors.Wrap(err, "could not start project update manager"))
 	}
-	defer manager.Stop()
+	defer manager.Stop() // nolint: errcheck
 
 	fail(server.GRPC(cfg.GRPC, service))
 }

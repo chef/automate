@@ -3177,7 +3177,8 @@ func setupV2WithMigrationState(t *testing.T,
 	require.NoError(t, err)
 
 	require.NoError(t, err)
-	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2, testhelpers.NewMockProjectUpdateManager(), testhelpers.NewMockPolicyRefresher())
+	projectsSrv, err := v2.NewProjectsServer(ctx, l, mem_v2,
+		testhelpers.NewMockProjectUpdateManager(), testhelpers.NewMockProjectPurger(true), testhelpers.NewMockPolicyRefresher())
 	require.NoError(t, err)
 
 	authzV2, err := v2.NewAuthzServer(l, authorizer, vSwitch, projectsSrv, mem_v2)
