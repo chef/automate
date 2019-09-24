@@ -3,8 +3,8 @@ package converge
 import (
 	"context"
 	"os"
+	"path"
 	"strconv"
-	"syscall"
 	"time"
 
 	"github.com/pkg/errors"
@@ -55,15 +55,13 @@ func (p *PhaseOrderedProgram) Execute(eventSink EventSink) error {
 	writer := newEventWriter(eventSink)
 	for _, phase := range p.phases {
 		err := phase.Run(writer)
-		if err != nil {
-			if err == api.ErrSelfUpgradePending {
-				logrus.Info("Deployment-service upgrade pending")
-				return err
-			}
-			if err == api.ErrSelfReconfigurePending {
-				logrus.Info("Deployment-service reconfiguration pending")
-				return err
-			}
+		switch err {
+		case nil:
+			continue
+		case api.ErrSelfUpgradePending, api.ErrSelfReconfigurePending, api.ErrRestartPending:
+			logrus.Info(err.Error())
+			return err
+		default:
 			logrus.WithError(err).WithFields(logrus.Fields{
 				"phase": phase.Name(),
 			}).Error("Phase failed")
@@ -391,17 +389,6 @@ func (phase *SelfConfigurePhase) Run(writer *eventWriter) error {
 		return nil
 	}
 
-	// We already have one reconfigure pending that hasn't been
-	// applied yet.
-	pending, err := phase.target.GetDeploymentServiceReconfigurePending()
-	if err != nil {
-		return errors.Wrap(err, "Failed to determine if deployment-service reconfiguration is already pending")
-	}
-
-	if pending {
-		return api.ErrSelfReconfigurePending
-	}
-
 	modified := false
 	writer.ConfiguringService(phase.deploymentServicePackage)
 	currentConfig, err := phase.target.GetUserToml(phase.deploymentServicePackage)
@@ -412,45 +399,13 @@ func (phase *SelfConfigurePhase) Run(writer *eventWriter) error {
 	}
 
 	if currentConfig != phase.userToml {
-		err = phase.target.SetDeploymentServiceReconfigurePending()
-		if err != nil {
-			return errors.Wrap(err, "Failed to mark deployment-service as reconfigure-pending")
-		}
-
 		err := phase.target.SetUserToml(phase.deploymentServicePackage.Name(), phase.userToml)
 		if err != nil {
-			// Rollback configuration pending marker
-			unsetErr := phase.target.UnsetDeploymentServiceReconfigurePending()
-			if unsetErr != nil {
-				logrus.WithError(err).Error("could not unset upgrade-pending configuration marker after failure to write configuration")
-			}
 			err = errors.Wrap(err, "Failed to set configuration")
 			writer.ConfiguringFailed(phase.deploymentServicePackage, err)
 			return err
 		}
 		modified = true
-		// TODO(ssd) 2018-05-15: We need this because we can't
-		// reliably determine whether Habitat is actually
-		// going to restart us. Remove when we do a DeepEqual
-		// on the config.
-		go func() {
-			time.Sleep(30 * time.Second)
-			pending, err := phase.target.GetDeploymentServiceReconfigurePending()
-			if err != nil {
-				logrus.WithError(err).Warn("Failed to determine if deployment-service is still awaiting reconfigure.")
-			}
-
-			if !pending {
-				return
-			}
-
-			logrus.Warn("Expected HUP from habitat but none received after 30 seconds, sending HUP to self")
-			myPid := os.Getpid()
-			err = syscall.Kill(myPid, syscall.SIGHUP)
-			if err != nil {
-				logrus.WithError(err).Warnf("Failed to send HUP to self (pid = %d)", myPid)
-			}
-		}()
 	}
 
 	writer.ConfiguringSuccess(phase.deploymentServicePackage, modified)
@@ -704,14 +659,38 @@ func (phase *SupervisorUpgradePhase) Run(w *eventWriter) error {
 			return errors.Wrap(err, "failed to update systemd unit file")
 		}
 
-		err = phase.reloadSystemd(w, target)
+		systemdReloaded, err := phase.reloadSystemd(w, target)
 		if err != nil {
 			return errors.Wrap(err, "failed to reload systemd daemon")
 		}
 
-		pendingRestart, err := phase.restartHabSup(w, target, services)
-		if err != nil {
-			return errors.Wrap(err, "failed to restart habitat supervisor")
+		// SystemdRestart's mitigation only cares about
+		// service names
+		serviceList := make([]string, len(services))
+		for i, svc := range services {
+			serviceList[i] = svc.Name
+		}
+
+		// A systemd restart will also restart hab-sup because
+		// our process tree is:
+		//
+		// systemd +
+		//         |- hab-launcher +
+		//                         |- hab-sup
+		//                         |- deployment-service
+		//                         | ... other automate services
+		//
+		var pendingRestart bool
+		if phase.systemdRestartRequired(systemdReloaded) {
+			pendingRestart, err = target.SystemdRestart(context.TODO(), serviceList)
+			if err != nil {
+				return errors.Wrap(err, "failed to restart systemd unit")
+			}
+		} else {
+			pendingRestart, err = phase.restartHabSup(w, target, serviceList)
+			if err != nil {
+				return errors.Wrap(err, "failed to restart habitat supervisor")
+			}
 		}
 
 		anyPendingRestarts = anyPendingRestarts || pendingRestart
@@ -720,13 +699,37 @@ func (phase *SupervisorUpgradePhase) Run(w *eventWriter) error {
 	// This is here to protect against getting past this phase
 	// before the hab-sup restart is finished.
 	if anyPendingRestarts {
-		return errors.New("hab-sup upgrade pending")
+		return api.ErrRestartPending
 	}
 
 	return nil
 }
 
-func (phase *SupervisorUpgradePhase) restartHabSup(w *eventWriter, target target.Target, services []Service) (bool, error) {
+// systemdRestartRequired returns true if we need to restart our system unit.
+func (phase *SupervisorUpgradePhase) systemdRestartRequired(systemdReloaded bool) bool {
+	if systemdReloaded {
+		return true
+	}
+
+	// If we previously failed to restart the systemd unit, then
+	// we may still need a restart even though we didn't need a
+	// reload.
+	//
+	// TODO(ssd) 2019-04-21: Ideally we would check _all_ of the
+	// configuration (perhaps via a hash we inject in the env?).
+	launcherBin := os.Getenv("HAB_LAUNCH_BIN")
+	if launcherBin != "" {
+		launchP := phase.desiredSupState.LauncherPkg()
+		expectedPath := path.Join(habpkg.PathFor(&launchP), "bin/hab-launch")
+		if launcherBin != expectedPath {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (phase *SupervisorUpgradePhase) restartHabSup(w *eventWriter, target target.Target, serviceList []string) (bool, error) {
 	w.RestartingHabSup()
 	restartRequired, err := target.HabSupRestartRequired(phase.desiredSupState.SupPkg())
 	if err != nil {
@@ -736,10 +739,6 @@ func (phase *SupervisorUpgradePhase) restartHabSup(w *eventWriter, target target
 	}
 
 	if restartRequired {
-		serviceList := make([]string, len(services))
-		for i, svc := range services {
-			serviceList[i] = svc.Name
-		}
 		waitForFullRestart, err := target.HabSupRestart(context.TODO(), serviceList)
 		if err != nil {
 			err = errors.Wrap(err, "failed to restart Habitat supervisor")
@@ -853,13 +852,13 @@ func (phase *SupervisorUpgradePhase) updateSystemdUnitFile(w *eventWriter, targe
 	return nil
 }
 
-func (phase *SupervisorUpgradePhase) reloadSystemd(w *eventWriter, target target.Target) error {
+func (phase *SupervisorUpgradePhase) reloadSystemd(w *eventWriter, target target.Target) (bool, error) {
 	w.ReloadingSystemd()
 	reloadRequired, err := target.SystemdReloadRequired()
 	if err != nil {
 		err = errors.Wrap(err, "failed to determine if systemd daemon-reload is required")
 		w.ReloadingSystemdFailed(err)
-		return err
+		return false, err
 	}
 
 	if reloadRequired {
@@ -867,15 +866,15 @@ func (phase *SupervisorUpgradePhase) reloadSystemd(w *eventWriter, target target
 		if err != nil {
 			err = errors.Wrap(err, "failed to reload systemd daemon")
 			w.ReloadingSystemdFailed(err)
-			return err
+			return false, err
 		}
 
 		w.ReloadingSystemdSuccess(true)
-		return nil
+		return true, nil
 	}
 
 	w.ReloadingSystemdSuccess(false)
-	return nil
+	return false, nil
 }
 
 func (phase *SupervisorUpgradePhase) Name() string {

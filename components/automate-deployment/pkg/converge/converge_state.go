@@ -2,6 +2,25 @@ package converge
 
 import "github.com/chef/automate/components/automate-deployment/pkg/habpkg"
 
+// DesiredState is the desired state we wish to put our targets in. Each target
+// will have services in a certain state.
+type DesiredState struct {
+	topology           Topology
+	supervisor         SupervisorState
+	ignoredPackages    []habpkg.HabPkg
+	packageCleanupMode string
+}
+
+// NewDesiredState creates a DesiredState from a topology and supervisor
+func NewDesiredState(topology Topology, supervisor SupervisorState, ignoredPackages []habpkg.HabPkg, packageCleanupMode string) DesiredState {
+	return DesiredState{
+		topology:           topology,
+		supervisor:         supervisor,
+		ignoredPackages:    ignoredPackages,
+		packageCleanupMode: packageCleanupMode,
+	}
+}
+
 // ServiceConvergeState is the desired state for an individual service
 type ServiceConvergeState interface {
 	isServiceConvergeState()
