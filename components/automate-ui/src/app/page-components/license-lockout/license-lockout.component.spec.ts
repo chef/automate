@@ -15,6 +15,7 @@ import { FetchStatus, RequestStatus } from 'app/entities/license/license.reducer
 import { LicenseLockoutComponent } from './license-lockout.component';
 import { using } from 'app/testing/spec-helpers';
 import { LicenseStatus } from 'app/entities/license/license.model';
+import { DateTime } from 'app/helpers/datetime/datetime';
 
 class MockTelemetryService {
   enabled = observableOf(false);
@@ -62,7 +63,7 @@ describe('LicenseLockoutComponent', () => {
       expect(component).toBeTruthy();
     });
 
-    it('reflects current license', () => {
+    fit('reflects current license', () => {
       const futureDate = moment().add(2, 'months');
       setup(genLicenseFetchReducer(futureDate));
 
@@ -70,7 +71,7 @@ describe('LicenseLockoutComponent', () => {
       expect(component.fetchStatusInternalError).toBeFalsy();
       // Note using moment formatting so this unit test will still pass outside the US!
       expect(component.expirationDate).toEqual(futureDate
-                                      .format('ddd, DD MMM YYYY HH:mm:ss [UTC]'));
+                                      .format(DateTime.RFC2822));
     });
 
     // this test is failing in wallaby with "Expression has changed after it was checked"
