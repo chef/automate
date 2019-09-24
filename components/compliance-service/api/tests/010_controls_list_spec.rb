@@ -41,7 +41,7 @@ describe File.basename(__FILE__) do
     )
 
     expected_data = {
-        "controlItem" => [
+        "controlItems" => [
             {
                 "id" => "apache-01",
                 "title" => "Apache should be running",
@@ -100,7 +100,7 @@ describe File.basename(__FILE__) do
     )
 
     expected_data = {
-        "controlItem" => [
+        "controlItems" => [
             {
                 "id" => "apache-01",
                 "title" => "Apache should be running",
@@ -157,7 +157,7 @@ describe File.basename(__FILE__) do
     )
 
     expected_data = {
-        "controlItem" => [
+        "controlItems" => [
             {
                 "id" => "apache-02",
                 "title" => "Apache should be enabled",
@@ -217,7 +217,7 @@ describe File.basename(__FILE__) do
     )
 
     expected_data = {
-        "controlItem" => [
+        "controlItems" => [
             {
                 "id" => "nginx-01",
                 "title" => "Running worker process as non-privileged user",
@@ -274,7 +274,7 @@ describe File.basename(__FILE__) do
         size: 4
     )
     expected_data = {
-      "controlItem" =>
+      "controlItems" =>
         [
           {
             "id"=>"apache-01",

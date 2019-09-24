@@ -686,7 +686,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		}
 	}
 
-	contListItemList := &reportingapi.ControlItems{ControlItem: contListItems}
+	contListItemList := &reportingapi.ControlItems{ControlItems: contListItems}
 	return contListItemList, nil
 }
 
@@ -778,30 +778,6 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 	}
 	contListItem.ControlSummary = controlSummary
 	return contListItem, nil
-}
-
-func (backend *ES2Backend) getStringTags(keys *elastic.AggregationBucketKeyItems, stringTags []*reportingapi.StringTag) []*reportingapi.StringTag {
-	for _, key := range keys.Buckets {
-		stringTag := &reportingapi.StringTag{}
-		tagKey, ok := key.Key.(string)
-		stringTag.Key = tagKey
-		if !ok {
-			logrus.Errorf("could not convert the value of tag key: %v, to a string!", key)
-		}
-		if values, ok := key.Aggregations.Terms("values"); ok && len(values.Buckets) > 0 {
-			valuesArray := make([]string, 0)
-			for _, value := range values.Buckets {
-				tagValue, ok := value.Key.(string)
-				if !ok {
-					logrus.Errorf("could not convert the value of tag value: %v, to a string!", key)
-				}
-				valuesArray = append(valuesArray, tagValue)
-			}
-			stringTag.Values = valuesArray
-		}
-		stringTags = append(stringTags, stringTag)
-	}
-	return stringTags
 }
 
 //getFiltersQuery - builds up an elasticsearch query filter based on the filters map that is passed in
