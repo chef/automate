@@ -36,6 +36,8 @@ type TestContext interface {
 	WriteJSON(writer io.Writer) error
 	// DoLBRequest performs an authenticated request against the automate load balancer
 	DoLBRequest(path string, opts ...lbrequest.Opts) (*http.Response, error)
+	// GetOption returns the Option for the given key
+	GetOption(key string) *Option
 }
 
 // VerificationTestContext is accepted by the Verify stage of a diagnostic. This
@@ -55,7 +57,8 @@ type testContext struct {
 }
 
 type globals struct {
-	CachedToken string `json:"token"`
+	CachedToken string    `json:"token"`
+	Options     []*Option `json:"options"`
 }
 
 type save struct {
@@ -70,6 +73,12 @@ type TestContextOpt func(*testContext)
 func WithAdminToken(token string) TestContextOpt {
 	return func(tstContext *testContext) {
 		tstContext.save.Globals.CachedToken = token
+	}
+}
+
+func WithOptions(options []*Option) TestContextOpt {
+	return func(tstContext *testContext) {
+		tstContext.save.Globals.Options = options
 	}
 }
 
@@ -134,6 +143,15 @@ func (c *testContext) GetValue(key string, value interface{}) error {
 
 func (c *testContext) SetValue(key string, value interface{}) {
 	c.Components[key] = value
+}
+
+func (c *testContext) GetOption(key string) *Option {
+	for _, o := range c.Globals.Options {
+		if o.Key == key {
+			return o
+		}
+	}
+	return nil
 }
 
 func (c *testContext) WriteJSON(writer io.Writer) error {
