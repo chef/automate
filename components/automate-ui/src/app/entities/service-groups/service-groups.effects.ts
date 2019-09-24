@@ -34,7 +34,10 @@ import {
   GetServiceGroupsFailure,
   GetServiceGroupsSuggestionsSuccess,
   GetServiceGroupsSuggestionsFailure,
-  GetServiceGroupsSuggestions
+  GetServiceGroupsSuggestions,
+  GetServicesStats,
+  GetServicesStatsSuccess,
+  GetServicesStatsFailure
 } from './service-groups.actions';
 
 @Injectable()
@@ -103,4 +106,15 @@ export class ServiceGroupsEffects {
           new GetServiceGroupsSuggestionsSuccess({ serviceGroupsSuggestions })),
         catchError((error) => of(new GetServiceGroupsSuggestionsFailure(error))));
       }));
+
+  @Effect()
+  getServiceStats = this.actions$.pipe(
+    ofType(ServiceGroupsActionTypes.GET_SERVICES_STATS),
+    mergeMap(() =>
+      this.requests.getServiceStats().pipe(
+        map((resp: ServicesStats) => new GetServicesStats(resp))
+        catchError((error: HttpErrorResponse) => observableOf(new GetServiceStats(error)))
+      )
+    )
+  );
 }

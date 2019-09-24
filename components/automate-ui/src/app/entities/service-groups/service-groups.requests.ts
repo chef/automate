@@ -10,7 +10,8 @@ import {
   ServiceGroupsSuggestions,
   ServiceGroupsHealthSummary,
   GroupServicesPayload,
-  GroupServicesFilters
+  GroupServicesFilters,
+  ServicesStats
 } from './service-groups.model';
 import { Chicklet } from 'app/types/types';
 import { environment } from 'environments/environment';
@@ -98,6 +99,12 @@ export class ServiceGroupsRequests {
       const params = this.formatFilters(filters);
 
       return this.httpClient.get<ServiceGroupsHealthSummary>(url, {params});
+  }
+
+  public getServiceStats(): Observable<ServicesStats> {
+    const url = `${APPLICATIONS_URL}/stats`;
+
+    return this.httpClient.get<ServicesStats>(url);
   }
 
   public getSuggestions(
