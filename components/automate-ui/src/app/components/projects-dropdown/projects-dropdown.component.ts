@@ -2,6 +2,8 @@ import { Component, EventEmitter, Input, Output, OnChanges } from '@angular/core
 
 import { ProjectConstants, Project } from 'app/entities/projects/project.model';
 
+import { ChefSorters } from 'app/helpers/auth/sorter';
+
 const { UNASSIGNED_PROJECT_ID } = ProjectConstants;
 
 // Extend the project model with the checked field.
@@ -35,22 +37,8 @@ export class ProjectsDropdownComponent implements OnChanges {
   label = UNASSIGNED_PROJECT_ID;
 
   projectsArray(): ProjectChecked[] {
-    const sortedProjects = Object.values(this.projects);
-
-    const opts = {
-      numeric: true,
-      sensitivity: 'base'
-    };
-
-    // per @msorens https://github.com/chef/a2/pull/4434
-    // Sort by name then by cased-name, since no other field is useful as a secondary sort;
-    // this ensures stable sort with respect to case, so 'a' always comes before 'A'.
-    sortedProjects.sort(
-      (a, b) =>
-        a.name.localeCompare(b.name, undefined, opts) ||
-        a.name.localeCompare(b.name, undefined, { numeric: true })
-    );
-    return sortedProjects;
+    const unsortedProjects = Object.values(this.projects);
+    return ChefSorters.normalSort(unsortedProjects, 'name');
   }
 
   ngOnChanges(): void {
