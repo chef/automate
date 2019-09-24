@@ -13,6 +13,7 @@ import {
   CreateUser, DeleteUser, GetUsers, CreateUserPayload
 } from 'app/entities/users/user.actions';
 import { User } from 'app/entities/users/user.model';
+import { ChefSorters } from 'app/helpers/auth/sorter';
 
 // pattern for valid usernames
 const USERNAME_PATTERN = '[0-9A-Za-z_@.+-]+';
@@ -70,20 +71,8 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       filter(([_, uStatus]: [User[], EntityStatus]) =>
         this.isLoading = uStatus === EntityStatus.loading
       )).subscribe(([users, _]: [User[], EntityStatus]) => {
-        users.sort(
-          (a, b) => {
-            // Note: the `undefined` is the locale to use for comparison. According to
-            // MDN, in Swedish, 'ä' comes after 'z', while in German, it's after 'a':
-            // tslint:disable-next-line:max-line-length
-            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare
-            // See https://stackoverflow.com/a/38641281 for these options
-            const opts = { numeric: true, sensitivity: 'base' };
-            // sort by name then by username
-            return a.name.localeCompare(b.name, undefined, opts) ||
-              a.name.localeCompare(b.name, undefined, { numeric: true}) ||
-              a.id.localeCompare(b.id, undefined, opts);
-          });
-        this.users = users;
+        // sort naturally first by name then by id
+        this.users = ChefSorters.naturalSort(users, ['name', 'id']);
       });
   }
 
