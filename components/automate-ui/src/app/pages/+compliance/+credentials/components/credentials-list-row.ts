@@ -22,7 +22,6 @@ export class CredentialsListRowComponent {
   }
 
   getLastModified(lastModifiedDate): string {
-    console.log(DateTime.RFC2822);
     return moment(lastModifiedDate).format(DateTime.RFC2822);
   }
 
