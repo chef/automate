@@ -696,7 +696,7 @@ level=error msg="Failed to login user: failed to connect: LDAP Result Code 200 \
 ```
 
 Note that the log contains the _IP address_ even when the LDAP server was
-configured via hostname.  Double-checking that can be helpful to exclude issues
+configured via hostname. Double-checking that can be helpful to exclude issues
 in domain-name resolution.
 
 Issues in TLS verification manifest in the same way, but the log indicates that:
@@ -778,7 +778,7 @@ User search also fails if more than one user is returned.
 {{% /warning %}}
 
 Ensure that a search for `username_attr` with the given search base can only
-return one user.  Something like this could happen (simplified for
+return one user. Something like this could happen (simplified for
 demonstration):
 
 ```LDIF
@@ -960,7 +960,7 @@ groups by distinguished names (DN). The latter can cause little information
 (e.g. the group name _"admins"_) to grow out of proportion (e.g.
 _"cn=admins,ou=DeptA,ou=CityB,ou=StateWA,dc=subcorp,dc=corp,dc=com"_). This can
 be mitigated by changing the `group_display_name_attr` from `DN` to `cn`
-(common name).  Note that for authorization purposes, that is also advisable.
+(common name). Note that for authorization purposes, that is also advisable.
 LDAP-provided groups are referenced in policies using `team:ldap:<group-name>`.
 Thus `team:ldap:admins` is handier than
 `team:ldap:cn=admins,ou=DeptA,ou=CityB,ou=StateWA,dc=subcorp,dc=corp,dc=com`.
