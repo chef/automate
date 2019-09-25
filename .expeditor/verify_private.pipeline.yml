@@ -752,7 +752,7 @@ steps:
   - label: "backups"
     command:
       - integration/run_test integration/tests/backup.sh
-    timeout_in_minutes: 20
+    timeout_in_minutes: 25
     expeditor:
       secrets:
         A2_LICENSE:

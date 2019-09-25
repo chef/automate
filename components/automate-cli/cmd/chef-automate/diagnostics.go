@@ -63,6 +63,7 @@ var diagnosticsRunCmdOpts = struct {
 	saveFilePath string
 	adminToken   string
 	lbURL        string
+	options      []string
 }{}
 
 func runDiagnosticsRunCmd(cmd *cobra.Command, args []string) error {
@@ -103,9 +104,19 @@ func runDiagnosticsRunCmd(cmd *cobra.Command, args []string) error {
 			)
 		}
 	} else {
+		opts, err := diagnostics.OptionsFromStrings(diagnosticsRunCmdOpts.options)
+		if err != nil {
+			return status.Wrap(
+				err,
+				status.DiagnosticsError,
+				"Failed to parse options",
+			)
+		}
 		tstContext = diagnostics.NewTestContext(dsClient,
 			diagnostics.WithLBURL(*lbURL),
-			diagnostics.WithAdminToken(strings.TrimSpace(diagnosticsRunCmdOpts.adminToken)))
+			diagnostics.WithAdminToken(strings.TrimSpace(diagnosticsRunCmdOpts.adminToken)),
+			diagnostics.WithOptions(opts),
+		)
 	}
 
 	r := runner.New(
@@ -169,6 +180,12 @@ func init() {
 		"lb-url",
 		"https://localhost",
 		"URL for the automate-load-balancer",
+	)
+	diagnosticsRunCmd.Flags().StringSliceVar(
+		&diagnosticsRunCmdOpts.options,
+		"opt",
+		[]string{},
+		"Set of options that can be used to configure tests",
 	)
 	RootCmd.AddCommand(diagnosticsCmd)
 }
