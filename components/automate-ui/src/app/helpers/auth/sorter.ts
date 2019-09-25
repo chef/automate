@@ -1,14 +1,20 @@
 
 export class ChefSorters {
 
+    // ***********
     // naturalSort takes in an Array of Objects and returns an Array of Objects
     // sorted 'naturally' by the property chosen.
+    // @input: Array of Objects
+    // @property: string or an Array of strings, max length is 2 properties
+    //            when using an Array, will sort first by string one, then by string 2;
+    //
+    // example use with single prop:  ChefSorters.naturalSort(users, 'name');
+    // example use with dual prop:    ChefSorters.naturalSort(users, ['name', 'id']);
+    // ***********
 
     public static naturalSort( input: Array<any>, property: Array<string> | string ): Array<any> {
         // per @msorens https://github.com/chef/a2/pull/4434
         // Stable sort so 'a' always comes before 'A'.
-        console.log('********');
-        console.log( property );
         const opts = { numeric: true, sensitivity: 'base' };
 
         // propComparator function idea from Dave Newton
@@ -24,11 +30,10 @@ export class ChefSorters {
                       a[propTwo].localeCompare(b[propTwo], undefined, opts);
         };
 
+        // if property argument is an array, use the dualPropComparator
         if ( property instanceof Array ) {
-            console.log('array');
             return input.sort( dualPropComparator(property[0], property[1]) );
         } else {
-            console.log('string');
             return input.sort( propComparator(property) );
         }
 
