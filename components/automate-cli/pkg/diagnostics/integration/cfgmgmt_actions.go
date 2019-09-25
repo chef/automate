@@ -59,17 +59,15 @@ func CreateCfgmgmtActionsDiagnostic() diagnostics.Diagnostic {
 		Generate: func(tstCtx diagnostics.TestContext) error {
 			// Make sure we cover multiple days
 			now := time.Now().UTC()
-			days := []time.Time{
-				now,
-				now.AddDate(0, 0, -1),
-				now.AddDate(0, 0, -2),
-			}
+
+			days := tstCtx.GetOption("cfgmgmt-actions.days").AsInt(3)
+
 			save := cfgmgmtActionsSave{
 				CreatedEntities: []cfgmgmtActionsEntity{},
 			}
 
-			for _, day := range days {
-
+			for i := 0; i < days; i++ {
+				day := now.AddDate(0, 0, -1*i)
 				id := uuid.Must(uuid.NewV4()).String()
 				entityName := "chef-automate-diagnostics-integration-" + id
 				buf := bytes.NewBuffer([]byte{})

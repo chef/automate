@@ -3,7 +3,7 @@
 #shellcheck disable=SC2034
 test_name="backup"
 test_backup_restore=true
-test_diagnostics_opts="--opt compliance-report.days:120"
+test_diagnostics_opts="--opt compliance-report.days:120 --opt cfgmgmt-actions.days:120 --opt cfgmgmt-ccr.days:120"
 
 do_deploy() {
     do_deploy_default
