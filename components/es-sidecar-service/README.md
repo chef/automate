@@ -45,5 +45,5 @@ This project includes CLI commands to assist in development and local testing.  
 * `./es-sidecar-service grpc` will show the available GRPC calls and allow you to execute them from the shell
 * `./es-sidecar-service dev` will show the other development helper tools.
 
-These tools assume a locally running ES5 instance, which you can bring up in docker via `make start-es5`.
-You can stop and purge es5 testing data with `make stop-es5` and `make purge-es5` respectively.
+These tools assume a locally running ES6 instance, which you can bring up in docker via `make start-es6`.
+You can stop and purge es5 testing data with `make stop-es6` and `make purge-es6` respectively.
