@@ -37,12 +37,12 @@ your existing configuration by following these steps:
 3. Run `chef-automate config set config.toml` to set your updated config.
 
 {{< info >}}
-Users who log in via SAML will have a session time of 24 hours before needing to log in again.
+Users who sign in via SAML will have a session time of 24 hours before needing to sign in again.
 Local, MSAD, and LDAP users will have their Chef Automate sessions refreshed while they maintain an active
-browsing session of the Chef Automate UI or until they log out directly.
+browsing session of the Chef Automate UI or until they sign out directly.
 {{< /info >}}
 
-## SAML
+## SAML Configuration Settings
 
 The SAML configuration settings are:
 
@@ -72,7 +72,7 @@ k2WFcoiiKyeIznNScx/K6AeykKR/lPrJedanSA==
 ```
 
 {{% warning %}}
-The `groups_attr` setting is optional. However, if it's not provided,
+The `groups_attr` setting is optional. However, if it is not provided,
 users authenticating via SAML will not be members of any teams.
 {{% /warning %}}
 
@@ -110,7 +110,7 @@ Chef Automate supports using SAML to authenticate users and [applying permission
   # Note: Even when configured otherwise, the username gathered from the SAML
   # response is _treated_ as persistent. So, if this is set to
   #    "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
-  # and a user has changed their email address, they'll be a _new_ user to Chef
+  # and a user has changed their email address, they will be a _new_ user to Chef
   # Automate.
   name_id_policy_format = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
 ```

@@ -36,9 +36,9 @@ require you to remake your policies, as the [subjects]({{< relref "authorization
 policies will be incorrectly labelled as `ldap`.
 
 {{< info >}}
-Users who log in via SAML will have a session time of 24 hours before needing to log in again.
+Users who sign in via SAML will have a session time of 24 hours before needing to sign in again.
 Local, MSAD, and LDAP users will have their Chef Automate sessions refreshed while they maintain an active
-browsing session of the Chef Automate UI or until they log out directly.
+browsing session of the Chef Automate UI or until they sign out directly.
 {{< /info >}}
 
 ## Overview
@@ -48,7 +48,7 @@ This is documentation for configuring Chef Automate's Lightweight Directory Appl
 ## Microsoft Active Directory
 
 Microsoft Active Directory (MSAD) is a type of directory server that supports LDAP. Chef Automate comes with a default LDAP configuration for MSAD.
-The Chef Automate default MSAD configuration is a minimal configuration for standard MSAD systems which you can extend by overriding default values and using additional configuration options.
+The Chef Automate default MSAD configuration is a minimal configuration for standard MSAD systems, which you can extend by overriding default values and using additional configuration options.
 Chef Automate's default configuration for Microsoft AD is specific to LDAP.
 To configure Microsoft AD using SAML, see the [SAML documentation]({{< relref "saml.md" >}}).
 
@@ -339,7 +339,7 @@ names (`user_id_attr`, `email_attr`, and `user_display_name_attr`). See
 [Configuration: LDAP]({{< relref "configuration.md#ldap" >}}) for an overview.
 
 {{% info %}}
-The `ldapsearch` command line corresponding do _User Search_ is
+The `ldapsearch` command line corresponding to _User Search_ is
 
 ```shell
 ldapsearch -h $host -D $bind_dn -w $bind_password \
@@ -388,7 +388,7 @@ When a user tries to sign in, they would only be authorized if they were found a
 ```
 
 {{% info %}}
-The `ldapsearch` command line corresponding do _User Search_ with restricted
+The `ldapsearch` command line corresponding to _User Search_ with restricted
 groups is
 
 ```shell
@@ -415,7 +415,7 @@ successful user search, returning `cn=jane,ou=People,dc=corp,dc=com`, the next
 step will be to _bind again_ using that DN, and the password `janespassword`.
 
 {{% info %}}
-The `ldapsearch` command line corresponding do _User Search_ is
+The `ldapsearch` command line corresponding to _User Search_ is
 
 ```shell
 ldapsearch -h $host -D $user_dn -w $password
@@ -454,12 +454,12 @@ The correct configuration settings again depend on your directory server's schem
 see the example configs below.
 
 {{% warning %}}
-The `base_group_search_dn` setting is optional. However, if it's not provided,
+The `base_group_search_dn` setting is optional. However, if it is not provided,
 users authenticating via LDAP (or MSAD) will not be members of any teams.
 {{% /warning %}}
 
 {{% info %}}
-The `ldapsearch` command line corresponding do _Group Search_ is
+The `ldapsearch` command line corresponding to _Group Search_ is
 
 ```shell
 ldapsearch -h $host -D $bind_dn -w $bind_password \
@@ -660,7 +660,7 @@ cn: designers
 gidNumber: 1002
 ```
 
-you'll need different settings to tie users and groups together:
+You will need different settings to tie users and groups together:
 
 ```toml
 base_user_search = "ou=People,dc=corp,dc=com"
@@ -688,7 +688,7 @@ service, the sign in screen will display
 >
 > Login error.
 
-In the logs (`journalctl -u chef-automate`), you'll find a line from
+In the logs (`journalctl -u chef-automate`), you will find a line from
 `automate-dex.default` like this -- note that for readability, the timestamp and service name has been removed from this example log):
 
 ```text
@@ -717,7 +717,7 @@ level=error msg="Failed to login user: ldap: initial bind for user \"cn=service_
 #### Troubleshoot User Search
 
 There's two main ways the user search could fail, and they lead to different
-sign in failures: One is queries that can't be executed at all, leading to
+sign in failures: One is queries that cannot be executed at all, leading to
 
 > Internal Server Error
 >
@@ -740,7 +740,7 @@ record, the browser will show the sign in prompt with an error banner saying
 
 > Username or password is incorrect.
 
-In the logs, you'll find more information. There's a line informing you about
+In the logs, you will find more information. There is a line informing you about
 the actual _search_ query,
 
 ```text
@@ -755,7 +755,7 @@ level=error msg="ldap: no results returned for filter: \"(cnn=jane)\""
 
 In this example output, the `username_attr` was set to `cnn` (not `cn`).
 
-Since there's no way for the LDAP integration to determine whether a
+Since there is no way for the LDAP integration to determine whether a
 configuration was _wrong_ or the provided user does not exist, the sign in UI can
 only assume that the credentials were invalid.
 
@@ -868,9 +868,9 @@ level=info msg="Authorization Query" action=search resource="compliance:profiles
 #### `ldapsearch` Example Queries
 
 For debugging purposes it can be useful to execute LDAP queries manually using
-the `ldapsearch` utility. On Ubuntu, it's provided via `ldap-utils` (i.e.,
+the `ldapsearch` utility. On Ubuntu, it is provided via `ldap-utils` (i.e.,
 `sudo apt-get install ldap-utils`).
-In what follows, we'll outline an example directory layout, and the `ldapsearch`
+In what follows, we will outline an example directory layout, and the `ldapsearch`
 queries corresponding to the different phases.
 
 The _User Search_ query looks like this, with comments referencing the
@@ -894,7 +894,7 @@ ldapsearch -H ldap://ldap-server:636/ \ # host
   '(cn=jane)'                           # (username_attr=what-was-provided-via-sign-in-form)
 ```
 
-If you've configured a `user_query_filter`, it's wrapped into the filter
+If you have configured a `user_query_filter`, it is wrapped into the filter
 argument:
 
 ```shell
@@ -904,7 +904,7 @@ argument:
 Once a user directory entry has been retrieved, the password can be verified,
 and the group query can be constructed from it:
 
-Let's assume we've gotten the entry for user `jane`:
+Let us assume we have gotten the entry for user `jane`:
 
 ```LDIF
 # jane, People, corp.com
