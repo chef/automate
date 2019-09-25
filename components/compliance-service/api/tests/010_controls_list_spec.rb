@@ -89,6 +89,66 @@ describe File.basename(__FILE__) do
     assert_equal_json_content(expected_data, actual_data)
   end
 
+
+  it "control list items with a size of 2 with nginx profile" do
+    actual_data = GRPC reporting, :list_control_items, Reporting::ControlItemRequest.new(
+        filters: [
+            Reporting::ListFilter.new(type: 'start_time', values: ['2018-02-01T23:59:59Z']),
+            Reporting::ListFilter.new(type: "profile_id", values: ["09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"]),
+            Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
+            Reporting::ListFilter.new(type: "platform", values: ["centos"])
+
+        ],
+        size: 2
+    )
+    expected_data = {
+        "controlItems" => [
+            {
+                "id" => "nginx-01",
+                "title" => "Running worker process as non-privileged user",
+                "profile" => {
+                    "title" => "DevSec Nginx Baseline",
+                    "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                    "version" => "2.1.0"
+                },
+                "impact" => 1,
+                "endTime" => "2018-03-04T09:18:41Z",
+                "controlSummary" => {
+                    "total" => 1,
+                    "passed" => {
+                        "total" => 1
+                    },
+                    "skipped" => {},
+                    "failed" => {}
+                }
+            },
+            {
+                "id" => "nginx-02",
+                "title" => "Check NGINX config file owner, group and permissions.",
+                "profile" => {
+                    "title" => "DevSec Nginx Baseline",
+                    "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                    "version" => "2.1.0"
+                },
+                "impact" => 1,
+                "endTime" => "2018-03-04T09:18:41Z",
+                "controlSummary" => {
+                    "total" => 1,
+                    "passed" => {
+                        "total" => 1
+                    },
+                    "skipped" => {},
+                    "failed" => {}
+                }
+            }
+        ]
+    }
+
+    control_item_array = actual_data['control_items']
+    assert_equal(2, control_item_array.size)
+    assert_equal_json_content(expected_data, actual_data)
+  end
+
   it "control list items with a size of 2 but only care about skipped" do
     actual_data = GRPC reporting, :list_control_items, Reporting::ControlItemRequest.new(
         filters: [
@@ -274,29 +334,29 @@ describe File.basename(__FILE__) do
         size: 4
     )
     expected_data = {
-      "controlItems" =>
-        [
-          {
-            "id"=>"apache-01",
-            "title"=>"Apache should be running",
-            "profile"=> {
-              "title"=>"DevSec Apache Baseline",
-              "id"=>"41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
-              "version"=>"2.0.1"
-            },
-            "impact" => 1,
-            "endTime" => "2018-03-04T09:18:41Z",
-            "controlSummary" => {
-              "total" => 1,
-              "passed" => {},
-              "skipped" => {
-                "total"=>1
-              },
-              "failed" => {}
-            }
-          }
-        ]
-      }
+        "controlItems" =>
+            [
+                {
+                    "id" => "apache-01",
+                    "title" => "Apache should be running",
+                    "profile" => {
+                        "title" => "DevSec Apache Baseline",
+                        "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "version" => "2.0.1"
+                    },
+                    "impact" => 1,
+                    "endTime" => "2018-03-04T09:18:41Z",
+                    "controlSummary" => {
+                        "total" => 1,
+                        "passed" => {},
+                        "skipped" => {
+                            "total" => 1
+                        },
+                        "failed" => {}
+                    }
+                }
+            ]
+    }
     assert_equal_json_content(expected_data, actual_data)
   end
 
