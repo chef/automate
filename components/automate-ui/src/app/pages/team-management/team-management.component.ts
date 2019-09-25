@@ -20,6 +20,7 @@ import { HttpStatus } from 'app/types/types';
 import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
 import { Project, ProjectConstants } from 'app/entities/projects/project.model';
+import { ChefSorters } from 'app/helpers/auth/sorter';
 
 @Component({
   selector: 'app-team-management',
@@ -50,17 +51,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
     ) {
     this.loading$ = store.select(getAllStatus).pipe(map(loading));
     this.sortedTeams$ = store.select(allTeams).pipe(
-      map((teams: Team[]) => teams.sort(
-        (a, b) => {
-          // See https://stackoverflow.com/a/38641281 for these options
-          const opts = { numeric: true, sensitivity: 'base' };
-          // TODO: still need to observe case for v1; not needed for v2; simplify when v1 removed.
-          // Sort by name then by cased-name, since no other field is useful as a secondary sort;
-          // this ensures stable sort with respect to case, so 'a' always comes before 'A'.
-          return a.id.localeCompare(b.id, undefined, opts)
-          || a.id.localeCompare(b.id, undefined, {numeric: true});
-        }
-      )),
+      map((teams: Team[]) => ChefSorters.naturalSort(teams, 'id')),
       takeUntil(this.isDestroyed));
     this.projectsEnabled$ = store.select(atLeastV2p1);
     this.createTeamForm = fb.group({
