@@ -10,7 +10,7 @@ export class ChefSorters {
     // example use with dual prop:    ChefSorters.naturalSort(users, ['name', 'id']);
     // ***********
 
-    public static naturalSort(input: Array<any>, property: Array<string> | string): Array<any> {
+    public static naturalSort(input: Array<{}>, property: Array<string> | string): Array<{}> {
         // per @msorens https://github.com/chef/a2/pull/4434
         // Stable sort so 'a' always comes before 'A'.
         const opts = { numeric: true, sensitivity: 'base' };
