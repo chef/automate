@@ -9,6 +9,59 @@ do_deploy() {
     do_deploy_default
     log_info "applying dev license"
     chef-automate license apply "$A2_LICENSE"
+
+    ## We define the purge policies to not delete any data we might generate
+    chef-automate dev grpcurl compliance-service -- chef.automate.infra.data_lifecycle.api.Purge.Configure -d '{
+      "enabled":true,
+      "recurrence":"FREQ=DAILY;DTSTART=20190820T221315Z;INTERVAL=1",
+      "policy_update": {
+        "es": [
+          {
+            "disabled": false,
+            "policy_name":"compliance-scans",
+            "older_than_days":"150"
+          },
+          {
+            "disabled": false,
+            "policy_name":"compliance-reports",
+            "older_than_days":"150"
+          }
+        ]
+      }
+    }'
+
+    chef-automate dev grpcurl ingest-service -- chef.automate.infra.data_lifecycle.api.Purge.Configure -d '{
+      "enabled":true,
+      "recurrence":"FREQ=DAILY;DTSTART=20190820T221315Z;INTERVAL=1",
+      "policy_update": {
+        "es": [
+          {
+            "disabled": false,
+            "policy_name":"converge-history",
+            "older_than_days":"150"
+          },
+          {
+            "disabled": false,
+            "policy_name":"actions",
+            "older_than_days":"150"
+          }
+        ]
+      }
+    }'
+
+    chef-automate dev grpcurl event-feed-service -- chef.automate.infra.data_lifecycle.api.Purge.Configure -d '{
+      "enabled":true,
+      "recurrence":"FREQ=DAILY;DTSTART=20190820T221315Z;INTERVAL=1",
+      "policy_update": {
+        "es": [
+          {
+            "disabled": false,
+            "policy_name":"feed",
+            "older_than_days":"150"
+          }
+        ]
+      }
+    }'
 }
 
 do_restore() {
