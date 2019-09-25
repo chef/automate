@@ -112,6 +112,7 @@ export interface RouterState {
   path: UrlSegment[];
 }
 
+// Adapted from https://ngrx.io/guide/router-store/configuration
 export class RouterSerializer implements router.RouterStateSerializer<RouterState> {
   serialize(routerState: RouterStateSnapshot): RouterState {
     let route = routerState.root;
