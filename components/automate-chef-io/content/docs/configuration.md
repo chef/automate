@@ -751,12 +751,12 @@ chef-automate dev grpcurl ingest-service -- chef.automate.infra.data_lifecycle.a
       {
         "disabled": false,
         "policy_name":"converge-history",
-        "older_than_days":"30",
+        "older_than_days":"30"
       },
       {
         "disabled": false,
         "policy_name":"actions",
-        "older_than_days":"30",
+        "older_than_days":"30"
       }
     ]
   }
@@ -770,7 +770,7 @@ chef-automate dev grpcurl event-feed-service -- chef.automate.infra.data_lifecyc
       {
         "disabled": false,
         "policy_name":"feed",
-        "older_than_days":"7",
+        "older_than_days":"7"
       }
     ]
   }
