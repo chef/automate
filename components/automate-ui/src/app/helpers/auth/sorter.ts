@@ -11,7 +11,7 @@ export class ChefSorters {
     // ***********
 
     // tslint:disable-next-line: max-line-length
-    public static naturalSort(input: Array<object>, property: Array<string> | string): Array<object> {
+    public static naturalSort(input: Array<any>, property: Array<string> | string): Array<any> {
         // per @msorens https://github.com/chef/a2/pull/4434
         // Stable sort so 'a' always comes before 'A'.
         const opts = { numeric: true, sensitivity: 'base' };
@@ -29,6 +29,7 @@ export class ChefSorters {
                 a[propTwo].localeCompare(b[propTwo], undefined, opts);
         };
 
+        console.log(input);
         return property instanceof Array
             ? input.sort(dualPropComparator(property[0], property[1]))
             : input.sort(propComparator(property));

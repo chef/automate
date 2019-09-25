@@ -32,7 +32,6 @@ describe('naturalSort', () => {
         // Group2
         const idOutput2 = ChefSorters.naturalSort(Group2, 'id').map(p => p.id);
         expect(idOutput2).toEqual(sortedIds2);
-
     });
 
     it('intermixes capitals and lowercase with lowercase first', () => {
