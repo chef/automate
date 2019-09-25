@@ -28,6 +28,7 @@ import {
   GetTeamUsers,
   AddTeamUsers
 } from 'app/entities/teams/team.actions';
+import { ChefSorters } from 'app/helpers/auth/sorter';
 
 const TEAM_ADD_USERS_ROUTE = /^\/settings\/teams\/.*\/add-users$/;
 
@@ -104,16 +105,10 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
               this.loading = true;
               return [];
             }
-            const sortedUser = users.sort(
-              (a, b) => {
-                // See https://stackoverflow.com/a/38641281 for these options
-                const opts = { numeric: true, sensitivity: 'base' };
-                // sort by name then by id
-                return a.name.localeCompare(b.name, undefined, opts) ||
-                  a.name.localeCompare(b.name, undefined, { numeric: true }) ||
-                  a.id.localeCompare(b.id, undefined, opts);
-                });
-            this.users = sortedUser;
+
+            // Sort users naturally first by name, then by id
+            this.users = ChefSorters.naturalSort(users, ['name', 'id']);
+
             // Map UUID membership to user records and remove any entries that don't
             // map to user records.
             return at(tUsers, keyBy('membership_id', users))
