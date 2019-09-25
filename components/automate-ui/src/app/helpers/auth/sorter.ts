@@ -20,31 +20,18 @@ export class ChefSorters {
         // propComparator function idea from Dave Newton
         // https://stackoverflow.com/questions
         const propComparator = (propName) => {
-            console.log(propName);
             return (a, b) => a[propName].localeCompare(b[propName], undefined, opts) ||
                       a[propName].localeCompare(b[propName], undefined, { numeric: true });
         };
 
         const dualPropComparator = (propOne, propTwo) => {
-            console.log(`PropOne: ${propOne}`);
-            console.log('PropTwo: ${propTwo}');
             return (a, b) => a[propOne].localeCompare(b[propOne], undefined, opts) ||
                       a[propOne].localeCompare(b[propOne], undefined, { numeric: true }) ||
                       a[propTwo].localeCompare(b[propTwo], undefined, opts);
         };
 
-        // let sorted;
-        // // if property argument is an array, use the dualPropComparator
-        // if ( property instanceof Array ) {
-        //     console.log(typeof property);
-        //     sorted =  input.sort( dualPropComparator(property[0], property[1]) );
-        // } else {
-        //     console.log(typeof property);
-        //     sorted = input.sort( propComparator(property) );
-        // }
         return property instanceof Array
             ? input.sort(dualPropComparator(property[0], property[1]))
             : input.sort(propComparator(property));
-
     }
 }
