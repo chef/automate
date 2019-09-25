@@ -1,6 +1,8 @@
 import { map, mergeMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
+import { CreateNotification } from 'app/entities/notifications/notification.actions';
+import { Type } from 'app/entities/notifications/notification.model';
 
 import {
   JobActionTypes,
@@ -38,8 +40,24 @@ export class JobEffects {
     map((payload: {id: string}) => new JobCreateSuccess(payload)));
 
   @Effect()
+  JobCreateSuccess$ = this.actions$.pipe(
+    ofType<JobCreateSuccess>(JobActionTypes.JOB_CREATE_SUCCESS),
+    map(() => new CreateNotification({
+      type: Type.info,
+      message: 'Created a scan job.'
+    })));
+
+  @Effect()
   jobUpdate$ = this.actions$.pipe(
     ofType(JobActionTypes.JOB_UPDATE),
     mergeMap((action: JobActions) => this.requests.jobUpdate(action.payload)),
     map(payload => new JobUpdateSuccess(payload)));
+
+  @Effect()
+  JobUpdateSuccess$ = this.actions$.pipe(
+    ofType(JobActionTypes.JOB_UPDATE_SUCCESS),
+    map(() => new CreateNotification({
+      type: Type.info,
+      message: 'Updated a scan job.'
+    })));
 }
