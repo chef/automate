@@ -88,7 +88,7 @@ describe('naturalSort', () => {
         expect(users[4]).toEqual(jasmine.objectContaining({ name: 'Alice300' }));
     });
 
-    it('uses natural ordering in username', () => {
+    it('uses natural ordering in id', () => {
         const users = [
             { membership_id: 'uuid-1', name: 'Alice', id: 'Alice01' },
             { membership_id: 'uuid-2', name: 'Alice', id: 'Alice300' },
@@ -106,5 +106,20 @@ describe('naturalSort', () => {
         expect(users[3]).toEqual(jasmine.objectContaining({ id: 'Alice3' }));
         expect(users[4]).toEqual(jasmine.objectContaining({ id: 'Alice300' }));
     });
+
+    it('sorts by whole string before case', () => {
+        const policies = [
+            { id: 'uuid-2', name: 'developer', members: [], statements: [] },
+            { id: 'uuid-4', name: 'developer-Manager', members: [], statements: [] },
+            { id: 'uuid-5', name: 'Developer', members: [], statements: [] }
+        ];
+
+        ChefSorters.naturalSort(policies, 'name');
+
+        expect(policies.length).toBe(3);
+        expect(policies[0]).toEqual(jasmine.objectContaining({ name: 'developer' }));
+        expect(policies[1]).toEqual(jasmine.objectContaining({ name: 'Developer' }));
+        expect(policies[2]).toEqual(jasmine.objectContaining({ name: 'developer-Manager' }));
+        });
 
 });
