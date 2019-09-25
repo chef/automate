@@ -118,7 +118,7 @@ func CreateComplianceReportDiagnostic() diagnostics.Diagnostic {
 				CreatedEntities: []complianceReportEntity{},
 			}
 
-			days := tstCtx.GetOption("compliance-report.days").GetInt(3)
+			days := tstCtx.GetOption("compliance-report.days").AsInt(3)
 
 			for i := 0; i < days; i++ {
 				day := now.AddDate(0, 0, -1*i)

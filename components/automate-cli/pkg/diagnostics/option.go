@@ -39,14 +39,14 @@ func OptionFromString(option string) (*Option, error) {
 	}, nil
 }
 
-func (o *Option) GetString(defaultVal string) string {
+func (o *Option) AsString(defaultVal string) string {
 	if o == nil || o.Value == "" {
 		return defaultVal
 	}
 	return o.Value
 }
 
-func (o *Option) GetInt(defaultVal int) int {
+func (o *Option) AsInt(defaultVal int) int {
 	if o == nil || o.Value == "" {
 		return defaultVal
 	}
