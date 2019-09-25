@@ -19,24 +19,50 @@
         <h2>Add Member Expression</h2>
         <div id="left-align">
           <form [formGroup]="expressionForm">
+
+            <chef-form-field id="create-type">
+              <label>
+                <span class="label">Type<span aria-hidden="true">*</span></span>
+                <select id="expression-type-dropdown" ngDefaultControl formControlName="type">
+                  <option value='USER'>User</option>
+                  <option value='TEAM'>Team</option>
+                  <option value='TOKEN'>Token</option>
+                  <option value='ALL_MEMBERS'>All members (*)</option>
+                </select>
+              </label>
+              <chef-error *ngIf="expressionForm.get('type').hasError('required') && expressionForm.get('type').touched">Type is
+                required.</chef-error>
+            </chef-form-field>
+
+            <chef-form-field id="create-identity">
+              <label>
+                <span class="label">Identity Provider<span aria-hidden="true">*</span></span>
+                <select id="expression-identity-dropdown" ngDefaultControl formControlName="identity">
+                  <option value="LDAP">LDAP</option>
+                  <option value="LOCAL">local</option>
+                  <option value="SAML">SAML</option>
+                  <option value="ALL_TEAMS">All teams (*)</option>
+                </select>
+              </label>
+              <chef-error *ngIf="expressionForm.get('identity').hasError('required') && expressionForm.get('identity').touched">
+                Some sort of error goes here for identity selection
+              </chef-error>
+            </chef-form-field>
+
+            <chef-form-field id="create-name">
+              <label>
+                <span class="label">Name<span aria-hidden="true">*</span></span>
+                <chef-input id="expression-name-dropdown" 
+                            ngDefaultControl 
+                            formControlName="name"></chef-input>
+              </label>
+              <chef-error *ngIf="expressionForm.get('name').hasError('required') && expressionForm.get('name').touched">
+                Some sort of error goes here for name selection
+              </chef-error>
+            </chef-form-field>
+
+
             <chef-form-field>
-
-              <div id="type-input-container">
-                <label>Type *</label>
-                <input chefInput formControlName="expression" type="text" (keyup)="resetErrors()" autocomplete="off">
-              </div>
-
-              <div id="identity-input-container">
-                <label>Identity Provider *</label>
-                <input chefInput formControlName="expression" type="text" (keyup)="resetErrors()" autocomplete="off">
-              </div>
-
-              <div id="name-input-container">
-                <label>Name *</label>
-                <input chefInput formControlName="expression" type="text" (keyup)="resetErrors()" autocomplete="off">
-                <span>Wildcards (*) are allowed.</span>
-              </div>
-
               <chef-error *ngIf="unparsableMember">Invalid member expression.</chef-error>
               <chef-error *ngIf="duplicateMember">Member expression already in table.</chef-error>
               <chef-error *ngIf="alreadyPolicyMember">Member already in policy.</chef-error>
