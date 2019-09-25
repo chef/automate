@@ -41,9 +41,9 @@ interface KVCondition {
 export class ProjectRulesComponent implements OnInit, OnDestroy {
   public ruleId: string;
   public ruleForm: FormGroup;
-  public selectResourceChefOption: boolean = true;
-  public selectAttributeChefOption: boolean = true;
-  public selectOperatorChefOption: boolean = true;
+  public selectResourceChefOption = true;
+  public selectAttributeChefOption = true;
+  public selectOperatorChefOption = true;
   public currentRuleIndex: number;
 
   // FIXME: either make properties optional in interface, or provide them on initialization:
