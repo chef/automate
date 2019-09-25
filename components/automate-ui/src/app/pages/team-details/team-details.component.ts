@@ -42,6 +42,7 @@ import {
 } from 'app/entities/projects/project.selectors';
 import { ProjectConstants, Project } from 'app/entities/projects/project.model';
 import { IAMMajorVersion } from 'app/entities/policies/policy.model';
+import { ChefSorters } from 'app/helpers/auth/sorter';
 
 const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 
@@ -192,16 +193,8 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
             return at(teamUserIds, keyBy('membership_id', users))
               .filter(userRecord => userRecord !== undefined);
         })).subscribe((users: User[]) => {
-          users.sort(
-            (a, b) => {
-              // See https://stackoverflow.com/a/38641281 for these options
-              const opts = { numeric: true, sensitivity: 'base' };
-              // sort by name then by id
-              return a.name.localeCompare(b.name, undefined, opts) ||
-                a.name.localeCompare(b.name, undefined, { numeric: true }) ||
-                a.id.localeCompare(b.id, undefined, opts);
-            });
-          this.users = users;
+          // Sort naturally first by name, then by id
+          this.users = ChefSorters.naturalSort(users, ['name', 'id']);
         });
 
     // If, however, the user browses directly to /settings/teams/ID, the store
