@@ -29,7 +29,6 @@ export class ChefSorters {
                 a[propTwo].localeCompare(b[propTwo], undefined, opts);
         };
 
-        console.log(input);
         return property instanceof Array
             ? input.sort(dualPropComparator(property[0], property[1]))
             : input.sort(propComparator(property));
