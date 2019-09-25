@@ -562,13 +562,6 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		Size(int(size)).
 		Order("_key", true)
 
-	controlTermsAgg.SubAggregation("tags", elastic.NewNestedAggregation().
-		Path("profiles.controls.string_tags").
-		SubAggregation("key", elastic.NewTermsAggregation().
-			Field("profiles.controls.string_tags.key").
-			SubAggregation("values", elastic.NewTermsAggregation().
-				Field("profiles.controls.string_tags.values"))))
-
 	controlTermsAgg.SubAggregation("impact",
 		elastic.NewTermsAggregation().Field("profiles.controls.impact").Size(1))
 
