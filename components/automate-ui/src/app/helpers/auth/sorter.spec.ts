@@ -2,44 +2,109 @@ import { ChefSorters } from './sorter';
 
 describe('naturalSort', () => {
 
-    const inputObject1: any[] = [
-        { checked: false, id: 'B', name: '123abc', status: 'NO_RULES', type: 'CUSTOM' },
-        { checked: false, id: '3', name: 'project-6', status: 'NO_RULES', type: 'CUSTOM' },
-        { checked: false, id: 'a', name: '12345zero', status: 'NO_RULES', type: 'CUSTOM' },
-        { checked: false, id: '1', name: '123xyz', status: 'NO_RULES', type: 'CUSTOM' },
-        { checked: false, id: 'abc123', name: 'abc123', status: 'NO_RULES', type: 'CUSTOM' }
-    ];
-
-    const inputObject2: any[] = [
-        { checked: false, id: 'a', name: 'one', status: 'NO_RULES', type: 'CUSTOM' },
-        { checked: false, id: 'A', name: 'two', status: 'NO_RULES', type: 'CUSTOM' },
-        { checked: false, id: '123', name: 'three', status: 'NO_RULES', type: 'CUSTOM' },
-        { checked: false, id: '1234', name: 'four', status: 'NO_RULES', type: 'CUSTOM' },
-        { checked: false, id: 'abc123', name: 'five', status: 'NO_RULES', type: 'CUSTOM' }
-    ];
-
-    const sortedNames: string[] = ['123abc', '123xyz', '12345zero', 'abc123', 'project-6'];
-    const sortedIds: string[] = ['1', '3', 'a', 'abc123', 'B'];
-    const sortedIds2: string[] = ['123', '1234', 'a', 'A', 'abc123'];
-
-
     it('returns a normally sorted array by chosen property', () => {
-        // related to inputObject1
-        const nameOutput = ChefSorters.naturalSort(inputObject1, 'name')
-            .map(p => p.name);
+        const Group1 = [
+            { checked: false, id: 'B', name: '123abc', status: 'NO_RULES'},
+            { checked: false, id: '3', name: 'project-6', status: 'NO_RULES'},
+            { checked: false, id: 'a', name: '12345zero', status: 'NO_RULES'},
+            { checked: false, id: '1', name: '123xyz', status: 'NO_RULES'},
+            { checked: false, id: 'abc123', name: 'abc123', status: 'NO_RULES'}
+        ];
 
-        const idOutput = ChefSorters.naturalSort(inputObject1, 'id')
-            .map(p => p.id);
+        const Group2 = [
+            { checked: false, id: 'a', name: 'one', status: 'NO_RULES'},
+            { checked: false, id: 'A', name: 'two', status: 'NO_RULES'},
+            { checked: false, id: '123', name: 'three', status: 'NO_RULES'},
+            { checked: false, id: '1234', name: 'four', status: 'NO_RULES'},
+            { checked: false, id: 'abc123', name: 'five', status: 'NO_RULES'}
+        ];
 
+        const sortedNames = ['123abc', '123xyz', '12345zero', 'abc123', 'project-6'];
+        const sortedIds = ['1', '3', 'a', 'abc123', 'B'];
+        const sortedIds2 = ['123', '1234', 'a', 'A', 'abc123'];
+
+        // Group1
+        const nameOutput = ChefSorters.naturalSort(Group1, 'name').map(p => p.name);
+        const idOutput = ChefSorters.naturalSort(Group1, 'id').map(p => p.id);
         expect(nameOutput).toEqual(sortedNames);
         expect(idOutput).toEqual(sortedIds);
 
-        // related to inputObject2
-        const idOutput2 = ChefSorters.naturalSort(inputObject2, 'id')
-            .map(p => p.id);
-
-        // inputObject2
+        // Group2
+        const idOutput2 = ChefSorters.naturalSort(Group2, 'id').map(p => p.id);
         expect(idOutput2).toEqual(sortedIds2);
 
     });
+
+    it('intermixes capitals and lowercase with lowercase first', () => {
+        const users = [
+            { membership_id: 'uuid-1', name: 'Alice', id: 'alice2' },
+            { membership_id: 'uuid-2', name: 'alice', id: 'alice1' },
+            { membership_id: 'uuid-3', name: 'bob', id: 'builder2001' },
+            { membership_id: 'uuid-4', name: 'Bob', id: 'builder2000' }
+        ];
+
+        ChefSorters.naturalSort(users, ['name', 'id']);
+
+        expect(users.length).toEqual(4);
+        expect(users[0]).toEqual(jasmine.objectContaining({ name: 'alice' }));
+        expect(users[1]).toEqual(jasmine.objectContaining({ name: 'Alice' }));
+        expect(users[2]).toEqual(jasmine.objectContaining({ name: 'bob' }));
+        expect(users[3]).toEqual(jasmine.objectContaining({ name: 'Bob' }));
+    });
+
+    it('sorts by name then by id', () => {
+        const users = [
+            { membership_id: 'uuid-22', name: 'Bob', id: 'builder2001' },
+            { membership_id: 'uuid-2', name: 'Bob', id: 'builder2000' },
+            { membership_id: 'uuid-1', name: 'Alice in Wonderland', id: 'alice' },
+            { membership_id: 'uuid-20', name: 'alice', id: 'the-other-alice' }
+        ];
+
+        ChefSorters.naturalSort(users, ['name', 'id']);
+
+        expect(users.length).toEqual(4);
+        expect(users[0]).toEqual(jasmine.objectContaining({ name: 'alice' }));
+        expect(users[1]).toEqual(jasmine.objectContaining({ name: 'Alice in Wonderland' }));
+        expect(users[2]).toEqual(jasmine.objectContaining({ name: 'Bob', id: 'builder2000' }));
+        expect(users[3]).toEqual(jasmine.objectContaining({ name: 'Bob', id: 'builder2001' }));
+    });
+
+    it('uses natural ordering in name', () => {
+        const users = [
+            { membership_id: 'uuid-1', name: 'Alice01', id: 'alice1' },
+            { membership_id: 'uuid-2', name: 'Alice300', id: 'alice2' },
+            { membership_id: 'uuid-3', name: 'Alice3', id: 'alice3' },
+            { membership_id: 'uuid-4', name: 'Alice-2', id: 'alice4' },
+            { membership_id: 'uuid-5', name: 'alice', id: 'alice5' }
+        ];
+
+        ChefSorters.naturalSort(users, ['name', 'id']);
+
+        expect(users.length).toEqual(5);
+        expect(users[0]).toEqual(jasmine.objectContaining({ name: 'alice' }));
+        expect(users[1]).toEqual(jasmine.objectContaining({ name: 'Alice-2' }));
+        expect(users[2]).toEqual(jasmine.objectContaining({ name: 'Alice01' }));
+        expect(users[3]).toEqual(jasmine.objectContaining({ name: 'Alice3' }));
+        expect(users[4]).toEqual(jasmine.objectContaining({ name: 'Alice300' }));
+    });
+
+    it('uses natural ordering in username', () => {
+        const users = [
+            { membership_id: 'uuid-1', name: 'Alice', id: 'Alice01' },
+            { membership_id: 'uuid-2', name: 'Alice', id: 'Alice300' },
+            { membership_id: 'uuid-3', name: 'Alice', id: 'Alice3' },
+            { membership_id: 'uuid-4', name: 'Alice', id: 'Alice-2' },
+            { membership_id: 'uuid-5', name: 'Alice', id: 'alice' }
+        ];
+
+        ChefSorters.naturalSort(users, ['name', 'id']);
+
+        expect(users.length).toEqual(5);
+        expect(users[0]).toEqual(jasmine.objectContaining({ id: 'alice' }));
+        expect(users[1]).toEqual(jasmine.objectContaining({ id: 'Alice-2' }));
+        expect(users[2]).toEqual(jasmine.objectContaining({ id: 'Alice01' }));
+        expect(users[3]).toEqual(jasmine.objectContaining({ id: 'Alice3' }));
+        expect(users[4]).toEqual(jasmine.objectContaining({ id: 'Alice300' }));
+    });
+
 });
