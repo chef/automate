@@ -46,4 +46,4 @@ This project includes CLI commands to assist in development and local testing.  
 * `./es-sidecar-service dev` will show the other development helper tools.
 
 These tools assume a locally running ES6 instance, which you can bring up in docker via `make start-es6`.
-You can stop and purge es5 testing data with `make stop-es6` and `make purge-es6` respectively.
+You can stop and purge es6 testing data with `make stop-es6` and `make purge-es6` respectively.
