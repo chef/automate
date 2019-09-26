@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 
+import { DateTime } from '../../../helpers/datetime/datetime';
 import { NgrxStateAtom } from '../../../ngrx.reducers';
 import { EntityStatus } from '../../../entities/entities';
 import { Manager } from '../../../entities/managers/manager.model';
@@ -11,7 +12,6 @@ import {
 } from '../../../entities/managers/manager.selectors';
 import { DeleteManager } from '../../../entities/managers/manager.actions';
 import { routeParams } from '../../../route.selectors';
-import { DateTime } from '../../../helpers/datetime/datetime';
 
 @Component({
   selector: 'app-integrations',

@@ -5,6 +5,7 @@ import { MockComponent } from 'ng2-mock-component';
 import * as moment from 'moment';
 import { of as observableOf } from 'rxjs';
 
+import { DateTime } from 'app/helpers/datetime/datetime';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { SessionStorageService } from 'app/services/storage/sessionstorage.service';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
@@ -15,7 +16,6 @@ import { FetchStatus, RequestStatus } from 'app/entities/license/license.reducer
 import { LicenseLockoutComponent } from './license-lockout.component';
 import { using } from 'app/testing/spec-helpers';
 import { LicenseStatus } from 'app/entities/license/license.model';
-import { DateTime } from 'app/helpers/datetime/datetime';
 
 class MockTelemetryService {
   enabled = observableOf(false);

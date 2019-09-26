@@ -5,6 +5,7 @@ import { Observable, Subject } from 'rxjs';
 import { filter, takeUntil, map } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 
+import { DateTime } from 'app/helpers/datetime/datetime';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { HttpStatus } from 'app/types/types';
@@ -25,7 +26,6 @@ import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
 import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
-import { DateTime } from 'app/helpers/datetime/datetime';
 
 @Component({
   selector: 'app-api-tokens',
