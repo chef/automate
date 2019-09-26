@@ -11,27 +11,13 @@ describe('naturalSort', () => {
             { checked: false, id: 'abc123', name: 'abc123', status: 'NO_RULES'}
         ];
 
-        const Group2 = [
-            { checked: false, id: 'a', name: 'one', status: 'NO_RULES'},
-            { checked: false, id: 'A', name: 'two', status: 'NO_RULES'},
-            { checked: false, id: '123', name: 'three', status: 'NO_RULES'},
-            { checked: false, id: '1234', name: 'four', status: 'NO_RULES'},
-            { checked: false, id: 'abc123', name: 'five', status: 'NO_RULES'}
-        ];
-
         const sortedNames = ['123abc', '123xyz', '12345zero', 'abc123', 'project-6'];
         const sortedIds = ['1', '3', 'a', 'abc123', 'B'];
-        const sortedIds2 = ['123', '1234', 'a', 'A', 'abc123'];
 
-        // Group1
         const nameOutput = ChefSorters.naturalSort(Group1, 'name').map(p => p.name);
         const idOutput = ChefSorters.naturalSort(Group1, 'id').map(p => p.id);
         expect(nameOutput).toEqual(sortedNames);
         expect(idOutput).toEqual(sortedIds);
-
-        // Group2
-        const idOutput2 = ChefSorters.naturalSort(Group2, 'id').map(p => p.id);
-        expect(idOutput2).toEqual(sortedIds2);
     });
 
     it('intermixes capitals and lowercase with lowercase first', () => {
