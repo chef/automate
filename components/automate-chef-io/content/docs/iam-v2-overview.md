@@ -60,17 +60,17 @@ IAM policy evaluation order is:
 Examples:
 
 - Neither user1, nor any team that user1 belongs to, are included in any policy with the action `iam:users:list`.
-  Net effect: user1 is denied, and will not be able to view the list of users.
+  Net effect: user1 is denied access to view the list of users.
   (This illustrates the global default DENY condition.)
 - Bob is a member of team alpha and team omega.
   Team alpha has a broad range of permissions while team omega is very restricted in what its members may access.
-  The "major teams" policy has a statement that allows team alpha to access the resource `compliance:reporting:nodes` while it has another statement that denies team omega access to the that very same resource.
+  The "major teams" policy has a statement that allows team alpha to access the resource `compliance:reporting:nodes` while it has another statement that denies team omega access to that very same resource.
   Net effect: Bob is denied access because there is at least one statement denying access.
 - Mary is a member of the default viewers team, which allows read access to everything because
   of the default Viewers policy.
   Mary is also a member of the deployment team, which has permission to upload and download profiles.
   Net effect: Mary is granted read access to everything and Mary can also upload/download profiles,
-  because neither of those policies explicitly denies something allowed by the other.
+  because here access is determined by taking the union of the policies of which she is a member.
 
 #### Properties of a Policy
 
@@ -94,7 +94,7 @@ Effect     | ALLOW or DENY
 #### Properties of a Role
 
 A v2 role consists of a list of **actions**.
-Roles are discussed in detail in [Basic Role-Based Access Control]({{< relref "iam-v2-api-reference.md#roles" >}}).
+Roles are discussed in detail in [Basic Role-Based Access Control]({{< relref "iam-v2-overview.md.md#basic-role-based-access-control" >}}).
 
 Property   | Description
 -----------|-----------------------------
@@ -156,16 +156,16 @@ Just add members to any of these default policies, as described later, to quickl
 
 <!-- I do not like saying "user interface" because technically that includes the command line, too. But I can live with it if you think that is the lesser of two evils. -->
 IAM v2 introduces partial policy management from within Chef Automate in your browser.
+Chef Automate's **Settings** tab has a new _Access Management_ heading on the left panel, with new pages for both _Policies_ and _Roles_.
 
 ![](/images/docs/admin-policies.png)
 
-Chef Automate's **Settings** tab has a new _Access Management_ heading on the left panel, with new pages for both _Policies_ and _Roles_.
-Here, you'll see all of the policies and roles listed out on their respective pages, and an indication of their types, Chef-managed or custom.
+Here, you'll see all of the policies and roles listed on their respective pages and an indication of their types, Chef-managed or custom.
 
 ![](/images/docs/admin-policies-administrator-access.png)
 
 Select a policy or role to open its definition.
-For policies, use the **Members** tab to manage the membership of the policy, right from the browser.
+For policies, use the **Members** tab to manage the membership of the policy right from the browser.
 
 ![](/images/docs/admin-roles-chef-managed-owner-role.png)
 
