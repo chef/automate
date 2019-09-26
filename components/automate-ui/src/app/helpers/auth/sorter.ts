@@ -17,7 +17,7 @@ export class ChefSorters {
         const opts = { numeric: true, sensitivity: 'base' };
 
         // propComparator function idea from Dave Newton
-        // https://stackoverflow.com/questions
+        // https://stackoverflow.com/questions/8537602
         const propComparator = (propName) => {
             return (a, b) => a[propName].localeCompare(b[propName], undefined, opts) ||
                 a[propName].localeCompare(b[propName], undefined, { numeric: true });
