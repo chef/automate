@@ -29,7 +29,7 @@ export class ChefSorters {
             return (a, b) => a[propOne].localeCompare(b[propOne],
                                                      undefined, naturalAndCaseInsensitive) ||
                 a[propOne].localeCompare(b[propOne], undefined, naturalAndCaseSensitive) ||
-                a[propTwo].localeCompare(b[propTwo], undefined, naturalAndCaseInsensitive);
+                a[propTwo].localeCompare(b[propTwo], undefined, naturalAndCaseSensitive);
         };
 
         return property instanceof Array
