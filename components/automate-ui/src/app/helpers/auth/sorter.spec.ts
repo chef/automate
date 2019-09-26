@@ -56,21 +56,21 @@ describe('naturalSort', () => {
 
     it('uses natural ordering in name', () => {
         const users = [
-            { membership_id: 'uuid-1', name: 'Alice01', id: 'alice1' },
-            { membership_id: 'uuid-2', name: 'Alice300', id: 'alice2' },
-            { membership_id: 'uuid-3', name: 'Alice3', id: 'alice3' },
-            { membership_id: 'uuid-4', name: 'Alice-2', id: 'alice4' },
-            { membership_id: 'uuid-5', name: 'alice', id: 'alice5' }
+            { membership_id: 'uuid-1', name: 'Alice500', id: 'alice1' },
+            { membership_id: 'uuid-2', name: 'Alice05', id: 'alice2' },
+            { membership_id: 'uuid-3', name: 'Alice1', id: 'alice3' },
+            { membership_id: 'uuid-4', name: 'Alice51', id: 'alice4' },
+            { membership_id: 'uuid-5', name: 'alice8', id: 'alice5' }
         ];
 
         ChefSorters.naturalSort(users, ['name', 'id']);
 
         expect(users.length).toEqual(5);
-        expect(users[0]).toEqual(jasmine.objectContaining({ name: 'alice' }));
-        expect(users[1]).toEqual(jasmine.objectContaining({ name: 'Alice-2' }));
-        expect(users[2]).toEqual(jasmine.objectContaining({ name: 'Alice01' }));
-        expect(users[3]).toEqual(jasmine.objectContaining({ name: 'Alice3' }));
-        expect(users[4]).toEqual(jasmine.objectContaining({ name: 'Alice300' }));
+        expect(users[0]).toEqual(jasmine.objectContaining({ name: 'Alice1' }));
+        expect(users[1]).toEqual(jasmine.objectContaining({ name: 'Alice05' }));
+        expect(users[2]).toEqual(jasmine.objectContaining({ name: 'alice8' }));
+        expect(users[3]).toEqual(jasmine.objectContaining({ name: 'Alice51' }));
+        expect(users[4]).toEqual(jasmine.objectContaining({ name: 'Alice500' }));
     });
 
     it('uses natural ordering in id', () => {
