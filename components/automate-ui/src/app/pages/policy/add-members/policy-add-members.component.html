@@ -25,8 +25,7 @@
                 <span class="label">Type<span aria-hidden="true">*</span></span>
                 <select id="expression-type-dropdown" 
                         ngDefaultControl 
-                        formControlName="type"
-                        (change)="buildExpressionOutput()">
+                        formControlName="type">
                   <option value='USER'>User</option>
                   <option value='TEAM'>Team</option>
                   <option value='TOKEN'>Token</option>
@@ -42,8 +41,7 @@
                 <span class="label">Identity Provider<span aria-hidden="true">*</span></span>
                 <select id="expression-identity-dropdown" 
                         ngDefaultControl 
-                        formControlName="identity"
-                        (change)="buildExpressionOutput()">
+                        formControlName="identity">
                   <option value="LDAP">LDAP</option>
                   <option value="LOCAL">local</option>
                   <option value="SAML">SAML</option>
@@ -81,7 +79,7 @@
         </div>
         <!-- expression builder output -->
         <div>
-          <span class="expression-output">{{ expressionOutput }}</span>
+          <span class="expression-output">{{ expressionForm.type.value }}</span>
         </div>
 
         <div id="align-buttons">

@@ -75,7 +75,6 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     fb: FormBuilder) {
 
     this.expressionForm = fb.group({
-      // Must stay in sync with error checks in policy-add-members.component.html
       type: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       identity: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
@@ -141,6 +140,9 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
     this.store.dispatch(new GetTeams());
     this.store.dispatch(new GetUsers());
+
+    // subscribe to expressionForm changes
+    this.displayExpressionOutput();
   }
 
   addAvailableMember(member: Member, refresh: boolean): void {
@@ -310,12 +312,12 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     this.closeModal();
   }
 
-  buildExpressionOutput(): void {
-    const { expressionForm } = this;
-    const type = expressionForm.value['type'];
+  displayExpressionOutput() {
+    // initialize stream
+    const expressionValueChanges = this.expressionForm.valueChanges;
 
-    const output = type;
-
-    this.expressionOutput = output;
+    // subscribe to stream
+    expressionValueChanges.subscribe(x => console.log(x);
+    //  ngOnit is where subscribe happens
   }
 }
