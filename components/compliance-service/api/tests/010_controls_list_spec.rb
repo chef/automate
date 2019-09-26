@@ -11,10 +11,12 @@ describe File.basename(__FILE__) do
 
   it "no filters gets them all filter" do
     actual_data = GRPC reporting, :list_control_items, Reporting::ControlItemRequest.new(
-        filters: []
+        filters: [
+            Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
+        ]
     )
     control_item_array = actual_data['control_items']
-    assert_equal(63, control_item_array.size)
+    assert_equal(18, control_item_array.size)
   end
 
   it "suggests control tag keys matching 'scope'" do
@@ -52,10 +54,10 @@ describe File.basename(__FILE__) do
                 }, "impact" => 1,
                 "endTime" => "2018-03-04T09:18:42Z",
                 "controlSummary" => {
-                    "total" => 6,
+                    "total" => 5,
                     "passed" => {},
                     "skipped" => {
-                        "total" => 6
+                        "total" => 5
                     },
                     "failed" => {}
                 }
@@ -71,10 +73,10 @@ describe File.basename(__FILE__) do
                 "impact" => 1,
                 "endTime" => "2018-03-04T09:18:42Z",
                 "controlSummary" => {
-                    "total" => 6,
+                    "total" => 5,
                     "passed" => {},
                     "skipped" => {
-                        "total" => 5
+                        "total" => 4
                     },
                     "failed" => {
                         "total" => 1,
@@ -171,10 +173,10 @@ describe File.basename(__FILE__) do
                 }, "impact" => 1,
                 "endTime" => "2018-03-04T09:18:42Z",
                 "controlSummary" => {
-                    "total" => 6,
+                    "total" => 5,
                     "passed" => {},
                     "skipped" => {
-                        "total" => 6
+                        "total" => 5
                     },
                     "failed" => {}
                 }
@@ -188,12 +190,12 @@ describe File.basename(__FILE__) do
                     "version" => "2.0.1"
                 },
                 "impact" => 1,
-                "endTime" => "2018-02-09T09:18:41Z",
+                "endTime" => "2018-03-04T09:18:41Z",
                 "controlSummary" => {
-                    "total" => 5,
+                    "total" => 4,
                     "passed" => {},
                     "skipped" => {
-                        "total" => 5
+                        "total" => 4
                     },
                     "failed" => {}
                 }
@@ -297,30 +299,11 @@ describe File.basename(__FILE__) do
                         "critical" => 1
                     }
                 }
-            },
-            {
-                "id" => "os-01",
-                "title" => "Trusted hosts login",
-                "profile" => {
-                    "title" => "DevSec Linux Security Baseline",
-                    "id" => "b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015",
-                    "version" => "2.0.1"
-                },
-                "impact" => 1,
-                "endTime" => "2018-02-09T09:18:41Z",
-                "controlSummary" => {
-                    "total" => 1,
-                    "passed" => {
-                        "total" => 1
-                    },
-                    "skipped" => {},
-                    "failed" => {}
-                }
             }
         ]
     }
     control_item_array = actual_data['control_items']
-    assert_equal(2, control_item_array.size)
+    assert_equal(1, control_item_array.size)
     assert_equal_json_content(expected_data, actual_data)
   end
 
