@@ -4,6 +4,7 @@ import { Store, StoreModule } from '@ngrx/store';
 import * as moment from 'moment';
 import { MockComponent } from 'ng2-mock-component';
 import { using } from 'app/testing/spec-helpers';
+import { DateTime } from 'app/helpers/datetime/datetime';
 import { HttpStatus } from 'app/types/types';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
@@ -12,7 +13,6 @@ import { EntityStatus } from 'app/entities/entities';
 import { ApplyStatus } from 'app/entities/license/license.reducer';
 import { LicenseStatus } from 'app/entities/license/license.model';
 import { LicenseApplyComponent } from './license-apply.component';
-import { DateTime } from 'app/helpers/datetime/datetime';
 
 function genErrorResp(status: number, msg: string): any /* HttpErrorResponse */ {
   // not a full-fledged HttpErrorResponse but enough for our needs

@@ -1,8 +1,8 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Credential } from '../credentials.state';
 import * as moment from 'moment';
-import { CredentialsLogic } from '../credentials.logic';
 import { DateTime } from '../../../../helpers/datetime/datetime';
+import { CredentialsLogic } from '../credentials.logic';
 
 @Component({
   selector: 'app-credentials-list-row',
