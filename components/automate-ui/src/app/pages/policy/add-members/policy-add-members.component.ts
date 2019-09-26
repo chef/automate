@@ -66,6 +66,8 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
   // Form info
   public expressionForm: FormGroup;
+  public expressionOutput: string;
+
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -74,10 +76,9 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
     this.expressionForm = fb.group({
       // Must stay in sync with error checks in policy-add-members.component.html
-      expression: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       type: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      identity: ['', Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)],
-      name: ['', Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]
+      identity: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
   }
 
@@ -307,5 +308,14 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     this.addAvailableMember(member, true);
     this.addOrRemoveQueuedMember(true, member);
     this.closeModal();
+  }
+
+  buildExpressionOutput(): void {
+    const { expressionForm } = this;
+    const type = expressionForm.value['type'];
+
+    const output = type;
+
+    this.expressionOutput = output;
   }
 }

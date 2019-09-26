@@ -23,7 +23,10 @@
             <chef-form-field id="create-type">
               <label>
                 <span class="label">Type<span aria-hidden="true">*</span></span>
-                <select id="expression-type-dropdown" ngDefaultControl formControlName="type">
+                <select id="expression-type-dropdown" 
+                        ngDefaultControl 
+                        formControlName="type"
+                        (change)="buildExpressionOutput()">
                   <option value='USER'>User</option>
                   <option value='TEAM'>Team</option>
                   <option value='TOKEN'>Token</option>
@@ -37,7 +40,10 @@
             <chef-form-field id="create-identity">
               <label>
                 <span class="label">Identity Provider<span aria-hidden="true">*</span></span>
-                <select id="expression-identity-dropdown" ngDefaultControl formControlName="identity">
+                <select id="expression-identity-dropdown" 
+                        ngDefaultControl 
+                        formControlName="identity"
+                        (change)="buildExpressionOutput()">
                   <option value="LDAP">LDAP</option>
                   <option value="LOCAL">local</option>
                   <option value="SAML">SAML</option>
@@ -56,27 +62,31 @@
                             ngDefaultControl 
                             formControlName="name"></chef-input>
               </label>
+              <p>wildcards (*) are allowed.</p>
               <chef-error *ngIf="expressionForm.get('name').hasError('required') && expressionForm.get('name').touched">
                 Some sort of error goes here for name selection
               </chef-error>
             </chef-form-field>
 
-
-            <chef-form-field>
+            <!-- CURRENTLY USED ERROR MESSAGES -->
+            <!-- <chef-form-field>
               <chef-error *ngIf="unparsableMember">Invalid member expression.</chef-error>
               <chef-error *ngIf="duplicateMember">Member expression already in table.</chef-error>
               <chef-error *ngIf="alreadyPolicyMember">Member already in policy.</chef-error>
               <chef-error *ngIf="(expressionForm.get('expression').hasError('required') || expressionForm.get('expression').hasError('pattern')) && expressionForm.get('expression').dirty">
                 Member expression is required.
               </chef-error>
-            </chef-form-field>
+            </chef-form-field> -->
           </form>
-          <p><span class="expression">user | team : local | ldap | saml : &lt;name&gt;</span> or <span class="expression">token : &lt;id&gt;</span>, wildcards (*) are allowed.</p>
-          <p>More details in <a href="https://automate.chef.io/docs/iam-v2-guide/#member-expressions" target="_blank">member expression documentation</a>.</p>
         </div>
+        <!-- expression builder output -->
+        <div>
+          <span class="expression-output">{{ expressionOutput }}</span>
+        </div>
+
         <div id="align-buttons">
           <chef-button primary [disabled]="!expressionForm.valid" (click)="validateAndAddExpression()">Add Expression</chef-button>
-          <chef-button tertiary (click)="closeModal()">Cancel</chef-button>
+          <chef-button secondary (click)="closeModal()">Cancel</chef-button>
         </div>
       </chef-modal>
       <!--  -->
