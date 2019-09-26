@@ -13,7 +13,7 @@
   (close)="closePage()">
     <div *ngIf="!loading">
       <!--  -->
-      <!--  -->
+      <!-- MODAL START -->
       <!--  -->
       <chef-modal label="member-expression-label" class="member-expression-modal" [visible]="modalVisible" (close)="closeModal()">
         <h2>Add Member Expression</h2>
@@ -80,7 +80,7 @@
         </div>
       </chef-modal>
       <!--  -->
-      <!--  -->
+      <!-- MODAL END -->
       <!--  -->
       <div id="no-members-container" *ngIf="sortedMembersAvailable.length === 0">
         <h3>Create more local users or local teams first, or add a member expression.</h3>
