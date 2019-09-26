@@ -240,9 +240,9 @@ message Id {
 }
 
 message Query {
-	// The id of a specific resource to fetch
+	// Used by the ReadReport endpoint to specify which report to return
 	string id = 18;
-	// The type of request being made ???
+	// Used by the ListSuggestions endpoint to control the type of suggestions requested, used by the Export endpoint to control the file format of the returned documents
 	string type = 19;
 	// The list of filters used to narrow down the list
 	repeated ListFilter filters = 20;
@@ -253,7 +253,7 @@ message Query {
 	}
 	// Whether to sort in ascending or descending order
 	OrderType order = 21;
-	// The field to sort by
+	// The field to sort the list of results by
 	string sort = 22;
 	// The offset to use when paginating requests
 	int32 page = 23;
@@ -261,7 +261,6 @@ message Query {
 	int32 per_page = 24;
 }
 
-// The list of filters used in the request.
 message ListFilter {
 	// The values to filter for
 	repeated string values = 20;
@@ -269,26 +268,40 @@ message ListFilter {
 	string type = 21;
 }
 
+// A subtotal of controls
 message Total {
+	// The number of controls
 	int32 total = 1;
 }
 
+// Stats of failed controls
 message Failed {
+	// The total number of failed controls
 	int32 total = 1;
+	// The number of failed controls with minor severity
 	int32 minor = 2;
+	// The number of failed controls with major severity
 	int32 major = 3;
+	// The number of failed controls with critical severity
 	int32 critical = 4;
 }
 
+// A minimal represenation of the statuses of the controls in the report
 message ControlSummary {
+	// The total number of controls in the report
 	int32 total = 1;
+	// Intentionally blank
 	Total passed = 2;
+	// Intentionally blank
 	Total skipped = 3;
+	// Intentionally blank
 	Failed failed = 4;
 }
 
 message Reports {
+	// The paginated results of reports matching the filters
 	repeated Report reports = 1;
+	// The total number of reports matching the filters
 	int32 total = 2;
 }
 
@@ -298,133 +311,215 @@ message ReportIds {
 }
 
 message Report {
+	// The id of the report
 	string id = 1;
+	// The id of the node generating the report
 	string node_id = 2;
+	// The name of the node generating the report
 	string node_name = 3;
+	// The time the report was submitted at
 	google.protobuf.Timestamp end_time = 4;
+	// The status of the run the report was made from
 	string status = 5;
+	// Intentionally blank
 	ControlSummary controls = 6;
+	// The environment of the node generating the report
 	string environment = 7;
+	// The version of the report (???)
 	string version = 8;
+	// Intentionally blank
 	Platform platform = 9;
+	// Intentionally blank
 	Statistics statistics = 10;
+	// The profiles run as part of this report
 	repeated Profile profiles = 11;
+	// The id of the job associated with the report (???)
 	string job_id = 12;
+	// The IP address of the node generating the report
 	string ipaddress = 13;
+	// The FQDN (fully qualified domain name) of the node generating the report
 	string fqdn = 14;
 }
 
 message Profile {
+	// The name of the profile. Must be unique
 	string name = 1;
+	// The human-readable name of the profile
 	string title = 2;
+	// The maintainer listed in the profile metadata
 	string maintainer = 3;
+	// The name of the copyright holder
 	string copyright = 4;
+	// The contact information for the copyright holder
 	string copyright_email = 5;
+	// The license the profile is released under
 	string license = 6;
+	// A short description of the profile
 	string summary = 7;
+	// The version of the profile
 	string version = 8;
+	// The name of the account that uploaded the profile to Automate
 	string owner = 9;
+	// ???
 	string full = 10;
+	// The supported platform targets
 	repeated Support supports = 16;
+	// Other profiles that this profile depends on
 	repeated Dependency depends = 17;
+	// A unique value generated from the profile used to identify it
 	string sha256 = 18;
+	// ???
 	repeated Group groups = 19;
+	// The controls defined on the profile
 	repeated Control controls = 20;
+	// The attributes defined on the profile
 	repeated Attribute attributes = 21;
+	// The highest version number of the profile stored in Automate
 	string latest_version = 22;
+	// The status of the profile in the generated report
 	string status = 23;
+	// The reason this profile was skipped in the generated report, if any
 	string skip_message = 24;
 }
 
 message Ref {
+	// The URL of the external document
 	string url = 1;
+	// The description of the external document
 	string ref = 2;
 }
 
 message Result {
+	// The status of the test
 	string status = 1;
+	// The description of the test
 	string code_desc = 2;
+	// The time taken to run the test
 	float run_time = 3;
+	// The timestamp of when this individual test was run
 	string start_time = 4;
+	// The reason the test failed, if any
 	string message = 5;
+	// The reason the test was skipped, if any
 	string skip_message = 6;
 }
 
 message SourceLocation {
+	// The source code file the control is defined in
 	string ref = 1;
+	// The line number the control is defined on
 	int32 line = 2;
 }
 
 message Option {
+	// The description of the attribute
 	string description = 1;
+	// The default value of the attribute
 	string default = 2 ;
 }
 
 message Support {
+	// The name of the supported operating system
 	string os_name = 1;
+	// The name of the broader category of the supported platform (eg, linux, windows)
 	string os_family = 2;
+	// The specific release of the operating system this profile supports
 	string release = 3;
+	// The supported inspec version this profile was made to run on
 	string inspec_version = 4;
+	// The platform name and version combined
 	string platform = 5;
 }
 
 message Dependency {
+	// The name of the profile
 	string name = 1;
+	// The URL of the profile accessible over HTTP or HTTPS
 	string url = 2;
+	// The path to the profile on disk
 	string path = 3;
+	// The git URL of the profile
 	string git = 4;
+	// The specific git branch of the dependency
 	string branch = 5;
+	// The specific git tag of the dependency
 	string tag = 6;
+	// The specific git commit of the dependency
 	string commit = 7;
+	// The specific git version of the dependency
 	string version = 8;
+	// The name of the dependency stored in Chef Supermarket
 	string supermarket = 9;
+	// The short name of the dependency stored on Github
 	string github = 10;
+	// The short name of the dependency stored on the Chef Automate or Chef Compliance server
 	string compliance = 11;
+	// The status of the dependency in the report
 	string status = 12;
+	// The reason this profile was skipped in the generated report, if any
 	string skip_message = 13;
 }
 
 message Group {
+	// ???
 	string id = 1;
+	// ???
 	string title = 2;
+	// ???
 	repeated string controls = 3;
 }
 
 message Control {
+	// The unique id of this control
 	string id = 1;
+	// The full ruby code of the control defined in the profile
 	string code = 2;
+	// The full description of the control
 	string desc = 3;
+	// The severity of the control
 	float impact = 4;
+	// The compact description of the control
 	string title = 5;
+	// Intentionally blank
 	SourceLocation source_location = 6;
+	// The results of running all tests defined in the control against the node
 	repeated Result results = 7;
+	// External supporting documents for the control
 	repeated Ref refs = 8;
+	// Metadata defined on the control in key-value format
 	map<string, string> tags = 9;
 }
 
 message Attribute {
+	// The name of the attribute
 	string name = 1;
+	// The options defined for the attribute
 	Option options = 2;
 }
 
+// The name and version of the node's operating system
 message Platform {
+	// The name of the node's operating system
 	string name = 1;
+	// The version of the node's operating system
 	string release = 2;
 	string full = 3;
 }
 
+// Statistics of the report's run
 message Statistics {
+	// The duration of the report's generation time
 	float duration = 1;
 }
 
 message SuggestionRequest {
 	// The type of resource to get suggestions for
 	string type = 1;
-	// The term to use to match resources on 
+	// The term to use to match resources on
 	string text = 2;
 	// The maximum number of suggestions to return
 	int32 size = 3;
-	// The criteria used to filter the suggestions returned.
+	// The criteria used to filter the suggestions returned
 	repeated ListFilter filters = 4;
 }
 
@@ -440,63 +535,99 @@ message Suggestion {
 }
 
 message Suggestions {
-	// The list of returned suggestions.
+	// The list of returned suggestions
 	repeated Suggestion suggestions = 1;
 }
 
 message ProfileMins {
+	// Minimal represenations of the profiles matching the filters
 	repeated ProfileMin profiles = 1;
+	// Intentionally blank
 	ProfileCounts counts = 2;
 }
+
+// Stats on the statuses of nodes matching the filters
 message ProfileCounts {
+	// The total number of nodes matching the filters
 	int32 total = 1;
+	// The total number of failed nodes matching the filters
 	int32 failed = 2;
+	// The total number of skipped nodes matching the filters
 	int32 skipped = 3;
+	// The total number of passing nodes matching the filters
 	int32 passed = 4;
 }
 
 message ProfileMin {
+	// The name of the profile
 	string name = 1;
+	// The title of the profile
 	string title = 2;
+	// The id of the profile
 	string id = 3;
+	// The version of the profile
 	string version = 4;
+	// The aggregated status of the profile across the nodes it has been run on
 	string status = 5;
 }
 
 message Node {
+	// The id of this node
 	string id = 1;
+	// The name assigned to the node
 	string name = 2;
+	// Intentionally blank
 	Platform platform = 3;
+	// The environment assigned to the node
 	string environment = 4;
+	// A summary of the information contained in the latest report for this node
 	LatestReportSummary latest_report = 8;
+	// The tags assigned to this node
 	repeated Kv tags = 9;
+	// A minimal represenation of the compliance profiles run against the node
 	repeated ProfileMeta profiles = 10;
 }
 
 message Nodes {
+	// The nodes matching the request filters
 	repeated Node nodes = 1;
+	// The total number of nodes matching the filters
 	int32 total = 20;
+	// The total number of passing nodes matching the filters
 	int32 total_passed = 21;
+	// The total number of failed nodes matching the filters
 	int32 total_failed = 22;
+	// The total number of skipped nodes matching the filters
 	int32 total_skipped = 23;
 }
 
 message Kv {
+	// The key of the tag
 	string key = 1;
+	// The value of the tag
 	string value = 2;
 }
 
+// A summary of the information contained in the latest report for this node
 message LatestReportSummary {
+	// The id of the latest report
 	string id = 1;
+	// The time the report was submitted at
 	google.protobuf.Timestamp end_time = 2;
+	// The status of the run the report was made from
 	string status = 3;
+	// Intentionally blank
 	ControlSummary controls = 4;
 }
 
 message ProfileMeta {
+	// The name of the profile
 	string name = 1;
+	// The version of the profile
 	string version = 2;
+	// The unique id of the profile
 	string id = 3;
+	// The status of the profile run against the node
 	string status = 4;
 	string full = 5;
 }

@@ -294,43 +294,56 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "title": "The name of the profile"
         },
         "url": {
-          "type": "string"
+          "type": "string",
+          "title": "The URL of the profile accessible over HTTP or HTTPS"
         },
         "path": {
-          "type": "string"
+          "type": "string",
+          "title": "The path to the profile on disk"
         },
         "git": {
-          "type": "string"
+          "type": "string",
+          "title": "The git URL of the profile"
         },
         "branch": {
-          "type": "string"
+          "type": "string",
+          "title": "The specific git branch of the dependency"
         },
         "tag": {
-          "type": "string"
+          "type": "string",
+          "title": "The specific git tag of the dependency"
         },
         "commit": {
-          "type": "string"
+          "type": "string",
+          "title": "The specific git commit of the dependency"
         },
         "version": {
-          "type": "string"
+          "type": "string",
+          "title": "The specific git version of the dependency"
         },
         "supermarket": {
-          "type": "string"
+          "type": "string",
+          "title": "The name of the dependency stored in Chef Supermarket"
         },
         "github": {
-          "type": "string"
+          "type": "string",
+          "title": "The short name of the dependency stored on Github"
         },
         "compliance": {
-          "type": "string"
+          "type": "string",
+          "title": "The short name of the dependency stored on the Chef Automate or Chef Compliance server"
         },
         "status": {
-          "type": "string"
+          "type": "string",
+          "title": "The status of the dependency in the report"
         },
         "skip_message": {
-          "type": "string"
+          "type": "string",
+          "title": "The reason this profile was skipped in the generated report, if any"
         }
       }
     },

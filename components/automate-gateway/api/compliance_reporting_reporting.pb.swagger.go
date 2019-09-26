@@ -200,7 +200,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "The id of a specific resource to fetch",
+            "description": "Used by the ReadReport endpoint to specify which report to return",
             "in": "path",
             "required": true,
             "type": "string"
@@ -318,10 +318,12 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "title": "The name of the attribute"
         },
         "options": {
-          "$ref": "#/definitions/v1Option"
+          "$ref": "#/definitions/v1Option",
+          "title": "The options defined for the attribute"
         }
       }
     },
@@ -329,41 +331,50 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "title": "The unique id of this control"
         },
         "code": {
-          "type": "string"
+          "type": "string",
+          "title": "The full ruby code of the control defined in the profile"
         },
         "desc": {
-          "type": "string"
+          "type": "string",
+          "title": "The full description of the control"
         },
         "impact": {
           "type": "number",
-          "format": "float"
+          "format": "float",
+          "title": "The severity of the control"
         },
         "title": {
-          "type": "string"
+          "type": "string",
+          "title": "The compact description of the control"
         },
         "source_location": {
-          "$ref": "#/definitions/v1SourceLocation"
+          "$ref": "#/definitions/v1SourceLocation",
+          "title": "Intentionally blank"
         },
         "results": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1Result"
-          }
+          },
+          "title": "The results of running all tests defined in the control against the node"
         },
         "refs": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1Ref"
-          }
+          },
+          "title": "External supporting documents for the control"
         },
         "tags": {
           "type": "object",
           "additionalProperties": {
             "type": "string"
-          }
+          },
+          "title": "Metadata defined on the control in key-value format"
         }
       }
     },
@@ -426,60 +437,78 @@ func init() {
       "properties": {
         "total": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "The total number of controls in the report"
         },
         "passed": {
-          "$ref": "#/definitions/v1Total"
+          "$ref": "#/definitions/v1Total",
+          "title": "Intentionally blank"
         },
         "skipped": {
-          "$ref": "#/definitions/v1Total"
+          "$ref": "#/definitions/v1Total",
+          "title": "Intentionally blank"
         },
         "failed": {
-          "$ref": "#/definitions/v1Failed"
+          "$ref": "#/definitions/v1Failed",
+          "title": "Intentionally blank"
         }
-      }
+      },
+      "title": "A minimal represenation of the statuses of the controls in the report"
     },
     "v1Dependency": {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "title": "The name of the profile"
         },
         "url": {
-          "type": "string"
+          "type": "string",
+          "title": "The URL of the profile accessible over HTTP or HTTPS"
         },
         "path": {
-          "type": "string"
+          "type": "string",
+          "title": "The path to the profile on disk"
         },
         "git": {
-          "type": "string"
+          "type": "string",
+          "title": "The git URL of the profile"
         },
         "branch": {
-          "type": "string"
+          "type": "string",
+          "title": "The specific git branch of the dependency"
         },
         "tag": {
-          "type": "string"
+          "type": "string",
+          "title": "The specific git tag of the dependency"
         },
         "commit": {
-          "type": "string"
+          "type": "string",
+          "title": "The specific git commit of the dependency"
         },
         "version": {
-          "type": "string"
+          "type": "string",
+          "title": "The specific git version of the dependency"
         },
         "supermarket": {
-          "type": "string"
+          "type": "string",
+          "title": "The name of the dependency stored in Chef Supermarket"
         },
         "github": {
-          "type": "string"
+          "type": "string",
+          "title": "The short name of the dependency stored on Github"
         },
         "compliance": {
-          "type": "string"
+          "type": "string",
+          "title": "The short name of the dependency stored on the Chef Automate or Chef Compliance server"
         },
         "status": {
-          "type": "string"
+          "type": "string",
+          "title": "The status of the dependency in the report"
         },
         "skip_message": {
-          "type": "string"
+          "type": "string",
+          "title": "The reason this profile was skipped in the generated report, if any"
         }
       }
     },
@@ -498,36 +527,44 @@ func init() {
       "properties": {
         "total": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "The total number of failed controls"
         },
         "minor": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "The number of failed controls with minor severity"
         },
         "major": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "The number of failed controls with major severity"
         },
         "critical": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "The number of failed controls with critical severity"
         }
-      }
+      },
+      "title": "Stats of failed controls"
     },
     "v1Group": {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "title": "???"
         },
         "title": {
-          "type": "string"
+          "type": "string",
+          "title": "???"
         },
         "controls": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "title": "???"
         }
       }
     },
@@ -535,10 +572,12 @@ func init() {
       "type": "object",
       "properties": {
         "key": {
-          "type": "string"
+          "type": "string",
+          "title": "The key of the tag"
         },
         "value": {
-          "type": "string"
+          "type": "string",
+          "title": "The value of the tag"
         }
       }
     },
@@ -546,19 +585,24 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "title": "The id of the latest report"
         },
         "end_time": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "title": "The time the report was submitted at"
         },
         "status": {
-          "type": "string"
+          "type": "string",
+          "title": "The status of the run the report was made from"
         },
         "controls": {
-          "$ref": "#/definitions/v1ControlSummary"
+          "$ref": "#/definitions/v1ControlSummary",
+          "title": "Intentionally blank"
         }
-      }
+      },
+      "title": "A summary of the information contained in the latest report for this node"
     },
     "v1ListFilter": {
       "type": "object",
@@ -574,38 +618,44 @@ func init() {
           "type": "string",
           "title": "The field to filter on"
         }
-      },
-      "description": "The list of filters used in the request."
+      }
     },
     "v1Node": {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "title": "The id of this node"
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "title": "The name assigned to the node"
         },
         "platform": {
-          "$ref": "#/definitions/v1Platform"
+          "$ref": "#/definitions/v1Platform",
+          "title": "Intentionally blank"
         },
         "environment": {
-          "type": "string"
+          "type": "string",
+          "title": "The environment assigned to the node"
         },
         "latest_report": {
-          "$ref": "#/definitions/v1LatestReportSummary"
+          "$ref": "#/definitions/v1LatestReportSummary",
+          "title": "A summary of the information contained in the latest report for this node"
         },
         "tags": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1Kv"
-          }
+          },
+          "title": "The tags assigned to this node"
         },
         "profiles": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1ProfileMeta"
-          }
+          },
+          "title": "A minimal represenation of the compliance profiles run against the node"
         }
       }
     },
@@ -616,23 +666,28 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1Node"
-          }
+          },
+          "title": "The nodes matching the request filters"
         },
         "total": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "The total number of nodes matching the filters"
         },
         "total_passed": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "The total number of passing nodes matching the filters"
         },
         "total_failed": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "The total number of failed nodes matching the filters"
         },
         "total_skipped": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "The total number of skipped nodes matching the filters"
         }
       }
     },
@@ -640,10 +695,12 @@ func init() {
       "type": "object",
       "properties": {
         "description": {
-          "type": "string"
+          "type": "string",
+          "title": "The description of the attribute"
         },
         "default": {
-          "type": "string"
+          "type": "string",
+          "title": "The default value of the attribute"
         }
       }
     },
@@ -651,90 +708,112 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "title": "The name of the node's operating system"
         },
         "release": {
-          "type": "string"
+          "type": "string",
+          "title": "The version of the node's operating system"
         },
         "full": {
           "type": "string"
         }
-      }
+      },
+      "title": "The name and version of the node's operating system"
     },
     "v1Profile": {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "title": "The name of the profile. Must be unique"
         },
         "title": {
-          "type": "string"
+          "type": "string",
+          "title": "The human-readable name of the profile"
         },
         "maintainer": {
-          "type": "string"
+          "type": "string",
+          "title": "The maintainer listed in the profile metadata"
         },
         "copyright": {
-          "type": "string"
+          "type": "string",
+          "title": "The name of the copyright holder"
         },
         "copyright_email": {
-          "type": "string"
+          "type": "string",
+          "title": "The contact information for the copyright holder"
         },
         "license": {
-          "type": "string"
+          "type": "string",
+          "title": "The license the profile is released under"
         },
         "summary": {
-          "type": "string"
+          "type": "string",
+          "title": "A short description of the profile"
         },
         "version": {
-          "type": "string"
+          "type": "string",
+          "title": "The version of the profile"
         },
         "owner": {
-          "type": "string"
+          "type": "string",
+          "title": "The name of the account that uploaded the profile to Automate"
         },
         "full": {
-          "type": "string"
+          "type": "string",
+          "title": "???"
         },
         "supports": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1Support"
-          }
+          },
+          "title": "The supported platform targets"
         },
         "depends": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1Dependency"
-          }
+          },
+          "title": "Other profiles that this profile depends on"
         },
         "sha256": {
-          "type": "string"
+          "type": "string",
+          "title": "A unique value generated from the profile used to identify it"
         },
         "groups": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1Group"
-          }
+          },
+          "title": "???"
         },
         "controls": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1Control"
-          }
+          },
+          "title": "The controls defined on the profile"
         },
         "attributes": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1Attribute"
-          }
+          },
+          "title": "The attributes defined on the profile"
         },
         "latest_version": {
-          "type": "string"
+          "type": "string",
+          "title": "The highest version number of the profile stored in Automate"
         },
         "status": {
-          "type": "string"
+          "type": "string",
+          "title": "The status of the profile in the generated report"
         },
         "skip_message": {
-          "type": "string"
+          "type": "string",
+          "title": "The reason this profile was skipped in the generated report, if any"
         }
       }
     },
@@ -743,36 +822,45 @@ func init() {
       "properties": {
         "total": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "The total number of nodes matching the filters"
         },
         "failed": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "The total number of failed nodes matching the filters"
         },
         "skipped": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "The total number of skipped nodes matching the filters"
         },
         "passed": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "The total number of passing nodes matching the filters"
         }
-      }
+      },
+      "title": "Stats on the statuses of nodes matching the filters"
     },
     "v1ProfileMeta": {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "title": "The name of the profile"
         },
         "version": {
-          "type": "string"
+          "type": "string",
+          "title": "The version of the profile"
         },
         "id": {
-          "type": "string"
+          "type": "string",
+          "title": "The unique id of the profile"
         },
         "status": {
-          "type": "string"
+          "type": "string",
+          "title": "The status of the profile run against the node"
         },
         "full": {
           "type": "string"
@@ -783,19 +871,24 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "title": "The name of the profile"
         },
         "title": {
-          "type": "string"
+          "type": "string",
+          "title": "The title of the profile"
         },
         "id": {
-          "type": "string"
+          "type": "string",
+          "title": "The id of the profile"
         },
         "version": {
-          "type": "string"
+          "type": "string",
+          "title": "The version of the profile"
         },
         "status": {
-          "type": "string"
+          "type": "string",
+          "title": "The aggregated status of the profile across the nodes it has been run on"
         }
       }
     },
@@ -806,10 +899,12 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1ProfileMin"
-          }
+          },
+          "title": "Minimal represenations of the profiles matching the filters"
         },
         "counts": {
-          "$ref": "#/definitions/v1ProfileCounts"
+          "$ref": "#/definitions/v1ProfileCounts",
+          "title": "Intentionally blank"
         }
       }
     },
@@ -818,11 +913,11 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "title": "The id of a specific resource to fetch"
+          "title": "Used by the ReadReport endpoint to specify which report to return"
         },
         "type": {
           "type": "string",
-          "title": "The type of request being made ???"
+          "title": "Used by the ListSuggestions endpoint to control the type of suggestions requested, used by the Export endpoint to control the file format of the returned documents"
         },
         "filters": {
           "type": "array",
@@ -837,7 +932,7 @@ func init() {
         },
         "sort": {
           "type": "string",
-          "title": "The field to sort by"
+          "title": "The field to sort the list of results by"
         },
         "page": {
           "type": "integer",
@@ -855,10 +950,12 @@ func init() {
       "type": "object",
       "properties": {
         "url": {
-          "type": "string"
+          "type": "string",
+          "title": "The URL of the external document"
         },
         "ref": {
-          "type": "string"
+          "type": "string",
+          "title": "The description of the external document"
         }
       }
     },
@@ -866,50 +963,64 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "title": "The id of the report"
         },
         "node_id": {
-          "type": "string"
+          "type": "string",
+          "title": "The id of the node generating the report"
         },
         "node_name": {
-          "type": "string"
+          "type": "string",
+          "title": "The name of the node generating the report"
         },
         "end_time": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "title": "The time the report was submitted at"
         },
         "status": {
-          "type": "string"
+          "type": "string",
+          "title": "The status of the run the report was made from"
         },
         "controls": {
-          "$ref": "#/definitions/v1ControlSummary"
+          "$ref": "#/definitions/v1ControlSummary",
+          "title": "Intentionally blank"
         },
         "environment": {
-          "type": "string"
+          "type": "string",
+          "title": "The environment of the node generating the report"
         },
         "version": {
-          "type": "string"
+          "type": "string",
+          "title": "The version of the report (???)"
         },
         "platform": {
-          "$ref": "#/definitions/v1Platform"
+          "$ref": "#/definitions/v1Platform",
+          "title": "Intentionally blank"
         },
         "statistics": {
-          "$ref": "#/definitions/v1Statistics"
+          "$ref": "#/definitions/v1Statistics",
+          "title": "Intentionally blank"
         },
         "profiles": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1Profile"
-          }
+          },
+          "title": "The profiles run as part of this report"
         },
         "job_id": {
-          "type": "string"
+          "type": "string",
+          "title": "The id of the job associated with the report (???)"
         },
         "ipaddress": {
-          "type": "string"
+          "type": "string",
+          "title": "The IP address of the node generating the report"
         },
         "fqdn": {
-          "type": "string"
+          "type": "string",
+          "title": "The FQDN (fully qualified domain name) of the node generating the report"
         }
       }
     },
@@ -932,11 +1043,13 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1Report"
-          }
+          },
+          "title": "The paginated results of reports matching the filters"
         },
         "total": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "The total number of reports matching the filters"
         }
       }
     },
@@ -944,23 +1057,29 @@ func init() {
       "type": "object",
       "properties": {
         "status": {
-          "type": "string"
+          "type": "string",
+          "title": "The status of the test"
         },
         "code_desc": {
-          "type": "string"
+          "type": "string",
+          "title": "The description of the test"
         },
         "run_time": {
           "type": "number",
-          "format": "float"
+          "format": "float",
+          "title": "The time taken to run the test"
         },
         "start_time": {
-          "type": "string"
+          "type": "string",
+          "title": "The timestamp of when this individual test was run"
         },
         "message": {
-          "type": "string"
+          "type": "string",
+          "title": "The reason the test failed, if any"
         },
         "skip_message": {
-          "type": "string"
+          "type": "string",
+          "title": "The reason the test was skipped, if any"
         }
       }
     },
@@ -968,11 +1087,13 @@ func init() {
       "type": "object",
       "properties": {
         "ref": {
-          "type": "string"
+          "type": "string",
+          "title": "The source code file the control is defined in"
         },
         "line": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "The line number the control is defined on"
         }
       }
     },
@@ -981,9 +1102,11 @@ func init() {
       "properties": {
         "duration": {
           "type": "number",
-          "format": "float"
+          "format": "float",
+          "title": "The duration of the report's generation time"
         }
-      }
+      },
+      "title": "Statistics of the report's run"
     },
     "v1Suggestion": {
       "type": "object",
@@ -1028,7 +1151,7 @@ func init() {
           "items": {
             "$ref": "#/definitions/v1ListFilter"
           },
-          "description": "The criteria used to filter the suggestions returned."
+          "title": "The criteria used to filter the suggestions returned"
         }
       }
     },
@@ -1040,7 +1163,7 @@ func init() {
           "items": {
             "$ref": "#/definitions/v1Suggestion"
           },
-          "description": "The list of returned suggestions."
+          "title": "The list of returned suggestions"
         }
       }
     },
@@ -1048,19 +1171,24 @@ func init() {
       "type": "object",
       "properties": {
         "os_name": {
-          "type": "string"
+          "type": "string",
+          "title": "The name of the supported operating system"
         },
         "os_family": {
-          "type": "string"
+          "type": "string",
+          "title": "The name of the broader category of the supported platform (eg, linux, windows)"
         },
         "release": {
-          "type": "string"
+          "type": "string",
+          "title": "The specific release of the operating system this profile supports"
         },
         "inspec_version": {
-          "type": "string"
+          "type": "string",
+          "title": "The supported inspec version this profile was made to run on"
         },
         "platform": {
-          "type": "string"
+          "type": "string",
+          "title": "The platform name and version combined"
         }
       }
     },
@@ -1069,9 +1197,11 @@ func init() {
       "properties": {
         "total": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "The number of controls"
         }
-      }
+      },
+      "title": "A subtotal of controls"
     },
     "versionVersionInfo": {
       "type": "object",

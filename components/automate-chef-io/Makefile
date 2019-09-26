@@ -4,7 +4,7 @@ SHELL=bash
 SWAGGER_RESULT_FILE=static/api-docs/all-apis.swagger.json
 SWAGGER_DIR=data/docs/api_chef_automate
 #SWAGGER_FILES=$(shell find $(SWAGGER_DIR) -name '*.swagger.json')
-SWAGGER_FILES=data/docs/api_chef_automate/compliance/reporting/reporting.swagger.json data/docs/api_chef_automate/gateway/gateway.swagger.json
+SWAGGER_FILES=data/docs/api_chef_automate/compliance/reporting/reporting.swagger.json
 STATIC_SWAGGER_FILES=$(shell find data/docs/api-static/ -type f | sort -n)
 
 EXPECTED_CONFLICTS=46

@@ -350,15 +350,15 @@ func (m *Id) GetId() string {
 }
 
 type Query struct {
-	// The id of a specific resource to fetch
+	// Used by the ReadReport endpoint to specify which report to return
 	Id string `protobuf:"bytes,18,opt,name=id,proto3" json:"id,omitempty"`
-	// The type of request being made ???
+	// Used by the ListSuggestions endpoint to control the type of suggestions requested, used by the Export endpoint to control the file format of the returned documents
 	Type string `protobuf:"bytes,19,opt,name=type,proto3" json:"type,omitempty"`
 	// The list of filters used to narrow down the list
 	Filters []*ListFilter `protobuf:"bytes,20,rep,name=filters,proto3" json:"filters,omitempty"`
 	// Whether to sort in ascending or descending order
 	Order Query_OrderType `protobuf:"varint,21,opt,name=order,proto3,enum=chef.automate.api.compliance.reporting.v1.Query_OrderType" json:"order,omitempty"`
-	// The field to sort by
+	// The field to sort the list of results by
 	Sort string `protobuf:"bytes,22,opt,name=sort,proto3" json:"sort,omitempty"`
 	// The offset to use when paginating requests
 	Page int32 `protobuf:"varint,23,opt,name=page,proto3" json:"page,omitempty"`
@@ -443,7 +443,6 @@ func (m *Query) GetPerPage() int32 {
 	return 0
 }
 
-// The list of filters used in the request.
 type ListFilter struct {
 	// The values to filter for
 	Values []string `protobuf:"bytes,20,rep,name=values,proto3" json:"values,omitempty"`
@@ -493,7 +492,9 @@ func (m *ListFilter) GetType() string {
 	return ""
 }
 
+// A subtotal of controls
 type Total struct {
+	// The number of controls
 	Total                int32    `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -532,10 +533,15 @@ func (m *Total) GetTotal() int32 {
 	return 0
 }
 
+// Stats of failed controls
 type Failed struct {
-	Total                int32    `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
-	Minor                int32    `protobuf:"varint,2,opt,name=minor,proto3" json:"minor,omitempty"`
-	Major                int32    `protobuf:"varint,3,opt,name=major,proto3" json:"major,omitempty"`
+	// The total number of failed controls
+	Total int32 `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
+	// The number of failed controls with minor severity
+	Minor int32 `protobuf:"varint,2,opt,name=minor,proto3" json:"minor,omitempty"`
+	// The number of failed controls with major severity
+	Major int32 `protobuf:"varint,3,opt,name=major,proto3" json:"major,omitempty"`
+	// The number of failed controls with critical severity
 	Critical             int32    `protobuf:"varint,4,opt,name=critical,proto3" json:"critical,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -595,10 +601,15 @@ func (m *Failed) GetCritical() int32 {
 	return 0
 }
 
+// A minimal represenation of the statuses of the controls in the report
 type ControlSummary struct {
-	Total                int32    `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
-	Passed               *Total   `protobuf:"bytes,2,opt,name=passed,proto3" json:"passed,omitempty"`
-	Skipped              *Total   `protobuf:"bytes,3,opt,name=skipped,proto3" json:"skipped,omitempty"`
+	// The total number of controls in the report
+	Total int32 `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
+	// Intentionally blank
+	Passed *Total `protobuf:"bytes,2,opt,name=passed,proto3" json:"passed,omitempty"`
+	// Intentionally blank
+	Skipped *Total `protobuf:"bytes,3,opt,name=skipped,proto3" json:"skipped,omitempty"`
+	// Intentionally blank
 	Failed               *Failed  `protobuf:"bytes,4,opt,name=failed,proto3" json:"failed,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -659,11 +670,13 @@ func (m *ControlSummary) GetFailed() *Failed {
 }
 
 type Reports struct {
-	Reports              []*Report `protobuf:"bytes,1,rep,name=reports,proto3" json:"reports,omitempty"`
-	Total                int32     `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	// The paginated results of reports matching the filters
+	Reports []*Report `protobuf:"bytes,1,rep,name=reports,proto3" json:"reports,omitempty"`
+	// The total number of reports matching the filters
+	Total                int32    `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *Reports) Reset()         { *m = Reports{} }
@@ -746,23 +759,37 @@ func (m *ReportIds) GetIds() []string {
 }
 
 type Report struct {
-	Id                   string               `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	NodeId               string               `protobuf:"bytes,2,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
-	NodeName             string               `protobuf:"bytes,3,opt,name=node_name,json=nodeName,proto3" json:"node_name,omitempty"`
-	EndTime              *timestamp.Timestamp `protobuf:"bytes,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	Status               string               `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
-	Controls             *ControlSummary      `protobuf:"bytes,6,opt,name=controls,proto3" json:"controls,omitempty"`
-	Environment          string               `protobuf:"bytes,7,opt,name=environment,proto3" json:"environment,omitempty"`
-	Version              string               `protobuf:"bytes,8,opt,name=version,proto3" json:"version,omitempty"`
-	Platform             *Platform            `protobuf:"bytes,9,opt,name=platform,proto3" json:"platform,omitempty"`
-	Statistics           *Statistics          `protobuf:"bytes,10,opt,name=statistics,proto3" json:"statistics,omitempty"`
-	Profiles             []*Profile           `protobuf:"bytes,11,rep,name=profiles,proto3" json:"profiles,omitempty"`
-	JobId                string               `protobuf:"bytes,12,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
-	Ipaddress            string               `protobuf:"bytes,13,opt,name=ipaddress,proto3" json:"ipaddress,omitempty"`
-	Fqdn                 string               `protobuf:"bytes,14,opt,name=fqdn,proto3" json:"fqdn,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	// The id of the report
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// The id of the node generating the report
+	NodeId string `protobuf:"bytes,2,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	// The name of the node generating the report
+	NodeName string `protobuf:"bytes,3,opt,name=node_name,json=nodeName,proto3" json:"node_name,omitempty"`
+	// The time the report was submitted at
+	EndTime *timestamp.Timestamp `protobuf:"bytes,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	// The status of the run the report was made from
+	Status string `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
+	// Intentionally blank
+	Controls *ControlSummary `protobuf:"bytes,6,opt,name=controls,proto3" json:"controls,omitempty"`
+	// The environment of the node generating the report
+	Environment string `protobuf:"bytes,7,opt,name=environment,proto3" json:"environment,omitempty"`
+	// The version of the report (???)
+	Version string `protobuf:"bytes,8,opt,name=version,proto3" json:"version,omitempty"`
+	// Intentionally blank
+	Platform *Platform `protobuf:"bytes,9,opt,name=platform,proto3" json:"platform,omitempty"`
+	// Intentionally blank
+	Statistics *Statistics `protobuf:"bytes,10,opt,name=statistics,proto3" json:"statistics,omitempty"`
+	// The profiles run as part of this report
+	Profiles []*Profile `protobuf:"bytes,11,rep,name=profiles,proto3" json:"profiles,omitempty"`
+	// The id of the job associated with the report (???)
+	JobId string `protobuf:"bytes,12,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
+	// The IP address of the node generating the report
+	Ipaddress string `protobuf:"bytes,13,opt,name=ipaddress,proto3" json:"ipaddress,omitempty"`
+	// The FQDN (fully qualified domain name) of the node generating the report
+	Fqdn                 string   `protobuf:"bytes,14,opt,name=fqdn,proto3" json:"fqdn,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *Report) Reset()         { *m = Report{} }
@@ -889,28 +916,47 @@ func (m *Report) GetFqdn() string {
 }
 
 type Profile struct {
-	Name                 string        `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Title                string        `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	Maintainer           string        `protobuf:"bytes,3,opt,name=maintainer,proto3" json:"maintainer,omitempty"`
-	Copyright            string        `protobuf:"bytes,4,opt,name=copyright,proto3" json:"copyright,omitempty"`
-	CopyrightEmail       string        `protobuf:"bytes,5,opt,name=copyright_email,json=copyrightEmail,proto3" json:"copyright_email,omitempty"`
-	License              string        `protobuf:"bytes,6,opt,name=license,proto3" json:"license,omitempty"`
-	Summary              string        `protobuf:"bytes,7,opt,name=summary,proto3" json:"summary,omitempty"`
-	Version              string        `protobuf:"bytes,8,opt,name=version,proto3" json:"version,omitempty"`
-	Owner                string        `protobuf:"bytes,9,opt,name=owner,proto3" json:"owner,omitempty"`
-	Full                 string        `protobuf:"bytes,10,opt,name=full,proto3" json:"full,omitempty"`
-	Supports             []*Support    `protobuf:"bytes,16,rep,name=supports,proto3" json:"supports,omitempty"`
-	Depends              []*Dependency `protobuf:"bytes,17,rep,name=depends,proto3" json:"depends,omitempty"`
-	Sha256               string        `protobuf:"bytes,18,opt,name=sha256,proto3" json:"sha256,omitempty"`
-	Groups               []*Group      `protobuf:"bytes,19,rep,name=groups,proto3" json:"groups,omitempty"`
-	Controls             []*Control    `protobuf:"bytes,20,rep,name=controls,proto3" json:"controls,omitempty"`
-	Attributes           []*Attribute  `protobuf:"bytes,21,rep,name=attributes,proto3" json:"attributes,omitempty"`
-	LatestVersion        string        `protobuf:"bytes,22,opt,name=latest_version,json=latestVersion,proto3" json:"latest_version,omitempty"`
-	Status               string        `protobuf:"bytes,23,opt,name=status,proto3" json:"status,omitempty"`
-	SkipMessage          string        `protobuf:"bytes,24,opt,name=skip_message,json=skipMessage,proto3" json:"skip_message,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
-	XXX_unrecognized     []byte        `json:"-"`
-	XXX_sizecache        int32         `json:"-"`
+	// The name of the profile. Must be unique
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The human-readable name of the profile
+	Title string `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	// The maintainer listed in the profile metadata
+	Maintainer string `protobuf:"bytes,3,opt,name=maintainer,proto3" json:"maintainer,omitempty"`
+	// The name of the copyright holder
+	Copyright string `protobuf:"bytes,4,opt,name=copyright,proto3" json:"copyright,omitempty"`
+	// The contact information for the copyright holder
+	CopyrightEmail string `protobuf:"bytes,5,opt,name=copyright_email,json=copyrightEmail,proto3" json:"copyright_email,omitempty"`
+	// The license the profile is released under
+	License string `protobuf:"bytes,6,opt,name=license,proto3" json:"license,omitempty"`
+	// A short description of the profile
+	Summary string `protobuf:"bytes,7,opt,name=summary,proto3" json:"summary,omitempty"`
+	// The version of the profile
+	Version string `protobuf:"bytes,8,opt,name=version,proto3" json:"version,omitempty"`
+	// The name of the account that uploaded the profile to Automate
+	Owner string `protobuf:"bytes,9,opt,name=owner,proto3" json:"owner,omitempty"`
+	// ???
+	Full string `protobuf:"bytes,10,opt,name=full,proto3" json:"full,omitempty"`
+	// The supported platform targets
+	Supports []*Support `protobuf:"bytes,16,rep,name=supports,proto3" json:"supports,omitempty"`
+	// Other profiles that this profile depends on
+	Depends []*Dependency `protobuf:"bytes,17,rep,name=depends,proto3" json:"depends,omitempty"`
+	// A unique value generated from the profile used to identify it
+	Sha256 string `protobuf:"bytes,18,opt,name=sha256,proto3" json:"sha256,omitempty"`
+	// ???
+	Groups []*Group `protobuf:"bytes,19,rep,name=groups,proto3" json:"groups,omitempty"`
+	// The controls defined on the profile
+	Controls []*Control `protobuf:"bytes,20,rep,name=controls,proto3" json:"controls,omitempty"`
+	// The attributes defined on the profile
+	Attributes []*Attribute `protobuf:"bytes,21,rep,name=attributes,proto3" json:"attributes,omitempty"`
+	// The highest version number of the profile stored in Automate
+	LatestVersion string `protobuf:"bytes,22,opt,name=latest_version,json=latestVersion,proto3" json:"latest_version,omitempty"`
+	// The status of the profile in the generated report
+	Status string `protobuf:"bytes,23,opt,name=status,proto3" json:"status,omitempty"`
+	// The reason this profile was skipped in the generated report, if any
+	SkipMessage          string   `protobuf:"bytes,24,opt,name=skip_message,json=skipMessage,proto3" json:"skip_message,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *Profile) Reset()         { *m = Profile{} }
@@ -1072,7 +1118,9 @@ func (m *Profile) GetSkipMessage() string {
 }
 
 type Ref struct {
-	Url                  string   `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+	// The URL of the external document
+	Url string `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+	// The description of the external document
 	Ref                  string   `protobuf:"bytes,2,opt,name=ref,proto3" json:"ref,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1119,11 +1167,17 @@ func (m *Ref) GetRef() string {
 }
 
 type Result struct {
-	Status               string   `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
-	CodeDesc             string   `protobuf:"bytes,2,opt,name=code_desc,json=codeDesc,proto3" json:"code_desc,omitempty"`
-	RunTime              float32  `protobuf:"fixed32,3,opt,name=run_time,json=runTime,proto3" json:"run_time,omitempty"`
-	StartTime            string   `protobuf:"bytes,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	Message              string   `protobuf:"bytes,5,opt,name=message,proto3" json:"message,omitempty"`
+	// The status of the test
+	Status string `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	// The description of the test
+	CodeDesc string `protobuf:"bytes,2,opt,name=code_desc,json=codeDesc,proto3" json:"code_desc,omitempty"`
+	// The time taken to run the test
+	RunTime float32 `protobuf:"fixed32,3,opt,name=run_time,json=runTime,proto3" json:"run_time,omitempty"`
+	// The timestamp of when this individual test was run
+	StartTime string `protobuf:"bytes,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	// The reason the test failed, if any
+	Message string `protobuf:"bytes,5,opt,name=message,proto3" json:"message,omitempty"`
+	// The reason the test was skipped, if any
 	SkipMessage          string   `protobuf:"bytes,6,opt,name=skip_message,json=skipMessage,proto3" json:"skip_message,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1198,7 +1252,9 @@ func (m *Result) GetSkipMessage() string {
 }
 
 type SourceLocation struct {
-	Ref                  string   `protobuf:"bytes,1,opt,name=ref,proto3" json:"ref,omitempty"`
+	// The source code file the control is defined in
+	Ref string `protobuf:"bytes,1,opt,name=ref,proto3" json:"ref,omitempty"`
+	// The line number the control is defined on
 	Line                 int32    `protobuf:"varint,2,opt,name=line,proto3" json:"line,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1245,7 +1301,9 @@ func (m *SourceLocation) GetLine() int32 {
 }
 
 type Option struct {
-	Description          string   `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
+	// The description of the attribute
+	Description string `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
+	// The default value of the attribute
 	Default              string   `protobuf:"bytes,2,opt,name=default,proto3" json:"default,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1292,10 +1350,15 @@ func (m *Option) GetDefault() string {
 }
 
 type Support struct {
-	OsName               string   `protobuf:"bytes,1,opt,name=os_name,json=osName,proto3" json:"os_name,omitempty"`
-	OsFamily             string   `protobuf:"bytes,2,opt,name=os_family,json=osFamily,proto3" json:"os_family,omitempty"`
-	Release              string   `protobuf:"bytes,3,opt,name=release,proto3" json:"release,omitempty"`
-	InspecVersion        string   `protobuf:"bytes,4,opt,name=inspec_version,json=inspecVersion,proto3" json:"inspec_version,omitempty"`
+	// The name of the supported operating system
+	OsName string `protobuf:"bytes,1,opt,name=os_name,json=osName,proto3" json:"os_name,omitempty"`
+	// The name of the broader category of the supported platform (eg, linux, windows)
+	OsFamily string `protobuf:"bytes,2,opt,name=os_family,json=osFamily,proto3" json:"os_family,omitempty"`
+	// The specific release of the operating system this profile supports
+	Release string `protobuf:"bytes,3,opt,name=release,proto3" json:"release,omitempty"`
+	// The supported inspec version this profile was made to run on
+	InspecVersion string `protobuf:"bytes,4,opt,name=inspec_version,json=inspecVersion,proto3" json:"inspec_version,omitempty"`
+	// The platform name and version combined
 	Platform             string   `protobuf:"bytes,5,opt,name=platform,proto3" json:"platform,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1363,18 +1426,31 @@ func (m *Support) GetPlatform() string {
 }
 
 type Dependency struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Url                  string   `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
-	Path                 string   `protobuf:"bytes,3,opt,name=path,proto3" json:"path,omitempty"`
-	Git                  string   `protobuf:"bytes,4,opt,name=git,proto3" json:"git,omitempty"`
-	Branch               string   `protobuf:"bytes,5,opt,name=branch,proto3" json:"branch,omitempty"`
-	Tag                  string   `protobuf:"bytes,6,opt,name=tag,proto3" json:"tag,omitempty"`
-	Commit               string   `protobuf:"bytes,7,opt,name=commit,proto3" json:"commit,omitempty"`
-	Version              string   `protobuf:"bytes,8,opt,name=version,proto3" json:"version,omitempty"`
-	Supermarket          string   `protobuf:"bytes,9,opt,name=supermarket,proto3" json:"supermarket,omitempty"`
-	Github               string   `protobuf:"bytes,10,opt,name=github,proto3" json:"github,omitempty"`
-	Compliance           string   `protobuf:"bytes,11,opt,name=compliance,proto3" json:"compliance,omitempty"`
-	Status               string   `protobuf:"bytes,12,opt,name=status,proto3" json:"status,omitempty"`
+	// The name of the profile
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The URL of the profile accessible over HTTP or HTTPS
+	Url string `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
+	// The path to the profile on disk
+	Path string `protobuf:"bytes,3,opt,name=path,proto3" json:"path,omitempty"`
+	// The git URL of the profile
+	Git string `protobuf:"bytes,4,opt,name=git,proto3" json:"git,omitempty"`
+	// The specific git branch of the dependency
+	Branch string `protobuf:"bytes,5,opt,name=branch,proto3" json:"branch,omitempty"`
+	// The specific git tag of the dependency
+	Tag string `protobuf:"bytes,6,opt,name=tag,proto3" json:"tag,omitempty"`
+	// The specific git commit of the dependency
+	Commit string `protobuf:"bytes,7,opt,name=commit,proto3" json:"commit,omitempty"`
+	// The specific git version of the dependency
+	Version string `protobuf:"bytes,8,opt,name=version,proto3" json:"version,omitempty"`
+	// The name of the dependency stored in Chef Supermarket
+	Supermarket string `protobuf:"bytes,9,opt,name=supermarket,proto3" json:"supermarket,omitempty"`
+	// The short name of the dependency stored on Github
+	Github string `protobuf:"bytes,10,opt,name=github,proto3" json:"github,omitempty"`
+	// The short name of the dependency stored on the Chef Automate or Chef Compliance server
+	Compliance string `protobuf:"bytes,11,opt,name=compliance,proto3" json:"compliance,omitempty"`
+	// The status of the dependency in the report
+	Status string `protobuf:"bytes,12,opt,name=status,proto3" json:"status,omitempty"`
+	// The reason this profile was skipped in the generated report, if any
 	SkipMessage          string   `protobuf:"bytes,13,opt,name=skip_message,json=skipMessage,proto3" json:"skip_message,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1498,8 +1574,11 @@ func (m *Dependency) GetSkipMessage() string {
 }
 
 type Group struct {
-	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Title                string   `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	// ???
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// ???
+	Title string `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	// ???
 	Controls             []string `protobuf:"bytes,3,rep,name=controls,proto3" json:"controls,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1553,14 +1632,23 @@ func (m *Group) GetControls() []string {
 }
 
 type Control struct {
-	Id                   string            `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Code                 string            `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
-	Desc                 string            `protobuf:"bytes,3,opt,name=desc,proto3" json:"desc,omitempty"`
-	Impact               float32           `protobuf:"fixed32,4,opt,name=impact,proto3" json:"impact,omitempty"`
-	Title                string            `protobuf:"bytes,5,opt,name=title,proto3" json:"title,omitempty"`
-	SourceLocation       *SourceLocation   `protobuf:"bytes,6,opt,name=source_location,json=sourceLocation,proto3" json:"source_location,omitempty"`
-	Results              []*Result         `protobuf:"bytes,7,rep,name=results,proto3" json:"results,omitempty"`
-	Refs                 []*Ref            `protobuf:"bytes,8,rep,name=refs,proto3" json:"refs,omitempty"`
+	// The unique id of this control
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// The full ruby code of the control defined in the profile
+	Code string `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	// The full description of the control
+	Desc string `protobuf:"bytes,3,opt,name=desc,proto3" json:"desc,omitempty"`
+	// The severity of the control
+	Impact float32 `protobuf:"fixed32,4,opt,name=impact,proto3" json:"impact,omitempty"`
+	// The compact description of the control
+	Title string `protobuf:"bytes,5,opt,name=title,proto3" json:"title,omitempty"`
+	// Intentionally blank
+	SourceLocation *SourceLocation `protobuf:"bytes,6,opt,name=source_location,json=sourceLocation,proto3" json:"source_location,omitempty"`
+	// The results of running all tests defined in the control against the node
+	Results []*Result `protobuf:"bytes,7,rep,name=results,proto3" json:"results,omitempty"`
+	// External supporting documents for the control
+	Refs []*Ref `protobuf:"bytes,8,rep,name=refs,proto3" json:"refs,omitempty"`
+	// Metadata defined on the control in key-value format
 	Tags                 map[string]string `protobuf:"bytes,9,rep,name=tags,proto3" json:"tags,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
@@ -1656,7 +1744,9 @@ func (m *Control) GetTags() map[string]string {
 }
 
 type Attribute struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The name of the attribute
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The options defined for the attribute
 	Options              *Option  `protobuf:"bytes,2,opt,name=options,proto3" json:"options,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1702,8 +1792,11 @@ func (m *Attribute) GetOptions() *Option {
 	return nil
 }
 
+// The name and version of the node's operating system
 type Platform struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The name of the node's operating system
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The version of the node's operating system
 	Release              string   `protobuf:"bytes,2,opt,name=release,proto3" json:"release,omitempty"`
 	Full                 string   `protobuf:"bytes,3,opt,name=full,proto3" json:"full,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -1757,7 +1850,9 @@ func (m *Platform) GetFull() string {
 	return ""
 }
 
+// Statistics of the report's run
 type Statistics struct {
+	// The duration of the report's generation time
 	Duration             float32  `protobuf:"fixed32,1,opt,name=duration,proto3" json:"duration,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1803,7 +1898,7 @@ type SuggestionRequest struct {
 	Text string `protobuf:"bytes,2,opt,name=text,proto3" json:"text,omitempty"`
 	// The maximum number of suggestions to return
 	Size int32 `protobuf:"varint,3,opt,name=size,proto3" json:"size,omitempty"`
-	// The criteria used to filter the suggestions returned.
+	// The criteria used to filter the suggestions returned
 	Filters              []*ListFilter `protobuf:"bytes,4,rep,name=filters,proto3" json:"filters,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
@@ -1931,7 +2026,7 @@ func (m *Suggestion) GetVersion() string {
 }
 
 type Suggestions struct {
-	// The list of returned suggestions.
+	// The list of returned suggestions
 	Suggestions          []*Suggestion `protobuf:"bytes,1,rep,name=suggestions,proto3" json:"suggestions,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
@@ -1971,7 +2066,9 @@ func (m *Suggestions) GetSuggestions() []*Suggestion {
 }
 
 type ProfileMins struct {
-	Profiles             []*ProfileMin  `protobuf:"bytes,1,rep,name=profiles,proto3" json:"profiles,omitempty"`
+	// Minimal represenations of the profiles matching the filters
+	Profiles []*ProfileMin `protobuf:"bytes,1,rep,name=profiles,proto3" json:"profiles,omitempty"`
+	// Intentionally blank
 	Counts               *ProfileCounts `protobuf:"bytes,2,opt,name=counts,proto3" json:"counts,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
 	XXX_unrecognized     []byte         `json:"-"`
@@ -2017,10 +2114,15 @@ func (m *ProfileMins) GetCounts() *ProfileCounts {
 	return nil
 }
 
+// Stats on the statuses of nodes matching the filters
 type ProfileCounts struct {
-	Total                int32    `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
-	Failed               int32    `protobuf:"varint,2,opt,name=failed,proto3" json:"failed,omitempty"`
-	Skipped              int32    `protobuf:"varint,3,opt,name=skipped,proto3" json:"skipped,omitempty"`
+	// The total number of nodes matching the filters
+	Total int32 `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
+	// The total number of failed nodes matching the filters
+	Failed int32 `protobuf:"varint,2,opt,name=failed,proto3" json:"failed,omitempty"`
+	// The total number of skipped nodes matching the filters
+	Skipped int32 `protobuf:"varint,3,opt,name=skipped,proto3" json:"skipped,omitempty"`
+	// The total number of passing nodes matching the filters
 	Passed               int32    `protobuf:"varint,4,opt,name=passed,proto3" json:"passed,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -2081,10 +2183,15 @@ func (m *ProfileCounts) GetPassed() int32 {
 }
 
 type ProfileMin struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Title                string   `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	Id                   string   `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
-	Version              string   `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
+	// The name of the profile
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The title of the profile
+	Title string `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	// The id of the profile
+	Id string `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
+	// The version of the profile
+	Version string `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
+	// The aggregated status of the profile across the nodes it has been run on
 	Status               string   `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -2152,16 +2259,23 @@ func (m *ProfileMin) GetStatus() string {
 }
 
 type Node struct {
-	Id                   string               `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name                 string               `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Platform             *Platform            `protobuf:"bytes,3,opt,name=platform,proto3" json:"platform,omitempty"`
-	Environment          string               `protobuf:"bytes,4,opt,name=environment,proto3" json:"environment,omitempty"`
-	LatestReport         *LatestReportSummary `protobuf:"bytes,8,opt,name=latest_report,json=latestReport,proto3" json:"latest_report,omitempty"`
-	Tags                 []*Kv                `protobuf:"bytes,9,rep,name=tags,proto3" json:"tags,omitempty"`
-	Profiles             []*ProfileMeta       `protobuf:"bytes,10,rep,name=profiles,proto3" json:"profiles,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	// The id of this node
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// The name assigned to the node
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Intentionally blank
+	Platform *Platform `protobuf:"bytes,3,opt,name=platform,proto3" json:"platform,omitempty"`
+	// The environment assigned to the node
+	Environment string `protobuf:"bytes,4,opt,name=environment,proto3" json:"environment,omitempty"`
+	// A summary of the information contained in the latest report for this node
+	LatestReport *LatestReportSummary `protobuf:"bytes,8,opt,name=latest_report,json=latestReport,proto3" json:"latest_report,omitempty"`
+	// The tags assigned to this node
+	Tags []*Kv `protobuf:"bytes,9,rep,name=tags,proto3" json:"tags,omitempty"`
+	// A minimal represenation of the compliance profiles run against the node
+	Profiles             []*ProfileMeta `protobuf:"bytes,10,rep,name=profiles,proto3" json:"profiles,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
 }
 
 func (m *Node) Reset()         { *m = Node{} }
@@ -2239,10 +2353,15 @@ func (m *Node) GetProfiles() []*ProfileMeta {
 }
 
 type Nodes struct {
-	Nodes                []*Node  `protobuf:"bytes,1,rep,name=nodes,proto3" json:"nodes,omitempty"`
-	Total                int32    `protobuf:"varint,20,opt,name=total,proto3" json:"total,omitempty"`
-	TotalPassed          int32    `protobuf:"varint,21,opt,name=total_passed,json=totalPassed,proto3" json:"total_passed,omitempty"`
-	TotalFailed          int32    `protobuf:"varint,22,opt,name=total_failed,json=totalFailed,proto3" json:"total_failed,omitempty"`
+	// The nodes matching the request filters
+	Nodes []*Node `protobuf:"bytes,1,rep,name=nodes,proto3" json:"nodes,omitempty"`
+	// The total number of nodes matching the filters
+	Total int32 `protobuf:"varint,20,opt,name=total,proto3" json:"total,omitempty"`
+	// The total number of passing nodes matching the filters
+	TotalPassed int32 `protobuf:"varint,21,opt,name=total_passed,json=totalPassed,proto3" json:"total_passed,omitempty"`
+	// The total number of failed nodes matching the filters
+	TotalFailed int32 `protobuf:"varint,22,opt,name=total_failed,json=totalFailed,proto3" json:"total_failed,omitempty"`
+	// The total number of skipped nodes matching the filters
 	TotalSkipped         int32    `protobuf:"varint,23,opt,name=total_skipped,json=totalSkipped,proto3" json:"total_skipped,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -2310,7 +2429,9 @@ func (m *Nodes) GetTotalSkipped() int32 {
 }
 
 type Kv struct {
-	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	// The key of the tag
+	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	// The value of the tag
 	Value                string   `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -2356,14 +2477,19 @@ func (m *Kv) GetValue() string {
 	return ""
 }
 
+// A summary of the information contained in the latest report for this node
 type LatestReportSummary struct {
-	Id                   string               `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	EndTime              *timestamp.Timestamp `protobuf:"bytes,2,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	Status               string               `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
-	Controls             *ControlSummary      `protobuf:"bytes,4,opt,name=controls,proto3" json:"controls,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	// The id of the latest report
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// The time the report was submitted at
+	EndTime *timestamp.Timestamp `protobuf:"bytes,2,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	// The status of the run the report was made from
+	Status string `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	// Intentionally blank
+	Controls             *ControlSummary `protobuf:"bytes,4,opt,name=controls,proto3" json:"controls,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_unrecognized     []byte          `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
 }
 
 func (m *LatestReportSummary) Reset()         { *m = LatestReportSummary{} }
@@ -2420,9 +2546,13 @@ func (m *LatestReportSummary) GetControls() *ControlSummary {
 }
 
 type ProfileMeta struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Version              string   `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
-	Id                   string   `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
+	// The name of the profile
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The version of the profile
+	Version string `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
+	// The unique id of the profile
+	Id string `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
+	// The status of the profile run against the node
 	Status               string   `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
 	Full                 string   `protobuf:"bytes,5,opt,name=full,proto3" json:"full,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`

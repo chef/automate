@@ -3,7 +3,7 @@
     "/compliance/reporting/export": {
       "get": {
         "summary": "Export reports",
-        "description": "Stream reports in CSV or JSON format",
+        "description": "Stream reports in JSON (default) or CSV format. Use the value 'csv' for the type parameter in the request to receive CSV formatted data.",
         "operationId": "Export",
         "responses": {
           "200": {
@@ -25,6 +25,10 @@
         ],
         "tags": [
           "Compliance Reporting Export"
+        ],
+        "produces": [
+          "application/json",
+          "text/csv"
         ]
       }
     }
