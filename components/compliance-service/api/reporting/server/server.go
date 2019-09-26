@@ -178,7 +178,7 @@ func (srv *Server) ListProfiles(ctx context.Context, in *reporting.Query) (*repo
 func (srv *Server) ListControlItems(ctx context.Context, in *reporting.ControlItemRequest) (*reporting.ControlItems, error) {
 	var controlListItems *reporting.ControlItems
 	if in.Size == 0 {
-		in.Size = 1000
+		in.Size = 100
 	}
 
 	formattedFilters := formatFilters(in.Filters)
