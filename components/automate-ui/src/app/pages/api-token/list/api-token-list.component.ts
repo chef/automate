@@ -27,7 +27,6 @@ import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
 import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
-import { DateTime } from 'app/helpers/datetime/datetime';
 
 @Component({
   selector: 'app-api-tokens',

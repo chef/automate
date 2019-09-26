@@ -16,7 +16,6 @@ import { FetchStatus, RequestStatus } from 'app/entities/license/license.reducer
 import { LicenseLockoutComponent } from './license-lockout.component';
 import { using } from 'app/testing/spec-helpers';
 import { LicenseStatus } from 'app/entities/license/license.model';
-import { DateTime } from 'app/helpers/datetime/datetime';
 
 class MockTelemetryService {
   enabled = observableOf(false);

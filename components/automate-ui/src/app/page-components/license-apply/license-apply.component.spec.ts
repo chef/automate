@@ -13,7 +13,6 @@ import { EntityStatus } from 'app/entities/entities';
 import { ApplyStatus } from 'app/entities/license/license.reducer';
 import { LicenseStatus } from 'app/entities/license/license.model';
 import { LicenseApplyComponent } from './license-apply.component';
-import { DateTime } from 'app/helpers/datetime/datetime';
 
 function genErrorResp(status: number, msg: string): any /* HttpErrorResponse */ {
   // not a full-fledged HttpErrorResponse but enough for our needs
