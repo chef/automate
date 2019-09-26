@@ -47,6 +47,7 @@ type TestFramework struct {
 
 type TestDB struct {
 	*sql.DB
+	ConnURI string
 }
 
 const resetDatabaseStatement = `DROP SCHEMA public CASCADE;
@@ -206,7 +207,11 @@ func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *opa.State, *prng.Prng
 
 	err = postgres.Initialize(ctx, opaInstance, l, *migrationConfig, datamigration.Config(*dataMigrationConfig))
 	require.NoError(t, err)
-	return postgres.GetInstance(), &TestDB{DB: db}, opaInstance, prng.Seed(t), migrationConfig
+	return postgres.GetInstance(), &TestDB{
+			DB:      db,
+			ConnURI: "postgres://postgres:postgres@127.0.0.1:5432/authz_test?sslmode=disable",
+		},
+		opaInstance, prng.Seed(t), migrationConfig
 }
 
 func (d *TestDB) Flush(t *testing.T) {

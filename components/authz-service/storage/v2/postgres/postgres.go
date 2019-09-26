@@ -1558,6 +1558,7 @@ func (p *pg) DeleteProject(ctx context.Context, id string) error {
 		return p.processError(err)
 	}
 
+	// FIXME: DONT FORGET: Tyler this is wrong
 	err = p.singleRowResultOrNotFoundErr(res)
 	if err != nil {
 		return err

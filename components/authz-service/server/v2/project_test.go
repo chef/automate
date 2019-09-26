@@ -12,6 +12,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 
+	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/logger"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
@@ -22,6 +24,7 @@ import (
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	memstore_v2 "github.com/chef/automate/components/authz-service/storage/v2/memstore"
 	"github.com/chef/automate/components/authz-service/testhelpers"
+	"github.com/chef/automate/lib/authz/project_purge"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/test/helpers"
@@ -35,26 +38,33 @@ func TestUpdateProject(t *testing.T) {
 		f    func(*testing.T)
 	}{
 		{"if the project name is empty, returns 'invalid argument'", func(t *testing.T) {
-			cl, _ := setupProjects(t)
+			cl, _, cleanup := setupProjects(t)
+			defer cleanup()
+
 			resp, err := cl.UpdateProject(ctx, &api.UpdateProjectReq{Id: "empty-name", Name: ""})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
 		{"if the project id is empty, returns 'invalid argument'", func(t *testing.T) {
-			cl, _ := setupProjects(t)
+			cl, _, cleanup := setupProjects(t)
+			defer cleanup()
 			resp, err := cl.UpdateProject(ctx, &api.UpdateProjectReq{Id: "", Name: "empty-id"})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
 		{"if the project id is invalid, returns 'invalid argument'", func(t *testing.T) {
-			cl, _ := setupProjects(t)
+			cl, _, cleanup := setupProjects(t)
+			defer cleanup()
+
 			resp, err := cl.UpdateProject(ctx,
 				&api.UpdateProjectReq{Id: "no spaces", Name: "any name"})
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 			assert.Nil(t, resp)
 		}},
 		{"if the project with that id does not exist, returns 'not found'", func(t *testing.T) {
-			cl, _ := setupProjects(t)
+			cl, _, cleanup := setupProjects(t)
+			defer cleanup()
+
 			resp, err := cl.UpdateProject(ctx,
 				&api.UpdateProjectReq{Id: "false-project", Name: "my other foo"})
 			grpctest.AssertCode(t, codes.NotFound, err)
@@ -62,7 +72,9 @@ func TestUpdateProject(t *testing.T) {
 		}},
 		{"if the project already exists and update request is valid, project is updated",
 			func(t *testing.T) {
-				cl, store := setupProjects(t)
+				cl, store, cleanup := setupProjects(t)
+				defer cleanup()
+
 				id, updatedName := "my-foo", "updated name"
 				addProjectToStore(t, store, id, "original name", storage.ChefManaged)
 
@@ -87,7 +99,9 @@ func TestUpdateProject(t *testing.T) {
 
 func TestCreateProject(t *testing.T) {
 	ctx := context.Background()
-	cl, store := setupProjects(t)
+	cl, store, cleanup := setupProjects(t)
+	defer cleanup()
+
 	cases := []struct {
 		desc string
 		f    func(*testing.T)
@@ -158,7 +172,9 @@ func TestCreateProject(t *testing.T) {
 
 func TestGetProject(t *testing.T) {
 	ctx := context.Background()
-	cl, store := setupProjects(t)
+	cl, store, cleanup := setupProjects(t)
+	defer cleanup()
+
 	cases := []struct {
 		desc string
 		f    func(*testing.T)
@@ -210,7 +226,9 @@ func TestGetProject(t *testing.T) {
 
 func TestDeleteProject(t *testing.T) {
 	ctx := context.Background()
-	cl, store := setupProjects(t)
+	cl, store, cleanup := setupProjects(t)
+	defer cleanup()
+
 	cases := []struct {
 		desc string
 		f    func(*testing.T)
@@ -270,7 +288,8 @@ func TestDeleteProject(t *testing.T) {
 
 func TestListProjects(t *testing.T) {
 	ctx := context.Background()
-	cl, store := setupProjects(t)
+	cl, store, cleanup := setupProjects(t)
+	defer cleanup()
 
 	cases := []struct {
 		desc string
@@ -319,7 +338,8 @@ func TestListProjects(t *testing.T) {
 
 func TestListProjectsForIntrospection(t *testing.T) {
 	ctx := context.Background()
-	cl, store := setupProjects(t)
+	cl, store, cleanup := setupProjects(t)
+	defer cleanup()
 
 	cases := []struct {
 		desc string
@@ -390,13 +410,26 @@ func addProjectToStore(t *testing.T, store *cache.Cache, id, name string, projTy
 	}
 }
 
-func setupProjects(t *testing.T) (api.ProjectsClient, *cache.Cache) {
-	cl, ca, _, _ := setupProjectsAndRules(t)
-	return cl, ca
+func setupProjects(t *testing.T) (api.ProjectsClient, *cache.Cache, cleanupFunc) {
+	cl, ca, _, _, cleanup := setupProjectsAndRules(t)
+	return cl, ca, cleanup
 }
 
+type MockPurgeClient struct {
+	purgeProject func(context.Context, string) error
+}
+
+func (m *MockPurgeClient) PurgeProject(ctx context.Context, something string) error {
+	if m.purgeProject != nil {
+		return m.purgeProject(ctx, something)
+	}
+	return nil
+}
+
+type cleanupFunc func()
+
 func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cache.Cache,
-	int64) {
+	int64, cleanupFunc) {
 	t.Helper()
 	ctx := context.Background()
 	seed := prng.GenSeed(t)
@@ -405,12 +438,20 @@ func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cac
 	require.NoError(t, err, "init logger for storage")
 
 	mem_v2 := memstore_v2.New()
-
+	pg, testDb, _, _, _ := testhelpers.SetupTestDB(t)
+	manager, err := cereal.NewManager(postgres.NewPostgresBackend(testDb.ConnURI))
 	require.NoError(t, err)
+	domainServices := []string{"testdomain"}
+	projectPurger, err := v2.RegisterCerealProjectPurgerWithDomainServices(manager, l, mem_v2, domainServices)
+	require.NoError(t, err)
+
+	err = project_purge.RegisterTaskExecutors(manager, "testdomain", &MockPurgeClient{})
+	require.NoError(t, err)
+
 	projectUpdateManager := testhelpers.NewMockProjectUpdateManager()
 	projectsSrv, err := v2.NewProjectsServer(
 		ctx, l, mem_v2,
-		projectUpdateManager, testhelpers.NewMockProjectPurger(true), testhelpers.NewMockPolicyRefresher())
+		projectUpdateManager, projectPurger, testhelpers.NewMockPolicyRefresher())
 	require.NoError(t, err)
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
 	connFactory := secureconn.NewFactory(*serviceCerts)
@@ -429,5 +470,11 @@ func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cac
 		t.Fatalf("connecting to grpc endpoint: %s", err)
 	}
 
-	return api.NewProjectsClient(conn), mem_v2.ProjectsCache(), mem_v2.RulesCache(), seed
+	manager.Start(ctx)
+	return api.NewProjectsClient(conn), mem_v2.ProjectsCache(), mem_v2.RulesCache(), seed,
+		func() {
+			manager.Stop()
+			pg.Close()
+			testDb.CloseDB(t)
+		}
 }

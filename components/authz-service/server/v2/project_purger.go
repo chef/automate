@@ -77,6 +77,10 @@ type CerealProjectPurger struct {
 }
 
 func RegisterCerealProjectPurger(manager *cereal.Manager, log logger.Logger, s storage.Storage) (ProjectPurger, error) {
+	return RegisterCerealProjectPurgerWithDomainServices(manager, log, s, ProjectPurgeDomainServices)
+}
+
+func RegisterCerealProjectPurgerWithDomainServices(manager *cereal.Manager, log logger.Logger, s storage.Storage, domainServices []string) (ProjectPurger, error) {
 	domainServicesWorkflowExecutor, err := NewProjectPurgerWorkflowExecutor()
 	if err != nil {
 		return nil, err
@@ -105,7 +109,7 @@ func RegisterCerealProjectPurger(manager *cereal.Manager, log logger.Logger, s s
 	purgeManager := &CerealProjectPurger{
 		manager:        manager,
 		workflowName:   PurgeProjectWorkflowName,
-		domainServices: ProjectPurgeDomainServices,
+		domainServices: domainServices,
 	}
 
 	return purgeManager, nil
