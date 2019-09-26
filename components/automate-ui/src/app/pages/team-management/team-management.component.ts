@@ -5,6 +5,7 @@ import { Observable, Subject } from 'rxjs';
 import { map, filter, takeUntil } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 
+import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { loading, EntityStatus } from 'app/entities/entities';
 import { iamMajorVersion, atLeastV2p1 } from 'app/entities/policies/policy.selectors';
@@ -20,7 +21,6 @@ import { HttpStatus } from 'app/types/types';
 import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
 import { Project, ProjectConstants } from 'app/entities/projects/project.model';
-import { ChefSorters } from 'app/helpers/auth/sorter';
 
 @Component({
   selector: 'app-team-management',

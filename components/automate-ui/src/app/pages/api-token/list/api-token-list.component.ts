@@ -9,6 +9,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { HttpStatus } from 'app/types/types';
 import { loading, EntityStatus } from 'app/entities/entities';
+import { ChefSorters } from 'app/helpers/auth/sorter';
 import { Type } from 'app/entities/notifications/notification.model';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { ApiToken } from 'app/entities/api-tokens/api-token.model';
@@ -25,7 +26,6 @@ import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
 import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
-import { ChefSorters } from 'app/helpers/auth/sorter';
 
 @Component({
   selector: 'app-api-tokens',

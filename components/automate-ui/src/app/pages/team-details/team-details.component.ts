@@ -6,6 +6,7 @@ import { isEmpty, identity, keyBy, at, xor } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 
+import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams, routeURL } from 'app/route.selectors';
 import { EntityStatus, loading } from 'app/entities/entities';
@@ -42,7 +43,6 @@ import {
 } from 'app/entities/projects/project.selectors';
 import { ProjectConstants, Project } from 'app/entities/projects/project.model';
 import { IAMMajorVersion } from 'app/entities/policies/policy.model';
-import { ChefSorters } from 'app/helpers/auth/sorter';
 
 const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 

@@ -4,6 +4,7 @@ import { Store } from '@ngrx/store';
 import { Observable ,  Subject, combineLatest } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
 
+import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { ChefValidators } from 'app/helpers/auth/validator';
@@ -13,7 +14,6 @@ import {
   CreateUser, DeleteUser, GetUsers, CreateUserPayload
 } from 'app/entities/users/user.actions';
 import { User } from 'app/entities/users/user.model';
-import { ChefSorters } from 'app/helpers/auth/sorter';
 
 // pattern for valid usernames
 const USERNAME_PATTERN = '[0-9A-Za-z_@.+-]+';

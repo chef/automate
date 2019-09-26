@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnChanges } from '@angular/core';
 
-import { ProjectConstants, Project } from 'app/entities/projects/project.model';
 import { ChefSorters } from 'app/helpers/auth/sorter';
+import { ProjectConstants, Project } from 'app/entities/projects/project.model';
 
 const { UNASSIGNED_PROJECT_ID } = ProjectConstants;
 

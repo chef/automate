@@ -7,6 +7,7 @@ import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
+import { ChefSorters } from 'app/helpers/auth/sorter';
 import { HttpStatus } from 'app/types/types';
 import { loading, EntityStatus } from 'app/entities/entities';
 import { atLeastV2p1 } from 'app/entities/policies/policy.selectors';
@@ -21,7 +22,6 @@ import { Project } from 'app/entities/projects/project.model';
 import { ApplyRulesStatus, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
 import { ProjectStatus } from 'app/entities/rules/rule.model';
 import { LoadOptions } from 'app/services/projects-filter/projects-filter.actions';
-import { ChefSorters } from 'app/helpers/auth/sorter';
 
 @Component({
   selector: 'app-project-list',

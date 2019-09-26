@@ -7,10 +7,10 @@ import { identity } from 'lodash/fp';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { combineLatest, Subject } from 'rxjs';
 
+import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
 import { EntityStatus } from 'app/entities/entities';
-
 import {
   GetPolicy, AddPolicyMembers, PolicyMembersMgmtPayload
 } from 'app/entities/policies/policy.actions';
@@ -30,7 +30,6 @@ import {
 } from 'app/entities/users/user.actions';
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
-import { ChefSorters } from 'app/helpers/auth/sorter';
 
 @Component({
   selector: 'app-policy-add-members',

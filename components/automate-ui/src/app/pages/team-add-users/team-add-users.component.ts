@@ -7,6 +7,7 @@ import { identity, keyBy, at } from 'lodash/fp';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 import { filter as lodashFilter } from 'lodash/fp';
 
+import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams, routeURL } from 'app/route.selectors';
 import { EntityStatus } from 'app/entities/entities';
@@ -28,7 +29,6 @@ import {
   GetTeamUsers,
   AddTeamUsers
 } from 'app/entities/teams/team.actions';
-import { ChefSorters } from 'app/helpers/auth/sorter';
 
 const TEAM_ADD_USERS_ROUTE = /^\/settings\/teams\/.*\/add-users$/;
 

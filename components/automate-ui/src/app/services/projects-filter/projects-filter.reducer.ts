@@ -1,12 +1,12 @@
 import { set, pipe, find } from 'lodash/fp';
 
 import { EntityStatus } from 'app/entities/entities';
+import { ChefSorters } from 'app/helpers/auth/sorter';
 import { ProjectConstants } from 'app/entities/projects/project.model';
 import {
   ProjectsFilterActions,
   ProjectsFilterActionTypes
 } from './projects-filter.actions';
-import { ChefSorters } from 'app/helpers/auth/sorter';
 
 const {
   UNASSIGNED_PROJECT_ID,

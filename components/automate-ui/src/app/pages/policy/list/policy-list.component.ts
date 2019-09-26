@@ -3,13 +3,13 @@ import { Store, select } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { loading } from 'app/entities/entities';
 import { DeletePolicy, GetPolicies } from 'app/entities/policies/policy.actions';
 import { allPolicies, getAllStatus, iamMajorVersion } from 'app/entities/policies/policy.selectors';
 import { Policy } from 'app/entities/policies/policy.model';
 import { IAMMajorVersion } from 'app/entities/policies/policy.model';
-import { ChefSorters } from 'app/helpers/auth/sorter';
 
 @Component({
   selector: 'app-policy-list',
