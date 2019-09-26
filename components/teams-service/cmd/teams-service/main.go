@@ -17,6 +17,7 @@ import (
 	"github.com/chef/automate/components/teams-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/teams-service/storage/postgres/migration"
 	authz_library "github.com/chef/automate/lib/authz"
+	"github.com/chef/automate/lib/authz/project_purge"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
@@ -155,11 +156,15 @@ Please pass a config file as the only argument to this command.`))
 		Logger: l,
 	}
 
-	service, err := service.NewPostgresService(l, connFactory, manager,
+	service, err := service.NewPostgresService(l, connFactory,
 		migrationConfig, dataMigrationConfig,
 		authzClient, authzV2PoliciesClient, authzV2AuthorizationClient)
 	if err != nil {
 		fail(errors.Wrap(err, "could not initialize storage"))
+	}
+	err = project_purge.RegisterTaskExecutors(manager, "teams", service.Storage)
+	if err != nil {
+		fail(errors.Wrap(err, "could not register project purge client"))
 	}
 
 	err = manager.Start(context.Background())
