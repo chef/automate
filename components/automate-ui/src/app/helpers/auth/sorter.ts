@@ -14,19 +14,22 @@ export class ChefSorters {
     public static naturalSort(input: Array<any>, property: Array<string> | string): Array<any> {
         // per @msorens https://github.com/chef/a2/pull/4434
         // Stable sort so 'a' always comes before 'A'.
-        const opts = { numeric: true, sensitivity: 'base' };
+        const naturalAndCaseInsensitive = { numeric: true, sensitivity: 'base' };
+        const naturalAndCaseSensitive = { numeric: true };
 
         // propComparator function idea from Dave Newton
         // https://stackoverflow.com/questions/8537602
         const propComparator = (propName) => {
-            return (a, b) => a[propName].localeCompare(b[propName], undefined, opts) ||
-                a[propName].localeCompare(b[propName], undefined, { numeric: true });
+            return (a, b) => a[propName].localeCompare(b[propName],
+                                                       undefined, naturalAndCaseInsensitive) ||
+                a[propName].localeCompare(b[propName], undefined, naturalAndCaseSensitive);
         };
 
         const dualPropComparator = (propOne, propTwo) => {
-            return (a, b) => a[propOne].localeCompare(b[propOne], undefined, opts) ||
-                a[propOne].localeCompare(b[propOne], undefined, { numeric: true }) ||
-                a[propTwo].localeCompare(b[propTwo], undefined, opts);
+            return (a, b) => a[propOne].localeCompare(b[propOne],
+                                                     undefined, naturalAndCaseInsensitive) ||
+                a[propOne].localeCompare(b[propOne], undefined, naturalAndCaseSensitive) ||
+                a[propTwo].localeCompare(b[propTwo], undefined, naturalAndCaseInsensitive);
         };
 
         return property instanceof Array
