@@ -200,13 +200,18 @@ export class ReportingSearchbarComponent implements OnInit {
     if (this.highlightedIndex >= 0) {
       const search = this.filterValues[this.highlightedIndex];
       const type = this.selectedType;
-      this.ClearAll();
-      this.filterAdded.emit({
-        detail: {
-          value: search,
-          type: type
-        }
-      });
+      if (type.name === 'control_tag_key') {
+        this.onControlTagKeyValueClick(search);
+      } else {
+        this.ClearAll();
+        this.suggestionsVisible = false;
+        this.filterAdded.emit({
+          detail: {
+            value: search,
+            type: type
+          }
+        });
+      }
     } else {
       if (currentText.indexOf('?') >= 0 || currentText.indexOf('*') >= 0) {
         const type = this.selectedType;
