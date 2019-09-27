@@ -227,7 +227,7 @@ describe('Job List', () => {
         });
 
         expect(list.isDisplayed()).toEqual(true);
-        expect(nameColumn).toEqual(['test-job-1','test-job-2']);
+        expect(nameColumn).toEqual(['test-job-1', 'test-job-2']);
       });
     });
   });
