@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { trigger, transition, style, animate } from '@angular/animations';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -34,8 +35,24 @@ import { Regex } from 'app/helpers/auth/regex';
 @Component({
   selector: 'app-policy-add-members',
   templateUrl: './policy-add-members.component.html',
-  styleUrls: ['./policy-add-members.component.scss']
+  styleUrls: ['./policy-add-members.component.scss'],
+  animations: [
+    trigger(
+      'dropInAnimation',
+      [
+        transition(':enter', [
+          style({height: '0%', opacity: 0}),
+          animate('.5s ease', style({ height: '100%', opacity: 1}))
+        ]),
+        transition(':leave', [
+          style({height: '100%', opacity: 1}),
+          animate('.5s ease', style({height: '0%', opacity: 0}))
+        ])
+      ]
+    )
+  ]
 })
+
 export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   // Data structures and state
 
