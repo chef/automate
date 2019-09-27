@@ -36,7 +36,7 @@
                 required.</chef-error>
             </chef-form-field>
 
-            <chef-form-field id="create-identity">
+            <chef-form-field id="create-identity" *ngIf="expressionForm.get('type').value">
               <label>
                 <span class="label">Identity Provider<span aria-hidden="true">*</span></span>
                 <select id="expression-identity-dropdown" 
@@ -53,7 +53,7 @@
               </chef-error>
             </chef-form-field>
 
-            <chef-form-field id="create-name">
+            <chef-form-field id="create-name" *ngIf="expressionForm.get('identity').value">
               <label>
                 <span class="label">Name<span aria-hidden="true">*</span></span>
                 <chef-input id="expression-name-dropdown" 
