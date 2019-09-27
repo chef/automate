@@ -9,6 +9,7 @@ NG_CMD := npm run ng --
 
 install:
 	npm install
+	npm run install:ui-library
 
 build:
 	hab studio run "source .studiorc; build"
