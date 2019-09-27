@@ -9,17 +9,25 @@ chef-page {
     }
 
     #modal-content-container {
-      width: 50%;
-      min-width: 350px;
-      margin: 0 auto;
+      width: 40%;
+      min-width: 300px;
+      margin: 1.5em auto 0;
 
-      select,
-      chef-input {
-        width: 100%;
+      chef-form-field {
+        padding-bottom: 1em;
+
+        select,
+        chef-input {
+          width: 100%;
+        }
+  
+        .label {
+          font-weight: normal;
+          font-size: 14px;
+        }
       }
 
-      p,
-      span {
+      .note {
         font-size: 11px;
       }
 
@@ -36,7 +44,7 @@ chef-page {
           &:first-child {
             margin-left: unset;
           }
-          
+
           &:last-child {
             margin-right: unset;
           }

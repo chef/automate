@@ -334,7 +334,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     const values = Object.values(formValues);
     const output = [];
     values.forEach(value => {
-      if (value != null) {
+      if (value != null && value.length > 0) {
         return output.push(value.toLowerCase());
       }
     });

@@ -60,7 +60,7 @@
                               ngDefaultControl 
                               formControlName="name"></chef-input>
                 </label>
-                <p>Wildcards (*) are allowed.</p>
+                <p class="note">Wildcards (*) are allowed.</p>
                 <chef-error *ngIf="expressionForm.get('name').hasError('required') && expressionForm.get('name').touched">
                   Some sort of error goes here for name selection
                 </chef-error>
@@ -79,7 +79,7 @@
           </form>
           <!-- expression builder output -->
           <div *ngIf="expressionOutput">
-            <p id="expression-output">Member expression: </p><span>{{ expressionOutput }}</span>
+            <p id="expression-output" class="note">Member expression: {{ expressionOutput }}</p>
           </div>
   
           <div id="buttons-container">
