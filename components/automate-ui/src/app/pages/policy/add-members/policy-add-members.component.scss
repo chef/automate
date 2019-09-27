@@ -8,37 +8,41 @@ chef-page {
       text-align: center;
     }
 
-    .expressionSelectContainer {
-      height: 55px;
-    }
+    #modal-content-container {
+      width: 50%;
+      min-width: 350px;
+      margin: 0 auto;
 
-    .expressionInputContainer {
-      height: 65px;
-    }
-
-    #left-align {
-      margin-left: 150px;
-
-      chef-form-field {
-        margin-top: 20px;
-        padding-right: 150px;
+      select,
+      chef-input {
+        width: 100%;
       }
 
-      p {
-        size: 11px;
-        margin-top: 11px;
-        margin-bottom: 11px;
+      p,
+      span {
+        font-size: 11px;
       }
 
-      .expression {
-        background-color: $chef-light-grey;
-        padding-left: 0.3em;
-        padding-right: 0.3em;
+      #expression-output {
+        display: inline;
       }
-    }
 
-    #align-buttons {
-      text-align: center;
+      #buttons-container {
+        display: flex;
+
+        chef-button {
+          width: 50%;
+
+          &:first-child {
+            margin-left: unset;
+          }
+          
+          &:last-child {
+            margin-right: unset;
+          }
+        }
+      }
+        
     }
   }
 
