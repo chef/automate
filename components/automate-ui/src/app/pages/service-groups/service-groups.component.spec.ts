@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { StoreModule, Store } from '@ngrx/store';
 import { ServiceGroupsComponent  } from './service-groups.component';
 import { ServiceStatusIconPipe } from '../../pipes/service-status-icon.pipe';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import { serviceGroupsEntityReducer } from 'app/entities/service-groups/service-groups.reducer';
 import {
   UpdateServiceGroupsFilters,
@@ -35,7 +35,7 @@ describe('ServiceGroupsComponent', () => {
       imports: [
         StoreModule.forRoot({
           serviceGroups: serviceGroupsEntityReducer
-        }),
+        }, { runtimeChecks }),
         RouterTestingModule
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]

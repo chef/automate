@@ -130,6 +130,13 @@ export class RouterSerializer implements router.RouterStateSerializer<RouterStat
   }
 }
 
+export const runtimeChecks = {
+  strictStateImmutability: false,
+  strictActionImmutability: false,
+  strictStateSerializability: false,
+  strictActionSerializability: false
+};
+
 const defaultRouterState = {
   state: {
     url: '/',

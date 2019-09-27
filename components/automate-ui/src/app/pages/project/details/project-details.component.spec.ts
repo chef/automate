@@ -8,6 +8,7 @@ import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { GetProjectSuccess } from 'app/entities/projects/project.actions';
+import { runtimeChecks } from 'app/ngrx.reducers';
 import { projectEntityReducer } from 'app/entities/projects/project.reducer';
 import { Project } from 'app/entities/projects/project.model';
 import { Rule } from 'app/entities/rules/rule.model';
@@ -115,7 +116,7 @@ describe('ProjectDetailsComponent', () => {
           }),
           projects: projectEntityReducer,
           rules: ruleEntityReducer
-        })
+        }, { runtimeChecks })
       ],
       providers: [
         FeatureFlagsService

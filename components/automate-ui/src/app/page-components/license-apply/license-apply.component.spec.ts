@@ -10,6 +10,7 @@ import { ChefSessionService } from 'app/services/chef-session/chef-session.servi
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { EntityStatus } from 'app/entities/entities';
+import { runtimeChecks } from 'app/ngrx.reducers';
 import { ApplyStatus } from 'app/entities/license/license.reducer';
 import { LicenseStatus } from 'app/entities/license/license.model';
 import { LicenseApplyComponent } from './license-apply.component';
@@ -146,7 +147,7 @@ describe('LicenseApplyComponent', () => {
         ReactiveFormsModule,
         StoreModule.forRoot({
           licenseStatus: reducer
-        })
+        }, { runtimeChecks })
       ],
       declarations: [
         LicenseApplyComponent,

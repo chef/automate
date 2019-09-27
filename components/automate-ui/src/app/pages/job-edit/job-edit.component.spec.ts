@@ -7,7 +7,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { ROUTER_NAVIGATION } from '@ngrx/router-store';
-import { NgrxStateAtom, ngrxReducers } from '../../ngrx.reducers';
+import { NgrxStateAtom, ngrxReducers, runtimeChecks } from '../../ngrx.reducers';
 import { ChefSessionService } from '../../services/chef-session/chef-session.service';
 import { JobEditComponent, Step } from './job-edit.component';
 import { Job } from '../../entities/jobs/job.model';
@@ -47,7 +47,7 @@ describe('JobEditComponent', () => {
       imports: [
         ReactiveFormsModule,
         RouterTestingModule,
-        StoreModule.forRoot(ngrxReducers)
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       declarations: [
         JobEditComponent

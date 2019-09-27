@@ -5,6 +5,7 @@ import { MockComponent } from 'ng2-mock-component';
 
 import { ClientRunsComponent } from './client-runs.component';
 import { StoreModule } from '@ngrx/store';
+import { runtimeChecks } from 'app/ngrx.reducers';
 import * as sidebar from '../../services/sidebar/sidebar.reducer';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { Router } from '@angular/router';
@@ -44,7 +45,7 @@ describe('ClientRunsComponent', () => {
         HttpClientTestingModule,
         StoreModule.forRoot({
           sidebar: sidebar.sidebarReducer
-        })
+        }, { runtimeChecks })
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });

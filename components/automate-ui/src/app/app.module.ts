@@ -17,7 +17,7 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { StoreModule } from '@ngrx/store';
 import { StoreRouterConnectingModule } from '@ngrx/router-store';
 import { NgrxEffectsModule } from './ngrx.effects';
-import { ngrxReducers, RouterSerializer } from './ngrx.reducers';
+import { ngrxReducers, RouterSerializer, runtimeChecks } from './ngrx.reducers';
 
 // angular material stuff
 import {
@@ -290,7 +290,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ProjectModule,
     ReactiveFormsModule,
     RoleModule,
-    StoreModule.forRoot(ngrxReducers),
+    StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
     StoreRouterConnectingModule.forRoot({
       serializer: RouterSerializer
     }),

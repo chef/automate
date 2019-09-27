@@ -7,7 +7,7 @@ import { routerReducer } from '@ngrx/router-store';
 import { Subject } from 'rxjs';
 import { MockComponent } from 'ng2-mock-component';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import { customMatchers } from 'app/testing/custom-matchers';
 import {
   userEntityReducer,
@@ -58,7 +58,7 @@ describe('UserDetailsComponent', () => {
         StoreModule.forRoot({
           router: routerReducer,
           users: userEntityReducer
-        }, { initialState })
+        }, { initialState, runtimeChecks })
       ],
       declarations: [
         MockComponent({ selector: 'app-settings-sidebar' }),

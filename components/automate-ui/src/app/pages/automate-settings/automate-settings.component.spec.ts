@@ -2,6 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { AutomateSettingsComponent } from './automate-settings.component';
 import { StoreModule } from '@ngrx/store';
+import { runtimeChecks } from 'app/ngrx.reducers';
 import {
   automateSettingsEntityReducer
 } from 'app/entities/automate-settings/automate-settings.reducer';
@@ -31,7 +32,7 @@ describe('AutomateSettingsComponent', () => {
         HttpClientTestingModule,
         StoreModule.forRoot({
           automateSettings: automateSettingsEntityReducer
-        })
+        }, { runtimeChecks })
       ],
       declarations: [
         AutomateSettingsComponent

@@ -4,6 +4,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { StoreModule } from '@ngrx/store';
 
 import { ChefSessionService } from '../chef-session/chef-session.service';
+import { runtimeChecks } from 'app/ngrx.reducers';
 import {
   ProjectsFilterState, ProjectsFilterOption
 } from '../projects-filter/projects-filter.reducer';
@@ -186,7 +187,7 @@ function configure(projects?: ProjectsFilterOption[]): void {
         projectsFilter: () => <ProjectsFilterState>{
           options: projects || []
         }
-      })
+      }, { runtimeChecks })
     ],
     providers: [
       ChefSessionService,

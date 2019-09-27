@@ -5,7 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store } from '@ngrx/store';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import { HttpStatus } from 'app/types/types';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import { projectsFilterReducer } from 'app/services/projects-filter/projects-filter.reducer';
@@ -72,7 +72,7 @@ describe('TeamManagementComponent', () => {
           teams: teamEntityReducer,
           policies: policyEntityReducer,
           projectsFilter: projectsFilterReducer
-        })
+        }, { runtimeChecks })
       ]
     })
     .compileComponents();

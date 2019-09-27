@@ -5,6 +5,7 @@ import { of as observableOf } from 'rxjs';
 import { NavbarComponent } from './navbar.component';
 import { MockComponent } from 'ng2-mock-component';
 import { using } from 'app/testing/spec-helpers';
+import { runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import {
   PolicyEntityInitialState,
@@ -23,7 +24,8 @@ describe('NavbarComponent', () => {
         StoreModule.forRoot({
           policies: policyEntityReducer
         }, {
-          initialState: { policies: PolicyEntityInitialState }
+          initialState: { policies: PolicyEntityInitialState },
+          runtimeChecks
         })
       ],
       declarations: [
