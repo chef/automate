@@ -24,6 +24,7 @@ pkg_binds=(
 )
 pkg_description="PostgreSQL Gateway for Chef Automate"
 pkg_upstream_url="https://www.chef.io/automate"
+pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
 
 do_download() {
   return 0
@@ -40,4 +41,3 @@ do_install() {
 do_strip() {
   return 0
 }
-

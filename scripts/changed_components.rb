@@ -18,6 +18,11 @@ def get_hab_deps(source_dir)
   depString.lines.last.split
 end
 
+def get_hab_scaffolding(source_dir)
+  scafString = `bash -c 'cd #{source_dir}; PLAN_CONTEXT=habitat . habitat/plan.sh; echo ${pkg_scaffolding}'`
+  scafString.lines.last.chomp
+end
+
 config = TOML.load_file(".bldr.toml")
 
 changed_files = `git diff --name-only $(scripts/git_difference_expression.rb)`.split("\n")
@@ -48,6 +53,12 @@ config.each do |pkg_name, metadata|
     name = p.split("/")[1]
     name if config[name]
   end.compact
+
+  pkg_scaffolding = get_hab_scaffolding(metadata["plan_path"])
+  if !pkg_scaffolding.empty?
+    pkg_scaffolding = pkg_scaffolding.split("/")[1]
+    hab_deps[pkg_name] << pkg_scaffolding if config[pkg_scaffolding]
+  end
 
   # Look for changed packages based on file diff
   if build_all

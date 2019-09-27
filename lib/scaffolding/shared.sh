@@ -53,17 +53,6 @@ chmod 0600 {{pkg.svc_config_path}}/service.key
 chmod 0600 {{pkg.svc_config_path}}/root_ca.crt
 EOF
 
-    if [ ! -e "${pkg_prefix}/hooks/reconfigure" ]; then
-        build_line "Adding Reconfigure Hook"
-        cat << EOF > "${pkg_prefix}/hooks/reconfigure"
-#!{{pkgPathFor "core/bash"}}/bin/bash
-
-chmod 0600 {{pkg.svc_config_path}}/service.crt
-chmod 0600 {{pkg.svc_config_path}}/service.key
-chmod 0600 {{pkg.svc_config_path}}/root_ca.crt
-EOF
-    fi
-
     build_line "Injecting Platform Environment Into Run Hook"
     insertAfter "${pkg_prefix}/hooks/run" 1 "source {{pkg.svc_config_path}}/_a2_platform_environment"
 

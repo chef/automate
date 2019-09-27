@@ -20,6 +20,7 @@ source {{pkg.svc_config_path}}/functions.sh
 
 write_local_conf
 ensure_dir_ownership
+ensure_key_ownership
 
 echo "Starting PostgreSQL"
 export PGDATA={{pkg.svc_data_path}}/pgdata
