@@ -126,6 +126,10 @@
             <b>{{ serviceGroups.services_health_counts.ok }} of {{ serviceGroups.services_health_counts.total }}</b>
              OK
           </div>
+          <div class="disconnect-notice" *ngIf="serviceGroups.disconnected_count > 0">
+            <img class="disconnect-icon" src="assets/img/icon-disconnected.svg" alt="" aria-hidden />
+            <span>{{ serviceGroups.disconnected_count }}</span>
+          </div>
         </chef-td>
         <chef-td class="package-name">
           {{ serviceGroups.package }}

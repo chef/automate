@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, Input } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { getOr } from 'lodash/fp';
 
 import { EntityStatus } from '../../entities/entities';
 import { ServiceGroupsFacadeService } from '../../entities/service-groups/service-groups.facade';
@@ -10,8 +11,8 @@ import {
   GroupService,
   GroupServicesFilters
 } from '../../entities/service-groups/service-groups.model';
-import { getOr } from 'lodash/fp';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { DateTime } from 'app/helpers/datetime/datetime';
 
 @Component({
   selector: 'app-services-sidebar',
@@ -27,6 +28,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   public currentPage = 1;
   public pageSize = 25;
   public totalServices = 0;
+  public RFC2822 = DateTime.RFC2822;
 
   public services$: Observable<GroupService[]>;
   public serviceGroupsStatus$: Observable<EntityStatus>;
