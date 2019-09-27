@@ -23,20 +23,23 @@
               <chef-form-field id="create-type">
                 <label>
                   <span class="label">Type<span aria-hidden="true">*</span></span>
-                  <select id="expression-type-dropdown" 
+                  <select id="expression-type-dropdown"
                           ngDefaultControl 
                           formControlName="type">
                     <option value='USER'>User</option>
                     <option value='TEAM'>Team</option>
                     <option value='TOKEN'>Token</option>
-                    <option value='ALL_MEMBERS'>All members (*)</option>
+                    <option value='*'>All members (*)</option>
                   </select>
                 </label>
-                <chef-error *ngIf="expressionForm.get('type').hasError('required') && expressionForm.get('type').touched">Type is
-                  required.</chef-error>
+                <!-- Note: might not need the errors in this stepper setup  -->
               </chef-form-field>
 
-              <chef-form-field id="create-identity" *ngIf="expressionForm.get('type').value" [@dropInAnimation]>
+              <chef-form-field 
+                id="create-identity" 
+                *ngIf="expressionForm.get('type').value === 'USER' 
+                        || expressionForm.get('type').value === 'TEAM' " 
+                [@dropInAnimation]>
                 <label>
                   <span class="label">Identity Provider<span aria-hidden="true">*</span></span>
                   <select id="expression-identity-dropdown" 
@@ -45,15 +48,18 @@
                     <option value="LDAP">LDAP</option>
                     <option value="LOCAL">local</option>
                     <option value="SAML">SAML</option>
-                    <option value="ALL_TEAMS">All teams (*)</option>
+                    <option value="*">All teams (*)</option>
                   </select>
                 </label>
-                <chef-error *ngIf="expressionForm.get('identity').hasError('required') && expressionForm.get('identity').touched">
-                  Some sort of error goes here for identity selection
-                </chef-error>
+                <!-- Note: might not need the errors in this stepper setup  -->
               </chef-form-field>
 
-              <chef-form-field id="create-name" *ngIf="expressionForm.get('identity').value" [@dropInAnimation]>
+              <chef-form-field 
+                id="create-name" 
+                *ngIf="expressionForm.get('identity').value
+                        || expressionForm.get('type').value === 'TOKEN'
+                        || expressionForm.get('type').value === '*' " 
+                [@dropInAnimation]>
                 <label>
                   <span class="label">Name<span aria-hidden="true">*</span></span>
                   <chef-input id="expression-name-dropdown" 
@@ -61,6 +67,7 @@
                               formControlName="name"></chef-input>
                 </label>
                 <p class="note">Wildcards (*) are allowed.</p>
+                <!-- Note: probably need errors here  -->
                 <chef-error *ngIf="expressionForm.get('name').hasError('required') && expressionForm.get('name').touched">
                   Some sort of error goes here for name selection
                 </chef-error>

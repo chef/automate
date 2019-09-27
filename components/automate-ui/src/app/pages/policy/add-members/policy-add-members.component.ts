@@ -306,7 +306,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   public validateAndAddExpression(): void {
     this.resetErrors();
 
-    const member = stringToMember(this.expressionForm.value.expression.trim());
+    const member = stringToMember(this.expressionOutput.trim());
 
     if (member.type === Type.Unknown) {
       this.unparsableMember = true;
@@ -339,6 +339,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
         return output.push(value.toLowerCase());
       }
     });
+    console.log(output);
 
     this.expressionOutput = output.join(':');
   }
@@ -348,6 +349,6 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     const expressionValueChanges = this.expressionForm.valueChanges;
     // subscribe to stream
     expressionValueChanges.subscribe(formValues => this.displayExpressionOutput(formValues));
-    //  ngOnit is where subscribe happens
+    //  ngOnit is where subscribe happens, maybe move to modal open
   }
 }
