@@ -40,6 +40,7 @@ import { Regex } from 'app/helpers/auth/regex';
     trigger(
       'dropInAnimation',
       [
+        // Note: really shouldn't be animating height. Probably look at scale
         transition(':enter', [
           style({height: '0%', opacity: 0}),
           animate('.5s ease', style({ height: '100%', opacity: 1}))
