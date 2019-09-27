@@ -76,6 +76,7 @@ describe('ReportingOverviewComponent', () => {
 
     it('invalid date', () => {
       spyOn(router, 'navigate');
+      spyOn(console, 'warn');
 
       component.onDateChanged('lkjasdl');
 
