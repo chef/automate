@@ -78,8 +78,8 @@
           </form>
         </div>
         <!-- expression builder output -->
-        <div>
-          <span class="expression-output">{{ expressionForm.type.value }}</span>
+        <div *ngIf="expressionOutput">
+          <p>Member expression: </p><span class="expression-output">{{ expressionOutput }}</span>
         </div>
 
         <div id="align-buttons">

@@ -142,7 +142,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetUsers());
 
     // subscribe to expressionForm changes
-    this.displayExpressionOutput();
+    this.subscribeToExpressionFormChanges();
   }
 
   addAvailableMember(member: Member, refresh: boolean): void {
@@ -312,12 +312,24 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     this.closeModal();
   }
 
-  displayExpressionOutput() {
+
+  displayExpressionOutput(formValues: object): void {
+    const values = Object.values(formValues);
+    let output = [];
+    values.forEach(value => {
+      if(value != null) {
+        return output.push(value.toLowerCase());
+      }
+    });
+
+    this.expressionOutput = output.join(':');
+  }
+
+  subscribeToExpressionFormChanges() {
     // initialize stream
     const expressionValueChanges = this.expressionForm.valueChanges;
-
     // subscribe to stream
-    expressionValueChanges.subscribe(x => console.log(x);
+    expressionValueChanges.subscribe(formValues => this.displayExpressionOutput(formValues));
     //  ngOnit is where subscribe happens
   }
 }
