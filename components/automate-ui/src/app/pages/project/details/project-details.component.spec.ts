@@ -1,5 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { Router } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
@@ -105,7 +106,7 @@ describe('ProjectDetailsComponent', () => {
         StoreModule.forRoot({
           router: () => ({
             state: {
-              url: '/projects/uuid-1',
+              url: '/settings/projects/uuid-1',
               queryParams: {},
               params: {},
               fragment: '',
@@ -125,8 +126,11 @@ describe('ProjectDetailsComponent', () => {
   }));
 
   let store: Store<NgrxStateAtom>;
+  let router: Router;
+
   beforeEach(() => {
     store = TestBed.get(Store);
+    router = TestBed.get(Router);
 
     store.dispatch(new GetProjectSuccess({
       project: {
@@ -156,11 +160,15 @@ describe('ProjectDetailsComponent', () => {
     });
 
     it('shows/hides sections when based on selection', () => {
+      spyOn(router, 'navigate');
+
       component.onSelectedTab({ target: { value: 'details' } });
       expect(component.tabValue).toBe('details');
+      expect(router.navigate).toHaveBeenCalled();
 
       component.onSelectedTab({ target: { value: 'rules' } });
       expect(component.tabValue).toBe('rules');
+      expect(router.navigate).toHaveBeenCalled();
     });
 
     it('does not display rule table', () => {
@@ -183,10 +191,15 @@ describe('ProjectDetailsComponent', () => {
     });
 
     it('shows/hides sections when based on selection', () => {
+      spyOn(router, 'navigate');
+
       component.onSelectedTab({ target: { value: 'details' } });
       expect(component.tabValue).toBe('details');
+      expect(router.navigate).toHaveBeenCalled();
+
       component.onSelectedTab({ target: { value: 'rules' } });
       expect(component.tabValue).toBe('rules');
+      expect(router.navigate).toHaveBeenCalled();
     });
 
     it('displays rule table', () => {
