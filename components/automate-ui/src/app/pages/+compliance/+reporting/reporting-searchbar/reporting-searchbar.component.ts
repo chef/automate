@@ -14,9 +14,10 @@ import {
   debounceTime, switchMap, distinctUntilChanged
 } from 'rxjs/operators';
 import { FilterC } from '../types';
+import { Chicklet } from 'app/types/types';
 import {
   ReportQueryService
-} from '../../shared/reporting';
+} from 'app/pages/+compliance/shared/reporting';
 
 @Component({
   selector: 'app-reporting-searchbar',
@@ -440,7 +441,7 @@ export class ReportingSearchbarComponent implements OnInit {
     this.highlightedIndex = -1;
   }
 
-  requestForSuggestions(c: any): void {
+  requestForSuggestions(c: Chicklet): void {
     if (c.type) {
       c.type = this.formatType(c.type);
       this.suggestionSearchTermDebounce.next(c);
@@ -467,10 +468,10 @@ export class ReportingSearchbarComponent implements OnInit {
   // When value is clicked for the control tag key
   onControlTagKeyValueClick(value: any) {
     const reportQuery = this.reportQuery.getReportQuery();
-    const type = this.selectedType;
-    type.name = `control_tag:${value.text}`;
-    type.title = `Control Tag | ${value.text}`;
-    type.placeholder = 'Enter Control Tag Values...';
+    const type = { ...this.selectedType,
+      name: `control_tag:${value.text}`,
+      title: `Control Tag | ${value.text}`,
+      placeholder: 'Enter Control Tag Values...'};
     reportQuery.filters.push({
       type: type,
       value: {text: undefined }
