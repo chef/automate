@@ -79,8 +79,7 @@ EOF
     "editor",
     "viewer",
     "ingest",
-    "project-owner",
-    "iam-members-viewer"
+    "project-owner"
   ]
 
   NON_ADMIN_USERNAME_V2 = 'inspec_test_non_admin_with_iam_v2'
