@@ -17,7 +17,8 @@ do_setup() {
     hab pkg install --binlink core/docker
     echo "Installed docker"
     echo "Installing inspec"
-    hab pkg install --binlink chef/inspec
+    # inspec 4.17.7 is broken
+    hab pkg install --binlink chef/inspec/4.16.0/20190829191134
     echo "Installed inspec"
 }
 
