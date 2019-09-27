@@ -468,10 +468,10 @@ export class ReportingSearchbarComponent implements OnInit {
   // When value is clicked for the control tag key
   onControlTagKeyValueClick(value: any) {
     const reportQuery = this.reportQuery.getReportQuery();
-    const type = { ...this.selectedType,
-      name: `control_tag:${value.text}`,
-      title: `Control Tag | ${value.text}`,
-      placeholder: 'Enter Control Tag Values...'};
+    const type = this.selectedType;
+    type.name = `control_tag:${value.text}`;
+    type.title = `Control Tag | ${value.text}`;
+    type.placeholder = 'Enter Control Tag Values...';
     reportQuery.filters.push({
       type: type,
       value: {text: undefined }
