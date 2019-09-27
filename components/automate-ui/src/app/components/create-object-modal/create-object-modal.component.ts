@@ -63,7 +63,7 @@ export class CreateObjectModalComponent implements OnInit, OnChanges {
   }
 
   public handleNameInput(event: KeyboardEvent): void {
-    if (!this.modifyID && !this.isNavigationKey(event)) {
+    if (!this.modifyID && !this.isNavigationKey(event) && this.createForm.controls.name.value) {
       this.conflictError = false;
       this.createForm.controls.id.setValue(
         IdMapper.transform(this.createForm.controls.name.value.trim()));
