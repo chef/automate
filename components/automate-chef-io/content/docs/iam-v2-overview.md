@@ -13,39 +13,39 @@ toc = true
 Show the simplest possible experience that most users will experience. We are assuming that experience will be UI only, so present the UI information first followed by CLI information presented in reference format.
 -->
 
-This guide helps you understand and use the beta version of Chef Automate's new **Identity and Access Management** ([IAM](https://en.wikipedia.org/wiki/Identity_management)) system (IAM v2.1).
+This guide helps you understand and use the beta version of Chef Automate's new **Identity and Access Management** ([IAM](https://en.wikipedia.org/wiki/Identity_management)) system (IAM v2).
 
-IAM v2.1 is a beta release and its functionality is subject to change during this period, based on customer feedback.
+IAM v2 is a beta release and its functionality is subject to change during this period, based on customer feedback.
 This is an opt-in only feature during the beta period.
 Chef Automate users will not be automatically upgraded.
 
-We designed IAM v2.1 to leave your v1 policy data untouched during your upgrade to v2.1; however, you can choose to not port over v1 policies by using the provided `--skip-policy-migration` flag with the upgrade command.
+We designed IAM v2 to leave your v1 policy data untouched during your upgrade to v2; however, you can choose to not port over v1 policies by using the provided `--skip-policy-migration` flag with the upgrade command.
 
 Whether or not you migrate your v1 policies, if at any time you decide to opt back out of the beta and revert to v1, your original v1 policies will still be intact.
-Reverting to v1, however, will remove any new v2.1 data created while using IAM v2.1 (policies, roles, projects, rules).
-Users, teams, and tokens are shared between v1 and v2.1 so changes to them will persist.
+Reverting to v1, however, will remove any new v2 data created while using IAM v2 (policies, roles, projects, rules).
+Users, teams, and tokens are shared between v1 and v2 so changes to them will persist.
 
 See the [IAM v2 API Reference]({{< relref "iam-v2-api-reference.md" >}}) for day-to-day use of the IAM v2 system.
 
-## New Features in IAM v2.1
+## New Features in IAM v2
 
-IAM v2.1 expands Chef Automate's authorization system by supporting policies to allow multiple permissions, separating out policy membership from policy definition for more fine-grained control, and adding roles to begin moving towards role-based access control.
-Additionally, IAM v2.1 improves the user experience by starting to expose policy management in the Automate UI.
+IAM v2 expands Chef Automate's authorization system by supporting policies to allow multiple permissions, separating out policy membership from policy definition for more fine-grained control, and adding roles to begin moving towards role-based access control.
+Additionally, IAM v2 improves the user experience by starting to expose policy management in the Automate UI.
 
 At the heart of Chef Automate's IAM system is the *policy*.
 A policy defines permissions for who may perform what action on which resource.
 The "who" may be a user, a team, or a system.
 Users and teams are designated by name while systems use pre-authorized tokens to communicate with Automate.
 
-Conceptually, this description applies equally to both v1 and v2.1.
-However, for IAM v2.1, we have revised and expanded what constitutes a policy.
+Conceptually, this description applies equally to both v1 and v2.
+However, for IAM v2, we have revised and expanded what constitutes a policy.
 The following diagram shows the new policy structure; we'll detail the specifics in the next few sections.
 
 ![](/images/docs/iam-v2-diagram.png)
 
 ## New Policy Definition
 
-IAM v2.1 introduces multi-statement policies, so more complex permissions can be embodied in a single policy, resulting in fewer policies required to secure your system.
+IAM v2 introduces multi-statement policies, so more complex permissions can be embodied in a single policy, resulting in fewer policies required to secure your system.
 Each statement specifies a single permission.
 The net effect (ALLOW or DENY) of a policy is determined by evaluating the effect of each statement and combining them: if there is at least one statement allowing access, and none denying it, then the policy allows access. Otherwise, it is denied.
 
@@ -71,7 +71,7 @@ Examples:
 
 ### Properties of a Policy
 
-A v2.1 policy consists of a list of **statements**, where each statement describes a permission.
+A v2 policy consists of a list of **statements**, where each statement describes a permission.
 
 Property   | Description
 -----------|------------
@@ -91,7 +91,7 @@ Projects   | list of project IDs to constrain the actions and/or role
 
 ### Properties of a Role
 
-A v2.1 role consists of a list of **actions**.
+A v2 role consists of a list of **actions**.
 Roles are discussed in detail in [Basic Role-Based Access Control]({{< relref "iam-v2-overview.md#basic-role-based-access-control" >}}).
 
 Property   | Description
@@ -102,17 +102,17 @@ Actions    | list of operations the role manages, e.g., read IAM users, get comp
 
 A **member**  (previously called a *subject* in v1) may be a user, a team, or a token.
 Users and teams may be *local*, meaning they are defined within Chef Automate, or managed by an external identity provider, specifically LDAP or SAML.
-In this so far, v2.1 and v1 behave the same.
+In this so far, v2 and v1 behave the same.
 
-What is new in v2.1 is that policy *membership* is separate and distinct from policy *definition*.
+What is new in v2 is that policy *membership* is separate and distinct from policy *definition*.
 (Notice that members were **not** included as part of the [New Policy Definition]({{< relref "iam-v2-overview.md#new-policy-definition" >}})).
-Notably, with IAM v2.1, you can modify policy membership for any policy,
+Notably, with IAM v2, you can modify policy membership for any policy,
 but you can only adjust policy definition for policies that you create yourself.
 [Policy Types]({{< relref "iam-v2-overview.md#policy-types" >}}) discusses this point further.
 
 ## Policy Types
 
-IAM v2.1 distinguishes two types of policies: *Chef-managed* and *custom*.
+IAM v2 distinguishes two types of policies: *Chef-managed* and *custom*.
 *Chef-managed* policies are provided by Chef and are integral to the operation of Chef Automate. The policy statements (comprising the policy definition) in Chef-managed policies are immutable.
 *Custom* policies are those you create for your own needs. You can add, edit, and delete policy statements in your custom policies.
 
@@ -121,7 +121,7 @@ It is, however, not possible to remove the local Administrator from the Administ
 
 ## Basic Role-Based Access Control
 
-IAM v2.1 also introduces basic roles as our first step to delivering
+IAM v2 also introduces basic roles as our first step to delivering
 Role-Based Access Control ([RBAC](https://en.wikipedia.org/wiki/Role-based_access_control)).
 A role is a named set of actions.
 This provides the benefits of *encapsulation* (only needing to know the name and not be encumbered by all the details after initial definition) and *reuse* (apply the role to any statement that needs it).
@@ -174,7 +174,7 @@ Note that out-of-the-box we provide a *project-owner* role so the global admin m
 
 ### Properties of a Project
 
-A v2.1 project consists of a list of **rules**, where each rule describes a group of node characteristics.
+A v2 project consists of a list of **rules**, where each rule describes a group of node characteristics.
 
 Property   | Description
 -----------|------------
@@ -212,7 +212,7 @@ Once you define your set of projects with their contained rules and conditions, 
 
 ## Policies, Roles, and Projects in the UI
 
-IAM v2.1 introduces partial policy management from within Chef Automate in your browser.
+IAM v2 introduces partial policy management from within Chef Automate in your browser.
 Chef Automate's **Settings** tab has a new *Access Management* heading on the left panel, with new pages for *Policies*, *Roles*, and *Projects*.
 
 The main body on the policy list page displays all your policies along with their types (*Chef-managed* or *Custom*) and status (*In use* or *No members*).
