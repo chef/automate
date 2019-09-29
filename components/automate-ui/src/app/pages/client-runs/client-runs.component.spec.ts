@@ -1,17 +1,17 @@
+import { CUSTOM_ELEMENTS_SCHEMA, NgZone } from '@angular/core';
+import { Router } from '@angular/router';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
-import { ClientRunsComponent } from './client-runs.component';
-import { StoreModule } from '@ngrx/store';
 import { runtimeChecks } from 'app/ngrx.reducers';
 import * as sidebar from '../../services/sidebar/sidebar.reducer';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { Router } from '@angular/router';
 import { UpdateNodeFilters } from '../../entities/client-runs/client-runs.actions';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import { EntityStatus } from '../../entities/entities';
+import { ClientRunsComponent } from './client-runs.component';
 
 class MockTelemetryService {
   track() { }
@@ -19,6 +19,7 @@ class MockTelemetryService {
 import {
   ClientRunsRequests
 } from '../../entities/client-runs/client-runs.requests';
+import { wrapRouterInNgZone } from 'app/testing/routing-helper';
 
 describe('ClientRunsComponent', () => {
   let fixture, component;
@@ -52,7 +53,10 @@ describe('ClientRunsComponent', () => {
 
     fixture = TestBed.createComponent(ClientRunsComponent);
     component = fixture.componentInstance;
-    router = TestBed.get(Router);
+    router = wrapRouterInNgZone(
+      TestBed.get(Router),
+      TestBed.get(NgZone)
+    );
   });
 
   describe('sets categoryTypes', () => {

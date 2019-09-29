@@ -1,17 +1,19 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { RouterTestingModule } from '@angular/router/testing';
-import { TestBed, fakeAsync, tick, ComponentFixture } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
+import { TestBed, fakeAsync, tick, ComponentFixture } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { StoreModule, Store } from '@ngrx/store';
-import { ServiceGroupsComponent  } from './service-groups.component';
-import { ServiceStatusIconPipe } from '../../pipes/service-status-icon.pipe';
+
 import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
+import { wrapRouterInNgZone } from 'app/testing/routing-helper';
+import { ServiceStatusIconPipe } from 'app/pipes/service-status-icon.pipe';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { serviceGroupsEntityReducer } from 'app/entities/service-groups/service-groups.reducer';
 import {
   UpdateServiceGroupsFilters,
   GetServiceGroupsCountsSuccess
 } from 'app/entities/service-groups/service-groups.actions';
-import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { ServiceGroupsComponent  } from './service-groups.component';
 
 class MockTelemetryService {
   track(_event?: string, _properties?: any): void {
@@ -43,7 +45,10 @@ describe('ServiceGroupsComponent', () => {
 
     fixture = TestBed.createComponent(ServiceGroupsComponent);
     component = fixture.componentInstance;
-    router = TestBed.get(Router);
+    router = wrapRouterInNgZone(
+      TestBed.get(Router),
+      TestBed.get(NgZone)
+    );
     ngrxStore = TestBed.get(Store);
     component.ngOnInit();
   });
