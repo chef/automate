@@ -237,32 +237,4 @@ describe('TeamManagementComponent', () => {
       });
     });
   });
-
-  describe('sortedTeams$', () => {
-    let store: Store<NgrxStateAtom>;
-    beforeEach(() => {
-      store = TestBed.get(Store);
-    });
-
-    it('uses natural ordering', () => {
-      store.dispatch(new GetTeamsSuccess({
-        teams: [
-          { guid: 'uuid-1', id: 'Viewer01', name: 'Viewer01 name', projects: [] },
-          { guid: 'uuid-2', id: 'Viewer300', name: 'Viewer300 name', projects: [] },
-          { guid: 'uuid-3', id: 'Viewer3', name: 'hello Viewer3', projects: [] },
-          { guid: 'uuid-4', id: 'Viewer-2', name: 'goodbye Viewer-2', projects: [] },
-          { guid: 'uuid-6', id: 'viewer', name: 'a viewer', projects: [] }
-        ]
-      }));
-      component.sortedTeams$.subscribe(teams => {
-        expect(teams.length).toBe(5);
-        expect(teams[0]).toEqual(jasmine.objectContaining({ id: 'viewer' }));
-        expect(teams[1]).toEqual(jasmine.objectContaining({ id: 'Viewer-2' }));
-        expect(teams[2]).toEqual(jasmine.objectContaining({ id: 'Viewer01' }));
-        expect(teams[3]).toEqual(jasmine.objectContaining({ id: 'Viewer3' }));
-        expect(teams[4]).toEqual(jasmine.objectContaining({ id: 'Viewer300' }));
-      });
-    });
-
-  });
 });
