@@ -10,7 +10,6 @@ export class ChefSorters {
     // example use with dual prop:    ChefSorters.naturalSort(users, ['name', 'id']);
     // ***********
 
-    // tslint:disable-next-line: max-line-length
     public static naturalSort(input: Array<any>, property: Array<string> | string): Array<any> {
         // See https://stackoverflow.com/a/38641281 for these options
         // "sensitivity provides a stable sort so 'a' always comes before 'A'.
