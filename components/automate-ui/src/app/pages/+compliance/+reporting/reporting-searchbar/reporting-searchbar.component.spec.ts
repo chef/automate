@@ -3,6 +3,9 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { ReportingSearchbarComponent } from './reporting-searchbar.component';
 import { using } from 'app/testing/spec-helpers';
 import * as moment from 'moment';
+import {
+  ReportQueryService
+} from 'app/pages/+compliance/shared/reporting';
 
 describe('ReportingSearchbarComponent', () => {
   let fixture: ComponentFixture<ReportingSearchbarComponent>,
@@ -16,6 +19,7 @@ describe('ReportingSearchbarComponent', () => {
         ReportingSearchbarComponent
       ],
       providers: [
+        ReportQueryService
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });
