@@ -22,7 +22,7 @@ const (
 )
 
 var (
-	waitingForReconfigureTimeout = 60 * time.Second
+	waitingForReconfigureTimeout = 30 * time.Second
 	waitingForRestartTimeout     = 600 * time.Second
 )
 
