@@ -12,8 +12,16 @@ const (
 	a2V4IndexPrefix    = "comp-4-"
 	a2V4SumIndexPrefix = a2V4IndexPrefix + "s-"
 	profileFullScript  = `
-		for (int i = 0; i < ctx._source.profiles.length; ++i) {
-			ctx._source.profiles[i].full = ctx._source.profiles[i].title + ', v' + ctx._source.profiles[i].version;
+		if (ctx._source.profiles != null) {
+			for (int i = 0; i < ctx._source.profiles.length; ++i) {
+				if (ctx._source.profiles[i] != null) {
+					if (ctx._source.profiles[i].title != null && ctx._source.profiles[i].title != '' && ctx._source.profiles[i].version != null && ctx._source.profiles[i].version != '') {
+						ctx._source.profiles[i].full = ctx._source.profiles[i].title + ', v' + ctx._source.profiles[i].version;
+					} else if (ctx._source.profiles[i].title != null && ctx._source.profiles[i].title != '') {
+						ctx._source.profiles[i].full = ctx._source.profiles[i].title;
+					}
+				}
+			}
 		}
 	`
 )
