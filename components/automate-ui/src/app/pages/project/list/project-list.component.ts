@@ -7,6 +7,7 @@ import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
+import { ChefSorters } from 'app/helpers/auth/sorter';
 import { HttpStatus } from 'app/types/types';
 import { loading, EntityStatus } from 'app/entities/entities';
 import { atLeastV2p1 } from 'app/entities/policies/policy.selectors';
@@ -75,13 +76,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   ) {
     this.loading$ = store.select(getAllStatus).pipe(map(loading));
     this.sortedProjects$ = store.select(allProjects).pipe(
-      map((unsorted: Project[]) => unsorted.sort(
-        (a, b) => {
-          const opts = { numeric: true, sensitivity: 'base' };
-          return a.name.localeCompare(b.name, undefined, opts)
-            || a.name.localeCompare(b.name, undefined, { numeric: true });
-        }
-      )));
+      map((unsorted: Project[]) => ChefSorters.naturalSort(unsorted, 'name')));
 
     this.iamMajorVersion$ = store.select(iamMajorVersion);
     this.projectsEnabled$ = store.select(atLeastV2p1);

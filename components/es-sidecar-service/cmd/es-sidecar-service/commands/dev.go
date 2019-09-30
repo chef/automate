@@ -37,7 +37,7 @@ var devCreateRepositoryCmd = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
-		if res == true {
+		if res {
 			fmt.Println("Repository created and verified")
 		} else {
 			fmt.Println("Repository created but not verified")

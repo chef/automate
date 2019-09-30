@@ -15,6 +15,33 @@
     "application/json"
   ],
   "paths": {
+    "/compliance/reporting/controls": {
+      "post": {
+        "summary": "should cover /controls\nThis api is useful for getting a limited list of control items for latest runs.  It also honors all reporting filters",
+        "operationId": "ListControlItems",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ControlItems"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ControlItemRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ReportingService"
+        ]
+      }
+    },
     "/compliance/reporting/nodes/id/{id}": {
       "get": {
         "operationId": "ReadNode",
@@ -318,6 +345,60 @@
           "type": "object",
           "additionalProperties": {
             "type": "string"
+          }
+        }
+      }
+    },
+    "v1ControlItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "profile": {
+          "$ref": "#/definitions/v1ProfileMin"
+        },
+        "impact": {
+          "type": "number",
+          "format": "float"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "control_summary": {
+          "$ref": "#/definitions/v1ControlSummary"
+        }
+      }
+    },
+    "v1ControlItemRequest": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ListFilter"
+          }
+        }
+      }
+    },
+    "v1ControlItems": {
+      "type": "object",
+      "properties": {
+        "control_items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1ControlItem"
           }
         }
       }

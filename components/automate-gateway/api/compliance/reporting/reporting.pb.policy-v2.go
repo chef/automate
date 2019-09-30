@@ -40,6 +40,19 @@ func init() {
 		}
 		return ""
 	})
+	policyv2.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/ListControlItems", "compliance:reporting:control", "compliance:controlItems:list", "POST", "/compliance/reporting/controls", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*ControlItemRequest); ok {
+			return policyv2.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "text":
+					return m.Text
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 	policyv2.MapMethodTo("/chef.automate.api.compliance.reporting.v1.ReportingService/ReadReport", "compliance:reporting:reports:{id}", "compliance:reports:get", "POST", "/compliance/reporting/reports/id/{id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*Query); ok {
 			return policyv2.ExpandParameterizedResource(unexpandedResource, func(want string) string {

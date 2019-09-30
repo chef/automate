@@ -7,10 +7,11 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/pkg/errors"
+
 	config "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
 	"github.com/chef/automate/components/automate-deployment/pkg/toml"
-	"github.com/pkg/errors"
 )
 
 // NewUserOverrideConfig returns a completely blank config struct onto which we
@@ -474,13 +475,21 @@ func (c *AutomateConfig) RedactedCopy() (*AutomateConfig, error) {
 // Redact removes sensitive or deprecated values from the configuration
 func (c *AutomateConfig) Redact() {
 	// sensitive
-	c.Deployment.V1.Svc.AdminUser = nil
+	if c.GetDeployment().GetV1().GetSvc() != nil {
+		c.Deployment.V1.Svc.AdminUser = nil
+	}
 
 	// deprecated
-	c.Compliance.V1.Sys.Retention = nil
-	c.EventFeedService.V1.Sys.Service.PurgeEventFeedAfterDays = nil
-	c.Ingest.V1.Sys.Service.PurgeActionsAfterDays = nil
-	c.Ingest.V1.Sys.Service.PurgeConvergeHistoryAfterDays = nil
+	if c.GetCompliance().GetV1().GetSys() != nil {
+		c.Compliance.V1.Sys.Retention = nil
+	}
+	if c.GetEventFeedService().GetV1().GetSys().GetService() != nil {
+		c.EventFeedService.V1.Sys.Service.PurgeEventFeedAfterDays = nil
+	}
+	if c.GetIngest().GetV1().GetSys().GetService() != nil {
+		c.Ingest.V1.Sys.Service.PurgeActionsAfterDays = nil
+		c.Ingest.V1.Sys.Service.PurgeConvergeHistoryAfterDays = nil
+	}
 }
 
 // MarshalToTOMLFile marshals the AutomateConfig to a TOML representation and

@@ -9,6 +9,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { HttpStatus } from 'app/types/types';
 import { loading, EntityStatus } from 'app/entities/entities';
+import { ChefSorters } from 'app/helpers/auth/sorter';
 import { Type } from 'app/entities/notifications/notification.model';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { ApiToken } from 'app/entities/api-tokens/api-token.model';
@@ -57,17 +58,7 @@ export class ApiTokenListComponent implements OnInit {
 
     this.sortedApiTokens$ = store.pipe(
       select(allApiTokens),
-      map(tokens => tokens.sort(
-        (a, b) => {
-          // See https://stackoverflow.com/a/38641281 for these options
-          const opts = { numeric: true, sensitivity: 'base' };
-          // Sort by name then by cased-name, since no other field
-          // is useful as a secondary sort; this ensures stable sort with
-          // respect to case, so 'a' always comes before 'A'.
-          return a.name.localeCompare(b.name, undefined, opts)
-            || a.name.localeCompare(b.name, undefined, {numeric: true});
-        }
-      )));
+      map(tokens => ChefSorters.naturalSort(tokens, 'name')));
 
     this.createTokenForm = fb.group({
       // Must stay in sync with error checks in create-object-modal.component.html

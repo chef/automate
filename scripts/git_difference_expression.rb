@@ -20,7 +20,11 @@ end
 
 current_rev = `git rev-parse HEAD`.chomp!
 master_rev = `git rev-parse origin/master`.chomp!
-dev_rev = get_dev_manifest_sha
+dev_rev = if ENV['GIT_DIFF_BASE']
+            ENV['GIT_DIFF_BASE']
+          else
+            get_dev_manifest_sha
+          end
 
 # check if the dev_rev is actually from this tree.  we only expect to
 # see this until we can get a build through dev.

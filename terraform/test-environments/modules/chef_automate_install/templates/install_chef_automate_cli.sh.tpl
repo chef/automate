@@ -56,7 +56,7 @@ install_inspec() {
     # this currently only gets run on the hardened fresh install instances
     # so we're always going to have the latest inspec
     if ! [ -x "$(command -v inspec)" ]; then
-	curl -s https://omnitruck.chef.io/install.sh | bash -s -- -P inspec
+	curl -s https://omnitruck.chef.io/install.sh | bash -s -- -P inspec -v 4.16.0
     fi
 }
 

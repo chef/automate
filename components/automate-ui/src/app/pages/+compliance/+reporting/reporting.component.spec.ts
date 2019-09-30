@@ -92,8 +92,9 @@ describe('ReportingComponent', () => {
       const availableFilterTypesNames = component.availableFilterTypes.map( type => type.name);
 
       const expected = [
-        'chef_server', 'chef_tags', 'control', 'environment', 'node', 'organization', 'platform',
-        'policy_group', 'policy_name', 'profile', 'recipe', 'role', 'inspec_version'];
+        'chef_server', 'chef_tags', 'control', 'control_tag_key',
+        'environment', 'node', 'organization', 'platform', 'policy_group',
+        'policy_name', 'profile', 'recipe', 'role', 'inspec_version'];
 
       expect(expected.sort()).toEqual(availableFilterTypesNames.sort());
     });

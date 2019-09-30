@@ -271,7 +271,8 @@ export class StatsService {
         if (group) {
           group.values.push(value);
         } else {
-          formatted.push({type, values: [value]});
+          const typeValue = value === undefined ? [] : [value];
+          formatted.push({type, values: typeValue});
         }
       return formatted;
     }, []);

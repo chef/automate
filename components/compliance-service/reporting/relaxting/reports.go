@@ -530,6 +530,249 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 	return report, errorutils.ProcessNotFound(nil, reportId)
 }
 
+func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[string][]string,
+	size int32) (*reportingapi.ControlItems, error) {
+	myName := "GetControlListItems"
+
+	contListItems := make([]*reportingapi.ControlItem, 0)
+
+	client, err := backend.ES2Client()
+	if err != nil {
+		logrus.Errorf("Cannot connect to ElasticSearch: %s", err)
+		return nil, err
+	}
+
+	// we need to use start_time or else we won't see all of the controls that were used outside of end_time day
+	// we use start_time for the same reason we need it for trends
+	esIndex, err := GetEsIndex(filters, false, false)
+	if err != nil {
+		return nil, errors.Wrap(err, myName)
+	}
+
+	//here, we set latestOnly to true.  We may need to set it to false if we want to search non lastest reports
+	//for now, we don't search non-latest reports so don't do it.. it's slower for obvious reasons.
+	filtQuery := backend.getFiltersQuery(filters, true)
+
+	searchSource := elastic.NewSearchSource().
+		Query(filtQuery).
+		FetchSource(false).
+		Size(1)
+
+	controlTermsAgg := elastic.NewTermsAggregation().Field("profiles.controls.id").
+		Size(int(size)).
+		Order("_key", true)
+
+	controlTermsAgg.SubAggregation("impact",
+		elastic.NewTermsAggregation().Field("profiles.controls.impact").Size(1))
+
+	controlTermsAgg.SubAggregation("title",
+		elastic.NewTermsAggregation().Field("profiles.controls.title").Size(1))
+
+	controlTermsAgg.SubAggregation("skipped",
+		elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "skipped")))
+
+	controlTermsAgg.SubAggregation("failed",
+		elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "failed")))
+
+	controlTermsAgg.SubAggregation("passed",
+		elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "passed")))
+
+	controlTermsAgg.SubAggregation("end_time", elastic.NewReverseNestedAggregation().SubAggregation("most_recent_report",
+		elastic.NewTermsAggregation().Field("end_time").Size(1)))
+
+	profileInfoAgg := elastic.NewReverseNestedAggregation().Path("profiles").SubAggregation("version",
+		elastic.NewTermsAggregation().Field("profiles.name"))
+
+	profileInfoAgg.SubAggregation("sha",
+		elastic.NewTermsAggregation().Field("profiles.sha256"))
+
+	profileInfoAgg.SubAggregation("title",
+		elastic.NewTermsAggregation().Field("profiles.title"))
+
+	profileInfoAgg.SubAggregation("version",
+		elastic.NewTermsAggregation().Field("profiles.version"))
+
+	controlTermsAgg.SubAggregation("profile", profileInfoAgg)
+
+	controlsQuery := &elastic.BoolQuery{}
+	// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
+	for filterType := range filters {
+		if strings.HasPrefix(filterType, "control_tag:") {
+			_, tagKey := leftSplit(filterType, ":")
+			termQuery := backend.newNestedTermQueryFromControlTagsFilter(tagKey, filters[filterType])
+			controlsQuery = controlsQuery.Must(termQuery)
+		}
+	}
+	if len(filters["control_status"]) > 0 {
+		controlStatusQuery := backend.newTermQueryFromFilter("profiles.controls.status", filters["control_status"])
+		controlsQuery = controlsQuery.Must(controlStatusQuery)
+		logrus.Infof("controls status query %v", controlStatusQuery)
+	}
+	if len(filters["control_name"]) > 0 {
+		controlTitlesQuery := backend.newTermQueryFromFilter("profiles.controls.title.lower", filters["control_name"])
+		controlsQuery = controlsQuery.Should(controlTitlesQuery)
+		logrus.Infof("controls name query %v", controlTitlesQuery)
+	}
+	if len(filters["control"]) > 0 {
+		controlIdsQuery := backend.newTermQueryFromFilter("profiles.controls.id", filters["control"])
+		controlsQuery = controlsQuery.Should(controlIdsQuery)
+		logrus.Infof("controls ids query %v", controlIdsQuery)
+	}
+
+	filteredControls := elastic.NewFilterAggregation().Filter(controlsQuery)
+	filteredControls.SubAggregation("control", controlTermsAgg)
+	controlsAgg := elastic.NewNestedAggregation().Path("profiles.controls")
+	controlsAgg.SubAggregation("filtered_controls", filteredControls)
+
+	profilesQuery := &elastic.BoolQuery{}
+	if len(filters["profile_name"]) > 0 {
+		profileTitlesQuery := backend.newTermQueryFromFilter("profiles.title.lower", filters["profile_name"])
+		profilesQuery = profilesQuery.Should(profileTitlesQuery)
+		logrus.Infof("profiles name query %v", profileTitlesQuery)
+	}
+
+	if len(filters["profile_id"]) > 0 {
+		profilesShaQuery := backend.newTermQueryFromFilter("profiles.sha256", filters["profile_id"])
+		profilesQuery = profilesQuery.Should(profilesShaQuery)
+	}
+
+	filteredProfiles := elastic.NewFilterAggregation().Filter(profilesQuery)
+	filteredProfiles.SubAggregation("controls", controlsAgg)
+	outterMostProfilesAgg := elastic.NewNestedAggregation().Path("profiles")
+	outterMostProfilesAgg.SubAggregation("filtered_profiles", filteredProfiles)
+
+	searchSource.Aggregation("profiles", outterMostProfilesAgg)
+
+	source, err := searchSource.Source()
+	if err != nil {
+		return nil, errors.Wrapf(err, "%s unable to get Source", myName)
+	}
+	LogQueryPartMin(esIndex, source, fmt.Sprintf("%s query", myName))
+
+	searchResult, err := client.Search().
+		SearchSource(searchSource).
+		Index(esIndex).
+		Do(ctx)
+
+	if err != nil {
+		logrus.Errorf("%s search failed", myName)
+		return nil, err
+	}
+
+	logrus.Debugf("Search query took %d milliseconds\n", searchResult.TookInMillis)
+
+	if outerProfilesAggResult, found := searchResult.Aggregations.Nested("profiles"); found {
+		if outerFilteredProfiles, found := outerProfilesAggResult.Aggregations.Filter("filtered_profiles"); found {
+			if outerControlsAggResult, found := outerFilteredProfiles.Aggregations.Nested("controls"); found {
+				if filteredControls, found := outerControlsAggResult.Aggregations.Filter("filtered_controls"); found {
+					if controlBuckets, found := filteredControls.Aggregations.Terms("control"); found && len(controlBuckets.Buckets) > 0 {
+						for _, controlBucket := range controlBuckets.Buckets {
+							contListItem, err := backend.getControlItem(controlBucket)
+							if err != nil {
+								return nil, err
+							}
+							contListItems = append(contListItems, &contListItem)
+						}
+					}
+				}
+			}
+		}
+	}
+
+	contListItemList := &reportingapi.ControlItems{ControlItems: contListItems}
+	return contListItemList, nil
+}
+
+func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBucketKeyItem) (reportingapi.ControlItem, error) {
+	contListItem := reportingapi.ControlItem{}
+	id, ok := controlBucket.Key.(string)
+	if !ok {
+		logrus.Errorf("could not convert the value of controlBucket: %v, to a string!", controlBucket)
+	}
+	contListItem.Id = id
+	controlSummary := &reportingapi.ControlSummary{
+		Passed:  &reportingapi.Total{},
+		Skipped: &reportingapi.Total{},
+		Failed:  &reportingapi.Failed{},
+	}
+	if aggResult, found := controlBucket.Aggregations.Terms("title"); found {
+		//there can only be one
+		bucket := aggResult.Buckets[0]
+		title, ok := bucket.Key.(string)
+		if !ok {
+			logrus.Errorf("could not convert the value of title: %v, to a string!", bucket)
+		}
+		contListItem.Title = title
+	}
+	if impactAggResult, found := controlBucket.Aggregations.Terms("impact"); found {
+		//there can only be one
+		impactBucket := impactAggResult.Buckets[0]
+		impactAsNumber, ok := impactBucket.Key.(float64)
+		if !ok {
+			logrus.Errorf("could not convert the value of impact: %v, to a float!", impactBucket)
+		}
+		contListItem.Impact = float32(impactAsNumber)
+		controlSummary.Total = int32(impactBucket.DocCount)
+	}
+	profileMin := &reportingapi.ProfileMin{}
+	if profileResult, found := controlBucket.Aggregations.ReverseNested("profile"); found {
+		if result, found := profileResult.Terms("sha"); found && len(result.Buckets) > 0 {
+			sha := result.Buckets[0]
+			name := sha.KeyNumber
+			profileMin.Id = string(name)
+		}
+		if result, found := profileResult.Terms("title"); found && len(result.Buckets) > 0 {
+			title := result.Buckets[0]
+			name := title.KeyNumber
+			profileMin.Title = string(name)
+		}
+		if result, found := profileResult.Terms("version"); found && len(result.Buckets) > 0 {
+			version := result.Buckets[0]
+			name := version.KeyNumber
+			profileMin.Version = string(name)
+		}
+	}
+	contListItem.Profile = profileMin
+
+	if endTimeResult, found := controlBucket.Aggregations.ReverseNested("end_time"); found {
+		if result, found := endTimeResult.Terms("most_recent_report"); found && len(result.Buckets) > 0 {
+			endTime := result.Buckets[0]
+			name := endTime.KeyAsString
+
+			endTimeAsTime, err := time.Parse(time.RFC3339, *name)
+			if err != nil {
+				return reportingapi.ControlItem{}, errors.Wrapf(err, "%s time error: ", *name)
+			}
+
+			timestamp, err := ptypes.TimestampProto(endTimeAsTime)
+			if err != nil {
+				return reportingapi.ControlItem{}, errors.Wrapf(err, "%s time error: ", *name)
+			} else {
+				contListItem.EndTime = timestamp
+			}
+		}
+	}
+	if passed, found := controlBucket.Aggregations.Filter("passed"); found {
+		controlSummary.Passed.Total = int32(passed.DocCount)
+	}
+	if skipped, found := controlBucket.Aggregations.Filter("skipped"); found {
+		controlSummary.Skipped.Total = int32(skipped.DocCount)
+	}
+	if failed, found := controlBucket.Aggregations.Filter("failed"); found {
+		total := int32(failed.DocCount)
+		controlSummary.Failed.Total = total
+		if contListItem.Impact < 0.4 {
+			controlSummary.Failed.Minor = total
+		} else if contListItem.Impact < 0.7 {
+			controlSummary.Failed.Major = total
+		} else {
+			controlSummary.Failed.Critical = total
+		}
+	}
+	contListItem.ControlSummary = controlSummary
+	return contListItem, nil
+}
+
 //getFiltersQuery - builds up an elasticsearch query filter based on the filters map that is passed in
 //  arguments: filters - is a map of filters that serve as the source for generated es query filters
 //             latestOnly - specifies whether or not we are only interested in retrieving only the latest report
