@@ -33,7 +33,8 @@ describe File.basename(__FILE__) do
           "name": "centos(2)-beta-nginx-apache",
           "platform": {
             "name": "centos",
-            "release": "5.11"
+            "release": "5.11",
+            "full": "centos 5.11"
           },
           "environment": "DevSec Prod Beta",
           "latestReport": {
@@ -56,13 +57,15 @@ describe File.basename(__FILE__) do
               "name": "nginx-baseline",
               "version": "2.1.0",
               "id": "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
-              "status": "passed"
+              "status": "passed",
+              "full": "DevSec Nginx Baseline, v2.1.0"
             },
             {
               "name": "apache-baseline",
               "version": "2.0.1",
               "id": "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
-              "status": "skipped"
+              "status": "skipped",
+              "full": "DevSec Apache Baseline, v2.0.1"
             }
           ]
         }
@@ -79,7 +82,8 @@ describe File.basename(__FILE__) do
       "name": "centos(2)-beta-nginx-apache",
       "platform": {
         "name": "centos",
-        "release": "5.11"
+        "release": "5.11",
+        "full": "centos 5.11"
       },
       "environment": "DevSec Prod Beta",
       "latestReport": {
@@ -105,13 +109,15 @@ describe File.basename(__FILE__) do
           "name": "nginx-baseline",
           "version": "2.1.0",
           "id": "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
-          "status": "failed"
+          "status": "failed",
+          "full": "DevSec Nginx Baseline, v2.1.0"
         },
         {
           "name": "apache-baseline",
           "version": "2.0.1",
           "id": "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
-          "status": "failed"
+          "status": "failed",
+          "full": "DevSec Apache Baseline, v2.0.1"
         }
       ]
     }.to_json
@@ -240,12 +246,14 @@ describe File.basename(__FILE__) do
     assert_equal('DevSec Prod Beta', res['environment'])
     assert_equal('failed', res['status'])
     assert_equal(Google::Protobuf::Timestamp.new(seconds: 1520233322, nanos: 0), res['end_time'])
-    assert_equal(Reporting::Platform.new(name: "centos", release: "5.11"), res['platform'])
+    assert_equal(Reporting::Platform.new(name: "centos", release: "5.11", full: "centos 5.11"),
+      res['platform'])
     assert_equal(Reporting::Statistics.new(duration: 4.109065055847168), res['statistics'])
     assert_equal(Google::Protobuf::RepeatedField, res['profiles'].class)
     if res['profiles'].is_a?(Google::Protobuf::RepeatedField)
       assert_equal(2, res['profiles'].length)
       assert_equal('nginx-baseline', res['profiles'][0]['name'])
+      assert_equal('DevSec Nginx Baseline, v2.1.0', res['profiles'][0]['full'])
       assert_equal(4, res['profiles'][0]['controls'].length)
 
       control_ids = res['profiles'][0]['controls'].map {|c| c.id}

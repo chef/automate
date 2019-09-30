@@ -226,7 +226,7 @@ start-es-pg: start-pg create-es-data-dir
 	fi; \
 	if [ "$(A2V4_DATA)" == "true" ]; then \
 	  printf "\n===> ${yellow}Loading test A2v4 data into ElasticSearch${reset} ($$data_dir)...\n"; \
-	  tar -xzvf test_data/es-pg/es6-a2v3-data.tar.gz -C "$$data_dir"; \
+	  tar -xzvf test_data/es-pg/es6-a2v4-data.tar.gz -C "$$data_dir"; \
 	fi; \
 	chmod -R 775 "$$data_dir"; \
 	my_primary_group=`id -g -n $(USER)`; \
@@ -410,7 +410,7 @@ test-integration-scanner: start-es start-pg start-ssh-node download-sample-marke
 test-automate-upgrade: clean-all
 	printf "\n===> Running Automate upgrade integration tests with TEST=$(TEST)\n"
 	@if [ "$(A1_DATA)" != "true" ] && [ "$(A2V1_DATA)" != "true" ] && [ "$(A2V2_DATA)" != "true" ] && [ "$(A2V3_DATA)" != "true" ] && [ "$(A2V4_DATA)" != "true" ]; then \
-	  printf "===> ${red}Aborting test-automate-upgrade as one of these ENV variables is not true: A1_DATA, A2V1_DATA, A2V2_DATA, A2V3_DATA${reset}\n"; \
+	  printf "===> ${red}Aborting test-automate-upgrade as one of these ENV variables is not true: A1_DATA, A2V1_DATA, A2V2_DATA, A2V3_DATA, A2V4_DATA${reset}\n"; \
 	  exit 2; \
 	fi;
 	if ! [[ $(TEST) == 6* ]]; then \

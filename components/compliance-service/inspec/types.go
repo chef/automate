@@ -124,6 +124,7 @@ type Group struct {
 
 type Profile struct {
 	Name           string                     `json:"name"`
+	Full           string                     `json:"full"`
 	Title          string                     `json:"title"`
 	Version        string                     `json:"version"`
 	Summary        string                     `json:"summary"`

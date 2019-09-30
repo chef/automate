@@ -402,6 +402,7 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 					reportProfile.SkipMessage = esInSpecProfile.SkipMessage
 					reportProfile.Status = esInSpecReportProfileMin.Status
 					reportProfile.SkipMessage = esInSpecReportProfileMin.SkipMessage
+					reportProfile.Full = esInSpecReportProfileMin.Full
 
 					dependsHash := make(map[string]*ESInSpecReportDepends, len(esInSpecReportProfileMin.Depends))
 					for _, esInSpecProfileDependency := range esInSpecReportProfileMin.Depends {
@@ -479,6 +480,7 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 
 					convertedProfile := reportingapi.Profile{
 						Name:           reportProfile.Name,
+						Full:           reportProfile.Full,
 						Title:          reportProfile.Title,
 						Maintainer:     reportProfile.Maintainer,
 						Copyright:      reportProfile.Copyright,
@@ -521,6 +523,7 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 				report.Platform = &reportingapi.Platform{
 					Name:    esInSpecReport.Platform.Name,
 					Release: esInSpecReport.Platform.Release,
+					Full:    esInSpecReport.Platform.Full,
 				}
 			}
 		}
