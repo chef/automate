@@ -228,7 +228,8 @@ func CreateComplianceReportDiagnostic() diagnostics.Diagnostic {
 
 					tries++
 					if tries >= maxTries {
-						assert.Failf(tstCtx, fmt.Sprintf("POST %s failed with status code %d", reportReqPath, resp.StatusCode))
+						assert.Fail(tstCtx, "POST Failed", "POST %s failed with status code %d",
+							reportReqPath, resp.StatusCode)
 						break
 					}
 					time.Sleep(2 * time.Duration(tries) * time.Second)
