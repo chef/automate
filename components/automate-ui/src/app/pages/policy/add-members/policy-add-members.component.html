@@ -37,8 +37,7 @@
 
               <chef-form-field 
                 id="create-identity" 
-                *ngIf="expressionForm.get('type').value === 'USER' 
-                        || expressionForm.get('type').value === 'TEAM' " 
+                *ngIf="showInputs('type')"
                 [@dropInAnimation]>
                 <label>
                   <span class="label">Identity Provider<span aria-hidden="true">*</span></span>
@@ -56,9 +55,7 @@
 
               <chef-form-field 
                 id="create-name" 
-                *ngIf="expressionForm.get('identity').value
-                        || expressionForm.get('type').value === 'TOKEN'
-                        || expressionForm.get('type').value === '*' " 
+                *ngIf="showInputs('identity')"
                 [@dropInAnimation]>
                 <label>
                   <span class="label">Name<span aria-hidden="true">*</span></span>

@@ -330,6 +330,33 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     this.closeModal();
   }
 
+  public showInputs(inputName: string): boolean {
+    switch(inputName) {
+      case 'type':
+        if (this.expressionForm.get('type').value === 'USER'
+          || this.expressionForm.get('type').value === 'TEAM') {
+            return true;
+          } else {
+            this.expressionForm.get('identity').reset();
+            return false;
+          }
+        break;
+      case 'identity':
+        const typeValue = this.expressionForm.get('type').value;
+        const identityValue = this.expressionForm.get('identity').value;
+        if ( typeValue === 'TOKEN'
+            || (identityValue && identityValue !== '*') ) {
+          return true;
+        } else {
+          this.expressionForm.get('name').reset();
+          return false;
+        }
+        break;
+      default:
+        return false;
+    }
+  }
+
 
   displayExpressionOutput(formValues: object): void {
     const values = Object.values(formValues);
