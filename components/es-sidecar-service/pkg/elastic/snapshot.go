@@ -8,7 +8,6 @@ import (
 	"path"
 	"regexp"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/olivere/elastic"
@@ -372,7 +371,7 @@ func (es *Elastic) RestoreSnapshot(ctx context.Context, serviceName, snapshotNam
 	// customer's system is really sluggish, which we have seen on larger clusters
 	// or when snapshots are being restored from a remote repositories in the cloud.
 	for tries := uint(0); tries < 10; tries++ {
-		recoveryInfo, err := es.indicesSnapshotRecoveryStatus(ctx, indexesList)
+		recoveryInfo, err := es.indicesSnapshotRecoveryStatus(ctx)
 		ctxLog = ctxLog.WithField("recovery_info", recoveryInfo)
 		if err != nil {
 			ctxLog.WithError(err).Debug("failed to get snapshot recovery status")
@@ -408,12 +407,12 @@ func (es *Elastic) GetRestoreSnapshotStatus(ctx context.Context, serviceName, sn
 		"snapshot_repository": repoName,
 	})
 
-	indexesList, totalShards, err := es.indicesAndShardsInSnapshot(ctx, repoName, snapshotName)
+	indexesList, _, err := es.indicesAndShardsInSnapshot(ctx, repoName, snapshotName)
 	if err != nil {
 		return nil, err
 	}
 
-	recoveryStatus, err := es.indicesSnapshotRecoveryStatus(ctx, indexesList)
+	recoveryStatus, err := es.indicesSnapshotRecoveryStatus(ctx)
 
 	if err != nil {
 		ctxLog.WithError(err).Debug("failed to get recovery status for restore")
@@ -425,6 +424,7 @@ func (es *Elastic) GetRestoreSnapshotStatus(ctx context.Context, serviceName, sn
 		ProgressPercentage: float64(100),
 	}
 
+	idxComplete := 0
 	for _, indexName := range indexesList {
 		indexStatus, exist := (*recoveryStatus)[indexName]
 		if !exist {
@@ -437,6 +437,7 @@ func (es *Elastic) GetRestoreSnapshotStatus(ctx context.Context, serviceName, sn
 				break
 			}
 		}
+		idxComplete++
 	}
 
 	if s.State == "SUCCESS" {
@@ -444,45 +445,11 @@ func (es *Elastic) GetRestoreSnapshotStatus(ctx context.Context, serviceName, sn
 		return &s, nil
 	}
 
-	// If we are not done, then we will compute the progress as a percentage of
-	// shards that need to be recovered. The shards are probably different sizes
-	// so it's not a great way to measure, but none of the better ways actually
-	// work because the Es restores the snapshot in chunks and we only get stats
-	// about the ones that are in-progress or finished,.therefore we don't have
-	// detailed information about what is left to do.
-	// TODO: we need to better understand how shards are balanced and reported on
-	// in a cluster situation to ensure the progress we report back is accurate
-	// for multi-node Es.
-	esIndexSpec := strings.Join(indexesList, ",")
-	healthCheckPath := fmt.Sprintf("/_cluster/health/%s", esIndexSpec)
-
-	response, err := es.client.PerformRequest(ctx, elastic.PerformRequestOptions{
-		Method: "GET",
-		Path:   healthCheckPath,
-		Params: url.Values{},
-	})
-
-	if err != nil {
-		return nil, errors.Wrapf(err, "Failed fetching cluster health for indexes %q", esIndexSpec)
-	}
-
-	var c ClusterHealth
-	err = json.Unmarshal(response.Body, &c)
-	if err != nil {
-		ctxLog.WithFields(log.Fields{
-			"raw_response": response.Body,
-		}).WithError(err).Debug("Invalid JSON returned for cluster health")
-		return nil, errors.Wrapf(err,
-			"Invalid JSON response from Es for cluster health; Raw data:\n%s\n",
-			response.Body,
-		)
-	}
-
-	s.ProgressPercentage = (float64(c.ActiveShards) / float64(totalShards)) * 100
+	s.ProgressPercentage = (float64(idxComplete) / float64(len(indexesList))) * 100
 	ctxLog.WithFields(log.Fields{
 		"snapshot_restore_state": s.State,
-		"total_shards":           totalShards,
-		"completed_shards":       c.ActiveShards,
+		"num_indexes":            len(indexesList),
+		"completed_indexes":      idxComplete,
 	}).Debug("got snapshot status")
 	return &s, nil
 }
@@ -630,12 +597,8 @@ func (es *Elastic) indicesAndShardsInSnapshot(ctx context.Context, repoName, sna
 	return indexesList, shardsToWaitFor, nil
 }
 
-func (es *Elastic) indicesSnapshotRecoveryStatus(ctx context.Context, indexesList []string) (*indicesRecoveryStats, error) {
+func (es *Elastic) indicesSnapshotRecoveryStatus(ctx context.Context) (*indicesRecoveryStats, error) {
 	indicesRecoveryPath := "/_recovery"
-	esIndexSpec := strings.Join(indexesList, ",")
-	if len(indexesList) > 0 {
-		indicesRecoveryPath = fmt.Sprintf("/%s/_recovery", esIndexSpec)
-	}
 
 	response, err := es.client.PerformRequest(ctx, elastic.PerformRequestOptions{
 		Method: "GET",
@@ -644,7 +607,7 @@ func (es *Elastic) indicesSnapshotRecoveryStatus(ctx context.Context, indexesLis
 	})
 
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed fetching indices recovery status for indexes %q", esIndexSpec)
+		return nil, errors.Wrapf(err, "Failed fetching indices recovery status")
 	}
 
 	recoveryData := make(indicesRecoveryStats)

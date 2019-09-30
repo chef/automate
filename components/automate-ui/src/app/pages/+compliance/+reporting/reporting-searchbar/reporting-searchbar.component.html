@@ -11,7 +11,6 @@
     [hidden]="!keyInputVisible"
     placeholder="Filter reports by..."
     (click)="handleFocus($event)"
-    (focus)="handleFocus($event)"
     (change)="onKeyChange($event)"
     (keyup)="handleInput($event.key, keyInput.value)"
     autocomplete="off"/>

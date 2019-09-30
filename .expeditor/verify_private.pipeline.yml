@@ -6,7 +6,7 @@ expeditor:
   defaults:
     executor:
       docker:
-        image_sha256: 79b7ec0e5534cb1a78bc83526fa302f5162dafacc24791e3b78fc8a2b35bb13a
+        image_sha256: 258cc9fed0cf84e885c9b393eca8943f673f260e7481783dd1899f69fff02619
         workdir: /go/src/github.com/chef/automate
 
 steps:
@@ -752,7 +752,7 @@ steps:
   - label: "backups"
     command:
       - integration/run_test integration/tests/backup.sh
-    timeout_in_minutes: 20
+    timeout_in_minutes: 25
     expeditor:
       secrets:
         A2_LICENSE:

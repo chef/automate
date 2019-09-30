@@ -13,7 +13,7 @@ import {
   OnDestroy
 } from '@angular/core';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
-import { Subject, of as observableOf, Observable } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
 import * as moment from 'moment';
 import {
   StatsService,
@@ -40,6 +40,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     'chef_tags',
     'control_id',
     'control_name',
+    'control_tag_key',
     'environment',
     'inspec_version',
     'job_id',
@@ -76,8 +77,14 @@ export class ReportingComponent implements OnInit, OnDestroy {
       'placeholder': 'Chef Tag'
     },
     {
+      'name': 'control_tag_key',
+      'title': 'Control Tag',
+      'description': '',
+      'placeholder': 'Control Tag'
+    },
+    {
       'name': 'control',
-      'title': 'Control',
+      'title': 'Controls',
       'description': 'Add the title to filter this report against a control',
       'placeholder': 'Title'
     },
@@ -204,16 +211,13 @@ export class ReportingComponent implements OnInit, OnDestroy {
       // switch to new search observable each time the term changes
       switchMap(([terms, reportQuery]) => {
         const { type, text } = terms;
-        if (text && text.length > 0) {
-          return this.getSuggestions(type, text, reportQuery);
-        }
-        return observableOf([]);
+        return this.getSuggestions(type, text, reportQuery);
       }),
       takeUntil(this.isDestroyed)
     ).subscribe(suggestions => this.availableFilterValues = suggestions.filter(e => e.text));
 
     this.filters$ = this.reportQuery.state.pipe(map((reportQuery: ReportQuery) =>
-      reportQuery.filters.map(filter => {
+      reportQuery.filters.filter((filter) => filter.value.text !== undefined).map(filter => {
         filter.value.id = filter.value.text;
         if (['profile_id', 'node_id', 'control_id'].indexOf(filter.type.name) >= 0) {
           const name = this.reportQuery.getFilterTitle(filter.type.name, filter.value.id);
@@ -418,7 +422,8 @@ export class ReportingComponent implements OnInit, OnDestroy {
     const reportQuery = this.reportQuery.getReportQuery();
 
     reportQuery.filters = urlFilters.filter(
-      (urlParm: Chicklet) => this.allowedURLFilterTypes.indexOf(urlParm.type) >= 0)
+      (urlParm: Chicklet) => this.isTypeControlTag(urlParm.type)
+        || this.allowedURLFilterTypes.indexOf(urlParm.type) >= 0)
       .map((urlParm: Chicklet) => {
         return { type: { name: urlParm.type }, value: { text: urlParm.text } };
       });
@@ -429,6 +434,10 @@ export class ReportingComponent implements OnInit, OnDestroy {
       reportQuery.interval, reportQuery.endDate);
 
     this.reportQuery.setState(reportQuery);
+  }
+
+  isTypeControlTag(type: string) {
+    return type.search('control_tag:') !== -1;
   }
 
   getEndDate(urlFilters: Chicklet[]): moment.Moment {
