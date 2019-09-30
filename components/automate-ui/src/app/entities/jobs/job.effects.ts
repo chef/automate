@@ -40,7 +40,7 @@ export class JobEffects {
     map((payload: {id: string}) => new JobCreateSuccess(payload)));
 
   @Effect()
-  JobCreateSuccess$ = this.actions$.pipe(
+  jobCreateSuccess$ = this.actions$.pipe(
     ofType<JobCreateSuccess>(JobActionTypes.JOB_CREATE_SUCCESS),
     map(() => new CreateNotification({
       type: Type.info,
@@ -54,7 +54,7 @@ export class JobEffects {
     map(payload => new JobUpdateSuccess(payload)));
 
   @Effect()
-  JobUpdateSuccess$ = this.actions$.pipe(
+  jobUpdateSuccess$ = this.actions$.pipe(
     ofType(JobActionTypes.JOB_UPDATE_SUCCESS),
     map(() => new CreateNotification({
       type: Type.info,
