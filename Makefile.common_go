@@ -16,7 +16,7 @@ GOLANGCILINTTARBALL:=golangci-lint-$(GOLANGCILINTVERSION)-$(PLATFORM).tar.gz
 
 LINTERARGS?=./...
 
-export GOFLAGS = -mod=vendor
+export GOFLAGS=-mod=vendor
 
 $(REPOROOT)/cache/$(GOLANGCILINTTARBALL):
 	curl --output $(REPOROOT)/cache/$(GOLANGCILINTTARBALL) -L https://github.com/golangci/golangci-lint/releases/download/v$(GOLANGCILINTVERSION)/$(GOLANGCILINTTARBALL)

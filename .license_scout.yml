@@ -19,6 +19,7 @@ directories:
   - ./components/automate-gateway
   - ./components/automate-grpc
   - ./components/automate-load-balancer
+  - ./components/automate-openjdk
   - ./components/automate-pg-gateway
   - ./components/automate-platform-tools
   - ./components/automate-postgresql
@@ -254,6 +255,9 @@ exceptions:
       reason: (sd) Shell out only
     - name: core/haproxy
       reason: (sd) Binary use only. Already shipped in chef-server. Exception made by Chef Legal
+    - name: chef/automate-openjdk
+      reason: Exception made by Chef Legal
+
   ruby:
     - name: highline
       reason: Ruby license (previously shipped in Automate 1)

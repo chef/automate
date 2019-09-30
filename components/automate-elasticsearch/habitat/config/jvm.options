@@ -17,9 +17,8 @@
 ################################################################
 
 # Xms represents the initial size of total heap space
-# Xmx represents the maximum size of total heap space
-
 -Xms{{cfg.runtime.heapsize}}
+# Xmx represents the maximum size of total heap space
 -Xmx{{cfg.runtime.heapsize}}
 
 ################################################################
@@ -32,26 +31,68 @@
 ##
 ################################################################
 
+## CMS Configuration (tentatively scheduled for removal in JDK 14)
 -XX:+UseConcMarkSweepGC
 -XX:CMSInitiatingOccupancyFraction=75
 -XX:+UseCMSInitiatingOccupancyOnly
 -XX:+DisableExplicitGC
+
+## G1GC Configuration (not currently recommended by Elastic)
+#-XX:-UseCMSInitiatingOccupancyOnly
+#-XX:+UseG1GC
+#-XX:InitiatingHeapOccupancyPercent=75
+
+## DNS cache policy
+# cache ttl in seconds for positive DNS lookups noting that this overrides the
+# JDK security property networkaddress.cache.ttl; set to -1 to cache forever
+-Des.networkaddress.cache.ttl=60
+# cache ttl in seconds for negative DNS lookups noting that this overrides the
+# JDK security property networkaddress.cache.negative ttl; set to -1 to cache
+# forever
+-Des.networkaddress.cache.negative.ttl=10
+
+# pre-touch memory pages used by the JVM during initialization
 -XX:+AlwaysPreTouch
 -server
+
+# explicitly set the stack size
 -Xss1m
+
+# set to headless, just in case
 -Djava.awt.headless=true
+
+# ensure UTF-8 encoding by default (e.g. filenames)
 -Dfile.encoding=UTF-8
+
+# use our provided JNA always versus the system one
 -Djna.nosys=true
 -Djdk.io.permissionsUseCanonicalPath=true
+
+# turn off a JDK optimization that throws away stack traces for common
+# exceptions because stack traces are important for debugging
+-XX:-OmitStackTraceInFastThrow
+
+# flags to configure Netty
 -Dio.netty.noUnsafe=true
 -Dio.netty.noKeySetOptimization=true
 -Dio.netty.recycler.maxCapacityPerThread=0
+
+# log4j 2
 -Dlog4j.shutdownHookEnabled=false
 -Dlog4j2.disable.jmx=true
 -Dlog4j.skipJansi=true
--XX:+HeapDumpOnOutOfMemoryError
+
+# Ensure the tmpdir is in the service directory
 -Djava.io.tmpdir=${ES_TMPDIR}
+
+# generate a heap dump when an allocation from the Java heap fails
+# heap dumps are created in the working directory of the JVM
+-XX:+HeapDumpOnOutOfMemoryError
+
+# user specified elasticsearch java opts
+{{cfg.runtime.es_java_opts}}
+
+# custom CA
 -Djavax.net.ssl.trustStore={{pkg.svc_var_path}}/ca.jks
 -Djavax.net.ssl.trustStorePassword=changeit
 -Djavax.net.ssl.trustStoreType=JKS
-{{cfg.runtime.es_java_opts}}

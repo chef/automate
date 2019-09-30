@@ -290,6 +290,9 @@ github.com/jhump/protoreflect/internal
 github.com/jmespath/go-jmespath
 # github.com/jonboulle/clockwork v0.1.0
 github.com/jonboulle/clockwork
+# github.com/kevinburke/go-bindata v3.16.0+incompatible
+github.com/kevinburke/go-bindata
+github.com/kevinburke/go-bindata/go-bindata
 # github.com/konsorten/go-windows-terminal-sequences v1.0.2
 github.com/konsorten/go-windows-terminal-sequences
 # github.com/kylelemons/godebug v0.0.0-20170820004349-d65d576e9348
