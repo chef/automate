@@ -167,7 +167,7 @@ var ComplianceRepDate = Mapping{
             "name": {
               "fields": {
                 "engram": {
-                  "analyzer": "autocomplete_version_numbers",
+                  "analyzer": "autocomplete",
                   "type": "text"
                 },
                 "lower": {
@@ -193,7 +193,7 @@ var ComplianceRepDate = Mapping{
             "full": {
               "fields": {
                 "engram": {
-                  "analyzer": "autocomplete",
+                  "analyzer": "autocomplete_version_numbers",
                   "type": "text"
                 },
                 "lower": {

@@ -173,7 +173,7 @@ var ComplianceSumDate = Mapping{
             "full": {
               "fields": {
                 "engram": {
-                  "analyzer": "autocomplete",
+                  "analyzer": "autocomplete_version_numbers",
                   "type": "text"
                 },
                 "lower": {
