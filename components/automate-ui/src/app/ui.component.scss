@@ -1,9 +1,12 @@
 @import "~styles/variables";
 
-.notifications {
-  margin-left: $sidebar-width;
-
+.notifications,
+.license-banner {
   a {
     color: $chef-white;
   }
+}
+
+.notifications {
+  margin-left: $sidebar-width;
 }

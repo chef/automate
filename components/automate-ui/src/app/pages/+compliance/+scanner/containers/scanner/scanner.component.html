@@ -1,24 +1,26 @@
-<app-compliance-reporting-sidebar></app-compliance-reporting-sidebar>
-<chef-loading-spinner *ngIf="countsLoading" size='50' fixed></chef-loading-spinner>
+<div class="page-container">
+  <app-compliance-reporting-sidebar sidebar></app-compliance-reporting-sidebar>
+  <chef-loading-spinner *ngIf="countsLoading" size='50' fixed></chef-loading-spinner>
 
-<div class="container">
-  <main>
-    <chef-page-header>
-      <chef-heading>Scan Jobs</chef-heading>
-      <chef-subheading>Compliance scan jobs run inspec exec on a set of nodes.</chef-subheading>
-    </chef-page-header>
+  <div class="container">
+    <main>
+      <chef-page-header>
+        <chef-heading>Scan Jobs</chef-heading>
+        <chef-subheading>Compliance scan jobs run inspec exec on a set of nodes.</chef-subheading>
+      </chef-page-header>
 
-    <ul class="nav-tabs">
-      <li class="nav-tab" routerLink="/compliance/scan-jobs/jobs" routerLinkActive="active">
-        <span *ngIf="jobsCountLoaded">{{jobsCount$ | async | number}}</span> Scan jobs 
-      </li>
-      <li class="nav-tab" routerLink="/compliance/scan-jobs/nodes" routerLinkActive="active">
-        <span *ngIf="nodesCountLoaded">{{nodesCount$ | async | number}}</span> Nodes added
-      </li>
-    </ul>
+      <ul class="nav-tabs">
+        <li class="nav-tab" routerLink="/compliance/scan-jobs/jobs" routerLinkActive="active">
+          <span *ngIf="jobsCountLoaded">{{jobsCount$ | async | number}}</span> Scan jobs 
+        </li>
+        <li class="nav-tab" routerLink="/compliance/scan-jobs/nodes" routerLinkActive="active">
+          <span *ngIf="nodesCountLoaded">{{nodesCount$ | async | number}}</span> Nodes added
+        </li>
+      </ul>
 
-    <div class="scanner-body">
-      <router-outlet></router-outlet>
-    </div>
-  </main>
+      <div class="scanner-body">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
 </div>

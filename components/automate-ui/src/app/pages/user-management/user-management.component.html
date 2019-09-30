@@ -1,52 +1,54 @@
-<app-settings-sidebar></app-settings-sidebar>
-<chef-loading-spinner *ngIf="isLoading" size='50' fixed></chef-loading-spinner>
+<div class="page-container">
+  <app-settings-sidebar sidebar></app-settings-sidebar>
+  <chef-loading-spinner *ngIf="isLoading" size='50' fixed></chef-loading-spinner>
 
-<div class="container">
-  <main>
-    <app-delete-object-modal
-      [visible]="deleteModalVisible"
-      objectNoun="user"
-      [objectName]="userToDelete?.name"
-      (close)="closeDeleteModal()"
-      (deleteClicked)="deleteUser()"
-      objectAction="Delete">
-    </app-delete-object-modal>
-    <chef-page-header>
-      <chef-heading>Users</chef-heading>
-      <chef-subheading>Chef Automate only displays local users.</chef-subheading>
-    </chef-page-header>
+  <div class="container">
+    <main>
+      <app-delete-object-modal
+        [visible]="deleteModalVisible"
+        objectNoun="user"
+        [objectName]="userToDelete?.name"
+        (close)="closeDeleteModal()"
+        (deleteClicked)="deleteUser()"
+        objectAction="Delete">
+      </app-delete-object-modal>
+      <chef-page-header>
+        <chef-heading>Users</chef-heading>
+        <chef-subheading>Chef Automate only displays local users.</chef-subheading>
+      </chef-page-header>
 
-    <chef-modal label="create-user-label" class="user-modal" [visible]="createModalVisible" (closeModal)="closeCreateModal()">
-      <h2 id="create-user-label" class="title" slot="title">
-        Create User
-      </h2>
-      <div>
-        <app-user-form [createUserForm]="createUserForm"></app-user-form>
-        <div class="line"></div>
-        <div class="options">
-        <chef-button primary class="create" (click)="handleCreateUser()"
-          [disabled]="!createUserForm.valid" tabindex="2" data-cy="save-user">
-          <chef-icon *ngIf="!isLoading">save</chef-icon>
-          <span *ngIf="!isLoading">Save and Close </span>
-          <chef-loading-spinner *ngIf="isLoading"></chef-loading-spinner>
-          <span *ngIf="isLoading">Saving...</span>
-        </chef-button>
-        <chef-button type="reset" tertiary id="cancel" (click)="closeCreateModal()" tabindex="-1">Cancel</chef-button>
+      <chef-modal label="create-user-label" class="user-modal" [visible]="createModalVisible" (closeModal)="closeCreateModal()">
+        <h2 id="create-user-label" class="title" slot="title">
+          Create User
+        </h2>
+        <div>
+          <app-user-form [createUserForm]="createUserForm"></app-user-form>
+          <div class="line"></div>
+          <div class="options">
+            <chef-button primary class="create" (click)="handleCreateUser()"
+              [disabled]="!createUserForm.valid" tabindex="2" data-cy="save-user">
+              <chef-icon *ngIf="!isLoading">save</chef-icon>
+              <span *ngIf="!isLoading">Save and Close </span>
+              <chef-loading-spinner *ngIf="isLoading"></chef-loading-spinner>
+              <span *ngIf="isLoading">Saving...</span>
+            </chef-button>
+            <chef-button type="reset" tertiary id="cancel" (click)="closeCreateModal()" tabindex="-1">Cancel</chef-button>
+          </div>
         </div>
-      </div>
-    </chef-modal>
+      </chef-modal>
 
-    <section class="page-body">
-      <app-user-table
-        [addButtonText]="addButtonText"
-        [removeText]="removeText"
-        [users]="users"
-        [baseUrl]="baseUrl"
-        [showTable]="showUsersTable()"
-        [showEmptyMessage]="showEmptyStateMessage()"
-        (addClicked)="openCreateModal()"
-        (removeClicked)="startUserDelete($event)">
-      </app-user-table>
-    </section>
-  </main>
+      <section class="page-body">
+        <app-user-table
+          [addButtonText]="addButtonText"
+          [removeText]="removeText"
+          [users]="users"
+          [baseUrl]="baseUrl"
+          [showTable]="showUsersTable()"
+          [showEmptyMessage]="showEmptyStateMessage()"
+          (addClicked)="openCreateModal()"
+          (removeClicked)="startUserDelete($event)">
+        </app-user-table>
+      </section>
+    </main>
+  </div>
 </div>

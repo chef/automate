@@ -1,62 +1,64 @@
-<app-client-runs-sidebar></app-client-runs-sidebar>
+<div class="page-container">
+    <app-client-runs-sidebar sidebar></app-client-runs-sidebar>
 
-<div class="container">
-    <main>
-        <div class="node-noruns-details-container">
-          <chef-breadcrumbs>
-            <chef-breadcrumb [link]="['/client-runs']">Client runs</chef-breadcrumb>
-            Node {{ node.name }}
-          </chef-breadcrumbs>
+    <div class="container">
+        <main>
+            <div class="node-noruns-details-container">
+            <chef-breadcrumbs>
+                <chef-breadcrumb [link]="['/client-runs']">Client runs</chef-breadcrumb>
+                Node {{ node.name }}
+            </chef-breadcrumbs>
 
-            <div class="run-container">
-                <chef-page-header>
-                    <chef-heading>Node {{node.name }}</chef-heading>
-                    <chef-alert type="error">
-                        There is no client run data available for this node.
-                    </chef-alert>
-                    <dl class="metadata">
-                        <dt class="heading">
-                            Node ID
-                        </dt>
-                        <dd class="content">{{node.id}}</dd>
+                <div class="run-container">
+                    <chef-page-header>
+                        <chef-heading>Node {{node.name }}</chef-heading>
+                        <chef-alert type="error">
+                            There is no client run data available for this node.
+                        </chef-alert>
+                        <dl class="metadata">
+                            <dt class="heading">
+                                Node ID
+                            </dt>
+                            <dd class="content">{{node.id}}</dd>
 
-                        <dt class="heading">
-                            Uptime
-                        </dt>
-                        <dd class="content">{{node.uptime_seconds | timeDuration:'seconds'}}</dd>
+                            <dt class="heading">
+                                Uptime
+                            </dt>
+                            <dd class="content">{{node.uptime_seconds | timeDuration:'seconds'}}</dd>
 
-                        <dt class="heading">
-                            Environment
-                        </dt>
-                        <dd class="content">{{node.environment}}</dd>
+                            <dt class="heading">
+                                Environment
+                            </dt>
+                            <dd class="content">{{node.environment}}</dd>
 
-                        <dt class="heading">
-                            Platform
-                        </dt>
-                        <dd class="content">{{node.platform}}</dd>
+                            <dt class="heading">
+                                Platform
+                            </dt>
+                            <dd class="content">{{node.platform}}</dd>
 
-                        <dt class="heading">
-                            Node Name
-                        </dt>
-                        <dd class="content">{{node.name}}</dd>
+                            <dt class="heading">
+                                Node Name
+                            </dt>
+                            <dd class="content">{{node.name}}</dd>
 
-                        <dt class="heading">
-                            Org Name
-                        </dt>
-                        <dd class="content">{{node.organization}}</dd>
+                            <dt class="heading">
+                                Org Name
+                            </dt>
+                            <dd class="content">{{node.organization}}</dd>
 
-                        <dt class="heading">
-                            Check-in
-                        </dt>
-                        <dd class="content">{{node.checkin | timeFromNow}}</dd>
+                            <dt class="heading">
+                                Check-in
+                            </dt>
+                            <dd class="content">{{node.checkin | timeFromNow}}</dd>
 
-                        <dt class="heading">
-                            FQDN
-                        </dt>
-                        <dd class="content">{{node.fqdn || 'Not Available'}}</dd>
-                    </dl>
-                </chef-page-header>
+                            <dt class="heading">
+                                FQDN
+                            </dt>
+                            <dd class="content">{{node.fqdn || 'Not Available'}}</dd>
+                        </dl>
+                    </chef-page-header>
+                </div>
             </div>
-        </div>
-    </main>
+        </main>
+    </div>
 </div>

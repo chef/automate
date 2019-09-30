@@ -1,5 +1,6 @@
-<app-settings-sidebar></app-settings-sidebar>
-<chef-loading-spinner *ngIf="loading$ | async" size='50' fixed></chef-loading-spinner>
+<div class="page-container">
+  <app-settings-sidebar sidebar></app-settings-sidebar>
+  <chef-loading-spinner *ngIf="loading$ | async" size='50' fixed></chef-loading-spinner>
 
 <div class="container">
   <main>
@@ -43,14 +44,15 @@
       </app-authorized>
     </section>
 
-    <app-delete-object-modal
-      [visible]="deleteModalVisible"
-      objectNoun="policy"
-      [objectName]="policyToDelete?.id"
-      [moreDetails]="inUseMessage()"
-      (close)="closeDeleteModal()"
-      (deleteClicked)="deletePolicy()"
-      objectAction="Delete">
-    </app-delete-object-modal>
-  </main>
+      <app-delete-object-modal
+        [visible]="deleteModalVisible"
+        objectNoun="policy"
+        [objectName]="policyToDelete?.id"
+        [moreDetails]="inUseMessage()"
+        (close)="closeDeleteModal()"
+        (deleteClicked)="deletePolicy()"
+        objectAction="Delete">
+      </app-delete-object-modal>
+    </main>
+  </div>
 </div>

@@ -2,80 +2,81 @@
   <p>It looks like you don't have permission to access this page.</p>
   <p>If this is a mistake, then reach out to your administrator.</p>
 </div>
+<div class="page-container">
+  <app-event-feed-sidebar sidebar></app-event-feed-sidebar>
 
-<app-event-feed-sidebar></app-event-feed-sidebar>
-
-<div class="container">
-  <main>
-    <div class="event-feed-container">
-      <div class="event-feed-upper">
-        <chef-page-header>
-          <chef-heading>Event Feed</chef-heading>
-          <chef-subheading>Displays events for the past week. Use <em>SHIFT+R</em>  to reset the time scale.</chef-subheading>
-          <app-search-bar
-          [numberOfFilters]="numberOfSearchBarFilters$ | async"
-          [categories]="categoryTypes"
-          [dynamicSuggestions]="suggestions$ | async"
-          (suggestValues)="onSuggestValues($event)"
-          (itemSelected)="onFilterAdded($event)"
-          (filtersButtonClick)="toggleFilters()">
-          </app-search-bar>
-          <app-search-bar-filter-bar *ngIf="filtersVisible"
-            [filters]="searchBarFilters$ | async"
-            (filtersCleared)="onFiltersClear($event)"
-            (filterRemoved)="onFilterRemoved($event)">
-          </app-search-bar-filter-bar>
-        </chef-page-header>
-      </div>
-      <div class="page-body">
-          <div class="event-summary-bar">
-            <div class="summary-totals small strong">
-              <div class="summary">
-                <div class="title">Total events</div>
-                <div class="total">{{totalTaskCounts | number}}</div>
+  <div class="container">
+    <main>
+      <div class="event-feed-container">
+        <div class="event-feed-upper">
+          <chef-page-header>
+            <chef-heading>Event Feed</chef-heading>
+            <chef-subheading>Displays events for the past week. Use <em>SHIFT+R</em>  to reset the time scale.</chef-subheading>
+            <app-search-bar
+            [numberOfFilters]="numberOfSearchBarFilters$ | async"
+            [categories]="categoryTypes"
+            [dynamicSuggestions]="suggestions$ | async"
+            (suggestValues)="onSuggestValues($event)"
+            (itemSelected)="onFilterAdded($event)"
+            (filtersButtonClick)="toggleFilters()">
+            </app-search-bar>
+            <app-search-bar-filter-bar *ngIf="filtersVisible"
+              [filters]="searchBarFilters$ | async"
+              (filtersCleared)="onFiltersClear($event)"
+              (filterRemoved)="onFilterRemoved($event)">
+            </app-search-bar-filter-bar>
+          </chef-page-header>
+        </div>
+        <div class="page-body">
+            <div class="event-summary-bar">
+              <div class="summary-totals small strong">
+                <div class="summary">
+                  <div class="title">Total events</div>
+                  <div class="total">{{totalTaskCounts | number}}</div>
+                </div>
+                <div class="summary circle">
+                  <div class="title">Creations</div>
+                  <div class="total">{{createCounts | number}}</div>
+                </div>
+                <div class="summary outline">
+                  <div class="title">Deletions</div>
+                  <div class="total">{{deleteCounts | number}}</div>
+                </div>
+                <div class="summary rhombus">
+                  <div class="title">Updates</div>
+                  <div class="total">{{updateCounts | number}} </div>
+                </div>
               </div>
-              <div class="summary circle">
-                <div class="title">Creations</div>
-                <div class="total">{{createCounts | number}}</div>
-              </div>
-              <div class="summary outline">
-                <div class="title">Deletions</div>
-                <div class="total">{{deleteCounts | number}}</div>
-              </div>
-              <div class="summary rhombus">
-                <div class="title">Updates</div>
-                <div class="total">{{updateCounts | number}} </div>
-              </div>
+              <chef-button secondary class="reset-button"
+                (click)="guitarStrings.resetSliders()"
+                [disabled]="resetTimescaleDisabled">
+                Reset Timescale
+              </chef-button>
             </div>
-            <chef-button secondary class="reset-button"
-              (click)="guitarStrings.resetSliders()"
-              [disabled]="resetTimescaleDisabled">
-              Reset Timescale
+            <div class="app-event-feed-guitar-strings">
+              <app-event-feed-guitar-strings #guitarStrings
+                (newDateRange)="selectDateRange($event)"
+                [guitarStringCollection]="guitarStringCollection">
+              </app-event-feed-guitar-strings>
+            </div>
+          <p class="is-empty" *ngIf="loadedEmptySetOfEvents">There were no events in the selected timeframe.</p>
+          <p class="is-empty" *ngIf="errorLoadingEvents">There was an error loading events.</p>
+          <chef-loading-spinner *ngIf="eventsLoading" size="50"></chef-loading-spinner>
+          <ng-container>
+              <app-event-feed-table
+                [events]="events"
+                [searchBarFilters]="searchBarFilters$ | async">
+              </app-event-feed-table>
+          </ng-container>
+          <chef-separator class="load-more" *ngIf="completeNumberOfEvents > totalNumberOfEventsLoaded">
+            <chef-button primary (click)="loadMore()" >
+              <div class="load-more-text">Load more events</div>
+              <div class="load-more-index"> ({{totalNumberOfEventsLoaded | number}} of {{completeNumberOfEvents | number}})</div>
             </chef-button>
-          </div>
-          <div class="app-event-feed-guitar-strings">
-            <app-event-feed-guitar-strings #guitarStrings
-              (newDateRange)="selectDateRange($event)"
-              [guitarStringCollection]="guitarStringCollection">
-            </app-event-feed-guitar-strings>
-          </div>
-        <p class="is-empty" *ngIf="loadedEmptySetOfEvents">There were no events in the selected timeframe.</p>
-        <p class="is-empty" *ngIf="errorLoadingEvents">There was an error loading events.</p>
-        <chef-loading-spinner *ngIf="eventsLoading" size="50"></chef-loading-spinner>
-        <ng-container>
-            <app-event-feed-table
-              [events]="events"
-              [searchBarFilters]="searchBarFilters$ | async">
-            </app-event-feed-table>
-        </ng-container>
-        <chef-separator class="load-more" *ngIf="completeNumberOfEvents > totalNumberOfEventsLoaded">
-          <chef-button primary (click)="loadMore()" >
-            <div class="load-more-text">Load more events</div>
-            <div class="load-more-index"> ({{totalNumberOfEventsLoaded | number}} of {{completeNumberOfEvents | number}})</div>
-          </chef-button>
-        </chef-separator>
+          </chef-separator>
+        </div>
       </div>
-    </div>
-  </main>
+    </main>
+  </div>
+  <chef-scroll-top></chef-scroll-top>
 </div>
-<chef-scroll-top></chef-scroll-top>

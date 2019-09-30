@@ -1,4 +1,4 @@
-<div>
+<div id="main-container">
   <app-license-lockout
     (triggerApplyLicense)="onTriggerApplyLicense($event); licenseApplyModal.openModal();"
     #licenseLockoutModal>
@@ -8,40 +8,45 @@
     (openLicenseLockout)="licenseLockoutModal.openModal()"
     >
   </app-license-apply>
-  <div *ngIf="renderNavbar">
-    <ng-container *ngFor="let notification of notifications$ | async">
-      <chef-notification *ngIf="notification.type === 'license'"
-        [className]="notification.type === 'license' ? 'license-banner' : ''"
-        [type]="notification.type === 'license' ? 'error' : notification.type"
-        [timeout]="notification.timeout" (dismissed)="handleNotificationDismissal(notification.id)">
-        {{ notification.message }}
-        <!-- TODO (tc) This code is all temporary. The full experience will be implemented post ChefConf.-->
-        <ng-container *ngIf="notification.type === 'license'">
-          <a href="https://www.chef.io/contact-us/" target="_blank">Get a license from Chef</a>
-          or
-          <a href="#" (click)="onTriggerBannerLicenseApply(); licenseApplyModal.openModal(); false">apply a license</a>
-          if you already have one.
-        </ng-container>
-      </chef-notification>
-    </ng-container>
-  </div>
-  <app-navbar *ngIf="renderNavbar"></app-navbar>
-  <div class="notifications" *ngIf="renderNavbar">
-    <ng-container *ngFor="let notification of notifications$ | async">
-      <chef-notification *ngIf="notification.type === 'error'"
-        [type]="notification.type === 'license' ? 'error' : notification.type"
-        [timeout]="notification.timeout" (dismissed)="handleNotificationDismissal(notification.id)">
-        {{ notification.message }}
-      </chef-notification>
-    </ng-container>
-    <ng-container *ngFor="let notification of notifications$ | async">
-      <chef-notification *ngIf="notification.type === 'info'"
-        [type]="notification.type === 'license' ? 'error' : notification.type"
-        [timeout]="notification.timeout" (dismissed)="handleNotificationDismissal(notification.id)">
-        {{ notification.message }}
-      </chef-notification>
-    </ng-container>
+  <div id="main-header">
+    <div *ngIf="renderNavbar">
+      <ng-container *ngFor="let notification of notifications$ | async">
+        <chef-notification *ngIf="notification.type === 'license'"
+          [className]="notification.type === 'license' ? 'license-banner' : ''"
+          [type]="notification.type === 'license' ? 'error' : notification.type"
+          [timeout]="notification.timeout" (dismissed)="handleNotificationDismissal(notification.id)">
+          {{ notification.message }}
+          <!-- TODO (tc) This code is all temporary. The full experience will be implemented post ChefConf.-->
+          <ng-container *ngIf="notification.type === 'license'">
+            <a href="https://www.chef.io/contact-us/" target="_blank">Get a license from Chef</a>
+            or
+            <a href="#" (click)="onTriggerBannerLicenseApply(); licenseApplyModal.openModal(); false">apply a license</a>
+            if you already have one.
+          </ng-container>
+        </chef-notification>
+      </ng-container>
+      <app-navbar></app-navbar>
     </div>
-  <app-feature-flags [experimentalFeatures]="experimentalFeatures" [betaFeatures]="betaFeatures" [legacyFeatures]="legacyFeatures"></app-feature-flags>
-  <router-outlet></router-outlet>
+    
+    <div class="notifications" *ngIf="renderNavbar">
+      <ng-container *ngFor="let notification of notifications$ | async">
+        <chef-notification *ngIf="notification.type === 'error'"
+          [type]="notification.type === 'license' ? 'error' : notification.type"
+          [timeout]="notification.timeout" (dismissed)="handleNotificationDismissal(notification.id)">
+          {{ notification.message }}
+        </chef-notification>
+      </ng-container>
+      <ng-container *ngFor="let notification of notifications$ | async">
+        <chef-notification *ngIf="notification.type === 'info'"
+          [type]="notification.type === 'license' ? 'error' : notification.type"
+          [timeout]="notification.timeout" (dismissed)="handleNotificationDismissal(notification.id)">
+          {{ notification.message }}
+        </chef-notification>
+      </ng-container>
+    </div>
+    <app-feature-flags [experimentalFeatures]="experimentalFeatures" [betaFeatures]="betaFeatures" [legacyFeatures]="legacyFeatures"></app-feature-flags>
+  </div>
+  <div id="main-content">
+    <router-outlet></router-outlet>
+  </div>
 </div>

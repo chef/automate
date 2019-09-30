@@ -1,36 +1,38 @@
-<app-settings-sidebar></app-settings-sidebar>
-<chef-loading-spinner *ngIf="loading$ | async" size='50' fixed></chef-loading-spinner>
+<div class="page-container">
+  <app-settings-sidebar sidebar></app-settings-sidebar>
+  <chef-loading-spinner *ngIf="loading$ | async" size='50' fixed></chef-loading-spinner>
 
-<div class="container">
-  <main>
-    <chef-page-header>
-      <chef-heading>Roles</chef-heading>
-      <chef-subheading>
-        Roles are named groups of actions used to define policies.
-      </chef-subheading>
-    </chef-page-header>
-    <section *ngIf="!(isIAMv2$ | async)" class="page-body">
-      Currently, you are using IAM v1. Roles are only available when using IAM v2.
-    </section>
-    <section *ngIf="isIAMv2$ | async" class="page-body">
-      <app-authorized [allOf]="['/iam/v2beta/roles', 'get']">
-        <chef-table-new>
-          <chef-table-header>
-            <chef-table-row>
-              <chef-table-header-cell>Name</chef-table-header-cell>
-              <chef-table-header-cell>Type</chef-table-header-cell>
-            </chef-table-row>
-          </chef-table-header>
-          <chef-table-body>
-            <chef-table-row *ngFor="let role of sortedRoles$ | async">
-                <chef-table-cell>
-                  <a [routerLink]="['/settings/roles', role.id]">{{ role.name }}</a>
-                </chef-table-cell>
-                <chef-table-cell>{{ role.type | iamType }}</chef-table-cell>
-            </chef-table-row>
-          </chef-table-body>
-        </chef-table-new>
-      </app-authorized>
-    </section>
-  </main>
+  <div class="container">
+    <main>
+      <chef-page-header>
+        <chef-heading>Roles</chef-heading>
+        <chef-subheading>
+          Roles are named groups of actions used to define policies.
+        </chef-subheading>
+      </chef-page-header>
+      <section *ngIf="!(isIAMv2$ | async)" class="page-body">
+        Currently, you are using IAM v1. Roles are only available when using IAM v2.
+      </section>
+      <section *ngIf="isIAMv2$ | async" class="page-body">
+        <app-authorized [allOf]="['/iam/v2beta/roles', 'get']">
+          <chef-table-new>
+            <chef-table-header>
+              <chef-table-row>
+                <chef-table-header-cell>Name</chef-table-header-cell>
+                <chef-table-header-cell>Type</chef-table-header-cell>
+              </chef-table-row>
+            </chef-table-header>
+            <chef-table-body>
+              <chef-table-row *ngFor="let role of sortedRoles$ | async">
+                  <chef-table-cell>
+                    <a [routerLink]="['/settings/roles', role.id]">{{ role.name }}</a>
+                  </chef-table-cell>
+                  <chef-table-cell>{{ role.type | iamType }}</chef-table-cell>
+              </chef-table-row>
+            </chef-table-body>
+          </chef-table-new>
+        </app-authorized>
+      </section>
+    </main>
+  </div>
 </div>

@@ -3,65 +3,67 @@
   <p>Please contact an administrator for permission.</p>
 </div>
 
-<app-settings-sidebar></app-settings-sidebar>
-<div class="container">
-  <main>
-    <chef-page-header [contrasting-background]="false">
-      <chef-heading>Notifications</chef-heading>
-      <chef-subheading>Notifications for Inspec compliance scans and Chef client runs.</chef-subheading>
-    </chef-page-header>
+<div class="page-container">
+  <app-settings-sidebar sidebar></app-settings-sidebar>
+  <div class="container">
+    <main>
+      <chef-page-header [contrasting-background]="false">
+        <chef-heading>Notifications</chef-heading>
+        <chef-subheading>Notifications for Inspec compliance scans and Chef client runs.</chef-subheading>
+      </chef-page-header>
 
-    <div class="page-body">
-      <chef-alert type="error" *ngIf="errorLoading">There was an error loading notifications.</chef-alert>
+      <div class="page-body">
+        <chef-alert type="error" *ngIf="errorLoading">There was an error loading notifications.</chef-alert>
 
-      <chef-toolbar>
-        <app-authorized [anyOf]="['/notifications/rules', 'post']">
-          <div *ngIf="(rules$ | async)?.length === 0" class="empty-state">
-            <p>Create the first notification to get started!</p>
-          </div>
-          <div [ngClass]="(rules$ | async)?.length === 0 ? 'empty-state' : ''">
-            <chef-button primary [routerLink]="['/settings/notifications/form']">Create Notification</chef-button>
-          </div>
+        <chef-toolbar>
+          <app-authorized [anyOf]="['/notifications/rules', 'post']">
+            <div *ngIf="(rules$ | async)?.length === 0" class="empty-state">
+              <p>Create the first notification to get started!</p>
+            </div>
+            <div [ngClass]="(rules$ | async)?.length === 0 ? 'empty-state' : ''">
+              <chef-button primary [routerLink]="['/settings/notifications/form']">Create Notification</chef-button>
+            </div>
+          </app-authorized>
+        </chef-toolbar>
+        <app-authorized [anyOf]="['/notifications/rules', 'get']">
+          <chef-table *ngIf="(rules$ | async)?.length > 0" id="notifications-list">
+            <chef-tr>
+              <chef-th class="sort" (click)="toggleSort('node_name')">
+                <div class="text-and-sort-icons">
+                  <span>Notification Name</span>
+                  <chef-icon aria-hidden="true" id="{{sortIcon('node_name')}}" class="sort-icon">arrow_drop_up</chef-icon>
+                </div>
+              </chef-th>
+              <chef-th>Alert Type</chef-th>
+              <chef-th aria-hidden="true"></chef-th>
+            </chef-tr>
+
+            <chef-tr tabindex="0" *ngFor="let rule of rules$ | async |
+              slice:(pageSize * (currentPage - 1)):(pageSize * (currentPage - 1)) + pageSize">
+              <chef-td class="{{rule.targetType}}">
+                <img src="assets/img/logo-{{rule.targetType}}.svg" alt="{{rule.targetType}} logo" />
+                <a [routerLink]="['/settings/notifications/form', rule.id]">{{ rule.name }}</a>
+              </chef-td>
+              <chef-td>
+                {{rule.AlertTypeLabels[rule.ruleType]}}
+              </chef-td>
+              <chef-td class="actions">
+                <chef-control-menu>
+                  <chef-option (click)="deleteRule(rule)">Delete Notification</chef-option>
+                </chef-control-menu>
+              </chef-td>
+            </chef-tr>
+          </chef-table>
         </app-authorized>
-      </chef-toolbar>
-      <app-authorized [anyOf]="['/notifications/rules', 'get']">
-        <chef-table *ngIf="(rules$ | async)?.length > 0" id="notifications-list">
-          <chef-tr>
-            <chef-th class="sort" (click)="toggleSort('node_name')">
-              <div class="text-and-sort-icons">
-                <span>Notification Name</span>
-                <chef-icon aria-hidden="true" id="{{sortIcon('node_name')}}" class="sort-icon">arrow_drop_up</chef-icon>
-              </div>
-            </chef-th>
-            <chef-th>Alert Type</chef-th>
-            <chef-th aria-hidden="true"></chef-th>
-          </chef-tr>
 
-          <chef-tr tabindex="0" *ngFor="let rule of rules$ | async |
-            slice:(pageSize * (currentPage - 1)):(pageSize * (currentPage - 1)) + pageSize">
-            <chef-td class="{{rule.targetType}}">
-              <img src="assets/img/logo-{{rule.targetType}}.svg" alt="{{rule.targetType}} logo" />
-              <a [routerLink]="['/settings/notifications/form', rule.id]">{{ rule.name }}</a>
-            </chef-td>
-            <chef-td>
-              {{rule.AlertTypeLabels[rule.ruleType]}}
-            </chef-td>
-            <chef-td class="actions">
-              <chef-control-menu>
-                <chef-option (click)="deleteRule(rule)">Delete Notification</chef-option>
-              </chef-control-menu>
-            </chef-td>
-          </chef-tr>
-        </chef-table>
-      </app-authorized>
+        <app-page-picker
+          [total]="(rules$ | async)?.length"
+          [perPage]="pageSize"
+          [page]="currentPage"
+          (pageChanged)="currentPage = $event">
+        </app-page-picker>
 
-      <app-page-picker
-        [total]="(rules$ | async)?.length"
-        [perPage]="pageSize"
-        [page]="currentPage"
-        (pageChanged)="currentPage = $event">
-      </app-page-picker>
-
-    </div><!--page-body-->
-  </main>
-</div><!--notifications-container-->
+      </div><!--page-body-->
+    </main>
+  </div><!--notifications-container-->
+</div>

@@ -1,67 +1,68 @@
-<app-settings-sidebar></app-settings-sidebar>
-<chef-loading-spinner *ngIf="isLoading" size='50' fixed></chef-loading-spinner>
+<div class="page-container">
+  <app-settings-sidebar sidebar></app-settings-sidebar>
+  <chef-loading-spinner *ngIf="isLoading" size='50' fixed></chef-loading-spinner>
 
-<div class="container">
-  <main>
-    <chef-breadcrumbs>
-      <chef-breadcrumb [link]="['/settings/projects']">Projects</chef-breadcrumb>
-      {{ project?.name }}
-    </chef-breadcrumbs>
-    <chef-page-header>
-      <chef-heading>{{ project?.name }}</chef-heading>
-      <table>
-        <thead>
-          <tr class="detail-row">
-            <th class="id-column">ID</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="detail-row">
-            <td class="id-column">{{ project?.id }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
-        <chef-option value='rules' data-cy="rules-tab">Ingest Rules</chef-option>
-        <chef-option value='details' data-cy="details-tab">Details</chef-option>
-      </chef-tab-selector>
-    </chef-page-header>
-    <section class="page-body" *ngIf="tabValue === 'details'">
-      <form [formGroup]="projectForm">
-        <chef-form-field id="update-name">
-          <label>
-            <span class="label">Name <span aria-hidden="true">*</span></span>
-            <input chefInput formControlName="name" type="text" [resetOrigin]="saveSuccessful"
-              [attr.disabled]="(isChefManaged || isLoading) ? true : null"
-              autocomplete="off"
-              data-cy="update-project-name">
-          </label>
-          <chef-error
-            *ngIf="(projectForm.get('name').hasError('required') || projectForm.get('name').hasError('pattern')) && projectForm.get('name').dirty">
-            Name is required.
-          </chef-error>
-        </chef-form-field>
-        <span [hidden]="!isChefManaged" id="changes-not-allowed">
-          Name changes are not allowed for the default project.
-        </span>
-        <div id="button-bar" *ngIf="!isChefManaged">
-          <chef-button [disabled]="isLoading || !projectForm.valid || !projectForm.dirty"
-            primary inline (click)="saveProject()">
-            <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
-            <span *ngIf="saving">Saving...</span>
-            <span *ngIf="!saving">Save</span>
-          </chef-button>
-          <span id="saved-note" *ngIf="saveSuccessful && !projectForm.dirty">All changes saved.</span>
-        </div>
-      </form>
-    </section>
-    <section class="page-body" *ngIf="tabValue === 'rules'">
-      <ng-container *ngIf="showRulesTable()">
-        <chef-toolbar>
-          <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">
-            <chef-button [routerLink]="['/settings', 'projects', project?.id, 'rules']" id="create-button" primary>Create Rule</chef-button>
-          </app-authorized>
-          <small *ngIf="project?.status === 'EDITS_PENDING'">Edits are pending: update <a [routerLink]="['/settings/projects']">projects</a> to apply edits.</small>
+  <div class="container">
+    <main>
+      <chef-breadcrumbs>
+        <chef-breadcrumb [link]="['/settings/projects']">Projects</chef-breadcrumb>
+        {{ project?.name }}
+      </chef-breadcrumbs>
+      <chef-page-header>
+        <chef-heading>{{ project?.name }}</chef-heading>
+        <table>
+          <thead>
+            <tr class="detail-row">
+              <th class="id-column">ID</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="detail-row">
+              <td class="id-column">{{ project?.id }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
+          <chef-option value='rules' data-cy="rules-tab">Ingest Rules</chef-option>
+          <chef-option value='details' data-cy="details-tab">Details</chef-option>
+        </chef-tab-selector>
+      </chef-page-header>
+      <section class="page-body" *ngIf="tabValue === 'details'">
+        <form [formGroup]="projectForm">
+          <chef-form-field id="update-name">
+            <label>
+              <span class="label">Name <span aria-hidden="true">*</span></span>
+              <input chefInput formControlName="name" type="text" [resetOrigin]="saveSuccessful"
+                [attr.disabled]="(isChefManaged || isLoading) ? true : null"
+                autocomplete="off"
+                data-cy="update-project-name">
+            </label>
+            <chef-error
+              *ngIf="(projectForm.get('name').hasError('required') || projectForm.get('name').hasError('pattern')) && projectForm.get('name').dirty">
+              Name is required.
+            </chef-error>
+          </chef-form-field>
+          <span [hidden]="!isChefManaged" id="changes-not-allowed">
+            Name changes are not allowed for the default project.
+          </span>
+          <div id="button-bar" *ngIf="!isChefManaged">
+            <chef-button [disabled]="isLoading || !projectForm.valid || !projectForm.dirty"
+              primary inline (click)="saveProject()">
+              <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
+              <span *ngIf="saving">Saving...</span>
+              <span *ngIf="!saving">Save</span>
+            </chef-button>
+            <span id="saved-note" *ngIf="saveSuccessful && !projectForm.dirty">All changes saved.</span>
+          </div>
+        </form>
+      </section>
+      <section class="page-body" *ngIf="tabValue === 'rules'">
+        <ng-container *ngIf="showRulesTable()">
+          <chef-toolbar>
+            <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">
+              <chef-button [routerLink]="['/settings', 'projects', project?.id, 'rules']" id="create-button" primary>Create Rule</chef-button>
+            </app-authorized>
+            <small *ngIf="project?.status === 'EDITS_PENDING'">Edits are pending: update <a [routerLink]="['/settings/projects']">projects</a> to apply edits.</small>
         </chef-toolbar>
         <app-authorized [allOf]="['/iam/v2beta/projects', 'get']">
           <chef-table-new id="project-rules-table">
@@ -109,14 +110,15 @@
       </ng-container>
     </section>
 
-    <app-delete-object-modal
-      [visible]="deleteModalVisible"
-      objectNoun="rule"
-      [objectName]="ruleToDelete?.name"
-      (close)="closeDeleteModal()"
-      (deleteClicked)="deleteRule()"
-      objectAction="Delete">
-    </app-delete-object-modal>
+      <app-delete-object-modal
+        [visible]="deleteModalVisible"
+        objectNoun="rule"
+        [objectName]="ruleToDelete?.name"
+        (close)="closeDeleteModal()"
+        (deleteClicked)="deleteRule()"
+        objectAction="Delete">
+      </app-delete-object-modal>
 
-  </main>
+    </main>
+  </div>
 </div>

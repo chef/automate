@@ -11,13 +11,16 @@ import { NgrxStateAtom } from '../../../../ngrx.reducers';
 @Component({
   selector: 'app-credentials-list-screen',
   template: `
-    <app-settings-sidebar></app-settings-sidebar>
-    <app-credentials-list
-      [credentialsList]="credentialsList$ | async"
-      (deleteCredential)="handleDeleteCredential($event)"
-      (pageChanged)="handlePageChanged($event)"
-      (sortToggled)="handleSortToggled($event)"
-    ></app-credentials-list>
+    <div class="page-container">
+      <app-settings-sidebar sidebar></app-settings-sidebar>
+      <app-credentials-list
+        class="container"
+        [credentialsList]="credentialsList$ | async"
+        (deleteCredential)="handleDeleteCredential($event)"
+        (pageChanged)="handlePageChanged($event)"
+        (sortToggled)="handleSortToggled($event)"
+      ></app-credentials-list>
+    </div>
   `
 })
 
