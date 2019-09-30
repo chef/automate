@@ -47,7 +47,8 @@ import { Regex } from 'app/helpers/auth/regex';
         ]),
         transition(':leave', [
           style({height: '100%', opacity: 1}),
-          animate('.5s ease', style({height: '0%', opacity: 0}))
+          animate('0s ease', style({opacity: 0})),
+          animate('.5s ease', style({height: '0%'}))
         ])
       ]
     )
@@ -331,10 +332,12 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   }
 
   public showInputs(inputName: string): boolean {
+    const typeValue = this.expressionForm.get('type').value;
+    const identityValue = this.expressionForm.get('identity').value;
+
     switch (inputName) {
       case 'type':
-        if (this.expressionForm.get('type').value === 'USER'
-          || this.expressionForm.get('type').value === 'TEAM') {
+        if (typeValue === 'USER' || typeValue === 'TEAM') {
             return true;
           } else {
             this.expressionForm.get('identity').reset();
@@ -342,8 +345,6 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
           }
         break;
       case 'identity':
-        const typeValue = this.expressionForm.get('type').value;
-        const identityValue = this.expressionForm.get('identity').value;
         if ( typeValue === 'TOKEN' || (identityValue && identityValue !== '*') ) {
           return true;
         } else {
