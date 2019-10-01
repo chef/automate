@@ -12,7 +12,7 @@ import (
 
 // ConfigureManager registers the purge workflow executor and task
 // executor.
-func ConfigureManager(man *cereal.Manager, workflowName string, taskName string, opts ...TaskOpt) error {
+func ConfigureManager(man *cereal.Manager, workflowName cereal.WorkflowName, taskName cereal.TaskName, opts ...TaskOpt) error {
 	task := &Task{}
 	for _, o := range opts {
 		o(task)
@@ -36,23 +36,23 @@ func ConfigureManager(man *cereal.Manager, workflowName string, taskName string,
 func CreateOrUpdatePurgeWorkflow(
 	ctx context.Context,
 	man *cereal.Manager,
+	workflowName cereal.WorkflowName,
 	scheduleName string,
-	workflowName string,
 	defaultPolicies *Policies,
 	enabled bool,
 	recurrence *rrule.RRule) error {
 
 	err := man.CreateWorkflowSchedule(
 		ctx,
-		scheduleName,
 		workflowName,
+		scheduleName,
 		defaultPolicies,
 		true,
 		recurrence,
 	)
 
 	if err == cereal.ErrWorkflowScheduleExists {
-		sched, err := man.GetWorkflowScheduleByName(ctx, scheduleName, workflowName)
+		sched, err := man.GetWorkflowScheduleByName(ctx, workflowName, scheduleName)
 		if err != nil {
 			return errors.Wrap(err, "failed to get purge schedule from job manager")
 		}

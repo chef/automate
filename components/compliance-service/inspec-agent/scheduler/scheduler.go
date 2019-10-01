@@ -10,6 +10,7 @@ import (
 	rrule "github.com/teambition/rrule-go"
 
 	"github.com/chef/automate/components/compliance-service/api/jobs"
+	"github.com/chef/automate/components/compliance-service/inspec-agent/runner"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/chef/automate/components/compliance-service/scanner"
 	"github.com/chef/automate/lib/cereal"
@@ -65,7 +66,7 @@ func (a *Scheduler) pushWorkflow(job *jobs.Job, retry bool) error {
 	defer cancel()
 
 	for {
-		err := a.cerealManager.EnqueueWorkflow(context.TODO(), "scan-job-workflow", fmt.Sprintf("scan-job-%s", job.Id), job)
+		err := a.cerealManager.EnqueueWorkflow(context.TODO(), runner.ScanJobWorkflowName, fmt.Sprintf("scan-job-%s", job.Id), job)
 		if err == nil || !retry || err != cereal.ErrWorkflowInstanceExists {
 			return err
 		}

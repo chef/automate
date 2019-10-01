@@ -114,7 +114,8 @@ func NewSuiteForBackend(ctx context.Context, t *testing.T, d backend.Driver) *Ce
 			m, err := cereal.NewManager(d, o.ManagerOpts...)
 			require.NoError(t, err)
 			for _, w := range o.WorkflowExecutors {
-				err := m.RegisterWorkflowExecutor(w.Name, w.Executor)
+				workflowName := cereal.NewWorkflowName(w.Name)
+				err := m.RegisterWorkflowExecutor(workflowName, w.Executor)
 				require.NoError(t, err)
 			}
 			for _, te := range o.TaskExecutors {

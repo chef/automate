@@ -8,7 +8,7 @@ func NewStartEvent() cereal.StartEvent {
 
 func NewTaskCompleteEvent(taskName string, tr cereal.TaskResult) cereal.TaskCompleteEvent {
 	return cereal.TaskCompleteEvent{
-		TaskName: taskName,
+		TaskName: cereal.NewTaskName(taskName),
 		Result:   tr,
 	}
 }

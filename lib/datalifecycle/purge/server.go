@@ -20,7 +20,7 @@ var _ (data_lifecycle.PurgeServer) = (*Server)(nil)
 
 // Server is the purge server implementation
 type Server struct {
-	jobName         string
+	workflowName    cereal.WorkflowName
 	scheduleName    string
 	defaultPolicies *Policies
 	esSidecarClient es.EsSidecarClient
@@ -30,8 +30,8 @@ type Server struct {
 // NewServer - create a new purge gRPC server
 func NewServer(
 	man *cereal.Manager,
-	scheduleName string,
 	jobName string,
+	scheduleName string,
 	defaultPolicies *Policies,
 	opts ...ServerOpt) (*Server, error) {
 	s := &Server{
