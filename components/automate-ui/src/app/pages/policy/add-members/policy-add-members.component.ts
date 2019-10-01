@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { trigger, transition, style, animate, state, keyframes } from '@angular/animations';
+import { trigger, transition, style, animate, state } from '@angular/animations';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -93,8 +93,8 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
     this.expressionForm = fb.group({
       type: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      identity: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+      identity: [''],
+      name: ['']
     });
   }
 
@@ -336,16 +336,20 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     switch (inputName) {
       case 'type':
         if (typeValue === 'USER' || typeValue === 'TEAM') {
+            this.updateValidations('identity', true);
             return true;
           } else {
+            this.updateValidations('identity', false);
             this.expressionForm.get('identity').reset();
             return false;
           }
         break;
       case 'identity':
         if ( typeValue === 'TOKEN' || (identityValue && identityValue !== '*') ) {
+          this.updateValidations('name', true);
           return true;
         } else {
+          this.updateValidations('name', false);
           this.expressionForm.get('name').reset();
           return false;
         }
@@ -354,6 +358,19 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
         return false;
     }
   }
+
+  updateValidations(inputName: string, active: boolean): void {
+    const updateInput = this.expressionForm.get(inputName);
+
+     active === true
+      ? updateInput.setValidators([Validators.required,
+        Validators.pattern(Regex.patterns.NON_BLANK)])
+      : updateInput.clearValidators();
+
+      updateInput.updateValueAndValidity();
+
+      return;
+    }
 
 
   displayExpressionOutput(formValues: object): void {
