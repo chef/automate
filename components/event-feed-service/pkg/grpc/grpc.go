@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	libgrpc "google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
 	"github.com/chef/automate/api/interservice/data_lifecycle"
@@ -25,7 +26,6 @@ import (
 	"github.com/chef/automate/lib/datalifecycle/purge"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
-	libgrpc "google.golang.org/grpc"
 )
 
 // Spawn starts a gRPC server using the provided configuration
@@ -142,7 +142,7 @@ func newJobManager(
 
 	err = purge.ConfigureManager(
 		jobManager,
-		server.PurgeScheduleName,
+		server.PurgeWorkflowName,
 		server.PurgeJobName,
 		purge.WithTaskEsSidecarClient(esSidecarClient),
 	)

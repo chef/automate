@@ -4,14 +4,16 @@ import (
 	"context"
 	"time"
 
+	"github.com/pkg/errors"
+	rrule "github.com/teambition/rrule-go"
+
 	"github.com/chef/automate/components/ingest-service/serveropts"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/datalifecycle/purge"
-	"github.com/pkg/errors"
-	rrule "github.com/teambition/rrule-go"
 )
 
 const (
+	PurgeWorkflowName         = "purge_timeseries"
 	PurgeJobName              = "purge_timeseries"
 	PurgeScheduleName         = "periodic_purge_timeseries"
 	PurgeConvergeHistoryName  = "converge-history"
@@ -87,7 +89,7 @@ func ConfigurePurge(man *cereal.Manager, opts *serveropts.Opts) error {
 		context.Background(),
 		man,
 		PurgeScheduleName,
-		PurgeJobName,
+		PurgeWorkflowName,
 		DefaultPurgePolicies,
 		true,
 		r,
