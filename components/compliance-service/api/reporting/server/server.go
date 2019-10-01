@@ -19,7 +19,6 @@ import (
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/io/chunks"
-	"github.com/chef/automate/lib/stringutils"
 )
 
 // Chosen somewhat arbitrarily to be a "good enough" value.
@@ -46,7 +45,7 @@ func (srv *Server) ListReports(ctx context.Context, in *reporting.Query) (*repor
 		"latest_report.controls.failed.total":    "controls_sums.failed.total",
 		"latest_report.controls.failed.critical": "controls_sums.failed.critical",
 	}
-	from, perPage, sort, asc, err := validatePaginationAndSorting(in, SORT_FIELDS, "latest_report.end_time")
+	pageInfo, err := validatePaginationAndSorting(in, SORT_FIELDS, "latest_report.end_time")
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -55,7 +54,7 @@ func (srv *Server) ListReports(ctx context.Context, in *reporting.Query) (*repor
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
-	reportsList, total, err := srv.es.GetReports(from, perPage, formattedFilters, SORT_FIELDS[sort], asc)
+	reportsList, total, err := srv.es.GetReports(pageInfo.from, pageInfo.perPage, formattedFilters, pageInfo.sort, pageInfo.asc)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
@@ -154,7 +153,7 @@ func (srv *Server) ListProfiles(ctx context.Context, in *reporting.Query) (*repo
 		"name":  "name.lower",
 		"title": "title.lower",
 	}
-	from, perPage, sort, asc, err := validatePaginationAndSorting(in, SORT_FIELDS, "title")
+	pageInfo, err := validatePaginationAndSorting(in, SORT_FIELDS, "title")
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -165,7 +164,7 @@ func (srv *Server) ListProfiles(ctx context.Context, in *reporting.Query) (*repo
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	profiles, counts, err := srv.es.GetAllProfilesFromNodes(from, perPage, formattedFilters, SORT_FIELDS[sort], asc)
+	profiles, counts, err := srv.es.GetAllProfilesFromNodes(pageInfo.from, pageInfo.perPage, formattedFilters, pageInfo.sort, pageInfo.asc)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
@@ -337,7 +336,7 @@ func (srv *Server) ListNodes(ctx context.Context, in *reporting.Query) (*reporti
 		"latest_report.controls.failed.total":    "controls_sums.failed.total",
 		"latest_report.controls.failed.critical": "controls_sums.failed.critical",
 	}
-	from, perPage, sort, asc, err := validatePaginationAndSorting(in, SORT_FIELDS, "latest_report.end_time")
+	pageInfo, err := validatePaginationAndSorting(in, SORT_FIELDS, "latest_report.end_time")
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -347,7 +346,7 @@ func (srv *Server) ListNodes(ctx context.Context, in *reporting.Query) (*reporti
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 
-	nodesList, totalCounts, err := srv.es.GetNodes(from, perPage, formattedFilters, SORT_FIELDS[sort], asc)
+	nodesList, totalCounts, err := srv.es.GetNodes(pageInfo.from, pageInfo.perPage, formattedFilters, pageInfo.sort, pageInfo.asc)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
@@ -383,38 +382,49 @@ func formatFilters(filters []*reporting.ListFilter) map[string][]string {
 	return formattedFilters
 }
 
-func validatePaginationAndSorting(in *reporting.Query, validSortFields map[string]string, defaultSortField string) (from int32, per_page int32, sort string, asc bool, err error) {
+type pageSortInfo struct {
+	from    int32
+	perPage int32
+	sort    string
+	asc     bool
+}
+
+func validatePaginationAndSorting(in *reporting.Query, validSortFields map[string]string, defaultSortField string) (pageSortInfo, error) {
+	ret := pageSortInfo{}
 	if in.PerPage == 0 {
 		in.PerPage = 10
 	}
-	per_page = in.PerPage
+	ret.perPage = in.PerPage
 
 	if in.Page == 0 {
 		in.Page = 1
 	}
-	from = (in.Page - 1) * in.PerPage
+	ret.from = (in.Page - 1) * in.PerPage
 
-	switch order := in.Order; order {
-	case 0:
-		asc = true
-	case 1:
-		asc = false
+	switch in.Order {
+	case reporting.Query_ASC:
+		ret.asc = true
+	case reporting.Query_DESC:
+		ret.asc = false
 	}
+
+	sortKey := defaultSortField
 	if in.Sort != "" {
-		valid_fields := make([]string, 0)
-		for k := range validSortFields {
-			valid_fields = append(valid_fields, k)
-		}
-		if !stringutils.SliceContains(valid_fields, in.Sort) {
-			sorter.Strings(valid_fields)
-			err = &errorutils.InvalidError{Msg: fmt.Sprintf("Parameter 'sort' only supports one of the following fields: %v", valid_fields)}
-			return
-		}
-		sort = in.Sort
-	} else {
-		sort = defaultSortField
+		sortKey = in.Sort
 	}
-	return
+
+	sortValue, ok := validSortFields[sortKey]
+	if !ok {
+		validFields := make([]string, 0, len(validSortFields))
+		for k := range validSortFields {
+			validFields = append(validFields, k)
+		}
+		sorter.Strings(validFields)
+		return ret, &errorutils.InvalidError{Msg: fmt.Sprintf("Parameter 'sort' only supports one of the following fields: %v", validFields)}
+	}
+	ret.sort = sortValue
+
+	return ret, nil
 }
 
 func filterByProjects(ctx context.Context, filters map[string][]string) (map[string][]string, error) {
