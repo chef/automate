@@ -75,6 +75,7 @@ var SERVICE_STATE serviceState
 
 const (
 	PurgeJobName      = "purge"
+	PurgeWorkflowName = "purge"
 	PurgeScheduleName = "periodic_purge"
 )
 
@@ -447,7 +448,7 @@ func setupDataLifecyclePurgeInterface(ctx context.Context, connFactory *secureco
 
 	err = purge.ConfigureManager(
 		cerealManager,
-		PurgeScheduleName,
+		PurgeWorkflowName,
 		PurgeJobName,
 		purge.WithTaskEsSidecarClient(esSidecarClient),
 	)
@@ -468,7 +469,7 @@ func setupDataLifecyclePurgeInterface(ctx context.Context, connFactory *secureco
 		timeoutCtx,
 		cerealManager,
 		PurgeScheduleName,
-		PurgeJobName,
+		PurgeWorkflowName,
 		defaultPurgePolicies,
 		true,
 		recurrence,

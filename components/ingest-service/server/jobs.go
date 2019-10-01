@@ -46,7 +46,7 @@ func InitializeJobManager(c *cereal.Manager, client backend.Client, esSidecarCli
 		}
 	}
 	err = purge.ConfigureManager(
-		c, PurgeScheduleName, PurgeJobName, purge.WithTaskEsSidecarClient(esSidecarClient),
+		c, PurgeWorkflowName, PurgeJobName, purge.WithTaskEsSidecarClient(esSidecarClient),
 	)
 	if err != nil {
 		return errors.Wrap(err, "failed to configure purge workflow")

@@ -14,6 +14,7 @@ import (
 )
 
 const (
+	PurgeWorkflowName   = "purge"
 	PurgeJobName        = "purge"
 	PurgeScheduleName   = "periodic_purge"
 	PurgeFeedPolicyName = "feed"
@@ -67,7 +68,7 @@ func ConfigureJobManager(man *cereal.Manager, config *config.EventFeed) error {
 		context.Background(),
 		man,
 		PurgeScheduleName,
-		PurgeJobName,
+		PurgeWorkflowName,
 		DefaultPurgePolicies,
 		true,
 		r,
