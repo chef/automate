@@ -65,6 +65,7 @@ func (s *server) GatherLogs(ctx context.Context, req *api.GatherLogsRequest,
 	if req.LogLines > 0 {
 		logLinesStr := strconv.FormatUint(req.LogLines, 10)
 		g.AddCommand("journalctl_chef-automate", "journalctl", "--utc", "-u", "chef-automate", "-n", logLinesStr)
+
 	} else {
 		g.AddCommand("journalctl_chef-automate", "journalctl", "--utc", "-u", "chef-automate")
 	}
@@ -103,8 +104,8 @@ func (s *server) GatherLogs(ctx context.Context, req *api.GatherLogsRequest,
 	g.AddCopy("/etc/resolv.conf")
 	g.AddCopy("/etc/hosts")
 	g.AddCopy("/proc/sys/crypto/fips_enabled")
-	g.AddCopiesFromPath("syslog", "/var/log")
-	g.AddCopiesFromPath("messages", "/var/log")
+	g.AddTail("/var/log/syslog", req.GetLogLines())
+	g.AddTail("/var/log/messages", req.GetLogLines())
 	// Distro version/release of the underlying operating system.
 	// If a distro uses systemd, it provides distro information in
 	// /etc/os-release

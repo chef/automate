@@ -484,8 +484,8 @@ func runGatherLogsLocalCmd(outfileOverride string, logLines uint64) error {
 	g.AddCopy("/etc/hosts")
 	g.AddCopy("/proc/cpuinfo")
 	g.AddCopy("/proc/sys/crypto/fips_enabled")
-	g.AddCopiesFromPath("syslog", "/var/log")
-	g.AddCopiesFromPath("messages", "/var/log")
+	g.AddTail("/var/log/syslog", logLines)
+	g.AddTail("/var/log/messages", logLines)
 
 	// automate-gateway metrics
 	// FIXME: Move this to using config.
