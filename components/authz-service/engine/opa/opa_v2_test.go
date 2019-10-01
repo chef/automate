@@ -225,14 +225,400 @@ func TestAuthorizedProjects(t *testing.T) {
           "actions": [ "iam:teams:create" ]
         }
       }
+    },
+
+    "9acbe920-d977-4c4d-a482-0125fe83a95a": {
+      "name": "Administrator",
+      "id": "administrator-access",
+      "type": "CHEF_MANAGED",
+      "members": [
+        "team:local:admins",
+        "user:local:localuser"
+      ],
+      "statements": {
+        "9acbe920-d977-4c4d-a482-0125fe83a901": {
+          "effect": "allow",
+          "actions": [
+            "*"
+          ],
+          "role": "",
+          "resources": [
+            "*"
+          ],
+          "projects": [
+            "*"
+          ]
+        },
+        "9acbe920-d977-4c4d-a482-0125fe83a902": {
+          "effect": "DENY",
+          "actions": [
+            "iam:policies:delete",
+            "iam:policies:update"
+          ],
+          "role": "",
+          "resources": [
+            "iam:policies:administrator-access"
+          ],
+          "projects": [
+            "*"
+          ]
+        }
+      },
+      "projects": [
+      ]
+    },
+    "9acbe920-d977-4c4d-a482-1125fe83a95a": {
+      "name": "Editors",
+      "id": "editor-access",
+      "type": "CHEF_MANAGED",
+      "members": [
+        "team:local:editors"
+      ],
+      "statements": {
+       "9acbe920-d977-4c4d-a482-0125fe83a903":  {
+          "effect": "allow",
+          "actions": [
+          ],
+          "role": "editor",
+          "resources": [
+            "*"
+          ],
+          "projects": [
+            "*"
+          ]
+        }
+      },
+      "projects": [
+      ]
+    },
+    "9acbe920-d977-4c4d-a482-2125fe83a95a": {
+      "name": "Viewers",
+      "id": "viewer-access",
+      "type": "CHEF_MANAGED",
+      "members": [
+        "team:local:viewers"
+      ],
+      "statements": {
+       "9acbe920-d977-4c4d-a482-0125fe83a904":  {
+          "effect": "allow",
+          "actions": [
+          ],
+          "role": "viewer",
+          "resources": [
+            "*"
+          ],
+          "projects": [
+            "*"
+          ]
+        }
+      },
+      "projects": [
+      ]
+    },
+    "9acbe920-d977-4c4d-a482-3125fe83a95a": {
+      "name": "Ingest",
+      "id": "ingest-access",
+      "type": "CHEF_MANAGED",
+      "members": [
+        "user:local:admin",
+        "team:local:admins"
+      ],
+      "statements": {
+       "9acbe920-d977-4c4d-a482-0125fe83a905":  {
+          "effect": "allow",
+          "actions": [
+          ],
+          "role": "ingest",
+          "resources": [
+            "*"
+          ],
+          "projects": [
+            "*"
+          ]
+        }
+      },
+      "projects": [
+      ]
+    },
+    "9acbe920-d977-4c4d-a482-4125fe83a95a": {
+      "name": "policy 3",
+      "id": "policy-3 ",
+      "type": "CUSTOM",
+      "members": [
+        "user:local:other"
+      ],
+      "statements": {
+       "9acbe920-d977-4c4d-a482-0125fe83a906":  {
+          "effect": "allow",
+          "actions": [
+          ],
+          "role": "viewer",
+          "resources": [
+            "*"
+          ],
+          "projects": [
+            "vcs1"
+          ]
+        }
+      },
+      "projects": [
+      ]
+    },
+    "9acbe920-d977-4c4d-a482-5125fe83a95a": {
+      "name": "policy 2",
+      "id": "policy-2",
+      "type": "CUSTOM",
+      "members": [
+        "user:local:other"
+      ],
+      "statements": {
+       "9acbe920-d977-4c4d-a482-0125fe83a907":  {
+          "effect": "allow",
+          "actions": [
+          ],
+          "role": "viewer",
+          "resources": [
+            "*"
+          ],
+          "projects": [
+            "other2"
+          ]
+        }
+      },
+      "projects": [
+      ]
+    },
+    "9acbe920-d977-4c4d-a482-6125fe83a95a": {
+      "name": "Other3",
+      "id": "policy-other3",
+      "type": "CUSTOM",
+      "members": [
+        "user:local:other"
+      ],
+      "statements": {
+       "9acbe920-d977-4c4d-a482-0125fe83a908":  {
+          "effect": "allow",
+          "actions": [
+          ],
+          "role": "viewer",
+          "resources": [
+            "*"
+          ],
+          "projects": [
+            "other"
+          ]
+        }
+      },
+      "projects": [
+      ]
+    },
+    "9acbe920-d977-4c4d-a482-7125fe83a95a": {
+      "name": "Other1",
+      "id": "other1",
+      "type": "CUSTOM",
+      "members": [
+        "team:ldap:Aenean a lorem sodales"
+      ],
+      "statements": {
+       "9acbe920-d977-4c4d-a482-0125fe83a909":  {
+          "effect": "allow",
+          "actions": [
+            "*"
+          ],
+          "role": "",
+          "resources": [
+            "*"
+          ],
+          "projects": [
+            "my-target-project"
+          ]
+        }
+      },
+      "projects": [
+      ]
+    },
+    "9acbe920-d977-4c4d-a482-8125fe83a95a": {
+      "name": "Other2",
+      "id": "other2",
+      "type": "CUSTOM",
+      "members": [
+        "team:ldap:Aenean a lorem sodalesas"
+      ],
+      "statements": {
+       "9acbe920-d977-4c4d-a482-0125fe83a910":  {
+          "effect": "allow",
+          "actions": [
+            "*"
+          ],
+          "role": "",
+          "resources": [
+            "*"
+          ],
+          "projects": [
+            "my-target-project"
+          ]
+        }
+      },
+      "projects": [
+      ]
     }
   }
 }`
 
 	cases := map[string]map[string]interface{}{
 		"exact match": {
-			"subjects": []string{"team:local:admins"},
-			"projects": []string{"p1", "p3", "p4"},
+			"subjects": []string{
+				"team:ldap:Aenean a lorem sodalesas",
+				"team:ldap:Aenean ac libero fringil",
+				"team:ldap:Aenean at tellus quis se",
+				"team:ldap:Aenean dapibus risus rut",
+				"team:ldap:Aenean scelerisque ex eu",
+				"team:ldap:Aliquam a nibh egestas a",
+				"team:ldap:Aliquam auctor tellus fr",
+				"team:ldap:Aliquam convallis nisi q",
+				"team:ldap:Aliquam eget libero sit ",
+				"team:ldap:Aliquam id arcu vel augu",
+				"team:ldap:Aliquam id elit at nisl ",
+				"team:ldap:Aliquam rutrum turpis co",
+				"team:ldap:Aliquam vel mi eu eros d",
+				"team:ldap:Aliquam vitae nunc vitae",
+				"team:ldap:Cras ac ex quis augue pe",
+				"team:ldap:Cras commodo diam nec ve",
+				"team:ldap:Cras porta justo non ex ",
+				"team:ldap:Cras quis eros vel urna ",
+				"team:ldap:Curabitur convallis lore",
+				"team:ldap:Curabitur eget nibh accu",
+				"team:ldap:Curabitur euismod purus ",
+				"team:ldap:Curabitur vitae nunc dap",
+				"team:ldap:Donec a turpis non elit ",
+				"team:ldap:Donec congue lacus vel l",
+				"team:ldap:Donec consequat quam sit",
+				"team:ldap:Donec efficitur nunc tri",
+				"team:ldap:Donec efficitur risus so",
+				"team:ldap:Donec eget urna porttito",
+				"team:ldap:Donec fringilla augue et",
+				"team:ldap:Donec id lectus lacinia ",
+				"team:ldap:Donec interdum dui non r",
+				"team:ldap:Donec laoreet ipsum et e",
+				"team:ldap:Donec molestie eros et s",
+				"team:ldap:Donec ultricies neque ne",
+				"team:ldap:Donec ut nunc consectetu",
+				"team:ldap:Donec vel magna dictum, ",
+				"team:ldap:Duis feugiat nibh eu fel",
+				"team:ldap:Duis id sapien vitae odi",
+				"team:ldap:Duis tristique nisl eget",
+				"team:ldap:Duis vel tellus eget leo",
+				"team:ldap:Etiam molestie mauris in",
+				"team:ldap:Etiam suscipit felis sed",
+				"team:ldap:Fusce ac nunc at elit tr",
+				"team:ldap:Fusce et sapien sed lect",
+				"team:ldap:Fusce fringilla massa ac",
+				"team:ldap:Fusce in arcu at justo d",
+				"team:ldap:Fusce pulvinar urna ac a",
+				"team:ldap:Fusce ultrices lacus ut ",
+				"team:ldap:Fusce ut eros posuere, a",
+				"team:ldap:Fusce ut nisl sit amet t",
+				"team:ldap:Fusce vel lectus vulputa",
+				"team:ldap:Fusce vitae nulla in qua",
+				"team:ldap:In at est nec nunc tinci",
+				"team:ldap:In dapibus risus sit ame",
+				"team:ldap:In non ipsum consectetur",
+				"team:ldap:In placerat dui non mass",
+				"team:ldap:In ullamcorper arcu vel ",
+				"team:ldap:Integer a libero dapibus",
+				"team:ldap:Integer in ipsum in erat",
+				"team:ldap:Integer in mauris imperd",
+				"team:ldap:Integer pharetra est a n",
+				"team:ldap:Integer sit amet augue f",
+				"team:ldap:Integer sodales arcu id ",
+				"team:ldap:Maecenas ac sapien et li",
+				"team:ldap:Maecenas blandit nisi ut",
+				"team:ldap:Maecenas dictum quam sit",
+				"team:ldap:Maecenas dignissim nunc ",
+				"team:ldap:Maecenas egestas purus s",
+				"team:ldap:Maecenas elementum ante ",
+				"team:ldap:Maecenas mollis sapien e",
+				"team:ldap:Mauris non justo et orci",
+				"team:ldap:Mauris tempor lacus ac o",
+				"team:ldap:Mauris ut purus a nisl a",
+				"team:ldap:Morbi eget lacus tempor,",
+				"team:ldap:Morbi id sem lobortis, f",
+				"team:ldap:Morbi imperdiet mi quis ",
+				"team:ldap:Morbi ornare diam vel co",
+				"team:ldap:Morbi rhoncus neque id m",
+				"team:ldap:Morbi vitae dui porta, s",
+				"team:ldap:Nam a enim quis mi phare",
+				"team:ldap:Nam ac ligula sed neque ",
+				"team:ldap:Nam facilisis nisl quis ",
+				"team:ldap:Nam id enim ac purus pre",
+				"team:ldap:Nam in est vitae odio in",
+				"team:ldap:Nam lobortis justo ac ve",
+				"team:ldap:Nam mattis diam nec enim",
+				"team:ldap:Nam pulvinar ex sodales,",
+				"team:ldap:Nam vitae eros quis elit",
+				"team:ldap:Nulla eu sapien facilisi",
+				"team:ldap:Nulla fringilla dolor eg",
+				"team:ldap:Nulla nec nisl vel leo g",
+				"team:ldap:Nulla scelerisque felis ",
+				"team:ldap:Nulla sed mauris tincidu",
+				"team:ldap:Nulla ut nulla sit amet ",
+				"team:ldap:Nulla vitae nulla id leo",
+				"team:ldap:Nullam et leo nec lorem ",
+				"team:ldap:Nullam faucibus orci sed",
+				"team:ldap:Nullam in urna volutpat ",
+				"team:ldap:Nullam lobortis enim qui",
+				"team:ldap:Nullam nec risus ac ante",
+				"user:ldap:Nullam pellentesque odio",
+				"user:ldap:Nunc malesuada ipsum a u",
+				"user:ldap:Nunc porttitor erat in b",
+				"user:ldap:Pellentesque consectetur",
+				"user:ldap:Pellentesque efficitur f",
+				"user:ldap:Pellentesque in justo mo",
+				"user:ldap:Pellentesque malesuada t",
+				"user:ldap:Pellentesque vulputate e",
+				"user:ldap:Phasellus lobortis sapie",
+				"user:ldap:Phasellus sed tellus mal",
+				"user:ldap:Phasellus sit amet lorem",
+				"user:ldap:Praesent sed odio a sapi",
+				"user:ldap:Proin eget justo at augu",
+				"user:ldap:Proin et mauris bibendum",
+				"user:ldap:Proin rutrum ipsum lacin",
+				"user:ldap:Proin sed leo in eros ul",
+				"user:ldap:Proin varius arcu quis i",
+				"user:ldap:Quisque eget est id lacu",
+				"user:ldap:Quisque in urna malesuad",
+				"user:ldap:Quisque nec mauris at el",
+				"user:ldap:Quisque sagittis mauris ",
+				"user:ldap:Sed blandit ligula sed n",
+				"user:ldap:Sed facilisis dolor sit ",
+				"user:ldap:Sed feugiat justo vitae ",
+				"user:ldap:Sed id mi nec massa moll",
+				"user:ldap:Sed id nunc at erat hend",
+				"user:ldap:Sed imperdiet diam et he",
+				"user:ldap:Sed laoreet magna vel me",
+				"user:ldap:Sed mattis nulla vitae d",
+				"user:ldap:Sed maximus massa sit am",
+				"user:ldap:Sed mollis sem tempor od",
+				"user:ldap:Sed pharetra nibh at lac",
+				"user:ldap:Sed semper nisl nec dui ",
+				"user:ldap:Sed vitae magna eget sap",
+				"user:ldap:Sed vitae mi vel mi volu",
+				"user:ldap:Suspendisse eget nibh pe",
+				"user:ldap:Suspendisse placerat arc",
+				"user:ldap:Suspendisse vel urna mol",
+				"user:ldap:Ut efficitur nunc non ve",
+				"user:ldap:Ut sed arcu eget mi mole",
+				"user:ldap:Ut ullamcorper dui ut ni",
+				"user:ldap:Ut vel nisl quis enim ef",
+				"user:ldap:Ut vitae metus vel arcu ",
+				"user:ldap:Ut viverra risus dapibus",
+				"user:ldap:Vestibulum in ligula fac",
+				"user:ldap:Vivamus congue tellus at",
+				"user:ldap:Vivamus cursus nunc eget",
+				"user:ldap:Vivamus eu ex molestie, ",
+				"user:ldap:Vivamus id magna eget ip",
+			},
+			"projects": []string{"my-target-project"},
 			"action":   "iam:teams:create",
 			"resource": "iam:teams",
 		},
@@ -248,7 +634,7 @@ func TestAuthorizedProjects(t *testing.T) {
 			require.Equal(t, 1, len(rs[0].Expressions), "expected one result expression")
 			projects, ok := rs[0].Expressions[0].Value.([]interface{})
 			require.True(t, ok, "result value is an array")
-			expectedProjects := []string{"p4", "p3"}
+			expectedProjects := []string{"my-target-project"}
 			assert.ElementsMatch(t, expectedProjects, projects, "expected %q to return %v", query, expectedProjects)
 		})
 	}
