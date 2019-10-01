@@ -9,7 +9,7 @@ aws s3 cp "s3://chef-automate-artifacts/${source_channel}/latest/automate/manife
 
 build_version=$(jq -r -c ".build"  manifest.json)
 
-git clone https://github.com/chef/automate.wiki.git
+git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/chef/automate.wiki.git"
 
 pushd ./automate.wiki
   # Publish release notes to S3
