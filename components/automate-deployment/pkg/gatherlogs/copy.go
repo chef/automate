@@ -62,7 +62,7 @@ func (c *Tail) execute() error {
 
 	lines := c.Lines
 	if lines <= 0 {
-		lines = 10
+		lines = 1000
 	}
 	tailArgs := command.Args(
 		"-n",
