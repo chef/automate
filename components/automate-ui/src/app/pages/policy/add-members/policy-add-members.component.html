@@ -12,9 +12,8 @@
   (confirm)="addMembers()"
   (close)="closePage()">
     <div *ngIf="!loading">
-      <!--  -->
+
       <!-- MODAL START -->
-      <!--  -->
       <chef-modal label="member-expression-label" class="member-expression-modal" [visible]="modalVisible" (close)="closeModal()">
         <h2>Add Member Expression</h2>
         <div id="modal-content-container">
@@ -70,17 +69,14 @@
                 </chef-error>
               </chef-form-field>
 
-
-            <!-- CURRENTLY USED ERROR MESSAGES -->
+            <!-- ERROR MESSAGES -->
             <chef-form-field>
               <chef-error *ngIf="unparsableMember">Invalid member expression.</chef-error>
               <chef-error *ngIf="duplicateMember">Member expression already in table.</chef-error>
               <chef-error *ngIf="alreadyPolicyMember">Member already in policy.</chef-error>
-              <!-- <chef-error *ngIf="(expressionForm.get('expression').hasError('required') || expressionForm.get('expression').hasError('pattern')) && expressionForm.get('expression').dirty">
-                Member expression is required.
-              </chef-error> -->
             </chef-form-field>
           </form>
+
           <!-- expression builder output -->
           <div *ngIf="expressionOutput">
             <p id="expression-output" class="note">Member expression: {{ expressionOutput }}</p>
@@ -94,9 +90,9 @@
           </div>
         </div>
       </chef-modal>
-      <!--  -->
       <!-- MODAL END -->
-      <!--  -->
+
+
       <div id="no-members-container" *ngIf="sortedMembersAvailable.length === 0">
         <h3>Create more local users or local teams first, or add a member expression.</h3>
         <chef-button
