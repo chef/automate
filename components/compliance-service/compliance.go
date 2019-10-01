@@ -449,7 +449,6 @@ func setupDataLifecyclePurgeInterface(ctx context.Context, connFactory *secureco
 	err = purge.ConfigureManager(
 		cerealManager,
 		PurgeWorkflowName,
-		PurgeJobName,
 		purge.WithTaskEsSidecarClient(esSidecarClient),
 	)
 	if err != nil {

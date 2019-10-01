@@ -10,9 +10,11 @@ import (
 	"github.com/chef/automate/lib/cereal"
 )
 
+const taskName = "purge"
+
 // ConfigureManager registers the purge workflow executor and task
 // executor.
-func ConfigureManager(man *cereal.Manager, workflowName string, taskName string, opts ...TaskOpt) error {
+func ConfigureManager(man *cereal.Manager, workflowName string, opts ...TaskOpt) error {
 	task := &Task{}
 	for _, o := range opts {
 		o(task)
@@ -121,11 +123,9 @@ func (s *Workflow) OnStart(w cereal.WorkflowInstance, _ cereal.StartEvent) cerea
 		return w.Fail(err)
 	}
 
-	for _, policy := range policies.Es {
-		err = w.EnqueueTask(policy.Name, policy)
-		if err != nil {
-			w.Fail(err)
-		}
+	err = w.EnqueueTask(taskName, policies)
+	if err != nil {
+		w.Fail(err)
 	}
 
 	return w.Continue(nil)

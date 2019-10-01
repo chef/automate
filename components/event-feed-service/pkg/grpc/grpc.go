@@ -143,7 +143,6 @@ func newJobManager(
 	err = purge.ConfigureManager(
 		jobManager,
 		server.PurgeWorkflowName,
-		server.PurgeJobName,
 		purge.WithTaskEsSidecarClient(esSidecarClient),
 	)
 	if err != nil {
