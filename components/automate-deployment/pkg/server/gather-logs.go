@@ -140,7 +140,7 @@ func (s *server) GatherLogs(ctx context.Context, req *api.GatherLogsRequest,
 
 	// Elasticsearch
 	// FIXME: Move this to using config.
-	elasticsearchURL := "http://localhost:10141"
+	elasticsearchURL := "http://localhost:10144"
 	g.AddURL("elasticsearch_cat_health", elasticsearchURL+"/_cat/health?v")
 	g.AddURL("elasticsearch_cluster_health", elasticsearchURL+"/_cluster/health?human&pretty")
 	g.AddURL("elasticsearch_cluster_pending_tasks", elasticsearchURL+"/_cluster/pending_tasks?human&pretty")
