@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { StoreModule, Store } from '@ngrx/store';
+import { StoreModule } from '@ngrx/store';
 // import { of as observableOf } from 'rxjs';
 import { MockComponent } from 'ng2-mock-component';
 
@@ -11,6 +11,7 @@ import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { customMatchers } from 'app/testing/custom-matchers';
 import { PolicyAddMembersComponent } from './policy-add-members.component';
+
 
 
 
@@ -64,7 +65,12 @@ describe('PolicyAddMembersComponent', () => {
     });
 
     it('contains key elements', () => {
-        expect(element).toContainPath('chef-modal');
+        component.loading = false;
+        component.modalVisible = true;
+        component.sortedMembersAvailable = [];
+        fixture.detectChanges();
+        expect(element).toContainPath('chef-page');
+        // expect(thisElement).toContainPath('chef-page');
     });
 
 });
