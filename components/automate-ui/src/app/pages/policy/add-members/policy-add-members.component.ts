@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { trigger, transition, style, animate } from '@angular/animations';
+import { trigger, transition, style, animate, state, keyframes } from '@angular/animations';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -37,21 +37,19 @@ import { Regex } from 'app/helpers/auth/regex';
   templateUrl: './policy-add-members.component.html',
   styleUrls: ['./policy-add-members.component.scss'],
   animations: [
-    trigger(
-      'dropInAnimation',
-      [
-        // Note: really shouldn't be animating height. Probably look at scale
-        transition(':enter', [
-          style({height: '0%', opacity: 0}),
-          animate('.5s ease', style({ height: '100%', opacity: 1}))
-        ]),
-        transition(':leave', [
-          style({height: '100%', opacity: 1}),
-          animate('0s ease', style({opacity: 0})),
-          animate('.5s ease', style({height: '0%'}))
-        ])
-      ]
-    )
+    trigger('dropInAnimation', [
+      state('void', style({
+          'opacity': '0',
+          'transform' : 'scaleY(0)'
+        })),
+      state('open', style({
+          'opacity' : '1',
+          'transform' : 'scaleY(1)'
+      })),
+      // Would be great if could expand the modal smoothly and then fade in
+      transition('void => *', animate('.4s cubic-bezier(.8,0,.6,1)')),
+      transition('* => void', animate('.4s cubic-bezier(0,.2,.25,1)'))
+    ])
   ]
 })
 
