@@ -10,8 +10,8 @@ import (
 	"github.com/chef/automate/lib/cereal"
 )
 
-// ConfigureManager registers the purge workflow schedule and job with purge
-// task and workflow executors.
+// ConfigureManager registers the purge workflow executor and task
+// executor.
 func ConfigureManager(man *cereal.Manager, workflowName string, taskName string, opts ...TaskOpt) error {
 	task := &Task{}
 	for _, o := range opts {
