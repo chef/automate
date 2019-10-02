@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { identity } from 'lodash/fp';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
-import { combineLatest, Subject } from 'rxjs';
+import { combineLatest, Subject, Subscription } from 'rxjs';
 
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -82,6 +82,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   // Form info
   public expressionForm: FormGroup;
   public expressionOutput: string;
+  private formSubscription: Subscription;
 
 
   constructor(
@@ -156,8 +157,6 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetTeams());
     this.store.dispatch(new GetUsers());
 
-    // subscribe to expressionForm changes
-    this.subscribeToExpressionFormChanges();
   }
 
   addAvailableMember(member: Member, refresh: boolean): void {
@@ -249,12 +248,16 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   }
 
   public closeModal(): void {
+    // unsubscribe from Changes to the form
+    this.unsubscribeFromExpressionFormChanges();
     this.resetModal();
     this.modalVisible = false;
   }
 
   public openModal(): void {
     this.resetModal();
+    // subscribe to expressionForm changes
+    this.subscribeToExpressionFormChanges();
     this.modalVisible = true;
   }
 
@@ -382,13 +385,20 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     console.log(output);
 
     this.expressionOutput = output.join(':');
+
+    return;
   }
 
-  subscribeToExpressionFormChanges() {
+  subscribeToExpressionFormChanges(): void {
     // initialize stream
     const expressionValueChanges = this.expressionForm.valueChanges;
-    // subscribe to stream
-    expressionValueChanges.subscribe(formValues => this.displayExpressionOutput(formValues));
-    //  ngOnit is where subscribe happens, maybe move to modal open
+    // subscribe to form changes
+    this.formSubscription = expressionValueChanges.subscribe(formValues =>
+              this.displayExpressionOutput(formValues));
+    return;
+  }
+
+  unsubscribeFromExpressionFormChanges(): void {
+    return this.formSubscription.unsubscribe();
   }
 }
