@@ -71,4 +71,4 @@
 - [`69_add_status_to_get_project.up.sql`](69_add_status_to_get_project.up.sql)
 - [`70_fix_status_for_list_projects.up.sql`](70_fix_status_for_list_projects.up.sql)
 - [`71_sync_query_projects_with_query_project.up.sql`](71_sync_query_projects_with_query_project.up.sql)
-- [`72_create_projects_graveyard_table.up.sql`](71_create_projects_graveyard_table.up.sql)
+- [`72_create_projects_graveyard_table.up.sql`](72_create_projects_graveyard_table.up.sql)
