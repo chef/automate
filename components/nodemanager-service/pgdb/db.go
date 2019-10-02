@@ -12,12 +12,14 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/nodemanager-service/config"
+	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/db/migrator"
 	"github.com/chef/automate/lib/logger"
 )
 
 type DB struct {
 	*gorp.DbMap
+	projectUpdateJobStatus project_update_lib.JobStatus
 }
 
 type DBTrans struct {
@@ -38,6 +40,12 @@ func New(conf *config.Postgres) (*DB, error) {
 	err = runMigrations(connectionString, migrationsPath)
 	if err != nil {
 		return nil, err
+	}
+
+	db.projectUpdateJobStatus = project_update_lib.JobStatus{
+		Completed:             true,
+		PercentageComplete:    1.0,
+		EstimatedEndTimeInSec: 0,
 	}
 
 	return db, nil

@@ -32,6 +32,8 @@ import (
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/version"
 
+	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/tracing"
 )
 
@@ -228,6 +230,33 @@ func serve(ctx context.Context, config *config.Nodemanager, connFactory *securec
 		if err != nil {
 			log.WithError(err).Fatal("could not start cereal manager")
 		}
+
+		// Authz Interface
+		authzConn, err := connFactory.DialContext(timeoutCtx, "authz-service", config.Authz.Endpoint, grpc.WithBlock())
+		if err != nil {
+			// This should never happen
+			log.WithError(err).Error("Failed to create Authz connection")
+			return err
+		}
+		defer authzConn.Close() // nolint: errcheck
+
+		authzProjectsClient := iam_v2.NewProjectsClient(authzConn)
+
+		projectUpdateManager, err := createProjectUpdateCerealManager(connFactory, config.Cereal.Endpoint)
+		if err != nil {
+			return err
+		}
+
+		err = project_update_lib.RegisterTaskExecutors(projectUpdateManager, "nodemanager",
+			db, authzProjectsClient)
+		if err != nil {
+			return err
+		}
+
+		if err := projectUpdateManager.Start(context.Background()); err != nil {
+			return err
+		}
+		defer projectUpdateManager.Stop() // nolint: errcheck
 	}
 
 	_, err = managers.CreateManualNodeManager(db)
@@ -293,4 +322,20 @@ func createOrUpdateWorkflowSchedule(cerealManager *cereal.Manager, scheduleName 
 		return errors.Wrapf(err, "could not continue creating workflow schedule %s", scheduleName)
 	}
 	return nil // make the linter happy
+}
+
+func createProjectUpdateCerealManager(connFactory *secureconn.Factory, address string) (*cereal.Manager, error) {
+	conn, err := connFactory.Dial("cereal-service", address)
+	if err != nil {
+		return nil, errors.Wrap(err, "error dialing cereal service")
+	}
+
+	grpcBackend := project_update_lib.ProjectUpdateBackend(conn)
+	manager, err := cereal.NewManager(grpcBackend)
+	if err != nil {
+		grpcBackend.Close() // nolint: errcheck
+		return nil, err
+	}
+
+	return manager, nil
 }
