@@ -82,14 +82,13 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.projectsEnabled$ = store.select(atLeastV2p1);
 
     this.projects.applyRulesStatus$
+      .pipe(takeUntil(this.isDestroyed))
       .subscribe(({ state, failed, cancelled, percentageComplete }: ApplyRulesStatus) => {
-        if (state === ApplyRulesStatusState.NotRunning) {
-          if (this.applyRulesInProgress) {
-            this.cancelRulesInProgress = false;
-            this.closeConfirmApplyStopModal();
-          }
-          this.applyRulesInProgress = false;
+        if (this.applyRulesInProgress && state === ApplyRulesStatusState.NotRunning) {
+          this.cancelRulesInProgress = false;
+          this.closeConfirmApplyStopModal();
         }
+        this.applyRulesInProgress = state === ApplyRulesStatusState.Running;
         this.updateProjectsFailed = failed;
         this.updateProjectsCancelled = cancelled;
         if (!this.cancelRulesInProgress) {
