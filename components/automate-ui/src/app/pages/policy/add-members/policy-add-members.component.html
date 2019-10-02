@@ -31,8 +31,10 @@
                     <option value='*'>All members (*)</option>
                   </select>
                 </label>
-                <!-- Note: might not need the errors in this stepper setup  -->
               </chef-form-field>
+              <chef-error *ngIf="expressionForm.get('type').hasError('required') && expressionForm.get('type').touched">
+                Type is a required field.
+              </chef-error>
 
               <chef-form-field 
                 id="create-identity" 
@@ -49,8 +51,10 @@
                     <option value="*">All {{ allIdentity | titlecase }}s (*)</option>
                   </select>
                 </label>
-                <!-- Note: might not need the errors in this stepper setup  -->
               </chef-form-field>
+              <chef-error *ngIf="expressionForm.get('identity').hasError('required') && expressionForm.get('identity').touched">
+                Identity Provider is a required field.
+              </chef-error>
 
               <chef-form-field 
                 id="create-name" 
@@ -63,9 +67,9 @@
                               formControlName="name"></chef-input>
                 </label>
                 <p class="note">Wildcards (*) are allowed.</p>
-                <!-- Note: probably need errors here  -->
+
                 <chef-error *ngIf="expressionForm.get('name').hasError('required') && expressionForm.get('name').touched">
-                  Some sort of error goes here for name selection
+                  Name is a required field.
                 </chef-error>
               </chef-form-field>
 
@@ -77,7 +81,6 @@
             </chef-form-field>
           </form>
 
-          <!-- expression builder output -->
           <div *ngIf="expressionOutput">
             <p id="expression-output" class="note">Member expression: {{ expressionOutput }}</p>
           </div>
