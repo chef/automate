@@ -39,12 +39,10 @@ import { Regex } from 'app/helpers/auth/regex';
   animations: [
     trigger('dropInAnimation', [
       state('void', style({
-          'opacity': '0',
-          'transform' : 'scaleY(0)'
+          'opacity': '0'
         })),
       state('open', style({
-          'opacity' : '1',
-          'transform' : 'scaleY(1)'
+          'opacity' : '1'
       })),
       // Would be great if could expand the modal smoothly and then fade in
       transition('void => *', animate('.4s cubic-bezier(.8,0,.6,1)')),

@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 // import { of as observableOf } from 'rxjs';
 import { MockComponent } from 'ng2-mock-component';
@@ -11,6 +11,7 @@ import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { customMatchers } from 'app/testing/custom-matchers';
 import { PolicyAddMembersComponent } from './policy-add-members.component';
+import { Regex } from 'app/helpers/auth/regex';
 
 
 
@@ -56,6 +57,11 @@ describe('PolicyAddMembersComponent', () => {
         jasmine.addMatchers(customMatchers);
         fixture = TestBed.createComponent(PolicyAddMembersComponent);
         component = fixture.componentInstance;
+        component.createForm = new FormBuilder().group({
+            type: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+            identity: [''],
+            name: ['']
+        })
         element = fixture.debugElement.nativeElement;
         fixture.detectChanges();
     });
@@ -69,8 +75,8 @@ describe('PolicyAddMembersComponent', () => {
         component.modalVisible = true;
         component.sortedMembersAvailable = [];
         fixture.detectChanges();
+        // expect(element).toContainPath('chef-modal');
         expect(element).toContainPath('chef-page');
-        // expect(thisElement).toContainPath('chef-page');
     });
 
 });
