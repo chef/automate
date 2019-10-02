@@ -31,16 +31,15 @@
                     <option value='*'>All members (*)</option>
                   </select>
                 </label>
+                <chef-error *ngIf="expressionForm.get('type').hasError('required') && expressionForm.get('type').touched">
+                  Type is a required field.
+                </chef-error>
               </chef-form-field>
-              <chef-error *ngIf="expressionForm.get('type').hasError('required') && expressionForm.get('type').touched">
-                Type is a required field.
-              </chef-error>
 
               <chef-form-field 
                 id="create-identity" 
                 *ngIf="showInputs('identity')"
-                [@dropInAnimation]="{ value: triggerValue, params: { height: 74.6875 }}" 
-                >
+                [@dropInAnimation]="{ value: triggerValue, params: { height: 74.6875 }}" >
                 <label>
                   <span class="label">Identity Provider<span aria-hidden="true">*</span></span>
                   <select id="expression-identity-dropdown" 
@@ -52,10 +51,10 @@
                     <option value="*">All {{ allIdentity | titlecase }}s (*)</option>
                   </select>
                 </label>
+                <chef-error *ngIf="expressionForm.get('identity').hasError('required') && expressionForm.get('identity').touched">
+                  Identity Provider is a required field.
+                </chef-error>
               </chef-form-field>
-              <chef-error *ngIf="expressionForm.get('identity').hasError('required') && expressionForm.get('identity').touched">
-                Identity Provider is a required field.
-              </chef-error>
 
               <chef-form-field 
                 id="create-name" 
