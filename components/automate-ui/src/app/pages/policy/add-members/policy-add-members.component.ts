@@ -373,8 +373,6 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
       : updateInput.clearValidators();
 
       updateInput.updateValueAndValidity();
-
-      return;
     }
 
 
@@ -391,8 +389,6 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     });
 
     this.expressionOutput = output.join(':');
-
-    return;
   }
 
   private subscribeToExpressionFormChanges(): void {
@@ -401,10 +397,9 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     // subscribe to form changes
     this.formSubscription = expressionValueChanges.subscribe(formValues =>
               this.displayExpressionOutput(formValues));
-    return;
   }
 
   private unsubscribeFromExpressionFormChanges(): void {
-    return this.formSubscription.unsubscribe();
+    this.formSubscription.unsubscribe();
   }
 }
