@@ -158,6 +158,18 @@ func (g *Gatherer) AddURL(name, url string) {
 	})
 }
 
+func (g *Gatherer) AddTail(srcPath string, maxLines uint64) {
+	if maxLines == 0 {
+		g.AddCopy(srcPath)
+		return
+	}
+	g.addOperation(&Tail{
+		SrcPath:  srcPath,
+		DestPath: path.Join(g.targetDir, srcPath),
+		Lines:    maxLines,
+	})
+}
+
 // AddCopy adds a copy operation for a given path
 func (g *Gatherer) AddCopy(srcPath string) {
 	g.addOperation(&Copy{

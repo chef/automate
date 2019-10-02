@@ -65,6 +65,7 @@ func (s *server) GatherLogs(ctx context.Context, req *api.GatherLogsRequest,
 	if req.LogLines > 0 {
 		logLinesStr := strconv.FormatUint(req.LogLines, 10)
 		g.AddCommand("journalctl_chef-automate", "journalctl", "--utc", "-u", "chef-automate", "-n", logLinesStr)
+
 	} else {
 		g.AddCommand("journalctl_chef-automate", "journalctl", "--utc", "-u", "chef-automate")
 	}
@@ -103,8 +104,8 @@ func (s *server) GatherLogs(ctx context.Context, req *api.GatherLogsRequest,
 	g.AddCopy("/etc/resolv.conf")
 	g.AddCopy("/etc/hosts")
 	g.AddCopy("/proc/sys/crypto/fips_enabled")
-	g.AddCopiesFromPath("syslog", "/var/log")
-	g.AddCopiesFromPath("messages", "/var/log")
+	g.AddTail("/var/log/syslog", req.GetLogLines())
+	g.AddTail("/var/log/messages", req.GetLogLines())
 	// Distro version/release of the underlying operating system.
 	// If a distro uses systemd, it provides distro information in
 	// /etc/os-release
@@ -140,7 +141,7 @@ func (s *server) GatherLogs(ctx context.Context, req *api.GatherLogsRequest,
 
 	// Elasticsearch
 	// FIXME: Move this to using config.
-	elasticsearchURL := "http://localhost:10141"
+	elasticsearchURL := "http://localhost:10144"
 	g.AddURL("elasticsearch_cat_health", elasticsearchURL+"/_cat/health?v")
 	g.AddURL("elasticsearch_cluster_health", elasticsearchURL+"/_cluster/health?human&pretty")
 	g.AddURL("elasticsearch_cluster_pending_tasks", elasticsearchURL+"/_cluster/pending_tasks?human&pretty")

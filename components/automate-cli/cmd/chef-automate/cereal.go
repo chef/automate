@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/chef/automate/lib/cereal/backend"
 	"github.com/chef/automate/lib/cereal/postgres"
@@ -93,6 +94,13 @@ func newCerealCmd() *cobra.Command {
 	}
 	schedulesCmd.AddCommand(listSchedulesCmd)
 
+	triggerScheduleCmd := &cobra.Command{
+		Use:   "trigger workflow_name instance_name",
+		Short: "trigger the schedules",
+		RunE:  runCerealTriggerSchedule,
+	}
+	schedulesCmd.AddCommand(triggerScheduleCmd)
+
 	return cerealCmd
 }
 
@@ -173,5 +181,30 @@ func runCerealListSchedules(cmd *cobra.Command, args []string) error {
 		fmt.Printf("%13s: %s\n", "Last Enqueued", s.LastEnqueuedAt.String())
 		fmt.Println("-----------------------------------")
 	}
+	return nil
+}
+
+func runCerealTriggerSchedule(cmd *cobra.Command, args []string) error {
+	b := getCerealBackend()
+	if err := b.Init(); err != nil {
+		return err
+	}
+	workflowName := args[0]
+	instanceName := args[1]
+
+	sched, err := b.GetWorkflowScheduleByName(context.Background(), instanceName, workflowName)
+	if err != nil {
+		return err
+	}
+
+	err = b.UpdateWorkflowScheduleByName(context.Background(), instanceName, workflowName, backend.WorkflowScheduleUpdateOpts{
+		UpdateRecurrence: true,
+		Recurrence:       sched.Recurrence,
+		NextRunAt:        time.Now(),
+	})
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
