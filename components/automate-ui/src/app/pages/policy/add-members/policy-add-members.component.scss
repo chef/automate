@@ -17,11 +17,15 @@ chef-page {
         padding-bottom: 1em;
         transform-origin: top;
 
+        &#create-type {
+          height: 75px;
+        }
+
         select,
         chef-input {
           width: 100%;
         }
-  
+
         .label {
           font-weight: normal;
           font-size: 14px;

@@ -44,7 +44,7 @@ import { Regex } from 'app/helpers/auth/regex';
         style({opacity: 0, height: '{{height}}px', offset: 0.3}),
         style({opacity: 1, height: '{{height}}px', offset: 1})
       ]))),
-      transition('* => void', animate(300, keyframes([
+      transition('* => void', animate(250, keyframes([
         style({ opacity: 1, height: '{{height}}px', offset: 0 }),
         style({ opacity: 0, height: '{{height}}px', offset: 0.3 }),
         style({ opacity: 0, height: '0px', offset: 1 })
