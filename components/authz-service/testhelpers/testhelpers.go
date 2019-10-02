@@ -218,7 +218,8 @@ func (d *TestDB) Flush(t *testing.T) {
 	_, err := d.Exec(`DELETE FROM iam_policies CASCADE;
 		DELETE FROM iam_members CASCADE;
 		DELETE FROM iam_roles CASCADE;
-		DELETE FROM iam_projects CASCADE;`)
+		DELETE FROM iam_projects CASCADE;
+		DELETE FROM iam_projects_graveyard CASCADE;`)
 	require.NoError(t, err)
 }
 

@@ -1580,11 +1580,8 @@ func (p *pg) DeleteProject(ctx context.Context, id string) error {
 }
 
 func (p *pg) RemoveProjectFromGraveyard(ctx context.Context, id string) error {
-	// TODO remove
-	p.logger.Warnf("IN POSTGRES REMOVING ID %q", id)
 	_, err := p.db.ExecContext(ctx, `DELETE FROM iam_projects_graveyard WHERE id=$1;`, id)
 	if err != nil {
-		p.logger.Warnf("IN POSTGRES REMOVING ID HAS ERROR %q", err.Error())
 		return p.processError(err)
 	}
 

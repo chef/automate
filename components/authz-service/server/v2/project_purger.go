@@ -197,16 +197,12 @@ func NewMoveProjectToGraveyardWorkflowExecutor() *MoveProjectToGraveyardWorkflow
 }
 
 func (s *MoveProjectToGraveyardWorkflowExecutor) OnStart(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
-	// TODO remove
-
 	var params MoveProjectToGraveyardWorkflowExecutorParams
 	err := w.GetParameters(&params)
 	if err != nil {
 		logrus.WithError(err).Error("failed to get move to graveyard parameters")
 		return w.Fail(err)
 	}
-
-	logrus.Warnf("STARTING MOVE PROJECT TO GRAVEYARD WITH ID %q", params.ProjectID)
 
 	if err := w.EnqueueTask(StartDeleteProjectFromGraveyardTaskName, MoveProjectToGraveyardParams{ProjectID: params.ProjectID}); err != nil {
 		logrus.WithError(err).Errorf("failed to enqueue move to graveyard task %s", StartDeleteProjectFromGraveyardTaskName)
@@ -230,7 +226,7 @@ func (s *MoveProjectToGraveyardWorkflowExecutor) OnTaskComplete(w cereal.Workflo
 	switch ev.TaskName {
 	case StartDeleteProjectFromGraveyardTaskName:
 		if errToLog := ev.Result.Err(); errToLog != nil {
-			// TODO Log errToLog
+			logrus.WithError(errToLog).Error("failed to move project to graveyard, retrying")
 			payload.ConsecutiveJobCheckFailures++
 			if err := w.EnqueueTask(
 				StartDeleteProjectFromGraveyardTaskName, MoveProjectToGraveyardParams{ProjectID: params.ProjectID},

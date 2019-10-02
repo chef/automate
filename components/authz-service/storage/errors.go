@@ -36,7 +36,7 @@ var (
 	ErrChangeTypeForRule = errors.New("cannot change rule type")
 
 	// ErrProjectInGraveyard indicates that an attempt was made to create a project with
-	// and ID that is currently in ima_project_graveyard
+	// and ID that is currently in iam_project_graveyard
 	ErrProjectInGraveyard = errors.New("cannot create project with ID that is currently being deleted")
 )
 
