@@ -10,3 +10,4 @@
 - [`08_update_v2_projects.up.sql`](08_update_v2_projects.up.sql)
 - [`09_update_project_admin.up.sql`](09_update_project_admin.up.sql)
 - [`10_add_owner_role_to_admin_pol.up.sql`](10_add_owner_role_to_admin_pol.up.sql)
+- [`11_remove_iam-members-viewer_role.up.sql`](11_remove_iam-members-viewer_role.up.sql)

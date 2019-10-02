@@ -7,10 +7,10 @@ import { identity } from 'lodash/fp';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { combineLatest, Subject } from 'rxjs';
 
+import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
 import { EntityStatus } from 'app/entities/entities';
-
 import {
   GetPolicy, AddPolicyMembers, PolicyMembersMgmtPayload
 } from 'app/entities/policies/policy.actions';
@@ -252,16 +252,9 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   }
 
   membersMapAvailableToSortedToArray(): Member[] {
-    return Object.values(this.membersAvailableMap)
-      .sort(
-        (a, b) => {
-          // See https://stackoverflow.com/a/38641281 for these options
-          const opts = { numeric: true, sensitivity: 'base' };
-          // sort by displayName then by name
-          return a.displayName.localeCompare(b.displayName, undefined, opts) ||
-            a.displayName.localeCompare(b.displayName, undefined, { numeric: true }) ||
-            a.name.localeCompare(b.name, undefined, opts);
-        });
+    const membersAvailable = Object.values(this.membersAvailableMap);
+    // sort by displayName then by name
+    return ChefSorters.naturalSort(membersAvailable, ['displayName', 'name']);
   }
 
   membersToAddValues(): Member[] {

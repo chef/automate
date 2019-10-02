@@ -94,19 +94,6 @@ describe('projectsFilterReducer', () => {
         expect(map('value', options))
           .toEqual(['a-proj1', 'a-proj2', 'a-proj10']);
       });
-
-      it('sorts first by case-independence then with lowercase before uppercase', () => {
-        const action = genAction(
-          genProject('a-proj'),
-          genProject('b-proj'),
-          genProject('A-proj')
-        );
-
-        const { options } = projectsFilterReducer(initialState, action);
-
-        expect(map('value', options))
-          .toEqual(['a-proj', 'A-proj', 'b-proj']);
-      });
     });
 
     describe('merging fetched and stored options', () => {

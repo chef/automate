@@ -19,8 +19,7 @@ control 'iam-v2-projects-1' do
     "editor",
     "viewer",
     "ingest",
-    "project-owner",
-    "iam-members-viewer"
+    "project-owner"
   ]
 
   CUSTOM_ROLE_1 = {

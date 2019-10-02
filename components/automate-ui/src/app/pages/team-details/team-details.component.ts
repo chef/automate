@@ -6,6 +6,7 @@ import { isEmpty, identity, keyBy, at, xor } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 
+import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams, routeURL } from 'app/route.selectors';
 import { EntityStatus, loading } from 'app/entities/entities';
@@ -192,16 +193,8 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
             return at(teamUserIds, keyBy('membership_id', users))
               .filter(userRecord => userRecord !== undefined);
         })).subscribe((users: User[]) => {
-          users.sort(
-            (a, b) => {
-              // See https://stackoverflow.com/a/38641281 for these options
-              const opts = { numeric: true, sensitivity: 'base' };
-              // sort by name then by id
-              return a.name.localeCompare(b.name, undefined, opts) ||
-                a.name.localeCompare(b.name, undefined, { numeric: true }) ||
-                a.id.localeCompare(b.id, undefined, opts);
-            });
-          this.users = users;
+          // Sort naturally first by name, then by id
+          this.users = ChefSorters.naturalSort(users, ['name', 'id']);
         });
 
     // If, however, the user browses directly to /settings/teams/ID, the store

@@ -1,6 +1,7 @@
 import { set, pipe, find } from 'lodash/fp';
 
 import { EntityStatus } from 'app/entities/entities';
+import { ChefSorters } from 'app/helpers/auth/sorter';
 import { ProjectConstants } from 'app/entities/projects/project.model';
 import {
   ProjectsFilterActions,
@@ -173,13 +174,8 @@ function mergeOptions(
 
 function sortOptions(options: ProjectsFilterOption[]): ProjectsFilterOption[] {
   // Sort all except unassigned, which should always be last
-  const sorted = options
-    .filter(o => o.value !== UNASSIGNED_PROJECT_ID)
-    .sort((a, b) => {
-      const opts = { numeric: true, sensitivity: 'base' };
-      return a.label.localeCompare(b.label, undefined, opts)
-        || a.label.localeCompare(b.label, undefined, { numeric: true });
-    });
+  const sorted = options.filter(o => o.value !== UNASSIGNED_PROJECT_ID);
+  ChefSorters.naturalSort(sorted, 'label');
 
   const unassignedProject = find(['value', UNASSIGNED_PROJECT_ID], options);
   if (unassignedProject) {

@@ -5,6 +5,7 @@ import { Observable, Subject } from 'rxjs';
 import { map, filter, takeUntil } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 
+import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { loading, EntityStatus } from 'app/entities/entities';
 import { iamMajorVersion, atLeastV2p1 } from 'app/entities/policies/policy.selectors';
@@ -50,17 +51,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
     ) {
     this.loading$ = store.select(getAllStatus).pipe(map(loading));
     this.sortedTeams$ = store.select(allTeams).pipe(
-      map((teams: Team[]) => teams.sort(
-        (a, b) => {
-          // See https://stackoverflow.com/a/38641281 for these options
-          const opts = { numeric: true, sensitivity: 'base' };
-          // TODO: still need to observe case for v1; not needed for v2; simplify when v1 removed.
-          // Sort by name then by cased-name, since no other field is useful as a secondary sort;
-          // this ensures stable sort with respect to case, so 'a' always comes before 'A'.
-          return a.id.localeCompare(b.id, undefined, opts)
-          || a.id.localeCompare(b.id, undefined, {numeric: true});
-        }
-      )),
+      map((teams: Team[]) => ChefSorters.naturalSort(teams, 'id')),
       takeUntil(this.isDestroyed));
     this.projectsEnabled$ = store.select(atLeastV2p1);
     this.createTeamForm = fb.group({

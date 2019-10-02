@@ -10,19 +10,21 @@ import (
 	"github.com/chef/automate/lib/cereal"
 )
 
-// ConfigureManager registers the purge workflow schedule and job with purge
-// task and workflow executors.
-func ConfigureManager(man *cereal.Manager, scheduleName string, jobName string, opts ...TaskOpt) error {
+const taskName = "purge"
+
+// ConfigureManager registers the purge workflow executor and task
+// executor.
+func ConfigureManager(man *cereal.Manager, workflowName string, opts ...TaskOpt) error {
 	task := &Task{}
 	for _, o := range opts {
 		o(task)
 	}
 
-	err := man.RegisterTaskExecutor(jobName, task, cereal.TaskExecutorOpts{})
+	err := man.RegisterTaskExecutor(taskName, task, cereal.TaskExecutorOpts{})
 	if err != nil {
 		return err
 	}
-	err = man.RegisterWorkflowExecutor(scheduleName, &Workflow{})
+	err = man.RegisterWorkflowExecutor(workflowName, &Workflow{})
 	if err != nil {
 		return err
 	}
@@ -37,7 +39,7 @@ func CreateOrUpdatePurgeWorkflow(
 	ctx context.Context,
 	man *cereal.Manager,
 	scheduleName string,
-	jobName string,
+	workflowName string,
 	defaultPolicies *Policies,
 	enabled bool,
 	recurrence *rrule.RRule) error {
@@ -45,14 +47,14 @@ func CreateOrUpdatePurgeWorkflow(
 	err := man.CreateWorkflowSchedule(
 		ctx,
 		scheduleName,
-		jobName,
+		workflowName,
 		defaultPolicies,
 		true,
 		recurrence,
 	)
 
 	if err == cereal.ErrWorkflowScheduleExists {
-		sched, err := man.GetWorkflowScheduleByName(ctx, scheduleName, jobName)
+		sched, err := man.GetWorkflowScheduleByName(ctx, scheduleName, workflowName)
 		if err != nil {
 			return errors.Wrap(err, "failed to get purge schedule from job manager")
 		}
@@ -91,7 +93,7 @@ func CreateOrUpdatePurgeWorkflow(
 		err = man.UpdateWorkflowScheduleByName(
 			context.Background(),
 			scheduleName,
-			jobName,
+			workflowName,
 			cereal.UpdateParameters(currentPolicies),
 		)
 		if err != nil {
@@ -121,11 +123,9 @@ func (s *Workflow) OnStart(w cereal.WorkflowInstance, _ cereal.StartEvent) cerea
 		return w.Fail(err)
 	}
 
-	for _, policy := range policies.Es {
-		err = w.EnqueueTask(policy.Name, policy)
-		if err != nil {
-			w.Fail(err)
-		}
+	err = w.EnqueueTask(taskName, policies)
+	if err != nil {
+		w.Fail(err)
 	}
 
 	return w.Continue(nil)

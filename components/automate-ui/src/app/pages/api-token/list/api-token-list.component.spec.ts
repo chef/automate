@@ -1,13 +1,11 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { StoreModule, Store } from '@ngrx/store';
+import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { apiTokenEntityReducer } from 'app/entities/api-tokens/api-token.reducer';
-import { GetAllTokensSuccess } from 'app/entities/api-tokens/api-token.actions';
 import { ApiTokenListComponent } from './api-token-list.component';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import { projectsFilterReducer } from 'app/services/projects-filter/projects-filter.reducer';
@@ -91,68 +89,5 @@ describe('ApiTokenListComponent', () => {
       expect(component.createTokenForm.controls.id.value).toBe(null);
       expect(component.createTokenForm.controls.projects.value).toBe(null);
     });
-  });
-
-  describe('sortedApiTokens$', () => {
-    const base = { value: 'random', active: true, created_at: '', updated_at: '', projects: [] };
-    let store: Store<NgrxStateAtom>;
-    beforeEach(() => {
-      store = TestBed.get(Store);
-    });
-
-    it('intermixes capitals and lowercase with lowercase first', () => {
-      store.dispatch(new GetAllTokensSuccess({
-        tokens: [
-          { ...base, id: 'uuid-1', name: 'Viewer' },
-          { ...base, id: 'uuid-2', name: 'developer' },
-          { ...base, id: 'uuid-3', name: 'Developer' },
-          { ...base, id: 'uuid-4', name: 'viewer' }
-        ]
-      }));
-      component.sortedApiTokens$.subscribe(tokens => {
-        expect(tokens.length).toBe(4);
-        expect(tokens[0]).toEqual(jasmine.objectContaining({ name: 'developer' }));
-        expect(tokens[1]).toEqual(jasmine.objectContaining({ name: 'Developer' }));
-        expect(tokens[2]).toEqual(jasmine.objectContaining({ name: 'viewer' }));
-        expect(tokens[3]).toEqual(jasmine.objectContaining({ name: 'Viewer' }));
-      });
-    });
-
-    it('sorts by whole string before case', () => {
-      store.dispatch(new GetAllTokensSuccess({
-        tokens: [
-          { ...base, id: 'uuid-2', name: 'developer' },
-          { ...base, id: 'uuid-4', name: 'developer-Manager' },
-          { ...base, id: 'uuid-5', name: 'Developer' }
-        ]
-      }));
-      component.sortedApiTokens$.subscribe(tokens => {
-        expect(tokens.length).toBe(3);
-        expect(tokens[0]).toEqual(jasmine.objectContaining({ name: 'developer' }));
-        expect(tokens[1]).toEqual(jasmine.objectContaining({ name: 'Developer' }));
-        expect(tokens[2]).toEqual(jasmine.objectContaining({ name: 'developer-Manager' }));
-      });
-    });
-
-    it('uses natural ordering', () => {
-      store.dispatch(new GetAllTokensSuccess({
-        tokens: [
-          { ...base, id: 'uuid-1', name: 'Viewer01' },
-          { ...base, id: 'uuid-2', name: 'Viewer300' },
-          { ...base, id: 'uuid-3', name: 'Viewer3' },
-          { ...base, id: 'uuid-4', name: 'Viewer-2' },
-          { ...base, id: 'uuid-6', name: 'viewer' }
-        ]
-      }));
-      component.sortedApiTokens$.subscribe(tokens => {
-        expect(tokens.length).toBe(5);
-        expect(tokens[0]).toEqual(jasmine.objectContaining({ name: 'viewer' }));
-        expect(tokens[1]).toEqual(jasmine.objectContaining({ name: 'Viewer-2' }));
-        expect(tokens[2]).toEqual(jasmine.objectContaining({ name: 'Viewer01' }));
-        expect(tokens[3]).toEqual(jasmine.objectContaining({ name: 'Viewer3' }));
-        expect(tokens[4]).toEqual(jasmine.objectContaining({ name: 'Viewer300' }));
-      });
-    });
-
   });
 });
