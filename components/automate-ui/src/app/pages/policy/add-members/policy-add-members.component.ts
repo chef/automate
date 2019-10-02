@@ -364,7 +364,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     }
   }
 
-  updateValidations(inputName: string, active: boolean): void {
+  private updateValidations(inputName: string, active: boolean): void {
     const updateInput = this.expressionForm.get(inputName);
 
     active === true
@@ -378,7 +378,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     }
 
 
-  displayExpressionOutput(formValues: object): void {
+  private displayExpressionOutput(formValues: object): void {
     const entries = Object.entries(formValues);
     const output = [];
 
@@ -395,7 +395,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     return;
   }
 
-  subscribeToExpressionFormChanges(): void {
+  private subscribeToExpressionFormChanges(): void {
     // initialize stream
     const expressionValueChanges = this.expressionForm.valueChanges;
     // subscribe to form changes
@@ -404,7 +404,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     return;
   }
 
-  unsubscribeFromExpressionFormChanges(): void {
+  private unsubscribeFromExpressionFormChanges(): void {
     return this.formSubscription.unsubscribe();
   }
 }
