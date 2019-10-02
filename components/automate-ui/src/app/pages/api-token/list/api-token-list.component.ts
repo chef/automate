@@ -5,6 +5,7 @@ import { Observable, Subject } from 'rxjs';
 import { filter, takeUntil, map } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 
+import { DateTime } from 'app/helpers/datetime/datetime';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { HttpStatus } from 'app/types/types';
@@ -47,6 +48,7 @@ export class ApiTokenListComponent implements OnInit {
   public projectsEnabled$: Observable<boolean>;
   public dropdownProjects: Project[] = [];
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
+  public readonly RFC2822 = DateTime.RFC2822;
 
   constructor(
     private store: Store<NgrxStateAtom>,

@@ -4,6 +4,7 @@ import { Store, StoreModule } from '@ngrx/store';
 import * as moment from 'moment';
 import { MockComponent } from 'ng2-mock-component';
 import { using } from 'app/testing/spec-helpers';
+import { DateTime } from 'app/helpers/datetime/datetime';
 import { HttpStatus } from 'app/types/types';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
@@ -63,8 +64,7 @@ describe('LicenseApplyComponent', () => {
       expect(component.permissionDenied).toBeFalsy();
       expect(component.applyLicenseInternalError).toBeFalsy();
       expect(component.badRequestReason).toBe('');
-      expect(component.expirationDate).toEqual(futureDate
-                                      .format('ddd, DD MMM YYYY HH:mm:ss [UTC]'));
+      expect(component.expirationDate).toEqual(futureDate.format(DateTime.RFC2822));
     });
 
     it('reflects permission denied', () => {

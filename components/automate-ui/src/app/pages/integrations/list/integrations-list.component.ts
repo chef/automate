@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 
+import { DateTime } from '../../../helpers/datetime/datetime';
 import { NgrxStateAtom } from '../../../ngrx.reducers';
 import { EntityStatus } from '../../../entities/entities';
 import { Manager } from '../../../entities/managers/manager.model';
@@ -23,6 +24,8 @@ export class IntegrationsListComponent {
   public automateManager$: Observable<Manager>;
   private sort: string;
   private order: string;
+
+  public readonly RFC2822 = DateTime.RFC2822;
 
   constructor(
     private store: Store<NgrxStateAtom>,

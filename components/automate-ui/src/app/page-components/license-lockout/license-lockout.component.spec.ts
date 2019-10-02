@@ -5,6 +5,7 @@ import { MockComponent } from 'ng2-mock-component';
 import * as moment from 'moment';
 import { of as observableOf } from 'rxjs';
 
+import { DateTime } from 'app/helpers/datetime/datetime';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { SessionStorageService } from 'app/services/storage/sessionstorage.service';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
@@ -70,7 +71,7 @@ describe('LicenseLockoutComponent', () => {
       expect(component.fetchStatusInternalError).toBeFalsy();
       // Note using moment formatting so this unit test will still pass outside the US!
       expect(component.expirationDate).toEqual(futureDate
-                                      .format('ddd, DD MMM YYYY HH:mm:ss [UTC]'));
+                                      .format(DateTime.RFC2822));
     });
 
     // this test is failing in wallaby with "Expression has changed after it was checked"
