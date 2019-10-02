@@ -386,7 +386,6 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
         return output.push(value.toLowerCase());
       }
     });
-    console.log(output);
 
     this.expressionOutput = output.join(':');
 
