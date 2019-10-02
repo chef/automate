@@ -2,16 +2,13 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
-// import { of as observableOf } from 'rxjs';
 import { MockComponent } from 'ng2-mock-component';
 
-// import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
-
+import { Regex } from 'app/helpers/auth/regex';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { customMatchers } from 'app/testing/custom-matchers';
+import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import { PolicyAddMembersComponent } from './policy-add-members.component';
-import { Regex } from 'app/helpers/auth/regex';
 
 
 
