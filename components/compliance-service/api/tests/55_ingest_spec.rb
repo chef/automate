@@ -104,7 +104,8 @@ describe File.basename(__FILE__) do
           "name": "My cc_pg Docker Node #{rand1000}",
           "platform": {
             "name": "debian",
-            "release": "9.7"
+            "release": "9.7",
+            "full": "debian 9.7"
           },
           "environment": "trouble",
           "latestReport": {
@@ -127,7 +128,8 @@ describe File.basename(__FILE__) do
               "id": "a9e6a3c330193aa1396939ae1ec277024f4e7df5337852616fc5bc0bdc746a84",
               "name": "ssl-baseline",
               "status": "passed",
-              "version": "1.4.0"
+              "version": "1.4.0",
+              "full": "DevSec SSL/TLS Baseline, v1.4.0"
             }
           ]
         }
