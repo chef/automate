@@ -37,7 +37,7 @@
               <chef-form-field 
                 id="create-identity" 
                 *ngIf="showInputs('identity')"
-                [@dropInAnimation]>
+                [@dropInAnimation]="{ value: triggerValue, params: {height: 75}}" >
                 <label>
                   <span class="label">Identity Provider<span aria-hidden="true">*</span></span>
                   <select id="expression-identity-dropdown" 
@@ -55,7 +55,7 @@
               <chef-form-field 
                 id="create-name" 
                 *ngIf="showInputs('name')"
-                [@dropInAnimation]>
+                [@dropInAnimation]="{ value: triggerValue, params: {height: 118}}">
                 <label>
                   <span class="label">Name<span aria-hidden="true">*</span></span>
                   <chef-input id="expression-name-dropdown" 
