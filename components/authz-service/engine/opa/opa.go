@@ -39,9 +39,9 @@ const (
 	authzQuery              = "data.authz.authorized"
 	filteredPairsQuery      = "data.authz.introspection.authorized_pair[_]"
 	authzV2Query            = "data.authz_v2.authorized"
-	authzProjectsV2Query    = "data.authz_v2.authorized_project"
+	authzProjectsV2Query    = "data.authz_v2.authorized_project[x]"
 	filteredPairsV2Query    = "data.authz_v2.introspection.authorized_pair[_]"
-	filteredProjectsV2Query = "data.authz_v2.introspection.authorized_project"
+	filteredProjectsV2Query = "data.authz_v2.introspection.authorized_project[x]"
 )
 
 // OptFunc is the type of functional options to be passed to New()
@@ -187,6 +187,7 @@ func (s *State) initPartialResultV2p1(ctx context.Context) error {
 		rego.ParsedQuery(s.queries[authzProjectsV2Query]),
 		rego.Compiler(compiler),
 		rego.Store(s.v2p1Store),
+		rego.DisableInlining([]string{"data.authz_v2.denied_project"}),
 	)
 	v2PartialProjects, err := r.PartialResult(ctx)
 	if err != nil {
@@ -243,6 +244,8 @@ func (s *State) IsAuthorized(
 	action engine.Action,
 	resource engine.Resource) (bool, error) {
 
+	s.log.Warnf("IsAuthorized start")
+
 	subs := make(ast.Array, len(subjects))
 	for i, sub := range subjects {
 		subs[i] = ast.NewTerm(ast.String(sub))
@@ -256,6 +259,8 @@ func (s *State) IsAuthorized(
 	if err != nil {
 		return false, &EvaluationError{e: err}
 	}
+
+	s.log.Warnf("IsAuthorized end")
 
 	switch len(resultSet) {
 	case 0:
@@ -280,6 +285,8 @@ func (s *State) V2IsAuthorized(
 	action engine.Action,
 	resource engine.Resource) (bool, error) {
 
+	s.log.Warnf("V2IsAuthorized start")
+
 	subs := make(ast.Array, len(subjects))
 	for i, sub := range subjects {
 		subs[i] = ast.NewTerm(ast.String(sub))
@@ -293,6 +300,8 @@ func (s *State) V2IsAuthorized(
 	if err != nil {
 		return false, &EvaluationError{e: err}
 	}
+
+	s.log.Warnf("V2IsAuthorized end")
 
 	switch len(resultSet) {
 	case 0:
@@ -318,6 +327,10 @@ func (s *State) V2ProjectsAuthorized(
 	action engine.Action,
 	resource engine.Resource,
 	projects engine.Projects) ([]string, error) {
+
+	s.log.Warnf("V2ProjectsAuthorized start")
+	s.log.Warnf("projects: %s", projects)
+
 	subs := make(ast.Array, len(subjects))
 	for i, sub := range subjects {
 		subs[i] = ast.NewTerm(ast.String(sub))
@@ -337,6 +350,8 @@ func (s *State) V2ProjectsAuthorized(
 		return []string{}, &EvaluationError{e: err}
 	}
 
+	s.log.Warnf("V2ProjectsAuthorized end")
+
 	return s.projectsFromResults(resultSet)
 }
 
@@ -346,6 +361,8 @@ func (s *State) FilterAuthorizedPairs(
 	ctx context.Context,
 	subjects engine.Subjects,
 	pairs []engine.Pair) ([]engine.Pair, error) {
+
+	s.log.Warnf("FilterAuthorizedPairs start")
 
 	opaInput := map[string]interface{}{
 		"subjects": subjects,
@@ -358,6 +375,8 @@ func (s *State) FilterAuthorizedPairs(
 		return nil, &EvaluationError{e: err}
 	}
 
+	s.log.Warnf("FilterAuthorizedPairs end")
+
 	return s.pairsFromResults(rs)
 }
 
@@ -369,6 +388,8 @@ func (s *State) V2FilterAuthorizedPairs(
 	pairs []engine.Pair,
 	isBeta2p1 bool,
 ) ([]engine.Pair, error) {
+
+	s.log.Warnf("V2FilterAuthorizedPairs start")
 
 	opaInput := map[string]interface{}{
 		"subjects": subjects,
@@ -385,6 +406,8 @@ func (s *State) V2FilterAuthorizedPairs(
 		return nil, &EvaluationError{e: err}
 	}
 
+	s.log.Warnf("V2FilterAuthorizedPairs end")
+
 	return s.pairsFromResults(rs)
 }
 
@@ -393,6 +416,8 @@ func (s *State) V2FilterAuthorizedPairs(
 // and returns the projects associated with the resulting (sub)list.
 func (s *State) V2FilterAuthorizedProjects(
 	ctx context.Context, subjects engine.Subjects) ([]string, error) {
+
+	s.log.Warnf("V2FilterAuthorizedProjects start")
 
 	opaInput := map[string]interface{}{
 		"subjects": subjects,
@@ -403,6 +428,8 @@ func (s *State) V2FilterAuthorizedProjects(
 	if err != nil {
 		return nil, &EvaluationError{e: err}
 	}
+
+	s.log.Warnf("V2FilterAuthorizedProjects end")
 
 	return s.projectsFromResults(rs)
 }
@@ -461,34 +488,15 @@ func (s *State) pairsFromResults(rs rego.ResultSet) ([]engine.Pair, error) {
 }
 
 func (s *State) projectsFromResults(rs rego.ResultSet) ([]string, error) {
-	if len(rs) != 1 {
-		return nil, &UnexpectedResultSetError{set: rs}
-	}
-	r := rs[0]
-	if len(r.Expressions) != 1 {
-		return nil, &UnexpectedResultExpressionError{exps: r.Expressions}
-	}
-	projects, err := s.stringArrayFromResults(r.Expressions)
-	if err != nil {
-		return nil, &UnexpectedResultExpressionError{exps: r.Expressions}
-	}
-	return projects, nil
-}
-
-func (s *State) stringArrayFromResults(exps []*rego.ExpressionValue) ([]string, error) {
-	rawArray, ok := exps[0].Value.([]interface{})
-	if !ok {
-		return nil, &UnexpectedResultExpressionError{exps: exps}
-	}
-	vals := make([]string, len(rawArray))
-	for i := range rawArray {
-		v, ok := rawArray[i].(string)
+	result := make([]string, len(rs))
+	for i := range rs {
+		var ok bool
+		result[i], ok = rs[i].Bindings["x"].(string)
 		if !ok {
-			return nil, errors.New("error casting to string")
+			return nil, &UnexpectedResultExpressionError{exps: rs[i].Expressions}
 		}
-		vals[i] = v
 	}
-	return vals, nil
+	return result, nil
 }
 
 // SetPolicies replaces OPA's data with a new set of policies, and resets the
