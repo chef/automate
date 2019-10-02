@@ -86,7 +86,7 @@ func ToChainWorkflowParameters(parameters []interface{}) (ChainWorkflowParams, e
 	return params, nil
 }
 
-func EnqueueChainWorkflow(ctx context.Context, m *cereal.Manager, workflowName string, instanceName string, parameters []interface{}) error {
+func EnqueueChainWorkflow(ctx context.Context, m *cereal.Manager, workflowName cereal.WorkflowName, instanceName string, parameters []interface{}) error {
 	params, err := ToChainWorkflowParameters(parameters)
 	if err != nil {
 		return err
@@ -123,7 +123,7 @@ func ToChainWorkflowInstance(instance cereal.ImmutableWorkflowInstance) (*ChainW
 	return &chainInstance, nil
 }
 
-func GetChainWorkflowInstance(ctx context.Context, m *cereal.Manager, workflowName string, instanceName string) (*ChainWorkflowInstance, error) {
+func GetChainWorkflowInstance(ctx context.Context, m *cereal.Manager, workflowName cereal.WorkflowName, instanceName string) (*ChainWorkflowInstance, error) {
 	instance, err := m.GetWorkflowInstanceByName(ctx, instanceName, workflowName)
 	if err != nil {
 		return nil, err

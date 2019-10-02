@@ -29,8 +29,8 @@ import (
 )
 
 const (
-	dataFeedTaskName     = "data-feed-poll"
-	dataFeedWorkflowName = "data-feed-workflow"
+	dataFeedTaskName     = cereal.TaskName("data-feed-poll")
+	dataFeedWorkflowName = cereal.WorkflowName("data-feed-workflow")
 	dataFeedScheduleName = "periodic-data-feed-workflow"
 )
 

@@ -107,7 +107,7 @@ func (server *JobSchedulerServer) GetStatusJobScheduler(ctx context.Context,
 	return jobStatus, nil
 }
 
-func (server *JobSchedulerServer) runJobNow(ctx context.Context, jobName string) error {
+func (server *JobSchedulerServer) runJobNow(ctx context.Context, jobName cereal.WorkflowName) error {
 	sched, err := server.jobManager.GetWorkflowScheduleByName(ctx, jobNameToInstanceName(jobName), jobName)
 	if err != nil {
 		return err
