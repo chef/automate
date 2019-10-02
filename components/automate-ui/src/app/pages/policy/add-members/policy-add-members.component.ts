@@ -39,14 +39,14 @@ import { Regex } from 'app/helpers/auth/regex';
   animations: [
     trigger('dropInAnimation', [
       state('void', style({ 'opacity': '0', 'height' : '0' })),
-      transition('void => *', animate(500, keyframes([
+      transition('void => *', animate(400, keyframes([
         style({opacity: 0, offset: 0}),
         style({opacity: 0, height: '{{height}}px', offset: 0.3}),
         style({opacity: 1, height: '{{height}}px', offset: 1})
       ]))),
-      transition('* => void', animate(250, keyframes([
+      transition('* => void', animate(150, keyframes([
         style({ opacity: 1, height: '{{height}}px', offset: 0 }),
-        style({ opacity: 0, height: '{{height}}px', offset: 0.3 }),
+        style({ opacity: 0, height: '{{height}}px', offset: 0.1 }),
         style({ opacity: 0, height: '0px', offset: 1 })
       ])))
     ])
