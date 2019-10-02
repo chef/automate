@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 // import { of as observableOf } from 'rxjs';
 import { MockComponent } from 'ng2-mock-component';
@@ -43,7 +43,6 @@ describe('PolicyAddMembersComponent', () => {
             ],
             imports: [
                 ChefPipesModule,
-                FormsModule,
                 ReactiveFormsModule,
                 RouterTestingModule,
                 StoreModule.forRoot({
@@ -57,11 +56,11 @@ describe('PolicyAddMembersComponent', () => {
         jasmine.addMatchers(customMatchers);
         fixture = TestBed.createComponent(PolicyAddMembersComponent);
         component = fixture.componentInstance;
-        component.createForm = new FormBuilder().group({
+        component.expressionForm = new FormBuilder().group({
             type: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
             identity: [''],
             name: ['']
-        })
+        });
         element = fixture.debugElement.nativeElement;
         fixture.detectChanges();
     });
