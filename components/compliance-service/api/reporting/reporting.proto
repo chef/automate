@@ -175,6 +175,10 @@ message Control {
 	repeated Result results = 7;
 	repeated Ref refs = 8;
 	map<string, string> tags = 9;
+	map<string, TagValues> string_tags = 10;
+}
+message TagValues {
+	repeated string values = 1;
 }
 message Attribute {
 	string name = 1;

@@ -42,6 +42,7 @@ type Control struct {
 	Refs           *json.RawMessage             `json:"refs"`
 	Tags           *json.RawMessage             `json:"tags"`
 	Results        []*reportingapi.Result       `json:"results,omitempty"`
+	StringTags     []*json.RawMessage           `json:"string_tags"`
 }
 
 // Status calculates the overall status of all controls based on all results
