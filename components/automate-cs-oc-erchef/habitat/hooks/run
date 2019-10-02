@@ -6,7 +6,6 @@ exec 2>&1
 "{{pkgPathFor "chef/mlsa"}}/bin/accept" {{cfg.mlsa.accept}}
 
 mkdir -p {{pkg.svc_var_path}}/logs
-source {{pkg.svc_path}}/hooks/reconfigure
 source "{{pkg.svc_config_path}}/elasticsearch-init.sh"
 
 export HOME={{pkg.svc_var_path}}

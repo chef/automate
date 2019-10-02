@@ -2,6 +2,8 @@
 
 exec 2>&1
 
-source {{pkg.svc_path}}/hooks/reconfigure
+chmod 0600 {{pkg.svc_config_path}}/service.crt
+chmod 0600 {{pkg.svc_config_path}}/service.key
+chmod 0600 {{pkg.svc_config_path}}/root_ca.crt
 
 exec haproxy -f {{pkg.svc_config_path}}/haproxy.conf -db

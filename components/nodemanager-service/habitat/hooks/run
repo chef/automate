@@ -9,7 +9,6 @@ export COMPLIANCE_DBNAME="{{cfg.storage.compliance_database}}"
 export A1_DBNAME="{{cfg.storage.a1_database}}"
 export DBNAME="{{cfg.storage.database}}"
 
-source {{pkg.svc_path}}/hooks/reconfigure
 source {{pkg.svc_config_path}}/migration.sh
 
 trigger_migrations

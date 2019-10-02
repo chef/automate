@@ -1,5 +1,9 @@
 #!{{pkgPathFor "core/bash"}}/bin/bash
 
+# ensure the backup repository is configured and has the correct
+# permissions
+source {{pkg.svc_config_path}}/init_backup
+
 PID=$(cat {{pkg.svc_pid_file}})
 echo "Sending SIGHUP to deployment-service (PID=$PID)"
 kill -HUP "$PID"

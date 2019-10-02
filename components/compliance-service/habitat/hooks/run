@@ -5,9 +5,14 @@ exec 2>&1
 # Call the script to block until user accepts the MLSA via the package's config
 {{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
 
+# create tmp folder for inspec
+mkdir -p {{pkg.svc_var_path}}/tmp
+chmod 0775 {{pkg.svc_var_path}}
+# nobody user needs access to this dir
+chmod 1777 {{pkg.svc_var_path}}/tmp
+
 export DBNAME="{{cfg.storage.database}}"
 export DBUSER="{{cfg.storage.user}}"
-source {{pkg.svc_path}}/hooks/reconfigure
 
 # Migrate from A1's delivery database if it's present
 pg-helper migrate-tables-v2 delivery "$DBNAME" \
