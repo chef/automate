@@ -10,11 +10,11 @@ import (
 	"github.com/chef/automate/lib/cereal"
 )
 
-const taskName = "purge"
+const taskName = cereal.TaskName("purge")
 
 // ConfigureManager registers the purge workflow executor and task
 // executor.
-func ConfigureManager(man *cereal.Manager, workflowName string, opts ...TaskOpt) error {
+func ConfigureManager(man *cereal.Manager, workflowName cereal.WorkflowName, opts ...TaskOpt) error {
 	task := &Task{}
 	for _, o := range opts {
 		o(task)
@@ -39,7 +39,7 @@ func CreateOrUpdatePurgeWorkflow(
 	ctx context.Context,
 	man *cereal.Manager,
 	scheduleName string,
-	workflowName string,
+	workflowName cereal.WorkflowName,
 	defaultPolicies *Policies,
 	enabled bool,
 	recurrence *rrule.RRule) error {

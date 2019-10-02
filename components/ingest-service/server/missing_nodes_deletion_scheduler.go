@@ -18,7 +18,7 @@ func (server *JobSchedulerServer) MarkMissingNodesForDeletion(ctx context.Contex
 	empty *ingest.MarkMissingNodesForDeletionRequest) (*ingest.MarkMissingNodesForDeletionResponse, error) {
 
 	sched, err := server.jobManager.GetWorkflowScheduleByName(ctx,
-		MissingNodesForDeletionScheduleName, MissingNodesForDeletionJobName)
+		MissingNodesForDeletionScheduleName, MissingNodesForDeletionWorkflowName)
 	if err != nil {
 		return &ingest.MarkMissingNodesForDeletionResponse{}, status.Error(codes.Internal, err.Error())
 	}
@@ -46,7 +46,7 @@ func (server *JobSchedulerServer) StartMissingNodesForDeletionScheduler(ctx cont
 	log.Info("StartMissingNodesForDeletionScheduler")
 
 	err := server.jobManager.UpdateWorkflowScheduleByName(
-		ctx, MissingNodesForDeletionScheduleName, MissingNodesForDeletionJobName,
+		ctx, MissingNodesForDeletionScheduleName, MissingNodesForDeletionWorkflowName,
 		cereal.UpdateEnabled(true))
 
 	if err != nil {
@@ -61,7 +61,7 @@ func (server *JobSchedulerServer) StopMissingNodesForDeletionScheduler(ctx conte
 	log.Info("StopMissingNodesForDeletionScheduler")
 
 	err := server.jobManager.UpdateWorkflowScheduleByName(
-		ctx, MissingNodesForDeletionScheduleName, MissingNodesForDeletionJobName,
+		ctx, MissingNodesForDeletionScheduleName, MissingNodesForDeletionWorkflowName,
 		cereal.UpdateEnabled(false))
 	if err != nil {
 		return &ingest.StopMissingNodesForDeletionSchedulerResponse{}, status.Error(codes.Internal, err.Error())
@@ -77,7 +77,7 @@ func (server *JobSchedulerServer) ConfigureMissingNodesForDeletionScheduler(ctx 
 	}).Info("Incoming job")
 
 	oldSchedule, err := server.jobManager.GetWorkflowScheduleByName(
-		ctx, MissingNodesForDeletionScheduleName, MissingNodesForDeletionJobName)
+		ctx, MissingNodesForDeletionScheduleName, MissingNodesForDeletionWorkflowName)
 	if err != nil {
 		return &ingest.ConfigureMissingNodesForDeletionSchedulerResponse{}, status.Error(codes.Internal, err.Error())
 	}
@@ -88,12 +88,12 @@ func (server *JobSchedulerServer) ConfigureMissingNodesForDeletionScheduler(ctx 
 	}
 
 	err = server.jobManager.UpdateWorkflowScheduleByName(
-		ctx, MissingNodesForDeletionScheduleName, MissingNodesForDeletionJobName, updateOpts...)
+		ctx, MissingNodesForDeletionScheduleName, MissingNodesForDeletionWorkflowName, updateOpts...)
 	if err != nil {
 		return &ingest.ConfigureMissingNodesForDeletionSchedulerResponse{}, status.Error(codes.Internal, err.Error())
 	}
 	if shouldRunNow {
-		err = server.runJobNow(ctx, MissingNodesForDeletionJobName)
+		err = server.runJobNow(ctx, MissingNodesForDeletionWorkflowName)
 		if err != nil {
 			return &ingest.ConfigureMissingNodesForDeletionSchedulerResponse{}, status.Error(codes.Internal, err.Error())
 		}

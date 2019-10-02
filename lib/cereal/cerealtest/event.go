@@ -6,7 +6,7 @@ func NewStartEvent() cereal.StartEvent {
 	return cereal.StartEvent{}
 }
 
-func NewTaskCompleteEvent(taskName string, tr cereal.TaskResult) cereal.TaskCompleteEvent {
+func NewTaskCompleteEvent(taskName cereal.TaskName, tr cereal.TaskResult) cereal.TaskCompleteEvent {
 	return cereal.TaskCompleteEvent{
 		TaskName: taskName,
 		Result:   tr,

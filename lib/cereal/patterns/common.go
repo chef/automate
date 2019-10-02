@@ -46,12 +46,12 @@ func (w *workflowInstance) GetParameters(obj interface{}) error {
 }
 
 type enqueueTaskRequest struct {
-	taskName   string
+	taskName   cereal.TaskName
 	parameters interface{}
 	opts       []cereal.TaskEnqueueOpts
 }
 
-func (w *workflowInstance) EnqueueTask(taskName string, parameters interface{}, opts ...cereal.TaskEnqueueOpts) error {
+func (w *workflowInstance) EnqueueTask(taskName cereal.TaskName, parameters interface{}, opts ...cereal.TaskEnqueueOpts) error {
 	v, err := merge(parameters, w.attachment)
 	if err != nil {
 		return err

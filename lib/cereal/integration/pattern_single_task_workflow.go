@@ -13,8 +13,8 @@ import (
 )
 
 func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowSuccess() {
-	taskName := randName("single_task")
-	workflowName := randName("single_task_workflow")
+	taskName := cereal.TaskName(randName("single_task"))
+	workflowName := cereal.WorkflowName(randName("single_task_workflow"))
 	instanceName := randName("instance")
 	type TaskResult struct {
 		Value string
@@ -72,8 +72,8 @@ func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowSuccess() {
 }
 
 func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowFail() {
-	taskName := randName("single_task")
-	workflowName := randName("single_task_workflow")
+	taskName := cereal.TaskName(randName("single_task"))
+	workflowName := cereal.WorkflowName(randName("single_task_workflow"))
 	instanceName := randName("instance")
 	type TaskResult struct {
 		Value string
@@ -124,8 +124,8 @@ func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowFail() {
 }
 
 func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowCancelWhenNotAllowed() {
-	taskName := randName("single_task")
-	workflowName := randName("single_task_workflow")
+	taskName := cereal.TaskName(randName("single_task"))
+	workflowName := cereal.WorkflowName(randName("single_task_workflow"))
 	instanceName := randName("instance")
 	type TaskResult struct {
 		Value string
@@ -194,8 +194,8 @@ func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowCancelWhenNotAllowed(
 }
 
 func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowCancelWhenAllowed() {
-	taskName := randName("single_task")
-	workflowName := randName("single_task_workflow")
+	taskName := cereal.TaskName(randName("single_task"))
+	workflowName := cereal.WorkflowName(randName("single_task_workflow"))
 	instanceName := randName("instance")
 	type TaskResult struct {
 		Value string

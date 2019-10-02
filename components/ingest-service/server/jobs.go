@@ -18,30 +18,36 @@ import (
 )
 
 const (
-	MissingNodesJobName                 = "missing_nodes"
-	MissingNodesScheduleName            = "periodic_missing_nodes"
-	DeleteNodesJobName                  = "delete_nodes"
-	DeleteNodesScheduleName             = "periodic_delete_nodes"
-	MissingNodesForDeletionJobName      = "missing_nodes_for_deletion"
+	MissingNodesTaskName     = cereal.TaskName("missing_nodes")
+	MissingNodesWorkflowName = cereal.WorkflowName("missing_nodes")
+	MissingNodesScheduleName = "periodic_missing_nodes"
+
+	DeleteNodesTaskName     = cereal.TaskName("delete_nodes")
+	DeleteNodesWorkflowName = cereal.WorkflowName("delete_nodes")
+	DeleteNodesScheduleName = "periodic_delete_nodes"
+
+	MissingNodesForDeletionTaskName     = cereal.TaskName("missing_nodes_for_deletion")
+	MissingNodesForDeletionWorkflowName = cereal.WorkflowName("missing_nodes_for_deletion")
 	MissingNodesForDeletionScheduleName = "periodic_missing_nodes_for_deletion"
 )
 
 func InitializeJobManager(c *cereal.Manager, client backend.Client, esSidecarClient es.EsSidecarClient) error {
-	err := c.RegisterTaskExecutor(DeleteNodesJobName, &DeleteExpiredMarkedNodesTask{client}, cereal.TaskExecutorOpts{})
+	err := c.RegisterTaskExecutor(DeleteNodesTaskName, &DeleteExpiredMarkedNodesTask{client}, cereal.TaskExecutorOpts{})
 	if err != nil {
 		return err
 	}
-	err = c.RegisterTaskExecutor(MissingNodesJobName, &MarkNodesMissingTask{client}, cereal.TaskExecutorOpts{})
+	err = c.RegisterTaskExecutor(MissingNodesTaskName, &MarkNodesMissingTask{client}, cereal.TaskExecutorOpts{})
 	if err != nil {
 		return err
 	}
-	err = c.RegisterTaskExecutor(MissingNodesForDeletionJobName, &MarkMissingNodesForDeletionTask{client}, cereal.TaskExecutorOpts{})
+	err = c.RegisterTaskExecutor(MissingNodesForDeletionTaskName, &MarkMissingNodesForDeletionTask{client}, cereal.TaskExecutorOpts{})
 	if err != nil {
 		return err
 	}
-	for _, jobName := range []string{MissingNodesJobName, DeleteNodesJobName, MissingNodesForDeletionJobName} {
-		err = c.RegisterWorkflowExecutor(jobName, NewSingleTaskWorkflow(jobName))
+	for _, jobName := range []cereal.WorkflowName{MissingNodesWorkflowName, DeleteNodesWorkflowName, MissingNodesForDeletionWorkflowName} {
+		err = c.RegisterWorkflowExecutor(jobName, NewSingleTaskWorkflow(cereal.TaskName(jobName.String())))
 		if err != nil {
+
 			return errors.Wrapf(err, "failed to register workflow for %q", jobName)
 		}
 	}
@@ -81,7 +87,7 @@ func MigrateJobsSchedule(ctx context.Context, c *cereal.Manager, oldConfigFile s
 			return errors.Wrap(err, "could not create recurrence rule for job configuration")
 		}
 
-		err = c.CreateWorkflowSchedule(ctx, scheduleName, name, config.Threshold, config.Running, r)
+		err = c.CreateWorkflowSchedule(ctx, scheduleName, cereal.WorkflowName(name), config.Threshold, config.Running, r)
 		if err == cereal.ErrWorkflowScheduleExists {
 			log.Infof("Schedule for %s already exists, not migrating", scheduleName)
 		} else if err != nil {
@@ -90,18 +96,18 @@ func MigrateJobsSchedule(ctx context.Context, c *cereal.Manager, oldConfigFile s
 	}
 	return nil
 }
-func jobNameToInstanceName(jobName string) string {
-	return fmt.Sprintf("periodic_%s", jobName)
+func jobNameToInstanceName(jobName cereal.WorkflowName) string {
+	return fmt.Sprintf("periodic_%s", jobName.String())
 }
 
 // TODO(ssd) 2019-05-15: This is a helper to avoid having to write
 // workflows for things that are just single tasks. Perhaps the
 // workflow library could have a helper that..helps with this.
 type SingleTaskWorkflow struct {
-	taskName string
+	taskName cereal.TaskName
 }
 
-func NewSingleTaskWorkflow(taskName string) *SingleTaskWorkflow {
+func NewSingleTaskWorkflow(taskName cereal.TaskName) *SingleTaskWorkflow {
 	return &SingleTaskWorkflow{taskName}
 }
 

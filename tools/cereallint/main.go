@@ -29,11 +29,17 @@ func main() {
 		fatal(err, "failed to load packages")
 	}
 
+	errs := []error{}
 	for _, pkg := range pkgs {
-		if len(pkg.Errors) > 0 {
-			// TODO(ssd) 2019-10-02: Annoying, will give you only 1 errror at a time
-			fatal(fmt.Errorf("%s: %v", pkg.ID, pkg.Errors), "failed to load packages")
+		for _, e := range pkg.Errors {
+			errs = append(errs, e)
 		}
+	}
+	if len(errs) > 0 {
+		for _, e := range errs {
+			fmt.Fprintf(os.Stderr, "%s\n", e.Error())
+		}
+		fatal(fmt.Errorf("found %d compilation errors", len(errs)), "failed to load packages")
 	}
 
 	err = lintPackages(pkgs)

@@ -63,11 +63,16 @@ func Serve(conf config.Nodemanager, grpcBinding string) error {
 }
 
 const (
-	AwsEc2PollingJobName        = "awsec2_polling"
-	Awsec2PollingScheduleName   = "awsec2_polling_schedule"
-	AzureVMPollingJobName       = "azurevm_polling"
-	AzureVMPollingScheduleName  = "azurevm_polling_schedule"
-	ManagersPollingJobName      = "managers_polling"
+	AwsEc2PollingTaskName     = cereal.TaskName("awsec2_polling")
+	AwsEc2PollingWorkflowName = cereal.WorkflowName("awsec2_polling")
+	Awsec2PollingScheduleName = "awsec2_polling_schedule"
+
+	AzureVMPollingTaskName     = cereal.TaskName("azurevm_polling")
+	AzureVMPollingWorkflowName = cereal.WorkflowName("azurevm_polling")
+	AzureVMPollingScheduleName = "azurevm_polling_schedule"
+
+	ManagersPollingTaskName     = cereal.TaskName("managers_polling")
+	ManagersPollingWorkflowName = cereal.WorkflowName("managers_polling")
 	ManagersPollingScheduleName = "managers_polling_schedule"
 )
 
@@ -153,30 +158,30 @@ func serve(ctx context.Context, config *config.Nodemanager, connFactory *securec
 		defer cerealManager.Stop() //nolint:errcheck
 
 		// Prelude to initializing the job manager: register task executors for the nodemanger polling jobs
-		err = cerealManager.RegisterTaskExecutor(AwsEc2PollingJobName,
+		err = cerealManager.RegisterTaskExecutor(AwsEc2PollingTaskName,
 			&CheckAWSNodesTask{db: db, secretsClient: secretsClient, eventsClient: eventClient},
 			cereal.TaskExecutorOpts{})
 		if err != nil {
 			return err
 		}
 
-		err = cerealManager.RegisterTaskExecutor(AzureVMPollingJobName,
+		err = cerealManager.RegisterTaskExecutor(AzureVMPollingTaskName,
 			&CheckAzureNodesTask{db: db, secretsClient: secretsClient}, cereal.TaskExecutorOpts{})
 		if err != nil {
 			return err
 		}
 
-		err = cerealManager.RegisterTaskExecutor(ManagersPollingJobName,
+		err = cerealManager.RegisterTaskExecutor(ManagersPollingTaskName,
 			&CheckManagersTask{db: db, secretsClient: secretsClient}, cereal.TaskExecutorOpts{})
 		if err != nil {
 			return err
 		}
 
 		// Prelude to initializing the cereal manager: register workflow executors to run tasks
-		for _, jobName := range []string{AwsEc2PollingJobName, AzureVMPollingJobName, ManagersPollingJobName} {
-			err = cerealManager.RegisterWorkflowExecutor(jobName, patterns.NewSingleTaskWorkflowExecutor(jobName, false))
+		for _, workflowName := range []cereal.WorkflowName{AwsEc2PollingWorkflowName, AzureVMPollingWorkflowName, ManagersPollingWorkflowName} {
+			err = cerealManager.RegisterWorkflowExecutor(workflowName, patterns.NewSingleTaskWorkflowExecutor(cereal.TaskName(workflowName), false))
 			if err != nil {
-				return errors.Wrapf(err, "failed to register workflow for %q", jobName)
+				return errors.Wrapf(err, "failed to register workflow for %q", workflowName.String())
 			}
 		}
 
@@ -184,22 +189,22 @@ func serve(ctx context.Context, config *config.Nodemanager, connFactory *securec
 		kindsOfChecks := [3]string{"aws", "azure", "manager"}
 		for _, k := range kindsOfChecks {
 			var pollInterval int
-			var jobName string
+			var workflowName cereal.WorkflowName
 			var scheduleName string
 
 			switch checkType := k; checkType {
 			case "aws":
 				pollInterval = config.AwsEc2PollIntervalMinutes
-				jobName = AwsEc2PollingJobName
+				workflowName = AwsEc2PollingWorkflowName
 				scheduleName = Awsec2PollingScheduleName
 			case "azure":
 				pollInterval = config.AzureVMPollIntervalMinutes
-				jobName = AzureVMPollingJobName
+				workflowName = AzureVMPollingWorkflowName
 				scheduleName = AzureVMPollingScheduleName
 			case "manager":
 				// The default for the manager check is *not* set in the config. 120 was the default in the pre-cereal code.
 				pollInterval = 120
-				jobName = ManagersPollingJobName
+				workflowName = ManagersPollingWorkflowName
 				scheduleName = ManagersPollingScheduleName
 			default:
 				panic("Unable to get data to set up nodemanager's scheduled workflows")
@@ -216,7 +221,7 @@ func serve(ctx context.Context, config *config.Nodemanager, connFactory *securec
 			}
 
 			// Set up workflow schedule.
-			err = createOrUpdateWorkflowSchedule(cerealManager, scheduleName, jobName, rule)
+			err = createOrUpdateWorkflowSchedule(cerealManager, scheduleName, workflowName, rule)
 			if err != nil {
 				return err
 			}
@@ -265,7 +270,7 @@ func newGRPCServer(db *pgdb.DB, connFactory *secureconn.Factory, config *config.
 	return s
 }
 
-func createOrUpdateWorkflowSchedule(cerealManager *cereal.Manager, scheduleName string, jobName string, rule *rrule.RRule) error {
+func createOrUpdateWorkflowSchedule(cerealManager *cereal.Manager, scheduleName string, jobName cereal.WorkflowName, rule *rrule.RRule) error {
 	err := cerealManager.CreateWorkflowSchedule(context.Background(), scheduleName, jobName, nil, true, rule)
 
 	if err == nil {

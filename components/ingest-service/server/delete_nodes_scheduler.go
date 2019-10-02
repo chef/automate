@@ -17,7 +17,7 @@ import (
 func (server *JobSchedulerServer) DeleteMarkedNodes(ctx context.Context,
 	empty *ingest.DeleteMarkedNodesRequest) (*ingest.DeleteMarkedNodesResponse, error) {
 
-	sched, err := server.jobManager.GetWorkflowScheduleByName(ctx, DeleteNodesScheduleName, DeleteNodesJobName)
+	sched, err := server.jobManager.GetWorkflowScheduleByName(ctx, DeleteNodesScheduleName, DeleteNodesWorkflowName)
 	if err != nil {
 		return &ingest.DeleteMarkedNodesResponse{}, status.Error(codes.Internal, err.Error())
 	}
@@ -44,7 +44,7 @@ func (server *JobSchedulerServer) StartDeleteNodesScheduler(ctx context.Context,
 	log.WithFields(log.Fields{"func": nameOfFunc()}).Debug("rpc call")
 
 	err := server.jobManager.UpdateWorkflowScheduleByName(
-		ctx, DeleteNodesScheduleName, DeleteNodesJobName, cereal.UpdateEnabled(true))
+		ctx, DeleteNodesScheduleName, DeleteNodesWorkflowName, cereal.UpdateEnabled(true))
 	if err != nil {
 		return &ingest.StartDeleteNodesSchedulerResponse{}, status.Error(codes.Internal, err.Error())
 	}
@@ -57,7 +57,7 @@ func (server *JobSchedulerServer) StopDeleteNodesScheduler(ctx context.Context,
 	log.WithFields(log.Fields{"func": nameOfFunc()}).Debug("rpc call")
 
 	err := server.jobManager.UpdateWorkflowScheduleByName(
-		ctx, DeleteNodesScheduleName, DeleteNodesJobName, cereal.UpdateEnabled(false))
+		ctx, DeleteNodesScheduleName, DeleteNodesWorkflowName, cereal.UpdateEnabled(false))
 	if err != nil {
 		return &ingest.StopDeleteNodesSchedulerResponse{}, status.Error(codes.Internal, err.Error())
 	}
@@ -74,7 +74,7 @@ func (server *JobSchedulerServer) ConfigureDeleteNodesScheduler(ctx context.Cont
 	}).Info("ConfigureDeleteNodesScheduler")
 
 	oldSchedule, err := server.jobManager.GetWorkflowScheduleByName(
-		ctx, DeleteNodesScheduleName, DeleteNodesJobName)
+		ctx, DeleteNodesScheduleName, DeleteNodesWorkflowName)
 	if err != nil {
 		return &ingest.ConfigureDeleteNodesSchedulerResponse{}, status.Error(codes.Internal, err.Error())
 	}
@@ -85,12 +85,12 @@ func (server *JobSchedulerServer) ConfigureDeleteNodesScheduler(ctx context.Cont
 	}
 
 	err = server.jobManager.UpdateWorkflowScheduleByName(
-		ctx, DeleteNodesScheduleName, DeleteNodesJobName, updateOpts...)
+		ctx, DeleteNodesScheduleName, DeleteNodesWorkflowName, updateOpts...)
 	if err != nil {
 		return &ingest.ConfigureDeleteNodesSchedulerResponse{}, status.Error(codes.Internal, err.Error())
 	}
 	if shouldRunNow {
-		err = server.runJobNow(ctx, DeleteNodesJobName)
+		err = server.runJobNow(ctx, DeleteNodesWorkflowName)
 		if err != nil {
 			return &ingest.ConfigureDeleteNodesSchedulerResponse{}, status.Error(codes.Internal, err.Error())
 		}

@@ -13,11 +13,11 @@ import (
 // a single task. The workflow enqueues the task and startup. The
 // workflow fails if the task fails.
 type SingleTaskWorkflowExecutor struct {
-	taskName    string
+	taskName    cereal.TaskName
 	allowCancel bool
 }
 
-func NewSingleTaskWorkflowExecutor(taskName string, allowCancel bool) *SingleTaskWorkflowExecutor {
+func NewSingleTaskWorkflowExecutor(taskName cereal.TaskName, allowCancel bool) *SingleTaskWorkflowExecutor {
 	return &SingleTaskWorkflowExecutor{
 		taskName:    taskName,
 		allowCancel: allowCancel,
