@@ -105,7 +105,7 @@ WITH res AS (
     ORDER BY instance_name, workflow_name, end_at DESC
 )
 SELECT s.id, enabled,
-    s.instance_name, s.workflow_name, s.parameters, recurrence,
+    s.instance_name, s.workflow_name, s.parameters, recurrence, s.last_enqueued_at,
     next_run_at, start_at last_start, end_at last_end
 FROM
     cereal_workflow_schedules s
@@ -348,6 +348,7 @@ func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*backen
 	schedules := make([]*backend.Schedule, 0)
 	for rows.Next() {
 		var scheduledWorkflow backend.Schedule
+		var lastEnqueuedAt *time.Time
 		err := rows.Scan(
 			&scheduledWorkflow.ID,
 			&scheduledWorkflow.Enabled,
@@ -355,12 +356,16 @@ func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*backen
 			&scheduledWorkflow.WorkflowName,
 			&scheduledWorkflow.Parameters,
 			&scheduledWorkflow.Recurrence,
+			&lastEnqueuedAt,
 			&scheduledWorkflow.NextDueAt,
 			&scheduledWorkflow.LastStart,
 			&scheduledWorkflow.LastEnd,
 		)
 		if err != nil {
 			return nil, errors.Wrap(err, "could not read workflow schedules")
+		}
+		if lastEnqueuedAt != nil {
+			scheduledWorkflow.LastEnqueuedAt = *lastEnqueuedAt
 		}
 		schedules = append(schedules, &scheduledWorkflow)
 	}
