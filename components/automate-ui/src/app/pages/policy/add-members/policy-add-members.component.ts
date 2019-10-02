@@ -83,6 +83,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   public expressionForm: FormGroup;
   public expressionOutput: string;
   private formSubscription: Subscription;
+  public allIdentity: string;
 
 
   constructor(
@@ -337,6 +338,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     switch (inputName) {
       case 'identity':
         if (typeValue === 'USER' || typeValue === 'TEAM') {
+            this.allIdentity = typeValue;
             this.updateValidations('identity', true);
             return true;
           } else {
