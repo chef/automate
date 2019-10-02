@@ -430,49 +430,19 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 					convertedControls := make([]*reportingapi.Control, 0)
 					// Enrich min report controls with profile metadata
 					for _, reportControlMin := range esInSpecReportProfileMin.Controls {
-						profileControl := profileControlsMap[reportControlMin.ID]
-
-						if profileControl != nil {
-							profileControl.Results = make([]*reportingapi.Result, 0)
-							if reportControlMin.ID == profileControl.Id {
-								minResults := make([]*reportingapi.Result, len(reportControlMin.Results))
-								for i, result := range reportControlMin.Results {
-									minResults[i] = &reportingapi.Result{
-										Status:      result.Status,
-										CodeDesc:    result.CodeDesc,
-										RunTime:     result.RunTime,
-										Message:     result.Message,
-										SkipMessage: result.SkipMessage,
-									}
-								}
-
-								convertedControl := reportingapi.Control{
-									Id:             profileControl.Id,
-									Code:           profileControl.Code,
-									Desc:           profileControl.Desc,
-									Impact:         profileControl.Impact,
-									Title:          profileControl.Title,
-									SourceLocation: profileControl.SourceLocation,
-									Results:        minResults,
-								}
-								var jsonTags map[string]string
-								tags, _ := json.Marshal(profileControl.Tags)
-								json.Unmarshal(tags, &jsonTags) // nolint: errcheck
-								convertedControl.Tags = jsonTags
-								var jsonRefs []*reportingapi.Ref
-								refs, _ := json.Marshal(profileControl.Refs)
-								json.Unmarshal(refs, &jsonRefs) // nolint: errcheck
-								convertedControl.Refs = jsonRefs
-								// store controls to returned report
-								convertedControls = append(convertedControls, &convertedControl)
-							}
+						// store controls to returned report
+						convertedControl := convertControl(profileControlsMap, reportControlMin, filters)
+						if convertedControl != nil {
+							convertedControls = append(convertedControls, convertedControl)
 						}
 					}
 
-					// Sort convertedControls by Id
-					sort.Slice(convertedControls, func(i, j int) bool {
-						return convertedControls[i].Id < convertedControls[j].Id
-					})
+					if len(convertedControls) > 1 {
+						// Sort convertedControls by Id
+						sort.Slice(convertedControls, func(i, j int) bool {
+							return convertedControls[i].Id < convertedControls[j].Id
+						})
+					}
 
 					// TODO: fix this (vj)
 					// Name: control.Attribute
@@ -499,7 +469,6 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 					}
 					profiles = append(profiles, &convertedProfile)
 				}
-
 				ipAddress := ""
 				if esInSpecReport.IPAddress != nil {
 					ipAddress = *esInSpecReport.IPAddress
@@ -531,6 +500,87 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 	}
 
 	return report, errorutils.ProcessNotFound(nil, reportId)
+}
+
+func convertControl(profileControlsMap map[string]*reportingapi.Control, reportControlMin ESInSpecReportControl, filters map[string][]string) *reportingapi.Control {
+	profileControl := profileControlsMap[reportControlMin.ID]
+
+	if profileControl != nil {
+		profileControl.Results = make([]*reportingapi.Result, 0)
+		if reportControlMin.ID == profileControl.Id {
+			minResults := make([]*reportingapi.Result, len(reportControlMin.Results))
+			for i, result := range reportControlMin.Results {
+				minResults[i] = &reportingapi.Result{
+					Status:      result.Status,
+					CodeDesc:    result.CodeDesc,
+					RunTime:     result.RunTime,
+					Message:     result.Message,
+					SkipMessage: result.SkipMessage,
+				}
+			}
+
+			convertedControl := reportingapi.Control{
+				Id:             profileControl.Id,
+				Code:           profileControl.Code,
+				Desc:           profileControl.Desc,
+				Impact:         profileControl.Impact,
+				Title:          profileControl.Title,
+				SourceLocation: profileControl.SourceLocation,
+				Results:        minResults,
+			}
+
+			jsonTags := make(map[string]*reportingapi.TagValues, 0)
+			for _, tag := range reportControlMin.StringTags {
+				if len(tag.Values) == 0 {
+					jsonTags[tag.Key] = &reportingapi.TagValues{Values: []string{"null"}}
+				}
+				vals := make([]string, 0)
+				for _, val := range tag.Values {
+					vals = append(vals, val)
+					jsonTags[tag.Key] = &reportingapi.TagValues{Values: vals}
+				}
+			}
+			matchingTagFound := false
+			matchingTagRequired := false
+			for filterKey, filterVals := range filters {
+				if strings.HasPrefix(filterKey, "control_tag") {
+					matchingTagRequired = true
+					trimmed := strings.TrimPrefix(filterKey, "control_tag:")
+					if tagVal, ok := jsonTags[trimmed]; ok {
+						for _, val := range filterVals {
+							if contains(tagVal.Values, val) || val == "null" {
+								matchingTagFound = true
+								break
+							}
+						}
+					}
+
+				}
+			}
+			if matchingTagRequired {
+				if !matchingTagFound {
+					return nil
+				}
+			}
+
+			convertedControl.StringTags = jsonTags
+			var jsonRefs []*reportingapi.Ref
+			refs, _ := json.Marshal(profileControl.Refs)
+			json.Unmarshal(refs, &jsonRefs) // nolint: errcheck
+			convertedControl.Refs = jsonRefs
+			return &convertedControl
+		}
+	}
+	return nil
+}
+
+func contains(a []string, x string) bool {
+	for _, n := range a {
+		if strings.HasSuffix(x, n) {
+			return true
+		}
+	}
+	return false
 }
 
 func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[string][]string,

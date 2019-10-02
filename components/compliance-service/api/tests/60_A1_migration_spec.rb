@@ -184,6 +184,7 @@ describe File.basename(__FILE__) do
                   "runTime": 0.000103
                 }
               ],
+              "stringTags": {},
               "tags": {}
             },
             {
@@ -201,6 +202,7 @@ describe File.basename(__FILE__) do
                   "runTime": 0.001871
                 }
               ],
+              "stringTags": {},
               "tags": {}
             }
           ],
