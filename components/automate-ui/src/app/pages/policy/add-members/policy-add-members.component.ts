@@ -335,7 +335,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     const identityValue = this.expressionForm.get('identity').value;
 
     switch (inputName) {
-      case 'type':
+      case 'identity':
         if (typeValue === 'USER' || typeValue === 'TEAM') {
             this.updateValidations('identity', true);
             return true;
@@ -345,7 +345,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
             return false;
           }
         break;
-      case 'identity':
+      case 'name':
         if ( typeValue === 'TOKEN' || (identityValue && identityValue !== '*') ) {
           this.updateValidations('name', true);
           return true;
