@@ -270,8 +270,8 @@ func newGRPCServer(db *pgdb.DB, connFactory *secureconn.Factory, config *config.
 	return s
 }
 
-func createOrUpdateWorkflowSchedule(cerealManager *cereal.Manager, scheduleName string, jobName cereal.WorkflowName, rule *rrule.RRule) error {
-	err := cerealManager.CreateWorkflowSchedule(context.Background(), scheduleName, jobName, nil, true, rule)
+func createOrUpdateWorkflowSchedule(cerealManager *cereal.Manager, scheduleName string, workflowName cereal.WorkflowName, rule *rrule.RRule) error {
+	err := cerealManager.CreateWorkflowSchedule(context.Background(), scheduleName, workflowName, nil, true, rule)
 
 	if err == nil {
 		return nil
@@ -280,7 +280,7 @@ func createOrUpdateWorkflowSchedule(cerealManager *cereal.Manager, scheduleName 
 	if err == cereal.ErrWorkflowScheduleExists {
 		log.Infof("nodemanager workflow schedule %s already exists, not creating", scheduleName)
 		// If the schedule exists, make sure the rrule is up-to-date.
-		schedule, err := cerealManager.GetWorkflowScheduleByName(context.Background(), scheduleName, jobName)
+		schedule, err := cerealManager.GetWorkflowScheduleByName(context.Background(), scheduleName, workflowName)
 		if err != nil {
 			return errors.Wrapf(err, "failed to get scheduled workflow %s from cereal manager", scheduleName)
 		}
@@ -289,7 +289,7 @@ func createOrUpdateWorkflowSchedule(cerealManager *cereal.Manager, scheduleName 
 			return errors.Wrapf(err, "unable to get rrule for scheduled workflow %s", scheduleName)
 		}
 		if scheduledRule != rule {
-			err = cerealManager.UpdateWorkflowScheduleByName(context.Background(), scheduleName, jobName, cereal.UpdateRecurrence(rule))
+			err = cerealManager.UpdateWorkflowScheduleByName(context.Background(), scheduleName, workflowName, cereal.UpdateRecurrence(rule))
 			if err != nil {
 				return errors.Wrapf(err, "unable to update recurrence rule for scheduled workflow %s", scheduleName)
 			}

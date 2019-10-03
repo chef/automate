@@ -88,8 +88,8 @@ func MigrateJobsSchedule(ctx context.Context, c *cereal.Manager, oldConfigFile s
 	return nil
 }
 
-func jobNameToInstanceName(jobName cereal.WorkflowName) string {
-	return fmt.Sprintf("periodic_%s", jobName.String())
+func workflowNameToInstanceName(workflowName cereal.WorkflowName) string {
+	return fmt.Sprintf("periodic_%s", workflowName)
 }
 
 type DeleteExpiredMarkedNodesTask struct {
