@@ -93,7 +93,7 @@ func (server *JobSchedulerServer) ConfigureMissingNodesForDeletionScheduler(ctx 
 		return &ingest.ConfigureMissingNodesForDeletionSchedulerResponse{}, status.Error(codes.Internal, err.Error())
 	}
 	if shouldRunNow {
-		err = server.runJobNow(ctx, MissingNodesForDeletionWorkflowName)
+		err = server.runWorkflowNow(ctx, MissingNodesForDeletionWorkflowName)
 		if err != nil {
 			return &ingest.ConfigureMissingNodesForDeletionSchedulerResponse{}, status.Error(codes.Internal, err.Error())
 		}

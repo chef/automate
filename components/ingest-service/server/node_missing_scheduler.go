@@ -99,7 +99,7 @@ func (server *JobSchedulerServer) ConfigureNodesMissingScheduler(ctx context.Con
 	}
 
 	if shouldRunNow {
-		err = server.runJobNow(ctx, MissingNodesWorkflowName)
+		err = server.runWorkflowNow(ctx, MissingNodesWorkflowName)
 		if err != nil {
 			return &ingest.ConfigureNodesMissingSchedulerResponse{}, status.Error(codes.Internal, err.Error())
 		}
