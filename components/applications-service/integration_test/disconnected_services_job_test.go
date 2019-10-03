@@ -7,11 +7,12 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/chef/automate/api/external/applications"
-	"github.com/chef/automate/components/applications-service/pkg/server"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/chef/automate/api/external/applications"
+	"github.com/chef/automate/components/applications-service/pkg/server"
 )
 
 const habConfigDir = "/hab/svc/applications-service/config"
@@ -33,7 +34,7 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("workflow schedule should exist for disconnected_services", func(t *testing.T) {
-		sched, err := suite.JobScheduler.CerealSvc.GetWorkflowScheduleByName(ctx, server.DisconnectedServicesScheduleName, server.DisconnectedServicesJobName)
+		sched, err := suite.JobScheduler.CerealSvc.GetWorkflowScheduleByName(ctx, server.DisconnectedServicesScheduleName, server.DisconnectedServicesWorkflowName)
 
 		require.NoError(t, err)
 		assert.Equal(t, "disconnected_services", sched.WorkflowName)
@@ -103,7 +104,7 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 	})
 
 	t.Run("workflow schedule should exist for delete_disconnected_services", func(t *testing.T) {
-		sched, err := suite.JobScheduler.CerealSvc.GetWorkflowScheduleByName(ctx, server.DeleteDisconnectedServicesScheduleName, server.DeleteDisconnectedServicesJobName)
+		sched, err := suite.JobScheduler.CerealSvc.GetWorkflowScheduleByName(ctx, server.DeleteDisconnectedServicesScheduleName, server.DeleteDisconnectedServicesWorkflowName)
 
 		require.NoError(t, err)
 		assert.Equal(t, "delete_disconnected_services", sched.WorkflowName)

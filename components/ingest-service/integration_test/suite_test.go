@@ -415,7 +415,7 @@ func createServices(s *Suite) error {
 	s.PurgeServer, err = purge.NewServer(
 		jobManager,
 		server.PurgeScheduleName,
-		server.PurgeJobName,
+		server.PurgeWorkflowName,
 		server.DefaultPurgePolicies,
 		purge.WithServerEsSidecarClient(esSidecarClient),
 	)

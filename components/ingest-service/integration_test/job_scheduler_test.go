@@ -158,7 +158,7 @@ func verifyPurgeJobs(t *testing.T, status *ingest.JobSchedulerStatus) {
 	for _, pp := range server.DefaultPurgePolicies.Es {
 		for _, job := range status.Jobs {
 			name := strings.ReplaceAll(pp.Name, "-", "_")
-			name = fmt.Sprintf("%s_%s", server.PurgeJobName, name)
+			name = fmt.Sprintf("%s_%s", server.PurgeWorkflowName, name)
 
 			if name == job.Name {
 				assert.NotEqual(t, pp.Disabled, job.Running, "job is disabled and should be running")
