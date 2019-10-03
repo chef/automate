@@ -449,7 +449,7 @@ func (p *ScheduleTestWorkflow) OnStart(w cereal.WorkflowInstance,
 		return w.Fail(errors.Wrap(err, "failed to get parameters"))
 	}
 	logrus.WithField("params", params).Info("Doing OnStart")
-	err = w.EnqueueTask("test task", "asdf")
+	err = w.EnqueueTask(ScheduleTestTaskName, "asdf")
 	if err != nil {
 		return w.Fail(errors.Wrap(err, "could not enqueue task"))
 	}

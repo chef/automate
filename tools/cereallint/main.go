@@ -173,6 +173,8 @@ func (v *visitor) checkCallsForStringLiterals(call *ast.CallExpr) {
 			v.checkArgForLiteralOrUntypeConst(call, 1, "workflow name", "CancelWorkflow")
 		case "(*github.com/chef/automate/lib/cereal.Manager).KillWorkflow":
 			v.checkArgForLiteralOrUntypeConst(call, 1, "workflow name", "KillWorkflow")
+		case "(github.com/chef/automate/lib/cereal.WorkflowInstance).EnqueueTask":
+			v.checkArgForLiteralOrUntypeConst(call, 0, "task name", "EnqueueTask")
 		}
 	}
 }
