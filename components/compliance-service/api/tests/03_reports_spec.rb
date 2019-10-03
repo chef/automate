@@ -715,15 +715,15 @@ describe File.basename(__FILE__) do
     # Get a specific report; ensure only the control with the specified filter tag is returned
     res = GRPC reporting, :read_report, Reporting::Query.new(id: '44024b50-2e0d-42fa-a57c-dddddddddddd',       
         filters: [
-            Reporting::ListFilter.new(type: 'control_tag:tag1', values: ['value-1']),
+            Reporting::ListFilter.new(type: 'control_tag:tag1', values: ['value1']),
         ]
     )
     assert_equal(Reporting::Report, res.class)
     assert_equal(Google::Protobuf::RepeatedField, res['profiles'].class)
     if res['profiles'].is_a?(Google::Protobuf::RepeatedField)
       assert_equal(2, res['profiles'].length)
-      assert_equal(0, res['profiles'][0]['controls'].length)
       assert_equal(1, res['profiles'][0]['controls'].length)
+      assert_equal(0, res['profiles'][1]['controls'].length)
       assert_equal('os-02', res['profiles'][0]['controls'][0]['id'])
     end
 
