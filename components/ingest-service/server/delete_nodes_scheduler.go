@@ -90,7 +90,7 @@ func (server *JobSchedulerServer) ConfigureDeleteNodesScheduler(ctx context.Cont
 		return &ingest.ConfigureDeleteNodesSchedulerResponse{}, status.Error(codes.Internal, err.Error())
 	}
 	if shouldRunNow {
-		err = server.runJobNow(ctx, DeleteNodesWorkflowName)
+		err = server.runWorkflowNow(ctx, DeleteNodesWorkflowName)
 		if err != nil {
 			return &ingest.ConfigureDeleteNodesSchedulerResponse{}, status.Error(codes.Internal, err.Error())
 		}
