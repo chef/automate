@@ -29,6 +29,8 @@ export class NodesListComponent implements OnInit, OnDestroy {
 
   showNodeResults = false;
 
+  failedNode: object;
+
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
   ngOnInit(): void {
@@ -79,13 +81,19 @@ export class NodesListComponent implements OnInit, OnDestroy {
     this.router.navigate([], {queryParams});
   }
 
-  onNodeResultsShow(_event, id) {
+  onNodeResultsShow(id: string): void {
     this.showNodeResults = true;
-    this.store.dispatch(actions.getNode(id));
+
+    this.nodesList.items.map(node => {
+      if ( node.id === id ) {
+        this.failedNode = node;
+      }
+    });
   }
 
   onNodeResultsHide(_event) {
     this.showNodeResults = false;
+    this.failedNode = null;
   }
 
   trackBy(index, _item) {
