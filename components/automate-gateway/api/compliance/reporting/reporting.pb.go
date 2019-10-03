@@ -2875,7 +2875,7 @@ type ReportingServiceClient interface {
 	ListReports(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Reports, error)
 	ListReportIds(ctx context.Context, in *Query, opts ...grpc.CallOption) (*ReportIds, error)
 	// should cover /controls
-	// This api is useful for getting a limited list of control items for latest runs.  It also honors all reporting filters
+	// This api is useful for getting a limited list of control items for latest runs. It also honors all reporting filters
 	ListControlItems(ctx context.Context, in *ControlItemRequest, opts ...grpc.CallOption) (*ControlItems, error)
 	ReadReport(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Report, error)
 	ListSuggestions(ctx context.Context, in *SuggestionRequest, opts ...grpc.CallOption) (*Suggestions, error)
@@ -3022,7 +3022,7 @@ type ReportingServiceServer interface {
 	ListReports(context.Context, *Query) (*Reports, error)
 	ListReportIds(context.Context, *Query) (*ReportIds, error)
 	// should cover /controls
-	// This api is useful for getting a limited list of control items for latest runs.  It also honors all reporting filters
+	// This api is useful for getting a limited list of control items for latest runs. It also honors all reporting filters
 	ListControlItems(context.Context, *ControlItemRequest) (*ControlItems, error)
 	ReadReport(context.Context, *Query) (*Report, error)
 	ListSuggestions(context.Context, *SuggestionRequest) (*Suggestions, error)
