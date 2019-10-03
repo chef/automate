@@ -125,7 +125,7 @@ func (s *Workflow) OnStart(w cereal.WorkflowInstance, _ cereal.StartEvent) cerea
 
 	err = w.EnqueueTask(taskName, policies)
 	if err != nil {
-		w.Fail(err)
+		return w.Fail(err)
 	}
 
 	return w.Continue(nil)
