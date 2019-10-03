@@ -5,10 +5,10 @@ require 'api/reporting/reporting_services_pb'
 describe File.basename(__FILE__) do
   Reporting = Chef::Automate::Domain::Compliance::Api::Reporting unless defined?(Reporting)
 
-  it "works" do
-    reporting = Reporting::ReportingService
+  reporting = Reporting::ReportingService
 
-    ##### Success tests #####
+  it "ListNodes: sort by node name" do
+
     # sort by node name now
     resp = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
       Reporting::ListFilter.new(type: 'start_time', values: ['2018-03-02T00:00:01Z']), # start_time is ignored for this call. Only end_time is used
@@ -20,7 +20,9 @@ describe File.basename(__FILE__) do
                   "windows(1)-zeta-apache(s)-skipped"],
                  resp['nodes'].map{ |x| x['name'] }
     )
+  end
 
+  it "ListNodes: defaults" do
     # Get all nodes, sorted by latest_report(default), asc(default) order
     # Hits only daily index 2018-03-05
     actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
@@ -74,7 +76,9 @@ describe File.basename(__FILE__) do
       "totalPassed"=>1
     }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
+  end
 
+  it "ReadNode" do
     # Node details API
     actual_node = GRPC reporting, :read_node, Reporting::Id.new(id: '9b9f4e51-b049-4b10-9555-10578916e149')
     expected_node = {
@@ -122,7 +126,9 @@ describe File.basename(__FILE__) do
       ]
     }.to_json
     assert_equal_json_sorted(expected_node, actual_node.to_json)
+  end
 
+  it "ListProfiles: Get two profiles" do
     END_OF_DAY = "23:59:59Z"
     # Get "two" profiles page 1
     actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(
@@ -154,7 +160,9 @@ describe File.basename(__FILE__) do
       }
     }.to_json
     assert_equal_json_sorted(expected_data, actual_data.to_json)
+  end
 
+  it "ListProfiles: filter by control" do
     # Search profiles and filter by control. Should not show profiles that ran on a node without containing the control
     actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'control', values: ['sysctl-06']),
@@ -186,7 +194,9 @@ describe File.basename(__FILE__) do
       }
     }.to_json
     assert_equal_json_sorted(expected_data, actual_data.to_json)
+  end
 
+  it "ListSuggestions: controls 'icMP' with filter by profile ID" do
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'control',
       text: 'icMP',
@@ -200,9 +210,10 @@ describe File.basename(__FILE__) do
       "ICMP echo ignore broadcasts--sysctl-04--",
       "ICMP ignore bogus error responses--sysctl-03--" ]
     assert_suggestions_text_id_version(expected, actual_data)
+  end
 
 
-
+  it "ListSuggestions: controls 'sys' with filter by profile ID" do
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'control',
       text: 'sys',
@@ -214,11 +225,11 @@ describe File.basename(__FILE__) do
       "Magic SysRq--sysctl-30--",
       "Disable the system`s acceptance of router advertisement--sysctl-25--",
       "Protection against SYN flood attacks--sysctl-11--",
-      #TODO - the control below should not be here. it is because we get info based on report..but this should only include
-      # controls of the the given profile.
       "Disable Apache’s follows Symbolic Links for directories in alias.conf--apache-11--"]
     assert_suggestions_text_id_version(expected, actual_data)
+  end
 
+  it "ListSuggestions: profile with filter by controls" do
     # suggest profiles with control filters. Should not show profiles that ran on a node without containing the control
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'profile',
@@ -226,18 +237,14 @@ describe File.basename(__FILE__) do
         Reporting::ListFilter.new(type: 'control', values: ['sysctl-06','missing-one'])
       ]
     )
-    #TODO - the profile (apache-baseline) below should not be here. it is because we get info based on report..but this
-    # should only include profiles that contain the given control
     expected = ["DevSec Apache Baseline--41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8--2.0.0",
                 "DevSec Linux Security Baseline--b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015--2.0.1"]
     assert_suggestions_text_id_version(expected, actual_data)
+  end
 
-    # Get a specific report
+  it "ReadReport" do
     res = GRPC reporting, :read_report, Reporting::Query.new(id: 'bb93e1b2-36d6-439e-ac70-cccccccccc07')
     assert_equal(Reporting::Report, res.class)
-
-    # in case you need to update the expected_json, print it out with the line below
-    #puts actual_data.to_json
 
     assert_equal('3.1.3', res['version'])
     assert_equal('bb93e1b2-36d6-439e-ac70-cccccccccc07', res['id'])
@@ -270,12 +277,8 @@ describe File.basename(__FILE__) do
       passed_control = res['profiles'][0]['controls'][0]['results'].first
       assert_equal('passed', passed_control['status'])
 
-      # assert_equal('skipped', res['profiles'][0]['depends'][0]['status'])
-      # assert_equal("Skipping profile: 'myprofile1' on unsupported platform: 'mac_os_x/17.7.0'.", res['profiles'][0]['depends'][0]['skip_message'])
-
       assert_equal('failed', res['profiles'][1]['status'])
       assert_equal('', res['profiles'][1]['skip_message'])
     end
-
   end
 end
