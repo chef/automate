@@ -35,7 +35,7 @@ var (
 	ScanJobWorkflowName = cereal.NewWorkflowName("scan-job-workflow")
 
 	CreateChildTaskName    = cereal.NewTaskName("create-child")
-	ResolveJobTaskName     = cereal.NewTaskName("resovle-job")
+	ResolveJobTaskName     = cereal.NewTaskName("resolve-job")
 	ScanJobTaskName        = cereal.NewTaskName("scan-job")
 	ScanJobSummaryTaskName = cereal.NewTaskName("scan-job-summary")
 )
