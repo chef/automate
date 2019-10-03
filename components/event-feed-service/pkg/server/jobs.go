@@ -13,9 +13,9 @@ import (
 	"github.com/chef/automate/lib/datalifecycle/purge"
 )
 
+var PurgeWorkflowName = cereal.NewWorkflowName("purge")
+
 const (
-	PurgeWorkflowName   = "purge"
-	PurgeJobName        = "purge"
 	PurgeScheduleName   = "periodic_purge"
 	PurgeFeedPolicyName = "feed"
 	PurgeFeedIndexName  = persistence.IndexNameFeeds

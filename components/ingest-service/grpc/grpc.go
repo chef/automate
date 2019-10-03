@@ -189,7 +189,7 @@ func Spawn(opts *serveropts.Opts) error {
 	purgeServer, err := purge.NewServer(
 		jobManager,
 		server.PurgeScheduleName,
-		server.PurgeJobName,
+		server.PurgeWorkflowName,
 		server.DefaultPurgePolicies,
 		purge.WithServerEsSidecarClient(esSidecarClient),
 	)

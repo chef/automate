@@ -12,9 +12,11 @@ import (
 	"github.com/chef/automate/lib/datalifecycle/purge"
 )
 
+var (
+	PurgeWorkflowName = cereal.NewWorkflowName("purge_timeseries")
+)
+
 const (
-	PurgeWorkflowName         = "purge_timeseries"
-	PurgeJobName              = "purge_timeseries"
 	PurgeScheduleName         = "periodic_purge_timeseries"
 	PurgeConvergeHistoryName  = "converge-history"
 	PurgeConvergeHistoryIndex = "converge-history"

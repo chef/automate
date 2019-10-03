@@ -28,9 +28,9 @@ import (
 	"github.com/chef/automate/lib/grpc/secureconn"
 )
 
-const (
-	dataFeedTaskName     = cereal.TaskName("data-feed-poll")
-	dataFeedWorkflowName = cereal.WorkflowName("data-feed-workflow")
+var (
+	dataFeedTaskName     = cereal.NewTaskName("data-feed-poll")
+	dataFeedWorkflowName = cereal.NewWorkflowName("data-feed-workflow")
 	dataFeedScheduleName = "periodic-data-feed-workflow"
 )
 

@@ -42,11 +42,20 @@ const (
 // for the parameters
 type Schedule backend.Schedule
 
-type WorkflowName string
-type TaskName string
+type WorkflowName struct {
+	value string
+}
 
-func (w WorkflowName) String() string { return string(w) }
-func (w TaskName) String() string     { return string(w) }
+func NewWorkflowName(name string) WorkflowName { return WorkflowName{value: name} }
+
+type TaskName struct {
+	value string
+}
+
+func NewTaskName(name string) TaskName { return TaskName{value: name} }
+
+func (w WorkflowName) String() string { return w.value }
+func (w TaskName) String() string     { return w.value }
 
 func (s *Schedule) GetParameters(out interface{}) error {
 	if s.Parameters != nil {
@@ -1148,7 +1157,7 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 		decision = executor.OnStart(w, StartEvent{})
 	case backend.TaskComplete:
 		decision = executor.OnTaskComplete(w, TaskCompleteEvent{
-			TaskName: TaskName(wevt.TaskResult.TaskName),
+			TaskName: NewTaskName(wevt.TaskResult.TaskName),
 			Result: &taskResult{
 				backendResult: wevt.TaskResult,
 			},

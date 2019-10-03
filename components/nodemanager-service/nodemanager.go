@@ -62,14 +62,14 @@ func Serve(conf config.Nodemanager, grpcBinding string) error {
 	return serve(ctx, &conf, connFactory)
 }
 
-const (
-	AwsEc2PollingWorkflowName = cereal.WorkflowName("awsec2_polling")
+var (
+	AwsEc2PollingWorkflowName = cereal.NewWorkflowName("awsec2_polling")
 	Awsec2PollingScheduleName = "awsec2_polling_schedule"
 
-	AzureVMPollingWorkflowName = cereal.WorkflowName("azurevm_polling")
+	AzureVMPollingWorkflowName = cereal.NewWorkflowName("azurevm_polling")
 	AzureVMPollingScheduleName = "azurevm_polling_schedule"
 
-	ManagersPollingWorkflowName = cereal.WorkflowName("managers_polling")
+	ManagersPollingWorkflowName = cereal.NewWorkflowName("managers_polling")
 	ManagersPollingScheduleName = "managers_polling_schedule"
 )
 

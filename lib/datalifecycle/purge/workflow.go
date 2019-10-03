@@ -10,7 +10,7 @@ import (
 	"github.com/chef/automate/lib/cereal"
 )
 
-const taskName = cereal.TaskName("purge")
+var taskName = cereal.NewTaskName("purge")
 
 // ConfigureManager registers the purge workflow executor and task
 // executor.

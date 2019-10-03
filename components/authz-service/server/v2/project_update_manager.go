@@ -28,14 +28,16 @@ const (
 	ProjectUpdateRunningState    ProjectUpdateState = "running"
 	ProjectUpdateNotRunningState ProjectUpdateState = "not_running"
 
-	ProjectUpdateWorkflowName = cereal.WorkflowName("ProjectUpdate")
-	ProjectUpdateInstanceName = "SingletonV1"
-	ApplyStagedRulesTaskName  = cereal.TaskName("authz/ApplyStagedRules")
-
 	ProjectUpdateStageApplyStagedRules     ProjectUpdateStage = "apply_staged_rules"
 	ProjectUpdateStageUpdateDomainServices ProjectUpdateStage = "update_domain_services"
 	ProjectUpdateStageUpdateDone           ProjectUpdateStage = "done"
 	ProjectUpdateStageUpdateNone           ProjectUpdateStage = "none"
+)
+
+var (
+	ProjectUpdateWorkflowName = cereal.NewWorkflowName("ProjectUpdate")
+	ProjectUpdateInstanceName = "SingletonV1"
+	ApplyStagedRulesTaskName  = cereal.NewTaskName("authz/ApplyStagedRules")
 )
 
 var ProjectUpdateDomainServices = []string{

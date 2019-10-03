@@ -27,7 +27,7 @@ func NewSingleTaskWorkflowExecutor(taskName cereal.TaskName, allowCancel bool) *
 func RegisterSingleTaskWorkflowExecutor(mgr *cereal.Manager, workflowName cereal.WorkflowName,
 	allowCancel bool, executor cereal.TaskExecutor, opts cereal.TaskExecutorOpts) error {
 
-	taskName := cereal.TaskName(workflowName.String())
+	taskName := cereal.NewTaskName(workflowName.String())
 	err := mgr.RegisterTaskExecutor(taskName, executor, cereal.TaskExecutorOpts{})
 	if err != nil {
 		return err

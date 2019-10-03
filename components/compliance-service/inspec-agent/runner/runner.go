@@ -31,13 +31,13 @@ import (
 
 var ListenPort int = 2133
 
-const (
-	ScanJobWorkflowName = cereal.WorkflowName("scan-job-workflow")
+var (
+	ScanJobWorkflowName = cereal.NewWorkflowName("scan-job-workflow")
 
-	CreateChildTaskName    = cereal.TaskName("create-child")
-	ResolveJobTaskName     = cereal.TaskName("resovle-job")
-	ScanJobTaskName        = cereal.TaskName("scan-job")
-	ScanJobSummaryTaskName = cereal.TaskName("scan-job-summary")
+	CreateChildTaskName    = cereal.NewTaskName("create-child")
+	ResolveJobTaskName     = cereal.NewTaskName("resovle-job")
+	ScanJobTaskName        = cereal.NewTaskName("scan-job")
+	ScanJobSummaryTaskName = cereal.NewTaskName("scan-job-summary")
 )
 
 func InitCerealManager(m *cereal.Manager, workerCount int, ingestClient ingest.ComplianceIngesterClient,

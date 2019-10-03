@@ -47,7 +47,7 @@ func (server *JobSchedulerServer) GetStatusJobScheduler(ctx context.Context,
 	)
 	for _, sched := range schedules {
 		switch sched.WorkflowName {
-		case PurgeJobName:
+		case PurgeWorkflowName.String():
 			var (
 				purgePolicies purge.Policies
 				job           *ingest.Job
@@ -63,7 +63,7 @@ func (server *JobSchedulerServer) GetStatusJobScheduler(ctx context.Context,
 
 			toJobName := func(index string) string {
 				index = strings.ReplaceAll(index, "-", "_")
-				return fmt.Sprintf("%s_%s", PurgeJobName, index)
+				return fmt.Sprintf("%s_%s", PurgeWorkflowName, index)
 			}
 
 			for _, policy := range purgePolicies.Es {

@@ -87,7 +87,7 @@ func Spawn(c *config.EventFeed, connFactory *secureconn.Factory) error {
 	purgeServer, err := purge.NewServer(
 		jobManager,
 		server.PurgeScheduleName,
-		server.PurgeJobName,
+		server.PurgeWorkflowName,
 		server.DefaultPurgePolicies,
 		purge.WithServerEsSidecarClient(esSidecarClient),
 	)
