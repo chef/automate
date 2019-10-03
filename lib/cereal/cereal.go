@@ -601,7 +601,7 @@ func NewManager(b backend.Driver, opts ...ManagerOpt) (*Manager, error) {
 // done from only one thread of the process. This must be called before Start.
 func (m *Manager) RegisterWorkflowExecutor(workflowName WorkflowName,
 	workflowExecutor WorkflowExecutor) error {
-	m.workflowExecutors[string(workflowName)] = workflowExecutor
+	m.workflowExecutors[workflowName.String()] = workflowExecutor
 	return nil
 }
 
@@ -913,7 +913,7 @@ func (m *Manager) CreateWorkflowSchedule(
 	if err != nil {
 		return err
 	}
-	err = m.backend.CreateWorkflowSchedule(ctx, instanceName, string(workflowName),
+	err = m.backend.CreateWorkflowSchedule(ctx, instanceName, workflowName.String(),
 		jsonData, enabled, recurRule.String(), nextRunAt)
 	if err == nil {
 		m.workflowScheduler.Trigger()
@@ -968,7 +968,7 @@ func (m *Manager) UpdateWorkflowScheduleByName(ctx context.Context,
 			return err
 		}
 	}
-	err := m.backend.UpdateWorkflowScheduleByName(ctx, instanceName, string(workflowName), o)
+	err := m.backend.UpdateWorkflowScheduleByName(ctx, instanceName, workflowName.String(), o)
 	if err == nil {
 		m.workflowScheduler.Trigger()
 	}
@@ -989,7 +989,7 @@ func (m *Manager) ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error
 }
 
 func (m *Manager) GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName WorkflowName) (*Schedule, error) {
-	backendSched, err := m.backend.GetWorkflowScheduleByName(ctx, instanceName, string(workflowName))
+	backendSched, err := m.backend.GetWorkflowScheduleByName(ctx, instanceName, workflowName.String())
 	if err != nil {
 		return nil, err
 	}
@@ -998,7 +998,7 @@ func (m *Manager) GetWorkflowScheduleByName(ctx context.Context, instanceName st
 }
 
 func (m *Manager) GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName WorkflowName) (ImmutableWorkflowInstance, error) {
-	workflowInstance, err := m.backend.GetWorkflowInstanceByName(ctx, instanceName, string(workflowName))
+	workflowInstance, err := m.backend.GetWorkflowInstanceByName(ctx, instanceName, workflowName.String())
 	if err != nil {
 		return nil, err
 	}
@@ -1017,7 +1017,7 @@ func (m *Manager) EnqueueWorkflow(ctx context.Context, workflowName WorkflowName
 		return err
 	}
 	err = m.backend.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
-		WorkflowName: string(workflowName),
+		WorkflowName: workflowName.String(),
 		InstanceName: instanceName,
 		Parameters:   paramsData,
 	})
