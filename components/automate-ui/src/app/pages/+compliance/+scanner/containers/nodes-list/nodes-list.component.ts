@@ -29,7 +29,7 @@ export class NodesListComponent implements OnInit, OnDestroy {
 
   showNodeResults = false;
 
-  failedNode: object;
+  failedNode: Object;
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
