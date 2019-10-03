@@ -41,10 +41,6 @@ interface KVCondition {
 export class ProjectRulesComponent implements OnInit, OnDestroy {
   public ruleId: string;
   public ruleForm: FormGroup;
-  public selectResourceChefOption = true;
-  public selectAttributeChefOption = true;
-  public selectOperatorChefOption = true;
-  public currentRuleIndex: number;
   public attributeList: string;
 
   // FIXME: either make properties optional in interface, or provide them on initialization:
@@ -158,25 +154,20 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  public patchResourceValue(form, event) {
+  public patchTypeValue(form, event) {
     form.controls['type'].setValue(event.target.value);
     this.attributeList = this.attributes[form.get('type').value.toLowerCase()];
-    this.selectResourceChefOption = false;
   }
 
   public patchAttributeValue(form, event, i) {
-    this.currentRuleIndex = i;
     form.controls.conditions.controls[i].controls['attribute'].setValue(event.target.value);
-    this.selectAttributeChefOption = false;
     if (this.editingRule) {
       form.controls.conditions.controls[i].controls['attribute'].markAsDirty();
     }
   }
 
   public patchOperatorValue(form, event, i) {
-    this.currentRuleIndex = i;
     form.controls.conditions.controls[i].controls['operator'].setValue(event.target.value);
-    this.selectOperatorChefOption = false;
     if (this.editingRule) {
       form.controls.conditions.controls[i].controls['operator'].markAsDirty();
     }
@@ -210,8 +201,6 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   }
 
   addCondition(): void {
-    this.selectAttributeChefOption = true;
-    this.selectOperatorChefOption = true;
     const conditions = this.ruleForm.get('conditions') as FormArray;
     conditions.push(this.createCondition());
   }
@@ -240,8 +229,6 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         // Convert values array to display string
         this.createCondition(c.attribute, c.operator, c.values.join(', ')));
         this.attributeList = this.attributes[this.rule.type.toLowerCase()];
-        this.selectAttributeChefOption = false;
-        this.selectOperatorChefOption = false;
     } else {
       conditions = [this.createCondition()];
     }
