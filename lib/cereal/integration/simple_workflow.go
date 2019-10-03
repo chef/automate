@@ -17,8 +17,8 @@ import (
 // - OnStart -> Launch 'simple' task
 // - OnTaskComplete -> Done
 func (suite *CerealTestSuite) TestCompleteSimpleWorkflow() {
-	taskName := randName("simple")
-	workflowName := randName("simple")
+	taskName := cereal.NewTaskName(randName("simple"))
+	workflowName := cereal.NewWorkflowName(randName("simple"))
 	instanceName := randName("instance")
 
 	// There will be once task that runs, along

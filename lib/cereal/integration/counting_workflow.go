@@ -16,8 +16,8 @@ import (
 // workflow name but different workflow instance names.
 // Also tests the handling of workflow parameters
 func (suite *CerealTestSuite) TestCountToNWorkflow() {
-	taskName := randName("count1")
-	workflowName := randName("countN")
+	taskName := cereal.NewTaskName(randName("count1"))
+	workflowName := cereal.NewWorkflowName(randName("countN"))
 	instance100Name := "instance100"
 	var instance100Count int
 	instance10Name := "instance10"

@@ -12,8 +12,8 @@ import (
 )
 
 func (suite *CerealTestSuite) TestDelayedTask() {
-	taskName := randName("delayed")
-	workflowName := randName("delayed")
+	taskName := cereal.NewTaskName(randName("delayed"))
+	workflowName := cereal.NewWorkflowName(randName("delayed"))
 	instanceName := randName("instance")
 
 	wgTask := sync.WaitGroup{}

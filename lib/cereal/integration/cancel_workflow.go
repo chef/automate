@@ -13,8 +13,8 @@ import (
 )
 
 func (suite *CerealTestSuite) TestCancelWorkflow() {
-	taskName := randName("cancel")
-	workflowName := randName("cancel")
+	taskName := cereal.NewTaskName(randName("cancel"))
+	workflowName := cereal.NewWorkflowName(randName("cancel"))
 	instanceName := randName("instance")
 
 	wgWorkflowStart := sync.WaitGroup{}
