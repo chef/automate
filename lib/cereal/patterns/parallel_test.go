@@ -55,7 +55,7 @@ func TestParallelWorkflowOnStart(t *testing.T) {
 					err := w.GetParameters(&params)
 					require.NoError(t, err)
 					require.Equal(t, workflow1Params, params)
-					w.EnqueueTask("testTask1", workflow1TaskParams)
+					w.EnqueueTask(cereal.NewTaskName("testTask1"), workflow1TaskParams)
 					require.Equal(t, 0, w.TotalCompletedTasks())
 					require.Equal(t, 1, w.TotalEnqueuedTasks())
 					return w.Continue(TestWorkflowPayload{
@@ -71,7 +71,7 @@ func TestParallelWorkflowOnStart(t *testing.T) {
 					err := w.GetParameters(&params)
 					require.NoError(t, err)
 					require.Equal(t, workflow2Params, params)
-					w.EnqueueTask("testTask2", workflow2TaskParams)
+					w.EnqueueTask(cereal.NewTaskName("testTask2"), workflow2TaskParams)
 					require.Equal(t, 0, w.TotalCompletedTasks())
 					require.Equal(t, 1, w.TotalEnqueuedTasks())
 					return w.Continue(TestWorkflowPayload{
@@ -100,13 +100,13 @@ func TestParallelWorkflowOnStart(t *testing.T) {
 
 		executor.OnStart(instance, ev)
 		continuing := instance.AssertContinuing()
-		tasks := continuing.AssertTaskEnqueued("testTask1").AssertCount(1)
+		tasks := continuing.AssertTaskEnqueued(cereal.NewTaskName("testTask1")).AssertCount(1)
 		task1Params := TestTaskParams{}
 		tasks.Tasks[0].GetParameters(&task1Params)
 		require.Equal(t, workflow1TaskParams, task1Params)
 		assertTaskHasKey(t, tasks.Tasks[0], "workflow1")
 
-		tasks = continuing.AssertTaskEnqueued("testTask2").AssertCount(1)
+		tasks = continuing.AssertTaskEnqueued(cereal.NewTaskName("testTask2")).AssertCount(1)
 		task2Params := TestTaskParams{}
 		tasks.Tasks[0].GetParameters(&task2Params)
 		require.Equal(t, workflow2TaskParams, task2Params)
@@ -171,7 +171,7 @@ func TestParallelWorkflowOnStart(t *testing.T) {
 					err := w.GetParameters(&params)
 					require.NoError(t, err)
 					require.Equal(t, workflow2Params, params)
-					w.EnqueueTask("testTask2", workflow2TaskParams)
+					w.EnqueueTask(cereal.NewTaskName("testTask2"), workflow2TaskParams)
 					require.Equal(t, 0, w.TotalCompletedTasks())
 					require.Equal(t, 1, w.TotalEnqueuedTasks())
 					return w.Continue(TestWorkflowPayload{
@@ -201,7 +201,7 @@ func TestParallelWorkflowOnStart(t *testing.T) {
 		executor.OnStart(instance, ev)
 		continuing := instance.AssertContinuing()
 
-		tasks := continuing.AssertTaskEnqueued("testTask2").AssertCount(1)
+		tasks := continuing.AssertTaskEnqueued(cereal.NewTaskName("testTask2")).AssertCount(1)
 		task2Params := TestTaskParams{}
 		tasks.Tasks[0].GetParameters(&task2Params)
 		require.Equal(t, workflow2TaskParams, task2Params)
@@ -265,7 +265,7 @@ func TestParallelWorkflowOnStart(t *testing.T) {
 					err := w.GetParameters(&params)
 					require.NoError(t, err)
 					require.Equal(t, workflow2Params, params)
-					w.EnqueueTask("testTask2", workflow2TaskParams)
+					w.EnqueueTask(cereal.NewTaskName("testTask2"), workflow2TaskParams)
 					require.Equal(t, 0, w.TotalCompletedTasks())
 					require.Equal(t, 1, w.TotalEnqueuedTasks())
 					return w.Continue(TestWorkflowPayload{
@@ -295,7 +295,7 @@ func TestParallelWorkflowOnStart(t *testing.T) {
 		executor.OnStart(instance, ev)
 		continuing := instance.AssertContinuing()
 
-		tasks := continuing.AssertTaskEnqueued("testTask2").AssertCount(1)
+		tasks := continuing.AssertTaskEnqueued(cereal.NewTaskName("testTask2")).AssertCount(1)
 		task2Params := TestTaskParams{}
 		tasks.Tasks[0].GetParameters(&task2Params)
 		require.Equal(t, workflow2TaskParams, task2Params)
@@ -523,7 +523,7 @@ func TestParallelWorkflowOnTaskComplete(t *testing.T) {
 			XXX_ParallelWorkflowKey: "blah",
 		}
 		tr := cerealtest.NewTaskResult(t).WithParameters(taskMetadata)
-		ev := cerealtest.NewTaskCompleteEvent("testTask1", tr)
+		ev := cerealtest.NewTaskCompleteEvent(cereal.NewTaskName("testTask1"), tr)
 
 		executor.OnTaskComplete(instance, ev)
 		instance.AssertFailed().WithErrorEqual(ErrTaskWorkflowInvalid)
@@ -562,7 +562,7 @@ func TestParallelWorkflowOnTaskComplete(t *testing.T) {
 			XXX_ParallelWorkflowKey: "workflow1",
 		}
 		tr := cerealtest.NewTaskResult(t).WithParameters(taskMetadata)
-		ev := cerealtest.NewTaskCompleteEvent("testTask1", tr)
+		ev := cerealtest.NewTaskCompleteEvent(cereal.NewTaskName("testTask1"), tr)
 
 		executor.OnTaskComplete(instance, ev)
 		instance.AssertFailed().WithErrorEqual(ErrTaskWorkflowInvalid)
@@ -604,7 +604,7 @@ func TestParallelWorkflowOnTaskComplete(t *testing.T) {
 			XXX_ParallelWorkflowKey: "workflow1",
 		}
 		tr := cerealtest.NewTaskResult(t).WithParameters(taskMetadata)
-		ev := cerealtest.NewTaskCompleteEvent("testTask1", tr)
+		ev := cerealtest.NewTaskCompleteEvent(cereal.NewTaskName("testTask1"), tr)
 
 		executor.OnTaskComplete(instance, ev)
 
@@ -674,7 +674,7 @@ func TestParallelWorkflowOnTaskComplete(t *testing.T) {
 			XXX_ParallelWorkflowKey: "workflow2",
 		}
 		tr := cerealtest.NewTaskResult(t).WithParameters(taskMetadata)
-		ev := cerealtest.NewTaskCompleteEvent("testTask1", tr)
+		ev := cerealtest.NewTaskCompleteEvent(cereal.NewTaskName("testTask1"), tr)
 
 		executor.OnTaskComplete(instance, ev)
 
@@ -743,7 +743,7 @@ func TestParallelWorkflowOnTaskComplete(t *testing.T) {
 			XXX_ParallelWorkflowKey: "workflow2",
 		}
 		tr := cerealtest.NewTaskResult(t).WithParameters(taskMetadata)
-		ev := cerealtest.NewTaskCompleteEvent("testTask1", tr)
+		ev := cerealtest.NewTaskCompleteEvent(cereal.NewTaskName("testTask1"), tr)
 
 		executor.OnTaskComplete(instance, ev)
 
@@ -876,7 +876,7 @@ func TestParallelWorkflowOnCancel(t *testing.T) {
 					err := w.GetParameters(&params)
 					require.NoError(t, err)
 					require.Equal(t, workflow1Params, params)
-					w.EnqueueTask("testTask1", workflow1TaskParams)
+					w.EnqueueTask(cereal.NewTaskName("testTask1"), workflow1TaskParams)
 					require.Equal(t, 0, w.TotalCompletedTasks())
 					require.Equal(t, 2, w.TotalEnqueuedTasks())
 					return w.Continue(TestWorkflowPayload{
@@ -892,7 +892,7 @@ func TestParallelWorkflowOnCancel(t *testing.T) {
 					err := w.GetParameters(&params)
 					require.NoError(t, err)
 					require.Equal(t, workflow2Params, params)
-					w.EnqueueTask("testTask2", workflow2TaskParams)
+					w.EnqueueTask(cereal.NewTaskName("testTask2"), workflow2TaskParams)
 					require.Equal(t, 0, w.TotalCompletedTasks())
 					require.Equal(t, 2, w.TotalEnqueuedTasks())
 					return w.Continue(TestWorkflowPayload{
@@ -929,13 +929,13 @@ func TestParallelWorkflowOnCancel(t *testing.T) {
 		executor.OnCancel(instance, ev)
 		continuing := instance.AssertContinuing()
 
-		tasks1 := continuing.AssertTaskEnqueued("testTask1").AssertCount(1)
+		tasks1 := continuing.AssertTaskEnqueued(cereal.NewTaskName("testTask1")).AssertCount(1)
 		task1Params := TestTaskParams{}
 		tasks1.Tasks[0].GetParameters(&task1Params)
 		require.Equal(t, workflow1TaskParams, task1Params)
 		assertTaskHasKey(t, tasks1.Tasks[0], "workflow1")
 
-		tasks2 := continuing.AssertTaskEnqueued("testTask2").AssertCount(1)
+		tasks2 := continuing.AssertTaskEnqueued(cereal.NewTaskName("testTask2")).AssertCount(1)
 		task2Params := TestTaskParams{}
 		tasks2.Tasks[0].GetParameters(&task2Params)
 		require.Equal(t, workflow2TaskParams, task2Params)

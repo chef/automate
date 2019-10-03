@@ -6,15 +6,19 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
+	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/cerealtest"
 )
 
 const (
 	svcName         = "testSvc"
 	projectUpdateID = "someid"
-	startTaskName   = "testSvc/StartProjectTagUpdater"
-	statusTaskName  = "testSvc/ProjectTagUpdaterStatus"
-	cancelTaskName  = "testSvc/CancelUpdateProjectTags"
+)
+
+var (
+	startTaskName  = cereal.NewTaskName("testSvc/StartProjectTagUpdater")
+	statusTaskName = cereal.NewTaskName("testSvc/ProjectTagUpdaterStatus")
+	cancelTaskName = cereal.NewTaskName("testSvc/CancelUpdateProjectTags")
 )
 
 func TestWorkflowOnStart(t *testing.T) {

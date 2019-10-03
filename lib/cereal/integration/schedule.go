@@ -14,8 +14,8 @@ import (
 )
 
 func (suite *CerealTestSuite) TestSimpleScheduleWorkflow() {
-	taskName := randName("simple_schedule")
-	workflowName := randName("simple_schedule")
+	taskName := cereal.NewTaskName(randName("simple_schedule"))
+	workflowName := cereal.NewWorkflowName(randName("simple_schedule"))
 	instanceName := randName("instance")
 
 	wgWorkflow := sync.WaitGroup{}
@@ -80,7 +80,7 @@ func (suite *CerealTestSuite) TestSimpleScheduleWorkflow() {
 	schedules, err := m.ListWorkflowSchedules(context.Background())
 	suite.Require().NoError(err)
 	for _, s := range schedules {
-		if s.WorkflowName == workflowName && s.InstanceName == instanceName {
+		if s.WorkflowName == workflowName.String() && s.InstanceName == instanceName {
 			found = true
 		}
 	}
@@ -94,7 +94,7 @@ func (suite *CerealTestSuite) TestSimpleScheduleWorkflow() {
 }
 
 func (suite *CerealTestSuite) TestScheduleUpdates() {
-	workflowName := randName("test_schedule")
+	workflowName := cereal.NewWorkflowName(randName("test_schedule"))
 	instanceName := randName("test_instance")
 
 	m := suite.newManager(
@@ -149,7 +149,7 @@ func (suite *CerealTestSuite) TestScheduleUpdates() {
 }
 
 func (suite *CerealTestSuite) TestCreateExpiredSchedule() {
-	workflowName := randName("expired_schedule")
+	workflowName := cereal.NewWorkflowName(randName("expired_schedule"))
 	instanceName := randName("instance")
 
 	m := suite.newManager(
@@ -183,8 +183,8 @@ func (suite *CerealTestSuite) TestCreateExpiredSchedule() {
 }
 
 func (suite *CerealTestSuite) TestExpiringSchedule() {
-	taskName := randName("expiring_schedule")
-	workflowName := randName("expiring_schedule")
+	taskName := cereal.NewTaskName(randName("expiring_schedule"))
+	workflowName := cereal.NewWorkflowName(randName("expiring_schedule"))
 	instanceName := randName("instance")
 
 	wgWorkflow := sync.WaitGroup{}
@@ -240,7 +240,7 @@ func (suite *CerealTestSuite) TestExpiringSchedule() {
 	schedules, err := m.ListWorkflowSchedules(context.Background())
 	suite.Require().NoError(err)
 	for _, s := range schedules {
-		if s.WorkflowName == workflowName && s.InstanceName == instanceName {
+		if s.WorkflowName == workflowName.String() && s.InstanceName == instanceName {
 			suite.Assert().True(s.Enabled)
 			found = true
 		}
@@ -255,7 +255,7 @@ func (suite *CerealTestSuite) TestExpiringSchedule() {
 	schedules, err = m.ListWorkflowSchedules(context.Background())
 	suite.Require().NoError(err)
 	for _, s := range schedules {
-		if s.WorkflowName == workflowName && s.InstanceName == instanceName {
+		if s.WorkflowName == workflowName.String() && s.InstanceName == instanceName {
 			suite.Assert().False(s.Enabled,
 				"expected scheduled workflow to be disabled because it expired")
 			found = true
