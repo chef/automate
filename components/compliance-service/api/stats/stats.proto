@@ -56,12 +56,18 @@ message NodeSummary {
 	int32 medium_risk = 5;
 	int32 low_risk = 6;
 }
+
 message Stats {
-	int64	nodes = 1;
-	int32 platforms = 2;
-	int32 environments = 3;
-	int32 profiles = 4;
+	int32 nodes_cnt = 1;
+	//int64 types render into string types when serialized to satisfy all browsers
+	//we don't really need for nodes counts to be int64 as int32 limits us to 2billion nodes which is plenty for now
+	//we are therefore deprecating nodes and favor nodesCnt
+	int64 nodes = 2 [deprecated = true];
+	int32 platforms = 3;
+	int32 environments = 4;
+	int32 profiles = 5;
 }
+
 message ReportSummary {
 	Stats stats = 4;
 	string status = 1;

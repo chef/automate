@@ -372,6 +372,7 @@ func (depth *ProfileDepth) getStatsSummaryResult(searchResult *elastic.SearchRes
 				//we need to do this because the number of nodes can get huge and we only need the node count
 				//by setting the terms query for node_id to 1, we won't return any values but then we can just
 				//use nodes.SumOfOtherDocCount which works well because node_uuid is unique per node and therefore
+				reportSummary.Stats.NodesCnt = int32(len(nodes.Buckets)) + int32(nodes.SumOfOtherDocCount)
 				reportSummary.Stats.Nodes = int64(len(nodes.Buckets)) + nodes.SumOfOtherDocCount
 			}
 		}
