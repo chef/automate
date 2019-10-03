@@ -41,7 +41,7 @@ const (
 	authzV2Query            = "data.authz_v2.authorized"
 	authzProjectsV2Query    = "data.authz_v2.authorized_project[project]"
 	filteredPairsV2Query    = "data.authz_v2.introspection.authorized_pair[_]"
-	filteredProjectsV2Query = "data.authz_v2.introspection.authorized_project[project]"
+	filteredProjectsV2Query = "data.authz_v2.introspection.authorized_project"
 )
 
 // OptFunc is the type of functional options to be passed to New()
@@ -427,7 +427,7 @@ func (s *State) V2ProjectsAuthorized(
 
 	s.log.Warnf("V2ProjectsAuthorized end")
 
-	return s.projectsFromResults(resultSet)
+	return s.projectsFromPreparedEvalQuery(resultSet)
 }
 
 // FilterAuthorizedPairs passes the pairs into OPA, lets it take care of the
@@ -506,7 +506,7 @@ func (s *State) V2FilterAuthorizedProjects(
 
 	s.log.Warnf("V2FilterAuthorizedProjects end")
 
-	return s.projectsFromResults(rs)
+	return s.projectsFromPartialResults(rs)
 }
 
 func (s *State) evalQuery(
@@ -562,7 +562,38 @@ func (s *State) pairsFromResults(rs rego.ResultSet) ([]engine.Pair, error) {
 	return pairs, nil
 }
 
-func (s *State) projectsFromResults(rs rego.ResultSet) ([]string, error) {
+func (s *State) projectsFromPartialResults(rs rego.ResultSet) ([]string, error) {
+	if len(rs) != 1 {
+		return nil, &UnexpectedResultSetError{set: rs}
+	}
+	r := rs[0]
+	if len(r.Expressions) != 1 {
+		return nil, &UnexpectedResultExpressionError{exps: r.Expressions}
+	}
+	projects, err := s.stringArrayFromResults(r.Expressions)
+	if err != nil {
+		return nil, &UnexpectedResultExpressionError{exps: r.Expressions}
+	}
+	return projects, nil
+}
+
+func (s *State) stringArrayFromResults(exps []*rego.ExpressionValue) ([]string, error) {
+	rawArray, ok := exps[0].Value.([]interface{})
+	if !ok {
+		return nil, &UnexpectedResultExpressionError{exps: exps}
+	}
+	vals := make([]string, len(rawArray))
+	for i := range rawArray {
+		v, ok := rawArray[i].(string)
+		if !ok {
+			return nil, errors.New("error casting to string")
+		}
+		vals[i] = v
+	}
+	return vals, nil
+}
+
+func (s *State) projectsFromPreparedEvalQuery(rs rego.ResultSet) ([]string, error) {
 	result := make([]string, len(rs))
 	for i := range rs {
 		var ok bool
