@@ -42,16 +42,29 @@ const (
 // for the parameters
 type Schedule backend.Schedule
 
+// WorkflowName identifies workflows registered with the cereal
+// library. Many functions in the cereal library take or return
+// WorkflowNames.
 type WorkflowName struct {
 	value string
 }
 
+// NewWorkflowName constructs a WorkflowName from the given
+// string. The resulting WorkflowName is comparable to other
+// WorkflowName. Two WorkflowNames are equal if they were constructed
+// with strings that were equal.
 func NewWorkflowName(name string) WorkflowName { return WorkflowName{value: name} }
 
+// TaskName identifies tasks registered with the cereal library. Many
+// functions in the cereal library take or return TaskNames.
 type TaskName struct {
 	value string
 }
 
+// NewTaskName constructs a TaskName from the given
+// string. The resulting TaskName is comparable to other
+// WorkflowName. Two TaskNames are equal if they were constructed
+// with strings that were equal.
 func NewTaskName(name string) TaskName { return TaskName{value: name} }
 
 func (w WorkflowName) String() string { return w.value }
