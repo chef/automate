@@ -1,5 +1,4 @@
 include ../../Makefile.common_go
-LINTERARGS=-D lll ./... ../../api/config/es-sidecar-service/...
 PROJECT=es-sidecar-service
 ORG_PATH=github.com/chef/automate/components
 PACKAGE_PATH = $(ORG_PATH)/es-sidecar-service
