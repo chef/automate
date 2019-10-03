@@ -1,0 +1,23 @@
+    {
+      "name": "Viewerschef1",
+      "id": "policychef12",
+      "type": "CUSTOM",
+      "members": [
+        "team:saml:All Developers"
+      ],
+      "statements": [
+        {
+          "effect": "ALLOW",
+          "actions": [
+            "*"
+          ],
+          "role": "",
+          "projects": [
+            "gi-vrt-aut-infra"
+          ]
+        }
+      ],
+      "projects": [
+        "gi-vrt-aut-infra"
+      ]
+    }

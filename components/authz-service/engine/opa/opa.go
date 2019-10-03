@@ -31,7 +31,7 @@ type State struct {
 	modules           map[string]*ast.Module
 	partialAuth       rego.PartialResult
 	v2PartialAuth     rego.PartialResult
-	v2PartialProjects rego.PartialResult
+	v2PartialProjects rego.PreparedEvalQuery
 }
 
 // this needs to match the hardcoded OPA policy document we've put in place
@@ -39,7 +39,7 @@ const (
 	authzQuery              = "data.authz.authorized"
 	filteredPairsQuery      = "data.authz.introspection.authorized_pair[_]"
 	authzV2Query            = "data.authz_v2.authorized"
-	authzProjectsV2Query    = "data.authz_v2.authorized_project[x]"
+	authzProjectsV2Query    = "data.authz_v2.authorized_project[project]"
 	filteredPairsV2Query    = "data.authz_v2.introspection.authorized_pair[_]"
 	filteredProjectsV2Query = "data.authz_v2.introspection.authorized_project[x]"
 )
@@ -176,24 +176,99 @@ func (s *State) initPartialResultV2(ctx context.Context) error {
 	return nil
 }
 
-func (s *State) initPartialResultV2p1(ctx context.Context) error {
-	// Partial eval for authzProjectsV2Query.
-	// Each partial eval needs a separate compiler.
+// func (s *State) initPartialResultV2p1(ctx context.Context) error {
+// 	// Partial eval for authzProjectsV2Query.
+// 	// Each partial eval needs a separate compiler.
+// 	compiler, err := s.newCompiler()
+// 	if err != nil {
+// 		return err
+// 	}
+// 	r := rego.New(
+// 		rego.ParsedQuery(s.queries[authzProjectsV2Query]),
+// 		rego.Compiler(compiler),
+// 		rego.Store(s.v2p1Store),
+// 		rego.DisableInlining([]string{"data.authz_v2.denied_project"}),
+// 	)
+// 	v2PartialProjects, err := r.PartialResult(ctx)
+// 	if err != nil {
+// 		return errors.Wrap(err, "partial eval (authorized_project)")
+// 	}
+// 	s.v2PartialProjects = v2PartialProjects
+// 	return nil
+// }
+
+// returns a prepared query that can be executed. The result set will contain a
+// binding for a variable named 'project' that contains the name (string) of a
+// project the subject has access to.
+func (s *State) makeAuthorizedProjectPreparedQuery(ctx context.Context) error {
 	compiler, err := s.newCompiler()
 	if err != nil {
 		return err
 	}
+
 	r := rego.New(
-		rego.ParsedQuery(s.queries[authzProjectsV2Query]),
-		rego.Compiler(compiler),
 		rego.Store(s.v2p1Store),
-		rego.DisableInlining([]string{"data.authz_v2.denied_project"}),
+		rego.Compiler(compiler),
+		rego.ParsedQuery(s.queries[authzProjectsV2Query]),
+		rego.DisableInlining([]string{
+			"data.authz_v2.denied_project",
+		}),
 	)
-	v2PartialProjects, err := r.PartialResult(ctx)
+
+	// rego.Rego#Partial must be used because the rego.Rego#PartialResult and
+	// rego.Rego#PrepareForEval(rego.WithPartialEval()) APIs (currently) do not
+	// support queries that ask for a single decision, i.e., they cannot contain
+	// variables or multiple expressions.
+	pq, err := r.Partial(ctx)
 	if err != nil {
-		return errors.Wrap(err, "partial eval (authorized_project)")
+		return err
 	}
-	s.v2PartialProjects = v2PartialProjects
+
+	// Partial evaluation returns a set of queries and support modules that have
+	// to be compiled. Add the support modules to compiler.
+	for i, module := range pq.Support {
+		compiler.Modules[fmt.Sprintf("support%d", i)] = module
+	}
+
+	// Make a module/ruleset for the queries returned by partial evaluation.
+	// This will be the ruleset that is ultimately queried for authorization
+	// checks. Add the module to the compiler.
+	main := &ast.Module{
+		Package: ast.MustParsePackage("package __partialauthzv2"),
+	}
+
+	for i := range pq.Queries {
+		rule := &ast.Rule{
+			Module: main,
+			Head:   ast.NewHead("authorized_project", ast.VarTerm("project")),
+			Body:   pq.Queries[i],
+		}
+		main.Rules = append(main.Rules, rule)
+	}
+
+	compiler.Modules["__partialauthzv2"] = main
+
+	// Finally, compile everything and make a prepared query that can be
+	// executed for authorization checks.
+	compiler.Compile(compiler.Modules)
+
+	if compiler.Failed() {
+		return compiler.Errors
+	}
+
+	r2 := rego.New(
+		rego.Store(s.v2p1Store),
+		rego.Compiler(compiler),
+		rego.Query("data.__partialauthzv2.authorized_project[project]"),
+	)
+
+	query, err := r2.PrepareForEval(ctx)
+	if err != nil {
+		return err
+	}
+
+	s.v2PartialProjects = query
+
 	return nil
 }
 
@@ -345,7 +420,7 @@ func (s *State) V2ProjectsAuthorized(
 		[2]*ast.Term{ast.NewTerm(ast.String("action")), ast.NewTerm(ast.String(action))},
 		[2]*ast.Term{ast.NewTerm(ast.String("projects")), ast.NewTerm(projs)},
 	)
-	resultSet, err := s.v2PartialProjects.Rego(rego.ParsedInput(input)).Eval(ctx)
+	resultSet, err := s.v2PartialProjects.Eval(ctx, rego.EvalInput(input))
 	if err != nil {
 		return []string{}, &EvaluationError{e: err}
 	}
@@ -532,7 +607,7 @@ func (s *State) V2p1SetPolicies(
 		"roles":    roleMap,
 	})
 
-	return s.initPartialResultV2p1(ctx)
+	return s.makeAuthorizedProjectPreparedQuery(ctx)
 }
 
 // UnexpectedResultExpressionError is returned when one of the result sets
