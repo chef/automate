@@ -24,6 +24,23 @@ func NewSingleTaskWorkflowExecutor(taskName cereal.TaskName, allowCancel bool) *
 	}
 }
 
+func RegisterSingleTaskWorkflowExecutor(mgr *cereal.Manager, workflowName cereal.WorkflowName,
+	allowCancel bool, executor cereal.TaskExecutor, opts cereal.TaskExecutorOpts) error {
+
+	taskName := cereal.TaskName(workflowName.String())
+	err := mgr.RegisterTaskExecutor(taskName, executor, cereal.TaskExecutorOpts{})
+	if err != nil {
+		return err
+	}
+
+	wfX := NewSingleTaskWorkflowExecutor(taskName, allowCancel)
+	err = mgr.RegisterWorkflowExecutor(workflowName, wfX)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *SingleTaskWorkflowExecutor) OnStart(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
 	var params json.RawMessage
 	err := w.GetParameters(&params)

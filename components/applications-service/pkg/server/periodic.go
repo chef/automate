@@ -37,11 +37,9 @@ const (
 
 	DefaultJobIntervalSeconds = 60
 
-	DisconnectedServicesTaskName     = cereal.TaskName("disconnected_services")
 	DisconnectedServicesWorkflowName = cereal.WorkflowName("disconnected_services")
 	DisconnectedServicesScheduleName = "periodic_disconnected_services"
 
-	DeleteDisconnectedServicesTaskName     = cereal.TaskName("delete_disconnected_services")
 	DeleteDisconnectedServicesWorkflowName = cereal.WorkflowName("delete_disconnected_services")
 	DeleteDisconnectedServicesScheduleName = "periodic_delete_disconnected_services"
 )
@@ -317,35 +315,25 @@ func NewJobRunnerSet(applicationsServer *ApplicationsServer) *JobRunnerSet {
 }
 
 func (j *JobRunnerSet) Start(cerealSvc *cereal.Manager) error {
-	err := cerealSvc.RegisterTaskExecutor(
-		DisconnectedServicesTaskName,
+	err := patterns.RegisterSingleTaskWorkflowExecutor(
+		cerealSvc,
+		DisconnectedServicesWorkflowName,
+		false,
 		j.MarkDisconnectedServicesExecutor,
-		cereal.TaskExecutorOpts{},
-	)
+		cereal.TaskExecutorOpts{})
 	if err != nil {
-		return errors.Wrap(err, "failed to register as task executor to mark disconnected services")
+		return errors.Wrap(err, "failed to register marked disconnected services executors")
 	}
 
-	wfX := patterns.NewSingleTaskWorkflowExecutor(DisconnectedServicesTaskName, false)
-	err = cerealSvc.RegisterWorkflowExecutor(DisconnectedServicesWorkflowName, wfX)
-	if err != nil {
-		return errors.Wrap(err, "failed to register as workflow executor to mark disconnected services")
-	}
-
-	err = cerealSvc.RegisterTaskExecutor(
-		DeleteDisconnectedServicesTaskName,
+	err = patterns.RegisterSingleTaskWorkflowExecutor(
+		cerealSvc,
+		DeleteDisconnectedServicesWorkflowName,
+		false,
 		j.DeleteDisconnectedServicesExecutor,
 		cereal.TaskExecutorOpts{},
 	)
-
 	if err != nil {
-		return errors.Wrap(err, "failed to register as task executor to delete disconnected services")
-	}
-
-	wfX = patterns.NewSingleTaskWorkflowExecutor(DeleteDisconnectedServicesTaskName, false)
-	err = cerealSvc.RegisterWorkflowExecutor(DeleteDisconnectedServicesWorkflowName, wfX)
-	if err != nil {
-		return errors.Wrap(err, "failed to register as workflow executor to mark disconnected services")
+		return errors.Wrap(err, "failed to register delete disconnected services executors")
 	}
 
 	// TODO: set a timeout
