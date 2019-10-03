@@ -22,16 +22,16 @@ import (
 
 // State wraps the state of OPA we need to track
 type State struct {
-	log               logger.Logger
-	store             storage.Store
-	v2Store           storage.Store
-	v2p1Store         storage.Store
-	queries           map[string]ast.Body
-	compiler          *ast.Compiler
-	modules           map[string]*ast.Module
-	partialAuth       rego.PartialResult
-	v2PartialAuth     rego.PartialResult
-	v2PartialProjects rego.PreparedEvalQuery
+	log                    logger.Logger
+	store                  storage.Store
+	v2Store                storage.Store
+	v2p1Store              storage.Store
+	queries                map[string]ast.Body
+	compiler               *ast.Compiler
+	modules                map[string]*ast.Module
+	partialAuth            rego.PartialResult
+	v2PartialAuth          rego.PartialResult
+	v2PreparedEvalProjects rego.PreparedEvalQuery
 }
 
 // this needs to match the hardcoded OPA policy document we've put in place
@@ -41,7 +41,7 @@ const (
 	authzV2Query            = "data.authz_v2.authorized"
 	authzProjectsV2Query    = "data.authz_v2.authorized_project[project]"
 	filteredPairsV2Query    = "data.authz_v2.introspection.authorized_pair[_]"
-	filteredProjectsV2Query = "data.authz_v2.introspection.authorized_project[x]"
+	filteredProjectsV2Query = "data.authz_v2.introspection.authorized_project[project]"
 )
 
 // OptFunc is the type of functional options to be passed to New()
@@ -189,11 +189,11 @@ func (s *State) initPartialResultV2(ctx context.Context) error {
 // 		rego.Store(s.v2p1Store),
 // 		rego.DisableInlining([]string{"data.authz_v2.denied_project"}),
 // 	)
-// 	v2PartialProjects, err := r.PartialResult(ctx)
+// 	v2PreparedEvalProjects, err := r.PartialResult(ctx)
 // 	if err != nil {
 // 		return errors.Wrap(err, "partial eval (authorized_project)")
 // 	}
-// 	s.v2PartialProjects = v2PartialProjects
+// 	s.v2PreparedEvalProjects = v2PreparedEvalProjects
 // 	return nil
 // }
 
@@ -267,7 +267,7 @@ func (s *State) makeAuthorizedProjectPreparedQuery(ctx context.Context) error {
 		return err
 	}
 
-	s.v2PartialProjects = query
+	s.v2PreparedEvalProjects = query
 
 	return nil
 }
@@ -420,7 +420,7 @@ func (s *State) V2ProjectsAuthorized(
 		[2]*ast.Term{ast.NewTerm(ast.String("action")), ast.NewTerm(ast.String(action))},
 		[2]*ast.Term{ast.NewTerm(ast.String("projects")), ast.NewTerm(projs)},
 	)
-	resultSet, err := s.v2PartialProjects.Eval(ctx, rego.EvalInput(input))
+	resultSet, err := s.v2PreparedEvalProjects.Eval(ctx, rego.EvalParsedInput(input))
 	if err != nil {
 		return []string{}, &EvaluationError{e: err}
 	}
@@ -566,7 +566,7 @@ func (s *State) projectsFromResults(rs rego.ResultSet) ([]string, error) {
 	result := make([]string, len(rs))
 	for i := range rs {
 		var ok bool
-		result[i], ok = rs[i].Bindings["x"].(string)
+		result[i], ok = rs[i].Bindings["project"].(string)
 		if !ok {
 			return nil, &UnexpectedResultExpressionError{exps: rs[i].Expressions}
 		}
