@@ -9,6 +9,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type NodeProjectData struct {
+	ID   string
+	Data string
+}
+
 // JobCancel - cancel the a currently running project update
 func (db *DB) JobCancel(ctx context.Context, projectID string) error {
 	log.Infof("Running node manager JobCancel %s", projectID)
@@ -31,25 +36,45 @@ func (db *DB) JobStatus(ctx context.Context, projectID string) (project_update_l
 }
 
 func (db *DB) updateNodes(ctx context.Context, projectRules map[string]*iam_v2.ProjectRules) {
-	// numberOfNodes := len(nodes)
-	//  db.projectUpdateJobStatus = project_update_lib.JobStatus{
-	// 		Completed:             false,
-	// 		PercentageComplete:    0.0,
-	// 		EstimatedEndTimeInSec: 0,
-	// 	}
-	// for index, node := range nodes {
-	//  matchingProjectIDs := getMatchingProjectIDs(node, projectRules)
-	//  updateNodeProjectIDs(node, matchingProjectIDs)
-	//  db.projectUpdateJobStatus = project_update_lib.JobStatus{
-	// 		Completed:             false,
-	// 		PercentageComplete:    index+1/numberOfNodes,
-	// 		EstimatedEndTimeInSec: 0,
-	// 	}
-	// }
-	// Need to update the Job status to say complete.
-	//	db.projectUpdateJobStatus = project_update_lib.JobStatus{
-	// 		Completed:             true,
-	// 		PercentageComplete:    1.0,
-	// 		EstimatedEndTimeInSec: 0,
-	// 	}
+	nodes, err := db.getAllNodes()
+	if err != nil {
+		// Fail the project update
+	}
+
+	numberOfNodes := float32(len(nodes))
+	db.projectUpdateJobStatus = project_update_lib.JobStatus{
+		Completed:             false,
+		PercentageComplete:    0,
+		EstimatedEndTimeInSec: 0,
+	}
+	for index, node := range nodes {
+		matchingProjectIDs := getMatchingProjectIDs(node, projectRules)
+
+		db.updateNodeProjectIDs(node, matchingProjectIDs)
+
+		db.projectUpdateJobStatus = project_update_lib.JobStatus{
+			Completed:             false,
+			PercentageComplete:    float32((index + 1)) / numberOfNodes,
+			EstimatedEndTimeInSec: 0,
+		}
+	}
+
+	// Mark the Job status complete.
+	db.projectUpdateJobStatus = project_update_lib.JobStatus{
+		Completed:             true,
+		PercentageComplete:    1.0,
+		EstimatedEndTimeInSec: 0,
+	}
+}
+
+func (db *DB) updateNodeProjectIDs(node *NodeProjectData, matchingProjectIDs []string) {
+	// update the nodes project IDs
+}
+
+func (db *DB) getAllNodes() ([]*NodeProjectData, error) {
+	return []*NodeProjectData{}, nil
+}
+
+func getMatchingProjectIDs(node *NodeProjectData, projectRules map[string]*iam_v2.ProjectRules) []string {
+	return []string{}
 }
