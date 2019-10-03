@@ -63,15 +63,12 @@ func Serve(conf config.Nodemanager, grpcBinding string) error {
 }
 
 const (
-	AwsEc2PollingTaskName     = cereal.TaskName("awsec2_polling")
 	AwsEc2PollingWorkflowName = cereal.WorkflowName("awsec2_polling")
 	Awsec2PollingScheduleName = "awsec2_polling_schedule"
 
-	AzureVMPollingTaskName     = cereal.TaskName("azurevm_polling")
 	AzureVMPollingWorkflowName = cereal.WorkflowName("azurevm_polling")
 	AzureVMPollingScheduleName = "azurevm_polling_schedule"
 
-	ManagersPollingTaskName     = cereal.TaskName("managers_polling")
 	ManagersPollingWorkflowName = cereal.WorkflowName("managers_polling")
 	ManagersPollingScheduleName = "managers_polling_schedule"
 )
@@ -158,31 +155,34 @@ func serve(ctx context.Context, config *config.Nodemanager, connFactory *securec
 		defer cerealManager.Stop() //nolint:errcheck
 
 		// Prelude to initializing the job manager: register task executors for the nodemanger polling jobs
-		err = cerealManager.RegisterTaskExecutor(AwsEc2PollingTaskName,
+		err = patterns.RegisterSingleTaskWorkflowExecutor(
+			cerealManager,
+			AwsEc2PollingWorkflowName,
+			false,
 			&CheckAWSNodesTask{db: db, secretsClient: secretsClient, eventsClient: eventClient},
 			cereal.TaskExecutorOpts{})
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "failed to register AWS polling workflow")
 		}
 
-		err = cerealManager.RegisterTaskExecutor(AzureVMPollingTaskName,
-			&CheckAzureNodesTask{db: db, secretsClient: secretsClient}, cereal.TaskExecutorOpts{})
+		err = patterns.RegisterSingleTaskWorkflowExecutor(
+			cerealManager,
+			AzureVMPollingWorkflowName,
+			false,
+			&CheckAzureNodesTask{db: db, secretsClient: secretsClient},
+			cereal.TaskExecutorOpts{})
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "failed to register Azure polling workflow")
 		}
 
-		err = cerealManager.RegisterTaskExecutor(ManagersPollingTaskName,
-			&CheckManagersTask{db: db, secretsClient: secretsClient}, cereal.TaskExecutorOpts{})
+		err = patterns.RegisterSingleTaskWorkflowExecutor(
+			cerealManager,
+			ManagersPollingWorkflowName,
+			false,
+			&CheckManagersTask{db: db, secretsClient: secretsClient},
+			cereal.TaskExecutorOpts{})
 		if err != nil {
-			return err
-		}
-
-		// Prelude to initializing the cereal manager: register workflow executors to run tasks
-		for _, workflowName := range []cereal.WorkflowName{AwsEc2PollingWorkflowName, AzureVMPollingWorkflowName, ManagersPollingWorkflowName} {
-			err = cerealManager.RegisterWorkflowExecutor(workflowName, patterns.NewSingleTaskWorkflowExecutor(cereal.TaskName(workflowName), false))
-			if err != nil {
-				return errors.Wrapf(err, "failed to register workflow for %q", workflowName.String())
-			}
+			return errors.Wrapf(err, "failed to register managers polling workflow")
 		}
 
 		// Prelude to initializing the cereal manager: set up recurrence rules and schedules.
