@@ -44,6 +44,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
         "reportSummary" => {
           "status" => "failed",
           "stats" => {
+            "nodesCnt" => 5,
             "nodes" => 5,
             "platforms" => 3,
             "environments" => 3,
@@ -63,6 +64,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
         "reportSummary" => {
           "status" => "failed",
           "stats" => {
+            "nodesCnt" => 4,
             "nodes" => 4,
             "platforms" => 2,
             "environments" => 2,
@@ -81,6 +83,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
         "reportSummary" => {
           "status" => "failed",
           "stats" => {
+            "nodesCnt" => 3,
             "nodes" => 3,
             "platforms" => 3,
             "environments" => 2,
@@ -99,6 +102,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
         "reportSummary" => {
           "status" => "skipped",
           "stats" => {
+            "nodesCnt" => 1,
             "nodes" => 1,
             "platforms" => 1,
             "environments" => 1,
@@ -120,6 +124,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
         "reportSummary" => {
           "status" => "failed",
           "stats" => {
+            "nodesCnt" => 5,
             "nodes" => 5,
             "platforms" => 3,
             "environments" => 3,
@@ -139,6 +144,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
         "reportSummary" => {
           "status" => "passed",
           "stats" => {
+            "nodesCnt" => 1,
             "nodes" => 1,
             "platforms" => 1,
             "environments" => 1,
@@ -159,6 +165,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
         "reportSummary" => {
           "status" => "passed",
           "stats" => {
+            "nodesCnt" => 1,
             "nodes" => 1,
             "platforms" => 1,
             "environments" => 1,
@@ -194,6 +201,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
         "reportSummary" => {
           "status" => "skipped",
           "stats" => {
+            "nodesCnt" => 1,
             "nodes" => 1,
             "platforms" => 1,
             "environments" => 1,
@@ -229,6 +237,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
         "reportSummary" => {
           "status" => "skipped",
           "stats" => {
+            "nodesCnt" => 1,
             "nodes" => 1,
             "platforms" => 1,
             "environments" => 1,
@@ -248,6 +257,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
         "reportSummary" => {
           "status" => "passed",
           "stats" => {
+            "nodesCnt" => 1,
             "nodes" => 1,
             "platforms" => 1,
             "environments" => 1,
@@ -268,6 +278,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
         "reportSummary" => {
           "status" => "failed",
           "stats" => {
+            "nodesCnt" => 1,
             "nodes" => 1,
             "platforms" => 1,
             "environments" => 1,
@@ -288,14 +299,15 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
       ])
       expected_data = {
           "reportSummary" => {
-          "status" => "failed",
-          "stats" => {
-              "nodes" => 4,
-          "platforms" => 2,
-          "environments" => 2,
-          "profiles" => 1
-      }
-      }
+              "status" => "failed",
+              "stats" => {
+                  "nodesCnt" => 4,
+                  "nodes" => 4,
+                  "platforms" => 2,
+                  "environments" => 2,
+                  "profiles" => 1
+              }
+          }
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
 
@@ -308,14 +320,15 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
       ])
       expected_data = {
           "reportSummary" => {
-          "status" => "skipped",
-          "stats" => {
-              "nodes" => 1,
-          "platforms" => 1,
-          "environments" => 1,
-          "profiles" => 1
-      }
-      }
+              "status" => "skipped",
+              "stats" => {
+                  "nodesCnt" => 1,
+                  "nodes" => 1,
+                  "platforms" => 1,
+                  "environments" => 1,
+                  "profiles" => 1
+              }
+          }
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
 
@@ -328,14 +341,15 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
       ])
       expected_data = {
           "reportSummary" => {
-          "status" => "passed",
-          "stats" => {
-              "nodes" => 1,
-          "platforms" => 1,
-          "environments" => 1,
-          "profiles" => 1
-      }
-      }
+              "status" => "passed",
+              "stats" => {
+                  "nodesCnt" => 1,
+                  "nodes" => 1,
+                  "platforms" => 1,
+                  "environments" => 1,
+                  "profiles" => 1
+              }
+          }
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
 
@@ -346,15 +360,16 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
       Stats::ListFilter.new(type: 'control', values: ['nginx-01'])
       ])
       expected_data = {
-        "reportSummary" => {
-          "status" => "failed",
-          "stats" => {
-            "nodes" => 4,
-            "platforms" => 2,
-            "environments" => 2,
-            "profiles" => 1
+          "reportSummary" => {
+              "status" => "failed",
+              "stats" => {
+                  "nodesCnt" => 4,
+                  "nodes" => 4,
+                  "platforms" => 2,
+                  "environments" => 2,
+                  "profiles" => 1
+              }
           }
-        }
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
 
@@ -366,15 +381,16 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           Stats::ListFilter.new(type: "platform", values: ["centos"])
       ])
       expected_data = {
-        "reportSummary" => {
-          "status" => "passed",   #look at this business! yes! for this control, we have a status of passed! notice the test above, we had 4 nodes with a status of failed
-          "stats" => {
-            "nodes" => 1,
-            "platforms" => 1,
-            "environments" => 1,
-            "profiles" => 1
+          "reportSummary" => {
+              "status" => "passed", #look at this business! yes! for this control, we have a status of passed! notice the test above, we had 4 nodes with a status of failed
+              "stats" => {
+                  "nodesCnt" => 1,
+                  "nodes" => 1,
+                  "platforms" => 1,
+                  "environments" => 1,
+                  "profiles" => 1
+              }
           }
-        }
       }.to_json
 
       assert_equal(expected_data, actual_data.to_json)

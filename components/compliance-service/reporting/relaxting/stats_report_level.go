@@ -292,8 +292,8 @@ func (depth *ReportDepth) getStatsSummaryResult(aggRoot *elastic.SearchResult) *
 		//we need to do this because the number of nodes can get huge and we only need the node count
 		//by setting the terms query for node_id to 1, we won't return any values but then we can just
 		//use nodes.SumOfOtherDocCount which works well because node_uuid is unique per node and therefore
+		summary.Stats.NodesCnt = int32(len(nodes.Buckets)) + int32(nodes.SumOfOtherDocCount)
 		summary.Stats.Nodes = int64(len(nodes.Buckets)) + nodes.SumOfOtherDocCount
-
 	}
 	if platforms, found := aggRoot.Aggregations.Terms("platforms"); found {
 		summary.Stats.Platforms = int32(len(platforms.Buckets))
