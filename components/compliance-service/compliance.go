@@ -73,9 +73,8 @@ const (
 
 var SERVICE_STATE serviceState
 
-const (
-	PurgeJobName      = "purge"
-	PurgeWorkflowName = "purge"
+var (
+	PurgeWorkflowName = cereal.NewWorkflowName("purge")
 	PurgeScheduleName = "periodic_purge"
 )
 
@@ -452,7 +451,7 @@ func setupDataLifecyclePurgeInterface(ctx context.Context, connFactory *secureco
 		purge.WithTaskEsSidecarClient(esSidecarClient),
 	)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to configure %s workflow", PurgeJobName)
+		return nil, errors.Wrapf(err, "failed to configure %s workflow", PurgeWorkflowName)
 	}
 
 	recurrence, err = rrule.NewRRule(rrule.ROption{
@@ -480,7 +479,7 @@ func setupDataLifecyclePurgeInterface(ctx context.Context, connFactory *secureco
 	return purge.NewServer(
 		cerealManager,
 		PurgeScheduleName,
-		PurgeJobName,
+		PurgeWorkflowName,
 		defaultPurgePolicies,
 		purge.WithServerEsSidecarClient(esSidecarClient),
 	)

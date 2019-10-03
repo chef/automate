@@ -247,11 +247,11 @@ func getBackend() backend.Driver {
 
 var echoWorkflowStartTime *time.Time
 
-const (
-	EchoWorkflowName         = cereal.WorkflowName("echo-workflow")
-	EchoTaskName             = cereal.TaskName("echo-task")
-	ScheduleTestWorkflowName = cereal.WorkflowName("schedule-test")
-	ScheduleTestTaskName     = cereal.TaskName("test task")
+var (
+	EchoWorkflowName         = cereal.NewWorkflowName("echo-workflow")
+	EchoTaskName             = cereal.NewTaskName("echo-task")
+	ScheduleTestWorkflowName = cereal.NewWorkflowName("schedule-test")
+	ScheduleTestTaskName     = cereal.NewTaskName("test task")
 )
 
 func startManager(_ *cobra.Command, args []string) error {

@@ -18,14 +18,14 @@ import (
 	"github.com/chef/automate/lib/datalifecycle/purge"
 )
 
-const (
-	MissingNodesWorkflowName = cereal.WorkflowName("missing_nodes")
+var (
+	MissingNodesWorkflowName = cereal.NewWorkflowName("missing_nodes")
 	MissingNodesScheduleName = "periodic_missing_nodes"
 
-	DeleteNodesWorkflowName = cereal.WorkflowName("delete_nodes")
+	DeleteNodesWorkflowName = cereal.NewWorkflowName("delete_nodes")
 	DeleteNodesScheduleName = "periodic_delete_nodes"
 
-	MissingNodesForDeletionWorkflowName = cereal.WorkflowName("missing_nodes_for_deletion")
+	MissingNodesForDeletionWorkflowName = cereal.NewWorkflowName("missing_nodes_for_deletion")
 	MissingNodesForDeletionScheduleName = "periodic_missing_nodes_for_deletion"
 )
 
@@ -78,7 +78,7 @@ func MigrateJobsSchedule(ctx context.Context, c *cereal.Manager, oldConfigFile s
 			return errors.Wrap(err, "could not create recurrence rule for job configuration")
 		}
 
-		err = c.CreateWorkflowSchedule(ctx, scheduleName, cereal.WorkflowName(name), config.Threshold, config.Running, r)
+		err = c.CreateWorkflowSchedule(ctx, scheduleName, cereal.NewWorkflowName(name), config.Threshold, config.Running, r)
 		if err == cereal.ErrWorkflowScheduleExists {
 			log.Infof("Schedule for %s already exists, not migrating", scheduleName)
 		} else if err != nil {

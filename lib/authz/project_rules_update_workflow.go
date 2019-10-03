@@ -265,15 +265,15 @@ func (m *ESProjectTagUpdaterStatusTask) collectJobStatus(ctx context.Context, es
 }
 
 func StartProjectTagUpdaterTaskName(svcName string) cereal.TaskName {
-	return cereal.TaskName(fmt.Sprintf("%s/%s", svcName, startProjectTagUpdaterTaskName))
+	return cereal.NewTaskName(fmt.Sprintf("%s/%s", svcName, startProjectTagUpdaterTaskName))
 }
 
 func ProjectTagUpdaterStatusTaskName(svcName string) cereal.TaskName {
-	return cereal.TaskName(fmt.Sprintf("%s/%s", svcName, projectTagUpdaterStatusTaskName))
+	return cereal.NewTaskName(fmt.Sprintf("%s/%s", svcName, projectTagUpdaterStatusTaskName))
 }
 
 func CancelUpdateProjectTagsTaskName(svcName string) cereal.TaskName {
-	return cereal.TaskName(fmt.Sprintf("%s/%s", svcName, cancelUpdateProjectTagsTaskName))
+	return cereal.NewTaskName(fmt.Sprintf("%s/%s", svcName, cancelUpdateProjectTagsTaskName))
 }
 
 func NewWorkflowExecutorForDomainService(domainService string) *DomainProjectUpdateWorkflowExecutor {

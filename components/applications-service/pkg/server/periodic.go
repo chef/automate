@@ -36,11 +36,13 @@ const (
 	cerealServiceMutualTLSName = "cereal-service"
 
 	DefaultJobIntervalSeconds = 60
+)
 
-	DisconnectedServicesWorkflowName = cereal.WorkflowName("disconnected_services")
+var (
+	DisconnectedServicesWorkflowName = cereal.NewWorkflowName("disconnected_services")
 	DisconnectedServicesScheduleName = "periodic_disconnected_services"
 
-	DeleteDisconnectedServicesWorkflowName = cereal.WorkflowName("delete_disconnected_services")
+	DeleteDisconnectedServicesWorkflowName = cereal.NewWorkflowName("delete_disconnected_services")
 	DeleteDisconnectedServicesScheduleName = "periodic_delete_disconnected_services"
 )
 
