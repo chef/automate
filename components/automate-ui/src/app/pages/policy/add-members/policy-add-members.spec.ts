@@ -66,13 +66,33 @@ describe('PolicyAddMembersComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('contains key elements', () => {
-        component.loading = false;
-        component.modalVisible = true;
-        component.sortedMembersAvailable = [];
-        fixture.detectChanges();
-        // expect(element).toContainPath('chef-modal');
-        expect(element).toContainPath('chef-page');
+    describe('showInputs', () => {
+
+        it('should return false when inputName is not identity or name', () => {
+            expect(component.showInputs('blank')).toBe(false);
+        });
+
+        it('should return true when inputName is identity and when typeValue equals USER', () => {
+            component.expressionForm.setValue({type: 'USER', identity: '', name: ''});
+            expect(component.showInputs('identity')).toBe(true);
+        });
+
+        it('should return true when inputName is identity and when typeValue equals TEAM', () => {
+            component.expressionForm.setValue({ type: 'TEAM', identity: '', name: '' });
+            expect(component.showInputs('identity')).toBe(true);
+        });
+
+        // tslint:disable-next-line: max-line-length
+        it('should return false when inputName is identity and typeValue does not equal TEAM or USER', () => {
+            component.expressionForm.setValue({ type: '*', identity: '', name: '' });
+            expect(component.showInputs('identity')).toBe(false);
+        });
+
+        it('should return true when inputName is name and when typeValue equals TOKEN', () => {
+            component.expressionForm.setValue({ type: 'TOKEN', identity: '', name: '' });
+            expect(component.showInputs('name')).toBe(true);
+        });
+
     });
 
 });
