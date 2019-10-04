@@ -8,7 +8,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/cereal/backend"
 	"github.com/chef/automate/lib/cereal/patterns"
 )
 
@@ -44,7 +43,7 @@ func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowSuccess() {
 			patterns.NewSingleTaskWorkflowExecutor(taskName, false),
 		),
 		WithManagerOpts(
-			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+			cereal.WithOnWorkflowCompleteCallback(func(*cereal.WorkflowEvent) {
 				wgTask.Done()
 			}),
 		),
@@ -99,7 +98,7 @@ func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowFail() {
 			patterns.NewSingleTaskWorkflowExecutor(taskName, false),
 		),
 		WithManagerOpts(
-			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+			cereal.WithOnWorkflowCompleteCallback(func(*cereal.WorkflowEvent) {
 				wgTask.Done()
 			}),
 		),
@@ -163,7 +162,7 @@ func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowCancelWhenNotAllowed(
 			patterns.NewSingleTaskWorkflowExecutor(taskName, false),
 		),
 		WithManagerOpts(
-			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+			cereal.WithOnWorkflowCompleteCallback(func(*cereal.WorkflowEvent) {
 				wgTaskEnd.Done()
 			}),
 		),
@@ -229,7 +228,7 @@ func (suite *CerealTestSuite) TestPatternSingleTaskWorkflowCancelWhenAllowed() {
 			patterns.NewSingleTaskWorkflowExecutor(taskName, true),
 		),
 		WithManagerOpts(
-			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+			cereal.WithOnWorkflowCompleteCallback(func(*cereal.WorkflowEvent) {
 				wgTaskEnd.Done()
 			}),
 		),
