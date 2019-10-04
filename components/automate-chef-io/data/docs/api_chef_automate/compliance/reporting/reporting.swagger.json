@@ -633,6 +633,9 @@
         },
         "release": {
           "type": "string"
+        },
+        "full": {
+          "type": "string"
         }
       }
     },
@@ -664,6 +667,9 @@
           "type": "string"
         },
         "owner": {
+          "type": "string"
+        },
+        "full": {
           "type": "string"
         },
         "supports": {
@@ -744,6 +750,9 @@
           "type": "string"
         },
         "status": {
+          "type": "string"
+        },
+        "full": {
           "type": "string"
         }
       }
