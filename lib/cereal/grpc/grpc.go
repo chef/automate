@@ -18,7 +18,7 @@ import (
 	"github.com/chef/automate/lib/cereal/backend"
 )
 
-var _ backend.Driver = &GrpcBackend{}
+var _ cereal.Driver = &GrpcBackend{}
 
 var errUnknownMessage = errors.New("Unknown message received")
 
@@ -70,7 +70,7 @@ type workflowCompleter struct {
 	tasks []*grpccereal.Task
 }
 
-var _ backend.WorkflowCompleter = &workflowCompleter{}
+var _ cereal.WorkflowCompleter = &workflowCompleter{}
 
 func (c *workflowCompleter) EnqueueTask(task *backend.Task, opts backend.TaskEnqueueOpts) error {
 	t := &grpccereal.Task{
@@ -149,7 +149,7 @@ func (c *workflowCompleter) Close() error {
 	return c.s.CloseSend()
 }
 
-func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []string) (*backend.WorkflowEvent, backend.WorkflowCompleter, error) {
+func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []string) (*backend.WorkflowEvent, cereal.WorkflowCompleter, error) {
 	s, err := g.client.DequeueWorkflow(ctx)
 	if err != nil {
 		return nil, nil, err
@@ -334,7 +334,7 @@ func (c *taskCompleter) Succeed(result []byte) error {
 	}
 }
 
-func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*backend.Task, backend.TaskCompleter, error) {
+func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*backend.Task, cereal.TaskCompleter, error) {
 	s, err := g.client.DequeueTask(ctx)
 	if err != nil {
 		return nil, nil, err
