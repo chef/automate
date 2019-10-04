@@ -1,11 +1,10 @@
-import { CUSTOM_ELEMENTS_SCHEMA, NgZone } from '@angular/core';
-import { Router } from '@angular/router';
-import { TestBed, fakeAsync, tick, ComponentFixture } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TestBed, fakeAsync, ComponentFixture } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { StoreModule, Store } from '@ngrx/store';
 
 import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
-import { wrapRouterInNgZone } from 'app/testing/routing-helper';
 import { ServiceStatusIconPipe } from 'app/pipes/service-status-icon.pipe';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { serviceGroupsEntityReducer } from 'app/entities/service-groups/service-groups.reducer';
@@ -25,6 +24,7 @@ describe('ServiceGroupsComponent', () => {
   let fixture: ComponentFixture<ServiceGroupsComponent>;
   let component: ServiceGroupsComponent;
   let router: Router;
+  let route: ActivatedRoute;
   let ngrxStore: Store<NgrxStateAtom>;
 
   beforeEach(() => {
@@ -45,10 +45,8 @@ describe('ServiceGroupsComponent', () => {
 
     fixture = TestBed.createComponent(ServiceGroupsComponent);
     component = fixture.componentInstance;
-    router = wrapRouterInNgZone(
-      TestBed.get(Router),
-      TestBed.get(NgZone)
-    );
+    router = TestBed.get(Router);
+    route = TestBed.get(ActivatedRoute);
     ngrxStore = TestBed.get(Store);
     component.ngOnInit();
   });
@@ -89,41 +87,44 @@ describe('ServiceGroupsComponent', () => {
   });
 
   describe('statusFilter', () => {
+    beforeEach(() => spyOn(router, 'navigate'));
+
     it('when set to an allowed value', () => {
-      spyOn(component.router, 'navigate');
+      route.snapshot.queryParams = {};
+
       component.statusFilter('critical');
-      expect(component.router.navigate).toHaveBeenCalledWith(
-        [], {queryParams: { status: ['critical'] }});
+
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: { status: ['critical'] }});
     });
 
     it('when set a not allowed value, the URL is not changed', () => {
-      spyOn(component.router, 'navigate');
+      route.snapshot.queryParams = {};
+
       component.statusFilter('not-allowed');
-      expect(component.router.navigate).toHaveBeenCalledWith(
-        [], {queryParams: { }});
+
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: {}});
     });
 
     it('when set to total', () => {
-      spyOn(component.router, 'navigate');
+      route.snapshot.queryParams = {};
+
       component.statusFilter('total');
-      expect(component.router.navigate).toHaveBeenCalledWith(
-        [], {queryParams: { }});
+
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: {}});
     });
 
-    it('when selection a different status the existing one should be replaced', fakeAsync(() => {
-      router.navigate([''], {queryParams: { status: ['ok'] }});
-
-      tick();
+    it('when selection a different status the existing one should be replaced', () => {
+      route.snapshot.queryParams['status'] = ['ok'];
 
       component.statusFilter('unknown');
 
-      tick();
-
-      expect('/?status=unknown').toEqual(router.routerState.snapshot.url);
-    }));
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: { status: ['unknown'] }});
+    });
   });
 
   describe('onToggleSort', () => {
+    beforeEach(() => spyOn(router, 'navigate'));
+
     describe('with defaults', () => {
       it('should return "name" as sorting field', () => {
         expect(component.defaultSortField ).toEqual('percent_ok');
@@ -132,105 +133,87 @@ describe('ServiceGroupsComponent', () => {
       });
 
       it('should change sort direction on already selected sorting field', () => {
-        spyOn(component.router, 'navigate');
+        route.snapshot.queryParams = {};
+
         component.onToggleSort('percent_ok');
-        expect(component.router.navigate).toHaveBeenCalledWith(
-          [], {queryParams: { sortField: ['percent_ok'], sortDirection: ['DESC'] }});
+
+        expect(router.navigate).toHaveBeenCalledWith(
+          [], { queryParams: { sortField: ['percent_ok'], sortDirection: ['DESC'] }});
       });
     });
 
     it('when set to an allowed value', () => {
-      spyOn(component.router, 'navigate');
+      route.snapshot.queryParams = {};
+
       component.onToggleSort('environment');
-      expect(component.router.navigate).toHaveBeenCalledWith(
-        [], {queryParams: { sortField: ['environment'], sortDirection: ['ASC'] }});
+
+      expect(router.navigate).toHaveBeenCalledWith(
+        [], { queryParams: { sortField: ['environment'], sortDirection: ['ASC'] }});
     });
 
     it('when set to an allowed value', () => {
-      spyOn(component.router, 'navigate');
+      route.snapshot.queryParams = {};
+
       component.onToggleSort('name');
-      expect(component.router.navigate).toHaveBeenCalledWith(
-        [], {queryParams: { sortField: ['name'], sortDirection: ['ASC'] }});
+
+      expect(router.navigate).toHaveBeenCalledWith(
+        [], { queryParams: { sortField: ['name'], sortDirection: ['ASC'] }});
     });
 
     it('when set to an allowed value', () => {
-      spyOn(component.router, 'navigate');
+      route.snapshot.queryParams = {};
+
       component.onToggleSort('app_name');
-      expect(component.router.navigate).toHaveBeenCalledWith(
-        [], {queryParams: { sortField: ['app_name'], sortDirection: ['ASC'] }});
+
+      expect(router.navigate).toHaveBeenCalledWith(
+        [], { queryParams: { sortField: ['app_name'], sortDirection: ['ASC'] }});
     });
   });
 
   describe('onPageChange', () => {
-    it('when the first page is selected remove page from URL', fakeAsync(() => {
-      component.sgHealthSummary = {
-        total: 30,
-        ok: 30,
-        warning: 0,
-        critical: 0,
-        unknown: 0
-      };
-      router.navigate([''], {queryParams: { }});
+    beforeEach(() => spyOn(router, 'navigate'));
 
-      tick();
+    it('when the first page is selected remove page from URL', () => {
+      route.snapshot.queryParams = {};
 
       component.onPageChange(1);
 
-      tick();
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: {}});
+    });
 
-      expect('/').toEqual(router.routerState.snapshot.url);
-    }));
-
-    it('when a page is selected', fakeAsync(() => {
-      router.navigate([''], {queryParams: { }});
-
-      tick();
+    it('when a page is selected', () => {
+      route.snapshot.queryParams = {};
 
       component.onPageChange(2);
 
-      tick();
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: { page: 2 }});
+    });
 
-      expect('/?page=2').toEqual(router.routerState.snapshot.url);
-    }));
-
-    it('when a page is a negative number do not change the URL', fakeAsync(() => {
-      router.navigate([''], {queryParams: { }});
-
-      tick();
+    it('when a page is a negative number do not change the URL', () => {
+      route.snapshot.queryParams = {};
 
       component.onPageChange(-2);
 
-      tick();
+      expect(router.navigate).not.toHaveBeenCalledWith([], { queryParams: { page: -2 }});
+    });
 
-      expect('/').toEqual(router.routerState.snapshot.url);
-    }));
-
-    it('when a page is 0 number do not change the URL', fakeAsync(() => {
-      router.navigate([''], {queryParams: { }});
-
-      tick();
+    it('when a page is 0 number do not change the URL', () => {
+      route.snapshot.queryParams = {};
 
       component.onPageChange(0);
 
-      tick();
+      expect(router.navigate).not.toHaveBeenCalledWith([], { queryParams: { page: 0 }});
+    });
 
-      expect('/').toEqual(router.routerState.snapshot.url);
-    }));
-
-    it('when a page changes do not remove existing URL parameters', fakeAsync(() => {
-      router.navigate([''], {queryParams: {sortField: ['name'], sortDirection: ['ASC']}});
-
-      tick();
+    it('when a page changes do not remove existing URL parameters', () => {
+      route.snapshot.queryParams = { sortField: ['name'], sortDirection: ['ASC'] };
 
       component.onPageChange(2);
 
-      tick();
-
-      expect('/?sortField=name&sortDirection=ASC&page=2').
-        toEqual(router.routerState.snapshot.url);
-    }));
+      expect(router.navigate).toHaveBeenCalledWith(
+        [], { queryParams: { sortField: ['name'], sortDirection: ['ASC'], page: 2 }});
+    });
   });
-
 
   describe('updateAllFilters', () => {
     it('when the URL is empty', fakeAsync(() => {
