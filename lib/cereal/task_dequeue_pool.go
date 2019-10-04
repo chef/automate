@@ -3,8 +3,6 @@ package cereal
 import (
 	"context"
 	"sync"
-
-	"github.com/chef/automate/lib/cereal/backend"
 )
 
 // taskDequeuePool is a pool of workers calling DequeueTask on the
@@ -29,7 +27,7 @@ type taskDequeueReq struct {
 
 type taskDequeueResp struct {
 	err       error
-	task      *backend.Task
+	task      *TaskData
 	completer TaskCompleter
 }
 
@@ -63,7 +61,7 @@ func (d *taskDequeuePool) Stop() {
 	d.wg.Wait()
 }
 
-func (d *taskDequeuePool) DequeueTask(ctx context.Context, taskName string) (*backend.Task, TaskCompleter, error) {
+func (d *taskDequeuePool) DequeueTask(ctx context.Context, taskName string) (*TaskData, TaskCompleter, error) {
 	respChan := make(chan taskDequeueResp)
 	req := taskDequeueReq{
 		name:     taskName,

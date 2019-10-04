@@ -93,13 +93,15 @@ type Task interface {
 	GetParameters(obj interface{}) error
 }
 
-type task struct {
-	backendTask *backend.Task
+// TODO(ssd) 2019-10-04: Probably remove this?
+type TaskData struct {
+	Name       string
+	Parameters []byte
 }
 
-func (r *task) GetParameters(obj interface{}) error {
-	if r.backendTask.Parameters != nil {
-		return json.Unmarshal(r.backendTask.Parameters, obj)
+func (r *TaskData) GetParameters(obj interface{}) error {
+	if r.Parameters != nil {
+		return json.Unmarshal(r.Parameters, obj)
 	}
 	return nil
 }
@@ -224,7 +226,7 @@ type WorkflowInstance interface {
 }
 
 type enqueueTaskRequest struct {
-	backendTask backend.Task
+	backendTask TaskData
 	opts        backend.TaskEnqueueOpts
 }
 type workflowInstanceImpl struct {
@@ -266,7 +268,7 @@ func (w *workflowInstanceImpl) EnqueueTask(taskName TaskName, parameters interfa
 	}
 
 	req := enqueueTaskRequest{
-		backendTask: backend.Task{
+		backendTask: TaskData{
 			Name:       taskName.String(),
 			Parameters: paramsData,
 		},
@@ -824,9 +826,9 @@ func (r *registeredExecutor) startTaskWorker(ctx context.Context, d TaskDequeuer
 	}()
 }
 
-func (r *registeredExecutor) runTask(ctx context.Context, t *backend.Task, taskCompleter TaskCompleter) error {
+func (r *registeredExecutor) runTask(ctx context.Context, t *TaskData, taskCompleter TaskCompleter) error {
 	startTime := time.Now()
-	result, err := r.executor.Run(ctx, &task{backendTask: t})
+	result, err := r.executor.Run(ctx, t)
 	endTime := time.Now()
 	logctx := logrus.WithFields(logrus.Fields{
 		"task_name":  r.name,

@@ -72,7 +72,7 @@ type workflowCompleter struct {
 
 var _ cereal.WorkflowCompleter = &workflowCompleter{}
 
-func (c *workflowCompleter) EnqueueTask(task *backend.Task, opts backend.TaskEnqueueOpts) error {
+func (c *workflowCompleter) EnqueueTask(task *cereal.TaskData, opts backend.TaskEnqueueOpts) error {
 	t := &grpccereal.Task{
 		Name:       task.Name,
 		Parameters: task.Parameters,
@@ -334,7 +334,7 @@ func (c *taskCompleter) Succeed(result []byte) error {
 	}
 }
 
-func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*backend.Task, cereal.TaskCompleter, error) {
+func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*cereal.TaskData, cereal.TaskCompleter, error) {
 	s, err := g.client.DequeueTask(ctx)
 	if err != nil {
 		return nil, nil, err
@@ -388,7 +388,7 @@ func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*backen
 		cancel()
 		doneChan <- errOut
 	}()
-	return &backend.Task{
+	return &cereal.TaskData{
 			Name:       deq.GetTask().GetName(),
 			Parameters: deq.GetTask().GetParameters(),
 		}, &taskCompleter{

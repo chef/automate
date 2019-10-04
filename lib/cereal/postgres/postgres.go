@@ -788,7 +788,7 @@ func (pg *PostgresBackend) KillWorkflow(ctx context.Context, instanceName string
 	return nil
 }
 
-func (workc *PostgresWorkflowCompleter) EnqueueTask(task *backend.Task, opts backend.TaskEnqueueOpts) error {
+func (workc *PostgresWorkflowCompleter) EnqueueTask(task *cereal.TaskData, opts backend.TaskEnqueueOpts) error {
 	if opts.StartAfter.IsZero() {
 		opts.StartAfter = time.Now()
 	}
@@ -803,9 +803,9 @@ func (workc *PostgresWorkflowCompleter) EnqueueTask(task *backend.Task, opts bac
 	return nil
 }
 
-func (pg *PostgresBackend) dequeueTask(tx *sql.Tx, taskName string) (int64, *backend.Task, error) {
+func (pg *PostgresBackend) dequeueTask(tx *sql.Tx, taskName string) (int64, *cereal.TaskData, error) {
 	row := tx.QueryRow(dequeueTaskQuery, taskName)
-	task := &backend.Task{
+	task := &cereal.TaskData{
 		Name: taskName,
 	}
 
@@ -820,7 +820,7 @@ func (pg *PostgresBackend) dequeueTask(tx *sql.Tx, taskName string) (int64, *bac
 	return tid, task, nil
 }
 
-func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*backend.Task, cereal.TaskCompleter, error) {
+func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*cereal.TaskData, cereal.TaskCompleter, error) {
 	ctx, cancel := context.WithCancel(ctx)
 
 	tx, err := pg.db.BeginTx(ctx, nil)
