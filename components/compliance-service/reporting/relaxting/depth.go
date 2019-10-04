@@ -3,12 +3,13 @@ package relaxting
 import (
 	"encoding/json"
 
-	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
-	"github.com/chef/automate/components/compliance-service/api/stats"
-	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
+	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
+	"github.com/chef/automate/components/compliance-service/api/stats"
+	"github.com/chef/automate/components/compliance-service/reporting"
 )
 
 type QueryInfo struct {
@@ -161,7 +162,7 @@ func getControlLevelControlSums(hit *elastic.SearchHit) (nodeControlSummary repo
 			}
 		}
 	}
-	return
+	return // nolint:nakedret
 }
 
 func getDeepInspecProfiles(hit *elastic.SearchHit,

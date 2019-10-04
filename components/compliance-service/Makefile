@@ -1,6 +1,3 @@
-# nakedret: naked returns in long functions
-LINTERARGS=-v -D nakedret ./...
-# govet in 1.16 is very confused by some of the code in this component
 include ../../Makefile.common_go
 
 .PHONY: test
