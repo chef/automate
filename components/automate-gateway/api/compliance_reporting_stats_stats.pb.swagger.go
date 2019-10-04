@@ -535,10 +535,6 @@ func init() {
     "v1Stats": {
       "type": "object",
       "properties": {
-        "nodes_cnt": {
-          "type": "integer",
-          "format": "int32"
-        },
         "nodes": {
           "type": "string",
           "format": "int64",
@@ -553,6 +549,10 @@ func init() {
           "format": "int32"
         },
         "profiles": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "nodes_cnt": {
           "type": "integer",
           "format": "int32"
         }
