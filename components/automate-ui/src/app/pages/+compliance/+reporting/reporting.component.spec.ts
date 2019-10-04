@@ -258,6 +258,8 @@ describe('ReportingComponent', () => {
   });
 
   describe('applyParamFilters()', () => {
+    beforeEach(() => spyOn(router, 'navigate'));
+
     it('parses multiple filters', () => {
       spyOn(reportQueryService, 'setState');
       const endDate = moment().utc().startOf('day').add(12, 'hours');
