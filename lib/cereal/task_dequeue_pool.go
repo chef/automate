@@ -12,7 +12,7 @@ import (
 // dequeue operations being send to the backend.
 type taskDequeuePool struct {
 	size     int
-	dequeuer backend.TaskDequeuer
+	dequeuer TaskDequeuer
 
 	reqChan chan taskDequeueReq
 	ctx     context.Context
@@ -30,10 +30,10 @@ type taskDequeueReq struct {
 type taskDequeueResp struct {
 	err       error
 	task      *backend.Task
-	completer backend.TaskCompleter
+	completer TaskCompleter
 }
 
-func newTaskDequeuePool(size int, dequeuer backend.TaskDequeuer) *taskDequeuePool {
+func newTaskDequeuePool(size int, dequeuer TaskDequeuer) *taskDequeuePool {
 	p := &taskDequeuePool{
 		size:     size,
 		dequeuer: dequeuer,
@@ -63,7 +63,7 @@ func (d *taskDequeuePool) Stop() {
 	d.wg.Wait()
 }
 
-func (d *taskDequeuePool) DequeueTask(ctx context.Context, taskName string) (*backend.Task, backend.TaskCompleter, error) {
+func (d *taskDequeuePool) DequeueTask(ctx context.Context, taskName string) (*backend.Task, TaskCompleter, error) {
 	respChan := make(chan taskDequeueResp)
 	req := taskDequeueReq{
 		name:     taskName,

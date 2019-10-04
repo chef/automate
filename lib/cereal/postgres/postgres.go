@@ -221,9 +221,9 @@ type PostgresScheduledWorkflowCompleter struct {
 	cancel context.CancelFunc
 }
 
-var _ backend.Driver = &PostgresBackend{}
-var _ backend.TaskCompleter = &PostgresTaskCompleter{}
-var _ backend.ScheduledWorkflowCompleter = &PostgresScheduledWorkflowCompleter{}
+var _ cereal.Driver = &PostgresBackend{}
+var _ cereal.TaskCompleter = &PostgresTaskCompleter{}
+var _ cereal.ScheduledWorkflowCompleter = &PostgresScheduledWorkflowCompleter{}
 
 func NewPostgresBackend(connURI string, opts ...PostgresBackendOpt) *PostgresBackend {
 	pg := &PostgresBackend{
@@ -396,7 +396,7 @@ func (pg *PostgresBackend) GetNextScheduledWorkflow(ctx context.Context) (*backe
 	return &scheduledWorkflow, err
 }
 
-func (pg *PostgresBackend) GetDueScheduledWorkflow(ctx context.Context) (*backend.Schedule, backend.ScheduledWorkflowCompleter, error) {
+func (pg *PostgresBackend) GetDueScheduledWorkflow(ctx context.Context) (*backend.Schedule, cereal.ScheduledWorkflowCompleter, error) {
 	ctx, cancel := context.WithCancel(ctx) // nolint: govet
 
 	tx, err := pg.db.BeginTx(ctx, nil)
@@ -641,7 +641,7 @@ func (pg *PostgresBackend) EnqueueWorkflow(ctx context.Context, w *backend.Workf
 	return nil
 }
 
-func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []string) (*backend.WorkflowEvent, backend.WorkflowCompleter, error) {
+func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []string) (*backend.WorkflowEvent, cereal.WorkflowCompleter, error) {
 	ctx, cancel := context.WithCancel(ctx)
 
 	tx, err := pg.db.BeginTx(ctx, nil)
@@ -820,7 +820,7 @@ func (pg *PostgresBackend) dequeueTask(tx *sql.Tx, taskName string) (int64, *bac
 	return tid, task, nil
 }
 
-func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*backend.Task, backend.TaskCompleter, error) {
+func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*backend.Task, cereal.TaskCompleter, error) {
 	ctx, cancel := context.WithCancel(ctx)
 
 	tx, err := pg.db.BeginTx(ctx, nil)

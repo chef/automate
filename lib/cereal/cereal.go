@@ -521,7 +521,7 @@ type Manager struct {
 	taskExecutors     map[string]*registeredExecutor
 	waywardWorkflows  waywardWorkflowList
 	workflowScheduler *WorkflowScheduler
-	backend           backend.Driver
+	backend           Driver
 	cancel            context.CancelFunc
 	wg                sync.WaitGroup
 	sg                StartGuard
@@ -578,7 +578,7 @@ func WithOnWorkflowCompleteCallback(c OnWorkflowCompleteCallback) ManagerOpt {
 
 // NewManager creates a new Manager with the given Driver. If
 // the driver fails to initialize, an error is returned.
-func NewManager(b backend.Driver, opts ...ManagerOpt) (*Manager, error) {
+func NewManager(b Driver, opts ...ManagerOpt) (*Manager, error) {
 	err := b.Init()
 	if err != nil {
 		return nil, err
@@ -600,11 +600,11 @@ func NewManager(b backend.Driver, opts ...ManagerOpt) (*Manager, error) {
 		sg:                   NewStartGuard("Start(ctx) called more than once on cereal.Manager!"),
 	}
 
-	if v, ok := b.(backend.SchedulerDriver); ok {
+	if v, ok := b.(SchedulerDriver); ok {
 		m.workflowScheduler = NewWorkflowScheduler(v, m.WakeupWorkflowExecutor)
 	}
 
-	if intervalSuggester, ok := b.(backend.IntervalSuggester); ok {
+	if intervalSuggester, ok := b.(IntervalSuggester); ok {
 		m.taskPollInterval = intervalSuggester.DefaultTaskPollInterval()
 		m.workflowPollInterval = intervalSuggester.DefaultWorkflowPollInterval()
 	}
@@ -745,7 +745,7 @@ func (j *jitterDownIntervalProvider) String() string {
 // StartPoller runs until the given context is cancelled, starting a
 // TaskWorker every interval (or sooner if we've been notified of a
 // change).
-func (r *registeredExecutor) StartPoller(ctx context.Context, d backend.TaskDequeuer, p pollIntervalProvider, workflowWakeupFun func()) {
+func (r *registeredExecutor) StartPoller(ctx context.Context, d TaskDequeuer, p pollIntervalProvider, workflowWakeupFun func()) {
 	logctx := logrus.WithFields(logrus.Fields{
 		"task_name":     r.name,
 		"poll_interval": p.String(),
@@ -776,7 +776,7 @@ func (r *registeredExecutor) StartPoller(ctx context.Context, d backend.TaskDequ
 // execute them, exiting when no tasks are available in the queue. If
 // the task poller initially finds a job, it will also start the next
 // task worker.
-func (r *registeredExecutor) startTaskWorker(ctx context.Context, d backend.TaskDequeuer, workflowWakeupFun func()) {
+func (r *registeredExecutor) startTaskWorker(ctx context.Context, d TaskDequeuer, workflowWakeupFun func()) {
 	logctx := logrus.WithField("task_name", r.name)
 	if !r.IncActiveWorkers() {
 		if r.maxWorkers > 1 {
@@ -824,7 +824,7 @@ func (r *registeredExecutor) startTaskWorker(ctx context.Context, d backend.Task
 	}()
 }
 
-func (r *registeredExecutor) runTask(ctx context.Context, t *backend.Task, taskCompleter backend.TaskCompleter) error {
+func (r *registeredExecutor) runTask(ctx context.Context, t *backend.Task, taskCompleter TaskCompleter) error {
 	startTime := time.Now()
 	result, err := r.executor.Run(ctx, &task{backendTask: t})
 	endTime := time.Now()
