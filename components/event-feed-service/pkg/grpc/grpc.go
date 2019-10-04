@@ -21,7 +21,6 @@ import (
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
 	"github.com/chef/automate/components/event-feed-service/pkg/server"
 	"github.com/chef/automate/lib/cereal"
-	cereal_backend "github.com/chef/automate/lib/cereal/backend"
 	cereal_grpc "github.com/chef/automate/lib/cereal/grpc"
 	"github.com/chef/automate/lib/datalifecycle/purge"
 	"github.com/chef/automate/lib/grpc/health"
@@ -128,7 +127,7 @@ func newGRPCServer(
 func newJobManager(
 	c *config.EventFeed,
 	esSidecarClient es_sidecar.EsSidecarClient,
-	cerealBackend cereal_backend.Driver) (*cereal.Manager, func(), error) {
+	cerealBackend cereal.Driver) (*cereal.Manager, func(), error) {
 
 	var (
 		man     *cereal.Manager
