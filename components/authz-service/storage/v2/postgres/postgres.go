@@ -1558,9 +1558,30 @@ func (p *pg) DeleteProject(ctx context.Context, id string) error {
 		return p.processError(err)
 	}
 
-	// FIXME: DONT FORGET: Tyler this is wrong
 	err = p.singleRowResultOrNotFoundErr(res)
 	if err != nil {
+		// don't error if the project is already in the graveyard.
+		// this is necessary since the status might not have been reported
+		// to cereal on the first attempt, in which case we want this
+		// function to be idempotent.
+		if err == storage_errors.ErrNotFound {
+			gyRes, _ := tx.ExecContext(ctx, `SELECT id FROM iam_projects_graveyard WHERE id=$1`, id)
+			gyErr := p.singleRowResultOrNotFoundErr(gyRes)
+			// if we don't find the project in the graveyard, return the original error
+			if gyErr != nil {
+				return err
+			}
+			// project found in graveyard
+			// abort transaction and report success to cereal. we don't really care about the rollback
+			// since nothing will have happened at this point in the transaction in this case.
+			// log the error if any for posterity though.
+			err := tx.Rollback()
+			if err != nil {
+				p.logger.Warnf("failed to rollback ProjectDelete when already graveyarded for id %q: %s",
+					id, err.Error())
+			}
+			return nil
+		}
 		return err
 	}
 

@@ -2,9 +2,11 @@ package v2_test
 
 import (
 	"context"
+	"fmt"
 	"math/rand"
 	"strconv"
 	"testing"
+	"time"
 
 	cache "github.com/patrickmn/go-cache"
 	"github.com/stretchr/testify/assert"
@@ -251,7 +253,7 @@ func TestDeleteProject(t *testing.T) {
 		}},
 		{"deletes custom project when one project is in database", func(t *testing.T) {
 			require.Zero(t, store.ItemCount())
-			id := "test-project"
+			id := fmt.Sprintf("test-project-%d", time.Now().UnixNano())
 			addProjectToStore(t, store, id, "my foo", storage.Custom)
 
 			_, err := cl.DeleteProject(ctx, &api.DeleteProjectReq{Id: id})
@@ -260,10 +262,10 @@ func TestDeleteProject(t *testing.T) {
 		}},
 		{"deletes custom project when several are in database", func(t *testing.T) {
 			require.Zero(t, store.ItemCount())
-			id := "test-project"
+			id := fmt.Sprintf("test-project-%d", time.Now().UnixNano())
 			addProjectToStore(t, store, id, "my foo", storage.Custom)
 
-			id2 := "test-2-project"
+			id2 := fmt.Sprintf("test-project-2-%d", time.Now().UnixNano())
 			addProjectToStore(t, store, id2, "my bar", storage.Custom)
 			require.Equal(t, 2, store.ItemCount())
 
