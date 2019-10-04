@@ -40,7 +40,27 @@ const (
 // Schedule represents a recurring workflow.
 // TODO(jaym): we should wrap this in the workflow package and provide a getter
 // for the parameters
-type Schedule backend.Schedule
+type Schedule struct {
+	// TODO(ssd) 2019-07-19: ID was originally placed on backends
+	// because it was unclear whether (workflow_name,
+	// instance_name) can actually be unique in the case of
+	// scheduled workflows. We currently have a unique constraint
+	// on them, so we could remove this, but since it was on this
+	// struct it ended up in a few queries that would need to
+	// change.
+	ID             int64
+	Enabled        bool
+	InstanceName   string
+	WorkflowName   string
+	Parameters     []byte
+	Recurrence     string
+	NextDueAt      time.Time
+	LastEnqueuedAt time.Time
+
+	// These come from the latest result
+	LastStart *time.Time
+	LastEnd   *time.Time
+}
 
 // WorkflowName identifies workflows registered with the cereal
 // library. Many functions in the cereal library take or return
@@ -1007,24 +1027,11 @@ func (m *Manager) UpdateWorkflowScheduleByName(ctx context.Context,
 
 // ListWorkflowSchedules list all the scheduled workflows.
 func (m *Manager) ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error) {
-	backendScheds, err := m.backend.ListWorkflowSchedules(ctx)
-	if err != nil {
-		return nil, err
-	}
-	ret := make([]*Schedule, len(backendScheds))
-	for i, s := range backendScheds {
-		ret[i] = (*Schedule)(s)
-	}
-	return ret, nil
+	return m.backend.ListWorkflowSchedules(ctx)
 }
 
 func (m *Manager) GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName WorkflowName) (*Schedule, error) {
-	backendSched, err := m.backend.GetWorkflowScheduleByName(ctx, instanceName, workflowName.String())
-	if err != nil {
-		return nil, err
-	}
-
-	return (*Schedule)(backendSched), nil
+	return m.backend.GetWorkflowScheduleByName(ctx, instanceName, workflowName.String())
 }
 
 func (m *Manager) GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName WorkflowName) (ImmutableWorkflowInstance, error) {

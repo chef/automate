@@ -62,28 +62,6 @@ type TaskEnqueueOpts struct {
 	StartAfter time.Time
 }
 
-type Schedule struct {
-	// TODO(ssd) 2019-07-19: ID was originally placed on backends
-	// because it was unclear whether (workflow_name,
-	// instance_name) can actually be unique in the case of
-	// scheduled workflows. We currently have a unique constraint
-	// on them, so we could remove this, but since it was on this
-	// struct it ended up in a few queries that would need to
-	// change.
-	ID             int64
-	Enabled        bool
-	InstanceName   string
-	WorkflowName   string
-	Parameters     []byte
-	Recurrence     string
-	NextDueAt      time.Time
-	LastEnqueuedAt time.Time
-
-	// These come from the latest result
-	LastStart *time.Time
-	LastEnd   *time.Time
-}
-
 type WorkflowScheduleUpdateOpts struct {
 	UpdateEnabled bool
 	Enabled       bool
