@@ -55,11 +55,6 @@ type WorkflowEvent struct {
 	TaskResult *TaskResult
 }
 
-type Task struct {
-	Name       string
-	Parameters []byte
-}
-
 type TaskResult struct {
 	TaskName   string
 	Parameters []byte
