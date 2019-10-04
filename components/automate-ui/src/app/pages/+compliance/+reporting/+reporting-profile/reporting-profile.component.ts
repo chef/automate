@@ -124,7 +124,7 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
   hideScanResults() {
     this.scanResults.opened = false;
     this.scanResults.clearParams();
-    this.scanResults.control = null;
+    this.scanResults.control = {};
     this.openControls = {};
   }
 
@@ -135,13 +135,16 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
     params = paginationOverride;
     params['sort'] = 'latest_report.end_time';
     params['order'] = 'desc';
-    return this.statsService.getNodes(reportQuery, params).pipe(
+    const nodes = this.statsService.getNodes(reportQuery, params).pipe(
       map(data => {
         return data.items.map(node => {
           node.status = node.latest_report.status;
           return node;
         });
       }));
+    // reset the filters
+    reportQuery.filters = [];
+    return nodes;
   }
 
   getControl(reportQuery: ReportQuery, params: any): Observable<any> {
