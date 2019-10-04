@@ -103,6 +103,33 @@ describe('StatsService', () => {
     });
   });
 
+  describe('getControls()', () => {
+    it('fetches controls data', () => {
+      const endDate = moment().utc().startOf('day').add(12, 'hours');
+      const reportQuery: ReportQuery = {
+        startDate: moment(endDate).subtract(10, 'days'),
+        endDate: endDate,
+        interval: 0,
+        filters: [{type: {name: 'control_id'}, value: {id: 'sshd-1'}}]
+      };
+
+      const expectedUrl = `${COMPLIANCE_URL}/reporting/controls`;
+      const expectedItems = [{}, {}];
+      const expectedTotal = expectedItems.length;
+      const mockResp = { control_items: expectedItems };
+
+      service.getControls(reportQuery).subscribe(data => {
+        expect(data).toEqual({total: expectedTotal, items: expectedItems});
+      });
+
+      const req = httpTestingController.expectOne(expectedUrl);
+
+      expect(req.request.method).toEqual('POST');
+
+      req.flush(mockResp);
+    });
+  });
+
   describe('getNodeSummary()', () => {
     it('fetches node summary data', () => {
       const endDate = moment().utc().startOf('day').add(12, 'hours');

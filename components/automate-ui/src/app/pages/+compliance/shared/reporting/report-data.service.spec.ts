@@ -121,4 +121,22 @@ describe('ReportDataService', () => {
       expect(service.profilesListLoading).toEqual(true);
     });
   });
+
+  describe('getReportingControlsList()', () => {
+    it('fetches controls data', () => {
+      const endDate = moment().utc().startOf('day').add(12, 'hours');
+      const reportQuery: ReportQuery = {
+        startDate: moment(endDate).subtract(10, 'days'),
+        endDate: endDate,
+        interval: 0,
+        filters: [ ]
+      };
+      const data = [];
+      spyOn(statsService, 'getControls').and.returnValue(observableOf(data));
+
+      service.getReportingControlsList(reportQuery);
+
+      expect(statsService.getControls).toHaveBeenCalledWith(reportQuery);
+    });
+  });
 });
