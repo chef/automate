@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/cereal/backend"
 )
 
 type WorkflowInstance struct {
@@ -67,7 +66,7 @@ type TestableTask struct {
 	parameters []byte
 
 	Name cereal.TaskName
-	Opts backend.TaskEnqueueOpts
+	Opts cereal.TaskEnqueueOptions
 }
 
 func (d *TestableTask) GetParameters(obj interface{}) {
@@ -152,8 +151,8 @@ func (w *WorkflowInstance) GetParameters(obj interface{}) error {
 	return json.Unmarshal(w.inputParams, obj)
 }
 
-func (w *WorkflowInstance) EnqueueTask(taskName cereal.TaskName, parameters interface{}, opts ...cereal.TaskEnqueueOpts) error {
-	bopts := backend.TaskEnqueueOpts{}
+func (w *WorkflowInstance) EnqueueTask(taskName cereal.TaskName, parameters interface{}, opts ...cereal.TaskEnqueueOpt) error {
+	bopts := cereal.TaskEnqueueOptions{}
 	for _, o := range opts {
 		o(&bopts)
 	}
@@ -181,7 +180,7 @@ func (w *WorkflowInstance) Continue(payload interface{}) cereal.Decision {
 	return cereal.NewContinueDecision(payload)
 }
 
-func (w *WorkflowInstance) Complete(opts ...cereal.CompleteOpts) cereal.Decision {
+func (w *WorkflowInstance) Complete(opts ...cereal.CompleteOpt) cereal.Decision {
 	d := cereal.NewCompleteDecision(nil)
 	for _, o := range opts {
 		o(&d)

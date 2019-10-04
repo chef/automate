@@ -788,7 +788,7 @@ func (pg *PostgresBackend) KillWorkflow(ctx context.Context, instanceName string
 	return nil
 }
 
-func (workc *PostgresWorkflowCompleter) EnqueueTask(task *cereal.TaskData, opts backend.TaskEnqueueOpts) error {
+func (workc *PostgresWorkflowCompleter) EnqueueTask(task *cereal.TaskData, opts cereal.TaskEnqueueOptions) error {
 	if opts.StartAfter.IsZero() {
 		opts.StartAfter = time.Now()
 	}

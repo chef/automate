@@ -48,10 +48,10 @@ func (w *workflowInstance) GetParameters(obj interface{}) error {
 type enqueueTaskRequest struct {
 	taskName   cereal.TaskName
 	parameters interface{}
-	opts       []cereal.TaskEnqueueOpts
+	opts       []cereal.TaskEnqueueOpt
 }
 
-func (w *workflowInstance) EnqueueTask(taskName cereal.TaskName, parameters interface{}, opts ...cereal.TaskEnqueueOpts) error {
+func (w *workflowInstance) EnqueueTask(taskName cereal.TaskName, parameters interface{}, opts ...cereal.TaskEnqueueOpt) error {
 	v, err := merge(parameters, w.attachment)
 	if err != nil {
 		return err
@@ -68,7 +68,7 @@ func (w *workflowInstance) Continue(payload interface{}) cereal.Decision {
 	return w.w.Continue(payload)
 }
 
-func (w *workflowInstance) Complete(opts ...cereal.CompleteOpts) cereal.Decision {
+func (w *workflowInstance) Complete(opts ...cereal.CompleteOpt) cereal.Decision {
 	return w.w.Complete(opts...)
 }
 
