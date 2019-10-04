@@ -44,11 +44,14 @@ var serveCmd = &cobra.Command{
 		//
 		// TODO: Figure out how to respawn if client crashes?
 		if os.Getenv(devModeEnvVar) == "true" {
-			go rest.Spawn(endpoint, conf)
+			go rest.Spawn(endpoint, conf) // nolint: errcheck
 		}
 
 		// Start the gRPC Server
-		grpc.Spawn(conf)
+		err = grpc.Spawn(conf)
+		if err != nil {
+			logrus.WithError(err).Fatal("spawn failed")
+		}
 	},
 }
 
@@ -121,5 +124,5 @@ func init() {
 	serveCmd.Flags().String("key", "key.pem", "SSL Private key for gRPC server")
 	serveCmd.Flags().String("cert", "cert.pem", "SSL Certificate for gRPC server")
 	serveCmd.Flags().String("root-cert", "cacert.pem", "Root SSL CA Certificate for gRPC server")
-	viper.BindPFlags(serveCmd.Flags())
+	viper.BindPFlags(serveCmd.Flags()) // nolint: errcheck
 }

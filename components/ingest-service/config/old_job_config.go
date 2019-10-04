@@ -52,19 +52,19 @@ func (c *OldJobConfig) ConfigForJob(jobIndex int) (JobConfig, error) {
 }
 
 var defaultJobConfig = []JobConfig{
-	DeleteNodes: JobConfig{
+	DeleteNodes: {
 		ID:        DeleteNodes,
 		Threshold: "1d",
 		Every:     "15m",
 		Running:   false,
 	},
-	NodesMissing: JobConfig{
+	NodesMissing: {
 		ID:        NodesMissing,
 		Threshold: "1d",
 		Every:     "15m",
 		Running:   true,
 	},
-	MissingNodesForDeletion: JobConfig{
+	MissingNodesForDeletion: {
 		ID:        MissingNodesForDeletion,
 		Threshold: "30d",
 		Every:     "15m",

@@ -24,12 +24,12 @@ const (
 
 var DefaultPurgePolicies = &purge.Policies{
 	Es: map[string]purge.EsPolicy{
-		PurgeConvergeHistoryName: purge.EsPolicy{
+		PurgeConvergeHistoryName: {
 			Name:          PurgeConvergeHistoryName,
 			IndexName:     PurgeConvergeHistoryIndex,
 			OlderThanDays: 30,
 		},
-		PurgeActionsName: purge.EsPolicy{
+		PurgeActionsName: {
 			Name:          PurgeActionsName,
 			IndexName:     PurgeActionsIndex,
 			OlderThanDays: 30,

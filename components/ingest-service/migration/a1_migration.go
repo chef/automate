@@ -69,7 +69,7 @@ func (ms *Status) stage1() error {
 		logWarning(err.Error(), "Elasticsearch removing '"+a1NodeStateIndexName+"' alias")
 	}
 
-	ms.client.InitializeStore(ms.ctx)
+	err = ms.client.InitializeStore(ms.ctx)
 	if err != nil {
 		logWarning(err.Error(), "Elasticsearch indices failed to initialize")
 		return err
@@ -110,7 +110,10 @@ func (ms *Status) finalCleanup() {
 	}
 
 	// delete node-state-2
-	ms.client.DeleteIndex(ms.ctx, a1NodeStateIndexName)
+	err = ms.client.DeleteIndex(ms.ctx, a1NodeStateIndexName)
+	if err != nil {
+		logWarning(err.Error(), "Failed to delete old node-state index")
+	}
 }
 
 // Walk each of the nodes and find the latest run from the insights indexes.

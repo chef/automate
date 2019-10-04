@@ -13,9 +13,10 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/olivere/elastic"
+
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
-	"github.com/olivere/elastic"
 )
 
 // MarkNodesMissing marks all nodes that have passed the specified threshold as 'missing'
@@ -48,7 +49,7 @@ func (es *Backend) MarkNodesMissing(ctx context.Context, threshold string) (int,
 		KeepAlive("5m") // Time ES will keep the cursor open
 
 	// Make sure that we clear the scroll service
-	defer scrollService.Clear(ctx)
+	defer scrollService.Clear(ctx) // nolint: errcheck
 
 	for {
 		// Scroll through the results by pages
@@ -175,9 +176,9 @@ func (es *Backend) DeleteMarkedNodes(ctx context.Context, threshold string) (upd
 	}
 
 	// Clear Scroll
-	scrollService.Clear(ctx)
+	scrollService.Clear(ctx) // nolint: errcheck
 
-	return
+	return // nolint:nakedret
 }
 
 // MarkMissingNodesForDeletion will mark all the nodes that have been missing for over the
@@ -211,7 +212,7 @@ func (es *Backend) MarkMissingNodesForDeletion(ctx context.Context, threshold st
 		KeepAlive("5m") // Time ES will keep the cursor open
 
 	// Make sure that we clear the scroll service
-	defer scrollService.Clear(ctx)
+	defer scrollService.Clear(ctx) // nolint: errcheck
 
 	for {
 		// Scroll through the results by pages

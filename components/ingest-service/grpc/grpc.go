@@ -103,7 +103,7 @@ func Spawn(opts *serveropts.Opts) error {
 		log.WithError(err).Error("Failed to create Authz connection")
 		return err
 	}
-	defer authzConn.Close()
+	defer authzConn.Close() // nolint: errcheck
 
 	authzProjectsClient := iam_v2.NewProjectsClient(authzConn)
 
@@ -114,7 +114,7 @@ func Spawn(opts *serveropts.Opts) error {
 		log.WithError(err).Error("Failed to create Event connection")
 		return err
 	}
-	defer eventConn.Close()
+	defer eventConn.Close() // nolint: errcheck
 
 	eventServiceClient := automate_event.NewEventServiceClient(eventConn)
 
@@ -125,7 +125,7 @@ func Spawn(opts *serveropts.Opts) error {
 		log.WithError(err).Error("Failed to create NodeManager connection")
 		return err
 	}
-	defer nodeMgrConn.Close()
+	defer nodeMgrConn.Close() // nolint: errcheck
 
 	nodeMgrServiceClient := manager.NewNodeManagerServiceClient(nodeMgrConn)
 
@@ -149,14 +149,14 @@ func Spawn(opts *serveropts.Opts) error {
 		logrus.WithError(err).Fatal("could not create job manager")
 		return err
 	}
-	defer jobManager.Stop()
+	defer jobManager.Stop() // nolint: errcheck
 
 	esSidecarConn, err := opts.ConnFactory.Dial("es-sidecar-service", opts.EsSidecarAddress)
 	if err != nil {
 		log.WithError(err).Error("Failed to create connection to es-sidecar-service")
 		return err
 	}
-	defer esSidecarConn.Close()
+	defer esSidecarConn.Close() // nolint: errcheck
 	esSidecarClient := es_sidecar.NewEsSidecarClient(esSidecarConn)
 
 	err = server.InitializeJobManager(jobManager, client, esSidecarClient)
