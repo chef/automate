@@ -178,19 +178,25 @@ func (r *taskResult) Err() error {
 	}
 }
 
+// This is annoying public so that it can be referred to by the
+// backends.
+type TaskEnqueueOptions struct {
+	StartAfter time.Time
+}
+
+// A TaskEnqueueOpt is an optional parameters for enqueuing a task
+type TaskEnqueueOpt func(*TaskEnqueueOptions)
+
 // StartAfter indicates when the task should start running
-func StartAfter(startAfter time.Time) TaskEnqueueOpts {
-	return func(o *backend.TaskEnqueueOpts) {
+func StartAfter(startAfter time.Time) TaskEnqueueOpt {
+	return func(o *TaskEnqueueOptions) {
 		o.StartAfter = startAfter
 	}
 }
 
-// EnqueueOpts are optional parameters for enqueuing a task
-type TaskEnqueueOpts func(*backend.TaskEnqueueOpts)
+type CompleteOpt func(*Decision)
 
-type CompleteOpts func(*Decision)
-
-func WithResult(obj interface{}) CompleteOpts {
+func WithResult(obj interface{}) CompleteOpt {
 	return func(d *Decision) {
 		d.result = obj
 	}
@@ -216,11 +222,11 @@ type WorkflowInstance interface {
 	// with the given parameters. Any enqueued tasks will be started
 	// after the currently running callback of the WorkflowExecutor
 	// returns.
-	EnqueueTask(taskName TaskName, parameters interface{}, opts ...TaskEnqueueOpts) error
+	EnqueueTask(taskName TaskName, parameters interface{}, opts ...TaskEnqueueOpt) error
 
 	// Complete returns a decision to end execution of the workflow for
 	// the running workflow instance.
-	Complete(...CompleteOpts) Decision
+	Complete(...CompleteOpt) Decision
 
 	// Continue returns a decision to continue execution of the workflow for
 	// the running workflow instance. The provided payload will available when
@@ -247,7 +253,7 @@ type WorkflowInstance interface {
 
 type enqueueTaskRequest struct {
 	backendTask TaskData
-	opts        backend.TaskEnqueueOpts
+	opts        TaskEnqueueOptions
 }
 type workflowInstanceImpl struct {
 	instance backend.WorkflowInstance
@@ -281,7 +287,7 @@ func (w *workflowInstanceImpl) TotalCompletedTasks() int {
 	return w.wevt.CompletedTaskCount
 }
 
-func (w *workflowInstanceImpl) EnqueueTask(taskName TaskName, parameters interface{}, opts ...TaskEnqueueOpts) error {
+func (w *workflowInstanceImpl) EnqueueTask(taskName TaskName, parameters interface{}, opts ...TaskEnqueueOpt) error {
 	paramsData, err := jsonify(parameters)
 	if err != nil {
 		return err
@@ -292,7 +298,7 @@ func (w *workflowInstanceImpl) EnqueueTask(taskName TaskName, parameters interfa
 			Name:       taskName.String(),
 			Parameters: paramsData,
 		},
-		opts: backend.TaskEnqueueOpts{},
+		opts: TaskEnqueueOptions{},
 	}
 	for _, o := range opts {
 		o(&req.opts)
@@ -301,7 +307,7 @@ func (w *workflowInstanceImpl) EnqueueTask(taskName TaskName, parameters interfa
 	return nil
 }
 
-func (w *workflowInstanceImpl) Complete(opts ...CompleteOpts) Decision {
+func (w *workflowInstanceImpl) Complete(opts ...CompleteOpt) Decision {
 	if len(w.tasks) > 0 {
 		logrus.Error("Cannot call EnqueueTask and Complete in same workflow step! failing workflow")
 		return Decision{failed: true, err: errors.New("EnqueueTask and Complete called in same workflow step")}

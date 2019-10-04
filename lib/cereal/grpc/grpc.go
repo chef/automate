@@ -72,7 +72,7 @@ type workflowCompleter struct {
 
 var _ cereal.WorkflowCompleter = &workflowCompleter{}
 
-func (c *workflowCompleter) EnqueueTask(task *cereal.TaskData, opts backend.TaskEnqueueOpts) error {
+func (c *workflowCompleter) EnqueueTask(task *cereal.TaskData, opts cereal.TaskEnqueueOptions) error {
 	t := &grpccereal.Task{
 		Name:       task.Name,
 		Parameters: task.Parameters,

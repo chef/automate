@@ -58,10 +58,6 @@ type TaskResult struct {
 	Result    []byte
 }
 
-type TaskEnqueueOpts struct {
-	StartAfter time.Time
-}
-
 type WorkflowScheduleUpdateOpts struct {
 	UpdateEnabled bool
 	Enabled       bool
