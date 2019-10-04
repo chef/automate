@@ -17,7 +17,6 @@ import { PolicyAddMembersComponent } from './policy-add-members.component';
 describe('PolicyAddMembersComponent', () => {
     let component: PolicyAddMembersComponent;
     let fixture: ComponentFixture<PolicyAddMembersComponent>;
-    let element: HTMLElement;
 
     beforeEach(async(() => {
         TestBed.configureTestingModule({
@@ -58,7 +57,6 @@ describe('PolicyAddMembersComponent', () => {
             identity: [''],
             name: ['']
         });
-        element = fixture.debugElement.nativeElement;
         fixture.detectChanges();
     });
 
@@ -114,12 +112,11 @@ describe('PolicyAddMembersComponent', () => {
     });
 
     describe('updateValidations', () => {
-        beforeEach(() => {
-          component.expressionForm.setValue({ type: 'TEAM', identity: 'LOCAL', name: '' });
-        });
 
         it('clears validators when input is not active', () => {
-
+          component.expressionForm.setValue({ type: 'TEAM', identity: '', name: '' });
+        //   create spy here i think
+        //   expect(component.updateValidations('identity', false))
         });
 
         it('applies validators when input is active', () => {
