@@ -447,7 +447,7 @@ func (pg *PostgresBackend) GetDueScheduledWorkflow(ctx context.Context) (*cereal
 }
 
 func (pg *PostgresBackend) UpdateWorkflowScheduleByName(
-	ctx context.Context, instanceName string, workflowName string, opts backend.WorkflowScheduleUpdateOpts) error {
+	ctx context.Context, instanceName string, workflowName string, opts cereal.WorkflowScheduleUpdateOptions) error {
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
