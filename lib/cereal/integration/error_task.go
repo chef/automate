@@ -9,7 +9,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/cereal/backend"
 )
 
 func (suite *CerealTestSuite) TestErroredTask() {
@@ -47,7 +46,7 @@ func (suite *CerealTestSuite) TestErroredTask() {
 		),
 
 		WithManagerOpts(
-			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+			cereal.WithOnWorkflowCompleteCallback(func(*cereal.WorkflowEvent) {
 				wgTask.Done()
 			}),
 		),

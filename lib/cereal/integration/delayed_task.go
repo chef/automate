@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/cereal/backend"
 )
 
 func (suite *CerealTestSuite) TestDelayedTask() {
@@ -48,7 +47,7 @@ func (suite *CerealTestSuite) TestDelayedTask() {
 		),
 		WithManagerOpts(
 			cereal.WithTaskPollInterval(2*time.Second),
-			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+			cereal.WithOnWorkflowCompleteCallback(func(*cereal.WorkflowEvent) {
 				wgTask.Done()
 			}),
 		),

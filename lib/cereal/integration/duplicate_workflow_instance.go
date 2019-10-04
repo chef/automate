@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/cereal/backend"
 )
 
 // TestEnqueueDuplicateWorkflowInstance tries the enqueue the same workflow
@@ -48,7 +47,7 @@ func (suite *CerealTestSuite) TestEnqueueDuplicateWorkflowInstance() {
 			},
 		),
 		WithManagerOpts(
-			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+			cereal.WithOnWorkflowCompleteCallback(func(*cereal.WorkflowEvent) {
 				wgTask.Done()
 			}),
 		),
