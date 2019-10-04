@@ -14,7 +14,6 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/cereal/backend"
 	grpccereal "github.com/chef/automate/lib/cereal/grpc"
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/platform/pg"
@@ -233,7 +232,7 @@ func runResetDB(_ *cobra.Command, args []string) error {
 	return nil
 }
 
-func getBackend() backend.Driver {
+func getBackend() cereal.Driver {
 	if opts.Endpoint != "" {
 		conn, err := grpc.Dial(opts.Endpoint, grpc.WithInsecure(), grpc.WithMaxMsgSize(64*1024*1024))
 		if err != nil {
@@ -257,7 +256,7 @@ var (
 func startManager(_ *cobra.Command, args []string) error {
 	b := getBackend()
 	manager, err := cereal.NewManager(b, cereal.WithOnWorkflowCompleteCallback(
-		func(w *backend.WorkflowEvent) {
+		func(w *cereal.WorkflowEvent) {
 			if w.Instance.WorkflowName == EchoWorkflowName.String() && echoWorkflowStartTime != nil {
 				logrus.Infof("echo workflow total runtime: %s", time.Since(*echoWorkflowStartTime))
 			}
@@ -397,7 +396,7 @@ func runListInstances(_ *cobra.Command, args []string) error {
 		return err
 	}
 
-	opts := backend.ListWorkflowOpts{}
+	opts := cereal.ListWorkflowOpts{}
 	if listInstanceOpts.IsRunning == "true" {
 		m := true
 		opts.IsRunning = &m
