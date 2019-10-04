@@ -537,7 +537,8 @@ func init() {
       "properties": {
         "nodes": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "title": "int64 types render into string types when serialized to satisfy all browsers\nwe don't really need for nodes counts to be int64 as int32 limits us to 2billion nodes which is plenty for now\nwe are therefore deprecating nodes and favor nodesCnt"
         },
         "platforms": {
           "type": "integer",
@@ -548,6 +549,10 @@ func init() {
           "format": "int32"
         },
         "profiles": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "nodes_cnt": {
           "type": "integer",
           "format": "int32"
         }

@@ -618,6 +618,7 @@ if !ENV['NO_STATS_TESTS']
         "reportSummary" => {
           "status" => "failed",
           "stats" => {
+            "nodesCnt" => 1,
             "nodes" => 1,
             "platforms" => 1,
             "environments" => 1,
