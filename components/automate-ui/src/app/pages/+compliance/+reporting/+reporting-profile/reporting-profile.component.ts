@@ -169,12 +169,19 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
     return 'minor';
   }
 
-  statusIcon(status) {
+  statusIcon(status: string): string {
     switch (status) {
-      case ('failed'): return 'report_problem';
-      case ('passed'): return 'check_circle';
-      case ('skipped'): return 'help';
-      default: return '';
+      case 'failed' :
+        return 'report_problem';
+        break;
+      case 'passed' :
+        return 'check_circle';
+        break;
+      case 'skipped' :
+        return 'help';
+        break;
+      default:
+        return '';
     }
   }
 
