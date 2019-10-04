@@ -63,7 +63,7 @@ func (srv *Server) ListReports(ctx context.Context, in *reporting.Query) (*repor
 	return &reports, nil
 }
 
-// ListReports returns a list of reports based on query
+// ListReportIds returns a list of reports based on query
 func (srv *Server) ListReportIds(ctx context.Context, in *reporting.Query) (*reporting.ReportIds, error) {
 	var ids reporting.ReportIds
 
