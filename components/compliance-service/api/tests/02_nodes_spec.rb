@@ -46,7 +46,8 @@ describe File.basename(__FILE__) do
                 "name" => "centos-beta",
                 "platform" => {
                     "name" => "centos",
-                    "release" => "5.11"
+                    "release" => "5.11",
+                    "full"=>"centos 5.11"
                 },
                 "environment" => "DevSec Prod beta",
                 "latestReport" => {
@@ -69,13 +70,15 @@ describe File.basename(__FILE__) do
                     "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
                     "name" => "nginx-baseline",
                     "status" => "passed",
-                    "version" => "2.1.0"
+                    "version" => "2.1.0",
+                    "full"=>"DevSec Nginx Baseline, v2.1.0"
                   },
                   {
                     "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "name" => "apache-baseline",
                     "status" => "skipped",
-                    "version" => "2.0.1"
+                    "version" => "2.0.1",
+                    "full"=>"DevSec Apache Baseline, v2.0.1"
                   }
                 ]
               }
@@ -96,7 +99,8 @@ describe File.basename(__FILE__) do
                 "name" => "centos-beta",
                 "platform" => {
                     "name" => "centos",
-                    "release" => "5.11"
+                    "release" => "5.11",
+                    "full" => "centos 5.11"
                 },
                 "environment" => "DevSec Prod beta",
                 "latestReport" => {
@@ -119,19 +123,22 @@ describe File.basename(__FILE__) do
                     "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
                     "name" => "nginx-baseline",
                     "status" => "passed",
-                    "version" => "2.1.0"
+                    "version" => "2.1.0",
+                    "full"=>"DevSec Nginx Baseline, v2.1.0"
                   },
                   {
                     "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "name" => "apache-baseline",
                     "status" => "skipped",
-                    "version" => "2.0.1"
+                    "version" => "2.0.1",
+                    "full"=>"DevSec Apache Baseline, v2.0.1"
                   },
                   {
                     "id" => "41a02797bfea15592ba2748d55929d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "name" => "fake-baseline",
                     "status" => "skipped",
-                    "version" => "2.0.1"
+                    "version" => "2.0.1",
+                    "full"=>"A fake one, v2.0.1"
                   }
                 ]
             },
@@ -140,7 +147,8 @@ describe File.basename(__FILE__) do
                 "name" => "redhat(2)-alpha-nginx(f)-apache(f)-failed",
                 "platform" => {
                     "name" => "redhat",
-                    "release" => "6.11"
+                    "release" => "6.11",
+                    "full" => "redhat 6.11"
                 },
                 "environment" => "DevSec Prod Alpha",
                 "latestReport" => {
@@ -167,13 +175,15 @@ describe File.basename(__FILE__) do
                     "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
                     "name" => "nginx-baseline",
                     "status" => "failed",
-                    "version" => "2.1.0"
+                    "version" => "2.1.0",
+                    "full"=>"DevSec Nginx Baseline, v2.1.0"
                   },
                   {
                     "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "name" => "apache-baseline",
                     "status" => "failed",
-                    "version" => "2.0.1"
+                    "version" => "2.0.1",
+                    "full"=>"DevSec Apache Baseline, v2.0.1"
                   }
                 ]
             },
@@ -182,7 +192,8 @@ describe File.basename(__FILE__) do
                 "name" => "redhat(2)-alpha-nginx(f)-apache(s)-failed",
                 "platform" => {
                     "name" => "redhat",
-                    "release" => "6.11"
+                    "release" => "6.11",
+                    "full" => "redhat 6.11"
                 },
                 "environment" => "DevSec Prod Alpha",
                 "latestReport" => {
@@ -209,13 +220,15 @@ describe File.basename(__FILE__) do
                     "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
                     "name" => "nginx-baseline",
                     "status" => "failed",
-                    "version" => "2.1.0"
+                    "version" => "2.1.0",
+                    "full"=>"DevSec Nginx Baseline, v2.1.0"
                   },
                   {
                     "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "name" => "apache-baseline",
                     "status" => "skipped",
-                    "version" => "2.0.1"
+                    "version" => "2.0.1",
+                    "full"=>"DevSec Apache Baseline, v2.0.1"
                   }
                 ]
             },
@@ -224,7 +237,8 @@ describe File.basename(__FILE__) do
                 "name" => "RedHat(2)-beta-nginx(f)-apache(s)-failed",
                 "platform" => {
                     "name" => "redhat",
-                    "release" => "6.11"
+                    "release" => "6.11",
+                    "full" => "redhat 6.11"
                 },
                 "environment" => "DevSec Prod beta",
                 "latestReport" => {
@@ -251,13 +265,15 @@ describe File.basename(__FILE__) do
                     "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
                     "name" => "nginx-baseline",
                     "status" => "failed",
-                    "version" => "2.1.0"
+                    "version" => "2.1.0",
+                    "full"=>"DevSec Nginx Baseline, v2.1.0"
                   },
                   {
                     "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "name" => "apache-baseline",
                     "status" => "skipped",
-                    "version" => "2.0.1"
+                    "version" => "2.0.1",
+                    "full"=>"DevSec Apache Baseline, v2.0.1"
                   }
                 ]
             },
@@ -266,7 +282,8 @@ describe File.basename(__FILE__) do
                 "name" => "windows(1)-zeta-apache(s)-skipped",
                 "platform" => {
                     "name" => "windows",
-                    "release" => "7"
+                    "release" => "7",
+                    "full" => "windows 7"
                 },
                 "environment" => "DevSec Prod Zeta",
                 "latestReport" => {
@@ -287,7 +304,8 @@ describe File.basename(__FILE__) do
                     "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "name" => "apache-baseline",
                     "status" => "skipped",
-                    "version" => "2.0.1"
+                    "version" => "2.0.1",
+                    "full"=>"DevSec Apache Baseline, v2.0.1"
                   }
                 ]
             }
@@ -313,7 +331,8 @@ describe File.basename(__FILE__) do
                 "name" => "windows(1)-zeta-apache(s)-skipped",
                 "platform" => {
                     "name" => "windows",
-                    "release" => "7"
+                    "release" => "7",
+                    "full" => "windows 7"
                 },
                 "environment" => "DevSec Prod Zeta",
                 "latestReport" => {
@@ -334,7 +353,8 @@ describe File.basename(__FILE__) do
                     "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "name" => "apache-baseline",
                     "status" => "skipped",
-                    "version" => "2.0.1"
+                    "version" => "2.0.1",
+                    "full" => "DevSec Apache Baseline, v2.0.1"
                   }
                 ]
             }
@@ -356,7 +376,8 @@ describe File.basename(__FILE__) do
                 "name" => "windows(1)-zeta-apache(s)-skipped",
                 "platform" => {
                     "name" => "windows",
-                    "release" => "7"
+                    "release" => "7",
+                    "full" => "windows 7"
                 },
                 "environment" => "DevSec Prod Zeta",
                 "latestReport" => {
@@ -377,7 +398,8 @@ describe File.basename(__FILE__) do
                     "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "name" => "apache-baseline",
                     "status" => "skipped",
-                    "version" => "2.0.1"
+                    "version" => "2.0.1",
+                    "full"=>"DevSec Apache Baseline, v2.0.1"
                   }
                 ]
             }
@@ -400,7 +422,8 @@ describe File.basename(__FILE__) do
                 "name" => "RedHat(2)-beta-nginx(f)-apache(s)-failed",
                 "platform" => {
                     "name" => "redhat",
-                    "release" => "6.11"
+                    "release" => "6.11",
+                    "full" => "redhat 6.11"
                 },
                 "environment" => "DevSec Prod beta",
                 "latestReport" => {
@@ -427,13 +450,15 @@ describe File.basename(__FILE__) do
                     "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
                     "name" => "nginx-baseline",
                     "status" => "failed",
-                    "version" => "2.1.0"
+                    "version" => "2.1.0",
+                    "full"=>"DevSec Nginx Baseline, v2.1.0"
                   },
                   {
                     "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "name" => "apache-baseline",
                     "status" => "skipped",
-                    "version" => "2.0.1"
+                    "version" => "2.0.1",
+                    "full"=>"DevSec Apache Baseline, v2.0.1"
                   }
                 ]
             }
@@ -456,7 +481,8 @@ describe File.basename(__FILE__) do
                 "name" => "windows(1)-zeta-apache(s)-skipped",
                 "platform" => {
                     "name" => "windows",
-                    "release" => "7"
+                    "release" => "7",
+                    "full" => "windows 7"
                 },
                 "environment" => "DevSec Prod Zeta",
                 "latestReport" => {
@@ -477,7 +503,8 @@ describe File.basename(__FILE__) do
                     "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "name" => "apache-baseline",
                     "status" => "skipped",
-                    "version" => "2.0.1"
+                    "version" => "2.0.1",
+                    "full"=>"DevSec Apache Baseline, v2.0.1"
                   }
                 ]
             }
@@ -499,7 +526,8 @@ describe File.basename(__FILE__) do
                 "name" => "centos-beta",
                 "platform" => {
                     "name" => "centos",
-                    "release" => "5.11"
+                    "release" => "5.11",
+                    "full" => "centos 5.11"
                 },
                 "environment" => "DevSec Prod beta",
                 "latestReport" => {
@@ -522,19 +550,22 @@ describe File.basename(__FILE__) do
                     "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
                     "name" => "nginx-baseline",
                     "status" => "passed",
-                    "version" => "2.1.0"
+                    "version" => "2.1.0",
+                    "full"=>"DevSec Nginx Baseline, v2.1.0"
                   },
                   {
                     "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "name" => "apache-baseline",
                     "status" => "skipped",
-                    "version" => "2.0.1"
+                    "version" => "2.0.1",
+                    "full"=>"DevSec Apache Baseline, v2.0.1"
                   },
                   {
                     "id" => "41a02797bfea15592ba2748d55929d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "name" => "fake-baseline",
                     "status" => "skipped",
-                    "version" => "2.0.1"
+                    "version" => "2.0.1",
+                    "full"=>"A fake one, v2.0.1"
                   }
                 ]
             }
@@ -565,7 +596,8 @@ describe File.basename(__FILE__) do
                 "name" => "centos-beta",
                 "platform" => {
                     "name" => "centos",
-                    "release" => "5.11"
+                    "release" => "5.11",
+                    "full" => "centos 5.11"
                 },
                 "environment" => "DevSec Prod beta",
                 "latestReport" => {
@@ -588,19 +620,22 @@ describe File.basename(__FILE__) do
                     "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
                     "name" => "nginx-baseline",
                     "status" => "passed",
-                    "version" => "2.1.0"
+                    "version" => "2.1.0",
+                    "full"=>"DevSec Nginx Baseline, v2.1.0"
                   },
                   {
                     "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "name" => "apache-baseline",
                     "status" => "skipped",
-                    "version" => "2.0.1"
+                    "version" => "2.0.1",
+                    "full"=>"DevSec Apache Baseline, v2.0.1"
                   },
                   {
                     "id" => "41a02797bfea15592ba2748d55929d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "name" => "fake-baseline",
                     "status" => "skipped",
-                    "version" => "2.0.1"
+                    "version" => "2.0.1",
+                    "full"=>"A fake one, v2.0.1"
                   }
                 ]
             }
@@ -623,7 +658,8 @@ describe File.basename(__FILE__) do
                 "name" => "centos-beta",
                 "platform" => {
                     "name" => "centos",
-                    "release" => "5.11"
+                    "release" => "5.11",
+                    "full" => "centos 5.11"
                 },
                 "environment" => "DevSec Prod beta",
                 "latestReport" => {
@@ -646,19 +682,22 @@ describe File.basename(__FILE__) do
                     "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
                     "name" => "nginx-baseline",
                     "status" => "passed",
-                    "version" => "2.1.0"
+                    "version" => "2.1.0",
+                    "full"=>"DevSec Nginx Baseline, v2.1.0"
                   },
                   {
                     "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "name" => "apache-baseline",
                     "status" => "skipped",
-                    "version" => "2.0.1"
+                    "version" => "2.0.1",
+                    "full"=>"DevSec Apache Baseline, v2.0.1"
                   },
                   {
                     "id" => "41a02797bfea15592ba2748d55929d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "name" => "fake-baseline",
                     "status" => "skipped",
-                    "version" => "2.0.1"
+                    "version" => "2.0.1",
+                    "full"=>"A fake one, v2.0.1"
                   }
                 ]
             }
@@ -680,7 +719,8 @@ describe File.basename(__FILE__) do
                 "name" => "centos-beta",
                 "platform" => {
                     "name" => "centos",
-                    "release" => "5.11"
+                    "release" => "5.11",
+                    "full" => "centos 5.11"
                 },
                 "environment" => "DevSec Prod beta",
                 "latestReport" => {
@@ -703,19 +743,22 @@ describe File.basename(__FILE__) do
                     "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
                     "name" => "nginx-baseline",
                     "status" => "passed",
-                    "version" => "2.1.0"
+                    "version" => "2.1.0",
+                    "full"=>"DevSec Nginx Baseline, v2.1.0"
                   },
                   {
                     "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "name" => "apache-baseline",
                     "status" => "skipped",
-                    "version" => "2.0.1"
+                    "version" => "2.0.1",
+                    "full"=>"DevSec Apache Baseline, v2.0.1"
                   },
                   {
                     "id" => "41a02797bfea15592ba2748d55929d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "name" => "fake-baseline",
                     "status" => "skipped",
-                    "version" => "2.0.1"
+                    "version" => "2.0.1",
+                    "full"=>"A fake one, v2.0.1"
                   }
                 ]
             }
@@ -744,7 +787,8 @@ describe File.basename(__FILE__) do
                 "name" => "centos-beta",
                 "platform" => {
                     "name" => "centos",
-                    "release" => "5.11"
+                    "release" => "5.11",
+                    "full" => "centos 5.11"
                 },
                 "environment" => "DevSec Prod beta",
                 "latestReport" => {
@@ -767,19 +811,22 @@ describe File.basename(__FILE__) do
                     "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
                     "name" => "nginx-baseline",
                     "status" => "passed",
-                    "version" => "2.1.0"
+                    "version" => "2.1.0",
+                    "full"=>"DevSec Nginx Baseline, v2.1.0"
                   },
                   {
                     "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "name" => "apache-baseline",
                     "status" => "skipped",
-                    "version" => "2.0.1"
+                    "version" => "2.0.1",
+                    "full"=>"DevSec Apache Baseline, v2.0.1"
                   },
                   {
                     "id" => "41a02797bfea15592ba2748d55929d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "name" => "fake-baseline",
                     "status" => "skipped",
-                    "version" => "2.0.1"
+                    "version" => "2.0.1",
+                    "full"=>"A fake one, v2.0.1"
                   }
                 ]
             },
@@ -788,7 +835,8 @@ describe File.basename(__FILE__) do
                 "name" => "windows(1)-zeta-apache(s)-skipped",
                 "platform" => {
                     "name" => "windows",
-                    "release" => "7"
+                    "release" => "7",
+                    "full" => "windows 7"
                 },
                 "environment" => "DevSec Prod Zeta",
                 "latestReport" => {
@@ -809,7 +857,8 @@ describe File.basename(__FILE__) do
                     "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                     "name" => "apache-baseline",
                     "status" => "skipped",
-                    "version" => "2.0.1"
+                    "version" => "2.0.1",
+                    "full"=>"DevSec Apache Baseline, v2.0.1"
                   }
                 ]
             }
@@ -843,7 +892,8 @@ describe File.basename(__FILE__) do
                     "name" => "windows(1)-zeta-apache(s)-skipped",
                     "platform" => {
                         "name" => "windows",
-                        "release" => "7"
+                        "release" => "7",
+                        "full" => "windows 7"
                     },
                     "environment" => "DevSec Prod Zeta",
                     "latestReport" => {
@@ -864,7 +914,8 @@ describe File.basename(__FILE__) do
                         "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                         "name" => "apache-baseline",
                         "status" => "skipped",
-                        "version" => "2.0.1"
+                        "version" => "2.0.1",
+                        "full"=>"DevSec Apache Baseline, v2.0.1"
                       }
                     ]
                 },
@@ -873,7 +924,8 @@ describe File.basename(__FILE__) do
                     "name" => "centos-beta",
                     "platform" => {
                         "name" => "centos",
-                        "release" => "5.11"
+                        "release" => "5.11",
+                        "full" => "centos 5.11"
                     },
                     "environment" => "DevSec Prod beta",
                     "latestReport" => {
@@ -896,19 +948,22 @@ describe File.basename(__FILE__) do
                         "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
                         "name" => "nginx-baseline",
                         "status" => "passed",
-                        "version" => "2.1.0"
+                        "version" => "2.1.0",
+                        "full"=>"DevSec Nginx Baseline, v2.1.0"
                       },
                       {
                         "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                         "name" => "apache-baseline",
                         "status" => "skipped",
-                        "version" => "2.0.1"
+                        "version" => "2.0.1",
+                        "full"=>"DevSec Apache Baseline, v2.0.1"
                       },
                       {
                         "id" => "41a02797bfea15592ba2748d55929d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                         "name" => "fake-baseline",
                         "status" => "skipped",
-                        "version" => "2.0.1"
+                        "version" => "2.0.1",
+                        "full"=>"A fake one, v2.0.1"
                       }
                     ]
                 },
@@ -917,7 +972,8 @@ describe File.basename(__FILE__) do
                     "name" => "RedHat(2)-beta-nginx(f)-apache(s)-failed",
                     "platform" => {
                         "name" => "redhat",
-                        "release" => "6.11"
+                        "release" => "6.11",
+                        "full" => "redhat 6.11"
                     },
                     "environment" => "DevSec Prod beta",
                     "latestReport" => {
@@ -944,13 +1000,15 @@ describe File.basename(__FILE__) do
                         "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
                         "name" => "nginx-baseline",
                         "status" => "failed",
-                        "version" => "2.1.0"
+                        "version" => "2.1.0",
+                        "full"=>"DevSec Nginx Baseline, v2.1.0"
                       },
                       {
                         "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                         "name" => "apache-baseline",
                         "status" => "skipped",
-                        "version" => "2.0.1"
+                        "version" => "2.0.1",
+                        "full"=>"DevSec Apache Baseline, v2.0.1"
                       }
                     ]
                 },
@@ -959,7 +1017,8 @@ describe File.basename(__FILE__) do
                     "name" => "redhat(2)-alpha-nginx(f)-apache(f)-failed",
                     "platform" => {
                         "name" => "redhat",
-                        "release" => "6.11"
+                        "release" => "6.11",
+                        "full" => "redhat 6.11"
                     },
                     "environment" => "DevSec Prod Alpha",
                     "latestReport" => {
@@ -986,13 +1045,15 @@ describe File.basename(__FILE__) do
                         "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
                         "name" => "nginx-baseline",
                         "status" => "failed",
-                        "version" => "2.1.0"
+                        "version" => "2.1.0",
+                        "full"=>"DevSec Nginx Baseline, v2.1.0"
                       },
                       {
                         "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                         "name" => "apache-baseline",
                         "status" => "failed",
-                        "version" => "2.0.1"
+                        "version" => "2.0.1",
+                        "full"=>"DevSec Apache Baseline, v2.0.1"
                       }
                     ]
                 },
@@ -1001,7 +1062,8 @@ describe File.basename(__FILE__) do
                     "name" => "redhat(2)-alpha-nginx(f)-apache(s)-failed",
                     "platform" => {
                         "name" => "redhat",
-                        "release" => "6.11"
+                        "release" => "6.11",
+                        "full" => "redhat 6.11"
                     },
                     "environment" => "DevSec Prod Alpha",
                     "latestReport" => {
@@ -1028,13 +1090,15 @@ describe File.basename(__FILE__) do
                         "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
                         "name" => "nginx-baseline",
                         "status" => "failed",
-                        "version" => "2.1.0"
+                        "version" => "2.1.0",
+                        "full"=>"DevSec Nginx Baseline, v2.1.0"
                       },
                       {
                         "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                         "name" => "apache-baseline",
                         "status" => "skipped",
-                        "version" => "2.0.1"
+                        "version" => "2.0.1",
+                        "full"=>"DevSec Apache Baseline, v2.0.1"
                       }
                     ]
                 }
@@ -1057,7 +1121,8 @@ describe File.basename(__FILE__) do
                     "name" => "centos-beta",
                     "platform" => {
                         "name" => "centos",
-                        "release" => "5.11"
+                        "release" => "5.11",
+                        "full" => "centos 5.11"
                     },
                     "environment" => "DevSec Prod beta",
                     "latestReport" => {
@@ -1080,19 +1145,22 @@ describe File.basename(__FILE__) do
                         "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
                         "name" => "nginx-baseline",
                         "status" => "passed",
-                        "version" => "2.1.0"
+                        "version" => "2.1.0",
+                        "full"=>"DevSec Nginx Baseline, v2.1.0"
                       },
                       {
                         "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                         "name" => "apache-baseline",
                         "status" => "skipped",
-                        "version" => "2.0.1"
+                        "version" => "2.0.1",
+                        "full"=>"DevSec Apache Baseline, v2.0.1"
                       },
                       {
                         "id" => "41a02797bfea15592ba2748d55929d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                         "name" => "fake-baseline",
                         "status" => "skipped",
-                        "version" => "2.0.1"
+                        "version" => "2.0.1",
+                        "full"=>"A fake one, v2.0.1"
                       }
                     ]
                 },
@@ -1101,7 +1169,8 @@ describe File.basename(__FILE__) do
                     "name" => "redhat(2)-alpha-nginx(f)-apache(f)-failed",
                     "platform" => {
                         "name" => "redhat",
-                        "release" => "6.11"
+                        "release" => "6.11",
+                        "full" => "redhat 6.11"
                     },
                     "environment" => "DevSec Prod Alpha",
                     "latestReport" => {
@@ -1128,13 +1197,15 @@ describe File.basename(__FILE__) do
                         "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
                         "name" => "nginx-baseline",
                         "status" => "failed",
-                        "version" => "2.1.0"
+                        "version" => "2.1.0",
+                        "full"=>"DevSec Nginx Baseline, v2.1.0"
                       },
                       {
                         "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                         "name" => "apache-baseline",
                         "status" => "failed",
-                        "version" => "2.0.1"
+                        "version" => "2.0.1",
+                        "full"=>"DevSec Apache Baseline, v2.0.1"
                       }
                     ]
                 },
@@ -1143,7 +1214,8 @@ describe File.basename(__FILE__) do
                     "name" => "redhat(2)-alpha-nginx(f)-apache(s)-failed",
                     "platform" => {
                         "name" => "redhat",
-                        "release" => "6.11"
+                        "release" => "6.11",
+                        "full" => "redhat 6.11"
                     },
                     "environment" => "DevSec Prod Alpha",
                     "latestReport" => {
@@ -1170,13 +1242,15 @@ describe File.basename(__FILE__) do
                         "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
                         "name" => "nginx-baseline",
                         "status" => "failed",
-                        "version" => "2.1.0"
+                        "version" => "2.1.0",
+                        "full"=>"DevSec Nginx Baseline, v2.1.0"
                       },
                       {
                         "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                         "name" => "apache-baseline",
                         "status" => "skipped",
-                        "version" => "2.0.1"
+                        "version" => "2.0.1",
+                        "full"=>"DevSec Apache Baseline, v2.0.1"
                       }
                     ]
                 },
@@ -1185,7 +1259,8 @@ describe File.basename(__FILE__) do
                     "name" => "RedHat(2)-beta-nginx(f)-apache(s)-failed",
                     "platform" => {
                         "name" => "redhat",
-                        "release" => "6.11"
+                        "release" => "6.11",
+                        "full" => "redhat 6.11"
                     },
                     "environment" => "DevSec Prod beta",
                     "latestReport" => {
@@ -1212,13 +1287,15 @@ describe File.basename(__FILE__) do
                         "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
                         "name" => "nginx-baseline",
                         "status" => "failed",
-                        "version" => "2.1.0"
+                        "version" => "2.1.0",
+                        "full"=>"DevSec Nginx Baseline, v2.1.0"
                       },
                       {
                         "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                         "name" => "apache-baseline",
                         "status" => "skipped",
-                        "version" => "2.0.1"
+                        "version" => "2.0.1",
+                        "full"=>"DevSec Apache Baseline, v2.0.1"
                       }
                     ]
                 },
@@ -1227,7 +1304,8 @@ describe File.basename(__FILE__) do
                     "name" => "windows(1)-zeta-apache(s)-skipped",
                     "platform" => {
                         "name" => "windows",
-                        "release" => "7"
+                        "release" => "7",
+                        "full" => "windows 7"
                     },
                     "environment" => "DevSec Prod Zeta",
                     "latestReport" => {
@@ -1248,7 +1326,8 @@ describe File.basename(__FILE__) do
                         "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
                         "name" => "apache-baseline",
                         "status" => "skipped",
-                        "version" => "2.0.1"
+                        "version" => "2.0.1",
+                        "full"=>"DevSec Apache Baseline, v2.0.1"
                       }
                     ]
                 }
@@ -1284,7 +1363,8 @@ describe File.basename(__FILE__) do
         "name" => "centos-beta",
         "platform" => {
             "name" => "centos",
-            "release" => "5.11"
+            "release" => "5.11",
+            "full" => "centos 5.11"
         },
         "environment" => "DevSec Prod beta",
         "latestReport" => {
@@ -1310,13 +1390,15 @@ describe File.basename(__FILE__) do
                 "name" => "nginx-baseline",
                 "version" => "2.1.0",
                 "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
-                "status": "failed"
+                "status": "failed",
+                "full"=>"DevSec Nginx Baseline, v2.1.0"
             },
             {
                 "name" => "apache-baseline",
                 "version" => "2.0.1",
                 "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
-                "status": "failed"
+                "status": "failed",
+                "full"=>"DevSec Apache Baseline, v2.0.1"
             }
         ]
     }

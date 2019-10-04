@@ -108,6 +108,7 @@ message Profile {
 	string summary = 7;
 	string version = 8;
 	string owner = 9;
+	string full = 10;
 	repeated Support supports = 16;
 	repeated Dependency depends = 17;
 	string sha256 = 18;
@@ -183,6 +184,7 @@ message Attribute {
 message Platform {
 	string name = 1;
 	string release = 2;
+	string full = 3;
 }
 message Statistics {
 	float duration = 1;
@@ -250,4 +252,5 @@ message ProfileMeta {
 	string version = 2;
 	string id = 3;
 	string status = 4;
+	string full = 5;
 }

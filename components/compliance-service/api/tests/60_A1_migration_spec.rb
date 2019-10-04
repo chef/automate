@@ -31,7 +31,8 @@ describe File.basename(__FILE__) do
           "name": "centos6-node1",
           "platform": {
             "name": "mac_os_x",
-            "release": "10.12.6"
+            "release": "10.12.6",
+            "full": "mac_os_x 10.12.6"
           },
           "environment": "_default",
           "latestReport": {
@@ -52,7 +53,8 @@ describe File.basename(__FILE__) do
               "name": "mylinux-success",
               "version": "1.0.0",
               "id": "d94022291cae7c87bb13d42bbd0dbc86b027c1e32fdc6790d2555d62deb8b6a9",
-              "status": "passed"
+              "status": "passed",
+              "full": "My Demo Linux successful profile, v1.0.0"
             }
           ]
         }
@@ -69,7 +71,8 @@ describe File.basename(__FILE__) do
       "name": "centos6-node1",
       "platform": {
         "name": "mac_os_x",
-        "release": "10.12.6"
+        "release": "10.12.6",
+        "full": "mac_os_x 10.12.6"
       },
       "environment": "_default",
       "latestReport": {
@@ -90,7 +93,8 @@ describe File.basename(__FILE__) do
           "name": "mylinux-success",
           "version": "1.0.0",
           "id": "d94022291cae7c87bb13d42bbd0dbc86b027c1e32fdc6790d2555d62deb8b6a9",
-          "status": "passed"
+          "status": "passed",
+          "full": "My Demo Linux successful profile, v1.0.0"
         }
       ]
     }.to_json
@@ -148,7 +152,8 @@ describe File.basename(__FILE__) do
       "version": "1.39.1",
       "platform": {
         "name": "mac_os_x",
-        "release": "10.12.6"
+        "release": "10.12.6",
+        "full": "mac_os_x 10.12.6"
       },
       "statistics": {
         "duration": 0.002533
@@ -161,6 +166,7 @@ describe File.basename(__FILE__) do
           "copyrightEmail": "support@chef.io",
           "summary": "Demonstrates the use of InSpec Compliance Profile",
           "version": "1.0.0",
+          "full": "My Demo Linux successful profile, v1.0.0",
           "sha256": "d94022291cae7c87bb13d42bbd0dbc86b027c1e32fdc6790d2555d62deb8b6a9",
           "controls": [
             {

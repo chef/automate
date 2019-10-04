@@ -320,6 +320,146 @@ func TestListNodesFiltering(t *testing.T) {
 			},
 			expectedIds: []string{},
 		},
+
+		// platform
+		{
+			description: "Filter out one of the nodes with platform",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID: "1",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Name: "org1",
+					},
+				},
+				{
+					NodeID: "2",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Name: "org2",
+					},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "platform",
+						Values: []string{"org1"},
+					},
+				},
+			},
+			expectedIds: []string{"1"},
+		},
+		{
+			description: "Filter out all of the nodes by platform",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID: "1",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Name: "org1",
+					},
+				},
+				{
+					NodeID: "2",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Name: "org2",
+					},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "platform",
+						Values: []string{"org3"},
+					},
+				},
+			},
+			expectedIds: []string{},
+		},
+
+		// platform_with_version
+		{
+			description: "Filter out one of the nodes with platform_with_version",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID: "1",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "org1",
+					},
+				},
+				{
+					NodeID: "2",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "org2",
+					},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "platform_with_version",
+						Values: []string{"org1"},
+					},
+				},
+			},
+			expectedIds: []string{"1"},
+		},
+		{
+			description: "Filter out all of the nodes by platform_with_version",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID: "1",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "org1",
+					},
+				},
+				{
+					NodeID: "2",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "org2",
+					},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "platform_with_version",
+						Values: []string{"org3"},
+					},
+				},
+			},
+			expectedIds: []string{},
+		},
 	}
 
 	for _, test := range cases {
@@ -1108,6 +1248,184 @@ func TestListNodesWildcardFiltering(t *testing.T) {
 				Filters: []*reporting.ListFilter{
 					{
 						Type:   "platform",
+						Values: []string{"A2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
+
+		// platform_with_version
+		{
+			description: "platform_with_version: '*' wildcard",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID: "1",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "a2-prod",
+					},
+				},
+				{
+					NodeID: "2",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "a2-dev",
+					},
+				},
+				{
+					NodeID: "3",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "a1-dev",
+					},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "platform_with_version",
+						Values: []string{"a2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
+		{
+			description: "platform_with_version: '?' wildcard",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID: "2",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "a2-dev",
+					},
+				},
+				{
+					NodeID: "3",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "a1-dev",
+					},
+				},
+				{
+					NodeID: "4",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "b1-dev",
+					},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "platform_with_version",
+						Values: []string{"a?-dev"},
+					},
+				},
+			},
+			expectedIds: []string{"3", "2"},
+		},
+		{
+			description: "platform_with_version: case insensitive wildcard 1",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID: "1",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "A2-prod",
+					},
+				},
+				{
+					NodeID: "2",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "a2-Dev",
+					},
+				},
+				{
+					NodeID: "3",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "A1-dev",
+					},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "platform_with_version",
+						Values: []string{"a2-*"},
+					},
+				},
+			},
+			expectedIds: []string{"1", "2"},
+		},
+		{
+			description: "platform_with_version: case insensitive wildcard 2",
+			reports: []*relaxting.ESInSpecReport{
+				{
+					NodeID: "1",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "A2-prod",
+					},
+				},
+				{
+					NodeID: "2",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "a2-Dev",
+					},
+				},
+				{
+					NodeID: "3",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "A1-dev",
+					},
+				},
+			},
+			query: reporting.Query{
+				Filters: []*reporting.ListFilter{
+					{
+						Type:   "platform_with_version",
 						Values: []string{"A2-*"},
 					},
 				},

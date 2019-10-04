@@ -60,9 +60,7 @@ func BulkInsertComplianceSummaryDocs(client *elastic.Client, ctx context.Context
 	}
 	// Bulk add the summary documents to the compliance timeseries index using the specified report id as document id
 	bulkRequest := client.Bulk()
-	//logrus.Infof("!!! BulkInsertComplianceSummaryDocs in with len(docsArray) = %d", len(docsArray))
 	for _, doc := range docsArray {
-		//logrus.Infof("!!! => inserting in index %s, mapping %s, _id %s", index, mappings.DocType, doc.ReportID)
 		bulkRequest = bulkRequest.Add(elastic.NewBulkIndexRequest().Index(index).Type(mappings.DocType).Id(doc.ReportID).Doc(doc))
 	}
 	approxBytes := bulkRequest.EstimatedSizeInBytes()
@@ -182,6 +180,16 @@ func RunMigrations(backend ES2Backend, statusSrv *statusserver.Server) error {
 		errMsg := errors.Wrap(err, fmt.Sprintf("%s, migration failed for %s", myName, statusserver.MigrationLabelESa2v3))
 		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa2v3, errMsg.Error())
 		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa2v3, statusserver.MigrationFailedMsg)
+		return errMsg
+	}
+
+	// Migrates A2 version 4 indices to the current version
+	a2V4Indices := A2V4ElasticSearchIndices{backend: &backend}
+	err = backend.migrate(a2V4Indices, statusSrv, statusserver.MigrationLabelESa2v4)
+	if err != nil {
+		errMsg := errors.Wrap(err, fmt.Sprintf("%s, migration failed for %s", myName, statusserver.MigrationLabelESa2v3))
+		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa2v4, errMsg.Error())
+		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa2v4, statusserver.MigrationFailedMsg)
 		return errMsg
 	}
 	return nil

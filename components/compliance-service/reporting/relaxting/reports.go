@@ -402,6 +402,7 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 					reportProfile.SkipMessage = esInSpecProfile.SkipMessage
 					reportProfile.Status = esInSpecReportProfileMin.Status
 					reportProfile.SkipMessage = esInSpecReportProfileMin.SkipMessage
+					reportProfile.Full = esInSpecReportProfileMin.Full
 
 					dependsHash := make(map[string]*ESInSpecReportDepends, len(esInSpecReportProfileMin.Depends))
 					for _, esInSpecProfileDependency := range esInSpecReportProfileMin.Depends {
@@ -479,6 +480,7 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 
 					convertedProfile := reportingapi.Profile{
 						Name:           reportProfile.Name,
+						Full:           reportProfile.Full,
 						Title:          reportProfile.Title,
 						Maintainer:     reportProfile.Maintainer,
 						Copyright:      reportProfile.Copyright,
@@ -521,6 +523,7 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 				report.Platform = &reportingapi.Platform{
 					Name:    esInSpecReport.Platform.Name,
 					Release: esInSpecReport.Platform.Release,
+					Full:    esInSpecReport.Platform.Full,
 				}
 			}
 		}
@@ -787,8 +790,8 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 
 	// These are filter types where we use ElasticSearch Term Queries
 	filterTypes := []string{"environment", "organization", "chef_server", "chef_tags",
-		"policy_group", "policy_name", "status", "node_name", "platform", "role", "recipe",
-		"inspec_version", "ipaddress"}
+		"policy_group", "policy_name", "status", "node_name", "platform", "platform_with_version",
+		"role", "recipe", "inspec_version", "ipaddress"}
 
 	for _, filterType := range filterTypes {
 		if len(filters[filterType]) > 0 {
@@ -806,6 +809,11 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 
 	if len(filters["profile_name"]) > 0 {
 		termQuery := backend.newNestedTermQueryFromFilter("profiles.title.lower", "profiles", filters["profile_name"])
+		boolQuery = boolQuery.Must(termQuery)
+	}
+
+	if len(filters["profile_with_version"]) > 0 {
+		termQuery := backend.newNestedTermQueryFromFilter("profiles.full.lower", "profiles", filters["profile_with_version"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
@@ -895,6 +903,8 @@ func (backend ES2Backend) getESFieldName(filterType string) string {
 		ESFieldName = "organization_name.lower"
 	case "platform":
 		ESFieldName = "platform.name.lower"
+	case "platform_with_version":
+		ESFieldName = "platform.full.lower"
 	case "recipe":
 		ESFieldName = "recipes.lower"
 	case "role":

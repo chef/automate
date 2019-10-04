@@ -140,6 +140,7 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec.Profile, profilesSums [
 			Title:        profile.Title,
 			Profile:      profileSums.Profile,
 			Version:      profile.Version,
+			Full:         fmt.Sprintf("%s, v%s", profile.Title, profile.Version),
 			SHA256:       profile.Sha256,
 			Controls:     minControls,
 			ControlsSums: profileSums.ControlsSums,
