@@ -720,12 +720,10 @@ describe File.basename(__FILE__) do
     )
     assert_equal(Reporting::Report, res.class)
     assert_equal(Google::Protobuf::RepeatedField, res['profiles'].class)
-    if res['profiles'].is_a?(Google::Protobuf::RepeatedField)
-      assert_equal(2, res['profiles'].length)
-      assert_equal(1, res['profiles'][0]['controls'].length)
-      assert_equal(0, res['profiles'][1]['controls'].length)
-      assert_equal('os-02', res['profiles'][0]['controls'][0]['id'])
-    end
+    assert_equal(2, res['profiles'].length)
+    assert_equal(1, res['profiles'][0]['controls'].length)
+    assert_equal(0, res['profiles'][1]['controls'].length)
+    assert_equal('os-02', res['profiles'][0]['controls'][0]['id'])
 
     # Get a specific report1
     res = GRPC reporting, :read_report, Reporting::Query.new(id: 'bb93e1b2-36d6-439e-ac70-cccccccccc04')

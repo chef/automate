@@ -505,73 +505,82 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 func convertControl(profileControlsMap map[string]*reportingapi.Control, reportControlMin ESInSpecReportControl, filters map[string][]string) *reportingapi.Control {
 	profileControl := profileControlsMap[reportControlMin.ID]
 
-	if profileControl != nil {
-		profileControl.Results = make([]*reportingapi.Result, 0)
-		if reportControlMin.ID == profileControl.Id {
-			minResults := make([]*reportingapi.Result, len(reportControlMin.Results))
-			for i, result := range reportControlMin.Results {
-				minResults[i] = &reportingapi.Result{
-					Status:      result.Status,
-					CodeDesc:    result.CodeDesc,
-					RunTime:     result.RunTime,
-					Message:     result.Message,
-					SkipMessage: result.SkipMessage,
-				}
-			}
+	if profileControl == nil {
+		return nil
+	}
 
-			convertedControl := reportingapi.Control{
-				Id:             profileControl.Id,
-				Code:           profileControl.Code,
-				Desc:           profileControl.Desc,
-				Impact:         profileControl.Impact,
-				Title:          profileControl.Title,
-				SourceLocation: profileControl.SourceLocation,
-				Results:        minResults,
-			}
+	profileControl.Results = make([]*reportingapi.Result, 0)
+	if reportControlMin.ID != profileControl.Id {
+		return nil
+	}
 
-			jsonTags := make(map[string]*reportingapi.TagValues, 0)
-			for _, tag := range reportControlMin.StringTags {
-				if len(tag.Values) == 0 {
-					jsonTags[tag.Key] = &reportingapi.TagValues{Values: []string{"null"}}
-				}
-				vals := make([]string, 0)
-				for _, val := range tag.Values {
-					vals = append(vals, val)
-					jsonTags[tag.Key] = &reportingapi.TagValues{Values: vals}
-				}
-			}
-			matchingTagFound := false
-			matchingTagRequired := false
-			for filterKey, filterVals := range filters {
-				if strings.HasPrefix(filterKey, "control_tag") {
-					matchingTagRequired = true
-					trimmed := strings.TrimPrefix(filterKey, "control_tag:")
-					if tagVal, ok := jsonTags[trimmed]; ok {
-						for _, val := range filterVals {
-							if contains(tagVal.Values, val) || val == "null" {
-								matchingTagFound = true
-								break
-							}
-						}
-					}
-
-				}
-			}
-			if matchingTagRequired {
-				if !matchingTagFound {
-					return nil
-				}
-			}
-
-			convertedControl.StringTags = jsonTags
-			var jsonRefs []*reportingapi.Ref
-			refs, _ := json.Marshal(profileControl.Refs)
-			json.Unmarshal(refs, &jsonRefs) // nolint: errcheck
-			convertedControl.Refs = jsonRefs
-			return &convertedControl
+	minResults := make([]*reportingapi.Result, len(reportControlMin.Results))
+	for i, result := range reportControlMin.Results {
+		minResults[i] = &reportingapi.Result{
+			Status:      result.Status,
+			CodeDesc:    result.CodeDesc,
+			RunTime:     result.RunTime,
+			Message:     result.Message,
+			SkipMessage: result.SkipMessage,
 		}
 	}
-	return nil
+
+	convertedControl := reportingapi.Control{
+		Id:             profileControl.Id,
+		Code:           profileControl.Code,
+		Desc:           profileControl.Desc,
+		Impact:         profileControl.Impact,
+		Title:          profileControl.Title,
+		SourceLocation: profileControl.SourceLocation,
+		Results:        minResults,
+	}
+
+	jsonTags := make(map[string]*reportingapi.TagValues, 0)
+	for _, tag := range reportControlMin.StringTags {
+		if len(tag.Values) == 0 {
+			jsonTags[tag.Key] = &reportingapi.TagValues{Values: []string{"null"}}
+		}
+		vals := make([]string, 0)
+		for _, val := range tag.Values {
+			vals = append(vals, val)
+			jsonTags[tag.Key] = &reportingapi.TagValues{Values: vals}
+		}
+	}
+
+	if !doesControlTagMatchFilter(filters, jsonTags) {
+		return nil
+	}
+
+	convertedControl.StringTags = jsonTags
+	var jsonRefs []*reportingapi.Ref
+	refs, _ := json.Marshal(profileControl.Refs)
+	json.Unmarshal(refs, &jsonRefs) // nolint: errcheck
+	convertedControl.Refs = jsonRefs
+	return &convertedControl
+
+}
+
+func doesControlTagMatchFilter(filters map[string][]string,
+	jsonTags map[string]*reportingapi.TagValues) bool {
+	matchingTagRequired := false
+	for filterKey, filterVals := range filters {
+		if strings.HasPrefix(filterKey, "control_tag") {
+			matchingTagRequired = true
+			trimmed := strings.TrimPrefix(filterKey, "control_tag:")
+			if tagVal, ok := jsonTags[trimmed]; ok {
+				for _, val := range filterVals {
+					if contains(tagVal.Values, val) || val == "null" {
+						return true
+					}
+				}
+			}
+
+		}
+	}
+	if matchingTagRequired {
+		return false
+	}
+	return true
 }
 
 func contains(a []string, x string) bool {
