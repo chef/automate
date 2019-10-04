@@ -257,28 +257,26 @@ describe File.basename(__FILE__) do
       res['platform'])
     assert_equal(Reporting::Statistics.new(duration: 4.109065055847168), res['statistics'])
     assert_equal(Google::Protobuf::RepeatedField, res['profiles'].class)
-    if res['profiles'].is_a?(Google::Protobuf::RepeatedField)
-      assert_equal(2, res['profiles'].length)
-      assert_equal('nginx-baseline', res['profiles'][0]['name'])
-      assert_equal('DevSec Nginx Baseline, v2.1.0', res['profiles'][0]['full'])
-      assert_equal(4, res['profiles'][0]['controls'].length)
+    assert_equal(2, res['profiles'].length)
+    assert_equal('nginx-baseline', res['profiles'][0]['name'])
+    assert_equal('DevSec Nginx Baseline, v2.1.0', res['profiles'][0]['full'])
+    assert_equal(4, res['profiles'][0]['controls'].length)
 
-      control_ids = res['profiles'][0]['controls'].map {|c| c.id}
-      assert_equal(["nginx-01", "nginx-02", "nginx-03", "nginx-04"], control_ids)
+    control_ids = res['profiles'][0]['controls'].map {|c| c.id}
+    assert_equal(["nginx-01", "nginx-02", "nginx-03", "nginx-04"], control_ids)
 
-      assert_equal(Reporting::Report, res.class)
+    assert_equal(Reporting::Report, res.class)
 
-      assert_equal('nginx-01', res['profiles'][0]['controls'][0]['id'])
-      assert_equal(1, res['profiles'][0]['controls'][0]['impact'])
-      assert_equal(Google::Protobuf::Map, res['profiles'][0]['controls'][0]['tags'].class)
-      assert_equal('Running worker process as non-privileged user', res['profiles'][0]['controls'][0]['title'])
-      assert_equal(1, res['profiles'][0]['controls'][0]['results'].length)
+    assert_equal('nginx-01', res['profiles'][0]['controls'][0]['id'])
+    assert_equal(1, res['profiles'][0]['controls'][0]['impact'])
+    assert_equal(Google::Protobuf::Map, res['profiles'][0]['controls'][0]['tags'].class)
+    assert_equal('Running worker process as non-privileged user', res['profiles'][0]['controls'][0]['title'])
+    assert_equal(1, res['profiles'][0]['controls'][0]['results'].length)
 
-      passed_control = res['profiles'][0]['controls'][0]['results'].first
-      assert_equal('passed', passed_control['status'])
+    passed_control = res['profiles'][0]['controls'][0]['results'].first
+    assert_equal('passed', passed_control['status'])
 
-      assert_equal('failed', res['profiles'][1]['status'])
-      assert_equal('', res['profiles'][1]['skip_message'])
-    end
+    assert_equal('failed', res['profiles'][1]['status'])
+    assert_equal('', res['profiles'][1]['skip_message'])
   end
 end
