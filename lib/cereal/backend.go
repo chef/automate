@@ -3,15 +3,13 @@ package cereal
 import (
 	"context"
 	"time"
-
-	"github.com/chef/automate/lib/cereal/backend"
 )
 
 type Driver interface {
 	TaskDequeuer
 
-	EnqueueWorkflow(ctx context.Context, workflow *backend.WorkflowInstance) error
-	DequeueWorkflow(ctx context.Context, workflowNames []string) (*backend.WorkflowEvent, WorkflowCompleter, error)
+	EnqueueWorkflow(ctx context.Context, workflow *WorkflowInstanceData) error
+	DequeueWorkflow(ctx context.Context, workflowNames []string) (*WorkflowEvent, WorkflowCompleter, error)
 	CancelWorkflow(ctx context.Context, instanceName string, workflowName string) error
 	KillWorkflow(ctx context.Context, instanceName string, workflowName string) error
 
@@ -21,8 +19,8 @@ type Driver interface {
 	GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string) (*Schedule, error)
 	UpdateWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string, opts WorkflowScheduleUpdateOptions) error
 
-	GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName string) (*backend.WorkflowInstance, error)
-	ListWorkflowInstances(ctx context.Context, opts ListWorkflowOpts) ([]*backend.WorkflowInstance, error)
+	GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName string) (*WorkflowInstanceData, error)
+	ListWorkflowInstances(ctx context.Context, opts ListWorkflowOpts) ([]*WorkflowInstanceData, error)
 
 	Init() error
 	Close() error

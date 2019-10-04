@@ -13,8 +13,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	rrule "github.com/teambition/rrule-go"
-
-	"github.com/chef/automate/lib/cereal/backend"
 )
 
 var (
@@ -105,6 +103,42 @@ func (s *Schedule) GetRRule() (*rrule.RRule, error) {
 	return rrule.StrToRRule(s.Recurrence)
 }
 
+type WorkflowInstanceStatus string
+
+const (
+	WorkflowInstanceStatusStarting  WorkflowInstanceStatus = "starting"
+	WorkflowInstanceStatusRunning   WorkflowInstanceStatus = "running"
+	WorkflowInstanceStatusCompleted WorkflowInstanceStatus = "completed"
+)
+
+type WorkflowInstanceData struct {
+	InstanceName string
+	WorkflowName string
+	Status       WorkflowInstanceStatus
+	Parameters   []byte
+	Payload      []byte
+
+	Err    error
+	Result []byte
+}
+
+type WorkflowEventType string
+
+const (
+	WorkflowStart  WorkflowEventType = "start"
+	TaskComplete   WorkflowEventType = "task_complete"
+	WorkflowCancel WorkflowEventType = "cancel"
+)
+
+type WorkflowEvent struct {
+	Instance           WorkflowInstanceData
+	Type               WorkflowEventType
+	EnqueuedTaskCount  int
+	CompletedTaskCount int
+
+	TaskResult *TaskResultData
+}
+
 // Task is an interface to an object representing a running Task. This will be
 // provided to TaskExecutor implementations when the Run method is called.
 type Task interface {
@@ -144,35 +178,49 @@ type TaskResult interface {
 	Err() error
 }
 
-type taskResult struct {
-	backendResult *backend.TaskResult
+type TaskStatusType string
+
+const (
+	TaskStatusSuccess        TaskStatusType = "success"
+	TaskStatusFailed         TaskStatusType = "failed"
+	TaskStatusLost           TaskStatusType = "lost"
+	TaskStatusUnusableResult TaskStatusType = "unusable_result"
+)
+
+type TaskResultData struct {
+	TaskName   string
+	Parameters []byte
+
+	Status    TaskStatusType
+	ErrorText string
+	Result    []byte
 }
 
-func (r *taskResult) Get(obj interface{}) error {
+func (r *TaskResultData) Get(obj interface{}) error {
 	if r.Err() != nil {
 		return r.Err()
 	}
-	if r.backendResult.Result != nil {
-		return json.Unmarshal(r.backendResult.Result, obj)
+	if r.Result != nil {
+		return json.Unmarshal(r.Result, obj)
 	}
 	return nil
 }
 
-func (r *taskResult) GetParameters(obj interface{}) error {
-	if r.backendResult.Parameters != nil {
-		return json.Unmarshal(r.backendResult.Parameters, obj)
+func (r *TaskResultData) GetParameters(obj interface{}) error {
+	if r.Parameters != nil {
+		return json.Unmarshal(r.Parameters, obj)
 	}
 	return nil
 }
 
-func (r *taskResult) Err() error {
-	switch r.backendResult.Status {
-	case backend.TaskStatusFailed:
-		return errors.New(r.backendResult.ErrorText)
-	case backend.TaskStatusLost:
+func (r *TaskResultData) Err() error {
+	switch r.Status {
+	case TaskStatusFailed:
+		return errors.New(r.ErrorText)
+	case TaskStatusLost:
 		return ErrTaskLost
-	case backend.TaskStatusUnusableResult:
-		return errors.New(r.backendResult.ErrorText)
+	case TaskStatusUnusableResult:
+		return errors.New(r.ErrorText)
 	default:
 		return nil
 	}
@@ -256,9 +304,9 @@ type enqueueTaskRequest struct {
 	opts        TaskEnqueueOptions
 }
 type workflowInstanceImpl struct {
-	instance backend.WorkflowInstance
+	instance WorkflowInstanceData
 	tasks    []enqueueTaskRequest
-	wevt     *backend.WorkflowEvent
+	wevt     *WorkflowEvent
 }
 
 func (w *workflowInstanceImpl) GetPayload(obj interface{}) error {
@@ -357,7 +405,7 @@ type ImmutableWorkflowInstance interface {
 }
 
 type immutableWorkflowInstanceImpl struct {
-	instance *backend.WorkflowInstance
+	instance *WorkflowInstanceData
 }
 
 func (w *immutableWorkflowInstanceImpl) GetPayload(obj interface{}) error {
@@ -395,7 +443,7 @@ func (w *immutableWorkflowInstanceImpl) Err() error {
 }
 
 func (w *immutableWorkflowInstanceImpl) IsRunning() bool {
-	return w.instance.Status != backend.WorkflowInstanceStatusCompleted
+	return w.instance.Status != WorkflowInstanceStatusCompleted
 }
 
 // Decision indicates how the execution of a workflow instance is to proceed.
@@ -545,7 +593,7 @@ func (w waywardWorkflowList) Filter(workflowNames []string) []string {
 // A OnWorkflowCompleteCallback is a function that can be called at
 // the completion of workflows for debugging and testing purposes. The
 // function should not be used for application logic.
-type OnWorkflowCompleteCallback func(*backend.WorkflowEvent)
+type OnWorkflowCompleteCallback func(*WorkflowEvent)
 
 // Manager is responsible for calling WorkflowExecutors and
 // TaskExecutors when they need to be processed, along with managing
@@ -1071,7 +1119,7 @@ func (m *Manager) EnqueueWorkflow(ctx context.Context, workflowName WorkflowName
 	if err != nil {
 		return err
 	}
-	err = m.backend.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = m.backend.EnqueueWorkflow(ctx, &WorkflowInstanceData{
 		WorkflowName: workflowName.String(),
 		InstanceName: instanceName,
 		Parameters:   paramsData,
@@ -1157,7 +1205,7 @@ LOOP:
 	m.wg.Done()
 }
 
-func (m *Manager) callOnWorkflowCompleteCallback(w *backend.WorkflowEvent) {
+func (m *Manager) callOnWorkflowCompleteCallback(w *WorkflowEvent) {
 	if m.onWorkflowCompleteCallback != nil {
 		m.onWorkflowCompleteCallback(w)
 	}
@@ -1199,16 +1247,14 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 
 	decision := Decision{}
 	switch wevt.Type {
-	case backend.WorkflowStart:
+	case WorkflowStart:
 		decision = executor.OnStart(w, StartEvent{})
-	case backend.TaskComplete:
+	case TaskComplete:
 		decision = executor.OnTaskComplete(w, TaskCompleteEvent{
 			TaskName: NewTaskName(wevt.TaskResult.TaskName),
-			Result: &taskResult{
-				backendResult: wevt.TaskResult,
-			},
+			Result:   wevt.TaskResult,
 		})
-	case backend.WorkflowCancel:
+	case WorkflowCancel:
 		decision = executor.OnCancel(w, CancelEvent{})
 	default:
 		logrus.Warnf("Unknown workflow event %q for workflow %q", wevt.Type, wevt.Instance.WorkflowName)
