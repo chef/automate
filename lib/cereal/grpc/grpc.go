@@ -584,7 +584,7 @@ func (g *GrpcBackend) GetWorkflowInstanceByName(ctx context.Context, instanceNam
 	return &backendInstance, nil
 }
 
-func (g *GrpcBackend) ListWorkflowInstances(ctx context.Context, opts backend.ListWorkflowOpts) ([]*backend.WorkflowInstance, error) {
+func (g *GrpcBackend) ListWorkflowInstances(ctx context.Context, opts cereal.ListWorkflowOpts) ([]*backend.WorkflowInstance, error) {
 	req := grpccereal.ListWorkflowInstancesRequest{
 		Domain: g.domain,
 	}

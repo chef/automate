@@ -471,6 +471,12 @@ type TaskExecutor interface {
 	Run(ctx context.Context, task Task) (result interface{}, err error)
 }
 
+type ListWorkflowOpts struct {
+	WorkflowName *string
+	InstanceName *string
+	IsRunning    *bool
+}
+
 // waywardWorkflowList is a map of wayward workflows to the time they
 // entered the map. A wayward workflow is a workflow that has
 // experienced some fundamental processing error in the past. To avoid
