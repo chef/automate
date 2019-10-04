@@ -116,15 +116,15 @@ describe('PolicyAddMembersComponent', () => {
     describe('updateValidations', () => {
         beforeEach(() => {
           component.expressionForm.setValue({ type: 'TEAM', identity: 'LOCAL', name: '' });
-        })
+        });
 
         it('clears validators when input is not active', () => {
 
-        })
+        });
 
         it('applies validators when input is active', () => {
 
-        })
-    })
+        });
+    });
 
 });
