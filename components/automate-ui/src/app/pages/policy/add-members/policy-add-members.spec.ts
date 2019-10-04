@@ -93,6 +93,38 @@ describe('PolicyAddMembersComponent', () => {
             expect(component.showInputs('name')).toBe(true);
         });
 
+        // tslint:disable-next-line: max-line-length
+        it('should return true when inputName is name and when identityValue exists and isnt a star', () => {
+            component.expressionForm.setValue({ type: '', identity: 'something', name: '' });
+            expect(component.showInputs('name')).toBe(true);
+        });
+
+        // tslint:disable-next-line: max-line-length
+        it('should return false when inputName is name and when identityValue exists and is a star', () => {
+            component.expressionForm.setValue({ type: '', identity: '*', name: '' });
+            expect(component.showInputs('name')).toBe(false);
+        });
+
+        // tslint:disable-next-line: max-line-length
+        it('should return false when inputName is name and when type is not TOKEN and identityValue does not exist', () => {
+            component.expressionForm.setValue({ type: 'TEAM', identity: '', name: '' });
+            expect(component.showInputs('name')).toBe(false);
+        });
+
     });
+
+    describe('updateValidations', () => {
+        beforeEach(() => {
+          component.expressionForm.setValue({ type: 'TEAM', identity: 'LOCAL', name: '' });
+        })
+
+        it('clears validators when input is not active', () => {
+
+        })
+
+        it('applies validators when input is active', () => {
+
+        })
+    })
 
 });
