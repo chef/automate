@@ -45,16 +45,17 @@ chef-alert {
   padding: 0em;
   position: relative;
   transition: all .2s;
-  border-radius: 4px;
+  border-radius: $global-radius;
 
   .body {
     display: block;
-    background-color: #FFFFFF;
+    background-color: $chef-white;
+    border-top: 1px solid $gray-pale;
     padding: 1em;
     position: relative;
     width: 100%;
     font-size: .8em;
-    border-radius: 4px;
+    border-radius: 0 0 $global-radius $global-radius;
   }
 
   .header {
@@ -159,4 +160,30 @@ chef-alert {
 .status-filter-bar {
   padding-left: 35px;
   padding-right: 35px;
+}
+
+.disconnect-notice {
+  display: flex;
+  align-items: flex-start;
+  background: $chef-info-alert-light;
+  color: $chef-info-alert;
+  border-radius: $global-radius;
+  padding: 8px;
+  margin-bottom: 8px;
+
+  .disconnect-icon {
+    display: block;
+    margin-right: 6px;
+    height: 14px;
+    width: 14px;
+    transform: translateY(5px);
+  }
+
+  .disconnect-time:hover {
+    color: $chef-info-alert-dark;
+  }
+
+  span:first-child {
+    display: block;
+  }
 }
