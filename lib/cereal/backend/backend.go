@@ -4,12 +4,6 @@ import (
 	"time"
 )
 
-type ListWorkflowOpts struct {
-	WorkflowName *string
-	InstanceName *string
-	IsRunning    *bool
-}
-
 type WorkflowInstanceStatus string
 
 const (

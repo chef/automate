@@ -578,7 +578,7 @@ func (pg *PostgresBackend) GetWorkflowInstanceByName(ctx context.Context, instan
 	return &workflowInstance, nil
 }
 
-func (pg *PostgresBackend) ListWorkflowInstances(ctx context.Context, opts backend.ListWorkflowOpts) ([]*backend.WorkflowInstance, error) {
+func (pg *PostgresBackend) ListWorkflowInstances(ctx context.Context, opts cereal.ListWorkflowOpts) ([]*backend.WorkflowInstance, error) {
 	rows, err := pg.db.Query(listWorkflowInstancesQuery, opts.WorkflowName, opts.InstanceName, opts.IsRunning)
 	if err != nil {
 		return nil, err
