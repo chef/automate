@@ -199,7 +199,7 @@ func (server *Server) Configure(ctx context.Context,
 
 	var (
 		res        = &data_lifecycle.ConfigureResponse{}
-		updateOpts []cereal.WorkflowScheduleUpdateOpts
+		updateOpts []cereal.WorkflowScheduleUpdateOpt
 		sched      *cereal.Schedule
 		recurrence *rrule.RRule
 		updated    = false

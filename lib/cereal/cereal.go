@@ -977,13 +977,25 @@ func (m *Manager) CreateWorkflowSchedule(
 	return err
 }
 
+type WorkflowScheduleUpdateOptions struct {
+	UpdateEnabled bool
+	Enabled       bool
+
+	UpdateParameters bool
+	Parameters       []byte
+
+	UpdateRecurrence bool
+	Recurrence       string
+	NextRunAt        time.Time
+}
+
 // WorkflowScheduleUpdateOpts represents changes that can be made to a scheduled
 // workflow. The changes will be committed atomically.
-type WorkflowScheduleUpdateOpts func(*backend.WorkflowScheduleUpdateOpts) error
+type WorkflowScheduleUpdateOpt func(*WorkflowScheduleUpdateOptions) error
 
 // UpdateEnabled allows enabling or disabling a scheduled workflow.
-func UpdateEnabled(enabled bool) WorkflowScheduleUpdateOpts {
-	return func(o *backend.WorkflowScheduleUpdateOpts) error {
+func UpdateEnabled(enabled bool) WorkflowScheduleUpdateOpt {
+	return func(o *WorkflowScheduleUpdateOptions) error {
 		o.Enabled = enabled
 		o.UpdateEnabled = true
 		return nil
@@ -992,8 +1004,8 @@ func UpdateEnabled(enabled bool) WorkflowScheduleUpdateOpts {
 
 // UpdateParameters allows changing the parameters a workflow will be started
 // with.
-func UpdateParameters(parameters interface{}) WorkflowScheduleUpdateOpts {
-	return func(o *backend.WorkflowScheduleUpdateOpts) error {
+func UpdateParameters(parameters interface{}) WorkflowScheduleUpdateOpt {
+	return func(o *WorkflowScheduleUpdateOptions) error {
 		paramsData, err := jsonify(parameters)
 		o.UpdateParameters = true
 		o.Parameters = paramsData
@@ -1003,8 +1015,8 @@ func UpdateParameters(parameters interface{}) WorkflowScheduleUpdateOpts {
 
 // UpdateRecurrence changes the recurrence rule for the scheduled workflow. The
 // next run will happen when the recurrence is first due from Now.
-func UpdateRecurrence(recurRule *rrule.RRule) WorkflowScheduleUpdateOpts {
-	return func(o *backend.WorkflowScheduleUpdateOpts) error {
+func UpdateRecurrence(recurRule *rrule.RRule) WorkflowScheduleUpdateOpt {
+	return func(o *WorkflowScheduleUpdateOptions) error {
 		o.UpdateRecurrence = true
 		o.Recurrence = recurRule.String()
 		o.NextRunAt = recurRule.After(time.Now().UTC(), true).UTC()
@@ -1015,9 +1027,9 @@ func UpdateRecurrence(recurRule *rrule.RRule) WorkflowScheduleUpdateOpts {
 // UpdateWorkflowScheduleByName updates the scheduled workflow identified by
 // (instanceName, workflowName).
 func (m *Manager) UpdateWorkflowScheduleByName(ctx context.Context,
-	instanceName string, workflowName WorkflowName, opts ...WorkflowScheduleUpdateOpts) error {
+	instanceName string, workflowName WorkflowName, opts ...WorkflowScheduleUpdateOpt) error {
 
-	o := backend.WorkflowScheduleUpdateOpts{}
+	o := WorkflowScheduleUpdateOptions{}
 	for _, opt := range opts {
 		err := opt(&o)
 		if err != nil {

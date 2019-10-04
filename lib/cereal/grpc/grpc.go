@@ -519,7 +519,7 @@ func grpcSchedToBackend(grpcSched *grpccereal.Schedule) *cereal.Schedule {
 	return schedule
 }
 
-func (g *GrpcBackend) UpdateWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string, opts backend.WorkflowScheduleUpdateOpts) error {
+func (g *GrpcBackend) UpdateWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string, opts cereal.WorkflowScheduleUpdateOptions) error {
 	req := grpccereal.UpdateWorkflowScheduleByNameRequest{
 		Domain:       g.domain,
 		InstanceName: instanceName,

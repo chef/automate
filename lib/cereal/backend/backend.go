@@ -1,9 +1,5 @@
 package backend
 
-import (
-	"time"
-)
-
 type WorkflowInstanceStatus string
 
 const (
@@ -56,16 +52,4 @@ type TaskResult struct {
 	Status    TaskStatusType
 	ErrorText string
 	Result    []byte
-}
-
-type WorkflowScheduleUpdateOpts struct {
-	UpdateEnabled bool
-	Enabled       bool
-
-	UpdateParameters bool
-	Parameters       []byte
-
-	UpdateRecurrence bool
-	Recurrence       string
-	NextRunAt        time.Time
 }
