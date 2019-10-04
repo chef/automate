@@ -22,7 +22,7 @@ Chef Automate users will not be automatically upgraded.
 We designed IAM v2 to leave your v1 policy data untouched during your upgrade to v2; however, you can choose to not port over v1 policies by using the provided `--skip-policy-migration` flag with the upgrade command.
 
 Whether or not you migrate your v1 policies, if at any time you decide to opt back out of the beta and revert to v1, your original v1 policies will still be intact.
-Reverting to v1, however, will remove any new v2 data created while using IAM v2 (policies, roles, projects, rules).
+Reverting to v1 will remove any new v2 data created while using IAM v2 (policies, roles, projects, rules).
 Users, teams, and tokens are shared between v1 and v2, so changes to them will persist.
 
 See the [IAM v2 API Reference]({{< relref "iam-v2-api-reference.md" >}}) for day-to-day use of the IAM v2 system.
@@ -166,16 +166,30 @@ There are four steps to setting up projects:
 2. Create or modify IAM policy statements to restrict permissions to specific projects as needed.
    *Every* statement must either indicate specific projects or specify the wildcard denoting all projects (`*`).
    By default, any previously existing policies are automatically setup with that wildcard so they apply to all projects.
-3. Assign resources with projects (see [Assigning Resources to Projects]({{< relref "iam-v2-overview.md#assigning-resources-to-projects" >}})).
+3. Assign resources to projects (see [Assigning Resources to Projects]({{< relref "iam-v2-overview.md#assigning-resources-to-projects" >}})).
 4. Select the projects to filter in the UI.
    Once you create some projects, use the **global project filter** in the top navigation bar to select one or more projects for viewing.
    With no selection (the default), you will see resources for *all* projects.
 
 Note that, by default, Automate includes a *project-owner* role so the global admin may delegate much of these responsibilities for project management to others, to alleviate some of the burden for the global admin.
 
+### Assigning Resources to Projects
+
+There are two broad categories of resources that may be assigned to projects: your set of nodes feeding data into Chef Automate and the set of IAM resources themselves.
+Any of these that you do not explicitly assign to a project (as described next) are considered *unassigned* with respect to projects.
+At the start, none of your resources are assigned to any projects.
+These unassigned resources will be displayed either if you have made no selection in the global project filter, or if you have selected the `(unassigned)` designator.
+
+Assignable IAM resources include teams, tokens, policies, and roles.
+Teams and tokens may be assigned to projects directly in the UI; policies and roles still can only be assigned on the command-line (since you cannot create or modify those at all in the UI yet).
+
+Assigning your set of nodes to projects is done via the rules you create for the project, mentioned just briefly above.
+A rule specifies one or more conditions, and each condition specifies a set of attribute values that a node must satisfy to be assigned to the given project.
+Once you define your set of projects with their contained rules and conditions, you then use the **Update Projects** button on the main projects list page to apply those definitions to all your nodes.
+
 ### Properties of a Project
 
-A v2 project consists of a list of **rules**, where each rule describes a group of node characteristics.
+To assign a project to a set of nodes as mentioned above, the project needs a list of **rules**, where each rule describes a group of node characteristics.
 
 Property   | Description
 -----------|------------
@@ -197,20 +211,6 @@ Attribute (for events) | one of (CHEF_ORGANIZATION, CHEF_SERVER)
 Attribute (for nodes)  | one of (CHEF_ORGANIZATION, CHEF_SERVER, ENVIRONMENT, CHEF_ROLE, CHEF_TAG, CHEF_POLICY_NAME, CHEF_POLICY_GROUP)
 Operator               | one of (equals, member_of)
 Values                 | list of one or more values to match on the specified attribute
-
-### Assigning Resources to Projects
-
-There are two broad categories of resources that may be assigned to projects: your set of nodes feeding data into Chef Automate and the set of IAM resources themselves.
-Any of these that you do not explicitly assign to a project (as described next) are considered *unassigned* with respect to projects.
-At the start, then, none of your resources are assigned to any projects.
-These unassigned resources will be displayed either if you have made no selection in the global project filter, or if you have selected the `(unassigned)` designator.
-
-Assignable IAM resources include teams, tokens, policies, and roles.
-Teams and tokens may be assigned to projects directly in the UI; policies and roles still can only be assigned on the command-line (since you cannot create or modify those at all in the UI yet).
-
-Assigning your set of nodes to projects is done via the rules you create for the project, mentioned just briefly above.
-A rule specifies one or more conditions, and each condition specifies a set of attribute values that a node must satisfy to be assigned to the given project.
-Once you define your set of projects with their contained rules and conditions, you then use the **Update Projects** button on the main projects list page to apply those definitions to all your nodes.
 
 ## Policies, Roles, and Projects in the UI
 
