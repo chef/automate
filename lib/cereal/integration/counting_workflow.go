@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/cereal/backend"
 )
 
 // TestCountToNWorkflow launches 2 workflow instances that do
@@ -71,7 +70,7 @@ func (suite *CerealTestSuite) TestCountToNWorkflow() {
 			},
 		),
 		WithManagerOpts(
-			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+			cereal.WithOnWorkflowCompleteCallback(func(*cereal.WorkflowEvent) {
 				wgWorkflow.Done()
 			}),
 		),

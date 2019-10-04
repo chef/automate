@@ -10,7 +10,6 @@ import (
 	"github.com/teambition/rrule-go"
 
 	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/cereal/backend"
 )
 
 func (suite *CerealTestSuite) TestSimpleScheduleWorkflow() {
@@ -53,7 +52,7 @@ func (suite *CerealTestSuite) TestSimpleScheduleWorkflow() {
 		),
 		WithNoStart(),
 		WithManagerOpts(
-			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+			cereal.WithOnWorkflowCompleteCallback(func(*WorkflowEvent) {
 				wgWorkflow.Done()
 			}),
 		),

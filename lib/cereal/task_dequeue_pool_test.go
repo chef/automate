@@ -9,8 +9,6 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/chef/automate/lib/cereal/backend"
 )
 
 var errTestDequeueNoTasks = errors.New("no tasks in test dequeuer")
@@ -19,7 +17,7 @@ type sleepyDequeuer struct {
 	maxMS int
 }
 
-func (s *sleepyDequeuer) DequeueTask(ctx context.Context, name string) (*backend.Task, backend.TaskCompleter, error) {
+func (s *sleepyDequeuer) DequeueTask(ctx context.Context, name string) (*TaskData, TaskCompleter, error) {
 	if s.maxMS > 0 {
 		time.Sleep(time.Duration(rand.Intn(s.maxMS)) * time.Millisecond)
 	}
@@ -29,13 +27,13 @@ func (s *sleepyDequeuer) DequeueTask(ctx context.Context, name string) (*backend
 type checkedMaxDequeuer struct {
 	max   int
 	t     *testing.T
-	inner backend.TaskDequeuer
+	inner TaskDequeuer
 
 	active int
 	mu     sync.Mutex
 }
 
-func (w *checkedMaxDequeuer) DequeueTask(ctx context.Context, name string) (*backend.Task, backend.TaskCompleter, error) {
+func (w *checkedMaxDequeuer) DequeueTask(ctx context.Context, name string) (*TaskData, TaskCompleter, error) {
 	w.checkWorkerLimit()
 	defer w.done()
 
