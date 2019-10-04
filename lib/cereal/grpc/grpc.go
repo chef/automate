@@ -423,7 +423,7 @@ func (g *GrpcBackend) CreateWorkflowSchedule(ctx context.Context, instanceName s
 	return nil
 }
 
-func (g *GrpcBackend) ListWorkflowSchedules(ctx context.Context) ([]*backend.Schedule, error) {
+func (g *GrpcBackend) ListWorkflowSchedules(ctx context.Context) ([]*cereal.Schedule, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -433,7 +433,7 @@ func (g *GrpcBackend) ListWorkflowSchedules(ctx context.Context) ([]*backend.Sch
 	if err != nil {
 		return nil, err
 	}
-	var schedules []*backend.Schedule
+	var schedules []*cereal.Schedule
 
 	for {
 		resp, err := s.Recv()
@@ -444,7 +444,7 @@ func (g *GrpcBackend) ListWorkflowSchedules(ctx context.Context) ([]*backend.Sch
 			return nil, err
 		}
 		if resp.NumSchedules > 0 && schedules == nil {
-			schedules = make([]*backend.Schedule, 0, resp.NumSchedules)
+			schedules = make([]*cereal.Schedule, 0, resp.NumSchedules)
 		}
 		if resp.Schedule != nil {
 			schedules = append(schedules, grpcSchedToBackend(resp.Schedule))
@@ -453,7 +453,7 @@ func (g *GrpcBackend) ListWorkflowSchedules(ctx context.Context) ([]*backend.Sch
 	return schedules, nil
 }
 
-func (g *GrpcBackend) GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string) (*backend.Schedule, error) {
+func (g *GrpcBackend) GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string) (*cereal.Schedule, error) {
 	resp, err := g.client.GetWorkflowScheduleByName(ctx, &grpccereal.GetWorkflowScheduleByNameRequest{
 		Domain:       g.domain,
 		InstanceName: instanceName,
@@ -474,8 +474,8 @@ func (g *GrpcBackend) GetWorkflowScheduleByName(ctx context.Context, instanceNam
 	return grpcSchedToBackend(resp.Schedule), nil
 }
 
-func grpcSchedToBackend(grpcSched *grpccereal.Schedule) *backend.Schedule {
-	schedule := &backend.Schedule{
+func grpcSchedToBackend(grpcSched *grpccereal.Schedule) *cereal.Schedule {
+	schedule := &cereal.Schedule{
 		InstanceName: grpcSched.InstanceName,
 		WorkflowName: grpcSched.WorkflowName,
 		Parameters:   grpcSched.Parameters,

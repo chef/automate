@@ -310,8 +310,8 @@ func (pg *PostgresBackend) Close() error {
 	return nil
 }
 
-func (pg *PostgresBackend) GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string) (*backend.Schedule, error) {
-	scheduledWorkflow := backend.Schedule{}
+func (pg *PostgresBackend) GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string) (*cereal.Schedule, error) {
+	scheduledWorkflow := cereal.Schedule{}
 	row := pg.db.QueryRowContext(ctx, getScheduledWorkflowQuery, instanceName, workflowName)
 	err := row.Scan(
 		&scheduledWorkflow.ID,
@@ -334,7 +334,7 @@ func (pg *PostgresBackend) GetWorkflowScheduleByName(ctx context.Context, instan
 	return &scheduledWorkflow, nil
 }
 
-func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*backend.Schedule, error) {
+func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*cereal.Schedule, error) {
 	ctx, cancel := context.WithTimeout(ctx, 1*time.Minute)
 	defer cancel()
 
@@ -345,9 +345,9 @@ func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*backen
 
 	defer rows.Close() // nolint: errcheck
 
-	schedules := make([]*backend.Schedule, 0)
+	schedules := make([]*cereal.Schedule, 0)
 	for rows.Next() {
-		var scheduledWorkflow backend.Schedule
+		var scheduledWorkflow cereal.Schedule
 		err := rows.Scan(
 			&scheduledWorkflow.ID,
 			&scheduledWorkflow.Enabled,
@@ -371,13 +371,13 @@ func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*backen
 	return schedules, nil
 }
 
-func (pg *PostgresBackend) GetNextScheduledWorkflow(ctx context.Context) (*backend.Schedule, error) {
+func (pg *PostgresBackend) GetNextScheduledWorkflow(ctx context.Context) (*cereal.Schedule, error) {
 	ctx, cancel := context.WithCancel(ctx) // nolint: govet
 	defer cancel()
 
 	row := pg.db.QueryRowContext(ctx, getNextScheduledWorkflowQuery)
 
-	var scheduledWorkflow backend.Schedule
+	var scheduledWorkflow cereal.Schedule
 	err := row.Scan(
 		&scheduledWorkflow.ID,
 		&scheduledWorkflow.Enabled,
@@ -396,7 +396,7 @@ func (pg *PostgresBackend) GetNextScheduledWorkflow(ctx context.Context) (*backe
 	return &scheduledWorkflow, err
 }
 
-func (pg *PostgresBackend) GetDueScheduledWorkflow(ctx context.Context) (*backend.Schedule, cereal.ScheduledWorkflowCompleter, error) {
+func (pg *PostgresBackend) GetDueScheduledWorkflow(ctx context.Context) (*cereal.Schedule, cereal.ScheduledWorkflowCompleter, error) {
 	ctx, cancel := context.WithCancel(ctx) // nolint: govet
 
 	tx, err := pg.db.BeginTx(ctx, nil)
@@ -407,7 +407,7 @@ func (pg *PostgresBackend) GetDueScheduledWorkflow(ctx context.Context) (*backen
 
 	row := tx.QueryRowContext(ctx, getDueScheduledWorkflowQuery)
 
-	var scheduledWorkflow backend.Schedule
+	var scheduledWorkflow cereal.Schedule
 	err = row.Scan(
 		&scheduledWorkflow.ID,
 		&scheduledWorkflow.Enabled,
@@ -953,7 +953,7 @@ func (workc *PostgresWorkflowCompleter) Close() error {
 }
 
 // TODO(ssd) 2019-05-14: We should probably allow bulk insertion of workflows and tasks
-func (c *PostgresScheduledWorkflowCompleter) EnqueueAndUpdateScheduledWorkflow(s *backend.Schedule) error {
+func (c *PostgresScheduledWorkflowCompleter) EnqueueAndUpdateScheduledWorkflow(s *cereal.Schedule) error {
 	defer c.cancel()
 	wrapErr := func(err error, msg string) error {
 		if isPGConflict(err) {
@@ -1007,7 +1007,7 @@ func (c *PostgresScheduledWorkflowCompleter) EnqueueAndUpdateScheduledWorkflow(s
 	}
 }
 
-func (c *PostgresScheduledWorkflowCompleter) DisableSchedule(s *backend.Schedule) error {
+func (c *PostgresScheduledWorkflowCompleter) DisableSchedule(s *cereal.Schedule) error {
 	defer c.cancel()
 	_, err := c.tx.ExecContext(
 		c.ctx,
