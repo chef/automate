@@ -99,7 +99,7 @@ func TestEnqueueWorkflowInstanceNameUnique(t *testing.T) {
 
 	require.NoError(t, err, "failed to enqueue workflow")
 
-	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: "workflow-instance",
 		WorkflowName: workflowName,
 	})
@@ -231,7 +231,7 @@ func TestTaskComplete(t *testing.T) {
 
 	wevt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
-	require.Equal(t, cereal.TaskDataComplete, wevt.Type)
+	require.Equal(t, cereal.TaskComplete, wevt.Type)
 	require.Equal(t, cereal.TaskStatusSuccess, wevt.TaskResult.Status)
 	require.Equal(t, []byte("foo"), wevt.TaskResult.Result)
 	require.Equal(t, "", wevt.TaskResult.ErrorText)
@@ -1096,7 +1096,7 @@ func TestListWorkflowInstancesEmpty(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	instances, err := b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOptions{})
+	instances, err := b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{})
 	require.NoError(t, err)
 	assert.Len(t, instances, 0)
 }
@@ -1137,7 +1137,7 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	instances, err := b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOptions{})
+	instances, err := b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{})
 	require.NoError(t, err)
 	assert.Len(t, instances, 3)
 
@@ -1152,7 +1152,7 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 		}
 	}
 
-	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOptions{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		WorkflowName: &workflowName,
 	})
 	require.NoError(t, err)
@@ -1167,7 +1167,7 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 		}
 	}
 
-	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOptions{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		WorkflowName: &workflowName,
 		InstanceName: &instance1Name,
 	})
@@ -1176,7 +1176,7 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 	assert.Equal(t, cereal.WorkflowInstanceStatusStarting, instances[0].Status)
 	assert.Equal(t, instance1Parameters, instances[0].Parameters)
 
-	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOptions{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		WorkflowName: &workflowName,
 		InstanceName: &instance2Name,
 	})
@@ -1186,7 +1186,7 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 	assert.Equal(t, instance2Parameters, instances[0].Parameters)
 
 	isRunning := true
-	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOptions{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		WorkflowName: &workflowName,
 		IsRunning:    &isRunning,
 	})
@@ -1203,7 +1203,7 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 	}
 
 	isRunning = false
-	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOptions{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		WorkflowName: &workflowName,
 		IsRunning:    &isRunning,
 	})
@@ -1213,7 +1213,7 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 	w1, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	err = completer.Done([]byte("result"))
 	require.NoError(t, err)
-	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOptions{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		WorkflowName: &workflowName,
 		IsRunning:    &isRunning,
 	})
@@ -1225,7 +1225,7 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 	assert.Equal(t, w1.Instance.Parameters, instances[0].Parameters)
 	assert.Equal(t, []byte("result"), instances[0].Result)
 
-	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOptions{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		WorkflowName: &workflowName,
 		InstanceName: &w1.Instance.InstanceName,
 	})
@@ -1238,27 +1238,27 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 	assert.Nil(t, instances[0].Payload)
 	assert.Equal(t, []byte("result"), instances[0].Result)
 
-	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOptions{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		WorkflowName: &workflowName,
 	})
 	require.NoError(t, err)
 	require.Len(t, instances, 2)
 
 	isRunning = false
-	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOptions{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		IsRunning: &isRunning,
 	})
 	require.NoError(t, err)
 	require.Len(t, instances, 1)
 
 	isRunning = true
-	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOptions{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		IsRunning: &isRunning,
 	})
 	require.NoError(t, err)
 	require.Len(t, instances, 2)
 
-	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOptions{})
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{})
 	require.NoError(t, err)
 	require.Len(t, instances, 3)
 
@@ -1267,7 +1267,7 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 	err = completer.Fail(errors.New("fail"))
 	require.NoError(t, err)
 
-	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOptions{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		WorkflowName: &workflowName,
 		InstanceName: &w2.Instance.InstanceName,
 	})
@@ -1283,14 +1283,14 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 	assert.Equal(t, "fail", instances[0].Err.Error())
 
 	isRunning = false
-	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOptions{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		IsRunning: &isRunning,
 	})
 	require.NoError(t, err)
 	require.Len(t, instances, 2)
 
 	isRunning = true
-	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOptions{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		IsRunning: &isRunning,
 	})
 	require.NoError(t, err)
@@ -1303,7 +1303,7 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 		Parameters:   instance1Parameters,
 	})
 	require.NoError(t, err)
-	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOptions{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		WorkflowName: &workflowName,
 		InstanceName: &instance1Name,
 	})
@@ -1320,7 +1320,7 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 		Parameters:   instance2Parameters,
 	})
 	require.NoError(t, err)
-	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOptions{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		WorkflowName: &workflowName,
 		InstanceName: &instance2Name,
 	})

@@ -52,7 +52,7 @@ func (suite *CerealTestSuite) TestSimpleScheduleWorkflow() {
 		),
 		WithNoStart(),
 		WithManagerOpts(
-			cereal.WithOnWorkflowCompleteCallback(func(*WorkflowEvent) {
+			cereal.WithOnWorkflowCompleteCallback(func(*cereal.WorkflowEvent) {
 				wgWorkflow.Done()
 			}),
 		),
