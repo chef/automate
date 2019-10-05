@@ -124,7 +124,7 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
   hideScanResults() {
     this.scanResults.opened = false;
     this.scanResults.clearParams();
-    this.scanResults.control = {};
+    this.scanResults.control = null;
     this.openControls = {};
   }
 
