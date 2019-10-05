@@ -129,6 +129,7 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
   }
 
   getNodes(reportQuery: ReportQuery, params: any): Observable<Array<any>> {
+    // Need to rethink this because it is removing all filters
     const profileFilter: FilterC = {type: { name: 'profile_id' }, value: { text: params.profileId}};
     const controlFilter: FilterC = {type: { name: 'control_id' }, value: { text: params.controlId}};
     reportQuery.filters = [profileFilter].concat(controlFilter);
