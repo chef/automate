@@ -129,12 +129,9 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
   }
 
   getNodes(reportQuery: ReportQuery, params: any): Observable<Array<any>> {
-    // reset the filters incase values are stuck;
-    reportQuery.filters = [];
-
     const profileFilter: FilterC = {type: { name: 'profile_id' }, value: { text: params.profileId}};
     const controlFilter: FilterC = {type: { name: 'control_id' }, value: { text: params.controlId}};
-    reportQuery.filters = [profileFilter, controlFilter].concat(reportQuery.filters);
+    reportQuery.filters = [profileFilter].concat(controlFilter);
     params = paginationOverride;
     params['sort'] = 'latest_report.end_time';
     params['order'] = 'desc';
