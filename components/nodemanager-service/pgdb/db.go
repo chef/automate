@@ -19,7 +19,8 @@ import (
 
 type DB struct {
 	*gorp.DbMap
-	projectUpdateJobStatus project_update_lib.JobStatus
+	projectUpdateJobStatus      project_update_lib.JobStatus
+	projectUpdateJobStatusError error
 }
 
 type DBTrans struct {

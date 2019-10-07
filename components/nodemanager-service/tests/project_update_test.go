@@ -83,6 +83,7 @@ func TestProjectUpdate(t *testing.T) {
 			description: "Environment - Single rule two matching conditions",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
+				{Key: "organization_name", Values: []string{"org1"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
 				"project3": {
@@ -348,8 +349,9 @@ func TestProjectUpdate(t *testing.T) {
 			expectedProjectIDs: []string{"project9"},
 		},
 
+		// general
 		{
-			description: "Environment - project removed all variables",
+			description: "project removed with all variables set",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
 				{Key: "roles", Values: []string{}},
@@ -364,7 +366,7 @@ func TestProjectUpdate(t *testing.T) {
 			expectedProjectIDs: []string{},
 		},
 		{
-			description:        "Environment - project removed no variables",
+			description:        "project removed no variables set",
 			projectsData:       []*nodes.ProjectsData{},
 			projectRules:       map[string]*iam_v2.ProjectRules{},
 			originalProjectIDs: []string{"project9"},
@@ -2205,11 +2207,11 @@ func TestProjectUpdate(t *testing.T) {
 
 func waitForJobToComplete(ctx context.Context, t *testing.T, db *pgdb.DB, jobID string) {
 	jobStatus, err := db.JobStatus(ctx, jobID)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	for !jobStatus.Completed {
 		time.Sleep(time.Millisecond * 5)
 		jobStatus, err = db.JobStatus(ctx, jobID)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		if err != nil {
 			assert.FailNow(t, "testing job status")
 		}
