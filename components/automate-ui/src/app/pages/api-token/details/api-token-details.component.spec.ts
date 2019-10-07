@@ -7,7 +7,7 @@ import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store } from '@ngrx/store';
 
 import { using } from 'app/testing/spec-helpers';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import {
   ApiTokenEntityInitialState,
@@ -94,7 +94,7 @@ describe('ApiTokenDetailsComponent', () => {
           policies: policyEntityReducer,
           projects: projectEntityReducer,
           projectsFilter: projectsFilterReducer
-        }, { initialState })
+        }, { initialState, runtimeChecks })
       ]
     }).compileComponents();
   }));

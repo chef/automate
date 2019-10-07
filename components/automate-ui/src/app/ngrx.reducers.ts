@@ -112,6 +112,7 @@ export interface RouterState {
   path: UrlSegment[];
 }
 
+// Adapted from https://ngrx.io/guide/router-store/configuration
 export class RouterSerializer implements router.RouterStateSerializer<RouterState> {
   serialize(routerState: RouterStateSnapshot): RouterState {
     let route = routerState.root;
@@ -129,6 +130,13 @@ export class RouterSerializer implements router.RouterStateSerializer<RouterStat
   }
 }
 
+export const runtimeChecks = {
+  strictStateImmutability: false,
+  strictActionImmutability: false,
+  strictStateSerializability: false,
+  strictActionSerializability: false
+};
+
 const defaultRouterState = {
   state: {
     url: '/',
@@ -143,7 +151,7 @@ const defaultRouterState = {
 
 export function routerReducer(state = defaultRouterState, action) {
   switch (action.type) {
-    case 'ROUTER_NAVIGATION':
+    case router.ROUTER_NAVIGATION:
       const newRouterState =
         set('previousRoute', get('state', state), router.routerReducer(state, action));
       return newRouterState;

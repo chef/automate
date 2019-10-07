@@ -22,7 +22,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   public licenseModalVisible = false;
 
-  @ViewChild(WelcomeModalComponent)
+  @ViewChild(WelcomeModalComponent, { static: true })
   private welcomeModalComponent: WelcomeModalComponent;
 
   @ViewChildren('focusElement') focusElements;

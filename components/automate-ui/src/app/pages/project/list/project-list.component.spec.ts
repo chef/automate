@@ -6,7 +6,7 @@ import { of as observableOf } from 'rxjs';
 import { MockComponent } from 'ng2-mock-component';
 
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import { customMatchers } from 'app/testing/custom-matchers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
@@ -100,7 +100,7 @@ describe('ProjectListComponent', () => {
         StoreModule.forRoot({
           policies: policyEntityReducer,
           projects: projectEntityReducer
-        })
+        }, { runtimeChecks })
       ],
       providers: [
         FeatureFlagsService,

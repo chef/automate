@@ -42,7 +42,7 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
 
   @Input() vbHeight = 300;
 
-  @ViewChild('svg') svg;
+  @ViewChild('svg', { static: true }) svg;
 
   get viewBox() {
     return `0 0 ${this.vbWidth} ${this.vbHeight}`;

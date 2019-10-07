@@ -8,6 +8,7 @@ import { MockComponent } from 'ng2-mock-component';
 import { using } from 'app/testing/spec-helpers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { SettingsLandingComponent } from 'app/pages/settings-landing/settings-landing.component';
+import { runtimeChecks } from 'app/ngrx.reducers';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import { checkFirstPerm } from 'app/testing/spec-helpers';
@@ -24,7 +25,7 @@ describe('SettingsSidebarComponent', () => {
       imports: [RouterTestingModule,
         StoreModule.forRoot({
           policies: policyEntityReducer
-        })
+        }, { runtimeChecks })
       ],
       declarations: [
         SettingsSidebarComponent,

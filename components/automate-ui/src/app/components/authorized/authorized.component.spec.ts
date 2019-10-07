@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { StoreModule, Store } from '@ngrx/store';
 import * as faker from 'faker';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import { using } from 'app/testing/spec-helpers';
 import { IndexedEntities } from 'app/entities/entities';
 import { UserPermEntity } from 'app/entities/userperms/userperms.entity';
@@ -57,7 +57,7 @@ describe('AuthorizedComponent', () => {
               }
             }
           })
-        })
+        }, { runtimeChecks })
       ],
       declarations: [
         AuthorizedComponent

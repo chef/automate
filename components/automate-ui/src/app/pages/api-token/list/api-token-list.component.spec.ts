@@ -4,6 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
+import { runtimeChecks } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { apiTokenEntityReducer } from 'app/entities/api-tokens/api-token.reducer';
 import { ApiTokenListComponent } from './api-token-list.component';
@@ -25,7 +26,7 @@ describe('ApiTokenListComponent', () => {
           apiTokens: apiTokenEntityReducer,
           policies: policyEntityReducer,
           projectsFilter: projectsFilterReducer
-        })
+        }, { runtimeChecks })
       ],
       declarations: [
         ApiTokenListComponent,

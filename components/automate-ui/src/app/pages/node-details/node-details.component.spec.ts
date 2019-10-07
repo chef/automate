@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, Subject } from 'rxjs';
+import { runtimeChecks } from 'app/ngrx.reducers';
 import { NodeDetailsComponent  } from './node-details.component';
 import { NodeDetailsService } from '../../services/node-details/node-details.service';
 import { MockComponent } from 'ng2-mock-component';
@@ -37,6 +38,8 @@ describe('NodeDetailsComponent', () => {
         spyOn(eventService.showModal$, 'subscribe')
           .and.returnValue(new BehaviorSubject<boolean>(false));
         component.ngOnInit();
+        // Next line complains "subscribe is deprecated" -- but this usage is OK!
+        // tslint:disable-next-line
         expect(eventService.showModal$.subscribe).toHaveBeenCalled();
       });
     });
@@ -88,7 +91,7 @@ function createTestFixture(
           previousRoute: {},
           navigationId: 0
         })
-      })
+      }, { runtimeChecks })
     ],
     declarations: [
       MockComponent({ selector: 'app-logs-modal', inputs: ['isVisible', 'nodeRun'] }),

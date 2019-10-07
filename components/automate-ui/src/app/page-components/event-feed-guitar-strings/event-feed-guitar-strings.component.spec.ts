@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA, SimpleChanges, SimpleChange } from '@angular/core';
+import { runtimeChecks } from 'app/ngrx.reducers';
 import {
   EventFeedGuitarStringsComponent,
   GraphicProportions,
@@ -48,7 +49,7 @@ describe('EventFeedGuitarStringsComponent', () => {
       imports: [
         StoreModule.forRoot({
           'event_feed': combineReducers(eventFeed.eventFeedReducer)
-        })
+        }, { runtimeChecks })
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });

@@ -2,6 +2,7 @@ import { Router } from '@angular/router';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { StoreModule } from '@ngrx/store';
 
+import { runtimeChecks } from 'app/ngrx.reducers';
 import { IndexedEntities } from 'app/entities/entities';
 import { UserPermEntity } from 'app/entities/userperms/userperms.entity';
 import { AuthorizedChecker } from 'app/helpers/auth/authorized';
@@ -148,7 +149,7 @@ describe('LandingComponent', () => {
             status: Status.loadingSuccess,
             byId: perms
           }
-        })
+        }, { runtimeChecks })
       ],
       providers: [
         { provide: Router, useValue: router }

@@ -7,6 +7,7 @@ import { MockComponent } from 'ng2-mock-component';
 import { using } from 'app/testing/spec-helpers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { runtimeChecks } from 'app/ngrx.reducers';
 import { projectEntityReducer } from 'app/entities/projects/project.reducer';
 import { Rule, Condition, ConditionOperator, RuleType } from 'app/entities/rules/rule.model';
 import { ruleEntityReducer } from 'app/entities/rules/rule.reducer';
@@ -95,7 +96,7 @@ describe('ProjectRulesComponent', () => {
           }),
           projects: projectEntityReducer,
           rules: ruleEntityReducer
-        })
+        }, { runtimeChecks })
       ],
       providers: [
         FeatureFlagsService

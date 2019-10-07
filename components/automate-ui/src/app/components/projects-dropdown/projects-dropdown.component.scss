@@ -74,7 +74,7 @@ chef-dropdown {
 chef-checkbox {
   display: flex;
   padding: 9px 18px;
-  align-items: start;
+  align-items: flex-start;
   white-space: normal; // prevents text from going outside of the element's container
 
   &:first-child {

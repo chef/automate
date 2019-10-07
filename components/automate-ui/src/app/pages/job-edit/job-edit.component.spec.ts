@@ -6,7 +6,8 @@ import { of as observableOf } from 'rxjs';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
-import { NgrxStateAtom, ngrxReducers } from '../../ngrx.reducers';
+import { ROUTER_NAVIGATION } from '@ngrx/router-store';
+import { NgrxStateAtom, ngrxReducers, runtimeChecks } from '../../ngrx.reducers';
 import { ChefSessionService } from '../../services/chef-session/chef-session.service';
 import { JobEditComponent, Step } from './job-edit.component';
 import { Job } from '../../entities/jobs/job.model';
@@ -15,7 +16,7 @@ import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 
 const changeStep = fragment => {
   return {
-    type: 'ROUTER_NAVIGATION',
+    type: ROUTER_NAVIGATION,
     payload: {
       routerState: {
         url: '/jobs/1/edit',
@@ -46,7 +47,7 @@ describe('JobEditComponent', () => {
       imports: [
         ReactiveFormsModule,
         RouterTestingModule,
-        StoreModule.forRoot(ngrxReducers)
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       declarations: [
         JobEditComponent

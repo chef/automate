@@ -14,25 +14,30 @@ const routes: Routes = [
       },
       {
         path: 'overview',
-        loadChildren: './+reporting-overview/reporting-overview.module#ReportingOverviewModule'
+        loadChildren: () => import('./+reporting-overview/reporting-overview.module')
+          .then(m => m.ReportingOverviewModule)
       },
       {
         path: 'nodes',
-        loadChildren: './+reporting-nodes/reporting-nodes.module#ReportingNodesModule'
+        loadChildren: () => import('./+reporting-nodes/reporting-nodes.module')
+          .then(m => m.ReportingNodesModule)
       },
       {
         path: 'profiles',
-        loadChildren: './+reporting-profiles/reporting-profiles.module#ReportingProfilesModule'
+        loadChildren: () => import('./+reporting-profiles/reporting-profiles.module')
+          .then(m => m.ReportingProfilesModule)
       }
     ]
   },
   {
     path: 'nodes/:id',
-    loadChildren: './+reporting-node/reporting-node.module#ReportingNodeModule'
+    loadChildren: () => import('./+reporting-node/reporting-node.module')
+      .then(m => m.ReportingNodeModule)
   },
   {
     path: 'profiles/:id',
-    loadChildren: './+reporting-profile/reporting-profile.module#ReportingProfileModule'
+    loadChildren: () => import('./+reporting-profile/reporting-profile.module')
+      .then(m => m.ReportingProfileModule)
   }
 ];
 

@@ -3,6 +3,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MockComponent } from 'ng2-mock-component';
 import { StoreModule } from '@ngrx/store';
 
+import { runtimeChecks } from 'app/ngrx.reducers';
 import { userEntityReducer } from 'app/entities/users/user.reducer';
 import { UserManagementComponent } from './user-management.component';
 
@@ -43,7 +44,7 @@ describe('UserManagementComponent', () => {
         ReactiveFormsModule,
         StoreModule.forRoot({
           users: userEntityReducer
-        })
+        }, { runtimeChecks })
       ]
     }).compileComponents();
   }));
