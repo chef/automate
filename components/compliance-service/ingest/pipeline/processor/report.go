@@ -54,7 +54,8 @@ func ComplianceReport(in <-chan message.Compliance) <-chan message.Compliance {
 			msg.InspecReport.Platform.Name = msg.Report.GetPlatform().GetName()
 			msg.InspecReport.Platform.Release = msg.Report.GetPlatform().GetRelease()
 			msg.InspecReport.Statistics.Duration = msg.Report.GetStatistics().GetDuration()
-			msg.InspecReport.Platform.Full = fmt.Sprintf("%s %s", msg.InspecReport.Platform.Name, msg.InspecReport.Platform.Release)
+			msg.InspecReport.Platform.Full = fmt.Sprintf("%s %s",
+				msg.InspecReport.Platform.Name, msg.InspecReport.Platform.Release)
 			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Processed Compliance Report")
 			out <- msg
 		}

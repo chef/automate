@@ -47,9 +47,10 @@ export class ReportingComponent implements OnInit, OnDestroy {
     'node_id',
     'node_name',
     'organization',
-    'platform',
+    'platform_with_version',
     'policy_group',
     'profile_id',
+    'profile_with_version',
     'profile_name',
     'recipe',
     'role'
@@ -106,7 +107,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
       'placeholder': 'Node Name'
     },
     {
-      'name': 'platform',
+      'name': 'platform_with_version',
       'title': 'Platform',
       'description': 'Add the name to filter this report to a specific platform',
       'placeholder': 'Name'
@@ -124,7 +125,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
       'placeholder': 'Policy Name'
     },
     {
-      'name': 'profile',
+      'name': 'profile_with_version',
       'title': 'Profile',
       'description': 'Add the name or ID to filter this report against a profile',
       'placeholder': 'Name or ID'
@@ -312,13 +313,13 @@ export class ReportingComponent implements OnInit, OnDestroy {
     let filterValue = value.text;
     let typeName = type.name;
 
-    if (type.name === 'profile') {
+    if (type.name === 'profile_with_version') {
       if ( value.id ) {
         typeName = 'profile_id';
         filterValue = value.id;
         this.reportQuery.setFilterTitle(typeName, value.id, value.title);
       } else {
-        typeName = 'profile_name';
+        typeName = 'profile_with_version';
       }
     } else if (type.name === 'node') {
       if ( value.id ) {
@@ -411,17 +412,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
   getSuggestions(type: string, text: string, reportQuery: ReportQuery) {
     return this.suggestionsService.getSuggestions(type.replace('_id', ''), text, reportQuery).pipe(
       map(data => {
-        return data.map(item => {
-          let title;
-          // if the item has a version (as in the case of a profile), append
-          // the version to the text so the user knows the version
-          if (item.version) {
-            title = `${item.text}, v${item.version}`;
-          } else {
-            title = item.text;
-          }
-          return Object.assign(item, { title: title });
-        });
+        return data.map(item => Object.assign(item, { title: item.text }));
       }),
       takeUntil(this.isDestroyed)
     );

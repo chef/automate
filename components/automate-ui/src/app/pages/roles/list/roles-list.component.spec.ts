@@ -2,6 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
+import { runtimeChecks } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { roleEntityReducer } from 'app/entities/roles/role.reducer';
@@ -38,7 +39,7 @@ describe('RolesListComponent', () => {
         StoreModule.forRoot({
           policies: policyEntityReducer,
           roles: roleEntityReducer
-        })
+        }, { runtimeChecks })
       ],
       providers: [
         FeatureFlagsService

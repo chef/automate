@@ -5,6 +5,7 @@ import { MockComponent } from 'ng2-mock-component';
 
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { customMatchers } from 'app/testing/custom-matchers';
+import { runtimeChecks } from 'app/ngrx.reducers';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import { PolicyListComponent } from './policy-list.component';
@@ -43,7 +44,7 @@ describe('PolicyListComponent', () => {
         ChefPipesModule,
         StoreModule.forRoot({
           policies: policyEntityReducer
-        })
+        }, { runtimeChecks })
       ]
     }).compileComponents();
   }));

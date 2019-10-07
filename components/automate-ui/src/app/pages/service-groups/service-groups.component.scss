@@ -87,8 +87,9 @@ chef-td {
   }
 
   &.service-group {
-    display: grid;
-    align-content: flex-start;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   &.package-name {
@@ -380,3 +381,22 @@ chef-radial-chart {
   }
 }
 
+.disconnect-notice {
+  display: inline-flex;
+  background: $chef-info-alert-light;
+  color: $chef-info-alert;
+  border-radius: $global-radius;
+  padding: 2px 8px 2px 4px;
+  margin-top: 4px;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+
+  .disconnect-icon {
+    display: block;
+    margin-right: 6px;
+    height: 14px;
+    width: 14px;
+  }
+}

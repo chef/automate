@@ -636,6 +636,9 @@ func init() {
         },
         "release": {
           "type": "string"
+        },
+        "full": {
+          "type": "string"
         }
       }
     },
@@ -667,6 +670,9 @@ func init() {
           "type": "string"
         },
         "owner": {
+          "type": "string"
+        },
+        "full": {
           "type": "string"
         },
         "supports": {
@@ -747,6 +753,9 @@ func init() {
           "type": "string"
         },
         "status": {
+          "type": "string"
+        },
+        "full": {
           "type": "string"
         }
       }

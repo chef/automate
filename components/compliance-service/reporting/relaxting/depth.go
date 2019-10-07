@@ -3,12 +3,13 @@ package relaxting
 import (
 	"encoding/json"
 
-	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
-	"github.com/chef/automate/components/compliance-service/api/stats"
-	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
+	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
+	"github.com/chef/automate/components/compliance-service/api/stats"
+	"github.com/chef/automate/components/compliance-service/reporting"
 )
 
 type QueryInfo struct {
@@ -110,12 +111,13 @@ func getDeepControlsSums(hit *elastic.SearchHit,
 				for _, profileHit := range innerHit.Hits.Hits {
 					var profile ProfileSource
 					if profileHit.Source != nil {
-						err := json.Unmarshal(*profileHit.Source, &profile)
+						err = json.Unmarshal(*profileHit.Source, &profile)
 						if err == nil {
 							if queryInfo.level == ControlLevel {
-								return getControlLevelControlSums(profileHit)
+								nodeControlSummary, status, err = getControlLevelControlSums(profileHit)
 							} else {
-								return profile.ControlsSums, profile.Status, nil
+								nodeControlSummary = profile.ControlsSums
+								status = profile.Status
 							}
 						}
 					}
@@ -123,7 +125,7 @@ func getDeepControlsSums(hit *elastic.SearchHit,
 			}
 		}
 	}
-	return nodeControlSummary, status, nil
+	return
 }
 
 func getControlLevelControlSums(hit *elastic.SearchHit) (nodeControlSummary reporting.NodeControlSummary,
@@ -134,7 +136,7 @@ func getControlLevelControlSums(hit *elastic.SearchHit) (nodeControlSummary repo
 				for _, controlHit := range innerHit.Hits.Hits {
 					var control ControlSource
 					if controlHit.Source != nil {
-						err := json.Unmarshal(*controlHit.Source, &control)
+						err = json.Unmarshal(*controlHit.Source, &control)
 						if err == nil {
 							// this is for one node and since this control should only be in this profile once, it's
 							// reasonable to list it with a cardinality of 1
@@ -153,14 +155,14 @@ func getControlLevelControlSums(hit *elastic.SearchHit) (nodeControlSummary repo
 								nodeControlSummary.Skipped.Total = 1
 							}
 							nodeControlSummary.Total = 1
-							return nodeControlSummary, control.Status, nil
+							status = control.Status
 						}
 					}
 				}
 			}
 		}
 	}
-	return
+	return // nolint:nakedret
 }
 
 func getDeepInspecProfiles(hit *elastic.SearchHit,
@@ -171,20 +173,15 @@ func getDeepInspecProfiles(hit *elastic.SearchHit,
 				for _, profileHit := range innerHit.Hits.Hits {
 					var profile ESInSpecReportProfile
 					if profileHit.Source != nil {
-						err := json.Unmarshal(*profileHit.Source, &profile)
+						err = json.Unmarshal(*profileHit.Source, &profile)
 						if err == nil {
 							if queryInfo.level == ControlLevel {
-								controls, status, err := getControlLevelControls(profileHit)
-								if err != nil {
-									return profiles, status, err
-								}
-								profile.Controls = controls
+								profile.Controls, status, err = getControlLevelControls(profileHit)
 								profile.Status = status
 								profiles = append(profiles, profile)
-								return profiles, status, err
 							} else {
 								profiles = append(profiles, profile)
-								return profiles, profile.Status, nil
+								status = profile.Status
 							}
 						}
 					}
@@ -192,7 +189,7 @@ func getDeepInspecProfiles(hit *elastic.SearchHit,
 			}
 		}
 	}
-	return profiles, status, nil
+	return
 }
 
 func getControlLevelControls(hit *elastic.SearchHit) (controls []ESInSpecReportControl, status string, err error) {
@@ -203,7 +200,7 @@ func getControlLevelControls(hit *elastic.SearchHit) (controls []ESInSpecReportC
 				for _, controlHit := range innerHit.Hits.Hits {
 					var control ESInSpecReportControl
 					if controlHit.Source != nil {
-						err := json.Unmarshal(*controlHit.Source, &control)
+						err = json.Unmarshal(*controlHit.Source, &control)
 						if err == nil {
 							status = control.Status
 							controls = append(controls, control)
@@ -213,5 +210,5 @@ func getControlLevelControls(hit *elastic.SearchHit) (controls []ESInSpecReportC
 			}
 		}
 	}
-	return controls, status, err
+	return
 }

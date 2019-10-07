@@ -2,7 +2,8 @@ import { of as observableOf,  Observable } from 'rxjs';
 
 import { map, filter } from 'rxjs/operators';
 import { Component, OnInit } from '@angular/core';
-import { MatDialog, MatSnackBar } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { Rule, ServiceActionType } from './rule';
 import { SortDirection } from '../../types/types';

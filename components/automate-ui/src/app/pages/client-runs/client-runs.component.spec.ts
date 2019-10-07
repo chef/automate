@@ -1,16 +1,17 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TestBed, fakeAsync } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
-import { ClientRunsComponent } from './client-runs.component';
-import { StoreModule } from '@ngrx/store';
+import { runtimeChecks } from 'app/ngrx.reducers';
 import * as sidebar from '../../services/sidebar/sidebar.reducer';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { Router } from '@angular/router';
 import { UpdateNodeFilters } from '../../entities/client-runs/client-runs.actions';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import { EntityStatus } from '../../entities/entities';
+import { ClientRunsComponent } from './client-runs.component';
 
 class MockTelemetryService {
   track() { }
@@ -22,6 +23,7 @@ import {
 describe('ClientRunsComponent', () => {
   let fixture, component;
   let router: Router;
+  let route: ActivatedRoute;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -44,7 +46,7 @@ describe('ClientRunsComponent', () => {
         HttpClientTestingModule,
         StoreModule.forRoot({
           sidebar: sidebar.sidebarReducer
-        })
+        }, { runtimeChecks })
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });
@@ -52,6 +54,7 @@ describe('ClientRunsComponent', () => {
     fixture = TestBed.createComponent(ClientRunsComponent);
     component = fixture.componentInstance;
     router = TestBed.get(Router);
+    route = TestBed.get(ActivatedRoute);
   });
 
   describe('sets categoryTypes', () => {
@@ -145,134 +148,114 @@ describe('ClientRunsComponent', () => {
   });
 
   describe('statusFilter', () => {
+    beforeEach(() => spyOn(router, 'navigate'));
+
     it('when set to an allowed value', () => {
-      spyOn(component.router, 'navigate');
+      route.snapshot.queryParams = {};
+
       component.statusFilter('success');
-      expect(component.router.navigate).toHaveBeenCalledWith(
-        [], {queryParams: { status: ['success'] }});
+
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: { status: ['success'] }});
     });
 
     it('when set a not allowed value, the URL is not changed', () => {
-      spyOn(component.router, 'navigate');
+      route.snapshot.queryParams = {};
+
       component.statusFilter('not-allowed');
-      expect(component.router.navigate).toHaveBeenCalledWith(
-        [], {queryParams: { }});
+
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: {}});
     });
 
     it('when set to total', () => {
-      spyOn(component.router, 'navigate');
+      route.snapshot.queryParams = {};
+
       component.statusFilter('total');
-      expect(component.router.navigate).toHaveBeenCalledWith(
-        [], {queryParams: { }});
+
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: {}});
     });
 
-    it('when a page is selected and the status is changed ' +
-    'the selected page is removed', fakeAsync(() => {
-      router.navigate([''], {queryParams: { page: [2], status: ['success'] }});
-
-      tick();
+    it('when a page is selected and the status is changed the selected page is removed', () => {
+      route.snapshot.queryParams = { page: [2], status: ['success'] };
 
       component.statusFilter('total');
 
-      tick();
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: {}});
+    });
 
-      expect('/').toEqual(router.routerState.snapshot.url);
-    }));
-
-    it('when selection a different status the existing one should be replaced', fakeAsync(() => {
-      router.navigate([''], {queryParams: { status: ['success'] }});
-
-      tick();
+    it('when selection a different status the existing one should be replaced', () => {
+      route.snapshot.queryParams = { status: ['success'] };
 
       component.statusFilter('failure');
 
-      tick();
-
-      expect('/?status=failure').toEqual(router.routerState.snapshot.url);
-    }));
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: { status: ['failure'] }});
+    });
   });
 
   describe('onUpdateSort', () => {
-    it('when name is selected with ASC', fakeAsync(() => {
-      router.navigate([''], {queryParams: { }});
+    beforeEach(() => spyOn(router, 'navigate'));
 
-      tick();
+    it('when name is selected with ASC', () => {
+      route.snapshot.queryParams = {};
 
       component.onUpdateSort({field: 'name', fieldDirection: 'ASC'});
 
-      tick();
+      expect(router.navigate).toHaveBeenCalledWith(
+        [], { queryParams: { sortField: ['name'], sortDirection: ['ASC'] }});
+    });
 
-      expect('/?sortField=name&sortDirection=ASC').toEqual(router.routerState.snapshot.url);
-    }));
-
-    it('when sort is selected an incorrect type, the sort is not changed', fakeAsync(() => {
-      router.navigate([''], {queryParams: { }});
-
-      tick();
+    it('when sort is selected an incorrect type, the sort is not changed', () => {
+      route.snapshot.queryParams = {};
 
       component.onUpdateSort({field: 'wrong', fieldDirection: 'ASC'});
 
-      tick();
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
 
-      expect('/').toEqual(router.routerState.snapshot.url);
-    }));
-
-    it('when a page is selected and the sort is changed ' +
-    'the selected page is removed', fakeAsync(() => {
-      router.navigate([''], {queryParams: { page: [2] }});
-
-      tick();
+    it('when a page is selected and the sort is changed the selected page is removed', () => {
+      route.snapshot.queryParams = { page: [2] };
 
       component.onUpdateSort({field: 'name', fieldDirection: 'ASC'});
 
-      tick();
+      expect(router.navigate).toHaveBeenCalledWith(
+        [], { queryParams: { sortField: ['name'], sortDirection: ['ASC'] }});
+    });
 
-      expect('/?sortField=name&sortDirection=ASC').toEqual(router.routerState.snapshot.url);
-    }));
-
-    it('when sort is selected an incorrect sort direction, ' +
-      'the sort is not change', fakeAsync(() => {
-      router.navigate([''], {queryParams: { }});
-
-      tick();
+    it('when sort is selected an incorrect sort direction, the sort is not changed', () => {
+      route.snapshot.queryParams = {};
 
       component.onUpdateSort({field: 'name', fieldDirection: 'wrong'});
 
-      tick();
-
-      expect('/').toEqual(router.routerState.snapshot.url);
-    }));
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
   });
 
   describe('onFiltersClear', () => {
-    it('when page is selected remove page selection', fakeAsync(() => {
-      router.navigate([''], {queryParams: { page: [2], name: ['chef-*'] }});
+    beforeEach(() => spyOn(router, 'navigate'));
 
-      tick();
-
-      component.onFiltersClear({});
-
-      tick();
-
-      expect('/').toEqual(router.routerState.snapshot.url);
-    }));
-
-    it('do not remove status or sort selections', fakeAsync(() => {
-      router.navigate([''], {queryParams: { status: ['success'], sortField: ['name'],
-        sortDirection: ['ASC'], name: ['chef-*'] }});
-
-      tick();
+    it('when page is selected remove page selection', () => {
+      route.snapshot.queryParams = { page: [2], name: ['chef-*'] };
 
       component.onFiltersClear({});
 
-      tick();
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: {}});
+    });
 
-      expect('/?status=success&sortField=name&sortDirection=ASC').
-        toEqual(router.routerState.snapshot.url);
-    }));
+    it('do not remove status or sort selections', () => {
+      route.snapshot.queryParams = {
+        status: ['success'],
+        sortField: ['name'],
+        sortDirection: ['ASC'],
+        name: ['chef-*']
+      };
 
-    it('all search bar filters are removed', fakeAsync(() => {
-      router.navigate([''], {queryParams: {
+      component.onFiltersClear({});
+
+      expect(router.navigate).toHaveBeenCalledWith(
+        [], { queryParams: { status: ['success'], sortField: ['name'], sortDirection: ['ASC'] }});
+    });
+
+    it('all search bar filters are removed', () => {
+      route.snapshot.queryParams = {
         attribute: ['attribute'],
         cookbook: ['apple_pie'],
         environment: ['environment'],
@@ -283,226 +266,196 @@ describe('ClientRunsComponent', () => {
         policy_revision: ['policy_revision'],
         recipe: ['recipe'],
         resource_name: ['resource_name'],
-        role: ['role']}});
-
-      tick();
+        role: ['role']
+      };
 
       component.onFiltersClear({});
 
-      tick();
-
-      expect('/').toEqual(router.routerState.snapshot.url);
-    }));
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: {}});
+    });
   });
 
   describe('onPageChange', () => {
-    it('when the first page is selected remove page from URL', fakeAsync(() => {
-      router.navigate([''], {queryParams: { }});
+    beforeEach(() => spyOn(router, 'navigate'));
 
-      tick();
+    it('when the first page is selected remove page from URL', () => {
+      route.snapshot.queryParams = {};
 
       component.onPageChange(1);
 
-      tick();
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: {}});
+    });
 
-      expect('/').toEqual(router.routerState.snapshot.url);
-    }));
-
-    it('when a page is selected', fakeAsync(() => {
-      router.navigate([''], {queryParams: { }});
-
-      tick();
+    it('when a page is selected', () => {
+      route.snapshot.queryParams = {};
 
       component.onPageChange(2);
 
-      tick();
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: { page: [2] }});
+    });
 
-      expect('/?page=2').toEqual(router.routerState.snapshot.url);
-    }));
-
-    it('when a page is a negative number do not change the URL', fakeAsync(() => {
-      router.navigate([''], {queryParams: { }});
-
-      tick();
+    it('when a page is a negative number do not change the URL', () => {
+      route.snapshot.queryParams = {};
 
       component.onPageChange(-2);
 
-      tick();
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
 
-      expect('/').toEqual(router.routerState.snapshot.url);
-    }));
-
-    it('when a page is 0 number do not change the URL', fakeAsync(() => {
-      router.navigate([''], {queryParams: { }});
-
-      tick();
+    it('when a page is 0 number do not change the URL', () => {
+      route.snapshot.queryParams = {};
 
       component.onPageChange(0);
 
-      tick();
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
 
-      expect('/').toEqual(router.routerState.snapshot.url);
-    }));
-
-    it('when a page changes do not remove existing URL parameters', fakeAsync(() => {
-      router.navigate([''], {queryParams: { attribute: ['attribute'], cookbook: ['apple_pie'],
-        environment: ['environment'], name: ['name']}});
-
-      tick();
+    it('when a page changes do not remove existing URL parameters', () => {
+      route.snapshot.queryParams = {
+        attribute: ['attribute'],
+        cookbook: ['apple_pie'],
+        environment: ['environment'],
+        name: ['name']
+      };
 
       component.onPageChange(2);
 
-      tick();
-
-      expect('/?attribute=attribute&cookbook=apple_pie&environment=environment&name=name&page=2').
-        toEqual(router.routerState.snapshot.url);
-    }));
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: {
+        attribute: ['attribute'],
+        cookbook: ['apple_pie'],
+        environment: ['environment'],
+        name: ['name'],
+        page: [2]
+      }});
+    });
   });
 
   describe('onFilterRemoved', () => {
-    it('removing only one search filter', fakeAsync(() => {
-      router.navigate([''], {queryParams: {
+    beforeEach(() => spyOn(router, 'navigate'));
+
+    it('removing only one search filter', () => {
+      route.snapshot.queryParams = {
         attribute: ['attribute'],
         cookbook: ['apple_pie'],
         environment: ['environment'],
-        name: ['name']}});
-
-      tick();
+        name: ['name']
+      };
 
       component.onFilterRemoved({detail: {type: 'name', text: 'name'}});
 
-      tick();
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: {
+        attribute: ['attribute'],
+        cookbook: ['apple_pie'],
+        environment: ['environment']
+      }});
+    });
 
-      expect('/?attribute=attribute&cookbook=apple_pie&environment=environment')
-        .toEqual(router.routerState.snapshot.url);
-    }));
-
-    it('removing one filter when there are multiple filters of the same type', fakeAsync(() => {
-      router.navigate([''], {queryParams: {
+    it('removing one filter when there are multiple filters of the same type', () => {
+      route.snapshot.queryParams = {
         attribute: ['attribute'],
         cookbook: ['apple_pie'],
         environment: ['environment'],
-        name: ['name', 'chef-*']}});
-
-      tick();
+        name: ['name', 'chef-*']
+      };
 
       component.onFilterRemoved({detail: {type: 'name', text: 'name'}});
 
-      tick();
-
-      expect('/?attribute=attribute&cookbook=apple_pie&environment=environment&name=chef-*')
-        .toEqual(router.routerState.snapshot.url);
-    }));
-
-    it('removing a filter where the value is not there,' +
-      ' should not change the URL', fakeAsync(() => {
-      router.navigate([''], {queryParams: {
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: {
         attribute: ['attribute'],
         cookbook: ['apple_pie'],
         environment: ['environment'],
-        name: ['name']}});
+        name: ['chef-*']
+      }});
+    });
 
-      tick();
-
-      component.onFilterRemoved({detail: {type: 'name', text: 'bob'}});
-
-      tick();
-
-      expect('/?attribute=attribute&cookbook=apple_pie&environment=environment&name=name')
-        .toEqual(router.routerState.snapshot.url);
-    }));
-
-    it('removing a filter where the type is not there,' +
-    ' should not change the URL', fakeAsync(() => {
-      router.navigate([''], {queryParams: {
+    it('removing a filter where the value is not there, should not change the URL', () => {
+      route.snapshot.queryParams = {
         attribute: ['attribute'],
         cookbook: ['apple_pie'],
-        environment: ['environment']}});
-
-      tick();
+        environment: ['environment'],
+        name: ['name']
+      };
 
       component.onFilterRemoved({detail: {type: 'name', text: 'bob'}});
 
-      tick();
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: {
+        attribute: ['attribute'],
+        cookbook: ['apple_pie'],
+        environment: ['environment'],
+        name: ['name']
+      }});
+    });
 
-      expect('/?attribute=attribute&cookbook=apple_pie&environment=environment')
-        .toEqual(router.routerState.snapshot.url);
-    }));
+    it('removing a filter where the type is not there, should not change the URL', () => {
+      route.snapshot.queryParams = {
+        attribute: ['attribute'],
+        cookbook: ['apple_pie'],
+        environment: ['environment']
+      };
+
+      component.onFilterRemoved({detail: {type: 'name', text: 'bob'}});
+
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: {
+        attribute: ['attribute'],
+        cookbook: ['apple_pie'],
+        environment: ['environment']
+      }});
+    });
   });
 
   describe('onFilterAdded', () => {
-    it('when adding a filter', fakeAsync(() => {
-      router.navigate([''], {queryParams: {}});
+    beforeEach(() => spyOn(router, 'navigate'));
 
-      tick();
+    it('when adding a filter', () => {
+      route.snapshot.queryParams = {};
 
       component.onFilterAdded({detail: {type: 'name', text: 'name'}});
 
-      tick();
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: { name: ['name'] }});
+    });
 
-      expect('/?name=name').toEqual(router.routerState.snapshot.url);
-    }));
-
-    it('when adding a filter to a type that already has a filter', fakeAsync(() => {
-      router.navigate([''], {queryParams: {name: ['name']}});
-
-      tick();
+    it('when adding a filter to a type that already has a filter', () => {
+      route.snapshot.queryParams = { name: ['name'] };
 
       component.onFilterAdded({detail: {type: 'name', text: 'tim'}});
 
-      tick();
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: { name: ['name', 'tim'] }});
+    });
 
-      expect('/?name=name&name=tim').toEqual(router.routerState.snapshot.url);
-    }));
-
-    it('when adding a filter when there is already a different filter type', fakeAsync(() => {
-      router.navigate([''], {queryParams: {name: ['name']}});
-
-      tick();
+    it('when adding a filter when there is already a different filter type', () => {
+      route.snapshot.queryParams = { name: ['name'] };
 
       component.onFilterAdded({detail: {type: 'cookbook', text: 'apple_pie'}});
 
-      tick();
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: {
+        name: ['name'],
+        cookbook: ['apple_pie']
+      }});
+    });
 
-      expect('/?name=name&cookbook=apple_pie').toEqual(router.routerState.snapshot.url);
-    }));
-
-    it('when adding an incorrect type filter, the URL should not change', fakeAsync(() => {
-      router.navigate([''], {queryParams: {name: ['name']}});
-
-      tick();
+    it('when adding an incorrect type filter, the URL should not change', () => {
+      route.snapshot.queryParams = { name: ['name'] };
 
       component.onFilterAdded({detail: {type: 'wrong', text: 'apple_pie'}});
 
-      tick();
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
 
-      expect('/?name=name').toEqual(router.routerState.snapshot.url);
-    }));
-
-    it('when filter is updated the selected page is removed', fakeAsync(() => {
-      router.navigate([''], {queryParams: {page: [2]}});
-
-      tick();
+    it('when filter is updated the selected page is removed', () => {
+      route.snapshot.queryParams = { page: [2] };
 
       component.onFilterAdded({detail: {type: 'name', text: 'tim'}});
 
-      tick();
+      expect(router.navigate).toHaveBeenCalledWith([], { queryParams: { name: ['tim'] }});
+    });
 
-      expect('/?name=tim').toEqual(router.routerState.snapshot.url);
-    }));
-
-    it('when a incorrect filter type is updated,' +
-      ' the URL should not change', fakeAsync(() => {
-      router.navigate([''], {queryParams: {page: [2]}});
-
-      tick();
+    it('when a incorrect filter type is updated, the URL should not change', () => {
+      route.snapshot.queryParams = { page: [2] };
 
       component.onFilterAdded({detail: {type: 'wrong', text: 'tim'}});
 
-      tick();
-
-      expect('/?page=2').toEqual(router.routerState.snapshot.url);
-    }));
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
   });
 
   describe('updateNodeFilters', () => {

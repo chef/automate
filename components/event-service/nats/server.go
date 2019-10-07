@@ -10,7 +10,7 @@ import (
 
 	natsd "github.com/nats-io/gnatsd/server"
 	"github.com/nats-io/go-nats"
-	streamd "github.com/nats-io/nats-streaming-server/server"
+	streamd "github.com/nats-io/nats-streaming-server/server" // nolint: misspell
 	stores "github.com/nats-io/nats-streaming-server/stores"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"

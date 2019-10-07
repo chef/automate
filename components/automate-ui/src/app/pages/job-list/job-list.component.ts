@@ -39,7 +39,7 @@ export class JobListComponent {
         params = pipe(
           set('order', toUpper(this.orderBy)),
           set('sort', this.sortBy)
-        )(params);
+        )(params) as object;
       }
 
       this.store.dispatch(new GetJobs(params));

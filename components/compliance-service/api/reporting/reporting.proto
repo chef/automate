@@ -108,6 +108,7 @@ message Profile {
 	string summary = 7;
 	string version = 8;
 	string owner = 9;
+	string full = 10;
 	repeated Support supports = 16;
 	repeated Dependency depends = 17;
 	string sha256 = 18;
@@ -175,6 +176,10 @@ message Control {
 	repeated Result results = 7;
 	repeated Ref refs = 8;
 	map<string, string> tags = 9;
+	map<string, TagValues> string_tags = 10;
+}
+message TagValues {
+	repeated string values = 1;
 }
 message Attribute {
 	string name = 1;
@@ -183,6 +188,7 @@ message Attribute {
 message Platform {
 	string name = 1;
 	string release = 2;
+	string full = 3;
 }
 message Statistics {
 	float duration = 1;
@@ -250,4 +256,5 @@ message ProfileMeta {
 	string version = 2;
 	string id = 3;
 	string status = 4;
+	string full = 5;
 }

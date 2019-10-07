@@ -73,57 +73,78 @@ func newSendTestCmd() *cobra.Command {
 			defer internalNATS.Close()
 
 			// subscribe on internal side
-			internalNATS.Subscribe("event-service-self-test-int", func(m *natsc.Msg) {
+			_, err = internalNATS.Subscribe("event-service-self-test-int", func(m *natsc.Msg) {
 				log.Infof("Received a message via internal NATS [event-service-self-test-1]: %s\n", string(m.Data))
 			})
+			if err != nil {
+				return errors.Wrap(err, "error subscribing")
+			}
 
 			// subscribe on external side
-			externalNATS.Subscribe("event-service-self-test-ext", func(m *natsc.Msg) {
+			_, err = externalNATS.Subscribe("event-service-self-test-ext", func(m *natsc.Msg) {
 				log.Infof("Received a message via external NATS [event-service-self-test-2]: %s\n", string(m.Data))
 			})
+			if err != nil {
+				return errors.Wrap(err, "error subscribing")
+			}
 
 			// publish from internal to internal
 			message := fmt.Sprintf("internal to internal at %s", time.Now())
 			log.Infof("sending message %q", message)
-			internalNATS.Publish("event-service-self-test-int", []byte(message)) // does not return until an ack has been received from NATS Streaming
+			err = internalNATS.Publish("event-service-self-test-int", []byte(message)) // does not return until an ack has been received from NATS Streaming
+			if err != nil {
+				return errors.Wrap(err, "error publishing to NATS")
+			}
 
 			// publish from external to external
 			message = fmt.Sprintf("external to external at %s", time.Now())
 			log.Infof("sending message %q", message)
-			externalNATS.Publish("event-service-self-test-ext", []byte(message)) // does not return until an ack has been received from NATS Streaming
+			err = externalNATS.Publish("event-service-self-test-ext", []byte(message)) // does not return until an ack has been received from NATS Streaming
+			if err != nil {
+				return errors.Wrap(err, "error publishing to NATS")
+			}
 
 			// publish from external to internal
 			message = fmt.Sprintf("external to internal at %s", time.Now())
 			log.Infof("sending message %q", message)
-			externalNATS.Publish("event-service-self-test-int", []byte(message)) // does not return until an ack has been received from NATS Streaming
+			err = externalNATS.Publish("event-service-self-test-int", []byte(message)) // does not return until an ack has been received from NATS Streaming
+			if err != nil {
+				return errors.Wrap(err, "error publishing to NATS")
+			}
 
 			// publish from internal to external
 			message = fmt.Sprintf("internal to external at %s", time.Now())
 			log.Infof("sending message %q", message)
-			internalNATS.Publish("event-service-self-test-ext", []byte(message)) // does not return until an ack has been received from NATS Streaming
+			err = internalNATS.Publish("event-service-self-test-ext", []byte(message)) // does not return until an ack has been received from NATS Streaming
+			if err != nil {
+				return errors.Wrap(err, "error publishing to NATS")
+			}
 
 			ncExternal, err := streamc.Connect(clusterID, "cli-test-external-pub", streamc.NatsConn(externalNATS))
 			if err != nil {
 				return errors.Wrap(err, "connecting to NATS Streaming server")
 			}
-			defer ncExternal.Close()
+			defer ncExternal.Close() // nolint: errcheck
 
 			ncInternal, err := streamc.Connect(clusterID, "cli-test-internal-sub", streamc.NatsConn(internalNATS))
 			if err != nil {
 				return errors.Wrap(err, "connecting to NATS Streaming server")
 			}
-			defer ncInternal.Close()
+			defer ncInternal.Close() // nolint: errcheck
 
 			// Subscriber on internal side
 			sub, _ := ncInternal.Subscribe("event-service-self-test-streaming", func(m *streamc.Msg) {
 				log.Infof("Received a message [event-service-self-test]: %s\n", string(m.Data))
 			})
-			defer sub.Unsubscribe()
+			defer sub.Unsubscribe() // nolint: errcheck
 
 			// Publisher on external side
 			message = fmt.Sprintf("NATS streaming self test at %s", time.Now())
 			log.Infof("sending message %q", message)
-			ncExternal.Publish("event-service-self-test-streaming", []byte(message)) // does not return until an ack has been received from NATS Streaming
+			err = ncExternal.Publish("event-service-self-test-streaming", []byte(message)) // does not return until an ack has been received from NATS Streaming
+			if err != nil {
+				return errors.Wrap(err, "error publishing to NATS")
+			}
 
 			time.Sleep(1 * time.Second) // wait for the messages to come in
 

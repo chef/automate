@@ -1,13 +1,15 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "downlevelIteration": true,
+    "importHelpers": true,
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es5",
+    "target": "es2015",
     "typeRoots": [
       "node_modules/@types"
     ],
@@ -17,7 +19,7 @@
     ],
     "baseUrl": "./src",
     "allowJs": true,
-    "module": "es2015",
+    "module": "esnext",
     "noUnusedLocals": true,
     "noUnusedParameters": true
   }

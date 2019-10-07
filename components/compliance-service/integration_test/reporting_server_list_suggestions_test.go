@@ -433,6 +433,250 @@ func TestReportingListSuggestionsFiltering(t *testing.T) {
 			},
 			expectedTerms: []string{},
 		},
+
+		// platform
+		{
+			description: "Only two platform names are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID: "1",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Name: "org1",
+					},
+				},
+				{
+					NodeID: "2",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Name: "org2",
+					},
+				},
+				{
+					NodeID: "3",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Name: "bob",
+					},
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "platform",
+				Text: "or",
+			},
+			expectedTerms: []string{"org1", "org2"},
+		},
+		{
+			description: "All platform names are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID: "1",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Name: "org1",
+					},
+				},
+				{
+					NodeID: "2",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Name: "org2",
+					},
+				},
+				{
+					NodeID: "3",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Name: "org3",
+					},
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "platform",
+				Text: "",
+			},
+			expectedTerms: []string{"org1", "org2", "org3"},
+		},
+		{
+			description: "No pratform names are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID: "1",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Name: "org1",
+					},
+				},
+				{
+					NodeID: "2",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Name: "org2",
+					},
+				},
+				{
+					NodeID: "3",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Name: "org3",
+					},
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "platform",
+				Text: "bob",
+			},
+			expectedTerms: []string{},
+		},
+
+		// platform_with_version
+		{
+			description: "Only two platform_with_version names are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID: "1",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "org1",
+					},
+				},
+				{
+					NodeID: "2",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "org2",
+					},
+				},
+				{
+					NodeID: "3",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "bob",
+					},
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "platform_with_version",
+				Text: "or",
+			},
+			expectedTerms: []string{"org1", "org2"},
+		},
+		{
+			description: "All platform_with_version names are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID: "1",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "org1",
+					},
+				},
+				{
+					NodeID: "2",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "org2",
+					},
+				},
+				{
+					NodeID: "3",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "org3",
+					},
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "platform_with_version",
+				Text: "",
+			},
+			expectedTerms: []string{"org1", "org2", "org3"},
+		},
+		{
+			description: "No platform_with_version names are returned",
+			summaries: []*relaxting.ESInSpecSummary{
+				{
+					NodeID: "1",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "org1",
+					},
+				},
+				{
+					NodeID: "2",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "org2",
+					},
+				},
+				{
+					NodeID: "3",
+					Platform: struct {
+						Name    string `json:"name"`
+						Release string `json:"release"`
+						Full    string `json:"full"`
+					}{
+						Full: "org3",
+					},
+				},
+			},
+			request: reporting.SuggestionRequest{
+				Type: "platform",
+				Text: "bob",
+			},
+			expectedTerms: []string{},
+		},
 	}
 
 	for _, test := range cases {

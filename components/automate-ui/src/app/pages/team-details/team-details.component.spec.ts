@@ -6,7 +6,7 @@ import { routerReducer } from '@ngrx/router-store';
 import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store } from '@ngrx/store';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import { using } from 'app/testing/spec-helpers';
 import {
   projectsFilterReducer,
@@ -109,7 +109,7 @@ describe('TeamDetailsComponent', () => {
           policies: policyEntityReducer,
           projects: projectEntityReducer,
           projectsFilter: projectsFilterReducer
-        }, { initialState })
+        }, { initialState, runtimeChecks })
       ]
     }).compileComponents();
   }));

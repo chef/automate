@@ -77,7 +77,7 @@
       <chef-td>
         <chef-button secondary caution
           *ngIf="node.status === 'unreachable'"
-          (click)="onNodeResultsShow($event, node.id)">
+          (click)="onNodeResultsShow(node.id)">
           Error
         </chef-button>
         <chef-button label="edit" secondary
@@ -107,7 +107,7 @@
     <chef-icon class="header-icon">equalizer</chef-icon>
     <div class="header-text">
       <h4><strong>Connectivity error for node:</strong></h4>
-      <p>{{ (nodeDetail$ | async)?.id }}</p>
+      <p>{{ failedNode?.id }}</p>
     </div>
     <chef-button secondary (click)="onNodeResultsHide($event)">
       <chef-icon>close</chef-icon>
@@ -115,10 +115,10 @@
   </div>
   <div class="side-panel-body">
     <div class="side-panel-body-header">
-      <p>Status: {{ (nodeDetail$ | async)?.status }}</p>
+      <p>Status: {{ failedNode?.status }}</p>
     </div>
     <div class="side-panel-body-detail">
-      <pre>{{ (nodeDetail$ | async)?.last_job?.result || (nodeDetail$ | async)?.connection_error }}</pre>
+      <pre>{{ failedNode?.last_job?.result || failedNode?.connection_error }}</pre>
     </div>
   </div>
 </chef-side-panel>

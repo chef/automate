@@ -40,7 +40,7 @@ export class SearchBarComponent implements OnChanges {
   @Output() itemSelected: EventEmitter<any> = new EventEmitter<any>();
   @Output() filtersButtonClick: EventEmitter<any> = new EventEmitter<any>();
 
-  @ViewChild('search_box') inputField: ElementRef;
+  @ViewChild('search_box', { static: true }) inputField: ElementRef;
 
   constructor(private renderer: Renderer2) {
     // This is needed because focus is lost when clicking items.

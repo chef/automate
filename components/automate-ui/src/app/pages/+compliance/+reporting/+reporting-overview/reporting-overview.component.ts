@@ -118,7 +118,7 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
 
   onPlatformChanged(platformItem) {
     if (platformItem && platformItem.name) {
-      this.updateUrlWithFilter(platformItem.name, 'platform');
+      this.updateUrlWithFilter(platformItem.name + '*', 'platform_with_version');
     }
   }
 

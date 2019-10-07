@@ -15,9 +15,9 @@ import { environment } from '../environments/environment';
 // ngrx/store
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { StoreModule } from '@ngrx/store';
-import { StoreRouterConnectingModule, RouterStateSerializer } from '@ngrx/router-store';
+import { StoreRouterConnectingModule } from '@ngrx/router-store';
 import { NgrxEffectsModule } from './ngrx.effects';
-import { ngrxReducers, RouterSerializer } from './ngrx.reducers';
+import { ngrxReducers, RouterSerializer, runtimeChecks } from './ngrx.reducers';
 
 // angular material stuff
 import {
@@ -290,8 +290,10 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ProjectModule,
     ReactiveFormsModule,
     RoleModule,
-    StoreModule.forRoot(ngrxReducers),
-    StoreRouterConnectingModule,
+    StoreModule.forRoot(ngrxReducers, { runtimeChecks }),
+    StoreRouterConnectingModule.forRoot({
+      serializer: RouterSerializer
+    }),
     !environment.production ? StoreDevtoolsModule.instrument({ maxAge: 25 }) : []
   ],
   providers: [
@@ -327,7 +329,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ProjectsFilterService,
     RoleRequests,
     RuleRequests,
-    { provide: RouterStateSerializer, useClass: RouterSerializer },
     RulesService,
     RunHistoryStore,
     ServiceGroupsRequests,

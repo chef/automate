@@ -3,7 +3,7 @@ import { StoreModule, Store } from '@ngrx/store';
 import { concat } from 'lodash/fp';
 import * as faker from 'faker';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import { using } from 'app/testing/spec-helpers';
 import { CheckObj, AuthorizedChecker } from 'app/helpers/auth/authorized';
 import { IndexedEntities } from 'app/entities/entities';
@@ -21,7 +21,7 @@ describe('AuthorizedComponent setPermissions', () => {
       imports: [
         StoreModule.forRoot({
           userperms: () => ({})
-        })
+        }, { runtimeChecks })
       ]
     }).compileComponents();
     const store: Store<NgrxStateAtom> = TestBed.get(Store);
@@ -251,7 +251,7 @@ describe('AuthorizedComponent real round trip', () => {
             }
           })
 
-        })
+        }, { runtimeChecks })
       ]
     })
     .compileComponents();
@@ -290,7 +290,7 @@ describe('AuthorizedComponent evalPerms', () => {
       imports: [
         StoreModule.forRoot({
           userperms: () => ({})
-        })
+        }, { runtimeChecks })
       ]
     }).compileComponents();
     const store: Store<NgrxStateAtom> = TestBed.get(Store);

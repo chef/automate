@@ -10,6 +10,7 @@ With the plugin installed, this TOC will update automatically when you save the 
 <!-- TOC depthFrom:2 depthTo:2 -->
 
 - [Requirements](#requirements)
+- [Dependency Management](#dependency-management)
 - [Angular Module Architecture](#angular-module-architecture)
 - [Developing against the Hab Studio](#developing-against-the-hab-studio)
 - [Project History](#project-history)
@@ -47,6 +48,46 @@ Having a Github token in `.netrc` allows some command line utilities (including
 git) to access private repositories in a secure way that is more granularly
 revokable than using ssh or a password. [Read more about
 accessing git and Github with tokens in this post from the Github blog..](https://github.com/blog/1270-easier-builds-and-deployments-using-git-over-https-and-oauth)
+
+## Dependency Management
+
+Certain packages in package.json are constrained for the reasons detailed here.
+At any future moment though, the reasons for constraint here could be invalidated, so this should be updated as needed when package.json is updated.
+While it is problematic to document this information due to the maintenance burden, the value of having this in one place outweighs that burden.
+
+**Package @types/jasmine: =3.3.10**
+
+Reason: `make unit` generates this error:
+```
+error TS6200: Definitions of the following identifiers conflict with those in another file: ImplementationCallback, Expected, SpyObjMethodNames, CustomEqualityTester, CustomMatcherFactory, ExpectationFailed, SpecFunction, SpyObj, jasmine
+```
+Reference: https://stackoverflow.com/a/57592510
+
+**Package @types/jasminewd2: =2.0.6**
+
+Reason:  `make serve` generates this error:
+```
+ERROR in ../node_modules/@types/jasminewd2/index.d.ts:8:23 - error TS2688: Cannot find type definition file for 'jasmine/v2'.
+```
+
+**Package @types/node: ^10.14.19**
+
+Reason: The major version should match our node version, which is 10.15.2 (this is a guess on my part, could neither confirm nor deny it), so I have constrained it to 10.14.* as shown.
+
+**Package immutable: ^3.8.2**
+
+Reason: Later releases are release candidates; should only be using production-releases.
+
+**Package typescript: ~3.5.3**
+
+Reason: `make serve` reported error that it needs angular < 3.6 so locking it at 3.5.* until a later Angular release.
+
+**Package zone.js: ~0.9.1**
+
+Reason: Trying to install the next version `npm install zone.js@0.10.2` reports that @angular/core requires it:
+```
+@angular/core@8.2.8 requires a peer of zone.js@~0.9.1
+```
 
 ## Angular Module Architecture
 

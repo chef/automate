@@ -402,6 +402,7 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 					reportProfile.SkipMessage = esInSpecProfile.SkipMessage
 					reportProfile.Status = esInSpecReportProfileMin.Status
 					reportProfile.SkipMessage = esInSpecReportProfileMin.SkipMessage
+					reportProfile.Full = esInSpecReportProfileMin.Full
 
 					dependsHash := make(map[string]*ESInSpecReportDepends, len(esInSpecReportProfileMin.Depends))
 					for _, esInSpecProfileDependency := range esInSpecReportProfileMin.Depends {
@@ -429,49 +430,19 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 					convertedControls := make([]*reportingapi.Control, 0)
 					// Enrich min report controls with profile metadata
 					for _, reportControlMin := range esInSpecReportProfileMin.Controls {
-						profileControl := profileControlsMap[reportControlMin.ID]
-
-						if profileControl != nil {
-							profileControl.Results = make([]*reportingapi.Result, 0)
-							if reportControlMin.ID == profileControl.Id {
-								minResults := make([]*reportingapi.Result, len(reportControlMin.Results))
-								for i, result := range reportControlMin.Results {
-									minResults[i] = &reportingapi.Result{
-										Status:      result.Status,
-										CodeDesc:    result.CodeDesc,
-										RunTime:     result.RunTime,
-										Message:     result.Message,
-										SkipMessage: result.SkipMessage,
-									}
-								}
-
-								convertedControl := reportingapi.Control{
-									Id:             profileControl.Id,
-									Code:           profileControl.Code,
-									Desc:           profileControl.Desc,
-									Impact:         profileControl.Impact,
-									Title:          profileControl.Title,
-									SourceLocation: profileControl.SourceLocation,
-									Results:        minResults,
-								}
-								var jsonTags map[string]string
-								tags, _ := json.Marshal(profileControl.Tags)
-								json.Unmarshal(tags, &jsonTags) // nolint: errcheck
-								convertedControl.Tags = jsonTags
-								var jsonRefs []*reportingapi.Ref
-								refs, _ := json.Marshal(profileControl.Refs)
-								json.Unmarshal(refs, &jsonRefs) // nolint: errcheck
-								convertedControl.Refs = jsonRefs
-								// store controls to returned report
-								convertedControls = append(convertedControls, &convertedControl)
-							}
+						// store controls to returned report
+						convertedControl := convertControl(profileControlsMap, reportControlMin, filters)
+						if convertedControl != nil {
+							convertedControls = append(convertedControls, convertedControl)
 						}
 					}
 
-					// Sort convertedControls by Id
-					sort.Slice(convertedControls, func(i, j int) bool {
-						return convertedControls[i].Id < convertedControls[j].Id
-					})
+					if len(convertedControls) > 1 {
+						// Sort convertedControls by Id
+						sort.Slice(convertedControls, func(i, j int) bool {
+							return convertedControls[i].Id < convertedControls[j].Id
+						})
+					}
 
 					// TODO: fix this (vj)
 					// Name: control.Attribute
@@ -479,6 +450,7 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 
 					convertedProfile := reportingapi.Profile{
 						Name:           reportProfile.Name,
+						Full:           reportProfile.Full,
 						Title:          reportProfile.Title,
 						Maintainer:     reportProfile.Maintainer,
 						Copyright:      reportProfile.Copyright,
@@ -497,7 +469,6 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 					}
 					profiles = append(profiles, &convertedProfile)
 				}
-
 				ipAddress := ""
 				if esInSpecReport.IPAddress != nil {
 					ipAddress = *esInSpecReport.IPAddress
@@ -521,6 +492,7 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 				report.Platform = &reportingapi.Platform{
 					Name:    esInSpecReport.Platform.Name,
 					Release: esInSpecReport.Platform.Release,
+					Full:    esInSpecReport.Platform.Full,
 				}
 			}
 		}
@@ -528,6 +500,96 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 	}
 
 	return report, errorutils.ProcessNotFound(nil, reportId)
+}
+
+func convertControl(profileControlsMap map[string]*reportingapi.Control, reportControlMin ESInSpecReportControl, filters map[string][]string) *reportingapi.Control {
+	profileControl := profileControlsMap[reportControlMin.ID]
+
+	if profileControl == nil {
+		return nil
+	}
+
+	profileControl.Results = make([]*reportingapi.Result, 0)
+	if reportControlMin.ID != profileControl.Id {
+		return nil
+	}
+
+	minResults := make([]*reportingapi.Result, len(reportControlMin.Results))
+	for i, result := range reportControlMin.Results {
+		minResults[i] = &reportingapi.Result{
+			Status:      result.Status,
+			CodeDesc:    result.CodeDesc,
+			RunTime:     result.RunTime,
+			Message:     result.Message,
+			SkipMessage: result.SkipMessage,
+		}
+	}
+
+	convertedControl := reportingapi.Control{
+		Id:             profileControl.Id,
+		Code:           profileControl.Code,
+		Desc:           profileControl.Desc,
+		Impact:         profileControl.Impact,
+		Title:          profileControl.Title,
+		SourceLocation: profileControl.SourceLocation,
+		Results:        minResults,
+	}
+
+	jsonTags := make(map[string]*reportingapi.TagValues, 0)
+	for _, tag := range reportControlMin.StringTags {
+		if len(tag.Values) == 0 {
+			jsonTags[tag.Key] = &reportingapi.TagValues{Values: []string{"null"}}
+		}
+		vals := make([]string, 0)
+		for _, val := range tag.Values {
+			vals = append(vals, val)
+			jsonTags[tag.Key] = &reportingapi.TagValues{Values: vals}
+		}
+	}
+
+	if !doesControlTagMatchFilter(filters, jsonTags) {
+		return nil
+	}
+
+	convertedControl.StringTags = jsonTags
+	var jsonRefs []*reportingapi.Ref
+	refs, _ := json.Marshal(profileControl.Refs)
+	json.Unmarshal(refs, &jsonRefs) // nolint: errcheck
+	convertedControl.Refs = jsonRefs
+	return &convertedControl
+
+}
+
+func doesControlTagMatchFilter(filters map[string][]string,
+	jsonTags map[string]*reportingapi.TagValues) bool {
+	matchingTagRequired := false
+	for filterKey, filterVals := range filters {
+		if strings.HasPrefix(filterKey, "control_tag") {
+			matchingTagRequired = true
+			trimmed := strings.TrimPrefix(filterKey, "control_tag:")
+			if tagVal, ok := jsonTags[trimmed]; ok {
+				for _, val := range filterVals {
+					if contains(tagVal.Values, val) || val == "null" {
+						return true
+					}
+				}
+			}
+
+		}
+	}
+	if matchingTagRequired {
+		return false
+	}
+	return true
+}
+
+func contains(a []string, x string) bool {
+	for _, n := range a {
+		if strings.HasSuffix(x, n) {
+			return true
+		}
+	}
+	return false
 }
 
 func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[string][]string,
@@ -787,8 +849,8 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 
 	// These are filter types where we use ElasticSearch Term Queries
 	filterTypes := []string{"environment", "organization", "chef_server", "chef_tags",
-		"policy_group", "policy_name", "status", "node_name", "platform", "role", "recipe",
-		"inspec_version", "ipaddress"}
+		"policy_group", "policy_name", "status", "node_name", "platform", "platform_with_version",
+		"role", "recipe", "inspec_version", "ipaddress"}
 
 	for _, filterType := range filterTypes {
 		if len(filters[filterType]) > 0 {
@@ -806,6 +868,11 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 
 	if len(filters["profile_name"]) > 0 {
 		termQuery := backend.newNestedTermQueryFromFilter("profiles.title.lower", "profiles", filters["profile_name"])
+		boolQuery = boolQuery.Must(termQuery)
+	}
+
+	if len(filters["profile_with_version"]) > 0 {
+		termQuery := backend.newNestedTermQueryFromFilter("profiles.full.lower", "profiles", filters["profile_with_version"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
@@ -895,6 +962,8 @@ func (backend ES2Backend) getESFieldName(filterType string) string {
 		ESFieldName = "organization_name.lower"
 	case "platform":
 		ESFieldName = "platform.name.lower"
+	case "platform_with_version":
+		ESFieldName = "platform.full.lower"
 	case "recipe":
 		ESFieldName = "recipes.lower"
 	case "role":

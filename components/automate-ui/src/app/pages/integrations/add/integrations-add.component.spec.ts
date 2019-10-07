@@ -4,6 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
 import { IntegrationsAddComponent } from './integrations-add.component';
+import { runtimeChecks } from 'app/ngrx.reducers';
 import { managerEntityReducer } from '../../../entities/managers/manager.reducer';
 import { integrationsAddReducer } from './integration-add.reducer';
 import { MockComponent } from 'ng2-mock-component';
@@ -20,7 +21,7 @@ describe('IntegrationsAddComponent', () => {
         StoreModule.forRoot({
           managers: managerEntityReducer,
           integrations_add: integrationsAddReducer
-        })
+        }, { runtimeChecks })
       ],
       declarations: [
         MockComponent({ selector: 'app-settings-sidebar' }),

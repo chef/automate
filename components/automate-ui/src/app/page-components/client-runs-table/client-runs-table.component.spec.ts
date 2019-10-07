@@ -11,6 +11,7 @@ import {
   Node
 } from '../../entities/client-runs/client-runs.model';
 import { StoreModule } from '@ngrx/store';
+import { runtimeChecks } from 'app/ngrx.reducers';
 import * as sidebar from '../../services/sidebar/sidebar.reducer';
 import {
   SimpleChanges,
@@ -128,7 +129,7 @@ describe('ClientRunsTable', () => {
           ChefPipesModule,
           StoreModule.forRoot({
             sidebar: sidebar.sidebarReducer
-          })
+          }, { runtimeChecks })
         ],
         declarations: [
           ClientRunsTableComponent,
@@ -230,7 +231,7 @@ describe('ClientRunsTable', () => {
           ChefPipesModule,
           StoreModule.forRoot({
             sidebar: sidebar.sidebarReducer
-          })
+          }, { runtimeChecks })
         ],
         declarations: [
           ClientRunsTableComponent,

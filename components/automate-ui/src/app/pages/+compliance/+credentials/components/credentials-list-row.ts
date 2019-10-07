@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Credential } from '../credentials.state';
 import * as moment from 'moment';
+import { DateTime } from '../../../../helpers/datetime/datetime';
 import { CredentialsLogic } from '../credentials.logic';
 
 @Component({
@@ -21,7 +22,7 @@ export class CredentialsListRowComponent {
   }
 
   getLastModified(lastModifiedDate): string {
-    return moment(lastModifiedDate).format('MMMM Do YYYY');
+    return moment(lastModifiedDate).format(DateTime.RFC2822);
   }
 
   public startCredentialDelete(): void {

@@ -23,6 +23,10 @@ func TestPeriodicDisconnectedServices(t *testing.T) {
 	err := suite.JobScheduler.ResetParams()
 	require.NoError(t, err)
 
+	// Re-enable
+	suite.JobScheduler.EnableDisconnectedServicesJob(ctx)
+	defer suite.JobScheduler.DisableDisconnectedServicesJob(ctx)
+
 	// We can only start the job runners with cereal once so we do it here.
 	runners := server.NewJobRunnerSet(suite.ApplicationsServer)
 	err = runners.Start(suite.JobScheduler.CerealSvc)

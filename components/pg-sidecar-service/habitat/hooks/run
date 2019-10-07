@@ -7,7 +7,5 @@ exec 2>&1
 
 export HOME={{pkg.svc_var_path}}
 
-source {{pkg.svc_path}}/hooks/reconfigure
-
 # Start pg-sidecar-service
 exec pg-sidecar-service serve --config {{pkg.svc_config_path}}/config.toml

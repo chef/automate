@@ -4,11 +4,13 @@ import { Store, StoreModule } from '@ngrx/store';
 import * as moment from 'moment';
 import { MockComponent } from 'ng2-mock-component';
 import { using } from 'app/testing/spec-helpers';
+import { DateTime } from 'app/helpers/datetime/datetime';
 import { HttpStatus } from 'app/types/types';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { EntityStatus } from 'app/entities/entities';
+import { runtimeChecks } from 'app/ngrx.reducers';
 import { ApplyStatus } from 'app/entities/license/license.reducer';
 import { LicenseStatus } from 'app/entities/license/license.model';
 import { LicenseApplyComponent } from './license-apply.component';
@@ -63,8 +65,7 @@ describe('LicenseApplyComponent', () => {
       expect(component.permissionDenied).toBeFalsy();
       expect(component.applyLicenseInternalError).toBeFalsy();
       expect(component.badRequestReason).toBe('');
-      expect(component.expirationDate).toEqual(futureDate
-                                      .format('ddd, DD MMM YYYY HH:mm:ss [UTC]'));
+      expect(component.expirationDate).toEqual(futureDate.format(DateTime.RFC2822));
     });
 
     it('reflects permission denied', () => {
@@ -146,7 +147,7 @@ describe('LicenseApplyComponent', () => {
         ReactiveFormsModule,
         StoreModule.forRoot({
           licenseStatus: reducer
-        })
+        }, { runtimeChecks })
       ],
       declarations: [
         LicenseApplyComponent,

@@ -805,22 +805,21 @@ func (trans *DBTrans) processJobsTagsUpdate(inJob *jobs.Job) error {
 	return nil
 
 }
-func (trans *DBTrans) processJobsProfilesUpdate(inJob *jobs.Job) (err error) {
-	var profileIdsByJobId []string
+func (trans *DBTrans) processJobsProfilesUpdate(inJob *jobs.Job) error {
+	var profileIDsByJobID []string
 
-	_, err = trans.Select(&profileIdsByJobId, selectProfileIdsFromJobsProfilesByJobId, inJob.Id)
+	_, err := trans.Select(&profileIDsByJobID, selectProfileIdsFromJobsProfilesByJobId, inJob.Id)
 	if err != nil {
-		err = errors.Wrap(err, "processJobsProfilesUpdate unable to select profile ids")
-		return
+		return errors.Wrap(err, "processJobsProfilesUpdate unable to select profile ids")
 	}
 
-	profilesToAdd := utils.DiffArray(inJob.Profiles, profileIdsByJobId)
+	profilesToAdd := utils.DiffArray(inJob.Profiles, profileIDsByJobID)
 	jobProfilesToAdd := make([]interface{}, 0)
 	for _, profile := range profilesToAdd {
 		jobProfilesToAdd = append(jobProfilesToAdd, &JobProfile{JobID: inJob.Id, ProfileID: profile})
 	}
 
-	profilesToDelete := utils.DiffArray(profileIdsByJobId, inJob.Profiles)
+	profilesToDelete := utils.DiffArray(profileIDsByJobID, inJob.Profiles)
 	jobProfilesToDelete := make([]*JobProfile, 0)
 	for _, profile := range profilesToDelete {
 		jobProfilesToDelete = append(jobProfilesToDelete, &JobProfile{JobID: inJob.Id, ProfileID: profile})
@@ -828,10 +827,9 @@ func (trans *DBTrans) processJobsProfilesUpdate(inJob *jobs.Job) (err error) {
 
 	if len(profilesToDelete) > 0 {
 		for _, jobProfileToDelete := range jobProfilesToDelete {
-			_, err = trans.Exec(deleteJobProfilesByJobId, inJob.Id, jobProfileToDelete.ProfileID)
+			_, err := trans.Exec(deleteJobProfilesByJobId, inJob.Id, jobProfileToDelete.ProfileID)
 			if err != nil {
-				err = errors.Wrap(err, "processJobsProfilesUpdate unable to delete profiles")
-				return
+				return errors.Wrap(err, "processJobsProfilesUpdate unable to delete profiles")
 			}
 		}
 	}
@@ -841,25 +839,24 @@ func (trans *DBTrans) processJobsProfilesUpdate(inJob *jobs.Job) (err error) {
 		return errors.Wrap(err, "processJobsProfilesUpdate")
 	}
 
-	return
+	return nil
 }
 
-func (trans *DBTrans) processJobsNodesUpdate(inJob *jobs.Job) (err error) {
-	var nodeIdsByJobId []string
+func (trans *DBTrans) processJobsNodesUpdate(inJob *jobs.Job) error {
+	var nodeIDsByJobID []string
 
-	_, err = trans.Select(&nodeIdsByJobId, selectNodeIdsFromJobsNodesByJobId, inJob.Id)
+	_, err := trans.Select(&nodeIDsByJobID, selectNodeIdsFromJobsNodesByJobId, inJob.Id)
 	if err != nil {
-		err = errors.Wrap(err, "processJobsNodesUpdate unable to select nodes for job")
-		return
+		return errors.Wrap(err, "processJobsNodesUpdate unable to select nodes for job")
 	}
 
-	nodesToAdd := utils.DiffArray(inJob.Nodes, nodeIdsByJobId)
+	nodesToAdd := utils.DiffArray(inJob.Nodes, nodeIDsByJobID)
 	jobNodesToAdd := make([]interface{}, 0)
 	for _, node := range nodesToAdd {
 		jobNodesToAdd = append(jobNodesToAdd, &JobNode{JobID: inJob.Id, NodeID: node})
 	}
 
-	nodesToDelete := utils.DiffArray(nodeIdsByJobId, inJob.Nodes)
+	nodesToDelete := utils.DiffArray(nodeIDsByJobID, inJob.Nodes)
 	jobNodesToDelete := make([]*JobNode, 0)
 	for _, node := range nodesToDelete {
 		jobNodesToDelete = append(jobNodesToDelete, &JobNode{JobID: inJob.Id, NodeID: node})
@@ -869,8 +866,7 @@ func (trans *DBTrans) processJobsNodesUpdate(inJob *jobs.Job) (err error) {
 		for _, jobNodeToDelete := range jobNodesToDelete {
 			_, err = trans.Exec(deleteJobNodesByJobId, inJob.Id, jobNodeToDelete.NodeID)
 			if err != nil {
-				err = errors.Wrap(err, "processJobsNodesUpdate unable to delete nodes for job")
-				return
+				return errors.Wrap(err, "processJobsNodesUpdate unable to delete nodes for job")
 			}
 		}
 	}
@@ -878,11 +874,10 @@ func (trans *DBTrans) processJobsNodesUpdate(inJob *jobs.Job) (err error) {
 	if len(nodesToAdd) > 0 {
 		err = trans.Insert(jobNodesToAdd...)
 		if err != nil {
-			err = errors.Wrap(err, "processJobsNodesUpdate unable to associates nodes with job")
-			return
+			return errors.Wrap(err, "processJobsNodesUpdate unable to associates nodes with job")
 		}
 	}
-	return
+	return nil
 }
 
 func validateJob(in *jobs.Job) error {

@@ -76,6 +76,7 @@ describe('ReportingOverviewComponent', () => {
 
     it('invalid date', () => {
       spyOn(router, 'navigate');
+      spyOn(console, 'warn');
 
       component.onDateChanged('lkjasdl');
 
@@ -305,7 +306,7 @@ describe('ReportingOverviewComponent', () => {
       component.onPlatformChanged({name: 'ubuntu'});
 
       expect(router.navigate).toHaveBeenCalledWith(['/compliance', 'reports', 'nodes'],
-        {queryParams: { platform: ['ubuntu'] }});
+        {queryParams: { platform_with_version: ['ubuntu*'] }});
     });
 
     it('invalid item', () => {

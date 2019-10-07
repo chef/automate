@@ -6,6 +6,7 @@
 package integration_test
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path"
@@ -132,10 +133,16 @@ func NewSuite(database string) *Suite {
 func (s *Suite) GlobalSetup() {
 	// Make sure our database is empty for our integration tests
 	s.DeleteDataFromStorage()
+	// Turn off the periodic job so that it doesn't interfere with tests
+	// This could be causing flaky tests
+	s.JobScheduler.DisableDisconnectedServicesJob(context.Background())
 }
 
 // GlobalTeardown tear everything down after finishing executing all our test suite
 func (s *Suite) GlobalTeardown() {
+	// Re-enable the periodic job so we can continue with business as usual.
+	// This is a mandatory job and should always be running (except for testing)
+	s.JobScheduler.EnableDisconnectedServicesJob(context.Background())
 }
 
 // DeleteDataFromStorage will drop the entire database, you can use this function

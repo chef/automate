@@ -5,13 +5,14 @@ import (
 
 	"fmt"
 
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
+
 	"github.com/chef/automate/components/event-service/config"
 	"github.com/chef/automate/components/event-service/nats"
 	"github.com/chef/automate/components/event-service/server"
 	"github.com/chef/automate/lib/tracing"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 )
 
 func newServeCmd() *cobra.Command {
@@ -36,7 +37,7 @@ func newServeCmd() *cobra.Command {
 
 			closer, err := tracing.NewGlobalTracer("event-service")
 			if err != nil {
-				errors.Wrap(err, "starting tracer for event-service")
+				return errors.Wrap(err, "starting tracer for event-service")
 			}
 			if closer != nil {
 				defer tracing.CloseQuietly(closer)

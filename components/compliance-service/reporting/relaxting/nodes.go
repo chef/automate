@@ -59,7 +59,9 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 		"environment",
 		"platform.name",
 		"platform.release",
+		"platform.full",
 		"profiles.name",
+		"profiles.full",
 		"profiles.version",
 		"profiles.sha256",
 		"profiles.status",
@@ -120,6 +122,7 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 							Version: profileMin.Version,
 							Id:      profileMin.SHA256,
 							Status:  profileMin.Status,
+							Full:    profileMin.Full,
 						})
 					}
 					node := reportingapi.Node{
@@ -132,6 +135,7 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 					var platform reportingapi.Platform
 					platform.Name = item.Platform.Name
 					platform.Release = item.Platform.Release
+					platform.Full = item.Platform.Full
 					node.Platform = &platform
 					reportID := hit.Id
 					if item.ReportID != "" {
@@ -219,6 +223,7 @@ func (backend *ES2Backend) GetNode(nodeUuid string, filters map[string][]string)
 		"profiles.version",
 		"profiles.sha256",
 		"profiles.status",
+		"profiles.full",
 		"end_time",
 		"report_uuid",
 		"status",
@@ -271,6 +276,7 @@ func (backend *ES2Backend) GetNode(nodeUuid string, filters map[string][]string)
 							Version: profileMin.Version,
 							Id:      profileMin.SHA256,
 							Status:  profileMin.Status,
+							Full:    profileMin.Full,
 						})
 					}
 					node := reportingapi.Node{
@@ -283,6 +289,7 @@ func (backend *ES2Backend) GetNode(nodeUuid string, filters map[string][]string)
 					var platform reportingapi.Platform
 					platform.Name = item.Platform.Name
 					platform.Release = item.Platform.Release
+					platform.Full = item.Platform.Full
 					node.Platform = &platform
 					var latestReport reportingapi.LatestReportSummary
 					latestReport.Id = item.ReportID

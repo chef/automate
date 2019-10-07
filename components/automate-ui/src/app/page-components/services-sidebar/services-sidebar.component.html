@@ -52,6 +52,14 @@
           <div class ="site-line"><b>Site:</b> {{ service.site  || "--"}}</div>
         </div>
         <div class="body">
+          <div class="disconnect-notice" *ngIf="service.disconnected">
+            <img class="disconnect-icon" src="assets/img/icon-disconnected.svg" alt="" aria-hidden />
+            <div>
+              <span>Disconnected service: Last health check received </span>
+              <span class="disconnect-time" [attr.id]="'disconnect-time-' + i">{{ service.last_event_since }} ago.</span>
+            </div>
+            <chef-tooltip [attr.for]="'disconnect-time-' + i">{{ service.last_event_occurred_at | datetime: RFC2822 }}</chef-tooltip>
+          </div>
           <div class ="release-line"><chef-icon>grain</chef-icon>{{ service.release || "--"}}</div>
           <div class ="channel-line">
             <chef-badge *ngIf="service.update_strategy !== 'NONE'">

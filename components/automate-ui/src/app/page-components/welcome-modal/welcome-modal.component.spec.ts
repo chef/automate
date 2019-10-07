@@ -11,6 +11,7 @@ import { SessionStorageService } from '../../services/storage/sessionstorage.ser
 import { ChefSessionService } from '../../services/chef-session/chef-session.service';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
+import { runtimeChecks } from 'app/ngrx.reducers';
 import { TriggerWelcomeStatus } from 'app/entities/license/license.reducer';
 import { EntityStatus } from 'app/entities/entities';
 
@@ -46,7 +47,7 @@ describe('WelcomeModalComponent', () => {
         HttpClientTestingModule,
         StoreModule.forRoot({
           licenseStatus: welcomeReducer
-        })
+        }, { runtimeChecks })
       ],
       providers: [
         LocalStorageService,

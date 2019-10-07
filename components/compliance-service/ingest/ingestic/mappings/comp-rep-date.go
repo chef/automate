@@ -191,6 +191,16 @@ var ComplianceRepDate = Mapping{
               "type": "keyword"
             },
             "full": {
+              "fields": {
+                "engram": {
+                  "analyzer": "autocomplete_version_numbers",
+                  "type": "text"
+                },
+                "lower": {
+                  "normalizer": "case_insensitive",
+                  "type": "keyword"
+                }
+              },
               "type": "keyword"
             }
           }
@@ -338,6 +348,19 @@ var ComplianceRepDate = Mapping{
               "type": "keyword"
             },
             "version": {
+              "type": "keyword"
+            },
+            "full": {
+              "fields": {
+                "engram": {
+                  "analyzer": "autocomplete_version_numbers",
+                  "type": "text"
+                },
+                "lower": {
+                  "normalizer": "case_insensitive",
+                  "type": "keyword"
+                }
+              },
               "type": "keyword"
             }
           },

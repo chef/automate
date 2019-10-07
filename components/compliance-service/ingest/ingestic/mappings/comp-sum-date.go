@@ -171,6 +171,16 @@ var ComplianceSumDate = Mapping{
               "type": "keyword"
             },
             "full": {
+              "fields": {
+                "engram": {
+                  "analyzer": "autocomplete_version_numbers",
+                  "type": "text"
+                },
+                "lower": {
+                  "normalizer": "case_insensitive",
+                  "type": "keyword"
+                }
+              },
               "type": "keyword"
             }
           }
@@ -244,6 +254,19 @@ var ComplianceSumDate = Mapping{
               "type": "keyword"
             },
             "status": {
+              "type": "keyword"
+            },
+            "full": {
+              "fields": {
+                "engram": {
+                  "analyzer": "autocomplete_version_numbers",
+                  "type": "text"
+                },
+                "lower": {
+                  "normalizer": "case_insensitive",
+                  "type": "keyword"
+                }
+              },
               "type": "keyword"
             }
           },

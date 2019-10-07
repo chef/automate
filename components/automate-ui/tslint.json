@@ -2,7 +2,6 @@
   "rulesDirectory": [
     "node_modules/codelyzer",
     "node_modules/rxjs-tslint",
-    "node_modules/ngrx-tslint-oftype",
     "node_modules/tslint-defocus/dist"
   ],
   "jsRules": {
@@ -151,17 +150,15 @@
       ["app", "chef"],
       "kebab-case"
     ],
-    "use-input-property-decorator": true,
-    "use-output-property-decorator": true,
-    "use-host-property-decorator": true,
+    "no-inputs-metadata-property": true,
+    "no-outputs-metadata-property": true,
+    "no-host-metadata-property": true,
     "no-input-rename": true,
     "no-output-rename": true,
-    "use-life-cycle-interface": true,
+    "use-lifecycle-interface": true,
     "use-pipe-transform-interface": true,
     "component-class-suffix": true,
     "directive-class-suffix": true,
-    "use-view-encapsulation": true,
-    "ngrx-effects-operators": true,
-    "ngrx-chained-pipes": true
+    "use-component-view-encapsulation": true
   }
 }

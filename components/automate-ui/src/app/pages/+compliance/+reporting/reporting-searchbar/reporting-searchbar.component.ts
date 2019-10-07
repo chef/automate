@@ -37,8 +37,9 @@ export class ReportingSearchbarComponent implements OnInit {
   @Output() filterAdded = new EventEmitter();
   @Output() dateChanged = new EventEmitter();
 
-  @ViewChild('keyInput') keyInput: ElementRef;
-  @ViewChild('valInput') valInput: ElementRef;
+  @ViewChild('keyInput', { static: true }) keyInput: ElementRef;
+  @ViewChild('valInput', { static: true }) valInput: ElementRef;
+
 
   private suggestionsVisibleStream = new Subject<boolean>();
   private suggestionSearchTermDebounce = new Subject<any>();
