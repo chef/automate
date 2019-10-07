@@ -108,20 +108,5 @@ describe('PolicyAddMembersComponent', () => {
             component.expressionForm.setValue({ type: 'TEAM', identity: '', name: '' });
             expect(component.showInputs('name')).toBe(false);
         });
-
     });
-
-    describe('updateValidations', () => {
-
-        it('clears validators when input is not active', () => {
-          component.expressionForm.setValue({ type: 'TEAM', identity: '', name: '' });
-        //   create spy here i think
-        //   expect(component.updateValidations('identity', false))
-        });
-
-        it('applies validators when input is active', () => {
-
-        });
-    });
-
 });
