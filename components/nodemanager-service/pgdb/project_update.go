@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"encoding/json"
+
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	project_update_lib "github.com/chef/automate/lib/authz"
@@ -29,23 +30,27 @@ type NodeProjectData struct {
 // JobCancel - cancel the a currently running project update
 func (db *DB) JobCancel(ctx context.Context, projectID string) error {
 	log.Debugf("Node manager project update JobCancel %s", projectID)
-	db.projectUpdateRunning = false
+	if db.ProjectUpdate.ID == projectID {
+		db.ProjectUpdate.running = false
+	}
 	return nil
 }
 
 // UpdateProjectTags - start a project update
-func (db *DB) UpdateProjectTags(ctx context.Context, projectRules map[string]*iam_v2.ProjectRules) ([]string, error) {
+func (db *DB) UpdateProjectTags(ctx context.Context,
+	projectRules map[string]*iam_v2.ProjectRules) ([]string, error) {
 	jobUUID, _ := uuid.NewV4()
 	log.Debugf("Running node manager UpdateProjectTags %v ID: %s", projectRules, jobUUID.String())
 
 	// setup for new project update run
-	db.projectUpdateJobStatusError = nil
-	db.projectUpdateRunning = true
-	db.projectUpdateJobStatus = project_update_lib.JobStatus{
+	db.ProjectUpdate.jobStatusError = nil
+	db.ProjectUpdate.running = true
+	db.ProjectUpdate.jobStatus = project_update_lib.JobStatus{
 		Completed:             false,
 		PercentageComplete:    0,
 		EstimatedEndTimeInSec: 0,
 	}
+	db.ProjectUpdate.ID = jobUUID.String()
 	go db.updateNodes(projectRules)
 
 	return []string{jobUUID.String()}, nil
@@ -53,10 +58,18 @@ func (db *DB) UpdateProjectTags(ctx context.Context, projectRules map[string]*ia
 
 // JobStatus - get the job status of the project update
 func (db *DB) JobStatus(ctx context.Context, projectID string) (project_update_lib.JobStatus, error) {
-	if db.projectUpdateJobStatusError != nil {
-		return project_update_lib.JobStatus{}, db.projectUpdateJobStatusError
+	if db.ProjectUpdate.ID == projectID {
+		if db.ProjectUpdate.jobStatusError != nil {
+			return project_update_lib.JobStatus{}, db.ProjectUpdate.jobStatusError
+		}
+		return db.ProjectUpdate.jobStatus, nil
 	}
-	return db.projectUpdateJobStatus, nil
+
+	return project_update_lib.JobStatus{
+		Completed:             true,
+		PercentageComplete:    1,
+		EstimatedEndTimeInSec: 0,
+	}, nil
 }
 
 func (db *DB) updateNodes(projectRules map[string]*iam_v2.ProjectRules) {
@@ -68,7 +81,7 @@ func (db *DB) updateNodes(projectRules map[string]*iam_v2.ProjectRules) {
 
 	numberOfNodes := float32(len(nodes))
 	for index, node := range nodes {
-		if !db.projectUpdateRunning {
+		if !db.ProjectUpdate.running {
 			db.projectUpdateComplete()
 			return
 		}
@@ -87,7 +100,7 @@ func (db *DB) updateNodes(projectRules map[string]*iam_v2.ProjectRules) {
 }
 
 func (db *DB) projectUpdateStatusUpdate(percentageComplete float32) {
-	db.projectUpdateJobStatus = project_update_lib.JobStatus{
+	db.ProjectUpdate.jobStatus = project_update_lib.JobStatus{
 		Completed:             false,
 		PercentageComplete:    percentageComplete,
 		EstimatedEndTimeInSec: 0,
@@ -95,22 +108,22 @@ func (db *DB) projectUpdateStatusUpdate(percentageComplete float32) {
 }
 
 func (db *DB) projectUpdateComplete() {
-	db.projectUpdateJobStatus = project_update_lib.JobStatus{
+	db.ProjectUpdate.jobStatus = project_update_lib.JobStatus{
 		Completed:             true,
 		PercentageComplete:    1.0,
 		EstimatedEndTimeInSec: 0,
 	}
-	db.projectUpdateRunning = false
+	db.ProjectUpdate.running = false
 }
 
 func (db *DB) projectUpdateFail(err error) {
-	db.projectUpdateJobStatusError = err
-	db.projectUpdateJobStatus = project_update_lib.JobStatus{
+	db.ProjectUpdate.jobStatusError = err
+	db.ProjectUpdate.jobStatus = project_update_lib.JobStatus{
 		Completed:             true,
 		PercentageComplete:    1.0,
 		EstimatedEndTimeInSec: 0,
 	}
-	db.projectUpdateRunning = false
+	db.ProjectUpdate.running = false
 }
 
 // updateNodeProjectIDs - update the nodes project IDs

@@ -17,11 +17,16 @@ import (
 	"github.com/chef/automate/lib/logger"
 )
 
+type ProjectUpdate struct {
+	jobStatus      project_update_lib.JobStatus
+	jobStatusError error
+	running        bool
+	ID             string
+}
+
 type DB struct {
 	*gorp.DbMap
-	projectUpdateJobStatus      project_update_lib.JobStatus
-	projectUpdateJobStatusError error
-	projectUpdateRunning        bool
+	ProjectUpdate *ProjectUpdate
 }
 
 type DBTrans struct {
@@ -44,10 +49,15 @@ func New(conf *config.Postgres) (*DB, error) {
 		return nil, err
 	}
 
-	db.projectUpdateJobStatus = project_update_lib.JobStatus{
-		Completed:             true,
-		PercentageComplete:    1.0,
-		EstimatedEndTimeInSec: 0,
+	db.ProjectUpdate = &ProjectUpdate{
+		jobStatus: project_update_lib.JobStatus{
+			Completed:             true,
+			PercentageComplete:    1.0,
+			EstimatedEndTimeInSec: 0,
+		},
+		jobStatusError: nil,
+		running:        false,
+		ID:             "",
 	}
 
 	return db, nil
