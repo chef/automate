@@ -129,10 +129,13 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
   }
 
   getNodes(reportQuery: ReportQuery, params: any): Observable<Array<any>> {
-    // Need to rethink this because it is removing all filters
+    // remove profile_id and control_id as filters if they are already applied
+    reportQuery.filters = reportQuery.filters.filter( filter => {
+      return filter.type.name !== 'profile_id' && filter.type.name !== 'control_id';
+    });
     const profileFilter: FilterC = {type: { name: 'profile_id' }, value: { text: params.profileId}};
     const controlFilter: FilterC = {type: { name: 'control_id' }, value: { text: params.controlId}};
-    reportQuery.filters = [profileFilter].concat(controlFilter);
+    reportQuery.filters = [profileFilter, controlFilter].concat(reportQuery.filters);
     params = paginationOverride;
     params['sort'] = 'latest_report.end_time';
     params['order'] = 'desc';
