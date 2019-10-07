@@ -21,6 +21,7 @@ type DB struct {
 	*gorp.DbMap
 	projectUpdateJobStatus      project_update_lib.JobStatus
 	projectUpdateJobStatusError error
+	projectUpdateRunning        bool
 }
 
 type DBTrans struct {

@@ -28,7 +28,8 @@ type NodeProjectData struct {
 
 // JobCancel - cancel the a currently running project update
 func (db *DB) JobCancel(ctx context.Context, projectID string) error {
-	log.Infof("Running node manager JobCancel %s", projectID)
+	log.Debugf("Node manager project update JobCancel %s", projectID)
+	db.projectUpdateRunning = false
 	return nil
 }
 
@@ -37,14 +38,15 @@ func (db *DB) UpdateProjectTags(ctx context.Context, projectRules map[string]*ia
 	jobUUID, _ := uuid.NewV4()
 	log.Debugf("Running node manager UpdateProjectTags %v ID: %s", projectRules, jobUUID.String())
 
-	// clear previous run
+	// setup for new project update run
 	db.projectUpdateJobStatusError = nil
+	db.projectUpdateRunning = true
 	db.projectUpdateJobStatus = project_update_lib.JobStatus{
 		Completed:             false,
 		PercentageComplete:    0,
 		EstimatedEndTimeInSec: 0,
 	}
-	go db.updateNodes(ctx, projectRules)
+	go db.updateNodes(projectRules)
 
 	return []string{jobUUID.String()}, nil
 }
@@ -57,7 +59,7 @@ func (db *DB) JobStatus(ctx context.Context, projectID string) (project_update_l
 	return db.projectUpdateJobStatus, nil
 }
 
-func (db *DB) updateNodes(ctx context.Context, projectRules map[string]*iam_v2.ProjectRules) {
+func (db *DB) updateNodes(projectRules map[string]*iam_v2.ProjectRules) {
 	nodes, err := db.getAllNodes()
 	if err != nil {
 		db.projectUpdateFail(err)
@@ -66,6 +68,10 @@ func (db *DB) updateNodes(ctx context.Context, projectRules map[string]*iam_v2.P
 
 	numberOfNodes := float32(len(nodes))
 	for index, node := range nodes {
+		if !db.projectUpdateRunning {
+			db.projectUpdateComplete()
+			return
+		}
 		matchingProjectIDs := getMatchingProjectIDs(node, projectRules)
 
 		err = db.updateNodeProjectIDs(node, matchingProjectIDs)
@@ -74,19 +80,27 @@ func (db *DB) updateNodes(ctx context.Context, projectRules map[string]*iam_v2.P
 			return
 		}
 
-		db.projectUpdateJobStatus = project_update_lib.JobStatus{
-			Completed:             false,
-			PercentageComplete:    float32((index + 1)) / numberOfNodes,
-			EstimatedEndTimeInSec: 0,
-		}
+		db.projectUpdateStatusUpdate(float32((index + 1)) / numberOfNodes)
 	}
 
-	// Mark the Job status complete.
+	db.projectUpdateComplete()
+}
+
+func (db *DB) projectUpdateStatusUpdate(percentageComplete float32) {
+	db.projectUpdateJobStatus = project_update_lib.JobStatus{
+		Completed:             false,
+		PercentageComplete:    percentageComplete,
+		EstimatedEndTimeInSec: 0,
+	}
+}
+
+func (db *DB) projectUpdateComplete() {
 	db.projectUpdateJobStatus = project_update_lib.JobStatus{
 		Completed:             true,
 		PercentageComplete:    1.0,
 		EstimatedEndTimeInSec: 0,
 	}
+	db.projectUpdateRunning = false
 }
 
 func (db *DB) projectUpdateFail(err error) {
@@ -96,6 +110,7 @@ func (db *DB) projectUpdateFail(err error) {
 		PercentageComplete:    1.0,
 		EstimatedEndTimeInSec: 0,
 	}
+	db.projectUpdateRunning = false
 }
 
 // updateNodeProjectIDs - update the nodes project IDs
