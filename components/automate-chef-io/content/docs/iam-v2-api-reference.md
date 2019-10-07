@@ -82,8 +82,7 @@ With the plugin installed, this TOC will update automatically when you save the 
 ## General Notes
 
 1. If you do not have one already, generate an admin token for IAM v2.
-   (Neither The v1 command `chef-automate admin-token` nor any v1 admin tokens will work for v2.)
-   Use this, filling in a token name of your choice:
+   Run this command, filling in a token name of your choice:
 
    ```bash
    export TOKEN=`chef-automate iam token create <your-token-name-here> --admin`
@@ -119,18 +118,17 @@ curl -sH "api-token: $TOKEN" -d @policy.json ...
 Teams, tokens, roles, and policies all contain a top-level `projects` property; you will see that in the example JSON for each resource in the following sections.
 This property associates the particular IAM resource with one or more projects.
 Users must have permissions for those projects to be able to view or modify those resources.
-This `projects` property may be empty, which would give access only to users included on policies specifying the special `(unassigned)` project designation.
-This `projects` property may **not** specify `*` to indicate all projects.
+If the `projects` property is left empty, that resource is categorized as *unassigned*.
 
 To create those permissions for users, there is a separate and distinct `projects` property on each policy statement.
 This `projects` property may **not** be empty; you must either specify specific projects or use a wildcard (`*`) to indicate all projects.
 
 Here is a summary:
 
-Type               | May be empty ? | Include * ? | May specify (unassigned) ?
--------------------|----------------|-------------|------------
-top-level projects |    yes         |   no        |  no
-statement projects |    no          |   yes       |  yes
+Type               | May be empty ? | Allows "*" ? | May specify (unassigned) ?
+-------------------|----------------|--------------|------------
+top-level projects |    yes         |   no         |  no
+statement projects |    no          |   yes        |  yes
 
 ## Policies
 
@@ -145,7 +143,7 @@ delete | DELETE /policies/***id*** | deletes a *Custom* policy
 **Example Policy:**
 
 This policy shows two statements, each enforcing a different set of permissions.
-The first policy statement grants list access to view users.
+The first policy statement grants "list" access to view users.
 The second statement grants access to all the actions comprising the `editor` role.
 Note that you may specify actions either inline with **actions** or using a **role** reference.
 (Within a single statement it is even OK to use both if you like; the set of actions is the union of the inline actions and the actions defined by the role.)
@@ -189,9 +187,7 @@ We recommend deleting these legacy policies and setting up new IAM v2 policies i
 
 ### Getting a Policy
 
-In order to fetch a policy on the command-line, you must know its ID.
-This may be obtained by first fetching the list of all policies and getting the `id` field of the policy of interest.
-For example, the ID for the default administrator policy is `administrator-access`.
+This shows the details of a single policy, selected by its ID.
 
 *In the browser:* **Settings**  >> **Policies** >> [select a policy]
 
@@ -201,12 +197,11 @@ Create a policy by composing JSON with all the necessary policy properties (see 
 
 ### Updating a Policy
 
+- You should supply all of a policy's properties, not just the ones you wish to update.
+  Because the update operation modifies *all* the properties--not just the ones you specify--*properties that you do not include are reset to empty values*.
 - You can modify the *membership* of both Chef-managed and custom policies; see [Policy Membership]({{< relref "iam-v2-api-reference.md#policy-membership" >}}) for more information.
 - You can modify the *definition* of custom policies but not Chef-managed policies.
 - The policy ID is immutable; it can only be set at creation time.
-- The update operation modifies *all* policy properties, not just the ones you specify.
-  Properties that you do not specify are reset to empty values.
-  Thus, you should supply all of a policy's properties, not just the ones you wish to update.
 
 ### Deleting a Policy
 
@@ -248,11 +243,11 @@ The output lists all defined members of the specified policy.
 ### Updating All Members on a Policy
 
 Specifying a complete list of members is often simpler than keeping track of a policy's membership and adding or deleting specific members (whether users, team, or tokens).
-Use this HTTP request to replace the policy's membership with a full, new list.
+Use this HTTP request to replace the policy's membership.
 
 ### Adding Members to a Policy
 
-Specify just new members to add to a policy's membership via this HTTP request.
+Specify new members to add to a policy's membership via this HTTP request.
 
 *In the browser:* **Settings**  >> **Policies** >> [select a policy] >> **Members** >> **Add Members**
 
@@ -260,7 +255,7 @@ Select any local users or teams listed to add to the policy, or use **Add Member
 
 ### Removing Members from a Policy
 
-Specify just members to remove from a policy's membership via this HTTP request.
+Specify members to remove from a policy's membership via this HTTP request.
 The removed members still exists within Chef Automate, but are no longer associated with this policy.
 
 *In the browser:* **Settings**  >> **Policies** >> [select a policy] >> **Members** >> [open control menu for target member] >> Remove Member
@@ -326,10 +321,9 @@ Create a role by composing JSON with all the necessary role properties (see the 
 
 ### Updating a Role
 
-The update operation modifies *all* role properties, not just the ones you specify.
-Properties that you do not specify are reset to empty values.
-Thus, you should supply all of a role's properties, not just the ones you wish to update.
-Note that the ID is immutable; it can only be set at creation time.
+- You should supply all of a role's properties, not just the ones you wish to update.
+  Because the update operation modifies *all* the properties--not just the ones you specify--*properties that you do not include are reset to empty values*.
+- The role ID is immutable; it can only be set at creation time.
 
 ### Deleting a Role
 
@@ -374,8 +368,8 @@ Create a project by composing JSON with all the necessary project properties (se
 
 ### Updating a Project
 
-A project has only one modifiable property, the project name.
-The ID is immutable; it can only be set at creation time.
+- The project name is the only property of a project you can modify.
+- The ID is immutable; it can only be set at creation time.
 
 ### Deleting a Project
 
@@ -452,10 +446,9 @@ Create a rule by composing JSON with all the necessary rule properties (see the 
 
 ### Updating a Project Rule
 
-The update operation modifies *all* rule properties, not just the ones you specify.
-Properties that you do not specify are reset to empty values.
-Thus, you should supply all of a rule's properties, not just the ones you wish to update.
-Note that the ID is immutable; it can only be set at creation time.
+- You should supply all of a rule's properties, not just the ones you wish to update.
+  Because the update operation modifies *all* the properties--not just the ones you specify--*properties that you do not include are reset to empty values*.
+- The rule ID is immutable; it can only be set at creation time.
 
 ### Deleting a Project Rule
 
@@ -505,10 +498,9 @@ Create a user by composing JSON with all the necessary user properties (see the 
 
 ### Updating a User
 
-The update operation modifies *all* user properties, not just the ones you specify.
-Properties that you do not specify are reset to empty values.
-Thus, you should supply all of a user's properties, not just the ones you wish to update.
-Note that the ID is immutable; it can only be set at creation time.
+- You should supply all of a user's properties, not just the ones you wish to update.
+  Because the update operation modifies *all* the properties--not just the ones you specify--*properties that you do not include are reset to empty values*.
+- The user ID is immutable; it can only be set at creation time.
 
 *In the browser:* **Settings**  >> **Users** >> [select a user] >> Edit
 
@@ -573,10 +565,9 @@ Create a team by composing JSON with all the necessary team properties (see the 
 
 ### Updating a Team
 
-The update operation modifies *all* team properties, not just the ones you specify.
-Properties that you do not specify are reset to empty values.
-Thus, you should supply all of a team's properties, not just the ones you wish to update.
-Note that the ID is immutable; it can only be set at creation time.
+- You should supply all of a team's properties, not just the ones you wish to update.
+  Because the update operation modifies *all* the properties--not just the ones you specify--*properties that you do not include are reset to empty values*.
+- The team ID is immutable; it can only be set at creation time.
 
 *In the browser:* **Settings**  >> **Teams** >> [select a team] >> Details
 
@@ -616,7 +607,7 @@ The output lists all local users on the specified team.
 
 ### Adding Users to a Team
 
-Specify just new users to add to a team's membership via this HTTP request.
+Specify new users to add to a team's membership via this HTTP request.
 
 *In the browser:* **Settings**  >> **Teams** >> [select a team] >> **Users** >> **Add User**
 
@@ -624,7 +615,7 @@ Select any local users listed to add to the team.
 
 ### Removing Users from a Team
 
-Specify just users to remove from a team's membership via this HTTP request.
+Specify users to remove from a team's membership via this HTTP request.
 The removed users still exists within Chef Automate, but are no longer associated with this team.
 
 *In the browser:* **Settings**  >> **Teams** >> [select a team] >> **Users** >> [open control menu for target user] >> Remove User
@@ -655,7 +646,7 @@ delete | DELETE /tokens/***id***   | deletes a token
 
 ### Listing Tokens
 
-The lists admin and non-admin tokens.
+This lists admin and non-admin tokens.
 
 *In the browser:* **Settings**  >> **API Tokens**
 
@@ -681,10 +672,9 @@ Admin tokens can only be created by specifying the `--admin` flag to this `chef-
 
 ### Updating a Token
 
-The update operation modifies *all* token properties, not just the ones you specify.
-Properties that you do not specify are reset to empty values.
-Thus, you should supply all of a token's properties, not just the ones you wish to update.
-Note that the ID is immutable; it can only be set at creation time.
+- You should supply all of a token's properties, not just the ones you wish to update.
+  Because the update operation modifies *all* the properties--not just the ones you specify--*properties that you do not include are reset to empty values*.
+- The token ID is immutable; it can only be set at creation time.
 
 *In the browser:* **Settings**  >> **API Tokens** >> [select a token] >> Details
 
