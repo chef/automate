@@ -31,7 +31,7 @@
           <chef-icon>{{ history.status | chefStatusIcon }}</chef-icon>
         </div>
         <div class="duration">
-          {{ history.startTime | datetime: RFC2822 }}
+          <p><strong>{{ history.startTime | datetime: RFC2822 }}</strong></p>
         </div>
         <div class="date-time">
           {{getDuration(history.startTime, history.endTime)}}
