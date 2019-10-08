@@ -33,7 +33,7 @@ do_deploy() {
     $upgrade_scaffold_bin setup "$test_manifest_path"
     $upgrade_scaffold_bin serve "$test_manifest_path" "$upgrade_scaffold_pid_file" &
     sleep 5
-
+    export CHEF_AUTOMATE_SKIP_MANIFEST_VERIFICATION=true
     #shellcheck disable=SC2154
     echo -e "[load_balancer.v1.sys.service]\\nhttps_port = 4443" >> "$test_config_path"
     #shellcheck disable=SC2154
