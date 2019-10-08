@@ -201,7 +201,7 @@ func (m *EchoWorkflow) OnStart(w cereal.WorkflowInstance, ev cereal.StartEvent) 
 		//
 		// Note, we can enqueue the same named task multiple
 		// times with different parameters.
-		err := w.EnqueueTask("echo-task", EchoTaskParams{
+		err := w.EnqueueTask(EchoTaskName, EchoTaskParams{
 			Msg: fmt.Sprintf("I'm agent 00%d", i),
 		})
 		if err != nil {

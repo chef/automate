@@ -73,7 +73,7 @@ func ToParallelWorkflowParameters(subworkflows []string, parameters map[string]i
 	return transformedParams, nil
 }
 
-func EnqueueParallelWorkflow(ctx context.Context, m *cereal.Manager, workflowName string, instanceName string, subworkflows []string, parameters map[string]interface{}) error {
+func EnqueueParallelWorkflow(ctx context.Context, m *cereal.Manager, workflowName cereal.WorkflowName, instanceName string, subworkflows []string, parameters map[string]interface{}) error {
 	transformedParams, err := ToParallelWorkflowParameters(subworkflows, parameters)
 	if err != nil {
 		return err
@@ -225,7 +225,7 @@ func ToParallelWorkflowInstance(instance cereal.ImmutableWorkflowInstance) (*Par
 	return &parallelInstance, nil
 }
 
-func GetWorkflowInstance(ctx context.Context, m *cereal.Manager, workflowName string, instanceName string) (*ParallelWorkflowInstance, error) {
+func GetWorkflowInstance(ctx context.Context, m *cereal.Manager, workflowName cereal.WorkflowName, instanceName string) (*ParallelWorkflowInstance, error) {
 	instance, err := m.GetWorkflowInstanceByName(ctx, instanceName, workflowName)
 	if err != nil {
 		return nil, err

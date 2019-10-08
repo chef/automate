@@ -7,6 +7,23 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestNamesAreComparable(t *testing.T) {
+	t.Run("WorkflowName must be comparable", func(t *testing.T) {
+		name1 := NewWorkflowName("test1")
+		name2 := NewWorkflowName("test1")
+		name3 := NewWorkflowName("test2")
+		assert.True(t, name1 == name2)
+		assert.False(t, name1 == name3)
+	})
+	t.Run("TaskName must be comparable", func(t *testing.T) {
+		name1 := NewTaskName("test1")
+		name2 := NewTaskName("test1")
+		name3 := NewTaskName("test2")
+		assert.True(t, name1 == name2)
+		assert.False(t, name1 == name3)
+	})
+}
+
 func TestJitterDownIntervalProvider(t *testing.T) {
 	base := 10 * time.Second
 	jitter := 1 * time.Second

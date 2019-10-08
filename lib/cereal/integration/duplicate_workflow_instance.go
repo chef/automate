@@ -13,8 +13,8 @@ import (
 // TestEnqueueDuplicateWorkflowInstance tries the enqueue the same workflow
 // instance twice. The first one must be accepted, the second one must fail
 func (suite *CerealTestSuite) TestEnqueueDuplicateWorkflowInstance() {
-	taskName := randName("duplicate_test")
-	workflowName := randName("duplicate_test")
+	taskName := cereal.NewTaskName(randName("duplicate_test"))
+	workflowName := cereal.NewWorkflowName(randName("duplicate_test"))
 	instanceName := randName("instance")
 
 	wgTask := sync.WaitGroup{}

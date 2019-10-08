@@ -28,14 +28,16 @@ const (
 	ProjectUpdateRunningState    ProjectUpdateState = "running"
 	ProjectUpdateNotRunningState ProjectUpdateState = "not_running"
 
-	ProjectUpdateWorkflowName = "ProjectUpdate"
-	ProjectUpdateInstanceName = "SingletonV1"
-	ApplyStagedRulesTaskName  = "authz/ApplyStagedRules"
-
 	ProjectUpdateStageApplyStagedRules     ProjectUpdateStage = "apply_staged_rules"
 	ProjectUpdateStageUpdateDomainServices ProjectUpdateStage = "update_domain_services"
 	ProjectUpdateStageUpdateDone           ProjectUpdateStage = "done"
 	ProjectUpdateStageUpdateNone           ProjectUpdateStage = "none"
+)
+
+var (
+	ProjectUpdateWorkflowName = cereal.NewWorkflowName("ProjectUpdate")
+	ProjectUpdateInstanceName = "SingletonV1"
+	ApplyStagedRulesTaskName  = cereal.NewTaskName("authz/ApplyStagedRules")
 )
 
 var ProjectUpdateDomainServices = []string{
@@ -161,7 +163,7 @@ func (s *ApplyStagedRulesTaskExecutor) Run(ctx context.Context, task cereal.Task
 
 type CerealProjectUpdateManager struct {
 	manager        *cereal.Manager
-	workflowName   string
+	workflowName   cereal.WorkflowName
 	instanceName   string
 	domainServices []string
 }

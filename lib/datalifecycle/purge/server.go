@@ -20,7 +20,7 @@ var _ (data_lifecycle.PurgeServer) = (*Server)(nil)
 
 // Server is the purge server implementation
 type Server struct {
-	jobName         string
+	workflowName    cereal.WorkflowName
 	scheduleName    string
 	defaultPolicies *Policies
 	esSidecarClient es.EsSidecarClient
@@ -31,13 +31,13 @@ type Server struct {
 func NewServer(
 	man *cereal.Manager,
 	scheduleName string,
-	jobName string,
+	workflowName cereal.WorkflowName,
 	defaultPolicies *Policies,
 	opts ...ServerOpt) (*Server, error) {
 	s := &Server{
 		jobManager:      man,
 		scheduleName:    scheduleName,
-		jobName:         jobName,
+		workflowName:    workflowName,
 		defaultPolicies: defaultPolicies,
 	}
 
@@ -88,7 +88,7 @@ func (server *Server) Run(
 	log.Info("Purging")
 
 	sched, err = server.jobManager.GetWorkflowScheduleByName(
-		ctx, server.scheduleName, server.jobName,
+		ctx, server.scheduleName, server.workflowName,
 	)
 	if err != nil {
 		return res, status.Error(codes.Internal, err.Error())
@@ -128,7 +128,7 @@ func (server *Server) Show(ctx context.Context,
 	)
 
 	sched, err = server.jobManager.GetWorkflowScheduleByName(
-		ctx, server.scheduleName, server.jobName,
+		ctx, server.scheduleName, server.workflowName,
 	)
 	if err != nil {
 		return res, status.Error(codes.Internal, err.Error())
@@ -155,8 +155,8 @@ func (server *Server) Show(ctx context.Context,
 		})
 	}
 
-	res.InstanceName = server.jobName
-	res.WorkflowName = server.scheduleName
+	res.InstanceName = server.scheduleName
+	res.WorkflowName = server.workflowName.String()
 	res.Enabled = sched.Enabled
 	res.EsPolicies = dsEsPolicies
 	res.PgPolicies = dsPgPolicies
@@ -223,7 +223,7 @@ func (server *Server) Configure(ctx context.Context,
 
 	// Get the existing scheduled job and policies
 	sched, err = server.jobManager.GetWorkflowScheduleByName(
-		ctx, server.scheduleName, server.jobName,
+		ctx, server.scheduleName, server.workflowName,
 	)
 	if err != nil {
 		return res, status.Error(codes.Internal, err.Error())
@@ -278,7 +278,7 @@ func (server *Server) Configure(ctx context.Context,
 
 	// Update the workflow
 	err = server.jobManager.UpdateWorkflowScheduleByName(
-		ctx, server.scheduleName, server.jobName, updateOpts...,
+		ctx, server.scheduleName, server.workflowName, updateOpts...,
 	)
 	if err != nil {
 		return res, status.Error(codes.Internal, err.Error())
@@ -287,7 +287,7 @@ func (server *Server) Configure(ctx context.Context,
 	// Kick off the workflow if it was updated and it is enabled
 	if updated && req.GetEnabled() {
 		err = server.jobManager.EnqueueWorkflow(
-			ctx, server.jobName, server.scheduleName, policies,
+			ctx, server.workflowName, server.scheduleName, policies,
 		)
 		if err == cereal.ErrWorkflowInstanceExists {
 			return res, nil // it's already running

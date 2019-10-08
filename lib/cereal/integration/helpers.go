@@ -13,11 +13,11 @@ import (
 )
 
 type taskExecutor struct {
-	Name     string
+	Name     cereal.TaskName
 	Executor cereal.TaskExecutor
 }
 type workflowExecutor struct {
-	Name     string
+	Name     cereal.WorkflowName
 	Executor cereal.WorkflowExecutor
 }
 
@@ -29,7 +29,7 @@ type managerOpt struct {
 }
 type managerOptFunc func(*managerOpt)
 
-func WithWorkflowExecutor(name string, executor cereal.WorkflowExecutor) managerOptFunc {
+func WithWorkflowExecutor(name cereal.WorkflowName, executor cereal.WorkflowExecutor) managerOptFunc {
 	return func(o *managerOpt) {
 		o.WorkflowExecutors = append(o.WorkflowExecutors, workflowExecutor{
 			Name:     name,
@@ -38,7 +38,7 @@ func WithWorkflowExecutor(name string, executor cereal.WorkflowExecutor) manager
 	}
 }
 
-func WithTaskExecutor(name string, executor cereal.TaskExecutor) managerOptFunc {
+func WithTaskExecutor(name cereal.TaskName, executor cereal.TaskExecutor) managerOptFunc {
 	return func(o *managerOpt) {
 		o.TaskExecutors = append(o.TaskExecutors, taskExecutor{
 			Name:     name,
@@ -67,7 +67,7 @@ func (w *taskExecutorWrapper) Run(ctx context.Context, task cereal.Task) (interf
 	return w.f(ctx, task)
 }
 
-func WithTaskExecutorF(name string, f func(context.Context, cereal.Task) (interface{}, error)) managerOptFunc {
+func WithTaskExecutorF(name cereal.TaskName, f func(context.Context, cereal.Task) (interface{}, error)) managerOptFunc {
 	return WithTaskExecutor(name, &taskExecutorWrapper{f})
 }
 

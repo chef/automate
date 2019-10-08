@@ -247,11 +247,18 @@ func getBackend() backend.Driver {
 
 var echoWorkflowStartTime *time.Time
 
+var (
+	EchoWorkflowName         = cereal.NewWorkflowName("echo-workflow")
+	EchoTaskName             = cereal.NewTaskName("echo-task")
+	ScheduleTestWorkflowName = cereal.NewWorkflowName("schedule-test")
+	ScheduleTestTaskName     = cereal.NewTaskName("test task")
+)
+
 func startManager(_ *cobra.Command, args []string) error {
 	b := getBackend()
 	manager, err := cereal.NewManager(b, cereal.WithOnWorkflowCompleteCallback(
 		func(w *backend.WorkflowEvent) {
-			if w.Instance.WorkflowName == "echo-workflow" && echoWorkflowStartTime != nil {
+			if w.Instance.WorkflowName == EchoWorkflowName.String() && echoWorkflowStartTime != nil {
 				logrus.Infof("echo workflow total runtime: %s", time.Since(*echoWorkflowStartTime))
 			}
 		}),
@@ -265,11 +272,11 @@ func startManager(_ *cobra.Command, args []string) error {
 	defer manager.Stop() // nolint: errcheck
 
 	if !startManagerOpts.SkipScheduleExecutors {
-		err = manager.RegisterWorkflowExecutor("scheduled-test", &ScheduleTestWorkflow{})
+		err = manager.RegisterWorkflowExecutor(ScheduleTestWorkflowName, &ScheduleTestWorkflow{})
 		if err != nil {
 			return err
 		}
-		err = manager.RegisterTaskExecutor("test task", &ScheduleTestTask{}, cereal.TaskExecutorOpts{
+		err = manager.RegisterTaskExecutor(ScheduleTestTaskName, &ScheduleTestTask{}, cereal.TaskExecutorOpts{
 			Workers: startManagerOpts.TaskExecutorCount,
 		})
 		if err != nil {
@@ -278,11 +285,11 @@ func startManager(_ *cobra.Command, args []string) error {
 	}
 
 	if !startManagerOpts.SkipEchoExecutors {
-		err = manager.RegisterWorkflowExecutor("echo-workflow", &EchoWorkflow{})
+		err = manager.RegisterWorkflowExecutor(EchoWorkflowName, &EchoWorkflow{})
 		if err != nil {
 			return err
 		}
-		err = manager.RegisterTaskExecutor("echo-task", &EchoTask{}, cereal.TaskExecutorOpts{
+		err = manager.RegisterTaskExecutor(EchoTaskName, &EchoTask{}, cereal.TaskExecutorOpts{
 			Workers: startManagerOpts.TaskExecutorCount,
 		})
 		if err != nil {
@@ -321,7 +328,7 @@ func enqueueEchoWorkflow(_ *cobra.Command, args []string) error {
 	}
 
 	err = manager.EnqueueWorkflow(context.TODO(),
-		"echo-workflow", instanceName, &params)
+		EchoWorkflowName, instanceName, &params)
 	if err != nil {
 		logrus.WithError(err).Error("Unexpected error enqueueing workflow")
 		return err
@@ -362,14 +369,14 @@ func runScheduleTest(_ *cobra.Command, args []string) error {
 
 	err = manager.CreateWorkflowSchedule(
 		context.Background(),
-		scheduleName, "schedule-test", nil, true, recRule)
+		scheduleName, ScheduleTestWorkflowName, nil, true, recRule)
 	if err != nil {
 		if err == cereal.ErrWorkflowScheduleExists {
 			logrus.Info("workflow schedule exists, updating it")
 			err = manager.UpdateWorkflowScheduleByName(
 				context.Background(),
 				scheduleName,
-				"schedule-test",
+				ScheduleTestWorkflowName,
 				cereal.UpdateRecurrence(recRule),
 				cereal.UpdateEnabled(true),
 			)
@@ -442,7 +449,7 @@ func (p *ScheduleTestWorkflow) OnStart(w cereal.WorkflowInstance,
 		return w.Fail(errors.Wrap(err, "failed to get parameters"))
 	}
 	logrus.WithField("params", params).Info("Doing OnStart")
-	err = w.EnqueueTask("test task", "asdf")
+	err = w.EnqueueTask(ScheduleTestTaskName, "asdf")
 	if err != nil {
 		return w.Fail(errors.Wrap(err, "could not enqueue task"))
 	}

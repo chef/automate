@@ -23,9 +23,9 @@ var ErrNoJobIDs = errors.New("0 Job IDs returned")
 type DomainProjectUpdateWorkflowExecutor struct {
 	PollInterval time.Duration
 
-	cancelUpdateProjectTagsTaskName string
-	startProjectTagUpdaterTaskName  string
-	projectTagUpdaterStatusTaskName string
+	cancelUpdateProjectTagsTaskName cereal.TaskName
+	startProjectTagUpdaterTaskName  cereal.TaskName
+	projectTagUpdaterStatusTaskName cereal.TaskName
 }
 
 type DomainProjectUpdateWorkflowParameters struct {
@@ -264,16 +264,16 @@ func (m *ESProjectTagUpdaterStatusTask) collectJobStatus(ctx context.Context, es
 	return jobStatuses, nil
 }
 
-func StartProjectTagUpdaterTaskName(svcName string) string {
-	return fmt.Sprintf("%s/%s", svcName, startProjectTagUpdaterTaskName)
+func StartProjectTagUpdaterTaskName(svcName string) cereal.TaskName {
+	return cereal.NewTaskName(fmt.Sprintf("%s/%s", svcName, startProjectTagUpdaterTaskName))
 }
 
-func ProjectTagUpdaterStatusTaskName(svcName string) string {
-	return fmt.Sprintf("%s/%s", svcName, projectTagUpdaterStatusTaskName)
+func ProjectTagUpdaterStatusTaskName(svcName string) cereal.TaskName {
+	return cereal.NewTaskName(fmt.Sprintf("%s/%s", svcName, projectTagUpdaterStatusTaskName))
 }
 
-func CancelUpdateProjectTagsTaskName(svcName string) string {
-	return fmt.Sprintf("%s/%s", svcName, cancelUpdateProjectTagsTaskName)
+func CancelUpdateProjectTagsTaskName(svcName string) cereal.TaskName {
+	return cereal.NewTaskName(fmt.Sprintf("%s/%s", svcName, cancelUpdateProjectTagsTaskName))
 }
 
 func NewWorkflowExecutorForDomainService(domainService string) *DomainProjectUpdateWorkflowExecutor {

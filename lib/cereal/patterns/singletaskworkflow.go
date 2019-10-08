@@ -13,15 +13,32 @@ import (
 // a single task. The workflow enqueues the task and startup. The
 // workflow fails if the task fails.
 type SingleTaskWorkflowExecutor struct {
-	taskName    string
+	taskName    cereal.TaskName
 	allowCancel bool
 }
 
-func NewSingleTaskWorkflowExecutor(taskName string, allowCancel bool) *SingleTaskWorkflowExecutor {
+func NewSingleTaskWorkflowExecutor(taskName cereal.TaskName, allowCancel bool) *SingleTaskWorkflowExecutor {
 	return &SingleTaskWorkflowExecutor{
 		taskName:    taskName,
 		allowCancel: allowCancel,
 	}
+}
+
+func RegisterSingleTaskWorkflowExecutor(mgr *cereal.Manager, workflowName cereal.WorkflowName,
+	allowCancel bool, executor cereal.TaskExecutor, opts cereal.TaskExecutorOpts) error {
+
+	taskName := cereal.NewTaskName(workflowName.String())
+	err := mgr.RegisterTaskExecutor(taskName, executor, cereal.TaskExecutorOpts{})
+	if err != nil {
+		return err
+	}
+
+	wfX := NewSingleTaskWorkflowExecutor(taskName, allowCancel)
+	err = mgr.RegisterWorkflowExecutor(workflowName, wfX)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *SingleTaskWorkflowExecutor) OnStart(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {

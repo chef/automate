@@ -42,6 +42,34 @@ const (
 // for the parameters
 type Schedule backend.Schedule
 
+// WorkflowName identifies workflows registered with the cereal
+// library. Many functions in the cereal library take or return
+// WorkflowNames.
+type WorkflowName struct {
+	value string
+}
+
+// NewWorkflowName constructs a WorkflowName from the given
+// string. The resulting WorkflowName is comparable to other
+// WorkflowName. Two WorkflowNames are equal if they were constructed
+// with strings that were equal.
+func NewWorkflowName(name string) WorkflowName { return WorkflowName{value: name} }
+
+// TaskName identifies tasks registered with the cereal library. Many
+// functions in the cereal library take or return TaskNames.
+type TaskName struct {
+	value string
+}
+
+// NewTaskName constructs a TaskName from the given
+// string. The resulting TaskName is comparable to other
+// WorkflowName. Two TaskNames are equal if they were constructed
+// with strings that were equal.
+func NewTaskName(name string) TaskName { return TaskName{value: name} }
+
+func (w WorkflowName) String() string { return w.value }
+func (w TaskName) String() string     { return w.value }
+
 func (s *Schedule) GetParameters(out interface{}) error {
 	if s.Parameters != nil {
 		return json.Unmarshal(s.Parameters, out)
@@ -166,7 +194,7 @@ type WorkflowInstance interface {
 	// with the given parameters. Any enqueued tasks will be started
 	// after the currently running callback of the WorkflowExecutor
 	// returns.
-	EnqueueTask(taskName string, parameters interface{}, opts ...TaskEnqueueOpts) error
+	EnqueueTask(taskName TaskName, parameters interface{}, opts ...TaskEnqueueOpts) error
 
 	// Complete returns a decision to end execution of the workflow for
 	// the running workflow instance.
@@ -231,7 +259,7 @@ func (w *workflowInstanceImpl) TotalCompletedTasks() int {
 	return w.wevt.CompletedTaskCount
 }
 
-func (w *workflowInstanceImpl) EnqueueTask(taskName string, parameters interface{}, opts ...TaskEnqueueOpts) error {
+func (w *workflowInstanceImpl) EnqueueTask(taskName TaskName, parameters interface{}, opts ...TaskEnqueueOpts) error {
 	paramsData, err := jsonify(parameters)
 	if err != nil {
 		return err
@@ -239,7 +267,7 @@ func (w *workflowInstanceImpl) EnqueueTask(taskName string, parameters interface
 
 	req := enqueueTaskRequest{
 		backendTask: backend.Task{
-			Name:       taskName,
+			Name:       taskName.String(),
 			Parameters: paramsData,
 		},
 		opts: backend.TaskEnqueueOpts{},
@@ -403,7 +431,7 @@ type StartEvent struct{}
 // WorkflowExecutor when a task for a workflow instance completes.
 type TaskCompleteEvent struct {
 	// TaskName is the type of the task that completed
-	TaskName string
+	TaskName TaskName
 
 	// Result contains information representing the completion of the
 	// task such as if it errored or returned a value.
@@ -593,9 +621,9 @@ func NewManager(b backend.Driver, opts ...ManagerOpt) (*Manager, error) {
 // RegisterWorkflowExecutor registers a WorkflowExecutor to execute workflows
 // of type workflowName. This is not safe to call concurrently and should be
 // done from only one thread of the process. This must be called before Start.
-func (m *Manager) RegisterWorkflowExecutor(workflowName string,
+func (m *Manager) RegisterWorkflowExecutor(workflowName WorkflowName,
 	workflowExecutor WorkflowExecutor) error {
-	m.workflowExecutors[workflowName] = workflowExecutor
+	m.workflowExecutors[workflowName.String()] = workflowExecutor
 	return nil
 }
 
@@ -834,9 +862,9 @@ func (r *registeredExecutor) runTask(ctx context.Context, t *backend.Task, taskC
 // RegisterTaskExecutor registers a TaskExecutor to execute tasks of type taskName.
 // This is not safe to call concurrently and should be done from only one thread
 // of the process. This must be called before Start.
-func (m *Manager) RegisterTaskExecutor(taskName string, executor TaskExecutor, opts TaskExecutorOpts) error {
+func (m *Manager) RegisterTaskExecutor(taskName TaskName, executor TaskExecutor, opts TaskExecutorOpts) error {
 	r := &registeredExecutor{
-		name:       taskName,
+		name:       taskName.String(),
 		wakeupChan: make(chan struct{}, 10), // 10 is arbitrary
 		executor:   executor,
 		opts:       opts,
@@ -846,7 +874,7 @@ func (m *Manager) RegisterTaskExecutor(taskName string, executor TaskExecutor, o
 		maxWorkers = 1
 	}
 	r.maxWorkers = maxWorkers
-	m.taskExecutors[taskName] = r
+	m.taskExecutors[taskName.String()] = r
 	return nil
 }
 
@@ -894,7 +922,7 @@ func (m *Manager) Stop() error {
 func (m *Manager) CreateWorkflowSchedule(
 	ctx context.Context,
 	instanceName string,
-	workflowName string,
+	workflowName WorkflowName,
 	parameters interface{},
 	enabled bool,
 	recurRule *rrule.RRule,
@@ -907,7 +935,7 @@ func (m *Manager) CreateWorkflowSchedule(
 	if err != nil {
 		return err
 	}
-	err = m.backend.CreateWorkflowSchedule(ctx, instanceName, workflowName,
+	err = m.backend.CreateWorkflowSchedule(ctx, instanceName, workflowName.String(),
 		jsonData, enabled, recurRule.String(), nextRunAt)
 	if err == nil {
 		m.workflowScheduler.Trigger()
@@ -953,7 +981,7 @@ func UpdateRecurrence(recurRule *rrule.RRule) WorkflowScheduleUpdateOpts {
 // UpdateWorkflowScheduleByName updates the scheduled workflow identified by
 // (instanceName, workflowName).
 func (m *Manager) UpdateWorkflowScheduleByName(ctx context.Context,
-	instanceName string, workflowName string, opts ...WorkflowScheduleUpdateOpts) error {
+	instanceName string, workflowName WorkflowName, opts ...WorkflowScheduleUpdateOpts) error {
 
 	o := backend.WorkflowScheduleUpdateOpts{}
 	for _, opt := range opts {
@@ -962,7 +990,7 @@ func (m *Manager) UpdateWorkflowScheduleByName(ctx context.Context,
 			return err
 		}
 	}
-	err := m.backend.UpdateWorkflowScheduleByName(ctx, instanceName, workflowName, o)
+	err := m.backend.UpdateWorkflowScheduleByName(ctx, instanceName, workflowName.String(), o)
 	if err == nil {
 		m.workflowScheduler.Trigger()
 	}
@@ -982,8 +1010,8 @@ func (m *Manager) ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error
 	return ret, nil
 }
 
-func (m *Manager) GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string) (*Schedule, error) {
-	backendSched, err := m.backend.GetWorkflowScheduleByName(ctx, instanceName, workflowName)
+func (m *Manager) GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName WorkflowName) (*Schedule, error) {
+	backendSched, err := m.backend.GetWorkflowScheduleByName(ctx, instanceName, workflowName.String())
 	if err != nil {
 		return nil, err
 	}
@@ -991,8 +1019,8 @@ func (m *Manager) GetWorkflowScheduleByName(ctx context.Context, instanceName st
 	return (*Schedule)(backendSched), nil
 }
 
-func (m *Manager) GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName string) (ImmutableWorkflowInstance, error) {
-	workflowInstance, err := m.backend.GetWorkflowInstanceByName(ctx, instanceName, workflowName)
+func (m *Manager) GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName WorkflowName) (ImmutableWorkflowInstance, error) {
+	workflowInstance, err := m.backend.GetWorkflowInstanceByName(ctx, instanceName, workflowName.String())
 	if err != nil {
 		return nil, err
 	}
@@ -1004,14 +1032,14 @@ func (m *Manager) GetWorkflowInstanceByName(ctx context.Context, instanceName st
 
 // EnqueueWorkflow enqueues a workflow of type workflowName. Only one instance of
 // (workflowName, instanceName) can be running at a time.
-func (m *Manager) EnqueueWorkflow(ctx context.Context, workflowName string,
+func (m *Manager) EnqueueWorkflow(ctx context.Context, workflowName WorkflowName,
 	instanceName string, parameters interface{}) error {
 	paramsData, err := jsonify(parameters)
 	if err != nil {
 		return err
 	}
 	err = m.backend.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
-		WorkflowName: workflowName,
+		WorkflowName: workflowName.String(),
 		InstanceName: instanceName,
 		Parameters:   paramsData,
 	})
@@ -1142,7 +1170,7 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 		decision = executor.OnStart(w, StartEvent{})
 	case backend.TaskComplete:
 		decision = executor.OnTaskComplete(w, TaskCompleteEvent{
-			TaskName: wevt.TaskResult.TaskName,
+			TaskName: NewTaskName(wevt.TaskResult.TaskName),
 			Result: &taskResult{
 				backendResult: wevt.TaskResult,
 			},
@@ -1228,14 +1256,14 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 	return false
 }
 
-func (m *Manager) CancelWorkflow(ctx context.Context, workflowName string,
+func (m *Manager) CancelWorkflow(ctx context.Context, workflowName WorkflowName,
 	instanceName string) error {
-	return m.backend.CancelWorkflow(ctx, instanceName, workflowName)
+	return m.backend.CancelWorkflow(ctx, instanceName, workflowName.String())
 }
 
-func (m *Manager) KillWorkflow(ctx context.Context, workflowName string,
+func (m *Manager) KillWorkflow(ctx context.Context, workflowName WorkflowName,
 	instanceName string) error {
-	return m.backend.KillWorkflow(ctx, instanceName, workflowName)
+	return m.backend.KillWorkflow(ctx, instanceName, workflowName.String())
 }
 
 // TODO(ssd) 2019-05-17: Replace me with prometheus

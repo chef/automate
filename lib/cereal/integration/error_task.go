@@ -13,8 +13,8 @@ import (
 )
 
 func (suite *CerealTestSuite) TestErroredTask() {
-	taskName := randName("return_error")
-	workflowName := randName("error_test")
+	taskName := cereal.NewTaskName(randName("return_error"))
+	workflowName := cereal.NewWorkflowName(randName("error_test"))
 	instanceName := randName("instance")
 
 	wgTask := sync.WaitGroup{}

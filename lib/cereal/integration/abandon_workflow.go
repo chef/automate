@@ -13,8 +13,8 @@ import (
 )
 
 func (suite *CerealTestSuite) TestCompleteWorkflowWithPendingWorkflowEvents() {
-	taskName := randName("success-pending-evts")
-	workflowName := randName("success-pending-evts")
+	taskName := cereal.NewTaskName(randName("success-pending-evts"))
+	workflowName := cereal.NewWorkflowName(randName("success-pending-evts"))
 	instanceName := randName("instance")
 
 	wgTask := sync.WaitGroup{}
@@ -57,8 +57,8 @@ func (suite *CerealTestSuite) TestCompleteWorkflowWithPendingWorkflowEvents() {
 }
 
 func (suite *CerealTestSuite) TestCompleteWorkflowWithPendingTasks() {
-	taskName := randName("success-pending-tasks")
-	workflowName := randName("success-pending-tasks")
+	taskName := cereal.NewTaskName(randName("success-pending-tasks"))
+	workflowName := cereal.NewWorkflowName(randName("success-pending-tasks"))
 	instanceName := randName("instance")
 
 	wgTask := sync.WaitGroup{}
@@ -76,7 +76,7 @@ func (suite *CerealTestSuite) TestCompleteWorkflowWithPendingTasks() {
 				onStart: func(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
 					err := w.EnqueueTask(taskName, nil)
 					suite.Require().NoError(err, "failed to enqueue task")
-					err = w.EnqueueTask(taskName+"noexec", nil)
+					err = w.EnqueueTask(cereal.NewTaskName(taskName.String()+"noexec"), nil)
 					suite.Require().NoError(err, "failed to enqueue task")
 					return w.Continue(nil)
 				},

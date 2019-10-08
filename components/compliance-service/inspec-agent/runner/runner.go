@@ -31,21 +31,30 @@ import (
 
 var ListenPort int = 2133
 
+var (
+	ScanJobWorkflowName = cereal.NewWorkflowName("scan-job-workflow")
+
+	CreateChildTaskName    = cereal.NewTaskName("create-child")
+	ResolveJobTaskName     = cereal.NewTaskName("resolve-job")
+	ScanJobTaskName        = cereal.NewTaskName("scan-job")
+	ScanJobSummaryTaskName = cereal.NewTaskName("scan-job-summary")
+)
+
 func InitCerealManager(m *cereal.Manager, workerCount int, ingestClient ingest.ComplianceIngesterClient,
 	scanner *scanner.Scanner, resolver *resolver.Resolver, remoteInspecVersion string) error {
-	err := m.RegisterWorkflowExecutor("scan-job-workflow", &ScanJobWorkflow{})
+	err := m.RegisterWorkflowExecutor(ScanJobWorkflowName, &ScanJobWorkflow{})
 	if err != nil {
 		return err
 	}
 
-	err = m.RegisterTaskExecutor("create-child", &CreateChildTask{
+	err = m.RegisterTaskExecutor(CreateChildTaskName, &CreateChildTask{
 		scanner,
 	}, cereal.TaskExecutorOpts{Workers: workerCount})
 	if err != nil {
 		return err
 	}
 
-	err = m.RegisterTaskExecutor("resolve-job", &ResolveTask{
+	err = m.RegisterTaskExecutor(ResolveJobTaskName, &ResolveTask{
 		remoteInspecVersion,
 		scanner,
 		resolver,
@@ -54,7 +63,7 @@ func InitCerealManager(m *cereal.Manager, workerCount int, ingestClient ingest.C
 		return err
 	}
 
-	err = m.RegisterTaskExecutor("scan-job", &InspecJobTask{
+	err = m.RegisterTaskExecutor(ScanJobTaskName, &InspecJobTask{
 		ingestClient,
 		scanner,
 	}, cereal.TaskExecutorOpts{Workers: workerCount})
@@ -62,7 +71,7 @@ func InitCerealManager(m *cereal.Manager, workerCount int, ingestClient ingest.C
 		return err
 	}
 
-	return m.RegisterTaskExecutor("scan-job-summary", &InspecJobSummaryTask{
+	return m.RegisterTaskExecutor(ScanJobSummaryTaskName, &InspecJobSummaryTask{
 		scanner,
 	}, cereal.TaskExecutorOpts{Workers: workerCount})
 }
@@ -92,12 +101,12 @@ func (p *ScanJobWorkflow) OnStart(w cereal.WorkflowInstance,
 		return w.Fail(err)
 	}
 
-	taskName := "create-child"
+	taskName := CreateChildTaskName
 	if job.Recurrence == "" {
 		// If we don't have a recurrence, it means this job isn't a
 		// scheduled job and thus doesn't need a child job created in
 		// the database.
-		taskName = "resolve-job"
+		taskName = ResolveJobTaskName
 	}
 	err = w.EnqueueTask(taskName, job)
 	if err != nil {
@@ -129,7 +138,7 @@ func (p *ScanJobWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 
 	logrus.Debugf("Entered ScanJobWorkflow > OnTaskComplete with payload %+v", payload)
 	switch ev.TaskName {
-	case "create-child":
+	case CreateChildTaskName:
 		if ev.Result.Err() != nil {
 			logrus.WithError(ev.Result.Err()).Error("create-child failed with error")
 			return w.Fail(ev.Result.Err())
@@ -145,7 +154,7 @@ func (p *ScanJobWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 
 		payload.ChildJobID = childJob.Id
 
-		err = w.EnqueueTask("resolve-job", childJob)
+		err = w.EnqueueTask(ResolveJobTaskName, childJob)
 		if err != nil {
 			err = errors.Wrap(err, "failed to enqueue resolve-job task")
 			logrus.WithError(err)
@@ -153,7 +162,7 @@ func (p *ScanJobWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 		}
 
 		return w.Continue(&payload)
-	case "resolve-job":
+	case ResolveJobTaskName:
 		if ev.Result.Err() != nil {
 			logrus.WithError(ev.Result.Err()).Error("resolve-job failed with error")
 			return w.Fail(ev.Result.Err())
@@ -178,7 +187,7 @@ func (p *ScanJobWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 			} else {
 				logrus.Debugf("Enqueueing individual scan job %s for %s", job.JobID, payload.ParentJobID)
 			}
-			err = w.EnqueueTask("scan-job", job)
+			err = w.EnqueueTask(ScanJobTaskName, job)
 			if err != nil {
 				err = errors.Wrap(err, "failed to enqueue scan-job task")
 				logrus.WithError(err)
@@ -188,7 +197,7 @@ func (p *ScanJobWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 
 		payload.OutstandingJobs = len(jobs)
 		return w.Continue(&payload)
-	case "scan-job":
+	case ScanJobTaskName:
 		payload.OutstandingJobs--
 
 		var childJobStatus string
@@ -243,7 +252,7 @@ func (p *ScanJobWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 			if payload.OverallJobStatus == types.StatusRunning {
 				payload.OverallJobStatus = types.StatusCompleted
 			}
-			err := w.EnqueueTask("scan-job-summary", payload)
+			err := w.EnqueueTask(ScanJobSummaryTaskName, payload)
 			if err != nil {
 				err = errors.Wrap(err, "failed to enqueue scan-job-summary task")
 				logctx.WithError(err).Error("failed to enqueue scan-job-summary")
@@ -251,7 +260,7 @@ func (p *ScanJobWorkflow) OnTaskComplete(w cereal.WorkflowInstance,
 			}
 		}
 		return w.Continue(&payload)
-	case "scan-job-summary":
+	case ScanJobSummaryTaskName:
 		// We only want to complete after processing the summary task
 		// This task is designed to conclude the overall status of a job that is resolved in child jobs
 		return w.Complete()

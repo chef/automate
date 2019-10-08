@@ -15,7 +15,7 @@ import (
 // TestWorkflowFail tests that a call to w.Fail ends the workflow
 // with an error that can be recovered.
 func (suite *CerealTestSuite) TestWorkflowFail() {
-	workflowName := randName("failing")
+	workflowName := cereal.NewWorkflowName(randName("failing"))
 	instanceName := randName("instance")
 
 	wg := sync.WaitGroup{}
@@ -53,7 +53,7 @@ func (suite *CerealTestSuite) TestWorkflowFail() {
 }
 
 func (suite *CerealTestSuite) TestWorkflowFailOnBadEnqueue() {
-	workflowName := randName("failing")
+	workflowName := cereal.NewWorkflowName(randName("failing"))
 	instanceName := randName("instance")
 
 	wg := sync.WaitGroup{}
@@ -64,7 +64,7 @@ func (suite *CerealTestSuite) TestWorkflowFailOnBadEnqueue() {
 			&workflowExecutorWrapper{
 				onStart: func(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
 					wg.Done()
-					w.EnqueueTask("foo", nil)
+					w.EnqueueTask(cereal.NewTaskName("foo"), nil)
 					return w.Complete(nil)
 				},
 				onTaskComplete: func(w cereal.WorkflowInstance, ev cereal.TaskCompleteEvent) cereal.Decision {
@@ -92,7 +92,7 @@ func (suite *CerealTestSuite) TestWorkflowFailOnBadEnqueue() {
 }
 
 func (suite *CerealTestSuite) TestWorkflowFailOnUnmarshalableJSON() {
-	workflowName := randName("failing")
+	workflowName := cereal.NewWorkflowName(randName("failing"))
 	instanceName := randName("instance")
 
 	wg := sync.WaitGroup{}

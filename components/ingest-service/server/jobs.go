@@ -14,36 +14,33 @@ import (
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/config"
 	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/patterns"
 	"github.com/chef/automate/lib/datalifecycle/purge"
 )
 
-const (
-	MissingNodesJobName                 = "missing_nodes"
-	MissingNodesScheduleName            = "periodic_missing_nodes"
-	DeleteNodesJobName                  = "delete_nodes"
-	DeleteNodesScheduleName             = "periodic_delete_nodes"
-	MissingNodesForDeletionJobName      = "missing_nodes_for_deletion"
+var (
+	MissingNodesWorkflowName = cereal.NewWorkflowName("missing_nodes")
+	MissingNodesScheduleName = "periodic_missing_nodes"
+
+	DeleteNodesWorkflowName = cereal.NewWorkflowName("delete_nodes")
+	DeleteNodesScheduleName = "periodic_delete_nodes"
+
+	MissingNodesForDeletionWorkflowName = cereal.NewWorkflowName("missing_nodes_for_deletion")
 	MissingNodesForDeletionScheduleName = "periodic_missing_nodes_for_deletion"
 )
 
 func InitializeJobManager(c *cereal.Manager, client backend.Client, esSidecarClient es.EsSidecarClient) error {
-	err := c.RegisterTaskExecutor(DeleteNodesJobName, &DeleteExpiredMarkedNodesTask{client}, cereal.TaskExecutorOpts{})
+	err := patterns.RegisterSingleTaskWorkflowExecutor(c, DeleteNodesWorkflowName, false, &DeleteExpiredMarkedNodesTask{client}, cereal.TaskExecutorOpts{})
 	if err != nil {
 		return err
 	}
-	err = c.RegisterTaskExecutor(MissingNodesJobName, &MarkNodesMissingTask{client}, cereal.TaskExecutorOpts{})
+	err = patterns.RegisterSingleTaskWorkflowExecutor(c, MissingNodesWorkflowName, false, &MarkNodesMissingTask{client}, cereal.TaskExecutorOpts{})
 	if err != nil {
 		return err
 	}
-	err = c.RegisterTaskExecutor(MissingNodesForDeletionJobName, &MarkMissingNodesForDeletionTask{client}, cereal.TaskExecutorOpts{})
+	err = patterns.RegisterSingleTaskWorkflowExecutor(c, MissingNodesForDeletionWorkflowName, false, &MarkMissingNodesForDeletionTask{client}, cereal.TaskExecutorOpts{})
 	if err != nil {
 		return err
-	}
-	for _, jobName := range []string{MissingNodesJobName, DeleteNodesJobName, MissingNodesForDeletionJobName} {
-		err = c.RegisterWorkflowExecutor(jobName, NewSingleTaskWorkflow(jobName))
-		if err != nil {
-			return errors.Wrapf(err, "failed to register workflow for %q", jobName)
-		}
 	}
 	err = purge.ConfigureManager(
 		c, PurgeWorkflowName, purge.WithTaskEsSidecarClient(esSidecarClient),
@@ -81,7 +78,7 @@ func MigrateJobsSchedule(ctx context.Context, c *cereal.Manager, oldConfigFile s
 			return errors.Wrap(err, "could not create recurrence rule for job configuration")
 		}
 
-		err = c.CreateWorkflowSchedule(ctx, scheduleName, name, config.Threshold, config.Running, r)
+		err = c.CreateWorkflowSchedule(ctx, scheduleName, cereal.NewWorkflowName(name), config.Threshold, config.Running, r)
 		if err == cereal.ErrWorkflowScheduleExists {
 			log.Infof("Schedule for %s already exists, not migrating", scheduleName)
 		} else if err != nil {
@@ -90,41 +87,9 @@ func MigrateJobsSchedule(ctx context.Context, c *cereal.Manager, oldConfigFile s
 	}
 	return nil
 }
-func jobNameToInstanceName(jobName string) string {
-	return fmt.Sprintf("periodic_%s", jobName)
-}
 
-// TODO(ssd) 2019-05-15: This is a helper to avoid having to write
-// workflows for things that are just single tasks. Perhaps the
-// workflow library could have a helper that..helps with this.
-type SingleTaskWorkflow struct {
-	taskName string
-}
-
-func NewSingleTaskWorkflow(taskName string) *SingleTaskWorkflow {
-	return &SingleTaskWorkflow{taskName}
-}
-
-func (s *SingleTaskWorkflow) OnStart(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
-	var params string
-	err := w.GetParameters(&params)
-	if err != nil {
-		return w.Fail(err)
-	}
-
-	err = w.EnqueueTask(s.taskName, params)
-	if err != nil {
-		return w.Fail(err)
-	}
-	return w.Continue(0)
-}
-
-func (s *SingleTaskWorkflow) OnTaskComplete(w cereal.WorkflowInstance, ev cereal.TaskCompleteEvent) cereal.Decision {
-	return w.Complete()
-}
-
-func (s *SingleTaskWorkflow) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEvent) cereal.Decision {
-	return w.Complete()
+func workflowNameToInstanceName(workflowName cereal.WorkflowName) string {
+	return fmt.Sprintf("periodic_%s", workflowName)
 }
 
 type DeleteExpiredMarkedNodesTask struct {

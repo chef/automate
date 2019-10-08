@@ -18,7 +18,7 @@ func (server *JobSchedulerServer) MarkNodesMissing(ctx context.Context,
 	empty *ingest.MarkNodesMissingRequest) (*ingest.MarkNodesMissingResponse, error) {
 
 	sched, err := server.jobManager.GetWorkflowScheduleByName(ctx,
-		MissingNodesScheduleName, MissingNodesJobName)
+		MissingNodesScheduleName, MissingNodesWorkflowName)
 	if err != nil {
 		return &ingest.MarkNodesMissingResponse{}, status.Error(codes.Internal, err.Error())
 	}
@@ -47,7 +47,7 @@ func (server *JobSchedulerServer) StartNodesMissingScheduler(ctx context.Context
 
 	err := server.jobManager.UpdateWorkflowScheduleByName(
 		ctx,
-		MissingNodesScheduleName, MissingNodesJobName,
+		MissingNodesScheduleName, MissingNodesWorkflowName,
 		cereal.UpdateEnabled(true))
 	if err != nil {
 		return &ingest.StartNodesMissingSchedulerResponse{}, status.Error(codes.Internal, err.Error())
@@ -63,7 +63,7 @@ func (server *JobSchedulerServer) StopNodesMissingScheduler(ctx context.Context,
 
 	err := server.jobManager.UpdateWorkflowScheduleByName(
 		ctx,
-		MissingNodesScheduleName, MissingNodesJobName,
+		MissingNodesScheduleName, MissingNodesWorkflowName,
 		cereal.UpdateEnabled(false))
 	if err != nil {
 		return &ingest.StopNodesMissingSchedulerResponse{}, status.Error(codes.Internal, err.Error())
@@ -79,7 +79,7 @@ func (server *JobSchedulerServer) ConfigureNodesMissingScheduler(ctx context.Con
 	}).Info("Incoming job")
 
 	oldSchedule, err := server.jobManager.GetWorkflowScheduleByName(
-		ctx, MissingNodesScheduleName, MissingNodesJobName)
+		ctx, MissingNodesScheduleName, MissingNodesWorkflowName)
 	if err != nil {
 		return &ingest.ConfigureNodesMissingSchedulerResponse{}, status.Error(codes.Internal, err.Error())
 	}
@@ -92,14 +92,14 @@ func (server *JobSchedulerServer) ConfigureNodesMissingScheduler(ctx context.Con
 
 	// apply job settings to the job config, then update the job if needed
 	err = server.jobManager.UpdateWorkflowScheduleByName(
-		ctx, MissingNodesScheduleName, MissingNodesJobName, updateOpts...)
+		ctx, MissingNodesScheduleName, MissingNodesWorkflowName, updateOpts...)
 	if err != nil {
 		return &ingest.ConfigureNodesMissingSchedulerResponse{},
 			status.Error(codes.Internal, err.Error())
 	}
 
 	if shouldRunNow {
-		err = server.runJobNow(ctx, MissingNodesJobName)
+		err = server.runWorkflowNow(ctx, MissingNodesWorkflowName)
 		if err != nil {
 			return &ingest.ConfigureNodesMissingSchedulerResponse{}, status.Error(codes.Internal, err.Error())
 		}

@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/backend"
-	"github.com/stretchr/testify/require"
 )
 
 type WorkflowInstance struct {
@@ -65,7 +66,7 @@ type TestableTask struct {
 	t          *testing.T
 	parameters []byte
 
-	Name string
+	Name cereal.TaskName
 	Opts backend.TaskEnqueueOpts
 }
 
@@ -87,7 +88,7 @@ func (t *TestableTaskEnqueued) AssertCount(c int) *TestableTaskEnqueued {
 	return t
 }
 
-func (d *TestableContinueDecision) AssertTaskEnqueued(taskName string) *TestableTaskEnqueued {
+func (d *TestableContinueDecision) AssertTaskEnqueued(taskName cereal.TaskName) *TestableTaskEnqueued {
 	e := &TestableTaskEnqueued{
 		t: d.t,
 	}
@@ -151,7 +152,7 @@ func (w *WorkflowInstance) GetParameters(obj interface{}) error {
 	return json.Unmarshal(w.inputParams, obj)
 }
 
-func (w *WorkflowInstance) EnqueueTask(taskName string, parameters interface{}, opts ...cereal.TaskEnqueueOpts) error {
+func (w *WorkflowInstance) EnqueueTask(taskName cereal.TaskName, parameters interface{}, opts ...cereal.TaskEnqueueOpts) error {
 	bopts := backend.TaskEnqueueOpts{}
 	for _, o := range opts {
 		o(&bopts)

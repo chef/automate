@@ -36,11 +36,13 @@ const (
 	cerealServiceMutualTLSName = "cereal-service"
 
 	DefaultJobIntervalSeconds = 60
+)
 
-	DisconnectedServicesJobName      = "disconnected_services"
+var (
+	DisconnectedServicesWorkflowName = cereal.NewWorkflowName("disconnected_services")
 	DisconnectedServicesScheduleName = "periodic_disconnected_services"
 
-	DeleteDisconnectedServicesJobName      = "delete_disconnected_services"
+	DeleteDisconnectedServicesWorkflowName = cereal.NewWorkflowName("delete_disconnected_services")
 	DeleteDisconnectedServicesScheduleName = "periodic_delete_disconnected_services"
 )
 
@@ -77,7 +79,7 @@ func (j *JobScheduler) Setup() error {
 	err = j.createWorkflowIfMissing(
 		context.Background(),
 		DisconnectedServicesScheduleName,
-		DisconnectedServicesJobName,
+		DisconnectedServicesWorkflowName,
 		defaultDisconnectedServicesJobParams(),
 		r,
 	)
@@ -98,7 +100,7 @@ func (j *JobScheduler) Setup() error {
 	err = j.createWorkflowIfMissing(
 		context.Background(),
 		DeleteDisconnectedServicesScheduleName,
-		DeleteDisconnectedServicesJobName,
+		DeleteDisconnectedServicesWorkflowName,
 		defaultDeleteDisconnectedServicesJobParams(),
 		r,
 	)
@@ -126,13 +128,13 @@ func (j *JobScheduler) ResetParams() error {
 func (j *JobScheduler) createWorkflowIfMissing(
 	ctx context.Context,
 	scheduleName string,
-	jobName string,
+	workflowName cereal.WorkflowName,
 	jobParams interface{},
 	recurrence *rrule.RRule,
 ) error {
 	logCtx := log.WithFields(log.Fields{
 		"scheduleName": scheduleName,
-		"jobName":      jobName,
+		"workflowName": workflowName,
 		"jobParams":    jobParams,
 		"recurrence":   recurrence,
 	})
@@ -140,7 +142,7 @@ func (j *JobScheduler) createWorkflowIfMissing(
 	err := j.CerealSvc.CreateWorkflowSchedule(
 		ctx,
 		scheduleName,
-		jobName,
+		workflowName,
 		jobParams,
 		true,
 		recurrence,
@@ -158,7 +160,7 @@ func (j *JobScheduler) createWorkflowIfMissing(
 }
 
 func (j *JobScheduler) GetDisconnectedServicesJobConfig(ctx context.Context) (*DisconnectedServicesConfigV0, error) {
-	sched, err := j.CerealSvc.GetWorkflowScheduleByName(ctx, DisconnectedServicesScheduleName, DisconnectedServicesJobName)
+	sched, err := j.CerealSvc.GetWorkflowScheduleByName(ctx, DisconnectedServicesScheduleName, DisconnectedServicesWorkflowName)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to retrieve schedule and config for disconnected_services job")
 	}
@@ -177,7 +179,7 @@ func (j *JobScheduler) GetDisconnectedServicesJobConfig(ctx context.Context) (*D
 func (j *JobScheduler) UpdateDisconnectedServicesJobParams(ctx context.Context, params *DisconnectedServicesParamsV0) error {
 	err := j.CerealSvc.UpdateWorkflowScheduleByName(
 		ctx,
-		DisconnectedServicesScheduleName, DisconnectedServicesJobName,
+		DisconnectedServicesScheduleName, DisconnectedServicesWorkflowName,
 		cereal.UpdateParameters(params))
 	if err != nil {
 		return errors.Wrap(err, "failed to set disconnected_services job to enabled")
@@ -186,7 +188,7 @@ func (j *JobScheduler) UpdateDisconnectedServicesJobParams(ctx context.Context, 
 }
 
 func (j *JobScheduler) GetDeleteDisconnectedServicesJobConfig(ctx context.Context) (*DisconnectedServicesConfigV0, error) {
-	sched, err := j.CerealSvc.GetWorkflowScheduleByName(ctx, DeleteDisconnectedServicesScheduleName, DeleteDisconnectedServicesJobName)
+	sched, err := j.CerealSvc.GetWorkflowScheduleByName(ctx, DeleteDisconnectedServicesScheduleName, DeleteDisconnectedServicesWorkflowName)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to retrieve schedule and config for delete_disconnected_services job")
 	}
@@ -205,7 +207,7 @@ func (j *JobScheduler) GetDeleteDisconnectedServicesJobConfig(ctx context.Contex
 func (j *JobScheduler) UpdateDeleteDisconnectedServicesJobParams(ctx context.Context, params *DisconnectedServicesParamsV0) error {
 	err := j.CerealSvc.UpdateWorkflowScheduleByName(
 		ctx,
-		DeleteDisconnectedServicesScheduleName, DeleteDisconnectedServicesJobName,
+		DeleteDisconnectedServicesScheduleName, DeleteDisconnectedServicesWorkflowName,
 		cereal.UpdateParameters(params))
 	if err != nil {
 		return errors.Wrap(err, "failed to set delete_disconnected_services job to enabled")
@@ -217,7 +219,7 @@ func (j *JobScheduler) UpdateDeleteDisconnectedServicesJobParams(ctx context.Con
 func (j *JobScheduler) EnableDeleteDisconnectedServicesJob(ctx context.Context) error {
 	err := j.CerealSvc.UpdateWorkflowScheduleByName(
 		ctx,
-		DeleteDisconnectedServicesScheduleName, DeleteDisconnectedServicesJobName,
+		DeleteDisconnectedServicesScheduleName, DeleteDisconnectedServicesWorkflowName,
 		cereal.UpdateEnabled(true))
 	if err != nil {
 		return errors.Wrap(err, "failed to set delete_disconnected_services job to enabled")
@@ -228,7 +230,7 @@ func (j *JobScheduler) EnableDeleteDisconnectedServicesJob(ctx context.Context) 
 func (j *JobScheduler) DisableDeleteDisconnectedServicesJob(ctx context.Context) error {
 	err := j.CerealSvc.UpdateWorkflowScheduleByName(
 		ctx,
-		DeleteDisconnectedServicesScheduleName, DeleteDisconnectedServicesJobName,
+		DeleteDisconnectedServicesScheduleName, DeleteDisconnectedServicesWorkflowName,
 		cereal.UpdateEnabled(false))
 	if err != nil {
 		return errors.Wrap(err, "failed to set delete_disconnected_services job to disabled")
@@ -240,7 +242,7 @@ func (j *JobScheduler) DisableDeleteDisconnectedServicesJob(ctx context.Context)
 func (j *JobScheduler) EnableDisconnectedServicesJob(ctx context.Context) error {
 	err := j.CerealSvc.UpdateWorkflowScheduleByName(
 		ctx,
-		DisconnectedServicesScheduleName, DisconnectedServicesJobName,
+		DisconnectedServicesScheduleName, DisconnectedServicesWorkflowName,
 		cereal.UpdateEnabled(true))
 	if err != nil {
 		return errors.Wrap(err, "failed to set disconnected_services job to enabled")
@@ -251,7 +253,7 @@ func (j *JobScheduler) EnableDisconnectedServicesJob(ctx context.Context) error 
 func (j *JobScheduler) DisableDisconnectedServicesJob(ctx context.Context) error {
 	err := j.CerealSvc.UpdateWorkflowScheduleByName(
 		ctx,
-		DisconnectedServicesScheduleName, DisconnectedServicesJobName,
+		DisconnectedServicesScheduleName, DisconnectedServicesWorkflowName,
 		cereal.UpdateEnabled(false))
 	if err != nil {
 		return errors.Wrap(err, "failed to set disconnected_services job to disabled")
@@ -274,7 +276,7 @@ func (j *JobScheduler) RunAllJobsConstantly(ctx context.Context) error {
 
 	err = j.CerealSvc.UpdateWorkflowScheduleByName(
 		ctx,
-		DisconnectedServicesScheduleName, DisconnectedServicesJobName,
+		DisconnectedServicesScheduleName, DisconnectedServicesWorkflowName,
 		cereal.UpdateRecurrence(r))
 	if err != nil {
 		return errors.Wrap(err, "failed to update recurrence of disconnected_services schedule")
@@ -282,7 +284,7 @@ func (j *JobScheduler) RunAllJobsConstantly(ctx context.Context) error {
 
 	err = j.CerealSvc.UpdateWorkflowScheduleByName(
 		ctx,
-		DeleteDisconnectedServicesScheduleName, DeleteDisconnectedServicesJobName,
+		DeleteDisconnectedServicesScheduleName, DeleteDisconnectedServicesWorkflowName,
 		cereal.UpdateRecurrence(r))
 	if err != nil {
 		return errors.Wrap(err, "failed to update recurrence of delete_disconnected_services schedule")
@@ -315,35 +317,25 @@ func NewJobRunnerSet(applicationsServer *ApplicationsServer) *JobRunnerSet {
 }
 
 func (j *JobRunnerSet) Start(cerealSvc *cereal.Manager) error {
-	err := cerealSvc.RegisterTaskExecutor(
-		DisconnectedServicesJobName,
+	err := patterns.RegisterSingleTaskWorkflowExecutor(
+		cerealSvc,
+		DisconnectedServicesWorkflowName,
+		false,
 		j.MarkDisconnectedServicesExecutor,
-		cereal.TaskExecutorOpts{},
-	)
+		cereal.TaskExecutorOpts{})
 	if err != nil {
-		return errors.Wrap(err, "failed to register as task executor to mark disconnected services")
+		return errors.Wrap(err, "failed to register marked disconnected services executors")
 	}
 
-	wfX := patterns.NewSingleTaskWorkflowExecutor(DisconnectedServicesJobName, false)
-	err = cerealSvc.RegisterWorkflowExecutor(DisconnectedServicesJobName, wfX)
-	if err != nil {
-		return errors.Wrap(err, "failed to register as workflow executor to mark disconnected services")
-	}
-
-	err = cerealSvc.RegisterTaskExecutor(
-		DeleteDisconnectedServicesJobName,
+	err = patterns.RegisterSingleTaskWorkflowExecutor(
+		cerealSvc,
+		DeleteDisconnectedServicesWorkflowName,
+		false,
 		j.DeleteDisconnectedServicesExecutor,
 		cereal.TaskExecutorOpts{},
 	)
-
 	if err != nil {
-		return errors.Wrap(err, "failed to register as task executor to delete disconnected services")
-	}
-
-	wfX = patterns.NewSingleTaskWorkflowExecutor(DeleteDisconnectedServicesJobName, false)
-	err = cerealSvc.RegisterWorkflowExecutor(DeleteDisconnectedServicesJobName, wfX)
-	if err != nil {
-		return errors.Wrap(err, "failed to register as workflow executor to mark disconnected services")
+		return errors.Wrap(err, "failed to register delete disconnected services executors")
 	}
 
 	// TODO: set a timeout
@@ -414,7 +406,7 @@ func (d *DeleteDisconnectedServicesExecutor) Run(ctx context.Context, t cereal.T
 }
 
 func (d *DeleteDisconnectedServicesExecutor) runWithoutStats(ctx context.Context, t cereal.Task) error {
-	logCtx := log.WithFields(log.Fields{"task_name": DeleteDisconnectedServicesJobName})
+	logCtx := log.WithFields(log.Fields{"task_name": DeleteDisconnectedServicesWorkflowName})
 	var params DisconnectedServicesParamsV0
 	if err := t.GetParameters(&params); err != nil {
 		return errors.Wrap(err, "failed to load parameters for disconnected_services job")

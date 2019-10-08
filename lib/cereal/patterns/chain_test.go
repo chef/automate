@@ -62,8 +62,8 @@ func TestChainSingleOnStart(t *testing.T) {
 				err := w.GetParameters(&params)
 				require.NoError(t, err)
 				require.Equal(t, workflow1Params, params)
-				w.EnqueueTask("testTask1", nil)
-				w.EnqueueTask("testTask2", nil)
+				w.EnqueueTask(cereal.NewTaskName("testTask1"), nil)
+				w.EnqueueTask(cereal.NewTaskName("testTask2"), nil)
 				return w.Continue(TestWorkflowPayload{
 					PayloadValue: params.Value,
 				})
@@ -83,8 +83,8 @@ func TestChainSingleOnStart(t *testing.T) {
 
 		executor.OnStart(instance, ev)
 		continuing := instance.AssertContinuing()
-		continuing.AssertTaskEnqueued("testTask1").AssertCount(1)
-		continuing.AssertTaskEnqueued("testTask2").AssertCount(1)
+		continuing.AssertTaskEnqueued(cereal.NewTaskName("testTask1")).AssertCount(1)
+		continuing.AssertTaskEnqueued(cereal.NewTaskName("testTask2")).AssertCount(1)
 
 		payload := ChainWorkflowPayload{}
 		continuing.GetPayload(&payload)
@@ -115,7 +115,7 @@ func TestChainSingleOnStart(t *testing.T) {
 		executor, err := NewChainWorkflowExecutor(cerealtest.NewWorkflowExecutor(
 			func(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
 				// This enqueued task is ignored as the workflow is ending
-				w.EnqueueTask("testTask1", nil)
+				w.EnqueueTask(cereal.NewTaskName("testTask1"), nil)
 				return w.Complete(cereal.WithResult(TestWorkflowPayload{
 					PayloadValue: workflow1Params.Value,
 				}))
@@ -160,7 +160,7 @@ func TestChainSingleOnStart(t *testing.T) {
 		executor, err := NewChainWorkflowExecutor(cerealtest.NewWorkflowExecutor(
 			func(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
 				// This enqueued task is ignored as the workflow is ending
-				w.EnqueueTask("testTask1", nil)
+				w.EnqueueTask(cereal.NewTaskName("testTask1"), nil)
 				return w.Fail(errors.New("fail"))
 			},
 			nil,
@@ -240,8 +240,8 @@ func TestChainMultipleOnStart(t *testing.T) {
 				err := w.GetParameters(&params)
 				require.NoError(t, err)
 				require.Equal(t, workflow1Params, params)
-				w.EnqueueTask("testTask1", nil)
-				w.EnqueueTask("testTask2", nil)
+				w.EnqueueTask(cereal.NewTaskName("testTask1"), nil)
+				w.EnqueueTask(cereal.NewTaskName("testTask2"), nil)
 				return w.Continue(TestWorkflowPayload{
 					PayloadValue: params.Value,
 				})
@@ -262,8 +262,8 @@ func TestChainMultipleOnStart(t *testing.T) {
 
 		executor.OnStart(instance, ev)
 		continuing := instance.AssertContinuing()
-		continuing.AssertTaskEnqueued("testTask1").AssertCount(1)
-		continuing.AssertTaskEnqueued("testTask2").AssertCount(1)
+		continuing.AssertTaskEnqueued(cereal.NewTaskName("testTask1")).AssertCount(1)
+		continuing.AssertTaskEnqueued(cereal.NewTaskName("testTask2")).AssertCount(1)
 
 		payload := ChainWorkflowPayload{}
 		continuing.GetPayload(&payload)
@@ -302,7 +302,7 @@ func TestChainMultipleOnStart(t *testing.T) {
 				err := w.GetParameters(&params)
 				require.NoError(t, err)
 				// This should be ignored as this workflow is completing
-				w.EnqueueTask("testTask1", nil)
+				w.EnqueueTask(cereal.NewTaskName("testTask1"), nil)
 				return w.Complete(cereal.WithResult(TestWorkflowPayload{
 					PayloadValue: params.Value,
 				}))
@@ -315,7 +315,7 @@ func TestChainMultipleOnStart(t *testing.T) {
 				params := TestWorkflowParams{}
 				err := w.GetParameters(&params)
 				require.NoError(t, err)
-				w.EnqueueTask("testTask1", workflow2TaskParams)
+				w.EnqueueTask(cereal.NewTaskName("testTask1"), workflow2TaskParams)
 				return w.Continue(TestWorkflowPayload{
 					PayloadValue: params.Value,
 				})
@@ -339,7 +339,7 @@ func TestChainMultipleOnStart(t *testing.T) {
 
 		payload := ChainWorkflowPayload{}
 		continuing.GetPayload(&payload)
-		tasks := continuing.AssertTaskEnqueued("testTask1").AssertCount(1)
+		tasks := continuing.AssertTaskEnqueued(cereal.NewTaskName("testTask1")).AssertCount(1)
 		taskMetadata := ChainWorkflowTaskParam{}
 		tasks.Tasks[0].GetParameters(&taskMetadata)
 		require.Equal(t, int64(1), taskMetadata.XXX_ChainWorkflowIdx)
@@ -574,7 +574,7 @@ func TestChainMultipleOnTaskComplete(t *testing.T) {
 			WithParameters(params)
 
 		tr := cerealtest.NewTaskResult(t)
-		ev := cerealtest.NewTaskCompleteEvent("task1Name", tr)
+		ev := cerealtest.NewTaskCompleteEvent(cereal.NewTaskName("task1Name"), tr)
 
 		executor.OnTaskComplete(instance, ev)
 		instance.AssertFailed().WithErrorEqual(ErrIncorrectParameters)
@@ -606,7 +606,7 @@ func TestChainMultipleOnTaskComplete(t *testing.T) {
 			WithParameters(params)
 
 		tr := cerealtest.NewTaskResult(t)
-		ev := cerealtest.NewTaskCompleteEvent("task1Name", tr)
+		ev := cerealtest.NewTaskCompleteEvent(cereal.NewTaskName("task1Name"), tr)
 
 		executor.OnTaskComplete(instance, ev)
 		instance.AssertFailed().WithErrorEqual(ErrTaskWorkflowInvalid)
@@ -654,7 +654,7 @@ func TestChainMultipleOnTaskComplete(t *testing.T) {
 			XXX_ChainWorkflowIdx: 0,
 		}
 		tr := cerealtest.NewTaskResult(t).WithParameters(taskMetadata)
-		ev := cerealtest.NewTaskCompleteEvent("task1Name", tr)
+		ev := cerealtest.NewTaskCompleteEvent(cereal.NewTaskName("task1Name"), tr)
 
 		executor.OnTaskComplete(instance, ev)
 		instance.AssertContinuing()
@@ -676,7 +676,7 @@ func TestChainMultipleOnTaskComplete(t *testing.T) {
 					require.Equal(t, 1, w.TotalCompletedTasks())
 					require.Equal(t, 1, w.TotalEnqueuedTasks())
 					// enqueue task is ignored
-					w.EnqueueTask("testTask2", nil)
+					w.EnqueueTask(cereal.NewTaskName("testTask2"), nil)
 					return w.Complete()
 				},
 				nil,
@@ -705,7 +705,7 @@ func TestChainMultipleOnTaskComplete(t *testing.T) {
 			XXX_ChainWorkflowIdx: 1,
 		}
 		tr := cerealtest.NewTaskResult(t).WithParameters(taskMetadata)
-		ev := cerealtest.NewTaskCompleteEvent("task1Name", tr)
+		ev := cerealtest.NewTaskCompleteEvent(cereal.NewTaskName("task1Name"), tr)
 
 		executor.OnTaskComplete(instance, ev)
 		complete := instance.AssertComplete()
@@ -768,7 +768,7 @@ func TestChainMultipleOnTaskComplete(t *testing.T) {
 			XXX_ChainWorkflowIdx: 1,
 		}
 		tr := cerealtest.NewTaskResult(t).WithParameters(taskMetadata)
-		ev := cerealtest.NewTaskCompleteEvent("task1Name", tr)
+		ev := cerealtest.NewTaskCompleteEvent(cereal.NewTaskName("task1Name"), tr)
 
 		executor.OnTaskComplete(instance, ev)
 		complete := instance.AssertComplete()
@@ -804,7 +804,7 @@ func TestChainMultipleOnTaskComplete(t *testing.T) {
 			cerealtest.NewWorkflowExecutor(
 				nil,
 				func(w cereal.WorkflowInstance, ev cereal.TaskCompleteEvent) cereal.Decision {
-					w.EnqueueTask("task1Name", workflow2TaskParams)
+					w.EnqueueTask(cereal.NewTaskName("task1Name"), workflow2TaskParams)
 					require.Equal(t, 1, w.TotalCompletedTasks())
 					require.Equal(t, 2, w.TotalEnqueuedTasks())
 					return w.Continue(nil)
@@ -835,12 +835,12 @@ func TestChainMultipleOnTaskComplete(t *testing.T) {
 			XXX_ChainWorkflowIdx: 1,
 		}
 		tr := cerealtest.NewTaskResult(t).WithParameters(taskMetadata)
-		ev := cerealtest.NewTaskCompleteEvent("task1Name", tr)
+		ev := cerealtest.NewTaskCompleteEvent(cereal.NewTaskName("task1Name"), tr)
 
 		executor.OnTaskComplete(instance, ev)
 		continuing := instance.AssertContinuing()
 
-		tasks := continuing.AssertTaskEnqueued("task1Name")
+		tasks := continuing.AssertTaskEnqueued(cereal.NewTaskName("task1Name"))
 		tasks.AssertCount(1)
 		taskMetadata = ChainWorkflowTaskParam{}
 		tasks.Tasks[0].GetParameters(&taskMetadata)
@@ -887,7 +887,7 @@ func TestChainMultipleOnTaskComplete(t *testing.T) {
 			),
 			cerealtest.NewWorkflowExecutor(
 				func(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
-					w.EnqueueTask("task2Name", workflow2TaskParams)
+					w.EnqueueTask(cereal.NewTaskName("task2Name"), workflow2TaskParams)
 					require.Equal(t, 0, w.TotalCompletedTasks())
 					require.Equal(t, 1, w.TotalEnqueuedTasks())
 					return w.Continue(workflow2Payload)
@@ -916,12 +916,12 @@ func TestChainMultipleOnTaskComplete(t *testing.T) {
 			XXX_ChainWorkflowIdx: 0,
 		}
 		tr := cerealtest.NewTaskResult(t).WithParameters(taskMetadata)
-		ev := cerealtest.NewTaskCompleteEvent("task1Name", tr)
+		ev := cerealtest.NewTaskCompleteEvent(cereal.NewTaskName("task1Name"), tr)
 
 		executor.OnTaskComplete(instance, ev)
 		continuing := instance.AssertContinuing()
 
-		tasks := continuing.AssertTaskEnqueued("task2Name")
+		tasks := continuing.AssertTaskEnqueued(cereal.NewTaskName("task2Name"))
 		tasks.AssertCount(1)
 		taskMetadata = ChainWorkflowTaskParam{}
 		tasks.Tasks[0].GetParameters(&taskMetadata)
@@ -992,7 +992,7 @@ func TestChainMultipleOnTaskComplete(t *testing.T) {
 			XXX_ChainWorkflowIdx: 0,
 		}
 		tr := cerealtest.NewTaskResult(t).WithParameters(taskMetadata)
-		ev := cerealtest.NewTaskCompleteEvent("task1Name", tr)
+		ev := cerealtest.NewTaskCompleteEvent(cereal.NewTaskName("task1Name"), tr)
 
 		executor.OnTaskComplete(instance, ev)
 		complete := instance.AssertComplete()
@@ -1054,7 +1054,7 @@ func TestChainMultipleOnTaskComplete(t *testing.T) {
 			XXX_ChainWorkflowIdx: 0,
 		}
 		tr := cerealtest.NewTaskResult(t).WithParameters(taskMetadata)
-		ev := cerealtest.NewTaskCompleteEvent("task1Name", tr)
+		ev := cerealtest.NewTaskCompleteEvent(cereal.NewTaskName("task1Name"), tr)
 
 		executor.OnTaskComplete(instance, ev)
 		complete := instance.AssertComplete()
@@ -1130,7 +1130,7 @@ func TestChainMultipleOnTaskComplete(t *testing.T) {
 			XXX_ChainWorkflowIdx: 0,
 		}
 		tr := cerealtest.NewTaskResult(t).WithParameters(taskMetadata)
-		ev := cerealtest.NewTaskCompleteEvent("task1Name", tr)
+		ev := cerealtest.NewTaskCompleteEvent(cereal.NewTaskName("task1Name"), tr)
 
 		executor.OnTaskComplete(instance, ev)
 		complete := instance.AssertComplete()
@@ -1339,7 +1339,7 @@ func TestChainMultipleOnCancel(t *testing.T) {
 					params := TestWorkflowParams{}
 					require.NoError(t, w.GetParameters(&params))
 					require.Equal(t, workflow1Params, params)
-					w.EnqueueTask("task1Name", workflow1TaskParams)
+					w.EnqueueTask(cereal.NewTaskName("task1Name"), workflow1TaskParams)
 					return w.Continue(workflow1Payload)
 				},
 			),
@@ -1368,7 +1368,7 @@ func TestChainMultipleOnCancel(t *testing.T) {
 
 		executor.OnCancel(instance, ev)
 		continuing := instance.AssertContinuing()
-		task := continuing.AssertTaskEnqueued("task1Name")
+		task := continuing.AssertTaskEnqueued(cereal.NewTaskName("task1Name"))
 		task.AssertCount(1)
 		tparams := TestTaskParams{}
 		task.Tasks[0].GetParameters(&tparams)
@@ -1428,7 +1428,7 @@ func TestChainMultipleOnCancel(t *testing.T) {
 			XXX_ChainWorkflowIdx: 0,
 		}
 		tr := cerealtest.NewTaskResult(t).WithResult(taskMetadata)
-		ev := cerealtest.NewTaskCompleteEvent("taskName1", tr)
+		ev := cerealtest.NewTaskCompleteEvent(cereal.NewTaskName("taskName1"), tr)
 
 		executor.OnTaskComplete(instance, ev)
 		complete := instance.AssertComplete()
@@ -1486,7 +1486,7 @@ func TestChainMultipleOnCancel(t *testing.T) {
 			XXX_ChainWorkflowIdx: 0,
 		}
 		tr := cerealtest.NewTaskResult(t).WithResult(taskMetadata)
-		ev := cerealtest.NewTaskCompleteEvent("taskName1", tr)
+		ev := cerealtest.NewTaskCompleteEvent(cereal.NewTaskName("taskName1"), tr)
 
 		executor.OnTaskComplete(instance, ev)
 		complete := instance.AssertComplete()

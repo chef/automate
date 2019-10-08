@@ -47,7 +47,7 @@ func (server *JobSchedulerServer) GetStatusJobScheduler(ctx context.Context,
 	)
 	for _, sched := range schedules {
 		switch sched.WorkflowName {
-		case PurgeJobName:
+		case PurgeWorkflowName.String():
 			var (
 				purgePolicies purge.Policies
 				job           *ingest.Job
@@ -63,7 +63,7 @@ func (server *JobSchedulerServer) GetStatusJobScheduler(ctx context.Context,
 
 			toJobName := func(index string) string {
 				index = strings.ReplaceAll(index, "-", "_")
-				return fmt.Sprintf("%s_%s", PurgeJobName, index)
+				return fmt.Sprintf("%s_%s", PurgeWorkflowName, index)
 			}
 
 			for _, policy := range purgePolicies.Es {
@@ -107,8 +107,8 @@ func (server *JobSchedulerServer) GetStatusJobScheduler(ctx context.Context,
 	return jobStatus, nil
 }
 
-func (server *JobSchedulerServer) runJobNow(ctx context.Context, jobName string) error {
-	sched, err := server.jobManager.GetWorkflowScheduleByName(ctx, jobNameToInstanceName(jobName), jobName)
+func (server *JobSchedulerServer) runWorkflowNow(ctx context.Context, workflowName cereal.WorkflowName) error {
+	sched, err := server.jobManager.GetWorkflowScheduleByName(ctx, workflowNameToInstanceName(workflowName), workflowName)
 	if err != nil {
 		return err
 	}
@@ -118,11 +118,11 @@ func (server *JobSchedulerServer) runJobNow(ctx context.Context, jobName string)
 		return err
 	}
 
-	err = server.jobManager.EnqueueWorkflow(ctx, jobName, jobNameToInstanceName(jobName), threshold)
+	err = server.jobManager.EnqueueWorkflow(ctx, workflowName, workflowNameToInstanceName(workflowName), threshold)
 	if err == cereal.ErrWorkflowInstanceExists {
 		// TODO(ssd) 2019-06-28: It would be nice if there was
 		// a way to queue this up rather than rejecting it.
-		log.Warnf("job %q is already running, not running now", jobName)
+		log.Warnf("workflow %q is already running, not running now", workflowName)
 		return nil
 	}
 	return err
