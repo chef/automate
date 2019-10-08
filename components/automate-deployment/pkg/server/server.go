@@ -423,9 +423,8 @@ func (s *server) configRenderer() (ConfigRenderer, error) {
 
 		preparableCfg, found := s.deployment.Config.PlatformServiceConfigForService(service.Name())
 		if !found {
-			err := errors.Errorf("unable to render configuration for unknown service %q", service.Name())
-			logrus.WithField("service", service.Name).WithError(err).Error("unable to render configuration")
-			return "", err
+			logrus.WithField("service", service.Name).WithError(err).Warnf("unable to render configuration for unknown service %q", service.Name())
+			return "", nil
 		}
 
 		preparedCfg, err := preparableCfg.PrepareSystemConfig(creds)

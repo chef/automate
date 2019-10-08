@@ -4,6 +4,7 @@ authn-service REQUIRED authz-service automate-dex automate-pg-gateway cereal-ser
 authn-service BINDING_MODE strict
 authz-service REQUIRED automate-pg-gateway cereal-service pg-sidecar-service
 authz-service BINDING_MODE strict
+automate-builder-memcached BINDING_MODE strict
 automate-cs-bookshelf REQUIRED automate-pg-gateway pg-sidecar-service
 automate-cs-bookshelf BINDING_MODE strict
 automate-cs-nginx REQUIRED automate-cs-bookshelf automate-cs-oc-erchef automate-es-gateway

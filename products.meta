@@ -36,6 +36,7 @@
     "chef/automate-cs-nginx",
     "chef/automate-workflow-server",
     "chef/automate-workflow-nginx",
+    "chef/automate-builder-memcached",
     "chef/automate-prometheus",
     "chef/automate-cli",
     "core/rsync"
@@ -147,6 +148,14 @@
       "services": [
         "chef/automate-workflow-server",
         "chef/automate-workflow-nginx"
+      ]
+    },
+    {
+      "name": "depot",
+      "type": "product",
+      "dependencies": ["core", "postgresql", "elasticsearch"],
+      "services": [
+        "chef/automate-builder-memcached"
       ]
     },
     {
