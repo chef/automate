@@ -103,4 +103,7 @@ func init() {
 	// Cereal Service Flags
 	runCmd.Flags().StringVar(&conf.Cereal.Endpoint, "cereal-endpoint", conf.Cereal.Endpoint, "Cereal Service Endpoint")
 	runCmd.Flags().BoolVar(&conf.Cereal.Skip, "skip-cereal", conf.Cereal.Skip, "Do not require a running Cereal Service (test only)")
+
+	// Authz service Flags
+	runCmd.Flags().StringVar(&conf.Authz.Endpoint, "authz-endpoint", conf.Authz.Endpoint, "Authz Service Endpoint")
 }
