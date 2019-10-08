@@ -153,7 +153,7 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
       .attr('x', this.vbWidth / 2)
       .attr('y', this.vbHeight - 3)
       .text(() => {
-        const format = '%B %e, %Y';
+        const format = '%a, %e %b %Y';
         return [
           d3.timeFormat(format)(this.domainX[0]),
           d3.timeFormat(format)(this.domainX[1])
