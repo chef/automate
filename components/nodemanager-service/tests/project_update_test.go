@@ -34,12 +34,12 @@ func TestProjectUpdate(t *testing.T) {
 	}{
 		// Environment
 		{
-			description: "Environment - updating project",
+			description: "Environment - project updates with single rule, single matching condition",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -54,7 +54,7 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
 			description: "Environment - not updating project. wrong rule type",
@@ -62,10 +62,10 @@ func TestProjectUpdate(t *testing.T) {
 				{Key: "environment", Values: []string{"env1"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
-							Type: iam_v2.ProjectRuleTypes_EVENT,
+							Type: iam_v2.ProjectRuleTypes_EVENT, // <- wrong type
 							Conditions: []*iam_v2.Condition{
 								{
 									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
@@ -76,17 +76,17 @@ func TestProjectUpdate(t *testing.T) {
 					},
 				},
 			},
-			originalProjectIDs: []string{"project9"},
+			originalProjectIDs: []string{},
 			expectedProjectIDs: []string{},
 		},
 		{
-			description: "Environment - Single rule two matching conditions",
+			description: "Environment - project updates with single rule two matching conditions",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
 				{Key: "organization_name", Values: []string{"org1"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -105,15 +105,16 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "Environment - Single rule, one non-matching condition",
+			description: "Environment - project does not update with single rule, " +
+				"one non-matching and one matching condition",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -135,19 +136,20 @@ func TestProjectUpdate(t *testing.T) {
 			expectedProjectIDs: []string{},
 		},
 		{
-			description: "Environment - a rule's condition has two values for a field",
+			description: "Environment - project updates with a single rule, single condition with " +
+				"three values and only one matching",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
 							Conditions: []*iam_v2.Condition{
 								{
 									Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
-									Values:    []string{"env1", "env2"},
+									Values:    []string{"env3", "env1", "env2"},
 								},
 							},
 						},
@@ -155,15 +157,15 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "Environment - two rules only one matching",
+			description: "Environment - project updates with two rules and only one matching",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -187,10 +189,10 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "Environment - two project only one matching",
+			description: "Environment - project updates with two projects and only one matching",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
 			},
@@ -208,7 +210,7 @@ func TestProjectUpdate(t *testing.T) {
 						},
 					},
 				},
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -223,16 +225,16 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "Environment - two matching projects",
+			description: "Environment - projects update with two matching projects",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
 				{Key: "organization_name", Values: []string{"org2"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project7": {
+				"targetProject2": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -245,7 +247,7 @@ func TestProjectUpdate(t *testing.T) {
 						},
 					},
 				},
-				"project3": {
+				"targetProject1": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -260,10 +262,10 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3", "project7"},
+			expectedProjectIDs: []string{"targetProject1", "targetProject2"},
 		},
 		{
-			description: "Environment - updating project all variables",
+			description: "Environment - project updates with all ProjectData variables set",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
 				{Key: "roles", Values: []string{}},
@@ -274,7 +276,7 @@ func TestProjectUpdate(t *testing.T) {
 				{Key: "chef_server", Values: []string{"chef_server.com"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -289,10 +291,10 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description:  "Environment - missing field",
+			description:  "Environment - project does not update with the matching condition field missing",
 			projectsData: []*nodes.ProjectsData{},
 			projectRules: map[string]*iam_v2.ProjectRules{
 				"project3": {
@@ -313,7 +315,8 @@ func TestProjectUpdate(t *testing.T) {
 			expectedProjectIDs: []string{},
 		},
 		{
-			description: "Environment - no project change",
+			description: "Environment - the project IDs does not update with a project matching for " +
+				"the same ID",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
 			},
@@ -331,7 +334,7 @@ func TestProjectUpdate(t *testing.T) {
 						},
 					},
 				},
-				"project9": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -345,13 +348,13 @@ func TestProjectUpdate(t *testing.T) {
 					},
 				},
 			},
-			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project9"},
+			originalProjectIDs: []string{"targetProject"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 
 		// general
 		{
-			description: "project removed with all variables set",
+			description: "project removed with no project rules and all ProjectsData variables set",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
 				{Key: "roles", Values: []string{}},
@@ -366,7 +369,7 @@ func TestProjectUpdate(t *testing.T) {
 			expectedProjectIDs: []string{},
 		},
 		{
-			description:        "project removed no variables set",
+			description:        "project removed with no project rules and not ProjectsData variables set",
 			projectsData:       []*nodes.ProjectsData{},
 			projectRules:       map[string]*iam_v2.ProjectRules{},
 			originalProjectIDs: []string{"project9"},
@@ -375,7 +378,7 @@ func TestProjectUpdate(t *testing.T) {
 
 		// Orgs
 		{
-			description: "Org - updating project all variables",
+			description: "Org - project updated with single condition and all ProjectsData variables set",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
 				{Key: "organization_name", Values: []string{"org"}},
@@ -386,7 +389,7 @@ func TestProjectUpdate(t *testing.T) {
 				{Key: "chef_tags", Values: []string{}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -401,10 +404,10 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "Org - not updating project. wrong rule type",
+			description: "Org - not updating project, one rule with the wrong rule type",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
 				{Key: "roles", Values: []string{}},
@@ -429,17 +432,17 @@ func TestProjectUpdate(t *testing.T) {
 					},
 				},
 			},
-			originalProjectIDs: []string{"project9"},
+			originalProjectIDs: []string{},
 			expectedProjectIDs: []string{},
 		},
 		{
-			description: "Org - Single rule two matching conditions",
+			description: "Org - project updated with single rule, two matching conditions",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "organization_name", Values: []string{"ink"}},
 				{Key: "roles", Values: []string{"backend"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -457,11 +460,11 @@ func TestProjectUpdate(t *testing.T) {
 					},
 				},
 			},
-			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			originalProjectIDs: []string{"originalProject"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "Org - Single rule, one non-matching condition",
+			description: "Org - project removed with a single rule, one non-matching and one matching condition",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "organization_name", Values: []string{"ink"}},
 			},
@@ -488,12 +491,13 @@ func TestProjectUpdate(t *testing.T) {
 			expectedProjectIDs: []string{},
 		},
 		{
-			description: "Org - a rule's condition has two values for a field",
+			description: "Org - project updated with a rule's condition having two values for a " +
+				"field with one matching",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "organization_name", Values: []string{"ink"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -508,15 +512,15 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "Org - two rules only one matching",
+			description: "Org - project updated with two rules, only one matching",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "organization_name", Values: []string{"ink"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -540,10 +544,10 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "Org - two project only one matching",
+			description: "Org - project update with two project, only one matching",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "organization_name", Values: []string{"ink"}},
 			},
@@ -561,7 +565,7 @@ func TestProjectUpdate(t *testing.T) {
 						},
 					},
 				},
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -576,10 +580,10 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description:  "Org - missing field",
+			description:  "Org - project removed with one condition matching a missing field",
 			projectsData: []*nodes.ProjectsData{},
 			projectRules: map[string]*iam_v2.ProjectRules{
 				"project3": {
@@ -600,7 +604,8 @@ func TestProjectUpdate(t *testing.T) {
 			expectedProjectIDs: []string{},
 		},
 		{
-			description: "Org - no project change",
+			description: "Org - project not updated with two rules one matching with the original " +
+				"project ID and the other rule not matching",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "organization_name", Values: []string{"ink"}},
 			},
@@ -618,7 +623,7 @@ func TestProjectUpdate(t *testing.T) {
 						},
 					},
 				},
-				"project9": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -632,13 +637,14 @@ func TestProjectUpdate(t *testing.T) {
 					},
 				},
 			},
-			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project9"},
+			originalProjectIDs: []string{"targetProject"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 
 		// chef_server
 		{
-			description: "chef_server - updating project all variables",
+			description: "chef_server - project updated with one condition and all the " +
+				"ProjectsData variables set",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
 				{Key: "organization_name", Values: []string{"org"}},
@@ -649,7 +655,7 @@ func TestProjectUpdate(t *testing.T) {
 				{Key: "chef_tags", Values: []string{}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -664,10 +670,10 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "chef_server - not updating project. wrong rule type",
+			description: "chef_server - project not updated with matching rule on the wrong type",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
 				{Key: "roles", Values: []string{}},
@@ -681,7 +687,7 @@ func TestProjectUpdate(t *testing.T) {
 				"project3": {
 					Rules: []*iam_v2.ProjectRule{
 						{
-							Type: iam_v2.ProjectRuleTypes_EVENT,
+							Type: iam_v2.ProjectRuleTypes_EVENT, // <- wrong type
 							Conditions: []*iam_v2.Condition{
 								{
 									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER,
@@ -692,7 +698,7 @@ func TestProjectUpdate(t *testing.T) {
 					},
 				},
 			},
-			originalProjectIDs: []string{"project9"},
+			originalProjectIDs: []string{},
 			expectedProjectIDs: []string{},
 		},
 		{
@@ -702,7 +708,7 @@ func TestProjectUpdate(t *testing.T) {
 				{Key: "roles", Values: []string{"backend"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -721,7 +727,7 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
 			description: "chef_server - Single rule, one non-matching condition",
@@ -756,7 +762,7 @@ func TestProjectUpdate(t *testing.T) {
 				{Key: "chef_server", Values: []string{"chef_server.com"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -771,7 +777,7 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
 			description: "chef_server - two rules only one matching",
@@ -779,7 +785,7 @@ func TestProjectUpdate(t *testing.T) {
 				{Key: "chef_server", Values: []string{"chef_server.com"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -803,7 +809,7 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
 			description: "chef_server - two project only one matching",
@@ -824,7 +830,7 @@ func TestProjectUpdate(t *testing.T) {
 						},
 					},
 				},
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -839,7 +845,7 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
 			description:  "chef_server - missing field",
@@ -881,7 +887,7 @@ func TestProjectUpdate(t *testing.T) {
 						},
 					},
 				},
-				"project9": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -895,8 +901,8 @@ func TestProjectUpdate(t *testing.T) {
 					},
 				},
 			},
-			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project9"},
+			originalProjectIDs: []string{"targetProject"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 
 		// policy_name
@@ -912,7 +918,7 @@ func TestProjectUpdate(t *testing.T) {
 				{Key: "chef_tags", Values: []string{}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -927,7 +933,7 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
 			description: "policy_name - not updating project. wrong rule type",
@@ -955,7 +961,7 @@ func TestProjectUpdate(t *testing.T) {
 					},
 				},
 			},
-			originalProjectIDs: []string{"project9"},
+			originalProjectIDs: []string{},
 			expectedProjectIDs: []string{},
 		},
 		{
@@ -965,7 +971,7 @@ func TestProjectUpdate(t *testing.T) {
 				{Key: "roles", Values: []string{"backend"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -984,7 +990,7 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
 			description: "policy_name - Single rule, one non-matching condition",
@@ -1020,7 +1026,7 @@ func TestProjectUpdate(t *testing.T) {
 				{Key: "policy_name", Values: []string{"prod"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1035,7 +1041,7 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
 			description: "policy_name - two rules only one matching",
@@ -1043,7 +1049,7 @@ func TestProjectUpdate(t *testing.T) {
 				{Key: "policy_name", Values: []string{"prod"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1067,7 +1073,7 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
 			description: "policy_name - two project only one matching",
@@ -1075,7 +1081,7 @@ func TestProjectUpdate(t *testing.T) {
 				{Key: "policy_name", Values: []string{"prod"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1103,7 +1109,7 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
 			description:  "policy_name - missing field",
@@ -1145,7 +1151,7 @@ func TestProjectUpdate(t *testing.T) {
 						},
 					},
 				},
-				"project9": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1159,8 +1165,8 @@ func TestProjectUpdate(t *testing.T) {
 					},
 				},
 			},
-			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project9"},
+			originalProjectIDs: []string{"targetProject"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 
 		// policy_group
@@ -1176,7 +1182,7 @@ func TestProjectUpdate(t *testing.T) {
 				{Key: "chef_tags", Values: []string{}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1191,10 +1197,10 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "policy_group - not updating project. wrong rule type",
+			description: "policy_group - project not updating, with a matching rule, wrong rule type",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
 				{Key: "roles", Values: []string{}},
@@ -1219,17 +1225,17 @@ func TestProjectUpdate(t *testing.T) {
 					},
 				},
 			},
-			originalProjectIDs: []string{"project9"},
+			originalProjectIDs: []string{},
 			expectedProjectIDs: []string{},
 		},
 		{
-			description: "policy_group - Single rule two matching conditions",
+			description: "policy_group - project updated, with a single rule two matching conditions",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "policy_group", Values: []string{"ts_sci_polygraph"}},
 				{Key: "roles", Values: []string{"backend"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1248,10 +1254,10 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "policy_group - Single rule, one non-matching condition",
+			description: "policy_group - project removed, with a single rule, two conditions only one matching",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "policy_group", Values: []string{"ts_sci_polygraph"}},
 				{Key: "roles", Values: []string{"frontend"}},
@@ -1279,12 +1285,12 @@ func TestProjectUpdate(t *testing.T) {
 			expectedProjectIDs: []string{},
 		},
 		{
-			description: "policy_group - a rule's condition has two values for a field",
+			description: "policy_group - project update, with a rule's condition having two values for a field",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "policy_group", Values: []string{"ts_sci_polygraph"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1299,15 +1305,15 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "policy_group - two rules only one matching",
+			description: "policy_group - project update, two rules only one matching",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "policy_group", Values: []string{"ts_sci_polygraph"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1331,15 +1337,15 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "policy_group - two project only one matching",
+			description: "policy_group - project updated, with two project only one matching",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "policy_group", Values: []string{"ts_sci_polygraph"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1367,7 +1373,7 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
 			description:  "policy_group - missing field",
@@ -1391,7 +1397,8 @@ func TestProjectUpdate(t *testing.T) {
 			expectedProjectIDs: []string{},
 		},
 		{
-			description: "policy_group - no project change",
+			description: "policy_group - no project change, with two projects only one matching with the " +
+				"original ID",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "policy_group", Values: []string{"ts_sci_polygraph"}},
 			},
@@ -1409,7 +1416,7 @@ func TestProjectUpdate(t *testing.T) {
 						},
 					},
 				},
-				"project9": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1423,13 +1430,13 @@ func TestProjectUpdate(t *testing.T) {
 					},
 				},
 			},
-			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project9"},
+			originalProjectIDs: []string{"targetProject"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 
 		// roles
 		{
-			description: "roles - updating project all variables",
+			description: "roles - project updated, with one condition matching, all ProjectsData variables set",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
 				{Key: "organization_name", Values: []string{"org"}},
@@ -1440,7 +1447,7 @@ func TestProjectUpdate(t *testing.T) {
 				{Key: "chef_tags", Values: []string{}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1455,10 +1462,10 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "roles - not updating project. wrong rule type",
+			description: "roles - project not updated, one matching rule, wrong rule type",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
 				{Key: "roles", Values: []string{"mysql"}},
@@ -1483,11 +1490,11 @@ func TestProjectUpdate(t *testing.T) {
 					},
 				},
 			},
-			originalProjectIDs: []string{"project9"},
+			originalProjectIDs: []string{},
 			expectedProjectIDs: []string{},
 		},
 		{
-			description: "roles - two roles",
+			description: "roles - project updated, one condition with two ProjectsData roles",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
 				{Key: "organization_name", Values: []string{"org"}},
@@ -1498,7 +1505,7 @@ func TestProjectUpdate(t *testing.T) {
 				{Key: "chef_tags", Values: []string{}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1513,10 +1520,10 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "roles - Single rule, multiple conitions with one non-matching",
+			description: "roles - project removed, with single rule, multiple conitions with one non-matching",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "policy_name", Values: []string{"prod"}},
 				{Key: "roles", Values: []string{"frontend", "mysql"}},
@@ -1544,12 +1551,12 @@ func TestProjectUpdate(t *testing.T) {
 			expectedProjectIDs: []string{},
 		},
 		{
-			description: "roles - a rule's condition has two values for a field",
+			description: "roles - project updated, a rule's condition has two values for a field",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "roles", Values: []string{"mysql"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1564,15 +1571,15 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "roles - two matching rule condition values",
+			description: "roles - project updated, two matching rule condition values",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "roles", Values: []string{"mysql", "ftp"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1587,15 +1594,15 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "roles - two rules only one matching",
+			description: "roles - project updated, two rules only one matching",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "roles", Values: []string{"mysql"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1619,15 +1626,15 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "roles - two rules only one matching with two roles",
+			description: "roles - project updated, with two rules, only one matching with two roles",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "roles", Values: []string{"mysql", "ftp"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1651,15 +1658,15 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "roles - two matching rules",
+			description: "roles - project updated, with two matching rules",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "roles", Values: []string{"mysql", "ftp"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1683,15 +1690,15 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "roles - two projects only one matching",
+			description: "roles - project update, with two projects only one matching",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "roles", Values: []string{"mysql"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1719,10 +1726,10 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description:  "roles - missing field",
+			description:  "roles - project removed, with a condition matching a missing ProjectsData field",
 			projectsData: []*nodes.ProjectsData{},
 			projectRules: map[string]*iam_v2.ProjectRules{
 				"project3": {
@@ -1743,7 +1750,7 @@ func TestProjectUpdate(t *testing.T) {
 			expectedProjectIDs: []string{},
 		},
 		{
-			description: "roles - no project change",
+			description: "roles - project not updated, with a rule matching with the original ID",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "roles", Values: []string{"mysql"}},
 			},
@@ -1761,7 +1768,7 @@ func TestProjectUpdate(t *testing.T) {
 						},
 					},
 				},
-				"project9": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1775,13 +1782,14 @@ func TestProjectUpdate(t *testing.T) {
 					},
 				},
 			},
-			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project9"},
+			originalProjectIDs: []string{"targetProject"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 
 		// chef_tags
 		{
-			description: "chef_tags - updating project with all variables set",
+			description: "chef_tags - project updated, with all the ProjectsData variables set with one" +
+				" matching",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
 				{Key: "organization_name", Values: []string{"org"}},
@@ -1792,7 +1800,7 @@ func TestProjectUpdate(t *testing.T) {
 				{Key: "chef_tags", Values: []string{"dev_sec"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1807,10 +1815,10 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "chef_tags - not updating project. wrong rule type",
+			description: "chef_tags - project not updated, with one rule with the wrong type",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
 				{Key: "roles", Values: []string{"mysql"}},
@@ -1835,11 +1843,11 @@ func TestProjectUpdate(t *testing.T) {
 					},
 				},
 			},
-			originalProjectIDs: []string{"project9"},
+			originalProjectIDs: []string{},
 			expectedProjectIDs: []string{},
 		},
 		{
-			description: "chef_tags - two chef tags",
+			description: "chef_tags - project updated, ProjectsData has two chef tags with only one matching",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "environment", Values: []string{"env1"}},
 				{Key: "organization_name", Values: []string{"org"}},
@@ -1850,7 +1858,7 @@ func TestProjectUpdate(t *testing.T) {
 				{Key: "chef_tags", Values: []string{"dev_sec", "cos"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1865,10 +1873,10 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "chef_tags - Single rule, multiple conitions with one non-matching",
+			description: "chef_tags - project updated, single rule, multiple conitions with one non-matching",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "policy_name", Values: []string{"prod"}},
 				{Key: "chef_tags", Values: []string{"dev_sec", "cos"}},
@@ -1896,12 +1904,12 @@ func TestProjectUpdate(t *testing.T) {
 			expectedProjectIDs: []string{},
 		},
 		{
-			description: "chef_tags - a rule's condition has two values for a field",
+			description: "chef_tags - project updated, a rule's condition has two values for a field",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "chef_tags", Values: []string{"dev_sec"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1916,15 +1924,15 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "chef_tags - two matching rule condition values",
+			description: "chef_tags - project updated, two matching rule condition values",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "chef_tags", Values: []string{"dev_sec", "cos"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1939,15 +1947,15 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "chef_tags - two rules only one matching",
+			description: "chef_tags - project updated, two rules only one matching",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "chef_tags", Values: []string{"dev_sec"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -1971,15 +1979,16 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "chef_tags - two chef tags only one matching",
+			description: "chef_tags - project updated, with ProjectsData chef_tags field having two values " +
+				"and only one matching",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "chef_tags", Values: []string{"dev_sec", "cos"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -2003,15 +2012,15 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "chef_tags - two matching rules",
+			description: "chef_tags - project ID updated, with one project, two matching rules",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "chef_tags", Values: []string{"dev_sec", "cos"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -2035,15 +2044,15 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "chef_tags - two projects only one matching",
+			description: "chef_tags - project ID updated, with two projects, only one matching",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "chef_tags", Values: []string{"dev_sec"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -2071,10 +2080,11 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project3"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description:  "chef_tags - missing field",
+			description: "chef_tags - project IDs removed, with one condition assoicated to a " +
+				"missing ProjectsData field",
 			projectsData: []*nodes.ProjectsData{},
 			projectRules: map[string]*iam_v2.ProjectRules{
 				"project3": {
@@ -2095,7 +2105,8 @@ func TestProjectUpdate(t *testing.T) {
 			expectedProjectIDs: []string{},
 		},
 		{
-			description: "chef_tags - no project change",
+			description: "chef_tags - project IDs not updated, with two projects only one matching " +
+				"with the original ID",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "chef_tags", Values: []string{"dev_sec", "cos"}},
 			},
@@ -2113,7 +2124,7 @@ func TestProjectUpdate(t *testing.T) {
 						},
 					},
 				},
-				"project9": {
+				"targetProject": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -2127,16 +2138,16 @@ func TestProjectUpdate(t *testing.T) {
 					},
 				},
 			},
-			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project9"},
+			originalProjectIDs: []string{"targetProject"},
+			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "chef_tags - two matching projects",
+			description: "chef_tags - project IDs updated with two matching projects",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "chef_tags", Values: []string{"dev_sec", "cos"}},
 			},
 			projectRules: map[string]*iam_v2.ProjectRules{
-				"project3": {
+				"targetProject1": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -2149,7 +2160,7 @@ func TestProjectUpdate(t *testing.T) {
 						},
 					},
 				},
-				"project9": {
+				"targetProject2": {
 					Rules: []*iam_v2.ProjectRule{
 						{
 							Type: iam_v2.ProjectRuleTypes_NODE,
@@ -2164,7 +2175,7 @@ func TestProjectUpdate(t *testing.T) {
 				},
 			},
 			originalProjectIDs: []string{"project9"},
-			expectedProjectIDs: []string{"project9", "project3"},
+			expectedProjectIDs: []string{"targetProject2", "targetProject1"},
 		},
 	}
 

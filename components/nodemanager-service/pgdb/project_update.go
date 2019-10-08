@@ -57,14 +57,15 @@ func (db *DB) UpdateProjectTags(ctx context.Context,
 }
 
 // JobStatus - get the job status of the project update
-func (db *DB) JobStatus(ctx context.Context, projectID string) (project_update_lib.JobStatus, error) {
-	if db.ProjectUpdate.ID == projectID {
+func (db *DB) JobStatus(ctx context.Context, jobID string) (project_update_lib.JobStatus, error) {
+	if db.ProjectUpdate.ID == jobID {
 		if db.ProjectUpdate.jobStatusError != nil {
 			return project_update_lib.JobStatus{}, db.ProjectUpdate.jobStatusError
 		}
 		return db.ProjectUpdate.jobStatus, nil
 	}
 
+	// If the jobID does not match the currently running job then it must have completed before.
 	return project_update_lib.JobStatus{
 		Completed:             true,
 		PercentageComplete:    1,
@@ -93,13 +94,13 @@ func (db *DB) updateNodes(projectRules map[string]*iam_v2.ProjectRules) {
 			return
 		}
 
-		db.projectUpdateStatusUpdate(float32((index + 1)) / numberOfNodes)
+		db.updateProjectStatus(float32((index + 1)) / numberOfNodes)
 	}
 
 	db.projectUpdateComplete()
 }
 
-func (db *DB) projectUpdateStatusUpdate(percentageComplete float32) {
+func (db *DB) updateProjectStatus(percentageComplete float32) {
 	db.ProjectUpdate.jobStatus = project_update_lib.JobStatus{
 		Completed:             false,
 		PercentageComplete:    percentageComplete,
@@ -146,7 +147,7 @@ func (db *DB) getAllNodes() ([]*NodeProjectData, error) {
 		dbProjectsData := []*nodes.ProjectsData{}
 		err := json.Unmarshal([]byte(node.Data), &dbProjectsData)
 		if err != nil {
-			return nodesDaos, errors.Wrap(err, "fromDBNode unable to unmarshal projects data")
+			return nodesDaos, errors.Wrap(err, "getAllNodes unable to unmarshal projects data")
 		}
 
 		node.ProjectDataKeyValues = dbProjectsData
@@ -188,47 +189,32 @@ func nodeMatchesAllConditions(node *NodeProjectData, conditions []*iam_v2.Condit
 		switch condition.Attribute {
 		case iam_v2.ProjectRuleConditionAttributes_CHEF_SERVER:
 			values := node.getValues("chef_server")
-			if len(values) == 0 {
-				return false
-			}
 
-			if !stringutils.SliceContains(condition.Values, values[0]) {
+			if len(values) == 0 || !stringutils.SliceContains(condition.Values, values[0]) {
 				return false
 			}
 		case iam_v2.ProjectRuleConditionAttributes_CHEF_ORGANIZATION:
 			values := node.getValues("organization_name")
-			if len(values) == 0 {
-				return false
-			}
 
-			if !stringutils.SliceContains(condition.Values, values[0]) {
+			if len(values) == 0 || !stringutils.SliceContains(condition.Values, values[0]) {
 				return false
 			}
 		case iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT:
 			values := node.getValues("environment")
-			if len(values) == 0 {
-				return false
-			}
 
-			if !stringutils.SliceContains(condition.Values, values[0]) {
+			if len(values) == 0 || !stringutils.SliceContains(condition.Values, values[0]) {
 				return false
 			}
 		case iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_GROUP:
 			values := node.getValues("policy_group")
-			if len(values) == 0 {
-				return false
-			}
 
-			if !stringutils.SliceContains(condition.Values, values[0]) {
+			if len(values) == 0 || !stringutils.SliceContains(condition.Values, values[0]) {
 				return false
 			}
 		case iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME:
 			values := node.getValues("policy_name")
-			if len(values) == 0 {
-				return false
-			}
 
-			if !stringutils.SliceContains(condition.Values, values[0]) {
+			if len(values) == 0 || !stringutils.SliceContains(condition.Values, values[0]) {
 				return false
 			}
 		case iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE:
