@@ -6,11 +6,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/chef/automate/lib/cereal/backend"
-	"github.com/chef/automate/lib/cereal/postgres"
-
-	"github.com/chef/automate/lib/platform/pg"
 	"github.com/spf13/cobra"
+
+	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/cereal/postgres"
+	"github.com/chef/automate/lib/platform/pg"
 )
 
 var cerealCmdFlags = struct {
@@ -37,7 +37,7 @@ func defaultConnURIForCerealDatabase() string {
 	return connInfo.ConnURI(cerealCmdFlags.DatabaseName)
 }
 
-func getCerealBackend() backend.Driver {
+func getCerealBackend() cereal.Driver {
 	return postgres.NewPostgresBackend(defaultConnURIForCerealDatabase())
 }
 
@@ -110,7 +110,7 @@ func runCerealListWorkflowInstances(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	opts := backend.ListWorkflowOpts{}
+	opts := cereal.ListWorkflowOpts{}
 	if listCerealWorkflowInstanceOpts.IsRunning == "true" {
 		m := true
 		opts.IsRunning = &m
@@ -197,7 +197,7 @@ func runCerealTriggerSchedule(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	err = b.UpdateWorkflowScheduleByName(context.Background(), instanceName, workflowName, backend.WorkflowScheduleUpdateOpts{
+	err = b.UpdateWorkflowScheduleByName(context.Background(), instanceName, workflowName, cereal.WorkflowScheduleUpdateOptions{
 		UpdateRecurrence: true,
 		Recurrence:       sched.Recurrence,
 		NextRunAt:        time.Now(),

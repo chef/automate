@@ -15,10 +15,9 @@ import (
 
 	grpccereal "github.com/chef/automate/api/interservice/cereal"
 	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/cereal/backend"
 )
 
-var _ backend.Driver = &GrpcBackend{}
+var _ cereal.Driver = &GrpcBackend{}
 
 var errUnknownMessage = errors.New("Unknown message received")
 
@@ -48,7 +47,7 @@ func (g *GrpcBackend) DefaultWorkflowPollInterval() time.Duration {
 	return 2 * time.Second
 }
 
-func (g *GrpcBackend) EnqueueWorkflow(ctx context.Context, workflow *backend.WorkflowInstance) error {
+func (g *GrpcBackend) EnqueueWorkflow(ctx context.Context, workflow *cereal.WorkflowInstanceData) error {
 	if _, err := g.client.EnqueueWorkflow(ctx, &grpccereal.EnqueueWorkflowRequest{
 		Domain:       g.domain,
 		InstanceName: workflow.InstanceName,
@@ -70,9 +69,9 @@ type workflowCompleter struct {
 	tasks []*grpccereal.Task
 }
 
-var _ backend.WorkflowCompleter = &workflowCompleter{}
+var _ cereal.WorkflowCompleter = &workflowCompleter{}
 
-func (c *workflowCompleter) EnqueueTask(task *backend.Task, opts backend.TaskEnqueueOpts) error {
+func (c *workflowCompleter) EnqueueTask(task *cereal.TaskData, opts cereal.TaskEnqueueOptions) error {
 	t := &grpccereal.Task{
 		Name:       task.Name,
 		Parameters: task.Parameters,
@@ -149,7 +148,7 @@ func (c *workflowCompleter) Close() error {
 	return c.s.CloseSend()
 }
 
-func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []string) (*backend.WorkflowEvent, backend.WorkflowCompleter, error) {
+func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []string) (*cereal.WorkflowEvent, cereal.WorkflowCompleter, error) {
 	s, err := g.client.DequeueWorkflow(ctx)
 	if err != nil {
 		return nil, nil, err
@@ -181,20 +180,20 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 		return nil, nil, errors.New("unexpected")
 	}
 
-	var taskResult *backend.TaskResult
+	var taskResult *cereal.TaskResultData
 	if tr := deq.GetEvent().GetTaskResult(); tr != nil {
-		taskResult = &backend.TaskResult{
+		taskResult = &cereal.TaskResultData{
 			TaskName:   tr.GetTaskName(),
 			Parameters: tr.GetParameters(),
-			Status:     backend.TaskStatusType(tr.GetStatus()),
+			Status:     cereal.TaskStatusType(tr.GetStatus()),
 			ErrorText:  tr.GetErrorText(),
 			Result:     tr.GetResult(),
 		}
 	}
 	backendInstance := grpcWorkflowInstanceToBackend(deq.GetInstance())
-	wevt := &backend.WorkflowEvent{
+	wevt := &cereal.WorkflowEvent{
 		Instance:           backendInstance,
-		Type:               backend.WorkflowEventType(deq.GetEvent().GetType()),
+		Type:               cereal.WorkflowEventType(deq.GetEvent().GetType()),
 		EnqueuedTaskCount:  int(deq.GetEvent().GetEnqueuedTaskCount()),
 		CompletedTaskCount: int(deq.GetEvent().GetCompletedTaskCount()),
 		TaskResult:         taskResult,
@@ -205,15 +204,15 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 	}, nil
 }
 
-func grpcWorkflowInstanceToBackend(grpcInstance *grpccereal.WorkflowInstance) backend.WorkflowInstance {
+func grpcWorkflowInstanceToBackend(grpcInstance *grpccereal.WorkflowInstance) cereal.WorkflowInstanceData {
 	var err error
 	if grpcInstance.Err != "" {
 		err = errors.New(grpcInstance.Err)
 	}
-	return backend.WorkflowInstance{
+	return cereal.WorkflowInstanceData{
 		InstanceName: grpcInstance.GetInstanceName(),
 		WorkflowName: grpcInstance.GetWorkflowName(),
-		Status:       backend.WorkflowInstanceStatus(grpcInstance.GetStatus()),
+		Status:       cereal.WorkflowInstanceStatus(grpcInstance.GetStatus()),
 		Parameters:   grpcInstance.GetParameters(),
 		Payload:      grpcInstance.GetPayload(),
 		Err:          err,
@@ -334,7 +333,7 @@ func (c *taskCompleter) Succeed(result []byte) error {
 	}
 }
 
-func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*backend.Task, backend.TaskCompleter, error) {
+func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*cereal.TaskData, cereal.TaskCompleter, error) {
 	s, err := g.client.DequeueTask(ctx)
 	if err != nil {
 		return nil, nil, err
@@ -388,7 +387,7 @@ func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*backen
 		cancel()
 		doneChan <- errOut
 	}()
-	return &backend.Task{
+	return &cereal.TaskData{
 			Name:       deq.GetTask().GetName(),
 			Parameters: deq.GetTask().GetParameters(),
 		}, &taskCompleter{
@@ -423,7 +422,7 @@ func (g *GrpcBackend) CreateWorkflowSchedule(ctx context.Context, instanceName s
 	return nil
 }
 
-func (g *GrpcBackend) ListWorkflowSchedules(ctx context.Context) ([]*backend.Schedule, error) {
+func (g *GrpcBackend) ListWorkflowSchedules(ctx context.Context) ([]*cereal.Schedule, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -433,7 +432,7 @@ func (g *GrpcBackend) ListWorkflowSchedules(ctx context.Context) ([]*backend.Sch
 	if err != nil {
 		return nil, err
 	}
-	var schedules []*backend.Schedule
+	var schedules []*cereal.Schedule
 
 	for {
 		resp, err := s.Recv()
@@ -444,7 +443,7 @@ func (g *GrpcBackend) ListWorkflowSchedules(ctx context.Context) ([]*backend.Sch
 			return nil, err
 		}
 		if resp.NumSchedules > 0 && schedules == nil {
-			schedules = make([]*backend.Schedule, 0, resp.NumSchedules)
+			schedules = make([]*cereal.Schedule, 0, resp.NumSchedules)
 		}
 		if resp.Schedule != nil {
 			schedules = append(schedules, grpcSchedToBackend(resp.Schedule))
@@ -453,7 +452,7 @@ func (g *GrpcBackend) ListWorkflowSchedules(ctx context.Context) ([]*backend.Sch
 	return schedules, nil
 }
 
-func (g *GrpcBackend) GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string) (*backend.Schedule, error) {
+func (g *GrpcBackend) GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string) (*cereal.Schedule, error) {
 	resp, err := g.client.GetWorkflowScheduleByName(ctx, &grpccereal.GetWorkflowScheduleByNameRequest{
 		Domain:       g.domain,
 		InstanceName: instanceName,
@@ -474,8 +473,8 @@ func (g *GrpcBackend) GetWorkflowScheduleByName(ctx context.Context, instanceNam
 	return grpcSchedToBackend(resp.Schedule), nil
 }
 
-func grpcSchedToBackend(grpcSched *grpccereal.Schedule) *backend.Schedule {
-	schedule := &backend.Schedule{
+func grpcSchedToBackend(grpcSched *grpccereal.Schedule) *cereal.Schedule {
+	schedule := &cereal.Schedule{
 		InstanceName: grpcSched.InstanceName,
 		WorkflowName: grpcSched.WorkflowName,
 		Parameters:   grpcSched.Parameters,
@@ -519,7 +518,7 @@ func grpcSchedToBackend(grpcSched *grpccereal.Schedule) *backend.Schedule {
 	return schedule
 }
 
-func (g *GrpcBackend) UpdateWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string, opts backend.WorkflowScheduleUpdateOpts) error {
+func (g *GrpcBackend) UpdateWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string, opts cereal.WorkflowScheduleUpdateOptions) error {
 	req := grpccereal.UpdateWorkflowScheduleByNameRequest{
 		Domain:       g.domain,
 		InstanceName: instanceName,
@@ -562,7 +561,7 @@ func (g *GrpcBackend) UpdateWorkflowScheduleByName(ctx context.Context, instance
 	return nil
 }
 
-func (g *GrpcBackend) GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName string) (*backend.WorkflowInstance, error) {
+func (g *GrpcBackend) GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName string) (*cereal.WorkflowInstanceData, error) {
 	resp, err := g.client.GetWorkflowInstanceByName(ctx, &grpccereal.GetWorkflowInstanceByNameRequest{
 		Domain:       g.domain,
 		InstanceName: instanceName,
@@ -584,7 +583,7 @@ func (g *GrpcBackend) GetWorkflowInstanceByName(ctx context.Context, instanceNam
 	return &backendInstance, nil
 }
 
-func (g *GrpcBackend) ListWorkflowInstances(ctx context.Context, opts backend.ListWorkflowOpts) ([]*backend.WorkflowInstance, error) {
+func (g *GrpcBackend) ListWorkflowInstances(ctx context.Context, opts cereal.ListWorkflowOpts) ([]*cereal.WorkflowInstanceData, error) {
 	req := grpccereal.ListWorkflowInstancesRequest{
 		Domain: g.domain,
 	}
@@ -611,7 +610,7 @@ func (g *GrpcBackend) ListWorkflowInstances(ctx context.Context, opts backend.Li
 		return nil, err
 	}
 
-	instances := []*backend.WorkflowInstance{}
+	instances := []*cereal.WorkflowInstanceData{}
 	for {
 		instance, err := stream.Recv()
 		if err == io.EOF {

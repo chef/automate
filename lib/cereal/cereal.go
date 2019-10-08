@@ -13,8 +13,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	rrule "github.com/teambition/rrule-go"
-
-	"github.com/chef/automate/lib/cereal/backend"
 )
 
 var (
@@ -40,7 +38,27 @@ const (
 // Schedule represents a recurring workflow.
 // TODO(jaym): we should wrap this in the workflow package and provide a getter
 // for the parameters
-type Schedule backend.Schedule
+type Schedule struct {
+	// TODO(ssd) 2019-07-19: ID was originally placed on backends
+	// because it was unclear whether (workflow_name,
+	// instance_name) can actually be unique in the case of
+	// scheduled workflows. We currently have a unique constraint
+	// on them, so we could remove this, but since it was on this
+	// struct it ended up in a few queries that would need to
+	// change.
+	ID             int64
+	Enabled        bool
+	InstanceName   string
+	WorkflowName   string
+	Parameters     []byte
+	Recurrence     string
+	NextDueAt      time.Time
+	LastEnqueuedAt time.Time
+
+	// These come from the latest result
+	LastStart *time.Time
+	LastEnd   *time.Time
+}
 
 // WorkflowName identifies workflows registered with the cereal
 // library. Many functions in the cereal library take or return
@@ -85,6 +103,42 @@ func (s *Schedule) GetRRule() (*rrule.RRule, error) {
 	return rrule.StrToRRule(s.Recurrence)
 }
 
+type WorkflowInstanceStatus string
+
+const (
+	WorkflowInstanceStatusStarting  WorkflowInstanceStatus = "starting"
+	WorkflowInstanceStatusRunning   WorkflowInstanceStatus = "running"
+	WorkflowInstanceStatusCompleted WorkflowInstanceStatus = "completed"
+)
+
+type WorkflowInstanceData struct {
+	InstanceName string
+	WorkflowName string
+	Status       WorkflowInstanceStatus
+	Parameters   []byte
+	Payload      []byte
+
+	Err    error
+	Result []byte
+}
+
+type WorkflowEventType string
+
+const (
+	WorkflowStart  WorkflowEventType = "start"
+	TaskComplete   WorkflowEventType = "task_complete"
+	WorkflowCancel WorkflowEventType = "cancel"
+)
+
+type WorkflowEvent struct {
+	Instance           WorkflowInstanceData
+	Type               WorkflowEventType
+	EnqueuedTaskCount  int
+	CompletedTaskCount int
+
+	TaskResult *TaskResultData
+}
+
 // Task is an interface to an object representing a running Task. This will be
 // provided to TaskExecutor implementations when the Run method is called.
 type Task interface {
@@ -93,13 +147,15 @@ type Task interface {
 	GetParameters(obj interface{}) error
 }
 
-type task struct {
-	backendTask *backend.Task
+// TODO(ssd) 2019-10-04: Probably remove this?
+type TaskData struct {
+	Name       string
+	Parameters []byte
 }
 
-func (r *task) GetParameters(obj interface{}) error {
-	if r.backendTask.Parameters != nil {
-		return json.Unmarshal(r.backendTask.Parameters, obj)
+func (r *TaskData) GetParameters(obj interface{}) error {
+	if r.Parameters != nil {
+		return json.Unmarshal(r.Parameters, obj)
 	}
 	return nil
 }
@@ -122,53 +178,73 @@ type TaskResult interface {
 	Err() error
 }
 
-type taskResult struct {
-	backendResult *backend.TaskResult
+type TaskStatusType string
+
+const (
+	TaskStatusSuccess        TaskStatusType = "success"
+	TaskStatusFailed         TaskStatusType = "failed"
+	TaskStatusLost           TaskStatusType = "lost"
+	TaskStatusUnusableResult TaskStatusType = "unusable_result"
+)
+
+type TaskResultData struct {
+	TaskName   string
+	Parameters []byte
+
+	Status    TaskStatusType
+	ErrorText string
+	Result    []byte
 }
 
-func (r *taskResult) Get(obj interface{}) error {
+func (r *TaskResultData) Get(obj interface{}) error {
 	if r.Err() != nil {
 		return r.Err()
 	}
-	if r.backendResult.Result != nil {
-		return json.Unmarshal(r.backendResult.Result, obj)
+	if r.Result != nil {
+		return json.Unmarshal(r.Result, obj)
 	}
 	return nil
 }
 
-func (r *taskResult) GetParameters(obj interface{}) error {
-	if r.backendResult.Parameters != nil {
-		return json.Unmarshal(r.backendResult.Parameters, obj)
+func (r *TaskResultData) GetParameters(obj interface{}) error {
+	if r.Parameters != nil {
+		return json.Unmarshal(r.Parameters, obj)
 	}
 	return nil
 }
 
-func (r *taskResult) Err() error {
-	switch r.backendResult.Status {
-	case backend.TaskStatusFailed:
-		return errors.New(r.backendResult.ErrorText)
-	case backend.TaskStatusLost:
+func (r *TaskResultData) Err() error {
+	switch r.Status {
+	case TaskStatusFailed:
+		return errors.New(r.ErrorText)
+	case TaskStatusLost:
 		return ErrTaskLost
-	case backend.TaskStatusUnusableResult:
-		return errors.New(r.backendResult.ErrorText)
+	case TaskStatusUnusableResult:
+		return errors.New(r.ErrorText)
 	default:
 		return nil
 	}
 }
 
+// This is annoying public so that it can be referred to by the
+// backends.
+type TaskEnqueueOptions struct {
+	StartAfter time.Time
+}
+
+// A TaskEnqueueOpt is an optional parameters for enqueuing a task
+type TaskEnqueueOpt func(*TaskEnqueueOptions)
+
 // StartAfter indicates when the task should start running
-func StartAfter(startAfter time.Time) TaskEnqueueOpts {
-	return func(o *backend.TaskEnqueueOpts) {
+func StartAfter(startAfter time.Time) TaskEnqueueOpt {
+	return func(o *TaskEnqueueOptions) {
 		o.StartAfter = startAfter
 	}
 }
 
-// EnqueueOpts are optional parameters for enqueuing a task
-type TaskEnqueueOpts func(*backend.TaskEnqueueOpts)
+type CompleteOpt func(*Decision)
 
-type CompleteOpts func(*Decision)
-
-func WithResult(obj interface{}) CompleteOpts {
+func WithResult(obj interface{}) CompleteOpt {
 	return func(d *Decision) {
 		d.result = obj
 	}
@@ -194,11 +270,11 @@ type WorkflowInstance interface {
 	// with the given parameters. Any enqueued tasks will be started
 	// after the currently running callback of the WorkflowExecutor
 	// returns.
-	EnqueueTask(taskName TaskName, parameters interface{}, opts ...TaskEnqueueOpts) error
+	EnqueueTask(taskName TaskName, parameters interface{}, opts ...TaskEnqueueOpt) error
 
 	// Complete returns a decision to end execution of the workflow for
 	// the running workflow instance.
-	Complete(...CompleteOpts) Decision
+	Complete(...CompleteOpt) Decision
 
 	// Continue returns a decision to continue execution of the workflow for
 	// the running workflow instance. The provided payload will available when
@@ -224,13 +300,13 @@ type WorkflowInstance interface {
 }
 
 type enqueueTaskRequest struct {
-	backendTask backend.Task
-	opts        backend.TaskEnqueueOpts
+	backendTask TaskData
+	opts        TaskEnqueueOptions
 }
 type workflowInstanceImpl struct {
-	instance backend.WorkflowInstance
+	instance WorkflowInstanceData
 	tasks    []enqueueTaskRequest
-	wevt     *backend.WorkflowEvent
+	wevt     *WorkflowEvent
 }
 
 func (w *workflowInstanceImpl) GetPayload(obj interface{}) error {
@@ -259,18 +335,18 @@ func (w *workflowInstanceImpl) TotalCompletedTasks() int {
 	return w.wevt.CompletedTaskCount
 }
 
-func (w *workflowInstanceImpl) EnqueueTask(taskName TaskName, parameters interface{}, opts ...TaskEnqueueOpts) error {
+func (w *workflowInstanceImpl) EnqueueTask(taskName TaskName, parameters interface{}, opts ...TaskEnqueueOpt) error {
 	paramsData, err := jsonify(parameters)
 	if err != nil {
 		return err
 	}
 
 	req := enqueueTaskRequest{
-		backendTask: backend.Task{
+		backendTask: TaskData{
 			Name:       taskName.String(),
 			Parameters: paramsData,
 		},
-		opts: backend.TaskEnqueueOpts{},
+		opts: TaskEnqueueOptions{},
 	}
 	for _, o := range opts {
 		o(&req.opts)
@@ -279,7 +355,7 @@ func (w *workflowInstanceImpl) EnqueueTask(taskName TaskName, parameters interfa
 	return nil
 }
 
-func (w *workflowInstanceImpl) Complete(opts ...CompleteOpts) Decision {
+func (w *workflowInstanceImpl) Complete(opts ...CompleteOpt) Decision {
 	if len(w.tasks) > 0 {
 		logrus.Error("Cannot call EnqueueTask and Complete in same workflow step! failing workflow")
 		return Decision{failed: true, err: errors.New("EnqueueTask and Complete called in same workflow step")}
@@ -329,7 +405,7 @@ type ImmutableWorkflowInstance interface {
 }
 
 type immutableWorkflowInstanceImpl struct {
-	instance *backend.WorkflowInstance
+	instance *WorkflowInstanceData
 }
 
 func (w *immutableWorkflowInstanceImpl) GetPayload(obj interface{}) error {
@@ -367,7 +443,7 @@ func (w *immutableWorkflowInstanceImpl) Err() error {
 }
 
 func (w *immutableWorkflowInstanceImpl) IsRunning() bool {
-	return w.instance.Status != backend.WorkflowInstanceStatusCompleted
+	return w.instance.Status != WorkflowInstanceStatusCompleted
 }
 
 // Decision indicates how the execution of a workflow instance is to proceed.
@@ -469,6 +545,12 @@ type TaskExecutor interface {
 	Run(ctx context.Context, task Task) (result interface{}, err error)
 }
 
+type ListWorkflowOpts struct {
+	WorkflowName *string
+	InstanceName *string
+	IsRunning    *bool
+}
+
 // waywardWorkflowList is a map of wayward workflows to the time they
 // entered the map. A wayward workflow is a workflow that has
 // experienced some fundamental processing error in the past. To avoid
@@ -511,7 +593,7 @@ func (w waywardWorkflowList) Filter(workflowNames []string) []string {
 // A OnWorkflowCompleteCallback is a function that can be called at
 // the completion of workflows for debugging and testing purposes. The
 // function should not be used for application logic.
-type OnWorkflowCompleteCallback func(*backend.WorkflowEvent)
+type OnWorkflowCompleteCallback func(*WorkflowEvent)
 
 // Manager is responsible for calling WorkflowExecutors and
 // TaskExecutors when they need to be processed, along with managing
@@ -521,7 +603,7 @@ type Manager struct {
 	taskExecutors     map[string]*registeredExecutor
 	waywardWorkflows  waywardWorkflowList
 	workflowScheduler *WorkflowScheduler
-	backend           backend.Driver
+	backend           Driver
 	cancel            context.CancelFunc
 	wg                sync.WaitGroup
 	sg                StartGuard
@@ -578,7 +660,7 @@ func WithOnWorkflowCompleteCallback(c OnWorkflowCompleteCallback) ManagerOpt {
 
 // NewManager creates a new Manager with the given Driver. If
 // the driver fails to initialize, an error is returned.
-func NewManager(b backend.Driver, opts ...ManagerOpt) (*Manager, error) {
+func NewManager(b Driver, opts ...ManagerOpt) (*Manager, error) {
 	err := b.Init()
 	if err != nil {
 		return nil, err
@@ -600,11 +682,11 @@ func NewManager(b backend.Driver, opts ...ManagerOpt) (*Manager, error) {
 		sg:                   NewStartGuard("Start(ctx) called more than once on cereal.Manager!"),
 	}
 
-	if v, ok := b.(backend.SchedulerDriver); ok {
+	if v, ok := b.(SchedulerDriver); ok {
 		m.workflowScheduler = NewWorkflowScheduler(v, m.WakeupWorkflowExecutor)
 	}
 
-	if intervalSuggester, ok := b.(backend.IntervalSuggester); ok {
+	if intervalSuggester, ok := b.(IntervalSuggester); ok {
 		m.taskPollInterval = intervalSuggester.DefaultTaskPollInterval()
 		m.workflowPollInterval = intervalSuggester.DefaultWorkflowPollInterval()
 	}
@@ -745,7 +827,7 @@ func (j *jitterDownIntervalProvider) String() string {
 // StartPoller runs until the given context is cancelled, starting a
 // TaskWorker every interval (or sooner if we've been notified of a
 // change).
-func (r *registeredExecutor) StartPoller(ctx context.Context, d backend.TaskDequeuer, p pollIntervalProvider, workflowWakeupFun func()) {
+func (r *registeredExecutor) StartPoller(ctx context.Context, d TaskDequeuer, p pollIntervalProvider, workflowWakeupFun func()) {
 	logctx := logrus.WithFields(logrus.Fields{
 		"task_name":     r.name,
 		"poll_interval": p.String(),
@@ -776,7 +858,7 @@ func (r *registeredExecutor) StartPoller(ctx context.Context, d backend.TaskDequ
 // execute them, exiting when no tasks are available in the queue. If
 // the task poller initially finds a job, it will also start the next
 // task worker.
-func (r *registeredExecutor) startTaskWorker(ctx context.Context, d backend.TaskDequeuer, workflowWakeupFun func()) {
+func (r *registeredExecutor) startTaskWorker(ctx context.Context, d TaskDequeuer, workflowWakeupFun func()) {
 	logctx := logrus.WithField("task_name", r.name)
 	if !r.IncActiveWorkers() {
 		if r.maxWorkers > 1 {
@@ -824,9 +906,9 @@ func (r *registeredExecutor) startTaskWorker(ctx context.Context, d backend.Task
 	}()
 }
 
-func (r *registeredExecutor) runTask(ctx context.Context, t *backend.Task, taskCompleter backend.TaskCompleter) error {
+func (r *registeredExecutor) runTask(ctx context.Context, t *TaskData, taskCompleter TaskCompleter) error {
 	startTime := time.Now()
-	result, err := r.executor.Run(ctx, &task{backendTask: t})
+	result, err := r.executor.Run(ctx, t)
 	endTime := time.Now()
 	logctx := logrus.WithFields(logrus.Fields{
 		"task_name":  r.name,
@@ -943,13 +1025,25 @@ func (m *Manager) CreateWorkflowSchedule(
 	return err
 }
 
+type WorkflowScheduleUpdateOptions struct {
+	UpdateEnabled bool
+	Enabled       bool
+
+	UpdateParameters bool
+	Parameters       []byte
+
+	UpdateRecurrence bool
+	Recurrence       string
+	NextRunAt        time.Time
+}
+
 // WorkflowScheduleUpdateOpts represents changes that can be made to a scheduled
 // workflow. The changes will be committed atomically.
-type WorkflowScheduleUpdateOpts func(*backend.WorkflowScheduleUpdateOpts) error
+type WorkflowScheduleUpdateOpt func(*WorkflowScheduleUpdateOptions) error
 
 // UpdateEnabled allows enabling or disabling a scheduled workflow.
-func UpdateEnabled(enabled bool) WorkflowScheduleUpdateOpts {
-	return func(o *backend.WorkflowScheduleUpdateOpts) error {
+func UpdateEnabled(enabled bool) WorkflowScheduleUpdateOpt {
+	return func(o *WorkflowScheduleUpdateOptions) error {
 		o.Enabled = enabled
 		o.UpdateEnabled = true
 		return nil
@@ -958,8 +1052,8 @@ func UpdateEnabled(enabled bool) WorkflowScheduleUpdateOpts {
 
 // UpdateParameters allows changing the parameters a workflow will be started
 // with.
-func UpdateParameters(parameters interface{}) WorkflowScheduleUpdateOpts {
-	return func(o *backend.WorkflowScheduleUpdateOpts) error {
+func UpdateParameters(parameters interface{}) WorkflowScheduleUpdateOpt {
+	return func(o *WorkflowScheduleUpdateOptions) error {
 		paramsData, err := jsonify(parameters)
 		o.UpdateParameters = true
 		o.Parameters = paramsData
@@ -969,8 +1063,8 @@ func UpdateParameters(parameters interface{}) WorkflowScheduleUpdateOpts {
 
 // UpdateRecurrence changes the recurrence rule for the scheduled workflow. The
 // next run will happen when the recurrence is first due from Now.
-func UpdateRecurrence(recurRule *rrule.RRule) WorkflowScheduleUpdateOpts {
-	return func(o *backend.WorkflowScheduleUpdateOpts) error {
+func UpdateRecurrence(recurRule *rrule.RRule) WorkflowScheduleUpdateOpt {
+	return func(o *WorkflowScheduleUpdateOptions) error {
 		o.UpdateRecurrence = true
 		o.Recurrence = recurRule.String()
 		o.NextRunAt = recurRule.After(time.Now().UTC(), true).UTC()
@@ -981,9 +1075,9 @@ func UpdateRecurrence(recurRule *rrule.RRule) WorkflowScheduleUpdateOpts {
 // UpdateWorkflowScheduleByName updates the scheduled workflow identified by
 // (instanceName, workflowName).
 func (m *Manager) UpdateWorkflowScheduleByName(ctx context.Context,
-	instanceName string, workflowName WorkflowName, opts ...WorkflowScheduleUpdateOpts) error {
+	instanceName string, workflowName WorkflowName, opts ...WorkflowScheduleUpdateOpt) error {
 
-	o := backend.WorkflowScheduleUpdateOpts{}
+	o := WorkflowScheduleUpdateOptions{}
 	for _, opt := range opts {
 		err := opt(&o)
 		if err != nil {
@@ -999,24 +1093,11 @@ func (m *Manager) UpdateWorkflowScheduleByName(ctx context.Context,
 
 // ListWorkflowSchedules list all the scheduled workflows.
 func (m *Manager) ListWorkflowSchedules(ctx context.Context) ([]*Schedule, error) {
-	backendScheds, err := m.backend.ListWorkflowSchedules(ctx)
-	if err != nil {
-		return nil, err
-	}
-	ret := make([]*Schedule, len(backendScheds))
-	for i, s := range backendScheds {
-		ret[i] = (*Schedule)(s)
-	}
-	return ret, nil
+	return m.backend.ListWorkflowSchedules(ctx)
 }
 
 func (m *Manager) GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName WorkflowName) (*Schedule, error) {
-	backendSched, err := m.backend.GetWorkflowScheduleByName(ctx, instanceName, workflowName.String())
-	if err != nil {
-		return nil, err
-	}
-
-	return (*Schedule)(backendSched), nil
+	return m.backend.GetWorkflowScheduleByName(ctx, instanceName, workflowName.String())
 }
 
 func (m *Manager) GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName WorkflowName) (ImmutableWorkflowInstance, error) {
@@ -1038,7 +1119,7 @@ func (m *Manager) EnqueueWorkflow(ctx context.Context, workflowName WorkflowName
 	if err != nil {
 		return err
 	}
-	err = m.backend.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = m.backend.EnqueueWorkflow(ctx, &WorkflowInstanceData{
 		WorkflowName: workflowName.String(),
 		InstanceName: instanceName,
 		Parameters:   paramsData,
@@ -1124,7 +1205,7 @@ LOOP:
 	m.wg.Done()
 }
 
-func (m *Manager) callOnWorkflowCompleteCallback(w *backend.WorkflowEvent) {
+func (m *Manager) callOnWorkflowCompleteCallback(w *WorkflowEvent) {
 	if m.onWorkflowCompleteCallback != nil {
 		m.onWorkflowCompleteCallback(w)
 	}
@@ -1166,16 +1247,14 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 
 	decision := Decision{}
 	switch wevt.Type {
-	case backend.WorkflowStart:
+	case WorkflowStart:
 		decision = executor.OnStart(w, StartEvent{})
-	case backend.TaskComplete:
+	case TaskComplete:
 		decision = executor.OnTaskComplete(w, TaskCompleteEvent{
 			TaskName: NewTaskName(wevt.TaskResult.TaskName),
-			Result: &taskResult{
-				backendResult: wevt.TaskResult,
-			},
+			Result:   wevt.TaskResult,
 		})
-	case backend.WorkflowCancel:
+	case WorkflowCancel:
 		decision = executor.OnCancel(w, CancelEvent{})
 	default:
 		logrus.Warnf("Unknown workflow event %q for workflow %q", wevt.Type, wevt.Instance.WorkflowName)

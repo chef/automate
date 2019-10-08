@@ -206,14 +206,14 @@ func deleteExpiredMarkedNodes(ctx context.Context, threshold string, client back
 	return nil
 }
 
-func JobSettingsToUpdateOpts(settings *ingest.JobSettings, oldSchedule *cereal.Schedule) ([]cereal.WorkflowScheduleUpdateOpts, bool, error) {
+func JobSettingsToUpdateOpts(settings *ingest.JobSettings, oldSchedule *cereal.Schedule) ([]cereal.WorkflowScheduleUpdateOpt, bool, error) {
 	shouldRunNow := false
 	err := settings.Validate()
 	if err != nil {
 		return nil, shouldRunNow, err
 	}
 
-	ret := make([]cereal.WorkflowScheduleUpdateOpts, 0)
+	ret := make([]cereal.WorkflowScheduleUpdateOpt, 0)
 	if e := settings.GetEvery(); len(e) > 0 {
 		// Convert duration to an rrule
 		d, err := time.ParseDuration(e)

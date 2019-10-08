@@ -18,7 +18,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/cereal/backend"
 	"github.com/chef/automate/lib/platform/pg"
 )
 
@@ -93,14 +92,14 @@ func TestEnqueueWorkflowInstanceNameUnique(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: "workflow-instance",
 		WorkflowName: workflowName,
 	})
 
 	require.NoError(t, err, "failed to enqueue workflow")
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: "workflow-instance",
 		WorkflowName: workflowName,
 	})
@@ -113,14 +112,14 @@ func TestEnqueueWorkflowInstanceNameUnique(t *testing.T) {
 	err = completer.Done(nil)
 	require.NoError(t, err)
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: "workflow-instance",
 		WorkflowName: workflowName,
 	})
 
 	require.NoError(t, err, "failed to enqueue workflow")
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: "workflow-instance1",
 		WorkflowName: workflowName,
 	})
@@ -151,7 +150,7 @@ func TestMultipleTasksCanDequeueConcurrently(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: "workflow-instance",
 		WorkflowName: workflowName,
 	})
@@ -161,12 +160,12 @@ func TestMultipleTasksCanDequeueConcurrently(t *testing.T) {
 	_, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
 
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
-	completer.EnqueueTask(&backend.Task{
+	}, cereal.TaskEnqueueOptions{})
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
+	}, cereal.TaskEnqueueOptions{})
 	completer.Continue(nil)
 
 	tx1, err := b1.db.BeginTx(ctx, nil)
@@ -211,7 +210,7 @@ func TestTaskComplete(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: "workflow-instance",
 		WorkflowName: workflowName,
 	})
@@ -221,9 +220,9 @@ func TestTaskComplete(t *testing.T) {
 	_, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
 
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
+	}, cereal.TaskEnqueueOptions{})
 	completer.Continue(nil)
 
 	_, taskCompleter, err := b1.DequeueTask(ctx, taskName)
@@ -232,8 +231,8 @@ func TestTaskComplete(t *testing.T) {
 
 	wevt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
-	require.Equal(t, backend.TaskComplete, wevt.Type)
-	require.Equal(t, backend.TaskStatusSuccess, wevt.TaskResult.Status)
+	require.Equal(t, cereal.TaskComplete, wevt.Type)
+	require.Equal(t, cereal.TaskStatusSuccess, wevt.TaskResult.Status)
 	require.Equal(t, []byte("foo"), wevt.TaskResult.Result)
 	require.Equal(t, "", wevt.TaskResult.ErrorText)
 
@@ -257,7 +256,7 @@ func TestTaskFail(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: "workflow-instance",
 		WorkflowName: workflowName,
 	})
@@ -267,9 +266,9 @@ func TestTaskFail(t *testing.T) {
 	_, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
 
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
+	}, cereal.TaskEnqueueOptions{})
 	completer.Continue(nil)
 
 	_, taskCompleter, err := b1.DequeueTask(ctx, taskName)
@@ -278,8 +277,8 @@ func TestTaskFail(t *testing.T) {
 
 	wevt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
-	require.Equal(t, backend.TaskComplete, wevt.Type)
-	require.Equal(t, backend.TaskStatusFailed, wevt.TaskResult.Status)
+	require.Equal(t, cereal.TaskComplete, wevt.Type)
+	require.Equal(t, cereal.TaskStatusFailed, wevt.TaskResult.Status)
 	require.Empty(t, wevt.TaskResult.Result)
 	require.Equal(t, "foo", wevt.TaskResult.ErrorText)
 
@@ -303,7 +302,7 @@ func TestDelayedTask(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: "workflow-instance",
 		WorkflowName: workflowName,
 	})
@@ -314,19 +313,19 @@ func TestDelayedTask(t *testing.T) {
 	require.NoError(t, err, "failed to dequeue workflow")
 
 	expectedTime := time.Now().Add(3 * time.Second)
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{
+	}, cereal.TaskEnqueueOptions{
 		StartAfter: expectedTime,
 	})
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{
+	}, cereal.TaskEnqueueOptions{
 		StartAfter: expectedTime.In(time.FixedZone("AEST", 10*60*60)),
 	})
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{
+	}, cereal.TaskEnqueueOptions{
 		StartAfter: expectedTime.In(time.FixedZone("HST", -10*60*60)),
 	})
 	completer.Continue(nil)
@@ -368,7 +367,7 @@ func TestWorkflowsRerun(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: "workflow-instance",
 		WorkflowName: workflowName,
 	})
@@ -377,12 +376,12 @@ func TestWorkflowsRerun(t *testing.T) {
 	_, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
 
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
-	completer.EnqueueTask(&backend.Task{
+	}, cereal.TaskEnqueueOptions{})
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
+	}, cereal.TaskEnqueueOptions{})
 	completer.Continue(nil)
 
 	_, taskCompleter, err := b1.DequeueTask(ctx, taskName)
@@ -391,8 +390,8 @@ func TestWorkflowsRerun(t *testing.T) {
 
 	wevt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
-	require.Equal(t, backend.TaskComplete, wevt.Type)
-	require.Equal(t, backend.TaskStatusSuccess, wevt.TaskResult.Status)
+	require.Equal(t, cereal.TaskComplete, wevt.Type)
+	require.Equal(t, cereal.TaskStatusSuccess, wevt.TaskResult.Status)
 	require.Equal(t, 1, wevt.CompletedTaskCount)
 	require.Equal(t, 2, wevt.EnqueuedTaskCount)
 	require.Equal(t, []byte("foo"), wevt.TaskResult.Result)
@@ -403,8 +402,8 @@ func TestWorkflowsRerun(t *testing.T) {
 
 	wevt, completer, err = b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
-	require.Equal(t, backend.TaskComplete, wevt.Type)
-	require.Equal(t, backend.TaskStatusSuccess, wevt.TaskResult.Status)
+	require.Equal(t, cereal.TaskComplete, wevt.Type)
+	require.Equal(t, cereal.TaskStatusSuccess, wevt.TaskResult.Status)
 	require.Equal(t, 1, wevt.CompletedTaskCount)
 	require.Equal(t, 2, wevt.EnqueuedTaskCount)
 	require.Equal(t, []byte("foo"), wevt.TaskResult.Result)
@@ -434,7 +433,7 @@ func TestLostWorkOnTaskSuccess(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: "workflow-instance",
 		WorkflowName: workflowName,
 	})
@@ -444,9 +443,9 @@ func TestLostWorkOnTaskSuccess(t *testing.T) {
 	_, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
 
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
+	}, cereal.TaskEnqueueOptions{})
 	completer.Continue(nil)
 
 	// start work on task
@@ -464,8 +463,8 @@ func TestLostWorkOnTaskSuccess(t *testing.T) {
 	// Make sure we get a message indicating failure because of lost work
 	wevt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
-	require.Equal(t, backend.TaskComplete, wevt.Type)
-	require.Equal(t, backend.TaskStatusLost, wevt.TaskResult.Status)
+	require.Equal(t, cereal.TaskComplete, wevt.Type)
+	require.Equal(t, cereal.TaskStatusLost, wevt.TaskResult.Status)
 	require.Nil(t, wevt.TaskResult.Result)
 	require.Equal(t, "", wevt.TaskResult.ErrorText)
 }
@@ -487,7 +486,7 @@ func TestLostWorkOnTaskFail(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: "workflow-instance",
 		WorkflowName: workflowName,
 	})
@@ -497,9 +496,9 @@ func TestLostWorkOnTaskFail(t *testing.T) {
 	_, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
 
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
+	}, cereal.TaskEnqueueOptions{})
 	completer.Continue(nil)
 
 	// start work on task
@@ -517,8 +516,8 @@ func TestLostWorkOnTaskFail(t *testing.T) {
 	// Make sure we get a message indicating failure because of lost work
 	wevt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
-	require.Equal(t, backend.TaskComplete, wevt.Type)
-	require.Equal(t, backend.TaskStatusLost, wevt.TaskResult.Status)
+	require.Equal(t, cereal.TaskComplete, wevt.Type)
+	require.Equal(t, cereal.TaskStatusLost, wevt.TaskResult.Status)
 	require.Equal(t, "", wevt.TaskResult.ErrorText)
 }
 
@@ -540,7 +539,7 @@ func TestNoLostWorkOnTaskSuccess(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: "workflow-instance",
 		WorkflowName: workflowName,
 	})
@@ -550,9 +549,9 @@ func TestNoLostWorkOnTaskSuccess(t *testing.T) {
 	_, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
 
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
+	}, cereal.TaskEnqueueOptions{})
 	completer.Continue(nil)
 
 	// start work on task
@@ -566,8 +565,8 @@ func TestNoLostWorkOnTaskSuccess(t *testing.T) {
 	// Make sure we get a message indicating failure because of lost work
 	wevt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
-	require.Equal(t, backend.TaskComplete, wevt.Type)
-	require.Equal(t, backend.TaskStatusSuccess, wevt.TaskResult.Status)
+	require.Equal(t, cereal.TaskComplete, wevt.Type)
+	require.Equal(t, cereal.TaskStatusSuccess, wevt.TaskResult.Status)
 
 	err = b1.cleaner.expireDeadTasks(ctx, 0)
 	require.NoError(t, err)
@@ -592,7 +591,7 @@ func TestTaskPinger(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: "workflow-instance",
 		WorkflowName: workflowName,
 	})
@@ -602,9 +601,9 @@ func TestTaskPinger(t *testing.T) {
 	_, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
 
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
+	}, cereal.TaskEnqueueOptions{})
 	completer.Continue(nil)
 
 	// start work on task
@@ -626,8 +625,8 @@ func TestTaskPinger(t *testing.T) {
 	// Make sure we get a message indicating failure because of lost work
 	wevt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
-	require.Equal(t, backend.TaskComplete, wevt.Type)
-	require.Equal(t, backend.TaskStatusSuccess, wevt.TaskResult.Status)
+	require.Equal(t, cereal.TaskComplete, wevt.Type)
+	require.Equal(t, cereal.TaskStatusSuccess, wevt.TaskResult.Status)
 }
 
 func TestWorkflowCompleteWithPendingTasks(t *testing.T) {
@@ -643,7 +642,7 @@ func TestWorkflowCompleteWithPendingTasks(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: "workflow-instance",
 		WorkflowName: workflowName,
 	})
@@ -653,13 +652,13 @@ func TestWorkflowCompleteWithPendingTasks(t *testing.T) {
 	_, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
 
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
+	}, cereal.TaskEnqueueOptions{})
 
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
+	}, cereal.TaskEnqueueOptions{})
 	completer.Continue(nil)
 
 	_, taskCompleter, err := b1.DequeueTask(ctx, taskName)
@@ -668,8 +667,8 @@ func TestWorkflowCompleteWithPendingTasks(t *testing.T) {
 
 	wevt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
-	require.Equal(t, backend.TaskComplete, wevt.Type)
-	require.Equal(t, backend.TaskStatusSuccess, wevt.TaskResult.Status)
+	require.Equal(t, cereal.TaskComplete, wevt.Type)
+	require.Equal(t, cereal.TaskStatusSuccess, wevt.TaskResult.Status)
 
 	err = completer.Done(nil)
 	require.NoError(t, err)
@@ -684,7 +683,7 @@ func TestWorkflowCompleteWithPendingTasks(t *testing.T) {
 
 	// make sure we can run it again. There was a bug where we couldn't
 	// run any more workflows correctly after one completed early
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: "workflow-instance",
 		WorkflowName: workflowName,
 	})
@@ -694,9 +693,9 @@ func TestWorkflowCompleteWithPendingTasks(t *testing.T) {
 	_, completer, err = b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
 
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
+	}, cereal.TaskEnqueueOptions{})
 	completer.Continue(nil)
 
 	_, taskCompleter, err = b1.DequeueTask(ctx, taskName)
@@ -705,8 +704,8 @@ func TestWorkflowCompleteWithPendingTasks(t *testing.T) {
 
 	wevt, completer, err = b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
-	require.Equal(t, backend.TaskComplete, wevt.Type)
-	require.Equal(t, backend.TaskStatusSuccess, wevt.TaskResult.Status)
+	require.Equal(t, cereal.TaskComplete, wevt.Type)
+	require.Equal(t, cereal.TaskStatusSuccess, wevt.TaskResult.Status)
 	err = completer.Done(nil)
 	require.NoError(t, err)
 
@@ -726,7 +725,7 @@ func TestWorkflowCompleteWithCompletingTask(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: "workflow-instance",
 		WorkflowName: workflowName,
 	})
@@ -736,13 +735,13 @@ func TestWorkflowCompleteWithCompletingTask(t *testing.T) {
 	_, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
 
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
+	}, cereal.TaskEnqueueOptions{})
 
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
+	}, cereal.TaskEnqueueOptions{})
 	completer.Continue(nil)
 
 	_, taskCompleter, err := b1.DequeueTask(ctx, taskName)
@@ -754,8 +753,8 @@ func TestWorkflowCompleteWithCompletingTask(t *testing.T) {
 
 	wevt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
-	require.Equal(t, backend.TaskComplete, wevt.Type)
-	require.Equal(t, backend.TaskStatusSuccess, wevt.TaskResult.Status)
+	require.Equal(t, cereal.TaskComplete, wevt.Type)
+	require.Equal(t, cereal.TaskStatusSuccess, wevt.TaskResult.Status)
 
 	err = taskCompleter.Succeed(nil)
 	require.NoError(t, err)
@@ -782,7 +781,7 @@ func TestWorkflowCompleteWithUnprocessedTask(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: "workflow-instance",
 		WorkflowName: workflowName,
 	})
@@ -792,13 +791,13 @@ func TestWorkflowCompleteWithUnprocessedTask(t *testing.T) {
 	_, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
 
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
+	}, cereal.TaskEnqueueOptions{})
 
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
+	}, cereal.TaskEnqueueOptions{})
 	completer.Continue(nil)
 
 	_, taskCompleter, err := b1.DequeueTask(ctx, taskName)
@@ -813,8 +812,8 @@ func TestWorkflowCompleteWithUnprocessedTask(t *testing.T) {
 
 	wevt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
-	require.Equal(t, backend.TaskComplete, wevt.Type)
-	require.Equal(t, backend.TaskStatusSuccess, wevt.TaskResult.Status)
+	require.Equal(t, cereal.TaskComplete, wevt.Type)
+	require.Equal(t, cereal.TaskStatusSuccess, wevt.TaskResult.Status)
 
 	err = completer.Done(nil)
 	require.NoError(t, err)
@@ -839,7 +838,7 @@ func TestWorkflowCancellationWithPendingTasks(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: instanceName,
 		WorkflowName: workflowName,
 	})
@@ -848,12 +847,12 @@ func TestWorkflowCancellationWithPendingTasks(t *testing.T) {
 
 	evt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
-	require.Equal(t, backend.WorkflowStart, evt.Type)
-	require.Equal(t, backend.WorkflowInstanceStatusStarting, evt.Instance.Status)
+	require.Equal(t, cereal.WorkflowStart, evt.Type)
+	require.Equal(t, cereal.WorkflowInstanceStatusStarting, evt.Instance.Status)
 
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
+	}, cereal.TaskEnqueueOptions{})
 
 	err = completer.Continue(nil)
 	require.NoError(t, err)
@@ -863,8 +862,8 @@ func TestWorkflowCancellationWithPendingTasks(t *testing.T) {
 
 	evt, completer, err = b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
-	require.Equal(t, backend.WorkflowCancel, evt.Type)
-	require.Equal(t, backend.WorkflowInstanceStatusRunning, evt.Instance.Status)
+	require.Equal(t, cereal.WorkflowCancel, evt.Type)
+	require.Equal(t, cereal.WorkflowInstanceStatusRunning, evt.Instance.Status)
 	err = completer.Done(nil)
 	require.NoError(t, err)
 
@@ -888,7 +887,7 @@ func TestWorkflowCancellationWithRunningTasks(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: instanceName,
 		WorkflowName: workflowName,
 	})
@@ -897,16 +896,16 @@ func TestWorkflowCancellationWithRunningTasks(t *testing.T) {
 
 	evt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
-	require.Equal(t, backend.WorkflowStart, evt.Type)
-	require.Equal(t, backend.WorkflowInstanceStatusStarting, evt.Instance.Status)
+	require.Equal(t, cereal.WorkflowStart, evt.Type)
+	require.Equal(t, cereal.WorkflowInstanceStatusStarting, evt.Instance.Status)
 
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
+	}, cereal.TaskEnqueueOptions{})
 
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
+	}, cereal.TaskEnqueueOptions{})
 
 	err = completer.Continue(nil)
 	require.NoError(t, err)
@@ -922,7 +921,7 @@ func TestWorkflowCancellationWithRunningTasks(t *testing.T) {
 
 	evt, completer, err = b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
-	require.Equal(t, backend.WorkflowCancel, evt.Type)
+	require.Equal(t, cereal.WorkflowCancel, evt.Type)
 	err = completer.Done(nil)
 	require.NoError(t, err)
 
@@ -954,7 +953,7 @@ func TestWorkflowCancellationWithCompletedTasks(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: instanceName,
 		WorkflowName: workflowName,
 	})
@@ -963,16 +962,16 @@ func TestWorkflowCancellationWithCompletedTasks(t *testing.T) {
 
 	evt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
-	require.Equal(t, backend.WorkflowStart, evt.Type)
-	require.Equal(t, backend.WorkflowInstanceStatusStarting, evt.Instance.Status)
+	require.Equal(t, cereal.WorkflowStart, evt.Type)
+	require.Equal(t, cereal.WorkflowInstanceStatusStarting, evt.Instance.Status)
 
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
+	}, cereal.TaskEnqueueOptions{})
 
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
+	}, cereal.TaskEnqueueOptions{})
 
 	err = completer.Continue(nil)
 	require.NoError(t, err)
@@ -995,7 +994,7 @@ func TestWorkflowCancellationWithCompletedTasks(t *testing.T) {
 	// It's possible the next line fails, but it will be very rare if it does.
 	// cancel might not be delivered in the expected order as it is an external
 	// event.
-	require.Equal(t, backend.WorkflowCancel, evt.Type)
+	require.Equal(t, cereal.WorkflowCancel, evt.Type)
 	err = completer.Done(nil)
 	require.NoError(t, err)
 
@@ -1016,7 +1015,7 @@ func TestWorkflowCancellationDedup(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: instanceName,
 		WorkflowName: workflowName,
 	})
@@ -1025,16 +1024,16 @@ func TestWorkflowCancellationDedup(t *testing.T) {
 
 	evt, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
-	require.Equal(t, backend.WorkflowStart, evt.Type)
-	require.Equal(t, backend.WorkflowInstanceStatusStarting, evt.Instance.Status)
+	require.Equal(t, cereal.WorkflowStart, evt.Type)
+	require.Equal(t, cereal.WorkflowInstanceStatusStarting, evt.Instance.Status)
 
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
+	}, cereal.TaskEnqueueOptions{})
 
-	completer.EnqueueTask(&backend.Task{
+	completer.EnqueueTask(&cereal.TaskData{
 		Name: taskName,
-	}, backend.TaskEnqueueOpts{})
+	}, cereal.TaskEnqueueOptions{})
 
 	err = completer.Continue(nil)
 	require.NoError(t, err)
@@ -1047,7 +1046,7 @@ func TestWorkflowCancellationDedup(t *testing.T) {
 
 	evt, completer, err = b1.DequeueWorkflow(ctx, []string{workflowName})
 	require.NoError(t, err, "failed to dequeue workflow")
-	require.Equal(t, backend.WorkflowCancel, evt.Type)
+	require.Equal(t, cereal.WorkflowCancel, evt.Type)
 	err = completer.Done(nil)
 
 	require.NoError(t, err)
@@ -1068,7 +1067,7 @@ func TestWorkflowCancellationBeforeStart(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: instanceName,
 		WorkflowName: workflowName,
 	})
@@ -1097,7 +1096,7 @@ func TestListWorkflowInstancesEmpty(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	instances, err := b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{})
+	instances, err := b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{})
 	require.NoError(t, err)
 	assert.Len(t, instances, 0)
 }
@@ -1116,7 +1115,7 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 
 	instance1Name := "instance1"
 	instance1Parameters := []byte("instance1Parameters")
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: instance1Name,
 		WorkflowName: workflowName,
 		Parameters:   instance1Parameters,
@@ -1124,26 +1123,26 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 	require.NoError(t, err)
 	instance2Name := "instance2"
 	instance2Parameters := []byte("instance2Parameters")
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: instance2Name,
 		WorkflowName: workflowName,
 		Parameters:   instance2Parameters,
 	})
 	require.NoError(t, err)
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: instance1Name,
 		WorkflowName: "someotherworkflow",
 		Parameters:   nil,
 	})
 	require.NoError(t, err)
 
-	instances, err := b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{})
+	instances, err := b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{})
 	require.NoError(t, err)
 	assert.Len(t, instances, 3)
 
 	for _, instance := range instances {
-		assert.Equal(t, backend.WorkflowInstanceStatusStarting, instance.Status)
+		assert.Equal(t, cereal.WorkflowInstanceStatusStarting, instance.Status)
 		if instance.WorkflowName == workflowName {
 			if instance.InstanceName == instance1Name {
 				assert.Equal(t, instance1Parameters, instance.Parameters)
@@ -1153,14 +1152,14 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 		}
 	}
 
-	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		WorkflowName: &workflowName,
 	})
 	require.NoError(t, err)
 	assert.Len(t, instances, 2)
 
 	for _, instance := range instances {
-		assert.Equal(t, backend.WorkflowInstanceStatusStarting, instance.Status)
+		assert.Equal(t, cereal.WorkflowInstanceStatusStarting, instance.Status)
 		if instance.InstanceName == instance1Name {
 			assert.Equal(t, instance1Parameters, instance.Parameters)
 		} else {
@@ -1168,26 +1167,26 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 		}
 	}
 
-	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		WorkflowName: &workflowName,
 		InstanceName: &instance1Name,
 	})
 	require.NoError(t, err)
 	require.Len(t, instances, 1)
-	assert.Equal(t, backend.WorkflowInstanceStatusStarting, instances[0].Status)
+	assert.Equal(t, cereal.WorkflowInstanceStatusStarting, instances[0].Status)
 	assert.Equal(t, instance1Parameters, instances[0].Parameters)
 
-	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		WorkflowName: &workflowName,
 		InstanceName: &instance2Name,
 	})
 	require.NoError(t, err)
 	require.Len(t, instances, 1)
-	assert.Equal(t, backend.WorkflowInstanceStatusStarting, instances[0].Status)
+	assert.Equal(t, cereal.WorkflowInstanceStatusStarting, instances[0].Status)
 	assert.Equal(t, instance2Parameters, instances[0].Parameters)
 
 	isRunning := true
-	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		WorkflowName: &workflowName,
 		IsRunning:    &isRunning,
 	})
@@ -1195,7 +1194,7 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 	assert.Len(t, instances, 2)
 
 	for _, instance := range instances {
-		assert.Equal(t, backend.WorkflowInstanceStatusStarting, instance.Status)
+		assert.Equal(t, cereal.WorkflowInstanceStatusStarting, instance.Status)
 		if instance.InstanceName == instance1Name {
 			assert.Equal(t, instance1Parameters, instance.Parameters)
 		} else {
@@ -1204,7 +1203,7 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 	}
 
 	isRunning = false
-	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		WorkflowName: &workflowName,
 		IsRunning:    &isRunning,
 	})
@@ -1214,52 +1213,52 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 	w1, completer, err := b1.DequeueWorkflow(ctx, []string{workflowName})
 	err = completer.Done([]byte("result"))
 	require.NoError(t, err)
-	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		WorkflowName: &workflowName,
 		IsRunning:    &isRunning,
 	})
 	require.NoError(t, err)
 	require.Len(t, instances, 1)
-	assert.Equal(t, backend.WorkflowInstanceStatusCompleted, instances[0].Status)
+	assert.Equal(t, cereal.WorkflowInstanceStatusCompleted, instances[0].Status)
 	assert.Equal(t, w1.Instance.WorkflowName, instances[0].WorkflowName)
 	assert.Equal(t, w1.Instance.InstanceName, instances[0].InstanceName)
 	assert.Equal(t, w1.Instance.Parameters, instances[0].Parameters)
 	assert.Equal(t, []byte("result"), instances[0].Result)
 
-	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		WorkflowName: &workflowName,
 		InstanceName: &w1.Instance.InstanceName,
 	})
 	require.NoError(t, err)
 	require.Len(t, instances, 1)
-	assert.Equal(t, backend.WorkflowInstanceStatusCompleted, instances[0].Status)
+	assert.Equal(t, cereal.WorkflowInstanceStatusCompleted, instances[0].Status)
 	assert.Equal(t, w1.Instance.WorkflowName, instances[0].WorkflowName)
 	assert.Equal(t, w1.Instance.InstanceName, instances[0].InstanceName)
 	assert.Equal(t, w1.Instance.Parameters, instances[0].Parameters)
 	assert.Nil(t, instances[0].Payload)
 	assert.Equal(t, []byte("result"), instances[0].Result)
 
-	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		WorkflowName: &workflowName,
 	})
 	require.NoError(t, err)
 	require.Len(t, instances, 2)
 
 	isRunning = false
-	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		IsRunning: &isRunning,
 	})
 	require.NoError(t, err)
 	require.Len(t, instances, 1)
 
 	isRunning = true
-	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		IsRunning: &isRunning,
 	})
 	require.NoError(t, err)
 	require.Len(t, instances, 2)
 
-	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{})
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{})
 	require.NoError(t, err)
 	require.Len(t, instances, 3)
 
@@ -1268,14 +1267,14 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 	err = completer.Fail(errors.New("fail"))
 	require.NoError(t, err)
 
-	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		WorkflowName: &workflowName,
 		InstanceName: &w2.Instance.InstanceName,
 	})
 
 	require.NoError(t, err)
 	require.Len(t, instances, 1)
-	assert.Equal(t, backend.WorkflowInstanceStatusCompleted, instances[0].Status)
+	assert.Equal(t, cereal.WorkflowInstanceStatusCompleted, instances[0].Status)
 	assert.Equal(t, w2.Instance.WorkflowName, instances[0].WorkflowName)
 	assert.Equal(t, w2.Instance.InstanceName, instances[0].InstanceName)
 	assert.Equal(t, w2.Instance.Parameters, instances[0].Parameters)
@@ -1284,50 +1283,50 @@ func TestListWorkflowInstancesMultipleInstances(t *testing.T) {
 	assert.Equal(t, "fail", instances[0].Err.Error())
 
 	isRunning = false
-	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		IsRunning: &isRunning,
 	})
 	require.NoError(t, err)
 	require.Len(t, instances, 2)
 
 	isRunning = true
-	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		IsRunning: &isRunning,
 	})
 	require.NoError(t, err)
 	require.Len(t, instances, 1)
 
 	instance1Parameters = []byte("instance1Parameters-new")
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: instance1Name,
 		WorkflowName: workflowName,
 		Parameters:   instance1Parameters,
 	})
 	require.NoError(t, err)
-	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		WorkflowName: &workflowName,
 		InstanceName: &instance1Name,
 	})
 	require.NoError(t, err)
 	require.Len(t, instances, 1)
-	assert.Equal(t, backend.WorkflowInstanceStatusStarting, instances[0].Status)
+	assert.Equal(t, cereal.WorkflowInstanceStatusStarting, instances[0].Status)
 	assert.Equal(t, instance1Parameters, instances[0].Parameters)
 	assert.Nil(t, instances[0].Result)
 	assert.Nil(t, instances[0].Err)
 
-	err = b1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	err = b1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 		InstanceName: instance2Name,
 		WorkflowName: workflowName,
 		Parameters:   instance2Parameters,
 	})
 	require.NoError(t, err)
-	instances, err = b1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{
+	instances, err = b1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{
 		WorkflowName: &workflowName,
 		InstanceName: &instance2Name,
 	})
 	require.NoError(t, err)
 	require.Len(t, instances, 1)
-	assert.Equal(t, backend.WorkflowInstanceStatusStarting, instances[0].Status)
+	assert.Equal(t, cereal.WorkflowInstanceStatusStarting, instances[0].Status)
 	assert.Equal(t, instance2Parameters, instances[0].Parameters)
 	assert.Nil(t, instances[0].Result)
 	assert.Nil(t, instances[0].Err)

@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/cereal/backend"
 )
 
 type taskExecutor struct {
@@ -103,7 +102,7 @@ type CerealTestSuite struct {
 	newManager func(...managerOptFunc) *cereal.Manager
 }
 
-func NewSuiteForBackend(ctx context.Context, t *testing.T, d backend.Driver) *CerealTestSuite {
+func NewSuiteForBackend(ctx context.Context, t *testing.T, d cereal.Driver) *CerealTestSuite {
 	cereal.MaxWakeupInterval = 2 * time.Second
 	return &CerealTestSuite{
 		newManager: func(opts ...managerOptFunc) *cereal.Manager {

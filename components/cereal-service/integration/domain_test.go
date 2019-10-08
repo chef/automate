@@ -17,7 +17,6 @@ import (
 	grpccereal "github.com/chef/automate/api/interservice/cereal"
 	"github.com/chef/automate/components/cereal-service/pkg/server"
 	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/cereal/backend"
 	libgrpc "github.com/chef/automate/lib/cereal/grpc"
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/grpc/grpctest"
@@ -55,7 +54,7 @@ func TestDomains(t *testing.T) {
 			{
 				Name: "EnqueueWorkflow",
 				Call: func() error {
-					return grpcBackend.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+					return grpcBackend.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 						WorkflowName: workflowName,
 						InstanceName: instanceName,
 					})
@@ -113,7 +112,7 @@ func TestDomains(t *testing.T) {
 			{
 				Name: "UpdateWorkflowScheduleByName",
 				Call: func() error {
-					err := grpcBackend.UpdateWorkflowScheduleByName(ctx, instanceName, workflowName, backend.WorkflowScheduleUpdateOpts{})
+					err := grpcBackend.UpdateWorkflowScheduleByName(ctx, instanceName, workflowName, cereal.WorkflowScheduleUpdateOptions{})
 					return err
 				},
 			},
@@ -127,7 +126,7 @@ func TestDomains(t *testing.T) {
 			{
 				Name: "ListWorkflowInstances",
 				Call: func() error {
-					_, err := grpcBackend.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{})
+					_, err := grpcBackend.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{})
 					return err
 				},
 			},
@@ -156,30 +155,30 @@ func TestDomains(t *testing.T) {
 		domain2TaskParams := []byte("domain2task")
 
 		// Enqueue workflow with same name in different domains
-		err := grpcBackendDomain1.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		err := grpcBackendDomain1.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 			WorkflowName: workflowName,
 			InstanceName: instanceName,
 			Parameters:   domain1Params,
 		})
 		require.NoError(t, err)
 
-		domain2Instances, err := grpcBackendDomain2.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{})
+		domain2Instances, err := grpcBackendDomain2.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{})
 		require.NoError(t, err)
 		require.Len(t, domain2Instances, 0)
 
-		err = grpcBackendDomain2.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+		err = grpcBackendDomain2.EnqueueWorkflow(ctx, &cereal.WorkflowInstanceData{
 			WorkflowName: workflowName,
 			InstanceName: instanceName,
 			Parameters:   domain2Params,
 		})
 		require.NoError(t, err)
 
-		domain1Instances, err := grpcBackendDomain1.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{})
+		domain1Instances, err := grpcBackendDomain1.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{})
 		require.NoError(t, err)
 		require.Len(t, domain1Instances, 1)
 		validateInstanceMatches(t, domain1Instances[0], workflowName, instanceName, domain1Params)
 
-		domain2Instances, err = grpcBackendDomain2.ListWorkflowInstances(ctx, backend.ListWorkflowOpts{})
+		domain2Instances, err = grpcBackendDomain2.ListWorkflowInstances(ctx, cereal.ListWorkflowOpts{})
 		require.NoError(t, err)
 		require.Len(t, domain2Instances, 1)
 		validateInstanceMatches(t, domain2Instances[0], workflowName, instanceName, domain2Params)
@@ -192,10 +191,10 @@ func TestDomains(t *testing.T) {
 		domain2Evt, workflowCompleter2, err := grpcBackendDomain2.DequeueWorkflow(ctx, []string{workflowName})
 		require.NoError(t, err)
 		validateInstanceMatches(t, &domain2Evt.Instance, workflowName, instanceName, domain2Params)
-		err = workflowCompleter2.EnqueueTask(&backend.Task{
+		err = workflowCompleter2.EnqueueTask(&cereal.TaskData{
 			Name:       taskName,
 			Parameters: domain2TaskParams,
-		}, backend.TaskEnqueueOpts{})
+		}, cereal.TaskEnqueueOptions{})
 		require.NoError(t, err)
 		err = workflowCompleter2.Continue(nil)
 		require.NoError(t, err)
@@ -205,10 +204,10 @@ func TestDomains(t *testing.T) {
 		domain1Evt, workflowCompleter1, err := grpcBackendDomain1.DequeueWorkflow(ctx, []string{workflowName})
 		require.NoError(t, err)
 		validateInstanceMatches(t, &domain1Evt.Instance, workflowName, instanceName, domain1Params)
-		err = workflowCompleter1.EnqueueTask(&backend.Task{
+		err = workflowCompleter1.EnqueueTask(&cereal.TaskData{
 			Name:       taskName,
 			Parameters: domain1TaskParams,
-		}, backend.TaskEnqueueOpts{})
+		}, cereal.TaskEnqueueOptions{})
 		require.NoError(t, err)
 		err = workflowCompleter1.Continue(nil)
 		require.NoError(t, err)
@@ -278,14 +277,14 @@ func TestDomains(t *testing.T) {
 
 		// Test updating the schedule
 		domain1Params = []byte("domain1workflow-updated")
-		err = grpcBackendDomain1.UpdateWorkflowScheduleByName(ctx, instanceName, workflowName, backend.WorkflowScheduleUpdateOpts{
+		err = grpcBackendDomain1.UpdateWorkflowScheduleByName(ctx, instanceName, workflowName, cereal.WorkflowScheduleUpdateOptions{
 			UpdateParameters: true,
 			Parameters:       domain1Params,
 		})
 		require.NoError(t, err)
 
 		domain2Params = []byte("domain2workflow-updated")
-		err = grpcBackendDomain2.UpdateWorkflowScheduleByName(ctx, instanceName, workflowName, backend.WorkflowScheduleUpdateOpts{
+		err = grpcBackendDomain2.UpdateWorkflowScheduleByName(ctx, instanceName, workflowName, cereal.WorkflowScheduleUpdateOptions{
 			UpdateParameters: true,
 			Parameters:       domain2Params,
 		})
@@ -303,20 +302,20 @@ func TestDomains(t *testing.T) {
 	})
 }
 
-func validateInstanceMatches(t *testing.T, instance *backend.WorkflowInstance, workflowName string, instanceName string, params []byte) {
+func validateInstanceMatches(t *testing.T, instance *cereal.WorkflowInstanceData, workflowName string, instanceName string, params []byte) {
 	t.Helper()
 	require.Equal(t, workflowName, instance.WorkflowName)
 	require.Equal(t, instanceName, instance.InstanceName)
 	require.Equal(t, params, instance.Parameters)
 }
 
-func validateTaskMatches(t *testing.T, task *backend.Task, taskName string, taskParams []byte) {
+func validateTaskMatches(t *testing.T, task *cereal.TaskData, taskName string, taskParams []byte) {
 	t.Helper()
 	require.Equal(t, taskName, task.Name)
 	require.Equal(t, taskParams, task.Parameters)
 }
 
-func validateScheduleMatches(t *testing.T, schedule *backend.Schedule, workflowName string, instanceName string, params []byte) {
+func validateScheduleMatches(t *testing.T, schedule *cereal.Schedule, workflowName string, instanceName string, params []byte) {
 	t.Helper()
 	require.Equal(t, workflowName, schedule.WorkflowName)
 	require.Equal(t, instanceName, schedule.InstanceName)

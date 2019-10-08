@@ -9,7 +9,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/cereal/backend"
 )
 
 // TestWorkflowFail tests that a call to w.Fail ends the workflow
@@ -34,7 +33,7 @@ func (suite *CerealTestSuite) TestWorkflowFail() {
 			},
 		),
 		WithManagerOpts(
-			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+			cereal.WithOnWorkflowCompleteCallback(func(*cereal.WorkflowEvent) {
 				wg.Done()
 			}),
 		),
@@ -73,7 +72,7 @@ func (suite *CerealTestSuite) TestWorkflowFailOnBadEnqueue() {
 			},
 		),
 		WithManagerOpts(
-			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+			cereal.WithOnWorkflowCompleteCallback(func(*cereal.WorkflowEvent) {
 				wg.Done()
 			}),
 		),
@@ -111,7 +110,7 @@ func (suite *CerealTestSuite) TestWorkflowFailOnUnmarshalableJSON() {
 			},
 		),
 		WithManagerOpts(
-			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+			cereal.WithOnWorkflowCompleteCallback(func(*cereal.WorkflowEvent) {
 				wg.Done()
 			}),
 		),

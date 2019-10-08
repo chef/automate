@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/cereal/backend"
 )
 
 // TestCompleteSimpleWorkflow tests that a workflow the launches a
@@ -50,7 +49,7 @@ func (suite *CerealTestSuite) TestCompleteSimpleWorkflow() {
 			},
 		),
 		WithManagerOpts(
-			cereal.WithOnWorkflowCompleteCallback(func(*backend.WorkflowEvent) {
+			cereal.WithOnWorkflowCompleteCallback(func(*cereal.WorkflowEvent) {
 				wgTask.Done()
 			}),
 		),

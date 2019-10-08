@@ -7,8 +7,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	rrule "github.com/teambition/rrule-go"
-
-	"github.com/chef/automate/lib/cereal/backend"
 )
 
 var (
@@ -21,12 +19,12 @@ var (
 )
 
 type WorkflowScheduler struct {
-	backend           backend.SchedulerDriver
+	backend           SchedulerDriver
 	workflowWakeupFun func()
 	triggerChan       chan struct{}
 }
 
-func NewWorkflowScheduler(b backend.SchedulerDriver, w func()) *WorkflowScheduler {
+func NewWorkflowScheduler(b SchedulerDriver, w func()) *WorkflowScheduler {
 	return &WorkflowScheduler{
 		backend:           b,
 		workflowWakeupFun: w,

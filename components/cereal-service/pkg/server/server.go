@@ -18,7 +18,6 @@ import (
 
 	"github.com/chef/automate/api/interservice/cereal"
 	libcereal "github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/cereal/backend"
 )
 
 var errInvalidMsg = errors.New("invalid msg")
@@ -26,15 +25,15 @@ var domainRegex = regexp.MustCompile("^[a-zA-Z0-9_\\-\\.]+$")
 
 type CerealService struct {
 	workflowScheduler *libcereal.WorkflowScheduler
-	backend           backend.Driver
+	backend           libcereal.Driver
 }
 
-func NewCerealService(ctx context.Context, b backend.Driver) *CerealService {
+func NewCerealService(ctx context.Context, b libcereal.Driver) *CerealService {
 	cs := &CerealService{
 		backend: b,
 	}
 
-	if v, ok := b.(backend.SchedulerDriver); ok {
+	if v, ok := b.(libcereal.SchedulerDriver); ok {
 		cs.workflowScheduler = libcereal.NewWorkflowScheduler(v, func() {})
 		go cs.workflowScheduler.Run(ctx)
 	}
@@ -86,7 +85,7 @@ func (s *CerealService) EnqueueWorkflow(ctx context.Context, req *cereal.Enqueue
 		return nil, err
 	}
 	logctx.Info("enqueuing workflow")
-	if err := s.backend.EnqueueWorkflow(ctx, &backend.WorkflowInstance{
+	if err := s.backend.EnqueueWorkflow(ctx, &libcereal.WorkflowInstanceData{
 		InstanceName: req.InstanceName,
 		WorkflowName: namespace(req.Domain, req.WorkflowName),
 		Parameters:   req.Parameters,
@@ -252,7 +251,7 @@ func (s *CerealService) DequeueWorkflow(req cereal.Cereal_DequeueWorkflowServer)
 		}
 	} else if cont := msg.GetContinue(); cont != nil {
 		for _, task := range cont.GetTasks() {
-			opts := backend.TaskEnqueueOpts{}
+			opts := libcereal.TaskEnqueueOptions{}
 			opts.StartAfter = time.Time{}
 			if task.StartAfter != nil {
 				ts, err := ptypes.Timestamp(task.StartAfter)
@@ -264,7 +263,7 @@ func (s *CerealService) DequeueWorkflow(req cereal.Cereal_DequeueWorkflowServer)
 				}
 			}
 
-			err := completer.EnqueueTask(&backend.Task{
+			err := completer.EnqueueTask(&libcereal.TaskData{
 				Name:       namespace(deqMsg.Domain, task.Name),
 				Parameters: task.Parameters,
 			}, opts)
@@ -619,7 +618,7 @@ func (s *CerealService) GetWorkflowScheduleByName(ctx context.Context, req *cere
 	}, nil
 }
 
-func cerealScheduleToGrpcSchedule(logctx *logrus.Entry, schedule *backend.Schedule) *cereal.Schedule {
+func cerealScheduleToGrpcSchedule(logctx *logrus.Entry, schedule *libcereal.Schedule) *cereal.Schedule {
 	grpcSchedule := &cereal.Schedule{
 		InstanceName: schedule.InstanceName,
 		WorkflowName: schedule.WorkflowName,
@@ -665,7 +664,7 @@ func (s *CerealService) UpdateWorkflowScheduleByName(ctx context.Context, req *c
 		return nil, err
 	}
 
-	opts := backend.WorkflowScheduleUpdateOpts{}
+	opts := libcereal.WorkflowScheduleUpdateOptions{}
 
 	if req.GetEnabled() != nil {
 		logctx.Info("updating enabled")
@@ -753,7 +752,7 @@ func (s *CerealService) ListWorkflowInstances(req *cereal.ListWorkflowInstancesR
 		return err
 	}
 
-	opts := backend.ListWorkflowOpts{}
+	opts := libcereal.ListWorkflowOpts{}
 
 	if workflowName := req.GetWorkflowName().GetValue(); workflowName != "" {
 		workflowName = namespace(req.Domain, workflowName)
@@ -797,7 +796,7 @@ func (s *CerealService) ListWorkflowInstances(req *cereal.ListWorkflowInstancesR
 	return nil
 }
 
-func cerealWorkflowInstanceToGrpc(workflowInstance *backend.WorkflowInstance) *cereal.WorkflowInstance {
+func cerealWorkflowInstanceToGrpc(workflowInstance *libcereal.WorkflowInstanceData) *cereal.WorkflowInstance {
 	grpcInstance := &cereal.WorkflowInstance{
 		InstanceName: workflowInstance.InstanceName,
 		WorkflowName: workflowInstance.WorkflowName,

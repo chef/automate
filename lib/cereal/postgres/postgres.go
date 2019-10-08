@@ -13,7 +13,6 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/cereal/backend"
 )
 
 const (
@@ -221,9 +220,9 @@ type PostgresScheduledWorkflowCompleter struct {
 	cancel context.CancelFunc
 }
 
-var _ backend.Driver = &PostgresBackend{}
-var _ backend.TaskCompleter = &PostgresTaskCompleter{}
-var _ backend.ScheduledWorkflowCompleter = &PostgresScheduledWorkflowCompleter{}
+var _ cereal.Driver = &PostgresBackend{}
+var _ cereal.TaskCompleter = &PostgresTaskCompleter{}
+var _ cereal.ScheduledWorkflowCompleter = &PostgresScheduledWorkflowCompleter{}
 
 func NewPostgresBackend(connURI string, opts ...PostgresBackendOpt) *PostgresBackend {
 	pg := &PostgresBackend{
@@ -310,8 +309,8 @@ func (pg *PostgresBackend) Close() error {
 	return nil
 }
 
-func (pg *PostgresBackend) GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string) (*backend.Schedule, error) {
-	scheduledWorkflow := backend.Schedule{}
+func (pg *PostgresBackend) GetWorkflowScheduleByName(ctx context.Context, instanceName string, workflowName string) (*cereal.Schedule, error) {
+	scheduledWorkflow := cereal.Schedule{}
 	row := pg.db.QueryRowContext(ctx, getScheduledWorkflowQuery, instanceName, workflowName)
 	err := row.Scan(
 		&scheduledWorkflow.ID,
@@ -334,7 +333,7 @@ func (pg *PostgresBackend) GetWorkflowScheduleByName(ctx context.Context, instan
 	return &scheduledWorkflow, nil
 }
 
-func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*backend.Schedule, error) {
+func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*cereal.Schedule, error) {
 	ctx, cancel := context.WithTimeout(ctx, 1*time.Minute)
 	defer cancel()
 
@@ -345,9 +344,9 @@ func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*backen
 
 	defer rows.Close() // nolint: errcheck
 
-	schedules := make([]*backend.Schedule, 0)
+	schedules := make([]*cereal.Schedule, 0)
 	for rows.Next() {
-		var scheduledWorkflow backend.Schedule
+		var scheduledWorkflow cereal.Schedule
 		var lastEnqueuedAt *time.Time
 		err := rows.Scan(
 			&scheduledWorkflow.ID,
@@ -376,13 +375,13 @@ func (pg *PostgresBackend) ListWorkflowSchedules(ctx context.Context) ([]*backen
 	return schedules, nil
 }
 
-func (pg *PostgresBackend) GetNextScheduledWorkflow(ctx context.Context) (*backend.Schedule, error) {
+func (pg *PostgresBackend) GetNextScheduledWorkflow(ctx context.Context) (*cereal.Schedule, error) {
 	ctx, cancel := context.WithCancel(ctx) // nolint: govet
 	defer cancel()
 
 	row := pg.db.QueryRowContext(ctx, getNextScheduledWorkflowQuery)
 
-	var scheduledWorkflow backend.Schedule
+	var scheduledWorkflow cereal.Schedule
 	err := row.Scan(
 		&scheduledWorkflow.ID,
 		&scheduledWorkflow.Enabled,
@@ -401,7 +400,7 @@ func (pg *PostgresBackend) GetNextScheduledWorkflow(ctx context.Context) (*backe
 	return &scheduledWorkflow, err
 }
 
-func (pg *PostgresBackend) GetDueScheduledWorkflow(ctx context.Context) (*backend.Schedule, backend.ScheduledWorkflowCompleter, error) {
+func (pg *PostgresBackend) GetDueScheduledWorkflow(ctx context.Context) (*cereal.Schedule, cereal.ScheduledWorkflowCompleter, error) {
 	ctx, cancel := context.WithCancel(ctx) // nolint: govet
 
 	tx, err := pg.db.BeginTx(ctx, nil)
@@ -412,7 +411,7 @@ func (pg *PostgresBackend) GetDueScheduledWorkflow(ctx context.Context) (*backen
 
 	row := tx.QueryRowContext(ctx, getDueScheduledWorkflowQuery)
 
-	var scheduledWorkflow backend.Schedule
+	var scheduledWorkflow cereal.Schedule
 	err = row.Scan(
 		&scheduledWorkflow.ID,
 		&scheduledWorkflow.Enabled,
@@ -447,7 +446,7 @@ func (pg *PostgresBackend) GetDueScheduledWorkflow(ctx context.Context) (*backen
 }
 
 func (pg *PostgresBackend) UpdateWorkflowScheduleByName(
-	ctx context.Context, instanceName string, workflowName string, opts backend.WorkflowScheduleUpdateOpts) error {
+	ctx context.Context, instanceName string, workflowName string, opts cereal.WorkflowScheduleUpdateOptions) error {
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -523,7 +522,7 @@ VALUES ($1, $2, $3, $4, $5, $6)`,
 	return wrapErr(tx.Commit(), "failed to commit workflow schedule update")
 }
 
-func (pg *PostgresBackend) GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName string) (*backend.WorkflowInstance, error) {
+func (pg *PostgresBackend) GetWorkflowInstanceByName(ctx context.Context, instanceName string, workflowName string) (*cereal.WorkflowInstanceData, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -536,7 +535,7 @@ func (pg *PostgresBackend) GetWorkflowInstanceByName(ctx context.Context, instan
 		"SELECT status, parameters, payload FROM cereal_workflow_instances WHERE workflow_name = $1 AND instance_name = $2",
 		workflowName, instanceName,
 	)
-	workflowInstance := backend.WorkflowInstance{
+	workflowInstance := cereal.WorkflowInstanceData{
 		WorkflowName: workflowName,
 		InstanceName: instanceName,
 	}
@@ -566,7 +565,7 @@ func (pg *PostgresBackend) GetWorkflowInstanceByName(ctx context.Context, instan
 			if errStr.Valid {
 				workflowInstance.Err = errors.New(errStr.String)
 			}
-			workflowInstance.Status = backend.WorkflowInstanceStatusCompleted
+			workflowInstance.Status = cereal.WorkflowInstanceStatusCompleted
 		} else {
 			return nil, err
 		}
@@ -578,17 +577,17 @@ func (pg *PostgresBackend) GetWorkflowInstanceByName(ctx context.Context, instan
 	return &workflowInstance, nil
 }
 
-func (pg *PostgresBackend) ListWorkflowInstances(ctx context.Context, opts backend.ListWorkflowOpts) ([]*backend.WorkflowInstance, error) {
+func (pg *PostgresBackend) ListWorkflowInstances(ctx context.Context, opts cereal.ListWorkflowOpts) ([]*cereal.WorkflowInstanceData, error) {
 	rows, err := pg.db.Query(listWorkflowInstancesQuery, opts.WorkflowName, opts.InstanceName, opts.IsRunning)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close() // nolint: errcheck
 
-	instances := []*backend.WorkflowInstance{}
+	instances := []*cereal.WorkflowInstanceData{}
 	for rows.Next() {
 		var id int64
-		workflowInstance := backend.WorkflowInstance{}
+		workflowInstance := cereal.WorkflowInstanceData{}
 		errText := sql.NullString{}
 		err := rows.Scan(
 			&id,
@@ -605,7 +604,7 @@ func (pg *PostgresBackend) ListWorkflowInstances(ctx context.Context, opts backe
 			return nil, err
 		}
 
-		if workflowInstance.Status == backend.WorkflowInstanceStatusCompleted {
+		if workflowInstance.Status == cereal.WorkflowInstanceStatusCompleted {
 			workflowInstance.Payload = nil
 			if errText.Valid {
 				workflowInstance.Err = errors.New(errText.String)
@@ -622,7 +621,7 @@ func (pg *PostgresBackend) ListWorkflowInstances(ctx context.Context, opts backe
 	return instances, nil
 }
 
-func (pg *PostgresBackend) EnqueueWorkflow(ctx context.Context, w *backend.WorkflowInstance) error {
+func (pg *PostgresBackend) EnqueueWorkflow(ctx context.Context, w *cereal.WorkflowInstanceData) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -646,7 +645,7 @@ func (pg *PostgresBackend) EnqueueWorkflow(ctx context.Context, w *backend.Workf
 	return nil
 }
 
-func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []string) (*backend.WorkflowEvent, backend.WorkflowCompleter, error) {
+func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []string) (*cereal.WorkflowEvent, cereal.WorkflowCompleter, error) {
 	ctx, cancel := context.WithCancel(ctx)
 
 	tx, err := pg.db.BeginTx(ctx, nil)
@@ -662,7 +661,7 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 	}
 
 	row := tx.QueryRowContext(ctx, dequeueWorkflowQuery, pq.Array(workflowNames))
-	event := &backend.WorkflowEvent{}
+	event := &cereal.WorkflowEvent{}
 	workc := &PostgresWorkflowCompleter{
 		ctx:             ctx,
 		enqueueTaskStmt: stmt,
@@ -704,7 +703,7 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 
 	logctx.Debug("Dequeued workflow")
 
-	if event.Instance.Status == backend.WorkflowInstanceStatusStarting && event.Type == backend.WorkflowCancel {
+	if event.Instance.Status == cereal.WorkflowInstanceStatusStarting && event.Type == cereal.WorkflowCancel {
 		defer cancel()
 		logctx.Warn("Cancel received before start")
 		// This case should be an anomaly. Because our ordering scheme (time) doesn't guarantee
@@ -720,7 +719,7 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 		return nil, nil, cereal.ErrNoDueWorkflows
 	}
 
-	if event.Type == backend.TaskComplete {
+	if event.Type == cereal.TaskComplete {
 		event.CompletedTaskCount++
 		tr, err := consumeTaskResult(ctx, tx, taskResultID)
 		if err != nil {
@@ -736,13 +735,13 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 	return event, workc, nil
 }
 
-func consumeTaskResult(ctx context.Context, tx *sql.Tx, taskResultID sql.NullInt64) (*backend.TaskResult, error) {
+func consumeTaskResult(ctx context.Context, tx *sql.Tx, taskResultID sql.NullInt64) (*cereal.TaskResultData, error) {
 	if !taskResultID.Valid {
 		return nil, errors.New("invalid task result id for completed task event")
 	}
 
 	row := tx.QueryRowContext(ctx, consumeTaskResultQuery, taskResultID.Int64)
-	tr := backend.TaskResult{}
+	tr := cereal.TaskResultData{}
 	err := row.Scan(
 		&tr.TaskName, &tr.Parameters, &tr.Status, &tr.ErrorText, &tr.Result)
 	if err != nil {
@@ -751,8 +750,8 @@ func consumeTaskResult(ctx context.Context, tx *sql.Tx, taskResultID sql.NullInt
 			// that aborting and retrying will fix. Thus,
 			// we move on and allow the workflow to handle
 			// the error, if they needed this result.
-			return &backend.TaskResult{
-				Status:    backend.TaskStatusUnusableResult,
+			return &cereal.TaskResultData{
+				Status:    cereal.TaskStatusUnusableResult,
 				ErrorText: err.Error(),
 			}, nil
 		}
@@ -793,7 +792,7 @@ func (pg *PostgresBackend) KillWorkflow(ctx context.Context, instanceName string
 	return nil
 }
 
-func (workc *PostgresWorkflowCompleter) EnqueueTask(task *backend.Task, opts backend.TaskEnqueueOpts) error {
+func (workc *PostgresWorkflowCompleter) EnqueueTask(task *cereal.TaskData, opts cereal.TaskEnqueueOptions) error {
 	if opts.StartAfter.IsZero() {
 		opts.StartAfter = time.Now()
 	}
@@ -808,9 +807,9 @@ func (workc *PostgresWorkflowCompleter) EnqueueTask(task *backend.Task, opts bac
 	return nil
 }
 
-func (pg *PostgresBackend) dequeueTask(tx *sql.Tx, taskName string) (int64, *backend.Task, error) {
+func (pg *PostgresBackend) dequeueTask(tx *sql.Tx, taskName string) (int64, *cereal.TaskData, error) {
 	row := tx.QueryRow(dequeueTaskQuery, taskName)
-	task := &backend.Task{
+	task := &cereal.TaskData{
 		Name: taskName,
 	}
 
@@ -825,7 +824,7 @@ func (pg *PostgresBackend) dequeueTask(tx *sql.Tx, taskName string) (int64, *bac
 	return tid, task, nil
 }
 
-func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*backend.Task, backend.TaskCompleter, error) {
+func (pg *PostgresBackend) DequeueTask(ctx context.Context, taskName string) (*cereal.TaskData, cereal.TaskCompleter, error) {
 	ctx, cancel := context.WithCancel(ctx)
 
 	tx, err := pg.db.BeginTx(ctx, nil)
@@ -878,7 +877,7 @@ func (taskc *PostgresTaskCompleter) Fail(errMsg string) error {
 	default:
 	}
 
-	_, err := taskc.db.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, backend.TaskStatusFailed, errMsg, "")
+	_, err := taskc.db.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, cereal.TaskStatusFailed, errMsg, "")
 
 	if err != nil {
 		if isErrTaskLost(err) {
@@ -903,7 +902,7 @@ func (taskc *PostgresTaskCompleter) Succeed(results []byte) error {
 	default:
 	}
 
-	_, err := taskc.db.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, backend.TaskStatusSuccess, "", results)
+	_, err := taskc.db.ExecContext(taskc.ctx, completeTaskQuery, taskc.tid, cereal.TaskStatusSuccess, "", results)
 
 	if err != nil {
 		if isErrTaskLost(err) {
@@ -958,7 +957,7 @@ func (workc *PostgresWorkflowCompleter) Close() error {
 }
 
 // TODO(ssd) 2019-05-14: We should probably allow bulk insertion of workflows and tasks
-func (c *PostgresScheduledWorkflowCompleter) EnqueueAndUpdateScheduledWorkflow(s *backend.Schedule) error {
+func (c *PostgresScheduledWorkflowCompleter) EnqueueAndUpdateScheduledWorkflow(s *cereal.Schedule) error {
 	defer c.cancel()
 	wrapErr := func(err error, msg string) error {
 		if isPGConflict(err) {
@@ -1012,7 +1011,7 @@ func (c *PostgresScheduledWorkflowCompleter) EnqueueAndUpdateScheduledWorkflow(s
 	}
 }
 
-func (c *PostgresScheduledWorkflowCompleter) DisableSchedule(s *backend.Schedule) error {
+func (c *PostgresScheduledWorkflowCompleter) DisableSchedule(s *cereal.Schedule) error {
 	defer c.cancel()
 	_, err := c.tx.ExecContext(
 		c.ctx,
