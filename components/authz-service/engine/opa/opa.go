@@ -5,7 +5,9 @@ package opa
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 
@@ -307,7 +309,12 @@ func dumpData(ctx context.Context, store storage.Store, l logger.Logger) error {
 		return err
 	}
 
-	l.Infof("data: %#v", data)
+	jsonResult, err := json.Marshal(data)
+	if err != nil {
+		panic(err)
+	}
+	ioutil.WriteFile("/tmp/output.json", jsonResult, 0644)
+	l.Infof("data: %s", jsonResult)
 	return store.Commit(ctx, txn)
 }
 
@@ -318,8 +325,6 @@ func (s *State) IsAuthorized(
 	subjects engine.Subjects,
 	action engine.Action,
 	resource engine.Resource) (bool, error) {
-
-	s.log.Warnf("IsAuthorized start")
 
 	subs := make(ast.Array, len(subjects))
 	for i, sub := range subjects {
@@ -334,8 +339,6 @@ func (s *State) IsAuthorized(
 	if err != nil {
 		return false, &EvaluationError{e: err}
 	}
-
-	s.log.Warnf("IsAuthorized end")
 
 	switch len(resultSet) {
 	case 0:
@@ -360,8 +363,6 @@ func (s *State) V2IsAuthorized(
 	action engine.Action,
 	resource engine.Resource) (bool, error) {
 
-	s.log.Warnf("V2IsAuthorized start")
-
 	subs := make(ast.Array, len(subjects))
 	for i, sub := range subjects {
 		subs[i] = ast.NewTerm(ast.String(sub))
@@ -375,8 +376,6 @@ func (s *State) V2IsAuthorized(
 	if err != nil {
 		return false, &EvaluationError{e: err}
 	}
-
-	s.log.Warnf("V2IsAuthorized end")
 
 	switch len(resultSet) {
 	case 0:
@@ -403,9 +402,6 @@ func (s *State) V2ProjectsAuthorized(
 	resource engine.Resource,
 	projects engine.Projects) ([]string, error) {
 
-	s.log.Warnf("V2ProjectsAuthorized start")
-	s.log.Warnf("projects: %s", projects)
-
 	subs := make(ast.Array, len(subjects))
 	for i, sub := range subjects {
 		subs[i] = ast.NewTerm(ast.String(sub))
@@ -425,8 +421,6 @@ func (s *State) V2ProjectsAuthorized(
 		return []string{}, &EvaluationError{e: err}
 	}
 
-	s.log.Warnf("V2ProjectsAuthorized end")
-
 	return s.projectsFromPreparedEvalQuery(resultSet)
 }
 
@@ -436,8 +430,6 @@ func (s *State) FilterAuthorizedPairs(
 	ctx context.Context,
 	subjects engine.Subjects,
 	pairs []engine.Pair) ([]engine.Pair, error) {
-
-	s.log.Warnf("FilterAuthorizedPairs start")
 
 	opaInput := map[string]interface{}{
 		"subjects": subjects,
@@ -449,8 +441,6 @@ func (s *State) FilterAuthorizedPairs(
 	if err != nil {
 		return nil, &EvaluationError{e: err}
 	}
-
-	s.log.Warnf("FilterAuthorizedPairs end")
 
 	return s.pairsFromResults(rs)
 }
@@ -464,8 +454,6 @@ func (s *State) V2FilterAuthorizedPairs(
 	isBeta2p1 bool,
 ) ([]engine.Pair, error) {
 
-	s.log.Warnf("V2FilterAuthorizedPairs start")
-
 	opaInput := map[string]interface{}{
 		"subjects": subjects,
 		"pairs":    pairs,
@@ -476,12 +464,15 @@ func (s *State) V2FilterAuthorizedPairs(
 	if isBeta2p1 {
 		store = s.v2p1Store
 	}
+
+	//s.DumpDataV2p1(ctx)
+	//s.log.Warnf("subjects: %v", subjects)
+	//s.log.Warnf("pairs: %v", pairs)
+
 	rs, err := s.evalQuery(ctx, s.queries[filteredPairsV2Query], opaInput, store)
 	if err != nil {
 		return nil, &EvaluationError{e: err}
 	}
-
-	s.log.Warnf("V2FilterAuthorizedPairs end")
 
 	return s.pairsFromResults(rs)
 }
@@ -492,8 +483,6 @@ func (s *State) V2FilterAuthorizedPairs(
 func (s *State) V2FilterAuthorizedProjects(
 	ctx context.Context, subjects engine.Subjects) ([]string, error) {
 
-	s.log.Warnf("V2FilterAuthorizedProjects start")
-
 	opaInput := map[string]interface{}{
 		"subjects": subjects,
 	}
@@ -503,8 +492,6 @@ func (s *State) V2FilterAuthorizedProjects(
 	if err != nil {
 		return nil, &EvaluationError{e: err}
 	}
-
-	s.log.Warnf("V2FilterAuthorizedProjects end")
 
 	return s.projectsFromPartialResults(rs)
 }

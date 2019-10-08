@@ -2,7 +2,9 @@ package opa
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"os"
 	"testing"
@@ -297,6 +299,215 @@ func BenchmarkFilterAuthorizedPairsWithPolicies(b *testing.B) {
 	}
 }
 
+func BenchmarkV2FilterAuthorizedPairsWithPolicies(b *testing.B) {
+	ctx := context.Background()
+	fmt.Println("starting...")
+
+	l, err := logger.NewLogger("text", "debug")
+	require.NoError(b, err, "init logger")
+	s, err := New(ctx, l)
+	require.NoError(b, err, "init state")
+
+	pairs := []engine.Pair{
+		engine.Pair{Resource: "compliance:reporting:nodes", Action: "compliance:reportNodes:list"},
+		engine.Pair{Resource: "iam:policies", Action: "iam:policies:list"},
+		engine.Pair{Resource: "iam:teams", Action: "iam:teams:create"},
+		engine.Pair{Resource: "system:config", Action: "system:telemetryConfig:get"},
+		engine.Pair{Resource: "compliance:profiles:market", Action: "compliance:marketProfiles:get"},
+		engine.Pair{Resource: "retention:nodes", Action: "retention:nodes:update"},
+		engine.Pair{Resource: "compliance:reporting:reports", Action: "compliance:reports:list"},
+		engine.Pair{Resource: "infra:actions", Action: "infra:ingest:create"},
+		engine.Pair{Resource: "system:service:logLevel", Action: "system:serviceLogLevel:set"},
+		engine.Pair{Resource: "iam:rules", Action: "iam:rules:apply"},
+		engine.Pair{Resource: "secrets:secrets", Action: "secrets:secrets:create"},
+		engine.Pair{Resource: "system:iam:upgradeToV2", Action: "system:iam:upgrade"},
+		engine.Pair{Resource: "iam:teams", Action: "iam:teams:update"},
+		engine.Pair{Resource: "system:service:version", Action: "system:serviceVersion:get"},
+		engine.Pair{Resource: "iam:policies", Action: "iam:policies:create"},
+		engine.Pair{Resource: "compliance:reporting:stats:trend", Action: "compliance:reportTrend:get"},
+		engine.Pair{Resource: "compliance:profiles", Action: "compliance:profiles:list"},
+		engine.Pair{Resource: "infra:nodes", Action: "infra:nodes:delete"},
+		engine.Pair{Resource: "compliance:reporting:stats:failures", Action: "compliance:reportFailures:get"},
+		engine.Pair{Resource: "system:health", Action: "system:health:get"},
+		engine.Pair{Resource: "compliance:scanner:jobs", Action: "compliance:scannerJobs:create"},
+		engine.Pair{Resource: "compliance:profiles", Action: "compliance:profiles:create"},
+		engine.Pair{Resource: "secrets:secrets", Action: "secrets:secrets:list"},
+		engine.Pair{Resource: "applications:serviceGroups", Action: "applications:serviceGroups:list"},
+		engine.Pair{Resource: "event:events", Action: "event:events:list"},
+		engine.Pair{Resource: "iam:projects", Action: "iam:projects:create"},
+		engine.Pair{Resource: "system:iam:resetToV1", Action: "system:iam:reset"},
+		engine.Pair{Resource: "compliance:reporting:stats:profiles", Action: "compliance:reportProfiles:get"},
+		engine.Pair{Resource: "infra:status", Action: "infra:ingest:get"},
+		engine.Pair{Resource: "compliance:reporting:licenseusage", Action: "compliance:reportingLicenseUsage:list"},
+		engine.Pair{Resource: "iam:policyVersion", Action: "iam:policies:get"},
+		engine.Pair{Resource: "iam:projects", Action: "iam:projects:list"},
+		engine.Pair{Resource: "iam:introspect", Action: "iam:introspect:get"},
+		engine.Pair{Resource: "system:status", Action: "system:license:get"},
+		engine.Pair{Resource: "iam:teams", Action: "iam:teams:list"},
+		engine.Pair{Resource: "infra:nodes", Action: "infra:nodes:list"},
+		engine.Pair{Resource: "iam:introspect", Action: "iam:introspect:getAllProjects"},
+		engine.Pair{Resource: "retention:nodes", Action: "retention:nodes:get"},
+		engine.Pair{Resource: "retention:serviceGroups", Action: "retention:serviceGroups:update"},
+		engine.Pair{Resource: "compliance:scanner:jobs", Action: "compliance:scannerJobs:list"},
+		engine.Pair{Resource: "infra:nodes", Action: "infra:nodes:create"},
+		engine.Pair{Resource: "iam:tokens", Action: "iam:tokens:create"},
+		engine.Pair{Resource: "iam:rules", Action: "iam:rules:cancel"},
+		engine.Pair{Resource: "iam:tokens", Action: "iam:tokens:list"},
+		engine.Pair{Resource: "infra:nodeManagers", Action: "infra:nodeManagers:create"},
+		engine.Pair{Resource: "compliance:reporting:profiles", Action: "compliance:reportProfiles:list"},
+		engine.Pair{Resource: "system:license", Action: "system:license:apply"},
+		engine.Pair{Resource: "iam:introspect", Action: "iam:introspect:getAll"},
+		engine.Pair{Resource: "infra:nodes", Action: "infra:ingestNodes:delete"},
+		engine.Pair{Resource: "iam:roles", Action: "iam:roles:list"},
+		engine.Pair{Resource: "retention:serviceGroups", Action: "retention:serviceGroups:get"},
+		engine.Pair{Resource: "notifications:rules", Action: "notifications:notifyRules:validate"},
+		engine.Pair{Resource: "compliance:reporting:suggestions", Action: "compliance:reportSuggestions:list"},
+		engine.Pair{Resource: "system:service:version", Action: "system:serviceVersion:list"},
+		engine.Pair{Resource: "iam:users", Action: "iam:users:list"},
+		engine.Pair{Resource: "infra:nodes", Action: "infra:ingest:delete"},
+		engine.Pair{Resource: "notifications:rules", Action: "notifications:notifyRules:create"},
+		engine.Pair{Resource: "iam:rules", Action: "iam:rules:status"},
+		engine.Pair{Resource: "iam:introspect", Action: "iam:introspect:getSome"},
+		engine.Pair{Resource: "infra:nodeManagers", Action: "infra:nodeManagers:list"},
+		engine.Pair{Resource: "applications:serviceGroups", Action: "applications:serviceGroups:delete"},
+		engine.Pair{Resource: "compliance:reporting:control", Action: "compliance:controlItems:list"},
+		engine.Pair{Resource: "compliance:reporting:report-ids", Action: "compliance:reportids:list"},
+		engine.Pair{Resource: "compliance:reporting:stats:summary", Action: "compliance:reportSummary:get"},
+		engine.Pair{Resource: "iam:users", Action: "iam:users:create"},
+		engine.Pair{Resource: "system:license", Action: "system:license:request"},
+		engine.Pair{Resource: "notifications:rules", Action: "notifications:notifyRules:list"},
+		engine.Pair{Resource: "iam:roles", Action: "iam:roles:create"},
+	}
+	subjects := []string{
+		"team:local:newteam1",
+		"team:local:newteam2",
+		"team:local:newteam3",
+		"team:local:newteam4",
+		"team:local:newteam5",
+		"team:local:newteam6",
+		"team:local:newteam7",
+		"team:local:newteam8",
+		"team:local:newteam9",
+		"team:local:newteam10",
+		"team:local:newteam11",
+		"team:local:newteam12",
+		"team:local:newteam13",
+		"team:local:newteam14",
+		"team:local:newteam15",
+		"team:local:newteam16",
+		"team:local:newteam17",
+		"team:local:newteam18",
+		"team:local:newteam19",
+		"team:local:newteam20",
+		"team:local:newteam21",
+		"team:local:newteam22",
+		"team:local:newteam23",
+		"team:local:newteam24",
+		"team:local:newteam25",
+		"team:local:newteam26",
+		"team:local:newteam27",
+		"team:local:newteam28",
+		"team:local:newteam29",
+		"team:local:newteam30",
+		"team:local:newteam31",
+		"team:local:newteam32",
+		"team:local:newteam33",
+		"team:local:newteam34",
+		"team:local:newteam35",
+		"team:local:newteam36",
+		"team:local:newteam37",
+		"team:local:newteam38",
+		"team:local:newteam39",
+		"team:local:newteam40",
+		"team:local:newteam41",
+		"team:local:newteam42",
+		"team:local:newteam43",
+		"team:local:newteam44",
+		"team:local:newteam45",
+		"team:local:newteam46",
+		"team:local:newteam47",
+		"team:local:newteam48",
+		"team:local:newteam49",
+		"team:local:newteam50",
+		"team:local:newteam51",
+		"team:local:newteam52",
+		"team:local:newteam53",
+		"team:local:newteam54",
+		"team:local:newteam55",
+		"team:local:newteam56",
+		"team:local:newteam57",
+		"team:local:newteam58",
+		"team:local:newteam59",
+		"team:local:newteam60",
+		"team:local:newteam61",
+		"team:local:newteam62",
+		"team:local:newteam63",
+		"team:local:newteam64",
+		"team:local:newteam65",
+		"team:local:newteam66",
+		"team:local:newteam67",
+		"team:local:newteam68",
+		"team:local:newteam69",
+		"team:local:newteam70",
+		"team:local:newteam71",
+		"team:local:newteam72",
+		"team:local:newteam73",
+		"team:local:newteam74",
+		"team:local:newteam75",
+		"team:local:newteam76",
+		"team:local:newteam77",
+		"team:local:newteam78",
+		"team:local:newteam79",
+		"team:local:newteam80",
+		"team:local:newteam81",
+		"team:local:newteam82",
+		"team:local:newteam83",
+		"team:local:newteam84",
+		"team:local:newteam85",
+		"team:local:newteam86",
+		"team:local:newteam87",
+		"team:local:newteam88",
+		"team:local:newteam89",
+		"team:local:newteam90",
+		"team:local:newteam91",
+		"team:local:newteam92",
+		"team:local:newteam93",
+		"team:local:newteam94",
+		"team:local:newteam95",
+		"team:local:newteam96",
+		"team:local:newteam97",
+		"team:local:newteam98",
+		"team:local:newteam99",
+		"team:local:newteam100",
+		"user:local:test",
+	}
+
+	jsonFile, err := os.Open("test.json")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer jsonFile.Close()
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	var pr struct {
+		Policies map[string]interface{} `json:policies`
+		Roles    map[string]interface{} `json:roles`
+	}
+	json.Unmarshal(byteValue, &pr)
+	require.NoError(b, s.V2p1SetPolicies(ctx, pr.Policies, pr.Roles))
+
+	b.Run("V2FilterAuthorizedPairs with real life input", func(b *testing.B) {
+		var resp []engine.Pair
+		var err error
+		for n := 0; n < b.N; n++ {
+			resp, err = s.V2FilterAuthorizedPairs(ctx, subjects, pairs, true)
+			if err != nil {
+				b.Error(err)
+			}
+		}
+		filteredPairsResp = resp
+	})
+}
+
 // BenchmarkInitPartialResultV2 is initializing a partial result object using
 // what currently (as of this commit) is a pretty default store content.
 // The JSON is taken from the store-pretty.json file in engine/opa/example_v2/.
@@ -398,7 +609,7 @@ func testPairs(c int) []engine.Pair {
 		// repeat until our random policy has no wildcard action
 		// the resource count contain a wildcard, but it really doesn't matter;
 		// it'll be treated as a string
-		for pol = randomPolicies(1)[0]; pol["action"] == "*"; pol = randomPolicies(1)[0] {
+		for pol = randomPolicies(1, 0)[0]; pol["action"] == "*"; pol = randomPolicies(1, 0)[0] {
 		}
 
 		// append the count to ensure we don't end up with duplicates
@@ -480,12 +691,30 @@ func defaultPolicies() []map[string]interface{} {
 
 // r is the number of random policies to include, appended to the default ones
 func testPolicies(r int) []map[string]interface{} {
-	return append(defaultPolicies(), randomPolicies(r)...)
+	return append(defaultPolicies(), randomPolicies(r, 0)...)
 }
 
-func randomPolicies(i int) []map[string]interface{} {
+func testPoliciesWithProjects(r int, p int) []map[string]interface{} {
+	return append(defaultPolicies(), randomPolicies(r, p)...)
+}
+
+func testSubjects(r int) []string {
+	sub := make([]string, r)
+	for i := 0; i < r; i++ {
+		sub[i] = fmt.Sprintf("user:local:%d", i)
+	}
+	return sub
+}
+
+func randomPolicies(i int, p int) []map[string]interface{} {
 	subjects := []string{"user:local:admin", "team:*", "team:local:sec", "team:local:admin", "user:ldap:*", "token:*"}
+	// resources := []string{
+	// 	"*",
+	// }
+	// actions := []string{"*"}
+	actions := []string{"read", "update", "delete", "create", "*", "search", "rerun", "count", "stop", "start"}
 	resources := []string{
+		"*",
 		"nodes",
 		"nodes:123",
 		"cfgmgmt:nodes:*",
@@ -499,7 +728,7 @@ func randomPolicies(i int) []map[string]interface{} {
 		"secrets:12345",
 		"service_info:telemetry",
 	}
-	actions := []string{"read", "update", "delete", "create", "*", "search", "rerun", "count", "stop", "start"}
+	effects := []string{"allow", "deny"}
 
 	newPolicies := make([]map[string]interface{}, i)
 	for j := 0; j < i; j++ {
@@ -507,12 +736,25 @@ func randomPolicies(i int) []map[string]interface{} {
 		subIndex := rand.Intn(len(subjects))
 		resIndex := rand.Intn(len(resources))
 		actIndex := rand.Intn(len(actions))
+		//effectIndex := rand.Intn(len(effects))
+		projects := []string{}
+		if p > 0 {
+			maxProjects := rand.Intn(p)
+			for i := 0; i < maxProjects; i++ {
+				projects = append(projects, fmt.Sprintf("project%d", i))
+			}
+		}
 
 		newPolicies[j] = map[string]interface{}{
-			"subjects": subjects[subIndex],
-			"action":   actions[actIndex],
-			"resource": resources[resIndex],
-			"effect":   "allow",
+			"members": subjects[subIndex],
+			"statements": map[string]interface{}{
+				"statement-id-0": map[string]interface{}{
+					"actions":   []string{resources[resIndex]},
+					"resources": []string{actions[actIndex]},
+					"effect":    effects[i%2],
+					"projects":  projects,
+				},
+			},
 		}
 	}
 
