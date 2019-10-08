@@ -17,13 +17,6 @@ import (
 	"github.com/chef/automate/lib/logger"
 )
 
-type ProjectUpdate struct {
-	jobStatus      project_update_lib.JobStatus
-	jobStatusError error
-	running        bool
-	ID             string
-}
-
 type DB struct {
 	*gorp.DbMap
 	ProjectUpdate *ProjectUpdate

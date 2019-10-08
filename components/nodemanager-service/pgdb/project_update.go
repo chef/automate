@@ -27,42 +27,36 @@ type NodeProjectData struct {
 	ProjectDataKeyValues []*nodes.ProjectsData
 }
 
-// JobCancel - cancel the a currently running project update
-func (db *DB) JobCancel(ctx context.Context, projectID string) error {
-	log.Debugf("Node manager project update JobCancel %s", projectID)
-	if db.ProjectUpdate.ID == projectID {
-		db.ProjectUpdate.running = false
-	}
-	return nil
+type ProjectUpdate struct {
+	jobStatus      project_update_lib.JobStatus
+	jobStatusError error
+	running        bool
+	ID             string
 }
 
-// UpdateProjectTags - start a project update
-func (db *DB) UpdateProjectTags(ctx context.Context,
-	projectRules map[string]*iam_v2.ProjectRules) ([]string, error) {
-	jobUUID, _ := uuid.NewV4()
-	log.Debugf("Running node manager UpdateProjectTags %v ID: %s", projectRules, jobUUID.String())
-
-	// setup for new project update run
-	db.ProjectUpdate.jobStatusError = nil
-	db.ProjectUpdate.running = true
-	db.ProjectUpdate.jobStatus = project_update_lib.JobStatus{
+func (projectUpdate *ProjectUpdate) start(jobUUID string) {
+	projectUpdate.jobStatusError = nil
+	projectUpdate.running = true
+	projectUpdate.jobStatus = project_update_lib.JobStatus{
 		Completed:             false,
 		PercentageComplete:    0,
 		EstimatedEndTimeInSec: 0,
 	}
-	db.ProjectUpdate.ID = jobUUID.String()
-	go db.updateNodes(projectRules)
-
-	return []string{jobUUID.String()}, nil
+	projectUpdate.ID = jobUUID
 }
 
-// JobStatus - get the job status of the project update
-func (db *DB) JobStatus(ctx context.Context, jobID string) (project_update_lib.JobStatus, error) {
-	if db.ProjectUpdate.ID == jobID {
-		if db.ProjectUpdate.jobStatusError != nil {
-			return project_update_lib.JobStatus{}, db.ProjectUpdate.jobStatusError
+func (projectUpdate *ProjectUpdate) cancel(jobUUID string) {
+	if projectUpdate.ID == jobUUID {
+		projectUpdate.running = false
+	}
+}
+
+func (projectUpdate *ProjectUpdate) getJobStatus(jobUUID string) (project_update_lib.JobStatus, error) {
+	if projectUpdate.ID == jobUUID {
+		if projectUpdate.jobStatusError != nil {
+			return project_update_lib.JobStatus{}, projectUpdate.jobStatusError
 		}
-		return db.ProjectUpdate.jobStatus, nil
+		return projectUpdate.jobStatus, nil
 	}
 
 	// If the jobID does not match the currently running job then it must have completed before.
@@ -73,58 +67,83 @@ func (db *DB) JobStatus(ctx context.Context, jobID string) (project_update_lib.J
 	}, nil
 }
 
-func (db *DB) updateNodes(projectRules map[string]*iam_v2.ProjectRules) {
-	nodes, err := db.getAllNodes()
-	if err != nil {
-		db.projectUpdateFail(err)
-		return
-	}
-
-	numberOfNodes := float32(len(nodes))
-	for index, node := range nodes {
-		if !db.ProjectUpdate.running {
-			db.projectUpdateComplete()
-			return
-		}
-		matchingProjectIDs := getMatchingProjectIDs(node, projectRules)
-
-		err = db.updateNodeProjectIDs(node, matchingProjectIDs)
-		if err != nil {
-			db.projectUpdateFail(err)
-			return
-		}
-
-		db.updateProjectStatus(float32((index + 1)) / numberOfNodes)
-	}
-
-	db.projectUpdateComplete()
-}
-
-func (db *DB) updateProjectStatus(percentageComplete float32) {
-	db.ProjectUpdate.jobStatus = project_update_lib.JobStatus{
+func (projectUpdate *ProjectUpdate) updateProjectStatus(percentageComplete float32) {
+	projectUpdate.jobStatus = project_update_lib.JobStatus{
 		Completed:             false,
 		PercentageComplete:    percentageComplete,
 		EstimatedEndTimeInSec: 0,
 	}
 }
 
-func (db *DB) projectUpdateComplete() {
-	db.ProjectUpdate.jobStatus = project_update_lib.JobStatus{
+func (projectUpdate *ProjectUpdate) updateComplete() {
+	projectUpdate.jobStatus = project_update_lib.JobStatus{
 		Completed:             true,
 		PercentageComplete:    1.0,
 		EstimatedEndTimeInSec: 0,
 	}
-	db.ProjectUpdate.running = false
+	projectUpdate.running = false
 }
 
-func (db *DB) projectUpdateFail(err error) {
-	db.ProjectUpdate.jobStatusError = err
-	db.ProjectUpdate.jobStatus = project_update_lib.JobStatus{
+func (projectUpdate *ProjectUpdate) updateFail(err error) {
+	projectUpdate.jobStatusError = err
+	projectUpdate.jobStatus = project_update_lib.JobStatus{
 		Completed:             true,
 		PercentageComplete:    1.0,
 		EstimatedEndTimeInSec: 0,
 	}
-	db.ProjectUpdate.running = false
+	projectUpdate.running = false
+}
+
+// JobCancel - cancel the a currently running project update
+func (db *DB) JobCancel(ctx context.Context, jobID string) error {
+	log.Debugf("Node manager project update JobCancel %s", jobID)
+	db.ProjectUpdate.cancel(jobID)
+	return nil
+}
+
+// UpdateProjectTags - start a project update
+func (db *DB) UpdateProjectTags(ctx context.Context,
+	projectRules map[string]*iam_v2.ProjectRules) ([]string, error) {
+	jobUUID := uuid.Must(uuid.NewV4()).String()
+	log.Debugf("Running node manager UpdateProjectTags %v ID: %s", projectRules, jobUUID)
+
+	db.ProjectUpdate.start(jobUUID)
+
+	go db.updateNodes(projectRules)
+
+	return []string{jobUUID}, nil
+}
+
+// JobStatus - get the job status of the project update
+func (db *DB) JobStatus(ctx context.Context, jobID string) (project_update_lib.JobStatus, error) {
+	return db.ProjectUpdate.getJobStatus(jobID)
+}
+
+func (db *DB) updateNodes(projectRules map[string]*iam_v2.ProjectRules) {
+	nodes, err := db.getAllNodes()
+	if err != nil {
+		db.ProjectUpdate.updateFail(err)
+		return
+	}
+
+	numberOfNodes := float32(len(nodes))
+	for index, node := range nodes {
+		if !db.ProjectUpdate.running {
+			db.ProjectUpdate.updateComplete()
+			return
+		}
+		matchingProjectIDs := getMatchingProjectIDs(node, projectRules)
+
+		err = db.updateNodeProjectIDs(node, matchingProjectIDs)
+		if err != nil {
+			db.ProjectUpdate.updateFail(err)
+			return
+		}
+
+		db.ProjectUpdate.updateProjectStatus(float32((index + 1)) / numberOfNodes)
+	}
+
+	db.ProjectUpdate.updateComplete()
 }
 
 // updateNodeProjectIDs - update the nodes project IDs
