@@ -31,10 +31,10 @@
           <chef-icon>{{ history.status | chefStatusIcon }}</chef-icon>
         </div>
         <div class="duration">
-          {{renderDate(history.startTime)}} <span>{{renderTime(history.startTime)}}</span>
+          {{ history.startTime | datetime: RFC2822 }}
         </div>
         <div class="date-time">
-          {{getDuration(history.startTime, history.endTime)}} <span>{{renderTime(history.endTime)}}</span>
+          {{getDuration(history.startTime, history.endTime)}}
         </div>
       </li>
       <li class="no-runs-small" *ngIf="stats(selected) == 0">
