@@ -112,7 +112,10 @@ func (s *SingleTaskWorkflow) OnStart(w cereal.WorkflowInstance, ev cereal.StartE
 		return w.Fail(err)
 	}
 
-	w.EnqueueTask(s.taskName, params)
+	err = w.EnqueueTask(s.taskName, params)
+	if err != nil {
+		return w.Fail(err)
+	}
 	return w.Continue(0)
 }
 

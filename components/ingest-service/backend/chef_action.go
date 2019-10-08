@@ -20,7 +20,7 @@ type InternalChefAction struct {
 	RequestId        string    `json:"request_id,omitempty"`
 	RequestorName    string    `json:"requestor_name,omitempty"`
 	RequestorType    string    `json:"requestor_type,omitempty"`
-	RevisionId       string    `json:"revision_id, omitempty"`
+	RevisionId       string    `json:"revision_id,omitempty"`
 	ServiceHostname  string    `json:"service_hostname,omitempty"`
 	UserAgent        string    `json:"user_agent,omitempty"`
 	Data             string    `json:"data,omitempty"`

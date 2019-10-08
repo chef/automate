@@ -132,7 +132,7 @@ func (ccr *ChefClientRun) ToNode() (nodeState Node, err error) {
 			if ccr.NodePayload.Automatic["cloud"] != nil {
 				cloud := ccr.NodePayload.Automatic["cloud"].(map[string]interface{})
 				// Getting the public_ipv4 from the `cloud.public_ipv4` attribute
-				// Avoid the convertion to a `string` if it is `nil` - We want nil!
+				// Avoid the conversion to a `string` if it is `nil` - We want nil!
 				nodeState.Ec2.PublicIpv4 = cloud["public_ipv4"]
 			}
 			nodeState.Ec2.PlacementAvailabilityZone =
@@ -143,7 +143,7 @@ func (ccr *ChefClientRun) ToNode() (nodeState Node, err error) {
 			nodeState.ErrorMessage = ccr.Error.Message
 		}
 	}
-	return
+	return // nolint:nakedret
 }
 
 // ToNodeAttribute Returns the node attribute from a ChefClientRun
@@ -213,7 +213,7 @@ func CreateNodeAttribute(nodePayload NodePayload, entityUUID string) (attribute 
 		LastUpdate:          time.Now().UTC(),
 	}
 
-	return
+	return // nolint: nakedret
 }
 
 func (ccr *ChefClientRun) initializeNodeInfo() (sharedNodeInfo NodeInfo, err error) {
@@ -269,7 +269,7 @@ func (ccr *ChefClientRun) initializeNodeInfo() (sharedNodeInfo NodeInfo, err err
 	copy(sharedNodeInfo.RunList, ccr.RunList)
 	sharedNodeInfo.ChefVersion = ccr.ChefVersion()
 	sharedNodeInfo.VersionedCookbooks = VersionedCookbooks(ccr.NodePayload)
-	return
+	return // nolint: nakedret
 }
 
 // ChefVersion Returns a chef version string retrieved from automatic attributes or an empty string if it is not present

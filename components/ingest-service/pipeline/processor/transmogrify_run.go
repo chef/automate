@@ -3,12 +3,12 @@ package processor
 import (
 	"encoding/json"
 
+	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
-	log "github.com/sirupsen/logrus"
 )
 
 // BuildTransmogrify Builds the Transmogrify Processor(s)
@@ -101,9 +101,9 @@ func ChefRunCorrections(in <-chan message.ChefRun) <-chan message.ChefRun {
 	return out
 }
 
-// This method cleans up an error message comming from chef server.
-// Because 412 "Precondition Failed" is not user friendly, the message was changed to
-// "Error Resolving Cookbooks for Run List."
+// This method cleans up an error message coming from chef server.
+// Because 412 "Precondition Failed" is not user friendly, the message
+// was changed to "Error Resolving Cookbooks for Run List."
 func cleanUpErrorTitle(chefRun *message.ChefRun) {
 	if chefRun.NodeRun.Error.Description.Title == "412 \"Precondition Failed\"" ||
 		chefRun.NodeRun.Error.Description.Title == "Error Resolving Cookbooks for Run List:" {

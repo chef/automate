@@ -15,7 +15,7 @@ import (
 var (
 	// This variable will allow us to add a test so that if the mappings.NodeState.Index
 	// changes we might need to add some migration bits over here
-	a2CurrentNodeStateIndex = "node-state-6"
+	a2CurrentNodeStateIndex = "node-state-6" // nolint: varcheck,deadcode
 
 	// NodeState 5 index: This change was made since we are now indexing the 'projects' field
 	a2NodeState5Index = "node-state-5"
@@ -248,12 +248,16 @@ func (ms *Status) migrateBerlinToCurrent() error {
 // creates a new alias pointing to the new index and deletes the previous index.
 //
 // NOTE: If any of these steps fails, we won't be in a healthy state, so we throw
-// an error to the end user to verify what happended with the migration.
+// an error to the end user to verify what happened with the migration.
 func (ms *Status) migrateNodeStateToCurrent(previousIndex string) error {
 	ms.total = 5
 
 	ms.update("Initializing new node state index")
-	ms.client.InitializeStore(ms.ctx)
+	err := ms.client.InitializeStore(ms.ctx)
+	if err != nil {
+		ms.updateErr(err.Error(), "Failed to initialize node state index")
+		return err
+	}
 	ms.taskCompleted()
 
 	ms.update(fmt.Sprintf("Reindexing %s index to current", previousIndex))

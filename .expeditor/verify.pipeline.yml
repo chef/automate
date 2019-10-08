@@ -364,7 +364,7 @@ steps:
 
   - label: "[unit] ingest-service"
     command:
-      - hab studio run "source .studiorc && go_component_unit ingest-service && go_component_static_tests ingest-service"
+      - hab studio run "source .studiorc && go_component_unit ingest-service && go_component_static_tests ingest-service && go_component_lint ingest-service"
     timeout_in_minutes: 10
     retry:
       automatic:

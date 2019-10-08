@@ -241,7 +241,6 @@ func (es *Backend) ReindexNodeStateA1(ctx context.Context, a1NodeStateIndexName 
 		DestinationIndex(mappings.NodeState.Index).
 		Script(esScript).
 		DoAsync(ctx)
-
 	if err != nil {
 		return err
 	}
@@ -260,9 +259,7 @@ func (es *Backend) ReindexNodeStateA1(ctx context.Context, a1NodeStateIndexName 
 		}
 	}
 
-	es.RefreshIndex(ctx, mappings.NodeState.Index)
-
-	return err
+	return es.RefreshIndex(ctx, mappings.NodeState.Index)
 }
 
 // GetAllTimeseriesIndiceNames - get all the indice names for the givin indexName tag.
@@ -273,7 +270,7 @@ func (es *Backend) GetAllTimeseriesIndiceNames(ctx context.Context, indexName st
 		return []string{}, err
 	}
 
-	var names []string
+	names := make([]string, 0, len(res))
 	for name := range res {
 		names = append(names, name)
 	}
