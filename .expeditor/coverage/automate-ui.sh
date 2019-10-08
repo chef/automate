@@ -6,7 +6,7 @@ export COVERAGE_DATE
 COVERAGE_DATE="$(date +"%Y-%m-%dT%H:%M:%S")"
 
 pushd ./components/automate-ui
-  npm install
+	npm run install:ui-library
   # https://github.com/sass/node-sass/issues/1579
   # We were failing with a missing node-sass file and that bug recommended to rebuild it - fixed the error we were seeing
   npm rebuild node-sass
