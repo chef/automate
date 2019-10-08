@@ -5,11 +5,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/golang/protobuf/jsonpb"
+	proto "github.com/golang/protobuf/proto"
+
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
 	"github.com/chef/automate/components/compliance-service/ingest/events/inspec"
 	. "github.com/chef/automate/components/notifications-client/api"
-	"github.com/golang/protobuf/jsonpb"
-	proto "github.com/golang/protobuf/proto"
 )
 
 // Inspec builds an inspec event that can be sent to the notifier
@@ -45,7 +46,7 @@ func Compliance(url string, report *compliance.Report) (*Event, error) {
 			EndTime:        report.GetEndTime(),
 			Timestamp:      time.Now().Format(time.RFC3339),
 		}
-		ev.Event = &Event_ComplianceFailure{&compliance_failure}
+		ev.Event = &Event_ComplianceFailure{ComplianceFailure: &compliance_failure}
 	} else {
 		compliance_success := ComplianceSuccess{
 			Id:            report.GetReportUuid(),
@@ -55,7 +56,7 @@ func Compliance(url string, report *compliance.Report) (*Event, error) {
 			EndTime:       report.GetEndTime(),
 			Timestamp:     time.Now().Format(time.RFC3339),
 		}
-		ev.Event = &Event_ComplianceSuccess{&compliance_success}
+		ev.Event = &Event_ComplianceSuccess{ComplianceSuccess: &compliance_success}
 	}
 
 	return &ev, nil

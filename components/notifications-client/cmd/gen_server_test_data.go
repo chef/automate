@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -69,9 +70,14 @@ func (c *CaptureClient) ValidateWebhook(ctx context.Context, in *URLValidationRe
 	return nil, nil
 }
 
+func fatal(msg string) {
+	fmt.Fprintln(os.Stderr, msg)
+	os.Exit(1)
+}
+
 func main() {
 	if len(os.Args) != 3 {
-		panic("Incorrect number of args")
+		fatal("Incorrect number of args")
 	}
 
 	capturer := new(CaptureClient)
@@ -81,33 +87,44 @@ func main() {
 	client := notifier.NewWithClient(capturer, notifier.WithBacklog(1), notifier.WithConcurrency(1))
 
 	unknown := pbtype.Struct{}
-	in_b, err := ioutil.ReadFile(os.Args[1])
+	inB, err := ioutil.ReadFile(os.Args[1])
 	if err != nil {
-		panic(err)
+		fatal(err.Error())
 	}
-	in := string(in_b)
+	in := string(inB)
 	unmarshaler := &jsonpb.Unmarshaler{AllowUnknownFields: true}
-	unmarshaler.Unmarshal(strings.NewReader(in), &unknown)
+	err = unmarshaler.Unmarshal(strings.NewReader(in), &unknown)
+	if err != nil {
+		fatal(err.Error())
+	}
 
 	var ev *Event
 	_, exists := unknown.GetFields()["profiles"]
 	if exists {
 		report := compliance.Report{}
-		unmarshaler.Unmarshal(strings.NewReader(in), &report)
+		err = unmarshaler.Unmarshal(strings.NewReader(in), &report)
+		if err != nil {
+			fatal(err.Error())
+		}
 		ev, err = builder.Compliance(url, &report)
+		if err != nil {
+			fatal(err.Error())
+		}
 	} else {
 		_, exists = unknown.GetFields()["message_type"]
 		if exists {
 			run := chef.Run{}
-			unmarshaler.Unmarshal(strings.NewReader(in), &run)
+			err = unmarshaler.Unmarshal(strings.NewReader(in), &run)
+			if err != nil {
+				fatal(err.Error())
+			}
 			ev, err = builder.ChefClientConverge(url, &run)
+			if err != nil {
+				fatal(err.Error())
+			}
 		} else {
-			panic("Unknown type")
+			fatal("Unknown type")
 		}
-	}
-
-	if err != nil {
-		panic(err)
 	}
 	client.Send(context.Background(), ev)
 	<-capturer.done

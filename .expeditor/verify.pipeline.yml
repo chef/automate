@@ -394,6 +394,7 @@ steps:
     command:
       - scripts/install_golang.sh
       - cd components/notifications-client
+      - make lint
       - make test
     timeout_in_minutes: 10
     retry:

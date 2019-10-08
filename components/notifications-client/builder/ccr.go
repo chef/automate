@@ -6,9 +6,10 @@ import (
 	"strings"
 	"time"
 
+	_struct "github.com/golang/protobuf/ptypes/struct"
+
 	chef "github.com/chef/automate/api/external/ingest/request"
 	. "github.com/chef/automate/components/notifications-client/api"
-	_struct "github.com/golang/protobuf/ptypes/struct"
 )
 
 // ChefClientConverge builds a chef converge event that can be sent to the notifier
@@ -30,7 +31,7 @@ func ChefClientConverge(url string, run *chef.Run) (*Event, error) {
 		}
 
 		err_desc := err.GetDescription()
-		if err == nil {
+		if err_desc == nil {
 			return nil, errors.New("Could not find description of error struct in chef run")
 		}
 
@@ -55,7 +56,7 @@ func ChefClientConverge(url string, run *chef.Run) (*Event, error) {
 			RunUrl:    runUrlFor(url, run.GetEntityUuid(), run.GetRunId()),
 		}
 
-		ev.Event = &Event_CCRFailure{&ccr_failure}
+		ev.Event = &Event_CCRFailure{CCRFailure: &ccr_failure}
 	} else {
 		ccr_success := CCRSuccess{
 			RunId:    run.GetId(),
@@ -69,7 +70,7 @@ func ChefClientConverge(url string, run *chef.Run) (*Event, error) {
 			Timestamp:            time.Now().Format(time.RFC3339),
 		}
 
-		ev.Event = &Event_CCRSuccess{&ccr_success}
+		ev.Event = &Event_CCRSuccess{CCRSuccess: &ccr_success}
 	}
 
 	return &ev, nil

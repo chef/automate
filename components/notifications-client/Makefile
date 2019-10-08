@@ -1,3 +1,5 @@
+include ../../Makefile.common_go
+
 BIN_DIR=$(PWD)/bin
 TEST_PACKAGES = ./builder ./notifier
 
