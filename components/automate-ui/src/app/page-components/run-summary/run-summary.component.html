@@ -1,14 +1,14 @@
 
 <div class="node-run-message">
   <chef-alert type="error" *ngIf="nodeRun.status === 'failure'">
-    This run failed on {{renderDate(nodeRun.endTime)}} at {{renderTime(nodeRun.endTime)}}  &nbsp;
+    This run failed on {{ nodeRun.endTime | datetime: RFC2822 }} &nbsp;
     <span *ngIf="nodeRun.error?.description?.title">
       because there was a {{nodeRun.error?.description?.title}} &nbsp;
     </span>
     <chef-button secondary (click)="activateModal()">View error log</chef-button>
   </chef-alert>
   <chef-alert type="success" *ngIf="nodeRun.status === 'success'">
-    This run succeeded on {{renderDate(nodeRun.endTime)}} at {{renderTime(nodeRun.endTime)}}.
+    This run succeeded on {{ nodeRun.endTime | datetime: RFC2822 }}.
     All resources ran successfully!
   </chef-alert>
 </div>
