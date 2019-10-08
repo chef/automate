@@ -48,7 +48,7 @@ export class RunSummaryComponent implements OnChanges, AfterContentInit {
   }
 
   renderTime(timestamp) {
-    return moment(timestamp).format('HH:mm [UTC]');
+    return moment(timestamp).format('HH:mm');
   }
 
   renderDate(timestamp) {

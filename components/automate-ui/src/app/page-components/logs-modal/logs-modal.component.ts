@@ -28,7 +28,7 @@ export class LogsModalComponent implements OnChanges {
   }
 
   renderTime(timestamp) {
-    return moment(timestamp).format('LT');
+    return moment(timestamp).format('HH:mm');
   }
 
   errorSections() {
