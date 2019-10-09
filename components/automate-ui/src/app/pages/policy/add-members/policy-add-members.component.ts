@@ -339,7 +339,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
     switch (inputName) {
       case 'identity':
-        if (typeValue === 'USER' || typeValue === 'TEAM') {
+        if (typeValue === 'user' || typeValue === 'team') {
             this.allIdentity = typeValue;
             this.updateValidations(inputName, true);
             return true;
@@ -350,7 +350,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
           }
         break;
       case 'name':
-        if ( typeValue === 'TOKEN' || (identityValue && identityValue !== '*') ) {
+        if ( typeValue === 'token' || (identityValue && identityValue !== '*') ) {
           this.updateValidations(inputName, true);
           return true;
         } else {
@@ -379,17 +379,17 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
 
   private displayExpressionOutput(formValues: object): void {
-    const entries = Object.entries(formValues);
+    const values: string[] = Object.values(formValues);
     const output = [];
-
-    entries.forEach( ([key, value]) => {
-      if (key === 'name' && value != null && value.length > 0) {
+    
+    values.forEach( value => {
+      if (value != null && value.length > 0) {
         return output.push(value);
-      } else if (value != null && value.length > 0) {
-        return output.push(value.toLowerCase());
       }
     });
-
+    console.log('%c output ', 'background: orange; color: white;');
+    console.log(output);
+    
     this.expressionOutput = output.join(':');
   }
 }

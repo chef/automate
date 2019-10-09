@@ -23,9 +23,9 @@
                   <select id="expression-type-dropdown"
                           ngDefaultControl 
                           formControlName="type">
-                    <option value='USER'>User</option>
-                    <option value='TEAM'>Team</option>
-                    <option value='TOKEN'>Token</option>
+                    <option value='user'>User</option>
+                    <option value='team'>Team</option>
+                    <option value='token'>Token</option>
                     <option value='*'>All members (*)</option>
                   </select>
                 </label>
@@ -43,9 +43,9 @@
                   <select id="expression-identity-dropdown" 
                           ngDefaultControl 
                           formControlName="identity">
-                    <option value="LDAP">LDAP</option>
-                    <option value="LOCAL">local</option>
-                    <option value="SAML">SAML</option>
+                    <option value="ldap">LDAP</option>
+                    <option value="local">local</option>
+                    <option value="saml">SAML</option>
                     <option value="*">All {{ allIdentity | titlecase }}s (*)</option>
                   </select>
                 </label>
