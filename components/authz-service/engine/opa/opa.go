@@ -628,6 +628,18 @@ func (s *State) V2p1SetPolicies(
 	return s.makeAuthorizedProjectPreparedQuery(ctx)
 }
 
+// NOTE(tsandall): HACK HACK HACK.
+func (s *State) V2p1SetPolicies2(
+	ctx context.Context, policyMap map[string]interface{},
+	roleMap map[string]interface{}) error {
+	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+		"policies": policyMap,
+		"roles":    roleMap,
+	})
+
+	return nil
+}
+
 // UnexpectedResultExpressionError is returned when one of the result sets
 // expressions can't be made sense of
 type UnexpectedResultExpressionError struct {

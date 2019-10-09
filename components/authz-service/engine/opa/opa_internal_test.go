@@ -493,7 +493,10 @@ func BenchmarkV2FilterAuthorizedPairsWithPolicies(b *testing.B) {
 		Roles    map[string]interface{} `json:roles`
 	}
 	json.Unmarshal(byteValue, &pr)
-	require.NoError(b, s.V2p1SetPolicies(ctx, pr.Policies, pr.Roles))
+
+	// NOTE(tsandall): the query below does not rely on partial eval so use a
+	// separate helper to setup the store that doesn't perform partial eval.
+	require.NoError(b, s.V2p1SetPolicies2(ctx, pr.Policies, pr.Roles))
 
 	b.Run("V2FilterAuthorizedPairs with real life input", func(b *testing.B) {
 		var resp []engine.Pair
