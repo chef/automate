@@ -396,12 +396,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
   public displayExpressionOutput(): void {
     const values: string[] = Object.values(this.expressionForm.value);
-    // console.log(values);
     const output: string[] = values.filter(value => value != null && value.length > 0);
-
-    // // console.log('%c output ', 'background: orange; color: white;');
-    // // console.log(output);
-
     this.expressionOutput = output.join(':');
   }
 }

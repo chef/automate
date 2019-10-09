@@ -64,7 +64,7 @@
                   <span class="label">Name<span aria-hidden="true">*</span></span>
                   <chef-input id="expression-name-dropdown" 
                               ngDefaultControl 
-                              (change)="displayExpressionOutput()"
+                              (keyup)="displayExpressionOutput()"
                               formControlName="name"></chef-input>
                 </label>
                 <p class="note">Wildcards (*) are allowed.</p>
