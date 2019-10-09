@@ -192,14 +192,14 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     this.store.select(addPolicyMembersStatus).pipe(
       filter(identity),
       takeUntil(pendingAdd))
-      .subscribe((p_state) => {
-        if (p_state === EntityStatus.loadingSuccess) {
+      .subscribe((addPolicyState) => {
+        if (addPolicyState === EntityStatus.loadingSuccess) {
           pendingAdd.next(true);
           pendingAdd.complete();
           this.addingMembers = false;
           this.router.navigate(this.backRoute(), { fragment: 'members' });
         }
-        if (p_state === EntityStatus.loadingFailure) {
+        if (addPolicyState === EntityStatus.loadingFailure) {
           this.store.select(addPolicyMembersHTTPError).pipe(
             filter(identity),
             takeUntil(pendingAdd)).subscribe((error: HttpErrorResponse) => {
