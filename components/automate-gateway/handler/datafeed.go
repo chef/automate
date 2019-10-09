@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+
 	"github.com/chef/automate/api/external/data_feed"
 	"github.com/chef/automate/components/automate-gateway/protobuf"
 	"github.com/golang/protobuf/proto"

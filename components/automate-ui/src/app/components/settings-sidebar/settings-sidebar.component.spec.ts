@@ -129,7 +129,7 @@ describe('SettingsSidebarComponent', () => {
 
     using([
       ['Notifications', '/settings/notifications', 0],
-      ['Data feeds', '/settings/data-feed', 1],
+      ['Data Feeds', '/settings/data-feed', 1],
       ['Node Integrations', '/settings/node-integrations', 2],
       ['Node Credentials', '/settings/node-credentials', 3],
       ['Node Lifecycle', '/settings/node-lifecycle', 4],
