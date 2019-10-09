@@ -365,13 +365,15 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   private updateValidations(inputName: string, active: boolean): void {
     const updateInput = this.expressionForm.get(inputName);
 
-    active === true
-      ? updateInput.setValidators([Validators.required,
-        Validators.pattern(Regex.patterns.NON_BLANK)])
-      : updateInput.clearValidators();
-
-      updateInput.updateValueAndValidity();
+    if (active) {
+      updateInput.setValidators([Validators.required,
+                                 Validators.pattern(Regex.patterns.NON_BLANK)]);
+    } else {
+      updateInput.clearValidators();
     }
+
+    updateInput.updateValueAndValidity();
+  }
 
 
   private displayExpressionOutput(formValues: object): void {
