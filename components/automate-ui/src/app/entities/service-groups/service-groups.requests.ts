@@ -104,7 +104,15 @@ export class ServiceGroupsRequests {
   public getServiceStats(): Observable<ServicesStats> {
     const url = `${APPLICATIONS_URL}/stats`;
 
-    return this.httpClient.get<ServicesStats>(url);
+    return this.httpClient.get<ServicesStats>(url).pipe(
+      map(
+      (stats: any) => ({
+        totalServiceGroups: stats.total_service_groups,
+        totalServices: stats.total_services,
+        totalSupervisors: stats.total_supervisors,
+        totalDeployments: stats.total_deployments
+      })
+    ));
   }
 
   public getSuggestions(

@@ -116,17 +116,17 @@ export class GetServiceGroupsSuggestionsFailure implements Action {
 }
 
 export class GetServicesStats implements Action {
-  readonly type = ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP
+  readonly type = ServiceGroupsActionTypes.GET_SERVICES_STATS
   constructor() {}
 }
 
 export class GetServicesStatsSuccess implements Action {
-  readonly type = ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP
+  readonly type = ServiceGroupsActionTypes.GET_SERVICES_STATS_SUCCESS
   constructor(public payload: ServicesStats) {}
 }
 
 export class GetServicesStatsFailure implements Action {
-  readonly type = ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP
+  readonly type = ServiceGroupsActionTypes.GET_SERVICES_STATS_FAILURE
   constructor(public payload: HttpErrorResponse) { }
 }
 
@@ -146,4 +146,6 @@ export type ServiceGroupsActions =
   | GetServiceGroupsSuggestions
   | GetServiceGroupsSuggestionsSuccess
   | GetServiceGroupsSuggestionsFailure
-  | GetServicesStats;
+  | GetServicesStats
+  | GetServicesStatsFailure
+  | GetServicesStatsSuccess;

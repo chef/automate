@@ -13,7 +13,8 @@ import {
   ServiceGroupsHealthSummary,
   ServiceGroupsFilters,
   GroupServicesFilters,
-  GroupServicesPayload
+  GroupServicesPayload,
+  ServicesStats
 } from './service-groups.model';
 
 import {
@@ -35,7 +36,6 @@ import {
   GetServiceGroupsSuggestionsSuccess,
   GetServiceGroupsSuggestionsFailure,
   GetServiceGroupsSuggestions,
-  GetServicesStats,
   GetServicesStatsSuccess,
   GetServicesStatsFailure
 } from './service-groups.actions';
@@ -108,13 +108,13 @@ export class ServiceGroupsEffects {
       }));
 
   @Effect()
-  getServiceStats = this.actions$.pipe(
+  getServiceStats$ = this.actions$.pipe(
     ofType(ServiceGroupsActionTypes.GET_SERVICES_STATS),
-    mergeMap(() =>
-      this.requests.getServiceStats().pipe(
-        map((resp: ServicesStats) => new GetServicesStats(resp))
-        catchError((error: HttpErrorResponse) => observableOf(new GetServiceStats(error)))
+    mergeMap((_action) => {
+      return this.requests.getServiceStats().pipe(
+        map((resp: ServicesStats) => new GetServicesStatsSuccess(resp)),
+        catchError((error: HttpErrorResponse) => of(new GetServicesStatsFailure(error)))
       )
-    )
+      })
   );
 }

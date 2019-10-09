@@ -1,4 +1,4 @@
-import { map, takeUntil, withLatestFrom, distinctUntilChanged } from 'rxjs/operators';
+import { map, skip, take, takeUntil, withLatestFrom, distinctUntilChanged } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject, Observable, combineLatest } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -13,7 +13,7 @@ import {
 } from 'app/types/types';
 import { EntityStatus } from 'app/entities/entities';
 import {
-  GetServiceGroupsSuggestions, UpdateServiceGroupsFilters, UpdateSelectedSG
+  GetServiceGroupsSuggestions, UpdateServiceGroupsFilters, UpdateSelectedSG, GetServicesStats
 } from 'app/entities/service-groups/service-groups.actions';
 import {
   ServiceGroup,
@@ -29,7 +29,8 @@ import {
   serviceGroupsHealth,
   serviceGroupsError,
   selectedServiceGroupList,
-  selectedServiceGroupStatus
+  selectedServiceGroupStatus,
+  servicesStats
 } from '../../entities/service-groups/service-groups.selector';
 import { find, filter as fpFilter, pickBy, some, includes, get } from 'lodash/fp';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
@@ -183,6 +184,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     allUrlParameters$.pipe(takeUntil(this.isDestroyed)).subscribe(
       allUrlParameters => this.listParamsChange(allUrlParameters));
 
+
     this.route.queryParamMap.pipe(
       distinctUntilChanged((a, b) => {
         return a.get('status') === b.get('status') &&
@@ -192,6 +194,21 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       }),
       takeUntil(this.isDestroyed)
     ).subscribe(queryParams => this.listParamsChange(queryParams));
+
+    this.store.dispatch(new GetServicesStats());
+
+    this.store.select(servicesStats)
+    .pipe(skip(1), take(1)) // Skip 1 which is the initialization, take the next one which is the result
+    .subscribe((resp) => {
+      if(resp != undefined){
+        this.telemetryService.track('a2applicationsStats', {
+          totalServiceGroups: resp.totalServiceGroups,
+          totalServices: resp.totalServices,
+          totalSupervisors: resp.totalSupervisors,
+          totalDeployments: resp.totalDeployments
+        });
+      }
+    });
 
     combineLatest([
       this.route.queryParamMap.pipe(
@@ -255,10 +272,6 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
           this.selectedStatus = 'total';
           this.totalServiceGroups = get('total', this.sgHealthSummary);
       }
-      this.telemetryService.track('applicationsServiceGroupCount', {
-        totalServiceGroups: this.totalServiceGroups,
-        statusFilter: status
-      });
     });
 
     this.healthSummary$ = this.store.select(serviceGroupsHealth);
@@ -297,6 +310,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
     this.numberOfSearchBarFilters$ = this.searchBarFilters$.pipe(
       map((chicklets: Chicklet[]) => chicklets.length));
+
   }
 
   ngOnDestroy() {

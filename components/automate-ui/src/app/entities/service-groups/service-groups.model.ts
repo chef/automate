@@ -89,10 +89,10 @@ export interface GroupServicesPayload {
 }
 
 export interface ServicesStats {
-  total_service_groups: number;
-  total_services: number;
-  total_supervisors: number;
-  total_deployments: number;
+  totalServiceGroups: number;
+  totalServices: number;
+  totalSupervisors: number;
+  totalDeployments: number;
 }
 
 // Not used within file
