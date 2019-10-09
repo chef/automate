@@ -251,16 +251,18 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   }
 
   public closeModal(): void {
-    this.formSubscription.unsubscribe();
+    // this.formSubscription.unsubscribe();
     this.resetModal();
     this.modalVisible = false;
   }
 
   public openModal(): void {
     this.resetModal();
-    const expressionValueChanges = this.expressionForm.valueChanges;
-    this.formSubscription = expressionValueChanges.subscribe(formValues =>
-      this.displayExpressionOutput(formValues));
+    // const expressionValueChanges = this.expressionForm.valueChanges;
+    // this.formSubscription = expressionValueChanges.subscribe(formValues => {
+    //   this.updateValidations2(formValues);
+    //   this.displayExpressionOutput(formValues);
+    // });
     this.modalVisible = true;
   }
 
@@ -377,13 +379,28 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     updateInput.updateValueAndValidity();
   }
 
+  private updateValidations2(formGroup: object): void {
+    console.log('%c formGroup ', 'background: orange; color: white;');
+    console.log(formGroup);
+  }
 
-  private displayExpressionOutput(formValues: object): void {
-    const values: string[] = Object.values(formValues);
-    const output: string[] = values.filter(value => value != null && value.length > 0);
+  // private displayExpressionOutput(formValues: object): void {
+  //   const values: string[] = Object.values(formValues);
+  //   const output: string[] = values.filter(value => value != null && value.length > 0);
     
-    console.log('%c output ', 'background: orange; color: white;');
-    console.log(output);
+  //   // console.log('%c output ', 'background: orange; color: white;');
+  //   // console.log(output);
+
+  //   this.expressionOutput = output.join(':');
+  // }
+
+  public displayExpressionOutput(): void {
+    const values: string[] = Object.values(this.expressionForm.value);
+    // console.log(values);
+    const output: string[] = values.filter(value => value != null && value.length > 0);
+
+    // // console.log('%c output ', 'background: orange; color: white;');
+    // // console.log(output);
 
     this.expressionOutput = output.join(':');
   }

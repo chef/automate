@@ -22,6 +22,7 @@
                   <span class="label">Type<span aria-hidden="true">*</span></span>
                   <select id="expression-type-dropdown"
                           ngDefaultControl 
+                          (change)="displayExpressionOutput()"
                           formControlName="type">
                     <option value='user'>User</option>
                     <option value='team'>Team</option>
@@ -42,6 +43,7 @@
                   <span class="label">Identity Provider<span aria-hidden="true">*</span></span>
                   <select id="expression-identity-dropdown" 
                           ngDefaultControl 
+                          (change)="displayExpressionOutput()"
                           formControlName="identity">
                     <option value="ldap">LDAP</option>
                     <option value="local">local</option>
@@ -62,6 +64,7 @@
                   <span class="label">Name<span aria-hidden="true">*</span></span>
                   <chef-input id="expression-name-dropdown" 
                               ngDefaultControl 
+                              (change)="displayExpressionOutput()"
                               formControlName="name"></chef-input>
                 </label>
                 <p class="note">Wildcards (*) are allowed.</p>
