@@ -364,8 +364,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
     if (active) {
       updateInput.setValidators([Validators.required,
-                                 Validators.pattern(Regex.patterns.NON_BLANK),
-                                 Validators.pattern(Regex.patterns.NO_MIXED_WILDCARD)]);
+                                 Validators.pattern(Regex.patterns.NON_BLANK)]);
     } else {
       updateInput.clearValidators();
     }
