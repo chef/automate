@@ -251,7 +251,6 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   }
 
   public closeModal(): void {
-    // unsubscribe from Changes to the form
     this.unsubscribeFromExpressionFormChanges();
     this.resetModal();
     this.modalVisible = false;
@@ -259,7 +258,6 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
   public openModal(): void {
     this.resetModal();
-    // subscribe to expressionForm changes
     this.subscribeToExpressionFormChanges();
     this.modalVisible = true;
   }
