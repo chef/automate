@@ -2,7 +2,9 @@ package opa
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"os"
 	"testing"
@@ -288,6 +290,119 @@ func BenchmarkFilterAuthorizedPairsWithPolicies(b *testing.B) {
 			for n := 0; n < b.N; n++ {
 				resp, err = s.FilterAuthorizedPairs(ctx, append([]string{"user:local:test@example.com"}, randomTeams(count)...),
 					[]engine.Pair{{Action: "read", Resource: "cfgmgmt:nodes"}})
+				if err != nil {
+					b.Error(err)
+				}
+			}
+			filteredPairsResp = resp
+		})
+	}
+}
+
+// At time of benchmarking, this is around half a second for 1000 teams
+func BenchmarkV2FilterAuthorizedPairsRealWorldExample(b *testing.B) {
+	ctx := context.Background()
+
+	l, err := logger.NewLogger("text", "debug")
+	require.NoError(b, err, "init logger")
+	s, err := New(ctx, l)
+	require.NoError(b, err, "init state")
+
+	pairs := []engine.Pair{
+		engine.Pair{Resource: "compliance:reporting:nodes", Action: "compliance:reportNodes:list"},
+		engine.Pair{Resource: "iam:policies", Action: "iam:policies:list"},
+		engine.Pair{Resource: "iam:teams", Action: "iam:teams:create"},
+		engine.Pair{Resource: "system:config", Action: "system:telemetryConfig:get"},
+		engine.Pair{Resource: "compliance:profiles:market", Action: "compliance:marketProfiles:get"},
+		engine.Pair{Resource: "retention:nodes", Action: "retention:nodes:update"},
+		engine.Pair{Resource: "compliance:reporting:reports", Action: "compliance:reports:list"},
+		engine.Pair{Resource: "infra:actions", Action: "infra:ingest:create"},
+		engine.Pair{Resource: "system:service:logLevel", Action: "system:serviceLogLevel:set"},
+		engine.Pair{Resource: "iam:rules", Action: "iam:rules:apply"},
+		engine.Pair{Resource: "secrets:secrets", Action: "secrets:secrets:create"},
+		engine.Pair{Resource: "system:iam:upgradeToV2", Action: "system:iam:upgrade"},
+		engine.Pair{Resource: "iam:teams", Action: "iam:teams:update"},
+		engine.Pair{Resource: "system:service:version", Action: "system:serviceVersion:get"},
+		engine.Pair{Resource: "iam:policies", Action: "iam:policies:create"},
+		engine.Pair{Resource: "compliance:reporting:stats:trend", Action: "compliance:reportTrend:get"},
+		engine.Pair{Resource: "compliance:profiles", Action: "compliance:profiles:list"},
+		engine.Pair{Resource: "infra:nodes", Action: "infra:nodes:delete"},
+		engine.Pair{Resource: "compliance:reporting:stats:failures", Action: "compliance:reportFailures:get"},
+		engine.Pair{Resource: "system:health", Action: "system:health:get"},
+		engine.Pair{Resource: "compliance:scanner:jobs", Action: "compliance:scannerJobs:create"},
+		engine.Pair{Resource: "compliance:profiles", Action: "compliance:profiles:create"},
+		engine.Pair{Resource: "secrets:secrets", Action: "secrets:secrets:list"},
+		engine.Pair{Resource: "applications:serviceGroups", Action: "applications:serviceGroups:list"},
+		engine.Pair{Resource: "event:events", Action: "event:events:list"},
+		engine.Pair{Resource: "iam:projects", Action: "iam:projects:create"},
+		engine.Pair{Resource: "system:iam:resetToV1", Action: "system:iam:reset"},
+		engine.Pair{Resource: "compliance:reporting:stats:profiles", Action: "compliance:reportProfiles:get"},
+		engine.Pair{Resource: "infra:status", Action: "infra:ingest:get"},
+		engine.Pair{Resource: "compliance:reporting:licenseusage", Action: "compliance:reportingLicenseUsage:list"},
+		engine.Pair{Resource: "iam:policyVersion", Action: "iam:policies:get"},
+		engine.Pair{Resource: "iam:projects", Action: "iam:projects:list"},
+		engine.Pair{Resource: "iam:introspect", Action: "iam:introspect:get"},
+		engine.Pair{Resource: "system:status", Action: "system:license:get"},
+		engine.Pair{Resource: "iam:teams", Action: "iam:teams:list"},
+		engine.Pair{Resource: "infra:nodes", Action: "infra:nodes:list"},
+		engine.Pair{Resource: "iam:introspect", Action: "iam:introspect:getAllProjects"},
+		engine.Pair{Resource: "retention:nodes", Action: "retention:nodes:get"},
+		engine.Pair{Resource: "retention:serviceGroups", Action: "retention:serviceGroups:update"},
+		engine.Pair{Resource: "compliance:scanner:jobs", Action: "compliance:scannerJobs:list"},
+		engine.Pair{Resource: "infra:nodes", Action: "infra:nodes:create"},
+		engine.Pair{Resource: "iam:tokens", Action: "iam:tokens:create"},
+		engine.Pair{Resource: "iam:rules", Action: "iam:rules:cancel"},
+		engine.Pair{Resource: "iam:tokens", Action: "iam:tokens:list"},
+		engine.Pair{Resource: "infra:nodeManagers", Action: "infra:nodeManagers:create"},
+		engine.Pair{Resource: "compliance:reporting:profiles", Action: "compliance:reportProfiles:list"},
+		engine.Pair{Resource: "system:license", Action: "system:license:apply"},
+		engine.Pair{Resource: "iam:introspect", Action: "iam:introspect:getAll"},
+		engine.Pair{Resource: "infra:nodes", Action: "infra:ingestNodes:delete"},
+		engine.Pair{Resource: "iam:roles", Action: "iam:roles:list"},
+		engine.Pair{Resource: "retention:serviceGroups", Action: "retention:serviceGroups:get"},
+		engine.Pair{Resource: "notifications:rules", Action: "notifications:notifyRules:validate"},
+		engine.Pair{Resource: "compliance:reporting:suggestions", Action: "compliance:reportSuggestions:list"},
+		engine.Pair{Resource: "system:service:version", Action: "system:serviceVersion:list"},
+		engine.Pair{Resource: "iam:users", Action: "iam:users:list"},
+		engine.Pair{Resource: "infra:nodes", Action: "infra:ingest:delete"},
+		engine.Pair{Resource: "notifications:rules", Action: "notifications:notifyRules:create"},
+		engine.Pair{Resource: "iam:rules", Action: "iam:rules:status"},
+		engine.Pair{Resource: "iam:introspect", Action: "iam:introspect:getSome"},
+		engine.Pair{Resource: "infra:nodeManagers", Action: "infra:nodeManagers:list"},
+		engine.Pair{Resource: "applications:serviceGroups", Action: "applications:serviceGroups:delete"},
+		engine.Pair{Resource: "compliance:reporting:control", Action: "compliance:controlItems:list"},
+		engine.Pair{Resource: "compliance:reporting:report-ids", Action: "compliance:reportids:list"},
+		engine.Pair{Resource: "compliance:reporting:stats:summary", Action: "compliance:reportSummary:get"},
+		engine.Pair{Resource: "iam:users", Action: "iam:users:create"},
+		engine.Pair{Resource: "system:license", Action: "system:license:request"},
+		engine.Pair{Resource: "notifications:rules", Action: "notifications:notifyRules:list"},
+		engine.Pair{Resource: "iam:roles", Action: "iam:roles:create"},
+	}
+
+	jsonFile, err := os.Open("example_v2/real_world_2p1_store.json")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer jsonFile.Close()
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	var pr struct {
+		Policies map[string]interface{} `json:policies`
+		Roles    map[string]interface{} `json:roles`
+	}
+	json.Unmarshal(byteValue, &pr)
+
+	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+		"policies": pr.Policies,
+		"roles":    pr.Roles,
+	})
+
+	teamCount := []int{0, 1, 10, 30, 50, 100, 150, 300, 500, 1000, 10000}
+	for _, count := range teamCount {
+		b.Run(fmt.Sprintf("V2FilterAuthorizedPairs with real life input and %d teams", count), func(b *testing.B) {
+			var resp []engine.Pair
+			var err error
+			for n := 0; n < b.N; n++ {
+				resp, err = s.V2FilterAuthorizedPairs(ctx, append([]string{"user:local:test@example.com"}, randomTeams(count)...), pairs, true)
 				if err != nil {
 					b.Error(err)
 				}
