@@ -299,15 +299,7 @@ func BenchmarkFilterAuthorizedPairsWithPolicies(b *testing.B) {
 	}
 }
 
-// At time of writing
-// 0: 0.047070435 seconds
-// 1: 0.08253188
-// 10: 0.412672182
-// 30: 1.110166404
-// 50: 1.811321927
-// 100: 3.697555415
-// 150: 5.584124273
-// 300: 11.007249684
+// At time of benchmarking, this is around half a second for 1000 teams
 func BenchmarkV2FilterAuthorizedPairsRealWorldExample(b *testing.B) {
 	ctx := context.Background()
 
@@ -404,7 +396,7 @@ func BenchmarkV2FilterAuthorizedPairsRealWorldExample(b *testing.B) {
 		"roles":    pr.Roles,
 	})
 
-	teamCount := []int{0, 1, 10, 30, 50, 100, 150, 300}
+	teamCount := []int{0, 1, 10, 30, 50, 100, 150, 300, 500, 1000, 10000}
 	for _, count := range teamCount {
 		b.Run(fmt.Sprintf("V2FilterAuthorizedPairs with real life input and %d teams", count), func(b *testing.B) {
 			var resp []engine.Pair
@@ -521,7 +513,7 @@ func testPairs(c int) []engine.Pair {
 		// repeat until our random policy has no wildcard action
 		// the resource count contain a wildcard, but it really doesn't matter;
 		// it'll be treated as a string
-		for pol = randomPolicies(1, 0)[0]; pol["action"] == "*"; pol = randomPolicies(1, 0)[0] {
+		for pol = randomPolicies(1)[0]; pol["action"] == "*"; pol = randomPolicies(1)[0] {
 		}
 
 		// append the count to ensure we don't end up with duplicates
@@ -603,30 +595,12 @@ func defaultPolicies() []map[string]interface{} {
 
 // r is the number of random policies to include, appended to the default ones
 func testPolicies(r int) []map[string]interface{} {
-	return append(defaultPolicies(), randomPolicies(r, 0)...)
+	return append(defaultPolicies(), randomPolicies(r)...)
 }
 
-func testPoliciesWithProjects(r int, p int) []map[string]interface{} {
-	return append(defaultPolicies(), randomPolicies(r, p)...)
-}
-
-func testTeams(r int) []string {
-	sub := make([]string, r)
-	for i := 0; i < r; i++ {
-		sub[i] = fmt.Sprintf("user:local:%d", i)
-	}
-	return sub
-}
-
-func randomPolicies(i int, p int) []map[string]interface{} {
+func randomPolicies(i int) []map[string]interface{} {
 	subjects := []string{"user:local:admin", "team:*", "team:local:sec", "team:local:admin", "user:ldap:*", "token:*"}
-	// resources := []string{
-	// 	"*",
-	// }
-	// actions := []string{"*"}
-	actions := []string{"read", "update", "delete", "create", "*", "search", "rerun", "count", "stop", "start"}
 	resources := []string{
-		"*",
 		"nodes",
 		"nodes:123",
 		"cfgmgmt:nodes:*",
@@ -640,7 +614,7 @@ func randomPolicies(i int, p int) []map[string]interface{} {
 		"secrets:12345",
 		"service_info:telemetry",
 	}
-	effects := []string{"allow", "deny"}
+	actions := []string{"read", "update", "delete", "create", "*", "search", "rerun", "count", "stop", "start"}
 
 	newPolicies := make([]map[string]interface{}, i)
 	for j := 0; j < i; j++ {
@@ -648,25 +622,12 @@ func randomPolicies(i int, p int) []map[string]interface{} {
 		subIndex := rand.Intn(len(subjects))
 		resIndex := rand.Intn(len(resources))
 		actIndex := rand.Intn(len(actions))
-		//effectIndex := rand.Intn(len(effects))
-		projects := []string{}
-		if p > 0 {
-			maxProjects := rand.Intn(p)
-			for i := 0; i < maxProjects; i++ {
-				projects = append(projects, fmt.Sprintf("project%d", i))
-			}
-		}
 
 		newPolicies[j] = map[string]interface{}{
-			"members": subjects[subIndex],
-			"statements": map[string]interface{}{
-				"statement-id-0": map[string]interface{}{
-					"actions":   []string{resources[resIndex]},
-					"resources": []string{actions[actIndex]},
-					"effect":    effects[i%2],
-					"projects":  projects,
-				},
-			},
+			"subjects": subjects[subIndex],
+			"action":   actions[actIndex],
+			"resource": resources[resIndex],
+			"effect":   "allow",
 		}
 	}
 

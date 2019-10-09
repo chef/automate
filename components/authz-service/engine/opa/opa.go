@@ -5,9 +5,7 @@ package opa
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -178,28 +176,7 @@ func (s *State) initPartialResultV2(ctx context.Context) error {
 	return nil
 }
 
-// func (s *State) initPartialResultV2p1(ctx context.Context) error {
-// 	// Partial eval for authzProjectsV2Query.
-// 	// Each partial eval needs a separate compiler.
-// 	compiler, err := s.newCompiler()
-// 	if err != nil {
-// 		return err
-// 	}
-// 	r := rego.New(
-// 		rego.ParsedQuery(s.queries[authzProjectsV2Query]),
-// 		rego.Compiler(compiler),
-// 		rego.Store(s.v2p1Store),
-// 		rego.DisableInlining([]string{"data.authz_v2.denied_project"}),
-// 	)
-// 	v2PreparedEvalProjects, err := r.PartialResult(ctx)
-// 	if err != nil {
-// 		return errors.Wrap(err, "partial eval (authorized_project)")
-// 	}
-// 	s.v2PreparedEvalProjects = v2PreparedEvalProjects
-// 	return nil
-// }
-
-// returns a prepared query that can be executed. The result set will contain a
+// Returns a prepared query that can be executed. The result set will contain a
 // binding for a variable named 'project' that contains the name (string) of a
 // project the subject has access to.
 func (s *State) makeAuthorizedProjectPreparedQuery(ctx context.Context) error {
@@ -266,7 +243,7 @@ func (s *State) makeAuthorizedProjectPreparedQuery(ctx context.Context) error {
 
 	query, err := r2.PrepareForEval(ctx)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "prepare query for eval (authorized_project)")
 	}
 
 	s.v2PreparedEvalProjects = query
@@ -309,12 +286,7 @@ func dumpData(ctx context.Context, store storage.Store, l logger.Logger) error {
 		return err
 	}
 
-	jsonResult, err := json.Marshal(data)
-	if err != nil {
-		panic(err)
-	}
-	ioutil.WriteFile("/tmp/output.json", jsonResult, 0644)
-	l.Infof("data: %s", jsonResult)
+	l.Infof("data: %#v", data)
 	return store.Commit(ctx, txn)
 }
 
@@ -464,10 +436,6 @@ func (s *State) V2FilterAuthorizedPairs(
 	if isBeta2p1 {
 		store = s.v2p1Store
 	}
-
-	//s.DumpDataV2p1(ctx)
-	//s.log.Warnf("subjects: %v", subjects)
-	//s.log.Warnf("pairs: %v", pairs)
 
 	rs, err := s.evalQuery(ctx, s.queries[filteredPairsV2Query], opaInput, store)
 	if err != nil {
