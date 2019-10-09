@@ -40,9 +40,13 @@ match_pair[[effect, pair, pol_id, statement_id]] {
 
 # Note: to return the subset of the authorized pairs of the provided input,
 # our rules must "return" the 'pair' data.
-allowed_pair[pair] { match_pair[["allow", pair, _, _]] }
+allowed_pair[pair] {
+	match_pair[["allow", pair, _, _]]
+}
 
-denied_pair[pair] { match_pair[["deny", pair, _, _]] }
+denied_pair[pair] {
+	match_pair[["deny", pair, _, _]]
+}
 
 authorized_pair = allowed_pair - denied_pair
 
