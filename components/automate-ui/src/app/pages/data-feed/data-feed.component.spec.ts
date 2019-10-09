@@ -102,7 +102,6 @@ describe('DatafeedComponent', () => {
 
     it('shows expected item count', () => {
       const tableBody = getElementByCss(`${listId}`);
-      console.log("the table body"+JSON.stringify(tableBody));
       expect(tableBody.children.length).toBe(destinations.length + 1);
     });
 
