@@ -330,7 +330,7 @@ func (mr *MockClientsFactoryMockRecorder) SecretClient() *gomock.Call {
 func (m *MockClientsFactory) DatafeedClient() (data_feed.DatafeedServiceClient, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DatafeedClient")
-	ret0, _ := ret[0].(secrets.DatafeedServiceClient)
+	ret0, _ := ret[0].(data_feed.DatafeedServiceClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

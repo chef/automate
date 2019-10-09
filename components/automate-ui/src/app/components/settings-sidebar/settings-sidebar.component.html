@@ -5,7 +5,7 @@
       <chef-sidebar-entry route="/settings/notifications" icon="notifications">Notifications</chef-sidebar-entry>
     </app-authorized>
     <app-authorized #data_feed [anyOf]="['/datafeed/destinations', 'post']">
-      <chef-sidebar-entry *ngIf="featureFlagOn" route="/settings/data-feed" icon="notifications">Data feeds</chef-sidebar-entry>
+      <chef-sidebar-entry *ngIf="featureFlagOn" route="/settings/data-feed" icon="notifications">Data Feeds</chef-sidebar-entry>
     </app-authorized>
     <app-authorized #integrations [anyOf]="['/nodemanagers/search', 'post']">
       <chef-sidebar-entry route="/settings/node-integrations" icon="settings_input_component">Node Integrations</chef-sidebar-entry>
