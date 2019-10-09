@@ -35,3 +35,7 @@ message SourceFQDNS {
 message ExportData {
 	bytes content = 1;
 }
+
+message ReportExportData {
+	bytes content = 1;
+}

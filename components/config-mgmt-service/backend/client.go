@@ -58,6 +58,10 @@ type Client interface {
 	GetNodesPageByCurser(context.Context, time.Time,
 		time.Time, map[string][]string, interface{},
 		string, int, string, bool) ([]Node, error)
+	// @params (ctx, nodeID, start, end, filters, cursorEndTime, cursorID, pageSize, ascending)
+	// returns (Runs, error)
+	GetRunsPageByCurser(context.Context, string, time.Time, time.Time, map[string][]string, time.Time,
+		string, int, bool) ([]Run, error)
 }
 
 // Types that we consume from the ingest-service

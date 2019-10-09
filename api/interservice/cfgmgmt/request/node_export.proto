@@ -10,3 +10,10 @@ message NodeExport {
   Sorting sorting         = 2;
   string output_type      = 3;
 }
+
+message ReportExport {
+  repeated string filter  = 1;
+  Sorting sorting         = 2;
+  string output_type      = 3;
+  string node_id          = 4;
+}

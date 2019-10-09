@@ -620,6 +620,51 @@ func (s *Server) configMgmtNodeExportHandler(w http.ResponseWriter, r *http.Requ
 	}
 }
 
+func (s *Server) configMgmtReportExportHandler(w http.ResponseWriter, r *http.Request) {
+	const (
+		actionV1   = "read"
+		resourceV1 = "cfgmgmt:nodes"
+		actionV2   = "infra:nodes:list"
+		resourceV2 = "infra:nodes"
+	)
+
+	ctx, err := s.authRequest(r, resourceV1, actionV1, resourceV2, actionV2)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	var reportExportRequest cfgmgmt_request.ReportExport
+	if err := decoder.Decode(&reportExportRequest); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	cfgMgmtClient, err := s.clientsFactory.CfgMgmtClient()
+	if err != nil {
+		http.Error(w, "grpc service for config mgmt unavailable", http.StatusServiceUnavailable)
+		return
+	}
+
+	stream, err := cfgMgmtClient.ReportExport(ctx, &reportExportRequest)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	for {
+		data, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		w.Write(data.GetContent()) // nolint: errcheck
+	}
+}
+
 func init() {
 	// Register streaming methods for introspection.
 	// - Almost all calls of this method are in *.pb.go files, auto-generated from proto files.

@@ -30,10 +30,12 @@ const (
 
 	// Elasticsearch fields we use within this package
 	RunFieldTimestamp    = "start_time"
+	RunFieldEndTimestamp = "end_time"
 	CheckinTimestamp     = "checkin"
 	ActionFieldTimestamp = "recorded_at"
 	ActionFieldID        = "id"
 	NodeFieldID          = "entity_uuid"
+	RunFieldID           = "run_id"
 	SuggestionSize       = 10
 	SuggestionQuerySize  = 100
 )
