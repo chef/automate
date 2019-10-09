@@ -339,21 +339,21 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
       case 'identity':
         if (typeValue === 'USER' || typeValue === 'TEAM') {
             this.allIdentity = typeValue;
-            this.updateValidations('identity', true);
+            this.updateValidations(inputName, true);
             return true;
           } else {
-            this.updateValidations('identity', false);
-            this.expressionForm.get('identity').reset();
+            this.updateValidations(inputName, false);
+            this.expressionForm.get(inputName).reset();
             return false;
           }
         break;
       case 'name':
         if ( typeValue === 'TOKEN' || (identityValue && identityValue !== '*') ) {
-          this.updateValidations('name', true);
+          this.updateValidations(inputName, true);
           return true;
         } else {
-          this.updateValidations('name', false);
-          this.expressionForm.get('name').reset();
+          this.updateValidations(inputName, false);
+          this.expressionForm.get(inputName).reset();
           return false;
         }
         break;
