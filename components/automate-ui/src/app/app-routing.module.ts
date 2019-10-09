@@ -2,7 +2,9 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 // Views
-import { ApiTokenDetailsComponent } from './modules/token/token-details/api-token-details.component';
+import {
+  ApiTokenDetailsComponent
+} from './modules/token/token-details/api-token-details.component';
 import { ApiTokenListComponent } from './modules/token/token-list/api-token-list.component';
 import { ApplicationsComponent } from './pages/applications/applications.component';
 import { EventFeedComponent } from './pages/event-feed/event-feed.component';

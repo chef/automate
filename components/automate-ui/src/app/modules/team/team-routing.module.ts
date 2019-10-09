@@ -1,4 +1,4 @@
-import { NgModule }             from '@angular/core';
+import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import { TeamManagementComponent } from './team-management/team-management.component';
@@ -18,7 +18,7 @@ const teamRoutes: Routes = [
         path: ':id/add-users',
         component: TeamAddUsersComponent,
         data: { hideNavBar: true }
-    },
+    }
 ];
 
 @NgModule({
