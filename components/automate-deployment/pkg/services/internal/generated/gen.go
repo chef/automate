@@ -330,6 +330,10 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
+      "name": "chef/automate-builder-api",
+      "metadata": null
+    },
+    {
       "name": "chef/automate-prometheus",
       "metadata": {
         "name": "chef/automate-prometheus",
@@ -519,7 +523,8 @@ var ProductMetadataJSON = `
       "aliases": null,
       "type": "product",
       "services": [
-        "chef/automate-builder-memcached"
+        "chef/automate-builder-memcached",
+        "chef/automate-builder-api"
       ],
       "packages": null,
       "dependencies": [

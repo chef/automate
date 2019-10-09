@@ -1,0 +1,77 @@
+[api]
+data_path = "{{svc_path}}/data"
+log_path = "{{svc_var_path}}"
+key_path = "{{svc_path}}/files"
+features_enabled = ""
+targets = ["x86_64-linux", "x86_64-linux-kernel2", "x86_64-windows"]
+build_targets = ["x86_64-linux", "x86_64-linux-kernel2", "x86_64-windows"]
+build_on_upload = true
+
+[github]
+app_private_key = "{{svc_path}}/files/builder-github-app.pem"
+api_url        = "https://api.github.com"
+app_id         = 5565
+webhook_secret = ""
+
+[http]
+listen = "{{cfg.conf.service.listen}}"
+port = {{cfg.conf.service.port}}
+
+[oauth]
+provider       = "github"
+token_url      = "https://github.com/login/oauth/access_token"
+userinfo_url   = "https://api.github.com/user"
+redirect_url   = ""
+client_id      = ""
+client_secret  = ""
+
+[s3]
+backend = "minio"
+access_key = "83df85809becb3fda12dddb856be7ce75f93a2cc5cb402760aaad56ff4c3ac5e"
+secret_key = "ac3fd3565d9326e7d4e2b98b5c7c957eef953b5eaf01f7370f4ba9f3ad3aa0f4"
+endpoint = "https://localhost:10143"
+bucket_name = "builder"
+
+[ui]
+root = "{{svc_static_path}}"
+
+[memcache]
+ttl = {{cfg.conf.memcache.ttl}}
+[[memcache.hosts]]
+{{- if cfg.binds.memcache.sys.ip }}
+host = "{{cfg.binds.memcache.sys.ip}}"
+{{- else }}
+{{ fail "missing memcache ip" }}
+{{- end }}
+{{- if cfg.binds.memcache.cfg.port }}
+port = {{cfg.binds.memcache.cfg.port}}
+{{- else }}
+{{ fail "missing memcache port" }}
+{{- end }}
+
+[datastore]
+host = "{{ pg_gateway_host }}"
+port = {{ pg_gateway_port }}
+database = "{{cfg.conf.datastore.database}}"
+{{- if is_external_pg }}
+  {{- if eq "password" .Platform.GetPlatform.GetExternalPostgresql.GetAuth.GetScheme.GetValue }}
+user = "{{ .Platform.GetPlatform.GetExternalPostgresql.GetAuth.GetPassword.GetDbuser.GetUsername.GetValue }}"
+password = "{{ .Platform.GetPlatform.GetExternalPostgresql.GetAuth.GetPassword.GetDbuser.GetPassword.GetValue }}"
+  {{- else }}
+    {{ fail "unsupported auth scheme" }}
+  {{- end }}
+  {{- if .Platform.GetPlatform.GetExternalPostgresql.GetSsl }}
+    {{- if .Platform.GetPlatform.GetExternalPostgresql.GetSsl.GetEnable.GetValue }}
+ssl_mode = "verify-ca"
+ssl_root_cert "{{pg_root_ca_cert_path}}"
+    {{- else }}
+ssl_mode = "disable"
+    {{- end }}
+  {{- end }}
+{{- else }}
+user = "{{cfg.conf.datastore.user}}"
+ssl_mode = "verify-ca"
+ssl_root_cert = "{{svc_root_ca_path}}"
+ssl_key = "{{svc_key_path}}"
+ssl_cert = "{{svc_cert_path}}"
+{{- end }}

@@ -1,0 +1,35 @@
+// -*- mode: protobuf; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*-
+syntax = "proto3";
+
+package chef.automate.domain.builder_api;
+option go_package = "github.com/chef/automate/api/config/builder_api";
+import "api/config/shared/global.proto";
+import "api/config/shared/tls.proto";
+import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.proto";
+import "google/protobuf/wrappers.proto";
+
+message ConfigRequest {
+	option (chef.automate.api.service_config) = {name: "automate-builder-api"};
+
+	V1 v1 = 1;
+
+	message V1 {
+		System sys = 1;
+		Service svc = 2;
+
+		message System {
+			chef.automate.infra.config.Mlsa mlsa = 1;
+			chef.automate.infra.config.TLSCredentials tls = 2;
+
+			Service service = 3;
+
+			message Service {
+				google.protobuf.StringValue host = 1;
+				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10103, protocol: "http" } ];
+			}
+
+		} // System
+
+		message Service {}
+	} // V1
+}

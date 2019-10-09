@@ -1,0 +1,41 @@
+[service]
+log_level = "info"
+listen = "0.0.0.0"
+port   = 10103
+
+[oauth]
+provider       = "github"
+token_url      = "https://github.com/login/oauth/access_token"
+userinfo_url   = "https://api.github.com/user"
+redirect_url   = ""
+client_id      = ""
+client_secret  = ""
+
+[github]
+api_url        = "https://api.github.com"
+app_id         = 5565
+webhook_secret = ""
+
+[s3]
+backend = "minio"
+key_id = "depot"
+secret_key = "password"
+endpoint = "http://localhost:9000"
+bucket_name = "habitat-builder-artifact-store.default"
+
+[artifactory]
+api_url = "http://localhost:8080"
+api_key = "key"
+repo = "habitat-builder-artifact-store.default"
+
+[memcache]
+ttl = 15
+
+[datastore]
+user = "automate-builder-api"
+database = "builder"
+connection_retry_ms = 300
+connection_timeout_sec = 3600
+db_workers = 4
+host = "127.0.0.1"
+port = 5432

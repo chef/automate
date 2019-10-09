@@ -1,0 +1,21 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash -e
+
+exec 2>&1
+
+set -e
+
+export HOME="{{pkg.svc_data_path}}"
+export RUST_LOG="info"
+export RUST_BACKTRACE=1
+
+echo "builder-api starting"
+
+mkdir -p "{{pkg.svc_var_path}}/etc"
+render-template config.toml "{{pkg.svc_var_path}}/etc/config.toml" \
+  --conf "{{pkg.svc_config_path}}/config.json"
+
+export DBNAME="{{cfg.datastore.database}}"
+pg-helper ensure-service-database "$DBNAME"
+pg-helper fix-permissions "$DBNAME"
+
+exec bldr-api start -c "{{pkg.svc_var_path}}/etc/config.toml"

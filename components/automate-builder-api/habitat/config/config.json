@@ -1,0 +1,7 @@
+{
+"conf": {{ toJson cfg }},
+"binds": {
+  "memcache": {{ toJson bind.automate-builder-memcached.first }}
+},
+"__placeholder": {}
+}
