@@ -251,14 +251,16 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   }
 
   public closeModal(): void {
-    this.unsubscribeFromExpressionFormChanges();
+    this.formSubscription.unsubscribe();
     this.resetModal();
     this.modalVisible = false;
   }
 
   public openModal(): void {
     this.resetModal();
-    this.subscribeToExpressionFormChanges();
+    const expressionValueChanges = this.expressionForm.valueChanges;
+    this.formSubscription = expressionValueChanges.subscribe(formValues =>
+      this.displayExpressionOutput(formValues));
     this.modalVisible = true;
   }
 
@@ -389,17 +391,5 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     });
 
     this.expressionOutput = output.join(':');
-  }
-
-  private subscribeToExpressionFormChanges(): void {
-    // initialize stream
-    const expressionValueChanges = this.expressionForm.valueChanges;
-    // subscribe to form changes
-    this.formSubscription = expressionValueChanges.subscribe(formValues =>
-              this.displayExpressionOutput(formValues));
-  }
-
-  private unsubscribeFromExpressionFormChanges(): void {
-    this.formSubscription.unsubscribe();
   }
 }
