@@ -267,11 +267,11 @@ func AssetNames() []string {
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
 	"data/a1_elasticsearch_mappings/compliance-template.json": dataA1_elasticsearch_mappingsComplianceTemplateJson,
-	"data/a1_elasticsearch_mappings/insights-template.json": dataA1_elasticsearch_mappingsInsightsTemplateJson,
+	"data/a1_elasticsearch_mappings/insights-template.json":   dataA1_elasticsearch_mappingsInsightsTemplateJson,
 	"data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.crl": dataA1stub_certsChefautomateupgradefromv1selftestCrl,
 	"data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.crt": dataA1stub_certsChefautomateupgradefromv1selftestCrt,
 	"data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.key": dataA1stub_certsChefautomateupgradefromv1selftestKey,
-	"data/binds.txt": dataBindsTxt,
+	"data/binds.txt":        dataBindsTxt,
 	"data/init-config.toml": dataInitConfigToml,
 }
 
@@ -314,18 +314,19 @@ type bintree struct {
 	Func     func() (*asset, error)
 	Children map[string]*bintree
 }
+
 var _bintree = &bintree{nil, map[string]*bintree{
 	"data": &bintree{nil, map[string]*bintree{
 		"a1_elasticsearch_mappings": &bintree{nil, map[string]*bintree{
 			"compliance-template.json": &bintree{dataA1_elasticsearch_mappingsComplianceTemplateJson, map[string]*bintree{}},
-			"insights-template.json": &bintree{dataA1_elasticsearch_mappingsInsightsTemplateJson, map[string]*bintree{}},
+			"insights-template.json":   &bintree{dataA1_elasticsearch_mappingsInsightsTemplateJson, map[string]*bintree{}},
 		}},
 		"a1stub_certs": &bintree{nil, map[string]*bintree{
 			"ChefAutomateUpgradeFromv1SelfTest.crl": &bintree{dataA1stub_certsChefautomateupgradefromv1selftestCrl, map[string]*bintree{}},
 			"ChefAutomateUpgradeFromv1SelfTest.crt": &bintree{dataA1stub_certsChefautomateupgradefromv1selftestCrt, map[string]*bintree{}},
 			"ChefAutomateUpgradeFromv1SelfTest.key": &bintree{dataA1stub_certsChefautomateupgradefromv1selftestKey, map[string]*bintree{}},
 		}},
-		"binds.txt": &bintree{dataBindsTxt, map[string]*bintree{}},
+		"binds.txt":        &bintree{dataBindsTxt, map[string]*bintree{}},
 		"init-config.toml": &bintree{dataInitConfigToml, map[string]*bintree{}},
 	}},
 }}
@@ -376,4 +377,3 @@ func _filePath(dir, name string) string {
 	cannonicalName := strings.Replace(name, "\\", "/", -1)
 	return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
 }
-
