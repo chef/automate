@@ -1,11 +1,11 @@
 import { combineLatest as observableCombineLatest,  Observable, Subject } from 'rxjs';
-
 import { map, takeUntil } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from '../../../../../ngrx.reducers';
 import * as moment from 'moment';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import * as selectors from '../../state/scanner.selectors';
 import * as actions from '../../state/scanner.actions';
 
@@ -17,7 +17,8 @@ export class JobScansListComponent implements OnInit, OnDestroy {
   constructor(
     public route: ActivatedRoute,
     private store: Store<NgrxStateAtom>,
-    private router: Router
+    private router: Router,
+    private layoutFacade: LayoutFacadeService
   ) {}
 
   jobScansList;
@@ -32,6 +33,7 @@ export class JobScansListComponent implements OnInit, OnDestroy {
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
   ngOnInit(): void {
+    this.layoutFacade.showComplianceSidebar();
     this.store.select(selectors.jobScansList).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(jobScansList => this.jobScansList = jobScansList);

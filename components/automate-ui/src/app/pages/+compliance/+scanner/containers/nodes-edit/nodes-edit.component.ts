@@ -4,8 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormArray, FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Observable, combineLatest  } from 'rxjs';
 import { startWith, switchMap, map } from 'rxjs/operators';
-
 import { environment as env } from 'environments/environment';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
 @Component({
   templateUrl: './nodes-edit.component.html',
@@ -16,7 +16,8 @@ export class NodesEditComponent implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private httpClient: HttpClient
+    private httpClient: HttpClient,
+    private layoutFacade: LayoutFacadeService
   ) {}
 
   node: any;
@@ -29,6 +30,7 @@ export class NodesEditComponent implements OnInit {
   secrets$: Observable<any[]>;
 
   ngOnInit() {
+    this.layoutFacade.showComplianceSidebar();
     this.route.paramMap.pipe(
       switchMap(params => this.fetchNode(params.get('id'))))
       .subscribe(node => {

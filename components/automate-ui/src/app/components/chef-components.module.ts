@@ -31,6 +31,7 @@ import {
 } from './guitar-string-collection/guitar-string-section/guitar-string-section.component';
 import { InputDirective } from './input/input.directive';
 import { LandingComponent } from './landing/landing.component';
+import { ChefNotificationsComponent } from './notifications/notifications.component';
 import { PagePickerComponent } from './page-picker/page-picker.component';
 import { ProjectsDropdownComponent } from './projects-dropdown/projects-dropdown.component';
 import { SettingsSidebarComponent } from './settings-sidebar/settings-sidebar.component';
@@ -76,6 +77,7 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     GuitarStringItemComponent,
     GuitarStringSectionComponent,
     LandingComponent,
+    ChefNotificationsComponent,
     PagePickerComponent,
     ProjectsDropdownComponent,
     SettingsSidebarComponent,
@@ -112,6 +114,7 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     GuitarStringSectionComponent,
     InputDirective,
     LandingComponent,
+    ChefNotificationsComponent,
     PagePickerComponent,
     ProjectsDropdownComponent,
     SettingsSidebarComponent,

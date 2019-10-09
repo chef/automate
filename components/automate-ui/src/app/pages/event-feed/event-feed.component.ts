@@ -23,6 +23,7 @@ import { some, pickBy } from 'lodash/fp';
 import {
   eventFeedState
 } from '../../services/event-feed/event-feed.selectors';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
 @Component({
   selector: 'app-event-feed',
@@ -149,8 +150,22 @@ export class EventFeedComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<NgrxStateAtom>,
     private route: ActivatedRoute,
-    private router: Router
-  ) {}
+    private router: Router,
+    private layoutFacade: LayoutFacadeService,
+  ) {
+    this.layoutFacade.updateMenuGroups([{
+      name: 'Dashboards',
+      items: [
+        {
+          name: 'Event Feed',
+          icon: 'today',
+          route: '/dashboards/event-feed',
+          visible: true
+        }
+      ],
+      visible: true
+    }]);
+  }
 
   ngOnInit() {
     this.store.select(eventFeedSelectors.loadedEvents).pipe(

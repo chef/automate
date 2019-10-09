@@ -4,10 +4,39 @@
 @import "assets/chef-ui-library/collection/styles/variables.example.css";
 @import "styles/chef-theme";
 
+// .app-main-container {
+//   display: flex;
+//   flex-flow: row;
+//   position: relative;
+
+//   *[sidebar] {
+//     min-height: 95vh;
+//   }
+
+//   .notifications {
+//     flex: 3 0 0;
+//     order: 2;
+//   }
+
+//   .container main {
+//     height: 100%;
+//     position: relative;
+
+//     chef-loading-spinner[fixed] {
+//       position: absolute;
+//       top: 0;
+//       left: 0;
+//     }
+//   }
+// }
+
+chef-side-panel {
+  position: absolute;
+  top: 0;
+}
+
 .container {
   position: relative;
-  width: 100%;
-  height: 100vh;
 
   main {
     padding-left: 0;
@@ -15,35 +44,35 @@
   }
 }
 
-app-navbar {
-  display: block;
-  position: relative;
-}
+// app-navbar {
+//   display: block;
+//   position: relative;
+// }
 
-.page-container,
-.applications-container {
-  display: flex;
-  flex-flow: row nowrap;
+// .page-container,
+// .applications-container {
+//   display: flex;
+//   flex-flow: row nowrap;
 
-  *[sidebar] {
-    flex: 200px;
+//   *[sidebar] {
+//     flex: 200px;
 
-    & + .container {
-      flex: auto;
-      position: static;
-      width: calc(100% - 200px);
-      height: auto;
-    }
-  }
-}
+//     & + .container {
+//       flex: auto;
+//       position: static;
+//       width: calc(100% - 200px);
+//       height: auto;
+//     }
+//   }
+// }
 
-chef-side-panel {
-  top: 106px;
-}
+// chef-side-panel {
+//   top: 106px;
+// }
 
-app-services-sidebar {
-  top: 109px;
-}
+// app-services-sidebar {
+//   top: 109px;
+// }
 
 @media screen and (max-width: 769px) {
   .container {
@@ -185,10 +214,10 @@ html.no-smil {
   }
 }
 
-// Global loading modifier class to accomodate for our navigation
 chef-loading-spinner[fixed] {
-  top: $navigation-height;
-  left: $sidebar-width;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 input {

@@ -12,6 +12,7 @@ import {
   ElementRef,
   ViewChild
 } from '@angular/core';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { ProfilesService } from 'app/services/profiles/profiles.service';
 import { UploadService } from 'app/services/profiles/upload.service';
 import { AvailableProfilesService } from 'app/services/profiles/available-profiles.service';
@@ -79,10 +80,12 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
     private profilesService: ProfilesService,
     private availableProfilesService: AvailableProfilesService,
     private uploadService: UploadService,
-    private chefSessionService: ChefSessionService
+    private chefSessionService: ChefSessionService,
+    private layoutFacade: LayoutFacadeService
   ) {}
 
   ngOnInit() {
+    this.layoutFacade.showComplianceSidebar();
     this.user = this.chefSessionService.username;
 
     observableForkJoin([

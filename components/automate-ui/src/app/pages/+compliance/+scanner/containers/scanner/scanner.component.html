@@ -1,9 +1,7 @@
-<div class="page-container">
-  <app-compliance-reporting-sidebar sidebar></app-compliance-reporting-sidebar>
-  <chef-loading-spinner *ngIf="countsLoading" size='50' fixed></chef-loading-spinner>
-
+<div class="app-main-container">
   <div class="container">
     <main>
+      <chef-loading-spinner *ngIf="countsLoading" size='50' fixed></chef-loading-spinner>
       <chef-page-header>
         <chef-heading>Scan Jobs</chef-heading>
         <chef-subheading>Compliance scan jobs run inspec exec on a set of nodes.</chef-subheading>

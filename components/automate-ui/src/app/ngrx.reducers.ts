@@ -36,6 +36,10 @@ import {
   licenseStatusEntityReducer
 } from './entities/license/license.reducer';
 import {
+  LayoutEntityState,
+  layoutEntityReducer
+} from './entities/layout/layout.reducer';
+import {
   NotificationEntityState,
   notificationEntityReducer
 } from './entities/notifications/notification.reducer';
@@ -67,6 +71,7 @@ export interface NgrxStateAtom {
   router: RouterReducerState;
   scanner: scanner.ScannerState;
   sidebar: sidebar.SidebarState;
+  layout: LayoutEntityState;
   projectsFilter: projectsFilter.ProjectsFilterState;
 
   // UI State
@@ -168,6 +173,7 @@ export const ngrxReducers = {
   event_feed: eventFeed.eventFeedReducer,
   projectsFilter: projectsFilter.projectsFilterReducer,
   sidebar: sidebar.sidebarReducer,
+  layout: layoutEntityReducer,
 
   // UI State
   job_add: jobAddReducer,

@@ -24,6 +24,12 @@ export interface LicenseStatus {
   };
 }
 
+export interface LicenseApplyReason {
+  INITIAL_INSTALL: number,
+  LICENSE_EXPIRED: number,
+  LICENSE_ABOUT_TO_EXPIRE: number
+}
+
 export interface ApplyLicensePayload {
 
   // NB: Keep in sync with automate-gateway/api/license/license.proto:ApplyLicenseReq.

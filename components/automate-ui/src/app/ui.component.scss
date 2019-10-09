@@ -1,12 +1,37 @@
 @import "~styles/variables";
 
-.notifications,
-.license-banner {
-  a {
-    color: $chef-white;
+#app-container {
+  height: 100vh;
+}
+
+#app-header-wrapper {
+//   display: flex;
+//   flex-flow: column nowrap;
+
+//   & > * {
+//     flex: 1 100%;
+//   }
+
+  app-navbar {
+    display: block;
+    height: 70px;
   }
 }
 
-.notifications {
-  margin-left: $sidebar-width;
+#app-content-wrapper {
+  display: flex;
+  flex-flow: row nowrap;
+  height: calc(100vh - 110px);
+  position: relative;
+  
+  & > .aside-1 { order: 1; }
+  & > .main { 
+    flex: 2 0px;
+    order: 2;
+    height: 100%;
+    overflow-x: scroll;
+  }
+  & > .aside-2 { order: 3; }
 }
+
+  

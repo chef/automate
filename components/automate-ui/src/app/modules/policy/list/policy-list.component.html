@@ -1,0 +1,105 @@
+<div class="app-main-container">
+  <app-settings-sidebar sidebar></app-settings-sidebar>
+<<<<<<< HEAD:components/automate-ui/src/app/pages/policy/list/policy-list.component.html
+  <chef-loading-spinner *ngIf="loading$ | async" size='50' fixed></chef-loading-spinner>
+
+<div class="container">
+  <main>
+    <chef-page-header>
+      <chef-heading>Policies</chef-heading>
+      <chef-subheading>
+        Policies manage the resources and actions used by identities.
+      </chef-subheading>
+    </chef-page-header>
+    <section *ngIf="!(isIAMv2$ | async)" class="page-body">
+      Currently, you are using IAM v1 policies. Automate only shows IAM v2 policies.
+    </section>
+    <section *ngIf="isIAMv2$ | async" class="page-body">
+      <app-authorized [allOf]="['/iam/v2beta/policies', 'get']">
+        <chef-table-new>
+          <chef-table-header>
+            <chef-table-row>
+              <chef-table-header-cell class="name-column">Name</chef-table-header-cell>
+              <chef-table-header-cell class="type-column">Type</chef-table-header-cell>
+              <chef-table-header-cell class="status-column">Status</chef-table-header-cell>
+              <chef-table-header-cell class="three-dot-column"></chef-table-header-cell>
+            </chef-table-row>
+          </chef-table-header>
+          <chef-table-body>
+            <chef-table-row *ngFor="let policy of sortedPolicies$ | async">
+                <chef-table-cell class="name-column">
+                  <a [routerLink]="['/settings/policies', policy.id]">{{ policy.name }}</a>
+                </chef-table-cell>
+                <chef-table-cell class="type-column">{{ policy.type | iamType }}</chef-table-cell>
+                <chef-table-cell class="status-column">{{ status(policy) | capitalize }}</chef-table-cell>
+                <chef-table-cell class="three-dot-column">
+                <!-- <app-authorized [allOf]="['/policies/{policy}', 'delete', policy]"> -->
+                  <chef-control-menu *ngIf="policy.type !== 'CHEF_MANAGED'">
+                    <chef-option (click)="startPolicyDelete(policy)">Delete Policy</chef-option>
+                  </chef-control-menu>
+                <!-- </app-authorized> -->
+                </chef-table-cell>
+            </chef-table-row>
+          </chef-table-body>
+        </chef-table-new>
+      </app-authorized>
+    </section>
+=======
+  
+  <div class="container">
+    <chef-notifications></chef-notifications>
+    <main>
+      <chef-loading-spinner *ngIf="loading$ | async" size='50' fixed></chef-loading-spinner>
+      <chef-page-header>
+        <chef-heading>Policies</chef-heading>
+        <chef-subheading>
+          Policies manage the resources and actions used by identities.
+        </chef-subheading>
+      </chef-page-header>
+      <section *ngIf="(iamMajorVersion$ | async) === 'v1'" class="page-body">
+        Currently, you are using IAM v1 policies. Automate only shows IAM v2 policies.
+      </section>
+      <section *ngIf="(iamMajorVersion$ | async) !== 'v1'" class="page-body">
+        <app-authorized [allOf]="['/iam/v2beta/policies', 'get']">
+          <chef-table>
+            <chef-thead>
+              <chef-tr>
+                <chef-th class="name-column">Name</chef-th>
+                <chef-th class="type-column">Type</chef-th>
+                <chef-th class="status-column">Status</chef-th>
+                <chef-th class="button-column"></chef-th>
+              </chef-tr>
+            </chef-thead>
+            <chef-tbody>
+              <chef-tr *ngFor="let policy of sortedPolicies$ | async">
+                  <chef-td class="name-column">
+                    <a [routerLink]="['/settings/policies', policy.id]">{{ policy.name }}</a>
+                  </chef-td>
+                  <chef-td class="type-column">{{ policy.type | iamType }}</chef-td>
+                  <chef-td class="status-column">{{ status(policy) | capitalize }}</chef-td>
+                  <chef-td class="button-column">
+                  <!-- <app-authorized [allOf]="['/policies/{policy}', 'delete', policy]"> -->
+                    <chef-control-menu *ngIf="policy.type !== 'CHEF_MANAGED'">
+                      <chef-option (click)="startPolicyDelete(policy)">Delete Policy</chef-option>
+                    </chef-control-menu>
+                  <!-- </app-authorized> -->
+                  </chef-td>
+              </chef-tr>
+            </chef-tbody>
+          </chef-table>
+        </app-authorized>
+      </section>
+>>>>>>> Restructured page layouts  Signed-Off-By: Tara Black <tblack@chef.io>:components/automate-ui/src/app/modules/policy/list/policy-list.component.html
+
+      <app-delete-object-modal
+        [visible]="deleteModalVisible"
+        objectNoun="policy"
+        [objectName]="policyToDelete?.id"
+        [moreDetails]="inUseMessage()"
+        (close)="closeDeleteModal()"
+        (deleteClicked)="deletePolicy()"
+        objectAction="Delete">
+      </app-delete-object-modal>
+    </main>
+  </div>
+</div>

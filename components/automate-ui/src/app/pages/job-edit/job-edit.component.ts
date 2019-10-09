@@ -11,6 +11,7 @@ import * as moment from 'moment';
 
 import { NgrxStateAtom } from '../../ngrx.reducers';
 
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { ChefSessionService } from '../../services/chef-session/chef-session.service';
 import { Job } from '../../entities/jobs/job.model';
 import { Manager } from '../../entities/managers/manager.model';
@@ -63,8 +64,10 @@ export class JobEditComponent implements OnDestroy {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private chefSession: ChefSessionService
+    private chefSession: ChefSessionService,
+    private layoutFacade: LayoutFacadeService
   ) {
+    this.layoutFacade.showComplianceSidebar();
     this.managers$ = this.store.select(allManagers);
     this.profiles$ = this.store.select(allProfiles);
     this.status$ = this.store.select(jobEditStatus);

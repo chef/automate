@@ -12,6 +12,7 @@ import { ScanResultsService } from '../../shared/reporting/scan-results.service'
 import { paginationOverride } from '../shared';
 import * as moment from 'moment';
 import { FilterC } from '../../+reporting/types';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
 @Component({
   selector: 'app-reporting-profile',
@@ -33,10 +34,12 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private statsService: StatsService,
     private reportQuery: ReportQueryService,
-    public scanResults: ScanResultsService
+    public scanResults: ScanResultsService,
+    private layoutFacade: LayoutFacadeService
   ) {}
 
   ngOnInit() {
+    this.layoutFacade.showComplianceSidebar();
     this.showLoadingIcon = true;
 
     const id = this.route.snapshot.params['id'];

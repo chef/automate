@@ -1,10 +1,7 @@
-<div class="page-container">
-  <app-compliance-reporting-sidebar sidebar></app-compliance-reporting-sidebar>
-  <chef-loading-spinner *ngIf="ProfilesDataLoading" size='50' fixed></chef-loading-spinner>
-
+<div class="app-main-container">
   <div class="container">
     <main>
-
+      <chef-loading-spinner *ngIf="ProfilesDataLoading" size='50' fixed></chef-loading-spinner>
       <chef-notification
         *ngIf="downloadErrorVisible"
         type="error"

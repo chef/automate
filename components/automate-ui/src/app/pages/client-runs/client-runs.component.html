@@ -3,8 +3,11 @@
   <p>Please contact your administrator for permission.</p>
 </div>
 
-<div class="page-container">
-  <app-client-runs-sidebar sidebar></app-client-runs-sidebar>
+<div class="app-main-container">
+  <div *ngIf="permissionDenied$ | async" class="permission-denied-banner">
+    <p>You do not currently have permission to view this page.</p>
+    <p>Please contact your administrator for permission.</p>
+  </div>
 
   <div class="container">
     <chef-notification

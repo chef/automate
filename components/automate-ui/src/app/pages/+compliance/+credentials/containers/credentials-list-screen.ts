@@ -11,7 +11,7 @@ import { NgrxStateAtom } from '../../../../ngrx.reducers';
 @Component({
   selector: 'app-credentials-list-screen',
   template: `
-    <div class="page-container">
+    <div class="app-main-container">
       <app-settings-sidebar sidebar></app-settings-sidebar>
       <app-credentials-list
         class="container"

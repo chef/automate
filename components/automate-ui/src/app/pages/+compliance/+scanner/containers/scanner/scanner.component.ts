@@ -2,6 +2,7 @@ import { map } from 'rxjs/operators';
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import * as selectors from '../../state/scanner.selectors';
 
 @Component({
@@ -18,9 +19,13 @@ export class ScannerComponent implements OnInit {
   jobsCountLoaded = false;
   nodesCountLoaded = false;
 
-  constructor(private store: Store<any>) {}
+  constructor(
+    private store: Store<any>,
+    private layoutFacade: LayoutFacadeService
+  ) {}
 
   ngOnInit() {
+    this.layoutFacade.showComplianceSidebar();
     this.jobsCount$ = this.store.select(selectors.jobsList)
       .pipe(map(jobsList => jobsList.total));
     this.jobsCountLoaded = true;

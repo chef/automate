@@ -1,0 +1,15 @@
+<ng-container *ngFor="let notification of notifications$ | async">
+  <chef-notification *ngIf="notification.type === 'license'"
+    [className]="'license-banner'"
+    [type]="'error'"
+    [timeout]="notification.timeout" (dismissed)="handleNotificationDismissal(notification.id)">
+    {{ notification.message }}
+    <!-- TODO (tc) This code is all temporary. The full experience will be implemented post ChefConf.-->
+    <ng-container>
+      <a href="https://www.chef.io/contact-us/" target="_blank">Get a license from Chef</a>
+      or
+      <a href="#" (click)="onTriggerBannerLicenseApply(); licenseApplyModal.openModal(); false">apply a license</a>
+      if you already have one.
+    </ng-container>
+  </chef-notification>
+</ng-container>

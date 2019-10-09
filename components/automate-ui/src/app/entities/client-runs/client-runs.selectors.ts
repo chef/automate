@@ -7,7 +7,12 @@ import {
 export const clientRunsState =
   createFeatureSelector<ClientRunsEntityState>('clientRunsEntity');
 
-export const clientRunsNodes = createSelector(
+  export const clientRunsWorkflowEnabled= createSelector(
+    clientRunsState,
+    (state) => state.workflowEnabled
+  );
+
+  export const clientRunsNodes = createSelector(
   clientRunsState,
   (state) => state.nodes
 );

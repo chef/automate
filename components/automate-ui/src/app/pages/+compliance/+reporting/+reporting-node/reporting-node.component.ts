@@ -5,6 +5,7 @@ import { Subject } from 'rxjs';
 import { ReportQueryService } from '../../shared/reporting/report-query.service';
 import * as moment from 'moment';
 import { DateTime } from 'app/helpers/datetime/datetime';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
 @Component({
   selector: 'app-reporting-node',
@@ -28,11 +29,13 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private statsService: StatsService,
-    private reportQuery: ReportQueryService
+    private reportQuery: ReportQueryService,
+    private layoutFacade: LayoutFacadeService
   ) {
   }
 
   ngOnInit() {
+    this.layoutFacade.showComplianceSidebar();
     this.reportLoading = true;
     const id: string = this.route.snapshot.params['id'];
     const reportQuery = this.reportQuery.getReportQuery();

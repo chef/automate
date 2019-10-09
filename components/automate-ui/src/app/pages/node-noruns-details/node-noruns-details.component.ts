@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import {
   Node
 } from '../../entities/client-runs/client-runs.model';
+import { ClientRunsFacadeService } from 'app/entities/client-runs/client-runs.facade';
 
 @Component({
   selector: 'app-node-noruns-details',
@@ -14,10 +15,12 @@ export class NodeNoRunsDetailsComponent implements OnInit {
   node: Node;
 
   constructor(
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private facade: ClientRunsFacadeService
   ) {}
 
   ngOnInit() {
+    this.facade.showSidebar();
     this.nodeId = this.getRouteParam('node-id');
     this.route.data.subscribe((data: { node: Node }) => {
         this.node = data.node;

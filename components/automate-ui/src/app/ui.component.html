@@ -1,52 +1,34 @@
-<div id="main-container">
+<div id="app-container">
+
+  <!-- App Modals -->
   <app-license-lockout
-    (triggerApplyLicense)="onTriggerApplyLicense($event); licenseApplyModal.openModal();"
+    (triggerApplyLicense)="licenseApplyModal.openModal();"
     #licenseLockoutModal>
   </app-license-lockout>
+
   <app-license-apply
-    [licenseApplyReason]="licenseApplyReason" #licenseApplyModal
-    (openLicenseLockout)="licenseLockoutModal.openModal()"
-    >
+    #licenseApplyModal
+    (openLicenseLockout)="licenseLockoutModal.openModal()">
   </app-license-apply>
-  <div id="main-header">
-    <div *ngIf="renderNavbar">
-      <ng-container *ngFor="let notification of notifications$ | async">
-        <chef-notification *ngIf="notification.type === 'license'"
-          [className]="notification.type === 'license' ? 'license-banner' : ''"
-          [type]="notification.type === 'license' ? 'error' : notification.type"
-          [timeout]="notification.timeout" (dismissed)="handleNotificationDismissal(notification.id)">
-          {{ notification.message }}
-          <!-- TODO (tc) This code is all temporary. The full experience will be implemented post ChefConf.-->
-          <ng-container *ngIf="notification.type === 'license'">
-            <a href="https://www.chef.io/contact-us/" target="_blank">Get a license from Chef</a>
-            or
-            <a href="#" (click)="onTriggerBannerLicenseApply(); licenseApplyModal.openModal(); false">apply a license</a>
-            if you already have one.
-          </ng-container>
-        </chef-notification>
-      </ng-container>
-      <app-navbar></app-navbar>
-    </div>
-    
-    <div class="notifications" *ngIf="renderNavbar">
-      <ng-container *ngFor="let notification of notifications$ | async">
-        <chef-notification *ngIf="notification.type === 'error'"
-          [type]="notification.type === 'license' ? 'error' : notification.type"
-          [timeout]="notification.timeout" (dismissed)="handleNotificationDismissal(notification.id)">
-          {{ notification.message }}
-        </chef-notification>
-      </ng-container>
-      <ng-container *ngFor="let notification of notifications$ | async">
-        <chef-notification *ngIf="notification.type === 'info'"
-          [type]="notification.type === 'license' ? 'error' : notification.type"
-          [timeout]="notification.timeout" (dismissed)="handleNotificationDismissal(notification.id)">
-          {{ notification.message }}
-        </chef-notification>
-      </ng-container>
-    </div>
-    <app-feature-flags [experimentalFeatures]="experimentalFeatures" [betaFeatures]="betaFeatures" [legacyFeatures]="legacyFeatures"></app-feature-flags>
+
+  <app-feature-flags
+    [experimentalFeatures]="experimentalFeatures"
+    [betaFeatures]="betaFeatures"
+    [legacyFeatures]="legacyFeatures">
+  </app-feature-flags>
+  
+  <!-- App Header -->
+  <div id="app-header-wrapper" *ngIf="renderNavbar">
+    <app-license-notifications (triggerApplyLicense)="licenseApplyModal.openModal();"></app-license-notifications>
+    <app-navbar></app-navbar>
   </div>
-  <div id="main-content">
-    <router-outlet></router-outlet>
+
+  <!-- App Content -->
+  <div id="app-content-wrapper">
+    <div class="main">
+      <router-outlet></router-outlet>
+    </div>
+    <!-- App Sidebar -->
+    <chef-sidebar class="aside-1"></chef-sidebar>
   </div>
 </div>
