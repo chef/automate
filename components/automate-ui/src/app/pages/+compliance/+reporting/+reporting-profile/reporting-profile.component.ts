@@ -129,6 +129,10 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
   }
 
   getNodes(reportQuery: ReportQuery, params: any): Observable<Array<any>> {
+    // remove profile_id and control_id as filters if they are already applied
+    reportQuery.filters = reportQuery.filters.filter( filter => {
+      return filter.type.name !== 'profile_id' && filter.type.name !== 'control_id';
+    });
     const profileFilter: FilterC = {type: { name: 'profile_id' }, value: { text: params.profileId}};
     const controlFilter: FilterC = {type: { name: 'control_id' }, value: { text: params.controlId}};
     reportQuery.filters = [profileFilter, controlFilter].concat(reportQuery.filters);
@@ -169,12 +173,19 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
     return 'minor';
   }
 
-  statusIcon(status) {
+  statusIcon(status: string): string {
     switch (status) {
-      case ('failed'): return 'report_problem';
-      case ('passed'): return 'check_circle';
-      case ('skipped'): return 'help';
-      default: return '';
+      case 'failed' :
+        return 'report_problem';
+        break;
+      case 'passed' :
+        return 'check_circle';
+        break;
+      case 'skipped' :
+        return 'help';
+        break;
+      default:
+        return '';
     }
   }
 
