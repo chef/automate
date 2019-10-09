@@ -299,9 +299,17 @@ func BenchmarkFilterAuthorizedPairsWithPolicies(b *testing.B) {
 	}
 }
 
-func BenchmarkV2FilterAuthorizedPairsWithPolicies(b *testing.B) {
+// At time of writing
+// 0: 0.047070435 seconds
+// 1: 0.08253188
+// 10: 0.412672182
+// 30: 1.110166404
+// 50: 1.811321927
+// 100: 3.697555415
+// 150: 5.584124273
+// 300: 11.007249684
+func BenchmarkV2FilterAuthorizedPairsRealWorldExample(b *testing.B) {
 	ctx := context.Background()
-	fmt.Println("starting...")
 
 	l, err := logger.NewLogger("text", "debug")
 	require.NoError(b, err, "init logger")
@@ -378,111 +386,8 @@ func BenchmarkV2FilterAuthorizedPairsWithPolicies(b *testing.B) {
 		engine.Pair{Resource: "notifications:rules", Action: "notifications:notifyRules:list"},
 		engine.Pair{Resource: "iam:roles", Action: "iam:roles:create"},
 	}
-	subjects := []string{
-		"team:local:newteam1",
-		"team:local:newteam2",
-		"team:local:newteam3",
-		"team:local:newteam4",
-		"team:local:newteam5",
-		"team:local:newteam6",
-		"team:local:newteam7",
-		"team:local:newteam8",
-		"team:local:newteam9",
-		"team:local:newteam10",
-		"team:local:newteam11",
-		"team:local:newteam12",
-		"team:local:newteam13",
-		"team:local:newteam14",
-		"team:local:newteam15",
-		"team:local:newteam16",
-		"team:local:newteam17",
-		"team:local:newteam18",
-		"team:local:newteam19",
-		"team:local:newteam20",
-		"team:local:newteam21",
-		"team:local:newteam22",
-		"team:local:newteam23",
-		"team:local:newteam24",
-		"team:local:newteam25",
-		"team:local:newteam26",
-		"team:local:newteam27",
-		"team:local:newteam28",
-		"team:local:newteam29",
-		"team:local:newteam30",
-		"team:local:newteam31",
-		"team:local:newteam32",
-		"team:local:newteam33",
-		"team:local:newteam34",
-		"team:local:newteam35",
-		"team:local:newteam36",
-		"team:local:newteam37",
-		"team:local:newteam38",
-		"team:local:newteam39",
-		"team:local:newteam40",
-		"team:local:newteam41",
-		"team:local:newteam42",
-		"team:local:newteam43",
-		"team:local:newteam44",
-		"team:local:newteam45",
-		"team:local:newteam46",
-		"team:local:newteam47",
-		"team:local:newteam48",
-		"team:local:newteam49",
-		"team:local:newteam50",
-		"team:local:newteam51",
-		"team:local:newteam52",
-		"team:local:newteam53",
-		"team:local:newteam54",
-		"team:local:newteam55",
-		"team:local:newteam56",
-		"team:local:newteam57",
-		"team:local:newteam58",
-		"team:local:newteam59",
-		"team:local:newteam60",
-		"team:local:newteam61",
-		"team:local:newteam62",
-		"team:local:newteam63",
-		"team:local:newteam64",
-		"team:local:newteam65",
-		"team:local:newteam66",
-		"team:local:newteam67",
-		"team:local:newteam68",
-		"team:local:newteam69",
-		"team:local:newteam70",
-		"team:local:newteam71",
-		"team:local:newteam72",
-		"team:local:newteam73",
-		"team:local:newteam74",
-		"team:local:newteam75",
-		"team:local:newteam76",
-		"team:local:newteam77",
-		"team:local:newteam78",
-		"team:local:newteam79",
-		"team:local:newteam80",
-		"team:local:newteam81",
-		"team:local:newteam82",
-		"team:local:newteam83",
-		"team:local:newteam84",
-		"team:local:newteam85",
-		"team:local:newteam86",
-		"team:local:newteam87",
-		"team:local:newteam88",
-		"team:local:newteam89",
-		"team:local:newteam90",
-		"team:local:newteam91",
-		"team:local:newteam92",
-		"team:local:newteam93",
-		"team:local:newteam94",
-		"team:local:newteam95",
-		"team:local:newteam96",
-		"team:local:newteam97",
-		"team:local:newteam98",
-		"team:local:newteam99",
-		"team:local:newteam100",
-		"user:local:test",
-	}
 
-	jsonFile, err := os.Open("test.json")
+	jsonFile, err := os.Open("example_v2/real_world_2p1_store.json")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -494,21 +399,25 @@ func BenchmarkV2FilterAuthorizedPairsWithPolicies(b *testing.B) {
 	}
 	json.Unmarshal(byteValue, &pr)
 
-	// NOTE(tsandall): the query below does not rely on partial eval so use a
-	// separate helper to setup the store that doesn't perform partial eval.
-	require.NoError(b, s.V2p1SetPolicies2(ctx, pr.Policies, pr.Roles))
-
-	b.Run("V2FilterAuthorizedPairs with real life input", func(b *testing.B) {
-		var resp []engine.Pair
-		var err error
-		for n := 0; n < b.N; n++ {
-			resp, err = s.V2FilterAuthorizedPairs(ctx, subjects, pairs, true)
-			if err != nil {
-				b.Error(err)
-			}
-		}
-		filteredPairsResp = resp
+	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+		"policies": pr.Policies,
+		"roles":    pr.Roles,
 	})
+
+	teamCount := []int{0, 1, 10, 30, 50, 100, 150, 300}
+	for _, count := range teamCount {
+		b.Run(fmt.Sprintf("V2FilterAuthorizedPairs with real life input and %d teams", count), func(b *testing.B) {
+			var resp []engine.Pair
+			var err error
+			for n := 0; n < b.N; n++ {
+				resp, err = s.V2FilterAuthorizedPairs(ctx, append([]string{"user:local:test@example.com"}, randomTeams(count)...), pairs, true)
+				if err != nil {
+					b.Error(err)
+				}
+			}
+			filteredPairsResp = resp
+		})
+	}
 }
 
 // BenchmarkInitPartialResultV2 is initializing a partial result object using
@@ -701,7 +610,7 @@ func testPoliciesWithProjects(r int, p int) []map[string]interface{} {
 	return append(defaultPolicies(), randomPolicies(r, p)...)
 }
 
-func testSubjects(r int) []string {
+func testTeams(r int) []string {
 	sub := make([]string, r)
 	for i := 0; i < r; i++ {
 		sub[i] = fmt.Sprintf("user:local:%d", i)
