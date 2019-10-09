@@ -6,6 +6,8 @@ authz-service REQUIRED automate-pg-gateway cereal-service pg-sidecar-service
 authz-service BINDING_MODE strict
 automate-builder-api REQUIRED automate-builder-memcached automate-pg-gateway pg-sidecar-service
 automate-builder-api BINDING_MODE strict
+automate-builder-api-proxy REQUIRED automate-builder-api
+automate-builder-api-proxy BINDING_MODE strict
 automate-builder-memcached BINDING_MODE strict
 automate-cs-bookshelf REQUIRED automate-pg-gateway pg-sidecar-service
 automate-cs-bookshelf BINDING_MODE strict
@@ -26,7 +28,7 @@ automate-es-gateway REQUIRED automate-elasticsearch
 automate-es-gateway BINDING_MODE relaxed
 automate-gateway OPTIONAL authn-service authz-service compliance-service config-mgmt-service data-feed-service deployment-service event-service ingest-service license-control-service local-user-service nodemanager-service notifications-service secrets-service teams-service
 automate-gateway BINDING_MODE strict
-automate-load-balancer OPTIONAL automate-cs-nginx automate-dex automate-gateway automate-ui automate-workflow-nginx session-service
+automate-load-balancer OPTIONAL automate-builder-api-proxy automate-cs-nginx automate-dex automate-gateway automate-ui automate-workflow-nginx session-service
 automate-load-balancer BINDING_MODE relaxed
 automate-pg-gateway REQUIRED automate-postgresql
 automate-pg-gateway BINDING_MODE relaxed

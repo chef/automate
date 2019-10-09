@@ -237,6 +237,18 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
+      "name": "chef/automate-builder-memcached",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-builder-api",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-builder-api-proxy",
+      "metadata": null
+    },
+    {
       "name": "chef/automate-cs-bookshelf",
       "metadata": {
         "name": "chef/automate-cs-bookshelf",
@@ -323,14 +335,6 @@ var ProductMetadataJSON = `
     },
     {
       "name": "chef/automate-load-balancer",
-      "metadata": null
-    },
-    {
-      "name": "chef/automate-builder-memcached",
-      "metadata": null
-    },
-    {
-      "name": "chef/automate-builder-api",
       "metadata": null
     },
     {
@@ -524,7 +528,8 @@ var ProductMetadataJSON = `
       "type": "product",
       "services": [
         "chef/automate-builder-memcached",
-        "chef/automate-builder-api"
+        "chef/automate-builder-api",
+        "chef/automate-builder-api-proxy"
       ],
       "packages": null,
       "dependencies": [

@@ -38,6 +38,7 @@
     "chef/automate-workflow-nginx",
     "chef/automate-builder-memcached",
     "chef/automate-builder-api",
+    "chef/automate-builder-api-proxy",
     "chef/automate-prometheus",
     "chef/automate-cli",
     "core/rsync"
@@ -157,7 +158,8 @@
       "dependencies": ["core", "postgresql", "elasticsearch"],
       "services": [
         "chef/automate-builder-memcached",
-        "chef/automate-builder-api"
+        "chef/automate-builder-api",
+        "chef/automate-builder-api-proxy"
       ]
     },
     {

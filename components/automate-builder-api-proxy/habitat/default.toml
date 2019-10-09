@@ -1,0 +1,84 @@
+app_url                   = "https://bldr.habitat.sh"
+cookie_domain             = ""
+demo_app_url              = "https://www.habitat.sh/demo/build-system/steps/1/"
+docs_url                  = "https://www.habitat.sh/docs"
+enable_publisher_amazon   = false
+enable_publisher_azure    = false
+enable_publisher_docker   = false
+enable_builder            = false
+environment               = "production"
+hosted                    = false
+source_code_url           = "https://github.com/habitat-sh/habitat"
+status_url                = "https://status.habitat.sh/"
+tutorials_url             = "https://www.habitat.sh/learn"
+use_gravatar              = true
+www_url                   = "https://www.habitat.sh"
+# How we connect to the proxied backend API service.
+#   When true, connect to all backend API services via their IPs provided
+#   via the bind
+#   By default (load_balanced=false) we connect to a single backend on the same `sys.ip` as this service
+load_balanced             = false
+
+[analytics]
+company_id                = ""
+company_name              = ""
+enabled                   = false
+write_key                 = ""
+
+[github]
+app_id                    = 5565
+app_url                   = "https://github.com/apps/habitat-builder"
+api_url                   = "https://api.github.com"
+
+[oauth]
+authorize_url             = "https://github.com/login/oauth/authorize"
+client_id                 = ""
+provider                  = "github"
+redirect_url              = ""
+signup_url                = "https://github.com/join"
+
+[nginx]
+worker_connections        = 8000
+worker_processes          = "auto"
+worker_rlimit_nofile      = 8192
+max_body_size             = "1024m"
+proxy_send_timeout        = 300
+proxy_read_timeout        = 300
+proxy_connect_timeout     = 60
+limit_req_zone_unknown    = "$limit_unknown zone=unknown:10m rate=2r/s"
+limit_req_zone_known      = "$http_x_forwarded_for zone=known:10m rate=20r/s"
+limit_req_unknown         = "burst=20 nodelay"
+limit_req_known           = "burst=40 nodelay"
+limit_req_status          = 429
+limit_ua_known            = "hab|builder|Chef|Mozilla|Github"
+limit_ua_unknown_target   = "$http_x_forwarded_for"
+enable_caching            = false
+enable_gzip               = false
+enable_ipv6               = true
+
+[http]
+keepalive_connections     = 16
+keepalive_requests        = 128
+keepalive_timeout         = 180
+sendfile                  = "on"
+tcp_nopush                = "on"
+tcp_nodelay               = "on"
+
+[server]
+listen_port               = 80
+listen_tls_port           = 443
+listen_tls                = false
+cert_file                 = "ssl-certificate.crt"
+cert_key_file             = "ssl-certificate.key"
+ssl_protocols             = "TLSv1 TLSv1.1 TLSv1.2"
+ssl_ciphers               = "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH"
+ssl_session_cache         = "shared:SSL:10m"
+ssl_session_timeout       = "10m"
+ssl_prefer_server_ciphers = "on"
+enable_access_log         = true
+
+[service]
+host = "0.0.0.0"
+port = 10104
+
+
