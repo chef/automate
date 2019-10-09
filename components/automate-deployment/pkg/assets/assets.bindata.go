@@ -1,2 +1,1 @@
 package assets
-package assets

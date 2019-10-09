@@ -23,6 +23,7 @@ import (
 	"github.com/chef/automate/components/authz-service/prng"
 	grpc_server "github.com/chef/automate/components/authz-service/server"
 	v2 "github.com/chef/automate/components/authz-service/server/v2"
+	"github.com/chef/automate/components/authz-service/server/v2/project_purger_workflow"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	memstore_v2 "github.com/chef/automate/components/authz-service/storage/v2/memstore"
 	"github.com/chef/automate/components/authz-service/testhelpers"
@@ -444,7 +445,7 @@ func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cac
 	manager, err := cereal.NewManager(postgres.NewPostgresBackend(testDb.ConnURI))
 	require.NoError(t, err)
 	domainServices := []string{"testdomain"}
-	projectPurger, err := v2.RegisterCerealProjectPurgerWithDomainServices(manager, l, mem_v2, domainServices)
+	projectPurger, err := project_purger_workflow.RegisterCerealProjectPurgerWithDomainServices(manager, l, mem_v2, domainServices)
 	require.NoError(t, err)
 
 	err = project_purge.RegisterTaskExecutors(manager, "testdomain", &MockPurgeClient{})

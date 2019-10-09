@@ -20,6 +20,7 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
+	"github.com/chef/automate/components/authz-service/server/v2/project_purger_workflow"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/memstore"
@@ -31,7 +32,7 @@ type ProjectState struct {
 	log                  logger.Logger
 	store                storage.Storage
 	ProjectUpdateManager ProjectUpdateMgr
-	ProjectPurger        ProjectPurger
+	ProjectPurger        project_purger_workflow.ProjectPurger
 	policyRefresher      PolicyRefresher
 }
 
@@ -48,7 +49,7 @@ func NewMemstoreProjectsServer(
 	if err != nil {
 		return nil, err
 	}
-	projectPurger, err := RegisterCerealProjectPurger(projectUpdateCerealManager, l, s)
+	projectPurger, err := project_purger_workflow.RegisterCerealProjectPurger(projectUpdateCerealManager, l, s)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +72,7 @@ func NewPostgresProjectsServer(
 	if err != nil {
 		return nil, err
 	}
-	projectPurger, err := RegisterCerealProjectPurger(projectUpdateCerealManager, l, s)
+	projectPurger, err := project_purger_workflow.RegisterCerealProjectPurger(projectUpdateCerealManager, l, s)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +84,7 @@ func NewProjectsServer(
 	l logger.Logger,
 	s storage.Storage,
 	projectUpdateManager ProjectUpdateMgr,
-	projectPurger ProjectPurger,
+	projectPurger project_purger_workflow.ProjectPurger,
 	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
 
@@ -331,7 +332,6 @@ func (s *ProjectState) ListProjectsForIntrospection(
 func (s *ProjectState) DeleteProject(ctx context.Context,
 	req *api.DeleteProjectReq) (*api.DeleteProjectResp, error) {
 
-	s.log.Info("server purge: START")
 	err := s.ProjectPurger.Start(req.Id)
 	if err != nil {
 		if err == cereal.ErrWorkflowInstanceExists {

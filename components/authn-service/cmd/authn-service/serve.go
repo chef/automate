@@ -129,9 +129,9 @@ func serve(cmd *cobra.Command, args []string) error {
 	}
 
 	grpcBackend := authz.ProjectUpdateBackend(cerealConn)
+	defer grpcBackend.Close() // nolint: errcheck
 	manager, err := cereal.NewManager(grpcBackend)
 	if err != nil {
-		grpcBackend.Close() // nolint: errcheck
 		return errors.Wrap(err, "error starting project update backend")
 	}
 
@@ -151,7 +151,7 @@ func serve(cmd *cobra.Command, args []string) error {
 		return errors.Wrap(err, "failed to initialize server")
 	}
 
-	err = project_purge.RegisterTaskExecutors(manager, "tokens", serv.TokenStorage)
+	err = project_purge.RegisterTaskExecutors(manager, "authn", serv.TokenStorage)
 	if err != nil {
 		return errors.Wrap(err, "failed to register project purge task executor")
 	}

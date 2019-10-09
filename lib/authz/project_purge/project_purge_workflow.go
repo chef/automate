@@ -12,12 +12,12 @@ import (
 )
 
 const (
-	startPurgeProjectTaskName = "StartPurgeProjects"
-	maxBackoffDuration        = time.Minute
+	purgeProjectForDomain = "PurgeProjectsForDomain"
+	maxBackoffDuration    = time.Minute
 )
 
 type DomainProjectPurgeWorkflowExecutor struct {
-	startPurgeProjectTaskName string
+	purgeProjectForDomainTaskName cereal.TaskName
 }
 
 type DomainProjectPurgeWorkflowParameters struct {
@@ -31,7 +31,7 @@ type DomainProjectPurgeWorkflowPayload struct {
 func (m *DomainProjectPurgeWorkflowExecutor) OnStart(
 	w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
 
-	logrus.Info("OnStart for domain")
+	logrus.Info("OnStart for DomainProjectPurgeWorkflowExecutor")
 	params := DomainProjectPurgeWorkflowParameters{}
 	if err := w.GetParameters(&params); err != nil {
 		return w.Fail(err)
@@ -40,7 +40,7 @@ func (m *DomainProjectPurgeWorkflowExecutor) OnStart(
 	logrus.Debugf("Started DomainProjectPurgeWorkflow for %s",
 		params.ProjectID)
 	taskParams := DomainProjectPurgeTaskParams{ProjectID: params.ProjectID}
-	if err := w.EnqueueTask(m.startPurgeProjectTaskName, taskParams); err != nil {
+	if err := w.EnqueueTask(m.purgeProjectForDomainTaskName, taskParams); err != nil {
 		return w.Fail(err)
 	}
 	return w.Continue(DomainProjectPurgeWorkflowPayload{})
@@ -61,12 +61,12 @@ func (m *DomainProjectPurgeWorkflowExecutor) OnTaskComplete(
 	}
 
 	switch ev.TaskName {
-	case m.startPurgeProjectTaskName:
+	case m.purgeProjectForDomainTaskName:
 		if errToLog := ev.Result.Err(); errToLog != nil {
 			logrus.WithError(errToLog).Error("failed to purge project, retrying")
 			payload.ConsecutiveJobCheckFailures++
 			if err := w.EnqueueTask(
-				m.startPurgeProjectTaskName, DomainProjectPurgeTaskParams{ProjectID: params.ProjectID},
+				m.purgeProjectForDomainTaskName, DomainProjectPurgeTaskParams{ProjectID: params.ProjectID},
 				cereal.StartAfter(m.nextCheck(payload.ConsecutiveJobCheckFailures))); err != nil {
 				return w.Fail(err)
 			}
@@ -102,36 +102,28 @@ func (m *DomainProjectPurgeTask) Run(
 		return nil, errors.Wrap(err, "unmarshall purge project params")
 	}
 
-	err := m.startProjectTagUpdater(ctx, params.ProjectID)
+	logrus.Info("starting project purges")
+
+	err := m.purgeClient.PurgeProject(ctx, params.ProjectID)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to launch purge project client")
 	}
+
 	return nil, nil
 }
 
-func (m *DomainProjectPurgeTask) startProjectTagUpdater(ctx context.Context, projectID string) error {
-	logrus.Info("starting project purges")
-
-	err := m.purgeClient.PurgeProject(ctx, projectID)
-	if err != nil {
-		return errors.Wrap(err, "failed to launch purge project client")
-	}
-
-	return nil
-}
-
 func StartProjectPurgeTaskName(svcName string) string {
-	return fmt.Sprintf("%s/%s", svcName, startPurgeProjectTaskName)
+	return fmt.Sprintf("%s/%s", svcName, purgeProjectForDomain)
 }
 
 func NewWorkflowExecutorForDomainService(domainService string) *DomainProjectPurgeWorkflowExecutor {
 	return &DomainProjectPurgeWorkflowExecutor{
-		startPurgeProjectTaskName: StartProjectPurgeTaskName(domainService),
+		purgeProjectForDomainTaskName: cereal.NewTaskName(StartProjectPurgeTaskName(domainService)),
 	}
 }
 
 func RegisterTaskExecutors(manager *cereal.Manager, domainService string, domainPurgeClient PurgeClient) error {
-	startPurgeProjectTaskName := StartProjectPurgeTaskName(domainService)
+	purgeProjectForDomain := cereal.NewTaskName(StartProjectPurgeTaskName(domainService))
 
 	taskExecutorOpts := cereal.TaskExecutorOpts{
 		Workers: 1,
@@ -140,7 +132,7 @@ func RegisterTaskExecutors(manager *cereal.Manager, domainService string, domain
 	startPurgeProjectTask := &DomainProjectPurgeTask{
 		purgeClient: domainPurgeClient,
 	}
-	if err := manager.RegisterTaskExecutor(startPurgeProjectTaskName, startPurgeProjectTask,
+	if err := manager.RegisterTaskExecutor(purgeProjectForDomain, startPurgeProjectTask,
 		taskExecutorOpts); err != nil {
 		return err
 	}
