@@ -26,35 +26,35 @@ type exportReportHandler func([]backend.Run) error
 
 // The fields that will be displayed in a CSV and JSON download
 type displayReport struct {
-	RunID                string    `csv:"Run ID" json:"run_id"`
-	StartTime            time.Time `csv:"Start Time" json:"start_time"`
-	EndTime              time.Time `csv:"End Time" json:"end_time"`
-	UpdatedResourceCount int       `csv:"Updated Resource Count" json:"updated_resource_count"`
-	// Resources            []backend.Resource      `csv:"-" json:"resources"`
-	NodeName           string                  `csv:"Node Name" json:"name"`
-	ID                 string                  `csv:"Node ID" json:"node_id"`
-	Platform           string                  `csv:"Platform" json:"platform"`
-	Organization       string                  `csv:"Organization" json:"organization"`
-	Environment        string                  `csv:"Environment" json:"environment"`
-	Fqdn               string                  `csv:"Fqdn" json:"fqdn"`
-	ClientVersion      string                  `csv:"Client Version" json:"client_version"`
-	RunList            []string                `csv:"-" json:"run_list"`
-	Source             string                  `csv:"Source" json:"source"`
-	Status             string                  `csv:"Status" json:"status"`
-	TotalResourceCount int                     `csv:"Total Resource Count" json:"total_resource_count"`
-	Tags               []string                `csv:"-" json:"tags"`
-	ResourceNames      []string                `csv:"-" json:"resource_names"`
-	Recipes            []string                `csv:"-" json:"recipes"`
-	Cookbooks          []string                `csv:"-" json:"cookbooks"`
-	UptimeSeconds      int64                   `csv:"Uptime Seconds" json:"uptime_seconds"`
-	Roles              []string                `csv:"-" json:"roles"`
-	PolicyName         string                  `csv:"Policy Name" json:"policy_name"`
-	PolicyGroup        string                  `csv:"Policy Group" json:"policy_group"`
-	PolicyRevision     string                  `csv:"Policy Revision" json:"policy_revision"`
-	SourceFqdn         string                  `csv:"Source FQDN" json:"source_fqdn"`
-	IpAddress          string                  `csv:"IP Address" json:"ip_address"`
-	Deprecations       []backend.Deprecation   `csv:"-" json:"deprecations"`
-	ExpandedRunList    backend.ExpandedRunList `csv:"-" json:"expanded_run_list"`
+	RunID                string                  `csv:"Run ID" json:"run_id"`
+	StartTime            time.Time               `csv:"Start Time" json:"start_time"`
+	EndTime              time.Time               `csv:"End Time" json:"end_time"`
+	UpdatedResourceCount int                     `csv:"Updated Resource Count" json:"updated_resource_count"`
+	Resources            []backend.Resource      `csv:"-" json:"resources"`
+	NodeName             string                  `csv:"Node Name" json:"name"`
+	ID                   string                  `csv:"Node ID" json:"node_id"`
+	Platform             string                  `csv:"Platform" json:"platform"`
+	Organization         string                  `csv:"Organization" json:"organization"`
+	Environment          string                  `csv:"Environment" json:"environment"`
+	Fqdn                 string                  `csv:"Fqdn" json:"fqdn"`
+	ClientVersion        string                  `csv:"Client Version" json:"client_version"`
+	RunList              []string                `csv:"-" json:"run_list"`
+	Source               string                  `csv:"Source" json:"source"`
+	Status               string                  `csv:"Status" json:"status"`
+	TotalResourceCount   int                     `csv:"Total Resource Count" json:"total_resource_count"`
+	Tags                 []string                `csv:"-" json:"tags"`
+	ResourceNames        []string                `csv:"-" json:"resource_names"`
+	Recipes              []string                `csv:"-" json:"recipes"`
+	Cookbooks            []string                `csv:"-" json:"cookbooks"`
+	UptimeSeconds        int64                   `csv:"Uptime Seconds" json:"uptime_seconds"`
+	Roles                []string                `csv:"-" json:"roles"`
+	PolicyName           string                  `csv:"Policy Name" json:"policy_name"`
+	PolicyGroup          string                  `csv:"Policy Group" json:"policy_group"`
+	PolicyRevision       string                  `csv:"Policy Revision" json:"policy_revision"`
+	SourceFqdn           string                  `csv:"Source FQDN" json:"source_fqdn"`
+	IpAddress            string                  `csv:"IP Address" json:"ip_address"`
+	Deprecations         []backend.Deprecation   `csv:"-" json:"deprecations"`
+	ExpandedRunList      backend.ExpandedRunList `csv:"-" json:"expanded_run_list"`
 }
 
 // ReportExport streams a json or csv export
@@ -214,6 +214,11 @@ func runToDisplayReport(run backend.Run) displayReport {
 	for index, dep := range run.Deprecations {
 		deprecations[index] = backend.Deprecation(dep)
 	}
+
+	resources := make([]backend.Resource, len(run.Resources))
+	for index, resource := range run.Resources {
+		resources[index] = backend.Resource(resource)
+	}
 	var ip string
 
 	ipAddress := net.ParseIP(toString(run.Ipaddress))
@@ -250,5 +255,6 @@ func runToDisplayReport(run backend.Run) displayReport {
 		StartTime:            run.StartTime,
 		EndTime:              run.EndTime,
 		UpdatedResourceCount: run.UpdatedResourceCount,
+		Resources:            resources,
 	}
 }
