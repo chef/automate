@@ -363,8 +363,12 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     const updateInput = this.expressionForm.get(inputName);
 
     if (active) {
-      updateInput.setValidators([Validators.required,
-                                 Validators.pattern(Regex.patterns.NON_BLANK)]);
+      return inputName === 'name'
+              ? updateInput.setValidators([Validators.required,
+                                      Validators.pattern(Regex.patterns.NON_BLANK),
+                                      Validators.pattern(Regex.patterns.NO_MIXED_WILDCARD)])
+              : updateInput.setValidators([Validators.required,
+                                      Validators.pattern(Regex.patterns.NON_BLANK)]);
     } else {
       updateInput.clearValidators();
     }
