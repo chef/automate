@@ -53,7 +53,7 @@ This includes the following:
 ## Policy Conversion
 
 Now that you are up-and-running with v2 policies, as the first step we recommend that you reconstitute your v1 policies as v2 policies.
-Once that is done, then delete the old legacy v1 policies and you will have a clean, up-to-date system.
+Once that is done, delete the old legacy v1 policies and you will have a clean, up-to-date system.
 
 Alternately, you can run `--skip-policy-migration` on upgrade to start without any policies at all. You will still need to create new v2 policies to preserve any IAM behavior from v1.
 
