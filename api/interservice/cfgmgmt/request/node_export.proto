@@ -3,6 +3,7 @@ syntax = "proto3";
 package chef.automate.domain.cfgmgmt.request;
 option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/request";
 
+import "google/protobuf/timestamp.proto";
 import "api/interservice/cfgmgmt/request/parameters.proto";
 
 message NodeExport {
@@ -12,8 +13,10 @@ message NodeExport {
 }
 
 message ReportExport {
-  repeated string filter  = 1;
-  Sorting sorting         = 2;
-  string output_type      = 3;
-  string node_id          = 4;
+  repeated string filter                = 1;
+  Sorting sorting                       = 2;
+  string output_type                    = 3;
+  string node_id                        = 4;
+  google.protobuf.Timestamp start       = 5;
+  google.protobuf.Timestamp end         = 6;
 }

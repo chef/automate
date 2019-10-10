@@ -86,9 +86,18 @@ func getReportExportHandler(outputType string, stream service.CfgMgmt_ReportExpo
 
 func (s *CfgMgmtServer) exportReports(ctx context.Context, request *pRequest.ReportExport,
 	sendResult exportReportHandler) error {
+	// Date Range
+	start, err := ToTime(request.Start)
+	if err != nil {
+		return status.Errorf(codes.InvalidArgument, err.Error())
+	}
+
+	end, err := ToTime(request.End)
+	if err != nil {
+		return status.Errorf(codes.InvalidArgument, err.Error())
+	}
+
 	pageSize := 100
-	start := time.Time{}
-	end := time.Time{}
 	var cursorEndTime time.Time
 	cursorID := ""
 	sortAsc := false
