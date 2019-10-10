@@ -15,7 +15,9 @@ export class Regex {
     // Only allowed wildcard alone or words and numbers, but not combined
     // Legal Values: *, chef, _state, etc.
     // Illegal Values: abc*, *chef, c*h*e*f, **
-    NO_MIXED_WILDCARD: '\\*[A-Za-z0-9* ]|[A-Za-z0-9* ]\\*'
+    // NO_MIXED_WILDCARD: '\\*[A-Za-z0-9* ]|[A-Za-z0-9* ]\\*'
+    // NO_MIXED_WILDCARD: '^\\*|[A-Za-z0-9]+$'
+    NO_MIXED_WILDCARD: '^(\\*|\\w+)$'
   };
 
 }

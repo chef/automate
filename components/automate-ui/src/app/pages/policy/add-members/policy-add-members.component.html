@@ -61,7 +61,7 @@
                 *ngIf="showInputs('name')"
                 [@dropInAnimation]="{ value: triggerValue, params: { height: 119.427 }}">
                 <label>
-                  <span class="label">Name<span aria-hidden="true">*</span></span>
+                  <span class="label">{{ nameOrId }}<span aria-hidden="true">*</span></span>
                   <chef-input id="expression-name-dropdown" 
                               ngDefaultControl 
                               (keyup)="displayExpressionOutput()"
@@ -90,7 +90,7 @@
             <chef-button primary 
                         [disabled]="!expressionForm.valid" 
                         (click)="validateAndAddExpression()">Add Expression</chef-button>
-            <chef-button secondary (click)="closeModal()">Cancel</chef-button>
+            <chef-button tertiary (click)="closeModal()">Cancel</chef-button>
           </div>
         </div>
       </chef-modal>

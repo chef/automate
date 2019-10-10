@@ -85,6 +85,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   public expressionForm: FormGroup;
   public expressionOutput: string;
   public allIdentity: string;
+  public nameOrId: string;
 
 
   constructor(
@@ -332,10 +333,11 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     const typeValue = this.expressionForm.get('type').value;
     const identityValue = this.expressionForm.get('identity').value;
 
+    this.setFormLabels(typeValue);
+
     switch (inputName) {
       case 'identity':
         if (typeValue === 'user' || typeValue === 'team') {
-            this.allIdentity = typeValue;
             this.updateValidations(inputName, true);
             return true;
           } else {
@@ -356,6 +358,15 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
         break;
       default:
         return false;
+    }
+  }
+
+  private setFormLabels(typeValue: string): void {
+    if (typeValue === 'token') {
+      this.nameOrId = 'ID';
+    } else {
+      this.allIdentity = typeValue;
+      this.nameOrId = 'Name';
     }
   }
 
