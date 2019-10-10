@@ -106,6 +106,8 @@ func (s *CfgMgmtServer) exportReports(ctx context.Context, request *pRequest.Rep
 		return status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
+	log.Infof("runFilters: %v", runFilters)
+
 	runFilters, err = filterByProjects(ctx, runFilters)
 	if err != nil {
 		return err
