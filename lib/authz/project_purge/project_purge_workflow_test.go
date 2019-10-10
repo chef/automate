@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/cerealtest"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -13,7 +14,7 @@ import (
 const (
 	svcName       = "testSvc"
 	testProjectID = "testproject"
-	startTaskName = "testSvc/StartPurgeProjects"
+	startTaskName = "testSvc/PurgeProjectsForDomain"
 )
 
 func TestWorkflowOnTaskComplete(t *testing.T) {
@@ -30,7 +31,7 @@ func TestWorkflowOnTaskComplete(t *testing.T) {
 			WithPayload(curPayload)
 
 		tr := cerealtest.NewTaskResult(t)
-		ev := cerealtest.NewTaskCompleteEvent(startTaskName, tr)
+		ev := cerealtest.NewTaskCompleteEvent(cereal.NewTaskName(startTaskName), tr)
 		executor.OnTaskComplete(instance, ev)
 		instance.AssertComplete()
 	})
@@ -45,9 +46,9 @@ func TestWorkflowOnTaskComplete(t *testing.T) {
 			WithPayload(curPayload)
 
 		tr := cerealtest.NewTaskResult(t).WithError(failureErr)
-		ev := cerealtest.NewTaskCompleteEvent(startTaskName, tr)
+		ev := cerealtest.NewTaskCompleteEvent(cereal.NewTaskName(startTaskName), tr)
 		executor.OnTaskComplete(instance, ev)
-		assertEnqueued := instance.AssertContinuing().AssertTaskEnqueued(startTaskName)
+		assertEnqueued := instance.AssertContinuing().AssertTaskEnqueued(cereal.NewTaskName(startTaskName))
 		assertEnqueued.AssertCount(1)
 		params := DomainProjectPurgeWorkflowParameters{}
 		assertEnqueued.Tasks[0].GetParameters(&params)
@@ -65,9 +66,9 @@ func TestWorkflowOnTaskComplete(t *testing.T) {
 			WithPayload(curPayload)
 
 		tr := cerealtest.NewTaskResult(t).WithError(failureErr)
-		ev := cerealtest.NewTaskCompleteEvent(startTaskName, tr)
+		ev := cerealtest.NewTaskCompleteEvent(cereal.NewTaskName(startTaskName), tr)
 		executor.OnTaskComplete(instance, ev)
-		assertEnqueued := instance.AssertContinuing().AssertTaskEnqueued(startTaskName)
+		assertEnqueued := instance.AssertContinuing().AssertTaskEnqueued(cereal.NewTaskName(startTaskName))
 		assertEnqueued.AssertCount(1)
 		params := DomainProjectPurgeWorkflowParameters{}
 		assertEnqueued.Tasks[0].GetParameters(&params)
