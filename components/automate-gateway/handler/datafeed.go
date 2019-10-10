@@ -21,9 +21,9 @@ func NewDatafeedHandler(datafeedClient data_feed.DatafeedServiceClient) *Datafee
 }
 
 // Create - create a new destination
-func (a *Datafeed) AddDestination(ctx context.Context, in *data_feed.Destination) (*data_feed.DestinationResponse, error) {
-	inDomain := &data_feed.Destination{}
-	out := &data_feed.DestinationResponse{}
+func (a *Datafeed) AddDestination(ctx context.Context, in *data_feed.AddDestinationRequest) (*data_feed.AddDestinationResponse, error) {
+	inDomain := &data_feed.AddDestinationRequest{}
+	out := &data_feed.AddDestinationResponse{}
 	f := func() (proto.Message, error) {
 		return a.client.AddDestination(ctx, inDomain)
 	}
@@ -34,9 +34,9 @@ func (a *Datafeed) AddDestination(ctx context.Context, in *data_feed.Destination
 	return out, nil
 }
 
-func (a *Datafeed) TestDestination(ctx context.Context, in *data_feed.URLValidationRequest) (*data_feed.DestinationResponse, error) {
+func (a *Datafeed) TestDestination(ctx context.Context, in *data_feed.URLValidationRequest) (*data_feed.TestDestinationResponse, error) {
 	inDomain := &data_feed.URLValidationRequest{}
-	out := &data_feed.DestinationResponse{}
+	out := &data_feed.TestDestinationResponse{}
 	f := func() (proto.Message, error) {
 		return a.client.TestDestination(ctx, inDomain)
 	}
@@ -48,9 +48,9 @@ func (a *Datafeed) TestDestination(ctx context.Context, in *data_feed.URLValidat
 }
 
 // GetDestination - get the destination information for one destination.
-func (a *Datafeed) GetDestination(ctx context.Context, in *data_feed.DestinationId) (*data_feed.Destination, error) {
-	inDomain := &data_feed.DestinationId{}
-	out := &data_feed.Destination{}
+func (a *Datafeed) GetDestination(ctx context.Context, in *data_feed.GetDestinationRequest) (*data_feed.GetDestinationResponse, error) {
+	inDomain := &data_feed.GetDestinationRequest{}
+	out := &data_feed.GetDestinationResponse{}
 	f := func() (proto.Message, error) {
 		return a.client.GetDestination(ctx, inDomain)
 	}
@@ -62,9 +62,9 @@ func (a *Datafeed) GetDestination(ctx context.Context, in *data_feed.Destination
 }
 
 // Update - update an existing destination
-func (a *Datafeed) UpdateDestination(ctx context.Context, in *data_feed.Destination) (*data_feed.DestinationResponse, error) {
-	inDomain := &data_feed.Destination{}
-	out := &data_feed.DestinationResponse{}
+func (a *Datafeed) UpdateDestination(ctx context.Context, in *data_feed.UpdateDestinationRequest) (*data_feed.UpdateDestinationResponse, error) {
+	inDomain := &data_feed.UpdateDestinationRequest{}
+	out := &data_feed.UpdateDestinationResponse{}
 	f := func() (proto.Message, error) {
 		return a.client.UpdateDestination(ctx, inDomain)
 	}
@@ -76,9 +76,9 @@ func (a *Datafeed) UpdateDestination(ctx context.Context, in *data_feed.Destinat
 }
 
 // Delete - delete an existing destination
-func (a *Datafeed) DeleteDestination(ctx context.Context, in *data_feed.DestinationId) (*data_feed.DestinationResponse, error) {
-	inDomain := &data_feed.DestinationId{}
-	out := &data_feed.DestinationResponse{}
+func (a *Datafeed) DeleteDestination(ctx context.Context, in *data_feed.DeleteDestinationRequest) (*data_feed.DeleteDestinationResponse, error) {
+	inDomain := &data_feed.DeleteDestinationRequest{}
+	out := &data_feed.DeleteDestinationResponse{}
 	f := func() (proto.Message, error) {
 		return a.client.DeleteDestination(ctx, inDomain)
 	}
@@ -90,8 +90,8 @@ func (a *Datafeed) DeleteDestination(ctx context.Context, in *data_feed.Destinat
 }
 
 // List - List the stored destinations
-func (a *Datafeed) ListDestinations(ctx context.Context, in *data_feed.Empty) (*data_feed.ListDestinationResponse, error) {
-	inDomain := &data_feed.Empty{}
+func (a *Datafeed) ListDestinations(ctx context.Context, in *data_feed.ListDestinationRequest) (*data_feed.ListDestinationResponse, error) {
+	inDomain := &data_feed.ListDestinationRequest{}
 	out := &data_feed.ListDestinationResponse{}
 	f := func() (proto.Message, error) {
 		return a.client.ListDestinations(ctx, inDomain)

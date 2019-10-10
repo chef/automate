@@ -44,9 +44,9 @@ func NewDatafeedServer(db *dao.DB, config *config.DataFeedConfig, connFactory *s
 }
 
 // Add a new destination
-func (datafeedServer *DatafeedServer) AddDestination(ctx context.Context, destination *datafeed.Destination) (*datafeed.DestinationResponse, error) {
+func (datafeedServer *DatafeedServer) AddDestination(ctx context.Context, destination *datafeed.AddDestinationRequest) (*datafeed.AddDestinationResponse, error) {
 	log.Infof("AddDestination %s", destination)
-	response := &datafeed.DestinationResponse{Success: false}
+	response := &datafeed.AddDestinationResponse{Success: false}
 	success, err := datafeedServer.db.AddDestination(destination)
 	response.Success = success
 	if err != nil {
@@ -56,9 +56,9 @@ func (datafeedServer *DatafeedServer) AddDestination(ctx context.Context, destin
 	return response, nil
 }
 
-func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, request *datafeed.URLValidationRequest) (*datafeed.DestinationResponse, error) {
+func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, request *datafeed.URLValidationRequest) (*datafeed.TestDestinationResponse, error) {
 	log.Infof("TestDestination %s", request)
-	response := &datafeed.DestinationResponse{Success: false}
+	response := &datafeed.TestDestinationResponse{Success: false}
 	// http client to endpoint {text: "TEST: Successful validation completed by Automate"}
 	// if it's secret - get the credentials
 	// otherwise use passwd
@@ -117,7 +117,7 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 	} else {
 		log.Infof("Test data posted to %v, Status %v", url, httpResponse.Status)
 	}
-	if httpResponse.StatusCode != http.StatusCreated {
+	if httpResponse.StatusCode != http.StatusOK {
 		return response, errors.New(httpResponse.Status)
 	} else {
 		response.Success = true
@@ -131,9 +131,9 @@ func (datafeedServer *DatafeedServer) TestDestination(ctx context.Context, reque
 	return response, nil
 }
 
-func (datafeedServer *DatafeedServer) DeleteDestination(ctx context.Context, destination *datafeed.DestinationId) (*datafeed.DestinationResponse, error) {
+func (datafeedServer *DatafeedServer) DeleteDestination(ctx context.Context, destination *datafeed.DeleteDestinationRequest) (*datafeed.DeleteDestinationResponse, error) {
 	log.Infof("DeleteDestination %s", destination)
-	response := &datafeed.DestinationResponse{Success: false}
+	response := &datafeed.DeleteDestinationResponse{Success: false}
 	success, err := datafeedServer.db.DeleteDestination(destination)
 	response.Success = success
 	if err != nil {
@@ -143,7 +143,7 @@ func (datafeedServer *DatafeedServer) DeleteDestination(ctx context.Context, des
 	return response, nil
 }
 
-func (datafeedServer *DatafeedServer) GetDestination(ctx context.Context, destination *datafeed.DestinationId) (*datafeed.Destination, error) {
+func (datafeedServer *DatafeedServer) GetDestination(ctx context.Context, destination *datafeed.GetDestinationRequest) (*datafeed.GetDestinationResponse, error) {
 	log.Infof("GetDestination %s", destination)
 	response, err := datafeedServer.db.GetDestination(destination)
 	if err != nil {
@@ -153,7 +153,7 @@ func (datafeedServer *DatafeedServer) GetDestination(ctx context.Context, destin
 	return response, err
 }
 
-func (datafeedServer *DatafeedServer) ListDestinations(ctx context.Context, destination *datafeed.Empty) (*datafeed.ListDestinationResponse, error) {
+func (datafeedServer *DatafeedServer) ListDestinations(ctx context.Context, destination *datafeed.ListDestinationRequest) (*datafeed.ListDestinationResponse, error) {
 	log.Infof("ListDestinations %s", destination)
 
 	response, err := datafeedServer.db.ListDestinations()
@@ -165,9 +165,9 @@ func (datafeedServer *DatafeedServer) ListDestinations(ctx context.Context, dest
 	return response, err
 }
 
-func (datafeedServer *DatafeedServer) UpdateDestination(ctx context.Context, destination *datafeed.Destination) (*datafeed.DestinationResponse, error) {
+func (datafeedServer *DatafeedServer) UpdateDestination(ctx context.Context, destination *datafeed.UpdateDestinationRequest) (*datafeed.UpdateDestinationResponse, error) {
 	log.Infof("UpdateDestination %s", destination)
-	response := &datafeed.DestinationResponse{Success: false}
+	response := &datafeed.UpdateDestinationResponse{Success: false}
 	success, err := datafeedServer.db.UpdateDestination(destination)
 	response.Success = success
 	if err != nil {

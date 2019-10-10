@@ -29,7 +29,7 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 
 func request_DatafeedService_AddDestination_0(ctx context.Context, marshaler runtime.Marshaler, client DatafeedServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq Destination
+	var protoReq AddDestinationRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -46,7 +46,7 @@ func request_DatafeedService_AddDestination_0(ctx context.Context, marshaler run
 }
 
 func local_request_DatafeedService_AddDestination_0(ctx context.Context, marshaler runtime.Marshaler, server DatafeedServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq Destination
+	var protoReq AddDestinationRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -63,7 +63,7 @@ func local_request_DatafeedService_AddDestination_0(ctx context.Context, marshal
 }
 
 func request_DatafeedService_GetDestination_0(ctx context.Context, marshaler runtime.Marshaler, client DatafeedServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq DestinationId
+	var protoReq GetDestinationRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -90,7 +90,7 @@ func request_DatafeedService_GetDestination_0(ctx context.Context, marshaler run
 }
 
 func local_request_DatafeedService_GetDestination_0(ctx context.Context, marshaler runtime.Marshaler, server DatafeedServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq DestinationId
+	var protoReq GetDestinationRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -117,7 +117,7 @@ func local_request_DatafeedService_GetDestination_0(ctx context.Context, marshal
 }
 
 func request_DatafeedService_DeleteDestination_0(ctx context.Context, marshaler runtime.Marshaler, client DatafeedServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq DestinationId
+	var protoReq DeleteDestinationRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -144,7 +144,7 @@ func request_DatafeedService_DeleteDestination_0(ctx context.Context, marshaler 
 }
 
 func local_request_DatafeedService_DeleteDestination_0(ctx context.Context, marshaler runtime.Marshaler, server DatafeedServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq DestinationId
+	var protoReq DeleteDestinationRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -171,7 +171,7 @@ func local_request_DatafeedService_DeleteDestination_0(ctx context.Context, mars
 }
 
 func request_DatafeedService_UpdateDestination_0(ctx context.Context, marshaler runtime.Marshaler, client DatafeedServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq Destination
+	var protoReq UpdateDestinationRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -206,7 +206,7 @@ func request_DatafeedService_UpdateDestination_0(ctx context.Context, marshaler 
 }
 
 func local_request_DatafeedService_UpdateDestination_0(ctx context.Context, marshaler runtime.Marshaler, server DatafeedServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq Destination
+	var protoReq UpdateDestinationRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -241,7 +241,7 @@ func local_request_DatafeedService_UpdateDestination_0(ctx context.Context, mars
 }
 
 func request_DatafeedService_ListDestinations_0(ctx context.Context, marshaler runtime.Marshaler, client DatafeedServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq Empty
+	var protoReq ListDestinationRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -258,7 +258,7 @@ func request_DatafeedService_ListDestinations_0(ctx context.Context, marshaler r
 }
 
 func local_request_DatafeedService_ListDestinations_0(ctx context.Context, marshaler runtime.Marshaler, server DatafeedServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq Empty
+	var protoReq ListDestinationRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)

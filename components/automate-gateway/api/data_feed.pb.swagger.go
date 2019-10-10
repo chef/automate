@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/datafeedDestinationResponse"
+              "$ref": "#/definitions/datafeedAddDestinationResponse"
             }
           }
         },
@@ -35,7 +35,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/datafeedDestination"
+              "$ref": "#/definitions/datafeedAddDestinationRequest"
             }
           }
         ],
@@ -51,7 +51,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/datafeedDestination"
+              "$ref": "#/definitions/datafeedGetDestinationResponse"
             }
           }
         },
@@ -74,7 +74,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/datafeedDestinationResponse"
+              "$ref": "#/definitions/datafeedDeleteDestinationResponse"
             }
           }
         },
@@ -97,7 +97,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/datafeedDestinationResponse"
+              "$ref": "#/definitions/datafeedUpdateDestinationResponse"
             }
           }
         },
@@ -114,7 +114,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/datafeedDestination"
+              "$ref": "#/definitions/datafeedUpdateDestinationRequest"
             }
           }
         ],
@@ -140,7 +140,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/datafeedEmpty"
+              "$ref": "#/definitions/datafeedListDestinationRequest"
             }
           }
         ],
@@ -156,7 +156,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/datafeedDestinationResponse"
+              "$ref": "#/definitions/datafeedTestDestinationResponse"
             }
           }
         },
@@ -177,7 +177,7 @@ func init() {
     }
   },
   "definitions": {
-    "datafeedDestination": {
+    "datafeedAddDestinationRequest": {
       "type": "object",
       "properties": {
         "id": {
@@ -195,7 +195,7 @@ func init() {
         }
       }
     },
-    "datafeedDestinationResponse": {
+    "datafeedAddDestinationResponse": {
       "type": "object",
       "properties": {
         "success": {
@@ -204,7 +204,38 @@ func init() {
         }
       }
     },
-    "datafeedEmpty": {
+    "datafeedDeleteDestinationResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "datafeedGetDestinationResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "secret": {
+          "type": "string"
+        }
+      }
+    },
+    "datafeedListDestinationRequest": {
       "type": "object"
     },
     "datafeedListDestinationResponse": {
@@ -213,7 +244,7 @@ func init() {
         "destinations": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/datafeedDestination"
+            "$ref": "#/definitions/datafeedGetDestinationResponse"
           }
         }
       }
@@ -223,6 +254,15 @@ func init() {
       "properties": {
         "id": {
           "type": "string"
+        }
+      }
+    },
+    "datafeedTestDestinationResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },
@@ -237,9 +277,33 @@ func init() {
         },
         "secret_id": {
           "$ref": "#/definitions/datafeedSecretId"
+        }
+      }
+    },
+    "datafeedUpdateDestinationRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "int64"
         },
-        "none": {
-          "$ref": "#/definitions/datafeedEmpty"
+        "name": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "secret": {
+          "type": "string"
+        }
+      }
+    },
+    "datafeedUpdateDestinationResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "format": "boolean"
         }
       }
     },

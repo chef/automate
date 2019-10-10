@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Destination } from 'app/pages/data-feed/destination';
 import { DatafeedService } from 'app/services/data-feed/data-feed.service';
 
@@ -34,7 +34,7 @@ type Modal = 'save' | 'url';
   templateUrl: './data-feed-form.component.html',
   styleUrls: ['./data-feed-form.component.scss']
 })
-export class DatafeedFormComponent implements OnInit {
+export class DatafeedFormComponent {
   model: Model;
   urlState = UrlTestState; // expose enum to template
   saveState = SaveState; // expose enum to template
@@ -67,11 +67,6 @@ export class DatafeedFormComponent implements OnInit {
         });
     }
   }
-
-  ngOnInit() {
-
-  }
-
 
   private revealSaveStatus(status: SaveState) {
     this.saveStatus = status;

@@ -27,38 +27,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-type Empty struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *Empty) Reset()         { *m = Empty{} }
-func (m *Empty) String() string { return proto.CompactTextString(m) }
-func (*Empty) ProtoMessage()    {}
-func (*Empty) Descriptor() ([]byte, []int) {
-	return fileDescriptor_dfa5074251be5580, []int{0}
-}
-
-func (m *Empty) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Empty.Unmarshal(m, b)
-}
-func (m *Empty) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Empty.Marshal(b, m, deterministic)
-}
-func (m *Empty) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Empty.Merge(m, src)
-}
-func (m *Empty) XXX_Size() int {
-	return xxx_messageInfo_Empty.Size(m)
-}
-func (m *Empty) XXX_DiscardUnknown() {
-	xxx_messageInfo_Empty.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Empty proto.InternalMessageInfo
-
-type Destination struct {
+type AddDestinationRequest struct {
 	Id                   int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Url                  string   `protobuf:"bytes,3,opt,name=url,proto3" json:"url,omitempty"`
@@ -68,149 +37,431 @@ type Destination struct {
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *Destination) Reset()         { *m = Destination{} }
-func (m *Destination) String() string { return proto.CompactTextString(m) }
-func (*Destination) ProtoMessage()    {}
-func (*Destination) Descriptor() ([]byte, []int) {
-	return fileDescriptor_dfa5074251be5580, []int{1}
+func (m *AddDestinationRequest) Reset()         { *m = AddDestinationRequest{} }
+func (m *AddDestinationRequest) String() string { return proto.CompactTextString(m) }
+func (*AddDestinationRequest) ProtoMessage()    {}
+func (*AddDestinationRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_dfa5074251be5580, []int{0}
 }
 
-func (m *Destination) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Destination.Unmarshal(m, b)
+func (m *AddDestinationRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AddDestinationRequest.Unmarshal(m, b)
 }
-func (m *Destination) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Destination.Marshal(b, m, deterministic)
+func (m *AddDestinationRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AddDestinationRequest.Marshal(b, m, deterministic)
 }
-func (m *Destination) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Destination.Merge(m, src)
+func (m *AddDestinationRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddDestinationRequest.Merge(m, src)
 }
-func (m *Destination) XXX_Size() int {
-	return xxx_messageInfo_Destination.Size(m)
+func (m *AddDestinationRequest) XXX_Size() int {
+	return xxx_messageInfo_AddDestinationRequest.Size(m)
 }
-func (m *Destination) XXX_DiscardUnknown() {
-	xxx_messageInfo_Destination.DiscardUnknown(m)
+func (m *AddDestinationRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_AddDestinationRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Destination proto.InternalMessageInfo
+var xxx_messageInfo_AddDestinationRequest proto.InternalMessageInfo
 
-func (m *Destination) GetId() int64 {
+func (m *AddDestinationRequest) GetId() int64 {
 	if m != nil {
 		return m.Id
 	}
 	return 0
 }
 
-func (m *Destination) GetName() string {
+func (m *AddDestinationRequest) GetName() string {
 	if m != nil {
 		return m.Name
 	}
 	return ""
 }
 
-func (m *Destination) GetUrl() string {
+func (m *AddDestinationRequest) GetUrl() string {
 	if m != nil {
 		return m.Url
 	}
 	return ""
 }
 
-func (m *Destination) GetSecret() string {
+func (m *AddDestinationRequest) GetSecret() string {
 	if m != nil {
 		return m.Secret
 	}
 	return ""
 }
 
-type DestinationResponse struct {
+type AddDestinationResponse struct {
 	Success              bool     `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *DestinationResponse) Reset()         { *m = DestinationResponse{} }
-func (m *DestinationResponse) String() string { return proto.CompactTextString(m) }
-func (*DestinationResponse) ProtoMessage()    {}
-func (*DestinationResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_dfa5074251be5580, []int{2}
+func (m *AddDestinationResponse) Reset()         { *m = AddDestinationResponse{} }
+func (m *AddDestinationResponse) String() string { return proto.CompactTextString(m) }
+func (*AddDestinationResponse) ProtoMessage()    {}
+func (*AddDestinationResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_dfa5074251be5580, []int{1}
 }
 
-func (m *DestinationResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_DestinationResponse.Unmarshal(m, b)
+func (m *AddDestinationResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AddDestinationResponse.Unmarshal(m, b)
 }
-func (m *DestinationResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_DestinationResponse.Marshal(b, m, deterministic)
+func (m *AddDestinationResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AddDestinationResponse.Marshal(b, m, deterministic)
 }
-func (m *DestinationResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DestinationResponse.Merge(m, src)
+func (m *AddDestinationResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddDestinationResponse.Merge(m, src)
 }
-func (m *DestinationResponse) XXX_Size() int {
-	return xxx_messageInfo_DestinationResponse.Size(m)
+func (m *AddDestinationResponse) XXX_Size() int {
+	return xxx_messageInfo_AddDestinationResponse.Size(m)
 }
-func (m *DestinationResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_DestinationResponse.DiscardUnknown(m)
+func (m *AddDestinationResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_AddDestinationResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_DestinationResponse proto.InternalMessageInfo
+var xxx_messageInfo_AddDestinationResponse proto.InternalMessageInfo
 
-func (m *DestinationResponse) GetSuccess() bool {
+func (m *AddDestinationResponse) GetSuccess() bool {
 	if m != nil {
 		return m.Success
 	}
 	return false
 }
 
-type DestinationId struct {
+type GetDestinationRequest struct {
 	Id                   int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *DestinationId) Reset()         { *m = DestinationId{} }
-func (m *DestinationId) String() string { return proto.CompactTextString(m) }
-func (*DestinationId) ProtoMessage()    {}
-func (*DestinationId) Descriptor() ([]byte, []int) {
-	return fileDescriptor_dfa5074251be5580, []int{3}
+func (m *GetDestinationRequest) Reset()         { *m = GetDestinationRequest{} }
+func (m *GetDestinationRequest) String() string { return proto.CompactTextString(m) }
+func (*GetDestinationRequest) ProtoMessage()    {}
+func (*GetDestinationRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_dfa5074251be5580, []int{2}
 }
 
-func (m *DestinationId) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_DestinationId.Unmarshal(m, b)
+func (m *GetDestinationRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetDestinationRequest.Unmarshal(m, b)
 }
-func (m *DestinationId) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_DestinationId.Marshal(b, m, deterministic)
+func (m *GetDestinationRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetDestinationRequest.Marshal(b, m, deterministic)
 }
-func (m *DestinationId) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DestinationId.Merge(m, src)
+func (m *GetDestinationRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetDestinationRequest.Merge(m, src)
 }
-func (m *DestinationId) XXX_Size() int {
-	return xxx_messageInfo_DestinationId.Size(m)
+func (m *GetDestinationRequest) XXX_Size() int {
+	return xxx_messageInfo_GetDestinationRequest.Size(m)
 }
-func (m *DestinationId) XXX_DiscardUnknown() {
-	xxx_messageInfo_DestinationId.DiscardUnknown(m)
+func (m *GetDestinationRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetDestinationRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_DestinationId proto.InternalMessageInfo
+var xxx_messageInfo_GetDestinationRequest proto.InternalMessageInfo
 
-func (m *DestinationId) GetId() int64 {
+func (m *GetDestinationRequest) GetId() int64 {
 	if m != nil {
 		return m.Id
 	}
 	return 0
 }
 
+type GetDestinationResponse struct {
+	Success              bool     `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Id                   int64    `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
+	Name                 string   `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Url                  string   `protobuf:"bytes,4,opt,name=url,proto3" json:"url,omitempty"`
+	Secret               string   `protobuf:"bytes,5,opt,name=secret,proto3" json:"secret,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetDestinationResponse) Reset()         { *m = GetDestinationResponse{} }
+func (m *GetDestinationResponse) String() string { return proto.CompactTextString(m) }
+func (*GetDestinationResponse) ProtoMessage()    {}
+func (*GetDestinationResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_dfa5074251be5580, []int{3}
+}
+
+func (m *GetDestinationResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetDestinationResponse.Unmarshal(m, b)
+}
+func (m *GetDestinationResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetDestinationResponse.Marshal(b, m, deterministic)
+}
+func (m *GetDestinationResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetDestinationResponse.Merge(m, src)
+}
+func (m *GetDestinationResponse) XXX_Size() int {
+	return xxx_messageInfo_GetDestinationResponse.Size(m)
+}
+func (m *GetDestinationResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetDestinationResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetDestinationResponse proto.InternalMessageInfo
+
+func (m *GetDestinationResponse) GetSuccess() bool {
+	if m != nil {
+		return m.Success
+	}
+	return false
+}
+
+func (m *GetDestinationResponse) GetId() int64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *GetDestinationResponse) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *GetDestinationResponse) GetUrl() string {
+	if m != nil {
+		return m.Url
+	}
+	return ""
+}
+
+func (m *GetDestinationResponse) GetSecret() string {
+	if m != nil {
+		return m.Secret
+	}
+	return ""
+}
+
+type DeleteDestinationRequest struct {
+	Id                   int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DeleteDestinationRequest) Reset()         { *m = DeleteDestinationRequest{} }
+func (m *DeleteDestinationRequest) String() string { return proto.CompactTextString(m) }
+func (*DeleteDestinationRequest) ProtoMessage()    {}
+func (*DeleteDestinationRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_dfa5074251be5580, []int{4}
+}
+
+func (m *DeleteDestinationRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeleteDestinationRequest.Unmarshal(m, b)
+}
+func (m *DeleteDestinationRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeleteDestinationRequest.Marshal(b, m, deterministic)
+}
+func (m *DeleteDestinationRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteDestinationRequest.Merge(m, src)
+}
+func (m *DeleteDestinationRequest) XXX_Size() int {
+	return xxx_messageInfo_DeleteDestinationRequest.Size(m)
+}
+func (m *DeleteDestinationRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteDestinationRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteDestinationRequest proto.InternalMessageInfo
+
+func (m *DeleteDestinationRequest) GetId() int64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+type DeleteDestinationResponse struct {
+	Success              bool     `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DeleteDestinationResponse) Reset()         { *m = DeleteDestinationResponse{} }
+func (m *DeleteDestinationResponse) String() string { return proto.CompactTextString(m) }
+func (*DeleteDestinationResponse) ProtoMessage()    {}
+func (*DeleteDestinationResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_dfa5074251be5580, []int{5}
+}
+
+func (m *DeleteDestinationResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeleteDestinationResponse.Unmarshal(m, b)
+}
+func (m *DeleteDestinationResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeleteDestinationResponse.Marshal(b, m, deterministic)
+}
+func (m *DeleteDestinationResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteDestinationResponse.Merge(m, src)
+}
+func (m *DeleteDestinationResponse) XXX_Size() int {
+	return xxx_messageInfo_DeleteDestinationResponse.Size(m)
+}
+func (m *DeleteDestinationResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteDestinationResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteDestinationResponse proto.InternalMessageInfo
+
+func (m *DeleteDestinationResponse) GetSuccess() bool {
+	if m != nil {
+		return m.Success
+	}
+	return false
+}
+
+type UpdateDestinationRequest struct {
+	Id                   int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Url                  string   `protobuf:"bytes,3,opt,name=url,proto3" json:"url,omitempty"`
+	Secret               string   `protobuf:"bytes,4,opt,name=secret,proto3" json:"secret,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *UpdateDestinationRequest) Reset()         { *m = UpdateDestinationRequest{} }
+func (m *UpdateDestinationRequest) String() string { return proto.CompactTextString(m) }
+func (*UpdateDestinationRequest) ProtoMessage()    {}
+func (*UpdateDestinationRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_dfa5074251be5580, []int{6}
+}
+
+func (m *UpdateDestinationRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UpdateDestinationRequest.Unmarshal(m, b)
+}
+func (m *UpdateDestinationRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UpdateDestinationRequest.Marshal(b, m, deterministic)
+}
+func (m *UpdateDestinationRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpdateDestinationRequest.Merge(m, src)
+}
+func (m *UpdateDestinationRequest) XXX_Size() int {
+	return xxx_messageInfo_UpdateDestinationRequest.Size(m)
+}
+func (m *UpdateDestinationRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpdateDestinationRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UpdateDestinationRequest proto.InternalMessageInfo
+
+func (m *UpdateDestinationRequest) GetId() int64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *UpdateDestinationRequest) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *UpdateDestinationRequest) GetUrl() string {
+	if m != nil {
+		return m.Url
+	}
+	return ""
+}
+
+func (m *UpdateDestinationRequest) GetSecret() string {
+	if m != nil {
+		return m.Secret
+	}
+	return ""
+}
+
+type UpdateDestinationResponse struct {
+	Success              bool     `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *UpdateDestinationResponse) Reset()         { *m = UpdateDestinationResponse{} }
+func (m *UpdateDestinationResponse) String() string { return proto.CompactTextString(m) }
+func (*UpdateDestinationResponse) ProtoMessage()    {}
+func (*UpdateDestinationResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_dfa5074251be5580, []int{7}
+}
+
+func (m *UpdateDestinationResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UpdateDestinationResponse.Unmarshal(m, b)
+}
+func (m *UpdateDestinationResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UpdateDestinationResponse.Marshal(b, m, deterministic)
+}
+func (m *UpdateDestinationResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpdateDestinationResponse.Merge(m, src)
+}
+func (m *UpdateDestinationResponse) XXX_Size() int {
+	return xxx_messageInfo_UpdateDestinationResponse.Size(m)
+}
+func (m *UpdateDestinationResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpdateDestinationResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UpdateDestinationResponse proto.InternalMessageInfo
+
+func (m *UpdateDestinationResponse) GetSuccess() bool {
+	if m != nil {
+		return m.Success
+	}
+	return false
+}
+
+type ListDestinationRequest struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ListDestinationRequest) Reset()         { *m = ListDestinationRequest{} }
+func (m *ListDestinationRequest) String() string { return proto.CompactTextString(m) }
+func (*ListDestinationRequest) ProtoMessage()    {}
+func (*ListDestinationRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_dfa5074251be5580, []int{8}
+}
+
+func (m *ListDestinationRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListDestinationRequest.Unmarshal(m, b)
+}
+func (m *ListDestinationRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListDestinationRequest.Marshal(b, m, deterministic)
+}
+func (m *ListDestinationRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListDestinationRequest.Merge(m, src)
+}
+func (m *ListDestinationRequest) XXX_Size() int {
+	return xxx_messageInfo_ListDestinationRequest.Size(m)
+}
+func (m *ListDestinationRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListDestinationRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListDestinationRequest proto.InternalMessageInfo
+
 type ListDestinationResponse struct {
-	Destinations         []*Destination `protobuf:"bytes,1,rep,name=destinations,proto3" json:"destinations,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
-	XXX_unrecognized     []byte         `json:"-"`
-	XXX_sizecache        int32          `json:"-"`
+	Destinations         []*GetDestinationResponse `protobuf:"bytes,1,rep,name=destinations,proto3" json:"destinations,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                  `json:"-"`
+	XXX_unrecognized     []byte                    `json:"-"`
+	XXX_sizecache        int32                     `json:"-"`
 }
 
 func (m *ListDestinationResponse) Reset()         { *m = ListDestinationResponse{} }
 func (m *ListDestinationResponse) String() string { return proto.CompactTextString(m) }
 func (*ListDestinationResponse) ProtoMessage()    {}
 func (*ListDestinationResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_dfa5074251be5580, []int{4}
+	return fileDescriptor_dfa5074251be5580, []int{9}
 }
 
 func (m *ListDestinationResponse) XXX_Unmarshal(b []byte) error {
@@ -231,7 +482,7 @@ func (m *ListDestinationResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ListDestinationResponse proto.InternalMessageInfo
 
-func (m *ListDestinationResponse) GetDestinations() []*Destination {
+func (m *ListDestinationResponse) GetDestinations() []*GetDestinationResponse {
 	if m != nil {
 		return m.Destinations
 	}
@@ -250,7 +501,7 @@ func (m *UsernamePassword) Reset()         { *m = UsernamePassword{} }
 func (m *UsernamePassword) String() string { return proto.CompactTextString(m) }
 func (*UsernamePassword) ProtoMessage()    {}
 func (*UsernamePassword) Descriptor() ([]byte, []int) {
-	return fileDescriptor_dfa5074251be5580, []int{5}
+	return fileDescriptor_dfa5074251be5580, []int{10}
 }
 
 func (m *UsernamePassword) XXX_Unmarshal(b []byte) error {
@@ -296,7 +547,7 @@ func (m *SecretId) Reset()         { *m = SecretId{} }
 func (m *SecretId) String() string { return proto.CompactTextString(m) }
 func (*SecretId) ProtoMessage()    {}
 func (*SecretId) Descriptor() ([]byte, []int) {
-	return fileDescriptor_dfa5074251be5580, []int{6}
+	return fileDescriptor_dfa5074251be5580, []int{11}
 }
 
 func (m *SecretId) XXX_Unmarshal(b []byte) error {
@@ -329,7 +580,6 @@ type URLValidationRequest struct {
 	// Types that are valid to be assigned to Credentials:
 	//	*URLValidationRequest_UsernamePassword
 	//	*URLValidationRequest_SecretId
-	//	*URLValidationRequest_None
 	Credentials          isURLValidationRequest_Credentials `protobuf_oneof:"credentials"`
 	XXX_NoUnkeyedLiteral struct{}                           `json:"-"`
 	XXX_unrecognized     []byte                             `json:"-"`
@@ -340,7 +590,7 @@ func (m *URLValidationRequest) Reset()         { *m = URLValidationRequest{} }
 func (m *URLValidationRequest) String() string { return proto.CompactTextString(m) }
 func (*URLValidationRequest) ProtoMessage()    {}
 func (*URLValidationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_dfa5074251be5580, []int{7}
+	return fileDescriptor_dfa5074251be5580, []int{12}
 }
 
 func (m *URLValidationRequest) XXX_Unmarshal(b []byte) error {
@@ -380,15 +630,9 @@ type URLValidationRequest_SecretId struct {
 	SecretId *SecretId `protobuf:"bytes,3,opt,name=secret_id,json=secretId,proto3,oneof"`
 }
 
-type URLValidationRequest_None struct {
-	None *Empty `protobuf:"bytes,4,opt,name=none,proto3,oneof"`
-}
-
 func (*URLValidationRequest_UsernamePassword) isURLValidationRequest_Credentials() {}
 
 func (*URLValidationRequest_SecretId) isURLValidationRequest_Credentials() {}
-
-func (*URLValidationRequest_None) isURLValidationRequest_Credentials() {}
 
 func (m *URLValidationRequest) GetCredentials() isURLValidationRequest_Credentials {
 	if m != nil {
@@ -411,31 +655,68 @@ func (m *URLValidationRequest) GetSecretId() *SecretId {
 	return nil
 }
 
-func (m *URLValidationRequest) GetNone() *Empty {
-	if x, ok := m.GetCredentials().(*URLValidationRequest_None); ok {
-		return x.None
-	}
-	return nil
-}
-
 // XXX_OneofWrappers is for the internal use of the proto package.
 func (*URLValidationRequest) XXX_OneofWrappers() []interface{} {
 	return []interface{}{
 		(*URLValidationRequest_UsernamePassword)(nil),
 		(*URLValidationRequest_SecretId)(nil),
-		(*URLValidationRequest_None)(nil),
 	}
 }
 
+type TestDestinationResponse struct {
+	Success              bool     `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *TestDestinationResponse) Reset()         { *m = TestDestinationResponse{} }
+func (m *TestDestinationResponse) String() string { return proto.CompactTextString(m) }
+func (*TestDestinationResponse) ProtoMessage()    {}
+func (*TestDestinationResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_dfa5074251be5580, []int{13}
+}
+
+func (m *TestDestinationResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_TestDestinationResponse.Unmarshal(m, b)
+}
+func (m *TestDestinationResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_TestDestinationResponse.Marshal(b, m, deterministic)
+}
+func (m *TestDestinationResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TestDestinationResponse.Merge(m, src)
+}
+func (m *TestDestinationResponse) XXX_Size() int {
+	return xxx_messageInfo_TestDestinationResponse.Size(m)
+}
+func (m *TestDestinationResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_TestDestinationResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_TestDestinationResponse proto.InternalMessageInfo
+
+func (m *TestDestinationResponse) GetSuccess() bool {
+	if m != nil {
+		return m.Success
+	}
+	return false
+}
+
 func init() {
-	proto.RegisterType((*Empty)(nil), "chef.automate.api.datafeed.Empty")
-	proto.RegisterType((*Destination)(nil), "chef.automate.api.datafeed.Destination")
-	proto.RegisterType((*DestinationResponse)(nil), "chef.automate.api.datafeed.DestinationResponse")
-	proto.RegisterType((*DestinationId)(nil), "chef.automate.api.datafeed.DestinationId")
+	proto.RegisterType((*AddDestinationRequest)(nil), "chef.automate.api.datafeed.AddDestinationRequest")
+	proto.RegisterType((*AddDestinationResponse)(nil), "chef.automate.api.datafeed.AddDestinationResponse")
+	proto.RegisterType((*GetDestinationRequest)(nil), "chef.automate.api.datafeed.GetDestinationRequest")
+	proto.RegisterType((*GetDestinationResponse)(nil), "chef.automate.api.datafeed.GetDestinationResponse")
+	proto.RegisterType((*DeleteDestinationRequest)(nil), "chef.automate.api.datafeed.DeleteDestinationRequest")
+	proto.RegisterType((*DeleteDestinationResponse)(nil), "chef.automate.api.datafeed.DeleteDestinationResponse")
+	proto.RegisterType((*UpdateDestinationRequest)(nil), "chef.automate.api.datafeed.UpdateDestinationRequest")
+	proto.RegisterType((*UpdateDestinationResponse)(nil), "chef.automate.api.datafeed.UpdateDestinationResponse")
+	proto.RegisterType((*ListDestinationRequest)(nil), "chef.automate.api.datafeed.ListDestinationRequest")
 	proto.RegisterType((*ListDestinationResponse)(nil), "chef.automate.api.datafeed.ListDestinationResponse")
 	proto.RegisterType((*UsernamePassword)(nil), "chef.automate.api.datafeed.UsernamePassword")
 	proto.RegisterType((*SecretId)(nil), "chef.automate.api.datafeed.SecretId")
 	proto.RegisterType((*URLValidationRequest)(nil), "chef.automate.api.datafeed.URLValidationRequest")
+	proto.RegisterType((*TestDestinationResponse)(nil), "chef.automate.api.datafeed.TestDestinationResponse")
 }
 
 func init() {
@@ -443,58 +724,62 @@ func init() {
 }
 
 var fileDescriptor_dfa5074251be5580 = []byte{
-	// 804 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x96, 0x41, 0x4f, 0xe3, 0x46,
-	0x14, 0xc7, 0x71, 0x92, 0x86, 0xe4, 0xa5, 0x40, 0x98, 0x02, 0x75, 0x1d, 0x5a, 0xc0, 0xad, 0x28,
-	0x45, 0x25, 0xa6, 0x41, 0x55, 0xab, 0x1c, 0xaa, 0x96, 0x52, 0x15, 0x5a, 0x0e, 0x95, 0x29, 0x3d,
-	0x94, 0x03, 0x1a, 0x3c, 0x43, 0x18, 0xc9, 0xb1, 0x5d, 0xcf, 0xb8, 0x2d, 0xaa, 0x2a, 0xa1, 0x9c,
-	0xaa, 0x1c, 0x7a, 0xd8, 0xfd, 0x2c, 0xf9, 0x08, 0xfb, 0x09, 0xf6, 0x03, 0xec, 0x65, 0x57, 0xfb,
-	0x15, 0xf6, 0xb6, 0xab, 0x99, 0xc4, 0xe0, 0x04, 0xc7, 0x64, 0xd1, 0xee, 0xc5, 0xf2, 0xbc, 0xf7,
-	0x7f, 0xcf, 0xef, 0xf7, 0xde, 0x93, 0x6d, 0x58, 0xc7, 0x01, 0xb3, 0xe8, 0xdf, 0x82, 0x86, 0x1e,
-	0x76, 0x2d, 0x82, 0x05, 0x3e, 0x3d, 0xa7, 0x94, 0xdc, 0xdc, 0xd5, 0x83, 0xd0, 0x17, 0x3e, 0x32,
-	0x9c, 0x0b, 0x7a, 0x5e, 0xc7, 0x91, 0xf0, 0xdb, 0x58, 0xd0, 0x3a, 0x0e, 0x58, 0x5d, 0x4a, 0xa4,
-	0xc2, 0x58, 0x6e, 0xf9, 0x7e, 0xcb, 0xa5, 0x96, 0x4c, 0x85, 0x3d, 0xcf, 0x17, 0x58, 0x30, 0xdf,
-	0xe3, 0xfd, 0x48, 0xe3, 0x5b, 0xc7, 0x6f, 0x07, 0xbe, 0x47, 0x3d, 0xc1, 0xad, 0x38, 0x7e, 0xab,
-	0x15, 0x06, 0x8e, 0xa5, 0xfc, 0xce, 0x56, 0x8b, 0x7a, 0x5b, 0x81, 0xef, 0x32, 0xe7, 0xf2, 0x0d,
-	0x64, 0x60, 0xb8, 0x7d, 0x3b, 0x83, 0x39, 0x0d, 0xef, 0xfc, 0xd0, 0x0e, 0xc4, 0xa5, 0x79, 0x02,
-	0x95, 0x3d, 0xca, 0x05, 0xf3, 0x94, 0x1b, 0xcd, 0x42, 0x8e, 0x11, 0x5d, 0x5b, 0xd5, 0x36, 0xf2,
-	0x76, 0x8e, 0x11, 0x84, 0xa0, 0xe0, 0xe1, 0x36, 0xd5, 0x73, 0xab, 0xda, 0x46, 0xd9, 0x56, 0xf7,
-	0xa8, 0x0a, 0xf9, 0x28, 0x74, 0xf5, 0xbc, 0x32, 0xc9, 0x5b, 0xb4, 0x04, 0x45, 0x4e, 0x9d, 0x90,
-	0x0a, 0xbd, 0xa0, 0x8c, 0x83, 0x93, 0x69, 0xc1, 0x7b, 0x89, 0xe4, 0x36, 0xe5, 0x81, 0xef, 0x71,
-	0x8a, 0x74, 0x98, 0xe6, 0x91, 0xe3, 0x50, 0xce, 0xd5, 0x93, 0x4a, 0x76, 0x7c, 0x34, 0x57, 0x60,
-	0x26, 0x11, 0x70, 0x40, 0x46, 0xeb, 0x31, 0xcf, 0xe1, 0xfd, 0x43, 0xc6, 0x45, 0x5a, 0xd6, 0x9f,
-	0xe1, 0x5d, 0x72, 0x63, 0x96, 0xa9, 0xf3, 0x1b, 0x95, 0xc6, 0xa7, 0xf5, 0xf1, 0x73, 0xaa, 0x27,
-	0xd3, 0x0c, 0x05, 0x9b, 0x3f, 0x41, 0xf5, 0x98, 0xcb, 0x15, 0x68, 0xd3, 0x5f, 0x30, 0xe7, 0x7f,
-	0xf9, 0x21, 0x41, 0x06, 0x94, 0xa2, 0x81, 0x4d, 0x55, 0x54, 0xb6, 0xaf, 0xcf, 0xd2, 0x17, 0x0c,
-	0x74, 0x83, 0x5e, 0x5d, 0x9f, 0x4d, 0x03, 0x4a, 0x47, 0xaa, 0x1f, 0x43, 0x3c, 0x65, 0xc5, 0xf3,
-	0x20, 0x07, 0x0b, 0xc7, 0xf6, 0xe1, 0x6f, 0xd8, 0x65, 0x64, 0x80, 0xf3, 0x47, 0x44, 0xb9, 0x88,
-	0x9b, 0xac, 0xdd, 0x34, 0xf9, 0x04, 0xe6, 0xe3, 0xc7, 0x9d, 0x0e, 0x3d, 0xab, 0xd2, 0xf8, 0x3c,
-	0x0b, 0x72, 0x94, 0x63, 0x7f, 0xca, 0xae, 0x46, 0xa3, 0x6c, 0xdf, 0x43, 0xb9, 0x3f, 0xb3, 0x53,
-	0x46, 0xd4, 0x64, 0x2b, 0x8d, 0x4f, 0xb2, 0x92, 0xc6, 0x40, 0xfb, 0x53, 0x76, 0x89, 0xc7, 0x70,
-	0x5f, 0x41, 0xc1, 0xf3, 0x3d, 0xaa, 0x96, 0xa0, 0xd2, 0x58, 0xcb, 0x8a, 0x57, 0xcb, 0xb7, 0x3f,
-	0x65, 0xab, 0x80, 0xdd, 0x19, 0xa8, 0x38, 0x21, 0x25, 0xd4, 0x13, 0x0c, 0xbb, 0xbc, 0xf1, 0xa8,
-	0x02, 0x73, 0x7b, 0x03, 0xe5, 0x11, 0x0d, 0xff, 0x64, 0x0e, 0x45, 0x4f, 0x34, 0x98, 0xfd, 0x8e,
-	0x90, 0xe4, 0xae, 0x4e, 0x3a, 0x5a, 0xc3, 0x9a, 0x74, 0x07, 0x06, 0xab, 0x64, 0xf2, 0x4e, 0x4f,
-	0xaf, 0xc1, 0x42, 0xac, 0x69, 0x26, 0x56, 0x03, 0xe5, 0x31, 0x21, 0xdd, 0x9e, 0xbe, 0x3d, 0xc6,
-	0xad, 0xa7, 0x59, 0x9b, 0x98, 0x90, 0xce, 0xe3, 0xa7, 0x0f, 0x73, 0x86, 0xb9, 0x68, 0xc5, 0x02,
-	0x2b, 0x29, 0xd0, 0x36, 0xd1, 0x73, 0x0d, 0x66, 0x7f, 0xa4, 0xc9, 0xd5, 0x46, 0x9f, 0x4d, 0x58,
-	0xf8, 0x01, 0x31, 0x26, 0x6d, 0x86, 0x79, 0xa5, 0x75, 0x7a, 0xfa, 0x1a, 0x7c, 0x90, 0x5a, 0xe7,
-	0x3f, 0x8c, 0xfc, 0x8b, 0x0a, 0x21, 0xc5, 0x12, 0xf1, 0xcb, 0x2c, 0x51, 0x3a, 0x67, 0x8b, 0x0a,
-	0xc5, 0xb9, 0x8c, 0x8c, 0x54, 0x4e, 0x4b, 0xc5, 0x5e, 0xe5, 0x60, 0x7e, 0x8f, 0xba, 0x54, 0xd0,
-	0x7b, 0xc2, 0xbe, 0xf6, 0x40, 0xff, 0x97, 0xd0, 0xeb, 0xb0, 0x9c, 0xac, 0xf5, 0x16, 0x52, 0x91,
-	0xa8, 0x9a, 0xba, 0x3d, 0xfd, 0x9b, 0x3b, 0x94, 0x1f, 0x8d, 0xf3, 0xf6, 0x33, 0xf4, 0x5b, 0xb0,
-	0x99, 0xd5, 0x82, 0x17, 0x1a, 0xcc, 0x1f, 0x07, 0x04, 0x0f, 0xb7, 0xe0, 0xed, 0x6d, 0xf4, 0x7f,
-	0xb2, 0x01, 0x1f, 0xa7, 0x0f, 0xb4, 0x5f, 0x51, 0x31, 0x52, 0xe5, 0x74, 0x7b, 0xfa, 0xd7, 0x59,
-	0x73, 0xaf, 0xa5, 0xba, 0xfa, 0xb1, 0x8a, 0x7b, 0xa5, 0x91, 0xc1, 0x2d, 0xf7, 0xfc, 0x99, 0x06,
-	0xd5, 0x91, 0x77, 0x38, 0x47, 0x77, 0xbf, 0x2c, 0x8c, 0x9d, 0x2c, 0xc9, 0x98, 0x8f, 0x82, 0x79,
-	0xd9, 0xe9, 0xe9, 0x1f, 0xc2, 0x62, 0x5a, 0xd1, 0x1c, 0x15, 0x5c, 0xc6, 0x45, 0xb7, 0xa7, 0xef,
-	0x8c, 0x13, 0x18, 0xa9, 0xe6, 0xa6, 0x0c, 0x53, 0xac, 0x35, 0x73, 0x29, 0x95, 0x95, 0x4b, 0xce,
-	0x97, 0x1a, 0xcc, 0xfd, 0x4a, 0x87, 0xca, 0x42, 0xdb, 0x99, 0x2f, 0xea, 0x94, 0xef, 0xc0, 0x3d,
-	0x27, 0x6d, 0xc2, 0x98, 0xd2, 0x85, 0xfc, 0xb6, 0x14, 0xe4, 0x55, 0x0d, 0x3a, 0x4b, 0x95, 0xe1,
-	0x53, 0xf0, 0xab, 0x66, 0x2d, 0x1d, 0xde, 0x92, 0x92, 0xa6, 0xb6, 0xb9, 0xfb, 0xc5, 0xef, 0x56,
-	0x8b, 0x89, 0x8b, 0xe8, 0xac, 0xee, 0xf8, 0x6d, 0x4b, 0x72, 0x5c, 0xff, 0xad, 0x58, 0xe9, 0x7f,
-	0x59, 0x67, 0x45, 0xf5, 0x7b, 0xb2, 0xf3, 0x2a, 0x00, 0x00, 0xff, 0xff, 0x03, 0x0a, 0xed, 0xb9,
-	0x86, 0x09, 0x00, 0x00,
+	// 866 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x56, 0xcf, 0x6f, 0xdc, 0x44,
+	0x14, 0xae, 0xbd, 0x4b, 0x48, 0x5e, 0x4a, 0x9a, 0x8c, 0x9a, 0xed, 0xc4, 0x09, 0x10, 0x0c, 0x2a,
+	0x51, 0x44, 0xd6, 0xad, 0x43, 0x24, 0x94, 0x03, 0x82, 0x12, 0x89, 0x82, 0x7a, 0x40, 0x2e, 0xe9,
+	0x01, 0x0e, 0xd1, 0xd4, 0x33, 0xdd, 0x8c, 0xe4, 0xb5, 0x5d, 0xcf, 0x18, 0xa8, 0x10, 0x52, 0x15,
+	0x2e, 0x68, 0x91, 0x90, 0x10, 0x77, 0xfe, 0x8b, 0xfd, 0x4b, 0x38, 0x71, 0xe7, 0xc8, 0x99, 0x03,
+	0x27, 0x34, 0x63, 0x6f, 0xb2, 0x3f, 0xc6, 0xb3, 0x5d, 0xe0, 0x62, 0xcd, 0xcc, 0xfb, 0xde, 0x9b,
+	0xf7, 0x7d, 0x6f, 0xe6, 0x8d, 0xe1, 0x36, 0xc9, 0x79, 0xc0, 0xbe, 0x91, 0xac, 0x48, 0x49, 0x12,
+	0x50, 0x22, 0xc9, 0xd9, 0x13, 0xc6, 0xe8, 0xd5, 0xa8, 0x9b, 0x17, 0x99, 0xcc, 0x90, 0x17, 0x9f,
+	0xb3, 0x27, 0x5d, 0x52, 0xca, 0xac, 0x4f, 0x24, 0xeb, 0x92, 0x9c, 0x77, 0x15, 0x44, 0x21, 0xbc,
+	0x9d, 0x5e, 0x96, 0xf5, 0x12, 0x16, 0xa8, 0x50, 0x24, 0x4d, 0x33, 0x49, 0x24, 0xcf, 0x52, 0x51,
+	0x79, 0x7a, 0x1f, 0xc4, 0x59, 0x3f, 0xcf, 0x52, 0x96, 0x4a, 0x11, 0x8c, 0xfc, 0x0f, 0x7a, 0x45,
+	0x1e, 0x07, 0xda, 0x1e, 0x1f, 0xf4, 0x58, 0x7a, 0x90, 0x67, 0x09, 0x8f, 0x9f, 0xfd, 0x0f, 0x11,
+	0x38, 0xe9, 0xcf, 0x46, 0xf0, 0x19, 0x6c, 0x7e, 0x48, 0xe9, 0x09, 0x13, 0x92, 0xa7, 0xda, 0x10,
+	0xb1, 0xa7, 0x25, 0x13, 0x12, 0xad, 0x81, 0xcb, 0x29, 0x76, 0x76, 0x9d, 0xbd, 0x56, 0xe4, 0x72,
+	0x8a, 0x10, 0xb4, 0x53, 0xd2, 0x67, 0xd8, 0xdd, 0x75, 0xf6, 0x56, 0x22, 0x3d, 0x46, 0xeb, 0xd0,
+	0x2a, 0x8b, 0x04, 0xb7, 0xf4, 0x92, 0x1a, 0xa2, 0x0e, 0x2c, 0x09, 0x16, 0x17, 0x4c, 0xe2, 0xb6,
+	0x5e, 0xac, 0x67, 0x7e, 0x08, 0x9d, 0xe9, 0x6d, 0x44, 0x9e, 0xa5, 0x82, 0x21, 0x0c, 0x2f, 0x8b,
+	0x32, 0x8e, 0x99, 0x10, 0x7a, 0xb3, 0xe5, 0x68, 0x34, 0xf5, 0xdf, 0x86, 0xcd, 0x8f, 0x99, 0x9c,
+	0x9f, 0x9a, 0xff, 0xdc, 0x81, 0xce, 0x34, 0x72, 0x5e, 0xf4, 0x3a, 0x88, 0x3b, 0xc3, 0xaf, 0x35,
+	0xcb, 0xaf, 0x6d, 0xe2, 0xf7, 0xd2, 0x04, 0xbf, 0x7d, 0xc0, 0x27, 0x2c, 0x61, 0x92, 0xbd, 0x40,
+	0xba, 0x47, 0xb0, 0x65, 0xc0, 0xce, 0x95, 0xe3, 0x1c, 0xf0, 0x69, 0x4e, 0xc9, 0x8b, 0x6c, 0xf1,
+	0x1f, 0x8b, 0x75, 0x04, 0x5b, 0x86, 0x9d, 0xe6, 0x26, 0x88, 0xa1, 0xf3, 0x80, 0x0b, 0x43, 0xc1,
+	0xfc, 0xa7, 0x70, 0x6b, 0xc6, 0x52, 0x87, 0x7b, 0x04, 0xd7, 0xe9, 0xd5, 0xb2, 0x8a, 0xd9, 0xda,
+	0x5b, 0x0d, 0xc3, 0x6e, 0xf3, 0xa5, 0xea, 0x9a, 0x4b, 0x1d, 0x4d, 0xc4, 0xf1, 0x3f, 0x85, 0xf5,
+	0x53, 0xa1, 0xae, 0x6e, 0x9f, 0x7d, 0x46, 0x84, 0xf8, 0x3a, 0x2b, 0x28, 0xf2, 0x60, 0xb9, 0xac,
+	0xd7, 0x74, 0xee, 0x2b, 0xd1, 0xe5, 0x5c, 0xd9, 0xf2, 0x1a, 0x57, 0xab, 0x76, 0x39, 0xf7, 0x3d,
+	0x58, 0x7e, 0xa8, 0x95, 0xf9, 0x84, 0x8e, 0x29, 0xbd, 0xa2, 0x8b, 0xf9, 0xbb, 0x03, 0x37, 0x4f,
+	0xa3, 0x07, 0x8f, 0x48, 0xc2, 0xe9, 0x44, 0x49, 0x6a, 0xb9, 0x9d, 0x2b, 0xb9, 0xbf, 0x84, 0x8d,
+	0xd1, 0x76, 0x67, 0x13, 0x7b, 0xad, 0x86, 0xef, 0xd8, 0xf8, 0x4e, 0xf3, 0xb8, 0x7f, 0x2d, 0x5a,
+	0x2f, 0xa7, 0xb9, 0x7d, 0x04, 0x2b, 0x55, 0xf5, 0xce, 0x38, 0xd5, 0x35, 0x5e, 0x0d, 0xdf, 0xb2,
+	0x05, 0x1d, 0x11, 0xba, 0x7f, 0x2d, 0x5a, 0x16, 0xf5, 0xf8, 0xde, 0x2b, 0xb0, 0x1a, 0x17, 0x8c,
+	0xb2, 0x54, 0x72, 0x92, 0x08, 0xff, 0x10, 0x6e, 0x7d, 0xce, 0xc4, 0x62, 0xf7, 0x2a, 0xfc, 0xf5,
+	0x3a, 0xdc, 0x38, 0xa9, 0x77, 0x79, 0xc8, 0x8a, 0xaf, 0x78, 0xcc, 0xd0, 0x9f, 0x0e, 0xac, 0x4d,
+	0x5e, 0x7f, 0x74, 0xd7, 0x96, 0x9c, 0xb1, 0x23, 0x79, 0xe1, 0x22, 0x2e, 0x55, 0x9e, 0xbe, 0xb8,
+	0x18, 0xe2, 0x6d, 0xb8, 0x39, 0x82, 0x1d, 0x8f, 0x9d, 0x11, 0xd4, 0x22, 0x94, 0x0e, 0x86, 0xf8,
+	0x4e, 0x83, 0x19, 0x9b, 0x56, 0x8f, 0x09, 0xa5, 0x17, 0xbf, 0xfd, 0xf1, 0x8b, 0xeb, 0xf9, 0x9b,
+	0xc1, 0x08, 0x10, 0x8c, 0x03, 0x9c, 0x7d, 0xf4, 0xb7, 0x03, 0x6b, 0x93, 0x87, 0xd4, 0x4e, 0xd7,
+	0xd8, 0xe5, 0xbc, 0x7f, 0x71, 0x07, 0xfc, 0xe7, 0xce, 0xc5, 0x10, 0xbf, 0x01, 0x5b, 0xc6, 0xd4,
+	0xbf, 0xe5, 0xf4, 0x3b, 0xd4, 0x2e, 0x18, 0x51, 0xac, 0x8f, 0x6c, 0x20, 0x33, 0xf5, 0x1e, 0x93,
+	0x9a, 0xfa, 0x0e, 0xf2, 0x8c, 0xd4, 0x03, 0xed, 0xfb, 0xb3, 0x0b, 0x1b, 0x33, 0xed, 0x0d, 0xbd,
+	0x6b, 0x23, 0xd3, 0xd4, 0x39, 0xbd, 0xa3, 0x05, 0xbd, 0x6a, 0x15, 0x7e, 0x52, 0x2a, 0xdc, 0x86,
+	0x9d, 0xf1, 0xe4, 0x67, 0x38, 0x2e, 0x51, 0xed, 0x3f, 0x18, 0xe2, 0xf7, 0xe7, 0x20, 0x5f, 0x6b,
+	0xb2, 0x56, 0x11, 0x2a, 0x4d, 0xf6, 0x6d, 0x9a, 0xfc, 0xe8, 0xc2, 0xc6, 0x4c, 0x47, 0xb5, 0x6b,
+	0xd2, 0xd4, 0xea, 0xed, 0x9a, 0x34, 0xb6, 0x6d, 0xff, 0x07, 0xa5, 0xc9, 0x9b, 0xe6, 0xa2, 0x57,
+	0x49, 0x2e, 0x95, 0xda, 0x79, 0x30, 0xc4, 0xef, 0xd9, 0xce, 0xc6, 0xb6, 0xd1, 0x54, 0xf9, 0x6a,
+	0x29, 0x5e, 0x0f, 0x2d, 0x52, 0xa8, 0xeb, 0xf1, 0x97, 0x03, 0xeb, 0x53, 0xcf, 0x81, 0x40, 0xd6,
+	0xd3, 0x6e, 0x7e, 0x56, 0xbc, 0xc3, 0x85, 0x7c, 0x6a, 0x21, 0x9e, 0x5d, 0x0c, 0xf1, 0xab, 0xb0,
+	0x69, 0x62, 0x21, 0x50, 0x3b, 0xe1, 0x42, 0x0e, 0x86, 0xf8, 0xb0, 0x09, 0xe0, 0x19, 0x97, 0x8f,
+	0x95, 0x9b, 0x26, 0xbf, 0xed, 0x77, 0x8c, 0xe4, 0x85, 0x22, 0xfe, 0xbd, 0x0b, 0x37, 0xa6, 0x1a,
+	0x2a, 0xba, 0x63, 0x2d, 0xa7, 0xe1, 0x61, 0xb1, 0xb3, 0x6e, 0xe8, 0xd7, 0x55, 0xf9, 0x7d, 0x68,
+	0x48, 0x5f, 0xaa, 0x07, 0xab, 0xad, 0xbe, 0xba, 0xfa, 0x36, 0x94, 0xc5, 0xa6, 0x05, 0xd8, 0xf5,
+	0xb7, 0xcd, 0x02, 0x04, 0x0a, 0x72, 0xec, 0xec, 0xdf, 0xbb, 0xfb, 0x45, 0xd0, 0xe3, 0xf2, 0xbc,
+	0x7c, 0xdc, 0x8d, 0xb3, 0x7e, 0xa0, 0xb8, 0x5c, 0xfe, 0xba, 0x06, 0xe6, 0x5f, 0xee, 0xc7, 0x4b,
+	0xfa, 0x5f, 0xf5, 0xf0, 0x9f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x24, 0xe3, 0x6c, 0xac, 0x93, 0x0b,
+	0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -509,12 +794,12 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type DatafeedServiceClient interface {
-	AddDestination(ctx context.Context, in *Destination, opts ...grpc.CallOption) (*DestinationResponse, error)
-	GetDestination(ctx context.Context, in *DestinationId, opts ...grpc.CallOption) (*Destination, error)
-	DeleteDestination(ctx context.Context, in *DestinationId, opts ...grpc.CallOption) (*DestinationResponse, error)
-	UpdateDestination(ctx context.Context, in *Destination, opts ...grpc.CallOption) (*DestinationResponse, error)
-	ListDestinations(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ListDestinationResponse, error)
-	TestDestination(ctx context.Context, in *URLValidationRequest, opts ...grpc.CallOption) (*DestinationResponse, error)
+	AddDestination(ctx context.Context, in *AddDestinationRequest, opts ...grpc.CallOption) (*AddDestinationResponse, error)
+	GetDestination(ctx context.Context, in *GetDestinationRequest, opts ...grpc.CallOption) (*GetDestinationResponse, error)
+	DeleteDestination(ctx context.Context, in *DeleteDestinationRequest, opts ...grpc.CallOption) (*DeleteDestinationResponse, error)
+	UpdateDestination(ctx context.Context, in *UpdateDestinationRequest, opts ...grpc.CallOption) (*UpdateDestinationResponse, error)
+	ListDestinations(ctx context.Context, in *ListDestinationRequest, opts ...grpc.CallOption) (*ListDestinationResponse, error)
+	TestDestination(ctx context.Context, in *URLValidationRequest, opts ...grpc.CallOption) (*TestDestinationResponse, error)
 }
 
 type datafeedServiceClient struct {
@@ -525,8 +810,8 @@ func NewDatafeedServiceClient(cc *grpc.ClientConn) DatafeedServiceClient {
 	return &datafeedServiceClient{cc}
 }
 
-func (c *datafeedServiceClient) AddDestination(ctx context.Context, in *Destination, opts ...grpc.CallOption) (*DestinationResponse, error) {
-	out := new(DestinationResponse)
+func (c *datafeedServiceClient) AddDestination(ctx context.Context, in *AddDestinationRequest, opts ...grpc.CallOption) (*AddDestinationResponse, error) {
+	out := new(AddDestinationResponse)
 	err := c.cc.Invoke(ctx, "/chef.automate.api.datafeed.DatafeedService/AddDestination", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -534,8 +819,8 @@ func (c *datafeedServiceClient) AddDestination(ctx context.Context, in *Destinat
 	return out, nil
 }
 
-func (c *datafeedServiceClient) GetDestination(ctx context.Context, in *DestinationId, opts ...grpc.CallOption) (*Destination, error) {
-	out := new(Destination)
+func (c *datafeedServiceClient) GetDestination(ctx context.Context, in *GetDestinationRequest, opts ...grpc.CallOption) (*GetDestinationResponse, error) {
+	out := new(GetDestinationResponse)
 	err := c.cc.Invoke(ctx, "/chef.automate.api.datafeed.DatafeedService/GetDestination", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -543,8 +828,8 @@ func (c *datafeedServiceClient) GetDestination(ctx context.Context, in *Destinat
 	return out, nil
 }
 
-func (c *datafeedServiceClient) DeleteDestination(ctx context.Context, in *DestinationId, opts ...grpc.CallOption) (*DestinationResponse, error) {
-	out := new(DestinationResponse)
+func (c *datafeedServiceClient) DeleteDestination(ctx context.Context, in *DeleteDestinationRequest, opts ...grpc.CallOption) (*DeleteDestinationResponse, error) {
+	out := new(DeleteDestinationResponse)
 	err := c.cc.Invoke(ctx, "/chef.automate.api.datafeed.DatafeedService/DeleteDestination", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -552,8 +837,8 @@ func (c *datafeedServiceClient) DeleteDestination(ctx context.Context, in *Desti
 	return out, nil
 }
 
-func (c *datafeedServiceClient) UpdateDestination(ctx context.Context, in *Destination, opts ...grpc.CallOption) (*DestinationResponse, error) {
-	out := new(DestinationResponse)
+func (c *datafeedServiceClient) UpdateDestination(ctx context.Context, in *UpdateDestinationRequest, opts ...grpc.CallOption) (*UpdateDestinationResponse, error) {
+	out := new(UpdateDestinationResponse)
 	err := c.cc.Invoke(ctx, "/chef.automate.api.datafeed.DatafeedService/UpdateDestination", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -561,7 +846,7 @@ func (c *datafeedServiceClient) UpdateDestination(ctx context.Context, in *Desti
 	return out, nil
 }
 
-func (c *datafeedServiceClient) ListDestinations(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ListDestinationResponse, error) {
+func (c *datafeedServiceClient) ListDestinations(ctx context.Context, in *ListDestinationRequest, opts ...grpc.CallOption) (*ListDestinationResponse, error) {
 	out := new(ListDestinationResponse)
 	err := c.cc.Invoke(ctx, "/chef.automate.api.datafeed.DatafeedService/ListDestinations", in, out, opts...)
 	if err != nil {
@@ -570,8 +855,8 @@ func (c *datafeedServiceClient) ListDestinations(ctx context.Context, in *Empty,
 	return out, nil
 }
 
-func (c *datafeedServiceClient) TestDestination(ctx context.Context, in *URLValidationRequest, opts ...grpc.CallOption) (*DestinationResponse, error) {
-	out := new(DestinationResponse)
+func (c *datafeedServiceClient) TestDestination(ctx context.Context, in *URLValidationRequest, opts ...grpc.CallOption) (*TestDestinationResponse, error) {
+	out := new(TestDestinationResponse)
 	err := c.cc.Invoke(ctx, "/chef.automate.api.datafeed.DatafeedService/TestDestination", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -581,34 +866,34 @@ func (c *datafeedServiceClient) TestDestination(ctx context.Context, in *URLVali
 
 // DatafeedServiceServer is the server API for DatafeedService service.
 type DatafeedServiceServer interface {
-	AddDestination(context.Context, *Destination) (*DestinationResponse, error)
-	GetDestination(context.Context, *DestinationId) (*Destination, error)
-	DeleteDestination(context.Context, *DestinationId) (*DestinationResponse, error)
-	UpdateDestination(context.Context, *Destination) (*DestinationResponse, error)
-	ListDestinations(context.Context, *Empty) (*ListDestinationResponse, error)
-	TestDestination(context.Context, *URLValidationRequest) (*DestinationResponse, error)
+	AddDestination(context.Context, *AddDestinationRequest) (*AddDestinationResponse, error)
+	GetDestination(context.Context, *GetDestinationRequest) (*GetDestinationResponse, error)
+	DeleteDestination(context.Context, *DeleteDestinationRequest) (*DeleteDestinationResponse, error)
+	UpdateDestination(context.Context, *UpdateDestinationRequest) (*UpdateDestinationResponse, error)
+	ListDestinations(context.Context, *ListDestinationRequest) (*ListDestinationResponse, error)
+	TestDestination(context.Context, *URLValidationRequest) (*TestDestinationResponse, error)
 }
 
 // UnimplementedDatafeedServiceServer can be embedded to have forward compatible implementations.
 type UnimplementedDatafeedServiceServer struct {
 }
 
-func (*UnimplementedDatafeedServiceServer) AddDestination(ctx context.Context, req *Destination) (*DestinationResponse, error) {
+func (*UnimplementedDatafeedServiceServer) AddDestination(ctx context.Context, req *AddDestinationRequest) (*AddDestinationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddDestination not implemented")
 }
-func (*UnimplementedDatafeedServiceServer) GetDestination(ctx context.Context, req *DestinationId) (*Destination, error) {
+func (*UnimplementedDatafeedServiceServer) GetDestination(ctx context.Context, req *GetDestinationRequest) (*GetDestinationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDestination not implemented")
 }
-func (*UnimplementedDatafeedServiceServer) DeleteDestination(ctx context.Context, req *DestinationId) (*DestinationResponse, error) {
+func (*UnimplementedDatafeedServiceServer) DeleteDestination(ctx context.Context, req *DeleteDestinationRequest) (*DeleteDestinationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteDestination not implemented")
 }
-func (*UnimplementedDatafeedServiceServer) UpdateDestination(ctx context.Context, req *Destination) (*DestinationResponse, error) {
+func (*UnimplementedDatafeedServiceServer) UpdateDestination(ctx context.Context, req *UpdateDestinationRequest) (*UpdateDestinationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateDestination not implemented")
 }
-func (*UnimplementedDatafeedServiceServer) ListDestinations(ctx context.Context, req *Empty) (*ListDestinationResponse, error) {
+func (*UnimplementedDatafeedServiceServer) ListDestinations(ctx context.Context, req *ListDestinationRequest) (*ListDestinationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListDestinations not implemented")
 }
-func (*UnimplementedDatafeedServiceServer) TestDestination(ctx context.Context, req *URLValidationRequest) (*DestinationResponse, error) {
+func (*UnimplementedDatafeedServiceServer) TestDestination(ctx context.Context, req *URLValidationRequest) (*TestDestinationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TestDestination not implemented")
 }
 
@@ -617,7 +902,7 @@ func RegisterDatafeedServiceServer(s *grpc.Server, srv DatafeedServiceServer) {
 }
 
 func _DatafeedService_AddDestination_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Destination)
+	in := new(AddDestinationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -629,13 +914,13 @@ func _DatafeedService_AddDestination_Handler(srv interface{}, ctx context.Contex
 		FullMethod: "/chef.automate.api.datafeed.DatafeedService/AddDestination",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DatafeedServiceServer).AddDestination(ctx, req.(*Destination))
+		return srv.(DatafeedServiceServer).AddDestination(ctx, req.(*AddDestinationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _DatafeedService_GetDestination_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DestinationId)
+	in := new(GetDestinationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -647,13 +932,13 @@ func _DatafeedService_GetDestination_Handler(srv interface{}, ctx context.Contex
 		FullMethod: "/chef.automate.api.datafeed.DatafeedService/GetDestination",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DatafeedServiceServer).GetDestination(ctx, req.(*DestinationId))
+		return srv.(DatafeedServiceServer).GetDestination(ctx, req.(*GetDestinationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _DatafeedService_DeleteDestination_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DestinationId)
+	in := new(DeleteDestinationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -665,13 +950,13 @@ func _DatafeedService_DeleteDestination_Handler(srv interface{}, ctx context.Con
 		FullMethod: "/chef.automate.api.datafeed.DatafeedService/DeleteDestination",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DatafeedServiceServer).DeleteDestination(ctx, req.(*DestinationId))
+		return srv.(DatafeedServiceServer).DeleteDestination(ctx, req.(*DeleteDestinationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _DatafeedService_UpdateDestination_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Destination)
+	in := new(UpdateDestinationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -683,13 +968,13 @@ func _DatafeedService_UpdateDestination_Handler(srv interface{}, ctx context.Con
 		FullMethod: "/chef.automate.api.datafeed.DatafeedService/UpdateDestination",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DatafeedServiceServer).UpdateDestination(ctx, req.(*Destination))
+		return srv.(DatafeedServiceServer).UpdateDestination(ctx, req.(*UpdateDestinationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _DatafeedService_ListDestinations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
+	in := new(ListDestinationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -701,7 +986,7 @@ func _DatafeedService_ListDestinations_Handler(srv interface{}, ctx context.Cont
 		FullMethod: "/chef.automate.api.datafeed.DatafeedService/ListDestinations",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DatafeedServiceServer).ListDestinations(ctx, req.(*Empty))
+		return srv.(DatafeedServiceServer).ListDestinations(ctx, req.(*ListDestinationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

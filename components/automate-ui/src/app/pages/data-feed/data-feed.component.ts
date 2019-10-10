@@ -120,11 +120,6 @@ export class DatafeedComponent implements OnInit {
     this.telemetryService.track('datafeedDestinationsCount', destinations.length);
   }
 
-
-  // TODO - this was common in all three uses, but I'm not sure this is the best
-  // way to do it - do we really need to refresh after the server confirms the action
-  // successful? Seem it should be possible to update the local model with the
-  // changes and have that trigger view updates?
   refreshDestinations() {
     this.destinations$ = this.service.fetchDestinations();
     this.destinations$.subscribe(destinations => {

@@ -7,7 +7,7 @@ import policy "github.com/chef/automate/components/automate-gateway/api/authz/po
 
 func init() {
 	policy.MapMethodTo("/chef.automate.api.datafeed.DatafeedService/AddDestination", "datafeed:destination", "add", "POST", "/datafeed/destination", func(unexpandedResource string, input interface{}) string {
-		if m, ok := input.(*Destination); ok {
+		if m, ok := input.(*AddDestinationRequest); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
 				case "name":
@@ -30,7 +30,7 @@ func init() {
 		return unexpandedResource
 	})
 	policy.MapMethodTo("/chef.automate.api.datafeed.DatafeedService/UpdateDestination", "datafeed:destination/{id}", "update", "PATCH", "/datafeed/destination/{id}", func(unexpandedResource string, input interface{}) string {
-		if m, ok := input.(*Destination); ok {
+		if m, ok := input.(*UpdateDestinationRequest); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
 				case "name":

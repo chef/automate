@@ -104,7 +104,7 @@ func initTables(db *gorp.DbMap) {
 	logs.Infof("completed initTables -- data-feed-service db ")
 }
 
-func (db *DB) toDBDestination(inDestination *datafeed.Destination) *Destination {
+func (db *DB) addToDBDestination(inDestination *datafeed.AddDestinationRequest) *Destination {
 	newDestination := Destination{}
 	newDestination.ID = inDestination.Id
 	newDestination.Name = inDestination.Name
@@ -114,8 +114,18 @@ func (db *DB) toDBDestination(inDestination *datafeed.Destination) *Destination 
 	return &newDestination
 }
 
-func (db *DB) fromDBDestination(inDestination *Destination) *datafeed.Destination {
-	newDestination := datafeed.Destination{}
+func (db *DB) updateToDBDestination(inDestination *datafeed.UpdateDestinationRequest) *Destination {
+	newDestination := Destination{}
+	newDestination.ID = inDestination.Id
+	newDestination.Name = inDestination.Name
+	newDestination.URL = inDestination.Url
+	newDestination.Secret = inDestination.Secret
+
+	return &newDestination
+}
+
+func (db *DB) dbToGetDestinationResponse(inDestination *Destination) *datafeed.GetDestinationResponse {
+	newDestination := datafeed.GetDestinationResponse{}
 	newDestination.Id = inDestination.ID
 	newDestination.Name = inDestination.Name
 	newDestination.Url = inDestination.URL
@@ -124,15 +134,15 @@ func (db *DB) fromDBDestination(inDestination *Destination) *datafeed.Destinatio
 	return &newDestination
 }
 
-func (db *DB) idToDBDestination(inDestination *datafeed.DestinationId) *Destination {
+func (db *DB) getDestinationRequestToDB(inDestination *datafeed.GetDestinationRequest) *Destination {
 	newDestination := Destination{}
 	newDestination.ID = inDestination.Id
 
 	return &newDestination
 }
 
-func (db *DB) AddDestination(destination *datafeed.Destination) (bool, error) {
-	dbDestination := db.toDBDestination(destination)
+func (db *DB) AddDestination(destination *datafeed.AddDestinationRequest) (bool, error) {
+	dbDestination := db.addToDBDestination(destination)
 	var err error
 	err = Transact(db, func(tx *DBTrans) error {
 		if err = tx.Insert(dbDestination); err != nil {
@@ -147,15 +157,15 @@ func (db *DB) AddDestination(destination *datafeed.Destination) (bool, error) {
 	return true, err
 }
 
-func (db *DB) DeleteDestination(id *datafeed.DestinationId) (bool, error) {
+func (db *DB) DeleteDestination(delete *datafeed.DeleteDestinationRequest) (bool, error) {
 
 	var count int64 = 0
 	var err error
 	err = Transact(db, func(tx *DBTrans) error {
 
-		count, err = tx.Delete(&Destination{ID: id.Id})
+		count, err = tx.Delete(&Destination{ID: delete.Id})
 		if err != nil {
-			return errorutils.ProcessSQLNotFound(err, strconv.FormatInt(id.Id, 10), "DeleteDestination")
+			return errorutils.ProcessSQLNotFound(err, strconv.FormatInt(delete.Id, 10), "DeleteDestination")
 		}
 
 		return nil
@@ -167,8 +177,8 @@ func (db *DB) DeleteDestination(id *datafeed.DestinationId) (bool, error) {
 	return true, err
 }
 
-func (db *DB) UpdateDestination(destination *datafeed.Destination) (bool, error) {
-	dbDestination := db.toDBDestination(destination)
+func (db *DB) UpdateDestination(destination *datafeed.UpdateDestinationRequest) (bool, error) {
+	dbDestination := db.updateToDBDestination(destination)
 	var err error
 	var count int64 = 0
 	err = Transact(db, func(tx *DBTrans) error {
@@ -185,25 +195,25 @@ func (db *DB) UpdateDestination(destination *datafeed.Destination) (bool, error)
 	return true, err
 }
 
-func (db *DB) GetDestination(destinationId *datafeed.DestinationId) (*datafeed.Destination, error) {
+func (db *DB) GetDestination(get *datafeed.GetDestinationRequest) (*datafeed.GetDestinationResponse, error) {
 
 	var err error
 	var obj interface{}
 	var dest *Destination
 	err = Transact(db, func(tx *DBTrans) error {
 		// tx.Delete retuen count, error
-		if obj, err = tx.Get(Destination{}, destinationId.Id); err != nil {
+		if obj, err = tx.Get(Destination{}, get.Id); err != nil {
 			return errors.Wrap(err, "GetDestination: unable to get destination")
 		}
 		if obj == nil {
 			dest = &Destination{}
-			err = errorutils.ProcessSQLNotFound(errors.New("Record not found"), strconv.FormatInt(destinationId.Id, 10), "GetDestination")
+			err = errorutils.ProcessSQLNotFound(errors.New("Record not found"), strconv.FormatInt(get.Id, 10), "GetDestination")
 		} else {
 			dest = obj.(*Destination)
 		}
 		return err
 	})
-	result := db.fromDBDestination(dest)
+	result := db.dbToGetDestinationResponse(dest)
 	if err != nil {
 		return result, err
 	}
@@ -227,9 +237,9 @@ func (db *DB) ListDestinations() (*datafeed.ListDestinationResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	listOfDestinations := make([]*datafeed.Destination, 0)
+	listOfDestinations := make([]*datafeed.GetDestinationResponse, 0)
 	for _, d := range destinations {
-		listOfDestinations = append(listOfDestinations, db.fromDBDestination(&d))
+		listOfDestinations = append(listOfDestinations, db.dbToGetDestinationResponse(&d))
 	}
 	return &datafeed.ListDestinationResponse{Destinations: listOfDestinations}, err
 }
