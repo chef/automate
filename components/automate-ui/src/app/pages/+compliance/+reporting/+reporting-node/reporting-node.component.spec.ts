@@ -7,6 +7,7 @@ import { ReportingNodeComponent } from './reporting-node.component';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { of as observableOf } from 'rxjs';
 import { StatsService, ReportQueryService, ScanResultsService } from '../../shared/reporting';
+import { DatetimePipe } from 'app/pipes/datetime.pipe';
 
 describe('ReportingNodeComponent', () => {
   let fixture: ComponentFixture<ReportingNodeComponent>;
@@ -22,7 +23,8 @@ describe('ReportingNodeComponent', () => {
         HttpClientTestingModule
       ],
       declarations: [
-        ReportingNodeComponent
+        ReportingNodeComponent,
+        DatetimePipe
       ],
       providers: [
         ChefSessionService,
