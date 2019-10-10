@@ -22,6 +22,7 @@ export class RunSummaryComponent implements OnChanges, AfterContentInit {
   public chartFailed;
   public chartOther;
   public RFC2822 = DateTime.RFC2822;
+  public ChefTime = DateTime.CHEF_TIME;
 
   constructor(
     private eventService: NodeDetailsService
@@ -45,10 +46,6 @@ export class RunSummaryComponent implements OnChanges, AfterContentInit {
 
   renderDuration(totalSeconds) {
     return moment.duration(totalSeconds, 'seconds').humanize();
-  }
-
-  renderTime(timestamp) {
-    return moment(timestamp).format('HH:mm');
   }
 
   renderDate(timestamp) {

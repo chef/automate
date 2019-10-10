@@ -27,7 +27,7 @@
   <div class="run-detail-labels flex-block">
     <div class="run-metadata">
       <div class="label">Run Duration</div>
-      <div class="value">{{ renderTime(nodeRun.startTime) }} - {{ renderTime(nodeRun.endTime) }} UTC</div>
+      <div class="value">{{ nodeRun.startTime | datetime: ChefTime }} - {{ nodeRun.endTime | datetime: ChefTime }} UTC</div>
     </div>
     <div class="run-metadata">
       <div class="label">Node ID</div>
