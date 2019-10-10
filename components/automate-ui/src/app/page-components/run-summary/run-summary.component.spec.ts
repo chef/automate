@@ -5,6 +5,7 @@ import {
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RunSummaryComponent } from './run-summary.component';
 import { MockComponent } from 'ng2-mock-component';
+import { DatetimePipe } from '../../pipes/datetime.pipe';
 import { NodeRun } from '../../types/types';
 
 describe('RunSummaryComponent', () => {
@@ -14,6 +15,7 @@ describe('RunSummaryComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         RunSummaryComponent,
+        DatetimePipe,
         MockComponent({ selector: 'chef-radial-chart',
                 inputs: ['chartData', 'chartColors', 'labelIcon', 'labelText'] })
       ],
