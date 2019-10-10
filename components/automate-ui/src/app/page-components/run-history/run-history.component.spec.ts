@@ -4,6 +4,7 @@ import { RunHistoryStore } from '../../services/run-history-store/run-history.st
 import { DateSelectorComponent } from '../date-selector/date-selector.component';
 import { StatusSelectorPipe } from '../../pipes/status-selector.pipe';
 import { ChefStatusIconPipe } from '../../pipes/chef-status-icon.pipe';
+import { DatetimePipe } from '../../pipes/datetime.pipe';
 import { HistorySelection } from '../../helpers/history-selection/history-selection';
 import { AbridgedNodeRun, NodeHistoryCountsFilter, NodeRunsCount } from '../../types/types';
 import { NodeRunsService } from '../../services/node-details/node-runs.service';
@@ -31,6 +32,7 @@ describe('RunHistoryComponent', () => {
         DateSelectorComponent,
         StatusSelectorPipe,
         ChefStatusIconPipe,
+        DatetimePipe
         MockComponent({selector: 'chef-icon'})
       ],
       providers: [
