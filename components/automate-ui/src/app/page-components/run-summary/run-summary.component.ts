@@ -22,7 +22,7 @@ export class RunSummaryComponent implements OnChanges, AfterContentInit {
   public chartFailed;
   public chartOther;
   public RFC2822 = DateTime.RFC2822;
-  public ChefTime = DateTime.CHEF_TIME;
+  public ChefHoursMins = DateTime.CHEF_HOURS_MINS;
 
   constructor(
     private eventService: NodeDetailsService

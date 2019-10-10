@@ -15,7 +15,7 @@ export class LogsModalComponent implements OnChanges {
   @Input() isVisible = false;
 
   hideBacktrace = true;
-  ChefTime = DateTime.CHEF_TIME;
+  ChefHoursMins = DateTime.CHEF_HOURS_MINS;
 
   constructor(private eventService: NodeDetailsService) {}
 
