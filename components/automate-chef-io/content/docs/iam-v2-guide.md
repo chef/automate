@@ -57,6 +57,9 @@ Once that is done, delete the old legacy v1 policies and you will have a clean, 
 
 Alternately, you can run `--skip-policy-migration` on upgrade to start without any policies at all. You will still need to create new v2 policies to preserve any IAM behavior from v1.
 
+Note that several legacy policies (Compliance Profile Access and Ingest Access) have API tokens that will stop working if not ported. Alternately,
+you may choose to keep those policies in tact if that's easier and you do not plan to alter those permissions.
+
 The next few sections explain how to use Chef-managed policies and how to create custom policies.
 
 ### Using Chef-Managed Policies
@@ -209,14 +212,25 @@ The member expression dialog also supports tokens, because candidate tokens are 
 You enter a token using the expression `token:<id>`.
 In order to find a token's ID, use the command in the API reference for [listing tokens]({{< relref "iam-v2-api-reference#listing-tokens" >}}).
 
+### Projects
+
+Projects are used to group and permission Chef Automate resources. Chef Automate is currently limited to the management of 300 projects.
+
+Projects can be managed via the _Projects_ page under the *Settings* tab.
+
 ## Removing Legacy Policies
 
-Once you've rewritten your v1 policies as v2 policies, you should remove the v1 legacy policies.
-This section walks you through deleting all of the legacy policies imported into v2, which will provide you a clean slate for exploring the IAM v2 Beta.
+This section walks you through deleting legacy policies imported into v2, which will provide you a clean slate for exploring the IAM v2 Beta.
+
+Once you've rewritten your v1 policies as v2 policies, you should remove the v1 legacy policies you do not need.
+Be sure you have moved over any members of those policies or they will lose permissions. Note that several
+legacy policies (Compliance Profile Access and Ingest Access) have API tokens that will stop working if not ported. Alternately,
+you may choose to keep those policies in tact if that's easier and you do not plan to alter those permissions.
 
 Open the menu on any custom policy, located at the end of the policy row, and select **Delete Policy** from the menu.
 (You will not have this option for Chef-managed policies.)
-A warning appears if members are still attached to the policy, because deleting that policy disrupts access for all of its members.
+A warning appears if members are still attached to the policy because deleting that policy disrupts access for all of its members.
+
 However, you can still delete the policy.
 Repeat for each legacy policy.
 
