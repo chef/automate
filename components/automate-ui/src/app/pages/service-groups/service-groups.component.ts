@@ -304,7 +304,6 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
     this.numberOfSearchBarFilters$ = this.searchBarFilters$.pipe(
       map((chicklets: Chicklet[]) => chicklets.length));
-
   }
 
   ngOnDestroy() {

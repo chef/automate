@@ -74,4 +74,3 @@ export const selectedServiceGroupStatus = createSelector(
   serviceGroupsState,
   (serviceGroups) => serviceGroups.selectedGroup.services.status
 );
-
