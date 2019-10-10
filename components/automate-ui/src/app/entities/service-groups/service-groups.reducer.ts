@@ -8,8 +8,7 @@ import {
   ServiceGroupsFilters,
   ServiceGroupsHealthSummary,
   ServiceGroupsSuggestions,
-  SelectedServiceGroup,
-  ServicesStats
+  SelectedServiceGroup
 } from './service-groups.model';
 
 export interface ServiceGroupsEntityState {
@@ -20,7 +19,6 @@ export interface ServiceGroupsEntityState {
   selectedGroup: SelectedServiceGroup;
   status: EntityStatus;
   suggestions: ServiceGroupsSuggestions;
-  servicesStats: ServicesStats;
 }
 
 export const ServiceGroupEntityInitialState: ServiceGroupsEntityState = {
@@ -57,8 +55,7 @@ export const ServiceGroupEntityInitialState: ServiceGroupsEntityState = {
   suggestions: {
     values: [],
     status: EntityStatus.notLoaded
-  },
-  servicesStats: undefined
+  }
 };
 
 export function serviceGroupsEntityReducer(
@@ -130,19 +127,6 @@ export function serviceGroupsEntityReducer(
       return pipe(
         set('suggestions.values', []),
         set('suggestions.status', EntityStatus.loadingFailure),
-        set('error', action.payload))(state);
-
-    case ServiceGroupsActionTypes.GET_SERVICES_STATS:
-      return set('status', EntityStatus.loading, state);
-
-    case ServiceGroupsActionTypes.GET_SERVICES_STATS_SUCCESS:
-      return pipe(
-        set('status', EntityStatus.loadingSuccess),
-        set('servicesStats', action.payload))(state);
-
-    case ServiceGroupsActionTypes.GET_SERVICES_STATS_FAILURE:
-      return pipe(
-        set('status', EntityStatus.loadingFailure),
         set('error', action.payload))(state);
 
     default:

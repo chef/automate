@@ -1,4 +1,4 @@
-import { map, skip, take, takeUntil, withLatestFrom, distinctUntilChanged } from 'rxjs/operators';
+import { map, takeUntil, withLatestFrom, distinctUntilChanged } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject, Observable, combineLatest } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -13,7 +13,7 @@ import {
 } from 'app/types/types';
 import { EntityStatus } from 'app/entities/entities';
 import {
-  GetServiceGroupsSuggestions, UpdateServiceGroupsFilters, UpdateSelectedSG, GetServicesStats
+  GetServiceGroupsSuggestions, UpdateServiceGroupsFilters, UpdateSelectedSG
 } from 'app/entities/service-groups/service-groups.actions';
 import {
   ServiceGroup,
@@ -29,11 +29,11 @@ import {
   serviceGroupsHealth,
   serviceGroupsError,
   selectedServiceGroupList,
-  selectedServiceGroupStatus,
-  servicesStats
+  selectedServiceGroupStatus
 } from '../../entities/service-groups/service-groups.selector';
 import { find, filter as fpFilter, pickBy, some, includes, get } from 'lodash/fp';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { ServiceGroupsRequests } from '../../entities/service-groups/service-groups.requests';
 
 @Component({
   selector: 'app-service-groups',
@@ -174,7 +174,8 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     public router: Router,
     public store: Store<NgrxStateAtom>,
-    private telemetryService: TelemetryService
+    private telemetryService: TelemetryService,
+    private serviceGroupsRequests: ServiceGroupsRequests
   ) { }
 
   ngOnInit() {
@@ -195,20 +196,13 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed)
     ).subscribe(queryParams => this.listParamsChange(queryParams));
 
-    this.store.dispatch(new GetServicesStats());
-
-    this.store.select(servicesStats)
-    .pipe(skip(1), take(1)) // Skip 1 which is the initialization, take the next one which is the result
-    .subscribe((resp) => {
-      if(resp != undefined){
-        this.telemetryService.track('a2applicationsStats', {
-          totalServiceGroups: resp.totalServiceGroups,
-          totalServices: resp.totalServices,
-          totalSupervisors: resp.totalSupervisors,
-          totalDeployments: resp.totalDeployments
-        });
-      }
-    });
+    this.serviceGroupsRequests.getServiceStats().subscribe((resp) =>
+      this.telemetryService.track('a2applicationsStats', {
+        totalServiceGroups: resp.totalServiceGroups,
+        totalServices: resp.totalServices,
+        totalSupervisors: resp.totalSupervisors,
+        totalDeployments: resp.totalDeployments
+      }));
 
     combineLatest([
       this.route.queryParamMap.pipe(

@@ -34,11 +34,6 @@ export const serviceGroupsSuggestions = createSelector(
   (serviceGroups) => serviceGroups.suggestions
 );
 
-export const servicesStats = createSelector(
-  serviceGroupsState,
-  (serviceGroups) => serviceGroups.servicesStats
-);
-
 export const selectedServiceGroup = createSelector(
   serviceGroupsState,
   (serviceGroups) => serviceGroups.selectedGroup

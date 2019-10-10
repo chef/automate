@@ -13,8 +13,7 @@ import {
   ServiceGroup,
   ServiceGroupsHealthSummary,
   GroupService,
-  GroupServicesFilters,
-  ServicesStats
+  GroupServicesFilters
 } from '../../entities/service-groups/service-groups.model';
 import {
   serviceGroupsStatus,
@@ -22,8 +21,7 @@ import {
   selectedServiceGroupHealth,
   selectedServiceGroupName,
   selectedServiceGroupList,
-  selectedServiceGroupFilters,
-  servicesStats
+  selectedServiceGroupFilters
 } from './service-groups.selector';
 
 @Injectable({
@@ -44,7 +42,6 @@ export class ServiceGroupsFacadeService {
   public serviceGroupsName$: Observable<string>;
   public svcHealthSummary$: Observable<ServiceGroupsHealthSummary>;
   public currentServicesFilters$: Observable<GroupServicesFilters>;
-  public servicesStats$: Observable<ServicesStats>;
 
   // The collection of allowable status
   public allowedStatus = ['ok', 'critical', 'warning', 'unknown'];
@@ -61,7 +58,6 @@ export class ServiceGroupsFacadeService {
     this.serviceGroupsName$ = store.select(selectedServiceGroupName);
     this.svcHealthSummary$ = this.store.select(selectedServiceGroupHealth);
     this.currentServicesFilters$ = this.store.select(selectedServiceGroupFilters);
-    this.servicesStats$ = this.store.select(servicesStats);
   }
 
   dispatch(action: Action) {
