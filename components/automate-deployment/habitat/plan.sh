@@ -1,3 +1,6 @@
+#shellcheck disable=SC2034
+#shellcheck disable=SC2154
+
 pkg_name=deployment-service
 pkg_description="Automate Deployment Service"
 pkg_origin=chef
@@ -22,7 +25,6 @@ pkg_deps=(
   core/certstrap
   core/coreutils
   core/findutils
-  core/glibc
   core/rsync
   core/tar
   chef/mlsa
@@ -30,16 +32,13 @@ pkg_deps=(
   # we need pg11 because the ha backend uses postgres 11
   core/postgresql11-client
 )
-pkg_build_deps=(
-  core/gcc
-  core/git
-)
 pkg_bin_dirs=(bin)
 pkg_exports=(
   [port]=service.port
 )
 pkg_svc_user=root
-pkg_scaffolding=chef/scaffolding-go
+pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
+scaffolding_no_platform=true # Don't inject automate platform scaffolding
 scaffolding_go_base_path=github.com/chef
 scaffolding_go_repo_name=automate
 scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_name}/components/automate-deployment"
@@ -48,14 +47,5 @@ scaffolding_go_binary_list=(
 )
 
 do_strip() {
-    return 0;
-}
-
-do_prepare() {
-  GIT_SHA=$(git rev-parse HEAD)
-  GO_LDFLAGS=" -X ${scaffolding_go_base_path}/automate/lib/version.Version=${pkg_release}"
-  GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/automate/lib/version.GitSHA=${GIT_SHA}"
-  GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/automate/lib/version.BuildTime=${pkg_release}"
-  export GO_LDFLAGS
-  build_line "Setting GO_LDFLAGS=${GO_LDFLAGS}"
+  return 0
 }

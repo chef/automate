@@ -1,13 +1,6 @@
 #!/bin/bash
 #shellcheck disable=SC2034
 
-# Setting up the minimum settings to be able to configure
-# the Go Workspace inside the studio
-pkg_scaffolding=chef/scaffolding-go
-scaffolding_go_base_path=github.com/chef
-scaffolding_go_repo_name=automate
-scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_name}"
-
 export HAB_ORIGIN=${HAB_ORIGIN:-chef}
 # Bring studio-common to life
 RECOMMENDED_HAB_VERSION="0.77.0"
@@ -52,9 +45,18 @@ export GATEWAY_PORT=2000
 # use cgo so we set CGO_ENABLED=0 by default in the studio.
 export CGO_ENABLED=0
 
+# Go >= 1.13 will assume this but we have tools like protoc extensions that
+# look for it.
+export GO111MODULE=on
 
-# The version of the Go dependency management tool
-export GO_DEP_VERSION=0.5.0
+# Specify where to put 'go installed' binaries
+export GOBIN=/src/bin
+
+# Make 'go installed' binaries available in the PATH
+export PATH=$PATH:/src/bin
+
+# Enable vendor mode by default
+export GOFLAGS=-mod=vendor
 
 # Delve Server port for remote debugging
 export GO_DEBUG_PORT=2345

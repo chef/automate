@@ -1,16 +1,37 @@
 #!/bin/bash
 # set -x
-GOPATH=$(go env GOPATH)
 
-echo "Generate Go, Swagger, and GRPC Gateway"
+echo "Generate Go, Swagger, Validation, and GRPC Gateway"
 
-IMPORTS=(-I.
-         -I$GOPATH/src
-         -Ivendor
-         -Ivendor/github.com/grpc-ecosystem/grpc-gateway
-         -Ivendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
-         -Ivendor/github.com/envoyproxy/protoc-gen-validate
-         -Ilib/license
+# Unlike gen-go, the gateway, swagger, and validation protoc extension don't
+# support the source_relative path option, which is crucial when generating
+# go code in go module mode without a full GOPATH. Therefore, we have to use
+# the default import path option. Since we're using modules and don't have
+# a GOPATH we'll create a faux GOPATH and copy the generated files into the
+# the proper source when the source_relative path option is not available.
+
+fauxpath=$(mktemp -d)
+[[ ! "$fauxpath" || ! -d "$fauxpath" ]] && echo "Unable to create temp directory" && exit 1
+
+# Given a proto file location, copy the generated output from the faux GOPATH to
+# the src directory.
+function sync_from_fauxpath() {
+    base_dir=$(dirname "${1}")
+    gen_dir="${fauxpath}/github.com/chef/automate/${base_dir}/"
+    [[ -d "${gen_dir}" ]] && rsync -r "${gen_dir}" "/src/${base_dir}/"
+}
+
+function cleanup() {
+  [[ -d "${fauxpath}" ]] && rm -rf "${fauxpath}"
+}
+trap cleanup EXIT
+
+IMPORTS=(-I /src
+         -I vendor
+         -I vendor/github.com/grpc-ecosystem/grpc-gateway
+         -I vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
+         -I vendor/github.com/envoyproxy/protoc-gen-validate
+         -I lib/license
         )
 
 shopt -s globstar
@@ -23,15 +44,18 @@ for i in api/external/**/; do
 
     # service, grpc-gateway, policy mapping
     protoc ${IMPORTS[@]} \
-      --go_out=plugins=grpc:$GOPATH/src \
-      --grpc-gateway_out=request_context=true,logtostderr=true:$GOPATH/src  \
-      --policy_out=logtostderr=true:$GOPATH/src  \
+      --go_out=plugins=grpc,paths=source_relative:/src \
+      --grpc-gateway_out=request_context=true,logtostderr=true:$fauxpath  \
+      --policy_out=logtostderr=true:$fauxpath  \
       ${list[@]} || exit 1
+
+    sync_from_fauxpath "${list[0]}"
 
     # generates swagger output, only generate if a gateway file was generated
     gogw=(`find $i -maxdepth 1 -name "*.gw.go"`)
     if [ ${#gogw[@]} -gt 0 ]; then
-        protoc  ${IMPORTS[@]} --swagger_out=logtostderr=true,fqn_for_swagger_name=true:$PWD ${list[@]} || exit 1
+      printf 'SWG: %s\n' "${list[@]}"
+      protoc  ${IMPORTS[@]} --swagger_out=logtostderr=true,fqn_for_swagger_name=true:$PWD ${list[@]} || exit 1
     fi
   fi
 done
@@ -46,9 +70,11 @@ for i in api/interservice/**/; do
 
     # service, grpc-gateway, policy mapping
     protoc ${IMPORTS[@]} \
-      --go_out=plugins=grpc:$GOPATH/src \
-      --grpc-gateway_out=request_context=true,logtostderr=true:$GOPATH/src  \
+      --go_out=plugins=grpc,paths=source_relative:/src \
+      --grpc-gateway_out=request_context=true,logtostderr=true:$fauxpath  \
       ${list[@]} || exit 1
+
+    sync_from_fauxpath "${list[0]}"
 
     # Validation & Mocks
     #
@@ -63,9 +89,11 @@ for i in api/interservice/**/; do
         "api/interservice/authz/"*)
             printf 'VAL: %s\n' "${list[@]}"
             protoc ${IMPORTS[@]} \
-                   --grpc-mock_out=$GOPATH/src \
-                   --validate_out=lang=go:$GOPATH/src \
+                   --grpc-mock_out="${fauxpath}" \
+                   --validate_out=lang=go:"${fauxpath}" \
                    ${list[@]} || exit 1
+
+            sync_from_fauxpath "${list[0]}"
             ;;
         *)
             # no validation
@@ -74,9 +102,9 @@ for i in api/interservice/**/; do
     # generates swagger output, only generate if a gateway file was generated
     gogw=(`find $i -maxdepth 1 -name "*.gw.go"`)
     if [ ${#gogw[@]} -gt 0 ]; then
-        protoc  ${IMPORTS[@]} --swagger_out=logtostderr=true,fqn_for_swagger_name=true:$PWD ${list[@]} || exit 1
+      printf 'SWG: %s\n' "${list[@]}"
+      protoc  ${IMPORTS[@]} --swagger_out=logtostderr=true,fqn_for_swagger_name=true:$PWD ${list[@]} || exit 1
     fi
-
 
     pb_files=$(ls "$i"/*.pb.go)
     # extract the first field from the json tag (the name) and apply it as the
@@ -94,6 +122,6 @@ done
 # TODO (@afiune) Should this be moved to a 'go generate' hook instead?
 echo " "
 echo "Creating go src for swagger"
-pushd ${scaffolding_go_pkg_path:-$PWD}/api > /dev/null
+pushd "/src/api" || exit 1
 go run scripts/swagger.go
-popd > /dev/null
+popd || exit 1

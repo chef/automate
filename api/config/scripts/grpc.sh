@@ -17,10 +17,9 @@ for pkg in api/config/**/; do
   if [ ${#proto_files[@]} -gt 0 ]; then
       printf 'GEN: %s\n' "${proto_files[*]}"
 
-      protoc -I .\
-          -I "$GOPATH/src" \
-          --go_out=plugins=grpc:"$GOPATH/src" \
-          --a2-config_out="$GOPATH/src" \
+      protoc -I /src \
+          --go_out=plugins=grpc,paths=source_relative:/src \
+          --a2-config_out=paths=source_relative:/src \
           ${proto_files[*]} # don't quote so we word split
 
       pb_files=$(ls "$pkg"/*.pb.go)

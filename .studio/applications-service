@@ -83,8 +83,6 @@ function applications_benchmarks() {
   check_if_deployinate_started || return 1
 
   (
-    enter_go_workspace
-    install_if_missing core/go go
     install_if_missing core/git git
 
     local tmp_txt=/tmp/new.txt
@@ -94,7 +92,7 @@ function applications_benchmarks() {
     log_line "Running applications-service benchmark. (temporarily stored at $(yellow $tmp_txt))"
     log_line "$(yellow "This might take a while...")"
     cd components/applications-service || return 1
-    A2_SVC_NAME="applications-service" A2_SVC_PATH="/hab/svc/applications-service" go test \
+    A2_SVC_NAME="applications-service" A2_SVC_PATH="/hab/svc/applications-service" go_test \
       ./... \
       -bench=Benchmark \
       -benchmem \

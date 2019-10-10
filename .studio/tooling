@@ -23,21 +23,6 @@ function grpcurl() {
   $TOOL_BIN "$@"
 }
 
-document "dep" <<DOC
-  Go dependency management tool.
-
-  For more documentation go to: https://golang.github.io/dep/docs/FAQ.html
-DOC
-function dep() {
-  local TOOL_BIN
-  TOOL_BIN=$(type -P dep);
-  if [[ "x${TOOL_BIN}" == "x" ]]; then
-    install_if_missing "core/dep/$GO_DEP_VERSION" dep;
-    TOOL_BIN=$(type -P dep);
-  fi;
-  $TOOL_BIN "$@"
-}
-
 function ps() {
   install_if_missing core/procps-ng ps;
   TOOL_BIN=$(type -P ps);
@@ -99,9 +84,8 @@ DOC
 function generate_bldr_config()
 {
   (
-    enter_go_workspace
     echo "Generating updated bldr config. It takes a couple of minutes. It is very slow on Docker for Mac"
-    go run ./tools/bldr-config-gen/main.go
+    go run /src/tools/bldr-config-gen/main.go
   )
 }
 
@@ -109,7 +93,7 @@ document "install_benchstat" <<DOC
   Install benchstat tool. Used to compare statistics about benchmarks.
 DOC
 function install_benchstat() {
-  GO_TOOL_METHOD="get" install_go_tool "github.com/golang/perf/cmd/benchstat"
+  install_go_tool golang.org/x/perf/cmd/benchstat
 }
 
 document "install_gomock" <<DOC
@@ -120,5 +104,35 @@ function install_gomock() {
     github.com/golang/mock/gomock
     github.com/golang/mock/mockgen
   )
-  GO_TOOL_VENDOR=true install_go_tool "${go_mock_tools[@]}"
+  install_go_tool "${go_mock_tools[@]}"
+}
+
+document "install_go_tool" <<DOC
+  Install the specified go tool(s).
+  @(arg:*) The array of packages you wish to install.
+  The default behavior is to install go tools with 'go install -v -mod=vendor'
+
+  To attempt to build the binary statically set GO_BIN_STATIC=true
+
+  To install tools using not included in the vendor you'll either need to
+  include them and revendor or unset GO_LDFLAGS so that we don't use the
+  module vendor directory when installing the binary to the GOBIN directory.
+DOC
+function install_go_tool() {
+  install_if_missing core/go go
+
+  local go_cmd="go install -v"
+
+  # Add static linked flags if needed
+  if [[ $GO_STATIC_BIN == true ]]; then
+    go_static_linked_envs
+    go_cmd+=" $GO_ARGS"
+  fi
+
+  for tool in "$@"; do
+    go_tool=$(basename "$tool")
+    if [[ ! -f "${GOBIN}/${go_tool}" ]]; then
+      eval "$go_cmd $tool"
+    fi
+  done
 }

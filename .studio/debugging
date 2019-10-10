@@ -37,7 +37,7 @@ function debug_go_service() {
     return 1
   fi
 
-  GO_TOOL_METHOD="get" install_go_tool github.com/derekparker/delve/cmd/dlv
+  install_go_tool github.com/go-delve/delve/cmd/dlv
 
   dlv attach --headless -l ":${GO_DEBUG_PORT:-2345}" "$pid" --log=true --api-version=2
 }

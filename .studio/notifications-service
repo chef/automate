@@ -4,18 +4,18 @@ document "notifications_unit_test" <<DOC
   run the notifications service's unit tests
 DOC
 function notifications_unit_test() {
-  elixir_install;
-  pushd /src/components/notifications-service/server >/dev/null;
+  elixir_install
+  pushd /src/components/notifications-service/server >/dev/null || return 1
 	  mix local.hex --force
 	  mix local.rebar --force
 	  mix escript.install github tony612/protobuf-elixir --force
 
     mix deps.get
     mix test --no-start
-    local EXIT_CODE=$?;
-  popd >/dev/null;
+    local EXIT_CODE=$?
+  popd >/dev/null || return 1
 
-  return $EXIT_CODE;
+  return $EXIT_CODE
 }
 
 document "notifications_lint" <<DOC
@@ -23,7 +23,7 @@ document "notifications_lint" <<DOC
 DOC
 function notifications_lint() {
   elixir_install;
-  pushd /src/components/notifications-service/server >/dev/null;
+  pushd /src/components/notifications-service/server >/dev/null || return 1
 	  mix local.hex --force
 	  mix local.rebar --force
 	  mix escript.install github tony612/protobuf-elixir --force
@@ -32,10 +32,10 @@ function notifications_lint() {
     mix compile
     mix credo
 
-    local EXIT_CODE=$?;
-  popd >/dev/null;
+    local EXIT_CODE=$?
+  popd >/dev/null || return 1
 
-  return $EXIT_CODE;
+  return $EXIT_CODE
 }
 
 document "notifications_compile_protobuf" <<DOC
@@ -45,17 +45,15 @@ DOC
 function notifications_compile_protobuf() {
   local error_code
   install_if_missing core/protobuf-cpp protoc
-  GO_TOOL_VENDOR=true install_go_tool github.com/golang/protobuf/protoc-gen-go;
-  GO_TOOL_METHOD="install" install_go_tool github.com/golang/protobuf/protoc-gen-go
+  install_go_tool github.com/golang/protobuf/protoc-gen-go
 
-  setup_go_workspace
   # notifications-client
-  pushd /hab/cache/src/scaffolding-go-gopath/src/github.com/chef/automate/components/notifications-client/ >/dev/null;
+  pushd /src/components/notifications-client/ >/dev/null || return 1
     log_line "compiling for notifications-client..."
-    protoc -I../../components/notifications-service/server/priv \
-      --go_out=plugins=grpc:./api notifications.proto rules.proto server.proto health.proto
+    protoc -I /src/components/notifications-service/server/priv \
+      --go_out=plugins=grpc,paths=source_relative:./api notifications.proto rules.proto server.proto health.proto
     error_code=$?
-  popd >/dev/null;
+  popd >/dev/null || return 1
 
   if [[ $error_code -ne 0 ]]
   then
@@ -63,10 +61,10 @@ function notifications_compile_protobuf() {
     return $error_code
   fi
 
-  elixir_install;
+  elixir_install
 
   # compile to notifications-service elixir
-  pushd /src/components/notifications-service/server >/dev/null;
+  pushd /src/components/notifications-service/server >/dev/null || return 1
 
     log_line "installing elixir tools to compile protobuf files"
     mix local.hex --force
@@ -88,7 +86,7 @@ function notifications_compile_protobuf() {
       secrets.proto \
       google/protobuf/struct.proto
     error_code=$?
-  popd >/dev/null;
+  popd >/dev/null || return 1
 
   if [[ $error_code -eq 0 ]]
   then
@@ -105,7 +103,7 @@ document "notifications_update_component" <<DOC
   Warning: this does not work for new files. If you create a new file run rebuild components/notifications-service
 DOC
 function notifications_update_component() {
-  component_path=$(hab pkg path $HAB_ORIGIN/notifications-service 2> /dev/null)
+  component_path=$(hab pkg path "$HAB_ORIGIN"/notifications-service 2> /dev/null)
   if [[ $? -ne 0 ]]; then
     component_path=$(hab pkg path chef/notifications-service 2> /dev/null)
     if [[ $? -ne 0 ]]; then
@@ -115,14 +113,14 @@ function notifications_update_component() {
     fi
   fi
 
-  elixir_install;
+  elixir_install
 
-  pushd /src/components/notifications-service/server >/dev/null;
+  pushd /src/components/notifications-service/server >/dev/null
     mix local.hex --force
     mix local.rebar --force
     MIX_ENV=habitat mix "do" deps.get, compile
     returnStatus=$?
-  popd >/dev/null;
+  popd >/dev/null
 
   if [[ $returnStatus == 0 ]]; then
     log_line "reload the notifications-service binary."

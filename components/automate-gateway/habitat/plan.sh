@@ -1,3 +1,6 @@
+#shellcheck disable=SC2034
+#shellcheck disable=SC2154
+
 pkg_name=automate-gateway
 pkg_description="Automate API Gateway"
 pkg_origin=chef
@@ -8,12 +11,8 @@ pkg_version="0.1.0"
 pkg_deps=(
   core/cacerts # communicate with license service over HTTPS
   core/curl
-  core/glibc
   core/jq-static
   chef/mlsa
-)
-pkg_build_deps=(
-  core/gcc
 )
 pkg_exports=(
   [port]=service.port
@@ -45,17 +44,8 @@ scaffolding_go_binary_list=(
   "${scaffolding_go_import_path}/cmd/${pkg_name}"
 )
 
-do_prepare() {
-  GIT_SHA=$(git rev-parse HEAD)
-  GO_LDFLAGS=" -X ${scaffolding_go_base_path}/automate/lib/version.Version=${pkg_release}"
-  GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/automate/lib/version.GitSHA=${GIT_SHA}"
-  GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/automate/lib/version.BuildTime=${pkg_release}"
-  export GO_LDFLAGS
-  build_line "Setting GO_LDFLAGS=${GO_LDFLAGS}"
-}
-
 do_install() {
-  scaffolding_go_install
+  do_default_install
 
   build_line "Packaging swagger documentation"
   mkdir -p "${pkg_prefix}/static/"
@@ -65,5 +55,5 @@ do_install() {
 do_strip() {
   if [[ "${CHEF_DEV_ENVIRONMENT}" != "true" ]]; then
     do_default_strip
-  fi;
+  fi
 }

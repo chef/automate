@@ -311,8 +311,8 @@ func TestCorrectlyAnnotated(t *testing.T) {
 	// ```
 	// protoc -I .\
 	// -I "$GOPATH/src" \
-	// --go_out=plugins=grpc:"$GOPATH/src" \
-	// --a2-config_out=$GOPATH/src \
+	// --go_out=plugins=grpc,paths=source_relative:/src" \
+	// --a2-config_out,paths=source_relative=/src \
 	// "${proto_files}"
 	//```
 

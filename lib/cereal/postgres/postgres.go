@@ -237,21 +237,46 @@ func NewPostgresBackend(connURI string, opts ...PostgresBackendOpt) *PostgresBac
 }
 
 func (pg *PostgresBackend) Init() error {
-	db, err := sql.Open("postgres", pg.connURI)
+	err := pg.migrate()
 	if err != nil {
 		return err
 	}
-	pg.db = db
 
-	pg.db.SetMaxIdleConns(defaultMaxIdleConnections)
+	pg.db, err = pg.newDB()
+	if err != nil {
+		return err
+	}
+
+	pg.cleaner = newTaskCleaner(pg.db)
+	pg.cleaner.Start(context.Background())
+
+	return nil
+}
+
+func (pg *PostgresBackend) newDB() (*sql.DB, error) {
+	db, err := sql.Open("postgres", pg.connURI)
+	if err != nil {
+		return nil, err
+	}
+
+	db.SetMaxIdleConns(defaultMaxIdleConnections)
+
+	return db, nil
+}
+
+func (pg *PostgresBackend) migrate() error {
+	db, err := pg.newDB()
+	if err != nil {
+		return err
+	}
 
 	var dbName string
-	err = pg.db.QueryRow("SELECT CURRENT_DATABASE()").Scan(&dbName)
+	err = db.QueryRow("SELECT CURRENT_DATABASE()").Scan(&dbName)
 	if err != nil {
 		return errors.Wrap(err, "could not get database name")
 	}
 
-	dbInstance, err := postgres.WithInstance(pg.db, &postgres.Config{
+	dbInstance, err := postgres.WithInstance(db, &postgres.Config{
 		MigrationsTable: "cereal_schema_version",
 	})
 	if err != nil {
@@ -291,9 +316,6 @@ func (pg *PostgresBackend) Init() error {
 	} else if err != nil {
 		return errors.Wrap(err, "migration failed")
 	}
-
-	pg.cleaner = newTaskCleaner(pg.db)
-	pg.cleaner.Start(context.Background())
 
 	return nil
 }

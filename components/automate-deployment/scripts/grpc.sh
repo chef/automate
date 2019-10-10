@@ -19,10 +19,7 @@ for i in components/automate-deployment/pkg/persistence/boltdb/internal/v*/schem
 
   printf 'GEN: %s\n' "${proto_files[@]}"
 
-  protoc -I .\
-    -I $GOPATH/src \
-    --go_out=plugins=grpc:$GOPATH/src \
-    ${proto_files}
+  protoc -I /src --go_out=plugins=grpc,paths=source_relative:/src ${proto_files}
 
   pb_files=$(ls $i/*.pb.go)
 

@@ -23,10 +23,15 @@ func GenerateCode(t *testing.T,
 	pluginName string,
 	fds []*desc.FileDescriptor) (*plugin.CodeGeneratorResponse, func(), error) {
 
+	root, err := rootDir()
+	if err != nil {
+		return nil, nil, err
+	}
+
 	var pluginPackage string
 	switch pluginName {
 	case "policy":
-		pluginPackage = filepath.Join(a2Root, "components/automate-grpc/protoc-gen-policy")
+		pluginPackage = filepath.Join(root, "components/automate-grpc/protoc-gen-policy")
 	default:
 		return nil, nil, fmt.Errorf("unknown plugin %q", pluginName)
 	}

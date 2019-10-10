@@ -7,5 +7,5 @@ document "nodemanager_scans_integration" <<DOC
 DOC
 function nodemanager_scans_integration() {
   go_test -v "github.com/chef/automate/components/nodemanager-service/tests"
-  go test -v "github.com/chef/automate/components/nodemanager-service/tests/scanjobtests"
+  go_test -v "github.com/chef/automate/components/nodemanager-service/tests/scanjobtests"
 }

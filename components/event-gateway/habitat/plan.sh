@@ -1,5 +1,4 @@
 #shellcheck disable=SC2034
-#shellcheck disable=SC2039
 #shellcheck disable=SC2154
 
 pkg_name=event-gateway
@@ -12,13 +11,8 @@ pkg_upstream_url="http://github.com/chef/automate/components/event-gateway"
 
 pkg_deps=(
   core/bash
-  core/glibc
   chef/automate-platform-tools
   chef/mlsa
-)
-pkg_build_deps=(
-  core/git # for ref in version
-  core/gcc
 )
 
 pkg_exports=(
@@ -37,7 +31,7 @@ pkg_binds=(
 )
 
 pkg_bin_dirs=(bin)
-pkg_scaffolding=chef/scaffolding-go
+pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
 scaffolding_go_base_path=github.com/chef
 scaffolding_go_repo_name=automate
 scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_name}/components/${pkg_name}"
@@ -47,14 +41,5 @@ scaffolding_go_binary_list=(
 )
 
 do_strip() {
-    return 0;
+  return 0
 }
-
-do_prepare() {
-  GIT_SHA=$(git rev-parse HEAD)
-  GO_LDFLAGS=" -X ${scaffolding_go_base_path}/automate/lib/version.Version=${pkg_release}"
-  GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/automate/lib/version.GitSHA=${GIT_SHA}"
-  export GO_LDFLAGS
-  build_line "Setting GO_LDFLAGS=${GO_LDFLAGS}"
-}
-

@@ -205,8 +205,6 @@ function deployment_generate() {
   install_if_missing core/go go
   install_if_missing core/go gofmt
 
-  setup_go_workspace
-
   pushd /src/components/automate-deployment >/dev/null;
     make generate;
   popd >/dev/null;
@@ -219,8 +217,6 @@ function deployment_update_bindings() {
   install_if_missing core/git git
   install_if_missing core/go go
   install_if_missing core/go gofmt
-
-  setup_go_workspace
 
   pushd /src/components/automate-deployment >/dev/null;
     make update-bindings;

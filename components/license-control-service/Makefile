@@ -4,7 +4,7 @@ ci: build
 
 include ../../Makefile.common_go
 
-review: lint vet
+review: lint
 
 # Utilities
 build:

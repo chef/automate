@@ -171,69 +171,101 @@ func generateHabPackageConfig(outBuf io.Writer, habPackages []PackageSpec) error
 	return nil
 }
 
+// getGoDepInfo gets all of the non-standard lib deps and reduces their import
+// paths according to desired reduce rules. This allows us to tailor exactly
+// the depths we want to go for a desired package before rebuildling.
 func getGoDepInfo(path string) (GoDepInfo, error) {
-	info := GoDepInfo{}
 	path = strings.TrimLeft(path, "/")
 	goPkgPath := fmt.Sprintf("./%s/...", path)
-	output, err := command.Output("go",
-		command.Args("list", "-f", "{{join .Deps \"\\n\"}}", goPkgPath),
+	deps, err := command.Output("go",
+		command.Args("list", "-deps", "-f", "{{if not .Standard}}{{.ImportPath}}{{end}}", goPkgPath),
 		command.Envvar("GOOS", "linux"),
 	)
 	if err != nil {
-		return info, errors.Wrapf(err, "could not query go dependencies: %s", command.StderrFromError(err))
+		return GoDepInfo{}, errors.Wrapf(err, "could not query go dependencies: %s", command.StderrFromError(err))
 	}
 
-	scanner := bufio.NewScanner(strings.NewReader(output))
+	dp := &depImportReducer{}
+	dp.RegisterReduceRules([]depImportReduceRule{
+		{reduce: "github.com/chef/automate/api", to: 6},
+		// Many services depend on automate-gateway right now because of some
+		// dependency relations around the debug API and auth. Including deeper
+		// matches helps reduce rebuilds for non-auth changes in the gateway.
+		// If there are cross-component dependencies, we don't look at subdirs
+		// so that people can move code around inside their own projects without
+		// having to constantly update this file.
+		{reduce: "github.com/chef/automate/components/automate-gateway", to: 7},
+		{reduce: "github.com/chef/automate/lib/platform", to: 6},
+		{reduce: "github.com/chef/automate/lib/", to: 5},
+		{reduce: "github.com/chef/automate/components", to: 5},
+		{reduce: "github.com/chef/automate", to: 5},
+		{reduce: "google.golang.org", to: 2},
+		{reduce: "", to: 3}, // everything else gets trimmed to 3
+	}...)
+
+	return dp.Reduce(path, deps)
+}
+
+type depImportReducer struct {
+	rules []depImportReduceRule
+}
+
+func (p *depImportReducer) RegisterReduceRules(f ...depImportReduceRule) {
+	rules := append(p.rules, f...)
+
+	sort.Slice(rules, func(i, j int) bool {
+		// If the reduce pattern isn't set we'll move it to the bottom
+		if rules[i].reduce == "" {
+			return false
+		}
+
+		// Longer reduce strings are matched first
+		return len(strings.Split(rules[i].reduce, "/")) > len(strings.Split(rules[j].reduce, "/"))
+	})
+
+	p.rules = rules
+}
+
+// Reduce the imports paths according to the reduce rules, sort them and uniq
+// them.
+func (p *depImportReducer) Reduce(path, deps string) (GoDepInfo, error) {
+	info := GoDepInfo{}
+
+	scanner := bufio.NewScanner(strings.NewReader(deps))
 	for scanner.Scan() {
 		line := scanner.Text()
-		if strings.HasPrefix(line, "github.com/chef/automate/") {
-			if strings.Contains(line, path) {
-				continue // ignore imports inside our own package
-			}
+		line = strings.TrimLeft(line, "/")
 
-			parts := strings.Split(line, "/")
-			if len(parts) < 4 {
-				return info, errors.Errorf("unknown go dependency path for %s: %s", path, line)
-			}
-
-			end := len(parts)
-			switch parts[3] {
-			case "api":
-				end = 6
-			case "lib":
-				if len(parts) > 4 && parts[4] == "platform" {
-					end = 6
-				} else {
-					end = 5
-				}
-			case "vendor":
-				if len(parts) > 4 && parts[4] == "google.golang.org" {
-					end = 6
-				} else {
-					end = 7
-				}
-			case "components":
-				if len(parts) > 4 && parts[4] == "automate-gateway" {
-					// Many services depend on
-					// automate-gateway right now because of
-					// some dependency relations around the
-					// debug API and auth. Including deeper
-					// matches helps reduce rebuilds for
-					// non-auth changes in the gateway.
-					end = 7
-				} else {
-					// If there are cross-component
-					// dependencies, we don't look at
-					// subdirs so that people can move code
-					// around inside their own projects
-					// without having to constantly update
-					// this file.
-					end = 5
-				}
-			}
-			end = min(end, len(parts))
-			info.deps = append(info.deps, strings.Join(parts[3:end], "/"))
+		if strings.Contains(line, path) {
+			continue
 		}
+
+		parts := strings.Split(line, "/")
+		dep := ""
+
+		for _, f := range p.rules {
+			if strings.HasPrefix(line, f.reduce) {
+				if f.to > 0 {
+					dep = strings.Join(parts[0:min(f.to, len(parts))], "/")
+				} else {
+					dep = line
+				}
+
+				if strings.HasPrefix(dep, "github.com/chef/automate/") {
+					dep = strings.TrimPrefix(dep, "github.com/chef/automate/")
+				} else {
+					dep = fmt.Sprintf("vendor/%s", dep)
+				}
+
+				break
+			}
+		}
+
+		if dep == "" {
+			dep = line
+		}
+
+		info.deps = append(info.deps, dep)
 	}
 	if err := scanner.Err(); err != nil {
 		return info, errors.Wrap(err, "error scanning go list output")
@@ -253,6 +285,12 @@ func getGoDepInfo(path string) (GoDepInfo, error) {
 	info.deps = uniqDeps
 
 	return info, nil
+}
+
+// depImportReduceRule is a filter for our depImportReducer.
+type depImportReduceRule struct {
+	reduce string // the import path to match
+	to     int    // the depth we want to reduce the path to
 }
 
 func min(a, b int) int {
