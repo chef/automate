@@ -118,7 +118,8 @@ Let's further assume you want user `Bob` as well as anyone on team `gamma` to be
   ],
 ```
 
-Next, you'll specify the permissions themselves--which in IAM v2 are the `statements`-- declared as an array.
+Next, you'll specify the permissions themselves--which in IAM v2 are the `statements`-- declared as an array. Here we use the wildcard
+value`"*"` in the projects field, which indicates that members of this policy can perform these actions within _any_ project.
 We only need a single statement in this case, though, providing access to the _get_, _list_, and _update_ actions for _users_ and _teams_:
 
 ```json
@@ -131,7 +132,8 @@ We only need a single statement in this case, though, providing access to the _g
         "iam:teams:update",
         "iam:teams:list",
         "iam:teams:get"
-      ]
+      ],
+      "projects": ["*"],
     },
 ```
 
@@ -155,11 +157,16 @@ The complete policy should look like:
         "iam:teams:update",
         "iam:teams:list",
         "iam:teams:get"
-      ]
+      ],
+      "projects": ["*"]
     }
-  ]
+  ],
+  "projects": []
 }
 ```
+
+Note that policies also have a top-level field `projects`; however, this field is used for filtering and permissioning on the policy itself. Here,
+an empty `projects` field indicates that the policy is _unassigned_.
 
 Save your JSON file and follow the steps in [Creating a Policy]({{< relref "iam-v2-api-reference.md#creating-a-policy" >}}) to pass that data to Chef Automate.
 
