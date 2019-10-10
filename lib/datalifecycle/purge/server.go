@@ -141,7 +141,7 @@ func (server *Server) Show(ctx context.Context,
 	for _, policy := range policies.Es {
 		dsEsPolicies = append(dsEsPolicies, &data_lifecycle.EsPolicy{
 			Name:             policy.Name,
-			Index:            policy.IndexName,
+			Index:            policy.IndexNames,
 			OlderThanDays:    policy.OlderThanDays,
 			CustomPurgeField: policy.CustomPurgeField,
 			Disabled:         policy.Disabled,

@@ -21,7 +21,6 @@ var AllMappings = []Mapping{
 }
 
 const (
-
 	//N.B. - the two IndicesVersion consts may very well be different from one another.  it's important to only change the one(s) that need migration.
 	//if we tied both to the same version, then a simple change to profiles structure would require us to do a full migration of timeseries (which is time consuming)
 	//the net result of separating them is that we can migrate them when one or both change by simply incrementing one or both.  cool, right!?

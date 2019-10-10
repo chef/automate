@@ -2,9 +2,11 @@ package purge
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 
 	es "github.com/chef/automate/api/interservice/es_sidecar"
@@ -26,8 +28,10 @@ func NewPolicies() *Policies {
 
 // EsPolicy represents an elasticsearch purge policy
 type EsPolicy struct {
-	Name          string `json:"name"`
-	IndexName     string `json:"index_name"`
+	Name string `json:"name"`
+	// IndexNames is a comma separated list of index names (or bases if custom purge field is not provided)
+	// DO NOT CHANGE THE JSON NAME, YOU'LL PROBABLY BREAK THINGS. It preserves backwards compatibility
+	IndexNames    string `json:"index_name"`
 	OlderThanDays int32  `json:"older_than_days"`
 	// If the custom purge field is set we'll delete via document instead of
 	// timeseries index.
@@ -37,54 +41,59 @@ type EsPolicy struct {
 
 // Purge purges based on the policy
 func (p EsPolicy) Purge(ctx context.Context, esSidecarClient es.EsSidecarClient) error {
-	var (
-		err    error
-		id     = time.Now().UTC().Format(time.RFC3339)
-		res    *es.PurgeResponse
-		req    = &es.PurgeRequest{}
-		logctx = log.WithFields(log.Fields{
-			"id":              id,
-			"older_than_days": p.OlderThanDays,
-			"index_name":      p.IndexName,
-		})
-	)
+	logctx := log.WithFields(log.Fields{
+		"older_than_days": p.OlderThanDays,
+		"index_names":     p.IndexNames,
+	})
 
 	if p.Disabled {
 		logctx.Debug("Skipping purge because policy is disabled")
 		return nil
 	}
 
-	req.Id = id
-	req.Index = p.IndexName
-	req.OlderThanDays = p.OlderThanDays
+	indexNames := strings.Split(p.IndexNames, ",")
 
-	if req.CustomPurgeField != "" {
-		logctx = logctx.WithField("custom_purge_field", p.CustomPurgeField)
-		req.CustomPurgeField = p.CustomPurgeField
+	failures := []string{}
+	for _, indexName := range indexNames {
+		id := time.Now().UTC().Format(time.RFC3339)
+		logctx := logctx.WithFields(logrus.Fields{
+			"id":    id,
+			"index": indexName,
+		})
+		req := &es.PurgeRequest{
+			Id:               id,
+			Index:            indexName,
+			OlderThanDays:    p.OlderThanDays,
+			CustomPurgeField: p.CustomPurgeField,
+		}
+
+		var err error
+		var res *es.PurgeResponse
+		if req.CustomPurgeField == "" {
+			// We add 1 one here because otherwise we would delete an
+			// index that included documents newer than olderThanDays.
+			req.OlderThanDays = req.OlderThanDays + 1
+			res, err = esSidecarClient.PurgeTimeSeriesIndicesByAge(ctx, req)
+		} else {
+			res, err = esSidecarClient.PurgeDocumentsFromIndexByAge(ctx, req)
+		}
+		if err != nil {
+			logctx.WithError(err).Error("Failed to purge elaticsearch data")
+			failures = append(failures, err.Error())
+		} else {
+			if res.GetSuccess() {
+				logctx.Debug(res.GetMessage())
+			} else {
+				logctx.WithField("failures", res.GetFailures()).Error(res.GetMessage())
+				failures = append(failures, res.GetMessage())
+			}
+		}
 	}
 
-	logctx.Debug("Purging")
-	if req.CustomPurgeField == "" {
-		// We add 1 one here because otherwise we would delete an
-		// index that included documents newer than olderThanDays.
-		req.OlderThanDays = req.OlderThanDays + 1
-		res, err = esSidecarClient.PurgeTimeSeriesIndicesByAge(ctx, req)
-	} else {
-		res, err = esSidecarClient.PurgeDocumentsFromIndexByAge(ctx, req)
-	}
-
-	if err != nil {
-		logctx.WithError(err).Error("Failed to purge elaticsearch data")
-		return err
-	}
-
-	if res.GetSuccess() {
-		logctx.Debug(res.GetMessage())
+	if len(failures) <= 0 {
 		return nil
 	}
-
-	logctx.WithField("failures", res.GetFailures()).Error(res.GetMessage())
-	return errors.New(res.GetMessage())
+	return errors.New(strings.Join(failures, "\n"))
 }
 
 // NOTE: PgPolicies are just a shim until they are actually required by a service.

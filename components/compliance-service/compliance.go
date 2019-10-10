@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/golang/mock/gomock"
@@ -367,30 +368,33 @@ func getManagerConnection(connectionFactory *secureconn.Factory,
 func setupDataLifecyclePurgeInterface(ctx context.Context, connFactory *secureconn.Factory,
 	conf config.Compliance, cerealManager *cereal.Manager) (*purge.Server, error) {
 
-	var (
-		compSIndex           = fmt.Sprintf("comp-%s-s", mappings.ComplianceCurrentTimeSeriesIndicesVersion)
-		compSName            = "compliance-scans"
-		compRIndex           = fmt.Sprintf("comp-%s-r", mappings.ComplianceCurrentTimeSeriesIndicesVersion)
-		compRName            = "compliance-reports"
-		defaultPurgePolicies = &purge.Policies{
-			Es: map[string]purge.EsPolicy{
-				compSName: {
-					Name:          compSName,
-					IndexName:     compSIndex,
-					OlderThanDays: conf.ComplianceReportDays,
-				},
-				compRName: {
-					Name:          compRName,
-					IndexName:     compRIndex,
-					OlderThanDays: conf.ComplianceReportDays,
-				},
+	curIndexVersion, err := strconv.Atoi(mappings.ComplianceCurrentTimeSeriesIndicesVersion)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to convert %s to int", mappings.ComplianceCurrentTimeSeriesIndicesVersion)
+	}
+	compSIndices := make([]string, curIndexVersion)
+	compRIndices := make([]string, curIndexVersion)
+	for i := 1; i <= curIndexVersion; i++ {
+		compSIndices[i-1] = fmt.Sprintf("comp-%d-s", i)
+		compRIndices[i-1] = fmt.Sprintf("comp-%d-r", i)
+	}
+
+	compSName := "compliance-scans"
+	compRName := "compliance-reports"
+	defaultPurgePolicies := &purge.Policies{
+		Es: map[string]purge.EsPolicy{
+			compSName: {
+				Name:          compSName,
+				IndexNames:    strings.Join(compSIndices, ","),
+				OlderThanDays: conf.ComplianceReportDays,
 			},
-		}
-		err             error
-		esSidecarConn   *grpc.ClientConn
-		esSidecarClient es_sidecar.EsSidecarClient
-		recurrence      *rrule.RRule
-	)
+			compRName: {
+				Name:          compRName,
+				IndexNames:    strings.Join(compRIndices, ","),
+				OlderThanDays: conf.ComplianceReportDays,
+			},
+		},
+	}
 
 	// Migrate default policy values from the config. The default policies are
 	// only persisted the first time the workflow is created, after which only
@@ -437,13 +441,13 @@ func setupDataLifecyclePurgeInterface(ctx context.Context, connFactory *secureco
 		dialOpts = append(dialOpts, grpc.WithBlock())
 	}
 
-	esSidecarConn, err = connFactory.DialContext(timeoutCtx, "es-sidecar-service",
+	esSidecarConn, err := connFactory.DialContext(timeoutCtx, "es-sidecar-service",
 		addr, dialOpts...)
 	if err != nil || esSidecarConn == nil {
 		logrus.WithFields(logrus.Fields{"error": err}).Fatal("Failed to create ES Sidecar connection")
 		return nil, err
 	}
-	esSidecarClient = es_sidecar.NewEsSidecarClient(esSidecarConn)
+	esSidecarClient := es_sidecar.NewEsSidecarClient(esSidecarConn)
 
 	err = purge.ConfigureManager(
 		cerealManager,
@@ -454,7 +458,7 @@ func setupDataLifecyclePurgeInterface(ctx context.Context, connFactory *secureco
 		return nil, errors.Wrapf(err, "failed to configure %s workflow", PurgeWorkflowName)
 	}
 
-	recurrence, err = rrule.NewRRule(rrule.ROption{
+	recurrence, err := rrule.NewRRule(rrule.ROption{
 		Freq:     rrule.DAILY,
 		Interval: 1,
 		Dtstart:  time.Now(),

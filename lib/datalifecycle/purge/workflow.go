@@ -69,7 +69,7 @@ func CreateOrUpdatePurgeWorkflow(
 		for name, dp := range defaultPolicies.Es {
 			p, ok := currentPolicies.Es[name]
 			if ok {
-				p.IndexName = dp.IndexName
+				p.IndexNames = dp.IndexNames
 				p.CustomPurgeField = dp.CustomPurgeField
 				currentPolicies.Es[name] = p
 			} else {

@@ -7,6 +7,8 @@ var AllMappings = []Mapping{
 }
 
 const (
+	// TODO: next person that changes the index version needs to fix the
+	// purging to happen for old indices
 	feedsIndicesVersion = "2"
 	DocType             = "_doc"
 	IndexNameFeeds      = "eventfeed-" + feedsIndicesVersion + "-feeds"

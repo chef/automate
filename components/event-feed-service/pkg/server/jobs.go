@@ -25,7 +25,7 @@ var DefaultPurgePolicies = &purge.Policies{
 	Es: map[string]purge.EsPolicy{
 		PurgeFeedPolicyName: {
 			Name:             PurgeFeedPolicyName,
-			IndexName:        PurgeFeedIndexName,
+			IndexNames:       PurgeFeedIndexName,
 			CustomPurgeField: "pub_timestamp",
 		},
 	},
