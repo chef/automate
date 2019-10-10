@@ -13,13 +13,13 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/lib/authz/project_purge"
 )
 
 var (
 	purgeProjectWorkflowName           = cereal.NewWorkflowName("authz/PurgeProject")
 	moveProjectToGraveyardTaskName     = cereal.NewTaskName("authz/MoveProjectToGraveyard")
-	deleteProjectFromDomainTaskName    = cereal.NewTaskName("authz/DeleteProjectFromDomain")
 	deleteProjectFromGraveyardTaskName = cereal.NewTaskName("authz/DeleteProjectFromGraveyard")
 )
 
@@ -68,7 +68,7 @@ func RegisterCerealProjectPurgerWithDomainServices(manager *cereal.Manager, log 
 		store: s,
 		log:   log,
 	}
-	if err := manager.RegisterTaskExecutor(deleteProjectFromDomainTaskName, deleteProjectFromGraveyardTaskExecutor,
+	if err := manager.RegisterTaskExecutor(deleteProjectFromGraveyardTaskName, deleteProjectFromGraveyardTaskExecutor,
 		cereal.TaskExecutorOpts{Workers: 1}); err != nil {
 	}
 
@@ -134,19 +134,18 @@ func (m *cerealProjectPurger) GraveyardingCompleted(projectID string) (bool, err
 		return false, nil
 	}
 	result := moveProjectToGraveyardResult{}
-	if err := subinstance.GetResult(&result); err != nil {
-		return true, status.Errorf(codes.Internal,
-			"unmarshall move to graveyard result for project with ID ID %q: %s", projectID, err.Error())
+	err = subinstance.GetResult(&result)
+
+	if err != nil {
+		switch err.Error() {
+		case storage_errors.ErrNotFound.Error():
+			return true, status.Errorf(codes.NotFound, "no project with ID %q found", projectID)
+		default:
+			return true, status.Errorf(codes.Internal,
+				"error graveyarding project with ID %q", projectID)
+		}
 	}
-	switch result.Code {
-	case codes.OK:
-		return true, nil
-	case codes.NotFound:
-		return true, status.Errorf(codes.NotFound, "no project with ID %q found", projectID)
-	default:
-		return true, status.Errorf(codes.Internal,
-			"error graveyarding project with ID %q", projectID)
-	}
+	return true, nil
 }
 
 // NewProjectPurgerWorkflowExecutor mostly follows the pattern described in project_update_manager.go but here is a detailed description:

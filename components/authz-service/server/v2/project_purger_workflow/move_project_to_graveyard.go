@@ -3,13 +3,11 @@ package project_purger_workflow
 import (
 	"context"
 
-	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/logger"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"google.golang.org/grpc/codes"
 )
 
 type moveProjectToGraveyardWorkflowExecutor struct {
@@ -37,7 +35,7 @@ func (s *moveProjectToGraveyardWorkflowExecutor) OnStart(w cereal.WorkflowInstan
 	}
 
 	if err := w.EnqueueTask(moveProjectToGraveyardTaskName, moveProjectToGraveyardParams{ProjectID: params.ProjectID}); err != nil {
-		logrus.WithError(err).Errorf("failed to enqueue move to graveyard task %s", deleteProjectFromGraveyardTaskName)
+		logrus.WithError(err).Errorf("failed to enqueue move to graveyard task %s", moveProjectToGraveyardTaskName)
 		return w.Fail(err)
 	}
 	return w.Continue(nil)
@@ -69,7 +67,7 @@ func (s *moveProjectToGraveyardWorkflowExecutor) OnTaskComplete(w cereal.Workflo
 					return w.Fail(err)
 				}
 			}
-			// for all other errors, the task will not have been moved to the graveyard. return the error and fail the request.
+			// return database failure
 			return w.Fail(taskErr)
 		}
 		return w.Complete()
@@ -88,7 +86,6 @@ type moveProjectToGraveyardTaskExecutor struct {
 }
 
 type moveProjectToGraveyardResult struct {
-	Code codes.Code
 }
 
 type moveProjectToGraveyardParams struct {
@@ -104,12 +101,9 @@ func (s *moveProjectToGraveyardTaskExecutor) Run(ctx context.Context, task cerea
 	s.log.Infof("starting project move to graveyard for id %q", params.ProjectID)
 
 	err := s.store.DeleteProject(ctx, params.ProjectID)
-	switch err {
-	case nil:
-		return &moveProjectToGraveyardResult{Code: codes.OK}, nil
-	case storage_errors.ErrNotFound:
-		return &moveProjectToGraveyardResult{Code: codes.NotFound}, nil
-	default:
-		return &moveProjectToGraveyardResult{Code: codes.Internal}, nil
+	if err != nil {
+		// could be storage_errors.ErrNotFound which is the only one we will special case upstream
+		return &moveProjectToGraveyardResult{}, err
 	}
+	return &moveProjectToGraveyardResult{}, nil
 }

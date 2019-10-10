@@ -31,7 +31,7 @@ type DomainProjectPurgeWorkflowPayload struct {
 func (m *DomainProjectPurgeWorkflowExecutor) OnStart(
 	w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
 
-	logrus.Info("OnStart for DomainProjectPurgeWorkflowExecutor")
+	logrus.Infof("OnStart for DomainProjectPurgeWorkflowExecutor for domain %s", m.purgeProjectForDomainTaskName)
 	params := DomainProjectPurgeWorkflowParameters{}
 	if err := w.GetParameters(&params); err != nil {
 		return w.Fail(err)

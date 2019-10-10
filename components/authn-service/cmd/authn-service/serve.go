@@ -160,18 +160,18 @@ func serve(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("GRPC endpoint not configured")
 	}
 
+	err = manager.Start(context.Background())
+	if err != nil {
+		return errors.Wrap(err, "could not start project update manager")
+	}
+	defer manager.Stop() // nolint: errcheck
+
 	l.Infof("grpc endpoint listening on %s", c.GRPC)
 	l.Infof("http1 endpoint listening on %s", c.HTTP1)
 	err = serv.Serve(c.GRPC, c.HTTP1)
 	if err != nil {
 		return errors.Wrapf(err, "grpc endpoint listening on %s failed", c.GRPC)
 	}
-
-	err = manager.Start(context.Background())
-	if err != nil {
-		return errors.Wrap(err, "could not start project update manager")
-	}
-	defer manager.Stop() // nolint: errcheck
 
 	return nil
 }
