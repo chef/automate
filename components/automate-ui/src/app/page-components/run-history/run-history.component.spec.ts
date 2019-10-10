@@ -32,7 +32,7 @@ describe('RunHistoryComponent', () => {
         DateSelectorComponent,
         StatusSelectorPipe,
         ChefStatusIconPipe,
-        DatetimePipe
+        DatetimePipe,
         MockComponent({selector: 'chef-icon'})
       ],
       providers: [
