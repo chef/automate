@@ -21,7 +21,7 @@ func init() {
     "/compliance/reporting/controls": {
       "post": {
         "summary": "List controls",
-        "description": "List all controls optionally using filters. Supports filtering, but not pagination or sorting.",
+        "description": "Lists controls from the last run, with the option of applying filters. Supports filtering, but not pagination or sorting.",
         "operationId": "ListControlItems",
         "responses": {
           "200": {
@@ -42,7 +42,7 @@ func init() {
           }
         ],
         "tags": [
-          "Compliance Reporting Controls"
+          "Reporting"
         ]
       }
     },
@@ -62,14 +62,14 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "The id of the node to fetch",
+            "description": "Unique identifier.",
             "in": "path",
             "required": true,
             "type": "string"
           }
         ],
         "tags": [
-          "Compliance Reporting Nodes"
+          "Reporting"
         ]
       }
     },
@@ -97,14 +97,14 @@ func init() {
           }
         ],
         "tags": [
-          "Compliance Reporting Nodes"
+          "Reporting"
         ]
       }
     },
     "/compliance/reporting/profiles": {
       "post": {
         "summary": "List profiles",
-        "description": "List all profiles optionally using filters. Supports pagination, filtering, and sorting.\n\n| Sort paramter | Sort value |\n| --- | --- |\n| name | name.lower |\n| title (default) | title.lower |",
+        "description": "List all profiles in use, with the option of applying filters. Adding a profile filter returns a list of all the nodes using that profile. Supports pagination, filtering, and sorting.\n\n| Sort paramter | Sort value |\n| --- | --- |\n| name | name.lower |\n| title (default) | title.lower |",
         "operationId": "ListProfiles",
         "responses": {
           "200": {
@@ -125,7 +125,7 @@ func init() {
           }
         ],
         "tags": [
-          "Compliance Reporting Profiles"
+          "Reporting"
         ]
       }
     },
@@ -153,14 +153,14 @@ func init() {
           }
         ],
         "tags": [
-          "Compliance Reporting Report IDs"
+          "Reports"
         ]
       }
     },
     "/compliance/reporting/reports": {
       "post": {
         "summary": "List reports",
-        "description": "List all reports optionally using filters. Supports pagination, filtering, and sorting.\n\n| Sort paramter | Sort value |\n| --- | --- |\n| latest_report.controls.failed.critical | controls_sums.failed.critical |\n| latest_report.controls.failed.total | controls_sums.failed.total |\n| latest_report.end_time (default) | end_time |\n| latest_report.status | status |\n| node_name | node_name.lower |",
+        "description": "Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria. Supports pagination, filtering, and sorting.\n\n| Sort paramter | Sort value |\n| --- | --- |\n| latest_report.controls.failed.critical | controls_sums.failed.critical |\n| latest_report.controls.failed.total | controls_sums.failed.total |\n| latest_report.end_time (default) | end_time |\n| latest_report.status | status |\n| node_name | node_name.lower |",
         "operationId": "ListReports",
         "responses": {
           "200": {
@@ -181,7 +181,7 @@ func init() {
           }
         ],
         "tags": [
-          "Compliance Reporting Reports"
+          "Reporting"
         ]
       }
     },
@@ -201,7 +201,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "Used by the ReadReport endpoint to specify which report to return",
+            "description": "Unique idenfifier.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -216,7 +216,7 @@ func init() {
           }
         ],
         "tags": [
-          "Compliance Reporting Reports"
+          "Reporting"
         ]
       }
     },
@@ -244,7 +244,7 @@ func init() {
           }
         ],
         "tags": [
-          "Compliance Reporting Suggestions"
+          "Reporting"
         ]
       }
     },
@@ -288,11 +288,11 @@ func init() {
       "properties": {
         "name": {
           "type": "string",
-          "title": "The name of the attribute"
+          "description": "The name of the attribute."
         },
         "options": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Option",
-          "title": "The options defined for the attribute"
+          "description": "The options defined for the attribute."
         }
       }
     },
@@ -301,49 +301,49 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "title": "The unique id of this control"
+          "description": "The unique id of this control."
         },
         "code": {
           "type": "string",
-          "title": "The full ruby code of the control defined in the profile"
+          "description": "The full ruby code of the control defined in the profile."
         },
         "desc": {
           "type": "string",
-          "title": "The full description of the control"
+          "description": "The full description of the control."
         },
         "impact": {
           "type": "number",
           "format": "float",
-          "title": "The severity of the control"
+          "description": "The severity of the control."
         },
         "title": {
           "type": "string",
-          "title": "The compact description of the control"
+          "description": "The compact description of the control."
         },
         "source_location": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.SourceLocation",
-          "title": "Intentionally blank"
+          "description": "Intentionally blank."
         },
         "results": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Result"
           },
-          "title": "The results of running all tests defined in the control against the node"
+          "description": "The results of running all tests defined in the control against the node."
         },
         "refs": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Ref"
           },
-          "title": "External supporting documents for the control"
+          "description": "External supporting documents for the control."
         },
         "tags": {
           "type": "object",
           "additionalProperties": {
             "type": "string"
           },
-          "title": "Metadata defined on the control in key-value format"
+          "description": "Metadata defined on the control in key-value format."
         }
       }
     },
@@ -352,29 +352,29 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "title": "The unique id of this control"
+          "description": "The unique id of this control."
         },
         "title": {
           "type": "string",
-          "title": "The compact description of the control"
+          "description": "The compact description of the control."
         },
         "profile": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ProfileMin",
-          "title": "Intentionally blank"
+          "description": "Intentionally blank."
         },
         "impact": {
           "type": "number",
           "format": "float",
-          "title": "The severity of the control"
+          "description": "The severity of the control."
         },
         "end_time": {
           "type": "string",
           "format": "date-time",
-          "title": "The time the report using the control was submitted at"
+          "description": "The time the report using the control was submitted at."
         },
         "control_summary": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlSummary",
-          "title": "Intentionally blank"
+          "description": "Intentionally blank."
         }
       }
     },
@@ -383,19 +383,19 @@ func init() {
       "properties": {
         "text": {
           "type": "string",
-          "title": "The term to use to match resources on"
+          "description": "The term to use to match resources on."
         },
         "size": {
           "type": "integer",
           "format": "int32",
-          "title": "The maximum number of controls to return (Default 100)"
+          "description": "The maximum number of controls to return (Default 100)."
         },
         "filters": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ListFilter"
           },
-          "title": "The criteria used to filter the controls returned"
+          "description": "The criteria used to filter the controls returned."
         }
       }
     },
@@ -407,7 +407,7 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlItem"
           },
-          "title": "The paginated results of controls matching the filters"
+          "description": "The paginated results of controls matching the filters."
         }
       }
     },
@@ -417,77 +417,77 @@ func init() {
         "total": {
           "type": "integer",
           "format": "int32",
-          "title": "The total number of controls"
+          "description": "The total number of controls in the report."
         },
         "passed": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Total",
-          "title": "Intentionally blank"
+          "description": "Intentionally blank."
         },
         "skipped": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Total",
-          "title": "Intentionally blank"
+          "description": "Intentionally blank."
         },
         "failed": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Failed",
-          "title": "Intentionally blank"
+          "description": "Intentionally blank."
         }
       },
-      "title": "A minimal represenation of the statuses of the controls"
+      "description": "A minimal represenation of the statuses of the controls in the report."
     },
     "chef.automate.api.compliance.reporting.v1.Dependency": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string",
-          "title": "The name of the profile"
+          "description": "The name of the profile."
         },
         "url": {
           "type": "string",
-          "title": "The URL of the profile accessible over HTTP or HTTPS"
+          "description": "The URL of the profile accessible over HTTP or HTTPS."
         },
         "path": {
           "type": "string",
-          "title": "The path to the profile on disk"
+          "description": "The path to the profile on disk."
         },
         "git": {
           "type": "string",
-          "title": "The git URL of the profile"
+          "description": "The git URL of the profile."
         },
         "branch": {
           "type": "string",
-          "title": "The specific git branch of the dependency"
+          "description": "The specific git branch of the dependency."
         },
         "tag": {
           "type": "string",
-          "title": "The specific git tag of the dependency"
+          "description": "The specific git tag of the dependency."
         },
         "commit": {
           "type": "string",
-          "title": "The specific git commit of the dependency"
+          "description": "The specific git commit of the dependency."
         },
         "version": {
           "type": "string",
-          "title": "The specific git version of the dependency"
+          "description": "The specific git version of the dependency."
         },
         "supermarket": {
           "type": "string",
-          "title": "The name of the dependency stored in Chef Supermarket"
+          "description": "The name of the dependency stored in Chef Supermarket."
         },
         "github": {
           "type": "string",
-          "title": "The short name of the dependency stored on Github"
+          "description": "The short name of the dependency stored on Github."
         },
         "compliance": {
           "type": "string",
-          "title": "The short name of the dependency stored on the Chef Automate or Chef Compliance server"
+          "description": "The short name of the dependency stored on the Chef Automate or Chef Compliance server."
         },
         "status": {
           "type": "string",
-          "title": "The status of the dependency in the report"
+          "description": "The status of the dependency in the report."
         },
         "skip_message": {
           "type": "string",
-          "title": "The reason this profile was skipped in the generated report, if any"
+          "description": "The reason this profile was skipped in the generated report, if any."
         }
       }
     },
@@ -497,7 +497,7 @@ func init() {
         "content": {
           "type": "string",
           "format": "byte",
-          "title": "The exported reports in the requested format"
+          "description": "Exported reports in JSON or CSV."
         }
       }
     },
@@ -507,43 +507,43 @@ func init() {
         "total": {
           "type": "integer",
           "format": "int32",
-          "title": "The total number of failed controls"
+          "description": "The total number of failed controls."
         },
         "minor": {
           "type": "integer",
           "format": "int32",
-          "title": "The number of failed controls with minor severity"
+          "description": "The number of failed controls with minor severity."
         },
         "major": {
           "type": "integer",
           "format": "int32",
-          "title": "The number of failed controls with major severity"
+          "description": "The number of failed controls with major severity."
         },
         "critical": {
           "type": "integer",
           "format": "int32",
-          "title": "The number of failed controls with critical severity"
+          "description": "The number of failed controls with critical severity."
         }
       },
-      "title": "Stats of failed controls"
+      "description": "Stats of failed controls."
     },
     "chef.automate.api.compliance.reporting.v1.Group": {
       "type": "object",
       "properties": {
         "id": {
           "type": "string",
-          "title": "The name of the file the controls are defined in"
+          "description": "The name of the file the controls are defined in."
         },
         "title": {
           "type": "string",
-          "title": "The title of control group"
+          "description": "The title of control group."
         },
         "controls": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "title": "The ids of the controls defined in this file"
+          "description": "The ids of the controls defined in this file."
         }
       }
     },
@@ -552,11 +552,11 @@ func init() {
       "properties": {
         "key": {
           "type": "string",
-          "title": "The key of the tag"
+          "description": "The key of the tag."
         },
         "value": {
           "type": "string",
-          "title": "The value of the tag"
+          "description": "The value of the tag."
         }
       }
     },
@@ -565,23 +565,23 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "title": "The id of the latest report"
+          "description": "The id of the latest report."
         },
         "end_time": {
           "type": "string",
           "format": "date-time",
-          "title": "The time the report was submitted at"
+          "description": "The time the report was submitted at."
         },
         "status": {
           "type": "string",
-          "title": "The status of the run the report was made from"
+          "description": "The status of the run the report was made from."
         },
         "controls": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlSummary",
-          "title": "Intentionally blank"
+          "description": "Intentionally blank."
         }
       },
-      "title": "A summary of the information contained in the latest report for this node"
+      "description": "A summary of the information contained in the latest report for this node."
     },
     "chef.automate.api.compliance.reporting.v1.ListFilter": {
       "type": "object",
@@ -591,11 +591,11 @@ func init() {
           "items": {
             "type": "string"
           },
-          "title": "The values to filter for"
+          "description": "Filters applied to the list."
         },
         "type": {
           "type": "string",
-          "title": "The field to filter on"
+          "description": "The field to filter on."
         }
       }
     },
@@ -604,37 +604,37 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "title": "The id of this node"
+          "description": "The id of this node."
         },
         "name": {
           "type": "string",
-          "title": "The name assigned to the node"
+          "description": "The name assigned to the node."
         },
         "platform": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Platform",
-          "title": "Intentionally blank"
+          "description": "Intentionally blank."
         },
         "environment": {
           "type": "string",
-          "title": "The environment assigned to the node"
+          "description": "The environment assigned to the node."
         },
         "latest_report": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.LatestReportSummary",
-          "title": "A summary of the information contained in the latest report for this node"
+          "description": "A summary of the information contained in the latest report for this node."
         },
         "tags": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Kv"
           },
-          "title": "The tags assigned to this node"
+          "description": "The tags assigned to this node."
         },
         "profiles": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ProfileMeta"
           },
-          "title": "A minimal represenation of the compliance profiles run against the node"
+          "description": "A minimal represenation of the compliance profiles run against the node."
         }
       }
     },
@@ -646,27 +646,27 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Node"
           },
-          "title": "The nodes matching the request filters"
+          "description": "The nodes matching the request filters."
         },
         "total": {
           "type": "integer",
           "format": "int32",
-          "title": "The total number of nodes matching the filters"
+          "description": "The total number of nodes matching the filters."
         },
         "total_passed": {
           "type": "integer",
           "format": "int32",
-          "title": "The total number of passing nodes matching the filters"
+          "description": "The total number of passing nodes matching the filters."
         },
         "total_failed": {
           "type": "integer",
           "format": "int32",
-          "title": "The total number of failed nodes matching the filters"
+          "description": "The total number of failed nodes matching the filters."
         },
         "total_skipped": {
           "type": "integer",
           "format": "int32",
-          "title": "The total number of skipped nodes matching the filters"
+          "description": "The total number of skipped nodes matching the filters."
         }
       }
     },
@@ -675,11 +675,11 @@ func init() {
       "properties": {
         "description": {
           "type": "string",
-          "title": "The description of the attribute"
+          "description": "The description of the attribute."
         },
         "default": {
           "type": "string",
-          "title": "The default value of the attribute"
+          "description": "The default value of the attribute."
         }
       }
     },
@@ -688,112 +688,112 @@ func init() {
       "properties": {
         "name": {
           "type": "string",
-          "title": "The name of the node's operating system"
+          "description": "The name of the node's operating system."
         },
         "release": {
           "type": "string",
-          "title": "The version of the node's operating system"
+          "description": "The version of the node's operating system."
         },
         "full": {
           "type": "string",
-          "title": "The combined name and version of the node's operating system"
+          "description": "The combined name and version of the node's operating system."
         }
       },
-      "title": "The name and version of the node's operating system"
+      "description": "The name and version of the node's operating system."
     },
     "chef.automate.api.compliance.reporting.v1.Profile": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string",
-          "title": "The name of the profile. Must be unique"
+          "description": "The name of the profile. Must be unique."
         },
         "title": {
           "type": "string",
-          "title": "The human-readable name of the profile"
+          "description": "The profile title."
         },
         "maintainer": {
           "type": "string",
-          "title": "The maintainer listed in the profile metadata"
+          "description": "The maintainer listed in the profile metadata."
         },
         "copyright": {
           "type": "string",
-          "title": "The name of the copyright holder"
+          "description": "The name of the copyright holder."
         },
         "copyright_email": {
           "type": "string",
-          "title": "The contact information for the copyright holder"
+          "description": "The contact information for the copyright holder."
         },
         "license": {
           "type": "string",
-          "title": "The license the profile is released under"
+          "description": "The license the profile is released under."
         },
         "summary": {
           "type": "string",
-          "title": "A short description of the profile"
+          "description": "A short description of the profile."
         },
         "version": {
           "type": "string",
-          "title": "The version of the profile"
+          "description": "The version of the profile."
         },
         "owner": {
           "type": "string",
-          "title": "The name of the account that uploaded the profile to Automate"
+          "description": "The name of the account that uploaded the profile to Automate."
         },
         "full": {
           "type": "string",
-          "title": "The combined name and version of the profile"
+          "description": "The combined name and version of the profile."
         },
         "supports": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Support"
           },
-          "title": "The supported platform targets"
+          "description": "The supported platform targets."
         },
         "depends": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Dependency"
           },
-          "title": "Other profiles that this profile depends on"
+          "description": "Other profiles that this profile depends on."
         },
         "sha256": {
           "type": "string",
-          "title": "A unique value generated from the profile used to identify it"
+          "description": "A unique value generated from the profile used to identify it."
         },
         "groups": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Group"
           },
-          "title": "The groups of controls defined in the profile"
+          "description": "The groups of controls defined in the profile."
         },
         "controls": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Control"
           },
-          "title": "The controls defined on the profile"
+          "description": "The controls defined on the profile."
         },
         "attributes": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Attribute"
           },
-          "title": "The attributes defined on the profile"
+          "description": "The attributes defined on the profile."
         },
         "latest_version": {
           "type": "string",
-          "title": "The highest version number of the profile stored in Automate"
+          "description": "The highest version number of the profile stored in Automate."
         },
         "status": {
           "type": "string",
-          "title": "The status of the profile in the generated report"
+          "description": "The status of the profile in the generated report."
         },
         "skip_message": {
           "type": "string",
-          "title": "The reason this profile was skipped in the generated report, if any"
+          "description": "The reason this profile was skipped in the generated report, if any."
         }
       }
     },
@@ -803,48 +803,48 @@ func init() {
         "total": {
           "type": "integer",
           "format": "int32",
-          "title": "The total number of nodes matching the filters"
+          "description": "The total number of nodes matching the filters."
         },
         "failed": {
           "type": "integer",
           "format": "int32",
-          "title": "The total number of failed nodes matching the filters"
+          "description": "The total number of failed nodes matching the filters."
         },
         "skipped": {
           "type": "integer",
           "format": "int32",
-          "title": "The total number of skipped nodes matching the filters"
+          "description": "The total number of skipped nodes matching the filters."
         },
         "passed": {
           "type": "integer",
           "format": "int32",
-          "title": "The total number of passing nodes matching the filters"
+          "description": "The total number of passing nodes matching the filters."
         }
       },
-      "title": "Stats on the statuses of nodes matching the filters"
+      "description": "Stats on the statuses of nodes matching the filters."
     },
     "chef.automate.api.compliance.reporting.v1.ProfileMeta": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string",
-          "title": "The name of the profile"
+          "description": "The name of the profile."
         },
         "version": {
           "type": "string",
-          "title": "The version of the profile"
+          "description": "The version of the profile."
         },
         "id": {
           "type": "string",
-          "title": "The unique id of the profile"
+          "description": "The unique id of the profile."
         },
         "status": {
           "type": "string",
-          "title": "The status of the profile run against the node"
+          "description": "The status of the profile run against the node."
         },
         "full": {
           "type": "string",
-          "title": "The combined name and version of the profile"
+          "description": "The combined name and version of the profile."
         }
       }
     },
@@ -853,26 +853,26 @@ func init() {
       "properties": {
         "name": {
           "type": "string",
-          "title": "The name of the profile"
+          "description": "The name of the profile."
         },
         "title": {
           "type": "string",
-          "title": "The title of the profile"
+          "description": "The title of the profile."
         },
         "id": {
           "type": "string",
-          "title": "The id of the profile"
+          "description": "The id of the profile."
         },
         "version": {
           "type": "string",
-          "title": "The version of the profile"
+          "description": "The version of the profile."
         },
         "status": {
           "type": "string",
-          "title": "The aggregated status of the profile across the nodes it has been run on"
+          "description": "The aggregated status of the profile across the nodes it has been run on."
         }
       },
-      "title": "Minimal represenation of a profile"
+      "description": "Minimal represenation of a profile."
     },
     "chef.automate.api.compliance.reporting.v1.ProfileMins": {
       "type": "object",
@@ -882,11 +882,11 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ProfileMin"
           },
-          "title": "Minimal represenations of the profiles matching the filters"
+          "description": "Minimal represenations of the profiles matching the filters."
         },
         "counts": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ProfileCounts",
-          "title": "Intentionally blank"
+          "description": "Intentionally blank."
         }
       }
     },
@@ -895,36 +895,35 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "title": "Used by the ReadReport endpoint to specify which report to return"
+          "description": "Unique idenfifier."
         },
         "type": {
           "type": "string",
-          "title": "Used by the ListSuggestions endpoint to control the type of suggestions requested, used by the Export endpoint to control the file format of the returned documents"
+          "description": "File type, either JSON or CSV."
         },
         "filters": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ListFilter"
           },
-          "title": "The list of filters used to narrow down the list"
+          "description": "Filters applied to the report results."
         },
         "order": {
-          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Query.OrderType",
-          "title": "Whether to sort in ascending or descending order"
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Query.OrderType"
         },
         "sort": {
           "type": "string",
-          "title": "The field to sort the list of results by"
+          "description": "Sort the list of results by a field."
         },
         "page": {
           "type": "integer",
           "format": "int32",
-          "title": "The offset to use when paginating requests"
+          "description": "The offset for paginating requests. An offset defines a place in the results in order to fetch the next page of the results."
         },
         "per_page": {
           "type": "integer",
           "format": "int32",
-          "title": "The number of results to return with each paginated request"
+          "description": "The number of results on each paginated request page."
         }
       }
     },
@@ -935,18 +934,18 @@ func init() {
         "DESC"
       ],
       "default": "ASC",
-      "title": "The two allowed values for ordering results"
+      "description": "Sort the results in ascending or descending order."
     },
     "chef.automate.api.compliance.reporting.v1.Ref": {
       "type": "object",
       "properties": {
         "url": {
           "type": "string",
-          "title": "The URL of the external document"
+          "description": "The external document URL."
         },
         "ref": {
           "type": "string",
-          "title": "The description of the external document"
+          "description": "A description of the external document."
         }
       }
     },
@@ -955,63 +954,63 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "title": "The id of the report"
+          "description": "A unique report identifier."
         },
         "node_id": {
           "type": "string",
-          "title": "The id of the node generating the report"
+          "description": "The id of the node making the report."
         },
         "node_name": {
           "type": "string",
-          "title": "The name of the node generating the report"
+          "description": "The name of the node making the report."
         },
         "end_time": {
           "type": "string",
           "format": "date-time",
-          "title": "The time the report was submitted at"
+          "description": "The time that the report was completed."
         },
         "status": {
           "type": "string",
-          "title": "The status of the run the report was made from"
+          "description": "The status of the run the report was made from."
         },
         "controls": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlSummary",
-          "title": "Intentionally blank"
+          "description": "Intentionally blank."
         },
         "environment": {
           "type": "string",
-          "title": "The environment of the node generating the report"
+          "description": "The environment of the node making the report."
         },
         "version": {
           "type": "string",
-          "title": "The version of the report"
+          "description": "The version of the report."
         },
         "platform": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Platform",
-          "title": "Intentionally blank"
+          "description": "Intentionally blank."
         },
         "statistics": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Statistics",
-          "title": "Intentionally blank"
+          "description": "Intentionally blank."
         },
         "profiles": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Profile"
           },
-          "title": "The profiles run as part of this report"
+          "description": "The profiles run as part of this report."
         },
         "job_id": {
           "type": "string",
-          "title": "The id of the job associated with the report"
+          "description": "The id of the compliance scan job associated with the report."
         },
         "ipaddress": {
           "type": "string",
-          "title": "The IP address of the node generating the report"
+          "description": "The IP address of the node making the report."
         },
         "fqdn": {
           "type": "string",
-          "title": "The FQDN (fully qualified domain name) of the node generating the report"
+          "description": "The FQDN (fully qualified domain name) of the node making the report."
         }
       }
     },
@@ -1023,7 +1022,7 @@ func init() {
           "items": {
             "type": "string"
           },
-          "title": "The list of report ids found matching the query"
+          "description": "The list of unique report identifiers found matching the query."
         }
       }
     },
@@ -1035,12 +1034,12 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Report"
           },
-          "title": "The paginated results of reports matching the filters"
+          "description": "Paginated results of reports matching the filters."
         },
         "total": {
           "type": "integer",
           "format": "int32",
-          "title": "The total number of reports matching the filters"
+          "description": "Total number of reports matching the filters."
         }
       }
     },
@@ -1049,28 +1048,28 @@ func init() {
       "properties": {
         "status": {
           "type": "string",
-          "title": "The status of the test"
+          "description": "The status of the test."
         },
         "code_desc": {
           "type": "string",
-          "title": "The description of the test"
+          "description": "The description of the test."
         },
         "run_time": {
           "type": "number",
           "format": "float",
-          "title": "The time taken to run the test"
+          "description": "The time taken to run the test."
         },
         "start_time": {
           "type": "string",
-          "title": "The timestamp of when this individual test was run"
+          "description": "The timestamp of when this individual test was run."
         },
         "message": {
           "type": "string",
-          "title": "The reason the test failed, if any"
+          "description": "The reason the test failed, if any."
         },
         "skip_message": {
           "type": "string",
-          "title": "The reason the test was skipped, if any"
+          "description": "The reason the test was skipped, if any."
         }
       }
     },
@@ -1079,12 +1078,12 @@ func init() {
       "properties": {
         "ref": {
           "type": "string",
-          "title": "The source code file the control is defined in"
+          "description": "The source code file the control is defined in."
         },
         "line": {
           "type": "integer",
           "format": "int32",
-          "title": "The line number the control is defined on"
+          "description": "The line number the control is defined on."
         }
       }
     },
@@ -1094,30 +1093,30 @@ func init() {
         "duration": {
           "type": "number",
           "format": "float",
-          "title": "The duration of the report's generation time"
+          "description": "The duration of the report's generation time."
         }
       },
-      "title": "Statistics of the report's run"
+      "description": "Statistics of the report's run."
     },
     "chef.automate.api.compliance.reporting.v1.Suggestion": {
       "type": "object",
       "properties": {
         "text": {
           "type": "string",
-          "title": "The content that matched the search term"
+          "description": "The content that matched the search term."
         },
         "id": {
           "type": "string",
-          "title": "The id of the resource that was suggested"
+          "description": "The id of the resource that was suggested."
         },
         "score": {
           "type": "number",
           "format": "float",
-          "title": "The confidence in the match quality"
+          "description": "The confidence in the match quality."
         },
         "version": {
           "type": "string",
-          "title": "The version of the suggestion"
+          "description": "The version of the suggestion."
         }
       }
     },
@@ -1126,23 +1125,23 @@ func init() {
       "properties": {
         "type": {
           "type": "string",
-          "title": "The type of resource to get suggestions for"
+          "description": "The type of resource to get suggestions for."
         },
         "text": {
           "type": "string",
-          "title": "The term to use to match resources on"
+          "description": "The term to use to match resources on."
         },
         "size": {
           "type": "integer",
           "format": "int32",
-          "title": "The maximum number of suggestions to return (Default 100)"
+          "description": "The maximum number of suggestions to return."
         },
         "filters": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ListFilter"
           },
-          "title": "The criteria used to filter the suggestions returned"
+          "description": "The criteria used to filter the suggestions returned."
         }
       }
     },
@@ -1154,7 +1153,7 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Suggestion"
           },
-          "title": "The list of returned suggestions"
+          "description": "The list of returned suggestions."
         }
       }
     },
@@ -1163,23 +1162,23 @@ func init() {
       "properties": {
         "os_name": {
           "type": "string",
-          "title": "The name of the supported operating system"
+          "description": "The name of the supported operating system."
         },
         "os_family": {
           "type": "string",
-          "title": "The name of the broader category of the supported platform (eg, linux, windows)"
+          "description": "The wider category of supported platform (e.g., linux, windows)."
         },
         "release": {
           "type": "string",
-          "title": "The specific release of the operating system this profile supports"
+          "description": "The specific operating system release number this profile supports."
         },
         "inspec_version": {
           "type": "string",
-          "title": "The supported inspec version this profile was made to run on"
+          "description": "The supported inspec version for this profile."
         },
         "platform": {
           "type": "string",
-          "title": "The platform name and version combined"
+          "description": "The platform name and version combined."
         }
       }
     },
@@ -1189,10 +1188,10 @@ func init() {
         "total": {
           "type": "integer",
           "format": "int32",
-          "title": "The number of controls"
+          "description": "The total number of controls."
         }
       },
-      "title": "A subtotal of controls"
+      "description": "A subtotal of controls."
     },
     "google.protobuf.Any": {
       "type": "object",
