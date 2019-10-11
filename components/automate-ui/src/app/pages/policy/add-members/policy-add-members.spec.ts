@@ -86,26 +86,13 @@ describe('PolicyAddMembersComponent', () => {
         });
 
         using([
-
+            ['something', true, 'name and when identityValue exists and isnt a star', 'name'],
+            ['*', false, 'name and when identityValue exists and is a star', 'name']
         ], function(identity: string, outcome: boolean, description: string, input: string) {
-            it('should return true when inputName is name and when identityValue exists and isnt a star', () => {
-                // component.expressionForm.setValue({ type: '', identity: 'something', name: '' });
-                // expect(component.showInputs('name')).toBe(true);
+            it(`should return ${outcome} when inputName is ${description}`, () => {
+                component.expressionForm.setValue({ type: '', identity: identity, name: '' });
+                expect(component.showInputs(input)).toBe(outcome);
             });
         });
-
-        // tslint:disable-next-line: max-line-length
-        it('should return true when inputName is name and when identityValue exists and isnt a star', () => {
-            component.expressionForm.setValue({ type: '', identity: 'something', name: '' });
-            expect(component.showInputs('name')).toBe(true);
-        });
-
-        // tslint:disable-next-line: max-line-length
-        it('should return false when inputName is name and when identityValue exists and is a star', () => {
-            component.expressionForm.setValue({ type: '', identity: '*', name: '' });
-            expect(component.showInputs('name')).toBe(false);
-        });
-
- 
     });
 });
