@@ -33,6 +33,7 @@ export class CreateObjectModalComponent implements OnInit, OnChanges {
   // Whether the edit ID form is open or not.
   public modifyID = false;
   public conflictError = false;
+  public projectsUpdatedEvent = new EventEmitter<boolean>();
 
   ngOnInit(): void {
     this.conflictErrorEvent.subscribe((isConflict: boolean) => {
@@ -49,6 +50,11 @@ export class CreateObjectModalComponent implements OnInit, OnChanges {
       this.projects = {};
       changes.assignableProjects.currentValue.forEach((proj: Project) =>
         this.projects[proj.id] = { ...proj, checked });
+    }
+    // clear checked projects when opening
+    if (changes.visible && (changes.visible.currentValue as boolean)) {
+      Object.values(this.projects).forEach(p => p.checked = false);
+      this.projectsUpdatedEvent.emit(true);
     }
   }
 

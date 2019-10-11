@@ -1,5 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, EventEmitter } from '@angular/core';
 
 import { ProjectsDropdownComponent } from './projects-dropdown.component';
 
@@ -18,6 +18,7 @@ describe('ProjectsDropdownComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ProjectsDropdownComponent);
     component = fixture.componentInstance;
+    component.projectsUpdated = new EventEmitter();
     fixture.detectChanges();
   });
 
