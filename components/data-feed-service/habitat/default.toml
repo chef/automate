@@ -19,4 +19,3 @@ level = "info"
 
 [storage]
 database = "data_feed_service"
-user = "data-feed"
