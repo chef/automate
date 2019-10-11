@@ -2,7 +2,6 @@ import {
   Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { hasIn } from 'lodash/fp';
 
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Project } from 'app/entities/projects/project.model';
@@ -29,9 +28,7 @@ export class CreateObjectModalComponent implements OnInit, OnChanges {
   @Output() createClicked = new EventEmitter<Project[]>();
 
   public projects: ProjectCheckedMap = {};
-
-  // Whether the edit ID form is open or not.
-  public modifyID = false;
+  public modifyID = false; // Whether the edit ID form is open or not.
   public conflictError = false;
   public projectsUpdatedEvent = new EventEmitter();
 
@@ -44,12 +41,11 @@ export class CreateObjectModalComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // if a new list of projects to populate dropdown with is passed in we update the dropdown
-    const checked = false;
-    if (hasIn('assignableProjects.currentValue', changes)) {
+    // update project dropdown if list changes
+    if (changes.assignableProjects) {
       this.projects = {};
       changes.assignableProjects.currentValue.forEach((proj: Project) =>
-        this.projects[proj.id] = { ...proj, checked });
+        this.projects[proj.id] = { ...proj, checked: false });
     }
     // clear checked projects when opening
     if (changes.visible && (changes.visible.currentValue as boolean)) {
@@ -68,7 +64,7 @@ export class CreateObjectModalComponent implements OnInit, OnChanges {
     return Object.values(this.projects).length === 0;
   }
 
-  public handleNameInput(event: KeyboardEvent): void {
+  handleNameInput(event: KeyboardEvent): void {
     if (!this.modifyID && !this.isNavigationKey(event)) {
       this.conflictError = false;
       this.createForm.controls.id.setValue(
@@ -76,7 +72,7 @@ export class CreateObjectModalComponent implements OnInit, OnChanges {
     }
   }
 
-  public handleIDInput(event: KeyboardEvent): void {
+  handleIDInput(event: KeyboardEvent): void {
     if (this.isNavigationKey(event)) {
       return;
     }

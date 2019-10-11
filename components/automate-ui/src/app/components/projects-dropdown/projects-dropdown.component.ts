@@ -38,12 +38,9 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
   // Emits a project that changed as a result of a check or uncheck.
   @Output() onProjectChecked = new EventEmitter<ProjectChecked>();
 
-  active = false;
-  label = UNASSIGNED_PROJECT_ID;
+  public active = false;
+  public label = UNASSIGNED_PROJECT_ID;
 
-  projectsArray(): ProjectChecked[] {
-    const projects = Object.values(this.projects);
-    return ChefSorters.naturalSort(projects, 'name');
   ngOnInit(): void {
     if (this.projectsUpdated) { // an optional setting
       this.projectsUpdated.subscribe(() => {
@@ -54,6 +51,10 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
 
   ngOnChanges(): void {
     this.updateLabel();
+  }
+
+  get projectsArray(): ProjectChecked[] {
+    return ChefSorters.naturalSort(Object.values(this.projects), 'name');
   }
 
   toggleDropdown(event: MouseEvent): void {
@@ -96,7 +97,7 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
   }
 
   private updateLabel(): void {
-    const checkedProjects = this.projectsArray().filter(p => p.checked);
+    const checkedProjects = Object.values(this.projects).filter(p => p.checked);
     switch (checkedProjects.length) {
       case 1: {
         const onlyProject = checkedProjects[0];

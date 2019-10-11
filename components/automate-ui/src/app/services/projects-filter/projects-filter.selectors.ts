@@ -8,7 +8,7 @@ export const projectsFilterState = state => state.projectsFilter;
 export const options = createSelector(projectsFilterState, state => state.options);
 
 export const assignableProjects = createSelector(projectsFilterState, state => {
-  let projectOptions = state.options.filter((p: ProjectsFilterOption) => p.checked);
+  let projectOptions = (state.options as ProjectsFilterOption[]).filter(p => p.checked);
 
   // there is no project filter, populate all projects.
   if (projectOptions.length === 0) {

@@ -1,5 +1,5 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA, EventEmitter } from '@angular/core';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ProjectsDropdownComponent } from './projects-dropdown.component';
 
