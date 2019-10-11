@@ -8,8 +8,8 @@ import { Regex } from 'app/helpers/auth/regex';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { customMatchers } from 'app/testing/custom-matchers';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
+import { runtimeChecks } from 'app/ngrx.reducers';
 import { PolicyAddMembersComponent } from './policy-add-members.component';
-// import { using } from 'rxjs';
 import { using } from 'app/testing/spec-helpers';
 
 
@@ -45,7 +45,7 @@ describe('PolicyAddMembersComponent', () => {
                 RouterTestingModule,
                 StoreModule.forRoot({
                     policies: policyEntityReducer
-                })
+                }, { runtimeChecks })
             ]
         }).compileComponents();
     }));
