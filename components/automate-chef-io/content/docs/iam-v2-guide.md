@@ -376,11 +376,36 @@ Note that this discards your IAM v2 policies, roles, and projects, and re-config
 <!-- TODO move this next to the rest of the projects walkthrough -->
 ## Assigning Projects to Ingested Resources
 
-While projects can be directly assigned to resources created within Automate, ingested resources, including Compliance reports, events, and nodes, are created outside of Automate and therefore must be tagged with projects a different way.
+While resources created within Automate can be directly added to a project, ingested resources, including Compliance reports, events, and nodes, are created outside of Automate and therefore must be added to projects a different way.
 
-To tag any ingested resource with a project, that project must have at least one rule. A project rule contains conditions that
-determine if an ingested resource should be tagged with the rule's associated project. Each condition contains an attribute, operator, and value. See the [API reference]({{< relref "iam-v2-api-reference.md#project-rules" >}}) for details on how to manage project rules.
-Take this rule for the project `project-devops` as an example:
+Project rules are used to associate ingested resources with projects within Automate. A project rule contains conditions that determine if an ingested resource should be moved into the rule's project.
+Each condition contains an attribute, operator, and value.
+
+{{% info %}}
+See the [API reference]({{< relref "iam-v2-api-reference.md#project-rules" >}}) for details on how to manage project rules.
+{{% /info %}}
+
+In this example you will add a project rule to the project `project-devops`, created as part of the [project creation walkthrough]({{< relref "iam-v2-guide.md#creating-a-project" >}}).
+You will update projects to apply this new project rule, causing all matching ingested resources to be associated with the appropriate project.
+You will use the global project filter to filter your ingested data by `project-devops`.
+
+First, determine which ingested resources should belong to the project. In this example, we want to add the following ingested resources to `project-devops`:
+
+* Compliance reports with Chef Organization `devops`
+* Infrastructure nodes with Environment `dev`
+* actions on Chef Server `devops.pizza`
+
+You may want to verify that those filters work as expected using the search filter bars on the Event Feed, Client Runs, and
+Reports pages.
+
+Navigate to the project details page of `project-devops`, created in the previous section, either by heading directly to `https://{{< example_fqdn "automate" >}}/settings/projects/project-devops` or selecting the project name on the project list page.
+
+Select the `Create Rule` button to create a new project rule. Choose type `Node` then fill in the first condition's fields.
+Feel free to create fake ingest data that corresponds to the example json below, or come up with a condition that matches your existing data set.
+
+{{% warning %}}
+Compliance reports must be using audit cookbook 7.5+ in order to make use of all of the available project rule attributes. Older reports will only have environment and role available as attributes.
+{{% /warning %}}
 
 ```json
 {
@@ -400,90 +425,51 @@ Take this rule for the project `project-devops` as an example:
 }
 ```
 
-Once this project rule has been created, it must be applied in order to take effect. Once the project rule is in effect, all ingested resources with a `CHEF_ORGANIZATION` field that has the value `devops` will be considered a part of the `project-devops` project.
-Only these resources will appear in Automate when the `project-devops` project has been selected in the global project filter.
-
-{{% warning %}}
-Compliance reports must be using audit cookbook 7.5+ in order to make use of all of the available project rule attributes. Older reports will only have environment and role available as attributes.
-{{% /warning %}}
-
-In this example you will add a project rule to a project you just created. You will apply this new project rule so that all matching ingested resources get tagged with the appropriate project. You will then grant a user access to only that project
-and log in to that user's account to see their filtered view.
-
-First, determine which ingested resources should belong to the project. In this example, we want to tag Compliance reports
-with the Chef Organization `devops`, Infrastructure nodes with the environment `dev`, and actions on Chef Server `devops.pizza` with the project `project-devops`.
-You may want to verify that those filters work as expected using the search filter bars on the Event Feed, Client Runs, and
-Reports pages.
-
-{{% info %}}
-It is important to note that Compliance and Infrastructure resources will not necessarily match under the same conditions.
-Separate conditions governing Compliance and Infrastructure resources should be used. Similarly, events require conditions of `EVENT` type to be tagged correctly. A condition of type `NODE` will not match an event, even if the condition's
-operator, attribute, and value all match (and vice versa with `EVENT` project rules and node).
-{{% /info %}}
-
-Navigate to the project details page of `project-devops`, created in the previous section, by heading to `https://{{< example_fqdn "automate" >}}/settings/projects/project-devops` or from the project list page.
-
-<!-- TODO empty project details screenshot -->
-
-Select the `Create Rule` button to open a full-page modal where you can create a new project rule. First choose type `NODE` then fill in the first condition's fields.
-Feel free to create dummy ingest data that corresponds to the example json above, or come up with a condition that matches your existing data set.
-
-<!-- TODO create rule page screenshot -->
+![](/images/docs/create-project-rule.png)
 
 Save the rule. If you need to change the name or the conditions, select the project rule name on the project details page.
 
 You should see a message that says `Edits are pending: update projects to apply edits.` Select the `projects` link in the message to go back to the project list page.
 
-On the project list page, the button `Update Projects` should be enabled since a new rule has been added to a project. Select that button and confirm the action in the modal that pops up.
+On the project list page, the button `Update Projects` should be enabled since a new rule has been added to a project. You should also see `Edits pending` in the Ingest Rules column of `project-devops` in the projects table. Select `Update Projects` and confirm the action in the modal that pops up.
 
-<!-- TODO update projects button -->
+![](/images/docs/update-projects-button.png)
 
-<!-- TODO update projects modal -->
-
-Updating a project begins a process that applies the latest version of every project rule to ingested resources. Applying a rule to an ingested resource means tagging it with the correct project(s) according to any matching project rule conditions.
-In this example, ingested resources with the property `chef_organization: devops` will be tagged with the project `project-devops`.
+Updating a project begins an operation that applies all pending rule edits and then moves ingested resources into the correct projects according to those latest changes. An ingested resource is moved into a project only if it matches any of the project's rule conditions.
+In this example, upon successful update, all ingested resources whose Chef Organization matches `devops` will be considered a part of the project `project-devops`.
+Only these resources will appear in Automate's dashboards when the `project-devops` project has been selected in the global project filter.
 
 As the operation takes place, you should see a percentage count up within the `Update Projects` button. You may cancel the update at any time by selecting
 `Stop Updating Projects` and confirming the cancel in the modal that pops up.
 
 {{% warning %}}
-Avoid stopping an update unless absolutely necessary. It will leave your system in an in-between state where only some resources have been re-tagged with updated projects while others still have old projects. Only another successful update will restore the system to a good state.
+Avoid stopping an update unless absolutely necessary. It will leave your system in an in-between state where only some resources have been moved into their updated projects while others still remain in old projects. Only another successful update will restore the system to a happy state.
 {{% /warning %}}
-
-<!-- TODO update projects button with percentage and cancel button -->
 
 Once rules have been successfully applied, the update button will change to `Projects Up-to-Date` and be disabled until the next
 time a change is made to any project.
 
-<!-- TODO projects up-to-date -->
-
-To verify that the ingested resources have been tagged correctly, select `project-devops` in the global projects filter, which is on the top navbar. The data in Automate will now be filtered by the selected project.
+To verify that the ingested resources have been moved into the correct projects, select `project-devops` in the global projects filter, which is on the top navbar. The data in Automate will now be filtered by the selected project.
 In this example, the effect is revealed by navigating to the Compliance Reports' Nodes tab, which only features nodes that belong to the `devops` Chef Organization.
 
-<!-- TODO global project filter -->
+![](/images/docs/global-projects-filter.png)
 
-<!-- TODO compliance reports  (before and after?) -->
-
-Now that we have the first set of our ingested data tagged with our new project, let's add another condition and a new rule to
+Now that we have the first set of our ingested data associated with our new project, let's add another condition and a new rule to
 add more data to `project-devops`.
+
+{{% info %}}
+Compliance and Infrastructure ingested resources will not necessarily match under the same conditions since they are not
+the exact same nodes and do not have all the same matching fields.
+Separate conditions governing said resources may need to be used. Similarly, ingested events require conditions of `Event` type to be associated correctly. A condition of type `Node` will not match an event, even if the condition's
+operator, attribute, and value all match exactly (and vice versa with `Event` project rules and nodes).
+{{% /info %}}
 
 Back at the project details page (`https://{{< example_fqdn "automate" >}}/settings/projects/project-devops`), select the name
 of the rule just created.
 
-Add a condition. In this example, we'll add a condition for resources with the environment `dev`. Save the rule.
+Add a condition. In this example, we'll add a condition for resources with the attribute `Environment`, operator `equals`, and value `dev`. Save the rule.
 
-<!-- TODO add new condition  -->
+Back on the project details page, select `Create Rule`. This time, choose resource type `Event`. Add a condition for resources with the Chef Server `devops.pizza`, or any value matching your data set.
 
-Back on the project details page, select `Create Rule`. This time, choose type `EVENT`. Add a condition for resources with the Chef Server `devops.pizza`, or any value matching your data set.
-
-<!-- TODO new rule with type Event -->
-
-Navigate to the Project list page once more.
-
-<!-- 
-TODO 
-update projects
-see filtered data
-create user 
-create a policy with editor access on project-devops with the new user as a member
-log in as that user -->
+Navigate to the project list page once more. Select `Update Projects`. Upon completion of the update, you should be able to
+filter by `project-devops` across Automate's dashboards and see only the ingested data that you expect.
