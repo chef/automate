@@ -9,6 +9,8 @@ import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { customMatchers } from 'app/testing/custom-matchers';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import { PolicyAddMembersComponent } from './policy-add-members.component';
+// import { using } from 'rxjs';
+import { using } from 'app/testing/spec-helpers';
 
 
 
@@ -70,25 +72,26 @@ describe('PolicyAddMembersComponent', () => {
             expect(component.showInputs('blank')).toBe(false);
         });
 
-        it('should return true when inputName is identity and when typeValue equals USER', () => {
-            component.expressionForm.setValue({type: 'USER', identity: '', name: ''});
-            expect(component.showInputs('identity')).toBe(true);
+        using([
+            ['user', true, 'identity and when typeValue equals user', 'identity'],
+            ['team', true, 'identity and when typeValue equals team', 'identity'],
+            ['*', false, 'identity and typeValue does not equal team or user', 'identity'],
+            ['token', true, 'name and when typeValue equals token', 'name'],
+            ['team', false, 'name + typeValue is not token + identityValue does not exist', 'name']
+        ], function (type: string, outcome: boolean, description: string, input: string) {
+            it(`should return ${outcome} when inputName is ${description}`, () => {
+                component.expressionForm.setValue({ type: type, identity: '', name: '' });
+                expect(component.showInputs(input)).toBe(outcome);
+            });
         });
 
-        it('should return true when inputName is identity and when typeValue equals TEAM', () => {
-            component.expressionForm.setValue({ type: 'TEAM', identity: '', name: '' });
-            expect(component.showInputs('identity')).toBe(true);
-        });
+        using([
 
-        // tslint:disable-next-line: max-line-length
-        it('should return false when inputName is identity and typeValue does not equal TEAM or USER', () => {
-            component.expressionForm.setValue({ type: '*', identity: '', name: '' });
-            expect(component.showInputs('identity')).toBe(false);
-        });
-
-        it('should return true when inputName is name and when typeValue equals TOKEN', () => {
-            component.expressionForm.setValue({ type: 'TOKEN', identity: '', name: '' });
-            expect(component.showInputs('name')).toBe(true);
+        ], function(identity: string, outcome: boolean, description: string, input: string) {
+            it('should return true when inputName is name and when identityValue exists and isnt a star', () => {
+                // component.expressionForm.setValue({ type: '', identity: 'something', name: '' });
+                // expect(component.showInputs('name')).toBe(true);
+            });
         });
 
         // tslint:disable-next-line: max-line-length
@@ -103,10 +106,6 @@ describe('PolicyAddMembersComponent', () => {
             expect(component.showInputs('name')).toBe(false);
         });
 
-        // tslint:disable-next-line: max-line-length
-        it('should return false when inputName is name and when type is not TOKEN and identityValue does not exist', () => {
-            component.expressionForm.setValue({ type: 'TEAM', identity: '', name: '' });
-            expect(component.showInputs('name')).toBe(false);
-        });
+ 
     });
 });
