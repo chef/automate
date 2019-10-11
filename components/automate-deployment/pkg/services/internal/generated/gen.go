@@ -220,7 +220,13 @@ var ProductMetadataJSON = `
     },
     {
       "name": "chef/data-feed-service",
-      "metadata": null
+      "metadata": {
+        "name": "chef/data-feed-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/event-gateway",
