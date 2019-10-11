@@ -58,7 +58,7 @@ func (p EsPolicy) Purge(ctx context.Context, esSidecarClient es.EsSidecarClient)
 	req.Index = p.IndexName
 	req.OlderThanDays = p.OlderThanDays
 
-	if req.CustomPurgeField != "" {
+	if p.CustomPurgeField != "" {
 		logctx = logctx.WithField("custom_purge_field", p.CustomPurgeField)
 		req.CustomPurgeField = p.CustomPurgeField
 	}
