@@ -17,7 +17,6 @@ import (
 	"github.com/chef/automate/components/config-mgmt-service/params"
 	"github.com/chef/automate/lib/io/chunks"
 	"github.com/gocarina/gocsv"
-	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -97,6 +96,13 @@ func (s *CfgMgmtServer) exportReports(ctx context.Context, request *pRequest.Rep
 		return status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
+	projectFilters, err := filterByProjects(ctx, map[string][]string{})
+	if err != nil {
+		return err
+	}
+
+	nodeExistsChan := s.nodeExistsAsync(request.NodeId, projectFilters)
+
 	pageSize := 100
 	var cursorEndTime time.Time
 	cursorID := ""
@@ -106,17 +112,20 @@ func (s *CfgMgmtServer) exportReports(ctx context.Context, request *pRequest.Rep
 		return status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	log.Infof("runFilters: %v", runFilters)
-
-	runFilters, err = filterByProjects(ctx, runFilters)
-	if err != nil {
-		return err
-	}
-
 	runs, err := s.client.GetRunsPageByCurser(ctx, request.NodeId, start, end,
 		runFilters, cursorEndTime, cursorID, pageSize, sortAsc)
 	if err != nil {
 		return status.Errorf(codes.Internal, err.Error())
+	}
+
+	nodeExists := <-nodeExistsChan
+	if nodeExists.err != nil {
+		return nodeExists.err
+	}
+
+	// Either the user does not have permissions or the node does not exist
+	if !nodeExists.exists {
+		return nil
 	}
 
 	for len(runs) > 0 {
@@ -128,8 +137,6 @@ func (s *CfgMgmtServer) exportReports(ctx context.Context, request *pRequest.Rep
 		lastRun := runs[len(runs)-1]
 		cursorID = lastRun.RunID
 		cursorEndTime = lastRun.EndTime
-
-		log.Infof("cursorID: %s cursorEndTime: %v", cursorID, cursorEndTime)
 
 		runs, err = s.client.GetRunsPageByCurser(ctx, request.NodeId, start, end,
 			runFilters, cursorEndTime, cursorID, pageSize, sortAsc)

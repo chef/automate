@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 import {
   NodeHistoryFilter,
@@ -14,6 +15,7 @@ import {
   PolicyCookbooks } from '../../types/types';
 
 import { environment } from '../../../environments/environment';
+import * as moment from 'moment';
 const CONFIG_MGMT_URL = environment.config_mgmt_url;
 
 @Injectable()
@@ -55,6 +57,30 @@ export class NodeRunsService {
         console.error(reason);
         return [];
       });
+  }
+
+  public downloadRuns(type: string, filters: NodeHistoryFilter): Observable<string> {
+    const url = `${CONFIG_MGMT_URL}/reports/export`;
+
+    let typeFilters: string[] = [];
+    if (filters.status) {
+      typeFilters = [`status:${filters.status}`];
+    }
+
+    const body = {
+      output_type: type,
+      sorting: {},
+      node_id: filters.nodeId,
+      filter: typeFilters,
+      start: {
+        seconds: moment.utc(filters.startDate).unix()
+      },
+      end: {
+        seconds: moment.utc().endOf('day').unix()
+      }
+    };
+
+    return this.httpClient.post(url, body, {responseType: 'text'});
   }
 
   getPolicyCookbooks(revision_id: string): Promise<PolicyCookbooks> {
