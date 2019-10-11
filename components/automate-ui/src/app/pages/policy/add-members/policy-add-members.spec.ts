@@ -6,12 +6,9 @@ import { MockComponent } from 'ng2-mock-component';
 
 import { Regex } from 'app/helpers/auth/regex';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
-import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import { runtimeChecks } from 'app/ngrx.reducers';
 import { PolicyAddMembersComponent } from './policy-add-members.component';
 import { using } from 'app/testing/spec-helpers';
-
-
 
 
 
@@ -43,7 +40,12 @@ describe('PolicyAddMembersComponent', () => {
                 ReactiveFormsModule,
                 RouterTestingModule,
                 StoreModule.forRoot({
-                    policies: policyEntityReducer
+                    router: () => ({
+                        state: {
+                            url: '/settings/policies/editor-access/add-members',
+                            params: {}
+                        }
+                    })
                 }, { runtimeChecks })
             ]
         }).compileComponents();
