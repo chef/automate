@@ -57,8 +57,10 @@ Once that is done, delete the old legacy v1 policies and you will have a clean, 
 
 Alternately, you can run `--skip-policy-migration` on upgrade to start without any policies at all. You will still need to create new v2 policies to preserve any IAM behavior from v1.
 
+{{% warning %}}
 Note that several legacy policies (Compliance Profile Access and Ingest Access) have API tokens that will stop working if not ported. Alternately,
 you may choose to keep those policies in tact if that's easier and you do not plan to alter those permissions.
+{{% /warning %}}
 
 The next few sections explain how to use Chef-managed policies and how to create custom policies.
 
@@ -112,7 +114,7 @@ So let's give this policy the ID `team-managers-admin`.
   "id": "team-managers-devops",
 ```
 
-Additionally, we can permission actions on this policy just like any other IAM resource by assigning it one or more projects. We could use the wildcard value`"*"`
+Additionally, we can permission actions on this policy just like any other IAM resource by assigning it to one or more projects. We could use the wildcard value`"*"`
 in the projects field, which indicates that members of this policy can perform these actions within _any_ project. If we leave the projects array
 empty, we indicate the policy is _unassigned_. For example, anyone with permission to view _unassigned_ policies can view this policy.
 
@@ -131,7 +133,7 @@ Let's further assume you want user `Bob` as well as anyone on team `gamma` to be
 
 Next, you'll specify the permissions themselves--which in IAM v2 are the `statements`-- declared as an array.
 We only need a single statement in this case, though, providing access to the _get_, _list_, and _update_ actions for _users_ and _teams_
-that have been assigned the project `project-devops`. Note that the `projects` property in statements designates permission for the resources
+that have been assigned to the project `project-devops`. Note that the `projects` property in statements designates permission for the resources
 within the statement (here, that is `iam:users` and `iam:teams`), _not_ for the policy itself:
 
 ```json
@@ -220,19 +222,130 @@ In order to find a token's ID, use the command in the API reference for [listing
 
 ### Projects
 
-Projects are used to group and permission Chef Automate resources, ingested client-runs and compliance nodes.
+Projects are used to group and permission Chef Automate resources, ingested client-runs, and compliance nodes.
 
-Projects can be managed via the Projects list under the *Settings* tab and consist of an ID, a name, and a collection of rules. Project rules are lists of conditions that describe ingested
-resources, so they are not necessary when assigning IAM resources such as teams or roles.
+Projects can be managed via the Projects list under the *Settings* tab and consist of an ID, a name, and a collection of rules. Project
+ingest rules (TODO: link to anchor of rules) are lists of conditions that describe ingested resources, so they are not relevant
+when assigning IAM resources such as teams or roles.
+
+#### Creating a Project
 
 To create a project, navigate to the Projects list under the **Settings** tab and select **Create Project**. You will need to provide a name and can optionally edit the ID. You must create a project
-before you can assign it to any resources.
+before you can assign any resources to it.
 
-You can use the browser to assign projects to teams and tokens. To assign projects to a team, select a team from the _Teams_ list, then select **Details**.
-Likewise, to assign projects to a token, select a token from the API tokens list, then select **Details**.
+#### Assigning Resources to Projects
+
+You can use the browser to assign teams and tokens to projects. To assign a team to projects, select a team from the _Teams_ list, then select **Details**.
+Likewise, to assign a token projects to projects, select a token from the API tokens list, then select **Details**.
 In either case, you can select projects from the projects dropdown to assign.
 
-Presently, projects cannot be assigned to users, and must be assigned to polices and roles using the command line.
+Presently, policies and roles can only be assigned to projects using the browser. Users cannot be assigned to projects.
+
+If you would like to delegate ownership of a project to another user so that they may assign resources, you will want to make that user a Project Owner (TODO link to Project Owner) of that project.
+
+#### Project Owners
+
+The role Project Owner is designed to allow admin users to delegate management of project membership to another user without granting that user
+access to all parts of Chef Automate. Project Owners have the following permissions on resources assigned to their project:
+
+```
+"infra:*",
+"compliance:*",
+"system:*",
+"event:*",
+"ingest:*",
+"secrets:*",
+"telemetry:*",
+"iam:projects:list",
+"iam:projects:get",
+"iam:projects:assign",
+"iam:policies:list",
+"iam:policies:get",
+"iam:policyMembers:*",
+"iam:teams:list",
+"iam:teams:get",
+"iam:teamUsers:*",
+"iam:users:get",
+"iam:users:list"
+```
+
+In order to create a Project Owner, you can use an existing user, or create a user with username `test_project_owner` by following [Creating Users]({{< relref "users.md#creating-users" >}}).
+
+Next, you will create a policy that gives `test_project_owner` the role of `project-owner` for your new project. You may choose the and ID. The policy will look like the JSON below:
+
+```json
+{
+  "name": "Test Project Policy",
+  "id": "test-project-policy",
+  "projects": ["test-project"],
+  "members": [ "user:local:test_project_owner"],
+  "statements": [
+    {
+      "effect": "ALLOW",
+      "role": "project-owner",
+      "projects": ["test-project"]
+    }
+  ]
+}
+```
+
+By adding `test-project` to the policy's top-level `projects` field, we ensure that the Project Owner has access to this policy.
+
+Save as a JSON file and follow the steps in [Creating a Policy]({{< relref "iam-v2-api-reference.md#creating-a-policy" >}}) to pass that data to Chef Automate.
+
+#### Editor and Viewer Policies for Projects
+
+You (or your new Project Owner) may additionally choose to create a `Test-Project Editors` policy and a `Test-Project Viewers`
+policy. Once those are in place, you or your `Test-Project Owner` can easily add members to each policy
+to give them privileges to view or edit resources assigned to the `Test Project` project. To create
+those policies, use the JSON below:
+
+Viewers Policy:
+
+```json
+{
+  "name": "Test Project Viewers",
+  "id": "test-project-viewer-policy",
+  "projects": ["test-project"],
+  "members": [],
+  "statements": [
+    {
+      "effect": "ALLOW",
+      "role": "viewer",
+      "projects": ["test-project"]
+    }
+  ]
+}
+```
+
+Editors Policy:
+
+```json
+{
+  "name": "Test Project Editors",
+  "id": "test-project-editor-policy",
+  "projects": ["test-project"],
+  "members": [],
+  "statements": [
+    {
+      "effect": "ALLOW",
+      "role": "editor",
+      "projects": ["test-project"]
+    }
+  ]
+}
+```
+
+Now, if you would like Terry to be able to view `Test Project` and Kelly to be able to edit `Test Project`, you'll add them
+as members to the relevant policies. You can do that directly in the above JSON when creating the policy, or in the browser
+by selecting **Settings**, then **Policies**, then `Test-Project Policy`. Under the **Details** tab, you will find the
+option to select new policy members.
+
+Assuming Terry is not a member of any other policy, once you make Terry a member of the `Test-Project Viewer` policy,
+they will only be able to see resources assigned to `Test Project`. They will not be able to update or delete them.
+Kelly, however, will be able to do both.
+
+See [Policy Membership]({{< relref "iam-v2-api-reference.md#policy-membership" >}}) for more information on policy membership.
 
 ## Removing Legacy Policies
 
@@ -241,7 +354,7 @@ This section walks you through deleting legacy policies imported into v2, which 
 Once you've rewritten your v1 policies as v2 policies, you should remove the v1 legacy policies you do not need.
 Be sure you have moved over any members of those policies or they will lose permissions. Note that several
 legacy policies (Compliance Profile Access and Ingest Access) have API tokens that will stop working if not ported. Alternately,
-you may choose to keep those policies in tact if that's easier and you do not plan to alter those permissions.
+you may choose to keep those policies intact if that's easier and you do not plan to alter those permissions.
 
 Open the menu on any custom policy, located at the end of the policy row, and select **Delete Policy** from the menu.
 (You will not have this option for Chef-managed policies.)
