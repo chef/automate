@@ -43,6 +43,7 @@ the specific endpoints they protect.
 
 > Corresponds to "Client Runs" tab or `/nodes`
 
+{{% table %}}
 Service | Method | HTTP Endpoint | HTTP Method | Resource | Action
 ---|---|---|---|---|---
 ConfigMgmt | GetNodes | /cfgmgmt/nodes | GET | cfgmgmt:nodes | read
@@ -61,6 +62,7 @@ JobScheduler | GetStatusJobScheduler | /retention/nodes/status | GET | cfgmgmt:s
 JobScheduler | ConfigureNodesMissingScheduler | /retention/nodes/missing-nodes/config | POST | cfgmgmt:scheduler:missing-node | configure
 JobScheduler | ConfigureDeleteNodesScheduler | /retention/nodes/delete-nodes/config | POST | cfgmgmt:scheduler:delete-node | configure
 JobScheduler | ConfigureMissingNodesForDeletionScheduler | /retention/nodes/missing-nodes-deletion/config | POST | cfgmgmt:scheduler:missing-nodes-deletion | configure
+{{% /table %}}
 
 ## Compliance
 
@@ -83,6 +85,7 @@ JobScheduler | ConfigureMissingNodesForDeletionScheduler | /retention/nodes/miss
 > Corresponds to "Compliance" tab (`/compliance/reporting/overview`), "Scan Jobs" tab
 (`/compliance/scanner/jobs`) & "Profiles" tab (`/profiles`)
 
+{{% table %}}
 Service | Method | HTTP Endpoint | HTTP Method | Resource | Action
 ---|---|---|---|---|---
 ProfilesService | Read | /compliance/profiles/read/{owner}/{name}/version/{version} | GET | compliance:profiles:storage:{owner}:{name}:{version} | read
@@ -109,6 +112,7 @@ JobsService | Update | /compliance/scanner/jobs/id/{id} | PUT | compliance:scann
 JobsService | Delete | /compliance/scanner/jobs/id/{id} | DELETE | compliance:scanner:jobs:{id} | delete
 JobsService | List | /compliance/scanner/jobs/search | POST | compliance:scanner:jobs | search
 JobsService | Rerun | /compliance/scanner/jobs/rerun/id/{id} | GET | compliance:scanner:jobs:{id} | rerun
+{{% /table %}}
 
 ## Event Feed
 
@@ -137,12 +141,14 @@ JobsService | Rerun | /compliance/scanner/jobs/rerun/id/{id} | GET | compliance:
 
 > Corresponds to "Event Feed" tab (`/event-feed`)
 
+{{% table %}}
 Service | Method | HTTP Endpoint | HTTP Method | Resource | Action
 ---|---|---|---|---|---
 EventFeed | GetEventFeed | /eventfeed | GET | events | read
 EventFeed | GetEventTypeCounts | /event_type_counts | GET | events:types | count
 EventFeed | GetEventTaskCounts | /event_task_counts | GET | events:tasks | count
 EventFeed | GetEventStringBuckets | /eventstrings | GET | events:strings | read
+{{% /table %}}
 
 ## Applications (BETA)
 
@@ -171,6 +177,7 @@ EventFeed | GetEventStringBuckets | /eventstrings | GET | events:strings | read
 
 > Corresponds to "Application tab (`/applications`)
 
+{{% table %}}
 Service | Method | HTTP Endpoint | HTTP Method | Resource | Action
 ---|---|---|---|---|---
 Applications | GetServiceGroups | /beta/applications/service-groups | GET | service_groups | list
@@ -182,6 +189,7 @@ JobScheduler | GetDisconnectedServicesConfig          | /beta/retention/service_
 JobScheduler | UpdateDisconnectedServicesConfig       | /beta/retention/service_groups/disconnected_services/config        | POST | service_groups:scheduler:disconnected_services        | configure
 JobScheduler | GetDeleteDisconnectedServicesConfig    | /beta/retention/service_groups/delete_disconnected_services/config | GET  | service_groups:scheduler:delete_disconnected_services | read
 JobScheduler | UpdateDeleteDisconnectedServicesConfig | /beta/retention/service_groups/delete_disconnected_services/config | POST | service_groups:scheduler:delete_disconnected_services | configure
+{{% /table %}}
 
 ## Telemetry
 
@@ -203,9 +211,11 @@ JobScheduler | UpdateDeleteDisconnectedServicesConfig | /beta/retention/service_
 
 > Corresponds to Telemetry (`/telemetry`)
 
+{{% table %}}
 Service | Method | HTTP Endpoint | HTTP Method | Resource | Action
 ---|---|---|---|---|---
 Telemetry | GetTelemetryConfiguration | /config | GET | telemetry:config | read
+{{% /table %}}
 
 ## Secrets
 
@@ -234,6 +244,7 @@ Telemetry | GetTelemetryConfiguration | /config | GET | telemetry:config | read
 
 > Corresponds to the "Credentials" tab or `/compliance/credentials`
 
+{{% table %}}
 Service | Method | HTTP Endpoint | HTTP Method | Resource | Action
 ---|---|---|---|---|---
 SecretsService | Create | /secrets | POST | secrets | create
@@ -241,6 +252,7 @@ SecretsService | Read | /secrets/id/{id} | GET | secrets:{id} | read
 SecretsService | Update | /secrets/id/{id} | PATCH | secrets:{id} | update
 SecretsService | Delete | /secrets/id/{id} | DELETE | secrets:{id} | delete
 SecretsService | List | /secrets/search | POST | secrets | search
+{{% /table %}}
 
 ## Nodes
 
@@ -269,6 +281,7 @@ SecretsService | List | /secrets/search | POST | secrets | search
 
 > Corresponds to `/compliance/scanner/nodes`
 
+{{% table %}}
 Service | Method | HTTP Endpoint | HTTP Method | Resource | Action
 ---|---|---|---|---|---
 NodesService | Create | /nodes | POST | nodes | create
@@ -277,6 +290,7 @@ NodesService | Update | /nodes/id/{id} | PUT | nodes:{id} | update
 NodesService | Delete | /nodes/id/{id} | DELETE | nodes:{id} | delete
 NodesService | List | /nodes/search | POST | nodes | list
 NodesService | Rerun | /nodes/rerun/id/{id} | GET | nodes:{id} | rerun
+{{% /table %}}
 
 ## Node Manager
 
@@ -303,6 +317,7 @@ NodesService | Rerun | /nodes/rerun/id/{id} | GET | nodes:{id} | rerun
 
 ### Node Manager Page
 
+{{% table %}}
 Service | Method | HTTP Endpoint | HTTP Method | Resource | Action
 ---|---|---|---|---|---
 NodeManagerService | Create | /nodemanagers | POST | nodemanagers | create
@@ -312,6 +327,7 @@ NodeManagerService | Delete | /nodemanagers/id/{id} | DELETE | nodemanagers:{id}
 NodeManagerService | List | /nodemanagers/search | POST | nodemanagers | list
 NodeManagerService | SearchCloudProviderFields | /nodemanagers/id/{node_manager_id}/search-fields | POST | nodemanagers:{node_manager_id}:fields | search
 NodeManagerService | SearchCloudProviderNodes | /nodemanagers/id/{node_manager_id}/search-nodes | POST | nodemanagers:{node_manager_id}:nodes | search
+{{% /table %}}
 
 ## Ingest
 
@@ -337,6 +353,7 @@ NodeManagerService | SearchCloudProviderNodes | /nodemanagers/id/{node_manager_i
 
 > Corresponds to `/ingest/events`
 
+{{% table %}}
 Service | Method | HTTP Endpoint | HTTP Method | Resource | Action
 ---|---|---|---|---|---
 ChefIngester | ProcessChefRun | /ingest/events/chef/run | POST | ingest:nodes:{entity_uuid}:runs | create
@@ -345,6 +362,7 @@ ChefIngester | ProcessNodeDelete | /ingest/events/chef/nodedelete | POST | inges
 ChefIngester | GetVersion | /ingest/version | GET | service_info:version | read
  |  |  |  |  |
 LegacyDataCollector | ProcessLegacyEvent | /events/data-collector | POST | ingest:unified_events | create
+{{% /table %}}
 
 ## Profile
 
@@ -376,10 +394,12 @@ LegacyDataCollector | ProcessLegacyEvent | /events/data-collector | POST | inges
 
 ### Profile Pages
 
+{{% table %}}
 Service | Method | HTTP Endpoint | HTTP Method | Resource | Action
 ---|---|---|---|---|---
 UsersMgmt | GetUserByUsername | /auth/users/{username} | GET | auth:users:{username} | read
 UsersMgmt | UpdateSelf | /users/{username} | PUT | users:{username} | update
+{{% /table %}}
 
 ## Administrative
 
@@ -408,6 +428,7 @@ UsersMgmt | UpdateSelf | /users/{username} | PUT | users:{username} | update
 
 > Corresponds to the "Admin" (`/auth`) and "Notifications" tab (`/notifications`)
 
+{{% table %}}
 Service | Method | HTTP Endpoint | HTTP Method | Resource | Action
 ---|---|---|---|---|---
 TokensMgmt | GetTokens | /auth/tokens | GET | auth:api_tokens | read
@@ -448,3 +469,4 @@ Authorization | DeletePolicy | /auth/policies/{id} | DELETE | auth:policies:{id}
 Authorization | IntrospectAll | /auth/introspect | GET | auth_introspection:introspect_all | read
 Authorization | IntrospectSome | /auth/introspect_some | POST | auth_introspection:introspect_some | read
 Authorization | Introspect | /auth/introspect | POST | auth_introspection:introspect | read
+{{% /table %}}
