@@ -340,7 +340,7 @@ func (depth *ReportDepth) getStatsSummaryResult(aggRoot *elastic.SearchResult) *
 	}
 
 	if controlsAggResult, found := aggRoot.Aggregations.Nested("controls"); found {
-		if controls, found := controlsAggResult.Aggregations.Cardinality("controls_count"); found {
+		if controls, found := controlsAggResult.Aggregations.Cardinality("control_count"); found {
 			summary.Stats.Controls = int32(*controls.Value)
 		}
 	}
