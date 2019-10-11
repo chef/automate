@@ -6,7 +6,6 @@ import { MockComponent } from 'ng2-mock-component';
 
 import { Regex } from 'app/helpers/auth/regex';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
-import { customMatchers } from 'app/testing/custom-matchers';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import { runtimeChecks } from 'app/ngrx.reducers';
 import { PolicyAddMembersComponent } from './policy-add-members.component';
@@ -51,7 +50,6 @@ describe('PolicyAddMembersComponent', () => {
     }));
 
     beforeEach(() => {
-        jasmine.addMatchers(customMatchers);
         fixture = TestBed.createComponent(PolicyAddMembersComponent);
         component = fixture.componentInstance;
         component.expressionForm = new FormBuilder().group({
