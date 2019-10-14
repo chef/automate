@@ -94,6 +94,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     fb: FormBuilder) {
 
     this.expressionForm = fb.group({
+      // Must stay in sync with error checks in policy-add-members.component.html
       type: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       identity: [''],
       name: ['']
@@ -374,12 +375,14 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     const updateInput = this.expressionForm.get(inputName);
 
     if (active) {
-      return inputName === 'name'
-              ? updateInput.setValidators([Validators.required,
+      if (inputName === 'name') {
+        updateInput.setValidators([Validators.required,
                                       Validators.pattern(Regex.patterns.NON_BLANK),
-                                      Validators.pattern(Regex.patterns.NO_MIXED_WILDCARD)])
-              : updateInput.setValidators([Validators.required,
+                                      Validators.pattern(Regex.patterns.NO_MIXED_WILDCARD)]);
+      } else {
+        updateInput.setValidators([Validators.required,
                                       Validators.pattern(Regex.patterns.NON_BLANK)]);
+      }
     } else {
       updateInput.clearValidators();
     }
