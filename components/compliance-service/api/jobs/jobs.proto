@@ -10,7 +10,7 @@ import "google/protobuf/empty.proto";
 import "components/compliance-service/api/common/common.proto";
 
 service JobsService {
-	rpc Create(Job) returns (Id) {};
+	rpc Create(Job) returns (Job) {};
 	rpc Read(Id) returns (Job) {};
 	rpc Update(Job) returns (google.protobuf.Empty) {};
 	rpc Delete(Id) returns (google.protobuf.Empty) {};

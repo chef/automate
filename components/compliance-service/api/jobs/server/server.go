@@ -91,7 +91,7 @@ func (srv *Server) GetJobResultByNodeId(ctx context.Context, in *jobs.GetJobResu
 }
 
 // Create creates a new job
-func (srv *Server) Create(ctx context.Context, in *jobs.Job) (*jobs.Id, error) {
+func (srv *Server) Create(ctx context.Context, in *jobs.Job) (*jobs.Job, error) {
 	logrus.Debugf("Create a new job: %+v", in)
 	if in.Recurrence != "" {
 		// Ensure recurrence rule can be parsed
@@ -106,12 +106,13 @@ func (srv *Server) Create(ctx context.Context, in *jobs.Job) (*jobs.Id, error) {
 		return nil, status.Error(codes.InvalidArgument, "Invalid job: nodes or node selectors required.")
 	}
 
-	sID, err := srv.db.AddJob(in)
+	sID, name, err := srv.db.AddJob(in)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 
 	in.Id = sID
+	in.Name = name
 	// Trigger Agent. Agents are responsible for all further steps.
 	go srv.schedulerServer.Run(in) // nolint: errcheck
 
@@ -121,7 +122,8 @@ func (srv *Server) Create(ctx context.Context, in *jobs.Job) (*jobs.Id, error) {
 		go srv.fireEvent(event.ScanJobCreatedEventName, in, nil, user)
 	}
 
-	return &jobs.Id{Id: sID}, nil
+	logrus.Debugf("printttt the id and name %s %s", &jobs.Job{Id: sID, Name: name})
+	return &jobs.Job{Id: sID, Name: name}, nil
 }
 
 // Read a job via ID
