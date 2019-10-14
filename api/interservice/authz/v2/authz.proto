@@ -89,7 +89,12 @@ message FilterAuthorizedProjectsResp {
 
 message ValidateProjectAssignmentReq {
     repeated string subjects = 1;
-    repeated string project_ids = 2
+    repeated string old_projects = 2
+      [(validate.rules).repeated = {
+        unique: true,
+        items: { string: { pattern: "^[a-z0-9()-_]{1,64}$" } }
+      }];
+    repeated string new_projects = 3
       [(validate.rules).repeated = {
         min_items: 1,
         unique: true,
