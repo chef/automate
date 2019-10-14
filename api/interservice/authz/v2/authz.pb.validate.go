@@ -859,35 +859,60 @@ func (m *ValidateProjectAssignmentReq) Validate() error {
 		return nil
 	}
 
-	if len(m.GetProjectIds()) < 1 {
-		return ValidateProjectAssignmentReqValidationError{
-			field:  "ProjectIds",
-			reason: "value must contain at least 1 item(s)",
-		}
-	}
+	_ValidateProjectAssignmentReq_OldProjects_Unique := make(map[string]struct{}, len(m.GetOldProjects()))
 
-	_ValidateProjectAssignmentReq_ProjectIds_Unique := make(map[string]struct{}, len(m.GetProjectIds()))
-
-	for idx, item := range m.GetProjectIds() {
+	for idx, item := range m.GetOldProjects() {
 		_, _ = idx, item
 
-		if _, exists := _ValidateProjectAssignmentReq_ProjectIds_Unique[item]; exists {
+		if _, exists := _ValidateProjectAssignmentReq_OldProjects_Unique[item]; exists {
 			return ValidateProjectAssignmentReqValidationError{
-				field:  fmt.Sprintf("ProjectIds[%v]", idx),
+				field:  fmt.Sprintf("OldProjects[%v]", idx),
 				reason: "repeated value must contain unique items",
 			}
 		} else {
-			_ValidateProjectAssignmentReq_ProjectIds_Unique[item] = struct{}{}
+			_ValidateProjectAssignmentReq_OldProjects_Unique[item] = struct{}{}
 		}
 
-		if !_ValidateProjectAssignmentReq_ProjectIds_Pattern.MatchString(item) {
+		if !_ValidateProjectAssignmentReq_OldProjects_Pattern.MatchString(item) {
 			return ValidateProjectAssignmentReqValidationError{
-				field:  fmt.Sprintf("ProjectIds[%v]", idx),
+				field:  fmt.Sprintf("OldProjects[%v]", idx),
 				reason: "value does not match regex pattern \"^[a-z0-9()-_]{1,64}$\"",
 			}
 		}
 
 	}
+
+	if len(m.GetNewProjects()) < 1 {
+		return ValidateProjectAssignmentReqValidationError{
+			field:  "NewProjects",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
+
+	_ValidateProjectAssignmentReq_NewProjects_Unique := make(map[string]struct{}, len(m.GetNewProjects()))
+
+	for idx, item := range m.GetNewProjects() {
+		_, _ = idx, item
+
+		if _, exists := _ValidateProjectAssignmentReq_NewProjects_Unique[item]; exists {
+			return ValidateProjectAssignmentReqValidationError{
+				field:  fmt.Sprintf("NewProjects[%v]", idx),
+				reason: "repeated value must contain unique items",
+			}
+		} else {
+			_ValidateProjectAssignmentReq_NewProjects_Unique[item] = struct{}{}
+		}
+
+		if !_ValidateProjectAssignmentReq_NewProjects_Pattern.MatchString(item) {
+			return ValidateProjectAssignmentReqValidationError{
+				field:  fmt.Sprintf("NewProjects[%v]", idx),
+				reason: "value does not match regex pattern \"^[a-z0-9()-_]{1,64}$\"",
+			}
+		}
+
+	}
+
+	// no validation rules for IsUpdateRequest
 
 	return nil
 }
@@ -949,7 +974,9 @@ var _ interface {
 	ErrorName() string
 } = ValidateProjectAssignmentReqValidationError{}
 
-var _ValidateProjectAssignmentReq_ProjectIds_Pattern = regexp.MustCompile("^[a-z0-9()-_]{1,64}$")
+var _ValidateProjectAssignmentReq_OldProjects_Pattern = regexp.MustCompile("^[a-z0-9()-_]{1,64}$")
+
+var _ValidateProjectAssignmentReq_NewProjects_Pattern = regexp.MustCompile("^[a-z0-9()-_]{1,64}$")
 
 // Validate checks the field values on ValidateProjectAssignmentResp with the
 // rules defined in the proto definition for this message. If any rules are
