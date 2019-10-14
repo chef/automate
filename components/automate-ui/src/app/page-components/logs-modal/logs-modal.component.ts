@@ -1,8 +1,8 @@
 import { Component, Input, OnChanges, SimpleChange } from '@angular/core';
-import * as moment from 'moment';
 import { NodeDetailsService } from '../../services/node-details/node-details.service';
 import { NodeRun } from '../../types/types';
 import { saveAs } from 'file-saver';
+import { DateTime } from 'app/helpers/datetime/datetime';
 
 @Component({
   selector: 'app-logs-modal',
@@ -15,6 +15,7 @@ export class LogsModalComponent implements OnChanges {
   @Input() isVisible = false;
 
   hideBacktrace = true;
+  ChefHoursMins = DateTime.CHEF_HOURS_MINS;
 
   constructor(private eventService: NodeDetailsService) {}
 
@@ -25,10 +26,6 @@ export class LogsModalComponent implements OnChanges {
     if (changes['isVisible']) {
       this.isVisible = changes['isVisible'].currentValue;
     }
-  }
-
-  renderTime(timestamp) {
-    return moment(timestamp).format('LT');
   }
 
   errorSections() {

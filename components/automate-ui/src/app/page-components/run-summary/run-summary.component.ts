@@ -5,6 +5,7 @@ import {
 } from '../../services/node-details/node-details.service';
 import * as moment from 'moment';
 import { NodeRun } from '../../types/types';
+import { DateTime } from 'app/helpers/datetime/datetime';
 
 @Component({
   selector: 'app-run-summary',
@@ -20,6 +21,8 @@ export class RunSummaryComponent implements OnChanges, AfterContentInit {
   public chartSucceeded;
   public chartFailed;
   public chartOther;
+  public RFC2822 = DateTime.RFC2822;
+  public ChefHoursMins = DateTime.CHEF_HOURS_MINS;
 
   constructor(
     private eventService: NodeDetailsService
@@ -43,10 +46,6 @@ export class RunSummaryComponent implements OnChanges, AfterContentInit {
 
   renderDuration(totalSeconds) {
     return moment.duration(totalSeconds, 'seconds').humanize();
-  }
-
-  renderTime(timestamp) {
-    return moment(timestamp).format('LT');
   }
 
   renderDate(timestamp) {

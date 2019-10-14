@@ -7,6 +7,7 @@ import {
   NodeHistoryFilter,
   NodeHistoryCountsFilter,
   RunInfo } from '../../types/types';
+import { DateTime } from 'app/helpers/datetime/datetime';
 import { NodeRunsService } from '../../services/node-details/node-runs.service';
 import { HistorySelection } from '../../helpers/history-selection/history-selection';
 import { RunHistoryStore } from '../../services/run-history-store/run-history.store';
@@ -32,6 +33,7 @@ export class RunHistoryComponent implements OnInit, OnDestroy {
   nodeHistory: AbridgedNodeRun[];
   currentPage = 1;
   pageSize = 10;
+  RFC2822 = DateTime.RFC2822;
   // store enum as member to be able to access it via html templates
   selectedStatus = SelectedStatus;
   // store selection
