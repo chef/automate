@@ -71,6 +71,7 @@ export class WelcomeModalComponent {
     // again so users can set their individual telemetry preference.
     if (this.isTelemetryServiceEnabled &&
       this.chefSessionService.fetchTelemetryPreference() === null) {
+        console.log('telemetryServiceEnabled');
       this.showModal();
       return;
     }
@@ -118,6 +119,7 @@ export class WelcomeModalComponent {
 
   // Shows the modal and sets the has_been_seen flag to true.
   public showModal(): void {
+    console.log('showModal');
     this.isVisible = true;
     this.sessionStorage.putBoolean(this.chefSessionService.userWelcomeModalSeenKey(), true);
   }
