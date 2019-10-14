@@ -22,7 +22,7 @@ Chef Automate users will not be automatically upgraded.
 We designed IAM v2 to leave your v1 policy data untouched during your upgrade to v2; however, you can choose to not port over v1 policies by using the provided `--skip-policy-migration` flag with the upgrade command.
 
 Whether or not you migrate your v1 policies, if at any time you decide to opt back out of the beta and revert to v1, your original v1 policies will still be intact.
-Reverting to v1 will remove any new v2 data created while using IAM v2 (policies, roles, projects, rules).
+Reverting to v1 will remove any new v2 data created while using IAM v2 (policies, roles, projects, project rules).
 Users, teams, and tokens are shared between v1 and v2, so changes to them will persist.
 
 See the [IAM v2 API Reference]({{< relref "iam-v2-api-reference.md" >}}) for day-to-day use of the IAM v2 system.
@@ -31,9 +31,10 @@ See the [IAM v2 API Reference]({{< relref "iam-v2-api-reference.md" >}}) for day
 
 IAM v2 expands Chef Automate's authorization system by supporting policies to allow multiple permissions, separating out policy membership from policy definition for more fine-grained control, and adding roles to begin moving towards role-based access control.
 Additionally, IAM v2 improves the user experience by allowing policy members to be managed directly from the Automate UI.
+And perhaps most significantly, IAM v2 supports projects that allow filtering and segregation of your data amongst your user base.
 
 At the heart of Chef Automate's IAM system is the *policy*.
-A policy defines permissions for who may perform what action on which resource.
+A policy defines permissions for who may perform what action on which resource scoped by project.
 The "who" may be a user, a team, or a system.
 Users and teams are designated by name while systems use pre-authorized tokens to communicate with Automate.
 
@@ -83,7 +84,7 @@ Statements are typically composed using roles, but inline policy statements are 
 Property   | Description
 -----------|-----------------------------
 Actions    | list of operations, e.g., read IAM users, get compliance profiles, update node status, etc.
-Role       | a named set of actions
+Role       | a named list of actions
 Effect     | ALLOW or DENY
 Projects   | list of project IDs to constrain the actions and/or role
 
@@ -119,9 +120,8 @@ It is, however, not possible to remove the local Administrator from the Administ
 
 ## Basic Role-Based Access Control
 
-IAM v2 also introduces roles as our first step to delivering
-Role-Based Access Control ([RBAC](https://en.wikipedia.org/wiki/Role-based_access_control)).
-A role is a named set of actions.
+IAM v2 also introduces roles to provide Role-Based Access Control ([RBAC](https://en.wikipedia.org/wiki/Role-based_access_control)).
+A role is a named list of actions.
 This provides the benefits of *encapsulation* (only needing to know the name and not be encumbered by all the details after initial definition) and *reuse* (apply the role to any statement that needs it).
 For example, one of the default roles provided is `Viewer`.
 That role is comprised of a number of actions.
@@ -169,34 +169,37 @@ There are four steps to setting up projects:
 3. Assign resources to projects (see [Assigning Resources to Projects]({{< relref "iam-v2-overview.md#assigning-resources-to-projects" >}})).
 4. Select the projects to filter in the UI.
    Once you create some projects, use the **global project filter** in the top navigation bar to select one or more projects for viewing.
-   With no selection (the default), you will see resources for *all* projects.
+   With no selection (the default), all resources you have permission on will be displayed.
 
 Note that, by default, Automate includes a *project-owner* role so the global admin may delegate much of these responsibilities for project management to others, to alleviate some of the burden for the global admin.
 
 ### Assigning Resources to Projects
 
-There are two broad categories of resources that may be assigned to projects: your set of nodes feeding data into Chef Automate and the set of IAM resources themselves.
+There are two broad categories of resources that may be assigned to projects: your set of ingested client-run/compliance nodes and the resources created within Chef Automate.
 Any of these that you do not explicitly assign to a project (as described next) are considered *unassigned* with respect to projects.
 At the start, none of your resources are assigned to any projects.
 These unassigned resources will be displayed either if you have made no selection in the global project filter, or if you have selected the `(unassigned)` designator.
 
-Assignable IAM resources include teams, tokens, policies, and roles.
-Teams and tokens may be assigned to projects directly in the UI; policies and roles still can only be assigned on the command-line (since you cannot create or modify those at all in the UI yet).
-
-Assigning your set of nodes to projects is done via the rules you create for the project, mentioned just briefly above.
+Assigning your set of ingested client-run/compliance nodes to projects is done via the project rules you create for the project, mentioned just briefly above.
 A rule specifies one or more conditions, and each condition specifies a set of attribute values that a node must satisfy to be assigned to the given project.
 Once you define your set of projects with their contained rules and conditions, you then use the **Update Projects** button on the main projects list page to apply those definitions to all your nodes.
 
+Assignable resources that you create with Automate include teams, tokens, policies, and roles.
+Teams and tokens may be assigned to projects directly in the UI; policies and roles still can only be assigned on the command-line (since you cannot create or modify those at all in the UI yet).
+These resources created within Automate do not make use of, nor do they require, any project rules.
+
 ### Properties of a Project
 
-To assign a project to a set of nodes as mentioned above, the project needs a list of **rules**, where each rule describes a group of node characteristics.
+To assign a project to a set of ingested client-run/compliance nodes as mentioned above, the project needs a list of **rules**, where each rule describes a group of node characteristics.
 
 Property   | Description
 -----------|------------
 Rules      | list of project assignment rules
 
 A rule consists of a list of **conditions**, where each condition describes a single characteristic.
-It also contains a type where <<TODO describe what node and event mean>>
+It also contains a type: *node* or *event*.
+Here, *node* corresponds to ingested nodes on the client run and compliance pages in the UI,
+and *event* corresponds to ingested events on the event feed page.
 
 Property   | Description
 -----------|------------
@@ -242,13 +245,13 @@ Selecting a role from the list opens the role's details page, displaying the def
 
 ![](/images/docs/admin-roles.png)
 
-The project list page displays all your projects along with the status of associated rules (*No rules*, *Edits pending*, or *Applied*).
+The project list page displays all your projects along with the status of associated project rules (*No rules*, *Edits pending*, or *Applied*).
 When you create or update rules, those changes are **not** directly applied.
 Rather, they are staged so that you may coordinate a set of changes to be applied together at a time of your choosing.
 In fact, other administrative users may also stage changes and you would see each other's changes when you refresh your view.
 All changes will be applied together when you select the **Update Projects** button.
 
 Selecting a project from the list opens the projects's details page, displaying the list of rules comprising that project.
-From there, you can select any individual rule to view its list of conditions,  then select a condition to view its details.
+From there, you can select any individual rule to view its list of conditions,  then select a condition to view or update its details.
 
 ![](/images/docs/admin-projects.png)
