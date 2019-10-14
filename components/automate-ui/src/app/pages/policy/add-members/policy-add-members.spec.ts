@@ -73,23 +73,23 @@ describe('PolicyAddMembersComponent', () => {
         });
 
         using([
-            ['user', true, 'identity and when typeValue equals user', 'identity'],
-            ['team', true, 'identity and when typeValue equals team', 'identity'],
-            ['*', false, 'identity and typeValue does not equal team or user', 'identity'],
-            ['token', true, 'name and when typeValue equals token', 'name'],
-            ['team', false, 'name + typeValue is not token + identityValue does not exist', 'name']
-        ], function (type: string, outcome: boolean, description: string, input: string) {
-            it(`should return ${outcome} when inputName is ${description}`, () => {
+            ['and when typeValue equals user', 'user', 'identity', true],
+            ['and when typeValue equals team', 'team', 'identity', true],
+            ['and typeValue does not equal team or user', '*', 'identity', false],
+            ['and when typeValue equals token', 'token', 'name', true],
+            ['and typeValue is not token and identityValue does not exist', 'team', 'name', false]
+        ], function (description: string, type: string, input: string, outcome: boolean) {
+            it(`returns ${outcome} when inputName is ${input} ${description}`, () => {
                 component.expressionForm.setValue({ type: type, identity: '', name: '' });
                 expect(component.showInputs(input)).toBe(outcome);
             });
         });
 
         using([
-            ['something', true, 'name and when identityValue exists and isnt a star', 'name'],
-            ['*', false, 'name and when identityValue exists and is a star', 'name']
-        ], function(identity: string, outcome: boolean, description: string, input: string) {
-            it(`should return ${outcome} when inputName is ${description}`, () => {
+            ['and identityValue exists and isnt a star', 'something', 'name', true],
+            ['and identityValue exists and is a star', '*', 'name', false]
+        ], function (description: string, identity: string, input: string, outcome: boolean) {
+            it(`returns ${outcome} when inputName is ${input} ${description}`, () => {
                 component.expressionForm.setValue({ type: '', identity: identity, name: '' });
                 expect(component.showInputs(input)).toBe(outcome);
             });
