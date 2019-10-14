@@ -17,3 +17,9 @@ data-migrations-path: {{ pkg.path }}/data-migrations
 authz-address: {{authz-service.sys.ip}}:{{authz-service.cfg.port}}
 {{~/if}}
 {{~/eachAlive}}
+
+{{~#eachAlive bind.cereal-service.members as |cereal-service|}}
+{{~#if @last}}
+cereal-address: {{cereal-service.sys.ip}}:{{cereal-service.cfg.port}}
+{{~/if}}
+{{~/eachAlive}}

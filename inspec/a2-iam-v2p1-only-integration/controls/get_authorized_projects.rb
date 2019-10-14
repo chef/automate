@@ -21,7 +21,7 @@ control 'iam-v2-global-projects-filter-1' do
     PROJECT_3 = { id: PROJECT_ID_3, name: "Test Project 3" }
     PROJECTS = [ PROJECT_1, PROJECT_2, PROJECT_3 ]
     UNASSIGNED = { id: UNASSIGNED_PROJECT_ID, name: UNASSIGNED_PROJECT_NAME }
- 
+
     before(:all) do
       PROJECTS.each do|project|
         resp = automate_api_request("/apis/iam/v2beta/projects",
@@ -31,7 +31,7 @@ control 'iam-v2-global-projects-filter-1' do
         expect(resp.http_status).to eq 200
       end
     end
-    
+
     after(:all) do
       PROJECTS.each do|project|
         resp = automate_api_request("/apis/iam/v2beta/projects/#{project[:id]}", http_method: 'DELETE')

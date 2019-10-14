@@ -51,6 +51,12 @@ authz_address: {{authz-service.sys.ip}}:{{authz-service.cfg.port}}
 {{~/if}}
 {{~/eachAlive}}
 
+{{~#eachAlive bind.cereal-service.members as |cereal-service|}}
+{{~#if @last}}
+cereal_address: {{cereal-service.sys.ip}}:{{cereal-service.cfg.port}}
+{{~/if}}
+{{~/eachAlive}}
+
 {{~#if cfg.service.a1_data_collector_token}}
 legacy_data_collector_token: {{cfg.service.a1_data_collector_token}}
 {{~/if}}
