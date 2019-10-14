@@ -166,7 +166,7 @@ func (m *cerealProjectPurger) GraveyardingCompleted(projectID string) (bool, err
 // | | if the database 500s or 404s. The initial   |        | runs a single task per project purge        |         |                                             |      |
 // | | API request waits for this task to complete.|        | that removes the project from its domain.   |         | Similar to the previous workflow, it will   |      |
 // | | In the case of an error, it will return     | +--->  | ProjectPurger workflow will wait until      | +--->   | retry with exponential backoff and logging. |      |
-// | | Either a 404 or a 500, and abort            |        | every domain is done before moving onto     |         |                                             |      |
+// | | either a 404 or a 500, and abort            |        | every domain is done before moving onto     |         |                                             |      |
 // | | subsequent workflows. Except in the case    |        | the last workflow. We don't expect failures |         | We never expect errors here unless the      |      |
 // | | of the task getting lost, which will retry  |        | here unless the system is unhealthy and     |         | system is unhealthy.                        |      |
 // | | the idempotent db call to move the project  |        | now the project is in the graveyard so we   |         |                                             |      |
