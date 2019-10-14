@@ -55,11 +55,12 @@ This includes the following:
 Now that you are up-and-running with v2 policies, as the first step we recommend that you reconstitute your v1 policies as v2 policies.
 Once that is done, delete the old legacy v1 policies and you will have a clean, up-to-date system.
 
-Alternately, you can run `--skip-policy-migration` on upgrade to start without any policies at all. You will still need to create new v2 policies to preserve any IAM behavior from v1.
+Alternately, if you include `--skip-policy-migration` on upgrade, no existing v1 policies will be ported.
+You will still need to create new v2 policies to preserve any IAM behavior from v1.
 
 {{% warning %}}
-Note that several legacy policies (Compliance Profile Access and Ingest Access) have API tokens that will stop working if not ported. Alternately,
-you may choose to keep those policies in tact if that's easier and you do not plan to alter those permissions.
+Note that several legacy policies (Compliance Profile Access and Ingest Access) have API tokens that will stop working if not ported.
+Alternately, you may choose to keep those policies intact if that's easier and you do not plan to alter those permissions.
 {{% /warning %}}
 
 The next few sections explain how to use Chef-managed policies and how to create custom policies.
@@ -98,7 +99,7 @@ You will likely want to write more fine-grained policies, tailored to the demand
 Defining your own policies is a straightforward process; however, it must be done from the command line.
 
 As an example, let's say you, the admin, want to delegate a portion of your tasks to a colleague, but without granting them full admin access.
-In this case, you could create a policy called `Team Managers`, which grants its members some--but not all--administrative privileges.
+In this case, you could create a policy called `Team Devops Managers`, which grants its members some--but not all--administrative privileges.
 Create a JSON file in the editor of your choice.
 Following JSON syntax, begin with the name property.
 (For this example's complete JSON, see the end of this section.)
@@ -108,15 +109,15 @@ Following JSON syntax, begin with the name property.
 ```
 
 That name is for human consumption; when you want to refer to the policy in commands you will need to know its ID.
-So let's give this policy the ID `team-managers-admin`.
+So let's give this policy the ID `team-managers-devops`.
 
 ```json
   "id": "team-managers-devops",
 ```
 
-Additionally, we can permission actions on this policy just like any other IAM resource by assigning it to one or more projects. We could use the wildcard value`"*"`
-in the projects field, which indicates that members of this policy can perform these actions within _any_ project. If we leave the projects array
-empty, we indicate the policy is _unassigned_. For example, anyone with permission to view _unassigned_ policies can view this policy.
+Additionally, we can permission actions on this policy just like any other IAM resource by assigning it to one or more projects.
+If we leave the projects array empty, we indicate the policy is _unassigned_.
+For example, anyone with permission to view _unassigned_ policies can view this policy.
 
 ```json
   "projects": [],
@@ -132,9 +133,12 @@ Let's further assume you want user `Bob` as well as anyone on team `gamma` to be
 ```
 
 Next, you'll specify the permissions themselves--which in IAM v2 are the `statements`-- declared as an array.
-We only need a single statement in this case, though, providing access to the _get_, _list_, and _update_ actions for _users_ and _teams_
-that have been assigned to the project `project-devops`. Note that the `projects` property in statements designates permission for the resources
-within the statement (here, that is `iam:users` and `iam:teams`), _not_ for the policy itself:
+The statement allows us to specify the `actions` a user is permitted to take on resources that have been assigned to a `project`.
+The `projects` field on a statement is an array that may contain more than one existing project, a wildcard `*` to indicate permission to resources in _any project_, or the word "(unassigned)" to indicate permission to resources that have not been assigned to a project.
+Note that the `projects` property in statements designates permission for the resources within the statement (here, that is `iam:users` and `iam:teams`), _not_ for the policy itself, and _cannot_ be left empty.
+For more about projects, please see [Projects]({{< relref "iam-v2-guide.md#projects" >}}) or [Notes on the Projects Property](#notes-on-the-projects-property).
+
+In this case, we only need a single statement providing access to the _get_, _list_, and _update_ actions for _users_ and _teams_ that have been assigned to the project `project-devops`.
 
 ```json
     {
@@ -155,8 +159,8 @@ The complete policy should look like:
 
 ```json
 {
-  "name": "Team Managers",
-  "id": "team-managers-admin",
+  "name": "Team Devops Managers",
+  "id": "team-managers-devops",
   "projects": [],
   "members": [
     "user:local:bob",
