@@ -1,22 +1,36 @@
 @import "~styles/variables";
 @import "~styles/mixins";
 
-.history-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 19px 35px;
-  border-bottom: 1px solid $chef-grey;
-  background-color: $chef-white;
-}
 
-.history-heading {
-  font-size: 18px;
-  font-weight: bold;
-}
+#run-history-panel {
+  chef-button {
+    margin: 0;
+  }
 
-.close-button {
-  margin: 0;
+  .side-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1em;
+    background: $chef-white;
+    border-bottom: 1px solid $chef-grey;
+
+    .header-icon {
+      font-size: 2em;
+      color: $chef-dark-grey;
+    }
+
+    .header-text {
+      margin: 0 1em;
+      flex-grow: 1;
+      word-break: break-all;
+
+      p {
+        margin: 0;
+        color: $chef-dark-grey;
+      }
+    }
+  }
 }
 
 app-date-selector {

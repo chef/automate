@@ -1,8 +1,12 @@
 <chef-click-outside omit="run-history-button" (clickOutside)="closeRunHistory()">
   <chef-side-panel id="run-history-panel" tabindex="0" [visible]="visible">
-    <div class="history-header">
-      <h2 class="history-heading"> Run History</h2>
-      <chef-button (click)="closeRunHistory()" secondary class="close-button" label="close">
+    <div class="side-panel-header">
+      <chef-icon class="header-icon">restore</chef-icon>
+      <div class="header-text">
+        <h4><strong>Run history for node:</strong></h4>
+        <p>{{ node name here }}</p>
+      </div>
+      <chef-button secondary label="close" (click)="closeRunHistory()">
         <chef-icon>close</chef-icon>
       </chef-button>
     </div>
