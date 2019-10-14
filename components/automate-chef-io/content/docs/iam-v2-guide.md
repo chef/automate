@@ -55,6 +55,14 @@ This includes the following:
 Now that you are up-and-running with v2 policies, as the first step we recommend that you reconstitute your v1 policies as v2 policies.
 Once that is done, delete the old legacy v1 policies and you will have a clean, up-to-date system.
 
+{{% info %}}
+To delete a legacy policy, open the menu on any custom policy, located at the end of the policy row, and select **Delete Policy** from the menu.
+(You will not have this option for Chef-managed policies.)
+
+A warning appears if members are still attached to the policy because deleting that policy disrupts access for all of its members.
+However, you can still delete the policy.
+{{% /info %}}
+
 Alternately, if you include `--skip-policy-migration` on upgrade, no existing v1 policies will be ported.
 You will still need to create new v2 policies to preserve any IAM behavior from v1.
 
@@ -228,169 +236,35 @@ In order to find a token's ID, use the command in the API reference for [listing
 
 Projects are used to group and permission Chef Automate resources, ingested client-runs, and compliance nodes.
 
-Projects can be managed via the Projects list under the *Settings* tab and consist of an ID, a name, and a collection of rules. Project
-ingest rules (TODO: link to anchor of rules) are lists of conditions that describe ingested resources, so they are not relevant
-when assigning IAM resources such as teams or roles.
+Projects can be managed via the Projects list under the *Settings* tab and consist of an ID, a name, and a collection of rules. Project ingest rules are lists of conditions used only when
+[assigning ingested resources to projects]({{< relref "iam-v2-guide#assigning-ingested-resources-to-projects" >}}),
+so they are not relevant when assigning IAM resources such as teams or roles.
 
 #### Creating a Project
 
-To create a project, navigate to the Projects list under the **Settings** tab and select **Create Project**. You will need to provide a name and can optionally edit the ID. You must create a project
-before you can assign any resources to it.
+To create a project, navigate to the Projects list under the **Settings** tab and select **Create Project**. You will need to provide a name and can optionally edit the ID. You must create a project before you can assign any resources to it.
 
 #### Assigning Resources to Projects
 
 You can use the browser to assign teams and tokens to projects. To assign a team to projects, select a team from the _Teams_ list, then select **Details**.
-Likewise, to assign a token projects to projects, select a token from the API tokens list, then select **Details**.
+Likewise, to assign a token to projects, select a token from the API tokens list, then select **Details**.
 In either case, you can select projects from the projects dropdown to assign.
 
-Presently, policies and roles can only be assigned to projects using the browser. Users cannot be assigned to projects.
+You may also assign teams and tokens to projects on creation. In the creation modal, select any projects to which the new resource should belong.
 
-If you would like to delegate ownership of a project to another user so that they may assign resources, you will want to make that user a Project Owner (TODO link to Project Owner) of that project.
+Presently, policies and roles can only be assigned to projects using the CLI, not the browser. Users cannot be assigned to projects from the browser or CLI.
 
-#### Project Owners
+If you would like to delegate ownership of a project to another user so that they may assign resources, you will want to make that user a [Project Owner]({{< relref "iam-v2-guide.md#project-owners" >}}) of that project.
 
-The role Project Owner is designed to allow admin users to delegate management of project membership to another user without granting that user
-access to all parts of Chef Automate. Project Owners have the following permissions on resources assigned to their project:
+#### Assigning Ingested Resources to Projects
 
-```
-"infra:*",
-"compliance:*",
-"system:*",
-"event:*",
-"ingest:*",
-"secrets:*",
-"telemetry:*",
-"iam:projects:list",
-"iam:projects:get",
-"iam:projects:assign",
-"iam:policies:list",
-"iam:policies:get",
-"iam:policyMembers:*",
-"iam:teams:list",
-"iam:teams:get",
-"iam:teamUsers:*",
-"iam:users:get",
-"iam:users:list"
-```
-
-In order to create a Project Owner, you can use an existing user, or create a user with username `test_project_owner` by following [Creating Users]({{< relref "users.md#creating-users" >}}).
-
-Next, you will create a policy that gives `test_project_owner` the role of `project-owner` for your new project. You may choose the and ID. The policy will look like the JSON below:
-
-```json
-{
-  "name": "Test Project Policy",
-  "id": "test-project-policy",
-  "projects": ["test-project"],
-  "members": [ "user:local:test_project_owner"],
-  "statements": [
-    {
-      "effect": "ALLOW",
-      "role": "project-owner",
-      "projects": ["test-project"]
-    }
-  ]
-}
-```
-
-By adding `test-project` to the policy's top-level `projects` field, we ensure that the Project Owner has access to this policy.
-
-Save as a JSON file and follow the steps in [Creating a Policy]({{< relref "iam-v2-api-reference.md#creating-a-policy" >}}) to pass that data to Chef Automate.
-
-#### Editor and Viewer Policies for Projects
-
-You (or your new Project Owner) may additionally choose to create a `Test-Project Editors` policy and a `Test-Project Viewers`
-policy. Once those are in place, you or your `Test-Project Owner` can easily add members to each policy
-to give them privileges to view or edit resources assigned to the `Test Project` project. To create
-those policies, use the JSON below:
-
-Viewers Policy:
-
-```json
-{
-  "name": "Test Project Viewers",
-  "id": "test-project-viewer-policy",
-  "projects": ["test-project"],
-  "members": [],
-  "statements": [
-    {
-      "effect": "ALLOW",
-      "role": "viewer",
-      "projects": ["test-project"]
-    }
-  ]
-}
-```
-
-Editors Policy:
-
-```json
-{
-  "name": "Test Project Editors",
-  "id": "test-project-editor-policy",
-  "projects": ["test-project"],
-  "members": [],
-  "statements": [
-    {
-      "effect": "ALLOW",
-      "role": "editor",
-      "projects": ["test-project"]
-    }
-  ]
-}
-```
-
-Now, if you would like Terry to be able to view `Test Project` and Kelly to be able to edit `Test Project`, you'll add them
-as members to the relevant policies. You can do that directly in the above JSON when creating the policy, or in the browser
-by selecting **Settings**, then **Policies**, then `Test-Project Policy`. Under the **Details** tab, you will find the
-option to select new policy members.
-
-Assuming Terry is not a member of any other policy, once you make Terry a member of the `Test-Project Viewer` policy,
-they will only be able to see resources assigned to `Test Project`. They will not be able to update or delete them.
-Kelly, however, will be able to do both.
-
-See [Policy Membership]({{< relref "iam-v2-api-reference.md#policy-membership" >}}) for more information on policy membership.
-
-## Removing Legacy Policies
-
-This section walks you through deleting legacy policies imported into v2, which will provide you a clean slate for exploring the IAM v2 Beta.
-
-Once you've rewritten your v1 policies as v2 policies, you should remove the v1 legacy policies you do not need.
-Be sure you have moved over any members of those policies or they will lose permissions. Note that several
-legacy policies (Compliance Profile Access and Ingest Access) have API tokens that will stop working if not ported. Alternately,
-you may choose to keep those policies intact if that's easier and you do not plan to alter those permissions.
-
-Open the menu on any custom policy, located at the end of the policy row, and select **Delete Policy** from the menu.
-(You will not have this option for Chef-managed policies.)
-A warning appears if members are still attached to the policy because deleting that policy disrupts access for all of its members.
-
-However, you can still delete the policy.
-Repeat for each legacy policy.
-
-## Reverting to IAM v1
-
-Should you have a need to revert back to IAM v1, it is quick and easy to do:
-
-```console
-$ chef-automate iam reset-to-v1
-```
-
-Note that this discards your IAM v2 policies, roles, and projects, and re-configures Chef Automate to use your v1 policies again.
-
-<!-- TODO move this next to the rest of the projects walkthrough -->
-## Assigning Projects to Ingested Resources
-
-While resources created within Automate can be directly added to a project, ingested resources, including Compliance reports, events, and nodes, are created outside of Automate and therefore must be added to projects a different way.
+While resources created within Automate can be directly assigned to a project, ingested resources, including Compliance reports, events, and nodes, are created outside of Automate and therefore must be assigned to projects a different way.
 
 Project rules are used to associate ingested resources with projects within Automate. A project rule contains conditions that determine if an ingested resource should be moved into the rule's project.
-Each condition contains an attribute, operator, and value.
+Each condition contains an attribute, operator, and value. See [Project Rules]({{< relref "iam-v2-api-reference.md#project-rules" >}}) for details on how to manage project rules.
 
-{{% info %}}
-See [Project Rules]({{< relref "iam-v2-api-reference.md#project-rules" >}}) for details on how to manage project rules.
-{{% /info %}}
-
-In this example, after [creating a project]({{< relref "iam-v2-guide.md#creating-a-project" >}}), you will add a project rule to the new project `project-devops`.
-You will update projects to apply this new project rule, causing all matching ingested resources to be associated with the appropriate project.
+In this example, after [creating a project]({{< relref "iam-v2-guide.md#creating-a-project" >}}) with the ID `project-devops`, you will add a project rule to this new project.
+You will update projects to apply this new project rule, causing all matching ingested resources to be associated with `project-devops`.
 You will then use the global project filter to filter your ingested data by `project-devops`.
 
 First, determine which ingested resources should belong to the project. In this example, we want to add the following ingested resources to `project-devops`:
@@ -402,13 +276,13 @@ First, determine which ingested resources should belong to the project. In this 
 You may want to verify that those filters work as expected using the search filter bars on the Event Feed, Client Runs, and
 Reports pages.
 
-Navigate to the project details page of `project-devops`, created in the previous section, either by heading directly to `https://{{< example_fqdn "automate" >}}/settings/projects/project-devops` or selecting the project name on the project list page.
+Navigate to the project details page of `project-devops`, either by heading directly to `https://{{< example_fqdn "automate" >}}/settings/projects/project-devops` or selecting the project name on the project list page.
 
-Select the `Create Rule` button to create a new project rule. Choose type `Node` then fill in the first condition's fields.
+Select the `Create Rule` button to create a new project rule. Choose resource type `Node` then fill in the first condition's fields.
 Feel free to create fake ingest data that corresponds to the example json below, or come up with a condition that matches your existing data set.
 
 {{% warning %}}
-Compliance reports must be using audit cookbook 7.5+ in order to make use of all of the available project rule attributes. Older reports will only have environment and role available as attributes.
+Compliance reports must be using **audit cookbook 7.5+** in order to make use of all of the available project rule attributes. Older reports will only have **Environment** and **Chef Role** available as attributes.
 {{% /warning %}}
 
 ```json
@@ -464,15 +338,135 @@ add more data to `project-devops`.
 {{% info %}}
 Compliance and Infrastructure ingested resources are not the exact same nodes, so their properties may not be the same.
 Separate conditions governing said resources *may* need to be used if their properties do not match exactly.
+
 Similarly, ingested events require conditions of `Event` type to be associated with the correct project. A condition of type `Node` will not match an event, even if the condition's
 operator, attribute, and value all match exactly (and vice versa with `Event` project rules and nodes).
 {{% /info %}}
 
-Return again to the project details page (`https://{{< example_fqdn "automate" >}}/settings/projects/project-devops`) and select the name of the rule just created.
+Return again to the project details page `https://{{< example_fqdn "automate" >}}/settings/projects/project-devops` and select the name of the rule just created.
 
-Add a condition. In this example, we'll add a condition for resources with the attribute `Environment`, operator `equals`, and value `dev`. Save the rule.
+Add a condition. In this example, we'll add a condition for resources with the attribute `Environment`, operator `equals`, and value `dev`, or any value matching your data set. Save the rule.
 
 Back on the project details page, select `Create Rule`. This time, choose resource type `Event`. Add a condition for resources with the Chef Server `devops.pizza`, or any value matching your data set.
 
+{{% info %}}
+Note that setting the project rule `Resource Type` determines what condition attributes are available to select. `Event` rule conditions can only have the attributes `Chef Organization` or `Chef Server`.
+
+Rules of type `Node` can have conditions with attributes `Chef Organization`, `Chef Server`, `Environment`, `Chef Role`, `Chef Tag`, `Chef Policy Name`, `Chef Policy Group`.
+{{% /info %}}
+
 Navigate to the project list page once more. Select `Update Projects`. Upon completion of the update, you should be able to
 filter by `project-devops` across Automate's dashboards and see only the ingested data that you expect.
+
+#### Project Owners
+
+The role Project Owner is designed to allow admin users to delegate management of project membership to another user without granting that user access to all parts of Chef Automate. Project Owners have the following permissions on resources assigned to their project:
+
+```text
+"infra:*",
+"compliance:*",
+"system:*",
+"event:*",
+"ingest:*",
+"secrets:*",
+"telemetry:*",
+"iam:projects:list",
+"iam:projects:get",
+"iam:projects:assign",
+"iam:policies:list",
+"iam:policies:get",
+"iam:policyMembers:*",
+"iam:teams:list",
+"iam:teams:get",
+"iam:teamUsers:*",
+"iam:users:get",
+"iam:users:list"
+```
+
+In order to create a Project Owner, you can use an existing user, or create a user with username `test_project_owner` by following [Creating Users]({{< relref "users.md#creating-users" >}}).
+
+Next, you will create a policy that gives `test_project_owner` the role of `project-owner` for your new project. The policy will look like the JSON below:
+
+```json
+{
+  "name": "Project Devops Policy",
+  "id": "project-devops-policy",
+  "projects": ["project-devops"],
+  "members": [ "user:local:test_project_owner"],
+  "statements": [
+    {
+      "effect": "ALLOW",
+      "role": "project-owner",
+      "projects": ["project-devops"]
+    }
+  ]
+}
+```
+
+By adding `project-devops` to the policy's top-level `projects` field, we ensure that the Project Owner has access to this policy.
+
+Save as a JSON file and follow the steps in [Creating a Policy]({{< relref "iam-v2-api-reference.md#creating-a-policy" >}}) to pass that data to Chef Automate.
+
+#### Editor and Viewer Policies for Projects
+
+You may additionally choose to create a `Project Devops Editors` policy and a `Project Devops Viewers`
+policy. Once those are in place, you or your `project-devops` Owner can easily add members to each policy
+to give them privileges to view or edit resources assigned to `Project Devops`. To create
+those policies, use the JSON below:
+
+Viewers Policy:
+
+```json
+{
+  "name": "Project Devops Viewers",
+  "id": "project-devops-viewer-policy",
+  "projects": ["project-devops"],
+  "members": [],
+  "statements": [
+    {
+      "effect": "ALLOW",
+      "role": "viewer",
+      "projects": ["project-devops"]
+    }
+  ]
+}
+```
+
+Editors Policy:
+
+```json
+{
+  "name": "Project Devops Editors",
+  "id": "project-devops-editor-policy",
+  "projects": ["project-devops"],
+  "members": [],
+  "statements": [
+    {
+      "effect": "ALLOW",
+      "role": "editor",
+      "projects": ["project-devops"]
+    }
+  ]
+}
+```
+
+Now, if you would like Terry to be able to view `Project Devops` and Kelly to be able to edit `Project Devops`, you'll add them
+as members to the relevant policies. You can do that directly in the above JSON when creating the policy, or in the browser
+by selecting **Settings**, then **Policies**, then `Project Devops Policy`. Under the **Details** tab, you will find the
+option to select new policy members.
+
+Assuming Terry is not a member of any other policy, once you make Terry a member of the `Project Devops Viewers` policy,
+they will only be able to see resources assigned to `Project Devops`. They will not be able to update or delete them.
+Kelly, however, will be able to do both.
+
+See [Policy Membership]({{< relref "iam-v2-api-reference.md#policy-membership" >}}) for more information on policy membership.
+
+## Reverting to IAM v1
+
+Should you have a need to revert back to IAM v1, it is quick and easy to do:
+
+```console
+$ chef-automate iam reset-to-v1
+```
+
+Note that this discards your IAM v2 policies, roles, and projects, and re-configures Chef Automate to use your v1 policies again.
