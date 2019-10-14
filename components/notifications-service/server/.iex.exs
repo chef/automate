@@ -35,7 +35,7 @@ defmodule H do
   ## Parameters
   name: the name of the rule
   type: :slack or :custom
-  event: one of "ccr_failure", "ccr_success", "compliance_failure", "compliance_success", "Assets"
+  event: one of "ccr_failure", "ccr_success", "compliance_failure", "compliance_success"
   url: url to post to when event is triggered
 
   ## Examples

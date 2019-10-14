@@ -106,3 +106,10 @@ level = "{{cfg.service.log.level}}"
     secure = true
 {{~/if}}
 {{~/eachAlive}}
+{{~#eachAlive bind.data-feed-service.members as |datafeed|}}
+{{~#if @last}}
+  [grpc_clients.endpoints.data-feed-service]
+    target = "{{datafeed.sys.ip}}:{{datafeed.cfg.port}}"
+    secure = true
+{{~/if}}
+{{~/eachAlive}}

@@ -73,6 +73,12 @@ addNoProxy {{teams.sys.ip}}
 addNoProxy {{secrets.sys.ip}}
 {{~/if}}
 {{~/eachAlive}}
+{{~#eachAlive bind.data-feed-service.members as |datafeed|}}
+{{~#if @last}}
+# Add data-feed-service to no_proxy
+addNoProxy {{datafeed.sys.ip}}
+{{~/if}}
+{{~/eachAlive}}
 {{~#eachAlive bind.nodemanager-service.members as |manager|}}
  {{~#if @last}}
  # Add nodemanager to no_proxy

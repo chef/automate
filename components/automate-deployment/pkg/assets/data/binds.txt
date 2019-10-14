@@ -21,7 +21,7 @@ automate-elasticsearch REQUIRED backup-gateway
 automate-elasticsearch BINDING_MODE strict
 automate-es-gateway REQUIRED automate-elasticsearch
 automate-es-gateway BINDING_MODE relaxed
-automate-gateway OPTIONAL authn-service authz-service compliance-service config-mgmt-service deployment-service event-service ingest-service license-control-service local-user-service nodemanager-service notifications-service secrets-service teams-service
+automate-gateway OPTIONAL authn-service authz-service compliance-service config-mgmt-service data-feed-service deployment-service event-service ingest-service license-control-service local-user-service nodemanager-service notifications-service secrets-service teams-service
 automate-gateway BINDING_MODE strict
 automate-load-balancer OPTIONAL automate-cs-nginx automate-dex automate-gateway automate-ui automate-workflow-nginx session-service
 automate-load-balancer BINDING_MODE relaxed
@@ -43,7 +43,7 @@ compliance-service OPTIONAL authn-service es-sidecar-service notifications-servi
 compliance-service BINDING_MODE strict
 config-mgmt-service REQUIRED automate-es-gateway
 config-mgmt-service BINDING_MODE strict
-data-feed-service REQUIRED cereal-service compliance-service config-mgmt-service notifications-service secrets-service
+data-feed-service REQUIRED automate-pg-gateway cereal-service compliance-service config-mgmt-service pg-sidecar-service secrets-service
 data-feed-service BINDING_MODE strict
 es-sidecar-service REQUIRED automate-elasticsearch automate-es-gateway
 es-sidecar-service BINDING_MODE strict

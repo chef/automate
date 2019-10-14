@@ -6,6 +6,7 @@ package mock_gateway
 
 import (
 	applications "github.com/chef/automate/api/external/applications"
+	data_feed "github.com/chef/automate/api/external/data_feed"
 	secrets "github.com/chef/automate/api/external/secrets"
 	authn "github.com/chef/automate/api/interservice/authn"
 	authz "github.com/chef/automate/api/interservice/authz"
@@ -324,6 +325,22 @@ func (mr *MockClientsFactoryMockRecorder) SecretClient() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SecretClient", reflect.TypeOf((*MockClientsFactory)(nil).SecretClient))
 }
+
+// DatafeedClient mocks base method
+func (m *MockClientsFactory) DatafeedClient() (data_feed.DatafeedServiceClient, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DatafeedClient")
+	ret0, _ := ret[0].(data_feed.DatafeedServiceClient)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DatafeedClient indicates an expected call of DatafeedClient
+func (mr *MockClientsFactoryMockRecorder) DatafeedClient() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DatafeedClient", reflect.TypeOf((*MockClientsFactory)(nil).DatafeedClient))
+}
+
 
 // NodesClient mocks base method
 func (m *MockClientsFactory) NodesClient() (nodes.NodesServiceClient, error) {

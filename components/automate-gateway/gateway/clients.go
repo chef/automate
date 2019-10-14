@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/chef/automate/api/external/applications"
+	"github.com/chef/automate/api/external/data_feed"
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/authn"
 	authz "github.com/chef/automate/api/interservice/authz"
@@ -108,6 +109,7 @@ type ClientsFactory interface {
 	NodeManagerClient() (manager.NodeManagerServiceClient, error)
 	LicenseControlClient() (license_control.LicenseControlClient, error)
 	DeploymentServiceClient() (deployment.DeploymentClient, error)
+	DatafeedClient() (data_feed.DatafeedServiceClient, error)
 }
 
 // clientsFactory caches grpc client connections and returns clients
@@ -448,6 +450,14 @@ func (c *clientsFactory) DeploymentServiceClient() (deployment.DeploymentClient,
 		return nil, err
 	}
 	return deployment.NewDeploymentClient(conn), nil
+}
+
+func (c *clientsFactory) DatafeedClient() (data_feed.DatafeedServiceClient, error) {
+	conn, err := c.connectionByName("data-feed-service")
+	if err != nil {
+		return nil, err
+	}
+	return data_feed.NewDatafeedServiceClient(conn), nil
 }
 
 func (c *clientsFactory) connectionByName(name string) (*grpc.ClientConn, error) {

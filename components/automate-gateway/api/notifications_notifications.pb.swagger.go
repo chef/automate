@@ -184,8 +184,7 @@ func init() {
         "CCRFailure",
         "CCRSuccess",
         "ComplianceFailure",
-        "ComplianceSuccess",
-        "Assets"
+        "ComplianceSuccess"
       ],
       "default": "CCRFailure"
     },

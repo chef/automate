@@ -31,6 +31,7 @@ export const environment = {
   // don't forget to remove it from the proxy
   elasticsearch_url: '/api/v0/elasticsearch',
   notifier_url: '/api/v0/notifications',
+  data_feed_url: '/api/v0/datafeed',
   license_id: '00000000-0000-0000-0000-111111111111',
   install_id: '00000000-0000-0000-0000-111111111111',
   use_default_session: false
