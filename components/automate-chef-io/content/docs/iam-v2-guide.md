@@ -386,12 +386,12 @@ Project rules are used to associate ingested resources with projects within Auto
 Each condition contains an attribute, operator, and value.
 
 {{% info %}}
-See the [API reference]({{< relref "iam-v2-api-reference.md#project-rules" >}}) for details on how to manage project rules.
+See [Project Rules]({{< relref "iam-v2-api-reference.md#project-rules" >}}) for details on how to manage project rules.
 {{% /info %}}
 
-In this example you will add a project rule to the project `project-devops`, created as part of the [project creation walkthrough]({{< relref "iam-v2-guide.md#creating-a-project" >}}).
+In this example, after [creating a project]({{< relref "iam-v2-guide.md#creating-a-project" >}}), you will add a project rule to the new project `project-devops`.
 You will update projects to apply this new project rule, causing all matching ingested resources to be associated with the appropriate project.
-You will use the global project filter to filter your ingested data by `project-devops`.
+You will then use the global project filter to filter your ingested data by `project-devops`.
 
 First, determine which ingested resources should belong to the project. In this example, we want to add the following ingested resources to `project-devops`:
 
@@ -431,7 +431,7 @@ Compliance reports must be using audit cookbook 7.5+ in order to make use of all
 
 ![](/images/docs/create-project-rule.png)
 
-Save the rule. If you need to change the name or the conditions, select the project rule name on the project details page.
+Save the rule. If you later need to change the name or the conditions, select the project rule name on the project details page.
 
 You should see a message that says `Edits are pending: update projects to apply edits.` Select the `projects` link in the message to go back to the project list page.
 
@@ -439,7 +439,7 @@ On the project list page, the button `Update Projects` should be enabled since a
 
 ![](/images/docs/update-projects-button.png)
 
-Updating a project begins an operation that applies all pending rule edits and then moves ingested resources into the correct projects according to those latest changes. An ingested resource is moved into a project only if it matches any of the project's rule conditions.
+Updating a project begins an operation that applies all pending rule edits and then moves ingested resources into the correct projects according to those latest changes. An ingested resource is moved into a project if it matches at least one of the project's rules.
 In this example, upon successful update, all ingested resources whose Chef Organization matches `devops` will be considered a part of the project `project-devops`.
 Only these resources will appear in Automate's dashboards when the `project-devops` project has been selected in the global project filter.
 
@@ -447,11 +447,11 @@ As the operation takes place, you should see a percentage count up within the `U
 `Stop Updating Projects` and confirming the cancel in the modal that pops up.
 
 {{% warning %}}
-Avoid stopping an update unless absolutely necessary. It will leave your system in an in-between state where only some resources have been moved into their updated projects while others still remain in old projects. Only another successful update will restore the system to a happy state.
+Avoid stopping an update unless absolutely necessary. It will leave your system in an unknown state where only some resources have been moved into their updated projects while others still remain in old projects. Only another successful update will restore the system to a happy state.
 {{% /warning %}}
 
 Once rules have been successfully applied, the update button will change to `Projects Up-to-Date` and be disabled until the next
-time a change is made to any project.
+time there are *pending edits* to any project.
 
 To verify that the ingested resources have been moved into the correct projects, select `project-devops` in the global projects filter, which is on the top navbar. The data in Automate will now be filtered by the selected project.
 In this example, the effect is revealed by navigating to the Compliance Reports' Nodes tab, which only features nodes that belong to the `devops` Chef Organization.
@@ -462,14 +462,13 @@ Now that we have the first set of our ingested data associated with our new proj
 add more data to `project-devops`.
 
 {{% info %}}
-Compliance and Infrastructure ingested resources will not necessarily match under the same conditions since they are not
-the exact same nodes and do not have all the same matching fields.
-Separate conditions governing said resources may need to be used. Similarly, ingested events require conditions of `Event` type to be associated correctly. A condition of type `Node` will not match an event, even if the condition's
+Compliance and Infrastructure ingested resources are not the exact same nodes, so their properties may not be the same.
+Separate conditions governing said resources *may* need to be used if their properties do not match exactly.
+Similarly, ingested events require conditions of `Event` type to be associated with the correct project. A condition of type `Node` will not match an event, even if the condition's
 operator, attribute, and value all match exactly (and vice versa with `Event` project rules and nodes).
 {{% /info %}}
 
-Back at the project details page (`https://{{< example_fqdn "automate" >}}/settings/projects/project-devops`), select the name
-of the rule just created.
+Return again to the project details page (`https://{{< example_fqdn "automate" >}}/settings/projects/project-devops`) and select the name of the rule just created.
 
 Add a condition. In this example, we'll add a condition for resources with the attribute `Environment`, operator `equals`, and value `dev`. Save the rule.
 
