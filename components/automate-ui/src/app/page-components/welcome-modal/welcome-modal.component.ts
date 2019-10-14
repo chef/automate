@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ɵConsole } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 
@@ -75,6 +75,8 @@ export class WelcomeModalComponent {
       return;
     }
 
+    console.log(SHOW_AT_START_PREF_KEY);
+    console.log( this.localStorage.getBoolean(SHOW_AT_START_PREF_KEY) );
     // On init check if user has selected a preference for modal visibility on startup.
     switch (this.localStorage.getBoolean(SHOW_AT_START_PREF_KEY)) {
       case true:
@@ -124,6 +126,7 @@ export class WelcomeModalComponent {
   // preference, which is passed as an argument, AND whether or not
   // the modal has already been seen this session.
   private maybeShowModal(showPref: boolean): void {
+    console.log('maybeShowModal');
     // The result of this query to sessionStorage should always result in
     // either a 'true' or a 'null' value but we are explicitly checking for
     // true here for clarity.
@@ -131,6 +134,7 @@ export class WelcomeModalComponent {
       // If the modal has already been seen we return early and do nothing.
       return;
     } else if (showPref) {
+      console.log('maybeShowModal - showPref');
       // If the modal has not been seen and the user has set a preference
       // to see the modal on startup then we show the modal.
       this.showModal();
