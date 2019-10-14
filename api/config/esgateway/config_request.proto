@@ -42,6 +42,7 @@ message ConfigRequest {
 
 				message Main {
 					google.protobuf.Int32Value worker_processes = 1;
+					google.protobuf.Int32Value max_fails = 2;
 				}
 
 				message Events {
