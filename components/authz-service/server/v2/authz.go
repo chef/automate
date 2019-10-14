@@ -211,7 +211,7 @@ func (s *authzServer) ValidateProjectAssignment(
 		return &api.ValidateProjectAssignmentResp{}, nil
 	}
 
-	err := s.store.EnsureNoProjectsMissing(ctx, req.ProjectIds)
+	err := s.store.EnsureNoProjectsMissing(ctx, req.NewProjects)
 	if err != nil {
 		if _, ok := err.(*projectassignment.ProjectsMissingError); ok {
 			return nil, status.Error(codes.NotFound, err.Error())
