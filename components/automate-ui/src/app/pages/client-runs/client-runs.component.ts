@@ -401,6 +401,7 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
     this.shareDropdownVisible = false;
   }
 
+
   onDeleteNodes(event): void {
     this.telemetryService.track('nodeDeletion', { count: event.nodeIds.length } );
 

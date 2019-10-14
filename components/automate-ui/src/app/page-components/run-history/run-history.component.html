@@ -21,9 +21,6 @@
       <div>
         <app-date-selector (select)="dateSelected($event)" [initialDateTerm]="defaultSelectionTerm"> </app-date-selector>
       </div>
-      <chef-button class="dropdown-toggle" secondary (click)="toggleDownloadDropdown()">
-        <chef-icon>cloud_download</chef-icon>
-      </chef-button>
     </div>
     <ul>
       <li class="history-item" *ngFor="let history of nodeHistory" (click)="onSelect(history)">

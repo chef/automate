@@ -14,9 +14,8 @@ message NodeExport {
 
 message ReportExport {
   repeated string filter                = 1;
-  Sorting sorting                       = 2;
-  string output_type                    = 3;
-  string node_id                        = 4;
-  google.protobuf.Timestamp start       = 5;
-  google.protobuf.Timestamp end         = 6;
+  string output_type                    = 2;
+  string node_id                        = 3;
+  google.protobuf.Timestamp start       = 4;
+  google.protobuf.Timestamp end         = 5;
 }

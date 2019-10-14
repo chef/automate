@@ -101,6 +101,7 @@ func (s *CfgMgmtServer) exportReports(ctx context.Context, request *pRequest.Rep
 		return err
 	}
 
+	// Check if the projects match the associated node async
 	nodeExistsChan := s.nodeExistsAsync(request.NodeId, projectFilters)
 
 	pageSize := 100
@@ -118,6 +119,7 @@ func (s *CfgMgmtServer) exportReports(ctx context.Context, request *pRequest.Rep
 		return status.Errorf(codes.Internal, err.Error())
 	}
 
+	// Wait for check if the associated node's projects match
 	nodeExists := <-nodeExistsChan
 	if nodeExists.err != nil {
 		return nodeExists.err

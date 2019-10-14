@@ -59,7 +59,7 @@ export class NodeRunsService {
       });
   }
 
-  public downloadRuns(type: string, filters: NodeHistoryFilter): Observable<string> {
+  downloadRuns(type: string, filters: NodeHistoryFilter): Observable<string> {
     const url = `${CONFIG_MGMT_URL}/reports/export`;
 
     let typeFilters: string[] = [];

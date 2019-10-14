@@ -45,10 +45,6 @@ export class RunHistoryComponent implements OnInit, OnDestroy {
   defaultSelectionTerm: string;
   private nodeHistoryFilterSubscription: Subscription;
   private nodeHistoryCountsFilterSubscription: Subscription;
-  downloadOptsVisible = false;
-  downloadInProgress = false;
-  downloadFailed = false;
-  downloadStatusVisible = false;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -114,45 +110,22 @@ export class RunHistoryComponent implements OnInit, OnDestroy {
     return moment.duration(moment(end_time).diff(moment(start_time))).humanize();
   }
 
-  toggleDownloadDropdown() {
-    this.onDownloadOptPressed('csv');
-  }
-
-  hideDownloadDropdown() {
-    this.downloadOptsVisible = false;
-  }
-
-  onDownloadOptPressed(format) {
-    this.downloadOptsVisible = false;
-
+  onDownloadRunsReport() {
+    const format = 'csv'; // or 'json'
     const filename = `${moment().format('YYYY-M-D')}.${format}`;
 
-    const onComplete = () => this.downloadInProgress = false;
-    const onError = _e => this.downloadFailed = true;
+    const onComplete = () => console.warn('completed downloading report');
+    const onError = _e => console.error('error downloading report');
     const types = {'json': 'application/json', 'csv': 'text/csv'};
     const onNext = data => {
       const type = types[format];
       const blob = new Blob([data], {type});
       saveAs(blob, filename);
-      this.hideDownloadStatus();
     };
 
-    this.showDownloadStatus();
     this.nodeRunsService.downloadRuns(format, this.nodeHistoryStore.filter.getValue()).pipe(
       finalize(onComplete))
       .subscribe(onNext, onError);
-  }
-
-  showDownloadStatus() {
-    this.downloadStatusVisible = true;
-    this.downloadInProgress = true;
-    this.downloadFailed = false;
-  }
-
-  hideDownloadStatus() {
-    this.downloadStatusVisible = false;
-    this.downloadInProgress = false;
-    this.downloadFailed = false;
   }
 
   // return specific stat values
