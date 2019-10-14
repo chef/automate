@@ -91,7 +91,7 @@ func (srv *Server) GetJobResultByNodeId(ctx context.Context, in *jobs.GetJobResu
 }
 
 // Create creates a new job
-func (srv *Server) Create(ctx context.Context, in *jobs.Job) (*jobs.Job, error) {
+func (srv *Server) Create(ctx context.Context, in *jobs.Job) (*jobs.Id, error) {
 	logrus.Debugf("Create a new job: %+v", in)
 	if in.Recurrence != "" {
 		// Ensure recurrence rule can be parsed
@@ -123,7 +123,7 @@ func (srv *Server) Create(ctx context.Context, in *jobs.Job) (*jobs.Job, error) 
 	}
 
 	logrus.Debugf("printttt the id and name %s %s", &jobs.Job{Id: sID, Name: name})
-	return &jobs.Job{Id: sID, Name: name}, nil
+	return &jobs.Id{Id: sID, Name: name}, nil
 }
 
 // Read a job via ID

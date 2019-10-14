@@ -10,7 +10,7 @@ import "google/protobuf/empty.proto";
 import "components/compliance-service/api/common/common.proto";
 
 service JobsService {
-	rpc Create(Job) returns (Job) {};
+	rpc Create(Job) returns (Id) {};
 	rpc Read(Id) returns (Job) {};
 	rpc Update(Job) returns (google.protobuf.Empty) {};
 	rpc Delete(Id) returns (google.protobuf.Empty) {};
@@ -27,6 +27,7 @@ message GetJobResultByNodeIdRequest{
 message RerunResponse {}
 message Id {
 	string id = 1;
+	string name = 2;
 }
 message Ids {
 	repeated string ids = 1;
