@@ -82,7 +82,7 @@ func RegisterCerealProjectPurgerWithDomainServices(manager *cereal.Manager, log 
 }
 
 // Start kicks off the purging of a project. It sets up the cereal workflows needed
-// enqueues them all.
+// and enqueues them all.
 func (m *cerealProjectPurger) Start(projectID string) error {
 	params := map[string]interface{}{}
 
