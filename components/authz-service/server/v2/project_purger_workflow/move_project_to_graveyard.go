@@ -41,7 +41,7 @@ func (s *moveProjectToGraveyardWorkflowExecutor) OnStart(w cereal.WorkflowInstan
 	return w.Continue(nil)
 }
 
-// OnTaskComplete instantly retires on ErrTaskLost to handle the case where the project move to graveyard
+// OnTaskComplete instantly retries on ErrTaskLost to handle the case where the project move to graveyard
 // was completed in postgres but things crashed before the success could be reported. All other errors are
 // real database errors (like NotFound) that should be bubbled up.
 func (s *moveProjectToGraveyardWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev cereal.TaskCompleteEvent) cereal.Decision {
