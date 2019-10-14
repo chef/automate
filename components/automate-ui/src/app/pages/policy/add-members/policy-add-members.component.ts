@@ -333,6 +333,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   public showInputs(inputName: string): boolean {
     const typeValue = this.expressionForm.get('type').value;
     const identityValue = this.expressionForm.get('identity').value;
+    const matchAllWildCard = '*';
 
     this.setFormLabels(typeValue);
 
@@ -348,7 +349,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
           }
         break;
       case 'name':
-        if ( typeValue === 'token' || (identityValue && identityValue !== '*') ) {
+        if ( typeValue === 'token' || (identityValue && identityValue !== matchAllWildCard) ) {
           this.updateValidations(inputName, true);
           return true;
         } else {
