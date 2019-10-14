@@ -155,7 +155,7 @@ func (m *cerealProjectPurger) GraveyardingCompleted(projectID string) (bool, err
 // |    ProjectPurger is a wrapper around a ChainWorkflowExecutor that contains the subworkflows required to purge projects.                                             |
 // |                                                                                                                                                                     |
 // |                                                        Executor: ParallelWorkflowExecutor contains multiple                                                         |
-// | Executor: moveProjectToGraeyardWorkflowExecutor          Executors: domainProjectPurgeWorkflowExecutor         Executor: deleteProjectFromGraveyardWorkflowExecutor |
+// | Executor: moveProjectToGraveyardWorkflowExecutor         Executors: domainProjectPurgeWorkflowExecutor         Executor: deleteProjectFromGraveyardWorkflowExecutor |
 // |                                                            for each domain (authn, tokens) in parallel.                                                             |
 // | +---------------------------------------------+        +---------------------------------------------+         +---------------------------------------------+      |
 // | | Contains a single task per project:         |        | There is a                                  |         | Contains a single task per project:         |      |
