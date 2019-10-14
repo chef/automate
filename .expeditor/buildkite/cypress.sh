@@ -6,7 +6,7 @@ cd /workdir/e2e
 
 data=$(curl --silent "https://a2-${CHANNEL}.cd.chef.co/assets/data.json")
 instances_to_test=$(jq -nr --argjson data "$data" '$data[] | select(.tags | any(. == "e2e")) | .fqdn')
-versions=(v1 v2 v2.1)
+versions=(v1 v2.1)
 timestamp=$(date +"%m-%d-%y-%H-%M")
 
 for instance in ${instances_to_test[*]}
@@ -24,14 +24,14 @@ do
           echo "$token"
           return 1
         fi
-      else 
+      else
         if ! token=$(chef-automate iam token create "$timestamp-tok" --admin); then
           echo "Non-zero exit code, output:"
           echo "$token"
           return 1
         fi
       fi
-      
+
       export CYPRESS_ADMIN_TOKEN=$token
       export CYPRESS_IAM_VERSION=$version
     fi

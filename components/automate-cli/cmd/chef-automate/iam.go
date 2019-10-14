@@ -100,15 +100,15 @@ func newIAMUpgradeToV2Cmd() *cobra.Command {
 		"skip-policy-migration",
 		false,
 		"Do not migrate policies from IAM v1.")
+
+	// this flag is deprecated and does nothing but we don't wanna error on it
 	cmd.PersistentFlags().BoolVar(
 		&iamCmdFlags.betaVersion,
 		"beta2.1",
 		false,
 		"Upgrade to version 2.1 with beta project authorization.")
+	_ = cmd.PersistentFlags().MarkHidden("beta2.1")
 
-	if !isDevMode() {
-		_ = cmd.PersistentFlags().MarkHidden("beta2.1")
-	}
 	return cmd
 }
 
@@ -170,22 +170,13 @@ func display(v *policies_common.Version) string {
 }
 
 func runIAMUpgradeToV2Cmd(cmd *cobra.Command, args []string) error {
-	label := map[bool]string{
-		true:  "v2.1",
-		false: "v2",
-	}
 	upgradeReq := &policies_req.UpgradeToV2Req{
-		Flag:           policies_common.Flag_VERSION_2_0,
+		Flag:           policies_common.Flag_VERSION_2_1,
 		SkipV1Policies: iamCmdFlags.skipLegacyUpgrade,
 	}
 
-	isBetaVersion := iamCmdFlags.betaVersion
-	if isBetaVersion {
-		upgradeReq.Flag = policies_common.Flag_VERSION_2_1
-		writer.Title("Enabling IAM v2.1")
-	} else {
-		writer.Title("Upgrading to IAM v2")
-	}
+	writer.Title("Upgrading to IAM v2.1")
+
 	if !iamCmdFlags.skipLegacyUpgrade {
 		writer.Println("Migrating v1 policies...")
 	}
@@ -210,13 +201,13 @@ func runIAMUpgradeToV2Cmd(cmd *cobra.Command, args []string) error {
 		}
 	case codes.FailedPrecondition:
 		return status.Wrap(err, status.IAMUpgradeV2DatabaseError,
-			"Migration to IAM v2 already in progress")
+			"Migration to IAM v2.1 already in progress")
 	case codes.AlreadyExists:
-		writer.Failf(alreadyMigratedMessage, label[isBetaVersion])
+		writer.Failf(alreadyMigratedMessage, "v2.1")
 		return nil
 	default: // something else: fail
 		return status.Wrap(err, status.IAMUpgradeV2DatabaseError,
-			"Failed to reset IAM v2 database state")
+			"Failed to reset IAM v2.1 database state")
 	}
 
 	writer.Println("Creating default teams Editors and Viewers...")
@@ -242,7 +233,7 @@ func runIAMUpgradeToV2Cmd(cmd *cobra.Command, args []string) error {
 			"Failed to migrate teams service")
 	}
 
-	writer.Successf("Enabled IAM %s", label[isBetaVersion])
+	writer.Success("Enabled IAM v2.1")
 	return nil
 }
 
