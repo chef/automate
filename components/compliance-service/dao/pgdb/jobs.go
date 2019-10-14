@@ -564,14 +564,14 @@ func (trans *DBTrans) nodeJob(jobID string, nodeIDs []string) error {
 	return trans.Insert(links...)
 }
 
-func (db *DB) AddJob(inJob *jobs.Job) (string, error) {
+func (db *DB) AddJob(inJob *jobs.Job) (string, string, error) {
 	if err := validateJob(inJob); err != nil {
-		return "", errors.Wrap(err, "AddJob unable to validate job")
+		return "", "", errors.Wrap(err, "AddJob unable to validate job")
 	}
 
 	job, err := toDBJob(inJob)
 	if err != nil {
-		return "", errors.Wrap(err, "AddJob unable to translate job to db struct")
+		return "", "", errors.Wrap(err, "AddJob unable to translate job to db struct")
 	}
 
 	job.ID = uuid.Must(uuid.NewV4()).String()
@@ -604,8 +604,9 @@ func (db *DB) AddJob(inJob *jobs.Job) (string, error) {
 
 		return nil
 	})
+	logrus.Debugf("printtttt the id and name %s %s", job.ID, job.Name)
 
-	return job.ID, err
+	return job.ID, job.Name, err
 }
 
 func isValidJobType(jobType string) bool {
