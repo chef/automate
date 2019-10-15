@@ -12,6 +12,7 @@ import {
 import { DOCUMENT } from '@angular/common';
 import * as d3 from 'd3';
 import * as moment from 'moment';
+import { DateTime } from 'app/helpers/datetime/datetime';
 
 export interface TrendData {
   report_time: Date;
@@ -153,10 +154,9 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
       .attr('x', this.vbWidth / 2)
       .attr('y', this.vbHeight - 3)
       .text(() => {
-        const format = '%a, %e %b %Y';
         return [
-          d3.timeFormat(format)(this.domainX[0]),
-          d3.timeFormat(format)(this.domainX[1])
+          moment(this.domainX[0]).format(DateTime.CHEF_DATE_TIME),
+          moment(this.domainX[1]).format(DateTime.CHEF_DATE_TIME)
         ].join(' - ');
       });
 
