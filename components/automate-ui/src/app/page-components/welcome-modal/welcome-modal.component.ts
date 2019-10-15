@@ -48,10 +48,14 @@ export class WelcomeModalComponent {
     if (this.telemetryService.hasTelemetryResponse) {
       this.isTelemetryServiceEnabled = this.telemetryService.telemetryEnabled;
     } else {
+      console.log('%c welcome-modal.component constructor ', 'background: yellow; color: black;');
+      console.log('welcome, enabled yet?: ' + this.telemetryService.telemetryEnabled);
+
       this.telemetryServiceSubscription =
         this.telemetryService.enabled.subscribe(telemetryEnabled => {
-          this.isTelemetryServiceEnabled = telemetryEnabled;
-        });
+          console.log('enabled now?: ' + telemetryEnabled)
+            this.isTelemetryServiceEnabled = telemetryEnabled;
+          });
     }
 }
 
@@ -71,13 +75,10 @@ export class WelcomeModalComponent {
     // again so users can set their individual telemetry preference.
     if (this.isTelemetryServiceEnabled &&
       this.chefSessionService.fetchTelemetryPreference() === null) {
-        console.log('telemetryServiceEnabled');
       this.showModal();
       return;
     }
 
-    console.log(SHOW_AT_START_PREF_KEY);
-    console.log( this.localStorage.getBoolean(SHOW_AT_START_PREF_KEY) );
     // On init check if user has selected a preference for modal visibility on startup.
     switch (this.localStorage.getBoolean(SHOW_AT_START_PREF_KEY)) {
       case true:
@@ -119,7 +120,6 @@ export class WelcomeModalComponent {
 
   // Shows the modal and sets the has_been_seen flag to true.
   public showModal(): void {
-    console.log('showModal');
     this.isVisible = true;
     this.sessionStorage.putBoolean(this.chefSessionService.userWelcomeModalSeenKey(), true);
   }
@@ -128,7 +128,6 @@ export class WelcomeModalComponent {
   // preference, which is passed as an argument, AND whether or not
   // the modal has already been seen this session.
   private maybeShowModal(showPref: boolean): void {
-    console.log('maybeShowModal');
     // The result of this query to sessionStorage should always result in
     // either a 'true' or a 'null' value but we are explicitly checking for
     // true here for clarity.
@@ -136,7 +135,6 @@ export class WelcomeModalComponent {
       // If the modal has already been seen we return early and do nothing.
       return;
     } else if (showPref) {
-      console.log('maybeShowModal - showPref');
       // If the modal has not been seen and the user has set a preference
       // to see the modal on startup then we show the modal.
       this.showModal();

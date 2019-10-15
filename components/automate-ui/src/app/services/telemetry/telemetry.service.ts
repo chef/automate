@@ -64,9 +64,10 @@ export class TelemetryService {
     });
 
     this.configService.getConfig().pipe(
-      filter(config => config.telemetryEnabled),
+      filter( config => config.telemetryEnabled),
       map((config) => {
         this.telemetryEnabled = config.telemetryEnabled;
+        console.log(config.telemetryEnabled);
         this.telemetryEnabledObservable.next(config.telemetryEnabled);
         this.hasTelemetryResponse = true;
         this.telemetryUrl = config.telemetryUrl;
