@@ -344,7 +344,6 @@ func (depth *ReportDepth) getStatsSummaryResult(aggRoot *elastic.SearchResult) *
 			summary.Stats.Controls = int32(*controls.Value)
 		}
 	}
-
 	return summary
 }
 
