@@ -48,7 +48,8 @@
           <app-projects-dropdown
             [projects]="projects"
             (onProjectChecked)="onProjectChecked($event)"
-            [disabled]="dropdownDisabled()">
+            [disabled]="dropdownDisabled()"
+            [projectsUpdated]="projectsUpdatedEvent">
           </app-projects-dropdown>
         </div>
         <div id="button-bar">
