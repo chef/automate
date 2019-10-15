@@ -234,7 +234,7 @@ In order to find a token's ID, use the command in the API reference for [listing
 
 ### Projects
 
-Projects are used to group and permission Chef Automate resources, ingested client-runs, and compliance nodes.
+Projects are used to group and permission Chef Automate resources as well as ingested data, specifically Compliance reports, Chef Server and Compliance events, and Infrastructure nodes.
 
 Projects can be managed via the Projects list under the *Settings* tab and consist of an ID, a name, and a collection of rules. Project ingest rules are lists of conditions used only when
 [assigning ingested resources to projects]({{< relref "iam-v2-guide#assigning-ingested-resources-to-projects" >}}),
@@ -258,7 +258,7 @@ If you would like to delegate ownership of a project to another user so that the
 
 #### Assigning Ingested Resources to Projects
 
-While resources created within Automate can be directly assigned to a project, ingested resources, including Compliance reports, events, and nodes, are created outside of Automate and therefore must be assigned to projects a different way.
+While Automate's local teams and tokens can be directly assigned to a project, ingested resources are created outside of Automate and therefore must be assigned to projects a different way.
 
 Project rules are used to associate ingested resources with projects within Automate. A project rule contains conditions that determine if an ingested resource should be moved into the rule's project.
 Each condition contains an attribute, operator, and value. See [Project Rules]({{< relref "iam-v2-api-reference.md#project-rules" >}}) for details on how to manage project rules.
