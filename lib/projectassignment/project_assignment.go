@@ -37,7 +37,21 @@ func EnsureProjectAssignmentAuthorized(ctx context.Context, authorizer engine.V2
 // CalculateProjectDiff returns the symmetric difference of oldProjects and newProjects,
 // meaning that any project that is not in the intersection of oldProjects and newProjects
 // will be returned.
-func CalculateProjectDiff(oldProjects []string, newProjects []string) []string {
+func CalculateProjectDiff(oldProjects, newProjects []string, isUpdateRequest bool) []string {
+	projectDiff := []string{}
+	previouslyUnassigned := len(oldProjects) == 0
+	newlyUnassigned := len(newProjects) == 0
+
+	// because we don't do patchy updates, users will need to submit the projects
+	// field on update even if they are not changing it. While a user is often
+	// not allowed to _create_ an unassigned resource, they may be permitted to
+	// change the name of one, provided the projects are not altered. In those
+	// cases, we do not want to check authorization for moving resources to
+	// being unassigned.
+	if isUpdateRequest && previouslyUnassigned && newlyUnassigned {
+		return projectDiff
+	}
+
 	oldProjectMap := make(map[string]bool, len(oldProjects))
 	for _, oldProj := range oldProjects {
 		oldProjectMap[oldProj] = true
@@ -46,7 +60,6 @@ func CalculateProjectDiff(oldProjects []string, newProjects []string) []string {
 	for _, newProj := range newProjects {
 		newProjectMap[newProj] = true
 	}
-	projectDiff := []string{}
 
 	// any projects were removed, put in diff
 	for _, oldProj := range oldProjects {
@@ -60,6 +73,11 @@ func CalculateProjectDiff(oldProjects []string, newProjects []string) []string {
 		if !oldProjectMap[newProj] {
 			projectDiff = append(projectDiff, newProj)
 		}
+	}
+
+	// if project goes from no projects to some or the reverse
+	if previouslyUnassigned || newlyUnassigned {
+		projectDiff = append(projectDiff, "(unassigned)")
 	}
 
 	return projectDiff
