@@ -270,8 +270,8 @@ You will then use the global project filter to filter your ingested data by `pro
 First, determine which ingested resources should belong to the project. In this example, we want to add the following ingested resources to `project-devops`:
 
 * Compliance reports with Chef Organization `devops`
-* Infrastructure nodes with Environment `dev`
-* actions on Chef Server `devops.pizza`
+* Infrastructure nodes with Environment `dev` and Chef Tag `devops-123`
+* actions on Chef Servers `devops.pizza` or `devops.dog`
 
 You may want to verify that those filters work as expected using the search filter bars on the Event Feed, Client Runs, and
 Reports pages.
@@ -343,11 +343,19 @@ Similarly, ingested events require conditions of `Event` type to be associated w
 operator, attribute, and value all match exactly (and vice versa with `Event` project rules and nodes).
 {{% /info %}}
 
-Return again to the project details page `https://{{< example_fqdn "automate" >}}/settings/projects/project-devops` and select the name of the rule just created.
+Return again to the project details page `https://{{< example_fqdn "automate" >}}/settings/projects/project-devops` and create two new rules by selecting `Create Rule`. Creating new rules will expand the data set under `project-devops`,
+because an ingested resource need only match one rule to be placed in the project.
 
-Add a condition. In this example, we'll add a condition for resources with the attribute `Environment`, operator `equals`, and value `dev`, or any value matching your data set. Save the rule.
+The first rule should contain two conditions.
+Fill in the first condition with attribute `Environment`, operator `equals`, and value `dev`, or any value matching your data set.
+Select `Add Condition` to add another condition with attribute `Chef Tag`, operator `equals`, and `devops-123`.
+Save the rule.
 
-Back on the project details page, select `Create Rule`. This time, choose resource type `Event`. Add a condition for resources with the Chef Server `devops.pizza`, or any value matching your data set.
+{{% info %}}
+Adding conditions further restricts the ingested data because every condition must be true for an ingested resource to be placed in the project.
+{{% /info %}}
+
+For the second rule, choose resource type `Event`. Fill in the first condition with attribute `Chef Server`, operator `member of`, and value `devops.pizza, devops.dog`, or any values matching your data set.
 
 {{% info %}}
 Note that setting the project rule `Resource Type` determines what condition attributes are available to select. `Event` rule conditions can only have the attributes `Chef Organization` or `Chef Server`.
