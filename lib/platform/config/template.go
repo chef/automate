@@ -9,11 +9,14 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/lib/secrets"
 )
 
 var errMissingPGGatewayConfig = errors.New("Missing pg-gateway config. Did you forget to bind?")
 
-func (c *Config) builtinFuncs() template.FuncMap {
+func (c *Config) builtinFuncs(opts *templateOptions) template.FuncMap {
+	secretsReader := secrets.NewDiskStoreReader(opts.secretsPath)
 	return template.FuncMap{
 		"fail": func(msg string) (string, error) {
 			return "", errors.New(msg)
@@ -69,16 +72,46 @@ func (c *Config) builtinFuncs() template.FuncMap {
 		"pg_root_ca_cert_path": func() string {
 			return c.ExternalPGRootCertPath()
 		},
+		"getSecret": func(name string) (string, error) {
+			secretName, err := secrets.SecretNameFromString(name)
+			if err != nil {
+				return "", err
+			}
+			data, err := secretsReader.GetSecret(secretName)
+			return string(data), err
+		},
 	}
-
 }
 
 func (c *Config) TemplatesPath() string {
 	return path.Join(c.GetPackage().GetPath(), "templates")
 }
 
-func (c *Config) LoadTemplates(funcs template.FuncMap) (*template.Template, error) {
-	t := template.New("__empty__").Funcs(c.builtinFuncs()).Funcs(funcs)
+type templateOptions struct {
+	secretsPath string
+}
+
+func defaultTemplateOptions() *templateOptions {
+	return &templateOptions{
+		secretsPath: secrets.DefaultDiskStoreDataDir,
+	}
+}
+
+type TemplateOpt func(*templateOptions)
+
+func WithSecretsPath(path string) TemplateOpt {
+	return func(t *templateOptions) {
+		t.secretsPath = path
+	}
+}
+
+func (c *Config) LoadTemplates(funcs template.FuncMap, opts ...TemplateOpt) (*template.Template, error) {
+	options := defaultTemplateOptions()
+	for _, o := range opts {
+		o(options)
+	}
+
+	t := template.New("__empty__").Funcs(c.builtinFuncs(options)).Funcs(funcs)
 
 	templatesPath := c.TemplatesPath()
 	err := filepath.Walk(templatesPath, func(p string, info os.FileInfo, err error) error {

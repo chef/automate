@@ -7,6 +7,7 @@ build:
 	go build -o bin/secrets-helper $(TOOLS_CMD_PKG)/secrets-helper
 	go build -o bin/service-health $(TOOLS_CMD_PKG)/service-health
 	go build -o bin/pg-helper $(TOOLS_CMD_PKG)/pg-helper
+	go build -o bin/render-template $(TOOLS_CMD_PKG)/render-template
 
 unit:
 	go test -cover -v ./...
