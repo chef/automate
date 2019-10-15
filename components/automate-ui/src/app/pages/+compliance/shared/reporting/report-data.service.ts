@@ -8,6 +8,7 @@ interface ReportingSummary {
   stats: {
     nodes: any;
     profiles: any;
+    controls?: any;
   };
 }
 

@@ -1754,6 +1754,7 @@ paths = [
   "lib/logger/*",
   "lib/platform/config/*",
   "lib/proxy/*",
+  "lib/secrets/*",
   "lib/stringutils/*",
   "lib/tls/*",
   "lib/tracing/*",
