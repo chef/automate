@@ -14,11 +14,13 @@ import (
 
 	"github.com/chef/automate/lib/io/fileutils"
 	platform_config "github.com/chef/automate/lib/platform/config"
+	"github.com/chef/automate/lib/secrets"
 )
 
 type Opts struct {
-	Debug      bool
-	ConfigPath string
+	Debug       bool
+	ConfigPath  string
+	SecretsPath string
 }
 
 var opts = Opts{}
@@ -32,10 +34,12 @@ func main() {
 
 func newCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "render-template TEMPLATE_NAME OUTPUT_PATH",
-		Short: "Renders a template for the current service",
-		RunE:  renderTemplate,
-		Args:  cobra.RangeArgs(1, 2),
+		Use:           "render-template TEMPLATE_NAME OUTPUT_PATH",
+		Short:         "Renders a template for the current service",
+		SilenceUsage:  true,
+		SilenceErrors: true,
+		RunE:          renderTemplate,
+		Args:          cobra.RangeArgs(1, 2),
 	}
 
 	cmd.PersistentFlags().BoolVarP(
@@ -50,6 +54,13 @@ func newCmd() *cobra.Command {
 		"conf",
 		"",
 		"The path to the user config. Must be json.")
+
+	cmd.PersistentFlags().StringVar(
+		&opts.SecretsPath,
+		"secrets-path",
+		secrets.DefaultDiskStoreDataDir,
+		"The path to the on-disk secrets store",
+	)
 
 	return cmd
 }

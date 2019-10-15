@@ -26,23 +26,29 @@ pair_matches_action[[pol_id, statement_id, pair]] {
 	authz.action_matches(pair.action, role_action)
 }
 
+# This causes the has_member set to be generated and memoized once instead of
+# for each policy. Moreover it prevents the backtracking from generating duplicate
+# answers which be evaluated by the resource and action matchers.
+has_member = authz.has_member
+
 match_pair[[effect, pair, pol_id, statement_id]] {
 	effect := policies[pol_id].statements[statement_id].effect
-	authz.has_member[pol_id]
+	has_member[pol_id]
 	pair_matches_resource[[pol_id, statement_id, pair]]
 	pair_matches_action[[pol_id, statement_id, pair]]
 }
 
 # Note: to return the subset of the authorized pairs of the provided input,
 # our rules must "return" the 'pair' data.
-allowed_pair[pair] = match_pair[["allow", pair, _, _]]
-
-denied_pair[pair] = match_pair[["deny", pair, _, _]]
-
-authorized_pair[pair] {
-	allowed_pair[pair]
-	not denied_pair[pair]
+allowed_pair[pair] {
+	match_pair[["allow", pair, _, _]]
 }
+
+denied_pair[pair] {
+	match_pair[["deny", pair, _, _]]
+}
+
+authorized_pair = allowed_pair - denied_pair
 
 allowed_project[project] {
 	project := policies[pol_id].statements[statement_id].projects[_]

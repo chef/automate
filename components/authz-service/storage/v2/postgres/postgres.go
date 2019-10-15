@@ -1464,6 +1464,19 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 		}
 	}
 
+	row := tx.QueryRowContext(ctx, "SELECT EXISTS(SELECT 1 FROM iam_projects_graveyard WHERE id=$1)", project.ID)
+	var existsInGraveyard bool
+	if err := row.Scan(&existsInGraveyard); err != nil {
+		err = p.processError(err)
+		// failed with an unexpected error
+		if err != storage_errors.ErrNotFound {
+			return nil, err
+		}
+	}
+	if existsInGraveyard {
+		return nil, storage_errors.ErrProjectInGraveyard
+	}
+
 	if err := p.insertProjectWithQuerier(ctx, project, tx); err != nil {
 		return nil, p.processError(err)
 	}
@@ -1522,6 +1535,14 @@ func (p *pg) GetProject(ctx context.Context, id string) (*v2.Project, error) {
 }
 
 func (p *pg) DeleteProject(ctx context.Context, id string) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return p.processError(err)
+	}
+
 	projectsFilter, err := projectsListFromContext(ctx)
 	if err != nil {
 		return err
@@ -1529,7 +1550,7 @@ func (p *pg) DeleteProject(ctx context.Context, id string) error {
 
 	// Delete project if ID found AND intersection between projects and projectsFilter,
 	// unless the projectsFilter is empty (v2.0 case).
-	res, err := p.db.ExecContext(ctx,
+	res, err := tx.ExecContext(ctx,
 		`DELETE FROM iam_projects WHERE id=$1 AND (array_length($2::TEXT[], 1) IS NULL OR id=ANY($2));`,
 		id, pq.Array(projectsFilter),
 	)
@@ -1539,7 +1560,50 @@ func (p *pg) DeleteProject(ctx context.Context, id string) error {
 
 	err = p.singleRowResultOrNotFoundErr(res)
 	if err != nil {
+		// don't error if the project is already in the graveyard.
+		// this is necessary since the status might not have been reported
+		// to cereal on the first attempt, in which case we want this
+		// function to be idempotent.
+		if err == storage_errors.ErrNotFound {
+			gyRes, _ := tx.ExecContext(ctx, `SELECT id FROM iam_projects_graveyard WHERE id=$1`, id)
+			gyErr := p.singleRowResultOrNotFoundErr(gyRes)
+			// if we don't find the project in the graveyard, return the original error
+			if gyErr != nil {
+				return err
+			}
+			// project found in graveyard
+			// abort transaction and report success to cereal. we don't really care about the rollback
+			// since nothing will have happened at this point in the transaction in this case.
+			// log the error if any for posterity though.
+			err := tx.Rollback()
+			if err != nil {
+				p.logger.Warnf("failed to rollback ProjectDelete when already graveyarded for id %q: %s",
+					id, err.Error())
+			}
+			return nil
+		}
 		return err
+	}
+
+	// insert project into graveyard
+	_, err = tx.ExecContext(ctx,
+		`INSERT INTO iam_projects_graveyard (id) VALUES ($1)`, id)
+	if err != nil {
+		return p.processError(err)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return storage_errors.NewTxCommitError(err)
+	}
+
+	return nil
+}
+
+func (p *pg) RemoveProjectFromGraveyard(ctx context.Context, id string) error {
+	_, err := p.db.ExecContext(ctx, `DELETE FROM iam_projects_graveyard WHERE id=$1;`, id)
+	if err != nil {
+		return p.processError(err)
 	}
 
 	return nil

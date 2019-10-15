@@ -1270,7 +1270,7 @@ describe('Admin pages', () => {
       it('shows the control button', () => {
         const controlButton = $(
           'app-project-list chef-table chef-tbody chef-tr:nth-child(3) ' +
-          'chef-td:nth-child(5) chef-control-menu');
+          'chef-td:nth-child(4) chef-control-menu');
         expect(controlButton.isPresent()).toBeTruthy();
 
         [ 'Delete Project' ].forEach((item, index) => {

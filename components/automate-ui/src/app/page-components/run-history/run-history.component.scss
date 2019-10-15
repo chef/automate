@@ -129,10 +129,12 @@ app-date-selector {
 
   .duration {
     display: inline-block;
-    font-size: .75em;
-    font-style: italic;
     position: relative;
     width: 80%;
+
+    p {
+      margin-bottom: 0;
+    }
   }
 
   > div span {

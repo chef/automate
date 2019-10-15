@@ -137,6 +137,15 @@ export class StatsService {
       map(({ profiles, counts: { total }}) => ({total, items: profiles})));
   }
 
+  getControls(reportQuery: ReportQuery) {
+    const url = `${CC_API_URL}/reporting/controls`;
+    const filters = this.formatFilters(reportQuery);
+    const body = { filters };
+
+    return this.httpClient.post<any>(url, body).pipe(
+      map(({ control_items }) => ({ total: control_items.length, items: control_items })));
+  }
+
   getStatsProfiles(reportQuery: ReportQuery, listParams: any): Observable<any> {
     const url = `${CC_API_URL}/reporting/stats/profiles`;
 

@@ -22,6 +22,7 @@ type Nodemanager struct {
 	Secrets
 	EventConfig
 	Cereal
+	Authz
 }
 
 // Secrets service specific config options
@@ -53,4 +54,8 @@ type EventConfig struct {
 type Cereal struct {
 	Endpoint string
 	Skip     bool
+}
+
+type Authz struct {
+	Endpoint string
 }

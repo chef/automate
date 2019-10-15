@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"os"
@@ -15,6 +16,9 @@ import (
 	"github.com/chef/automate/components/teams-service/service"
 	"github.com/chef/automate/components/teams-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/teams-service/storage/postgres/migration"
+	authz_library "github.com/chef/automate/lib/authz"
+	"github.com/chef/automate/lib/authz/project_purge"
+	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
 	platform_config "github.com/chef/automate/lib/platform/config"
@@ -40,8 +44,8 @@ func main() {
 	cmd.PersistentFlags().StringP("migrations-path", "m", "", "migrations path")
 	cmd.PersistentFlags().StringP("data-migrations-path", "d", "", "data migrations path")
 	cmd.PersistentFlags().StringP("authz-address", "a", "", "authz-service GRPC address")
+	cmd.PersistentFlags().StringP("cereal-address", "c", "", "cereal-service GRPC address")
 
-	// bind all flags to viper config
 	if err := viper.BindPFlags(cmd.PersistentFlags()); err != nil {
 		fail(err)
 	}
@@ -61,6 +65,7 @@ type config struct {
 	MigrationsPath     string `mapstructure:"migrations-path"`
 	DataMigrationsPath string `mapstructure:"data-migrations-path"`
 	AuthzAddress       string `mapstructure:"authz-address"`
+	CerealAddress      string `mapstructure:"cereal-address"`
 }
 
 func serve(_ *cobra.Command, args []string) {
@@ -104,6 +109,21 @@ Please pass a config file as the only argument to this command.`))
 		fail(errors.Wrap(err, "couldn't initialize logger"))
 	}
 
+	if cfg.CerealAddress == "" {
+		fail(errors.New("missing required config cereal_address"))
+	}
+	cerealConn, err := connFactory.Dial("cereal-service", cfg.CerealAddress)
+	if err != nil {
+		fail(errors.Wrap(err, "error dialing cereal service"))
+	}
+
+	grpcBackend := authz_library.ProjectUpdateBackend(cerealConn)
+	manager, err := cereal.NewManager(grpcBackend)
+	if err != nil {
+		grpcBackend.Close() // nolint: errcheck
+		fail(errors.Wrap(err, "error starting project update backend"))
+	}
+
 	if cfg.AuthzAddress == "" {
 		fail(errors.New("missing required config authz_address"))
 	}
@@ -142,6 +162,16 @@ Please pass a config file as the only argument to this command.`))
 	if err != nil {
 		fail(errors.Wrap(err, "could not initialize storage"))
 	}
+	err = project_purge.RegisterTaskExecutors(manager, "teams", service.Storage)
+	if err != nil {
+		fail(errors.Wrap(err, "could not register project purge client"))
+	}
+
+	err = manager.Start(context.Background())
+	if err != nil {
+		fail(errors.Wrap(err, "could not start project update manager"))
+	}
+	defer manager.Stop() // nolint: errcheck
 
 	fail(server.GRPC(cfg.GRPC, service))
 }

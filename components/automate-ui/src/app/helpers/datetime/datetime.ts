@@ -5,4 +5,6 @@ export class DateTime {
 
   // Tue, 24 Sept 2019
   public static readonly CHEF_DATE_TIME: string = 'ddd, DD MMM YYYY';
+
+  public static readonly CHEF_HOURS_MINS: string = 'HH:mm';
 }

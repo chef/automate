@@ -134,11 +134,11 @@ func TestPurgeServer(t *testing.T) {
 			before            func()
 			after             func()
 		}{
-			{description: "purge should delete 900 docs and leave 100 docs",
+			{description: "purge should delete 200 docs and leave 100 docs",
 				expectedRemaining: 100,
 				after:             func() { GetTestSuite().DeleteAllDocuments(); return },
 				before: func() {
-					for _, entry := range createEntries(time.Now().UTC(), 100, int(time.Hour)*-24) {
+					for _, entry := range createEntries(time.Now().UTC(), 200, int(time.Hour)*-24) {
 						testSuite.feedBackend.CreateFeedEntry(entry)
 					}
 
@@ -175,7 +175,7 @@ func TestPurgeServer(t *testing.T) {
 						Es: []*data_lifecycle.EsPolicyUpdate{
 							{
 								PolicyName:    server.PurgeFeedPolicyName,
-								OlderThanDays: 1,
+								OlderThanDays: 100,
 							},
 						},
 					},

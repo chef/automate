@@ -13,10 +13,22 @@ import {
   GetServiceGroupsCountsSuccess
 } from 'app/entities/service-groups/service-groups.actions';
 import { ServiceGroupsComponent  } from './service-groups.component';
-
+import { ServiceGroupsRequests } from 'app/entities/service-groups/service-groups.requests';
+import { Observable, of as observableOf } from 'rxjs';
 class MockTelemetryService {
   track(_event?: string, _properties?: any): void {
 
+  }
+}
+
+class MockServiceGroupsRequests {
+  getServiceStats(): Observable<Object> {
+    return observableOf({
+      totalServiceGroups: 0,
+      totalServices: 0,
+      totalSupervisors: 0,
+      totalDeployments: 0
+    });
   }
 }
 
@@ -33,7 +45,9 @@ describe('ServiceGroupsComponent', () => {
         ServiceStatusIconPipe,
         ServiceGroupsComponent
       ],
-      providers: [  { provide: TelemetryService, useClass: MockTelemetryService }],
+      providers: [
+        { provide: TelemetryService, useClass: MockTelemetryService },
+        { provide: ServiceGroupsRequests, useClass: MockServiceGroupsRequests }],
       imports: [
         StoreModule.forRoot({
           serviceGroups: serviceGroupsEntityReducer

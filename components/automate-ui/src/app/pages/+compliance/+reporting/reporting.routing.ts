@@ -26,6 +26,11 @@ const routes: Routes = [
         path: 'profiles',
         loadChildren: () => import('./+reporting-profiles/reporting-profiles.module')
           .then(m => m.ReportingProfilesModule)
+      },
+      {
+        path: 'controls',
+        loadChildren: () => import('./+reporting-controls/reporting-controls.module')
+          .then(m => m.ReportingControlsModule)
       }
     ]
   },

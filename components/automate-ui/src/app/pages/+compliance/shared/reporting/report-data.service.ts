@@ -8,6 +8,7 @@ interface ReportingSummary {
   stats: {
     nodes: any;
     profiles: any;
+    controls?: any;
   };
 }
 
@@ -39,6 +40,17 @@ export class ReportDataService {
   };
   profilesListEmpty = false;
   profilesList: any = {
+    items: [],
+    total: 0
+  };
+
+  controlsListLoading = true;
+  controlsListParams: any = {
+    perPage: 100,
+    page: 1
+  };
+  controlsListEmpty = false;
+  controlsList: any = {
     items: [],
     total: 0
   };
@@ -80,6 +92,16 @@ export class ReportDataService {
         this.profilesListLoading = false;
         this.profilesListEmpty = this.isEmpty(data.items);
         this.profilesList = Object.assign({}, this.profilesList, data);
+      });
+  }
+
+  getReportingControlsList(reportQuery: ReportQuery) {
+    this.controlsListLoading = true;
+    this.statsService.getControls(reportQuery)
+      .subscribe(data => {
+        this.controlsListLoading = false;
+        this.controlsListEmpty = this.isEmpty(data.items);
+        this.controlsList = Object.assign({}, this.controlsList, data);
       });
   }
 

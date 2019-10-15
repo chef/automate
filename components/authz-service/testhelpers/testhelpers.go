@@ -47,6 +47,7 @@ type TestFramework struct {
 
 type TestDB struct {
 	*sql.DB
+	ConnURI string
 }
 
 const resetDatabaseStatement = `DROP SCHEMA public CASCADE;
@@ -80,7 +81,7 @@ func NewTestFramework(t *testing.T, ctx context.Context) *TestFramework {
 	require.NoError(t, err)
 
 	projectUpdateManager := NewMockProjectUpdateManager()
-	projectsSrv, err := server.NewProjectsServer(ctx, l, pg, projectUpdateManager, polRefresher)
+	projectsSrv, err := server.NewProjectsServer(ctx, l, pg, projectUpdateManager, NewMockProjectPurger(true), polRefresher)
 	require.NoError(t, err)
 
 	authzSrv, err := server.NewPostgresAuthzServer(l, opaInstance, vSwitch, projectsSrv)
@@ -147,7 +148,7 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (
 	require.NoError(t, err, "init logger for storage")
 	projectUpdateManager := NewMockProjectUpdateManager()
 	projectsSrv, err := server.NewProjectsServer(
-		ctx, l, pg, projectUpdateManager, NewMockPolicyRefresher())
+		ctx, l, pg, projectUpdateManager, NewMockProjectPurger(true), NewMockPolicyRefresher())
 	require.NoError(t, err)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
@@ -206,14 +207,19 @@ func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *opa.State, *prng.Prng
 
 	err = postgres.Initialize(ctx, opaInstance, l, *migrationConfig, datamigration.Config(*dataMigrationConfig))
 	require.NoError(t, err)
-	return postgres.GetInstance(), &TestDB{DB: db}, opaInstance, prng.Seed(t), migrationConfig
+	return postgres.GetInstance(), &TestDB{
+			DB:      db,
+			ConnURI: "postgres://postgres:postgres@127.0.0.1:5432/authz_test?sslmode=disable",
+		},
+		opaInstance, prng.Seed(t), migrationConfig
 }
 
 func (d *TestDB) Flush(t *testing.T) {
 	_, err := d.Exec(`DELETE FROM iam_policies CASCADE;
 		DELETE FROM iam_members CASCADE;
 		DELETE FROM iam_roles CASCADE;
-		DELETE FROM iam_projects CASCADE;`)
+		DELETE FROM iam_projects CASCADE;
+		DELETE FROM iam_projects_graveyard CASCADE;`)
 	require.NoError(t, err)
 }
 
@@ -349,4 +355,20 @@ func (*mockProjectUpdateManager) Start() error {
 
 func (*mockProjectUpdateManager) Status() (server.ProjectUpdateStatus, error) {
 	return &server.EmptyProjectUpdateStatus{}, nil
+}
+
+type mockProjectPurger struct {
+	GraveyardingComplete bool
+}
+
+func NewMockProjectPurger(gyComplete bool) *mockProjectPurger {
+	return &mockProjectPurger{GraveyardingComplete: gyComplete}
+}
+
+func (m *mockProjectPurger) GraveyardingCompleted(string) (bool, error) {
+	return m.GraveyardingComplete, nil
+}
+
+func (*mockProjectPurger) Start(string) error {
+	return nil
 }

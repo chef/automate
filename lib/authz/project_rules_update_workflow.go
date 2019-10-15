@@ -73,7 +73,7 @@ func (m *DomainProjectUpdateWorkflowExecutor) OnTaskComplete(
 
 	payload := DomainProjectUpdateWorkflowPayload{}
 	if err := w.GetPayload(&payload); err != nil {
-		logrus.WithError(err).Errorf("Failed to launch %s", m.cancelUpdateProjectTagsTaskName)
+		logrus.WithError(err).Error("Failed to deserialize payload")
 		return w.Fail(err)
 	}
 

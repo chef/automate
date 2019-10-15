@@ -200,7 +200,7 @@ func (r *TaskResultData) Get(obj interface{}) error {
 	if r.Err() != nil {
 		return r.Err()
 	}
-	if r.Result != nil {
+	if len(r.Result) != 0 {
 		return json.Unmarshal(r.Result, obj)
 	}
 	return nil

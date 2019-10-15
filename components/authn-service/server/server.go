@@ -44,8 +44,8 @@ type Server struct {
 	// Map of authenticator IDs to authenticators.
 	// Note: dex wraps this with a ResourceVersion, but that is due to storing
 	// connectors in the database -- we don't do this
+	TokenStorage       tokens.Storage
 	authenticators     map[string]authenticator.Authenticator
-	token              tokens.Storage
 	logger             *zap.Logger
 	connFactory        *secureconn.Factory
 	teamsClient        teams.TeamsV1Client
@@ -163,11 +163,11 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 	}
 
 	s := &Server{
+		TokenStorage:       ts,
 		authzSubjectClient: authz.NewSubjectPurgeClient(authzConn),
 		authzV2Client:      authzV2Client,
 		authenticators:     authenticators,
 		logger:             c.Logger,
-		token:              ts,
 		connFactory:        factory,
 		teamsClient:        teams.NewTeamsV1Client(teamsConn),
 		health:             health.NewService(),

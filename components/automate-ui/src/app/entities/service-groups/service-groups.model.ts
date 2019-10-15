@@ -88,6 +88,13 @@ export interface GroupServicesPayload {
   services_health_counts: ServiceGroupsHealthSummary;
 }
 
+export interface ServicesStats {
+  totalServiceGroups: number;
+  totalServices: number;
+  totalSupervisors: number;
+  totalDeployments: number;
+}
+
 // Not used within file
 export interface FieldDirection {
   name: SortDirection;

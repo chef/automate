@@ -20,7 +20,8 @@ const staged = "staged"
 
 func TestCreateRule(t *testing.T) {
 	ctx := context.Background()
-	cl, projects, rules, _ := setupProjectsAndRules(t)
+	cl, projects, rules, _, cleanup := setupProjectsAndRules(t)
+	defer cleanup()
 
 	// it's cumbersome to set this up, so we re-use it in a few of the following
 	// cases
@@ -183,7 +184,8 @@ func TestCreateRule(t *testing.T) {
 
 func TestUpdateRule(t *testing.T) {
 	ctx := context.Background()
-	cl, _, store, _ := setupProjectsAndRules(t)
+	cl, _, store, _, cleanup := setupProjectsAndRules(t)
+	defer cleanup()
 	apiConditions := []*api.Condition{
 		{
 			Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
@@ -452,7 +454,8 @@ func TestUpdateRule(t *testing.T) {
 
 func TestGetRule(t *testing.T) {
 	ctx := context.Background()
-	cl, projects, rules, _ := setupProjectsAndRules(t)
+	cl, projects, rules, _, cleanup := setupProjectsAndRules(t)
+	defer cleanup()
 	apiConditions := []*api.Condition{
 		{
 			Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
@@ -529,7 +532,8 @@ func TestGetRule(t *testing.T) {
 
 func TestListRules(t *testing.T) {
 	ctx := context.Background()
-	cl, _, store, _ := setupProjectsAndRules(t)
+	cl, _, store, _, cleanup := setupProjectsAndRules(t)
+	defer cleanup()
 	apiConditions1 := []*api.Condition{
 		{
 			Attribute: api.ProjectRuleConditionAttributes_CHEF_ORGANIZATION,
@@ -610,7 +614,8 @@ func TestListRules(t *testing.T) {
 
 func TestListRulesForProject(t *testing.T) {
 	ctx := context.Background()
-	cl, projects, rules, _ := setupProjectsAndRules(t)
+	cl, projects, rules, _, cleanup := setupProjectsAndRules(t)
+	defer cleanup()
 	storageConditions1 := []storage.Condition{
 		{
 			Attribute: storage.Organization,
@@ -746,7 +751,9 @@ func TestListRulesForProject(t *testing.T) {
 
 func TestDeleteRule(t *testing.T) {
 	ctx := context.Background()
-	cl, projects, rules, _ := setupProjectsAndRules(t)
+	cl, projects, rules, _, cleanup := setupProjectsAndRules(t)
+	defer cleanup()
+
 	storageConditions1 := []storage.Condition{
 		{
 			Attribute: storage.Organization,

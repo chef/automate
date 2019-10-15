@@ -84,4 +84,24 @@ describe('ReportingProfileComponent', () => {
         { perPage: 1000, page: 1, sort: 'latest_report.end_time', order: 'desc' });
     });
   });
+
+  describe('statusIcon', () => {
+    it('returns an empty string when no cases match', () => {
+      expect(component.statusIcon('whoops')).toBe('');
+      expect(component.statusIcon('')).toBe('');
+      expect(component.statusIcon('not matching')).toBe('');
+    });
+
+    it('returns "report_problem" when status argument is "failed" ', () => {
+      expect(component.statusIcon('failed')).toBe('report_problem');
+    });
+
+    it('returns "check_circle" when status argument is "passed" ', () => {
+      expect(component.statusIcon('passed')).toBe('check_circle');
+    });
+
+    it('returns "help" when status argument is "skipped" ', () => {
+      expect(component.statusIcon('skipped')).toBe('help');
+    });
+  });
 });

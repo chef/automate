@@ -86,7 +86,7 @@ defmodule Notifications.Profile.Control do
 
   @type t :: %__MODULE__{
           id: String.t(),
-          impact: float,
+          impact: float | :infinity | :negative_infinity | :nan,
           title: String.t(),
           code: String.t(),
           desc: String.t(),
@@ -115,7 +115,7 @@ defmodule Notifications.Profile.Control.Result do
   @type t :: %__MODULE__{
           status: String.t(),
           code_desc: String.t(),
-          run_time: float,
+          run_time: float | :infinity | :negative_infinity | :nan,
           start_time: String.t(),
           message: String.t(),
           skip_message: String.t()

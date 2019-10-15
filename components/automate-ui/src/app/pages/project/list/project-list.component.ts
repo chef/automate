@@ -20,7 +20,6 @@ import {
 import { GetProjects, CreateProject, DeleteProject  } from 'app/entities/projects/project.actions';
 import { Project } from 'app/entities/projects/project.model';
 import { ApplyRulesStatus, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
-import { ProjectStatus } from 'app/entities/rules/rule.model';
 import { LoadOptions } from 'app/services/projects-filter/projects-filter.actions';
 
 @Component({
@@ -42,13 +41,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   public conflictErrorEvent = new EventEmitter<boolean>();
   public confirmApplyStartModalVisible = false;
   public confirmApplyStopModalVisible = false;
-
-  // During an update the Project Update Status needs to show "updating..."
-  // for any project whose status is "edits pending" at the moment the update starts.
-  // Very shortly after the update starts, though, the project's live status changes
-  // from "edits pending" to "applied" so we have lost that initial status.
-  // This statusCache, then, remembers those initial status values during the update.
-  private statusCache: {  [id: string]: ProjectStatus; } = {};
 
   // This flag governs filling the above cache.
   // The state returned by this.projects.applyRulesStatus$ (Running, NotRunning)
@@ -99,10 +91,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     store.select(allProjects).pipe(
       takeUntil(this.isDestroyed)
     ).subscribe((projectList: Project[]) => {
-      if (!this.applyRulesInProgress) {
-        // do not update this cache while an update is in progress
-        this.statusCache = projectList.reduce((m, p) => ({ ...m, [p.id]: p.status }), {});
-      }
       this.projectsHaveStagedChanges = projectList.some(p => p.status === 'EDITS_PENDING');
     });
 
@@ -253,23 +241,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       case 'RULES_APPLIED': return 'Applied';
       default: return '';
     }
-  }
-
-  public getProjectStatus(project: Project): string {
-    const cachedStatus = this.statusCache[project.id];
-    let result: string;
-    if (project.status === 'NO_RULES') {
-      result = 'OK';
-    } else if (this.applyRulesInProgress) {
-      result = cachedStatus === 'EDITS_PENDING' ? 'Updating...' : 'OK';
-    } else {
-      result = project.status === 'EDITS_PENDING'
-        || this.updateProjectsFailed
-        || this.updateProjectsCancelled
-        ? 'Needs updating' : 'OK';
-    }
-    // TODO: check how often this is hit
-    return result;
   }
 
   public getButtonText(): string {

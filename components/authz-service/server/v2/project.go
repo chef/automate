@@ -20,6 +20,7 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
+	"github.com/chef/automate/components/authz-service/server/v2/project_purger_workflow"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/memstore"
@@ -31,6 +32,7 @@ type ProjectState struct {
 	log                  logger.Logger
 	store                storage.Storage
 	ProjectUpdateManager ProjectUpdateMgr
+	ProjectPurger        project_purger_workflow.ProjectPurger
 	policyRefresher      PolicyRefresher
 }
 
@@ -47,7 +49,11 @@ func NewMemstoreProjectsServer(
 	if err != nil {
 		return nil, err
 	}
-	return NewProjectsServer(ctx, l, s, projectUpdateManager, pr)
+	projectPurger, err := project_purger_workflow.RegisterCerealProjectPurger(projectUpdateCerealManager, l, s)
+	if err != nil {
+		return nil, err
+	}
+	return NewProjectsServer(ctx, l, s, projectUpdateManager, projectPurger, pr)
 }
 
 // NewPostgresProjectsServer instantiates a ProjectsServer using a PG store
@@ -66,7 +72,11 @@ func NewPostgresProjectsServer(
 	if err != nil {
 		return nil, err
 	}
-	return NewProjectsServer(ctx, l, s, projectUpdateManager, pr)
+	projectPurger, err := project_purger_workflow.RegisterCerealProjectPurger(projectUpdateCerealManager, l, s)
+	if err != nil {
+		return nil, err
+	}
+	return NewProjectsServer(ctx, l, s, projectUpdateManager, projectPurger, pr)
 }
 
 func NewProjectsServer(
@@ -74,6 +84,7 @@ func NewProjectsServer(
 	l logger.Logger,
 	s storage.Storage,
 	projectUpdateManager ProjectUpdateMgr,
+	projectPurger project_purger_workflow.ProjectPurger,
 	pr PolicyRefresher,
 ) (api.ProjectsServer, error) {
 
@@ -81,6 +92,7 @@ func NewProjectsServer(
 		log:                  l,
 		store:                s,
 		ProjectUpdateManager: projectUpdateManager,
+		ProjectPurger:        projectPurger,
 		policyRefresher:      pr,
 	}, nil
 }
@@ -116,6 +128,8 @@ func (s *ProjectState) CreateProject(ctx context.Context,
 	case nil: // continue
 	case storage_errors.ErrConflict:
 		return nil, status.Errorf(codes.AlreadyExists, "project with ID %q already exists", req.Id)
+	case storage_errors.ErrProjectInGraveyard:
+		return nil, status.Errorf(codes.AlreadyExists, "project with ID %q is in the process of being deleted, try again later", req.Id)
 	case storage_errors.ErrMaxProjectsExceeded:
 		return nil, status.Errorf(codes.FailedPrecondition,
 			"max of %d projects allowed while IAM v2 Beta", constants_v2.MaxProjects)
@@ -317,15 +331,53 @@ func (s *ProjectState) ListProjectsForIntrospection(
 
 func (s *ProjectState) DeleteProject(ctx context.Context,
 	req *api.DeleteProjectReq) (*api.DeleteProjectResp, error) {
-	err := s.store.DeleteProject(ctx, req.Id)
-	switch err {
-	case nil:
-		return &api.DeleteProjectResp{}, nil
-	case storage_errors.ErrNotFound:
-		return nil, status.Errorf(codes.NotFound, "no project with ID %q found", req.Id)
-	default: // some other error
+
+	err := s.ProjectPurger.Start(req.Id)
+	if err != nil {
+		if err == cereal.ErrWorkflowInstanceExists {
+			return nil, status.Errorf(codes.FailedPrecondition,
+				"project deletion already in progress for project with id %q: %s", req.Id, err.Error())
+		}
 		return nil, status.Errorf(codes.Internal,
-			"error deleting project with ID %q: %s", req.Id, err.Error())
+			"error starting project deletion for project with id %q: %s", req.Id, err.Error())
+	}
+
+	if err := s.waitForProjectToBeGraveyarded(ctx, 10*time.Second, req.Id); err != nil {
+		return nil, err
+	}
+
+	return &api.DeleteProjectResp{}, nil
+}
+
+func (s *ProjectState) waitForProjectToBeGraveyarded(ctx context.Context, maxWaitTime time.Duration, projectID string) error {
+	ctx, cancel := context.WithTimeout(ctx, maxWaitTime)
+	defer cancel()
+	s.log.Info("Waiting for GraveyardingCompleted status")
+	tries := 0
+	startTime := time.Now()
+	for {
+		logctx := s.log.WithField("tries", tries+1).WithField("duration", time.Since(startTime))
+		completed, err := s.ProjectPurger.GraveyardingCompleted(projectID)
+		// if completed we return the final error
+		if completed {
+			return err
+		}
+
+		// if not completed and we get an error, it's unexpected, try again
+		if err != nil {
+			s.log.WithError(err).Warn("failed to get GraveyardingCompleted status")
+		}
+		sleepTime := time.Duration((5 * (1 << uint(tries)))) * time.Millisecond
+		if sleepTime > time.Second {
+			sleepTime = time.Second
+		}
+		select {
+		case <-ctx.Done():
+			logctx.Error("Timed out waiting for GraveyardingCompleted")
+			return status.Error(codes.DeadlineExceeded, "Timed out waiting for GraveyardingCompleted")
+		case <-time.After(sleepTime):
+		}
+		tries++
 	}
 }
 
@@ -500,6 +552,7 @@ func (s *ProjectState) ListRulesForProject(ctx context.Context, req *api.ListRul
 }
 
 func (s *ProjectState) DeleteRule(ctx context.Context, req *api.DeleteRuleReq) (*api.DeleteRuleResp, error) {
+
 	err := s.store.DeleteRule(ctx, req.ProjectId, req.Id)
 	switch err {
 	case nil:

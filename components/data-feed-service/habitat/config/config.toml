@@ -9,6 +9,10 @@ feed_interval = "{{cfg.service.feed_interval}}"
 asset_page_size = {{cfg.service.asset_page_size}}
 reports_page_size = {{cfg.service.reports_page_size}}
 
+[postgres]
+database = "{{cfg.storage.database}}"
+migrations_path = "{{pkg.path}}/migrations"
+
 [log]
 log_format = "{{cfg.log.format}}"
 log_level = "{{cfg.log.level}}"
@@ -17,13 +21,6 @@ log_level = "{{cfg.log.level}}"
 cert_path = "{{pkg.svc_config_path}}/service.crt"
 key_path = "{{pkg.svc_config_path}}/service.key"
 root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"
-
-[notifications]
-{{~#eachAlive bind.notifications-service.members as |notifications-service|}}
-{{~#if @last}}
-target = "{{notifications-service.cfg.host}}:{{notifications-service.cfg.port}}"
-{{~/if}}
-{{~/eachAlive}}
 
 [secrets]
 {{~#eachAlive bind.secrets-service.members as |secrets-service|}}

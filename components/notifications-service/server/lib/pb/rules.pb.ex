@@ -75,7 +75,6 @@ defmodule Notifications.Rule.Event do
   field :CCRSuccess, 1
   field :ComplianceFailure, 2
   field :ComplianceSuccess, 3
-  field :Assets, 4
 end
 
 defmodule Notifications.UsernamePassword do

@@ -140,6 +140,11 @@
           {{reportData.reportingSummary?.stats.profiles | number }} Profiles
         </a>
       </li>
+      <li class="nav-tabs-item">
+        <a class="nav-tab" routerLink="/compliance/reports/controls" routerLinkActive="active" queryParamsHandling="preserve">
+          {{reportData.reportingSummary?.stats.controls | number }} Controls
+        </a>
+      </li>
     </ul>
 
     <router-outlet></router-outlet>

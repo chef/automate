@@ -36,7 +36,7 @@ func (s *Server) NewGRPCServer(authzSubjectClient authz.SubjectPurgeClient, pv t
 			),
 		),
 	)
-	api.RegisterTokensMgmtServer(g, newTokenAPI(s.token, authzSubjectClient, pv))
+	api.RegisterTokensMgmtServer(g, newTokenAPI(s.TokenStorage, authzSubjectClient, pv))
 	health.RegisterHealthServer(g, s.health)
 	api.RegisterAuthenticationServer(g, s)
 	reflection.Register(g)

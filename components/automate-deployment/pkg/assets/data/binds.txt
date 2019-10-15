@@ -1,6 +1,6 @@
 applications-service REQUIRED automate-pg-gateway cereal-service event-service pg-sidecar-service
 applications-service BINDING_MODE strict
-authn-service REQUIRED authz-service automate-dex automate-pg-gateway pg-sidecar-service teams-service
+authn-service REQUIRED authz-service automate-dex automate-pg-gateway cereal-service pg-sidecar-service teams-service
 authn-service BINDING_MODE strict
 authz-service REQUIRED automate-pg-gateway cereal-service pg-sidecar-service
 authz-service BINDING_MODE strict
@@ -21,7 +21,7 @@ automate-elasticsearch REQUIRED backup-gateway
 automate-elasticsearch BINDING_MODE strict
 automate-es-gateway REQUIRED automate-elasticsearch
 automate-es-gateway BINDING_MODE relaxed
-automate-gateway OPTIONAL authn-service authz-service compliance-service config-mgmt-service deployment-service event-service ingest-service license-control-service local-user-service nodemanager-service notifications-service secrets-service teams-service
+automate-gateway OPTIONAL authn-service authz-service compliance-service config-mgmt-service data-feed-service deployment-service event-service ingest-service license-control-service local-user-service nodemanager-service notifications-service secrets-service teams-service
 automate-gateway BINDING_MODE strict
 automate-load-balancer OPTIONAL automate-cs-nginx automate-dex automate-gateway automate-ui automate-workflow-nginx session-service
 automate-load-balancer BINDING_MODE relaxed
@@ -43,7 +43,7 @@ compliance-service OPTIONAL authn-service es-sidecar-service notifications-servi
 compliance-service BINDING_MODE strict
 config-mgmt-service REQUIRED automate-es-gateway
 config-mgmt-service BINDING_MODE strict
-data-feed-service REQUIRED cereal-service compliance-service config-mgmt-service notifications-service secrets-service
+data-feed-service REQUIRED automate-pg-gateway cereal-service compliance-service config-mgmt-service pg-sidecar-service secrets-service
 data-feed-service BINDING_MODE strict
 es-sidecar-service REQUIRED automate-elasticsearch automate-es-gateway
 es-sidecar-service BINDING_MODE strict
@@ -60,7 +60,7 @@ license-control-service REQUIRED automate-pg-gateway pg-sidecar-service
 license-control-service BINDING_MODE strict
 local-user-service REQUIRED authz-service automate-dex teams-service
 local-user-service BINDING_MODE strict
-nodemanager-service REQUIRED automate-pg-gateway cereal-service event-service pg-sidecar-service secrets-service
+nodemanager-service REQUIRED authz-service automate-pg-gateway cereal-service event-service pg-sidecar-service secrets-service
 nodemanager-service BINDING_MODE strict
 notifications-service REQUIRED automate-pg-gateway pg-sidecar-service secrets-service
 notifications-service BINDING_MODE strict
@@ -70,6 +70,6 @@ secrets-service REQUIRED automate-pg-gateway pg-sidecar-service
 secrets-service BINDING_MODE strict
 session-service REQUIRED automate-dex automate-pg-gateway pg-sidecar-service
 session-service BINDING_MODE strict
-teams-service REQUIRED authz-service automate-pg-gateway pg-sidecar-service
+teams-service REQUIRED authz-service automate-pg-gateway cereal-service pg-sidecar-service
 teams-service BINDING_MODE strict
 trial-license-service BINDING_MODE strict

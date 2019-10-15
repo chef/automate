@@ -43,6 +43,7 @@ var (
 var ProjectUpdateDomainServices = []string{
 	"ingest",
 	"compliance",
+	"nodemanager",
 }
 
 type ProjectUpdateStatus interface {

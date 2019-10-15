@@ -40,6 +40,7 @@ import { RoleModule } from './pages/roles/roles.module';
 import { AttributesService } from './services/attributes/attributes.service';
 import { ChefSessionService } from './services/chef-session/chef-session.service';
 import { ConfigService } from './services/config/config.service';
+import { DatafeedService } from './services/data-feed/data-feed.service';
 import { EventFeedService } from './services/event-feed/event-feed.service';
 import { FeatureFlagsService } from './services/feature-flags/feature-flags.service';
 import { HttpClientAuthInterceptor } from './services/http/http-client-auth.interceptor';
@@ -101,10 +102,15 @@ import {
 import {
   CreateV1TeamModalComponent
 } from './page-components/create-v1-team-modal/create-v1-team-modal.component';
+import { DatafeedFormComponent } from './pages/data-feed-form/data-feed-form.component';
+import { DatafeedComponent } from './pages/data-feed/data-feed.component';
 import { DateSelectorComponent } from './page-components/date-selector/date-selector.component';
 import {
   DeletableNodeControlComponent
 } from './page-components/deletable-node-control/deletable-node-control.component';
+import {
+  DeleteDatafeedDialogComponent
+} from './page-components/delete-data-feed-dialog/delete-data-feed-dialog.component';
 import {
   DeleteNotificationDialogComponent
 } from './page-components/delete-notification-dialog/delete-notification-dialog.component';
@@ -212,8 +218,11 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ClientRunsTableComponent,
     ConvergeRadialGraphComponent,
     CreateV1TeamModalComponent,
+    DatafeedComponent,
+    DatafeedFormComponent,
     DateSelectorComponent,
     DeletableNodeControlComponent,
+    DeleteDatafeedDialogComponent,
     DeleteNotificationDialogComponent,
     DeltaViewerComponent,
     EventFeedComponent,
@@ -270,6 +279,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     WelcomeModalComponent
   ],
   entryComponents: [
+    DeleteDatafeedDialogComponent,
     DeleteNotificationDialogComponent
   ],
   imports: [
@@ -304,6 +314,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ConfigService,
     ClientRunsRequests,
     CredentialRequests,
+    DatafeedService,
     EventFeedService,
     FeatureFlagsService,
     HistorySelection,

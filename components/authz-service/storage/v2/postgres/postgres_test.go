@@ -4861,6 +4861,17 @@ func TestDeleteProject(t *testing.T) {
 			require.NoError(t, err)
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, proj.ID))
 		}},
+		{"when the project is already deleted but is in the graveyard, the function succeeds", func(t *testing.T) {
+			ctx := context.Background()
+			projID := "test-project"
+			_, err := db.Exec(`INSERT INTO iam_projects_graveyard (id) values ($1)`, projID)
+			require.NoError(t, err)
+
+			err = store.DeleteProject(ctx, projID)
+
+			require.NoError(t, err)
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, projID))
+		}},
 		{"deletes project with several projects in database", func(t *testing.T) {
 			ctx := context.Background()
 			proj := insertTestProject(t, db, "test-project", "name", storage.Custom)

@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { LogsModalComponent } from './logs-modal.component';
 import { NodeDetailsService } from '../../services/node-details/node-details.service';
 import { NodeRun } from '../../types/types';
+import { DatetimePipe } from 'app/pipes/datetime.pipe';
 
 describe('LogsModalComponent', () => {
   let fixture, component, eventService;
@@ -57,7 +58,8 @@ describe('LogsModalComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [
-        LogsModalComponent
+        LogsModalComponent,
+        DatetimePipe
       ],
       providers: [
         NodeDetailsService

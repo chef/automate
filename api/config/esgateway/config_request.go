@@ -40,6 +40,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Log.Level = w.String("error")
 
 	c.V1.Sys.Ngx.Main.WorkerProcesses = w.Int32(4)
+	c.V1.Sys.Ngx.Main.MaxFails = w.Int32(10)
 
 	c.V1.Sys.Ngx.Events.WorkerConnections = w.Int32(1024)
 
