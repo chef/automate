@@ -12,7 +12,6 @@ import (
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
 	tutil "github.com/chef/automate/components/authn-service/tokens/util"
 	"github.com/chef/automate/lib/grpc/auth_context"
-	"github.com/chef/automate/lib/projectassignment"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
 
@@ -73,8 +72,10 @@ func (a *adapter) insertToken(ctx context.Context,
 	}
 	if len(projects) > 0 {
 		_, err := a.validator.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
-			Subjects:   auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
-			ProjectIds: projects,
+			Subjects:        auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+			OldProjects:     []string{},
+			NewProjects:     projects,
+			IsUpdateRequest: false,
 		})
 		if err != nil {
 			return nil, err
@@ -124,15 +125,14 @@ func (a *adapter) UpdateToken(ctx context.Context,
 		return nil, processSQLError(err, "fetch projects for update")
 	}
 
-	projectDiff := projectassignment.CalculateProjectDiff(originalProjects, updatedProjects, true)
-	if len(projectDiff) != 0 {
-		_, err := a.validator.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
-			Subjects:   auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
-			ProjectIds: projectDiff,
-		})
-		if err != nil {
-			return nil, err
-		}
+	_, err = a.validator.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
+		Subjects:        auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+		OldProjects:     originalProjects,
+		NewProjects:     updatedProjects,
+		IsUpdateRequest: true,
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	if description != "" {
