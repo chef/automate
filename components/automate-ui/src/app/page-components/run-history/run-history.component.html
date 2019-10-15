@@ -10,49 +10,59 @@
         <chef-icon>close</chef-icon>
       </chef-button>
     </div>
-    <div class="filter-selectors">
-      <div class="selector all" (click)="onStatusChange(selectedStatus.All)" [ngClass]="{active: selected == selectedStatus.All}">
-          <chef-icon>check_circle</chef-icon>
-          <div>{{stats(selectedStatus.All)}}</div>
-      </div>
-      <div class="selector failed" (click)="onStatusChange(selectedStatus.Failure)" [ngClass]="{active: selected == selectedStatus.Failure}">
-        <chef-icon>warning</chef-icon>
-        <div>{{stats(selectedStatus.Failure)}}</div>
-      </div>
-      <div class="selector successful" (click)="onStatusChange(selectedStatus.Success)" [ngClass]="{active: selected == selectedStatus.Success}">
-        <chef-icon>check_circle</chef-icon><div>{{stats(selectedStatus.Success)}}</div>
-      </div>
-      <div>
-        <app-date-selector (select)="dateSelected($event)" [initialDateTerm]="defaultSelectionTerm"> </app-date-selector>
-      </div>
-    </div>
-    <ul>
-      <li class="history-item" *ngFor="let history of nodeHistory" (click)="onSelect(history)">
-        <div class="arrow">
-          <chef-icon *ngIf="activeRunId === history.runId">chevron_left</chef-icon>
+<!--  -->
+    <div class="side-panel-body">
+      <div class="side-panel-body-header">
+        <div>
+          <p>Select a run below to view results on that date</p>
         </div>
-        <div class="status" [ngClass]="history.status">
-          <chef-icon>{{ history.status | chefStatusIcon }}</chef-icon>
-        </div>
-        <div class="duration">
-          <p><strong>{{ history.startTime | datetime: RFC2822 }}</strong></p>
-        </div>
-        <div class="date-time">
-          {{getDuration(history.startTime, history.endTime)}}
-        </div>
-      </li>
-      <li class="no-runs-small" *ngIf="stats(selected) == 0">
-        <span>There are no runs for this node that match the criteria selected.</span>
-      </li>
-    </ul>
 
-    <app-page-picker
-      class="history-pagination"
-      [total]="stats(selected)"
-      [perPage]="pageSize"
-      [page]="currentPage"
-      [maxPageItems]="3"
-      (pageChanged)="updatePageNumber($event)">
-    </app-page-picker>
+        <div class="filter-selectors">
+          <div class="selector all" (click)="onStatusChange(selectedStatus.All)" [ngClass]="{active: selected == selectedStatus.All}">
+              <chef-icon>check_circle</chef-icon>
+              <div>{{stats(selectedStatus.All)}}</div>
+          </div>
+          <div class="selector failed" (click)="onStatusChange(selectedStatus.Failure)" [ngClass]="{active: selected == selectedStatus.Failure}">
+            <chef-icon>warning</chef-icon>
+            <div>{{stats(selectedStatus.Failure)}}</div>
+          </div>
+          <div class="selector successful" (click)="onStatusChange(selectedStatus.Success)" [ngClass]="{active: selected == selectedStatus.Success}">
+            <chef-icon>check_circle</chef-icon><div>{{stats(selectedStatus.Success)}}</div>
+          </div>
+          <div>
+            <app-date-selector (select)="dateSelected($event)" [initialDateTerm]="defaultSelectionTerm"> </app-date-selector>
+          </div>
+        </div>
+      </div>
+<!--  -->
+      <ul>
+        <li class="history-item" *ngFor="let history of nodeHistory" (click)="onSelect(history)">
+          <div class="arrow">
+            <chef-icon *ngIf="activeRunId === history.runId">chevron_left</chef-icon>
+          </div>
+          <div class="status" [ngClass]="history.status">
+            <chef-icon>{{ history.status | chefStatusIcon }}</chef-icon>
+          </div>
+          <div class="duration">
+            <p><strong>{{ history.startTime | datetime: RFC2822 }}</strong></p>
+          </div>
+          <div class="date-time">
+            {{getDuration(history.startTime, history.endTime)}}
+          </div>
+        </li>
+        <li class="no-runs-small" *ngIf="stats(selected) == 0">
+          <span>There are no runs for this node that match the criteria selected.</span>
+        </li>
+      </ul>
+
+      <app-page-picker
+        class="history-pagination"
+        [total]="stats(selected)"
+        [perPage]="pageSize"
+        [page]="currentPage"
+        [maxPageItems]="3"
+        (pageChanged)="updatePageNumber($event)">
+      </app-page-picker>
+    </div>
   </chef-side-panel>
 </chef-click-outside>

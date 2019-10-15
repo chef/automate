@@ -33,6 +33,24 @@
   }
 }
 
+.side-panel-body {
+  .side-panel-body-header {
+    display: flex;
+    flex-direction: column;
+    padding: 1em;
+    border-bottom: 1px solid $chef-grey;
+
+    chef-button {
+      margin: 0 1em 0 0;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+}
+
+
 app-date-selector {
   .date-selector .selector {
     border: 1px solid $gray-shadow;
@@ -41,9 +59,9 @@ app-date-selector {
 
 .filter-selectors {
   display: flex;
-  justify-content: space-evenly;
-  align-items: stretch;
-  padding: 15px 0 0 35px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding-top: 1em;
 
   .selector {
     display: flex;
@@ -54,7 +72,8 @@ app-date-selector {
     height: 60px;
     border-color: $chef-grey;
     border-radius: 4px;
-
+    margin-right: 20px;
+    cursor: pointer;
   }
 
   .all {
@@ -74,6 +93,10 @@ app-date-selector {
     &.active {
       color: $chef-white;
       background-color: $chef-critical;
+
+      chef-icon {
+        color: $chef-white;
+      }
     }
   }
 
