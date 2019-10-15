@@ -33,6 +33,7 @@ import {
 } from '../../entities/service-groups/service-groups.selector';
 import { find, filter as fpFilter, pickBy, some, includes, get } from 'lodash/fp';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { ServiceGroupsRequests } from '../../entities/service-groups/service-groups.requests';
 
 @Component({
   selector: 'app-service-groups',
@@ -173,7 +174,8 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     public router: Router,
     public store: Store<NgrxStateAtom>,
-    private telemetryService: TelemetryService
+    private telemetryService: TelemetryService,
+    private serviceGroupsRequests: ServiceGroupsRequests
   ) { }
 
   ngOnInit() {
@@ -182,6 +184,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     // URL change listener
     allUrlParameters$.pipe(takeUntil(this.isDestroyed)).subscribe(
       allUrlParameters => this.listParamsChange(allUrlParameters));
+
 
     this.route.queryParamMap.pipe(
       distinctUntilChanged((a, b) => {
@@ -192,6 +195,14 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       }),
       takeUntil(this.isDestroyed)
     ).subscribe(queryParams => this.listParamsChange(queryParams));
+
+    this.serviceGroupsRequests.getServiceStats().subscribe((resp) =>
+      this.telemetryService.track('a2applicationsStats', {
+        totalServiceGroups: resp.totalServiceGroups,
+        totalServices: resp.totalServices,
+        totalSupervisors: resp.totalSupervisors,
+        totalDeployments: resp.totalDeployments
+      }));
 
     combineLatest([
       this.route.queryParamMap.pipe(
@@ -255,10 +266,6 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
           this.selectedStatus = 'total';
           this.totalServiceGroups = get('total', this.sgHealthSummary);
       }
-      this.telemetryService.track('applicationsServiceGroupCount', {
-        totalServiceGroups: this.totalServiceGroups,
-        statusFilter: status
-      });
     });
 
     this.healthSummary$ = this.store.select(serviceGroupsHealth);
