@@ -19,38 +19,36 @@ IAM v2 is a beta release and its functionality is subject to change during this 
 This is an opt-in only feature during the beta period.
 Chef Automate users will not be automatically upgraded.
 
-We designed IAM v2 to leave your v1 policy data untouched during your upgrade to v2; however, you can choose to not port over v1 policies by using the provided 
-`--skip-policy-migration` flag with the upgrade command.
+We designed IAM v2 to leave your v1 policy data untouched during your upgrade to v2; however, you can choose to not port over v1 policies by using the provided `--skip-policy-migration` flag with the upgrade command.
 
 Whether or not you migrate your v1 policies, if at any time you decide to opt back out of the beta and revert to v1, your original v1 policies will still be intact.
-Reverting to v1, however, will remove any new v2 policies or roles created while using IAM v2.
-Note that this applies only to policies and roles in this beta period. Users, teams, and tokens are currently shared between v1 and v2, but these are slated for separation before the full v2 release.
+Reverting to v1 will remove any new v2 data created while using IAM v2 (policies, roles, projects, project rules).
+Users, teams, and tokens are shared between v1 and v2, so changes to them will persist.
 
 See the [IAM v2 API Reference]({{< relref "iam-v2-api-reference.md" >}}) for day-to-day use of the IAM v2 system.
 
 ## New Features in IAM v2
 
 IAM v2 expands Chef Automate's authorization system by supporting policies to allow multiple permissions, separating out policy membership from policy definition for more fine-grained control, and adding roles to begin moving towards role-based access control.
-Additionally, IAM v2 improves the user experience by starting to expose policy management in the Automate user interface.
+Additionally, IAM v2 improves the user experience by allowing policy members to be managed directly from the Automate UI.
+And perhaps most significantly, IAM v2 supports projects that allow filtering and segregation of your data amongst your user base.
 
 At the heart of Chef Automate's IAM system is the *policy*.
-A policy defines permissions for who may perform what action on which resource.
+A policy defines permissions for who may perform what action on which resource scoped by project.
 The "who" may be a user, a team, or a system.
 Users and teams are designated by name while systems use pre-authorized tokens to communicate with Automate.
 
-Conceptually, this description applies equally to both v1 and v2.
-However, for IAM v2, we have revised and expanded what constitutes a policy.
 The following diagram shows the new policy structure; we'll detail the specifics in the next few sections.
 
 ![](/images/docs/iam-v2-diagram.png)
 
-### New Policy Definition
+## New Policy Definition
 
 IAM v2 introduces multi-statement policies, so more complex permissions can be embodied in a single policy, resulting in fewer policies required to secure your system.
 Each statement specifies a single permission.
 The net effect (ALLOW or DENY) of a policy is determined by evaluating the effect of each statement and combining them: if there is at least one statement allowing access, and none denying it, then the policy allows access. Otherwise, it is denied.
 
-Taking the aggregate of all policies, access is granted only if explicitly allowed in any policy, and not explicitly denied in any policy.
+Access is granted only if explicitly allowed in some policy and not explicitly denied in any policy.
 IAM policy evaluation order is:
 
 1. By default, all requests are denied.
@@ -60,49 +58,48 @@ IAM policy evaluation order is:
 Examples:
 
 - Neither user1, nor any team that user1 belongs to, are included in any policy with the action `iam:users:list`.
-  Net effect: user1 is denied, and will not be able to view the list of users.
+  Net effect: user1 is denied access to view the list of users.
   (This illustrates the global default DENY condition.)
 - Bob is a member of team alpha and team omega.
   Team alpha has a broad range of permissions while team omega is very restricted in what its members may access.
-  The "major teams" policy has a statement that allows team alpha to access the resource `compliance:reporting:nodes` while it has another statement that denies team omega access to the that very same resource.
+  The "major teams" policy has a statement that allows team alpha to access the resource `compliance:reporting:nodes` while it has another statement that denies team omega access to that very same resource.
   Net effect: Bob is denied access because there is at least one statement denying access.
-- Mary is a member of the default viewers team, which allows read access to everything because
-  of the default Viewers policy.
+- Mary is a member of the default viewers team, which allows read access to everything because of the default Viewers policy.
   Mary is also a member of the deployment team, which has permission to upload and download profiles.
-  Net effect: Mary is granted read access to everything and Mary can also upload/download profiles,
-  because neither of those policies explicitly denies something allowed by the other.
+  Net effect: Mary is granted both those permissions (effectively the union of relevant policies).
 
-#### Properties of a Policy
+### Properties of a Policy
 
-A v2 policy consists of a list of **statements**, where each statement describes a permission. This is a departure from v1 policies, which had _action_, _resource_, and _effect_ as top-level properties.
+A v2 policy consists of a list of **statements**, where each statement describes a permission.
 
 Property   | Description
 -----------|------------
 Statements | list of permissions
 
-#### Properties of a Policy Statement
+### Properties of a Statement
 
-A policy statement must include one or more *actions*, which can be defined *inline* with the `Actions` property or by reference through a role definition, specified in the `Role` property.
+A policy statement must include one or more *actions*, which can be defined *inline* with the `Actions` property or *by reference* through a role definition, specified in the `Role` property.
 Statements are typically composed using roles, but inline policy statements are useful for managing access to specific resources for special cases, or for when you don't want to create a named role for monolithic policies.
 
 Property   | Description
 -----------|-----------------------------
 Actions    | list of operations, e.g., read IAM users, get compliance profiles, update node status, etc.
-Role       | a named set of actions
+Role       | a named list of actions
 Effect     | ALLOW or DENY
+Projects   | list of project IDs to constrain the actions and/or role
 
-#### Properties of a Role
+### Properties of a Role
 
 A v2 role consists of a list of **actions**.
-Roles are discussed in detail in [Basic Role-Based Access Control]({{< relref "iam-v2-api-reference.md#roles" >}}).
+Roles are discussed in detail in [Basic Role-Based Access Control]({{< relref "iam-v2-overview.md#basic-role-based-access-control" >}}).
 
 Property   | Description
 -----------|-----------------------------
 Actions    | list of operations the role manages, e.g., read IAM users, get compliance profiles, update node status, etc.
 
-### Members and Policies
+## Members and Policies
 
-A **member**  (called a _subject_ in v1) may be a user, a team, or a token.
+A **member**  (previously called a *subject* in v1) may be a user, a team, or a token.
 Users and teams may be *local*, meaning they are defined within Chef Automate, or managed by an external identity provider, specifically LDAP or SAML.
 In this so far, v2 and v1 behave the same.
 
@@ -112,36 +109,36 @@ Notably, with IAM v2, you can modify policy membership for any policy,
 but you can only adjust policy definition for policies that you create yourself.
 [Policy Types]({{< relref "iam-v2-overview.md#policy-types" >}}) discusses this point further.
 
-### Policy Types
+## Policy Types
 
-IAM v2 distinguishes two types of policies: *Chef-managed* and *custom*.
+IAM v2 distinguishes two types of policies: *Chef-managed* and *Custom*.
 *Chef-managed* policies are provided by Chef and are integral to the operation of Chef Automate. The policy statements (comprising the policy definition) in Chef-managed policies are immutable.
 *Custom* policies are those you create for your own needs. You can add, edit, and delete policy statements in your custom policies.
 
 You can modify the membership of either type of policy.
 It is, however, not possible to remove the local Administrator from the Administrator policy.
 
-### Basic Role-Based Access Control
+## Basic Role-Based Access Control
 
-IAM v2 also introduces basic roles as our first step to delivering
-Role-Based Access Control ([RBAC](https://en.wikipedia.org/wiki/Role-based_access_control)).
-A role is a named set of actions.
+IAM v2 also introduces roles to provide Role-Based Access Control ([RBAC](https://en.wikipedia.org/wiki/Role-based_access_control)).
+A role is a named list of actions.
 This provides the benefits of *encapsulation* (only needing to know the name and not be encumbered by all the details after initial definition) and *reuse* (apply the role to any statement that needs it).
 For example, one of the default roles provided is `Viewer`.
 That role is comprised of a number of actions.
 You could enumerate those actions in the `Actions` property of a given statement, or you can specify the single role name `Viewer` in the `Role` property of the statement; the result is identical either way.
 
 Chef Automate ships with the default roles shown below.
-The descriptions shown should typically be all the detail you need, but for the actions comprising the roles see [Chef-managed Roles]({{< relref "iam-v2-api-reference.md#roles" >}}) or inspect the roles in your browser.
+To see the actions comprising the roles see [Chef-managed Roles]({{< relref "iam-v2-api-reference.md#roles" >}}) or inspect the roles in your browser.
 
-Role        | Description
-------------|------------
-Viewer      | can **view** everything in the system *except* IAM
-Editor      | can **do** everything in the system *except* IAM
-Owner       | can **do** everything in the system *including* IAM
-Ingest      | can ingest data into the system and get resources needed to generate data e.g., profiles (mainly used for tokens)
+Role          | Description
+--------------|------------
+Viewer        | can **view** everything in the system *except* IAM
+Editor        | can **do** everything in the system *except* IAM
+Owner         | can **do** everything in the system *including* IAM
+Project Owner | Editor + can **view** and **assign** IAM resources for specific projects
+Ingest        | can ingest data into the system and get resources needed to generate data e.g., profiles (mainly used for tokens)
 
-Just as policies can be *Chef-managed* or *custom*, so too, can roles.
+Just as policies can be *Chef-managed* or *Custom*, so too, can roles.
 These default roles are Chef-managed, so they, like Chef-managed policies, are immutable.
 
 You can use these default roles in your own policies, or create your own roles for more customized permissions.
@@ -152,23 +149,109 @@ The default policies are: Viewers, Editors, Administrator, and Ingest.
 
 Just add members to any of these default policies, as described later, to quickly get your basic users up and running.
 
-### Policies and Roles in Automate
+## Working with Projects
 
-<!-- I do not like saying "user interface" because technically that includes the command line, too. But I can live with it if you think that is the lesser of two evils. -->
-IAM v2 introduces partial policy management from within Chef Automate in your browser.
+IAM projects are collections of resources created in Chef Automate or ingested from external data providers, including Chef Infra and Chef Inspec.
+Projects are used in a policy to reduce the scope of permissions of that policy to just the resources assigned to the given projects.
+Without a policy statement allowing an operation for a resource assigned to a given project, a user cannot perform the actions of that policy.
+
+{{< info >}}
+Note that Chef Automate is currently limited to six projects while we continue to refine the user experience during this beta period.
+{{< /info >}}
+
+There are four steps to setting up projects:
+
+1. Define each project via the UI (or the command line if you prefer).
+   Start on the projects list page shown previously to create your projects.
+2. Create or modify IAM policy statements to restrict permissions to specific projects as needed.
+   *Every* statement must either indicate specific projects or specify the wildcard denoting all projects (`*`).
+   By default, any previously existing policies are automatically setup with that wildcard so they apply to all projects.
+3. Assign resources to projects (see [Assigning Resources to Projects]({{< relref "iam-v2-overview.md#assigning-resources-to-projects" >}})).
+4. Select the projects to filter in the UI.
+   Once you create some projects, use the **global project filter** in the top navigation bar to select one or more projects for viewing.
+   With no selection (the default), all resources you have permission on will be displayed.
+
+Note that, by default, Automate includes a *project-owner* role so the global admin may delegate much of these responsibilities for project management to others, to alleviate some of the burden for the global admin.
+
+### Assigning Resources to Projects
+
+There are two broad categories of resources that may be assigned to projects: your set of ingested client-run/compliance nodes and the resources created within Chef Automate.
+Any of these that you do not explicitly assign to a project (as described next) are considered *unassigned* with respect to projects.
+At the start, none of your resources are assigned to any projects.
+These unassigned resources will be displayed either if you have made no selection in the global project filter, or if you have selected the `(unassigned)` designator.
+
+Assigning your set of ingested client-run/compliance nodes to projects is done via the project rules you create for the project, mentioned just briefly above.
+A rule specifies one or more conditions, and each condition specifies a set of attribute values that a node must satisfy to be assigned to the given project.
+Once you define your set of projects with their contained rules and conditions, you then use the **Update Projects** button on the main projects list page to apply those definitions to all your nodes.
+
+Assignable resources that you create with Automate include teams, tokens, policies, and roles.
+Teams and tokens may be assigned to projects directly in the UI; policies and roles still can only be assigned on the command-line (since you cannot create or modify those at all in the UI yet).
+These resources created within Automate do not make use of, nor do they require, any project rules.
+
+### Properties of a Project
+
+To assign a project to a set of ingested client-run/compliance nodes as mentioned above, the project needs a list of **rules**, where each rule describes a group of node characteristics.
+
+Property   | Description
+-----------|------------
+Rules      | list of project assignment rules
+
+A rule consists of a list of **conditions**, where each condition describes a single characteristic.
+It also contains a type: *node* or *event*.
+Here, *node* corresponds to ingested nodes on the client run and compliance pages in the UI,
+and *event* corresponds to ingested events on the event feed page.
+
+Property   | Description
+-----------|------------
+Type       | one of (node, event)
+Conditions | list of node characteristics
+
+A condition consists of these properties:
+
+Property               | Description
+-----------------------|------------
+Attribute (for events) | one of (CHEF_ORGANIZATION, CHEF_SERVER)
+Attribute (for nodes)  | one of (CHEF_ORGANIZATION, CHEF_SERVER, ENVIRONMENT, CHEF_ROLE, CHEF_TAG, CHEF_POLICY_NAME, CHEF_POLICY_GROUP)
+Operator               | one of (equals, member_of)
+Values                 | list of one or more values to match on the specified attribute
+
+## Policies, Roles, and Projects in the UI
+
+Chef Automate's **Settings** tab has a new *Access Management* heading in the left panel, with new pages for *Policies*, *Roles*, and *Projects*.
+
+The main body on the policy list page displays all your policies along with their types (*Chef-managed* or *Custom*) and status (*In use* or *No members*).
 
 ![](/images/docs/admin-policies.png)
 
-Chef Automate's **Settings** tab has a new _Access Management_ heading on the left panel, with new pages for both _Policies_ and _Roles_.
-Here, you'll see all of the policies and roles listed out on their respective pages, and an indication of their types, Chef-managed or custom.
+Select any listed resource to view its details.
+For example, here is the definition of the *Editors* policy after selecting it from the list.
 
-![](/images/docs/admin-policies-administrator-access.png)
+![](/images/docs/admin-policies-editors-definition.png)
 
-Select a policy or role to open its definition.
-For policies, use the **Members** tab to manage the membership of the policy, right from the browser.
+Notice also the **Members** tab: that allows you to manage the membership of the policy right from the browser.
 
-![](/images/docs/admin-roles-chef-managed-owner-role.png)
+![](/images/docs/admin-policies-editors-members.png)
 
-Though membership covers users, teams, and tokens, there is a useful feature specific to just local users and teams.
-Because local users and teams are managed by Chef Automate directly (as opposed to LDAP and SAML users and teams), Automate provides a convenient mechanism for streamlining the process.
-When you open the _Add Members_ page, Automate lists all your local members but filters out those already attached to the policy, giving you a smaller list to peruse.
+The *Editors* policy includes, by default, the *editors* team as shown, but you are free to add other members with the **Add Members** button.
+On that page you can add tokens as well as users and teams, be they local (defined within Chef Automate) or from an external identity provider (LDAP or SAML).
+Upon opening the *Add Members* page Automate lists all your local members but filters out those already attached to the policy, giving you a smaller list to peruse.
+Observe here, for example, there is an *editor* user but there is no corresponding `editors` team in the list because, as shown above, that team is already a member.
+By the way, that button at the bottom, **Add Member Expression**, is where you can add LDAP or SAML users and teams.
+
+![](/images/docs/admin-policies-editors-add-members.png)
+
+The role list page displays all your roles along with their types (*Chef-managed* or *Custom*).
+Selecting a role from the list opens the role's details page, displaying the definition of the role.
+
+![](/images/docs/admin-roles.png)
+
+The project list page displays all your projects along with the status of associated project rules (*No rules*, *Edits pending*, or *Applied*).
+When you create or update rules, those changes are **not** directly applied.
+Rather, they are staged so that you may coordinate a set of changes to be applied together at a time of your choosing.
+In fact, other administrative users may also stage changes and you would see each other's changes when you refresh your view.
+All changes will be applied together when you select the **Update Projects** button.
+
+Selecting a project from the list opens the projects's details page, displaying the list of rules comprising that project.
+From there, you can select any individual rule to view its list of conditions,  then select a condition to view or update its details.
+
+![](/images/docs/admin-projects.png)
