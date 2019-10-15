@@ -263,22 +263,23 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy, checkProjects boo
 		return nil, p.processError(err)
 	}
 
+	newProjects := pol.Projects
+
+	if len(newProjects) != 0 {
+		err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, newProjects)
+		if err != nil {
+			return nil, p.processError(err)
+		}
+	}
 	if checkProjects {
-		projectDiff := projectassignment.CalculateProjectDiff(oldPolicy.Projects, pol.Projects, true)
+		projectDiff := projectassignment.CalculateProjectDiff(oldPolicy.Projects, newProjects, true)
 
-		if len(projectDiff) != 0 {
-			err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, projectDiff)
-			if err != nil {
-				return nil, p.processError(err)
-			}
-
-			err = projectassignment.EnsureProjectAssignmentAuthorized(ctx,
-				p.engine,
-				auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
-				projectDiff)
-			if err != nil {
-				return nil, p.processError(err)
-			}
+		err = projectassignment.EnsureProjectAssignmentAuthorized(ctx,
+			p.engine,
+			auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+			projectDiff)
+		if err != nil {
+			return nil, p.processError(err)
 		}
 	}
 
@@ -313,7 +314,7 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy, checkProjects boo
 	}
 
 	// Update policy's projects
-	if err := p.associatePolicyWithProjects(ctx, pol.ID, pol.Projects, tx); err != nil {
+	if err := p.associatePolicyWithProjects(ctx, pol.ID, newProjects, tx); err != nil {
 		return nil, p.processError(err)
 	}
 
@@ -868,6 +869,7 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role, checkProjects bool) 
 		return nil, storage_errors.ErrNotFound
 	}
 
+	newProjects := role.Projects
 	if checkProjects {
 		var oldRole v2.Role
 		// get the old role and lock the role for updates (still readable)
@@ -879,21 +881,20 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role, checkProjects bool) 
 			return nil, p.processError(err)
 		}
 
-		projectDiff := projectassignment.CalculateProjectDiff(oldRole.Projects, role.Projects, true)
-
-		if len(projectDiff) != 0 {
-			err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, projectDiff)
+		if len(newProjects) != 0 {
+			err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, newProjects)
 			if err != nil {
 				return nil, p.processError(err)
 			}
+		}
+		projectDiff := projectassignment.CalculateProjectDiff(oldRole.Projects, newProjects, true)
 
-			err = projectassignment.EnsureProjectAssignmentAuthorized(ctx,
-				p.engine,
-				auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
-				projectDiff)
-			if err != nil {
-				return nil, p.processError(err)
-			}
+		err = projectassignment.EnsureProjectAssignmentAuthorized(ctx,
+			p.engine,
+			auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+			projectDiff)
+		if err != nil {
+			return nil, p.processError(err)
 		}
 	}
 
