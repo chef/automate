@@ -1,0 +1,69 @@
+@import "~styles/variables";
+
+.reporting-controls-table {
+  margin: 2em 35px 0;
+
+  chef-th,
+  chef-td {
+    &:first-child {
+      flex-grow: 2;
+      word-break: break-all;
+
+      strong {
+        display: block;
+      }
+    }
+
+    &:last-child {
+      justify-content: flex-end;
+    }
+  }
+
+  .control-result {
+    display: flex;
+    margin-right: 1em;
+    align-items: center;
+    color: $chef-grey;
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    chef-icon {
+      margin-right: 5px;
+    }
+  }
+
+  .status-icon,
+  .impact-status,
+  .control-result {
+    &.failed {
+      color: $chef-critical;
+    }
+
+    &.passed {
+      color: $chef-success;
+    }
+
+    &.skipped {
+      color: $chef-dark-grey;
+    }
+
+    &.critical {
+      color: $chef-critical;
+    }
+
+    &.major {
+      color: $chef-major;
+    }
+
+    &.minor {
+      color: $chef-minor;
+    }
+  }
+}
+
+.item-count-warning {
+  margin: 35px 0;
+  text-align: center;
+}

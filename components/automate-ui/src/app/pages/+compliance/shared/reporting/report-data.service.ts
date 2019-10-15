@@ -43,6 +43,17 @@ export class ReportDataService {
     total: 0
   };
 
+  controlsListLoading = true;
+  controlsListParams: any = {
+    perPage: 100,
+    page: 1
+  };
+  controlsListEmpty = false;
+  controlsList: any = {
+    items: [],
+    total: 0
+  };
+
   constructor(
     private statsService: StatsService,
     private telemetryService: TelemetryService
@@ -80,6 +91,16 @@ export class ReportDataService {
         this.profilesListLoading = false;
         this.profilesListEmpty = this.isEmpty(data.items);
         this.profilesList = Object.assign({}, this.profilesList, data);
+      });
+  }
+
+  getReportingControlsList(reportQuery: ReportQuery) {
+    this.controlsListLoading = true;
+    this.statsService.getControls(reportQuery)
+      .subscribe(data => {
+        this.controlsListLoading = false;
+        this.controlsListEmpty = this.isEmpty(data.items);
+        this.controlsList = Object.assign({}, this.controlsList, data);
       });
   }
 
