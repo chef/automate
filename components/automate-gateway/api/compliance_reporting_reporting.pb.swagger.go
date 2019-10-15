@@ -20,7 +20,8 @@ func init() {
   "paths": {
     "/compliance/reporting/controls": {
       "post": {
-        "summary": "should cover /controls\nThis api is useful for getting a limited list of control items for latest runs. It also honors all reporting filters",
+        "summary": "List controls",
+        "description": "List all controls optionally using filters. Supports filtering, but not pagination or sorting.",
         "operationId": "ListControlItems",
         "responses": {
           "200": {
@@ -41,14 +42,14 @@ func init() {
           }
         ],
         "tags": [
-          "ReportingService"
+          "Compliance Reporting Controls"
         ]
       }
     },
     "/compliance/reporting/nodes/id/{id}": {
       "get": {
         "summary": "Fetch a node",
-        "description": "Fetch a specific node by id",
+        "description": "Fetch a specific node by id.\nDoes not support filtering, pagination or sorting.",
         "operationId": "ReadNode",
         "responses": {
           "200": {
@@ -75,7 +76,7 @@ func init() {
     "/compliance/reporting/nodes/search": {
       "post": {
         "summary": "List nodes",
-        "description": "List all nodes optionally using filters",
+        "description": "List all nodes optionally using filters. Supports pagination, filtering, and sorting.\n\n| Sort paramter | Sort value |\n| --- | --- |\n| environment | environment.lower |\n| latest_report.controls.failed.critical | controls_sums.failed.critical |\n| latest_report.controls.failed.total | controls_sums.failed.total |\n| latest_report.end_time (default) | end_time |\n| latest_report.status | status |\n| name | node_name.lower |\n| platform | platform.full |\n| status | status |",
         "operationId": "ListNodes",
         "responses": {
           "200": {
@@ -103,7 +104,7 @@ func init() {
     "/compliance/reporting/profiles": {
       "post": {
         "summary": "List profiles",
-        "description": "List all profiles optionally using filters",
+        "description": "List all profiles optionally using filters. Supports pagination, filtering, and sorting.\n\n| Sort paramter | Sort value |\n| --- | --- |\n| name | name.lower |\n| title (default) | title.lower |",
         "operationId": "ListProfiles",
         "responses": {
           "200": {
@@ -131,7 +132,7 @@ func init() {
     "/compliance/reporting/report-ids": {
       "post": {
         "summary": "List report IDs",
-        "description": "List all report IDs optionally using filters",
+        "description": "List all report IDs optionally using filters. Supports filtering, but not pagination or sorting.\nIncluding more than one value for ` + "`" + `control` + "`" + `, ` + "`" + `profile_id` + "`" + `, or ` + "`" + `profile_name` + "`" + ` is not allowed.\nIncluding values for both ` + "`" + `profile_id` + "`" + ` and ` + "`" + `profile_name` + "`" + ` in one request is not allowed.",
         "operationId": "ListReportIds",
         "responses": {
           "200": {
@@ -159,7 +160,7 @@ func init() {
     "/compliance/reporting/reports": {
       "post": {
         "summary": "List reports",
-        "description": "List all reports optionally using filters",
+        "description": "List all reports optionally using filters. Supports pagination, filtering, and sorting.\n\n| Sort paramter | Sort value |\n| --- | --- |\n| latest_report.controls.failed.critical | controls_sums.failed.critical |\n| latest_report.controls.failed.total | controls_sums.failed.total |\n| latest_report.end_time (default) | end_time |\n| latest_report.status | status |\n| node_name | node_name.lower |",
         "operationId": "ListReports",
         "responses": {
           "200": {
@@ -187,7 +188,7 @@ func init() {
     "/compliance/reporting/reports/id/{id}": {
       "post": {
         "summary": "Fetch a report",
-        "description": "Fetch a specific report by id",
+        "description": "Fetch a specific report by id. Supports filtering, but not pagination or sorting.\nIncluding more than one value for ` + "`" + `profile_id` + "`" + ` is not allowed.",
         "operationId": "ReadReport",
         "responses": {
           "200": {
@@ -222,7 +223,7 @@ func init() {
     "/compliance/reporting/suggestions": {
       "post": {
         "summary": "List suggestions",
-        "description": "Get suggestions for compliance reporting resources based on matching text substrings",
+        "description": "Get suggestions for compliance reporting resources based on matching text substrings.\nSupports filtering, but not pagination or sorting.\n` + "`" + `type` + "`" + ` parameter is required. It must be one of the parameters from the following table.\n\n| Suggestion type parameter | Suggestion type value |\n| --- | --- |\n| chef_server | source_fqdn |\n| chef_tags | chef_tags |\n| control | profiles.controls.title |\n| control_tag_key | profiles.controls.string_tags.key |\n| control_tag_value | profiles.controls.string_tags.values |\n| environment | environment |\n| inspec_version | version |\n| node | node_name |\n| organization | organization_name |\n| platform | platform.name |\n| platform_with_version | platform.full |\n| policy_group | policy_group |\n| policy_name | policy_name |\n| profile | profiles.title |\n| profile_with_version | profiles.full |\n| recipe | recipes |\n| role | roles |",
         "operationId": "ListSuggestions",
         "responses": {
           "200": {
@@ -407,17 +408,20 @@ func init() {
       "type": "object",
       "properties": {
         "text": {
-          "type": "string"
+          "type": "string",
+          "title": "The term to use to match resources on"
         },
         "size": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "The maximum number of controls to return (Default 100)"
         },
         "filters": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1ListFilter"
-          }
+          },
+          "title": "The criteria used to filter the controls returned"
         }
       }
     },
@@ -1144,7 +1148,7 @@ func init() {
         "size": {
           "type": "integer",
           "format": "int32",
-          "title": "The maximum number of suggestions to return"
+          "title": "The maximum number of suggestions to return (Default 100)"
         },
         "filters": {
           "type": "array",
