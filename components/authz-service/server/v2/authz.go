@@ -211,12 +211,17 @@ func (s *authzServer) ValidateProjectAssignment(
 		return &api.ValidateProjectAssignmentResp{}, nil
 	}
 
-	err := s.store.EnsureNoProjectsMissing(ctx, req.NewProjects)
-	if err != nil {
-		if _, ok := err.(*projectassignment.ProjectsMissingError); ok {
-			return nil, status.Error(codes.NotFound, err.Error())
+	newProjects := req.NewProjects
+	oldProjects := req.OldProjects
+
+	if len(newProjects) != 0 {
+		err := s.store.EnsureNoProjectsMissing(ctx, newProjects)
+		if err != nil {
+			if _, ok := err.(*projectassignment.ProjectsMissingError); ok {
+				return nil, status.Error(codes.NotFound, err.Error())
+			}
+			return nil, status.Error(codes.Internal, err.Error())
 		}
-		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	projectsToAuthz := projectassignment.CalculateProjectDiff(oldProjects, newProjects, req.IsUpdateRequest)
