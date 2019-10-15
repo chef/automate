@@ -10,7 +10,7 @@
         <chef-icon>close</chef-icon>
       </chef-button>
     </div>
-<!--  -->
+
     <div class="side-panel-body">
       <div class="side-panel-body-header">
         <div>
@@ -18,18 +18,18 @@
         </div>
 
         <div class="filter-selectors">
-          <div class="selector all" (click)="onStatusChange(selectedStatus.All)" [ngClass]="{active: selected == selectedStatus.All}">
+          <button class="selector all" (click)="onStatusChange(selectedStatus.All)" [ngClass]="{active: selected == selectedStatus.All}">
               <chef-icon>check_circle</chef-icon>
               <div>{{stats(selectedStatus.All)}}</div>
-          </div>
-          <div class="selector failed" (click)="onStatusChange(selectedStatus.Failure)" [ngClass]="{active: selected == selectedStatus.Failure}">
+          </button>
+          <button class="selector failed" (click)="onStatusChange(selectedStatus.Failure)" [ngClass]="{active: selected == selectedStatus.Failure}">
             <chef-icon>warning</chef-icon>
             <div>{{stats(selectedStatus.Failure)}}</div>
-          </div>
-          <div class="selector successful" (click)="onStatusChange(selectedStatus.Success)" [ngClass]="{active: selected == selectedStatus.Success}">
+          </button>
+          <button class="selector successful" (click)="onStatusChange(selectedStatus.Success)" [ngClass]="{active: selected == selectedStatus.Success}">
             <chef-icon>check_circle</chef-icon>
             <div>{{stats(selectedStatus.Success)}}</div>
-          </div>
+          </button>
           <div>
             <app-date-selector (select)="dateSelected($event)" [initialDateTerm]="defaultSelectionTerm"> </app-date-selector>
           </div>
@@ -39,6 +39,7 @@
       <ul class="run-history-list">
         <li *ngFor="let history of nodeHistory" 
             class="run-history-list-item"
+            [class.selected]="history.runId === activeRunId"
             (click)="onSelect(history)">
           <div class="list-item-summary">
             <chef-icon [ngClass]="history.status">{{ history.status | chefStatusIcon }}</chef-icon>
