@@ -100,7 +100,7 @@ func TestSuggestionsLargeArrayValues(t *testing.T) {
 				Type: "cookbook",
 				Text: "zzz.zzz-zzzzzzzz",
 			},
-			expected: []string{"zzz.zzz-zzzzzzzz"},
+			expected: []string{"ZZZ.ZZZ-ZZzzzZZZ"},
 		},
 		{
 			description: "case sensitive 2",
@@ -115,7 +115,7 @@ func TestSuggestionsLargeArrayValues(t *testing.T) {
 				Type: "cookbook",
 				Text: "ZZZ.ZZZ-ZZzzzZZZ",
 			},
-			expected: []string{"zzz.zzz-zzzzzzzz"},
+			expected: []string{"ZZZ.ZZZ-ZZzzzZZZ"},
 		},
 		{
 			description: "case sensitive 3",
