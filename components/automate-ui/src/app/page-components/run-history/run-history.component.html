@@ -27,27 +27,30 @@
             <div>{{stats(selectedStatus.Failure)}}</div>
           </div>
           <div class="selector successful" (click)="onStatusChange(selectedStatus.Success)" [ngClass]="{active: selected == selectedStatus.Success}">
-            <chef-icon>check_circle</chef-icon><div>{{stats(selectedStatus.Success)}}</div>
+            <chef-icon>check_circle</chef-icon>
+            <div>{{stats(selectedStatus.Success)}}</div>
           </div>
           <div>
             <app-date-selector (select)="dateSelected($event)" [initialDateTerm]="defaultSelectionTerm"> </app-date-selector>
           </div>
         </div>
       </div>
-<!--  -->
-      <ul>
-        <li class="history-item" *ngFor="let history of nodeHistory" (click)="onSelect(history)">
-          <div class="arrow">
-            <chef-icon *ngIf="activeRunId === history.runId">chevron_left</chef-icon>
-          </div>
-          <div class="status" [ngClass]="history.status">
-            <chef-icon>{{ history.status | chefStatusIcon }}</chef-icon>
-          </div>
-          <div class="duration">
-            <p><strong>{{ history.startTime | datetime: RFC2822 }}</strong></p>
-          </div>
-          <div class="date-time">
-            {{getDuration(history.startTime, history.endTime)}}
+
+      <ul class="run-history-list">
+        <li *ngFor="let history of nodeHistory" 
+            class="run-history-list-item"
+            (click)="onSelect(history)">
+          <div class="list-item-summary">
+            <chef-icon [ngClass]="history.status">{{ history.status | chefStatusIcon }}</chef-icon>
+            <div class="list-item-text">
+              <p>
+                <strong>{{ history.startTime | datetime: RFC2822 }}</strong>
+              </p>
+              <p>{{ getDuration(history.startTime, history.endTime) }} ago</p>
+            </div>
+            <!-- <chef-button secondary>
+              <chef-icon>chevron_right</chef-icon>
+            </chef-button> -->
           </div>
         </li>
         <li class="no-runs-small" *ngIf="stats(selected) == 0">
