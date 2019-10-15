@@ -223,7 +223,7 @@ func (p *postgres) EditTeamByName(ctx context.Context,
 		return storage.Team{}, p.processError(err)
 	}
 
-	projectDiff := projectassignment.CalculateProjectDiff(oldProjects, updatedProjects)
+	projectDiff := projectassignment.CalculateProjectDiff(oldProjects, updatedProjects, true)
 	if len(projectDiff) != 0 {
 		// will only return an error if authz is in v2.1 mode
 		_, err := p.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{

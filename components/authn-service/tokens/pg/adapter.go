@@ -124,7 +124,7 @@ func (a *adapter) UpdateToken(ctx context.Context,
 		return nil, processSQLError(err, "fetch projects for update")
 	}
 
-	projectDiff := projectassignment.CalculateProjectDiff(originalProjects, updatedProjects)
+	projectDiff := projectassignment.CalculateProjectDiff(originalProjects, updatedProjects, true)
 	if len(projectDiff) != 0 {
 		_, err := a.validator.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
 			Subjects:   auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,

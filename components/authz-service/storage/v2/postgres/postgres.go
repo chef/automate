@@ -264,7 +264,7 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy, checkProjects boo
 	}
 
 	if checkProjects {
-		projectDiff := projectassignment.CalculateProjectDiff(oldPolicy.Projects, pol.Projects)
+		projectDiff := projectassignment.CalculateProjectDiff(oldPolicy.Projects, pol.Projects, true)
 
 		if len(projectDiff) != 0 {
 			err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, projectDiff)
@@ -879,7 +879,7 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role, checkProjects bool) 
 			return nil, p.processError(err)
 		}
 
-		projectDiff := projectassignment.CalculateProjectDiff(oldRole.Projects, role.Projects)
+		projectDiff := projectassignment.CalculateProjectDiff(oldRole.Projects, role.Projects, true)
 
 		if len(projectDiff) != 0 {
 			err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, projectDiff)
