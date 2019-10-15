@@ -57,6 +57,7 @@ export class TelemetryCheckboxComponent implements OnInit, OnDestroy {
 
       this.telemetryServiceSubscription =
         this.telemetryService.enabled.subscribe(telemetryEnabled => {
+          console.log('telemetryEnabled from TC: ' + telemetryEnabled);
           this.setTelemetryPreferences(telemetryEnabled);
         });
     }
@@ -65,6 +66,7 @@ export class TelemetryCheckboxComponent implements OnInit, OnDestroy {
   setTelemetryPreferences(telemetryEnabled) {
     this.isTelemetryServiceEnabled = telemetryEnabled;
     const telemetryPref = this.chefSessionService.telemetry_enabled;
+
     if (!isNil(telemetryPref)) {
       this.telemetryPersonalPref = telemetryPref;
     }

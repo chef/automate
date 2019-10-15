@@ -48,9 +48,6 @@ export class WelcomeModalComponent {
     if (this.telemetryService.hasTelemetryResponse) {
       this.isTelemetryServiceEnabled = this.telemetryService.telemetryEnabled;
     } else {
-      console.log('%c welcome-modal.component constructor ', 'background: yellow; color: black;');
-      console.log('welcome, enabled yet?: ' + this.telemetryService.telemetryEnabled);
-
       this.telemetryServiceSubscription =
         this.telemetryService.enabled.subscribe(telemetryEnabled => {
           console.log('enabled now?: ' + telemetryEnabled)
