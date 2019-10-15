@@ -3,6 +3,7 @@ declare namespace Cypress {
   interface Chainable<Subject> {
     login(url: string, username: string): Cypress.Chainable<Object>
     adminLogin(url: string): Cypress.Chainable<Object>
+    generateAdminToken(idToken: string): void
     logout(): Cypress.Chainable<Object>
     saveStorage(): void
     restoreStorage(): void

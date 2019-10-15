@@ -53,6 +53,56 @@ Cypress.Commands.add('applyProjectsFilter', (projectsToFilterOn: string[]) => {
   }
 });
 
+Cypress.Commands.add('generateAdminToken', (idToken: string) => {
+  const adminTokenObj = {
+    id: 'cypress-api-test-admin-token',
+    name: 'cypress-api-test-admin-token'
+  };
+
+  // delete old token if exists
+  cy.request({
+    auth: { bearer: idToken },
+    method: 'DELETE',
+    url: `/apis/iam/v2beta/tokens/${adminTokenObj.id}`,
+    failOnStatusCode: false
+  }).then((resp: Cypress.ObjectLike) => {
+    expect([200, 404]).to.include(resp.status);
+  });
+
+  // create token
+  cy.request({
+    auth: { bearer: idToken },
+    method: 'POST',
+    url: '/apis/iam/v2beta/tokens',
+    body: adminTokenObj
+  }).then((resp: Cypress.ObjectLike) => {
+    Cypress.env('ADMIN_TOKEN', resp.body.token.value);
+  });
+
+  // grant permissions based on IAM version
+  if (Cypress.env('IAM_VERSION') === 'v1') {
+    cy.request({
+      auth: { bearer: idToken },
+      method: 'POST',
+      url: '/apis/iam/v2beta/policies',
+      body: {
+        action: '*',
+        resource: '*',
+        subjects: [`token:${adminTokenObj.id}`]
+      }
+    });
+  } else {
+    cy.request({
+      auth: { bearer: idToken },
+      method: 'POST',
+      url: '/apis/iam/v2beta/policies/administrator-access/members:add',
+      body: {
+        members: [`token:${adminTokenObj.id}`]
+      }
+    });
+  }
+});
+
 interface MemoryMap {
   [key: string]: any;
 }
