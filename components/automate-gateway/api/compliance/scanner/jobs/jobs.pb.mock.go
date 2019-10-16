@@ -32,7 +32,7 @@ type JobsServiceServerMock struct {
 	validateRequests bool
 	CreateFunc       func(context.Context, *Job) (*Id, error)
 	ReadFunc         func(context.Context, *Id) (*Job, error)
-	UpdateFunc       func(context.Context, *Job) (*empty.Empty, error)
+	UpdateFunc       func(context.Context, *Job) (*Id, error)
 	DeleteFunc       func(context.Context, *Id) (*empty.Empty, error)
 	ListFunc         func(context.Context, *Query) (*Jobs, error)
 	RerunFunc        func(context.Context, *Id) (*RerunResponse, error)
@@ -62,7 +62,7 @@ func (m *JobsServiceServerMock) Read(ctx context.Context, req *Id) (*Job, error)
 	return nil, status.Error(codes.Internal, "mock: 'Read' not implemented")
 }
 
-func (m *JobsServiceServerMock) Update(ctx context.Context, req *Job) (*empty.Empty, error) {
+func (m *JobsServiceServerMock) Update(ctx context.Context, req *Job) (*Id, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())

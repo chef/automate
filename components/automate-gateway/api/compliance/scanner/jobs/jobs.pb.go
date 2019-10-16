@@ -6,6 +6,8 @@ package jobs
 import (
 	context "context"
 	fmt "fmt"
+	math "math"
+
 	_ "github.com/chef/automate/components/automate-grpc/protoc-gen-policy/api"
 	_ "github.com/chef/automate/components/automate-grpc/protoc-gen-policy/iam"
 	common "github.com/chef/automate/components/compliance-service/api/common"
@@ -16,7 +18,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -693,7 +694,7 @@ const _ = grpc.SupportPackageIsVersion4
 type JobsServiceClient interface {
 	Create(ctx context.Context, in *Job, opts ...grpc.CallOption) (*Id, error)
 	Read(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Job, error)
-	Update(ctx context.Context, in *Job, opts ...grpc.CallOption) (*empty.Empty, error)
+	Update(ctx context.Context, in *Job, opts ...grpc.CallOption) (*Id, error)
 	Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*empty.Empty, error)
 	List(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Jobs, error)
 	Rerun(ctx context.Context, in *Id, opts ...grpc.CallOption) (*RerunResponse, error)
@@ -725,8 +726,8 @@ func (c *jobsServiceClient) Read(ctx context.Context, in *Id, opts ...grpc.CallO
 	return out, nil
 }
 
-func (c *jobsServiceClient) Update(ctx context.Context, in *Job, opts ...grpc.CallOption) (*empty.Empty, error) {
-	out := new(empty.Empty)
+func (c *jobsServiceClient) Update(ctx context.Context, in *Job, opts ...grpc.CallOption) (*Id, error) {
+	out := new(Id)
 	err := c.cc.Invoke(ctx, "/chef.automate.api.compliance.scanner.jobs.v1.JobsService/Update", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -765,7 +766,7 @@ func (c *jobsServiceClient) Rerun(ctx context.Context, in *Id, opts ...grpc.Call
 type JobsServiceServer interface {
 	Create(context.Context, *Job) (*Id, error)
 	Read(context.Context, *Id) (*Job, error)
-	Update(context.Context, *Job) (*empty.Empty, error)
+	Update(context.Context, *Job) (*Id, error)
 	Delete(context.Context, *Id) (*empty.Empty, error)
 	List(context.Context, *Query) (*Jobs, error)
 	Rerun(context.Context, *Id) (*RerunResponse, error)
@@ -781,7 +782,7 @@ func (*UnimplementedJobsServiceServer) Create(ctx context.Context, req *Job) (*I
 func (*UnimplementedJobsServiceServer) Read(ctx context.Context, req *Id) (*Job, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Read not implemented")
 }
-func (*UnimplementedJobsServiceServer) Update(ctx context.Context, req *Job) (*empty.Empty, error) {
+func (*UnimplementedJobsServiceServer) Update(ctx context.Context, req *Job) (*Id, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
 }
 func (*UnimplementedJobsServiceServer) Delete(ctx context.Context, req *Id) (*empty.Empty, error) {

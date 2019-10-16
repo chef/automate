@@ -62,13 +62,13 @@ export class JobCreate implements Action {
 export class JobCreateSuccess implements Action {
   readonly type = JobActionTypes.JOB_CREATE_SUCCESS;
 
-  constructor(public payload: { id: string }) {}
+  constructor(public payload: { id: string, name: string }) {}
 }
 
 export class JobCreateFailure implements Action {
   readonly type = JobActionTypes.JOB_CREATE_FAILURE;
 
-  constructor(public payload: {}) {}
+  constructor(public payload: { id: string, name: string }) {}
 }
 
 export class JobUpdate implements Action {
@@ -80,13 +80,13 @@ export class JobUpdate implements Action {
 export class JobUpdateSuccess implements Action {
   readonly type = JobActionTypes.JOB_UPDATE_SUCCESS;
 
-  constructor(public payload: { id: string }) {}
+  constructor(public payload: { id: string, name: string }) {}
 }
 
 export class JobUpdateFailure implements Action {
   readonly type = JobActionTypes.JOB_UPDATE_FAILURE;
 
-  constructor(public payload: {}) {}
+  constructor(public payload: { id: string, name: string }) {}
 }
 
 export type JobActions =

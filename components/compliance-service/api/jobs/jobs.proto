@@ -12,7 +12,7 @@ import "components/compliance-service/api/common/common.proto";
 service JobsService {
 	rpc Create(Job) returns (Id) {};
 	rpc Read(Id) returns (Job) {};
-	rpc Update(Job) returns (google.protobuf.Empty) {};
+	rpc Update(Job) returns (Id) {};
 	rpc Delete(Id) returns (google.protobuf.Empty) {};
 	rpc List(Query) returns (Jobs) {};
 	rpc Rerun(Id) returns (RerunResponse) {};

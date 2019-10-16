@@ -137,7 +137,7 @@ func (srv *Server) Read(ctx context.Context, in *jobs.Id) (*jobs.Job, error) {
 }
 
 // Update one job
-func (srv *Server) Update(ctx context.Context, in *jobs.Job) (*pb.Empty, error) {
+func (srv *Server) Update(ctx context.Context, in *jobs.Job) (*jobs.Id, error) {
 	logrus.Debugf("Update job with id: %+v", in)
 	if in.Recurrence == "" && in.ParentId != "" {
 		err := &errorutils.InvalidError{Msg: fmt.Sprintf("Invalid job. Child jobs may not be updated. If you wish to update the parent job, please find job: " + in.ParentId)}
@@ -164,7 +164,14 @@ func (srv *Server) Update(ctx context.Context, in *jobs.Job) (*pb.Empty, error) 
 	user := getUserValFromCtx(ctx)
 	go srv.fireEvent(event.ScanJobUpdatedEventName, in, nil, user)
 
-	return &empty, nil
+	// get job name to populate event feed with useful info later
+	name, err := srv.db.GetJobName(in.GetId())
+	if err != nil {
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
+	}
+
+	logrus.Debugf("printttt the id and name %s %s", &jobs.Job{Id: in.Id, Name: name})
+	return &jobs.Id{Id: in.Id, Name: name}, nil
 }
 
 // Delete a job

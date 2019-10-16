@@ -42,7 +42,7 @@ service JobsService {
 			action: "compliance:scannerJobs:get"
 		};
 	};
-	rpc Update(Job) returns (google.protobuf.Empty) {
+	rpc Update(Job) returns (Id) {
 		option (google.api.http) = {
 			put: "/compliance/scanner/jobs/id/{id}"
 			body: "*"

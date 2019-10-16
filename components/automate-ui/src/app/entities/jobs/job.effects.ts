@@ -37,27 +37,27 @@ export class JobEffects {
   jobCreate$ = this.actions$.pipe(
     ofType(JobActionTypes.JOB_CREATE),
     mergeMap((action: JobActions) => this.requests.jobCreate(action.payload)),
-    map((payload: {id: string}) => new JobCreateSuccess(payload)));
+    map((payload: {id: string, name: string }) => new JobCreateSuccess(payload)));
 
   @Effect()
   jobCreateSuccess$ = this.actions$.pipe(
     ofType<JobCreateSuccess>(JobActionTypes.JOB_CREATE_SUCCESS),
-    map(() => new CreateNotification({
+    map((payload) => new CreateNotification({
       type: Type.info,
-      message: 'Created a scan job.'
+      message: `Created a scan job ${payload.payload.name}.`
     })));
 
   @Effect()
   jobUpdate$ = this.actions$.pipe(
     ofType(JobActionTypes.JOB_UPDATE),
     mergeMap((action: JobActions) => this.requests.jobUpdate(action.payload)),
-    map(payload => new JobUpdateSuccess(payload)));
+    map((payload: {id: string, name: string}) => new JobUpdateSuccess(payload)));
 
   @Effect()
   jobUpdateSuccess$ = this.actions$.pipe(
-    ofType(JobActionTypes.JOB_UPDATE_SUCCESS),
-    map(() => new CreateNotification({
+    ofType<JobUpdateSuccess>(JobActionTypes.JOB_UPDATE_SUCCESS),
+    map((payload) => new CreateNotification({
       type: Type.info,
-      message: 'Updated a scan job.'
+      message: `Updated a scan job ${payload.payload.name}.`
     })));
 }
