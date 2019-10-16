@@ -34,10 +34,10 @@ func EnsureProjectAssignmentAuthorized(ctx context.Context, authorizer engine.V2
 	return nil
 }
 
-// CalculateProjectDiff returns the symmetric difference of oldProjects and newProjects,
+// CalculateProjectsToAuthorize returns the symmetric difference of oldProjects and newProjects,
 // meaning that any project that is not in the intersection of oldProjects and newProjects
 // will be returned.
-func CalculateProjectDiff(oldProjects, newProjects []string, isUpdateRequest bool) []string {
+func CalculateProjectsToAuthorize(oldProjects, newProjects []string, isUpdateRequest bool) []string {
 	projectDiff := []string{}
 	previouslyUnassigned := len(oldProjects) == 0
 	newlyUnassigned := len(newProjects) == 0
