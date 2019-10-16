@@ -39,8 +39,7 @@
       <ul class="run-history-list">
         <li *ngFor="let history of nodeHistory" 
             class="run-history-list-item"
-            [class.selected]="history.runId === activeRunId"
-            (click)="onSelect(history)">
+            [class.selected]="history.runId === activeRunId">
           <div class="list-item-summary">
             <chef-icon [ngClass]="history.status">{{ history.status | chefStatusIcon }}</chef-icon>
             <div class="list-item-text">
@@ -49,7 +48,7 @@
               </p>
               <p>{{ getDuration(history.startTime, history.endTime) }} ago</p>
             </div>
-            <chef-button secondary>
+            <chef-button secondary (click)="onSelect(history)">
               <chef-icon>chevron_right</chef-icon>
             </chef-button>
           </div>
