@@ -95,7 +95,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
     this.expressionForm = fb.group({
       // Must stay in sync with error checks in policy-add-members.component.html
-      type: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      type: ['', [Validators.required]],
       identity: [''],
       name: ['']
     });
@@ -381,8 +381,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
                                       Validators.pattern(Regex.patterns.NON_BLANK),
                                       Validators.pattern(Regex.patterns.NO_MIXED_WILDCARD)]);
       } else {
-        updateInput.setValidators([Validators.required,
-                                      Validators.pattern(Regex.patterns.NON_BLANK)]);
+        updateInput.setValidators([Validators.required]);
       }
     } else {
       updateInput.clearValidators();
