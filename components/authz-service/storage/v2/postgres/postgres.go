@@ -272,7 +272,7 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy, checkProjects boo
 		}
 	}
 	if checkProjects {
-		projectDiff := projectassignment.CalculateProjectDiff(oldPolicy.Projects, newProjects, true)
+		projectDiff := projectassignment.CalculateProjectsToAuthorize(oldPolicy.Projects, newProjects, true)
 
 		err = projectassignment.EnsureProjectAssignmentAuthorized(ctx,
 			p.engine,
@@ -887,7 +887,7 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role, checkProjects bool) 
 				return nil, p.processError(err)
 			}
 		}
-		projectDiff := projectassignment.CalculateProjectDiff(oldRole.Projects, newProjects, true)
+		projectDiff := projectassignment.CalculateProjectsToAuthorize(oldRole.Projects, newProjects, true)
 
 		err = projectassignment.EnsureProjectAssignmentAuthorized(ctx,
 			p.engine,
