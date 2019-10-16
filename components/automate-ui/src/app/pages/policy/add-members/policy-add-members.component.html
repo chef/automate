@@ -70,10 +70,10 @@
                 <p class="note">Wildcards (*) are allowed.</p>
 
                 <chef-error *ngIf="expressionForm.get('name').hasError('required') && expressionForm.get('name').dirty">
-                  Name is a required field.
+                  {{ nameOrId }} is a required field.
                 </chef-error>
                 <chef-error *ngIf="expressionForm.get('name').hasError('pattern') && expressionForm.get('name').dirty">
-                  This is a pattern error. --> consult for text
+                  {{ nameOrId }} must be a text or a wildcard but not both.
                 </chef-error>
               </chef-form-field>
 
