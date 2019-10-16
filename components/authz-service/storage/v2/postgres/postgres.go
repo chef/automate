@@ -1621,6 +1621,9 @@ func (p *pg) EnsureNoProjectsMissing(ctx context.Context, projectIDs []string) e
 
 func (p *pg) ensureNoProjectsMissingWithQuerier(ctx context.Context, q Querier, projectIDs []string) error {
 	// Return any input ID that does not exist in the projects table.
+	if len(projectIDs) == 0 {
+		return nil
+	}
 	rows, err := p.db.QueryContext(ctx,
 		`SELECT id FROM unnest($1::text[]) AS input(id)
 			WHERE NOT EXISTS (SELECT * FROM iam_projects p WHERE input.id = p.id);`, pq.Array(projectIDs))
