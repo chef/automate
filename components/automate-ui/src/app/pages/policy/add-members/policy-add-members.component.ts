@@ -341,6 +341,10 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
     this.setFormLabels(typeValue);
 
+    // Need to include all of the input types and each outcome
+      // case type
+      // case identity
+      // case name
     switch (inputName) {
       case 'identity':
         this.showIdentity = false;
@@ -398,6 +402,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
         updateInput.setValidators([Validators.required]);
       }
     } else {
+
       updateInput.clearValidators();
     }
 
