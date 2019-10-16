@@ -86,6 +86,8 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   public expressionOutput: string;
   public allIdentity: string;
   public nameOrId: string;
+  public showIdentity = false;
+  public showName = false;
 
 
   constructor(
@@ -263,6 +265,8 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
   resetModal(): void {
     this.expressionForm.reset();
+    this.showIdentity = false;
+    this.showName = false;
     this.unparsableMember = false;
     this.duplicateMember = false;
   }
@@ -330,7 +334,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     this.closeModal();
   }
 
-  public showInputs(inputName: string): boolean {
+  public showInputs(inputName: string): void {
     const typeValue = this.expressionForm.get('type').value;
     const identityValue = this.expressionForm.get('identity').value;
     const matchAllWildCard = '*';
@@ -339,31 +343,41 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
     switch (inputName) {
       case 'identity':
+        this.showIdentity = false;
+        this.showName = false;
         if (typeValue === 'user' || typeValue === 'team') {
-            this.updateValidations(inputName, true);
-            return true;
-          } else {
-            this.updateValidations(inputName, false);
-            this.expressionForm.get(inputName).reset();
-            return false;
-          }
-        break;
-      case 'name':
-        if ( typeValue === 'token' || (identityValue && identityValue !== matchAllWildCard) ) {
           this.updateValidations(inputName, true);
-          return true;
+          this.showIdentity = true;
+        } else if ( typeValue === 'token' ) {
+          this.showIdentity = false;
+          this.showName = true;
+          this.updateValidations('name', true);
+          this.updateValidations(inputName, false);
+          this.expressionForm.get(inputName).reset();
         } else {
           this.updateValidations(inputName, false);
           this.expressionForm.get(inputName).reset();
-          return false;
+          this.showIdentity = false;
+        }
+        break;
+      case 'name':
+        if (typeValue === 'token' || (identityValue && identityValue !== matchAllWildCard)) {
+          this.updateValidations(inputName, true);
+          this.showName = true;
+          return;
+        } else {
+          this.updateValidations(inputName, false);
+          this.expressionForm.get(inputName).reset();
+          this.showName = false;
+          return;
         }
         break;
       default:
-        return false;
+        return;
     }
   }
 
-  private setFormLabels(typeValue: string): void {
+  private setFormLabels(typeValue): void {
     if (typeValue === 'token') {
       this.nameOrId = 'ID';
     } else {
@@ -390,7 +404,10 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     updateInput.updateValueAndValidity();
   }
 
-  public displayExpressionOutput(): void {
+  public updateFormDisplay(inputName): void {
+
+    this.showInputs(inputName);
+
     const values: string[] = Object.values(this.expressionForm.value);
     const output = values.filter(value => value != null && value.length > 0);
     this.expressionOutput = output.join(':');

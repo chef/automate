@@ -22,7 +22,7 @@
                   <span class="label">Type<span aria-hidden="true">*</span></span>
                   <select id="expression-type-dropdown"
                           ngDefaultControl 
-                          (change)="displayExpressionOutput()"
+                          (change)="updateFormDisplay('identity')"
                           formControlName="type">
                     <option value='user'>User</option>
                     <option value='team'>Team</option>
@@ -37,13 +37,13 @@
 
               <chef-form-field 
                 id="create-identity" 
-                *ngIf="showInputs('identity')"
+                *ngIf="showIdentity === true"
                 [@dropInAnimation]="{ value: triggerValue, params: { height: 74.6875 }}" >
                 <label>
                   <span class="label">Identity Provider<span aria-hidden="true">*</span></span>
                   <select id="expression-identity-dropdown" 
                           ngDefaultControl 
-                          (change)="displayExpressionOutput()"
+                          (change)="updateFormDisplay('name')"
                           formControlName="identity">
                     <option value="ldap">LDAP</option>
                     <option value="local">local</option>
@@ -58,19 +58,22 @@
 
               <chef-form-field 
                 id="create-name" 
-                *ngIf="showInputs('name')"
+                *ngIf="showName === true"
                 [@dropInAnimation]="{ value: triggerValue, params: { height: 119.427 }}">
                 <label>
                   <span class="label">{{ nameOrId }}<span aria-hidden="true">*</span></span>
                   <chef-input id="expression-name-dropdown" 
                               ngDefaultControl 
-                              (keyup)="displayExpressionOutput()"
+                              (keyup)="updateFormDisplay()"
                               formControlName="name"></chef-input>
                 </label>
                 <p class="note">Wildcards (*) are allowed.</p>
 
-                <chef-error *ngIf="expressionForm.get('name').hasError('required') && expressionForm.get('name').touched">
+                <chef-error *ngIf="expressionForm.get('name').hasError('required') && expressionForm.get('name').dirty">
                   Name is a required field.
+                </chef-error>
+                <chef-error *ngIf="expressionForm.get('name').hasError('pattern') && expressionForm.get('name').dirty">
+                  This is a pattern error. --> consult for text
                 </chef-error>
               </chef-form-field>
 
