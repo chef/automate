@@ -293,15 +293,22 @@ message ControlItemRequest {
 }
 
 message ControlItem {
-	string id =1;
-	string title=2;
+	// The unique id of this control
+	string id = 1;
+	// The compact description of the control
+	string title= 2;
+	// Intentionally blank
 	ProfileMin profile = 3;
+	// The severity of the control
 	float impact = 4;
+	// The time the report using the control was submitted at
 	google.protobuf.Timestamp end_time = 5;
+	// Intentionally blank
 	ControlSummary control_summary = 6;
 }
 
 message ControlItems {
+	// The paginated results of controls matching the filters
 	repeated ControlItem control_items = 1;
 }
 
@@ -366,9 +373,9 @@ message Failed {
 	int32 critical = 4;
 }
 
-// A minimal represenation of the statuses of the controls in the report
+// A minimal represenation of the statuses of the controls
 message ControlSummary {
-	// The total number of controls in the report
+	// The total number of controls
 	int32 total = 1;
 	// Intentionally blank
 	Total passed = 2;
@@ -405,7 +412,7 @@ message Report {
 	ControlSummary controls = 6;
 	// The environment of the node generating the report
 	string environment = 7;
-	// The version of the report (???)
+	// The version of the report
 	string version = 8;
 	// Intentionally blank
 	Platform platform = 9;
@@ -413,7 +420,7 @@ message Report {
 	Statistics statistics = 10;
 	// The profiles run as part of this report
 	repeated Profile profiles = 11;
-	// The id of the job associated with the report (???)
+	// The id of the job associated with the report
 	string job_id = 12;
 	// The IP address of the node generating the report
 	string ipaddress = 13;
@@ -440,7 +447,7 @@ message Profile {
 	string version = 8;
 	// The name of the account that uploaded the profile to Automate
 	string owner = 9;
-	// ???
+	// The combined name and version of the profile
 	string full = 10;
 	// The supported platform targets
 	repeated Support supports = 16;
@@ -448,7 +455,7 @@ message Profile {
 	repeated Dependency depends = 17;
 	// A unique value generated from the profile used to identify it
 	string sha256 = 18;
-	// ???
+	// The groups of controls defined in the profile
 	repeated Group groups = 19;
 	// The controls defined on the profile
 	repeated Control controls = 20;
@@ -541,11 +548,11 @@ message Dependency {
 }
 
 message Group {
-	// ???
+	// The name of the file the controls are defined in
 	string id = 1;
-	// ???
+	// The title of control group
 	string title = 2;
-	// ???
+	// The ids of the controls defined in this file
 	repeated string controls = 3;
 }
 
@@ -583,6 +590,7 @@ message Platform {
 	string name = 1;
 	// The version of the node's operating system
 	string release = 2;
+	// The combined name and version of the node's operating system
 	string full = 3;
 }
 
@@ -610,7 +618,7 @@ message Suggestion {
 	string id = 2;
 	// The confidence in the match quality
 	float score = 3;
-	// ???
+	// The version of the suggestion
 	string version = 4;
 }
 
@@ -638,6 +646,7 @@ message ProfileCounts {
 	int32 passed = 4;
 }
 
+// Minimal represenation of a profile
 message ProfileMin {
 	// The name of the profile
 	string name = 1;
@@ -709,5 +718,6 @@ message ProfileMeta {
 	string id = 3;
 	// The status of the profile run against the node
 	string status = 4;
+	// The combined name and version of the profile
 	string full = 5;
 }

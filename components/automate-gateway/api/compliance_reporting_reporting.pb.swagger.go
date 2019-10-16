@@ -383,24 +383,30 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "title": "The unique id of this control"
         },
         "title": {
-          "type": "string"
+          "type": "string",
+          "title": "The compact description of the control"
         },
         "profile": {
-          "$ref": "#/definitions/v1ProfileMin"
+          "$ref": "#/definitions/v1ProfileMin",
+          "title": "Intentionally blank"
         },
         "impact": {
           "type": "number",
-          "format": "float"
+          "format": "float",
+          "title": "The severity of the control"
         },
         "end_time": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "title": "The time the report using the control was submitted at"
         },
         "control_summary": {
-          "$ref": "#/definitions/v1ControlSummary"
+          "$ref": "#/definitions/v1ControlSummary",
+          "title": "Intentionally blank"
         }
       }
     },
@@ -432,7 +438,8 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1ControlItem"
-          }
+          },
+          "title": "The paginated results of controls matching the filters"
         }
       }
     },
@@ -442,7 +449,7 @@ func init() {
         "total": {
           "type": "integer",
           "format": "int32",
-          "title": "The total number of controls in the report"
+          "title": "The total number of controls"
         },
         "passed": {
           "$ref": "#/definitions/v1Total",
@@ -457,7 +464,7 @@ func init() {
           "title": "Intentionally blank"
         }
       },
-      "title": "A minimal represenation of the statuses of the controls in the report"
+      "title": "A minimal represenation of the statuses of the controls"
     },
     "v1Dependency": {
       "type": "object",
@@ -557,18 +564,18 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "title": "???"
+          "title": "The name of the file the controls are defined in"
         },
         "title": {
           "type": "string",
-          "title": "???"
+          "title": "The title of control group"
         },
         "controls": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "title": "???"
+          "title": "The ids of the controls defined in this file"
         }
       }
     },
@@ -720,7 +727,8 @@ func init() {
           "title": "The version of the node's operating system"
         },
         "full": {
-          "type": "string"
+          "type": "string",
+          "title": "The combined name and version of the node's operating system"
         }
       },
       "title": "The name and version of the node's operating system"
@@ -766,7 +774,7 @@ func init() {
         },
         "full": {
           "type": "string",
-          "title": "???"
+          "title": "The combined name and version of the profile"
         },
         "supports": {
           "type": "array",
@@ -791,7 +799,7 @@ func init() {
           "items": {
             "$ref": "#/definitions/v1Group"
           },
-          "title": "???"
+          "title": "The groups of controls defined in the profile"
         },
         "controls": {
           "type": "array",
@@ -867,7 +875,8 @@ func init() {
           "title": "The status of the profile run against the node"
         },
         "full": {
-          "type": "string"
+          "type": "string",
+          "title": "The combined name and version of the profile"
         }
       }
     },
@@ -894,7 +903,8 @@ func init() {
           "type": "string",
           "title": "The aggregated status of the profile across the nodes it has been run on"
         }
-      }
+      },
+      "title": "Minimal represenation of a profile"
     },
     "v1ProfileMins": {
       "type": "object",
@@ -997,7 +1007,7 @@ func init() {
         },
         "version": {
           "type": "string",
-          "title": "The version of the report (???)"
+          "title": "The version of the report"
         },
         "platform": {
           "$ref": "#/definitions/v1Platform",
@@ -1016,7 +1026,7 @@ func init() {
         },
         "job_id": {
           "type": "string",
-          "title": "The id of the job associated with the report (???)"
+          "title": "The id of the job associated with the report"
         },
         "ipaddress": {
           "type": "string",
@@ -1130,7 +1140,7 @@ func init() {
         },
         "version": {
           "type": "string",
-          "title": "???"
+          "title": "The version of the suggestion"
         }
       }
     },
