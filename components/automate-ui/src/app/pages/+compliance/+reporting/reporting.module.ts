@@ -7,6 +7,7 @@ import { ReportingComponent } from './reporting.component';
 import { ReportingSearchbarComponent } from './reporting-searchbar/reporting-searchbar.component';
 import { ReportingRoutingModule } from './reporting.routing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 
 @NgModule({
   imports: [
@@ -14,6 +15,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
     RouterModule,
     ComplianceSharedModule,
     ChefComponentsModule,
+    ChefPipesModule,
     ReportingRoutingModule
   ],
   declarations: [

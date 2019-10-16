@@ -18,6 +18,7 @@ import {
 } from '../shared/reporting';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
 import * as moment from 'moment';
+import { DatetimePipe } from 'app/pipes/datetime.pipe';
 import { using } from 'app/testing/spec-helpers';
 
 class MockTelemetryService {
@@ -41,7 +42,8 @@ describe('ReportingComponent', () => {
         HttpClientTestingModule
       ],
       declarations: [
-        ReportingComponent
+        ReportingComponent,
+        DatetimePipe
       ],
       providers: [
         { provide: TelemetryService, useClass: MockTelemetryService },

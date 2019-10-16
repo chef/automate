@@ -24,7 +24,7 @@
               <chef-th>
                 Last Scan
               </chef-th>
-              <chef-td>{{ formatDate(activeReport.end_time) }}</chef-td>
+              <chef-td>{{ activeReport.end_time | datetime: RFC2822 }}</chef-td>
               <chef-th>
                 Platform
               </chef-th>
@@ -201,7 +201,7 @@
               <chef-icon class="status-icon list-item-icon" [ngClass]="report.status">{{ statusIcon(report.status) }}</chef-icon>
               <div class="list-item-text">
                 <p class="node-name">
-                  <strong>{{formatDate(report.end_time)}}</strong>
+                  <strong>{{ report.end_time | datetime: RFC2822 }}</strong>
                 </p>
                 <p>{{formatDaysAgo(report.end_time)}}</p>
               </div>
