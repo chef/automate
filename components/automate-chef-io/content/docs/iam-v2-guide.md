@@ -144,7 +144,7 @@ Next, you'll specify the permissions themselves--which in IAM v2 are the `statem
 The statement allows us to specify the `actions` a user is permitted to take on resources that have been assigned to a `project`.
 The `projects` field on a statement is an array that may contain more than one existing project, a wildcard `*` to indicate permission to resources in _any project_, or the word "(unassigned)" to indicate permission to resources that have not been assigned to a project.
 Note that the `projects` property in statements designates permission for the resources within the statement (here, that is `iam:users` and `iam:teams`), _not_ for the policy itself, and _cannot_ be left empty.
-For more about projects, please see [Projects]({{< relref "iam-v2-guide.md#projects" >}}) or [Notes on the Projects Property](#notes-on-the-projects-property).
+For more about projects, please see [Projects]({{< relref "iam-v2-guide.md#projects" >}}) or [Notes on the Projects Property]({{< relref "iam-v2-api-reference.md#notes-on-the-projects-property" >}}).
 
 In this case, we only need a single statement providing access to the _get_, _list_, and _update_ actions for _users_ and _teams_ that have been assigned to the project `project-devops`.
 
@@ -191,7 +191,7 @@ The complete policy should look like:
 }
 ```
 
-Save your JSON file and follow the steps in [Creating a Policy]({{< relref "iam-v2-api-reference.md#creating-a-policy" >}}) to pass that data to Chef Automate.
+Save your JSON file and follow the steps in [Creating a Policy]({{< relref "iam-v2-api-reference.md#creating-a-policy" >}}) to send that data to Chef Automate.
 
 ### Policy Membership
 
@@ -368,7 +368,7 @@ filter by `project-devops` across Automate's dashboards and see only the ingeste
 
 #### Project Owners
 
-The role Project Owner is designed to allow admin users to delegate management of project membership to another user without granting that user access to all parts of Chef Automate. Project Owners have the following permissions on resources assigned to their project:
+The role Project Owner allows admin users to delegate management of project membership to another user without granting that user access to other admin functions of Chef Automate. Project Owners have the following permissions on resources assigned to their project:
 
 ```text
 "infra:*",
@@ -413,7 +413,7 @@ Next, you will create a policy that gives `test_project_owner` the role of `proj
 
 By adding `project-devops` to the policy's top-level `projects` field, we ensure that the Project Owner has access to this policy.
 
-Save as a JSON file and follow the steps in [Creating a Policy]({{< relref "iam-v2-api-reference.md#creating-a-policy" >}}) to pass that data to Chef Automate.
+Save as a JSON file and follow the steps in [Creating a Policy]({{< relref "iam-v2-api-reference.md#creating-a-policy" >}}) to send that data to Chef Automate.
 
 #### Editor and Viewer Policies for Projects
 
@@ -464,7 +464,7 @@ by selecting **Settings**, then **Policies**, then `Project Devops Policy`. Unde
 option to select new policy members.
 
 Assuming Terry is not a member of any other policy, once you make Terry a member of the `Project Devops Viewers` policy,
-they will only be able to see resources assigned to `Project Devops`. They will not be able to update or delete them.
+Terry will only be able to see resources assigned to `Project Devops` and will not be able to update or delete them.
 Kelly, however, will be able to do both.
 
 See [Policy Membership]({{< relref "iam-v2-api-reference.md#policy-membership" >}}) for more information on policy membership.
