@@ -182,61 +182,68 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 		// assigns to unassigned when not allowed to assign to unassigned
 		"when assigning (unassigned) is allowed, from unassigned to authorized project": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:    []string{user},
-				OldProjects: []string{},
-				NewProjects: []string{authorizedProjectId},
+				Subjects:        []string{user},
+				OldProjects:     []string{},
+				NewProjects:     []string{authorizedProjectId},
+				IsUpdateRequest: false,
 			})
 			assert.NoError(t, err)
 		},
 		"when assigning (unassigned) is not allowed, from unassigned to authorized project": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:    []string{user},
-				OldProjects: []string{},
-				NewProjects: []string{authorizedProjectId},
+				Subjects:        []string{user},
+				OldProjects:     []string{},
+				NewProjects:     []string{authorizedProjectId},
+				IsUpdateRequest: false,
 			})
 			grpctest.AssertCode(t, codes.PermissionDenied, err)
 			assert.Contains(t, err.Error(), unauthorizedProjectId)
 		},
 		"when assigning (unassigned) is allowed, from authorized project to unassigned": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:    []string{user},
-				OldProjects: []string{authorizedProjectId},
-				NewProjects: []string{},
+				Subjects:        []string{user},
+				OldProjects:     []string{authorizedProjectId},
+				NewProjects:     []string{},
+				IsUpdateRequest: false,
 			})
 			assert.NoError(t, err)
 		},
 		"when assigning (unassigned) is not allowed, from authorized project to unassigned": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:    []string{user},
-				OldProjects: []string{authorizedProjectId},
-				NewProjects: []string{},
+				Subjects:        []string{user},
+				OldProjects:     []string{authorizedProjectId},
+				NewProjects:     []string{},
+				IsUpdateRequest: false,
 			})
 			grpctest.AssertCode(t, codes.PermissionDenied, err)
 			assert.Contains(t, err.Error(), unassignedProjectId)
 		},
 		"when passed one unauthorized project": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:    []string{user},
-				OldProjects: []string{authorizedProjectId},
-				NewProjects: []string{unauthorizedProjectId},
+				Subjects:        []string{user},
+				OldProjects:     []string{authorizedProjectId},
+				NewProjects:     []string{unauthorizedProjectId},
+				IsUpdateRequest: false,
 			})
 			grpctest.AssertCode(t, codes.PermissionDenied, err)
 			assert.Contains(t, err.Error(), unauthorizedProjectId)
 		},
 		"when passed one non-existent project": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:    []string{user},
-				OldProjects: []string{authorizedProjectId},
-				NewProjects: []string{notFoundProjectId},
+				Subjects:        []string{user},
+				OldProjects:     []string{authorizedProjectId},
+				NewProjects:     []string{notFoundProjectId},
+				IsUpdateRequest: false,
 			})
 			grpctest.AssertCode(t, codes.NotFound, err)
 			assert.Contains(t, err.Error(), notFoundProjectId)
 		},
 		"when passed two non-existent projects and one unauthorized": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:    []string{user},
-				OldProjects: []string{authorizedProjectId},
-				NewProjects: []string{notFoundProjectId, "also-not-found"},
+				Subjects:        []string{user},
+				OldProjects:     []string{authorizedProjectId},
+				NewProjects:     []string{notFoundProjectId, "also-not-found"},
+				IsUpdateRequest: false,
 			})
 			grpctest.AssertCode(t, codes.NotFound, err)
 			assert.Contains(t, err.Error(), notFoundProjectId, "also-not-found")
@@ -244,9 +251,10 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 		},
 		"when passed one authorized and one non-existent project": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:    []string{user},
-				OldProjects: []string{authorizedProjectId},
-				NewProjects: []string{authorizedProjectId, notFoundProjectId},
+				Subjects:        []string{user},
+				OldProjects:     []string{authorizedProjectId},
+				NewProjects:     []string{authorizedProjectId, notFoundProjectId},
+				IsUpdateRequest: false,
 			})
 			grpctest.AssertCode(t, codes.NotFound, err)
 			assert.Contains(t, err.Error(), notFoundProjectId)
@@ -254,9 +262,10 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 		},
 		"when passed one unauthorized project and one non-existent project": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:    []string{user},
-				OldProjects: []string{authorizedProjectId},
-				NewProjects: []string{unauthorizedProjectId, notFoundProjectId},
+				Subjects:        []string{user},
+				OldProjects:     []string{authorizedProjectId},
+				NewProjects:     []string{unauthorizedProjectId, notFoundProjectId},
+				IsUpdateRequest: false,
 			})
 			grpctest.AssertCode(t, codes.NotFound, err)
 			assert.Contains(t, err.Error(), notFoundProjectId)
@@ -264,9 +273,10 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 		},
 		"when passed one unauthorized project and one authorized project": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:    []string{user},
-				OldProjects: []string{authorizedProjectId},
-				NewProjects: []string{unauthorizedProjectId, authorizedProjectId},
+				Subjects:        []string{user},
+				OldProjects:     []string{authorizedProjectId},
+				NewProjects:     []string{unauthorizedProjectId, authorizedProjectId},
+				IsUpdateRequest: false,
 			})
 			grpctest.AssertCode(t, codes.PermissionDenied, err)
 			assert.Contains(t, err.Error(), unauthorizedProjectId)
@@ -274,9 +284,10 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 		},
 		"when passed two unauthorized projects and one authorized project": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:    []string{user},
-				OldProjects: []string{authorizedProjectId},
-				NewProjects: []string{unauthorizedProjectId, authorizedProjectId},
+				Subjects:        []string{user},
+				OldProjects:     []string{authorizedProjectId},
+				NewProjects:     []string{unauthorizedProjectId, authorizedProjectId},
+				IsUpdateRequest: false,
 			})
 			grpctest.AssertCode(t, codes.PermissionDenied, err)
 			assert.Contains(t, err.Error(), unauthorizedProjectId, unauthorizedProjectId2)
@@ -284,9 +295,10 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 		},
 		"when passed one authorized project": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:    []string{user},
-				OldProjects: []string{authorizedProjectId},
-				NewProjects: []string{authorizedProjectId},
+				Subjects:        []string{user},
+				OldProjects:     []string{authorizedProjectId},
+				NewProjects:     []string{authorizedProjectId},
+				IsUpdateRequest: false,
 			})
 			assert.NoError(t, err)
 		},
