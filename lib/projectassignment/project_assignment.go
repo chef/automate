@@ -6,12 +6,21 @@ import (
 	"github.com/chef/automate/components/authz-service/engine"
 )
 
-func EnsureProjectAssignmentAuthorized(ctx context.Context, authorizer engine.V2Authorizer, subjects, projectIDs []string) error {
+const UnassignedProjectID = "(unassigned)"
+
+func AuthorizeProjectAssignment(ctx context.Context, authorizer engine.V2Authorizer,
+	subjects, oldProjects, newProjects []string, isUpdateRequest bool) error {
+
+	projectsToAuthz := calculateProjectsToAuthorize(oldProjects, newProjects, isUpdateRequest)
+	if len(projectsToAuthz) == 0 {
+		return nil
+	}
+
 	engineResp, err := authorizer.V2ProjectsAuthorized(ctx,
 		engine.Subjects(subjects),
 		engine.Action("iam:projects:assign"),
 		engine.Resource("*"),
-		engine.ProjectList(projectIDs...))
+		engine.ProjectList(projectsToAuthz...))
 	if err != nil {
 		return err
 	}
@@ -22,7 +31,7 @@ func EnsureProjectAssignmentAuthorized(ctx context.Context, authorizer engine.V2
 	}
 
 	var unauthorizedProjects []string
-	for _, proj := range projectIDs {
+	for _, proj := range projectsToAuthz {
 		if !authorized[proj] {
 			unauthorizedProjects = append(unauthorizedProjects, proj)
 		}
@@ -78,7 +87,7 @@ func calculateProjectsToAuthorize(oldProjects, newProjects []string, isUpdateReq
 
 	// if project goes from no projects to some or the reverse
 	if previouslyUnassigned || newlyUnassigned {
-		projectDiff = append(projectDiff, "(unassigned)")
+		projectDiff = append(projectDiff, UnassignedProjectID)
 	}
 
 	return projectDiff

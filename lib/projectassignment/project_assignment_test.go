@@ -17,13 +17,13 @@ func TestCalculateProjectsToAuthorizeForUpdate(t *testing.T) {
 			assert.ElementsMatch(t, []string{}, calculateProjectsToAuthorize([]string{}, []string{}, isUpdate))
 		}},
 		{"there are only new projects", func(t *testing.T) {
-			assert.ElementsMatch(t, []string{"a", "b", "(unassigned)"}, calculateProjectsToAuthorize([]string{}, []string{"a", "b"}, isUpdate))
+			assert.ElementsMatch(t, []string{"a", "b", UnassignedProjectID}, calculateProjectsToAuthorize([]string{}, []string{"a", "b"}, isUpdate))
 		}},
 		{"no projects were removed", func(t *testing.T) {
 			assert.ElementsMatch(t, []string{}, calculateProjectsToAuthorize([]string{"a", "b"}, []string{"a", "b"}, isUpdate))
 		}},
 		{"there are only old projects", func(t *testing.T) {
-			assert.ElementsMatch(t, []string{"a", "b", "(unassigned)"}, calculateProjectsToAuthorize([]string{"a", "b"}, []string{}, isUpdate))
+			assert.ElementsMatch(t, []string{"a", "b", UnassignedProjectID}, calculateProjectsToAuthorize([]string{"a", "b"}, []string{}, isUpdate))
 		}},
 		{"one project is removed", func(t *testing.T) {
 			assert.ElementsMatch(t, []string{"a"}, calculateProjectsToAuthorize([]string{"a", "b"}, []string{"b"}, isUpdate))
@@ -58,16 +58,16 @@ func TestCalculateProjectsToAuthorizeForCreate(t *testing.T) {
 		f    func(*testing.T)
 	}{
 		{"unassigned to unassigned", func(t *testing.T) {
-			assert.ElementsMatch(t, []string{"(unassigned)"}, calculateProjectsToAuthorize([]string{}, []string{}, isUpdate))
+			assert.ElementsMatch(t, []string{UnassignedProjectID}, calculateProjectsToAuthorize([]string{}, []string{}, isUpdate))
 		}},
 		{"there are only new projects", func(t *testing.T) {
-			assert.ElementsMatch(t, []string{"a", "b", "(unassigned)"}, calculateProjectsToAuthorize([]string{}, []string{"a", "b"}, isUpdate))
+			assert.ElementsMatch(t, []string{"a", "b", UnassignedProjectID}, calculateProjectsToAuthorize([]string{}, []string{"a", "b"}, isUpdate))
 		}},
 		{"no projects were removed", func(t *testing.T) {
 			assert.ElementsMatch(t, []string{}, calculateProjectsToAuthorize([]string{"a", "b"}, []string{"a", "b"}, isUpdate))
 		}},
 		{"there are only old projects", func(t *testing.T) {
-			assert.ElementsMatch(t, []string{"a", "b", "(unassigned)"}, calculateProjectsToAuthorize([]string{"a", "b"}, []string{}, isUpdate))
+			assert.ElementsMatch(t, []string{"a", "b", UnassignedProjectID}, calculateProjectsToAuthorize([]string{"a", "b"}, []string{}, isUpdate))
 		}},
 		{"one project is removed", func(t *testing.T) {
 			assert.ElementsMatch(t, []string{"a"}, calculateProjectsToAuthorize([]string{"a", "b"}, []string{"b"}, isUpdate))

@@ -224,13 +224,8 @@ func (s *authzServer) ValidateProjectAssignment(
 		}
 	}
 
-	projectsToAuthz := projectassignment.calculateProjectsToAuthorize(oldProjects, newProjects, req.IsUpdateRequest)
-
-	if len(projectsToAuthz) == 0 {
-		return &api.ValidateProjectAssignmentResp{}, nil
-	}
-
-	err := projectassignment.EnsureProjectAssignmentAuthorized(ctx, s.engine, req.Subjects, projectsToAuthz)
+	err := projectassignment.AuthorizeProjectAssignment(ctx, s.engine, req.Subjects,
+		oldProjects, newProjects, req.IsUpdateRequest)
 	if err != nil {
 		if _, ok := err.(*projectassignment.ProjectsUnauthorizedForAssignmentErr); ok {
 			return nil, status.Error(codes.PermissionDenied, err.Error())
