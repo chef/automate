@@ -224,7 +224,7 @@ func (s *authzServer) ValidateProjectAssignment(
 		}
 	}
 
-	projectsToAuthz := projectassignment.CalculateProjectsToAuthorize(oldProjects, newProjects, req.IsUpdateRequest)
+	projectsToAuthz := projectassignment.calculateProjectsToAuthorize(oldProjects, newProjects, req.IsUpdateRequest)
 
 	if len(projectsToAuthz) == 0 {
 		return &api.ValidateProjectAssignmentResp{}, nil
