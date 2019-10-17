@@ -6,7 +6,7 @@ cd /workdir/e2e
 
 data=$(curl --silent "https://a2-${CHANNEL}.cd.chef.co/assets/data.json")
 instances_to_test=$(jq -nr --argjson data "$data" '$data[] | select(.tags | any(. == "e2e")) | .fqdn')
-versions=(v1 v2 v2.1)
+versions=(v1 v2.1)
 
 for instance in ${instances_to_test[*]}
 do
