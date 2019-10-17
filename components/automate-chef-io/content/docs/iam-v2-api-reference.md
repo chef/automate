@@ -132,6 +132,11 @@ The set of actions for a statement is the union of the actions within the role a
 
 ### Listing Policies
 
+```bash
+curl -sSH "api-token: $TOKEN" -X GET \
+https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies?pretty
+```
+
 The output includes both *Chef-managed* and *Custom* policies.
 Policies migrated from IAM v1 are included as *Custom* policies.
 Policy names that begin with `[Legacy]` are default policies migrated from v1.
@@ -141,6 +146,11 @@ We recommend deleting these legacy policies and setting up new IAM v2 policies i
 
 ### Getting a Policy
 
+```bash
+curl -sSH "api-token: $TOKEN" -X GET \
+https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}?pretty
+```
+
 This shows the details of a single policy, selected by its ID.
 
 *In the browser:* **Settings**  >> **Policies** >> [select a policy]
@@ -149,7 +159,19 @@ This shows the details of a single policy, selected by its ID.
 
 Create a policy by composing JSON with all the necessary policy properties (see [Policies]({{< relref "iam-v2-api-reference.md#policies" >}})).
 
+Assuming you store it in the file "policy.json", pass it to `curl` to create the policy:
+
+```bash
+curl -sSH "api-token: $TOKEN" -d @policy.json -X POST \
+https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies?pretty
+```
+
 ### Updating a Policy
+
+```bash
+curl -sSH "api-token: $TOKEN" -d @policy.json -X PUT \
+https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}?pretty
+```
 
 - You should supply all of a policy's properties, not just the ones you wish to update.
   Because the update operation modifies *all* the properties--not just the ones you specify--*properties that you do not include are reset to empty values*.
@@ -158,6 +180,11 @@ Create a policy by composing JSON with all the necessary policy properties (see 
 - The policy ID is immutable; it can only be set at creation time.
 
 ### Deleting a Policy
+
+```bash
+curl -sSH "api-token: $TOKEN" -X DELETE \
+https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}?pretty
+```
 
 Deleting a policy is permanent and cannot be undone.
 
@@ -192,14 +219,31 @@ POST /policies/***id***/members:remove | remove from the membership
 
 ### Listing Policy Members
 
+```bash
+curl -sSH "api-token: $TOKEN" -X GET \
+https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}/members?pretty
+```
+
 The output lists all defined members of the specified policy.
 
 ### Updating All Members on a Policy
+
+```bash
+curl -sSH "api-token: $TOKEN" -X PUT \
+-d '{"members":["{member-id}","{member-id}","{member-id}"]}' \
+https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}/members?pretty
+```
 
 Specifying a complete list of members is often simpler than keeping track of a policy's membership and adding or deleting specific members (whether users, team, or tokens).
 Use this HTTP request to replace the policy's membership.
 
 ### Adding Members to a Policy
+
+```bash
+curl -sSH "api-token: $TOKEN" -X POST \
+-d '{"members":["{member-id}","{member-id}"]}' \
+https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}/members:add?pretty
+```
 
 Specify new members to add to a policy's membership via this HTTP request.
 
@@ -208,6 +252,12 @@ Specify new members to add to a policy's membership via this HTTP request.
 Select any local users or teams listed to add to the policy, or use **Add Member Expressions** for tokens, or LDAP or SAML users or teams.
 
 ### Removing Members from a Policy
+
+```bash
+curl -sSH "api-token: $TOKEN" -X POST \
+-d '{"members":["{member-id}","{member-id}","{member-id}","{member-id}"]}' \
+https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}/members:remove?pretty
+```
 
 Specify members to remove from a policy's membership via this HTTP request.
 The removed members still exists within Chef Automate, but are no longer associated with this policy.
@@ -259,11 +309,21 @@ Ingest             | ingest        | infra:ingest:\*, compliance:profiles:get, c
 
 ### Listing Roles
 
+```bash
+curl -sSH "api-token: $TOKEN" -X GET \
+https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/roles?pretty
+```
+
 The output includes both *Chef-managed* and *Custom* roles.
 
 *In the browser:* **Settings**  >> **Roles**
 
 ### Getting a Role
+
+```bash
+curl -sSH "api-token: $TOKEN" -X GET \
+https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/roles/{role-id}?pretty
+```
 
 This shows the details of a single role, selected by its ID.
 
@@ -271,15 +331,32 @@ This shows the details of a single role, selected by its ID.
 
 ### Creating a Role
 
+```bash
+curl -sSH "api-token: $TOKEN" -X POST \
+-d '{"name": "Test Role", "id": "test-role-1", "actions": ["infra:*", "compliance:*", "teams:*", "users:*"] }' \
+https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/roles?pretty
+```
+
 Create a role by composing JSON with all the necessary role properties (see [Roles]({{< relref "iam-v2-api-reference.md#roles" >}})).
 
 ### Updating a Role
+
+```bash
+curl -sSH "api-token: $TOKEN" -X PUT \
+-d '{"name": "Test Role", "actions": ["compliance:*", "teams:*", "users:*"] }' \
+https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/roles/{role-id}?pretty
+```
 
 - You should supply all of a role's properties, not just the ones you wish to update.
   Because the update operation modifies *all* the properties--not just the ones you specify--*properties that you do not include are reset to empty values*.
 - The role ID is immutable; it can only be set at creation time.
 
 ### Deleting a Role
+
+```bash
+curl -sSH "api-token: $TOKEN" -X DELETE \
+https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/roles/{role-id}?pretty
+```
 
 Deleting a role is permanent and cannot be undone.
 
