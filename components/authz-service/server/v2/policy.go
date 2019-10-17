@@ -246,6 +246,7 @@ func (s *policyServer) UpdatePolicy(
 	req *api.UpdatePolicyReq) (*api.Policy, error) {
 
 	statements := make([]storage.Statement, len(req.Statements))
+
 	for i, statement := range req.Statements {
 		statementInt, err := s.statementFromAPI(statement)
 		if err != nil {
