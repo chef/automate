@@ -55,9 +55,9 @@ describe('PolicyAddMembersComponent', () => {
         fixture = TestBed.createComponent(PolicyAddMembersComponent);
         component = fixture.componentInstance;
         component.expressionForm = new FormBuilder().group({
-            type: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-            identity: [''],
-            name: ['']
+            type: ['', Validators.required],
+            identity: '',
+            name: ''
         });
         fixture.detectChanges();
     });
@@ -66,32 +66,22 @@ describe('PolicyAddMembersComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    describe('showInputs', () => {
-
-        it('should return false when inputName is not identity or name', () => {
-            expect(component.showInputs('blank')).toBe(false);
-        });
+    describe('updateFormDisplay', () => {
 
         using([
-            ['and when typeValue equals user', 'user', 'identity', true],
-            ['and when typeValue equals team', 'team', 'identity', true],
-            ['and typeValue does not equal team or user', '*', 'identity', false],
-            ['and when typeValue equals token', 'token', 'name', true],
-            ['and typeValue is not token and identityValue does not exist', 'team', 'name', false]
-        ], function (description: string, type: string, input: string, outcome: boolean) {
-            it(`returns ${outcome} when inputName is ${input} ${description}`, () => {
-                component.expressionForm.setValue({ type: type, identity: '', name: '' });
-                expect(component.showInputs(input)).toBe(outcome);
-            });
-        });
-
-        using([
-            ['and identityValue exists and isnt a star', 'something', 'name', true],
-            ['and identityValue exists and is a star', '*', 'name', false]
-        ], function (description: string, identity: string, input: string, outcome: boolean) {
-            it(`returns ${outcome} when inputName is ${input} ${description}`, () => {
-                component.expressionForm.setValue({ type: '', identity: identity, name: '' });
-                expect(component.showInputs(input)).toBe(outcome);
+            [{ type: 'team', identity: null, name: null }, 'type', 'team'],
+            [{ type: '*', identity: null, name: null}, 'team', '*'],
+            [{ type: 'team', identity: 'saml', name: null}, 'identity', 'team:saml'],
+            [{ type: 'team', identity: 'saml', name: '*'}, 'identity', 'team:saml:*'],
+            [{ type: 'user', identity: 'local', name: null}, 'identity', 'user:local'],
+            [{ type: 'user', identity: 'ldap', name: 'square'}, 'name', 'user:ldap:square'],
+            [{ type: 'token', identity: null, name: 'whatever'}, 'name', 'token:whatever'],
+            [{ type: 'token', identity: null, name: 'something'}, 'name', 'token:something'],
+        ], function (formValues: {}, inputName: string, output: string) {
+            it(`sets expressionOutput to ${output} when formValues are ${formValues} and inputName is ${inputName}`, () => {
+                component.expressionForm.setValue(formValues);
+                component.updateFormDisplay(inputName);
+                expect(component.expressionOutput).toBe(output);
             });
         });
     });
