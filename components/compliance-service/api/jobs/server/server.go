@@ -121,8 +121,6 @@ func (srv *Server) Create(ctx context.Context, in *jobs.Job) (*jobs.Id, error) {
 		user := getUserValFromCtx(ctx)
 		go srv.fireEvent(event.ScanJobCreatedEventName, in, nil, user)
 	}
-
-	logrus.Debugf("printttt the id and name %s %s", &jobs.Job{Id: sID, Name: name})
 	return &jobs.Id{Id: sID, Name: name}, nil
 }
 
