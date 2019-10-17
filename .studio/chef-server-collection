@@ -155,7 +155,7 @@ function converge_chef_client() {
 
   local tmplog
   tmplog=$(mktemp)
-  chef-client \
+  CHEF_LICENSE=accept-no-persist chef-client \
     -j ${chef_server_first_boot_json_path} \
     -c ${chef_server_client_rb_path} 2>&1 | tee "$tmplog"
 
@@ -184,9 +184,9 @@ function test_cookbook_caching() {
       hab pkg install -b core/curl
     fi
 
-    audit_version=$(hab pkg exec chef/chef-dk knife cookbook show audit -c ${chef_server_client_rb_path} | head -1 | awk '{print $2}')
-    cookbook_file_url1=$(hab pkg exec chef/chef-dk knife cookbook show audit "$audit_version" root_files -c ${chef_server_client_rb_path} | grep url | head -1 | awk '{print $2}')
-    cookbook_file_url2=$(hab pkg exec chef/chef-dk knife cookbook show audit "$audit_version" root_files -c ${chef_server_client_rb_path} | grep url | head -1 | awk '{print $2}')
+    audit_version=$(CHEF_LICENSE=accept-no-persist hab pkg exec chef/chef-dk knife cookbook show audit -c ${chef_server_client_rb_path} | head -1 | awk '{print $2}')
+    cookbook_file_url1=$(CHEF_LICENSE=accept-no-persist hab pkg exec chef/chef-dk knife cookbook show audit "$audit_version" root_files -c ${chef_server_client_rb_path} | grep url | head -1 | awk '{print $2}')
+    cookbook_file_url2=$(CHEF_LICENSE=accept-no-persist hab pkg exec chef/chef-dk knife cookbook show audit "$audit_version" root_files -c ${chef_server_client_rb_path} | grep url | head -1 | awk '{print $2}')
 
     if [[ "$cookbook_file_url1" = "$cookbook_file_url2" ]]; then
       log_line "Success: erchef returned duplicate cache URLs"
@@ -314,7 +314,7 @@ function test_knife() {
   bootstrap_chef_user_data || return 1
 
   local knife_cmd_fmt
-  knife_cmd_fmt="$(hab pkg path chef/chef-dk)/bin/knife %s -c ${chef_server_pivotal_rb_path} > /dev/null 2>&1"
+  knife_cmd_fmt="CHEF_LICENSE=accept-no-persist $(hab pkg path chef/chef-dk)/bin/knife %s -c ${chef_server_pivotal_rb_path} > /dev/null 2>&1"
 
   declare -a cmds=(
     "user create ${chef_server_test_user_name} ${chef_server_test_user_name} ${chef_server_test_user_name} ${chef_server_test_user_name} ${chef_server_test_user_email} '${chef_server_test_user_password}' -d"
@@ -346,7 +346,7 @@ DOC
 function ohai_time() {
   set_up_chef_server_test_environment
 
-  hab pkg exec chef/chef-dk knife node show test-admin \
+  CHEF_LICENSE=accept-no-persist hab pkg exec chef/chef-dk knife node show test-admin \
     --server-url "${chef_server_url}" \
     --key        "${chef_server_test_admin_key_path_path}" \
     -c           "${chef_server_pivotal_rb_path}" \
