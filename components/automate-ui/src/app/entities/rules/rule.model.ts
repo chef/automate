@@ -8,7 +8,7 @@ export function isConditionOperator(s: string): s is ConditionOperator {
     return s === 'MEMBER_OF' || s === 'EQUALS';
 }
 
-interface KVPair {
+export interface KVPair {
   key: string;
   value: string;
 }

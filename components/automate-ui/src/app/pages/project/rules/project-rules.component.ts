@@ -13,7 +13,7 @@ import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Regex } from 'app/helpers/auth/regex';
 import { EntityStatus, loading } from 'app/entities/entities';
 import {
-  Rule, RuleTypeMappedObject, Condition, ConditionOperator, isConditionOperator
+  Rule, RuleTypeMappedObject, Condition, ConditionOperator, isConditionOperator, KVPair
 } from 'app/entities/rules/rule.model';
 import {
   GetRule, GetRulesForProject, CreateRule, UpdateRule
@@ -48,7 +48,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
 
   public isLoading = true;
   public saving = false;
-  public attributeList: any;
+  public attributeList: KVPair;
   public attributes: RuleTypeMappedObject;
   public editingRule = false;
   private isDestroyed: Subject<boolean> = new Subject<boolean>();

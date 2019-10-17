@@ -33,37 +33,47 @@ chef-page {
   .custom-dropdown {
     position: relative;
     vertical-align: middle;
-  }
 
-  .custom-dropdown select {
-    margin: 0;
-    background-color: $chef-white;
-    color: $chef-primary-dark;
-    font-size: inherit;
-    padding: 12px;
-    padding-right: 16px;
-    height: 45px;
-    border-radius: 4px;
-    border: solid 1px $chef-grey;
-    text-indent: 0.01px;
-    text-overflow: '';
-    font-weight: 400;
-    font-stretch: normal;
-    font-style: normal;
-    line-height: 1.5;
-    letter-spacing: 0.2px;
-    outline: none;
-    /*Hiding the select arrow for firefox*/
-    -moz-appearance: none;
-    /*Hiding the select arrow for chrome*/
-    -webkit-appearance: none;
-    /*Hiding the select arrow default implementation*/
-    appearance: none;
-  }
-
-  /*Hiding the select arrow for IE10*/
-  .custom-dropdown select::-ms-expand {
-    display: none;
+    & select {
+      margin: 0;
+      background-color: $chef-white;
+      color: $chef-primary-dark;
+      font-size: inherit;
+      padding: 12px;
+      padding-right: 16px;
+      height: 45px;
+      border-radius: 4px;
+      border: solid 1px $chef-grey;
+      text-indent: 0.01px;
+      text-overflow: '';
+      font-weight: 400;
+      font-stretch: normal;
+      font-style: normal;
+      line-height: 1.5;
+      letter-spacing: 0.2px;
+      outline: none;
+      /* Hiding the select arrow for firefox */
+      -moz-appearance: none;
+      /* Hiding the select arrow for chrome */
+      -webkit-appearance: none;
+      /* Hiding the select arrow default implementation */
+      appearance: none;
+    }
+  
+    & select[disabled] {
+      color: $chef-dark-grey;
+      border: solid 1px $chef-grey;
+      background-color: $chef-grey;
+    }
+  
+    & select:focus {
+      border: solid 1px $chef-primary-bright;
+    }
+  
+    /* Hiding the select arrow for IE10 */
+    & select::-ms-expand {
+      display: none;
+    }
   }
 
   .custom-dropdown::before,
@@ -73,7 +83,8 @@ chef-page {
     pointer-events: none;
   }
 
-  .custom-dropdown::after { /*  Custom dropdown arrow */
+  .custom-dropdown::after {
+    /* Custom dropdown arrow */
     content: "⌄";
     height: 1em;
     font-size: 18px;
@@ -82,16 +93,6 @@ chef-page {
     top: 50%;
     margin-top: -.5em;
     color: $chef-primary-dark;
-  }
-
-  .custom-dropdown select[disabled] {
-    color: $chef-dark-grey;
-    border: solid 1px $chef-grey;
-    background-color: $chef-grey;
-  }
-
-  .custom-dropdown select:focus {
-    border: solid 1px $chef-primary-bright;
   }
 
   #create-name {
@@ -162,6 +163,7 @@ chef-page {
       position: relative;
       vertical-align: top;
       width: 27%;
+      margin-right: 2%;
 
       .label {
         color: $chef-dark-grey;
@@ -173,7 +175,7 @@ chef-page {
       select,
       chef-input {
         min-width: 0;
-        width: 95%;
+        width: 100%;
       }
     }
 
@@ -182,6 +184,7 @@ chef-page {
       position: relative;
       vertical-align: top;
       width: 17%;
+      margin-right: 2%;
 
       .label {
         color: $chef-dark-grey;
@@ -190,14 +193,8 @@ chef-page {
         font-weight: 200;
       }
 
-      select,
-      chef-input {
-        min-width: 0;
-        width: 95%;
-      }
-
       .operator-dropdown {
-        width: 92%;
+        width: 100%;
       }
     }
   }
