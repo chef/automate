@@ -335,7 +335,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
     this.setFormLabels(formValues.type);
 
-    switch(inputName) {
+    switch (inputName) {
       case 'type':
         this.resetFormControls();
         if (formValues.type === 'user' || formValues.type === 'team') {

@@ -4,7 +4,6 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
-import { Regex } from 'app/helpers/auth/regex';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { runtimeChecks } from 'app/ngrx.reducers';
 import { PolicyAddMembersComponent } from './policy-add-members.component';
@@ -76,7 +75,7 @@ describe('PolicyAddMembersComponent', () => {
             [{ type: 'user', identity: 'local', name: null}, 'identity', 'user:local'],
             [{ type: 'user', identity: 'ldap', name: 'square'}, 'name', 'user:ldap:square'],
             [{ type: 'token', identity: null, name: 'whatever'}, 'name', 'token:whatever'],
-            [{ type: 'token', identity: null, name: 'something'}, 'name', 'token:something'],
+            [{ type: 'token', identity: null, name: 'something'}, 'name', 'token:something']
         ], function (formValues: {}, inputName: string, output: string) {
             it(`sets expressionOutput to ${output} when formValues are ${formValues} and inputName is ${inputName}`, () => {
                 component.expressionForm.setValue(formValues);
