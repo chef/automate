@@ -41,11 +41,13 @@ control 'iam-v2-1' do
           statements: [
             {
               effect: "DENY",
-              role: CUSTOM_ROLE_ID
+              role: CUSTOM_ROLE_ID,
+              projects: ["*"]
             },
             {
               effect: "ALLOW",
-              actions: ["test:some:action"]
+              actions: ["test:some:action"],
+              projects: ["*"]
             }
           ]
         }.to_json()
@@ -76,7 +78,8 @@ control 'iam-v2-1' do
           statements: [
             {
               effect: "DENY",
-              role: CUSTOM_ROLE_ID
+              role: CUSTOM_ROLE_ID,
+              projects: ["*"]
             },
           ]
         }.to_json()
@@ -131,7 +134,8 @@ EOF
           statements: [
             {
               effect: "DENY",
-              role: CUSTOM_ROLE_ID
+              role: CUSTOM_ROLE_ID,
+              projects: ["*"]
             },
           ]
         }.to_json()
@@ -168,7 +172,8 @@ EOF
             {
               effect: "DENY",
               resources: ["compliance:foo1","compliance:bar1"],
-              role: CUSTOM_ROLE_ID
+              role: CUSTOM_ROLE_ID,
+              projects: ["*"]
             },
           ]
         }.to_json()
@@ -244,7 +249,8 @@ EOF
           statements: [
             {
               effect:    "ALLOW",
-              actions:   ["compliance:profiles:upload"]
+              actions:   ["compliance:profiles:upload"],
+              projects: ["*"]
             }
           ],
           members: []
@@ -403,13 +409,34 @@ EOF
   end
 
   describe "v2beta token API" do
+    project_id = "inspec-token-project-#{Time.now.utc.to_i}"
+    project_id_2 = "inspec-token-project-2-#{Time.now.utc.to_i}"
+
     before(:all) do
-       resp = automate_api_request("/apis/iam/v2beta/tokens",
+      resp = automate_api_request("/apis/iam/v2beta/projects",
+        http_method: 'POST',
+        request_body: {
+          id: project_id,
+          name: "display name !#$#"
+        }.to_json
+      )
+      expect(resp.http_status).to eq 200
+
+      resp = automate_api_request("/apis/iam/v2beta/projects",
+        http_method: 'POST',
+        request_body: {
+          id: project_id_2,
+          name: "display name !#$#"
+        }.to_json
+      )
+      expect(resp.http_status).to eq 200
+
+      resp = automate_api_request("/apis/iam/v2beta/tokens",
         http_method: 'POST',
         request_body: {
           id: CUSTOM_TOKEN_ID,
           name: "my cool token",
-          projects: ["project-random"],
+          projects: [project_id],
         }.to_json
       )
       expect(resp.http_status).to eq 200
@@ -417,7 +444,11 @@ EOF
 
     after(:all) do
       resp = automate_api_request("/apis/iam/v2beta/tokens/#{CUSTOM_TOKEN_ID}", http_method: 'DELETE')
-      expect(resp.http_status).to eq 200
+      expect(resp.http_status.to_s).to match(/200|404/)
+      resp = automate_api_request("/apis/iam/v2beta/projects/#{project_id}", http_method: 'DELETE')
+      expect(resp.http_status.to_s).to match(/200|404/)
+      resp = automate_api_request("/apis/iam/v2beta/projects/#{project_id_2}", http_method: 'DELETE')
+      expect(resp.http_status.to_s).to match(/200|404/)
     end
 
     it "CREATE and DELETE token responds as expected" do
@@ -432,14 +463,14 @@ EOF
           id: id,
           name: "my neat token",
           active: true,
-          projects: ["project-1"]
+          projects: [project_id]
         }.to_json
       )
       expect(resp.http_status).to eq 200
       expect(resp.parsed_response_body[:token][:id]).to eq id
       expect(resp.parsed_response_body[:token][:name]).to eq 'my neat token'
       expect(resp.parsed_response_body[:token][:active]).to be true
-      expect(resp.parsed_response_body[:token][:projects]).to eq ["project-1"]
+      expect(resp.parsed_response_body[:token][:projects]).to eq [project_id]
 
       resp = automate_api_request("/apis/iam/v2beta/tokens")
       expect(resp.parsed_response_body[:tokens].length).to eq init_token_count + 1
@@ -464,14 +495,14 @@ EOF
         request_body: {
           id: id,
           name: "my neat token",
-          projects: ["project-1"]
+          projects: [project_id]
         }.to_json
       )
       expect(resp.http_status).to eq 200
       expect(resp.parsed_response_body[:token][:id]).to eq id
       expect(resp.parsed_response_body[:token][:name]).to eq 'my neat token'
       expect(resp.parsed_response_body[:token][:active]).to be true
-      expect(resp.parsed_response_body[:token][:projects]).to eq ["project-1"]
+      expect(resp.parsed_response_body[:token][:projects]).to eq [project_id]
 
       resp = automate_api_request("/apis/iam/v2beta/tokens/#{id}")
       expect(resp.http_status).to eq 200
@@ -502,12 +533,12 @@ EOF
         http_method: 'PUT',
         request_body: {
           name: "inspec test token updated",
-          projects: ["project-1", "my-new-project"]
+          projects: [project_id, project_id_2]
         }.to_json
       )
       expect(resp.http_status).to eq 200
       expect(resp.parsed_response_body[:token][:name]).to eq "inspec test token updated"
-      expect(resp.parsed_response_body[:token][:projects]).to eq ["project-1", "my-new-project"]
+      expect(resp.parsed_response_body[:token][:projects]).to eq [project_id, project_id_2]
     end
 
     it "UPDATE token defaults active to true if not specified" do
@@ -517,13 +548,13 @@ EOF
         request_body: {
           active: false,
           name: "inspec test token updated",
-          projects: ["project-1", "my-new-project"]
+          projects: [project_id, project_id_2]
         }.to_json
       )
       expect(resp.http_status).to eq 200
       expect(resp.parsed_response_body[:token][:name]).to eq "inspec test token updated"
       expect(resp.parsed_response_body[:token][:active]).to eq false
-      expect(resp.parsed_response_body[:token][:projects]).to eq ["project-1", "my-new-project"]
+      expect(resp.parsed_response_body[:token][:projects]).to eq [project_id, project_id_2]
 
       resp = automate_api_request("/apis/iam/v2beta/tokens/#{CUSTOM_TOKEN_ID}")
       expect(resp.http_status).to eq 200
@@ -533,13 +564,13 @@ EOF
         http_method: 'PUT',
         request_body: {
           name: "inspec test token updated",
-          projects: ["project-1", "my-new-project"]
+          projects: [project_id, project_id_2]
         }.to_json
       )
       expect(resp.http_status).to eq 200
       expect(resp.parsed_response_body[:token][:name]).to eq "inspec test token updated"
       expect(resp.parsed_response_body[:token][:active]).to eq true
-      expect(resp.parsed_response_body[:token][:projects]).to eq ["project-1", "my-new-project"]
+      expect(resp.parsed_response_body[:token][:projects]).to eq [project_id, project_id_2]
 
       resp = automate_api_request("/apis/iam/v2beta/tokens/#{CUSTOM_TOKEN_ID}")
       expect(resp.http_status).to eq 200
@@ -752,21 +783,46 @@ EOF
   end
 
   describe "v2beta team API" do
+    project_id = "inspec-team-project-#{Time.now.utc.to_i}"
+    project_id_2 = "inspec-team-project-2-#{Time.now.utc.to_i}"
+
     before(:all) do
-       resp = automate_api_request("/apis/iam/v2beta/teams",
+      resp = automate_api_request("/apis/iam/v2beta/projects",
+        http_method: 'POST',
+        request_body: {
+          id: project_id,
+          name: "display name !#$#"
+        }.to_json
+      )
+      expect(resp.http_status).to eq 200
+
+      resp = automate_api_request("/apis/iam/v2beta/projects",
+        http_method: 'POST',
+        request_body: {
+          id: project_id_2,
+          name: "display name !#$#"
+        }.to_json
+      )
+      expect(resp.http_status).to eq 200
+
+      resp = automate_api_request("/apis/iam/v2beta/teams",
         http_method: 'POST',
         request_body: {
           id: CUSTOM_TEAM_ID,
           name: "display name !#$#",
-          projects: ['a-project']
+          projects: [project_id]
         }.to_json
       )
       expect(resp.http_status).to eq 200
     end
 
     after(:all) do
+      resp = automate_api_request("/apis/iam/v2beta/projects/#{project_id}", http_method: 'DELETE')
+      expect(resp.http_status.to_s).to match(/200|404/)
+      resp = automate_api_request("/apis/iam/v2beta/projects/#{project_id_2}", http_method: 'DELETE')
+      expect(resp.http_status.to_s).to match(/200|404/)
       resp = automate_api_request("/apis/iam/v2beta/teams/#{CUSTOM_TEAM_ID}", http_method: 'DELETE')
-      expect(resp.http_status).to eq 200
+      expect(resp.http_status.to_s).to match(/200|404/)
     end
 
     it "LIST teams responds properly" do
@@ -781,7 +837,7 @@ EOF
       init_team_count = resp.parsed_response_body[:teams].length
 
       id = "inspec-team-#{Time.now.utc.to_i}"
-      projects = ["another-project"]
+      projects = [project_id_2]
       resp = automate_api_request("/apis/iam/v2beta/teams",
         http_method: 'POST',
         request_body: {
@@ -823,7 +879,7 @@ EOF
         http_method: 'PUT',
         request_body: {
           name: "inspec test team updated",
-          projects: ["a-project"]
+          projects: [project_id_2]
         }.to_json
       )
       expect(resp.http_status).to eq 200
@@ -1036,9 +1092,6 @@ EOF
       }
 
       before(:all) do
-        puts "wat"
-        puts custom_project_id
-        puts custom_project_id_2
         resp = automate_api_request("/apis/iam/v2beta/projects",
           http_method: 'POST',
           request_body: {

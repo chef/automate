@@ -62,6 +62,17 @@ func TestGenerateAdminToken(t *testing.T) {
 			}, nil
 		}
 
+		mockV2PolicyServer.GetPolicyVersionFunc = func(
+			_ context.Context, req *authz_v2.GetPolicyVersionReq) (*authz_v2.GetPolicyVersionResp, error) {
+
+			return &authz_v2.GetPolicyVersionResp{
+				Version: &authz_v2.Version{
+					Major: authz_v2.Version_V1,
+					Minor: authz_v2.Version_V0,
+				},
+			}, nil
+		}
+
 		mockAuthZ.CreatePolicyFunc = func(
 			_ context.Context, req *authz.CreatePolicyReq) (*authz.CreatePolicyResp, error) {
 
@@ -151,7 +162,7 @@ func TestGenerateAdminToken(t *testing.T) {
 		require.Error(t, err)
 	})
 
-	t.Run("when API token succeeds but policy creation fails due to precondition, v2 policy creation succeeds", func(t *testing.T) {
+	t.Run("when authz is in v2 mode, v2 policy creation succeeds", func(t *testing.T) {
 		mockAuthN.CreateTokenFunc = func(
 			_ context.Context, req *authn.CreateTokenReq) (*authn.Token, error) {
 
@@ -164,16 +175,15 @@ func TestGenerateAdminToken(t *testing.T) {
 			}, nil
 		}
 
-		mockAuthZ.CreatePolicyFunc = func(
-			_ context.Context, req *authz.CreatePolicyReq) (*authz.CreatePolicyResp, error) {
+		mockV2PolicyServer.GetPolicyVersionFunc = func(
+			_ context.Context, req *authz_v2.GetPolicyVersionReq) (*authz_v2.GetPolicyVersionResp, error) {
 
-			assert.Equal(t, []string{testSubjectString}, req.Subjects)
-			assert.Equal(t, "*", req.Action)
-			assert.Equal(t, "*", req.Resource)
-
-			st := status.New(codes.FailedPrecondition, "authz-service set to v2")
-			st, _ = st.WithDetails(&common.ErrorShouldUseV2{})
-			return nil, st.Err()
+			return &authz_v2.GetPolicyVersionResp{
+				Version: &authz_v2.Version{
+					Major: authz_v2.Version_V2,
+					Minor: authz_v2.Version_V1,
+				},
+			}, nil
 		}
 
 		mockV2PolicyServer.CreatePolicyFunc = func(
@@ -243,6 +253,17 @@ func TestGenerateAdminToken(t *testing.T) {
 			return &authn.Token{
 				Value: testTokenString,
 				Id:    testID,
+			}, nil
+		}
+
+		mockV2PolicyServer.GetPolicyVersionFunc = func(
+			_ context.Context, req *authz_v2.GetPolicyVersionReq) (*authz_v2.GetPolicyVersionResp, error) {
+
+			return &authz_v2.GetPolicyVersionResp{
+				Version: &authz_v2.Version{
+					Major: authz_v2.Version_V1,
+					Minor: authz_v2.Version_V0,
+				},
 			}, nil
 		}
 
