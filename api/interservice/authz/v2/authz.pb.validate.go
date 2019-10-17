@@ -882,13 +882,6 @@ func (m *ValidateProjectAssignmentReq) Validate() error {
 
 	}
 
-	if len(m.GetNewProjects()) < 1 {
-		return ValidateProjectAssignmentReqValidationError{
-			field:  "NewProjects",
-			reason: "value must contain at least 1 item(s)",
-		}
-	}
-
 	_ValidateProjectAssignmentReq_NewProjects_Unique := make(map[string]struct{}, len(m.GetNewProjects()))
 
 	for idx, item := range m.GetNewProjects() {
