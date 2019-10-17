@@ -260,7 +260,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   }
 
   resetModal(): void {
-    this.expressionForm.reset();
+    this.resetForm();
     this.unparsableMember = false;
     this.duplicateMember = false;
   }
@@ -370,6 +370,12 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   private resetFormControls(): void {
     this.expressionForm.removeControl('identity');
     this.expressionForm.removeControl('name');
+  }
+
+  private resetForm(): void {
+    this.resetFormControls();
+    this.expressionForm.reset();
+    this.expressionOutput = '';
   }
 
   private addIdentityControl(): void {
