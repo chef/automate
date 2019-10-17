@@ -177,19 +177,18 @@ func (es Backend) getArrayAggSuggestions(term string, text string, filters map[s
 	typeQuery := elastic.NewTypeQuery(IndexNodeState)
 	filters["exists"] = []string{"true"}
 	boolQuery := newBoolQueryFromFilters(filters)
-	textLower := strings.ToLower(text)
 
 	boolQuery = boolQuery.Must(typeQuery)
 
 	// return all unless text has at least 2 chars
 	if len(text) >= 2 {
-		matchQuery := elastic.NewMatchQuery(fmt.Sprintf("%s.engram", term), textLower)
+		matchQuery := elastic.NewMatchQuery(fmt.Sprintf("%s.engram", term), text)
 		boolQuery = boolQuery.Must(matchQuery)
 	}
 	// multiplying the size by 10 as elasticsearch will sort array aggregations by doc_count. Will trim it back to size once we match it again in go
 	aggs := elastic.NewTermsAggregation().Field(term).Size(SuggestionQuerySize)
 	if len(text) >= 2 {
-		aggs = aggs.Include(".*" + textLower + ".*")
+		aggs = aggs.Include(caseInsensitivePattern(text))
 	}
 	searchSource := elastic.NewSearchSource().
 		Query(boolQuery).
@@ -247,12 +246,7 @@ func (es Backend) getArrayAggSuggestions(term string, text string, filters map[s
 	suggs := make([]string, 0)
 	if aggResult != nil {
 		for _, bucket := range aggResult.Buckets {
-			// When elasticsearch find a match in an array it returns that whole array and includes other values in that array as buckets.
-			// Because of this we will filter any buckets that do not contain any of the search string text
-			bucketname := string(bucket.KeyNumber)
-			if strings.Contains(bucketname, textLower) {
-				suggs = append(suggs, bucketname)
-			}
+			suggs = append(suggs, string(bucket.KeyNumber))
 		}
 	}
 
@@ -264,7 +258,7 @@ func (es Backend) getArrayAggSuggestions(term string, text string, filters map[s
 		bagSizes := []int{2, 3}
 		// Create a closestmatch object
 		cm := closestmatch.New(suggs, bagSizes)
-		suggs = cm.ClosestN(textLower, SuggestionSize)
+		suggs = cm.ClosestN(text, SuggestionSize)
 	}
 
 	finalSuggs := make([]backend.Suggestion, 0)
@@ -274,4 +268,20 @@ func (es Backend) getArrayAggSuggestions(term string, text string, filters map[s
 	}
 
 	return finalSuggs, nil
+}
+
+// This function simulates case-insensitive regex, because elasticsearch does not allow provide it
+// ZZZ.ZZZ-ZZzzzZZZ" = ".*[zZ][zZ][zZ].[Zz][Zz][zZ]-[zZ][zZ][zZ][zZ][zZ][zZ][zZ][zZ].*"
+func caseInsensitivePattern(term string) string {
+	pattern := ".*"
+	for _, char := range strings.Split(term, "") {
+		lower := strings.ToLower(char)
+		upper := strings.ToUpper(char)
+		if lower != upper {
+			pattern = pattern + "[" + lower + upper + "]"
+		} else {
+			pattern = pattern + char
+		}
+	}
+	return pattern + ".*"
 }

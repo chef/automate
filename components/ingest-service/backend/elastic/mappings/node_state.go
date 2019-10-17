@@ -42,11 +42,14 @@ var nodeProps = `
 	},
 	"node_name": {
 		"type": "keyword",
-		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
 				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
 			}
 		}
 	},
@@ -56,11 +59,14 @@ var nodeProps = `
 	},
 	"organization_name": {
 		"type": "keyword",
-		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
 				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
 			}
 		}
 	},
@@ -129,71 +135,92 @@ var nodeProps = `
 	},
 	"resource_names": {
 		"type": "keyword",
-		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
 				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
 			}
 		}
 	},
 	"error_message": {
 		"type": "keyword",
-		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
 				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
 			}
 		}
 	},
 	"recipes": {
 		"type": "keyword",
-		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
 				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
 			}
 		}
 	},
 	"chef_tags": {
 		"type": "keyword",
-		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
 				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
 			}
 		}
 	},
 	"cookbooks": {
 		"type": "keyword",
-		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
 				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
 			}
 		}
 	},
 	"attributes": {
 		"type": "keyword",
-		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
 				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
 			}
 		}
 	},
 	"platform": {
 		"type": "keyword",
-		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
 				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
 			}
 		}
 	},
@@ -211,11 +238,14 @@ var nodeProps = `
 	},
 	"chef_version": {
 		"type": "keyword",
-		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
 				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
 			}
 		}
 	},
@@ -224,21 +254,27 @@ var nodeProps = `
 	},
 	"environment": {
 		"type": "keyword",
-		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
 				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
 			}
 		}
 	},
 	"roles": {
 		"type": "keyword",
-		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
 				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
 			}
 		}
 	},
@@ -281,41 +317,53 @@ var nodeProps = `
 	},
 	"source_fqdn": {
 		"type": "keyword",
-		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
 				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
 			}
 		}
 	},
 	"policy_group": {
 		"type": "keyword",
-		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
 				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
 			}
 		}
 	},
 	"policy_name": {
 		"type": "keyword",
-		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
 				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
 			}
 		}
 	},
 	"policy_revision": {
 		"type": "keyword",
-		"normalizer": "case_insensitive",
 		"fields": {
 			"engram" : {
 				"type": "text",
 				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
 			}
 		}
 	},
@@ -351,7 +399,7 @@ var nodeProps = `
 
 // NodeState is the representation of our `node-state` Mapping
 var NodeState = Mapping{
-	Index:      "node-state-6",
+	Index:      "node-state-7",
 	Alias:      "node-state",
 	Type:       "node-state",
 	Timeseries: false,

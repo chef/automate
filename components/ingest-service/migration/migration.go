@@ -2,7 +2,6 @@ package migration
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
@@ -15,8 +14,9 @@ import (
 var (
 	// This variable will allow us to add a test so that if the mappings.NodeState.Index
 	// changes we might need to add some migration bits over here
-	a2CurrentNodeStateIndex = "node-state-6" // nolint: varcheck,deadcode
+	a2CurrentNodeStateIndex = "node-state-7" // nolint: varcheck,deadcode
 
+	a2NodeState6Index = "node-state-6"
 	// NodeState 5 index: This change was made since we are now indexing the 'projects' field
 	a2NodeState5Index = "node-state-5"
 
@@ -112,7 +112,22 @@ func (ms *Status) Start() error {
 		ms.update("Starting migration to latest node state index")
 		err = ms.migrateNodeStateToCurrent(a2NodeState5Index)
 		if err != nil {
-			ms.updateErr(err.Error(), "Unable run node-state 4 to current migration")
+			ms.updateErr(err.Error(), "Unable run node-state 5 to current migration")
+			return err
+		}
+		return nil
+	}
+
+	exists, err = ms.hasNodeState6Data()
+	if err != nil {
+		ms.updateErr(err.Error(), "Unable to detect migration status")
+		return err
+	}
+	if exists {
+		ms.update("Starting migration to latest node state index")
+		err = ms.migrateNodeStateToCurrent(a2NodeState6Index)
+		if err != nil {
+			ms.updateErr(err.Error(), "Unable run node-state 6 to current migration")
 			return err
 		}
 		return nil
@@ -130,6 +145,7 @@ func (ms *Status) MigrationNeeded() (bool, error) {
 		nodeStateIndexExists, err3 = ms.client.DoesIndexExists(ms.ctx, nodeStateAliasName)
 		nodeState4Exists, err4     = ms.hasNodeState4Data()
 		nodeState5Exists, err5     = ms.hasNodeState5Data()
+		nodeState6Exists, err6     = ms.hasNodeState6Data()
 	)
 
 	if err1 != nil {
@@ -147,16 +163,19 @@ func (ms *Status) MigrationNeeded() (bool, error) {
 	if err5 != nil {
 		logFatal(err4.Error(), "Error detecting migration status")
 	}
+	if err6 != nil {
+		logFatal(err4.Error(), "Error detecting migration status")
+	}
 
 	// If the node-state alias doesn't exist and it is an index
 	// instead, we might have corrupted data
 	if !nodeStateAliasExists && nodeStateIndexExists {
-		err := errors.New(fmt.Sprintf("Alias %q not found", nodeStateAliasName))
+		err := fmt.Errorf("Alias %q not found", nodeStateAliasName)
 		logFatal(err.Error(), "Data might be corrupted")
 		return false, err
 	}
 
-	if a1Exists || BerlinExists || nodeState4Exists || nodeState5Exists {
+	if a1Exists || BerlinExists || nodeState4Exists || nodeState5Exists || nodeState6Exists {
 		return true, nil
 	}
 
@@ -228,6 +247,10 @@ func (ms *Status) hasNodeState4Data() (bool, error) {
 
 func (ms *Status) hasNodeState5Data() (bool, error) {
 	return ms.client.DoesIndexExists(ms.ctx, a2NodeState5Index)
+}
+
+func (ms *Status) hasNodeState6Data() (bool, error) {
+	return ms.client.DoesIndexExists(ms.ctx, a2NodeState6Index)
 }
 
 func (ms *Status) migrateBerlinToCurrent() error {
