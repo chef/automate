@@ -165,7 +165,7 @@ exit_code = 0
 
 all_files.each do |file|
   require_relative file
-  exit_code = 1 unless Minitest.run
+  exit_code = 1 unless Minitest.run ["--verbose"]
 
   Minitest::Runnable.reset
 end

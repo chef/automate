@@ -442,7 +442,7 @@ test-reporting: ingest-reports-into-es
 
 test-scanner:
 	@printf "\n===> ${blue}Running the scanner integration tests${reset}\n"
-	TEST='[2-5]*_spec.rb' $(MAKE) test
+	TEST='[2-5]*_spec.rb' $(MAKE) --debug=v test
 
 # Run individual tests with: TEST="02_nodes_spec.rb" make test
 # or multiple ones with: TEST="02_*" make test
