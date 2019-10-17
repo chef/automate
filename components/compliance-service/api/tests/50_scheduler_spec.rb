@@ -154,7 +154,7 @@ describe File.basename(__FILE__) do
     # scheduled datetime should be same as dtstart value
     assert_equal(Google::Protobuf::Timestamp.new(seconds: 1861920000, nanos: 0), job2.scheduled_time)
 
-    sleep 60
+    sleep 70
     all_jobs = GRPC jobs, :list, Jobs::Query.new()
     # we should have seven jobs now, the three from above, our scheduled-for-the-future one,
     # our child job from the first one, our child job from the test_count_max_job job
