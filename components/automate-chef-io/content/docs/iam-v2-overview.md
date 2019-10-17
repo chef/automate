@@ -237,3 +237,43 @@ Selecting a project from the list opens the projects's detail page, displaying t
 From there, you can select any individual rule to view its list of conditions, then select a condition to view or update its details.
 
 ![](/images/docs/admin-projects.png)
+
+## Projects in the API
+
+It is also possible to filter APIs by project from the CLI. The following requests as examples of fetching data using project headers as filters.
+
+To use them, first:
+
+- [Create an admin token]({{< relref "iam-v2-api-reference.md#creating-a-token" >}}) and set it to the environment variable `$TOKEN`
+- [Create two projects]({{< relref "iam-v2-api-reference.md#creating-a-project" >}})
+- [Assign IAM resources]({{< relref "iam-v2-guide.md#assigning-resources-to-projects" >}}) to both projects
+- [Assign ingested resources]({{< relref "iam-v2-guide.md#assigning-ingested-resources-to-projects" >}}) to both projects
+
+This request returns a list of teams that belong to `test-project-1`.
+
+```bash
+curl -sH "api-token: $TOKEN" -H "projects: test-project-1" \
+  https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/teams?pretty
+```
+
+This request returns a list of tokens that belong to `test-project-2`.
+
+```bash
+curl -sH "api-token: $TOKEN" -H "projects: test-project-2" \
+  https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/tokens?pretty
+```
+
+This request returns a list of Infrastructure nodes that do not belong to any project.
+Note, the `(unassigned)` project does not need to be created.
+
+```bash
+curl -kH "api-token: $TOKEN" -H "projects: (unassigned)" \
+  https://a2-dev.test/api/v0/cfgmgmt/nodes?pagination.page=1&pagination.size=100&sorting.field=name&sorting.order=ASC
+```
+
+This request returns a list of Compliance nodes that belong to `test-project-1` or `test-project-2`.
+
+```bash
+curl  -kH "api-token: $TOKEN" -H "projects: test-project-1, test-project-2"  -X POST \  
+  https://a2-dev.test/api/v0/compliance/reporting/nodes/search?pretty
+```
