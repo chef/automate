@@ -86,7 +86,8 @@ func (p *pg) CreatePolicy(ctx context.Context, pol *v2.Policy, checkProjects boo
 	}
 
 	projects := pol.Projects
-	if checkProjects {
+	// ensure initial chef-managed policies/roles created
+	if checkProjects && pol.Type == v2.Custom {
 		err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, projects)
 		if err != nil {
 			return nil, p.processError(err)
@@ -703,7 +704,8 @@ func (p *pg) CreateRole(ctx context.Context, role *v2.Role, checkProjects bool) 
 	}
 
 	projects := role.Projects
-	if checkProjects {
+	// ensure initial chef-managed policies/roles created
+	if checkProjects && role.Type == v2.Custom {
 		err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, role.Projects)
 		if err != nil {
 			return nil, p.processError(err)
