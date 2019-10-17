@@ -85,10 +85,10 @@ statement projects | empty not allowed | wildcard allowed     | (unassigned) all
 HTTP request              | Description
 --------------------------|------------
 GET /policies             | lists both *Chef-managed* and *Custom* policies
-GET /policies/***id***    | gets the specified policy
+GET /policies/{**id**}    | gets the specified policy
 POST /policies            | creates a *Custom* policy
-PUT /policies/***id***    | updates a *Custom* policy
-DELETE /policies/***id*** | deletes a *Custom* policy
+PUT /policies/{**id**}    | updates a *Custom* policy
+DELETE /policies/{**id**} | deletes a *Custom* policy
 
 ### Example Policy
 
@@ -188,10 +188,10 @@ For more information, see [Adding Members to a Policy]({{< relref "iam-v2-api-re
 
 HTTP request                           | Description
 ---------------------------------------|------------
-GET /policies/***id***/members         | lists the membership
-PUT /policies/***id***/members         | replaces the membership
-POST /policies/***id***/members:add    | add to the membership
-POST /policies/***id***/members:remove | remove from the membership
+GET /policies/{**id**}/members         | lists the membership
+PUT /policies/{**id**}/members         | replaces the membership
+POST /policies/{**id**}/members:add    | add to the membership
+POST /policies/{**id**}/members:remove | remove from the membership
 
 ### Example Policy Membership Payload
 
@@ -255,10 +255,10 @@ Roles you create are *Custom* roles.
 HTTP request              | Description
 --------------------------|------------
 GET /roles                | lists both *Chef-managed* and *Custom* roles
-GET /roles/***id***       | gets the specified role
+GET /roles/{**id**}       | gets the specified role
 POST /roles               | creates a *Custom* role
-PUT /roles/***id***       | updates a *Custom* role
-DELETE /roles/***id***    | deletes a *Custom* role
+PUT /roles/{**id**}       | updates a *Custom* role
+DELETE /roles/{**id**}    | deletes a *Custom* role
 
 ### Default Chef-managed Roles
 
@@ -341,10 +341,10 @@ Deleting a role is permanent and cannot be undone.
 HTTP request              | Description
 --------------------------|------------
 GET /projects             | lists all projects
-GET /projects/***id***    | gets the specified role
+GET /projects/{**id**}    | gets the specified role
 POST /projects            | creates a project
-PUT /projects/***id***    | updates a project
-DELETE /projects/***id*** | deletes a project
+PUT /projects/{**id**}    | updates a project
+DELETE /projects/{**id**} | deletes a project
 
 ### Example Project
 
@@ -527,12 +527,12 @@ Deleting a project rule is permanent and cannot be undone.
 HTTP request              | Description
 --------------------------|------------
 GET /users                | lists all users
-GET /users/***id***       | gets the specified user
+GET /users/{**id**}       | gets the specified user
 POST /users               | creates a user
-PUT /users/***id***       | updates a user
-DELETE /users/***id***    | deletes a user
-GET /users/***id***/teams | list teams for a user
-PUT /self/***id***        | updates your own user
+PUT /users/{**id**}       | updates a user
+DELETE /users/{**id**}    | deletes a user
+GET /users/{**id**}/teams | list teams for a user
+PUT /self/{**id**}        | updates your own user
 
 ### Example User
 
@@ -604,10 +604,10 @@ Note, it uses the `membership_id` property of the user instead of the user's `id
 HTTP request              | Description
 --------------------------|------------
 GET /teams               | lists all teams
-GET /teams/***id***      | gets the specified team
+GET /teams/{**id**}      | gets the specified team
 POST /teams              | creates a team
-PUT /teams/***id***      | updates a team
-DELETE /teams/***id***   | deletes a team
+PUT /teams/{**id**}      | updates a team
+DELETE /teams/{**id**}   | deletes a team
 
 ### Example Team
 
@@ -675,9 +675,9 @@ A user's GUID is reported in the `membership_id` property when you fetch a user.
 
 HTTP request                           | Description
 ---------------------------------------|------------
-GET /teams/***id***/users              | lists the membership
-POST /teams/***id***/users:add         | add to the membership
-POST /teams/***id***/users:remove      | remove from the membership
+GET /teams/{**id**}/users              | lists the membership
+POST /teams/{**id**}/users:add         | add to the membership
+POST /teams/{**id**}/users:remove      | remove from the membership
 
 ### Example Team Membership Payload
 
@@ -721,10 +721,10 @@ The removed users still exists within Chef Automate, but are no longer associate
 HTTP request              | Description
 --------------------------|------------
 GET /tokens               | lists all tokens
-GET /tokens/***id***      | gets the specified token
+GET /tokens/{**id**}      | gets the specified token
 POST /tokens              | creates a token
-PUT /tokens/***id***      | updates a token
-DELETE /tokens/***id***   | deletes a token
+PUT /tokens/{**id**}      | updates a token
+DELETE /tokens/{**id**}   | deletes a token
 
 ### Example Token
 
