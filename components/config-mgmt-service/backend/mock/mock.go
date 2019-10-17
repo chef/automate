@@ -164,3 +164,13 @@ func (m Backend) GetNodesPageByCurser(context.Context, time.Time,
 	nodes = append(nodes, n)
 	return nodes, nil
 }
+
+func (m Backend) GetRunsPageByCurser(context.Context, string, time.Time,
+	time.Time, map[string][]string, time.Time,
+	string, int, bool) ([]backend.Run, error) {
+	var runs []backend.Run
+	r := *new(backend.Run)
+	r.Environment = "mock"
+	runs = append(runs, r)
+	return runs, nil
+}

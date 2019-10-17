@@ -398,6 +398,26 @@ func (mr *MockCfgMgmtClientMockRecorder) NodeExport(ctx, in interface{}, opts ..
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NodeExport", reflect.TypeOf((*MockCfgMgmtClient)(nil).NodeExport), varargs...)
 }
 
+// ReportExport mocks base method
+func (m *MockCfgMgmtClient) ReportExport(ctx context.Context, in *request.ReportExport, opts ...grpc.CallOption) (CfgMgmt_ReportExportClient, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ReportExport", varargs...)
+	ret0, _ := ret[0].(CfgMgmt_ReportExportClient)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ReportExport indicates an expected call of ReportExport
+func (mr *MockCfgMgmtClientMockRecorder) ReportExport(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReportExport", reflect.TypeOf((*MockCfgMgmtClient)(nil).ReportExport), varargs...)
+}
+
 // MockCfgMgmt_NodeExportClient is a mock of CfgMgmt_NodeExportClient interface
 type MockCfgMgmt_NodeExportClient struct {
 	ctrl     *gomock.Controller
@@ -519,6 +539,129 @@ func (m_2 *MockCfgMgmt_NodeExportClient) RecvMsg(m interface{}) error {
 func (mr *MockCfgMgmt_NodeExportClientMockRecorder) RecvMsg(m interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RecvMsg", reflect.TypeOf((*MockCfgMgmt_NodeExportClient)(nil).RecvMsg), m)
+}
+
+// MockCfgMgmt_ReportExportClient is a mock of CfgMgmt_ReportExportClient interface
+type MockCfgMgmt_ReportExportClient struct {
+	ctrl     *gomock.Controller
+	recorder *MockCfgMgmt_ReportExportClientMockRecorder
+}
+
+// MockCfgMgmt_ReportExportClientMockRecorder is the mock recorder for MockCfgMgmt_ReportExportClient
+type MockCfgMgmt_ReportExportClientMockRecorder struct {
+	mock *MockCfgMgmt_ReportExportClient
+}
+
+// NewMockCfgMgmt_ReportExportClient creates a new mock instance
+func NewMockCfgMgmt_ReportExportClient(ctrl *gomock.Controller) *MockCfgMgmt_ReportExportClient {
+	mock := &MockCfgMgmt_ReportExportClient{ctrl: ctrl}
+	mock.recorder = &MockCfgMgmt_ReportExportClientMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockCfgMgmt_ReportExportClient) EXPECT() *MockCfgMgmt_ReportExportClientMockRecorder {
+	return m.recorder
+}
+
+// Recv mocks base method
+func (m *MockCfgMgmt_ReportExportClient) Recv() (*response.ReportExportData, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Recv")
+	ret0, _ := ret[0].(*response.ReportExportData)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Recv indicates an expected call of Recv
+func (mr *MockCfgMgmt_ReportExportClientMockRecorder) Recv() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Recv", reflect.TypeOf((*MockCfgMgmt_ReportExportClient)(nil).Recv))
+}
+
+// Header mocks base method
+func (m *MockCfgMgmt_ReportExportClient) Header() (metadata.MD, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Header")
+	ret0, _ := ret[0].(metadata.MD)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Header indicates an expected call of Header
+func (mr *MockCfgMgmt_ReportExportClientMockRecorder) Header() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Header", reflect.TypeOf((*MockCfgMgmt_ReportExportClient)(nil).Header))
+}
+
+// Trailer mocks base method
+func (m *MockCfgMgmt_ReportExportClient) Trailer() metadata.MD {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Trailer")
+	ret0, _ := ret[0].(metadata.MD)
+	return ret0
+}
+
+// Trailer indicates an expected call of Trailer
+func (mr *MockCfgMgmt_ReportExportClientMockRecorder) Trailer() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Trailer", reflect.TypeOf((*MockCfgMgmt_ReportExportClient)(nil).Trailer))
+}
+
+// CloseSend mocks base method
+func (m *MockCfgMgmt_ReportExportClient) CloseSend() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CloseSend")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CloseSend indicates an expected call of CloseSend
+func (mr *MockCfgMgmt_ReportExportClientMockRecorder) CloseSend() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CloseSend", reflect.TypeOf((*MockCfgMgmt_ReportExportClient)(nil).CloseSend))
+}
+
+// Context mocks base method
+func (m *MockCfgMgmt_ReportExportClient) Context() context.Context {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Context")
+	ret0, _ := ret[0].(context.Context)
+	return ret0
+}
+
+// Context indicates an expected call of Context
+func (mr *MockCfgMgmt_ReportExportClientMockRecorder) Context() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Context", reflect.TypeOf((*MockCfgMgmt_ReportExportClient)(nil).Context))
+}
+
+// SendMsg mocks base method
+func (m_2 *MockCfgMgmt_ReportExportClient) SendMsg(m interface{}) error {
+	m_2.ctrl.T.Helper()
+	ret := m_2.ctrl.Call(m_2, "SendMsg", m)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SendMsg indicates an expected call of SendMsg
+func (mr *MockCfgMgmt_ReportExportClientMockRecorder) SendMsg(m interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMsg", reflect.TypeOf((*MockCfgMgmt_ReportExportClient)(nil).SendMsg), m)
+}
+
+// RecvMsg mocks base method
+func (m_2 *MockCfgMgmt_ReportExportClient) RecvMsg(m interface{}) error {
+	m_2.ctrl.T.Helper()
+	ret := m_2.ctrl.Call(m_2, "RecvMsg", m)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RecvMsg indicates an expected call of RecvMsg
+func (mr *MockCfgMgmt_ReportExportClientMockRecorder) RecvMsg(m interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RecvMsg", reflect.TypeOf((*MockCfgMgmt_ReportExportClient)(nil).RecvMsg), m)
 }
 
 // MockCfgMgmtServer is a mock of CfgMgmtServer interface
@@ -813,6 +956,20 @@ func (mr *MockCfgMgmtServerMockRecorder) NodeExport(arg0, arg1 interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NodeExport", reflect.TypeOf((*MockCfgMgmtServer)(nil).NodeExport), arg0, arg1)
 }
 
+// ReportExport mocks base method
+func (m *MockCfgMgmtServer) ReportExport(arg0 *request.ReportExport, arg1 CfgMgmt_ReportExportServer) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ReportExport", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ReportExport indicates an expected call of ReportExport
+func (mr *MockCfgMgmtServerMockRecorder) ReportExport(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReportExport", reflect.TypeOf((*MockCfgMgmtServer)(nil).ReportExport), arg0, arg1)
+}
+
 // MockCfgMgmt_NodeExportServer is a mock of CfgMgmt_NodeExportServer interface
 type MockCfgMgmt_NodeExportServer struct {
 	ctrl     *gomock.Controller
@@ -930,4 +1087,123 @@ func (m_2 *MockCfgMgmt_NodeExportServer) RecvMsg(m interface{}) error {
 func (mr *MockCfgMgmt_NodeExportServerMockRecorder) RecvMsg(m interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RecvMsg", reflect.TypeOf((*MockCfgMgmt_NodeExportServer)(nil).RecvMsg), m)
+}
+
+// MockCfgMgmt_ReportExportServer is a mock of CfgMgmt_ReportExportServer interface
+type MockCfgMgmt_ReportExportServer struct {
+	ctrl     *gomock.Controller
+	recorder *MockCfgMgmt_ReportExportServerMockRecorder
+}
+
+// MockCfgMgmt_ReportExportServerMockRecorder is the mock recorder for MockCfgMgmt_ReportExportServer
+type MockCfgMgmt_ReportExportServerMockRecorder struct {
+	mock *MockCfgMgmt_ReportExportServer
+}
+
+// NewMockCfgMgmt_ReportExportServer creates a new mock instance
+func NewMockCfgMgmt_ReportExportServer(ctrl *gomock.Controller) *MockCfgMgmt_ReportExportServer {
+	mock := &MockCfgMgmt_ReportExportServer{ctrl: ctrl}
+	mock.recorder = &MockCfgMgmt_ReportExportServerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockCfgMgmt_ReportExportServer) EXPECT() *MockCfgMgmt_ReportExportServerMockRecorder {
+	return m.recorder
+}
+
+// Send mocks base method
+func (m *MockCfgMgmt_ReportExportServer) Send(arg0 *response.ReportExportData) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Send", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Send indicates an expected call of Send
+func (mr *MockCfgMgmt_ReportExportServerMockRecorder) Send(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Send", reflect.TypeOf((*MockCfgMgmt_ReportExportServer)(nil).Send), arg0)
+}
+
+// SetHeader mocks base method
+func (m *MockCfgMgmt_ReportExportServer) SetHeader(arg0 metadata.MD) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetHeader", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetHeader indicates an expected call of SetHeader
+func (mr *MockCfgMgmt_ReportExportServerMockRecorder) SetHeader(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetHeader", reflect.TypeOf((*MockCfgMgmt_ReportExportServer)(nil).SetHeader), arg0)
+}
+
+// SendHeader mocks base method
+func (m *MockCfgMgmt_ReportExportServer) SendHeader(arg0 metadata.MD) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SendHeader", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SendHeader indicates an expected call of SendHeader
+func (mr *MockCfgMgmt_ReportExportServerMockRecorder) SendHeader(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendHeader", reflect.TypeOf((*MockCfgMgmt_ReportExportServer)(nil).SendHeader), arg0)
+}
+
+// SetTrailer mocks base method
+func (m *MockCfgMgmt_ReportExportServer) SetTrailer(arg0 metadata.MD) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetTrailer", arg0)
+}
+
+// SetTrailer indicates an expected call of SetTrailer
+func (mr *MockCfgMgmt_ReportExportServerMockRecorder) SetTrailer(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetTrailer", reflect.TypeOf((*MockCfgMgmt_ReportExportServer)(nil).SetTrailer), arg0)
+}
+
+// Context mocks base method
+func (m *MockCfgMgmt_ReportExportServer) Context() context.Context {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Context")
+	ret0, _ := ret[0].(context.Context)
+	return ret0
+}
+
+// Context indicates an expected call of Context
+func (mr *MockCfgMgmt_ReportExportServerMockRecorder) Context() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Context", reflect.TypeOf((*MockCfgMgmt_ReportExportServer)(nil).Context))
+}
+
+// SendMsg mocks base method
+func (m_2 *MockCfgMgmt_ReportExportServer) SendMsg(m interface{}) error {
+	m_2.ctrl.T.Helper()
+	ret := m_2.ctrl.Call(m_2, "SendMsg", m)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SendMsg indicates an expected call of SendMsg
+func (mr *MockCfgMgmt_ReportExportServerMockRecorder) SendMsg(m interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMsg", reflect.TypeOf((*MockCfgMgmt_ReportExportServer)(nil).SendMsg), m)
+}
+
+// RecvMsg mocks base method
+func (m_2 *MockCfgMgmt_ReportExportServer) RecvMsg(m interface{}) error {
+	m_2.ctrl.T.Helper()
+	ret := m_2.ctrl.Call(m_2, "RecvMsg", m)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RecvMsg indicates an expected call of RecvMsg
+func (mr *MockCfgMgmt_ReportExportServerMockRecorder) RecvMsg(m interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RecvMsg", reflect.TypeOf((*MockCfgMgmt_ReportExportServer)(nil).RecvMsg), m)
 }
