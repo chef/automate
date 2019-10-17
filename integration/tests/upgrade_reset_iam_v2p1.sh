@@ -33,7 +33,7 @@ do_test_deploy() {
 
     log_info "v1 -> v2.1"
     expect_iam_upgrade_output "Success: Enabled IAM v2.1" \
-        "$(chef-automate iam upgrade-to-v2 --beta2.1 --skip-policy-migration)" || return 1
+        "$(chef-automate iam upgrade-to-v2 --skip-policy-migration)" || return 1
     expect_iam_version "IAM v2.1" || return 1
 
     log_info "v2.1 -> v1"
@@ -42,7 +42,7 @@ do_test_deploy() {
 
     log_info "v1 -> v2.1"
     expect_iam_upgrade_output "Success: Enabled IAM v2.1" \
-        "$(chef-automate iam upgrade-to-v2 --beta2.1 --skip-policy-migration)" || return 1
+        "$(chef-automate iam upgrade-to-v2 --skip-policy-migration)" || return 1
     expect_iam_version "IAM v2.1" || return 1
 
     do_test_deploy_default

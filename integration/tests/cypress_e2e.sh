@@ -25,24 +25,9 @@ do_deploy() {
                 return 1
             fi
             ;;
-        v2)
+        v2.1)
             log_info "run chef-automate iam upgrade-to-v2 --skip-policy-migration"
             if ! output=$(chef-automate iam upgrade-to-v2 --skip-policy-migration); then
-                log_error "Non-zero exit code, output:"
-                log_error "$output"
-                return 1
-            fi
-
-            log_info "generating admin token"
-            if ! token=$(chef-automate iam token create "$timestamp-tok" --admin); then
-                log_error "Non-zero exit code, output:"
-                log_error "$token"
-                return 1
-            fi
-            ;;
-        v2.1)
-            log_info "run chef-automate iam upgrade-to-v2 --skip-policy-migration --beta2.1"
-            if ! output=$(chef-automate iam upgrade-to-v2 --skip-policy-migration --beta2.1); then
                 log_error "Non-zero exit code, output:"
                 log_error "$output"
                 return 1
