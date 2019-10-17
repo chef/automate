@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/olivere/elastic"
 	"github.com/schollz/closestmatch"
 	log "github.com/sirupsen/logrus"
@@ -188,7 +189,7 @@ func (es Backend) getArrayAggSuggestions(term string, text string, filters map[s
 	// multiplying the size by 10 as elasticsearch will sort array aggregations by doc_count. Will trim it back to size once we match it again in go
 	aggs := elastic.NewTermsAggregation().Field(term).Size(SuggestionQuerySize)
 	if len(text) >= 2 {
-		aggs = aggs.Include(caseInsensitivePattern(text))
+		aggs = aggs.Include(createCaseInsensitivePattern(text))
 	}
 	searchSource := elastic.NewSearchSource().
 		Query(boolQuery).
@@ -219,7 +220,7 @@ func (es Backend) getArrayAggSuggestions(term string, text string, filters map[s
 	//		"myagg": {
 	//			"terms": {
 	//				"field": "roles",
-	//				"include":".*base.*",
+	//				"include":".*[bB][aA][sS][eE].*",
 	//				"size": 100
 	//			}
 	//		}
@@ -270,15 +271,22 @@ func (es Backend) getArrayAggSuggestions(term string, text string, filters map[s
 	return finalSuggs, nil
 }
 
-// This function simulates case-insensitive regex, because elasticsearch does not allow provide it
-// ZZZ.ZZZ-ZZzzzZZZ" = ".*[zZ][zZ][zZ].[Zz][Zz][zZ]-[zZ][zZ][zZ][zZ][zZ][zZ][zZ][zZ].*"
-func caseInsensitivePattern(term string) string {
+// This function simulates case-insensitive regex, because elasticsearch does not provide it
+// "ZZZ.ZZZ-ZZzzzZZZ" = ".*[zZ][zZ][zZ].[Zz][Zz][zZ]-[zZ][zZ][zZ][zZ][zZ][zZ][zZ][zZ].*"
+// "bob" = ".*[bB][oO][bB].*"
+func createCaseInsensitivePattern(term string) string {
 	pattern := ".*"
+	regexMetaChars := []string{"*", ".", "?", "+"}
+
+	// Walking through each character and if it is a letter adding [aA]
+	// If it is a regex meta character it is escaped.
 	for _, char := range strings.Split(term, "") {
 		lower := strings.ToLower(char)
 		upper := strings.ToUpper(char)
 		if lower != upper {
 			pattern = pattern + "[" + lower + upper + "]"
+		} else if stringutils.SliceContains(regexMetaChars, char) {
+			pattern = pattern + "\\" + char
 		} else {
 			pattern = pattern + char
 		}

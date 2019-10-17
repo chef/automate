@@ -147,6 +147,51 @@ func TestSuggestionsLargeArrayValues(t *testing.T) {
 			},
 			expected: []string{"zzz.zzz-zzzzzzzz"},
 		},
+		{
+			description: "with regex chars $",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz.$zz-zzzzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz.$zz-zzzzzzzz",
+			},
+			expected: []string{"zzz.$zz-zzzzzzzz"},
+		},
+		{
+			description: "with regex chars *",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz*zz-zzzzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz*zz-zzzzzzzz",
+			},
+			expected: []string{"zzz*zz-zzzzzzzz"},
+		},
+		{
+			description: "with regex chars +",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz+zz-zzzzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz+zz-zzzzzzzz",
+			},
+			expected: []string{"zzz+zz-zzzzzzzz"},
+		},
 	}
 
 	for _, test := range cases {
@@ -167,6 +212,8 @@ func TestSuggestionsLargeArrayValues(t *testing.T) {
 			assert.ElementsMatch(t, test.expected, actualSuggestions)
 		})
 	}
+
+	assert.Fail(t, "testing the tests")
 }
 
 // If there are over one hundred and five attributes that start with the prefix 'zum' and one term 'zum'.
