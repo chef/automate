@@ -13,6 +13,7 @@ import (
 	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/testhelpers"
+	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
 
@@ -131,7 +132,8 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 	defer ts.Shutdown(t, ctx)
 	cl := ts.Authz
 
-	user := "user:local:alice"
+	onlyAssignsAuthorizedProjUser := "user:local:alice"
+	assignsAuthorizedAndUnassignedProjUser := "user:local:severus"
 	authorizedProjectId := "authorized-project"
 	unauthorizedProjectId := "project-not-authorized"
 	unauthorizedProjectId2 := "project-not-authorized-2"
@@ -165,137 +167,219 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 	req := api_v2.CreatePolicyReq{
 		Id:         "policy-2",
 		Name:       "my favorite policy",
-		Members:    []string{user},
+		Members:    []string{onlyAssignsAuthorizedProjUser},
 		Statements: []*api_v2.Statement{&statement},
+		Projects:   []string{authorizedProjectId},
 	}
-	_, err = ts.Policy.CreatePolicy(ctx, &req)
-	require.NoError(t, err)
+
+	statementUnassigned := api_v2.Statement{
+		Effect:    api_v2.Statement_ALLOW,
+		Resources: []string{"*"},
+		Actions:   []string{"iam:projects:assign"},
+		Projects:  []string{unassignedProjectId, authorizedProjectId},
+	}
+	req2 := api_v2.CreatePolicyReq{
+		Id:         "policy-unassigned",
+		Name:       "my unassigned policy",
+		Members:    []string{assignsAuthorizedAndUnassignedProjUser},
+		Statements: []*api_v2.Statement{&statementUnassigned},
+	}
+
+	ctx = auth_context.NewOutgoingContext(auth_context.NewContext(ctx,
+		[]string{"team:local:admins"}, []string{}, "*", "*", "pol"))
 
 	// force sync refresh to load new policies
 	err = ts.PolicyRefresher.Refresh(ctx)
 	require.NoError(t, err)
 
+	_, err = ts.Policy.CreatePolicy(ctx, &req)
+	require.NoError(t, err)
+
+	_, err = ts.Policy.CreatePolicy(ctx, &req2)
+	require.NoError(t, err)
+	// force sync refresh to load new policies
+	err = ts.PolicyRefresher.Refresh(ctx)
+	require.NoError(t, err)
+
+	// type testStruct struct {
+	// 	description string
+	// 	subject     string
+	// 	oldProjects []string
+	// 	newProjects []string
+	// 	isUpdate    bool
+	// 	expectError bool
+	// }
+	// func TestValidateProjectAssignmentAuthorizedOnUpdate(t *testing.T) {
+	// runCases(t, true, testCases)
+	// func TestValidateProjectAssignmentUnauthorizedOnCreate(t *testing.T) {
+	// runCases(t, false, testCases)
+
+
+	//fmt.Sprintf("when moving resource from %s to %s with permission on %s", unassignedProjectId, authorizedProjectId)
+	//fmt.Sprintf("when moving resource from %s to %s with permission on %s", old, new, allowed)
+	// runCases(t, isUpdate, testCases)
+	// on update w/ access to both
+	// on create w/ access to both
+	// on update with access to auth
+	// on create w/ access to auth
+	// on update w/ access to unass
+	// on create w/ access to unass
+
+	// unassigned -> authorized
+	// unassigned -> unauthorized
+	// unassigned -> authorized, unauthorized
+	// authorized -> unassigned
+	// authorized -> unauthorized
+	// authorized -> authorized, unauthorized
+	// unauthorized -> unassigned
+	// unauthorized -> unauthorized
+	// unauthorized -> authorized, unauthorized
+	// unauthorized, authorized -> unassigned
+	// unauthorized, authorized -> authorized, unauthorized
+	// unauthorized, authorized -> authorized, unauthorized
+
+	// cases2 := []testStruct{}
 	// if any projects are non-existed, NotFound is returned.
 	// avoids a potentially expensive authz call.
 	cases := map[string]func(*testing.T){
-		// deletes resulting unassigned when not allowed to assign to unassigned
-		// assigns to unassigned when not allowed to assign to unassigned
+		// cases for (unassigned)
 		"when assigning (unassigned) is allowed, from unassigned to authorized project": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:        []string{user},
+				Subjects:        []string{assignsAuthorizedAndUnassignedProjUser},
 				OldProjects:     []string{},
 				NewProjects:     []string{authorizedProjectId},
 				IsUpdateRequest: false,
 			})
 			assert.NoError(t, err)
-		},
-		"when assigning (unassigned) is not allowed, from unassigned to authorized project": func(t *testing.T) {
-			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:        []string{user},
-				OldProjects:     []string{},
-				NewProjects:     []string{authorizedProjectId},
-				IsUpdateRequest: false,
-			})
-			grpctest.AssertCode(t, codes.PermissionDenied, err)
-			assert.Contains(t, err.Error(), unauthorizedProjectId)
 		},
 		"when assigning (unassigned) is allowed, from authorized project to unassigned": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:        []string{user},
+				Subjects:        []string{assignsAuthorizedAndUnassignedProjUser},
 				OldProjects:     []string{authorizedProjectId},
 				NewProjects:     []string{},
 				IsUpdateRequest: false,
 			})
 			assert.NoError(t, err)
 		},
+		"when assigning (unassigned) is allowed, from unassigned to unauthorized": func(t *testing.T) {
+			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
+				Subjects:        []string{assignsAuthorizedAndUnassignedProjUser},
+				OldProjects:     []string{unauthorizedProjectId},
+				NewProjects:     []string{},
+				IsUpdateRequest: true,
+			})
+			require.Error(t, err)
+			grpctest.AssertCode(t, codes.PermissionDenied, err)
+			assert.Contains(t, err.Error(), unauthorizedProjectId)
+			assert.NotContains(t, err.Error(), unassignedProjectId)
+		},
+		"when assigning (unassigned) is not allowed, from unassigned to authorized project": func(t *testing.T) {
+			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
+				Subjects:        []string{onlyAssignsAuthorizedProjUser},
+				OldProjects:     []string{},
+				NewProjects:     []string{authorizedProjectId},
+				IsUpdateRequest: true,
+			})
+			require.Error(t, err)
+			grpctest.AssertCode(t, codes.PermissionDenied, err)
+			assert.Contains(t, err.Error(), unassignedProjectId)
+		},
 		"when assigning (unassigned) is not allowed, from authorized project to unassigned": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:        []string{user},
+				Subjects:        []string{onlyAssignsAuthorizedProjUser},
 				OldProjects:     []string{authorizedProjectId},
 				NewProjects:     []string{},
-				IsUpdateRequest: false,
+				IsUpdateRequest: true,
 			})
+			require.Error(t, err)
 			grpctest.AssertCode(t, codes.PermissionDenied, err)
 			assert.Contains(t, err.Error(), unassignedProjectId)
 		},
 		"when passed one unauthorized project": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:        []string{user},
+				Subjects:        []string{onlyAssignsAuthorizedProjUser},
 				OldProjects:     []string{authorizedProjectId},
 				NewProjects:     []string{unauthorizedProjectId},
 				IsUpdateRequest: false,
 			})
+			require.Error(t, err)
 			grpctest.AssertCode(t, codes.PermissionDenied, err)
 			assert.Contains(t, err.Error(), unauthorizedProjectId)
 		},
 		"when passed one non-existent project": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:        []string{user},
+				Subjects:        []string{onlyAssignsAuthorizedProjUser},
 				OldProjects:     []string{authorizedProjectId},
 				NewProjects:     []string{notFoundProjectId},
 				IsUpdateRequest: false,
 			})
+			require.Error(t, err)
 			grpctest.AssertCode(t, codes.NotFound, err)
 			assert.Contains(t, err.Error(), notFoundProjectId)
 		},
 		"when passed two non-existent projects and one unauthorized": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:        []string{user},
+				Subjects:        []string{onlyAssignsAuthorizedProjUser},
 				OldProjects:     []string{authorizedProjectId},
 				NewProjects:     []string{notFoundProjectId, "also-not-found"},
 				IsUpdateRequest: false,
 			})
+			require.Error(t, err)
 			grpctest.AssertCode(t, codes.NotFound, err)
 			assert.Contains(t, err.Error(), notFoundProjectId, "also-not-found")
 			assert.NotContains(t, err.Error(), unauthorizedProjectId)
 		},
 		"when passed one authorized and one non-existent project": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:        []string{user},
+				Subjects:        []string{onlyAssignsAuthorizedProjUser},
 				OldProjects:     []string{authorizedProjectId},
 				NewProjects:     []string{authorizedProjectId, notFoundProjectId},
 				IsUpdateRequest: false,
 			})
+			require.Error(t, err)
 			grpctest.AssertCode(t, codes.NotFound, err)
 			assert.Contains(t, err.Error(), notFoundProjectId)
 			assert.NotContains(t, err.Error(), authorizedProjectId)
 		},
 		"when passed one unauthorized project and one non-existent project": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:        []string{user},
+				Subjects:        []string{onlyAssignsAuthorizedProjUser},
 				OldProjects:     []string{authorizedProjectId},
 				NewProjects:     []string{unauthorizedProjectId, notFoundProjectId},
 				IsUpdateRequest: false,
 			})
+			require.Error(t, err)
 			grpctest.AssertCode(t, codes.NotFound, err)
 			assert.Contains(t, err.Error(), notFoundProjectId)
 			assert.NotContains(t, err.Error(), unauthorizedProjectId)
 		},
 		"when passed one unauthorized project and one authorized project": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:        []string{user},
+				Subjects:        []string{onlyAssignsAuthorizedProjUser},
 				OldProjects:     []string{authorizedProjectId},
 				NewProjects:     []string{unauthorizedProjectId, authorizedProjectId},
 				IsUpdateRequest: false,
 			})
+			require.Error(t, err)
 			grpctest.AssertCode(t, codes.PermissionDenied, err)
 			assert.Contains(t, err.Error(), unauthorizedProjectId)
 			assert.NotContains(t, err.Error(), authorizedProjectId)
 		},
 		"when passed two unauthorized projects and one authorized project": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:        []string{user},
+				Subjects:        []string{onlyAssignsAuthorizedProjUser},
 				OldProjects:     []string{authorizedProjectId},
 				NewProjects:     []string{unauthorizedProjectId, authorizedProjectId},
 				IsUpdateRequest: false,
 			})
+			require.Error(t, err)
 			grpctest.AssertCode(t, codes.PermissionDenied, err)
 			assert.Contains(t, err.Error(), unauthorizedProjectId, unauthorizedProjectId2)
 			assert.NotContains(t, err.Error(), authorizedProjectId)
 		},
 		"when passed one authorized project": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:        []string{user},
+				Subjects:        []string{onlyAssignsAuthorizedProjUser},
 				OldProjects:     []string{authorizedProjectId},
 				NewProjects:     []string{authorizedProjectId},
 				IsUpdateRequest: false,
@@ -318,53 +402,48 @@ func TestIntegrationFilterAuthorizedProjectsWithSystemPolicies(t *testing.T) {
 	ts := setupWithOPAV2p1(t)
 	defer ts.Shutdown(t, ctx)
 
-	cases := []struct {
-		desc string
-		f    func(*testing.T)
-	}{
-		{"user should only get projects they have non-system level access to", func(t *testing.T) {
-			_, err := ts.Projects.CreateProject(ctx, &api_v2.CreateProjectReq{
-				Id:   "project-1",
-				Name: "name1",
-			})
-			require.NoError(t, err)
-
-			statement := api_v2.Statement{
-				Effect:    api_v2.Statement_ALLOW,
-				Resources: []string{"infra:nodes:*"},
-				Actions:   []string{"infra:nodes:get", "infra:nodes:list"},
-				Projects:  []string{"project-1"},
-			}
-			req := api_v2.CreatePolicyReq{
-				Id:         "policy1",
-				Name:       "my favorite policy",
-				Members:    []string{"user:local:alice"},
-				Statements: []*api_v2.Statement{&statement},
-			}
-			_, err = ts.Policy.CreatePolicy(ctx, &req)
-			require.NoError(t, err)
-
-			// force sync refresh
-			err = ts.PolicyRefresher.Refresh(ctx)
-			require.NoError(t, err)
-
-			resp, err := ts.Authz.FilterAuthorizedProjects(ctx,
-				&api_v2.FilterAuthorizedProjectsReq{
-					Subjects: []string{"user:local:alice"},
-				})
-			require.NoError(t, err)
-
-			assert.ElementsMatch(t, []string{"project-1"}, resp.Projects)
-		}},
-	}
-
-	rand.Shuffle(len(cases), func(i, j int) {
-		cases[i], cases[j] = cases[j], cases[i]
+	_, err := ts.Projects.CreateProject(ctx, &api_v2.CreateProjectReq{
+		Id:   "project-1",
+		Name: "name1",
 	})
+	require.NoError(t, err)
 
-	for _, test := range cases {
-		t.Run(test.desc, test.f)
+	ctx = auth_context.NewOutgoingContext(auth_context.NewContext(ctx,
+		[]string{"team:local:admins"}, []string{}, "*", "*", "pol"))
+
+	statement := api_v2.Statement{
+		Effect:    api_v2.Statement_ALLOW,
+		Resources: []string{"infra:nodes:*"},
+		Actions:   []string{"infra:nodes:get", "infra:nodes:list"},
+		Projects:  []string{"project-1"},
 	}
+	req := api_v2.CreatePolicyReq{
+		Id:         "policy1",
+		Name:       "my favorite policy",
+		Members:    []string{"user:local:jane"},
+		Statements: []*api_v2.Statement{&statement},
+	}
+
+	// force sync refresh to load new policies
+	err = ts.PolicyRefresher.Refresh(ctx)
+	require.NoError(t, err)
+
+	_, err = ts.Policy.CreatePolicy(ctx, &req)
+	require.NoError(t, err)
+
+	// force sync refresh
+	err = ts.PolicyRefresher.Refresh(ctx)
+	require.NoError(t, err)
+
+	t.Run("user should only get projects they have non-system level access to", func(t *testing.T) {
+		resp, err := ts.Authz.FilterAuthorizedProjects(ctx,
+			&api_v2.FilterAuthorizedProjectsReq{
+				Subjects: []string{"user:local:jane"},
+			})
+		require.NoError(t, err)
+
+		assert.ElementsMatch(t, []string{"project-1"}, resp.Projects)
+	})
 }
 
 func TestIntegrationRuleApplyAndList(t *testing.T) {
@@ -697,3 +776,24 @@ func setupWithOPAV2pX(t *testing.T, twoPointOne bool) *testhelpers.TestFramework
 	require.NoError(t, err)
 	return tf
 }
+
+// func buildCase(isUpdate bool, user string, expectError bool, old, new, allowed []string{}) testStruct {
+// desc := fmt.Sprintf("when moving resource from %s to %s with permission on %s", old, new, allowed)
+// c := testStruct{
+// 		description: desc,
+// 		subject: user,
+// 		oldProjects: old,
+// 		newProjects: new,
+// 		isUpdate: isUpdate,
+// 		expectError: expectError,
+// }
+// }
+// 	return TestStruct{
+// 		description: desc,
+// 		subject: user,
+// 		oldProjects: old,
+// 		newProjects: new,
+// 		isUpdate: isUpdate,
+// 		expectError: expectError,
+// 	}
+// }
