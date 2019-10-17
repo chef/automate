@@ -21,12 +21,10 @@ import (
 // ConvertParamToNodeRunBackend Transforms a parameter provided by consumers
 // into a parameter that the 'backend' can understand.
 //
-// We HAVE to use this function on every parameter query that we collect
+// This is used for query of the node-state only for sorting and the converge-history index.
 func ConvertParamToNodeRunBackend(parameter string) string {
 	switch parameter {
-	case "id":
-		return backend.Id
-	case "node_id":
+	case "id", "node_id":
 		return backend.Id
 	case "name":
 		return backend.Name
@@ -34,7 +32,7 @@ func ConvertParamToNodeRunBackend(parameter string) string {
 		return backend.Cookbook
 	case "attribute":
 		return backend.Attribute
-	case "resource_name":
+	case "resource_name", "resource_names":
 		return backend.ResourceName
 	case "recipe":
 		return backend.Recipe
@@ -48,8 +46,62 @@ func ConvertParamToNodeRunBackend(parameter string) string {
 		return backend.ChefTags
 	case "error":
 		return backend.ErrorMessage
-	case "chef_server":
+	case "chef_server", "source_fqdn":
 		return backend.ChefServer
+	case "environment":
+		return backend.Environment
+	case "platform":
+		return backend.Platform
+	case "policy_group":
+		return backend.PolicyGroup
+	case "policy_name":
+		return backend.PolicyName
+	case "policy_revision":
+		return backend.PolicyRevision
+	default:
+		return parameter
+	}
+}
+
+// ConvertParamToNodeStateBackendLowerFilter -
+// The fields for the Elasticsearch mapping of node-state index.
+// This is using the ".lower" values to match on fields case-insensitively
+func ConvertParamToNodeStateBackendLowerFilter(parameter string) string {
+	switch parameter {
+	case "id", "node_id":
+		return backend.Id
+	case "name":
+		return backend.Name + ".lower"
+	case "cookbook":
+		return backend.Cookbook + ".lower"
+	case "attribute":
+		return backend.Attribute + ".lower"
+	case "resource_name", "resource_names":
+		return backend.ResourceName + ".lower"
+	case "recipe":
+		return backend.Recipe + ".lower"
+	case "organization":
+		return backend.Organization + ".lower"
+	case "role":
+		return backend.Role + ".lower"
+	case "chef_version":
+		return backend.ChefVersion + ".lower"
+	case "chef_tags":
+		return backend.ChefTags + ".lower"
+	case "error":
+		return backend.ErrorMessage + ".lower"
+	case "chef_server", "source_fqdn":
+		return backend.ChefServer + ".lower"
+	case "environment":
+		return backend.Environment + ".lower"
+	case "platform":
+		return backend.Platform + ".lower"
+	case "policy_group":
+		return backend.PolicyGroup + ".lower"
+	case "policy_name":
+		return backend.PolicyName + ".lower"
+	case "policy_revision":
+		return backend.PolicyRevision + ".lower"
 	default:
 		return parameter
 	}
@@ -68,28 +120,6 @@ func ConvertParamToActionBackend(parameter string) string {
 	default:
 		return parameter
 	}
-}
-
-// FormatNodeFilters Will receive an array of filters and will format them into a map of strings
-// To be used on filtering Node Runs
-//
-// Example:
-//   [
-//    "environment:adios",
-//    "environment:hola",
-//    "cookbook:awesome",
-//    "roles:lalala",
-//   ]
-//
-// The returned filters would look like:
-//
-// map[string][]string [
-// 	"environment": ["adios","hola"],
-// 	"cookbook": ["awesome"],
-// 	"roles": ["lalala"],
-// ]
-func FormatNodeFilters(filters []string) (map[string][]string, error) {
-	return stringutils.FormatFiltersWithKeyConverter(filters, ConvertParamToNodeRunBackend)
 }
 
 // FormatActionFilters Will receive an array of filters and will format them into a map of strings

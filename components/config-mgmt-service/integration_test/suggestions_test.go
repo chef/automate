@@ -48,8 +48,8 @@ func TestSuggestionsWithAnInvalidTypeReturnsError(t *testing.T) {
 func TestSuggestionsLargeArrayValues(t *testing.T) {
 
 	ctx := context.Background()
-	terms := make([]string, 10)
-	for index := 0; index < 10; index++ {
+	terms := make([]string, 105)
+	for index := 0; index < 105; index++ {
 		terms[index] = "a_" + strconv.Itoa(index)
 	}
 
@@ -88,7 +88,7 @@ func TestSuggestionsLargeArrayValues(t *testing.T) {
 			expected: []string{"zum.epel-debuginfo.gpgcheck"},
 		},
 		{
-			description: "case sensitive 0",
+			description: "case sensitive Organization",
 			nodes: []iBackend.Node{
 				{
 					NodeInfo: iBackend.NodeInfo{
@@ -212,8 +212,6 @@ func TestSuggestionsLargeArrayValues(t *testing.T) {
 			assert.ElementsMatch(t, test.expected, actualSuggestions)
 		})
 	}
-
-	assert.Fail(t, "testing the tests")
 }
 
 // If there are over one hundred and five attributes that start with the prefix 'zum' and one term 'zum'.

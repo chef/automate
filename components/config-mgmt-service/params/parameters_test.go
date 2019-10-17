@@ -16,14 +16,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFormatFiltersEmptyArray(t *testing.T) {
-	empty := make([]string, 0)
-	expected := make(map[string][]string, 0)
-	filters, err := subject.FormatNodeFilters(empty)
-	assert.Nil(t, err)
-	assert.Equal(t, expected, filters)
-}
-
 func TestStringDateRangeToTimeWithInvalidDatesReturnFalse(t *testing.T) {
 	cases := []string{
 		"01-01-2017", // DD-MM-YYYY
