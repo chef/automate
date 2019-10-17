@@ -13,6 +13,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
+	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/authn-service/server"
 	"github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/authz/project_purge"
@@ -146,7 +147,14 @@ func serve(cmd *cobra.Command, args []string) error {
 		LegacyDataCollectorToken: c.LegacyDataCollectorToken,
 	}
 
-	serv, err := server.NewServer(context.Background(), serverConfig)
+	// TODO (tc): We are dialing twice now. We should move all the client dials out here.
+	authzConn, err := factory.Dial("authz-service", c.AuthzAddress)
+	if err != nil {
+		return errors.Wrapf(err, "dial authz-service (%s)", c.AuthzAddress)
+	}
+	authzV2Client := authz_v2.NewAuthorizationClient(authzConn)
+
+	serv, err := server.NewServer(context.Background(), serverConfig, authzV2Client)
 	if err != nil {
 		return errors.Wrap(err, "failed to initialize server")
 	}

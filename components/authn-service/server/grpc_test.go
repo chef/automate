@@ -72,12 +72,6 @@ func newTestGRPCServer(ctx context.Context,
 	t *testing.T, config Config) (*grpc.ClientConn, func(), *authz.SubjectPurgeServerMock) {
 	t.Helper()
 
-	serviceCerts := helpers.LoadDevCerts(t, "authn-service")
-	serv, err := NewServer(ctx, config)
-	if err != nil {
-		t.Fatalf("instantiate server: %s", err)
-	}
-
 	authzCerts := helpers.LoadDevCerts(t, "authz-service")
 	authzConnFactory := secureconn.NewFactory(*authzCerts)
 	grpcAuthz := authzConnFactory.NewServer()
@@ -89,6 +83,12 @@ func newTestGRPCServer(ctx context.Context,
 	require.NoError(t, err)
 	authzSubjectClient := authz.NewSubjectPurgeClient(authzConn)
 	authzV2Client := authz_v2.NewAuthorizationClient(authzConn)
+
+	serviceCerts := helpers.LoadDevCerts(t, "authn-service")
+	serv, err := NewServer(ctx, config, authzV2Client)
+	if err != nil {
+		t.Fatalf("instantiate server: %s", err)
+	}
 
 	authnServer := grpctest.NewServer(serv.NewGRPCServer(authzSubjectClient, authzV2Client))
 

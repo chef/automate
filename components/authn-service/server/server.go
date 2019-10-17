@@ -55,8 +55,8 @@ type Server struct {
 }
 
 // NewServer constructs a server from the provided config.
-func NewServer(ctx context.Context, c Config) (*Server, error) {
-	return newServer(ctx, c)
+func NewServer(ctx context.Context, c Config, authzV2Client authz_v2.AuthorizationClient) (*Server, error) {
+	return newServer(ctx, c, authzV2Client)
 }
 
 // Serve tells authn to start responding to GRPC and HTTP1 requests. On success, it never returns.
@@ -103,7 +103,7 @@ func (s *Server) ServeHTTP1(pbmux *runtime.ServeMux, http1Endpoint string) error
 	return http.ListenAndServe(http1Endpoint, httpmux)
 }
 
-func newServer(ctx context.Context, c Config) (*Server, error) {
+func newServer(ctx context.Context, c Config, authzV2Client authz_v2.AuthorizationClient) (*Server, error) {
 	// Users shouldn't see this, but gives you a clearer error message if you
 	// don't configure things correctly in testing.
 	if c.ServiceCerts == nil {
@@ -133,8 +133,6 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "dial authz-service (%s)", c.AuthzAddress)
 	}
-
-	authzV2Client := authz_v2.NewAuthorizationClient(authzConn)
 
 	var ts tokens.Storage
 	if c.Token != nil {

@@ -2,6 +2,7 @@ package integration
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -90,7 +91,11 @@ func TestChefClientAuthn(t *testing.T) {
 		ServiceCerts: serviceCerts,
 	}
 
-	serv, err := server.NewServer(ctx, config)
+	subjectPurgeClient, authorizationClient, close := newAuthzMock(t)
+	fmt.Printf("pointer %v\n", authorizationClient)
+	defer close()
+
+	serv, err := server.NewServer(ctx, config, authorizationClient)
 	if err != nil {
 		// SKIP these tests if there's no PG_URL given -- and never skip during CI!
 		if pgURLGiven || os.Getenv("CI") == "true" {
@@ -102,9 +107,6 @@ func TestChefClientAuthn(t *testing.T) {
 		}
 		t.Fatalf("opening connector: %s", err)
 	}
-
-	subjectPurgeClient, authorizationClient, close := newAuthzMock(t)
-	defer close()
 
 	// start services: local mgmt REST interface, and proxy service, and
 	// authenticate endpoint
@@ -132,18 +134,16 @@ func TestChefClientAuthn(t *testing.T) {
 		t.Run(test.desc, func(t *testing.T) {
 
 			var myTokenID string
-
 			// set up a token to authenticate with
-			{
-				resp, err := tokenClient.CreateToken(ctx, &authn.CreateTokenReq{Active: true, Description: "mytoken", Projects: []string{}})
-				if err != nil {
-					t.Fatalf("create token request: %s", err)
-				}
-
-				// Note: technically, we already have the token's value in this response. We are going to go grab
-				// it in the next step any, to ensure that flow works.
-				myTokenID = resp.GetId()
+			fmt.Println("TEST ABOUT TO RUN")
+			resp, err := tokenClient.CreateToken(ctx, &authn.CreateTokenReq{Active: true, Description: "mytoken", Projects: []string{}})
+			if err != nil {
+				t.Fatalf("create token request: %s", err)
 			}
+
+			// Note: technically, we already have the token's value in this response. We are going to go grab
+			// it in the next step any, to ensure that flow works.
+			myTokenID = resp.GetId()
 
 			// read back token
 			var myTokenValue string
@@ -226,6 +226,7 @@ func newAuthzMock(t *testing.T) (authz.SubjectPurgeClient, authz_v2.Authorizatio
 	mockCommon := authz.NewSubjectPurgeServerMock()
 	mockCommon.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
 	authz.RegisterSubjectPurgeServer(g, mockCommon)
+	authz_v2.RegisterAuthorizationServer(g, mockV2Authz)
 	authzServer := grpctest.NewServer(g)
 	conn, err := connFactory.Dial("authz-service", authzServer.URL)
 	require.NoError(t, err)
@@ -240,5 +241,6 @@ func defaultMockPurgeFunc(context.Context,
 
 func defaultValidateProjectAssignmentFunc(context.Context,
 	*authz_v2.ValidateProjectAssignmentReq) (*authz_v2.ValidateProjectAssignmentResp, error) {
+	fmt.Println("WE IN HEREWE IN HEREWE IN HEREWE IN HEREWE IN HEREWE IN HEREWE IN HEREWE IN HEREWE IN HEREWE IN HEREWE IN HEREWE IN HERE")
 	return &authz_v2.ValidateProjectAssignmentResp{}, nil
 }
