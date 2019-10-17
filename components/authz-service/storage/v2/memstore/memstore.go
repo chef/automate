@@ -48,6 +48,7 @@ func (s *State) CreatePolicy(_ context.Context, inputPol *storage.Policy, checkP
 			return nil, storage_errors.ErrConflict
 		}
 	}
+
 	copyPol := *inputPol
 	if err := s.policies.Add(inputPol.ID, &copyPol, cache.NoExpiration); err != nil {
 		return nil, storage_errors.ErrConflict
