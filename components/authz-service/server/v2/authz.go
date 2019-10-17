@@ -343,13 +343,14 @@ func (v *VersionSwitch) Interceptor(ctx context.Context,
 
 	// These methods skip the check, though they are in the relevant service
 	// definition:
-	switch info.FullMethod {
-	case "/chef.automate.domain.authz.Authorization/GetVersion":
+	fullMethod := info.FullMethod
+	if strings.HasSuffix(fullMethod, "GetVersion") ||
+		strings.HasSuffix(fullMethod, "ValidateProjectAssignment") {
 		return handler(ctx, req)
 	}
 
-	v1Req := strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.Authorization/")
-	v2Req := strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.v2.Authorization/")
+	v1Req := strings.HasPrefix(fullMethod, "/chef.automate.domain.authz.Authorization/")
+	v2Req := strings.HasPrefix(fullMethod, "/chef.automate.domain.authz.v2.Authorization/")
 
 	if v.Version.Major == api.Version_V2 && v1Req {
 		st := status.New(codes.FailedPrecondition, "authz-service set to v2")
