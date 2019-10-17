@@ -212,7 +212,13 @@ func (s *authzServer) ValidateProjectAssignment(
 	}
 
 	newProjects := req.NewProjects
+	if len(newProjects) == 0 {
+		newProjects = []string{}
+	}
 	oldProjects := req.OldProjects
+	if len(oldProjects) == 0 {
+		oldProjects = []string{}
+	}
 
 	if len(newProjects) != 0 {
 		err := s.store.EnsureNoProjectsMissing(ctx, newProjects)
