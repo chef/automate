@@ -8,3 +8,4 @@
 - [`06_add-filter-function.up.sql`](06_add-filter-function.up.sql)
 - [`07_add_db_id_field.up.sql`](07_add_db_id_field.up.sql)
 - [`08_update_admin_team_name.up.sql`](08_update_admin_team_name.up.sql)
+- [`09_reset_projects.up.sql`](09_reset_projects.up.sql)
