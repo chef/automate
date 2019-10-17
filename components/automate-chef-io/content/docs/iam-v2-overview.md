@@ -111,7 +111,7 @@ A role is a named list of actions.
 This provides the benefits of *encapsulation* (only needing to know the name and not be encumbered by all the details after initial definition) and *reuse* (apply the role to any statement that needs it).
 
 Chef Automate has 5 default roles.
-To see the actions comprising the roles see [Chef-managed Roles]({{< relref "iam-v2-api-reference.md#roles" >}}).
+To see the actions comprising the roles see [Chef-managed Roles]({{< relref "iam-v2-api-reference.md#default-chef-managed-roles" >}}).
 
 Role          | Description
 --------------|------------

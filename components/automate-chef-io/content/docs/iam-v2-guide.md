@@ -74,7 +74,7 @@ Note that you could also add users directly to policies without the intermediate
 
 #### Create Users
 
-Follow [Creating Users]({{< relref "users.md#creating-users" >}}) to:
+Follow [Creating Users]({{< relref "users.md#manage-local-users-from-the-ui" >}}) to:
 
 * Create a local user with the username `test_viewer`.
 * Create a local user with the username `test_editor`.
@@ -140,7 +140,7 @@ The statement allows us to specify the `actions` a user is permitted to take on 
 The `projects` field on a statement is an array that may contain more than one existing project, a wildcard `*` to indicate permission to resources in _any project_, or `(unassigned)` to indicate permission to resources that have not been assigned to a project.
 
 Note that the `projects` property in statements designates permission for the resources within the statement (here, that is `iam:users` and `iam:teams`), _not_ for the policy itself, and _cannot_ be left empty.
-For more about projects, please see [Projects]({{< relref "iam-v2-guide.md#projects" >}}) or [Notes on the Projects Property](iam-v2-guide.md#projects-property).
+For more about projects, please see [Projects]({{< relref "iam-v2-guide.md#projects" >}}) or [Projects Property]({{< relref "iam-v2-api-reference/#projects-property" >}}).
 
 In this case, we only need a single statement providing access to the _get_, _list_, and _update_ actions for _users_ and _teams_ that have been assigned to the project `project-devops`.
 
@@ -386,7 +386,7 @@ The role Project Owner allows admin users to delegate management of project memb
 "iam:users:list"
 ```
 
-In order to create a Project Owner, you can use an existing user, or create a user with username `test_project_owner` by following [Creating Users]({{< relref "users.md#creating-users" >}}).
+In order to create a Project Owner, you can use an existing user, or create a user with username `test_project_owner` by following [Creating Users]({{< relref "users.md#manage-local-users-from-the-ui" >}}).
 
 Next, you will create a policy that gives `test_project_owner` the role of `project-owner` for your new project. The policy will look like the JSON below:
 
@@ -466,7 +466,7 @@ See [Policy Membership]({{< relref "iam-v2-api-reference.md#policy-membership" >
 
 ## Restoring Admin Access
 
-While we have [safeguards]({{< relref "iam-v2-overview.md#policy-types" >}}) to prevent it, it is possible to lock yourself out of Chef Automate.
+While we have safeguards to prevent it, it is possible to lock yourself out of Chef Automate.
 If you have root access to the node where Chef Automate is installed, use the following commands to restore admin access:
 
 This command, which is also available on IAM v1, resets the local `admin` user's password and ensures that user is a member of the local `admins` team, which is a permanent member of the Chef-managed `Administrator` policy.

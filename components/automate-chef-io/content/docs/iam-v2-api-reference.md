@@ -28,7 +28,6 @@ With the plugin installed, this TOC will update automatically when you save the 
 - [Teams](#teams)
 - [Team Membership](#team-membership)
 - [Tokens](#tokens)
-- [Restoring Admin Access](#restoring-admin-access)
 
 <!-- /TOC -->
 
@@ -182,10 +181,10 @@ Deleting a policy is permanent and cannot be undone.
 
 Chef Automate supports two methods for updating policy membership.
 
-Using `PUT` lets you set membership for the entire policy; see [Setting Policy Membership]({{< relref "iam-v2-api-reference.md#setting-policy-membership" >}}).
+Using `PUT` lets you set membership for the entire policy; see [Updating All Members On a Policy]({{< relref "iam-v2-api-reference/#updating-all-members-on-a-policy" >}}).
 
 Using `POST` lets you add members to (or remove members from) an existing membership list.
-For more information, see [Adding Members to Policies]({{< relref "iam-v2-api-reference.md#adding-members-to-policies" >}}) and [Removing Members from Policies]({{< relref "iam-v2-api-reference.md#removing-members-from-policies" >}}).
+For more information, see [Adding Members to a Policy]({{< relref "iam-v2-api-reference/#adding-members-to-a-policy" >}}) and [Removing Members from a Policy]({{< relref "iam-v2-api-reference/#removing-members-from-a-policy" >}}).
 
 HTTP request                           | Description
 ---------------------------------------|------------
