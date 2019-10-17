@@ -22,7 +22,7 @@
                   <span class="label">Type<span aria-hidden="true">*</span></span>
                   <select id="expression-type-dropdown"
                           ngDefaultControl 
-                          (change)="updateFormDisplay('identity')"
+                          (change)="updateFormDisplay('type')"
                           formControlName="type">
                     <option value='user'>User</option>
                     <option value='team'>Team</option>
@@ -37,13 +37,13 @@
 
               <chef-form-field 
                 id="create-identity" 
-                *ngIf="showIdentity === true"
+                *ngIf="expressionForm.contains('identity')"
                 [@dropInAnimation]="{ value: triggerValue, params: { height: 74.6875 }}" >
                 <label>
                   <span class="label">Identity Provider<span aria-hidden="true">*</span></span>
                   <select id="expression-identity-dropdown" 
                           ngDefaultControl 
-                          (change)="updateFormDisplay('name')"
+                          (change)="updateFormDisplay('identity')"
                           formControlName="identity">
                     <option value="ldap">LDAP</option>
                     <option value="local">local</option>
@@ -58,13 +58,13 @@
 
               <chef-form-field 
                 id="create-name" 
-                *ngIf="showName === true"
+                *ngIf="expressionForm.contains('name')"
                 [@dropInAnimation]="{ value: triggerValue, params: { height: 119.427 }}">
                 <label>
                   <span class="label">{{ nameOrId }}<span aria-hidden="true">*</span></span>
                   <chef-input id="expression-name-dropdown" 
                               ngDefaultControl 
-                              (keyup)="updateFormDisplay()"
+                              (keyup)="updateFormDisplay('name')"
                               formControlName="name"></chef-input>
                 </label>
                 <p class="note">Wildcards (*) are allowed.</p>

@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { trigger, transition, style, animate, state, keyframes } from '@angular/animations';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -86,8 +86,6 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   public expressionOutput: string;
   public allIdentity: string;
   public nameOrId: string;
-  public showIdentity = false;
-  public showName = false;
 
 
   constructor(
@@ -97,9 +95,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
     this.expressionForm = fb.group({
       // Must stay in sync with error checks in policy-add-members.component.html
-      type: ['', [Validators.required]],
-      identity: [''],
-      name: ['']
+      type: ['', Validators.required]
     });
   }
 
@@ -265,8 +261,6 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
   resetModal(): void {
     this.expressionForm.reset();
-    this.showIdentity = false;
-    this.showName = false;
     this.unparsableMember = false;
     this.duplicateMember = false;
   }
@@ -334,51 +328,34 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     this.closeModal();
   }
 
-  public showInputs(inputName: string): void {
-    const typeValue = this.expressionForm.get('type').value;
-    const identityValue = this.expressionForm.get('identity').value;
+  public showInputs(inputName) {
+
+    const formValues = this.expressionForm.value;
     const matchAllWildCard = '*';
 
-    this.setFormLabels(typeValue);
+    this.setFormLabels(formValues.type);
 
-    // Need to include all of the input types and each outcome
-      // case type
-      // case identity
-      // case name
-    switch (inputName) {
-      case 'identity':
-        this.showIdentity = false;
-        this.showName = false;
-        if (typeValue === 'user' || typeValue === 'team') {
-          this.updateValidations(inputName, true);
-          this.showIdentity = true;
-        } else if ( typeValue === 'token' ) {
-          this.showIdentity = false;
-          this.showName = true;
-          this.updateValidations('name', true);
-          this.updateValidations(inputName, false);
-          this.expressionForm.get(inputName).reset();
-        } else {
-          this.updateValidations(inputName, false);
-          this.expressionForm.get(inputName).reset();
-          this.showIdentity = false;
+    switch(inputName) {
+      case 'type':
+        this.resetFormControls();
+        if (formValues.type === 'user' || formValues.type === 'team') {
+          this.addIdentityControl();
+        }
+        if (formValues.type === 'token') {
+          this.addNameControl();
         }
         break;
-      case 'name':
-        if (typeValue === 'token' || (identityValue && identityValue !== matchAllWildCard)) {
-          this.updateValidations(inputName, true);
-          this.showName = true;
-          return;
+      case 'identity':
+        if (formValues.identity !== matchAllWildCard) {
+          this.addNameControl();
         } else {
-          this.updateValidations(inputName, false);
-          this.expressionForm.get(inputName).reset();
-          this.showName = false;
-          return;
+          this.expressionForm.removeControl('name');
         }
         break;
       default:
-        return;
+        break;
     }
+
   }
 
   private setFormLabels(typeValue): void {
@@ -390,31 +367,34 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     }
   }
 
-  private updateValidations(inputName: string, active: boolean): void {
-    const updateInput = this.expressionForm.get(inputName);
-
-    if (active) {
-      if (inputName === 'name') {
-        updateInput.setValidators([Validators.required,
-                                      Validators.pattern(Regex.patterns.NON_BLANK),
-                                      Validators.pattern(Regex.patterns.NO_MIXED_WILDCARD)]);
-      } else {
-        updateInput.setValidators([Validators.required]);
-      }
-    } else {
-
-      updateInput.clearValidators();
-    }
-
-    updateInput.updateValueAndValidity();
+  private resetFormControls(): void {
+    this.expressionForm.removeControl('identity');
+    this.expressionForm.removeControl('name');
   }
 
-  public updateFormDisplay(inputName): void {
+  private addIdentityControl(): void {
+    this.expressionForm.addControl('identity', new FormControl('', Validators.required));
+  }
 
-    this.showInputs(inputName);
+  private addNameControl(): void {
+    this.expressionForm.addControl('name', new FormControl('',
+      [
+        Validators.required,
+        Validators.pattern(Regex.patterns.NON_BLANK),
+        Validators.pattern(Regex.patterns.NO_MIXED_WILDCARD)
+      ]
+    )
+    );
+  }
 
+  private setExpressionOutput(): void {
     const values: string[] = Object.values(this.expressionForm.value);
     const output = values.filter(value => value != null && value.length > 0);
     this.expressionOutput = output.join(':');
+  }
+
+  public updateFormDisplay(inputName: string): void {
+    this.showInputs(inputName);
+    this.setExpressionOutput();
   }
 }
