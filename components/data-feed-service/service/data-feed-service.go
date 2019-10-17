@@ -24,7 +24,8 @@ import (
 	"github.com/chef/automate/components/data-feed-service/dao"
 	"github.com/chef/automate/lib/cereal"
 	grpccereal "github.com/chef/automate/lib/cereal/grpc"
-	"github.com/chef/automate/lib/cereal/patterns"
+
+	//"github.com/chef/automate/lib/cereal/patterns"
 	"github.com/chef/automate/lib/grpc/secureconn"
 )
 
@@ -74,12 +75,12 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 		return err
 	}
 
-	dataFeedPollTask, err := NewDataFeedPollTask(dataFeedConfig, connFactory, db)
+	dataFeedPollTask, err := NewDataFeedPollTask(dataFeedConfig, connFactory, db, manager)
 	if err != nil {
 		return err
 	}
 
-	err = manager.RegisterWorkflowExecutor(dataFeedWorkflowName, patterns.NewSingleTaskWorkflowExecutor(dataFeedTaskName, false))
+	err = manager.RegisterWorkflowExecutor(dataFeedWorkflowName, &DataFeedWorkflowExecutor{workflowName: dataFeedWorkflowName})
 	if err != nil {
 		return err
 	}
@@ -99,19 +100,24 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 		return err
 	}
 
+	var zeroTime time.Time
 	dataFeedTaskParams := DataFeedPollTaskParams{
 		FeedInterval:    dataFeedConfig.ServiceConfig.FeedInterval,
 		AssetPageSize:   dataFeedConfig.ServiceConfig.AssetPageSize,
 		ReportsPageSize: dataFeedConfig.ServiceConfig.ReportsPageSize,
+		NextFeedStart:   zeroTime,
+		NextFeedEnd:     zeroTime,
 	}
+
+	dataFeedWorkflowParams := DataFeedWorkflowParams{PollTaskParams: dataFeedTaskParams}
 
 	err = manager.CreateWorkflowSchedule(context.Background(),
 		dataFeedScheduleName, dataFeedWorkflowName,
-		dataFeedTaskParams, true, r)
+		dataFeedWorkflowParams, true, r)
 	if err == cereal.ErrWorkflowScheduleExists {
 		// TODO(ssd) 2019-09-09: Right now this resets Dtstart on the recurrence, do we want that?
 		err = manager.UpdateWorkflowScheduleByName(context.Background(), dataFeedScheduleName, dataFeedWorkflowName,
-			cereal.UpdateParameters(dataFeedTaskParams),
+			cereal.UpdateParameters(dataFeedWorkflowParams),
 			cereal.UpdateEnabled(true),
 			cereal.UpdateRecurrence(r))
 		if err != nil {
@@ -124,20 +130,88 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 	return manager.Start(context.Background())
 }
 
+type DataFeedWorkflowExecutor struct {
+	workflowName cereal.WorkflowName
+}
+
+type DataFeedWorkflowParams struct {
+	PollTaskParams DataFeedPollTaskParams
+}
+
 type DataFeedPollTask struct {
 	cfgMgmt   cfgmgmt.CfgMgmtClient
 	secrets   secrets.SecretsServiceClient
 	reporting reporting.ReportingServiceClient
 	db        *dao.DB
+	manager   *cereal.Manager
 }
 
 type DataFeedPollTaskParams struct {
 	AssetPageSize   int32
 	ReportsPageSize int32
 	FeedInterval    time.Duration
+	NextFeedStart   time.Time
+	NextFeedEnd     time.Time
 }
 
-func NewDataFeedPollTask(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factory, db *dao.DB) (*DataFeedPollTask, error) {
+type DataFeedWorkflowPayload struct {
+	Done bool
+}
+
+func (e *DataFeedWorkflowExecutor) OnStart(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
+	params := DataFeedWorkflowParams{}
+	log.Infof("OnStart params %v", params)
+	err := w.GetParameters(&params)
+	if err != nil {
+		return w.Fail(err)
+	}
+
+	err = w.EnqueueTask(dataFeedTaskName, params)
+	if err != nil {
+		return w.Fail(err)
+	}
+
+	initialPayload := DataFeedWorkflowPayload{
+		Done: true,
+	}
+	return w.Continue(&initialPayload)
+}
+
+func (e *DataFeedWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev cereal.TaskCompleteEvent) cereal.Decision {
+	params := DataFeedWorkflowParams{}
+	err := w.GetParameters(&params)
+	if err != nil {
+		return w.Fail(err)
+	}
+
+	payload := DataFeedWorkflowPayload{}
+	err = w.GetPayload(&payload)
+	if err != nil {
+		return w.Fail(err)
+	}
+
+	err = ev.Result.Err()
+	if err != nil {
+		return w.Fail(err)
+	}
+
+	taskParams := DataFeedWorkflowParams{}
+	if err = ev.Result.GetParameters(&taskParams); err != nil {
+		return w.Fail(err)
+	}
+
+	if payload.Done {
+		return w.Complete()
+	}
+	return w.Continue(&payload)
+
+}
+
+func (e *DataFeedWorkflowExecutor) OnCancel(w cereal.WorkflowInstance, ev cereal.CancelEvent) cereal.Decision {
+	return w.Complete()
+}
+
+func NewDataFeedPollTask(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factory, db *dao.DB, manager *cereal.Manager) (*DataFeedPollTask, error) {
 
 	cfgMgmtConn, err := connFactory.Dial("config-mgmt-service", dataFeedConfig.CfgmgmtConfig.Target)
 	if err != nil {
@@ -159,30 +233,42 @@ func NewDataFeedPollTask(dataFeedConfig *config.DataFeedConfig, connFactory *sec
 		reporting: reporting.NewReportingServiceClient(complianceConn),
 		cfgMgmt:   cfgmgmt.NewCfgMgmtClient(cfgMgmtConn),
 		db:        db,
+		manager:   manager,
 	}, nil
 }
 
 func (d *DataFeedPollTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
-	params := DataFeedPollTaskParams{}
+	params := DataFeedWorkflowParams{}
 	err := task.GetParameters(&params)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse task parameters")
 	}
-
+	log.Infof("Run params %v", params)
 	now := time.Now()
-	feedStartTime, feedEndTime := getFeedTimes(params.FeedInterval, now)
+	params = getFeedTimes(params, now)
+	feedStartTime := params.PollTaskParams.NextFeedStart
+	feedEndTime := params.PollTaskParams.NextFeedEnd
 	destinations, err := d.getDestinations()
-
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get destinations from db")
 	}
+	params.PollTaskParams.NextFeedStart = feedEndTime
+	params.PollTaskParams.NextFeedEnd = feedEndTime.Add(params.PollTaskParams.FeedInterval)
+	log.Debugf("Updated Feed interval start, end: %s, %s", params.PollTaskParams.NextFeedStart.Format("15:04:05"), params.PollTaskParams.NextFeedEnd.Format("15:04:05"))
+	err = d.manager.UpdateWorkflowScheduleByName(context.Background(), dataFeedScheduleName, dataFeedWorkflowName,
+		cereal.UpdateParameters(params),
+		cereal.UpdateEnabled(true))
+	if err != nil {
+		return nil, err
+	}
+
 	if len(destinations) == 0 {
 		return nil, nil
 	}
 	// build messages for any nodes which have had a CCR in last window, include last compliance report
-	datafeedMessages := d.buildDatafeed(ctx, params.AssetPageSize, feedStartTime, feedEndTime)
+	datafeedMessages := d.buildDatafeed(ctx, params.PollTaskParams.AssetPageSize, feedStartTime, feedEndTime)
 	// build messages for any reports in last window include last CCR and OHAI
-	d.buildReportFeed(ctx, params.ReportsPageSize, feedStartTime, feedEndTime, datafeedMessages)
+	d.buildReportFeed(ctx, params.PollTaskParams.ReportsPageSize, feedStartTime, feedEndTime, datafeedMessages)
 	// get the valus from this ipaddress:datafeedMessage map
 	data := make([]datafeedMessage, 0, len(datafeedMessages))
 	for _, value := range datafeedMessages {
@@ -226,15 +312,15 @@ func handleSendErr(notification datafeedNotification, startTime time.Time, endTi
 	// TODO report this failure to the UI with the time window and notification details
 }
 
-func getFeedTimes(feedInterval time.Duration, now time.Time) (time.Time, time.Time) {
-	var feedEndTime time.Time
-	var feedStartTime time.Time
+func getFeedTimes(params DataFeedWorkflowParams, now time.Time) DataFeedWorkflowParams {
 
-	feedEndTime = getFeedEndTime(feedInterval, now)
-	feedStartTime = feedEndTime.Add(-feedInterval)
+	if params.PollTaskParams.NextFeedStart.IsZero() {
+		params.PollTaskParams.NextFeedEnd = getFeedEndTime(params.PollTaskParams.FeedInterval, now)
+		params.PollTaskParams.NextFeedStart = params.PollTaskParams.NextFeedEnd.Add(-params.PollTaskParams.FeedInterval)
+	}
 
-	log.Debugf("Feed interval start, end: %s, %s", feedStartTime.Format("15:04:05"), feedEndTime.Format("15:04:05"))
-	return feedStartTime, feedEndTime
+	log.Debugf("Current Feed interval start, end: %s, %s", params.PollTaskParams.NextFeedStart.Format("15:04:05"), params.PollTaskParams.NextFeedEnd.Format("15:04:05"))
+	return params
 }
 
 func getFeedEndTime(feedInterval time.Duration, now time.Time) time.Time {
