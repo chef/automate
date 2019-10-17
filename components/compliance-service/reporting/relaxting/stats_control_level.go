@@ -342,6 +342,7 @@ func (depth *ControlDepth) getStatsSummaryAggs() map[string]elastic.Aggregation 
 	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "passed"))
 	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "failed"))
 	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "skipped"))
+	controlsCard := elastic.NewCardinalityAggregation().Field("profiles.controls.id")
 
 	//we have nodeUUIDTermsQSize set to 1 because we don't need to return the actual values.
 	//this works for node_uuid because it's unique to the report_id. we will use when we compute reportMeta.Stats.Nodes (below)
@@ -360,6 +361,7 @@ func (depth *ControlDepth) getStatsSummaryAggs() map[string]elastic.Aggregation 
 	aggs["platforms"] = elastic.NewReverseNestedAggregation().SubAggregation("platforms", platformTerms)
 	aggs["environment"] = elastic.NewReverseNestedAggregation().SubAggregation("environment", environmentTerms)
 	aggs["profiles"] = elastic.NewReverseNestedAggregation().Path("profiles").SubAggregation("profiles", profilesTerms)
+	aggs["control_count"] = controlsCard
 
 	return depth.wrap(aggs)
 }
@@ -421,6 +423,9 @@ func (depth *ControlDepth) getStatsSummaryResult(searchResult *elastic.SearchRes
 			}
 		}
 
+		if controls, found := aggRoot.Aggregations.Cardinality("control_count"); found {
+			summary.Stats.Controls = int32(*controls.Value)
+		}
 	}
 	return summary
 }
