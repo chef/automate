@@ -70,19 +70,17 @@ func (a *adapter) insertToken(ctx context.Context,
 	if projects == nil {
 		projects = []string{}
 	}
-	if len(projects) > 0 {
-		_, err := a.validator.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
-			Subjects:        auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
-			OldProjects:     []string{},
-			NewProjects:     projects,
-			IsUpdateRequest: false,
-		})
-		if err != nil {
-			return nil, err
-		}
+	_, err := a.validator.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
+		Subjects:        auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+		OldProjects:     []string{},
+		NewProjects:     projects,
+		IsUpdateRequest: false,
+	})
+	if err != nil {
+		return nil, err
 	}
 
-	err := a.db.QueryRowContext(ctx,
+	err = a.db.QueryRowContext(ctx,
 		`INSERT INTO chef_authn_tokens(id, description, value, active, project_ids, created, updated)
 		VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
 		RETURNING id, description, value, active, project_ids, created, updated`,
