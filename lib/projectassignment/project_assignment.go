@@ -45,8 +45,9 @@ func AuthorizeProjectAssignment(ctx context.Context, authorizer engine.V2Authori
 
 // calculateProjectsToAuthorize returns the symmetric difference of oldProjects and newProjects,
 // meaning that any project that is not in the intersection of oldProjects and newProjects
-// will be returned. It also accounts for the internal understanding of no projects to mean
-// '(unassigned)' project, which requires authorization.
+// will be returned. It also accounts for the internal understanding that if either the field for
+// new or the field for old projects is empty, we need to include '(unassigned)' as part of
+// the list of projects requiring authorization.
 func calculateProjectsToAuthorize(oldProjects, newProjects []string, isUpdateRequest bool) []string {
 	projectDiff := []string{}
 	previouslyUnassigned := len(oldProjects) == 0
@@ -85,8 +86,9 @@ func calculateProjectsToAuthorize(oldProjects, newProjects []string, isUpdateReq
 		}
 	}
 
-	// if project goes from no projects to some or the reverse
-	if previouslyUnassigned || newlyUnassigned {
+	// if project goes from no projects to some or the reverse on update
+	// or has no projects on create
+	if (previouslyUnassigned && isUpdateRequest) || newlyUnassigned {
 		projectDiff = append(projectDiff, UnassignedProjectID)
 	}
 
