@@ -340,8 +340,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
         this.resetFormControls();
         if (formValues.type === 'user' || formValues.type === 'team') {
           this.addIdentityControl();
-        }
-        if (formValues.type === 'token') {
+        } else if (formValues.type === 'token') {
           this.addNameControl();
         }
         break;

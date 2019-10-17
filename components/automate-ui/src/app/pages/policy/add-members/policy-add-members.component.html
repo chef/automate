@@ -72,7 +72,7 @@
                 <chef-error *ngIf="expressionForm.get('name').hasError('required') && expressionForm.get('name').touched">
                   {{ nameOrId }} is a required field.
                 </chef-error>
-                <chef-error *ngIf="expressionForm.get('name').hasError('pattern') && expressionForm.get('name').touched">
+                <chef-error *ngIf="expressionForm.get('name').hasError('pattern') && expressionForm.get('name').dirty">
                   {{ nameOrId }} must be a text or a wildcard but not both.
                 </chef-error>
               </chef-form-field>
