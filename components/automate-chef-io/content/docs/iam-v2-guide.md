@@ -464,6 +464,24 @@ Kelly, however, will be able to do both.
 
 See [Policy Membership]({{< relref "iam-v2-api-reference.md#policy-membership" >}}) for more information on policy membership.
 
+## Restoring Admin Access
+
+While we have [safeguards]({{< relref "iam-v2-overview.md#policy-types" >}}) to prevent it, it is possible to lock yourself out of Chef Automate.
+If you have root access to the node where Chef Automate is installed, use the following commands to restore admin access:
+
+This command, which is also available on IAM v1, resets the local `admin` user's password and ensures that user is a member of the local `admins` team, which is a permanent member of the Chef-managed `Administrator` policy.
+
+```bash
+  chef-automate iam admin-access restore <your new password here>
+```
+
+Generate a new token and add that token as a new member of the Chef-managed `Administrator` policy. This is the equivalent of the v1 command `chef-automate admin-token`.
+
+```bash
+  chef-automate iam token create <your token name here> --admin
+```
+
+
 ## Reverting to IAM v1
 
 Reverting to IAM v1 discards your IAM v2 policies, roles, and projects, and re-configures Chef Automate to use your v1 policies again.
