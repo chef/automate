@@ -1,4 +1,3 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -56,7 +55,6 @@ describe('ProjectRulesComponent', () => {
         MockComponent({ selector: 'chef-input', inputs: ['value'] }),
         MockComponent({ selector: 'chef-error'}),
         MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-select' }),
         MockComponent({ selector: 'chef-option' }),
         MockComponent({ selector: 'chef-page',
           inputs: [
@@ -79,9 +77,6 @@ describe('ProjectRulesComponent', () => {
         MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'ng-container', inputs: ['hidden'] }),
         ProjectRulesComponent
-      ],
-      schemas: [
-        CUSTOM_ELEMENTS_SCHEMA
       ],
       imports: [
         ReactiveFormsModule,

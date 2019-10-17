@@ -41,7 +41,6 @@ interface KVCondition {
 export class ProjectRulesComponent implements OnInit, OnDestroy {
   public ruleId: string;
   public ruleForm: FormGroup;
-  public attributeList: string;
 
   // FIXME: either make properties optional in interface, or provide them on initialization:
   public project: Project = <Project>{};
@@ -49,6 +48,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
 
   public isLoading = true;
   public saving = false;
+  public attributeList: any;
   public attributes: RuleTypeMappedObject;
   public editingRule = false;
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
@@ -137,6 +137,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         type: [{ value: this.rule.type, disabled: true }], // always disabled, no validation needed
         conditions: this.fb.array(this.populateConditions())
       });
+      this.attributeList = this.attributes[this.rule.type.toLowerCase()];
     } else {
       this.ruleForm = this.fb.group({
         // Must stay in sync with error checks in project-rules.component.html
@@ -147,6 +148,8 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         conditions: this.fb.array(this.populateConditions())
       });
     }
+
+    this.checkTypeChange();
   }
 
   ngOnDestroy(): void {
@@ -154,23 +157,11 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  public patchTypeValue(form, event) {
-    form.controls['type'].setValue(event.target.value);
-    this.attributeList = this.attributes[form.get('type').value.toLowerCase()];
-  }
-
-  public patchAttributeValue(form, event, i) {
-    form.controls.conditions.controls[i].controls['attribute'].setValue(event.target.value);
-    if (this.editingRule) {
-      form.controls.conditions.controls[i].controls['attribute'].markAsDirty();
-    }
-  }
-
-  public patchOperatorValue(form, event, i) {
-    form.controls.conditions.controls[i].controls['operator'].setValue(event.target.value);
-    if (this.editingRule) {
-      form.controls.conditions.controls[i].controls['operator'].markAsDirty();
-    }
+  public checkTypeChange() {
+    this.ruleForm.get('type').valueChanges.pipe(takeUntil(this.isDestroyed)).subscribe(
+      (type: string) => {
+        this.attributeList = this.attributes[type.toLowerCase()];
+    });
   }
 
   getHeading(): string {
@@ -228,10 +219,10 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
       conditions = this.rule.conditions.map(c =>
         // Convert values array to display string
         this.createCondition(c.attribute, c.operator, c.values.join(', ')));
-        this.attributeList = this.attributes[this.rule.type.toLowerCase()];
     } else {
       conditions = [this.createCondition()];
     }
+
     return conditions;
   }
 
