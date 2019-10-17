@@ -96,7 +96,6 @@ message ValidateProjectAssignmentReq {
       }];
     repeated string new_projects = 3
       [(validate.rules).repeated = {
-        min_items: 1,
         unique: true,
         items: { string: { pattern: "^[a-z0-9()-_]{1,64}$" } }
       }];
