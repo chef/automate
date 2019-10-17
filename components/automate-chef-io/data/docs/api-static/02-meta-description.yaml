@@ -1,0 +1,14 @@
+info:
+  description: |
+    # Authentication
+    The standard way of authenticating for the Automate API is to generate an
+    API token and pass that with your API requests with the `api-token` header.
+    An example request using curl looks like this:
+
+    ```
+    curl -s -H "api-token: $TOKEN" https://automate.example.com/api/v0/auth/policies -v
+    ```
+
+    For more information about authentication, refer to the
+    [API Tokens](https://automate.chef.io/docs/api-tokens/)
+    section of the Automate documentation.

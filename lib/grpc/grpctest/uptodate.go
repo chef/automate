@@ -235,6 +235,8 @@ func ParseProtoFiles(files []string) ([]*desc.FileDescriptor, error) {
 			filepath.Join(topLevel, "vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/"),
 			// for validate/validate.proto
 			filepath.Join(topLevel, "vendor/github.com/envoyproxy/protoc-gen-validate/"),
+			// for protoc-gen-swagger/options/annotations.proto
+			filepath.Join(topLevel, "vendor/github.com/grpc-ecosystem/grpc-gateway/"),
 		},
 	}
 	return parser.ParseFiles(files...)
