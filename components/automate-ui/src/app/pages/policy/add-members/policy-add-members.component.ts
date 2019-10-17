@@ -328,7 +328,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     this.closeModal();
   }
 
-  public showInputs(inputName) {
+  public showInputs(inputName: string): void {
 
     const formValues = this.expressionForm.value;
     const matchAllWildCard = '*';
