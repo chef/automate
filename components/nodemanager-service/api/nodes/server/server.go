@@ -11,11 +11,13 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/chef/automate/api/external/secrets"
+	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/secretsint"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	"github.com/chef/automate/components/nodemanager-service/mgrtypes"
 	"github.com/chef/automate/components/nodemanager-service/pgdb"
 	"github.com/chef/automate/lib/errorutils"
+	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/secureconn"
 )
 
@@ -264,8 +266,17 @@ func (srv *Server) Delete(ctx context.Context, in *nodes.Id) (*pb.Empty, error) 
 
 // List nodes based on a query
 func (srv *Server) List(ctx context.Context, in *nodes.Query) (*nodes.Nodes, error) {
-	logrus.Debugf("Getting Nodes with query: %+v", in)
-	dbnodes, totalCount, err := srv.db.GetNodes(in.Sort, in.Order, in.Page, in.PerPage, in.Filters)
+	logrus.Debugf("1Getting Nodes with query: %+v", in)
+	projectFilters, err := filterByProjects(ctx)
+	if err != nil {
+		return nil, errorutils.FormatErrorMsg(err, "")
+	}
+
+	filtersWithProjects := append(in.Filters, &common.Filter{
+		Key:    "project",
+		Values: projectFilters,
+	})
+	dbnodes, totalCount, err := srv.db.GetNodes(in.Sort, in.Order, in.Page, in.PerPage, filtersWithProjects)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
@@ -275,6 +286,18 @@ func (srv *Server) List(ctx context.Context, in *nodes.Query) (*nodes.Nodes, err
 		TotalUnreachable: totalCount.Unreachable,
 		TotalReachable:   totalCount.Reachable,
 		TotalUnknown:     totalCount.Unknown}, nil
+}
+
+func filterByProjects(ctx context.Context) ([]string, error) {
+	projectsFilter, err := auth_context.ProjectsFromIncomingContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if auth_context.AllProjectsRequested(projectsFilter) {
+		return []string{}, nil
+	}
+
+	return projectsFilter, nil
 }
 
 // Delete nodes based on a query

@@ -475,7 +475,9 @@ type TotalCount struct {
 	Total, Unreachable, Reachable, Unknown int32
 }
 
-func (db *DB) GetNodes(sortField string, insortOrder nodes.Query_OrderType, pageNr int32, perPage int32, filters []*common.Filter) ([]*nodes.Node, *TotalCount, error) {
+func (db *DB) GetNodes(sortField string, insortOrder nodes.Query_OrderType, pageNr int32,
+	perPage int32, filters []*common.Filter) ([]*nodes.Node, *TotalCount, error) {
+	logrus.Infof("GetNodes")
 	var sortOrder string
 	sortField = valueOrDefaultStr(sortField, "name")
 	if insortOrder == 1 {

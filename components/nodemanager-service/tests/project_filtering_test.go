@@ -13,11 +13,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	nodesserver "github.com/chef/automate/components/nodemanager-service/api/nodes/server"
 	"github.com/chef/automate/lib/grpc/auth_context"
 )
 
-func TestProjectRequests(t *testing.T) {
-
+func TestListProjectFiltering(t *testing.T) {
 	mgrConn, err := mgrtesthelpers.GetManagerConn()
 	require.NoError(t, err)
 	defer mgrConn.Close()
@@ -26,8 +26,7 @@ func TestProjectRequests(t *testing.T) {
 	require.NoError(t, err)
 
 	// setup clients
-	mgrClient := nodes.NewNodesServiceClient(mgrConn)
-	assert.NotNil(t, mgrClient)
+	nodeManager := nodesserver.New(db, nil, "")
 
 	timestamp, err := ptypes.TimestampProto(time.Now())
 
@@ -69,17 +68,22 @@ func TestProjectRequests(t *testing.T) {
 					err = db.ProcessIncomingNode(node)
 					require.NoError(t, err)
 				}
+				// Delete nodes after the test is complete
 				defer func() {
 					for _, node := range test.ingestedNodes {
 						db.DeleteNode(node.Uuid)
 					}
 				}()
 
-				mgrs, err := mgrClient.List(test.ctx, &nodes.Query{})
+				projectFilters, _ := filterByProjects(test.ctx)
+				t.Logf("projectFilters: %v", projectFilters)
+				// Call List to get all ingested nodes with project filtering context.
+				nodesResponse, err := nodeManager.List(test.ctx, &nodes.Query{})
 				require.NoError(t, err)
 
+				// Get all the node IDs returned.
 				actualNodeIDs := []string{}
-				for _, node := range mgrs.Nodes {
+				for _, node := range nodesResponse.Nodes {
 					actualNodeIDs = append(actualNodeIDs, node.Id)
 				}
 
@@ -91,4 +95,16 @@ func TestProjectRequests(t *testing.T) {
 func contextWithProjects(projects []string) context.Context {
 	ctx := context.Background()
 	return auth_context.NewContext(ctx, []string{}, projects, "", "", "")
+}
+
+func filterByProjects(ctx context.Context) ([]string, error) {
+	projectsFilter, err := auth_context.ProjectsFromIncomingContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if auth_context.AllProjectsRequested(projectsFilter) {
+		return []string{}, nil
+	}
+
+	return projectsFilter, nil
 }
