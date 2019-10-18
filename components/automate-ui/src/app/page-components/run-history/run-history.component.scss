@@ -75,7 +75,7 @@
     }
 
     &.success {
-      color: $chef-primary-bright;
+      color: $chef-success;
     }
   }
 
@@ -145,12 +145,12 @@ app-date-selector {
   }
 
   .successful, .passed {
-    color: $chef-primary-bright;
+    color: $chef-success;
     background-color: $chef-white;
 
     &.active {
       color: $chef-white;
-      background-color: $chef-primary-bright;
+      background-color: $chef-success;
     }
   }
 

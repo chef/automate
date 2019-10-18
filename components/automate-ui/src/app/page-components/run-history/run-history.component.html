@@ -19,7 +19,7 @@
 
         <div class="filter-selectors">
           <button class="selector all" (click)="onStatusChange(selectedStatus.All)" [ngClass]="{active: selected == selectedStatus.All}">
-              <chef-icon>check_circle</chef-icon>
+              <chef-icon>list</chef-icon>
               <div>{{stats(selectedStatus.All)}}</div>
           </button>
           <button class="selector failed" (click)="onStatusChange(selectedStatus.Failure)" [ngClass]="{active: selected == selectedStatus.Failure}">
