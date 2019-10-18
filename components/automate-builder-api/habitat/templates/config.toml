@@ -1,7 +1,7 @@
 [api]
 data_path = "{{svc_path}}/data"
 log_path = "{{svc_var_path}}"
-key_path = "{{svc_path}}/files"
+key_path = "{{svc_path}}/data/keys"
 features_enabled = ""
 targets = ["x86_64-linux", "x86_64-linux-kernel2", "x86_64-windows"]
 build_targets = ["x86_64-linux", "x86_64-linux-kernel2", "x86_64-windows"]
@@ -18,12 +18,12 @@ listen = "{{cfg.conf.service.listen}}"
 port = {{cfg.conf.service.port}}
 
 [oauth]
-provider       = "github"
-token_url      = "https://github.com/login/oauth/access_token"
-userinfo_url   = "https://api.github.com/user"
-redirect_url   = ""
-client_id      = ""
-client_secret  = ""
+provider       = "chef-automate"
+token_url      = "{{cfg.conf.oauth.token_url}}"
+userinfo_url   = "{{cfg.conf.oauth.userinfo_url}}"
+redirect_url   = "{{cfg.conf.oauth.redirect_url}}"
+client_id      = "{{cfg.conf.oauth.client_id}}"
+client_secret  = "{{cfg.conf.oauth.client_secret}}"
 
 [s3]
 backend = "minio"

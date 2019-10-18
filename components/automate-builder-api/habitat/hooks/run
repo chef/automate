@@ -5,7 +5,7 @@ exec 2>&1
 set -e
 
 export HOME="{{pkg.svc_data_path}}"
-export RUST_LOG="info"
+export RUST_LOG="{{cfg.service.log_level}}"
 export RUST_BACKTRACE=1
 
 echo "builder-api starting"
@@ -17,5 +17,10 @@ render-template config.toml "{{pkg.svc_var_path}}/etc/config.toml" \
 export DBNAME="{{cfg.datastore.database}}"
 pg-helper ensure-service-database "$DBNAME"
 pg-helper fix-permissions "$DBNAME"
+
+if ! ls {{pkg.svc_data_path}}/keys/bldr-*; then
+  echo "generating bldr key"
+  hab user key generate bldr --cache-key-path "{{pkg.svc_data_path}}/keys"
+fi
 
 exec bldr-api start -c "{{pkg.svc_var_path}}/etc/config.toml"

@@ -1,15 +1,15 @@
 [service]
-log_level = "info"
+log_level = "debug,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
 listen = "0.0.0.0"
 port   = 10103
 
 [oauth]
-provider       = "github"
-token_url      = "https://github.com/login/oauth/access_token"
-userinfo_url   = "https://api.github.com/user"
-redirect_url   = ""
-client_id      = ""
-client_secret  = ""
+provider       = "chef-automate"
+token_url      = "https://a2-dev.test/session/token"
+userinfo_url   = "https://a2-dev.test/session/userinfo"
+redirect_url   = "https://a2-dev.test/bldr"
+client_id      = "client_id"
+client_secret  = "client_secret"
 
 [github]
 api_url        = "https://api.github.com"

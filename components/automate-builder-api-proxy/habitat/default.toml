@@ -31,11 +31,10 @@ app_url                   = "https://github.com/apps/habitat-builder"
 api_url                   = "https://api.github.com"
 
 [oauth]
-authorize_url             = "https://github.com/login/oauth/authorize"
-client_id                 = ""
-provider                  = "github"
-redirect_url              = ""
-signup_url                = "https://github.com/join"
+provider       = "chef-automate"
+redirect_url   = "https://a2-dev.test/bldr"
+client_id      = "client_id"
+authorize_url  = "https://a2-dev.test/session/new"
 
 [nginx]
 worker_connections        = 8000

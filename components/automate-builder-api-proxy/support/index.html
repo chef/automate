@@ -12,9 +12,10 @@
   <body>
     <hab-app>
     <script>
-        window.Habitat = { config: {} };
+        let defaultConfig = { config: {  } };
+        window.Habitat = defaultConfig;
         function habitatConfig(options) {
-          window.Habitat.config = options || {};
+          window.Habitat.config = options || defaultConfig; 
         };
     </script>
     <script src="/bldr/habitat.conf.js"></script>
