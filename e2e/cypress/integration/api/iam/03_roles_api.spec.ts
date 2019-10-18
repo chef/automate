@@ -5,15 +5,6 @@ describe('roles API', () => {
     let nonAdminToken = '';
     const nonAdminTokenID = `${cypressPrefix}-nonadmin-token`;
 
-    before(() => {
-        if (Cypress.env('ADMIN_TOKEN') === undefined) {
-            cy.adminLogin('/').then(() => {
-                const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
-                cy.generateAdminToken(admin.id_token);
-            });
-        }
-    });
-
     describeIfIAMV2p1('project assignment enforcement', () => {
         const project1 = {
             id: `${cypressPrefix}-project1-${Cypress.moment().format('MMDDYYhhmm')}`,

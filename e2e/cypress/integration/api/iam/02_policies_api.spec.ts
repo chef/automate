@@ -1,8 +1,8 @@
-import { describeIfIAMV2, describeIfIAMV2p1, adminApiToken } from '../../constants';
+import { describeIfIAMV2, describeIfIAMV2p1 } from '../../constants';
 
 describeIfIAMV2('policies API', () => {
   const defaultAdminReq = {
-    headers: { 'api-token': adminApiToken },
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
     method: 'GET',
     url: '/apis/iam/v2beta/policies'
   };
@@ -22,10 +22,10 @@ describeIfIAMV2('policies API', () => {
 
     for (const project of [project1, project2]) {
       cy.request({
-          headers: { 'api-token': adminApiToken },
-          method: 'POST',
-          url: '/apis/iam/v2beta/projects',
-          body: project
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+        method: 'POST',
+        url: '/apis/iam/v2beta/projects',
+        body: project
       });
     }
   });

@@ -8,15 +8,6 @@ describeIfIAMV2p1('projects API', () => {
     status: string;
   }
 
-  before(() => {
-    if (Cypress.env('ADMIN_TOKEN') === undefined) {
-      cy.adminLogin('/').then(() => {
-        const idToken = JSON.parse(<string>localStorage.getItem('chef-automate-user')).id_token;
-        cy.generateAdminToken(idToken);
-      });
-    }
-  });
-
   describe('project graveyarding and deletion', () => {
     const projectID = `${cypressPrefix}-to-delete-${Cypress.moment().format('MMDDYYhhmm')}`;
     before(() => {
