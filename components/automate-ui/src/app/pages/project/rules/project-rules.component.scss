@@ -59,18 +59,19 @@ chef-page {
       /* Hiding the select arrow default implementation */
       appearance: none;
     }
-  
-    & select[disabled] {
+
+    & select [disabled] {
       color: $chef-dark-grey;
       border: solid 1px $chef-grey;
       background-color: $chef-grey;
     }
-  
+
     & select:focus {
       border: solid 1px $chef-primary-bright;
     }
-  
+
     /* Hiding the select arrow for IE10 */
+
     & select::-ms-expand {
       display: none;
     }
