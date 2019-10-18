@@ -13,6 +13,10 @@ import { HistorySelection } from '../../helpers/history-selection/history-select
 import { RunHistoryStore } from '../../services/run-history-store/run-history.store';
 import { Subscription } from 'rxjs';
 import * as moment from 'moment';
+import { saveAs } from 'file-saver';
+import {
+  finalize
+} from 'rxjs/operators';
 
 @Component({
   selector: 'app-run-history',
@@ -106,6 +110,24 @@ export class RunHistoryComponent implements OnInit, OnDestroy {
 
   getDuration(start_time, end_time) {
     return moment.duration(moment(end_time).diff(moment(start_time))).humanize();
+  }
+
+  onDownloadRunsReport() {
+    const format = 'csv'; // or 'json'
+    const filename = `${moment().format('YYYY-M-D')}.${format}`;
+
+    const onComplete = () => console.warn('completed downloading report');
+    const onError = _e => console.error('error downloading report');
+    const types = {'json': 'application/json', 'csv': 'text/csv'};
+    const onNext = data => {
+      const type = types[format];
+      const blob = new Blob([data], {type});
+      saveAs(blob, filename);
+    };
+
+    this.nodeRunsService.downloadRuns(format, this.nodeHistoryStore.filter.getValue()).pipe(
+      finalize(onComplete))
+      .subscribe(onNext, onError);
   }
 
   // return specific stat values

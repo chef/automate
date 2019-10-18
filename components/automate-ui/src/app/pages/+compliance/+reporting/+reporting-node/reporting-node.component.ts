@@ -4,6 +4,7 @@ import { StatsService } from '../../shared/reporting/stats.service';
 import { Subject } from 'rxjs';
 import { ReportQueryService } from '../../shared/reporting/report-query.service';
 import * as moment from 'moment';
+import { DateTime } from 'app/helpers/datetime/datetime';
 
 @Component({
   selector: 'app-reporting-node',
@@ -18,6 +19,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   activeReportStatus = 'all';
   showScanHistory = false;
   reportLoading = false;
+  RFC2822 = DateTime.RFC2822;
 
   openControls = {};
 
@@ -175,10 +177,6 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   formatDuration(duration) {
     const d = moment.duration(duration);
     return d.humanize();
-  }
-
-  formatDate(timestamp) {
-    return moment(timestamp).format('LLL');
   }
 
   formatDaysAgo(timestamp) {

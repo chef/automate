@@ -429,6 +429,9 @@ func (s *Server) Serve() error {
 	// `rpc NodeExport(NodeExport) returns (stream ExportData) {};`
 	mux.HandleFunc("/cfgmgmt/nodes/export", s.configMgmtNodeExportHandler)
 
+	// rpc ReportExport(ReportExport) returns (stream ReportExportData);
+	mux.HandleFunc("/cfgmgmt/reports/export", s.configMgmtReportExportHandler)
+
 	// register open api endpoint definitions
 	mux.Handle("/openapi/", http.StripPrefix("/openapi", openAPIServicesHandler()))
 

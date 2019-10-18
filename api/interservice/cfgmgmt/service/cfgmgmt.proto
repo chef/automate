@@ -42,4 +42,5 @@ service CfgMgmt {
 	rpc GetEventStringBuckets(chef.automate.domain.cfgmgmt.request.EventStrings) returns (chef.automate.domain.cfgmgmt.response.EventStrings);
 	rpc GetInventoryNodes(chef.automate.domain.cfgmgmt.request.InventoryNodes) returns (chef.automate.domain.cfgmgmt.response.InventoryNodes);
 	rpc NodeExport(chef.automate.domain.cfgmgmt.request.NodeExport) returns (stream chef.automate.domain.cfgmgmt.response.ExportData);
+	rpc ReportExport(chef.automate.domain.cfgmgmt.request.ReportExport) returns (stream chef.automate.domain.cfgmgmt.response.ReportExportData);
 }

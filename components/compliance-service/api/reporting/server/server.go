@@ -63,7 +63,7 @@ func (srv *Server) ListReports(ctx context.Context, in *reporting.Query) (*repor
 	return &reports, nil
 }
 
-// ListReports returns a list of reports based on query
+// ListReportIds returns a list of reports based on query
 func (srv *Server) ListReportIds(ctx context.Context, in *reporting.Query) (*reporting.ReportIds, error) {
 	var ids reporting.ReportIds
 
@@ -173,7 +173,7 @@ func (srv *Server) ListProfiles(ctx context.Context, in *reporting.Query) (*repo
 	return &profileMins, nil
 }
 
-// ListControls returns a list of contolListItems based on query
+// ListControlItems returns a list of contolListItems based on query
 func (srv *Server) ListControlItems(ctx context.Context, in *reporting.ControlItemRequest) (*reporting.ControlItems, error) {
 	var controlListItems *reporting.ControlItems
 	if in.Size == 0 {

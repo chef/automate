@@ -6,6 +6,7 @@ import { ChefComponentsModule } from '../../../../components/chef-components.mod
 import { ReportingNodeComponent } from './reporting-node.component';
 import { ReportingNodeRoutingModule } from './reporting-node.routing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 
 @NgModule({
   imports: [
@@ -13,7 +14,8 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
     RouterModule,
     ReportingNodeRoutingModule,
     ComplianceSharedModule,
-    ChefComponentsModule
+    ChefComponentsModule,
+    ChefPipesModule
   ],
   declarations: [
     ReportingNodeComponent

@@ -1,0 +1,32 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Chef Automate documentation",
+    "version": "1.3.3.7",
+    "termsOfService": "https://www.chef.io/terms-and-conditions-of-use/",
+    "contact": {
+      "email": "support@chef.io",
+      "url": "https://github.com/chef/automate"
+    },
+    "x-logo": {
+      "url": "/images/chef-automate-logo.svg",
+      "altText": "Chef logo"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://github.com/chef/automate/blob/master/LICENSE"
+    },
+    "description": ""
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {}
+}

@@ -1,0 +1,36 @@
+{
+  "paths": {
+    "/compliance/reporting/export": {
+      "get": {
+        "summary": "Export reports",
+        "description": "Stream reports in JSON (default) or CSV format.\nSupports filtering, but not pagination or sorting.\nInclude the value `csv` for the `type` parameter in the request to receive CSV formatted data.\nIncluding more than one value for `control`, `profile_id`, or `profile_name` is not allowed.\nIncluding values for both `profile_id` and `profile_name` in one request is not allowed.",
+        "operationId": "Export",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ExportData"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1Query"
+            }
+          }
+        ],
+        "tags": [
+          "Compliance Reporting Export"
+        ],
+        "produces": [
+          "application/json",
+          "text/csv"
+        ]
+      }
+    }
+  }
+}

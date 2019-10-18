@@ -158,6 +158,56 @@ func (es Backend) GetRuns(nodeID string, page int, perPage int, filters map[stri
 	return runs, nil
 }
 
+func (es Backend) GetRunsPageByCurser(ctx context.Context, nodeID string, start time.Time,
+	end time.Time, filters map[string][]string, cursorEndTime time.Time,
+	cursorID string, pageSize int, ascending bool) ([]backend.Run, error) {
+
+	filters["entity_uuid"] = []string{nodeID}
+	mainQuery := newBoolQueryFromFilters(filters)
+
+	rangeQuery, ok := newRangeQueryTime(start, end, RunFieldEndTimestamp)
+
+	if ok {
+		mainQuery = mainQuery.Must(rangeQuery)
+	}
+
+	searchService := es.client.Search().
+		Query(mainQuery).
+		Index(IndexConvergeHistory).
+		Size(pageSize).
+		Sort(RunFieldEndTimestamp, ascending).
+		Sort(RunFieldID, ascending)
+
+	if !cursorEndTime.IsZero() && cursorID != "" {
+		// the date has to be in milliseconds
+		milliseconds := cursorEndTime.UnixNano() / int64(time.Millisecond)
+		searchService = searchService.SearchAfter(milliseconds, cursorID)
+	}
+
+	searchResult, err := searchService.Do(ctx)
+
+	// Return an error if the search was not successful
+	if err != nil {
+		return nil, err
+	}
+
+	var runs []backend.Run
+	if searchResult.Hits.TotalHits > 0 {
+		// Iterate through every Hit and unmarshal the Source into a backend.Run
+		for _, hit := range searchResult.Hits.Hits {
+			var run backend.Run
+			err := json.Unmarshal(*hit.Source, &run)
+			if err != nil {
+				log.WithError(err).Error("Error unmarshalling the node object")
+			} else {
+				runs = append(runs, run)
+			}
+		}
+	}
+
+	return runs, nil
+}
+
 // GetDateOfOldestConvergeIndices - Find the date of the oldest converge history index.
 // If there is no converge history indices returns false on the second return value.
 func (es Backend) GetDateOfOldestConvergeIndices() (time.Time, bool, error) {

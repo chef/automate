@@ -184,7 +184,7 @@ func (backend ES2Backend) filterIdsByControl(esIndex string, ids, controls []str
 	return ids, nil
 }
 
-// GetAllReports returns all reports in a given timeframe
+// GetReports returns all reports in a given timeframe
 // TODO: support timeframe and pagination
 func (backend *ES2Backend) GetReports(from int32, size int32, filters map[string][]string,
 	sortField string, sortAsc bool) ([]*reportingapi.Report, int64, error) {
@@ -246,7 +246,7 @@ func (backend *ES2Backend) GetReports(from int32, size int32, filters map[string
 	if err != nil {
 		return nil, 0, errors.Wrapf(err, "%s unable to complete search", myName)
 	}
-	logrus.Debugf("GetAllReports got %d reports in %d milliseconds\n", searchResult.TotalHits(),
+	logrus.Debugf("GetReports got %d reports in %d milliseconds\n", searchResult.TotalHits(),
 		searchResult.TookInMillis)
 	reports := make([]*reportingapi.Report, 0)
 	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
@@ -283,7 +283,7 @@ func (backend *ES2Backend) GetReports(from int32, size int32, filters map[string
 
 					reports = append(reports, &report)
 				} else {
-					logrus.Errorf("GetAllReports unmarshal error: %s", err.Error())
+					logrus.Errorf("GetReports unmarshal error: %s", err.Error())
 				}
 			}
 		}
