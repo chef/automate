@@ -1,5 +1,6 @@
 {
   "projectId": "yvg8zo",
   "defaultCommandTimeout": 25000,
-  "pageLoadTimeout": 80000
+  "pageLoadTimeout": 80000,
+  "supportFile": "cypress/support/index.ts"
 }
