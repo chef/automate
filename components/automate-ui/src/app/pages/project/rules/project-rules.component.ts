@@ -13,7 +13,7 @@ import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Regex } from 'app/helpers/auth/regex';
 import { EntityStatus, loading } from 'app/entities/entities';
 import {
-  Rule, RuleTypeMappedObject, Condition, ConditionOperator, isConditionOperator
+  Rule, RuleTypeMappedObject, Condition, ConditionOperator, isConditionOperator, KVPair
 } from 'app/entities/rules/rule.model';
 import {
   GetRule, GetRulesForProject, CreateRule, UpdateRule
@@ -48,6 +48,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
 
   public isLoading = true;
   public saving = false;
+  public attributeList: KVPair;
   public attributes: RuleTypeMappedObject;
   public editingRule = false;
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
@@ -136,6 +137,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         type: [{ value: this.rule.type, disabled: true }], // always disabled, no validation needed
         conditions: this.fb.array(this.populateConditions())
       });
+      this.attributeList = this.attributes[this.rule.type.toLowerCase()];
     } else {
       this.ruleForm = this.fb.group({
         // Must stay in sync with error checks in project-rules.component.html
@@ -146,11 +148,20 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         conditions: this.fb.array(this.populateConditions())
       });
     }
+
+    this.checkTypeChange();
   }
 
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  public checkTypeChange() {
+    this.ruleForm.get('type').valueChanges.pipe(takeUntil(this.isDestroyed)).subscribe(
+      (type: string) => {
+        this.attributeList = this.attributes[type.toLowerCase()];
+    });
   }
 
   getHeading(): string {
