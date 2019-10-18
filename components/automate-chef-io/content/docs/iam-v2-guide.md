@@ -482,7 +482,6 @@ Generate a new token and add that token as a new member of the Chef-managed `Adm
   chef-automate iam token create <your token name here> --admin
 ```
 
-
 ## Reverting to IAM v1
 
 Reverting to IAM v1 discards your IAM v2 policies, roles, and projects, and re-configures Chef Automate to use your v1 policies again.

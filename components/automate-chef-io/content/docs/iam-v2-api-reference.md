@@ -360,7 +360,7 @@ DELETE /projects/{**id**} | delete a project
 ### Listing Projects
 
 ```bash
-curl -sH "api-token: $TOKEN" \
+curl -sH "api-token: $TOKEN" -X GET \
   https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/projects?pretty
 ```
 
@@ -476,7 +476,7 @@ Rather, write the rule with a single condition like this:
 ### Listing Rules for a Project
 
 ```bash
-curl -sH "api-token: $TOKEN" \
+curl -sH "api-token: $TOKEN" -X GET \
   https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/projects/{project-id}/rules?pretty
 ```
 
@@ -485,7 +485,7 @@ The output lists all rules for a specified project.
 ### Getting a Project Rule
 
 ```bash
-curl -sH "api-token: $TOKEN" \
+curl -sH "api-token: $TOKEN" -X GET \
   https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/projects/{project-id}/rules/{rule-id}?pretty
 ```
 
@@ -593,12 +593,23 @@ Deleting a user is permanent and cannot be undone.
 ### List Teams for a User
 
 ```bash
-curl -sSH "api-token: $TOKEN" \
+curl -sSH "api-token: $TOKEN" -X GET \
 https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/users/{membership-id}/teams?pretty
 ```
 
 The output lists all teams that contain the specified user.
 Note, it uses the `membership_id` property of the user instead of the user's `id`.
+
+### Updating Your Own User
+
+```bash
+curl -sSH "api-token: $TOKEN" -d @user.json -X PUT \
+https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/self/{user-id}?pretty
+```
+
+- Supply all of your user properties, not just the ones you wish to update.
+  Properties that you do not include are reset to empty values.
+- Your user ID is immutable; it can only be set at creation time.
 
 ## Teams
 
@@ -695,7 +706,7 @@ POST /teams/{**id**}/users:remove      | remove from the membership
 ### Listing Team Users
 
 ```bash
-curl -sSH "api-token: $TOKEN"  \
+curl -sSH "api-token: $TOKEN"  -X GET \
 https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/teams/{team-id}/users?pretty
 ```
 
@@ -704,14 +715,16 @@ The output lists all local users on the specified team.
 ### Adding Users to a Team
 
 ```bash
-curl -sSH "api-token: $TOKEN" -d '{"user_ids":["{membership_id}","{membership_id}"]}' -X POST \
+curl -sSH "api-token: $TOKEN" -X POST \
+-d '{"user_ids":["{membership_id}","{membership_id}"]}' \
 https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/teams/{team-id}/users:add?pretty
 ```
 
 ### Removing Users from a Team
 
 ```bash
-curl -sSH "api-token: $TOKEN" -d '{"user_ids":["{membership_id}","{membership_id}"]}' -X POST \
+curl -sSH "api-token: $TOKEN" -X POST \
+-d '{"user_ids":["{membership_id}","{membership_id}"]}' \
 https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/teams/{team-id}/users:remove?pretty
 ```
 

@@ -157,8 +157,8 @@ By default, Automate includes a *project-owner* role so the global admin may del
 
 There are two categories of resources that may be assigned to projects:
 
-* Ingested client run and compliance nodes
-* Teams, API Tokens, Policies, and Roles created in Automate
+- Ingested client run and compliance nodes
+- Teams, API Tokens, Policies, and Roles created in Automate
 
 Any of these that you do not explicitly assign to a project are considered *unassigned* with respect to projects.
 After upgrading and before creating projects, all of your resources are considered *unassigned*.
