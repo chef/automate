@@ -837,6 +837,15 @@ FIGURE 12 -- HANDLING OF "ALL PROJECTS" REQUESTED
 
 There is a lot more to say about projects, but this at least serves as a place holder for now.
 
+## Data Layer
+
+There are a lot of moving parts in Authz service.
+To aid in visualizing the various pieces here is an entity-relationship diagram detailing the data layer.
+
+![Automate 2 AuthZ Entity Relationship Diagram](../../dev-docs/diagrams/authz-entity-relationships.png)
+
+FIGURE 13 -- ENTITY RELATIONSHIP DIAGRAM
+
 ## Spinning up the GRPC Service Locally
 
 This section describes how to bring up services in a standalone fashion.

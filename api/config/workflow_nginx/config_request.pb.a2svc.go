@@ -25,7 +25,7 @@ func (m *ConfigRequest) ListPorts() []a2conf.PortInfo {
 }
 
 // GetPort gets the port tagged with the given name. If the value is not set, it returns 0.
-func (m *ConfigRequest) GetPort(name string, value uint16) (uint16, error) {
+func (m *ConfigRequest) GetPort(name string) (uint16, error) {
 	switch name {
 	default:
 		return 0, a2conf.ErrPortNotFound

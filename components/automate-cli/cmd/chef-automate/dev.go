@@ -824,7 +824,6 @@ func newDevPortCmd() *cobra.Command {
 				f := a.Field(i)
 				if f.Type.Implements(a2ServiceConfigType) {
 					v := (reflect.New(f.Type.Elem()).Interface()).(a2conf.A2ServiceConfig)
-					//writer.Titlef("%s [%s]", v.ServiceName(), f.Name)
 					ports := v.ListPorts()
 					for _, p := range ports {
 						writer.Bodyf("%-30s%-10s\t%-10d\t%-10s", v.ServiceName(), p.Name, p.Default, p.Protocol)
