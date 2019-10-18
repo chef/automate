@@ -69,13 +69,16 @@ describe('PolicyAddMembersComponent', () => {
 
         using([
             [{ type: 'team', identity: null, name: null }, 'type', 'team'],
-            [{ type: '*', identity: null, name: null}, 'team', '*'],
+            [{ type: '*', identity: null, name: null}, 'type', '*'],
             [{ type: 'team', identity: 'saml', name: null}, 'identity', 'team:saml'],
             [{ type: 'team', identity: 'saml', name: '*'}, 'identity', 'team:saml:*'],
             [{ type: 'user', identity: 'local', name: null}, 'identity', 'user:local'],
             [{ type: 'user', identity: 'ldap', name: 'square'}, 'name', 'user:ldap:square'],
             [{ type: 'token', identity: null, name: 'whatever'}, 'name', 'token:whatever'],
-            [{ type: 'token', identity: null, name: 'something'}, 'name', 'token:something']
+            [{ type: 'token', identity: null, name: 'something'}, 'name', 'token:something'],
+            [{ type: 'user', identity: null, name: '*'}, 'name', 'user:*'],
+            [{ type: 'team', identity: null, name: '*'}, 'name', 'team:*'],
+            [{ type: 'token', identity: null, name: '*'}, 'name', 'token:*']
         ], function (formValues: {}, inputName: string, output: string) {
             it(`sets expressionOutput to ${output} when formValues are ${formValues} and inputName is ${inputName}`, () => {
                 component.expressionForm.setValue(formValues);

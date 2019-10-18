@@ -75,7 +75,6 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   public addMembersFailed = '';
 
   // Add expression modal and modal error cases
-
   public modalVisible = false;
   public unparsableMember = false;
   public duplicateMember = false;
@@ -158,7 +157,6 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
     this.store.dispatch(new GetTeams());
     this.store.dispatch(new GetUsers());
-
   }
 
   addAvailableMember(member: Member, refresh: boolean): void {
@@ -328,14 +326,14 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     this.closeModal();
   }
 
-  private showInputs(inputName: string): void {
+  private showInputs(fieldName: string): void {
 
     const formValues = this.expressionForm.value;
     const matchAllWildCard = '*';
 
     this.setFormLabels(formValues.type);
 
-    switch (inputName) {
+    switch (fieldName) {
       case 'type':
         this.resetFormControls();
         if (formValues.type === 'user' || formValues.type === 'team') {
@@ -385,7 +383,6 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     this.expressionForm.addControl('name', new FormControl('',
       [
         Validators.required,
-        Validators.pattern(Regex.patterns.NON_BLANK),
         Validators.pattern(Regex.patterns.NO_MIXED_WILDCARD)
       ]
     )
@@ -393,13 +390,14 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   }
 
   private setExpressionOutput(): void {
-    const values: string[] = Object.values(this.expressionForm.value);
-    const output = values.filter(value => value != null && value.length > 0);
-    this.expressionOutput = output.join(':');
+    this.expressionOutput =
+      (Object.values(this.expressionForm.value) as string[])
+             .filter(value => value != null && value.length > 0)
+             .join(':');
   }
 
-  public updateFormDisplay(inputName: string): void {
-    this.showInputs(inputName);
+  public updateFormDisplay(fieldName: string): void {
+    this.showInputs(fieldName);
     this.setExpressionOutput();
   }
 }
