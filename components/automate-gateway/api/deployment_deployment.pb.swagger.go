@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/deploymentServiceVersionsResponse"
+              "$ref": "#/definitions/chef.automate.api.deployment.ServiceVersionsResponse"
             }
           }
         },
@@ -41,7 +41,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/deploymentVersion"
+              "$ref": "#/definitions/chef.automate.api.deployment.Version"
             }
           }
         },
@@ -52,7 +52,7 @@ func init() {
     }
   },
   "definitions": {
-    "deploymentServiceVersion": {
+    "chef.automate.api.deployment.ServiceVersion": {
       "type": "object",
       "properties": {
         "name": {
@@ -69,18 +69,18 @@ func init() {
         }
       }
     },
-    "deploymentServiceVersionsResponse": {
+    "chef.automate.api.deployment.ServiceVersionsResponse": {
       "type": "object",
       "properties": {
         "services": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/deploymentServiceVersion"
+            "$ref": "#/definitions/chef.automate.api.deployment.ServiceVersion"
           }
         }
       }
     },
-    "deploymentVersion": {
+    "chef.automate.api.deployment.Version": {
       "type": "object",
       "properties": {
         "build_timestamp": {

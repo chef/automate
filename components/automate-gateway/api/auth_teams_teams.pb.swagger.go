@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseTeams"
+              "$ref": "#/definitions/chef.automate.api.teams.response.Teams"
             }
           }
         },
@@ -39,7 +39,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseCreateTeamResp"
+              "$ref": "#/definitions/chef.automate.api.teams.response.CreateTeamResp"
             }
           }
         },
@@ -49,7 +49,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestCreateTeamReq"
+              "$ref": "#/definitions/chef.automate.api.teams.request.CreateTeamReq"
             }
           }
         ],
@@ -65,7 +65,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/versionVersionInfo"
+              "$ref": "#/definitions/chef.automate.api.common.version.VersionInfo"
             }
           }
         },
@@ -81,7 +81,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseGetTeamResp"
+              "$ref": "#/definitions/chef.automate.api.teams.response.GetTeamResp"
             }
           }
         },
@@ -103,7 +103,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseDeleteTeamResp"
+              "$ref": "#/definitions/chef.automate.api.teams.response.DeleteTeamResp"
             }
           }
         },
@@ -125,7 +125,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseUpdateTeamResp"
+              "$ref": "#/definitions/chef.automate.api.teams.response.UpdateTeamResp"
             }
           }
         },
@@ -141,7 +141,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestUpdateTeamReq"
+              "$ref": "#/definitions/chef.automate.api.teams.request.UpdateTeamReq"
             }
           }
         ],
@@ -157,7 +157,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseGetUsersResp"
+              "$ref": "#/definitions/chef.automate.api.teams.response.GetUsersResp"
             }
           }
         },
@@ -179,7 +179,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseAddUsersResp"
+              "$ref": "#/definitions/chef.automate.api.teams.response.AddUsersResp"
             }
           }
         },
@@ -195,7 +195,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestAddUsersReq"
+              "$ref": "#/definitions/chef.automate.api.teams.request.AddUsersReq"
             }
           }
         ],
@@ -209,7 +209,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseRemoveUsersResp"
+              "$ref": "#/definitions/chef.automate.api.teams.response.RemoveUsersResp"
             }
           }
         },
@@ -225,7 +225,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestRemoveUsersReq"
+              "$ref": "#/definitions/chef.automate.api.teams.request.RemoveUsersReq"
             }
           }
         ],
@@ -241,7 +241,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseGetTeamsForUserResp"
+              "$ref": "#/definitions/chef.automate.api.teams.response.GetTeamsForUserResp"
             }
           }
         },
@@ -260,155 +260,7 @@ func init() {
     }
   },
   "definitions": {
-    "requestAddUsersReq": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "user_ids": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "requestCreateTeamReq": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        }
-      }
-    },
-    "requestRemoveUsersReq": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "user_ids": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "requestUpdateTeamReq": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        }
-      }
-    },
-    "responseAddUsersResp": {
-      "type": "object",
-      "properties": {
-        "team": {
-          "$ref": "#/definitions/teamsresponseTeam"
-        }
-      }
-    },
-    "responseCreateTeamResp": {
-      "type": "object",
-      "properties": {
-        "team": {
-          "$ref": "#/definitions/teamsresponseTeam"
-        }
-      }
-    },
-    "responseDeleteTeamResp": {
-      "type": "object",
-      "properties": {
-        "team": {
-          "$ref": "#/definitions/teamsresponseTeam"
-        }
-      }
-    },
-    "responseGetTeamResp": {
-      "type": "object",
-      "properties": {
-        "team": {
-          "$ref": "#/definitions/teamsresponseTeam"
-        }
-      }
-    },
-    "responseGetTeamsForUserResp": {
-      "type": "object",
-      "properties": {
-        "teams": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/teamsresponseTeam"
-          }
-        }
-      }
-    },
-    "responseGetUsersResp": {
-      "type": "object",
-      "properties": {
-        "user_ids": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "responseRemoveUsersResp": {
-      "type": "object",
-      "properties": {
-        "team": {
-          "$ref": "#/definitions/teamsresponseTeam"
-        }
-      }
-    },
-    "responseTeams": {
-      "type": "object",
-      "properties": {
-        "teams": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/teamsresponseTeam"
-          }
-        }
-      }
-    },
-    "responseUpdateTeamResp": {
-      "type": "object",
-      "properties": {
-        "team": {
-          "$ref": "#/definitions/teamsresponseTeam"
-        }
-      }
-    },
-    "teamsresponseTeam": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        }
-      }
-    },
-    "versionVersionInfo": {
+    "chef.automate.api.common.version.VersionInfo": {
       "type": "object",
       "properties": {
         "name": {
@@ -422,6 +274,154 @@ func init() {
         },
         "built": {
           "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.teams.request.AddUsersReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "user_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "chef.automate.api.teams.request.CreateTeamReq": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.teams.request.RemoveUsersReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "user_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "chef.automate.api.teams.request.UpdateTeamReq": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.teams.response.AddUsersResp": {
+      "type": "object",
+      "properties": {
+        "team": {
+          "$ref": "#/definitions/chef.automate.api.teams.response.Team"
+        }
+      }
+    },
+    "chef.automate.api.teams.response.CreateTeamResp": {
+      "type": "object",
+      "properties": {
+        "team": {
+          "$ref": "#/definitions/chef.automate.api.teams.response.Team"
+        }
+      }
+    },
+    "chef.automate.api.teams.response.DeleteTeamResp": {
+      "type": "object",
+      "properties": {
+        "team": {
+          "$ref": "#/definitions/chef.automate.api.teams.response.Team"
+        }
+      }
+    },
+    "chef.automate.api.teams.response.GetTeamResp": {
+      "type": "object",
+      "properties": {
+        "team": {
+          "$ref": "#/definitions/chef.automate.api.teams.response.Team"
+        }
+      }
+    },
+    "chef.automate.api.teams.response.GetTeamsForUserResp": {
+      "type": "object",
+      "properties": {
+        "teams": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.teams.response.Team"
+          }
+        }
+      }
+    },
+    "chef.automate.api.teams.response.GetUsersResp": {
+      "type": "object",
+      "properties": {
+        "user_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "chef.automate.api.teams.response.RemoveUsersResp": {
+      "type": "object",
+      "properties": {
+        "team": {
+          "$ref": "#/definitions/chef.automate.api.teams.response.Team"
+        }
+      }
+    },
+    "chef.automate.api.teams.response.Team": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.teams.response.Teams": {
+      "type": "object",
+      "properties": {
+        "teams": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.teams.response.Team"
+          }
+        }
+      }
+    },
+    "chef.automate.api.teams.response.UpdateTeamResp": {
+      "type": "object",
+      "properties": {
+        "team": {
+          "$ref": "#/definitions/chef.automate.api.teams.response.Team"
         }
       }
     }

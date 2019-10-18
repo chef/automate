@@ -22,7 +22,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/ingestConfigureDeleteNodesSchedulerResponse"
+              "$ref": "#/definitions/chef.automate.domain.ingest.ConfigureDeleteNodesSchedulerResponse"
             }
           }
         },
@@ -39,7 +39,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/ingestDeleteMarkedNodesResponse"
+              "$ref": "#/definitions/chef.automate.domain.ingest.DeleteMarkedNodesResponse"
             }
           }
         },
@@ -55,7 +55,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/ingestStartDeleteNodesSchedulerResponse"
+              "$ref": "#/definitions/chef.automate.domain.ingest.StartDeleteNodesSchedulerResponse"
             }
           }
         },
@@ -71,7 +71,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/ingestStopDeleteNodesSchedulerResponse"
+              "$ref": "#/definitions/chef.automate.domain.ingest.StopDeleteNodesSchedulerResponse"
             }
           }
         },
@@ -87,7 +87,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/ingestJobSchedulerStatus"
+              "$ref": "#/definitions/chef.automate.domain.ingest.JobSchedulerStatus"
             }
           }
         },
@@ -103,7 +103,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/ingestConfigureNodesMissingSchedulerResponse"
+              "$ref": "#/definitions/chef.automate.domain.ingest.ConfigureNodesMissingSchedulerResponse"
             }
           }
         },
@@ -119,7 +119,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/ingestMarkNodesMissingResponse"
+              "$ref": "#/definitions/chef.automate.domain.ingest.MarkNodesMissingResponse"
             }
           }
         },
@@ -135,7 +135,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/ingestStartNodesMissingSchedulerResponse"
+              "$ref": "#/definitions/chef.automate.domain.ingest.StartNodesMissingSchedulerResponse"
             }
           }
         },
@@ -151,7 +151,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/ingestStopNodesMissingSchedulerResponse"
+              "$ref": "#/definitions/chef.automate.domain.ingest.StopNodesMissingSchedulerResponse"
             }
           }
         },
@@ -162,19 +162,19 @@
     }
   },
   "definitions": {
-    "ingestConfigureDeleteNodesSchedulerResponse": {
+    "chef.automate.domain.ingest.ConfigureDeleteNodesSchedulerResponse": {
       "type": "object"
     },
-    "ingestConfigureMissingNodesForDeletionSchedulerResponse": {
+    "chef.automate.domain.ingest.ConfigureMissingNodesForDeletionSchedulerResponse": {
       "type": "object"
     },
-    "ingestConfigureNodesMissingSchedulerResponse": {
+    "chef.automate.domain.ingest.ConfigureNodesMissingSchedulerResponse": {
       "type": "object"
     },
-    "ingestDeleteMarkedNodesResponse": {
+    "chef.automate.domain.ingest.DeleteMarkedNodesResponse": {
       "type": "object"
     },
-    "ingestJob": {
+    "chef.automate.domain.ingest.Job": {
       "type": "object",
       "properties": {
         "running": {
@@ -204,7 +204,7 @@
         }
       }
     },
-    "ingestJobSchedulerStatus": {
+    "chef.automate.domain.ingest.JobSchedulerStatus": {
       "type": "object",
       "properties": {
         "running": {
@@ -214,34 +214,34 @@
         "jobs": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/ingestJob"
+            "$ref": "#/definitions/chef.automate.domain.ingest.Job"
           }
         }
       }
     },
-    "ingestMarkMissingNodesForDeletionResponse": {
+    "chef.automate.domain.ingest.MarkMissingNodesForDeletionResponse": {
       "type": "object",
       "title": "MissingNodesForDeletionScheduler"
     },
-    "ingestMarkNodesMissingResponse": {
+    "chef.automate.domain.ingest.MarkNodesMissingResponse": {
       "type": "object"
     },
-    "ingestStartDeleteNodesSchedulerResponse": {
+    "chef.automate.domain.ingest.StartDeleteNodesSchedulerResponse": {
       "type": "object"
     },
-    "ingestStartMissingNodesForDeletionSchedulerResponse": {
+    "chef.automate.domain.ingest.StartMissingNodesForDeletionSchedulerResponse": {
       "type": "object"
     },
-    "ingestStartNodesMissingSchedulerResponse": {
+    "chef.automate.domain.ingest.StartNodesMissingSchedulerResponse": {
       "type": "object"
     },
-    "ingestStopDeleteNodesSchedulerResponse": {
+    "chef.automate.domain.ingest.StopDeleteNodesSchedulerResponse": {
       "type": "object"
     },
-    "ingestStopMissingNodesForDeletionSchedulerResponse": {
+    "chef.automate.domain.ingest.StopMissingNodesForDeletionSchedulerResponse": {
       "type": "object"
     },
-    "ingestStopNodesMissingSchedulerResponse": {
+    "chef.automate.domain.ingest.StopNodesMissingSchedulerResponse": {
       "type": "object"
     }
   }

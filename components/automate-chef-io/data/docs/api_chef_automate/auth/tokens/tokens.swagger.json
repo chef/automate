@@ -22,7 +22,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseTokens"
+              "$ref": "#/definitions/chef.automate.api.tokens.response.Tokens"
             }
           }
         },
@@ -36,7 +36,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseToken"
+              "$ref": "#/definitions/chef.automate.api.tokens.response.Token"
             }
           }
         },
@@ -46,7 +46,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestCreateToken"
+              "$ref": "#/definitions/chef.automate.api.tokens.request.CreateToken"
             }
           }
         ],
@@ -62,7 +62,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseToken"
+              "$ref": "#/definitions/chef.automate.api.tokens.response.Token"
             }
           }
         },
@@ -84,7 +84,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseDeleteTokenResp"
+              "$ref": "#/definitions/chef.automate.api.tokens.response.DeleteTokenResp"
             }
           }
         },
@@ -106,7 +106,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseToken"
+              "$ref": "#/definitions/chef.automate.api.tokens.response.Token"
             }
           }
         },
@@ -122,7 +122,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestUpdateToken"
+              "$ref": "#/definitions/chef.automate.api.tokens.request.UpdateToken"
             }
           }
         ],
@@ -133,7 +133,7 @@
     }
   },
   "definitions": {
-    "requestCreateToken": {
+    "chef.automate.api.tokens.request.CreateToken": {
       "type": "object",
       "properties": {
         "description": {
@@ -151,7 +151,7 @@
         }
       }
     },
-    "requestUpdateToken": {
+    "chef.automate.api.tokens.request.UpdateToken": {
       "type": "object",
       "properties": {
         "id": {
@@ -166,10 +166,10 @@
         }
       }
     },
-    "responseDeleteTokenResp": {
+    "chef.automate.api.tokens.response.DeleteTokenResp": {
       "type": "object"
     },
-    "responseToken": {
+    "chef.automate.api.tokens.response.Token": {
       "type": "object",
       "properties": {
         "id": {
@@ -193,13 +193,13 @@
         }
       }
     },
-    "responseTokens": {
+    "chef.automate.api.tokens.response.Tokens": {
       "type": "object",
       "properties": {
         "tokens": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/responseToken"
+            "$ref": "#/definitions/chef.automate.api.tokens.response.Token"
           }
         }
       }

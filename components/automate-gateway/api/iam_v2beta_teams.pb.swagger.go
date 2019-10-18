@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaListTeamsResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.ListTeamsResp"
             }
           }
         },
@@ -39,7 +39,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaCreateTeamResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.CreateTeamResp"
             }
           }
         },
@@ -49,7 +49,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v2betaCreateTeamReq"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.CreateTeamReq"
             }
           }
         ],
@@ -65,7 +65,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaGetTeamResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.GetTeamResp"
             }
           }
         },
@@ -87,7 +87,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaDeleteTeamResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.DeleteTeamResp"
             }
           }
         },
@@ -109,7 +109,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaUpdateTeamResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.UpdateTeamResp"
             }
           }
         },
@@ -125,7 +125,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v2betaUpdateTeamReq"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.UpdateTeamReq"
             }
           }
         ],
@@ -141,7 +141,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaGetTeamMembershipResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.GetTeamMembershipResp"
             }
           }
         },
@@ -165,7 +165,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaAddTeamMembersResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.AddTeamMembersResp"
             }
           }
         },
@@ -181,7 +181,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v2betaAddTeamMembersReq"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.AddTeamMembersReq"
             }
           }
         ],
@@ -197,7 +197,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaRemoveTeamMembersResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.RemoveTeamMembersResp"
             }
           }
         },
@@ -213,7 +213,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v2betaRemoveTeamMembersReq"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.RemoveTeamMembersReq"
             }
           }
         ],
@@ -229,7 +229,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaGetTeamsForMemberResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.GetTeamsForMemberResp"
             }
           }
         },
@@ -248,7 +248,7 @@ func init() {
     }
   },
   "definitions": {
-    "v2betaAddTeamMembersReq": {
+    "chef.automate.api.iam.v2beta.AddTeamMembersReq": {
       "type": "object",
       "properties": {
         "id": {
@@ -262,7 +262,7 @@ func init() {
         }
       }
     },
-    "v2betaAddTeamMembersResp": {
+    "chef.automate.api.iam.v2beta.AddTeamMembersResp": {
       "type": "object",
       "properties": {
         "user_ids": {
@@ -273,10 +273,10 @@ func init() {
         }
       }
     },
-    "v2betaApplyV2DataMigrationsResp": {
+    "chef.automate.api.iam.v2beta.ApplyV2DataMigrationsResp": {
       "type": "object"
     },
-    "v2betaCreateTeamReq": {
+    "chef.automate.api.iam.v2beta.CreateTeamReq": {
       "type": "object",
       "properties": {
         "id": {
@@ -293,23 +293,23 @@ func init() {
         }
       }
     },
-    "v2betaCreateTeamResp": {
+    "chef.automate.api.iam.v2beta.CreateTeamResp": {
       "type": "object",
       "properties": {
         "team": {
-          "$ref": "#/definitions/v2betaTeam"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Team"
         }
       }
     },
-    "v2betaDeleteTeamResp": {
+    "chef.automate.api.iam.v2beta.DeleteTeamResp": {
       "type": "object",
       "properties": {
         "team": {
-          "$ref": "#/definitions/v2betaTeam"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Team"
         }
       }
     },
-    "v2betaGetTeamMembershipResp": {
+    "chef.automate.api.iam.v2beta.GetTeamMembershipResp": {
       "type": "object",
       "properties": {
         "user_ids": {
@@ -320,37 +320,37 @@ func init() {
         }
       }
     },
-    "v2betaGetTeamResp": {
+    "chef.automate.api.iam.v2beta.GetTeamResp": {
       "type": "object",
       "properties": {
         "team": {
-          "$ref": "#/definitions/v2betaTeam"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Team"
         }
       }
     },
-    "v2betaGetTeamsForMemberResp": {
+    "chef.automate.api.iam.v2beta.GetTeamsForMemberResp": {
       "type": "object",
       "properties": {
         "teams": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v2betaTeam"
+            "$ref": "#/definitions/chef.automate.api.iam.v2beta.Team"
           }
         }
       }
     },
-    "v2betaListTeamsResp": {
+    "chef.automate.api.iam.v2beta.ListTeamsResp": {
       "type": "object",
       "properties": {
         "teams": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v2betaTeam"
+            "$ref": "#/definitions/chef.automate.api.iam.v2beta.Team"
           }
         }
       }
     },
-    "v2betaRemoveTeamMembersReq": {
+    "chef.automate.api.iam.v2beta.RemoveTeamMembersReq": {
       "type": "object",
       "properties": {
         "id": {
@@ -364,7 +364,7 @@ func init() {
         }
       }
     },
-    "v2betaRemoveTeamMembersResp": {
+    "chef.automate.api.iam.v2beta.RemoveTeamMembersResp": {
       "type": "object",
       "properties": {
         "user_ids": {
@@ -375,7 +375,7 @@ func init() {
         }
       }
     },
-    "v2betaTeam": {
+    "chef.automate.api.iam.v2beta.Team": {
       "type": "object",
       "properties": {
         "id": {
@@ -392,7 +392,7 @@ func init() {
         }
       }
     },
-    "v2betaUpdateTeamReq": {
+    "chef.automate.api.iam.v2beta.UpdateTeamReq": {
       "type": "object",
       "properties": {
         "id": {
@@ -409,11 +409,11 @@ func init() {
         }
       }
     },
-    "v2betaUpdateTeamResp": {
+    "chef.automate.api.iam.v2beta.UpdateTeamResp": {
       "type": "object",
       "properties": {
         "team": {
-          "$ref": "#/definitions/v2betaTeam"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Team"
         }
       }
     }

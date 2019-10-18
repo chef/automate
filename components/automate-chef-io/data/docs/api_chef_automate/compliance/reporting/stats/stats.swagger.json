@@ -22,7 +22,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Failures"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.Failures"
             }
           }
         },
@@ -32,7 +32,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/reportingstatsv1Query"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.Query"
             }
           }
         ],
@@ -49,7 +49,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/reportingstatsv1Profile"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.Profile"
             }
           }
         },
@@ -59,7 +59,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/reportingstatsv1Query"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.Query"
             }
           }
         ],
@@ -76,7 +76,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Summary"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.Summary"
             }
           }
         },
@@ -86,7 +86,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/reportingstatsv1Query"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.Query"
             }
           }
         ],
@@ -103,7 +103,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Trends"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.Trends"
             }
           }
         },
@@ -113,7 +113,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/reportingstatsv1Query"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.Query"
             }
           }
         ],
@@ -124,114 +124,7 @@
     }
   },
   "definitions": {
-    "reportingstatsv1ListFilter": {
-      "type": "object",
-      "properties": {
-        "values": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "type": {
-          "type": "string"
-        }
-      }
-    },
-    "reportingstatsv1Profile": {
-      "type": "object",
-      "properties": {
-        "profile_list": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1ProfileList"
-          }
-        },
-        "profile_summary": {
-          "$ref": "#/definitions/v1ProfileSummary"
-        },
-        "control_stats": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1ControlStats"
-          }
-        }
-      }
-    },
-    "reportingstatsv1Query": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "type": {
-          "type": "string"
-        },
-        "size": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "interval": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "filters": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/reportingstatsv1ListFilter"
-          }
-        },
-        "order": {
-          "$ref": "#/definitions/reportingstatsv1QueryOrderType"
-        },
-        "sort": {
-          "type": "string"
-        },
-        "page": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "per_page": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "reportingstatsv1QueryOrderType": {
-      "type": "string",
-      "enum": [
-        "ASC",
-        "DESC"
-      ],
-      "default": "ASC"
-    },
-    "reportingstatsv1Support": {
-      "type": "object",
-      "properties": {
-        "os_name": {
-          "type": "string"
-        },
-        "os_family": {
-          "type": "string"
-        },
-        "release": {
-          "type": "string"
-        },
-        "inspec_version": {
-          "type": "string"
-        },
-        "platform_name": {
-          "type": "string"
-        },
-        "platform_family": {
-          "type": "string"
-        },
-        "platform": {
-          "type": "string"
-        }
-      }
-    },
-    "v1ControlStats": {
+    "chef.automate.api.compliance.reporting.stats.v1.ControlStats": {
       "type": "object",
       "properties": {
         "control": {
@@ -258,7 +151,7 @@
         }
       }
     },
-    "v1ControlsSummary": {
+    "chef.automate.api.compliance.reporting.stats.v1.ControlsSummary": {
       "type": "object",
       "properties": {
         "failures": {
@@ -287,7 +180,383 @@
         }
       }
     },
-    "v1Dependency": {
+    "chef.automate.api.compliance.reporting.stats.v1.FailureSummary": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "failures": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "id": {
+          "type": "string"
+        },
+        "profile": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.stats.v1.Failures": {
+      "type": "object",
+      "properties": {
+        "profiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.FailureSummary"
+          }
+        },
+        "platforms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.FailureSummary"
+          }
+        },
+        "controls": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.FailureSummary"
+          }
+        },
+        "environments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.FailureSummary"
+          }
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.stats.v1.ListFilter": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.stats.v1.NodeSummary": {
+      "type": "object",
+      "properties": {
+        "compliant": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "skipped": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "noncompliant": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "high_risk": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "medium_risk": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "low_risk": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.stats.v1.Profile": {
+      "type": "object",
+      "properties": {
+        "profile_list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.ProfileList"
+          }
+        },
+        "profile_summary": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.ProfileSummary"
+        },
+        "control_stats": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.ControlStats"
+          }
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.stats.v1.ProfileList": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "failures": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "majors": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "minors": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "criticals": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "passed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "skipped": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.stats.v1.ProfileSummary": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "license": {
+          "type": "string"
+        },
+        "maintainer": {
+          "type": "string"
+        },
+        "copyright": {
+          "type": "string"
+        },
+        "copyright_email": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "supports": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.Support"
+          }
+        },
+        "stats": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.ProfileSummaryStats"
+        },
+        "depends": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Dependency"
+          }
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.stats.v1.ProfileSummaryStats": {
+      "type": "object",
+      "properties": {
+        "failed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "passed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "skipped": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "failed_nodes": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "total_nodes": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.stats.v1.Query": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "interval": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.ListFilter"
+          }
+        },
+        "order": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.Query.OrderType"
+        },
+        "sort": {
+          "type": "string"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "per_page": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.stats.v1.Query.OrderType": {
+      "type": "string",
+      "enum": [
+        "ASC",
+        "DESC"
+      ],
+      "default": "ASC"
+    },
+    "chef.automate.api.compliance.reporting.stats.v1.ReportSummary": {
+      "type": "object",
+      "properties": {
+        "stats": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.Stats"
+        },
+        "status": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "number",
+          "format": "double"
+        },
+        "start_date": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.stats.v1.Stats": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "string",
+          "format": "int64",
+          "title": "int64 types render into string types when serialized to satisfy all browsers\nwe don't really need for nodes counts to be int64 as int32 limits us to 2billion nodes which is plenty for now\nwe are therefore deprecating nodes and favor nodesCnt"
+        },
+        "platforms": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "environments": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "profiles": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "nodes_cnt": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.stats.v1.Summary": {
+      "type": "object",
+      "properties": {
+        "controls_summary": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.ControlsSummary"
+        },
+        "node_summary": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.NodeSummary"
+        },
+        "report_summary": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.ReportSummary"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.stats.v1.Support": {
+      "type": "object",
+      "properties": {
+        "os_name": {
+          "type": "string"
+        },
+        "os_family": {
+          "type": "string"
+        },
+        "release": {
+          "type": "string"
+        },
+        "inspec_version": {
+          "type": "string"
+        },
+        "platform_name": {
+          "type": "string"
+        },
+        "platform_family": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.stats.v1.Trend": {
+      "type": "object",
+      "properties": {
+        "report_time": {
+          "type": "string"
+        },
+        "passed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "failed": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "skipped": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.stats.v1.Trends": {
+      "type": "object",
+      "properties": {
+        "trends": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.Trend"
+          }
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.Dependency": {
       "type": "object",
       "properties": {
         "name": {
@@ -341,275 +610,6 @@
         "skip_message": {
           "type": "string",
           "title": "The reason this profile was skipped in the generated report, if any"
-        }
-      }
-    },
-    "v1FailureSummary": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "failures": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "id": {
-          "type": "string"
-        },
-        "profile": {
-          "type": "string"
-        }
-      }
-    },
-    "v1Failures": {
-      "type": "object",
-      "properties": {
-        "profiles": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1FailureSummary"
-          }
-        },
-        "platforms": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1FailureSummary"
-          }
-        },
-        "controls": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1FailureSummary"
-          }
-        },
-        "environments": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1FailureSummary"
-          }
-        }
-      }
-    },
-    "v1NodeSummary": {
-      "type": "object",
-      "properties": {
-        "compliant": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "skipped": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "noncompliant": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "high_risk": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "medium_risk": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "low_risk": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "v1ProfileList": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        },
-        "failures": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "majors": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "minors": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "criticals": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "passed": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "skipped": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "v1ProfileSummary": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "title": {
-          "type": "string"
-        },
-        "version": {
-          "type": "string"
-        },
-        "license": {
-          "type": "string"
-        },
-        "maintainer": {
-          "type": "string"
-        },
-        "copyright": {
-          "type": "string"
-        },
-        "copyright_email": {
-          "type": "string"
-        },
-        "summary": {
-          "type": "string"
-        },
-        "supports": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/reportingstatsv1Support"
-          }
-        },
-        "stats": {
-          "$ref": "#/definitions/v1ProfileSummaryStats"
-        },
-        "depends": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1Dependency"
-          }
-        }
-      }
-    },
-    "v1ProfileSummaryStats": {
-      "type": "object",
-      "properties": {
-        "failed": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "passed": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "skipped": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "failed_nodes": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "total_nodes": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "v1ReportSummary": {
-      "type": "object",
-      "properties": {
-        "stats": {
-          "$ref": "#/definitions/v1Stats"
-        },
-        "status": {
-          "type": "string"
-        },
-        "duration": {
-          "type": "number",
-          "format": "double"
-        },
-        "start_date": {
-          "type": "string"
-        }
-      }
-    },
-    "v1Stats": {
-      "type": "object",
-      "properties": {
-        "nodes": {
-          "type": "string",
-          "format": "int64",
-          "title": "int64 types render into string types when serialized to satisfy all browsers\nwe don't really need for nodes counts to be int64 as int32 limits us to 2billion nodes which is plenty for now\nwe are therefore deprecating nodes and favor nodesCnt"
-        },
-        "platforms": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "environments": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "profiles": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "nodes_cnt": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "v1Summary": {
-      "type": "object",
-      "properties": {
-        "controls_summary": {
-          "$ref": "#/definitions/v1ControlsSummary"
-        },
-        "node_summary": {
-          "$ref": "#/definitions/v1NodeSummary"
-        },
-        "report_summary": {
-          "$ref": "#/definitions/v1ReportSummary"
-        }
-      }
-    },
-    "v1Trend": {
-      "type": "object",
-      "properties": {
-        "report_time": {
-          "type": "string"
-        },
-        "passed": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "failed": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "skipped": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "v1Trends": {
-      "type": "object",
-      "properties": {
-        "trends": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/v1Trend"
-          }
         }
       }
     }

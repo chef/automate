@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Profile"
+              "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Profile"
             }
           }
         },
@@ -61,7 +61,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Profile"
+              "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Profile"
             }
           }
         },
@@ -97,7 +97,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Profiles"
+              "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Profiles"
             }
           }
         },
@@ -107,7 +107,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1Query"
+              "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Query"
             }
           }
         ],
@@ -154,63 +154,18 @@ func init() {
     }
   },
   "definitions": {
-    "QueryOrderType": {
-      "type": "string",
-      "enum": [
-        "ASC",
-        "DESC"
-      ],
-      "default": "ASC"
-    },
-    "protobufAny": {
-      "type": "object",
-      "properties": {
-        "type_url": {
-          "type": "string"
-        },
-        "value": {
-          "type": "string",
-          "format": "byte"
-        }
-      }
-    },
-    "runtimeStreamError": {
-      "type": "object",
-      "properties": {
-        "grpc_code": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "http_code": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "message": {
-          "type": "string"
-        },
-        "http_status": {
-          "type": "string"
-        },
-        "details": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/protobufAny"
-          }
-        }
-      }
-    },
-    "v1Attribute": {
+    "chef.automate.api.compliance.profiles.v1.Attribute": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string"
         },
         "options": {
-          "$ref": "#/definitions/v1Option"
+          "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Option"
         }
       }
     },
-    "v1CheckMessage": {
+    "chef.automate.api.compliance.profiles.v1.CheckMessage": {
       "type": "object",
       "properties": {
         "file": {
@@ -232,27 +187,27 @@ func init() {
         }
       }
     },
-    "v1CheckResult": {
+    "chef.automate.api.compliance.profiles.v1.CheckResult": {
       "type": "object",
       "properties": {
         "summary": {
-          "$ref": "#/definitions/v1ResultSummary"
+          "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.ResultSummary"
         },
         "errors": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1CheckMessage"
+            "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.CheckMessage"
           }
         },
         "warnings": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1CheckMessage"
+            "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.CheckMessage"
           }
         }
       }
     },
-    "v1Chunk": {
+    "chef.automate.api.compliance.profiles.v1.Chunk": {
       "type": "object",
       "properties": {
         "data": {
@@ -265,7 +220,7 @@ func init() {
         }
       }
     },
-    "v1Control": {
+    "chef.automate.api.compliance.profiles.v1.Control": {
       "type": "object",
       "properties": {
         "id": {
@@ -285,18 +240,18 @@ func init() {
           "type": "string"
         },
         "source_location": {
-          "$ref": "#/definitions/v1SourceLocation"
+          "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.SourceLocation"
         },
         "results": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Result"
+            "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Result"
           }
         },
         "refs": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Ref"
+            "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Ref"
           }
         },
         "tags": {
@@ -307,7 +262,7 @@ func init() {
         }
       }
     },
-    "v1Dependency": {
+    "chef.automate.api.compliance.profiles.v1.Dependency": {
       "type": "object",
       "properties": {
         "name": {
@@ -345,7 +300,7 @@ func init() {
         }
       }
     },
-    "v1Group": {
+    "chef.automate.api.compliance.profiles.v1.Group": {
       "type": "object",
       "properties": {
         "id": {
@@ -362,7 +317,7 @@ func init() {
         }
       }
     },
-    "v1ListFilter": {
+    "chef.automate.api.compliance.profiles.v1.ListFilter": {
       "type": "object",
       "properties": {
         "values": {
@@ -376,7 +331,7 @@ func init() {
         }
       }
     },
-    "v1Metadata": {
+    "chef.automate.api.compliance.profiles.v1.Metadata": {
       "type": "object",
       "properties": {
         "name": {
@@ -390,7 +345,7 @@ func init() {
         }
       }
     },
-    "v1Option": {
+    "chef.automate.api.compliance.profiles.v1.Option": {
       "type": "object",
       "properties": {
         "description": {
@@ -401,7 +356,7 @@ func init() {
         }
       }
     },
-    "v1Profile": {
+    "chef.automate.api.compliance.profiles.v1.Profile": {
       "type": "object",
       "properties": {
         "name": {
@@ -434,13 +389,13 @@ func init() {
         "supports": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Support"
+            "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Support"
           }
         },
         "depends": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Dependency"
+            "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Dependency"
           }
         },
         "sha256": {
@@ -449,19 +404,19 @@ func init() {
         "groups": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Group"
+            "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Group"
           }
         },
         "controls": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Control"
+            "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Control"
           }
         },
         "attributes": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Attribute"
+            "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Attribute"
           }
         },
         "latest_version": {
@@ -469,7 +424,7 @@ func init() {
         }
       }
     },
-    "v1ProfileData": {
+    "chef.automate.api.compliance.profiles.v1.ProfileData": {
       "type": "object",
       "properties": {
         "owner": {
@@ -487,13 +442,13 @@ func init() {
         }
       }
     },
-    "v1Profiles": {
+    "chef.automate.api.compliance.profiles.v1.Profiles": {
       "type": "object",
       "properties": {
         "profiles": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Profile"
+            "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Profile"
           }
         },
         "total": {
@@ -502,17 +457,17 @@ func init() {
         }
       }
     },
-    "v1Query": {
+    "chef.automate.api.compliance.profiles.v1.Query": {
       "type": "object",
       "properties": {
         "filters": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1ListFilter"
+            "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.ListFilter"
           }
         },
         "order": {
-          "$ref": "#/definitions/QueryOrderType"
+          "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Query.OrderType"
         },
         "sort": {
           "type": "string"
@@ -536,7 +491,15 @@ func init() {
         }
       }
     },
-    "v1Ref": {
+    "chef.automate.api.compliance.profiles.v1.Query.OrderType": {
+      "type": "string",
+      "enum": [
+        "ASC",
+        "DESC"
+      ],
+      "default": "ASC"
+    },
+    "chef.automate.api.compliance.profiles.v1.Ref": {
       "type": "object",
       "properties": {
         "url": {
@@ -547,7 +510,7 @@ func init() {
         }
       }
     },
-    "v1Result": {
+    "chef.automate.api.compliance.profiles.v1.Result": {
       "type": "object",
       "properties": {
         "status": {
@@ -571,7 +534,7 @@ func init() {
         }
       }
     },
-    "v1ResultSummary": {
+    "chef.automate.api.compliance.profiles.v1.ResultSummary": {
       "type": "object",
       "properties": {
         "valid": {
@@ -590,7 +553,7 @@ func init() {
         }
       }
     },
-    "v1SourceLocation": {
+    "chef.automate.api.compliance.profiles.v1.SourceLocation": {
       "type": "object",
       "properties": {
         "ref": {
@@ -602,7 +565,7 @@ func init() {
         }
       }
     },
-    "v1Support": {
+    "chef.automate.api.compliance.profiles.v1.Support": {
       "type": "object",
       "properties": {
         "os_name": {
@@ -621,20 +584,57 @@ func init() {
           "type": "string"
         }
       }
+    },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "grpc.gateway.runtime.StreamError": {
+      "type": "object",
+      "properties": {
+        "grpc_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "http_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "http_status": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
+        }
+      }
     }
   },
   "x-stream-definitions": {
-    "v1ProfileData": {
+    "chef.automate.api.compliance.profiles.v1.ProfileData": {
       "type": "object",
       "properties": {
         "result": {
-          "$ref": "#/definitions/v1ProfileData"
+          "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.ProfileData"
         },
         "error": {
-          "$ref": "#/definitions/runtimeStreamError"
+          "$ref": "#/definitions/grpc.gateway.runtime.StreamError"
         }
       },
-      "title": "Stream result of v1ProfileData"
+      "title": "Stream result of chef.automate.api.compliance.profiles.v1.ProfileData"
     }
   }
 }

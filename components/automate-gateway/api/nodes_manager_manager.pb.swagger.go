@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Ids"
+              "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Ids"
             }
           }
         },
@@ -35,7 +35,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1NodeManager"
+              "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.NodeManager"
             }
           }
         ],
@@ -51,7 +51,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1NodeManager"
+              "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.NodeManager"
             }
           }
         },
@@ -111,7 +111,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1NodeManager"
+              "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.NodeManager"
             }
           }
         ],
@@ -175,7 +175,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Ids"
+              "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Ids"
             }
           }
         },
@@ -199,7 +199,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Fields"
+              "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Fields"
             }
           }
         },
@@ -215,7 +215,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1FieldQuery"
+              "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.FieldQuery"
             }
           }
         ],
@@ -231,7 +231,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Nodes"
+              "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Nodes"
             }
           }
         },
@@ -247,7 +247,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1NodeQuery"
+              "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.NodeQuery"
             }
           }
         ],
@@ -263,7 +263,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ConnectResponse"
+              "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.ConnectResponse"
             }
           }
         },
@@ -279,7 +279,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1Id"
+              "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Id"
             }
           }
         ],
@@ -295,7 +295,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1NodeManagers"
+              "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.NodeManagers"
             }
           }
         },
@@ -305,7 +305,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1Query"
+              "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Query"
             }
           }
         ],
@@ -316,47 +316,10 @@ func init() {
     }
   },
   "definitions": {
-    "QueryOrderType": {
-      "type": "string",
-      "enum": [
-        "ASC",
-        "DESC"
-      ],
-      "default": "ASC"
-    },
-    "commonFilter": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "type": "string"
-        },
-        "exclude": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "values": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "commonKv": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "type": "string"
-        },
-        "value": {
-          "type": "string"
-        }
-      }
-    },
-    "v1ConnectResponse": {
+    "chef.automate.api.nodes.manager.v1.ConnectResponse": {
       "type": "object"
     },
-    "v1CredentialsByTags": {
+    "chef.automate.api.nodes.manager.v1.CredentialsByTags": {
       "type": "object",
       "properties": {
         "tag_key": {
@@ -373,11 +336,11 @@ func init() {
         }
       }
     },
-    "v1FieldQuery": {
+    "chef.automate.api.nodes.manager.v1.FieldQuery": {
       "type": "object",
       "properties": {
         "query": {
-          "$ref": "#/definitions/v1Query"
+          "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Query"
         },
         "field": {
           "type": "string"
@@ -387,7 +350,7 @@ func init() {
         }
       }
     },
-    "v1Fields": {
+    "chef.automate.api.nodes.manager.v1.Fields": {
       "type": "object",
       "properties": {
         "fields": {
@@ -398,7 +361,7 @@ func init() {
         }
       }
     },
-    "v1Id": {
+    "chef.automate.api.nodes.manager.v1.Id": {
       "type": "object",
       "properties": {
         "id": {
@@ -406,18 +369,18 @@ func init() {
         }
       }
     },
-    "v1Ids": {
+    "chef.automate.api.nodes.manager.v1.Ids": {
       "type": "object",
       "properties": {
         "ids": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Id"
+            "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Id"
           }
         }
       }
     },
-    "v1NodeManager": {
+    "chef.automate.api.nodes.manager.v1.NodeManager": {
       "type": "object",
       "properties": {
         "id": {
@@ -435,7 +398,7 @@ func init() {
         "instance_credentials": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1CredentialsByTags"
+            "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.CredentialsByTags"
           }
         },
         "status": {
@@ -451,18 +414,18 @@ func init() {
         "credential_data": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/commonKv"
+            "$ref": "#/definitions/chef.automate.domain.compliance.api.common.Kv"
           }
         }
       }
     },
-    "v1NodeManagers": {
+    "chef.automate.api.nodes.manager.v1.NodeManagers": {
       "type": "object",
       "properties": {
         "managers": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1NodeManager"
+            "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.NodeManager"
           }
         },
         "total": {
@@ -471,18 +434,18 @@ func init() {
         }
       }
     },
-    "v1NodeQuery": {
+    "chef.automate.api.nodes.manager.v1.NodeQuery": {
       "type": "object",
       "properties": {
         "query": {
-          "$ref": "#/definitions/v1Query"
+          "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Query"
         },
         "node_manager_id": {
           "type": "string"
         }
       }
     },
-    "v1Nodes": {
+    "chef.automate.api.nodes.manager.v1.Nodes": {
       "type": "object",
       "properties": {
         "nodes": {
@@ -497,17 +460,17 @@ func init() {
         }
       }
     },
-    "v1Query": {
+    "chef.automate.api.nodes.manager.v1.Query": {
       "type": "object",
       "properties": {
         "filter_map": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/commonFilter"
+            "$ref": "#/definitions/chef.automate.domain.compliance.api.common.Filter"
           }
         },
         "order": {
-          "$ref": "#/definitions/QueryOrderType"
+          "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Query.OrderType"
         },
         "sort": {
           "type": "string"
@@ -519,6 +482,43 @@ func init() {
         "per_page": {
           "type": "integer",
           "format": "int32"
+        }
+      }
+    },
+    "chef.automate.api.nodes.manager.v1.Query.OrderType": {
+      "type": "string",
+      "enum": [
+        "ASC",
+        "DESC"
+      ],
+      "default": "ASC"
+    },
+    "chef.automate.domain.compliance.api.common.Filter": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "exclude": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "chef.automate.domain.compliance.api.common.Kv": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
         }
       }
     }

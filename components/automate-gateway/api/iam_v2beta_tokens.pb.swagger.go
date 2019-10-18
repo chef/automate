@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaListTokensResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.ListTokensResp"
             }
           }
         },
@@ -39,7 +39,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaCreateTokenResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.CreateTokenResp"
             }
           }
         },
@@ -49,7 +49,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v2betaCreateTokenReq"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.CreateTokenReq"
             }
           }
         ],
@@ -65,7 +65,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaGetTokenResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.GetTokenResp"
             }
           }
         },
@@ -87,7 +87,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaDeleteTokenResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.DeleteTokenResp"
             }
           }
         },
@@ -109,7 +109,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaUpdateTokenResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.UpdateTokenResp"
             }
           }
         },
@@ -126,7 +126,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v2betaUpdateTokenReq"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.UpdateTokenReq"
             }
           }
         ],
@@ -137,7 +137,7 @@ func init() {
     }
   },
   "definitions": {
-    "v2betaCreateTokenReq": {
+    "chef.automate.api.iam.v2beta.CreateTokenReq": {
       "type": "object",
       "properties": {
         "id": {
@@ -161,37 +161,37 @@ func init() {
         }
       }
     },
-    "v2betaCreateTokenResp": {
+    "chef.automate.api.iam.v2beta.CreateTokenResp": {
       "type": "object",
       "properties": {
         "token": {
-          "$ref": "#/definitions/v2betaToken"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Token"
         }
       }
     },
-    "v2betaDeleteTokenResp": {
+    "chef.automate.api.iam.v2beta.DeleteTokenResp": {
       "type": "object"
     },
-    "v2betaGetTokenResp": {
+    "chef.automate.api.iam.v2beta.GetTokenResp": {
       "type": "object",
       "properties": {
         "token": {
-          "$ref": "#/definitions/v2betaToken"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Token"
         }
       }
     },
-    "v2betaListTokensResp": {
+    "chef.automate.api.iam.v2beta.ListTokensResp": {
       "type": "object",
       "properties": {
         "tokens": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v2betaToken"
+            "$ref": "#/definitions/chef.automate.api.iam.v2beta.Token"
           }
         }
       }
     },
-    "v2betaToken": {
+    "chef.automate.api.iam.v2beta.Token": {
       "type": "object",
       "properties": {
         "id": {
@@ -221,7 +221,7 @@ func init() {
         }
       }
     },
-    "v2betaUpdateTokenReq": {
+    "chef.automate.api.iam.v2beta.UpdateTokenReq": {
       "type": "object",
       "properties": {
         "id": {
@@ -243,11 +243,11 @@ func init() {
         }
       }
     },
-    "v2betaUpdateTokenResp": {
+    "chef.automate.api.iam.v2beta.UpdateTokenResp": {
       "type": "object",
       "properties": {
         "token": {
-          "$ref": "#/definitions/v2betaToken"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Token"
         }
       }
     }

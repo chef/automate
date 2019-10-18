@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseUsers"
+              "$ref": "#/definitions/chef.automate.api.users.response.Users"
             }
           }
         },
@@ -39,7 +39,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseUser"
+              "$ref": "#/definitions/chef.automate.api.users.response.User"
             }
           }
         },
@@ -49,7 +49,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestCreateUser"
+              "$ref": "#/definitions/chef.automate.api.users.request.CreateUser"
             }
           }
         ],
@@ -65,7 +65,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseUser"
+              "$ref": "#/definitions/chef.automate.api.users.response.User"
             }
           }
         },
@@ -87,7 +87,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseDeleteUserResp"
+              "$ref": "#/definitions/chef.automate.api.users.response.DeleteUserResp"
             }
           }
         },
@@ -109,7 +109,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseUser"
+              "$ref": "#/definitions/chef.automate.api.users.response.User"
             }
           }
         },
@@ -125,7 +125,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestUpdateUser"
+              "$ref": "#/definitions/chef.automate.api.users.request.UpdateUser"
             }
           }
         ],
@@ -141,7 +141,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseUser"
+              "$ref": "#/definitions/chef.automate.api.users.response.User"
             }
           }
         },
@@ -157,7 +157,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestUpdateSelf"
+              "$ref": "#/definitions/chef.automate.api.users.request.UpdateSelf"
             }
           }
         ],
@@ -168,7 +168,7 @@ func init() {
     }
   },
   "definitions": {
-    "requestCreateUser": {
+    "chef.automate.api.users.request.CreateUser": {
       "type": "object",
       "properties": {
         "id": {
@@ -188,7 +188,7 @@ func init() {
         }
       }
     },
-    "requestUpdateSelf": {
+    "chef.automate.api.users.request.UpdateSelf": {
       "type": "object",
       "properties": {
         "id": {
@@ -208,7 +208,7 @@ func init() {
         }
       }
     },
-    "requestUpdateUser": {
+    "chef.automate.api.users.request.UpdateUser": {
       "type": "object",
       "properties": {
         "id": {
@@ -228,10 +228,10 @@ func init() {
         }
       }
     },
-    "responseDeleteUserResp": {
+    "chef.automate.api.users.response.DeleteUserResp": {
       "type": "object"
     },
-    "responseUser": {
+    "chef.automate.api.users.response.User": {
       "type": "object",
       "properties": {
         "id": {
@@ -248,13 +248,13 @@ func init() {
         }
       }
     },
-    "responseUsers": {
+    "chef.automate.api.users.response.Users": {
       "type": "object",
       "properties": {
         "users": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/responseUser"
+            "$ref": "#/definitions/chef.automate.api.users.response.User"
           }
         }
       }

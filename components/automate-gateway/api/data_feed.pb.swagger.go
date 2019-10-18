@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/datafeedAddDestinationResponse"
+              "$ref": "#/definitions/chef.automate.api.datafeed.AddDestinationResponse"
             }
           }
         },
@@ -35,7 +35,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/datafeedAddDestinationRequest"
+              "$ref": "#/definitions/chef.automate.api.datafeed.AddDestinationRequest"
             }
           }
         ],
@@ -51,7 +51,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/datafeedGetDestinationResponse"
+              "$ref": "#/definitions/chef.automate.api.datafeed.GetDestinationResponse"
             }
           }
         },
@@ -74,7 +74,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/datafeedDeleteDestinationResponse"
+              "$ref": "#/definitions/chef.automate.api.datafeed.DeleteDestinationResponse"
             }
           }
         },
@@ -97,7 +97,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/datafeedUpdateDestinationResponse"
+              "$ref": "#/definitions/chef.automate.api.datafeed.UpdateDestinationResponse"
             }
           }
         },
@@ -114,7 +114,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/datafeedUpdateDestinationRequest"
+              "$ref": "#/definitions/chef.automate.api.datafeed.UpdateDestinationRequest"
             }
           }
         ],
@@ -130,7 +130,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/datafeedListDestinationResponse"
+              "$ref": "#/definitions/chef.automate.api.datafeed.ListDestinationResponse"
             }
           }
         },
@@ -140,7 +140,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/datafeedListDestinationRequest"
+              "$ref": "#/definitions/chef.automate.api.datafeed.ListDestinationRequest"
             }
           }
         ],
@@ -156,7 +156,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/datafeedTestDestinationResponse"
+              "$ref": "#/definitions/chef.automate.api.datafeed.TestDestinationResponse"
             }
           }
         },
@@ -166,7 +166,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/datafeedURLValidationRequest"
+              "$ref": "#/definitions/chef.automate.api.datafeed.URLValidationRequest"
             }
           }
         ],
@@ -177,7 +177,7 @@ func init() {
     }
   },
   "definitions": {
-    "datafeedAddDestinationRequest": {
+    "chef.automate.api.datafeed.AddDestinationRequest": {
       "type": "object",
       "properties": {
         "id": {
@@ -195,7 +195,7 @@ func init() {
         }
       }
     },
-    "datafeedAddDestinationResponse": {
+    "chef.automate.api.datafeed.AddDestinationResponse": {
       "type": "object",
       "properties": {
         "success": {
@@ -204,7 +204,7 @@ func init() {
         }
       }
     },
-    "datafeedDeleteDestinationResponse": {
+    "chef.automate.api.datafeed.DeleteDestinationResponse": {
       "type": "object",
       "properties": {
         "success": {
@@ -213,7 +213,7 @@ func init() {
         }
       }
     },
-    "datafeedGetDestinationResponse": {
+    "chef.automate.api.datafeed.GetDestinationResponse": {
       "type": "object",
       "properties": {
         "success": {
@@ -235,21 +235,21 @@ func init() {
         }
       }
     },
-    "datafeedListDestinationRequest": {
+    "chef.automate.api.datafeed.ListDestinationRequest": {
       "type": "object"
     },
-    "datafeedListDestinationResponse": {
+    "chef.automate.api.datafeed.ListDestinationResponse": {
       "type": "object",
       "properties": {
         "destinations": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/datafeedGetDestinationResponse"
+            "$ref": "#/definitions/chef.automate.api.datafeed.GetDestinationResponse"
           }
         }
       }
     },
-    "datafeedSecretId": {
+    "chef.automate.api.datafeed.SecretId": {
       "type": "object",
       "properties": {
         "id": {
@@ -257,7 +257,7 @@ func init() {
         }
       }
     },
-    "datafeedTestDestinationResponse": {
+    "chef.automate.api.datafeed.TestDestinationResponse": {
       "type": "object",
       "properties": {
         "success": {
@@ -266,21 +266,21 @@ func init() {
         }
       }
     },
-    "datafeedURLValidationRequest": {
+    "chef.automate.api.datafeed.URLValidationRequest": {
       "type": "object",
       "properties": {
         "url": {
           "type": "string"
         },
         "username_password": {
-          "$ref": "#/definitions/datafeedUsernamePassword"
+          "$ref": "#/definitions/chef.automate.api.datafeed.UsernamePassword"
         },
         "secret_id": {
-          "$ref": "#/definitions/datafeedSecretId"
+          "$ref": "#/definitions/chef.automate.api.datafeed.SecretId"
         }
       }
     },
-    "datafeedUpdateDestinationRequest": {
+    "chef.automate.api.datafeed.UpdateDestinationRequest": {
       "type": "object",
       "properties": {
         "id": {
@@ -298,7 +298,7 @@ func init() {
         }
       }
     },
-    "datafeedUpdateDestinationResponse": {
+    "chef.automate.api.datafeed.UpdateDestinationResponse": {
       "type": "object",
       "properties": {
         "success": {
@@ -307,7 +307,7 @@ func init() {
         }
       }
     },
-    "datafeedUsernamePassword": {
+    "chef.automate.api.datafeed.UsernamePassword": {
       "type": "object",
       "properties": {
         "username": {

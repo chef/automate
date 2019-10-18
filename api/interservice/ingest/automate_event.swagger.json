@@ -16,7 +16,7 @@
   ],
   "paths": {},
   "definitions": {
-    "apiActor": {
+    "chef.automate.domain.event.api.Actor": {
       "type": "object",
       "properties": {
         "ID": {
@@ -30,7 +30,7 @@
         }
       }
     },
-    "apiEventResponse": {
+    "chef.automate.domain.event.api.EventResponse": {
       "type": "object",
       "properties": {
         "Success": {
@@ -39,7 +39,7 @@
         }
       }
     },
-    "apiEventType": {
+    "chef.automate.domain.event.api.EventType": {
       "type": "object",
       "properties": {
         "Name": {
@@ -47,7 +47,7 @@
         }
       }
     },
-    "apiObject": {
+    "chef.automate.domain.event.api.Object": {
       "type": "object",
       "properties": {
         "ID": {
@@ -61,7 +61,7 @@
         }
       }
     },
-    "apiProducer": {
+    "chef.automate.domain.event.api.Producer": {
       "type": "object",
       "properties": {
         "ID": {
@@ -81,7 +81,7 @@
         }
       }
     },
-    "apiTarget": {
+    "chef.automate.domain.event.api.Target": {
       "type": "object",
       "properties": {
         "ID": {
@@ -95,7 +95,7 @@
         }
       }
     },
-    "ingestProjectUpdateStatusResp": {
+    "chef.automate.domain.ingest.ProjectUpdateStatusResp": {
       "type": "object",
       "properties": {
         "state": {
@@ -111,7 +111,7 @@
         }
       }
     },
-    "protobufNullValue": {
+    "google.protobuf.NullValue": {
       "type": "string",
       "enum": [
         "NULL_VALUE"

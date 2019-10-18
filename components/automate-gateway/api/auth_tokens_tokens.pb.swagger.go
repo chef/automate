@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseTokens"
+              "$ref": "#/definitions/chef.automate.api.tokens.response.Tokens"
             }
           }
         },
@@ -39,7 +39,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseToken"
+              "$ref": "#/definitions/chef.automate.api.tokens.response.Token"
             }
           }
         },
@@ -49,7 +49,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestCreateToken"
+              "$ref": "#/definitions/chef.automate.api.tokens.request.CreateToken"
             }
           }
         ],
@@ -65,7 +65,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseToken"
+              "$ref": "#/definitions/chef.automate.api.tokens.response.Token"
             }
           }
         },
@@ -87,7 +87,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseDeleteTokenResp"
+              "$ref": "#/definitions/chef.automate.api.tokens.response.DeleteTokenResp"
             }
           }
         },
@@ -109,7 +109,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseToken"
+              "$ref": "#/definitions/chef.automate.api.tokens.response.Token"
             }
           }
         },
@@ -125,7 +125,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestUpdateToken"
+              "$ref": "#/definitions/chef.automate.api.tokens.request.UpdateToken"
             }
           }
         ],
@@ -136,7 +136,7 @@ func init() {
     }
   },
   "definitions": {
-    "requestCreateToken": {
+    "chef.automate.api.tokens.request.CreateToken": {
       "type": "object",
       "properties": {
         "description": {
@@ -154,7 +154,7 @@ func init() {
         }
       }
     },
-    "requestUpdateToken": {
+    "chef.automate.api.tokens.request.UpdateToken": {
       "type": "object",
       "properties": {
         "id": {
@@ -169,10 +169,10 @@ func init() {
         }
       }
     },
-    "responseDeleteTokenResp": {
+    "chef.automate.api.tokens.response.DeleteTokenResp": {
       "type": "object"
     },
-    "responseToken": {
+    "chef.automate.api.tokens.response.Token": {
       "type": "object",
       "properties": {
         "id": {
@@ -196,13 +196,13 @@ func init() {
         }
       }
     },
-    "responseTokens": {
+    "chef.automate.api.tokens.response.Tokens": {
       "type": "object",
       "properties": {
         "tokens": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/responseToken"
+            "$ref": "#/definitions/chef.automate.api.tokens.response.Token"
           }
         }
       }

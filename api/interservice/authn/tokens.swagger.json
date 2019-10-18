@@ -16,10 +16,10 @@
   ],
   "paths": {},
   "definitions": {
-    "authnDeleteTokenResp": {
+    "chef.automate.domain.authn.DeleteTokenResp": {
       "type": "object"
     },
-    "authnToken": {
+    "chef.automate.domain.authn.Token": {
       "type": "object",
       "properties": {
         "id": {
@@ -49,13 +49,13 @@
         }
       }
     },
-    "authnTokens": {
+    "chef.automate.domain.authn.Tokens": {
       "type": "object",
       "properties": {
         "tokens": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/authnToken"
+            "$ref": "#/definitions/chef.automate.domain.authn.Token"
           }
         }
       }

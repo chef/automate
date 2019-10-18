@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaListProjectsResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.ListProjectsResp"
             }
           }
         },
@@ -41,7 +41,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaListPoliciesResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.ListPoliciesResp"
             }
           }
         },
@@ -55,7 +55,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaCreatePolicyResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.CreatePolicyResp"
             }
           }
         },
@@ -65,7 +65,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v2betaCreatePolicyReq"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.CreatePolicyReq"
             }
           }
         ],
@@ -81,7 +81,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaGetPolicyResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.GetPolicyResp"
             }
           }
         },
@@ -103,7 +103,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaDeletePolicyResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.DeletePolicyResp"
             }
           }
         },
@@ -125,7 +125,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaUpdatePolicyResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.UpdatePolicyResp"
             }
           }
         },
@@ -141,7 +141,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v2betaUpdatePolicyReq"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.UpdatePolicyReq"
             }
           }
         ],
@@ -157,7 +157,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaListPolicyMembersResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.ListPolicyMembersResp"
             }
           }
         },
@@ -179,7 +179,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaReplacePolicyMembersResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.ReplacePolicyMembersResp"
             }
           }
         },
@@ -195,7 +195,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v2betaReplacePolicyMembersReq"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.ReplacePolicyMembersReq"
             }
           }
         ],
@@ -211,7 +211,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaAddPolicyMembersResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.AddPolicyMembersResp"
             }
           }
         },
@@ -227,7 +227,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v2betaAddPolicyMembersReq"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.AddPolicyMembersReq"
             }
           }
         ],
@@ -243,7 +243,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaRemovePolicyMembersResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.RemovePolicyMembersResp"
             }
           }
         },
@@ -259,7 +259,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v2betaRemovePolicyMembersReq"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.RemovePolicyMembersReq"
             }
           }
         ],
@@ -275,7 +275,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaGetPolicyVersionResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.GetPolicyVersionResp"
             }
           }
         },
@@ -291,7 +291,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaListProjectsResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.ListProjectsResp"
             }
           }
         },
@@ -305,7 +305,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaCreateProjectResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.CreateProjectResp"
             }
           }
         },
@@ -315,7 +315,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v2betaCreateProjectReq"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.CreateProjectReq"
             }
           }
         ],
@@ -331,7 +331,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaGetProjectResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.GetProjectResp"
             }
           }
         },
@@ -353,7 +353,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaDeleteProjectResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.DeleteProjectResp"
             }
           }
         },
@@ -375,7 +375,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaUpdateProjectResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.UpdateProjectResp"
             }
           }
         },
@@ -391,7 +391,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v2betaUpdateProjectReq"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.UpdateProjectReq"
             }
           }
         ],
@@ -407,7 +407,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaListRolesResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.ListRolesResp"
             }
           }
         },
@@ -421,7 +421,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaCreateRoleResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.CreateRoleResp"
             }
           }
         },
@@ -431,7 +431,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v2betaCreateRoleReq"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.CreateRoleReq"
             }
           }
         ],
@@ -447,7 +447,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaGetRoleResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.GetRoleResp"
             }
           }
         },
@@ -469,7 +469,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaDeleteRoleResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.DeleteRoleResp"
             }
           }
         },
@@ -491,7 +491,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaUpdateRoleResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.UpdateRoleResp"
             }
           }
         },
@@ -507,7 +507,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v2betaUpdateRoleReq"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.UpdateRoleReq"
             }
           }
         ],
@@ -518,32 +518,7 @@ func init() {
     }
   },
   "definitions": {
-    "StatementEffect": {
-      "type": "string",
-      "enum": [
-        "ALLOW",
-        "DENY"
-      ],
-      "default": "ALLOW"
-    },
-    "VersionVersionNumber": {
-      "type": "string",
-      "enum": [
-        "V0",
-        "V1",
-        "V2"
-      ],
-      "default": "V0"
-    },
-    "iamv2betaType": {
-      "type": "string",
-      "enum": [
-        "CHEF_MANAGED",
-        "CUSTOM"
-      ],
-      "default": "CHEF_MANAGED"
-    },
-    "v2betaAddPolicyMembersReq": {
+    "chef.automate.api.iam.v2beta.AddPolicyMembersReq": {
       "type": "object",
       "properties": {
         "id": {
@@ -557,7 +532,7 @@ func init() {
         }
       }
     },
-    "v2betaAddPolicyMembersResp": {
+    "chef.automate.api.iam.v2beta.AddPolicyMembersResp": {
       "type": "object",
       "properties": {
         "members": {
@@ -568,7 +543,7 @@ func init() {
         }
       }
     },
-    "v2betaCreatePolicyReq": {
+    "chef.automate.api.iam.v2beta.CreatePolicyReq": {
       "type": "object",
       "properties": {
         "id": {
@@ -586,7 +561,7 @@ func init() {
         "statements": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v2betaStatement"
+            "$ref": "#/definitions/chef.automate.api.iam.v2beta.Statement"
           }
         },
         "projects": {
@@ -598,15 +573,15 @@ func init() {
       },
       "description": "Does not contain type as the enduser can only create 'custom' policies."
     },
-    "v2betaCreatePolicyResp": {
+    "chef.automate.api.iam.v2beta.CreatePolicyResp": {
       "type": "object",
       "properties": {
         "policy": {
-          "$ref": "#/definitions/v2betaPolicy"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Policy"
         }
       }
     },
-    "v2betaCreateProjectReq": {
+    "chef.automate.api.iam.v2beta.CreateProjectReq": {
       "type": "object",
       "properties": {
         "id": {
@@ -617,15 +592,15 @@ func init() {
         }
       }
     },
-    "v2betaCreateProjectResp": {
+    "chef.automate.api.iam.v2beta.CreateProjectResp": {
       "type": "object",
       "properties": {
         "project": {
-          "$ref": "#/definitions/v2betaProject"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Project"
         }
       }
     },
-    "v2betaCreateRoleReq": {
+    "chef.automate.api.iam.v2beta.CreateRoleReq": {
       "type": "object",
       "properties": {
         "id": {
@@ -649,24 +624,24 @@ func init() {
       },
       "description": "Does not contain type as the enduser can only create 'custom' roles."
     },
-    "v2betaCreateRoleResp": {
+    "chef.automate.api.iam.v2beta.CreateRoleResp": {
       "type": "object",
       "properties": {
         "role": {
-          "$ref": "#/definitions/v2betaRole"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Role"
         }
       }
     },
-    "v2betaDeletePolicyResp": {
+    "chef.automate.api.iam.v2beta.DeletePolicyResp": {
       "type": "object"
     },
-    "v2betaDeleteProjectResp": {
+    "chef.automate.api.iam.v2beta.DeleteProjectResp": {
       "type": "object"
     },
-    "v2betaDeleteRoleResp": {
+    "chef.automate.api.iam.v2beta.DeleteRoleResp": {
       "type": "object"
     },
-    "v2betaFlag": {
+    "chef.automate.api.iam.v2beta.Flag": {
       "type": "string",
       "enum": [
         "VERSION_2_0",
@@ -675,50 +650,50 @@ func init() {
       "default": "VERSION_2_0",
       "title": "passed to UpgradeToV2 to set version"
     },
-    "v2betaGetPolicyResp": {
+    "chef.automate.api.iam.v2beta.GetPolicyResp": {
       "type": "object",
       "properties": {
         "policy": {
-          "$ref": "#/definitions/v2betaPolicy"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Policy"
         }
       }
     },
-    "v2betaGetPolicyVersionResp": {
+    "chef.automate.api.iam.v2beta.GetPolicyVersionResp": {
       "type": "object",
       "properties": {
         "version": {
-          "$ref": "#/definitions/v2betaVersion"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Version"
         }
       }
     },
-    "v2betaGetProjectResp": {
+    "chef.automate.api.iam.v2beta.GetProjectResp": {
       "type": "object",
       "properties": {
         "project": {
-          "$ref": "#/definitions/v2betaProject"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Project"
         }
       }
     },
-    "v2betaGetRoleResp": {
+    "chef.automate.api.iam.v2beta.GetRoleResp": {
       "type": "object",
       "properties": {
         "role": {
-          "$ref": "#/definitions/v2betaRole"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Role"
         }
       }
     },
-    "v2betaListPoliciesResp": {
+    "chef.automate.api.iam.v2beta.ListPoliciesResp": {
       "type": "object",
       "properties": {
         "policies": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v2betaPolicy"
+            "$ref": "#/definitions/chef.automate.api.iam.v2beta.Policy"
           }
         }
       }
     },
-    "v2betaListPolicyMembersResp": {
+    "chef.automate.api.iam.v2beta.ListPolicyMembersResp": {
       "type": "object",
       "properties": {
         "members": {
@@ -729,29 +704,29 @@ func init() {
         }
       }
     },
-    "v2betaListProjectsResp": {
+    "chef.automate.api.iam.v2beta.ListProjectsResp": {
       "type": "object",
       "properties": {
         "projects": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v2betaProject"
+            "$ref": "#/definitions/chef.automate.api.iam.v2beta.Project"
           }
         }
       }
     },
-    "v2betaListRolesResp": {
+    "chef.automate.api.iam.v2beta.ListRolesResp": {
       "type": "object",
       "properties": {
         "roles": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v2betaRole"
+            "$ref": "#/definitions/chef.automate.api.iam.v2beta.Role"
           }
         }
       }
     },
-    "v2betaPolicy": {
+    "chef.automate.api.iam.v2beta.Policy": {
       "type": "object",
       "properties": {
         "name": {
@@ -761,7 +736,7 @@ func init() {
           "type": "string"
         },
         "type": {
-          "$ref": "#/definitions/iamv2betaType"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Type"
         },
         "members": {
           "type": "array",
@@ -772,7 +747,7 @@ func init() {
         "statements": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v2betaStatement"
+            "$ref": "#/definitions/chef.automate.api.iam.v2beta.Statement"
           }
         },
         "projects": {
@@ -783,7 +758,7 @@ func init() {
         }
       }
     },
-    "v2betaProject": {
+    "chef.automate.api.iam.v2beta.Project": {
       "type": "object",
       "properties": {
         "name": {
@@ -793,14 +768,14 @@ func init() {
           "type": "string"
         },
         "type": {
-          "$ref": "#/definitions/iamv2betaType"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Type"
         },
         "status": {
-          "$ref": "#/definitions/v2betaProjectRulesStatus"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.ProjectRulesStatus"
         }
       }
     },
-    "v2betaProjectRulesStatus": {
+    "chef.automate.api.iam.v2beta.ProjectRulesStatus": {
       "type": "string",
       "enum": [
         "PROJECT_RULES_STATUS_UNSET",
@@ -810,7 +785,7 @@ func init() {
       ],
       "default": "PROJECT_RULES_STATUS_UNSET"
     },
-    "v2betaRemovePolicyMembersReq": {
+    "chef.automate.api.iam.v2beta.RemovePolicyMembersReq": {
       "type": "object",
       "properties": {
         "id": {
@@ -824,7 +799,7 @@ func init() {
         }
       }
     },
-    "v2betaRemovePolicyMembersResp": {
+    "chef.automate.api.iam.v2beta.RemovePolicyMembersResp": {
       "type": "object",
       "properties": {
         "members": {
@@ -835,7 +810,7 @@ func init() {
         }
       }
     },
-    "v2betaReplacePolicyMembersReq": {
+    "chef.automate.api.iam.v2beta.ReplacePolicyMembersReq": {
       "type": "object",
       "properties": {
         "id": {
@@ -849,7 +824,7 @@ func init() {
         }
       }
     },
-    "v2betaReplacePolicyMembersResp": {
+    "chef.automate.api.iam.v2beta.ReplacePolicyMembersResp": {
       "type": "object",
       "properties": {
         "members": {
@@ -860,10 +835,10 @@ func init() {
         }
       }
     },
-    "v2betaResetToV1Resp": {
+    "chef.automate.api.iam.v2beta.ResetToV1Resp": {
       "type": "object"
     },
-    "v2betaRole": {
+    "chef.automate.api.iam.v2beta.Role": {
       "type": "object",
       "properties": {
         "name": {
@@ -873,7 +848,7 @@ func init() {
           "type": "string"
         },
         "type": {
-          "$ref": "#/definitions/iamv2betaType"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Type"
         },
         "actions": {
           "type": "array",
@@ -889,11 +864,11 @@ func init() {
         }
       }
     },
-    "v2betaStatement": {
+    "chef.automate.api.iam.v2beta.Statement": {
       "type": "object",
       "properties": {
         "effect": {
-          "$ref": "#/definitions/StatementEffect"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Statement.Effect"
         },
         "actions": {
           "type": "array",
@@ -921,7 +896,23 @@ func init() {
         }
       }
     },
-    "v2betaUpdatePolicyReq": {
+    "chef.automate.api.iam.v2beta.Statement.Effect": {
+      "type": "string",
+      "enum": [
+        "ALLOW",
+        "DENY"
+      ],
+      "default": "ALLOW"
+    },
+    "chef.automate.api.iam.v2beta.Type": {
+      "type": "string",
+      "enum": [
+        "CHEF_MANAGED",
+        "CUSTOM"
+      ],
+      "default": "CHEF_MANAGED"
+    },
+    "chef.automate.api.iam.v2beta.UpdatePolicyReq": {
       "type": "object",
       "properties": {
         "id": {
@@ -936,7 +927,7 @@ func init() {
         "statements": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v2betaStatement"
+            "$ref": "#/definitions/chef.automate.api.iam.v2beta.Statement"
           }
         },
         "name": {
@@ -951,15 +942,15 @@ func init() {
       },
       "description": "Does not contain type as the enduser can only create 'custom' policies."
     },
-    "v2betaUpdatePolicyResp": {
+    "chef.automate.api.iam.v2beta.UpdatePolicyResp": {
       "type": "object",
       "properties": {
         "policy": {
-          "$ref": "#/definitions/v2betaPolicy"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Policy"
         }
       }
     },
-    "v2betaUpdateProjectReq": {
+    "chef.automate.api.iam.v2beta.UpdateProjectReq": {
       "type": "object",
       "properties": {
         "id": {
@@ -970,15 +961,15 @@ func init() {
         }
       }
     },
-    "v2betaUpdateProjectResp": {
+    "chef.automate.api.iam.v2beta.UpdateProjectResp": {
       "type": "object",
       "properties": {
         "project": {
-          "$ref": "#/definitions/v2betaProject"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Project"
         }
       }
     },
-    "v2betaUpdateRoleReq": {
+    "chef.automate.api.iam.v2beta.UpdateRoleReq": {
       "type": "object",
       "properties": {
         "id": {
@@ -1001,15 +992,15 @@ func init() {
         }
       }
     },
-    "v2betaUpdateRoleResp": {
+    "chef.automate.api.iam.v2beta.UpdateRoleResp": {
       "type": "object",
       "properties": {
         "role": {
-          "$ref": "#/definitions/v2betaRole"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Role"
         }
       }
     },
-    "v2betaUpgradeToV2Resp": {
+    "chef.automate.api.iam.v2beta.UpgradeToV2Resp": {
       "type": "object",
       "properties": {
         "reports": {
@@ -1020,17 +1011,26 @@ func init() {
         }
       }
     },
-    "v2betaVersion": {
+    "chef.automate.api.iam.v2beta.Version": {
       "type": "object",
       "properties": {
         "major": {
-          "$ref": "#/definitions/VersionVersionNumber"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Version.VersionNumber"
         },
         "minor": {
-          "$ref": "#/definitions/VersionVersionNumber"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Version.VersionNumber"
         }
       },
       "title": "the only values that may be returned by GetPolicyVersion"
+    },
+    "chef.automate.api.iam.v2beta.Version.VersionNumber": {
+      "type": "string",
+      "enum": [
+        "V0",
+        "V1",
+        "V2"
+      ],
+      "default": "V0"
     }
   }
 }

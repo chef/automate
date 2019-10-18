@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/applicationsServicesRes"
+              "$ref": "#/definitions/chef.automate.api.applications.ServicesRes"
             }
           }
         },
@@ -35,7 +35,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/applicationsDisconnectedServicesReq"
+              "$ref": "#/definitions/chef.automate.api.applications.DisconnectedServicesReq"
             }
           }
         ],
@@ -51,7 +51,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/applicationsServicesRes"
+              "$ref": "#/definitions/chef.automate.api.applications.ServicesRes"
             }
           }
         },
@@ -76,7 +76,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/applicationsServiceGroups"
+              "$ref": "#/definitions/chef.automate.api.applications.ServiceGroups"
             }
           }
         },
@@ -135,7 +135,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/applicationsServicesBySGRes"
+              "$ref": "#/definitions/chef.automate.api.applications.ServicesBySGRes"
             }
           }
         },
@@ -206,7 +206,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/applicationsHealthCounts"
+              "$ref": "#/definitions/chef.automate.api.applications.HealthCounts"
             }
           }
         },
@@ -234,7 +234,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/applicationsServicesRes"
+              "$ref": "#/definitions/chef.automate.api.applications.ServicesRes"
             }
           }
         },
@@ -293,7 +293,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/applicationsServicesDistinctValuesRes"
+              "$ref": "#/definitions/chef.automate.api.applications.ServicesDistinctValuesRes"
             }
           }
         },
@@ -333,7 +333,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/applicationsServicesStatsRes"
+              "$ref": "#/definitions/chef.automate.api.applications.ServicesStatsRes"
             }
           }
         },
@@ -349,7 +349,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/versionVersionInfo"
+              "$ref": "#/definitions/chef.automate.api.common.version.VersionInfo"
             }
           }
         },
@@ -365,7 +365,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/applicationsPeriodicJobConfig"
+              "$ref": "#/definitions/chef.automate.api.applications.PeriodicJobConfig"
             }
           }
         },
@@ -379,7 +379,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/applicationsUpdateDeleteDisconnectedServicesConfigRes"
+              "$ref": "#/definitions/chef.automate.api.applications.UpdateDeleteDisconnectedServicesConfigRes"
             }
           }
         },
@@ -389,7 +389,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/applicationsPeriodicJobConfig"
+              "$ref": "#/definitions/chef.automate.api.applications.PeriodicJobConfig"
             }
           }
         ],
@@ -405,7 +405,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/applicationsPeriodicMandatoryJobConfig"
+              "$ref": "#/definitions/chef.automate.api.applications.PeriodicMandatoryJobConfig"
             }
           }
         },
@@ -419,7 +419,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/applicationsUpdateDisconnectedServicesConfigRes"
+              "$ref": "#/definitions/chef.automate.api.applications.UpdateDisconnectedServicesConfigRes"
             }
           }
         },
@@ -429,7 +429,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/applicationsPeriodicMandatoryJobConfig"
+              "$ref": "#/definitions/chef.automate.api.applications.PeriodicMandatoryJobConfig"
             }
           }
         ],
@@ -440,7 +440,7 @@ func init() {
     }
   },
   "definitions": {
-    "applicationsDisconnectedServicesReq": {
+    "chef.automate.api.applications.DisconnectedServicesReq": {
       "type": "object",
       "properties": {
         "threshold_seconds": {
@@ -449,7 +449,7 @@ func init() {
         }
       }
     },
-    "applicationsHealthCounts": {
+    "chef.automate.api.applications.HealthCounts": {
       "type": "object",
       "properties": {
         "total": {
@@ -478,7 +478,7 @@ func init() {
         }
       }
     },
-    "applicationsHealthStatus": {
+    "chef.automate.api.applications.HealthStatus": {
       "type": "string",
       "enum": [
         "OK",
@@ -491,7 +491,7 @@ func init() {
       "description": "- NONE: The representation of NO health check status\nTODO @afiune how much effort would be to change\nthe OK enum to be NONE",
       "title": "The HealthStatus enum matches the habitat implementation for health-check status:\n=\u003e https://www.habitat.sh/docs/reference/#health-check"
     },
-    "applicationsPeriodicJobConfig": {
+    "chef.automate.api.applications.PeriodicJobConfig": {
       "type": "object",
       "properties": {
         "running": {
@@ -504,7 +504,7 @@ func init() {
         }
       }
     },
-    "applicationsPeriodicMandatoryJobConfig": {
+    "chef.automate.api.applications.PeriodicMandatoryJobConfig": {
       "type": "object",
       "properties": {
         "threshold": {
@@ -514,7 +514,7 @@ func init() {
       },
       "title": "it's like a PeriodicJobConfig but the user isn't allowed to change whether\nor not the job runs"
     },
-    "applicationsService": {
+    "chef.automate.api.applications.Service": {
       "type": "object",
       "properties": {
         "supervisor_id": {
@@ -527,10 +527,10 @@ func init() {
           "type": "string"
         },
         "health_check": {
-          "$ref": "#/definitions/applicationsHealthStatus"
+          "$ref": "#/definitions/chef.automate.api.applications.HealthStatus"
         },
         "status": {
-          "$ref": "#/definitions/applicationsServiceStatus"
+          "$ref": "#/definitions/chef.automate.api.applications.ServiceStatus"
         },
         "application": {
           "type": "string"
@@ -551,7 +551,7 @@ func init() {
           "type": "string"
         },
         "previous_health_check": {
-          "$ref": "#/definitions/applicationsHealthStatus"
+          "$ref": "#/definitions/chef.automate.api.applications.HealthStatus"
         },
         "current_health_since": {
           "type": "string"
@@ -573,7 +573,7 @@ func init() {
         }
       }
     },
-    "applicationsServiceGroup": {
+    "chef.automate.api.applications.ServiceGroup": {
       "type": "object",
       "properties": {
         "name": {
@@ -584,7 +584,7 @@ func init() {
           "title": "Combination of the version and release in a single string like:\nExample: 0.1.0/8743278934278923"
         },
         "status": {
-          "$ref": "#/definitions/applicationsHealthStatus"
+          "$ref": "#/definitions/chef.automate.api.applications.HealthStatus"
         },
         "health_percentage": {
           "type": "integer",
@@ -592,7 +592,7 @@ func init() {
           "title": "The health_percentage can be a number between 0-100"
         },
         "services_health_counts": {
-          "$ref": "#/definitions/applicationsHealthCounts"
+          "$ref": "#/definitions/chef.automate.api.applications.HealthCounts"
         },
         "id": {
           "type": "string"
@@ -614,18 +614,18 @@ func init() {
       },
       "title": "A service group message is the representation of one single service group that\nis internally generated by aggregating all the services"
     },
-    "applicationsServiceGroups": {
+    "chef.automate.api.applications.ServiceGroups": {
       "type": "object",
       "properties": {
         "service_groups": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/applicationsServiceGroup"
+            "$ref": "#/definitions/chef.automate.api.applications.ServiceGroup"
           }
         }
       }
     },
-    "applicationsServiceStatus": {
+    "chef.automate.api.applications.ServiceStatus": {
       "type": "string",
       "enum": [
         "RUNNING",
@@ -636,7 +636,7 @@ func init() {
       "default": "RUNNING",
       "title": "The ServiceStatus enum describes the status of the service\n@afiune have we defined these states somewhere?"
     },
-    "applicationsServicesBySGRes": {
+    "chef.automate.api.applications.ServicesBySGRes": {
       "type": "object",
       "properties": {
         "group": {
@@ -645,15 +645,15 @@ func init() {
         "services": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/applicationsService"
+            "$ref": "#/definitions/chef.automate.api.applications.Service"
           }
         },
         "services_health_counts": {
-          "$ref": "#/definitions/applicationsHealthCounts"
+          "$ref": "#/definitions/chef.automate.api.applications.HealthCounts"
         }
       }
     },
-    "applicationsServicesDistinctValuesRes": {
+    "chef.automate.api.applications.ServicesDistinctValuesRes": {
       "type": "object",
       "properties": {
         "values": {
@@ -664,18 +664,18 @@ func init() {
         }
       }
     },
-    "applicationsServicesRes": {
+    "chef.automate.api.applications.ServicesRes": {
       "type": "object",
       "properties": {
         "services": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/applicationsService"
+            "$ref": "#/definitions/chef.automate.api.applications.Service"
           }
         }
       }
     },
-    "applicationsServicesStatsRes": {
+    "chef.automate.api.applications.ServicesStatsRes": {
       "type": "object",
       "properties": {
         "total_service_groups": {
@@ -696,13 +696,13 @@ func init() {
         }
       }
     },
-    "applicationsUpdateDeleteDisconnectedServicesConfigRes": {
+    "chef.automate.api.applications.UpdateDeleteDisconnectedServicesConfigRes": {
       "type": "object"
     },
-    "applicationsUpdateDisconnectedServicesConfigRes": {
+    "chef.automate.api.applications.UpdateDisconnectedServicesConfigRes": {
       "type": "object"
     },
-    "queryPagination": {
+    "chef.automate.api.common.query.Pagination": {
       "type": "object",
       "properties": {
         "page": {
@@ -715,7 +715,7 @@ func init() {
         }
       }
     },
-    "querySortOrder": {
+    "chef.automate.api.common.query.SortOrder": {
       "type": "string",
       "enum": [
         "ASC",
@@ -723,18 +723,18 @@ func init() {
       ],
       "default": "ASC"
     },
-    "querySorting": {
+    "chef.automate.api.common.query.Sorting": {
       "type": "object",
       "properties": {
         "field": {
           "type": "string"
         },
         "order": {
-          "$ref": "#/definitions/querySortOrder"
+          "$ref": "#/definitions/chef.automate.api.common.query.SortOrder"
         }
       }
     },
-    "versionVersionInfo": {
+    "chef.automate.api.common.version.VersionInfo": {
       "type": "object",
       "properties": {
         "name": {

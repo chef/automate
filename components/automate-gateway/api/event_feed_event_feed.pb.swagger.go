@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseEventCounts"
+              "$ref": "#/definitions/chef.automate.api.event_feed.response.EventCounts"
             }
           }
         },
@@ -67,7 +67,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseEventCounts"
+              "$ref": "#/definitions/chef.automate.api.event_feed.response.EventCounts"
             }
           }
         },
@@ -109,7 +109,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseEvents"
+              "$ref": "#/definitions/chef.automate.api.event_feed.response.Events"
             }
           }
         },
@@ -185,7 +185,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/event_feedresponseEventStrings"
+              "$ref": "#/definitions/chef.automate.api.event_feed.response.EventStrings"
             }
           }
         },
@@ -233,28 +233,7 @@ func init() {
     }
   },
   "definitions": {
-    "event_feedresponseEventStrings": {
-      "type": "object",
-      "properties": {
-        "strings": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/responseEventString"
-          }
-        },
-        "start": {
-          "type": "string"
-        },
-        "end": {
-          "type": "string"
-        },
-        "hours_between": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "responseEvent": {
+    "chef.automate.api.event_feed.response.Event": {
       "type": "object",
       "properties": {
         "event_type": {
@@ -301,18 +280,18 @@ func init() {
         }
       }
     },
-    "responseEventCollection": {
+    "chef.automate.api.event_feed.response.EventCollection": {
       "type": "object",
       "properties": {
         "events_count": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/responseEventCount"
+            "$ref": "#/definitions/chef.automate.api.event_feed.response.EventCount"
           }
         }
       }
     },
-    "responseEventCount": {
+    "chef.automate.api.event_feed.response.EventCount": {
       "type": "object",
       "properties": {
         "name": {
@@ -324,7 +303,7 @@ func init() {
         }
       }
     },
-    "responseEventCounts": {
+    "chef.automate.api.event_feed.response.EventCounts": {
       "type": "object",
       "properties": {
         "total": {
@@ -334,18 +313,18 @@ func init() {
         "counts": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/responseEventCount"
+            "$ref": "#/definitions/chef.automate.api.event_feed.response.EventCount"
           }
         }
       }
     },
-    "responseEventString": {
+    "chef.automate.api.event_feed.response.EventString": {
       "type": "object",
       "properties": {
         "collection": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/responseEventCollection"
+            "$ref": "#/definitions/chef.automate.api.event_feed.response.EventCollection"
           }
         },
         "event_action": {
@@ -353,13 +332,34 @@ func init() {
         }
       }
     },
-    "responseEvents": {
+    "chef.automate.api.event_feed.response.EventStrings": {
+      "type": "object",
+      "properties": {
+        "strings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.event_feed.response.EventString"
+          }
+        },
+        "start": {
+          "type": "string"
+        },
+        "end": {
+          "type": "string"
+        },
+        "hours_between": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "chef.automate.api.event_feed.response.Events": {
       "type": "object",
       "properties": {
         "events": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/responseEvent"
+            "$ref": "#/definitions/chef.automate.api.event_feed.response.Event"
           }
         },
         "total_events": {
