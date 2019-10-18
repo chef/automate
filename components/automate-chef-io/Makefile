@@ -3,11 +3,8 @@
 SHELL=bash
 SWAGGER_RESULT_FILE=static/api-docs/all-apis.swagger.json
 SWAGGER_DIR=data/docs/api_chef_automate
-#SWAGGER_FILES=$(shell find $(SWAGGER_DIR) -name '*.swagger.json')
-SWAGGER_FILES=data/docs/api_chef_automate/compliance/reporting/reporting.swagger.json
+SWAGGER_FILES=$(shell find $(SWAGGER_DIR) -name '*.swagger.json')
 STATIC_SWAGGER_FILES=$(shell find data/docs/api-static/ -type f | sort -n)
-
-EXPECTED_CONFLICTS=46
 
 themes/chef:
 	scripts/clone_hugo.sh
@@ -41,11 +38,8 @@ sync_swagger_files: clean_swagger_files
 
 $(SWAGGER_RESULT_FILE): $(SWAGGER_FILES)
 
-#generate_swagger: $(SWAGGER_RESULT_FILE)
-#	swagger mixin --quiet -c=$(EXPECTED_CONFLICTS) $(SWAGGER_FILES) > $(SWAGGER_RESULT_FILE)
-
 generate_swagger: $(SWAGGER_RESULT_FILE)
-	swagger mixin $(STATIC_SWAGGER_FILES) $(SWAGGER_FILES) | \
+	swagger mixin -c=0 $(STATIC_SWAGGER_FILES) $(SWAGGER_FILES) | \
 		jq '.paths = (.paths | with_entries( select( all( .value[].tags[]; . != "hidden") ) ) )' \
 		> $(SWAGGER_RESULT_FILE)
 
