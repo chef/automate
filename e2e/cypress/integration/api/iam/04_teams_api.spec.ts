@@ -3,7 +3,6 @@ import { describeIfIAMV2p1 } from '../../constants';
 describe('teams API', () => {
   const defaultAdminReq = {
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    method: 'GET',
     url: '/apis/iam/v2beta/teams'
   };
   const cypressPrefix = 'test-teams-api';

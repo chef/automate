@@ -101,6 +101,8 @@ Cypress.Commands.add('generateAdminToken', (idToken: string) => {
       }
     });
   }
+
+  waitUntilAdminTokenPermissioned(100);
 });
 
 interface MemoryMap {
@@ -249,5 +251,26 @@ function LoginHelper(username: string) {
     cy.saveStorage();
 
     cy.wait(['@getAuthPopulateCache', '@getAuthParameterized']);
+  });
+}
+
+function waitUntilAdminTokenPermissioned(attempts: number): void {
+  if (attempts === -1) {
+    throw new Error('admin token failed to generate');
+  }
+  // admin-only API endpoint
+  cy.request({
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    url: '/apis/iam/v2beta/projects',
+    method: 'GET',
+    failOnStatusCode: false
+  }).then((response) => {
+    if (response.status === 200) {
+      return;
+    } else {
+      cy.log(`${attempts} attempts remaining: waiting for admin token to be permissioned`);
+      cy.wait(1000);
+      waitUntilAdminTokenPermissioned(--attempts);
+    }
   });
 }
