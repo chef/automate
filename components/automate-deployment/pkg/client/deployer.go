@@ -530,6 +530,7 @@ func (d *deployer) preflight(skipSharedPortCheck bool) {
 	preflightCheckOpts := preflight.DeployPreflightCheckOptions{
 		SkipSharedPortCheck: skipSharedPortCheck,
 		Airgap:              d.airgap,
+		AutomateConfig:      d.mergedCfg,
 	}
 
 	d.writer.Title("Beginning pre-flight checks")
