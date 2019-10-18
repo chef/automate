@@ -313,7 +313,6 @@ func (m *A2ServiceConfigModule) generateGetPortMethod(message pgs.Message, acc *
 		jen.Id("m").Id("*"+m.ctx.Name(message).String()),
 	).Id("GetPort").Params(
 		jen.Id("name").String(),
-		jen.Id("value").Uint16(),
 	).Params(jen.Uint16(), jen.Error()).BlockFunc(func(g *jen.Group) {
 		// switch name {
 		g.Switch(jen.Id("name")).BlockFunc(func(sg *jen.Group) {
@@ -346,8 +345,8 @@ func (m *A2ServiceConfigModule) generateGetPortMethod(message pgs.Message, acc *
 							switch path.Type().Embed().FullyQualifiedName() {
 							case ".google.protobuf.Int32Value":
 								// Example:
-								// return v3.Value, nil
-								cg.Return(jen.Uint16().Call(jen.Id(cur).Dot("Value")), jen.Nil())
+								// return v3.GetValue(), nil
+								cg.Return(jen.Uint16().Call(jen.Id(cur).Dot("GetValue()")), jen.Nil())
 							case ".google.protobuf.StringValue":
 								// Example:
 								// parts := strings.Split(v3.Value, "-")

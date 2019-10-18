@@ -62,7 +62,7 @@ func (m *ConfigRequest) ListPorts() []a2conf.PortInfo {
 }
 
 // GetPort gets the port tagged with the given name. If the value is not set, it returns 0.
-func (m *ConfigRequest) GetPort(name string, value uint16) (uint16, error) {
+func (m *ConfigRequest) GetPort(name string) (uint16, error) {
 	switch name {
 	case "git":
 		v0 := m.V1
@@ -78,7 +78,7 @@ func (m *ConfigRequest) GetPort(name string, value uint16) (uint16, error) {
 			return 0, nil
 		}
 		v3 := v2.Port
-		return uint16(v3.Value), nil
+		return uint16(v3.GetValue()), nil
 	case "service":
 		v0 := m.V1
 		if v0 == nil {
@@ -89,7 +89,7 @@ func (m *ConfigRequest) GetPort(name string, value uint16) (uint16, error) {
 			return 0, nil
 		}
 		v2 := v1.ApiPort
-		return uint16(v2.Value), nil
+		return uint16(v2.GetValue()), nil
 	default:
 		return 0, a2conf.ErrPortNotFound
 	}
