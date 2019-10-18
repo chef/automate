@@ -22,7 +22,7 @@ To get the best possible IAM v2 experience, Chef Automate should be running the 
 Perform the upgrade to IAM v2 with `chef-automate iam upgrade-to-v2`; the response should look something like:
 
 ```terminal
-Upgrading to IAM v2
+Upgrading to IAM v2.1
 Migrating v1 policies...
 Creating default teams Editors and Viewers...
 
@@ -240,6 +240,8 @@ so they are not relevant when assigning IAM resources such as teams or roles.
 To create a project, navigate to the Projects list under the **Settings** tab and select **Create Project**. You will need to provide a name and can optionally edit the ID. You must create a project before you can assign any resources to it.
 
 #### Assigning Resources to Projects
+
+Projects can be assigned to Automate created resources on creation or update.
 
 To assign a team to projects, select a team from the _Teams_ list, then select **Details**.
 Likewise, to assign a token to projects, select a token from the API tokens list, then select **Details**.

@@ -92,7 +92,7 @@ DELETE /policies/{**id**} | deletes a *Custom* policy
 
 ### Example Policy
 
-This policy shows two statements, each enforcing a different set of permissions.
+This policy has two statements, each enforcing a different set of permissions.
 The first policy statement grants "list" and "get" access to view users.
 The second statement grants access to all the actions comprising the `editor` role.
 Note that you may specify inline **actions** or use a **role** reference.
