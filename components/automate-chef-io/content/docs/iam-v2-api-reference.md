@@ -84,11 +84,11 @@ statement projects | empty not allowed | wildcard allowed     | (unassigned) all
 
 HTTP request              | Description
 --------------------------|------------
-GET /policies             | lists both *Chef-managed* and *Custom* policies
-GET /policies/{**id**}    | gets the specified policy
-POST /policies            | creates a *Custom* policy
-PUT /policies/{**id**}    | updates a *Custom* policy
-DELETE /policies/{**id**} | deletes a *Custom* policy
+GET /policies             | list both *Chef-managed* and *Custom* policies
+GET /policies/{**id**}    | get the specified policy
+POST /policies            | create a *Custom* policy
+PUT /policies/{**id**}    | update a *Custom* policy
+DELETE /policies/{**id**} | delete a *Custom* policy
 
 ### Example Policy
 
@@ -188,8 +188,8 @@ For more information, see [Adding Members to a Policy]({{< relref "iam-v2-api-re
 
 HTTP request                           | Description
 ---------------------------------------|------------
-GET /policies/{**id**}/members         | lists the membership
-PUT /policies/{**id**}/members         | replaces the membership
+GET /policies/{**id**}/members         | list the membership
+PUT /policies/{**id**}/members         | replace the membership
 POST /policies/{**id**}/members:add    | add to the membership
 POST /policies/{**id**}/members:remove | remove from the membership
 
@@ -254,11 +254,11 @@ Roles you create are *Custom* roles.
 
 HTTP request              | Description
 --------------------------|------------
-GET /roles                | lists both *Chef-managed* and *Custom* roles
-GET /roles/{**id**}       | gets the specified role
-POST /roles               | creates a *Custom* role
-PUT /roles/{**id**}       | updates a *Custom* role
-DELETE /roles/{**id**}    | deletes a *Custom* role
+GET /roles                | list both *Chef-managed* and *Custom* roles
+GET /roles/{**id**}       | get the specified role
+POST /roles               | create a *Custom* role
+PUT /roles/{**id**}       | update a *Custom* role
+DELETE /roles/{**id**}    | delete a *Custom* role
 
 ### Default Chef-managed Roles
 
@@ -340,11 +340,11 @@ Deleting a role is permanent and cannot be undone.
 
 HTTP request              | Description
 --------------------------|------------
-GET /projects             | lists all projects
-GET /projects/{**id**}    | gets the specified role
-POST /projects            | creates a project
-PUT /projects/{**id**}    | updates a project
-DELETE /projects/{**id**} | deletes a project
+GET /projects             | list all projects
+GET /projects/{**id**}    | get the specified role
+POST /projects            | create a project
+PUT /projects/{**id**}    | update a project
+DELETE /projects/{**id**} | delete a project
 
 ### Example Project
 
@@ -405,11 +405,11 @@ Deleting a project is permanent and cannot be undone.
 
 HTTP request                                          | Description
 ------------------------------------------------------|------------
-GET /projects/***project_id***/rules                  | lists rules for a project
-GET /projects/***project_id***/rules/***rule_id***    | gets a project rule
-POST /projects/***project_id***/rules                 | creates a project rule
-PUT /projects/***project_id***/rules/***rule_id***    | updates a project rule
-DELETE /projects/***project_id***/rules/***rule_id*** | deletes a project rule
+GET /projects/***project_id***/rules                  | list rules for a project
+GET /projects/***project_id***/rules/***rule_id***    | get a project rule
+POST /projects/***project_id***/rules                 | create a project rule
+PUT /projects/***project_id***/rules/***rule_id***    | update a project rule
+DELETE /projects/***project_id***/rules/***rule_id*** | delete a project rule
 
 A project rule specifies a non-empty array of conditions.
 Each project rule **condition** specifies values to match for a particular **attribute**.
@@ -512,6 +512,7 @@ https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/projects/{project-id}/ru
 - Supply all of a rule's properties, not just the ones you wish to update.
   Properties that you do not include are reset to empty values.
 - The rule ID and Type are immutable; both properties can only be set at creation time.
+- If you need to change the rule's Type you will need to create a new rule instead.
 
 ### Deleting a Project Rule
 
@@ -526,13 +527,13 @@ Deleting a project rule is permanent and cannot be undone.
 
 HTTP request              | Description
 --------------------------|------------
-GET /users                | lists all users
-GET /users/{**id**}       | gets the specified user
-POST /users               | creates a user
-PUT /users/{**id**}       | updates a user
-DELETE /users/{**id**}    | deletes a user
+GET /users                | list all users
+GET /users/{**id**}       | get the specified user
+POST /users               | create a user
+PUT /users/{**id**}       | update a user
+DELETE /users/{**id**}    | delete a user
 GET /users/{**id**}/teams | list teams for a user
-PUT /self/{**id**}        | updates your own user
+PUT /self/{**id**}        | update your own user
 
 ### Example User
 
@@ -603,11 +604,11 @@ Note, it uses the `membership_id` property of the user instead of the user's `id
 
 HTTP request              | Description
 --------------------------|------------
-GET /teams               | lists all teams
-GET /teams/{**id**}      | gets the specified team
-POST /teams              | creates a team
-PUT /teams/{**id**}      | updates a team
-DELETE /teams/{**id**}   | deletes a team
+GET /teams               | list all teams
+GET /teams/{**id**}      | get the specified team
+POST /teams              | create a team
+PUT /teams/{**id**}      | update a team
+DELETE /teams/{**id**}   | delete a team
 
 ### Example Team
 
@@ -675,7 +676,7 @@ A user's GUID is reported in the `membership_id` property when you fetch a user.
 
 HTTP request                           | Description
 ---------------------------------------|------------
-GET /teams/{**id**}/users              | lists the membership
+GET /teams/{**id**}/users              | list the membership
 POST /teams/{**id**}/users:add         | add to the membership
 POST /teams/{**id**}/users:remove      | remove from the membership
 
@@ -720,11 +721,11 @@ The removed users still exists within Chef Automate, but are no longer associate
 
 HTTP request              | Description
 --------------------------|------------
-GET /tokens               | lists all tokens
-GET /tokens/{**id**}      | gets the specified token
-POST /tokens              | creates a token
-PUT /tokens/{**id**}      | updates a token
-DELETE /tokens/{**id**}   | deletes a token
+GET /tokens               | list all tokens
+GET /tokens/{**id**}      | get the specified token
+POST /tokens              | create a token
+PUT /tokens/{**id**}      | update a token
+DELETE /tokens/{**id**}   | delete a token
 
 ### Example Token
 

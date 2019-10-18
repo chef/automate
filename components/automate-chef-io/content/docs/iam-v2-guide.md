@@ -62,7 +62,6 @@ You will still need to create new v2 policies to preserve any IAM behavior from 
 
 {{% warning %}}
 Note that several legacy policies, including *Compliance Profile Access* and *Ingest Access*,  have API tokens that will stop working if not ported.
-Alternately, you may choose to keep those policies intact if that's easier and you do not plan to alter those permissions.
 {{% /warning %}}
 
 The next few sections explain how to use Chef-managed policies and how to create custom policies.
