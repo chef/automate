@@ -184,10 +184,10 @@ Currently, only some resources in Chef Automate respect projects. Only resources
 
 #### Resources that do not yet respect projects
 
-- Application Services
 - Compliance Scan Jobs
 - Compliance Profiles
 - Data Feeds
+- Habitat Services
 - Manually added nodes
 - Node Credentials
 - Node Managers (also called Node Integrations)
