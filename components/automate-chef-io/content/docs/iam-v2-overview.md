@@ -194,8 +194,6 @@ Currently, only some resources in Chef Automate respect projects. Only resources
 - Notifications
 - Users
 
-
-
 ### Properties of a Project
 
 To assign a project to a set of ingested client run  and compliance nodes , the project needs a list of **ingest rules**, where each rule describes a group of node characteristics.
