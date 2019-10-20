@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang/protobuf/jsonpb"
 	structpb "github.com/golang/protobuf/ptypes/struct"
+	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/compliance-service/ingest/events/inspec"
 	inspecTypes "github.com/chef/automate/components/compliance-service/inspec"
@@ -116,6 +117,29 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec.Profile, profilesSums [
 				}
 			}
 
+			refs := make([]relaxting.ESInSpecReportControlRefs, 0)
+			var refVal, urlVal string
+			for _, ref := range control.Refs {
+				if len(ref.Fields) != 2 {
+					logrus.Warnf("ref object contains more than two fields: %v", ref)
+					continue
+				}
+				for key, val := range ref.Fields {
+					if key == "ref" {
+						refVal = val.GetStringValue()
+					} else {
+						// both url and uri values accepted here.
+						urlVal = val.GetStringValue()
+					}
+
+				}
+
+				refs = append(refs, relaxting.ESInSpecReportControlRefs{
+					Ref: refVal,
+					Url: urlVal,
+				})
+			}
+
 			minControls[i] = relaxting.ESInSpecReportControl{
 				ID:         control.Id,
 				Title:      control.Title,
@@ -123,6 +147,7 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec.Profile, profilesSums [
 				Status:     control.Status(),
 				Results:    minResults,
 				StringTags: stringTags,
+				Refs:       refs,
 			}
 		}
 

@@ -315,6 +315,11 @@ func parseProfilesMin(js *string) (profiles []relaxting.ESInSpecReportProfile) {
 		if profiles[i].Depends == nil {
 			profiles[i].Depends = []relaxting.ESInSpecReportDepends{}
 		}
+		for ci := range profiles[i].Controls {
+			if profiles[i].Controls[ci].Refs == nil {
+				profiles[i].Controls[ci].Refs = []relaxting.ESInSpecReportControlRefs{}
+			}
+		}
 	}
 	return profiles
 }

@@ -58,7 +58,11 @@
           "title": "Running worker process as non-privileged user",
           "desc": "The NGINX worker processes should run as non-privileged user. In case of compromise of the process, an attacker has full access to the system.",
           "impact": 1,
-          "refs": [],
+          "refs":[ 
+            { 
+              "ref":"testing-ref", "url": "test-url"
+            }
+          ],
           "tags": {},
           "code": "control 'nginx-01' do\n  impact 1.0\n  title 'Running worker process as non-privileged user'\n  desc 'The NGINX worker processes should run as non-privileged user. In case of compromise of the process, an attacker has full access to the system.'\n  describe user(nginx_lib.valid_users) do\n    it { should exist }\n  end\n  describe parse_config_file(nginx_conf, options) do\n    its('user') { should eq nginx_lib.valid_users }\n  end\n\n  describe parse_config_file(nginx_conf, options) do\n    its('group') { should_not eq 'root' }\n  end\nend\n",
           "source_location": {
