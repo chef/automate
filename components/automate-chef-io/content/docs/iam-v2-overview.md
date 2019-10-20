@@ -170,6 +170,32 @@ Once you define your set of projects with their contained ingest rules and condi
 Teams and API tokens may be assigned to projects directly in the UI; policies and roles can only be assigned on the command-line.
 These resources created within Automate do not make use of, nor do they require, any project ingest rules.
 
+Currently, only some resources in Chef Automate respect projects. Only resources that respect projects will be filtered when using the project filter. Resources that do not respect projects will always be displayed and will ignore any applied project filters. After IAM v2 becomes generally available we will continue the work to make more resources respect projects.
+
+#### Resources that respect projects
+
+- API Tokens
+- Ingested Client Run nodes
+- Ingested Compliance nodes
+- Ingested Event Feed events
+- Policies
+- Teams
+- Roles
+
+#### Resources that do not yet respect projects
+
+- Application Services
+- Compliance Scan Jobs
+- Compliance Profiles
+- Data Feeds
+- Manually added nodes
+- Node Credentials
+- Node Managers (also called Node Integrations)
+- Notifications
+- Users
+
+
+
 ### Properties of a Project
 
 To assign a project to a set of ingested client run  and compliance nodes , the project needs a list of **ingest rules**, where each rule describes a group of node characteristics.
