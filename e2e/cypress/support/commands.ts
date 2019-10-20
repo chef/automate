@@ -66,10 +66,10 @@ Cypress.Commands.add('generateAdminToken', (idToken: string) => {
     url: `/apis/iam/v2beta/tokens/${adminTokenObj.id}`,
     failOnStatusCode: false
   }).then((resp: Cypress.ObjectLike) => {
-    expect([200, 404]).to.include(resp.status);
+    expect(resp.status).to.be.oneOf([200, 404]);
   });
 
-  // create token
+  // create token (OK to run v2 endpoints even if system is v1)
   cy.request({
     auth: { bearer: idToken },
     method: 'POST',
@@ -84,7 +84,7 @@ Cypress.Commands.add('generateAdminToken', (idToken: string) => {
     cy.request({
       auth: { bearer: idToken },
       method: 'POST',
-      url: '/apis/iam/v2beta/policies',
+      url: '/api/v0/auth/policies',
       body: {
         action: '*',
         resource: '*',
@@ -180,7 +180,7 @@ function cleanupV2IAMObjectByIDPrefix(idPrefix: string, iamObject: string): void
           method: 'DELETE',
           url: `/apis/iam/v2beta/${iamObject}/${object.id}`
         }).then((deleteResp) => {
-          expect([200, 404]).to.include(deleteResp.status);
+          expect(deleteResp.status).to.be.oneOf([200, 404]);
         });
       }
     }
@@ -255,11 +255,8 @@ function LoginHelper(username: string) {
 }
 
 function waitUntilAdminTokenPermissioned(attempts: number): void {
-  if (attempts === -1) {
-    throw new Error('admin token failed to generate');
-  }
-  // admin-only API endpoint
-  cy.request({
+  for (let i = 0; i > attempts; i++) {
+    cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
     url: '/apis/iam/v2beta/projects',
     method: 'GET',
@@ -270,7 +267,8 @@ function waitUntilAdminTokenPermissioned(attempts: number): void {
     } else {
       cy.log(`${attempts} attempts remaining: waiting for admin token to be permissioned`);
       cy.wait(1000);
-      waitUntilAdminTokenPermissioned(--attempts);
+      ++attempts;
     }
   });
+  }
 }

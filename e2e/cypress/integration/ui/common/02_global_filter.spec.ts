@@ -126,7 +126,7 @@ function createPolicy(id_token: string, id: string, username: string, projects: 
       ]
     }
   }).then((response) => {
-    expect([200, 409]).to.include(response.status);
+    expect(response.status).to.be.oneOf([200, 404]);
   });
 }
 
@@ -138,6 +138,6 @@ function createProject(id_token: string, project: CreateProject): void {
     failOnStatusCode: false,
     body: project
   }).then((response) => {
-    expect([200, 409]).to.include(response.status);
+    expect(response.status).to.be.oneOf([200, 404]);
   });
 }
