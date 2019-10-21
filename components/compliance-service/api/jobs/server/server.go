@@ -106,13 +106,12 @@ func (srv *Server) Create(ctx context.Context, in *jobs.Job) (*jobs.Id, error) {
 		return nil, status.Error(codes.InvalidArgument, "Invalid job: nodes or node selectors required.")
 	}
 
-	sID, name, err := srv.db.AddJob(in)
+	sID, err := srv.db.AddJob(in)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 
 	in.Id = sID
-	in.Name = name
 	// Trigger Agent. Agents are responsible for all further steps.
 	go srv.schedulerServer.Run(in) // nolint: errcheck
 
@@ -121,7 +120,7 @@ func (srv *Server) Create(ctx context.Context, in *jobs.Job) (*jobs.Id, error) {
 		user := getUserValFromCtx(ctx)
 		go srv.fireEvent(event.ScanJobCreatedEventName, in, nil, user)
 	}
-	return &jobs.Id{Id: sID, Name: name}, nil
+	return &jobs.Id{Id: sID, Name: in.Name}, nil
 }
 
 // Read a job via ID

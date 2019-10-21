@@ -30,7 +30,7 @@ func TestRunSuiteJobs(t *testing.T) {
 func (suite *ScannerDBSuite) TestUpdateJobStatus() {
 	s := Scanner{DB: suite.Database}
 	// add a job
-	id, _, err := suite.Database.AddJob(&jobs.Job{
+	id, err := suite.Database.AddJob(&jobs.Job{
 		Name:       "my job 1",
 		Recurrence: "",
 		Type:       "exec",
@@ -66,7 +66,7 @@ func (suite *ScannerDBSuite) TestIsJobDeleted() {
 	s := Scanner{DB: suite.Database}
 
 	// add two exec jobs
-	id, _, err := suite.Database.AddJob(&jobs.Job{
+	id, err := suite.Database.AddJob(&jobs.Job{
 		Name:       "my job 1",
 		Recurrence: "",
 		Type:       "exec",
@@ -74,7 +74,7 @@ func (suite *ScannerDBSuite) TestIsJobDeleted() {
 	})
 	suite.Require().NoError(err)
 
-	id2, _, err := suite.Database.AddJob(&jobs.Job{
+	id2, err := suite.Database.AddJob(&jobs.Job{
 		Name:       "my job 2",
 		Recurrence: "",
 		Type:       "exec",

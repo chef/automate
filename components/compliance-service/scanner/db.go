@@ -293,9 +293,7 @@ func (s *Scanner) GetNodeUUID(ctx context.Context, sourceID string, region strin
 }
 
 func (s *Scanner) createDbJob(inJob *jobs.Job) (string, error) {
-	id, name, err := s.DB.AddJob(inJob)
-	_ = name
-	return id, err
+	return s.DB.AddJob(inJob)
 }
 
 // UpdateParentJobSchedule updates recurrent(parent) jobs fields:

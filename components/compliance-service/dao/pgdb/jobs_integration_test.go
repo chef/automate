@@ -32,7 +32,7 @@ func TestRunSuiteJobs(t *testing.T) {
 func (suite *JobsDBSuite) TestListInitiatedScans() {
 	now := time.Now()
 	nowMinus5 := now.Add(time.Duration(-5) * time.Minute)
-	_, _, err := suite.Database.AddJob(&jobs.Job{
+	_, err := suite.Database.AddJob(&jobs.Job{
 		Name:       "my job 1",
 		Status:     "completed",
 		Recurrence: "",
@@ -41,7 +41,7 @@ func (suite *JobsDBSuite) TestListInitiatedScans() {
 	})
 	suite.Require().NoError(err)
 
-	_, _, err = suite.Database.AddJob(&jobs.Job{
+	_, err = suite.Database.AddJob(&jobs.Job{
 		Name:       "my job 2",
 		Status:     "running",
 		Recurrence: "",
@@ -50,7 +50,7 @@ func (suite *JobsDBSuite) TestListInitiatedScans() {
 	})
 	suite.Require().NoError(err)
 
-	_, _, err = suite.Database.AddJob(&jobs.Job{
+	_, err = suite.Database.AddJob(&jobs.Job{
 		Name:       "my job 3",
 		Status:     "scheduled",
 		Recurrence: "bla",
@@ -59,7 +59,7 @@ func (suite *JobsDBSuite) TestListInitiatedScans() {
 	})
 	suite.Require().NoError(err)
 
-	_, _, err = suite.Database.AddJob(&jobs.Job{
+	_, err = suite.Database.AddJob(&jobs.Job{
 		Name:       "my job 4",
 		Status:     "running",
 		Recurrence: "",
