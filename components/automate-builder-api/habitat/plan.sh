@@ -21,6 +21,7 @@ pkg_binds=(
   [pg-sidecar-service]="port"
   [automate-builder-memcached]="port"
   [automate-minio]="port"
+  [session-service]="port"
 )
 
 pkg_exports=(

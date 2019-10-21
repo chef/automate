@@ -546,7 +546,8 @@ var ProductMetadataJSON = `
       "dependencies": [
         "core",
         "postgresql",
-        "elasticsearch"
+        "elasticsearch",
+        "auth"
       ],
       "hidden": false
     },

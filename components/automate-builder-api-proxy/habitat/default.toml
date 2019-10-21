@@ -33,7 +33,7 @@ api_url                   = "https://api.github.com"
 [oauth]
 provider       = "chef-automate"
 redirect_url   = "https://a2-dev.test/bldr"
-client_id      = "client_id"
+client_id      = "automate-builder-api"
 authorize_url  = "https://a2-dev.test/session/new"
 
 [nginx]
@@ -79,5 +79,3 @@ enable_access_log         = true
 [service]
 host = "0.0.0.0"
 port = 10104
-
-

@@ -19,11 +19,11 @@ port = {{cfg.conf.service.port}}
 
 [oauth]
 provider       = "chef-automate"
-token_url      = "{{cfg.conf.oauth.token_url}}"
-userinfo_url   = "{{cfg.conf.oauth.userinfo_url}}"
-redirect_url   = "{{cfg.conf.oauth.redirect_url}}"
-client_id      = "{{cfg.conf.oauth.client_id}}"
-client_secret  = "{{cfg.conf.oauth.client_secret}}"
+token_url      = "https://{{cfg.binds.session.sys.ip}}:{{cfg.binds.session.cfg.port}}/token"
+userinfo_url   = "https://{{cfg.binds.session.sys.ip}}:{{cfg.binds.session.cfg.port}}/userinfo"
+redirect_url   = "https://a2-dev.test/bldr"
+client_id      = "automate-builder-api"
+client_secret  = "{{getSecret "bldr.auth_client_secret"}}"
 
 [s3]
 endpoint = "https://{{cfg.binds.minio.sys.ip}}:{{cfg.binds.minio.cfg.port}}"

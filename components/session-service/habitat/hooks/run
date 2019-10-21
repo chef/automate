@@ -5,6 +5,13 @@ exec 2>&1
 # Call the script to block until user accepts the MLSA via the package's config
 {{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
 
+secrets-helper generate bldr.auth_client_id 12 --if-not-exists
+secrets-helper generate bldr.auth_client_secret 64 --if-not-exists
+
+mkdir -p "{{pkg.svc_var_path}}/etc"
+render-template config.yml "{{pkg.svc_var_path}}/etc/config.yml" \
+  --conf "{{pkg.svc_config_path}}/config.json"
+
 pg-helper ensure-service-database "{{cfg.storage.database}}"
 
 pg-helper create-extension "{{cfg.storage.database}}" "pgcrypto"
@@ -12,4 +19,4 @@ pg-helper create-extension "{{cfg.storage.database}}" "pgcrypto"
 # cleanup old migration files
 rm -rf {{pkg.svc_static_path}}/migrations
 
-exec session-service {{pkg.svc_config_path}}/config.yml
+exec session-service "{{pkg.svc_var_path}}/etc/config.yml"

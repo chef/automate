@@ -1,0 +1,18 @@
+{
+"pkg_path": "{{ pkg.path }}",
+"conf": {{ toJson cfg }},
+"binds": {
+  "dex": {
+{{~#eachAlive bind.automate-dex.members as |dex|}}
+  {{~#if @last}}
+    "ip": "{{dex.sys.ip}}",
+    {{~#if dex.cfg }}
+    "cfg": {{ toJson dex.cfg }},
+    {{~/if}}
+  {{~/if}}
+{{~/eachAlive}}
+    "__placeholder": {}
+  }
+},
+"__placeholder": {}
+}
