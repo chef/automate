@@ -552,16 +552,7 @@ func convertControl(profileControlsMap map[string]*reportingapi.Control, reportC
 	}
 
 	convertedControl.StringTags = jsonTags
-	var jsonRefs []*reportingapi.Ref
-	refs, err := json.Marshal(reportControlMin.Refs)
-	if err == nil {
-		err = json.Unmarshal(refs, &jsonRefs)
-	}
-	if err != nil {
-		// don't return error on this failure, it's ok
-		logrus.Errorf("unable to unmarshal refs: %v", refs)
-	}
-	convertedControl.Refs = jsonRefs
+	convertedControl.Refs = reportControlMin.Refs
 	return &convertedControl
 
 }

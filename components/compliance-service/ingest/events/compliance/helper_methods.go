@@ -6,6 +6,7 @@ import (
 	"time"
 	"unicode/utf8"
 
+	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
 	"github.com/golang/protobuf/jsonpb"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/sirupsen/logrus"
@@ -117,9 +118,9 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec.Profile, profilesSums [
 				}
 			}
 
-			refs := make([]relaxting.ESInSpecReportControlRefs, 0)
-			var refVal, urlVal string
+			refs := make([]*reportingapi.Ref, 0)
 			for _, ref := range control.Refs {
+				var refVal, urlVal string
 				if len(ref.Fields) != 2 {
 					logrus.Warnf("ref object contains more than two fields: %v", ref)
 					continue
@@ -134,7 +135,7 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec.Profile, profilesSums [
 
 				}
 
-				refs = append(refs, relaxting.ESInSpecReportControlRefs{
+				refs = append(refs, &reportingapi.Ref{
 					Ref: refVal,
 					Url: urlVal,
 				})
