@@ -266,17 +266,12 @@ func (srv *Server) Delete(ctx context.Context, in *nodes.Id) (*pb.Empty, error) 
 
 // List nodes based on a query
 func (srv *Server) List(ctx context.Context, in *nodes.Query) (*nodes.Nodes, error) {
-	logrus.Debugf("1Getting Nodes with query: %+v", in)
-	projectFilters, err := filterByProjects(ctx)
+	filters, err := addProjectFilters(ctx, in.Filters)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 
-	filtersWithProjects := append(in.Filters, &common.Filter{
-		Key:    "project",
-		Values: projectFilters,
-	})
-	dbnodes, totalCount, err := srv.db.GetNodes(in.Sort, in.Order, in.Page, in.PerPage, filtersWithProjects)
+	dbnodes, totalCount, err := srv.db.GetNodes(in.Sort, in.Order, in.Page, in.PerPage, filters)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
@@ -286,18 +281,6 @@ func (srv *Server) List(ctx context.Context, in *nodes.Query) (*nodes.Nodes, err
 		TotalUnreachable: totalCount.Unreachable,
 		TotalReachable:   totalCount.Reachable,
 		TotalUnknown:     totalCount.Unknown}, nil
-}
-
-func filterByProjects(ctx context.Context) ([]string, error) {
-	projectsFilter, err := auth_context.ProjectsFromIncomingContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-	if auth_context.AllProjectsRequested(projectsFilter) {
-		return []string{}, nil
-	}
-
-	return projectsFilter, nil
 }
 
 // Delete nodes based on a query
@@ -355,4 +338,32 @@ func (srv *Server) BulkDeleteById(ctx context.Context, in *nodes.Ids) (*nodes.Bu
 		return nil, err
 	}
 	return &nodes.BulkDeleteResponse{Names: names}, nil
+}
+
+func filterByProjects(ctx context.Context) ([]string, error) {
+	projectsFilter, err := auth_context.ProjectsFromIncomingContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if auth_context.AllProjectsRequested(projectsFilter) {
+		return []string{}, nil
+	}
+
+	return projectsFilter, nil
+}
+
+func addProjectFilters(ctx context.Context, filters []*common.Filter) ([]*common.Filter, error) {
+	projectFilters, err := filterByProjects(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(projectFilters) == 0 {
+		return filters, nil
+	}
+
+	return append(filters, &common.Filter{
+		Key:    "project",
+		Values: projectFilters,
+	}), nil
 }

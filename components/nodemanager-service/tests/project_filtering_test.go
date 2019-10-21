@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
 	nodesserver "github.com/chef/automate/components/nodemanager-service/api/nodes/server"
 	"github.com/chef/automate/lib/grpc/auth_context"
 )
@@ -37,6 +38,36 @@ func TestListProjectFiltering(t *testing.T) {
 		expectedNodeIDs []string
 	}{
 		{
+			description: "Two nodes matching on the same project tag",
+			ctx:         contextWithProjects([]string{"target_project"}),
+			ingestedNodes: []*manager.NodeMetadata{
+				{
+					Uuid:     "node1",
+					Projects: []string{"target_project"},
+				},
+				{
+					Uuid:     "node2",
+					Projects: []string{"project8", "target_project"},
+				},
+			},
+			expectedNodeIDs: []string{"node1", "node2"},
+		},
+		{
+			description: "Two nodes matching with two project tags",
+			ctx:         contextWithProjects([]string{"target_project_1", "target_project_2"}),
+			ingestedNodes: []*manager.NodeMetadata{
+				{
+					Uuid:     "node1",
+					Projects: []string{"target_project_1"},
+				},
+				{
+					Uuid:     "node2",
+					Projects: []string{"target_project_2"},
+				},
+			},
+			expectedNodeIDs: []string{"node1", "node2"},
+		},
+		{
 			description: "Two nodes with only one with a matching project",
 			ctx:         contextWithProjects([]string{"target_project"}),
 			ingestedNodes: []*manager.NodeMetadata{
@@ -50,6 +81,88 @@ func TestListProjectFiltering(t *testing.T) {
 				},
 			},
 			expectedNodeIDs: []string{"node1"},
+		},
+		{
+			description: "Three nodes with different projects and one missing a project where all match " +
+				"because the AllProjectsID is requested",
+			ctx: contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			ingestedNodes: []*manager.NodeMetadata{
+				{
+					Uuid:     "node1",
+					Projects: []string{"project3"},
+				},
+				{
+					Uuid:     "node2",
+					Projects: []string{"project8", "project7"},
+				},
+				{
+					Uuid:     "node3",
+					Projects: []string{},
+				},
+			},
+			expectedNodeIDs: []string{"node1", "node2", "node3"},
+		},
+		{
+			description: "Two nodes one with a project tag and one with none. Matching one unassigned",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			ingestedNodes: []*manager.NodeMetadata{
+				{
+					Uuid:     "node1",
+					Projects: []string{"project9"},
+				},
+				{
+					Uuid:     "node2",
+					Projects: []string{},
+				},
+			},
+			expectedNodeIDs: []string{"node2"},
+		},
+		{
+			description: "Two nodes with projects assigned, with unassigned request no matches",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			ingestedNodes: []*manager.NodeMetadata{
+				{
+					Uuid:     "node1",
+					Projects: []string{"project9"},
+				},
+				{
+					Uuid:     "node2",
+					Projects: []string{"project7"},
+				},
+			},
+			expectedNodeIDs: []string{},
+		},
+		{
+			description: "Two nodes one unassigned and one with a node, with unassigned and macthing " +
+				"project request matching both",
+			ctx: contextWithProjects([]string{authzConstants.UnassignedProjectID, "target_project"}),
+			ingestedNodes: []*manager.NodeMetadata{
+				{
+					Uuid:     "node1",
+					Projects: []string{"target_project"},
+				},
+				{
+					Uuid:     "node2",
+					Projects: []string{},
+				},
+			},
+			expectedNodeIDs: []string{"node1", "node2"},
+		},
+		{
+			description: "Two nodes one unassigned and one with a node, with unassigned and macthing " +
+				"project request matching both",
+			ctx: contextWithProjects([]string{authzConstants.UnassignedProjectID, "target_project"}),
+			ingestedNodes: []*manager.NodeMetadata{
+				{
+					Uuid:     "node1",
+					Projects: []string{"target_project"},
+				},
+				{
+					Uuid:     "node2",
+					Projects: []string{},
+				},
+			},
+			expectedNodeIDs: []string{"node1", "node2"},
 		},
 	}
 
