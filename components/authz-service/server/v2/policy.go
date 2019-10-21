@@ -110,7 +110,12 @@ func NewPoliciesServer(
 	case storage.SuccessfulBeta1:
 		v = api.Version{Major: api.Version_V2, Minor: api.Version_V1}
 	case storage.Successful:
-		v = api.Version{Major: api.Version_V2, Minor: api.Version_V0}
+		// auto-upgrade a 2.0 installation to 2.1
+		_, err := srv.handleMinorUpgrade(ctx, ms, api.Flag_VERSION_2_1)
+		if err != nil {
+			return nil, errors.Wrap(err, "auto-upgrade a 2.0 installation to 2.1")
+		}
+		v = api.Version{Major: api.Version_V2, Minor: api.Version_V1}
 	default:
 		v = api.Version{Major: api.Version_V1, Minor: api.Version_V0}
 	}
