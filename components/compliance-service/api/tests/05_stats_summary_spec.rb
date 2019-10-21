@@ -50,7 +50,8 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
                   "platforms" => 3,
                   "environments" => 3,
                   "profiles" => 3,
-                  "nodesCnt" => 5
+                  "nodesCnt" => 5,
+                  "controls" => 18
               }
           }
       }.to_json
@@ -70,7 +71,8 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
                   "platforms" => 2,
                   "environments" => 2,
                   "profiles" => 1,
-                  "nodesCnt" => 4
+                  "nodesCnt" => 4,
+                  "controls" => 4
               }
           }
       }.to_json
@@ -89,7 +91,8 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
                   "platforms" => 3,
                   "environments" => 2,
                   "profiles" => 3,
-                  "nodesCnt" => 3
+                  "nodesCnt" => 3,
+                  "controls" => 18
               }
           }
       }.to_json
@@ -108,7 +111,8 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 1,
-                  "nodesCnt" => 1
+                  "nodesCnt" => 1,
+                  "controls" => 14
               }
           }
       }.to_json
@@ -130,7 +134,8 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
                   "platforms" => 3,
                   "environments" => 3,
                   "profiles" => 2,
-                  "nodesCnt" => 5
+                  "nodesCnt" => 5,
+                  "controls" => 18
               }
           }
       }.to_json
@@ -150,7 +155,8 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 3,
-                  "nodesCnt" => 1
+                  "nodesCnt" => 1,
+                  "controls" => 18
               }
           }
       }.to_json
@@ -171,7 +177,8 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 1,
-                  "nodesCnt" => 1
+                  "nodesCnt" => 1,
+                  "controls" => 4
               }
           }
       }.to_json
@@ -207,7 +214,8 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 1,
-                  "nodesCnt" => 1
+                  "nodesCnt" => 1,
+                  "controls" => 14
               }
           }
       }.to_json
@@ -243,7 +251,8 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 1,
-                  "nodesCnt" => 1
+                  "nodesCnt" => 1,
+                  "controls" => 14
               }
           }
       }.to_json
@@ -263,7 +272,8 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 3,
-                  "nodesCnt" => 1
+                  "nodesCnt" => 1,
+                  "controls" => 18
               }
           }
       }.to_json
@@ -284,7 +294,8 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 2,
-                  "nodesCnt" => 1
+                  "nodesCnt" => 1,
+                  "controls" => 59
               }
           }
       }.to_json
@@ -308,6 +319,7 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
                   "environments" => 2,
                   "profiles" => 1,
                   "nodesCnt" => 4,
+                  "controls" => 4
               }
           }
       }.to_json
@@ -328,7 +340,8 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 1,
-                  "nodesCnt" => 1
+                  "nodesCnt" => 1,
+                  "controls" => 14
               }
           }
       }.to_json
@@ -349,7 +362,8 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 1,
-                  "nodesCnt" => 1
+                  "nodesCnt" => 1,
+                  "controls" => 4
               }
           }
       }.to_json
@@ -369,7 +383,8 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
                   "platforms" => 2,
                   "environments" => 2,
                   "profiles" => 1,
-                  "nodesCnt" => 4
+                  "nodesCnt" => 4,
+                  "controls" => 1
               }
           }
       }.to_json
@@ -390,7 +405,8 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
                   "platforms" => 1,
                   "environments" => 1,
                   "profiles" => 1,
-                  "nodesCnt" => 1
+                  "nodesCnt" => 1,
+                  "controls" => 1
               }
           }
       }.to_json
