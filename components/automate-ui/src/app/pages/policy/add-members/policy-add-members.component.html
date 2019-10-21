@@ -20,15 +20,17 @@
               <chef-form-field id="create-type">
                 <label>
                   <span class="label">Type <span aria-hidden="true">*</span></span>
-                  <select id="expression-type-dropdown"
-                          ngDefaultControl 
-                          (change)="updateFormDisplay('type')"
-                          formControlName="type">
-                    <option value='user'>User</option>
-                    <option value='team'>Team</option>
-                    <option value='token'>Token</option>
-                    <option value='*'>All members (*)</option>
-                  </select>
+                  <span class="custom-dropdown">
+                    <select id="expression-type-dropdown"
+                            ngDefaultControl 
+                            (change)="updateFormDisplay('type')"
+                            formControlName="type">
+                      <option value='user'>User</option>
+                      <option value='team'>Team</option>
+                      <option value='token'>Token</option>
+                      <option value='*'>All members (*)</option>
+                    </select>
+                  </span>
                 </label>
                 <chef-error *ngIf="expressionForm.get('type').hasError('required') && expressionForm.get('type').touched">
                   Type is a required field.
@@ -38,18 +40,20 @@
               <chef-form-field 
                 id="create-identity" 
                 *ngIf="expressionForm.contains('identityProvider')"
-                [@dropInAnimation]="{ value: triggerValue, params: { height: 74.6875 }}" >
+                [@dropInAnimation]="{ value: triggerValue, params: { height: 88.2422 }}" >
                 <label>
                   <span class="label">Identity Provider <span aria-hidden="true">*</span></span>
-                  <select id="expression-identity-dropdown" 
-                          ngDefaultControl 
-                          (change)="updateFormDisplay('identityProvider')"
-                          formControlName="identityProvider">
-                    <option value="ldap">LDAP</option>
-                    <option value="local">local</option>
-                    <option value="saml">SAML</option>
-                    <option value="*">All {{ allIdentity | titlecase }}s (*)</option>
-                  </select>
+                  <span class="custom-dropdown">
+                    <select id="expression-identity-dropdown" 
+                            ngDefaultControl 
+                            (change)="updateFormDisplay('identityProvider')"
+                            formControlName="identityProvider">
+                      <option value="ldap">LDAP</option>
+                      <option value="local">local</option>
+                      <option value="saml">SAML</option>
+                      <option value="*">All {{ allIdentity | titlecase }}s (*)</option>
+                    </select>
+                  </span>
                 </label>
                 <chef-error *ngIf="expressionForm.get('identityProvider').hasError('required') && expressionForm.get('identityProvider').touched">
                   Identity Provider is a required field.
@@ -59,7 +63,7 @@
               <chef-form-field 
                 id="create-name" 
                 *ngIf="expressionForm.contains('name')"
-                [@dropInAnimation]="{ value: triggerValue, params: { height: 119.427 }}">
+                [@dropInAnimation]="{ value: triggerValue, params: { height: 109.219 }}">
                 <label>
                   <span class="label">{{ nameOrId }} <span aria-hidden="true">*</span></span>
                   <chef-input id="expression-name-dropdown" 
