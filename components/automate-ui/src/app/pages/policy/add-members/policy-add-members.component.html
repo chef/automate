@@ -19,7 +19,7 @@
 
               <chef-form-field id="create-type">
                 <label>
-                  <span class="label">Type<span aria-hidden="true">*</span></span>
+                  <span class="label">Type <span aria-hidden="true">*</span></span>
                   <select id="expression-type-dropdown"
                           ngDefaultControl 
                           (change)="updateFormDisplay('type')"
@@ -40,7 +40,7 @@
                 *ngIf="expressionForm.contains('identityProvider')"
                 [@dropInAnimation]="{ value: triggerValue, params: { height: 74.6875 }}" >
                 <label>
-                  <span class="label">Identity Provider<span aria-hidden="true">*</span></span>
+                  <span class="label">Identity Provider <span aria-hidden="true">*</span></span>
                   <select id="expression-identity-dropdown" 
                           ngDefaultControl 
                           (change)="updateFormDisplay('identityProvider')"
@@ -61,13 +61,13 @@
                 *ngIf="expressionForm.contains('name')"
                 [@dropInAnimation]="{ value: triggerValue, params: { height: 119.427 }}">
                 <label>
-                  <span class="label">{{ nameOrId }}<span aria-hidden="true">*</span></span>
+                  <span class="label">{{ nameOrId }} <span aria-hidden="true">*</span></span>
                   <chef-input id="expression-name-dropdown" 
                               ngDefaultControl 
                               (keyup)="updateFormDisplay('name')"
                               formControlName="name"></chef-input>
                 </label>
-                <p class="note">Wildcards (*) are allowed.</p>
+                <p class="note">A single wildcard (*) is allowed.</p>
 
                 <chef-error *ngIf="expressionForm.get('name').hasError('required') && expressionForm.get('name').touched">
                   {{ nameOrId }} is a required field.

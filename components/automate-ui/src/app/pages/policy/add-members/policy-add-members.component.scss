@@ -36,19 +36,7 @@ chef-page {
       }
 
       #buttons-container {
-        display: flex;
-
-        chef-button {
-          width: 50%;
-
-          &:first-child {
-            margin-left: unset;
-          }
-
-          &:last-child {
-            margin-right: unset;
-          }
-        }
+        text-align: center;
       }
 
     }
