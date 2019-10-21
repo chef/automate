@@ -37,21 +37,21 @@
 
               <chef-form-field 
                 id="create-identity" 
-                *ngIf="expressionForm.contains('identity')"
+                *ngIf="expressionForm.contains('identityProvider')"
                 [@dropInAnimation]="{ value: triggerValue, params: { height: 74.6875 }}" >
                 <label>
                   <span class="label">Identity Provider<span aria-hidden="true">*</span></span>
                   <select id="expression-identity-dropdown" 
                           ngDefaultControl 
                           (change)="updateFormDisplay('identity')"
-                          formControlName="identity">
+                          formControlName="identityProvider">
                     <option value="ldap">LDAP</option>
                     <option value="local">local</option>
                     <option value="saml">SAML</option>
                     <option value="*">All {{ allIdentity | titlecase }}s (*)</option>
                   </select>
                 </label>
-                <chef-error *ngIf="expressionForm.get('identity').hasError('required') && expressionForm.get('identity').touched">
+                <chef-error *ngIf="expressionForm.get('identityProvider').hasError('required') && expressionForm.get('identityProvider').touched">
                   Identity Provider is a required field.
                 </chef-error>
               </chef-form-field>

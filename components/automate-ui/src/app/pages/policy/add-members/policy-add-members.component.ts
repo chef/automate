@@ -32,6 +32,8 @@ import {
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
 
+type FieldName = 'type' | 'identity' | 'name';
+
 @Component({
   selector: 'app-policy-add-members',
   templateUrl: './policy-add-members.component.html',
@@ -52,6 +54,7 @@ import { Regex } from 'app/helpers/auth/regex';
     ])
   ]
 })
+
 
 export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   // Data structures and state
@@ -326,7 +329,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     this.closeModal();
   }
 
-  private showInputs(fieldName: string): void {
+  private showInputs(fieldName: FieldName): void {
 
     const formValues = this.expressionForm.value;
     const matchAllWildCard = '*';
@@ -343,12 +346,13 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
         }
         break;
       case 'identity':
-        if (formValues.identity !== matchAllWildCard) {
+        if (formValues.identityProvider !== matchAllWildCard) {
           this.addNameControl();
         } else {
           this.expressionForm.removeControl('name');
         }
         break;
+      case 'name': // fallthrough
       default:
         break;
     }
@@ -365,7 +369,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   }
 
   private resetFormControls(): void {
-    this.expressionForm.removeControl('identity');
+    this.expressionForm.removeControl('identityProvider');
     this.expressionForm.removeControl('name');
   }
 
@@ -376,7 +380,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   }
 
   private addIdentityControl(): void {
-    this.expressionForm.addControl('identity', new FormControl('', Validators.required));
+    this.expressionForm.addControl('identityProvider', new FormControl('', Validators.required));
   }
 
   private addNameControl(): void {
@@ -396,7 +400,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
              .join(':');
   }
 
-  public updateFormDisplay(fieldName: string): void {
+  public updateFormDisplay(fieldName: FieldName): void {
     this.showInputs(fieldName);
     this.setExpressionOutput();
   }

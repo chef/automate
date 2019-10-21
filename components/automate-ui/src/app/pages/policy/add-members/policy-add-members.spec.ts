@@ -9,7 +9,7 @@ import { runtimeChecks } from 'app/ngrx.reducers';
 import { PolicyAddMembersComponent } from './policy-add-members.component';
 import { using } from 'app/testing/spec-helpers';
 
-
+type FieldName = 'type' | 'identity' | 'name';
 
 describe('PolicyAddMembersComponent', () => {
     let component: PolicyAddMembersComponent;
@@ -58,7 +58,6 @@ describe('PolicyAddMembersComponent', () => {
             identity: '',
             name: ''
         });
-        fixture.detectChanges();
     });
 
     it('should be created', () => {
@@ -79,7 +78,7 @@ describe('PolicyAddMembersComponent', () => {
             [{ type: 'user', identity: null, name: '*'}, 'name', 'user:*'],
             [{ type: 'team', identity: null, name: '*'}, 'name', 'team:*'],
             [{ type: 'token', identity: null, name: '*'}, 'name', 'token:*']
-        ], function (formValues: {}, inputName: string, output: string) {
+        ], function (formValues: {}, inputName: FieldName, output: string) {
             it(`sets expressionOutput to ${output} when formValues are ${formValues} and inputName is ${inputName}`, () => {
                 component.expressionForm.setValue(formValues);
                 component.updateFormDisplay(inputName);
