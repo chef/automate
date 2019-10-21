@@ -262,8 +262,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
   resetModal(): void {
     this.resetForm();
-    this.unparsableMember = false;
-    this.duplicateMember = false;
+    this.resetErrors();
   }
 
   memberHasURL(member: Member): boolean {
@@ -296,7 +295,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     return member.name in this.membersToAdd;
   }
 
-  public resetErrors(): void {
+  private resetErrors(): void {
     this.unparsableMember = false;
     this.duplicateMember = false;
     this.alreadyPolicyMember = false;
@@ -339,6 +338,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     switch (fieldName) {
       case 'type':
         this.resetFormControls();
+        this.resetErrors();
         if (formValues.type === 'user' || formValues.type === 'team') {
           this.addIdentityControl();
         } else if (formValues.type === 'token') {
@@ -346,6 +346,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
         }
         break;
       case 'identityProvider':
+        this.resetErrors();
         if (formValues.identityProvider !== matchAllWildCard) {
           this.addNameControl();
         } else {
