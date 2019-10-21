@@ -1,17 +1,10 @@
-app_url                   = "https://bldr.habitat.sh"
 cookie_domain             = ""
-demo_app_url              = "https://www.habitat.sh/demo/build-system/steps/1/"
 docs_url                  = "https://www.habitat.sh/docs"
-enable_publisher_amazon   = false
-enable_publisher_azure    = false
-enable_publisher_docker   = false
-enable_builder            = false
 environment               = "production"
 hosted                    = false
 source_code_url           = "https://github.com/habitat-sh/habitat"
-status_url                = "https://status.habitat.sh/"
 tutorials_url             = "https://www.habitat.sh/learn"
-use_gravatar              = true
+use_gravatar              = false
 www_url                   = "https://www.habitat.sh"
 # How we connect to the proxied backend API service.
 #   When true, connect to all backend API services via their IPs provided
@@ -20,10 +13,7 @@ www_url                   = "https://www.habitat.sh"
 load_balanced             = false
 
 [analytics]
-company_id                = ""
-company_name              = ""
 enabled                   = false
-write_key                 = ""
 
 [github]
 app_id                    = 5565
@@ -62,19 +52,6 @@ keepalive_timeout         = 180
 sendfile                  = "on"
 tcp_nopush                = "on"
 tcp_nodelay               = "on"
-
-[server]
-listen_port               = 80
-listen_tls_port           = 443
-listen_tls                = false
-cert_file                 = "ssl-certificate.crt"
-cert_key_file             = "ssl-certificate.key"
-ssl_protocols             = "TLSv1 TLSv1.1 TLSv1.2"
-ssl_ciphers               = "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH"
-ssl_session_cache         = "shared:SSL:10m"
-ssl_session_timeout       = "10m"
-ssl_prefer_server_ciphers = "on"
-enable_access_log         = true
 
 [service]
 host = "0.0.0.0"
