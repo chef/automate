@@ -192,6 +192,126 @@ func TestSuggestionsLargeArrayValues(t *testing.T) {
 			},
 			expected: []string{"zzz+zz-zzzzzzzz"},
 		},
+		{
+			description: "with regex chars ^",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz^zz-zzzzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz^zz-zzzzzzzz",
+			},
+			expected: []string{"zzz^zz-zzzzzzzz"},
+		},
+		{
+			description: "with chars @",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz@zz-zzzzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz@zz-zzzzzzzz",
+			},
+			expected: []string{"zzz@zz-zzzzzzzz"},
+		},
+		{
+			description: "with chars #",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz#zz-zZZzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz#zz-zzzzzzzz",
+			},
+			expected: []string{"zzz#zz-zZZzzzzz"},
+		},
+		{
+			description: "with chars &",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz&zz-zZZzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz&zz-zzzzzzzz",
+			},
+			expected: []string{"zzz&zz-zZZzzzzz"},
+		},
+		{
+			description: "with chars !",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz!zz-zZZzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz!zz-zzzzzzzz",
+			},
+			expected: []string{"zzz!zz-zZZzzzzz"},
+		},
+		{
+			description: "with chars ~",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz~zz-zZZzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz~zz-zzzzzzzz",
+			},
+			expected: []string{"zzz~zz-zZZzzzzz"},
+		},
+		{
+			description: "with chars :",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz:zz-zZZzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz:zz-zzzzzzzz",
+			},
+			expected: []string{"zzz:zz-zZZzzzzz"},
+		},
+		{
+			description: "with chars =",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz=zz-zZZzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz=zz-zzzzzzzz",
+			},
+			expected: []string{"zzz=zz-zZZzzzzz"},
+		},
 	}
 
 	for _, test := range cases {

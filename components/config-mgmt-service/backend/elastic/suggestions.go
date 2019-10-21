@@ -276,7 +276,7 @@ func (es Backend) getArrayAggSuggestions(term string, text string, filters map[s
 // "bob" = ".*[bB][oO][bB].*"
 func createCaseInsensitivePattern(term string) string {
 	pattern := ".*"
-	regexMetaChars := []string{"*", ".", "?", "+"}
+	regexMetaChars := []string{"*", ".", "?", "+", "#", "&"}
 
 	// Walking through each character and if it is a letter adding [aA]
 	// If it is a regex meta character it is escaped.

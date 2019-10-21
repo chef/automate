@@ -16,7 +16,7 @@ func TestCreateCaseInsensitivePatternWord(t *testing.T) {
 	assert.Equal(t, ".*[bB][oO][bB].*", regex)
 }
 
-func TestCreateCaseInsensitivePatternWordWithPunctuation(t *testing.T) {
+func TestCreateCaseInsensitivePatternWordWithNonLetters(t *testing.T) {
 	regex := createCaseInsensitivePattern("chef.io")
 	assert.Equal(t, ".*[cC][hH][eE][fF]\\.[iI][oO].*", regex)
 
@@ -28,6 +28,18 @@ func TestCreateCaseInsensitivePatternWordWithPunctuation(t *testing.T) {
 
 	regex = createCaseInsensitivePattern("chef+io")
 	assert.Equal(t, ".*[cC][hH][eE][fF]\\+[iI][oO].*", regex)
+
+	regex = createCaseInsensitivePattern("chef$io")
+	assert.Equal(t, ".*[cC][hH][eE][fF]$[iI][oO].*", regex)
+
+	regex = createCaseInsensitivePattern("chef^io")
+	assert.Equal(t, ".*[cC][hH][eE][fF]^[iI][oO].*", regex)
+
+	regex = createCaseInsensitivePattern("chef@io")
+	assert.Equal(t, ".*[cC][hH][eE][fF]@[iI][oO].*", regex)
+
+	regex = createCaseInsensitivePattern("chef#io")
+	assert.Equal(t, ".*[cC][hH][eE][fF]\\#[iI][oO].*", regex)
 }
 
 func TestCreateCaseInsensitivePatternWordWithNumber(t *testing.T) {
