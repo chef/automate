@@ -8,7 +8,6 @@ import (
 
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
-	"github.com/chef/automate/components/nodemanager-service/tests/mgrtesthelpers"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -18,24 +17,39 @@ import (
 	"github.com/chef/automate/lib/grpc/auth_context"
 )
 
-func TestListProjectFiltering(t *testing.T) {
-	mgrConn, err := mgrtesthelpers.GetManagerConn()
-	require.NoError(t, err)
-	defer mgrConn.Close()
-
+// All manually added nodes should be returned because they are not included in project filtering.
+func TestListProjectFilteringIngestedNodes(t *testing.T) {
 	db, err := createPGDB()
 	require.NoError(t, err)
 
-	// setup clients
 	nodeManager := nodesserver.New(db, nil, "")
 
 	timestamp, err := ptypes.TimestampProto(time.Now())
 
+	// Adding a manual node
+	mgr1 := manager.NodeManager{Name: "mgr1", Type: "aws-ec2"}
+	mgrID1, err := db.AddNodeManager(&mgr1, "11111111")
+	require.NoError(t, err)
+	defer db.DeleteNodeManager(mgrID1)
+
+	node1 := manager.ManagerNode{Id: "i-1111111", Region: "us-west-2", Host: "Node1"}
+
+	instances := []*manager.ManagerNode{&node1}
+	manualNodeIds := db.AddManagerNodesToDB(instances, mgrID1, "242403433", []*manager.CredentialsByTags{}, "aws-ec2")
+	require.NoError(t, err)
+	defer func() {
+		for _, node := range manualNodeIds {
+			db.DeleteNode(node)
+		}
+	}()
+
+	assert.Equal(t, 1, len(manualNodeIds))
+
 	cases := []struct {
-		description     string
-		ctx             context.Context
-		ingestedNodes   []*manager.NodeMetadata
-		expectedNodeIDs []string
+		description             string
+		ctx                     context.Context
+		ingestedNodes           []*manager.NodeMetadata
+		expectedIngestedNodeIDs []string
 	}{
 		{
 			description: "Two nodes matching on the same project tag",
@@ -50,7 +64,7 @@ func TestListProjectFiltering(t *testing.T) {
 					Projects: []string{"project8", "target_project"},
 				},
 			},
-			expectedNodeIDs: []string{"node1", "node2"},
+			expectedIngestedNodeIDs: []string{"node1", "node2"},
 		},
 		{
 			description: "Two nodes matching with two project tags",
@@ -65,7 +79,7 @@ func TestListProjectFiltering(t *testing.T) {
 					Projects: []string{"target_project_2"},
 				},
 			},
-			expectedNodeIDs: []string{"node1", "node2"},
+			expectedIngestedNodeIDs: []string{"node1", "node2"},
 		},
 		{
 			description: "Two nodes with only one with a matching project",
@@ -80,7 +94,7 @@ func TestListProjectFiltering(t *testing.T) {
 					Projects: []string{"project8"},
 				},
 			},
-			expectedNodeIDs: []string{"node1"},
+			expectedIngestedNodeIDs: []string{"node1"},
 		},
 		{
 			description: "Three nodes with different projects and one missing a project where all match " +
@@ -100,7 +114,7 @@ func TestListProjectFiltering(t *testing.T) {
 					Projects: []string{},
 				},
 			},
-			expectedNodeIDs: []string{"node1", "node2", "node3"},
+			expectedIngestedNodeIDs: []string{"node1", "node2", "node3"},
 		},
 		{
 			description: "Two nodes one with a project tag and one with none. Matching one unassigned",
@@ -115,7 +129,7 @@ func TestListProjectFiltering(t *testing.T) {
 					Projects: []string{},
 				},
 			},
-			expectedNodeIDs: []string{"node2"},
+			expectedIngestedNodeIDs: []string{"node2"},
 		},
 		{
 			description: "Two nodes with projects assigned, with unassigned request no matches",
@@ -130,7 +144,7 @@ func TestListProjectFiltering(t *testing.T) {
 					Projects: []string{"project7"},
 				},
 			},
-			expectedNodeIDs: []string{},
+			expectedIngestedNodeIDs: []string{},
 		},
 		{
 			description: "Two nodes one unassigned and one with a node, with unassigned and macthing " +
@@ -146,7 +160,7 @@ func TestListProjectFiltering(t *testing.T) {
 					Projects: []string{},
 				},
 			},
-			expectedNodeIDs: []string{"node1", "node2"},
+			expectedIngestedNodeIDs: []string{"node1", "node2"},
 		},
 		{
 			description: "Two nodes one unassigned and one with a node, with unassigned and macthing " +
@@ -162,7 +176,7 @@ func TestListProjectFiltering(t *testing.T) {
 					Projects: []string{},
 				},
 			},
-			expectedNodeIDs: []string{"node1", "node2"},
+			expectedIngestedNodeIDs: []string{"node1", "node2"},
 		},
 	}
 
@@ -188,8 +202,6 @@ func TestListProjectFiltering(t *testing.T) {
 					}
 				}()
 
-				projectFilters, _ := filterByProjects(test.ctx)
-				t.Logf("projectFilters: %v", projectFilters)
 				// Call List to get all ingested nodes with project filtering context.
 				nodesResponse, err := nodeManager.List(test.ctx, &nodes.Query{})
 				require.NoError(t, err)
@@ -200,7 +212,7 @@ func TestListProjectFiltering(t *testing.T) {
 					actualNodeIDs = append(actualNodeIDs, node.Id)
 				}
 
-				assert.ElementsMatch(t, test.expectedNodeIDs, actualNodeIDs)
+				assert.ElementsMatch(t, append(test.expectedIngestedNodeIDs, manualNodeIds...), actualNodeIDs)
 			})
 	}
 }
@@ -208,16 +220,4 @@ func TestListProjectFiltering(t *testing.T) {
 func contextWithProjects(projects []string) context.Context {
 	ctx := context.Background()
 	return auth_context.NewContext(ctx, []string{}, projects, "", "", "")
-}
-
-func filterByProjects(ctx context.Context) ([]string, error) {
-	projectsFilter, err := auth_context.ProjectsFromIncomingContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-	if auth_context.AllProjectsRequested(projectsFilter) {
-		return []string{}, nil
-	}
-
-	return projectsFilter, nil
 }

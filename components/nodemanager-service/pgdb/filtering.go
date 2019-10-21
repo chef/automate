@@ -267,5 +267,8 @@ func whereProjectsMatch(_ string, arr []string, tableAbbrev string) (string, err
 		}
 	}
 
+	// Or the node is manually added
+	condition = condition + " OR n.manager <> ''"
+
 	return condition, nil
 }
