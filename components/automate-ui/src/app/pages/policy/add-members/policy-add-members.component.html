@@ -40,10 +40,10 @@
                 *ngIf="expressionForm.contains('identityProvider')"
                 [@dropInAnimation]="{ value: triggerValue, params: { height: 74.6875 }}" >
                 <label>
-                  <span class="label">Identity Provider<span aria-hidden="true">*</span></span>
+                  <span class="label">Identity<span aria-hidden="true">*</span></span>
                   <select id="expression-identity-dropdown" 
                           ngDefaultControl 
-                          (change)="updateFormDisplay('identity')"
+                          (change)="updateFormDisplay('identityProvider')"
                           formControlName="identityProvider">
                     <option value="ldap">LDAP</option>
                     <option value="local">local</option>

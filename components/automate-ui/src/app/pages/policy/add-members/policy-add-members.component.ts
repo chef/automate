@@ -32,7 +32,7 @@ import {
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
 
-export type FieldName = 'type' | 'identity' | 'name';
+export type FieldName = 'type' | 'identityProvider' | 'name';
 
 @Component({
   selector: 'app-policy-add-members',
@@ -345,7 +345,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
           this.addNameControl();
         }
         break;
-      case 'identity':
+      case 'identityProvider':
         if (formValues.identityProvider !== matchAllWildCard) {
           this.addNameControl();
         } else {
