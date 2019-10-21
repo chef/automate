@@ -10,7 +10,12 @@ export class Regex {
     ID: '[0-9a-z-_]+',
 
     // NB: neither \S nor ^\s work inside the brackets in this regex language.
-    NON_BLANK: '.*[^ ].*'
+    NON_BLANK: '.*[^ ].*',
+
+    // Only allows wildcard alone or words and numbers, but not combined
+    // Legal Values: *, chef, _state, etc.
+    // Illegal Values: abc*, *chef, c*h*e*f, **
+    NO_MIXED_WILDCARD: '^(\\*|\\w+)$'
   };
 
 }

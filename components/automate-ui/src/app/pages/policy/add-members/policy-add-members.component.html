@@ -14,27 +14,94 @@
     <div *ngIf="!loading">
       <chef-modal label="member-expression-label" class="member-expression-modal" [visible]="modalVisible" (close)="closeModal()">
         <h2>Add Member Expression</h2>
-        <div id="left-align">
+        <div id="modal-content-container">
           <form [formGroup]="expressionForm">
+
+              <chef-form-field id="create-type">
+                <label>
+                  <span class="label">Type <span aria-hidden="true">*</span></span>
+                  <span class="custom-dropdown">
+                    <select id="expression-type-dropdown"
+                            ngDefaultControl 
+                            (change)="updateFormDisplay('type')"
+                            formControlName="type">
+                      <option value='user'>User</option>
+                      <option value='team'>Team</option>
+                      <option value='token'>Token</option>
+                      <option value='*'>All members (*)</option>
+                    </select>
+                  </span>
+                </label>
+                <chef-error *ngIf="expressionForm.get('type').hasError('required') && expressionForm.get('type').touched">
+                  Type is a required field.
+                </chef-error>
+              </chef-form-field>
+
+              <chef-form-field 
+                id="create-identity" 
+                *ngIf="expressionForm.contains('identityProvider')"
+                [@dropInAnimation]="{ value: triggerValue, params: { height: 88.2422 }}" >
+                <label>
+                  <span class="label">Identity Provider <span aria-hidden="true">*</span></span>
+                  <span class="custom-dropdown">
+                    <select id="expression-identity-dropdown" 
+                            ngDefaultControl 
+                            (change)="updateFormDisplay('identityProvider')"
+                            formControlName="identityProvider">
+                      <option value="ldap">LDAP</option>
+                      <option value="local">local</option>
+                      <option value="saml">SAML</option>
+                      <option value="*">All {{ allIdentity | titlecase }}s (*)</option>
+                    </select>
+                  </span>
+                </label>
+                <chef-error *ngIf="expressionForm.get('identityProvider').hasError('required') && expressionForm.get('identityProvider').touched">
+                  Identity Provider is a required field.
+                </chef-error>
+              </chef-form-field>
+
+              <chef-form-field 
+                id="create-name" 
+                *ngIf="expressionForm.contains('name')"
+                [@dropInAnimation]="{ value: triggerValue, params: { height: 109.219 }}">
+                <label>
+                  <span class="label">{{ nameOrId }} <span aria-hidden="true">*</span></span>
+                  <chef-input id="expression-name-dropdown" 
+                              ngDefaultControl 
+                              (keyup)="updateFormDisplay('name')"
+                              formControlName="name"></chef-input>
+                </label>
+                <p class="note">A single wildcard (*) is allowed.</p>
+
+                <chef-error *ngIf="expressionForm.get('name').hasError('required') && expressionForm.get('name').touched">
+                  {{ nameOrId }} is a required field.
+                </chef-error>
+                <chef-error *ngIf="expressionForm.get('name').hasError('pattern') && expressionForm.get('name').dirty">
+                  {{ nameOrId }} must be text or a wildcard but not both.
+                </chef-error>
+              </chef-form-field>
+
+            <!-- ERROR MESSAGES -->
             <chef-form-field>
-              <label>Member expression *</label>
-              <input chefInput formControlName="expression" type="text" (keyup)="resetErrors()" autocomplete="off">
               <chef-error *ngIf="unparsableMember">Invalid member expression.</chef-error>
               <chef-error *ngIf="duplicateMember">Member expression already in table.</chef-error>
               <chef-error *ngIf="alreadyPolicyMember">Member already in policy.</chef-error>
-              <chef-error *ngIf="(expressionForm.get('expression').hasError('required') || expressionForm.get('expression').hasError('pattern')) && expressionForm.get('expression').dirty">
-                Member expression is required.
-              </chef-error>
             </chef-form-field>
           </form>
-          <p><span class="expression">user | team : local | ldap | saml : &lt;name&gt;</span> or <span class="expression">token : &lt;id&gt;</span>, wildcards (*) are allowed.</p>
-          <p>More details in <a href="https://automate.chef.io/docs/iam-v2-guide/#member-expressions" target="_blank">member expression documentation</a>.</p>
-        </div>
-        <div id="align-buttons">
-          <chef-button primary [disabled]="!expressionForm.valid" (click)="validateAndAddExpression()">Add Expression</chef-button>
-          <chef-button tertiary (click)="closeModal()">Cancel</chef-button>
+
+          <div *ngIf="expressionOutput">
+            <p id="expression-output" class="note">Member expression: {{ expressionOutput }}</p>
+          </div>
+  
+          <div id="buttons-container">
+            <chef-button primary 
+                        [disabled]="!expressionForm.valid" 
+                        (click)="validateAndAddExpression()">Add Expression</chef-button>
+            <chef-button tertiary (click)="closeModal()">Cancel</chef-button>
+          </div>
         </div>
       </chef-modal>
+
       <div id="no-members-container" *ngIf="sortedMembersAvailable.length === 0">
         <h3>Create more local users or local teams first, or add a member expression.</h3>
         <chef-button

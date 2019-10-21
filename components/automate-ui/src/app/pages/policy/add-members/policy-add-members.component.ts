@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
+import { trigger, transition, style, animate, state, keyframes } from '@angular/animations';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -31,11 +32,30 @@ import {
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
 
+export type FieldName = 'type' | 'identityProvider' | 'name';
+
 @Component({
   selector: 'app-policy-add-members',
   templateUrl: './policy-add-members.component.html',
-  styleUrls: ['./policy-add-members.component.scss']
+  styleUrls: ['./policy-add-members.component.scss'],
+  animations: [
+    trigger('dropInAnimation', [
+      state('void', style({ 'opacity': '0', 'height' : '0' })),
+      transition('void => *', animate(400, keyframes([
+        style({opacity: 0, offset: 0}),
+        style({opacity: 0, height: '{{height}}px', offset: 0.3}),
+        style({opacity: 1, height: '{{height}}px', offset: 1})
+      ]))),
+      transition('* => void', animate(150, keyframes([
+        style({ opacity: 1, height: '{{height}}px', offset: 0 }),
+        style({ opacity: 0, height: '{{height}}px', offset: 0.1 }),
+        style({ opacity: 0, height: '0px', offset: 1 })
+      ])))
+    ])
+  ]
 })
+
+
 export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   // Data structures and state
 
@@ -58,7 +78,6 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   public addMembersFailed = '';
 
   // Add expression modal and modal error cases
-
   public modalVisible = false;
   public unparsableMember = false;
   public duplicateMember = false;
@@ -66,6 +85,10 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
   // Form info
   public expressionForm: FormGroup;
+  public expressionOutput: string;
+  public allIdentity: string;
+  public nameOrId: string;
+
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -74,7 +97,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
     this.expressionForm = fb.group({
       // Must stay in sync with error checks in policy-add-members.component.html
-      expression: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+      type: ['', Validators.required]
     });
   }
 
@@ -169,14 +192,14 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     this.store.select(addPolicyMembersStatus).pipe(
       filter(identity),
       takeUntil(pendingAdd))
-      .subscribe((state) => {
-        if (state === EntityStatus.loadingSuccess) {
+      .subscribe((addPolicyState) => {
+        if (addPolicyState === EntityStatus.loadingSuccess) {
           pendingAdd.next(true);
           pendingAdd.complete();
           this.addingMembers = false;
           this.router.navigate(this.backRoute(), { fragment: 'members' });
         }
-        if (state === EntityStatus.loadingFailure) {
+        if (addPolicyState === EntityStatus.loadingFailure) {
           this.store.select(addPolicyMembersHTTPError).pipe(
             filter(identity),
             takeUntil(pendingAdd)).subscribe((error: HttpErrorResponse) => {
@@ -238,9 +261,8 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   }
 
   resetModal(): void {
-    this.expressionForm.reset();
-    this.unparsableMember = false;
-    this.duplicateMember = false;
+    this.resetForm();
+    this.resetErrors();
   }
 
   memberHasURL(member: Member): boolean {
@@ -273,7 +295,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     return member.name in this.membersToAdd;
   }
 
-  public resetErrors(): void {
+  private resetErrors(): void {
     this.unparsableMember = false;
     this.duplicateMember = false;
     this.alreadyPolicyMember = false;
@@ -282,7 +304,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   public validateAndAddExpression(): void {
     this.resetErrors();
 
-    const member = stringToMember(this.expressionForm.value.expression.trim());
+    const member = stringToMember(this.expressionOutput.trim());
 
     if (member.type === Type.Unknown) {
       this.unparsableMember = true;
@@ -304,5 +326,83 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     this.addAvailableMember(member, true);
     this.addOrRemoveQueuedMember(true, member);
     this.closeModal();
+  }
+
+  private showInputs(fieldName: FieldName): void {
+
+    const formValues = this.expressionForm.value;
+    const matchAllWildCard = '*';
+
+    this.setFormLabels(formValues.type);
+
+    switch (fieldName) {
+      case 'type':
+        this.resetFormControls();
+        this.resetErrors();
+        if (formValues.type === 'user' || formValues.type === 'team') {
+          this.addIdentityControl();
+        } else if (formValues.type === 'token') {
+          this.addNameControl();
+        }
+        break;
+      case 'identityProvider':
+        this.resetErrors();
+        if (formValues.identityProvider !== matchAllWildCard) {
+          this.addNameControl();
+        } else {
+          this.expressionForm.removeControl('name');
+        }
+        break;
+      case 'name': // fallthrough
+      default:
+        break;
+    }
+
+  }
+
+  private setFormLabels(typeValue): void {
+    if (typeValue === 'token') {
+      this.nameOrId = 'ID';
+    } else {
+      this.allIdentity = typeValue;
+      this.nameOrId = 'Name';
+    }
+  }
+
+  private resetFormControls(): void {
+    this.expressionForm.removeControl('identityProvider');
+    this.expressionForm.removeControl('name');
+  }
+
+  private resetForm(): void {
+    this.resetFormControls();
+    this.expressionForm.reset();
+    this.expressionOutput = '';
+  }
+
+  private addIdentityControl(): void {
+    this.expressionForm.addControl('identityProvider', new FormControl('', Validators.required));
+  }
+
+  private addNameControl(): void {
+    this.expressionForm.addControl('name', new FormControl('',
+      [
+        Validators.required,
+        Validators.pattern(Regex.patterns.NO_MIXED_WILDCARD)
+      ]
+    )
+    );
+  }
+
+  private setExpressionOutput(): void {
+    this.expressionOutput =
+      (Object.values(this.expressionForm.value) as string[])
+             .filter(value => value != null && value.length > 0)
+             .join(':');
+  }
+
+  public updateFormDisplay(fieldName: FieldName): void {
+    this.showInputs(fieldName);
+    this.setExpressionOutput();
   }
 }
