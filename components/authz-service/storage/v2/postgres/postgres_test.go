@@ -3,7 +3,9 @@ package postgres_test
 import (
 	"context"
 	"database/sql"
+	"io/ioutil"
 	"math/rand"
+	"os"
 	"sort"
 	"strconv"
 	"testing"
@@ -37,7 +39,8 @@ const (
 	statementQueryFull        = "SELECT count(*) FROM iam_statements WHERE resources=$1 AND actions=$2 AND effect=$3 AND policy_id=policy_db_id($4)"
 	policyFull                = "SELECT count(*) FROM iam_policies WHERE id=$1 AND name=$2 AND type=$3"
 	membersCount              = "SELECT count(*) FROM iam_members"
-	policyProjectsByProjectID = "SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)"
+	policyProjectsByPolicyID  = "SELECT count(*) FROM iam_policy_projects WHERE policy_id=policy_db_id($1)"
+	statementProjectsByIDs    = "SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=$2"
 )
 
 // Note: to set up PG locally for running these tests,
@@ -1529,7 +1532,7 @@ func TestCreatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
 			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
 			assertEmpty(t, db.QueryRow(membersCount))
-			assertEmpty(t, db.QueryRow(policyProjectsByProjectID, polID))
+			assertEmpty(t, db.QueryRow(policyProjectsByPolicyID, polID))
 		},
 		"policy with single project": func(t *testing.T) {
 			polID := genSimpleID(t, prngSeed)
@@ -1556,7 +1559,7 @@ func TestCreatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
 			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
 			assertEmpty(t, db.QueryRow(membersCount))
-			assertOne(t, db.QueryRow(policyProjectsByProjectID, polID))
+			assertOne(t, db.QueryRow(policyProjectsByPolicyID, polID))
 		},
 		"policy with multiple projects": func(t *testing.T) {
 			polID := genSimpleID(t, prngSeed)
@@ -1586,7 +1589,7 @@ func TestCreatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
 			assertEmpty(t, db.QueryRow(membersCount))
 
-			projCount := db.QueryRow(policyProjectsByProjectID, polID)
+			projCount := db.QueryRow(policyProjectsByPolicyID, polID)
 			assertCount(t, 2, projCount)
 		},
 		"policy with only one non-existent project fails": func(t *testing.T) {
@@ -1616,7 +1619,7 @@ func TestCreatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
 			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
 			assertEmpty(t, db.QueryRow(membersCount))
-			assertEmpty(t, db.QueryRow(policyProjectsByProjectID, polID))
+			assertEmpty(t, db.QueryRow(policyProjectsByPolicyID, polID))
 		},
 		"policy with one existent, one non-existent project fails": func(t *testing.T) {
 			polID := genSimpleID(t, prngSeed)
@@ -1647,7 +1650,7 @@ func TestCreatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
 			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
 			assertEmpty(t, db.QueryRow(membersCount))
-			assertEmpty(t, db.QueryRow(policyProjectsByProjectID, polID))
+			assertEmpty(t, db.QueryRow(policyProjectsByPolicyID, polID))
 		},
 	}
 
@@ -2834,7 +2837,7 @@ func TestUpdatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
 			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
 			assertEmpty(t, db.QueryRow(membersCount))
-			assertOne(t, db.QueryRow(policyProjectsByProjectID, polID))
+			assertOne(t, db.QueryRow(policyProjectsByPolicyID, polID))
 		},
 		"policy with project to no projects": func(t *testing.T) {
 			ctx := context.Background()
@@ -2844,7 +2847,7 @@ func TestUpdatePolicy(t *testing.T) {
 			projID := "special-project"
 			insertTestProject(t, db, projID, "too special", storage.Custom)
 			insertPolicyProject(t, db, polID, projID)
-			assertOne(t, db.QueryRow(policyProjectsByProjectID, polID))
+			assertOne(t, db.QueryRow(policyProjectsByPolicyID, polID))
 
 			expProjs := []string{}
 			pol := storage.Policy{
@@ -2862,7 +2865,7 @@ func TestUpdatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
 			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
 			assertEmpty(t, db.QueryRow(membersCount))
-			assertEmpty(t, db.QueryRow(policyProjectsByProjectID, polID))
+			assertEmpty(t, db.QueryRow(policyProjectsByPolicyID, polID))
 		},
 		"policy with projects to same projects": func(t *testing.T) {
 			ctx := context.Background()
@@ -2877,7 +2880,7 @@ func TestUpdatePolicy(t *testing.T) {
 			projID2 := "ordinary-project"
 			insertTestProject(t, db, projID2, "too ordinary", storage.Custom)
 			insertPolicyProject(t, db, polID, projID2)
-			initPolProjCount := db.QueryRow(policyProjectsByProjectID, polID)
+			initPolProjCount := db.QueryRow(policyProjectsByPolicyID, polID)
 			assertCount(t, 2, initPolProjCount)
 
 			expProjs := []string{projID, projID2}
@@ -2896,7 +2899,7 @@ func TestUpdatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
 			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
 			assertEmpty(t, db.QueryRow(membersCount))
-			expPolProjCount := db.QueryRow(policyProjectsByProjectID, polID)
+			expPolProjCount := db.QueryRow(policyProjectsByPolicyID, polID)
 			assertCount(t, 2, expPolProjCount)
 		},
 		"policy with single project to diff project": func(t *testing.T) {
@@ -2904,12 +2907,12 @@ func TestUpdatePolicy(t *testing.T) {
 			name := "testPolicy"
 			polID := insertTestPolicy(t, db, name)
 
-			assertEmpty(t, db.QueryRow(policyProjectsByProjectID, polID))
+			assertEmpty(t, db.QueryRow(policyProjectsByPolicyID, polID))
 
 			projID := "special-project"
 			insertTestProject(t, db, projID, "too special", storage.Custom)
 			insertPolicyProject(t, db, polID, projID)
-			assertOne(t, db.QueryRow(policyProjectsByProjectID, polID))
+			assertOne(t, db.QueryRow(policyProjectsByPolicyID, polID))
 
 			projID2 := "ordinary-project"
 			insertTestProject(t, db, projID2, "too ordinary", storage.Custom)
@@ -2930,18 +2933,18 @@ func TestUpdatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
 			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
 			assertEmpty(t, db.QueryRow(membersCount))
-			assertOne(t, db.QueryRow(policyProjectsByProjectID, polID))
+			assertOne(t, db.QueryRow(policyProjectsByPolicyID, polID))
 		},
 		"policy with one project to additional project": func(t *testing.T) {
 			ctx := context.Background()
 			name := "testPolicy"
 			polID := insertTestPolicy(t, db, name)
-			assertEmpty(t, db.QueryRow(policyProjectsByProjectID, polID))
+			assertEmpty(t, db.QueryRow(policyProjectsByPolicyID, polID))
 
 			projID := "special-project"
 			insertTestProject(t, db, projID, "too special", storage.Custom)
 			insertPolicyProject(t, db, polID, projID)
-			assertOne(t, db.QueryRow(policyProjectsByProjectID, polID))
+			assertOne(t, db.QueryRow(policyProjectsByPolicyID, polID))
 
 			projID2 := "another-project"
 			insertTestProject(t, db, projID2, "more", storage.Custom)
@@ -2964,7 +2967,7 @@ func TestUpdatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
 			assertEmpty(t, db.QueryRow(membersCount))
 
-			projCount := db.QueryRow(policyProjectsByProjectID, polID)
+			projCount := db.QueryRow(policyProjectsByPolicyID, polID)
 			assertCount(t, 2, projCount)
 		},
 		"policy with project to add non-existent project fails": func(t *testing.T) {
@@ -2975,7 +2978,7 @@ func TestUpdatePolicy(t *testing.T) {
 			projID := "special-project"
 			insertTestProject(t, db, projID, "too special", storage.Custom)
 			insertPolicyProject(t, db, polID, projID)
-			assertOne(t, db.QueryRow(policyProjectsByProjectID, polID))
+			assertOne(t, db.QueryRow(policyProjectsByPolicyID, polID))
 
 			pol := storage.Policy{
 				ID:       polID,
@@ -2993,7 +2996,7 @@ func TestUpdatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statements WHERE policy_id=policy_db_id($1)`, polID))
 			assertEmpty(t, db.QueryRow(policyMembersByPolicyID, polID))
 			assertEmpty(t, db.QueryRow(membersCount))
-			assertOne(t, db.QueryRow(policyProjectsByProjectID, polID))
+			assertOne(t, db.QueryRow(policyProjectsByPolicyID, polID))
 		},
 		"when the policy's projects and the project filter intersect, update policy": func(t *testing.T) {
 			ctx := context.Background()
@@ -6697,6 +6700,221 @@ func TestEnsureNoProjectsMissing(t *testing.T) {
 	}
 }
 
+func TestResetProjectsMigration(t *testing.T) {
+	store, db, _, _, _ := testhelpers.SetupTestDB(t)
+	defer db.CloseDB(t)
+	defer store.Close()
+	ctx := context.Background()
+
+	cases := []struct {
+		desc string
+		f    func(*testing.T)
+	}{
+		{"migration does not delete chef-managed projects", func(t *testing.T) {
+			proj1 := insertTestProject(t, db, "project-1", "pika-p", storage.ChefManaged)
+			proj2 := insertTestProject(t, db, "project-2", "pika-p", storage.ChefManaged)
+			precondition, err := store.ListProjects(ctx)
+			assert.NoError(t, err)
+			assert.Equal(t, 2, len(precondition))
+
+			mig, err := getResetProjectsMigration()
+			assert.NoError(t, err)
+			_, err = db.ExecContext(ctx, mig)
+			assert.NoError(t, err)
+
+			res, err := store.ListProjects(ctx)
+			assert.NoError(t, err)
+			assert.Equal(t, 2, len(res))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, proj1.ID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, proj2.ID))
+		}},
+		{"migration does delete custom projects", func(t *testing.T) {
+			proj1 := insertTestProject(t, db, "project-1", "pika-p", storage.ChefManaged)
+			proj2 := insertTestProject(t, db, "project-2", "pika-p", storage.ChefManaged)
+			proj3 := insertTestProject(t, db, "project-3", "pika-p", storage.Custom)
+			proj4 := insertTestProject(t, db, "project-4", "pika-p", storage.Custom)
+			precondition, err := store.ListProjects(ctx)
+			assert.NoError(t, err)
+			assert.Equal(t, 4, len(precondition))
+
+			mig, err := getResetProjectsMigration()
+			assert.NoError(t, err)
+			_, err = db.ExecContext(ctx, mig)
+			assert.NoError(t, err)
+
+			res, err := store.ListProjects(ctx)
+			assert.NoError(t, err)
+			assert.Equal(t, 2, len(res))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, proj1.ID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, proj2.ID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, proj3.ID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, proj4.ID))
+		}},
+		{"migration deletes policies and their related data associated with custom projects", func(t *testing.T) {
+			chefManagedProj := insertTestProject(t, db, "project-1", "pika-p", storage.ChefManaged)
+			customProj := insertTestProject(t, db, "project-2", "woof", storage.Custom)
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, chefManagedProj.ID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, customProj.ID))
+
+			polID1 := insertTestPolicy(t, db, "testpolicy1")
+			statementID1 := insertTestStatement(t, db, polID1, "allow", "", []string{"iam:users:delete"}, []string{"iam:users"})
+			insertStatementProject(t, db, statementID1, chefManagedProj.ID)
+			member1 := insertTestPolicyMember(t, db, polID1, "user:local:messi")
+			insertPolicyProject(t, db, polID1, chefManagedProj.ID)
+			assertOne(t, db.QueryRow(policyWithID, polID1))
+			assertOne(t, db.QueryRow(statementWithID, statementID1))
+			assertOne(t, db.QueryRow(policyMembersByMemberName, member1.Name))
+
+			polID2 := insertTestPolicy(t, db, "testpolicy2")
+			statementID2 := insertTestStatement(t, db, polID2, "allow", "", []string{"iam:users:delete"}, []string{"iam:users"})
+			insertStatementProject(t, db, statementID2, customProj.ID)
+			member2 := insertTestPolicyMember(t, db, polID2, "user:local:montag")
+			insertPolicyProject(t, db, polID2, customProj.ID)
+			assertOne(t, db.QueryRow(policyWithID, polID2))
+			assertOne(t, db.QueryRow(statementWithID, statementID2))
+			assertOne(t, db.QueryRow(policyMembersByPolicyID, polID2))
+			assertOne(t, db.QueryRow(policyMembersByMemberName, member2.Name))
+
+			mig, err := getResetProjectsMigration()
+			assert.NoError(t, err)
+			_, err = db.ExecContext(ctx, mig)
+			assert.NoError(t, err)
+
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, chefManagedProj.ID))
+			assertOne(t, db.QueryRow(policyWithID, polID1))
+			assertOne(t, db.QueryRow(statementWithID, statementID1))
+			assertOne(t, db.QueryRow(policyMembersByMemberName, member1.Name))
+
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, customProj.ID))
+			assertEmpty(t, db.QueryRow(policyWithID, polID2))
+			assertEmpty(t, db.QueryRow(statementWithID, statementID2))
+			assertEmpty(t, db.QueryRow(policyMembersByMemberName, member2.Name))
+		}},
+		{"migration deletes policies statements that only contain custom projects and removes custom project from others", func(t *testing.T) {
+			chefManagedProj := insertTestProject(t, db, "project-1", "pika-p", storage.ChefManaged)
+			customProj1 := insertTestProject(t, db, "project-2", "woof", storage.Custom)
+			customProj2 := insertTestProject(t, db, "project-3", "bark", storage.Custom)
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, chefManagedProj.ID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, customProj1.ID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, customProj2.ID))
+
+			polID1 := insertTestPolicy(t, db, "testpolicy1")
+			assertOne(t, db.QueryRow(policyWithID, polID1))
+			insertPolicyProject(t, db, polID1, chefManagedProj.ID)
+
+			// chef-managed
+			statementID1 := insertTestStatement(t, db, polID1, "allow", "", []string{"iam:users:delete"}, []string{"iam:users:1"})
+			assertOne(t, db.QueryRow(statementWithID, statementID1))
+			insertStatementProject(t, db, statementID1, chefManagedProj.ID)
+			assertOne(t, db.QueryRow(statementProjectsByIDs, chefManagedProj.ID, statementID1))
+
+			// chef-managed, custom
+			statementID2 := insertTestStatement(t, db, polID1, "allow", "", []string{"iam:users:delete"}, []string{"iam:user:2s"})
+			assertOne(t, db.QueryRow(statementWithID, statementID2))
+			insertStatementProject(t, db, statementID2, chefManagedProj.ID)
+			assertOne(t, db.QueryRow(statementProjectsByIDs, chefManagedProj.ID, statementID2))
+			insertStatementProject(t, db, statementID2, customProj1.ID)
+			assertOne(t, db.QueryRow(statementProjectsByIDs, customProj1.ID, statementID2))
+
+			// two custom
+			statementID3 := insertTestStatement(t, db, polID1, "allow", "", []string{"iam:users:delete"}, []string{"iam:users:3"})
+			assertOne(t, db.QueryRow(statementWithID, statementID3))
+			insertStatementProject(t, db, statementID3, customProj1.ID)
+			assertOne(t, db.QueryRow(statementProjectsByIDs, customProj1.ID, statementID3))
+			insertStatementProject(t, db, statementID3, customProj2.ID)
+			assertOne(t, db.QueryRow(statementProjectsByIDs, customProj2.ID, statementID3))
+
+			mig, err := getResetProjectsMigration()
+			assert.NoError(t, err)
+			_, err = db.ExecContext(ctx, mig)
+			assert.NoError(t, err)
+
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, chefManagedProj.ID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, customProj1.ID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, customProj2.ID))
+
+			assertOne(t, db.QueryRow(policyWithID, polID1))
+
+			assertOne(t, db.QueryRow(statementWithID, statementID1))
+			assertOne(t, db.QueryRow(statementProjectsByIDs, chefManagedProj.ID, statementID1))
+
+			assertOne(t, db.QueryRow(statementWithID, statementID2))
+			assertOne(t, db.QueryRow(statementProjectsByIDs, chefManagedProj.ID, statementID2))
+
+			assertEmpty(t, db.QueryRow(statementWithID, statementID3))
+		}},
+		{"when a role only has a chef-managed project, it is unmodified", func(t *testing.T) {
+			chefManagedProj := insertTestProject(t, db, "project-1", "pika-p", storage.ChefManaged)
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, chefManagedProj.ID))
+
+			role := insertTestRole(t, db, "role-1", "role name", []string{"action1"}, []string{chefManagedProj.ID})
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_roles WHERE id=$1`, role.ID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_role_projects WHERE project_id=project_db_id($1) AND role_id=role_db_id($2)`, chefManagedProj.ID, role.ID))
+
+			mig, err := getResetProjectsMigration()
+			assert.NoError(t, err)
+			_, err = db.ExecContext(ctx, mig)
+			assert.NoError(t, err)
+
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, chefManagedProj.ID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_roles WHERE id=$1`, role.ID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_role_projects WHERE project_id=project_db_id($1) AND role_id=role_db_id($2)`, chefManagedProj.ID, role.ID))
+		}},
+		{"when a role only has a chef-managed project and a custom project, the custom project is removed", func(t *testing.T) {
+			chefManagedProj := insertTestProject(t, db, "project-1", "pika-p", storage.ChefManaged)
+			customProj1 := insertTestProject(t, db, "project-2", "woof", storage.Custom)
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, chefManagedProj.ID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, customProj1.ID))
+
+			role := insertTestRole(t, db, "role-1", "role name", []string{"action1"}, []string{chefManagedProj.ID, customProj1.ID})
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_roles WHERE id=$1`, role.ID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_role_projects WHERE project_id=project_db_id($1) AND role_id=role_db_id($2)`, chefManagedProj.ID, role.ID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_role_projects WHERE project_id=project_db_id($1) AND role_id=role_db_id($2)`, customProj1.ID, role.ID))
+
+			mig, err := getResetProjectsMigration()
+			assert.NoError(t, err)
+			_, err = db.ExecContext(ctx, mig)
+			assert.NoError(t, err)
+
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, chefManagedProj.ID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, customProj1.ID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_roles WHERE id=$1`, role.ID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_role_projects WHERE project_id=project_db_id($1) AND role_id=role_db_id($2)`, chefManagedProj.ID, role.ID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_role_projects WHERE role_id=role_db_id($1)`, role.ID))
+		}},
+		{"when a role only has only multiple custom projects, it becomes unassigned", func(t *testing.T) {
+			customProj1 := insertTestProject(t, db, "project-1", "woof", storage.Custom)
+			customProj2 := insertTestProject(t, db, "project-2", "pika-p", storage.Custom)
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, customProj1.ID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, customProj2.ID))
+
+			role := insertTestRole(t, db, "role-1", "role name", []string{"action1"}, []string{customProj1.ID, customProj2.ID})
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_roles WHERE id=$1`, role.ID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_role_projects WHERE project_id=project_db_id($1) AND role_id=role_db_id($2)`, customProj1.ID, role.ID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_role_projects WHERE project_id=project_db_id($1) AND role_id=role_db_id($2)`, customProj2.ID, role.ID))
+
+			mig, err := getResetProjectsMigration()
+			assert.NoError(t, err)
+			_, err = db.ExecContext(ctx, mig)
+			assert.NoError(t, err)
+
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, customProj1.ID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, customProj2.ID))
+			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_roles WHERE id=$1`, role.ID))
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_role_projects WHERE project_id=project_db_id($1)`, role.ID))
+		}},
+	}
+
+	rand.Shuffle(len(cases), func(i, j int) {
+		cases[i], cases[j] = cases[j], cases[i]
+	})
+
+	for _, test := range cases {
+		t.Run(test.desc, test.f)
+		db.Flush(t)
+	}
+}
+
 func TestFetchAppliedRulesByProjectIDs(t *testing.T) {
 	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
@@ -7094,4 +7312,15 @@ func assertNoPolicyChange(t *testing.T, store storage.Storage, f func()) {
 	after, err := store.GetPolicyChangeID(context.Background())
 	require.NoError(t, err)
 	assert.Equal(t, before, after)
+}
+
+func getResetProjectsMigration() (string, error) {
+	file, err := os.Open("../../postgres/migration/sql/73_reset_projects.up.sql")
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	b, err := ioutil.ReadAll(file)
+	return string(b), err
 }
