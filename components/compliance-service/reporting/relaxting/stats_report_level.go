@@ -2,6 +2,7 @@ package relaxting
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/chef/automate/components/compliance-service/api/stats"
 	"github.com/chef/automate/components/compliance-service/reporting"
@@ -9,6 +10,7 @@ import (
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 func (depth *ReportDepth) getControlListStatsByProfileIdAggs(
@@ -283,6 +285,48 @@ func (depth *ReportDepth) getStatsSummaryAggs() map[string]elastic.Aggregation {
 	aggs["environment"] = environmentTerms
 	aggs["profiles"] = profilesNested
 	aggs["controls"] = controlsNested
+
+	filters := depth.filters
+
+	controlsQuery := &elastic.BoolQuery{}
+	// Going through all filters to find the ones prefixed with 'control_tag', e.g. 'control_tag:nist'
+	for filterType := range filters {
+		if strings.HasPrefix(filterType, "control_tag:") {
+			_, tagKey := leftSplit(filterType, ":")
+			termQuery := newNestedTermQueryFromControlTagsFilter(tagKey, filters[filterType])
+			controlsQuery = controlsQuery.Must(termQuery)
+		}
+	}
+
+	if len(filters["control"]) > 0 {
+		controlIdsQuery := newTermQueryFromFilter("profiles.controls.id", filters["control"])
+		controlsQuery = controlsQuery.Should(controlIdsQuery)
+		logrus.Infof("controls ids query %v", controlIdsQuery)
+	}
+
+	filteredControls := elastic.NewFilterAggregation().Filter(controlsQuery)
+	filteredControls.SubAggregation("control", controlsNested)
+	controlsAgg := elastic.NewNestedAggregation().Path("profiles.controls")
+	controlsAgg.SubAggregation("filtered_controls", filteredControls)
+
+	profilesQuery := &elastic.BoolQuery{}
+	if len(filters["profile_name"]) > 0 {
+		profileTitlesQuery := newTermQueryFromFilter("profiles.title.lower", filters["profile_name"])
+		profilesQuery = profilesQuery.Should(profileTitlesQuery)
+		logrus.Infof("profiles name query %v", profileTitlesQuery)
+	}
+
+	if len(filters["profile_id"]) > 0 {
+		profilesShaQuery := newTermQueryFromFilter("profiles.sha256", filters["profile_id"])
+		profilesQuery = profilesQuery.Should(profilesShaQuery)
+	}
+
+	filteredProfiles := elastic.NewFilterAggregation().Filter(profilesQuery)
+	filteredProfiles.SubAggregation("controls", controlsAgg)
+	outterMostProfilesAgg := elastic.NewNestedAggregation().Path("profiles")
+	outterMostProfilesAgg.SubAggregation("filtered_profiles", filteredProfiles)
+
+	aggs["profiles_controls"] = outterMostProfilesAgg
 
 	return aggs
 }

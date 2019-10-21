@@ -661,22 +661,22 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 	for filterType := range filters {
 		if strings.HasPrefix(filterType, "control_tag:") {
 			_, tagKey := leftSplit(filterType, ":")
-			termQuery := backend.newNestedTermQueryFromControlTagsFilter(tagKey, filters[filterType])
+			termQuery := newNestedTermQueryFromControlTagsFilter(tagKey, filters[filterType])
 			controlsQuery = controlsQuery.Must(termQuery)
 		}
 	}
 	if len(filters["control_status"]) > 0 {
-		controlStatusQuery := backend.newTermQueryFromFilter("profiles.controls.status", filters["control_status"])
+		controlStatusQuery := newTermQueryFromFilter("profiles.controls.status", filters["control_status"])
 		controlsQuery = controlsQuery.Must(controlStatusQuery)
 		logrus.Infof("controls status query %v", controlStatusQuery)
 	}
 	if len(filters["control_name"]) > 0 {
-		controlTitlesQuery := backend.newTermQueryFromFilter("profiles.controls.title.lower", filters["control_name"])
+		controlTitlesQuery := newTermQueryFromFilter("profiles.controls.title.lower", filters["control_name"])
 		controlsQuery = controlsQuery.Should(controlTitlesQuery)
 		logrus.Infof("controls name query %v", controlTitlesQuery)
 	}
 	if len(filters["control"]) > 0 {
-		controlIdsQuery := backend.newTermQueryFromFilter("profiles.controls.id", filters["control"])
+		controlIdsQuery := newTermQueryFromFilter("profiles.controls.id", filters["control"])
 		controlsQuery = controlsQuery.Should(controlIdsQuery)
 		logrus.Infof("controls ids query %v", controlIdsQuery)
 	}
@@ -688,13 +688,13 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 
 	profilesQuery := &elastic.BoolQuery{}
 	if len(filters["profile_name"]) > 0 {
-		profileTitlesQuery := backend.newTermQueryFromFilter("profiles.title.lower", filters["profile_name"])
+		profileTitlesQuery := newTermQueryFromFilter("profiles.title.lower", filters["profile_name"])
 		profilesQuery = profilesQuery.Should(profileTitlesQuery)
 		logrus.Infof("profiles name query %v", profileTitlesQuery)
 	}
 
 	if len(filters["profile_id"]) > 0 {
-		profilesShaQuery := backend.newTermQueryFromFilter("profiles.sha256", filters["profile_id"])
+		profilesShaQuery := newTermQueryFromFilter("profiles.sha256", filters["profile_id"])
 		profilesQuery = profilesQuery.Should(profilesShaQuery)
 	}
 
@@ -855,24 +855,24 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	for _, filterType := range filterTypes {
 		if len(filters[filterType]) > 0 {
 			ESFieldName := backend.getESFieldName(filterType)
-			termQuery := backend.newTermQueryFromFilter(ESFieldName, filters[filterType])
+			termQuery := newTermQueryFromFilter(ESFieldName, filters[filterType])
 			boolQuery = boolQuery.Must(termQuery)
 		}
 	}
 
 	if len(filters["control_name"]) > 0 {
-		termQuery := backend.newNestedTermQueryFromFilter("profiles.controls.title.lower", "profiles.controls",
+		termQuery := newNestedTermQueryFromFilter("profiles.controls.title.lower", "profiles.controls",
 			filters["control_name"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
 	if len(filters["profile_name"]) > 0 {
-		termQuery := backend.newNestedTermQueryFromFilter("profiles.title.lower", "profiles", filters["profile_name"])
+		termQuery := newNestedTermQueryFromFilter("profiles.title.lower", "profiles", filters["profile_name"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
 	if len(filters["profile_with_version"]) > 0 {
-		termQuery := backend.newNestedTermQueryFromFilter("profiles.full.lower", "profiles", filters["profile_with_version"])
+		termQuery := newNestedTermQueryFromFilter("profiles.full.lower", "profiles", filters["profile_with_version"])
 		boolQuery = boolQuery.Must(termQuery)
 	}
 
@@ -943,7 +943,7 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 	for filterType := range filters {
 		if strings.HasPrefix(filterType, "control_tag:") {
 			_, tagKey := leftSplit(filterType, ":")
-			termQuery := backend.newNestedTermQueryFromControlTagsFilter(tagKey, filters[filterType])
+			termQuery := newNestedTermQueryFromControlTagsFilter(tagKey, filters[filterType])
 			boolQuery = boolQuery.Must(termQuery)
 		}
 	}
@@ -983,7 +983,7 @@ func (backend ES2Backend) getESFieldName(filterType string) string {
 	return ESFieldName
 }
 
-func (backend ES2Backend) newTermQueryFromFilter(ESField string,
+func newTermQueryFromFilter(ESField string,
 	filters []string) *elastic.BoolQuery {
 	refinedValues := make([]string, 0, 0)
 	filterQuery := elastic.NewBoolQuery()
@@ -1003,7 +1003,7 @@ func (backend ES2Backend) newTermQueryFromFilter(ESField string,
 	return filterQuery
 }
 
-func (backend ES2Backend) newNestedTermQueryFromFilter(ESField string, ESFieldPath string,
+func newNestedTermQueryFromFilter(ESField string, ESFieldPath string,
 	filterValues []string) *elastic.BoolQuery {
 	refinedValues := make([]string, 0, 0)
 	filterQuery := elastic.NewBoolQuery()
@@ -1027,7 +1027,7 @@ func (backend ES2Backend) newNestedTermQueryFromFilter(ESField string, ESFieldPa
 }
 
 // Returns an ElasticSearch nested query to filter reports by control tags
-func (backend ES2Backend) newNestedTermQueryFromControlTagsFilter(tagKey string, tagValues []string) *elastic.NestedQuery {
+func newNestedTermQueryFromControlTagsFilter(tagKey string, tagValues []string) *elastic.NestedQuery {
 	refinedValues := make([]string, 0, 0)
 	ESFieldPath := "profiles.controls.string_tags"
 	ESFieldTagKey := "profiles.controls.string_tags.key.lower"
