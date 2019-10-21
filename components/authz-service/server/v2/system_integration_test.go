@@ -201,44 +201,6 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 	err = ts.PolicyRefresher.Refresh(ctx)
 	require.NoError(t, err)
 
-	// type testStruct struct {
-	// 	description string
-	// 	subject     string
-	// 	oldProjects []string
-	// 	newProjects []string
-	// 	isUpdate    bool
-	// 	expectError bool
-	// }
-	// func TestValidateProjectAssignmentAuthorizedOnUpdate(t *testing.T) {
-	// runCases(t, true, testCases)
-	// func TestValidateProjectAssignmentUnauthorizedOnCreate(t *testing.T) {
-	// runCases(t, false, testCases)
-
-
-	//fmt.Sprintf("when moving resource from %s to %s with permission on %s", unassignedProjectId, authorizedProjectId)
-	//fmt.Sprintf("when moving resource from %s to %s with permission on %s", old, new, allowed)
-	// runCases(t, isUpdate, testCases)
-	// on update w/ access to both
-	// on create w/ access to both
-	// on update with access to auth
-	// on create w/ access to auth
-	// on update w/ access to unass
-	// on create w/ access to unass
-
-	// unassigned -> authorized
-	// unassigned -> unauthorized
-	// unassigned -> authorized, unauthorized
-	// authorized -> unassigned
-	// authorized -> unauthorized
-	// authorized -> authorized, unauthorized
-	// unauthorized -> unassigned
-	// unauthorized -> unauthorized
-	// unauthorized -> authorized, unauthorized
-	// unauthorized, authorized -> unassigned
-	// unauthorized, authorized -> authorized, unauthorized
-	// unauthorized, authorized -> authorized, unauthorized
-
-	// cases2 := []testStruct{}
 	// if any projects are non-existed, NotFound is returned.
 	// avoids a potentially expensive authz call.
 	cases := map[string]func(*testing.T){
@@ -641,7 +603,6 @@ func TestIntegrationRuleApplyAndList(t *testing.T) {
 			/*
 				expectedRules1 := []*api_v2.ProjectRule{createResp1.Rule, createResp2.Rule}
 				expectedRules2 := []*api_v2.ProjectRule{createResp3.Rule}
-
 				resp, err := ts.Projects.ListRulesForAllProjects(ctx, &api_v2.ListRulesForAllProjectsReq{})
 				require.NoError(t, err)
 				actualPid1Rules, ok := resp.ProjectRules[pid1]
@@ -650,11 +611,9 @@ func TestIntegrationRuleApplyAndList(t *testing.T) {
 				require.True(t, ok)
 				rulesEqual(t, expectedRules1, actualPid1Rules.Rules)
 				rulesEqual(t, expectedRules2, actualPid2Rules.Rules)
-
 				// Update and delete rules
 				_, err = ts.Projects.DeleteRule(ctx, &api_v2.DeleteRuleReq{Id: id1, ProjectId: pid1})
 				require.NoError(t, err)
-
 				newConditions := []*api_v2.Condition{
 					{
 						Attribute: api_v2.ProjectRuleConditionAttributes_CHEF_TAG,
@@ -667,7 +626,6 @@ func TestIntegrationRuleApplyAndList(t *testing.T) {
 						Operator:  api_v2.ProjectRuleConditionOperators_EQUALS,
 					},
 				}
-
 				_, err = ts.Projects.UpdateRule(ctx, &api_v2.UpdateRuleReq{
 					Id:         createResp2.Rule.Id,
 					ProjectId:  createResp2.Rule.ProjectId,
@@ -676,11 +634,9 @@ func TestIntegrationRuleApplyAndList(t *testing.T) {
 					Conditions: newConditions,
 				})
 				require.NoError(t, err)
-
 				// Re-apply and check cache
 				_, err = ts.Projects.ApplyRulesStart(ctx, &api_v2.ApplyRulesStartReq{})
 				assert.NoError(t, err)
-
 				expectedAfterApplyRules1 := []*api_v2.ProjectRule{
 					&api_v2.ProjectRule{
 						Id:         createResp2.Rule.Id,
@@ -692,7 +648,6 @@ func TestIntegrationRuleApplyAndList(t *testing.T) {
 					},
 				}
 				expectedAfterApplyRules2 := []*api_v2.ProjectRule{createResp3.Rule}
-
 				resp2, err := ts.Projects.ListRulesForAllProjects(ctx, &api_v2.ListRulesForAllProjectsReq{})
 				require.NoError(t, err)
 				actualAfterApplyPid1Rules, ok := resp2.ProjectRules[pid1]
@@ -776,24 +731,3 @@ func setupWithOPAV2pX(t *testing.T, twoPointOne bool) *testhelpers.TestFramework
 	require.NoError(t, err)
 	return tf
 }
-
-// func buildCase(isUpdate bool, user string, expectError bool, old, new, allowed []string{}) testStruct {
-// desc := fmt.Sprintf("when moving resource from %s to %s with permission on %s", old, new, allowed)
-// c := testStruct{
-// 		description: desc,
-// 		subject: user,
-// 		oldProjects: old,
-// 		newProjects: new,
-// 		isUpdate: isUpdate,
-// 		expectError: expectError,
-// }
-// }
-// 	return TestStruct{
-// 		description: desc,
-// 		subject: user,
-// 		oldProjects: old,
-// 		newProjects: new,
-// 		isUpdate: isUpdate,
-// 		expectError: expectError,
-// 	}
-// }
