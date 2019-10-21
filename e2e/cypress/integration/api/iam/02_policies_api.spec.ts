@@ -203,13 +203,13 @@ describeIfIAMV2('policies API', () => {
         });
       });
 
-      it('non-admin with project1 assignment access can create a new policy ' +
-      'with no projects', () => {
+      it('non-admin with project1 assignment access but not (unassigned) access ' +
+        'cannot create a new policy with no projects', () => {
         cy.request({ ...defaultNonAdminReq,
             method: 'POST',
             body: policyWithProjects(policyID, [], statementProjects)
         }).then((response) => {
-            expect(response.body.policy.projects).to.have.length(0);
+            expect(response.status).to.equal(403);
         });
       });
 

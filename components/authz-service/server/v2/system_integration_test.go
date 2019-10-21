@@ -246,12 +246,12 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 			grpctest.AssertCode(t, codes.PermissionDenied, err)
 			assert.Contains(t, err.Error(), unassignedProjectId)
 		},
-		"when assigning (unassigned) is not allowed, from authorized project to unassigned": func(t *testing.T) {
+		"on create, when assigning (unassigned) is not allowed, from unassigned (new) to unassigned": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
 				Subjects:        []string{onlyAssignsAuthorizedProjUser},
-				OldProjects:     []string{authorizedProjectId},
+				OldProjects:     []string{},
 				NewProjects:     []string{},
-				IsUpdateRequest: true,
+				IsUpdateRequest: false,
 			})
 			require.Error(t, err)
 			grpctest.AssertCode(t, codes.PermissionDenied, err)
@@ -344,6 +344,51 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 				Subjects:        []string{onlyAssignsAuthorizedProjUser},
 				OldProjects:     []string{authorizedProjectId},
 				NewProjects:     []string{authorizedProjectId},
+				IsUpdateRequest: false,
+			})
+			assert.NoError(t, err)
+		},
+		"when assigning (unassigned) is not allowed, from authorized project to unassigned": func(t *testing.T) {
+			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
+				Subjects:        []string{onlyAssignsAuthorizedProjUser},
+				OldProjects:     []string{authorizedProjectId},
+				NewProjects:     []string{},
+				IsUpdateRequest: true,
+			})
+			assert.NoError(t, err)
+		},
+		"on update, when assigning (unassigned) is not allowed, from authorized project to unassigned": func(t *testing.T) {
+			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
+				Subjects:        []string{onlyAssignsAuthorizedProjUser},
+				OldProjects:     []string{authorizedProjectId},
+				NewProjects:     []string{},
+				IsUpdateRequest: true,
+			})
+			assert.NoError(t, err)
+		},
+		"on update, when assigning (unassigned) is not allowed, from unassigned to unassigned": func(t *testing.T) {
+			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
+				Subjects:        []string{onlyAssignsAuthorizedProjUser},
+				OldProjects:     []string{},
+				NewProjects:     []string{},
+				IsUpdateRequest: true,
+			})
+			assert.NoError(t, err)
+		},
+		"on update, when project assignment has not changed": func(t *testing.T) {
+			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
+				Subjects:        []string{onlyAssignsAuthorizedProjUser},
+				OldProjects:     []string{unauthorizedProjectId},
+				NewProjects:     []string{unauthorizedProjectId},
+				IsUpdateRequest: true,
+			})
+			assert.NoError(t, err)
+		},
+		"on create, when project assignment has not changed": func(t *testing.T) {
+			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
+				Subjects:        []string{onlyAssignsAuthorizedProjUser},
+				OldProjects:     []string{unauthorizedProjectId, authorizedProjectId},
+				NewProjects:     []string{unauthorizedProjectId, authorizedProjectId},
 				IsUpdateRequest: false,
 			})
 			assert.NoError(t, err)
