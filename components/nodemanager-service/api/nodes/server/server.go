@@ -266,6 +266,7 @@ func (srv *Server) Delete(ctx context.Context, in *nodes.Id) (*pb.Empty, error) 
 
 // List nodes based on a query
 func (srv *Server) List(ctx context.Context, in *nodes.Query) (*nodes.Nodes, error) {
+	logrus.Debugf("Getting Nodes with query: %+v", in)
 	filters, err := addProjectFilters(ctx, in.Filters)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
