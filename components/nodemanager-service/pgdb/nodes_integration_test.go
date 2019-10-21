@@ -261,26 +261,6 @@ func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByProjects() {
 	suite.Equal("Taco Node", fetchedNodes[0].Name)
 }
 
-func (suite *NodesIntegrationSuite) TestGetNodesCanFilterByNoProjects() {
-	node1Id, err := suite.Database.AddNode(&nodes.Node{Name: "Taco Node"})
-	suite.Require().NoError(err)
-
-	_, err = suite.Database.AddNode(&nodes.Node{Name: "Spaghetti Node", Projects: []string{"Best Pastas", "Favorite Food"}})
-	suite.Require().NoError(err)
-
-	filter := &common.Filter{
-		Key:    "project",
-		Values: []string{},
-	}
-	fetchedNodes, count, err := suite.Database.GetNodes("name", nodes.Query_ASC, 1, 100, []*common.Filter{filter})
-	suite.Require().NoError(err)
-	suite.Require().Equal(1, len(fetchedNodes))
-	suite.Equal(&pgdb.TotalCount{Total: 1, Unreachable: 0, Reachable: 0, Unknown: 2}, count)
-
-	suite.Equal(node1Id, fetchedNodes[0].Id)
-	suite.Equal("Taco Node", fetchedNodes[0].Name)
-}
-
 func (suite *NodesIntegrationSuite) TestDeleteNodesWithQuery() {
 	_, err := suite.Database.AddNode(&nodes.Node{Name: "Taco Node", Manager: "automate", Tags: []*common.Kv{}, TargetConfig: &nodes.TargetConfig{}})
 	suite.Require().NoError(err)

@@ -96,6 +96,10 @@ func buildWhereHavingFilter(mergeableFilters []*common.Filter, tableAbbrev strin
 			}
 		}
 
+		if newCondition == "" {
+			continue
+		}
+
 		if err != nil {
 			return "", "", errors.Wrap(err, "buildWhereHavingFilter error")
 		}
@@ -245,6 +249,10 @@ func whereNodeManagerNodeExists(field string, arr []string, tableAbbrev string) 
 
 func whereProjectsMatch(_ string, arr []string, tableAbbrev string) (string, error) {
 	var condition string
+
+	if len(arr) == 0 {
+		return "", nil
+	}
 
 	refinedValues := stringutils.SliceFilter(arr, func(projectId string) bool {
 		return projectId != authzConstants.UnassignedProjectID
