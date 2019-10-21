@@ -27,10 +27,10 @@ client_secret  = "{{cfg.conf.oauth.client_secret}}"
 
 [s3]
 backend = "minio"
-access_key = "83df85809becb3fda12dddb856be7ce75f93a2cc5cb402760aaad56ff4c3ac5e"
+key_id = "83df85809becb3fda12dddb856be7ce75f93a2cc5cb402760aaad56ff4c3ac5e"
 secret_key = "ac3fd3565d9326e7d4e2b98b5c7c957eef953b5eaf01f7370f4ba9f3ad3aa0f4"
-endpoint = "https://localhost:10143"
-bucket_name = "builder"
+endpoint = "https://172.17.0.3:10143"
+bucket_name = "backups"
 
 [ui]
 root = "{{svc_static_path}}"
