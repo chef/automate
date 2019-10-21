@@ -6,10 +6,8 @@ import { MockComponent } from 'ng2-mock-component';
 
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { runtimeChecks } from 'app/ngrx.reducers';
-import { PolicyAddMembersComponent } from './policy-add-members.component';
+import { PolicyAddMembersComponent, FieldName } from './policy-add-members.component';
 import { using } from 'app/testing/spec-helpers';
-
-type FieldName = 'type' | 'identity' | 'name';
 
 describe('PolicyAddMembersComponent', () => {
     let component: PolicyAddMembersComponent;

@@ -32,7 +32,7 @@ import {
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
 
-type FieldName = 'type' | 'identity' | 'name';
+export type FieldName = 'type' | 'identity' | 'name';
 
 @Component({
   selector: 'app-policy-add-members',
