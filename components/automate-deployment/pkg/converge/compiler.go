@@ -717,7 +717,7 @@ func (phase *SupervisorUpgradePhase) systemdRestartRequired(systemdReloaded bool
 	//
 	// TODO(ssd) 2019-04-21: Ideally we would check _all_ of the
 	// configuration (perhaps via a hash we inject in the env?).
-	launcherBin := os.Getenv("HAB_LAUNCH_BIN")
+	launcherBin := os.Getenv("HAB_LAUNCH_BINARY")
 	if launcherBin != "" {
 		launchP := phase.desiredSupState.LauncherPkg()
 		expectedPath := path.Join(habpkg.PathFor(&launchP), "bin/hab-launch")
