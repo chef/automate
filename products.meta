@@ -5,6 +5,7 @@
     "chef/automate-pg-gateway",
     "chef/automate-elasticsearch",
     "chef/automate-es-gateway",
+    "chef/automate-minio",
     "chef/automate-ui",
     "chef/pg-sidecar-service",
     "chef/cereal-service",
@@ -157,6 +158,7 @@
       "type": "product",
       "dependencies": ["core", "postgresql", "elasticsearch"],
       "services": [
+        "chef/automate-minio",
         "chef/automate-builder-memcached",
         "chef/automate-builder-api",
         "chef/automate-builder-api-proxy"

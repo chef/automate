@@ -20,6 +20,7 @@ pkg_binds=(
   [automate-pg-gateway]="port"
   [pg-sidecar-service]="port"
   [automate-builder-memcached]="port"
+  [automate-minio]="port"
 )
 
 pkg_exports=(

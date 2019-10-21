@@ -1,0 +1,4 @@
+{
+  "name": "chef/automate-minio",
+  "data_service": true
+}

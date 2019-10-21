@@ -43,6 +43,16 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
+      "name": "chef/automate-minio",
+      "metadata": {
+        "name": "chef/automate-minio",
+        "data_service": true,
+        "binlinks": null,
+        "uses_platform_scaffolding": false,
+        "bootstrap": null
+      }
+    },
+    {
       "name": "chef/automate-ui",
       "metadata": null
     },
@@ -527,6 +537,7 @@ var ProductMetadataJSON = `
       "aliases": null,
       "type": "product",
       "services": [
+        "chef/automate-minio",
         "chef/automate-builder-memcached",
         "chef/automate-builder-api",
         "chef/automate-builder-api-proxy"

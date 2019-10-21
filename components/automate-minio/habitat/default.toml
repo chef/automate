@@ -1,0 +1,14 @@
+[service]
+host = "localhost"
+port = 10106
+
+[tls]
+key_contents = ""
+cert_contents = ""
+root_cert_contents = ""
+
+[gateway]
+backend = "fs"
+
+[gateway.s3]
+

@@ -26,11 +26,11 @@ client_id      = "{{cfg.conf.oauth.client_id}}"
 client_secret  = "{{cfg.conf.oauth.client_secret}}"
 
 [s3]
+endpoint = "https://{{cfg.binds.minio.sys.ip}}:{{cfg.binds.minio.cfg.port}}"
 backend = "minio"
-key_id = "83df85809becb3fda12dddb856be7ce75f93a2cc5cb402760aaad56ff4c3ac5e"
-secret_key = "ac3fd3565d9326e7d4e2b98b5c7c957eef953b5eaf01f7370f4ba9f3ad3aa0f4"
-endpoint = "https://172.17.0.3:10143"
-bucket_name = "backups"
+key_id = "{{getSecret "minio.access_key"}}"
+secret_key = "{{getSecret "minio.secret_key"}}"
+bucket_name = "depot"
 
 [ui]
 root = "{{svc_static_path}}"
