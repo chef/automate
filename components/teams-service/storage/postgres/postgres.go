@@ -40,7 +40,11 @@ type querier interface {
 // New instantiates and returns a postgres storage implementation
 func New(logger logger.Logger, migrationConfig migration.Config,
 	dataMigrationConfig datamigration.Config, isAuthZV2 bool,
-	authzClient authz_v2.AuthorizationClient) (storage.Storage, error) {
+	authzClient authz_v2.AuthorizationClient,
+	authzV2ProjectsClient authz_v2.ProjectsClient) (storage.Storage, error) {
+
+	ctx, cancel := context.WithCancel(context.TODO())
+	defer cancel()
 
 	if err := migrationConfig.Migrate(); err != nil {
 		return nil, errors.Wrap(err, "database migrations")
@@ -55,6 +59,59 @@ func New(logger logger.Logger, migrationConfig migration.Config,
 	db, err := initPostgresDB(migrationConfig.PGURL.String())
 	if err != nil {
 		return nil, errors.Wrap(err, "initialize database")
+	}
+
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create db transaction for golang migrations")
+	}
+
+	var lastMig int
+	row := tx.QueryRowContext(ctx, "SELECT last_migration_ran FROM golang_migrations")
+	err = row.Scan(&lastMig)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to query current golang migration")
+	}
+
+	logger.Warnf("current mig: %d", lastMig)
+
+	// TOOD (tc): Update this to be a loop that only runs the
+	// needed migrations if we add more than one golang migration
+	switch lastMig {
+	case 0:
+		logger.Info("running golang migration 1")
+		resp, err := authzV2ProjectsClient.ListProjects(ctx, &authz_v2.ListProjectsReq{})
+		if err != nil {
+			return nil, errors.Wrap(err, "golang migration 1: failed to query projects")
+		}
+
+		projectIDs := make([]string, len(resp.Projects))
+		for i, project := range resp.Projects {
+			projectIDs[i] = project.Id
+		}
+
+		// set each team's project to be the intersection of its current projects
+		// and projects that exist
+		_, err = tx.ExecContext(ctx, `UPDATE teams SET projects=(SELECT
+			array(SELECT unnest(projects::TEXT[]) intersect
+				  SELECT unnest($1::TEXT[]))
+			)`,
+			pq.Array(projectIDs))
+		if err != nil {
+			return nil, errors.Wrap(err, "golang migration 1: failed to update projects")
+		}
+
+		_, err = tx.ExecContext(ctx, "UPDATE golang_migrations SET last_migration_ran=1")
+		if err != nil {
+			return nil, errors.Wrap(err, "golang migration 1: failed to update last_migration_ran")
+		}
+	default:
+		logger.Infof("golang migrations up to date: %d", lastMig)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to commit golang migrations")
 	}
 
 	return &postgres{db, logger, dataMigrationConfig, authzClient}, nil

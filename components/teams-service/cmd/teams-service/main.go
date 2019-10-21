@@ -134,6 +134,7 @@ Please pass a config file as the only argument to this command.`))
 	authzClient := authz.NewSubjectPurgeClient(authzConn)
 	authzV2PoliciesClient := authz_v2.NewPoliciesClient(authzConn)
 	authzV2AuthorizationClient := authz_v2.NewAuthorizationClient(authzConn)
+	authzV2ProjectsClient := authz_v2.NewProjectsClient(authzConn)
 
 	mustBeADirectory(cfg.MigrationsPath)
 	mustBeADirectory(cfg.DataMigrationsPath)
@@ -158,7 +159,7 @@ Please pass a config file as the only argument to this command.`))
 
 	service, err := service.NewPostgresService(l, connFactory,
 		migrationConfig, dataMigrationConfig,
-		authzClient, authzV2PoliciesClient, authzV2AuthorizationClient)
+		authzClient, authzV2PoliciesClient, authzV2AuthorizationClient, authzV2ProjectsClient)
 	if err != nil {
 		fail(errors.Wrap(err, "could not initialize storage"))
 	}
