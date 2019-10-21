@@ -23,7 +23,7 @@ func TestCalculateProjectsToAuthorizeForUpdate(t *testing.T) {
 			assert.ElementsMatch(t, []string{}, calculateProjectsToAuthorize([]string{"a", "b"}, []string{"a", "b"}, isUpdate))
 		}},
 		{"there are only old projects", func(t *testing.T) {
-			assert.ElementsMatch(t, []string{"a", "b", UnassignedProjectID}, calculateProjectsToAuthorize([]string{"a", "b"}, []string{}, isUpdate))
+			assert.ElementsMatch(t, []string{"a", "b"}, calculateProjectsToAuthorize([]string{"a", "b"}, []string{}, isUpdate))
 		}},
 		{"one project is removed", func(t *testing.T) {
 			assert.ElementsMatch(t, []string{"a"}, calculateProjectsToAuthorize([]string{"a", "b"}, []string{"b"}, isUpdate))
