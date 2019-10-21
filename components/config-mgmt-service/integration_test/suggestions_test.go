@@ -88,6 +88,21 @@ func TestSuggestionsLargeArrayValues(t *testing.T) {
 			expected: []string{"zum.epel-debuginfo.gpgcheck"},
 		},
 		{
+			description: "case sensitive Organization",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						OrganizationName: "ZZZ.ZZZ-ZZzzzZZZ",
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "organization",
+				Text: "zzz.zzz-zzzzzzzz",
+			},
+			expected: []string{"ZZZ.ZZZ-ZZzzzZZZ"},
+		},
+		{
 			description: "case sensitive 1",
 			nodes: []iBackend.Node{
 				{
@@ -100,7 +115,7 @@ func TestSuggestionsLargeArrayValues(t *testing.T) {
 				Type: "cookbook",
 				Text: "zzz.zzz-zzzzzzzz",
 			},
-			expected: []string{"zzz.zzz-zzzzzzzz"},
+			expected: []string{"ZZZ.ZZZ-ZZzzzZZZ"},
 		},
 		{
 			description: "case sensitive 2",
@@ -115,7 +130,7 @@ func TestSuggestionsLargeArrayValues(t *testing.T) {
 				Type: "cookbook",
 				Text: "ZZZ.ZZZ-ZZzzzZZZ",
 			},
-			expected: []string{"zzz.zzz-zzzzzzzz"},
+			expected: []string{"ZZZ.ZZZ-ZZzzzZZZ"},
 		},
 		{
 			description: "case sensitive 3",
@@ -131,6 +146,171 @@ func TestSuggestionsLargeArrayValues(t *testing.T) {
 				Text: "ZZZ.ZZZ-ZZzzzZZZ",
 			},
 			expected: []string{"zzz.zzz-zzzzzzzz"},
+		},
+		{
+			description: "with regex chars $",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz.$zz-zzzzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz.$zz-zzzzzzzz",
+			},
+			expected: []string{"zzz.$zz-zzzzzzzz"},
+		},
+		{
+			description: "with regex chars *",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz*zz-zzzzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz*zz-zzzzzzzz",
+			},
+			expected: []string{"zzz*zz-zzzzzzzz"},
+		},
+		{
+			description: "with regex chars +",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz+zz-zzzzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz+zz-zzzzzzzz",
+			},
+			expected: []string{"zzz+zz-zzzzzzzz"},
+		},
+		{
+			description: "with regex chars ^",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz^zz-zzzzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz^zz-zzzzzzzz",
+			},
+			expected: []string{"zzz^zz-zzzzzzzz"},
+		},
+		{
+			description: "with chars @",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz@zz-zzzzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz@zz-zzzzzzzz",
+			},
+			expected: []string{"zzz@zz-zzzzzzzz"},
+		},
+		{
+			description: "with chars #",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz#zz-zZZzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz#zz-zzzzzzzz",
+			},
+			expected: []string{"zzz#zz-zZZzzzzz"},
+		},
+		{
+			description: "with chars &",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz&zz-zZZzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz&zz-zzzzzzzz",
+			},
+			expected: []string{"zzz&zz-zZZzzzzz"},
+		},
+		{
+			description: "with chars !",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz!zz-zZZzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz!zz-zzzzzzzz",
+			},
+			expected: []string{"zzz!zz-zZZzzzzz"},
+		},
+		{
+			description: "with chars ~",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz~zz-zZZzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz~zz-zzzzzzzz",
+			},
+			expected: []string{"zzz~zz-zZZzzzzz"},
+		},
+		{
+			description: "with chars :",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz:zz-zZZzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz:zz-zzzzzzzz",
+			},
+			expected: []string{"zzz:zz-zZZzzzzz"},
+		},
+		{
+			description: "with chars =",
+			nodes: []iBackend.Node{
+				{
+					NodeInfo: iBackend.NodeInfo{
+						Cookbooks: append(terms, "zzz=zz-zZZzzzzz"),
+					},
+				},
+			},
+			request: request.Suggestion{
+				Type: "cookbook",
+				Text: "zzz=zz-zzzzzzzz",
+			},
+			expected: []string{"zzz=zz-zZZzzzzz"},
 		},
 	}
 
@@ -930,7 +1110,7 @@ func TestSuggestionsWithTableDriven(t *testing.T) {
 			request.Suggestion{Type: "platform", Text: "lol"},
 			[]string{}},
 		{"should return results when starting typing 'new-york'",
-			request.Suggestion{Type: "environment", Text: "n"}, // less than 2 characters we return all results?
+			request.Suggestion{Type: "environment", Text: "n"}, // less than 2 characters we return all results
 			[]string{"dev", "prod", "games", "new-york", ""}},
 		{"should return one environment suggestion 'new-york'",
 			request.Suggestion{Type: "environment", Text: "ne"},
@@ -947,7 +1127,7 @@ func TestSuggestionsWithTableDriven(t *testing.T) {
 			request.Suggestion{Type: "platform", Text: "lol"},
 			[]string{}},
 		{"should return results when starting typing 'oracle'",
-			request.Suggestion{Type: "platform", Text: "o"}, // less than 2 characters we return all results?
+			request.Suggestion{Type: "platform", Text: "o"}, // less than 2 characters we return all results
 			[]string{"centos", "redhat", "ubuntu", "oracle", "windows", "solaris"}},
 		{"should return one platform suggestion 'oracle'",
 			request.Suggestion{Type: "platform", Text: "or"},
@@ -959,13 +1139,13 @@ func TestSuggestionsWithTableDriven(t *testing.T) {
 		// Suggestions for Policy Group
 		{"should return all policy_group suggestions",
 			request.Suggestion{Type: "policy_group"},
-			[]string{"sports", "tv_series", "rpgs", "heros", "movies", "nintendo", ""}},
+			[]string{"sports", "tv_series", "RPGs", "heros", "movies", "nintendo", ""}},
 		{"should return zero policy_group suggestions",
 			request.Suggestion{Type: "policy_group", Text: "lol"},
 			[]string{}},
 		{"should return results when starting typing 'nintendo'",
-			request.Suggestion{Type: "policy_group", Text: "n"}, // less than 2 characters we return all results?
-			[]string{"sports", "tv_series", "rpgs", "heros", "movies", "nintendo", ""}},
+			request.Suggestion{Type: "policy_group", Text: "n"}, // less than 2 characters we return all results
+			[]string{"sports", "tv_series", "RPGs", "heros", "movies", "nintendo", ""}},
 		{"should return one policy_group suggestion 'nintendo'",
 			request.Suggestion{Type: "policy_group", Text: "ni"},
 			[]string{"nintendo"}},
@@ -981,7 +1161,7 @@ func TestSuggestionsWithTableDriven(t *testing.T) {
 			request.Suggestion{Type: "policy_name", Text: "lol"},
 			[]string{}},
 		{"should return results when starting typing 'games'",
-			request.Suggestion{Type: "policy_name", Text: "g"}, // less than 2 characters we return all results?
+			request.Suggestion{Type: "policy_name", Text: "g"}, // less than 2 characters we return all results
 			[]string{"time_to_be_funny", "games", "boardgames", "comics", "videogames", ""}},
 		{"should return one policy_name suggestion 'games'",
 			request.Suggestion{Type: "policy_name", Text: "ga"},
@@ -998,7 +1178,7 @@ func TestSuggestionsWithTableDriven(t *testing.T) {
 			request.Suggestion{Type: "policy_revision", Text: "lol"},
 			[]string{}},
 		{"should return results when starting typing 'friends'",
-			request.Suggestion{Type: "policy_revision", Text: "f"}, // less than 2 characters we return all results?
+			request.Suggestion{Type: "policy_revision", Text: "f"}, // less than 2 characters we return all results
 			[]string{"extream", "friends", "fantasy", "marvel", "old_school", "zelda", ""}},
 		{"should return one policy_revision suggestion 'friends'",
 			request.Suggestion{Type: "policy_revision", Text: "fr"},
@@ -1017,8 +1197,10 @@ func TestSuggestionsWithTableDriven(t *testing.T) {
 			request.Suggestion{Type: "recipe", Text: "lol"},
 			[]string{}},
 		{"should return results when starting typing 'season2'",
-			request.Suggestion{Type: "recipe", Text: "s"}, // only return the words that has 's'
-			[]string{"season1", "season2", "season3", "soccer", "dr_strange", "spiderman", "students"}},
+			request.Suggestion{Type: "recipe", Text: "s"}, // less than 2 characters we return all results
+			[]string{"season1", "season2", "season3", "soccer", "you_get_it", "ant-man", "barbarian",
+				"bard", "dr_strange", "elf", "epona", "ganon", "human", "ironman", "link", "spiderman",
+				"students", "thor", "zelda"}},
 		{"should return one recipe suggestion 'season2'",
 			request.Suggestion{Type: "recipe", Text: "se"},
 			[]string{"season1", "season3", "season2"}},
@@ -1039,8 +1221,10 @@ func TestSuggestionsWithTableDriven(t *testing.T) {
 			request.Suggestion{Type: "cookbook", Text: "lol"},
 			[]string{}},
 		{"should return results when starting typing 'breakfast_club'",
-			request.Suggestion{Type: "cookbook", Text: "b"}, // only return the words that has 'b'
-			[]string{"phoebe", "breakfast_club", "breath_of_the_wild"}},
+			request.Suggestion{Type: "cookbook", Text: "b"}, // less than 2 characters we return all results
+			[]string{"chandler", "joey", "monica", "phoebe", "ping_pong", "rachel", "angels", "avengers",
+				"breakfast_club", "breath_of_the_wild", "dungeons_n_dragons", "guardians_of_the_galaxy",
+				"justice_league", "ocarina_of_time", "starfinder", "startwars", "twilight"}},
 		{"should return one cookbook suggestion 'breakfast_club'",
 			request.Suggestion{Type: "cookbook", Text: "br"},
 			[]string{"breakfast_club", "breath_of_the_wild"}},
@@ -1060,8 +1244,9 @@ func TestSuggestionsWithTableDriven(t *testing.T) {
 			request.Suggestion{Type: "resource_name", Text: "lol"},
 			[]string{}},
 		{"should return results when starting typing 'super_powers' or 'smart'",
-			request.Suggestion{Type: "resource_name", Text: "s"}, // only return the words that has 's'
-			[]string{"hilarious", "honest", "smart", "smile", "shield", "super_powers", "sword"}},
+			request.Suggestion{Type: "resource_name", Text: "s"}, // less than 2 characters we return all results
+			[]string{"attack", "hilarious", "honest", "joke", "smart", "smile", "bow", "shield",
+				"super_powers", "sword", "triforce", "wand"}},
 		{"should return one resource_name suggestion 'super_powers'",
 			request.Suggestion{Type: "resource_name", Text: "su"},
 			[]string{"super_powers"}},
@@ -1086,9 +1271,11 @@ func TestSuggestionsWithTableDriven(t *testing.T) {
 			request.Suggestion{Type: "attribute", Text: "lol"},
 			[]string{}},
 		{"should return results when starting typing 'dexterity'",
-			request.Suggestion{Type: "attribute", Text: "d"}, // only return the words that has 'd'
-			[]string{"friendship", "i_ran_out_of_ideas", "detention", "dexterity", "disparate",
-				"god", "saturday", "shield", "sword"}},
+			request.Suggestion{Type: "attribute", Text: "d"}, // less than 2 characters we return all results
+			[]string{"friendship", "funny", "i_ran_out_of_ideas", "please_forgive_my_typos", "sarcasm",
+				"bow", "can_fly", "charisma", "complex_attr_lala", "constitution", "detention", "dexterity",
+				"disparate", "finally_can_jump", "god", "horse", "immortal", "intelligence", "magic",
+				"saturday", "school", "shield", "strength", "sword"}},
 		{"should return one attribute suggestion 'dexterity'",
 			request.Suggestion{Type: "attribute", Text: "de"},
 			[]string{"dexterity", "detention"}},
@@ -1105,8 +1292,9 @@ func TestSuggestionsWithTableDriven(t *testing.T) {
 			request.Suggestion{Type: "role", Text: "lol"},
 			[]string{}},
 		{"should return results when starting typing 'necromancer'",
-			request.Suggestion{Type: "role", Text: "n"}, // only return the words that has 'd'
-			[]string{"defence", "villains", "allison", "andrew", "brian", "john", "necromancer"}},
+			request.Suggestion{Type: "role", Text: "n"}, // less than 2 characters we return all results
+			[]string{"defence", "heros", "villains", "allison", "andrew", "brian", "claire", "fighter",
+				"john", "necromancer", "wizard"}},
 		{"should return one role suggestion 'necromancer'",
 			request.Suggestion{Type: "role", Text: "ne"},
 			[]string{"necromancer"}},

@@ -16,6 +16,7 @@ import (
 	"github.com/chef/automate/components/config-mgmt-service/backend"
 	"github.com/chef/automate/components/config-mgmt-service/params"
 	"github.com/chef/automate/lib/io/chunks"
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/gocarina/gocsv"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -100,7 +101,8 @@ func (s *CfgMgmtServer) exportNodes(ctx context.Context, request *pRequest.NodeE
 	var cursorField interface{}
 	cursorID := ""
 	sortField, sortAsc := request.Sorting.GetParameters()
-	nodeFilters, err := params.FormatNodeFilters(request.Filter)
+	nodeFilters, err := stringutils.FormatFiltersWithKeyConverter(request.Filter,
+		params.ConvertParamToNodeStateBackendLowerFilter)
 	if err != nil {
 		return status.Errorf(codes.InvalidArgument, err.Error())
 	}

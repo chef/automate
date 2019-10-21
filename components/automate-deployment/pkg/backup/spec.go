@@ -328,7 +328,7 @@ func DefaultSpecs(serviceNames []string) []Spec {
 			SyncEsIndices: []ElasticsearchOperation{
 				{
 					ServiceName:    "ingest-service",
-					MultiIndexSpec: "node-state-6,node-attribute,converge-history-*,actions-*",
+					MultiIndexSpec: "node-state-7,node-attribute,converge-history-*,actions-*",
 				},
 			},
 		},

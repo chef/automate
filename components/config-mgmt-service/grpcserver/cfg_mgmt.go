@@ -16,6 +16,7 @@ import (
 	"github.com/chef/automate/components/config-mgmt-service/config"
 	"github.com/chef/automate/components/config-mgmt-service/errors"
 	"github.com/chef/automate/components/config-mgmt-service/params"
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/chef/automate/lib/version"
 )
 
@@ -98,7 +99,8 @@ func (s *CfgMgmtServer) GetNodesCounts(ctx context.Context,
 	request *request.NodesCounts) (*response.NodesCounts, error) {
 	var nodesCounts *response.NodesCounts
 
-	filters, err := params.FormatNodeFilters(request.Filter)
+	filters, err := stringutils.FormatFiltersWithKeyConverter(request.Filter,
+		params.ConvertParamToNodeStateBackendLowerFilter)
 	if err != nil {
 		return nodesCounts, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
@@ -130,7 +132,8 @@ func (s *CfgMgmtServer) GetRunsCounts(ctx context.Context,
 		return nil, status.Errorf(codes.InvalidArgument, "Parameter 'node_id' not provided")
 	}
 
-	filters, err := params.FormatNodeFilters(request.Filter)
+	filters, err := stringutils.FormatFiltersWithKeyConverter(request.Filter,
+		params.ConvertParamToNodeRunBackend)
 	if err != nil {
 		return runsCounts, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
@@ -238,8 +241,8 @@ func (s *CfgMgmtServer) GetSuggestions(ctx context.Context,
 	}
 
 	adjustedFilter := removeSuggestionTypeFromFilter(request.Filter, typeParam)
-
-	filters, err := params.FormatNodeFilters(adjustedFilter)
+	filters, err := stringutils.FormatFiltersWithKeyConverter(adjustedFilter,
+		params.ConvertParamToNodeStateBackendLowerFilter)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}

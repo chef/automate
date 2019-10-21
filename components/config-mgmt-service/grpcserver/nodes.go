@@ -19,6 +19,7 @@ import (
 	"github.com/chef/automate/components/config-mgmt-service/backend"
 	"github.com/chef/automate/components/config-mgmt-service/errors"
 	"github.com/chef/automate/components/config-mgmt-service/params"
+	"github.com/chef/automate/lib/stringutils"
 )
 
 func (s *CfgMgmtServer) GetRuns(
@@ -35,7 +36,8 @@ func (s *CfgMgmtServer) GetRuns(
 		return runs, status.Errorf(codes.InvalidArgument, "Parameter 'node_id' not provided")
 	}
 
-	filters, err := params.FormatNodeFilters(request.Filter)
+	filters, err := stringutils.FormatFiltersWithKeyConverter(request.Filter,
+		params.ConvertParamToNodeRunBackend)
 	if err != nil {
 		return runs, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -100,7 +102,8 @@ func (s *CfgMgmtServer) GetInventoryNodes(ctx context.Context,
 		pageSize = 100
 	}
 
-	filters, err := params.FormatNodeFilters(request.Filter)
+	filters, err := stringutils.FormatFiltersWithKeyConverter(request.Filter,
+		params.ConvertParamToNodeStateBackendLowerFilter)
 	if err != nil {
 		return &interserviceResp.InventoryNodes{}, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -146,7 +149,8 @@ func (s *CfgMgmtServer) GetNodes(
 		"func":    nameOfFunc(),
 	}).Debug("rpc call")
 
-	filters, err := params.FormatNodeFilters(request.Filter)
+	filters, err := stringutils.FormatFiltersWithKeyConverter(request.Filter,
+		params.ConvertParamToNodeStateBackendLowerFilter)
 	if err != nil {
 		return nodes, status.Errorf(codes.InvalidArgument, err.Error())
 	}

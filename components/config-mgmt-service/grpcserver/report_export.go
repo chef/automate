@@ -16,6 +16,7 @@ import (
 	"github.com/chef/automate/components/config-mgmt-service/backend"
 	"github.com/chef/automate/components/config-mgmt-service/params"
 	"github.com/chef/automate/lib/io/chunks"
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/gocarina/gocsv"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -108,7 +109,8 @@ func (s *CfgMgmtServer) exportReports(ctx context.Context, request *pRequest.Rep
 	var cursorEndTime time.Time
 	cursorID := ""
 	sortAsc := false
-	runFilters, err := params.FormatNodeFilters(request.Filter)
+	runFilters, err := stringutils.FormatFiltersWithKeyConverter(request.Filter,
+		params.ConvertParamToNodeRunBackend)
 	if err != nil {
 		return status.Errorf(codes.InvalidArgument, err.Error())
 	}

@@ -2725,7 +2725,7 @@
 
       ],
       "cookbooks": {
-        "apt": {
+        "APT": {
           "version": "2.9.2"
         },
         "aws": {
