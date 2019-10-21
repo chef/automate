@@ -32,9 +32,9 @@ api_url                   = "https://api.github.com"
 
 [oauth]
 provider       = "chef-automate"
-redirect_url   = "https://a2-dev.test/bldr"
+redirect_url   = "/bldr"
 client_id      = "automate-builder-api"
-authorize_url  = "https://a2-dev.test/session/new"
+authorize_url  = "/session/new"
 
 [nginx]
 worker_connections        = 8000

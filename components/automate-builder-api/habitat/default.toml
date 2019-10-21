@@ -3,25 +3,10 @@ log_level = "debug,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
 listen = "0.0.0.0"
 port   = 10103
 
-[oauth]
-provider       = "chef-automate"
-token_url      = "https://a2-dev.test/session/token"
-userinfo_url   = "https://a2-dev.test/session/userinfo"
-redirect_url   = "https://a2-dev.test/bldr"
-client_id      = "client_id"
-client_secret  = "client_secret"
-
 [github]
 api_url        = "https://api.github.com"
 app_id         = 5565
 webhook_secret = ""
-
-[s3]
-backend = "minio"
-key_id = "depot"
-secret_key = "password"
-endpoint = "http://localhost:9000"
-bucket_name = "habitat-builder-artifact-store.default"
 
 [artifactory]
 api_url = "http://localhost:8080"

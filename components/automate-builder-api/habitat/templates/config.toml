@@ -21,7 +21,7 @@ port = {{cfg.conf.service.port}}
 provider       = "chef-automate"
 token_url      = "https://{{cfg.binds.session.sys.ip}}:{{cfg.binds.session.cfg.port}}/token"
 userinfo_url   = "https://{{cfg.binds.session.sys.ip}}:{{cfg.binds.session.cfg.port}}/userinfo"
-redirect_url   = "https://a2-dev.test/bldr"
+redirect_url   = "/bldr"
 client_id      = "automate-builder-api"
 client_secret  = "{{getSecret "bldr.auth_client_secret"}}"
 

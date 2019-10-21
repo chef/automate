@@ -10,7 +10,7 @@ signin-url: {{ cfg.conf.service.signin_url }}
 {{- if cfg.conf.service.bldr_signin_url }}
 bldr-signin-url: {{ cfg.conf.service.bldr_signin_url }}
 {{- else }}
-bldr-signin-url: https://{{cfg.conf.service.external_fqdn}}/bldr
+bldr-signin-url: /bldr
 {{- end }}
 {{- if cfg.conf.service.bldr_client_id }}
 bldr-client-id: {{ cfg.conf.service.bldr_client_id }}
